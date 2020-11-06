@@ -1,6 +1,4 @@
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * Unpack RGBA depth shader
  * - show RGBA encoded depth as monochrome color
  */

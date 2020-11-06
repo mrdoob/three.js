@@ -5,19 +5,13 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			#vt { display:none }
-			#vt, #vt a { color:orange; }
-		</style>
 	</head>
 
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - (<span id="description">normal + ao + displacement + environment</span>) map demo.<br />
-			ninja head from <a href="http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
-
-			<div id="vt">displacement mapping requires vertex textures</div>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - (normal + ao + displacement + environment) map demo.<br />
+			ninja head from <a href="https://gpuopen.com/archive/gamescgi/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
 		</div>
 
 		<script type="module">
@@ -29,10 +23,10 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-			var stats;
+			let stats;
 
-			var camera, scene, renderer, controls;
-			var settings = {
+			let camera, scene, renderer, controls;
+			const settings = {
 				metalness: 1.0,
 				roughness: 0.4,
 				ambientIntensity: 0.2,
@@ -42,13 +36,13 @@
 				normalScale: 1.0
 			};
 
-			var mesh, material;
+			let mesh, material;
 
-			var pointLight, ambientLight;
+			let pointLight, ambientLight;
 
-			var height = 500; // of camera frustum
+			const height = 500; // of camera frustum
 
-			var r = 0.0;
+			let r = 0.0;
 
 			init();
 			animate();
@@ -57,8 +51,8 @@
 			// Init gui
 			function initGui() {
 
-				var gui = new GUI();
-				//var gui = gui.addFolder( "Material" );
+				const gui = new GUI();
+				//let gui = gui.addFolder( "Material" );
 				gui.add( settings, "metalness" ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					material.metalness = value;
@@ -105,22 +99,20 @@
 
 			function init() {
 
-				var container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
 				scene = new THREE.Scene();
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 				camera = new THREE.OrthographicCamera( - height * aspect, height * aspect, height, - height, 1, 10000 );
 				camera.position.z = 1500;
 				scene.add( camera );
@@ -138,32 +130,33 @@
 				pointLight.position.z = 2500;
 				scene.add( pointLight );
 
-				var pointLight2 = new THREE.PointLight( 0xff6666, 1 );
+				const pointLight2 = new THREE.PointLight( 0xff6666, 1 );
 				camera.add( pointLight2 );
 
-				var pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
+				const pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
 				pointLight3.position.x = - 1000;
 				pointLight3.position.z = 1000;
 				scene.add( pointLight3 );
 
 				// env map
 
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
+				const path = "textures/cube/SwedishRoyalCastle/";
+				const format = '.jpg';
+				const urls = [
 					path + 'px' + format, path + 'nx' + format,
 					path + 'py' + format, path + 'ny' + format,
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				const reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				reflectionCube.encoding = THREE.sRGBEncoding;
 
 				// textures
 
-				var textureLoader = new THREE.TextureLoader();
-				var normalMap = textureLoader.load( "models/obj/ninja/normal.jpg" );
-				var aoMap = textureLoader.load( "models/obj/ninja/ao.jpg" );
-				var displacementMap = textureLoader.load( "models/obj/ninja/displacement.jpg" );
+				const textureLoader = new THREE.TextureLoader();
+				const normalMap = textureLoader.load( "models/obj/ninja/normal.png" );
+				const aoMap = textureLoader.load( "models/obj/ninja/ao.jpg" );
+				const displacementMap = textureLoader.load( "models/obj/ninja/displacement.jpg" );
 
 				// material
 
@@ -192,10 +185,10 @@
 
 				//
 
-				var loader = new OBJLoader();
+				const loader = new OBJLoader();
 				loader.load( "models/obj/ninja/ninjaHead_Low.obj", function ( group ) {
 
-					var geometry = group.children[ 0 ].geometry;
+					const geometry = group.children[ 0 ].geometry;
 					geometry.attributes.uv2 = geometry.attributes.uv;
 					geometry.center();
 
@@ -204,12 +197,6 @@
 					scene.add( mesh );
 
 				} );
-
-				//
-
-				var description = "normal + ao" + ( renderer.capabilities.vertexTextures ? " + displacement + environment" : " + <strike>displacement</strike>" );
-				document.getElementById( "description" ).innerHTML = description;
-				document.getElementById( "vt" ).style.display = renderer.capabilities.vertexTextures ? "none" : "block";
 
 				//
 
@@ -224,7 +211,7 @@
 
 			function onWindowResize() {
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 
 				camera.left = - height * aspect;
 				camera.right = height * aspect;
@@ -242,6 +229,8 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				controls.update();
 
 				stats.begin();
 				render();

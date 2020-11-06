@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -41,7 +40,7 @@
 		在平面上应用矩阵。矩阵必须是仿射齐次变换。<br />
 		如果提供一个optionalNormalMatrix，可以这样创建:
 		<code>
-		var optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+		const optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 		</code>
 		</p>
 
@@ -123,7 +122,7 @@
 			[page:Vector3 normal] - 单位长度的向量表示平面的法向量。<br />
 			[page:Float constant] - 原点到平面有符号距离。默认值为 *0*。<br /><br />
 
-			设置平面 [page:.normal normal] 的法线和常量 [page:.constant constant] 属性值。
+			设置平面 [page:.normal normal] 的法线和常量 [page:.constant constant] 属性值 by copying the values from the given normal。
 		</p>
 
 		<h3>[method:Plane setComponents]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>

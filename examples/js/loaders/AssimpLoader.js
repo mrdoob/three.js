@@ -1,7 +1,3 @@
-/**
- * @author Virtulous / https://virtulo.us/
- */
-
 THREE.AssimpLoader = function ( manager ) {
 
 	THREE.Loader.call( this, manager );
@@ -18,13 +14,33 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 		var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
-		var loader = new THREE.FileLoader( this.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 
 		loader.load( url, function ( buffer ) {
 
-			onLoad( scope.parse( buffer, path ) );
+			try {
+
+				onLoad( scope.parse( buffer, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -51,6 +67,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				return n;
 
 			};
+
 			this.lerp = function ( nextKey, time ) {
 
 				time -= this.time;
@@ -94,6 +111,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				this.keys.push( key );
 
 			};
+
 			this.init = function () {
 
 				this.sortKeys();
@@ -137,6 +155,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 					this.addKey( new Virtulous.KeyFrame( i / fps || track[ i ].time, track[ i ].targets[ 0 ].data ) );
 
 				}
+
 				this.init();
 
 			};
@@ -498,6 +517,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			}
 
 		}
+
 		function cloneTreeToBones( root, scene ) {
 
 			var rootBone = new THREE.Bone();
@@ -655,6 +675,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 					}
 
 				}
+
 				var skeleton = new THREE.Skeleton( allBones, offsetMatrix );
 
 				this.threeNode.bind( skeleton, new THREE.Matrix4() );
@@ -672,19 +693,19 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				else
 					mat = new THREE.MeshLambertMaterial();
 				geometry.setIndex( new THREE.BufferAttribute( new Uint32Array( this.mIndexArray ), 1 ) );
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( this.mVertexBuffer, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( this.mVertexBuffer, 3 ) );
 				if ( this.mNormalBuffer && this.mNormalBuffer.length > 0 )
-					geometry.addAttribute( 'normal', new THREE.BufferAttribute( this.mNormalBuffer, 3 ) );
+					geometry.setAttribute( 'normal', new THREE.BufferAttribute( this.mNormalBuffer, 3 ) );
 				if ( this.mColorBuffer && this.mColorBuffer.length > 0 )
-					geometry.addAttribute( 'color', new THREE.BufferAttribute( this.mColorBuffer, 4 ) );
+					geometry.setAttribute( 'color', new THREE.BufferAttribute( this.mColorBuffer, 4 ) );
 				if ( this.mTexCoordsBuffers[ 0 ] && this.mTexCoordsBuffers[ 0 ].length > 0 )
-					geometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 0 ] ), 2 ) );
+					geometry.setAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 0 ] ), 2 ) );
 				if ( this.mTexCoordsBuffers[ 1 ] && this.mTexCoordsBuffers[ 1 ].length > 0 )
-					geometry.addAttribute( 'uv1', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 1 ] ), 2 ) );
+					geometry.setAttribute( 'uv1', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 1 ] ), 2 ) );
 				if ( this.mTangentBuffer && this.mTangentBuffer.length > 0 )
-					geometry.addAttribute( 'tangents', new THREE.BufferAttribute( this.mTangentBuffer, 3 ) );
+					geometry.setAttribute( 'tangents', new THREE.BufferAttribute( this.mTangentBuffer, 3 ) );
 				if ( this.mBitangentBuffer && this.mBitangentBuffer.length > 0 )
-					geometry.addAttribute( 'bitangents', new THREE.BufferAttribute( this.mBitangentBuffer, 3 ) );
+					geometry.setAttribute( 'bitangents', new THREE.BufferAttribute( this.mBitangentBuffer, 3 ) );
 				if ( this.mBones.length > 0 ) {
 
 					var weights = [];
@@ -737,8 +758,8 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 					}
 
-					geometry.addAttribute( 'skinWeight', new THREE.BufferAttribute( new Float32Array( _weights ), BONESPERVERT ) );
-					geometry.addAttribute( 'skinIndex', new THREE.BufferAttribute( new Float32Array( _bones ), BONESPERVERT ) );
+					geometry.setAttribute( 'skinWeight', new THREE.BufferAttribute( new Float32Array( _weights ), BONESPERVERT ) );
+					geometry.setAttribute( 'skinIndex', new THREE.BufferAttribute( new Float32Array( _bones ), BONESPERVERT ) );
 
 				}
 
@@ -957,6 +978,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			};
 
 		}
+
 		var namePropMapping = {
 
 			"?mat.name": "name",
@@ -1540,7 +1562,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 		function ReadBounds( stream, T /*p*/, n ) {
 
 			// not sure what to do here, the data isn't really useful.
-			return stream.Seek( sizeof( T ) * n, aiOrigin_CUR );
+			return stream.Seek( sizeof( T ) * n, aiOrigin_CUR ); // eslint-disable-line no-undef
 
 		}
 
@@ -1749,6 +1771,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// write faces. There are no floating-point calculations involved
 			// in these, so we can write a simple hash over the face data
 			// to the dump file. We generate a single 32 Bit hash for 512 faces
@@ -1814,6 +1837,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// write bones
 			if ( mesh.mNumBones ) {
 
@@ -1876,7 +1900,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryNodeAnim( stream, nd ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -1942,7 +1966,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryAnim( stream, anim ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -1996,7 +2020,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryLight( stream, l ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2026,7 +2050,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryCamera( stream, cam ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2073,6 +2097,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// Read materials
 			if ( scene.mNumMaterials ) {
 
@@ -2086,6 +2111,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// Read all animations
 			if ( scene.mNumAnimations ) {
 
@@ -2099,6 +2125,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// Read all textures
 			if ( scene.mNumTextures ) {
 
@@ -2112,6 +2139,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// Read lights
 			if ( scene.mNumLights ) {
 
@@ -2125,6 +2153,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// Read cameras
 			if ( scene.mNumCameras ) {
 
@@ -2140,6 +2169,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			}
 
 		}
+
 		var aiOrigin_CUR = 0;
 		var aiOrigin_BEG = 1;
 
@@ -2153,6 +2183,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 					stream.readOffset += off;
 
 				}
+
 				if ( ori == aiOrigin_BEG ) {
 
 					stream.readOffset = off;
@@ -2233,7 +2264,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				var compressedData = [];
 				stream.Read( compressedData, 1, compressedSize );
 				var uncompressedData = [];
-				uncompress( uncompressedData, uncompressedSize, compressedData, compressedSize );
+				uncompress( uncompressedData, uncompressedSize, compressedData, compressedSize ); // eslint-disable-line no-undef
 				var buff = new ArrayBuffer( uncompressedData );
 				ReadBinaryScene( buff, pScene );
 

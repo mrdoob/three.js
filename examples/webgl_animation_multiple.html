@@ -24,11 +24,11 @@
 			//////////////////////////////
 			// Global objects
 			//////////////////////////////
-			var worldScene = null; // THREE.Scene where it all will be rendered
-			var renderer = null;
-			var camera = null;
-			var clock = null;
-			var mixers = []; // All the THREE.AnimationMixer objects for all the animations in the scene
+			let worldScene = null; // THREE.Scene where it all will be rendered
+			let renderer = null;
+			let camera = null;
+			let clock = null;
+			const mixers = []; // All the THREE.AnimationMixer objects for all the animations in the scene
 			//////////////////////////////
 
 
@@ -40,7 +40,7 @@
 			// A model may have multiple SkinnedMesh objects as well as several rigs (armatures). Units will define which
 			// meshes, armatures and animations to use. We will load the whole scene for each object and clone it for each unit.
 			// Models are from https://www.mixamo.com/
-			var MODELS = [
+			const MODELS = [
 				{ name: "Soldier" },
 				{ name: "Parrot" },
 				// { name: "RiflePunch" },
@@ -48,7 +48,7 @@
 
 			// Here we define instances of the models that we want to place in the scene, their position, scale and the animations
 			// that must be played.
-			var UNITS = [
+			const UNITS = [
 				{
 					modelName: "Soldier", // Will use the 3D model from file models/gltf/Soldier.glb
 					meshName: "vanguard_Mesh", // Name of the main mesh to animate
@@ -91,7 +91,7 @@
 			//////////////////////////////
 			// The main setup happens here
 			//////////////////////////////
-			var numLoadedModels = 0;
+			let numLoadedModels = 0;
 			initScene();
 			initRenderer();
 			loadModels();
@@ -109,9 +109,9 @@
 			 */
 			function loadModels() {
 
-				for ( var i = 0; i < MODELS.length; ++ i ) {
+				for ( let i = 0; i < MODELS.length; ++ i ) {
 
-					var m = MODELS[ i ];
+					const m = MODELS[ i ];
 
 					loadGltfModel( m, function () {
 
@@ -136,25 +136,25 @@
 			 */
 			function instantiateUnits() {
 
-				var numSuccess = 0;
+				let numSuccess = 0;
 
-				for ( var i = 0; i < UNITS.length; ++ i ) {
+				for ( let i = 0; i < UNITS.length; ++ i ) {
 
-					var u = UNITS[ i ];
-					var model = getModelByName( u.modelName );
+					const u = UNITS[ i ];
+					const model = getModelByName( u.modelName );
 
 					if ( model ) {
 
-						var clonedScene = SkeletonUtils.clone( model.scene );
+						const clonedScene = SkeletonUtils.clone( model.scene );
 
 						if ( clonedScene ) {
 
 							// THREE.Scene is cloned properly, let's find one mesh and launch animation for it
-							var clonedMesh = clonedScene.getObjectByName( u.meshName );
+							const clonedMesh = clonedScene.getObjectByName( u.meshName );
 
 							if ( clonedMesh ) {
 
-								var mixer = startAnimation( clonedMesh, model.animations, u.animationName );
+								const mixer = startAnimation( clonedMesh, model.animations, u.animationName );
 
 								// Save the animation mixer in the list, will need it in the animation loop
 								mixers.push( mixer );
@@ -211,12 +211,12 @@
 			 */
 			function startAnimation( skinnedMesh, animations, animationName ) {
 
-				var mixer = new THREE.AnimationMixer( skinnedMesh );
-				var clip = THREE.AnimationClip.findByName( animations, animationName );
+				const mixer = new THREE.AnimationMixer( skinnedMesh );
+				const clip = THREE.AnimationClip.findByName( animations, animationName );
 
 				if ( clip ) {
 
-					var action = mixer.clipAction( clip );
+					const action = mixer.clipAction( clip );
 					action.play();
 
 				}
@@ -232,7 +232,7 @@
 			 */
 			function getModelByName( name ) {
 
-				for ( var i = 0; i < MODELS.length; ++ i ) {
+				for ( let i = 0; i < MODELS.length; ++ i ) {
 
 					if ( MODELS[ i ].name === name ) {
 
@@ -253,12 +253,12 @@
 			 */
 			function loadGltfModel( model, onLoaded ) {
 
-				var loader = new GLTFLoader();
-				var modelName = "models/gltf/" + model.name + ".glb";
+				const loader = new GLTFLoader();
+				const modelName = "models/gltf/" + model.name + ".glb";
 
 				loader.load( modelName, function ( gltf ) {
 
-					var scene = gltf.scene;
+					const scene = gltf.scene;
 
 					model.animations = gltf.animations;
 					model.scene = scene;
@@ -292,11 +292,11 @@
 
 				// Get the time elapsed since the last frame
 
-				var mixerUpdateDelta = clock.getDelta();
+				const mixerUpdateDelta = clock.getDelta();
 
 				// Update all the animation frames
 
-				for ( var i = 0; i < mixers.length; ++ i ) {
+				for ( let i = 0; i < mixers.length; ++ i ) {
 
 					mixers[ i ].update( mixerUpdateDelta );
 
@@ -316,12 +316,11 @@
 			 */
 			function initRenderer() {
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
-				renderer.gammaFactor = 2.2;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				container.appendChild( renderer.domElement );
@@ -343,11 +342,11 @@
 				worldScene.background = new THREE.Color( 0xa0a0a0 );
 				worldScene.fog = new THREE.Fog( 0xa0a0a0, 10, 22 );
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 20, 0 );
 				worldScene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				const dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( - 3, 10, - 10 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.top = 10;
@@ -359,7 +358,7 @@
 				worldScene.add( dirLight );
 
 				// ground
-				var groundMesh = new THREE.Mesh(
+				const groundMesh = new THREE.Mesh(
 					new THREE.PlaneBufferGeometry( 40, 40 ),
 					new THREE.MeshPhongMaterial( {
 						color: 0x999999,

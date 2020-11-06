@@ -1,10 +1,14 @@
+import {
+	BufferAttribute,
+	BufferGeometry,
+	FileLoader,
+	Float32BufferAttribute,
+	Loader,
+	LoaderUtils,
+	Vector3
+} from "../../../build/three.module.js";
+
 /**
- * @author aleeper / http://adamleeper.com/
- * @author mrdoob / http://mrdoob.com/
- * @author gero3 / https://github.com/gero3
- * @author Mugen87 / https://github.com/Mugen87
- * @author neverhood311 / https://github.com/neverhood311
- *
  * Description: A THREE loader for STL ASCII files, as created by Solidworks and other CAD programs.
  *
  * Supports both binary and ASCII encoded files, with automatic detection of type.
@@ -25,7 +29,7 @@
  * For binary STLs geometry might contain colors for vertices. To use it:
  *  // use the same code to load STL as above
  *  if (geometry.hasColors) {
- *    material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
+ *    material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: true });
  *  } else { .... }
  *  var mesh = new THREE.Mesh( geometry, material );
  *
@@ -55,16 +59,6 @@
  *  var mesh = new THREE.Mesh(geometry, materials);
  */
 
-import {
-	BufferAttribute,
-	BufferGeometry,
-	FileLoader,
-	Float32BufferAttribute,
-	Loader,
-	LoaderUtils,
-	Vector3
-} from "../../../build/three.module.js";
-
 
 var STLLoader = function ( manager ) {
 
@@ -80,22 +74,31 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		var scope = this;
 
-		var loader = new FileLoader( scope.manager );
-		loader.setPath( scope.path );
+		var loader = new FileLoader( this.manager );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
+
 		loader.load( url, function ( text ) {
 
 			try {
 
 				onLoad( scope.parse( text ) );
 
-			} catch ( exception ) {
+			} catch ( e ) {
 
 				if ( onError ) {
 
-					onError( exception );
+					onError( e );
+
+				} else {
+
+					console.error( e );
 
 				}
+
+				scope.manager.itemError( url );
 
 			}
 
@@ -250,12 +253,12 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			geometry.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-			geometry.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 
 			if ( hasColors ) {
 
-				geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
 				geometry.hasColors = true;
 				geometry.alpha = alpha;
 
@@ -283,7 +286,6 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var result;
 
-			var groupVertexes = [];
 			var groupCount = 0;
 			var startVertex = 0;
 			var endVertex = 0;
@@ -339,23 +341,16 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				}
 
-				groupVertexes.push( { startVertex: startVertex, endVertex: endVertex } );
+				var start = startVertex;
+				var count = endVertex - startVertex;
+
+				geometry.addGroup( start, count, groupCount );
 				groupCount ++;
 
 			}
 
-			geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-			geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-
-			if ( groupCount > 0 ) {
-
-				for ( var i = 0; i < groupVertexes.length; i ++ ) {
-
-					geometry.addGroup( groupVertexes[ i ].startVertex, groupVertexes[ i ].endVertex, i );
-
-				}
-
-			}
+			geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 
 			return geometry;
 

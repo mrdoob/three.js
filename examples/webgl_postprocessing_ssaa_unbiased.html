@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Unbiased Manual Supersamling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Unbiased Manual Supersamling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
 			This example shows how to unbias the rounding errors accumulated using high number of SSAA samples on a 8-bit per channel buffer.<br/><br/>
 			Turn off the "unbiased" feature to see the banding that results from accumulated rounding errors.
 		</div>
@@ -27,12 +27,12 @@
 			import { SSAARenderPass } from './jsm/postprocessing/SSAARenderPass.js';
 			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
-			var scene, renderer, composer, copyPass;
-			var cameraP, ssaaRenderPassP;
-			var cameraO, ssaaRenderPassO;
-			var gui, stats;
+			let scene, renderer, composer, copyPass;
+			let cameraP, ssaaRenderPassP;
+			let cameraO, ssaaRenderPassO;
+			let gui, stats;
 
-			var params = {
+			const params = {
 				sampleLevel: 4,
 				renderToScreen: false,
 				unbiased: true,
@@ -75,12 +75,12 @@
 
 			function init() {
 
-				var container = document.getElementById( "container" );
+				const container = document.getElementById( "container" );
 
-				var width = window.innerWidth || 1;
-				var height = window.innerHeight || 1;
-				var aspect = width / height;
-				var devicePixelRatio = window.devicePixelRatio || 1;
+				const width = window.innerWidth || 1;
+				const height = window.innerHeight || 1;
+				const aspect = width / height;
+				const devicePixelRatio = window.devicePixelRatio || 1;
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( devicePixelRatio );
@@ -96,47 +96,48 @@
 				cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 3, 10 );
 				cameraO.position.z = 7;
 
-				var fov = THREE.Math.degToRad( cameraP.fov );
-				var hyperfocus = ( cameraP.near + cameraP.far ) / 2;
-				var _height = 2 * Math.tan( fov / 2 ) * hyperfocus;
+				const fov = THREE.MathUtils.degToRad( cameraP.fov );
+				const hyperfocus = ( cameraP.near + cameraP.far ) / 2;
+				const _height = 2 * Math.tan( fov / 2 ) * hyperfocus;
 				cameraO.zoom = height / _height;
 
 
 				scene = new THREE.Scene();
 
-				var group = new THREE.Group();
+				const group = new THREE.Group();
 				scene.add( group );
 
-				var light = new THREE.PointLight( 0xddffdd, 1.0 );
+				const light = new THREE.PointLight( 0xddffdd, 1.0 );
 				light.position.z = 70;
 				light.position.y = - 70;
 				light.position.x = - 70;
 				scene.add( light );
 
-				var light2 = new THREE.PointLight( 0xffdddd, 1.0 );
+				const light2 = new THREE.PointLight( 0xffdddd, 1.0 );
 				light2.position.z = 70;
 				light2.position.x = - 70;
 				light2.position.y = 70;
 				scene.add( light2 );
 
-				var light3 = new THREE.PointLight( 0xddddff, 1.0 );
+				const light3 = new THREE.PointLight( 0xddddff, 1.0 );
 				light3.position.z = 70;
 				light3.position.x = 70;
 				light3.position.y = - 70;
 				scene.add( light3 );
 
-				var light3 = new THREE.AmbientLight( 0xffffff, 0.05 );
-				scene.add( light3 );
+				const light4 = new THREE.AmbientLight( 0xffffff, 0.05 );
+				scene.add( light4 );
 
-				var geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
-				for ( var i = 0; i < 120; i ++ ) {
+				const geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
 
-					var material = new THREE.MeshStandardMaterial();
+				for ( let i = 0; i < 120; i ++ ) {
+
+					const material = new THREE.MeshStandardMaterial();
 					material.roughness = 0.5 * Math.random() + 0.25;
 					material.metalness = 0;
 					material.color.setHSL( Math.random(), 1.0, 0.3 );
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 4 - 2;
 					mesh.position.y = Math.random() * 4 - 2;
 					mesh.position.z = Math.random() * 4 - 2;
@@ -166,9 +167,9 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
-				var aspect = width / height;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+				const aspect = width / height;
 
 				cameraP.aspect = aspect;
 				cameraO.updateProjectionMatrix();
@@ -192,9 +193,9 @@
 
 				if ( params.autoRotate ) {
 
-					for ( var i = 0; i < scene.children.length; i ++ ) {
+					for ( let i = 0; i < scene.children.length; i ++ ) {
 
-						var child = scene.children[ i ];
+						const child = scene.children[ i ];
 
 						child.rotation.x += 0.005;
 						child.rotation.y += 0.01;
@@ -203,7 +204,8 @@
 
 				}
 
-				var newColor = ssaaRenderPassP.clearColor;
+				let newColor = ssaaRenderPassP.clearColor;
+
 				switch ( params.clearColor ) {
 
 					case 'blue': newColor = 0x0000ff; break;
@@ -213,6 +215,7 @@
 					case 'black': newColor = 0x000000; break;
 
 				}
+
 				ssaaRenderPassP.clearColor = ssaaRenderPassO.clearColor = newColor;
 				ssaaRenderPassP.clearAlpha = ssaaRenderPassO.clearAlpha = params.clearAlpha;
 

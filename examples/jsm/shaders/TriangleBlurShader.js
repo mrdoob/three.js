@@ -1,6 +1,8 @@
+import {
+	Vector2
+} from "../../../build/three.module.js";
+
 /**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- *
  * Triangle blur shader
  * based on glfx.js triangle blur shader
  * https://github.com/evanw/glfx.js
@@ -9,10 +11,6 @@
  * pyramid filter. The pyramid filter is separable and is applied as two
  * perpendicular triangle filters.
  */
-
-import {
-	Vector2
-} from "../../../build/three.module.js";
 
 var TriangleBlurShader = {
 

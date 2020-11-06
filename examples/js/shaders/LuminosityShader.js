@@ -1,6 +1,4 @@
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * Luminosity
  * http://en.wikipedia.org/wiki/Luminosity
  */

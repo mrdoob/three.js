@@ -6,9 +6,6 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			a {
-				color: #08f;
-			}
 			svg {
 				display: block;
 			}
@@ -17,7 +14,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> svg - lines
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> svg - lines
 		</div>
 
 		<script type="module">
@@ -26,7 +23,7 @@
 
 			import { SVGRenderer } from './jsm/renderers/SVGRenderer.js';
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
 			animate();
@@ -45,44 +42,44 @@
 
 				//
 
-				var vertices = [];
-				var divisions = 50;
+				const vertices = [];
+				const divisions = 50;
 
-				for ( var i = 0; i <= divisions; i ++ ) {
+				for ( let i = 0; i <= divisions; i ++ ) {
 
-					var v = ( i / divisions ) * ( Math.PI * 2 );
+					const v = ( i / divisions ) * ( Math.PI * 2 );
 
-					var x = Math.sin( v );
-					var z = Math.cos( v );
+					const x = Math.sin( v );
+					const z = Math.cos( v );
 
 					vertices.push( x, 0, z );
 
 				}
 
-				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 				//
 
-				for ( var i = 1; i <= 3; i ++ ) {
+				for ( let i = 1; i <= 3; i ++ ) {
 
-					var material = new THREE.LineBasicMaterial( {
+					const material = new THREE.LineBasicMaterial( {
 						color: Math.random() * 0xffffff,
 						linewidth: 10
 					} );
-					var line = new THREE.Line( geometry, material );
+					const line = new THREE.Line( geometry, material );
 					line.scale.setScalar( i / 3 );
 					scene.add( line );
 
 				}
 
-				var material = new THREE.LineDashedMaterial( {
+				const material = new THREE.LineDashedMaterial( {
 					color: 'blue',
 					linewidth: 1,
 					dashSize: 10,
 					gapSize: 10
 				} );
-				var line = new THREE.Line( geometry, material );
+				const line = new THREE.Line( geometry, material );
 				line.scale.setScalar( 2 );
 				scene.add( line );
 
@@ -103,8 +100,8 @@
 
 			function animate() {
 
-				var count = 0;
-				var time = performance.now() / 1000;
+				let count = 0;
+				const time = performance.now() / 1000;
 
 				scene.traverse( function ( child ) {
 

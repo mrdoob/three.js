@@ -18,7 +18,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - morph targets - horse<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - morph targets - horse<br/>
 			model by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a>
 		</div>
 
@@ -30,9 +30,13 @@
 
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var container, stats;
-			var camera, scene, renderer;
-			var mesh, mixer;
+			let container, stats;
+			let camera, scene, renderer;
+			let mesh, mixer;
+
+			const radius = 600;
+			let theta = 0;
+			let prevTime = Date.now();
 
 			init();
 			animate();
@@ -53,15 +57,15 @@
 
 				//
 
-				var light = new THREE.DirectionalLight( 0xefefff, 1.5 );
-				light.position.set( 1, 1, 1 ).normalize();
-				scene.add( light );
+				const light1 = new THREE.DirectionalLight( 0xefefff, 1.5 );
+				light1.position.set( 1, 1, 1 ).normalize();
+				scene.add( light1 );
 
-				var light = new THREE.DirectionalLight( 0xffefef, 1.5 );
-				light.position.set( - 1, - 1, - 1 ).normalize();
-				scene.add( light );
+				const light2 = new THREE.DirectionalLight( 0xffefef, 1.5 );
+				light2.position.set( - 1, - 1, - 1 ).normalize();
+				scene.add( light2 );
 
-				var loader = new GLTFLoader();
+				const loader = new GLTFLoader();
 				loader.load( "models/gltf/Horse.glb", function ( gltf ) {
 
 					mesh = gltf.scene.children[ 0 ];
@@ -80,8 +84,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.gammaOutput = true;
-				renderer.gammaFactor = 2.2;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
 
@@ -116,23 +119,18 @@
 
 			}
 
-			var radius = 600;
-			var theta = 0;
-
-			var prevTime = Date.now();
-
 			function render() {
 
 				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+				camera.position.x = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.MathUtils.degToRad( theta ) );
 
 				camera.lookAt( camera.target );
 
 				if ( mixer ) {
 
-					var time = Date.now();
+					const time = Date.now();
 
 					mixer.update( ( time - prevTime ) * 0.001 );
 

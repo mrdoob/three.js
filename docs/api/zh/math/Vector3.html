@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,7 +13,7 @@
 
 		一个三维向量表示的是一个有顺序的、三个为一组的数字组合（标记为x、y和z），
 		可被用来表示很多事物，例如：
-		
+
 		</p>
 
 		<ul>
@@ -36,16 +35,15 @@
 		但以上这些是它在three.js中的常用用途。
 		</p>
 
-
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
-var a = new THREE.Vector3( 0, 1, 0 );
+		const a = new THREE.Vector3( 0, 1, 0 );
 
-//no arguments; will be initialised to (0, 0, 0)
-var b = new THREE.Vector3( );
+		//no arguments; will be initialised to (0, 0, 0)
+		const b = new THREE.Vector3( );
 
-var d = a.distanceTo( b );
+		const d = a.distanceTo( b );
 		</code>
 
 
@@ -62,13 +60,6 @@ var d = a.distanceTo( b );
 
 
 		<h2>属性</h2>
-
-		<h3>[property:Boolean isVector3]</h3>
-		<p>
-			用于测试这个类或者派生类是否为Vector3，默认为*true*。<br /><br />
-
-			你不应当对这个属性进行改变,因为它在内部使用，以用于优化。
-		</p>
 
 		<h3>[property:Float x]</h3>
 
@@ -112,6 +103,9 @@ var d = a.distanceTo( b );
 		<p>
 			将该向量乘以四阶矩阵m（第四个维度隐式地为1），and divides by perspective.
 		</p>
+
+		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
+		<p>Multiplies this vector by normal matrix [page:Matrix3 m] and normalizes the result.</p>
 
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>
@@ -308,7 +302,7 @@ var d = a.distanceTo( b );
 		<p>
 		[page:Camera camera] — 在投影中使用的摄像机。<br /><br />
 
-		使用所传入的摄像机来投影（[link:https://en.wikipedia.org/wiki/Vector_projection projects]）该向量。
+		Projects this vector from world space into the camera's normalized device coordinate (NDC) space.
 		</p>
 
 		<h3>[method:this projectOnPlane]( [param:Vector3 planeNormal] )</h3>
@@ -319,14 +313,14 @@ var d = a.distanceTo( b );
 		normal from this vector.
 		</p>
 
-		<h3>[method:this projectOnVector]( [param:Vector3] )</h3>
-		<p>投影（[link:https://en.wikipedia.org/wiki/Vector_projection Projects]）该向量到另一个向量上。 </p>
+		<h3>[method:this projectOnVector]( [param:Vector3 v] )</h3>
+		<p>投影（[link:https://en.wikipedia.org/wiki/Vector_projection Projects]）该向量到向量[page:Vector3 v]上。</p>
 
 		<h3>[method:this reflect]( [param:Vector3 normal] )</h3>
 		<p>
 		[page:Vector3 normal] - the normal to the reflecting plane<br /><br />
 
-		Reflect the vector off of plane orthogonal to [page:Vector3 normal]. Normal is assumed to
+		Reflect this vector off of plane orthogonal to [page:Vector3 normal]. Normal is assumed to
 		have unit length.
 		</p>
 
@@ -363,6 +357,11 @@ var d = a.distanceTo( b );
 		<p>
 		从传入的四阶矩阵[page:Matrix4 matrix]由[page:Integer index]指定的列中，
 		设置该向量的[page:.x x]值、[page:.y y]值和[page:.z z]值。
+		</p>
+
+		<h3>[method:this setFromMatrix3Column]( [param:Matrix3 matrix], [param:Integer index] )</h3>
+		<p>
+		Sets this vector's [page:.x x], [page:.y y] and [page:.z z] components from [page:Integer index] column of [page:Matrix3 matrix].
 		</p>
 
 		<h3>[method:this setFromMatrixPosition]( [param:Matrix4 m] )</h3>
@@ -431,10 +430,13 @@ var d = a.distanceTo( b );
 		<p>
 		[page:Camera camera] — 在投影中使用的摄像机。<br /><br />
 
-		[link:https://en.wikipedia.org/wiki/Vector_projection Unprojects] the vector with the
-		camera's projection matrix.
+		Projects this vector from the camera's normalized device coordinate (NDC) space into world space.
 		</p>
 
+		<h3>[method:this random]()</h3>
+		<p>
+			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
+		</p>
 
 		<h2>源代码</h2>
 

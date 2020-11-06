@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass<br/>
 			by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
 		</div>
 
@@ -30,12 +30,12 @@
 			import { CopyShader } from './jsm/shaders/CopyShader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var scene, renderer, composer;
-			var clearPass, texturePass, renderPass;
-			var cameraP, cubeTexturePassP;
-			var gui, stats;
+			let scene, renderer, composer;
+			let clearPass, texturePass, renderPass;
+			let cameraP, cubeTexturePassP;
+			let gui, stats;
 
-			var params = {
+			const params = {
 
 				clearPass: true,
 				clearColor: 'white',
@@ -79,12 +79,12 @@
 
 			function init() {
 
-				var container = document.getElementById( "container" );
+				const container = document.getElementById( "container" );
 
-				var width = window.innerWidth || 1;
-				var height = window.innerHeight || 1;
-				var aspect = width / height;
-				var devicePixelRatio = window.devicePixelRatio || 1;
+				const width = window.innerWidth || 1;
+				const height = window.innerHeight || 1;
+				const aspect = width / height;
+				const devicePixelRatio = window.devicePixelRatio || 1;
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( devicePixelRatio );
@@ -101,40 +101,40 @@
 
 				scene = new THREE.Scene();
 
-				var group = new THREE.Group();
+				const group = new THREE.Group();
 				scene.add( group );
 
-				var light = new THREE.PointLight( 0xddffdd, 1.0 );
+				const light = new THREE.PointLight( 0xddffdd, 1.0 );
 				light.position.z = 70;
 				light.position.y = - 70;
 				light.position.x = - 70;
 				scene.add( light );
 
-				var light2 = new THREE.PointLight( 0xffdddd, 1.0 );
+				const light2 = new THREE.PointLight( 0xffdddd, 1.0 );
 				light2.position.z = 70;
 				light2.position.x = - 70;
 				light2.position.y = 70;
 				scene.add( light2 );
 
-				var light3 = new THREE.PointLight( 0xddddff, 1.0 );
+				const light3 = new THREE.PointLight( 0xddddff, 1.0 );
 				light3.position.z = 70;
 				light3.position.x = 70;
 				light3.position.y = - 70;
 				scene.add( light3 );
 
-				var geometry = new THREE.SphereBufferGeometry( 1, 48, 24 );
+				const geometry = new THREE.SphereBufferGeometry( 1, 48, 24 );
 
-				var material = new THREE.MeshStandardMaterial();
+				const material = new THREE.MeshStandardMaterial();
 				material.roughness = 0.5 * Math.random() + 0.25;
 				material.metalness = 0;
 				material.color.setHSL( Math.random(), 1.0, 0.3 );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh = new THREE.Mesh( geometry, material );
 				group.add( mesh );
 
 				// postprocessing
 
-				var genCubeUrls = function ( prefix, postfix ) {
+				const genCubeUrls = function ( prefix, postfix ) {
 
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
@@ -152,20 +152,20 @@
 				texturePass = new TexturePass();
 				composer.addPass( texturePass );
 
-				var textureLoader = new THREE.TextureLoader();
+				const textureLoader = new THREE.TextureLoader();
 				textureLoader.load( "textures/hardwood2_diffuse.jpg", function ( map ) {
 
 					texturePass.map = map;
 
 				} );
 
-				cubeTexturePassP = new CubeTexturePass( cameraP );
-				composer.addPass( cubeTexturePassP );
+				cubeTexturePassP = null;
 
-				var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
+				const ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
 				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
 
-					cubeTexturePassP.envMap = ldrCubeMap;
+					cubeTexturePassP = new CubeTexturePass( cameraP, ldrCubeMap );
+					composer.insertPass( cubeTexturePassP, 2 );
 
 				} );
 
@@ -173,10 +173,11 @@
 				renderPass.clear = false;
 				composer.addPass( renderPass );
 
-				var copyPass = new ShaderPass( CopyShader );
+				const copyPass = new ShaderPass( CopyShader );
 				composer.addPass( copyPass );
 
-				var controls = new OrbitControls( cameraP, renderer.domElement );
+				const controls = new OrbitControls( cameraP, renderer.domElement );
+				controls.enableZoom = false;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -184,9 +185,9 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
-				var aspect = width / height;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+				const aspect = width / height;
 
 				cameraP.aspect = aspect;
 				cameraP.updateProjectionMatrix();
@@ -204,7 +205,8 @@
 
 				cameraP.updateMatrixWorld( true );
 
-				var newColor = clearPass.clearColor;
+				let newColor = clearPass.clearColor;
+
 				switch ( params.clearColor ) {
 
 					case 'blue': newColor = 0x0000ff; break;
@@ -222,8 +224,12 @@
 				texturePass.enabled = params.texturePass;
 				texturePass.opacity = params.texturePassOpacity;
 
-				cubeTexturePassP.enabled = params.cubeTexturePass;
-				cubeTexturePassP.opacity = params.cubeTexturePassOpacity;
+				if ( cubeTexturePassP !== null ) {
+
+					cubeTexturePassP.enabled = params.cubeTexturePass;
+					cubeTexturePassP.opacity = params.cubeTexturePassOpacity;
+
+				}
 
 				renderPass.enabled = params.renderPass;
 

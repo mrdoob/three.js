@@ -1,12 +1,7 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
-import {
-	LatheBufferGeometry
-} from '../../../../src/geometries/LatheGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils';
+import { LatheBufferGeometry } from '../../../../src/geometries/LatheBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 

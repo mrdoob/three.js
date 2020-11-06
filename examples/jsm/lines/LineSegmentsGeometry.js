@@ -1,8 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
 import {
 	Box3,
 	Float32BufferAttribute,
@@ -25,8 +20,8 @@ var LineSegmentsGeometry = function () {
 	var index = [ 0, 2, 1, 2, 3, 1, 2, 4, 3, 4, 5, 3, 4, 6, 5, 6, 7, 5 ];
 
 	this.setIndex( index );
-	this.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+	this.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+	this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 };
 
@@ -36,18 +31,18 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 
 	isLineSegmentsGeometry: true,
 
-	applyMatrix: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		var start = this.attributes.instanceStart;
 		var end = this.attributes.instanceEnd;
 
 		if ( start !== undefined ) {
 
-			matrix.applyToBufferAttribute( start );
+			start.applyMatrix4( matrix );
 
-			matrix.applyToBufferAttribute( end );
+			end.applyMatrix4( matrix );
 
-			start.data.needsUpdate = true;
+			start.needsUpdate = true;
 
 		}
 
@@ -83,8 +78,8 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 
 		var instanceBuffer = new InstancedInterleavedBuffer( lineSegments, 6, 1 ); // xyz, xyz
 
-		this.addAttribute( 'instanceStart', new InterleavedBufferAttribute( instanceBuffer, 3, 0 ) ); // xyz
-		this.addAttribute( 'instanceEnd', new InterleavedBufferAttribute( instanceBuffer, 3, 3 ) ); // xyz
+		this.setAttribute( 'instanceStart', new InterleavedBufferAttribute( instanceBuffer, 3, 0 ) ); // xyz
+		this.setAttribute( 'instanceEnd', new InterleavedBufferAttribute( instanceBuffer, 3, 3 ) ); // xyz
 
 		//
 
@@ -111,8 +106,8 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 
 		var instanceColorBuffer = new InstancedInterleavedBuffer( colors, 6, 1 ); // rgb, rgb
 
-		this.addAttribute( 'instanceColorStart', new InterleavedBufferAttribute( instanceColorBuffer, 3, 0 ) ); // rgb
-		this.addAttribute( 'instanceColorEnd', new InterleavedBufferAttribute( instanceColorBuffer, 3, 3 ) ); // rgb
+		this.setAttribute( 'instanceColorStart', new InterleavedBufferAttribute( instanceColorBuffer, 3, 0 ) ); // rgb
+		this.setAttribute( 'instanceColorEnd', new InterleavedBufferAttribute( instanceColorBuffer, 3, 3 ) ); // rgb
 
 		return this;
 
@@ -144,7 +139,7 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 
 	},
 
-	fromLineSegements: function ( lineSegments ) {
+	fromLineSegments: function ( lineSegments ) {
 
 		var geometry = lineSegments.geometry;
 
@@ -154,7 +149,7 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 
 		} else if ( geometry.isBufferGeometry ) {
 
-			this.setPositions( geometry.position.array ); // assumes non-indexed
+			this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
 
 		}
 
@@ -252,17 +247,11 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 
 	},
 
-	clone: function () {
+	applyMatrix: function ( matrix ) {
 
-		// todo
+		console.warn( 'THREE.LineSegmentsGeometry: applyMatrix() has been renamed to applyMatrix4().' );
 
-	},
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
+		return this.applyMatrix4( matrix );
 
 	}
 

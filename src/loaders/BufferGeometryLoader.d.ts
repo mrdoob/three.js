@@ -1,6 +1,7 @@
 import { Loader } from './Loader';
 import { LoadingManager } from './LoadingManager';
 import { BufferGeometry } from './../core/BufferGeometry';
+import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry';
 
 export class BufferGeometryLoader extends Loader {
 
@@ -8,10 +9,10 @@ export class BufferGeometryLoader extends Loader {
 
 	load(
 		url: string,
-		onLoad: ( bufferGeometry: BufferGeometry ) => void,
-		onProgress?: ( event: any ) => void,
-		onError?: ( event: any ) => void
+		onLoad: ( bufferGeometry: InstancedBufferGeometry | BufferGeometry ) => void,
+		onProgress?: ( request: ProgressEvent ) => void,
+		onError?: ( event: ErrorEvent ) => void
 	): void;
-	parse( json: any ): BufferGeometry;
+	parse( json: any ): InstancedBufferGeometry | BufferGeometry;
 
 }

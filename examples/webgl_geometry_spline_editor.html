@@ -29,38 +29,43 @@
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			import { DragControls } from './jsm/controls/DragControls.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TransformControls } from './jsm/controls/TransformControls.js';
 
 			String.prototype.format = function () {
 
-				var str = this;
+				let str = this;
 
-				for ( var i = 0; i < arguments.length; i ++ ) {
+				for ( let i = 0; i < arguments.length; i ++ ) {
 
 					str = str.replace( '{' + i + '}', arguments[ i ] );
 
 				}
+
 				return str;
 
 			};
 
-			var container, stats;
-			var camera, scene, renderer;
-			var splineHelperObjects = [];
-			var splinePointsLength = 4;
-			var positions = [];
-			var point = new THREE.Vector3();
+			let container, stats;
+			let camera, scene, renderer;
+			const splineHelperObjects = [];
+			let splinePointsLength = 4;
+			const positions = [];
+			const point = new THREE.Vector3();
 
-			var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
-			var transformControl;
+			const raycaster = new THREE.Raycaster();
+			const pointer = new THREE.Vector2();
+			const onUpPosition = new THREE.Vector2();
+			const onDownPosition = new THREE.Vector2();
 
-			var ARC_SEGMENTS = 200;
+			const geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+			let transformControl;
 
-			var splines = {};
+			const ARC_SEGMENTS = 200;
 
-			var params = {
+			const splines = {};
+
+			const params = {
 				uniform: true,
 				tension: 0.5,
 				centripetal: true,
@@ -85,33 +90,31 @@
 				scene.add( camera );
 
 				scene.add( new THREE.AmbientLight( 0xf0f0f0 ) );
-				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				const light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 1500, 200 );
+				light.angle = Math.PI * 0.2;
 				light.castShadow = true;
-				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 70, 1, 200, 2000 ) );
+				light.shadow.camera.near = 200;
+				light.shadow.camera.far = 2000;
 				light.shadow.bias = - 0.000222;
 				light.shadow.mapSize.width = 1024;
 				light.shadow.mapSize.height = 1024;
 				scene.add( light );
 
-				var planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
+				const planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
 				planeGeometry.rotateX( - Math.PI / 2 );
-				var planeMaterial = new THREE.ShadowMaterial( { opacity: 0.2 } );
+				const planeMaterial = new THREE.ShadowMaterial( { opacity: 0.2 } );
 
-				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+				const plane = new THREE.Mesh( planeGeometry, planeMaterial );
 				plane.position.y = - 200;
 				plane.receiveShadow = true;
 				scene.add( plane );
 
-				var helper = new THREE.GridHelper( 2000, 100 );
+				const helper = new THREE.GridHelper( 2000, 100 );
 				helper.position.y = - 199;
 				helper.material.opacity = 0.25;
 				helper.material.transparent = true;
 				scene.add( helper );
-
-				//var axes = new AxesHelper( 1000 );
-				//axes.position.set( - 500, - 500, - 500 );
-				//scene.add( axes );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -122,7 +125,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'uniform' );
 				gui.add( params, 'tension', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
@@ -130,7 +133,7 @@
 					splines.uniform.tension = value;
 					updateSplineOutline();
 
-	} );
+				} );
 				gui.add( params, 'centripetal' );
 				gui.add( params, 'chordal' );
 				gui.add( params, 'addPoint' );
@@ -139,21 +142,9 @@
 				gui.open();
 
 				// Controls
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.damping = 0.2;
 				controls.addEventListener( 'change', render );
-
-				controls.addEventListener( 'start', function () {
-
-					cancelHideTransform();
-
-				} );
-
-				controls.addEventListener( 'end', function () {
-
-					delayHideTransform();
-
-				} );
 
 				transformControl = new TransformControls( camera, renderer.domElement );
 				transformControl.addEventListener( 'change', render );
@@ -161,27 +152,8 @@
 
 					controls.enabled = ! event.value;
 
-	} );
+				} );
 				scene.add( transformControl );
-
-				// Hiding transform situation is a little in a mess :()
-				transformControl.addEventListener( 'change', function () {
-
-					cancelHideTransform();
-
-				} );
-
-				transformControl.addEventListener( 'mouseDown', function () {
-
-					cancelHideTransform();
-
-				} );
-
-				transformControl.addEventListener( 'mouseUp', function () {
-
-					delayHideTransform();
-
-				} );
 
 				transformControl.addEventListener( 'objectChange', function () {
 
@@ -189,68 +161,32 @@
 
 				} );
 
-				var dragcontrols = new DragControls( splineHelperObjects, camera, renderer.domElement ); //
-				dragcontrols.enabled = false;
-				dragcontrols.addEventListener( 'hoveron', function ( event ) {
-
-					transformControl.attach( event.object );
-					cancelHideTransform();
-
-				} );
-
-				dragcontrols.addEventListener( 'hoveroff', function () {
-
-					delayHideTransform();
-
-				} );
-
-				var hiding;
-
-				function delayHideTransform() {
-
-					cancelHideTransform();
-					hideTransform();
-
-				}
-
-				function hideTransform() {
-
-					hiding = setTimeout( function () {
-
-						transformControl.detach( transformControl.object );
-
-					}, 2500 );
-
-				}
-
-				function cancelHideTransform() {
-
-					if ( hiding ) clearTimeout( hiding );
-
-				}
+				document.addEventListener( 'pointerdown', onPointerDown, false );
+				document.addEventListener( 'pointerup', onPointerUp, false );
+				document.addEventListener( 'pointermove', onPointerMove, false );
 
 				/*******
 				 * Curves
 				 *********/
 
-				for ( var i = 0; i < splinePointsLength; i ++ ) {
+				for ( let i = 0; i < splinePointsLength; i ++ ) {
 
 					addSplineObject( positions[ i ] );
 
 				}
 
-				positions = [];
+				positions.length = 0;
 
-				for ( var i = 0; i < splinePointsLength; i ++ ) {
+				for ( let i = 0; i < splinePointsLength; i ++ ) {
 
 					positions.push( splineHelperObjects[ i ].position );
 
 				}
 
-				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( ARC_SEGMENTS * 3 ), 3 ) );
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( ARC_SEGMENTS * 3 ), 3 ) );
 
-				var curve = new THREE.CatmullRomCurve3( positions );
+				let curve = new THREE.CatmullRomCurve3( positions );
 				curve.curveType = 'catmullrom';
 				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0xff0000,
@@ -277,9 +213,9 @@
 				curve.mesh.castShadow = true;
 				splines.chordal = curve;
 
-				for ( var k in splines ) {
+				for ( const k in splines ) {
 
-					var spline = splines[ k ];
+					const spline = splines[ k ];
 					scene.add( spline.mesh );
 
 				}
@@ -293,8 +229,8 @@
 
 			function addSplineObject( position ) {
 
-				var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
-				var object = new THREE.Mesh( geometry, material );
+				const material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
+				const object = new THREE.Mesh( geometry, material );
 
 				if ( position ) {
 
@@ -333,9 +269,13 @@
 					return;
 
 				}
+
+				const point = splineHelperObjects.pop();
 				splinePointsLength --;
 				positions.pop();
-				scene.remove( splineHelperObjects.pop() );
+
+				if ( transformControl.object === point ) transformControl.detach();
+				scene.remove( point );
 
 				updateSplineOutline();
 
@@ -343,16 +283,16 @@
 
 			function updateSplineOutline() {
 
-				for ( var k in splines ) {
+				for ( const k in splines ) {
 
-					var spline = splines[ k ];
+					const spline = splines[ k ];
 
-					var splineMesh = spline.mesh;
-					var position = splineMesh.geometry.attributes.position;
+					const splineMesh = spline.mesh;
+					const position = splineMesh.geometry.attributes.position;
 
-					for ( var i = 0; i < ARC_SEGMENTS; i ++ ) {
+					for ( let i = 0; i < ARC_SEGMENTS; i ++ ) {
 
-						var t = i / ( ARC_SEGMENTS - 1 );
+						const t = i / ( ARC_SEGMENTS - 1 );
 						spline.getPoint( t, point );
 						position.setXYZ( i, point.x, point.y, point.z );
 
@@ -366,17 +306,17 @@
 
 			function exportSpline() {
 
-				var strplace = [];
+				const strplace = [];
 
-				for ( var i = 0; i < splinePointsLength; i ++ ) {
+				for ( let i = 0; i < splinePointsLength; i ++ ) {
 
-					var p = splineHelperObjects[ i ].position;
+					const p = splineHelperObjects[ i ].position;
 					strplace.push( 'new THREE.Vector3({0}, {1}, {2})'.format( p.x, p.y, p.z ) );
 
 				}
 
 				console.log( strplace.join( ',\n' ) );
-				var code = '[' + ( strplace.join( ',\n\t' ) ) + ']';
+				const code = '[' + ( strplace.join( ',\n\t' ) ) + ']';
 				prompt( 'copy and paste code', code );
 
 			}
@@ -395,7 +335,7 @@
 
 				}
 
-				for ( var i = 0; i < positions.length; i ++ ) {
+				for ( let i = 0; i < positions.length; i ++ ) {
 
 					positions[ i ].copy( new_positions[ i ] );
 
@@ -421,6 +361,46 @@
 				renderer.render( scene, camera );
 
 			}
+
+			function onPointerDown( event ) {
+
+				onDownPosition.x = event.clientX;
+				onDownPosition.y = event.clientY;
+
+			}
+
+			function onPointerUp() {
+
+				onUpPosition.x = event.clientX;
+				onUpPosition.y = event.clientY;
+
+				if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) transformControl.detach();
+
+			}
+
+			function onPointerMove( event ) {
+
+				pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+				raycaster.setFromCamera( pointer, camera );
+
+				const intersects = raycaster.intersectObjects( splineHelperObjects );
+
+				if ( intersects.length > 0 ) {
+
+					const object = intersects[ 0 ].object;
+
+					if ( object !== transformControl.object ) {
+
+						transformControl.attach( object );
+
+					}
+
+				}
+
+			}
+
 
 		</script>
 

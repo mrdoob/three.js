@@ -3,26 +3,25 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc"> A animation helper for <a href="http://www.geocities.jp/higuchuu4/index_e.htm"><em>MMD</em></a> resources. <br /><br />
+		<p class="desc"> A animation helper for <a href="https://sites.google.com/view/evpvp/"><em>MMD</em></a> resources. <br /><br />
 		[name] handles animation of MMD assets loaded by [page:MMDLoader] with MMD special features as IK, Grant, and Physics.
 		It uses [page:CCDIKSolver] and [page:MMDPhysics] inside.
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
 		// Instantiate a helper
-		var helper = new THREE.MMDAnimationHelper();
+		const helper = new MMDAnimationHelper();
 
 		// Load MMD resources and add to helper
-		new THREE.MMDLoader().loadWithAnimation(
+		new MMDLoader().loadWithAnimation(
 			'models/mmd/miku.pmd',
 			'models/mmd/dance.vmd',
 			function ( mmd ) {
@@ -38,9 +37,8 @@
 					'audios/mmd/song.mp3',
 					function ( buffer ) {
 
-						var listener = new THREE.AudioListener();
-						var audio = new THREE.Audio( listener )
-							.setBuffer( buffer );
+						const listener = new THREE.AudioListener();
+						const audio = new THREE.Audio( listener ).setBuffer( buffer );
 
 						listener.position.z = 1;
 
@@ -62,12 +60,13 @@
 		}
 		</code>
 
-		[example:webgl_loader_mmd]<br />
-		[example:webgl_loader_mmd_pose]<br />
-		[example:webgl_loader_mmd_audio]<br />
+		<h2>Examples</h2>
 
-		<br />
-		<hr>
+		<p>
+			[example:webgl_loader_mmd]<br />
+			[example:webgl_loader_mmd_pose]<br />
+			[example:webgl_loader_mmd_audio]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -98,7 +97,7 @@
 		<h3>[property:WeakMap objects]</h3>
 		<p>A [page:WeakMap] which holds animation stuffs used in helper for objects added to helper. For example, you can access [page:AnimationMixer] for an added [page:SkinnedMesh] with "helper.objects.get( mesh ).mixer"</p>
 
-		<h3>[property:function onBeforePhysics]</h3>
+		<h3>[property:Function onBeforePhysics]</h3>
 		<p>An optional callback that is executed immediately before the physicis calculation for an [page:SkinnedMesh]. This function is called with the [page:SkinnedMesh].</p>
 
 		<h2>Methods</h2>
@@ -122,9 +121,9 @@
 		If camera/audio has already been added, it'll be replaced with a new one.
 		</p>
 
-		<h3>[method:MMDAnimationHelper enable]( [param:string key], [param:Boolean enabled] )</h3>
+		<h3>[method:MMDAnimationHelper enable]( [param:String key], [param:Boolean enabled] )</h3>
 		<p>
-		[page:string key] — Allowed strings are 'animation', 'ik', 'grant', 'physics', and 'cameraAnimation'.<br />
+		[page:String key] — Allowed strings are 'animation', 'ik', 'grant', 'physics', and 'cameraAnimation'.<br />
 		[page:Boolean enabled] — true is enable, false is disable<br />
 		</p>
 		<p>
@@ -165,7 +164,7 @@
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/animation/MMDAnimationHelper.js examples/js/animation/MMDAnimationHelper.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/MMDAnimationHelper.js examples/jsm/animation/MMDAnimationHelper.js]
 		</p>
 	</body>
 </html>

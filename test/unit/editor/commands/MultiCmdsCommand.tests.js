@@ -1,9 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../../editor/js/commands/MultiCmdsCommand';
+import { } from '../../../../editor/js/commands/MultiCmdsCommand';
 
 export default QUnit.module( 'Editor', () => {
 

@@ -18,7 +18,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl layers
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl layers
 		</div>
 
 		<script type="module">
@@ -28,10 +28,11 @@
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			var container, stats;
-			var camera, scene, renderer;
+			let container, stats;
+			let camera, scene, renderer;
 
-			var radius = 100, theta = 0;
+			let theta = 0;
+			const radius = 100;
 
 			init();
 			animate();
@@ -49,7 +50,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var light = new THREE.PointLight( 0xffffff, 1 );
+				const light = new THREE.PointLight( 0xffffff, 1 );
 				light.layers.enable( 0 );
 				light.layers.enable( 1 );
 				light.layers.enable( 2 );
@@ -57,15 +58,14 @@
 				scene.add( camera );
 				camera.add( light );
 
-				var colors = [ 0xff0000, 0x00ff00, 0x0000ff ];
-				var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
-				var layer;
+				const colors = [ 0xff0000, 0x00ff00, 0x0000ff ];
+				const geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
 
-				for ( var i = 0; i < 300; i ++ ) {
+				for ( let i = 0; i < 300; i ++ ) {
 
-					layer = ( i % 3 );
+					const layer = ( i % 3 );
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: colors[ layer ] } ) );
+					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: colors[ layer ] } ) );
 
 					object.position.x = Math.random() * 800 - 400;
 					object.position.y = Math.random() * 800 - 400;
@@ -93,33 +93,33 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var layers = {
+				const layers = {
 
-					'toggle red': function() {
+					'toggle red': function () {
 
 						camera.layers.toggle( 0 );
 
 					},
 
-					'toggle green': function() {
+					'toggle green': function () {
 
 						camera.layers.toggle( 1 );
 
 					},
 
-					'toggle blue': function() {
+					'toggle blue': function () {
 
 						camera.layers.toggle( 2 );
 
 					},
 
-					'enable all': function() {
+					'enable all': function () {
 
 						camera.layers.enableAll();
 
 					},
 
-					'disable all': function() {
+					'disable all': function () {
 
 						camera.layers.disableAll();
 
@@ -129,7 +129,7 @@
 
 				//
 				// Init gui
-				var gui = new GUI();
+				const gui = new GUI();
 				gui.add( layers, 'toggle red' );
 				gui.add( layers, 'toggle green' );
 				gui.add( layers, 'toggle blue' );
@@ -164,9 +164,9 @@
 
 				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+				camera.position.x = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.y = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.MathUtils.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );

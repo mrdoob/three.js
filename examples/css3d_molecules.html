@@ -58,7 +58,7 @@
 	</head>
 	<body>
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - molecules</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - molecules</div>
 		<div id="topmenu">
 			<button id="b_a">Atoms</button><button id="b_b">Bonds</button><button id="b_ab">Atoms + Bonds</button>
 		</div>
@@ -72,20 +72,20 @@
 			import { PDBLoader } from './jsm/loaders/PDBLoader.js';
 			import { CSS3DRenderer, CSS3DObject, CSS3DSprite } from './jsm/renderers/CSS3DRenderer.js';
 
-			var camera, scene, renderer;
-			var controls;
-			var root;
+			let camera, scene, renderer;
+			let controls;
+			let root;
 
-			var objects = [];
-			var tmpVec1 = new THREE.Vector3();
-			var tmpVec2 = new THREE.Vector3();
-			var tmpVec3 = new THREE.Vector3();
-			var tmpVec4 = new THREE.Vector3();
-			var offset = new THREE.Vector3();
+			const objects = [];
+			const tmpVec1 = new THREE.Vector3();
+			const tmpVec2 = new THREE.Vector3();
+			const tmpVec3 = new THREE.Vector3();
+			const tmpVec4 = new THREE.Vector3();
+			const offset = new THREE.Vector3();
 
-			var visualizationType = 2;
+			let visualizationType = 2;
 
-			var MOLECULES = {
+			const MOLECULES = {
 				"Ethanol": "ethanol.pdb",
 				"Aspirin": "aspirin.pdb",
 				"Caffeine": "caffeine.pdb",
@@ -106,11 +106,11 @@
 				"Graphite": "graphite.pdb"
 			};
 
-			var loader = new PDBLoader();
-			var colorSpriteMap = {};
-			var baseSprite = document.createElement( 'img' );
+			const loader = new PDBLoader();
+			const colorSpriteMap = {};
+			const baseSprite = document.createElement( 'img' );
 
-			var menu = document.getElementById( "menu" );
+			const menu = document.getElementById( "menu" );
 
 			init();
 			animate();
@@ -118,7 +118,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
-				camera.position.z = 1500;
+				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
 
@@ -135,13 +135,12 @@
 
 				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 0.5;
-				controls.addEventListener( 'change', render );
 
 				//
 
 				baseSprite.onload = function () {
 
-					loadMolecule( "models/molecules/caffeine.pdb" );
+					loadMolecule( "models/pdb/caffeine.pdb" );
 					createMenu();
 
 				};
@@ -168,21 +167,21 @@
 
 			function createMenu() {
 
-				for ( var m in MOLECULES ) {
+				for ( const m in MOLECULES ) {
 
-					var button = document.createElement( 'button' );
+					const button = document.createElement( 'button' );
 					button.innerHTML = m;
 					menu.appendChild( button );
 
-					var url = "models/molecules/" + MOLECULES[ m ];
+					const url = "models/pdb/" + MOLECULES[ m ];
 
 					button.addEventListener( 'click', generateButtonCallback( url ), false );
 
 				}
 
-				var b_a = document.getElementById( "b_a" );
-				var b_b = document.getElementById( "b_b" );
-				var b_ab = document.getElementById( "b_ab" );
+				const b_a = document.getElementById( "b_a" );
+				const b_b = document.getElementById( "b_b" );
+				const b_ab = document.getElementById( "b_ab" );
 
 				b_a.addEventListener( 'click', function () {
 
@@ -209,9 +208,9 @@
 
 			function showAtoms() {
 
-				for ( var i = 0; i < objects.length; i ++ ) {
+				for ( let i = 0; i < objects.length; i ++ ) {
 
-					var object = objects[ i ];
+					const object = objects[ i ];
 
 					if ( object instanceof CSS3DSprite ) {
 
@@ -231,9 +230,9 @@
 
 			function showBonds() {
 
-				for ( var i = 0; i < objects.length; i ++ ) {
+				for ( let i = 0; i < objects.length; i ++ ) {
 
-					var object = objects[ i ];
+					const object = objects[ i ];
 
 					if ( object instanceof CSS3DSprite ) {
 
@@ -254,9 +253,9 @@
 
 			function showAtomsBonds() {
 
-				for ( var i = 0; i < objects.length; i ++ ) {
+				for ( let i = 0; i < objects.length; i ++ ) {
 
-					var object = objects[ i ];
+					const object = objects[ i ];
 
 					object.element.style.display = "";
 					object.visible = true;
@@ -275,12 +274,12 @@
 
 			function colorify( ctx, width, height, color ) {
 
-				var r = color.r, g = color.g, b = color.b;
+				const r = color.r, g = color.g, b = color.b;
 
-				var imageData = ctx.getImageData( 0, 0, width, height );
-				var data = imageData.data;
+				const imageData = ctx.getImageData( 0, 0, width, height );
+				const data = imageData.data;
 
-				for ( var i = 0, l = data.length; i < l; i += 4 ) {
+				for ( let i = 0, l = data.length; i < l; i += 4 ) {
 
 					data[ i + 0 ] *= r;
 					data[ i + 1 ] *= g;
@@ -294,15 +293,15 @@
 
 			function imageToCanvas( image ) {
 
-				var width = image.width;
-				var height = image.height;
+				const width = image.width;
+				const height = image.height;
 
-				var canvas = document.createElement( 'canvas' );
+				const canvas = document.createElement( 'canvas' );
 
 				canvas.width = width;
 				canvas.height = height;
 
-				var context = canvas.getContext( '2d' );
+				const context = canvas.getContext( '2d' );
 				context.drawImage( image, 0, 0, width, height );
 
 				return canvas;
@@ -313,20 +312,20 @@
 
 			function loadMolecule( url ) {
 
-				for ( var i = 0; i < objects.length; i ++ ) {
+				for ( let i = 0; i < objects.length; i ++ ) {
 
-					var object = objects[ i ];
+					const object = objects[ i ];
 					object.parent.remove( object );
 
 				}
 
-				objects = [];
+				objects.length = 0;
 
 				loader.load( url, function ( pdb ) {
 
-					var geometryAtoms = pdb.geometryAtoms;
-					var geometryBonds = pdb.geometryBonds;
-					var json = pdb.json;
+					const geometryAtoms = pdb.geometryAtoms;
+					const geometryBonds = pdb.geometryBonds;
+					const json = pdb.json;
 
 					geometryAtoms.computeBoundingBox();
 					geometryAtoms.boundingBox.getCenter( offset ).negate();
@@ -334,44 +333,39 @@
 					geometryAtoms.translate( offset.x, offset.y, offset.z );
 					geometryBonds.translate( offset.x, offset.y, offset.z );
 
-					var positions = geometryAtoms.getAttribute( 'position' );
-					var colors = geometryAtoms.getAttribute( 'color' );
+					const positionAtoms = geometryAtoms.getAttribute( 'position' );
+					const colorAtoms = geometryAtoms.getAttribute( 'color' );
 
-					var position = new THREE.Vector3();
-					var color = new THREE.Color();
+					const position = new THREE.Vector3();
+					const color = new THREE.Color();
 
-					for ( var i = 0; i < positions.count; i ++ ) {
+					for ( let i = 0; i < positionAtoms.count; i ++ ) {
 
-						position.x = positions.getX( i );
-						position.y = positions.getY( i );
-						position.z = positions.getZ( i );
+						position.fromBufferAttribute( positionAtoms, i );
+						color.fromBufferAttribute( colorAtoms, i );
 
-						color.r = colors.getX( i );
-						color.g = colors.getY( i );
-						color.b = colors.getZ( i );
-
-						var atom = json.atoms[ i ];
-						var element = atom[ 4 ];
+						const atomJSON = json.atoms[ i ];
+						const element = atomJSON[ 4 ];
 
 						if ( ! colorSpriteMap[ element ] ) {
 
-							var canvas = imageToCanvas( baseSprite );
-							var context = canvas.getContext( '2d' );
+							const canvas = imageToCanvas( baseSprite );
+							const context = canvas.getContext( '2d' );
 
 							colorify( context, canvas.width, canvas.height, color );
 
-							var dataUrl = canvas.toDataURL();
+							const dataUrl = canvas.toDataURL();
 
 							colorSpriteMap[ element ] = dataUrl;
 
 						}
 
-						var colorSprite = colorSpriteMap[ element ];
+						const colorSprite = colorSpriteMap[ element ];
 
-						var atom = document.createElement( 'img' );
+						const atom = document.createElement( 'img' );
 						atom.src = colorSprite;
 
-						var object = new CSS3DSprite( atom );
+						const object = new CSS3DSprite( atom );
 						object.position.copy( position );
 						object.position.multiplyScalar( 75 );
 
@@ -384,34 +378,29 @@
 
 					}
 
-					positions = geometryBonds.getAttribute( 'position' );
+					const positionBonds = geometryBonds.getAttribute( 'position' );
 
-					var start = new THREE.Vector3();
-					var end = new THREE.Vector3();
+					const start = new THREE.Vector3();
+					const end = new THREE.Vector3();
 
-					for ( var i = 0; i < positions.count; i += 2 ) {
+					for ( let i = 0; i < positionBonds.count; i += 2 ) {
 
-						start.x = positions.getX( i );
-						start.y = positions.getY( i );
-						start.z = positions.getZ( i );
-
-						end.x = positions.getX( i + 1 );
-						end.y = positions.getY( i + 1 );
-						end.z = positions.getZ( i + 1 );
+						start.fromBufferAttribute( positionBonds, i );
+						end.fromBufferAttribute( positionBonds, i + 1 );
 
 						start.multiplyScalar( 75 );
 						end.multiplyScalar( 75 );
 
 						tmpVec1.subVectors( end, start );
-						var bondLength = tmpVec1.length() - 50;
+						const bondLength = tmpVec1.length() - 50;
 
 						//
 
-						var bond = document.createElement( 'div' );
+						let bond = document.createElement( 'div' );
 						bond.className = "bond";
 						bond.style.height = bondLength + "px";
 
-						var object = new CSS3DObject( bond );
+						let object = new CSS3DObject( bond );
 						object.position.copy( start );
 						object.position.lerp( end, 0.5 );
 
@@ -420,11 +409,11 @@
 
 						//
 
-						var axis = tmpVec2.set( 0, 1, 0 ).cross( tmpVec1 );
-						var radians = Math.acos( tmpVec3.set( 0, 1, 0 ).dot( tmpVec4.copy( tmpVec1 ).normalize() ) );
+						const axis = tmpVec2.set( 0, 1, 0 ).cross( tmpVec1 );
+						const radians = Math.acos( tmpVec3.set( 0, 1, 0 ).dot( tmpVec4.copy( tmpVec1 ).normalize() ) );
 
-						var objMatrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
-						object.matrix = objMatrix;
+						const objMatrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
+						object.matrix.copy( objMatrix );
 						object.quaternion.setFromRotationMatrix( object.matrix );
 
 						object.matrixAutoUpdate = false;
@@ -436,11 +425,11 @@
 
 						//
 
-						var bond = document.createElement( 'div' );
+						bond = document.createElement( 'div' );
 						bond.className = "bond";
 						bond.style.height = bondLength + "px";
 
-						var joint = new THREE.Object3D( bond );
+						const joint = new THREE.Object3D( bond );
 						joint.position.copy( start );
 						joint.position.lerp( end, 0.5 );
 
@@ -450,7 +439,7 @@
 						joint.matrixAutoUpdate = false;
 						joint.updateMatrix();
 
-						var object = new CSS3DObject( bond );
+						object = new CSS3DObject( bond );
 						object.rotation.y = Math.PI / 2;
 
 						object.matrixAutoUpdate = false;
@@ -484,8 +473,6 @@
 
 					}
 
-					render();
-
 				} );
 
 
@@ -500,8 +487,6 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				render();
-
 			}
 
 			function animate() {
@@ -509,7 +494,7 @@
 				requestAnimationFrame( animate );
 				controls.update();
 
-				var time = Date.now() * 0.0004;
+				const time = Date.now() * 0.0004;
 
 				root.rotation.x = time;
 				root.rotation.y = time * 0.7;

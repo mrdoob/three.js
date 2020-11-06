@@ -1,15 +1,13 @@
+import {
+	CompressedTextureLoader
+} from "../../../build/three.module.js";
+
 /**
- * @author amakaseev / https://github.com/amakaseev
- *
  * for description see https://www.khronos.org/opengles/sdk/tools/KTX/
  * for file layout see https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/
  *
  * ported from https://github.com/BabylonJS/Babylon.js/blob/master/src/Tools/babylon.khronosTextureContainer.ts
  */
-
-import {
-	CompressedTextureLoader
-} from "../../../build/three.module.js";
 
 
 var KTXLoader = function ( manager ) {
@@ -104,24 +102,28 @@ var KhronosTextureContainer = ( function () {
 			this.numberOfMipmapLevels = Math.max( 1, this.numberOfMipmapLevels );
 
 		}
+
 		if ( this.pixelHeight === 0 || this.pixelDepth !== 0 ) {
 
 			console.warn( 'only 2D textures currently supported' );
 			return;
 
 		}
+
 		if ( this.numberOfArrayElements !== 0 ) {
 
 			console.warn( 'texture arrays not currently supported' );
 			return;
 
 		}
+
 		if ( this.numberOfFaces !== facesExpected ) {
 
 			console.warn( 'number of faces expected' + facesExpected + ', but found ' + this.numberOfFaces );
 			return;
 
 		}
+
 		// we now have a completely validated file, so could use existence of loadType as success
 		// would need to make this more elaborate & adjust checks above to support more than one load type
 		this.loadType = KhronosTextureContainer.COMPRESSED_2D;
@@ -154,6 +156,7 @@ var KhronosTextureContainer = ( function () {
 				dataOffset += 3 - ( ( imageSize + 3 ) % 4 ); // add padding for odd sized image
 
 			}
+
 			width = Math.max( 1.0, width * 0.5 );
 			height = Math.max( 1.0, height * 0.5 );
 

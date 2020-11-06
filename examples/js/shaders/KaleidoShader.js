@@ -1,6 +1,4 @@
 /**
- * @author felixturner / http://airtight.cc/
- *
  * Kaleidoscope Shader
  * Radial reflection around center point
  * Ported from: http://pixelshaders.com/editor/

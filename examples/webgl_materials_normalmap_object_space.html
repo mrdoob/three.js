@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl object-space normalmap demo<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl object-space normalmap demo<br />
 			Nefertiti Bust by
 			<a href="http://www.cultlab3d.de/" target="_blank" rel="noopener">CultLab3D</a><br />
 
@@ -22,7 +22,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var renderer, scene, camera;
+			let renderer, scene, camera;
 
 			init();
 
@@ -33,7 +33,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				// scene
 				scene = new THREE.Scene();
@@ -44,7 +44,7 @@
 				scene.add( camera );
 
 				// controls
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 10;
 				controls.maxDistance = 50;
@@ -54,7 +54,7 @@
 				scene.add( new THREE.AmbientLight( 0xffffff, .2 ) );
 
 				// light
-				var light = new THREE.PointLight( 0xffffff, 1.5 );
+				const light = new THREE.PointLight( 0xffffff, 1.5 );
 				camera.add( light );
 
 				// model
@@ -71,7 +71,7 @@
 
 							// attribute normals are not required with an object-space normal map. remove them.
 
-							child.geometry.removeAttribute( 'normal' );
+							child.geometry.deleteAttribute( 'normal' );
 
 							//
 

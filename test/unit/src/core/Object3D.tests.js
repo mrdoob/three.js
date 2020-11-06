@@ -1,7 +1,3 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Object3D } from '../../../../src/core/Object3D';
@@ -87,7 +83,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "applyMatrix", ( assert ) => {
+		QUnit.test( "applyMatrix4", ( assert ) => {
 
 			var a = new Object3D();
 			var m = new Matrix4();
@@ -97,7 +93,7 @@ export default QUnit.module( 'Core', () => {
 			m.makeRotationX( Math.PI / 2 );
 			m.setPosition( new Vector3( x, y, z ) );
 
-			a.applyMatrix( m );
+			a.applyMatrix4( m );
 
 			assert.deepEqual( a.position, expectedPos, "Position has the expected values" );
 			assert.ok(
@@ -300,7 +296,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "add/remove", ( assert ) => {
+		QUnit.test( "add/remove/clear", ( assert ) => {
 
 			var a = new Object3D();
 			var child1 = new Object3D();
@@ -331,6 +327,13 @@ export default QUnit.module( 'Core', () => {
 			assert.strictEqual( a.children.length, 1, "The second one was added to the parent (no remove)" );
 			assert.strictEqual( a.children[ 0 ], child2, "The second one is now the parent's child again" );
 			assert.strictEqual( child1.children.length, 0, "The first one no longer has any children" );
+
+			a.add( child1 );
+			assert.strictEqual( a.children.length, 2, "The first child was added to the parent" );
+			a.clear();
+			assert.strictEqual( a.children.length, 0, "All childrens were removed" );
+			assert.strictEqual( child1.parent, null, "First child has no parent" );
+			assert.strictEqual( child2.parent, null, "Second child has no parent" );
 
 		} );
 
@@ -392,7 +395,7 @@ export default QUnit.module( 'Core', () => {
 			var m = new Matrix4().makeScale( x, y, z );
 			var expected = new Vector3( x, y, z );
 
-			a.applyMatrix( m );
+			a.applyMatrix4( m );
 
 			assert.deepEqual( a.getWorldScale( new Vector3() ), expected, "WorldScale as expected" );
 

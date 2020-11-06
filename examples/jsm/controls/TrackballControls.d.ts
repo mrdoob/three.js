@@ -1,4 +1,4 @@
-import { Camera, EventDispatcher, Vector3 } from '../../../src/Three';
+import { Camera, EventDispatcher, MOUSE, Vector3 } from '../../../src/Three';
 
 export class TrackballControls extends EventDispatcher {
 
@@ -22,6 +22,7 @@ export class TrackballControls extends EventDispatcher {
 	minDistance: number;
 	maxDistance: number;
 	keys: number[];
+	mouseButtons: { LEFT: MOUSE; MIDDLE: MOUSE; RIGHT: MOUSE };
 
 	target: Vector3;
 	position0: Vector3;

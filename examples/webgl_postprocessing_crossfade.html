@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl scene transitions<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl scene transitions<br/>
 			by <a href="https://twitter.com/fernandojsg">fernandojsg</a> - <a href="https://github.com/kile/three.js-demos">github</a>
 		</div>
 
@@ -24,11 +24,11 @@
 
 			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
-			var container, stats;
-			var renderer;
-			var transition;
+			let container, stats;
+			let renderer;
+			let transition;
 
-			var transitionParams = {
+			const transitionParams = {
 				"useTexture": true,
 				"transition": 0.5,
 				"transitionSpeed": 2.0,
@@ -38,7 +38,7 @@
 				"textureThreshold": 0.3
 			};
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -57,8 +57,8 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var sceneA = new FXScene( "cube", 5000, 1200, 120, new THREE.Vector3( 0, - 0.4, 0 ), 0xffffff );
-				var sceneB = new FXScene( "sphere", 500, 2000, 50, new THREE.Vector3( 0, 0.2, 0.1 ), 0x000000 );
+				const sceneA = new FXScene( "cube", 5000, 1200, 120, new THREE.Vector3( 0, - 0.4, 0 ), 0xffffff );
+				const sceneB = new FXScene( "sphere", 500, 2000, 50, new THREE.Vector3( 0, 0.2, 0.1 ), 0x000000 );
 
 				transition = new Transition( sceneA, sceneB );
 
@@ -75,7 +75,7 @@
 
 			function initGUI() {
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( transitionParams, "useTexture" ).onChange( function ( value ) {
 
@@ -114,29 +114,29 @@
 
 				function applyVertexColors( geometry, color ) {
 
-					var position = geometry.attributes.position;
-					var colors = [];
+					const position = geometry.attributes.position;
+					const colors = [];
 
-					for ( var i = 0; i < position.count; i ++ ) {
+					for ( let i = 0; i < position.count; i ++ ) {
 
 						colors.push( color.r, color.g, color.b );
 
 					}
 
-					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+					geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				}
 
-				var geometries = [];
+				const geometries = [];
 
-				var matrix = new THREE.Matrix4();
-				var position = new THREE.Vector3();
-				var rotation = new THREE.Euler();
-				var quaternion = new THREE.Quaternion();
-				var scale = new THREE.Vector3();
-				var color = new THREE.Color();
+				const matrix = new THREE.Matrix4();
+				const position = new THREE.Vector3();
+				const rotation = new THREE.Euler();
+				const quaternion = new THREE.Quaternion();
+				const scale = new THREE.Vector3();
+				const color = new THREE.Color();
 
-				for ( var i = 0; i < numObjects; i ++ ) {
+				for ( let i = 0; i < numObjects; i ++ ) {
 
 					position.x = Math.random() * 10000 - 5000;
 					position.y = Math.random() * 6000 - 3000;
@@ -149,7 +149,7 @@
 
 					scale.x = Math.random() * 200 + 100;
 
-					var geometry;
+					let geometry;
 
 					if ( objectType === 'cube' ) {
 
@@ -171,7 +171,7 @@
 					applyVertexColors( geometry, color );
 
 					matrix.compose( position, quaternion, scale );
-					geometry.applyMatrix( matrix );
+					geometry.applyMatrix4( matrix );
 
 					geometries.push( geometry );
 
@@ -192,17 +192,17 @@
 				this.scene = new THREE.Scene();
 				this.scene.add( new THREE.AmbientLight( 0x555555 ) );
 
-				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				const light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
 				this.scene.add( light );
 
 				this.rotationSpeed = rotationSpeed;
 
-				var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+				const defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: true } );
 				this.mesh = new THREE.Mesh( generateGeometry( type, numObjects ), defaultMaterial );
 				this.scene.add( this.mesh );
 
-				var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+				const renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 				this.fbo = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
 
 				this.render = function ( delta, rtt ) {
@@ -238,9 +238,9 @@
 
 				this.textures = [];
 
-				var loader = new THREE.TextureLoader();
+				const loader = new THREE.TextureLoader();
 
-				for ( var i = 0; i < 6; i ++ )
+				for ( let i = 0; i < 6; i ++ )
 					this.textures[ i ] = loader.load( 'textures/transition/transition' + ( i + 1 ) + '.png' );
 
 				this.quadmaterial = new THREE.ShaderMaterial( {
@@ -316,7 +316,7 @@
 
 				} );
 
-				var quadgeometry = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+				const quadgeometry = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
 
 				this.quad = new THREE.Mesh( quadgeometry, this.quadmaterial );
 				this.scene.add( this.quad );
@@ -353,8 +353,8 @@
 					// Transition animation
 					if ( transitionParams.animateTransition ) {
 
-						var t = ( 1 + Math.sin( transitionParams.transitionSpeed * clock.getElapsedTime() / Math.PI ) ) / 2;
-						transitionParams.transition = THREE.Math.smoothstep( t, 0.3, 0.7 );
+						const t = ( 1 + Math.sin( transitionParams.transitionSpeed * clock.getElapsedTime() / Math.PI ) ) / 2;
+						transitionParams.transition = THREE.MathUtils.smoothstep( t, 0.3, 0.7 );
 
 						// Change the current alpha texture after each transition
 						if ( transitionParams.loopTexture && ( transitionParams.transition == 0 || transitionParams.transition == 1 ) ) {

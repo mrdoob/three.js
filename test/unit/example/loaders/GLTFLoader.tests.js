@@ -1,6 +1,3 @@
-/**
- * @author Don McCurdy / https://www.donmccurdy.com
- */
 /* global QUnit */
 
 import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter';
@@ -35,7 +32,7 @@ export default QUnit.module( 'Loaders', () => {
 				1, 1, 1,
 				4, 4, 4
 			] );
-			geometry.addAttribute( 'position', new BufferAttribute( array, 3 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( array, 3 ) );
 
 			var meshIn = new Mesh( geometry, new MeshStandardMaterial( { color: 0xFF0000 } ) );
 			meshIn.name = 'test_mesh';

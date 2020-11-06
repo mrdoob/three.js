@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import * as Constants from '../../../src/constants';
@@ -15,8 +12,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.CullFaceBack, 1, 'CullFaceBack equal 1' );
 		assert.equal( Constants.CullFaceFront, 2, 'CullFaceFront is equal to 2' );
 		assert.equal( Constants.CullFaceFrontBack, 3, 'CullFaceFrontBack is equal to 3' );
-		assert.equal( Constants.FrontFaceDirectionCW, 0, 'FrontFaceDirectionCW is equal to 0' );
-		assert.equal( Constants.FrontFaceDirectionCCW, 1, 'FrontFaceDirectionCCW is equal to 1' );
 		assert.equal( Constants.BasicShadowMap, 0, 'BasicShadowMap is equal to 0' );
 		assert.equal( Constants.PCFShadowMap, 1, 'PCFShadowMap is equal to 1' );
 		assert.equal( Constants.PCFSoftShadowMap, 2, 'PCFSoftShadowMap is equal to 2' );
@@ -25,9 +20,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.DoubleSide, 2, 'DoubleSide is equal to 2' );
 		assert.equal( Constants.FlatShading, 1, 'FlatShading is equal to 1' );
 		assert.equal( Constants.SmoothShading, 2, 'SmoothShading is equal to 2' );
-		assert.equal( Constants.NoColors, 0, 'NoColors is equal to 0' );
-		assert.equal( Constants.FaceColors, 1, 'FaceColors is equal to 1' );
-		assert.equal( Constants.VertexColors, 2, 'VertexColors is equal to 2' );
 		assert.equal( Constants.NoBlending, 0, 'NoBlending is equal to 0' );
 		assert.equal( Constants.NormalBlending, 1, 'NormalBlending is equal to 1' );
 		assert.equal( Constants.AdditiveBlending, 2, 'AdditiveBlending is equal to 2' );
@@ -64,14 +56,13 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.NoToneMapping, 0, 'NoToneMapping is equal to 0' );
 		assert.equal( Constants.LinearToneMapping, 1, 'LinearToneMapping is equal to 1' );
 		assert.equal( Constants.ReinhardToneMapping, 2, 'ReinhardToneMapping is equal to 2' );
-		assert.equal( Constants.Uncharted2ToneMapping, 3, 'Uncharted2ToneMapping is equal to 3' );
-		assert.equal( Constants.CineonToneMapping, 4, 'CineonToneMapping is equal to 4' );
+		assert.equal( Constants.CineonToneMapping, 3, 'CineonToneMapping is equal to 3' );
+		assert.equal( Constants.ACESFilmicToneMapping, 4, 'ACESFilmicToneMapping is equal to 4' );
 		assert.equal( Constants.UVMapping, 300, 'UVMapping is equal to 300' );
 		assert.equal( Constants.CubeReflectionMapping, 301, 'CubeReflectionMapping is equal to 301' );
 		assert.equal( Constants.CubeRefractionMapping, 302, 'CubeRefractionMapping is equal to 302' );
 		assert.equal( Constants.EquirectangularReflectionMapping, 303, 'EquirectangularReflectionMapping is equal to 303' );
 		assert.equal( Constants.EquirectangularRefractionMapping, 304, 'EquirectangularRefractionMapping is equal to 304' );
-		assert.equal( Constants.SphericalReflectionMapping, 305, 'SphericalReflectionMapping is equal to 305' );
 		assert.equal( Constants.CubeUVReflectionMapping, 306, 'CubeUVReflectionMapping is equal to 306' );
 		assert.equal( Constants.CubeUVRefractionMapping, 307, 'CubeUVRefractionMapping is equal to 307' );
 		assert.equal( Constants.RepeatWrapping, 1000, 'RepeatWrapping is equal to 1000' );

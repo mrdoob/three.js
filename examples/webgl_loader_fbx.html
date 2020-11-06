@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader<br />
 			Character and animation from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">Mixamo</a>
 		</div>
 
@@ -22,19 +22,18 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
-			var container, stats, controls;
-			var camera, scene, renderer, light;
+			let camera, scene, renderer, stats;
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
-			var mixer;
+			let mixer;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -44,39 +43,39 @@
 				scene.background = new THREE.Color( 0xa0a0a0 );
 				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
 
-				light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				light.position.set( 0, 200, 0 );
-				scene.add( light );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				hemiLight.position.set( 0, 200, 0 );
+				scene.add( hemiLight );
 
-				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 200, 100 );
-				light.castShadow = true;
-				light.shadow.camera.top = 180;
-				light.shadow.camera.bottom = - 100;
-				light.shadow.camera.left = - 120;
-				light.shadow.camera.right = 120;
-				scene.add( light );
+				const dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 0, 200, 100 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.top = 180;
+				dirLight.shadow.camera.bottom = - 100;
+				dirLight.shadow.camera.left = - 120;
+				dirLight.shadow.camera.right = 120;
+				scene.add( dirLight );
 
-				// scene.add( new CameraHelper( light.shadow.camera ) );
+				// scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
 
 				// ground
-				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				const mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
+				const grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
 				scene.add( grid );
 
 				// model
-				var loader = new FBXLoader();
+				const loader = new FBXLoader();
 				loader.load( 'models/fbx/Samba Dancing.fbx', function ( object ) {
 
 					mixer = new THREE.AnimationMixer( object );
 
-					var action = mixer.clipAction( object.animations[ 0 ] );
+					const action = mixer.clipAction( object.animations[ 0 ] );
 					action.play();
 
 					object.traverse( function ( child ) {
@@ -100,7 +99,7 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 100, 0 );
 				controls.update();
 
@@ -127,7 +126,7 @@
 
 				requestAnimationFrame( animate );
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 

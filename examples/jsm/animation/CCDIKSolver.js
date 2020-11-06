@@ -1,6 +1,19 @@
+import {
+	BufferAttribute,
+	BufferGeometry,
+	Color,
+	Line,
+	LineBasicMaterial,
+	Matrix4,
+	Mesh,
+	MeshBasicMaterial,
+	Object3D,
+	Quaternion,
+	SphereBufferGeometry,
+	Vector3
+} from "../../../build/three.module.js";
+
 /**
- * @author takahiro / https://github.com/takahirox
- *
  * CCD Algorithm
  *  - https://sites.google.com/site/auraliusproject/ccd-algorithm
  *
@@ -19,21 +32,6 @@
  *	maxAngle: 1.0,
  * } ];
  */
-
-import {
-	BufferAttribute,
-	BufferGeometry,
-	Color,
-	Line,
-	LineBasicMaterial,
-	Matrix4,
-	Mesh,
-	MeshBasicMaterial,
-	Object3D,
-	Quaternion,
-	SphereBufferGeometry,
-	Vector3
-} from "../../../build/three.module.js";
 
 var CCDIKSolver = ( function () {
 
@@ -112,7 +110,7 @@ var CCDIKSolver = ( function () {
 							// don't use getWorldPosition/Quaternion() here for the performance
 							// because they call updateMatrixWorld( true ) inside.
 							link.matrixWorld.decompose( linkPos, invLinkQ, linkScale );
-							invLinkQ.inverse();
+							invLinkQ.invert();
 							effectorPos.setFromMatrixPosition( effector.matrixWorld );
 
 							// work in link world
@@ -349,7 +347,7 @@ var CCDIKSolver = ( function () {
 					var iks = this.iks;
 					var bones = mesh.skeleton.bones;
 
-					matrix.getInverse( mesh.matrixWorld );
+					matrix.copy( mesh.matrixWorld ).invert();
 
 					for ( var i = 0, il = iks.length; i < il; i ++ ) {
 
@@ -407,14 +405,14 @@ var CCDIKSolver = ( function () {
 
 		_init: function () {
 
-			var self = this;
+			var scope = this;
 			var iks = this.iks;
 
 			function createLineGeometry( ik ) {
 
 				var geometry = new BufferGeometry();
 				var vertices = new Float32Array( ( 2 + ik.links.length ) * 3 );
-				geometry.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 
 				return geometry;
 
@@ -422,25 +420,25 @@ var CCDIKSolver = ( function () {
 
 			function createTargetMesh() {
 
-				return new Mesh( self.sphereGeometry, self.targetSphereMaterial );
+				return new Mesh( scope.sphereGeometry, scope.targetSphereMaterial );
 
 			}
 
 			function createEffectorMesh() {
 
-				return new Mesh( self.sphereGeometry, self.effectorSphereMaterial );
+				return new Mesh( scope.sphereGeometry, scope.effectorSphereMaterial );
 
 			}
 
 			function createLinkMesh() {
 
-				return new Mesh( self.sphereGeometry, self.linkSphereMaterial );
+				return new Mesh( scope.sphereGeometry, scope.linkSphereMaterial );
 
 			}
 
 			function createLine( ik ) {
 
-				return new Line( createLineGeometry( ik ), self.lineMaterial );
+				return new Line( createLineGeometry( ik ), scope.lineMaterial );
 
 			}
 

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,19 +13,23 @@
 
 		<p class="desc">极坐标格辅助对象. 坐标格实际上是2维线数组.</p>
 
+		<h2>代码示例</h2>
+
+		<code>
+		const radius = 10;
+		const radials = 16;
+		const circles = 8;
+		const divisions = 64;
+
+		const helper = new THREE.PolarGridHelper( radius, radials, circles, divisions );
+		scene.add( helper );
+		</code>
 
 		<h2>例子</h2>
 
-		<code>var radius = 10;
-		var radials = 16;
-		var circles = 8;
-		var divisions = 64;
-
-		var helper = new THREE.PolarGridHelper( radius, radials, circles, divisions );
-		scene.add( helper );
-		</code>
-		[example:webgl_helpers Example using various helpers]
-
+		<p>
+			[example:webgl_helpers WebGL / helpers]
+		</p>
 
 		<h2>构造函数</h2>
 

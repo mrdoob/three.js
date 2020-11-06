@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - 3DS loader
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - 3DS loader
 		</div>
 
 		<script type="module">
@@ -19,8 +19,8 @@
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { TDSLoader } from './jsm/loaders/TDSLoader.js';
 
-			var container, controls;
-			var camera, scene, renderer;
+			let container, controls;
+			let camera, scene, renderer;
 
 			init();
 			animate();
@@ -36,15 +36,14 @@
 				scene = new THREE.Scene();
 				scene.add( new THREE.HemisphereLight() );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+				const directionalLight = new THREE.DirectionalLight( 0xffeedd );
 				directionalLight.position.set( 0, 0, 2 );
 				scene.add( directionalLight );
 
 				//3ds files dont store normal maps
-				var loader = new THREE.TextureLoader();
-				var normal = loader.load( 'models/3ds/portalgun/textures/normal.jpg' );
+				const normal = new THREE.TextureLoader().load( 'models/3ds/portalgun/textures/normal.jpg' );
 
-				var loader = new TDSLoader( );
+				const loader = new TDSLoader( );
 				loader.setResourcePath( 'models/3ds/portalgun/textures/' );
 				loader.load( 'models/3ds/portalgun/portalgun.3ds', function ( object ) {
 
@@ -52,6 +51,7 @@
 
 						if ( child.isMesh ) {
 
+							child.material.specular.setScalar( 0.1 );
 							child.material.normalMap = normal;
 
 						}
@@ -65,6 +65,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				controls = new TrackballControls( camera, renderer.domElement );

@@ -1,6 +1,14 @@
+import {
+	BufferGeometry,
+	DynamicDrawUsage,
+	Float32BufferAttribute,
+	MathUtils,
+	Uint32BufferAttribute,
+	Vector3
+} from "../../../build/three.module.js";
+import { SimplexNoise } from "../math/SimplexNoise.js";
+
 /**
- * @author yomboprime https://github.com/yomboprime
- *
  * @fileoverview LightningStrike object for creating lightning strikes and voltaic arcs.
  *
  *
@@ -100,16 +108,6 @@
  *
  *
 */
-
-import {
-	BufferGeometry,
-	DynamicDrawUsage,
-	Float32BufferAttribute,
-	Math as _Math,
-	Uint32BufferAttribute,
-	Vector3
-} from "../../../build/three.module.js";
-import { SimplexNoise } from "../math/SimplexNoise.js";
 
 var LightningStrike = function ( rayParameters ) {
 
@@ -429,12 +427,12 @@ LightningStrike.prototype.createMesh = function () {
 	this.setIndex( new Uint32BufferAttribute( this.indices, 1 ) );
 
 	this.positionAttribute = new Float32BufferAttribute( this.vertices, 3 );
-	this.addAttribute( 'position', this.positionAttribute );
+	this.setAttribute( 'position', this.positionAttribute );
 
 	if ( this.generateUVs ) {
 
 		this.uvsAttribute = new Float32BufferAttribute( new Float32Array( this.uvs ), 2 );
-		this.addAttribute( 'uv', this.uvsAttribute );
+		this.setAttribute( 'uv', this.uvsAttribute );
 
 	}
 
@@ -587,8 +585,8 @@ LightningStrike.prototype.fractalRay = function ( time, segmentCallback ) {
 
 		this.randomGenerator.setSeed( subray.seed );
 
-		subray.endPropagationTime = _Math.lerp( subray.birthTime, subray.deathTime, subray.propagationTimeFactor );
-		subray.beginVanishingTime = _Math.lerp( subray.deathTime, subray.birthTime, 1 - subray.vanishingTimeFactor );
+		subray.endPropagationTime = MathUtils.lerp( subray.birthTime, subray.deathTime, subray.propagationTimeFactor );
+		subray.beginVanishingTime = MathUtils.lerp( subray.deathTime, subray.birthTime, 1 - subray.vanishingTimeFactor );
 
 		var random1 = this.randomGenerator.random;
 		subray.linPos0.set( random1(), random1(), random1() ).multiplyScalar( 1000 );
@@ -833,7 +831,7 @@ LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function () {
 		var period = lightningStrike.rayParameters.subrayPeriod;
 		var dutyCycle = lightningStrike.rayParameters.subrayDutyCycle;
 
-		var phase0 = ( lightningStrike.rayParameters.isEternal && subray.recursion == 0 ) ? - random1() * period : _Math.lerp( subray.birthTime, subray.endPropagationTime, segment.fraction0 ) - random1() * period;
+		var phase0 = ( lightningStrike.rayParameters.isEternal && subray.recursion == 0 ) ? - random1() * period : MathUtils.lerp( subray.birthTime, subray.endPropagationTime, segment.fraction0 ) - random1() * period;
 
 		var phase = lightningStrike.time - phase0;
 		var currentCycle = Math.floor( phase / period );

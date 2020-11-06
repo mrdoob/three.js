@@ -1,12 +1,7 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- * @thanks bhouston / https://clara.io/
- */
-
 import { TempNode } from './TempNode.js';
 import { NodeLib } from './NodeLib.js';
 
-var declarationRegexp = /^([a-z_0-9]+)\s([a-z_0-9]+)\s*\((.*?)\)/i,
+var declarationRegexp = /^\s*([a-z_0-9]+)\s([a-z_0-9]+)\s*\((.*?)\)/i,
 	propertiesRegexp = /[a-z_0-9]+/ig;
 
 function FunctionNode( src, includes, extensions, keywords, type ) {

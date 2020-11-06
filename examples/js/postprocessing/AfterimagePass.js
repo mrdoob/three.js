@@ -1,7 +1,3 @@
-/**
- * @author HypnosNova / https://www.threejs.org.cn/gallery/
- */
-
 THREE.AfterimagePass = function ( damp ) {
 
 	THREE.Pass.call( this );

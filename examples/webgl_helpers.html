@@ -17,9 +17,15 @@
 
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var scene, renderer;
-			var camera, light;
-			var vnh;
+			import { VertexNormalsHelper } from './jsm/helpers/VertexNormalsHelper.js';
+			import { VertexTangentsHelper } from './jsm/helpers/VertexTangentsHelper.js';
+
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
+
+			let scene, renderer;
+			let camera, light;
+			let vnh;
+			let vth;
 
 			init();
 			animate();
@@ -44,22 +50,24 @@
 
 				scene.add( new THREE.PointLightHelper( light, 15 ) );
 
-				var gridHelper = new THREE.GridHelper( 400, 40, 0x0000ff, 0x808080 );
+				const gridHelper = new THREE.GridHelper( 400, 40, 0x0000ff, 0x808080 );
 				gridHelper.position.y = - 150;
 				gridHelper.position.x = - 150;
 				scene.add( gridHelper );
 
-				var polarGridHelper = new THREE.PolarGridHelper( 200, 16, 8, 64, 0x0000ff, 0x808080 );
+				const polarGridHelper = new THREE.PolarGridHelper( 200, 16, 8, 64, 0x0000ff, 0x808080 );
 				polarGridHelper.position.y = - 150;
 				polarGridHelper.position.x = 200;
 				scene.add( polarGridHelper );
 
-				var loader = new GLTFLoader();
+				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
-					var mesh = gltf.scene.children[ 0 ];
+					const mesh = gltf.scene.children[ 0 ];
 
-					var group = new THREE.Group();
+					BufferGeometryUtils.computeTangents( mesh.geometry ); // generates bad data due to degenerate UVs
+
+					const group = new THREE.Group();
 					group.scale.multiplyScalar( 50 );
 					scene.add( group );
 
@@ -68,13 +76,16 @@
 
 					group.add( mesh );
 
-					vnh = new THREE.VertexNormalsHelper( mesh, 5 );
+					vnh = new VertexNormalsHelper( mesh, 5 );
 					scene.add( vnh );
+
+					vth = new VertexTangentsHelper( mesh, 5 );
+					scene.add( vth );
 
 					scene.add( new THREE.BoxHelper( mesh ) );
 
-					var wireframe = new THREE.WireframeGeometry( mesh.geometry );
-					var line = new THREE.LineSegments( wireframe );
+					const wireframe = new THREE.WireframeGeometry( mesh.geometry );
+					let line = new THREE.LineSegments( wireframe );
 					line.material.depthTest = false;
 					line.material.opacity = 0.25;
 					line.material.transparent = true;
@@ -82,8 +93,8 @@
 					group.add( line );
 					scene.add( new THREE.BoxHelper( line ) );
 
-					var edges = new THREE.EdgesGeometry( mesh.geometry );
-					var line = new THREE.LineSegments( edges );
+					const edges = new THREE.EdgesGeometry( mesh.geometry );
+					line = new THREE.LineSegments( edges );
 					line.material.depthTest = false;
 					line.material.opacity = 0.25;
 					line.material.transparent = true;
@@ -116,7 +127,7 @@
 
 				requestAnimationFrame( animate );
 
-				var time = - performance.now() * 0.0003;
+				const time = - performance.now() * 0.0003;
 
 				camera.position.x = 400 * Math.cos( time );
 				camera.position.z = 400 * Math.sin( time );
@@ -127,6 +138,7 @@
 				light.position.z = Math.cos( time * 1.3 ) * 300;
 
 				if ( vnh ) vnh.update();
+				if ( vth ) vth.update();
 
 				renderer.render( scene, camera );
 

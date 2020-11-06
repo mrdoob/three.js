@@ -1,7 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
 
 	THREE.Pass.call( this );

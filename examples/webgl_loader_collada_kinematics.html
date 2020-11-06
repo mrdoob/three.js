@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> collada loader - kinematics<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> collada loader - kinematics<br/>
 			robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank" rel="noopener">collada robots</a>
 		</div>
 
@@ -21,17 +21,17 @@
 			import { TWEEN } from './jsm/libs/tween.module.min.js';
 			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer;
-			var particleLight;
-			var dae;
+			let camera, scene, renderer;
+			let particleLight;
+			let dae;
 
-			var kinematics;
-			var kinematicsTween;
-			var tweenParameters = {};
+			let kinematics;
+			let kinematicsTween;
+			const tweenParameters = {};
 
-			var loader = new ColladaLoader();
+			const loader = new ColladaLoader();
 			// loader.load( './models/collada/kawada-hironx.dae', function ( collada ) {
 			loader.load( './models/collada/abb_irb52_7_120.dae', function ( collada ) {
 
@@ -70,7 +70,7 @@
 
 				// Grid
 
-				var grid = new THREE.GridHelper( 20, 20 );
+				const grid = new THREE.GridHelper( 20, 20, 0x888888, 0x444444 );
 				scene.add( grid );
 
 				// Add the COLLADA
@@ -82,10 +82,10 @@
 
 				// Lights
 
-				var light = new THREE.HemisphereLight( 0xffeeee, 0x111122 );
+				const light = new THREE.HemisphereLight( 0xffeeee, 0x111122 );
 				scene.add( light );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.3 );
+				const pointLight = new THREE.PointLight( 0xffffff, 0.3 );
 				particleLight.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer();
@@ -106,25 +106,25 @@
 
 			function setupTween() {
 
-				var duration = THREE.Math.randInt( 1000, 5000 );
+				const duration = THREE.MathUtils.randInt( 1000, 5000 );
 
-				var target = {};
+				const target = {};
 
-				for ( var prop in kinematics.joints ) {
+				for ( const prop in kinematics.joints ) {
 
 					if ( kinematics.joints.hasOwnProperty( prop ) ) {
 
 						if ( ! kinematics.joints[ prop ].static ) {
 
-							var joint = kinematics.joints[ prop ];
+							const joint = kinematics.joints[ prop ];
 
-							var old = tweenParameters[ prop ];
+							const old = tweenParameters[ prop ];
 
-							var position = old ? old : joint.zeroPosition;
+							const position = old ? old : joint.zeroPosition;
 
 							tweenParameters[ prop ] = position;
 
-							target[ prop ] = THREE.Math.randInt( joint.limits.min, joint.limits.max );
+							target[ prop ] = THREE.MathUtils.randInt( joint.limits.min, joint.limits.max );
 
 						}
 
@@ -136,7 +136,7 @@
 
 				kinematicsTween.onUpdate( function ( object ) {
 
-					for ( var prop in kinematics.joints ) {
+					for ( const prop in kinematics.joints ) {
 
 						if ( kinematics.joints.hasOwnProperty( prop ) ) {
 
@@ -181,7 +181,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.0001;
+				const timer = Date.now() * 0.0001;
 
 				camera.position.x = Math.cos( timer ) * 20;
 				camera.position.y = 10;

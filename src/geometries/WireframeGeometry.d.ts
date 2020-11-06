@@ -5,4 +5,9 @@ export class WireframeGeometry extends BufferGeometry {
 
 	constructor( geometry: Geometry | BufferGeometry );
 
+	/**
+	 * @default 'WireframeGeometry'
+	 */
+	type: string;
+
 }

@@ -17,7 +17,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - Resolution-Independent Vector Fonts. <a href="https://github.com/mrdoob/three.js/issues/4746">info</a>.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - Resolution-Independent Vector Fonts. <a href="https://github.com/mrdoob/three.js/issues/4746">info</a>.
 		</div>
 
 		<script type="x-shader/x-fragment" id="fs">
@@ -66,13 +66,13 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var stats;
+			let stats;
 
-			var camera, scene, renderer, controls;
+			let camera, scene, renderer, controls;
 
-			var group;
+			let group;
 
-			var loader = new THREE.FontLoader();
+			const loader = new THREE.FontLoader();
 			loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 				init( font );
@@ -88,46 +88,46 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var theText = '&'; // i % & j b 8
+				const theText = '&'; // i % & j b 8
 
 				group = new THREE.Group();
 				scene.add( group );
 
-				var textMaterial = new THREE.MeshBasicMaterial( {
+				const textMaterial = new THREE.MeshBasicMaterial( {
 					color: new THREE.Color( 0, 0, 1 ),
 					side: THREE.DoubleSide,
 					wireframe: true
 				} );
 
-				var textShapes = font.generateShapes( theText, 180 );
+				const textShapes = font.generateShapes( theText, 180 );
 
-				var geometry = new THREE.ShapeBufferGeometry( textShapes );
+				let geometry = new THREE.ShapeBufferGeometry( textShapes );
 
-				var text = new THREE.Mesh( geometry, textMaterial );
+				let text = new THREE.Mesh( geometry, textMaterial );
 				text.position.x = - 200;
 				group.add( text );
 
 				//
 
-				var vA = new THREE.Vector2();
-				var vB = new THREE.Vector2();
+				let vA = new THREE.Vector2();
+				let vB = new THREE.Vector2();
 
 				function processShape( path ) {
 
-					var pts = []; // bigger area (convex hull)
-					var pts2 = []; // smaller area (full solid shapes)
-					var beziers = []; // quad bezier points
-					var invert = [];
-					var z;
+					const pts = []; // bigger area (convex hull)
+					const pts2 = []; // smaller area (full solid shapes)
+					const beziers = []; // quad bezier points
+					const invert = [];
+					let z;
 
-					var wind;
+					let wind;
 
-					pts.push( path[ 0 ].getPoint( 0 ) );
-					pts2.push( path[ 0 ].getPoint( 0 ) );
+					pts.push( path[ 0 ].getPoint( 0, new THREE.Vector2() ) );
+					pts2.push( path[ 0 ].getPoint( 0, new THREE.Vector2() ) );
 
-					for ( var i = 0; i < path.length; i ++ ) {
+					for ( let i = 0; i < path.length; i ++ ) {
 
-						var curve = path[ i ];
+						const curve = path[ i ];
 						if ( curve instanceof THREE.LineCurve ) {
 
 							pts.push( curve.v2 );
@@ -154,7 +154,7 @@
 
 							}
 
-							var flip = wind ? 1 : - 1;
+							const flip = wind ? 1 : - 1;
 							// if (reverse) flip *= -1;
 
 							invert.push( flip, flip, flip );
@@ -173,18 +173,18 @@
 
 				}
 
-				var pts, pts2;
-				var subshape;
-				var convexhullShape;
-				var solidShape;
-				var convexhullShapeGroup = [];
-				var solidShapeGroup = [];
+				let pts, pts2;
+				let subshape;
+				let convexhullShape;
+				let solidShape;
+				const convexhullShapeGroup = [];
+				const solidShapeGroup = [];
 
-				var beziers = [], invert = [];
-				var process;
-				var hole;
+				let beziers = [], invert = [];
+				let process;
+				let hole;
 
-				for ( var s = 0; s < textShapes.length; s ++ ) {
+				for ( let s = 0; s < textShapes.length; s ++ ) {
 
 					subshape = textShapes[ s ];
 					process = processShape( subshape.curves );
@@ -200,7 +200,7 @@
 					convexhullShapeGroup.push( convexhullShape );
 					solidShapeGroup.push( solidShape );
 
-					for ( var i = 0; i < subshape.holes.length; i ++ ) {
+					for ( let i = 0; i < subshape.holes.length; i ++ ) {
 
 						hole = subshape.holes[ i ];
 
@@ -218,26 +218,26 @@
 
 				} // end of subshape
 
-				var bezierGeometry = new THREE.BufferGeometry();
-				var vertices = [];
-				var uvs = [];
+				const bezierGeometry = new THREE.BufferGeometry();
+				const vertices = [];
+				const uvs = [];
 
-				for ( var i = 0; i < beziers.length; i ++ ) {
+				for ( let i = 0; i < beziers.length; i ++ ) {
 
-					var p = beziers[ i ];
+					const p = beziers[ i ];
 					vertices.push( p.x, p.y, 0 );
 
 				}
 
-				for ( var i = 0; i < beziers.length; i += 3 ) {
+				for ( let i = 0; i < beziers.length; i += 3 ) {
 
 					uvs.push( 0, 0, 0.5, 0, 1, 1 );
 
 				}
 
-				bezierGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-				bezierGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
-				bezierGeometry.addAttribute( 'invert', new THREE.Float32BufferAttribute( invert, 1 ) );
+				bezierGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				bezierGeometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				bezierGeometry.setAttribute( 'invert', new THREE.Float32BufferAttribute( invert, 1 ) );
 
 				geometry = new THREE.ShapeBufferGeometry( convexhullShapeGroup );
 
@@ -253,7 +253,7 @@
 
 				//
 
-				var newMaterial = new THREE.ShaderMaterial( {
+				const newMaterial = new THREE.ShaderMaterial( {
 					uniforms: {
 						color: { value: new THREE.Color( 0.45 * 0xffffff ) }
 					},

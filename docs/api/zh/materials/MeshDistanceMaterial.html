@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -13,15 +12,17 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			[name] is internally used for implementing shadow mapping with [page:PointLight]s.<br/><br/>
+			[name] 在内部用于使用[page:PointLight]来实现阴影映射。
 
-			Can also be used to customize the shadow casting of an object by assigning an instance of [name] to [page:Object3D.customDistanceMaterial].
-			The following examples demonstrates this approach in order to ensure transparent parts of objects do no cast shadows.
+			也可以用于通过将[name]实例指定给[page:Object3D.customDistanceMaterial]，来自定义物体阴影投射。
+			下列示例演示了这一方法，以确保物体的透明部分不投射阴影。
 		</p>
 
-		<h2>Example</h2>
+		<h2>例子</h2>
 
-		[example:webgl_shadowmap_pointlight WebGL / shadowmap / pointlight]
+		<p>
+			[example:webgl_shadowmap_pointlight WebGL / shadowmap / pointlight]
+		</p>
 
 		<script>
 
@@ -29,7 +30,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -50,9 +51,13 @@
 		<p>共有属性请参见其基类[page:Material]。</p>
 
 		<h3>[property:Texture alphaMap]</h3>
-		<p>alpha贴图是一种灰度纹理，用于控制整个表面的不透明度（黑色：完全透明;白色：完全不透明）。默认值为null。<br /><br />
-			仅使用纹理的颜色，忽略alpha通道（如果存在）。对于RGB和RGBA纹理，[page:WebGLRenderer WebGL]渲染器在采样此纹理时将使用绿色通道，
-			因为在DXT压缩和未压缩RGB 565格式中为绿色提供了额外的精度。Luminance-only以及luminance/alpha纹理也仍然有效。
+		<p>alpha贴图是一张灰度纹理，用于控制整个表面的不透明度。（黑色：完全透明；白色：完全不透明）。
+			默认值为null。<br /><br />
+
+			仅使用纹理的颜色，忽略alpha通道（如果存在）。
+			对于RGB和RGBA纹理，[page:WebGLRenderer WebGL]渲染器在采样此纹理时将使用绿色通道，
+			因为在DXT压缩和未压缩RGB 565格式中为绿色提供了额外的精度。
+			Luminance-only以及luminance/alpha纹理也仍然有效。
 		</p>
 
 		<h3>[property:Texture displacementMap]</h3>
@@ -70,32 +75,26 @@
 
 		<h3>[property:Float farDistance]</h3>
 		<p>
-			TODO
+			The far value of the point light's internal shadow camera.
 		</p>
 
 		<h3>[property:Boolean fog]</h3>
 		<p> 材质是否受雾影响。默认值为*false*。</p>
 
-		<h3>[property:Boolean isMeshDistanceMaterial]</h3>
-		<p> 用于检查此类或派生类是否为深度网格材质。默认值为 *true*。<br /><br />
-
-			因为其通常用在内部优化，所以不应该更改该属性值。
-		</p>
-
 		<h3>[property:Texture map]</h3>
 		<p>颜色贴图。默认为null。</p>
 
-		<h3>[property:boolean morphTargets]</h3>
+		<h3>[property:Boolean morphTargets]</h3>
 		<p>材质是否使用morphTargets。默认值为false。</p>
 
 		<h3>[property:Float nearDistance]</h3>
 		<p>
-			TODO
+			The near value of the point light's internal shadow camera.
 		</p>
 
 		<h3>[property:Vector3 referencePosition]</h3>
 		<p>
-			TODO
+			The position of the point light in world space.
 		</p>
 
 		<h3>[property:Boolean skinning]</h3>

@@ -1,8 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 THREE.ColladaLoader = function ( manager ) {
 
 	THREE.Loader.call( this, manager );
@@ -21,9 +16,29 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text, path ) );
+			try {
+
+				onLoad( scope.parse( text, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -217,6 +232,8 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 				channels: {}
 			};
 
+			var hasChildren = false;
+
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 				var child = xml.childNodes[ i ];
@@ -242,6 +259,12 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 						data.channels[ id ] = parseAnimationChannel( child );
 						break;
 
+					case 'animation':
+						// hierarchy of related animations
+						parseAnimation( child );
+						hasChildren = true;
+						break;
+
 					default:
 						console.log( child );
 
@@ -249,7 +272,13 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			}
 
-			library.animations[ xml.getAttribute( 'id' ) ] = data;
+			if ( hasChildren === false ) {
+
+				// since 'id' attributes can be optional, it's necessary to generate a UUID for unqiue assignment
+
+				library.animations[ xml.getAttribute( 'id' ) || THREE.MathUtils.generateUUID() ] = data;
+
+			}
 
 		}
 
@@ -2056,6 +2085,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 							data.stride = parseInt( accessor.getAttribute( 'stride' ) );
 
 						}
+
 						break;
 
 				}
@@ -2328,6 +2358,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 											}
 
 										}
+
 										break;
 
 									case 'NORMAL':
@@ -2356,6 +2387,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 								}
 
 							}
+
 							break;
 
 						case 'NORMAL':
@@ -2386,14 +2418,14 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			// build geometry
 
-			if ( position.array.length > 0 ) geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position.array, position.stride ) );
-			if ( normal.array.length > 0 ) geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normal.array, normal.stride ) );
-			if ( color.array.length > 0 ) geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( color.array, color.stride ) );
-			if ( uv.array.length > 0 ) geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uv.array, uv.stride ) );
-			if ( uv2.array.length > 0 ) geometry.addAttribute( 'uv2', new THREE.Float32BufferAttribute( uv2.array, uv2.stride ) );
+			if ( position.array.length > 0 ) geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( position.array, position.stride ) );
+			if ( normal.array.length > 0 ) geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normal.array, normal.stride ) );
+			if ( color.array.length > 0 ) geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( color.array, color.stride ) );
+			if ( uv.array.length > 0 ) geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uv.array, uv.stride ) );
+			if ( uv2.array.length > 0 ) geometry.setAttribute( 'uv2', new THREE.Float32BufferAttribute( uv2.array, uv2.stride ) );
 
-			if ( skinIndex.array.length > 0 ) geometry.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( skinIndex.array, skinIndex.stride ) );
-			if ( skinWeight.array.length > 0 ) geometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeight.array, skinWeight.stride ) );
+			if ( skinIndex.array.length > 0 ) geometry.setAttribute( 'skinIndex', new THREE.Float32BufferAttribute( skinIndex.array, skinIndex.stride ) );
+			if ( skinWeight.array.length > 0 ) geometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeight.array, skinWeight.stride ) );
 
 			build.data = geometry;
 			build.type = primitives[ 0 ].type;
@@ -2728,7 +2760,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 				case 'rotate':
 					data.obj = new THREE.Vector3();
 					data.obj.fromArray( array );
-					data.angle = THREE.Math.degToRad( array[ 3 ] );
+					data.angle = THREE.MathUtils.degToRad( array[ 3 ] );
 					break;
 
 			}
@@ -2907,7 +2939,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 				if ( targetElement ) {
 
-					// get the parent of the transfrom element
+					// get the parent of the transform element
 
 					var parentVisualElement = targetElement.parentElement;
 
@@ -3000,7 +3032,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 									switch ( joint.type ) {
 
 										case 'revolute':
-											matrix.multiply( m0.makeRotationAxis( axis, THREE.Math.degToRad( value ) ) );
+											matrix.multiply( m0.makeRotationAxis( axis, THREE.MathUtils.degToRad( value ) ) );
 											break;
 
 										case 'prismatic':
@@ -3096,7 +3128,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 					case 'rotate':
 						var array = parseFloats( child.textContent );
 						var vector = new THREE.Vector3().fromArray( array );
-						var angle = THREE.Math.degToRad( array[ 3 ] );
+						var angle = THREE.MathUtils.degToRad( array[ 3 ] );
 						transforms.push( {
 							sid: child.getAttribute( 'sid' ),
 							type: child.nodeName,
@@ -3203,7 +3235,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 					case 'rotate':
 						var array = parseFloats( child.textContent );
-						var angle = THREE.Math.degToRad( array[ 3 ] );
+						var angle = THREE.MathUtils.degToRad( array[ 3 ] );
 						data.matrix.multiply( matrix.makeRotationAxis( vector.fromArray( array ), angle ) );
 						data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
 						break;
@@ -3555,12 +3587,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			}
 
-			if ( object.name === '' ) {
-
-				object.name = ( type === 'JOINT' ) ? data.sid : data.name;
-
-			}
-
+			object.name = ( type === 'JOINT' ) ? data.sid : data.name;
 			object.matrix.copy( matrix );
 			object.matrix.decompose( object.position, object.quaternion, object.scale );
 
@@ -3664,6 +3691,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 							object = new THREE.Mesh( geometry.data, material );
 
 						}
+
 						break;
 
 				}

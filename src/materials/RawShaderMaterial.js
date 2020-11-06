@@ -1,9 +1,5 @@
 import { ShaderMaterial } from './ShaderMaterial.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function RawShaderMaterial( parameters ) {
 
 	ShaderMaterial.call( this, parameters );

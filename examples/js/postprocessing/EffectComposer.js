@@ -1,7 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	this.renderer = renderer;
@@ -11,8 +7,7 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 		var parameters = {
 			minFilter: THREE.LinearFilter,
 			magFilter: THREE.LinearFilter,
-			format: THREE.RGBAFormat,
-			stencilBuffer: false
+			format: THREE.RGBAFormat
 		};
 
 		var size = renderer.getSize( new THREE.Vector2() );
@@ -82,6 +77,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 	insertPass: function ( pass, index ) {
 
 		this.passes.splice( index, 0, pass );
+		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
 
 	},
 
@@ -278,6 +274,12 @@ THREE.Pass.FullScreenQuad = ( function () {
 	} );
 
 	Object.assign( FullScreenQuad.prototype, {
+
+		dispose: function () {
+
+			this._mesh.geometry.dispose();
+
+		},
 
 		render: function ( renderer ) {
 

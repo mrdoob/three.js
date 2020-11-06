@@ -1,15 +1,11 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
 
 /**
  * @param editor Editor
  * @param cmdArray array containing command objects
  * @constructor
  */
-
-var MultiCmdsCommand = function ( editor, cmdArray ) {
+function MultiCmdsCommand( editor, cmdArray ) {
 
 	Command.call( this, editor );
 
@@ -18,7 +14,7 @@ var MultiCmdsCommand = function ( editor, cmdArray ) {
 
 	this.cmdArray = ( cmdArray !== undefined ) ? cmdArray : [];
 
-};
+}
 
 MultiCmdsCommand.prototype = {
 
@@ -62,6 +58,7 @@ MultiCmdsCommand.prototype = {
 			cmds.push( this.cmdArray[ i ].toJSON() );
 
 		}
+
 		output.cmds = cmds;
 
 		return output;
@@ -84,3 +81,5 @@ MultiCmdsCommand.prototype = {
 	}
 
 };
+
+export { MultiCmdsCommand };

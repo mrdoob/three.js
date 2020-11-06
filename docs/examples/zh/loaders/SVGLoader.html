@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,11 +15,11 @@
 		<a href="https://en.wikipedia.org/wiki/Scalable_Vector_Graphics">Scalable Vector Graphics</a> is an XML-based vector image format for two-dimensional graphics with support for interactivity and animation.
 		</p>
 
-		<h2>Example</h2>
+		<h2>代码示例</h2>
 
 		<code>
 		// instantiate a loader
-		var loader = new THREE.SVGLoader();
+		const loader = new SVGLoader();
 
 		// load a SVG resource
 		loader.load(
@@ -29,26 +28,26 @@
 			// called when the resource is loaded
 			function ( data ) {
 
-				var paths = data.paths;
-				var group = new THREE.Group();
+				const paths = data.paths;
+				const group = new THREE.Group();
 
-				for ( var i = 0; i < paths.length; i ++ ) {
+				for ( let i = 0; i < paths.length; i ++ ) {
 
-					var path = paths[ i ];
+					const path = paths[ i ];
 
-					var material = new THREE.MeshBasicMaterial( {
+					const material = new THREE.MeshBasicMaterial( {
 						color: path.color,
 						side: THREE.DoubleSide,
 						depthWrite: false
 					} );
 
-					var shapes = path.toShapes( true );
+					const shapes = path.toShapes( true );
 
-					for ( var j = 0; j < shapes.length; j ++ ) {
+					for ( let j = 0; j < shapes.length; j ++ ) {
 
-						var shape = shapes[ j ];
-						var geometry = new THREE.ShapeBufferGeometry( shape );
-						var mesh = new THREE.Mesh( geometry, material );
+						const shape = shapes[ j ];
+						const geometry = new THREE.ShapeBufferGeometry( shape );
+						const mesh = new THREE.Mesh( geometry, material );
 						group.add( mesh );
 
 					}
@@ -73,7 +72,10 @@
 		);
 		</code>
 
-		[example:webgl_loader_svg]
+		<h2>例子</h2>
+		<p>
+			[example:webgl_loader_svg]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -105,7 +107,7 @@
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/SVGLoader.js examples/js/loaders/SVGLoader.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/SVGLoader.js examples/jsm/loaders/SVGLoader.js]
 		</p>
 	</body>
 </html>

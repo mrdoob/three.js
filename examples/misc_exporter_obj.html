@@ -24,7 +24,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - obj<br /><br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - obj<br /><br />
 			<button id="triangle">triangle</button>
 			<button id="cube">cube</button>
 			<button id="cylinder">cylinder</button>
@@ -39,14 +39,14 @@
 
 			import { OBJExporter } from './jsm/exporters/OBJExporter.js';
 
-			var camera, scene, light, renderer;
-			var exportButton, floatingDiv;
-			var mouseX = 0, mouseY = 0;
+			let camera, scene, light, renderer;
+			let exportButton, floatingDiv;
+			let mouseX = 0, mouseY = 0;
 
 			function exportToObj() {
 
-				var exporter = new OBJExporter();
-				var result = exporter.parse( scene );
+				const exporter = new OBJExporter();
+				const result = exporter.parse( scene );
 				floatingDiv.style.display = 'block';
 				floatingDiv.innerHTML = result.split( '\n' ).join( '<br />' );
 
@@ -54,9 +54,9 @@
 
 			function addGeometry( type ) {
 
-				for ( var i = 0; i < scene.children.length; i ++ ) {
+				for ( let i = 0; i < scene.children.length; i ++ ) {
 
-					var child = scene.children[ i ];
+					const child = scene.children[ i ];
 
 					if ( child.isMesh ) {
 
@@ -70,39 +70,39 @@
 
 				if ( type === 1 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-					var geometry = generateTriangleGeometry();
+					const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+					const geometry = generateTriangleGeometry();
 
 					scene.add( new THREE.Mesh( geometry, material ) );
 
 
 				} else if ( type === 2 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-					var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
+					const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+					const geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
 					scene.add( new THREE.Mesh( geometry, material ) );
 
 				} else if ( type === 3 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-					var geometry = new THREE.CylinderBufferGeometry( 50, 50, 100, 30, 1 );
+					const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+					const geometry = new THREE.CylinderBufferGeometry( 50, 50, 100, 30, 1 );
 					scene.add( new THREE.Mesh( geometry, material ) );
 
 				} else if ( type === 4 || type === 5 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-					var geometry = generateTriangleGeometry();
+					const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+					const geometry = generateTriangleGeometry();
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = - 200;
 					scene.add( mesh );
 
-					var geometry2 = new THREE.BoxBufferGeometry( 100, 100, 100 );
-					var mesh2 = new THREE.Mesh( geometry2, material );
+					const geometry2 = new THREE.BoxBufferGeometry( 100, 100, 100 );
+					const mesh2 = new THREE.Mesh( geometry2, material );
 					scene.add( mesh2 );
 
-					var geometry3 = new THREE.CylinderBufferGeometry( 50, 50, 100, 30, 1 );
-					var mesh3 = new THREE.Mesh( geometry3, material );
+					const geometry3 = new THREE.CylinderBufferGeometry( 50, 50, 100, 30, 1 );
+					const mesh3 = new THREE.Mesh( geometry3, material );
 					mesh3.position.x = 200;
 					scene.add( mesh3 );
 
@@ -181,8 +181,8 @@
 
 			function onWindowClick( event ) {
 
-				var needToClose = true;
-				var target = event.target;
+				let needToClose = true;
+				let target = event.target;
 
 				while ( target !== null ) {
 
@@ -216,8 +216,8 @@
 
 			function onDocumentMouseMove( event ) {
 
-				var windowHalfX = window.innerWidth / 2;
-				var windowHalfY = window.innerHeight / 2;
+				const windowHalfX = window.innerWidth / 2;
+				const windowHalfY = window.innerHeight / 2;
 				mouseX = ( event.clientX - windowHalfX ) / 2;
 				mouseY = ( event.clientY - windowHalfY ) / 2;
 
@@ -238,14 +238,14 @@
 
 			function generateTriangleGeometry() {
 
-				var geometry = new THREE.BufferGeometry();
-				var vertices = [];
+				const geometry = new THREE.BufferGeometry();
+				const vertices = [];
 
 				vertices.push( - 50, - 50, 0 );
 				vertices.push( 50, - 50, 0 );
 				vertices.push( 50, 50, 0 );
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 				geometry.computeVertexNormals();
 
 				return geometry;

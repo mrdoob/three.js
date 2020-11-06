@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,20 +20,10 @@
 		</p>
 		</div>
 
+		<h2>Code Example</h2>
 
-		<h2>Example</h2>
-
-		<div>[example:webgl_geometry_minecraft WebGL / geometry / minecraft ]</div>
-		<div>[example:webgl_geometry_minecraft_ao WebGL / geometry / minecraft / ao ]</div>
-		<div>[example:webgl_geometry_nurbs WebGL / geometry / nurbs ]</div>
-		<div>[example:webgl_geometry_spline_editor WebGL / geometry / spline / editor ]</div>
-		<div>[example:webgl_interactive_cubes_gpu WebGL / interactive / cubes / gpu ]</div>
-		<div>[example:webgl_interactive_lines WebGL / interactive / lines ]</div>
-		<div>[example:webgl_interactive_raycasting_points WebGL / interactive / raycasting / points ]</div>
-		<div>[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter ]</div>
-
-
-		<code>var geometry = new THREE.Geometry();
+		<code>
+		const geometry = new THREE.Geometry();
 
 		geometry.vertices.push(
 			new THREE.Vector3( -10,  10, 0 ),
@@ -46,6 +35,20 @@
 
 		geometry.computeBoundingSphere();
 		</code>
+
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_geometry_minecraft WebGL / geometry / minecraft ]<br />
+			[example:webgl_geometry_minecraft_ao WebGL / geometry / minecraft / ao ]<br />
+			[example:webgl_geometry_nurbs WebGL / geometry / nurbs ]<br />
+			[example:webgl_geometry_spline_editor WebGL / geometry / spline / editor ]<br />
+			[example:webgl_interactive_cubes_gpu WebGL / interactive / cubes / gpu ]<br />
+			[example:webgl_interactive_lines WebGL / interactive / lines ]<br />
+			[example:webgl_interactive_raycasting_points WebGL / interactive / raycasting / points ]<br />
+			[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter ]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -91,21 +94,14 @@
 		<h3>[property:Array faceVertexUvs]</h3>
 		<p>
 		Array of face [link:https://en.wikipedia.org/wiki/UV_mapping UV] layers, used for mapping textures onto the geometry.<br />
-		Each UV layer is an array of [page:UV]s matching the order and number of vertices in faces.<br /><br />
+		Each UV layer is an array of [page:Vector2]s matching the order and number of vertices in faces.<br /><br />
 		To signal an update in this array, [page:Geometry Geometry.uvsNeedUpdate] needs to be set to true.
 		</p>
 
 		<h3>[property:Integer id]</h3>
 		<p>Unique number for this geometry instance.</p>
 
-		<h3>[property:Boolean isGeometry]</h3>
-		<p>
-			Used to check whether this or derived classes are Geometries. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
-		<h3>[property:array lineDistances]</h3>
+		<h3>[property:Array lineDistances]</h3>
 		<p>
 		An array containing distances between vertices for Line geometries.
 		This is required for [page:LineDashedMaterial] to render correctly.
@@ -137,8 +133,8 @@
 		</p>
 		<p>
 		The values of the vector should typically be between 0 and 1. For instance when set to 0 the bone
-		transformation will have no affect. When set to 0.5 it will have 50% affect. When set to 100%, it will
-		have 100% affect. If there is only 1 bone associated with the vertex then you only need to worry about
+		transformation will have no effect. When set to 0.5 it will have 50% effect. When set to 100%, it will
+		have 100% effect. If there is only 1 bone associated with the vertex then you only need to worry about
 		the first component of the vector, the rest can be ignored and set to 0.
 		</p>
 
@@ -149,9 +145,9 @@
 		first skinIndex, this will tell you the bones associated with that vertex. For example the first vertex
 		could have a value of <strong>( 10.05, 30.10, 12.12 )</strong>. Then the first skin index could have the
 		value of <strong>( 10, 2, 0, 0 )</strong>. The first skin weight could have the value of
-		<strong>( 0.8, 0.2, 0, 0 )</strong>. In affect this would take the first vertex, and then the bone
+		<strong>( 0.8, 0.2, 0, 0 )</strong>. In effect this would take the first vertex, and then the bone
 		<strong>mesh.bones[10]</strong> and apply it 80% of the way. Then it would take the bone <strong>skeleton.bones[2]</strong>
-		and apply it 20% of the way. The next two values have a weight of 0, so they would have no affect.
+		and apply it 20% of the way. The next two values have a weight of 0, so they would have no effect.
 		</p>
 		<p>
 		In code another example could look like this:
@@ -210,7 +206,7 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>Bakes matrix transform directly into vertex coordinates.</p>
 
 		<h3>[method:Geometry center] ()</h3>

@@ -4,7 +4,10 @@ export class ArrayCamera extends PerspectiveCamera {
 
 	constructor( cameras?: PerspectiveCamera[] );
 
+	/**
+	 * @default []
+	 */
 	cameras: PerspectiveCamera[];
-	isArrayCamera: true;
+	readonly isArrayCamera: true;
 
 }

@@ -1,10 +1,10 @@
-/**
- * TODO
- */
-
 import {
 	Vector2
 } from "../../../build/three.module.js";
+
+/**
+ * TODO
+ */
 
 var DepthLimitedBlurShader = {
 	defines: {

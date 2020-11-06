@@ -5,30 +5,36 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				touch-action: none;
+			}
+		</style>
 	</head>
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
 
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer;
-			var cube, sphere, torus, material;
+			let camera, scene, renderer;
+			let cube, sphere, torus, material;
 
-			var count = 0, cubeCamera1, cubeCamera2;
+			let count = 0, cubeCamera1, cubeCamera2, cubeRenderTarget1, cubeRenderTarget2;
 
-			var onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
+			let onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
 
-			var lon = 0, lat = 0;
-			var phi = 0, theta = 0;
+			let lon = 0, lat = 0;
+			let phi = 0, theta = 0;
 
-			var textureLoader = new THREE.TextureLoader();
+			const textureLoader = new THREE.TextureLoader();
 
 			textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg', function ( texture ) {
 
-				texture.mapping = THREE.UVMapping;
+				texture.encoding = THREE.sRGBEncoding;
+				texture.mapping = THREE.EquirectangularReflectionMapping;
 
 				init( texture );
 				animate();
@@ -40,53 +46,54 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
+				scene.background = texture;
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 
-				// background
-
-				var options = {
-					generateMipmaps: true,
-					minFilter: THREE.LinearMipmapLinearFilter,
-					magFilter: THREE.LinearFilter
-				};
-
-				scene.background = new THREE.WebGLRenderTargetCube( 1024, 1024, options ).fromEquirectangularTexture( renderer, texture );
-
 				//
 
-				cubeCamera1 = new THREE.CubeCamera( 1, 1000, 256 );
-				cubeCamera1.renderTarget.texture.generateMipmaps = true;
-				cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
-				scene.add( cubeCamera1 );
+				cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget( 256, {
+					format: THREE.RGBFormat,
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipmapLinearFilter,
+					encoding: THREE.sRGBEncoding // temporary -- to prevent the material's shader from recompiling every frame
+				} );
 
-				cubeCamera2 = new THREE.CubeCamera( 1, 1000, 256 );
-				cubeCamera2.renderTarget.texture.generateMipmaps = true;
-				cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
-				scene.add( cubeCamera2 );
+				cubeCamera1 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget1 );
 
-				document.body.appendChild( renderer.domElement );
+				cubeRenderTarget2 = new THREE.WebGLCubeRenderTarget( 256, {
+					format: THREE.RGBFormat,
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipmapLinearFilter,
+					encoding: THREE.sRGBEncoding
+				} );
+
+				cubeCamera2 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget2 );
 
 				//
 
 				material = new THREE.MeshBasicMaterial( {
-					envMap: cubeCamera2.renderTarget.texture
+					envMap: cubeRenderTarget2.texture,
+					combine: THREE.MultiplyOperation,
+					reflectivity: 1
 				} );
 
-				sphere = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 20, 3 ), material );
+				sphere = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 20, 8 ), material );
 				scene.add( sphere );
 
 				cube = new THREE.Mesh( new THREE.BoxBufferGeometry( 20, 20, 20 ), material );
 				scene.add( cube );
 
-				torus = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 10, 5, 100, 25 ), material );
+				torus = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 10, 5, 128, 16 ), material );
 				scene.add( torus );
 
 				//
 
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+				document.addEventListener( 'pointerdown', onPointerDown, false );
 				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
 
 				window.addEventListener( 'resize', onWindowResized, false );
@@ -102,7 +109,7 @@
 
 			}
 
-			function onDocumentMouseDown( event ) {
+			function onPointerDown( event ) {
 
 				event.preventDefault();
 
@@ -112,30 +119,30 @@
 				onPointerDownLon = lon;
 				onPointerDownLat = lat;
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'pointermove', onPointerMove, false );
+				document.addEventListener( 'pointerup', onPointerUp, false );
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
 
 				lon = ( event.clientX - onPointerDownPointerX ) * 0.1 + onPointerDownLon;
 				lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
 
 			}
 
-			function onDocumentMouseUp() {
+			function onPointerUp() {
 
-				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.removeEventListener( 'pointermove', onPointerMove, false );
+				document.removeEventListener( 'pointerup', onPointerUp, false );
 
 			}
 
 			function onDocumentMouseWheel( event ) {
 
-				var fov = camera.fov + event.deltaY * 0.05;
+				const fov = camera.fov + event.deltaY * 0.05;
 
-				camera.fov = THREE.Math.clamp( fov, 10, 75 );
+				camera.fov = THREE.MathUtils.clamp( fov, 10, 75 );
 
 				camera.updateProjectionMatrix();
 
@@ -150,13 +157,13 @@
 
 			function render() {
 
-				var time = Date.now();
+				const time = Date.now();
 
 				lon += .15;
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
-				phi = THREE.Math.degToRad( 90 - lat );
-				theta = THREE.Math.degToRad( lon );
+				phi = THREE.MathUtils.degToRad( 90 - lat );
+				theta = THREE.MathUtils.degToRad( lon );
 
 				cube.position.x = Math.cos( time * 0.001 ) * 30;
 				cube.position.y = Math.sin( time * 0.001 ) * 30;
@@ -178,25 +185,21 @@
 
 				camera.lookAt( scene.position );
 
-				sphere.visible = false;
-
 				// pingpong
 
 				if ( count % 2 === 0 ) {
 
-					material.envMap = cubeCamera1.renderTarget.texture;
-					cubeCamera2.update( renderer, scene );
+					cubeCamera1.update( renderer, scene );
+					material.envMap = cubeRenderTarget1.texture;
 
 				} else {
 
-					material.envMap = cubeCamera2.renderTarget.texture;
-					cubeCamera1.update( renderer, scene );
+					cubeCamera2.update( renderer, scene );
+					material.envMap = cubeRenderTarget2.texture;
 
 				}
 
 				count ++;
-
-				sphere.visible = true;
 
 				renderer.render( scene, camera );
 

@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,12 +16,11 @@
 			默认使用[page:FileLoader]进行加载文件。
 		</p>
 
-		<h2>例子</h2>
-
+		<h2>代码示例</h2>
 
 		<code>
 		// 初始化一个加载器
-		var loader = new THREE.MaterialLoader();
+		const loader = new THREE.MaterialLoader();
 
 		// 加载资源
 		loader.load(
@@ -73,7 +71,7 @@
 		[page:Function onProgress] — 将在加载过程中进行调用，参数为进度事件。<br />
 		[page:Function onError] — 在加载错误时被调用。<br /><br />
 
-            从URL中进行加载，并返回将包含数据的[page:Material]对象。
+			从URL中进行加载，并返回将包含数据的[page:Material]对象。
 		</p>
 
 		<h3>[method:Material parse]( [param:Object json] )</h3>

@@ -23,21 +23,21 @@
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
-			var camera, scene, renderer, controls;
+			let camera, scene, renderer, controls;
 
 			init();
 			animate();
 
 			function init() {
 
-				var info = document.createElement( 'div' );
+				const info = document.createElement( 'div' );
 				info.style.position = 'absolute';
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
 				info.style.color = '#fff';
 				info.style.link = '#f80';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - geometry extrude shapes';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - geometry extrude shapes';
 				document.body.appendChild( info );
 
 				renderer = new THREE.WebGLRenderer();
@@ -57,13 +57,13 @@
 
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				var light = new THREE.PointLight( 0xffffff );
+				const light = new THREE.PointLight( 0xffffff );
 				light.position.copy( camera.position );
 				scene.add( light );
 
 				//
 
-				var closedSpline = new THREE.CatmullRomCurve3( [
+				const closedSpline = new THREE.CatmullRomCurve3( [
 					new THREE.Vector3( - 60, - 100, 60 ),
 					new THREE.Vector3( - 60, 20, 60 ),
 					new THREE.Vector3( - 60, 120, 60 ),
@@ -74,86 +74,86 @@
 				closedSpline.curveType = 'catmullrom';
 				closedSpline.closed = true;
 
-				var extrudeSettings = {
+				const extrudeSettings1 = {
 					steps: 100,
 					bevelEnabled: false,
 					extrudePath: closedSpline
 				};
 
 
-				var pts = [], count = 3;
+				const pts1 = [], count = 3;
 
-				for ( var i = 0; i < count; i ++ ) {
+				for ( let i = 0; i < count; i ++ ) {
 
-					var l = 20;
+					const l = 20;
 
-					var a = 2 * i / count * Math.PI;
+					const a = 2 * i / count * Math.PI;
 
-					pts.push( new THREE.Vector2( Math.cos( a ) * l, Math.sin( a ) * l ) );
+					pts1.push( new THREE.Vector2( Math.cos( a ) * l, Math.sin( a ) * l ) );
 
 				}
 
-				var shape = new THREE.Shape( pts );
+				const shape1 = new THREE.Shape( pts1 );
 
-				var geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
+				const geometry1 = new THREE.ExtrudeBufferGeometry( shape1, extrudeSettings1 );
 
-				var material = new THREE.MeshLambertMaterial( { color: 0xb00000, wireframe: false } );
+				const material1 = new THREE.MeshLambertMaterial( { color: 0xb00000, wireframe: false } );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh1 = new THREE.Mesh( geometry1, material1 );
 
-				scene.add( mesh );
+				scene.add( mesh1 );
 
 
 				//
 
 
-				var randomPoints = [];
+				const randomPoints = [];
 
-				for ( var i = 0; i < 10; i ++ ) {
+				for ( let i = 0; i < 10; i ++ ) {
 
-					randomPoints.push( new THREE.Vector3( ( i - 4.5 ) * 50, THREE.Math.randFloat( - 50, 50 ), THREE.Math.randFloat( - 50, 50 ) ) );
+					randomPoints.push( new THREE.Vector3( ( i - 4.5 ) * 50, THREE.MathUtils.randFloat( - 50, 50 ), THREE.MathUtils.randFloat( - 50, 50 ) ) );
 
 				}
 
-				var randomSpline = new THREE.CatmullRomCurve3( randomPoints );
+				const randomSpline = new THREE.CatmullRomCurve3( randomPoints );
 
 				//
 
-				var extrudeSettings = {
+				const extrudeSettings2 = {
 					steps: 200,
 					bevelEnabled: false,
 					extrudePath: randomSpline
 				};
 
 
-				var pts = [], numPts = 5;
+				const pts2 = [], numPts = 5;
 
-				for ( var i = 0; i < numPts * 2; i ++ ) {
+				for ( let i = 0; i < numPts * 2; i ++ ) {
 
-					var l = i % 2 == 1 ? 10 : 20;
+					const l = i % 2 == 1 ? 10 : 20;
 
-					var a = i / numPts * Math.PI;
+					const a = i / numPts * Math.PI;
 
-					pts.push( new THREE.Vector2( Math.cos( a ) * l, Math.sin( a ) * l ) );
+					pts2.push( new THREE.Vector2( Math.cos( a ) * l, Math.sin( a ) * l ) );
 
 				}
 
-				var shape = new THREE.Shape( pts );
+				const shape2 = new THREE.Shape( pts2 );
 
-				var geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
+				const geometry2 = new THREE.ExtrudeBufferGeometry( shape2, extrudeSettings2 );
 
-				var material2 = new THREE.MeshLambertMaterial( { color: 0xff8000, wireframe: false } );
+				const material2 = new THREE.MeshLambertMaterial( { color: 0xff8000, wireframe: false } );
 
-				var mesh = new THREE.Mesh( geometry, material2 );
+				const mesh2 = new THREE.Mesh( geometry2, material2 );
 
-				scene.add( mesh );
+				scene.add( mesh2 );
 
 
 				//
 
-				var materials = [ material, material2 ];
+				const materials = [ material1, material2 ];
 
-				var extrudeSettings = {
+				const extrudeSettings3 = {
 					depth: 20,
 					steps: 1,
 					bevelEnabled: true,
@@ -162,13 +162,13 @@
 					bevelSegments: 1
 				};
 
-				var geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
+				const geometry3 = new THREE.ExtrudeBufferGeometry( shape2, extrudeSettings3 );
 
-				var mesh = new THREE.Mesh( geometry, materials );
+				const mesh3 = new THREE.Mesh( geometry3, materials );
 
-				mesh.position.set( 50, 100, 50 );
+				mesh3.position.set( 50, 100, 50 );
 
-				scene.add( mesh );
+				scene.add( mesh3 );
 
 			}
 

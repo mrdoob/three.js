@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,14 +15,14 @@
 			多面体是在三维空间中具有一些平面的立体图形。这个类将一个顶点数组投射到一个球面上，之后将它们细分为所需的细节级别。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 <code>
-var verticesOfCube = [
+const verticesOfCube = [
     -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
     -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
 ];
 
-var indicesOfFaces = [
+const indicesOfFaces = [
     2,1,0,    0,3,2,
     0,4,7,    7,3,0,
     0,1,5,    5,4,0,
@@ -32,7 +31,7 @@ var indicesOfFaces = [
     4,5,6,    6,7,4
 ];
 
-var geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
+const geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
 </code>
 
 		<h2>构造器</h2>

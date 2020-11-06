@@ -3,12 +3,6 @@ import { Texture } from '../textures/Texture.js';
 import { LinearFilter } from '../constants.js';
 import { Vector4 } from '../math/Vector4.js';
 
-/**
- * @author szimek / https://github.com/szimek/
- * @author alteredq / http://alteredqualia.com/
- * @author Marius Kintel / https://github.com/kintel
- */
-
 /*
  In options, we can specify:
  * Texture parameters for an auto-generated target texture
@@ -26,7 +20,7 @@ function WebGLRenderTarget( width, height, options ) {
 
 	options = options || {};
 
-	this.texture = new Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+	this.texture = new Texture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
 	this.texture.image = {};
 	this.texture.image.width = width;
@@ -36,7 +30,7 @@ function WebGLRenderTarget( width, height, options ) {
 	this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
-	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
+	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
 	this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
 }

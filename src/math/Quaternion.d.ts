@@ -6,9 +6,9 @@ import { Matrix4 } from './Matrix4';
  * Implementation of a quaternion. This is used for rotating things without incurring in the dreaded gimbal lock issue, amongst other advantages.
  *
  * @example
- * var quaternion = new THREE.Quaternion();
+ * const quaternion = new THREE.Quaternion();
  * quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
- * var vector = new THREE.Vector3( 1, 0, 0 );
+ * const vector = new THREE.Vector3( 1, 0, 0 );
  * vector.applyQuaternion( quaternion );
  */
 export class Quaternion {
@@ -21,10 +21,26 @@ export class Quaternion {
 	 */
 	constructor( x?: number, y?: number, z?: number, w?: number );
 
+	/**
+	 * @default 0
+	 */
 	x: number;
+
+	/**
+	 * @default 0
+	 */
 	y: number;
+
+	/**
+	 * @default 0
+	 */
 	z: number;
+
+	/**
+	 * @default 1
+	 */
 	w: number;
+	readonly isQuaternion: true;
 
 	/**
 	 * Sets values of this quaternion.
@@ -61,10 +77,12 @@ export class Quaternion {
 	angleTo( q: Quaternion ): number;
 	rotateTowards( q: Quaternion, step: number ): Quaternion;
 
+	identity(): Quaternion;
+
 	/**
 	 * Inverts this quaternion.
 	 */
-	inverse(): Quaternion;
+	invert(): Quaternion;
 
 	conjugate(): Quaternion;
 	dot( v: Quaternion ): number;
@@ -148,9 +166,23 @@ export class Quaternion {
 		t: number
 	): Quaternion;
 
+	static multiplyQuaternionsFlat(
+		dst: number[],
+		dstOffset: number,
+		src0: number[],
+		srcOffset: number,
+		src1: number[],
+		stcOffset1: number
+	): number[];
+
 	/**
 	 * @deprecated Use {@link Vector#applyQuaternion vector.applyQuaternion( quaternion )} instead.
 	 */
 	multiplyVector3( v: any ): any;
+
+	/**
+	 * @deprecated Use {@link Quaternion#invert .invert()} instead.
+	 */
+	inverse(): Quaternion;
 
 }

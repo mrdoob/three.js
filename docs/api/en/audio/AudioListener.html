@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -18,25 +17,18 @@
 			In most cases, the listener object is a child of the camera. So the 3D transformation of the camera represents the 3D transformation of the listener.
 		</p>
 
-
-		<h2>Example</h2>
-
-		<p>
-			[example:webaudio_sandbox webaudio / sandbox ]<br />
-			[example:webaudio_timing webaudio / timing ]<br />
-			[example:webaudio_visualizer webaudio / visualizer ]
-		</p>
+		<h2>Code Example</h2>
 
 		<code>
 		// create an AudioListener and add it to the camera
-		var listener = new THREE.AudioListener();
+		const listener = new THREE.AudioListener();
 		camera.add( listener );
 
 		// create a global audio source
-		var sound = new THREE.Audio( listener );
+		const sound = new THREE.Audio( listener );
 
 		// load a sound and set it as the Audio object's buffer
-		var audioLoader = new THREE.AudioLoader();
+		const audioLoader = new THREE.AudioLoader();
 		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 			sound.setBuffer( buffer );
 			sound.setLoop(true);
@@ -45,6 +37,13 @@
 		});
 		</code>
 
+		<h2>Examples</h2>
+
+		<p>
+			[example:webaudio_sandbox webaudio / sandbox ]<br />
+			[example:webaudio_timing webaudio / timing ]<br />
+			[example:webaudio_visualizer webaudio / visualizer ]
+		</p>
 
 		<h2>Constructor</h2>
 

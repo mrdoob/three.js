@@ -1,13 +1,7 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
-import {
-	CylinderBufferGeometry
-} from '../../../../src/geometries/CylinderGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils';
+import { CylinderBufferGeometry } from '../../../../src/geometries/CylinderBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 

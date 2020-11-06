@@ -1,8 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
 import {
 	WireframeGeometry
 } from "../../../build/three.module.js";
@@ -24,15 +19,7 @@ WireframeGeometry2.prototype = Object.assign( Object.create( LineSegmentsGeometr
 
 	constructor: WireframeGeometry2,
 
-	isWireframeGeometry2: true,
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
-
-	}
+	isWireframeGeometry2: true
 
 } );
 

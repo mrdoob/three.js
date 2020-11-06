@@ -26,16 +26,6 @@ interface SAOPassParams {
 	saoBlurDepthCutoff: number;
 }
 
-export namespace SAOPass {
-	enum OUTPUT {
-		Default,
-		Beauty,
-		SAO,
-		Depth,
-		Normal
-	}
-}
-
 export class SAOPass extends Pass {
 
 	constructor( scene: Scene, camera: Camera, depthTexture?: boolean, useNormals?: boolean, resolution?: Vector2 );
@@ -62,9 +52,15 @@ export class SAOPass extends Pass {
 	fsQuad: object;
 	params: SAOPassParams;
 
-	renderPass( renderer: WebGLRenderer, passMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: Color, clearAlpha?: number ): void;
-	renderPass( renderer: WebGLRenderer, passMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: number, clearAlpha?: number ): void;
-	renderOverride( renderer: WebGLRenderer, overrideMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: Color, clearAlpha?: number ): void;
-	renderOverride( renderer: WebGLRenderer, overrideMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: number, clearAlpha?: number ): void;
+	static OUTPUT: {
+		Beauty: number;
+		Default: number;
+		SAO: number;
+		Depth: number;
+		Normal: number;
+	};
+
+	renderPass( renderer: WebGLRenderer, passMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: Color | string | number, clearAlpha?: number ): void;
+	renderOverride( renderer: WebGLRenderer, overrideMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: Color | string | number, clearAlpha?: number ): void;
 
 }

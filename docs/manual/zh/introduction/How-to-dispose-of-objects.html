@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
 	<meta charset="utf-8">
 	<base href="../../../" />
-	<script src="list.js"></script>
 	<script src="page.js"></script>
 	<link type="text/css" rel="stylesheet" href="page.css" />
 </head>
@@ -53,13 +52,6 @@
 		这些对象仅能通过执行[page:WebGLRenderTarget.dispose]()来解除分配。
 	</p>
 
-	<h2>Scenes</h2>
-
-	<p>
-		The renderer maintains for scenes special data structures for sorting and rendering. If for some reasons a scene object becomes obsolete in an application,
-		call [page:Scene.dispose]() in order to free these resources.
-	</p>
-
 	<h2>杂项</h2>
 
 	<p>
@@ -90,11 +82,6 @@
 		是的，可以评估[page:WebGLRenderer.info] —— 渲染器中的一个特殊属性，具有一系列关于显存和渲染过程的统计信息。
 		除此之外，它还告诉你有多少纹理、几何体和着色器程序在内部存储。
 		如果你在你的应用程序中注意到了性能问题，一个较好的方法便是调试该属性，以便轻松识别内存泄漏。
-	</p>
-
-	<p>
-		对于纹理的内部资源仅在图像完全被加载后才会分配。如果你在图像被加载之前废置纹理，什么都不会发生。
-		没有资源被分配，因此也没有必要进行清理。
 	</p>
 
 	<h3>当你在纹理还没有被加载时，在纹理上调用*dispose()*，会发生什么？</h3>

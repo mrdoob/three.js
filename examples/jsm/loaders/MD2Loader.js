@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import {
 	AnimationClip,
 	BufferGeometry,
@@ -28,9 +24,29 @@ MD2Loader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
-			onLoad( scope.parse( buffer ) );
+			try {
+
+				onLoad( scope.parse( buffer ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -123,8 +139,6 @@ MD2Loader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		];
 
 		return function ( buffer ) {
-
-			console.time( 'MD2Loader' );
 
 			var data = new DataView( buffer );
 
@@ -309,9 +323,9 @@ MD2Loader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-			geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-			geometry.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+			geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 			// animation
 
@@ -375,10 +389,9 @@ MD2Loader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			geometry.morphAttributes.position = morphPositions;
 			geometry.morphAttributes.normal = morphNormals;
+			geometry.morphTargetsRelative = false;
 
 			geometry.animations = AnimationClip.CreateClipsFromMorphTargetSequences( frames, 10 );
-
-			console.timeEnd( 'MD2Loader' );
 
 			return geometry;
 

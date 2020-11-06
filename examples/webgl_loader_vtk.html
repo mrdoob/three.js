@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		vtk formats loader test<br />
 		Legacy vtk model from <a href="http://www.cc.gatech.edu/projects/large_models/" target="_blank" rel="noopener">The GeorgiaTech Lagre Geometric Model Archive</a>
 		</div>
@@ -23,9 +23,9 @@
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { VTKLoader } from './jsm/loaders/VTKLoader.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, controls, scene, renderer;
+			let camera, controls, scene, renderer;
 
 			init();
 			animate();
@@ -41,35 +41,35 @@
 
 				// light
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( 200, 200, 1000 ).normalize();
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
+				scene.add( hemiLight );
 
-				camera.add( dirLight );
-				camera.add( dirLight.target );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				dirLight.position.set( 2, 2, 2 );
+				scene.add( dirLight );
 
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, side: THREE.DoubleSide } );
-
-				var loader = new VTKLoader();
+				const loader = new VTKLoader();
 				loader.load( "models/vtk/bunny.vtk", function ( geometry ) {
 
 					geometry.center();
 					geometry.computeVertexNormals();
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set( - 0.075, 0.005, 0 );
 					mesh.scale.multiplyScalar( 0.2 );
 					scene.add( mesh );
 
 				} );
 
-				var loader1 = new VTKLoader();
+				const loader1 = new VTKLoader();
 				loader1.load( 'models/vtk/cube_ascii.vtp', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 					geometry.center();
 
-					var material = new THREE.MeshLambertMaterial( { color: 0x00ff00, side: THREE.DoubleSide } );
-					var mesh = new THREE.Mesh( geometry, material );
+					const material = new THREE.MeshLambertMaterial( { color: 0x00ff00 } );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( - 0.025, 0, 0 );
 					mesh.scale.multiplyScalar( 0.01 );
@@ -79,14 +79,14 @@
 
 				} );
 
-				var loader2 = new VTKLoader();
+				const loader2 = new VTKLoader();
 				loader2.load( 'models/vtk/cube_binary.vtp', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 					geometry.center();
 
-					var material = new THREE.MeshLambertMaterial( { color: 0x0000ff, side: THREE.DoubleSide } );
-					var mesh = new THREE.Mesh( geometry, material );
+					const material = new THREE.MeshLambertMaterial( { color: 0x0000ff } );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( 0.025, 0, 0 );
 					mesh.scale.multiplyScalar( 0.01 );
@@ -96,14 +96,14 @@
 
 				} );
 
-				var loader3 = new VTKLoader();
+				const loader3 = new VTKLoader();
 				loader3.load( 'models/vtk/cube_no_compression.vtp', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 					geometry.center();
 
-					var material = new THREE.MeshLambertMaterial( { color: 0xff0000, side: THREE.DoubleSide } );
-					var mesh = new THREE.Mesh( geometry, material );
+					const material = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( 0.075, 0, 0 );
 					mesh.scale.multiplyScalar( 0.01 );
@@ -126,16 +126,9 @@
 				// controls
 
 				controls = new TrackballControls( camera, renderer.domElement );
-
+				controls.minDistance = .1;
+				controls.maxDistance = 0.5;
 				controls.rotateSpeed = 5.0;
-				controls.zoomSpeed = 5;
-				controls.panSpeed = 2;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -162,6 +155,7 @@
 				requestAnimationFrame( animate );
 
 				controls.update();
+
 				renderer.render( scene, camera );
 
 				stats.update();

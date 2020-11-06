@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -15,36 +14,32 @@
 			[link:https://github.com/mrdoob/eventdispatcher.js Eventdispatcher on GitHub]
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
-// 为自定义对象添加事件
+		// 为自定义对象添加事件
 
-var Car = function () {
+		class Car extends EventDispatcher {
 
-    this.start = function () {
+			start() {
 
-        this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
+				this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
 
-    };
+			};
 
-};
+		}
 
-// 将 EventDispatcher.prototype 与自定义对象 prototype 进行混合
+		// 使用自定义对象的事件
 
-Object.assign( Car.prototype, EventDispatcher.prototype );
+		const car = new Car();
 
-// 使用自定义对象的事件
+		car.addEventListener( 'start', function ( event ) {
 
-var car = new Car();
+			alert( event.message );
 
-car.addEventListener( 'start', function ( event ) {
+		} );
 
-    alert( event.message );
-
-} );
-
-car.start();
+		car.start();
 		</code>
 
 		<h2>构造函数</h2>
@@ -84,7 +79,7 @@ car.start();
 		从指定事件类型中移除监听函数。
 		</p>
 
-		<h3>[method:null dispatchEvent]( [param:object event] )</h3>
+		<h3>[method:null dispatchEvent]( [param:Object event] )</h3>
 		<p>
 		event - 将被触发的事件。
 		</p>

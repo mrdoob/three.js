@@ -8,7 +8,7 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - custom attributes example - particles - billboards</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - custom attributes example - particles - billboards</div>
 		<div id="container"></div>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
@@ -55,11 +55,11 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var renderer, scene, camera, stats;
-			var sphere, length1;
+			let renderer, scene, camera, stats;
+			let sphere, length1;
 
-			var WIDTH = window.innerWidth;
-			var HEIGHT = window.innerHeight;
+			const WIDTH = window.innerWidth;
+			const HEIGHT = window.innerHeight;
 
 			init();
 			animate();
@@ -71,25 +71,24 @@
 
 				scene = new THREE.Scene();
 
-				var radius = 100, segments = 68, rings = 38;
+				const radius = 100, segments = 68, rings = 38;
 
-				var vertices1 = new THREE.SphereGeometry( radius, segments, rings ).vertices;
-				var vertices2 = new THREE.BoxGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 ).vertices;
+				const vertices1 = new THREE.SphereGeometry( radius, segments, rings ).vertices;
+				const vertices2 = new THREE.BoxGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 ).vertices;
 
 				length1 = vertices1.length;
 
-				var vertices = vertices1.concat( vertices2 );
+				const vertices = vertices1.concat( vertices2 );
 
-				var positions = new Float32Array( vertices.length * 3 );
-				var colors = new Float32Array( vertices.length * 3 );
-				var sizes = new Float32Array( vertices.length );
+				const positions = new Float32Array( vertices.length * 3 );
+				const colors = new Float32Array( vertices.length * 3 );
+				const sizes = new Float32Array( vertices.length );
 
-				var vertex;
-				var color = new THREE.Color();
+				const color = new THREE.Color();
 
-				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+				for ( let i = 0, l = vertices.length; i < l; i ++ ) {
 
-					vertex = vertices[ i ];
+					const vertex = vertices[ i ];
 					vertex.toArray( positions, i * 3 );
 
 					if ( i < length1 ) {
@@ -108,18 +107,18 @@
 
 				}
 
-				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
-				geometry.addAttribute( 'ca', new THREE.BufferAttribute( colors, 3 ) );
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
+				geometry.setAttribute( 'ca', new THREE.BufferAttribute( colors, 3 ) );
 
 				//
 
-				var texture = new THREE.TextureLoader().load( "textures/sprites/disc.png" );
+				const texture = new THREE.TextureLoader().load( "textures/sprites/disc.png" );
 				texture.wrapS = THREE.RepeatWrapping;
 				texture.wrapT = THREE.RepeatWrapping;
 
-				var material = new THREE.ShaderMaterial( {
+				const material = new THREE.ShaderMaterial( {
 
 					uniforms: {
 						color: { value: new THREE.Color( 0xffffff ) },
@@ -142,7 +141,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -165,27 +164,27 @@
 
 			function sortPoints() {
 
-				var vector = new THREE.Vector3();
+				const vector = new THREE.Vector3();
 
 				// Model View Projection matrix
 
-				var matrix = new THREE.Matrix4();
+				const matrix = new THREE.Matrix4();
 				matrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 				matrix.multiply( sphere.matrixWorld );
 
 				//
 
-				var geometry = sphere.geometry;
+				const geometry = sphere.geometry;
 
-				var index = geometry.getIndex();
-				var positions = geometry.getAttribute( 'position' ).array;
-				var length = positions.length / 3;
+				let index = geometry.getIndex();
+				const positions = geometry.getAttribute( 'position' ).array;
+				const length = positions.length / 3;
 
 				if ( index === null ) {
 
-					var array = new Uint16Array( length );
+					const array = new Uint16Array( length );
 
-					for ( var i = 0; i < length; i ++ ) {
+					for ( let i = 0; i < length; i ++ ) {
 
 						array[ i ] = i;
 
@@ -197,9 +196,9 @@
 
 				}
 
-				var sortArray = [];
+				const sortArray = [];
 
-				for ( var i = 0; i < length; i ++ ) {
+				for ( let i = 0; i < length; i ++ ) {
 
 					vector.fromArray( positions, i * 3 );
 					vector.applyMatrix4( matrix );
@@ -216,9 +215,9 @@
 
 				sortArray.sort( numericalSort );
 
-				var indices = index.array;
+				const indices = index.array;
 
-				for ( var i = 0; i < length; i ++ ) {
+				for ( let i = 0; i < length; i ++ ) {
 
 					indices[ i ] = sortArray[ i ][ 1 ];
 
@@ -239,15 +238,15 @@
 
 			function render() {
 
-				var time = Date.now() * 0.005;
+				const time = Date.now() * 0.005;
 
 				sphere.rotation.y = 0.02 * time;
 				sphere.rotation.z = 0.02 * time;
 
-				var geometry = sphere.geometry;
-				var attributes = geometry.attributes;
+				const geometry = sphere.geometry;
+				const attributes = geometry.attributes;
 
-				for ( var i = 0; i < attributes.size.array.length; i ++ ) {
+				for ( let i = 0; i < attributes.size.array.length; i ++ ) {
 
 					if ( i < length1 ) {
 

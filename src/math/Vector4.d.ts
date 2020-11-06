@@ -13,13 +13,29 @@ export class Vector4 implements Vector {
 
 	constructor( x?: number, y?: number, z?: number, w?: number );
 
+	/**
+	 * @default 0
+	 */
 	x: number;
+
+	/**
+	 * @default 0
+	 */
 	y: number;
+
+	/**
+	 * @default 0
+	 */
 	z: number;
+
+	/**
+	 * @default 0
+	 */
 	w: number;
+
 	width: number;
 	height: number;
-	isVector4: true;
+	readonly isVector4: true;
 
 	/**
 	 * Sets value of this vector.
@@ -68,7 +84,7 @@ export class Vector4 implements Vector {
 	/**
 	 * Adds v to this vector.
 	 */
-	add( v: Vector4, w?: Vector4 ): this;
+	add( v: Vector4 ): this;
 
 	addScalar( scalar: number ): this;
 
@@ -206,8 +222,12 @@ export class Vector4 implements Vector {
 
 	fromBufferAttribute(
 		attribute: BufferAttribute,
-		index: number,
-		offset?: number
+		index: number
 	): this;
+
+	/**
+	 * Sets this vector's x, y, z and w from Math.random
+	 */
+	random(): this;
 
 }

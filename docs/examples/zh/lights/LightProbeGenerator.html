@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>光照探针生成器（[name]）</h1>
+
+		<p class="desc">
+			用于创建 [page:LightProbe] 实例的工具类。
+		</p>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_lightprobe WebGL / light probe ]<br />
+			[example:webgl_lightprobe_cubecamera WebGL / light probe / cube camera ]
+		</p>
+
+		<h2>静态方法</h2>
+
+		<h3>[method:LightProbe fromCubeTexture] ( [param:CubeTexture cubeTexture] )</h3>
+		<p>
+			从传入的（辐射）环境贴图创建一个光照探针。该方法期望将环境贴图表示为一个立方体纹理。
+		</p>
+
+		<h3>[method:LightProbe fromCubeRenderTarget] ( [param:WebGLRenderer renderer], [param:WebGLCubeRenderTarget cubeRenderTarget] )</h3>
+		<p>
+			从传入的（辐射）环境贴图创建一个光照探针。该方法期望将环境贴图表示为一个立方体渲染目标。
+		</p>
+		<p>
+			立方体渲染目标的 [page:Texture.format format] 必须被设为 *RGBA*。
+		</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/lights/LightProbeGenerator.js examples/jsm/lights/LightProbeGenerator.js]
+		</p>
+	</body>
+</html>

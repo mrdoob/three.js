@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -12,15 +11,15 @@
 
 		<p class="desc">编译顶点或片元着色器的更底层的函数</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
-		var gl = renderer.getContext();
+		const gl = renderer.getContext();
 
-		var glVertexShader = new THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexSourceCode );
-		var glFragmentShader = new THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentSourceCode );
+		const glVertexShader = new THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexSourceCode );
+		const glFragmentShader = new THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentSourceCode );
 
-		var program = gl.createProgram();
+		const program = gl.createProgram();
 
 		gl.attachShader( program, glVertexShader );
 		gl.attachShader( program, glFragmentShader );
@@ -38,7 +37,7 @@
 		source -- 着色器源码
 		</p>
 		<p>
-        此函数将编译一个独立的着色器，不会将它和一个完整的[page:WebGLProgram]链接起来。
+		此函数将编译一个独立的着色器，不会将它和一个完整的[page:WebGLProgram]链接起来。
 		说明: 这是一个函数，因此不应该使用新的操作符。
 
 		</p>

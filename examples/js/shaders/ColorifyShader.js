@@ -1,6 +1,4 @@
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * Colorify shader
  */
 

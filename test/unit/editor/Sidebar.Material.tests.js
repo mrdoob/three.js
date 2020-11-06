@@ -1,9 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../editor/js/Sidebar.Material';
+import { } from '../../../editor/js/Sidebar.Material';
 
 export default QUnit.module( 'Editor', () => {
 

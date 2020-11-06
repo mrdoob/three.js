@@ -8,7 +8,7 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - custom attributes example</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - custom attributes example</div>
 		<div id="container"></div>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
@@ -53,11 +53,11 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var renderer, scene, camera, stats;
+			let renderer, scene, camera, stats;
 
-			var line, uniforms;
+			let line, uniforms;
 
-			var loader = new THREE.FontLoader();
+			const loader = new THREE.FontLoader();
 			loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
 				init( font );
@@ -81,7 +81,7 @@
 
 				};
 
-				var shaderMaterial = new THREE.ShaderMaterial( {
+				const shaderMaterial = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
@@ -93,7 +93,7 @@
 				} );
 
 
-				var geometry = new THREE.TextBufferGeometry( 'three.js', {
+				const geometry = new THREE.TextBufferGeometry( 'three.js', {
 
 					font: font,
 
@@ -110,17 +110,17 @@
 
 				geometry.center();
 
-				var count = geometry.attributes.position.count;
+				const count = geometry.attributes.position.count;
 
-				var displacement = new THREE.Float32BufferAttribute( count * 3, 3 );
-				geometry.addAttribute( 'displacement', displacement );
+				const displacement = new THREE.Float32BufferAttribute( count * 3, 3 );
+				geometry.setAttribute( 'displacement', displacement );
 
-				var customColor = new THREE.Float32BufferAttribute( count * 3, 3 );
-				geometry.addAttribute( 'customColor', customColor );
+				const customColor = new THREE.Float32BufferAttribute( count * 3, 3 );
+				geometry.setAttribute( 'customColor', customColor );
 
-				var color = new THREE.Color( 0xffffff );
+				const color = new THREE.Color( 0xffffff );
 
-				for ( var i = 0, l = customColor.count; i < l; i ++ ) {
+				for ( let i = 0, l = customColor.count; i < l; i ++ ) {
 
 					color.setHSL( i / l, 0.5, 0.5 );
 					color.toArray( customColor.array, i * customColor.itemSize );
@@ -135,7 +135,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -167,17 +167,17 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
 				line.rotation.y = 0.25 * time;
 
 				uniforms.amplitude.value = Math.sin( 0.5 * time );
 				uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
 
-				var attributes = line.geometry.attributes;
-				var array = attributes.displacement.array;
+				const attributes = line.geometry.attributes;
+				const array = attributes.displacement.array;
 
-				for ( var i = 0, l = array.length; i < l; i += 3 ) {
+				for ( let i = 0, l = array.length; i < l; i += 3 ) {
 
 					array[ i ] += 0.3 * ( 0.5 - Math.random() );
 					array[ i + 1 ] += 0.3 * ( 0.5 - Math.random() );

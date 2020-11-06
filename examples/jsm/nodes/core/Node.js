@@ -1,12 +1,8 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
-import { Math as _Math } from '../../../../build/three.module.js';
+import { MathUtils } from '../../../../build/three.module.js';
 
 function Node( type ) {
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.name = "";
 
@@ -21,6 +17,8 @@ Node.prototype = {
 	constructor: Node,
 
 	isNode: true,
+
+	hashProperties: undefined,
 
 	analyze: function ( builder, settings ) {
 
@@ -91,6 +89,48 @@ Node.prototype = {
 		}
 
 		return this.generate( builder, output, uuid );
+
+	},
+
+	generate: function ( /* builder, output, uuid, type, ns */ ) {
+
+		// This method needs to be implemented in subclasses
+
+	},
+
+	getHash: function () {
+
+		var hash = '{';
+		var prop, obj;
+
+		for ( prop in this ) {
+
+			obj = this[ prop ];
+
+			if ( obj instanceof Node ) {
+
+				hash += '"' + prop + '":' + obj.getHash() + ',';
+
+			}
+
+		}
+
+		if ( this.hashProperties ) {
+
+			for ( var i = 0; i < this.hashProperties.length; i ++ ) {
+
+				prop = this.hashProperties[ i ];
+				obj = this[ prop ];
+
+				hash += '"' + prop + '":"' + String( obj ) + '",';
+
+			}
+
+		}
+
+		hash += '"id":"' + this.uuid + '"}';
+
+		return hash;
 
 	},
 

@@ -13,23 +13,33 @@ export class LoadingManager {
 		onError?: ( url: string ) => void
 	);
 
+	/**
+	 * Will be called when loading of an item starts.
+	 * @param url The url of the item that started loading.
+	 * @param loaded The number of items already loaded so far.
+	 * @param total The total amount of items to be loaded.
+	 */
 	onStart?: ( url: string, loaded: number, total: number ) => void;
 
 	/**
-	 * Will be called when load starts.
+	 * Will be called when all items finish loading.
 	 * The default is a function with empty body.
 	 */
 	onLoad: () => void;
 
 	/**
-	 * Will be called while load progresses.
+	 * Will be called for each loaded item.
 	 * The default is a function with empty body.
+	 * @param url The url of the item just loaded.
+	 * @param loaded The number of items already loaded so far.
+	 * @param total The total amount of items to be loaded.
 	 */
-	onProgress: ( item: any, loaded: number, total: number ) => void;
+	onProgress: ( url: string, loaded: number, total: number ) => void;
 
 	/**
-	 * Will be called when each element in the scene completes loading.
+	 * Will be called when item loading fails.
 	 * The default is a function with empty body.
+	 * @param url The url of the item that errored.
 	 */
 	onError: ( url: string ) => void;
 

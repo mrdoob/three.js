@@ -5,21 +5,12 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			#vt { display:none }
-			#vt, #vt a { color:orange; }
-		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl normalmap demo.<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl normalmap demo.<br/>
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
-
-			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)<br/>
-			on Windows use <span class="code">Chrome --use-gl=desktop</span> or Firefox 4<br/>
-			please star this <a href="http://code.google.com/p/chromium/issues/detail?id=52497">Chrome issue</a> to get ANGLE support
-			</div>
 		</div>
 
 		<script type="module">
@@ -35,25 +26,26 @@
 			import { BleachBypassShader } from './jsm/shaders/BleachBypassShader.js';
 			import { ColorCorrectionShader } from './jsm/shaders/ColorCorrectionShader.js';
 			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
+			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
 
-			var container, stats, loader;
+			let container, stats, loader;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var mesh;
+			let mesh;
 
-			var directionalLight, pointLight, ambientLight;
+			let directionalLight, pointLight, ambientLight;
 
-			var mouseX = 0;
-			var mouseY = 0;
+			let mouseX = 0;
+			let mouseY = 0;
 
-			var targetX = 0;
-			var targetY = 0;
+			let targetX = 0;
+			let targetY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			const windowHalfX = window.innerWidth / 2;
+			const windowHalfY = window.innerHeight / 2;
 
-			var composer, effectFXAA;
+			let composer, effectFXAA;
 
 			init();
 			animate();
@@ -83,15 +75,23 @@
 				directionalLight.position.set( 1, - 0.5, - 1 );
 				scene.add( directionalLight );
 
-				var textureLoader = new THREE.TextureLoader();
+				const textureLoader = new THREE.TextureLoader();
 
-				var material = new THREE.MeshPhongMaterial( {
+				const diffuseMap = textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
+				diffuseMap.encoding = THREE.sRGBEncoding;
+
+				const specularMap = textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" );
+				specularMap.encoding = THREE.sRGBEncoding;
+
+				const normalMap = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+
+				const material = new THREE.MeshPhongMaterial( {
 					color: 0xdddddd,
 					specular: 0x222222,
 					shininess: 35,
-					map: textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
-					specularMap: textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" ),
-					normalMap: textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					map: diffuseMap,
+					specularMap: specularMap,
+					normalMap: normalMap,
 					normalScale: new THREE.Vector2( 0.8, 0.8 )
 				} );
 
@@ -108,11 +108,6 @@
 
 				//
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
-
-				//
-
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
@@ -121,15 +116,16 @@
 
 				renderer.autoClear = false;
 
-				var renderModel = new RenderPass( scene, camera );
+				const renderModel = new RenderPass( scene, camera );
 
-				var effectBleach = new ShaderPass( BleachBypassShader );
-				var effectColor = new ShaderPass( ColorCorrectionShader );
+				const effectBleach = new ShaderPass( BleachBypassShader );
+				const effectColor = new ShaderPass( ColorCorrectionShader );
 				effectFXAA = new ShaderPass( FXAAShader );
+				const gammaCorrection = new ShaderPass( GammaCorrectionShader );
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
-				effectBleach.uniforms[ 'opacity' ].value = 0.4;
+				effectBleach.uniforms[ 'opacity' ].value = 0.2;
 
 				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
 				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
@@ -140,6 +136,7 @@
 				composer.addPass( effectFXAA );
 				composer.addPass( effectBleach );
 				composer.addPass( effectColor );
+				composer.addPass( gammaCorrection );
 
 				// EVENTS
 
@@ -163,8 +160,8 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();

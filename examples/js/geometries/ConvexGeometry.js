@@ -1,7 +1,3 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 // ConvexGeometry
 
 THREE.ConvexGeometry = function ( points ) {
@@ -61,8 +57,8 @@ THREE.ConvexBufferGeometry = function ( points ) {
 
 	// build geometry
 
-	this.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+	this.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 
 };
 

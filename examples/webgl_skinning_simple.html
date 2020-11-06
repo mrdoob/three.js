@@ -22,18 +22,18 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var stats, mixer, camera, scene, renderer, clock;
+			let stats, mixer, camera, scene, renderer, clock;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set( 24, 8, 24 );
+				camera.position.set( 18, 6, 18 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
@@ -43,16 +43,16 @@
 
 				// ground
 
-				var geometry = new THREE.PlaneBufferGeometry( 500, 500 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } );
+				const geometry = new THREE.PlaneBufferGeometry( 500, 500 );
+				const material = new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } );
 
-				var ground = new THREE.Mesh( geometry, material );
+				const ground = new THREE.Mesh( geometry, material );
 				ground.position.set( 0, - 5, 0 );
 				ground.rotation.x = - Math.PI / 2;
 				ground.receiveShadow = true;
 				scene.add( ground );
 
-				var grid = new THREE.GridHelper( 500, 100, 0x000000, 0x000000 );
+				const grid = new THREE.GridHelper( 500, 100, 0x000000, 0x000000 );
 				grid.position.y = - 5;
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
@@ -60,22 +60,22 @@
 
 				// lights
 
-				var light = new THREE.HemisphereLight( 0xffffff, 0x444444, 0.6 );
-				light.position.set( 0, 200, 0 );
-				scene.add( light );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444, 0.6 );
+				hemiLight.position.set( 0, 200, 0 );
+				scene.add( hemiLight );
 
-				light = new THREE.DirectionalLight( 0xffffff, 0.8 );
-				light.position.set( 0, 20, 10 );
-				light.castShadow = true;
-				light.shadow.camera.top = 18;
-				light.shadow.camera.bottom = - 10;
-				light.shadow.camera.left = - 12;
-				light.shadow.camera.right = 12;
-				scene.add( light );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				dirLight.position.set( 0, 20, 10 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.top = 18;
+				dirLight.shadow.camera.bottom = - 10;
+				dirLight.shadow.camera.left = - 12;
+				dirLight.shadow.camera.right = 12;
+				scene.add( dirLight );
 
 				//
 
-				var loader = new GLTFLoader();
+				const loader = new GLTFLoader();
 				loader.load( './models/gltf/SimpleSkinning.gltf', function ( gltf ) {
 
 					scene.add( gltf.scene );
@@ -104,7 +104,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.enablePan = false;
 				controls.minDistance = 5;
 				controls.maxDistance = 50;

@@ -30,10 +30,12 @@
 
 			import { CinematicCamera } from './jsm/cameras/CinematicCamera.js';
 
-			var camera, scene, raycaster, renderer, stats;
+			let camera, scene, raycaster, renderer, stats;
 
-			var mouse = new THREE.Vector2(), INTERSECTED;
-			var radius = 100, theta = 0;
+			const mouse = new THREE.Vector2();
+			let INTERSECTED;
+			const radius = 100;
+			let theta = 0;
 
 			init();
 			animate();
@@ -49,15 +51,15 @@
 
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.3 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 0.35 );
+				const light = new THREE.DirectionalLight( 0xffffff, 0.35 );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				const geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
 
-				for ( var i = 0; i < 1500; i ++ ) {
+				for ( let i = 0; i < 1500; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 800 - 400;
 					object.position.y = Math.random() * 800 - 400;
@@ -81,7 +83,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var effectController = {
+				const effectController = {
 
 					focalLength: 15,
 					// jsDepthCalculation: true,
@@ -109,9 +111,9 @@
 
 				};
 
-				var matChanger = function ( ) {
+				const matChanger = function ( ) {
 
-					for ( var e in effectController ) {
+					for ( const e in effectController ) {
 
 						if ( e in camera.postprocessing.bokeh_uniforms ) {
 
@@ -130,7 +132,7 @@
 
 				//
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( effectController, 'focalLength', 1, 135, 0.01 ).onChange( matChanger );
 				gui.add( effectController, 'fstop', 1.8, 22, 0.01 ).onChange( matChanger );
@@ -175,9 +177,9 @@
 
 				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+				camera.position.x = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.y = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.MathUtils.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
 				camera.updateMatrixWorld();
@@ -186,11 +188,11 @@
 
 				raycaster.setFromCamera( mouse, camera );
 
-				var intersects = raycaster.intersectObjects( scene.children );
+				const intersects = raycaster.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 
-					var targetDistance = intersects[ 0 ].distance;
+					const targetDistance = intersects[ 0 ].distance;
 
 					camera.focusAt( targetDistance ); // using Cinematic camera focusAt method
 

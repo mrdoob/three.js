@@ -1,7 +1,4 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
 
 /**
  * @param editor Editor
@@ -10,8 +7,7 @@
  * @param newValue number, string, boolean or object
  * @constructor
  */
-
-var SetMaterialValueCommand = function ( editor, object, attributeName, newValue, materialSlot ) {
+function SetMaterialValueCommand( editor, object, attributeName, newValue, materialSlot ) {
 
 	Command.call( this, editor );
 
@@ -27,7 +23,7 @@ var SetMaterialValueCommand = function ( editor, object, attributeName, newValue
 
 	this.attributeName = attributeName;
 
-};
+}
 
 SetMaterialValueCommand.prototype = {
 
@@ -82,3 +78,5 @@ SetMaterialValueCommand.prototype = {
 	}
 
 };
+
+export { SetMaterialValueCommand };

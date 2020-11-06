@@ -10,7 +10,7 @@
 <body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
 			<a href="https://github.com/Virtulous" target="_blank" rel="noopener">Assimp File format</a>
 			<div>Assimp loader by <a href="https://virtulo.us" target="_blank" rel="noopener">Virtulous</a></div>
 			<div>Octaminator model from <a href="http://opengameart.org/content/octaminator-engine-ready" target="_blank" rel="noopener">Teh_Bucket and raymoohawk</a></div>
@@ -25,9 +25,9 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { AssimpLoader } from './jsm/loaders/AssimpLoader.js';
 
-			var container, stats;
-			var camera, scene, renderer;
-			var animation;
+			let container, stats;
+			let camera, scene, renderer;
+			let animation;
 
 			init();
 
@@ -41,11 +41,11 @@
 
 				scene = new THREE.Scene();
 
-				var ambient = new THREE.HemisphereLight( 0x8888fff, 0xff8888, 0.5 );
+				const ambient = new THREE.HemisphereLight( 0x8888fff, 0xff8888, 0.5 );
 				ambient.position.set( 0, 1, 0 );
 				scene.add( ambient );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				const light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 0, 4, 4 ).normalize();
 				scene.add( light );
 
@@ -54,15 +54,17 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 750;
+				controls.maxDistance = 2500;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var loader = new AssimpLoader();
+				const loader = new AssimpLoader();
 				loader.load( './models/assimp/octaminator/Octaminator.assimp', function ( result ) {
 
-					var object = result.object;
+					const object = result.object;
 
 					object.position.y = - 100;
 					object.rotation.x = Math.PI / 2;

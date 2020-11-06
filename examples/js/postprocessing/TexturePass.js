@@ -1,7 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 THREE.TexturePass = function ( map, opacity ) {
 
 	THREE.Pass.call( this );

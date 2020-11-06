@@ -1,9 +1,7 @@
 /**
- * @author renej
  * NURBS utils
  *
  * See NURBSCurve and NURBSSurface.
- *
  **/
 
 
@@ -209,6 +207,7 @@ THREE.NURBSUtils = {
 				a[ i ] = zeroArr.slice( 0 );
 
 			}
+
 			a[ 0 ][ 0 ] = 1.0;
 
 			for ( var k = 1; k <= n; ++ k ) {
@@ -260,6 +259,7 @@ THREE.NURBSUtils = {
 				ders[ k ][ j ] *= r;
 
 			}
+
 			r *= p - k;
 
 		}
@@ -300,6 +300,7 @@ THREE.NURBSUtils = {
 			Pw[ i ] = point;
 
 		}
+
 		for ( var k = 0; k <= du; ++ k ) {
 
 			var point = Pw[ span - p ].clone().multiplyScalar( nders[ k ][ 0 ] );

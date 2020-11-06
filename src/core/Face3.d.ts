@@ -1,12 +1,6 @@
 import { Vector3 } from './../math/Vector3';
 import { Color } from './../math/Color';
 
-export interface Event {
-	type: string;
-	target?: any;
-	[attachment: string]: any;
-}
-
 /**
  * Triangle face.
  *
@@ -72,26 +66,31 @@ export class Face3 {
 
 	/**
 	 * Face normal.
+	 * @default new THREE.Vector3()
 	 */
 	normal: Vector3;
 
 	/**
-	 * Array of 4 vertex normals.
+	 * Array of 3 vertex normals.
+	 * @default []
 	 */
 	vertexNormals: Vector3[];
 
 	/**
 	 * Face color.
+	 * @default new THREE.Color()
 	 */
 	color: Color;
 
 	/**
-	 * Array of 4 vertex normals.
+	 * Array of 3 vertex colors.
+	 * @default []
 	 */
 	vertexColors: Color[];
 
 	/**
-	 * Material index (points to {@link Geometry.materials}).
+	 * Material index (points to {@link Mesh.material}).
+	 * @default 0
 	 */
 	materialIndex: number;
 

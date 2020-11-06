@@ -1,5 +1,4 @@
 /**
- * @author Kai Salmen / https://kaisalmen.de
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
@@ -15,11 +14,11 @@ import { CodeSerializer } from "./obj2/utils/CodeSerializer.js";
 import { OBJLoader2 } from "./OBJLoader2.js";
 
 // Imports only related to worker (when standard workers (modules aren't supported) are used)
-import { OBJLoader2Parser } from "./obj2/worker/parallel/OBJLoader2Parser.js";
-import { ObjectManipulator } from "./obj2/utils/ObjectManipulator.js";
+import { OBJLoader2Parser } from "./obj2/OBJLoader2Parser.js";
 import {
 	WorkerRunner,
-	DefaultWorkerPayloadHandler
+	DefaultWorkerPayloadHandler,
+	ObjectManipulator
 } from "./obj2/worker/parallel/WorkerRunner.js";
 
 
@@ -34,15 +33,16 @@ const OBJLoader2Parallel = function ( manager ) {
 
 	OBJLoader2.call( this, manager );
 	this.preferJsmWorker = false;
+	this.jsmWorkerUrl = null;
 
 	this.executeParallel = true;
 	this.workerExecutionSupport = new WorkerExecutionSupport();
 
 };
 
-OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION = '3.1.1';
+OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION = '3.2.0';
 console.info( 'Using OBJLoader2Parallel version: ' + OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION );
-
+OBJLoader2Parallel.DEFAULT_JSM_WORKER_PATH = './jsm/loaders/obj2/worker/parallel/OBJLoader2JsmWorker.js';
 
 OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototype ), {
 
@@ -51,7 +51,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	/**
 	 * Execution of parse in parallel via Worker is default, but normal {OBJLoader2} parsing can be enforced via false here.
 	 *
-	 * @param executeParallel True or False
+	 * @param {boolean} executeParallel True or False
 	 * @return {OBJLoader2Parallel}
 	 */
 	setExecuteParallel: function ( executeParallel ) {
@@ -63,12 +63,22 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 	/**
 	 * Set whether jsm modules in workers should be used. This requires browser support which is currently only experimental.
-	 * @param preferJsmWorker True or False
+	 * @param {boolean} preferJsmWorker True or False
+	 * @param {URL} jsmWorkerUrl Provide complete jsm worker URL otherwise relative path to this module may not be correct
 	 * @return {OBJLoader2Parallel}
 	 */
-	setPreferJsmWorker: function ( preferJsmWorker ) {
+	setJsmWorker: function ( preferJsmWorker, jsmWorkerUrl ) {
 
 		this.preferJsmWorker = preferJsmWorker === true;
+
+		if ( jsmWorkerUrl === undefined || jsmWorkerUrl === null ) {
+
+			throw "The url to the jsm worker is not valid. Aborting...";
+
+		}
+
+		this.jsmWorkerUrl = jsmWorkerUrl;
+
 		return this;
 
 	},
@@ -89,27 +99,29 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	 */
 	buildWorkerCode: function () {
 
-		let codeBuilderInstructions = new CodeBuilderInstructions( true, true, this.preferJsmWorker );
+		const codeBuilderInstructions = new CodeBuilderInstructions( true, true, this.preferJsmWorker );
+
 		if ( codeBuilderInstructions.isSupportsJsmWorker() ) {
 
-			codeBuilderInstructions.setJsmWorkerFile( '../examples/loaders/jsm/obj2/worker/parallel/jsm/OBJLoader2Worker.js' );
+			codeBuilderInstructions.setJsmWorkerUrl( this.jsmWorkerUrl );
 
 		}
+
 		if ( codeBuilderInstructions.isSupportsStandardWorker() ) {
 
-			let codeOBJLoader2Parser = CodeSerializer.serializeClass( 'OBJLoader2Parser', OBJLoader2Parser );
-			let codeObjectManipulator = CodeSerializer.serializeObject( 'ObjectManipulator', ObjectManipulator );
-			let codeParserPayloadHandler = CodeSerializer.serializeClass( 'DefaultWorkerPayloadHandler', DefaultWorkerPayloadHandler );
-			let codeWorkerRunner = CodeSerializer.serializeClass( 'WorkerRunner', WorkerRunner );
+			const objectManipulator = new ObjectManipulator();
+			const defaultWorkerPayloadHandler = new DefaultWorkerPayloadHandler( this.parser );
+			const workerRunner = new WorkerRunner( {} );
+			codeBuilderInstructions.addCodeFragment( CodeSerializer.serializeClass( OBJLoader2Parser, this.parser ) );
+			codeBuilderInstructions.addCodeFragment( CodeSerializer.serializeClass( ObjectManipulator, objectManipulator ) );
+			codeBuilderInstructions.addCodeFragment( CodeSerializer.serializeClass( DefaultWorkerPayloadHandler, defaultWorkerPayloadHandler ) );
+			codeBuilderInstructions.addCodeFragment( CodeSerializer.serializeClass( WorkerRunner, workerRunner ) );
 
-			codeBuilderInstructions.addCodeFragment( codeOBJLoader2Parser );
-			codeBuilderInstructions.addCodeFragment( codeObjectManipulator );
-			codeBuilderInstructions.addCodeFragment( codeParserPayloadHandler );
-			codeBuilderInstructions.addCodeFragment( codeWorkerRunner );
-
-			codeBuilderInstructions.addStartCode( 'new WorkerRunner( new DefaultWorkerPayloadHandler( new OBJLoader2Parser() ) );' );
+			const startCode = 'new ' + workerRunner.constructor.name + '( new ' + defaultWorkerPayloadHandler.constructor.name + '( new ' + this.parser.constructor.name + '() ) );';
+			codeBuilderInstructions.addStartCode( startCode );
 
 		}
+
 		return codeBuilderInstructions;
 
 	},
@@ -119,7 +131,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	 */
 	load: function ( content, onLoad, onFileLoadProgress, onError, onMeshAlter ) {
 
- 		let scope = this;
+ 		const scope = this;
 		function interceptOnLoad( object3d, message ) {
 
 			if ( object3d.name === 'OBJLoader2ParallelDummy' ) {
@@ -156,17 +168,19 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 				throw "No callback other than the default callback was provided! Aborting!";
 
 			}
+
 			// check if worker has been initialize before. If yes, skip init
 			if ( ! this.workerExecutionSupport.isWorkerLoaded( this.preferJsmWorker ) ) {
 
 				this.workerExecutionSupport.buildWorker( this.buildWorkerCode() );
 
-				let scope = this;
-				let scopedOnAssetAvailable = function ( payload ) {
+				const scope = this;
+				const scopedOnAssetAvailable = function ( payload ) {
 
 					scope._onAssetAvailable( payload );
 
 				};
+
 				function scopedOnLoad( message ) {
 
 					scope.parser.callbacks.onLoad( scope.baseObject3d, message );
@@ -201,7 +215,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 					}
 				} );
 
-			let dummy = new Object3D();
+			const dummy = new Object3D();
 			dummy.name = 'OBJLoader2ParallelDummy';
 			return dummy;
 

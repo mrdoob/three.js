@@ -1,7 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 THREE.MD2Character = function () {
 
 	var scope = this;
@@ -221,6 +217,7 @@ THREE.MD2Character = function () {
 			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
 			textures[ i ].mapping = THREE.UVMapping;
 			textures[ i ].name = textureUrls[ i ];
+			textures[ i ].encoding = THREE.sRGBEncoding;
 
 		}
 

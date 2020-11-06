@@ -1,7 +1,4 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
 
 /**
  * @param editor Editor
@@ -10,8 +7,7 @@
  * @param newValue number, string, boolean or object
  * @constructor
  */
-
-var SetValueCommand = function ( editor, object, attributeName, newValue ) {
+function SetValueCommand( editor, object, attributeName, newValue ) {
 
 	Command.call( this, editor );
 
@@ -24,7 +20,7 @@ var SetValueCommand = function ( editor, object, attributeName, newValue ) {
 	this.oldValue = ( object !== undefined ) ? object[ attributeName ] : undefined;
 	this.newValue = newValue;
 
-};
+}
 
 SetValueCommand.prototype = {
 
@@ -75,3 +71,5 @@ SetValueCommand.prototype = {
 	}
 
 };
+
+export { SetValueCommand };

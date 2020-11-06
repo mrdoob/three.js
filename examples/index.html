@@ -6,18 +6,13 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="shortcut icon" href="../files/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
-		<style>
-			#panel #content .link {
-				display: block;
-			}
-		</style>
 	</head>
 	<body>
 
 		<div id="panel">
 
 			<div id="header">
-				<h1><a href="http://threejs.org">three.js</a></h1>
+				<h1><a href="https://threejs.org">three.js</a></h1>
 
 				<div id="sections">
 					<a href="../docs/index.html#manual/introduction/Creating-a-scene">docs</a>
@@ -32,11 +27,13 @@
 			<div id="contentWrapper">
 
 				<div id="inputWrapper">
-					<input placeholder="" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
 					<div id="exitSearchButton"></div>
 				</div>
 
-				<div id="content"></div>
+				<div id="content">
+					<img id="previewsToggler" src="./files/thumbnails.svg" width="20" height="20" />
+				</div>
 			</div>
 
 		</div>
@@ -45,74 +42,166 @@
 
 		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
 
-		<script src="files.js"></script>
-
 		<script>
 
-		function extractQuery() {
+		const panel = document.getElementById( 'panel' );
+		const content = document.getElementById( 'content' );
+		const viewer = document.getElementById( 'viewer' );
+		const filterInput = document.getElementById( 'filterInput' );
+		const exitSearchButton = document.getElementById( 'exitSearchButton' );
+		const expandButton = document.getElementById( 'expandButton' );
+		const viewSrcButton = document.getElementById( 'button' );
+		const panelScrim = document.getElementById( 'panelScrim' );
 
-			var p = window.location.search.indexOf( '?q=' );
+		const previewsToggler = document.getElementById( 'previewsToggler' );
 
-			if ( p !== - 1 ) {
+		const links = {};
+		const validRedirects = new Map();
+		const container = document.createElement( 'div' );
 
-				return window.location.search.substr( 3 );
+		let selected = null;
+
+		init();
+
+		async function init() {
+
+			content.appendChild( container );
+
+			viewSrcButton.style.display = 'none';
+
+			const files = await ( await fetch( 'files.json' ) ).json();
+			const tags = await ( await fetch( 'tags.json' ) ).json();
+
+			for ( const key in files ) {
+
+				const section = files[ key ];
+
+				const header = document.createElement( 'h2' );
+				header.textContent = key;
+				header.setAttribute( 'data-category', key );
+				container.appendChild( header );
+
+				for ( let i = 0; i < section.length; i ++ ) {
+
+					const file = section[ i ];
+
+					const link = createLink( file );
+					container.appendChild( link );
+
+					links[ file ] = link;
+					validRedirects.set( file, file + '.html' );
+
+				}
 
 			}
 
-			return '';
+			if ( window.location.hash !== '' ) {
+
+				const file = window.location.hash.substring( 1 );
+
+				// use a predefined map of redirects to avoid untrusted URL redirection due to user-provided value
+
+				if ( validRedirects.has( file ) === true ) {
+
+					selectFile( file );
+					viewer.src = validRedirects.get( file );
+
+				}
+
+			}
+
+			filterInput.value = extractQuery();
+
+			if ( filterInput.value !== '' ) {
+
+				panel.classList.add( 'searchFocused' );
+
+			}
+
+			updateFilter( files, tags );
+
+			// Events
+
+			filterInput.onfocus = function ( ) {
+
+				panel.classList.add( 'searchFocused' );
+
+			};
+
+			filterInput.onblur = function ( ) {
+
+				if ( filterInput.value === '' ) {
+
+					panel.classList.remove( 'searchFocused' );
+
+				}
+
+			};
+
+			exitSearchButton.onclick = function ( ) {
+
+				filterInput.value = '';
+				updateFilter( files, tags );
+				panel.classList.remove( 'searchFocused' );
+
+			};
+
+			filterInput.addEventListener( 'input', function () {
+
+				updateFilter( files, tags );
+
+			} );
+
+
+			expandButton.addEventListener( 'click', function ( event ) {
+
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
+
+			} );
+
+			panelScrim.onclick = function ( event ) {
+
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
+
+			};
+
+			previewsToggler.onclick = function ( event ) {
+
+				event.preventDefault();
+				content.classList.toggle( 'minimal' );
+
+			};
+
+			// iOS iframe auto-resize workaround
+
+			if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+				viewer.style.width = getComputedStyle( viewer ).width;
+				viewer.style.height = getComputedStyle( viewer ).height;
+				viewer.setAttribute( 'scrolling', 'no' );
+
+			}
 
 		}
-
-		var panel = document.getElementById( 'panel' );
-		var content = document.getElementById( 'content' );
-		var viewer = document.getElementById( 'viewer' );
-
-		var filterInput = document.getElementById( 'filter' );
-		var exitSearchButton = document.getElementById( 'exitSearchButton' );
-
-		var expandButton = document.getElementById( 'expandButton' );
-		expandButton.addEventListener( 'click', function ( event ) {
-
-			event.preventDefault();
-			panel.classList.toggle( 'open' );
-
-		} );
-
-		var panelScrim = document.getElementById( 'panelScrim' );
-		panelScrim.onclick = function ( event ) {
-
-			event.preventDefault();
-			panel.classList.toggle( 'open' );
-
-		};
-
-		// iOS iframe auto-resize workaround
-
-		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
-
-			viewer.style.width = getComputedStyle( viewer ).width;
-			viewer.style.height = getComputedStyle( viewer ).height;
-			viewer.setAttribute( 'scrolling', 'no' );
-
-		}
-
-		var container = document.createElement( 'div' );
-		content.appendChild( container );
-
-		var viewSrcButton = document.getElementById( 'button' );
-		viewSrcButton.style.display = 'none';
-
-		var links = {};
-		var selected = null;
 
 		function createLink( file ) {
 
-			var link = document.createElement( 'a' );
-			link.className = 'link';
-			link.href = file + '.html';
-			link.textContent = getName( file );
-			link.setAttribute( 'target', 'viewer' );
-			link.addEventListener( 'click', function ( event ) {
+			const template = [
+				'<div class="card">',
+				'	<a href="' + file + '.html" target="viewer">',
+				'		<div class="cover">',
+				'			<img src="screenshots/' + file + '.jpg" loading="lazy" width="400" />',
+				'		</div>',
+				'		<div class="title">' + getName( file ) + '</div>',
+				'	</a>',
+				'</div>'
+			].join( "\n" );
+
+			const link = createElementFromHTML( template );
+
+			link.querySelector( 'a[target="viewer"]' ).addEventListener( 'click', function ( event ) {
 
 				if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
 
@@ -121,35 +210,6 @@
 			} );
 
 			return link;
-
-		}
-
-		for ( var key in files ) {
-
-			var section = files[ key ];
-
-			var header = document.createElement( 'h2' );
-			header.textContent = key;
-			header.setAttribute( 'data-category', key );
-			container.appendChild( header );
-
-			for ( var i = 0; i < section.length; i ++ ) {
-
-				var file = section[ i ];
-
-				var link = createLink( file );
-				container.appendChild( link );
-
-				links[ file ] = link;
-
-			}
-
-		}
-
-		function loadFile( file ) {
-
-			selectFile( file );
-			viewer.src = file + '.html';
 
 		}
 
@@ -173,46 +233,10 @@
 
 		}
 
-		if ( window.location.hash !== '' && links[ window.location.hash.substring( 1 ) ] ) {
+		function updateFilter( files, tags ) {
 
-			loadFile( window.location.hash.substring( 1 ) );
-
-		}
-
-		// filter
-		filterInput.onfocus = function ( event ) {
-
-			panel.classList.add( 'searchFocused' );
-
-		};
-
-		filterInput.onblur = function ( event ) {
-
-			if ( filterInput.value === '' ) {
-
-				panel.classList.remove( 'searchFocused' );
-
-			}
-
-		};
-
-		exitSearchButton.onclick = function ( event ) {
-
-			filterInput.value = '';
-			updateFilter();
-			panel.classList.remove( 'searchFocused' );
-
-		};
-
-		filterInput.addEventListener( 'input', function () {
-
-			updateFilter();
-
-		} );
-
-		function updateFilter() {
-
-			var v = filterInput.value;
+			let v = filterInput.value.trim();
+			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
 
 			if ( v !== '' ) {
 
@@ -224,47 +248,48 @@
 
 			}
 
-			var exp = new RegExp( v, 'gi' );
+			const exp = new RegExp( v, 'gi' );
 
-			for ( var key in files ) {
+			for ( const key in files ) {
 
-				var section = files[ key ];
+				const section = files[ key ];
 
-				for ( var i = 0; i < section.length; i ++ ) {
+				for ( let i = 0; i < section.length; i ++ ) {
 
-					filterExample( section[ i ], exp );
+					filterExample( section[ i ], exp, tags );
 
 				}
 
 			}
 
-			layoutList();
+			layoutList( files );
 
 		}
 
-		function filterExample( file, exp ) {
+		function filterExample( file, exp, tags ) {
 
-			var link = links[ file ];
-			var name = getName( file );
-			var res = file.match( exp );
-			var text;
+			const link = links[ file ];
+			const name = getName( file );
+			if ( file in tags ) file += ' ' + tags[ file ].join( ' ' );
+			const res = file.match( exp );
+			let text;
 
 			if ( res && res.length > 0 ) {
 
 				link.classList.remove( 'hidden' );
 
-				for ( var i = 0; i < res.length; i ++ ) {
+				for ( let i = 0; i < res.length; i ++ ) {
 
 					text = name.replace( res[ i ], '<b>' + res[ i ] + '</b>' );
 
 				}
 
-				link.innerHTML = text;
+				link.querySelector( '.title' ).innerHTML = text;
 
 			} else {
 
 				link.classList.add( 'hidden' );
-				link.innerHTML = name;
+				link.querySelector( '.title' ).innerHTML = name;
 
 			}
 
@@ -272,23 +297,23 @@
 
 		function getName( file ) {
 
-			var name = file.split( '_' );
+			const name = file.split( '_' );
 			name.shift();
 			return name.join( ' / ' );
 
 		}
 
-		function layoutList() {
+		function layoutList( files ) {
 
-			for ( var key in files ) {
+			for ( const key in files ) {
 
-				var collapsed = true;
+				let collapsed = true;
 
-				var section = files[ key ];
+				const section = files[ key ];
 
-				for ( var i = 0; i < section.length; i ++ ) {
+				for ( let i = 0; i < section.length; i ++ ) {
 
-					var file = section[ i ];
+					const file = section[ i ];
 
 					if ( links[ file ].classList.contains( 'hidden' ) === false ) {
 
@@ -299,7 +324,7 @@
 
 				}
 
-				var element = document.querySelector( 'h2[data-category="' + key + '"]' );
+				const element = document.querySelector( 'h2[data-category="' + key + '"]' );
 
 				if ( collapsed ) {
 
@@ -315,8 +340,28 @@
 
 		}
 
-		filterInput.value = extractQuery();
-		updateFilter();
+		function extractQuery() {
+
+			const p = window.location.search.indexOf( '?q=' );
+
+			if ( p !== - 1 ) {
+
+				return decodeURI( window.location.search.substr( 3 ) );
+
+			}
+
+			return '';
+
+		}
+
+
+		function createElementFromHTML( htmlString ) {
+
+			const div = document.createElement( 'div' );
+			div.innerHTML = htmlString.trim();
+			return div.firstChild;
+
+		}
 
 		</script>
 

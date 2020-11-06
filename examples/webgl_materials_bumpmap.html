@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - bump mapping without tangents<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - bump mapping without tangents<br/>
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
@@ -21,24 +21,24 @@
 
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var statsEnabled = true;
+			const statsEnabled = true;
 
-			var container, stats, loader;
+			let container, stats, loader;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var mesh;
+			let mesh;
 
-			var spotLight;
+			let spotLight;
 
-			var mouseX = 0;
-			var mouseY = 0;
+			let mouseX = 0;
+			let mouseY = 0;
 
-			var targetX = 0;
-			var targetY = 0;
+			let targetX = 0;
+			let targetY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			const windowHalfX = window.innerWidth / 2;
+			const windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -79,9 +79,9 @@
 
 				//
 
-				var mapHeight = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				const mapHeight = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
-				var material = new THREE.MeshPhongMaterial( {
+				const material = new THREE.MeshPhongMaterial( {
 					color: 0x552811,
 					specular: 0x222222,
 					shininess: 25,
@@ -102,11 +102,7 @@
 				container.appendChild( renderer.domElement );
 
 				renderer.shadowMap.enabled = true;
-
-				//
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 

@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - typed arrays<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - typed arrays<br/>
 			nearest neighbour for 500,000 sprites
 		</div>
 
@@ -57,14 +57,17 @@
 			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 			import { TypedArrayUtils } from './jsm/utils/TypedArrayUtils.js';
 
-			var camera, scene, renderer;
-			var controls;
+			let camera, scene, renderer;
+			let controls;
 
-			var amountOfParticles = 500000, maxDistance = Math.pow( 120, 2 );
-			var positions, alphas, particles, _particleGeom;
-			var kdtree;
+			const amountOfParticles = 500000, maxDistance = Math.pow( 120, 2 );
+			let positions, alphas, particles, _particleGeom;
+			let kdtree;
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
+
+			init();
+			animate();
 
 			function init() {
 
@@ -73,11 +76,11 @@
 				scene = new THREE.Scene();
 
 				// add a skybox background
-				var cubeTextureLoader = new THREE.CubeTextureLoader();
+				const cubeTextureLoader = new THREE.CubeTextureLoader();
 
 				cubeTextureLoader.setPath( 'textures/cube/skyboxsun25deg/' );
 
-				var cubeTexture = cubeTextureLoader.load( [
+				const cubeTexture = cubeTextureLoader.load( [
 					'px.jpg', 'nx.jpg',
 					'py.jpg', 'ny.jpg',
 					'pz.jpg', 'nz.jpg',
@@ -100,14 +103,14 @@
 
 				// create the custom shader
 
-				var textureLoader = new THREE.TextureLoader();
+				const textureLoader = new THREE.TextureLoader();
 
-				var imagePreviewTexture = textureLoader.load( 'textures/crate.gif' );
+				const imagePreviewTexture = textureLoader.load( 'textures/crate.gif' );
 
 				imagePreviewTexture.minFilter = THREE.LinearMipmapLinearFilter;
 				imagePreviewTexture.magFilter = THREE.LinearFilter;
 
-				var pointShaderMaterial = new THREE.ShaderMaterial( {
+				const pointShaderMaterial = new THREE.ShaderMaterial( {
 					uniforms: {
 						tex1: { value: imagePreviewTexture },
 						zoom: { value: 9.0 }
@@ -119,22 +122,17 @@
 
 
 				//create particles with buffer geometry
-				var distanceFunction = function ( a, b ) {
-
-					return Math.pow( a[ 0 ] - b[ 0 ], 2 ) + Math.pow( a[ 1 ] - b[ 1 ], 2 ) + Math.pow( a[ 2 ] - b[ 2 ], 2 );
-
-				};
 
 				positions = new Float32Array( amountOfParticles * 3 );
 				alphas = new Float32Array( amountOfParticles );
 
 				_particleGeom = new THREE.BufferGeometry();
-				_particleGeom.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				_particleGeom.addAttribute( 'alpha', new THREE.BufferAttribute( alphas, 1 ) );
+				_particleGeom.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				_particleGeom.setAttribute( 'alpha', new THREE.BufferAttribute( alphas, 1 ) );
 
 				particles = new THREE.Points( _particleGeom, pointShaderMaterial );
 
-				for ( var x = 0; x < amountOfParticles; x ++ ) {
+				for ( let x = 0; x < amountOfParticles; x ++ ) {
 
 					positions[ x * 3 + 0 ] = Math.random() * 1000;
 					positions[ x * 3 + 1 ] = Math.random() * 1000;
@@ -144,8 +142,7 @@
 
 				}
 
-
-				var measureStart = new Date().getTime();
+				const measureStart = new Date().getTime();
 
 				// creating the kdtree takes a lot of time to execute, in turn the nearest neighbour search will be much faster
 				kdtree = new TypedArrayUtils.Kdtree( positions, distanceFunction, 3 );
@@ -186,23 +183,23 @@
 			function displayNearest( position ) {
 
 				// take the nearest 200 around him. distance^2 'cause we use the manhattan distance and no square is applied in the distance function
-				var imagePositionsInRange = kdtree.nearest( [ position.x, position.y, position.z ], 100, maxDistance );
+				const imagePositionsInRange = kdtree.nearest( [ position.x, position.y, position.z ], 100, maxDistance );
 
 				// We combine the nearest neighbour with a view frustum. Doesn't make sense if we change the sprites not in our view... well maybe it does. Whatever you want.
-				var _frustum = new THREE.Frustum();
-				var _projScreenMatrix = new THREE.Matrix4();
+				const _frustum = new THREE.Frustum();
+				const _projScreenMatrix = new THREE.Matrix4();
 
 				_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-				_frustum.setFromMatrix( _projScreenMatrix );
+				_frustum.setFromProjectionMatrix( _projScreenMatrix );
 
-				for ( var i = 0, il = imagePositionsInRange.length; i < il; i ++ ) {
+				for ( let i = 0, il = imagePositionsInRange.length; i < il; i ++ ) {
 
-					var object = imagePositionsInRange[ i ];
-					var objectPoint = new THREE.Vector3().fromArray( object[ 0 ].obj );
+					const object = imagePositionsInRange[ i ];
+					const objectPoint = new THREE.Vector3().fromArray( object[ 0 ].obj );
 
 					if ( _frustum.containsPoint( objectPoint ) ) {
 
-						var objectIndex = object[ 0 ].pos;
+						const objectIndex = object[ 0 ].pos;
 
 						// set the alpha according to distance
 						alphas[ objectIndex ] = 1.0 / maxDistance * object[ 1 ];
@@ -216,9 +213,11 @@
 
 			}
 
+			function distanceFunction( a, b ) {
 
-			init();
-			animate();
+				return Math.pow( a[ 0 ] - b[ 0 ], 2 ) + Math.pow( a[ 1 ] - b[ 1 ], 2 ) + Math.pow( a[ 2 ] - b[ 2 ], 2 );
+
+			}
 
 		</script>
 	</body>

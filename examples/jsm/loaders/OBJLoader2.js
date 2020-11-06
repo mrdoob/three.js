@@ -1,5 +1,4 @@
 /**
- * @author Kai Salmen / https://kaisalmen.de
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
@@ -9,7 +8,7 @@ import {
 	Loader
 } from "../../../build/three.module.js";
 
-import { OBJLoader2Parser } from "./obj2/worker/parallel/OBJLoader2Parser.js";
+import { OBJLoader2Parser } from "./obj2/OBJLoader2Parser.js";
 import { MeshReceiver } from "./obj2/shared/MeshReceiver.js";
 import { MaterialHandler } from "./obj2/shared/MaterialHandler.js";
 
@@ -33,17 +32,18 @@ const OBJLoader2 = function ( manager ) {
 	this.meshReceiver = new MeshReceiver( this.materialHandler );
 
 	// as OBJLoader2 is no longer derived from OBJLoader2Parser, we need to override the default onAssetAvailable callback
-	let scope = this;
-	let defaultOnAssetAvailable = function ( payload ) {
+	const scope = this;
+	const defaultOnAssetAvailable = function ( payload ) {
 
 		scope._onAssetAvailable( payload );
 
 	};
+
 	this.parser.setCallbackOnAssetAvailable( defaultOnAssetAvailable );
 
 };
 
-OBJLoader2.OBJLOADER2_VERSION = '3.1.1';
+OBJLoader2.OBJLOADER2_VERSION = '3.2.0';
 console.info( 'Using OBJLoader2 version: ' + OBJLoader2.OBJLOADER2_VERSION );
 
 
@@ -227,10 +227,10 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 */
 	load: function ( url, onLoad, onFileLoadProgress, onError, onMeshAlter ) {
 
-		let scope = this;
+		const scope = this;
 		if ( onLoad === null || onLoad === undefined || ! ( onLoad instanceof Function ) ) {
 
-			let errorMessage = 'onLoad is not a function! Aborting...';
+			const errorMessage = 'onLoad is not a function! Aborting...';
 			scope.parser.callbacks.onError( errorMessage );
 			throw errorMessage;
 
@@ -239,36 +239,41 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 			this.parser.setCallbackOnLoad( onLoad );
 
 		}
+
 		if ( onError === null || onError === undefined || ! ( onError instanceof Function ) ) {
 
 			onError = function ( event ) {
 
 				let errorMessage = event;
+
 				if ( event.currentTarget && event.currentTarget.statusText !== null ) {
 
 					errorMessage = 'Error occurred while downloading!\nurl: ' + event.currentTarget.responseURL + '\nstatus: ' + event.currentTarget.statusText;
 
 				}
+
 				scope.parser.callbacks.onError( errorMessage );
 
 			};
 
 		}
+
 		if ( ! url ) {
 
 			onError( 'An invalid url was provided. Unable to continue!' );
 
 		}
-		let urlFull = new URL( url, window.location.href ).href;
+
+		const urlFull = new URL( url, window.location.href ).href;
 		let filename = urlFull;
-		let urlParts = urlFull.split( '/' );
+		const urlParts = urlFull.split( '/' );
 		if ( urlParts.length > 2 ) {
 
 			filename = urlParts[ urlParts.length - 1 ];
-			let urlPartsPath = urlParts.slice( 0, urlParts.length - 1 ).join( '/' ) + '/';
-			if ( urlPartsPath !== undefined && urlPartsPath !== null ) this.path = urlPartsPath;
+			this.path = urlParts.slice( 0, urlParts.length - 1 ).join( '/' ) + '/';
 
 		}
+
 		if ( onFileLoadProgress === null || onFileLoadProgress === undefined || ! ( onFileLoadProgress instanceof Function ) ) {
 
 			let numericalValueRef = 0;
@@ -278,10 +283,11 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 				if ( ! event.lengthComputable ) return;
 
 				numericalValue = event.loaded / event.total;
+
 				if ( numericalValue > numericalValueRef ) {
 
 					numericalValueRef = numericalValue;
-					let output = 'Download of "' + url + '": ' + ( numericalValue * 100 ).toFixed( 2 ) + '%';
+					const output = 'Download of "' + url + '": ' + ( numericalValue * 100 ).toFixed( 2 ) + '%';
 					scope.parser.callbacks.onProgress( 'progressLoad', output, numericalValue );
 
 				}
@@ -291,12 +297,13 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 		}
 
 		this.setCallbackOnMeshAlter( onMeshAlter );
-		let fileLoaderOnLoad = function ( content ) {
+		const fileLoaderOnLoad = function ( content ) {
 
 			scope.parser.callbacks.onLoad( scope.parse( content ), "OBJLoader2#load: Parsing completed" );
 
 		};
-		let fileLoader = new FileLoader( this.manager );
+
+		const fileLoader = new FileLoader( this.manager );
 		fileLoader.setPath( this.path || this.resourcePath );
 		fileLoader.setResponseType( 'arraybuffer' );
 		fileLoader.load( filename, fileLoaderOnLoad, onFileLoadProgress, onError );
@@ -317,6 +324,7 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 			throw 'Provided content is not a valid ArrayBuffer or String. Unable to continue parsing';
 
 		}
+
 		if ( this.parser.logging.enabled ) {
 
 			console.time( 'OBJLoader parse: ' + this.modelName );
@@ -344,11 +352,13 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 			this.parser.callbacks.onError( 'Provided content was neither of type String nor Uint8Array! Aborting...' );
 
 		}
+
 		if ( this.parser.logging.enabled ) {
 
 			console.timeEnd( 'OBJLoader parse: ' + this.modelName );
 
 		}
+
 		return this.baseObject3d;
 
 	},
@@ -359,8 +369,8 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		if ( payload.type === 'mesh' ) {
 
-			let meshes = this.meshReceiver.buildMeshes( payload );
-			for ( let mesh of meshes ) {
+			const meshes = this.meshReceiver.buildMeshes( payload );
+			for ( const mesh of meshes ) {
 
 				this.baseObject3d.add( mesh );
 

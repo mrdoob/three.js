@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,7 +13,32 @@
 
 		<p class="desc">[page:Points]使用的默认材质。</p>
 
-		<h2>例子(Examples)</h2>
+		<h2>代码示例</h2>
+
+		<code>
+		const vertices = [];
+
+		for ( let i = 0; i < 10000; i ++ ) {
+
+			const x = THREE.MathUtils.randFloatSpread( 2000 );
+			const y = THREE.MathUtils.randFloatSpread( 2000 );
+			const z = THREE.MathUtils.randFloatSpread( 2000 );
+
+			vertices.push( x, y, z );
+
+		}
+
+		const geometry = new THREE.BufferGeometry();
+		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+		const material = new THREE.PointsMaterial( { color: 0x888888 } );
+
+		const points = new THREE.Points( geometry, material );
+
+		scene.add( points );
+		</code>
+
+		<h2>例子</h2>
 		<p>
 			[example:misc_controls_fly misc / controls / fly]<br />
 			[example:webgl_buffergeometry_drawcalls WebGL / BufferGeometry / drawcalls]<br />
@@ -26,36 +50,12 @@
 			[example:webgl_interactive_raycasting_points WebGL / interactive / raycasting / points]<br />
 			[example:webgl_multiple_elements_text WebGL / multiple / elements / text]<br />
 			[example:webgl_points_billboards WebGL / points / billboards]<br />
-			[example:webgl_points_billboards_colors WebGL / points / billboards / colors]<br />
 			[example:webgl_points_dynamic WebGL / points / dynamic]<br />
-			[example:webgl_points_random WebGL / points / random]<br />
 			[example:webgl_points_sprites WebGL / points / sprites]<br />
 			[example:webgl_trails WebGL / trails]
 		</p>
 
-		<code>
-//This will add a starfield to the background of a scene
-var starsGeometry = new THREE.Geometry();
-
-for ( var i = 0; i < 10000; i ++ ) {
-
-	var star = new THREE.Vector3();
-	star.x = THREE.Math.randFloatSpread( 2000 );
-	star.y = THREE.Math.randFloatSpread( 2000 );
-	star.z = THREE.Math.randFloatSpread( 2000 );
-
-	starsGeometry.vertices.push( star );
-
-}
-
-var starsMaterial = new THREE.PointsMaterial( { color: 0x888888 } );
-
-var starField = new THREE.Points( starsGeometry, starsMaterial );
-
-scene.add( starField );
-		</code>
-
-		<h3>[name]( [param:Object parameters] )</h3>
+		<h2>[name]( [param:Object parameters] )</h2>
 		<p> [page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
 			材质的任何属性都可以从此处传入(包括从[page:Material]继承的任何属性)。<br /><br />
 
@@ -65,14 +65,18 @@ scene.add( starField );
 		<h2>属性(Properties)</h2>
 		<p>共有属性请参见其基类[page:Material]。</p>
 
+		<h3>[property:Texture alphaMap]</h3>
+		<p>alpha贴图是一张灰度纹理，用于控制整个表面的不透明度。（黑色：完全透明；白色：完全不透明）。
+			默认值为null。<br /><br />
+
+			仅使用纹理的颜色，忽略alpha通道（如果存在）。
+			对于RGB和RGBA纹理，[page:WebGLRenderer WebGL]渲染器在采样此纹理时将使用绿色通道，
+			因为在DXT压缩和未压缩RGB 565格式中为绿色提供了额外的精度。
+			Luminance-only以及luminance/alpha纹理也仍然有效。
+		</p>
+
 		<h3>[property:Color color]</h3>
 		<p>材质的颜色([page:Color])，默认值为白色 (0xffffff)。</p>
-
-		<h3>[property:Boolean isPointsMaterial]</h3>
-		<p> 用于检查此类或派生类是否为点材质。默认值为 *true*。<br /><br />
-
-			因为其通常用在内部优化，所以不应该更改该属性值。
-		</p>
 
 		<h3>[property:Texture map]</h3>
 
@@ -82,7 +86,8 @@ scene.add( starField );
 		<p>材质是否使用morphTargets。默认值为false。</p>
 
 		<h3>[property:Number size]</h3>
-		<p>设置点的大小。默认值为1.0。</p>
+		<p>设置点的大小。默认值为1.0。<br/>
+			Will be capped if it exceeds the hardware dependent parameter [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter gl.ALIASED_POINT_SIZE_RANGE].</p>
 
 		<h3>[property:Boolean sizeAttenuation]</h3>
 		<p>指定点的大小是否因相机深度而衰减。（仅限透视摄像头。）默认为true。 </p>

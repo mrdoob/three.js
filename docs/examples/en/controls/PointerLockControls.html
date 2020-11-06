@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,28 +16,29 @@
 		[name] is a perfect choice for first person 3D games.
 		</p>
 
-		<h2>Example</h2>
-
-		<p>[example:misc_controls_pointerlock misc / controls / pointerlock ]</p>
+		<h2>Code Example</h2>
 
 		<code>
-var controls = new PointerLockControls( camera, document.body );
+		const controls = new PointerLockControls( camera, document.body );
 
-// add event listener to show/hide a UI (e.g. the game's menu)
+		// add event listener to show/hide a UI (e.g. the game's menu)
 
-controls.addEventListener( 'lock', function () {
+		controls.addEventListener( 'lock', function () {
 
-	menu.style.display = 'none';
+			menu.style.display = 'none';
 
-} );
+		} );
 
-controls.addEventListener( 'unlock', function () {
+		controls.addEventListener( 'unlock', function () {
 
-	menu.style.display = 'block';
+			menu.style.display = 'block';
 
-} );
-
+		} );
 		</code>
+
+		<h2>Examples</h2>
+
+		<p>[example:misc_controls_pointerlock misc / controls / pointerlock ]</p>
 
 		<h2>Constructor</h2>
 
@@ -84,6 +84,16 @@ controls.addEventListener( 'unlock', function () {
 		<h3>[property:Boolean isLocked]</h3>
 		<p>
 			Whether or not the controls are locked.
+		</p>
+
+		<h3>[property:Float maxPolarAngle]</h3>
+		<p>
+			Camera pitch, upper limit. Range is 0 to Math.PI radians. Default is Math.PI.
+		</p>
+
+		<h3>[property:Float minPolarAngle]</h3>
+		<p>
+			Camera pitch, lower limit. Range is 0 to Math.PI radians. Default is 0.
 		</p>
 
 		<h2>Methods</h2>
@@ -143,7 +153,7 @@ controls.addEventListener( 'unlock', function () {
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/controls/PointerLockControls.js examples/js/controls/PointerLockControls.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/PointerLockControls.js examples/jsm/controls/PointerLockControls.js]
 		</p>
 	</body>
 </html>

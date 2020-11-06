@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -18,37 +17,38 @@
 
 		</p>
 
-
-		<h2>示例</h2>
-
-		<p>[example:misc_controls_orbit misc / controls / orbit ]</p>
+		<h2>代码示例</h2>
 
 		<code>
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
 
-var scene = new THREE.Scene();
+		const scene = new THREE.Scene();
 
-var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+		const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
-var controls = new THREE.OrbitControls( camera, renderer.domElement );
+		const controls = new OrbitControls( camera, renderer.domElement );
 
-//controls.update() must be called after any manual changes to the camera's transform
-camera.position.set( 0, 20, 100 );
-controls.update();
+		//controls.update() must be called after any manual changes to the camera's transform
+		camera.position.set( 0, 20, 100 );
+		controls.update();
 
-function animate() {
+		function animate() {
 
-	requestAnimationFrame( animate );
+			requestAnimationFrame( animate );
 
-	// required if controls.enableDamping or controls.autoRotate are set to true
-	controls.update();
+			// required if controls.enableDamping or controls.autoRotate are set to true
+			controls.update();
 
-	renderer.render( scene, camera );
+			renderer.render( scene, camera );
 
-}
+		}
 		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:misc_controls_orbit misc / controls / orbit ]</p>
 
 		<h2>Constructor</h2>
 
@@ -56,11 +56,27 @@ function animate() {
 		<p>
 			[page:Camera object]: （必须）将要被控制的相机。该相机不允许是其他任何对象的子级，除非该对象是场景自身。<br><br>
 
-			[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+			[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。
 		</p>
 
+		<h2>Events</h2>
 
-		<h2>Properties</h2>
+		<h3>change</h3>
+		<p>
+			Fires when the camera has been transformed by the controls.
+		</p>
+
+		<h3>start</h3>
+		<p>
+			Fires when an interaction was initiated.
+		</p>
+
+		<h3>end</h3>
+		<p>
+			Fires when an interaction has finished.
+		</p>
+
+		<h2>属性</h2>
 
 		<h3>[property:Boolean autoRotate]</h3>
 		<p>
@@ -70,26 +86,25 @@ function animate() {
 
 		<h3>[property:Float autoRotateSpeed]</h3>
 		<p>
-			当[property:Boolean autoRotate]为true时，围绕目标旋转的速度将有多快，默认值为2.0，相当于在60fps时每旋转一次需要30秒。<br>
-			请注意，如果[property:Boolean autoRotate]被启用，你必须在你的动画循环里调用[page:.update]()。
+			当[page:.autoRotate]为true时，围绕目标旋转的速度将有多快，默认值为2.0，相当于在60fps时每旋转一次需要30秒。<br>
+			请注意，如果[page:.autoRotate]被启用，你必须在你的动画循环里调用[page:.update]()。
 		</p>
 
 		<h3>
 			[property:Float dampingFactor]</h3>
 		<p>
-			当[property:Boolean enableDamping]设置为true的时候，阻尼惯性有多大。<br>
+			当[page:.enableDamping]设置为true的时候，阻尼惯性有多大。<br>
 			请注意，要使得这一值生效，你必须在你的动画循环里调用[page:.update]()。
 		</p>
 
 		<h3>[property:HTMLDOMElement domElement]</h3>
 		<p>
-			用于监听鼠标事件或触摸事件的HTMLDOMElement（DOM元素）。该值必须在构造函数中进行传入；
-			在此更改它将不会设置新的事件监听器
+			该 HTMLDOMElement 用于监听鼠标/触摸事件，该属性必须在构造函数中传入。在此处改变它将不会设置新的事件监听。
 		</p>
 
 		<h3>[property:Boolean enabled]</h3>
 		<p>
-			控制器是否被启用。
+			When set to *false*, the controls will not respond to user input. Default is *true*.
 		</p>
 
 		<h3>[property:Boolean enableDamping]</h3>
@@ -141,8 +156,7 @@ controls.keys = {
 
 		<h3>[property:Float maxAzimuthAngle]</h3>
 		<p>
-			你能够水平旋转的角度的上限，范围是-Math.PI到Math.PI（或Infinity无限制），
-			其默认值为Infinity。
+			How far you can orbit horizontally, upper limit. If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI ). Default is Infinity.
 		</p>
 
 		<h3>[property:Float maxDistance]</h3>
@@ -157,13 +171,12 @@ controls.keys = {
 
 		<h3>[property:Float maxZoom]</h3>
 		<p>
-			你能够将相机缩小多少( 仅适用于[page:OrthographicCamera] only )，其默认值为Infinity。
+			你能够将相机缩小多少（仅适用于[page:OrthographicCamera]），其默认值为Infinity。
 		</p>
 
 		<h3>[property:Float minAzimuthAngle]</h3>
 		<p>
-			你能够水平旋转的角度的下限，范围是-Math.PI到Math.PI（或-Infinity无限制），
-			其默认值为-Infinity。
+			How far you can orbit horizontally, lower limit. If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI ). Default is Infinity.
 		</p>
 
 		<h3>[property:Float minDistance]</h3>
@@ -178,13 +191,13 @@ controls.keys = {
 
 		<h3>[property:Float minZoom]</h3>
 		<p>
-			你能够将相机放大多少( 仅适用于[page:OrthographicCamera] )，其默认值为0。
+			你能够将相机放大多少（仅适用于[page:OrthographicCamera]），其默认值为0。
 		</p>
 
 		<h3>
 			[property:Object mouseButtons]</h3>
 		<p>
-			这一对象包含了对用于控制的鼠标按钮的引用。
+			该对象包含由控件所使用的鼠标操作的引用。
 			<code>
 controls.mouseButtons = {
 	LEFT: THREE.MOUSE.ROTATE,
@@ -211,13 +224,16 @@ controls.mouseButtons = {
 
 		<h3>[property:Float rotateSpeed]</h3>
 		<p>
-			旋转的速度，其默认值为1.
+			旋转的速度，其默认值为1。
 		</p>
 
 		<h3>[property:Boolean screenSpacePanning]</h3>
 		<p>
 			定义当平移的时候摄像机的位置将如何移动。如果为true，摄像机将在屏幕空间内平移。
-			否则，摄像机将在与摄像机向上方向垂直的平面中平移。其默认值为false。
+			否则，摄像机将在与摄像机向上方向垂直的平面中平移。
+			Defines how the camera's position is translated when panning. If true, the camera pans in screen space.
+			Otherwise, the camera pans in the plane orthogonal to the camera's up direction.
+			Default is true for OrbitControls; false for MapControls.
 		</p>
 
 		<h3>[property:Vector3 target0]</h3>
@@ -291,7 +307,7 @@ controls.touches = {
 		<h2>源代码</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/controls/OrbitControls.js examples/js/controls/OrbitControls.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js examples/jsm/controls/OrbitControls.js]
 		</p>
 	</body>
 </html>

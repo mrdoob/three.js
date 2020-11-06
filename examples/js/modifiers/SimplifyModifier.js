@@ -1,6 +1,4 @@
 /**
- *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
- *
  *	Simplification Geometry Modifier
  *    - based on code and technique
  *	  - by Stan Melax in 1998
@@ -484,7 +482,7 @@ THREE.SimplifyModifier = function () {};
 
 		//
 
-		simplifiedGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+		simplifiedGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
 		simplifiedGeometry.setIndex( index );
 
 		return simplifiedGeometry;

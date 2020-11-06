@@ -1,19 +1,30 @@
 import { Camera } from './../../cameras/Camera';
+import { Material } from './../../materials/Material';
+import { WebGLProperties } from './WebGLProperties';
 
 export class WebGLClipping {
 
+	constructor( properties: WebGLProperties );
+
 	uniform: { value: any; needsUpdate: boolean };
+
+	/**
+	 * @default 0
+	 */
 	numPlanes: number;
+
+	/**
+	 * @default 0
+	 */
+	numIntersection: number;
 
 	init( planes: any[], enableLocalClipping: boolean, camera: Camera ): boolean;
 	beginShadows(): void;
 	endShadows(): void;
 	setState(
-		planes: any[],
-		clipShadows: boolean,
+		material: Material,
 		camera: Camera,
-		cache: boolean,
-		fromCache: boolean
+		useCache: boolean
 	): void;
 
 }

@@ -1,15 +1,13 @@
 import { NodeBuilder } from '../../core/NodeBuilder';
 import { Node } from '../../core/Node';
-import { ColorNode } from '../../inputs/ColorNode';
-import { FloatNode } from '../../inputs/FloatNode';
 
 export class PhongNode extends Node {
 
 	constructor();
 
-	color: ColorNode;
-	specular: ColorNode;
-	shininess: FloatNode;
+	color: Node;
+	specular: Node;
+	shininess: Node;
 	nodeType: string;
 
 	build( builder: NodeBuilder ): string;

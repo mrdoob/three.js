@@ -1,6 +1,3 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- */
 /* global QUnit */
 
 import { InstancedInterleavedBuffer } from '../../../../src/core/InstancedInterleavedBuffer';

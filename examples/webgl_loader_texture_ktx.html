@@ -9,7 +9,7 @@
 <body>
 
 <div id="info">
-	<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - compressed KTX textures<br />
+	<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - compressed KTX textures<br />
 	<a href="https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/">Khronos Texture</a> is a lightweight file format for OpenGL
 </div>
 
@@ -33,8 +33,8 @@
 	ASTC_4x4, ASTC8x8 - transparent textures with full alpha range
 	*/
 
-	var camera, scene, renderer;
-	var meshes = [];
+	let camera, scene, renderer;
+	const meshes = [];
 
 	init();
 	animate();
@@ -46,11 +46,11 @@
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
 
-		var formats = {
-			astc: renderer.extensions.get( 'WEBGL_compressed_texture_astc' ),
-			etc1: renderer.extensions.get( 'WEBGL_compressed_texture_etc1' ),
-			s3tc: renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' ),
-			pvrtc: renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
+		const formats = {
+			astc: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
+			etc1: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
+			s3tc: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
+			pvrtc: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
 		};
 
 		camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -58,11 +58,11 @@
 
 		scene = new THREE.Scene();
 
-		var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-		var material1, material2;
+		const geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+		let material1, material2;
 
 		// TODO: add cubemap support
-		var loader = new KTXLoader();
+		const loader = new KTXLoader();
 
 		if ( formats.pvrtc ) {
 
@@ -125,10 +125,10 @@
 
 		}
 
-		var x = - meshes.length / 2 * 150;
-		for ( var i = 0; i < meshes.length; ++ i, x += 300 ) {
+		let x = - meshes.length / 2 * 150;
+		for ( let i = 0; i < meshes.length; ++ i, x += 300 ) {
 
-			var mesh = meshes[ i ];
+			const mesh = meshes[ i ];
 			mesh.position.x = x;
 			mesh.position.y = 0;
 			scene.add( mesh );
@@ -152,11 +152,11 @@
 
 		requestAnimationFrame( animate );
 
-		var time = Date.now() * 0.001;
+		const time = Date.now() * 0.001;
 
-		for ( var i = 0; i < meshes.length; i ++ ) {
+		for ( let i = 0; i < meshes.length; i ++ ) {
 
-			var mesh = meshes[ i ];
+			const mesh = meshes[ i ];
 			mesh.rotation.x = time;
 			mesh.rotation.y = time;
 

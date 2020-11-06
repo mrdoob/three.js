@@ -1,14 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Alex Pletzer
- *
- * Updated on 22.03.2017
- * VTK header is now parsed and used to extract all the compressed data
- * @author Andrii Iudin https://github.com/andreyyudin
- * @author Paul Kibet Korir https://github.com/polarise
- * @author Sriram Somasundharam https://github.com/raamssundar
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,
@@ -17,7 +6,7 @@ import {
 	Loader,
 	LoaderUtils
 } from "../../../build/three.module.js";
-import { Zlib } from "../libs/inflate.module.min.js";
+import { Inflate } from "../libs/inflate.module.min.js";
 
 var VTKLoader = function ( manager ) {
 
@@ -36,9 +25,29 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -61,6 +70,9 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var normals = [];
 
 			var result;
+
+			// pattern for detecting the end of a number sequence
+			var patWord = /^[^\d.\s-]+/;
 
 			// pattern for reading vertices, 3 floats or integers
 			var pat3Floats = /(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)/g;
@@ -102,7 +114,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			for ( var i in lines ) {
 
-				var line = lines[ i ];
+				var line = lines[ i ].trim();
 
 				if ( line.indexOf( 'DATASET' ) === 0 ) {
 
@@ -114,6 +126,8 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					// get the vertices
 					while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+
+						if ( patWord.exec( line ) !== null ) break;
 
 						var x = parseFloat( result[ 1 ] );
 						var y = parseFloat( result[ 2 ] );
@@ -193,6 +207,8 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
 
+							if ( patWord.exec( line ) !== null ) break;
+
 							var r = parseFloat( result[ 1 ] );
 							var g = parseFloat( result[ 2 ] );
 							var b = parseFloat( result[ 3 ] );
@@ -205,6 +221,8 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						// Get the normal vectors
 
 						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+
+							if ( patWord.exec( line ) !== null ) break;
 
 							var nx = parseFloat( result[ 1 ] );
 							var ny = parseFloat( result[ 2 ] );
@@ -271,11 +289,11 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var geometry = new BufferGeometry();
 			geometry.setIndex( indices );
-			geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
 			if ( normals.length === positions.length ) {
 
-				geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 
 			}
 
@@ -285,7 +303,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				if ( colors.length === positions.length ) {
 
-					geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+					geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 				}
 
@@ -312,7 +330,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					}
 
-					geometry.addAttribute( 'color', new Float32BufferAttribute( newColors, 3 ) );
+					geometry.setAttribute( 'color', new Float32BufferAttribute( newColors, 3 ) );
 
 				}
 
@@ -391,6 +409,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						pointIndex = pointIndex + 12;
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -439,6 +458,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						}
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -476,6 +496,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						}
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -518,11 +539,11 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var geometry = new BufferGeometry();
 			geometry.setIndex( new BufferAttribute( indices, 1 ) );
-			geometry.addAttribute( 'position', new BufferAttribute( points, 3 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( points, 3 ) );
 
 			if ( normals.length === points.length ) {
 
-				geometry.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 
 			}
 
@@ -774,7 +795,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					for ( var i = 0; i < dataOffsets.length - 1; i ++ ) {
 
-						var inflate = new Zlib.Inflate( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ), { resize: true, verify: true } ); // eslint-disable-line no-undef
+						var inflate = new Inflate( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ), { resize: true, verify: true } ); // eslint-disable-line no-undef
 						content = inflate.decompress();
 						content = content.buffer;
 
@@ -1122,11 +1143,11 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var geometry = new BufferGeometry();
 				geometry.setIndex( new BufferAttribute( indices, 1 ) );
-				geometry.addAttribute( 'position', new BufferAttribute( points, 3 ) );
+				geometry.setAttribute( 'position', new BufferAttribute( points, 3 ) );
 
 				if ( normals.length === points.length ) {
 
-					geometry.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+					geometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 
 				}
 
@@ -1140,33 +1161,16 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function getStringFile( data ) {
-
-			var stringFile = '';
-			var charArray = new Uint8Array( data );
-			var i = 0;
-			var len = charArray.length;
-
-			while ( len -- ) {
-
-				stringFile += String.fromCharCode( charArray[ i ++ ] );
-
-			}
-
-			return stringFile;
-
-		}
-
 		// get the 5 first lines of the files to check if there is the key word binary
 		var meta = LoaderUtils.decodeText( new Uint8Array( data, 0, 250 ) ).split( '\n' );
 
 		if ( meta[ 0 ].indexOf( 'xml' ) !== - 1 ) {
 
-			return parseXML( getStringFile( data ) );
+			return parseXML( LoaderUtils.decodeText( data ) );
 
 		} else if ( meta[ 2 ].includes( 'ASCII' ) ) {
 
-			return parseASCII( getStringFile( data ) );
+			return parseASCII( LoaderUtils.decodeText( data ) );
 
 		} else {
 

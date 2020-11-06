@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org">Three.js</a> parallax mapping <br />
+			<a href="https://threejs.org">Three.js</a> parallax mapping <br />
 			Oryginal shaders authors:
 			<a href="http://sunandblackcat.com/tipFullView.php?topicid=28">Igor Dyhta</a>,
 			<a href="http://mmikkelsen3d.blogspot.sk/2012/02/parallaxpoc-mapping-and-no-tangent.html">Morten S. Mikkelsen</a><br />
@@ -26,9 +26,9 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { ParallaxShader } from './jsm/shaders/ParallaxShader.js';
 
-			var camera, scene, material, renderer, stats;
+			let camera, scene, material, renderer, stats;
 
-			var effectController = {
+			const effectController = {
 				'mode': 'relief',
 				'scale': 0.005,
 				'minLayers': 20,
@@ -41,7 +41,7 @@
 
 			function init() {
 
-				var container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 10 );
@@ -50,9 +50,9 @@
 
 				//
 
-				var shader = ParallaxShader;
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-				var parameters = {
+				const shader = ParallaxShader;
+				const uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+				const parameters = {
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
 					uniforms: uniforms
@@ -60,7 +60,7 @@
 
 				//
 
-				var textureLoader = new THREE.TextureLoader();
+				const textureLoader = new THREE.TextureLoader();
 
 				material = new THREE.ShaderMaterial( parameters );
 				material.map = textureLoader.load( 'textures/brick_diffuse.jpg' );
@@ -72,8 +72,8 @@
 
 				//
 
-				var geometry = new THREE.BoxBufferGeometry( 1.0, 1.0, 1.0 );
-				var mesh = new THREE.Mesh( geometry, material );
+				const geometry = new THREE.BoxBufferGeometry( 1.0, 1.0, 1.0 );
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				//
@@ -82,13 +82,13 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 5;
 
 				//
 
@@ -103,7 +103,7 @@
 
 			function guiChanged() {
 
-				var uniforms = material.uniforms;
+				const uniforms = material.uniforms;
 
 				uniforms[ 'parallaxScale' ].value = - 1.0 * effectController.scale;
 				uniforms[ 'parallaxMinLayers' ].value = effectController.minLayers;
@@ -117,7 +117,7 @@
 
 			function initGUI() {
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( effectController, 'mode', Object.keys( ParallaxShader.modes ) ).onChange( guiChanged );
 				gui.add( effectController, 'scale', 0.0, 0.01, 0.001 ).onChange( guiChanged );

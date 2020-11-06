@@ -1,9 +1,3 @@
-/**
- * Loads a Wavefront .mtl file specifying materials
- *
- * @author angelxuanchang
- */
-
 import {
 	Color,
 	DefaultLoadingManager,
@@ -16,6 +10,10 @@ import {
 	TextureLoader,
 	Vector2
 } from "../../../build/three.module.js";
+
+/**
+ * Loads a Wavefront .mtl file specifying materials
+ */
 
 var MTLLoader = function ( manager ) {
 
@@ -48,9 +46,29 @@ MTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		var loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text, path ) );
+			try {
+
+				onLoad( scope.parse( text, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -136,7 +154,7 @@ MTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 } );
 
 /**
- * Create a new THREE-MTLLoader.MaterialCreator
+ * Create a new MTLLoader.MaterialCreator
  * @param baseUrl - Url relative to which textures are loaded
  * @param options - Set of options on how to construct the materials
  *                  side: Which side to apply the material

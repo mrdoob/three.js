@@ -1,6 +1,12 @@
+import {
+	BufferAttribute,
+	BufferGeometry,
+	Matrix4,
+	Vector3,
+	Vector4
+} from "../../../build/three.module.js";
+
 /**
- * @author Eric Haines / http://erichaines.com/
- *
  * Tessellates the famous Utah teapot database by Martin Newell into triangles.
  *
  * Parameters: size = 50, segments = 10, bottom = true, lid = true, body = true,
@@ -48,14 +54,6 @@
  * See https://en.wikipedia.org/wiki/Utah_teapot for the history of the teapot
  *
  */
-
-import {
-	BufferAttribute,
-	BufferGeometry,
-	Matrix4,
-	Vector3,
-	Vector4
-} from "../../../build/three.module.js";
 
 var TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn ) {
 
@@ -682,7 +680,7 @@ var TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid,
 					v4 = v1 + vertPerRow;
 
 					// Normals and UVs cannot be shared. Without clone(), you can see the consequences
-					// of sharing if you call geometry.applyMatrix( matrix ).
+					// of sharing if you call geometry.applyMatrix4( matrix ).
 					if ( notDegenerate( v1, v2, v3 ) ) {
 
 						indices[ indexCount ++ ] = v1;
@@ -690,6 +688,7 @@ var TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid,
 						indices[ indexCount ++ ] = v3;
 
 					}
+
 					if ( notDegenerate( v1, v3, v4 ) ) {
 
 						indices[ indexCount ++ ] = v1;
@@ -710,9 +709,9 @@ var TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid,
 	}
 
 	this.setIndex( new BufferAttribute( indices, 1 ) );
-	this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
+	this.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+	this.setAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
 
 	this.computeBoundingSphere();
 

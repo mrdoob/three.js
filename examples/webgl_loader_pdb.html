@@ -39,7 +39,7 @@
 	</head>
 	<body>
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - molecules</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - molecules</div>
 		<div id="menu"></div>
 
 		<script type="module">
@@ -50,12 +50,12 @@
 			import { PDBLoader } from './jsm/loaders/PDBLoader.js';
 			import { CSS2DRenderer, CSS2DObject } from './jsm/renderers/CSS2DRenderer.js';
 
-			var camera, scene, renderer, labelRenderer;
-			var controls;
+			let camera, scene, renderer, labelRenderer;
+			let controls;
 
-			var root;
+			let root;
 
-			var MOLECULES = {
+			const MOLECULES = {
 				"Ethanol": "ethanol.pdb",
 				"Aspirin": "aspirin.pdb",
 				"Caffeine": "caffeine.pdb",
@@ -75,10 +75,10 @@
 				"Graphite": "graphite.pdb"
 			};
 
-			var loader = new PDBLoader();
-			var offset = new THREE.Vector3();
+			const loader = new PDBLoader();
+			const offset = new THREE.Vector3();
 
-			var menu = document.getElementById( 'menu' );
+			const menu = document.getElementById( 'menu' );
 
 			init();
 			animate();
@@ -92,13 +92,13 @@
 				camera.position.z = 1000;
 				scene.add( camera );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 0.8 );
-				light.position.set( 1, 1, 1 );
-				scene.add( light );
+				const light1 = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				light1.position.set( 1, 1, 1 );
+				scene.add( light1 );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
-				light.position.set( - 1, - 1, 1 );
-				scene.add( light );
+				const light2 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				light2.position.set( - 1, - 1, 1 );
+				scene.add( light2 );
 
 				root = new THREE.Group();
 				scene.add( root );
@@ -113,7 +113,7 @@
 				labelRenderer = new CSS2DRenderer();
 				labelRenderer.setSize( window.innerWidth, window.innerHeight );
 				labelRenderer.domElement.style.position = 'absolute';
-				labelRenderer.domElement.style.top = '0';
+				labelRenderer.domElement.style.top = '0px';
 				labelRenderer.domElement.style.pointerEvents = 'none';
 				document.getElementById( 'container' ).appendChild( labelRenderer.domElement );
 
@@ -125,7 +125,7 @@
 
 				//
 
-				loadMolecule( 'models/molecules/caffeine.pdb' );
+				loadMolecule( 'models/pdb/caffeine.pdb' );
 				createMenu();
 
 				//
@@ -148,13 +148,13 @@
 
 			function createMenu() {
 
-				for ( var m in MOLECULES ) {
+				for ( const m in MOLECULES ) {
 
-					var button = document.createElement( 'button' );
+					const button = document.createElement( 'button' );
 					button.innerHTML = m;
 					menu.appendChild( button );
 
-					var url = 'models/molecules/' + MOLECULES[ m ];
+					const url = 'models/pdb/' + MOLECULES[ m ];
 
 					button.addEventListener( 'click', generateButtonCallback( url ), false );
 
@@ -168,19 +168,19 @@
 
 				while ( root.children.length > 0 ) {
 
-					var object = root.children[ 0 ];
+					const object = root.children[ 0 ];
 					object.parent.remove( object );
 
 				}
 
 				loader.load( url, function ( pdb ) {
 
-					var geometryAtoms = pdb.geometryAtoms;
-					var geometryBonds = pdb.geometryBonds;
-					var json = pdb.json;
+					const geometryAtoms = pdb.geometryAtoms;
+					const geometryBonds = pdb.geometryBonds;
+					const json = pdb.json;
 
-					var boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-					var sphereGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
+					const boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+					const sphereGeometry = new THREE.IcosahedronBufferGeometry( 1, 3 );
 
 					geometryAtoms.computeBoundingBox();
 					geometryAtoms.boundingBox.getCenter( offset ).negate();
@@ -188,13 +188,13 @@
 					geometryAtoms.translate( offset.x, offset.y, offset.z );
 					geometryBonds.translate( offset.x, offset.y, offset.z );
 
-					var positions = geometryAtoms.getAttribute( 'position' );
-					var colors = geometryAtoms.getAttribute( 'color' );
+					let positions = geometryAtoms.getAttribute( 'position' );
+					const colors = geometryAtoms.getAttribute( 'color' );
 
-					var position = new THREE.Vector3();
-					var color = new THREE.Color();
+					const position = new THREE.Vector3();
+					const color = new THREE.Color();
 
-					for ( var i = 0; i < positions.count; i ++ ) {
+					for ( let i = 0; i < positions.count; i ++ ) {
 
 						position.x = positions.getX( i );
 						position.y = positions.getY( i );
@@ -204,22 +204,22 @@
 						color.g = colors.getY( i );
 						color.b = colors.getZ( i );
 
-						var material = new THREE.MeshPhongMaterial( { color: color } );
+						const material = new THREE.MeshPhongMaterial( { color: color } );
 
-						var object = new THREE.Mesh( sphereGeometry, material );
+						const object = new THREE.Mesh( sphereGeometry, material );
 						object.position.copy( position );
 						object.position.multiplyScalar( 75 );
 						object.scale.multiplyScalar( 25 );
 						root.add( object );
 
-						var atom = json.atoms[ i ];
+						const atom = json.atoms[ i ];
 
-						var text = document.createElement( 'div' );
+						const text = document.createElement( 'div' );
 						text.className = 'label';
 						text.style.color = 'rgb(' + atom[ 3 ][ 0 ] + ',' + atom[ 3 ][ 1 ] + ',' + atom[ 3 ][ 2 ] + ')';
 						text.textContent = atom[ 4 ];
 
-						var label = new CSS2DObject( text );
+						const label = new CSS2DObject( text );
 						label.position.copy( object.position );
 						root.add( label );
 
@@ -227,10 +227,10 @@
 
 					positions = geometryBonds.getAttribute( 'position' );
 
-					var start = new THREE.Vector3();
-					var end = new THREE.Vector3();
+					const start = new THREE.Vector3();
+					const end = new THREE.Vector3();
 
-					for ( var i = 0; i < positions.count; i += 2 ) {
+					for ( let i = 0; i < positions.count; i += 2 ) {
 
 						start.x = positions.getX( i );
 						start.y = positions.getY( i );
@@ -243,7 +243,7 @@
 						start.multiplyScalar( 75 );
 						end.multiplyScalar( 75 );
 
-						var object = new THREE.Mesh( boxGeometry, new THREE.MeshPhongMaterial( 0xffffff ) );
+						const object = new THREE.Mesh( boxGeometry, new THREE.MeshPhongMaterial( 0xffffff ) );
 						object.position.copy( start );
 						object.position.lerp( end, 0.5 );
 						object.scale.set( 5, 5, start.distanceTo( end ) );
@@ -277,7 +277,7 @@
 				requestAnimationFrame( animate );
 				controls.update();
 
-				var time = Date.now() * 0.0004;
+				const time = Date.now() * 0.0004;
 
 				root.rotation.x = time;
 				root.rotation.y = time * 0.7;

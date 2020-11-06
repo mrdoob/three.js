@@ -1,8 +1,17 @@
 import { Geometry } from './../core/Geometry';
-import { BufferGeometry } from '../core/BufferGeometry';
 
-export class CylinderBufferGeometry extends BufferGeometry {
+export class CylinderGeometry extends Geometry {
 
+	/**
+	 * @param [radiusTop=1] — Radius of the cylinder at the top.
+	 * @param [radiusBottom=1] — Radius of the cylinder at the bottom.
+	 * @param [height=1] — Height of the cylinder.
+	 * @param [radialSegments=8] — Number of segmented faces around the circumference of the cylinder.
+	 * @param [heightSegments=1] — Number of rows of faces along the height of the cylinder.
+	 * @param [openEnded=false] - A Boolean indicating whether or not to cap the ends of the cylinder.
+	 * @param [thetaStart=0]
+	 * @param [thetaLength=Math.PI * 2]
+	 */
 	constructor(
 		radiusTop?: number,
 		radiusBottom?: number,
@@ -14,39 +23,10 @@ export class CylinderBufferGeometry extends BufferGeometry {
 		thetaLength?: number
 	);
 
-	parameters: {
-		radiusTop: number;
-		radiusBottom: number;
-		height: number;
-		radialSegments: number;
-		heightSegments: number;
-		openEnded: boolean;
-		thetaStart: number;
-		thetaLength: number;
-	};
-
-}
-
-export class CylinderGeometry extends Geometry {
-
 	/**
-	 * @param radiusTop — Radius of the cylinder at the top.
-	 * @param radiusBottom — Radius of the cylinder at the bottom.
-	 * @param height — Height of the cylinder.
-	 * @param radiusSegments — Number of segmented faces around the circumference of the cylinder.
-	 * @param heightSegments — Number of rows of faces along the height of the cylinder.
-	 * @param openEnded - A Boolean indicating whether or not to cap the ends of the cylinder.
+	 * @default 'CylinderGeometry'
 	 */
-	constructor(
-		radiusTop?: number,
-		radiusBottom?: number,
-		height?: number,
-		radiusSegments?: number,
-		heightSegments?: number,
-		openEnded?: boolean,
-		thetaStart?: number,
-		thetaLength?: number
-	);
+	type: string;
 
 	parameters: {
 		radiusTop: number;

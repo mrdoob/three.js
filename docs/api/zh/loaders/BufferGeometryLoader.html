@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,13 +16,11 @@
 			内部使用[page:FileLoader]来加载文件。
 		</p>
 
-		<h2>例子</h2>
-
-		[example:webgl_geometry_colors_lookuptable WebGL / geometry / colors / lookuptable]
+		<h2>代码示例</h2>
 
 		<code>
 		// 初始化一个加载器
-		var loader = new THREE.BufferGeometryLoader();
+		const loader = new THREE.BufferGeometryLoader();
 
 		// 加载资源
 		loader.load(
@@ -32,8 +29,8 @@
 
 			// onLoad回调
 			function ( geometry ) {
-				var material = new THREE.MeshLambertMaterial( { color: 0xF5F5F5 } );
-				var object = new THREE.Mesh( geometry, material );
+				const material = new THREE.MeshLambertMaterial( { color: 0xF5F5F5 } );
+				const object = new THREE.Mesh( geometry, material );
 				scene.add( object );
 			},
 
@@ -48,6 +45,12 @@
 			}
 		);
 		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_performance WebGL / performance]
+		</p>
 
 		<h2>构造函数</h2>
 
@@ -74,7 +77,7 @@
 		[page:Function onError] —在加载错误时被调用。<br />
 		</p>
 		<p>
-            从URL中进行加载，并将已经以解析的响应内容传递给onLoad。
+			从URL中进行加载，并将已经以解析的响应内容传递给onLoad。
 		</p>
 
 		<h3>[method:BufferGeometry parse]( [param:Object json] )</h3>

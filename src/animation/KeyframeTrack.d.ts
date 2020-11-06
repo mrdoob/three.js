@@ -5,6 +5,12 @@ import { InterpolationModes } from '../constants';
 
 export class KeyframeTrack {
 
+	/**
+	 * @param name
+	 * @param times
+	 * @param values
+	 * @param [interpolation=THREE.InterpolateLinear]
+	 */
 	constructor(
 		name: string,
 		times: any[],
@@ -20,24 +26,27 @@ export class KeyframeTrack {
 	TimeBufferType: Float32Array;
 	ValueBufferType: Float32Array;
 
+	/**
+	 * @default THREE.InterpolateLinear
+	 */
 	DefaultInterpolation: InterpolationModes;
 
 	InterpolantFactoryMethodDiscrete( result: any ): DiscreteInterpolant;
 	InterpolantFactoryMethodLinear( result: any ): LinearInterpolant;
 	InterpolantFactoryMethodSmooth( result: any ): CubicInterpolant;
 
-	setInterpolation( interpolation: InterpolationModes ): void;
+	setInterpolation( interpolation: InterpolationModes ): KeyframeTrack;
 	getInterpolation(): InterpolationModes;
 
-	getValuesize(): number;
+	getValueSize(): number;
 
 	shift( timeOffset: number ): KeyframeTrack;
 	scale( timeScale: number ): KeyframeTrack;
 	trim( startTime: number, endTime: number ): KeyframeTrack;
 	validate(): boolean;
 	optimize(): KeyframeTrack;
+	clone(): KeyframeTrack;
 
-	static parse( json: any ): KeyframeTrack;
 	static toJSON( track: KeyframeTrack ): any;
 
 }

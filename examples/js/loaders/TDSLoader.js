@@ -3,8 +3,6 @@
  *
  * Loads geometry with uv and materials basic properties with texture support.
  *
- * @author @tentone
- * @author @timknip
  * @class TDSLoader
  * @constructor
  */
@@ -40,15 +38,35 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		var scope = this;
 
-		var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+		var path = ( this.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : this.path;
 
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, function ( data ) {
 
-			onLoad( scope.parse( data, path ) );
+			try {
+
+				onLoad( scope.parse( data, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -358,7 +376,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 			} else if ( next === FACE_ARRAY ) {
 
@@ -382,7 +400,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				}
 
-				geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
 
 			} else if ( next === MESH_MATRIX ) {
@@ -425,8 +443,8 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 				matrix.transpose();
 
 				var inverse = new THREE.Matrix4();
-				inverse.getInverse( matrix, true );
-				geometry.applyMatrix( inverse );
+				inverse.copy( matrix ).invert();
+				geometry.applyMatrix4( inverse );
 
 				matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
 

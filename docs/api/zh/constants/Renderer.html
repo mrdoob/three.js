@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -24,16 +23,6 @@
 		[page:constant CullFaceFrontBack] 剔除正面和背面。
 		</p>
 
-		<h2>正面方向</h2>
-		<code>
-		THREE.FrontFaceDirectionCW
-		THREE.FrontFaceDirectionCCW
-		</code>
-		<p>
-		[page:constant FrontFaceDirectionCW] 将多边形的缠绕顺序设置为顺时针方向。 <br />
-		[page:constant FrontFaceDirectionCCW] 为默认值，将多边形的缠绕顺序设置为逆时针方向。
-		</p>
-
 		<h2>阴影类型</h2>
 		<code>
 		THREE.BasicShadowMap
@@ -46,8 +35,8 @@
 
 		[page:constant BasicShadowMap] 能够给出没有经过过滤的阴影映射 —— 速度最快，但质量最差。<br />
 		[page:constant PCFShadowMap] 为默认值，使用Percentage-Closer Filtering (PCF)算法来过滤阴影映射。<br />
-		[page:constant PCFSoftShadowMap] 使用Percentage-Closer Soft Shadows (PCSS) 算法来过滤阴影映射。<br />
-		[page:constant VSMShadowMap] filters shadow maps using the Variance Shadow Map (VSM) algorithm.
+		[page:constant PCFSoftShadowMap] filters shadow maps using the Percentage-Closer Filtering (PCF) algorithm with better soft shadows especially when using low-resolution shadow maps.<br />
+		[page:constant VSMShadowMap] 使用Variance Shadow Map (VSM)算法来过滤阴影映射。当使用VSMShadowMap时，所有阴影接收者也将会投射阴影。
 		</p>
 
 		<h2>色调映射</h2>
@@ -55,16 +44,13 @@
 		THREE.NoToneMapping
 		THREE.LinearToneMapping
 		THREE.ReinhardToneMapping
-		THREE.Uncharted2ToneMapping
 		THREE.CineonToneMapping
+		THREE.ACESFilmicToneMapping
 		</code>
 		<p>
-				这些常量定义了WebGLRenderer中[page:WebGLRenderer.toneMapping toneMapping]的属性。
+		这些常量定义了WebGLRenderer中[page:WebGLRenderer.toneMapping toneMapping]的属性。
 
-				这个属性用于在普通计算机显示器或者移动设备屏幕等低动态范围介质上，模拟、逼近高动态范围（HDR）效果。<br /><br />
-
-		[page:constant NoToneMapping] 禁用色调映射。<br />
-		[page:constant LinearToneMapping] 为默认值，线性色调映射。<br /><br />
+		这个属性用于在普通计算机显示器或者移动设备屏幕等低动态范围介质上，模拟、逼近高动态范围（HDR）效果。<br /><br />
 
 		请查看示例：[example:webgl_tonemapping WebGL / tonemapping]。
 

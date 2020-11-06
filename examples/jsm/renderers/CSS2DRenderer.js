@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import {
 	Matrix4,
 	Object3D,
@@ -12,27 +8,47 @@ var CSS2DObject = function ( element ) {
 
 	Object3D.call( this );
 
-	this.element = element;
+	this.element = element || document.createElement( 'div' );
+
 	this.element.style.position = 'absolute';
 
 	this.addEventListener( 'removed', function () {
 
-		if ( this.element.parentNode !== null ) {
+		this.traverse( function ( object ) {
 
-			this.element.parentNode.removeChild( this.element );
+			if ( object.element instanceof Element && object.element.parentNode !== null ) {
 
-		}
+				object.element.parentNode.removeChild( object.element );
+
+			}
+
+		} );
 
 	} );
 
 };
 
-CSS2DObject.prototype = Object.create( Object3D.prototype );
-CSS2DObject.prototype.constructor = CSS2DObject;
+CSS2DObject.prototype = Object.assign( Object.create( Object3D.prototype ), {
+
+	constructor: CSS2DObject,
+
+	copy: function ( source, recursive ) {
+
+		Object3D.prototype.copy.call( this, source, recursive );
+
+		this.element = source.element.cloneNode( true );
+
+		return this;
+
+	}
+
+} );
 
 //
 
 var CSS2DRenderer = function () {
+
+	var _this = this;
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
@@ -72,9 +88,11 @@ var CSS2DRenderer = function () {
 
 	};
 
-	var renderObject = function ( object, camera ) {
+	var renderObject = function ( object, scene, camera ) {
 
 		if ( object instanceof CSS2DObject ) {
+
+			object.onBeforeRender( _this, scene, camera );
 
 			vector.setFromMatrixPosition( object.matrixWorld );
 			vector.applyMatrix4( viewProjectionMatrix );
@@ -101,11 +119,13 @@ var CSS2DRenderer = function () {
 
 			}
 
+			object.onAfterRender( _this, scene, camera );
+
 		}
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			renderObject( object.children[ i ], camera );
+			renderObject( object.children[ i ], scene, camera );
 
 		}
 
@@ -164,14 +184,13 @@ var CSS2DRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		scene.updateMatrixWorld();
-
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		viewMatrix.copy( camera.matrixWorldInverse );
 		viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, viewMatrix );
 
-		renderObject( scene, camera );
+		renderObject( scene, scene, camera );
 		zOrder( scene );
 
 	};

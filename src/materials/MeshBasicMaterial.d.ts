@@ -29,21 +29,89 @@ export class MeshBasicMaterial extends Material {
 
 	constructor( parameters?: MeshBasicMaterialParameters );
 
+	/**
+	 * @default 'MeshBasicMaterial'
+	 */
+	type: string;
+
+	/**
+	 * @default new THREE.Color( 0xffffff )
+	 */
 	color: Color;
+
+	/**
+	 * @default null
+	 */
 	map: Texture | null;
+
+	/**
+	 * @default null
+	 */
 	aoMap: Texture | null;
+
+	/**
+	 * @default 1
+	 */
 	aoMapIntensity: number;
+
+	/**
+	 * @default null
+	 */
 	specularMap: Texture | null;
+
+	/**
+	 * @default null
+	 */
 	alphaMap: Texture | null;
+
+	/**
+	 * @default null
+	 */
 	envMap: Texture | null;
+
+	/**
+	 * @default THREE.MultiplyOperation
+	 */
 	combine: Combine;
+
+	/**
+	 * @default 1
+	 */
 	reflectivity: number;
+
+	/**
+	 * @default 0.98
+	 */
 	refractionRatio: number;
+
+	/**
+	 * @default false
+	 */
 	wireframe: boolean;
+
+	/**
+	 * @default 1
+	 */
 	wireframeLinewidth: number;
+
+	/**
+	 * @default 'round'
+	 */
 	wireframeLinecap: string;
+
+	/**
+	 * @default 'round'
+	 */
 	wireframeLinejoin: string;
+
+	/**
+	 * @default false
+	 */
 	skinning: boolean;
+
+	/**
+	 * @default false
+	 */
 	morphTargets: boolean;
 
 	setValues( parameters: MeshBasicMaterialParameters ): void;

@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -24,7 +23,7 @@
 		<p>
 		[page:Vector3 origin] - （可选）[page:Ray]（射线）的原点，默认值是一个位于(0, 0, 0)的[page:Vector3]。<br />
 		[page:Vector3 direction] - [page:Vector3] [page:Ray]（射线）的方向。该向量必须经过标准化（使用[page:Vector3.normalize]），这样才能使方法正常运行。
-		默认值是一个位于(0, 0, 0)的[page:Vector3]。<br /><br />
+		默认值是一个位于(0, 0, -1)的[page:Vector3]。<br /><br />
 
 		创建一个新的[name]。
 		</p>
@@ -37,7 +36,7 @@
 		<h3>[property:Vector3 direction]</h3>
 		<p>
 		[page:Ray]（射线）的方向。该向量必须经过标准化（使用[page:Vector3.normalize]），这样才能使方法正常运行。
-		默认值是一个位于(0, 0, 0)的[page:Vector3]。
+		默认值是一个位于(0, 0, -1)的[page:Vector3]。
 		</p>
 
 
@@ -115,7 +114,7 @@
 		<p>
 		[page:Ray ray] - 用于比较的[page:Ray]。<br /><br />
 
-		如果所传入的[page:Ray ray]具有和当前Ray相同的[page:.offset offset]和[page:.direction direction]则返回true。
+		如果所传入的[page:Ray ray]具有和当前Ray相同的[page:.origin origin]和[page:.direction direction]则返回true。
 		</p>
 
 		<h3>[method:Vector3 intersectBox]( [param:Box3 box], [param:Vector3 target] )</h3>
@@ -190,11 +189,11 @@
 		<p>
 		[page:Vector3 origin] - [page:Ray]（射线）的[page:.origin origin]（原点）。<br />
 		[page:Vector3 origin] - [page:Ray]（射线）的[page:.direction direction]（方向）。
-		
+
 		该向量必须经过标准化（使用[page:Vector3.normalize]），这样才能使方法正常运行。
 		<br /><br />
 
-		将传入的参数赋值给射线的[page:.origin origin]和[page:.direction direction]。
+		Sets this ray's [page:.origin origin] and [page:.direction direction] properties by copying the values from the given objects.
 		</p>
 
 

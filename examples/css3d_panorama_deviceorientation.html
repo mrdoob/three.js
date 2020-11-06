@@ -7,7 +7,10 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - panorama - device orientation.<br/>cubemap by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>.</div>
+		<div id="overlay">
+			<button id="startButton">Start Demo</button>
+		</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - panorama - device orientation.<br/>cubemap by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>.</div>
 
 		<script type="module">
 
@@ -16,13 +19,21 @@
 			import { DeviceOrientationControls } from './jsm/controls/DeviceOrientationControls.js';
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
-			var camera, scene, renderer;
-			var controls;
+			let camera, scene, renderer;
+			let controls;
 
-			init();
-			animate();
+			const startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', function () {
+
+				init();
+				animate();
+
+			}, false );
 
 			function init() {
+
+				const overlay = document.getElementById( 'overlay' );
+				overlay.remove();
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
 
@@ -30,7 +41,7 @@
 
 				scene = new THREE.Scene();
 
-				var sides = [
+				const sides = [
 					{
 						url: 'textures/cube/Bridge2/posx.jpg',
 						position: [ - 512, 0, 0 ],
@@ -63,18 +74,18 @@
 					}
 				];
 
-				var cube = new THREE.Object3D();
+				const cube = new THREE.Object3D();
 				scene.add( cube );
 
-				for ( var i = 0; i < sides.length; i ++ ) {
+				for ( let i = 0; i < sides.length; i ++ ) {
 
-					var side = sides[ i ];
+					const side = sides[ i ];
 
-					var element = document.createElement( 'img' );
+					const element = document.createElement( 'img' );
 					element.width = 1026; // 2 pixels extra to close the gap.
 					element.src = side.url;
 
-					var object = new CSS3DObject( element );
+					const object = new CSS3DObject( element );
 					object.position.fromArray( side.position );
 					object.rotation.fromArray( side.rotation );
 					cube.add( object );

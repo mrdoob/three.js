@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Lambert Material Variantions by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Lambert Material Variantions by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
 
 		<script type="module">
 
@@ -19,12 +19,12 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer;
-			var particleLight;
+			let camera, scene, renderer;
+			let particleLight;
 
-			var loader = new THREE.FontLoader();
+			const loader = new THREE.FontLoader();
 			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
@@ -37,49 +37,50 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2500 );
 				camera.position.set( 0.0, 400, 400 * 3.5 );
 
 				//
 
-				var reflectionCube = new THREE.CubeTextureLoader()
+				const reflectionCube = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/SwedishRoyalCastle/' )
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-				reflectionCube.format = THREE.RGBFormat;
+				reflectionCube.encoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
 				scene.background = reflectionCube;
 
 				// Materials
 
-				var imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
+				let imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
+				imgTexture.encoding = THREE.sRGBEncoding;
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
-				var cubeWidth = 400;
-				var numberOfSphersPerSide = 5;
-				var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
-				var stepSize = 1.0 / numberOfSphersPerSide;
+				const cubeWidth = 400;
+				const numberOfSphersPerSide = 5;
+				const sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
+				const stepSize = 1.0 / numberOfSphersPerSide;
 
-				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
+				const geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
-				for ( var alpha = 0; alpha <= 1.0; alpha += stepSize ) {
+				for ( let alpha = 0; alpha <= 1.0; alpha += stepSize ) {
 
-					for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
+					for ( let beta = 0; beta <= 1.0; beta += stepSize ) {
 
-						for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
+						for ( let gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
-							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 + 0.1 );
+							const diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 + 0.1 );
 
-							var material = new THREE.MeshLambertMaterial( {
+							const material = new THREE.MeshLambertMaterial( {
 								map: imgTexture,
 								color: diffuseColor,
 								reflectivity: beta,
 								envMap: alpha < 0.5 ? reflectionCube : null
 							} );
 
-							var mesh = new THREE.Mesh( geometry, material );
+							const mesh = new THREE.Mesh( geometry, material );
 
 							mesh.position.x = alpha * 400 - 200;
 							mesh.position.y = beta * 400 - 200;
@@ -95,7 +96,7 @@
 
 				function addLabel( name, location ) {
 
-					var textGeo = new THREE.TextBufferGeometry( name, {
+					const textGeo = new THREE.TextBufferGeometry( name, {
 
 						font: font,
 
@@ -105,8 +106,8 @@
 
 					} );
 
-					var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-					var textMesh = new THREE.Mesh( textGeo, textMaterial );
+					const textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+					const textMesh = new THREE.Mesh( textGeo, textMaterial );
 					textMesh.position.copy( location );
 					scene.add( textMesh );
 
@@ -131,11 +132,11 @@
 
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
+				const pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
 				particleLight.add( pointLight );
 
 				//
@@ -144,16 +145,16 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 200;
+				controls.maxDistance = 2000;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -181,7 +182,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.00025;
+				const timer = Date.now() * 0.00025;
 
 				//camera.position.x = Math.cos( timer ) * 800;
 				//camera.position.z = Math.sin( timer ) * 800;

@@ -25,25 +25,26 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { DecalGeometry } from './jsm/geometries/DecalGeometry.js';
 
-			var container = document.getElementById( 'container' );
+			const container = document.getElementById( 'container' );
 
-			var renderer, scene, camera, stats;
-			var mesh;
-			var raycaster;
-			var line;
+			let renderer, scene, camera, stats;
+			let mesh;
+			let raycaster;
+			let line;
 
-			var intersection = {
+			const intersection = {
 				intersects: false,
 				point: new THREE.Vector3(),
 				normal: new THREE.Vector3()
 			};
-			var mouse = new THREE.Vector2();
+			const mouse = new THREE.Vector2();
+			const intersects = [];
 
-			var textureLoader = new THREE.TextureLoader();
-			var decalDiffuse = textureLoader.load( 'textures/decal/decal-diffuse.png' );
-			var decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
+			const textureLoader = new THREE.TextureLoader();
+			const decalDiffuse = textureLoader.load( 'textures/decal/decal-diffuse.png' );
+			const decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
 
-			var decalMaterial = new THREE.MeshPhongMaterial( {
+			const decalMaterial = new THREE.MeshPhongMaterial( {
 				specular: 0x444444,
 				map: decalDiffuse,
 				normalMap: decalNormal,
@@ -57,13 +58,13 @@
 				wireframe: false
 			} );
 
-			var decals = [];
-			var mouseHelper;
-			var position = new THREE.Vector3();
-			var orientation = new THREE.Euler();
-			var size = new THREE.Vector3( 10, 10, 10 );
+			const decals = [];
+			let mouseHelper;
+			const position = new THREE.Vector3();
+			const orientation = new THREE.Euler();
+			const size = new THREE.Vector3( 10, 10, 10 );
 
-			var params = {
+			const params = {
 				minScale: 10,
 				maxScale: 20,
 				rotate: true,
@@ -92,21 +93,21 @@
 				camera.position.z = 120;
 				camera.target = new THREE.Vector3();
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 200;
 
 				scene.add( new THREE.AmbientLight( 0x443333 ) );
 
-				var light = new THREE.DirectionalLight( 0xffddcc, 1 );
-				light.position.set( 1, 0.75, 0.5 );
-				scene.add( light );
+				const dirLight1 = new THREE.DirectionalLight( 0xffddcc, 1 );
+				dirLight1.position.set( 1, 0.75, 0.5 );
+				scene.add( dirLight1 );
 
-				var light = new THREE.DirectionalLight( 0xccccff, 1 );
-				light.position.set( - 1, 0.75, - 0.5 );
-				scene.add( light );
+				const dirLight2 = new THREE.DirectionalLight( 0xccccff, 1 );
+				dirLight2.position.set( - 1, 0.75, - 0.5 );
+				scene.add( dirLight2 );
 
-				var geometry = new THREE.BufferGeometry();
+				const geometry = new THREE.BufferGeometry();
 				geometry.setFromPoints( [ new THREE.Vector3(), new THREE.Vector3() ] );
 
 				line = new THREE.Line( geometry, new THREE.LineBasicMaterial() );
@@ -122,7 +123,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var moved = false;
+				let moved = false;
 
 				controls.addEventListener( 'change', function () {
 
@@ -130,60 +131,53 @@
 
 				} );
 
-				window.addEventListener( 'mousedown', function () {
+				window.addEventListener( 'pointerdown', function () {
 
 					moved = false;
 
 				}, false );
 
-				window.addEventListener( 'mouseup', function () {
+				window.addEventListener( 'pointerup', function ( event ) {
 
-					checkIntersection();
-					if ( ! moved && intersection.intersects ) shoot();
+					if ( moved === false ) {
+
+						checkIntersection( event.clientX, event.clientY );
+
+						if ( intersection.intersects ) shoot();
+
+					}
 
 				} );
 
-				window.addEventListener( 'mousemove', onTouchMove );
-				window.addEventListener( 'touchmove', onTouchMove );
+				window.addEventListener( 'pointermove', onPointerMove );
 
-				function onTouchMove( event ) {
+				function onPointerMove( event ) {
 
-					var x, y;
+					if ( event.isPrimary ) {
 
-					if ( event.changedTouches ) {
-
-						x = event.changedTouches[ 0 ].pageX;
-						y = event.changedTouches[ 0 ].pageY;
-
-					} else {
-
-						x = event.clientX;
-						y = event.clientY;
+						checkIntersection( event.clientX, event.clientY );
 
 					}
+
+				}
+
+				function checkIntersection( x, y ) {
+
+					if ( mesh === undefined ) return;
 
 					mouse.x = ( x / window.innerWidth ) * 2 - 1;
 					mouse.y = - ( y / window.innerHeight ) * 2 + 1;
 
-					checkIntersection();
-
-				}
-
-				function checkIntersection() {
-
-					if ( ! mesh ) return;
-
 					raycaster.setFromCamera( mouse, camera );
-
-					var intersects = raycaster.intersectObjects( [ mesh ] );
+					raycaster.intersectObject( mesh, false, intersects );
 
 					if ( intersects.length > 0 ) {
 
-						var p = intersects[ 0 ].point;
+						const p = intersects[ 0 ].point;
 						mouseHelper.position.copy( p );
 						intersection.point.copy( p );
 
-						var n = intersects[ 0 ].face.normal.clone();
+						const n = intersects[ 0 ].face.normal.clone();
 						n.transformDirection( mesh.matrixWorld );
 						n.multiplyScalar( 10 );
 						n.add( intersects[ 0 ].point );
@@ -191,12 +185,14 @@
 						intersection.normal.copy( intersects[ 0 ].face.normal );
 						mouseHelper.lookAt( n );
 
-						var positions = line.geometry.attributes.position;
+						const positions = line.geometry.attributes.position;
 						positions.setXYZ( 0, p.x, p.y, p.z );
 						positions.setXYZ( 1, n.x, n.y, n.z );
 						positions.needsUpdate = true;
 
 						intersection.intersects = true;
+
+						intersects.length = 0;
 
 					} else {
 
@@ -206,7 +202,7 @@
 
 				}
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'minScale', 1, 30 );
 				gui.add( params, 'maxScale', 1, 30 );
@@ -221,7 +217,7 @@
 
 			function loadLeePerrySmith() {
 
-				var loader = new GLTFLoader();
+				const loader = new GLTFLoader();
 
 				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
@@ -248,13 +244,13 @@
 
 				if ( params.rotate ) orientation.z = Math.random() * 2 * Math.PI;
 
-				var scale = params.minScale + Math.random() * ( params.maxScale - params.minScale );
+				const scale = params.minScale + Math.random() * ( params.maxScale - params.minScale );
 				size.set( scale, scale, scale );
 
-				var material = decalMaterial.clone();
+				const material = decalMaterial.clone();
 				material.color.setHex( Math.random() * 0xffffff );
 
-				var m = new THREE.Mesh( new DecalGeometry( mesh, position, orientation, size ), material );
+				const m = new THREE.Mesh( new DecalGeometry( mesh, position, orientation, size ), material );
 
 				decals.push( m );
 				scene.add( m );
@@ -269,7 +265,7 @@
 
 				} );
 
-				decals = [];
+				decals.length = 0;
 
 			}
 

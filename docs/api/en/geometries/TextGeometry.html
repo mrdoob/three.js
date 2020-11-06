@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -15,7 +14,7 @@
 		<p class="desc">
 			A class for generating text as a single geometry. It is constructed by providing a string of text, and a hash of
 			parameters consisting of a loaded [page:Font] and settings for the geometry's parent [page:ExtrudeGeometry].
-			See the [page:Font], [page:FontLoader] and [page:Creating_Text] pages for additional details.
+			See the [page:Font], [page:FontLoader] and [page:Creating-Text] pages for additional details.
 		</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#TextGeometry"></iframe>
@@ -26,7 +25,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -36,18 +35,14 @@
 
 		</script>
 
-		<h2>Examples</h2>
-
-		<p>
-		[example:webgl_geometry_text geometry / text ]
-		</p>
+		<h2>Code Example</h2>
 
 		<code>
-		var loader = new THREE.FontLoader();
+		const loader = new THREE.FontLoader();
 
 		loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
-			var geometry = new THREE.TextGeometry( 'Hello three.js!', {
+			const geometry = new THREE.TextGeometry( 'Hello three.js!', {
 				font: font,
 				size: 80,
 				height: 5,
@@ -60,6 +55,12 @@
 			} );
 		} );
 		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+		[example:webgl_geometry_text geometry / text ]
+		</p>
 
 		<h2>Constructor</h2>
 

@@ -21,12 +21,13 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { VertexNormalsHelper } from './jsm/helpers/VertexNormalsHelper.js';
 
-			var container, stats, gui;
-			var camera, scene, renderer;
-			var mesh, geometry;
+			let container, stats, gui;
+			let camera, scene, renderer;
+			let mesh, geometry;
 
-			var geometries = [
+			const geometries = [
 				new THREE.BoxBufferGeometry( 200, 200, 200, 2, 2, 2 ),
 				new THREE.CircleBufferGeometry( 200, 32 ),
 				new THREE.CylinderBufferGeometry( 75, 75, 200, 8, 8 ),
@@ -39,11 +40,11 @@
 				new THREE.TorusKnotBufferGeometry( 64, 16 )
 			];
 
-			var options = {
+			const options = {
 				Geometry: 0
 			};
 
-			var material = new THREE.MeshBasicMaterial( { color: 0xfefefe, wireframe: true, opacity: 0.5 } );
+			const material = new THREE.MeshBasicMaterial( { color: 0xfefefe, wireframe: true, opacity: 0.5 } );
 
 			init();
 			animate();
@@ -63,13 +64,13 @@
 
 				geometry.computeBoundingSphere();
 
-				var scaleFactor = 160 / geometry.boundingSphere.radius;
+				const scaleFactor = 160 / geometry.boundingSphere.radius;
 				geometry.scale( scaleFactor, scaleFactor, scaleFactor );
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				var vertexNormalsHelper = new THREE.VertexNormalsHelper( mesh, 10 );
+				const vertexNormalsHelper = new VertexNormalsHelper( mesh, 10 );
 				mesh.add( vertexNormalsHelper );
 
 			}
@@ -99,7 +100,7 @@
 
 				//
 
-				var geometries = {
+				const geometries = {
 					BoxBufferGeometry: 0,
 					CircleBufferGeometry: 1,
 					CylinderBufferGeometry: 2,
@@ -121,7 +122,8 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
 
 				//
 

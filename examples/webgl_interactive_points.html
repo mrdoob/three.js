@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - particles</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - particles</div>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -57,21 +57,21 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var renderer, scene, camera, stats;
+			let renderer, scene, camera, stats;
 
-			var particles;
+			let particles;
 
-			var PARTICLE_SIZE = 20;
+			const PARTICLE_SIZE = 20;
 
-			var raycaster, intersects;
-			var mouse, INTERSECTED;
+			let raycaster, intersects;
+			let mouse, INTERSECTED;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				scene = new THREE.Scene();
 
@@ -80,16 +80,16 @@
 
 				//
 
-				var vertices = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 ).vertices;
+				const vertices = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 ).vertices;
 
-				var positions = new Float32Array( vertices.length * 3 );
-				var colors = new Float32Array( vertices.length * 3 );
-				var sizes = new Float32Array( vertices.length );
+				const positions = new Float32Array( vertices.length * 3 );
+				const colors = new Float32Array( vertices.length * 3 );
+				const sizes = new Float32Array( vertices.length );
 
-				var vertex;
-				var color = new THREE.Color();
+				let vertex;
+				const color = new THREE.Color();
 
-				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+				for ( let i = 0, l = vertices.length; i < l; i ++ ) {
 
 					vertex = vertices[ i ];
 					vertex.toArray( positions, i * 3 );
@@ -101,14 +101,14 @@
 
 				}
 
-				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
-				geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
 
 				//
 
-				var material = new THREE.ShaderMaterial( {
+				const material = new THREE.ShaderMaterial( {
 
 					uniforms: {
 						color: { value: new THREE.Color( 0xffffff ) },
@@ -182,8 +182,8 @@
 				particles.rotation.x += 0.0005;
 				particles.rotation.y += 0.001;
 
-				var geometry = particles.geometry;
-				var attributes = geometry.attributes;
+				const geometry = particles.geometry;
+				const attributes = geometry.attributes;
 
 				raycaster.setFromCamera( mouse, camera );
 

@@ -1,16 +1,11 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
 THREE.Line2 = function ( geometry, material ) {
 
-	THREE.LineSegments2.call( this );
+	if ( geometry === undefined ) geometry = new THREE.LineGeometry();
+	if ( material === undefined ) material = new THREE.LineMaterial( { color: Math.random() * 0xffffff } );
+
+	THREE.LineSegments2.call( this, geometry, material );
 
 	this.type = 'Line2';
-
-	this.geometry = geometry !== undefined ? geometry : new THREE.LineGeometry();
-	this.material = material !== undefined ? material : new THREE.LineMaterial( { color: Math.random() * 0xffffff } );
 
 };
 
@@ -18,14 +13,6 @@ THREE.Line2.prototype = Object.assign( Object.create( THREE.LineSegments2.protot
 
 	constructor: THREE.Line2,
 
-	isLine2: true,
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
-
-	}
+	isLine2: true
 
 } );

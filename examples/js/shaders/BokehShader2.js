@@ -1,6 +1,4 @@
 /**
- * @author zz85 / https://github.com/zz85 | twitter.com/blurspline
- *
  * Depth-of-field shader with bokeh
  * ported from GLSL shader by Martins Upitis
  * http://blenderartists.org/forum/showthread.php?237488-GLSL-depth-of-field-with-bokeh-v2-4-(update)

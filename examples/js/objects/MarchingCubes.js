@@ -1,7 +1,4 @@
 /**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com
- * @author chaht01 / http://hyuntak.com
  * Port of http://webglsamples.org/blob/blob.html
  */
 
@@ -954,13 +951,13 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		this.render( geo_callback );
 
 		if ( this.hasPositions )
-			geo.addAttribute( "position", new THREE.BufferAttribute( posArray, 3 ) );
+			geo.setAttribute( "position", new THREE.BufferAttribute( posArray, 3 ) );
 		if ( this.hasNormals )
-			geo.addAttribute( "normal", new THREE.BufferAttribute( normArray, 3 ) );
+			geo.setAttribute( "normal", new THREE.BufferAttribute( normArray, 3 ) );
 		if ( this.hasColors )
-			geo.addAttribute( "color", new THREE.BufferAttribute( colorArray, 3 ) );
+			geo.setAttribute( "color", new THREE.BufferAttribute( colorArray, 3 ) );
 		if ( this.hasUvs )
-			geo.addAttribute( "uv", new THREE.BufferAttribute( uvArray, 2 ) );
+			geo.setAttribute( "uv", new THREE.BufferAttribute( uvArray, 2 ) );
 
 		return geo;
 

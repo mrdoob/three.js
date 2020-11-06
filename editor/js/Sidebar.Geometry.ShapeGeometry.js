@@ -1,35 +1,37 @@
-/**
- * @author Temdog007 / http://github.com/Temdog007
- */
+import * as THREE from '../../build/three.module.js';
 
-Sidebar.Geometry.ShapeGeometry = function ( editor, object ) {
+import { UIRow, UIText, UIInteger, UIButton } from './libs/ui.js';
+
+import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
+
+function SidebarGeometryShapeGeometry( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new UI.Row();
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
 
 	// curveSegments
 
-	var curveSegmentsRow = new UI.Row();
-	var curveSegments = new UI.Integer( parameters.curveSegments || 12 ).onChange( changeShape ).setRange( 1, Infinity );
+	var curveSegmentsRow = new UIRow();
+	var curveSegments = new UIInteger( parameters.curveSegments || 12 ).onChange( changeShape ).setRange( 1, Infinity );
 
-	curveSegmentsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/shape_geometry/curveSegments' ) ).setWidth( '90px' ) );
+	curveSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/shape_geometry/curveSegments' ) ).setWidth( '90px' ) );
 	curveSegmentsRow.add( curveSegments );
 
 	container.add( curveSegmentsRow );
 
 	// to extrude
-	var button = new UI.Button( strings.getKey( 'sidebar/geometry/shape_geometry/extrude' ) ).onClick( toExtrude ).setWidth( '90px' ).setMarginLeft( '90px' );
+	var button = new UIButton( strings.getKey( 'sidebar/geometry/shape_geometry/extrude' ) ).onClick( toExtrude ).setWidth( '90px' ).setMarginLeft( '90px' );
 	container.add( button );
 
 	//
 
 	function changeShape() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE[ geometry.type ](
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ShapeBufferGeometry(
 			parameters.shapes,
 			curveSegments.getValue()
 		) ) );
@@ -48,6 +50,6 @@ Sidebar.Geometry.ShapeGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
-Sidebar.Geometry.ShapeBufferGeometry = Sidebar.Geometry.ShapeGeometry;
+export { SidebarGeometryShapeGeometry };

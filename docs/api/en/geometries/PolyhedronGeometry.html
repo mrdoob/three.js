@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,14 +16,14 @@
 			project them onto a sphere, and then divide them up to the desired level of detail.
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 <code>
-var verticesOfCube = [
+const verticesOfCube = [
     -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
     -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
 ];
 
-var indicesOfFaces = [
+const indicesOfFaces = [
     2,1,0,    0,3,2,
     0,4,7,    7,3,0,
     0,1,5,    5,4,0,
@@ -33,7 +32,7 @@ var indicesOfFaces = [
     4,5,6,    6,7,4
 ];
 
-var geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
+const geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
 </code>
 
 		<h2>Constructor</h2>

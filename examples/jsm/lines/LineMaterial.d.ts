@@ -10,6 +10,7 @@ export interface LineMaterialParameters extends MaterialParameters {
 	dashed?: boolean;
 	dashScale?: number;
 	dashSize?: number;
+	dashOffset?: number;
 	gapSize?: number;
 	linewidth?: number;
 	resolution?: Vector2;
@@ -22,8 +23,10 @@ export class LineMaterial extends ShaderMaterial {
 	dashed: boolean;
 	dashScale: number;
 	dashSize: number;
+	dashOffset: number;
 	gapSize: number;
-	isLineMaterial: boolean;
+	opacity: number;
+	readonly isLineMaterial: true;
 	linewidth: number;
 	resolution: Vector2;
 

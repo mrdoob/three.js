@@ -7,8 +7,6 @@ export class FileLoader extends Loader {
 
 	mimeType: undefined | MimeType;
 	responseType: undefined |string;
-	withCredentials: undefined |string;
-	requestHeader: undefined | { [header: string]: string };
 
 	load(
 		url: string,
@@ -18,7 +16,5 @@ export class FileLoader extends Loader {
 	): any;
 	setMimeType( mimeType: MimeType ): FileLoader;
 	setResponseType( responseType: string ): FileLoader;
-	setWithCredentials( value: string ): FileLoader;
-	setRequestHeader( value: { [header: string]: string } ): FileLoader;
 
 }

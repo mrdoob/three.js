@@ -2,7 +2,7 @@ import {
 	Uniform
 } from '../../../src/Three';
 
-export const VolumeShader: {
+export const VolumeRenderShader1: {
 	uniforms: {
 		u_size: Uniform;
 		u_renderstyle: Uniform;

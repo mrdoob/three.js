@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import {
 	FrontSide,
 	LessEqualDepth,
@@ -19,36 +15,10 @@ function NodeMaterial( vertex, fragment ) {
 
 	ShaderMaterial.call( this );
 
-	var self = this;
-
 	this.vertex = vertex || new RawNode( new PositionNode( PositionNode.PROJECTION ) );
 	this.fragment = fragment || new RawNode( new ColorNode( 0xFF0000 ) );
 
 	this.updaters = [];
-
-	// onBeforeCompile can't be in the prototype because onBeforeCompile.toString varies per material
-
-	this.onBeforeCompile = function ( shader, renderer ) {
-
-		if ( this.needsUpdate ) {
-
-			this.build( { renderer: renderer } );
-
-			shader.uniforms = this.uniforms;
-			shader.vertexShader = this.vertexShader;
-			shader.fragmentShader = this.fragmentShader;
-
-		}
-
-	};
-
-	// it fix the programCache and share the code with others materials
-
-	this.onBeforeCompile.toString = function () {
-
-		return self.needsCompile;
-
-	};
 
 }
 
@@ -74,6 +44,7 @@ Object.defineProperties( NodeMaterial.prototype, {
 
 		set: function ( value ) {
 
+			if ( value === true ) this.version ++;
 			this.needsCompile = value;
 
 		},
@@ -87,6 +58,37 @@ Object.defineProperties( NodeMaterial.prototype, {
 	}
 
 } );
+
+NodeMaterial.prototype.onBeforeCompile = function ( shader, renderer ) {
+
+	this.build( { renderer: renderer } );
+
+	shader.uniforms = this.uniforms;
+	shader.vertexShader = this.vertexShader;
+	shader.fragmentShader = this.fragmentShader;
+
+};
+
+NodeMaterial.prototype.customProgramCacheKey = function () {
+
+	var hash = this.getHash();
+
+	return hash;
+
+};
+
+NodeMaterial.prototype.getHash = function () {
+
+	var hash = '{';
+
+	hash += '"vertex":' + this.vertex.getHash() + ',';
+	hash += '"fragment":' + this.fragment.getHash();
+
+	hash += '}';
+
+	return hash;
+
+};
 
 NodeMaterial.prototype.updateFrame = function ( frame ) {
 
@@ -119,8 +121,6 @@ NodeMaterial.prototype.build = function ( params ) {
 	this.lights = builder.requires.lights;
 
 	this.transparent = builder.requires.transparent || this.blending > NormalBlending;
-
-	this.needsUpdate = false;
 
 	return this;
 

@@ -1,6 +1,4 @@
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * Film grain & scanlines shader
  *
  * - ported from HLSL to WebGL / GLSL

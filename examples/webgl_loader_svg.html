@@ -16,7 +16,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - SVGLoader
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - SVGLoader
 		</div>
 
 		<script type="module">
@@ -29,7 +29,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 
-			var renderer, stats, scene, camera, gui, guiData;
+			let renderer, stats, scene, camera, gui, guiData;
 
 			init();
 			animate();
@@ -38,7 +38,7 @@
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				//
 
@@ -54,7 +54,7 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.screenSpacePanning = true;
 
 				//
@@ -99,7 +99,13 @@
 					"Test 5": 'models/svg/tests/5.svg',
 					"Test 6": 'models/svg/tests/6.svg',
 					"Test 7": 'models/svg/tests/7.svg',
-					"Test 8": 'models/svg/tests/8.svg'
+					"Test 8": 'models/svg/tests/8.svg',
+					"Units": 'models/svg/tests/units.svg',
+					"Defs": 'models/svg/tests/testDefs/Svg-defs.svg',
+					"Defs2": 'models/svg/tests/testDefs/Svg-defs2.svg',
+					"Defs3": 'models/svg/tests/testDefs/Wave-defs.svg',
+					"Defs4": 'models/svg/tests/testDefs/defs4.svg'
+
 
 				} ).name( 'SVG File' ).onChange( update );
 
@@ -128,32 +134,32 @@
 
 				//
 
-				var helper = new THREE.GridHelper( 160, 10 );
+				const helper = new THREE.GridHelper( 160, 10 );
 				helper.rotation.x = Math.PI / 2;
 				scene.add( helper );
 
 				//
 
-				var loader = new SVGLoader();
+				const loader = new SVGLoader();
 
 				loader.load( url, function ( data ) {
 
-					var paths = data.paths;
+					const paths = data.paths;
 
-					var group = new THREE.Group();
+					const group = new THREE.Group();
 					group.scale.multiplyScalar( 0.25 );
 					group.position.x = - 70;
 					group.position.y = 70;
 					group.scale.y *= - 1;
 
-					for ( var i = 0; i < paths.length; i ++ ) {
+					for ( let i = 0; i < paths.length; i ++ ) {
 
-						var path = paths[ i ];
+						const path = paths[ i ];
 
-						var fillColor = path.userData.style.fill;
+						const fillColor = path.userData.style.fill;
 						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none' ) {
 
-							var material = new THREE.MeshBasicMaterial( {
+							const material = new THREE.MeshBasicMaterial( {
 								color: new THREE.Color().setStyle( fillColor ),
 								opacity: path.userData.style.fillOpacity,
 								transparent: path.userData.style.fillOpacity < 1,
@@ -162,14 +168,14 @@
 								wireframe: guiData.fillShapesWireframe
 							} );
 
-							var shapes = path.toShapes( true );
+							const shapes = path.toShapes( true );
 
-							for ( var j = 0; j < shapes.length; j ++ ) {
+							for ( let j = 0; j < shapes.length; j ++ ) {
 
-								var shape = shapes[ j ];
+								const shape = shapes[ j ];
 
-								var geometry = new THREE.ShapeBufferGeometry( shape );
-								var mesh = new THREE.Mesh( geometry, material );
+								const geometry = new THREE.ShapeBufferGeometry( shape );
+								const mesh = new THREE.Mesh( geometry, material );
 
 								group.add( mesh );
 
@@ -177,11 +183,11 @@
 
 						}
 
-						var strokeColor = path.userData.style.stroke;
+						const strokeColor = path.userData.style.stroke;
 
 						if ( guiData.drawStrokes && strokeColor !== undefined && strokeColor !== 'none' ) {
 
-							var material = new THREE.MeshBasicMaterial( {
+							const material = new THREE.MeshBasicMaterial( {
 								color: new THREE.Color().setStyle( strokeColor ),
 								opacity: path.userData.style.strokeOpacity,
 								transparent: path.userData.style.strokeOpacity < 1,
@@ -190,15 +196,15 @@
 								wireframe: guiData.strokesWireframe
 							} );
 
-							for ( var j = 0, jl = path.subPaths.length; j < jl; j ++ ) {
+							for ( let j = 0, jl = path.subPaths.length; j < jl; j ++ ) {
 
-								var subPath = path.subPaths[ j ];
+								const subPath = path.subPaths[ j ];
 
-								var geometry = SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
+								const geometry = SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
 
 								if ( geometry ) {
 
-									var mesh = new THREE.Mesh( geometry, material );
+									const mesh = new THREE.Mesh( geometry, material );
 
 									group.add( mesh );
 

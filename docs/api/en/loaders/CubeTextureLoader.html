@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,18 +16,10 @@
 			This uses the [page:ImageLoader] internally for loading files.
 		</p>
 
-		<h2>Example</h2>
-
-		<p>
-			[example:webgl_materials_cubemap materials / cubemap]<br />
-			[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection]<br />
-			[example:webgl_materials_cubemap_balls_refraction materials / cubemap / balls / refraction]<br />
-			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic]<br />
-			[example:webgl_materials_cubemap_refraction materials / cubemap / refraction]
-		</p>
+		<h2>Code Example</h2>
 
 		<code>
-var scene = new THREE.Scene();
+const scene = new THREE.Scene();
 scene.background = new THREE.CubeTextureLoader()
 	.setPath( 'textures/cubeMaps/' )
 	.load( [
@@ -40,6 +31,16 @@ scene.background = new THREE.CubeTextureLoader()
 				'nz.png'
 			] );
 		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_materials_cubemap materials / cubemap]<br />
+			[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection]<br />
+			[example:webgl_materials_cubemap_balls_refraction materials / cubemap / balls / refraction]<br />
+			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic]<br />
+			[example:webgl_materials_cubemap_refraction materials / cubemap / refraction]
+		</p>
 
 		<h2>Constructor</h2>
 

@@ -17,7 +17,7 @@
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Object3D.lookAt() example</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Object3D.lookAt() example</div>
 
 		<script type="module">
 
@@ -25,14 +25,14 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var camera, scene, renderer, stats;
+			let camera, scene, renderer, stats;
 
-			var sphere;
+			let sphere;
 
-			var mouseX = 0, mouseY = 0;
+			let mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -51,14 +51,14 @@
 				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 100, 20, 20 ), new THREE.MeshNormalMaterial() );
 				scene.add( sphere );
 
-				var geometry = new THREE.CylinderBufferGeometry( 0, 10, 100, 12 );
+				const geometry = new THREE.CylinderBufferGeometry( 0, 10, 100, 12 );
 				geometry.rotateX( Math.PI / 2 );
 
-				var material = new THREE.MeshNormalMaterial();
+				const material = new THREE.MeshNormalMaterial();
 
-				for ( var i = 0; i < 1000; i ++ ) {
+				for ( let i = 0; i < 1000; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 4000 - 2000;
 					mesh.position.y = Math.random() * 4000 - 2000;
 					mesh.position.z = Math.random() * 4000 - 2000;
@@ -113,13 +113,13 @@
 
 			function render() {
 
-				var time = Date.now() * 0.0005;
+				const time = Date.now() * 0.0005;
 
 				sphere.position.x = Math.sin( time * 0.7 ) * 2000;
 				sphere.position.y = Math.cos( time * 0.5 ) * 2000;
 				sphere.position.z = Math.cos( time * 0.3 ) * 2000;
 
-				for ( var i = 1, l = scene.children.length; i < l; i ++ ) {
+				for ( let i = 1, l = scene.children.length; i < l; i ++ ) {
 
 					scene.children[ i ].lookAt( sphere.position );
 

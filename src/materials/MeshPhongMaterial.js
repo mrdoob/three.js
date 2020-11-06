@@ -4,9 +4,6 @@ import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
 
 /**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- *
  * parameters = {
  *  color: <hex>,
  *  specular: <hex>,
@@ -41,7 +38,7 @@ import { Color } from '../math/Color.js';
  *  alphaMap: new THREE.Texture( <Image> ),
  *
  *  envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
- *  combine: THREE.Multiply,
+ *  combine: THREE.MultiplyOperation,
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
  *

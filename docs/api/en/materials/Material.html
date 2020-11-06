@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -45,7 +44,7 @@
 		</p>
 
 		<h3>[property:Integer blendDstAlpha]</h3>
-		<p>The transparency of the [page:.blendDst]. Default is *null*.</p>
+		<p>The transparency of the [page:.blendDst]. Uses [page:.blendDst] value if null. Default is *null*.</p>
 
 		<h3>[property:Integer blendEquation]</h3>
 		<p>
@@ -55,7 +54,7 @@
 		</p>
 
 		<h3>[property:Integer blendEquationAlpha]</h3>
-		<p>The tranparency of the [page:.blendEquation]. Default is *null*.</p>
+		<p>The transparency of the [page:.blendEquation]. Uses [page:.blendEquation] value if null. Default is *null*.</p>
 
 		<h3>[property:Blending blending]</h3>
 		<p>
@@ -72,7 +71,7 @@
 		</p>
 
 		<h3>[property:Integer blendSrcAlpha]</h3>
-		<p>The tranparency of the [page:.blendSrc]. Default is *null*.</p>
+		<p>The transparency of the [page:.blendSrc]. Uses [page:.blendSrc] value if null. Default is *null*.</p>
 
 		<h3>[property:Boolean clipIntersection]</h3>
 		<p>
@@ -125,7 +124,7 @@
 
 		<h3>[property:Boolean stencilWrite]</h3>
 		<p>
-		Whether rendering this material has any effect on the stencil buffer. Default is *false*.
+		Whether stencil operations are performed against the stencil buffer. In order to perform writes or comparisons against the stencil buffer this value must be *true*. Default is *false*.
 		</p>
 
 		<h3>[property:Integer stencilWriteMask]</h3>
@@ -174,20 +173,12 @@
 		<h3>[property:Integer id]</h3>
 		<p>Unique number for this material instance.</p>
 
-		<h3>[property:Boolean isMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 		<h3>[property:String name]</h3>
 		<p>Optional name of the object (doesn't need to be unique). Default is an empty string.</p>
 
 		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
-		Specifies that the material needs to be recompiled.<br />
-		This property is automatically set to *true* when instancing a new material.
+		Specifies that the material needs to be recompiled.
 		</p>
 
 		<h3>[property:Float opacity]</h3>
@@ -219,7 +210,7 @@
 		<h3>[property:Boolean premultipliedAlpha]</h3>
 		<p>
 		Whether to premultiply the alpha (transparency) value.
-		See [Example:webgl_materials_transparency WebGL / Materials / Transparency] for an example of the difference.
+		See [Example:webgl_materials_physical_transmission WebGL / Materials / Physical / Transmission] for an example of the difference.
 		Default is *false*.
 		</p>
 
@@ -296,18 +287,14 @@
 		This gets automatically assigned, so this shouldn't be edited.
 		</p>
 
-		<h3>[property:Integer vertexColors]</h3>
+		<h3>[property:Integer version]</h3>
 		<p>
-		Defines whether vertex coloring is used.
-		Default is [page:Materials THREE.NoColors].
-		Other options are [page:Materials THREE.VertexColors] and [page:Materials THREE.FaceColors].
+		This starts at *0* and counts how many times [property:Boolean needsUpdate] is set to *true*.
 		</p>
 
-		<h3>[property:Boolean vertexTangents]</h3>
+		<h3>[property:Boolean vertexColors]</h3>
 		<p>
-		Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
-		are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
-		more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
+		Defines whether vertex coloring is used. Default is *false*.
 		</p>
 
 		<h3>[property:Boolean visible]</h3>
@@ -315,7 +302,7 @@
 		Defines whether this material is visible. Default is *true*.
 		</p>
 
-		<h3>[property:object userData]</h3>
+		<h3>[property:Object userData]</h3>
 		<p>
 		An object that can be used to store custom data about the Material. It should not hold
 		references to functions as these will not be cloned.
@@ -346,13 +333,43 @@
 		Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
 		</p>
 
-		<h3>[method:null setValues]( [param:object values] )</h3>
+		<h3>[method:String customProgramCacheKey]()</h3>
+		<p>
+		In case onBeforeCompile is used, this callback can be used to identify values of settings used in onBeforeCompile, so three.js can reuse a cached shader or recompile the shader for this material as needed.
+		</p>
+
+		<p>
+		For example, if onBeforeCompile contains a conditional statement like:<br />
+
+		<code>if ( black ) {
+
+			shader.fragmentShader = shader.fragmentShader.replace('gl_FragColor = vec4(1)', 'gl_FragColor = vec4(0)')
+
+		}
+		</code>
+
+		then customProgramCacheKey should be set like this:<br />
+
+		<code>material.customProgramCacheKey = function() {
+
+			return black ? '1' : '0';
+
+		}
+		</code>
+
+		</p>
+
+		<p>
+		Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
+		</p>
+
+		<h3>[method:null setValues]( [param:Object values] )</h3>
 		<p>
 		values -- a container with parameters.<br />
 		Sets the properties based on the *values*.
 		</p>
 
-		<h3>[method:Object toJSON]( [param:object meta] )</h3>
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
 		<p>
 		meta -- object containing metadata such as textures or images for the material.<br />
 		Convert the material to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].

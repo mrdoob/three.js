@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - texture rotation
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - texture rotation
 		</div>
 
 		<script type="module">
@@ -19,11 +19,11 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var mesh, renderer, scene, camera;
+			let mesh, renderer, scene, camera;
 
-			var gui;
+			let gui;
 
-			var API = {
+			const API = {
 				offsetX: 0,
 				offsetY: 0,
 				repeatX: 0.25,
@@ -48,13 +48,13 @@
 				camera.position.set( 10, 15, 25 );
 				scene.add( camera );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 20;
 				controls.maxDistance = 50;
 				controls.maxPolarAngle = Math.PI / 2;
 
-				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+				const geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
 
 				new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg', function ( texture ) {
 
@@ -63,7 +63,7 @@
 
 					//texture.matrixAutoUpdate = false; // default true; set to false to update texture.matrix manually
 
-					var material = new THREE.MeshBasicMaterial( { map: texture } );
+					const material = new THREE.MeshBasicMaterial( { map: texture } );
 
 					mesh = new THREE.Mesh( geometry, material );
 					scene.add( mesh );
@@ -100,7 +100,7 @@
 
 			function updateUvTransform() {
 
-				var texture = mesh.material.map;
+				const texture = mesh.material.map;
 
 				if ( texture.matrixAutoUpdate === true ) {
 

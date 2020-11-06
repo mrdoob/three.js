@@ -1,8 +1,5 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
+
 import { Euler } from '../../../../src/math/Euler';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Quaternion } from '../../../../src/math/Quaternion';

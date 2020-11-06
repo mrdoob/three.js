@@ -6,8 +6,15 @@ export class Box2 {
 
 	constructor( min?: Vector2, max?: Vector2 );
 
-	max: Vector2;
+	/**
+	 * @default new THREE.Vector2( + Infinity, + Infinity )
+	 */
 	min: Vector2;
+
+	/**
+	 * @default new THREE.Vector2( - Infinity, - Infinity )
+	 */
+	max: Vector2;
 
 	set( min: Vector2, max: Vector2 ): Box2;
 	setFromPoints( points: Vector2[] ): Box2;
@@ -23,7 +30,7 @@ export class Box2 {
 	expandByScalar( scalar: number ): Box2;
 	containsPoint( point: Vector2 ): boolean;
 	containsBox( box: Box2 ): boolean;
-	getParameter( point: Vector2 ): Vector2;
+	getParameter( point: Vector2, target: Vector2 ): Vector2;
 	intersectsBox( box: Box2 ): boolean;
 	clampPoint( point: Vector2, target: Vector2 ): Vector2;
 	distanceToPoint( point: Vector2 ): number;

@@ -10,7 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGL morph target example
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGL morph target example
 		</div>
 
 		<script type="module">
@@ -20,38 +20,38 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var container;
+			let camera, scene, renderer, clock;
 
-			var camera, scene, renderer;
+			let mesh;
 
-			var mesh;
-
-			var sign = 1;
+			let sign = 1;
+			const speed = 0.5;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.2, 100 );
 				camera.position.set( 0, 5, 5 );
 
 				scene = new THREE.Scene();
 
-				var light = new THREE.PointLight( 0xff2200, 0.7 );
-				light.position.set( 100, 100, 100 );
-				scene.add( light );
+				clock = new THREE.Clock();
 
-				light = new THREE.PointLight( 0x22ff00, 0.7 );
-				light.position.set( - 100, - 100, - 100 );
-				scene.add( light );
+				const light1 = new THREE.PointLight( 0xff2200, 0.7 );
+				light1.position.set( 100, 100, 100 );
+				scene.add( light1 );
 
-				light = new THREE.AmbientLight( 0x111111 );
-				scene.add( light );
+				const light2 = new THREE.PointLight( 0x22ff00, 0.7 );
+				light2.position.set( - 100, - 100, - 100 );
+				scene.add( light2 );
 
-				var loader = new GLTFLoader();
+				scene.add( new THREE.AmbientLight( 0x111111 ) );
+
+				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/AnimatedMorphSphere/glTF/AnimatedMorphSphere.gltf', function ( gltf ) {
 
 					gltf.scene.traverse( function ( node ) {
@@ -70,7 +70,7 @@
 
 					//
 
-					var pointsMaterial = new THREE.PointsMaterial( {
+					const pointsMaterial = new THREE.PointsMaterial( {
 
 						size: 10,
 						sizeAttenuation: false,
@@ -80,7 +80,7 @@
 
 					} );
 
-					var points = new THREE.Points( mesh.geometry, pointsMaterial );
+					const points = new THREE.Points( mesh.geometry, pointsMaterial );
 
 					points.morphTargetInfluences = mesh.morphTargetInfluences;
 					points.morphTargetDictionary = mesh.morphTargetDictionary;
@@ -98,13 +98,15 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
 				controls.maxDistance = 20;
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				document.addEventListener( 'visibilitychange', onVisibilityChange );
 
 			}
 
@@ -117,6 +119,20 @@
 
 			}
 
+			function onVisibilityChange() {
+
+				if ( document.hidden === true ) {
+
+					clock.stop();
+
+				} else {
+
+					clock.start();
+
+				}
+
+			}
+
 			function animate() {
 
 				requestAnimationFrame( animate );
@@ -126,11 +142,15 @@
 
 			function render() {
 
+				const delta = clock.getDelta();
+
 				if ( mesh !== undefined ) {
 
-					mesh.rotation.y += 0.01;
+					const step = delta * speed;
 
-					mesh.morphTargetInfluences[ 1 ] = mesh.morphTargetInfluences[ 1 ] + 0.01 * sign;
+					mesh.rotation.y += step;
+
+					mesh.morphTargetInfluences[ 1 ] = mesh.morphTargetInfluences[ 1 ] + step * sign;
 
 					if ( mesh.morphTargetInfluences[ 1 ] <= 0 || mesh.morphTargetInfluences[ 1 ] >= 1 ) {
 

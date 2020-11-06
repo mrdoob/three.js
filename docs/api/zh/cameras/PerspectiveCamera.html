@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,18 +18,22 @@
 
 		</p>
 
+		<h2>代码示例</h2>
 
-		<h2>示例</h2>
+		<code>
+		const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+		scene.add( camera );
+		</code>
 
-		<p>[example:webgl_animation_skinning_blending animation / skinning / blending ]</p>
-		<p>[example:webgl_animation_skinning_morph animation / skinning / blending ]</p>
-		<p>[example:webgl_effects_stereo effects / stereo ]</p>
-		<p>[example:webgl_interactive_cubes interactive / cubes ]</p>
-		<p>[example:webgl_loader_collada_skinning loader / collada / skinning ]</p>
+		<h2>例子</h2>
 
-		<code>var camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
-scene.add( camera );</code>
-
+		<p>
+			[example:webgl_animation_skinning_blending animation / skinning / blending ]<br />
+			[example:webgl_animation_skinning_morph animation / skinning / blending ]<br />
+			[example:webgl_effects_stereo effects / stereo ]<br />
+			[example:webgl_interactive_cubes interactive / cubes ]<br />
+			[example:webgl_loader_collada_skinning loader / collada / skinning ]
+		</p>
 
 		<h2>构造器</h2>
 
@@ -58,7 +61,7 @@ scene.add( camera );</code>
 		<p>
 			摄像机的远端面，默认值是*2000*。
 			<br /><br />
-			其有效值范围是在当前摄像机[page:.near near] plane（近端面）的值到无穷远之间。
+			该值必须大于[page:.near near] plane（摄像机视锥体近端面）的值。
 		</p>
 
 		<h3>[property:Float filmGauge]</h3>
@@ -76,15 +79,6 @@ scene.add( camera );</code>
 
 		<h3>[property:Float fov]</h3>
 		<p>摄像机视锥体垂直视野角度，从视图的底部到顶部，以角度来表示。默认值是*50*。</p>
-
-		<h3>[property:Boolean isPerspectiveCamera]</h3>
-		<p>
-
-			用于测试这个类或者派生类是否为PerspectiveCameras，默认为true。
-			<br /><br />
-
-			你不应当对这个属性进行改变,因为它在内部由渲染器使用，以用于优化。
-		</p>
 
 
 		<h3>[property:Float near]</h3>
@@ -159,10 +153,10 @@ scene.add( camera );</code>
 		</pre>
 		那对于每个显示器，你可以这样来设置、调用：<br />
 
-		<code>var w = 1920;
-var h = 1080;
-var fullWidth = w * 3;
-var fullHeight = h * 2;
+		<code>const w = 1920;
+const h = 1080;
+const fullWidth = w * 3;
+const fullHeight = h * 2;
 
 // A
 camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
@@ -185,7 +179,7 @@ camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 		更新摄像机投影矩阵。在任何参数被改变以后必须被调用。
 		</p>
 
-		<h3>[method:Object toJSON]([param:object meta])</h3>
+		<h3>[method:Object toJSON]([param:Object meta])</h3>
 		<p>
 		meta -- 包含有元数据的对象，例如对象后代中的纹理或图像<br />
 		将摄像机转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。

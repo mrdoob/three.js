@@ -44,7 +44,7 @@
 
 		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 direct loader test
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 direct loader test
 			<div id="feedback"></div>
 		</div>
 
@@ -62,6 +62,7 @@
 
 
 			const OBJLoader2Example = function ( elementToBindTo ) {
+
 				this.renderer = null;
 				this.canvas = elementToBindTo;
 				this.aspectRatio = 1;
@@ -79,6 +80,7 @@
 				this.cameraTarget = this.cameraDefaults.posCameraTarget;
 
 				this.controls = null;
+
 			};
 
 			OBJLoader2Example.prototype = {
@@ -86,6 +88,7 @@
 				constructor: OBJLoader2Example,
 
 				initGL: function () {
+
 					this.renderer = new THREE.WebGLRenderer( {
 						canvas: this.canvas,
 						antialias: true,
@@ -99,9 +102,9 @@
 					this.resetCamera();
 					this.controls = new TrackballControls( this.camera, this.renderer.domElement );
 
-					let ambientLight = new THREE.AmbientLight( 0x404040 );
-					let directionalLight1 = new THREE.DirectionalLight( 0xC0C090 );
-					let directionalLight2 = new THREE.DirectionalLight( 0xC0C090 );
+					const ambientLight = new THREE.AmbientLight( 0x404040 );
+					const directionalLight1 = new THREE.DirectionalLight( 0xC0C090 );
+					const directionalLight2 = new THREE.DirectionalLight( 0xC0C090 );
 
 					directionalLight1.position.set( - 100, - 50, 100 );
 					directionalLight2.position.set( 100, 50, - 100 );
@@ -110,86 +113,111 @@
 					this.scene.add( directionalLight2 );
 					this.scene.add( ambientLight );
 
-					let helper = new THREE.GridHelper( 1200, 60, 0xFF4444, 0x404040 );
+					const helper = new THREE.GridHelper( 1200, 60, 0xFF4444, 0x404040 );
 					this.scene.add( helper );
+
 				},
 
 				initContent: function () {
-					let modelName = 'female02';
+
+					const modelName = 'female02';
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
 
-					let scope = this;
-					let objLoader2 = new OBJLoader2();
-					let callbackOnLoad = function ( object3d ) {
+					const scope = this;
+					const objLoader2 = new OBJLoader2();
+					const callbackOnLoad = function ( object3d ) {
+
 						scope.scene.add( object3d );
 						console.log( 'Loading complete: ' + modelName );
 						scope._reportProgress( { detail: { text: '' } } );
+
 					};
 
-					let onLoadMtl = function ( mtlParseResult ) {
+					const onLoadMtl = function ( mtlParseResult ) {
+
 						objLoader2.setModelName( modelName );
 						objLoader2.setLogging( true, true );
 						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ), true );
 						objLoader2.load( 'models/obj/female02/female02.obj', callbackOnLoad, null, null, null );
+
 					};
-					let mtlLoader = new MTLLoader();
+
+					const mtlLoader = new MTLLoader();
 					mtlLoader.load( 'models/obj/female02/female02.mtl', onLoadMtl );
+
 				},
 
 				_reportProgress: function ( event ) {
+
 					let output = '';
 					if ( event.detail !== null && event.detail !== undefined && event.detail.text ) {
 
 						output = event.detail.text;
 
 					}
+
 					console.log( 'Progress: ' + output );
 					document.getElementById( 'feedback' ).innerHTML = output;
+
 				},
 
 				resizeDisplayGL: function () {
+
 					this.controls.handleResize();
 
 					this.recalcAspectRatio();
 					this.renderer.setSize( this.canvas.offsetWidth, this.canvas.offsetHeight, false );
 
 					this.updateCamera();
+
 				},
 
 				recalcAspectRatio: function () {
-					this.aspectRatio = (this.canvas.offsetHeight === 0) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
+
+					this.aspectRatio = ( this.canvas.offsetHeight === 0 ) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
+
 				},
 
 				resetCamera: function () {
+
 					this.camera.position.copy( this.cameraDefaults.posCamera );
 					this.cameraTarget.copy( this.cameraDefaults.posCameraTarget );
 
 					this.updateCamera();
+
 				},
 
 				updateCamera: function () {
+
 					this.camera.aspect = this.aspectRatio;
 					this.camera.lookAt( this.cameraTarget );
 					this.camera.updateProjectionMatrix();
+
 				},
 
 				render: function () {
-					if ( !this.renderer.autoClear ) this.renderer.clear();
+
+					if ( ! this.renderer.autoClear ) this.renderer.clear();
 					this.controls.update();
 					this.renderer.render( this.scene, this.camera );
+
 				}
 			};
 
-			let app = new OBJLoader2Example( document.getElementById( 'example' ) );
+			const app = new OBJLoader2Example( document.getElementById( 'example' ) );
 
-			let resizeWindow = function () {
+			const resizeWindow = function () {
+
 				app.resizeDisplayGL();
+
 			};
 
-			let render = function () {
+			const render = function () {
+
 				requestAnimationFrame( render );
 				app.render();
+
 			};
 
 			window.addEventListener( 'resize', resizeWindow, false );

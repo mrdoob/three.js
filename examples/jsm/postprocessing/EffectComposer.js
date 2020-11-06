@@ -1,7 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 import {
 	Clock,
 	LinearFilter,
@@ -26,8 +22,7 @@ var EffectComposer = function ( renderer, renderTarget ) {
 		var parameters = {
 			minFilter: LinearFilter,
 			magFilter: LinearFilter,
-			format: RGBAFormat,
-			stencilBuffer: false
+			format: RGBAFormat
 		};
 
 		var size = renderer.getSize( new Vector2() );
@@ -97,6 +92,7 @@ Object.assign( EffectComposer.prototype, {
 	insertPass: function ( pass, index ) {
 
 		this.passes.splice( index, 0, pass );
+		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
 
 	},
 
@@ -293,6 +289,12 @@ Pass.FullScreenQuad = ( function () {
 	} );
 
 	Object.assign( FullScreenQuad.prototype, {
+
+		dispose: function () {
+
+			this._mesh.geometry.dispose();
+
+		},
 
 		render: function ( renderer ) {
 

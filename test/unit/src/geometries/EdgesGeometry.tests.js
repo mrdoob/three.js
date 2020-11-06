@@ -1,7 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
 import { EdgesGeometry } from '../../../../src/geometries/EdgesGeometry';
@@ -90,7 +86,7 @@ function createIndexedBufferGeometry( vertList, idxList ) {
 	vertices = vertices.subarray( 0, 3 * numVerts );
 
 	geom.setIndex( new BufferAttribute( indices, 1 ) );
-	geom.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+	geom.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 
 	geom.computeFaceNormals();
 
@@ -289,7 +285,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( "three triangles, coplanar first", ( assert ) => {
 
-			testEdges( vertList, [ 0, 1, 2, 0, 2, 3, 0, 4, 2 ], 7, assert );
+			testEdges( vertList, [ 0, 2, 3, 0, 1, 2, 0, 4, 2 ], 7, assert );
 
 		} );
 

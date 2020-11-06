@@ -1,34 +1,3 @@
-/**
- * @author takahiro / https://github.com/takahirox
- *
- * Dependencies
- *  - mmd-parser https://github.com/takahirox/mmd-parser
- *  - TGALoader
- *  - OutlineEffect
- *
- * MMDLoader creates Three.js Objects from MMD resources as
- * PMD, PMX, VMD, and VPD files.
- *
- * PMD/PMX is a model data format, VMD is a motion data format
- * VPD is a posing data format used in MMD(Miku Miku Dance).
- *
- * MMD official site
- *  - http://www.geocities.jp/higuchuu4/index_e.htm
- *
- * PMD, VMD format (in Japanese)
- *  - http://blog.goo.ne.jp/torisu_tetosuki/e/209ad341d3ece2b1b4df24abf619d6e4
- *
- * PMX format
- *  - https://gist.github.com/felixjones/f8a06bd48f9da9a4539f
- *
- * TODO
- *  - light motion in vmd support.
- *  - SDEF support.
- *  - uv/material/bone morphing support.
- *  - more precise grant skinning support.
- *  - shadow support.
- */
-
 import {
 	AddOperation,
 	AnimationClip,
@@ -55,7 +24,6 @@ import {
 	RepeatWrapping,
 	Skeleton,
 	SkinnedMesh,
-	SphericalReflectionMapping,
 	SrcAlphaFactor,
 	TextureLoader,
 	Uint16BufferAttribute,
@@ -64,6 +32,35 @@ import {
 } from "../../../build/three.module.js";
 import { TGALoader } from "../loaders/TGALoader.js";
 import { MMDParser } from "../libs/mmdparser.module.js";
+
+/**
+ * Dependencies
+ *  - mmd-parser https://github.com/takahirox/mmd-parser
+ *  - TGALoader
+ *  - OutlineEffect
+ *
+ * MMDLoader creates Three.js Objects from MMD resources as
+ * PMD, PMX, VMD, and VPD files.
+ *
+ * PMD/PMX is a model data format, VMD is a motion data format
+ * VPD is a posing data format used in MMD(Miku Miku Dance).
+ *
+ * MMD official site
+ *  - https://sites.google.com/view/evpvp/
+ *
+ * PMD, VMD format (in Japanese)
+ *  - http://blog.goo.ne.jp/torisu_tetosuki/e/209ad341d3ece2b1b4df24abf619d6e4
+ *
+ * PMX format
+ *  - https://gist.github.com/felixjones/f8a06bd48f9da9a4539f
+ *
+ * TODO
+ *  - light motion in vmd support.
+ *  - SDEF support.
+ *  - uv/material/bone morphing support.
+ *  - more precise grant skinning support.
+ *  - shadow support.
+ */
 
 var MMDLoader = ( function () {
 
@@ -220,6 +217,8 @@ var MMDLoader = ( function () {
 				.setMimeType( undefined )
 				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader )
+				.setWithCredentials( this.withCredentials )
 				.load( url, function ( buffer ) {
 
 					onLoad( parser.parsePmd( buffer, true ) );
@@ -244,6 +243,8 @@ var MMDLoader = ( function () {
 				.setMimeType( undefined )
 				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader )
+				.setWithCredentials( this.withCredentials )
 				.load( url, function ( buffer ) {
 
 					onLoad( parser.parsePmx( buffer, true ) );
@@ -273,7 +274,9 @@ var MMDLoader = ( function () {
 			this.loader
 				.setMimeType( undefined )
 				.setPath( this.animationPath )
-				.setResponseType( 'arraybuffer' );
+				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader )
+				.setWithCredentials( this.withCredentials );
 
 			for ( var i = 0, il = urls.length; i < il; i ++ ) {
 
@@ -306,6 +309,8 @@ var MMDLoader = ( function () {
 				.setMimeType( isUnicode ? undefined : 'text/plain; charset=shift_jis' )
 				.setPath( this.animationPath )
 				.setResponseType( 'text' )
+				.setRequestHeader( this.requestHeader )
+				.setWithCredentials( this.withCredentials )
 				.load( url, function ( text ) {
 
 					onLoad( parser.parseVpd( text, true ) );
@@ -333,7 +338,7 @@ var MMDLoader = ( function () {
 
 				}
 
-				this.parser = new MMDParser.Parser();
+				this.parser = new MMDParser.Parser(); // eslint-disable-line no-undef
 
 			}
 
@@ -941,11 +946,11 @@ var MMDLoader = ( function () {
 
 			var geometry = new BufferGeometry();
 
-			geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-			geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-			geometry.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
-			geometry.addAttribute( 'skinIndex', new Uint16BufferAttribute( skinIndices, 4 ) );
-			geometry.addAttribute( 'skinWeight', new Float32BufferAttribute( skinWeights, 4 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+			geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+			geometry.setAttribute( 'skinIndex', new Uint16BufferAttribute( skinIndices, 4 ) );
+			geometry.setAttribute( 'skinWeight', new Float32BufferAttribute( skinWeights, 4 ) );
 			geometry.setIndex( indices );
 
 			for ( var i = 0, il = groups.length; i < il; i ++ ) {
@@ -958,6 +963,7 @@ var MMDLoader = ( function () {
 
 			geometry.morphTargets = morphTargets;
 			geometry.morphAttributes.position = morphPositions;
+			geometry.morphTargetsRelative = false;
 
 			geometry.userData.MMD = {
 				bones: bones,
@@ -1050,7 +1056,6 @@ var MMDLoader = ( function () {
 				 *
 				 * MMD         MeshToonMaterial
 				 * diffuse  -  color
-				 * specular -  specular
 				 * ambient  -  emissive * a
 				 *               (a = 1.0 without map texture or 0.2 with map texture)
 				 *
@@ -1059,9 +1064,7 @@ var MMDLoader = ( function () {
 				 */
 				params.color = new Color().fromArray( material.diffuse );
 				params.opacity = material.diffuse[ 3 ];
-				params.specular = new Color().fromArray( material.specular );
 				params.emissive = new Color().fromArray( material.ambient );
-				params.shininess = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
 				params.transparent = params.opacity !== 1.0;
 
 				//
@@ -1110,8 +1113,7 @@ var MMDLoader = ( function () {
 
 							params.envMap = this._loadTexture(
 								fileNames[ 1 ],
-								textures,
-								{ sphericalReflectionMapping: true }
+								textures
 							);
 
 							params.combine = extension === '.sph'
@@ -1162,7 +1164,7 @@ var MMDLoader = ( function () {
 
 						params.envMap = this._loadTexture(
 							data.textures[ material.envTextureIndex ],
-							textures, { sphericalReflectionMapping: true }
+							textures
 						);
 
 						params.combine = material.envFlag === 1
@@ -1319,7 +1321,7 @@ var MMDLoader = ( function () {
 
 				try {
 
-					index = parseInt( filePath.match( 'toon([0-9]{2})\.bmp$' )[ 1 ] );
+					index = parseInt( filePath.match( /toon([0-9]{2})\.bmp$/ )[ 1 ] );
 
 				} catch ( e ) {
 
@@ -1377,12 +1379,6 @@ var MMDLoader = ( function () {
 				delete texture.readyCallbacks;
 
 			}, onProgress, onError );
-
-			if ( params.sphericalReflectionMapping === true ) {
-
-				texture.mapping = SphericalReflectionMapping;
-
-			}
 
 			texture.readyCallbacks = [];
 

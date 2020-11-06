@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shader material demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank" rel="noopener">Monjori by Mic</a></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shader material demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank" rel="noopener">Monjori by Mic</a></div>
 
 		<script id="fragment_shader4" type="x-shader/x-fragment">
 
@@ -137,18 +137,18 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var container, stats;
+			let stats;
 
-			var camera, scene, renderer, clock;
+			let camera, scene, renderer, clock;
 
-			var uniforms1, uniforms2;
+			let uniforms1, uniforms2;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 4;
@@ -157,7 +157,7 @@
 
 				clock = new THREE.Clock();
 
-				var geometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 0.75 );
+				const geometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 0.75 );
 
 				uniforms1 = {
 					"time": { value: 1.0 }
@@ -170,16 +170,16 @@
 
 				uniforms2[ "colorTexture" ].value.wrapS = uniforms2[ "colorTexture" ].value.wrapT = THREE.RepeatWrapping;
 
-				var params = [
+				const params = [
 					[ 'fragment_shader1', uniforms1 ],
 					[ 'fragment_shader2', uniforms2 ],
 					[ 'fragment_shader3', uniforms1 ],
 					[ 'fragment_shader4', uniforms1 ]
 				];
 
-				for ( var i = 0; i < params.length; i ++ ) {
+				for ( let i = 0; i < params.length; i ++ ) {
 
-					var material = new THREE.ShaderMaterial( {
+					const material = new THREE.ShaderMaterial( {
 
 						uniforms: params[ i ][ 1 ],
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -187,7 +187,7 @@
 
 					} );
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = i - ( params.length - 1 ) / 2;
 					mesh.position.y = i % 2 - 0.5;
 					scene.add( mesh );
@@ -229,14 +229,14 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				uniforms1[ "time" ].value += delta * 5;
 				uniforms2[ "time" ].value = clock.elapsedTime;
 
-				for ( var i = 0; i < scene.children.length; i ++ ) {
+				for ( let i = 0; i < scene.children.length; i ++ ) {
 
-					var object = scene.children[ i ];
+					const object = scene.children[ i ];
 
 					object.rotation.y += delta * 0.5 * ( i % 2 ? 1 : - 1 );
 					object.rotation.x += delta * 0.5 * ( i % 2 ? - 1 : 1 );

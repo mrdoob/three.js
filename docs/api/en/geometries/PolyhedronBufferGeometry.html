@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,14 +18,14 @@
 			and [page:TetrahedronBufferGeometry] to generate their respective geometries.
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 <code>
-var verticesOfCube = [
+const verticesOfCube = [
     -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
     -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
 ];
 
-var indicesOfFaces = [
+const indicesOfFaces = [
     2,1,0,    0,3,2,
     0,4,7,    7,3,0,
     0,1,5,    5,4,0,
@@ -35,7 +34,7 @@ var indicesOfFaces = [
     4,5,6,    6,7,4
 ];
 
-var geometry = new THREE.PolyhedronBufferGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
+const geometry = new THREE.PolyhedronBufferGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
 </code>
 
 		<h2>Constructor</h2>
@@ -62,6 +61,8 @@ var geometry = new THREE.PolyhedronBufferGeometry( verticesOfCube, indicesOfFace
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/PolyhedronGeometry.js src/geometries/PolyhedronGeometry.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

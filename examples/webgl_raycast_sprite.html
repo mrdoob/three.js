@@ -17,15 +17,15 @@
 		</style>
 	</head>
 <body>
-	<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raycast sprite<br></div>
+	<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raycast sprite<br></div>
 
 	<script type="module">
 		import * as THREE from '../build/three.module.js';
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-		var renderer, scene, camera;
-		var controls, group;
+		let renderer, scene, camera;
+		let controls, group;
 
 		init();
 		animate();
@@ -55,30 +55,30 @@
 
 			// add sprites
 
-			var sprite = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f' } ) );
-			sprite.position.set( 6, 5, 5 );
-			sprite.scale.set( 2, 5, 1 );
-			group.add( sprite );
+			const sprite1 = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f' } ) );
+			sprite1.position.set( 6, 5, 5 );
+			sprite1.scale.set( 2, 5, 1 );
+			group.add( sprite1 );
 
-			var sprite = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f', sizeAttenuation: false } ) );
-			sprite.material.rotation = Math.PI / 3 * 4;
-			sprite.position.set( 8, - 2, 2 );
-			sprite.center.set( 0.5, 0 );
-			sprite.scale.set( .1, .5, .1 );
-			group.add( sprite );
+			const sprite2 = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f', sizeAttenuation: false } ) );
+			sprite2.material.rotation = Math.PI / 3 * 4;
+			sprite2.position.set( 8, - 2, 2 );
+			sprite2.center.set( 0.5, 0 );
+			sprite2.scale.set( .1, .5, .1 );
+			group.add( sprite2 );
 
-			var group2 = new THREE.Object3D();
+			const group2 = new THREE.Object3D();
 			group2.scale.set( 1, 2, 1 );
 			group2.position.set( - 5, 0, 0 );
 			group2.rotation.set( Math.PI / 2, 0, 0 );
 			group.add( group2 );
 
-			var sprite = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f' } ) );
-			sprite.position.set( 0, 2, 5 );
-			sprite.scale.set( 10, 2, 3 );
-			sprite.center.set( - 0.1, 0 );
-			sprite.material.rotation = Math.PI / 3;
-			group2.add( sprite );
+			const sprite3 = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f' } ) );
+			sprite3.position.set( 0, 2, 5 );
+			sprite3.scale.set( 10, 2, 3 );
+			sprite3.center.set( - 0.1, 0 );
+			sprite3.material.rotation = Math.PI / 3;
+			group2.add( sprite3 );
 
 			window.addEventListener( 'resize', onWindowResize, false );
 			window.addEventListener( "mousemove", onDocumentMouseMove, false );
@@ -101,7 +101,7 @@
 
 		}
 
-		var selectedObject = null;
+		let selectedObject = null;
 
 		function onDocumentMouseMove( event ) {
 
@@ -113,10 +113,11 @@
 
 			}
 
-			var intersects = getIntersects( event.layerX, event.layerY );
+			const intersects = getIntersects( event.layerX, event.layerY );
+
 			if ( intersects.length > 0 ) {
 
-				var res = intersects.filter( function ( res ) {
+				const res = intersects.filter( function ( res ) {
 
 					return res && res.object;
 
@@ -133,8 +134,8 @@
 
 		}
 
-		var raycaster = new THREE.Raycaster();
-		var mouseVector = new THREE.Vector3();
+		const raycaster = new THREE.Raycaster();
+		const mouseVector = new THREE.Vector3();
 
 		function getIntersects( x, y ) {
 

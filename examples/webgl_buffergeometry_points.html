@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - particles</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - particles</div>
 
 		<script type="module">
 
@@ -17,11 +17,11 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var points;
+			let points;
 
 			init();
 			animate();
@@ -41,32 +41,32 @@
 
 				//
 
-				var particles = 500000;
+				const particles = 500000;
 
-				var geometry = new THREE.BufferGeometry();
+				const geometry = new THREE.BufferGeometry();
 
-				var positions = [];
-				var colors = [];
+				const positions = [];
+				const colors = [];
 
-				var color = new THREE.Color();
+				const color = new THREE.Color();
 
-				var n = 1000, n2 = n / 2; // particles spread in the cube
+				const n = 1000, n2 = n / 2; // particles spread in the cube
 
-				for ( var i = 0; i < particles; i ++ ) {
+				for ( let i = 0; i < particles; i ++ ) {
 
 					// positions
 
-					var x = Math.random() * n - n2;
-					var y = Math.random() * n - n2;
-					var z = Math.random() * n - n2;
+					const x = Math.random() * n - n2;
+					const y = Math.random() * n - n2;
+					const z = Math.random() * n - n2;
 
 					positions.push( x, y, z );
 
 					// colors
 
-					var vx = ( x / n ) + 0.5;
-					var vy = ( y / n ) + 0.5;
-					var vz = ( z / n ) + 0.5;
+					const vx = ( x / n ) + 0.5;
+					const vy = ( y / n ) + 0.5;
+					const vz = ( z / n ) + 0.5;
 
 					color.setRGB( vx, vy, vz );
 
@@ -74,14 +74,14 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				geometry.computeBoundingSphere();
 
 				//
 
-				var material = new THREE.PointsMaterial( { size: 15, vertexColors: THREE.VertexColors } );
+				const material = new THREE.PointsMaterial( { size: 15, vertexColors: true } );
 
 				points = new THREE.Points( geometry, material );
 				scene.add( points );
@@ -127,7 +127,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
 				points.rotation.x = time * 0.25;
 				points.rotation.y = time * 0.5;

@@ -5,15 +5,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			a {
-				color: #08f;
-			}
-		</style>
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry constructed from geometry<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry constructed from geometry<br/>
 			by <a target="_blank" href="http://callum.com">Callum Prentice</a>
 		</div>
 
@@ -25,7 +20,7 @@
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
-			var camera, scene, renderer, controls, stats;
+			let camera, scene, renderer, controls, stats;
 
 			init();
 			animate();
@@ -50,7 +45,7 @@
 
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
 
-				var light = new THREE.PointLight( 0xffffff, 0.7 );
+				const light = new THREE.PointLight( 0xffffff, 0.7 );
 				camera.add( light );
 
 				createScene();
@@ -64,8 +59,8 @@
 
 			function createGeometry() {
 
-				var heartShape = new THREE.Shape(); // From http://blog.burlock.org/html5/130-paths
-				var x = 0, y = 0;
+				const heartShape = new THREE.Shape(); // From http://blog.burlock.org/html5/130-paths
+				const x = 0, y = 0;
 
 				heartShape.moveTo( x + 25, y + 25 );
 				heartShape.bezierCurveTo( x + 25, y + 25, x + 20, y, x, y );
@@ -75,7 +70,7 @@
 				heartShape.bezierCurveTo( x + 80, y + 35, x + 80, y, x + 50, y );
 				heartShape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
 
-				var extrudeSettings = {
+				const extrudeSettings = {
 					depth: 16,
 					bevelEnabled: true,
 					bevelSegments: 1,
@@ -84,7 +79,7 @@
 					bevelThickness: 1
 				};
 
-				var geometry = new THREE.ExtrudeGeometry( heartShape, extrudeSettings );
+				const geometry = new THREE.ExtrudeGeometry( heartShape, extrudeSettings );
 				geometry.rotateX( Math.PI );
 				geometry.scale( 0.4, 0.4, 0.4 );
 
@@ -94,25 +89,25 @@
 
 			function createScene() {
 
-				var bufferGeometry = new THREE.BufferGeometry();
+				const bufferGeometry = new THREE.BufferGeometry();
 
-				var radius = 125;
-				var count = 80;
+				const radius = 125;
+				const count = 80;
 
-				var positions = [];
-				var normals = [];
-				var colors = [];
+				const positions = [];
+				const normals = [];
+				const colors = [];
 
-				var vector = new THREE.Vector3();
+				const vector = new THREE.Vector3();
 
-				var color = new THREE.Color( 0xffffff );
-				var heartGeometry = createGeometry();
-				var geometry = new THREE.Geometry();
+				const color = new THREE.Color( 0xffffff );
+				const heartGeometry = createGeometry();
+				const geometry = new THREE.Geometry();
 
-				for ( var i = 1, l = count; i <= l; i ++ ) {
+				for ( let i = 1, l = count; i <= l; i ++ ) {
 
-					var phi = Math.acos( - 1 + ( 2 * i ) / l );
-					var theta = Math.sqrt( l * Math.PI ) * phi;
+					const phi = Math.acos( - 1 + ( 2 * i ) / l );
+					const theta = Math.sqrt( l * Math.PI ) * phi;
 
 					vector.setFromSphericalCoords( radius, phi, theta );
 
@@ -158,13 +153,13 @@
 
 				}
 
-				bufferGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-				bufferGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-				bufferGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				bufferGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				bufferGeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+				bufferGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.MeshPhongMaterial( { shininess: 80, vertexColors: THREE.VertexColors } );
+				const material = new THREE.MeshPhongMaterial( { shininess: 80, vertexColors: true } );
 
-				var mesh = new THREE.Mesh( bufferGeometry, material );
+				const mesh = new THREE.Mesh( bufferGeometry, material );
 				scene.add( mesh );
 
 			}

@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Mesh } from '../../../../src/objects/Mesh';
@@ -25,11 +22,6 @@ export default QUnit.module( 'Objects', () => {
 
 		// PUBLIC STUFF
 		QUnit.todo( "isMesh", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-		QUnit.todo( "setDrawMode", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -32,14 +32,14 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { SubdivisionModifier } from './jsm/modifiers/SubdivisionModifier.js';
 
-			var camera, scene, renderer, stats, smoothMesh, wireframe;
+			let camera, scene, renderer, stats, smoothMesh, wireframe;
 
-			var smoothMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
-			var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, opacity: 0.15, transparent: true } );
+			const smoothMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: true } );
+			const wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, opacity: 0.15, transparent: true } );
 
-			var faceIndices = [ 'a', 'b', 'c' ];
+			const faceIndices = [ 'a', 'b', 'c' ];
 
-			var params = {
+			const params = {
 				subdivisions: 2
 			};
 
@@ -53,23 +53,23 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var light = new THREE.PointLight( 0xffffff, 1.5 );
+				const light = new THREE.PointLight( 0xffffff, 1.5 );
 				light.position.set( 1000, 1000, 2000 );
 				scene.add( light );
 
-				var loader = new THREE.BufferGeometryLoader();
+				const loader = new THREE.BufferGeometryLoader();
 				loader.load( 'models/json/WaltHeadLo_buffergeometry.json', function ( bufferGeometry ) {
 
 					// converting to legacy THREE.Geometry because SubdivisionModifier only returns THREE.Geometry
 
-					var geometry = new THREE.Geometry().fromBufferGeometry( bufferGeometry );
+					const geometry = new THREE.Geometry().fromBufferGeometry( bufferGeometry );
 					geometry.mergeVertices();
 
-					var material = new THREE.MeshBasicMaterial( { color: 0xcccccc, wireframe: true } );
-					var mesh = new THREE.Mesh( bufferGeometry, material );
+					const material = new THREE.MeshBasicMaterial( { color: 0xcccccc, wireframe: true } );
+					const mesh = new THREE.Mesh( bufferGeometry, material );
 					scene.add( mesh );
 
-					var gui = new GUI();
+					const gui = new GUI();
 
 					gui.add( params, 'subdivisions', 0, 3 ).step( 1 ).onChange( function ( subdivisions ) {
 
@@ -94,7 +94,7 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 400;
 
@@ -110,23 +110,23 @@
 
 			function subdivide( geometry, subdivisions ) {
 
-				var modifier = new SubdivisionModifier( subdivisions );
+				const modifier = new SubdivisionModifier( subdivisions );
 
-				var smoothGeometry = modifier.modify( geometry );
+				const smoothGeometry = modifier.modify( geometry );
 
 				// colorify faces
 
-				for ( var i = 0; i < smoothGeometry.faces.length; i ++ ) {
+				for ( let i = 0; i < smoothGeometry.faces.length; i ++ ) {
 
-					var face = smoothGeometry.faces[ i ];
+					const face = smoothGeometry.faces[ i ];
 
-					for ( var j = 0; j < 3; j ++ ) {
+					for ( let j = 0; j < 3; j ++ ) {
 
-						var vertexIndex = face[ faceIndices[ j ] ];
-						var vertex = smoothGeometry.vertices[ vertexIndex ];
+						const vertexIndex = face[ faceIndices[ j ] ];
+						const vertex = smoothGeometry.vertices[ vertexIndex ];
 
-						var hue = ( vertex.y / 200 ) + 0.5;
-						var color = new THREE.Color().setHSL( hue, 1, 0.5 );
+						const hue = ( vertex.y / 200 ) + 0.5;
+						const color = new THREE.Color().setHSL( hue, 1, 0.5 );
 						face.vertexColors[ j ] = color;
 
 					}

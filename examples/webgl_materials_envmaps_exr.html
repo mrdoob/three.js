@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Example of an IBL (Image based lighting) pipeline based around<br> equirectangular EXR lightprobe data. Created by <a href="https://github.com/richardmonette" target="_blank" rel="noopener">Richard Monette</a></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Example of an IBL (Image based lighting) pipeline based around<br> equirectangular EXR lightprobe data. Created by <a href="https://github.com/richardmonette" target="_blank" rel="noopener">Richard Monette</a></div>
 
 		<script type="module">
 
@@ -20,10 +20,8 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
-			var params = {
+			const params = {
 				envMap: 'EXR',
 				roughness: 0.0,
 				metalness: 0.0,
@@ -31,11 +29,11 @@
 				debug: false,
 			};
 
-			var container, stats;
-			var camera, scene, renderer, controls;
-			var torusMesh, planeMesh;
-			var pngCubeRenderTarget, exrCubeRenderTarget;
-			var pngBackground, exrBackground;
+			let container, stats;
+			let camera, scene, renderer, controls;
+			let torusMesh, planeMesh;
+			let pngCubeRenderTarget, exrCubeRenderTarget;
+			let pngBackground, exrBackground;
 
 			init();
 			animate();
@@ -51,12 +49,11 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.toneMapping = THREE.LinearToneMapping;
 
 				//
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
-				var material = new THREE.MeshStandardMaterial( {
+				let geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				let material = new THREE.MeshStandardMaterial( {
 					metalness: params.roughness,
 					roughness: params.metalness,
 					envMapIntensity: 1.0
@@ -65,34 +62,28 @@
 				torusMesh = new THREE.Mesh( geometry, material );
 				scene.add( torusMesh );
 
-				var geometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				var material = new THREE.MeshBasicMaterial();
+				geometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				material = new THREE.MeshBasicMaterial();
 
 				planeMesh = new THREE.Mesh( geometry, material );
 				planeMesh.position.y = - 50;
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
+				THREE.DefaultLoadingManager.onLoad = function ( ) {
+
+					pmremGenerator.dispose();
+
+				};
+
 				new EXRLoader()
-					.setDataType( THREE.HalfFloatType )
+					.setDataType( THREE.UnsignedByteType )
 					.load( 'textures/piz_compressed.exr', function ( texture ) {
 
-						texture.minFilter = THREE.NearestFilter;
-						texture.encoding = THREE.LinearEncoding;
-
-						exrBackground = new THREE.WebGLRenderTargetCube( 512, 512 ).fromEquirectangularTexture( renderer, texture );
-
-						var pmremGenerator = new PMREMGenerator( exrBackground.texture );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						exrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+						exrCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
+						exrBackground = exrCubeRenderTarget.texture;
 
 						texture.dispose();
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
 
 					} );
 
@@ -100,29 +91,24 @@
 
 					texture.encoding = THREE.sRGBEncoding;
 
-					pngBackground = new THREE.WebGLRenderTargetCube( 512, 512 ).fromEquirectangularTexture( renderer, texture );
+					pngCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
 
-					var pmremGenerator = new PMREMGenerator( pngBackground.texture );
-					pmremGenerator.update( renderer );
-
-					var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
-
-					pngCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+					pngBackground = pngCubeRenderTarget.texture;
 
 					texture.dispose();
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
 
 				} );
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaInput = false;
-				renderer.gammaOutput = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -133,7 +119,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'envMap', [ 'EXR', 'PNG' ] );
 				gui.add( params, 'roughness', 0, 1, 0.01 );
@@ -146,8 +132,8 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -171,8 +157,8 @@
 				torusMesh.material.roughness = params.roughness;
 				torusMesh.material.metalness = params.metalness;
 
-				var newEnvMap = torusMesh.material.envMap;
-				var background = scene.background;
+				let newEnvMap = torusMesh.material.envMap;
+				let background = scene.background;
 
 				switch ( params.envMap ) {
 

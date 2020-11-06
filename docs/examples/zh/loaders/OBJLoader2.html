@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -18,11 +17,11 @@
 			vertices, and texture vertices.
 		</p>
 
-		<h2>Examples</h2>
+		<h2>代码示例</h2>
 
 		<code>
 		// instantiate the loader
-		let loader = new THREE.OBJLoader2();
+		let loader = new OBJLoader2();
 
 		// function called on successful load
 		function callbackOnLoad ( object3d ) {
@@ -33,9 +32,11 @@
 		loader.load( 'obj/female02/female02.obj', callbackOnLoad, null, null, null );
 		</code>
 
-		[example:webgl_loader_obj2] - Simple example <br>
-		[example:webgl_loader_obj2_options] - Example for multiple use-cases (parse and load, sync or in parallel to main (see [page:OBJLoader2Parallel]))<br>
-
+		<h2>例子</h2>
+		<p>
+			[example:webgl_loader_obj2] - Simple example<br />
+			[example:webgl_loader_obj2_options] - Example for multiple use-cases (parse and load, sync or in parallel to main (see [page:OBJLoader2Parallel]))
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -56,9 +57,9 @@
 		<p>See the base [page:Loader] class for common methods.</p>
 
 
-		<h3>[method:Object3D parse]( [param:arraybuffer content]|[param:String content] )</h3>
+		<h3>[method:Object3D parse]( [param:Arraybuffer content]|[param:String content] )</h3>
 		<p>
-			[[page:arraybuffer content]|[page:String content]] OBJ data as Uint8Array or String
+			[[page:Arraybuffer content]|[page:String content]] OBJ data as Uint8Array or String
 		</p>
 		<p>
 			Parses OBJ data synchronously from arraybuffer or string and returns the [page:Object3D baseObject3d].
@@ -88,18 +89,18 @@
 		</p>
 
 
-		<h3>[method:OBJLoader2 addMaterialPerSmoothingGroup] ( [param:boolean materialPerSmoothingGroup] )</h3>
+		<h3>[method:OBJLoader2 addMaterialPerSmoothingGroup] ( [param:Boolean materialPerSmoothingGroup] )</h3>
 		<p>
-			[page:boolean materialPerSmoothingGroup]
+			[page:Boolean materialPerSmoothingGroup]
 		</p>
 		<p>
 			Tells whether a material shall be created per smoothing group.
 		</p>
 
 
-		<h3>[method:OBJLoader2 setUseOAsMesh] ( [param:boolean useOAsMesh] )</h3>
+		<h3>[method:OBJLoader2 setUseOAsMesh] ( [param:Boolean useOAsMesh] )</h3>
 		<p>
-			[page:boolean useOAsMesh]
+			[page:Boolean useOAsMesh]
 		</p>
 		<p>
 			Usually 'o' is meta-information and does not result in creation of new meshes, but mesh creation on occurrence of "o" can be enforced.

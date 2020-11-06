@@ -1,7 +1,3 @@
-/**
- * @author bhouston / http://clara.io/
- */
-
 THREE.CubeTexturePass = function ( camera, envMap, opacity ) {
 
 	THREE.Pass.call( this );
@@ -22,6 +18,16 @@ THREE.CubeTexturePass = function ( camera, envMap, opacity ) {
 			side: THREE.BackSide
 		} )
 	);
+
+	Object.defineProperty( this.cubeMesh.material, 'envMap', {
+
+		get: function () {
+
+			return this.uniforms.envMap.value;
+
+		}
+
+	} );
 
 	this.envMap = envMap;
 	this.opacity = ( opacity !== undefined ) ? opacity : 1.0;
@@ -44,8 +50,8 @@ THREE.CubeTexturePass.prototype = Object.assign( Object.create( THREE.Pass.proto
 		this.cubeCamera.projectionMatrix.copy( this.camera.projectionMatrix );
 		this.cubeCamera.quaternion.setFromRotationMatrix( this.camera.matrixWorld );
 
-		this.cubeMesh.material.uniforms[ "tCube" ].value = this.envMap;
-		this.cubeMesh.material.uniforms[ "opacity" ].value = this.opacity;
+		this.cubeMesh.material.uniforms.envMap.value = this.envMap;
+		this.cubeMesh.material.uniforms.opacity.value = this.opacity;
 		this.cubeMesh.material.transparent = ( this.opacity < 1.0 );
 
 		renderer.setRenderTarget( this.renderToScreen ? null : readBuffer );

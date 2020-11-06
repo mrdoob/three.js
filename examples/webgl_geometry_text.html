@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a> &amp; alteredq<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a> &amp; alteredq<br/>
 			type to enter new text, drag to spin the text<br/>
 			<button id="color">change color</button>
 			<button id="font">change font</button>
@@ -24,28 +24,18 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
-
 			THREE.Cache.enabled = true;
 
-			var container, stats, permalink, hex;
+			let container, stats, permalink, hex;
 
-			var camera, cameraTarget, scene, renderer;
+			let camera, cameraTarget, scene, renderer;
 
-			var group, textMesh1, textMesh2, textGeo, materials;
+			let group, textMesh1, textMesh2, textGeo, materials;
 
-			var firstLetter = true;
+			let firstLetter = true;
 
-			var text = "three.js",
+			let text = "three.js",
 
-				height = 20,
-				size = 70,
-				hover = 30,
-
-				curveSegments = 4,
-
-				bevelThickness = 2,
-				bevelSize = 1.5,
 				bevelEnabled = true,
 
 				font = undefined,
@@ -53,9 +43,18 @@
 				fontName = "optimer", // helvetiker, optimer, gentilis, droid sans, droid serif
 				fontWeight = "bold"; // normal bold
 
-			var mirror = true;
+			const height = 20,
+				size = 70,
+				hover = 30,
 
-			var fontMap = {
+				curveSegments = 4,
+
+				bevelThickness = 2,
+				bevelSize = 1.5;
+
+			const mirror = true;
+
+			const fontMap = {
 
 				"helvetiker": 0,
 				"optimer": 1,
@@ -65,35 +64,35 @@
 
 			};
 
-			var weightMap = {
+			const weightMap = {
 
 				"regular": 0,
 				"bold": 1
 
 			};
 
-			var reverseFontMap = [];
-			var reverseWeightMap = [];
+			const reverseFontMap = [];
+			const reverseWeightMap = [];
 
-			for ( var i in fontMap ) reverseFontMap[ fontMap[ i ] ] = i;
-			for ( var i in weightMap ) reverseWeightMap[ weightMap[ i ] ] = i;
+			for ( const i in fontMap ) reverseFontMap[ fontMap[ i ] ] = i;
+			for ( const i in weightMap ) reverseWeightMap[ weightMap[ i ] ] = i;
 
-			var targetRotation = 0;
-			var targetRotationOnMouseDown = 0;
+			let targetRotation = 0;
+			let targetRotationOnPointerDown = 0;
 
-			var mouseX = 0;
-			var mouseXOnMouseDown = 0;
+			let pointerX = 0;
+			let pointerXOnPointerDown = 0;
 
-			var windowHalfX = window.innerWidth / 2;
+			let windowHalfX = window.innerWidth / 2;
 
-			var fontIndex = 1;
+			let fontIndex = 1;
 
 			init();
 			animate();
 
 			function decimalToHex( d ) {
 
-				var hex = Number( d ).toString( 16 );
+				let hex = Number( d ).toString( 16 );
 				hex = "000000".substr( 0, 6 - hex.length ) + hex;
 				return hex.toUpperCase();
 
@@ -121,25 +120,25 @@
 
 				// LIGHTS
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
 				dirLight.position.set( 0, 0, 1 ).normalize();
 				scene.add( dirLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 1.5 );
+				const pointLight = new THREE.PointLight( 0xffffff, 1.5 );
 				pointLight.position.set( 0, 100, 90 );
 				scene.add( pointLight );
 
 				// Get text from hash
 
-				var hash = document.location.hash.substr( 1 );
+				const hash = document.location.hash.substr( 1 );
 
 				if ( hash.length !== 0 ) {
 
-					var colorhash = hash.substring( 0, 6 );
-					var fonthash = hash.substring( 6, 7 );
-					var weighthash = hash.substring( 7, 8 );
-					var bevelhash = hash.substring( 8, 9 );
-					var texthash = hash.substring( 10 );
+					const colorhash = hash.substring( 0, 6 );
+					const fonthash = hash.substring( 6, 7 );
+					const weighthash = hash.substring( 7, 8 );
+					const bevelhash = hash.substring( 8, 9 );
+					const texthash = hash.substring( 10 );
 
 					hex = colorhash;
 					pointLight.color.setHex( parseInt( colorhash, 16 ) );
@@ -172,7 +171,7 @@
 
 				loadFont();
 
-				var plane = new THREE.Mesh(
+				const plane = new THREE.Mesh(
 					new THREE.PlaneBufferGeometry( 10000, 10000 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
 				);
@@ -194,9 +193,9 @@
 
 				// EVENTS
 
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				container.style.touchAction = 'none';
+				container.addEventListener( 'pointerdown', onPointerDown, false );
+
 				document.addEventListener( 'keypress', onDocumentKeyPress, false );
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 
@@ -271,7 +270,7 @@
 
 			function updatePermalink() {
 
-				var link = hex + fontMap[ fontName ] + weightMap[ fontWeight ] + boolToNum( bevelEnabled ) + "#" + encodeURI( text );
+				const link = hex + fontMap[ fontName ] + weightMap[ fontWeight ] + boolToNum( bevelEnabled ) + "#" + encodeURI( text );
 
 				permalink.href = "#" + link;
 				window.location.hash = link;
@@ -287,7 +286,7 @@
 
 				}
 
-				var keyCode = event.keyCode;
+				const keyCode = event.keyCode;
 
 				// backspace
 
@@ -306,7 +305,7 @@
 
 			function onDocumentKeyPress( event ) {
 
-				var keyCode = event.which;
+				const keyCode = event.which;
 
 				// backspace
 
@@ -316,7 +315,7 @@
 
 				} else {
 
-					var ch = String.fromCharCode( keyCode );
+					const ch = String.fromCharCode( keyCode );
 					text += ch;
 
 					refreshText();
@@ -327,7 +326,7 @@
 
 			function loadFont() {
 
-				var loader = new THREE.FontLoader();
+				const loader = new THREE.FontLoader();
 				loader.load( 'fonts/' + fontName + '_' + fontWeight + '.typeface.json', function ( response ) {
 
 					font = response;
@@ -357,35 +356,37 @@
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
 
+				const triangle = new THREE.Triangle();
+
 				// "fix" side normals by removing z-component of normals for side faces
 				// (this doesn't work well for beveled geometry as then we lose nice curvature around z-axis)
 
 				if ( ! bevelEnabled ) {
 
-					var triangleAreaHeuristics = 0.1 * ( height * size );
+					const triangleAreaHeuristics = 0.1 * ( height * size );
 
-					for ( var i = 0; i < textGeo.faces.length; i ++ ) {
+					for ( let i = 0; i < textGeo.faces.length; i ++ ) {
 
-						var face = textGeo.faces[ i ];
+						const face = textGeo.faces[ i ];
 
 						if ( face.materialIndex == 1 ) {
 
-							for ( var j = 0; j < face.vertexNormals.length; j ++ ) {
+							for ( let j = 0; j < face.vertexNormals.length; j ++ ) {
 
 								face.vertexNormals[ j ].z = 0;
 								face.vertexNormals[ j ].normalize();
 
 							}
 
-							var va = textGeo.vertices[ face.a ];
-							var vb = textGeo.vertices[ face.b ];
-							var vc = textGeo.vertices[ face.c ];
+							const va = textGeo.vertices[ face.a ];
+							const vb = textGeo.vertices[ face.b ];
+							const vc = textGeo.vertices[ face.c ];
 
-							var s = GeometryUtils.triangleArea( va, vb, vc );
+							const s = triangle.set( va, vb, vc ).getArea();
 
 							if ( s > triangleAreaHeuristics ) {
 
-								for ( var j = 0; j < face.vertexNormals.length; j ++ ) {
+								for ( let j = 0; j < face.vertexNormals.length; j ++ ) {
 
 									face.vertexNormals[ j ].copy( face.normal );
 
@@ -399,7 +400,7 @@
 
 				}
 
-				var centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+				const centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
 				textGeo = new THREE.BufferGeometry().fromGeometry( textGeo );
 
@@ -444,66 +445,34 @@
 
 			}
 
-			function onDocumentMouseDown( event ) {
+			function onPointerDown( event ) {
 
-				event.preventDefault();
+				if ( event.isPrimary === false ) return;
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.addEventListener( 'mouseout', onDocumentMouseOut, false );
+				pointerXOnPointerDown = event.clientX - windowHalfX;
+				targetRotationOnPointerDown = targetRotation;
 
-				mouseXOnMouseDown = event.clientX - windowHalfX;
-				targetRotationOnMouseDown = targetRotation;
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = event.clientX - windowHalfX;
-
-				targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+				document.addEventListener( 'pointermove', onPointerMove, false );
+				document.addEventListener( 'pointerup', onPointerUp, false );
 
 			}
 
-			function onDocumentMouseUp() {
+			function onPointerMove( event ) {
 
-				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+				if ( event.isPrimary === false ) return;
 
-			}
+				pointerX = event.clientX - windowHalfX;
 
-			function onDocumentMouseOut() {
-
-				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+				targetRotation = targetRotationOnPointerDown + ( pointerX - pointerXOnPointerDown ) * 0.02;
 
 			}
 
-			function onDocumentTouchStart( event ) {
+			function onPointerUp() {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.isPrimary === false ) return;
 
-					event.preventDefault();
-
-					mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
-					targetRotationOnMouseDown = targetRotation;
-
-				}
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length == 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
-
-				}
+				document.removeEventListener( 'pointermove', onPointerMove );
+				document.removeEventListener( 'pointerup', onPointerUp );
 
 			}
 

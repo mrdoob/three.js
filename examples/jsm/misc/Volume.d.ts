@@ -2,7 +2,7 @@ import {
 	Matrix3,
 } from '../../../src/Three';
 
-import { VolumeSlice } from "./VolumeSlice.js";
+import { VolumeSlice } from './VolumeSlice.js';
 
 export class Volume {
 

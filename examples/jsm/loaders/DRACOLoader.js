@@ -1,7 +1,3 @@
-/**
- * @author Don McCurdy / https://www.donmccurdy.com
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,
@@ -93,12 +89,8 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
-
-		if ( this.crossOrigin === 'use-credentials' ) {
-
-			loader.setWithCredentials( true );
-
-		}
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, ( buffer ) => {
 
@@ -131,10 +123,6 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	decodeGeometry: function ( buffer, taskConfig ) {
 
-		var worker;
-		var taskID = this.workerNextTaskID ++;
-		var taskCost = buffer.byteLength;
-
 		// TODO: For backward-compatibility, support 'attributeTypes' objects containing
 		// references (rather than names) to typed array constructors. These must be
 		// serialized before sending them to the worker.
@@ -149,6 +137,43 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
 
 		}
+
+		//
+
+		var taskKey = JSON.stringify( taskConfig );
+
+		// Check for an existing task using this buffer. A transferred buffer cannot be transferred
+		// again from this thread.
+		if ( DRACOLoader.taskCache.has( buffer ) ) {
+
+			var cachedTask = DRACOLoader.taskCache.get( buffer );
+
+			if ( cachedTask.key === taskKey ) {
+
+				return cachedTask.promise;
+
+			} else if ( buffer.byteLength === 0 ) {
+
+				// Technically, it would be possible to wait for the previous task to complete,
+				// transfer the buffer back, and decode again with the second configuration. That
+				// is complex, and I don't know of any reason to decode a Draco buffer twice in
+				// different ways, so this is left unimplemented.
+				throw new Error(
+
+					'THREE.DRACOLoader: Unable to re-decode a buffer with different ' +
+					'settings. Buffer has already been transferred.'
+
+				);
+
+			}
+
+		}
+
+		//
+
+		var worker;
+		var taskID = this.workerNextTaskID ++;
+		var taskCost = buffer.byteLength;
 
 		// Obtain a worker and assign a task, and construct a geometry instance
 		// when the task completes.
@@ -171,8 +196,10 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			.then( ( message ) => this._createGeometry( message.geometry ) );
 
 		// Remove task from the task list.
+		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
 		geometryPending
-			.finally( () => {
+			.catch( () => true )
+			.then( () => {
 
 				if ( worker && taskID ) {
 
@@ -183,6 +210,14 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				}
 
 			} );
+
+		// Cache the task result.
+		DRACOLoader.taskCache.set( buffer, {
+
+			key: taskKey,
+			promise: geometryPending
+
+		} );
 
 		return geometryPending;
 
@@ -205,7 +240,7 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var array = attribute.array;
 			var itemSize = attribute.itemSize;
 
-			geometry.addAttribute( name, new BufferAttribute( array, itemSize ) );
+			geometry.setAttribute( name, new BufferAttribute( array, itemSize ) );
 
 		}
 
@@ -218,12 +253,21 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( this.manager );
 		loader.setPath( this.decoderPath );
 		loader.setResponseType( responseType );
+		loader.setWithCredentials( this.withCredentials );
 
 		return new Promise( ( resolve, reject ) => {
 
 			loader.load( url, resolve, undefined, reject );
 
 		} );
+
+	},
+
+	preload: function () {
+
+		this._initDecoder();
+
+		return this;
 
 	},
 
@@ -384,7 +428,7 @@ DRACOLoader.DRACOWorker = function () {
 
 					};
 
-					DracoDecoderModule( decoderConfig );
+					DracoDecoderModule( decoderConfig ); // eslint-disable-line no-undef
 
 				} );
 				break;
@@ -497,27 +541,7 @@ DRACOLoader.DRACOWorker = function () {
 		// Add index.
 		if ( geometryType === draco.TRIANGULAR_MESH ) {
 
-			// Generate mesh faces.
-			var numFaces = dracoGeometry.num_faces();
-			var numIndices = numFaces * 3;
-			var index = new Uint32Array( numIndices );
-			var indexArray = new draco.DracoInt32Array();
-
-			for ( var i = 0; i < numFaces; ++ i ) {
-
-				decoder.GetFaceFromMesh( dracoGeometry, i, indexArray );
-
-				for ( var j = 0; j < 3; ++ j ) {
-
-					index[ i * 3 + j ] = indexArray.GetValue( j );
-
-				}
-
-			}
-
-			geometry.index = { array: index, itemSize: 1 };
-
-			draco.destroy( indexArray );
+			geometry.index = decodeIndex( draco, decoder, dracoGeometry );
 
 		}
 
@@ -527,71 +551,33 @@ DRACOLoader.DRACOWorker = function () {
 
 	}
 
+	function decodeIndex( draco, decoder, dracoGeometry ) {
+
+		var numFaces = dracoGeometry.num_faces();
+		var numIndices = numFaces * 3;
+		var byteLength = numIndices * 4;
+
+		var ptr = draco._malloc( byteLength );
+		decoder.GetTrianglesUInt32Array( dracoGeometry, byteLength, ptr );
+		var index = new Uint32Array( draco.HEAPF32.buffer, ptr, numIndices ).slice();
+		draco._free( ptr );
+
+		return { array: index, itemSize: 1 };
+
+	}
+
 	function decodeAttribute( draco, decoder, dracoGeometry, attributeName, attributeType, attribute ) {
 
 		var numComponents = attribute.num_components();
 		var numPoints = dracoGeometry.num_points();
 		var numValues = numPoints * numComponents;
-		var dracoArray;
+		var byteLength = numValues * attributeType.BYTES_PER_ELEMENT;
+		var dataType = getDracoDataType( draco, attributeType );
 
-		var array;
-
-		switch ( attributeType ) {
-
-			case Float32Array:
-				dracoArray = new draco.DracoFloat32Array();
-				decoder.GetAttributeFloatForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Float32Array( numValues );
-				break;
-
-			case Int8Array:
-				dracoArray = new draco.DracoInt8Array();
-				decoder.GetAttributeInt8ForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Int8Array( numValues );
-				break;
-
-			case Int16Array:
-				dracoArray = new draco.DracoInt16Array();
-				decoder.GetAttributeInt16ForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Int16Array( numValues );
-				break;
-
-			case Int32Array:
-				dracoArray = new draco.DracoInt32Array();
-				decoder.GetAttributeInt32ForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Int32Array( numValues );
-				break;
-
-			case Uint8Array:
-				dracoArray = new draco.DracoUInt8Array();
-				decoder.GetAttributeUInt8ForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Uint8Array( numValues );
-				break;
-
-			case Uint16Array:
-				dracoArray = new draco.DracoUInt16Array();
-				decoder.GetAttributeUInt16ForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Uint16Array( numValues );
-				break;
-
-			case Uint32Array:
-				dracoArray = new draco.DracoUInt32Array();
-				decoder.GetAttributeUInt32ForAllPoints( dracoGeometry, attribute, dracoArray );
-				array = new Uint32Array( numValues );
-				break;
-
-			default:
-				throw new Error( 'THREE.DRACOLoader: Unexpected attribute type.' );
-
-		}
-
-		for ( var i = 0; i < numValues; i ++ ) {
-
-			array[ i ] = dracoArray.GetValue( i );
-
-		}
-
-		draco.destroy( dracoArray );
+		var ptr = draco._malloc( byteLength );
+		decoder.GetAttributeDataArrayForAllPoints( dracoGeometry, attribute, dataType, byteLength, ptr );
+		var array = new attributeType( draco.HEAPF32.buffer, ptr, numValues ).slice();
+		draco._free( ptr );
 
 		return {
 			name: attributeName,
@@ -601,7 +587,25 @@ DRACOLoader.DRACOWorker = function () {
 
 	}
 
+	function getDracoDataType( draco, attributeType ) {
+
+		switch ( attributeType ) {
+
+			case Float32Array: return draco.DT_FLOAT32;
+			case Int8Array: return draco.DT_INT8;
+			case Int16Array: return draco.DT_INT16;
+			case Int32Array: return draco.DT_INT32;
+			case Uint8Array: return draco.DT_UINT8;
+			case Uint16Array: return draco.DT_UINT16;
+			case Uint32Array: return draco.DT_UINT32;
+
+		}
+
+	}
+
 };
+
+DRACOLoader.taskCache = new WeakMap();
 
 /** Deprecated static methods */
 

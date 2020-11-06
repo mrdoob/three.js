@@ -1,36 +1,52 @@
-/**
- * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
- * @author mrdoob / http://mrdoob.com/
- * @author yomotsu / https://yomotsu.net/
- */
-
 import {
 	Matrix4,
 	Object3D,
 	Vector3
 } from "../../../build/three.module.js";
 
+/**
+ * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
+ */
+
 var CSS3DObject = function ( element ) {
 
 	Object3D.call( this );
 
-	this.element = element;
+	this.element = element || document.createElement( 'div' );
 	this.element.style.position = 'absolute';
+	this.element.style.pointerEvents = 'auto';
 
 	this.addEventListener( 'removed', function () {
 
-		if ( this.element.parentNode !== null ) {
+		this.traverse( function ( object ) {
 
-			this.element.parentNode.removeChild( this.element );
+			if ( object.element instanceof Element && object.element.parentNode !== null ) {
 
-		}
+				object.element.parentNode.removeChild( object.element );
+
+			}
+
+		} );
 
 	} );
 
 };
 
-CSS3DObject.prototype = Object.create( Object3D.prototype );
-CSS3DObject.prototype.constructor = CSS3DObject;
+CSS3DObject.prototype = Object.assign( Object.create( Object3D.prototype ), {
+
+	constructor: CSS3DObject,
+
+	copy: function ( source, recursive ) {
+
+		Object3D.prototype.copy.call( this, source, recursive );
+
+		this.element = source.element.cloneNode( true );
+
+		return this;
+
+	}
+
+} );
 
 var CSS3DSprite = function ( element ) {
 
@@ -44,6 +60,8 @@ CSS3DSprite.prototype.constructor = CSS3DSprite;
 //
 
 var CSS3DRenderer = function () {
+
+	var _this = this;
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
@@ -64,6 +82,7 @@ var CSS3DRenderer = function () {
 
 	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	cameraElement.style.transformStyle = 'preserve-3d';
+	cameraElement.style.pointerEvents = 'none';
 
 	domElement.appendChild( cameraElement );
 
@@ -159,9 +178,11 @@ var CSS3DRenderer = function () {
 
 	}
 
-	function renderObject( object, camera, cameraCSSMatrix ) {
+	function renderObject( object, scene, camera, cameraCSSMatrix ) {
 
 		if ( object instanceof CSS3DObject ) {
+
+			object.onBeforeRender( _this, scene, camera );
 
 			var style;
 
@@ -207,17 +228,21 @@ var CSS3DRenderer = function () {
 
 			}
 
+			element.style.display = object.visible ? '' : 'none';
+
 			if ( element.parentNode !== cameraElement ) {
 
 				cameraElement.appendChild( element );
 
 			}
 
+			object.onAfterRender( _this, scene, camera );
+
 		}
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			renderObject( object.children[ i ], camera, cameraCSSMatrix );
+			renderObject( object.children[ i ], scene, camera, cameraCSSMatrix );
 
 		}
 
@@ -285,14 +310,18 @@ var CSS3DRenderer = function () {
 				domElement.style.WebkitPerspective = fov + 'px';
 				domElement.style.perspective = fov + 'px';
 
+			} else {
+
+				domElement.style.WebkitPerspective = '';
+				domElement.style.perspective = '';
+
 			}
 
 			cache.camera.fov = fov;
 
 		}
 
-		scene.updateMatrixWorld();
-
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		if ( camera.isOrthographicCamera ) {
@@ -318,7 +347,7 @@ var CSS3DRenderer = function () {
 
 		}
 
-		renderObject( scene, camera, cameraCSSMatrix );
+		renderObject( scene, scene, camera, cameraCSSMatrix );
 
 		if ( isIE ) {
 

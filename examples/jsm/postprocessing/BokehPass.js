@@ -1,20 +1,19 @@
-/**
- * Depth-of-field post-process with bokeh shader
- */
-
 import {
 	Color,
-	LinearFilter,
 	MeshDepthMaterial,
+	NearestFilter,
 	NoBlending,
 	RGBADepthPacking,
-	RGBFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
 } from "../../../build/three.module.js";
 import { Pass } from "../postprocessing/Pass.js";
 import { BokehShader } from "../shaders/BokehShader.js";
+
+/**
+ * Depth-of-field post-process with bokeh shader
+ */
 
 var BokehPass = function ( scene, camera, params ) {
 
@@ -33,14 +32,11 @@ var BokehPass = function ( scene, camera, params ) {
 	var width = params.width || window.innerWidth || 1;
 	var height = params.height || window.innerHeight || 1;
 
-	this.renderTargetColor = new WebGLRenderTarget( width, height, {
-		minFilter: LinearFilter,
-		magFilter: LinearFilter,
-		format: RGBFormat
+	this.renderTargetDepth = new WebGLRenderTarget( width, height, {
+		minFilter: NearestFilter,
+		magFilter: NearestFilter
 	} );
-	this.renderTargetColor.texture.name = "BokehPass.color";
 
-	this.renderTargetDepth = this.renderTargetColor.clone();
 	this.renderTargetDepth.texture.name = "BokehPass.depth";
 
 	// depth material

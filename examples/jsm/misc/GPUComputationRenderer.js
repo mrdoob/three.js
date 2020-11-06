@@ -1,6 +1,18 @@
+import {
+	Camera,
+	ClampToEdgeWrapping,
+	DataTexture,
+	FloatType,
+	Mesh,
+	NearestFilter,
+	PlaneBufferGeometry,
+	RGBAFormat,
+	Scene,
+	ShaderMaterial,
+	WebGLRenderTarget
+} from "../../../build/three.module.js";
+
 /**
- * @author yomboprime https://github.com/yomboprime
- *
  * GPUComputationRenderer, based on SimulationRenderer by zz85
  *
  * The GPUComputationRenderer uses the concept of variables. These variables are RGBA float textures that hold 4 floats
@@ -97,26 +109,13 @@
  * @param {WebGLRenderer} renderer The renderer
   */
 
-import {
-	Camera,
-	ClampToEdgeWrapping,
-	DataTexture,
-	FloatType,
-	HalfFloatType,
-	Mesh,
-	NearestFilter,
-	PlaneBufferGeometry,
-	RGBAFormat,
-	Scene,
-	ShaderMaterial,
-	WebGLRenderTarget
-} from "../../../build/three.module.js";
-
 var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.variables = [];
 
 	this.currentTextureIndex = 0;
+
+	var dataType = FloatType;
 
 	var scene = new Scene();
 
@@ -132,6 +131,13 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 	var mesh = new Mesh( new PlaneBufferGeometry( 2, 2 ), passThruShader );
 	scene.add( mesh );
 
+
+	this.setDataType = function ( type ) {
+
+		dataType = type;
+		return this;
+
+	};
 
 	this.addVariable = function ( variableName, computeFragmentShader, initialValueTexture ) {
 
@@ -163,16 +169,15 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.init = function () {
 
-		if ( ! renderer.extensions.get( "OES_texture_float" ) &&
-			 ! renderer.capabilities.isWebGL2 ) {
+		if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'OES_texture_float' ) === false ) {
 
-			return "No OES_texture_float support for float textures.";
+			return 'No OES_texture_float support for float textures.';
 
 		}
 
 		if ( renderer.capabilities.maxVertexTextures === 0 ) {
 
-			return "No support for vertex shader textures.";
+			return 'No support for vertex shader textures.';
 
 		}
 
@@ -189,6 +194,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 			// Adds dependencies uniforms to the ShaderMaterial
 			var material = variable.material;
 			var uniforms = material.uniforms;
+
 			if ( variable.dependencies !== null ) {
 
 				for ( var d = 0; d < variable.dependencies.length; d ++ ) {
@@ -283,6 +289,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 		materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + " )";
 
 	}
+
 	this.addResolutionDefine = addResolutionDefine;
 
 
@@ -323,8 +330,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 			minFilter: minFilter,
 			magFilter: magFilter,
 			format: RGBAFormat,
-			type: ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) ? HalfFloatType : FloatType,
-			stencilBuffer: false,
+			type: dataType,
 			depthBuffer: false
 		} );
 
@@ -334,11 +340,8 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.createTexture = function () {
 
-		var a = new Float32Array( sizeX * sizeY * 4 );
-		var texture = new DataTexture( a, sizeX, sizeY, RGBAFormat, FloatType );
-		texture.needsUpdate = true;
-
-		return texture;
+		var data = new Float32Array( sizeX * sizeY * 4 );
+		return new DataTexture( data, sizeX, sizeY, RGBAFormat, FloatType );
 
 	};
 

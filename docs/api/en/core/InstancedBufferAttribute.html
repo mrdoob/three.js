@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,16 +21,11 @@
 		</p>
 
 		<h2>Properties</h2>
-		See [page:BufferAttribute] for inherited properties.
+		<p>See [page:BufferAttribute] for inherited properties.</p>
 
 		<h3>[property:Number meshPerAttribute]</h3>
 		<p>
-			Default is *1*.
-		</p>
-
-		<h3>[property:Boolean isInstancedBufferAttribute]</h3>
-		<p>
-			Default is *true*.
+			Defines how often a value of this buffer attribute should be repeated. A value of one means that each value of the instanced attribute is used for a single instance. A value of two means that each value is used for two consecutive instances (and so on). Default is *1*.
 		</p>
 
 		<h2>Methods</h2>

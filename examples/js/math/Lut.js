@@ -1,7 +1,3 @@
-/**
- * @author daron1337 / http://daron1337.github.io/
- */
-
 THREE.Lut = function ( colormap, numberofcolors ) {
 
 	this.lut = [];

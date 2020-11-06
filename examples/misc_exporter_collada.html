@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada<br /><br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada<br /><br />
 			<button id="export">Export COLLADA</button>
 		</div>
 
@@ -27,37 +27,37 @@
 			////////////////////////////////////////////////////////////////////////////////
 			/*global window */
 
-			var camera, scene, renderer;
-			var cameraControls;
-			var effectController;
-			var teapotSize = 400;
-			var ambientLight, light;
+			let camera, scene, renderer;
+			let cameraControls;
+			let effectController;
+			const teapotSize = 400;
+			let ambientLight, light;
 
-			var tess = - 1;	// force initialization
-			var bBottom;
-			var bLid;
-			var bBody;
-			var bFitLid;
-			var bNonBlinn;
-			var shading;
-			var wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, reflectiveMaterial;
+			let tess = - 1;	// force initialization
+			let bBottom;
+			let bLid;
+			let bBody;
+			let bFitLid;
+			let bNonBlinn;
+			let shading;
+			let wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, normalMaterial, reflectiveMaterial;
 
-			var teapot, textureCube;
+			let teapot, textureCube;
 
 			// allocate these just once
-			var diffuseColor = new THREE.Color();
-			var specularColor = new THREE.Color();
+			const diffuseColor = new THREE.Color();
+			const specularColor = new THREE.Color();
 
 			init();
 			render();
 
 			function init() {
 
-				var container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var canvasWidth = window.innerWidth;
-				var canvasHeight = window.innerHeight;
+				const canvasWidth = window.innerWidth;
+				const canvasHeight = window.innerHeight;
 
 				// CAMERA
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 80000 );
@@ -73,8 +73,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( canvasWidth, canvasHeight );
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
@@ -85,22 +84,31 @@
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
-				var textureMap = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
+				const loader = new THREE.TextureLoader();
+
+				const textureMap = loader.load( 'textures/uv_grid_opengl.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
+				textureMap.encoding = THREE.sRGBEncoding;
+
+				// NORMAL MAP
+
+				const diffuseMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
+				const normalMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Normal.jpg' );
 
 				// REFLECTION MAP
-				var path = "textures/cube/pisa/";
-				var urls = [
+				const path = "textures/cube/pisa/";
+				const urls = [
 					path + "px.png", path + "nx.png",
 					path + "py.png", path + "ny.png",
 					path + "pz.png", path + "nz.png"
 				];
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.encoding = THREE.sRGBEncoding;
 
 				// MATERIALS
-				var materialColor = new THREE.Color();
+				const materialColor = new THREE.Color();
 				materialColor.setRGB( 1.0, 1.0, 1.0 );
 
 				wireMaterial = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe: true } );
@@ -112,6 +120,8 @@
 				phongMaterial = new THREE.MeshPhongMaterial( { color: materialColor, side: THREE.DoubleSide } );
 
 				texturedMaterial = new THREE.MeshPhongMaterial( { color: materialColor, map: textureMap, side: THREE.DoubleSide } );
+
+				normalMaterial = new THREE.MeshPhongMaterial( { color: materialColor, map: diffuseMap, normalMap: normalMap, side: THREE.DoubleSide } );
 
 				reflectiveMaterial = new THREE.MeshPhongMaterial( { color: materialColor, envMap: textureCube, side: THREE.DoubleSide } );
 
@@ -131,8 +141,8 @@
 
 			function onWindowResize() {
 
-				var canvasWidth = window.innerWidth;
-				var canvasHeight = window.innerHeight;
+				const canvasWidth = window.innerWidth;
+				const canvasHeight = window.innerHeight;
 
 				renderer.setSize( canvasWidth, canvasHeight );
 
@@ -175,9 +185,9 @@
 					newShading: "glossy"
 				};
 
-				var h;
+				let h;
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				// material (attributes)
 
@@ -223,9 +233,9 @@
 
 				// shading
 
-				gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "reflective" ] ).name( "Shading" ).onChange( render );
+				gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "normal", "reflective" ] ).name( "Shading" ).onChange( render );
 
-				var exportButton = document.getElementById( 'export' );
+				const exportButton = document.getElementById( 'export' );
 				exportButton.addEventListener( 'click', exportCollada );
 
 			}
@@ -259,6 +269,7 @@
 				// only if they have. But, these calls are cheap enough and this is just a demo.
 				phongMaterial.shininess = effectController.shininess;
 				texturedMaterial.shininess = effectController.shininess;
+				normalMaterial.shininess = effectController.shininess;
 
 				diffuseColor.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 				if ( effectController.metallic ) {
@@ -278,10 +289,12 @@
 				gouraudMaterial.color.copy( diffuseColor );
 				phongMaterial.color.copy( diffuseColor );
 				texturedMaterial.color.copy( diffuseColor );
+				normalMaterial.color.copy( diffuseColor );
 
 				specularColor.multiplyScalar( effectController.ks );
 				phongMaterial.specular.copy( specularColor );
 				texturedMaterial.specular.copy( specularColor );
+				normalMaterial.specular.copy( specularColor );
 
 				// Ambient's actually controlled by the light for this demo
 				ambientLight.color.setHSL( effectController.hue, effectController.saturation, effectController.lightness * effectController.ka );
@@ -314,7 +327,7 @@
 
 				}
 
-				var teapotGeometry = new TeapotBufferGeometry( teapotSize,
+				const teapotGeometry = new TeapotBufferGeometry( teapotSize,
 					tess,
 					effectController.bottom,
 					effectController.lid,
@@ -328,30 +341,33 @@
 						shading === "flat" ? flatMaterial : (
 							shading === "smooth" ? gouraudMaterial : (
 								shading === "glossy" ? phongMaterial : (
-									shading === "textured" ? texturedMaterial : reflectiveMaterial ) ) ) ) );	// if no match, pick Phong
+									shading === "textured" ? texturedMaterial : (
+										shading === "normal" ? normalMaterial : reflectiveMaterial ) ) ) ) ) );	// if no match, pick Phong
 
 				scene.add( teapot );
 
 			}
 
-			var exporter = new ColladaExporter();
+			const exporter = new ColladaExporter();
 
 			function exportCollada() {
 
-				var result = exporter.parse( teapot );
-				var material_type = "Phong";
+				const result = exporter.parse( teapot );
+				let materialType = "Phong";
+
 				if ( shading === "wireframe" ) {
 
-					material_type = "Constant";
+					materialType = "Constant";
 
 				}
+
 				if ( shading === "smooth" ) {
 
-					material_type = "Lambert";
+					materialType = "Lambert";
 
 				}
 
-				saveString( result.data, 'teapot_' + shading + "_" + material_type + '.dae' );
+				saveString( result.data, 'teapot_' + shading + "_" + materialType + '.dae' );
 
 				result.textures.forEach( tex => {
 
@@ -381,7 +397,7 @@
 
 			}
 
-			var link = document.createElement( 'a' );
+			const link = document.createElement( 'a' );
 			link.style.display = 'none';
 			document.body.appendChild( link );
 

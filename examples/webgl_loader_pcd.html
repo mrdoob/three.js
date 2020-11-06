@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
 			<a href="http://pointclouds.org/documentation/tutorials/pcd_file_format.php#pcd-file-format" target="_blank" rel="noopener">PCD File format</a>
 			<div>PCD loader test by <a href="http://filipecaixeta.com.br" target="_blank" rel="noopener">Filipe Caixeta</a></div>
 			<div>+/-: Increase/Decrease point size</div>
@@ -24,8 +24,8 @@
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { PCDLoader } from './jsm/loaders/PCDLoader.js';
 
-			var container, stats;
-			var camera, controls, scene, renderer;
+			let container, stats;
+			let camera, controls, scene, renderer;
 
 			init();
 			animate();
@@ -46,11 +46,11 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var loader = new PCDLoader();
+				const loader = new PCDLoader();
 				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( points ) {
 
 					scene.add( points );
-					var center = points.geometry.boundingSphere.center;
+					const center = points.geometry.boundingSphere.center;
 					controls.target.set( center.x, center.y, center.z );
 					controls.update();
 
@@ -66,11 +66,7 @@
 				controls.zoomSpeed = 0.3;
 				controls.panSpeed = 0.2;
 
-				controls.noZoom = false;
-				controls.noPan = false;
-
 				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
 
 				controls.minDistance = 0.3;
 				controls.maxDistance = 0.3 * 100;
@@ -95,7 +91,7 @@
 
 			function keyboard( ev ) {
 
-				var points = scene.getObjectByName( 'Zaghetto.pcd' );
+				const points = scene.getObjectByName( 'Zaghetto.pcd' );
 
 				switch ( ev.key || String.fromCharCode( ev.keyCode || ev.charCode ) ) {
 

@@ -24,6 +24,8 @@ export class NodeBuilder {
 		color: boolean[];
 		lights: boolean;
 		fog: boolean;
+		transparent: boolean;
+		irradiance: boolean;
 	};
 
 	includes: {
@@ -94,19 +96,19 @@ export class NodeBuilder {
 	removeSlot(): this;
 	addVertexCode( code: string ): void;
 	addFragmentCode( code: string ): void;
-	addCode( code: string, shader: string ): void;
+	addCode( code: string, shader?: string ): void;
 	addVertexNodeCode( code: string ): void;
 	addFragmentNodeCode( code: string ): void;
-	addNodeCode( code: string, shader: string ): void;
+	addNodeCode( code: string, shader?: string ): void;
 	clearNodeCode( shader: string ): string;
 	clearVertexNodeCode(): string;
 	clearFragmentNodeCode(): string;
 	addVertexFinalCode( code: string ): void;
 	addFragmentFinalCode( code: string ): void;
-	addFinalCode( code: string, shader: string ): void;
+	addFinalCode( code: string, shader?: string ): void;
 	addVertexParsCode( code: string ): void;
 	addFragmentParsCode( code: string ): void;
-	addParsCode( code: string, shader: string ): void;
+	addParsCode( code: string, shader?: string ): void;
 	addVaryCode( code: string ): void;
 	isCache( name: string ): boolean;
 	isSlot( name: string ): boolean;
@@ -114,7 +116,7 @@ export class NodeBuilder {
 	isDefined( name: string ): boolean;
 	getVar( uuid: string, type: string, ns: string, shader?: string, prefix?: string, label?: string ): object;
 	getVar( uuid: string, type: string, ns: string, label: string ): object;
-	getAttribute( name: string, type: string );
+	getAttribute( name: string, type: string ): any;
 	getCode( shader: string ): string;
 	getVarListCode( vars: object[], prefix?: string ): string;
 	getVars( shader: string ): object[];
@@ -143,6 +145,6 @@ export class NodeBuilder {
 	setShader( shader: string ): this;
 	mergeDefines( defines: object ): object;
 	mergeUniform( uniforms: object ): object;
-	getTextureEncodingFromMap( map: Texture, gammaOverrideLinear?: boolean ): TextureEncoding;
+	getTextureEncodingFromMap( map: Texture ): TextureEncoding;
 
 }

@@ -1,9 +1,6 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
 
-var SetMaterialVectorCommand = function ( editor, object, attributeName, newValue, materialSlot ) {
+function SetMaterialVectorCommand( editor, object, attributeName, newValue, materialSlot ) {
 
 	Command.call( this, editor );
 
@@ -19,7 +16,7 @@ var SetMaterialVectorCommand = function ( editor, object, attributeName, newValu
 
 	this.attributeName = attributeName;
 
-};
+}
 
 SetMaterialVectorCommand.prototype = {
 
@@ -70,3 +67,5 @@ SetMaterialVectorCommand.prototype = {
 	}
 
 };
+
+export { SetMaterialVectorCommand };

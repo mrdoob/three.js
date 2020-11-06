@@ -1,6 +1,4 @@
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * Depth-of-field shader with bokeh
  * ported from GLSL shader by Martins Upitis
  * http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
@@ -20,7 +18,7 @@ THREE.BokehShader = {
 		"focus": { value: 1.0 },
 		"aspect": { value: 1.0 },
 		"aperture": { value: 0.025 },
-		"maxblur": { value: 1.0 },
+		"maxblur": { value: 0.01 },
 		"nearClip": { value: 1.0 },
 		"farClip": { value: 1000.0 },
 

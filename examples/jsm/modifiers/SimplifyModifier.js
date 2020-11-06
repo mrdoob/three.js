@@ -1,19 +1,17 @@
-/**
- *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
- *
- *	Simplification Geometry Modifier
- *    - based on code and technique
- *	  - by Stan Melax in 1998
- *	  - Progressive Mesh type Polygon Reduction Algorithm
- *    - http://www.melax.com/polychop/
- */
-
 import {
 	BufferGeometry,
 	Float32BufferAttribute,
 	Geometry,
 	Vector3
 } from "../../../build/three.module.js";
+
+/**
+ *	Simplification Geometry Modifier
+ *    - based on code and technique
+ *	  - by Stan Melax in 1998
+ *	  - Progressive Mesh type Polygon Reduction Algorithm
+ *    - http://www.melax.com/polychop/
+ */
 
 var SimplifyModifier = function () {};
 
@@ -491,7 +489,7 @@ var SimplifyModifier = function () {};
 
 		//
 
-		simplifiedGeometry.addAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
+		simplifiedGeometry.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 		simplifiedGeometry.setIndex( index );
 
 		return simplifiedGeometry;

@@ -1,57 +1,53 @@
 import { Matrix3 } from './Matrix3.js';
 import { Vector3 } from './Vector3.js';
 
-/**
- * @author bhouston / http://clara.io
- */
+const _vector1 = /*@__PURE__*/ new Vector3();
+const _vector2 = /*@__PURE__*/ new Vector3();
+const _normalMatrix = /*@__PURE__*/ new Matrix3();
 
-var _vector1 = new Vector3();
-var _vector2 = new Vector3();
-var _normalMatrix = new Matrix3();
+class Plane {
 
-function Plane( normal, constant ) {
+	constructor( normal, constant ) {
 
-	// normal is assumed to be normalized
+		Object.defineProperty( this, 'isPlane', { value: true } );
 
-	this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
-	this.constant = ( constant !== undefined ) ? constant : 0;
+		// normal is assumed to be normalized
 
-}
+		this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
+		this.constant = ( constant !== undefined ) ? constant : 0;
 
-Object.assign( Plane.prototype, {
+	}
 
-	isPlane: true,
-
-	set: function ( normal, constant ) {
+	set( normal, constant ) {
 
 		this.normal.copy( normal );
 		this.constant = constant;
 
 		return this;
 
-	},
+	}
 
-	setComponents: function ( x, y, z, w ) {
+	setComponents( x, y, z, w ) {
 
 		this.normal.set( x, y, z );
 		this.constant = w;
 
 		return this;
 
-	},
+	}
 
-	setFromNormalAndCoplanarPoint: function ( normal, point ) {
+	setFromNormalAndCoplanarPoint( normal, point ) {
 
 		this.normal.copy( normal );
 		this.constant = - point.dot( this.normal );
 
 		return this;
 
-	},
+	}
 
-	setFromCoplanarPoints: function ( a, b, c ) {
+	setFromCoplanarPoints( a, b, c ) {
 
-		var normal = _vector1.subVectors( c, b ).cross( _vector2.subVectors( a, b ) ).normalize();
+		const normal = _vector1.subVectors( c, b ).cross( _vector2.subVectors( a, b ) ).normalize();
 
 		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 
@@ -59,57 +55,57 @@ Object.assign( Plane.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	copy: function ( plane ) {
+	copy( plane ) {
 
 		this.normal.copy( plane.normal );
 		this.constant = plane.constant;
 
 		return this;
 
-	},
+	}
 
-	normalize: function () {
+	normalize() {
 
 		// Note: will lead to a divide by zero if the plane is invalid.
 
-		var inverseNormalLength = 1.0 / this.normal.length();
+		const inverseNormalLength = 1.0 / this.normal.length();
 		this.normal.multiplyScalar( inverseNormalLength );
 		this.constant *= inverseNormalLength;
 
 		return this;
 
-	},
+	}
 
-	negate: function () {
+	negate() {
 
 		this.constant *= - 1;
 		this.normal.negate();
 
 		return this;
 
-	},
+	}
 
-	distanceToPoint: function ( point ) {
+	distanceToPoint( point ) {
 
 		return this.normal.dot( point ) + this.constant;
 
-	},
+	}
 
-	distanceToSphere: function ( sphere ) {
+	distanceToSphere( sphere ) {
 
 		return this.distanceToPoint( sphere.center ) - sphere.radius;
 
-	},
+	}
 
-	projectPoint: function ( point, target ) {
+	projectPoint( point, target ) {
 
 		if ( target === undefined ) {
 
@@ -120,9 +116,9 @@ Object.assign( Plane.prototype, {
 
 		return target.copy( this.normal ).multiplyScalar( - this.distanceToPoint( point ) ).add( point );
 
-	},
+	}
 
-	intersectLine: function ( line, target ) {
+	intersectLine( line, target ) {
 
 		if ( target === undefined ) {
 
@@ -131,9 +127,9 @@ Object.assign( Plane.prototype, {
 
 		}
 
-		var direction = line.delta( _vector1 );
+		const direction = line.delta( _vector1 );
 
-		var denominator = this.normal.dot( direction );
+		const denominator = this.normal.dot( direction );
 
 		if ( denominator === 0 ) {
 
@@ -149,7 +145,7 @@ Object.assign( Plane.prototype, {
 
 		}
 
-		var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
+		const t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
 
 		if ( t < 0 || t > 1 ) {
 
@@ -159,32 +155,32 @@ Object.assign( Plane.prototype, {
 
 		return target.copy( direction ).multiplyScalar( t ).add( line.start );
 
-	},
+	}
 
-	intersectsLine: function ( line ) {
+	intersectsLine( line ) {
 
 		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
 
-		var startSign = this.distanceToPoint( line.start );
-		var endSign = this.distanceToPoint( line.end );
+		const startSign = this.distanceToPoint( line.start );
+		const endSign = this.distanceToPoint( line.end );
 
 		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
 
-	},
+	}
 
-	intersectsBox: function ( box ) {
+	intersectsBox( box ) {
 
 		return box.intersectsPlane( this );
 
-	},
+	}
 
-	intersectsSphere: function ( sphere ) {
+	intersectsSphere( sphere ) {
 
 		return sphere.intersectsPlane( this );
 
-	},
+	}
 
-	coplanarPoint: function ( target ) {
+	coplanarPoint( target ) {
 
 		if ( target === undefined ) {
 
@@ -195,37 +191,37 @@ Object.assign( Plane.prototype, {
 
 		return target.copy( this.normal ).multiplyScalar( - this.constant );
 
-	},
+	}
 
-	applyMatrix4: function ( matrix, optionalNormalMatrix ) {
+	applyMatrix4( matrix, optionalNormalMatrix ) {
 
-		var normalMatrix = optionalNormalMatrix || _normalMatrix.getNormalMatrix( matrix );
+		const normalMatrix = optionalNormalMatrix || _normalMatrix.getNormalMatrix( matrix );
 
-		var referencePoint = this.coplanarPoint( _vector1 ).applyMatrix4( matrix );
+		const referencePoint = this.coplanarPoint( _vector1 ).applyMatrix4( matrix );
 
-		var normal = this.normal.applyMatrix3( normalMatrix ).normalize();
+		const normal = this.normal.applyMatrix3( normalMatrix ).normalize();
 
 		this.constant = - referencePoint.dot( normal );
 
 		return this;
 
-	},
+	}
 
-	translate: function ( offset ) {
+	translate( offset ) {
 
 		this.constant -= offset.dot( this.normal );
 
 		return this;
 
-	},
+	}
 
-	equals: function ( plane ) {
+	equals( plane ) {
 
 		return plane.normal.equals( this.normal ) && ( plane.constant === this.constant );
 
 	}
 
-} );
+}
 
 
 export { Plane };

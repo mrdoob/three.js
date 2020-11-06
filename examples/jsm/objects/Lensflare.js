@@ -1,8 +1,3 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- * @author mrdoob / http://mrdoob.com/
- */
-
 import {
 	AdditiveBlending,
 	Box2,
@@ -388,8 +383,8 @@ Lensflare.Geometry = ( function () {
 	var interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
 
 	geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-	geometry.addAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-	geometry.addAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+	geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+	geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
 
 	return geometry;
 

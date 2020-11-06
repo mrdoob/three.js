@@ -18,7 +18,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lookup table<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lookup table<br/>
 			vertex color values from a range of data values
 		</div>
 
@@ -33,14 +33,14 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Lut } from './jsm/math/Lut.js';
 
-			var container;
+			let container;
 
-			var perpCamera, orthoCamera, renderer, lut;
+			let perpCamera, orthoCamera, renderer, lut;
 
-			var mesh, sprite;
-			var scene, uiScene;
+			let mesh, sprite;
+			let scene, uiScene;
 
-			var params;
+			let params;
 
 			init();
 
@@ -55,8 +55,8 @@
 
 				lut = new Lut();
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				perpCamera = new THREE.PerspectiveCamera( 60, width / height, 1, 100 );
 				perpCamera.position.set( 0, 0, 10 );
@@ -74,7 +74,7 @@
 				mesh = new THREE.Mesh( undefined, new THREE.MeshLambertMaterial( {
 					side: THREE.DoubleSide,
 					color: 0xF5F5F5,
-					vertexColors: THREE.VertexColors
+					vertexColors: true
 				} ) );
 				scene.add( mesh );
 
@@ -83,7 +83,7 @@
 				};
 				loadModel( );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 1 );
+				const pointLight = new THREE.PointLight( 0xffffff, 1 );
 				perpCamera.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -94,10 +94,10 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var controls = new OrbitControls( perpCamera, renderer.domElement );
+				const controls = new OrbitControls( perpCamera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange( function () {
 
@@ -110,8 +110,8 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				perpCamera.aspect = width / height;
 				perpCamera.updateProjectionMatrix();
@@ -131,20 +131,22 @@
 
 			function loadModel( ) {
 
-				var loader = new THREE.BufferGeometryLoader();
+				const loader = new THREE.BufferGeometryLoader();
 				loader.load( 'models/json/pressure.json', function ( geometry ) {
 
 					geometry.center();
 					geometry.computeVertexNormals();
 
 					// default color attribute
-					var colors = [];
-					for ( var i = 0, n = geometry.attributes.position.count; i < n; ++ i ) {
+					const colors = [];
+
+					for ( let i = 0, n = geometry.attributes.position.count; i < n; ++ i ) {
 
 						colors.push( 1, 1, 1 );
 
 					}
-					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+					geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 					mesh.geometry = geometry;
 					updateColors();
@@ -162,14 +164,15 @@
 				lut.setMax( 2000 );
 				lut.setMin( 0 );
 
-				var geometry = mesh.geometry;
-				var pressures = geometry.attributes.pressure;
-				var colors = geometry.attributes.color;
-				for ( var i = 0; i < pressures.array.length; i ++ ) {
+				const geometry = mesh.geometry;
+				const pressures = geometry.attributes.pressure;
+				const colors = geometry.attributes.color;
 
-					var colorValue = pressures.array[ i ];
+				for ( let i = 0; i < pressures.array.length; i ++ ) {
 
-					var color = lut.getColor( colorValue );
+					const colorValue = pressures.array[ i ];
+
+					const color = lut.getColor( colorValue );
 
 					if ( color === undefined ) {
 
@@ -185,7 +188,7 @@
 
 				colors.needsUpdate = true;
 
-				var map = sprite.material.map;
+				const map = sprite.material.map;
 				lut.updateCanvas( map.image );
 				map.needsUpdate = true;
 

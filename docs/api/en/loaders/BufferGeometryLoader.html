@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,13 +16,11 @@
 			This uses the [page:FileLoader] internally for loading files.
 		</p>
 
-		<h2>Example</h2>
-
-		[example:webgl_geometry_colors_lookuptable WebGL / geometry / colors / lookuptable]
+		<h2>Code Example</h2>
 
 		<code>
 		// instantiate a loader
-		var loader = new THREE.BufferGeometryLoader();
+		const loader = new THREE.BufferGeometryLoader();
 
 		// load a resource
 		loader.load(
@@ -32,8 +29,8 @@
 
 			// onLoad callback
 			function ( geometry ) {
-				var material = new THREE.MeshLambertMaterial( { color: 0xF5F5F5 } );
-				var object = new THREE.Mesh( geometry, material );
+				const material = new THREE.MeshLambertMaterial( { color: 0xF5F5F5 } );
+				const object = new THREE.Mesh( geometry, material );
 				scene.add( object );
 			},
 
@@ -48,6 +45,12 @@
 			}
 		);
 		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_performance WebGL / performance]
+		</p>
 
 		<h2>Constructor</h2>
 

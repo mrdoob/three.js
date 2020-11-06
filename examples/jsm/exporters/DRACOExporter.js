@@ -1,3 +1,7 @@
+import {
+	BufferGeometry
+} from "../../../build/three.module.js";
+
 /**
  * Export draco compressed files from threejs geometry objects.
  *
@@ -10,14 +14,7 @@
  *  - quantization, indicates the presision of each type of data stored in the draco file in the order (POSITION, NORMAL, COLOR, TEX_COORD, GENERIC)
  *  - exportUvs
  *  - exportNormals
- *
- * @class DRACOExporter
- * @author tentone
  */
-
-import {
-	BufferGeometry
-} from "../../../build/three.module.js";
 
 /* global DracoEncoderModule */
 
@@ -78,7 +75,7 @@ DRACOExporter.prototype = {
 
 		if ( faces !== null ) {
 
-			builder.AddFacesToMesh( mesh, faces.count, faces.array );
+			builder.AddFacesToMesh( mesh, faces.count / 3, faces.array );
 
 		} else {
 

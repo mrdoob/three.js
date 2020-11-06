@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 THREE.SVGObject = function ( node ) {
 
 	THREE.Object3D.call( this );
@@ -32,7 +28,6 @@ THREE.SVGRenderer = function () {
 		_directionalLights = new THREE.Color(),
 		_pointLights = new THREE.Color(),
 		_clearColor = new THREE.Color(),
-		_clearAlpha = 1,
 
 		_vector3 = new THREE.Vector3(), // Needed for PointLight
 		_centroid = new THREE.Vector3(),
@@ -79,10 +74,9 @@ THREE.SVGRenderer = function () {
 
 	};
 
-	this.setClearColor = function ( color, alpha ) {
+	this.setClearColor = function ( color ) {
 
 		_clearColor.set( color );
-		_clearAlpha = alpha !== undefined ? alpha : 1;
 
 	};
 
@@ -99,6 +93,15 @@ THREE.SVGRenderer = function () {
 
 		_clipBox.min.set( - _svgWidthHalf, - _svgHeightHalf );
 		_clipBox.max.set( _svgWidthHalf, _svgHeightHalf );
+
+	};
+
+	this.getSize = function () {
+
+		return {
+			width: _svgWidth,
+			height: _svgHeight
+		};
 
 	};
 
@@ -120,16 +123,6 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function getSvgColor( color, opacity, asStroke ) {
-
-		var arg = Math.floor( color.r * 255 ) + ',' + Math.floor( color.g * 255 ) + ',' + Math.floor( color.b * 255 );
-
-		if ( opacity === undefined || opacity === 1 ) return 'rgb(' + arg + ')';
-
-		return 'rgb(' + arg + ');' + ( asStroke ? 'stroke-opacity' : 'fill-opacity' ) + ':' + opacity;
-
-	}
-
 	function convert( c ) {
 
 		return _precision !== null ? c.toFixed( _precision ) : c;
@@ -139,7 +132,7 @@ THREE.SVGRenderer = function () {
 	this.clear = function () {
 
 		removeChildNodes();
-		_svg.style.backgroundColor = getSvgColor( _clearColor, _clearAlpha );
+		_svg.style.backgroundColor = _clearColor.getStyle();
 
 	};
 
@@ -157,7 +150,7 @@ THREE.SVGRenderer = function () {
 		if ( background && background.isColor ) {
 
 			removeChildNodes();
-			_svg.style.backgroundColor = getSvgColor( background );
+			_svg.style.backgroundColor = background.getStyle();
 
 		} else if ( this.autoClear === true ) {
 
@@ -373,7 +366,7 @@ THREE.SVGRenderer = function () {
 
 		if ( material.isSpriteMaterial || material.isPointsMaterial ) {
 
-			style = 'fill:' + getSvgColor( material.color, material.opacity );
+			style = 'fill:' + material.color.getStyle() + ';fill-opacity:' + material.opacity;
 
 		}
 
@@ -387,7 +380,7 @@ THREE.SVGRenderer = function () {
 
 		if ( material.isLineBasicMaterial ) {
 
-			var style = 'fill:none;stroke:' + getSvgColor( material.color, material.opacity, true ) + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
+			var style = 'fill:none;stroke:' + material.color.getStyle() + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
 
 			if ( material.isLineDashedMaterial ) {
 
@@ -413,7 +406,7 @@ THREE.SVGRenderer = function () {
 
 			_color.copy( material.color );
 
-			if ( material.vertexColors === THREE.FaceColors || material.vertexColors === THREE.VertexColors ) {
+			if ( material.vertexColors ) {
 
 				_color.multiply( element.color );
 
@@ -423,7 +416,7 @@ THREE.SVGRenderer = function () {
 
 			_diffuseColor.copy( material.color );
 
-			if ( material.vertexColors === THREE.FaceColors || material.vertexColors === THREE.VertexColors ) {
+			if ( material.vertexColors ) {
 
 				_diffuseColor.multiply( element.color );
 
@@ -439,7 +432,7 @@ THREE.SVGRenderer = function () {
 
 		} else if ( material.isMeshNormalMaterial ) {
 
-			_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix );
+			_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix ).normalize();
 
 			_color.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
@@ -447,11 +440,11 @@ THREE.SVGRenderer = function () {
 
 		if ( material.wireframe ) {
 
-			style = 'fill:none;stroke:' + getSvgColor( _color, material.opacity, true ) + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
+			style = 'fill:none;stroke:' + _color.getStyle() + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
 
 		} else {
 
-			style = 'fill:' + getSvgColor( _color, material.opacity );
+			style = 'fill:' + _color.getStyle() + ';fill-opacity:' + material.opacity;
 
 		}
 

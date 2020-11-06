@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -33,24 +32,23 @@
 			有关更新目标的详细信息，请参阅 [page:.target target] 下面的目标属性。
 		</p>
 
+		<h2>代码示例</h2>
 
-		<h2>示例</h2>
+		<code>
+		// White directional light at half intensity shining from the top.
+		const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+		scene.add( directionalLight );
+		</code>
+
+		<h2>例子</h2>
 		<p>
 			[example:misc_controls_fly controls / fly ]<br />
-			[example:webvr_cubes cubes ]<br />
 			[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]<br />
 			[example:webgl_effects_stereo effects / stereo ]<br />
 			[example:webgl_geometry_extrude_splines geometry / extrude / splines ]<br />
 			[example:webgl_materials_bumpmap materials / bumpmap ]<br />
 			[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection ]
 		</p>
-
-		<code>
-		// White directional light at half intensity shining from the top.
-		var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-		scene.add( directionalLight );
-		</code>
-
 
 		<h2>构造器</h2>
 
@@ -64,19 +62,12 @@
 
 		<h2>属性</h2>
 
-		公共属性请查看基类 [page:Light Light]。
+		<p>公共属性请查看基类 [page:Light Light]。</p>
 
 		<h3>[property:Boolean castShadow]</h3>
 		<p>
 			如果设置为 *true* 该平行光会产生动态阴影。 警告: 这样做的代价比较高而且需要一直调整到阴影看起来正确.
 			查看 [page:DirectionalLightShadow] 了解详细信息。该属性默认为 *false*。
-		</p>
-
-		<h3>[property:Boolean isDirectionalLight]</h3>
-		<p>
-			用来校验这个类或者派生类是不是平行光.默认是 *true*。<br /><br />
-
-			不应该去改变这个变量,因为内部使用这个变量做了些优化的工作。
 		</p>
 
 
@@ -106,7 +97,7 @@
 			它也可以设置target为场景中的其他对象(任意拥有 [page:Object3D.position position] 属性的对象), 示例如下:
 		</p>
 		<code>
-		var targetObject = new THREE.Object3D();
+		const targetObject = new THREE.Object3D();
 		scene.add(targetObject);
 
 		light.target = targetObject;
@@ -118,7 +109,7 @@
 
 		<h2>方法</h2>
 
-		公共方法请查看基类 [page:Light Light]。
+		<p>公共方法请查看基类 [page:Light Light]。</p>
 
 		<h3>[method:DirectionalLight copy]( [param:DirectionalLight source] )</h3>
 		<p>

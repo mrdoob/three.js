@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - groups
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - groups
 		</div>
 
 		<script type="module">
@@ -18,8 +18,8 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var stats, clock;
-			var scene, camera, renderer, mixer;
+			let stats, clock;
+			let scene, camera, renderer, mixer;
 
 			init();
 			animate();
@@ -36,20 +36,20 @@
 
 				// all objects of this animation group share a common animation state
 
-				var animationGroup = new THREE.AnimationObjectGroup();
+				const animationGroup = new THREE.AnimationObjectGroup();
 
 				//
 
-				var geometry = new THREE.BoxBufferGeometry( 5, 5, 5 );
-				var material = new THREE.MeshBasicMaterial( { transparent: true } );
+				const geometry = new THREE.BoxBufferGeometry( 5, 5, 5 );
+				const material = new THREE.MeshBasicMaterial( { transparent: true } );
 
 				//
 
-				for ( var i = 0; i < 5; i ++ ) {
+				for ( let i = 0; i < 5; i ++ ) {
 
-					for ( var j = 0; j < 5; j ++ ) {
+					for ( let j = 0; j < 5; j ++ ) {
 
-						var mesh = new THREE.Mesh( geometry, material );
+						const mesh = new THREE.Mesh( geometry, material );
 
 						mesh.position.x = 32 - ( 16 * i );
 						mesh.position.y = 0;
@@ -64,23 +64,23 @@
 
 				// create some keyframe tracks
 
-				var xAxis = new THREE.Vector3( 1, 0, 0 );
-				var qInitial = new THREE.Quaternion().setFromAxisAngle( xAxis, 0 );
-				var qFinal = new THREE.Quaternion().setFromAxisAngle( xAxis, Math.PI );
-				var quaternionKF = new THREE.QuaternionKeyframeTrack( '.quaternion', [ 0, 1, 2 ], [ qInitial.x, qInitial.y, qInitial.z, qInitial.w, qFinal.x, qFinal.y, qFinal.z, qFinal.w, qInitial.x, qInitial.y, qInitial.z, qInitial.w ] );
+				const xAxis = new THREE.Vector3( 1, 0, 0 );
+				const qInitial = new THREE.Quaternion().setFromAxisAngle( xAxis, 0 );
+				const qFinal = new THREE.Quaternion().setFromAxisAngle( xAxis, Math.PI );
+				const quaternionKF = new THREE.QuaternionKeyframeTrack( '.quaternion', [ 0, 1, 2 ], [ qInitial.x, qInitial.y, qInitial.z, qInitial.w, qFinal.x, qFinal.y, qFinal.z, qFinal.w, qInitial.x, qInitial.y, qInitial.z, qInitial.w ] );
 
-				var colorKF = new THREE.ColorKeyframeTrack( '.material.color', [ 0, 1, 2 ], [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ], THREE.InterpolateDiscrete );
-				var opacityKF = new THREE.NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2 ], [ 1, 0, 1 ] );
+				const colorKF = new THREE.ColorKeyframeTrack( '.material.color', [ 0, 1, 2 ], [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ], THREE.InterpolateDiscrete );
+				const opacityKF = new THREE.NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2 ], [ 1, 0, 1 ] );
 
 				// create clip
 
-				var clip = new THREE.AnimationClip( 'default', 3, [ quaternionKF, colorKF, opacityKF ] );
+				const clip = new THREE.AnimationClip( 'default', 3, [ quaternionKF, colorKF, opacityKF ] );
 
 				// apply the animation group to the mixer as the root object
 
 				mixer = new THREE.AnimationMixer( animationGroup );
 
-				var clipAction = mixer.clipAction( clip );
+				const clipAction = mixer.clipAction( clip );
 				clipAction.play();
 
 				//
@@ -124,7 +124,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( mixer ) {
 

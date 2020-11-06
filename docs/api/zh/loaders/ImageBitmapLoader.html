@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,7 +13,7 @@
 
 		<p class="desc">
 			一个把[page:Image]加载为[link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap]的加载器。
-            ImageBitmap提供了一种异步且有效的资源的途径，用于在WebGL中渲染的纹理。<br/>
+			ImageBitmap提供了一种异步且有效的资源的途径，用于在WebGL中渲染的纹理。<br/>
 			不像[page:FileLoader], [name]无需避免对同一的URL进行多次请求。
 		</p>
 
@@ -25,15 +24,11 @@
 			instead. Refer to [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#6.10 WebGL specification] for the detail.
 		</p>
 
-		<h2>例子</h2>
-
-		<p>
-			[example:webgl_loader_imagebitmap WebGL / loader / ImageBitmap]
-		</p>
+		<h2>代码示例</h2>
 
 		<code>
 		// 初始化一个加载器
-		var loader = new THREE.ImageBitmapLoader();
+		const loader = new THREE.ImageBitmapLoader();
 
 		// set options if needed
 		loader.setOptions( { imageOrientation: 'flipY' } );
@@ -45,8 +40,8 @@
 
 			// onLoad回调
 			function ( imageBitmap ) {
-				var texture = new THREE.CanvasTexture( imageBitmap );
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				const texture = new THREE.CanvasTexture( imageBitmap );
+				const material = new THREE.MeshBasicMaterial( { map: texture } );
 			},
 
 			// 目前暂不支持onProgress的回调
@@ -59,6 +54,11 @@
 		);
 		</code>
 
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_loader_imagebitmap WebGL / loader / ImageBitmap]
+		</p>
 
 		<h2>构造函数</h2>
 
@@ -75,7 +75,7 @@
 
 		<h3>[property:String options]</h3>
 		<p>一个可选对象，用来设置内部使用的[link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap]工厂方法，
-            默认为*undefined*.</p>
+			默认为*undefined*.</p>
 
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Loader]。</p>
@@ -89,7 +89,7 @@
 		[page:Function onError] —  在加载错误时被调用。<br />
 		</p>
 		<p>
-            从URL中进行加载，并返回将包含数据的[page:ImageBitmap image]对象。
+			从URL中进行加载，并返回将包含数据的[page:ImageBitmap image]对象。
 		</p>
 
 		<h3>[method:ImageBitmapLoader setOptions]( [param:Object options] )</h3>

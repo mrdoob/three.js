@@ -8,14 +8,27 @@ import { Object3D } from './../core/Object3D';
 
 export class ArrowHelper extends Object3D {
 
+	/**
+	 * @param [dir=new THREE.Vector3( 0, 0, 1 )]
+	 * @param [origin=new THREE.Vector3( 0, 0, 0 )]
+	 * @param [length=1]
+	 * @param [color=0xffff00]
+	 * @param headLength
+	 * @param headWidth
+	 */
 	constructor(
 		dir: Vector3,
 		origin?: Vector3,
 		length?: number,
-		hex?: number,
+		color?: Color | string | number,
 		headLength?: number,
 		headWidth?: number
 	);
+
+	/**
+	 * @default 'ArrowHelper'
+	 */
+	type: string;
 
 	line: Line;
 	cone: Mesh;

@@ -19,7 +19,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - texture manual mipmapping example<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - texture manual mipmapping example<br/>
 			painting by <a href="http://en.wikipedia.org/wiki/Basket_of_Fruit_%28Caravaggio%29">Caravaggio</a>
 		</div>
 
@@ -47,17 +47,17 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
+			const SCREEN_WIDTH = window.innerWidth;
+			const SCREEN_HEIGHT = window.innerHeight;
 
-			var container;
+			let container;
 
-			var camera, scene1, scene2, renderer;
+			let camera, scene1, scene2, renderer;
 
-			var mouseX = 0, mouseY = 0;
+			let mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			const windowHalfX = window.innerWidth / 2;
+			const windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -83,8 +83,8 @@
 
 				function mipmap( size, color ) {
 
-					var imageCanvas = document.createElement( "canvas" ),
-						context = imageCanvas.getContext( "2d" );
+					const imageCanvas = document.createElement( "canvas" );
+					const context = imageCanvas.getContext( "2d" );
 
 					imageCanvas.width = imageCanvas.height = size;
 
@@ -98,8 +98,8 @@
 
 				}
 
-				var canvas = mipmap( 128, '#f00' );
-				var textureCanvas1 = new THREE.CanvasTexture( canvas );
+				const canvas = mipmap( 128, '#f00' );
+				const textureCanvas1 = new THREE.CanvasTexture( canvas );
 				textureCanvas1.mipmaps[ 0 ] = canvas;
 				textureCanvas1.mipmaps[ 1 ] = mipmap( 64, '#0f0' );
 				textureCanvas1.mipmaps[ 2 ] = mipmap( 32, '#00f' );
@@ -112,29 +112,29 @@
 				textureCanvas1.wrapS = THREE.RepeatWrapping;
 				textureCanvas1.wrapT = THREE.RepeatWrapping;
 
-				var textureCanvas2 = textureCanvas1.clone();
+				const textureCanvas2 = textureCanvas1.clone();
 				textureCanvas2.magFilter = THREE.NearestFilter;
 				textureCanvas2.minFilter = THREE.NearestMipmapNearestFilter;
 
-				var materialCanvas1 = new THREE.MeshBasicMaterial( { map: textureCanvas1 } );
-				var materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
+				const materialCanvas1 = new THREE.MeshBasicMaterial( { map: textureCanvas1 } );
+				const materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
-				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
-				var meshCanvas1 = new THREE.Mesh( geometry, materialCanvas1 );
+				const meshCanvas1 = new THREE.Mesh( geometry, materialCanvas1 );
 				meshCanvas1.rotation.x = - Math.PI / 2;
 				meshCanvas1.scale.set( 1000, 1000, 1000 );
 
-				var meshCanvas2 = new THREE.Mesh( geometry, materialCanvas2 );
+				const meshCanvas2 = new THREE.Mesh( geometry, materialCanvas2 );
 				meshCanvas2.rotation.x = - Math.PI / 2;
 				meshCanvas2.scale.set( 1000, 1000, 1000 );
 
 
 				// PAINTING
 
-				var callbackPainting = function () {
+				const callbackPainting = function () {
 
-					var image = texturePainting1.image;
+					const image = texturePainting1.image;
 
 					texturePainting2.image = image;
 					texturePainting2.needsUpdate = true;
@@ -142,9 +142,9 @@
 					scene1.add( meshCanvas1 );
 					scene2.add( meshCanvas2 );
 
-					var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-					var mesh1 = new THREE.Mesh( geometry, materialPainting1 );
-					var mesh2 = new THREE.Mesh( geometry, materialPainting2 );
+					const geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+					const mesh1 = new THREE.Mesh( geometry, materialPainting1 );
+					const mesh2 = new THREE.Mesh( geometry, materialPainting2 );
 
 					addPainting( scene1, mesh1 );
 					addPainting( scene2, mesh2 );
@@ -156,13 +156,13 @@
 
 						zscene.add( zmesh );
 
-						var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
+						const meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
 						meshFrame.position.z = - 10.0;
 						meshFrame.scale.x = 1.1 * image.width / 100;
 						meshFrame.scale.y = 1.1 * image.height / 100;
 						zscene.add( meshFrame );
 
-						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.75, transparent: true } ) );
+						const meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.75, transparent: true } ) );
 						meshShadow.position.y = - 1.1 * image.height / 2;
 						meshShadow.position.z = - 1.1 * image.height / 2;
 						meshShadow.rotation.x = - Math.PI / 2;
@@ -170,7 +170,7 @@
 						meshShadow.scale.y = 1.1 * image.height / 100;
 						zscene.add( meshShadow );
 
-						var floorHeight = - 1.117 * image.height / 2;
+						const floorHeight = - 1.117 * image.height / 2;
 						meshCanvas1.position.y = meshCanvas2.position.y = floorHeight;
 
 					}
@@ -178,10 +178,10 @@
 
 				};
 
-				var texturePainting1 = new THREE.TextureLoader().load( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", callbackPainting );
-				var texturePainting2 = new THREE.Texture();
-				var materialPainting1 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting1 } );
-				var materialPainting2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
+				const texturePainting1 = new THREE.TextureLoader().load( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", callbackPainting );
+				const texturePainting2 = new THREE.Texture();
+				const materialPainting1 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting1 } );
+				const materialPainting2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
 
 				texturePainting2.minFilter = texturePainting2.magFilter = THREE.NearestFilter;
 				texturePainting1.minFilter = texturePainting1.magFilter = THREE.LinearFilter;

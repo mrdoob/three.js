@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import {
 	GammaEncoding,
 	LinearEncoding,
@@ -128,7 +124,7 @@ ColorSpaceNode.Nodes = ( function () {
 
 		"	float maxRGB = max( value.x, max( value.g, value.b ) );",
 		"	float D      = max( maxRange / maxRGB, 1.0 );",
-		"	D            = min( floor( D ) / 255.0, 1.0 );",
+		"	D            = clamp( floor( D ) / 255.0, 0.0, 1.0 );",
 		"	return vec4( value.rgb * ( D * ( 255.0 / maxRange ) ), D );",
 
 		"}"
@@ -239,6 +235,7 @@ ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 ColorSpaceNode.prototype = Object.create( TempNode.prototype );
 ColorSpaceNode.prototype.constructor = ColorSpaceNode;
 ColorSpaceNode.prototype.nodeType = "ColorSpace";
+ColorSpaceNode.prototype.hashProperties = [ "method" ];
 
 ColorSpaceNode.prototype.generate = function ( builder, output ) {
 

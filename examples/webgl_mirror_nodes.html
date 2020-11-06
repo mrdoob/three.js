@@ -17,7 +17,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - mirror node-based
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - mirror node-based
 		</div>
 
 		<script type="module">
@@ -42,31 +42,31 @@
 			} from './jsm/nodes/Nodes.js';
 
 			// scene size
-			var WIDTH = window.innerWidth;
-			var HEIGHT = window.innerHeight;
+			const WIDTH = window.innerWidth;
+			const HEIGHT = window.innerHeight;
 
 			// camera
-			var VIEW_ANGLE = 45;
-			var ASPECT = WIDTH / HEIGHT;
-			var NEAR = 1;
-			var FAR = 500;
+			const VIEW_ANGLE = 45;
+			const ASPECT = WIDTH / HEIGHT;
+			const NEAR = 1;
+			const FAR = 500;
 
-			var decalNormal = new THREE.TextureLoader().load( 'textures/decal/decal-normal.jpg' );
+			const decalNormal = new THREE.TextureLoader().load( 'textures/decal/decal-normal.jpg' );
 
-			var decalDiffuse = new THREE.TextureLoader().load( 'textures/decal/decal-diffuse.png' );
+			const decalDiffuse = new THREE.TextureLoader().load( 'textures/decal/decal-diffuse.png' );
 			decalDiffuse.wrapS = decalDiffuse.wrapT = THREE.RepeatWrapping;
 
-			var camera, scene, renderer;
-			var clock = new THREE.Clock();
+			let camera, scene, renderer;
+			const clock = new THREE.Clock();
 
-			var cameraControls;
+			let cameraControls;
 
-			var gui = new GUI();
+			const gui = new GUI();
 
-			var sphereGroup, smallSphere;
-			var groundMirrorMaterial;
+			let sphereGroup, smallSphere;
+			let groundMirrorMaterial;
 
-			var frame = new NodeFrame();
+			const frame = new NodeFrame();
 
 			function init() {
 
@@ -88,31 +88,33 @@
 				cameraControls.minDistance = 10;
 				cameraControls.update();
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
 			}
 
 			function fillScene() {
 
-				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
+				const planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
+
+				let geometry, material;
 
 				// reflector/mirror plane
-				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var groundMirror = new ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
+				geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const groundMirror = new ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
 
-				var mask = new SwitchNode( new TextureNode( decalDiffuse ), 'w' );
+				const mask = new SwitchNode( new TextureNode( decalDiffuse ), 'w' );
 
-				var mirror = new ReflectorNode( groundMirror );
+				const mirror = new ReflectorNode( groundMirror );
 
-				var normalMap = new TextureNode( decalNormal );
-				var normalXY = new SwitchNode( normalMap, 'xy' );
-				var normalXYFlip = new MathNode(
+				const normalMap = new TextureNode( decalNormal );
+				const normalXY = new SwitchNode( normalMap, 'xy' );
+				const normalXYFlip = new MathNode(
 					normalXY,
 					MathNode.INVERT
 				);
 
-				var offsetNormal = new OperatorNode(
+				const offsetNormal = new OperatorNode(
 					normalXYFlip,
 					new FloatNode( .5 ),
 					OperatorNode.SUB
@@ -124,7 +126,7 @@
 					OperatorNode.MUL
 				);
 
-				var blurMirror = new BlurNode( mirror );
+				const blurMirror = new BlurNode( mirror );
 				blurMirror.size = new THREE.Vector2( WIDTH, HEIGHT );
 				blurMirror.uv = new ExpressionNode( "projCoord.xyz / projCoord.q", "vec3" );
 				blurMirror.uv.keywords[ "projCoord" ] = new OperatorNode( mirror.offset, mirror.uv, OperatorNode.ADD );
@@ -144,19 +146,19 @@
 
 				// test serialization
 				/*
-						var library = {};
+						let library = {};
 						library[ groundMirror.uuid ] = groundMirror;
 						library[ decalDiffuse.uuid ] = decalDiffuse;
 						library[ decalNormal.uuid ] = decalNormal;
 						library[ mirror.textureMatrix.uuid ] = mirror.textureMatrix; // use textureMatrix to projection
 
-						var json = groundMirrorMaterial.toJSON();
+						let json = groundMirrorMaterial.toJSON();
 
 						groundMirrorMaterial = new NodeMaterialLoader( null, library ).parse( json );
 					*/
 				//--
 
-				var mirrorMesh = new THREE.Mesh( planeGeo, groundMirrorMaterial );
+				const mirrorMesh = new THREE.Mesh( planeGeo, groundMirrorMaterial );
 				// add all alternative mirror materials inside the ReflectorRTT to prevent:
 				// glDrawElements: Source and destination textures of the draw are the same.
 				groundMirror.add( mirrorMesh );
@@ -166,14 +168,14 @@
 				sphereGroup = new THREE.Object3D();
 				scene.add( sphereGroup );
 
-				var geometry = new THREE.CylinderBufferGeometry( 0.1, 15 * Math.cos( Math.PI / 180 * 30 ), 0.1, 24, 1 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x444444 } );
-				var sphereCap = new THREE.Mesh( geometry, material );
+				geometry = new THREE.CylinderBufferGeometry( 0.1, 15 * Math.cos( Math.PI / 180 * 30 ), 0.1, 24, 1 );
+				material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x444444 } );
+				const sphereCap = new THREE.Mesh( geometry, material );
 				sphereCap.position.y = - 15 * Math.sin( Math.PI / 180 * 30 ) - 0.05;
 				sphereCap.rotateX( - Math.PI );
 
-				var geometry = new THREE.SphereBufferGeometry( 15, 24, 24, Math.PI / 2, Math.PI * 2, 0, Math.PI / 180 * 120 );
-				var halfSphere = new THREE.Mesh( geometry, material );
+				geometry = new THREE.SphereBufferGeometry( 15, 24, 24, Math.PI / 2, Math.PI * 2, 0, Math.PI / 180 * 120 );
+				const halfSphere = new THREE.Mesh( geometry, material );
 				halfSphere.add( sphereCap );
 				halfSphere.rotateX( - Math.PI / 180 * 135 );
 				halfSphere.rotateZ( - Math.PI / 180 * 20 );
@@ -181,54 +183,54 @@
 
 				sphereGroup.add( halfSphere );
 
-				var geometry = new THREE.IcosahedronBufferGeometry( 5, 0 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, flatShading: true } );
+				geometry = new THREE.IcosahedronBufferGeometry( 5, 0 );
+				material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, flatShading: true } );
 				smallSphere = new THREE.Mesh( geometry, material );
 				scene.add( smallSphere );
 
 				// walls
-				var planeTop = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
+				const planeTop = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
 				planeTop.position.y = 100;
 				planeTop.rotateX( Math.PI / 2 );
 				scene.add( planeTop );
 
-				var planeBack = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
+				const planeBack = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
 				planeBack.position.z = - 50;
 				planeBack.position.y = 50;
 				scene.add( planeBack );
 
-				var planeFront = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x7f7fff } ) );
+				const planeFront = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x7f7fff } ) );
 				planeFront.position.z = 50;
 				planeFront.position.y = 50;
 				planeFront.rotateY( Math.PI );
 				scene.add( planeFront );
 
-				var planeRight = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x00ff00 } ) );
+				const planeRight = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x00ff00 } ) );
 				planeRight.position.x = 50;
 				planeRight.position.y = 50;
 				planeRight.rotateY( - Math.PI / 2 );
 				scene.add( planeRight );
 
-				var planeLeft = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xff0000 } ) );
+				const planeLeft = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xff0000 } ) );
 				planeLeft.position.x = - 50;
 				planeLeft.position.y = 50;
 				planeLeft.rotateY( Math.PI / 2 );
 				scene.add( planeLeft );
 
 				// lights
-				var mainLight = new THREE.PointLight( 0xcccccc, 1.5, 250 );
+				const mainLight = new THREE.PointLight( 0xcccccc, 1.5, 250 );
 				mainLight.position.y = 60;
 				scene.add( mainLight );
 
-				var greenLight = new THREE.PointLight( 0x00ff00, 0.25, 1000 );
+				const greenLight = new THREE.PointLight( 0x00ff00, 0.25, 1000 );
 				greenLight.position.set( 550, 50, 0 );
 				scene.add( greenLight );
 
-				var redLight = new THREE.PointLight( 0xff0000, 0.25, 1000 );
+				const redLight = new THREE.PointLight( 0xff0000, 0.25, 1000 );
 				redLight.position.set( - 550, 50, 0 );
 				scene.add( redLight );
 
-				var blueLight = new THREE.PointLight( 0x7f7fff, 0.25, 1000 );
+				const blueLight = new THREE.PointLight( 0x7f7fff, 0.25, 1000 );
 				blueLight.position.set( 0, 50, 550 );
 				scene.add( blueLight );
 
@@ -244,8 +246,8 @@
 
 				requestAnimationFrame( update );
 
-				var delta = clock.getDelta();
-				var timer = Date.now() * 0.01;
+				const delta = clock.getDelta();
+				const timer = Date.now() * 0.01;
 
 				sphereGroup.rotation.y -= 0.002;
 

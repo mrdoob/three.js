@@ -10,7 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> read float pixels webgl example<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> read float pixels webgl example<br/>
 			<span id="values"></span>
 		</div>
 
@@ -64,19 +64,19 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var container, stats;
+			let container, stats;
 
-			var cameraRTT, sceneRTT, sceneScreen, renderer, zmesh1, zmesh2;
+			let cameraRTT, sceneRTT, sceneScreen, renderer, zmesh1, zmesh2;
 
-			var mouseX = 0, mouseY = 0;
+			let mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			const windowHalfX = window.innerWidth / 2;
+			const windowHalfY = window.innerHeight / 2;
 
-			var rtTexture, material, quad;
+			let rtTexture, material, quad;
 
-			var delta = 0.01;
-			var valueNode;
+			let delta = 0.01;
+			let valueNode;
 
 			init();
 			animate();
@@ -93,7 +93,7 @@
 				sceneRTT = new THREE.Scene();
 				sceneScreen = new THREE.Scene();
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				let light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 ).normalize();
 				sceneRTT.add( light );
 
@@ -111,7 +111,7 @@
 
 				} );
 
-				var materialScreen = new THREE.ShaderMaterial( {
+				const materialScreen = new THREE.ShaderMaterial( {
 
 					uniforms: { "tDiffuse": { value: rtTexture.texture } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -121,16 +121,16 @@
 
 				} );
 
-				var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+				const plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
 
 				quad = new THREE.Mesh( plane, material );
 				quad.position.z = - 100;
 				sceneRTT.add( quad );
 
-				var geometry = new THREE.TorusBufferGeometry( 100, 25, 15, 30 );
+				const geometry = new THREE.TorusBufferGeometry( 100, 25, 15, 30 );
 
-				var mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
-				var mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
+				const mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
+				const mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
 
 				zmesh1 = new THREE.Mesh( geometry, mat1 );
 				zmesh1.position.set( 0, 0, 100 );
@@ -182,7 +182,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.0015;
+				const time = Date.now() * 0.0015;
 
 				if ( zmesh1 && zmesh2 ) {
 
@@ -212,7 +212,7 @@
 				renderer.setRenderTarget( null );
 				renderer.render( sceneScreen, cameraRTT );
 
-				var read = new Float32Array( 4 );
+				const read = new Float32Array( 4 );
 				renderer.readRenderTargetPixels( rtTexture, windowHalfX + mouseX, windowHalfY - mouseY, 1, 1, read );
 
 				valueNode.innerHTML = 'r:' + read[ 0 ] + '<br/>g:' + read[ 1 ] + '<br/>b:' + read[ 2 ];

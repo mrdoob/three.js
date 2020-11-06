@@ -1,43 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-        [page:Object3D] &rarr; [page:Light] &rarr;
+		[page:Object3D] &rarr; [page:Light] &rarr;
 
 		<h1>半球光（[name]）</h1>
 
 		<p class="desc">
-			光源直接放置于场景之上，光照颜色从天空光线颜色颜色渐变到地面光线颜色。
+			光源直接放置于场景之上，光照颜色从天空光线颜色渐变到地面光线颜色。
 			<br /><br />
 
 			半球光不能投射阴影。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
-		<div>
+		<code>
+		const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+		scene.add( light );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
 			[example:webgl_lights_hemisphere lights / hemisphere ]<br />
-		  [example:misc_controls_pointerlock controls / pointerlock ]<br />
-		  [example:webgl_decals decals ]<br />
-		  [example:webgl_loader_collada_kinematics loader / collada / kinematics ]<br />
-		  [example:webgl_materials_lightmap materials / lightmap ]<br />
-		  [example:webgl_shaders_ocean shaders / ocean ]
-		</div>
-
-<code>
-var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
-scene.add( light );
-</code>
+			[example:misc_controls_pointerlock controls / pointerlock ]<br />
+			[example:webgl_decals decals ]<br />
+			[example:webgl_loader_collada_kinematics loader / collada / kinematics ]<br />
+			[example:webgl_materials_lightmap materials / lightmap ]<br />
+			[example:webgl_shaders_ocean shaders / ocean ]
+		</p>
 
 		<h2>构造器（Constructor）</h2>
 		<h3>[name]( [param:Integer skyColor], [param:Integer groundColor], [param:Float intensity] )</h3>
-    <p>
+	<p>
 		[page:Integer skyColor] - (可选参数) 天空中发出光线的颜色。 缺省值 0xffffff。<br />
 		[page:Integer groundColor] - (可选参数) 地面发出光线的颜色。 缺省值 0xffffff。<br />
 		[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。<br /><br />
@@ -68,13 +69,6 @@ scene.add( light );
 			默认会创建 [page:Color] 并设置为白色（0xffffff）。
 		</p>
 
-		<h3>[property:Boolean isHemisphereLight]</h3>
-		<p>
-				用来校验这个类或者派生类是不是半球光。缺省值为 *true*。<br /><br />
-
-				不应该去改变这个变量,因为内部使用这个变量做了些优化的工作。
-		</p>
-
 		<h3>[property:Vector3 position]</h3>
 		<p>
 			假如这个值设置等于 [page:Object3D.DefaultUp] (0, 1, 0),那么光线将会从上往下照射。
@@ -84,7 +78,7 @@ scene.add( light );
 
 		<h2>方法（Methods）</h2>
 
-		公共方法请查看基类 [page:Light Light]。
+		<p>公共方法请查看基类 [page:Light Light]。</p>
 
 		<h3>[method:HemisphereLight copy]( [param:HemisphereLight source] )</h3>
 		<p>

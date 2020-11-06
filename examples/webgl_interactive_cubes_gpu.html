@@ -18,7 +18,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking
 		</div>
 
 		<div id="container"></div>
@@ -32,13 +32,15 @@
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
-			var container, stats;
-			var camera, controls, scene, renderer;
-			var pickingData = [], pickingTexture, pickingScene;
-			var highlightBox;
+			let container, stats;
+			let camera, controls, scene, renderer;
+			let pickingTexture, pickingScene;
+			let highlightBox;
 
-			var mouse = new THREE.Vector2();
-			var offset = new THREE.Vector3( 10, 10, 10 );
+			const pickingData = [];
+
+			const mouse = new THREE.Vector2();
+			const offset = new THREE.Vector3( 10, 10, 10 );
 
 			init();
 			animate();
@@ -58,50 +60,50 @@
 
 				scene.add( new THREE.AmbientLight( 0x555555 ) );
 
-				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				const light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
 				scene.add( light );
 
-				var pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
-				var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0	} );
+				const pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
+				const defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: true, shininess: 0	} );
 
 				function applyVertexColors( geometry, color ) {
 
-					var position = geometry.attributes.position;
-					var colors = [];
+					const position = geometry.attributes.position;
+					const colors = [];
 
-					for ( var i = 0; i < position.count; i ++ ) {
+					for ( let i = 0; i < position.count; i ++ ) {
 
 						colors.push( color.r, color.g, color.b );
 
 					}
 
-					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+					geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				}
 
-				var geometriesDrawn = [];
-				var geometriesPicking = [];
+				const geometriesDrawn = [];
+				const geometriesPicking = [];
 
-				var matrix = new THREE.Matrix4();
-				var quaternion = new THREE.Quaternion();
-				var color = new THREE.Color();
+				const matrix = new THREE.Matrix4();
+				const quaternion = new THREE.Quaternion();
+				const color = new THREE.Color();
 
-				for ( var i = 0; i < 5000; i ++ ) {
+				for ( let i = 0; i < 5000; i ++ ) {
 
-					var geometry = new THREE.BoxBufferGeometry();
+					let geometry = new THREE.BoxBufferGeometry();
 
-					var position = new THREE.Vector3();
+					const position = new THREE.Vector3();
 					position.x = Math.random() * 10000 - 5000;
 					position.y = Math.random() * 6000 - 3000;
 					position.z = Math.random() * 8000 - 4000;
 
-					var rotation = new THREE.Euler();
+					const rotation = new THREE.Euler();
 					rotation.x = Math.random() * 2 * Math.PI;
 					rotation.y = Math.random() * 2 * Math.PI;
 					rotation.z = Math.random() * 2 * Math.PI;
 
-					var scale = new THREE.Vector3();
+					const scale = new THREE.Vector3();
 					scale.x = Math.random() * 200 + 100;
 					scale.y = Math.random() * 200 + 100;
 					scale.z = Math.random() * 200 + 100;
@@ -109,7 +111,7 @@
 					quaternion.setFromEuler( rotation );
 					matrix.compose( position, quaternion, scale );
 
-					geometry.applyMatrix( matrix );
+					geometry.applyMatrix4( matrix );
 
 					// give the geometry's vertices a random color, to be displayed
 
@@ -135,7 +137,7 @@
 
 				}
 
-				var objects = new THREE.Mesh( BufferGeometryUtils.mergeBufferGeometries( geometriesDrawn ), defaultMaterial );
+				const objects = new THREE.Mesh( BufferGeometryUtils.mergeBufferGeometries( geometriesDrawn ), defaultMaterial );
 				scene.add( objects );
 
 				pickingScene.add( new THREE.Mesh( BufferGeometryUtils.mergeBufferGeometries( geometriesPicking ), pickingMaterial ) );
@@ -204,7 +206,7 @@
 
 				//create buffer for reading single pixel
 
-				var pixelBuffer = new Uint8Array( 4 );
+				const pixelBuffer = new Uint8Array( 4 );
 
 				//read the pixel
 
@@ -212,8 +214,8 @@
 
 				//interpret the pixel as an ID
 
-				var id = ( pixelBuffer[ 0 ] << 16 ) | ( pixelBuffer[ 1 ] << 8 ) | ( pixelBuffer[ 2 ] );
-				var data = pickingData[ id ];
+				const id = ( pixelBuffer[ 0 ] << 16 ) | ( pixelBuffer[ 1 ] << 8 ) | ( pixelBuffer[ 2 ] );
+				const data = pickingData[ id ];
 
 				if ( data ) {
 

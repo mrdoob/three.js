@@ -4,6 +4,22 @@
 		<title>three.js - uv mapping tests</title>
 		<meta charset=utf-8 />
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background: #ffffff;
+				color: #000000;
+				text-align: center;
+				font-family: sans-serif;
+			}
+			h3 {
+				margin-top: 60px;
+				margin-bottom: 30px;
+				font-weight: normal;
+			}
+			canvas {
+				width: 100%;
+			}
+		</style>
 	</head>
 
 	<body>
@@ -21,9 +37,9 @@
 
 			function test( name, geometry ) {
 
-				var d = document.createElement( 'div' );
+				const d = document.createElement( 'div' );
 
-				d.innerHTML = '<br><br>' + name + '<br>';
+				d.innerHTML = '<h3>' + name + '</h3>';
 
 				d.appendChild( UVsDebug( geometry ) );
 
@@ -31,9 +47,9 @@
 
 			}
 
-			var points = [];
+			const points = [];
 
-			for ( var i = 0; i < 10; i ++ ) {
+			for ( let i = 0; i < 10; i ++ ) {
 
 				points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 15 + 50, ( i - 5 ) * 2 ) );
 

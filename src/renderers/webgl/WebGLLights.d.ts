@@ -1,6 +1,9 @@
+import { WebGLExtensions } from './WebGLExtensions';
+import { WebGLCapabilities } from './WebGLCapabilities';
+
 export class WebGLLights {
 
-	constructor( gl: WebGLRenderingContext, properties: any, info: any );
+	constructor( extensions: WebGLExtensions, capabilities: WebGLCapabilities );
 
 	state: {
 		version: number;
@@ -20,20 +23,19 @@ export class WebGLLights {
 		ambient: Array<number>;
 		probe: Array<any>;
 		directional: Array<any>;
+		directionalShadow: Array<any>;
 		directionalShadowMap: Array<any>;
 		directionalShadowMatrix: Array<any>;
 		spot: Array<any>;
+		spotShadow: Array<any>;
 		spotShadowMap: Array<any>;
 		spotShadowMatrix: Array<any>;
 		rectArea: Array<any>;
 		point: Array<any>;
+		pointShadow: Array<any>;
 		pointShadowMap: Array<any>;
 		pointShadowMatrix: Array<any>;
 		hemi: Array<any>;
-
-		numDirectionalShadows: number;
-		numPointShadows: number;
-		numSpotShadows: number;
 	};
 
 	get( light: any ): any;

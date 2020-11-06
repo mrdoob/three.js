@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -18,23 +17,23 @@
 			内部默认使用[page:FileLoader]来加载文件。
 		</p>
 
-		<h2>例子</h2>
+		<h2>代码示例</h2>
 
 		<code>
 		// 初始化一个监听
-		var audioListener = new THREE.AudioListener();
+		const audioListener = new THREE.AudioListener();
 
 		// 把监听添加到camera
 		camera.add( audioListener );
 
 		// 初始化音频对象
-		var oceanAmbientSound = new THREE.Audio( audioListener );
+		const oceanAmbientSound = new THREE.Audio( audioListener );
 
 		// 添加一个音频对象到场景中
 		scene.add( oceanAmbientSound );
 
 		// 初始化一个加载器
-		var loader = new THREE.AudioLoader();
+		const loader = new THREE.AudioLoader();
 
 		// 加载资源
 		loader.load(
@@ -86,7 +85,7 @@
 		[page:Function onError] — 在加载错误时被调用。<br />
 		</p>
 		<p>
-            从URL中进行加载并将已经加载的[page:String AudioBuffer]传递给onLoad。
+			从URL中进行加载并将已经加载的[page:String AudioBuffer]传递给onLoad。
 		</p>
 
 		<h2>源</h2>

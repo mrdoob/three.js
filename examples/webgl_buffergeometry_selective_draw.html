@@ -41,7 +41,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> buffergeometry - selective - draw
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> buffergeometry - selective - draw
 			<div id="title"></div>
 			<div id="ui"><a href="#" id="hideLines">CULL SOME LINES</a> - <a href="#" id="showAllLines">SHOW ALL LINES</a></div>
 		</div>
@@ -52,11 +52,11 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var camera, scene, renderer, stats;
-			var geometry, mesh;
-			var numLat = 100;
-			var numLng = 200;
-			var numLinesCulled = 0;
+			let camera, scene, renderer, stats;
+			let geometry, mesh;
+			const numLat = 100;
+			const numLng = 200;
+			let numLinesCulled = 0;
 
 			init();
 			animate();
@@ -82,10 +82,10 @@
 
 				addLines( 1.0 );
 
-				var hideLinesButton = document.getElementById( 'hideLines' );
+				const hideLinesButton = document.getElementById( 'hideLines' );
 				hideLinesButton.addEventListener( 'click', hideLines );
 
-				var showAllLinesButton = document.getElementById( 'showAllLines' );
+				const showAllLinesButton = document.getElementById( 'showAllLines' );
 				showAllLinesButton.addEventListener( 'click', showAllLines );
 
 			}
@@ -93,18 +93,18 @@
 			function addLines( radius ) {
 
 				geometry = new THREE.BufferGeometry();
-				var linePositions = new Float32Array( numLat * numLng * 3 * 2 );
-				var lineColors = new Float32Array( numLat * numLng * 3 * 2 );
-				var visible = new Float32Array( numLat * numLng * 2 );
+				const linePositions = new Float32Array( numLat * numLng * 3 * 2 );
+				const lineColors = new Float32Array( numLat * numLng * 3 * 2 );
+				const visible = new Float32Array( numLat * numLng * 2 );
 
-				for ( var i = 0; i < numLat; ++ i ) {
+				for ( let i = 0; i < numLat; ++ i ) {
 
-					for ( var j = 0; j < numLng; ++ j ) {
+					for ( let j = 0; j < numLng; ++ j ) {
 
-						var lat = ( Math.random() * Math.PI ) / 50.0 + i / numLat * Math.PI;
-						var lng = ( Math.random() * Math.PI ) / 50.0 + j / numLng * 2 * Math.PI;
+						const lat = ( Math.random() * Math.PI ) / 50.0 + i / numLat * Math.PI;
+						const lng = ( Math.random() * Math.PI ) / 50.0 + j / numLng * 2 * Math.PI;
 
-						var index = i * numLng + j;
+						const index = i * numLng + j;
 
 						linePositions[ index * 6 + 0 ] = 0;
 						linePositions[ index * 6 + 1 ] = 0;
@@ -113,7 +113,7 @@
 						linePositions[ index * 6 + 4 ] = radius * Math.cos( lat );
 						linePositions[ index * 6 + 5 ] = radius * Math.sin( lat ) * Math.sin( lng );
 
-						var color = new THREE.Color( 0xffffff );
+						const color = new THREE.Color( 0xffffff );
 
 						color.setHSL( lat / Math.PI, 1.0, 0.2 );
 						lineColors[ index * 6 + 0 ] = color.r;
@@ -133,13 +133,13 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( linePositions, 3 ) );
-				geometry.addAttribute( 'vertColor', new THREE.BufferAttribute( lineColors, 3 ) );
-				geometry.addAttribute( 'visible', new THREE.BufferAttribute( visible, 1 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( linePositions, 3 ) );
+				geometry.setAttribute( 'vertColor', new THREE.BufferAttribute( lineColors, 3 ) );
+				geometry.setAttribute( 'visible', new THREE.BufferAttribute( visible, 1 ) );
 
 				geometry.computeBoundingSphere();
 
-				var shaderMaterial = new THREE.ShaderMaterial( {
+				const shaderMaterial = new THREE.ShaderMaterial( {
 
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent
@@ -154,14 +154,14 @@
 
 			function updateCount() {
 
-				var str = '1 draw call, ' + numLat * numLng + ' lines, ' + numLinesCulled + ' culled (<a target="_blank" href="http://callum.com">author</a>)';
+				const str = '1 draw call, ' + numLat * numLng + ' lines, ' + numLinesCulled + ' culled (<a target="_blank" href="http://callum.com">author</a>)';
 				document.getElementById( 'title' ).innerHTML = str.replace( /\B(?=(\d{3})+(?!\d))/g, "," );
 
 			}
 
 			function hideLines() {
 
-				for ( var i = 0; i < geometry.attributes.visible.array.length; i += 2 ) {
+				for ( let i = 0; i < geometry.attributes.visible.array.length; i += 2 ) {
 
 					if ( Math.random() > 0.75 ) {
 
@@ -188,7 +188,7 @@
 
 				numLinesCulled = 0;
 
-				for ( var i = 0; i < geometry.attributes.visible.array.length; i += 2 ) {
+				for ( let i = 0; i < geometry.attributes.visible.array.length; i += 2 ) {
 
 					geometry.attributes.visible.array[ i + 0 ] = 1;
 					geometry.attributes.visible.array[ i + 1 ] = 1;
@@ -210,11 +210,11 @@
 
 			}
 
-			function animate( time ) {
+			function animate() {
 
 				requestAnimationFrame( animate );
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
 				mesh.rotation.x = time * 0.25;
 				mesh.rotation.y = time * 0.5;

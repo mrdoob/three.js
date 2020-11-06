@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl postprocessing example<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl postprocessing example<br/>
 			<a href="http://g3d.cs.williams.edu/g3d/data10/index.html#mesh19" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
@@ -36,24 +36,25 @@
 			import { VerticalBlurShader } from './jsm/shaders/VerticalBlurShader.js';
 			import { SepiaShader } from './jsm/shaders/SepiaShader.js';
 			import { VignetteShader } from './jsm/shaders/VignetteShader.js';
+			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
 
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var container, stats;
+			let container, stats;
 
-			var composerScene, composer1, composer2, composer3, composer4;
+			let composerScene, composer1, composer2, composer3, composer4;
 
-			var cameraOrtho, cameraPerspective, sceneModel, sceneBG, renderer, mesh, directionalLight;
+			let cameraOrtho, cameraPerspective, sceneModel, sceneBG, renderer, mesh, directionalLight;
 
-			var width = window.innerWidth || 2;
-			var height = window.innerHeight || 2;
+			const width = window.innerWidth || 2;
+			const height = window.innerHeight || 2;
 
-			var halfWidth = width / 2;
-			var halfHeight = height / 2;
+			let halfWidth = width / 2;
+			let halfHeight = height / 2;
 
-			var quadBG, quadMask, renderScene;
+			let quadBG, quadMask, renderScene;
 
-			var delta = 0.01;
+			const delta = 0.01;
 
 			init();
 			animate();
@@ -81,7 +82,7 @@
 				directionalLight.position.set( 0, - 0.1, 1 ).normalize();
 				sceneModel.add( directionalLight );
 
-				var loader = new GLTFLoader();
+				const loader = new GLTFLoader();
 				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
 					createMesh( gltf.scene.children[ 0 ].geometry, sceneModel, 100 );
@@ -90,8 +91,11 @@
 
 				//
 
-				var materialColor = new THREE.MeshBasicMaterial( {
-					map: new THREE.TextureLoader().load( "textures/cube/SwedishRoyalCastle/pz.jpg" ),
+				const diffuseMap = new THREE.TextureLoader().load( "textures/cube/SwedishRoyalCastle/pz.jpg" );
+				diffuseMap.encoding = THREE.sRGBEncoding;
+
+				const materialColor = new THREE.MeshBasicMaterial( {
+					map: diffuseMap,
 					depthTest: false
 				} );
 
@@ -102,7 +106,7 @@
 
 				//
 
-				var sceneMask = new THREE.Scene();
+				const sceneMask = new THREE.Scene();
 
 				quadMask = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				quadMask.position.z = - 300;
@@ -118,11 +122,6 @@
 
 				//
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
-
-				//
-
 				container.appendChild( renderer.domElement );
 
 				//
@@ -132,15 +131,14 @@
 
 				//
 
-				var shaderBleach = BleachBypassShader;
-				var shaderSepia = SepiaShader;
-				var shaderVignette = VignetteShader;
-				// var shaderCopy = CopyShader;
+				const shaderBleach = BleachBypassShader;
+				const shaderSepia = SepiaShader;
+				const shaderVignette = VignetteShader;
 
-				var effectBleach = new ShaderPass( shaderBleach );
-				var effectSepia = new ShaderPass( shaderSepia );
-				var effectVignette = new ShaderPass( shaderVignette );
-				// var effectCopy = new ShaderPass( shaderCopy );
+				const effectBleach = new ShaderPass( shaderBleach );
+				const effectSepia = new ShaderPass( shaderSepia );
+				const effectVignette = new ShaderPass( shaderVignette );
+				const gammaCorrection = new ShaderPass( GammaCorrectionShader );
 
 				effectBleach.uniforms[ "opacity" ].value = 0.95;
 
@@ -149,43 +147,43 @@
 				effectVignette.uniforms[ "offset" ].value = 0.95;
 				effectVignette.uniforms[ "darkness" ].value = 1.6;
 
-				var effectBloom = new BloomPass( 0.5 );
-				var effectFilm = new FilmPass( 0.35, 0.025, 648, false );
-				var effectFilmBW = new FilmPass( 0.35, 0.5, 2048, true );
-				var effectDotScreen = new DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.8 );
+				const effectBloom = new BloomPass( 0.5 );
+				const effectFilm = new FilmPass( 0.35, 0.025, 648, false );
+				const effectFilmBW = new FilmPass( 0.35, 0.5, 2048, true );
+				const effectDotScreen = new DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.8 );
 
-				var effectHBlur = new ShaderPass( HorizontalBlurShader );
-				var effectVBlur = new ShaderPass( VerticalBlurShader );
+				const effectHBlur = new ShaderPass( HorizontalBlurShader );
+				const effectVBlur = new ShaderPass( VerticalBlurShader );
 				effectHBlur.uniforms[ 'h' ].value = 2 / ( width / 2 );
 				effectVBlur.uniforms[ 'v' ].value = 2 / ( height / 2 );
 
-				var effectColorify1 = new ShaderPass( ColorifyShader );
-				var effectColorify2 = new ShaderPass( ColorifyShader );
+				const effectColorify1 = new ShaderPass( ColorifyShader );
+				const effectColorify2 = new ShaderPass( ColorifyShader );
 				effectColorify1.uniforms[ 'color' ] = new THREE.Uniform( new THREE.Color( 1, 0.8, 0.8 ) );
 				effectColorify2.uniforms[ 'color' ] = new THREE.Uniform( new THREE.Color( 1, 0.75, 0.5 ) );
 
-				var clearMask = new ClearMaskPass();
-				var renderMask = new MaskPass( sceneModel, cameraPerspective );
-				var renderMaskInverse = new MaskPass( sceneModel, cameraPerspective );
+				const clearMask = new ClearMaskPass();
+				const renderMask = new MaskPass( sceneModel, cameraPerspective );
+				const renderMaskInverse = new MaskPass( sceneModel, cameraPerspective );
 
 				renderMaskInverse.inverse = true;
 
 				//
 
-				var rtParameters = {
+				const rtParameters = {
 					minFilter: THREE.LinearFilter,
 					magFilter: THREE.LinearFilter,
 					format: THREE.RGBFormat,
 					stencilBuffer: true
 				};
 
-				var rtWidth = width / 2;
-				var rtHeight = height / 2;
+				const rtWidth = width / 2;
+				const rtHeight = height / 2;
 
 				//
 
-				var renderBackground = new RenderPass( sceneBG, cameraOrtho );
-				var renderModel = new RenderPass( sceneModel, cameraPerspective );
+				const renderBackground = new RenderPass( sceneBG, cameraOrtho );
+				const renderModel = new RenderPass( sceneModel, cameraPerspective );
 
 				renderModel.clear = false;
 
@@ -207,9 +205,8 @@
 				composer1 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer1.addPass( renderScene );
-				//composer1.addPass( renderMask );
+				composer1.addPass( gammaCorrection );
 				composer1.addPass( effectFilmBW );
-				//composer1.addPass( clearMask );
 				composer1.addPass( effectVignette );
 
 				//
@@ -217,6 +214,7 @@
 				composer2 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer2.addPass( renderScene );
+				composer2.addPass( gammaCorrection );
 				composer2.addPass( effectDotScreen );
 				composer2.addPass( renderMask );
 				composer2.addPass( effectColorify1 );
@@ -231,10 +229,9 @@
 				composer3 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer3.addPass( renderScene );
-				//composer3.addPass( renderMask );
+				composer3.addPass( gammaCorrection );
 				composer3.addPass( effectSepia );
 				composer3.addPass( effectFilm );
-				//composer3.addPass( clearMask );
 				composer3.addPass( effectVignette );
 
 				//
@@ -242,11 +239,10 @@
 				composer4 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer4.addPass( renderScene );
-				//composer4.addPass( renderMask );
+				composer4.addPass( gammaCorrection );
 				composer4.addPass( effectBloom );
 				composer4.addPass( effectFilm );
 				composer4.addPass( effectBleach );
-				//composer4.addPass( clearMask );
 				composer4.addPass( effectVignette );
 
 				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.texture;
@@ -288,12 +284,15 @@
 
 			function createMesh( geometry, scene, scale ) {
 
-				var mat2 = new THREE.MeshPhongMaterial( {
+				const diffuseMap = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
+				diffuseMap.encoding = THREE.sRGBEncoding;
+
+				const mat2 = new THREE.MeshPhongMaterial( {
 
 					color: 0x999999,
 					specular: 0x080808,
 					shininess: 20,
-					map: new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
+					map: diffuseMap,
 					normalMap: new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 					normalScale: new THREE.Vector2( 0.75, 0.75 )
 
@@ -321,7 +320,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.0004;
+				const time = Date.now() * 0.0004;
 
 				if ( mesh ) mesh.rotation.y = - time;
 

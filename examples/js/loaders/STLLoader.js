@@ -1,10 +1,4 @@
 /**
- * @author aleeper / http://adamleeper.com/
- * @author mrdoob / http://mrdoob.com/
- * @author gero3 / https://github.com/gero3
- * @author Mugen87 / https://github.com/Mugen87
- * @author neverhood311 / https://github.com/neverhood311
- *
  * Description: A THREE loader for STL ASCII files, as created by Solidworks and other CAD programs.
  *
  * Supports both binary and ASCII encoded files, with automatic detection of type.
@@ -25,7 +19,7 @@
  * For binary STLs geometry might contain colors for vertices. To use it:
  *  // use the same code to load STL as above
  *  if (geometry.hasColors) {
- *    material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
+ *    material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: true });
  *  } else { .... }
  *  var mesh = new THREE.Mesh( geometry, material );
  *
@@ -70,22 +64,31 @@ THREE.STLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		var scope = this;
 
-		var loader = new THREE.FileLoader( scope.manager );
-		loader.setPath( scope.path );
+		var loader = new THREE.FileLoader( this.manager );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
+
 		loader.load( url, function ( text ) {
 
 			try {
 
 				onLoad( scope.parse( text ) );
 
-			} catch ( exception ) {
+			} catch ( e ) {
 
 				if ( onError ) {
 
-					onError( exception );
+					onError( e );
+
+				} else {
+
+					console.error( e );
 
 				}
+
+				scope.manager.itemError( url );
 
 			}
 
@@ -240,12 +243,12 @@ THREE.STLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			}
 
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-			geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+			geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
 			if ( hasColors ) {
 
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 				geometry.hasColors = true;
 				geometry.alpha = alpha;
 
@@ -273,7 +276,6 @@ THREE.STLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			var result;
 
-			var groupVertexes = [];
 			var groupCount = 0;
 			var startVertex = 0;
 			var endVertex = 0;
@@ -329,23 +331,16 @@ THREE.STLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				}
 
-				groupVertexes.push( { startVertex: startVertex, endVertex: endVertex } );
+				var start = startVertex;
+				var count = endVertex - startVertex;
+
+				geometry.addGroup( start, count, groupCount );
 				groupCount ++;
 
 			}
 
-			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-			geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-
-			if ( groupCount > 0 ) {
-
-				for ( var i = 0; i < groupVertexes.length; i ++ ) {
-
-					geometry.addGroup( groupVertexes[ i ].startVertex, groupVertexes[ i ].endVertex, i );
-
-				}
-
-			}
+			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 
 			return geometry;
 
