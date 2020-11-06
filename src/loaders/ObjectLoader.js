@@ -59,6 +59,7 @@ import { Loader } from './Loader.js';
 import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
 import * as Curves from '../extras/curves/Curves.js';
+import { getTypedArray } from '../utils.js';
 
 class ObjectLoader extends Loader {
 
@@ -595,7 +596,7 @@ class ObjectLoader extends Loader {
 				if ( image.data ) {
 
 					return {
-						data: new TYPED_ARRAYS[ image.type ]( image.data ),
+						data: getTypedArray( image.type, image.data ),
 						width: image.width,
 						height: image.height
 					};
@@ -1146,19 +1147,6 @@ const TEXTURE_FILTER = {
 	LinearFilter: LinearFilter,
 	LinearMipmapNearestFilter: LinearMipmapNearestFilter,
 	LinearMipmapLinearFilter: LinearMipmapLinearFilter
-};
-
-const TYPED_ARRAYS = {
-	Int8Array: Int8Array,
-	Uint8Array: Uint8Array,
-	// Workaround for IE11 pre KB2929437. See #11440
-	Uint8ClampedArray: typeof Uint8ClampedArray !== 'undefined' ? Uint8ClampedArray : Uint8Array,
-	Int16Array: Int16Array,
-	Uint16Array: Uint16Array,
-	Int32Array: Int32Array,
-	Uint32Array: Uint32Array,
-	Float32Array: Float32Array,
-	Float64Array: Float64Array
 };
 
 export { ObjectLoader };
