@@ -11,6 +11,10 @@ function Skeleton( bones = [], boneInverses = [] ) {
 
 	this.bones = bones.slice( 0 );
 	this.boneInverses = boneInverses;
+	this.boneMatrices = null;
+
+	this.boneTexture = null;
+	this.boneTextureSize = 0;
 
 	this.frame = - 1;
 
@@ -138,7 +142,7 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-		if ( boneTexture !== undefined ) {
+		if ( boneTexture !== null ) {
 
 			boneTexture.needsUpdate = true;
 
@@ -172,11 +176,11 @@ Object.assign( Skeleton.prototype, {
 
 	dispose: function ( ) {
 
-		if ( this.boneTexture ) {
+		if ( this.boneTexture !== null ) {
 
 			this.boneTexture.dispose();
 
-			this.boneTexture = undefined;
+			this.boneTexture = null;
 
 		}
 
