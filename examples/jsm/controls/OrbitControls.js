@@ -18,7 +18,7 @@ import {
 
 var OrbitControls = function ( object, domElement ) {
 
-	var clock = new THREE.Clock();
+	var clock = new Clock();
 	var _dampingFactor;
 
 	if ( domElement === undefined ) console.warn( 'THREE.OrbitControls: The second parameter "domElement" is now mandatory.' );
