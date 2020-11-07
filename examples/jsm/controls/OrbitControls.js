@@ -55,7 +55,6 @@ var OrbitControls = function ( object, domElement ) {
 	// If damping is enabled, you must call controls.update() in your animation loop
 	this.enableDamping = false;
 	this.dampingFactor = 0.05;
-	_dampingFactor = this.dampingFactor
 
 	// This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
 	// Set to false to disable zooming
@@ -166,8 +165,9 @@ var OrbitControls = function ( object, domElement ) {
 			}
 
 			if ( scope.enableDamping ) {
-				const deltaTime = clock.getDelta()
-				_dampingFactor = scope.dampingFactor * deltaTime * 60
+				const deltaTime = clock.getDelta();
+				_dampingFactor = scope.dampingFactor * deltaTime * 60;
+				_dampingFactor = Math.min(_dampingFactor, 1);
 
 				spherical.theta += sphericalDelta.theta * _dampingFactor;
 				spherical.phi += sphericalDelta.phi * _dampingFactor;

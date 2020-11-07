@@ -5,9 +5,11 @@
 //    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
 //    Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
 
-const clock = new THREE.Clock();
-let _dampingFactor
+
 THREE.OrbitControls = function ( object, domElement ) {
+
+	var clock = new THREE.Clock();
+	var _dampingFactor
 
 	if ( domElement === undefined ) console.warn( 'THREE.OrbitControls: The second parameter "domElement" is now mandatory.' );
 	if ( domElement === document ) console.error( 'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.' );
@@ -43,7 +45,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// If damping is enabled, you must call controls.update() in your animation loop
 	this.enableDamping = false;
 	this.dampingFactor = 0.05;
-	_dampingFactor = this.dampingFactor
 
 	// This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
 	// Set to false to disable zooming
@@ -154,8 +155,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 			}
 
 			if ( scope.enableDamping ) {
-				const deltaTime = clock.getDelta()
-				_dampingFactor = scope.dampingFactor * deltaTime * 60
+				var deltaTime = clock.getDelta();
+				_dampingFactor = scope.dampingFactor * deltaTime * 60;
+				_dampingFactor = Math.min(_dampingFactor, 1);
 
 				spherical.theta += sphericalDelta.theta * _dampingFactor;
 				spherical.phi += sphericalDelta.phi * _dampingFactor;
