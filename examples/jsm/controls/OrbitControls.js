@@ -5,7 +5,8 @@ import {
 	Spherical,
 	TOUCH,
 	Vector2,
-	Vector3
+	Vector3,
+	Clock
 } from "../../../build/three.module.js";
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
@@ -14,6 +15,9 @@ import {
 //    Orbit - left mouse / touch: one-finger move
 //    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
 //    Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
+
+const clock = new Clock();
+let _dampingFactor
 
 var OrbitControls = function ( object, domElement ) {
 
@@ -51,6 +55,7 @@ var OrbitControls = function ( object, domElement ) {
 	// If damping is enabled, you must call controls.update() in your animation loop
 	this.enableDamping = false;
 	this.dampingFactor = 0.05;
+	_dampingFactor = this.dampingFactor
 
 	// This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
 	// Set to false to disable zooming
@@ -161,9 +166,11 @@ var OrbitControls = function ( object, domElement ) {
 			}
 
 			if ( scope.enableDamping ) {
+				const deltaTime = clock.getDelta()
+				_dampingFactor = scope.dampingFactor * deltaTime * 60
 
-				spherical.theta += sphericalDelta.theta * scope.dampingFactor;
-				spherical.phi += sphericalDelta.phi * scope.dampingFactor;
+				spherical.theta += sphericalDelta.theta * _dampingFactor;
+				spherical.phi += sphericalDelta.phi * _dampingFactor;
 
 			} else {
 
@@ -212,7 +219,7 @@ var OrbitControls = function ( object, domElement ) {
 
 			if ( scope.enableDamping === true ) {
 
-				scope.target.addScaledVector( panOffset, scope.dampingFactor );
+				scope.target.addScaledVector( panOffset, _dampingFactor );
 
 			} else {
 
@@ -231,10 +238,10 @@ var OrbitControls = function ( object, domElement ) {
 
 			if ( scope.enableDamping === true ) {
 
-				sphericalDelta.theta *= ( 1 - scope.dampingFactor );
-				sphericalDelta.phi *= ( 1 - scope.dampingFactor );
+				sphericalDelta.theta *= ( 1 - _dampingFactor );
+				sphericalDelta.phi *= ( 1 - _dampingFactor );
 
-				panOffset.multiplyScalar( 1 - scope.dampingFactor );
+				panOffset.multiplyScalar( 1 - _dampingFactor );
 
 			} else {
 
