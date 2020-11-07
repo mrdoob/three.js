@@ -17,7 +17,7 @@ import {
 //    Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
 
 const clock = new Clock();
-let _dampingFactor
+let _dampingFactor;
 
 var OrbitControls = function ( object, domElement ) {
 
