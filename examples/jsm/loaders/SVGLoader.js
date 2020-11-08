@@ -282,7 +282,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						}
 
 						break;
-
+	
 					case 'L':
 						var numbers = parseFloats( data );
 
@@ -398,15 +398,25 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						var numbers = parseFloats( data );
 
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
+							// skip command if start point == end point
+							if( numbers[ j + 5 ] == point.x && numbers[ j + 6 ] == point.y ) continue
 
+							
 							var start = point.clone();
 							point.x = numbers[ j + 5 ];
 							point.y = numbers[ j + 6 ];
 							control.x = point.x;
 							control.y = point.y;
-							parseArcCommand(
-								path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
-							);
+
+							if( numbers[ j ] == 0 || numbers[ j + 1 ] == 0 ) {
+								// draw a line if either of the radii == 0
+								path.lineTo( point.x, point.y );
+							}
+							else {
+								parseArcCommand(
+									path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
+								);
+							}
 
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
@@ -585,20 +595,27 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					case 'a':
 						var numbers = parseFloats( data );
-
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
+							// skip command if start point == end point
+							if( numbers[ j + 5 ] == 0 && numbers[ j + 6 ] == 0 ) continue
 
 							var start = point.clone();
 							point.x += numbers[ j + 5 ];
 							point.y += numbers[ j + 6 ];
 							control.x = point.x;
 							control.y = point.y;
-							parseArcCommand(
-								path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
-							);
+
+							if( numbers[ j ] == 0 || numbers[ j + 1 ] == 0 ) {
+								// draw a line if either of the radii == 0
+								path.lineTo( point.x, point.y );
+							}
+							else {
+								parseArcCommand(
+									path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
+								);
+							}
 
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
