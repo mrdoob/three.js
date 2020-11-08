@@ -18327,7 +18327,7 @@
 					var bones = skeleton.bones;
 
 					if (capabilities.floatVertexTextures) {
-						if (skeleton.boneTexture === undefined) {
+						if (skeleton.boneTexture === null) {
 							// layout (1 matrix = 4 pixels)
 							//			RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
 							//	with	8x8	pixel texture max	 16 bones * 4 pixels =	(8 * 8)
@@ -19435,6 +19435,9 @@
 		this.uuid = MathUtils.generateUUID();
 		this.bones = bones.slice(0);
 		this.boneInverses = boneInverses;
+		this.boneMatrices = null;
+		this.boneTexture = null;
+		this.boneTextureSize = 0;
 		this.frame = -1;
 		this.init();
 	}
@@ -19514,7 +19517,7 @@
 				_offsetMatrix.toArray(boneMatrices, i * 16);
 			}
 
-			if (boneTexture !== undefined) {
+			if (boneTexture !== null) {
 				boneTexture.needsUpdate = true;
 			}
 		},
@@ -19533,9 +19536,9 @@
 			return undefined;
 		},
 		dispose: function dispose() {
-			if (this.boneTexture) {
+			if (this.boneTexture !== null) {
 				this.boneTexture.dispose();
-				this.boneTexture = undefined;
+				this.boneTexture = null;
 			}
 		},
 		fromJSON: function fromJSON(json, bones) {
@@ -37550,3 +37553,4 @@
 	Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGhyZWUuanMiLCJzb3VyY2VzIjpbXSwic291cmNlc0NvbnRlbnQiOltdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiIn0=
