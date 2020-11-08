@@ -282,7 +282,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						}
 
 						break;
-
+	
 					case 'L':
 						var numbers = parseFloats( data );
 
@@ -595,7 +595,6 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					case 'a':
 						var numbers = parseFloats( data );
-						console.log(parseFloats(data));
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
 							// skip command if start point == end point
 							if( numbers[ j + 5 ] == 0 && numbers[ j + 6 ] == 0 ) continue
