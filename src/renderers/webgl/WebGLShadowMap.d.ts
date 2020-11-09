@@ -36,7 +36,7 @@ export class WebGLShadowMap {
 	render( shadowsArray: Light[], scene: Scene, camera: Camera ): void;
 
 	/**
-	 * @deprecated Use {@link WebGLShadowMap#renderReverseSided .shadowMap.renderReverseSided} instead.
+	 * @deprecated Use {@link Material#shadowSide} instead.
 	 */
 	cullFace: any;
 

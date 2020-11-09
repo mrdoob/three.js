@@ -44,6 +44,7 @@ import {
 } from "../../../build/three.module.js";
 import { Inflate } from "../libs/inflate.module.min.js";
 import { NURBSCurve } from "../curves/NURBSCurve.js";
+
 /**
  * Loader loads FBX file and generates Group representing FBX scene.
  * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format
@@ -87,6 +88,7 @@ var FBXLoader = ( function () {
 			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
 			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 
 			loader.load( url, function ( buffer ) {
 
@@ -2783,7 +2785,7 @@ var FBXLoader = ( function () {
 				postRotation.push( eulerOrder );
 
 				postRotation = new Euler().fromArray( postRotation );
-				postRotation = new Quaternion().setFromEuler( postRotation ).inverse();
+				postRotation = new Quaternion().setFromEuler( postRotation ).invert();
 
 			}
 
@@ -4058,7 +4060,7 @@ var FBXLoader = ( function () {
 		lParentTM.copyPosition( lParentGX );
 
 		var lParentGSM = new Matrix4();
-		lParentGSM.getInverse( lParentGRM ).multiply( lParentGX );
+		lParentGSM.copy( lParentGRM ).invert().multiply( lParentGX );
 
 		var lGlobalRS = new Matrix4();
 
@@ -4072,15 +4074,18 @@ var FBXLoader = ( function () {
 
 		} else {
 
-			var lParentLSM_inv = new Matrix4().getInverse( lScalingM );
+			var lParentLSM_inv = new Matrix4();
+			lParentLSM_inv.copy( lScalingM ).invert();
 			var lParentGSM_noLocal = new Matrix4().multiply( lParentGSM ).multiply( lParentLSM_inv );
 
 			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lScalingM );
 
 		}
 
-		var lRotationPivotM_inv = new Matrix4().getInverse( lRotationPivotM );
-		var lScalingPivotM_inv = new Matrix4().getInverse( lScalingPivotM );
+		var lRotationPivotM_inv = new Matrix4();
+		lRotationPivotM_inv.copy( lRotationPivotM ).invert();
+		var lScalingPivotM_inv = new Matrix4();
+		lScalingPivotM_inv.copy( lScalingPivotM ).invert();
 		// Calculate the local transform matrix
 		var lTransform = new Matrix4();
 		lTransform.copy( lTranslationM ).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );

@@ -2,6 +2,8 @@ class Vector4 {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
+		Object.defineProperty( this, 'isVector4', { value: true } );
+
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -587,9 +589,7 @@ class Vector4 {
 
 	}
 
-	fromArray( array, offset ) {
-
-		if ( offset === undefined ) offset = 0;
+	fromArray( array, offset = 0 ) {
 
 		this.x = array[ offset ];
 		this.y = array[ offset + 1 ];
@@ -600,10 +600,7 @@ class Vector4 {
 
 	}
 
-	toArray( array, offset ) {
-
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+	toArray( array = [], offset = 0 ) {
 
 		array[ offset ] = this.x;
 		array[ offset + 1 ] = this.y;
@@ -643,7 +640,5 @@ class Vector4 {
 	}
 
 }
-
-Vector4.prototype.isVector4 = true;
 
 export { Vector4 };

@@ -1,10 +1,11 @@
 import { BackSide, LinearFilter, LinearMipmapLinearFilter, NoBlending, RGBAFormat } from '../constants.js';
 import { Mesh } from '../objects/Mesh.js';
-import { BoxBufferGeometry } from '../geometries/BoxGeometry.js';
+import { BoxBufferGeometry } from '../geometries/BoxBufferGeometry.js';
 import { ShaderMaterial } from '../materials/ShaderMaterial.js';
 import { cloneUniforms } from './shaders/UniformsUtils.js';
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 import { CubeCamera } from '../cameras/CubeCamera.js';
+import { CubeTexture } from '../textures/CubeTexture.js';
 
 function WebGLCubeRenderTarget( size, options, dummy ) {
 
@@ -18,7 +19,11 @@ function WebGLCubeRenderTarget( size, options, dummy ) {
 
 	WebGLRenderTarget.call( this, size, size, options );
 
-	this.texture.isWebGLCubeRenderTargetTexture = true; // HACK Why is texture not a CubeTexture?
+	options = options || {};
+
+	this.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+
+	this.texture._needsFlipEnvMap = false;
 
 }
 
@@ -102,9 +107,6 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 	const mesh = new Mesh( geometry, material );
 
 	const currentMinFilter = texture.minFilter;
-	const currentRenderList = renderer.getRenderList();
-	const currentRenderTarget = renderer.getRenderTarget();
-	const currentRenderState = renderer.getRenderState();
 
 	// Avoid blurred poles
 	if ( texture.minFilter === LinearMipmapLinearFilter ) texture.minFilter = LinearFilter;
@@ -114,14 +116,26 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 
 	texture.minFilter = currentMinFilter;
 
-	renderer.setRenderTarget( currentRenderTarget );
-	renderer.setRenderList( currentRenderList );
-	renderer.setRenderState( currentRenderState );
-
 	mesh.geometry.dispose();
 	mesh.material.dispose();
 
 	return this;
+
+};
+
+WebGLCubeRenderTarget.prototype.clear = function ( renderer, color, depth, stencil ) {
+
+	const currentRenderTarget = renderer.getRenderTarget();
+
+	for ( let i = 0; i < 6; i ++ ) {
+
+		renderer.setRenderTarget( this, i );
+
+		renderer.clear( color, depth, stencil );
+
+	}
+
+	renderer.setRenderTarget( currentRenderTarget );
 
 };
 

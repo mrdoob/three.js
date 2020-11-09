@@ -3,42 +3,41 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>四元数（[name]）</h1>
 
 		<p class="desc">
-			Implementation of a [link:http://en.wikipedia.org/wiki/Quaternion quaternion].<br/>
-			Quaternions are used in three.js to represent [link:https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation rotations].
+			该类实现了 [link:http://en.wikipedia.org/wiki/Quaternion quaternion] 。<br/>
+			四元数在three.js中用于表示 [link:https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation rotation] （旋转）。
 		</p>
 
 		<h2>代码示例</h2>
 
 		<code>
-		var quaternion = new THREE.Quaternion();
+		const quaternion = new THREE.Quaternion();
 		quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
 
-		var vector = new THREE.Vector3( 1, 0, 0 );
+		const vector = new THREE.Vector3( 1, 0, 0 );
 		vector.applyQuaternion( quaternion );
 		</code>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
 		<p>
-		[page:Float x] - x coordinate<br />
-		[page:Float y] - y coordinate<br />
-		[page:Float z] - z coordinate<br />
-		[page:Float w] - w coordinate
+		[page:Float x] - x 坐标<br />
+		[page:Float y] - y 坐标<br />
+		[page:Float z] - z 坐标<br />
+		[page:Float w] - w 坐标
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Float x]</h3>
 
@@ -49,91 +48,87 @@
 		<h3>[property:Float w]</h3>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:Float angleTo]( [param:Quaternion q] )</h3>
 		<p>
-			Returns the angle between this quaternion and quaternion [page:Quaternion q] in radians.
+			以弧度返回该四元数与四元数 [page:Quaternion q] 之间的夹角。
 		</p>
 
 		<h3>[method:Quaternion clone]()</h3>
 		<p>
-			Creates a new Quaternion with identical [page:.x x], [page:.y y],
-			[page:.z z] and [page:.w w] properties to this one.
+			创建一个与该四元数具有相同[page:.x x]、[page:.y y]、[page:.z z]和[page:.w w]
+			属性的四元数。
 		</p>
 
 		<h3>[method:Quaternion conjugate]()</h3>
 		<p>
-		Returns the rotational conjugate of this quaternion. The conjugate of a quaternion
-		represents the same rotation in the opposite direction about the rotational axis.
+			返回该四元数的旋转共轭。
+			四元数的共轭表示的是，围绕旋转轴在相反方向上的相同旋转。
 		</p>
 
 		<h3>[method:Quaternion copy]( [param:Quaternion q] )</h3>
 		<p>
-			Copies the [page:.x x], [page:.y y],	[page:.z z] and [page:.w w] properties
-			of [page:Quaternion q] into this quaternion.
+			复制四元数 [page:Quaternion q] 的 [page:.x x]、[page:.y y]、[page:.z z] 和 [page:.w w]
+			属性到该四元数中。
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Quaternion v] )</h3>
 		<p>
-		[page:Quaternion v] - Quaternion that this quaternion will be compared to.<br /><br />
+		[page:Quaternion v] - 用于进行比较的四元数。<br /><br />
 
-		Compares the [page:.x x], [page:.y y],	[page:.z z] and [page:.w w] properties of
-		[page:Quaternion v] to the equivalent properties of this quaternion to determine if they
-		represent the same rotation.
+		将四元数 [page:Quaternion v] 的 [page:.x x]、 [page:.y y]、	[page:.z z] 和 [page:.w w] 的属性
+		与当前四元数的对应属性相比较，以确定它们是否表示相同的旋转。
 		</p>
 
 		<h3>[method:Float dot]( [param:Quaternion v] )</h3>
 		<p>
-			Calculates the [link:https://en.wikipedia.org/wiki/Dot_product dot product] of
-			quaternions [page:Quaternion v] and this one.
+			计算四元数 [page:Quaternion v] 与当前四元数的[link:https://en.wikipedia.org/wiki/Dot_product dot product]（点积）。
 		</p>
 
 		<h3>[method:Quaternion fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
-		[page:Array array] - array of format (x, y, z, w) used to construct the quaternion.<br />
-		[page:Integer offset] - (optional) an offset into the array.<br /><br />
+		[page:Array array] - 用于构造四元数的形如(x, y, z, w)的数组。<br />
+		[page:Integer offset] - （可选）数组的偏移量。（译者注：使用数组中从第offset元素算起的四个元素）<br /><br />
 
-		Sets this quaternion's [page:.x x], [page:.y y],	[page:.z z] and [page:.w w] properties
-		from an array.
+		从一个数组来设置四元数的 [page:.x x]、 [page:.y y]、[page:.z z] 和 [page:.w w] 的属性。
 		</p>
 
 		<h3>[method:Quaternion identity]()</h3>
 		<p>
-			Sets this quaternion to the identity quaternion; that is, to the quaternion that represents "no rotation".
+			设置该四元数为 identity 四元数，即表示“不旋转”的四元数。
 		</p>
 
-		<h3>[method:Quaternion inverse]()</h3>
+		<h3>[method:Quaternion invert]()</h3>
 		<p>
-			Inverts this quaternion - calculates the [page:.conjugate conjugate]. The quaternion is assumed to have unit length.
+			翻转该四元数 —— 计算 [page:.conjugate conjugate] 。假定该四元数具有单位长度。
 		</p>
 
 		<h3>[method:Float length]()</h3>
-		<p>Computes the [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean length]
-		(straight-line length) of this quaternion, considered as a 4 dimensional vector.</p>
+		<p>计算四元数的 [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean length]
+		（欧几里得长度，直线长度），视为一个四维向量。</p>
 
 		<h3>[method:Float lengthSq]()</h3>
 		<p>
-			Computes the squared [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean length]
-			(straight-line length) of this quaternion, considered as a 4 dimensional
-			vector. This can be useful if you are comparing the lengths of two quaternions,
-			as this is a slightly more efficient calculation than [page:.length length]().
+			计算四元数 [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean length]
+			（欧几里得长度，直线长度）的平方，视为一个四维向量。
+			如果要比较两个四元数的长度，这可能会十分有用，
+			因为这比 [page:.length length]() 的效率稍高一些。
 		</p>
 
 		<h3>[method:Quaternion normalize]()</h3>
 		<p>
-			[link:https://en.wikipedia.org/wiki/Normalized_vector Normalizes] this quaternion - that is,
-		calculated the quaternion that performs the same rotation as this one, but has  [page:.length length]
-		equal to *1*.
+			[link:https://en.wikipedia.org/wiki/Normalized_vector Normalizes]（归一化）四元数 ——
+			即计算与该四元数具有相同旋转、但长度为*1*的四元数。
 		</p>
 
 		<h3>[method:Quaternion multiply]( [param:Quaternion q] )</h3>
-		<p>Multiplies this quaternion by [page:Quaternion q].</p>
+		<p>将该四元数与[page:Quaternion q]相乘。</p>
 
 		<h3>[method:Quaternion multiplyQuaternions]( [param:Quaternion a], [param:Quaternion b] )</h3>
 		<p>
-		Sets this quaternion to [page:Quaternion a] x [page:Quaternion b].<br />
-		Adapted from the method outlined [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm here].
+		将该四元数设为 [page:Quaternion a] x [page:Quaternion b] 。<br />
+		改编自 [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm here] 所概述的方法。
 		</p>
 
 		<h3>[method:Quaternion premultiply]( [param:Quaternion q] )</h3>
@@ -142,20 +137,20 @@
 		<h3>[method:Quaternion rotateTowards]( [param:Quaternion q], [param:Float step] )</h3>
 		<p>
 			[page:Quaternion q] - The target quaternion.<br />
-			[page:float step] - The angular step in radians.<br /><br />
+			[page:Float step] - The angular step in radians.<br /><br />
 
 			Rotates this quaternion by a given angular step to the defined quaternion *q*.
 			The method ensures that the final quaternion will not overshoot *q*.
 		</p>
 
-		<h3>[method:Quaternion slerp]( [param:Quaternion qb], [param:float t] )</h3>
+		<h3>[method:Quaternion slerp]( [param:Quaternion qb], [param:Float t] )</h3>
 		<p>
 			[page:Quaternion qb] - The other quaternion rotation<br />
-			[page:float t] - interpolation factor in the closed interval [0, 1].<br /><br />
+			[page:Float t] - interpolation factor in the closed interval [0, 1].<br /><br />
 
-			Handles the spherical linear interpolation between quaternions. [page:float t] represents the
-			amount of rotation between this quaternion (where [page:float t] is 0) and [page:Quaternion qb] (where
-			[page:float t] is 1). This quaternion is set to the result. Also see the static version of the
+			Handles the spherical linear interpolation between quaternions. [page:Float t] represents the
+			amount of rotation between this quaternion (where [page:Float t] is 0) and [page:Quaternion qb] (where
+			[page:Float t] is 1). This quaternion is set to the result. Also see the static version of the
 			*slerp* below.
 
 			<code>
@@ -165,22 +160,22 @@
 		</p>
 
 		<h3>[method:Quaternion set]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
-		<p>Sets [page:.x x], [page:.y y], [page:.z z], [page:.w w] properties of this quaternion.</p>
+		<p>设置该四元数的 [page:.x x]、[page:.y y]、[page:.z z]和[page:.w w]属性。</p>
 
 		<h3>[method:Quaternion setFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<p>
-		Sets this quaternion from rotation specified by [page:Vector3 axis] and [page:Float angle].<br />
-		Adapted from the method [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm here].<br />
-		*Axis* is assumed to be normalized, *angle* is in radians.
+		从由 [page:Vector3 axis]（轴） 和 [page:Float angle]（角度）所给定的旋转来设置该四元数。<br />
+		改编自 [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm here] 所述的方法。<br />
+		假定*Axis*已被归一化，*angle*以弧度来表示。
 		</p>
 
 		<h3>[method:Quaternion setFromEuler]( [param:Euler euler] )</h3>
-		<p>Sets this quaternion from the rotation specified by [page:Euler] angle.</p>
+		<p>从由 [page:Euler] 角所给定的旋转来设置该四元数。</p>
 
 		<h3>[method:Quaternion setFromRotationMatrix]( [param:Matrix4 m] )</h3>
 		<p>
-		Sets this quaternion from rotation component of [page:Matrix4 m].<br />
-		Adapted from the method [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm here].
+		从[page:Matrix4 m]的旋转分量中来设置该四元数。<br />
+		改编自 [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm here] 所概述的方法。
 		</p>
 
 		<h3>[method:Quaternion setFromUnitVectors]( [param:Vector3 vFrom], [param:Vector3 vTo] )</h3>
@@ -193,33 +188,33 @@
 
 		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
-		[page:Array array] - An optional array to store the quaternion. If not specified, a new array will be created.<br/>
-		[page:Integer offset] - (optional) if specified, the result will be copied
-		into this [page:Array].<br /><br />
+		[page:Array array] - （可选）存储该四元数的数组。若未指定该参数，则将创建一个新数组。<br/>
+		[page:Integer offset] - （可选）若指定了该值，结果将会被拷贝到该
+		[page:Array]。<br /><br />
 
-		Returns the numerical elements of this quaternion in an array of format [x, y, z, w].
+		在形如[x, y, z, w]的数组中，返回四元数中的数字元素。
 		</p>
 
 		<h3>[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
 		<p>
-		[page:BufferAttribute attribute] - the source attribute.<br />
-		[page:Integer index] - index in the attribute.<br /><br />
+		[page:BufferAttribute attribute] - 源 attribute。<br />
+		[page:Integer index] - attribute 中的索引。<br /><br />
 
-		Sets [page:.x x], [page:.y y], [page:.z z], [page:.w w] properties of this quaternion from the [page:BufferAttribute attribute].
+		从 [page:BufferAttribute attribute] 中设置该四元数的[page:.x x]、 [page:.y y]、 [page:.z z]、 [page:.w w]属性。
 		</p>
 
-		<h2>Static Methods</h2>
+		<h2>静态方法</h2>
 
 		<p>
-			Static methods (as opposed to instance methods) are designed to be called directly from the class,
-			rather than from a specific instance. So to use the static version of, call it like so:
+			静态方法（相对于实例方法）被设计用来直接从类进行调用，而非从特定的实例上进行调用。
+			要使用静态版本，需要按照如下方式来调用：
 			<code>
 THREE.Quaternion.slerp( qStart, qEnd, qTarget, t );
 			</code>
-			By contrast, to call the 'normal' or instanced slerp method, you would do the following:
+			作为对比，要调用“正常”或实例的 slerp 方法，则进行如下操作：
 			<code>
 //instantiate a quaternion with default values
-var q = new THREE.Quaternion();
+const q = new THREE.Quaternion();
 
 //call the instanced slerp method
 q.slerp( qb, t )
@@ -232,14 +227,14 @@ q.slerp( qb, t )
 			[page:Quaternion qStart] - The starting quaternion (where [page:Float t] is 0)<br />
 			[page:Quaternion qEnd] - The ending quaternion (where [page:Float t] is 1)<br />
 			[page:Quaternion qTarget] - The target quaternion that gets set with the result<br />
-			[page:float t] - interpolation factor in the closed interval [0, 1].<br /><br />
+			[page:Float t] - interpolation factor in the closed interval [0, 1].<br /><br />
 
 			Unlike the normal method, the static version of slerp sets a target quaternion to the result of the slerp operation.
 			<code>
 			// Code setup
-			var startQuaternion = new THREE.Quaternion().set( 0, 0, 0, 1 ).normalize();
-			var endQuaternion = new THREE.Quaternion().set( 1, 1, 1, 1 ).normalize();
-			var t = 0;
+			const startQuaternion = new THREE.Quaternion().set( 0, 0, 0, 1 ).normalize();
+			const endQuaternion = new THREE.Quaternion().set( 1, 1, 1, 1 ).normalize();
+			let t = 0;
 
 			// Update a mesh's rotation in the loop
 			t = ( t + 0.01 ) % 1; // constant angular momentum
@@ -256,7 +251,7 @@ q.slerp( qb, t )
 		[page:Integer srcOffset0] - An offset into the array *src0*.<br />
 		[page:Array src1] - The source array of the target quatnerion.<br />
 		[page:Integer srcOffset1] - An offset into the array *src1*.<br />
-		[page:float t] - Normalized interpolation factor (between 0 and 1).<br /><br />
+		[page:Float t] - Normalized interpolation factor (between 0 and 1).<br /><br />
 		</p>
 		<p>
 		Like the static *slerp* method above, but operates directly on flat arrays of numbers.
@@ -264,7 +259,7 @@ q.slerp( qb, t )
 
 		<!-- Note: Do not add non-static methods to the bottom of this page. Put them above the <h2>Static Methods</h2> -->
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,13 +20,9 @@
 		<h2>Code Example</h2>
 
 		<code>
-		//assuming you have created a HTML video element with id="video"
-		var video = document.getElementById( 'video' );
-
-		var texture = new THREE.VideoTexture( video );
-		texture.minFilter = THREE.LinearFilter;
-		texture.magFilter = THREE.LinearFilter;
-		texture.format = THREE.RGBFormat;
+		// assuming you have created a HTML video element with id="video"
+		const video = document.getElementById( 'video' );
+		const texture = new THREE.VideoTexture( video );
 		</code>
 
 		<h2>Examples</h2>
@@ -72,7 +67,7 @@
 		See the base [page:Texture Texture] class for common properties.
 		</p>
 
-		<h3>[property:boolean needsUpdate]</h3>
+		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
 		You will not need to set this manually here as it is handled by the [page:VideoTexture.update update] method.
 		</p>
@@ -85,7 +80,7 @@
 
 		<h3>[method:null update]()</h3>
 		<p>
-		This is called automatically and sets [property:boolean needsUpdate] to *true* every time
+		This is called automatically and sets [property:Boolean needsUpdate] to *true* every time
 		a new frame is available.
 		</p>
 

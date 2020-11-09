@@ -25,6 +25,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( data ) {
 
 			try {
@@ -415,7 +416,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		}
 
 		volume.inverseMatrix = new Matrix4();
-		volume.inverseMatrix.getInverse( volume.matrix );
+		volume.inverseMatrix.copy( volume.matrix ).invert();
 		volume.RASDimensions = ( new Vector3( volume.xLength, volume.yLength, volume.zLength ) ).applyMatrix4( volume.matrix ).round().toArray().map( Math.abs );
 
 		// .. and set the default threshold

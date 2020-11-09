@@ -47,8 +47,7 @@ var Refractor = function ( geometry, options ) {
 	var parameters = {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
-		format: RGBFormat,
-		stencilBuffer: false
+		format: RGBFormat
 	};
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
@@ -132,7 +131,7 @@ var Refractor = function ( geometry, options ) {
 		return function updateVirtualCamera( camera ) {
 
 			virtualCamera.matrixWorld.copy( camera.matrixWorld );
-			virtualCamera.matrixWorldInverse.getInverse( virtualCamera.matrixWorld );
+			virtualCamera.matrixWorldInverse.copy( virtualCamera.matrixWorld ).invert();
 			virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 			virtualCamera.far = camera.far; // used in WebGLBackground
 

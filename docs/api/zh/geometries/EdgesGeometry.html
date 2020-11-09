@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,9 +15,9 @@
 
 		<h2>代码示例</h2>
 		<code>
-		var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
-		var edges = new THREE.EdgesGeometry( geometry );
-		var line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
+		const geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
+		const edges = new THREE.EdgesGeometry( geometry );
+		const line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
 		scene.add( line );
 		</code>
 

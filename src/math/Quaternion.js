@@ -4,6 +4,8 @@ class Quaternion {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
+		Object.defineProperty( this, 'isQuaternion', { value: true } );
+
 		this._x = x;
 		this._y = y;
 		this._z = z;
@@ -408,7 +410,7 @@ class Quaternion {
 
 	}
 
-	inverse() {
+	invert() {
 
 		// quaternion is assumed to have unit length
 
@@ -587,9 +589,7 @@ class Quaternion {
 
 	}
 
-	fromArray( array, offset ) {
-
-		if ( offset === undefined ) offset = 0;
+	fromArray( array, offset = 0 ) {
 
 		this._x = array[ offset ];
 		this._y = array[ offset + 1 ];
@@ -602,10 +602,7 @@ class Quaternion {
 
 	}
 
-	toArray( array, offset ) {
-
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+	toArray( array = [], offset = 0 ) {
 
 		array[ offset ] = this._x;
 		array[ offset + 1 ] = this._y;
@@ -638,7 +635,5 @@ class Quaternion {
 	_onChangeCallback() {}
 
 }
-
-Quaternion.prototype.isQuaternion = true;
 
 export { Quaternion };

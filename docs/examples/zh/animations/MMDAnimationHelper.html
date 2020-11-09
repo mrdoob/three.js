@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,7 +18,7 @@
 
 		<code>
 		// Instantiate a helper
-		var helper = new MMDAnimationHelper();
+		const helper = new MMDAnimationHelper();
 
 		// Load MMD resources and add to helper
 		new MMDLoader().loadWithAnimation(
@@ -38,9 +37,8 @@
 					'audios/mmd/song.mp3',
 					function ( buffer ) {
 
-						var listener = new THREE.AudioListener();
-						var audio = new THREE.Audio( listener )
-							.setBuffer( buffer );
+						const listener = new THREE.AudioListener();
+						const audio = new THREE.Audio( listener ).setBuffer( buffer );
 
 						listener.position.z = 1;
 
@@ -99,7 +97,7 @@
 		<h3>[property:WeakMap objects]</h3>
 		<p>A [page:WeakMap] which holds animation stuffs used in helper for objects added to helper. For example, you can access [page:AnimationMixer] for an added [page:SkinnedMesh] with "helper.objects.get( mesh ).mixer"</p>
 
-		<h3>[property:function onBeforePhysics]</h3>
+		<h3>[property:Function onBeforePhysics]</h3>
 		<p>An optional callback that is executed immediately before the physicis calculation for an [page:SkinnedMesh]. This function is called with the [page:SkinnedMesh].</p>
 
 		<h2>Methods</h2>
@@ -123,9 +121,9 @@
 		If camera/audio has already been added, it'll be replaced with a new one.
 		</p>
 
-		<h3>[method:MMDAnimationHelper enable]( [param:string key], [param:Boolean enabled] )</h3>
+		<h3>[method:MMDAnimationHelper enable]( [param:String key], [param:Boolean enabled] )</h3>
 		<p>
-		[page:string key] — Allowed strings are 'animation', 'ik', 'grant', 'physics', and 'cameraAnimation'.<br />
+		[page:String key] — Allowed strings are 'animation', 'ik', 'grant', 'physics', and 'cameraAnimation'.<br />
 		[page:Boolean enabled] — true is enable, false is disable<br />
 		</p>
 		<p>

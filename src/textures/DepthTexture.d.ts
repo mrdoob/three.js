@@ -43,4 +43,6 @@ export class DepthTexture extends Texture {
 	 */
 	generateMipmaps: boolean;
 
+	readonly isDepthTexture: true;
+
 }

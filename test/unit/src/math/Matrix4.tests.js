@@ -455,7 +455,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getInverse", ( assert ) => {
+		QUnit.test( "invert", ( assert ) => {
 
 			var zero = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 			var identity = new Matrix4();
@@ -463,7 +463,7 @@ export default QUnit.module( 'Maths', () => {
 			var a = new Matrix4();
 			var b = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
-			a.getInverse( b );
+			a.copy( b ).invert();
 			assert.ok( matrixEquals4( a, zero ), "Passed!" );
 
 
@@ -485,9 +485,9 @@ export default QUnit.module( 'Maths', () => {
 
 				var m = testMatrices[ i ];
 
-				var mInverse = new Matrix4().getInverse( m );
+				var mInverse = new Matrix4().copy( m ).invert();
 				var mSelfInverse = m.clone();
-				mSelfInverse.getInverse( mSelfInverse );
+				mSelfInverse.copy( mSelfInverse ).invert();
 
 				// self-inverse should the same as inverse
 				assert.ok( matrixEquals4( mSelfInverse, mInverse ), "Passed!" );

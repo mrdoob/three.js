@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -27,10 +26,16 @@
 
 		<h2>Properties</h2>
 
-		<h3>[property:string crossOrigin]</h3>
+		<h3>[property:String crossOrigin]</h3>
 		<p>
 		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
 		Default is *anonymous*.
+		</p>
+
+		<h3>[property:Boolean withCredentials]</h3>
+		<p>
+			Whether the XMLHttpRequest uses credentials. See [page:.setWithCredentials].
+			Default is *false*.
 		</p>
 
 		<h3>[property:LoadingManager manager]</h3>
@@ -84,6 +89,13 @@
 			[page:String crossOrigin] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
 		</p>
 
+		<h3>[method:Loader setWithCredentials]( [param:Boolean value] )</h3>
+		<p>
+			Whether the XMLHttpRequest uses credentials such as cookies, authorization headers or
+			TLS client certificates. See [link:https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials XMLHttpRequest.withCredentials].<br />
+			Note that this has no effect if you are loading files locally or from the same domain.
+		</p>
+
 		<h3>[method:Loader setPath]( [param:String path] )</h3>
 		<p>
 			[page:String path] — Set the base path for the asset.
@@ -96,7 +108,7 @@
 
 		<h3>[method:Loader setRequestHeader]( [param:Object requestHeader] )</h3>
 		<p>
-			[page:object requestHeader] - key: The name of the header whose value is to be set. value: The value to set as the body of the header.<br /><br />
+			[page:Object requestHeader] - key: The name of the header whose value is to be set. value: The value to set as the body of the header.<br /><br />
 
 			Set the [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request.
 		</p>

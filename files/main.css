@@ -304,16 +304,16 @@ h1 a {
 			margin: 1px 0;
 		}
 
-		#panel #content h2 {
+		#panel #content h2:not(.hidden) {
+			margin-top: 16px;
+			border-top: none;
+			padding-top: 0;
+		}
+
+		#panel #content h2:not(.hidden) ~ h2 {
 			margin-top: 32px;
 			border-top: var(--border-style);
 			padding-top: 12px;
-		}
-
-		#panel #content h2:first-child {
-			margin-top: 16px !important;
-			border-top: none;
-			padding-top: 0;
 		}
 
 		#panel #content a {

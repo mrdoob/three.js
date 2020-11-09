@@ -22,10 +22,6 @@ button {
 	text-transform: uppercase;
 }
 
-canvas {
-	display: block;
-}
-
 #info {
 	position: absolute;
 	top: 0px;

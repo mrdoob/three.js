@@ -2,6 +2,7 @@ import {
 	Matrix4,
 	Vector2
 } from "../../../build/three.module.js";
+
 /**
  * References:
  * http://john-chapman-graphics.blogspot.com/2013/01/ssao-tutorial.html
@@ -88,7 +89,7 @@ var SSAOShader = {
 
 		"	#else",
 
-		"		return texture2D( depthSampler, coord ).x;",
+		"		return texture2D( tDepth, screenPosition ).x;",
 
 		"	#endif",
 
@@ -225,7 +226,7 @@ var SSAODepthShader = {
 
 		"	#else",
 
-		"		return texture2D( depthSampler, coord ).x;",
+		"		return texture2D( tDepth, screenPosition ).x;",
 
 		"	#endif",
 

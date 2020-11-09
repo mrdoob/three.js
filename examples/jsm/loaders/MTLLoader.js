@@ -10,6 +10,7 @@ import {
 	TextureLoader,
 	Vector2
 } from "../../../build/three.module.js";
+
 /**
  * Loads a Wavefront .mtl file specifying materials
  */
@@ -46,6 +47,7 @@ MTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {

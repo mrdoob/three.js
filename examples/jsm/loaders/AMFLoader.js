@@ -10,6 +10,7 @@ import {
 	MeshPhongMaterial
 } from "../../../build/three.module.js";
 import { JSZip } from "../libs/jszip.module.min.js";
+
 /**
  * Description: Early release of an AMF Loader following the pattern of the
  * example loaders in the three.js project.
@@ -46,6 +47,7 @@ AMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -88,7 +90,7 @@ AMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				try {
 
-					zip = new JSZip( data );
+					zip = new JSZip( data ); // eslint-disable-line no-undef
 
 				} catch ( e ) {
 

@@ -1,4 +1,3 @@
-
 /**
  * RGB Halftone shader for three.js.
  *	NOTE:

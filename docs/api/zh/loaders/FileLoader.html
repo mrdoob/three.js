@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,7 +18,7 @@
 
 		<h2>代码示例</h2>
 		<code>
-		var loader = new THREE.FileLoader();
+		const loader = new THREE.FileLoader();
 
 		//加载一个文本文件，并把结果输出到控制台上
 		loader.load(
@@ -69,9 +68,6 @@
 			请参考 [page:.setMimeType]。默认为 *undefined*。
 		</p>
 
-		<h3>[property:object requestHeader]</h3>
-		<p>[link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] 在HTTP 请求中使用。 请参考 [page:.setRequestHeader]。 默认为 *undefined*.</p>
-
 		<h3>[property:String responseType]</h3>
 		<p>请求的响应类型。 请参考 [page:.setResponseType]. 默认为 *undefined*.</p>
 
@@ -102,9 +98,9 @@
 			。请注意，在许多情况下，这将自动确定，因此默认情况下它是 *undefined* 。
 		</p>
 
-		<h3>[method:FileLoader setRequestHeader]( [param:object requestHeader] )</h3>
+		<h3>[method:FileLoader setRequestHeader]( [param:Object requestHeader] )</h3>
 		<p>
-			[page:object requestHeader] - key: 要设置header的名称。 value：要设置header的值。<br /><br />
+			[page:Object requestHeader] - key: 要设置header的名称。 value：要设置header的值。<br /><br />
 
 			请参考在HTTP 请求中的 [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header]。
 		</p>

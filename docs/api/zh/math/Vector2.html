@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -37,12 +36,12 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var a = new THREE.Vector2( 0, 1 );
+		const a = new THREE.Vector2( 0, 1 );
 
 		//no arguments; will be initialised to (0, 0)
-		var b = new THREE.Vector2( );
+		const b = new THREE.Vector2( );
 
-		var d = a.distanceTo( b );
+		const d = a.distanceTo( b );
 		</code>
 
 
@@ -270,12 +269,12 @@
 		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
 		<p>将该向量与所传入的标量[page:Float s]进行相乘。</p>
 
-		<h3>[method:this rotateAround]( [param:Vector2 center], [param:float angle] )</h3>
+		<h3>[method:this rotateAround]( [param:Vector2 center], [param:Float angle] )</h3>
 		<p>
 		[page:Vector2 center] - 将被围绕旋转的点。<br />
-		[page:float angle] - 将要旋转的角度，以弧度来表示。<br /><br />
+		[page:Float angle] - 将要旋转的角度，以弧度来表示。<br /><br />
 
-		将向量围绕着[page:Vector2 center]旋转[page:float angle]弧度。
+		将向量围绕着[page:Vector2 center]旋转[page:Float angle]弧度。
 		</p>
 
 		<h3>[method:this round]()</h3>

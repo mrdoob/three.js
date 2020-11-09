@@ -1,10 +1,12 @@
 import { Vector2 } from './Vector2.js';
 
-const _vector = new Vector2();
+const _vector = /*@__PURE__*/ new Vector2();
 
 class Box2 {
 
 	constructor( min, max ) {
+
+		Object.defineProperty( this, 'isBox2', { value: true } );
 
 		this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
 		this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );

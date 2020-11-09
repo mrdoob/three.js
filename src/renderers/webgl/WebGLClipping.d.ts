@@ -1,6 +1,10 @@
 import { Camera } from './../../cameras/Camera';
+import { Material } from './../../materials/Material';
+import { WebGLProperties } from './WebGLProperties';
 
 export class WebGLClipping {
+
+	constructor( properties: WebGLProperties );
 
 	uniform: { value: any; needsUpdate: boolean };
 
@@ -18,12 +22,9 @@ export class WebGLClipping {
 	beginShadows(): void;
 	endShadows(): void;
 	setState(
-		planes: any[],
-		clipIntersection: boolean,
-		clipShadows: boolean,
+		material: Material,
 		camera: Camera,
-		cache: any,
-		fromCache: boolean
+		useCache: boolean
 	): void;
 
 }
