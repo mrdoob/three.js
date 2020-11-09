@@ -2,14 +2,16 @@ import { ShapePath } from './ShapePath.js';
 
 class Font {
 
-	constructor( data ){
+	constructor( data ) {
+
 		Object.defineProperty( this, 'isFont', { value: true } );
 		this.type = 'Font';
 
 		this.data = data;
+
 	}
 
-	generateShapes ( text, size = 100 ) {
+	generateShapes( text, size = 100 ) {
 
 		const shapes = [];
 		const paths = this.createPaths( text, size, this.data );
@@ -134,6 +136,7 @@ class Font {
 		return { offsetX: glyph.ha * scale, path: path };
 
 	}
+
 }
 
 export { Font };

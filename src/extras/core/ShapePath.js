@@ -5,13 +5,15 @@ import { ShapeUtils } from '../ShapeUtils.js';
 
 class ShapePath {
 
-	constructor () {
+	constructor() {
+
 		this.type = 'ShapePath';
 
 		this.color = new Color();
 
 		this.subPaths = [];
 		this.currentPath = null;
+
 	}
 
 	moveTo( x, y ) {
@@ -286,6 +288,7 @@ class ShapePath {
 		return shapes;
 
 	}
+
 }
 
 
