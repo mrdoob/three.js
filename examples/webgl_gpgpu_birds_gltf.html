@@ -179,6 +179,7 @@
 
 							// Attraction / Cohesion - move closer
 							float threshDelta = 1.0 - alignmentThresh;
+							threshDelta = max( threshDelta, 1e-6 );
 							float adjustedPercent = ( percent - alignmentThresh ) / threshDelta;
 
 							f = ( 0.5 - ( cos( adjustedPercent * PI_2 ) * -0.5 + 0.5 ) ) * delta;
