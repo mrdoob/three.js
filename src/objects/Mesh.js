@@ -33,26 +33,22 @@ const _uvC = new Vector2();
 const _intersectionPoint = new Vector3();
 const _intersectionPointWorld = new Vector3();
 
-function Mesh( geometry, material ) {
+class Mesh extends Object3D {
 
-	Object3D.call( this );
+	constructor( geometry, material ) {
 
-	this.type = 'Mesh';
+		super();
+		Object.defineProperty( this, "isMesh", { value: true } );
+		this.type = 'Mesh';
 
-	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new MeshBasicMaterial();
+		this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
+		this.material = material !== undefined ? material : new MeshBasicMaterial();
 
-	this.updateMorphTargets();
+		this.updateMorphTargets();
 
-}
+	}
 
-Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
-
-	constructor: Mesh,
-
-	isMesh: true,
-
-	copy: function ( source ) {
+	copy( source ) {
 
 		Object3D.prototype.copy.call( this, source );
 
@@ -73,9 +69,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	updateMorphTargets: function () {
+	updateMorphTargets() {
 
 		const geometry = this.geometry;
 
@@ -118,9 +114,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-	},
+	}
 
-	raycast: function ( raycaster, intersects ) {
+	raycast( raycaster, intersects ) {
 
 		const geometry = this.geometry;
 		const material = this.material;
@@ -330,7 +326,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
 
 function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point ) {
 
