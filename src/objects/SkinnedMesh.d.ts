@@ -8,7 +8,7 @@ import { BufferGeometry } from '../core/BufferGeometry';
 export class SkinnedMesh <
 	TGeometry extends Geometry | BufferGeometry = Geometry | BufferGeometry,
 	TMaterial extends Material | Material[] = Material | Material[]
-> extends Mesh {
+> extends Mesh<TGeometry, TMaterial> {
 
 	constructor(
 		geometry?: TGeometry,

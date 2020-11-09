@@ -230,13 +230,11 @@ const AnimationUtils = {
 
 	},
 
-	makeClipAdditive: function ( targetClip, referenceFrame, referenceClip, fps ) {
+	makeClipAdditive: function ( targetClip, referenceFrame = 0, referenceClip = targetClip, fps = 30 ) {
 
-		if ( referenceFrame === undefined ) referenceFrame = 0;
-		if ( referenceClip === undefined ) referenceClip = targetClip;
-		if ( fps === undefined || fps <= 0 ) fps = 30;
+		if ( fps <= 0 ) fps = 30;
 
-		const numTracks = targetClip.tracks.length;
+		const numTracks = referenceClip.tracks.length;
 		const referenceTime = referenceFrame / fps;
 
 		// Make each track's values relative to the values at the reference frame
@@ -252,13 +250,30 @@ const AnimationUtils = {
 			const targetTrack = targetClip.tracks.find( function ( track ) {
 
 				return track.name === referenceTrack.name
-				&& track.ValueTypeName === referenceTrackType;
+					&& track.ValueTypeName === referenceTrackType;
 
 			} );
 
 			if ( targetTrack === undefined ) continue;
 
-			const valueSize = referenceTrack.getValueSize();
+			let referenceOffset = 0;
+			const referenceValueSize = referenceTrack.getValueSize();
+
+			if ( referenceTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
+
+				referenceOffset = referenceValueSize / 3;
+
+			}
+
+			let targetOffset = 0;
+			const targetValueSize = targetTrack.getValueSize();
+
+			if ( targetTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
+
+				targetOffset = targetValueSize / 3;
+
+			}
+
 			const lastIndex = referenceTrack.times.length - 1;
 			let referenceValue;
 
@@ -266,32 +281,32 @@ const AnimationUtils = {
 			if ( referenceTime <= referenceTrack.times[ 0 ] ) {
 
 				// Reference frame is earlier than the first keyframe, so just use the first keyframe
-				referenceValue = AnimationUtils.arraySlice( referenceTrack.values, 0, referenceTrack.valueSize );
+				const startIndex = referenceOffset;
+				const endIndex = referenceValueSize - referenceOffset;
+				referenceValue = AnimationUtils.arraySlice( referenceTrack.values, startIndex, endIndex );
 
 			} else if ( referenceTime >= referenceTrack.times[ lastIndex ] ) {
 
 				// Reference frame is after the last keyframe, so just use the last keyframe
-				const startIndex = lastIndex * valueSize;
-				referenceValue = AnimationUtils.arraySlice( referenceTrack.values, startIndex );
+				const startIndex = lastIndex * referenceValueSize + referenceOffset;
+				const endIndex = startIndex + referenceValueSize - referenceOffset;
+				referenceValue = AnimationUtils.arraySlice( referenceTrack.values, startIndex, endIndex );
 
 			} else {
 
 				// Interpolate to the reference value
 				const interpolant = referenceTrack.createInterpolant();
+				const startIndex = referenceOffset;
+				const endIndex = referenceValueSize - referenceOffset;
 				interpolant.evaluate( referenceTime );
-				referenceValue = interpolant.resultBuffer;
+				referenceValue = AnimationUtils.arraySlice( interpolant.resultBuffer, startIndex, endIndex );
 
 			}
 
 			// Conjugate the quaternion
 			if ( referenceTrackType === 'quaternion' ) {
 
-				const referenceQuat = new Quaternion(
-					referenceValue[ 0 ],
-					referenceValue[ 1 ],
-					referenceValue[ 2 ],
-					referenceValue[ 3 ]
-				).normalize().conjugate();
+				const referenceQuat = new Quaternion().fromArray( referenceValue ).normalize().conjugate();
 				referenceQuat.toArray( referenceValue );
 
 			}
@@ -301,7 +316,7 @@ const AnimationUtils = {
 			const numTimes = targetTrack.times.length;
 			for ( let j = 0; j < numTimes; ++ j ) {
 
-				const valueStart = j * valueSize;
+				const valueStart = j * targetValueSize + targetOffset;
 
 				if ( referenceTrackType === 'quaternion' ) {
 
@@ -317,8 +332,10 @@ const AnimationUtils = {
 
 				} else {
 
+					const valueEnd = targetValueSize - targetOffset * 2;
+
 					// Subtract each value for all other numeric track types
-					for ( let k = 0; k < valueSize; ++ k ) {
+					for ( let k = 0; k < valueEnd; ++ k ) {
 
 						targetTrack.values[ valueStart + k ] -= referenceValue[ k ];
 

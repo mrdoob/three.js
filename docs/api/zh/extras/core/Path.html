@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,18 +18,18 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var path = new THREE.Path();
+		const path = new THREE.Path();
 
 		path.lineTo( 0, 0.8 );
 		path.quadraticCurveTo( 0, 1, 0.2, 1 );
 		path.lineTo( 1, 1 );
 
-		var points = path.getPoints();
+		const points = path.getPoints();
 
-		var geometry = new THREE.BufferGeometry().setFromPoints( points );
-		var material = new THREE.LineBasicMaterial( { color: 0xffffff } );
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
+		const material = new THREE.LineBasicMaterial( { color: 0xffffff } );
 
-		var line = new THREE.Line( geometry, material );
+		const line = new THREE.Line( geometry, material );
 		scene.add( line );
 		</code>
 
@@ -52,7 +51,7 @@
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:CurvePath]。</p>
 
-		<h3>[property:array currentPoint]</h3>
+		<h3>[property:Array currentPoint]</h3>
 		<p>路径当前的偏移量，任何新被加入的[page:Curve]将会从这里开始。</p>
 
 

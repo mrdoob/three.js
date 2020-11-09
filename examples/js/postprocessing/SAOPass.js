@@ -1,4 +1,3 @@
-console.warn( "THREE.SAOPass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * SAO implementation inspired from bhouston previous SAO work
  */
@@ -88,7 +87,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 	this.saoMaterial.uniforms[ 'tDepth' ].value = ( this.supportsDepthTextureExtension ) ? depthTexture : this.depthRenderTarget.texture;
 	this.saoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
 	this.saoMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
-	this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+	this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 	this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
 	this.saoMaterial.blending = THREE.NoBlending;
 
@@ -377,7 +376,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		this.depthRenderTarget.setSize( width, height );
 
 		this.saoMaterial.uniforms[ 'size' ].value.set( width, height );
-		this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+		this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 		this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
 		this.saoMaterial.needsUpdate = true;
 

@@ -8,7 +8,7 @@ function WebGLExtensions( gl ) {
 
 			if ( extensions[ name ] !== undefined ) {
 
-				return extensions[ name ];
+				return extensions[ name ] !== null;
 
 			}
 
@@ -39,7 +39,7 @@ function WebGLExtensions( gl ) {
 
 			extensions[ name ] = extension;
 
-			return !! extension;
+			return extension !== null;
 
 		},
 

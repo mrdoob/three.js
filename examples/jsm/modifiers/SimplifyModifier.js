@@ -4,6 +4,7 @@ import {
 	Geometry,
 	Vector3
 } from "../../../build/three.module.js";
+
 /**
  *	Simplification Geometry Modifier
  *    - based on code and technique

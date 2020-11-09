@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -24,7 +23,7 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var geometry = new THREE.Geometry();
+		const geometry = new THREE.Geometry();
 
 		geometry.vertices.push(
 			new THREE.Vector3( -10,  10, 0 ),
@@ -95,14 +94,14 @@
 		<h3>[property:Array faceVertexUvs]</h3>
 		<p>
 		Array of face [link:https://en.wikipedia.org/wiki/UV_mapping UV] layers, used for mapping textures onto the geometry.<br />
-		Each UV layer is an array of [page:UV]s matching the order and number of vertices in faces.<br /><br />
+		Each UV layer is an array of [page:Vector2]s matching the order and number of vertices in faces.<br /><br />
 		To signal an update in this array, [page:Geometry Geometry.uvsNeedUpdate] needs to be set to true.
 		</p>
 
 		<h3>[property:Integer id]</h3>
 		<p>Unique number for this geometry instance.</p>
 
-		<h3>[property:array lineDistances]</h3>
+		<h3>[property:Array lineDistances]</h3>
 		<p>
 		An array containing distances between vertices for Line geometries.
 		This is required for [page:LineDashedMaterial] to render correctly.

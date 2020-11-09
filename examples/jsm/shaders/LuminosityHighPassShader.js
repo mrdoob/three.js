@@ -1,6 +1,7 @@
 import {
 	Color
 } from "../../../build/three.module.js";
+
 /**
  * Luminosity
  * http://en.wikipedia.org/wiki/Luminosity

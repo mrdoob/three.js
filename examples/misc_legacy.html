@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title></title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=Object.values%2CPromise"></script>
+
+		<script src="../build/three.js"></script>
+		<script src="./js/controls/OrbitControls.js"></script>
+		<script src="./js/loaders/GLTFLoader.js"></script>
+		<script src="./js/loaders/RGBELoader.js"></script>
+		<script>
+
+			var camera, scene, renderer;
+			var controls;
+
+			init();
+			animate();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				document.body.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 20 );
+				camera.position.set( 1.5, 0.2, 1.5 );
+
+				controls = new THREE.OrbitControls( camera, document.body );
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = - 1.0;
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
+
+				new THREE.RGBELoader()
+					.setDataType( THREE.UnsignedByteType )
+					.load( './textures/equirectangular/venice_sunset_1k.hdr', function ( texture ) {
+
+						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+
+						scene.background = envMap;
+						scene.environment = envMap;
+
+					} );
+
+				var url = './models/gltf/BoomBox/glTF-Binary/BoomBox.glb';
+				var loader = new THREE.GLTFLoader();
+				loader.load( url, function ( gltf ) {
+
+					var model = gltf.scene;
+					model.rotation.y = Math.PI;
+					model.scale.setScalar( 50 );
+					scene.add( model );
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				renderer.setAnimationLoop( animate );
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

@@ -1,11 +1,11 @@
-import { BackSide, NoBlending, RGBAFormat } from '../constants.js';
-import { Scene } from '../scenes/Scene.js';
+import { BackSide, LinearFilter, LinearMipmapLinearFilter, NoBlending, RGBAFormat } from '../constants.js';
 import { Mesh } from '../objects/Mesh.js';
-import { BoxBufferGeometry } from '../geometries/BoxGeometry.js';
+import { BoxBufferGeometry } from '../geometries/BoxBufferGeometry.js';
 import { ShaderMaterial } from '../materials/ShaderMaterial.js';
 import { cloneUniforms } from './shaders/UniformsUtils.js';
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 import { CubeCamera } from '../cameras/CubeCamera.js';
+import { CubeTexture } from '../textures/CubeTexture.js';
 
 function WebGLCubeRenderTarget( size, options, dummy ) {
 
@@ -18,6 +18,12 @@ function WebGLCubeRenderTarget( size, options, dummy ) {
 	}
 
 	WebGLRenderTarget.call( this, size, size, options );
+
+	options = options || {};
+
+	this.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+
+	this.texture._needsFlipEnvMap = false;
 
 }
 
@@ -35,8 +41,6 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 	this.texture.generateMipmaps = texture.generateMipmaps;
 	this.texture.minFilter = texture.minFilter;
 	this.texture.magFilter = texture.magFilter;
-
-	const scene = new Scene();
 
 	const shader = {
 
@@ -84,6 +88,8 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 		`
 	};
 
+	const geometry = new BoxBufferGeometry( 5, 5, 5 );
+
 	const material = new ShaderMaterial( {
 
 		name: 'CubemapFromEquirect',
@@ -98,17 +104,38 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 
 	material.uniforms.tEquirect.value = texture;
 
-	const mesh = new Mesh( new BoxBufferGeometry( 5, 5, 5 ), material );
+	const mesh = new Mesh( geometry, material );
 
-	scene.add( mesh );
+	const currentMinFilter = texture.minFilter;
+
+	// Avoid blurred poles
+	if ( texture.minFilter === LinearMipmapLinearFilter ) texture.minFilter = LinearFilter;
 
 	const camera = new CubeCamera( 1, 10, this );
-	camera.update( renderer, scene );
+	camera.update( renderer, mesh );
+
+	texture.minFilter = currentMinFilter;
 
 	mesh.geometry.dispose();
 	mesh.material.dispose();
 
 	return this;
+
+};
+
+WebGLCubeRenderTarget.prototype.clear = function ( renderer, color, depth, stencil ) {
+
+	const currentRenderTarget = renderer.getRenderTarget();
+
+	for ( let i = 0; i < 6; i ++ ) {
+
+		renderer.setRenderTarget( this, i );
+
+		renderer.clear( color, depth, stencil );
+
+	}
+
+	renderer.setRenderTarget( currentRenderTarget );
 
 };
 

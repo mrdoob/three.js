@@ -33,6 +33,12 @@ class VideoTexture extends Texture {
 
 	}
 
+	clone() {
+
+		return new this.constructor( this.image ).copy( this );
+
+	}
+
 	update() {
 
 		const video = this.image;

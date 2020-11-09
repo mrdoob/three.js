@@ -16,7 +16,7 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var camera, scene, renderer, stats;
+			let camera, scene, renderer, stats;
 
 			init();
 			animate();
@@ -28,20 +28,20 @@
 
 				scene = new THREE.Scene();
 
-				var object;
+				let object;
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
-				var map = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
+				const map = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
-				var material = new THREE.MeshPhongMaterial( { map: map, side: THREE.DoubleSide } );
+				const material = new THREE.MeshPhongMaterial( { map: map, side: THREE.DoubleSide } );
 
 				//
 
@@ -85,9 +85,9 @@
 				object.position.set( - 300, 0, - 200 );
 				scene.add( object );
 
-				var points = [];
+				const points = [];
 
-				for ( var i = 0; i < 50; i ++ ) {
+				for ( let i = 0; i < 50; i ++ ) {
 
 					points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * Math.sin( i * 0.1 ) * 15 + 50, ( i - 5 ) * 2 ) );
 
@@ -143,7 +143,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.0001;
+				const timer = Date.now() * 0.0001;
 
 				camera.position.x = Math.cos( timer ) * 800;
 				camera.position.z = Math.sin( timer ) * 800;

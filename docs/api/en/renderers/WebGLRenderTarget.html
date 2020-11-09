@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -41,7 +40,7 @@
 		[page:Number anisotropy] - default is *1*. See [page:Texture.anisotropy]<br />
 		[page:Constant encoding] - default is [page:Textures LinearEncoding]. <br />
 		[page:Boolean depthBuffer] - default is *true*. Set this to false if you don't need it. <br />
-		[page:Boolean stencilBuffer] - default is *true*. Set this to false if you don't need it.<br /><br />
+		[page:Boolean stencilBuffer] - default is *false*. Set this to true if you need it.<br /><br />
 
 		Creates a new [name]
 		</p>
@@ -63,7 +62,7 @@
 		A rectangular area inside the render target's viewport. Fragments that are outside the area will be discarded.
 		</p>
 
-		<h3>[property:boolean scissorTest]</h3>
+		<h3>[property:Boolean scissorTest]</h3>
 		<p>
 		Indicates whether the scissor test is active or not.
 		</p>
@@ -78,14 +77,14 @@
 		This texture instance holds the rendered pixels. Use it as input for further processing.
 		</p>
 
-		<h3>[property:boolean depthBuffer]</h3>
+		<h3>[property:Boolean depthBuffer]</h3>
 		<p>
 		Renders to the depth buffer. Default is true.
 		</p>
 
-		<h3>[property:boolean stencilBuffer]</h3>
+		<h3>[property:Boolean stencilBuffer]</h3>
 		<p>
-		Renders to the stencil buffer. Default is true.
+		Renders to the stencil buffer. Default is false.
 		</p>
 
 		<h3>[property:DepthTexture depthTexture]</h3>

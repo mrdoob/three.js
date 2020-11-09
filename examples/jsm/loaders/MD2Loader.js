@@ -25,6 +25,7 @@ MD2Loader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			try {

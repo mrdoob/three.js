@@ -1,4 +1,3 @@
-
 /**
  * Blend two textures
  */

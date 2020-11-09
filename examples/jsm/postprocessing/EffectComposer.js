@@ -22,8 +22,7 @@ var EffectComposer = function ( renderer, renderTarget ) {
 		var parameters = {
 			minFilter: LinearFilter,
 			magFilter: LinearFilter,
-			format: RGBAFormat,
-			stencilBuffer: false
+			format: RGBAFormat
 		};
 
 		var size = renderer.getSize( new Vector2() );

@@ -1,4 +1,3 @@
-console.warn( "THREE.TDSLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Autodesk 3DS three.js file loader, based on lib3ds.
  *
@@ -39,12 +38,13 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		var scope = this;
 
-		var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+		var path = ( this.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : this.path;
 
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, function ( data ) {
 
@@ -443,7 +443,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 				matrix.transpose();
 
 				var inverse = new THREE.Matrix4();
-				inverse.getInverse( matrix );
+				inverse.copy( matrix ).invert();
 				geometry.applyMatrix4( inverse );
 
 				matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );

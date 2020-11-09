@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -38,7 +37,7 @@
 
 		<code>
 		// Instantiate a exporter
-		var exporter = new GLTFExporter();
+		const exporter = new GLTFExporter();
 
 		// Parse the input and generate the glTF output
 		exporter.parse( scene, function ( gltf ) {

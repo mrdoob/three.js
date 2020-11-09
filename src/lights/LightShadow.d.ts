@@ -10,14 +10,50 @@ export class LightShadow {
 	constructor( camera: Camera );
 
 	camera: Camera;
+
+	/**
+	 * @default 0
+	 */
 	bias: number;
+
+	/**
+	 * @default 0
+	 */
 	normalBias: number;
+
+	/**
+	 * @default 1
+	 */
 	radius: number;
+
+	/**
+	 * @default new THREE.Vector2( 512, 512 )
+	 */
 	mapSize: Vector2;
+
+	/**
+	 * @default null
+	 */
 	map: RenderTarget;
+
+	/**
+	 * @default null
+	 */
 	mapPass: RenderTarget;
+
+	/**
+	 * @default new THREE.Matrix4()
+	 */
 	matrix: Matrix4;
+
+	/**
+	 * @default true
+	 */
 	autoUpdate: boolean;
+
+	/**
+	 * @default false
+	 */
 	needsUpdate: boolean;
 
 	copy( source: LightShadow ): this;
