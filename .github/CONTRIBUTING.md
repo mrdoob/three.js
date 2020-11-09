@@ -28,7 +28,7 @@ As per the npm standard, ‘start’ is the place to begin the package.
 
 This script will start a local server similar to [threejs.org](https://threejs.org/), but instead will be hosted on your local machine. Browse to http://localhost:8080/ to check it out. It also automatically creates the ‘build/three.js’ and ‘build/three.module.js’ scripts anytime there is a change within your three.js directory.
 
-The next most important script runs all the appropriate testing.
+The next most important script runs all the appropriate testing. The E-2-E testing is intended to be run by github actions.
 
     npm test
 
