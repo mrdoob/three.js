@@ -17,6 +17,7 @@ class CurvePath extends Curve() {
 		this.autoClose = false; // Automatically closes the path
 
 	}
+
 	add( curve ) {
 
 		this.curves.push( curve );
