@@ -5,21 +5,17 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 const _start = new Vector3();
 const _end = new Vector3();
 
-function LineSegments( geometry, material ) {
+class LineSegments extends Line {
 
-	Line.call( this, geometry, material );
+	constructor( geometry, material ) {
 
-	this.type = 'LineSegments';
+		super( geometry, material );
+		Object.defineProperty( this, "isLineSegments", { value: true } );
+		this.type = 'LineSegments';
 
-}
+	}
 
-LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
-
-	constructor: LineSegments,
-
-	isLineSegments: true,
-
-	computeLineDistances: function () {
+	computeLineDistances() {
 
 		const geometry = this.geometry;
 
@@ -71,7 +67,7 @@ LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 
 	}
 
-} );
+}
 
 
 export { LineSegments };
