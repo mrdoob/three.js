@@ -13,40 +13,43 @@ const _inverseMatrix = new Matrix4();
 const _ray = new Ray();
 const _sphere = new Sphere();
 
-class Line extends Object3D {
+function Line( geometry, material, mode ) {
 
-	constructor( geometry, material, mode ) {
+	if ( mode === 1 ) {
 
-		if ( mode === 1 ) {
-
-			console.error( 'THREE.Line: parameter THREE.LinePieces no longer supported. Use THREE.LineSegments instead.' );
-
-		}
-
-		super();
-
-		Object.defineProperty( this, "isLine", { value: true } );
-		this.type = 'Line';
-
-		this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-		this.material = material !== undefined ? material : new LineBasicMaterial();
-
-		this.updateMorphTargets();
+		console.error( 'THREE.Line: parameter THREE.LinePieces no longer supported. Use THREE.LineSegments instead.' );
 
 	}
 
-	copy( source ) {
+	Object3D.call( this );
 
-		super.copy( source );
+	this.type = 'Line';
+
+	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
+	this.material = material !== undefined ? material : new LineBasicMaterial();
+
+	this.updateMorphTargets();
+
+}
+
+Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
+
+	constructor: Line,
+
+	isLine: true,
+
+	copy: function ( source ) {
+
+		Object3D.prototype.copy.call( this, source );
 
 		this.material = source.material;
 		this.geometry = source.geometry;
 
 		return this;
 
-	}
+	},
 
-	computeLineDistances() {
+	computeLineDistances: function () {
 
 		const geometry = this.geometry;
 
@@ -95,9 +98,9 @@ class Line extends Object3D {
 
 		return this;
 
-	}
+	},
 
-	raycast( raycaster, intersects ) {
+	raycast: function ( raycaster, intersects ) {
 
 		const geometry = this.geometry;
 		const matrixWorld = this.matrixWorld;
@@ -238,9 +241,9 @@ class Line extends Object3D {
 
 		}
 
-	}
+	},
 
-	updateMorphTargets() {
+	updateMorphTargets: function () {
 
 		const geometry = this.geometry;
 
@@ -285,7 +288,7 @@ class Line extends Object3D {
 
 	}
 
-}
+} );
 
 
 export { Line };
