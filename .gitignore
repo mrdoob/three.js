@@ -17,6 +17,7 @@ test/*
 !test/*/
 !test/*.*
 test/*.cmd
+test/*.ps1
 test/unit/build
 
 
