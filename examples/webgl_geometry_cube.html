@@ -12,8 +12,8 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer;
-			var mesh;
+			let camera, scene, renderer;
+			let mesh;
 
 			init();
 			animate();
@@ -25,10 +25,10 @@
 
 				scene = new THREE.Scene();
 
-				var texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
+				const texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
 
-				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				const geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+				const material = new THREE.MeshBasicMaterial( { map: texture } );
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );

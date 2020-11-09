@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,24 +15,24 @@
 
 		<h2>Code Example</h2>
 		<code>
-		var vertices = [];
+		const vertices = [];
 
-		for ( var i = 0; i < 10000; i ++ ) {
+		for ( let i = 0; i < 10000; i ++ ) {
 
-			var x = THREE.MathUtils.randFloatSpread( 2000 );
-			var y = THREE.MathUtils.randFloatSpread( 2000 );
-			var z = THREE.MathUtils.randFloatSpread( 2000 );
+			const x = THREE.MathUtils.randFloatSpread( 2000 );
+			const y = THREE.MathUtils.randFloatSpread( 2000 );
+			const z = THREE.MathUtils.randFloatSpread( 2000 );
 
 			vertices.push( x, y, z );
 
 		}
 
-		var geometry = new THREE.BufferGeometry();
+		const geometry = new THREE.BufferGeometry();
 		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
-		var material = new THREE.PointsMaterial( { color: 0x888888 } );
+		const material = new THREE.PointsMaterial( { color: 0x888888 } );
 
-		var points = new THREE.Points( geometry, material );
+		const points = new THREE.Points( geometry, material );
 
 		scene.add( points );
 		</code>
@@ -55,7 +54,8 @@
 			[example:webgl_trails WebGL / trails]
 		</p>
 
-		<h2>[name]( [param:Object parameters] )</h2>
+		<h2>Constructor</h2>
+		<h3>[name]( [param:Object parameters] )</h3>
 		<p>
 			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
 			Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />

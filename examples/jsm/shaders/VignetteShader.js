@@ -1,4 +1,3 @@
-
 /**
  * Vignette shader
  * based on PaintEffect postprocess from ro.me

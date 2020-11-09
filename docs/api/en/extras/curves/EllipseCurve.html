@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -20,7 +19,7 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var curve = new THREE.EllipseCurve(
+		const curve = new THREE.EllipseCurve(
 			0,  0,            // ax, aY
 			10, 10,           // xRadius, yRadius
 			0,  2 * Math.PI,  // aStartAngle, aEndAngle
@@ -28,13 +27,13 @@
 			0                 // aRotation
 		);
 
-		var points = curve.getPoints( 50 );
-		var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		const points = curve.getPoints( 50 );
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-		var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+		const material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
 		// Create the final object to add to the scene
-		var ellipse = new THREE.Line( geometry, material );
+		const ellipse = new THREE.Line( geometry, material );
 		</code>
 
 		<h2>Constructor</h2>

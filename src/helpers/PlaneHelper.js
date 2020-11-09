@@ -8,10 +8,9 @@ import { FrontSide, BackSide } from '../constants.js';
 
 class PlaneHelper extends Line {
 
-	constructor( plane, size, hex ) {
+	constructor( plane, size = 1, hex = 0xffff00 ) {
 
-
-		const color = ( hex !== undefined ) ? hex : 0xffff00;
+		const color = hex;
 
 		const positions = [ 1, - 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0 ];
 
@@ -25,7 +24,7 @@ class PlaneHelper extends Line {
 
 		this.plane = plane;
 
-		this.size = ( size === undefined ) ? 1 : size;
+		this.size = size;
 
 		const positions2 = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, - 1, 1, 1, - 1, 1 ];
 

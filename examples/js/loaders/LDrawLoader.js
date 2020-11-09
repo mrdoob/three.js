@@ -1,5 +1,3 @@
-console.warn( "THREE.LDrawLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.LDrawLoader = ( function () {
 
 	var conditionalLineVertShader = /* glsl */`
@@ -585,6 +583,7 @@ THREE.LDrawLoader = ( function () {
 			var fileLoader = new THREE.FileLoader( this.manager );
 			fileLoader.setPath( this.path );
 			fileLoader.setRequestHeader( this.requestHeader );
+			fileLoader.setWithCredentials( this.withCredentials );
 			fileLoader.load( url, function ( text ) {
 
 				scope.processObject( text, onLoad, null, url );
@@ -1899,6 +1898,7 @@ THREE.LDrawLoader = ( function () {
 				var fileLoader = new THREE.FileLoader( scope.manager );
 				fileLoader.setPath( scope.path );
 				fileLoader.setRequestHeader( scope.requestHeader );
+				fileLoader.setWithCredentials( scope.withCredentials );
 				fileLoader.load( subobjectURL, function ( text ) {
 
 					scope.processObject( text, function ( subobjectGroup ) {

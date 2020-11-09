@@ -4,6 +4,7 @@ import {
 	Matrix4,
 	Vector3
 } from "../../../build/three.module.js";
+
 /**
  * You can use this geometry to create a decal mesh, that serves different kinds of purposes.
  * e.g. adding unique details to models, performing dynamic visual environmental changes or covering seams.
@@ -39,7 +40,8 @@ var DecalGeometry = function ( mesh, position, orientation, size ) {
 	projectorMatrix.makeRotationFromEuler( orientation );
 	projectorMatrix.setPosition( position );
 
-	var projectorMatrixInverse = new Matrix4().getInverse( projectorMatrix );
+	var projectorMatrixInverse = new Matrix4();
+	projectorMatrixInverse.copy( projectorMatrix ).invert();
 
 	// generate buffers
 

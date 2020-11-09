@@ -3,7 +3,7 @@
 import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter';
 
 import { AnimationClip } from '../../../../src/animation/AnimationClip';
-import { BoxBufferGeometry } from '../../../../src/geometries/BoxGeometry';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
 import { Mesh } from '../../../../src/objects/Mesh';

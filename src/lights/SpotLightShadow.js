@@ -8,6 +8,8 @@ class SpotLightShadow extends LightShadow {
 
 		super( new PerspectiveCamera( 50, 1, 0.5, 500 ) );
 
+  	this.focus = 1;
+
 		Object.defineProperty( this, 'isSpotLightShadow', { value: true } );
 
 	}
@@ -16,7 +18,7 @@ class SpotLightShadow extends LightShadow {
 
 		const camera = this.camera;
 
-		const fov = MathUtils.RAD2DEG * 2 * light.angle;
+		const fov = MathUtils.RAD2DEG * 2 * light.angle * this.focus;
 		const aspect = this.mapSize.width / this.mapSize.height;
 		const far = light.distance || camera.far;
 

@@ -5,7 +5,14 @@ export class Line3 {
 
 	constructor( start?: Vector3, end?: Vector3 );
 
+	/**
+	 * @default new THREE.Vector3()
+	 */
 	start: Vector3;
+
+	/**
+	 * @default new THREE.Vector3()
+	 */
 	end: Vector3;
 
 	set( start?: Vector3, end?: Vector3 ): Line3;

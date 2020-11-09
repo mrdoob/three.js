@@ -87,7 +87,7 @@ class XRHandOculusMeshModel {
 
 				if ( XRJoint.visible ) {
 
-					let position = XRJoint.position;
+					const position = XRJoint.position;
 
 					if ( bone ) {
 

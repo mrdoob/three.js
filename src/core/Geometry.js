@@ -373,9 +373,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	computeVertexNormals: function ( areaWeighted ) {
-
-		if ( areaWeighted === undefined ) areaWeighted = true;
+	computeVertexNormals: function ( areaWeighted = true ) {
 
 		const vertices = new Array( this.vertices.length );
 
@@ -631,7 +629,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	merge: function ( geometry, matrix, materialIndexOffset ) {
+	merge: function ( geometry, matrix, materialIndexOffset = 0 ) {
 
 		if ( ! ( geometry && geometry.isGeometry ) ) {
 
@@ -648,8 +646,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			faces2 = geometry.faces,
 			colors1 = this.colors,
 			colors2 = geometry.colors;
-
-		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
 		if ( matrix !== undefined ) {
 

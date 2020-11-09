@@ -52,9 +52,7 @@ class PointLightShadow extends LightShadow {
 
 	}
 
-	updateMatrices( light, viewportIndex ) {
-
-		if ( viewportIndex === undefined ) viewportIndex = 0;
+	updateMatrices( light, viewportIndex = 0 ) {
 
 		const camera = this.camera,
 			shadowMatrix = this.matrix,

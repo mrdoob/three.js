@@ -1,8 +1,6 @@
 /* global QUnit */
 
-import {
-	ParametricBufferGeometry
-} from '../../../../src/geometries/ParametricGeometry';
+import { ParametricBufferGeometry } from '../../../../src/geometries/ParametricBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 

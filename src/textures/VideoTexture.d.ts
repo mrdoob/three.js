@@ -9,6 +9,17 @@ import {
 
 export class VideoTexture extends Texture {
 
+	/**
+	 * @param video
+	 * @param [mapping=THREE.Texture.DEFAULT_MAPPING]
+	 * @param [wrapS=THREE.ClampToEdgeWrapping]
+	 * @param [wrapT=THREE.ClampToEdgeWrapping]
+	 * @param [magFilter=THREE.LinearFilter]
+	 * @param [minFilter=THREE.LinearFilter]
+	 * @param [format=THREE.RGBFormat]
+	 * @param [type=THREE.UnsignedByteType]
+	 * @param [anisotropy=1]
+	 */
 	constructor(
 		video: HTMLVideoElement,
 		mapping?: Mapping,
@@ -22,5 +33,10 @@ export class VideoTexture extends Texture {
 	);
 
 	readonly isVideoTexture: true;
+
+	/**
+	 * @default false
+	 */
+	generateMipmaps: boolean;
 
 }

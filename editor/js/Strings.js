@@ -29,7 +29,6 @@ function Strings( config ) {
 			'menubar/edit/clear_history': 'Clear History',
 			'menubar/edit/clone': 'Clone',
 			'menubar/edit/delete': 'Delete (Del)',
-			'menubar/edit/minify_shaders': 'Minify Shaders',
 			'menubar/edit/fixcolormaps': 'Fix Color Maps',
 
 			'menubar/add': 'Add',
@@ -74,6 +73,11 @@ function Strings( config ) {
 			'menubar/help/source_code': 'Source Code',
 			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'About',
+
+			'sidebar/animations': 'Animations',
+			'sidebar/animations/play': 'Play',
+			'sidebar/animations/stop': 'Stop',
+			'sidebar/animations/timescale': 'Time Scale',
 
 			'sidebar/scene': 'Scene',
 			'sidebar/scene/background': 'Background',
@@ -224,6 +228,7 @@ function Strings( config ) {
 			'sidebar/material/new': 'New',
 			'sidebar/material/copy': 'Copy',
 			'sidebar/material/paste': 'Paste',
+			'sidebar/material/slot': 'Slot',
 			'sidebar/material/type': 'Type',
 			'sidebar/material/uuid': 'UUID',
 			'sidebar/material/name': 'Name',
@@ -348,7 +353,6 @@ function Strings( config ) {
 			'menubar/edit/clear_history': 'Supprimer Historique',
 			'menubar/edit/clone': 'Cloner',
 			'menubar/edit/delete': 'Supprimer (Supp)',
-			'menubar/edit/minify_shaders': 'Minimiser les Shaders',
 			'menubar/edit/fixcolormaps': 'Correction des couleurs',
 
 			'menubar/add': 'Ajouter',
@@ -393,6 +397,11 @@ function Strings( config ) {
 			'menubar/help/source_code': 'Code Source',
 			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'A propos',
+
+			'sidebar/animations': 'Animations',
+			'sidebar/animations/play': 'Play',
+			'sidebar/animations/stop': 'Stop',
+			'sidebar/animations/timescale': 'Time Scale',
 
 			'sidebar/scene': 'Scène',
 			'sidebar/scene/background': 'Arrière Plan',
@@ -543,6 +552,7 @@ function Strings( config ) {
 			'sidebar/material/new': 'Nouveau',
 			'sidebar/material/copy': 'Copier',
 			'sidebar/material/paste': 'Coller',
+			'sidebar/material/slot': 'Slot',
 			'sidebar/material/type': 'Type',
 			'sidebar/material/uuid': 'UUID',
 			'sidebar/material/name': 'Nom',
@@ -667,7 +677,6 @@ function Strings( config ) {
 			'menubar/edit/clear_history': '清空历史记录',
 			'menubar/edit/clone': '拷贝',
 			'menubar/edit/delete': '删除 (Del)',
-			'menubar/edit/minify_shaders': '压缩着色器',
 			'menubar/edit/fixcolormaps': '修复颜色贴图',
 
 			'menubar/add': '添加',
@@ -713,6 +722,11 @@ function Strings( config ) {
 			'menubar/help/icons': '图标组件包',
 			'menubar/help/about': '关于',
 
+			'sidebar/animations': '动画',
+			'sidebar/animations/play': '播放',
+			'sidebar/animations/stop': '暂停',
+			'sidebar/animations/timescale': '时间缩放',
+
 			'sidebar/scene': '场景',
 			'sidebar/scene/background': '背景',
 			'sidebar/scene/environment': '环境',
@@ -746,7 +760,7 @@ function Strings( config ) {
 			'sidebar/object/decay': '衰减',
 			'sidebar/object/shadow': '阴影',
 			'sidebar/object/shadowBias': '阴影偏移',
-			'sidebar/object/shadowNormalBias': 'Shadow Normal Bias',
+			'sidebar/object/shadowNormalBias': '阴影法线偏移',
 			'sidebar/object/shadowRadius': '阴影半径',
 			'sidebar/object/cast': '产生',
 			'sidebar/object/receive': '接受',
@@ -849,6 +863,7 @@ function Strings( config ) {
 			'sidebar/material/new': '更新',
 			'sidebar/material/copy': '复制',
 			'sidebar/material/paste': '粘贴',
+			'sidebar/material/slot': '插槽',
 			'sidebar/material/type': '类型',
 			'sidebar/material/uuid': '识别码',
 			'sidebar/material/name': '名称',
@@ -867,6 +882,7 @@ function Strings( config ) {
 			'sidebar/material/vertexcolors': '顶点颜色',
 			'sidebar/material/vertextangents': '顶点切线',
 			'sidebar/material/skinning': '皮肤',
+			'sidebar/material/matcap': '材质捕获',
 			'sidebar/material/map': '贴图',
 			'sidebar/material/alphamap': '透明贴图',
 			'sidebar/material/bumpmap': '凹凸贴图',

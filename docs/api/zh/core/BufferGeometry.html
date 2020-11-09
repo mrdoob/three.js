@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -23,10 +22,10 @@
 
 		<h2>代码示例</h2>
 		<code>
-		var geometry = new THREE.BufferGeometry();
+		const geometry = new THREE.BufferGeometry();
 		// 创建一个简单的矩形. 在这里我们左上和右下顶点被复制了两次。
 		// 因为在两个三角面片里，这两个顶点都需要被用到。
-		var vertices = new Float32Array( [
+		const vertices = new Float32Array( [
 			-1.0, -1.0,  1.0,
 			 1.0, -1.0,  1.0,
 			 1.0,  1.0,  1.0,
@@ -38,8 +37,8 @@
 
 		// itemSize = 3 因为每个顶点都是一个三元组。
 		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-		var mesh = new THREE.Mesh( geometry, material );
+		const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		const mesh = new THREE.Mesh( geometry, material );
 		</code>
 
 		<h2>例子</h2>
@@ -130,6 +129,13 @@
 		<h3>[property:Object morphAttributes]</h3>
 		<p>
 			存储 [page:BufferAttribute] 的 Hashmap，存储了几何体 [page:Geometry.morphTargets morphTargets] 的细节信息。
+		</p>
+
+		<h3>[property:Boolean morphTargetsRelative]</h3>
+		<p>
+			Used to control the morph target behavior; when set to true, the morph target data is treated as relative offsets, rather than as absolute positions/normals.
+
+			Default is *false*.
 		</p>
 
 		<h3>[property:String name]</h3>
@@ -254,7 +260,7 @@
 			缩放几何体。该操作一般在一次处理中完成，不会循环处理。典型的用法是通过调用 [page:Object3D.scale] 实时旋转几何体。
 		</p>
 
-		<h3>[method:null setIndex] ( [param:BufferAttribute index] )</h3>
+		<h3>[method:BufferGeometry setIndex] ( [param:BufferAttribute index] )</h3>
 		<p>设置缓存的 [page:.index]。</p>
 
 		<h3>[method:null setDrawRange] ( [param:Integer start], [param:Integer count] )</h3>

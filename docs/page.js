@@ -4,11 +4,11 @@ if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 	// redirect to the index page (using the current URL without extension as the new fragment).
 	// If this URL itself has a fragment, append it with a dot (since '#' in an URL fragment is not allowed).
 
-	var href = window.location.href;
-	var splitIndex = href.lastIndexOf( '/docs/' ) + 6;
-	var docsBaseURL = href.substr( 0, splitIndex );
+	let href = window.location.href;
+	const splitIndex = href.lastIndexOf( '/docs/' ) + 6;
+	const docsBaseURL = href.substr( 0, splitIndex );
 
-	var hash = window.location.hash;
+	let hash = window.location.hash;
 
 	if ( hash !== '' ) {
 
@@ -17,19 +17,21 @@ if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 
 	}
 
-	var pathSnippet = href.slice( splitIndex, - 5 );
+	const extension = href.split( '.' ).pop();
+	const end = ( extension === 'html' ) ? - 5 : href.length;
+	const pathSnippet = href.slice( splitIndex, end );
 
 	window.location.replace( docsBaseURL + '#' + pathSnippet + hash );
 
 }
 
 
-function onDocumentLoad( event ) {
+function onDocumentLoad() {
 
-	var path, localizedPath;
-	var pathname = window.location.pathname;
-	var section = /\/(manual|api|examples)\//.exec( pathname )[ 1 ].toString().split( '.html' )[ 0 ];
-	var name = /[\-A-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
+	let path, localizedPath;
+	const pathname = window.location.pathname;
+	const section = /\/(manual|api|examples)\//.exec( pathname )[ 1 ].toString().split( '.html' )[ 0 ];
+	let name = /[\-A-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
 
 	switch ( section ) {
 
@@ -54,7 +56,7 @@ function onDocumentLoad( event ) {
 
 	}
 
-	var text = document.body.innerHTML;
+	let text = document.body.innerHTML;
 
 	text = text.replace( /\[name\]/gi, name );
 	text = text.replace( /\[path\]/gi, path );
@@ -80,11 +82,11 @@ function onDocumentLoad( event ) {
 
 	// handle code snippets formatting
 
-	var elements = document.getElementsByTagName( 'code' );
+	const elements = document.getElementsByTagName( 'code' );
 
-	for ( var i = 0; i < elements.length; i ++ ) {
+	for ( let i = 0; i < elements.length; i ++ ) {
 
-		var element = elements[ i ];
+		const element = elements[ i ];
 
 		text = element.textContent.trim();
 		text = text.replace( /^\t\t/gm, '' );
@@ -95,7 +97,7 @@ function onDocumentLoad( event ) {
 
 	// Edit button
 
-	var button = document.createElement( 'div' );
+	const button = document.createElement( 'div' );
 	button.id = 'button';
 	button.innerHTML = '<img src="../files/ic_mode_edit_black_24dp.svg">';
 	button.addEventListener( 'click', function ( event ) {
@@ -108,27 +110,27 @@ function onDocumentLoad( event ) {
 
 	// Syntax highlighting
 
-	var styleBase = document.createElement( 'link' );
+	const styleBase = document.createElement( 'link' );
 	styleBase.href = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify/prettify.css';
 	styleBase.rel = 'stylesheet';
 
-	var styleCustom = document.createElement( 'link' );
+	const styleCustom = document.createElement( 'link' );
 	styleCustom.href = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify/threejs.css';
 	styleCustom.rel = 'stylesheet';
 
 	document.head.appendChild( styleBase );
 	document.head.appendChild( styleCustom );
 
-	var prettify = document.createElement( 'script' );
+	const prettify = document.createElement( 'script' );
 	prettify.src = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify/prettify.js';
 
 	prettify.onload = function () {
 
-		var elements = document.getElementsByTagName( 'code' );
+		const elements = document.getElementsByTagName( 'code' );
 
-		for ( var i = 0; i < elements.length; i ++ ) {
+		for ( let i = 0; i < elements.length; i ++ ) {
 
-			var e = elements[ i ];
+			const e = elements[ i ];
 			e.className += ' prettyprint';
 			e.setAttribute( 'translate', 'no' );
 
@@ -140,6 +142,6 @@ function onDocumentLoad( event ) {
 
 	document.head.appendChild( prettify );
 
-};
+}
 
 document.addEventListener( 'DOMContentLoaded', onDocumentLoad, false );

@@ -1,4 +1,3 @@
-
 /**
  * Full-screen textured quad shader
  */

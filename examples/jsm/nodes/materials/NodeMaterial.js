@@ -61,17 +61,12 @@ Object.defineProperties( NodeMaterial.prototype, {
 
 NodeMaterial.prototype.onBeforeCompile = function ( shader, renderer ) {
 
-	var materialProperties = renderer.properties.get( this );
+	this.build( { renderer: renderer } );
 
-	if ( this.version !== materialProperties.__version ) {
-
-		this.build( { renderer: renderer } );
-
-		shader.uniforms = this.uniforms;
-		shader.vertexShader = this.vertexShader;
-		shader.fragmentShader = this.fragmentShader;
-
-	}
+	shader.defines = this.defines;
+	shader.uniforms = this.uniforms;
+	shader.vertexShader = this.vertexShader;
+	shader.fragmentShader = this.fragmentShader;
 
 };
 

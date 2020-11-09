@@ -1,6 +1,6 @@
-var VRButton = {
+class VRButton {
 
-	createButton: function ( renderer, options ) {
+	static createButton( renderer, options ) {
 
 		if ( options ) {
 
@@ -8,9 +8,11 @@ var VRButton = {
 
 		}
 
+		const button = document.createElement( 'button' );
+
 		function showEnterVR( /*device*/ ) {
 
-			var currentSession = null;
+			let currentSession = null;
 
 			function onSessionStarted( session ) {
 
@@ -66,7 +68,7 @@ var VRButton = {
 					// ('local' is always available for immersive sessions and doesn't need to
 					// be requested separately.)
 
-					var sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor', 'hand-tracking' ] };
+					const sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor', 'hand-tracking' ] };
 					navigator.xr.requestSession( 'immersive-vr', sessionInit ).then( onSessionStarted );
 
 				} else {
@@ -121,7 +123,6 @@ var VRButton = {
 
 		if ( 'xr' in navigator ) {
 
-			var button = document.createElement( 'button' );
 			button.id = 'VRButton';
 			button.style.display = 'none';
 
@@ -137,7 +138,7 @@ var VRButton = {
 
 		} else {
 
-			var message = document.createElement( 'a' );
+			const message = document.createElement( 'a' );
 
 			if ( window.isSecureContext === false ) {
 
@@ -163,6 +164,6 @@ var VRButton = {
 
 	}
 
-};
+}
 
 export { VRButton };
