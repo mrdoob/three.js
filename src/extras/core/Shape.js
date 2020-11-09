@@ -1,23 +1,18 @@
 import { Path } from './Path.js';
 import { MathUtils } from '../../math/MathUtils.js';
 
-function Shape( points ) {
+class Shape extends Path {
 
-	Path.call( this, points );
-
-	this.uuid = MathUtils.generateUUID();
+	constructor( points ){
+		super(points)
+		this.uuid = MathUtils.generateUUID();
 
 	this.type = 'Shape';
 
 	this.holes = [];
+	}
 
-}
-
-Shape.prototype = Object.assign( Object.create( Path.prototype ), {
-
-	constructor: Shape,
-
-	getPointsHoles: function ( divisions ) {
+	getPointsHoles( divisions ) {
 
 		const holesPts = [];
 
@@ -29,11 +24,11 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 		return holesPts;
 
-	},
+	}
 
 	// get points of shape and holes (keypoints based on segments parameter)
 
-	extractPoints: function ( divisions ) {
+	extractPoints( divisions ) {
 
 		return {
 
@@ -42,11 +37,11 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 		};
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
-		Path.prototype.copy.call( this, source );
+		super.copy(  source );
 
 		this.holes = [];
 
@@ -60,11 +55,11 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		const data = Path.prototype.toJSON.call( this );
+		const data = super.toJSON( );
 
 		data.uuid = this.uuid;
 		data.holes = [];
@@ -78,11 +73,11 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 		return data;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Path.prototype.fromJSON.call( this, json );
+		super.fromJSON(  json );
 
 		this.uuid = json.uuid;
 		this.holes = [];
@@ -97,8 +92,7 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 		return this;
 
 	}
-
-} );
+}
 
 
 export { Shape };
