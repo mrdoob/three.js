@@ -1,4 +1,3 @@
-
 /**
  * RGB Shift Shader
  * Shifts red and blue channels from center in opposite directions

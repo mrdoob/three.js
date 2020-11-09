@@ -2,6 +2,7 @@ import { Color } from '../../math/Color.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
+import { UniformsLib } from '../shaders/UniformsLib.js';
 
 function UniformsCache() {
 
@@ -149,7 +150,7 @@ function shadowCastingLightsFirst( lightA, lightB ) {
 
 }
 
-function WebGLLights() {
+function WebGLLights( extensions, capabilities ) {
 
 	const cache = new UniformsCache();
 
@@ -182,6 +183,8 @@ function WebGLLights() {
 		spotShadowMap: [],
 		spotShadowMatrix: [],
 		rectArea: [],
+		rectAreaLTC1: null,
+		rectAreaLTC2: null,
 		point: [],
 		pointShadow: [],
 		pointShadowMap: [],
@@ -397,6 +400,39 @@ function WebGLLights() {
 				state.hemi[ hemiLength ] = uniforms;
 
 				hemiLength ++;
+
+			}
+
+		}
+
+		if ( rectAreaLength > 0 ) {
+
+			if ( capabilities.isWebGL2 ) {
+
+				// WebGL 2
+
+				state.rectAreaLTC1 = UniformsLib.LTC_FLOAT_1;
+				state.rectAreaLTC2 = UniformsLib.LTC_FLOAT_2;
+
+			} else {
+
+				// WebGL 1
+
+				if ( extensions.has( 'OES_texture_float_linear' ) === true ) {
+
+					state.rectAreaLTC1 = UniformsLib.LTC_FLOAT_1;
+					state.rectAreaLTC2 = UniformsLib.LTC_FLOAT_2;
+
+				} else if ( extensions.has( 'OES_texture_half_float_linear' ) === true ) {
+
+					state.rectAreaLTC1 = UniformsLib.LTC_HALF_1;
+					state.rectAreaLTC2 = UniformsLib.LTC_HALF_2;
+
+				} else {
+
+					console.error( 'THREE.WebGLRenderer: Unable to use RectAreaLight. Missing WebGL extensions.' );
+
+				}
 
 			}
 

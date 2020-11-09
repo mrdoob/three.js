@@ -33,11 +33,13 @@
 
 			uniform sampler2D uTextures[ 3 ];
 
+			out vec4 outColor;
+
 			void main()	{
 
-				if ( vIndex == 0 ) gl_FragColor = texture( uTextures[ 0 ], vUv );
-				else if ( vIndex == 1 ) gl_FragColor = texture( uTextures[ 1 ], vUv );
-				else if ( vIndex == 2 ) gl_FragColor = texture( uTextures[ 2 ], vUv );
+				if ( vIndex == 0 ) outColor = texture( uTextures[ 0 ], vUv );
+				else if ( vIndex == 1 ) outColor = texture( uTextures[ 1 ], vUv );
+				else if ( vIndex == 2 ) outColor = texture( uTextures[ 2 ], vUv );
 
 			}
 		</script>
@@ -46,7 +48,7 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer, mesh;
+			let camera, scene, renderer, mesh;
 
 			init();
 			animate();
@@ -62,36 +64,36 @@
 
 				// geometry
 
-				var triangles = 10000;
+				const triangles = 10000;
 
-				var geometry = new THREE.BufferGeometry();
+				const geometry = new THREE.BufferGeometry();
 
-				var positions = [];
-				var uvs = [];
-				var textureIndices = [];
+				const positions = [];
+				const uvs = [];
+				const textureIndices = [];
 
-				var n = 800, n2 = n / 2; // triangles spread in the cube
-				var d = 50, d2 = d / 2; // individual triangle size
+				const n = 800, n2 = n / 2; // triangles spread in the cube
+				const d = 50, d2 = d / 2; // individual triangle size
 
-				for ( var i = 0; i < triangles; i ++ ) {
+				for ( let i = 0; i < triangles; i ++ ) {
 
 					// positions
 
-					var x = Math.random() * n - n2;
-					var y = Math.random() * n - n2;
-					var z = Math.random() * n - n2;
+					const x = Math.random() * n - n2;
+					const y = Math.random() * n - n2;
+					const z = Math.random() * n - n2;
 
-					var ax = x + Math.random() * d - d2;
-					var ay = y + Math.random() * d - d2;
-					var az = z + Math.random() * d - d2;
+					const ax = x + Math.random() * d - d2;
+					const ay = y + Math.random() * d - d2;
+					const az = z + Math.random() * d - d2;
 
-					var bx = x + Math.random() * d - d2;
-					var by = y + Math.random() * d - d2;
-					var bz = z + Math.random() * d - d2;
+					const bx = x + Math.random() * d - d2;
+					const by = y + Math.random() * d - d2;
+					const bz = z + Math.random() * d - d2;
 
-					var cx = x + Math.random() * d - d2;
-					var cy = y + Math.random() * d - d2;
-					var cz = z + Math.random() * d - d2;
+					const cx = x + Math.random() * d - d2;
+					const cy = y + Math.random() * d - d2;
+					const cz = z + Math.random() * d - d2;
 
 					positions.push( ax, ay, az );
 					positions.push( bx, by, bz );
@@ -105,7 +107,7 @@
 
 					// texture indices
 
-					var t = i % 3;
+					const t = i % 3;
 					textureIndices.push( t, t, t );
 
 				}
@@ -118,13 +120,13 @@
 
 				// material
 
-				var loader = new THREE.TextureLoader();
+				const loader = new THREE.TextureLoader();
 
-				var map1 = loader.load( 'textures/crate.gif' );
-				var map2 = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
-				var map3 = loader.load( 'textures/terrain/grasslight-big.jpg' );
+				const map1 = loader.load( 'textures/crate.gif' );
+				const map2 = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
+				const map3 = loader.load( 'textures/terrain/grasslight-big.jpg' );
 
-				var material = new THREE.ShaderMaterial( {
+				const material = new THREE.ShaderMaterial( {
 					uniforms: {
 						uTextures: {
 							value: [ map1, map2, map3 ]
@@ -132,7 +134,8 @@
 					},
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-					side: THREE.DoubleSide
+					side: THREE.DoubleSide,
+					glslVersion: THREE.GLSL3
 				} );
 
 				// mesh
@@ -152,7 +155,7 @@
 
 				requestAnimationFrame( animate );
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
 				mesh.rotation.x = time * 0.25;
 				mesh.rotation.y = time * 0.5;

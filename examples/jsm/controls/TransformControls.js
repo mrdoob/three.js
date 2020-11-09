@@ -146,30 +146,18 @@ var TransformControls = function ( camera, domElement ) {
 
 	{
 
-		domElement.addEventListener( "mousedown", onPointerDown, false );
-		domElement.addEventListener( "touchstart", onPointerDown, false );
-		domElement.addEventListener( "mousemove", onPointerHover, false );
-		domElement.addEventListener( "touchmove", onPointerHover, false );
-		domElement.addEventListener( "touchmove", onPointerMove, false );
-		scope.domElement.ownerDocument.addEventListener( "mouseup", onPointerUp, false );
-		domElement.addEventListener( "touchend", onPointerUp, false );
-		domElement.addEventListener( "touchcancel", onPointerUp, false );
-		domElement.addEventListener( "touchleave", onPointerUp, false );
+		domElement.addEventListener( "pointerdown", onPointerDown, false );
+		domElement.addEventListener( "pointermove", onPointerHover, false );
+		scope.domElement.ownerDocument.addEventListener( "pointerup", onPointerUp, false );
 
 	}
 
 	this.dispose = function () {
 
-		domElement.removeEventListener( "mousedown", onPointerDown );
-		domElement.removeEventListener( "touchstart", onPointerDown );
-		domElement.removeEventListener( "mousemove", onPointerHover );
-		scope.domElement.ownerDocument.removeEventListener( "mousemove", onPointerMove );
-		domElement.removeEventListener( "touchmove", onPointerHover );
-		domElement.removeEventListener( "touchmove", onPointerMove );
-		scope.domElement.ownerDocument.removeEventListener( "mouseup", onPointerUp );
-		domElement.removeEventListener( "touchend", onPointerUp );
-		domElement.removeEventListener( "touchcancel", onPointerUp );
-		domElement.removeEventListener( "touchleave", onPointerUp );
+		domElement.removeEventListener( "pointerdown", onPointerDown );
+		domElement.removeEventListener( "pointermove", onPointerHover );
+		scope.domElement.ownerDocument.removeEventListener( "pointermove", onPointerMove );
+		scope.domElement.ownerDocument.removeEventListener( "pointerup", onPointerUp );
 
 		this.traverse( function ( child ) {
 
@@ -256,8 +244,8 @@ var TransformControls = function ( camera, domElement ) {
 
 			this.object.matrixWorld.decompose( worldPosition, worldQuaternion, worldScale );
 
-			parentQuaternionInv.copy( parentQuaternion ).inverse();
-			worldQuaternionInv.copy( worldQuaternion ).inverse();
+			parentQuaternionInv.copy( parentQuaternion ).invert();
+			worldQuaternionInv.copy( worldQuaternion ).invert();
 
 		}
 
@@ -272,7 +260,7 @@ var TransformControls = function ( camera, domElement ) {
 
 	this.pointerHover = function ( pointer ) {
 
-		if ( this.object === undefined || this.dragging === true || ( pointer.button !== undefined && pointer.button !== 0 ) ) return;
+		if ( this.object === undefined || this.dragging === true ) return;
 
 		raycaster.setFromCamera( pointer, this.camera );
 
@@ -292,9 +280,9 @@ var TransformControls = function ( camera, domElement ) {
 
 	this.pointerDown = function ( pointer ) {
 
-		if ( this.object === undefined || this.dragging === true || ( pointer.button !== undefined && pointer.button !== 0 ) ) return;
+		if ( this.object === undefined || this.dragging === true || pointer.button !== 0 ) return;
 
-		if ( ( pointer.button === 0 || pointer.button === undefined ) && this.axis !== null ) {
+		if ( this.axis !== null ) {
 
 			raycaster.setFromCamera( pointer, this.camera );
 
@@ -362,7 +350,7 @@ var TransformControls = function ( camera, domElement ) {
 
 		}
 
-		if ( object === undefined || axis === null || this.dragging === false || ( pointer.button !== undefined && pointer.button !== 0 ) ) return;
+		if ( object === undefined || axis === null || this.dragging === false || pointer.button !== - 1 ) return;
 
 		raycaster.setFromCamera( pointer, this.camera );
 
@@ -406,7 +394,7 @@ var TransformControls = function ( camera, domElement ) {
 
 				if ( space === 'local' ) {
 
-					object.position.applyQuaternion( _tempQuaternion.copy( quaternionStart ).inverse() );
+					object.position.applyQuaternion( _tempQuaternion.copy( quaternionStart ).invert() );
 
 					if ( axis.search( 'X' ) !== - 1 ) {
 
@@ -598,7 +586,7 @@ var TransformControls = function ( camera, domElement ) {
 
 	this.pointerUp = function ( pointer ) {
 
-		if ( pointer.button !== undefined && pointer.button !== 0 ) return;
+		if ( pointer.button !== 0 ) return;
 
 		if ( this.dragging && ( this.axis !== null ) ) {
 
@@ -608,8 +596,7 @@ var TransformControls = function ( camera, domElement ) {
 		}
 
 		this.dragging = false;
-
-		if ( pointer.button === undefined ) this.axis = null;
+		this.axis = null;
 
 	};
 
@@ -647,7 +634,14 @@ var TransformControls = function ( camera, domElement ) {
 
 		if ( ! scope.enabled ) return;
 
-		scope.pointerHover( getPointer( event ) );
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+			case 'pen':
+				scope.pointerHover( getPointer( event ) );
+				break;
+
+		}
 
 	}
 
@@ -655,7 +649,8 @@ var TransformControls = function ( camera, domElement ) {
 
 		if ( ! scope.enabled ) return;
 
-		scope.domElement.ownerDocument.addEventListener( "mousemove", onPointerMove, false );
+		scope.domElement.style.touchAction = 'none'; // disable touch scroll
+		scope.domElement.ownerDocument.addEventListener( "pointermove", onPointerMove, false );
 
 		scope.pointerHover( getPointer( event ) );
 		scope.pointerDown( getPointer( event ) );
@@ -674,7 +669,8 @@ var TransformControls = function ( camera, domElement ) {
 
 		if ( ! scope.enabled ) return;
 
-		scope.domElement.ownerDocument.removeEventListener( "mousemove", onPointerMove, false );
+		scope.domElement.style.touchAction = '';
+		scope.domElement.ownerDocument.removeEventListener( "pointermove", onPointerMove, false );
 
 		scope.pointerUp( getPointer( event ) );
 
@@ -1304,7 +1300,7 @@ var TransformControlsGizmo = function () {
 					handle.position.copy( this.worldPositionStart );
 					handle.quaternion.copy( this.worldQuaternionStart );
 					tempVector.set( 1e-10, 1e-10, 1e-10 ).add( this.worldPositionStart ).sub( this.worldPosition ).multiplyScalar( - 1 );
-					tempVector.applyQuaternion( this.worldQuaternionStart.clone().inverse() );
+					tempVector.applyQuaternion( this.worldQuaternionStart.clone().invert() );
 					handle.scale.copy( tempVector );
 					handle.visible = this.dragging;
 
@@ -1487,7 +1483,7 @@ var TransformControlsGizmo = function () {
 				// Align handles to current local or world rotation
 
 				tempQuaternion2.copy( quaternion );
-				alignVector.copy( this.eye ).applyQuaternion( tempQuaternion.copy( quaternion ).inverse() );
+				alignVector.copy( this.eye ).applyQuaternion( tempQuaternion.copy( quaternion ).invert() );
 
 				if ( handle.name.search( "E" ) !== - 1 ) {
 

@@ -6,6 +6,7 @@ import {
 } from "../../../build/three.module.js";
 import { CCDIKSolver } from "../animation/CCDIKSolver.js";
 import { MMDPhysics } from "../animation/MMDPhysics.js";
+
 /**
  * MMDAnimationHelper handles animation of MMD assets loaded by MMDLoader
  * with MMD special features as IK, Grant, and Physics.

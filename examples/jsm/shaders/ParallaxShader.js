@@ -1,4 +1,3 @@
-
 // Parallax Occlusion shaders from
 //    http://sunandblackcat.com/tipFullView.php?topicid=28
 // No tangent-space transforms logic based on

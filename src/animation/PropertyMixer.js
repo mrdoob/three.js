@@ -234,7 +234,7 @@ Object.assign( PropertyMixer.prototype, {
 	_setAdditiveIdentityQuaternion: function () {
 
 		this._setAdditiveIdentityNumeric();
-		this.buffer[ this._addIndex * 4 + 3 ] = 1;
+		this.buffer[ this._addIndex * this.valueSize + 3 ] = 1;
 
 	},
 

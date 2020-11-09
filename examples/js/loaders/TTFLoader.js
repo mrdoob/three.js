@@ -1,4 +1,3 @@
-console.warn( "THREE.TTFLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Requires opentype.js to be included in the project.
  * Loads TTF files and converts them into typeface JSON that can be used directly
@@ -26,6 +25,7 @@ THREE.TTFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			try {
@@ -209,7 +209,7 @@ THREE.TTFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}
 
-		return convert( opentype.parse( arraybuffer ), this.reversed );
+		return convert( opentype.parse( arraybuffer ), this.reversed ); // eslint-disable-line no-undef
 
 	}
 

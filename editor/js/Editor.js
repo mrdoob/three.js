@@ -357,7 +357,7 @@ Editor.prototype = {
 
 	},
 
-	addAnimation: function ( object, animations ) {
+	addAnimations: function ( object, animations ) {
 
 		if ( animations.length > 0 ) {
 
@@ -664,9 +664,49 @@ Editor.prototype = {
 
 		} );
 
+		// animations
+
+		var animationsJSON = json.animations;
+
+		for ( var i = 0; i < animationsJSON.length; i ++ ) {
+
+			var objectJSON = animationsJSON[ i ];
+			var animations = [];
+
+			for ( var j = 0; j < objectJSON.animations.length; j ++ ) {
+
+				animations.push( THREE.AnimationClip.parse( objectJSON.animations[ j ] ) );
+
+			}
+
+			this.animations[ objectJSON.uuid ] = animations;
+
+		}
+
 	},
 
 	toJSON: function () {
+
+		// animations
+
+		var animations = this.animations;
+		var animationsJSON = [];
+
+		for ( var entry in animations ) {
+
+			var objectAnimations = animations[ entry ];
+			var objectJSON = { uuid: entry, animations: [] };
+
+			for ( var i = 0; i < objectAnimations.length; i ++ ) {
+
+				var objectAnimation = objectAnimations[ i ];
+				objectJSON.animations.push( THREE.AnimationClip.toJSON( objectAnimation ) );
+
+			}
+
+			animationsJSON.push( objectJSON );
+
+		}
 
 		// scripts clean up
 
@@ -701,7 +741,8 @@ Editor.prototype = {
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
-			history: this.history.toJSON()
+			history: this.history.toJSON(),
+			animations: animationsJSON
 
 		};
 

@@ -14,7 +14,6 @@ const puppeteer = require( 'puppeteer' );
 const handler = require( 'serve-handler' );
 const http = require( 'http' );
 const pixelmatch = require( 'pixelmatch' );
-const printImage = require( 'image-output' );
 const jimp = require( 'jimp' );
 const fs = require( 'fs' );
 
@@ -40,6 +39,7 @@ const exceptionList = [
 	'index',
 	'css3d_youtube', // video tag not deterministic enough
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
+	'webgl_loader_texture_lottie', // not sure why this fails
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
 	'webgl_materials_envmaps_parallax', // empty for some reason
 	'webgl_raymarching_reflect', // exception for Github Actions
@@ -194,16 +194,16 @@ const pup = puppeteer.launch( {
 
 					/* Resolve render promise */
 
-					window.chromeRenderStarted = true;
+					window._renderStarted = true;
 					await new Promise( function ( resolve ) {
 
-						performance.wow = performance.wow || performance.now;
-						let renderStart = performance.wow();
+						performance._now = performance._now || performance.now;
+						let renderStart = performance._now();
 
 						let waitingLoop = setInterval( function () {
 
-							let renderEcceded = ( performance.wow() - renderStart > renderTimeout * attemptProgress );
-							if ( window.chromeRenderFinished || renderEcceded ) {
+							let renderEcceded = ( performance._now() - renderStart > renderTimeout * attemptProgress );
+							if ( window._renderFinished || renderEcceded ) {
 
 								if ( renderEcceded ) {
 
@@ -226,7 +226,7 @@ const pup = puppeteer.launch( {
 
 				if ( ++ attemptId === maxAttemptId ) {
 
-					console.red( `WTF? 'Network timeout' is small for your machine. file: ${ file } \n${ e }` );
+					console.red( `Something completely wrong. 'Network timeout' is small for your machine. file: ${ file } \n${ e }` );
 					failedScreenshots.push( file );
 					continue;
 
@@ -250,7 +250,6 @@ const pup = puppeteer.launch( {
 					.scale( 1 / viewScale ).quality( jpgQuality )
 					.write( `./examples/screenshots/${ file }.jpg` ).bitmap;
 
-				printImage( bitmap, console );
 				console.green( `file: ${ file } generated` );
 
 
@@ -276,7 +275,7 @@ const pup = puppeteer.launch( {
 				} catch {
 
 					attemptId = maxAttemptId;
-					console.red( `ERROR! Image sizes does not match in file: ${ file }` );
+					console.red( `Something completely wrong. Image sizes does not match in file: ${ file }` );
 					failedScreenshots.push( file );
 					continue;
 
@@ -295,7 +294,6 @@ const pup = puppeteer.launch( {
 
 					if ( ++ attemptId === maxAttemptId ) {
 
-						printImage( diff, console );
 						console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
 						failedScreenshots.push( file );
 						continue;

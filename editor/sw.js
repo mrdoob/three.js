@@ -1,4 +1,4 @@
-// r119
+// r122
 
 const assets = [
 	'./',
@@ -25,6 +25,10 @@ const assets = [
 	'../examples/js/libs/draco/gltf/draco_decoder.wasm',
 	'../examples/js/libs/draco/gltf/draco_wasm_wrapper.js',
 
+	'../examples/jsm/libs/rhino3dm/rhino3dm.wasm',
+	'../examples/jsm/libs/rhino3dm/rhino3dm.js',
+
+	'../examples/jsm/loaders/3DMLoader.js',
 	'../examples/jsm/loaders/3MFLoader.js',
 	'../examples/jsm/loaders/AMFLoader.js',
 	'../examples/jsm/loaders/ColladaLoader.js',
@@ -73,7 +77,6 @@ const assets = [
 
 	'./js/libs/esprima.js',
 	'./js/libs/jsonlint.js',
-	'./js/libs/glslprep.min.js',
 
 	'./js/libs/codemirror/addon/dialog.css',
 	'./js/libs/codemirror/addon/show-hint.css',
@@ -122,6 +125,7 @@ const assets = [
 	'./js/Menubar.Examples.js',
 	'./js/Menubar.Help.js',
 	'./js/Menubar.Status.js',
+	'./js/Resizer.js',
 	'./js/Sidebar.js',
 	'./js/Sidebar.Scene.js',
 	'./js/Sidebar.Project.js',

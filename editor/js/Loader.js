@@ -16,6 +16,7 @@ import { SVGLoader } from '../../examples/jsm/loaders/SVGLoader.js';
 import { TDSLoader } from '../../examples/jsm/loaders/TDSLoader.js';
 import { VTKLoader } from '../../examples/jsm/loaders/VTKLoader.js';
 import { VRMLLoader } from '../../examples/jsm/loaders/VRMLLoader.js';
+import { Rhino3dmLoader } from '../../examples/jsm/loaders/3DMLoader.js';
 
 import { TGALoader } from '../../examples/jsm/loaders/TGALoader.js';
 
@@ -50,6 +51,8 @@ function Loader( editor ) {
 
 			var manager = new THREE.LoadingManager();
 			manager.setURLModifier( function ( url ) {
+
+				url = url.replace( /^(\.?\/)/, '' ); // remove './'
 
 				var file = filesMap[ url ];
 
@@ -93,6 +96,25 @@ function Loader( editor ) {
 		} );
 
 		switch ( extension ) {
+
+			case '3dm':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var loader = new Rhino3dmLoader();
+					loader.setLibraryPath( '../examples/jsm/libs/rhino3dm/' );
+					loader.parse( contents, function ( object ) {
+
+						editor.execute( new AddObjectCommand( editor, object ) );
+
+					} );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
 
 			case '3ds':
 
@@ -147,7 +169,7 @@ function Loader( editor ) {
 
 					collada.scene.name = filename;
 
-					editor.addAnimation( collada.scene, collada.animations );
+					editor.addAnimations( collada.scene, collada.animations );
 					editor.execute( new AddObjectCommand( editor, collada.scene ) );
 
 				}, false );
@@ -188,7 +210,7 @@ function Loader( editor ) {
 					var loader = new FBXLoader( manager );
 					var object = loader.parse( contents );
 
-					editor.addAnimation( object, object.animations );
+					editor.addAnimations( object, object.animations );
 					editor.execute( new AddObjectCommand( editor, object ) );
 
 				}, false );
@@ -212,7 +234,7 @@ function Loader( editor ) {
 						var scene = result.scene;
 						scene.name = filename;
 
-						editor.addAnimation( scene, result.animations );
+						editor.addAnimations( scene, result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
@@ -249,7 +271,7 @@ function Loader( editor ) {
 						var scene = result.scene;
 						scene.name = filename;
 
-						editor.addAnimation( scene, result.animations );
+						editor.addAnimations( scene, result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
@@ -348,7 +370,7 @@ function Loader( editor ) {
 					mesh.mixer = new THREE.AnimationMixer( mesh );
 					mesh.name = filename;
 
-					editor.addAnimation( mesh, geometry.animations );
+					editor.addAnimations( mesh, geometry.animations );
 					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
@@ -489,7 +511,7 @@ function Loader( editor ) {
 					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
-				reader.readAsText( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 
@@ -660,7 +682,7 @@ function Loader( editor ) {
 
 						var scene = result.scene;
 
-						editor.addAnimation( scene, result.animations );
+						editor.addAnimations( scene, result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
@@ -678,7 +700,7 @@ function Loader( editor ) {
 
 						var scene = result.scene;
 
-						editor.addAnimation( scene, result.animations );
+						editor.addAnimations( scene, result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );

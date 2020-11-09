@@ -13,11 +13,13 @@ const S = fs.readdirSync( './examples/screenshots' )
 
 // files.js
 const F = [];
-eval( fs.readFileSync( './examples/files.js' ).toString() );
-for ( var key in files ) {
 
-	var section = files[ key ];
-	for ( var i = 0, len = section.length; i < len; i ++ ) {
+const files = JSON.parse( fs.readFileSync( './examples/files.json' ) );
+
+for ( const key in files ) {
+
+	const section = files[ key ];
+	for ( let i = 0, len = section.length; i < len; i ++ ) {
 
 		F.push( section[ i ] );
 
@@ -25,10 +27,10 @@ for ( var key in files ) {
 
 }
 
-let subES = E.filter( x => ! S.includes( x ) );
-let subSE = S.filter( x => ! E.includes( x ) );
-let subEF = E.filter( x => ! F.includes( x ) );
-let subFE = F.filter( x => ! E.includes( x ) );
+const subES = E.filter( x => ! S.includes( x ) );
+const subSE = S.filter( x => ! E.includes( x ) );
+const subEF = E.filter( x => ! F.includes( x ) );
+const subFE = F.filter( x => ! E.includes( x ) );
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );

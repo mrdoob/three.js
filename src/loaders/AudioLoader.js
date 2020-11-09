@@ -18,6 +18,7 @@ class AudioLoader extends Loader {
 		loader.setResponseType( 'arraybuffer' );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
+    loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			try {

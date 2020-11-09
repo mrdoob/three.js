@@ -21,6 +21,7 @@ import {
 	sRGBEncoding
 } from "../../../build/three.module.js";
 import { JSZip } from "../libs/jszip.module.min.js";
+
 /**
  *
  * 3D Manufacturing Format (3MF) specification: https://3mf.io/specification/
@@ -58,6 +59,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			try {
@@ -110,7 +112,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			try {
 
-				zip = new JSZip( data );
+				zip = new JSZip( data ); // eslint-disable-line no-undef
 
 			} catch ( e ) {
 

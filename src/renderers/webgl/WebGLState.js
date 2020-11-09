@@ -243,7 +243,7 @@ function WebGLState( gl, extensions, capabilities ) {
 			setFunc: function ( stencilFunc, stencilRef, stencilMask ) {
 
 				if ( currentStencilFunc !== stencilFunc ||
-				     currentStencilRef 	!== stencilRef 	||
+				     currentStencilRef !== stencilRef ||
 				     currentStencilFuncMask !== stencilMask ) {
 
 					gl.stencilFunc( stencilFunc, stencilRef, stencilMask );
@@ -258,7 +258,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 			setOp: function ( stencilFail, stencilZFail, stencilZPass ) {
 
-				if ( currentStencilFail	 !== stencilFail 	||
+				if ( currentStencilFail !== stencilFail ||
 				     currentStencilZFail !== stencilZFail ||
 				     currentStencilZPass !== stencilZPass ) {
 

@@ -9,8 +9,16 @@ export class Plane {
 
 	constructor( normal?: Vector3, constant?: number );
 
+	/**
+	 * @default new THREE.Vector3( 1, 0, 0 )
+	 */
 	normal: Vector3;
+
+	/**
+	 * @default 0
+	 */
 	constant: number;
+
 	readonly isPlane: true;
 
 	set( normal: Vector3, constant: number ): Plane;

@@ -1,9 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import {
-	BoxBufferGeometry
-} from '../../../../src/geometries/BoxGeometry';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 

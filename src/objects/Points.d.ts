@@ -6,9 +6,7 @@ import { BufferGeometry } from '../core/BufferGeometry';
 import { Intersection } from '../core/Raycaster';
 
 /**
- * A class for displaying particles in the form of variable size points. For example, if using the WebGLRenderer, the particles are displayed using GL_POINTS.
- *
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/objects/ParticleSystem.js|src/objects/ParticleSystem.js}
+ * A class for displaying points. The points are rendered by the WebGLRenderer using gl.POINTS.
  */
 export class Points <
 	TGeometry extends Geometry | BufferGeometry = Geometry | BufferGeometry,

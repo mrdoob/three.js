@@ -23,7 +23,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: 10
+          node-version: 12
       - name: Install packages
         run: npm ci
 
@@ -39,7 +39,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: 10
+          node-version: 12
       - name: Install packages
         run: npm ci && npm ci --prefix test
       - name: Build
@@ -63,7 +63,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: 10
+          node-version: 12
       - name: Install packages
         run: npm ci && npm ci --prefix test && sudo apt-get install xvfb
       - name: Build
@@ -81,7 +81,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: 10
+          node-version: 12
       - name: Install packages
         run: npm ci
 
