@@ -131,7 +131,6 @@ class CurvePath extends Curve {
 		return lengths;
 
 	}
-
 	getSpacedPoints( divisions = 40 ) {
 
 		const points = [];
