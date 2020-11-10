@@ -30,8 +30,9 @@ class Object3D extends EventDispatcher {
 	DefaultUp = new Vector3( 0, 1, 0 );
 	DefaultMatrixAutoUpdate = true;
 
-	constructor () {
-		super()
+	constructor() {
+
+		super();
 		Object.defineProperty( this, 'id', { value: _object3DId ++ } );
 
 		this.uuid = MathUtils.generateUUID();
@@ -92,7 +93,7 @@ class Object3D extends EventDispatcher {
 				value: new Matrix3()
 			},
 			isObject3D: {
-				value:true
+				value: true
 			},
 		} );
 
@@ -112,6 +113,7 @@ class Object3D extends EventDispatcher {
 		this.renderOrder = 0;
 
 		this.userData = {};
+
 	}
 
 	onBeforeRender() {
