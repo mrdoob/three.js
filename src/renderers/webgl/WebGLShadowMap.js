@@ -70,7 +70,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 	this.needsUpdate = false;
 
 	this.type = PCFShadowMap;
-	this.dither = false;
+	this.dithering = false;
 
 	this.render = function ( lights, scene, camera ) {
 
@@ -242,7 +242,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				morphTargets: useMorphing,
 				skinning: useSkinning,
-				opacity: opacity,
+				opacity: opacityFlag / 63,
 
 			} );
 			material.ditherTransparency = opacity < 1;
@@ -268,7 +268,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				morphTargets: useMorphing,
 				skinning: useSkinning,
-				opacity: opacity,
+				opacity: opacityFlag / 63,
 
 			} );
 			material.ditherTransparency = opacity < 1;
@@ -322,7 +322,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 			}
 
 			const useInstancing = object.isInstancedMesh === true;
-			const opacity = this.dither ? object.opacity : 1;
+			const opacity = scope.dithering ? material.opacity : 1;
 
 			result = getMaterialVariant( useMorphing, useSkinning, useInstancing, opacity );
 
