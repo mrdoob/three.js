@@ -525,7 +525,7 @@
 
 						vec3 pos = tmpPos.xyz;
 						vec3 velocity = normalize(texture2D( textureVelocity, reference.xy ).xyz);
-						vec3 aniPos = texture2D( textureAnimation, vec2( reference.z, mod( ( time + seeds.x ) * ( ( 0.0004 + seeds.y / 10000.0) + normalize( velocity ) / 20000.0 ), reference.w ) ) ).xyz;
+						vec3 aniPos = texture2D( textureAnimation, vec2( reference.z, mod( time + ( seeds.x ) * ( ( 0.0004 + seeds.y / 10000.0) + normalize( velocity ) / 20000.0 ), reference.w ) ) ).xyz;
 						vec3 newPosition = position;
 
 						newPosition = mat3( modelMatrix ) * ( newPosition + aniPos );
@@ -649,7 +649,7 @@
 				positionUniforms[ "delta" ].value = delta;
 				velocityUniforms[ "time" ].value = now;
 				velocityUniforms[ "delta" ].value = delta;
-				if ( materialShader ) materialShader.uniforms[ "time" ].value = now;
+				if ( materialShader ) materialShader.uniforms[ "time" ].value = now / 1000;
 				if ( materialShader ) materialShader.uniforms[ "delta" ].value = delta;
 
 				velocityUniforms[ "predator" ].value.set( 0.5 * mouseX / windowHalfX, - 0.5 * mouseY / windowHalfY, 0 );
