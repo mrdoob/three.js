@@ -18,6 +18,7 @@ export class InstancedMesh <
 	);
 
 	count: number;
+	instanceColor: null | BufferAttribute;
 	instanceMatrix: BufferAttribute;
 	readonly isInstancedMesh: true;
 
