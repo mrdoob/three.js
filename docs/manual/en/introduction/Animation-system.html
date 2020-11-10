@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -24,7 +23,7 @@
 
 			To achieve all this in one homogeneous system, the three.js animation system
 			[link:https://github.com/mrdoob/three.js/issues/6881 has completely changed in 2015]
-			(be aware of outdated information!), and it has now an architecture similar to
+			(beware of outdated information!), and it has now an architecture similar to
 			Unity/Unreal Engine 4. This page gives a short overview of the main components of the
 			system and how they work together.
 
@@ -36,7 +35,7 @@
 
 			If you have successfully imported an animated 3D object (it doesn't matter if it has
 			bones or morph targets or both) — for example exporting it from Blender with the
-			[link:https://github.com/KhronosGroup/glTF-Blender-Exporter glTF Blender exporter] and
+			[link:https://github.com/KhronosGroup/glTF-Blender-IO glTF Blender exporter] and
 			loading it into a three.js scene using [page:GLTFLoader] — one of the response fields
 			should be an array named "animations", containing the [page:AnimationClip AnimationClips]
 			for this model (see a list of possible loaders below).<br /><br />
@@ -113,7 +112,6 @@
 				<li>THREE.FBXLoader</li>
 				<li>[page:GLTFLoader THREE.GLTFLoader]</li>
 				<li>THREE.MMDLoader</li>
-				<li>THREE.SEA3DLoader</li>
 			</ul>
 
 		<p class="desc">
@@ -124,11 +122,11 @@
 		<h2>Example</h2>
 
 		<code>
-		var mesh;
+		let mesh;
 
 		// Create an AnimationMixer, and get the list of AnimationClip instances
-		var mixer = new THREE.AnimationMixer( mesh );
-		var clips = mesh.animations;
+		const mixer = new THREE.AnimationMixer( mesh );
+		const clips = mesh.animations;
 
 		// Update the mixer on each frame
 		function update () {
@@ -136,8 +134,8 @@
 		}
 
 		// Play a specific animation
-		var clip = THREE.AnimationClip.findByName( clips, 'dance' );
-		var action = mixer.clipAction( clip );
+		const clip = THREE.AnimationClip.findByName( clips, 'dance' );
+		const action = mixer.clipAction( clip );
 		action.play();
 
 		// Play all animations

@@ -1,18 +1,17 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
+
+import * as THREE from '../../../build/three.module.js';
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param newRotation THREE.Euler
  * @param optionalOldRotation THREE.Euler
  * @constructor
  */
+function SetRotationCommand( editor, object, newRotation, optionalOldRotation ) {
 
-var SetRotationCommand = function ( object, newRotation, optionalOldRotation ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetRotationCommand';
 	this.name = 'Set Rotation';
@@ -33,7 +32,7 @@ var SetRotationCommand = function ( object, newRotation, optionalOldRotation ) {
 
 	}
 
-};
+}
 
 SetRotationCommand.prototype = {
 
@@ -82,3 +81,5 @@ SetRotationCommand.prototype = {
 	}
 
 };
+
+export { SetRotationCommand };

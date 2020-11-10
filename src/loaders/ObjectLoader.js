@@ -4,7 +4,6 @@ import {
 	CubeRefractionMapping,
 	EquirectangularReflectionMapping,
 	EquirectangularRefractionMapping,
-	SphericalReflectionMapping,
 	CubeUVReflectionMapping,
 	CubeUVRefractionMapping,
 
@@ -13,15 +12,17 @@ import {
 	MirroredRepeatWrapping,
 
 	NearestFilter,
-	NearestMipMapNearestFilter,
-	NearestMipMapLinearFilter,
+	NearestMipmapNearestFilter,
+	NearestMipmapLinearFilter,
 	LinearFilter,
-	LinearMipMapNearestFilter,
-	LinearMipMapLinearFilter
+	LinearMipmapNearestFilter,
+	LinearMipmapLinearFilter
 } from '../constants.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
 import { Group } from '../objects/Group.js';
+import { InstancedMesh } from '../objects/InstancedMesh.js';
 import { Sprite } from '../objects/Sprite.js';
 import { Points } from '../objects/Points.js';
 import { Line } from '../objects/Line.js';
@@ -30,6 +31,8 @@ import { LineSegments } from '../objects/LineSegments.js';
 import { LOD } from '../objects/LOD.js';
 import { Mesh } from '../objects/Mesh.js';
 import { SkinnedMesh } from '../objects/SkinnedMesh.js';
+import { Bone } from '../objects/Bone.js';
+import { Skeleton } from '../objects/Skeleton.js';
 import { Shape } from '../extras/core/Shape.js';
 import { Fog } from '../scenes/Fog.js';
 import { FogExp2 } from '../scenes/FogExp2.js';
@@ -39,48 +42,45 @@ import { PointLight } from '../lights/PointLight.js';
 import { DirectionalLight } from '../lights/DirectionalLight.js';
 import { AmbientLight } from '../lights/AmbientLight.js';
 import { RectAreaLight } from '../lights/RectAreaLight.js';
+import { LightProbe } from '../lights/LightProbe.js';
 import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { Scene } from '../scenes/Scene.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
 import { Texture } from '../textures/Texture.js';
 import { ImageLoader } from './ImageLoader.js';
-import { LoadingManager, DefaultLoadingManager } from './LoadingManager.js';
+import { LoadingManager } from './LoadingManager.js';
 import { AnimationClip } from '../animation/AnimationClip.js';
 import { MaterialLoader } from './MaterialLoader.js';
 import { LoaderUtils } from './LoaderUtils.js';
 import { BufferGeometryLoader } from './BufferGeometryLoader.js';
+import { Loader } from './Loader.js';
 import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
 import * as Curves from '../extras/curves/Curves.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+class ObjectLoader extends Loader {
 
-function ObjectLoader( manager ) {
+	constructor( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
-	this.resourcePath = '';
+		super( manager );
 
-}
+	}
 
-Object.assign( ObjectLoader.prototype, {
+	load( url, onLoad, onProgress, onError ) {
 
-	crossOrigin: 'anonymous',
+		const scope = this;
 
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		var scope = this;
-
-		var path = ( this.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : this.path;
+		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 		this.resourcePath = this.resourcePath || path;
 
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
-			var json = null;
+			let json = null;
 
 			try {
 
@@ -96,7 +96,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			}
 
-			var metadata = json.metadata;
+			const metadata = json.metadata;
 
 			if ( metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry' ) {
 
@@ -109,44 +109,26 @@ Object.assign( ObjectLoader.prototype, {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	setPath: function ( value ) {
+	parse( json, onLoad ) {
 
-		this.path = value;
-		return this;
+		const shapes = this.parseShapes( json.shapes );
+		const geometries = this.parseGeometries( json.geometries, shapes );
 
-	},
-
-	setResourcePath: function ( value ) {
-
-		this.resourcePath = value;
-		return this;
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
-
-	},
-
-	parse: function ( json, onLoad ) {
-
-		var shapes = this.parseShape( json.shapes );
-		var geometries = this.parseGeometries( json.geometries, shapes );
-
-		var images = this.parseImages( json.images, function () {
+		const images = this.parseImages( json.images, function () {
 
 			if ( onLoad !== undefined ) onLoad( object );
 
 		} );
 
-		var textures = this.parseTextures( json.textures, images );
-		var materials = this.parseMaterials( json.materials, textures );
+		const textures = this.parseTextures( json.textures, images );
+		const materials = this.parseMaterials( json.materials, textures );
 
-		var object = this.parseObject( json.object, geometries, materials );
+		const object = this.parseObject( json.object, geometries, materials );
+		const skeletons = this.parseSkeletons( json.skeletons, object );
+
+		this.bindSkeletons( object, skeletons );
 
 		if ( json.animations ) {
 
@@ -162,17 +144,17 @@ Object.assign( ObjectLoader.prototype, {
 
 		return object;
 
-	},
+	}
 
-	parseShape: function ( json ) {
+	parseShapes( json ) {
 
-		var shapes = {};
+		const shapes = {};
 
 		if ( json !== undefined ) {
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			for ( let i = 0, l = json.length; i < l; i ++ ) {
 
-				var shape = new Shape().fromJSON( json[ i ] );
+				const shape = new Shape().fromJSON( json[ i ] );
 
 				shapes[ shape.uuid ] = shape;
 
@@ -182,20 +164,52 @@ Object.assign( ObjectLoader.prototype, {
 
 		return shapes;
 
-	},
+	}
 
-	parseGeometries: function ( json, shapes ) {
+	parseSkeletons( json, object ) {
 
-		var geometries = {};
+		const skeletons = {};
+		const bones = {};
+
+		// generate bone lookup table
+
+		object.traverse( function ( child ) {
+
+			if ( child.isBone ) bones[ child.uuid ] = child;
+
+		} );
+
+		// create skeletons
 
 		if ( json !== undefined ) {
 
-			var bufferGeometryLoader = new BufferGeometryLoader();
+			for ( let i = 0, l = json.length; i < l; i ++ ) {
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+				const skeleton = new Skeleton().fromJSON( json[ i ], bones );
 
-				var geometry;
-				var data = json[ i ];
+				skeletons[ skeleton.uuid ] = skeleton;
+
+			}
+
+		}
+
+		return skeletons;
+
+	}
+
+	parseGeometries( json, shapes ) {
+
+		const geometries = {};
+		let geometryShapes;
+
+		if ( json !== undefined ) {
+
+			const bufferGeometryLoader = new BufferGeometryLoader();
+
+			for ( let i = 0, l = json.length; i < l; i ++ ) {
+
+				let geometry;
+				const data = json[ i ];
 
 				switch ( data.type ) {
 
@@ -383,11 +397,11 @@ Object.assign( ObjectLoader.prototype, {
 					case 'ShapeGeometry':
 					case 'ShapeBufferGeometry':
 
-						var geometryShapes = [];
+						geometryShapes = [];
 
-						for ( var j = 0, jl = data.shapes.length; j < jl; j ++ ) {
+						for ( let j = 0, jl = data.shapes.length; j < jl; j ++ ) {
 
-							var shape = shapes[ data.shapes[ j ] ];
+							const shape = shapes[ data.shapes[ j ] ];
 
 							geometryShapes.push( shape );
 
@@ -404,17 +418,17 @@ Object.assign( ObjectLoader.prototype, {
 					case 'ExtrudeGeometry':
 					case 'ExtrudeBufferGeometry':
 
-						var geometryShapes = [];
+						geometryShapes = [];
 
-						for ( var j = 0, jl = data.shapes.length; j < jl; j ++ ) {
+						for ( let j = 0, jl = data.shapes.length; j < jl; j ++ ) {
 
-							var shape = shapes[ data.shapes[ j ] ];
+							const shape = shapes[ data.shapes[ j ] ];
 
 							geometryShapes.push( shape );
 
 						}
 
-						var extrudePath = data.options.extrudePath;
+						const extrudePath = data.options.extrudePath;
 
 						if ( extrudePath !== undefined ) {
 
@@ -430,6 +444,7 @@ Object.assign( ObjectLoader.prototype, {
 						break;
 
 					case 'BufferGeometry':
+					case 'InstancedBufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
 
@@ -437,17 +452,7 @@ Object.assign( ObjectLoader.prototype, {
 
 					case 'Geometry':
 
-						if ( 'THREE' in window && 'LegacyJSONLoader' in THREE ) {
-
-							var geometryLoader = new THREE.LegacyJSONLoader();
-							geometry = geometryLoader.parse( data, this.resourcePath ).geometry;
-
-
-						} else {
-
-							console.error( 'THREE.ObjectLoader: You have to import LegacyJSONLoader in order load geometry data of type "Geometry".' );
-
-						}
+						console.error( 'THREE.ObjectLoader: Loading "Geometry" is not supported anymore.' );
 
 						break;
 
@@ -472,31 +477,31 @@ Object.assign( ObjectLoader.prototype, {
 
 		return geometries;
 
-	},
+	}
 
-	parseMaterials: function ( json, textures ) {
+	parseMaterials( json, textures ) {
 
-		var cache = {}; // MultiMaterial
-		var materials = {};
+		const cache = {}; // MultiMaterial
+		const materials = {};
 
 		if ( json !== undefined ) {
 
-			var loader = new MaterialLoader();
+			const loader = new MaterialLoader();
 			loader.setTextures( textures );
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			for ( let i = 0, l = json.length; i < l; i ++ ) {
 
-				var data = json[ i ];
+				const data = json[ i ];
 
 				if ( data.type === 'MultiMaterial' ) {
 
 					// Deprecated
 
-					var array = [];
+					const array = [];
 
-					for ( var j = 0; j < data.materials.length; j ++ ) {
+					for ( let j = 0; j < data.materials.length; j ++ ) {
 
-						var material = data.materials[ j ];
+						const material = data.materials[ j ];
 
 						if ( cache[ material.uuid ] === undefined ) {
 
@@ -528,17 +533,17 @@ Object.assign( ObjectLoader.prototype, {
 
 		return materials;
 
-	},
+	}
 
-	parseAnimations: function ( json ) {
+	parseAnimations( json ) {
 
-		var animations = [];
+		const animations = [];
 
-		for ( var i = 0; i < json.length; i ++ ) {
+		for ( let i = 0; i < json.length; i ++ ) {
 
-			var data = json[ i ];
+			const data = json[ i ];
 
-			var clip = AnimationClip.parse( data );
+			const clip = AnimationClip.parse( data );
 
 			if ( data.uuid !== undefined ) clip.uuid = data.uuid;
 
@@ -548,12 +553,14 @@ Object.assign( ObjectLoader.prototype, {
 
 		return animations;
 
-	},
+	}
 
-	parseImages: function ( json, onLoad ) {
+	parseImages( json, onLoad ) {
 
-		var scope = this;
-		var images = {};
+		const scope = this;
+		const images = {};
+
+		let loader;
 
 		function loadImage( url ) {
 
@@ -574,15 +581,15 @@ Object.assign( ObjectLoader.prototype, {
 
 		if ( json !== undefined && json.length > 0 ) {
 
-			var manager = new LoadingManager( onLoad );
+			const manager = new LoadingManager( onLoad );
 
-			var loader = new ImageLoader( manager );
+			loader = new ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
-			for ( var i = 0, il = json.length; i < il; i ++ ) {
+			for ( let i = 0, il = json.length; i < il; i ++ ) {
 
-				var image = json[ i ];
-				var url = image.url;
+				const image = json[ i ];
+				const url = image.url;
 
 				if ( Array.isArray( url ) ) {
 
@@ -590,11 +597,11 @@ Object.assign( ObjectLoader.prototype, {
 
 					images[ image.uuid ] = [];
 
-					for ( var j = 0, jl = url.length; j < jl; j ++ ) {
+					for ( let j = 0, jl = url.length; j < jl; j ++ ) {
 
-						var currentUrl = url[ j ];
+						const currentUrl = url[ j ];
 
-						var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( currentUrl ) ? currentUrl : scope.resourcePath + currentUrl;
+						const path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( currentUrl ) ? currentUrl : scope.resourcePath + currentUrl;
 
 						images[ image.uuid ].push( loadImage( path ) );
 
@@ -604,7 +611,7 @@ Object.assign( ObjectLoader.prototype, {
 
 					// load single image
 
-					var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.resourcePath + image.url;
+					const path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.resourcePath + image.url;
 
 					images[ image.uuid ] = loadImage( path );
 
@@ -616,9 +623,9 @@ Object.assign( ObjectLoader.prototype, {
 
 		return images;
 
-	},
+	}
 
-	parseTextures: function ( json, images ) {
+	parseTextures( json, images ) {
 
 		function parseConstant( value, type ) {
 
@@ -630,13 +637,13 @@ Object.assign( ObjectLoader.prototype, {
 
 		}
 
-		var textures = {};
+		const textures = {};
 
 		if ( json !== undefined ) {
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			for ( let i = 0, l = json.length; i < l; i ++ ) {
 
-				var data = json[ i ];
+				const data = json[ i ];
 
 				if ( data.image === undefined ) {
 
@@ -650,7 +657,7 @@ Object.assign( ObjectLoader.prototype, {
 
 				}
 
-				var texture;
+				let texture;
 
 				if ( Array.isArray( images[ data.image ] ) ) {
 
@@ -703,11 +710,11 @@ Object.assign( ObjectLoader.prototype, {
 
 		return textures;
 
-	},
+	}
 
-	parseObject: function ( data, geometries, materials ) {
+	parseObject( data, geometries, materials ) {
 
-		var object;
+		let object;
 
 		function getGeometry( name ) {
 
@@ -727,11 +734,11 @@ Object.assign( ObjectLoader.prototype, {
 
 			if ( Array.isArray( name ) ) {
 
-				var array = [];
+				const array = [];
 
-				for ( var i = 0, l = name.length; i < l; i ++ ) {
+				for ( let i = 0, l = name.length; i < l; i ++ ) {
 
-					var uuid = name[ i ];
+					const uuid = name[ i ];
 
 					if ( materials[ uuid ] === undefined ) {
 
@@ -756,6 +763,8 @@ Object.assign( ObjectLoader.prototype, {
 			return materials[ name ];
 
 		}
+
+		let geometry, material;
 
 		switch ( data.type ) {
 
@@ -846,26 +855,43 @@ Object.assign( ObjectLoader.prototype, {
 
 				break;
 
+			case 'LightProbe':
+
+				object = new LightProbe().fromJSON( data );
+
+				break;
+
 			case 'SkinnedMesh':
 
-				console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.' );
+				geometry = getGeometry( data.geometry );
+			 	material = getMaterial( data.material );
+
+				object = new SkinnedMesh( geometry, material );
+
+				if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
+				if ( data.bindMatrix !== undefined ) object.bindMatrix.fromArray( data.bindMatrix );
+				if ( data.skeleton !== undefined ) object.skeleton = data.skeleton;
+
+				break;
 
 			case 'Mesh':
 
-				var geometry = getGeometry( data.geometry );
-				var material = getMaterial( data.material );
+				geometry = getGeometry( data.geometry );
+				material = getMaterial( data.material );
 
-				if ( geometry.bones && geometry.bones.length > 0 ) {
+				object = new Mesh( geometry, material );
 
-					object = new SkinnedMesh( geometry, material );
+				break;
 
-				} else {
+			case 'InstancedMesh':
 
-					object = new Mesh( geometry, material );
+				geometry = getGeometry( data.geometry );
+				material = getMaterial( data.material );
+				const count = data.count;
+				const instanceMatrix = data.instanceMatrix;
 
-				}
-
-				if ( data.drawMode !== undefined ) object.setDrawMode( data.drawMode );
+				object = new InstancedMesh( geometry, material, count );
+				object.instanceMatrix = new BufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
 
 				break;
 
@@ -912,6 +938,12 @@ Object.assign( ObjectLoader.prototype, {
 
 				break;
 
+			case 'Bone':
+
+				object = new Bone();
+
+				break;
+
 			default:
 
 				object = new Object3D();
@@ -944,6 +976,7 @@ Object.assign( ObjectLoader.prototype, {
 		if ( data.shadow ) {
 
 			if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
+			if ( data.shadow.normalBias !== undefined ) object.shadow.normalBias = data.shadow.normalBias;
 			if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
 			if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
 			if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
@@ -958,9 +991,9 @@ Object.assign( ObjectLoader.prototype, {
 
 		if ( data.children !== undefined ) {
 
-			var children = data.children;
+			const children = data.children;
 
-			for ( var i = 0; i < children.length; i ++ ) {
+			for ( let i = 0; i < children.length; i ++ ) {
 
 				object.add( this.parseObject( children[ i ], geometries, materials ) );
 
@@ -970,12 +1003,14 @@ Object.assign( ObjectLoader.prototype, {
 
 		if ( data.type === 'LOD' ) {
 
-			var levels = data.levels;
+			if ( data.autoUpdate !== undefined ) object.autoUpdate = data.autoUpdate;
 
-			for ( var l = 0; l < levels.length; l ++ ) {
+			const levels = data.levels;
 
-				var level = levels[ l ];
-				var child = object.getObjectByProperty( 'uuid', level.object );
+			for ( let l = 0; l < levels.length; l ++ ) {
+
+				const level = levels[ l ];
+				const child = object.getObjectByProperty( 'uuid', level.object );
 
 				if ( child !== undefined ) {
 
@@ -991,33 +1026,66 @@ Object.assign( ObjectLoader.prototype, {
 
 	}
 
-} );
+	bindSkeletons( object, skeletons ) {
 
-var TEXTURE_MAPPING = {
+		if ( Object.keys( skeletons ).length === 0 ) return;
+
+		object.traverse( function ( child ) {
+
+			if ( child.isSkinnedMesh === true && child.skeleton !== undefined ) {
+
+				const skeleton = skeletons[ child.skeleton ];
+
+				if ( skeleton === undefined ) {
+
+					console.warn( 'THREE.ObjectLoader: No skeleton found with UUID:', child.skeleton );
+
+				} else {
+
+					child.bind( skeleton, child.bindMatrix );
+
+				}
+
+			}
+
+		} );
+
+	}
+
+	/* DEPRECATED */
+
+	setTexturePath( value ) {
+
+		console.warn( 'THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().' );
+		return this.setResourcePath( value );
+
+	}
+
+}
+
+const TEXTURE_MAPPING = {
 	UVMapping: UVMapping,
 	CubeReflectionMapping: CubeReflectionMapping,
 	CubeRefractionMapping: CubeRefractionMapping,
 	EquirectangularReflectionMapping: EquirectangularReflectionMapping,
 	EquirectangularRefractionMapping: EquirectangularRefractionMapping,
-	SphericalReflectionMapping: SphericalReflectionMapping,
 	CubeUVReflectionMapping: CubeUVReflectionMapping,
 	CubeUVRefractionMapping: CubeUVRefractionMapping
 };
 
-var TEXTURE_WRAPPING = {
+const TEXTURE_WRAPPING = {
 	RepeatWrapping: RepeatWrapping,
 	ClampToEdgeWrapping: ClampToEdgeWrapping,
 	MirroredRepeatWrapping: MirroredRepeatWrapping
 };
 
-var TEXTURE_FILTER = {
+const TEXTURE_FILTER = {
 	NearestFilter: NearestFilter,
-	NearestMipMapNearestFilter: NearestMipMapNearestFilter,
-	NearestMipMapLinearFilter: NearestMipMapLinearFilter,
+	NearestMipmapNearestFilter: NearestMipmapNearestFilter,
+	NearestMipmapLinearFilter: NearestMipmapLinearFilter,
 	LinearFilter: LinearFilter,
-	LinearMipMapNearestFilter: LinearMipMapNearestFilter,
-	LinearMipMapLinearFilter: LinearMipMapLinearFilter
+	LinearMipmapNearestFilter: LinearMipmapNearestFilter,
+	LinearMipmapLinearFilter: LinearMipmapLinearFilter
 };
-
 
 export { ObjectLoader };

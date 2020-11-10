@@ -1,7 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Triangle } from '../../../../src/math/Triangle';
@@ -302,6 +298,21 @@ export default QUnit.module( 'Maths', () => {
 
 			a.closestPointToPoint( new Vector3( 0, - 2, 0 ), point );
 			assert.ok( point.equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
+
+		} );
+
+		QUnit.test( "isFrontFacing", ( assert ) => {
+
+			var a = new Triangle();
+			var dir = new Vector3();
+			assert.ok( ! a.isFrontFacing( dir ), "Passed!" );
+
+			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
+			var dir = new Vector3( 0, 0, - 1 );
+			assert.ok( a.isFrontFacing( dir ), "Passed!" );
+
+			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 1, 0, 0 ) );
+			assert.ok( ! a.isFrontFacing( dir ), "Passed!" );
 
 		} );
 

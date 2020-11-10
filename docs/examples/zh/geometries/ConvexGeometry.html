@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Geometry] &rarr;
+
+		<h1>凸包几何体（[name]）</h1>
+
+		<p class="desc">[name] 可被用于为传入的一组点生成凸包。
+			该任务的平均时间复杂度被认为是O(nlog(n))。</p>
+
+		<h2>代码示例</h2>
+
+		<code>const geometry = new ConvexGeometry( points );
+		const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+		const mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:webgl_geometry_convex geometry / convex ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Array points] )</h3>
+		<p>
+		points — 所得凸包中将包含的一组[page:Vector3 Vector3]。
+		</p>
+
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/geometries/ConvexGeometry.js examples/jsm/geometries/ConvexGeometry.js]
+		</p>
+	</body>
+</html>

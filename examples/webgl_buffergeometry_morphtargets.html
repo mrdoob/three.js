@@ -4,49 +4,26 @@
 		<title>three.js webgl - buffergeometry - morph targets</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				font-size: 13px;
-				margin: 0px;
-				overflow: hidden;
-				text-align: center;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - buffergeometry - morph targets
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - buffergeometry - morph targets<br/>
+			by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var container, camera, scene, renderer, mesh;
+			let container, camera, scene, renderer, mesh;
 
 			function init() {
-
-				if ( WEBGL.isWebGLAvailable() === false ) {
-
-					document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-					return false;
-
-				}
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x8FBCD4 );
@@ -55,17 +32,15 @@
 
 				container = document.getElementById( 'container' );
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20 );
-				camera.position.z = 8;
+				camera.position.z = 10;
 				scene.add( camera );
 
-				var controls = new THREE.OrbitControls( camera, container );
-
-				var pointLight = new THREE.PointLight( 0xffffff, 1 );
+				const pointLight = new THREE.PointLight( 0xffffff, 1 );
 				camera.add( pointLight );
 
-				var geometry = createGeometry();
+				const geometry = createGeometry();
 
-				var material = new THREE.MeshPhongMaterial( {
+				const material = new THREE.MeshPhongMaterial( {
 					color: 0xff0000,
 					flatShading: true,
 					morphTargets: true
@@ -79,15 +54,15 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				renderer.setAnimationLoop( function () {
 
 					renderer.render( scene, camera );
 
 				} );
-
 				container.appendChild( renderer.domElement );
 
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -95,28 +70,28 @@
 
 			function createGeometry() {
 
-				var geometry = new THREE.BoxBufferGeometry( 2, 2, 2, 32, 32, 32 );
+				const geometry = new THREE.BoxBufferGeometry( 2, 2, 2, 32, 32, 32 );
 
 				// create an empty array to  hold targets for the attribute we want to morph
 				// morphing positions and normals is supported
 				geometry.morphAttributes.position = [];
 
 				// the original positions of the cube's vertices
-				var positions = geometry.attributes.position.array;
+				const positions = geometry.attributes.position.array;
 
 				// for the first morph target we'll move the cube's vertices onto the surface of a sphere
-				var spherePositions = [];
+				const spherePositions = [];
 
 				// for the second morph target, we'll twist the cubes vertices
-				var twistPositions = [];
-				var direction = new THREE.Vector3( 1, 0, 0 ).normalize();
-				var vertex = new THREE.Vector3();
+				const twistPositions = [];
+				const direction = new THREE.Vector3( 1, 0, 0 ).normalize();
+				const vertex = new THREE.Vector3();
 
-				for ( var i = 0; i < positions.length; i += 3 ) {
+				for ( let i = 0; i < positions.length; i += 3 ) {
 
-					var x = positions[ i ];
-					var y = positions[ i + 1 ];
-					var z = positions[ i + 2 ];
+					const x = positions[ i ];
+					const y = positions[ i + 1 ];
+					const z = positions[ i + 2 ];
 
 					spherePositions.push(
 
@@ -146,12 +121,12 @@
 			function initGUI() {
 
 				// Set up dat.GUI to control targets
-				var params = {
+				const params = {
 					Spherify: 0,
 					Twist: 0,
 				};
-				var gui = new dat.GUI();
-				var folder = gui.addFolder( 'Morph Targets' );
+				const gui = new GUI();
+				const folder = gui.addFolder( 'Morph Targets' );
 
 				folder.add( params, 'Spherify', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
 

@@ -1,43 +1,34 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / http://github.com/Mugen87
- */
-
 import { Box3 } from '../math/Box3.js';
 import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-function BoxHelper( object, color ) {
+const _box = /*@__PURE__*/ new Box3();
 
-	this.object = object;
+class BoxHelper extends LineSegments {
 
-	if ( color === undefined ) color = 0xffff00;
+	constructor( object, color = 0xffff00 ) {
 
-	var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
-	var positions = new Float32Array( 8 * 3 );
+		const indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
+		const positions = new Float32Array( 8 * 3 );
 
-	var geometry = new BufferGeometry();
-	geometry.setIndex( new BufferAttribute( indices, 1 ) );
-	geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
+		const geometry = new BufferGeometry();
+		geometry.setIndex( new BufferAttribute( indices, 1 ) );
+		geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
 
-	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color } ) );
+		super( geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
 
-	this.matrixAutoUpdate = false;
+		this.object = object;
+		this.type = 'BoxHelper';
 
-	this.update();
+		this.matrixAutoUpdate = false;
 
-}
+		this.update();
 
-BoxHelper.prototype = Object.create( LineSegments.prototype );
-BoxHelper.prototype.constructor = BoxHelper;
+	}
 
-BoxHelper.prototype.update = ( function () {
-
-	var box = new Box3();
-
-	return function update( object ) {
+	update( object ) {
 
 		if ( object !== undefined ) {
 
@@ -47,17 +38,17 @@ BoxHelper.prototype.update = ( function () {
 
 		if ( this.object !== undefined ) {
 
-			box.setFromObject( this.object );
+			_box.setFromObject( this.object );
 
 		}
 
-		if ( box.isEmpty() ) return;
+		if ( _box.isEmpty() ) return;
 
-		var min = box.min;
-		var max = box.max;
+		const min = _box.min;
+		const max = _box.max;
 
 		/*
-		  5____4
+			5____4
 		1/___0/|
 		| 6__|_7
 		2/___3/
@@ -72,8 +63,8 @@ BoxHelper.prototype.update = ( function () {
 		7: max.x, min.y, min.z
 		*/
 
-		var position = this.geometry.attributes.position;
-		var array = position.array;
+		const position = this.geometry.attributes.position;
+		const array = position.array;
 
 		array[ 0 ] = max.x; array[ 1 ] = max.y; array[ 2 ] = max.z;
 		array[ 3 ] = min.x; array[ 4 ] = max.y; array[ 5 ] = max.z;
@@ -88,33 +79,29 @@ BoxHelper.prototype.update = ( function () {
 
 		this.geometry.computeBoundingSphere();
 
-	};
 
-} )();
+	}
 
-BoxHelper.prototype.setFromObject = function ( object ) {
+	setFromObject( object ) {
 
-	this.object = object;
-	this.update();
+		this.object = object;
+		this.update();
 
-	return this;
+		return this;
 
-};
+	}
 
-BoxHelper.prototype.copy = function ( source ) {
+	copy( source ) {
 
-	LineSegments.prototype.copy.call( this, source );
+		LineSegments.prototype.copy.call( this, source );
 
-	this.object = source.object;
+		this.object = source.object;
 
-	return this;
+		return this;
 
-};
+	}
 
-BoxHelper.prototype.clone = function () {
+}
 
-	return new this.constructor().copy( this );
-
-};
 
 export { BoxHelper };

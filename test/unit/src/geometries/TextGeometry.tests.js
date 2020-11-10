@@ -1,24 +1,10 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import {
-	TextBufferGeometry
-} from '../../../../src/geometries/TextGeometry';
+import { TextBufferGeometry } from '../../../../src/geometries/TextBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'TextBufferGeometry', ( hooks ) => {
-
-		var geometries = undefined;
-		hooks.beforeEach( function () {
-
-			geometries = [
-				new TextBufferGeometry()
-			];
-
-		} );
+	QUnit.module( 'TextBufferGeometry', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

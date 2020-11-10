@@ -2,8 +2,6 @@ import { Material } from './Material.js';
 import { Vector3 } from '../math/Vector3.js';
 
 /**
- * @author WestLangley / http://github.com/WestLangley
- *
  * parameters = {
  *
  *  referencePosition: <float>,
@@ -46,7 +44,6 @@ function MeshDistanceMaterial( parameters ) {
 	this.displacementBias = 0;
 
 	this.fog = false;
-	this.lights = false;
 
 	this.setValues( parameters );
 

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:EventDispatcher] &rarr;
+
+		<h1>拖放控制器（[name]）</h1>
+
+		<p class="desc">
+		该类被用于提供一个拖放交互。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const controls = new DragControls( objects, camera, renderer.domElement );
+
+		// add event listener to highlight dragged objects
+
+		controls.addEventListener( 'dragstart', function ( event ) {
+
+			event.object.material.emissive.set( 0xaaaaaa );
+
+		} );
+
+		controls.addEventListener( 'dragend', function ( event ) {
+
+			event.object.material.emissive.set( 0x000000 );
+
+		} );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:misc_controls_drag misc / controls / drag ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Array objects], [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+			[page:Array objects]: 一组可被拖拽的3D Objects。
+			</p>
+			<p>
+			[page:Camera camera]: 渲染场景的摄像机。
+			</p>
+			<p>
+			[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。
+			</p>
+			<p>
+				创建一个新的 [name] 实例。
+			</p>
+		</p>
+
+		<h2>事件</h2>
+
+		<h3>dragstart</h3>
+		<p>
+			当用户开始拖拽3D Objects时触发。
+		</p>
+
+		<h3>drag</h3>
+		<p>
+			当用户拖拽3D Objects时触发。
+		</p>
+
+		<h3>dragend</h3>
+		<p>
+			当用户开始完成3D Objects时触发。
+		</p>
+
+		<h3>hoveron</h3>
+		<p>
+			当指针移动到一个3D Object或者其某个子级上时触发。
+		</p>
+
+		<h3>hoveroff</h3>
+		<p>
+			当指针移出一个3D Object时触发。
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			是否启用控制器。
+		</p>
+
+		<h3>[property:Boolean transformGroup]</h3>
+		<p>
+			This option only works if the [page:DragControls.objects] array contains a single draggable group object.
+			If set to *true*, [name] does not transform individual objects but the entire group. Default is *false*.
+		</p>
+
+		<h2>Methods</h2>
+
+		<p>共有方法请参见其基类[page:EventDispatcher]。</p>
+
+		<h3>[method:null activate] ()</h3>
+		<p>
+			添加控制器的事件监听。
+		</p>
+
+		<h3>[method:null deactivate] ()</h3>
+		<p>
+			移除控制器的事件监听。
+		</p>
+
+		<h3>[method:null dispose] ()</h3>
+		<p>
+			若不再需要该控制器，则应当调用此函数。
+		</p>
+
+		<h3>[method:Array getObjects] ()</h3>
+		<p>
+			Returns the array of draggable objects.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/DragControls.js examples/jsm/controls/DragControls.js]
+		</p>
+	</body>
+</html>

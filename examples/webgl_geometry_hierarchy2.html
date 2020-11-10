@@ -4,29 +4,22 @@
 		<title>three.js webgl - geometry hierarchy 2</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer, stats, root;
+			import Stats from './jsm/libs/stats.module.js';
 
-			var mouseX = 0, mouseY = 0;
+			let camera, scene, renderer, stats, root;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let mouseX = 0, mouseY = 0;
+
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -39,16 +32,17 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
-				var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
-				var material = new THREE.MeshNormalMaterial();
+				const geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
+				const material = new THREE.MeshNormalMaterial();
 
 				root = new THREE.Mesh( geometry, material );
 				root.position.x = 1000;
 				scene.add( root );
 
-				var amount = 200, object, parent = root;
+				const amount = 200;
+				let object, parent = root;
 
-				for ( var i = 0; i < amount; i ++ ) {
+				for ( let i = 0; i < amount; i ++ ) {
 
 					object = new THREE.Mesh( geometry, material );
 					object.position.x = 100;
@@ -60,7 +54,7 @@
 
 				parent = root;
 
-				for ( var i = 0; i < amount; i ++ ) {
+				for ( let i = 0; i < amount; i ++ ) {
 
 					object = new THREE.Mesh( geometry, material );
 					object.position.x = - 100;
@@ -72,7 +66,7 @@
 
 				parent = root;
 
-				for ( var i = 0; i < amount; i ++ ) {
+				for ( let i = 0; i < amount; i ++ ) {
 
 					object = new THREE.Mesh( geometry, material );
 					object.position.y = - 100;
@@ -84,7 +78,7 @@
 
 				parent = root;
 
-				for ( var i = 0; i < amount; i ++ ) {
+				for ( let i = 0; i < amount; i ++ ) {
 
 					object = new THREE.Mesh( geometry, material );
 					object.position.y = 100;
@@ -96,7 +90,7 @@
 
 				parent = root;
 
-				for ( var i = 0; i < amount; i ++ ) {
+				for ( let i = 0; i < amount; i ++ ) {
 
 					object = new THREE.Mesh( geometry, material );
 					object.position.z = - 100;
@@ -108,7 +102,7 @@
 
 				parent = root;
 
-				for ( var i = 0; i < amount; i ++ ) {
+				for ( let i = 0; i < amount; i ++ ) {
 
 					object = new THREE.Mesh( geometry, material );
 					object.position.z = 100;
@@ -172,11 +166,11 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001 + 10000;
 
-				var rx = Math.sin( time * 0.7 ) * 0.2;
-				var ry = Math.sin( time * 0.3 ) * 0.1;
-				var rz = Math.sin( time * 0.2 ) * 0.1;
+				const rx = Math.sin( time * 0.7 ) * 0.2;
+				const ry = Math.sin( time * 0.3 ) * 0.1;
+				const rz = Math.sin( time * 0.2 ) * 0.1;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;

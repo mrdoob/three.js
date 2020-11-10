@@ -1,10 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author greggman / http://games.greggman.com/
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * @author kaypiKun
- */
-
 THREE.CinematicCamera = function ( fov, aspect, near, far ) {
 
 	THREE.PerspectiveCamera.call( this, fov, aspect, near, far );
@@ -186,14 +179,14 @@ THREE.CinematicCamera.prototype.renderCinematic = function ( scene, renderer ) {
 		scene.overrideMaterial = null;
 		renderer.setRenderTarget( this.postprocessing.rtTextureColor );
 		renderer.clear();
-		renderer.render( scene, camera );
+		renderer.render( scene, this );
 
 		// Render depth into texture
 
 		scene.overrideMaterial = this.materialDepth;
 		renderer.setRenderTarget( this.postprocessing.rtTextureDepth );
 		renderer.clear();
-		renderer.render( scene, camera );
+		renderer.render( scene, this );
 
 		// Render bokeh composite
 

@@ -1,6 +1,4 @@
-/*
- * @author tamarintech / https://tamarintech.com
- *
+/**
  * Description: Early release of an AMF Loader following the pattern of the
  * example loaders in the three.js project.
  *
@@ -20,11 +18,11 @@
 
 THREE.AMFLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.AMFLoader.prototype = {
+THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.AMFLoader,
 
@@ -35,18 +33,31 @@ THREE.AMFLoader.prototype = {
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -296,6 +307,7 @@ THREE.AMFLoader.prototype = {
 					}
 
 				}
+
 				currVerticesNode = currVerticesNode.nextElementSibling;
 
 			}
@@ -463,11 +475,11 @@ THREE.AMFLoader.prototype = {
 					var material = objDefaultMaterial;
 
 					newGeometry.setIndex( volume.triangles );
-					newGeometry.addAttribute( 'position', vertices.clone() );
+					newGeometry.setAttribute( 'position', vertices.clone() );
 
 					if ( normals ) {
 
-						newGeometry.addAttribute( 'normal', normals.clone() );
+						newGeometry.setAttribute( 'normal', normals.clone() );
 
 					}
 
@@ -492,4 +504,4 @@ THREE.AMFLoader.prototype = {
 
 	}
 
-};
+} );

@@ -1,7 +1,6 @@
 import { Vector3 } from '../../math/Vector3.js';
 import { Curve } from '../core/Curve.js';
 
-
 function LineCurve3( v1, v2 ) {
 
 	Curve.call( this );
@@ -20,7 +19,7 @@ LineCurve3.prototype.isLineCurve3 = true;
 
 LineCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 
-	var point = optionalTarget || new Vector3();
+	const point = optionalTarget || new Vector3();
 
 	if ( t === 1 ) {
 
@@ -58,7 +57,7 @@ LineCurve3.prototype.copy = function ( source ) {
 
 LineCurve3.prototype.toJSON = function () {
 
-	var data = Curve.prototype.toJSON.call( this );
+	const data = Curve.prototype.toJSON.call( this );
 
 	data.v1 = this.v1.toArray();
 	data.v2 = this.v2.toArray();

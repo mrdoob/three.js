@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 THREE.ClearPass = function ( clearColor, clearAlpha ) {
 
 	THREE.Pass.call( this );
@@ -17,7 +13,7 @@ THREE.ClearPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 	constructor: THREE.ClearPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 		var oldClearColor, oldClearAlpha;
 

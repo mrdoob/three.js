@@ -1,28 +1,28 @@
 import { Font } from '../extras/core/Font.js';
 import { FileLoader } from './FileLoader.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { Loader } from './Loader.js';
 
 function FontLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 }
 
-Object.assign( FontLoader.prototype, {
+FontLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+
+	constructor: FontLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		const scope = this;
 
-		var loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
-			var json;
+			let json;
 
 			try {
 
@@ -35,7 +35,7 @@ Object.assign( FontLoader.prototype, {
 
 			}
 
-			var font = scope.parse( json );
+			const font = scope.parse( json );
 
 			if ( onLoad ) onLoad( font );
 
@@ -46,13 +46,6 @@ Object.assign( FontLoader.prototype, {
 	parse: function ( json ) {
 
 		return new Font( json );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	}
 

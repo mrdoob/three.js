@@ -1,5 +1,4 @@
 /**
- * @author miibond
  * Generate a texture that represents the luminosity of the current scene, adapted over time
  * to simulate the optic nerve responding to the amount of light it is receiving.
  * Based on a GDC2007 presentation by Wolfgang Engel titled "Post-Processing Pipeline"
@@ -117,12 +116,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 		blending: THREE.NoBlending
 	} );
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.quad.frustumCulled = false; // Avoid getting clipped
-	this.scene.add( this.quad );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
 
 };
 
@@ -130,7 +124,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 
 	constructor: THREE.AdaptiveToneMappingPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime/*, maskActive*/ ) {
 
 		if ( this.needsInit ) {
 
@@ -146,35 +140,35 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 		if ( this.adaptive ) {
 
 			//Render the luminance of the current scene into a render target with mipmapping enabled
-			this.quad.material = this.materialLuminance;
+			this.fsQuad.material = this.materialLuminance;
 			this.materialLuminance.uniforms.tDiffuse.value = readBuffer.texture;
 			renderer.setRenderTarget( this.currentLuminanceRT );
-			renderer.render( this.scene, this.camera );
+			this.fsQuad.render( renderer );
 
 			//Use the new luminance values, the previous luminance and the frame delta to
 			//adapt the luminance over time.
-			this.quad.material = this.materialAdaptiveLum;
+			this.fsQuad.material = this.materialAdaptiveLum;
 			this.materialAdaptiveLum.uniforms.delta.value = deltaTime;
 			this.materialAdaptiveLum.uniforms.lastLum.value = this.previousLuminanceRT.texture;
 			this.materialAdaptiveLum.uniforms.currentLum.value = this.currentLuminanceRT.texture;
 			renderer.setRenderTarget( this.luminanceRT );
-			renderer.render( this.scene, this.camera );
+			this.fsQuad.render( renderer );
 
 			//Copy the new adapted luminance value so that it can be used by the next frame.
-			this.quad.material = this.materialCopy;
+			this.fsQuad.material = this.materialCopy;
 			this.copyUniforms.tDiffuse.value = this.luminanceRT.texture;
 			renderer.setRenderTarget( this.previousLuminanceRT );
-			renderer.render( this.scene, this.camera );
+			this.fsQuad.render( renderer );
 
 		}
 
-		this.quad.material = this.materialToneMap;
+		this.fsQuad.material = this.materialToneMap;
 		this.materialToneMap.uniforms.tDiffuse.value = readBuffer.texture;
 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.scene, this.camera );
+			this.fsQuad.render( renderer );
 
 		} else {
 
@@ -182,13 +176,13 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 
 			if ( this.clear ) renderer.clear();
 
-			renderer.render( this.scene, this.camera );
+			this.fsQuad.render( renderer );
 
 		}
 
 	},
 
-	reset: function ( renderer ) {
+	reset: function () {
 
 		// render targets
 		if ( this.luminanceRT ) {
@@ -196,11 +190,13 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.luminanceRT.dispose();
 
 		}
+
 		if ( this.currentLuminanceRT ) {
 
 			this.currentLuminanceRT.dispose();
 
 		}
+
 		if ( this.previousLuminanceRT ) {
 
 			this.previousLuminanceRT.dispose();
@@ -218,7 +214,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 		this.previousLuminanceRT.texture.generateMipmaps = false;
 
 		// We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
-		pars.minFilter = THREE.LinearMipMapLinearFilter;
+		pars.minFilter = THREE.LinearMipmapLinearFilter;
 		pars.generateMipmaps = true;
 		this.currentLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
 		this.currentLuminanceRT.texture.name = "AdaptiveToneMappingPass.cl";
@@ -229,8 +225,9 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT.texture;
 
 		}
+
 		//Put something in the adaptive luminance texture so that the scene can render initially
-		this.quad.material = new THREE.MeshBasicMaterial( { color: 0x777777 } );
+		this.fsQuad.material = new THREE.MeshBasicMaterial( { color: 0x777777 } );
 		this.materialLuminance.needsUpdate = true;
 		this.materialAdaptiveLum.needsUpdate = true;
 		this.materialToneMap.needsUpdate = true;
@@ -255,6 +252,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.materialToneMap.uniforms.luminanceMap.value = null;
 
 		}
+
 		this.materialToneMap.needsUpdate = true;
 
 	},
@@ -317,31 +315,37 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.luminanceRT.dispose();
 
 		}
+
 		if ( this.previousLuminanceRT ) {
 
 			this.previousLuminanceRT.dispose();
 
 		}
+
 		if ( this.currentLuminanceRT ) {
 
 			this.currentLuminanceRT.dispose();
 
 		}
+
 		if ( this.materialLuminance ) {
 
 			this.materialLuminance.dispose();
 
 		}
+
 		if ( this.materialAdaptiveLum ) {
 
 			this.materialAdaptiveLum.dispose();
 
 		}
+
 		if ( this.materialCopy ) {
 
 			this.materialCopy.dispose();
 
 		}
+
 		if ( this.materialToneMap ) {
 
 			this.materialToneMap.dispose();

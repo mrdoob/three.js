@@ -1,12 +1,9 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- */
 /* global QUnit */
 
 import { Geometry } from '../../../../src/core/Geometry';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
-import { BoxBufferGeometry } from '../../../../src/geometries/BoxGeometry';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
 import { DodecahedronGeometry } from '../../../../src/geometries/DodecahedronGeometry';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
@@ -64,7 +61,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "applyMatrix", ( assert ) => {
+		QUnit.test( "applyMatrix4", ( assert ) => {
 
 			var geometry = getGeometry();
 			geometry.faces.push( new Face3( 0, 1, 2 ) );
@@ -79,7 +76,7 @@ export default QUnit.module( 'Core', () => {
 			m.makeRotationX( Math.PI / 2 );
 			m.setPosition( new Vector3( x, y, z ) );
 
-			geometry.applyMatrix( m );
+			geometry.applyMatrix4( m );
 
 			v0 = geometry.vertices[ 0 ];
 			v1 = geometry.vertices[ 1 ];
@@ -112,7 +109,7 @@ export default QUnit.module( 'Core', () => {
 			var matrix = new Matrix4();
 			matrix.makeRotationX( Math.PI / 2 ); // 90 degree
 
-			geometry.applyMatrix( matrix );
+			geometry.applyMatrix4( matrix );
 
 			var v0 = geometry.vertices[ 0 ], v1 = geometry.vertices[ 1 ], v2 = geometry.vertices[ 2 ];
 			assert.ok( v0.x === - 0.5 && v0.y === 0 && v0.z === 0, "first vertex was rotated" );
@@ -128,7 +125,7 @@ export default QUnit.module( 'Core', () => {
 			var matrix = new Matrix4();
 			matrix.makeRotationY( Math.PI ); // 180 degrees
 
-			geometry.applyMatrix( matrix );
+			geometry.applyMatrix4( matrix );
 
 			var v0 = geometry.vertices[ 0 ], v1 = geometry.vertices[ 1 ], v2 = geometry.vertices[ 2 ];
 			assert.ok( v0.x === 0.5 && v0.y === 0 && v0.z < Number.EPSILON, "first vertex was rotated" );
@@ -144,7 +141,7 @@ export default QUnit.module( 'Core', () => {
 			var matrix = new Matrix4();
 			matrix.makeRotationZ( Math.PI / 2 * 3 ); // 270 degrees
 
-			geometry.applyMatrix( matrix );
+			geometry.applyMatrix4( matrix );
 
 			var v0 = geometry.vertices[ 0 ], v1 = geometry.vertices[ 1 ], v2 = geometry.vertices[ 2 ];
 			assert.ok( v0.x < Number.EPSILON && v0.y === 0.5 && v0.z === 0, "first vertex was rotated" );
@@ -233,11 +230,11 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( "fromBufferGeometry", ( assert ) => {
 
 			var bufferGeometry = new BufferGeometry();
-			bufferGeometry.addAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ] ), 3 ) );
-			bufferGeometry.addAttribute( 'color', new BufferAttribute( new Float32Array( [ 0, 0, 0, 0.5, 0.5, 0.5, 1, 1, 1 ] ), 3 ) );
-			bufferGeometry.addAttribute( 'normal', new BufferAttribute( new Float32Array( [ 0, 1, 0, 1, 0, 1, 1, 1, 0 ] ), 3 ) );
-			bufferGeometry.addAttribute( 'uv', new BufferAttribute( new Float32Array( [ 0, 0, 0, 1, 1, 1 ] ), 2 ) );
-			bufferGeometry.addAttribute( 'uv2', new BufferAttribute( new Float32Array( [ 0, 0, 0, 1, 1, 1 ] ), 2 ) );
+			bufferGeometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ] ), 3 ) );
+			bufferGeometry.setAttribute( 'color', new BufferAttribute( new Float32Array( [ 0, 0, 0, 0.5, 0.5, 0.5, 1, 1, 1 ] ), 3 ) );
+			bufferGeometry.setAttribute( 'normal', new BufferAttribute( new Float32Array( [ 0, 1, 0, 1, 0, 1, 1, 1, 0 ] ), 3 ) );
+			bufferGeometry.setAttribute( 'uv', new BufferAttribute( new Float32Array( [ 0, 0, 0, 1, 1, 1 ] ), 2 ) );
+			bufferGeometry.setAttribute( 'uv2', new BufferAttribute( new Float32Array( [ 0, 0, 0, 1, 1, 1 ] ), 2 ) );
 
 			var geometry = new Geometry().fromBufferGeometry( bufferGeometry );
 

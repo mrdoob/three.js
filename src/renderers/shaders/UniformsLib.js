@@ -6,7 +6,7 @@ import { Matrix3 } from '../../math/Matrix3.js';
  * Uniforms library for shared webgl shaders
  */
 
-var UniformsLib = {
+const UniformsLib = {
 
 	common: {
 
@@ -15,6 +15,7 @@ var UniformsLib = {
 
 		map: { value: null },
 		uvTransform: { value: new Matrix3() },
+		uv2Transform: { value: new Matrix3() },
 
 		alphaMap: { value: null },
 
@@ -109,12 +110,16 @@ var UniformsLib = {
 
 		ambientLightColor: { value: [] },
 
+		lightProbe: { value: [] },
+
 		directionalLights: { value: [], properties: {
 			direction: {},
-			color: {},
+			color: {}
+		} },
 
-			shadow: {},
+		directionalLightShadows: { value: [], properties: {
 			shadowBias: {},
+			shadowNormalBias: {},
 			shadowRadius: {},
 			shadowMapSize: {}
 		} },
@@ -129,10 +134,12 @@ var UniformsLib = {
 			distance: {},
 			coneCos: {},
 			penumbraCos: {},
-			decay: {},
+			decay: {}
+		} },
 
-			shadow: {},
+		spotLightShadows: { value: [], properties: {
 			shadowBias: {},
+			shadowNormalBias: {},
 			shadowRadius: {},
 			shadowMapSize: {}
 		} },
@@ -144,10 +151,12 @@ var UniformsLib = {
 			color: {},
 			position: {},
 			decay: {},
-			distance: {},
+			distance: {}
+		} },
 
-			shadow: {},
+		pointLightShadows: { value: [], properties: {
 			shadowBias: {},
+			shadowNormalBias: {},
 			shadowRadius: {},
 			shadowMapSize: {},
 			shadowCameraNear: {},
@@ -169,7 +178,10 @@ var UniformsLib = {
 			position: {},
 			width: {},
 			height: {}
-		} }
+		} },
+
+		ltc_1: { value: null },
+		ltc_2: { value: null }
 
 	},
 
@@ -180,6 +192,7 @@ var UniformsLib = {
 		size: { value: 1.0 },
 		scale: { value: 1.0 },
 		map: { value: null },
+		alphaMap: { value: null },
 		uvTransform: { value: new Matrix3() }
 
 	},
@@ -191,6 +204,7 @@ var UniformsLib = {
 		center: { value: new Vector2( 0.5, 0.5 ) },
 		rotation: { value: 0.0 },
 		map: { value: null },
+		alphaMap: { value: null },
 		uvTransform: { value: new Matrix3() }
 
 	}

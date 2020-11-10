@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">A class containing useful utility functions for scene manipulation.</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Group createMeshesFromInstancedMesh]( [param:InstancedMesh instancedMesh] )</h3>
+		<p>
+		instancedMesh -- The instanced mesh.
+		</p>
+		<p>
+		Creates a new group object that contains a new mesh for each instance of the given instanced mesh.
+		</p>
+		
+		<h3>[method:Group createMultiMaterialObject]( [param:Geometry geometry], [param:Array materials] )</h3>
+		<p>
+		geometry -- The geometry for the set of materials. <br />
+		materials -- The materials for the object.
+		</p>
+		<p>
+		Creates a new Group that contains a new mesh for each material defined in materials. Beware that this is not the same as an array of materials which defines multiple materials for 1 mesh.<br />
+		This is mostly useful for objects that need both a material and a wireframe implementation.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/SceneUtils.js examples/jsm/utils/SceneUtils.js]
+		</p>
+	</body>
+</html>

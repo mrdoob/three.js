@@ -4,26 +4,13 @@
 		<title>three.js webgl - animation - keyframes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
+				background-color: #bfe3dd;
+				color: #000;
 			}
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-			#info p {
-				max-width: 600px;
-				margin-left: auto;
-				margin-right: auto;
-				padding: 0 2em;
-			}
+
 			a {
 				color: #2983ff;
 			}
@@ -35,71 +22,70 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - keyframes
-			<p>
-				Model: <a href="https://www.artstation.com/artwork/1AGwX" target="_blank" rel="noopener">Littlest Tokyo</a> by
-				<a href="https://www.artstation.com/glenatron" target="_blank" rel="noopener">Glen Fox</a>, CC Attribution.
-			</p>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - keyframes<br/>
+			Model: <a href="https://www.artstation.com/artwork/1AGwX" target="_blank" rel="noopener">Littlest Tokyo</a> by
+			<a href="https://www.artstation.com/glenatron" target="_blank" rel="noopener">Glen Fox</a>, CC Attribution.
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/DRACOLoader.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			var scene, camera, pointLight, stats;
-			var renderer, mixer, controls;
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
-			var clock = new THREE.Clock();
-			var container = document.getElementById( 'container' );
+			let mixer;
 
-			stats = new Stats();
+			const clock = new THREE.Clock();
+			const container = document.getElementById( 'container' );
+
+			const stats = new Stats();
 			container.appendChild( stats.dom );
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.gammaOutput = true;
-			renderer.gammaFactor = 2.2;
+			renderer.outputEncoding = THREE.sRGBEncoding;
 			container.appendChild( renderer.domElement );
 
-			scene = new THREE.Scene();
+			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xbfe3dd );
 
-			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 			camera.position.set( 5, 2, 8 );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 0.5, 0 );
+			controls.update();
 			controls.enablePan = false;
+			controls.enableDamping = true;
 
-			scene.add( new THREE.AmbientLight( 0x404040 ) );
+			scene.add( new THREE.HemisphereLight( 0xffffff, 0x000000, 0.4 ) );
 
-			pointLight = new THREE.PointLight( 0xffffff, 1 );
-			pointLight.position.copy( camera.position );
-			scene.add( pointLight );
+			const dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+			dirLight.position.set( 5, 2, 8 );
+			scene.add( dirLight );
 
 			// envmap
-			var path = 'textures/cube/Park2/';
-			var format = '.jpg';
-			var envMap = new THREE.CubeTextureLoader().load( [
+			const path = 'textures/cube/Park2/';
+			const format = '.jpg';
+			const envMap = new THREE.CubeTextureLoader().load( [
 				path + 'posx' + format, path + 'negx' + format,
 				path + 'posy' + format, path + 'negy' + format,
 				path + 'posz' + format, path + 'negz' + format
 			] );
 
-			THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+			const dracoLoader = new DRACOLoader();
+			dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 
-			var loader = new THREE.GLTFLoader();
-			loader.setDRACOLoader( new THREE.DRACOLoader() );
+			const loader = new GLTFLoader();
+			loader.setDRACOLoader( dracoLoader );
 			loader.load( 'models/gltf/LittlestTokyo.glb', function ( gltf ) {
 
-				var model = gltf.scene;
+				const model = gltf.scene;
 				model.position.set( 1, 1, 0 );
 				model.scale.set( 0.01, 0.01, 0.01 );
 				model.traverse( function ( child ) {
@@ -136,9 +122,11 @@
 
 				requestAnimationFrame( animate );
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
+
 				mixer.update( delta );
-				controls.update( delta );
+
+				controls.update();
 
 				stats.update();
 

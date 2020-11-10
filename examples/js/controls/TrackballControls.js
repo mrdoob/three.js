@@ -1,17 +1,13 @@
-/**
- * @author Eberhard Graether / http://egraether.com/
- * @author Mark Lundin 	/ http://mark-lundin.com
- * @author Simone Manini / http://daron1337.github.io
- * @author Luca Antiga 	/ http://lantiga.github.io
- */
-
 THREE.TrackballControls = function ( object, domElement ) {
 
-	var _this = this;
+	if ( domElement === undefined ) console.warn( 'THREE.TrackballControls: The second parameter "domElement" is now mandatory.' );
+	if ( domElement === document ) console.error( 'THREE.TrackballControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.' );
+
+	var scope = this;
 	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
 
 	this.object = object;
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+	this.domElement = domElement;
 
 	// API
 
@@ -35,6 +31,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
 
+	this.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.ZOOM, RIGHT: THREE.MOUSE.PAN };
+
 	// internals
 
 	this.target = new THREE.Vector3();
@@ -42,9 +40,10 @@ THREE.TrackballControls = function ( object, domElement ) {
 	var EPS = 0.000001;
 
 	var lastPosition = new THREE.Vector3();
+	var lastZoom = 1;
 
 	var _state = STATE.NONE,
-		_prevState = STATE.NONE,
+		_keyState = STATE.NONE,
 
 		_eye = new THREE.Vector3(),
 
@@ -68,6 +67,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.target0 = this.target.clone();
 	this.position0 = this.object.position.clone();
 	this.up0 = this.object.up.clone();
+	this.zoom0 = this.object.zoom;
 
 	// events
 
@@ -80,24 +80,13 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.handleResize = function () {
 
-		if ( this.domElement === document ) {
-
-			this.screen.left = 0;
-			this.screen.top = 0;
-			this.screen.width = window.innerWidth;
-			this.screen.height = window.innerHeight;
-
-		} else {
-
-			var box = this.domElement.getBoundingClientRect();
-			// adjustments come from similar code in the jquery offset() function
-			var d = this.domElement.ownerDocument.documentElement;
-			this.screen.left = box.left + window.pageXOffset - d.clientLeft;
-			this.screen.top = box.top + window.pageYOffset - d.clientTop;
-			this.screen.width = box.width;
-			this.screen.height = box.height;
-
-		}
+		var box = scope.domElement.getBoundingClientRect();
+		// adjustments come from similar code in the jquery offset() function
+		var d = scope.domElement.ownerDocument.documentElement;
+		scope.screen.left = box.left + window.pageXOffset - d.clientLeft;
+		scope.screen.top = box.top + window.pageYOffset - d.clientTop;
+		scope.screen.width = box.width;
+		scope.screen.height = box.height;
 
 	};
 
@@ -108,8 +97,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 		return function getMouseOnScreen( pageX, pageY ) {
 
 			vector.set(
-				( pageX - _this.screen.left ) / _this.screen.width,
-				( pageY - _this.screen.top ) / _this.screen.height
+				( pageX - scope.screen.left ) / scope.screen.width,
+				( pageY - scope.screen.top ) / scope.screen.height
 			);
 
 			return vector;
@@ -125,8 +114,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 		return function getMouseOnCircle( pageX, pageY ) {
 
 			vector.set(
-				( ( pageX - _this.screen.width * 0.5 - _this.screen.left ) / ( _this.screen.width * 0.5 ) ),
-				( ( _this.screen.height + 2 * ( _this.screen.top - pageY ) ) / _this.screen.width ) // screen.width intentional
+				( ( pageX - scope.screen.width * 0.5 - scope.screen.left ) / ( scope.screen.width * 0.5 ) ),
+				( ( scope.screen.height + 2 * ( scope.screen.top - pageY ) ) / scope.screen.width ) // screen.width intentional
 			);
 
 			return vector;
@@ -152,10 +141,10 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			if ( angle ) {
 
-				_eye.copy( _this.object.position ).sub( _this.target );
+				_eye.copy( scope.object.position ).sub( scope.target );
 
 				eyeDirection.copy( _eye ).normalize();
-				objectUpDirection.copy( _this.object.up ).normalize();
+				objectUpDirection.copy( scope.object.up ).normalize();
 				objectSidewaysDirection.crossVectors( objectUpDirection, eyeDirection ).normalize();
 
 				objectUpDirection.setLength( _moveCurr.y - _movePrev.y );
@@ -165,22 +154,22 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 				axis.crossVectors( moveDirection, _eye ).normalize();
 
-				angle *= _this.rotateSpeed;
+				angle *= scope.rotateSpeed;
 				quaternion.setFromAxisAngle( axis, angle );
 
 				_eye.applyQuaternion( quaternion );
-				_this.object.up.applyQuaternion( quaternion );
+				scope.object.up.applyQuaternion( quaternion );
 
 				_lastAxis.copy( axis );
 				_lastAngle = angle;
 
-			} else if ( ! _this.staticMoving && _lastAngle ) {
+			} else if ( ! scope.staticMoving && _lastAngle ) {
 
-				_lastAngle *= Math.sqrt( 1.0 - _this.dynamicDampingFactor );
-				_eye.copy( _this.object.position ).sub( _this.target );
+				_lastAngle *= Math.sqrt( 1.0 - scope.dynamicDampingFactor );
+				_eye.copy( scope.object.position ).sub( scope.target );
 				quaternion.setFromAxisAngle( _lastAxis, _lastAngle );
 				_eye.applyQuaternion( quaternion );
-				_this.object.up.applyQuaternion( quaternion );
+				scope.object.up.applyQuaternion( quaternion );
 
 			}
 
@@ -199,19 +188,46 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
 			_touchZoomDistanceStart = _touchZoomDistanceEnd;
-			_eye.multiplyScalar( factor );
 
-		} else {
-
-			factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
-
-			if ( factor !== 1.0 && factor > 0.0 ) {
+			if ( scope.object.isPerspectiveCamera ) {
 
 				_eye.multiplyScalar( factor );
 
+			} else if ( scope.object.isOrthographicCamera ) {
+
+				scope.object.zoom *= factor;
+				scope.object.updateProjectionMatrix();
+
+			} else {
+
+				console.warn( 'THREE.TrackballControls: Unsupported camera type' );
+
 			}
 
-			if ( _this.staticMoving ) {
+		} else {
+
+			factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * scope.zoomSpeed;
+
+			if ( factor !== 1.0 && factor > 0.0 ) {
+
+				if ( scope.object.isPerspectiveCamera ) {
+
+					_eye.multiplyScalar( factor );
+
+				} else if ( scope.object.isOrthographicCamera ) {
+
+					scope.object.zoom /= factor;
+					scope.object.updateProjectionMatrix();
+
+				} else {
+
+					console.warn( 'THREE.TrackballControls: Unsupported camera type' );
+
+				}
+
+			}
+
+			if ( scope.staticMoving ) {
 
 				_zoomStart.copy( _zoomEnd );
 
@@ -237,21 +253,31 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			if ( mouseChange.lengthSq() ) {
 
-				mouseChange.multiplyScalar( _eye.length() * _this.panSpeed );
+				if ( scope.object.isOrthographicCamera ) {
 
-				pan.copy( _eye ).cross( _this.object.up ).setLength( mouseChange.x );
-				pan.add( objectUp.copy( _this.object.up ).setLength( mouseChange.y ) );
+					var scale_x = ( scope.object.right - scope.object.left ) / scope.object.zoom / scope.domElement.clientWidth;
+					var scale_y = ( scope.object.top - scope.object.bottom ) / scope.object.zoom / scope.domElement.clientWidth;
 
-				_this.object.position.add( pan );
-				_this.target.add( pan );
+					mouseChange.x *= scale_x;
+					mouseChange.y *= scale_y;
 
-				if ( _this.staticMoving ) {
+				}
+
+				mouseChange.multiplyScalar( _eye.length() * scope.panSpeed );
+
+				pan.copy( _eye ).cross( scope.object.up ).setLength( mouseChange.x );
+				pan.add( objectUp.copy( scope.object.up ).setLength( mouseChange.y ) );
+
+				scope.object.position.add( pan );
+				scope.target.add( pan );
+
+				if ( scope.staticMoving ) {
 
 					_panStart.copy( _panEnd );
 
 				} else {
 
-					_panStart.add( mouseChange.subVectors( _panEnd, _panStart ).multiplyScalar( _this.dynamicDampingFactor ) );
+					_panStart.add( mouseChange.subVectors( _panEnd, _panStart ).multiplyScalar( scope.dynamicDampingFactor ) );
 
 				}
 
@@ -263,18 +289,18 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.checkDistances = function () {
 
-		if ( ! _this.noZoom || ! _this.noPan ) {
+		if ( ! scope.noZoom || ! scope.noPan ) {
 
-			if ( _eye.lengthSq() > _this.maxDistance * _this.maxDistance ) {
+			if ( _eye.lengthSq() > scope.maxDistance * scope.maxDistance ) {
 
-				_this.object.position.addVectors( _this.target, _eye.setLength( _this.maxDistance ) );
+				scope.object.position.addVectors( scope.target, _eye.setLength( scope.maxDistance ) );
 				_zoomStart.copy( _zoomEnd );
 
 			}
 
-			if ( _eye.lengthSq() < _this.minDistance * _this.minDistance ) {
+			if ( _eye.lengthSq() < scope.minDistance * scope.minDistance ) {
 
-				_this.object.position.addVectors( _this.target, _eye.setLength( _this.minDistance ) );
+				scope.object.position.addVectors( scope.target, _eye.setLength( scope.minDistance ) );
 				_zoomStart.copy( _zoomEnd );
 
 			}
@@ -285,37 +311,58 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.update = function () {
 
-		_eye.subVectors( _this.object.position, _this.target );
+		_eye.subVectors( scope.object.position, scope.target );
 
-		if ( ! _this.noRotate ) {
+		if ( ! scope.noRotate ) {
 
-			_this.rotateCamera();
-
-		}
-
-		if ( ! _this.noZoom ) {
-
-			_this.zoomCamera();
+			scope.rotateCamera();
 
 		}
 
-		if ( ! _this.noPan ) {
+		if ( ! scope.noZoom ) {
 
-			_this.panCamera();
+			scope.zoomCamera();
 
 		}
 
-		_this.object.position.addVectors( _this.target, _eye );
+		if ( ! scope.noPan ) {
 
-		_this.checkDistances();
+			scope.panCamera();
 
-		_this.object.lookAt( _this.target );
+		}
 
-		if ( lastPosition.distanceToSquared( _this.object.position ) > EPS ) {
+		scope.object.position.addVectors( scope.target, _eye );
 
-			_this.dispatchEvent( changeEvent );
+		if ( scope.object.isPerspectiveCamera ) {
 
-			lastPosition.copy( _this.object.position );
+			scope.checkDistances();
+
+			scope.object.lookAt( scope.target );
+
+			if ( lastPosition.distanceToSquared( scope.object.position ) > EPS ) {
+
+				scope.dispatchEvent( changeEvent );
+
+				lastPosition.copy( scope.object.position );
+
+			}
+
+		} else if ( scope.object.isOrthographicCamera ) {
+
+			scope.object.lookAt( scope.target );
+
+			if ( lastPosition.distanceToSquared( scope.object.position ) > EPS || lastZoom !== scope.object.zoom ) {
+
+				scope.dispatchEvent( changeEvent );
+
+				lastPosition.copy( scope.object.position );
+				lastZoom = scope.object.zoom;
+
+			}
+
+		} else {
+
+			console.warn( 'THREE.TrackballControls: Unsupported camera type' );
 
 		}
 
@@ -324,116 +371,188 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.reset = function () {
 
 		_state = STATE.NONE;
-		_prevState = STATE.NONE;
+		_keyState = STATE.NONE;
 
-		_this.target.copy( _this.target0 );
-		_this.object.position.copy( _this.position0 );
-		_this.object.up.copy( _this.up0 );
+		scope.target.copy( scope.target0 );
+		scope.object.position.copy( scope.position0 );
+		scope.object.up.copy( scope.up0 );
+		scope.object.zoom = scope.zoom0;
 
-		_eye.subVectors( _this.object.position, _this.target );
+		scope.object.updateProjectionMatrix();
 
-		_this.object.lookAt( _this.target );
+		_eye.subVectors( scope.object.position, scope.target );
 
-		_this.dispatchEvent( changeEvent );
+		scope.object.lookAt( scope.target );
 
-		lastPosition.copy( _this.object.position );
+		scope.dispatchEvent( changeEvent );
+
+		lastPosition.copy( scope.object.position );
+		lastZoom = scope.object.zoom;
 
 	};
 
 	// listeners
 
-	function keydown( event ) {
+	function onPointerDown( event ) {
 
-		if ( _this.enabled === false ) return;
+		if ( scope.enabled === false ) return;
 
-		window.removeEventListener( 'keydown', keydown );
+		switch ( event.pointerType ) {
 
-		_prevState = _state;
+			case 'mouse':
+			case 'pen':
+				onMouseDown( event );
+				break;
 
-		if ( _state !== STATE.NONE ) {
-
-			return;
-
-		} else if ( event.keyCode === _this.keys[ STATE.ROTATE ] && ! _this.noRotate ) {
-
-			_state = STATE.ROTATE;
-
-		} else if ( event.keyCode === _this.keys[ STATE.ZOOM ] && ! _this.noZoom ) {
-
-			_state = STATE.ZOOM;
-
-		} else if ( event.keyCode === _this.keys[ STATE.PAN ] && ! _this.noPan ) {
-
-			_state = STATE.PAN;
+			// TODO touch
 
 		}
 
 	}
 
-	function keyup( event ) {
+	function onPointerMove( event ) {
 
-		if ( _this.enabled === false ) return;
+		if ( scope.enabled === false ) return;
 
-		_state = _prevState;
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+			case 'pen':
+				onMouseMove( event );
+				break;
+
+			// TODO touch
+
+		}
+
+	}
+
+	function onPointerUp( event ) {
+
+		if ( scope.enabled === false ) return;
+
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+			case 'pen':
+				onMouseUp( event );
+				break;
+
+			// TODO touch
+
+		}
+
+	}
+
+	function keydown( event ) {
+
+		if ( scope.enabled === false ) return;
+
+		window.removeEventListener( 'keydown', keydown );
+
+		if ( _keyState !== STATE.NONE ) {
+
+			return;
+
+		} else if ( event.keyCode === scope.keys[ STATE.ROTATE ] && ! scope.noRotate ) {
+
+			_keyState = STATE.ROTATE;
+
+		} else if ( event.keyCode === scope.keys[ STATE.ZOOM ] && ! scope.noZoom ) {
+
+			_keyState = STATE.ZOOM;
+
+		} else if ( event.keyCode === scope.keys[ STATE.PAN ] && ! scope.noPan ) {
+
+			_keyState = STATE.PAN;
+
+		}
+
+	}
+
+	function keyup() {
+
+		if ( scope.enabled === false ) return;
+
+		_keyState = STATE.NONE;
 
 		window.addEventListener( 'keydown', keydown, false );
 
 	}
 
-	function mousedown( event ) {
-
-		if ( _this.enabled === false ) return;
+	function onMouseDown( event ) {
 
 		event.preventDefault();
 		event.stopPropagation();
 
 		if ( _state === STATE.NONE ) {
 
-			_state = event.button;
+			switch ( event.button ) {
+
+				case scope.mouseButtons.LEFT:
+					_state = STATE.ROTATE;
+					break;
+
+				case scope.mouseButtons.MIDDLE:
+					_state = STATE.ZOOM;
+					break;
+
+				case scope.mouseButtons.RIGHT:
+					_state = STATE.PAN;
+					break;
+
+				default:
+					_state = STATE.NONE;
+
+			}
 
 		}
 
-		if ( _state === STATE.ROTATE && ! _this.noRotate ) {
+		var state = ( _keyState !== STATE.NONE ) ? _keyState : _state;
+
+		if ( state === STATE.ROTATE && ! scope.noRotate ) {
 
 			_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
 			_movePrev.copy( _moveCurr );
 
-		} else if ( _state === STATE.ZOOM && ! _this.noZoom ) {
+		} else if ( state === STATE.ZOOM && ! scope.noZoom ) {
 
 			_zoomStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 			_zoomEnd.copy( _zoomStart );
 
-		} else if ( _state === STATE.PAN && ! _this.noPan ) {
+		} else if ( state === STATE.PAN && ! scope.noPan ) {
 
 			_panStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 			_panEnd.copy( _panStart );
 
 		}
 
-		document.addEventListener( 'mousemove', mousemove, false );
-		document.addEventListener( 'mouseup', mouseup, false );
+		scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
+		scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
 
-		_this.dispatchEvent( startEvent );
+		scope.dispatchEvent( startEvent );
 
 	}
 
-	function mousemove( event ) {
+	function onMouseMove( event ) {
 
-		if ( _this.enabled === false ) return;
+		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
 
-		if ( _state === STATE.ROTATE && ! _this.noRotate ) {
+		var state = ( _keyState !== STATE.NONE ) ? _keyState : _state;
+
+		if ( state === STATE.ROTATE && ! scope.noRotate ) {
 
 			_movePrev.copy( _moveCurr );
 			_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
 
-		} else if ( _state === STATE.ZOOM && ! _this.noZoom ) {
+		} else if ( state === STATE.ZOOM && ! scope.noZoom ) {
 
 			_zoomEnd.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 
-		} else if ( _state === STATE.PAN && ! _this.noPan ) {
+		} else if ( state === STATE.PAN && ! scope.noPan ) {
 
 			_panEnd.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 
@@ -441,26 +560,27 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	}
 
-	function mouseup( event ) {
+	function onMouseUp( event ) {
 
-		if ( _this.enabled === false ) return;
+		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
 
 		_state = STATE.NONE;
 
-		document.removeEventListener( 'mousemove', mousemove );
-		document.removeEventListener( 'mouseup', mouseup );
-		_this.dispatchEvent( endEvent );
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
+
+		scope.dispatchEvent( endEvent );
 
 	}
 
 	function mousewheel( event ) {
 
-		if ( _this.enabled === false ) return;
+		if ( scope.enabled === false ) return;
 
-		if ( _this.noZoom === true ) return;
+		if ( scope.noZoom === true ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -484,15 +604,15 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		}
 
-		_this.dispatchEvent( startEvent );
-		_this.dispatchEvent( endEvent );
+		scope.dispatchEvent( startEvent );
+		scope.dispatchEvent( endEvent );
 
 	}
 
 	function touchstart( event ) {
 
-		if ( _this.enabled === false ) return;
-		
+		if ( scope.enabled === false ) return;
+
 		event.preventDefault();
 
 		switch ( event.touches.length ) {
@@ -517,13 +637,13 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		}
 
-		_this.dispatchEvent( startEvent );
+		scope.dispatchEvent( startEvent );
 
 	}
 
 	function touchmove( event ) {
 
-		if ( _this.enabled === false ) return;
+		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -551,7 +671,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	function touchend( event ) {
 
-		if ( _this.enabled === false ) return;
+		if ( scope.enabled === false ) return;
 
 		switch ( event.touches.length ) {
 
@@ -567,13 +687,13 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		}
 
-		_this.dispatchEvent( endEvent );
+		scope.dispatchEvent( endEvent );
 
 	}
 
 	function contextmenu( event ) {
 
-		if ( _this.enabled === false ) return;
+		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
 
@@ -581,16 +701,17 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.dispose = function () {
 
-		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
-		this.domElement.removeEventListener( 'mousedown', mousedown, false );
-		this.domElement.removeEventListener( 'wheel', mousewheel, false );
+		scope.domElement.removeEventListener( 'contextmenu', contextmenu, false );
 
-		this.domElement.removeEventListener( 'touchstart', touchstart, false );
-		this.domElement.removeEventListener( 'touchend', touchend, false );
-		this.domElement.removeEventListener( 'touchmove', touchmove, false );
+		scope.domElement.removeEventListener( 'pointerdown', onPointerDown, false );
+		scope.domElement.removeEventListener( 'wheel', mousewheel, false );
 
-		document.removeEventListener( 'mousemove', mousemove, false );
-		document.removeEventListener( 'mouseup', mouseup, false );
+		scope.domElement.removeEventListener( 'touchstart', touchstart, false );
+		scope.domElement.removeEventListener( 'touchend', touchend, false );
+		scope.domElement.removeEventListener( 'touchmove', touchmove, false );
+
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
 
 		window.removeEventListener( 'keydown', keydown, false );
 		window.removeEventListener( 'keyup', keyup, false );
@@ -598,12 +719,16 @@ THREE.TrackballControls = function ( object, domElement ) {
 	};
 
 	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
-	this.domElement.addEventListener( 'mousedown', mousedown, false );
+
+	this.domElement.addEventListener( 'pointerdown', onPointerDown, false );
 	this.domElement.addEventListener( 'wheel', mousewheel, false );
 
 	this.domElement.addEventListener( 'touchstart', touchstart, false );
 	this.domElement.addEventListener( 'touchend', touchend, false );
 	this.domElement.addEventListener( 'touchmove', touchmove, false );
+
+	this.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
+	this.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
 
 	window.addEventListener( 'keydown', keydown, false );
 	window.addEventListener( 'keyup', keyup, false );

@@ -2,8 +2,6 @@
 *
 * Supersample Anti-Aliasing Render Pass
 *
-* @author bhouston / http://clara.io/
-*
 * This manual approach to SSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
 *
 * References: https://en.wikipedia.org/wiki/Supersampling
@@ -40,11 +38,7 @@ THREE.SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 		depthWrite: false
 	} );
 
-	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene2	= new THREE.Scene();
-	this.quad2 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), this.copyMaterial );
-	this.quad2.frustumCulled = false; // Avoid getting clipped
-	this.scene2.add( this.quad2 );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.copyMaterial );
 
 };
 
@@ -133,7 +127,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			}
 
-			renderer.render( this.scene2, this.camera2 );
+			this.fsQuad.render( renderer );
 
 		}
 

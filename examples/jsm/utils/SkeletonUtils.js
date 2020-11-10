@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br
- */
-
 import {
 	AnimationClip,
 	AnimationMixer,
@@ -14,8 +10,6 @@ import {
 	Vector3,
 	VectorKeyframeTrack
 } from "../../../build/three.module.js";
-
-'use strict';
 
 var SkeletonUtils = {
 
@@ -131,7 +125,7 @@ var SkeletonUtils = {
 
 					} else {
 
-						relativeMatrix.getInverse( target.matrixWorld );
+						relativeMatrix.copy( target.matrixWorld ).invert();
 						relativeMatrix.multiply( boneTo.matrixWorld );
 
 					}
@@ -148,7 +142,7 @@ var SkeletonUtils = {
 					if ( target.isObject3D ) {
 
 						var boneIndex = bones.indexOf( bone ),
-							wBindMatrix = bindBones ? bindBones[ boneIndex ] : bindBoneMatrix.getInverse( target.skeleton.boneInverses[ boneIndex ] );
+							wBindMatrix = bindBones ? bindBones[ boneIndex ] : bindBoneMatrix.copy( target.skeleton.boneInverses[ boneIndex ] ).invert();
 
 						globalMatrix.multiply( wBindMatrix );
 
@@ -160,7 +154,7 @@ var SkeletonUtils = {
 
 				if ( bone.parent && bone.parent.isBone ) {
 
-					bone.matrix.getInverse( bone.parent.matrixWorld );
+					bone.matrix.copy( bone.parent.matrixWorld ).invert();
 					bone.matrix.multiply( globalMatrix );
 
 				} else {
@@ -541,8 +535,60 @@ var SkeletonUtils = {
 
 		return bones;
 
+	},
+
+	clone: function ( source ) {
+
+		var sourceLookup = new Map();
+		var cloneLookup = new Map();
+
+		var clone = source.clone();
+
+		parallelTraverse( source, clone, function ( sourceNode, clonedNode ) {
+
+			sourceLookup.set( clonedNode, sourceNode );
+			cloneLookup.set( sourceNode, clonedNode );
+
+		} );
+
+		clone.traverse( function ( node ) {
+
+			if ( ! node.isSkinnedMesh ) return;
+
+			var clonedMesh = node;
+			var sourceMesh = sourceLookup.get( node );
+			var sourceBones = sourceMesh.skeleton.bones;
+
+			clonedMesh.skeleton = sourceMesh.skeleton.clone();
+			clonedMesh.bindMatrix.copy( sourceMesh.bindMatrix );
+
+			clonedMesh.skeleton.bones = sourceBones.map( function ( bone ) {
+
+				return cloneLookup.get( bone );
+
+			} );
+
+			clonedMesh.bind( clonedMesh.skeleton, clonedMesh.bindMatrix );
+
+		} );
+
+		return clone;
+
 	}
 
 };
+
+
+function parallelTraverse( a, b, callback ) {
+
+	callback( a, b );
+
+	for ( var i = 0; i < a.children.length; i ++ ) {
+
+		parallelTraverse( a.children[ i ], b.children[ i ], callback );
+
+	}
+
+}
 
 export { SkeletonUtils };

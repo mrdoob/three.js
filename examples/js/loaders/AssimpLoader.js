@@ -1,55 +1,48 @@
-/**
- * @author Virtulous / https://virtulo.us/
- */
-
 THREE.AssimpLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.AssimpLoader.prototype = {
+THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.AssimpLoader,
-
-	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+		var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
-		var loader = new THREE.FileLoader( this.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 
 		loader.load( url, function ( buffer ) {
 
-			onLoad( scope.parse( buffer, path ) );
+			try {
+
+				onLoad( scope.parse( buffer, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
-	setResourcePath: function ( value ) {
-
-		this.resourcePath = value;
-		return this;
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
 
 	},
 
@@ -74,6 +67,7 @@ THREE.AssimpLoader.prototype = {
 				return n;
 
 			};
+
 			this.lerp = function ( nextKey, time ) {
 
 				time -= this.time;
@@ -117,6 +111,7 @@ THREE.AssimpLoader.prototype = {
 				this.keys.push( key );
 
 			};
+
 			this.init = function () {
 
 				this.sortKeys();
@@ -160,6 +155,7 @@ THREE.AssimpLoader.prototype = {
 					this.addKey( new Virtulous.KeyFrame( i / fps || track[ i ].time, track[ i ].targets[ 0 ].data ) );
 
 				}
+
 				this.init();
 
 			};
@@ -359,7 +355,7 @@ THREE.AssimpLoader.prototype = {
 		var ASSBIN_MESH_HAS_COLOR_BASE = 0x10000;
 		var AI_MAX_NUMBER_OF_COLOR_SETS = 1;
 		var AI_MAX_NUMBER_OF_TEXTURECOORDS = 4;
-		var aiLightSource_UNDEFINED = 0x0;
+		//var aiLightSource_UNDEFINED = 0x0;
 		//! A directional light source has a well-defined direction
 		//! but is infinitely far away. That's quite a good
 		//! approximation for sun light.
@@ -367,7 +363,7 @@ THREE.AssimpLoader.prototype = {
 		//! A point light source has a well-defined position
 		//! in space but no direction - it emits light in all
 		//! directions. A normal bulb is a point light.
-		var aiLightSource_POINT = 0x2;
+		//var aiLightSource_POINT = 0x2;
 		//! A spot light source emits light in a specific
 		//! angle. It has a position and a direction it is pointing to.
 		//! A good example for a spot light is a light spot in
@@ -378,49 +374,49 @@ THREE.AssimpLoader.prototype = {
 		//! Typically, there's at most one ambient light in a scene.
 		//! This light type doesn't have a valid position, direction, or
 		//! other properties, just a color.
-		var aiLightSource_AMBIENT = 0x4;
+		//var aiLightSource_AMBIENT = 0x4;
 		/** Flat shading. Shading is done on per-face base,
 		 *  diffuse only. Also known as 'faceted shading'.
 		 */
-		var aiShadingMode_Flat = 0x1;
+		//var aiShadingMode_Flat = 0x1;
 		/** Simple Gouraud shading.
 		 */
-		var aiShadingMode_Gouraud = 0x2;
+		//var aiShadingMode_Gouraud = 0x2;
 		/** Phong-Shading -
 		 */
-		var aiShadingMode_Phong = 0x3;
+		//var aiShadingMode_Phong = 0x3;
 		/** Phong-Blinn-Shading
 		 */
-		var aiShadingMode_Blinn = 0x4;
+		//var aiShadingMode_Blinn = 0x4;
 		/** Toon-Shading per pixel
 		 *
 		 *  Also known as 'comic' shader.
 		 */
-		var aiShadingMode_Toon = 0x5;
+		//var aiShadingMode_Toon = 0x5;
 		/** OrenNayar-Shading per pixel
 		 *
 		 *  Extension to standard Lambertian shading, taking the
 		 *  roughness of the material into account
 		 */
-		var aiShadingMode_OrenNayar = 0x6;
+		//var aiShadingMode_OrenNayar = 0x6;
 		/** Minnaert-Shading per pixel
 		 *
 		 *  Extension to standard Lambertian shading, taking the
 		 *  "darkness" of the material into account
 		 */
-		var aiShadingMode_Minnaert = 0x7;
+		//var aiShadingMode_Minnaert = 0x7;
 		/** CookTorrance-Shading per pixel
 		 *
 		 *  Special shader for metallic surfaces.
 		 */
-		var aiShadingMode_CookTorrance = 0x8;
+		//var aiShadingMode_CookTorrance = 0x8;
 		/** No shading at all. Constant light influence of 1.0.
 		 */
-		var aiShadingMode_NoShading = 0x9;
+		//var aiShadingMode_NoShading = 0x9;
 		/** Fresnel shading
 		 */
-		var aiShadingMode_Fresnel = 0xa;
-		var aiTextureType_NONE = 0x0;
+		//var aiShadingMode_Fresnel = 0xa;
+		//var aiTextureType_NONE = 0x0;
 		/** The texture is combined with the result of the diffuse
 		 *  lighting equation.
 		 */
@@ -428,21 +424,21 @@ THREE.AssimpLoader.prototype = {
 		/** The texture is combined with the result of the specular
 		 *  lighting equation.
 		 */
-		var aiTextureType_SPECULAR = 0x2;
+		//var aiTextureType_SPECULAR = 0x2;
 		/** The texture is combined with the result of the ambient
 		 *  lighting equation.
 		 */
-		var aiTextureType_AMBIENT = 0x3;
+		//var aiTextureType_AMBIENT = 0x3;
 		/** The texture is added to the result of the lighting
 		 *  calculation. It isn't influenced by incoming light.
 		 */
-		var aiTextureType_EMISSIVE = 0x4;
+		//var aiTextureType_EMISSIVE = 0x4;
 		/** The texture is a height map.
 		 *
 		 *  By convention, higher gray-scale values stand for
 		 *  higher elevations from the base height.
 		 */
-		var aiTextureType_HEIGHT = 0x5;
+		//var aiTextureType_HEIGHT = 0x5;
 		/** The texture is a (tangent space) normal-map.
 		 *
 		 *  Again, there are several conventions for tangent-space
@@ -457,7 +453,7 @@ THREE.AssimpLoader.prototype = {
 		 *  function defined to map the linear color values in the
 		 *  texture to a suitable exponent. Have fun.
 		 */
-		var aiTextureType_SHININESS = 0x7;
+		//var aiTextureType_SHININESS = 0x7;
 		/** The texture defines per-pixel opacity.
 		 *
 		 *  Usually 'white' means opaque and 'black' means
@@ -469,7 +465,7 @@ THREE.AssimpLoader.prototype = {
 		 *  The exact purpose and format is application-dependent.
 		 *  Higher color values stand for higher vertex displacements.
 		 */
-		var aiTextureType_DISPLACEMENT = 0x9;
+		//var aiTextureType_DISPLACEMENT = 0x9;
 		/** Lightmap texture (aka Ambient Occlusion)
 		 *
 		 *  Both 'Lightmaps' and dedicated 'ambient occlusion maps' are
@@ -483,14 +479,14 @@ THREE.AssimpLoader.prototype = {
 		 * Contains the color of a perfect mirror reflection.
 		 * Rarely used, almost never for real-time applications.
 		 */
-		var aiTextureType_REFLECTION = 0xB;
+		//var aiTextureType_REFLECTION = 0xB;
 		/** Unknown texture
 		 *
 		 *  A texture reference that does not match any of the definitions
 		 *  above is considered to be 'unknown'. It is still imported,
 		 *  but is excluded from any further postprocessing.
 		 */
-		var aiTextureType_UNKNOWN = 0xC;
+		//var aiTextureType_UNKNOWN = 0xC;
 		var BONESPERVERT = 4;
 
 		function ASSBIN_MESH_HAS_TEXCOORD( n ) {
@@ -521,6 +517,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 		}
+
 		function cloneTreeToBones( root, scene ) {
 
 			var rootBone = new THREE.Bone();
@@ -538,8 +535,7 @@ THREE.AssimpLoader.prototype = {
 			for ( var i in root.children ) {
 
 				var child = cloneTreeToBones( root.children[ i ], scene );
-				if ( child )
-					rootBone.add( child );
+				rootBone.add( child );
 
 			}
 
@@ -634,7 +630,7 @@ THREE.AssimpLoader.prototype = {
 			];
 			this.mFaces = [];
 			this.mBones = [];
-			this.hookupSkeletons = function ( scene, threeScene ) {
+			this.hookupSkeletons = function ( scene ) {
 
 				if ( this.mBones.length == 0 ) return;
 
@@ -668,7 +664,6 @@ THREE.AssimpLoader.prototype = {
 						var skeletonRoot = scene.findNode( this.mBones[ i ].mName );
 						if ( ! skeletonRoot ) return;
 						var threeSkeletonRoot = skeletonRoot.toTHREE( scene );
-						var threeSkeletonRootParent = threeSkeletonRoot.parent;
 						var threeSkeletonRootBone = cloneTreeToBones( threeSkeletonRoot, scene );
 						this.threeNode.add( threeSkeletonRootBone );
 						var bone = findMatchingBone( threeSkeletonRootBone, this.mBones[ i ].mName );
@@ -680,6 +675,7 @@ THREE.AssimpLoader.prototype = {
 					}
 
 				}
+
 				var skeleton = new THREE.Skeleton( allBones, offsetMatrix );
 
 				this.threeNode.bind( skeleton, new THREE.Matrix4() );
@@ -697,19 +693,19 @@ THREE.AssimpLoader.prototype = {
 				else
 					mat = new THREE.MeshLambertMaterial();
 				geometry.setIndex( new THREE.BufferAttribute( new Uint32Array( this.mIndexArray ), 1 ) );
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( this.mVertexBuffer, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( this.mVertexBuffer, 3 ) );
 				if ( this.mNormalBuffer && this.mNormalBuffer.length > 0 )
-					geometry.addAttribute( 'normal', new THREE.BufferAttribute( this.mNormalBuffer, 3 ) );
+					geometry.setAttribute( 'normal', new THREE.BufferAttribute( this.mNormalBuffer, 3 ) );
 				if ( this.mColorBuffer && this.mColorBuffer.length > 0 )
-					geometry.addAttribute( 'color', new THREE.BufferAttribute( this.mColorBuffer, 4 ) );
+					geometry.setAttribute( 'color', new THREE.BufferAttribute( this.mColorBuffer, 4 ) );
 				if ( this.mTexCoordsBuffers[ 0 ] && this.mTexCoordsBuffers[ 0 ].length > 0 )
-					geometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 0 ] ), 2 ) );
+					geometry.setAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 0 ] ), 2 ) );
 				if ( this.mTexCoordsBuffers[ 1 ] && this.mTexCoordsBuffers[ 1 ].length > 0 )
-					geometry.addAttribute( 'uv1', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 1 ] ), 2 ) );
+					geometry.setAttribute( 'uv1', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 1 ] ), 2 ) );
 				if ( this.mTangentBuffer && this.mTangentBuffer.length > 0 )
-					geometry.addAttribute( 'tangents', new THREE.BufferAttribute( this.mTangentBuffer, 3 ) );
+					geometry.setAttribute( 'tangents', new THREE.BufferAttribute( this.mTangentBuffer, 3 ) );
 				if ( this.mBitangentBuffer && this.mBitangentBuffer.length > 0 )
-					geometry.addAttribute( 'bitangents', new THREE.BufferAttribute( this.mBitangentBuffer, 3 ) );
+					geometry.setAttribute( 'bitangents', new THREE.BufferAttribute( this.mBitangentBuffer, 3 ) );
 				if ( this.mBones.length > 0 ) {
 
 					var weights = [];
@@ -762,8 +758,8 @@ THREE.AssimpLoader.prototype = {
 
 					}
 
-					geometry.addAttribute( 'skinWeight', new THREE.BufferAttribute( new Float32Array( _weights ), BONESPERVERT ) );
-					geometry.addAttribute( 'skinIndex', new THREE.BufferAttribute( new Float32Array( _bones ), BONESPERVERT ) );
+					geometry.setAttribute( 'skinWeight', new THREE.BufferAttribute( new Float32Array( _weights ), BONESPERVERT ) );
+					geometry.setAttribute( 'skinIndex', new THREE.BufferAttribute( new Float32Array( _bones ), BONESPERVERT ) );
 
 				}
 
@@ -773,8 +769,10 @@ THREE.AssimpLoader.prototype = {
 					mesh = new THREE.Mesh( geometry, mat );
 
 				if ( this.mBones.length > 0 ) {
+
 					mesh = new THREE.SkinnedMesh( geometry, mat );
 					mesh.normalizeSkinWeights();
+
 				}
 
 				this.threeNode = mesh;
@@ -806,46 +804,6 @@ THREE.AssimpLoader.prototype = {
 
 		}
 
-		function aiVector2D() {
-
-			this.x = 0;
-			this.y = 0;
-			this.toTHREE = function () {
-
-				return new THREE.Vector2( this.x, this.y );
-
-			};
-
-		}
-
-		function aiVector4D() {
-
-			this.w = 0;
-			this.x = 0;
-			this.y = 0;
-			this.z = 0;
-			this.toTHREE = function () {
-
-				return new THREE.Vector4( this.w, this.x, this.y, this.z );
-
-			};
-
-		}
-
-		function aiColor4D() {
-
-			this.r = 0;
-			this.g = 0;
-			this.b = 0;
-			this.a = 0;
-			this.toTHREE = function () {
-
-				return new THREE.Color( this.r, this.g, this.b, this.a );
-
-			};
-
-		}
-
 		function aiColor3D() {
 
 			this.r = 0;
@@ -854,7 +812,7 @@ THREE.AssimpLoader.prototype = {
 			this.a = 0;
 			this.toTHREE = function () {
 
-				return new THREE.Color( this.r, this.g, this.b, 1 );
+				return new THREE.Color( this.r, this.g, this.b );
 
 			};
 
@@ -1020,6 +978,7 @@ THREE.AssimpLoader.prototype = {
 			};
 
 		}
+
 		var namePropMapping = {
 
 			"?mat.name": "name",
@@ -1063,9 +1022,8 @@ THREE.AssimpLoader.prototype = {
 			this.mNumAllocated = 0;
 			this.mNumProperties = 0;
 			this.mProperties = [];
-			this.toTHREE = function ( scene ) {
+			this.toTHREE = function () {
 
-				var name = this.mProperties[ 0 ].dataAsString();
 				var mat = new THREE.MeshPhongMaterial();
 
 				for ( var i = 0; i < this.mProperties.length; i ++ ) {
@@ -1236,7 +1194,7 @@ THREE.AssimpLoader.prototype = {
 
 			};
 
-			this.toTHREE = function ( o, tps ) {
+			this.toTHREE = function ( o ) {
 
 				this.sortKeys();
 				var length = this.getLength();
@@ -1354,6 +1312,10 @@ THREE.AssimpLoader.prototype = {
 
 		function aiScene() {
 
+			this.versionMajor = 0;
+			this.versionMinor = 0;
+			this.versionRevision = 0;
+			this.compileFlags = 0;
 			this.mFlags = 0;
 			this.mNumMeshes = 0;
 			this.mNumMaterials = 0;
@@ -1402,7 +1364,7 @@ THREE.AssimpLoader.prototype = {
 				var o = this.mRootNode.toTHREE( this );
 
 				for ( var i in this.mMeshes )
-					this.mMeshes[ i ].hookupSkeletons( this, o );
+					this.mMeshes[ i ].hookupSkeletons( this );
 
 				if ( this.mAnimations.length > 0 ) {
 
@@ -1504,43 +1466,12 @@ THREE.AssimpLoader.prototype = {
 
 		}
 
-		function Read_aiVector2D( stream ) {
-
-			var v = new aiVector2D();
-			v.x = readFloat( stream );
-			v.y = readFloat( stream );
-			return v;
-
-		}
-
-		function Read_aiVector4D( stream ) {
-
-			var v = new aiVector4D();
-			v.w = readFloat( stream );
-			v.x = readFloat( stream );
-			v.y = readFloat( stream );
-			v.z = readFloat( stream );
-			return v;
-
-		}
-
 		function Read_aiColor3D( stream ) {
 
 			var c = new aiColor3D();
 			c.r = readFloat( stream );
 			c.g = readFloat( stream );
 			c.b = readFloat( stream );
-			return c;
-
-		}
-
-		function Read_aiColor4D( stream ) {
-
-			var c = new aiColor4D();
-			c.r = readFloat( stream );
-			c.g = readFloat( stream );
-			c.b = readFloat( stream );
-			c.a = readFloat( stream );
 			return c;
 
 		}
@@ -1610,39 +1541,9 @@ THREE.AssimpLoader.prototype = {
 
 		}
 
-		function ReadArray( stream, data, size ) {
-
-			for ( var i = 0; i < size; i ++ ) data[ i ] = Read( stream );
-
-		}
-
-		function ReadArray_aiVector2D( stream, data, size ) {
-
-			for ( var i = 0; i < size; i ++ ) data[ i ] = Read_aiVector2D( stream );
-
-		}
-
-		function ReadArray_aiVector3D( stream, data, size ) {
-
-			for ( var i = 0; i < size; i ++ ) data[ i ] = Read_aiVector3D( stream );
-
-		}
-
-		function ReadArray_aiVector4D( stream, data, size ) {
-
-			for ( var i = 0; i < size; i ++ ) data[ i ] = Read_aiVector4D( stream );
-
-		}
-
 		function ReadArray_aiVertexWeight( stream, data, size ) {
 
 			for ( var i = 0; i < size; i ++ ) data[ i ] = Read_aiVertexWeight( stream );
-
-		}
-
-		function ReadArray_aiColor4D( stream, data, size ) {
-
-			for ( var i = 0; i < size; i ++ ) data[ i ] = Read_aiColor4D( stream );
 
 		}
 
@@ -1661,7 +1562,7 @@ THREE.AssimpLoader.prototype = {
 		function ReadBounds( stream, T /*p*/, n ) {
 
 			// not sure what to do here, the data isn't really useful.
-			return stream.Seek( sizeof( T ) * n, aiOrigin_CUR );
+			return stream.Seek( sizeof( T ) * n, aiOrigin_CUR ); // eslint-disable-line no-undef
 
 		}
 
@@ -1853,7 +1754,7 @@ THREE.AssimpLoader.prototype = {
 
 				} else {
 
-				// else write as usual
+					// else write as usual
 
 					mesh.mTextureCoords[ n ] = [];
 					//note that assbin always writes 3d texcoords
@@ -1870,6 +1771,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// write faces. There are no floating-point calculations involved
 			// in these, so we can write a simple hash over the face data
 			// to the dump file. We generate a single 32 Bit hash for 512 faces
@@ -1884,8 +1786,6 @@ THREE.AssimpLoader.prototype = {
 
 				// if there are less than 2^16 vertices, we can simply use 16 bit integers ...
 				mesh.mFaces = [];
-
-				var indexCounter = 0;
 				mesh.mIndexArray = [];
 
 				for ( var i = 0; i < mesh.mNumFaces; ++ i ) {
@@ -1937,6 +1837,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// write bones
 			if ( mesh.mNumBones ) {
 
@@ -1999,7 +1900,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryNodeAnim( stream, nd ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2065,7 +1966,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryAnim( stream, anim ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2119,7 +2020,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryLight( stream, l ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2149,7 +2050,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryCamera( stream, cam ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2196,6 +2097,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// Read materials
 			if ( scene.mNumMaterials ) {
 
@@ -2209,6 +2111,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// Read all animations
 			if ( scene.mNumAnimations ) {
 
@@ -2222,6 +2125,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// Read all textures
 			if ( scene.mNumTextures ) {
 
@@ -2235,6 +2139,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// Read lights
 			if ( scene.mNumLights ) {
 
@@ -2248,6 +2153,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// Read cameras
 			if ( scene.mNumCameras ) {
 
@@ -2263,6 +2169,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 		}
+
 		var aiOrigin_CUR = 0;
 		var aiOrigin_BEG = 1;
 
@@ -2276,6 +2183,7 @@ THREE.AssimpLoader.prototype = {
 					stream.readOffset += off;
 
 				}
+
 				if ( ori == aiOrigin_BEG ) {
 
 					stream.readOffset = off;
@@ -2335,13 +2243,13 @@ THREE.AssimpLoader.prototype = {
 			extendStream( stream );
 			stream.Seek( 44, aiOrigin_CUR ); // signature
 			/*unsigned int versionMajor =*/
-			var versionMajor = Read_unsigned_int( stream );
+			pScene.versionMajor = Read_unsigned_int( stream );
 			/*unsigned int versionMinor =*/
-			var versionMinor = Read_unsigned_int( stream );
+			pScene.versionMinor = Read_unsigned_int( stream );
 			/*unsigned int versionRevision =*/
-			var versionRevision = Read_unsigned_int( stream );
+			pScene.versionRevision = Read_unsigned_int( stream );
 			/*unsigned int compileFlags =*/
-			var compileFlags = Read_unsigned_int( stream );
+			pScene.compileFlags = Read_unsigned_int( stream );
 			shortened = Read_uint16_t( stream ) > 0;
 			compressed = Read_uint16_t( stream ) > 0;
 			if ( shortened )
@@ -2356,16 +2264,17 @@ THREE.AssimpLoader.prototype = {
 				var compressedData = [];
 				stream.Read( compressedData, 1, compressedSize );
 				var uncompressedData = [];
-				uncompress( uncompressedData, uncompressedSize, compressedData, compressedSize );
+				uncompress( uncompressedData, uncompressedSize, compressedData, compressedSize ); // eslint-disable-line no-undef
 				var buff = new ArrayBuffer( uncompressedData );
 				ReadBinaryScene( buff, pScene );
 
 			} else {
 
 				ReadBinaryScene( stream, pScene );
-				return pScene.toTHREE();
 
 			}
+
+			return pScene.toTHREE();
 
 		}
 
@@ -2373,4 +2282,4 @@ THREE.AssimpLoader.prototype = {
 
 	}
 
-};
+} );

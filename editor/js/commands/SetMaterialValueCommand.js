@@ -1,18 +1,15 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param attributeName string
  * @param newValue number, string, boolean or object
  * @constructor
  */
+function SetMaterialValueCommand( editor, object, attributeName, newValue, materialSlot ) {
 
-var SetMaterialValueCommand = function ( object, attributeName, newValue, materialSlot ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetMaterialValueCommand';
 	this.name = 'Set Material.' + attributeName;
@@ -26,7 +23,7 @@ var SetMaterialValueCommand = function ( object, attributeName, newValue, materi
 
 	this.attributeName = attributeName;
 
-};
+}
 
 SetMaterialValueCommand.prototype = {
 
@@ -81,3 +78,5 @@ SetMaterialValueCommand.prototype = {
 	}
 
 };
+
+export { SetMaterialValueCommand };

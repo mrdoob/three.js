@@ -1,6 +1,4 @@
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * Depth-of-field shader using mipmaps
  * - from Matt Handley @applmak
  * - requires power-of-2 sized render target with enabled mipmaps
@@ -10,10 +8,10 @@ THREE.DOFMipMapShader = {
 
 	uniforms: {
 
-		"tColor":   { value: null },
-		"tDepth":   { value: null },
-		"focus":    { value: 1.0 },
-		"maxblur":  { value: 1.0 }
+		"tColor": { value: null },
+		"tDepth": { value: null },
+		"focus": { value: 1.0 },
+		"maxblur": { value: 1.0 }
 
 	},
 
@@ -23,8 +21,8 @@ THREE.DOFMipMapShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	vUv = uv;",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -42,14 +40,14 @@ THREE.DOFMipMapShader = {
 
 		"void main() {",
 
-			"vec4 depth = texture2D( tDepth, vUv );",
+		"	vec4 depth = texture2D( tDepth, vUv );",
 
-			"float factor = depth.x - focus;",
+		"	float factor = depth.x - focus;",
 
-			"vec4 col = texture2D( tColor, vUv, 2.0 * maxblur * abs( focus - depth.x ) );",
+		"	vec4 col = texture2D( tColor, vUv, 2.0 * maxblur * abs( focus - depth.x ) );",
 
-			"gl_FragColor = col;",
-			"gl_FragColor.a = 1.0;",
+		"	gl_FragColor = col;",
+		"	gl_FragColor.a = 1.0;",
 
 		"}"
 

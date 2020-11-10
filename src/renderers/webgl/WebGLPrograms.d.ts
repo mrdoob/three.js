@@ -1,24 +1,32 @@
 import { WebGLRenderer } from './../WebGLRenderer';
 import { WebGLProgram } from './WebGLProgram';
-import { ShaderMaterial } from './../../materials/ShaderMaterial';
+import { WebGLCapabilities } from './WebGLCapabilities';
+import { WebGLCubeMaps } from './WebGLCubeMaps';
+import { WebGLExtensions } from './WebGLExtensions';
+import { WebGLClipping } from './WebGLClipping';
+import { WebGLBindingStates } from './WebGLBindingStates';
+import { Material } from './../../materials/Material';
+import { Scene } from './../../scenes/Scene';
 
 export class WebGLPrograms {
-  constructor(renderer: WebGLRenderer, capabilities: any);
 
-  programs: WebGLProgram[];
+	constructor( renderer: WebGLRenderer, cubemaps: WebGLCubeMaps, extensions: WebGLExtensions, capabilities: WebGLCapabilities, bindingStates: WebGLBindingStates, clipping: WebGLClipping );
 
-  getParameters(
-    material: ShaderMaterial,
-    lights: any,
-    fog: any,
-    nClipPlanes: number,
-    object: any
-  ): any;
-  getProgramCode(material: ShaderMaterial, parameters: any): string;
-  acquireProgram(
-    material: ShaderMaterial,
-    parameters: any,
-    code: string
-  ): WebGLProgram;
-  releaseProgram(program: WebGLProgram): void;
+	programs: WebGLProgram[];
+
+	getParameters(
+		material: Material,
+		lights: any,
+		shadows: object[],
+		scene: Scene,
+		object: any
+	): any;
+	getProgramCacheKey( parameters: any ): string;
+	getUniforms( material: Material ): object;
+	acquireProgram(
+		parameters: any,
+		cacheKey: string
+	): WebGLProgram;
+	releaseProgram( program: WebGLProgram ): void;
+
 }

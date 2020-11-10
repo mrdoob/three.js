@@ -1,16 +1,14 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
+import * as THREE from '../../../build/three.module.js';
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @constructor
  */
+function AddObjectCommand( editor, object ) {
 
-var AddObjectCommand = function ( object ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'AddObjectCommand';
 
@@ -21,7 +19,7 @@ var AddObjectCommand = function ( object ) {
 
 	}
 
-};
+}
 
 AddObjectCommand.prototype = {
 
@@ -64,3 +62,5 @@ AddObjectCommand.prototype = {
 	}
 
 };
+
+export { AddObjectCommand };

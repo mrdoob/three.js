@@ -1,17 +1,23 @@
-import { LoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader';
+import { LoadingManager } from './LoadingManager';
 
-export class ImageBitmapLoader {
-  constructor(manager?: LoadingManager);
+export class ImageBitmapLoader extends Loader {
 
-  manager: LoadingManager;
+	constructor( manager?: LoadingManager );
 
-  setOptions(options: any): ImageBitmapLoader;
-  load(
-    url: string,
-    onLoad?: (response: string | ArrayBuffer) => void,
-    onProgress?: (request: ProgressEvent) => void,
-    onError?: (event: ErrorEvent) => void
-  ): any;
-  setCrossOrigin(): ImageBitmapLoader;
-  setPath(path: string): ImageBitmapLoader;
+	/**
+	 * @default { premultiplyAlpha: 'none' }
+	 */
+	options: undefined | object;
+
+	readonly isImageBitmapLoader: true;
+
+	setOptions( options: object ): ImageBitmapLoader;
+	load(
+		url: string,
+		onLoad?: ( response: ImageBitmap ) => void,
+		onProgress?: ( request: ProgressEvent ) => void,
+		onError?: ( event: ErrorEvent ) => void
+	): any;
+
 }

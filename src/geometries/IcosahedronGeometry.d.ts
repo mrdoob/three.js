@@ -1,14 +1,16 @@
-import { Shape } from './../extras/core/Shape';
-import { UVGenerator } from './ExtrudeGeometry';
-import {
-  PolyhedronGeometry,
-  PolyhedronBufferGeometry,
-} from './PolyhedronGeometry';
+import { Geometry } from './../core/Geometry';
 
-export class IcosahedronBufferGeometry extends PolyhedronBufferGeometry {
-  constructor(radius?: number, detail?: number);
-}
+export class IcosahedronGeometry extends Geometry {
 
-export class IcosahedronGeometry extends PolyhedronGeometry {
-  constructor(radius?: number, detail?: number);
+	/**
+	 * @param [radius=1]
+	 * @param [detail=0]
+	 */
+	constructor( radius?: number, detail?: number );
+
+	/**
+	 * @default 'IcosahedronGeometry'
+	 */
+	type: string;
+
 }

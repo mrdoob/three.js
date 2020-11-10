@@ -1,9 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author supereggbert / http://www.paulbrunt.co.uk/
- * @author julianwa / https://github.com/julianwa
- */
-
 THREE.RenderableObject = function () {
 
 	this.id = 0;
@@ -157,14 +151,12 @@ THREE.Projector = function () {
 		var uvs = [];
 
 		var object = null;
-		var material = null;
 
 		var normalMatrix = new THREE.Matrix3();
 
 		function setObject( value ) {
 
 			object = value;
-			material = object.material;
 
 			normalMatrix.getNormalMatrix( object.matrixWorld );
 
@@ -268,7 +260,7 @@ THREE.Projector = function () {
 
 				_line.material = object.material;
 
-				if ( object.material.vertexColors === THREE.VertexColors ) {
+				if ( object.material.vertexColors ) {
 
 					_line.vertexColors[ 0 ].fromArray( colors, a * 3 );
 					_line.vertexColors[ 1 ].fromArray( colors, b * 3 );
@@ -322,7 +314,7 @@ THREE.Projector = function () {
 
 				_face.material = material;
 
-				if ( material.vertexColors === THREE.FaceColors || material.vertexColors === THREE.VertexColors ) {
+				if ( material.vertexColors ) {
 
 					_face.color.fromArray( colors, a * 3 );
 
@@ -414,7 +406,7 @@ THREE.Projector = function () {
 		_viewMatrix.copy( camera.matrixWorldInverse );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-		_frustum.setFromMatrix( _viewProjectionMatrix );
+		_frustum.setFromProjectionMatrix( _viewProjectionMatrix );
 
 		//
 
@@ -470,6 +462,7 @@ THREE.Projector = function () {
 						if ( material.morphTargets === true ) {
 
 							var morphTargets = geometry.morphAttributes.position;
+							var morphTargetsRelative = geometry.morphTargetsRelative;
 							var morphInfluences = object.morphTargetInfluences;
 
 							for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
@@ -480,9 +473,19 @@ THREE.Projector = function () {
 
 								var target = morphTargets[ t ];
 
-								x += ( target.getX( i / 3 ) - positions[ i ] ) * influence;
-								y += ( target.getY( i / 3 ) - positions[ i + 1 ] ) * influence;
-								z += ( target.getZ( i / 3 ) - positions[ i + 2 ] ) * influence;
+								if ( morphTargetsRelative ) {
+
+									x += target.getX( i / 3 ) * influence;
+									y += target.getY( i / 3 ) * influence;
+									z += target.getZ( i / 3 ) * influence;
+
+								} else {
+
+									x += ( target.getX( i / 3 ) - positions[ i ] ) * influence;
+									y += ( target.getY( i / 3 ) - positions[ i + 1 ] ) * influence;
+									z += ( target.getZ( i / 3 ) - positions[ i + 2 ] ) * influence;
+
+								}
 
 							}
 
@@ -821,7 +824,7 @@ THREE.Projector = function () {
 
 							_line.material = object.material;
 
-							if ( object.material.vertexColors === THREE.VertexColors ) {
+							if ( object.material.vertexColors ) {
 
 								_line.vertexColors[ 0 ].copy( object.geometry.colors[ v ] );
 								_line.vertexColors[ 1 ].copy( object.geometry.colors[ v - 1 ] );

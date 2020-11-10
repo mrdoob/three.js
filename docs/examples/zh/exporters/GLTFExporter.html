@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		An exporter for *glTF* 2.0.
+		<br /><br />
+		<a href="https://www.khronos.org/gltf">glTF</a> (GL Transmission Format) is an
+		<a href="https://github.com/KhronosGroup/glTF/tree/master/specification/2.0">open format specification</a>
+		for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf)
+		or binary (.glb) format. External files store textures (.jpg, .png) and additional binary
+		data (.bin). A glTF asset may deliver one or more scenes, including meshes, materials,
+		textures, skins, skeletons, morph targets, animations, lights, and/or cameras.
+		</p>
+
+		<h2>Extensions</h2>
+
+		<p>
+			GLTFExporter supports the following
+			[link:https://github.com/KhronosGroup/glTF/tree/master/extensions/ glTF 2.0 extensions]:
+		</p>
+
+		<ul>
+			<li>KHR_lights_punctual</li>
+			<li>KHR_materials_unlit</li>
+			<li>KHR_texture_transform</li>
+		</ul>
+
+		<h2>代码示例</h2>
+
+		<code>
+		// Instantiate a exporter
+		const exporter = new GLTFExporter();
+
+		// Parse the input and generate the glTF output
+		exporter.parse( scene, function ( gltf ) {
+			console.log( gltf );
+			downloadJSON( gltf );
+		}, options );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:misc_exporter_gltf]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+		<p>
+		</p>
+		<p>
+		Creates a new [name].
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null parse]( [param:Object3D input], [param:Function onCompleted], [param:Object options] )</h3>
+		<p>
+		[page:Object input] — Scenes or objects to export. Valid options:<br />
+		<ul>
+			<li>
+				Export scenes
+				<code>
+				exporter.parse( scene1, ... )
+		exporter.parse( [ scene1, scene2 ], ... )
+				</code>
+			</li>
+			<li>
+				Export objects (It will create a new Scene to hold all the objects)
+				<code>
+				exporter.parse( object1, ... )
+		exporter.parse( [ object1, object2 ], ... )
+				</code>
+			</li>
+			<li>
+				Mix scenes and objects (It will export the scenes as usual but it will create a new scene to hold all the single objects).
+				<code>
+				exporter.parse( [ scene1, object1, object2, scene2 ], ... )
+				</code>
+			</li>
+		</ul>
+
+		[page:Function onCompleted] — Will be called when the export completes. The argument will be the generated glTF JSON or binary ArrayBuffer.<br />
+		[page:Options options] — Export options<br />
+		<ul>
+			<li>trs - bool. Export position, rotation and scale instead of matrix per node. Default is false</li>
+			<li>onlyVisible - bool. Export only visible objects. Default is true.</li>
+			<li>truncateDrawRange - bool. Export just the attributes within the drawRange, if defined, instead of exporting the whole array. Default is true.</li>
+			<li>binary - bool. Export in binary (.glb) format, returning an ArrayBuffer. Default is false.</li>
+			<li>embedImages - bool. Export with images embedded into the glTF asset. Default is true.</li>
+			<li>maxTextureSize - int. Restricts the image maximum size (both width and height) to the given value. This option works only if embedImages is true. Default is Infinity.</li>
+			<li>animations - Array<[page:AnimationClip AnimationClip]>. List of animations to be included in the export.</li>
+			<li>forceIndices - bool. Generate indices for non-index geometry and export with them. Default is false.</li>
+			<li>forcePowerOfTwoTextures - bool. Export with images resized to POT size. This option works only if embedImages is true. Default is false.</li>
+			<li>includeCustomExtensions - bool. Export custom glTF extensions defined on an object's <em>userData.gltfExtensions</em> property. Default is false.</li>
+		</ul>
+		</p>
+		<p>
+		Generates a .gltf (JSON) or .glb (binary) output from the input (Scenes or Objects)
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/GLTFExporter.js examples/jsm/exporters/GLTFExporter.js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">Utility class for sampling weighted random points on the surface of a mesh.</p>
+
+		<p>Weighted sampling is useful for effects like heavier foliage growth in certain areas of terrain, or concentrated particle emissions from specific parts of a mesh. Vertex weights may be written programmatically, or painted by hand as vertex colors in 3D tools like Blender.</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		// Create a sampler for a Mesh surface.
+		const sampler = new MeshSurfaceSampler( surfaceMesh )
+			.setWeightAttribute( 'color' )
+			.build();
+
+		const sampleMesh = new THREE.InstancedMesh( sampleGeometry, sampleMaterial, 100 );
+
+		const _position = new THREE.Vector3();
+		const _normal = new THREE.Vector3();
+		const _matrix = new THREE.Matrix4();
+
+		// Sample randomly from the surface, creating an instance of the sample
+		// geometry at each sample point.
+		for ( let i = 0; i < 100; i ++ ) {
+
+			sampler.sample( _position, _normal );
+
+			_matrix.makeTranslation( _position.x, _position.y, _position.z );
+
+			mesh.setMatrixAt( i, _matrix );
+
+		}
+
+		mesh.instanceMatrix.needsUpdate = true;
+
+		scene.add( mesh );
+		</code>
+
+		<h2>例子</h2>
+		<p>
+			[example:webgl_instancing_scatter]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Mesh mesh] )</h3>
+		<p>
+		[page:Mesh mesh] — Surface mesh from which to sample.
+		</p>
+		<p>
+		Creates a new [name]. If the input geometry is indexed, a non-indexed copy is made. After construction, the sampler is not able to return samples until [page:MeshSurfaceSampler.build build] is called.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:this setWeightAttribute]( [param:String name] )</h3>
+		<p>
+		Specifies a vertex attribute to be used as a weight when sampling from the surface. Faces with higher weights are more likely to be sampled, and those with weights of zero will not be sampled at all. For vector attributes, only <i>.x</i> is used in sampling.
+		</p>
+		<p>If no weight attribute is selected, sampling is randomly distributed by area.</p>
+
+		<h3>[method:this build]()</h3>
+		<p>
+		Processes the input geometry and prepares to return samples. Any configuration of the geometry or sampler must occur before this method is called. Time complexity is <i>O(n)</i> for a surface with <i>n</i> faces.
+		</p>
+
+		<h3>[method:this sample]( [param:Vector3 targetPosition], [param:Vector3 targetNormal] )</h3>
+		<p>
+		Selects a random point on the surface of the input geometry, returning the position and normal vector at that point. Time complexity is <i>O(log n)</i> for a surface with <i>n</i> faces.</i></p>
+
+		<h2>Source</h2>
+
+		<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/MeshSurfaceSampler.js examples/jsm/math/MeshSurfaceSampler.js]
+		</p>
+	</body>
+</html>

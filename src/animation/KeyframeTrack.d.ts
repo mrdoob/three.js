@@ -4,38 +4,49 @@ import { CubicInterpolant } from './../math/interpolants/CubicInterpolant';
 import { InterpolationModes } from '../constants';
 
 export class KeyframeTrack {
-  constructor(
-    name: string,
-    times: any[],
-    values: any[],
-    interpolation?: InterpolationModes
-  );
 
-  name: string;
-  times: any[];
-  values: any[];
+	/**
+	 * @param name
+	 * @param times
+	 * @param values
+	 * @param [interpolation=THREE.InterpolateLinear]
+	 */
+	constructor(
+		name: string,
+		times: any[],
+		values: any[],
+		interpolation?: InterpolationModes
+	);
 
-  ValueTypeName: string;
-  TimeBufferType: Float32Array;
-  ValueBufferType: Float32Array;
+	name: string;
+	times: Float32Array;
+	values: Float32Array;
 
-  DefaultInterpolation: InterpolationModes;
+	ValueTypeName: string;
+	TimeBufferType: Float32Array;
+	ValueBufferType: Float32Array;
 
-  InterpolantFactoryMethodDiscrete(result: any): DiscreteInterpolant;
-  InterpolantFactoryMethodLinear(result: any): LinearInterpolant;
-  InterpolantFactoryMethodSmooth(result: any): CubicInterpolant;
+	/**
+	 * @default THREE.InterpolateLinear
+	 */
+	DefaultInterpolation: InterpolationModes;
 
-  setInterpolation(interpolation: InterpolationModes): void;
-  getInterpolation(): InterpolationModes;
+	InterpolantFactoryMethodDiscrete( result: any ): DiscreteInterpolant;
+	InterpolantFactoryMethodLinear( result: any ): LinearInterpolant;
+	InterpolantFactoryMethodSmooth( result: any ): CubicInterpolant;
 
-  getValuesize(): number;
+	setInterpolation( interpolation: InterpolationModes ): KeyframeTrack;
+	getInterpolation(): InterpolationModes;
 
-  shift(timeOffset: number): KeyframeTrack;
-  scale(timeScale: number): KeyframeTrack;
-  trim(startTime: number, endTime: number): KeyframeTrack;
-  validate(): boolean;
-  optimize(): KeyframeTrack;
+	getValueSize(): number;
 
-  static parse(json: any): KeyframeTrack;
-  static toJSON(track: KeyframeTrack): any;
+	shift( timeOffset: number ): KeyframeTrack;
+	scale( timeScale: number ): KeyframeTrack;
+	trim( startTime: number, endTime: number ): KeyframeTrack;
+	validate(): boolean;
+	optimize(): KeyframeTrack;
+	clone(): KeyframeTrack;
+
+	static toJSON( track: KeyframeTrack ): any;
+
 }

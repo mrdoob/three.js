@@ -1,5 +1,8 @@
 export class WebGLExtensions {
-  constructor(gl: WebGLRenderingContext);
 
-  get(name: string): any;
+	constructor( gl: WebGLRenderingContext );
+
+	has( name: string ): boolean;
+	get( name: string ): any;
+
 }

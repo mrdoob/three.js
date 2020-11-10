@@ -1,18 +1,17 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
+
+import * as THREE from '../../../build/three.module.js';
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param newScale THREE.Vector3
  * @param optionalOldScale THREE.Vector3
  * @constructor
  */
+function SetScaleCommand( editor, object, newScale, optionalOldScale ) {
 
-var SetScaleCommand = function ( object, newScale, optionalOldScale ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetScaleCommand';
 	this.name = 'Set Scale';
@@ -33,7 +32,7 @@ var SetScaleCommand = function ( object, newScale, optionalOldScale ) {
 
 	}
 
-};
+}
 
 SetScaleCommand.prototype = {
 
@@ -82,3 +81,5 @@ SetScaleCommand.prototype = {
 	}
 
 };
+
+export { SetScaleCommand };

@@ -1,12 +1,7 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
-import {
-	PolyhedronBufferGeometry
-} from '../../../../src/geometries/PolyhedronGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils';
+import { PolyhedronBufferGeometry } from '../../../../src/geometries/PolyhedronBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 

@@ -3,9 +3,6 @@ import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
 
 /**
- * @author mrdoob / http://mrdoob.com/
- * @author WestLangley / http://github.com/WestLangley
- *
  * parameters = {
  *  opacity: <float>,
  *
@@ -50,7 +47,6 @@ function MeshNormalMaterial( parameters ) {
 	this.wireframeLinewidth = 1;
 
 	this.fog = false;
-	this.lights = false;
 
 	this.skinning = false;
 	this.morphTargets = false;

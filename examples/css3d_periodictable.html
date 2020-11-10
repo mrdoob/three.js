@@ -4,32 +4,10 @@
 		<title>three.js css3d - periodic table</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			html, body {
-				height: 100%;
-			}
-
-			body {
-				background-color: #000000;
-				margin: 0;
-				font-family: Helvetica, sans-serif;;
-				overflow: hidden;
-			}
-
 			a {
-				color: #ffffff;
-			}
-
-			#info {
-				position: absolute;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				font-weight: bold;
-				text-align: center;
-				z-index: 1;
+				color: #8ff;
 			}
 
 			#menu {
@@ -44,7 +22,9 @@
 				height: 160px;
 				box-shadow: 0px 0px 12px rgba(0,255,255,0.5);
 				border: 1px solid rgba(127,255,255,0.25);
+				font-family: Helvetica, sans-serif;
 				text-align: center;
+				line-height: normal;
 				cursor: default;
 			}
 
@@ -89,9 +69,11 @@
 				padding: 5px 10px;
 				cursor: pointer;
 			}
+
 			button:hover {
 				background-color: rgba(0,255,255,0.5);
 			}
+
 			button:active {
 				color: #000000;
 				background-color: rgba(0,255,255,0.75);
@@ -99,12 +81,8 @@
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/libs/tween.min.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/renderers/CSS3DRenderer.js"></script>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js css3d</a> - periodic table. <a href="https://plus.google.com/113862800338869870683/posts/QcFk5HrWran" target="_blank" rel="noopener">info</a>.</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - periodic table.</div>
 		<div id="container"></div>
 		<div id="menu">
 			<button id="table">TABLE</button>
@@ -113,9 +91,15 @@
 			<button id="grid">GRID</button>
 		</div>
 
-		<script>
+		<script type="module">
 
-			var table = [
+			import * as THREE from '../build/three.module.js';
+
+			import { TWEEN } from './jsm/libs/tween.module.min.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
+
+			const table = [
 				"H", "Hydrogen", "1.00794", 1, 1,
 				"He", "Helium", "4.002602", 18, 1,
 				"Li", "Lithium", "6.941", 1, 2,
@@ -236,11 +220,11 @@
 				"Og", "Oganesson", "(294)", 18, 7
 			];
 
-			var camera, scene, renderer;
-			var controls;
+			let camera, scene, renderer;
+			let controls;
 
-			var objects = [];
-			var targets = { table: [], sphere: [], helix: [], grid: [] };
+			const objects = [];
+			const targets = { table: [], sphere: [], helix: [], grid: [] };
 
 			init();
 			animate();
@@ -254,38 +238,38 @@
 
 				// table
 
-				for ( var i = 0; i < table.length; i += 5 ) {
+				for ( let i = 0; i < table.length; i += 5 ) {
 
-					var element = document.createElement( 'div' );
+					const element = document.createElement( 'div' );
 					element.className = 'element';
 					element.style.backgroundColor = 'rgba(0,127,127,' + ( Math.random() * 0.5 + 0.25 ) + ')';
 
-					var number = document.createElement( 'div' );
+					const number = document.createElement( 'div' );
 					number.className = 'number';
 					number.textContent = ( i / 5 ) + 1;
 					element.appendChild( number );
 
-					var symbol = document.createElement( 'div' );
+					const symbol = document.createElement( 'div' );
 					symbol.className = 'symbol';
 					symbol.textContent = table[ i ];
 					element.appendChild( symbol );
 
-					var details = document.createElement( 'div' );
+					const details = document.createElement( 'div' );
 					details.className = 'details';
 					details.innerHTML = table[ i + 1 ] + '<br>' + table[ i + 2 ];
 					element.appendChild( details );
 
-					var object = new THREE.CSS3DObject( element );
-					object.position.x = Math.random() * 4000 - 2000;
-					object.position.y = Math.random() * 4000 - 2000;
-					object.position.z = Math.random() * 4000 - 2000;
-					scene.add( object );
+					const objectCSS = new CSS3DObject( element );
+					objectCSS.position.x = Math.random() * 4000 - 2000;
+					objectCSS.position.y = Math.random() * 4000 - 2000;
+					objectCSS.position.z = Math.random() * 4000 - 2000;
+					scene.add( objectCSS );
 
-					objects.push( object );
+					objects.push( objectCSS );
 
 					//
 
-					var object = new THREE.Object3D();
+					const object = new THREE.Object3D();
 					object.position.x = ( table[ i + 3 ] * 140 ) - 1330;
 					object.position.y = - ( table[ i + 4 ] * 180 ) + 990;
 
@@ -295,14 +279,14 @@
 
 				// sphere
 
-				var vector = new THREE.Vector3();
+				const vector = new THREE.Vector3();
 
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+				for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
-					var phi = Math.acos( - 1 + ( 2 * i ) / l );
-					var theta = Math.sqrt( l * Math.PI ) * phi;
+					const phi = Math.acos( - 1 + ( 2 * i ) / l );
+					const theta = Math.sqrt( l * Math.PI ) * phi;
 
-					var object = new THREE.Object3D();
+					const object = new THREE.Object3D();
 
 					object.position.setFromSphericalCoords( 800, phi, theta );
 
@@ -316,14 +300,12 @@
 
 				// helix
 
-				var vector = new THREE.Vector3();
+				for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+					const theta = i * 0.175 + Math.PI;
+					const y = - ( i * 8 ) + 450;
 
-					var theta = i * 0.175 + Math.PI;
-					var y = - ( i * 8 ) + 450;
-
-					var object = new THREE.Object3D();
+					const object = new THREE.Object3D();
 
 					object.position.setFromCylindricalCoords( 900, theta, y );
 
@@ -339,9 +321,9 @@
 
 				// grid
 
-				for ( var i = 0; i < objects.length; i ++ ) {
+				for ( let i = 0; i < objects.length; i ++ ) {
 
-					var object = new THREE.Object3D();
+					const object = new THREE.Object3D();
 
 					object.position.x = ( ( i % 5 ) * 400 ) - 800;
 					object.position.y = ( - ( Math.floor( i / 5 ) % 5 ) * 400 ) + 800;
@@ -353,41 +335,40 @@
 
 				//
 
-				renderer = new THREE.CSS3DRenderer();
+				renderer = new CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
 				//
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 0.5;
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.minDistance = 500;
 				controls.maxDistance = 6000;
 				controls.addEventListener( 'change', render );
 
-				var button = document.getElementById( 'table' );
-				button.addEventListener( 'click', function () {
+				const buttonTable = document.getElementById( 'table' );
+				buttonTable.addEventListener( 'click', function () {
 
 					transform( targets.table, 2000 );
 
 				}, false );
 
-				var button = document.getElementById( 'sphere' );
-				button.addEventListener( 'click', function () {
+				const buttonSphere = document.getElementById( 'sphere' );
+				buttonSphere.addEventListener( 'click', function () {
 
 					transform( targets.sphere, 2000 );
 
 				}, false );
 
-				var button = document.getElementById( 'helix' );
-				button.addEventListener( 'click', function () {
+				const buttonHelix = document.getElementById( 'helix' );
+				buttonHelix.addEventListener( 'click', function () {
 
 					transform( targets.helix, 2000 );
 
 				}, false );
 
-				var button = document.getElementById( 'grid' );
-				button.addEventListener( 'click', function () {
+				const buttonGrid = document.getElementById( 'grid' );
+				buttonGrid.addEventListener( 'click', function () {
 
 					transform( targets.grid, 2000 );
 
@@ -405,10 +386,10 @@
 
 				TWEEN.removeAll();
 
-				for ( var i = 0; i < objects.length; i ++ ) {
+				for ( let i = 0; i < objects.length; i ++ ) {
 
-					var object = objects[ i ];
-					var target = targets[ i ];
+					const object = objects[ i ];
+					const target = targets[ i ];
 
 					new TWEEN.Tween( object.position )
 						.to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration )

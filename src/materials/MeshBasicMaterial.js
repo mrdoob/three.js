@@ -3,9 +3,6 @@ import { MultiplyOperation } from '../constants.js';
 import { Color } from '../math/Color.js';
 
 /**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- *
  * parameters = {
  *  color: <hex>,
  *  opacity: <float>,
@@ -69,8 +66,6 @@ function MeshBasicMaterial( parameters ) {
 
 	this.skinning = false;
 	this.morphTargets = false;
-
-	this.lights = false;
 
 	this.setValues( parameters );
 

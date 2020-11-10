@@ -1,6 +1,4 @@
 /**
- * Created by tpowellmeto on 29/10/2015.
- *
  * peppers ghost effect based on http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS
  */
 
@@ -40,6 +38,7 @@ THREE.PeppersGhostEffect = function ( renderer ) {
 			_height = height / 3;
 
 		}
+
 		renderer.setSize( width, height );
 
 	};

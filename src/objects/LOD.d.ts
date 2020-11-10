@@ -4,20 +4,25 @@ import { Camera } from './../cameras/Camera';
 import { Intersection } from '../core/Raycaster';
 
 export class LOD extends Object3D {
-  constructor();
 
-  type: 'LOD';
+	constructor();
 
-  levels: { distance: number; object: Object3D }[];
+	type: 'LOD';
 
-  addLevel(object: Object3D, distance?: number): void;
-  getObjectForDistance(distance: number): Object3D;
-  raycast(raycaster: Raycaster, intersects: Intersection[]): void;
-  update(camera: Camera): void;
-  toJSON(meta: any): any;
+	levels: { distance: number; object: Object3D }[];
+	autoUpdate: boolean;
+	readonly isLOD: true;
 
-  /**
-   * @deprecated Use {@link LOD#levels .levels} instead.
-   */
-  objects: any[];
+	addLevel( object: Object3D, distance?: number ): this;
+	getCurrentLevel(): number;
+	getObjectForDistance( distance: number ): Object3D | null;
+	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
+	update( camera: Camera ): void;
+	toJSON( meta: any ): any;
+
+	/**
+	 * @deprecated Use {@link LOD#levels .levels} instead.
+	 */
+	objects: any[];
+
 }

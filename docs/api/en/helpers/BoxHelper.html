@@ -3,37 +3,37 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:LineSegments] &rarr;
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
 
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Helper object to show the world-axis-aligned bounding box around an object.
-
+			Helper object to graphically show the world-axis-aligned bounding box around an object. The actual bounding box is handled with [page:Box3], this is just a visual helper for debugging.
+			It can be automatically resized with the [page:BoxHelper.update] method when the object it's created from is transformed.
 			Note that the object must have a [page:Geometry] or [page:BufferGeometry] for this to work,
 			so it won't work with [page:Sprite Sprites].
 		</p>
 
-
-		<h2>Example</h2>
-
-		<div>[example:webgl_helpers WebGL / helpers]</div>
-		<div>[example:webgl_loader_nrrd WebGL / loader / nrrd]</div>
-		<div>[example:webgl_buffergeometry_drawcalls advanced / buffergeometry / drawcalls]</div>
-
+		<h2>Code Example</h2>
 
 		<code>
-		var sphere = new THREE.SphereGeometry();
-		var object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( 0xff0000 ) );
-		var box = new THREE.BoxHelper( object, 0xffff00 );
+		const sphere = new THREE.SphereBufferGeometry();
+		const object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( 0xff0000 ) );
+		const box = new THREE.BoxHelper( object, 0xffff00 );
 		scene.add( box );
 		</code>
 
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_helpers WebGL / helpers]<br/>
+			[example:webgl_loader_nrrd WebGL / loader / nrrd]<br/>
+			[example:webgl_buffergeometry_drawrange WebGL / buffergeometry / drawrange]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -69,6 +69,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

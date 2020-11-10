@@ -1,6 +1,4 @@
 /**
- * @author felixturner / http://airtight.cc/
- *
  * RGB Shift Shader
  * Shifts red and blue channels from center in opposite directions
  * Ported from http://kriss.cx/tom/2009/05/rgb-shift/
@@ -15,8 +13,8 @@ THREE.RGBShiftShader = {
 	uniforms: {
 
 		"tDiffuse": { value: null },
-		"amount":   { value: 0.005 },
-		"angle":    { value: 0.0 }
+		"amount": { value: 0.005 },
+		"angle": { value: 0.0 }
 
 	},
 
@@ -26,8 +24,8 @@ THREE.RGBShiftShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	vUv = uv;",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -43,11 +41,11 @@ THREE.RGBShiftShader = {
 
 		"void main() {",
 
-			"vec2 offset = amount * vec2( cos(angle), sin(angle));",
-			"vec4 cr = texture2D(tDiffuse, vUv + offset);",
-			"vec4 cga = texture2D(tDiffuse, vUv);",
-			"vec4 cb = texture2D(tDiffuse, vUv - offset);",
-			"gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);",
+		"	vec2 offset = amount * vec2( cos(angle), sin(angle));",
+		"	vec4 cr = texture2D(tDiffuse, vUv + offset);",
+		"	vec4 cga = texture2D(tDiffuse, vUv);",
+		"	vec4 cb = texture2D(tDiffuse, vUv - offset);",
+		"	gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);",
 
 		"}"
 

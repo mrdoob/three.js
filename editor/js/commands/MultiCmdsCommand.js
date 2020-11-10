@@ -1,23 +1,20 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
 
 /**
+ * @param editor Editor
  * @param cmdArray array containing command objects
  * @constructor
  */
+function MultiCmdsCommand( editor, cmdArray ) {
 
-var MultiCmdsCommand = function ( cmdArray ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'MultiCmdsCommand';
 	this.name = 'Multiple Changes';
 
 	this.cmdArray = ( cmdArray !== undefined ) ? cmdArray : [];
 
-};
+}
 
 MultiCmdsCommand.prototype = {
 
@@ -61,6 +58,7 @@ MultiCmdsCommand.prototype = {
 			cmds.push( this.cmdArray[ i ].toJSON() );
 
 		}
+
 		output.cmds = cmds;
 
 		return output;
@@ -83,3 +81,5 @@ MultiCmdsCommand.prototype = {
 	}
 
 };
+
+export { MultiCmdsCommand };

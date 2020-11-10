@@ -1,6 +1,4 @@
 /**
- * @author wongbryan / http://wongbryan.github.io
- *
  * Pixelation shader
  */
 

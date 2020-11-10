@@ -1,6 +1,4 @@
 /**
- * @author tapio / http://tapio.github.com/
- *
  * Brightness and contrast adjustment
  * https://github.com/evanw/glfx.js
  * brightness: -1 to 1 (-1 is solid black, 0 is no change, and 1 is solid white)
@@ -11,9 +9,9 @@ THREE.BrightnessContrastShader = {
 
 	uniforms: {
 
-		"tDiffuse":   { value: null },
+		"tDiffuse": { value: null },
 		"brightness": { value: 0 },
-		"contrast":   { value: 0 }
+		"contrast": { value: 0 }
 
 	},
 
@@ -23,9 +21,9 @@ THREE.BrightnessContrastShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
+		"	vUv = uv;",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -41,15 +39,15 @@ THREE.BrightnessContrastShader = {
 
 		"void main() {",
 
-			"gl_FragColor = texture2D( tDiffuse, vUv );",
+		"	gl_FragColor = texture2D( tDiffuse, vUv );",
 
-			"gl_FragColor.rgb += brightness;",
+		"	gl_FragColor.rgb += brightness;",
 
-			"if (contrast > 0.0) {",
-				"gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) / (1.0 - contrast) + 0.5;",
-			"} else {",
-				"gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) * (1.0 + contrast) + 0.5;",
-			"}",
+		"	if (contrast > 0.0) {",
+		"		gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) / (1.0 - contrast) + 0.5;",
+		"	} else {",
+		"		gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) * (1.0 + contrast) + 0.5;",
+		"	}",
 
 		"}"
 

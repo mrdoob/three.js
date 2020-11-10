@@ -1,31 +1,20 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
 
 /**
- * @param editorRef pointer to main editor object used to initialize
+ * @param editor pointer to main editor object used to initialize
  *        each command object with a reference to the editor
  * @constructor
  */
 
-var Command = function ( editorRef ) {
+function Command( editor ) {
 
 	this.id = - 1;
 	this.inMemory = false;
 	this.updatable = false;
 	this.type = '';
 	this.name = '';
+	this.editor = editor;
 
-	if ( editorRef !== undefined ) {
-
-		Command.editor = editorRef;
-
-	}
-	this.editor = Command.editor;
-
-
-};
+}
 
 Command.prototype.toJSON = function () {
 
@@ -45,3 +34,5 @@ Command.prototype.fromJSON = function ( json ) {
 	this.name = json.name;
 
 };
+
+export { Command };

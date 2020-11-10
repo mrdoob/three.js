@@ -1,17 +1,14 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param newUuid string
  * @constructor
  */
+function SetUuidCommand( editor, object, newUuid ) {
 
-var SetUuidCommand = function ( object, newUuid ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetUuidCommand';
 	this.name = 'Update UUID';
@@ -21,7 +18,7 @@ var SetUuidCommand = function ( object, newUuid ) {
 	this.oldUuid = ( object !== undefined ) ? object.uuid : undefined;
 	this.newUuid = newUuid;
 
-};
+}
 
 SetUuidCommand.prototype = {
 
@@ -69,3 +66,5 @@ SetUuidCommand.prototype = {
 	}
 
 };
+
+export { SetUuidCommand };

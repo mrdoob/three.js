@@ -1,7 +1,3 @@
-/**
- * @author HypnosNova / https://www.threejs.org.cn/gallery
- */
-
 THREE.SelectionHelper = ( function () {
 
 	function SelectionHelper( selectionBox, renderer, cssClassName ) {
@@ -12,20 +8,20 @@ THREE.SelectionHelper = ( function () {
 
 		this.renderer = renderer;
 
-		this.startPoint = { x: 0, y: 0 };
-		this.pointTopLeft = { x: 0, y: 0 };
-		this.pointBottomRight = { x: 0, y: 0 };
+		this.startPoint = new THREE.Vector2();
+		this.pointTopLeft = new THREE.Vector2();
+		this.pointBottomRight = new THREE.Vector2();
 
 		this.isDown = false;
 
-		this.renderer.domElement.addEventListener( 'mousedown', function ( event ) {
+		this.renderer.domElement.addEventListener( 'pointerdown', function ( event ) {
 
 			this.isDown = true;
 			this.onSelectStart( event );
 
 		}.bind( this ), false );
 
-		this.renderer.domElement.addEventListener( 'mousemove', function ( event ) {
+		this.renderer.domElement.addEventListener( 'pointermove', function ( event ) {
 
 			if ( this.isDown ) {
 
@@ -35,7 +31,7 @@ THREE.SelectionHelper = ( function () {
 
 		}.bind( this ), false );
 
-		this.renderer.domElement.addEventListener( 'mouseup', function ( event ) {
+		this.renderer.domElement.addEventListener( 'pointerup', function ( event ) {
 
 			this.isDown = false;
 			this.onSelectOver( event );

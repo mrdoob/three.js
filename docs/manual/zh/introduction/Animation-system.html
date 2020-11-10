@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -28,7 +27,7 @@
 
 		<p class="desc">
 			如果您已成功导入3D动画对象（无论它是否有骨骼或变形目标或两者皆有都不要紧）——
-			例如使用<a href="https://github.com/KhronosGroup/glTF-Blender-Exporter">glTF Blender导出器</a>
+			例如使用[link:https://github.com/KhronosGroup/glTF-Blender-IO glTF Blender exporter]（glTF Blender导出器）</a>
 			从Blender导出它并使用[page:GLTFLoader]将其加载到three.js场景中
 			—— 其中一个响应字段应该是一个名为“animations”的数组，
 			其中包含此模型的[page:AnimationClip AnimationClips]（请参阅下面可用的加载器列表）。
@@ -90,7 +89,6 @@
 				<li>THREE.FBXLoader</li>
 				<li>[page:GLTFLoader THREE.GLTFLoader]</li>
 				<li>THREE.MMDLoader</li>
-				<li>THREE.SEA3DLoader</li>
 			</ul>
 
 		<p class="desc">
@@ -100,11 +98,11 @@
 		<h2>范例</h2>
 
 		<code>
-		var mesh;
+		let mesh;
 
 		// 新建一个AnimationMixer, 并取得AnimationClip实例列表
-		var mixer = new THREE.AnimationMixer( mesh );
-		var clips = mesh.animations;
+		const mixer = new THREE.AnimationMixer( mesh );
+		const clips = mesh.animations;
 
 		// 在每一帧中更新mixer
 		function update () {
@@ -112,8 +110,8 @@
 		}
 
 		// 播放一个特定的动画
-		var clip = THREE.AnimationClip.findByName( clips, 'dance' );
-		var action = mixer.clipAction( clip );
+		const clip = THREE.AnimationClip.findByName( clips, 'dance' );
+		const action = mixer.clipAction( clip );
 		action.play();
 
 		// 播放所有动画

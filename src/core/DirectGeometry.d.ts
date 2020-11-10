@@ -5,46 +5,109 @@ import { Vector4 } from './../math/Vector4';
 import { Box3 } from './../math/Box3';
 import { Sphere } from './../math/Sphere';
 import { Geometry } from './Geometry';
-import { Event } from './Face3';
-import { EventDispatcher } from './EventDispatcher';
 import { MorphTarget } from './Geometry';
+
 /**
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/DirectGeometry.js">src/core/DirectGeometry.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/DirectGeometry.js|src/core/DirectGeometry.js}
  */
-export class DirectGeometry extends EventDispatcher {
-  constructor();
+export class DirectGeometry {
 
-  id: number;
-  uuid: string;
-  name: string;
-  type: string;
-  indices: number[];
-  vertices: Vector3[];
-  normals: Vector3[];
-  colors: Color[];
-  uvs: Vector2[];
-  uvs2: Vector2[];
-  groups: { start: number; materialIndex: number }[];
-  morphTargets: MorphTarget[];
-  skinWeights: Vector4[];
-  skinIndices: Vector4[];
-  boundingBox: Box3;
-  boundingSphere: Sphere;
-  verticesNeedUpdate: boolean;
-  normalsNeedUpdate: boolean;
-  colorsNeedUpdate: boolean;
-  uvsNeedUpdate: boolean;
-  groupsNeedUpdate: boolean;
+	constructor();
 
-  computeBoundingBox(): void;
-  computeBoundingSphere(): void;
-  computeGroups(geometry: Geometry): void;
-  fromGeometry(geometry: Geometry): DirectGeometry;
-  dispose(): void;
+	id: number;
+	uuid: string;
+	name: string;
+	type: string;
 
-  // EventDispatcher mixins
-  addEventListener(type: string, listener: (event: Event) => void): void;
-  hasEventListener(type: string, listener: (event: Event) => void): boolean;
-  removeEventListener(type: string, listener: (event: Event) => void): void;
-  dispatchEvent(event: { type: string; [attachment: string]: any }): void;
+	/**
+	 * @default []
+	 */
+	indices: number[];
+
+	/**
+	 * @default []
+	 */
+	vertices: Vector3[];
+
+	/**
+	 * @default []
+	 */
+	normals: Vector3[];
+
+	/**
+	 * @default []
+	 */
+	colors: Color[];
+
+	/**
+	 * @default []
+	 */
+	uvs: Vector2[];
+
+	/**
+	 * @default []
+	 */
+	uvs2: Vector2[];
+
+	/**
+	 * @default []
+	 */
+	groups: { start: number; materialIndex: number }[];
+
+	/**
+	 * @default {}
+	 */
+	morphTargets: MorphTarget[];
+
+	/**
+	 * @default []
+	 */
+	skinWeights: Vector4[];
+
+	/**
+	 * @default []
+	 */
+	skinIndices: Vector4[];
+
+	/**
+	 * @default null
+	 */
+	boundingBox: Box3 | null;
+
+	/**
+	 * @default null
+	 */
+	boundingSphere: Sphere | null;
+
+	/**
+	 * @default false
+	 */
+	verticesNeedUpdate: boolean;
+
+	/**
+	 * @default false
+	 */
+	normalsNeedUpdate: boolean;
+
+	/**
+	 * @default false
+	 */
+	colorsNeedUpdate: boolean;
+
+	/**
+	 * @default false
+	 */
+	uvsNeedUpdate: boolean;
+
+	/**
+	 * @default false
+	 */
+	groupsNeedUpdate: boolean;
+
+	computeBoundingBox(): void;
+	computeBoundingSphere(): void;
+	computeGroups( geometry: Geometry ): void;
+	fromGeometry( geometry: Geometry ): DirectGeometry;
+	dispose(): void;
+
 }

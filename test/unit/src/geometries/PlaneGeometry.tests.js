@@ -1,13 +1,7 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
-import {
-	PlaneBufferGeometry
-} from '../../../../src/geometries/PlaneGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils';
+import { PlaneBufferGeometry } from '../../../../src/geometries/PlaneBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 

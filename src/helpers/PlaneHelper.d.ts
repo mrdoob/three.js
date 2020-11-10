@@ -2,10 +2,26 @@ import { Plane } from './../math/Plane';
 import { LineSegments } from './../objects/LineSegments';
 
 export class PlaneHelper extends LineSegments {
-  constructor(plane: Plane, size?: number, hex?: number);
 
-  plane: Plane;
-  size: number;
+	/**
+	 * @param plane
+	 * @param [size=1]
+	 * @param [hex=0xffff00]
+	 */
+	constructor( plane: Plane, size?: number, hex?: number );
 
-  updateMatrixWorld(force: boolean): void;
+	/**
+	 * @default 'PlaneHelper'
+	 */
+	type: string;
+
+	plane: Plane;
+
+	/**
+	 * @default 1
+	 */
+	size: number;
+
+	updateMatrixWorld( force?: boolean ): void;
+
 }

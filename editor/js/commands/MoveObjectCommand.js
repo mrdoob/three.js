@@ -1,18 +1,15 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param newParent THREE.Object3D
  * @param newBefore THREE.Object3D
  * @constructor
  */
+function MoveObjectCommand( editor, object, newParent, newBefore ) {
 
-var MoveObjectCommand = function ( object, newParent, newBefore ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'MoveObjectCommand';
 	this.name = 'Move Object';
@@ -40,7 +37,7 @@ var MoveObjectCommand = function ( object, newParent, newBefore ) {
 
 	this.newBefore = newBefore;
 
-};
+}
 
 MoveObjectCommand.prototype = {
 
@@ -93,15 +90,20 @@ MoveObjectCommand.prototype = {
 			this.oldParent = this.editor.scene;
 
 		}
+
 		this.newParent = this.editor.objectByUuid( json.newParentUuid );
+
 		if ( this.newParent === undefined ) {
 
 			this.newParent = this.editor.scene;
 
 		}
+
 		this.newIndex = json.newIndex;
 		this.oldIndex = json.oldIndex;
 
 	}
 
 };
+
+export { MoveObjectCommand };

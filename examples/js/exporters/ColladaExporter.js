@@ -1,5 +1,4 @@
 /**
- * @author Garrett Johnson / http://gkjohnson.github.io/
  * https://github.com/gkjohnson/collada-exporter-js
  *
  * Usage:
@@ -17,7 +16,9 @@ THREE.ColladaExporter.prototype = {
 
 	constructor: THREE.ColladaExporter,
 
-	parse: function ( object, onDone, options = {} ) {
+	parse: function ( object, onDone, options ) {
+
+		options = options || {};
 
 		options = Object.assign( {
 			version: '1.4.1',
@@ -98,8 +99,8 @@ THREE.ColladaExporter.prototype = {
 			canvas = canvas || document.createElement( 'canvas' );
 			ctx = ctx || canvas.getContext( '2d' );
 
-			canvas.width = image.naturalWidth;
-			canvas.height = image.naturalHeight;
+			canvas.width = image.width;
+			canvas.height = image.height;
 
 			ctx.drawImage( image, 0, 0 );
 
@@ -218,7 +219,9 @@ THREE.ColladaExporter.prototype = {
 						bufferGeometry.groups :
 						[ { start: 0, count: indexCount, materialIndex: 0 } ];
 
-				var gnode = `<geometry id="${ meshid }" name="${ g.name }"><mesh>`;
+
+				var gname = g.name ? ` name="${ g.name }"` : '';
+				var gnode = `<geometry id="${ meshid }"${ gname }><mesh>`;
 
 				// define the geometry node and the vertices for the geometry
 				var posName = `${ meshid }-position`;
@@ -247,6 +250,15 @@ THREE.ColladaExporter.prototype = {
 					var uvName = `${ meshid }-texcoord`;
 					gnode += getAttribute( bufferGeometry.attributes.uv, uvName, [ 'S', 'T' ], 'float' );
 					triangleInputs += `<input semantic="TEXCOORD" source="#${ uvName }" offset="0" set="0" />`;
+
+				}
+
+				// serialize lightmap uvs
+				if ( 'uv2' in bufferGeometry.attributes ) {
+
+					var uvName = `${ meshid }-texcoord2`;
+					gnode += getAttribute( bufferGeometry.attributes.uv2, uvName, [ 'S', 'T' ], 'float' );
+					triangleInputs += `<input semantic="TEXCOORD" source="#${ uvName }" offset="0" set="1" />`;
 
 				}
 
@@ -377,7 +389,7 @@ THREE.ColladaExporter.prototype = {
 				var reflectivity = m.reflectivity || 0;
 
 				// Do not export and alpha map for the reasons mentioned in issue (#13792)
-				// in THREE.js alpha maps are black and white, but collada expects the alpha
+				// in three.js alpha maps are black and white, but collada expects the alpha
 				// channel to specify the transparency
 				var transparencyNode = '';
 				if ( m.transparent === true ) {
@@ -421,6 +433,17 @@ THREE.ColladaExporter.prototype = {
 								`<color sid="diffuse">${ diffuse.r } ${ diffuse.g } ${ diffuse.b } 1</color>`
 						) +
 						'</diffuse>'
+							: ''
+					) +
+
+					(
+						type !== 'constant' ?
+							'<bump>' +
+
+						(
+							m.normalMap ? '<texture texture="bump-sampler" texcoord="TEXCOORD" />' : ''
+						) +
+						'</bump>'
 							: ''
 					) +
 
@@ -479,11 +502,20 @@ THREE.ColladaExporter.prototype = {
 							''
 					) +
 
+					(
+						m.normalMap ?
+							'<newparam sid="bump-surface"><surface type="2D">' +
+							`<init_from>${ processTexture( m.normalMap ) }</init_from>` +
+							'</surface></newparam>' +
+							'<newparam sid="bump-sampler"><sampler2D><source>bump-surface</source></sampler2D></newparam>' :
+							''
+					) +
+
 					techniqueNode +
 
 					(
 						m.side === THREE.DoubleSide ?
-							`<extra><technique><double_sided sid="double_sided" type="int">1</double_sided></technique></extra>` :
+							`<extra><technique profile="THREEJS"><double_sided sid="double_sided" type="int">1</double_sided></technique></extra>` :
 							''
 					) +
 
@@ -491,7 +523,10 @@ THREE.ColladaExporter.prototype = {
 
 					'</effect>';
 
-				libraryMaterials.push( `<material id="${ matid }" name="${ m.name }"><instance_effect url="#${ matid }-effect" /></material>` );
+				var materialName = m.name ? ` name="${ m.name }"` : '';
+				var materialNode = `<material id="${ matid }"${ materialName }><instance_effect url="#${ matid }-effect" /></material>`;
+
+				libraryMaterials.push( materialNode );
 				libraryEffects.push( effectnode );
 				materialMap.set( m, matid );
 
@@ -535,8 +570,8 @@ THREE.ColladaExporter.prototype = {
 					matidsArray = new Array( materials.length );
 
 				}
-				matids = matidsArray.fill()
-					.map( ( v, i ) => processMaterial( materials[ i % materials.length ] ) );
+
+				matids = matidsArray.fill().map( ( v, i ) => processMaterial( materials[ i % materials.length ] ) );
 
 				node +=
 					`<instance_geometry url="#${ meshid }">` +
@@ -586,7 +621,7 @@ THREE.ColladaExporter.prototype = {
 			'<asset>' +
 			(
 				'<contributor>' +
-				'<authoring_tool>THREE.js Collada Exporter</authoring_tool>' +
+				'<authoring_tool>three.js Collada Exporter</authoring_tool>' +
 				( options.author !== null ? `<author>${ options.author }</author>` : '' ) +
 				'</contributor>' +
 				`<created>${ ( new Date() ).toISOString() }</created>` +

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -32,31 +31,32 @@
 
 		</script>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 
 		<code>
-		var length = 12, width = 8;
+		const length = 12, width = 8;
 
-		var shape = new THREE.Shape();
+		const shape = new THREE.Shape();
 		shape.moveTo( 0,0 );
 		shape.lineTo( 0, width );
 		shape.lineTo( length, width );
 		shape.lineTo( length, 0 );
 		shape.lineTo( 0, 0 );
 
-		var extrudeSettings = {
+		const extrudeSettings = {
 			steps: 2,
 			depth: 16,
 			bevelEnabled: true,
 			bevelThickness: 1,
 			bevelSize: 1,
+			bevelOffset: 0,
 			bevelSegments: 1
 		};
 
-		var geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
-		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-		var mesh = new THREE.Mesh( geometry, material ) ;
+		const geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const mesh = new THREE.Mesh( geometry, material ) ;
 		scene.add( mesh );
 		</code>
 
@@ -76,8 +76,9 @@
 				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
 				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
 				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
+				<li>bevelOffset — float. Distance from the shape outline that the bevel starts. Default is 0.</li>
 				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
-				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded.</li>
+				<li>extrudePath — THREE.Curve. A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.</li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
 			</ul>
 
@@ -93,14 +94,20 @@
 		</p>
 
 		<h2>Properties</h2>
+		<p>See the base [page:BufferGeometry] class for common properties.</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
 		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
 		</p>
 
+		<h2>Methods</h2>
+		<p>See the base [page:BufferGeometry] class for common methods.</p>
+
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/ExtrudeGeometry.js src/geometries/ExtrudeGeometry.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

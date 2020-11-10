@@ -1,17 +1,14 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param script javascript object
  * @constructor
  */
+function AddScriptCommand( editor, object, script ) {
 
-var AddScriptCommand = function ( object, script ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'AddScriptCommand';
 	this.name = 'Add Script';
@@ -19,7 +16,7 @@ var AddScriptCommand = function ( object, script ) {
 	this.object = object;
 	this.script = script;
 
-};
+}
 
 AddScriptCommand.prototype = {
 
@@ -74,3 +71,5 @@ AddScriptCommand.prototype = {
 	}
 
 };
+
+export { AddScriptCommand };

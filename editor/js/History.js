@@ -1,9 +1,7 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
 
-History = function ( editor ) {
+import * as Commands from './commands/Commands.js';
+
+function History( editor ) {
 
 	this.editor = editor;
 	this.undos = [];
@@ -13,10 +11,6 @@ History = function ( editor ) {
 
 	this.historyDisabled = false;
 	this.config = editor.config;
-
-	//Set editor-reference in Command
-
-	Command( editor );
 
 	// signals
 
@@ -34,7 +28,7 @@ History = function ( editor ) {
 
 	} );
 
-};
+}
 
 History.prototype = {
 
@@ -71,6 +65,7 @@ History.prototype = {
 			cmd.id = ++ this.idCounter;
 
 		}
+
 		cmd.name = ( optionalName !== undefined ) ? optionalName : cmd.name;
 		cmd.execute();
 		cmd.inMemory = true;
@@ -80,6 +75,7 @@ History.prototype = {
 			cmd.json = cmd.toJSON();	// serialize the cmd immediately after execution and append the json to the cmd
 
 		}
+
 		this.lastCmdTime = new Date();
 
 		// clearing all the redo-commands
@@ -173,7 +169,7 @@ History.prototype = {
 
 		// Append Undos to History
 
-		for ( var i = 0 ; i < this.undos.length; i ++ ) {
+		for ( var i = 0; i < this.undos.length; i ++ ) {
 
 			if ( this.undos[ i ].hasOwnProperty( "json" ) ) {
 
@@ -185,7 +181,7 @@ History.prototype = {
 
 		// Append Redos to History
 
-		for ( var i = 0 ; i < this.redos.length; i ++ ) {
+		for ( var i = 0; i < this.redos.length; i ++ ) {
 
 			if ( this.redos[ i ].hasOwnProperty( "json" ) ) {
 
@@ -206,7 +202,7 @@ History.prototype = {
 		for ( var i = 0; i < json.undos.length; i ++ ) {
 
 			var cmdJSON = json.undos[ i ];
-			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+			var cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			cmd.id = cmdJSON.id;
 			cmd.name = cmdJSON.name;
@@ -218,7 +214,7 @@ History.prototype = {
 		for ( var i = 0; i < json.redos.length; i ++ ) {
 
 			var cmdJSON = json.redos[ i ];
-			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+			var cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			cmd.id = cmdJSON.id;
 			cmd.name = cmdJSON.name;
@@ -309,6 +305,7 @@ History.prototype = {
 				cmd.json = cmd.toJSON();
 
 			}
+
 			cmd = this.redo();
 
 		}
@@ -321,3 +318,5 @@ History.prototype = {
 	}
 
 };
+
+export { History };

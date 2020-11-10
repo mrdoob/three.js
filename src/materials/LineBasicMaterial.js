@@ -2,9 +2,6 @@ import { Material } from './Material.js';
 import { Color } from '../math/Color.js';
 
 /**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- *
  * parameters = {
  *  color: <hex>,
  *  opacity: <float>,
@@ -27,7 +24,7 @@ function LineBasicMaterial( parameters ) {
 	this.linecap = 'round';
 	this.linejoin = 'round';
 
-	this.lights = false;
+	this.morphTargets = false;
 
 	this.setValues( parameters );
 
@@ -47,6 +44,8 @@ LineBasicMaterial.prototype.copy = function ( source ) {
 	this.linewidth = source.linewidth;
 	this.linecap = source.linecap;
 	this.linejoin = source.linejoin;
+
+	this.morphTargets = source.morphTargets;
 
 	return this;
 

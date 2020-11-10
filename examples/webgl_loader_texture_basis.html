@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - basis texture loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - basis texture loader<br />
+			<a href="https://github.com/binomialLLC/basis_universal" target="_blank">Basis Universal GPU Texture Codec</a>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { BasisTextureLoader } from './jsm/loaders/BasisTextureLoader.js';
+
+			let camera, scene, renderer;
+			let mesh;
+
+			const clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 500;
+
+				scene = new THREE.Scene();
+
+				const geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+				const material = new THREE.MeshBasicMaterial();
+
+				mesh = new THREE.Mesh( geometry, material );
+
+				scene.add( mesh );
+
+				const loader = new BasisTextureLoader();
+				loader.setTranscoderPath( 'js/libs/basis/' );
+				loader.detectSupport( renderer );
+				loader.load( 'textures/compressed/PavingStones.basis', function ( texture ) {
+
+					texture.encoding = THREE.sRGBEncoding;
+					material.map = texture;
+					material.needsUpdate = true;
+
+				}, undefined, function ( error ) {
+
+					console.error( error );
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				const delta = clock.getDelta() * 0.5;
+
+				mesh.rotation.x += delta;
+				mesh.rotation.y += delta;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

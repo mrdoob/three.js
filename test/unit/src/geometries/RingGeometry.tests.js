@@ -1,13 +1,7 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
-import {
-	RingBufferGeometry
-} from '../../../../src/geometries/RingGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils';
+import { RingBufferGeometry } from '../../../../src/geometries/RingBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 

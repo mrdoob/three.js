@@ -1,7 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Box3 } from '../../../../src/math/Box3';
@@ -12,10 +8,8 @@ import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Mesh } from '../../../../src/objects/Mesh';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
-import {
-	BoxGeometry,
-	BoxBufferGeometry
-} from '../../../../src/geometries/BoxGeometry';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
 import {
 	negInf3,
 	posInf3,
@@ -54,9 +48,13 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isBox3", ( assert ) => {
+		QUnit.test( "isBox3", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Box3();
+			assert.ok( a.isBox3 === true, "Passed!" );
+
+			var b = new Sphere();
+			assert.ok( ! b.isBox3, "Passed!" );
 
 		} );
 
@@ -70,9 +68,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "setFromArray", ( assert ) => {
+		QUnit.test( "setFromArray", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Box3();
+
+			a.setFromArray( [ 0, 0, 0, 1, 1, 1, 2, 2, 2 ] );
+			assert.ok( a.min.equals( zero3 ), "Passed!" );
+			assert.ok( a.max.equals( two3 ), "Passed!" );
 
 		} );
 
@@ -164,9 +166,19 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "clone", ( assert ) => {
+		QUnit.test( "clone", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+
+			var a = new Box3( zero3.clone(), one3.clone() );
+
+			var b = a.clone();
+			assert.ok( b.min.equals( zero3 ), "Passed!" );
+			assert.ok( b.max.equals( one3 ), "Passed!" );
+
+			a = new Box3();
+			var b = a.clone();
+			assert.ok( b.min.equals( posInf3 ), "Passed!" );
+			assert.ok( b.max.equals( negInf3 ), "Passed!" );
 
 		} );
 
@@ -199,9 +211,20 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "isEmpty", ( assert ) => {
+		QUnit.test( "isEmpty", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Box3( zero3.clone(), zero3.clone() );
+			assert.ok( ! a.isEmpty(), "Passed!" );
+
+			var a = new Box3( zero3.clone(), one3.clone() );
+			assert.ok( ! a.isEmpty(), "Passed!" );
+
+			var a = new Box3( two3.clone(), one3.clone() );
+			assert.ok( a.isEmpty(), "Passed!" );
+
+			var a = new Box3( posInf3.clone(), negInf3.clone() );
+			assert.ok( a.isEmpty(), "Passed!" );
+
 
 		} );
 
@@ -317,6 +340,9 @@ export default QUnit.module( 'Maths', () => {
 			a.expandByObject( smaller );
 			assert.ok( a.min.equals( new Vector3( - 0.25, - 0.25, - 0.25 ) ), "Smaller box: correct new minimum" );
 			assert.ok( a.max.equals( new Vector3( 1, 1, 1 ) ), "Smaller box: correct new maximum" );
+
+			//
+			assert.ok( new Box3().expandByObject( new Mesh() ).isEmpty() === true, "The AABB of a mesh with inital geometry is empty." );
 
 		} );
 
@@ -560,9 +586,32 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "equals", ( assert ) => {
+		QUnit.test( "equals", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Box3();
+			var b = new Box3();
+			assert.ok( b.equals( a ), "Passed!" );
+			assert.ok( a.equals( b ), "Passed!" );
+
+			a = new Box3( one3, two3 );
+			b = new Box3( one3, two3 );
+			assert.ok( b.equals( a ), "Passed!" );
+			assert.ok( a.equals( b ), "Passed!" );
+
+			a = new Box3( one3, two3 );
+			b = a.clone();
+			assert.ok( b.equals( a ), "Passed!" );
+			assert.ok( a.equals( b ), "Passed!" );
+
+			a = new Box3( one3, two3 );
+			b = new Box3( one3, one3 );
+			assert.ok( ! b.equals( a ), "Passed!" );
+			assert.ok( ! a.equals( b ), "Passed!" );
+
+			a = new Box3();
+			b = new Box3( one3, one3 );
+			assert.ok( ! b.equals( a ), "Passed!" );
+			assert.ok( ! a.equals( b ), "Passed!" );
 
 		} );
 

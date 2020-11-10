@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>安装（[name]）</h1>
+
+		<p>
+			你可以使用[link:https://www.npmjs.com/ npm]以及现代构建工具来安装 three.js ，也可以只需静态主机或是 CDN 来快速上手。对于大多数用户来说，从 npm 安装是最佳选择。
+		</p>
+
+		<p>
+			无论你选择哪种方式，请始终保持一致，并注意从相同版本的库中导入所有文件。混合不同来源的文件可能会导致包含重复代码，甚至会以意料之外的方式破坏应用程序，
+		</p>
+
+		<p>
+			所有安装 three.js 的方式都依赖于 ES modules（参见 [link:https://eloquentjavascript.net/10_modules.html#h_hF2FmOVxw7 Eloquent JavaScript: ECMAScript Modules]）。ES modules使你能够在最终项目中包含所需库的一小部分。
+		</p>
+
+		<h2>安装自 npm</h2>
+
+		<p>
+			要安装[link:https://www.npmjs.com/package/three three] 的 npm 模块，请在你的项目文件夹里打开终端窗口，并运行：
+		</p>
+
+		<code>
+		npm install --save three
+		</code>
+
+		<p>
+			包将会被下载并安装。然后你就可以将它导入你的代码了：
+		</p>
+
+		<code>
+		///////////////////////////////////////////////////////
+		// 方式 1: 导入整个 three.js核心库
+		import * as THREE from 'three';
+
+		const scene = new THREE.Scene();
+
+
+		///////////////////////////////////////////////////////
+		// 方式 2: 仅导入你所需要的部分
+		import { Scene } from 'three';
+
+		const scene = new Scene();
+		</code>
+
+		<p>
+			从npm上进行安装的时候，几乎总是使用某种构建工具（[link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC bundling tool]）来将你项目中需要的所有包组合到一个独立的JavaScript软件中。虽然任何现代的 JavaScript 打包器都可以和 three.js 一起使用，但最流行的选择是 [link:https://webpack.js.org/ webpack] 。
+		</p>
+
+		<p>
+			并非所有功能都可以通过 <em>three</em> 模块来直接访问（也称为“裸导入”）。three.js 中其它较为流行的部分 —— 如控制器（control）、加载器（loader）以及后期处理效果（post-processing effect） —— 必须从 [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] 子目录下导入。了解更多信息，请参阅下方的<em>示例</em>。
+		</p>
+
+		<p>
+			你可以从 [link:https://eloquentjavascript.net/20_node.html#h_J6hW/SmL/a Eloquent JavaScript: Installing with npm] 来了解更多有关 npm 模块的信息。
+		</p>
+
+		<h2>从CDN或静态主机安装</h2>
+
+		<p>
+			通过将文件上传到你自己的服务器，或是使用一个已存在的CDN，three.js 便可以不借助任何构建系统来进行使用。由于 three.js 依赖于ES module，因此任何引用它的script标签必须使用<em>type="module"</em>。如下所示：
+		</p>
+
+		<code>
+		&lt;script type="module">
+
+		  // 通过访问 https://unpkg.com/three 来查找最新版本。 
+		  // 该URL将会重定向到最新的稳定版本。
+		  import * as THREE from 'https://unpkg.com/three@&lt;VERSION>/build/three.module.js';
+
+		  const scene = new THREE.Scene();
+
+		&lt;/script>
+		</code>
+
+		<p>
+			并非所有功能都可以通过 <em>build/three.module.js</em> 模块来直接访问。three.js 中其它较为流行的部分 —— 如控制器（control）、加载器（loader）以及后期处理效果（post-processing effect） —— 必须从 [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] 子目录下导入。了解更多信息，请参阅下方的<em>示例</em>。
+		</p>
+
+
+		<h2>示例</h2>
+
+		<p>
+			three.js的核心专注于3D引擎最重要的组件。其它很多有用的组件 —— 如控制器（control）、加载器（loader）以及后期处理效果（post-processing effect） —— 是 [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] 目录的一部分。它们被称为“示例”，虽然你可以直接将它们拿来使用，但它们也需要重新混合以及定制。这些组件和 three.js 的核心保持同步，而 npm 上类似的第三方包则由不同的作者进行维护，可能不是最新的。
+		</p>
+
+		<p>
+			示例无需被单独地<em>安装</em>，但需要被单独地<em>导入</em>。如果 three.js 是使用 npm 来安装的，你可以使用如下代码来加载轨道控制器（[page:OrbitControls]）：
+		</p>
+
+
+		<code>
+		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+		const controls = new OrbitControls();
+		</code>
+
+		<p>
+			如果 three.js 安装自一个 CDN ，请使用相同的 CDN 来安装其他组件：
+		</p>
+
+		<code>
+		&lt;script type="module">
+
+		  // 通过访问 https://unpkg.com/three 来查找最新版本。 
+		  // 该URL将会重定向到最新的稳定版本。
+		  import { OrbitControls } from 'https://unpkg.com/three@&lt;VERSION>/examples/jsm/controls/OrbitControls.js';
+
+		  const controls = new OrbitControls();
+
+		&lt;/script>
+		</code>
+
+		<p>
+			所有文件使用相同版本是十分重要的。请勿从不同版本导入不同的示例，也不要使用与 three.js 本身版本不一致的示例。
+		</p>
+
+		<h2>兼容性</h2>
+
+		<h3>CommonJS 导入</h3>
+
+		<p>
+			虽然现代的 JavaScript 打包器已经默认支持ES module，然而也有一些较旧的构建工具并不支持。对于这些情况，你或许可以对这些打包器进行配置，让它们能够理解 ES module 。例如，[link:http://browserify.org/ Browserify] 仅需 [link:https://github.com/babel/babelify babelify] 插件。
+		</p>
+
+		<h3>Import maps</h3>
+
+		<p>
+			和从静态主机或CDN来进行安装的方式相比，从npm安装时，导入的路径有所不同。我们意识到，对于使用两种不同方式的用户群体来说，这是一个人体工程学问题。使用构建工具与打包器的开发者更喜欢仅使用单独的包说明符（如'three'）而非相对路径，而<em>examples/</em>目录中的文件使用相对于 <em>three.module.js</em> 的引用并不符合这一期望。对于不使用构建工具的人（用于快速原型、学习或个人参考）来说，或许也会很反感这些相对导入。这些相对导入需要确定目录结构，并且比全局 <em>THREE.*</em> 命名空间更不宽容。
+		</p>
+
+		<p>
+			我们希望在 [link:https://github.com/WICG/import-maps import maps] 广泛可用时，能够移除这些相对路径，将它们替换为单独的包说明符，'three'。这更加符合构建工具对npm包的期望，且使得两种用户群体在导入文件时能够编写完全相同的代码。对于更偏向于避免使用构建工具的用户来说，一个简单的 JSON 映射即可将所有的导入都定向到一个 CDN 或是静态文件夹。通过实验，目前你可以通过一个 import map 的 polyfill，来尝试更简洁的导入，如 [link:https://glitch.com/edit/#!/three-import-map?path=index.html import map example] 示例中所示。
+		</p>
+
+		<h3>Node.js</h3>
+
+		<p>
+			在 [link:https://eloquentjavascript.net/20_node.html Node.js] 下使用 three.js 较为困难，原因有2条：
+		</p>
+
+		<p>
+			首先， three.js 是为 web 而构建的，其依赖于浏览器，以及并不总是存在于 Node.js 中的 DOM API。其中的一些问题可使用类似 [link:https://github.com/stackgl/headless-gl headless-gl] 的 shim ，或使用定制的替代品来替换掉一些组件（例如 [page:TextureLoader] ）来进行解决。其他的 DOM API 或许和使用它们的代码紧密相连在一起，并且很难解决。我们欢迎简单且可维护的 pull request，以改善对 Node.js 的支持。但建议您首先提出一个 issue 来讨论您的改进。
+		</p>
+
+		<p>
+			第二，Node.js 对于 ES module 的支持可以说……很复杂。在 Node.js v12 中， three.js 的核心库可使用 <em>require('three')</em> 来作为 CommonJS module 进行导入。然而，大多数在 <em>examples/jsm</em> 中的示例组件并不能够这样。未来版本的 Node.js 或许可以解决这个问题，但同时你可能需要一些类似 [link:https://github.com/standard-things/esm esm] 的解决方案，来使得你的 Node.js 应用程序识别 ES module。
+		</p>
+
+	</body>
+</html>

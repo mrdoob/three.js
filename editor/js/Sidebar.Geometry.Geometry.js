@@ -1,31 +1,29 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UIRow, UIText } from './libs/ui.js';
 
-Sidebar.Geometry.Geometry = function ( editor ) {
+function SidebarGeometryGeometry( editor ) {
 
 	var strings = editor.strings;
 
 	var signals = editor.signals;
 
-	var container = new UI.Row();
+	var container = new UIRow();
 
 	// vertices
 
-	var verticesRow = new UI.Row();
-	var vertices = new UI.Text();
+	var verticesRow = new UIRow();
+	var vertices = new UIText();
 
-	verticesRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/geometry/vertices' ) ).setWidth( '90px' ) );
+	verticesRow.add( new UIText( strings.getKey( 'sidebar/geometry/geometry/vertices' ) ).setWidth( '90px' ) );
 	verticesRow.add( vertices );
 
 	container.add( verticesRow );
 
 	// faces
 
-	var facesRow = new UI.Row();
-	var faces = new UI.Text();
+	var facesRow = new UIRow();
+	var faces = new UIText();
 
-	facesRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/geometry/faces' ) ).setWidth( '90px' ) );
+	facesRow.add( new UIText( strings.getKey( 'sidebar/geometry/geometry/faces' ) ).setWidth( '90px' ) );
 	facesRow.add( faces );
 
 	container.add( facesRow );
@@ -59,4 +57,6 @@ Sidebar.Geometry.Geometry = function ( editor ) {
 
 	return container;
 
-};
+}
+
+export { SidebarGeometryGeometry };

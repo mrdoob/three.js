@@ -1,6 +1,4 @@
-/*
- * @author yomboprime / https://github.com/yomboprime/
- *
+/**
  * LDraw object packer
  *
  * Usage:
@@ -26,8 +24,10 @@ var fs = require( 'fs' );
 var path = require( 'path' );
 
 if ( process.argv.length !== 3 ) {
+
 	console.log( "Usage: node packLDrawModel <modelFilePath>" );
-	exit ( 0 );
+	exit( 0 );
+
 }
 var fileName = process.argv[ 2 ];
 
@@ -61,14 +61,18 @@ for ( var i = 0; i < listOfNotFound.length; i ++ ) {
 }
 
 if ( someNotFound ) {
+
 	console.log( "Some files were not found, aborting." );
-	process.exit( -1 );
+	process.exit( - 1 );
+
 }
 
 // Obtain packed content
 var packedContent = materialsContent + "\n";
 for ( var i = objectsPaths.length - 1; i >= 0; i -- ) {
+
 	packedContent += objectsContents[ i ];
+
 }
 packedContent += "\n";
 
@@ -92,7 +96,7 @@ function parseObject( fileName, isRoot ) {
 
 	var prefix = "";
 	var objectContent = null;
-	for ( var attempt =  0; attempt < 2; attempt ++ ) {
+	for ( var attempt = 0; attempt < 2; attempt ++ ) {
 
 		prefix = "";
 
@@ -106,8 +110,7 @@ function parseObject( fileName, isRoot ) {
 
 			prefix = "p/";
 
-		}
-		else if ( fileName.startsWith( 's/' ) ) {
+		} else if ( fileName.startsWith( 's/' ) ) {
 
 			prefix = "parts/";
 
@@ -120,8 +123,7 @@ function parseObject( fileName, isRoot ) {
 			objectContent = fs.readFileSync( absoluteObjectPath, { encoding: "utf8" } );
 			break;
 
-		}
-		catch ( e ) {
+		} catch ( e ) {
 
 			prefix = "parts/";
 			absoluteObjectPath = path.join( ldrawPath, prefix, fileName );
@@ -131,8 +133,7 @@ function parseObject( fileName, isRoot ) {
 				objectContent = fs.readFileSync( absoluteObjectPath, { encoding: "utf8" } );
 				break;
 
-			}
-			catch ( e ) {
+			} catch ( e ) {
 
 				prefix = "p/";
 				absoluteObjectPath = path.join( ldrawPath, prefix, fileName );
@@ -142,8 +143,7 @@ function parseObject( fileName, isRoot ) {
 					objectContent = fs.readFileSync( absoluteObjectPath, { encoding: "utf8" } );
 					break;
 
-				}
-				catch ( e ) {
+				} catch ( e ) {
 
 					try {
 
@@ -153,8 +153,8 @@ function parseObject( fileName, isRoot ) {
 						objectContent = fs.readFileSync( absoluteObjectPath, { encoding: "utf8" } );
 						break;
 
-					}
-					catch ( e ) {
+					} catch ( e ) {
+
 						if ( attempt === 1 ) {
 
 							// The file has not been found, add to list of not found
@@ -184,7 +184,7 @@ function parseObject( fileName, isRoot ) {
 	if ( objectContent.indexOf( '\r\n' ) !== - 1 ) {
 
 		// This is faster than String.split with regex that splits on both
-		objectContent= objectContent.replace( /\r\n/g, '\n' );
+		objectContent = objectContent.replace( /\r\n/g, '\n' );
 
 	}
 
@@ -201,7 +201,7 @@ function parseObject( fileName, isRoot ) {
 		var charIndex = 0;
 		while ( ( line.charAt( charIndex ) === ' ' || line.charAt( charIndex ) === '\t' ) && charIndex < lineLength ) {
 
-			charIndex++;
+			charIndex ++;
 
 		}
 		line = line.substring( charIndex );
@@ -209,7 +209,7 @@ function parseObject( fileName, isRoot ) {
 		charIndex = 0;
 
 
-		if ( line.startsWith( '0 FILE ') ) {
+		if ( line.startsWith( '0 FILE ' ) ) {
 
 			if ( i === 0 ) {
 
@@ -220,7 +220,7 @@ function parseObject( fileName, isRoot ) {
 
 			// Embedded object was found, add to path map
 
-			var subobjectFileName = line.substring( charIndex ).trim().replace( "\\", "/" );
+			var subobjectFileName = line.substring( charIndex ).trim().replace( /\\/g, '/' );
 
 			if ( subobjectFileName ) {
 
@@ -238,6 +238,7 @@ function parseObject( fileName, isRoot ) {
 		}
 
 		if ( line.startsWith( '1 ' ) ) {
+
 			// Subobject, add it
 			charIndex = 2;
 
@@ -247,20 +248,20 @@ function parseObject( fileName, isRoot ) {
 				// Skip token
 				while ( line.charAt( charIndex ) !== ' ' && line.charAt( charIndex ) !== '\t' && charIndex < lineLength ) {
 
-					charIndex++;
+					charIndex ++;
 
 				}
 
 				// Skip spaces/tabs
 				while ( ( line.charAt( charIndex ) === ' ' || line.charAt( charIndex ) === '\t' ) && charIndex < lineLength ) {
 
-					charIndex++;
+					charIndex ++;
 
 				}
 
 			}
 
-			var subobjectFileName = line.substring( charIndex ).trim().replace( "\\", "/" );
+			var subobjectFileName = line.substring( charIndex ).trim().replace( /\\/g, '/' );
 
 			if ( subobjectFileName ) {
 
@@ -280,8 +281,7 @@ function parseObject( fileName, isRoot ) {
 
 			}
 
-		}
-		else {
+		} else {
 
 			processedObjectContent += line + "\n";
 
@@ -297,4 +297,5 @@ function parseObject( fileName, isRoot ) {
 	}
 
 	return objectPath;
+
 }

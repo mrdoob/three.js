@@ -1,5 +1,27 @@
-import { ShaderMaterialParameters, ShaderMaterial } from './ShaderMaterial';
+import { Color } from './../math/Color';
+import { MaterialParameters, Material } from './Material';
 
-export class ShadowMaterial extends ShaderMaterial {
-  constructor(parameters?: ShaderMaterialParameters);
+export interface ShadowMaterialParameters extends MaterialParameters {
+	color?: Color | string | number;
+}
+
+export class ShadowMaterial extends Material {
+
+	constructor( parameters?: ShadowMaterialParameters );
+
+	/**
+	 * @default 'ShadowMaterial'
+	 */
+	type: string;
+
+	/**
+	 * @default new THREE.Color( 0x000000 )
+	 */
+	color: Color;
+
+	/**
+	 * @default true
+	 */
+	transparent: boolean;
+
 }
