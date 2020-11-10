@@ -22,8 +22,9 @@ export class InstancedMesh <
 	instanceMatrix: BufferAttribute;
 	readonly isInstancedMesh: true;
 
+	getColorAt( index: number, color: Color ): void;
 	getMatrixAt( index: number, matrix: Matrix4 ): void;
-	setMatrixAt( index: number, matrix: Matrix4 ): void;
 	setColorAt( index: number, color: Color ): void;
+	setMatrixAt( index: number, matrix: Matrix4 ): void;
 
 }
