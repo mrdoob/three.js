@@ -422,7 +422,7 @@
 				gui.add( effectController, "count", 0, BIRDS, 1 ).onChange( valuesChanger );
 				gui.close();
 
-				initBirds();
+				initBirds(effectController);
 
 			}
 
@@ -483,7 +483,7 @@
 
 			}
 
-			function initBirds() {
+			function initBirds(effectController) {
 
 				const geometry = BirdGeometry;
 
@@ -500,7 +500,7 @@
 					shader.uniforms.textureVelocity = { value: null };
 					shader.uniforms.textureAnimation = { value: textureAnimation };
 					shader.uniforms.time = { value: 1.0 };
-					shader.uniforms.size = { value: 0.1 };
+					shader.uniforms.size = { value: effectController.size };
 					shader.uniforms.delta = { value: 0.0 };
 
 					let token = '#define STANDARD';
