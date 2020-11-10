@@ -8,7 +8,7 @@ import {
  * Break faces with edges longer than maxEdgeLength
  */
 
-var TessellateModifier = function ( maxEdgeLength = 0.1, maxIterations = 6, maxFaces = 1000000 ) {
+var TessellateModifier = function ( maxEdgeLength = 0.1, maxIterations = 6, maxFaces = Infinity ) {
 
 	this.maxEdgeLength = maxEdgeLength;
 	this.maxIterations = maxIterations;

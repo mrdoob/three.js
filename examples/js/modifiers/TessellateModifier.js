@@ -2,7 +2,7 @@
  * Break faces with edges longer than maxEdgeLength
  */
 
-THREE.TessellateModifier = function ( maxEdgeLength = 0.1, maxIterations = 6, maxFaces = 1000000 ) {
+THREE.TessellateModifier = function ( maxEdgeLength = 0.1, maxIterations = 6, maxFaces = Infinity ) {
 
 	this.maxEdgeLength = maxEdgeLength;
 	this.maxIterations = maxIterations;
@@ -263,7 +263,7 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 
 	if ( isBufferGeometry ) {
 
-		return new THREE.BufferGeometry().fromGeometry(geometry);
+		return new THREE.BufferGeometry().fromGeometry( geometry );
 
 	} else {
 
