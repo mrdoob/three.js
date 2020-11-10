@@ -70,6 +70,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 	this.needsUpdate = false;
 
 	this.type = PCFShadowMap;
+	this.dither = false;
 
 	this.render = function ( lights, scene, camera ) {
 
@@ -226,9 +227,10 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	}
 
-	function getDepthMaterialVariant( useMorphing, useSkinning, useInstancing ) {
+	function getDepthMaterialVariant( useMorphing, useSkinning, useInstancing, opacity ) {
 
-		const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
+		const opacityFlag = 0b111111 & opacity * 63;
+		const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2 | opacityFlag << 3;
 
 		let material = _depthMaterials[ index ];
 
@@ -239,9 +241,11 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 				depthPacking: RGBADepthPacking,
 
 				morphTargets: useMorphing,
-				skinning: useSkinning
+				skinning: useSkinning,
+				opacity: opacity,
 
 			} );
+			material.ditherTransparency = opacity < 1;
 
 			_depthMaterials[ index ] = material;
 
@@ -251,9 +255,10 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	}
 
-	function getDistanceMaterialVariant( useMorphing, useSkinning, useInstancing ) {
+	function getDistanceMaterialVariant( useMorphing, useSkinning, useInstancing, opacity ) {
 
-		const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
+		const opacityFlag = 0b111111 & opacity * 63;
+		const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2 | opacityFlag << 3;
 
 		let material = _distanceMaterials[ index ];
 
@@ -262,9 +267,11 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 			material = new MeshDistanceMaterial( {
 
 				morphTargets: useMorphing,
-				skinning: useSkinning
+				skinning: useSkinning,
+				opacity: opacity,
 
 			} );
+			material.ditherTransparency = opacity < 1;
 
 			_distanceMaterials[ index ] = material;
 
@@ -315,8 +322,9 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 			}
 
 			const useInstancing = object.isInstancedMesh === true;
+			const opacity = this.dither ? object.opacity : 1;
 
-			result = getMaterialVariant( useMorphing, useSkinning, useInstancing );
+			result = getMaterialVariant( useMorphing, useSkinning, useInstancing, opacity );
 
 		} else {
 
