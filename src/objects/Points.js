@@ -11,37 +11,33 @@ const _ray = new Ray();
 const _sphere = new Sphere();
 const _position = new Vector3();
 
-function Points( geometry, material ) {
+class Points extends Object3D {
 
-	Object3D.call( this );
+	constructor( geometry, material ) {
 
-	this.type = 'Points';
+		super();
+		Object.defineProperty( this, "isPoints", { value: true } );
+		this.type = 'Points';
 
-	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new PointsMaterial();
+		this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
+		this.material = material !== undefined ? material : new PointsMaterial();
 
-	this.updateMorphTargets();
+		this.updateMorphTargets();
 
-}
+	}
 
-Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
+	copy( source ) {
 
-	constructor: Points,
-
-	isPoints: true,
-
-	copy: function ( source ) {
-
-		Object3D.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.material = source.material;
 		this.geometry = source.geometry;
 
 		return this;
 
-	},
+	}
 
-	raycast: function ( raycaster, intersects ) {
+	raycast( raycaster, intersects ) {
 
 		const geometry = this.geometry;
 		const matrixWorld = this.matrixWorld;
@@ -109,9 +105,9 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-	},
+	}
 
-	updateMorphTargets: function () {
+	updateMorphTargets() {
 
 		const geometry = this.geometry;
 
@@ -156,7 +152,8 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
+
 
 function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, intersects, object ) {
 
