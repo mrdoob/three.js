@@ -26,45 +26,42 @@ const _uvA = new Vector2();
 const _uvB = new Vector2();
 const _uvC = new Vector2();
 
-function Sprite( material ) {
+class Sprite extends Object3D {
 
-	Object3D.call( this );
+	constructor( material ) {
 
-	this.type = 'Sprite';
+		super();
 
-	if ( _geometry === undefined ) {
+		Object.defineProperty( this, "isSprite", { value: true } );
+		this.type = 'Sprite';
 
-		_geometry = new BufferGeometry();
+		if ( _geometry === undefined ) {
 
-		const float32Array = new Float32Array( [
-			- 0.5, - 0.5, 0, 0, 0,
-			0.5, - 0.5, 0, 1, 0,
-			0.5, 0.5, 0, 1, 1,
-			- 0.5, 0.5, 0, 0, 1
-		] );
+			_geometry = new BufferGeometry();
 
-		const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
+			const float32Array = new Float32Array( [
+				- 0.5, - 0.5, 0, 0, 0,
+				0.5, - 0.5, 0, 1, 0,
+				0.5, 0.5, 0, 1, 1,
+				- 0.5, 0.5, 0, 0, 1
+			] );
 
-		_geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-		_geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-		_geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+			const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
+
+			_geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
+			_geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+			_geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+
+		}
+
+		this.geometry = _geometry;
+		this.material = ( material !== undefined ) ? material : new SpriteMaterial();
+
+		this.center = new Vector2( 0.5, 0.5 );
 
 	}
 
-	this.geometry = _geometry;
-	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
-
-	this.center = new Vector2( 0.5, 0.5 );
-
-}
-
-Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
-
-	constructor: Sprite,
-
-	isSprite: true,
-
-	raycast: function ( raycaster, intersects ) {
+	raycast( raycaster, intersects ) {
 
 		if ( raycaster.camera === null ) {
 
@@ -137,11 +134,11 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		} );
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
-		Object3D.prototype.copy.call( this, source );
+		super.copy( source );
 
 		if ( source.center !== undefined ) this.center.copy( source.center );
 
@@ -151,7 +148,7 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
 
 function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) {
 
