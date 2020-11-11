@@ -162,6 +162,12 @@ THREE.EdgeSplitModifier = function () {
 
 		if ( geometry.index == null ) {
 
+			if ( THREE.BufferGeometryUtils === undefined ) {
+
+			 	throw 'THREE.EdgeSplitModifier relies on THREE.BufferGeometryUtils';
+
+			}
+
 			geometry = THREE.BufferGeometryUtils.mergeVertices( geometry );
 
 		}
