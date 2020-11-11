@@ -386,7 +386,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						var numbers = parseFloats( data );
 
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
-							
+
 							// skip command if start point == end point
 							if ( numbers[ j + 5 ] == point.x && numbers[ j + 6 ] == point.y ) continue;
 
@@ -667,9 +667,11 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		function parseArcCommand( path, rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, start, end ) {
 
 			if ( rx == 0 || ry == 0 ) {
+
 				// draw a line if either of the radii == 0
 				path.lineTo( end.x, end.y );
 				return;
+
 			}
 
 			x_axis_rotation = x_axis_rotation * Math.PI / 180;
