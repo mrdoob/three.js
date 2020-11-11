@@ -300,9 +300,7 @@ class Color {
 
 	}
 
-	copyGammaToLinear( color, gammaFactor ) {
-
-		if ( gammaFactor === undefined ) gammaFactor = 2.0;
+	copyGammaToLinear( color, gammaFactor = 2.0 ) {
 
 		this.r = Math.pow( color.r, gammaFactor );
 		this.g = Math.pow( color.g, gammaFactor );
@@ -312,9 +310,7 @@ class Color {
 
 	}
 
-	copyLinearToGamma( color, gammaFactor ) {
-
-		if ( gammaFactor === undefined ) gammaFactor = 2.0;
+	copyLinearToGamma( color, gammaFactor = 2.0 ) {
 
 		const safeInverse = ( gammaFactor > 0 ) ? ( 1.0 / gammaFactor ) : 1.0;
 

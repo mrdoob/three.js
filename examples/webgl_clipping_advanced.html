@@ -376,7 +376,7 @@
 
 				const parent = object.parent;
 				scene.updateMatrixWorld();
-				object.matrix.getInverse( parent.matrixWorld );
+				object.matrix.copy( parent.matrixWorld ).invert();
 				object.applyMatrix4( matrix );
 
 			}
