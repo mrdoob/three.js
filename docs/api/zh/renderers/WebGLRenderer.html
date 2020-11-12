@@ -170,9 +170,13 @@
 			</li>
 		</ul>
 		</p>
-		<p>默认情况下，每次调用渲染时这些数据都会重置。 但当时用一个或多个镜像时，最好使用自定义模式重置它们：
+		<p>By default these data are reset at each render call but when having multiple render passes per frame (e.g. when using post processing) it can be preferred to reset with a custom pattern.
+			First, set *autoReset* to *false*.
 		<code>
 		renderer.info.autoReset = false;
+		</code>
+		Call *reset()* whenever you have finished to render a single frame.
+		<code>
 		renderer.info.reset();
 		</code>
 		</p>
