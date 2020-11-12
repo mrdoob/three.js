@@ -314,7 +314,8 @@
 			// Custom Geometry - using 3 triangles each. No UVs, no normals currently.
 			function BirdGeometry() {
 
-				const triangles = BIRDS * 3;
+				const trianglesPerBird = 3;
+				const triangles = BIRDS * trianglesPerBird;
 				const points = triangles * 3;
 
 				THREE.BufferGeometry.call( this );
@@ -355,14 +356,14 @@
 						0, 0, 30
 					);
 
-					// Left Wing
+					// Right Wing
 					verts_push(
 						0, 0, - 15,
 						- wingsSpan, 0, 0,
 						0, 0, 15
 					);
 
-					// Right Wing
+					// Left Wing
 					verts_push(
 						0, 0, 15,
 						wingsSpan, 0, 0,
@@ -373,9 +374,10 @@
 
 				for ( let v = 0; v < triangles * 3; v ++ ) {
 
-					const i = ~ ~ ( v / 3 );
-					const x = ( i % WIDTH ) / WIDTH;
-					const y = ~ ~ ( i / WIDTH ) / WIDTH;
+					const triangleIndex = ~ ~ ( v / 3 );
+					const birdIndex = ~ ~ ( triangleIndex / trianglesPerBird )
+					const x = ( birdIndex % WIDTH ) / WIDTH;
+					const y = ~ ~ ( birdIndex / WIDTH ) / WIDTH;
 
 					const c = new THREE.Color(
 						0x444444 +
