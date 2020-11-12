@@ -1,4 +1,3 @@
-console.warn( "THREE.PRWMLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * See https://github.com/kchapelier/PRWM for more informations about this file format
  */
@@ -240,6 +239,7 @@ THREE.PRWMLoader = ( function () {
 			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
 			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 
 			url = url.replace( /\*/g, isBigEndianPlatform() ? 'be' : 'le' );
 

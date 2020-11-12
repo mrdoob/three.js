@@ -93,7 +93,7 @@ export class BufferGeometry extends EventDispatcher {
 	readonly isBufferGeometry: true;
 
 	getIndex(): BufferAttribute | null;
-	setIndex( index: BufferAttribute | number[] | null ): void;
+	setIndex( index: BufferAttribute | number[] | null ): BufferGeometry;
 
 	setAttribute( name: string, attribute: BufferAttribute | InterleavedBufferAttribute ): BufferGeometry;
 	getAttribute( name: string ): BufferAttribute | InterleavedBufferAttribute;

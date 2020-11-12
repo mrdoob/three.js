@@ -1,5 +1,3 @@
-console.warn( "THREE.FlyControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.FlyControls = function ( object, domElement ) {
 
 	if ( domElement === undefined ) {
@@ -199,9 +197,6 @@ THREE.FlyControls = function ( object, domElement ) {
 
 			scope.tmpQuaternion.set( scope.rotationVector.x * rotMult, scope.rotationVector.y * rotMult, scope.rotationVector.z * rotMult, 1 ).normalize();
 			scope.object.quaternion.multiply( scope.tmpQuaternion );
-
-			// expose the rotation vector for convenience
-			scope.object.rotation.setFromQuaternion( scope.object.quaternion, scope.object.rotation.order );
 
 			if (
 				lastPosition.distanceToSquared( scope.object.position ) > EPS ||

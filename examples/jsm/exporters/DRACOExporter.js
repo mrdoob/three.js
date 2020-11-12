@@ -1,6 +1,7 @@
 import {
 	BufferGeometry
 } from "../../../build/three.module.js";
+
 /**
  * Export draco compressed files from threejs geometry objects.
  *

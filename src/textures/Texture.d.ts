@@ -11,9 +11,6 @@ import {
 	TextureEncoding
 } from '../constants';
 
-// Textures /////////////////////////////////////////////////////////////////////
-export let TextureIdCount: number;
-
 export class Texture extends EventDispatcher {
 
 	/**

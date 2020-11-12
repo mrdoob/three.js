@@ -53,4 +53,6 @@ export class CompressedTexture extends Texture {
 	 */
 	generateMipmaps: boolean;
 
+	readonly isCompressedTexture: true;
+
 }

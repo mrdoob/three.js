@@ -1,4 +1,3 @@
-
 /**
  * Based on Nvidia Cg tutorial
  */

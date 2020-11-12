@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,9 +20,9 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-		var mesh = new THREE.Mesh( geometry, material );
+		const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 		</code>
 

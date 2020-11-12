@@ -112,7 +112,7 @@ void main() {
 
 	// this is a stub for the transmission model
 	#ifdef TRANSMISSION
-		diffuseColor.a *= saturate( 1. - totalTransmission + linearToRelativeLuminance( reflectedLight.directSpecular + reflectedLight.indirectSpecular ) );
+		diffuseColor.a *= mix( saturate( 1. - totalTransmission + linearToRelativeLuminance( reflectedLight.directSpecular + reflectedLight.indirectSpecular ) ), 1.0, metalness );
 	#endif
 
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );

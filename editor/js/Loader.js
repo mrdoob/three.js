@@ -52,6 +52,8 @@ function Loader( editor ) {
 			var manager = new THREE.LoadingManager();
 			manager.setURLModifier( function ( url ) {
 
+				url = url.replace( /^(\.?\/)/, '' ); // remove './'
+
 				var file = filesMap[ url ];
 
 				if ( file ) {
@@ -167,7 +169,7 @@ function Loader( editor ) {
 
 					collada.scene.name = filename;
 
-					editor.addAnimation( collada.scene, collada.animations );
+					editor.addAnimations( collada.scene, collada.animations );
 					editor.execute( new AddObjectCommand( editor, collada.scene ) );
 
 				}, false );
@@ -208,7 +210,7 @@ function Loader( editor ) {
 					var loader = new FBXLoader( manager );
 					var object = loader.parse( contents );
 
-					editor.addAnimation( object, object.animations );
+					editor.addAnimations( object, object.animations );
 					editor.execute( new AddObjectCommand( editor, object ) );
 
 				}, false );
@@ -232,7 +234,7 @@ function Loader( editor ) {
 						var scene = result.scene;
 						scene.name = filename;
 
-						editor.addAnimation( scene, result.animations );
+						editor.addAnimations( scene, result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
@@ -269,7 +271,7 @@ function Loader( editor ) {
 						var scene = result.scene;
 						scene.name = filename;
 
-						editor.addAnimation( scene, result.animations );
+						editor.addAnimations( scene, result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
@@ -368,7 +370,7 @@ function Loader( editor ) {
 					mesh.mixer = new THREE.AnimationMixer( mesh );
 					mesh.name = filename;
 
-					editor.addAnimation( mesh, geometry.animations );
+					editor.addAnimations( mesh, geometry.animations );
 					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
@@ -509,7 +511,7 @@ function Loader( editor ) {
 					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
-				reader.readAsText( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 
@@ -680,7 +682,7 @@ function Loader( editor ) {
 
 						var scene = result.scene;
 
-						editor.addAnimation( scene, result.animations );
+						editor.addAnimations( scene, result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
@@ -698,7 +700,7 @@ function Loader( editor ) {
 
 						var scene = result.scene;
 
-						editor.addAnimation( scene, result.animations );
+						editor.addAnimations( scene, result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );

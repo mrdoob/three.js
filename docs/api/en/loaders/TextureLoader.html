@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -20,17 +19,17 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var texture = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
+		const texture = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
 
 		// immediately use the texture for material creation
-		var material = new THREE.MeshBasicMaterial( { map: texture } );
+		const material = new THREE.MeshBasicMaterial( { map: texture } );
 		</code>
 
 		<h2>Code Example with Callbacks</h2>
 
 		<code>
 		// instantiate a loader
-		var loader = new THREE.TextureLoader();
+		const loader = new THREE.TextureLoader();
 
 		// load a resource
 		loader.load(
@@ -40,7 +39,7 @@
 			// onLoad callback
 			function ( texture ) {
 				// in this example we create the material when the texture is loaded
-				var material = new THREE.MeshBasicMaterial( {
+				const material = new THREE.MeshBasicMaterial( {
 					map: texture
 				 } );
 			},

@@ -87,9 +87,7 @@ class Audio extends Object3D {
 
 	}
 
-	play( delay ) {
-
-		if ( delay === undefined ) delay = 0;
+	play( delay = 0 ) {
 
 		if ( this.isPlaying === true ) {
 
@@ -244,12 +242,12 @@ class Audio extends Object3D {
 		if ( this._connected === true ) {
 
 			this.disconnect();
-			this.filters = value;
+			this.filters = value.slice();
 			this.connect();
 
 		} else {
 
-			this.filters = value;
+			this.filters = value.slice();
 
 		}
 

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -26,7 +25,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -39,11 +38,11 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var loader = new THREE.FontLoader();
+		const loader = new THREE.FontLoader();
 
 		loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
-			var geometry = new THREE.TextBufferGeometry( 'Hello three.js!', {
+			const geometry = new THREE.TextBufferGeometry( 'Hello three.js!', {
 				font: font,
 				size: 80,
 				height: 5,
@@ -171,7 +170,7 @@
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/TextGeometry.js src/geometries/TextGeometry.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 		</p>
 	</body>
 </html>

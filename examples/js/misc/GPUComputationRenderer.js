@@ -1,4 +1,3 @@
-console.warn( "THREE.GPUComputationRenderer: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * GPUComputationRenderer, based on SimulationRenderer by zz85
  *
@@ -156,16 +155,15 @@ THREE.GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.init = function () {
 
-		if ( ! renderer.capabilities.isWebGL2 &&
-			 ! renderer.extensions.get( "OES_texture_float" ) ) {
+		if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'OES_texture_float' ) === false ) {
 
-			return "No OES_texture_float support for float textures.";
+			return 'No OES_texture_float support for float textures.';
 
 		}
 
 		if ( renderer.capabilities.maxVertexTextures === 0 ) {
 
-			return "No support for vertex shader textures.";
+			return 'No support for vertex shader textures.';
 
 		}
 

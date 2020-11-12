@@ -30,6 +30,9 @@ import { LineLoop } from '../objects/LineLoop.js';
 import { LineSegments } from '../objects/LineSegments.js';
 import { LOD } from '../objects/LOD.js';
 import { Mesh } from '../objects/Mesh.js';
+import { SkinnedMesh } from '../objects/SkinnedMesh.js';
+import { Bone } from '../objects/Bone.js';
+import { Skeleton } from '../objects/Skeleton.js';
 import { Shape } from '../extras/core/Shape.js';
 import { Fog } from '../scenes/Fog.js';
 import { FogExp2 } from '../scenes/FogExp2.js';
@@ -56,26 +59,25 @@ import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
 import * as Curves from '../extras/curves/Curves.js';
 
-function ObjectLoader( manager ) {
+class ObjectLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: ObjectLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
 
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 		this.resourcePath = this.resourcePath || path;
 
-		const loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
 			let json = null;
@@ -107,11 +109,11 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( json, onLoad ) {
+	parse( json, onLoad ) {
 
-		const shapes = this.parseShape( json.shapes );
+		const shapes = this.parseShapes( json.shapes );
 		const geometries = this.parseGeometries( json.geometries, shapes );
 
 		const images = this.parseImages( json.images, function () {
@@ -124,6 +126,9 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		const materials = this.parseMaterials( json.materials, textures );
 
 		const object = this.parseObject( json.object, geometries, materials );
+		const skeletons = this.parseSkeletons( json.skeletons, object );
+
+		this.bindSkeletons( object, skeletons );
 
 		if ( json.animations ) {
 
@@ -139,9 +144,9 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return object;
 
-	},
+	}
 
-	parseShape: function ( json ) {
+	parseShapes( json ) {
 
 		const shapes = {};
 
@@ -159,9 +164,40 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return shapes;
 
-	},
+	}
 
-	parseGeometries: function ( json, shapes ) {
+	parseSkeletons( json, object ) {
+
+		const skeletons = {};
+		const bones = {};
+
+		// generate bone lookup table
+
+		object.traverse( function ( child ) {
+
+			if ( child.isBone ) bones[ child.uuid ] = child;
+
+		} );
+
+		// create skeletons
+
+		if ( json !== undefined ) {
+
+			for ( let i = 0, l = json.length; i < l; i ++ ) {
+
+				const skeleton = new Skeleton().fromJSON( json[ i ], bones );
+
+				skeletons[ skeleton.uuid ] = skeleton;
+
+			}
+
+		}
+
+		return skeletons;
+
+	}
+
+	parseGeometries( json, shapes ) {
 
 		const geometries = {};
 		let geometryShapes;
@@ -441,9 +477,9 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return geometries;
 
-	},
+	}
 
-	parseMaterials: function ( json, textures ) {
+	parseMaterials( json, textures ) {
 
 		const cache = {}; // MultiMaterial
 		const materials = {};
@@ -497,9 +533,9 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return materials;
 
-	},
+	}
 
-	parseAnimations: function ( json ) {
+	parseAnimations( json ) {
 
 		const animations = [];
 
@@ -517,9 +553,9 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return animations;
 
-	},
+	}
 
-	parseImages: function ( json, onLoad ) {
+	parseImages( json, onLoad ) {
 
 		const scope = this;
 		const images = {};
@@ -587,9 +623,9 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return images;
 
-	},
+	}
 
-	parseTextures: function ( json, images ) {
+	parseTextures( json, images ) {
 
 		function parseConstant( value, type ) {
 
@@ -674,9 +710,9 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return textures;
 
-	},
+	}
 
-	parseObject: function ( data, geometries, materials ) {
+	parseObject( data, geometries, materials ) {
 
 		let object;
 
@@ -827,7 +863,16 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			case 'SkinnedMesh':
 
-				console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.' );
+				geometry = getGeometry( data.geometry );
+			 	material = getMaterial( data.material );
+
+				object = new SkinnedMesh( geometry, material );
+
+				if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
+				if ( data.bindMatrix !== undefined ) object.bindMatrix.fromArray( data.bindMatrix );
+				if ( data.skeleton !== undefined ) object.skeleton = data.skeleton;
+
+				break;
 
 			case 'Mesh':
 
@@ -890,6 +935,12 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'Group':
 
 				object = new Group();
+
+				break;
+
+			case 'Bone':
+
+				object = new Bone();
 
 				break;
 
@@ -975,7 +1026,42 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+	bindSkeletons( object, skeletons ) {
+
+		if ( Object.keys( skeletons ).length === 0 ) return;
+
+		object.traverse( function ( child ) {
+
+			if ( child.isSkinnedMesh === true && child.skeleton !== undefined ) {
+
+				const skeleton = skeletons[ child.skeleton ];
+
+				if ( skeleton === undefined ) {
+
+					console.warn( 'THREE.ObjectLoader: No skeleton found with UUID:', child.skeleton );
+
+				} else {
+
+					child.bind( skeleton, child.bindMatrix );
+
+				}
+
+			}
+
+		} );
+
+	}
+
+	/* DEPRECATED */
+
+	setTexturePath( value ) {
+
+		console.warn( 'THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().' );
+		return this.setResourcePath( value );
+
+	}
+
+}
 
 const TEXTURE_MAPPING = {
 	UVMapping: UVMapping,
@@ -1001,6 +1087,5 @@ const TEXTURE_FILTER = {
 	LinearMipmapNearestFilter: LinearMipmapNearestFilter,
 	LinearMipmapLinearFilter: LinearMipmapLinearFilter
 };
-
 
 export { ObjectLoader };

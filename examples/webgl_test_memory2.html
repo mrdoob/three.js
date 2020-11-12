@@ -52,15 +52,17 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var N = 100;
+			const N = 100;
 
-			var container;
+			let container;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var geometry, meshes = [];
+			let geometry;
 
-			var fragmentShader, vertexShader;
+			const meshes = [];
+
+			let fragmentShader, vertexShader;
 
 			init();
 			setInterval( render, 1000 / 60 );
@@ -81,11 +83,11 @@
 
 				geometry = new THREE.SphereBufferGeometry( 15, 64, 32 );
 
-				for ( var i = 0; i < N; i ++ ) {
+				for ( let i = 0; i < N; i ++ ) {
 
-					var material = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
+					const material = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = ( 0.5 - Math.random() ) * 1000;
 					mesh.position.y = ( 0.5 - Math.random() ) * 1000;
@@ -114,9 +116,9 @@
 
 			function render() {
 
-				for ( var i = 0; i < N; i ++ ) {
+				for ( let i = 0; i < N; i ++ ) {
 
-					var mesh = meshes[ i ];
+					const mesh = meshes[ i ];
 					mesh.material = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
 
 				}
@@ -125,9 +127,9 @@
 
 				console.log( "before", renderer.info.programs.length );
 
-				for ( var i = 0; i < N; i ++ ) {
+				for ( let i = 0; i < N; i ++ ) {
 
-					var mesh = meshes[ i ];
+					const mesh = meshes[ i ];
 					mesh.material.dispose();
 
 				}

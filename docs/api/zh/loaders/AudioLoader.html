@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,19 +21,19 @@
 
 		<code>
 		// 初始化一个监听
-		var audioListener = new THREE.AudioListener();
+		const audioListener = new THREE.AudioListener();
 
 		// 把监听添加到camera
 		camera.add( audioListener );
 
 		// 初始化音频对象
-		var oceanAmbientSound = new THREE.Audio( audioListener );
+		const oceanAmbientSound = new THREE.Audio( audioListener );
 
 		// 添加一个音频对象到场景中
 		scene.add( oceanAmbientSound );
 
 		// 初始化一个加载器
-		var loader = new THREE.AudioLoader();
+		const loader = new THREE.AudioLoader();
 
 		// 加载资源
 		loader.load(

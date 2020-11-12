@@ -1,9 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import {
-	PolyhedronBufferGeometry
-} from '../../../../src/geometries/PolyhedronGeometry';
+import { PolyhedronBufferGeometry } from '../../../../src/geometries/PolyhedronBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 

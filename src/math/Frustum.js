@@ -2,8 +2,8 @@ import { Vector3 } from './Vector3.js';
 import { Sphere } from './Sphere.js';
 import { Plane } from './Plane.js';
 
-const _sphere = new Sphere();
-const _vector = new Vector3();
+const _sphere = /*@__PURE__*/ new Sphere();
+const _vector = /*@__PURE__*/ new Vector3();
 
 class Frustum {
 

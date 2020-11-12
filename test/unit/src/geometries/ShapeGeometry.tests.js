@@ -1,8 +1,6 @@
 /* global QUnit */
 
-import {
-	ShapeBufferGeometry
-} from '../../../../src/geometries/ShapeGeometry';
+import { ShapeBufferGeometry } from '../../../../src/geometries/ShapeBufferGeometry';
 
 import { Shape } from '../../../../src/extras/core/Shape';
 

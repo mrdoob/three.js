@@ -1,4 +1,3 @@
-console.warn( "THREE.ImprovedNoise: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 // http://mrl.nyu.edu/~perlin/noise/
 
 THREE.ImprovedNoise = function () {
@@ -63,7 +62,7 @@ THREE.ImprovedNoise = function () {
 			lerp( u, grad( p[ AB ], x, yMinus1, z ),
 				grad( p[ BB ], xMinus1, yMinus1, z ) ) ),
 			lerp( v, lerp( u, grad( p[ AA + 1 ], x, y, zMinus1 ),
-				grad( p[ BA + 1 ], xMinus1, y, z - 1 ) ),
+				grad( p[ BA + 1 ], xMinus1, y, zMinus1 ) ),
 			lerp( u, grad( p[ AB + 1 ], x, yMinus1, zMinus1 ),
 				grad( p[ BB + 1 ], xMinus1, yMinus1, zMinus1 ) ) ) );
 

@@ -1,4 +1,3 @@
-console.warn( "THREE.AMFLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Description: Early release of an AMF Loader following the pattern of the
  * example loaders in the three.js project.
@@ -35,6 +34,7 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {

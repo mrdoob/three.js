@@ -204,9 +204,6 @@ var FlyControls = function ( object, domElement ) {
 			scope.tmpQuaternion.set( scope.rotationVector.x * rotMult, scope.rotationVector.y * rotMult, scope.rotationVector.z * rotMult, 1 ).normalize();
 			scope.object.quaternion.multiply( scope.tmpQuaternion );
 
-			// expose the rotation vector for convenience
-			scope.object.rotation.setFromQuaternion( scope.object.quaternion, scope.object.rotation.order );
-
 			if (
 				lastPosition.distanceToSquared( scope.object.position ) > EPS ||
 				8 * ( 1 - lastQuaternion.dot( scope.object.quaternion ) ) > EPS
