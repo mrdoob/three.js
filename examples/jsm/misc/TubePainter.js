@@ -1,7 +1,3 @@
-/**
- * @author mr.doob / http://mrdoob.com/
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,
@@ -10,49 +6,48 @@ import {
 	Matrix4,
 	Mesh,
 	MeshStandardMaterial,
-	Vector3,
-	VertexColors
+	Vector3
 } from '../../../build/three.module.js';
 
 function TubePainter() {
 
 	const BUFFER_SIZE = 1000000 * 3;
 
-	let positions = new BufferAttribute( new Float32Array( BUFFER_SIZE ), 3 );
+	const positions = new BufferAttribute( new Float32Array( BUFFER_SIZE ), 3 );
 	positions.usage = DynamicDrawUsage;
 
-	let normals = new BufferAttribute( new Float32Array( BUFFER_SIZE ), 3 );
+	const normals = new BufferAttribute( new Float32Array( BUFFER_SIZE ), 3 );
 	normals.usage = DynamicDrawUsage;
 
-	let colors = new BufferAttribute( new Float32Array( BUFFER_SIZE ), 3 );
+	const colors = new BufferAttribute( new Float32Array( BUFFER_SIZE ), 3 );
 	colors.usage = DynamicDrawUsage;
 
-	let geometry = new BufferGeometry();
+	const geometry = new BufferGeometry();
 	geometry.setAttribute( 'position', positions );
 	geometry.setAttribute( 'normal', normals );
 	geometry.setAttribute( 'color', colors );
 	geometry.drawRange.count = 0;
 
-	let material = new MeshStandardMaterial( {
-		vertexColors: VertexColors
+	const material = new MeshStandardMaterial( {
+		vertexColors: true
 	} );
 
-	let mesh = new Mesh( geometry, material );
+	const mesh = new Mesh( geometry, material );
 	mesh.frustumCulled = false;
 
 	//
 
 	function getPoints( size ) {
 
-		let PI2 = Math.PI * 2;
+		const PI2 = Math.PI * 2;
 
-		let sides = 10;
-		let array = [];
-		let radius = 0.01 * size;
+		const sides = 10;
+		const array = [];
+		const radius = 0.01 * size;
 
 		for ( let i = 0; i < sides; i ++ ) {
 
-			let angle = ( i / sides ) * PI2;
+			const angle = ( i / sides ) * PI2;
 			array.push( new Vector3( Math.sin( angle ) * radius, Math.cos( angle ) * radius, 0 ) );
 
 		}
@@ -63,12 +58,12 @@ function TubePainter() {
 
 	//
 
-	let vector1 = new Vector3();
-	let vector2 = new Vector3();
-	let vector3 = new Vector3();
-	let vector4 = new Vector3();
+	const vector1 = new Vector3();
+	const vector2 = new Vector3();
+	const vector3 = new Vector3();
+	const vector4 = new Vector3();
 
-	let color = new Color( 0xffffff );
+	const color = new Color( 0xffffff );
 	let size = 1;
 
 	function stroke( position1, position2, matrix1, matrix2 ) {
@@ -77,12 +72,12 @@ function TubePainter() {
 
 		let count = geometry.drawRange.count;
 
-		let points = getPoints( size );
+		const points = getPoints( size );
 
 		for ( let i = 0, il = points.length; i < il; i ++ ) {
 
-			let vertex1 = points[ i ];
-			let vertex2 = points[ ( i + 1 ) % il ];
+			const vertex1 = points[ i ];
+			const vertex2 = points[ ( i + 1 ) % il ];
 
 			// positions
 
@@ -134,13 +129,13 @@ function TubePainter() {
 
 	//
 
-	let up = new Vector3( 0, 1, 0 );
+	const up = new Vector3( 0, 1, 0 );
 
-	let point1 = new Vector3();
-	let point2 = new Vector3();
+	const point1 = new Vector3();
+	const point2 = new Vector3();
 
-	let matrix1 = new Matrix4();
-	let matrix2 = new Matrix4();
+	const matrix1 = new Matrix4();
+	const matrix2 = new Matrix4();
 
 	function moveTo( position ) {
 
@@ -176,8 +171,8 @@ function TubePainter() {
 
 	function update() {
 
-		let start = count;
-		let end = geometry.drawRange.count;
+		const start = count;
+		const end = geometry.drawRange.count;
 
 		if ( start === end ) return;
 

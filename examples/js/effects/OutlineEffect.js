@@ -1,6 +1,4 @@
 /**
- * @author takahirox / http://github.com/takahirox/
- *
  * Reference: https://en.wikipedia.org/wiki/Cel_shading
  *
  * API
@@ -158,10 +156,10 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		"	gl_FragColor = vec4( outlineColor, outlineAlpha );",
 
-		"	#include <premultiplied_alpha_fragment>",
 		"	#include <tonemapping_fragment>",
 		"	#include <encodings_fragment>",
 		"	#include <fog_fragment>",
+		"	#include <premultiplied_alpha_fragment>",
 
 		"}"
 

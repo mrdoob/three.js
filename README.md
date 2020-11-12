@@ -1,10 +1,9 @@
 three.js
 ========
 
-[![NPM package][npm]][npm-url]
+[![NPM Package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
-[![Build Status][build-status]][build-status-url]
-[![Dependencies][dependencies]][dependencies-url]
+[![NPM Downloads][npm-downloads]][npmtrends-url]
 [![Dev Dependencies][dev-dependencies]][dev-dependencies-url]
 [![Language Grade][lgtm]][lgtm-url]
 
@@ -18,23 +17,18 @@ The aim of the project is to create an easy to use, lightweight, 3D library with
 [Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
 [Questions](http://stackoverflow.com/questions/tagged/three.js) &mdash;
 [Forum](https://discourse.threejs.org/) &mdash;
-[Gitter](https://gitter.im/mrdoob/three.js) &mdash;
-[Slack](https://join.slack.com/t/threejs/shared_invite/enQtMzYxMzczODM2OTgxLTQ1YmY4YTQxOTFjNDAzYmQ4NjU2YzRhNzliY2RiNDEyYjU2MjhhODgyYWQ5Y2MyZTU3MWNkOGVmOGRhOTQzYTk)
+[Slack](https://join.slack.com/t/threejs/shared_invite/enQtMzYxMzczODM2OTgxLTQ1YmY4YTQxOTFjNDAzYmQ4NjU2YzRhNzliY2RiNDEyYjU2MjhhODgyYWQ5Y2MyZTU3MWNkOGVmOGRhOTQzYTk) &mdash;
+[Discord](https://discordapp.com/invite/HF4UdyF)
 
 ### Usage ###
-
-Download the [minified library](http://threejs.org/build/three.min.js) and include it in your HTML, or install and import it as a [module](http://threejs.org/docs/#manual/introduction/Import-via-modules),
-Alternatively, see [how to build the library yourself](https://github.com/mrdoob/three.js/wiki/Build-instructions).
-
-```html
-<script src="js/three.min.js"></script>
-```
 
 This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a `WebGL` renderer for the scene and camera, and it adds that viewport to the `document.body` element. Finally, it animates the cube within the scene for the camera.
 
 ```javascript
-var camera, scene, renderer;
-var geometry, material, mesh;
+import * as THREE from './js/three.module.js';
+
+let camera, scene, renderer;
+let geometry, material, mesh;
 
 init();
 animate();
@@ -70,22 +64,28 @@ function animate() {
 }
 ```
 
-If everything went well you should see [this](https://jsfiddle.net/f2Lommf5/).
+If everything went well, you should see [this](https://jsfiddle.net/ruc3h17j/).
+
+### Cloning this repository ###
+
+Cloning the repo with all its history results in a ~2GB download. If you don't need the whole history you can use the `depth` parameter to significantly reduce download size.
+
+```sh
+git clone --depth=1 https://github.com/mrdoob/three.js.git
+```
 
 ### Change log ###
 
 [Releases](https://github.com/mrdoob/three.js/releases)
 
 
-[npm]: https://img.shields.io/npm/v/three.svg
+[npm]: https://img.shields.io/npm/v/three
 [npm-url]: https://www.npmjs.com/package/three
 [build-size]: https://badgen.net/bundlephobia/minzip/three
 [build-size-url]: https://bundlephobia.com/result?p=three
-[build-status]: https://travis-ci.org/mrdoob/three.js.svg?branch=dev
-[build-status-url]: https://travis-ci.org/mrdoob/three.js
-[dependencies]: https://img.shields.io/david/mrdoob/three.js.svg
-[dependencies-url]: https://david-dm.org/mrdoob/three.js
-[dev-dependencies]: https://img.shields.io/david/dev/mrdoob/three.js.svg
+[npm-downloads]: https://img.shields.io/npm/dw/three
+[npmtrends-url]: https://www.npmtrends.com/three
+[dev-dependencies]: https://img.shields.io/david/dev/mrdoob/three.js
 [dev-dependencies-url]: https://david-dm.org/mrdoob/three.js#info=devDependencies
-[lgtm]: https://img.shields.io/lgtm/grade/javascript/g/mrdoob/three.js.svg?label=code%20quality
+[lgtm]: https://img.shields.io/lgtm/alerts/github/mrdoob/three.js
 [lgtm-url]: https://lgtm.com/projects/g/mrdoob/three.js/

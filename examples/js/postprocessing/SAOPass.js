@@ -1,5 +1,4 @@
 /**
- * @author ludobaka / ludobaka.github.io
  * SAO implementation inspired from bhouston previous SAO work
  */
 

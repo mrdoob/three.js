@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -92,6 +91,16 @@
 			attribute vec4 skinWeight;
 		#endif
 		</code>
+		<code>
+		#ifdef USE_INSTANCING
+			// Note that modelViewMatrix is not set when rendering an instanced model,
+			// but can be calculated from viewMatrix * modelMatrix.
+			//
+			// Basic Usage:
+			//   gl_Position = projectionMatrix * viewMatrix * modelMatrix * instanceMatrix * vec4(position, 1.0);
+			attribute mat4 instanceMatrix;
+		#endif
+		</code>
 		</div>
 
 		<h3>Fragment shader:</h3>
@@ -105,28 +114,31 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:WebGLRenderer renderer], [param:Object code], [param:Material material], [param:Object parameters] )</h3>
-		<p>For parameters see [page:WebGLRenderer WebGLRenderer]</p>
+		<h3>[name]( [param:WebGLRenderer renderer], [param:String cacheKey], [param:Object parameters] )</h3>
+		<p>For parameters see [page:WebGLRenderer WebGLRenderer].</p>
 
 		<h2>Properties</h2>
 
-		<h3>[property:String id]</h3>
-		<p></p>
+		<h3>[property:String name]</h3>
+		<p>The name of the respective shader program.</p>
 
-		<h3>[property:String code]</h3>
-		<p></p>
+		<h3>[property:String id]</h3>
+		<p>The identifier of this instance.</p>
+
+		<h3>[property:String cacheKey]</h3>
+		<p>This key enables the reusability of a single [name] for different materials.</p>
 
 		<h3>[property:Integer usedTimes]</h3>
-		<p></p>
+		<p>How many times this instance is used for rendering render items.</p>
 
 		<h3>[property:Object program]</h3>
-		<p></p>
+		<p>The actual shader program.</p>
 
 		<h3>[property:WebGLShader vertexShader]</h3>
-		<p></p>
+		<p>An instance of [page:WebGLShader] representing the vertex shader.</p>
 
 		<h3>[property:WebGLShader fragmentShader]</h3>
-		<p></p>
+		<p>An instance of [page:WebGLShader] representing the frament shader.</p>
 
 		<h2>Methods</h2>
 
@@ -138,6 +150,11 @@
 		<h3>[method:Object getAttributes]()</h3>
 		<p>
 		Returns a name-value mapping of all active vertex attribute locations.
+		</p>
+
+		<h3>[method:null destroy]()</h3>
+		<p>
+		Destroys an instance of [name].
 		</p>
 
 		<h2>Source</h2>

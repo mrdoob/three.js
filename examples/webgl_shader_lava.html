@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shader material demo. featuring lava shader by <a href="http://irrlicht.sourceforge.net/phpBB2/viewtopic.php?t=21057" target="_blank" rel="noopener">TheGameMaker</a></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shader material demo. featuring lava shader by <a href="http://irrlicht.sourceforge.net/phpBB2/viewtopic.php?t=21057" target="_blank" rel="noopener">TheGameMaker</a></div>
 
 		<script id="fragmentShader" type="x-shader/x-fragment">
 
@@ -83,27 +83,25 @@
 			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
 			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
 
-			var container;
+			let camera, renderer, composer, clock;
 
-			var camera, scene, renderer, composer, clock;
-
-			var uniforms, mesh;
+			let uniforms, mesh;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 4;
 
-				scene = new THREE.Scene();
+				const scene = new THREE.Scene();
 
 				clock = new THREE.Clock();
 
-				var textureLoader = new THREE.TextureLoader();
+				const textureLoader = new THREE.TextureLoader();
 
 				uniforms = {
 
@@ -119,9 +117,9 @@
 				uniforms[ "texture1" ].value.wrapS = uniforms[ "texture1" ].value.wrapT = THREE.RepeatWrapping;
 				uniforms[ "texture2" ].value.wrapS = uniforms[ "texture2" ].value.wrapT = THREE.RepeatWrapping;
 
-				var size = 0.65;
+				const size = 0.65;
 
-				var material = new THREE.ShaderMaterial( {
+				const material = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -143,9 +141,9 @@
 
 				//
 
-				var renderModel = new RenderPass( scene, camera );
-				var effectBloom = new BloomPass( 1.25 );
-				var effectFilm = new FilmPass( 0.35, 0.95, 2048, false );
+				const renderModel = new RenderPass( scene, camera );
+				const effectBloom = new BloomPass( 1.25 );
+				const effectFilm = new FilmPass( 0.35, 0.95, 2048, false );
 
 				composer = new EffectComposer( renderer );
 
@@ -183,9 +181,9 @@
 
 			function render() {
 
-				var delta = 5 * clock.getDelta();
+				const delta = 5 * clock.getDelta();
 
-				uniforms[ "time" ].value += 0.2 * delta;
+				uniforms[ 'time' ].value += 0.2 * delta;
 
 				mesh.rotation.y += 0.0125 * delta;
 				mesh.rotation.x += 0.05 * delta;

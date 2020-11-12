@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl cube reflection demo.<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl cube reflection demo.<br/>
 			skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank" rel="noopener">Paul Debevec</a>
 		</div>
 
@@ -16,17 +16,17 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var container;
+			let container;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var spheres = [];
+			const spheres = [];
 
-			var mouseX = 0;
-			var mouseY = 0;
+			let mouseX = 0;
+			let mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -46,12 +46,12 @@
 					.setPath( 'textures/cube/pisa/' )
 					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ] );
 
-				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: scene.background } );
+				const geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
+				const material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: scene.background } );
 
-				for ( var i = 0; i < 500; i ++ ) {
+				for ( let i = 0; i < 500; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
@@ -109,11 +109,11 @@
 
 			function render() {
 
-				var timer = 0.0001 * Date.now();
+				const timer = 0.0001 * Date.now();
 
-				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
+				for ( let i = 0, il = spheres.length; i < il; i ++ ) {
 
-					var sphere = spheres[ i ];
+					const sphere = spheres[ i ];
 
 					sphere.position.x = 5000 * Math.cos( timer + i );
 					sphere.position.y = 5000 * Math.sin( timer + i * 1.1 );

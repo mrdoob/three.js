@@ -17,19 +17,19 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var container, stats;
+			let stats;
 
-			var camera, scene, renderer;
-			var pointLight;
+			let camera, scene, renderer;
+			let pointLight;
 
-			var objects = [], materials = [];
+			const objects = [], materials = [];
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -39,13 +39,13 @@
 
 				// Grid
 
-				var helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
+				const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
 				helper.position.y = - 75;
 				scene.add( helper );
 
 				// Materials
 
-				var texture = new THREE.Texture( generateTexture() );
+				const texture = new THREE.Texture( generateTexture() );
 				texture.needsUpdate = true;
 
 				materials.push( new THREE.MeshLambertMaterial( { map: texture, transparent: true } ) );
@@ -64,9 +64,9 @@
 
 				// Spheres geometry
 
-				var geometry = new THREE.SphereBufferGeometry( 70, 32, 16 );
+				const geometry = new THREE.SphereBufferGeometry( 70, 32, 16 );
 
-				for ( var i = 0, l = materials.length; i < l; i ++ ) {
+				for ( let i = 0, l = materials.length; i < l; i ++ ) {
 
 					addMesh( geometry, materials[ i ] );
 
@@ -76,7 +76,7 @@
 
 				scene.add( new THREE.AmbientLight( 0x111111 ) );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
 
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
@@ -110,7 +110,7 @@
 
 			function addMesh( geometry, material ) {
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh = new THREE.Mesh( geometry, material );
 
 				mesh.position.x = ( objects.length % 4 ) * 200 - 400;
 				mesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
@@ -136,19 +136,19 @@
 
 			function generateTexture() {
 
-				var canvas = document.createElement( 'canvas' );
+				const canvas = document.createElement( 'canvas' );
 				canvas.width = 256;
 				canvas.height = 256;
 
-				var context = canvas.getContext( '2d' );
-				var image = context.getImageData( 0, 0, 256, 256 );
+				const context = canvas.getContext( '2d' );
+				const image = context.getImageData( 0, 0, 256, 256 );
 
-				var x = 0, y = 0;
+				let x = 0, y = 0;
 
-				for ( var i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
+				for ( let i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
 
 					x = j % 256;
-					y = x == 0 ? y + 1 : y;
+					y = ( x === 0 ) ? y + 1 : y;
 
 					image.data[ i ] = 255;
 					image.data[ i + 1 ] = 255;
@@ -176,16 +176,16 @@
 
 			function render() {
 
-				var timer = 0.0001 * Date.now();
+				const timer = 0.0001 * Date.now();
 
 				camera.position.x = Math.cos( timer ) * 1000;
 				camera.position.z = Math.sin( timer ) * 1000;
 
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+				for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
-					var object = objects[ i ];
+					const object = objects[ i ];
 
 					object.rotation.x += 0.01;
 					object.rotation.y += 0.005;

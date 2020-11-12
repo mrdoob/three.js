@@ -1,12 +1,9 @@
-/**
- * @author Don McCurdy / https://www.donmccurdy.com
- */
 /* global QUnit */
 
 import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter';
 
 import { AnimationClip } from '../../../../src/animation/AnimationClip';
-import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
 import { Mesh } from '../../../../src/objects/Mesh';
@@ -19,8 +16,7 @@ import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyf
 import {
 	DoubleSide,
 	InterpolateLinear,
-	InterpolateDiscrete,
-	VertexColors,
+	InterpolateDiscrete
 } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Exporters', () => {
@@ -59,7 +55,7 @@ export default QUnit.module( 'Exporters', () => {
 			var done = assert.async();
 
 			var box = new Mesh(
-				new BoxGeometry( 1, 1, 1 ),
+				new BoxBufferGeometry( 1, 1, 1 ),
 				new MeshStandardMaterial( { color: 0xFF0000 } )
 			);
 
@@ -155,7 +151,7 @@ export default QUnit.module( 'Exporters', () => {
 			geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
 			geometry.setDrawRange( 0, 0 );
 
-			var empty = new Mesh( geometry, new MeshBasicMaterial( { side: DoubleSide, vertexColors: VertexColors } ) );
+			var empty = new Mesh( geometry, new MeshBasicMaterial( { side: DoubleSide, vertexColors: true } ) );
 			empty.name = 'Custom buffered empty (drawrange)';
 			scene.add( empty );
 

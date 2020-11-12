@@ -1,9 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
-
 import { LineSegmentsGeometry } from "../lines/LineSegmentsGeometry.js";
 
 var LineGeometry = function () {
@@ -80,7 +74,7 @@ LineGeometry.prototype = Object.assign( Object.create( LineSegmentsGeometry.prot
 
 		} else if ( geometry.isBufferGeometry ) {
 
-			this.setPositions( geometry.position.array ); // assumes non-indexed
+			this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
 
 		}
 

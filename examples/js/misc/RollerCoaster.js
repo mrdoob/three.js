@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 THREE.RollerCoasterGeometry = function ( curve, divisions ) {
 
 	THREE.BufferGeometry.call( this );

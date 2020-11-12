@@ -8,40 +8,54 @@ import { Camera } from './Camera';
 export class PerspectiveCamera extends Camera {
 
 	/**
-	 * @param fov Camera frustum vertical field of view. Default value is 50.
-	 * @param aspect Camera frustum aspect ratio. Default value is 1.
-	 * @param near Camera frustum near plane. Default value is 0.1.
-	 * @param far Camera frustum far plane. Default value is 2000.
+	 * @param [fov=50] Camera frustum vertical field of view. Default value is 50.
+	 * @param [aspect=1] Camera frustum aspect ratio. Default value is 1.
+	 * @param [near=0.1] Camera frustum near plane. Default value is 0.1.
+	 * @param [far=2000] Camera frustum far plane. Default value is 2000.
 	 */
 	constructor( fov?: number, aspect?: number, near?: number, far?: number );
 
 	type: 'PerspectiveCamera';
 
-	isPerspectiveCamera: true;
+	readonly isPerspectiveCamera: true;
 
+	/**
+	 * @default 1
+	 */
 	zoom: number;
 
 	/**
 	 * Camera frustum vertical field of view, from bottom to top of view, in degrees.
+	 * @default 50
 	 */
 	fov: number;
 
 	/**
 	 * Camera frustum aspect ratio, window width divided by window height.
+	 * @default 1
 	 */
 	aspect: number;
 
 	/**
 	 * Camera frustum near plane.
+	 * @default 0.1
 	 */
 	near: number;
 
 	/**
 	 * Camera frustum far plane.
+	 * @default 2000
 	 */
 	far: number;
 
+	/**
+	 * @default 10
+	 */
 	focus: number;
+
+	/**
+	 * @default null
+	 */
 	view: null | {
 		enabled: boolean;
 		fullWidth: number;
@@ -51,7 +65,15 @@ export class PerspectiveCamera extends Camera {
 		width: number;
 		height: number;
 	};
+
+	/**
+	 * @default 35
+	 */
 	filmGauge: number;
+
+	/**
+	 * @default 0
+	 */
 	filmOffset: number;
 
 	setFocalLength( focalLength: number ): void;
@@ -72,10 +94,10 @@ export class PerspectiveCamera extends Camera {
 	 *
 	 * then for each monitor you would call it like this:
 	 *
-	 *		 var w = 1920;
-	 *		 var h = 1080;
-	 *		 var fullWidth = w * 3;
-	 *		 var fullHeight = h * 2;
+	 *		 const w = 1920;
+	 *		 const h = 1080;
+	 *		 const fullWidth = w * 3;
+	 *		 const fullHeight = h * 2;
 	 *
 	 *		 // A
 	 *		 camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );

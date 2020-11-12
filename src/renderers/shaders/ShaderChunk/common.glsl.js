@@ -1,10 +1,9 @@
 export default /* glsl */`
-#define PI 3.14159265359
-#define PI2 6.28318530718
-#define PI_HALF 1.5707963267949
-#define RECIPROCAL_PI 0.31830988618
-#define RECIPROCAL_PI2 0.15915494
-#define LOG2 1.442695
+#define PI 3.141592653589793
+#define PI2 6.283185307179586
+#define PI_HALF 1.5707963267948966
+#define RECIPROCAL_PI 0.3183098861837907
+#define RECIPROCAL_PI2 0.15915494309189535
 #define EPSILON 1e-6
 
 #ifndef saturate
@@ -63,8 +62,10 @@ vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 
 }
 
-// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations
 vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {
+
+	// dir can be either a direction vector or a normal vector
+	// upper-left 3x3 of matrix is assumed to be orthogonal
 
 	return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );
 
@@ -113,7 +114,19 @@ float linearToRelativeLuminance( const in vec3 color ) {
 
 bool isPerspectiveMatrix( mat4 m ) {
 
-  return m[ 2 ][ 3 ] == - 1.0;
+	return m[ 2 ][ 3 ] == - 1.0;
+
+}
+
+vec2 equirectUv( in vec3 dir ) {
+
+	// dir is assumed to be unit length
+
+	float u = atan( dir.z, dir.x ) * RECIPROCAL_PI2 + 0.5;
+
+	float v = asin( clamp( dir.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;
+
+	return vec2( u, v );
 
 }
 `;

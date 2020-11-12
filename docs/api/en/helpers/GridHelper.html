@@ -3,28 +3,30 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr; [page:Line] &rarr;
-		
+
 		<h1>[name]</h1>
 
 		<p class="desc">The GridHelper is an object to define grids. Grids are two-dimensional arrays of lines.</p>
 
+		<h2>Code Example</h2>
 
-		<h2>Example</h2>
+		<code>const size = 10;
+		const divisions = 10;
 
-		<code>var size = 10;
-		var divisions = 10;
-
-		var gridHelper = new THREE.GridHelper( size, divisions );
+		const gridHelper = new THREE.GridHelper( size, divisions );
 		scene.add( gridHelper );
 		</code>
-		[example:webgl_helpers Example using various helpers]
 
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_helpers WebGL / helpers]
+		</p>
 
 		<h2>Constructor</h2>
 

@@ -1,8 +1,5 @@
 /**
- * @author Mugen87 / https://github.com/Mugen87
- *
  * Ported from: https://github.com/maurizzzio/quickhull3d/ by Mauricio Poppe (https://github.com/maurizzzio)
- *
  */
 
 THREE.ConvexHull = ( function () {

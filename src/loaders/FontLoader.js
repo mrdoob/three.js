@@ -2,10 +2,6 @@ import { Font } from '../extras/core/Font.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function FontLoader( manager ) {
 
 	Loader.call( this, manager );
@@ -18,13 +14,15 @@ FontLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		const scope = this;
 
-		var loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
-			var json;
+			let json;
 
 			try {
 
@@ -37,7 +35,7 @@ FontLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			var font = scope.parse( json );
+			const font = scope.parse( json );
 
 			if ( onLoad ) onLoad( font );
 

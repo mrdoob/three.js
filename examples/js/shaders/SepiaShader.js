@@ -1,6 +1,4 @@
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * Sepia tone shader
  * based on glfx.js sepia shader
  * https://github.com/evanw/glfx.js

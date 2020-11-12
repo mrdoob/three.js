@@ -18,23 +18,27 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - drag controls
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - drag controls<br />
+			Use "Shift+Click" to add/remove objects to/from a group.<br />
+			Grouped objects can be transformed as a union.
 		</div>
 
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 
-			import Stats from './jsm/libs/stats.module.js';
-
 			import { DragControls } from './jsm/controls/DragControls.js';
 
-			var container, stats;
-			var camera, scene, renderer;
-			var objects = [];
+			let container;
+			let camera, scene, renderer;
+			let controls, group;
+			let enableSelection = false;
+
+			const objects = [];
+
+			const mouse = new THREE.Vector2(), raycaster = new THREE.Raycaster();
 
 			init();
-			animate();
 
 			function init() {
 
@@ -49,7 +53,7 @@
 
 				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
-				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				const light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
 				light.angle = Math.PI / 9;
 
@@ -61,11 +65,14 @@
 
 				scene.add( light );
 
-				var geometry = new THREE.BoxBufferGeometry( 40, 40, 40 );
+				group = new THREE.Group();
+				scene.add( group );
 
-				for ( var i = 0; i < 200; i ++ ) {
+				const geometry = new THREE.BoxBufferGeometry( 40, 40, 40 );
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+				for ( let i = 0; i < 200; i ++ ) {
+
+					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 1000 - 500;
 					object.position.y = Math.random() * 600 - 300;
@@ -97,26 +104,18 @@
 
 				container.appendChild( renderer.domElement );
 
-				var controls = new DragControls( objects, camera, renderer.domElement );
-
-				controls.addEventListener( 'dragstart', function ( event ) {
-
-					event.object.material.emissive.set( 0xaaaaaa );
-
-				} );
-
-				controls.addEventListener( 'dragend', function ( event ) {
-
-					event.object.material.emissive.set( 0x000000 );
-
-				} );
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				controls = new DragControls( [ ... objects ], camera, renderer.domElement );
+				controls.addEventListener( 'drag', render );
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				document.addEventListener( 'click', onClick, false );
+				window.addEventListener( 'keydown', onKeyDown, false );
+				window.addEventListener( 'keyup', onKeyUp, false );
+
+				render();
 
 			}
 
@@ -127,16 +126,69 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				render();
+
 			}
 
-			//
+			function onKeyDown( event ) {
 
-			function animate() {
+				enableSelection = ( event.keyCode === 16 ) ? true : false;
 
-				requestAnimationFrame( animate );
+			}
+
+			function onKeyUp() {
+
+				enableSelection = false;
+
+			}
+
+			function onClick( event ) {
+
+				event.preventDefault();
+
+				if ( enableSelection === true ) {
+
+					const draggableObjects = controls.getObjects();
+					draggableObjects.length = 0;
+
+					mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+					mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+					raycaster.setFromCamera( mouse, camera );
+
+					const intersections = raycaster.intersectObjects( objects, true );
+
+					if ( intersections.length > 0 ) {
+
+						const object = intersections[ 0 ].object;
+
+						if ( group.children.includes( object ) === true ) {
+
+							object.material.emissive.set( 0x000000 );
+							scene.attach( object );
+
+						} else {
+
+							object.material.emissive.set( 0xaaaaaa );
+							group.attach( object );
+
+						}
+
+						controls.transformGroup = true;
+						draggableObjects.push( group );
+
+					}
+
+					if ( group.children.length === 0 ) {
+
+						controls.transformGroup = false;
+						draggableObjects.push( ...objects );
+
+					}
+
+				}
 
 				render();
-				stats.update();
 
 			}
 

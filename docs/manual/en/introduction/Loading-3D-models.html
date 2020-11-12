@@ -4,7 +4,6 @@
 <head>
 	<meta charset="utf-8">
 	<base href="../../../" />
-	<script src="list.js"></script>
 	<script src="page.js"></script>
 	<link type="text/css" rel="stylesheet" href="page.css" />
 </head>
@@ -15,7 +14,7 @@
 	<p>
 		3D models are available in hundreds of file formats, each with different
 		purposes, assorted features, and varying complexity. Although
-		<a href="https://github.com/mrdoob/three.js/tree/dev/examples/js/loaders" target="_blank" rel="noopener">
+		<a href="https://github.com/mrdoob/three.js/tree/dev/examples/jsm/loaders" target="_blank" rel="noopener">
 		three.js provides many loaders</a>, choosing the right format and
 		workflow will save time and frustration later on. Some formats are
 		difficult to work with, inefficient for realtime experiences, or simply not
@@ -54,16 +53,16 @@
 	</p>
 
 	<ul>
-		<li><a href="https://github.com/KhronosGroup/glTF-Blender-IO" target="_blank" rel="noopener">glTF-Blender-IO</a> by the Khronos Group</li>
-		<li><a href="https://github.com/KhronosGroup/COLLADA2GLTF" target="_blank" rel="noopener">COLLADA2GLTF</a> by the Khronos Group</li>
-		<li><a href="https://github.com/facebookincubator/FBX2glTF" target="_blank" rel="noopener">FBX2GLTF</a> by Facebook</li>
-		<li><a href="https://github.com/AnalyticalGraphicsInc/obj2gltf" target="_blank" rel="noopener">OBJ2GLTF</a> by Analytical Graphics Inc</li>
+		<li><a href="https://www.blender.org/" target="_blank" rel="noopener">Blender</a> by the Blender Foundation</li>
 		<li><a href="https://www.allegorithmic.com/products/substance-painter" target="_blank" rel="noopener">Substance Painter</a> by Allegorithmic</li>
 		<li><a href="https://www.foundry.com/products/modo" target="_blank" rel="noopener">Modo</a> by Foundry</li>
 		<li><a href="https://www.marmoset.co/toolbag/" target="_blank" rel="noopener">Toolbag</a> by Marmoset</li>
 		<li><a href="https://www.sidefx.com/products/houdini/" target="_blank" rel="noopener">Houdini</a> by SideFX</li>
 		<li><a href="https://labs.maxon.net/?p=3360" target="_blank" rel="noopener">Cinema 4D</a> by MAXON</li>
-		<li>&hellip;and <a href="https://github.com/khronosgroup/gltf#gltf-tools" target="_blank" rel="noopener">many more</a></li>
+		<li><a href="https://github.com/KhronosGroup/COLLADA2GLTF" target="_blank" rel="noopener">COLLADA2GLTF</a> by the Khronos Group</li>
+		<li><a href="https://github.com/facebookincubator/FBX2glTF" target="_blank" rel="noopener">FBX2GLTF</a> by Facebook</li>
+		<li><a href="https://github.com/AnalyticalGraphicsInc/obj2gltf" target="_blank" rel="noopener">OBJ2GLTF</a> by Analytical Graphics Inc</li>
+		<li>&hellip;and <a href="http://github.khronos.org/glTF-Project-Explorer/" target="_blank" rel="noopener">many more</a></li>
 	</ul>
 
 	<p>
@@ -81,20 +80,11 @@
 
 	<p>
 		Only a few loaders (e.g. [page:ObjectLoader]) are included by default with
-		three.js — others should be added to your page individually. Depending on your
-		preference and comfort with build tools, choose one of the following:
+		three.js — others should be added to your app individually.
 	</p>
 
 	<code>
-		// global script
-		&lt;script src="GLTFLoader.js"&gt;&lt;/script&gt;
-
-		// commonjs
-		var THREE = window.THREE = require('three');
-		require('three/examples/js/loaders/GLTFLoader');
-
-		// ES modules
-		import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+		import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 	</code>
 
 	<p>
@@ -104,7 +94,7 @@
 	</p>
 
 	<code>
-		var loader = new THREE.GLTFLoader();
+		const loader = new GLTFLoader();
 
 		loader.load( 'path/to/model.glb', function ( gltf ) {
 

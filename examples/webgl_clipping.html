@@ -17,7 +17,7 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var camera, scene, renderer, startTime, object, stats;
+			let camera, scene, renderer, startTime, object, stats;
 
 			init();
 			animate();
@@ -34,7 +34,7 @@
 
 				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
-				var spotLight = new THREE.SpotLight( 0xffffff );
+				const spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.2;
 				spotLight.position.set( 2, 3, 3 );
@@ -45,7 +45,7 @@
 				spotLight.shadow.mapSize.height = 1024;
 				scene.add( spotLight );
 
-				var dirLight = new THREE.DirectionalLight( 0x55505a, 1 );
+				const dirLight = new THREE.DirectionalLight( 0x55505a, 1 );
 				dirLight.position.set( 0, 3, 0 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 1;
@@ -62,12 +62,12 @@
 
 				// ***** Clipping planes: *****
 
-				var localPlane = new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0.8 );
-				var globalPlane = new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), 0.1 );
+				const localPlane = new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0.8 );
+				const globalPlane = new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), 0.1 );
 
 				// Geometry
 
-				var material = new THREE.MeshPhongMaterial( {
+				const material = new THREE.MeshPhongMaterial( {
 					color: 0x80ee10,
 					shininess: 100,
 					side: THREE.DoubleSide,
@@ -78,13 +78,13 @@
 
 				} );
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.08, 95, 20 );
+				const geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.08, 95, 20 );
 
 				object = new THREE.Mesh( geometry, material );
 				object.castShadow = true;
 				scene.add( object );
 
-				var ground = new THREE.Mesh(
+				const ground = new THREE.Mesh(
 					new THREE.PlaneBufferGeometry( 9, 9, 1, 1 ),
 					new THREE.MeshPhongMaterial( { color: 0xa0adaf, shininess: 150 } )
 				);
@@ -108,20 +108,20 @@
 				document.body.appendChild( renderer.domElement );
 
 				// ***** Clipping setup (renderer): *****
-				var globalPlanes = [ globalPlane ],
+				const globalPlanes = [ globalPlane ],
 					Empty = Object.freeze( [] );
 				renderer.clippingPlanes = Empty; // GUI sets it to globalPlanes
 				renderer.localClippingEnabled = true;
 
 				// Controls
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 1, 0 );
 				controls.update();
 
 				// GUI
 
-				var gui = new GUI(),
+				const gui = new GUI(),
 					folderLocal = gui.addFolder( 'Local Clipping' ),
 					propsLocal = {
 
@@ -211,8 +211,8 @@
 
 			function animate() {
 
-				var currentTime = Date.now();
-				var time = ( currentTime - startTime ) / 1000;
+				const currentTime = Date.now();
+				const time = ( currentTime - startTime ) / 1000;
 
 				requestAnimationFrame( animate );
 

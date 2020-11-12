@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader - Nurbs
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader - Nurbs
 		</div>
 
 		<script type="module">
@@ -21,15 +21,14 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
-			var container, stats, controls;
-			var camera, scene, renderer, light;
+			let camera, scene, renderer, stats;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -37,16 +36,16 @@
 
 				scene = new THREE.Scene();
 
-				light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				light.position.set( 0, 1, 0 );
-				scene.add( light );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				hemiLight.position.set( 0, 1, 0 );
+				scene.add( hemiLight );
 
-				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 1, 0 );
-				scene.add( light );
+				const dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 0, 1, 0 );
+				scene.add( dirLight );
 
 				// grid
-				var gridHelper = new THREE.GridHelper( 28, 28, 0x303030, 0x303030 );
+				const gridHelper = new THREE.GridHelper( 28, 28, 0x303030, 0x303030 );
 				scene.add( gridHelper );
 
 				// stats
@@ -54,7 +53,7 @@
 				container.appendChild( stats.dom );
 
 				// model
-				var loader = new FBXLoader();
+				const loader = new FBXLoader();
 				loader.load( 'models/fbx/nurbs.fbx', function ( object ) {
 
 					scene.add( object );
@@ -66,7 +65,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 12, 0 );
 				controls.update();
 

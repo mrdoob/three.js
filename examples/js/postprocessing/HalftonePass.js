@@ -1,8 +1,5 @@
 /**
- * @author meatbags / xavierburrow.com, github/meatbags
- *
  * RGB Halftone pass for three.js effects composer. Requires THREE.HalftoneShader.
- *
  */
 
 THREE.HalftonePass = function ( width, height, params ) {

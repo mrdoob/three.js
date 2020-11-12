@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -32,11 +31,11 @@
 
 		</script>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
-		<code>var geometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
-		var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-		var sphere = new THREE.Mesh( geometry, material );
+		<code>const geometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
+		const material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+		const sphere = new THREE.Mesh( geometry, material );
 		scene.add( sphere );
 		</code>
 
@@ -73,6 +72,8 @@
 
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/SphereGeometry.js src/geometries/SphereGeometry.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

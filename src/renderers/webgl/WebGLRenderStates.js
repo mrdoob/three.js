@@ -1,15 +1,11 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import { WebGLLights } from './WebGLLights.js';
 
-function WebGLRenderState() {
+function WebGLRenderState( extensions, capabilities ) {
 
-	var lights = new WebGLLights();
+	const lights = new WebGLLights( extensions, capabilities );
 
-	var lightsArray = [];
-	var shadowsArray = [];
+	const lightsArray = [];
+	const shadowsArray = [];
 
 	function init() {
 
@@ -36,7 +32,7 @@ function WebGLRenderState() {
 
 	}
 
-	var state = {
+	const state = {
 		lightsArray: lightsArray,
 		shadowsArray: shadowsArray,
 
@@ -54,37 +50,25 @@ function WebGLRenderState() {
 
 }
 
-function WebGLRenderStates() {
+function WebGLRenderStates( extensions, capabilities ) {
 
-	var renderStates = new WeakMap();
-
-	function onSceneDispose( event ) {
-
-		var scene = event.target;
-
-		scene.removeEventListener( 'dispose', onSceneDispose );
-
-		renderStates.delete( scene );
-
-	}
+	let renderStates = new WeakMap();
 
 	function get( scene, camera ) {
 
-		var renderState;
+		let renderState;
 
 		if ( renderStates.has( scene ) === false ) {
 
-			renderState = new WebGLRenderState();
+			renderState = new WebGLRenderState( extensions, capabilities );
 			renderStates.set( scene, new WeakMap() );
 			renderStates.get( scene ).set( camera, renderState );
-
-			scene.addEventListener( 'dispose', onSceneDispose );
 
 		} else {
 
 			if ( renderStates.get( scene ).has( camera ) === false ) {
 
-				renderState = new WebGLRenderState();
+				renderState = new WebGLRenderState( extensions, capabilities );
 				renderStates.get( scene ).set( camera, renderState );
 
 			} else {

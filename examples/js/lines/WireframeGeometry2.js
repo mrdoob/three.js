@@ -1,8 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
 THREE.WireframeGeometry2 = function ( geometry ) {
 
 	THREE.LineSegmentsGeometry.call( this );

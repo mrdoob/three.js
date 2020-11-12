@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - post-processing SMAA
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - post-processing SMAA
 		</div>
 
 		<div id="container"></div>
@@ -23,14 +23,14 @@
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 			import { SMAAPass } from './jsm/postprocessing/SMAAPass.js';
 
-			var camera, scene, renderer, composer, pass, stats;
+			let camera, scene, renderer, composer, stats;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container = document.getElementById( "container" );
+				const container = document.getElementById( "container" );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -47,28 +47,28 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.BoxBufferGeometry( 120, 120, 120 );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+				const geometry = new THREE.BoxBufferGeometry( 120, 120, 120 );
+				const material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = - 100;
-				scene.add( mesh );
+				const mesh1 = new THREE.Mesh( geometry, material1 );
+				mesh1.position.x = - 100;
+				scene.add( mesh1 );
 
-				var texture = new THREE.TextureLoader().load( "textures/brick_diffuse.jpg" );
+				const texture = new THREE.TextureLoader().load( "textures/brick_diffuse.jpg" );
 				texture.anisotropy = 4;
 
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				const material2 = new THREE.MeshBasicMaterial( { map: texture } );
 
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = 100;
-				scene.add( mesh );
+				const mesh2 = new THREE.Mesh( geometry, material2 );
+				mesh2.position.x = 100;
+				scene.add( mesh2 );
 
 				// postprocessing
 
 				composer = new EffectComposer( renderer );
 				composer.addPass( new RenderPass( scene, camera ) );
 
-				pass = new SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
+				const pass = new SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
 				composer.addPass( pass );
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -77,8 +77,8 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -94,9 +94,9 @@
 
 				stats.begin();
 
-				for ( var i = 0; i < scene.children.length; i ++ ) {
+				for ( let i = 0; i < scene.children.length; i ++ ) {
 
-					var child = scene.children[ i ];
+					const child = scene.children[ i ];
 
 					child.rotation.x += 0.005;
 					child.rotation.y += 0.01;

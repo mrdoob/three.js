@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -115,7 +114,7 @@
 		<p>
 		[page:Ray ray] - 用于比较的[page:Ray]。<br /><br />
 
-		如果所传入的[page:Ray ray]具有和当前Ray相同的[page:.offset offset]和[page:.direction direction]则返回true。
+		如果所传入的[page:Ray ray]具有和当前Ray相同的[page:.origin origin]和[page:.direction direction]则返回true。
 		</p>
 
 		<h3>[method:Vector3 intersectBox]( [param:Box3 box], [param:Vector3 target] )</h3>
@@ -194,7 +193,7 @@
 		该向量必须经过标准化（使用[page:Vector3.normalize]），这样才能使方法正常运行。
 		<br /><br />
 
-		将传入的参数赋值给射线的[page:.origin origin]和[page:.direction direction]。
+		Sets this ray's [page:.origin origin] and [page:.direction direction] properties by copying the values from the given objects.
 		</p>
 
 

@@ -1,9 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author supereggbert / http://www.paulbrunt.co.uk/
- * @author julianwa / https://github.com/julianwa
- */
-
 THREE.RenderableObject = function () {
 
 	this.id = 0;
@@ -266,7 +260,7 @@ THREE.Projector = function () {
 
 				_line.material = object.material;
 
-				if ( object.material.vertexColors === THREE.VertexColors ) {
+				if ( object.material.vertexColors ) {
 
 					_line.vertexColors[ 0 ].fromArray( colors, a * 3 );
 					_line.vertexColors[ 1 ].fromArray( colors, b * 3 );
@@ -320,7 +314,7 @@ THREE.Projector = function () {
 
 				_face.material = material;
 
-				if ( material.vertexColors === THREE.FaceColors || material.vertexColors === THREE.VertexColors ) {
+				if ( material.vertexColors ) {
 
 					_face.color.fromArray( colors, a * 3 );
 
@@ -412,7 +406,7 @@ THREE.Projector = function () {
 		_viewMatrix.copy( camera.matrixWorldInverse );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-		_frustum.setFromMatrix( _viewProjectionMatrix );
+		_frustum.setFromProjectionMatrix( _viewProjectionMatrix );
 
 		//
 
@@ -830,7 +824,7 @@ THREE.Projector = function () {
 
 							_line.material = object.material;
 
-							if ( object.material.vertexColors === THREE.VertexColors ) {
+							if ( object.material.vertexColors ) {
 
 								_line.vertexColors[ 0 ].copy( object.geometry.colors[ v ] );
 								_line.vertexColors[ 1 ].copy( object.geometry.colors[ v - 1 ] );

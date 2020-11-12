@@ -66,7 +66,7 @@ import normal_fragment_maps from './ShaderChunk/normal_fragment_maps.glsl.js';
 import normalmap_pars_fragment from './ShaderChunk/normalmap_pars_fragment.glsl.js';
 import clearcoat_normal_fragment_begin from './ShaderChunk/clearcoat_normal_fragment_begin.glsl.js';
 import clearcoat_normal_fragment_maps from './ShaderChunk/clearcoat_normal_fragment_maps.glsl.js';
-import clearcoat_normalmap_pars_fragment from './ShaderChunk/clearcoat_normalmap_pars_fragment.glsl.js';
+import clearcoat_pars_fragment from './ShaderChunk/clearcoat_pars_fragment.glsl.js';
 import packing from './ShaderChunk/packing.glsl.js';
 import premultiplied_alpha_fragment from './ShaderChunk/premultiplied_alpha_fragment.glsl.js';
 import project_vertex from './ShaderChunk/project_vertex.glsl.js';
@@ -86,6 +86,8 @@ import specularmap_fragment from './ShaderChunk/specularmap_fragment.glsl.js';
 import specularmap_pars_fragment from './ShaderChunk/specularmap_pars_fragment.glsl.js';
 import tonemapping_fragment from './ShaderChunk/tonemapping_fragment.glsl.js';
 import tonemapping_pars_fragment from './ShaderChunk/tonemapping_pars_fragment.glsl.js';
+import transmissionmap_fragment from './ShaderChunk/transmissionmap_fragment.glsl.js';
+import transmissionmap_pars_fragment from './ShaderChunk/transmissionmap_pars_fragment.glsl.js';
 import uv_pars_fragment from './ShaderChunk/uv_pars_fragment.glsl.js';
 import uv_pars_vertex from './ShaderChunk/uv_pars_vertex.glsl.js';
 import uv_vertex from './ShaderChunk/uv_vertex.glsl.js';
@@ -127,7 +129,7 @@ import shadow_vert from './ShaderLib/shadow_vert.glsl.js';
 import sprite_frag from './ShaderLib/sprite_frag.glsl.js';
 import sprite_vert from './ShaderLib/sprite_vert.glsl.js';
 
-export var ShaderChunk = {
+export const ShaderChunk = {
 	alphamap_fragment: alphamap_fragment,
 	alphamap_pars_fragment: alphamap_pars_fragment,
 	alphatest_fragment: alphatest_fragment,
@@ -196,7 +198,7 @@ export var ShaderChunk = {
 	normalmap_pars_fragment: normalmap_pars_fragment,
 	clearcoat_normal_fragment_begin: clearcoat_normal_fragment_begin,
 	clearcoat_normal_fragment_maps: clearcoat_normal_fragment_maps,
-	clearcoat_normalmap_pars_fragment: clearcoat_normalmap_pars_fragment,
+	clearcoat_pars_fragment: clearcoat_pars_fragment,
 	packing: packing,
 	premultiplied_alpha_fragment: premultiplied_alpha_fragment,
 	project_vertex: project_vertex,
@@ -216,6 +218,8 @@ export var ShaderChunk = {
 	specularmap_pars_fragment: specularmap_pars_fragment,
 	tonemapping_fragment: tonemapping_fragment,
 	tonemapping_pars_fragment: tonemapping_pars_fragment,
+	transmissionmap_fragment: transmissionmap_fragment,
+	transmissionmap_pars_fragment: transmissionmap_pars_fragment,
 	uv_pars_fragment: uv_pars_fragment,
 	uv_pars_vertex: uv_pars_vertex,
 	uv_vertex: uv_vertex,

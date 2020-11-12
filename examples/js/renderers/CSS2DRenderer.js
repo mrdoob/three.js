@@ -1,12 +1,9 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 THREE.CSS2DObject = function ( element ) {
 
 	THREE.Object3D.call( this );
 
-	this.element = element;
+	this.element = element || document.createElement( 'div' );
+
 	this.element.style.position = 'absolute';
 
 	this.addEventListener( 'removed', function () {
@@ -25,12 +22,27 @@ THREE.CSS2DObject = function ( element ) {
 
 };
 
-THREE.CSS2DObject.prototype = Object.create( THREE.Object3D.prototype );
-THREE.CSS2DObject.prototype.constructor = THREE.CSS2DObject;
+THREE.CSS2DObject.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+
+	constructor: THREE.CSS2DObject,
+
+	copy: function ( source, recursive ) {
+
+		THREE.Object3D.prototype.copy.call( this, source, recursive );
+
+		this.element = source.element.cloneNode( true );
+
+		return this;
+
+	}
+
+} );
 
 //
 
 THREE.CSS2DRenderer = function () {
+
+	var _this = this;
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
@@ -70,9 +82,11 @@ THREE.CSS2DRenderer = function () {
 
 	};
 
-	var renderObject = function ( object, camera ) {
+	var renderObject = function ( object, scene, camera ) {
 
 		if ( object instanceof THREE.CSS2DObject ) {
+
+			object.onBeforeRender( _this, scene, camera );
 
 			vector.setFromMatrixPosition( object.matrixWorld );
 			vector.applyMatrix4( viewProjectionMatrix );
@@ -99,11 +113,13 @@ THREE.CSS2DRenderer = function () {
 
 			}
 
+			object.onAfterRender( _this, scene, camera );
+
 		}
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			renderObject( object.children[ i ], camera );
+			renderObject( object.children[ i ], scene, camera );
 
 		}
 
@@ -168,7 +184,7 @@ THREE.CSS2DRenderer = function () {
 		viewMatrix.copy( camera.matrixWorldInverse );
 		viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, viewMatrix );
 
-		renderObject( scene, camera );
+		renderObject( scene, scene, camera );
 		zOrder( scene );
 
 	};

@@ -17,11 +17,11 @@
 			import { AsciiEffect } from './jsm/effects/AsciiEffect.js';
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
-			var camera, controls, scene, renderer, effect;
+			let camera, controls, scene, renderer, effect;
 
-			var sphere, plane;
+			let sphere, plane;
 
-			var start = Date.now();
+			const start = Date.now();
 
 			init();
 			animate();
@@ -33,14 +33,15 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0, 0, 0 );
 
-				var light = new THREE.PointLight( 0xffffff );
-				light.position.set( 500, 500, 500 );
-				scene.add( light );
+				const pointLight1 = new THREE.PointLight( 0xffffff );
+				pointLight1.position.set( 500, 500, 500 );
+				scene.add( pointLight1 );
 
-				var light = new THREE.PointLight( 0xffffff, 0.25 );
-				light.position.set( - 500, - 500, - 500 );
-				scene.add( light );
+				const pointLight2 = new THREE.PointLight( 0xffffff, 0.25 );
+				pointLight2.position.set( - 500, - 500, - 500 );
+				scene.add( pointLight2 );
 
 				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 200, 20, 10 ), new THREE.MeshPhongMaterial( { flatShading: true } ) );
 				scene.add( sphere );
@@ -95,7 +96,7 @@
 
 			function render() {
 
-				var timer = Date.now() - start;
+				const timer = Date.now() - start;
 
 				sphere.position.y = Math.abs( Math.sin( timer * 0.002 ) ) * 150;
 				sphere.rotation.x = timer * 0.0003;

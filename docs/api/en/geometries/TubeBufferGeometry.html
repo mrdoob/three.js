@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -32,34 +31,35 @@
 
 		</script>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
-		function CustomSinCurve( scale ) {
+		class CustomSinCurve extends THREE.Curve {
 
-			THREE.Curve.call( this );
+			constructor( scale = 1 ) {
 
-			this.scale = ( scale === undefined ) ? 1 : scale;
+				super();
+
+				this.scale = scale;
+
+			}
+
+			getPoint( t, optionalTarget = new THREE.Vector3() ) {
+
+				const tx = t * 3 - 1.5;
+				const ty = Math.sin( 2 * Math.PI * t );
+				const tz = 0;
+
+				return optionalTarget.set( tx, ty, tz ).multiplyScalar( this.scale );
+
+			}
 
 		}
 
-		CustomSinCurve.prototype = Object.create( THREE.Curve.prototype );
-		CustomSinCurve.prototype.constructor = CustomSinCurve;
-
-		CustomSinCurve.prototype.getPoint = function ( t ) {
-
-			var tx = t * 3 - 1.5;
-			var ty = Math.sin( 2 * Math.PI * t );
-			var tz = 0;
-
-			return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
-
-		};
-
-		var path = new CustomSinCurve( 10 );
-		var geometry = new THREE.TubeBufferGeometry( path, 20, 2, 8, false );
-		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-		var mesh = new THREE.Mesh( geometry, material );
+		const path = new CustomSinCurve( 10 );
+		const geometry = new THREE.TubeBufferGeometry( path, 20, 2, 8, false );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 		</code>
 
@@ -68,7 +68,7 @@
 
 		<h3>[name]([param:Curve path], [param:Integer tubularSegments], [param:Float radius], [param:Integer radialSegments], [param:Boolean closed])</h3>
 		<p>
-		path — [page:Curve] - A path that inherits from the [page:Curve] base class<br />
+		path — [page:Curve] - A 3D path that inherits from the [page:Curve] base class<br />
 		tubularSegments — [page:Integer] - The number of segments that make up the tube, default is 64<br />
 		radius — [page:Float] - The radius of the tube, default is 1<br />
 		radialSegments — [page:Integer] - The number of segments that make up the cross-section, default is 8 <br />
@@ -104,6 +104,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/TubeGeometry.js src/geometries/TubeGeometry.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

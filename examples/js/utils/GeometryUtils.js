@@ -1,17 +1,9 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- */
-
 THREE.GeometryUtils = {
 
 	/**
 	 * Generates 2D-Coordinates in a very fast way.
 	 *
-	 * @author Dylan Grafmyre
-	 *
 	 * Based on work by:
-	 * @author Thomas Diewald
 	 * @link http://www.openprocessing.org/sketch/15493
 	 *
 	 * @param center     Center of Hilbert curve.
@@ -72,10 +64,7 @@ THREE.GeometryUtils = {
 	/**
 	 * Generates 3D-Coordinates in a very fast way.
 	 *
-	 * @author Dylan Grafmyre
-	 *
 	 * Based on work by:
-	 * @author Thomas Diewald
 	 * @link http://www.openprocessing.org/visuals/?visualID=15599
 	 *
 	 * @param center     Center of Hilbert curve.

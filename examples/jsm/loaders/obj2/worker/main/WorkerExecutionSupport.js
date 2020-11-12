@@ -1,5 +1,4 @@
 /**
- * @author Kai Salmen / https://kaisalmen.de
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
@@ -19,7 +18,7 @@ const CodeBuilderInstructions = function ( supportsStandardWorker, supportsJsmWo
 	this.codeFragments = [];
 	this.importStatements = [];
 
-	this.jsmWorkerFile = null;
+	this.jsmWorkerUrl = null;
 	this.defaultGeometryType = 0;
 
 };
@@ -49,13 +48,13 @@ CodeBuilderInstructions.prototype = {
 	/**
 	 * Set the full path to the module that contains the worker code.
 	 *
-	 * @param {String} jsmWorkerFile
+	 * @param {String} jsmWorkerUrl
 	 */
-	setJsmWorkerFile: function ( jsmWorkerFile ) {
+	setJsmWorkerUrl: function ( jsmWorkerUrl ) {
 
-		if ( jsmWorkerFile !== undefined && jsmWorkerFile !== null ) {
+		if ( jsmWorkerUrl !== undefined && jsmWorkerUrl !== null ) {
 
-			this.jsmWorkerFile = jsmWorkerFile;
+			this.jsmWorkerUrl = jsmWorkerUrl;
 
 		}
 
@@ -87,8 +86,8 @@ CodeBuilderInstructions.prototype = {
 	 */
 	addLibraryImport: function ( libraryPath ) {
 
-		let libraryUrl = new URL( libraryPath, window.location.href ).href;
-		let code = 'importScripts( "' + libraryUrl + '" );';
+		const libraryUrl = new URL( libraryPath, window.location.href ).href;
+		const code = 'importScripts( "' + libraryUrl + '" );';
 		this.importStatements.push(	code );
 
 	},
@@ -127,7 +126,8 @@ const WorkerExecutionSupport = function () {
 	this._reset();
 
 };
-WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.1.0';
+
+WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.2.0';
 console.info( 'Using WorkerSupport version: ' + WorkerExecutionSupport.WORKER_SUPPORT_VERSION );
 
 
@@ -142,12 +142,13 @@ WorkerExecutionSupport.prototype = {
 			debug: false
 		};
 
-		let scope = this;
-		let scopeTerminate = function ( ) {
+		const scope = this;
+		const scopeTerminate = function ( ) {
 
 			scope._terminate();
 
 		};
+
 		this.worker = {
 			native: null,
 			jsmWorker: false,
@@ -213,9 +214,11 @@ WorkerExecutionSupport.prototype = {
 				console.info( 'Worker is terminated immediately as it is not running!' );
 
 			}
+
 			this._terminate();
 
 		}
+
 		return this;
 
 	},
@@ -233,11 +236,13 @@ WorkerExecutionSupport.prototype = {
 			this.worker.callbacks.onAssetAvailable = onAssetAvailable;
 
 		}
+
 		if ( onLoad !== undefined && onLoad !== null ) {
 
 			this.worker.callbacks.onLoad = onLoad;
 
 		}
+
 		this._verifyCallbacks();
 
 	},
@@ -285,14 +290,13 @@ WorkerExecutionSupport.prototype = {
 	_buildWorkerJsm: function ( codeBuilderInstructions ) {
 
 		let jsmSuccess = true;
-		let timeLabel = 'buildWorkerJsm';
-		let workerAvailable = this._buildWorkerCheckPreconditions( true, timeLabel );
+		const timeLabel = 'buildWorkerJsm';
+		const workerAvailable = this._buildWorkerCheckPreconditions( true, timeLabel );
 		if ( ! workerAvailable ) {
 
-			let workerFileUrl = new URL( codeBuilderInstructions.jsmWorkerFile, window.location.href ).href;
 			try {
 
-				let worker = new Worker( workerFileUrl, { type: "module" } );
+				const worker = new Worker( codeBuilderInstructions.jsmWorkerUrl.href, { type: "module" } );
 				this._configureWorkerCommunication( worker, true, codeBuilderInstructions.defaultGeometryType, timeLabel );
 
 			} catch ( e ) {
@@ -326,8 +330,8 @@ WorkerExecutionSupport.prototype = {
 	 */
 	_buildWorkerStandard: function ( codeBuilderInstructions ) {
 
-		let timeLabel = 'buildWorkerStandard';
-		let workerAvailable = this._buildWorkerCheckPreconditions( false, timeLabel );
+		const timeLabel = 'buildWorkerStandard';
+		const workerAvailable = this._buildWorkerCheckPreconditions( false, timeLabel );
 		if ( ! workerAvailable ) {
 
 			let concatenateCode = '';
@@ -345,8 +349,8 @@ WorkerExecutionSupport.prototype = {
 			concatenateCode += '\n';
 			concatenateCode += codeBuilderInstructions.getStartCode();
 
-			let blob = new Blob( [ concatenateCode ], { type: 'application/javascript' } );
-			let worker = new Worker( window.URL.createObjectURL( blob ) );
+			const blob = new Blob( [ concatenateCode ], { type: 'application/javascript' } );
+			const worker = new Worker( window.URL.createObjectURL( blob ) );
 
 			this._configureWorkerCommunication( worker, false, codeBuilderInstructions.defaultGeometryType, timeLabel );
 
@@ -371,6 +375,7 @@ WorkerExecutionSupport.prototype = {
 			}
 
 		}
+
 		return workerAvailable;
 
 	},
@@ -380,13 +385,15 @@ WorkerExecutionSupport.prototype = {
 		this.worker.native = worker;
 		this.worker.jsmWorker = haveJsmWorker;
 
-		let scope = this;
-		let scopedReceiveWorkerMessage = function ( event ) {
+		const scope = this;
+		const scopedReceiveWorkerMessage = function ( event ) {
 
 			scope._receiveWorkerMessage( event );
 
 		};
+
 		this.worker.native.onmessage = scopedReceiveWorkerMessage;
+		this.worker.native.onerror = scopedReceiveWorkerMessage;
 		if ( defaultGeometryType !== undefined && defaultGeometryType !== null ) {
 
 			this.worker.workerRunner.defaultGeometryType = defaultGeometryType;
@@ -418,9 +425,16 @@ WorkerExecutionSupport.prototype = {
 	 */
 	_receiveWorkerMessage: function ( event ) {
 
-		let payload = event.data;
-		let workerRunnerName = this.worker.workerRunner.name;
+		// fast-fail in case of error
+		if ( event.type === "error" ) {
 
+			console.error( event );
+			return;
+
+		}
+
+		const payload = event.data;
+		const workerRunnerName = this.worker.workerRunner.name;
 		switch ( payload.cmd ) {
 
 			case 'assetAvailable':
@@ -435,6 +449,7 @@ WorkerExecutionSupport.prototype = {
 					this.worker.callbacks.onLoad( payload.msg );
 
 				}
+
 				if ( this.worker.terminateWorkerOnLoad ) {
 
 					if ( this.worker.logging.enabled ) {
@@ -442,9 +457,11 @@ WorkerExecutionSupport.prototype = {
 						console.info( 'WorkerSupport [' + workerRunnerName + ']: Run is complete. Terminating application on request!' );
 
 					}
+
 					this.worker.callbacks.terminate();
 
 				}
+
 				break;
 
 			case 'error':
@@ -456,6 +473,7 @@ WorkerExecutionSupport.prototype = {
 					this.worker.callbacks.onLoad( payload.msg );
 
 				}
+
 				if ( this.worker.terminateWorkerOnLoad ) {
 
 					if ( this.worker.logging.enabled ) {
@@ -463,9 +481,11 @@ WorkerExecutionSupport.prototype = {
 						console.info( 'WorkerSupport [' + workerRunnerName + ']: Run reported error. Terminating application on request!' );
 
 					}
+
 					this.worker.callbacks.terminate();
 
 				}
+
 				break;
 
 			default:
@@ -510,6 +530,7 @@ WorkerExecutionSupport.prototype = {
 			this.worker.started = true;
 
 		}
+
 		return ready;
 
 	},
@@ -530,11 +551,13 @@ WorkerExecutionSupport.prototype = {
 					transferables.push( this.worker.queuedMessage.payload.data.input );
 
 				}
+
 				if ( this.worker.queuedMessage.transferables.length > 0 ) {
 
 					transferables = transferables.concat( this.worker.queuedMessage.transferables );
 
 				}
+
 				this.worker.native.postMessage( this.worker.queuedMessage.payload, transferables );
 
 			} else {

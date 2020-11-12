@@ -1,7 +1,3 @@
-/**
- * @author lxxxvi / https://github.com/lxxxvi
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
 
 QUnit.module( "SetMaterialValueCommand" );
 
@@ -20,7 +16,6 @@ QUnit.test( "Test for SetMaterialValueCommand (Undo and Redo)", function( assert
 		uuid: [ THREE.Math.generateUUID(), THREE.Math.generateUUID(), THREE.Math.generateUUID() ],
 		name: [ 'Alpha', 'Bravo', 'Charlie' ],
 		shininess: [ 11.1, 22.2, 33.3 ],
-		vertexColors: [ 'No', 'Face', 'Vertex' ],
 		bumpScale: [ 1.1, 2.2, 3.3 ],
 		reflectivity: [ - 1.3, 2.1, 5.0 ],
 		aoMapIntensity: [ 0.1, 0.4, 0.7 ],

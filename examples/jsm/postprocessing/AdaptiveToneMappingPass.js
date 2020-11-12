@@ -1,12 +1,3 @@
-/**
- * @author miibond
- * Generate a texture that represents the luminosity of the current scene, adapted over time
- * to simulate the optic nerve responding to the amount of light it is receiving.
- * Based on a GDC2007 presentation by Wolfgang Engel titled "Post-Processing Pipeline"
- *
- * Full-screen tone-mapping shader based on http://www.graphics.cornell.edu/~jaf/publications/sig02_paper.pdf
- */
-
 import {
 	LinearFilter,
 	LinearMipmapLinearFilter,
@@ -21,6 +12,14 @@ import { Pass } from "../postprocessing/Pass.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 import { LuminosityShader } from "../shaders/LuminosityShader.js";
 import { ToneMapShader } from "../shaders/ToneMapShader.js";
+
+/**
+ * Generate a texture that represents the luminosity of the current scene, adapted over time
+ * to simulate the optic nerve responding to the amount of light it is receiving.
+ * Based on a GDC2007 presentation by Wolfgang Engel titled "Post-Processing Pipeline"
+ *
+ * Full-screen tone-mapping shader based on http://www.graphics.cornell.edu/~jaf/publications/sig02_paper.pdf
+ */
 
 var AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
@@ -206,11 +205,13 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 			this.luminanceRT.dispose();
 
 		}
+
 		if ( this.currentLuminanceRT ) {
 
 			this.currentLuminanceRT.dispose();
 
 		}
+
 		if ( this.previousLuminanceRT ) {
 
 			this.previousLuminanceRT.dispose();
@@ -239,6 +240,7 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT.texture;
 
 		}
+
 		//Put something in the adaptive luminance texture so that the scene can render initially
 		this.fsQuad.material = new MeshBasicMaterial( { color: 0x777777 } );
 		this.materialLuminance.needsUpdate = true;
@@ -265,6 +267,7 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 			this.materialToneMap.uniforms.luminanceMap.value = null;
 
 		}
+
 		this.materialToneMap.needsUpdate = true;
 
 	},
@@ -327,31 +330,37 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 			this.luminanceRT.dispose();
 
 		}
+
 		if ( this.previousLuminanceRT ) {
 
 			this.previousLuminanceRT.dispose();
 
 		}
+
 		if ( this.currentLuminanceRT ) {
 
 			this.currentLuminanceRT.dispose();
 
 		}
+
 		if ( this.materialLuminance ) {
 
 			this.materialLuminance.dispose();
 
 		}
+
 		if ( this.materialAdaptiveLum ) {
 
 			this.materialAdaptiveLum.dispose();
 
 		}
+
 		if ( this.materialCopy ) {
 
 			this.materialCopy.dispose();
 
 		}
+
 		if ( this.materialToneMap ) {
 
 			this.materialToneMap.dispose();

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -15,36 +14,32 @@
 			[link:https://github.com/mrdoob/eventdispatcher.js Eventdispatcher on GitHub]
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
-// Adding events to a custom object
+		// Adding events to a custom object
 
-var Car = function () {
+		class Car extends EventDispatcher {
 
-    this.start = function () {
+			start() {
 
-        this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
+				this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
 
-    };
+			}
 
-};
+		};
 
-// Mixing the EventDispatcher.prototype with the custom object prototype
+		// Using events with the custom object
 
-Object.assign( Car.prototype, EventDispatcher.prototype );
+		const car = new Car();
 
-// Using events with the custom object
+		car.addEventListener( 'start', function ( event ) {
 
-var car = new Car();
+			alert( event.message );
 
-car.addEventListener( 'start', function ( event ) {
+		} );
 
-    alert( event.message );
-
-} );
-
-car.start();
+		car.start();
 		</code>
 
 		<h2>Constructor</h2>

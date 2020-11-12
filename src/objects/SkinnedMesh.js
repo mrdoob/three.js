@@ -1,11 +1,6 @@
-/**
- * @author mikael emtinger / http://gomo.se/
- * @author alteredq / http://alteredqualia.com/
- * @author ikerr / http://verold.com
- */
-
 import { Mesh } from './Mesh.js';
 import { Matrix4 } from '../math/Matrix4.js';
+import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 
 function SkinnedMesh( geometry, material ) {
@@ -31,6 +26,20 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 	constructor: SkinnedMesh,
 
 	isSkinnedMesh: true,
+
+	copy: function ( source ) {
+
+		Mesh.prototype.copy.call( this, source );
+
+		this.bindMode = source.bindMode;
+		this.bindMatrix.copy( source.bindMatrix );
+		this.bindMatrixInverse.copy( source.bindMatrixInverse );
+
+		this.skeleton = source.skeleton;
+
+		return this;
+
+	},
 
 	bind: function ( skeleton, bindMatrix ) {
 
@@ -59,18 +68,18 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	normalizeSkinWeights: function () {
 
-		var vector = new Vector4();
+		const vector = new Vector4();
 
-		var skinWeight = this.geometry.attributes.skinWeight;
+		const skinWeight = this.geometry.attributes.skinWeight;
 
-		for ( var i = 0, l = skinWeight.count; i < l; i ++ ) {
+		for ( let i = 0, l = skinWeight.count; i < l; i ++ ) {
 
 			vector.x = skinWeight.getX( i );
 			vector.y = skinWeight.getY( i );
 			vector.z = skinWeight.getZ( i );
 			vector.w = skinWeight.getW( i );
 
-			var scale = 1.0 / vector.manhattanLength();
+			const scale = 1.0 / vector.manhattanLength();
 
 			if ( scale !== Infinity ) {
 
@@ -108,11 +117,49 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
-	clone: function () {
+	boneTransform: ( function () {
 
-		return new this.constructor( this.geometry, this.material ).copy( this );
+		const basePosition = new Vector3();
 
-	}
+		const skinIndex = new Vector4();
+		const skinWeight = new Vector4();
+
+		const vector = new Vector3();
+		const matrix = new Matrix4();
+
+		return function ( index, target ) {
+
+			const skeleton = this.skeleton;
+			const geometry = this.geometry;
+
+			skinIndex.fromBufferAttribute( geometry.attributes.skinIndex, index );
+			skinWeight.fromBufferAttribute( geometry.attributes.skinWeight, index );
+
+			basePosition.fromBufferAttribute( geometry.attributes.position, index ).applyMatrix4( this.bindMatrix );
+
+			target.set( 0, 0, 0 );
+
+			for ( let i = 0; i < 4; i ++ ) {
+
+				const weight = skinWeight.getComponent( i );
+
+				if ( weight !== 0 ) {
+
+					const boneIndex = skinIndex.getComponent( i );
+
+					matrix.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
+
+					target.addScaledVector( vector.copy( basePosition ).applyMatrix4( matrix ), weight );
+
+				}
+
+			}
+
+			return target.applyMatrix4( this.bindMatrixInverse );
+
+		};
+
+	}() )
 
 } );
 

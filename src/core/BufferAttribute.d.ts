@@ -3,24 +3,47 @@ import { Matrix3 } from './../math/Matrix3';
 import { Matrix4 } from './../math/Matrix4';
 
 /**
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferAttribute.js">src/core/BufferAttribute.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/BufferAttribute.js|src/core/BufferAttribute.js}
  */
 export class BufferAttribute {
 
 	constructor( array: ArrayLike<number>, itemSize: number, normalized?: boolean ); // array parameter should be TypedArray.
 
+	/**
+	 * @default ''
+	 */
 	name: string;
 	array: ArrayLike<number>;
 	itemSize: number;
+
+	/**
+	 * @default THREE.StaticDrawUsage
+	 */
 	usage: Usage;
+
+	/**
+	 * @default { offset: number; count: number }
+	 */
 	updateRange: { offset: number; count: number };
+
+	/**
+	 * @default 0
+	 */
 	version: number;
+
+	/**
+	 * @default false
+	 */
 	normalized: boolean;
+
+	/**
+	 * @default 0
+	 */
 	count: number;
 
 	set needsUpdate( value: boolean );
 
-	isBufferAttribute: true;
+	readonly isBufferAttribute: true;
 
 	onUploadCallback: () => void;
 	onUpload( callback: () => void ): this;

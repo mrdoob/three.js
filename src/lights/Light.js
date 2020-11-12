@@ -1,11 +1,6 @@
 import { Object3D } from '../core/Object3D.js';
 import { Color } from '../math/Color.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- */
-
 function Light( color, intensity ) {
 
 	Object3D.call( this );
@@ -14,8 +9,6 @@ function Light( color, intensity ) {
 
 	this.color = new Color( color );
 	this.intensity = intensity !== undefined ? intensity : 1;
-
-	this.receiveShadow = undefined;
 
 }
 
@@ -38,7 +31,7 @@ Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	toJSON: function ( meta ) {
 
-		var data = Object3D.prototype.toJSON.call( this, meta );
+		const data = Object3D.prototype.toJSON.call( this, meta );
 
 		data.object.color = this.color.getHex();
 		data.object.intensity = this.intensity;

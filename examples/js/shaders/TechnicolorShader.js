@@ -1,6 +1,4 @@
 /**
- * @author flimshaw / http://charliehoey.com
- *
  * Technicolor Shader
  * Simulates the look of the two-strip technicolor process popular in early 20th century films.
  * More historical info here: http://www.widescreenmuseum.com/oldcolor/technicolor1.htm

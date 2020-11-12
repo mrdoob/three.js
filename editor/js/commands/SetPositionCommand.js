@@ -1,8 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
-
 import { Command } from '../Command.js';
 
 import * as THREE from '../../../build/three.module.js';
@@ -14,7 +9,7 @@ import * as THREE from '../../../build/three.module.js';
  * @param optionalOldPosition THREE.Vector3
  * @constructor
  */
-var SetPositionCommand = function ( editor, object, newPosition, optionalOldPosition ) {
+function SetPositionCommand( editor, object, newPosition, optionalOldPosition ) {
 
 	Command.call( this, editor );
 
@@ -37,7 +32,8 @@ var SetPositionCommand = function ( editor, object, newPosition, optionalOldPosi
 
 	}
 
-};
+}
+
 SetPositionCommand.prototype = {
 
 	execute: function () {

@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,7 +15,7 @@
 		<h3>[name]( [param:Vector3 center], [param:Float radius] )</h3>
 		<p>
 		[page:Vector3 center] - 球心的位置，默认值是一个位于(0, 0, 0)的[page:Vector3]。<br />
-		[page:Float radius] - 球的半径，默认值是0。<br /><br />
+		[page:Float radius] - 球的半径，默认值是-1。<br /><br />
 
 		创建一个新的[name]。
 
@@ -70,8 +69,14 @@
 		若这个点，则距离将为负值。
 		</p>
 
-		<h3>[method:Boolean empty]()</h3>
-		<p>检查球是否为空（其半径设为了0）.</p>
+		<h3>[method:Boolean isEmpty]()</h3>
+		<p>
+		检查球是否为空（the radius set to a negative number）.
+		Spheres with a radius of 0 contain only their center point and are not considered to be empty.
+		</p>
+
+		<h3>[method:Sphere makeEmpty]()</h3>
+		<p>Makes the sphere empty by setting [page:.center center] to (0, 0, 0) and [page:.radius radius] to -1.</p>
 
 		<h3>[method:Boolean equals]( [param:Sphere sphere] )</h3>
 		<p>
@@ -111,7 +116,8 @@
 			[page:Vector3 center] - 球心位置。<br />
 			[page:Float radius] - 球的半径。<br /><br />
 
-		设置球的[page:.center center]和[page:.radius radius]属性。
+		设置球的[page:.center center]和[page:.radius radius]属性。<br>
+		Please note that this method only copies the values from the given center.
 		</p>
 
 		<h3>[method:Sphere setFromPoints]( [param:Array points], [param:Vector3 optionalCenter] )</h3>

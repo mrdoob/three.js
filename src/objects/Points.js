@@ -6,14 +6,10 @@ import { Vector3 } from '../math/Vector3.js';
 import { PointsMaterial } from '../materials/PointsMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-var _inverseMatrix = new Matrix4();
-var _ray = new Ray();
-var _sphere = new Sphere();
-var _position = new Vector3();
+const _inverseMatrix = new Matrix4();
+const _ray = new Ray();
+const _sphere = new Sphere();
+const _position = new Vector3();
 
 function Points( geometry, material ) {
 
@@ -22,7 +18,7 @@ function Points( geometry, material ) {
 	this.type = 'Points';
 
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new PointsMaterial( { color: Math.random() * 0xffffff } );
+	this.material = material !== undefined ? material : new PointsMaterial();
 
 	this.updateMorphTargets();
 
@@ -34,11 +30,22 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isPoints: true,
 
+	copy: function ( source ) {
+
+		Object3D.prototype.copy.call( this, source );
+
+		this.material = source.material;
+		this.geometry = source.geometry;
+
+		return this;
+
+	},
+
 	raycast: function ( raycaster, intersects ) {
 
-		var geometry = this.geometry;
-		var matrixWorld = this.matrixWorld;
-		var threshold = raycaster.params.Points.threshold;
+		const geometry = this.geometry;
+		const matrixWorld = this.matrixWorld;
+		const threshold = raycaster.params.Points.threshold;
 
 		// Checking boundingSphere distance to ray
 
@@ -55,24 +62,24 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		_inverseMatrix.getInverse( matrixWorld );
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-		var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
-		var localThresholdSq = localThreshold * localThreshold;
+		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		const localThresholdSq = localThreshold * localThreshold;
 
 		if ( geometry.isBufferGeometry ) {
 
-			var index = geometry.index;
-			var attributes = geometry.attributes;
-			var positions = attributes.position.array;
+			const index = geometry.index;
+			const attributes = geometry.attributes;
+			const positionAttribute = attributes.position;
 
 			if ( index !== null ) {
 
-				var indices = index.array;
+				const indices = index.array;
 
-				for ( var i = 0, il = indices.length; i < il; i ++ ) {
+				for ( let i = 0, il = indices.length; i < il; i ++ ) {
 
-					var a = indices[ i ];
+					const a = indices[ i ];
 
-					_position.fromArray( positions, a * 3 );
+					_position.fromBufferAttribute( positionAttribute, a );
 
 					testPoint( _position, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
@@ -80,9 +87,9 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			} else {
 
-				for ( var i = 0, l = positions.length / 3; i < l; i ++ ) {
+				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
 
-					_position.fromArray( positions, i * 3 );
+					_position.fromBufferAttribute( positionAttribute, i );
 
 					testPoint( _position, i, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
@@ -92,9 +99,9 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		} else {
 
-			var vertices = geometry.vertices;
+			const vertices = geometry.vertices;
 
-			for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+			for ( let i = 0, l = vertices.length; i < l; i ++ ) {
 
 				testPoint( vertices[ i ], i, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
@@ -106,26 +113,25 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	updateMorphTargets: function () {
 
-		var geometry = this.geometry;
-		var m, ml, name;
+		const geometry = this.geometry;
 
 		if ( geometry.isBufferGeometry ) {
 
-			var morphAttributes = geometry.morphAttributes;
-			var keys = Object.keys( morphAttributes );
+			const morphAttributes = geometry.morphAttributes;
+			const keys = Object.keys( morphAttributes );
 
 			if ( keys.length > 0 ) {
 
-				var morphAttribute = morphAttributes[ keys[ 0 ] ];
+				const morphAttribute = morphAttributes[ keys[ 0 ] ];
 
 				if ( morphAttribute !== undefined ) {
 
 					this.morphTargetInfluences = [];
 					this.morphTargetDictionary = {};
 
-					for ( m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
+					for ( let m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
 
-						name = morphAttribute[ m ].name || String( m );
+						const name = morphAttribute[ m ].name || String( m );
 
 						this.morphTargetInfluences.push( 0 );
 						this.morphTargetDictionary[ name ] = m;
@@ -138,7 +144,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		} else {
 
-			var morphTargets = geometry.morphTargets;
+			const morphTargets = geometry.morphTargets;
 
 			if ( morphTargets !== undefined && morphTargets.length > 0 ) {
 
@@ -148,28 +154,22 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-	},
-
-	clone: function () {
-
-		return new this.constructor( this.geometry, this.material ).copy( this );
-
 	}
 
 } );
 
 function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, intersects, object ) {
 
-	var rayPointDistanceSq = _ray.distanceSqToPoint( point );
+	const rayPointDistanceSq = _ray.distanceSqToPoint( point );
 
 	if ( rayPointDistanceSq < localThresholdSq ) {
 
-		var intersectPoint = new Vector3();
+		const intersectPoint = new Vector3();
 
 		_ray.closestPointToPoint( point, intersectPoint );
 		intersectPoint.applyMatrix4( matrixWorld );
 
-		var distance = raycaster.ray.origin.distanceTo( intersectPoint );
+		const distance = raycaster.ray.origin.distanceTo( intersectPoint );
 
 		if ( distance < raycaster.near || distance > raycaster.far ) return;
 

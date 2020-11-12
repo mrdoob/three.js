@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,23 +13,18 @@
 
 		<p class="desc">用于模拟聚光灯 [page:SpotLight] 的锥形辅助对象.</p>
 
-		<h2>例子</h2>
-		<iframe src='../examples/webgl_lights_spotlight.html'></iframe>
-		<a target="THREE_Examples" href="../examples/#webgl_lights_spotlight">View in Examples</a><br />
-		<h2>其他例子</h2>
-
-		<div>[example:webgl_lights_spotlights lights / spotlights ]</div>
-
 		<h2>代码示例</h2>
 		<code>
-		var spotLight = new THREE.SpotLight( 0xffffff );
+		const spotLight = new THREE.SpotLight( 0xffffff );
 		spotLight.position.set( 10, 10, 10 );
 		scene.add( spotLight );
 
-		var spotLightHelper = new THREE.SpotLightHelper( spotLight );
+		const spotLightHelper = new THREE.SpotLightHelper( spotLight );
 		scene.add( spotLightHelper );
 		</code>
 
+		<h2>例子</h2>
+		<p>[example:webgl_lights_spotlights WebGL / lights / spotlights ]</p>
 
 		<h2>构造函数</h2>
 

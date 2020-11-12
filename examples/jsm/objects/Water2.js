@@ -1,15 +1,7 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- *
- * References:
- *	http://www.valvesoftware.com/publications/2010/siggraph2010_vlachos_waterflow.pdf
- * 	http://graphicsrunner.blogspot.de/2010/08/water-using-flow-maps.html
- *
- */
-
 import {
 	Clock,
 	Color,
+	LinearEncoding,
 	Matrix4,
 	Mesh,
 	RepeatWrapping,
@@ -22,6 +14,13 @@ import {
 } from "../../../build/three.module.js";
 import { Reflector } from "../objects/Reflector.js";
 import { Refractor } from "../objects/Refractor.js";
+
+/**
+ * References:
+ *	http://www.valvesoftware.com/publications/2010/siggraph2010_vlachos_waterflow.pdf
+ * 	http://graphicsrunner.blogspot.de/2010/08/water-using-flow-maps.html
+ *
+ */
 
 var Water = function ( geometry, options ) {
 
@@ -42,6 +41,7 @@ var Water = function ( geometry, options ) {
 	var reflectivity = options.reflectivity || 0.02;
 	var scale = options.scale || 1;
 	var shader = options.shader || Water.WaterShader;
+	var encoding = options.encoding !== undefined ? options.encoding : LinearEncoding;
 
 	var textureLoader = new TextureLoader();
 
@@ -73,13 +73,15 @@ var Water = function ( geometry, options ) {
 	var reflector = new Reflector( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
-		clipBias: clipBias
+		clipBias: clipBias,
+		encoding: encoding
 	} );
 
 	var refractor = new Refractor( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
-		clipBias: clipBias
+		clipBias: clipBias,
+		encoding: encoding
 	} );
 
 	reflector.matrixAutoUpdate = false;
@@ -252,6 +254,7 @@ Water.WaterShader = {
 
 	vertexShader: [
 
+		'#include <common>',
 		'#include <fog_pars_vertex>',
 		'#include <logdepthbuf_pars_vertex>',
 

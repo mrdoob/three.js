@@ -20,52 +20,52 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TGALoader } from './jsm/loaders/TGALoader.js';
 
-			var camera, scene, renderer, stats;
+			let camera, scene, renderer, stats;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
 				camera.position.set( 0, 50, 250 );
 
 				scene = new THREE.Scene();
 
 				//
 
-				var loader = new TGALoader();
-				var geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				const loader = new TGALoader();
+				const geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
 
 				// add box 1 - grey8 texture
 
-				var texture1 = loader.load( 'textures/crate_grey8.tga' );
-				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
+				const texture1 = loader.load( 'textures/crate_grey8.tga' );
+				const material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 
-				var mesh1 = new THREE.Mesh( geometry, material1 );
+				const mesh1 = new THREE.Mesh( geometry, material1 );
 				mesh1.position.x = - 50;
 
 				scene.add( mesh1 );
 
 				// add box 2 - tga texture
 
-				var texture2 = loader.load( 'textures/crate_color8.tga' );
-				var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
+				const texture2 = loader.load( 'textures/crate_color8.tga' );
+				const material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
 
-				var mesh2 = new THREE.Mesh( geometry, material2 );
+				const mesh2 = new THREE.Mesh( geometry, material2 );
 				mesh2.position.x = 50;
 
 				scene.add( mesh2 );
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.4 );
 				scene.add( ambientLight );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				const light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
@@ -78,7 +78,8 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
 
 				//
 

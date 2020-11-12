@@ -1,23 +1,3 @@
-/**
- * @author Kyle-Larson https://github.com/Kyle-Larson
- * @author Takahiro https://github.com/takahirox
- * @author Lewy Blue https://github.com/looeee
- *
- * Loader loads FBX file and generates Group representing FBX scene.
- * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format
- * Versions lower than this may load but will probably have errors
- *
- * Needs Support:
- *  Morph normals / blend shape normals
- *
- * FBX format references:
- * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
- * 	http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html (C++ SDK reference)
- *
- * 	Binary format specification:
- *		https://code.blender.org/2013/08/fbx-binary-file-format-specification/
- */
-
 import {
 	AmbientLight,
 	AnimationClip,
@@ -36,7 +16,7 @@ import {
 	LineBasicMaterial,
 	Loader,
 	LoaderUtils,
-	Math as _Math,
+	MathUtils,
 	Matrix3,
 	Matrix4,
 	Mesh,
@@ -60,11 +40,26 @@ import {
 	Vector3,
 	Vector4,
 	VectorKeyframeTrack,
-	VertexColors,
 	sRGBEncoding
 } from "../../../build/three.module.js";
-import { Zlib } from "../libs/inflate.module.min.js";
+import { Inflate } from "../libs/inflate.module.min.js";
 import { NURBSCurve } from "../curves/NURBSCurve.js";
+
+/**
+ * Loader loads FBX file and generates Group representing FBX scene.
+ * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format
+ * Versions lower than this may load but will probably have errors
+ *
+ * Needs Support:
+ *  Morph normals / blend shape normals
+ *
+ * FBX format references:
+ * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
+ * 	http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html (C++ SDK reference)
+ *
+ * 	Binary format specification:
+ *		https://code.blender.org/2013/08/fbx-binary-file-format-specification/
+ */
 
 
 var FBXLoader = ( function () {
@@ -85,29 +80,35 @@ var FBXLoader = ( function () {
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
-			var self = this;
+			var scope = this;
 
-			var path = ( self.path === '' ) ? LoaderUtils.extractUrlBase( url ) : self.path;
+			var path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
 			var loader = new FileLoader( this.manager );
-			loader.setPath( self.path );
+			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 
 			loader.load( url, function ( buffer ) {
 
 				try {
 
-					onLoad( self.parse( buffer, path ) );
+					onLoad( scope.parse( buffer, path ) );
 
-				} catch ( error ) {
+				} catch ( e ) {
 
-					setTimeout( function () {
+					if ( onError ) {
 
-						if ( onError ) onError( error );
+						onError( e );
 
-						self.manager.itemError( url );
+					} else {
 
-					}, 0 );
+						console.error( e );
+
+					}
+
+					scope.manager.itemError( url );
 
 				}
 
@@ -536,6 +537,7 @@ var FBXLoader = ( function () {
 				parameters.bumpScale = materialNode.BumpFactor.value;
 
 			}
+
 			if ( materialNode.Diffuse ) {
 
 				parameters.color = new Color().fromArray( materialNode.Diffuse.value );
@@ -605,7 +607,7 @@ var FBXLoader = ( function () {
 
 			}
 
-			var self = this;
+			var scope = this;
 			connections.get( ID ).children.forEach( function ( child ) {
 
 				var type = child.relationship;
@@ -613,46 +615,47 @@ var FBXLoader = ( function () {
 				switch ( type ) {
 
 					case 'Bump':
-						parameters.bumpMap = self.getTexture( textureMap, child.ID );
+						parameters.bumpMap = scope.getTexture( textureMap, child.ID );
 						break;
 
 					case 'Maya|TEX_ao_map':
-						parameters.aoMap = self.getTexture( textureMap, child.ID );
+						parameters.aoMap = scope.getTexture( textureMap, child.ID );
 						break;
 
 					case 'DiffuseColor':
 					case 'Maya|TEX_color_map':
-						parameters.map = self.getTexture( textureMap, child.ID );
+						parameters.map = scope.getTexture( textureMap, child.ID );
 						parameters.map.encoding = sRGBEncoding;
 						break;
 
 					case 'DisplacementColor':
-						parameters.displacementMap = self.getTexture( textureMap, child.ID );
+						parameters.displacementMap = scope.getTexture( textureMap, child.ID );
 						break;
 
 					case 'EmissiveColor':
-						parameters.emissiveMap = self.getTexture( textureMap, child.ID );
+						parameters.emissiveMap = scope.getTexture( textureMap, child.ID );
 						parameters.emissiveMap.encoding = sRGBEncoding;
 						break;
 
 					case 'NormalMap':
 					case 'Maya|TEX_normal_map':
-						parameters.normalMap = self.getTexture( textureMap, child.ID );
+						parameters.normalMap = scope.getTexture( textureMap, child.ID );
 						break;
 
 					case 'ReflectionColor':
-						parameters.envMap = self.getTexture( textureMap, child.ID );
+						parameters.envMap = scope.getTexture( textureMap, child.ID );
 						parameters.envMap.mapping = EquirectangularReflectionMapping;
 						parameters.envMap.encoding = sRGBEncoding;
 						break;
 
 					case 'SpecularColor':
-						parameters.specularMap = self.getTexture( textureMap, child.ID );
+						parameters.specularMap = scope.getTexture( textureMap, child.ID );
 						parameters.specularMap.encoding = sRGBEncoding;
 						break;
 
 					case 'TransparentColor':
-						parameters.alphaMap = self.getTexture( textureMap, child.ID );
+					case 'TransparencyFactor':
+						parameters.alphaMap = scope.getTexture( textureMap, child.ID );
 						parameters.transparent = true;
 						break;
 
@@ -832,11 +835,11 @@ var FBXLoader = ( function () {
 
 			var modelNodes = fbxTree.Objects.Model;
 
-			var self = this;
+			var scope = this;
 			modelMap.forEach( function ( model ) {
 
 				var modelNode = modelNodes[ model.ID ];
-				self.setLookAtProperties( model, modelNode );
+				scope.setLookAtProperties( model, modelNode );
 
 				var parentConnections = connections.get( model.ID ).parents;
 
@@ -870,7 +873,7 @@ var FBXLoader = ( function () {
 
 					var transform = generateTransform( node.userData.transformData );
 
-					node.applyMatrix( transform );
+					node.applyMatrix4( transform );
 
 				}
 
@@ -1170,7 +1173,7 @@ var FBXLoader = ( function () {
 
 						if ( lightAttribute.InnerAngle !== undefined ) {
 
-							angle = _Math.degToRad( lightAttribute.InnerAngle.value );
+							angle = MathUtils.degToRad( lightAttribute.InnerAngle.value );
 
 						}
 
@@ -1180,7 +1183,7 @@ var FBXLoader = ( function () {
 							// TODO: this is not correct - FBX calculates outer and inner angle in degrees
 							// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
 							// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
-							penumbra = _Math.degToRad( lightAttribute.OuterAngle.value );
+							penumbra = MathUtils.degToRad( lightAttribute.OuterAngle.value );
 							penumbra = Math.max( penumbra, 1 );
 
 						}
@@ -1250,7 +1253,7 @@ var FBXLoader = ( function () {
 
 				materials.forEach( function ( material ) {
 
-					material.vertexColors = VertexColors;
+					material.vertexColors = true;
 
 				} );
 
@@ -1457,7 +1460,7 @@ var FBXLoader = ( function () {
 
 		setupMorphMaterials: function () {
 
-			var self = this;
+			var scope = this;
 			sceneGraph.traverse( function ( child ) {
 
 				if ( child.isMesh ) {
@@ -1468,13 +1471,13 @@ var FBXLoader = ( function () {
 
 							child.material.forEach( function ( material, i ) {
 
-								self.setupMorphMaterial( child, material, i );
+								scope.setupMorphMaterial( child, material, i );
 
 							} );
 
 						} else {
 
-							self.setupMorphMaterial( child, child.material );
+							scope.setupMorphMaterial( child, child.material );
 
 						}
 
@@ -1767,7 +1770,12 @@ var FBXLoader = ( function () {
 				var i = 0;
 				while ( geoNode.LayerElementUV[ i ] ) {
 
-					geoInfo.uv.push( this.parseUVs( geoNode.LayerElementUV[ i ] ) );
+					if ( geoNode.LayerElementUV[ i ].UV ) {
+
+						geoInfo.uv.push( this.parseUVs( geoNode.LayerElementUV[ i ] ) );
+
+					}
+
 					i ++;
 
 				}
@@ -1828,7 +1836,7 @@ var FBXLoader = ( function () {
 			var faceWeights = [];
 			var faceWeightIndices = [];
 
-			var self = this;
+			var scope = this;
 			geoInfo.vertexIndices.forEach( function ( vertexIndex, polygonVertexIndex ) {
 
 				var endOfFace = false;
@@ -1967,7 +1975,7 @@ var FBXLoader = ( function () {
 
 				if ( endOfFace ) {
 
-					self.genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength );
+					scope.genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength );
 
 					polygonIndex ++;
 					faceLength = 0;
@@ -2111,7 +2119,7 @@ var FBXLoader = ( function () {
 			parentGeo.morphAttributes.position = [];
 			// parentGeo.morphAttributes.normal = []; // not implemented
 
-			var self = this;
+			var scope = this;
 			morphTargets.forEach( function ( morphTarget ) {
 
 				morphTarget.rawTargets.forEach( function ( rawTarget ) {
@@ -2120,7 +2128,7 @@ var FBXLoader = ( function () {
 
 					if ( morphGeoNode !== undefined ) {
 
-						self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
+						scope.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
 
 					}
 
@@ -2538,6 +2546,13 @@ var FBXLoader = ( function () {
 
 										var rawModel = fbxTree.Objects.Model[ modelID.toString() ];
 
+										if ( rawModel === undefined ) {
+
+											console.warn( 'THREE.FBXLoader: Encountered a unused curve.', child );
+											return;
+
+										}
+
 										var node = {
 
 											modelName: rawModel.attrName ? PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',
@@ -2662,10 +2677,10 @@ var FBXLoader = ( function () {
 
 			var tracks = [];
 
-			var self = this;
+			var scope = this;
 			rawClip.layer.forEach( function ( rawTracks ) {
 
-				tracks = tracks.concat( self.generateTracks( rawTracks ) );
+				tracks = tracks.concat( scope.generateTracks( rawTracks ) );
 
 			} );
 
@@ -2733,19 +2748,21 @@ var FBXLoader = ( function () {
 			if ( curves.x !== undefined ) {
 
 				this.interpolateRotations( curves.x );
-				curves.x.values = curves.x.values.map( _Math.degToRad );
+				curves.x.values = curves.x.values.map( MathUtils.degToRad );
 
 			}
+
 			if ( curves.y !== undefined ) {
 
 				this.interpolateRotations( curves.y );
-				curves.y.values = curves.y.values.map( _Math.degToRad );
+				curves.y.values = curves.y.values.map( MathUtils.degToRad );
 
 			}
+
 			if ( curves.z !== undefined ) {
 
 				this.interpolateRotations( curves.z );
-				curves.z.values = curves.z.values.map( _Math.degToRad );
+				curves.z.values = curves.z.values.map( MathUtils.degToRad );
 
 			}
 
@@ -2754,7 +2771,7 @@ var FBXLoader = ( function () {
 
 			if ( preRotation !== undefined ) {
 
-				preRotation = preRotation.map( _Math.degToRad );
+				preRotation = preRotation.map( MathUtils.degToRad );
 				preRotation.push( eulerOrder );
 
 				preRotation = new Euler().fromArray( preRotation );
@@ -2764,7 +2781,7 @@ var FBXLoader = ( function () {
 
 			if ( postRotation !== undefined ) {
 
-				postRotation = postRotation.map( _Math.degToRad );
+				postRotation = postRotation.map( MathUtils.degToRad );
 				postRotation.push( eulerOrder );
 
 				postRotation = new Euler().fromArray( postRotation );
@@ -2998,7 +3015,7 @@ var FBXLoader = ( function () {
 			this.currentProp = [];
 			this.currentPropName = '';
 
-			var self = this;
+			var scope = this;
 
 			var split = text.split( /[\r\n]+/ );
 
@@ -3009,27 +3026,27 @@ var FBXLoader = ( function () {
 
 				if ( matchComment || matchEmpty ) return;
 
-				var matchBeginning = line.match( '^\\t{' + self.currentIndent + '}(\\w+):(.*){', '' );
-				var matchProperty = line.match( '^\\t{' + ( self.currentIndent ) + '}(\\w+):[\\s\\t\\r\\n](.*)' );
-				var matchEnd = line.match( '^\\t{' + ( self.currentIndent - 1 ) + '}}' );
+				var matchBeginning = line.match( '^\\t{' + scope.currentIndent + '}(\\w+):(.*){', '' );
+				var matchProperty = line.match( '^\\t{' + ( scope.currentIndent ) + '}(\\w+):[\\s\\t\\r\\n](.*)' );
+				var matchEnd = line.match( '^\\t{' + ( scope.currentIndent - 1 ) + '}}' );
 
 				if ( matchBeginning ) {
 
-					self.parseNodeBegin( line, matchBeginning );
+					scope.parseNodeBegin( line, matchBeginning );
 
 				} else if ( matchProperty ) {
 
-					self.parseNodeProperty( line, matchProperty, split[ ++ i ] );
+					scope.parseNodeProperty( line, matchProperty, split[ ++ i ] );
 
 				} else if ( matchEnd ) {
 
-					self.popStack();
+					scope.popStack();
 
 				} else if ( line.match( /^[^\s\t}]/ ) ) {
 
 					// large arrays are split over multiple lines terminated with a ',' character
 					// if this is encountered the line needs to be joined to the previous line
-					self.parseNodePropertyContinued( line );
+					scope.parseNodePropertyContinued( line );
 
 				}
 
@@ -3295,7 +3312,11 @@ var FBXLoader = ( function () {
 
 			var version = reader.getUint32();
 
-			console.log( 'THREE.FBXLoader: FBX binary version: ' + version );
+			if ( version < 6400 ) {
+
+				throw new Error( 'THREE.FBXLoader: FBX version not supported, FileVersion: ' + version );
+
+			}
 
 			var allNodes = new FBXTree();
 
@@ -3342,8 +3363,7 @@ var FBXLoader = ( function () {
 			var endOffset = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
 			var numProperties = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
 
-			// note: do not remove this even if you get a linter warning as it moves the buffer forward
-			var propertyListLen = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
+			( version >= 7500 ) ? reader.getUint64() : reader.getUint32(); // the returned propertyListLen is not used
 
 			var nameLen = reader.getUint8();
 			var name = reader.getString( nameLen );
@@ -3572,13 +3592,13 @@ var FBXLoader = ( function () {
 
 					}
 
-					if ( typeof Zlib === 'undefined' ) {
+					if ( typeof Inflate === 'undefined' ) {
 
 						console.error( 'THREE.FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
 
 					}
 
-					var inflate = new Zlib.Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
+					var inflate = new Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
 					var reader2 = new BinaryReader( inflate.decompress().buffer );
 
 					switch ( type ) {
@@ -3915,12 +3935,14 @@ var FBXLoader = ( function () {
 
 		var versionRegExp = /FBXVersion: (\d+)/;
 		var match = text.match( versionRegExp );
+
 		if ( match ) {
 
 			var version = parseInt( match[ 1 ] );
 			return version;
 
 		}
+
 		throw new Error( 'THREE.FBXLoader: Cannot find the version number for the file given.' );
 
 	}
@@ -3995,7 +4017,7 @@ var FBXLoader = ( function () {
 
 		if ( transformData.preRotation ) {
 
-			var array = transformData.preRotation.map( _Math.degToRad );
+			var array = transformData.preRotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4003,7 +4025,7 @@ var FBXLoader = ( function () {
 
 		if ( transformData.rotation ) {
 
-			var array = transformData.rotation.map( _Math.degToRad );
+			var array = transformData.rotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4011,7 +4033,7 @@ var FBXLoader = ( function () {
 
 		if ( transformData.postRotation ) {
 
-			var array = transformData.postRotation.map( _Math.degToRad );
+			var array = transformData.postRotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4035,43 +4057,42 @@ var FBXLoader = ( function () {
 
 		// Global Shear*Scaling
 		var lParentTM = new Matrix4();
-		var lLSM;
-		var lParentGSM;
-		var lParentGRSM;
-
 		lParentTM.copyPosition( lParentGX );
-		lParentGRSM = lParentTM.getInverse( lParentTM ).multiply( lParentGX );
-		lParentGSM = lParentGRM.getInverse( lParentGRM ).multiply( lParentGRSM );
-		lLSM = lScalingM;
 
-		var lGlobalRS;
+		var lParentGSM = new Matrix4();
+		lParentGSM.getInverse( lParentGRM ).multiply( lParentGX );
+
+		var lGlobalRS = new Matrix4();
+
 		if ( inheritType === 0 ) {
 
-			lGlobalRS = lParentGRM.multiply( lLRM ).multiply( lParentGSM ).multiply( lLSM );
+			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM ).multiply( lScalingM );
 
 		} else if ( inheritType === 1 ) {
 
-			lGlobalRS = lParentGRM.multiply( lParentGSM ).multiply( lLRM ).multiply( lLSM );
+			lGlobalRS.copy( lParentGRM ).multiply( lParentGSM ).multiply( lLRM ).multiply( lScalingM );
 
 		} else {
 
-			var lParentLSM = new Matrix4().copy( lScalingM );
+			var lParentLSM_inv = new Matrix4().getInverse( lScalingM );
+			var lParentGSM_noLocal = new Matrix4().multiply( lParentGSM ).multiply( lParentLSM_inv );
 
-			var lParentGSM_noLocal = lParentGSM.multiply( lParentLSM.getInverse( lParentLSM ) );
-
-			lGlobalRS = lParentGRM.multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lLSM );
+			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lScalingM );
 
 		}
 
+		var lRotationPivotM_inv = new Matrix4().getInverse( lRotationPivotM );
+		var lScalingPivotM_inv = new Matrix4().getInverse( lScalingPivotM );
 		// Calculate the local transform matrix
-		var lTransform = lTranslationM.multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM.getInverse( lRotationPivotM ) ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM.getInverse( lScalingPivotM ) );
+		var lTransform = new Matrix4();
+		lTransform.copy( lTranslationM ).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
 
 		var lLocalTWithAllPivotAndOffsetInfo = new Matrix4().copyPosition( lTransform );
 
-		var lGlobalTranslation = lParentGX.multiply( lLocalTWithAllPivotAndOffsetInfo );
+		var lGlobalTranslation = new Matrix4().copy( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
 		lGlobalT.copyPosition( lGlobalTranslation );
 
-		lTransform = lGlobalT.multiply( lGlobalRS );
+		lTransform = new Matrix4().multiply( lGlobalT ).multiply( lGlobalRS );
 
 		return lTransform;
 

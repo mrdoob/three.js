@@ -1,10 +1,6 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIRow, UIText } from './libs/ui.js';
 
-var SidebarGeometryGeometry = function ( editor ) {
+function SidebarGeometryGeometry( editor ) {
 
 	var strings = editor.strings;
 
@@ -61,6 +57,6 @@ var SidebarGeometryGeometry = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometryGeometry };

@@ -1,7 +1,3 @@
-/**
- * @author spidersharma / http://eduperiment.com/
- */
-
 import {
 	AdditiveBlending,
 	Color,
@@ -35,6 +31,8 @@ var OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 	this.edgeStrength = 3.0;
 	this.downSampleRatio = 2;
 	this.pulsePeriod = 0;
+
+	this._visibilityCache = new Map();
 
 	Pass.call( this );
 
@@ -87,10 +85,10 @@ var OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 	var MAX_EDGE_GLOW = 4;
 
 	this.separableBlurMaterial1 = this.getSeperableBlurMaterial( MAX_EDGE_THICKNESS );
-	this.separableBlurMaterial1.uniforms[ "texSize" ].value = new Vector2( resx, resy );
+	this.separableBlurMaterial1.uniforms[ "texSize" ].value.set( resx, resy );
 	this.separableBlurMaterial1.uniforms[ "kernelRadius" ].value = 1;
 	this.separableBlurMaterial2 = this.getSeperableBlurMaterial( MAX_EDGE_GLOW );
-	this.separableBlurMaterial2.uniforms[ "texSize" ].value = new Vector2( Math.round( resx / 2 ), Math.round( resy / 2 ) );
+	this.separableBlurMaterial2.uniforms[ "texSize" ].value.set( Math.round( resx / 2 ), Math.round( resy / 2 ) );
 	this.separableBlurMaterial2.uniforms[ "kernelRadius" ].value = MAX_EDGE_GLOW;
 
 	// Overlay material
@@ -162,7 +160,7 @@ OutlinePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.renderTargetMaskDownSampleBuffer.setSize( resx, resy );
 		this.renderTargetBlurBuffer1.setSize( resx, resy );
 		this.renderTargetEdgeBuffer1.setSize( resx, resy );
-		this.separableBlurMaterial1.uniforms[ "texSize" ].value = new Vector2( resx, resy );
+		this.separableBlurMaterial1.uniforms[ "texSize" ].value.set( resx, resy );
 
 		resx = Math.round( resx / 2 );
 		resy = Math.round( resy / 2 );
@@ -170,24 +168,25 @@ OutlinePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.renderTargetBlurBuffer2.setSize( resx, resy );
 		this.renderTargetEdgeBuffer2.setSize( resx, resy );
 
-		this.separableBlurMaterial2.uniforms[ "texSize" ].value = new Vector2( resx, resy );
+		this.separableBlurMaterial2.uniforms[ "texSize" ].value.set( resx, resy );
 
 	},
 
 	changeVisibilityOfSelectedObjects: function ( bVisible ) {
 
+		var cache = this._visibilityCache;
+
 		function gatherSelectedMeshesCallBack( object ) {
 
 			if ( object.isMesh ) {
 
-				if ( bVisible ) {
+				if ( bVisible === true ) {
 
-					object.visible = object.userData.oldVisible;
-					delete object.userData.oldVisible;
+					object.visible = cache.get( object );
 
 				} else {
 
-					object.userData.oldVisible = object.visible;
+					cache.set( object, object.visible );
 					object.visible = bVisible;
 
 				}
@@ -207,6 +206,7 @@ OutlinePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	changeVisibilityOfNonSelectedObjects: function ( bVisible ) {
 
+		var cache = this._visibilityCache;
 		var selectedMeshes = [];
 
 		function gatherSelectedMeshesCallBack( object ) {
@@ -224,7 +224,9 @@ OutlinePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		function VisibilityChangeCallBack( object ) {
 
-			if ( object.isMesh || object.isLine || object.isSprite ) {
+			if ( object.isMesh || object.isSprite ) {
+
+				// only meshes and sprites are supported by OutlinePass
 
 				var bFound = false;
 
@@ -241,13 +243,33 @@ OutlinePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 				}
 
-				if ( ! bFound ) {
+				if ( bFound === false ) {
 
 					var visibility = object.visible;
 
-					if ( ! bVisible || object.bVisible ) object.visible = bVisible;
+					if ( bVisible === false || cache.get( object ) === true ) {
 
-					object.bVisible = visibility;
+						object.visible = bVisible;
+
+					}
+
+					cache.set( object, visibility );
+
+				}
+
+			} else if ( object.isPoints || object.isLine ) {
+
+				// the visibilty of points and lines is always set to false in order to
+				// not affect the outline computation
+
+				if ( bVisible === true ) {
+
+					object.visible = cache.get( object ); // restore
+
+				} else {
+
+					cache.set( object, object.visible );
+					object.visible = bVisible;
 
 				}
 
@@ -298,6 +320,7 @@ OutlinePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 			// Make selected objects visible
 			this.changeVisibilityOfSelectedObjects( true );
+			this._visibilityCache.clear();
 
 			// Update Texture Matrix for Depth compare
 			this.updateTextureMatrix();
@@ -305,7 +328,7 @@ OutlinePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 			// Make non selected objects invisible, and draw only the selected objects, by comparing the depth buffer of non selected objects
 			this.changeVisibilityOfNonSelectedObjects( false );
 			this.renderScene.overrideMaterial = this.prepareMaskMaterial;
-			this.prepareMaskMaterial.uniforms[ "cameraNearFar" ].value = new Vector2( this.renderCamera.near, this.renderCamera.far );
+			this.prepareMaskMaterial.uniforms[ "cameraNearFar" ].value.set( this.renderCamera.near, this.renderCamera.far );
 			this.prepareMaskMaterial.uniforms[ "depthTexture" ].value = this.renderTargetDepthBuffer.texture;
 			this.prepareMaskMaterial.uniforms[ "textureMatrix" ].value = this.textureMatrix;
 			renderer.setRenderTarget( this.renderTargetMaskBuffer );
@@ -313,6 +336,7 @@ OutlinePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 			renderer.render( this.renderScene, this.renderCamera );
 			this.renderScene.overrideMaterial = null;
 			this.changeVisibilityOfNonSelectedObjects( true );
+			this._visibilityCache.clear();
 
 			this.renderScene.background = currentBackground;
 
@@ -337,7 +361,7 @@ OutlinePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 			// 3. Apply Edge Detection Pass
 			this.fsQuad.material = this.edgeDetectionMaterial;
 			this.edgeDetectionMaterial.uniforms[ "maskTexture" ].value = this.renderTargetMaskDownSampleBuffer.texture;
-			this.edgeDetectionMaterial.uniforms[ "texSize" ].value = new Vector2( this.renderTargetMaskDownSampleBuffer.width, this.renderTargetMaskDownSampleBuffer.height );
+			this.edgeDetectionMaterial.uniforms[ "texSize" ].value.set( this.renderTargetMaskDownSampleBuffer.width, this.renderTargetMaskDownSampleBuffer.height );
 			this.edgeDetectionMaterial.uniforms[ "visibleEdgeColor" ].value = this.tempPulseColor1;
 			this.edgeDetectionMaterial.uniforms[ "hiddenEdgeColor" ].value = this.tempPulseColor2;
 			renderer.setRenderTarget( this.renderTargetEdgeBuffer1 );
@@ -410,20 +434,28 @@ OutlinePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 			uniforms: {
 				"depthTexture": { value: null },
 				"cameraNearFar": { value: new Vector2( 0.5, 0.5 ) },
-				"textureMatrix": { value: new Matrix4() }
+				"textureMatrix": { value: null }
 			},
 
 			vertexShader: [
+				'#include <morphtarget_pars_vertex>',
+				'#include <skinning_pars_vertex>',
+
 				'varying vec4 projTexCoord;',
 				'varying vec4 vPosition;',
 				'uniform mat4 textureMatrix;',
 
 				'void main() {',
 
-				'	vPosition = modelViewMatrix * vec4( position, 1.0 );',
+				'	#include <skinbase_vertex>',
+				'	#include <begin_vertex>',
+				'	#include <morphtarget_vertex>',
+				'	#include <skinning_vertex>',
+				'	#include <project_vertex>',
+
+				'	vPosition = mvPosition;',
 				'	vec4 worldPosition = modelMatrix * vec4( position, 1.0 );',
 				'	projTexCoord = textureMatrix * worldPosition;',
-				'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
 				'}'
 			].join( '\n' ),

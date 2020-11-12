@@ -1,13 +1,7 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
-import {
-	IcosahedronBufferGeometry
-} from '../../../../src/geometries/IcosahedronGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils';
+import { IcosahedronBufferGeometry } from '../../../../src/geometries/IcosahedronBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 

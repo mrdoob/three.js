@@ -11,10 +11,19 @@ export class Light extends Object3D {
 
 	constructor( hex?: number | string, intensity?: number );
 
+	/**
+	 * @default 'Light'
+	 */
+	type: string;
+
 	color: Color;
+
+	/**
+	 * @default 1
+	 */
 	intensity: number;
-	isLight: true;
-	receiveShadow: boolean;
+	readonly isLight: true;
+
 	shadow: LightShadow;
 	/**
 	 * @deprecated Use shadow.camera.fov instead.

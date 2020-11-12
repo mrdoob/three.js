@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader<br />
 			Battle Damaged Sci-fi Helmet by
 			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
 			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
@@ -19,22 +19,19 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import Stats from './jsm/libs/stats.module.js';
-
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { RoughnessMipmapper } from './jsm/utils/RoughnessMipmapper.js';
 
-			var container, stats, controls;
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
@@ -47,24 +44,30 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
-						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
-						pmremGenerator.dispose();
+						const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 
 						scene.background = envMap;
 						scene.environment = envMap;
 
+						texture.dispose();
+						pmremGenerator.dispose();
+
+						render();
+
 						// model
 
-						var roughnessMipmapper = new RoughnessMipmapper( renderer );
+						// use of RoughnessMipmapper is optional
+						const roughnessMipmapper = new RoughnessMipmapper( renderer );
 
-						var loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+						const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
 
 							gltf.scene.traverse( function ( child ) {
 
 								if ( child.isMesh ) {
 
-									roughnessMipmapper.generateMipmaps( child.material );
+									// TOFIX RoughnessMipmapper seems to be broken with WebGL 2.0
+									// roughnessMipmapper.generateMipmaps( child.material );
 
 								}
 
@@ -74,6 +77,8 @@
 
 							roughnessMipmapper.dispose();
 
+							render();
+
 						} );
 
 					} );
@@ -82,21 +87,21 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
+				controls.minDistance = 2;
+				controls.maxDistance = 10;
 				controls.target.set( 0, 0, - 0.2 );
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
-				// stats
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 			}
 
@@ -107,17 +112,15 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				render();
+
 			}
 
 			//
 
-			function animate() {
-
-				requestAnimationFrame( animate );
+			function render() {
 
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

@@ -2,10 +2,6 @@ import { AnimationClip } from '../animation/AnimationClip.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 
-/**
- * @author bhouston / http://clara.io/
- */
-
 function AnimationLoader( manager ) {
 
 	Loader.call( this, manager );
@@ -18,13 +14,33 @@ AnimationLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		const scope = this;
 
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( JSON.parse( text ) ) );
+			try {
+
+				onLoad( scope.parse( JSON.parse( text ) ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -32,11 +48,11 @@ AnimationLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	parse: function ( json ) {
 
-		var animations = [];
+		const animations = [];
 
-		for ( var i = 0; i < json.length; i ++ ) {
+		for ( let i = 0; i < json.length; i ++ ) {
 
-			var clip = AnimationClip.parse( json[ i ] );
+			const clip = AnimationClip.parse( json[ i ] );
 
 			animations.push( clip );
 

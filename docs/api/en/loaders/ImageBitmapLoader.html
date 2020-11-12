@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -25,15 +24,11 @@
 			instead. Refer to [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#6.10 WebGL specification] for the detail.
 		</p>
 
-		<h2>Example</h2>
-
-		<p>
-			[example:webgl_loader_imagebitmap WebGL / loader / ImageBitmap]
-		</p>
+		<h2>Code Example</h2>
 
 		<code>
 		// instantiate a loader
-		var loader = new THREE.ImageBitmapLoader();
+		const loader = new THREE.ImageBitmapLoader();
 
 		// set options if needed
 		loader.setOptions( { imageOrientation: 'flipY' } );
@@ -45,8 +40,8 @@
 
 			// onLoad callback
 			function ( imageBitmap ) {
-				var texture = new THREE.CanvasTexture( imageBitmap );
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				const texture = new THREE.CanvasTexture( imageBitmap );
+				const material = new THREE.MeshBasicMaterial( { map: texture } );
 			},
 
 			// onProgress callback currently not supported
@@ -59,6 +54,11 @@
 		);
 		</code>
 
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_loader_imagebitmap WebGL / loader / ImageBitmap]
+		</p>
 
 		<h2>Constructor</h2>
 

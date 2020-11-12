@@ -51,9 +51,8 @@
 
 	</head>
 	<body>
-		<canvas></canvas>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> webgl - depth texture<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> webgl - depth texture<br/>
 			Stores render target depth in a texture attachment.<br/>
 			Created by <a href="http://twitter.com/mattdesl" target="_blank" rel="noopener">@mattdesl</a>.
 
@@ -69,21 +68,30 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var camera, scene, renderer, controls, stats;
-			var target;
-			var postScene, postCamera;
-			var supportsExtension = true;
+			let camera, scene, renderer, controls, stats;
+			let target;
+			let postScene, postCamera, postMaterial;
+			let supportsExtension = true;
+
+			const params = {
+				format: THREE.DepthFormat,
+				type: THREE.UnsignedShortType
+			};
+
+			const formats = { DepthFormat: THREE.DepthFormat, DepthStencilFormat: THREE.DepthStencilFormat };
+			const types = { UnsignedShortType: THREE.UnsignedShortType, UnsignedIntType: THREE.UnsignedIntType, UnsignedInt248Type: THREE.UnsignedInt248Type };
 
 			init();
 			animate();
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer( { canvas: document.querySelector( 'canvas' ) } );
+				renderer = new THREE.WebGLRenderer();
 
-				if ( ! renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
+				if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
 
 					supportsExtension = false;
 					document.querySelector( '#error' ).style.display = 'block';
@@ -93,6 +101,7 @@
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
 
 				//
 
@@ -104,21 +113,11 @@
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
-				controls.dampingFactor = 0.05;
 
-				// Create a multi render target with Float buffers
-				target = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
-				target.texture.format = THREE.RGBFormat;
-				target.texture.minFilter = THREE.NearestFilter;
-				target.texture.magFilter = THREE.NearestFilter;
-				target.texture.generateMipmaps = false;
-				target.stencilBuffer = false;
-				target.depthBuffer = true;
-				target.depthTexture = new THREE.DepthTexture();
-				target.depthTexture.type = THREE.UnsignedShortType;
+				// Create a render target with depth texture
+				setupRenderTarget();
 
 				// Our scene
-				scene = new THREE.Scene();
 				setupScene();
 
 				// Setup post-processing step
@@ -127,24 +126,51 @@
 				onWindowResize();
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				//
+				const gui = new GUI( { width: 300 } );
+
+				gui.add( params, 'format', formats ).onChange( setupRenderTarget );
+				gui.add( params, 'type', types ).onChange( setupRenderTarget );
+				gui.open();
+
+			}
+
+			function setupRenderTarget() {
+
+				if ( target ) target.dispose();
+
+				const format = parseFloat( params.format );
+				const type = parseFloat( params.type );
+
+				target = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+				target.texture.format = THREE.RGBFormat;
+				target.texture.minFilter = THREE.NearestFilter;
+				target.texture.magFilter = THREE.NearestFilter;
+				target.texture.generateMipmaps = false;
+				target.stencilBuffer = ( format === THREE.DepthStencilFormat ) ? true : false;
+				target.depthBuffer = true;
+				target.depthTexture = new THREE.DepthTexture();
+				target.depthTexture.format = format;
+				target.depthTexture.type = type;
+
 			}
 
 			function setupPost() {
 
 				// Setup post processing stage
 				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-				var postMaterial = new THREE.ShaderMaterial( {
+				postMaterial = new THREE.ShaderMaterial( {
 					vertexShader: document.querySelector( '#post-vert' ).textContent.trim(),
 					fragmentShader: document.querySelector( '#post-frag' ).textContent.trim(),
 					uniforms: {
 						cameraNear: { value: camera.near },
 						cameraFar: { value: camera.far },
-						tDiffuse: { value: target.texture },
-						tDepth: { value: target.depthTexture }
+						tDiffuse: { value: null },
+						tDepth: { value: null }
 					}
 				} );
-				var postPlane = new THREE.PlaneBufferGeometry( 2, 2 );
-				var postQuad = new THREE.Mesh( postPlane, postMaterial );
+				const postPlane = new THREE.PlaneBufferGeometry( 2, 2 );
+				const postQuad = new THREE.Mesh( postPlane, postMaterial );
 				postScene = new THREE.Scene();
 				postScene.add( postQuad );
 
@@ -152,23 +178,21 @@
 
 			function setupScene() {
 
-				//var diffuse = new TextureLoader().load( 'textures/brick_diffuse.jpg' );
-				//diffuse.wrapS = diffuse.wrapT = RepeatWrapping;
+				scene = new THREE.Scene();
 
-				// Setup some geometries
-				var geometry = new THREE.TorusKnotBufferGeometry( 1, 0.3, 128, 64 );
-				var material = new THREE.MeshBasicMaterial( { color: 'blue' } );
+				const geometry = new THREE.TorusKnotBufferGeometry( 1, 0.3, 128, 64 );
+				const material = new THREE.MeshBasicMaterial( { color: 'blue' } );
 
-				var count = 50;
-				var scale = 5;
+				const count = 50;
+				const scale = 5;
 
-				for ( var i = 0; i < count; i ++ ) {
+				for ( let i = 0; i < count; i ++ ) {
 
-					var r = Math.random() * 2.0 * Math.PI;
-					var z = ( Math.random() * 2.0 ) - 1.0;
-					var zScale = Math.sqrt( 1.0 - z * z ) * scale;
+					const r = Math.random() * 2.0 * Math.PI;
+					const z = ( Math.random() * 2.0 ) - 1.0;
+					const zScale = Math.sqrt( 1.0 - z * z ) * scale;
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set(
 						Math.cos( r ) * zScale,
 						Math.sin( r ) * zScale,
@@ -183,11 +207,11 @@
 
 			function onWindowResize() {
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 				camera.aspect = aspect;
 				camera.updateProjectionMatrix();
 
-				var dpr = renderer.getPixelRatio();
+				const dpr = renderer.getPixelRatio();
 				target.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -204,6 +228,9 @@
 				renderer.render( scene, camera );
 
 				// render post FX
+				postMaterial.uniforms.tDiffuse.value = target.texture;
+				postMaterial.uniforms.tDepth.value = target.depthTexture;
+
 				renderer.setRenderTarget( null );
 				renderer.render( postScene, postCamera );
 

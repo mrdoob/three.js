@@ -8,7 +8,7 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sandbox</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sandbox</div>
 
 		<script type="module">
 
@@ -18,16 +18,16 @@
 
 			import { BasicShader } from './jsm/shaders/BasicShader.js';
 
-			var statsEnabled = true;
+			const statsEnabled = true;
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var mouseX = 0, mouseY = 0;
+			let mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -43,18 +43,18 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1, 20000 );
 
-				var light = new THREE.PointLight( 0xffffff );
+				const light = new THREE.PointLight( 0xffffff );
 				scene.add( light );
 
-				var shader = BasicShader;
-				var uniforms = shader.uniforms;
-				var vertexShader = shader.vertexShader;
-				var fragmentShader = shader.fragmentShader;
+				const shader = BasicShader;
+				const uniforms = shader.uniforms;
+				const vertexShader = shader.vertexShader;
+				const fragmentShader = shader.fragmentShader;
 
-				var texture1 = new THREE.CanvasTexture( generateTexture( 0, 0.5, 1 ), THREE.UVMapping );
-				var texture2 = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
+				const texture1 = new THREE.CanvasTexture( generateTexture( 0, 0.5, 1 ), THREE.UVMapping );
+				const texture2 = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
 
-				var materials = [
+				const materials = [
 
 					new THREE.MeshNormalMaterial(),
 					new THREE.MeshDepthMaterial(),
@@ -70,19 +70,19 @@
 
 				];
 
-				var geometry = new THREE.SphereBufferGeometry( 50, 32, 16 );
+				const geometry = new THREE.SphereBufferGeometry( 50, 32, 16 );
 
-				for ( var i = 0; i < 5000; i ++ ) {
+				for ( let i = 0; i < 5000; i ++ ) {
 
 					// random order
-					//var index = Math.floor( Math.random() * materials.length );
+					//let index = Math.floor( Math.random() * materials.length );
 
 					// sort by material / geometry
-					var index = Math.floor( ( i / 5000 ) * materials.length );
+					const index = Math.floor( ( i / 5000 ) * materials.length );
 
-					var material = materials[ index ];
+					const material = materials[ index ];
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
@@ -131,16 +131,16 @@
 
 			function generateTexture( r, g, b ) {
 
-				var canvas = document.createElement( 'canvas' );
+				const canvas = document.createElement( 'canvas' );
 				canvas.width = 256;
 				canvas.height = 256;
 
-				var context = canvas.getContext( '2d' );
-				var image = context.getImageData( 0, 0, 256, 256 );
+				const context = canvas.getContext( '2d' );
+				const image = context.getImageData( 0, 0, 256, 256 );
 
-				var x = 0, y = 0, p;
+				let x = 0, y = 0, p;
 
-				for ( var i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
+				for ( let i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
 
 					x = j % 256;
 					y = x == 0 ? y + 1 : y;

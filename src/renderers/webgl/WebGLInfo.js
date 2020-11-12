@@ -1,15 +1,11 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 function WebGLInfo( gl ) {
 
-	var memory = {
+	const memory = {
 		geometries: 0,
 		textures: 0
 	};
 
-	var render = {
+	const render = {
 		frame: 0,
 		calls: 0,
 		triangles: 0,
@@ -18,8 +14,6 @@ function WebGLInfo( gl ) {
 	};
 
 	function update( count, mode, instanceCount ) {
-
-		instanceCount = instanceCount || 1;
 
 		render.calls ++;
 

@@ -1,4 +1,3 @@
-import { NodeBuilder } from '../../core/NodeBuilder';
 import { Node } from '../../core/Node';
 
 export class RawNode extends Node {

@@ -10,4 +10,9 @@ export class ArcCurve extends EllipseCurve {
 		aClockwise: boolean
 	);
 
+	/**
+	 * @default 'ArcCurve'
+	 */
+	type: string;
+
 }

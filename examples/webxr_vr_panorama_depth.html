@@ -10,42 +10,40 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> vr - panorama with depth<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - panorama with depth<br />
 			Created by <a href="https://orfleisher.com" target="_blank" rel="noopener">@juniorxsound</a>. Panorama from <a href="https://krpano.com/examples/?depthmap" target="_blank" rel="noopener">krpano</a>.
 		</div>
-
-		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
 
-			var camera, scene, renderer, sphere, clock;
+			let camera, scene, renderer, sphere, clock;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				clock = new THREE.Clock();
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x101010 );
 
-				var light = new THREE.AmbientLight( 0xffffff, 1 );
+				const light = new THREE.AmbientLight( 0xffffff, 1 );
 				scene.add( light );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
 				scene.add( camera );
 
 				// Create the panoramic sphere geometery
-				var panoSphereGeo = new THREE.SphereBufferGeometry( 6, 256, 256 );
+				const panoSphereGeo = new THREE.SphereBufferGeometry( 6, 256, 256 );
 
 				// Create the panoramic sphere material
-				var panoSphereMat = new THREE.MeshStandardMaterial( {
+				const panoSphereMat = new THREE.MeshStandardMaterial( {
 					side: THREE.BackSide,
 					displacementScale: - 4.0
 				} );
@@ -54,13 +52,12 @@
 				sphere = new THREE.Mesh( panoSphereGeo, panoSphereMat );
 
 				// Load and assign the texture and depth map
-				var manager = new THREE.LoadingManager();
-				var loader = new THREE.TextureLoader( manager );
+				const manager = new THREE.LoadingManager();
+				const loader = new THREE.TextureLoader( manager );
 
 				loader.load( './textures/kandao3.jpg', function ( texture ) {
 
 					texture.minFilter = THREE.NearestFilter;
-					texture.format = THREE.RGBFormat;
 					texture.generateMipmaps = false;
 					sphere.material.map = texture;
 
@@ -69,7 +66,6 @@
 				loader.load( './textures/kandao3_depthmap.jpg', function ( depth ) {
 
 					depth.minFilter = THREE.NearestFilter;
-					depth.format = THREE.RGBFormat;
 					depth.generateMipmaps = false;
 					sphere.material.displacementMap = depth;
 
@@ -86,9 +82,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.xr.enabled = true;
+				renderer.xr.setReferenceSpaceType( 'local' );
 				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( VRButton.createButton( renderer, { referenceSpaceType: 'local' } ) );
+				document.body.appendChild( VRButton.createButton( renderer ) );
 
 				//
 
@@ -117,7 +114,7 @@
 
 				if ( renderer.xr.isPresenting === false ) {
 
-					var time = clock.getElapsedTime();
+					const time = clock.getElapsedTime();
 
 					sphere.rotation.y += 0.001;
 					sphere.position.x = Math.sin( time ) * 0.2;

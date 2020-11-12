@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { PositionNode } from './PositionNode.js';
 import { NormalNode } from './NormalNode.js';
@@ -54,7 +50,7 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 			case ReflectNode.VECTOR:
 
-				var viewNormalNode = builder.context.viewNormal || new NormalNode( NormalNode.VIEW );
+				var viewNormalNode = new NormalNode( NormalNode.VIEW );
 				var roughnessNode = builder.context.roughness;
 
 				var viewNormal = viewNormalNode.build( builder, 'v3' );

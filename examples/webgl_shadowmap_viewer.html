@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - ShadowMapViewer example by <a href="https://github.com/arya-s">arya-s</a>
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - ShadowMapViewer example by <a href="https://github.com/arya-s">arya-s</a>
 		</div>
 
 		<script type="module">
@@ -20,10 +20,10 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { ShadowMapViewer } from './jsm/utils/ShadowMapViewer.js';
 
-			var camera, scene, renderer, clock, stats;
-			var dirLight, spotLight;
-			var torusKnot, cube;
-			var dirLightShadowMapViewer, spotLightShadowMapViewer;
+			let camera, scene, renderer, clock, stats;
+			let dirLight, spotLight;
+			let torusKnot, cube;
+			let dirLightShadowMapViewer, spotLightShadowMapViewer;
 
 			init();
 			animate();
@@ -82,8 +82,8 @@
 				scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
 
 				// Geometry
-				var geometry = new THREE.TorusKnotBufferGeometry( 25, 8, 75, 20 );
-				var material = new THREE.MeshPhongMaterial( {
+				let geometry = new THREE.TorusKnotBufferGeometry( 25, 8, 75, 20 );
+				let material = new THREE.MeshPhongMaterial( {
 					color: 0xff0000,
 					shininess: 150,
 					specular: 0x222222
@@ -96,21 +96,21 @@
 				torusKnot.receiveShadow = true;
 				scene.add( torusKnot );
 
-				var geometry = new THREE.BoxBufferGeometry( 3, 3, 3 );
+				geometry = new THREE.BoxBufferGeometry( 3, 3, 3 );
 				cube = new THREE.Mesh( geometry, material );
 				cube.position.set( 8, 3, 8 );
 				cube.castShadow = true;
 				cube.receiveShadow = true;
 				scene.add( cube );
 
-				var geometry = new THREE.BoxBufferGeometry( 10, 0.15, 10 );
-				var material = new THREE.MeshPhongMaterial( {
+				geometry = new THREE.BoxBufferGeometry( 10, 0.15, 10 );
+				material = new THREE.MeshPhongMaterial( {
 					color: 0xa0adaf,
 					shininess: 150,
 					specular: 0x111111
 				} );
 
-				var ground = new THREE.Mesh( geometry, material );
+				const ground = new THREE.Mesh( geometry, material );
 				ground.scale.multiplyScalar( 3 );
 				ground.castShadow = false;
 				ground.receiveShadow = true;
@@ -121,16 +121,8 @@
 			function initShadowMapViewers() {
 
 				dirLightShadowMapViewer = new ShadowMapViewer( dirLight );
-				dirLightShadowMapViewer.position.x = 10;
-				dirLightShadowMapViewer.position.y = 10;
-				dirLightShadowMapViewer.size.width = 256;
-				dirLightShadowMapViewer.size.height = 256;
-				dirLightShadowMapViewer.update(); //Required when setting position or size directly
-
 				spotLightShadowMapViewer = new ShadowMapViewer( spotLight );
-				spotLightShadowMapViewer.size.set( 256, 256 );
-				spotLightShadowMapViewer.position.set( 276, 10 );
-				// spotLightShadowMapViewer.update();	//NOT required because .set updates automatically
+				resizeShadowMapViewers();
 
 			}
 
@@ -143,7 +135,7 @@
 				renderer.shadowMap.type = THREE.BasicShadowMap;
 
 				// Mouse control
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 
@@ -154,6 +146,22 @@
 
 			}
 
+			function resizeShadowMapViewers() {
+
+				const size = window.innerWidth * 0.15;
+
+				dirLightShadowMapViewer.position.x = 10;
+				dirLightShadowMapViewer.position.y = 10;
+				dirLightShadowMapViewer.size.width = size;
+				dirLightShadowMapViewer.size.height = size;
+				dirLightShadowMapViewer.update(); //Required when setting position or size directly
+
+				spotLightShadowMapViewer.size.set( size, size );
+				spotLightShadowMapViewer.position.set( size + 20, 10 );
+				// spotLightShadowMapViewer.update();	//NOT required because .set updates automatically
+
+			}
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -161,6 +169,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				resizeShadowMapViewers();
 				dirLightShadowMapViewer.updateForWindowResize();
 				spotLightShadowMapViewer.updateForWindowResize();
 
@@ -190,7 +199,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				renderScene();
 				renderShadowMapViewers();

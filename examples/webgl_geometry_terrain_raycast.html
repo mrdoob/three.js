@@ -18,7 +18,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain raycasting demo</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain raycasting demo</div>
 
 		<script type="module">
 
@@ -29,19 +29,19 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, controls, scene, renderer;
+			let camera, controls, scene, renderer;
 
-			var mesh, texture;
+			let mesh, texture;
 
-			var worldWidth = 256, worldDepth = 256,
+			const worldWidth = 256, worldDepth = 256,
 				worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
 
-			var helper;
+			let helper;
 
-			var raycaster = new THREE.Raycaster();
-			var mouse = new THREE.Vector2();
+			const raycaster = new THREE.Raycaster();
+			const mouse = new THREE.Vector2();
 
 			init();
 			animate();
@@ -68,19 +68,19 @@
 
 				//
 
-				var data = generateHeight( worldWidth, worldDepth );
+				const data = generateHeight( worldWidth, worldDepth );
 
 				controls.target.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
 				camera.position.y = controls.target.y + 2000;
 				camera.position.x = 2000;
 				controls.update();
 
-				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				const geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
-				var vertices = geometry.attributes.position.array;
+				const vertices = geometry.attributes.position.array;
 
-				for ( var i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
+				for ( let i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
 
 					vertices[ j + 1 ] = data[ i ] * 10;
 
@@ -97,10 +97,10 @@
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
 
-				var geometry = new THREE.ConeBufferGeometry( 20, 100, 3 );
-				geometry.translate( 0, 50, 0 );
-				geometry.rotateX( Math.PI / 2 );
-				helper = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial() );
+				const geometryHelper = new THREE.ConeBufferGeometry( 20, 100, 3 );
+				geometryHelper.translate( 0, 50, 0 );
+				geometryHelper.rotateX( Math.PI / 2 );
+				helper = new THREE.Mesh( geometryHelper, new THREE.MeshNormalMaterial() );
 				scene.add( helper );
 
 				container.addEventListener( 'mousemove', onMouseMove, false );
@@ -125,14 +125,16 @@
 
 			function generateHeight( width, height ) {
 
-				var size = width * height, data = new Uint8Array( size ),
-					perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
+				const size = width * height, data = new Uint8Array( size ),
+					perlin = new ImprovedNoise(), z = Math.random() * 100;
 
-				for ( var j = 0; j < 4; j ++ ) {
+				let quality = 1;
 
-					for ( var i = 0; i < size; i ++ ) {
+				for ( let j = 0; j < 4; j ++ ) {
 
-						var x = i % width, y = ~ ~ ( i / width );
+					for ( let i = 0; i < size; i ++ ) {
+
+						const x = i % width, y = ~ ~ ( i / width );
 						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
 
 					}
@@ -149,14 +151,14 @@
 
 				// bake lighting into texture
 
-				var canvas, canvasScaled, context, image, imageData, vector3, sun, shade;
+				let context, image, imageData, shade;
 
-				vector3 = new THREE.Vector3( 0, 0, 0 );
+				const vector3 = new THREE.Vector3( 0, 0, 0 );
 
-				sun = new THREE.Vector3( 1, 1, 1 );
+				const sun = new THREE.Vector3( 1, 1, 1 );
 				sun.normalize();
 
-				canvas = document.createElement( 'canvas' );
+				const canvas = document.createElement( 'canvas' );
 				canvas.width = width;
 				canvas.height = height;
 
@@ -167,7 +169,7 @@
 				image = context.getImageData( 0, 0, canvas.width, canvas.height );
 				imageData = image.data;
 
-				for ( var i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++ ) {
+				for ( let i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++ ) {
 
 					vector3.x = data[ j - 2 ] - data[ j + 2 ];
 					vector3.y = 2;
@@ -186,7 +188,7 @@
 
 				// Scaled 4x
 
-				canvasScaled = document.createElement( 'canvas' );
+				const canvasScaled = document.createElement( 'canvas' );
 				canvasScaled.width = width * 4;
 				canvasScaled.height = height * 4;
 
@@ -197,9 +199,9 @@
 				image = context.getImageData( 0, 0, canvasScaled.width, canvasScaled.height );
 				imageData = image.data;
 
-				for ( var i = 0, l = imageData.length; i < l; i += 4 ) {
+				for ( let i = 0, l = imageData.length; i < l; i += 4 ) {
 
-					var v = ~ ~ ( Math.random() * 5 );
+					const v = ~ ~ ( Math.random() * 5 );
 
 					imageData[ i ] += v;
 					imageData[ i + 1 ] += v;
@@ -237,7 +239,7 @@
 				raycaster.setFromCamera( mouse, camera );
 
 				// See if the ray from the camera into the world hits one of our meshes
-				var intersects = raycaster.intersectObject( mesh );
+				const intersects = raycaster.intersectObject( mesh );
 
 				// Toggle rotation bool for meshes that we clicked
 				if ( intersects.length > 0 ) {

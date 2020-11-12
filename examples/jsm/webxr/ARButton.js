@@ -1,25 +1,16 @@
-/**
- * @author mrdoob / http://mrdoob.com
- * @author Mugen87 / https://github.com/Mugen87
- */
+class ARButton {
 
-var ARButton = {
+	static createButton( renderer, sessionInit = {} ) {
 
-	createButton: function ( renderer ) {
+		const button = document.createElement( 'button' );
 
 		function showStartAR( /*device*/ ) {
 
-			var currentSession = null;
+			let currentSession = null;
 
 			function onSessionStarted( session ) {
 
 				session.addEventListener( 'end', onSessionEnded );
-
-				/*
-				session.updateWorldTrackingState( {
-					'planeDetectionState': { 'enabled': true }
-				} );
-				*/
 
 				renderer.xr.setReferenceSpaceType( 'local' );
 				renderer.xr.setSession( session );
@@ -65,7 +56,7 @@ var ARButton = {
 
 				if ( currentSession === null ) {
 
-					navigator.xr.requestSession( 'immersive-ar' ).then( onSessionStarted );
+					navigator.xr.requestSession( 'immersive-ar', sessionInit ).then( onSessionStarted );
 
 				} else {
 
@@ -119,7 +110,7 @@ var ARButton = {
 
 		if ( 'xr' in navigator ) {
 
-			var button = document.createElement( 'button' );
+			button.id = 'ARButton';
 			button.style.display = 'none';
 
 			stylizeElement( button );
@@ -134,15 +125,16 @@ var ARButton = {
 
 		} else {
 
-			var message = document.createElement( 'a' );
-			message.href = 'https://immersiveweb.dev/';
+			const message = document.createElement( 'a' );
 
 			if ( window.isSecureContext === false ) {
 
+				message.href = document.location.href.replace( /^http:/, 'https:' );
 				message.innerHTML = 'WEBXR NEEDS HTTPS'; // TODO Improve message
 
 			} else {
 
+				message.href = 'https://immersiveweb.dev/';
 				message.innerHTML = 'WEBXR NOT AVAILABLE';
 
 			}
@@ -159,6 +151,6 @@ var ARButton = {
 
 	}
 
-};
+}
 
 export { ARButton };

@@ -33,14 +33,17 @@
 			import { Curves } from './jsm/curves/CurveExtras.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer, splineCamera, cameraHelper, cameraEye;
+			let camera, scene, renderer, splineCamera, cameraHelper, cameraEye;
 
-			var binormal = new THREE.Vector3();
-			var normal = new THREE.Vector3();
+			const direction = new THREE.Vector3();
+			const binormal = new THREE.Vector3();
+			const normal = new THREE.Vector3();
+			const position = new THREE.Vector3();
+			const lookAt = new THREE.Vector3();
 
-			var pipeSpline = new THREE.CatmullRomCurve3( [
+			const pipeSpline = new THREE.CatmullRomCurve3( [
 				new THREE.Vector3( 0, 10, - 10 ), new THREE.Vector3( 10, 0, - 10 ),
 				new THREE.Vector3( 20, 0, 0 ), new THREE.Vector3( 30, 0, 10 ),
 				new THREE.Vector3( 30, 0, 20 ), new THREE.Vector3( 20, 0, 30 ),
@@ -57,7 +60,7 @@
 				new THREE.Vector3( 90, 0, 0 ), new THREE.Vector3( 100, 0, 0 )
 			] );
 
-			var sampleClosedSpline = new THREE.CatmullRomCurve3( [
+			const sampleClosedSpline = new THREE.CatmullRomCurve3( [
 				new THREE.Vector3( 0, - 40, - 40 ),
 				new THREE.Vector3( 0, 40, - 40 ),
 				new THREE.Vector3( 0, 140, - 40 ),
@@ -69,7 +72,7 @@
 			sampleClosedSpline.closed = true;
 
 			// Keep a dictionary of Curve instances
-			var splines = {
+			const splines = {
 				GrannyKnot: new Curves.GrannyKnot(),
 				HeartCurve: new Curves.HeartCurve( 3.5 ),
 				VivianiCurve: new Curves.VivianiCurve( 70 ),
@@ -88,9 +91,9 @@
 				SampleClosedSpline: sampleClosedSpline
 			};
 
-			var parent, tubeGeometry, mesh;
+			let parent, tubeGeometry, mesh;
 
-			var params = {
+			const params = {
 				spline: 'GrannyKnot',
 				scale: 4,
 				extrusionSegments: 100,
@@ -101,9 +104,9 @@
 				cameraHelper: false,
 			};
 
-			var material = new THREE.MeshLambertMaterial( { color: 0xff00ff } );
+			const material = new THREE.MeshLambertMaterial( { color: 0xff00ff } );
 
-			var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.3, wireframe: true, transparent: true } );
+			const wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.3, wireframe: true, transparent: true } );
 
 			function addTube() {
 
@@ -114,7 +117,7 @@
 
 				}
 
-				var extrudePath = splines[ params.spline ];
+				const extrudePath = splines[ params.spline ];
 
 				tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, params.extrusionSegments, 2, params.radiusSegments, params.closed );
 
@@ -136,7 +139,7 @@
 				// 3D shape
 
 				mesh = new THREE.Mesh( geometry, material );
-				var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
+				const wireframe = new THREE.Mesh( geometry, wireframeMaterial );
 				mesh.add( wireframe );
 
 				parent.add( mesh );
@@ -169,7 +172,7 @@
 
 				// light
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				const light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
@@ -208,9 +211,9 @@
 
 				// dat.GUI
 
-				var gui = new GUI( { width: 300 } );
+				const gui = new GUI( { width: 300 } );
 
-				var folderGeometry = gui.addFolder( 'Geometry' );
+				const folderGeometry = gui.addFolder( 'Geometry' );
 				folderGeometry.add( params, 'spline', Object.keys( splines ) ).onChange( function () {
 
 					addTube();
@@ -238,7 +241,7 @@
 				} );
 				folderGeometry.open();
 
-				var folderCamera = gui.addFolder( 'Camera' );
+				const folderCamera = gui.addFolder( 'Camera' );
 				folderCamera.add( params, 'animationView' ).onChange( function () {
 
 					animateCamera();
@@ -256,7 +259,9 @@
 				} );
 				folderCamera.open();
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 100;
+				controls.maxDistance = 2000;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -286,42 +291,43 @@
 
 				// animate camera along spline
 
-				var time = Date.now();
-				var looptime = 20 * 1000;
-				var t = ( time % looptime ) / looptime;
+				const time = Date.now();
+				const looptime = 20 * 1000;
+				const t = ( time % looptime ) / looptime;
 
-				var pos = tubeGeometry.parameters.path.getPointAt( t );
-				pos.multiplyScalar( params.scale );
+				tubeGeometry.parameters.path.getPointAt( t, position );
+				position.multiplyScalar( params.scale );
 
 				// interpolation
 
-				var segments = tubeGeometry.tangents.length;
-				var pickt = t * segments;
-				var pick = Math.floor( pickt );
-				var pickNext = ( pick + 1 ) % segments;
+				const segments = tubeGeometry.tangents.length;
+				const pickt = t * segments;
+				const pick = Math.floor( pickt );
+				const pickNext = ( pick + 1 ) % segments;
 
 				binormal.subVectors( tubeGeometry.binormals[ pickNext ], tubeGeometry.binormals[ pick ] );
 				binormal.multiplyScalar( pickt - pick ).add( tubeGeometry.binormals[ pick ] );
 
-				var dir = tubeGeometry.parameters.path.getTangentAt( t );
-				var offset = 15;
+				tubeGeometry.parameters.path.getTangentAt( t, direction );
+				const offset = 15;
 
-				normal.copy( binormal ).cross( dir );
+				normal.copy( binormal ).cross( direction );
 
 				// we move on a offset on its binormal
 
-				pos.add( normal.clone().multiplyScalar( offset ) );
+				position.add( normal.clone().multiplyScalar( offset ) );
 
-				splineCamera.position.copy( pos );
-				cameraEye.position.copy( pos );
+				splineCamera.position.copy( position );
+				cameraEye.position.copy( position );
 
 				// using arclength for stablization in look ahead
 
-				var lookAt = tubeGeometry.parameters.path.getPointAt( ( t + 30 / tubeGeometry.parameters.path.getLength() ) % 1 ).multiplyScalar( params.scale );
+				tubeGeometry.parameters.path.getPointAt( ( t + 30 / tubeGeometry.parameters.path.getLength() ) % 1, lookAt );
+				lookAt.multiplyScalar( params.scale );
 
 				// camera orientation 2 - up orientation via normal
 
-				if ( ! params.lookAhead ) lookAt.copy( pos ).add( dir );
+				if ( ! params.lookAhead ) lookAt.copy( position ).add( direction );
 				splineCamera.matrix.lookAt( splineCamera.position, lookAt, normal );
 				splineCamera.quaternion.setFromRotationMatrix( splineCamera.matrix );
 

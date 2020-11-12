@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shader demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank" rel="noopener">Monjori by Mic</a></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shader demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank" rel="noopener">Monjori by Mic</a></div>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
@@ -67,30 +67,28 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var container;
+			let camera, scene, renderer;
 
-			var camera, scene, renderer;
-
-			var uniforms;
+			let uniforms;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+				const geometry = new THREE.PlaneBufferGeometry( 2, 2 );
 
 				uniforms = {
-					"time": { value: 1.0 }
+					time: { value: 1.0 }
 				};
 
-				var material = new THREE.ShaderMaterial( {
+				const material = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -98,7 +96,7 @@
 
 				} );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
@@ -119,11 +117,11 @@
 
 			//
 
-			function animate( timestamp ) {
+			function animate() {
 
 				requestAnimationFrame( animate );
 
-				uniforms[ "time" ].value = timestamp / 1000;
+				uniforms[ 'time' ].value = performance.now() / 1000;
 
 				renderer.render( scene, camera );
 

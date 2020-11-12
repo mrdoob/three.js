@@ -7,6 +7,9 @@ export class MaterialLoader extends Loader {
 
 	constructor( manager?: LoadingManager );
 
+	/**
+	 * @default {}
+	 */
 	textures: { [key: string]: Texture };
 
 	load(

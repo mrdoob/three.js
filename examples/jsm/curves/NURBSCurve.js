@@ -1,13 +1,3 @@
-/**
- * @author renej
- * NURBS curve object
- *
- * Derives from Curve, overriding getPoint and getTangent.
- *
- * Implementation is based on (x, y [, z=0 [, w=1]]) control points with w=weight.
- *
- **/
-
 import {
 	Curve,
 	Vector3,
@@ -15,10 +5,14 @@ import {
 } from "../../../build/three.module.js";
 import { NURBSUtils } from "../curves/NURBSUtils.js";
 
-
-/**************************************************************
- *	NURBS curve
- **************************************************************/
+/**
+ * NURBS curve object
+ *
+ * Derives from Curve, overriding getPoint and getTangent.
+ *
+ * Implementation is based on (x, y [, z=0 [, w=1]]) control points with w=weight.
+ *
+ **/
 
 var NURBSCurve = function ( degree, knots /* array of reals */, controlPoints /* array of Vector(2|3|4) */, startKnot /* index in knots */, endKnot /* index in knots */ ) {
 
@@ -45,7 +39,9 @@ NURBSCurve.prototype = Object.create( Curve.prototype );
 NURBSCurve.prototype.constructor = NURBSCurve;
 
 
-NURBSCurve.prototype.getPoint = function ( t ) {
+NURBSCurve.prototype.getPoint = function ( t, optionalTarget ) {
+
+	var point = optionalTarget || new Vector3();
 
 	var u = this.knots[ this.startKnot ] + t * ( this.knots[ this.endKnot ] - this.knots[ this.startKnot ] ); // linear mapping t->u
 
@@ -59,17 +55,18 @@ NURBSCurve.prototype.getPoint = function ( t ) {
 
 	}
 
-	return new Vector3( hpoint.x, hpoint.y, hpoint.z );
+	return point.set( hpoint.x, hpoint.y, hpoint.z );
 
 };
 
 
-NURBSCurve.prototype.getTangent = function ( t ) {
+NURBSCurve.prototype.getTangent = function ( t, optionalTarget ) {
+
+	var tangent = optionalTarget || new Vector3();
 
 	var u = this.knots[ 0 ] + t * ( this.knots[ this.knots.length - 1 ] - this.knots[ 0 ] );
 	var ders = NURBSUtils.calcNURBSDerivatives( this.degree, this.knots, this.controlPoints, u, 1 );
-	var tangent = ders[ 1 ].clone();
-	tangent.normalize();
+	tangent.copy( ders[ 1 ] ).normalize();
 
 	return tangent;
 

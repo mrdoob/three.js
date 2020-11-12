@@ -1,13 +1,9 @@
-/**
- * @author Mugen87 / http://github.com/Mugen87
- */
-
 import {
 	BufferGeometry,
 	BufferAttribute,
 	LineBasicMaterial,
 	Line,
-	Math as _Math
+	MathUtils
 } from '../../../build/three.module.js';
 
 function PositionalAudioHelper( audio, range, divisionsInnerAngle, divisionsOuterAngle ) {
@@ -27,6 +23,8 @@ function PositionalAudioHelper( audio, range, divisionsInnerAngle, divisionsOute
 
 	Line.call( this, geometry, [ materialOuterAngle, materialInnerAngle ] );
 
+	this.type = 'PositionalAudioHelper';
+
 	this.update();
 
 }
@@ -41,8 +39,8 @@ PositionalAudioHelper.prototype.update = function () {
 	var divisionsInnerAngle = this.divisionsInnerAngle;
 	var divisionsOuterAngle = this.divisionsOuterAngle;
 
-	var coneInnerAngle = _Math.degToRad( audio.panner.coneInnerAngle );
-	var coneOuterAngle = _Math.degToRad( audio.panner.coneOuterAngle );
+	var coneInnerAngle = MathUtils.degToRad( audio.panner.coneInnerAngle );
+	var coneOuterAngle = MathUtils.degToRad( audio.panner.coneOuterAngle );
 
 	var halfConeInnerAngle = coneInnerAngle / 2;
 	var halfConeOuterAngle = coneOuterAngle / 2;

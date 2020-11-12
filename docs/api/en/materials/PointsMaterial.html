@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -13,6 +12,30 @@
 		<h1>[name]</h1>
 
 		<p class="desc">The default material used by [page:Points].</p>
+
+		<h2>Code Example</h2>
+		<code>
+		const vertices = [];
+
+		for ( let i = 0; i < 10000; i ++ ) {
+
+			const x = THREE.MathUtils.randFloatSpread( 2000 );
+			const y = THREE.MathUtils.randFloatSpread( 2000 );
+			const z = THREE.MathUtils.randFloatSpread( 2000 );
+
+			vertices.push( x, y, z );
+
+		}
+
+		const geometry = new THREE.BufferGeometry();
+		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+		const material = new THREE.PointsMaterial( { color: 0x888888 } );
+
+		const points = new THREE.Points( geometry, material );
+
+		scene.add( points );
+		</code>
 
 		<h2>Examples</h2>
 		<p>
@@ -31,28 +54,7 @@
 			[example:webgl_trails WebGL / trails]
 		</p>
 
-		<code>
-//This will add a starfield to the background of a scene
-var starsGeometry = new THREE.Geometry();
-
-for ( var i = 0; i < 10000; i ++ ) {
-
-	var star = new THREE.Vector3();
-	star.x = THREE.Math.randFloatSpread( 2000 );
-	star.y = THREE.Math.randFloatSpread( 2000 );
-	star.z = THREE.Math.randFloatSpread( 2000 );
-
-	starsGeometry.vertices.push( star );
-
-}
-
-var starsMaterial = new THREE.PointsMaterial( { color: 0x888888 } );
-
-var starField = new THREE.Points( starsGeometry, starsMaterial );
-
-scene.add( starField );
-		</code>
-
+		<h2>Constructor</h2>
 		<h3>[name]( [param:Object parameters] )</h3>
 		<p>
 			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.

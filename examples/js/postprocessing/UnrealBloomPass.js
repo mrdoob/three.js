@@ -1,8 +1,4 @@
 /**
- * @author spidersharma / http://eduperiment.com/
- */
-
-/**
  * UnrealBloomPass is inspired by the bloom pass of Unreal Engine. It creates a
  * mip map chain of bloom textures and blurs them with different radii. Because
  * of the weighted combination of mips, and because larger blurs are done on

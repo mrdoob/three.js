@@ -8,10 +8,10 @@
 		<link rel="manifest" href="manifest.json">
 		<link rel="shortcut icon" href="../files/favicon.ico" />
 	</head>
-	<body ontouchstart="">
+	<body>
 		<link rel="stylesheet" href="css/main.css">
 
-		<script src="../examples/js/libs/jszip.min.js"></script>
+		<script src="../examples/js/libs/draco/draco_encoder.js"></script>
 
 		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
 		<link rel="stylesheet" href="js/libs/codemirror/theme/monokai.css">
@@ -19,10 +19,8 @@
 		<script src="js/libs/codemirror/mode/javascript.js"></script>
 		<script src="js/libs/codemirror/mode/glsl.js"></script>
 
-		<script src="js/libs/system.min.js"></script>
 		<script src="js/libs/esprima.js"></script>
 		<script src="js/libs/jsonlint.js"></script>
-		<script src="js/libs/glslprep.min.js"></script>
 
 		<link rel="stylesheet" href="js/libs/codemirror/addon/dialog.css">
 		<link rel="stylesheet" href="js/libs/codemirror/addon/show-hint.css">
@@ -55,6 +53,8 @@
 			import { Player } from './js/Player.js';
 			import { Sidebar } from './js/Sidebar.js';
 			import { Menubar } from './js/Menubar.js';
+			import { Resizer } from './js/Resizer.js';
+			import { VRButton } from '../examples/jsm/webxr/VRButton.js';
 
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
@@ -68,6 +68,10 @@
 			//
 
 			var editor = new Editor();
+
+			window.editor = editor; // Expose editor to Console
+			window.THREE = THREE; // Expose THREE to APP Scripts and Console
+			window.VRButton = VRButton; // Expose VRButton to APP Scripts
 
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
@@ -86,6 +90,9 @@
 
 			var menubar = new Menubar( editor );
 			document.body.appendChild( menubar.dom );
+
+			var resizer = new Resizer( editor );
+			document.body.appendChild( resizer.dom );
 
 			//
 
@@ -169,7 +176,19 @@
 
 				event.preventDefault();
 
-				editor.loader.loadFiles( event.dataTransfer.files );
+				if ( event.dataTransfer.types[ 0 ] === 'text/plain' ) return; // Outliner drop
+
+				if ( event.dataTransfer.items ) {
+
+					// DataTransferItemList supports folders
+
+					editor.loader.loadItemList( event.dataTransfer.items );
+
+				} else {
+
+					editor.loader.loadFiles( event.dataTransfer.files );
+
+				}
 
 			}, false );
 
@@ -222,15 +241,6 @@
 				}
 
 			}
-
-			/*
-			window.addEventListener( 'message', function ( event ) {
-
-				editor.clear();
-				editor.fromJSON( event.data );
-
-			}, false );
-			*/
 
 		</script>
 	</body>

@@ -10,6 +10,18 @@ import {
 
 export class CubeTexture extends Texture {
 
+	/**
+	 * @param [images=[]]
+	 * @param [mapping=THREE.CubeReflectionMapping]
+	 * @param [wrapS=THREE.ClampToEdgeWrapping]
+	 * @param [wrapT=THREE.ClampToEdgeWrapping]
+	 * @param [magFilter=THREE.LinearFilter]
+	 * @param [minFilter=THREE.LinearMipmapLinearFilter]
+	 * @param [format=THREE.RGBFormat]
+	 * @param [type=THREE.UnsignedByteType]
+	 * @param [anisotropy=1]
+	 * @param [encoding=THREE.LinearEncoding]
+	 */
 	constructor(
 		images?: any[], // HTMLImageElement or HTMLCanvasElement
 		mapping?: Mapping,
@@ -24,5 +36,12 @@ export class CubeTexture extends Texture {
 	);
 
 	images: any; // returns and sets the value of Texture.image in the codde ?
+
+	/**
+	 * @default false
+	 */
+	flipY: boolean;
+
+	readonly isCubeTexture: true;
 
 }

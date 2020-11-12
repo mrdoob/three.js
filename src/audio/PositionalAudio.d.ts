@@ -1,13 +1,7 @@
 import { AudioListener } from './AudioListener';
 import { Audio } from './Audio';
 
-export class AudioWeaken extends Audio {
-
-	getOutput(): any;
-
-}
-
-export class PositionalAudio extends AudioWeaken {
+export class PositionalAudio extends Audio<PannerNode> {
 
 	constructor( listener: AudioListener );
 
@@ -18,8 +12,8 @@ export class PositionalAudio extends AudioWeaken {
 	getRefDistance(): number;
 	setRolloffFactor( value: number ): this;
 	getRolloffFactor(): number;
-	setDistanceModel( value: DistanceModelType ): this;
-	getDistanceModel(): DistanceModelType;
+	setDistanceModel( value: string ): this;
+	getDistanceModel(): string;
 	setMaxDistance( value: number ): this;
 	getMaxDistance(): number;
 	setDirectionalCone(

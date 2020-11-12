@@ -1,8 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author WestLangley / http://github.com/WestLangley
- */
-
 import {
 	BufferGeometry,
 	Float32BufferAttribute,
@@ -53,6 +48,8 @@ function FaceNormalsHelper( object, size, hex, linewidth ) {
 	geometry.setAttribute( 'position', positions );
 
 	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
+
+	this.type = 'FaceNormalsHelper';
 
 	//
 

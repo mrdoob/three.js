@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,18 +18,22 @@
 			common projection mode used for rendering a 3D scene.
 		</p>
 
+		<h2>Code Example</h2>
 
-		<h2>Example</h2>
+		<code>
+		const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+		scene.add( camera );
+		</code>
 
-		<p>[example:webgl_animation_skinning_blending animation / skinning / blending ]</p>
-		<p>[example:webgl_animation_skinning_morph animation / skinning / blending ]</p>
-		<p>[example:webgl_effects_stereo effects / stereo ]</p>
-		<p>[example:webgl_interactive_cubes interactive / cubes ]</p>
-		<p>[example:webgl_loader_collada_skinning loader / collada / skinning ]</p>
+		<h2>Examples</h2>
 
-		<code>var camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
-scene.add( camera );</code>
-
+		<p>
+			[example:webgl_animation_skinning_blending animation / skinning / blending ]<br />
+			[example:webgl_animation_skinning_morph animation / skinning / morph ]<br />
+			[example:webgl_effects_stereo effects / stereo ]<br />
+			[example:webgl_interactive_cubes interactive / cubes ]<br />
+			[example:webgl_loader_collada_skinning loader / collada / skinning ]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -59,7 +62,7 @@ scene.add( camera );</code>
 		<p>
 			Camera frustum far plane. Default is *2000*.<br /><br />
 
-			The valid range is between the current value of the [page:.near near] plane and infinity.
+			Must be greater than the current value of [page:.near near] plane.
 		</p>
 
 		<h3>[property:Float filmGauge]</h3>
@@ -156,10 +159,10 @@ scene.add( camera );</code>
 
 		then for each monitor you would call it like this:<br />
 
-		<code>var w = 1920;
-var h = 1080;
-var fullWidth = w * 3;
-var fullHeight = h * 2;
+		<code>const w = 1920;
+const h = 1080;
+const fullWidth = w * 3;
+const fullHeight = h * 2;
 
 // A
 camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );

@@ -14,8 +14,6 @@
 		<div id="info">Sheen demo by <a href="https://github.com/DanielSturk">DanielSturk</a></div>
 		<div id="container"></div>
 
-		<script src="js/libs/ammo.js"></script>
-
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -30,11 +28,11 @@
 			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
 			// Graphics variables
-			var camera, controls, scene, renderer, stats;
-			var directionalLight;
-			var mesh, sphere, material, nodeMaterial;
+			let camera, controls, scene, renderer, stats;
+			let directionalLight;
+			let mesh, sphere, material, nodeMaterial;
 
-			var params = {
+			const params = {
 				nodeMaterial: true,
 				color: new THREE.Color( 255, 0, 127 ),
 				sheenBRDF: true,
@@ -46,7 +44,7 @@
 			// model
 			new FBXLoader().load( 'models/fbx/cloth.fbx', function ( loadedModel ) {
 
-				mesh = loadedModel.children[0];
+				mesh = loadedModel.children[ 0 ];
 
 				init();
 
@@ -82,11 +80,11 @@
 					new THREE.SphereBufferGeometry( 1, 100, 100 ),
 					material
 				);
-				scene.add(sphere);
+				scene.add( sphere );
 
 				camera.position.set( - 12, 7, 4 );
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -116,23 +114,23 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				function onUpdate() {
 
 					mesh.material = sphere.material = params.nodeMaterial
-					? nodeMaterial
-					: material;
+						? nodeMaterial
+						: material;
 
 					material.sheen = params.sheenBRDF
-					? new THREE.Color()
-					: null;
+						? new THREE.Color()
+						: null;
 
 					material.needsUpdate = true;
 
 					nodeMaterial.sheen = params.sheenBRDF
-					? new Nodes.ColorNode( material.sheen )
-					: undefined;
+						? new Nodes.ColorNode( material.sheen )
+						: undefined;
 
 					nodeMaterial.needsCompile = true;
 

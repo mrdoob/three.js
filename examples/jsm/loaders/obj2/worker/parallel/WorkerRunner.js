@@ -1,15 +1,20 @@
 /**
- * @author Kai Salmen / https://kaisalmen.de
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
-const ObjectManipulator = {
+const ObjectManipulator = function () {
+};
+
+ObjectManipulator.prototype = {
+
+	constructor: ObjectManipulator,
 
 	/**
 	 * Applies values from parameter object via set functions or via direct assignment.
 	 *
 	 * @param {Object} objToAlter The objToAlter instance
 	 * @param {Object} params The parameter object
+	 * @param {boolean} forceCreation Force the creation of a property
 	 */
 	applyProperties: function ( objToAlter, params, forceCreation ) {
 
@@ -59,10 +64,11 @@ DefaultWorkerPayloadHandler.prototype = {
 			this.logging.debug = payload.logging.debug === true;
 
 		}
+
 		if ( payload.cmd === 'parse' ) {
 
-			let scope = this;
-			let callbacks = {
+			const scope = this;
+			const callbacks = {
 				callbackOnAssetAvailable: function ( payload ) {
 
 					self.postMessage( payload );
@@ -75,16 +81,18 @@ DefaultWorkerPayloadHandler.prototype = {
 				}
 			};
 
-			let parser = this.parser;
+			const parser = this.parser;
 			if ( typeof parser[ 'setLogging' ] === 'function' ) {
 
 				parser.setLogging( this.logging.enabled, this.logging.debug );
 
 			}
-			ObjectManipulator.applyProperties( parser, payload.params, false );
-			ObjectManipulator.applyProperties( parser, callbacks, false );
 
-			let arraybuffer = payload.data.input;
+			const objectManipulator = new ObjectManipulator();
+			objectManipulator.applyProperties( parser, payload.params, false );
+			objectManipulator.applyProperties( parser, callbacks, false );
+
+			const arraybuffer = payload.data.input;
 			let executeFunctionName = 'execute';
 			if ( typeof parser.getParseFunctionName === 'function' ) executeFunctionName = parser.getParseFunctionName();
 			if ( payload.usesMeshDisassembler ) {
@@ -96,6 +104,7 @@ DefaultWorkerPayloadHandler.prototype = {
 				parser[ executeFunctionName ]( arraybuffer, payload.data.options );
 
 			}
+
 			if ( this.logging.enabled ) console.log( 'WorkerRunner: Run complete!' );
 
 			self.postMessage( {
@@ -121,12 +130,13 @@ const WorkerRunner = function ( payloadHandler ) {
 
 	this.payloadHandler = payloadHandler;
 
-	let scope = this;
-	let scopedRunner = function ( event ) {
+	const scope = this;
+	const scopedRunner = function ( event ) {
 
 		scope.processMessage( event.data );
 
 	};
+
 	self.addEventListener( 'message', scopedRunner, false );
 
 };

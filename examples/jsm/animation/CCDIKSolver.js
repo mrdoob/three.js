@@ -1,6 +1,19 @@
+import {
+	BufferAttribute,
+	BufferGeometry,
+	Color,
+	Line,
+	LineBasicMaterial,
+	Matrix4,
+	Mesh,
+	MeshBasicMaterial,
+	Object3D,
+	Quaternion,
+	SphereBufferGeometry,
+	Vector3
+} from "../../../build/three.module.js";
+
 /**
- * @author takahiro / https://github.com/takahirox
- *
  * CCD Algorithm
  *  - https://sites.google.com/site/auraliusproject/ccd-algorithm
  *
@@ -19,21 +32,6 @@
  *	maxAngle: 1.0,
  * } ];
  */
-
-import {
-	BufferAttribute,
-	BufferGeometry,
-	Color,
-	Line,
-	LineBasicMaterial,
-	Matrix4,
-	Mesh,
-	MeshBasicMaterial,
-	Object3D,
-	Quaternion,
-	SphereBufferGeometry,
-	Vector3
-} from "../../../build/three.module.js";
 
 var CCDIKSolver = ( function () {
 
@@ -407,7 +405,7 @@ var CCDIKSolver = ( function () {
 
 		_init: function () {
 
-			var self = this;
+			var scope = this;
 			var iks = this.iks;
 
 			function createLineGeometry( ik ) {
@@ -422,25 +420,25 @@ var CCDIKSolver = ( function () {
 
 			function createTargetMesh() {
 
-				return new Mesh( self.sphereGeometry, self.targetSphereMaterial );
+				return new Mesh( scope.sphereGeometry, scope.targetSphereMaterial );
 
 			}
 
 			function createEffectorMesh() {
 
-				return new Mesh( self.sphereGeometry, self.effectorSphereMaterial );
+				return new Mesh( scope.sphereGeometry, scope.effectorSphereMaterial );
 
 			}
 
 			function createLinkMesh() {
 
-				return new Mesh( self.sphereGeometry, self.linkSphereMaterial );
+				return new Mesh( scope.sphereGeometry, scope.linkSphereMaterial );
 
 			}
 
 			function createLine( ik ) {
 
-				return new Line( createLineGeometry( ik ), self.lineMaterial );
+				return new Line( createLineGeometry( ik ), scope.lineMaterial );
 
 			}
 

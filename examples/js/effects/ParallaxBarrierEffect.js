@@ -1,9 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author marklundin / http://mark-lundin.com/
- * @author alteredq / http://alteredqualia.com/
- */
-
 THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 	var _camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );

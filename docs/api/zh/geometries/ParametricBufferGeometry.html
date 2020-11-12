@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -32,12 +31,12 @@
 
 		</script>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
-		var geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.klein, 25, 25 );
-		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-		var klein = new THREE.Mesh( geometry, material );
+		const geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.klein, 25, 25 );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const klein = new THREE.Mesh( geometry, material );
 		scene.add( klein );
 		</code>
 
@@ -65,6 +64,8 @@
 
 		<h2>方法</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/ParametricGeometry.js src/geometries/ParametricGeometry.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

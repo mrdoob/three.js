@@ -10,7 +10,7 @@ export class Sprite extends Object3D {
 	constructor( material?: SpriteMaterial );
 
 	type: 'Sprite';
-	isSprite: true;
+	readonly isSprite: true;
 
 	geometry: BufferGeometry;
 	material: SpriteMaterial;

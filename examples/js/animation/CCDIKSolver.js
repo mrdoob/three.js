@@ -1,6 +1,4 @@
 /**
- * @author takahiro / https://github.com/takahirox
- *
  * CCD Algorithm
  *  - https://sites.google.com/site/auraliusproject/ccd-algorithm
  *
@@ -392,7 +390,7 @@ THREE.CCDIKSolver = ( function () {
 
 		_init: function () {
 
-			var self = this;
+			var scope = this;
 			var iks = this.iks;
 
 			function createLineGeometry( ik ) {
@@ -407,25 +405,25 @@ THREE.CCDIKSolver = ( function () {
 
 			function createTargetMesh() {
 
-				return new THREE.Mesh( self.sphereGeometry, self.targetSphereMaterial );
+				return new THREE.Mesh( scope.sphereGeometry, scope.targetSphereMaterial );
 
 			}
 
 			function createEffectorMesh() {
 
-				return new THREE.Mesh( self.sphereGeometry, self.effectorSphereMaterial );
+				return new THREE.Mesh( scope.sphereGeometry, scope.effectorSphereMaterial );
 
 			}
 
 			function createLinkMesh() {
 
-				return new THREE.Mesh( self.sphereGeometry, self.linkSphereMaterial );
+				return new THREE.Mesh( scope.sphereGeometry, scope.linkSphereMaterial );
 
 			}
 
 			function createLine( ik ) {
 
-				return new THREE.Line( createLineGeometry( ik ), self.lineMaterial );
+				return new THREE.Line( createLineGeometry( ik ), scope.lineMaterial );
 
 			}
 

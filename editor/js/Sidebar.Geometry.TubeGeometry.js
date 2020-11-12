@@ -1,7 +1,3 @@
-/**
- * @author Temdog007 / http://github.com/Temdog007
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UISelect, UICheckbox, UINumber } from './libs/ui.js';
@@ -9,7 +5,7 @@ import { UIPoints3 } from './libs/ui.three.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryTubeGeometry = function ( editor, object ) {
+function SidebarGeometryTubeGeometry( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -104,6 +100,6 @@ var SidebarGeometryTubeGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometryTubeGeometry };

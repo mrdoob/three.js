@@ -8,7 +8,7 @@
 </head>
 <body>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - X-File Loader <br>
+		<a href="https://threejs.org" target="_blank">three.js</a> - X-File Loader <br>
 		<a href="https://github.com/adrs2002/threeXfileLoader" target="_new">see more info and samples</a> <br /><br/>
 		<select id="mech1_anime">
 			<option value="stand">stand</option>
@@ -27,30 +27,30 @@
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { XLoader } from './jsm/loaders/XLoader.js';
 
-		var container, stats, controls;
-		var camera, scene, renderer;
-		var clock = new THREE.Clock();
-		var manager = null;
+		let container, stats, controls;
+		let camera, scene, renderer;
+		const clock = new THREE.Clock();
+		let manager = null;
 
-		var skeletonHelper = null;
-		var animates = [];
-		var actions = [];
-		var Models = [];
+		let skeletonHelper = null;
+		const animates = [];
+		const actions = [];
+		const Models = [];
 
-		init();
-
-		var onProgress = function ( xhr ) {
+		const onProgress = function ( xhr ) {
 
 			if ( xhr.lengthComputable ) {
 
-				var percentComplete = xhr.loaded / xhr.total * 100;
+				const percentComplete = xhr.loaded / xhr.total * 100;
 				console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
 
 			}
 
 		};
 
-		var onError = function () {};
+		const onError = function () {};
+
+		init();
 
 		function init() {
 
@@ -62,7 +62,7 @@
 
 			// grid
 
-			var gridHelper = new THREE.GridHelper( 14, 1, 0x303030, 0x303030 );
+			const gridHelper = new THREE.GridHelper( 14, 1, 0x303030, 0x303030 );
 			scene.add( gridHelper );
 
 			// stats
@@ -84,11 +84,11 @@
 			controls.target.set( 0, 5, 0 );
 			controls.update();
 
-			var light = new THREE.DirectionalLight( 0xffffff, 1 );
+			const light = new THREE.DirectionalLight( 0xffffff, 1 );
 			light.position.set( 10, 100, - 10 ).normalize();
 			scene.add( light );
 
-			var light2 = new THREE.DirectionalLight( 0x777666, 1 );
+			const light2 = new THREE.DirectionalLight( 0x777666, 1 );
 			light2.position.set( - 1, - 1, - 1 ).normalize();
 			scene.add( light2 );
 
@@ -105,7 +105,7 @@
 
 			};
 
-			var loader = new XLoader( manager );
+			const loader = new XLoader( manager );
 
 			actions[ 0 ] = {};
 
@@ -113,9 +113,9 @@
 
 			loader.load( [ 'models/xfile/SSR06_model.x' ], function ( object ) {
 
-				for ( var i = 0; i < object.models.length; i ++ ) {
+				for ( let i = 0; i < object.models.length; i ++ ) {
 
-					var model = object.models[ i ];
+					const model = object.models[ i ];
 
 					model.scale.x *= - 1;
 
@@ -144,7 +144,7 @@
 
 			//
 
-			var animationSelection = document.getElementById( 'mech1_anime' );
+			const animationSelection = document.getElementById( 'mech1_anime' );
 			animationSelection.addEventListener( 'change', mech1_changeAnime );
 
 		}
@@ -161,11 +161,11 @@
 
 			requestAnimationFrame( animate );
 
-			var delta = clock.getDelta();
+			const delta = clock.getDelta();
 
 			if ( animates != null && animates.length > 0 ) {
 
-				for ( var i = 0; i < animates.length; i ++ ) {
+				for ( let i = 0; i < animates.length; i ++ ) {
 
 					animates[ i ].update( delta * 1000 );
 
@@ -197,7 +197,7 @@
 
 			} else {
 
-				var loader2 = new XLoader( manager );
+				const loader2 = new XLoader( manager );
 				loader2.load( [ 'models/xfile/' + animeName + '.x', { putPos: false, putScl: false } ], function () {
 
 					// !! important!
@@ -235,7 +235,7 @@
 
 		function mech1_changeAnime( event ) {
 
-			var val = event.target.value;
+			const val = event.target.value;
 
 			loadAnimation( val, 0, function () {
 

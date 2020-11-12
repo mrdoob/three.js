@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { InputNode } from '../core/InputNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';

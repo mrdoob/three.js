@@ -4,8 +4,6 @@ import { DataTexture } from '../textures/DataTexture.js';
 import { Loader } from './Loader.js';
 
 /**
- * @author Nikos M. / https://github.com/foo123/
- *
  * Abstract Base class to load generic binary textures formats (rgbe, hdr, ...)
  *
  * Sub classes have to implement the parse() method which will be used in load().
@@ -23,16 +21,18 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		const scope = this;
 
-		var texture = new DataTexture();
+		const texture = new DataTexture();
 
-		var loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
 		loader.setPath( this.path );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
-			var texData = scope.parse( buffer );
+			const texData = scope.parse( buffer );
 
 			if ( ! texData ) return;
 
@@ -61,6 +61,7 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 				texture.format = texData.format;
 
 			}
+
 			if ( texData.type !== undefined ) {
 
 				texture.type = texData.type;

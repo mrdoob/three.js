@@ -1,7 +1,3 @@
-/**
- * @author Nikos M. / https://github.com/foo123/
- */
-
 // https://github.com/mrdoob/three.js/issues/5552
 // http://en.wikipedia.org/wiki/RGBE_image_format
 
@@ -45,6 +41,7 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 					case rgbe_memory_error: console.error( "THREE.RGBELoader: Error: " + ( msg || '' ) );
 
 				}
+
 				return RGBE_RETURN_FAILURE;
 
 			},
@@ -91,6 +88,7 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 					return s + chunk.slice( 0, i );
 
 				}
+
 				return false;
 
 			},
@@ -133,12 +131,14 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 					return rgbe_error( rgbe_read_error, "no header found" );
 
 				}
+
 				/* if you want to require the magic token then uncomment the next line */
 				if ( ! ( match = line.match( magic_token_re ) ) ) {
 
 					return rgbe_error( rgbe_format_error, "bad initial token" );
 
 				}
+
 				header.valid |= RGBE_VALID_PROGRAMTYPE;
 				header.programtype = match[ 1 ];
 				header.string += line + "\n";
@@ -161,17 +161,20 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 						header.gamma = parseFloat( match[ 1 ], 10 );
 
 					}
+
 					if ( match = line.match( exposure_re ) ) {
 
 						header.exposure = parseFloat( match[ 1 ], 10 );
 
 					}
+
 					if ( match = line.match( format_re ) ) {
 
 						header.valid |= RGBE_VALID_FORMAT;
 						header.format = match[ 1 ];//'32-bit_rle_rgbe';
 
 					}
+
 					if ( match = line.match( dimensions_re ) ) {
 
 						header.valid |= RGBE_VALID_DIMENSIONS;
@@ -189,6 +192,7 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 					return rgbe_error( rgbe_format_error, "missing format specifier" );
 
 				}
+
 				if ( ! ( header.valid & RGBE_VALID_DIMENSIONS ) ) {
 
 					return rgbe_error( rgbe_format_error, "missing image size specifier" );
@@ -226,7 +230,7 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 
 				data_rgba = new Uint8Array( 4 * w * h );
 
-				if ( ! data_rgba || ! data_rgba.length ) {
+				if ( ! data_rgba.length ) {
 
 					return rgbe_error( rgbe_memory_error, "unable to allocate buffer space" );
 

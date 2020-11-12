@@ -7,14 +7,20 @@ export class FogExp2 implements IFog {
 
 	constructor( hex: number | string, density?: number );
 
+	/**
+	 * @default ''
+	 */
 	name: string;
+
 	color: Color;
 
 	/**
 	 * Defines how fast the fog will grow dense.
-	 * Default is 0.00025.
+	 * @default 0.00025
 	 */
 	density: number;
+
+	readonly isFogExp2: true;
 
 	clone(): this;
 	toJSON(): any;

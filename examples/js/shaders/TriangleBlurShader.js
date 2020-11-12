@@ -1,6 +1,4 @@
 /**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- *
  * Triangle blur shader
  * based on glfx.js triangle blur shader
  * https://github.com/evanw/glfx.js

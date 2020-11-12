@@ -1,6 +1,4 @@
 /**
- * @author tapio / http://tapio.github.com/
- *
  * Hue and saturation adjustment
  * https://github.com/evanw/glfx.js
  * hue: -1 to 1 (-1 is 180 degrees in the negative direction, 0 is no change, etc.

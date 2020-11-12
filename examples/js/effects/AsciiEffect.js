@@ -1,6 +1,4 @@
 /**
- * @author zz85 / https://github.com/zz85
- *
  * Ascii generation is based on http://www.nihilogic.dk/labs/jsascii/
  * Maybe more about this later with a blog post at http://lab4games.net/zz85/blog
  *
@@ -272,6 +270,7 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 				}
 
 			}
+
 			strChars += "<br/>";
 
 		}

@@ -1,6 +1,4 @@
 /**
- * @author mrdoob / http://www.mrdoob.com
- *
  * Simple test shader
  */
 

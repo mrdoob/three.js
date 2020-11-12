@@ -1,13 +1,9 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIElement, UIPanel, UIText } from './libs/ui.js';
 
 import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 
-var Script = function ( editor ) {
+function Script( editor ) {
 
 	var signals = editor.signals;
 
@@ -94,6 +90,7 @@ var Script = function ( editor ) {
 					editor.execute( new SetScriptValueCommand( editor, currentObject, currentScript, 'source', value ) );
 
 				}
+
 				return;
 
 			}
@@ -109,6 +106,7 @@ var Script = function ( editor ) {
 				editor.execute( cmd );
 
 			}
+
 			if ( JSON.stringify( currentObject.material.uniforms ) !== JSON.stringify( json.uniforms ) ) {
 
 				var cmd = new SetMaterialValueCommand( editor, currentObject, 'uniforms', json.uniforms );
@@ -116,6 +114,7 @@ var Script = function ( editor ) {
 				editor.execute( cmd );
 
 			}
+
 			if ( JSON.stringify( currentObject.material.attributes ) !== JSON.stringify( json.attributes ) ) {
 
 				var cmd = new SetMaterialValueCommand( editor, currentObject, 'attributes', json.attributes );
@@ -221,35 +220,6 @@ var Script = function ( editor ) {
 					break;
 
 				case 'glsl':
-
-					try {
-
-						var shaderType = currentScript === 'vertexShader' ?
-							glslprep.Shader.VERTEX : glslprep.Shader.FRAGMENT;
-
-						glslprep.parseGlsl( string, shaderType );
-
-					} catch ( error ) {
-
-						if ( error instanceof glslprep.SyntaxError ) {
-
-							errors.push( {
-
-								lineNumber: error.line,
-								message: "Syntax Error: " + error.message
-
-							} );
-
-						} else {
-
-							console.error( error.stack || error );
-
-						}
-
-					}
-
-					if ( errors.length !== 0 ) break;
-					if ( renderer instanceof THREE.WebGLRenderer === false ) break;
 
 					currentObject.material[ currentScript ] = string;
 					currentObject.material.needsUpdate = true;
@@ -461,6 +431,6 @@ var Script = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { Script };

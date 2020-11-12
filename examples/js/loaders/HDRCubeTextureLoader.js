@@ -1,8 +1,3 @@
-/**
-* @author Prashant Sharma / spidersharma03
-* @author Ben Houston / http://clara.io / bhouston
-*/
-
 THREE.HDRCubeTextureLoader = function ( manager ) {
 
 	THREE.Loader.call( this, manager );
@@ -75,6 +70,7 @@ THREE.HDRCubeTextureLoader.prototype = Object.assign( Object.create( THREE.Loade
 			new THREE.FileLoader( scope.manager )
 				.setPath( scope.path )
 				.setResponseType( 'arraybuffer' )
+				.setWithCredentials( scope.withCredentials )
 				.load( urls[ i ], function ( buffer ) {
 
 					loaded ++;

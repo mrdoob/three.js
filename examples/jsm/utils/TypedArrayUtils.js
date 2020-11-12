@@ -1,14 +1,9 @@
-
 var TypedArrayUtils = {};
 
 /**
  * In-place quicksort for typed arrays (e.g. for Float32Array)
  * provides fast sorting
  * useful e.g. for a custom shader and/or BufferGeometry
- *
- * @author Roman Bolzern <roman.bolzern@fhnw.ch>, 2013
- * @author I4DS http://www.fhnw.ch/i4ds, 2013
- * @license MIT License <http://www.opensource.org/licenses/mit-license.php>
  *
  * Complexity: http://bigocheatsheet.com/ see Quicksort
  *
@@ -164,8 +159,6 @@ TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
  *
  * Based on https://github.com/ubilabs/kd-tree-javascript by Ubilabs
  *
- * @author Roman Bolzern <roman.bolzern@fhnw.ch>, 2013
- * @author I4DS http://www.fhnw.ch/i4ds, 2013
  * @license MIT License <http://www.opensource.org/licenses/mit-license.php>
  *
  * Requires typed array quicksort
@@ -184,7 +177,7 @@ TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
 
-	var self = this;
+	var scope = this;
 
 	var maxDepth = 0;
 
@@ -206,7 +199,7 @@ TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
 		if ( plength === 0 ) return null;
 		if ( plength === 1 ) {
 
-			return new self.Node( getPointSet( points, 0 ), depth, parent, pos );
+			return new scope.Node( getPointSet( points, 0 ), depth, parent, pos );
 
 		}
 
@@ -214,7 +207,7 @@ TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
 
 		median = Math.floor( plength / 2 );
 
-		node = new self.Node( getPointSet( points, median ), depth, parent, median + pos );
+		node = new scope.Node( getPointSet( points, median ), depth, parent, median + pos );
 		node.left = buildTree( points.subarray( 0, median * eleSize ), depth + 1, node, pos );
 		node.right = buildTree( points.subarray( ( median + 1 ) * eleSize, points.length ), depth + 1, node, pos + median + 1 );
 
@@ -370,7 +363,7 @@ TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
 
 		}
 
-		nearestSearch( self.root );
+		nearestSearch( scope.root );
 
 		result = [];
 
@@ -418,7 +411,6 @@ TypedArrayUtils.Kdtree.prototype.Node = function ( obj, depth, parent, pos ) {
 
 /**
  * Binary heap implementation
- * @author http://eloquentjavascript.net/appendix2.htm
  */
 
 TypedArrayUtils.Kdtree.BinaryHeap = function ( scoreFunction ) {

@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 THREE.ClearPass = function ( clearColor, clearAlpha ) {
 
 	THREE.Pass.call( this );

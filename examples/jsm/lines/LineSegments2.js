@@ -1,13 +1,8 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
 import {
 	InstancedInterleavedBuffer,
 	InterleavedBufferAttribute,
 	Line3,
-	Math as _Math,
+	MathUtils,
 	Matrix4,
 	Mesh,
 	Vector3,
@@ -18,12 +13,12 @@ import { LineMaterial } from "../lines/LineMaterial.js";
 
 var LineSegments2 = function ( geometry, material ) {
 
-	Mesh.call( this );
+	if ( geometry === undefined ) geometry = new LineSegmentsGeometry();
+	if ( material === undefined ) material = new LineMaterial( { color: Math.random() * 0xffffff } );
+
+	Mesh.call( this, geometry, material );
 
 	this.type = 'LineSegments2';
-
-	this.geometry = geometry !== undefined ? geometry : new LineSegmentsGeometry();
-	this.material = material !== undefined ? material : new LineMaterial( { color: Math.random() * 0xffffff } );
 
 };
 
@@ -86,6 +81,8 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			}
 
+			var threshold = ( raycaster.params.Line2 !== undefined ) ? raycaster.params.Line2.threshold || 0 : 0;
+
 			var ray = raycaster.ray;
 			var camera = raycaster.camera;
 			var projectionMatrix = camera.projectionMatrix;
@@ -93,7 +90,7 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			var geometry = this.geometry;
 			var material = this.material;
 			var resolution = material.resolution;
-			var lineWidth = material.linewidth;
+			var lineWidth = material.linewidth + threshold;
 
 			var instanceStart = geometry.attributes.instanceStart;
 			var instanceEnd = geometry.attributes.instanceEnd;
@@ -167,7 +164,7 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 				line.at( param, closestPoint );
 
 				// check if the intersection point is within clip space
-				var zPos = _Math.lerp( start.z, end.z, param );
+				var zPos = MathUtils.lerp( start.z, end.z, param );
 				var isInClipSpace = zPos >= - 1 && zPos <= 1;
 
 				var isInside = ssOrigin3.distanceTo( closestPoint ) < lineWidth * 0.5;

@@ -1,24 +1,22 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+function WebGLAttributes( gl, capabilities ) {
 
-function WebGLAttributes( gl ) {
+	const isWebGL2 = capabilities.isWebGL2;
 
-	var buffers = new WeakMap();
+	const buffers = new WeakMap();
 
 	function createBuffer( attribute, bufferType ) {
 
-		var array = attribute.array;
-		var usage = attribute.usage;
+		const array = attribute.array;
+		const usage = attribute.usage;
 
-		var buffer = gl.createBuffer();
+		const buffer = gl.createBuffer();
 
 		gl.bindBuffer( bufferType, buffer );
 		gl.bufferData( bufferType, array, usage );
 
 		attribute.onUploadCallback();
 
-		var type = gl.FLOAT;
+		let type = gl.FLOAT;
 
 		if ( array instanceof Float32Array ) {
 
@@ -65,8 +63,8 @@ function WebGLAttributes( gl ) {
 
 	function updateBuffer( buffer, attribute, bufferType ) {
 
-		var array = attribute.array;
-		var updateRange = attribute.updateRange;
+		const array = attribute.array;
+		const updateRange = attribute.updateRange;
 
 		gl.bindBuffer( bufferType, buffer );
 
@@ -78,8 +76,17 @@ function WebGLAttributes( gl ) {
 
 		} else {
 
-			gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
-				array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
+			if ( isWebGL2 ) {
+
+				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
+					array, updateRange.offset, updateRange.count );
+
+			} else {
+
+				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
+					array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
+
+			}
 
 			updateRange.count = - 1; // reset range
 
@@ -101,7 +108,7 @@ function WebGLAttributes( gl ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		var data = buffers.get( attribute );
+		const data = buffers.get( attribute );
 
 		if ( data ) {
 
@@ -115,9 +122,28 @@ function WebGLAttributes( gl ) {
 
 	function update( attribute, bufferType ) {
 
+		if ( attribute.isGLBufferAttribute ) {
+
+			var cached = buffers.get( attribute );
+
+			if ( ! cached || cached.version < attribute.version ) {
+
+				buffers.set( attribute, {
+					buffer: attribute.buffer,
+					type: attribute.type,
+					bytesPerElement: attribute.elementSize,
+					version: attribute.version
+				} );
+
+			}
+
+			return;
+
+		}
+
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		var data = buffers.get( attribute );
+		const data = buffers.get( attribute );
 
 		if ( data === undefined ) {
 

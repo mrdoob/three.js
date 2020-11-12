@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -24,7 +23,7 @@
 				&lt;title&gt;My first three.js app&lt;/title&gt;
 				&lt;style&gt;
 					body { margin: 0; }
-					canvas { width: 100%; height: 100% }
+					canvas { display: block; }
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
@@ -43,10 +42,10 @@
 		<p>To actually be able to display anything with three.js, we need three things: scene, camera and renderer, so that we can render the scene with camera.</p>
 
 		<code>
-		var scene = new THREE.Scene();
-		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-		var renderer = new THREE.WebGLRenderer();
+		const renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
 		</code>
@@ -72,9 +71,9 @@
 		<p><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</p>
 
 		<code>
-		var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-		var cube = new THREE.Mesh( geometry, material );
+		const geometry = new THREE.BoxGeometry();
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );
 
 		camera.position.z = 5;
@@ -121,32 +120,33 @@
 		<p>The full code is available below and as an editable [link:https://jsfiddle.net/mkba0ecu/ live example]. Play around with it to get a better understanding of how it works.</p>
 
 		<code>
+		&lt;!DOCTYPE html&gt;
 		&lt;html&gt;
 			&lt;head&gt;
 				&lt;title&gt;My first three.js app&lt;/title&gt;
 				&lt;style&gt;
 					body { margin: 0; }
-					canvas { width: 100%; height: 100% }
+					canvas { display: block; }
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
 				&lt;script src="js/three.js"&gt;&lt;/script&gt;
 				&lt;script&gt;
-					var scene = new THREE.Scene();
-					var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+					const scene = new THREE.Scene();
+					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-					var renderer = new THREE.WebGLRenderer();
+					const renderer = new THREE.WebGLRenderer();
 					renderer.setSize( window.innerWidth, window.innerHeight );
 					document.body.appendChild( renderer.domElement );
 
-					var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-					var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-					var cube = new THREE.Mesh( geometry, material );
+					const geometry = new THREE.BoxGeometry();
+					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+					const cube = new THREE.Mesh( geometry, material );
 					scene.add( cube );
 
 					camera.position.z = 5;
 
-					var animate = function () {
+					const animate = function () {
 						requestAnimationFrame( animate );
 
 						cube.rotation.x += 0.01;

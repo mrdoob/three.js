@@ -1,5 +1,4 @@
 /**
- * @author miibond
  * Generate a texture that represents the luminosity of the current scene, adapted over time
  * to simulate the optic nerve responding to the amount of light it is receiving.
  * Based on a GDC2007 presentation by Wolfgang Engel titled "Post-Processing Pipeline"
@@ -191,11 +190,13 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.luminanceRT.dispose();
 
 		}
+
 		if ( this.currentLuminanceRT ) {
 
 			this.currentLuminanceRT.dispose();
 
 		}
+
 		if ( this.previousLuminanceRT ) {
 
 			this.previousLuminanceRT.dispose();
@@ -224,6 +225,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT.texture;
 
 		}
+
 		//Put something in the adaptive luminance texture so that the scene can render initially
 		this.fsQuad.material = new THREE.MeshBasicMaterial( { color: 0x777777 } );
 		this.materialLuminance.needsUpdate = true;
@@ -250,6 +252,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.materialToneMap.uniforms.luminanceMap.value = null;
 
 		}
+
 		this.materialToneMap.needsUpdate = true;
 
 	},
@@ -312,31 +315,37 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.luminanceRT.dispose();
 
 		}
+
 		if ( this.previousLuminanceRT ) {
 
 			this.previousLuminanceRT.dispose();
 
 		}
+
 		if ( this.currentLuminanceRT ) {
 
 			this.currentLuminanceRT.dispose();
 
 		}
+
 		if ( this.materialLuminance ) {
 
 			this.materialLuminance.dispose();
 
 		}
+
 		if ( this.materialAdaptiveLum ) {
 
 			this.materialAdaptiveLum.dispose();
 
 		}
+
 		if ( this.materialCopy ) {
 
 			this.materialCopy.dispose();
 
 		}
+
 		if ( this.materialToneMap ) {
 
 			this.materialToneMap.dispose();

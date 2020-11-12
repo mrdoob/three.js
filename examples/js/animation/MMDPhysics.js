@@ -1,6 +1,4 @@
 /**
- * @author takahiro / https://github.com/takahirox
- *
  * Dependencies
  *  - Ammo.js https://github.com/kripken/ammo.js
  *

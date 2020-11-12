@@ -9,8 +9,8 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="description">Normal, Depth, DepthRGBA, DepthRGBAUnpacked, Materials</span><br/>
-			by <a href="https://Clara.io">Ben Houston</a>. ninja head from <a href="http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="description">Normal, Depth, DepthRGBA, DepthRGBAUnpacked, Materials</span><br/>
+			by <a href="https://Clara.io">Ben Houston</a>. ninja head from <a href="https://gpuopen.com/archive/gamescgi/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
 		</div>
 
 		<script type="module">
@@ -23,31 +23,29 @@
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var stats;
+			let stats;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var params = {
+			const params = {
 				material: 'normal',
 				camera: 'perspective',
 				side: 'double'
 			};
 
-			var sides = {
+			const sides = {
 				'front': THREE.FrontSide,
 				'back': THREE.BackSide,
 				'double': THREE.DoubleSide
 			};
 
-			var cameraOrtho, cameraPerspective;
-			var controlsOrtho, controlsPerspective;
+			let cameraOrtho, cameraPerspective;
+			let controlsOrtho, controlsPerspective;
 
-			var mesh, materialStandard, materialDepthBasic, materialDepthRGBA, materialNormal;
+			let mesh, materialStandard, materialDepthBasic, materialDepthRGBA, materialNormal;
 
-			var height = 500; // of camera frustum
-
-			var SCALE = 2.436143; // from original model
-			var BIAS = - 0.428408; // from original model
+			const SCALE = 2.436143; // from original model
+			const BIAS = - 0.428408; // from original model
 
 			init();
 			animate();
@@ -56,7 +54,7 @@
 			// Init gui
 			function initGui() {
 
-				var gui = new GUI();
+				const gui = new GUI();
 				gui.add( params, 'material', [ 'standard', 'normal', 'depthBasic', 'depthRGBA' ] );
 				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
 				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
@@ -65,7 +63,7 @@
 
 			function init() {
 
-				var container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				renderer = new THREE.WebGLRenderer();
@@ -77,11 +75,12 @@
 
 				scene = new THREE.Scene();
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 				cameraPerspective = new THREE.PerspectiveCamera( 45, aspect, 500, 3000 );
 				cameraPerspective.position.z = 1500;
 				scene.add( cameraPerspective );
 
+				const height = 500;
 				cameraOrtho = new THREE.OrthographicCamera( - height * aspect, height * aspect, height, - height, 1000, 2500 );
 				cameraOrtho.position.z = 1500;
 				scene.add( cameraOrtho );
@@ -102,27 +101,27 @@
 
 				// lights
 
-				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.1 );
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.1 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xff0000, 0.5 );
+				const pointLight = new THREE.PointLight( 0xff0000, 0.5 );
 				pointLight.position.z = 2500;
 				scene.add( pointLight );
 
-				var pointLight2 = new THREE.PointLight( 0xff6666, 1 );
+				const pointLight2 = new THREE.PointLight( 0xff6666, 1 );
 				camera.add( pointLight2 );
 
-				var pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
+				const pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
 				pointLight3.position.x = - 1000;
 				pointLight3.position.z = 1000;
 				scene.add( pointLight3 );
 
 				// textures
 
-				var textureLoader = new THREE.TextureLoader();
-				var normalMap = textureLoader.load( "models/obj/ninja/normal.jpg" );
-				var aoMap = textureLoader.load( "models/obj/ninja/ao.jpg" );
-				var displacementMap = textureLoader.load( "models/obj/ninja/displacement.jpg" );
+				const textureLoader = new THREE.TextureLoader();
+				const normalMap = textureLoader.load( "models/obj/ninja/normal.png" );
+				const aoMap = textureLoader.load( "models/obj/ninja/ao.jpg" );
+				const displacementMap = textureLoader.load( "models/obj/ninja/displacement.jpg" );
 
 				// material
 
@@ -181,10 +180,10 @@
 
 				//
 
-				var loader = new OBJLoader();
+				const loader = new OBJLoader();
 				loader.load( "models/obj/ninja/ninjaHead_Low.obj", function ( group ) {
 
-					var geometry = group.children[ 0 ].geometry;
+					const geometry = group.children[ 0 ].geometry;
 					geometry.attributes.uv2 = geometry.attributes.uv;
 					geometry.center();
 
@@ -208,9 +207,9 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
-				var aspect = window.innerWidth / window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 
 				camera.aspect = aspect;
 
@@ -241,7 +240,7 @@
 
 				if ( mesh ) {
 
-					var material = mesh.material;
+					let material = mesh.material;
 
 					switch ( params.material ) {
 

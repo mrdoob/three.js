@@ -8,7 +8,7 @@
 	</head>
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - convex geometry</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - convex geometry</div>
 
 		<script type="module">
 
@@ -17,7 +17,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { ConvexBufferGeometry } from './jsm/geometries/ConvexGeometry.js';
 
-			var group, camera, scene, renderer;
+			let group, camera, scene, renderer;
 
 			init();
 			animate();
@@ -39,7 +39,7 @@
 
 				// controls
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 20;
 				controls.maxDistance = 50;
 				controls.maxPolarAngle = Math.PI / 2;
@@ -48,7 +48,7 @@
 
 				// light
 
-				var light = new THREE.PointLight( 0xffffff, 1 );
+				const light = new THREE.PointLight( 0xffffff, 1 );
 				camera.add( light );
 
 				// helper
@@ -57,23 +57,23 @@
 
 				// textures
 
-				var loader = new THREE.TextureLoader();
-				var texture = loader.load( 'textures/sprites/disc.png' );
+				const loader = new THREE.TextureLoader();
+				const texture = loader.load( 'textures/sprites/disc.png' );
 
 				group = new THREE.Group();
 				scene.add( group );
 
 				// points
 
-				var vertices = new THREE.DodecahedronGeometry( 10 ).vertices;
+				const vertices = new THREE.DodecahedronGeometry( 10 ).vertices;
 
-				for ( var i = 0; i < vertices.length; i ++ ) {
+				for ( let i = 0; i < vertices.length; i ++ ) {
 
 					//vertices[ i ].add( randomPoint().multiplyScalar( 2 ) ); // wiggle the points
 
 				}
 
-				var pointsMaterial = new THREE.PointsMaterial( {
+				const pointsMaterial = new THREE.PointsMaterial( {
 
 					color: 0x0080ff,
 					map: texture,
@@ -82,30 +82,30 @@
 
 				} );
 
-				var pointsGeometry = new THREE.BufferGeometry().setFromPoints( vertices );
+				const pointsGeometry = new THREE.BufferGeometry().setFromPoints( vertices );
 
-				var points = new THREE.Points( pointsGeometry, pointsMaterial );
+				const points = new THREE.Points( pointsGeometry, pointsMaterial );
 				group.add( points );
 
 				// convex hull
 
-				var meshMaterial = new THREE.MeshLambertMaterial( {
+				const meshMaterial = new THREE.MeshLambertMaterial( {
 					color: 0xffffff,
 					opacity: 0.5,
 					transparent: true
 				} );
 
-				var meshGeometry = new ConvexBufferGeometry( vertices );
+				const meshGeometry = new ConvexBufferGeometry( vertices );
 
-				var mesh = new THREE.Mesh( meshGeometry, meshMaterial );
-				mesh.material.side = THREE.BackSide; // back faces
-				mesh.renderOrder = 0;
-				group.add( mesh );
+				const mesh1 = new THREE.Mesh( meshGeometry, meshMaterial );
+				mesh1.material.side = THREE.BackSide; // back faces
+				mesh1.renderOrder = 0;
+				group.add( mesh1 );
 
-				var mesh = new THREE.Mesh( meshGeometry, meshMaterial.clone() );
-				mesh.material.side = THREE.FrontSide; // front faces
-				mesh.renderOrder = 1;
-				group.add( mesh );
+				const mesh2 = new THREE.Mesh( meshGeometry, meshMaterial.clone() );
+				mesh2.material.side = THREE.FrontSide; // front faces
+				mesh2.renderOrder = 1;
+				group.add( mesh2 );
 
 				//
 

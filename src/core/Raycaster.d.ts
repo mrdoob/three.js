@@ -4,6 +4,7 @@ import { Object3D } from './Object3D';
 import { Vector2 } from './../math/Vector2';
 import { Ray } from './../math/Ray';
 import { Camera } from './../cameras/Camera';
+import { Layers } from './Layers';
 
 export interface Intersection {
 	distance: number;
@@ -14,11 +15,12 @@ export interface Intersection {
 	faceIndex?: number;
 	object: Object3D;
 	uv?: Vector2;
+	instanceId?: number;
 }
 
 export interface RaycasterParameters {
 	Mesh?: any;
-	Line?: any;
+	Line?: { threshold: number };
 	LOD?: any;
 	Points?: { threshold: number };
 	Sprite?: any;
@@ -46,12 +48,14 @@ export class Raycaster {
 	/**
 	 * The near factor of the raycaster. This value indicates which objects can be discarded based on the
 	 * distance. This value shouldn't be negative and should be smaller than the far property.
+	 * @default 0
 	 */
 	near: number;
 
 	/**
 	 * The far factor of the raycaster. This value indicates which objects can be discarded based on the
 	 * distance. This value shouldn't be negative and should be larger than the near property.
+	 * @default Infinity
 	 */
 	far: number;
 
@@ -61,12 +65,16 @@ export class Raycaster {
 	 */
 	camera: Camera;
 
-	params: RaycasterParameters;
+	/**
+	 * Used by Raycaster to selectively ignore 3D objects when performing intersection tests.
+	 * @default new THREE.Layers()
+	 */
+	layers: Layers;
 
 	/**
-	 * The precision factor of the raycaster when intersecting Line objects.
+	 * @default { Mesh: {}, Line: { threshold: 1 }, LOD: {}, Points: { threshold: 1 }, Sprite: {} }
 	 */
-	linePrecision: number;
+	params: RaycasterParameters;
 
 	/**
 	 * Updates the ray with a new origin and direction.

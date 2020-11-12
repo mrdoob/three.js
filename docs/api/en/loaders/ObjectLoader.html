@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -18,15 +17,10 @@
 			This uses the [page:FileLoader] internally for loading files.
 		</p>
 
-		<h2>Example</h2>
-
-		<p>
-			[example:webgl_loader_json_claraio WebGL / loader / json / claraio]<br />
-			[example:webgl_materials_lightmap WebGL / materials / lightmap]
-		</p>
+		<h2>Code Example</h2>
 
 		<code>
-		var loader = new THREE.ObjectLoader();
+		const loader = new THREE.ObjectLoader();
 
 		loader.load(
 			// resource URL
@@ -52,12 +46,16 @@
 
 
 		// Alternatively, to parse a previously loaded JSON structure
-		var object = loader.parse( a_json_object );
+		const object = loader.parse( a_json_object );
 
 		scene.add( object );
 		</code>
 
+		<h2>Examples</h2>
 
+		<p>
+			[example:webgl_materials_lightmap WebGL / materials / lightmap]
+		</p>
 
 		<h2>Constructor</h2>
 

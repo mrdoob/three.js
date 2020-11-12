@@ -1,14 +1,10 @@
-/**
- * @author Temdog007 / http://github.com/Temdog007
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryRingGeometry = function ( editor, object ) {
+function SidebarGeometryRingGeometry( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -60,7 +56,7 @@ var SidebarGeometryRingGeometry = function ( editor, object ) {
 	// thetaStart
 
 	var thetaStartRow = new UIRow();
-	var thetaStart = new UINumber( parameters.thetaStart * THREE.Math.RAD2DEG ).setStep( 10 ).onChange( update );
+	var thetaStart = new UINumber( parameters.thetaStart * THREE.MathUtils.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	thetaStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/thetastart' ) ).setWidth( '90px' ) );
 	thetaStartRow.add( thetaStart );
@@ -70,7 +66,7 @@ var SidebarGeometryRingGeometry = function ( editor, object ) {
 	// thetaLength
 
 	var thetaLengthRow = new UIRow();
-	var thetaLength = new UINumber( parameters.thetaLength * THREE.Math.RAD2DEG ).setStep( 10 ).onChange( update );
+	var thetaLength = new UINumber( parameters.thetaLength * THREE.MathUtils.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	thetaLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/thetalength' ) ).setWidth( '90px' ) );
 	thetaLengthRow.add( thetaLength );
@@ -86,14 +82,14 @@ var SidebarGeometryRingGeometry = function ( editor, object ) {
 			outerRadius.getValue(),
 			thetaSegments.getValue(),
 			phiSegments.getValue(),
-			thetaStart.getValue() * THREE.Math.DEG2RAD,
-			thetaLength.getValue() * THREE.Math.DEG2RAD
+			thetaStart.getValue() * THREE.MathUtils.DEG2RAD,
+			thetaLength.getValue() * THREE.MathUtils.DEG2RAD
 		) ) );
 
 	}
 
 	return container;
 
-};
+}
 
 export { SidebarGeometryRingGeometry };

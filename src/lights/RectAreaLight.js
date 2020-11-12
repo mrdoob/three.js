@@ -1,9 +1,5 @@
 import { Light } from './Light.js';
 
-/**
- * @author abelnation / http://github.com/abelnation
- */
-
 function RectAreaLight( color, intensity, width, height ) {
 
 	Light.call( this, color, intensity );
@@ -34,7 +30,7 @@ RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 	toJSON: function ( meta ) {
 
-		var data = Light.prototype.toJSON.call( this, meta );
+		const data = Light.prototype.toJSON.call( this, meta );
 
 		data.object.width = this.width;
 		data.object.height = this.height;

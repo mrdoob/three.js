@@ -11,9 +11,15 @@ export class AmbientLight extends Light {
 	/**
 	 * This creates a Ambientlight with a color.
 	 * @param color Numeric value of the RGB component of the color or a Color instance.
+	 * @param [intensity=1]
 	 */
 	constructor( color?: Color | string | number, intensity?: number );
 
-	castShadow: boolean;
+	/**
+	 * @default 'AmbientLight'
+	 */
+	type: string;
+
+	readonly isAmbientLight: true;
 
 }

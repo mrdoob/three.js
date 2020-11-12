@@ -1,24 +1,23 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { ColladaExporter } from '../../examples/jsm/exporters/ColladaExporter.js';
+import { DRACOExporter } from '../../examples/jsm/exporters/DRACOExporter.js';
 import { GLTFExporter } from '../../examples/jsm/exporters/GLTFExporter.js';
 import { OBJExporter } from '../../examples/jsm/exporters/OBJExporter.js';
 import { PLYExporter } from '../../examples/jsm/exporters/PLYExporter.js';
 import { STLExporter } from '../../examples/jsm/exporters/STLExporter.js';
 
+import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
+
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
-var MenubarFile = function ( editor ) {
-
-	var NUMBER_PRECISION = 6;
+function MenubarFile( editor ) {
 
 	function parseNumber( key, value ) {
 
-		return typeof value === 'number' ? parseFloat( value.toFixed( NUMBER_PRECISION ) ) : value;
+		var precision = config.getKey( 'exportPrecision' );
+
+		return typeof value === 'number' ? parseFloat( value.toFixed( precision ) ) : value;
 
 	}
 
@@ -214,6 +213,31 @@ var MenubarFile = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Export DRC
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/drc' ) );
+	option.onClick( function () {
+
+		var object = editor.selected;
+
+		if ( object === null || object.isMesh === undefined ) {
+
+			alert( 'No mesh selected' );
+			return;
+
+		}
+
+		var exporter = new DRACOExporter();
+
+		// TODO: Change to DRACOExporter's parse( geometry, onParse )?
+		var result = exporter.parse( object.geometry );
+		saveArrayBuffer( result, 'model.drc' );
+
+	} );
+	options.add( option );
+
 	// Export GLB
 
 	var option = new UIRow();
@@ -221,16 +245,16 @@ var MenubarFile = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/file/export/glb' ) );
 	option.onClick( function () {
 
+		var scene = editor.scene;
+		var animations = getAnimations( scene );
+
 		var exporter = new GLTFExporter();
 
-		exporter.parse( editor.scene, function ( result ) {
+		exporter.parse( scene, function ( result ) {
 
 			saveArrayBuffer( result, 'scene.glb' );
 
-			// forceIndices: true, forcePowerOfTwoTextures: true
-			// to allow compatibility with facebook
-
-		}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
+		}, { binary: true, animations: animations } );
 
 	} );
 	options.add( option );
@@ -242,13 +266,16 @@ var MenubarFile = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/file/export/gltf' ) );
 	option.onClick( function () {
 
+		var scene = editor.scene;
+		var animations = getAnimations( scene );
+
 		var exporter = new GLTFExporter();
 
-		exporter.parse( editor.scene, function ( result ) {
+		exporter.parse( scene, function ( result ) {
 
 			saveString( JSON.stringify( result, null, 2 ), 'scene.gltf' );
 
-		} );
+		}, { animations: animations } );
 
 
 	} );
@@ -392,7 +419,7 @@ var MenubarFile = function ( editor ) {
 					'',
 					'			var button = document.createElement( \'a\' );',
 					'			button.href = \'https://threejs.org/editor/#file=\' + location.href.split( \'/\' ).slice( 0, - 1 ).join( \'/\' ) + \'/app.json\';',
-					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 12px 14px; color: #fff; border: 1px solid #fff; border-radius: 4px; text-decoration: none;\';',
+					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 10px 16px; color: #fff; border: 1px solid #fff; border-radius: 20px; text-decoration: none;\';',
 					'			button.target = \'_blank\';',
 					'			button.textContent = \'EDIT\';',
 					'			document.body.appendChild( button );',
@@ -414,6 +441,11 @@ var MenubarFile = function ( editor ) {
 		loader.load( '../build/three.module.js', function ( content ) {
 
 			zip.file( 'js/three.module.js', content );
+
+		} );
+		loader.load( '../examples/jsm/webxr/VRButton.js', function ( content ) {
+
+			zip.file( 'js/VRButton.js', content );
 
 		} );
 
@@ -445,8 +477,24 @@ var MenubarFile = function ( editor ) {
 
 	}
 
+	function getAnimations( scene ) {
+
+		var animations = [];
+
+		scene.traverse( function ( object ) {
+
+			var objectAnimations = editor.animations[ object.uuid ];
+
+			if ( objectAnimations !== undefined ) animations.push( ... objectAnimations );
+
+		} );
+
+		return animations;
+
+	}
+
 	return container;
 
-};
+}
 
 export { MenubarFile };

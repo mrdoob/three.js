@@ -1,13 +1,7 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
-import {
-	DodecahedronBufferGeometry
-} from '../../../../src/geometries/DodecahedronGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils';
+import { DodecahedronBufferGeometry } from '../../../../src/geometries/DodecahedronBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 

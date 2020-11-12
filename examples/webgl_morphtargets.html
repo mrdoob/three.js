@@ -9,7 +9,7 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGL morph target example
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGL morph target example
 		</div>
 
 		<script type="module">
@@ -19,18 +19,17 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var container;
+			let camera, scene, renderer, raycaster;
 
-			var camera, scene, renderer, raycaster;
-
-			var mesh, mouse = new THREE.Vector2();
+			let mesh;
+			const mouse = new THREE.Vector2();
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 500;
@@ -39,24 +38,23 @@
 				scene.background = new THREE.Color( 0x222222 );
 				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
 
-				var light = new THREE.PointLight( 0xffffff );
+				const light = new THREE.PointLight( 0xffffff );
 				light.position.z = 500;
 				camera.add( light );
 				scene.add( camera );
 
-				var light = new THREE.AmbientLight( 0x111111 );
-				scene.add( light );
+				scene.add( new THREE.AmbientLight( 0x111111 ) );
 
-				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xff0000, morphTargets: true } );
+				const geometry = new THREE.BoxGeometry( 100, 100, 100 );
+				const material = new THREE.MeshLambertMaterial( { color: 0xff0000, morphTargets: true } );
 
 				// construct 8 blend shapes
 
-				for ( var i = 0; i < 8; i ++ ) {
+				for ( let i = 0; i < 8; i ++ ) {
 
-					var vertices = [];
+					const vertices = [];
 
-					for ( var v = 0; v < geometry.vertices.length; v ++ ) {
+					for ( let v = 0; v < geometry.vertices.length; v ++ ) {
 
 						vertices.push( geometry.vertices[ v ].clone() );
 
@@ -74,15 +72,13 @@
 
 				}
 
-				geometry = new THREE.BufferGeometry().fromGeometry( geometry );
-
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new THREE.Mesh( new THREE.BufferGeometry().fromGeometry( geometry ), material );
 
 				scene.add( mesh );
 
 				//
 
-				var params = {
+				const params = {
 					influence1: 0,
 					influence2: 0,
 					influence3: 0,
@@ -93,9 +89,9 @@
 					influence8: 0
 				};
 
-				var gui = new GUI();
+				const gui = new GUI();
 
-				var folder = gui.addFolder( 'Morph Targets' );
+				const folder = gui.addFolder( 'Morph Targets' );
 				folder.add( params, 'influence1', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
 
 					mesh.morphTargetInfluences[ 0 ] = value;
@@ -149,7 +145,7 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 400;
 				controls.maxDistance = 1000;
 
@@ -170,7 +166,7 @@
 
 				raycaster.setFromCamera( mouse, camera );
 
-				var intersects = raycaster.intersectObject( mesh );
+				const intersects = raycaster.intersectObject( mesh );
 
 				if ( intersects.length > 0 ) {
 

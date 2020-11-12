@@ -18,7 +18,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive cubes
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive cubes
 		</div>
 
 		<script type="module">
@@ -27,12 +27,15 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var container, stats;
-			var camera, scene, raycaster, renderer;
+			let container, stats;
+			let camera, scene, raycaster, renderer;
 
-			var mouse = new THREE.Vector2(), INTERSECTED;
-			var radius = 500, theta = 0;
-			var frustumSize = 1000;
+			let theta = 0;
+			let INTERSECTED;
+
+			const mouse = new THREE.Vector2();
+			const radius = 500;
+			const frustumSize = 1000;
 
 			init();
 			animate();
@@ -42,21 +45,21 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 				camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				const light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				const geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
 
-				for ( var i = 0; i < 2000; i ++ ) {
+				for ( let i = 0; i < 2000; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 800 - 400;
 					object.position.y = Math.random() * 800 - 400;
@@ -94,7 +97,7 @@
 
 			function onWindowResize() {
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 
 				camera.left = - frustumSize * aspect / 2;
 				camera.right = frustumSize * aspect / 2;
@@ -131,9 +134,9 @@
 
 				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+				camera.position.x = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.y = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.MathUtils.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
 				camera.updateMatrixWorld();
@@ -142,7 +145,7 @@
 
 				raycaster.setFromCamera( mouse, camera );
 
-				var intersects = raycaster.intersectObjects( scene.children );
+				const intersects = raycaster.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 

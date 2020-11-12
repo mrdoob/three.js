@@ -1,9 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { ExtrudeBufferGeometry } from '../../../../src/geometries/ExtrudeGeometry';
+import { ExtrudeBufferGeometry } from '../../../../src/geometries/ExtrudeBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
