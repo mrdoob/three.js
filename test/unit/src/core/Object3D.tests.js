@@ -500,9 +500,30 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( "updateMatrix", ( assert ) => {
+		QUnit.test( "updateMatrix", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const a = new Object3D();
+			a.position.set( 2, 3, 4 );
+			a.quaternion.set( 5, 6, 7, 8 );
+			a.scale.set( 9, 10, 11 );
+
+			assert.deepEqual( a.matrix.elements, [
+				1, 0, 0, 0,
+				0, 1, 0, 0,
+				0, 0, 1, 0,
+				0, 0, 0, 1
+			], "Updating position, quaternion, or scale has no effect to matrix until calling updateMatrix()" );
+
+			a.updateMatrix();
+
+			assert.deepEqual( a.matrix.elements, [
+				-1521, 1548, -234, 0,
+				-520, -1470, 1640, 0,
+				1826, 44, -1331, 0,
+				2, 3, 4, 1
+			], "matrix is calculated from position, quaternion, and scale" );
+
+			assert.equal( a.matrixWorldNeedsUpdate, true, "The flag indicating world matrix needs to be updated should be true" );
 
 		} );
 
