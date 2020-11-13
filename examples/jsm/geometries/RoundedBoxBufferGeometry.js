@@ -44,6 +44,9 @@ class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 		// ensure segments is odd so we have a plane connecting the rounded corners
 		segments = segments * 2 + 1;
 
+		// ensure radius isn't bigger than shortest side
+		radius = Math.min( width / 2, height / 2, depth / 2, radius );
+
 		super( 1, 1, 1, segments, segments, segments );
 
 		// if we just have one segment we're the same as a regular box
