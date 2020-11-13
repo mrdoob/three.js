@@ -39,10 +39,10 @@ function getUv( faceDirVector, normal, uvAxis, projectionAxis, radius, sideLengt
 
 class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 
-	constructor( width = 1, height = 1, depth = 1, segments = 4, radius = 0.1 ) {
+	constructor( width = 1, height = 1, depth = 1, segments = 2, radius = 0.1 ) {
 
 		// ensure segments is odd so we have a plane connecting the rounded corners
-		segments = segments % 2 === 0 ? segments + 1 : segments;
+		segments = segments * 2 + 1;
 
 		super( 1, 1, 1, segments, segments, segments );
 
