@@ -50,11 +50,7 @@ class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 		super( 1, 1, 1, segments, segments, segments );
 
 		// if we just have one segment we're the same as a regular box
-		if ( segments === 1 ) {
-
-			return;
-
-		}
+		if ( segments === 1 ) return;
 
 		const geometry2 = this.toNonIndexed();
 
