@@ -494,7 +494,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				brepObject.userData[ 'attributes' ] = attributes;
 				brepObject.userData[ 'objectType' ] = obj.objectType;
-<				if( attributes.name ) {
+				if( attributes.name ) {
 					brepObject.name = attributes.name;
 				}
 
