@@ -19615,12 +19615,8 @@
 			this.count = source.count;
 			return this;
 		},
-		setColorAt: function setColorAt(index, color) {
-			if (this.instanceColor === null) {
-				this.instanceColor = new BufferAttribute(new Float32Array(this.count * 3), 3);
-			}
-
-			color.toArray(this.instanceColor.array, index * 3);
+		getColorAt: function getColorAt(index, color) {
+			color.fromArray(this.instanceColor.array, index * 3);
 		},
 		getMatrixAt: function getMatrixAt(index, matrix) {
 			matrix.fromArray(this.instanceMatrix.array, index * 16);
@@ -19653,6 +19649,13 @@
 
 				_instanceIntersects.length = 0;
 			}
+		},
+		setColorAt: function setColorAt(index, color) {
+			if (this.instanceColor === null) {
+				this.instanceColor = new BufferAttribute(new Float32Array(this.count * 3), 3);
+			}
+
+			color.toArray(this.instanceColor.array, index * 3);
 		},
 		setMatrixAt: function setMatrixAt(index, matrix) {
 			matrix.toArray(this.instanceMatrix.array, index * 16);
@@ -20726,13 +20729,15 @@
 		 * Duplicated vertices are removed
 		 * and faces' vertices are updated.
 		 */
-		mergeVertices: function mergeVertices() {
+		mergeVertices: function mergeVertices(precisionPoints) {
+			if (precisionPoints === void 0) {
+				precisionPoints = 4;
+			}
+
 			var verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
 
 			var unique = [],
 					changes = [];
-			var precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
-
 			var precision = Math.pow(10, precisionPoints);
 
 			for (var i = 0, il = this.vertices.length; i < il; i++) {
