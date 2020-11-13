@@ -5,9 +5,7 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 
 class AxesHelper extends LineSegments {
 
-	constructor( size ) {
-
-		size = size || 1;
+	constructor( size = 1 ) {
 
 		const vertices = [
 			0, 0, 0,	size, 0, 0,

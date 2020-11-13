@@ -37,28 +37,27 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
-			var scene, camera, dirLight, stats;
-			var renderer, mixer, controls;
+			let mixer;
 
-			var clock = new THREE.Clock();
-			var container = document.getElementById( 'container' );
+			const clock = new THREE.Clock();
+			const container = document.getElementById( 'container' );
 
-			stats = new Stats();
+			const stats = new Stats();
 			container.appendChild( stats.dom );
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.outputEncoding = THREE.sRGBEncoding;
 			container.appendChild( renderer.domElement );
 
-			scene = new THREE.Scene();
+			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xbfe3dd );
 
-			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 			camera.position.set( 5, 2, 8 );
 
-			controls = new OrbitControls( camera, renderer.domElement );
+			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 0.5, 0 );
 			controls.update();
 			controls.enablePan = false;
@@ -66,27 +65,27 @@
 
 			scene.add( new THREE.HemisphereLight( 0xffffff, 0x000000, 0.4 ) );
 
-			dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+			const dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
 			dirLight.position.set( 5, 2, 8 );
 			scene.add( dirLight );
 
 			// envmap
-			var path = 'textures/cube/Park2/';
-			var format = '.jpg';
-			var envMap = new THREE.CubeTextureLoader().load( [
+			const path = 'textures/cube/Park2/';
+			const format = '.jpg';
+			const envMap = new THREE.CubeTextureLoader().load( [
 				path + 'posx' + format, path + 'negx' + format,
 				path + 'posy' + format, path + 'negy' + format,
 				path + 'posz' + format, path + 'negz' + format
 			] );
 
-			var dracoLoader = new DRACOLoader();
+			const dracoLoader = new DRACOLoader();
 			dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 
-			var loader = new GLTFLoader();
+			const loader = new GLTFLoader();
 			loader.setDRACOLoader( dracoLoader );
 			loader.load( 'models/gltf/LittlestTokyo.glb', function ( gltf ) {
 
-				var model = gltf.scene;
+				const model = gltf.scene;
 				model.position.set( 1, 1, 0 );
 				model.scale.set( 0.01, 0.01, 0.01 );
 				model.traverse( function ( child ) {
@@ -123,7 +122,7 @@
 
 				requestAnimationFrame( animate );
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				mixer.update( delta );
 

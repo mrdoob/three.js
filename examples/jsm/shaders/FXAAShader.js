@@ -1,6 +1,7 @@
 import {
 	Vector2
 } from "../../../build/three.module.js";
+
 /**
  * NVIDIA FXAA by Timothy Lottes
  * http://timothylottes.blogspot.com/2011/06/fxaa3-source-released.html

@@ -17,6 +17,7 @@ import {
 	Vector4,
 	WebGLRenderTarget
 } from "../../../build/three.module.js";
+
 /**
  * Work based on :
  * http://slayvin.net : Flat mirror for three.js
@@ -68,8 +69,7 @@ var Water = function ( geometry, options ) {
 	var parameters = {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
-		format: RGBFormat,
-		stencilBuffer: false
+		format: RGBFormat
 	};
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );

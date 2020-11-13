@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -20,7 +19,7 @@
 		<h2>Code Example</h2>
 
 		<code>
-var scene = new THREE.Scene();
+const scene = new THREE.Scene();
 scene.background = new THREE.CubeTextureLoader()
 	.setPath( 'textures/cubeMaps/' )
 	.load( [

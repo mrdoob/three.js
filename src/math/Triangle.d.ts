@@ -7,8 +7,19 @@ export class Triangle {
 
 	constructor( a?: Vector3, b?: Vector3, c?: Vector3 );
 
+	/**
+	 * @default new THREE.Vector3()
+	 */
 	a: Vector3;
+
+	/**
+	 * @default new THREE.Vector3()
+	 */
 	b: Vector3;
+
+	/**
+	 * @default new THREE.Vector3()
+	 */
 	c: Vector3;
 
 	set( a: Vector3, b: Vector3, c: Vector3 ): Triangle;

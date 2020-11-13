@@ -69,7 +69,6 @@ var Ocean = function ( renderer, camera, scene, options ) {
 		wrapS: ClampToEdgeWrapping,
 		wrapT: ClampToEdgeWrapping,
 		format: RGBAFormat,
-		stencilBuffer: false,
 		depthBuffer: false,
 		premultiplyAlpha: false,
 		type: renderTargetType
@@ -80,7 +79,6 @@ var Ocean = function ( renderer, camera, scene, options ) {
 		wrapS: ClampToEdgeWrapping,
 		wrapT: ClampToEdgeWrapping,
 		format: RGBAFormat,
-		stencilBuffer: false,
 		depthBuffer: false,
 		premultiplyAlpha: false,
 		type: renderTargetType
@@ -91,7 +89,6 @@ var Ocean = function ( renderer, camera, scene, options ) {
 		wrapS: RepeatWrapping,
 		wrapT: RepeatWrapping,
 		format: RGBAFormat,
-		stencilBuffer: false,
 		depthBuffer: false,
 		premultiplyAlpha: false,
 		type: renderTargetType

@@ -20,12 +20,12 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Ocean } from './jsm/misc/Ocean.js';
 
-			var stats = new Stats();
+			const stats = new Stats();
 			document.body.appendChild( stats.dom );
 
-			var lastTime = ( new Date() ).getTime();
+			let lastTime = ( new Date() ).getTime();
 
-			var DEMO = {
+			const DEMO = {
 				ms_Renderer: null,
 				ms_Camera: null,
 				ms_Scene: null,
@@ -53,11 +53,11 @@
 					this.ms_Controls.minPolarAngle = 0;
 					this.ms_Controls.maxPolarAngle = Math.PI * 0.495;
 
-					var gsize = 512;
-					var res = 1024;
-					var gres = res / 2;
-					var origx = - gsize / 2;
-					var origz = - gsize / 2;
+					const gsize = 512;
+					const res = 1024;
+					const gres = res / 2;
+					const origx = - gsize / 2;
+					const origz = - gsize / 2;
 					this.ms_Ocean = new Ocean( this.ms_Renderer, this.ms_Camera, this.ms_Scene,
 						{
 							USE_HALF_FLOAT: false,
@@ -80,7 +80,7 @@
 					this.ms_Ocean.materialOcean.uniforms[ "u_cameraPosition" ] = { value: this.ms_Camera.position };
 					this.ms_Scene.add( this.ms_Ocean.oceanMesh );
 
-					var gui = new GUI();
+					const gui = new GUI();
 					gui.add( this.ms_Ocean, "size", 100, 5000 ).onChange( function ( v ) {
 
 						this.object.size = v;
@@ -147,7 +147,7 @@
 
 				Update: function () {
 
-					var currentTime = new Date().getTime();
+					const currentTime = new Date().getTime();
 					this.ms_Ocean.deltaTime = ( currentTime - lastTime ) / 1000 || 0.0;
 					lastTime = currentTime;
 					this.ms_Ocean.render( this.ms_Ocean.deltaTime );
@@ -193,13 +193,13 @@
 
 			DEMO.Resize( window.innerWidth, window.innerHeight );
 
-			var render = function () {
+			function render() {
 
 				requestAnimationFrame( render );
 				DEMO.Update();
 				stats.update();
 
-			};
+			}
 
 			render();
 

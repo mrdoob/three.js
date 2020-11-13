@@ -1,4 +1,3 @@
-
 /**
  * Pixelation shader
  */

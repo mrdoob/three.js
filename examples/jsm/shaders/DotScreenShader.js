@@ -1,6 +1,7 @@
 import {
 	Vector2
 } from "../../../build/three.module.js";
+
 /**
  * Dot screen shader
  * based on glfx.js sepia shader

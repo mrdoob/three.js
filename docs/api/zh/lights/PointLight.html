@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,7 +20,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var light = new THREE.PointLight( 0xff0000, 1, 100 );
+		const light = new THREE.PointLight( 0xff0000, 1, 100 );
 		light.position.set( 50, 50, 50 );
 		scene.add( light );
 		</code>
@@ -76,7 +75,7 @@
 			表示以"流明（光通量单位）"为单位的光功率。 缺省值 - *4Math.PI*。 <br /><br />
 
 			该值与 [page:.intensity intensity] 直接关联
-  			<code>
+			<code>
 				power = intensity * 4&pi;
 			</code>
 			修改该值也会导致光强度的改变。
@@ -86,8 +85,8 @@
 		<p>
 			[page:PointLightShadow]用与计算此光照的阴影。<br /><br />
 
-			此对象的摄像机被设置为 [page:PerspectiveCamera.fov fov] 为90度，[page:PerspectiveCamera.aspect aspect]为1
-			,近裁剪面  [page:PerspectiveCamera.near near] 为0，远裁剪面[page:PerspectiveCamera.far far]
+			此对象的摄像机被设置为 [page:PerspectiveCamera.fov fov] 为90度，[page:PerspectiveCamera.aspect aspect]为1，
+			近裁剪面 [page:PerspectiveCamera.near near] 为0，远裁剪面[page:PerspectiveCamera.far far]
 			为500的透视摄像机 [page:PerspectiveCamera]。
 		</p>
 

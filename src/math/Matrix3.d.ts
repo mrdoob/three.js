@@ -28,14 +28,14 @@ export interface Matrix {
 	determinant(): number;
 
 	/**
-	 * getInverse(matrix:T):T;
-	 */
-	getInverse( matrix: Matrix ): Matrix;
-
-	/**
 	 * transpose():T;
 	 */
 	transpose(): Matrix;
+
+	/**
+	 * invert():T;
+	 */
+	invert(): Matrix;
 
 	/**
 	 * clone():T;
@@ -55,6 +55,7 @@ export class Matrix3 implements Matrix {
 
 	/**
 	 * Array with matrix values.
+	 * @default [1, 0, 0, 0, 1, 0, 0, 0, 1]
 	 */
 	elements: number[];
 
@@ -76,7 +77,11 @@ export class Matrix3 implements Matrix {
 	setFromMatrix4( m: Matrix4 ): Matrix3;
 	multiplyScalar( s: number ): Matrix3;
 	determinant(): number;
-	getInverse( matrix: Matrix3 ): Matrix3;
+
+	/**
+	 * Inverts this matrix in place.
+	 */
+	invert(): Matrix3;
 
 	/**
 	 * Transposes this matrix in place.
@@ -156,5 +161,10 @@ export class Matrix3 implements Matrix {
 	 * @deprecated Use {@link Matrix3#toArray .toArray()} instead.
 	 */
 	flattenToArrayOffset( array: number[], offset: number ): number[];
+
+	/**
+	 * @deprecated Use {@link Matrix3#invert .invert()} instead.
+	 */
+	getInverse( matrix: Matrix ): Matrix;
 
 }

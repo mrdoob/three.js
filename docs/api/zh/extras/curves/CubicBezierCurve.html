@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,20 +20,20 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var curve = new THREE.CubicBezierCurve(
+		const curve = new THREE.CubicBezierCurve(
 			new THREE.Vector2( -10, 0 ),
 			new THREE.Vector2( -5, 15 ),
 			new THREE.Vector2( 20, 15 ),
 			new THREE.Vector2( 10, 0 )
 		);
 
-		var points = curve.getPoints( 50 );
-		var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		const points = curve.getPoints( 50 );
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-		var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+		const material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
 		// Create the final object to add to the scene
-		var curveObject = new THREE.Line( geometry, material );
+		const curveObject = new THREE.Line( geometry, material );
 		</code>
 
 		<h2>构造函数</h2>

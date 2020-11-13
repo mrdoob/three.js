@@ -19,9 +19,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { VOXLoader } from './jsm/loaders/VOXLoader.js';
 
-			var container;
-
-			var camera, controls, scene, renderer;
+			let camera, controls, scene, renderer;
 
 			init();
 			animate();
@@ -36,14 +34,14 @@
 
 				// light
 
-				var hemiLight = new THREE.HemisphereLight( 0x888888, 0x000000, 1 );
+				const hemiLight = new THREE.HemisphereLight( 0x888888, 0x000000, 1 );
 				scene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.75 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.75 );
 				dirLight.position.set( 1.5, 3, 2.5 );
 				scene.add( dirLight );
 
-				var loader = new VOXLoader();
+				const loader = new VOXLoader();
 				loader.load( 'models/vox/monu10.vox', function ( chunks ) {
 
 					const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
@@ -52,7 +50,7 @@
 					const color = new THREE.Color();
 					const matrix = new THREE.Matrix4();
 
-					for ( var i = 0; i < chunks.length; i ++ ) {
+					for ( let i = 0; i < chunks.length; i ++ ) {
 
 						const chunk = chunks[ i ];
 
@@ -66,7 +64,7 @@
 						mesh.scale.setScalar( 0.0015 );
 						scene.add( mesh );
 
-						for ( var j = 0, k = 0; j < data.length; j += 4, k ++ ) {
+						for ( let j = 0, k = 0; j < data.length; j += 4, k ++ ) {
 
 							const x = data[ j + 0 ] - size.x / 2;
 							const y = data[ j + 1 ] - size.y / 2;
@@ -93,7 +91,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 				container.appendChild( renderer.domElement );
 
@@ -109,6 +107,7 @@
 
 			}
 
+			/*
 			function displayPalette( palette ) {
 
 				const canvas = document.createElement( 'canvas' );
@@ -116,13 +115,13 @@
 				canvas.height = 32;
 				canvas.style.position = 'absolute';
 				canvas.style.top = '0';
-				canvas.style.width = 100 + 'px';
+				canvas.style.width = '100px';
 				canvas.style.imageRendering = 'pixelated';
 				document.body.appendChild( canvas );
 
 				const context = canvas.getContext( '2d' );
 
-				for ( var c = 0; c < 256; c ++ ) {
+				for ( let c = 0; c < 256; c ++ ) {
 
 					const x = c % 8;
 					const y = Math.floor( c / 8 );
@@ -137,6 +136,7 @@
 				}
 
 			}
+			*/
 
 			function onWindowResize() {
 

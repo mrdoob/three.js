@@ -9,6 +9,7 @@ import {
 	Vector3,
 	VectorKeyframeTrack
 } from "../../../build/three.module.js";
+
 /**
  * Description: reads BVH files and outputs a single Skeleton and an AnimationClip
  *
@@ -36,6 +37,7 @@ BVHLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {

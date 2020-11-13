@@ -1,4 +1,3 @@
-
 /**
  * ACES Filmic Tone Mapping Shader by Stephen Hill
  * source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
