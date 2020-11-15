@@ -1,16 +1,19 @@
 import WebGPUUniformsGroup from './WebGPUUniformsGroup.js';
+import { FloatUniform, Matrix3Uniform, Matrix4Uniform } from './WebGPUUniform.js';
 import WebGPUSampler from './WebGPUSampler.js';
-import WebGPUSampledTexture from './WebGPUSampledTexture.js';
-import { Matrix4 } from '../../../../build/three.module.js';
+import { WebGPUSampledTexture } from './WebGPUSampledTexture.js';
 
 class WebGPUBindings {
 
-	constructor( device, info, properties, textures ) {
+	constructor( device, info, properties, textures, pipelines, computePipelines, attributes ) {
 
 		this.device = device;
 		this.info = info;
 		this.properties = properties;
 		this.textures = textures;
+		this.pipelines = pipelines;
+		this.computePipelines = computePipelines;
+		this.attributes = attributes;
 
 		this.uniformsData = new WeakMap();
 
@@ -28,6 +31,7 @@ class WebGPUBindings {
 
 		if ( data === undefined ) {
 
+			const pipeline = this.pipelines.get( object );
 			const material = object.material;
 			let bindings;
 
@@ -47,13 +51,13 @@ class WebGPUBindings {
 
 			} else {
 
-				console.error( 'WebGPURenderer: Unknwon shader type' );
+				console.error( 'THREE.WebGPURenderer: Unknwon shader type.' );
 
 			}
 
 			// setup (static) binding layout and (dynamic) binding group
 
-			const bindLayout = this._createBindLayout( bindings );
+			const bindLayout = pipeline.getBindGroupLayout( 0 );
 			const bindGroup = this._createBindGroup( bindings, bindLayout );
 
 			data = {
@@ -63,6 +67,31 @@ class WebGPUBindings {
 			};
 
 			this.uniformsData.set( object, data );
+
+		}
+
+		return data;
+
+	}
+
+	getForCompute( param ) {
+
+		let data = this.uniformsData.get( param );
+
+		if ( data === undefined ) {
+
+			const pipeline = this.computePipelines.get( param );
+			const bindings = param.bindings !== undefined ? param.bindings.slice() : [];
+			const bindLayout = pipeline.getBindGroupLayout( 0 );
+			const bindGroup = this._createBindGroup( bindings, bindLayout );
+
+			data = {
+				layout: bindLayout,
+				group: bindGroup,
+				bindings: bindings
+			};
+
+			this.uniformsData.set( param, data );
 
 		}
 
@@ -97,7 +126,9 @@ class WebGPUBindings {
 				const array = binding.array;
 				const bufferGPU = binding.bufferGPU;
 
-				const needsBufferWrite = binding.update( array, object, camera );
+				binding.onBeforeUpdate( object, camera );
+
+				const needsBufferWrite = binding.update();
 
 				if ( needsBufferWrite === true ) {
 
@@ -112,19 +143,28 @@ class WebGPUBindings {
 
 				updateMap.set( binding, frame );
 
+			} else if ( binding.isStorageBuffer ) {
+
+				const attribute = binding.attribute;
+				this.attributes.update( attribute, false, binding.usage );
+
 			} else if ( binding.isSampler ) {
 
 				const material = object.material;
 				const texture = material[ binding.name ];
 
-				textures.updateSampler( texture );
+				if ( texture !== null ) {
 
-				const samplerGPU = textures.getSampler( texture );
+					textures.updateSampler( texture );
 
-				if ( binding.samplerGPU !== samplerGPU ) {
+					const samplerGPU = textures.getSampler( texture );
 
-					binding.samplerGPU = samplerGPU;
-					needsBindGroupRefresh = true;
+					if ( binding.samplerGPU !== samplerGPU ) {
+
+						binding.samplerGPU = samplerGPU;
+						needsBindGroupRefresh = true;
+
+					}
 
 				}
 
@@ -133,13 +173,17 @@ class WebGPUBindings {
 				const material = object.material;
 				const texture = material[ binding.name ];
 
-				const forceUpdate = textures.updateTexture( texture );
-				const textureGPU = textures.getTextureGPU( texture );
+				if ( texture !== null ) {
 
-				if ( binding.textureGPU !== textureGPU || forceUpdate === true ) {
+					const forceUpdate = textures.updateTexture( texture );
+					const textureGPU = textures.getTextureGPU( texture );
 
-					binding.textureGPU = textureGPU;
-					needsBindGroupRefresh = true;
+					if ( binding.textureGPU !== textureGPU || forceUpdate === true ) {
+
+						binding.textureGPU = textureGPU;
+						needsBindGroupRefresh = true;
+
+					}
 
 				}
 
@@ -159,23 +203,6 @@ class WebGPUBindings {
 
 		this.uniformsData = new WeakMap();
 		this.updateMap = new WeakMap();
-
-	}
-
-	_createBindLayout( bindings ) {
-
-		let bindingPoint = 0;
-		const entries = [];
-
-		for ( const binding of bindings ) {
-
-			entries.push( { binding: bindingPoint, visibility: binding.visibility, type: binding.type } );
-
-			bindingPoint ++;
-
-		}
-
-		return this.device.createBindGroupLayout( { entries: entries } );
 
 	}
 
@@ -203,6 +230,19 @@ class WebGPUBindings {
 
 				entries.push( { binding: bindingPoint, resource: { buffer: binding.bufferGPU } } );
 
+			} else if ( binding.isStorageBuffer ) {
+
+				if ( binding.bufferGPU === null ) {
+
+					const attribute = binding.attribute;
+
+					this.attributes.update( attribute, false, binding.usage );
+					binding.bufferGPU = this.attributes.get( attribute ).buffer;
+
+				}
+
+				entries.push( { binding: bindingPoint, resource: { buffer: binding.bufferGPU } } );
+
 			} else if ( binding.isSampler ) {
 
 				if ( binding.samplerGPU === null ) {
@@ -217,11 +257,19 @@ class WebGPUBindings {
 
 				if ( binding.textureGPU === null ) {
 
-					binding.textureGPU = this.textures.getDefaultTexture();
+					if ( binding.isSampledCubeTexture ) {
+
+						binding.textureGPU = this.textures.getDefaultCubeTexture();
+
+					} else {
+
+						binding.textureGPU = this.textures.getDefaultTexture();
+
+					}
 
 				}
 
-				entries.push( { binding: bindingPoint, resource: binding.textureGPU.createView() } );
+				entries.push( { binding: bindingPoint, resource: binding.textureGPU.createView( { dimension: binding.dimension } ) } );
 
 			}
 
@@ -240,56 +288,55 @@ class WebGPUBindings {
 
 		const bindings = [];
 
-		// ubos
+		// UBOs
 
-		const modelGroup = new WebGPUUniformsGroup();
-		modelGroup.setName( 'modelUniforms' );
-		modelGroup.setUniform( 'modelMatrix', new Matrix4() );
-		modelGroup.setUniform( 'modelViewMatrix', new Matrix4() );
-		modelGroup.setUpdateCallback( function ( array, object/*, camera */ ) {
+		// model
 
-			array.set( object.matrixWorld.elements, 0 );
-			array.set( object.modelViewMatrix.elements, 16 );
+		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
+		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
+		const normalMatrixUniform = new Matrix3Uniform( 'normalMatrix' );
 
-			return true; // @TODO: Implement caching (return false when cache hits occurs)
+		const modelGroup = new WebGPUUniformsGroup( 'modelUniforms' );
+		modelGroup.addUniform( modelViewUniform );
+		modelGroup.addUniform( modelViewMatrixUniform );
+		modelGroup.addUniform( normalMatrixUniform );
+		modelGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
+
+			modelViewUniform.setValue( object.matrixWorld );
+			modelViewMatrixUniform.setValue( object.modelViewMatrix );
+			normalMatrixUniform.setValue( object.normalMatrix );
 
 		} );
+
+		// camera
 
 		const cameraGroup = this.sharedUniformsGroups.get( 'cameraUniforms' );
 
-		const opacityGroup = new WebGPUUniformsGroup();
-		opacityGroup.setName( 'opacityUniforms' );
-		opacityGroup.setUniform( 'opacity', 1.0 );
-		opacityGroup.visibility = GPUShaderStage.FRAGMENT;
-		opacityGroup.setUpdateCallback( function ( array, object ) {
+		// material (opacity for testing)
+
+		const opacityUniform = new FloatUniform( 'opacity', 1 );
+
+		const opacityGroup = new WebGPUUniformsGroup( 'opacityUniforms' );
+		opacityGroup.addUniform( opacityUniform );
+		opacityGroup.setVisibility( GPUShaderStage.FRAGMENT );
+		opacityGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
 
 			const material = object.material;
-			const opacity = material.transparent ? material.opacity : 1.0;
+			const opacity = ( material.transparent === true ) ? material.opacity : 1.0;
 
-			let updated = false;
-
-			if ( array[ 0 ] !== opacity ) {
-
-				array[ 0 ] = opacity;
-				updated = true;
-
-			}
-
-			return updated;
+			opacityUniform.setValue( opacity );
 
 		} );
 
-		// samplers
+		// sampler
 
-		const diffuseSampler = new WebGPUSampler();
-		diffuseSampler.setName( 'map' );
+		const diffuseSampler = new WebGPUSampler( 'map' );
 
-		// textures
+		// texture
 
-		const diffuseTexture = new WebGPUSampledTexture();
-		diffuseTexture.setName( 'map' );
+		const diffuseTexture = new WebGPUSampledTexture( 'map' );
 
-		//
+		// the order of WebGPUBinding objects must match the binding order in the shader
 
 		bindings.push( modelGroup );
 		bindings.push( cameraGroup );
@@ -305,18 +352,18 @@ class WebGPUBindings {
 
 		const bindings = [];
 
-		// ubos
+		// UBOs
 
-		const modelGroup = new WebGPUUniformsGroup();
-		modelGroup.setName( 'modelUniforms' );
-		modelGroup.setUniform( 'modelMatrix', new Matrix4() );
-		modelGroup.setUniform( 'modelViewMatrix', new Matrix4() );
-		modelGroup.setUpdateCallback( function ( array, object/*, camera */ ) {
+		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
+		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
 
-			array.set( object.matrixWorld.elements, 0 );
-			array.set( object.modelViewMatrix.elements, 16 );
+		const modelGroup = new WebGPUUniformsGroup( 'modelUniforms' );
+		modelGroup.addUniform( modelViewUniform );
+		modelGroup.addUniform( modelViewMatrixUniform );
+		modelGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
 
-			return true; // @TODO: Implement caching (return false when cache hits occurs)
+			modelViewUniform.setValue( object.matrixWorld );
+			modelViewMatrixUniform.setValue( object.modelViewMatrix );
 
 		} );
 
@@ -335,18 +382,18 @@ class WebGPUBindings {
 
 		const bindings = [];
 
-		// ubos
+		// UBOs
 
-		const modelGroup = new WebGPUUniformsGroup();
-		modelGroup.setName( 'modelUniforms' );
-		modelGroup.setUniform( 'modelMatrix', new Matrix4() );
-		modelGroup.setUniform( 'modelViewMatrix', new Matrix4() );
-		modelGroup.setUpdateCallback( function ( array, object/*, camera */ ) {
+		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
+		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
 
-			array.set( object.matrixWorld.elements, 0 );
-			array.set( object.modelViewMatrix.elements, 16 );
+		const modelGroup = new WebGPUUniformsGroup( 'modelUniforms' );
+		modelGroup.addUniform( modelViewUniform );
+		modelGroup.addUniform( modelViewMatrixUniform );
+		modelGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
 
-			return true; // @TODO: Implement caching (return false when cache hits occurs)
+			modelViewUniform.setValue( object.matrixWorld );
+			modelViewMatrixUniform.setValue( object.modelViewMatrix );
 
 		} );
 
@@ -363,16 +410,16 @@ class WebGPUBindings {
 
 	_setupSharedUniformsGroups() {
 
-		const cameraGroup = new WebGPUUniformsGroup();
-		cameraGroup.setName( 'cameraUniforms' );
-		cameraGroup.setUniform( 'projectionMatrix', new Matrix4() );
-		cameraGroup.setUniform( 'viewMatrix', new Matrix4() );
-		cameraGroup.setUpdateCallback( function ( array, object, camera ) {
+		const projectionMatrixUniform = new Matrix4Uniform( 'projectionMatrix' );
+		const viewMatrixUniform = new Matrix4Uniform( 'viewMatrix' );
 
-			array.set( camera.projectionMatrix.elements, 0 );
-			array.set( camera.matrixWorldInverse.elements, 16 );
+		const cameraGroup = new WebGPUUniformsGroup( 'cameraUniforms' );
+		cameraGroup.addUniform( projectionMatrixUniform );
+		cameraGroup.addUniform( viewMatrixUniform );
+		cameraGroup.setOnBeforeUpdate( function ( object, camera ) {
 
-			return true; // @TODO: Implement caching (return false when cache hits occurs)
+			projectionMatrixUniform.setValue( camera.projectionMatrix );
+			viewMatrixUniform.setValue( camera.matrixWorldInverse );
 
 		} );
 

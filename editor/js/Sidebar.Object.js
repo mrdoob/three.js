@@ -225,7 +225,7 @@ function SidebarObject( editor ) {
 	// color
 
 	var objectColorRow = new UIRow();
-	var objectColor = new UIColor().onChange( update );
+	var objectColor = new UIColor().onInput( update );
 
 	objectColorRow.add( new UIText( strings.getKey( 'sidebar/object/color' ) ).setWidth( '90px' ) );
 	objectColorRow.add( objectColor );
@@ -235,7 +235,7 @@ function SidebarObject( editor ) {
 	// ground color
 
 	var objectGroundColorRow = new UIRow();
-	var objectGroundColor = new UIColor().onChange( update );
+	var objectGroundColor = new UIColor().onInput( update );
 
 	objectGroundColorRow.add( new UIText( strings.getKey( 'sidebar/object/groundcolor' ) ).setWidth( '90px' ) );
 	objectGroundColorRow.add( objectGroundColor );
@@ -539,7 +539,7 @@ function SidebarObject( editor ) {
 
 			}
 
-			if ( object.receiveShadow !== undefined && object.receiveShadow !== objectReceiveShadow.getValue() ) {
+			if ( object.receiveShadow !== objectReceiveShadow.getValue() ) {
 
 				if ( object.material !== undefined ) object.material.needsUpdate = true;
 				editor.execute( new SetValueCommand( editor, object, 'receiveShadow', objectReceiveShadow.getValue() ) );
@@ -626,6 +626,20 @@ function SidebarObject( editor ) {
 				uiElement.setDisplay( object[ property ] !== undefined ? '' : 'none' );
 
 			}
+
+		}
+
+		//
+
+		if ( object.isLight ) {
+
+			objectReceiveShadow.setDisplay( 'none' );
+
+		}
+
+		if ( object.isAmbientLight || object.isHemisphereLight ) {
+
+			objectShadowRow.setDisplay( 'none' );
 
 		}
 

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -58,9 +57,9 @@
 		<p>See the base [page:Loader] class for common methods.</p>
 
 
-		<h3>[method:Object3D parse]( [param:arraybuffer content]|[param:String content] )</h3>
+		<h3>[method:Object3D parse]( [param:Arraybuffer content]|[param:String content] )</h3>
 		<p>
-			[[page:arraybuffer content]|[page:String content]] OBJ data as Uint8Array or String
+			[[page:Arraybuffer content]|[page:String content]] OBJ data as Uint8Array or String
 		</p>
 		<p>
 			Parses OBJ data synchronously from arraybuffer or string and returns the [page:Object3D baseObject3d].
@@ -90,18 +89,18 @@
 		</p>
 
 
-		<h3>[method:OBJLoader2 addMaterialPerSmoothingGroup] ( [param:boolean materialPerSmoothingGroup] )</h3>
+		<h3>[method:OBJLoader2 addMaterialPerSmoothingGroup] ( [param:Boolean materialPerSmoothingGroup] )</h3>
 		<p>
-			[page:boolean materialPerSmoothingGroup]
+			[page:Boolean materialPerSmoothingGroup]
 		</p>
 		<p>
 			Tells whether a material shall be created per smoothing group.
 		</p>
 
 
-		<h3>[method:OBJLoader2 setUseOAsMesh] ( [param:boolean useOAsMesh] )</h3>
+		<h3>[method:OBJLoader2 setUseOAsMesh] ( [param:Boolean useOAsMesh] )</h3>
 		<p>
-			[page:boolean useOAsMesh]
+			[page:Boolean useOAsMesh]
 		</p>
 		<p>
 			Usually 'o' is meta-information and does not result in creation of new meshes, but mesh creation on occurrence of "o" can be enforced.

@@ -1,5 +1,3 @@
-console.warn( "THREE.TrackballControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.TrackballControls = function ( object, domElement ) {
 
 	if ( domElement === undefined ) console.warn( 'THREE.TrackballControls: The second parameter "domElement" is now mandatory.' );
@@ -402,6 +400,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 		switch ( event.pointerType ) {
 
 			case 'mouse':
+			case 'pen':
 				onMouseDown( event );
 				break;
 
@@ -418,6 +417,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 		switch ( event.pointerType ) {
 
 			case 'mouse':
+			case 'pen':
 				onMouseMove( event );
 				break;
 
@@ -434,6 +434,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 		switch ( event.pointerType ) {
 
 			case 'mouse':
+			case 'pen':
 				onMouseUp( event );
 				break;
 

@@ -1,4 +1,3 @@
-
 /**
  * Kaleidoscope Shader
  * Radial reflection around center point

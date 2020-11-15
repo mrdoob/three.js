@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -55,10 +54,10 @@
 
 		[page:String powerPreference] - Provides a hint to the user agent indicating what configuration
 		of GPU is suitable for this WebGL context. Can be *"high-performance"*, *"low-power"* or *"default"*. Default is *"default"*.
-		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
+		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2 WebGL spec] for details.<br />
 
 		[page:Boolean failIfMajorPerformanceCaveat] - whether the renderer creation will fail upon low perfomance is detected. Default is *false*.
-		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
+		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2 WebGL spec] for details.<br />
 
 		[page:Boolean depth] - whether the drawing buffer has a
 		[link:https://en.wikipedia.org/wiki/Z-buffering depth buffer] of at least 16 bits.
@@ -192,9 +191,13 @@
 			</li>
 		</ul>
 		</p>
-		<p>By default these data are reset at each render calls, but when using the composer or mirrors it can be preferred to reset them with a custom pattern :
+		<p>By default these data are reset at each render call but when having multiple render passes per frame (e.g. when using post processing) it can be preferred to reset with a custom pattern.
+			First, set *autoReset* to *false*.
 		<code>
 		renderer.info.autoReset = false;
+		</code>
+		Call *reset()* whenever you have finished to render a single frame.
+		<code>
 		renderer.info.reset();
 		</code>
 		</p>

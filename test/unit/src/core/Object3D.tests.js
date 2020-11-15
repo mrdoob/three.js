@@ -296,7 +296,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "add/remove", ( assert ) => {
+		QUnit.test( "add/remove/clear", ( assert ) => {
 
 			var a = new Object3D();
 			var child1 = new Object3D();
@@ -327,6 +327,13 @@ export default QUnit.module( 'Core', () => {
 			assert.strictEqual( a.children.length, 1, "The second one was added to the parent (no remove)" );
 			assert.strictEqual( a.children[ 0 ], child2, "The second one is now the parent's child again" );
 			assert.strictEqual( child1.children.length, 0, "The first one no longer has any children" );
+
+			a.add( child1 );
+			assert.strictEqual( a.children.length, 2, "The first child was added to the parent" );
+			a.clear();
+			assert.strictEqual( a.children.length, 0, "All childrens were removed" );
+			assert.strictEqual( child1.parent, null, "First child has no parent" );
+			assert.strictEqual( child2.parent, null, "Second child has no parent" );
 
 		} );
 
@@ -493,9 +500,30 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( "updateMatrix", ( assert ) => {
+		QUnit.test( "updateMatrix", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const a = new Object3D();
+			a.position.set( 2, 3, 4 );
+			a.quaternion.set( 5, 6, 7, 8 );
+			a.scale.set( 9, 10, 11 );
+
+			assert.deepEqual( a.matrix.elements, [
+				1, 0, 0, 0,
+				0, 1, 0, 0,
+				0, 0, 1, 0,
+				0, 0, 0, 1
+			], "Updating position, quaternion, or scale has no effect to matrix until calling updateMatrix()" );
+
+			a.updateMatrix();
+
+			assert.deepEqual( a.matrix.elements, [
+				-1521, 1548, -234, 0,
+				-520, -1470, 1640, 0,
+				1826, 44, -1331, 0,
+				2, 3, 4, 1
+			], "matrix is calculated from position, quaternion, and scale" );
+
+			assert.equal( a.matrixWorldNeedsUpdate, true, "The flag indicating world matrix needs to be updated should be true" );
 
 		} );
 

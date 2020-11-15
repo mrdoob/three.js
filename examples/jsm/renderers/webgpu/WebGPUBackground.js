@@ -43,7 +43,7 @@ class WebGPUBackground {
 
 		} else {
 
-			console.error( 'WebGPURenderer: Unsupported background configuration.', background );
+			console.error( 'THREE.WebGPURenderer: Unsupported background configuration.', background );
 
 		}
 

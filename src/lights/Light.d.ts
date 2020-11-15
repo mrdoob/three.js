@@ -24,10 +24,6 @@ export class Light extends Object3D {
 	intensity: number;
 	readonly isLight: true;
 
-	/**
-	 * @default undefined
-	 */
-	receiveShadow: boolean;
 	shadow: LightShadow;
 	/**
 	 * @deprecated Use shadow.camera.fov instead.

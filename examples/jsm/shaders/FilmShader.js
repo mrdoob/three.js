@@ -1,4 +1,3 @@
-
 /**
  * Film grain & scanlines shader
  *

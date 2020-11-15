@@ -16,15 +16,15 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var params = {
+			const params = {
 				clipIntersection: true,
 				planeConstant: 0,
 				showHelpers: false
 			};
 
-			var clipPlanes = [
+			const clipPlanes = [
 				new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 ),
 				new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0 ),
 				new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0 )
@@ -47,28 +47,28 @@
 
 				camera.position.set( - 1.5, 2.5, 3.0 );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use only if there is no animation loop
 				controls.minDistance = 1;
 				controls.maxDistance = 10;
 				controls.enablePan = false;
 
-				var light = new THREE.HemisphereLight( 0xffffff, 0x080808, 1.5 );
+				const light = new THREE.HemisphereLight( 0xffffff, 0x080808, 1.5 );
 				light.position.set( - 1.25, 1, 1.25 );
 				scene.add( light );
 
-				// var helper = new CameraHelper( light.shadow.camera );
+				// const helper = new THREE.CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
 				//
 
-				var group = new THREE.Group();
+				const group = new THREE.Group();
 
-				for ( var i = 1; i <= 30; i += 2 ) {
+				for ( let i = 1; i <= 30; i += 2 ) {
 
-					var geometry = new THREE.SphereBufferGeometry( i / 30, 48, 24 );
+					const geometry = new THREE.SphereBufferGeometry( i / 30, 48, 24 );
 
-					var material = new THREE.MeshLambertMaterial( {
+					const material = new THREE.MeshLambertMaterial( {
 
 						color: new THREE.Color().setHSL( Math.random(), 0.5, 0.5 ),
 						side: THREE.DoubleSide,
@@ -85,7 +85,7 @@
 
 				// helpers
 
-				var helpers = new THREE.Group();
+				const helpers = new THREE.Group();
 				helpers.add( new THREE.PlaneHelper( clipPlanes[ 0 ], 2, 0xff0000 ) );
 				helpers.add( new THREE.PlaneHelper( clipPlanes[ 1 ], 2, 0x00ff00 ) );
 				helpers.add( new THREE.PlaneHelper( clipPlanes[ 2 ], 2, 0x0000ff ) );
@@ -94,13 +94,13 @@
 
 				// gui
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'clipIntersection' ).name( 'clip intersection' ).onChange( function ( value ) {
 
-					var children = group.children;
+					const children = group.children;
 
-					for ( var i = 0; i < children.length; i ++ ) {
+					for ( let i = 0; i < children.length; i ++ ) {
 
 						children[ i ].material.clipIntersection = value;
 
@@ -112,7 +112,7 @@
 
 				gui.add( params, 'planeConstant', - 1, 1 ).step( 0.01 ).name( 'plane constant' ).onChange( function ( value ) {
 
-					for ( var j = 0; j < clipPlanes.length; j ++ ) {
+					for ( let j = 0; j < clipPlanes.length; j ++ ) {
 
 						clipPlanes[ j ].constant = value;
 

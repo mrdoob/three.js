@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -40,12 +39,12 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var a = new THREE.Vector2( 0, 1 );
+		const a = new THREE.Vector2( 0, 1 );
 
 		//no arguments; will be initialised to (0, 0)
-		var b = new THREE.Vector2( );
+		const b = new THREE.Vector2( );
 
-		var d = a.distanceTo( b );
+		const d = a.distanceTo( b );
 		</code>
 
 
@@ -270,12 +269,12 @@
 		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
 		<p>Multiplies this vector by scalar [page:Float s].</p>
 
-		<h3>[method:this rotateAround]( [param:Vector2 center], [param:float angle] )</h3>
+		<h3>[method:this rotateAround]( [param:Vector2 center], [param:Float angle] )</h3>
 		<p>
 			[page:Vector2 center] - the point around which to rotate.<br />
-			[page:float angle] - the angle to rotate, in radians.<br /><br />
+			[page:Float angle] - the angle to rotate, in radians.<br /><br />
 
-			Rotates this vector around [page:Vector2 center] by [page:float angle] radians.
+			Rotates this vector around [page:Vector2 center] by [page:Float angle] radians.
 		</p>
 
 		<h3>[method:this round]()</h3>

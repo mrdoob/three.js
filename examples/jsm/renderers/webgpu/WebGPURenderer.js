@@ -5,6 +5,7 @@ import WebGPUGeometries from './WebGPUGeometries.js';
 import WebGPUInfo from './WebGPUInfo.js';
 import WebGPUProperties from './WebGPUProperties.js';
 import WebGPURenderPipelines from './WebGPURenderPipelines.js';
+import WebGPUComputePipelines from './WebGPUComputePipelines.js';
 import WebGPUBindings from './WebGPUBindings.js';
 import WebGPURenderLists from './WebGPURenderLists.js';
 import WebGPUTextures from './WebGPUTextures.js';
@@ -65,8 +66,7 @@ class WebGPURenderer {
 
 		// public
 
-		this.domElement = ( parameters.canvas !== undefined ) ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-		this.parameters = Object.assign( {}, parameters );
+		this.domElement = ( parameters.canvas !== undefined ) ? parameters.canvas : this._createCanvasElement();
 
 		this.autoClear = true;
 		this.autoClearColor = true;
@@ -76,6 +76,8 @@ class WebGPURenderer {
 		this.sortObjects = true;
 
 		// internals
+
+		this._parameters = Object.assign( {}, parameters );
 
 		this._pixelRatio = 1;
 		this._width = this.domElement.width;
@@ -98,6 +100,7 @@ class WebGPURenderer {
 		this._bindings = null;
 		this._objects = null;
 		this._renderPipelines = null;
+		this._computePipelines = null;
 		this._renderLists = null;
 		this._textures = null;
 		this._background = null;
@@ -115,25 +118,84 @@ class WebGPURenderer {
 
 		this._renderTarget = null;
 
-		// ensure some parameters
+		// some parameters require default values other than "undefined"
 
-		this.parameters.antialias = ( this.parameters.antialias === true );
+		this._parameters.antialias = ( parameters.antialias === true );
 
-		if ( this.parameters.antialias === true ) {
+		if ( this._parameters.antialias === true ) {
 
-			this.parameters.sampleCount = this.parameters.sampleCount || 4;
+			this._parameters.sampleCount = ( parameters.sampleCount === undefined ) ? 4 : parameters.sampleCount;
 
 		} else {
 
-			this.parameters.sampleCount = 1;
+			this._parameters.sampleCount = 1;
 
 		}
 
+		this._parameters.extensions = ( parameters.extensions === undefined ) ? [] : parameters.extensions;
+		this._parameters.limits = ( parameters.limits === undefined ) ? {} : parameters.limits;
+
 	}
 
-	init() {
+	async init() {
 
-		return initWebGPU( this );
+		const parameters = this._parameters;
+
+		const adapterOptions = {
+			powerPreference: parameters.powerPreference
+		};
+
+		const adapter = await navigator.gpu.requestAdapter( adapterOptions );
+
+		const deviceDescriptor = {
+			extensions: parameters.extensions,
+			limits: parameters.limits
+		};
+
+		const device = await adapter.requestDevice( deviceDescriptor );
+
+		const glslang = await import( 'https://cdn.jsdelivr.net/npm/@webgpu/glslang@0.0.15/dist/web-devel/glslang.js' );
+		const compiler = await glslang.default();
+
+		const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'gpupresent' );
+
+		const swapChain = context.configureSwapChain( {
+			device: device,
+			format: GPUTextureFormat.BRGA8Unorm // this is the only valid swap chain format right now (r121)
+		} );
+
+		this._adapter = adapter;
+		this._device = device;
+		this._context = context;
+		this._swapChain = swapChain;
+
+		this._info = new WebGPUInfo();
+		this._properties = new WebGPUProperties();
+		this._attributes = new WebGPUAttributes( device );
+		this._geometries = new WebGPUGeometries( this._attributes, this._info );
+		this._textures = new WebGPUTextures( device, this._properties, this._info, compiler );
+		this._objects = new WebGPUObjects( this._geometries, this._info );
+		this._renderPipelines = new WebGPURenderPipelines( this, this._properties, device, compiler, parameters.sampleCount );
+		this._computePipelines = new WebGPUComputePipelines( device, compiler );
+		this._bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes );
+		this._renderLists = new WebGPURenderLists();
+		this._background = new WebGPUBackground( this );
+
+		//
+
+		this._renderPassDescriptor = {
+			colorAttachments: [ {
+				attachment: null
+			} ],
+			 depthStencilAttachment: {
+				attachment: null,
+				depthStoreOp: GPUStoreOp.Store,
+				stencilStoreOp: GPUStoreOp.Store
+			}
+		};
+
+		this._setupColorBuffer();
+		this._setupDepthBuffer();
 
 	}
 
@@ -179,7 +241,7 @@ class WebGPURenderer {
 
 		} else {
 
-			if ( this.parameters.antialias === true ) {
+			if ( this._parameters.antialias === true ) {
 
 				colorAttachment.attachment = this._colorBuffer.createView();
 				colorAttachment.resolveTarget = this._swapChain.getCurrentTexture().createView();
@@ -451,6 +513,7 @@ class WebGPURenderer {
 		this._objects.dispose();
 		this._properties.dispose();
 		this._renderPipelines.dispose();
+		this._computePipelines.dispose();
 		this._bindings.dispose();
 		this._info.dispose();
 		this._renderLists.dispose();
@@ -467,6 +530,40 @@ class WebGPURenderer {
 			this._textures.initRenderTarget( renderTarget );
 
 		}
+
+	}
+
+	compute( computeParams ) {
+
+		const device = this._device;
+		const cmdEncoder = device.createCommandEncoder( {} );
+		const passEncoder = cmdEncoder.beginComputePass();
+
+		for ( const param of computeParams ) {
+
+			// pipeline
+
+			const pipeline = this._computePipelines.get( param );
+			passEncoder.setPipeline( pipeline );
+
+			// bind group
+
+			const bindGroup = this._bindings.getForCompute( param ).group;
+			this._bindings.update( param );
+			passEncoder.setBindGroup( 0, bindGroup );
+
+			passEncoder.dispatch( param.num );
+
+		}
+
+		passEncoder.endPass();
+		device.defaultQueue.submit( [ cmdEncoder.finish() ] );
+
+	}
+
+	getRenderTarget() {
+
+		return this._renderTarget;
 
 	}
 
@@ -519,6 +616,10 @@ class WebGPURenderer {
 					}
 
 				}
+
+			} else if ( object.isLineLoop ) {
+
+				console.error( 'THREE.WebGPURenderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.' );
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
@@ -589,9 +690,12 @@ class WebGPURenderer {
 
 		// process renderable objects
 
-		for ( let i = 0, l = renderList.length; i < l; i ++ ) {
+		for ( let i = 0, il = renderList.length; i < il; i ++ ) {
 
 			const renderItem = renderList[ i ];
+
+			// @TODO: Add support for multiple materials per object. This will require to extract
+			// the material from the renderItem object and pass it with its group data to _renderObject().
 
 			const object = renderItem.object;
 
@@ -599,9 +703,36 @@ class WebGPURenderer {
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 			this._objects.update( object );
-			this._bindings.update( object, camera );
 
-			this._renderObject( object, passEncoder );
+			if ( camera.isArrayCamera ) {
+
+				const cameras = camera.cameras;
+
+				for ( let j = 0, jl = cameras.length; j < jl; j ++ ) {
+
+					const camera2 = cameras[ j ];
+
+					if ( object.layers.test( camera2.layers ) ) {
+
+						const vp = camera2.viewport;
+						const minDepth = ( vp.minDepth === undefined ) ? 0 : vp.minDepth;
+						const maxDepth = ( vp.maxDepth === undefined ) ? 1 : vp.maxDepth;
+
+						passEncoder.setViewport( vp.x, vp.y, vp.width, vp.height, minDepth, maxDepth );
+
+						this._bindings.update( object, camera2 );
+						this._renderObject( object, passEncoder );
+
+					}
+
+				}
+
+			} else {
+
+				this._bindings.update( object, camera );
+				this._renderObject( object, passEncoder );
+
+			}
 
 		}
 
@@ -642,23 +773,24 @@ class WebGPURenderer {
 
 		const drawRange = geometry.drawRange;
 		const firstVertex = drawRange.start;
+		const instanceCount = ( geometry.isInstancedBufferGeometry ) ? geometry.instanceCount : 1;
 
 		if ( hasIndex === true ) {
 
 			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
 
-			passEncoder.drawIndexed( indexCount, 1, firstVertex, 0, 0 );
+			passEncoder.drawIndexed( indexCount, instanceCount, firstVertex, 0, 0 );
 
-			info.update( object, indexCount );
+			info.update( object, indexCount, instanceCount );
 
 		} else {
 
 			const positionAttribute = geometry.attributes.position;
 			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : positionAttribute.count;
 
-			passEncoder.draw( vertexCount, 1, firstVertex, 0 );
+			passEncoder.draw( vertexCount, instanceCount, firstVertex, 0 );
 
-			info.update( object, vertexCount );
+			info.update( object, vertexCount, instanceCount );
 
 		}
 
@@ -709,7 +841,7 @@ class WebGPURenderer {
 					height: this._height * this._pixelRatio,
 					depth: 1
 				},
-				sampleCount: this.parameters.sampleCount,
+				sampleCount: this._parameters.sampleCount,
 				format: GPUTextureFormat.BRGA8Unorm,
 				usage: GPUTextureUsage.OUTPUT_ATTACHMENT
 			} );
@@ -732,7 +864,7 @@ class WebGPURenderer {
 					height: this._height * this._pixelRatio,
 					depth: 1
 				},
-				sampleCount: this.parameters.sampleCount,
+				sampleCount: this._parameters.sampleCount,
 				format: GPUTextureFormat.Depth24PlusStencil8,
 				usage: GPUTextureUsage.OUTPUT_ATTACHMENT
 			} );
@@ -741,66 +873,13 @@ class WebGPURenderer {
 
 	}
 
-}
+	_createCanvasElement() {
 
-async function initWebGPU( scope ) {
+		const canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
+		canvas.style.display = 'block';
+		return canvas;
 
-	const parameters = scope.parameters;
-
-	const adapterOptions = {
-		powerPreference: ( parameters.powerPreference !== undefined ) ? parameters.powerPreference : undefined
-	};
-
-	const adapter = await navigator.gpu.requestAdapter( adapterOptions );
-
-	const deviceDescriptor = {
-		enabledExtensions: ( parameters.enabledExtensions !== undefined ) ? parameters.enabledExtensions : [],
-		limits: ( parameters.limits !== undefined ) ? parameters.limits : {}
-	};
-
-	const device = await adapter.requestDevice( deviceDescriptor );
-
-	const glslang = await import( 'https://cdn.jsdelivr.net/npm/@webgpu/glslang@0.0.15/dist/web-devel/glslang.js' );
-	const compiler = await glslang.default();
-
-	const context = ( parameters.context !== undefined ) ? parameters.context : scope.domElement.getContext( 'gpupresent' );
-
-	const swapChain = context.configureSwapChain( {
-		device: device,
-		format: GPUTextureFormat.BRGA8Unorm
-	} );
-
-	scope._adapter = adapter;
-	scope._device = device;
-	scope._context = context;
-	scope._swapChain = swapChain;
-
-	scope._info = new WebGPUInfo();
-	scope._properties = new WebGPUProperties();
-	scope._attributes = new WebGPUAttributes( device );
-	scope._geometries = new WebGPUGeometries( scope._attributes, scope._info );
-	scope._textures = new WebGPUTextures( device, scope._properties, scope._info, compiler );
-	scope._bindings = new WebGPUBindings( device, scope._info, scope._properties, scope._textures );
-	scope._objects = new WebGPUObjects( scope._geometries, scope._info );
-	scope._renderPipelines = new WebGPURenderPipelines( device, compiler, scope._bindings, scope.parameters.sampleCount );
-	scope._renderLists = new WebGPURenderLists();
-	scope._background = new WebGPUBackground( scope );
-
-	//
-
-	scope._renderPassDescriptor = {
-		colorAttachments: [ {
-			attachment: null
-		} ],
-		 depthStencilAttachment: {
-			attachment: null,
-			depthStoreOp: GPUStoreOp.Store,
-			stencilStoreOp: GPUStoreOp.Store
-		}
-	};
-
-	scope._setupColorBuffer();
-	scope._setupDepthBuffer();
+	}
 
 }
 

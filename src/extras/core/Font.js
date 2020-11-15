@@ -12,9 +12,7 @@ Object.assign( Font.prototype, {
 
 	isFont: true,
 
-	generateShapes: function ( text, size ) {
-
-		if ( size === undefined ) size = 100;
+	generateShapes: function ( text, size = 100 ) {
 
 		const shapes = [];
 		const paths = createPaths( text, size, this.data );

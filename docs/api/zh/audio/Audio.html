@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,14 +21,14 @@
 
 		<code>
 		// create an AudioListener and add it to the camera
-		var listener = new THREE.AudioListener();
+		const listener = new THREE.AudioListener();
 		camera.add( listener );
 
 		// create a global audio source
-		var sound = new THREE.Audio( listener );
+		const sound = new THREE.Audio( listener );
 
 		// load a sound and set it as the Audio object's buffer
-		var audioLoader = new THREE.AudioLoader();
+		const audioLoader = new THREE.AudioLoader();
 		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 			sound.setBuffer( buffer );
 			sound.setLoop( true );

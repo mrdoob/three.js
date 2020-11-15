@@ -25,11 +25,6 @@ export class HemisphereLight extends Light {
 	 */
 	position: Vector3;
 
-	/**
-	 * @default undefined
-	 */
-	castShadow: boolean;
-
 	groundColor: Color;
 
 	readonly isHemisphereLight: true;

@@ -150,7 +150,7 @@ export const GPUTextureFormat = {
 	BC4RSNorm: 'bc4-r-snorm',
 	BC5RGUnorm: 'bc5-rg-unorm',
 	BC5RGSnorm: 'bc5-rg-snorm',
-	BC6HRGBUfloat: 'bc6h-rgb-ufloat',
+	BC6HRGBUFloat: 'bc6h-rgb-ufloat',
 	BC6HRGBFloat: 'bc6h-rgb-float',
 	BC7RGBAUnorm: 'bc7-rgba-unorm',
 	BC7RGBAUnormSRGB: 'bc7-rgba-srgb',
@@ -199,3 +199,60 @@ export const GPUBlendOperation = {
 	Min: 'min',
 	Max: 'max'
 };
+
+export const GPUColorWriteFlags = {
+	None: 0,
+	Red: 0x1,
+	Green: 0x2,
+	Blue: 0x4,
+	Alpha: 0x8,
+	All: 0xF
+};
+
+export const GPUStencilOperation = {
+	Keep: 'keep',
+	Zero: 'zero',
+	Replace: 'replace',
+	Invert: 'invert',
+	IncrementClamp: 'increment-clamp',
+	DecrementClamp: 'decrement-clamp',
+	IncrementWrap: 'increment-wrap',
+	DecrementWrap: 'decrement-wrap'
+};
+
+export const GPUBindingType = {
+	UniformBuffer: 'uniform-buffer',
+	StorageBuffer: 'storage-buffer',
+	ReadonlyStorageBuffer: 'readonly-storage-buffer',
+	Sampler: 'sampler',
+	ComparisonSampler: 'comparison-sampler',
+	SampledTexture: 'sampled-texture',
+	MultisampledTexture: 'multisampled-texture',
+	ReadonlyStorageTexture: 'readonly-storage-texture',
+	WriteonlyStorageTexture: 'writeonly-storage-texture'
+};
+
+export const GPUTextureDimension = {
+	OneD: '1d',
+	TwoD: '2d',
+	ThreeD: '3d'
+};
+
+export const GPUTextureViewDimension = {
+	OneD: '1d',
+	TwoD: '2d',
+	TwoDArray: '2d-array',
+	Cube: 'cube',
+	CubeArray: 'cube-array',
+	ThreeD: '3d'
+};
+
+export const GPUInputStepMode = {
+	Vertex: 'vertex',
+	Instance: 'instance'
+};
+
+// @TODO: Move to src/constants.js
+
+export const BlendColorFactor = 211;
+export const OneMinusBlendColorFactor = 212;

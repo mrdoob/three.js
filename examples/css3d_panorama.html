@@ -15,13 +15,13 @@
 
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
-			var camera, scene, renderer;
-			var target = new THREE.Vector3();
+			let camera, scene, renderer;
+			const target = new THREE.Vector3();
 
-			var lon = 90, lat = 0;
-			var phi = 0, theta = 0;
+			let lon = 90, lat = 0;
+			let phi = 0, theta = 0;
 
-			var pointerX, pointerY;
+			let pointerX, pointerY;
 
 			init();
 			animate();
@@ -32,7 +32,7 @@
 
 				scene = new THREE.Scene();
 
-				var sides = [
+				const sides = [
 					{
 						url: 'textures/cube/Bridge2/posx.jpg',
 						position: [ - 512, 0, 0 ],
@@ -65,16 +65,16 @@
 					}
 				];
 
-				for ( var i = 0; i < sides.length; i ++ ) {
+				for ( let i = 0; i < sides.length; i ++ ) {
 
-					var side = sides[ i ];
+					const side = sides[ i ];
 
-					var element = document.createElement( 'img' );
+					const element = document.createElement( 'img' );
 					element.draggable = false;
 					element.width = 1026; // 2 pixels extra to close the gap.
 					element.src = side.url;
 
-					var object = new CSS3DObject( element );
+					const object = new CSS3DObject( element );
 					object.position.fromArray( side.position );
 					object.rotation.fromArray( side.rotation );
 					scene.add( object );
@@ -140,7 +140,7 @@
 
 			function onDocumentMouseWheel( event ) {
 
-				var fov = camera.fov + event.deltaY * 0.05;
+				const fov = camera.fov + event.deltaY * 0.05;
 
 				camera.fov = THREE.MathUtils.clamp( fov, 10, 75 );
 

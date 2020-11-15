@@ -69,6 +69,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
+		return this;
+
 	},
 
 	getAttribute: function ( name ) {

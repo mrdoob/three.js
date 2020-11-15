@@ -14,6 +14,8 @@
 
 			import * as THREE from '../build/three.module.js';
 
+			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
+
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
 			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
 
@@ -41,37 +43,53 @@
 
 				// textured mesh
 
-				const loader = new THREE.TextureLoader();
-				const texture = loader.load( './textures/uv_grid_opengl.jpg' );
+				const textureLoader = new THREE.TextureLoader();
+				const texture = textureLoader.load( './textures/uv_grid_opengl.jpg' );
 
 				const geometryBox = new THREE.BoxBufferGeometry();
 				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
 
 				box = new THREE.Mesh( geometryBox, materialBox );
-				box.position.set( - 1, 1, 0 );
+				box.position.set( 0, 1, 0 );
 				scene.add( box );
 
 				// data texture
 
 				const geometryPlane = new THREE.PlaneBufferGeometry();
-				const materialPlane = new THREE.MeshBasicMaterial( { map: createDataTexture() } );
+				const materialPlane = new THREE.MeshBasicMaterial( { map: createDataTexture(), transparent: true, opacity: 0.5 } );
 
 				const plane = new THREE.Mesh( geometryPlane, materialPlane );
-				plane.position.set( - 1, - 1, 0 );
+				plane.position.set( 0, - 1, 0 );
 				scene.add( plane );
+
+				// compressed texture
+
+				const ddsLoader = new DDSLoader();
+				const dxt5Texture = ddsLoader.load( './textures/compressed/explosion_dxt5_mip.dds' );
+
+				const materialCompressed = new THREE.MeshBasicMaterial( { map: dxt5Texture, transparent: true } );
+
+				const boxCompressed = new THREE.Mesh( geometryBox, materialCompressed );
+				boxCompressed.position.set( - 2, 1, 0 );
+				scene.add( boxCompressed );
 
 				// points
 
-				const geometryPoints = new THREE.BufferGeometry().setFromPoints( [
-					new THREE.Vector3( 0.5, 0.5, 0 ),
-					new THREE.Vector3( 0.5, - 0.5, 0 ),
-					new THREE.Vector3( - 0.5, 0.5, 0 ),
-					new THREE.Vector3( - 0.5, - 0.5, 0 ) ] );
+				const points = [];
+
+				for ( let i = 0; i < 1000; i ++ ) {
+
+					const point = new THREE.Vector3().random().subScalar( 0.5 );
+					points.push( point );
+
+				}
+
+				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
 				const materialPoints = new THREE.PointsMaterial();
 
-				const points = new THREE.Points( geometryPoints, materialPoints );
-				points.position.set( 1, - 1, 0 );
-				scene.add( points );
+				const pointCloud = new THREE.Points( geometryPoints, materialPoints );
+				pointCloud.position.set( 2, - 1, 0 );
+				scene.add( pointCloud );
 
 				// lines
 
@@ -83,10 +101,12 @@
 				] );
 				const materialLine = new THREE.LineBasicMaterial();
 				const line = new THREE.Line( geometryLine, materialLine );
-				line.position.set( 1, 1, 0 );
+				line.position.set( 2, 1, 0 );
 				scene.add( line );
 
-				renderer = new WebGPURenderer();
+				//
+
+				renderer = new WebGPURenderer( { extensions: [ 'texture-compression-bc' ] } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -138,7 +158,7 @@
 					data[ stride ] = r;
 					data[ stride + 1 ] = g;
 					data[ stride + 2 ] = b;
-					data[ stride + 3 ] = 1;
+					data[ stride + 3 ] = 255;
 
 				}
 
