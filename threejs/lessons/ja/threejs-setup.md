@@ -2,7 +2,7 @@ Title: Three.jsのセットアップ
 Description: three.jsの開発環境のセットアップ方法
 TOC: セットアップ
 
-これはthree.jsシリーズの記事の1つです。
+これはthree.jsの連載記事の1つです。
 最初の記事は[Three.jsの基礎知識](threejs-fundamentals.html)でした。
 まだ読んでない人はそこから読んでみるといいかもしれません。
 

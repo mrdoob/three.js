@@ -2,7 +2,7 @@ Title: Three.jsのレスポンシブデザイン
 Description: 異なるディスプレイサイズにThree.jsを適用させる方法
 TOC: レスポンシブデザイン
 
-これはthree.jsシリーズの2番目の記事です。
+これはthree.jsの2番目の連載記事です。
 最初の記事は [Three.jsの基礎知識](threejs-fundamentals.html) でした。
 まだ読んでいない場合はそこから始めて下さい。
 
