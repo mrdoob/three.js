@@ -37,7 +37,7 @@
 
 			function test( name, geometry ) {
 
-				var d = document.createElement( 'div' );
+				const d = document.createElement( 'div' );
 
 				d.innerHTML = '<h3>' + name + '</h3>';
 
@@ -47,9 +47,9 @@
 
 			}
 
-			var points = [];
+			const points = [];
 
-			for ( var i = 0; i < 10; i ++ ) {
+			for ( let i = 0; i < 10; i ++ ) {
 
 				points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 15 + 50, ( i - 5 ) * 2 ) );
 

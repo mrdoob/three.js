@@ -1,5 +1,3 @@
-console.warn( "THREE.TransformControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.TransformControls = function ( camera, domElement ) {
 
 	if ( domElement === undefined ) {
@@ -223,8 +221,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 			this.object.matrixWorld.decompose( worldPosition, worldQuaternion, worldScale );
 
-			parentQuaternionInv.copy( parentQuaternion ).inverse();
-			worldQuaternionInv.copy( worldQuaternion ).inverse();
+			parentQuaternionInv.copy( parentQuaternion ).invert();
+			worldQuaternionInv.copy( worldQuaternion ).invert();
 
 		}
 
@@ -373,7 +371,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 				if ( space === 'local' ) {
 
-					object.position.applyQuaternion( _tempQuaternion.copy( quaternionStart ).inverse() );
+					object.position.applyQuaternion( _tempQuaternion.copy( quaternionStart ).invert() );
 
 					if ( axis.search( 'X' ) !== - 1 ) {
 
@@ -1279,7 +1277,7 @@ THREE.TransformControlsGizmo = function () {
 					handle.position.copy( this.worldPositionStart );
 					handle.quaternion.copy( this.worldQuaternionStart );
 					tempVector.set( 1e-10, 1e-10, 1e-10 ).add( this.worldPositionStart ).sub( this.worldPosition ).multiplyScalar( - 1 );
-					tempVector.applyQuaternion( this.worldQuaternionStart.clone().inverse() );
+					tempVector.applyQuaternion( this.worldQuaternionStart.clone().invert() );
 					handle.scale.copy( tempVector );
 					handle.visible = this.dragging;
 
@@ -1462,7 +1460,7 @@ THREE.TransformControlsGizmo = function () {
 				// Align handles to current local or world rotation
 
 				tempQuaternion2.copy( quaternion );
-				alignVector.copy( this.eye ).applyQuaternion( tempQuaternion.copy( quaternion ).inverse() );
+				alignVector.copy( this.eye ).applyQuaternion( tempQuaternion.copy( quaternion ).invert() );
 
 				if ( handle.name.search( "E" ) !== - 1 ) {
 

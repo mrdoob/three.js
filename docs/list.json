@@ -1,4 +1,4 @@
-var list = {
+{
 
 	"en": {
 
@@ -106,10 +106,11 @@ var list = {
 			},
 
 			"Extras": {
+				"DataUtils": "api/en/extras/DataUtils",
 				"Earcut": "api/en/extras/Earcut",
 				"ImageUtils": "api/en/extras/ImageUtils",
 				"PMREMGenerator": "api/en/extras/PMREMGenerator",
-				"ShapeUtils": "api/en/extras/ShapeUtils",
+				"ShapeUtils": "api/en/extras/ShapeUtils"
 			},
 
 			"Extras / Core": {
@@ -136,7 +137,7 @@ var list = {
 			},
 
 			"Extras / Objects": {
-				"ImmediateRenderObject": "api/en/extras/objects/ImmediateRenderObject",
+				"ImmediateRenderObject": "api/en/extras/objects/ImmediateRenderObject"
 			},
 
 			"Geometries": {
@@ -406,7 +407,7 @@ var list = {
 			},
 
 			"Objects": {
-				"Lensflare": "examples/en/objects/Lensflare",
+				"Lensflare": "examples/en/objects/Lensflare"
 			},
 
 			"Post-Processing": {
@@ -421,7 +422,7 @@ var list = {
 
 			"Math": {
 				"LookupTable": "examples/en/math/Lut",
-				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler",
+				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler"
 			},
 
 			"ConvexHull": {
@@ -529,8 +530,8 @@ var list = {
 			"Cameras": {
 				"ArrayCamera": "api/ar/cameras/ArrayCamera",
 				"Camera": "api/ar/cameras/Camera",
-				"CubeCamera": "api/ar/cameras/CubeCamera",
-			},
+				"CubeCamera": "api/ar/cameras/CubeCamera"
+			}
 
 		}
 
@@ -672,7 +673,7 @@ var list = {
 			},
 
 			"附件 / 物体": {
-				"ImmediateRenderObject": "api/zh/extras/objects/ImmediateRenderObject",
+				"ImmediateRenderObject": "api/zh/extras/objects/ImmediateRenderObject"
 			},
 
 			"几何体": {
@@ -941,7 +942,7 @@ var list = {
 			},
 
 			"物体": {
-				"Lensflare": "examples/zh/objects/Lensflare",
+				"Lensflare": "examples/zh/objects/Lensflare"
 			},
 
 			"后期处理": {
@@ -956,7 +957,7 @@ var list = {
 
 			"数学库": {
 				"LookupTable": "examples/zh/math/Lut",
-				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler",
+				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler"
 			},
 
 			"QuickHull": {
@@ -997,4 +998,4 @@ var list = {
 
 	}
 
-};
+}

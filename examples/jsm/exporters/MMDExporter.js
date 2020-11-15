@@ -4,6 +4,7 @@ import {
 	Vector3
 } from "../../../build/three.module.js";
 import { MMDParser } from "../libs/mmdparser.module.js";
+
 /**
  * Dependencies
  *  - mmd-parser https://github.com/takahirox/mmd-parser

@@ -139,7 +139,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		//
 
-		_inverseMatrix.getInverse( matrixWorld );
+		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
 		// Check boundingBox before continuing

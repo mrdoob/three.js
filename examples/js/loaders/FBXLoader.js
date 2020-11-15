@@ -1,4 +1,3 @@
-console.warn( "THREE.FBXLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Loader loads FBX file and generates Group representing FBX scene.
  * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format
@@ -496,7 +495,7 @@ THREE.FBXLoader = ( function () {
 
 				parameters.color = new THREE.Color().fromArray( materialNode.Diffuse.value );
 
-			} else if ( materialNode.DiffuseColor && materialNode.DiffuseColor.type === 'Color' ) {
+			} else if ( materialNode.DiffuseColor && ( materialNode.DiffuseColor.type === 'Color' || materialNode.DiffuseColor.type === 'ColorRGB' ) ) {
 
 				// The blender exporter exports diffuse here instead of in materialNode.Diffuse
 				parameters.color = new THREE.Color().fromArray( materialNode.DiffuseColor.value );
@@ -513,7 +512,7 @@ THREE.FBXLoader = ( function () {
 
 				parameters.emissive = new THREE.Color().fromArray( materialNode.Emissive.value );
 
-			} else if ( materialNode.EmissiveColor && materialNode.EmissiveColor.type === 'Color' ) {
+			} else if ( materialNode.EmissiveColor && ( materialNode.EmissiveColor.type === 'Color' || materialNode.EmissiveColor.type === 'ColorRGB' ) ) {
 
 				// The blender exporter exports emissive color here instead of in materialNode.Emissive
 				parameters.emissive = new THREE.Color().fromArray( materialNode.EmissiveColor.value );
@@ -2739,7 +2738,7 @@ THREE.FBXLoader = ( function () {
 				postRotation.push( eulerOrder );
 
 				postRotation = new THREE.Euler().fromArray( postRotation );
-				postRotation = new THREE.Quaternion().setFromEuler( postRotation ).inverse();
+				postRotation = new THREE.Quaternion().setFromEuler( postRotation ).invert();
 
 			}
 
@@ -4014,7 +4013,7 @@ THREE.FBXLoader = ( function () {
 		lParentTM.copyPosition( lParentGX );
 
 		var lParentGSM = new THREE.Matrix4();
-		lParentGSM.getInverse( lParentGRM ).multiply( lParentGX );
+		lParentGSM.copy( lParentGRM ).invert().multiply( lParentGX );
 
 		var lGlobalRS = new THREE.Matrix4();
 
@@ -4028,15 +4027,18 @@ THREE.FBXLoader = ( function () {
 
 		} else {
 
-			var lParentLSM_inv = new THREE.Matrix4().getInverse( lScalingM );
+			var lParentLSM_inv = new THREE.Matrix4();
+			lParentLSM_inv.copy( lScalingM ).invert();
 			var lParentGSM_noLocal = new THREE.Matrix4().multiply( lParentGSM ).multiply( lParentLSM_inv );
 
 			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lScalingM );
 
 		}
 
-		var lRotationPivotM_inv = new THREE.Matrix4().getInverse( lRotationPivotM );
-		var lScalingPivotM_inv = new THREE.Matrix4().getInverse( lScalingPivotM );
+		var lRotationPivotM_inv = new THREE.Matrix4();
+		lRotationPivotM_inv.copy( lRotationPivotM ).invert();
+		var lScalingPivotM_inv = new THREE.Matrix4();
+		lScalingPivotM_inv.copy( lScalingPivotM ).invert();
 		// Calculate the local transform matrix
 		var lTransform = new THREE.Matrix4();
 		lTransform.copy( lTranslationM ).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );

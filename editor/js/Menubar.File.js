@@ -245,13 +245,16 @@ function MenubarFile( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/file/export/glb' ) );
 	option.onClick( function () {
 
+		var scene = editor.scene;
+		var animations = getAnimations( scene );
+
 		var exporter = new GLTFExporter();
 
-		exporter.parse( editor.scene, function ( result ) {
+		exporter.parse( scene, function ( result ) {
 
 			saveArrayBuffer( result, 'scene.glb' );
 
-		}, { binary: true } );
+		}, { binary: true, animations: animations } );
 
 	} );
 	options.add( option );
@@ -263,13 +266,16 @@ function MenubarFile( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/file/export/gltf' ) );
 	option.onClick( function () {
 
+		var scene = editor.scene;
+		var animations = getAnimations( scene );
+
 		var exporter = new GLTFExporter();
 
-		exporter.parse( editor.scene, function ( result ) {
+		exporter.parse( scene, function ( result ) {
 
 			saveString( JSON.stringify( result, null, 2 ), 'scene.gltf' );
 
-		} );
+		}, { animations: animations } );
 
 
 	} );
@@ -468,6 +474,22 @@ function MenubarFile( editor ) {
 	function saveString( text, filename ) {
 
 		save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+	}
+
+	function getAnimations( scene ) {
+
+		var animations = [];
+
+		scene.traverse( function ( object ) {
+
+			var objectAnimations = editor.animations[ object.uuid ];
+
+			if ( objectAnimations !== undefined ) animations.push( ... objectAnimations );
+
+		} );
+
+		return animations;
 
 	}
 

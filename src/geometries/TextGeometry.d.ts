@@ -1,17 +1,6 @@
 import { Font } from './../extras/core/Font';
 import { Geometry } from './../core/Geometry';
-
-export interface TextGeometryParameters {
-	font: Font;
-	size?: number;
-	height?: number;
-	curveSegments?: number;
-	bevelEnabled?: boolean;
-	bevelThickness?: number;
-	bevelSize?: number;
-	bevelOffset?: number;
-	bevelSegments?: number;
-}
+import { TextGeometryParameters } from './TextBufferGeometry';
 
 export class TextGeometry extends Geometry {
 

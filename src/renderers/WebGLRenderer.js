@@ -39,11 +39,19 @@ import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from "./webgl/WebGLMaterials.js";
 
+function createCanvasElement() {
+
+	const canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
+	canvas.style.display = 'block';
+	return canvas;
+
+}
+
 function WebGLRenderer( parameters ) {
 
 	parameters = parameters || {};
 
-	const _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' ),
+	const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 		_context = parameters.context !== undefined ? parameters.context : null,
 
 		_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
@@ -297,7 +305,7 @@ function WebGLRenderer( parameters ) {
 		programCache = new WebGLPrograms( _this, cubemaps, extensions, capabilities, bindingStates, clipping );
 		materials = new WebGLMaterials( properties );
 		renderLists = new WebGLRenderLists( properties );
-		renderStates = new WebGLRenderStates();
+		renderStates = new WebGLRenderStates( extensions, capabilities );
 		background = new WebGLBackground( _this, cubemaps, state, objects, _premultipliedAlpha );
 
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info, capabilities );
@@ -873,9 +881,9 @@ function WebGLRenderer( parameters ) {
 		currentRenderState = renderStates.get( scene, camera );
 		currentRenderState.init();
 
-		scene.traverse( function ( object ) {
+		scene.traverseVisible( function ( object ) {
 
-			if ( object.isLight ) {
+			if ( object.isLight && object.layers.test( camera.layers ) ) {
 
 				currentRenderState.pushLight( object );
 
@@ -1589,7 +1597,7 @@ function WebGLRenderer( parameters ) {
 
 				if ( capabilities.floatVertexTextures ) {
 
-					if ( skeleton.boneTexture === undefined ) {
+					if ( skeleton.boneTexture === null ) {
 
 						// layout (1 matrix = 4 pixels)
 						//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
@@ -1914,9 +1922,7 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.copyFramebufferToTexture = function ( position, texture, level ) {
-
-		if ( level === undefined ) level = 0;
+	this.copyFramebufferToTexture = function ( position, texture, level = 0 ) {
 
 		const levelScale = Math.pow( 2, - level );
 		const width = Math.floor( texture.image.width * levelScale );
@@ -1931,9 +1937,7 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.copyTextureToTexture = function ( position, srcTexture, dstTexture, level ) {
-
-		if ( level === undefined ) level = 0;
+	this.copyTextureToTexture = function ( position, srcTexture, dstTexture, level = 0 ) {
 
 		const width = srcTexture.image.width;
 		const height = srcTexture.image.height;

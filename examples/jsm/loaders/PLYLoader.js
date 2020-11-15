@@ -5,6 +5,7 @@ import {
 	Loader,
 	LoaderUtils
 } from "../../../build/three.module.js";
+
 /**
  * Description: A THREE loader for PLY ASCII files (known as the Polygon
  * File Format or the Stanford Triangle Format).
@@ -97,14 +98,15 @@ PLYLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			if ( result !== null ) {
 
 				headerText = result[ 1 ];
-				headerLength = result[ 0 ].length;
+				headerLength = new Blob( [ result[ 0 ] ] ).size;
 
 			}
 
 			var header = {
 				comments: [],
 				elements: [],
-				headerLength: headerLength
+				headerLength: headerLength,
+				objInfo: ''
 			};
 
 			var lines = headerText.split( '\n' );
@@ -181,6 +183,12 @@ PLYLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					case 'property':
 
 						currentElement.properties.push( make_ply_element_property( lineValues, scope.propertyNameMapping ) );
+
+						break;
+
+					case 'obj_info':
+
+						header.objInfo = line;
 
 						break;
 

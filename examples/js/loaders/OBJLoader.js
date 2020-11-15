@@ -1,5 +1,3 @@
-console.warn( "THREE.OBJLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.OBJLoader = ( function () {
 
 	// o object_name | g group_name
@@ -61,7 +59,6 @@ THREE.OBJLoader = ( function () {
 						normals: [],
 						colors: [],
 						uvs: [],
-						hasNormalIndices: false,
 						hasUVIndices: false
 					},
 					materials: [],
@@ -339,8 +336,6 @@ THREE.OBJLoader = ( function () {
 					ic = this.parseNormalIndex( nc, nLen );
 
 					this.addNormal( ia, ib, ic );
-
-					this.object.geometry.hasNormalIndices = true;
 
 				} else {
 
@@ -729,11 +724,7 @@ THREE.OBJLoader = ( function () {
 
 				buffergeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( geometry.vertices, 3 ) );
 
-				if ( geometry.hasNormalIndices === true ) {
-
-					buffergeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( geometry.normals, 3 ) );
-
-				}
+				buffergeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( geometry.normals, 3 ) );
 
 				if ( geometry.colors.length > 0 ) {
 

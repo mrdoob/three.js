@@ -27,8 +27,8 @@ This code creates a scene, a camera, and a geometric cube, and it adds the cube 
 ```javascript
 import * as THREE from './js/three.module.js';
 
-var camera, scene, renderer;
-var geometry, material, mesh;
+let camera, scene, renderer;
+let geometry, material, mesh;
 
 init();
 animate();
@@ -64,7 +64,7 @@ function animate() {
 }
 ```
 
-If everything went well, you should see [this](https://jsfiddle.net/8kubjpL5/).
+If everything went well, you should see [this](https://jsfiddle.net/ruc3h17j/).
 
 ### Cloning this repository ###
 

@@ -1,54 +1,67 @@
+import { Bone } from './Bone.js';
 import { Matrix4 } from '../math/Matrix4.js';
+import { MathUtils } from '../math/MathUtils.js';
 
 const _offsetMatrix = new Matrix4();
 const _identityMatrix = new Matrix4();
 
-function Skeleton( bones, boneInverses ) {
+function Skeleton( bones = [], boneInverses = [] ) {
 
-	// copy the bone array
-
-	bones = bones || [];
+	this.uuid = MathUtils.generateUUID();
 
 	this.bones = bones.slice( 0 );
-	this.boneMatrices = new Float32Array( this.bones.length * 16 );
+	this.boneInverses = boneInverses;
+	this.boneMatrices = null;
+
+	this.boneTexture = null;
+	this.boneTextureSize = 0;
 
 	this.frame = - 1;
 
-	// use the supplied bone inverses or calculate the inverses
-
-	if ( boneInverses === undefined ) {
-
-		this.calculateInverses();
-
-	} else {
-
-		if ( this.bones.length === boneInverses.length ) {
-
-			this.boneInverses = boneInverses.slice( 0 );
-
-		} else {
-
-			console.warn( 'THREE.Skeleton boneInverses is the wrong length.' );
-
-			this.boneInverses = [];
-
-			for ( let i = 0, il = this.bones.length; i < il; i ++ ) {
-
-				this.boneInverses.push( new Matrix4() );
-
-			}
-
-		}
-
-	}
+	this.init();
 
 }
 
 Object.assign( Skeleton.prototype, {
 
+	init: function () {
+
+		const bones = this.bones;
+		const boneInverses = this.boneInverses;
+
+		this.boneMatrices = new Float32Array( bones.length * 16 );
+
+		// calculate inverse bone matrices if necessary
+
+		if ( boneInverses.length === 0 ) {
+
+			this.calculateInverses();
+
+		} else {
+
+			// handle special case
+
+			if ( bones.length !== boneInverses.length ) {
+
+				console.warn( 'THREE.Skeleton: Number of inverse bone matrices does not match amount of bones.' );
+
+				this.boneInverses = [];
+
+				for ( let i = 0, il = this.bones.length; i < il; i ++ ) {
+
+					this.boneInverses.push( new Matrix4() );
+
+				}
+
+			}
+
+		}
+
+	},
+
 	calculateInverses: function () {
 
-		this.boneInverses = [];
+		this.boneInverses.length = 0;
 
 		for ( let i = 0, il = this.bones.length; i < il; i ++ ) {
 
@@ -56,7 +69,7 @@ Object.assign( Skeleton.prototype, {
 
 			if ( this.bones[ i ] ) {
 
-				inverse.getInverse( this.bones[ i ].matrixWorld );
+				inverse.copy( this.bones[ i ].matrixWorld ).invert();
 
 			}
 
@@ -76,7 +89,7 @@ Object.assign( Skeleton.prototype, {
 
 			if ( bone ) {
 
-				bone.matrixWorld.getInverse( this.boneInverses[ i ] );
+				bone.matrixWorld.copy( this.boneInverses[ i ] ).invert();
 
 			}
 
@@ -92,7 +105,7 @@ Object.assign( Skeleton.prototype, {
 
 				if ( bone.parent && bone.parent.isBone ) {
 
-					bone.matrix.getInverse( bone.parent.matrixWorld );
+					bone.matrix.copy( bone.parent.matrixWorld ).invert();
 					bone.matrix.multiply( bone.matrixWorld );
 
 				} else {
@@ -129,7 +142,7 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-		if ( boneTexture !== undefined ) {
+		if ( boneTexture !== null ) {
 
 			boneTexture.needsUpdate = true;
 
@@ -163,13 +176,71 @@ Object.assign( Skeleton.prototype, {
 
 	dispose: function ( ) {
 
-		if ( this.boneTexture ) {
+		if ( this.boneTexture !== null ) {
 
 			this.boneTexture.dispose();
 
-			this.boneTexture = undefined;
+			this.boneTexture = null;
 
 		}
+
+	},
+
+	fromJSON: function ( json, bones ) {
+
+		this.uuid = json.uuid;
+
+		for ( let i = 0, l = json.bones.length; i < l; i ++ ) {
+
+			const uuid = json.bones[ i ];
+			let bone = bones[ uuid ];
+
+			if ( bone === undefined ) {
+
+				console.warn( 'THREE.Skeleton: No bone found with UUID:', uuid );
+				bone = new Bone();
+
+			}
+
+			this.bones.push( bone );
+			this.boneInverses.push( new Matrix4().fromArray( json.boneInverses[ i ] ) );
+
+		}
+
+		this.init();
+
+		return this;
+
+	},
+
+	toJSON: function () {
+
+		const data = {
+			metadata: {
+				version: 4.5,
+				type: 'Skeleton',
+				generator: 'Skeleton.toJSON'
+			},
+			bones: [],
+			boneInverses: []
+		};
+
+		data.uuid = this.uuid;
+
+		const bones = this.bones;
+		const boneInverses = this.boneInverses;
+
+		for ( let i = 0, l = bones.length; i < l; i ++ ) {
+
+			const bone = bones[ i ];
+			data.bones.push( bone.uuid );
+
+			const boneInverse = boneInverses[ i ];
+			data.boneInverses.push( boneInverse.toArray() );
+
+		}
+
+		return data;
 
 	}
 

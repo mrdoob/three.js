@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.120.1",
+  "version": "0.122.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "module": "build/three.module.js",
@@ -34,7 +34,9 @@
       "@typescript-eslint"
     ],
     "rules": {
-      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/no-unused-vars": [
+        "error"
+      ],
       "@typescript-eslint/indent": [
         "error",
         "tab",
@@ -55,8 +57,7 @@
     "start": "npm run dev",
     "test": "npm run test-lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
-    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"http-server -c-1 -p 8080\"",
-    "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"npm run dev --prefix test\" \"http-server -p 8080\"",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
     "lint-fix": "eslint src --ext js --ext ts --fix && eslint examples/js/ --ext js --ext ts --ignore-pattern libs --fix",
     "lint-docs": "eslint docs --ext html",
     "lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
@@ -88,20 +89,20 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@babel/core": "^7.11.6",
-    "@babel/plugin-proposal-class-properties": "^7.10.4",
-    "@babel/preset-env": "^7.11.5",
-    "@rollup/plugin-babel": "^5.2.1",
-    "@typescript-eslint/eslint-plugin": "^4.0.0",
-    "@typescript-eslint/parser": "^4.0.0",
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
     "concurrently": "^5.3.0",
-    "eslint": "^7.6.0",
+    "@rollup/plugin-babel": "^5.2.1",
+    "@typescript-eslint/eslint-plugin": "^4.6.0",
+    "@typescript-eslint/parser": "^4.6.0",
+    "eslint": "^7.12.1",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-html": "^6.0.3",
-    "http-server": "^0.12.3",
-    "rollup": "^2.28.1",
+    "rollup": "^2.32.1",
     "rollup-plugin-terser": "^7.0.2",
-    "typescript": "^4.0.2"
+    "servez": "^1.11.0",
+    "typescript": "^4.0.5"
   },
   "jspm": {
     "files": [

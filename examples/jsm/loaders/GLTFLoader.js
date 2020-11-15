@@ -72,6 +72,7 @@ var GLTFLoader = ( function () {
 		this.dracoLoader = null;
 		this.ddsLoader = null;
 		this.ktx2Loader = null;
+		this.meshoptDecoder = null;
 
 		this.pluginCallbacks = [];
 
@@ -89,6 +90,12 @@ var GLTFLoader = ( function () {
 
 		this.register( function ( parser ) {
 
+			return new GLTFTextureWebPExtension( parser );
+
+		} );
+
+		this.register( function ( parser ) {
+
 			return new GLTFMaterialsTransmissionExtension( parser );
 
 		} );
@@ -96,6 +103,12 @@ var GLTFLoader = ( function () {
 		this.register( function ( parser ) {
 
 			return new GLTFLightsExtension( parser );
+
+		} );
+
+		this.register( function ( parser ) {
+
+			return new GLTFMeshoptCompression( parser );
 
 		} );
 
@@ -197,6 +210,13 @@ var GLTFLoader = ( function () {
 
 		},
 
+		setMeshoptDecoder: function ( meshoptDecoder ) {
+
+			this.meshoptDecoder = meshoptDecoder;
+			return this;
+
+		},
+
 		register: function ( callback ) {
 
 			if ( this.pluginCallbacks.indexOf( callback ) === - 1 ) {
@@ -272,7 +292,8 @@ var GLTFLoader = ( function () {
 				path: path || this.resourcePath || '',
 				crossOrigin: this.crossOrigin,
 				manager: this.manager,
-				ktx2Loader: this.ktx2Loader
+				ktx2Loader: this.ktx2Loader,
+				meshoptDecoder: this.meshoptDecoder
 
 			} );
 
@@ -397,6 +418,8 @@ var GLTFLoader = ( function () {
 		KHR_TEXTURE_BASISU: 'KHR_texture_basisu',
 		KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
 		KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
+		EXT_TEXTURE_WEBP: 'EXT_texture_webp',
+		EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
 		MSFT_TEXTURE_DDS: 'MSFT_texture_dds'
 	};
 
@@ -731,7 +754,6 @@ var GLTFLoader = ( function () {
 	 * BasisU Texture Extension
 	 *
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_texture_basisu
-	 * (draft PR https://github.com/KhronosGroup/glTF/pull/1751)
 	 */
 	function GLTFTextureBasisUExtension( parser ) {
 
@@ -759,11 +781,157 @@ var GLTFLoader = ( function () {
 
 		if ( ! loader ) {
 
-			throw new Error( 'THREE.GLTFLoader: setKTX2Loader must be called before loading KTX2 textures' );
+			if ( json.extensionsRequired && json.extensionsRequired.indexOf( this.name ) >= 0 ) {
+
+				throw new Error( 'THREE.GLTFLoader: setKTX2Loader must be called before loading KTX2 textures' );
+
+			} else {
+
+				// Assumes that the extension is optional and that a fallback texture is present
+				return null;
+
+			}
 
 		}
 
 		return parser.loadTextureImage( textureIndex, source, loader );
+
+	};
+
+	/**
+	 * WebP Texture Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_texture_webp
+	 */
+	function GLTFTextureWebPExtension( parser ) {
+
+		this.parser = parser;
+		this.name = EXTENSIONS.EXT_TEXTURE_WEBP;
+		this.isSupported = null;
+
+	}
+
+	GLTFTextureWebPExtension.prototype.loadTexture = function ( textureIndex ) {
+
+		var name = this.name;
+		var parser = this.parser;
+		var json = parser.json;
+
+		var textureDef = json.textures[ textureIndex ];
+
+		if ( ! textureDef.extensions || ! textureDef.extensions[ name ] ) {
+
+			return null;
+
+		}
+
+		var extension = textureDef.extensions[ name ];
+		var source = json.images[ extension.source ];
+		var loader = source.uri ? parser.options.manager.getHandler( source.uri ) : parser.textureLoader;
+
+		return this.detectSupport().then( function ( isSupported ) {
+
+			if ( isSupported ) return parser.loadTextureImage( textureIndex, source, loader );
+
+			if ( json.extensionsRequired && json.extensionsRequired.indexOf( name ) >= 0 ) {
+
+				throw new Error( 'THREE.GLTFLoader: WebP required by asset but unsupported.' );
+
+			}
+
+			// Fall back to PNG or JPEG.
+			return parser.loadTexture( textureIndex );
+
+		} );
+
+	};
+
+	GLTFTextureWebPExtension.prototype.detectSupport = function () {
+
+		if ( ! this.isSupported ) {
+
+			this.isSupported = new Promise( function ( resolve ) {
+
+				var image = new Image();
+
+				// Lossy test image. Support for lossy images doesn't guarantee support for all
+				// WebP images, unfortunately.
+				image.src = 'data:image/webp;base64,UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA';
+
+				image.onload = image.onerror = function () {
+
+					resolve( image.height === 1 );
+
+				};
+
+			} );
+
+		}
+
+		return this.isSupported;
+
+	};
+
+	/**
+	* meshopt BufferView Compression Extension
+	*
+	* Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_meshopt_compression
+	*/
+	function GLTFMeshoptCompression( parser ) {
+
+		this.name = EXTENSIONS.EXT_MESHOPT_COMPRESSION;
+		this.parser = parser;
+
+	}
+
+	GLTFMeshoptCompression.prototype.loadBufferView = function ( index ) {
+
+		var json = this.parser.json;
+		var bufferView = json.bufferViews[ index ];
+
+		if ( bufferView.extensions && bufferView.extensions[ this.name ] ) {
+
+			var extensionDef = bufferView.extensions[ this.name ];
+
+			var buffer = this.parser.getDependency( 'buffer', extensionDef.buffer );
+			var decoder = this.parser.options.meshoptDecoder;
+
+			if ( ! decoder || ! decoder.supported ) {
+
+				if ( json.extensionsRequired && json.extensionsRequired.indexOf( this.name ) >= 0 ) {
+
+					throw new Error( 'THREE.GLTFLoader: setMeshoptDecoder must be called before loading compressed files' );
+
+				} else {
+
+					// Assumes that the extension is optional and that fallback buffer data is present
+					return null;
+
+				}
+
+			}
+
+			return Promise.all( [ buffer, decoder.ready ] ).then( function ( res ) {
+
+				var byteOffset = extensionDef.byteOffset || 0;
+				var byteLength = extensionDef.byteLength || 0;
+
+				var count = extensionDef.count;
+				var stride = extensionDef.byteStride;
+
+				var result = new ArrayBuffer( count * stride );
+				var source = new Uint8Array( res[ 0 ], byteOffset, byteLength );
+
+				decoder.decodeGltfBuffer( new Uint8Array( result ), count, stride, source, extensionDef.mode, extensionDef.filter );
+				return result;
+
+			} );
+
+		} else {
+
+			return null;
+
+		}
 
 	};
 
@@ -3088,6 +3256,7 @@ var GLTFLoader = ( function () {
 
 		var parser = this;
 		var json = this.json;
+		var extensions = this.extensions;
 
 		var meshDef = json.meshes[ meshIndex ];
 		var primitives = meshDef.primitives;
@@ -3182,9 +3351,9 @@ var GLTFLoader = ( function () {
 
 				mesh.name = parser.createUniqueName( meshDef.name || ( 'mesh_' + meshIndex ) );
 
-				if ( geometries.length > 1 ) mesh.name += '_' + i;
-
 				assignExtrasToUserData( mesh, meshDef );
+
+				if ( primitive.extensions ) addUnknownExtensionsToUserData( extensions, mesh, primitive );
 
 				parser.assignFinalMaterial( mesh );
 

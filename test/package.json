@@ -8,7 +8,6 @@
   },
   "devDependencies": {
     "failonlyreporter": "^1.0.0",
-    "image-output": "^2.4.2",
     "jimp": "^0.12.0",
     "pixelmatch": "^5.2.0",
     "puppeteer": "3.1.0",

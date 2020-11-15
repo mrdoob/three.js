@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Community Help and Support
+  - name: Help and Support
     url: https://discourse.threejs.org/
-    about: This issue tracker is not for support questions. If you need help, please use the forum.
+    about: Please use the forum if you have questions or need help.

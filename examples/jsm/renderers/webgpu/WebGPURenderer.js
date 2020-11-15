@@ -66,7 +66,7 @@ class WebGPURenderer {
 
 		// public
 
-		this.domElement = ( parameters.canvas !== undefined ) ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
+		this.domElement = ( parameters.canvas !== undefined ) ? parameters.canvas : this._createCanvasElement();
 
 		this.autoClear = true;
 		this.autoClearColor = true;
@@ -694,6 +694,9 @@ class WebGPURenderer {
 
 			const renderItem = renderList[ i ];
 
+			// @TODO: Add support for multiple materials per object. This will require to extract
+			// the material from the renderItem object and pass it with its group data to _renderObject().
+
 			const object = renderItem.object;
 
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
@@ -867,6 +870,14 @@ class WebGPURenderer {
 			} );
 
 		}
+
+	}
+
+	_createCanvasElement() {
+
+		const canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
+		canvas.style.display = 'block';
+		return canvas;
 
 	}
 

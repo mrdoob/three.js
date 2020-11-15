@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,9 +16,9 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var box = new THREE.Box3();
+		const box = new THREE.Box3();
 
-		var mesh = new THREE.Mesh(
+		const mesh = new THREE.Mesh(
 			new THREE.SphereBufferGeometry(),
 			new THREE.MeshBasicMaterial()
 		);
@@ -135,11 +134,11 @@
 		扩展这个包围盒的边界使得该点（[page:Vector3 point]）在包围盒内。
 		</p>
 
-		<h3>[method:this expandByScalar]( [param:float scalar] )</h3>
+		<h3>[method:this expandByScalar]( [param:Float scalar] )</h3>
 		<p>
-		[page:float scalar] - 扩展包围盒的比例。<br /><br />
+		[page:Float scalar] - 扩展包围盒的比例。<br /><br />
 
-		按 [page:float scalar] 的值展开盒子的每个维度。如果是负数，盒子的尺寸会缩小。
+		按 [page:Float scalar] 的值展开盒子的每个维度。如果是负数，盒子的尺寸会缩小。
 		</p>
 
 		<h3>[method:this expandByVector]( [param:Vector3 vector] )</h3>

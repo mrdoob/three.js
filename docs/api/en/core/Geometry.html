@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -24,7 +23,7 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var geometry = new THREE.Geometry();
+		const geometry = new THREE.Geometry();
 
 		geometry.vertices.push(
 			new THREE.Vector3( -10,  10, 0 ),
@@ -102,7 +101,7 @@
 		<h3>[property:Integer id]</h3>
 		<p>Unique number for this geometry instance.</p>
 
-		<h3>[property:array lineDistances]</h3>
+		<h3>[property:Array lineDistances]</h3>
 		<p>
 		An array containing distances between vertices for Line geometries.
 		This is required for [page:LineDashedMaterial] to render correctly.

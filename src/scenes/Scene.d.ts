@@ -68,6 +68,5 @@ export class Scene extends Object3D {
 	) => void;
 
 	toJSON( meta?: any ): any;
-	dispose(): void;
 
 }

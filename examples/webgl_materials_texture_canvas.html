@@ -29,8 +29,8 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer, mesh, material;
-			var drawStartPos = new THREE.Vector2();
+			let camera, scene, renderer, mesh, material;
+			const drawStartPos = new THREE.Vector2();
 
 			init();
 			setupCanvasDrawing();
@@ -63,8 +63,8 @@
 
 				// get canvas and context
 
-				var drawingCanvas = document.getElementById( 'drawing-canvas' );
-				var drawingContext = drawingCanvas.getContext( '2d' );
+				const drawingCanvas = document.getElementById( 'drawing-canvas' );
+				const drawingContext = drawingCanvas.getContext( '2d' );
 
 				// draw white background
 
@@ -77,7 +77,7 @@
 
 				// set the variable to keep track of when to draw
 
-				var paint = false;
+				let paint = false;
 
 				// add canvas event listeners
 				drawingCanvas.addEventListener( 'pointerdown', function ( e ) {

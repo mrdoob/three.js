@@ -399,6 +399,9 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
 
+							// skip command if start point == end point
+							if ( numbers[ j + 5 ] == point.x && numbers[ j + 6 ] == point.y ) continue;
+
 							var start = point.clone();
 							point.x = numbers[ j + 5 ];
 							point.y = numbers[ j + 6 ];
@@ -588,6 +591,9 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
 
+							// skip command if no displacement
+							if ( numbers[ j + 5 ] == 0 && numbers[ j + 6 ] == 0 ) continue;
+
 							var start = point.clone();
 							point.x += numbers[ j + 5 ];
 							point.y += numbers[ j + 6 ];
@@ -671,6 +677,14 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		 */
 
 		function parseArcCommand( path, rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, start, end ) {
+
+			if ( rx == 0 || ry == 0 ) {
+
+				// draw a line if either of the radii == 0
+				path.lineTo( end.x, end.y );
+				return;
+
+			}
 
 			x_axis_rotation = x_axis_rotation * Math.PI / 180;
 
