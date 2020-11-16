@@ -129,6 +129,7 @@
 		"webgl_loader_vrml",
 		"webgl_loader_vtk",
 		"webgl_loader_x",
+		"webgl_loader_xyz",
 		"webgl_lod",
 		"webgl_marchingcubes",
 		"webgl_materials",
