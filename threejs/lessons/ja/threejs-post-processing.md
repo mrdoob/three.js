@@ -18,7 +18,7 @@ Three.jsには、ポストプロセスのパイプラインを設定するサン
 最後のレンダリングでポストプロセス結果をキャンバスにレンダリングします。
 
 `EffectComposer` 関数がどのようなものか理解するのは少し重要です。
-ここでは2つの[レンダーターゲット](threejs-renderertargets.html)を作成します。
+ここでは2つの[レンダーターゲット](threejs-rendertargets.html)を作成します。
 これを**rtA**と**rtB**と呼ぶ事にしましょう。
 
 次に `EffectComposer.addPass` を呼び出し、それぞれのPassに適用したい順番で追加します。
@@ -287,4 +287,4 @@ WebGL自体がどのように動作するかを知りたいならば、[これ�
 
 残念ながらThree.jsレポートにあるほとんどのポストプロセスエフェクトは文書化されていないので、使用するには[この例](https://github.com/mrdoob/three.js/tree/master/examples)か
 [エフェクト自体のコード](https://github.com/mrdoob/three.js/tree/master/examples/js/postprocessing)を読んで下さい。
-これらのシンプルな例と[レンダーターゲット](threejs-renderertargets.html)の記事がポストプロセスを始めるのに十分な知識を提供してくれると思います。
+これらのシンプルな例と[レンダーターゲット](threejs-rendertargets.html)の記事がポストプロセスを始めるのに十分な知識を提供してくれると思います。

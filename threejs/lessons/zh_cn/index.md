@@ -1,6 +1,6 @@
-Title: Three.js基础
+Title: Three.js 基础
 
-帮助学习Three.js的系列文章.
+帮助学习 Three.js 的系列文章。
 
 {{{include "threejs/lessons/toc.html"}}}
 
