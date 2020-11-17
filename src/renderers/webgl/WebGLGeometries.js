@@ -224,19 +224,23 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 	function dispose() {
 
-		weakRefGeometries.forEach( handle => {
+		if ( useWeakRef ) {
 
-			const geometry = handle.deref();
-			if ( geometry ) {
+			weakRefGeometries.forEach( handle => {
 
-				onGeometryDispose( { target: geometry } );
+				const geometry = handle.deref();
+				if ( geometry ) {
 
-			}
+					onGeometryDispose( { target: geometry } );
 
-		} );
-		weakRefGeometries.clear();
+				}
+
+			} );
+			weakRefGeometries.clear();
+
+		}
+
 		geometries.clear();
-
 
 	}
 
