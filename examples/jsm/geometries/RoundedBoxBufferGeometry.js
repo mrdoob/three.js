@@ -122,7 +122,7 @@ class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 				case 3: // bottom
 
 					// generate UVs along X then Z
-					faceDirVector.set( 0, -1, 0 );
+					faceDirVector.set( 0, - 1, 0 );
 					uvs[ j + 0 ] = 1.0 - getUv( faceDirVector, normal, 'x', 'z', radius, width );
 					uvs[ j + 1 ] = 1.0 - getUv( faceDirVector, normal, 'z', 'x', radius, depth );
 					break;
