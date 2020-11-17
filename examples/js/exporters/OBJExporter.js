@@ -290,7 +290,7 @@ THREE.OBJExporter.prototype = {
 
 			} else {
 
-				console.warn( 'THREE.OBJExporter.parseLine(): geometry type unsupported', geometry );
+				console.warn( 'THREE.OBJExporter.parsePoints(): geometry type unsupported', geometry );
 
 			}
 
