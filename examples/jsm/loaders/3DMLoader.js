@@ -1303,7 +1303,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		if ( curve instanceof rhino.ArcCurve ) {
 
 			pointCount = Math.floor( curve.angleDegrees / 5 );
-			pointCount = pointCount < 1 ? 2 : pointCount;
+			pointCount = pointCount < 2 ? 2 : pointCount;
 			// alternative to this hardcoded version: https://stackoverflow.com/a/18499923/2179399
 
 		}
