@@ -391,7 +391,10 @@ var OBJLoader = ( function () {
 
 				for ( var vi = 0, l = vertices.length; vi < l; vi ++ ) {
 
-					this.addVertexPoint( this.parseVertexIndex( vertices[ vi ], vLen ) );
+					var index = this.parseVertexIndex( vertices[ vi ], vLen );
+
+					this.addVertexPoint( index );
+					this.addColor( index );
 
 				}
 
@@ -740,7 +743,11 @@ var OBJLoader = ( function () {
 
 				buffergeometry.setAttribute( 'position', new Float32BufferAttribute( geometry.vertices, 3 ) );
 
-				buffergeometry.setAttribute( 'normal', new Float32BufferAttribute( geometry.normals, 3 ) );
+				if ( geometry.normals.length > 0 ) {
+
+					buffergeometry.setAttribute( 'normal', new Float32BufferAttribute( geometry.normals, 3 ) );
+
+				}
 
 				if ( geometry.colors.length > 0 ) {
 

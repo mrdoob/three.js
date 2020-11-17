@@ -375,7 +375,10 @@ THREE.OBJLoader = ( function () {
 
 				for ( var vi = 0, l = vertices.length; vi < l; vi ++ ) {
 
-					this.addVertexPoint( this.parseVertexIndex( vertices[ vi ], vLen ) );
+					var index = this.parseVertexIndex( vertices[ vi ], vLen );
+
+					this.addVertexPoint( index );
+					this.addColor( index );
 
 				}
 
@@ -724,7 +727,11 @@ THREE.OBJLoader = ( function () {
 
 				buffergeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( geometry.vertices, 3 ) );
 
-				buffergeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( geometry.normals, 3 ) );
+				if ( geometry.normals.length > 0 ) {
+
+					buffergeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( geometry.normals, 3 ) );
+
+				}
 
 				if ( geometry.colors.length > 0 ) {
 
