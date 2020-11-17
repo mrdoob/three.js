@@ -58,7 +58,7 @@
 				];
 
 				const boxGeometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1 );
-				const boxMaterial = new THREE.MeshBasicMaterial( 0x99ff99 );
+				const boxMaterial = new THREE.MeshBasicMaterial( { color: 0x99ff99 } );
 
 				for ( const handlePos of initialPoints ) {
 
@@ -116,9 +116,7 @@
 
 					geometry.rotateX( Math.PI );
 
-					const material = new THREE.MeshStandardMaterial( {
-						color: 0x99ffff
-					} );
+					const material = new THREE.MeshNormalMaterial();
 
 					const objectToCurve = new THREE.Mesh( geometry, material );
 
