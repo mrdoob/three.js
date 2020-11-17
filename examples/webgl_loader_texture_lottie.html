@@ -44,7 +44,7 @@
 
 					// texture = new THREE.TextureLoader().load( 'textures/uv_grid_directx.jpg' );
 
-					const geometry = new RoundedBoxBufferGeometry( 1, 1, 1, 15, 0.2 );
+					const geometry = new RoundedBoxBufferGeometry( 1, 1, 1, 7, 0.2 );
 					const material = new THREE.MeshStandardMaterial( { roughness: 0.1, map: texture } );
 					mesh = new THREE.Mesh( geometry, material );
 					scene.add( mesh );

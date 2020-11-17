@@ -119,6 +119,7 @@ export function modifyShader( material, uniforms, numberOfCurves = 1 ) {
 		Object.assign( shader.uniforms, uniforms );
 
 		const vertexShader = `
+		#define USE_ENVMAP
 		uniform sampler2D spineTexture;
 		uniform float pathOffset;
 		uniform float pathSegment;

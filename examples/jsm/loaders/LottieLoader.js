@@ -25,6 +25,7 @@ LottieLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		const quality = this._quality || 1;
 
 		const texture = new CanvasTexture();
+		texture.anisotropy = 16;
 
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );

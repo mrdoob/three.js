@@ -4,6 +4,8 @@ import { Matrix3 } from './Matrix3';
 import { BufferAttribute } from './../core/BufferAttribute';
 import { Vector } from './Vector2';
 
+type Vector4Tuple = [number, number, number, number];
+
 /**
  * 4D vector.
  *
@@ -211,6 +213,7 @@ export class Vector4 implements Vector {
 	 * @return The created or provided array.
 	 */
 	toArray( array?: number[], offset?: number ): number[];
+	toArray( array?: Vector4Tuple, offset?: 0 ): Vector4Tuple;
 
 	/**
 	 * Copies x, y, z and w into the provided array-like.
