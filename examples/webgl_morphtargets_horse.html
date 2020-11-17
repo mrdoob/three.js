@@ -50,7 +50,6 @@
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 300;
-				camera.target = new THREE.Vector3( 0, 150, 0 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
@@ -126,7 +125,7 @@
 				camera.position.x = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
 				camera.position.z = radius * Math.cos( THREE.MathUtils.degToRad( theta ) );
 
-				camera.lookAt( camera.target );
+				camera.lookAt( 0, 150, 0 );
 
 				if ( mixer ) {
 
