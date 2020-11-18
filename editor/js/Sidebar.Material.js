@@ -24,7 +24,8 @@ var materialClasses = {
 	'RawShaderMaterial': THREE.RawShaderMaterial,
 	'ShaderMaterial': THREE.ShaderMaterial,
 	'ShadowMaterial': THREE.ShadowMaterial,
-	'SpriteMaterial': THREE.SpriteMaterial
+	'SpriteMaterial': THREE.SpriteMaterial,
+	'PointsMaterial': THREE.PointsMaterial
 };
 
 function SidebarMaterial( editor ) {
@@ -75,7 +76,8 @@ function SidebarMaterial( editor ) {
 		'RawShaderMaterial': 'RawShaderMaterial',
 		'ShaderMaterial': 'ShaderMaterial',
 		'ShadowMaterial': 'ShadowMaterial',
-		'SpriteMaterial': 'SpriteMaterial'
+		'SpriteMaterial': 'SpriteMaterial',
+		'PointsMaterial': 'PointsMaterial'
 
 	} ).setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
 
@@ -500,6 +502,26 @@ function SidebarMaterial( editor ) {
 	materialSideRow.add( materialSide );
 
 	container.add( materialSideRow );
+
+	// size
+
+	var materialSizeRow = new UIRow();
+	var materialSize = new UINumber( 1 ).setWidth( '60px' ).setRange( 0, Infinity ).onChange( update );
+
+	materialSizeRow.add( new UIText( strings.getKey( 'sidebar/material/size' ) ).setWidth( '90px' ) );
+	materialSizeRow.add( materialSize );
+
+	container.add( materialSizeRow );
+
+	// sizeAttenuation
+
+	var materialSizeAttenuationRow = new UIRow();
+	var materialSizeAttenuation = new UICheckbox( true ).onChange( update );
+
+	materialSizeAttenuationRow.add( new UIText( strings.getKey( 'sidebar/material/sizeAttenuation' ) ).setWidth( '90px' ) );
+	materialSizeAttenuationRow.add( materialSizeAttenuation );
+
+	container.add( materialSizeAttenuationRow );
 
 	// shading
 
@@ -1120,6 +1142,28 @@ function SidebarMaterial( editor ) {
 
 			}
 
+			if ( material.size !== undefined ) {
+
+				var size = materialSize.getValue();
+				if ( material.size !== size ) {
+
+					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'size', size, currentMaterialSlot ) );
+
+				}
+
+			}
+
+			if ( material.sizeAttenuation !== undefined ) {
+
+				var sizeAttenuation = materialSizeAttenuation.getValue();
+				if ( material.sizeAttenuation !== sizeAttenuation ) {
+
+					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'sizeAttenuation', sizeAttenuation, currentMaterialSlot ) );
+
+				}
+
+			}
+
 			if ( material.flatShading !== undefined ) {
 
 				var flatShading = materialShading.getValue();
@@ -1248,6 +1292,8 @@ function SidebarMaterial( editor ) {
 			'emissiveMap': materialEmissiveMapRow,
 			'gradientMap': materialGradientMapRow,
 			'side': materialSideRow,
+			'size': materialSize,
+			'sizeAttenuation': materialSizeAttenuation,
 			'flatShading': materialShadingRow,
 			'blending': materialBlendingRow,
 			'opacity': materialOpacityRow,
@@ -1599,6 +1645,18 @@ function SidebarMaterial( editor ) {
 		if ( material.side !== undefined ) {
 
 			materialSide.setValue( material.side );
+
+		}
+
+		if ( material.size !== undefined ) {
+
+			materialSize.setValue( material.size );
+
+		}
+
+		if ( material.sizeAttenuation !== undefined ) {
+
+			materialSizeAttenuation.setValue( material.sizeAttenuation );
 
 		}
 
