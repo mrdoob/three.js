@@ -54,7 +54,7 @@ PLYLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
-		loader.load( url, function ( text ) {
+		var request = loader.load( url, function ( text ) {
 
 			try {
 
@@ -78,6 +78,7 @@ PLYLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
+		return request;
 	},
 
 	setPropertyNameMapping: function ( mapping ) {

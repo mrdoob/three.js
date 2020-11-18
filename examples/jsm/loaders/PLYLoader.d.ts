@@ -10,7 +10,7 @@ export class PLYLoader extends Loader {
 	constructor( manager?: LoadingManager );
 	propertyNameMapping: object;
 
-	load( url: string, onLoad: ( geometry: BufferGeometry ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
+	load( url: string, onLoad: ( geometry: BufferGeometry ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : XMLHttpRequest;
 	setPropertyNameMapping( mapping: object ) : void;
 	parse( data: ArrayBuffer | string ) : BufferGeometry;
 
