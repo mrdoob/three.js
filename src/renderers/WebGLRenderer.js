@@ -1411,6 +1411,12 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		if ( material.skinning ) {
+
+			materialProperties.maxBones = parameters.maxBones;
+
+		}
+
 		const progUniforms = materialProperties.program.getUniforms();
 		const uniformsList = WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
 
@@ -1474,6 +1480,10 @@ function WebGLRenderer( parameters ) {
 				initMaterial( material, scene, object );
 
 			} else if ( materialProperties.envMap !== envMap ) {
+
+				initMaterial( material, scene, object );
+
+			} else if ( object.isSkinnedMesh && material.skinning && materialProperties.maxBones < object.skeleton.bones.size ) {
 
 				initMaterial( material, scene, object );
 
