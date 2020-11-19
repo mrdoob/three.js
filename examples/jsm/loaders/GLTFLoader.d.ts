@@ -4,8 +4,10 @@ import {
 	Group,
 	Loader,
 	LoadingManager,
+	Mesh,
 	Object3D,
 	Material,
+	SkinnedMesh,
 	Texture
 } from '../../../src/Three';
 
@@ -38,6 +40,10 @@ export class GLTFLoader extends Loader {
 	load( url: string, onLoad: ( gltf: GLTF ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
 	setDRACOLoader( dracoLoader: DRACOLoader ): GLTFLoader;
 	setDDSLoader( ddsLoader: DDSLoader ): GLTFLoader;
+
+	register( callback: ( parser: GLTFParser ) => GLTFLoaderPlugin ): GLTFLoader;
+	unregister( callback: ( parser: GLTFParser ) => GLTFLoaderPlugin ): GLTFLoader;
+
 	parse( data: ArrayBuffer | string, path: string, onLoad: ( gltf: GLTF ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
 
 }
@@ -55,5 +61,18 @@ export class GLTFParser {
 
 	getDependency: ( type: string, index: number ) => Promise<any>;
 	getDependencies: ( type: string ) => Promise<any[]>;
+
+}
+
+export interface GLTFLoaderPlugin {
+
+	_markDefs?: () => void;
+	loadMesh?: ( meshIndex: number ) => Promise<Group | Mesh | SkinnedMesh> | null;
+	loadBufferView?: ( bufferViewIndex: number ) => Promise<ArrayBuffer> | null;
+	loadMaterial?: ( materialIndex: number ) => Promise<Material> | null;
+	loadTexture?: ( textureIndex: number ) => Promise<Texture> | null;
+	getMaterialType?: ( materialIndex: number ) => typeof Material | null;
+	extendMaterialParams?: ( materialIndex: number, materialParams: { [ key: string ]: any } ) => Promise<void> | null;
+	createNodeAttachment?: ( nodeIndex: number ) => Promise<Object3D> | null;
 
 }
