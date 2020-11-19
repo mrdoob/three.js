@@ -60,26 +60,7 @@ function SidebarMaterial( editor ) {
 	// type
 
 	var materialClassRow = new UIRow();
-	var materialClass = new UISelect().setOptions( {
-
-		'LineBasicMaterial': 'LineBasicMaterial',
-		'LineDashedMaterial': 'LineDashedMaterial',
-		'MeshBasicMaterial': 'MeshBasicMaterial',
-		'MeshDepthMaterial': 'MeshDepthMaterial',
-		'MeshNormalMaterial': 'MeshNormalMaterial',
-		'MeshLambertMaterial': 'MeshLambertMaterial',
-		'MeshMatcapMaterial': 'MeshMatcapMaterial',
-		'MeshPhongMaterial': 'MeshPhongMaterial',
-		'MeshToonMaterial': 'MeshToonMaterial',
-		'MeshStandardMaterial': 'MeshStandardMaterial',
-		'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
-		'RawShaderMaterial': 'RawShaderMaterial',
-		'ShaderMaterial': 'ShaderMaterial',
-		'ShadowMaterial': 'ShadowMaterial',
-		'SpriteMaterial': 'SpriteMaterial',
-		'PointsMaterial': 'PointsMaterial'
-
-	} ).setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
+	var materialClass = new UISelect().setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
 
 	materialClassRow.add( new UIText( strings.getKey( 'sidebar/material/type' ) ).setWidth( '90px' ) );
 	materialClassRow.add( materialClass );
@@ -1365,7 +1346,26 @@ function SidebarMaterial( editor ) {
 
 		}
 
+		if ( currentObject.isMesh ) {
+
+			materialClass.setOptions( meshMaterialOptions );
+
+		} else if ( currentObject.isSprite ) {
+
+			materialClass.setOptions( spriteMaterialOptions );
+
+		} else if ( currentObject.isPoints ) {
+
+			materialClass.setOptions( pointsMaterialOptions );
+
+		} else if ( currentObject.isLine ) {
+
+			lineMaterialOptions.setOptions( lineMaterialOptions );
+
+		}
+
 		materialClass.setValue( material.type );
+
 
 		if ( material.color !== undefined ) {
 
@@ -1758,6 +1758,40 @@ function SidebarMaterial( editor ) {
 		'uniform mat4 modelViewMatrix;\n',
 		'attribute vec3 position;\n\n',
 	].join( '\n' );
+
+	var meshMaterialOptions = {
+		'MeshBasicMaterial': 'MeshBasicMaterial',
+		'MeshDepthMaterial': 'MeshDepthMaterial',
+		'MeshNormalMaterial': 'MeshNormalMaterial',
+		'MeshLambertMaterial': 'MeshLambertMaterial',
+		'MeshMatcapMaterial': 'MeshMatcapMaterial',
+		'MeshPhongMaterial': 'MeshPhongMaterial',
+		'MeshToonMaterial': 'MeshToonMaterial',
+		'MeshStandardMaterial': 'MeshStandardMaterial',
+		'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
+		'RawShaderMaterial': 'RawShaderMaterial',
+		'ShaderMaterial': 'ShaderMaterial',
+		'ShadowMaterial': 'ShadowMaterial'
+	};
+
+	var lineMaterialOptions = {
+		'LineBasicMaterial': 'LineBasicMaterial',
+		'LineDashedMaterial': 'LineDashedMaterial',
+		'RawShaderMaterial': 'RawShaderMaterial',
+		'ShaderMaterial': 'ShaderMaterial'
+	};
+
+	var spriteMaterialOptions = {
+		'SpriteMaterial': 'SpriteMaterial',
+		'RawShaderMaterial': 'RawShaderMaterial',
+		'ShaderMaterial': 'ShaderMaterial'
+	};
+
+	var pointsMaterialOptions = {
+		'PointsMaterial': 'PointsMaterial',
+		'RawShaderMaterial': 'RawShaderMaterial',
+		'ShaderMaterial': 'ShaderMaterial'
+	};
 
 	return container;
 
