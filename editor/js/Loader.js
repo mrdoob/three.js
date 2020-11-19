@@ -187,12 +187,27 @@ function Loader( editor ) {
 					loader.setDecoderPath( '../examples/js/libs/draco/' );
 					loader.decodeDracoFile( contents, function ( geometry ) {
 
-						var material = new THREE.MeshStandardMaterial();
+						var object;
 
-						var mesh = new THREE.Mesh( geometry, material );
-						mesh.name = filename;
+						if ( geometry.index !== null ) {
 
-						editor.execute( new AddObjectCommand( editor, mesh ) );
+							var material = new THREE.MeshStandardMaterial();
+
+							object = new THREE.Mesh( geometry, material );
+							object.name = filename;
+
+						} else {
+
+							var material = new THREE.PointsMaterial( { size: 0.01 } );
+
+							if ( geometry.getAttribute( 'color' ) !== undefined ) material.vertexColors = true;
+
+							object = new THREE.Points( geometry, material );
+							object.name = filename;
+
+						}
+
+						editor.execute( new AddObjectCommand( editor, object ) );
 
 					} );
 
