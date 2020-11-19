@@ -146,6 +146,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </div>
 </div>
 </body>
+<script>
+const settings = {
+  contribTemplate: {{{stringify names="langInfo.contribTemplate,originalLangInfo.contribTemplate"}}},
+  owner: {{{stringify names="settings.owner"}}},
+  repo: {{{stringify names="settings.repo"}}},
+};
+</script>
+<script src="/contributors.js"></script>
 <script src="/3rdparty/jquery-3.3.1.slim.min.js"></script>
 <script src="/threejs/lessons/resources/prettify.js"></script>
 <script src="/threejs/lessons/resources/lesson.js"></script>

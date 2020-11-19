@@ -134,6 +134,8 @@ module.exports = function(grunt) {
     siteName: 'ThreeJSFundamentals',
     siteThumbnail: 'threejsfundamentals.jpg',  // in rootFolder/lessons/resources
     templatePath: 'build/templates',
+    owner: 'gfxfundamentals',
+    repo: 'threejsfundamentals',
     thumbnailOptions: {
       thumbnailBackground: 'threejsfundamentals-background.jpg',
       text: [

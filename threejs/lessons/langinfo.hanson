@@ -18,11 +18,12 @@
     </div>
   `,
   missing: `
-     Sorry this article has not been translated yet. 
+     Sorry this article has not been translated yet.
      [Translations Welcome](https://github.com/gfxfundamentals/threejsfundamentals)! 😄
      
      [Here's the original English article for now]({{{origLink}}}).
   `,
+  contribTemplate: 'Thank you <a href="${html_url}"><img src="${avatar_url}"> ${login}</a><br>for <a href="https://github.com/${owner}/${repo}/commits?author=${login}">${contributions} contributions</a>',
   toc: 'Table of Contents',
   categoryMapping: {
     'basics': 'Basics',

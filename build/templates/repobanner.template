@@ -1,30 +1,39 @@
 <style>
-#forkongithub a {
+#forkongithub>div {
     background: #000;
     color: #fff;
-    text-decoration: none;
     font-family: arial,sans-serif;
     text-align: center;
     font-weight: bold;
     padding: 5px 40px;
     font-size: 0.9rem;
-    line-height: 2rem;
+    line-height: 1.3rem;
     position: relative;
     transition: 0.5s;
     display: block;
-    width: 300px;
+    width: 400px;
     position: absolute;
     top: 0;
     right: 0;
-    transform: translateX(150px) rotate(45deg) translate(10px,70px);
+    transform: translateX(200px) rotate(45deg) translate(10px,70px);
     box-shadow: 4px 4px 10px rgba(0,0,0,0.8);
     pointer-events: auto;
 }
-#forkongithub a:hover {
+#forkongithub a {
+  text-decoration: none;
+  color: #fff;
+}
+#forkongithub>div:hover {
     background: #c11;
     color: #fff;
 }
-#forkongithub a::before,#forkongithub a::after {
+#forkongithub .contributors {
+  font-size: 0.75rem;
+  background: rgba(255,255,255,0.2);
+  line-height: 1.2;
+  padding: 0.1em;
+}
+#forkongithub>div::before,#forkongithub>div::after {
     content: "";
     width: 100%;
     display: block;
@@ -34,7 +43,7 @@
     height: 1px;
     background: #fff;
 }
-#forkongithub a::after {
+#forkongithub>div::after {
     bottom: 1px;
     top: auto;
 }
@@ -55,8 +64,15 @@
   height: 1em;
   vertical-align: middle;
 }
+#forkongithub img {
+  width: 1em;
+  height: 1em;
+  border-radius: 100%;
+  vertical-align: middle;
+}
+
 @media (max-width: 900px) {
-    #forkongithub a{
+    #forkongithub>div {
         line-height: 1.2rem;
     }
 }
@@ -66,11 +82,11 @@
   }
 }
 @media (max-width: 410px) {
-    #forkongithub a{
+    #forkongithub>div {
         font-size: 0.7rem;
         transform: translateX(150px) rotate(45deg) translate(20px,40px);
     }
 }
 
 </style>
-<div id="forkongithub"><a href="https://github.com/gfxfundamentals/threejsfundamentals">Fix, Fork, Contribute {{{include "build/templates/octocat-icon.svg"}}}</a></div>
+<div id="forkongithub"><div><div><a href="https://github.com/gfxfundamentals/threejsfundamentals">Fix, Fork, Contribute {{{include "build/templates/octocat-icon.svg"}}}</a></div></div></div>

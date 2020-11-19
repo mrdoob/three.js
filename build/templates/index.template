@@ -107,6 +107,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 {{{include "build/templates/repobanner.template"}}}
 <iframe class="background" src="/threejs/background.html"></iframe>
 </body>
+<script>
+const settings = {
+  contribTemplate: {{{stringify names="langInfo.contribTemplate,originalLangInfo.contribTemplate"}}},
+  owner: {{{stringify names="settings.owner"}}},
+  repo: {{{stringify names="settings.repo"}}},
+};
+</script>
+<script src="/contributors.js"></script>
 <script src="/3rdparty/jquery-3.3.1.slim.min.js"></script>
 <script src="/threejs/lessons/resources/lesson.js"></script>
 {{{include "build/templates/analytics.template" }}}
