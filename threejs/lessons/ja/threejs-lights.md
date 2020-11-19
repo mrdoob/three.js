@@ -7,10 +7,10 @@ TOC: ライト
 まだ読んでいない場合は、Three.jsの基礎知識や[セットアップ](threejs-setup.html)から始めると良いと思います。
 前回の記事は[テクスチャ](threejs-textures.html)でした。
 
-今回は色々な種類のライトの使い方を3つに分けて見ていきましょう。
+今回はthree.jsの色々な種類のライトの使い方を確認していきます。
 
-前回のサンプルからカメラ設定を修正しましょう。
-視野を45度にして、平面のfarを100ユニット、カメラを10ユニット上に移動して20ユニットを原点にします。
+前回のサンプルコードからカメラの設定を修正しましょう。
+視野角(fov)を45度にし、遠平面(far)を100、カメラを原点からY座標に10、Z座標を20にします。
 
 ```js
 *const fov = 45;
@@ -30,7 +30,7 @@ import * as THREE from './resources/three/r122/build/three.module.js';
 +import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
 ```
 
-これでOrbitControlsを使う事ができます。
+これでOrbitControlsを利用できます。
 `OrbitControls` にカメラと入力イベントを取得するDOM要素を渡します。
 
 ```js
@@ -39,7 +39,7 @@ controls.target.set(0, 5, 0);
 controls.update();
 ```
 
-controls.targetを原点から5ユニット上に設定し、`controls.update` を呼びます。
+controls.targetのY座標を5にして `controls.update` を呼び出します。
 
 次はライトアップするオブジェクトを作ってみましょう。
 まずは地上となる平面を作ります。
@@ -52,9 +52,9 @@ controls.targetを原点から5ユニット上に設定し、`controls.update` �
   ">
 </div>
 
-最初にテクスチャを読み込み、何回テクスチャのリピートを繰り返すかとフィルターにnearestを設定します。
+最初にテクスチャを読み込み、何回テクスチャのリピートを繰り返すかを設定し、フィルターはニアレスト(nearest)にします。
 テクスチャは2 x 2ピクセルのチェッカーボードです。
-リピートは平面の半分の大きさで、チェッカーボードのチェック部分は1ユニットの大きさにします。
+テクスチャのリピートは平面の半分の大きさにし、チェッカーボードの1つのチェック部分は1にします。
 
 ```js
 const planeSize = 40;
@@ -69,7 +69,7 @@ texture.repeat.set(repeats, repeats);
 ```
 
 平面のジオメトリとマテリアルを作り、それを元にシーンに追加するメッシュを作ります。
-平面のデフォルトはXY平面なので、XZ平面になるように回転します。
+平面のデフォルトは縦向きなので横向きになるように回転します。
 
 ```js
 const planeGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
@@ -82,7 +82,7 @@ mesh.rotation.x = Math.PI * -.5;
 scene.add(mesh);
 ```
 
-キューブと球体を加えて、平面を含め3つのオブジェクトをライティングする予定です。
+キューブと球体を追加し、平面を含めて3つのオブジェクトをライティングします。
 
 ```js
 {
@@ -118,11 +118,11 @@ const light = new THREE.AmbientLight(color, intensity);
 scene.add(light);
 ```
 
-ライトのパラメーターを調整できるようにしましょう。
+ライトのパラメーターを調整できるようにします。
 今回も[dat.GUI](https://github.com/dataarts/dat.gui)を使います。
 dat.GUIで色を調整するにはヘルパーが必要です。
 プロパティをdat.GUIにCSSの16進数の形で表示します(例: `#FF8844`)。
-ヘルパーは名前付きプロパティから色を取得し、16進数の文字列に変換してからdat.GUIに渡します。dat.GUIがヘルパーのプロパティを設定し、結果はライトの色に戻ります。
+ヘルパーは名前付きプロパティから色を取得し、16進数の文字列に変換してdat.GUIに渡します。dat.GUIがヘルパーのプロパティを設定し、結果をライトの色に戻します。
 
 これがヘルパーです。
 
@@ -155,19 +155,19 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 
 シーンをクリックしてドラッグして、カメラを*軌道*に乗せます。
 
-明確でない事に注意して下さい。形状は平面です。
-`AmbientLight` は、マテリアルの色にライトの色の強度を掛けたものです。
+環境光源だけでは正しくライティング表現できてません。キューブと球体に陰影がなく形状が平面に見えます。
+以下のように `AmbientLight` はマテリアルの色とライトの色、ライトの強度(intensity)を掛けてます。
 
     color = materialColor * light.color * light.intensity;
 
-それだけで方向性はないです。
-この環境光源は、100％均一でシーン内の全ての色を変える以外は*ライティング*としてはあまり役に立ちません。
-環境光源が役立つのは暗すぎない暗さを作る事です。
+それだけで方向性がないです。
+この環境光源は100％均一でシーン内の全ての色を変える以外は*ライティング*としてはあまり役に立ちません。
+環境光源は暗すぎない暗さを作る事ができます。
 
 ## `HemisphereLight（半球光源）`
 
 コードを `HemisphereLight` に切り替えてみましょう。
-`HemisphereLight` は空の色と地面の色を取得し、その2色の間にマテリアルの色を掛け合わせます。
+`HemisphereLight` は空と地面の色を取得し、その2色とマテリアルの色を掛け合わせます。
 
 これが新しいコードです。
 
@@ -195,8 +195,8 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 
 {{{example url="../threejs-lights-hemisphere.html" }}}
 
-まだ明確でなく、全てが平面に見える事に注意して下さい。
-別のライトと組み合わせて使用される `HemisphereLight` は、空や地面の色に良い影響を与えるのに役立ちます。
+まだ正しくライティング表現ができてなく、キューブと球体が平面に見えます。
+別のライトと組み合わせて使用される `HemisphereLight` は、空や地面の色に良い影響を与えます。
 この方法では他のライトと組み合わせて使うか、`HemisphereLight` を代わりに使うのがベストです。
 
 ## `DirectionalLight（平行光源）`
@@ -215,7 +215,7 @@ scene.add(light.target);
 ```
 
 シーンに `light` と `light.target` を追加する必要があります。
-three.jsの `DirectionalLight` はターゲットの方向に光ります。
+three.jsの `DirectionalLight` はターゲットの方向にライティングします。
 
 GUIに追加してlight.targetを動かせるようにしてみましょう。
 
@@ -232,7 +232,7 @@ gui.add(light.target.position, 'y', 0, 10);
 
 なんだか見づらいですね。
 Three.jsにはシーンに追加できるヘルパーオブジェクトがたくさんあり、シーンの見えない部分を視覚化するのに役立ちます。
-今回は `DirectionalLightHelper` を使い、ライトを表す平面とライトからターゲットまでの線を描画します。
+今回は `DirectionalLightHelper` を使い、ライトから平面までの線を描画します。
 lightをDirectionalLightHelperに渡してシーンに追加します。
 
 ```js
@@ -254,9 +254,9 @@ function makeXYZGUI(gui, vector3, name, onChangeFn) {
 ```
 
 変更時は常にヘルパーの `update` 関数を呼び出す必要があります。
-そのため、dat.GUIが値の更新時に常に呼ばれる `onChangeFn` 関数を渡しています。
+そのため、dat.GUIが値を更新時に `onChangeFn` 関数を渡しています。
 
-これはlight.positionとlight.target.positionの両方に使えます。
+makeXYZGUI関数はlight.positionとlight.target.positionの両方に使えます。
 
 ```js
 +function updateLight() {
@@ -278,13 +278,13 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 {{{example url="../threejs-lights-directional-w-helper.html" }}}
 
 カメラを軌道に乗せると見やすくなります。
-この平面は `DirectionalLight` を表してますが、これは方向性のあるライトが一方向からのライトを計算するからです。
-ライトはどこから来ているのかという*点*はなく、平行した光線を放つ無限のライトの平面です。
+この平面は `DirectionalLight` を表しており、DirectionalLightが一方向からのライティングを計算します。
+光の出所は*点*ではなく、平面を無限に照らす平行光線です。
 
 ## `PointLight（点光源）`
 
-`PointLight` は、ある点に置いてその点から全方向に光を放つライトです。
-コードを変更してみましょう。
+`PointLight` はある点から全方向に光を放つライトです。
+コード変更しましょう。
 
 ```js
 const color = 0xFFFFFF;
@@ -297,7 +297,7 @@ scene.add(light);
 -scene.add(light.target);
 ```
 
-`PointLightHelper` に切り替えてみましょう。
+`PointLightHelper` に切り替えます。
 
 ```js
 -const helper = new THREE.DirectionalLightHelper(light);
@@ -305,7 +305,7 @@ scene.add(light);
 scene.add(helper);
 ```
 
-ターゲットがないので `onChange` 関数はもっとシンプルになります。
+light.targetがないので `onChange` 関数はもっとシンプルになります。
 
 ```js
 function updateLight() {
@@ -316,14 +316,14 @@ function updateLight() {
 ```
 
 `PointLightHelper` には点がない事に注意して下さい。
-小さなワイヤーフレームのダイヤモンドを描画します。
-それだけで簡単に望む任意の形状にでき、ライト自体にメッシュを追加します。
+小さなダイヤモンドのワイヤーフレームを描画します。
+簡単に望む任意の形状にできて、ライト自体にメッシュを追加します。
 
 `PointLight` は [`distance`](PointLight.distance)プロパティを持ちます。
 `distance` が0ならば `PointLight` は無限大に輝きます。
-`distance` が0よりも大きい場合、ライトに向かってライトの全強度を照らし、ライトから離れた `distance` ユニットでは影響を受けないようにフェードアウトします。
+`distance` が0よりも大きい場合、ライトに向かってライトの全強度を照らし、ライトから離れた `distance` では影響を受けないようにフェードアウトします。
 
-GUIを設定して距離を調整できるようにしてみましょう。
+distanceを調整できるようにGUIを設定してみましょう。
 
 ```js
 const gui = new GUI();
@@ -335,7 +335,7 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 -makeXYZGUI(gui, light.target.position, 'target', updateLight);
 ```
 
-これを今すぐ試してみて下さい。
+これを試してみて下さい。
 
 {{{example url="../threejs-lights-point.html" }}}
 
@@ -343,12 +343,12 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 
 ## `SpotLight（集中光線）`
 
-集中光源は、コーンの中でしか光が当たらない部分に点状のライトが効果的です。
-実際には2つのコーンがあります。外側と内側のコーンです。
-内側と外側のコーンの中間では、ライトは完全な強度から0にフェードします。
+集中光源はコーン形状にライティングする時に効果的です。
+実際は2つのコーン形状があります。外側と内側のコーン形状です。
+内側と外側のコーン形状の間では、ライトは強度のMAX値から0にフェードします。
 
 `SpotLight` を使うには、平行光源と同じようにターゲットが必要です。
-ライトのコーンがターゲットに向かって開きます。
+ライトのコーン形状がターゲットに向かって照らされます。
 
 上記のヘルパーを使って `DirectionalLight` を修正します。
 
@@ -365,8 +365,8 @@ scene.add(light.target);
 scene.add(helper);
 ```
 
-集中光源のコーンの角度は [`angle`](SpotLight.angle)プロパティでラジアン単位で設定します。
-[テクスチャ記事](threejs-textures.html)の `DegRadHelper` を使い、度数でUIを表示します。
+集中光源のコーン形状の角度は [`angle`](SpotLight.angle)プロパティでラジアン単位で設定します。
+[テクスチャ記事](threejs-textures.html)の `DegRadHelper` を使い、度数でUIに表示します。
 
 ```js
 gui.add(new DegRadHelper(light, 'angle'), 'value', 0, 90).name('angle').onChange(updateLight);
@@ -374,7 +374,7 @@ gui.add(new DegRadHelper(light, 'angle'), 'value', 0, 90).name('angle').onChange
 
 内側の円錐は[`penumbra`](SpotLight.penumbra)プロパティを外側の円錐からの%として設定します。
 `penumbra` が1の時、ライトは円錐の中心から外側の円錐に向かってフェードしていきます。
-`penumbra` が5の時、ライトは外側のコーンの中心から50%からフェードしていきます。
+`penumbra` が5の時、ライトは外側のコーン形状の中心から50%からフェードしていきます。
 
 ```js
 gui.add(light, 'penumbra', 0, 1, 0.01);
@@ -384,9 +384,9 @@ gui.add(light, 'penumbra', 0, 1, 0.01);
 
 デフォルトの `penumbra` が0の場合、集中光源は非常にシャープなエッジを持っていますが、1 に向けて `penumbra` を調整するとエッジがぼやけます。
 
-集中光源の*コーン*が見えにくいかもしれません。
+集中光源の*コーン*形状が見えにくいかもしれません。
 その理由は地面にあります。
-距離を5くらいまで縮めると、コーンの端が開いているのが見えてきます。
+距離を5くらいまで縮めると、コーン形状の端が開いているのが見えてきます。
 
 ## `RectAreaLight（矩形光源）`
 
@@ -491,7 +491,7 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 
 {{{example url="../threejs-lights-rectarea.html" }}}
 
-説明ができてなかった事が1つあり、 `WebGLRenderer` に `physicallyCorrectLights` 設定します。
+説明してない事が1つあり、 `WebGLRenderer` に `physicallyCorrectLights` を設定します。
 ライトとの距離は、ライトの落ち方に影響を与えます。
 これは `PointLight` と `SpotLight` にのみ影響します。
 `RectAreaLight` は自動的にこれを行います。
@@ -500,11 +500,11 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 代わりにライトの[`power`](PointLight.power)をルーメン単位で設定すると、three.jsは実際のライトのように物理計算を行います。
 この場合の単位はメートルで、60Wの電球であれば800ルーメン程度の明るさになります。
 また[`decay`](PointLight.decay)プロパティもあります。
-現実的な減衰のためには `2` に設定する必要があります。
+現実的な減衰のためには `2` に設定します。
 
 試してみましょう。
 
-まずは物理的に正しいライトを点灯します。
+まずは物理的に正しいライトを作ります。
 
 ```js
 const renderer = new THREE.WebGLRenderer({canvas});
