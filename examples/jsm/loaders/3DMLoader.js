@@ -830,11 +830,16 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		//Handle objects
 
-		for ( var i = 0; i < doc.objects().count; i ++ ) {
+		var objs = doc.objects()
+		var cnt = objs.count
 
-			var _object = doc.objects().get( i );
+		for ( var i = 0; i < cnt; i ++ ) {
+
+			var _object = objs.get( i );
 
 			var object = extractObjectData( _object, doc );
+
+			_object.delete();
 
 			if ( object !== undefined ) {
 
@@ -848,8 +853,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				objects.push( object );
 
 			}
-
-			_object.delete();
 
 		}
 
