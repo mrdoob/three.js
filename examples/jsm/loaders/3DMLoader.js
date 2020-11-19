@@ -830,8 +830,8 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		//Handle objects
 
-		var objs = doc.objects()
-		var cnt = objs.count
+		var objs = doc.objects();
+		var cnt = objs.count;
 
 		for ( var i = 0; i < cnt; i ++ ) {
 
