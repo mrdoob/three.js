@@ -40,6 +40,8 @@ export class GLTFLoader extends Loader {
 	setDRACOLoader( dracoLoader: DRACOLoader ): GLTFLoader;
 	setDDSLoader( ddsLoader: DDSLoader ): GLTFLoader;
 	setKTX2Loader( ktx2Loader: KTX2Loader ): GLTFLoader;
+	setMeshoptDecoder( meshoptDecoder: /* MeshoptDecoder */ any ): GLTFLoader;
+
 	parse( data: ArrayBuffer | string, path: string, onLoad: ( gltf: GLTF ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
 
 }
