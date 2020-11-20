@@ -23,14 +23,11 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { RoughnessMipmapper } from './jsm/utils/RoughnessMipmapper.js';
 
 			let camera, scene, renderer;
 			let gui;
-			
-			const state = {
-				variant: "midnight"
-			};
+
+			const state = { variant: 'midnight' };
 
 			init();
 			render();
@@ -41,14 +38,14 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( 3.0, 3.0, - 3.0);
+				camera.position.set( 2.5, 1.5, 3.0 );
 
 				scene = new THREE.Scene();
 
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
+					.load( 'quarry_01_1k.hdr', function ( texture ) {
 
 						const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 
@@ -62,24 +59,10 @@
 
 						// model
 
-						// use of RoughnessMipmapper is optional
-						const roughnessMipmapper = new RoughnessMipmapper( renderer );
-
 						const loader = new GLTFLoader().setPath( 'models/gltf/MaterialsVariantsShoe/glTF/' );
 						loader.load( 'MaterialsVariantsShoe.gltf', function ( gltf ) {
 
 							gltf.scene.scale.set( 10.0, 10.0, 10.0 );
-
-							gltf.scene.traverse( function ( child ) {
-
-								if ( child.isMesh ) {
-
-									// TOFIX RoughnessMipmapper seems to be broken with WebGL 2.0
-									// roughnessMipmapper.generateMipmaps( child.material );
-
-								}
-
-							} );
 
 							scene.add( gltf.scene );
 
@@ -88,31 +71,14 @@
 
 							// Details of the KHR_materials_variants extension used here can be found below
 							// https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_variants
-							
-							if ( gltf.userData.gltfExtensions !== undefined ) {
+							const parser = gltf.parser;
+							const variantsExtension = gltf.userData.gltfExtensions[ 'KHR_materials_variants' ];
+							const variants = variantsExtension.variants.map( ( variant ) => variant.name );
+							const variantsCtrl = gui.add( state, 'variant', variants ).name( 'Variant' );
 
-								let parser = gltf.parser;
+							selectVariant( scene, parser, variantsExtension, state.variant );
 
-								const extension = gltf.userData.gltfExtensions[ 'KHR_materials_variants' ];
-
-								if ( extension !== undefined ) {
-
-									let variants = extension.variants.map( variant => variant.name );
-									let guiVariants = gui.add( state, 'variant', variants ).name( 'Variant' );
-									
-									changeMaterialByVariantName(scene, parser, extension, state.variant);
-
-									guiVariants.onChange( function ( value ) {
-
-										changeMaterialByVariantName(scene, parser, extension, value);
-
-									});
-
-								}
-
-							}
-
-							roughnessMipmapper.dispose();
+							variantsCtrl.onChange( ( value ) => selectVariant( scene, parser, variantsExtension, value ) );
 
 							render();
 
@@ -135,52 +101,47 @@
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
-				controls.target.set( 0, 0, - 0.2 );
+				controls.target.set( 0, 0.5, - 0.2 );
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-			function changeMaterialByVariantName( scene, parser, extension, variantName ) {
+			function selectVariant( scene, parser, extension, variantName ) {
 
 				const variantIndex = extension.variants.findIndex( ( v ) => v.name.includes( variantName ) );
 
 				scene.traverse( async ( object ) => {
 
-					if ( !object.isMesh ) return;
+					if ( ! object.isMesh || ! object.userData.gltfExtensions ) return;
 
-					const meshVariantData = object.userData.gltfExtensions[ 'KHR_materials_variants' ];
+					const meshVariantDef = object.userData.gltfExtensions[ 'KHR_materials_variants' ];
 
-					if ( meshVariantData !== undefined ) {
+					if ( ! meshVariantDef ) return;
 
-						let materialIndex = - 1;
+					if ( ! object.userData.originalMaterial ) {
 
-						for ( let i = 0; i < meshVariantData.mappings.length; i ++ ) {
-
-							const mapping = meshVariantData.mappings[ i ];
-
-							if ( mapping.variants.indexOf( variantIndex ) != - 1 ) {
-
-								materialIndex = mapping.material;
-
-								break;
-
-							}
-
-						}
-
-						if ( materialIndex != - 1 ) {
-
-							object.material = await parser.getDependency( 'material', materialIndex );
-
-							render();
-
-						}
+						object.userData.originalMaterial = object.material;
 
 					}
 
-				});
+					const mapping = meshVariantDef.mappings
+						.find( ( mapping ) => mapping.variants.includes( variantIndex ) );
+
+					if ( mapping ) {
+
+						object.material = await parser.getDependency( 'material', mapping.material );
+
+					} else {
+
+						object.material = object.originalMaterial;
+
+					}
+
+					render();
+
+				} );
 
 			}
 

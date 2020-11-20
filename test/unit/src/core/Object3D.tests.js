@@ -275,15 +275,63 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( "localToWorld", ( assert ) => {
+		QUnit.test( "localToWorld", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const v = new Vector3();
+			const expectedPosition = new Vector3( 5, - 1, - 4 );
+
+			const parent = new Object3D();
+			const child = new Object3D();
+
+			parent.position.set( 1, 0, 0 );
+			parent.rotation.set( 0, Math.PI / 2, 0 );
+			parent.scale.set( 2, 1, 1 );
+
+			child.position.set( 0, 1, 0 );
+			child.rotation.set( Math.PI / 2, 0, 0 );
+			child.scale.set( 1, 2, 1 );
+
+			parent.add( child );
+			parent.updateMatrixWorld();
+
+			child.localToWorld( v.set( 2, 2, 2 ) );
+
+			assert.ok(
+				Math.abs( v.x - expectedPosition.x ) <= eps &&
+				Math.abs( v.y - expectedPosition.y ) <= eps &&
+				Math.abs( v.z - expectedPosition.z ) <= eps,
+				"local vector is converted to world"
+			);
 
 		} );
 
-		QUnit.todo( "worldToLocal", ( assert ) => {
+		QUnit.test( "worldToLocal", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const v = new Vector3();
+			const expectedPosition = new Vector3( - 1, 0.5, - 1 );
+
+			const parent = new Object3D();
+			const child = new Object3D();
+
+			parent.position.set( 1, 0, 0 );
+			parent.rotation.set( 0, Math.PI / 2, 0 );
+			parent.scale.set( 2, 1, 1 );
+
+			child.position.set( 0, 1, 0 );
+			child.rotation.set( Math.PI / 2, 0, 0 );
+			child.scale.set( 1, 2, 1 );
+
+			parent.add( child );
+			parent.updateMatrixWorld();
+
+			child.worldToLocal( v.set( 2, 2, 2 ) );
+
+			assert.ok(
+				Math.abs( v.x - expectedPosition.x ) <= eps &&
+				Math.abs( v.y - expectedPosition.y ) <= eps &&
+				Math.abs( v.z - expectedPosition.z ) <= eps,
+				"world vector is converted to local"
+			);
 
 		} );
 
