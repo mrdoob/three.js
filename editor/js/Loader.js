@@ -1,5 +1,6 @@
 import * as THREE from '../../build/three.module.js';
 
+import { Rhino3dmLoader } from '../../examples/jsm/loaders/3DMLoader.js';
 import { ThreeMFLoader } from '../../examples/jsm/loaders/3MFLoader.js';
 import { AMFLoader } from '../../examples/jsm/loaders/AMFLoader.js';
 import { ColladaLoader } from '../../examples/jsm/loaders/ColladaLoader.js';
@@ -16,7 +17,7 @@ import { SVGLoader } from '../../examples/jsm/loaders/SVGLoader.js';
 import { TDSLoader } from '../../examples/jsm/loaders/TDSLoader.js';
 import { VTKLoader } from '../../examples/jsm/loaders/VTKLoader.js';
 import { VRMLLoader } from '../../examples/jsm/loaders/VRMLLoader.js';
-import { Rhino3dmLoader } from '../../examples/jsm/loaders/3DMLoader.js';
+import { XYZLoader } from '../../examples/jsm/loaders/XYZLoader.js';
 
 import { TGALoader } from '../../examples/jsm/loaders/TGALoader.js';
 
@@ -539,6 +540,28 @@ function Loader( editor ) {
 					var result = new VRMLLoader().parse( contents );
 
 					editor.execute( new SetSceneCommand( editor, result ) );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
+			case 'xyz':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var geometry = new XYZLoader().parse( contents );
+
+					var material = new THREE.PointsMaterial();
+
+					if ( geometry.getAttribute( 'color' ) !== undefined ) material.vertexColors = true;
+
+					var points = new THREE.Points( geometry, material );
+					points.name = filename;
+
+					editor.execute( new AddObjectCommand( editor, points ) );
 
 				}, false );
 				reader.readAsText( file );
