@@ -45,7 +45,7 @@ export class GLTFLoader extends Loader {
 	register( callback: ( parser: GLTFParser ) => GLTFLoaderPlugin ): GLTFLoader;
 	unregister( callback: ( parser: GLTFParser ) => GLTFLoaderPlugin ): GLTFLoader;
 
-  setKTX2Loader( ktx2Loader: KTX2Loader ): GLTFLoader;
+	setKTX2Loader( ktx2Loader: KTX2Loader ): GLTFLoader;
 	setMeshoptDecoder( meshoptDecoder: /* MeshoptDecoder */ any ): GLTFLoader;
 
 	parse( data: ArrayBuffer | string, path: string, onLoad: ( gltf: GLTF ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
