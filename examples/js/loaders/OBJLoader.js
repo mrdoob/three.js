@@ -711,31 +711,9 @@ THREE.OBJLoader = ( function () {
 			var container = new THREE.Group();
 			container.materialLibraries = [].concat( state.materialLibraries );
 
-			if ( state.objects.length === 1 && state.objects[ 0 ].geometry.vertices.length === 0 ) {
+			var hasPrimitives = ! ( state.objects.length === 1 && state.objects[ 0 ].geometry.vertices.length === 0 );
 
-				// if there is only the default parser state object with no geometry data, interpert OBJ as point cloud
-
-				if ( state.vertices.length > 0 ) {
-
-					var material = new THREE.PointsMaterial( { size: 1, sizeAttenuation: false } );
-
-					var buffergeometry = new THREE.BufferGeometry();
-
-					buffergeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( state.vertices, 3 ) );
-
-					if ( state.colors.length > 0 ) {
-
-						buffergeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( state.colors, 3 ) );
-						material.vertexColors = true;
-
-					}
-
-					var points = new THREE.Points( buffergeometry, material );
-					container.add( points );
-
-				}
-
-			} else {
+			if ( hasPrimitives === true ) {
 
 				for ( var i = 0, l = state.objects.length; i < l; i ++ ) {
 
@@ -882,6 +860,30 @@ THREE.OBJLoader = ( function () {
 					mesh.name = object.name;
 
 					container.add( mesh );
+
+				}
+
+			} else {
+
+				// if there is only the default parser state object with no geometry data, interpret data as point cloud
+
+				if ( state.vertices.length > 0 ) {
+
+					var material = new THREE.PointsMaterial( { size: 1, sizeAttenuation: false } );
+
+					var buffergeometry = new THREE.BufferGeometry();
+
+					buffergeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( state.vertices, 3 ) );
+
+					if ( state.colors.length > 0 ) {
+
+						buffergeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( state.colors, 3 ) );
+						material.vertexColors = true;
+
+					}
+
+					var points = new THREE.Points( buffergeometry, material );
+					container.add( points );
 
 				}
 
