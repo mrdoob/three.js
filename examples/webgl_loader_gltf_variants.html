@@ -38,14 +38,14 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( 3.0, 3.0, - 3.0 );
+				camera.position.set( 2.5, 1.5, 3.0 );
 
 				scene = new THREE.Scene();
 
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
+					.load( 'quarry_01_1k.hdr', function ( texture ) {
 
 						const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 
