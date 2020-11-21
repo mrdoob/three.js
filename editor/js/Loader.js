@@ -201,7 +201,7 @@ function Loader( editor ) {
 
 							var material = new THREE.PointsMaterial( { size: 0.01 } );
 
-							if ( geometry.getAttribute( 'color' ) !== undefined ) material.vertexColors = true;
+							if ( geometry.hasAttribute( 'color' ) === true ) material.vertexColors = true;
 
 							object = new THREE.Points( geometry, material );
 							object.name = filename;
@@ -556,7 +556,7 @@ function Loader( editor ) {
 
 					var material = new THREE.PointsMaterial();
 
-					if ( geometry.getAttribute( 'color' ) !== undefined ) material.vertexColors = true;
+					if ( geometry.hasAttribute( 'color' ) === true ) material.vertexColors = true;
 
 					var points = new THREE.Points( geometry, material );
 					points.name = filename;
