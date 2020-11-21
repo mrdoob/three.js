@@ -125,7 +125,7 @@ export class Matrix4 implements Matrix {
 	/**
 	 * Inverts this matrix.
 	 */
-	invert(): Matrix;
+	invert(): Matrix4;
 
 	/**
 	 * Multiplies the columns of this matrix by vector v.
