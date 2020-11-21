@@ -261,7 +261,7 @@ Defines whether vertex coloring is used. Default is *false*.
 <p> 此材质是否可见。默认为*true*。
 </p>
 
-<h3>[property:object userData]</h3>
+<h3>[property:Object userData]</h3>
 <p> 一个对象，可用于存储有关Material的自定义数据。它不应该包含对函数的引用，因为这些函数不会被克隆。
 </p>
 
@@ -316,12 +316,12 @@ then customProgramCacheKey should be set like this:<br />
 Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
 </p>
 
-<h3>[method:null setValues]( [param:object values] )</h3>
+<h3>[method:null setValues]( [param:Object values] )</h3>
 <p> values -- 具有参数的容器。
 	根据*values*设置属性。<br/>
 </p>
 
-<h3>[method:Object toJSON]( [param:object meta] )</h3>
+<h3>[method:Object toJSON]( [param:Object meta] )</h3>
 <p>
 	meta -- 包含有元数据的对象，例如该对象的纹理或图片。
 	将material对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。

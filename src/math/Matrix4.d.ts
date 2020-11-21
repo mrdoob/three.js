@@ -2,6 +2,14 @@ import { Vector3 } from './Vector3';
 import { Euler } from './Euler';
 import { Quaternion } from './Quaternion';
 import { Matrix } from './Matrix3';
+
+type Matrix4Tuple = [
+	number, number, number, number,
+	number, number, number, number,
+	number, number, number, number,
+	number, number, number, number,
+];
+
 /**
  * A 4x4 Matrix.
  *
@@ -115,10 +123,9 @@ export class Matrix4 implements Matrix {
 	setPosition( v: Vector3 | number, y?: number, z?: number ): Matrix4;
 
 	/**
-	 * Sets this matrix to the inverse of matrix m.
-	 * Based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm.
+	 * Inverts this matrix.
 	 */
-	getInverse( m: Matrix4 ): Matrix4;
+	invert(): Matrix4;
 
 	/**
 	 * Multiplies the columns of this matrix by vector v.
@@ -236,6 +243,7 @@ export class Matrix4 implements Matrix {
 	 * @return The created or provided array.
 	 */
 	toArray( array?: number[], offset?: number ): number[];
+	toArray( array?: Matrix4Tuple, offset?: 0 ): Matrix4Tuple;
 
 	/**
 	 * Copies he values of this matrix into the provided array-like.
@@ -284,5 +292,10 @@ export class Matrix4 implements Matrix {
 	 * @deprecated Use {@link Matrix4#toArray .toArray()} instead.
 	 */
 	flattenToArrayOffset( array: number[], offset: number ): number[];
+
+	/**
+	 * @deprecated Use {@link Matrix4#invert .invert()} instead.
+	 */
+	getInverse( matrix: Matrix ): Matrix;
 
 }

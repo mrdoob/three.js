@@ -54,8 +54,10 @@
     }
   },
   "scripts": {
+    "start": "npm run dev",
     "test": "npm run test-lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
     "lint-fix": "eslint src --ext js --ext ts --fix && eslint examples/js/ --ext js --ext ts --ignore-pattern libs --fix",
     "lint-docs": "eslint docs --ext html",
     "lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
@@ -90,6 +92,7 @@
     "@babel/core": "^7.12.3",
     "@babel/plugin-proposal-class-properties": "^7.12.1",
     "@babel/preset-env": "^7.12.1",
+    "concurrently": "^5.3.0",
     "@rollup/plugin-babel": "^5.2.1",
     "@typescript-eslint/eslint-plugin": "^4.6.0",
     "@typescript-eslint/parser": "^4.6.0",
@@ -98,6 +101,7 @@
     "eslint-plugin-html": "^6.0.3",
     "rollup": "^2.32.1",
     "rollup-plugin-terser": "^7.0.2",
+    "servez": "^1.11.0",
     "typescript": "^4.0.5"
   },
   "jspm": {

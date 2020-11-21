@@ -29,7 +29,8 @@
 			<button id="cube">cube</button>
 			<button id="cylinder">cylinder</button>
 			<button id="multiple">multiple</button>
-			<button id="transformed">transformed</button><br /><br />
+			<button id="transformed">transformed</button>
+			<button id="points">points</button><br /><br />
 			<button id="export">export to obj</button>
 		</div>
 
@@ -58,7 +59,7 @@
 
 					const child = scene.children[ i ];
 
-					if ( child.isMesh ) {
+					if ( child.isMesh || child.isPoints ) {
 
 						child.geometry.dispose();
 						scene.remove( child );
@@ -114,6 +115,21 @@
 
 					}
 
+				} else if ( type === 6 ) {
+
+					const points = [ 0, 0, 0, 100, 0, 0, 100, 100, 0, 0, 100, 0 ];
+					const colors = [ 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0 ];
+
+					const geometry = new THREE.BufferGeometry();
+					geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( points, 3 ) );
+					geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+					const material = new THREE.PointsMaterial( { size: 10, vertexColors: true } );
+
+					const pointCloud = new THREE.Points( geometry, material );
+					pointCloud.name = 'point cloud';
+					scene.add( pointCloud );
+
 				}
 
 			}
@@ -163,6 +179,11 @@
 				document.getElementById( 'transformed' ).addEventListener( 'click', function () {
 
 					addGeometry( 5 );
+
+				} );
+				document.getElementById( 'points' ).addEventListener( 'click', function () {
+
+					addGeometry( 6 );
 
 				} );
 

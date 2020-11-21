@@ -95,6 +95,12 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
+	hasAttribute: function ( name ) {
+
+		return this.attributes[ name ] !== undefined;
+
+	},
+
 	addGroup: function ( start, count, materialIndex ) {
 
 		this.groups.push( {

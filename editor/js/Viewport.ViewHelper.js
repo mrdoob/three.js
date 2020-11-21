@@ -103,7 +103,7 @@ function ViewHelper( editorCamera, container ) {
 
 	this.render = function ( renderer ) {
 
-		this.quaternion.copy( editorCamera.quaternion ).inverse();
+		this.quaternion.copy( editorCamera.quaternion ).invert();
 		this.updateMatrixWorld();
 
 		point.set( 0, 0, 1 );

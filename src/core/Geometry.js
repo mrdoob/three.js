@@ -373,9 +373,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	computeVertexNormals: function ( areaWeighted ) {
-
-		if ( areaWeighted === undefined ) areaWeighted = true;
+	computeVertexNormals: function ( areaWeighted = true ) {
 
 		const vertices = new Array( this.vertices.length );
 
@@ -631,7 +629,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	merge: function ( geometry, matrix, materialIndexOffset ) {
+	merge: function ( geometry, matrix, materialIndexOffset = 0 ) {
 
 		if ( ! ( geometry && geometry.isGeometry ) ) {
 
@@ -648,8 +646,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			faces2 = geometry.faces,
 			colors1 = this.colors,
 			colors2 = geometry.colors;
-
-		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
 		if ( matrix !== undefined ) {
 
@@ -773,12 +769,11 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	 * and faces' vertices are updated.
 	 */
 
-	mergeVertices: function () {
+	mergeVertices: function ( precisionPoints = 4 ) {
 
 		const verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
 		const unique = [], changes = [];
 
-		const precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
 		const precision = Math.pow( 10, precisionPoints );
 
 		for ( let i = 0, il = this.vertices.length; i < il; i ++ ) {

@@ -45,7 +45,7 @@ THREE.PLYExporter.prototype = {
 
 					if ( geometry.isBufferGeometry === true ) {
 
-						if ( geometry.getAttribute( 'position' ) !== undefined ) {
+						if ( geometry.hasAttribute( 'position' ) === true ) {
 
 							cb( mesh, geometry );
 

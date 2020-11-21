@@ -14,9 +14,18 @@ LottieLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: LottieLoader,
 
+	setQuality: function ( value ) {
+
+		this._quality = value;
+
+	},
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		const quality = this._quality || 1;
+
 		const texture = new CanvasTexture();
+		texture.anisotropy = 16;
 
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
@@ -40,7 +49,7 @@ LottieLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				loop: true,
 				autoplay: true,
 				animationData: data,
-				rendererSettings: { dpr: 1 }
+				rendererSettings: { dpr: quality }
 			} );
 
 			texture.animation = animation;

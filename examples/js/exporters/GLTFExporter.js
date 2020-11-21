@@ -77,7 +77,6 @@ THREE.GLTFExporter.prototype = {
 			embedImages: true,
 			maxTextureSize: Infinity,
 			animations: [],
-			forcePowerOfTwoTextures: false,
 			includeCustomExtensions: false
 		};
 
@@ -222,19 +221,6 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			return output;
-
-		}
-
-		/**
-		 * Checks if image size is POT.
-		 *
-		 * @param {Image} image The image to be checked.
-		 * @returns {Boolean} Returns true if image size is POT.
-		 *
-		 */
-		function isPowerOfTwo( image ) {
-
-			return THREE.MathUtils.isPowerOfTwo( image.width ) && THREE.MathUtils.isPowerOfTwo( image.height );
 
 		}
 
@@ -781,15 +767,6 @@ THREE.GLTFExporter.prototype = {
 
 				canvas.width = Math.min( image.width, options.maxTextureSize );
 				canvas.height = Math.min( image.height, options.maxTextureSize );
-
-				if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( canvas ) ) {
-
-					console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
-
-					canvas.width = THREE.MathUtils.floorPowerOfTwo( canvas.width );
-					canvas.height = THREE.MathUtils.floorPowerOfTwo( canvas.height );
-
-				}
 
 				var ctx = canvas.getContext( '2d' );
 
