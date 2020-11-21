@@ -195,7 +195,17 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 					for ( let i = 0, l = image.length; i < l; i ++ ) {
 
-						url.push( ImageUtils.getDataURL( image[ i ] ) );
+						// check cube texture with data textures
+
+						if ( image[ i ].isDataTexture ) {
+
+							url.push( serializeImage( image[ i ].image ) );
+
+						} else {
+
+							url.push( serializeImage( image[ i ] ) );
+
+						}
 
 					}
 
@@ -203,7 +213,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 					// process single image
 
-					url = ImageUtils.getDataURL( image );
+					url = serializeImage( image );
 
 				}
 
@@ -326,5 +336,38 @@ Object.defineProperty( Texture.prototype, "needsUpdate", {
 
 } );
 
+function serializeImage( image ) {
+
+	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
+
+		// default images
+
+		return ImageUtils.getDataURL( image );
+
+	} else {
+
+		if ( image.data ) {
+
+			// images of DataTexture
+
+			return {
+				data: Array.prototype.slice.call( image.data ),
+				width: image.width,
+				height: image.height,
+				type: image.data.constructor.name
+			};
+
+		} else {
+
+			console.warn( 'THREE.Texture: Unable to serialize Texture.' );
+			return {};
+
+		}
+
+	}
+
+}
 
 export { Texture };
