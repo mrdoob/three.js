@@ -7719,6 +7719,9 @@
 			delete this.attributes[name];
 			return this;
 		},
+		hasAttribute: function hasAttribute(name) {
+			return this.attributes[name] !== undefined;
+		},
 		addGroup: function addGroup(start, count, materialIndex) {
 			this.groups.push({
 				start: start,
@@ -12059,11 +12062,11 @@
 					morphInfluences[_i4] = value;
 					morphInfluencesSum += value;
 				} else {
-					if (morphTargets && geometry.getAttribute('morphTarget' + _i4) !== undefined) {
+					if (morphTargets && geometry.hasAttribute('morphTarget' + _i4) === true) {
 						geometry.deleteAttribute('morphTarget' + _i4);
 					}
 
-					if (morphNormals && geometry.getAttribute('morphNormal' + _i4) !== undefined) {
+					if (morphNormals && geometry.hasAttribute('morphNormal' + _i4) === true) {
 						geometry.deleteAttribute('morphNormal' + _i4);
 					}
 
@@ -15231,9 +15234,20 @@
 			currentTextureSlot = null;
 			currentBoundTextures = {};
 			currentProgram = null;
+			currentBlendingEnabled = null;
 			currentBlending = null;
+			currentBlendEquation = null;
+			currentBlendSrc = null;
+			currentBlendDst = null;
+			currentBlendEquationAlpha = null;
+			currentBlendSrcAlpha = null;
+			currentBlendDstAlpha = null;
+			currentPremultipledAlpha = false;
 			currentFlipSided = null;
 			currentCullFace = null;
+			currentLineWidth = null;
+			currentPolygonOffsetFactor = null;
+			currentPolygonOffsetUnits = null;
 			colorBuffer.reset();
 			depthBuffer.reset();
 			stencilBuffer.reset();
@@ -16372,7 +16386,7 @@
 			var grip = this._grip;
 			var hand = this._hand;
 
-			if (inputSource) {
+			if (inputSource && frame.session.visibilityState !== 'visible-blurred') {
 				if (hand && inputSource.hand) {
 					handPose = true;
 

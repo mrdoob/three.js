@@ -9779,6 +9779,12 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
+	hasAttribute: function ( name ) {
+
+		return this.attributes[ name ] !== undefined;
+
+	},
+
 	addGroup: function ( start, count, materialIndex ) {
 
 		this.groups.push( {
@@ -15567,13 +15573,13 @@ function WebGLMorphtargets( gl ) {
 
 			} else {
 
-				if ( morphTargets && geometry.getAttribute( 'morphTarget' + i ) !== undefined ) {
+				if ( morphTargets && geometry.hasAttribute( 'morphTarget' + i ) === true ) {
 
 					geometry.deleteAttribute( 'morphTarget' + i );
 
 				}
 
-				if ( morphNormals && geometry.getAttribute( 'morphNormal' + i ) !== undefined ) {
+				if ( morphNormals && geometry.hasAttribute( 'morphNormal' + i ) === true ) {
 
 					geometry.deleteAttribute( 'morphNormal' + i );
 
@@ -20171,10 +20177,23 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		currentProgram = null;
 
+		currentBlendingEnabled = null;
 		currentBlending = null;
+		currentBlendEquation = null;
+		currentBlendSrc = null;
+		currentBlendDst = null;
+		currentBlendEquationAlpha = null;
+		currentBlendSrcAlpha = null;
+		currentBlendDstAlpha = null;
+		currentPremultipledAlpha = false;
 
 		currentFlipSided = null;
 		currentCullFace = null;
+
+		currentLineWidth = null;
+
+		currentPolygonOffsetFactor = null;
+		currentPolygonOffsetUnits = null;
 
 		colorBuffer.reset();
 		depthBuffer.reset();
@@ -21847,7 +21866,7 @@ Object.assign( WebXRController.prototype, {
 		const grip = this._grip;
 		const hand = this._hand;
 
-		if ( inputSource ) {
+		if ( inputSource && frame.session.visibilityState !== 'visible-blurred' ) {
 
 			if ( hand && inputSource.hand ) {
 
