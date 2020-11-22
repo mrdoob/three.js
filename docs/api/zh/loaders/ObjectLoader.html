@@ -128,9 +128,12 @@
 			此函数通过[page:.parse]来解析JSON结构中任意纹理。
 		</p>
 
-		<h3>[method:Object3D parseObject]( [param:Object json] )</h3>
+		<h3>[method:Object3D parseObject]( [param:Object json], [param:BufferGeometry geometries], [param:Material materials], [param:AnimationClip animations] )</h3>
 		<p>
-		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
+		[page:Object json] —  必选参数，需要被解析的JSON源。<br />
+		[page:BufferGeometry geometries] — required. The geometries of the JSON.<br />
+		[page:Material materials] — required. The materials of the JSON.<br />
+		[page:AnimationClip animations] — required. The animations of the JSON.<br /><br />
 
 			此函数通过[page:.parse]来解析JSON结构中任意对象。
 		对象可以为如下类型：
