@@ -1,7 +1,7 @@
 {
   language: '中文',
   langCode: 'zh_cn',   // if not specified will use folder
-  defaultExampleCaption: "点击在新标签页中打开",
+  defaultExampleCaption: "点击此处在新标签页中打开",
   title: 'Three.js 基础',
   description: 'Three.js 基础学习',
   link: 'http://threejsfundamentals.org/',
