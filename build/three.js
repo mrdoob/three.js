@@ -9965,6 +9965,22 @@
 		function PlaneBufferGeometry(width, height, widthSegments, heightSegments) {
 			var _this;
 
+			if (width === void 0) {
+				width = 1;
+			}
+
+			if (height === void 0) {
+				height = 1;
+			}
+
+			if (widthSegments === void 0) {
+				widthSegments = 1;
+			}
+
+			if (heightSegments === void 0) {
+				heightSegments = 1;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'PlaneBufferGeometry';
 			_this.parameters = {
@@ -9973,21 +9989,19 @@
 				widthSegments: widthSegments,
 				heightSegments: heightSegments
 			};
-			width = width || 1;
-			height = height || 1;
 			var width_half = width / 2;
 			var height_half = height / 2;
-			var gridX = Math.floor(widthSegments) || 1;
-			var gridY = Math.floor(heightSegments) || 1;
+			var gridX = Math.floor(widthSegments);
+			var gridY = Math.floor(heightSegments);
 			var gridX1 = gridX + 1;
 			var gridY1 = gridY + 1;
 			var segment_width = width / gridX;
-			var segment_height = height / gridY; // buffers
+			var segment_height = height / gridY; //
 
 			var indices = [];
 			var vertices = [];
 			var normals = [];
-			var uvs = []; // generate vertices, normals and uvs
+			var uvs = [];
 
 			for (var iy = 0; iy < gridY1; iy++) {
 				var y = iy * segment_height - height_half;
@@ -9999,21 +10013,18 @@
 					uvs.push(ix / gridX);
 					uvs.push(1 - iy / gridY);
 				}
-			} // indices
-
+			}
 
 			for (var _iy = 0; _iy < gridY; _iy++) {
 				for (var _ix = 0; _ix < gridX; _ix++) {
 					var a = _ix + gridX1 * _iy;
 					var b = _ix + gridX1 * (_iy + 1);
 					var c = _ix + 1 + gridX1 * (_iy + 1);
-					var d = _ix + 1 + gridX1 * _iy; // faces
-
+					var d = _ix + 1 + gridX1 * _iy;
 					indices.push(a, b, d);
 					indices.push(b, c, d);
 				}
-			} // build geometry
-
+			}
 
 			_this.setIndex(indices);
 
@@ -21250,6 +21261,22 @@
 		function CircleBufferGeometry(radius, segments, thetaStart, thetaLength) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (segments === void 0) {
+				segments = 8;
+			}
+
+			if (thetaStart === void 0) {
+				thetaStart = 0;
+			}
+
+			if (thetaLength === void 0) {
+				thetaLength = Math.PI * 2;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'CircleBufferGeometry';
 			_this.parameters = {
@@ -21258,10 +21285,7 @@
 				thetaStart: thetaStart,
 				thetaLength: thetaLength
 			};
-			radius = radius || 1;
-			segments = segments !== undefined ? Math.max(3, segments) : 8;
-			thetaStart = thetaStart !== undefined ? thetaStart : 0;
-			thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2; // buffers
+			segments = Math.max(3, segments); // buffers
 
 			var indices = [];
 			var vertices = [];
@@ -21340,6 +21364,38 @@
 		function CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
 			var _this;
 
+			if (radiusTop === void 0) {
+				radiusTop = 1;
+			}
+
+			if (radiusBottom === void 0) {
+				radiusBottom = 1;
+			}
+
+			if (height === void 0) {
+				height = 1;
+			}
+
+			if (radialSegments === void 0) {
+				radialSegments = 8;
+			}
+
+			if (heightSegments === void 0) {
+				heightSegments = 1;
+			}
+
+			if (openEnded === void 0) {
+				openEnded = false;
+			}
+
+			if (thetaStart === void 0) {
+				thetaStart = 0;
+			}
+
+			if (thetaLength === void 0) {
+				thetaLength = Math.PI * 2;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'CylinderBufferGeometry';
 			_this.parameters = {
@@ -21355,14 +21411,8 @@
 
 			var scope = _assertThisInitialized(_this);
 
-			radiusTop = radiusTop !== undefined ? radiusTop : 1;
-			radiusBottom = radiusBottom !== undefined ? radiusBottom : 1;
-			height = height || 1;
-			radialSegments = Math.floor(radialSegments) || 8;
-			heightSegments = Math.floor(heightSegments) || 1;
-			openEnded = openEnded !== undefined ? openEnded : false;
-			thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
-			thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2; // buffers
+			radialSegments = Math.floor(radialSegments);
+			heightSegments = Math.floor(heightSegments); // buffers
 
 			var indices = [];
 			var vertices = [];
@@ -21579,6 +21629,34 @@
 		function ConeBufferGeometry(radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (height === void 0) {
+				height = 1;
+			}
+
+			if (radialSegments === void 0) {
+				radialSegments = 8;
+			}
+
+			if (heightSegments === void 0) {
+				heightSegments = 1;
+			}
+
+			if (openEnded === void 0) {
+				openEnded = false;
+			}
+
+			if (thetaStart === void 0) {
+				thetaStart = 0;
+			}
+
+			if (thetaLength === void 0) {
+				thetaLength = Math.PI * 2;
+			}
+
 			_this = _CylinderBufferGeomet.call(this, 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) || this;
 			_this.type = 'ConeBufferGeometry';
 			_this.parameters = {
@@ -21602,6 +21680,14 @@
 		function PolyhedronBufferGeometry(vertices, indices, radius, detail) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (detail === void 0) {
+				detail = 0;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'PolyhedronBufferGeometry';
 			_this.parameters = {
@@ -21609,9 +21695,7 @@
 				indices: indices,
 				radius: radius,
 				detail: detail
-			};
-			radius = radius || 1;
-			detail = detail || 0; // default buffer data
+			}; // default buffer data
 
 			var vertexBuffer = [];
 			var uvBuffer = []; // the subdivision creates the vertex buffer data
@@ -21804,6 +21888,14 @@
 
 		function DodecahedronBufferGeometry(radius, detail) {
 			var _this;
+
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (detail === void 0) {
+				detail = 0;
+			}
 
 			var t = (1 + Math.sqrt(5)) / 2;
 			var r = 1 / t;
@@ -23185,6 +23277,14 @@
 		function IcosahedronBufferGeometry(radius, detail) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (detail === void 0) {
+				detail = 0;
+			}
+
 			var t = (1 + Math.sqrt(5)) / 2;
 			var vertices = [-1, t, 0, 1, t, 0, -1, -t, 0, 1, -t, 0, 0, -1, t, 0, 1, t, 0, -1, -t, 0, 1, -t, t, 0, -1, t, 0, 1, -t, 0, -1, -t, 0, 1];
 			var indices = [0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11, 1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8, 3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9, 4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1];
@@ -23229,6 +23329,18 @@
 		function LatheBufferGeometry(points, segments, phiStart, phiLength) {
 			var _this;
 
+			if (segments === void 0) {
+				segments = 12;
+			}
+
+			if (phiStart === void 0) {
+				phiStart = 0;
+			}
+
+			if (phiLength === void 0) {
+				phiLength = Math.PI * 2;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'LatheBufferGeometry';
 			_this.parameters = {
@@ -23237,9 +23349,7 @@
 				phiStart: phiStart,
 				phiLength: phiLength
 			};
-			segments = Math.floor(segments) || 12;
-			phiStart = phiStart || 0;
-			phiLength = phiLength || Math.PI * 2; // clamp phiLength so it's in range of [ 0, 2PI ]
+			segments = Math.floor(segments); // clamp phiLength so it's in range of [ 0, 2PI ]
 
 			phiLength = MathUtils.clamp(phiLength, 0, Math.PI * 2); // buffers
 
@@ -23357,6 +23467,14 @@
 
 		function OctahedronBufferGeometry(radius, detail) {
 			var _this;
+
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (detail === void 0) {
+				detail = 0;
+			}
 
 			var vertices = [1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1];
 			var indices = [0, 2, 4, 0, 4, 3, 0, 3, 5, 0, 5, 2, 1, 2, 5, 1, 5, 3, 1, 3, 4, 1, 4, 2];
@@ -23560,6 +23678,30 @@
 		function RingBufferGeometry(innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength) {
 			var _this;
 
+			if (innerRadius === void 0) {
+				innerRadius = 0.5;
+			}
+
+			if (outerRadius === void 0) {
+				outerRadius = 1;
+			}
+
+			if (thetaSegments === void 0) {
+				thetaSegments = 8;
+			}
+
+			if (phiSegments === void 0) {
+				phiSegments = 1;
+			}
+
+			if (thetaStart === void 0) {
+				thetaStart = 0;
+			}
+
+			if (thetaLength === void 0) {
+				thetaLength = Math.PI * 2;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'RingBufferGeometry';
 			_this.parameters = {
@@ -23570,12 +23712,8 @@
 				thetaStart: thetaStart,
 				thetaLength: thetaLength
 			};
-			innerRadius = innerRadius || 0.5;
-			outerRadius = outerRadius || 1;
-			thetaStart = thetaStart !== undefined ? thetaStart : 0;
-			thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
-			thetaSegments = thetaSegments !== undefined ? Math.max(3, thetaSegments) : 8;
-			phiSegments = phiSegments !== undefined ? Math.max(1, phiSegments) : 1; // buffers
+			thetaSegments = Math.max(3, thetaSegments);
+			phiSegments = Math.max(1, phiSegments); // buffers
 
 			var indices = [];
 			var vertices = [];
@@ -23672,13 +23810,16 @@
 		function ShapeBufferGeometry(shapes, curveSegments) {
 			var _this;
 
+			if (curveSegments === void 0) {
+				curveSegments = 12;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'ShapeBufferGeometry';
 			_this.parameters = {
 				shapes: shapes,
 				curveSegments: curveSegments
-			};
-			curveSegments = curveSegments || 12; // buffers
+			}; // buffers
 
 			var indices = [];
 			var vertices = [];
@@ -23843,6 +23984,34 @@
 		function SphereBufferGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (widthSegments === void 0) {
+				widthSegments = 8;
+			}
+
+			if (heightSegments === void 0) {
+				heightSegments = 6;
+			}
+
+			if (phiStart === void 0) {
+				phiStart = 0;
+			}
+
+			if (phiLength === void 0) {
+				phiLength = Math.PI * 2;
+			}
+
+			if (thetaStart === void 0) {
+				thetaStart = 0;
+			}
+
+			if (thetaLength === void 0) {
+				thetaLength = Math.PI;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'SphereBufferGeometry';
 			_this.parameters = {
@@ -23854,13 +24023,8 @@
 				thetaStart: thetaStart,
 				thetaLength: thetaLength
 			};
-			radius = radius || 1;
-			widthSegments = Math.max(3, Math.floor(widthSegments) || 8);
-			heightSegments = Math.max(2, Math.floor(heightSegments) || 6);
-			phiStart = phiStart !== undefined ? phiStart : 0;
-			phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
-			thetaStart = thetaStart !== undefined ? thetaStart : 0;
-			thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
+			widthSegments = Math.max(3, Math.floor(widthSegments));
+			heightSegments = Math.max(2, Math.floor(heightSegments));
 			var thetaEnd = Math.min(thetaStart + thetaLength, Math.PI);
 			var index = 0;
 			var grid = [];
@@ -23963,6 +24127,14 @@
 		function TetrahedronBufferGeometry(radius, detail) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (detail === void 0) {
+				detail = 0;
+			}
+
 			var vertices = [1, 1, 1, -1, -1, 1, -1, 1, -1, 1, -1, -1];
 			var indices = [2, 1, 0, 0, 3, 2, 1, 3, 0, 2, 3, 1];
 			_this = _PolyhedronBufferGeom.call(this, vertices, indices, radius, detail) || this;
@@ -24006,7 +24178,10 @@
 		function TextBufferGeometry(text, parameters) {
 			var _this;
 
-			parameters = parameters || {};
+			if (parameters === void 0) {
+				parameters = {};
+			}
+
 			var font = parameters.font;
 
 			if (!(font && font.isFont)) {
@@ -24058,6 +24233,26 @@
 		function TorusBufferGeometry(radius, tube, radialSegments, tubularSegments, arc) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (tube === void 0) {
+				tube = 0.4;
+			}
+
+			if (radialSegments === void 0) {
+				radialSegments = 8;
+			}
+
+			if (tubularSegments === void 0) {
+				tubularSegments = 6;
+			}
+
+			if (arc === void 0) {
+				arc = Math.PI * 2;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'TorusBufferGeometry';
 			_this.parameters = {
@@ -24067,11 +24262,8 @@
 				tubularSegments: tubularSegments,
 				arc: arc
 			};
-			radius = radius || 1;
-			tube = tube || 0.4;
-			radialSegments = Math.floor(radialSegments) || 8;
-			tubularSegments = Math.floor(tubularSegments) || 6;
-			arc = arc || Math.PI * 2; // buffers
+			radialSegments = Math.floor(radialSegments);
+			tubularSegments = Math.floor(tubularSegments); // buffers
 
 			var indices = [];
 			var vertices = [];
@@ -24163,6 +24355,30 @@
 		function TorusKnotBufferGeometry(radius, tube, tubularSegments, radialSegments, p, q) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (tube === void 0) {
+				tube = 0.4;
+			}
+
+			if (tubularSegments === void 0) {
+				tubularSegments = 64;
+			}
+
+			if (radialSegments === void 0) {
+				radialSegments = 8;
+			}
+
+			if (p === void 0) {
+				p = 2;
+			}
+
+			if (q === void 0) {
+				q = 3;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'TorusKnotBufferGeometry';
 			_this.parameters = {
@@ -24173,12 +24389,8 @@
 				p: p,
 				q: q
 			};
-			radius = radius || 1;
-			tube = tube || 0.4;
-			tubularSegments = Math.floor(tubularSegments) || 64;
-			radialSegments = Math.floor(radialSegments) || 8;
-			p = p || 2;
-			q = q || 3; // buffers
+			tubularSegments = Math.floor(tubularSegments);
+			radialSegments = Math.floor(radialSegments); // buffers
 
 			var indices = [];
 			var vertices = [];
@@ -24304,6 +24516,22 @@
 		function TubeBufferGeometry(path, tubularSegments, radius, radialSegments, closed) {
 			var _this;
 
+			if (tubularSegments === void 0) {
+				tubularSegments = 64;
+			}
+
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (radialSegments === void 0) {
+				radialSegments = 8;
+			}
+
+			if (closed === void 0) {
+				closed = false;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'TubeBufferGeometry';
 			_this.parameters = {
@@ -24313,10 +24541,6 @@
 				radialSegments: radialSegments,
 				closed: closed
 			};
-			tubularSegments = tubularSegments || 64;
-			radius = radius || 1;
-			radialSegments = radialSegments || 8;
-			closed = closed || false;
 			var frames = path.computeFrenetFrames(tubularSegments, closed); // expose internals
 
 			_this.tangents = frames.tangents;

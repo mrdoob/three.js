@@ -12900,7 +12900,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 class PlaneBufferGeometry extends BufferGeometry {
 
-	constructor( width, height, widthSegments, heightSegments ) {
+	constructor( width = 1, height = 1, widthSegments = 1, heightSegments = 1 ) {
 
 		super();
 		this.type = 'PlaneBufferGeometry';
@@ -12912,14 +12912,11 @@ class PlaneBufferGeometry extends BufferGeometry {
 			heightSegments: heightSegments
 		};
 
-		width = width || 1;
-		height = height || 1;
-
 		const width_half = width / 2;
 		const height_half = height / 2;
 
-		const gridX = Math.floor( widthSegments ) || 1;
-		const gridY = Math.floor( heightSegments ) || 1;
+		const gridX = Math.floor( widthSegments );
+		const gridY = Math.floor( heightSegments );
 
 		const gridX1 = gridX + 1;
 		const gridY1 = gridY + 1;
@@ -12927,14 +12924,12 @@ class PlaneBufferGeometry extends BufferGeometry {
 		const segment_width = width / gridX;
 		const segment_height = height / gridY;
 
-		// buffers
+		//
 
 		const indices = [];
 		const vertices = [];
 		const normals = [];
 		const uvs = [];
-
-		// generate vertices, normals and uvs
 
 		for ( let iy = 0; iy < gridY1; iy ++ ) {
 
@@ -12955,8 +12950,6 @@ class PlaneBufferGeometry extends BufferGeometry {
 
 		}
 
-		// indices
-
 		for ( let iy = 0; iy < gridY; iy ++ ) {
 
 			for ( let ix = 0; ix < gridX; ix ++ ) {
@@ -12966,16 +12959,12 @@ class PlaneBufferGeometry extends BufferGeometry {
 				const c = ( ix + 1 ) + gridX1 * ( iy + 1 );
 				const d = ( ix + 1 ) + gridX1 * iy;
 
-				// faces
-
 				indices.push( a, b, d );
 				indices.push( b, c, d );
 
 			}
 
 		}
-
-		// build geometry
 
 		this.setIndex( indices );
 		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
@@ -28859,7 +28848,7 @@ class BoxGeometry extends Geometry {
 
 class CircleBufferGeometry extends BufferGeometry {
 
-	constructor( radius, segments, thetaStart, thetaLength ) {
+	constructor( radius = 1, segments = 8, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
@@ -28872,11 +28861,7 @@ class CircleBufferGeometry extends BufferGeometry {
 			thetaLength: thetaLength
 		};
 
-		radius = radius || 1;
-		segments = segments !== undefined ? Math.max( 3, segments ) : 8;
-
-		thetaStart = thetaStart !== undefined ? thetaStart : 0;
-		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+		segments = Math.max( 3, segments );
 
 		// buffers
 
@@ -28962,7 +28947,7 @@ class CircleGeometry extends Geometry {
 
 class CylinderBufferGeometry extends BufferGeometry {
 
-	constructor( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 		this.type = 'CylinderBufferGeometry';
@@ -28980,16 +28965,8 @@ class CylinderBufferGeometry extends BufferGeometry {
 
 		const scope = this;
 
-		radiusTop = radiusTop !== undefined ? radiusTop : 1;
-		radiusBottom = radiusBottom !== undefined ? radiusBottom : 1;
-		height = height || 1;
-
-		radialSegments = Math.floor( radialSegments ) || 8;
-		heightSegments = Math.floor( heightSegments ) || 1;
-
-		openEnded = openEnded !== undefined ? openEnded : false;
-		thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
-		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+		radialSegments = Math.floor( radialSegments );
+		heightSegments = Math.floor( heightSegments );
 
 		// buffers
 
@@ -29278,9 +29255,10 @@ class ConeGeometry extends CylinderGeometry {
 
 class ConeBufferGeometry extends CylinderBufferGeometry {
 
-	constructor( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+	constructor( radius = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super( 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
+
 		this.type = 'ConeBufferGeometry';
 
 		this.parameters = {
@@ -29299,7 +29277,7 @@ class ConeBufferGeometry extends CylinderBufferGeometry {
 
 class PolyhedronBufferGeometry extends BufferGeometry {
 
-	constructor( vertices, indices, radius, detail ) {
+	constructor( vertices, indices, radius = 1, detail = 0 ) {
 
 		super();
 
@@ -29311,9 +29289,6 @@ class PolyhedronBufferGeometry extends BufferGeometry {
 			radius: radius,
 			detail: detail
 		};
-
-		radius = radius || 1;
-		detail = detail || 0;
 
 		// default buffer data
 
@@ -29599,7 +29574,7 @@ class PolyhedronBufferGeometry extends BufferGeometry {
 
 class DodecahedronBufferGeometry extends PolyhedronBufferGeometry {
 
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
 		const t = ( 1 + Math.sqrt( 5 ) ) / 2;
 		const r = 1 / t;
@@ -31547,7 +31522,7 @@ function toJSON$1( shapes, options, data ) {
 
 class IcosahedronBufferGeometry extends PolyhedronBufferGeometry {
 
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
 		const t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
@@ -31599,7 +31574,7 @@ class IcosahedronGeometry extends Geometry {
 
 class LatheBufferGeometry extends BufferGeometry {
 
-	constructor( points, segments, phiStart, phiLength ) {
+	constructor( points, segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
 
 		super();
 
@@ -31612,14 +31587,11 @@ class LatheBufferGeometry extends BufferGeometry {
 			phiLength: phiLength
 		};
 
-		segments = Math.floor( segments ) || 12;
-		phiStart = phiStart || 0;
-		phiLength = phiLength || Math.PI * 2;
+		segments = Math.floor( segments );
 
 		// clamp phiLength so it's in range of [ 0, 2PI ]
 
 		phiLength = MathUtils.clamp( phiLength, 0, Math.PI * 2 );
-
 
 		// buffers
 
@@ -31766,7 +31738,7 @@ class LatheGeometry extends Geometry {
 
 class OctahedronBufferGeometry extends PolyhedronBufferGeometry {
 
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
 		const vertices = [
 			1, 0, 0, 	- 1, 0, 0,	0, 1, 0,
@@ -32010,7 +31982,7 @@ class PolyhedronGeometry extends Geometry {
 
 class RingBufferGeometry extends BufferGeometry {
 
-	constructor( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+	constructor( innerRadius = 0.5, outerRadius = 1, thetaSegments = 8, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
@@ -32025,14 +31997,8 @@ class RingBufferGeometry extends BufferGeometry {
 			thetaLength: thetaLength
 		};
 
-		innerRadius = innerRadius || 0.5;
-		outerRadius = outerRadius || 1;
-
-		thetaStart = thetaStart !== undefined ? thetaStart : 0;
-		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
-
-		thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 8;
-		phiSegments = phiSegments !== undefined ? Math.max( 1, phiSegments ) : 1;
+		thetaSegments = Math.max( 3, thetaSegments );
+		phiSegments = Math.max( 1, phiSegments );
 
 		// buffers
 
@@ -32145,7 +32111,7 @@ class RingGeometry extends Geometry {
 
 class ShapeBufferGeometry extends BufferGeometry {
 
-	constructor( shapes, curveSegments ) {
+	constructor( shapes, curveSegments = 12 ) {
 
 		super();
 		this.type = 'ShapeBufferGeometry';
@@ -32154,8 +32120,6 @@ class ShapeBufferGeometry extends BufferGeometry {
 			shapes: shapes,
 			curveSegments: curveSegments
 		};
-
-		curveSegments = curveSegments || 12;
 
 		// buffers
 
@@ -32369,7 +32333,7 @@ function toJSON$3( shapes, data ) {
 
 class SphereBufferGeometry extends BufferGeometry {
 
-	constructor( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+	constructor( radius = 1, widthSegments = 8, heightSegments = 6, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI ) {
 
 		super();
 		this.type = 'SphereBufferGeometry';
@@ -32384,16 +32348,8 @@ class SphereBufferGeometry extends BufferGeometry {
 			thetaLength: thetaLength
 		};
 
-		radius = radius || 1;
-
-		widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
-		heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
-
-		phiStart = phiStart !== undefined ? phiStart : 0;
-		phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
-
-		thetaStart = thetaStart !== undefined ? thetaStart : 0;
-		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
+		widthSegments = Math.max( 3, Math.floor( widthSegments ) );
+		heightSegments = Math.max( 2, Math.floor( heightSegments ) );
 
 		const thetaEnd = Math.min( thetaStart + thetaLength, Math.PI );
 
@@ -32516,7 +32472,7 @@ class SphereGeometry extends Geometry {
 
 class TetrahedronBufferGeometry extends PolyhedronBufferGeometry {
 
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
 		const vertices = [
 			1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1
@@ -32577,9 +32533,7 @@ class TetrahedronGeometry extends Geometry {
 
 class TextBufferGeometry extends ExtrudeBufferGeometry {
 
-	constructor( text, parameters ) {
-
-		parameters = parameters || {};
+	constructor( text, parameters = {} ) {
 
 		const font = parameters.font;
 
@@ -32648,7 +32602,7 @@ class TextGeometry extends Geometry {
 
 class TorusBufferGeometry extends BufferGeometry {
 
-	constructor( radius, tube, radialSegments, tubularSegments, arc ) {
+	constructor( radius = 1, tube = 0.4, radialSegments = 8, tubularSegments = 6, arc = Math.PI * 2 ) {
 
 		super();
 		this.type = 'TorusBufferGeometry';
@@ -32661,11 +32615,8 @@ class TorusBufferGeometry extends BufferGeometry {
 			arc: arc
 		};
 
-		radius = radius || 1;
-		tube = tube || 0.4;
-		radialSegments = Math.floor( radialSegments ) || 8;
-		tubularSegments = Math.floor( tubularSegments ) || 6;
-		arc = arc || Math.PI * 2;
+		radialSegments = Math.floor( radialSegments );
+		tubularSegments = Math.floor( tubularSegments );
 
 		// buffers
 
@@ -32771,7 +32722,7 @@ class TorusGeometry extends Geometry {
 
 class TorusKnotBufferGeometry extends BufferGeometry {
 
-	constructor( radius, tube, tubularSegments, radialSegments, p, q ) {
+	constructor( radius = 1, tube = 0.4, tubularSegments = 64, radialSegments = 8, p = 2, q = 3 ) {
 
 		super();
 		this.type = 'TorusKnotBufferGeometry';
@@ -32785,12 +32736,8 @@ class TorusKnotBufferGeometry extends BufferGeometry {
 			q: q
 		};
 
-		radius = radius || 1;
-		tube = tube || 0.4;
-		tubularSegments = Math.floor( tubularSegments ) || 64;
-		radialSegments = Math.floor( radialSegments ) || 8;
-		p = p || 2;
-		q = q || 3;
+		tubularSegments = Math.floor( tubularSegments );
+		radialSegments = Math.floor( radialSegments );
 
 		// buffers
 
@@ -32945,7 +32892,7 @@ class TorusKnotGeometry extends Geometry {
 
 class TubeBufferGeometry extends BufferGeometry {
 
-	constructor( path, tubularSegments, radius, radialSegments, closed ) {
+	constructor( path, tubularSegments = 64, radius = 1, radialSegments = 8, closed = false ) {
 
 		super();
 		this.type = 'TubeBufferGeometry';
@@ -32957,11 +32904,6 @@ class TubeBufferGeometry extends BufferGeometry {
 			radialSegments: radialSegments,
 			closed: closed
 		};
-
-		tubularSegments = tubularSegments || 64;
-		radius = radius || 1;
-		radialSegments = radialSegments || 8;
-		closed = closed || false;
 
 		const frames = path.computeFrenetFrames( tubularSegments, closed );
 
