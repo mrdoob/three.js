@@ -104,5 +104,8 @@
       "build/three.module.js"
     ],
     "directories": {}
+  },
+  "dependencies": {
+    "uglify-es": "^3.3.9"
   }
 }

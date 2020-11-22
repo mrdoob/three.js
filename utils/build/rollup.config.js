@@ -1,3 +1,7 @@
+//for build/three.module.min.js
+import fs from 'fs';
+import path from 'path';
+
 import buble from 'rollup-plugin-buble';
 
 function glconstants() {
@@ -200,6 +204,15 @@ function glsl() {
 	};
 
 }
+
+//Build build/three.module.min.js
+//https://www.npmjs.com/package/uglify-es
+const UglifyJS = require( "uglify-es" ),
+	code = fs.readFileSync( path.join( __dirname, '../../build/three.module.js' ), "utf8" ),
+	result = UglifyJS.minify( code );
+if ( result.error !== undefined )
+	console.log( result.error ); // runtime error, or `undefined` if no error
+else fs.writeFileSync( "build/three.module.min.js", result.code, "utf8" );
 
 export default [
 	{
