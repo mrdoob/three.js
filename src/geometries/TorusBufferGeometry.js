@@ -4,7 +4,7 @@ import { Vector3 } from '../math/Vector3.js';
 
 class TorusBufferGeometry extends BufferGeometry {
 
-	constructor( radius, tube, radialSegments, tubularSegments, arc ) {
+	constructor( radius = 1, tube = 0.4, radialSegments = 8, tubularSegments = 6, arc = Math.PI * 2 ) {
 
 		super();
 		this.type = 'TorusBufferGeometry';
@@ -17,11 +17,8 @@ class TorusBufferGeometry extends BufferGeometry {
 			arc: arc
 		};
 
-		radius = radius || 1;
-		tube = tube || 0.4;
-		radialSegments = Math.floor( radialSegments ) || 8;
-		tubularSegments = Math.floor( tubularSegments ) || 6;
-		arc = arc || Math.PI * 2;
+		radialSegments = Math.floor( radialSegments );
+		tubularSegments = Math.floor( tubularSegments );
 
 		// buffers
 

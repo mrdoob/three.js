@@ -2,7 +2,7 @@ import { PolyhedronBufferGeometry } from './PolyhedronBufferGeometry.js';
 
 class IcosahedronBufferGeometry extends PolyhedronBufferGeometry {
 
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
 		const t = ( 1 + Math.sqrt( 5 ) ) / 2;
 

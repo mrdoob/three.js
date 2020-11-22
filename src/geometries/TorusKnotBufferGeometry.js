@@ -4,7 +4,7 @@ import { Vector3 } from '../math/Vector3.js';
 
 class TorusKnotBufferGeometry extends BufferGeometry {
 
-	constructor( radius, tube, tubularSegments, radialSegments, p, q ) {
+	constructor( radius = 1, tube = 0.4, tubularSegments = 64, radialSegments = 8, p = 2, q = 3 ) {
 
 		super();
 		this.type = 'TorusKnotBufferGeometry';
@@ -18,12 +18,8 @@ class TorusKnotBufferGeometry extends BufferGeometry {
 			q: q
 		};
 
-		radius = radius || 1;
-		tube = tube || 0.4;
-		tubularSegments = Math.floor( tubularSegments ) || 64;
-		radialSegments = Math.floor( radialSegments ) || 8;
-		p = p || 2;
-		q = q || 3;
+		tubularSegments = Math.floor( tubularSegments );
+		radialSegments = Math.floor( radialSegments );
 
 		// buffers
 

@@ -5,7 +5,7 @@ import { Vector2 } from '../math/Vector2.js';
 
 class PolyhedronBufferGeometry extends BufferGeometry {
 
-	constructor( vertices, indices, radius, detail ) {
+	constructor( vertices, indices, radius = 1, detail = 0 ) {
 
 		super();
 
@@ -17,9 +17,6 @@ class PolyhedronBufferGeometry extends BufferGeometry {
 			radius: radius,
 			detail: detail
 		};
-
-		radius = radius || 1;
-		detail = detail || 0;
 
 		// default buffer data
 

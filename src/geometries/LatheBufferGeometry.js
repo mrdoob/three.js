@@ -6,7 +6,7 @@ import { MathUtils } from '../math/MathUtils.js';
 
 class LatheBufferGeometry extends BufferGeometry {
 
-	constructor( points, segments, phiStart, phiLength ) {
+	constructor( points, segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
 
 		super();
 
@@ -19,14 +19,11 @@ class LatheBufferGeometry extends BufferGeometry {
 			phiLength: phiLength
 		};
 
-		segments = Math.floor( segments ) || 12;
-		phiStart = phiStart || 0;
-		phiLength = phiLength || Math.PI * 2;
+		segments = Math.floor( segments );
 
 		// clamp phiLength so it's in range of [ 0, 2PI ]
 
 		phiLength = MathUtils.clamp( phiLength, 0, Math.PI * 2 );
-
 
 		// buffers
 
