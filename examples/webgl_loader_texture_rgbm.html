@@ -54,7 +54,7 @@
 
 					const material = new THREE.MeshBasicMaterial( { map: texture } );
 
-					const quad = new THREE.PlaneBufferGeometry( 1.5 * texture.width / texture.height, 1.5 );
+					const quad = new THREE.PlaneBufferGeometry( 1, 1.5 );
 
 					const mesh = new THREE.Mesh( quad, material );
 
