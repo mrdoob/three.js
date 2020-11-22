@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
 // Constants
 //------------------------------------------------------------------------------
+
 var WEBGL_CONSTANTS = {
 	POINTS: 0x0000,
 	LINES: 0x0001,
@@ -776,7 +777,35 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
+				if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+					( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+					( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
+
+					ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
+
+				} else {
+
+					if ( format !== THREE.RGBAFormat && format !== THREE.RGBFormat )
+						throw "Only RGB and RGBA formats are supported";
+
+					if ( image.width !== canvas.width || image.height !== canvas.height )
+						console.warn( "Image size and imposed canvas sized do not match" );
+
+					let data = image.data;
+					if ( format === THREE.RGBFormat ) {
+
+						data = new Uint8ClampedArray( image.height * image.width * 4 );
+						data.forEach( function ( _, i ) {
+
+							data[ i ] = i % 4 === 3 ? 255 : image.data[ 3 * Math.floor( i / 4 ) + i % 4 ];
+
+						} );
+
+					}
+
+					ctx.putImageData( new ImageData( data, image.width, image.height ), 0, 0 );
+
+				}
 
 				if ( options.binary === true ) {
 
