@@ -785,21 +785,32 @@ THREE.GLTFExporter.prototype = {
 
 				} else {
 
-					if ( format !== THREE.RGBAFormat && format !== THREE.RGBFormat )
-						throw "Only RGB and RGBA formats are supported";
+					if ( format !== THREE.RGBAFormat && format !== THREE.RGBFormat ) {
 
-					if ( image.width !== canvas.width || image.height !== canvas.height )
-						console.warn( "Image size and imposed canvas sized do not match" );
+						console.error( 'GLTFExporter: Only RGB and RGBA formats are supported.' );
+
+					}
+
+					if ( image.width > options.maxTextureSize || image.height > options.maxTextureSize ) {
+
+						console.warn( 'GLTFExporter: Image size is bigger than maxTextureSize', image );
+
+					}
 
 					let data = image.data;
+
 					if ( format === THREE.RGBFormat ) {
 
 						data = new Uint8ClampedArray( image.height * image.width * 4 );
-						data.forEach( function ( _, i ) {
 
-							data[ i ] = i % 4 === 3 ? 255 : image.data[ 3 * Math.floor( i / 4 ) + i % 4 ];
+						for ( var i = 0; i < data.length; i += 4 ) {
 
-						} );
+							data[ i + 0 ] = image.data[ i + 0 ];
+							data[ i + 1 ] = image.data[ i + 1 ];
+							data[ i + 2 ] = image.data[ i + 2 ];
+							data[ i + 3 ] = 255;
+
+						}
 
 					}
 
