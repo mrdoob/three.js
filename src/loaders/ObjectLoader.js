@@ -138,9 +138,24 @@ class ObjectLoader extends Loader {
 
 		}
 
-		if ( json.images === undefined || json.images.length === 0 ) {
+		//
 
-			if ( onLoad !== undefined ) onLoad( object );
+		if ( onLoad !== undefined ) {
+
+			let hasImages = false;
+
+			for ( const uuid in images ) {
+
+				if ( images[ uuid ] instanceof HTMLImageElement ) {
+
+					hasImages = true;
+					break;
+
+				}
+
+			}
+
+			if ( hasImages === false ) onLoad( object );
 
 		}
 
