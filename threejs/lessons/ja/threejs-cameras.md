@@ -6,15 +6,15 @@ TOC: カメラ
 最初の記事は[Three.jsの基礎知識](threejs-fundamentals.html)です。
 まだ読んでいない場合、そこから始めると良いかもしれません。
 
-three.jsのカメラについて話しましょう。
+three.jsでのカメラの話をしましょう。
 [最初の記事](threejs-fundamentals.html)でいくつか取り上げましたが、ここではもっと詳しく取り上げます。
 
-three.jsで最も一般的なカメラで、今までの記事で使ってきたのは `PerspectiveCamera（透視投影カメラ）` です。
-遠くのモノが近くのモノよりも小さく見える3Dビューを提供します。
+`PerspectiveCamera（透視投影カメラ）` はthree.jsで最も一般的なカメラで、今までの記事で使ってきました。
+遠くのものが近くのものよりも小さく見える3Dビューを提供します。
 
 `PerspectiveCamera` は *錐台* を定義します。
-[錐台とは、先端が切り取られたピラミッドのような3D形状の事です](https://en.wikipedia.org/wiki/Frustum)。
-つまり、錐台は、立方体、球、角柱、錐台のような別の3D形状と考えて下さい。
+[錐台とは先端が切り取られたピラミッドのような3D形状の事です](https://en.wikipedia.org/wiki/Frustum)。
+つまり、cube(立方体)、cone(円錐体)、sphere(球体)、cylinder(円柱)、frustum(錐台)は全て異なる種類の固体名です。
 
 <div class="spread">
   <div><div data-diagram="shapeCube"></div><div>cube</div></div>
@@ -24,27 +24,25 @@ three.jsで最も一般的なカメラで、今までの記事で使ってきた
   <div><div data-diagram="shapeFrustum"></div><div>frustum</div></div>
 </div>
 
-私はこのポイントを何年も知らなかったです。
-どこかの本やページで *錐台* について書かれていると目がかすんでしまいます。
-それが固体の形状の種類の名前だと理解する事で、それらの記述が急に理解できるようになりました。 &#128517
+私はこの事を何年も知らなかったです。
+どこかの本やページで *錐台* について書かれていると目が点になります。
+錐台が固体名と理解すると、それらの記述を急に理解できるようになりました &#128517;
 
-`PerspectiveCamera` には錐台をもとに4つのプロパティが定義されています。
-
-A `PerspectiveCamera` defines its frustum based on 4 properties. `near` defines where the
-front of the frustum starts. `far` defines where it ends. `fov`, the field of view, defines
-how tall the front and back of the frustum are by computing the correct height to get
-the specified field of view at `near` units from the camera. The `aspect` defines how
-wide the front and back of the frustum are. The width of the frustum is just the height
-multiplied by the aspect.
+`PerspectiveCamera` には4つのプロパティをもとに錐台が定義されています。
+`near` は錐台の正面がどこから始まるかを定義します。
+`far` は錐台が終了する場所です。
+`fov` は視野角で、カメラから `near` 単位で指定された視野角を得るために正しい高さが計算され、錐台の前面と背面の高さを定義します。
+`aspect` は錐台の前面と背面の幅です。
+錐台の幅は高さにaspectを掛けたものです。
 
 <img src="resources/frustum-3d.svg" width="500" class="threejs_center"/>
 
-Let's use the scene from [the previous article](threejs-lights.html) that has a ground
-plane, a sphere, and a cube and make it so we can adjust the camera's settings.
+[前回の記事](threejs-lights.html)から地面となる平面、球体、立方体のあるシーンを利用し、カメラの設定を調整してみましょう。
 
-To do that we'll make a `MinMaxGUIHelper` for the `near` and `far` settings so `far`
-is always greater than `near`. It will have `min` and `max` properties that dat.GUI
-will adjust. When adjusted they'll set the 2 properties we specify.
+`near` と `far` の設定用に `MinMaxGUIHelper` を作成します。
+`far` が常に `near` よりも大きい値になるようにします。
+MinMaxGUIHelperは `min` と `max` のプロパティがあり、dat.GUIで調整します。
+GUIで値を調整すると2つのプロパティに設定されます。
 
 ```js
 class MinMaxGUIHelper {
@@ -71,7 +69,7 @@ class MinMaxGUIHelper {
 }
 ```
 
-Now we can setup our GUI like this
+これでGUIを以下のように設定できます。
 
 ```js
 function updateCamera() {
@@ -85,25 +83,22 @@ gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera
 gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera);
 ```
 
-Anytime the camera's settings change we need to call the camera's
-[`updateProjectionMatrix`](PerspectiveCamera.updateProjectionMatrix) function
-so we made a function called `updateCamera` add passed it to dat.GUI to call it when things change.
+カメラ設定の変更時、カメラの [`updateProjectionMatrix`](PerspectiveCamera.updateProjectionMatrix) 関数を呼び出す必要があります。
+`updateCamera` という関数を作り、それをdat.GUI変更時に呼び出すようにします。
 
 {{{example url="../threejs-cameras-perspective.html" }}}
 
-You can adjust the values and see how they work. Note we didn't make `aspect` settable since
-it's taken from the size of the window so if you want to adjust the aspect open the example
-in a new window and then size the window.
+値を調整すると動作が確認できます。
+`aspect` を調整したい場合は、新しいウィンドウでサンプルを開いてからウィンドウサイズを変更して下さい。
 
-Still, I think it's a little hard to see so let's change the example so it has 2 cameras.
-One will show our scene as we see it above, the other will show another camera looking at the
-scene the first camera is drawing and showing that camera's frustum.
+それでもまだ少し見づらいので、2つのカメラを持つサンプルに変えます。
+1つ目のカメラは上記で見たシーンを表示し、2つ目のカメラは1つ目のカメラが描画してるシーンを見ている別のカメラとし、そのカメラの錐台を表示します。
 
-To do this we can use the scissor function of three.js.
-Let's change it to draw 2 scenes with 2 cameras side by side using the scissor function
+そのためにthree.jsのシザー関数を利用します。
+シザー機能を使い、カメラを2台並べて2つのシーンを描画するように変更してみましょう。
 
-First off let's use some HTML and CSS to define 2 side by side elements. This will also
-help us with events so both cameras can easily have their own `OrbitControls`.
+まず、HTMLとCSSを使って2つの並んでるDOM要素を定義してみましょう。
+両方のカメラが簡単に独自の `OrbitControls` を持てるようにします。
 
 ```html
 <body>
@@ -115,8 +110,7 @@ help us with events so both cameras can easily have their own `OrbitControls`.
 </body>
 ```
 
-And the CSS that will make those 2 views show up side by side overlaid on top of
-the canvas
+このview1とview2をキャンバスの上に重ねて表示させます。
 
 ```css
 .split {
@@ -133,7 +127,8 @@ the canvas
 }
 ```
 
-Then in our code we'll add a `CameraHelper`. A `CameraHelper` draws the frustum for a `Camera`
+次に `CameraHelper` を追加します。
+`CameraHelper` は `Camera` の錐台を描画します。
 
 ```js
 const cameraHelper = new THREE.CameraHelper(camera);
@@ -143,24 +138,22 @@ const cameraHelper = new THREE.CameraHelper(camera);
 scene.add(cameraHelper);
 ```
 
-Now let's look up the 2 view elements.
+view1とview2のDOM要素をquerySelectorしましょう。
 
 ```js
 const view1Elem = document.querySelector('#view1');
 const view2Elem = document.querySelector('#view2');
 ```
 
-And we'll set our existing `OrbitControls` to respond to the first
-view element only.
+既存の `OrbitControls` をview1にのみ反応するようにします。
 
 ```js
 -const controls = new OrbitControls(camera, canvas);
 +const controls = new OrbitControls(camera, view1Elem);
 ```
 
-Let's make a second `PerspectiveCamera` and a second `OrbitControls`.
-The second `OrbitControls` is tied to the second camera and gets input
-from the second view element.
+2つ目の `PerspectiveCamera` と `OrbitControls` を作ってみましょう。
+2つ目の `OrbitControls` は2つ目のカメラに関連付けし、view2から入力を取得します。
 
 ```js
 const camera2 = new THREE.PerspectiveCamera(
@@ -177,12 +170,10 @@ controls2.target.set(0, 5, 0);
 controls2.update();
 ```
 
-Finally we need to render the scene from the point of view of each
-camera using the scissor function to only render to part of the canvas.
+最後にキャンバスの一部だけをレンダリングするために、シザー機能を使い各カメラの視点からシーンをレンダリングします。
 
-Here is a function that given an element will compute the rectangle
-of that element that overlaps the canvas. It will then set the scissor
-and viewport to that rectangle and return the aspect for that size.
+ここにDOM要素を渡すと、キャンバスに重なる矩形を計算する関数があります。
+その矩形にシザーとビューポートを設定し、アスペクト比を返します。
 
 ```js
 function setScissorForElement(elem) {
@@ -208,7 +199,7 @@ function setScissorForElement(elem) {
 }
 ```
 
-And now we can use that function to draw the scene twice in our `render` function
+この関数を使って `render` 関数でシーンを2回描画できます。
 
 ```js
   function render() {
@@ -267,11 +258,9 @@ And now we can use that function to draw the scene twice in our `render` functio
 }
 ```
 
-The code above sets the background color of the scene when rendering the
-second view to dark blue just to make it easier to distinguish the two views.
+上記のコードはview1とview2を区別するために、view2をレンダリング時のシーンの背景色を紺色にしています。
 
-We can also remove our `updateCamera` code since we're updating everything
-in the `render` function.
+また、`render` 関数内で全て更新しているため、`updateCamera` のコードを削除できます。
 
 ```js
 -function updateCamera() {
@@ -288,31 +277,24 @@ const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
 +gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far');
 ```
 
-And now you can use one view to see the frustum of the other.
+片方のviewを使い、もう片方の錐台を見るれるようになりました。
 
 {{{example url="../threejs-cameras-perspective-2-scenes.html" }}}
 
-On the left you can see the original view and on the right you can
-see a view showing the frustum of the camera on the left. As you adjust
-`near`, `far`, `fov` and move the camera with mouse you can see that
-only what's inside the frustum shown on the right appears in the scene on
-the left.
+左側はオリジナルのビュー、右側はカメラの錐台を表示するビューがあります。
+マウスで `near`、`far`、`fov` を調整してカメラを動かすと、右側に表示されている錐台の内側だけが左側のシーンに表示されています。
 
-Adjust `near` up to around 20 and you'll easily see the front of objects
-disappear as they are no longer in the frustum. Adjust `far` below about 35
-and you'll start to see the ground plane disappear as it's no longer in
-the frustum.
+`near` を20くらいに調整すると、錐台に入らずオブジェクトの正面が消えます。
+`far` を35以下に調整すると、錐台に入らず地上の平面が消えていきます。
 
-This brings up the question, why not just set `near` to 0.0000000001 and `far`
-to 10000000000000 or something like that so you can just see everything?
-The reason is your GPU only has so much precision to decide if something
-is in front or behind something else. That precision is spread out between
-`near` and `far`. Worse, by default the precision close the camera is detailed
-and the precision far from the camera is coarse. The units start with `near`
-and slowly expand as they approach `far`.
+ここで疑問が湧いてきました。
+`near` を0.0000000001に `far` を10000000000000に設定し、全てを見えるようにできないでしょうか？
+なぜなら、GPUは何かが前後にあるかを判断する精度が高いからです。
+その精度は `near` と `far` の間に分散しています。
+さらに悪い事にデフォルトではカメラの近くの精度は細かく、カメラから遠い精度は粗くなっています。
+単位の値は `near` から始まり、`far` に近づくにつれて徐々に拡大していきます。
 
-Starting with the top example, let's change the code to insert 20 spheres in a
-row.
+上記のサンプルから始めて、20個の球体を1列に挿入するコードに変更してみましょう。
 
 ```js
 {
@@ -331,7 +313,7 @@ row.
 }
 ```
 
-and let's set `near` to 0.00001
+`near` を0.00001に設定してみましょう。
 
 ```js
 const fov = 45;
@@ -342,27 +324,25 @@ const far = 100;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 ```
 
-We also need to tweak the GUI code a little to allow 0.00001 if the value is edited
+値の編集時に0.00001を許容するようにGUIコードを微調整します。
 
 ```js
 -gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
 +gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near').onChange(updateCamera);
 ```
 
-What do you think will happen?
+何が起こると思いますか？
 
 {{{example url="../threejs-cameras-z-fighting.html" }}}
 
-This is an example of *z fighting* where the GPU on your computer does not have
-enough precision to decide which pixels are in front and which pixels are behind.
+これはGPUがどのピクセルが前後にあるか判断する精度が不足してる時に *Zファイティング* が発生する例です。
 
-Just in case the issue doesn't show on your machine here's what I see on mine
+あなたのマシンでは問題が表示されない可能性がありますが、私のマシンでは以下のように表示されます。
 
 <div class="threejs_center"><img src="resources/images/z-fighting.png" style="width: 570px;"></div>
 
-One solution is to tell three.js use to a different method to compute which
-pixels are in front and which are behind. We can do that by enabling
-`logarithmicDepthBuffer` when we create the `WebGLRenderer`
+1つ目の解決策はどのピクセルが前後にあるかを計算するために、three.jsの別メソッドを使用します。
+これは `WebGLRenderer` の作成時に `logarithmicDepthBuffer` を有効にします。
 
 ```js
 -const renderer = new THREE.WebGLRenderer({canvas});
@@ -372,40 +352,34 @@ pixels are in front and which are behind. We can do that by enabling
 +});
 ```
 
-and with that it might work
+これで上手く動くかもしれません。
 
 {{{example url="../threejs-cameras-logarithmic-depth-buffer.html" }}}
 
-If this didn't fix the issue for you then you've run into one reason why
-you can't always use this solution. That reason is because only certain GPUs
-support it. As of September 2018 almost no mobile devices support this
-solution whereas most desktops do.
+これで問題が解決しない場合、この解決策が使えない理由の1つに遭遇した事になります。
+その理由は、特定のGPUのみをサポートしているためです。
+2018年9月現在、ほとんどのデスクトップがこの解決策をサポートしていますが、モバイルデバイスはほとんどサポートしていません。
 
-Another reason not to choose this solution is it can be significantly slower
-than the standard solution.
+この解決策を選択しないもう1つの理由は、標準的な解決策よりも大幅に遅くなる可能性があります。
 
-Even with this solution there is still limited resolution. Make `near` even
-smaller or `far` even bigger and you'll eventually run into the same issues.
+この解決策は解像度に制限があります。
+`near` をさらに小さくしたり `far` をさらに大きくしたりすると最終的に同じ問題にぶつかります。
 
-What that means is that you should always make an effort to choose a `near`
-and `far` setting that fits your use case. Set `near` as far away from the camera
-as you can and not have things disappear. Set `far` as close to the camera
-as you can and not have things disappear. If you're trying to draw a giant
-scene and show a close up of someone's face so you can see their eyelashes
-while in the background you can see all the way to mountains 50 kilometers
-in the distance well then you'll need to find other creative solutions that
-maybe we'll go over later. For now, just be aware you should take care
-to choose appropriate `near` and `far` values for your needs.
+`near` と `far` の設定は、常にユースケースに合った値を選択して下さい。
+`near` はカメラからできるだけ離れた所に置き、オブジェクトが消えないようにしましょう。
+`far` はカメラからできるだけ近い所に置き、オブジェクトが消えないようにしましょう。
 
-The 2nd most common camera is the `OrthographicCamera`. Rather than
-specify a frustum it specifies a box with the settings `left`, `right`
-`top`, `bottom`, `near`, and `far`. Because it's projecting a box
-there is no perspective.
+もしまつげを見れるぐらい誰かの顔をクローズアップし、背景には50キロ離れた山までの道のりを見る巨大なシーンを描画したい場合、他の創造的な解決策を見つける必要があるでしょう。
+この解決策は後にしましょう。
+とりあえず自分のニーズに合わせて `near` と `far` は適切な値を選択しましょう。
 
-Let's change the 2 view example above to use an `OrthographicCamera`
-in the first view.
+2番目に一般的なカメラは `OrthographicCamera(平行投影カメラ)` です。
+錐台を指定するのではなく、`left`、`right`、`top`、`bottom`、`near`、`far` の設定でボックスを指定します。
+ボックスを投影しているので遠近感はありません。
 
-First let's setup an `OrthographicCamera`.
+上記のview1とview2のサンプルを変更し、最初のビューで `OrthographicCamera` を使うようにしましょう。
+
+最初に `OrthographicCamera` を設定します。
 
 ```js
 const left = -1;
@@ -418,24 +392,22 @@ const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far)
 camera.zoom = 0.2;
 ```
 
-We set `left` and `bottom` to -1 and `right` and `top` to 1. This would make
-a box 2 units wide and 2 units tall but we're going to adjust the `left` and `top`
-by the aspect of the rectangle we're drawing to. We'll use the `zoom` property
-to make it easy to adjust how many units are actually shown by the camera.
+`left` と `bottom` を-1、`right` と `top` を1にしました。
+これで箱の幅が2、高さが2になりますが、描画している矩形のアスペクト比で `left` と `top` を調整します。
+`zoom` プロパティでカメラで実際に表示される値を簡単に調整できます。
 
-Let's add a GUI setting for `zoom`
+GUIに `zoom` の設定を追加してみましょう。
 
 ```js
 const gui = new GUI();
 +gui.add(camera, 'zoom', 0.01, 1, 0.01).listen();
 ```
 
-The call to `listen` tells dat.GUI to watch for changes. This is here because
-the `OrbitControls` can also control zoom. For example the scroll wheel on
-a mouse will zoom via the `OrbitControls`.
+`listen` 呼び出しはdat.GUIに変更を監視するようにします。
+これは `OrbitControls` がズームも制御できるからです。
+例えばマウスのスクロールホイールは `OrbitControls` でズームします。
 
-Last we just need to change the part that renders the left
-side to update the `OrthographicCamera`.
+最後に左側をレンダリングする部分を変更して `OrthographicCamera` を更新します。
 
 ```js
 {
@@ -456,17 +428,15 @@ side to update the `OrthographicCamera`.
 }
 ```
 
-and now you can see an `OrthographicCamera` at work.
+これで `OrthographicCamera` が動作しているのが見れるようになりました。
 
 {{{example url="../threejs-cameras-orthographic-2-scenes.html" }}}
 
-An `OrthographicCamera` is most often used if using three.js
-to draw 2D things. You'd decide how many units you want the camera
-to show. For example if you want one pixel of canvas to match
-one unit in the camera you could do something like
+three.jsで2次元のものを描画する場合には、`OrthographicCamera` が最もよく使われます。
+カメラの表示台数を決める必要があります。
+例えば、1ピクセルのキャンバスをカメラの1単位と一致させたい場合、次のような事ができます。
 
-To put the origin at the center and have 1 pixel = 1 three.js unit
-something like
+原点を中心に置き、1ピクセル = three.jsの1単位とするには次のようにします。
 
 ```js
 camera.left = -canvas.width / 2;
@@ -478,8 +448,7 @@ camera.far = 1;
 camera.zoom = 1;
 ```
 
-Or if we wanted the origin to be in the top left just like a
-2D canvas we could use this
+原点を2Dキャンバスのように左上に配置したい場合は、次のようにします。
 
 ```js
 camera.left = 0;
@@ -491,9 +460,9 @@ camera.far = 1;
 camera.zoom = 1;
 ```
 
-In which case the top left corner would be 0,0 just like a 2D canvas
+この場合、左上の角は2Dキャンバスのように0, 0になります。
 
-Let's try it! First let's set the camera up
+やってみましょう！まずはカメラの設定をします。
 
 ```js
 const left = 0;
@@ -506,9 +475,8 @@ const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far)
 camera.zoom = 1;
 ```
 
-Then let's load 6 textures and make 6 planes, one for each texture.
-We'll parent each plane to a `THREE.Object3D` to make it easy to offset
-the plane so its center appears to be at its top left corner.
+続いて、6枚のテクスチャをロードし、6枚の平面を作ってみましょう。
+各平面は `THREE.Object3D` を親にし、平面の中心を左上にして簡単にオフセットできるようにします。
 
 ```js
 const loader = new THREE.TextureLoader();
@@ -538,8 +506,7 @@ const planes = textures.map((texture) => {
 });
 ```
 
-and we need to update the camera if the size of the canvas
-changes.
+キャンバスサイズの変更時、カメラを更新する必要があります。
 
 ```js
 function render() {
@@ -553,8 +520,8 @@ function render() {
   ...
 ```
 
-`planes` is an array of `THREE.Mesh`, one for each plane.
-Let's move them around based on the time.
+`planes` は `THREE.Mesh` の配列であり、各平面に1つずつあります。
+これらを時間に応じて移動させてみましょう。
 
 ```js
 function render(time) {
@@ -589,22 +556,19 @@ function render(time) {
   renderer.render(scene, camera);
 ```
 
-And you can see the images bounce pixel perfect off the edges of the
-canvas using pixel math just like a 2D canvas
+2Dキャンバスのようにピクセル計算を使い、画像がキャンバスの縁からピクセルのように跳ね返っているのが分かります。
 
 {{{example url="../threejs-cameras-orthographic-canvas-top-left-origin.html" }}}
 
-Another common use for an `OrthographicCamera` is to draw the
-up, down, left, right, front, back views of a 3D modeling
-program or a game engine's editor.
+`OrthographicCamera` のもう1つの一般的な用途は3Dモデリングツールやゲームエンジンで、上、下、左、右、正面、背面のビューを描画する場合です。
 
 <div class="threejs_center"><img src="resources/images/quad-viewport.png" style="width: 574px;"></div>
 
-In the screenshot above you can see 1 view is a perspective view and 3 views are
-orthographic views.
+上記のスクリーンショットでは右上のビューが透視投影図、左上のビューが平行投影図です。
 
-That's the fundamentals of cameras. We'll cover a few common ways to move cameras
-in other articles. For now let's move on to [shadows](threejs-shadows.html).
+それがカメラの基本です。
+カメラを動かすための一般的な方法は別の記事で紹介します。
+とりあえず[影](threejs-shadows.html)についてのページに移りましょう。
 
 <canvas id="c"></canvas>
 <script type="module" src="resources/threejs-cameras.js"></script>
