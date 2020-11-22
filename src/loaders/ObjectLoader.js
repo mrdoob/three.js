@@ -115,6 +115,7 @@ class ObjectLoader extends Loader {
 
 	parse( json, onLoad ) {
 
+		const animations = this.parseAnimations( json.animations );
 		const shapes = this.parseShapes( json.shapes );
 		const geometries = this.parseGeometries( json.geometries, shapes );
 
@@ -127,16 +128,10 @@ class ObjectLoader extends Loader {
 		const textures = this.parseTextures( json.textures, images );
 		const materials = this.parseMaterials( json.materials, textures );
 
-		const object = this.parseObject( json.object, geometries, materials );
+		const object = this.parseObject( json.object, geometries, materials, animations );
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
 		this.bindSkeletons( object, skeletons );
-
-		if ( json.animations ) {
-
-			object.animations = this.parseAnimations( json.animations );
-
-		}
 
 		//
 
@@ -554,17 +549,19 @@ class ObjectLoader extends Loader {
 
 	parseAnimations( json ) {
 
-		const animations = [];
+		const animations = {};
 
-		for ( let i = 0; i < json.length; i ++ ) {
+		if ( json !== undefined ) {
 
-			const data = json[ i ];
+			for ( let i = 0; i < json.length; i ++ ) {
 
-			const clip = AnimationClip.parse( data );
+				const data = json[ i ];
 
-			if ( data.uuid !== undefined ) clip.uuid = data.uuid;
+				const clip = AnimationClip.parse( data );
 
-			animations.push( clip );
+				animations[ clip.uuid ] = clip;
+
+			}
 
 		}
 
@@ -788,7 +785,7 @@ class ObjectLoader extends Loader {
 
 	}
 
-	parseObject( data, geometries, materials ) {
+	parseObject( data, geometries, materials, animations ) {
 
 		let object;
 
@@ -1071,7 +1068,21 @@ class ObjectLoader extends Loader {
 
 			for ( let i = 0; i < children.length; i ++ ) {
 
-				object.add( this.parseObject( children[ i ], geometries, materials ) );
+				object.add( this.parseObject( children[ i ], geometries, materials, animations ) );
+
+			}
+
+		}
+
+		if ( data.animations !== undefined ) {
+
+			const objectAnimations = data.animations;
+
+			for ( let i = 0; i < objectAnimations.length; i ++ ) {
+
+				const uuid = objectAnimations[ i ];
+
+				object.animations.push( animations[ uuid ] );
 
 			}
 

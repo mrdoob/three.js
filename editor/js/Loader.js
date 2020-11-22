@@ -170,7 +170,7 @@ function Loader( editor ) {
 
 					collada.scene.name = filename;
 
-					editor.addAnimations( collada.scene, collada.animations );
+					collada.scene.animations.push( ...collada.animations );
 					editor.execute( new AddObjectCommand( editor, collada.scene ) );
 
 				}, false );
@@ -226,7 +226,6 @@ function Loader( editor ) {
 					var loader = new FBXLoader( manager );
 					var object = loader.parse( contents );
 
-					editor.addAnimations( object, object.animations );
 					editor.execute( new AddObjectCommand( editor, object ) );
 
 				}, false );
@@ -250,7 +249,7 @@ function Loader( editor ) {
 						var scene = result.scene;
 						scene.name = filename;
 
-						editor.addAnimations( scene, result.animations );
+						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
@@ -287,7 +286,7 @@ function Loader( editor ) {
 						var scene = result.scene;
 						scene.name = filename;
 
-						editor.addAnimations( scene, result.animations );
+						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
@@ -386,7 +385,7 @@ function Loader( editor ) {
 					mesh.mixer = new THREE.AnimationMixer( mesh );
 					mesh.name = filename;
 
-					editor.addAnimations( mesh, geometry.animations );
+					mesh.animations.push( ...geometry.animations );
 					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
@@ -720,7 +719,7 @@ function Loader( editor ) {
 
 						var scene = result.scene;
 
-						editor.addAnimations( scene, result.animations );
+						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
@@ -738,7 +737,7 @@ function Loader( editor ) {
 
 						var scene = result.scene;
 
-						editor.addAnimations( scene, result.animations );
+						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
