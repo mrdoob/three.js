@@ -6410,6 +6410,8 @@ function Object3D() {
 	this.frustumCulled = true;
 	this.renderOrder = 0;
 
+	this.animations = [];
+
 	this.userData = {};
 
 }
@@ -6966,7 +6968,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 				textures: {},
 				images: {},
 				shapes: {},
-				skeletons: {}
+				skeletons: {},
+				animations: {}
 			};
 
 			output.metadata = {
@@ -7102,6 +7105,22 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
+		//
+
+		if ( this.animations.length > 0 ) {
+
+			object.animations = [];
+
+			for ( let i = 0; i < this.animations.length; i ++ ) {
+
+				const animation = this.animations[ i ];
+
+				object.animations.push( serialize( meta.animations, animation ) );
+
+			}
+
+		}
+
 		if ( isRootObject ) {
 
 			const geometries = extractFromCache( meta.geometries );
@@ -7110,6 +7129,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			const images = extractFromCache( meta.images );
 			const shapes = extractFromCache( meta.shapes );
 			const skeletons = extractFromCache( meta.skeletons );
+			const animations = extractFromCache( meta.animations );
 
 			if ( geometries.length > 0 ) output.geometries = geometries;
 			if ( materials.length > 0 ) output.materials = materials;
@@ -7117,6 +7137,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			if ( images.length > 0 ) output.images = images;
 			if ( shapes.length > 0 ) output.shapes = shapes;
 			if ( skeletons.length > 0 ) output.skeletons = skeletons;
+			if ( animations.length > 0 ) output.animations = animations;
 
 		}
 
@@ -35913,7 +35934,10 @@ Object.assign( AnimationClip, {
 
 		}
 
-		return new AnimationClip( json.name, json.duration, tracks, json.blendMode );
+		const clip = new AnimationClip( json.name, json.duration, tracks, json.blendMode );
+		clip.uuid = json.uuid;
+
+		return clip;
 
 	},
 
@@ -36254,6 +36278,12 @@ Object.assign( AnimationClip.prototype, {
 		}
 
 		return new AnimationClip( this.name, this.duration, tracks, this.blendMode );
+
+	},
+
+	toJSON: function () {
+
+		return AnimationClip.toJSON( this );
 
 	}
 
@@ -40903,6 +40933,7 @@ class ObjectLoader extends Loader {
 
 	parse( json, onLoad ) {
 
+		const animations = this.parseAnimations( json.animations );
 		const shapes = this.parseShapes( json.shapes );
 		const geometries = this.parseGeometries( json.geometries, shapes );
 
@@ -40915,16 +40946,10 @@ class ObjectLoader extends Loader {
 		const textures = this.parseTextures( json.textures, images );
 		const materials = this.parseMaterials( json.materials, textures );
 
-		const object = this.parseObject( json.object, geometries, materials );
+		const object = this.parseObject( json.object, geometries, materials, animations );
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
 		this.bindSkeletons( object, skeletons );
-
-		if ( json.animations ) {
-
-			object.animations = this.parseAnimations( json.animations );
-
-		}
 
 		//
 
@@ -41342,17 +41367,19 @@ class ObjectLoader extends Loader {
 
 	parseAnimations( json ) {
 
-		const animations = [];
+		const animations = {};
 
-		for ( let i = 0; i < json.length; i ++ ) {
+		if ( json !== undefined ) {
 
-			const data = json[ i ];
+			for ( let i = 0; i < json.length; i ++ ) {
 
-			const clip = AnimationClip.parse( data );
+				const data = json[ i ];
 
-			if ( data.uuid !== undefined ) clip.uuid = data.uuid;
+				const clip = AnimationClip.parse( data );
 
-			animations.push( clip );
+				animations[ clip.uuid ] = clip;
+
+			}
 
 		}
 
@@ -41576,7 +41603,7 @@ class ObjectLoader extends Loader {
 
 	}
 
-	parseObject( data, geometries, materials ) {
+	parseObject( data, geometries, materials, animations ) {
 
 		let object;
 
@@ -41859,7 +41886,21 @@ class ObjectLoader extends Loader {
 
 			for ( let i = 0; i < children.length; i ++ ) {
 
-				object.add( this.parseObject( children[ i ], geometries, materials ) );
+				object.add( this.parseObject( children[ i ], geometries, materials, animations ) );
+
+			}
+
+		}
+
+		if ( data.animations !== undefined ) {
+
+			const objectAnimations = data.animations;
+
+			for ( let i = 0; i < objectAnimations.length; i ++ ) {
+
+				const uuid = objectAnimations[ i ];
+
+				object.animations.push( animations[ uuid ] );
 
 			}
 

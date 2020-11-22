@@ -5169,6 +5169,7 @@
 		this.receiveShadow = false;
 		this.frustumCulled = true;
 		this.renderOrder = 0;
+		this.animations = [];
 		this.userData = {};
 	}
 
@@ -5504,7 +5505,8 @@
 					textures: {},
 					images: {},
 					shapes: {},
-					skeletons: {}
+					skeletons: {},
+					animations: {}
 				};
 				output.metadata = {
 					version: 4.5,
@@ -5592,6 +5594,16 @@
 				for (var _i2 = 0; _i2 < this.children.length; _i2++) {
 					object.children.push(this.children[_i2].toJSON(meta).object);
 				}
+			} //
+
+
+			if (this.animations.length > 0) {
+				object.animations = [];
+
+				for (var _i3 = 0; _i3 < this.animations.length; _i3++) {
+					var animation = this.animations[_i3];
+					object.animations.push(serialize(meta.animations, animation));
+				}
 			}
 
 			if (isRootObject) {
@@ -5603,12 +5615,14 @@
 				var _shapes = extractFromCache(meta.shapes);
 
 				var skeletons = extractFromCache(meta.skeletons);
+				var animations = extractFromCache(meta.animations);
 				if (geometries.length > 0) output.geometries = geometries;
 				if (materials.length > 0) output.materials = materials;
 				if (textures.length > 0) output.textures = textures;
 				if (images.length > 0) output.images = images;
 				if (_shapes.length > 0) output.shapes = _shapes;
 				if (skeletons.length > 0) output.skeletons = skeletons;
+				if (animations.length > 0) output.animations = animations;
 			}
 
 			output.object = object;
@@ -26503,7 +26517,9 @@
 				tracks.push(parseKeyframeTrack(jsonTracks[i]).scale(frameTime));
 			}
 
-			return new AnimationClip(json.name, json.duration, tracks, json.blendMode);
+			var clip = new AnimationClip(json.name, json.duration, tracks, json.blendMode);
+			clip.uuid = json.uuid;
+			return clip;
 		},
 		toJSON: function toJSON(clip) {
 			var tracks = [],
@@ -26717,6 +26733,9 @@
 			}
 
 			return new AnimationClip(this.name, this.duration, tracks, this.blendMode);
+		},
+		toJSON: function toJSON() {
+			return AnimationClip.toJSON(this);
 		}
 	});
 
@@ -29836,6 +29855,7 @@
 		};
 
 		_proto.parse = function parse(json, onLoad) {
+			var animations = this.parseAnimations(json.animations);
 			var shapes = this.parseShapes(json.shapes);
 			var geometries = this.parseGeometries(json.geometries, shapes);
 			var images = this.parseImages(json.images, function () {
@@ -29843,14 +29863,9 @@
 			});
 			var textures = this.parseTextures(json.textures, images);
 			var materials = this.parseMaterials(json.materials, textures);
-			var object = this.parseObject(json.object, geometries, materials);
+			var object = this.parseObject(json.object, geometries, materials, animations);
 			var skeletons = this.parseSkeletons(json.skeletons, object);
-			this.bindSkeletons(object, skeletons);
-
-			if (json.animations) {
-				object.animations = this.parseAnimations(json.animations);
-			} //
-
+			this.bindSkeletons(object, skeletons); //
 
 			if (onLoad !== undefined) {
 				var hasImages = false;
@@ -30081,13 +30096,14 @@
 		};
 
 		_proto.parseAnimations = function parseAnimations(json) {
-			var animations = [];
+			var animations = {};
 
-			for (var i = 0; i < json.length; i++) {
-				var data = json[i];
-				var clip = AnimationClip.parse(data);
-				if (data.uuid !== undefined) clip.uuid = data.uuid;
-				animations.push(clip);
+			if (json !== undefined) {
+				for (var i = 0; i < json.length; i++) {
+					var data = json[i];
+					var clip = AnimationClip.parse(data);
+					animations[clip.uuid] = clip;
+				}
 			}
 
 			return animations;
@@ -30232,7 +30248,7 @@
 			return textures;
 		};
 
-		_proto.parseObject = function parseObject(data, geometries, materials) {
+		_proto.parseObject = function parseObject(data, geometries, materials, animations) {
 			var object;
 
 			function getGeometry(name) {
@@ -30430,7 +30446,16 @@
 				var children = data.children;
 
 				for (var i = 0; i < children.length; i++) {
-					object.add(this.parseObject(children[i], geometries, materials));
+					object.add(this.parseObject(children[i], geometries, materials, animations));
+				}
+			}
+
+			if (data.animations !== undefined) {
+				var objectAnimations = data.animations;
+
+				for (var _i = 0; _i < objectAnimations.length; _i++) {
+					var uuid = objectAnimations[_i];
+					object.animations.push(animations[uuid]);
 				}
 			}
 
