@@ -29849,10 +29849,20 @@
 
 			if (json.animations) {
 				object.animations = this.parseAnimations(json.animations);
-			}
+			} //
 
-			if (json.images === undefined || json.images.length === 0) {
-				if (onLoad !== undefined) onLoad(object);
+
+			if (onLoad !== undefined) {
+				var hasImages = false;
+
+				for (var uuid in images) {
+					if (images[uuid] instanceof HTMLImageElement) {
+						hasImages = true;
+						break;
+					}
+				}
+
+				if (hasImages === false) onLoad(object);
 			}
 
 			return object;
