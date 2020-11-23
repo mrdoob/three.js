@@ -75,7 +75,7 @@ export class Object3D extends EventDispatcher {
 	readonly rotation: Euler;
 
 	/**
-	 * Global rotation.
+	 * Object's local rotation as a Quaternion.
 	 * @default new THREE.Quaternion()
 	 */
 	readonly quaternion: Quaternion;
