@@ -15,6 +15,7 @@ import {
 	NearestMipmapNearestFilter,
 	PropertyBinding,
 	RGBAFormat,
+	RGBFormat,
 	RepeatWrapping,
 	Scene,
 	Vector3
@@ -23,6 +24,7 @@ import {
 //------------------------------------------------------------------------------
 // Constants
 //------------------------------------------------------------------------------
+
 var WEBGL_CONSTANTS = {
 	POINTS: 0x0000,
 	LINES: 0x0001,
@@ -98,7 +100,6 @@ GLTFExporter.prototype = {
 			embedImages: true,
 			maxTextureSize: Infinity,
 			animations: [],
-			forcePowerOfTwoTextures: false,
 			includeCustomExtensions: false
 		};
 
@@ -243,19 +244,6 @@ GLTFExporter.prototype = {
 			}
 
 			return output;
-
-		}
-
-		/**
-		 * Checks if image size is POT.
-		 *
-		 * @param {Image} image The image to be checked.
-		 * @returns {Boolean} Returns true if image size is POT.
-		 *
-		 */
-		function isPowerOfTwo( image ) {
-
-			return MathUtils.isPowerOfTwo( image.width ) && MathUtils.isPowerOfTwo( image.height );
 
 		}
 
@@ -766,7 +754,7 @@ GLTFExporter.prototype = {
 		/**
 		 * Process image
 		 * @param  {Image} image to process
-		 * @param  {Integer} format of the image (e.g. THREE.RGBFormat, RGBAFormat etc)
+		 * @param  {Integer} format of the image (e.g. RGBFormat, RGBAFormat etc)
 		 * @param  {Boolean} flipY before writing out the image
 		 * @return {Integer}     Index of the processed texture in the "images" array
 		 */
@@ -803,15 +791,6 @@ GLTFExporter.prototype = {
 				canvas.width = Math.min( image.width, options.maxTextureSize );
 				canvas.height = Math.min( image.height, options.maxTextureSize );
 
-				if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( canvas ) ) {
-
-					console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
-
-					canvas.width = MathUtils.floorPowerOfTwo( canvas.width );
-					canvas.height = MathUtils.floorPowerOfTwo( canvas.height );
-
-				}
-
 				var ctx = canvas.getContext( '2d' );
 
 				if ( flipY === true ) {
@@ -821,7 +800,46 @@ GLTFExporter.prototype = {
 
 				}
 
-				ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
+				if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+					( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+					( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
+
+					ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
+
+				} else {
+
+					if ( format !== RGBAFormat && format !== RGBFormat ) {
+
+						console.error( 'GLTFExporter: Only RGB and RGBA formats are supported.' );
+
+					}
+
+					if ( image.width > options.maxTextureSize || image.height > options.maxTextureSize ) {
+
+						console.warn( 'GLTFExporter: Image size is bigger than maxTextureSize', image );
+
+					}
+
+					let data = image.data;
+
+					if ( format === RGBFormat ) {
+
+						data = new Uint8ClampedArray( image.height * image.width * 4 );
+
+						for ( var i = 0; i < data.length; i += 4 ) {
+
+							data[ i + 0 ] = image.data[ i + 0 ];
+							data[ i + 1 ] = image.data[ i + 1 ];
+							data[ i + 2 ] = image.data[ i + 2 ];
+							data[ i + 3 ] = 255;
+
+						}
+
+					}
+
+					ctx.putImageData( new ImageData( data, image.width, image.height ), 0, 0 );
+
+				}
 
 				if ( options.binary === true ) {
 

@@ -1298,11 +1298,16 @@
 						url = [];
 
 						for (var i = 0, l = image.length; i < l; i++) {
-							url.push(ImageUtils.getDataURL(image[i]));
+							// check cube texture with data textures
+							if (image[i].isDataTexture) {
+								url.push(serializeImage(image[i].image));
+							} else {
+								url.push(serializeImage(image[i]));
+							}
 						}
 					} else {
 						// process single image
-						url = ImageUtils.getDataURL(image);
+						url = serializeImage(image);
 					}
 
 					meta.images[image.uuid] = {
@@ -1383,6 +1388,26 @@
 			if (value === true) this.version++;
 		}
 	});
+
+	function serializeImage(image) {
+		if (typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement || typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement || typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap) {
+			// default images
+			return ImageUtils.getDataURL(image);
+		} else {
+			if (image.data) {
+				// images of DataTexture
+				return {
+					data: Array.prototype.slice.call(image.data),
+					width: image.width,
+					height: image.height,
+					type: image.data.constructor.name
+				};
+			} else {
+				console.warn('THREE.Texture: Unable to serialize Texture.');
+				return {};
+			}
+		}
+	}
 
 	var Vector4 = /*#__PURE__*/function () {
 		function Vector4(x, y, z, w) {
@@ -5144,6 +5169,7 @@
 		this.receiveShadow = false;
 		this.frustumCulled = true;
 		this.renderOrder = 0;
+		this.animations = [];
 		this.userData = {};
 	}
 
@@ -5479,7 +5505,8 @@
 					textures: {},
 					images: {},
 					shapes: {},
-					skeletons: {}
+					skeletons: {},
+					animations: {}
 				};
 				output.metadata = {
 					version: 4.5,
@@ -5567,6 +5594,16 @@
 				for (var _i2 = 0; _i2 < this.children.length; _i2++) {
 					object.children.push(this.children[_i2].toJSON(meta).object);
 				}
+			} //
+
+
+			if (this.animations.length > 0) {
+				object.animations = [];
+
+				for (var _i3 = 0; _i3 < this.animations.length; _i3++) {
+					var animation = this.animations[_i3];
+					object.animations.push(serialize(meta.animations, animation));
+				}
 			}
 
 			if (isRootObject) {
@@ -5578,12 +5615,14 @@
 				var _shapes = extractFromCache(meta.shapes);
 
 				var skeletons = extractFromCache(meta.skeletons);
+				var animations = extractFromCache(meta.animations);
 				if (geometries.length > 0) output.geometries = geometries;
 				if (materials.length > 0) output.materials = materials;
 				if (textures.length > 0) output.textures = textures;
 				if (images.length > 0) output.images = images;
 				if (_shapes.length > 0) output.shapes = _shapes;
 				if (skeletons.length > 0) output.skeletons = skeletons;
+				if (animations.length > 0) output.animations = animations;
 			}
 
 			output.object = object;
@@ -7658,6 +7697,23 @@
 		return max;
 	}
 
+	var TYPED_ARRAYS = {
+		Int8Array: Int8Array,
+		Uint8Array: Uint8Array,
+		// Workaround for IE11 pre KB2929437. See #11440
+		Uint8ClampedArray: typeof Uint8ClampedArray !== 'undefined' ? Uint8ClampedArray : Uint8Array,
+		Int16Array: Int16Array,
+		Uint16Array: Uint16Array,
+		Int32Array: Int32Array,
+		Uint32Array: Uint32Array,
+		Float32Array: Float32Array,
+		Float64Array: Float64Array
+	};
+
+	function getTypedArray(type, buffer) {
+		return new TYPED_ARRAYS[type](buffer);
+	}
+
 	var _bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
 
 	var _m1$2 = new Matrix4();
@@ -7718,6 +7774,9 @@
 		deleteAttribute: function deleteAttribute(name) {
 			delete this.attributes[name];
 			return this;
+		},
+		hasAttribute: function hasAttribute(name) {
+			return this.attributes[name] !== undefined;
 		},
 		addGroup: function addGroup(start, count, materialIndex) {
 			this.groups.push({
@@ -9906,6 +9965,22 @@
 		function PlaneBufferGeometry(width, height, widthSegments, heightSegments) {
 			var _this;
 
+			if (width === void 0) {
+				width = 1;
+			}
+
+			if (height === void 0) {
+				height = 1;
+			}
+
+			if (widthSegments === void 0) {
+				widthSegments = 1;
+			}
+
+			if (heightSegments === void 0) {
+				heightSegments = 1;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'PlaneBufferGeometry';
 			_this.parameters = {
@@ -9914,21 +9989,19 @@
 				widthSegments: widthSegments,
 				heightSegments: heightSegments
 			};
-			width = width || 1;
-			height = height || 1;
 			var width_half = width / 2;
 			var height_half = height / 2;
-			var gridX = Math.floor(widthSegments) || 1;
-			var gridY = Math.floor(heightSegments) || 1;
+			var gridX = Math.floor(widthSegments);
+			var gridY = Math.floor(heightSegments);
 			var gridX1 = gridX + 1;
 			var gridY1 = gridY + 1;
 			var segment_width = width / gridX;
-			var segment_height = height / gridY; // buffers
+			var segment_height = height / gridY; //
 
 			var indices = [];
 			var vertices = [];
 			var normals = [];
-			var uvs = []; // generate vertices, normals and uvs
+			var uvs = [];
 
 			for (var iy = 0; iy < gridY1; iy++) {
 				var y = iy * segment_height - height_half;
@@ -9940,21 +10013,18 @@
 					uvs.push(ix / gridX);
 					uvs.push(1 - iy / gridY);
 				}
-			} // indices
-
+			}
 
 			for (var _iy = 0; _iy < gridY; _iy++) {
 				for (var _ix = 0; _ix < gridX; _ix++) {
 					var a = _ix + gridX1 * _iy;
 					var b = _ix + gridX1 * (_iy + 1);
 					var c = _ix + 1 + gridX1 * (_iy + 1);
-					var d = _ix + 1 + gridX1 * _iy; // faces
-
+					var d = _ix + 1 + gridX1 * _iy;
 					indices.push(a, b, d);
 					indices.push(b, c, d);
 				}
-			} // build geometry
-
+			}
 
 			_this.setIndex(indices);
 
@@ -12059,11 +12129,11 @@
 					morphInfluences[_i4] = value;
 					morphInfluencesSum += value;
 				} else {
-					if (morphTargets && geometry.getAttribute('morphTarget' + _i4) !== undefined) {
+					if (morphTargets && geometry.hasAttribute('morphTarget' + _i4) === true) {
 						geometry.deleteAttribute('morphTarget' + _i4);
 					}
 
-					if (morphNormals && geometry.getAttribute('morphNormal' + _i4) !== undefined) {
+					if (morphNormals && geometry.hasAttribute('morphNormal' + _i4) === true) {
 						geometry.deleteAttribute('morphNormal' + _i4);
 					}
 
@@ -15231,9 +15301,20 @@
 			currentTextureSlot = null;
 			currentBoundTextures = {};
 			currentProgram = null;
+			currentBlendingEnabled = null;
 			currentBlending = null;
+			currentBlendEquation = null;
+			currentBlendSrc = null;
+			currentBlendDst = null;
+			currentBlendEquationAlpha = null;
+			currentBlendSrcAlpha = null;
+			currentBlendDstAlpha = null;
+			currentPremultipledAlpha = false;
 			currentFlipSided = null;
 			currentCullFace = null;
+			currentLineWidth = null;
+			currentPolygonOffsetFactor = null;
+			currentPolygonOffsetUnits = null;
 			colorBuffer.reset();
 			depthBuffer.reset();
 			stencilBuffer.reset();
@@ -16372,7 +16453,7 @@
 			var grip = this._grip;
 			var hand = this._hand;
 
-			if (inputSource) {
+			if (inputSource && frame.session.visibilityState !== 'visible-blurred') {
 				if (hand && inputSource.hand) {
 					handPose = true;
 
@@ -19615,12 +19696,8 @@
 			this.count = source.count;
 			return this;
 		},
-		setColorAt: function setColorAt(index, color) {
-			if (this.instanceColor === null) {
-				this.instanceColor = new BufferAttribute(new Float32Array(this.count * 3), 3);
-			}
-
-			color.toArray(this.instanceColor.array, index * 3);
+		getColorAt: function getColorAt(index, color) {
+			color.fromArray(this.instanceColor.array, index * 3);
 		},
 		getMatrixAt: function getMatrixAt(index, matrix) {
 			matrix.fromArray(this.instanceMatrix.array, index * 16);
@@ -19653,6 +19730,13 @@
 
 				_instanceIntersects.length = 0;
 			}
+		},
+		setColorAt: function setColorAt(index, color) {
+			if (this.instanceColor === null) {
+				this.instanceColor = new BufferAttribute(new Float32Array(this.count * 3), 3);
+			}
+
+			color.toArray(this.instanceColor.array, index * 3);
 		},
 		setMatrixAt: function setMatrixAt(index, matrix) {
 			matrix.toArray(this.instanceMatrix.array, index * 16);
@@ -20726,13 +20810,15 @@
 		 * Duplicated vertices are removed
 		 * and faces' vertices are updated.
 		 */
-		mergeVertices: function mergeVertices() {
+		mergeVertices: function mergeVertices(precisionPoints) {
+			if (precisionPoints === void 0) {
+				precisionPoints = 4;
+			}
+
 			var verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
 
 			var unique = [],
 					changes = [];
-			var precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
-
 			var precision = Math.pow(10, precisionPoints);
 
 			for (var i = 0, il = this.vertices.length; i < il; i++) {
@@ -21175,6 +21261,22 @@
 		function CircleBufferGeometry(radius, segments, thetaStart, thetaLength) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (segments === void 0) {
+				segments = 8;
+			}
+
+			if (thetaStart === void 0) {
+				thetaStart = 0;
+			}
+
+			if (thetaLength === void 0) {
+				thetaLength = Math.PI * 2;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'CircleBufferGeometry';
 			_this.parameters = {
@@ -21183,10 +21285,7 @@
 				thetaStart: thetaStart,
 				thetaLength: thetaLength
 			};
-			radius = radius || 1;
-			segments = segments !== undefined ? Math.max(3, segments) : 8;
-			thetaStart = thetaStart !== undefined ? thetaStart : 0;
-			thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2; // buffers
+			segments = Math.max(3, segments); // buffers
 
 			var indices = [];
 			var vertices = [];
@@ -21265,6 +21364,38 @@
 		function CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
 			var _this;
 
+			if (radiusTop === void 0) {
+				radiusTop = 1;
+			}
+
+			if (radiusBottom === void 0) {
+				radiusBottom = 1;
+			}
+
+			if (height === void 0) {
+				height = 1;
+			}
+
+			if (radialSegments === void 0) {
+				radialSegments = 8;
+			}
+
+			if (heightSegments === void 0) {
+				heightSegments = 1;
+			}
+
+			if (openEnded === void 0) {
+				openEnded = false;
+			}
+
+			if (thetaStart === void 0) {
+				thetaStart = 0;
+			}
+
+			if (thetaLength === void 0) {
+				thetaLength = Math.PI * 2;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'CylinderBufferGeometry';
 			_this.parameters = {
@@ -21280,14 +21411,8 @@
 
 			var scope = _assertThisInitialized(_this);
 
-			radiusTop = radiusTop !== undefined ? radiusTop : 1;
-			radiusBottom = radiusBottom !== undefined ? radiusBottom : 1;
-			height = height || 1;
-			radialSegments = Math.floor(radialSegments) || 8;
-			heightSegments = Math.floor(heightSegments) || 1;
-			openEnded = openEnded !== undefined ? openEnded : false;
-			thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
-			thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2; // buffers
+			radialSegments = Math.floor(radialSegments);
+			heightSegments = Math.floor(heightSegments); // buffers
 
 			var indices = [];
 			var vertices = [];
@@ -21504,6 +21629,34 @@
 		function ConeBufferGeometry(radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (height === void 0) {
+				height = 1;
+			}
+
+			if (radialSegments === void 0) {
+				radialSegments = 8;
+			}
+
+			if (heightSegments === void 0) {
+				heightSegments = 1;
+			}
+
+			if (openEnded === void 0) {
+				openEnded = false;
+			}
+
+			if (thetaStart === void 0) {
+				thetaStart = 0;
+			}
+
+			if (thetaLength === void 0) {
+				thetaLength = Math.PI * 2;
+			}
+
 			_this = _CylinderBufferGeomet.call(this, 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) || this;
 			_this.type = 'ConeBufferGeometry';
 			_this.parameters = {
@@ -21527,6 +21680,14 @@
 		function PolyhedronBufferGeometry(vertices, indices, radius, detail) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (detail === void 0) {
+				detail = 0;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'PolyhedronBufferGeometry';
 			_this.parameters = {
@@ -21534,9 +21695,7 @@
 				indices: indices,
 				radius: radius,
 				detail: detail
-			};
-			radius = radius || 1;
-			detail = detail || 0; // default buffer data
+			}; // default buffer data
 
 			var vertexBuffer = [];
 			var uvBuffer = []; // the subdivision creates the vertex buffer data
@@ -21729,6 +21888,14 @@
 
 		function DodecahedronBufferGeometry(radius, detail) {
 			var _this;
+
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (detail === void 0) {
+				detail = 0;
+			}
 
 			var t = (1 + Math.sqrt(5)) / 2;
 			var r = 1 / t;
@@ -23110,6 +23277,14 @@
 		function IcosahedronBufferGeometry(radius, detail) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (detail === void 0) {
+				detail = 0;
+			}
+
 			var t = (1 + Math.sqrt(5)) / 2;
 			var vertices = [-1, t, 0, 1, t, 0, -1, -t, 0, 1, -t, 0, 0, -1, t, 0, 1, t, 0, -1, -t, 0, 1, -t, t, 0, -1, t, 0, 1, -t, 0, -1, -t, 0, 1];
 			var indices = [0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11, 1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8, 3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9, 4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1];
@@ -23154,6 +23329,18 @@
 		function LatheBufferGeometry(points, segments, phiStart, phiLength) {
 			var _this;
 
+			if (segments === void 0) {
+				segments = 12;
+			}
+
+			if (phiStart === void 0) {
+				phiStart = 0;
+			}
+
+			if (phiLength === void 0) {
+				phiLength = Math.PI * 2;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'LatheBufferGeometry';
 			_this.parameters = {
@@ -23162,9 +23349,7 @@
 				phiStart: phiStart,
 				phiLength: phiLength
 			};
-			segments = Math.floor(segments) || 12;
-			phiStart = phiStart || 0;
-			phiLength = phiLength || Math.PI * 2; // clamp phiLength so it's in range of [ 0, 2PI ]
+			segments = Math.floor(segments); // clamp phiLength so it's in range of [ 0, 2PI ]
 
 			phiLength = MathUtils.clamp(phiLength, 0, Math.PI * 2); // buffers
 
@@ -23282,6 +23467,14 @@
 
 		function OctahedronBufferGeometry(radius, detail) {
 			var _this;
+
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (detail === void 0) {
+				detail = 0;
+			}
 
 			var vertices = [1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1];
 			var indices = [0, 2, 4, 0, 4, 3, 0, 3, 5, 0, 5, 2, 1, 2, 5, 1, 5, 3, 1, 3, 4, 1, 4, 2];
@@ -23485,6 +23678,30 @@
 		function RingBufferGeometry(innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength) {
 			var _this;
 
+			if (innerRadius === void 0) {
+				innerRadius = 0.5;
+			}
+
+			if (outerRadius === void 0) {
+				outerRadius = 1;
+			}
+
+			if (thetaSegments === void 0) {
+				thetaSegments = 8;
+			}
+
+			if (phiSegments === void 0) {
+				phiSegments = 1;
+			}
+
+			if (thetaStart === void 0) {
+				thetaStart = 0;
+			}
+
+			if (thetaLength === void 0) {
+				thetaLength = Math.PI * 2;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'RingBufferGeometry';
 			_this.parameters = {
@@ -23495,12 +23712,8 @@
 				thetaStart: thetaStart,
 				thetaLength: thetaLength
 			};
-			innerRadius = innerRadius || 0.5;
-			outerRadius = outerRadius || 1;
-			thetaStart = thetaStart !== undefined ? thetaStart : 0;
-			thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
-			thetaSegments = thetaSegments !== undefined ? Math.max(3, thetaSegments) : 8;
-			phiSegments = phiSegments !== undefined ? Math.max(1, phiSegments) : 1; // buffers
+			thetaSegments = Math.max(3, thetaSegments);
+			phiSegments = Math.max(1, phiSegments); // buffers
 
 			var indices = [];
 			var vertices = [];
@@ -23597,13 +23810,16 @@
 		function ShapeBufferGeometry(shapes, curveSegments) {
 			var _this;
 
+			if (curveSegments === void 0) {
+				curveSegments = 12;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'ShapeBufferGeometry';
 			_this.parameters = {
 				shapes: shapes,
 				curveSegments: curveSegments
-			};
-			curveSegments = curveSegments || 12; // buffers
+			}; // buffers
 
 			var indices = [];
 			var vertices = [];
@@ -23768,6 +23984,34 @@
 		function SphereBufferGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (widthSegments === void 0) {
+				widthSegments = 8;
+			}
+
+			if (heightSegments === void 0) {
+				heightSegments = 6;
+			}
+
+			if (phiStart === void 0) {
+				phiStart = 0;
+			}
+
+			if (phiLength === void 0) {
+				phiLength = Math.PI * 2;
+			}
+
+			if (thetaStart === void 0) {
+				thetaStart = 0;
+			}
+
+			if (thetaLength === void 0) {
+				thetaLength = Math.PI;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'SphereBufferGeometry';
 			_this.parameters = {
@@ -23779,13 +24023,8 @@
 				thetaStart: thetaStart,
 				thetaLength: thetaLength
 			};
-			radius = radius || 1;
-			widthSegments = Math.max(3, Math.floor(widthSegments) || 8);
-			heightSegments = Math.max(2, Math.floor(heightSegments) || 6);
-			phiStart = phiStart !== undefined ? phiStart : 0;
-			phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
-			thetaStart = thetaStart !== undefined ? thetaStart : 0;
-			thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
+			widthSegments = Math.max(3, Math.floor(widthSegments));
+			heightSegments = Math.max(2, Math.floor(heightSegments));
 			var thetaEnd = Math.min(thetaStart + thetaLength, Math.PI);
 			var index = 0;
 			var grid = [];
@@ -23888,6 +24127,14 @@
 		function TetrahedronBufferGeometry(radius, detail) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (detail === void 0) {
+				detail = 0;
+			}
+
 			var vertices = [1, 1, 1, -1, -1, 1, -1, 1, -1, 1, -1, -1];
 			var indices = [2, 1, 0, 0, 3, 2, 1, 3, 0, 2, 3, 1];
 			_this = _PolyhedronBufferGeom.call(this, vertices, indices, radius, detail) || this;
@@ -23931,7 +24178,10 @@
 		function TextBufferGeometry(text, parameters) {
 			var _this;
 
-			parameters = parameters || {};
+			if (parameters === void 0) {
+				parameters = {};
+			}
+
 			var font = parameters.font;
 
 			if (!(font && font.isFont)) {
@@ -23983,6 +24233,26 @@
 		function TorusBufferGeometry(radius, tube, radialSegments, tubularSegments, arc) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (tube === void 0) {
+				tube = 0.4;
+			}
+
+			if (radialSegments === void 0) {
+				radialSegments = 8;
+			}
+
+			if (tubularSegments === void 0) {
+				tubularSegments = 6;
+			}
+
+			if (arc === void 0) {
+				arc = Math.PI * 2;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'TorusBufferGeometry';
 			_this.parameters = {
@@ -23992,11 +24262,8 @@
 				tubularSegments: tubularSegments,
 				arc: arc
 			};
-			radius = radius || 1;
-			tube = tube || 0.4;
-			radialSegments = Math.floor(radialSegments) || 8;
-			tubularSegments = Math.floor(tubularSegments) || 6;
-			arc = arc || Math.PI * 2; // buffers
+			radialSegments = Math.floor(radialSegments);
+			tubularSegments = Math.floor(tubularSegments); // buffers
 
 			var indices = [];
 			var vertices = [];
@@ -24088,6 +24355,30 @@
 		function TorusKnotBufferGeometry(radius, tube, tubularSegments, radialSegments, p, q) {
 			var _this;
 
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (tube === void 0) {
+				tube = 0.4;
+			}
+
+			if (tubularSegments === void 0) {
+				tubularSegments = 64;
+			}
+
+			if (radialSegments === void 0) {
+				radialSegments = 8;
+			}
+
+			if (p === void 0) {
+				p = 2;
+			}
+
+			if (q === void 0) {
+				q = 3;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'TorusKnotBufferGeometry';
 			_this.parameters = {
@@ -24098,12 +24389,8 @@
 				p: p,
 				q: q
 			};
-			radius = radius || 1;
-			tube = tube || 0.4;
-			tubularSegments = Math.floor(tubularSegments) || 64;
-			radialSegments = Math.floor(radialSegments) || 8;
-			p = p || 2;
-			q = q || 3; // buffers
+			tubularSegments = Math.floor(tubularSegments);
+			radialSegments = Math.floor(radialSegments); // buffers
 
 			var indices = [];
 			var vertices = [];
@@ -24229,6 +24516,22 @@
 		function TubeBufferGeometry(path, tubularSegments, radius, radialSegments, closed) {
 			var _this;
 
+			if (tubularSegments === void 0) {
+				tubularSegments = 64;
+			}
+
+			if (radius === void 0) {
+				radius = 1;
+			}
+
+			if (radialSegments === void 0) {
+				radialSegments = 8;
+			}
+
+			if (closed === void 0) {
+				closed = false;
+			}
+
 			_this = _BufferGeometry.call(this) || this;
 			_this.type = 'TubeBufferGeometry';
 			_this.parameters = {
@@ -24238,10 +24541,6 @@
 				radialSegments: radialSegments,
 				closed: closed
 			};
-			tubularSegments = tubularSegments || 64;
-			radius = radius || 1;
-			radialSegments = radialSegments || 8;
-			closed = closed || false;
 			var frames = path.computeFrenetFrames(tubularSegments, closed); // expose internals
 
 			_this.tangents = frames.tangents;
@@ -26442,7 +26741,9 @@
 				tracks.push(parseKeyframeTrack(jsonTracks[i]).scale(frameTime));
 			}
 
-			return new AnimationClip(json.name, json.duration, tracks, json.blendMode);
+			var clip = new AnimationClip(json.name, json.duration, tracks, json.blendMode);
+			clip.uuid = json.uuid;
+			return clip;
 		},
 		toJSON: function toJSON(clip) {
 			var tracks = [],
@@ -26656,6 +26957,9 @@
 			}
 
 			return new AnimationClip(this.name, this.duration, tracks, this.blendMode);
+		},
+		toJSON: function toJSON() {
+			return AnimationClip.toJSON(this);
 		}
 	});
 
@@ -29628,7 +29932,7 @@
 				var interleavedBuffers = json.interleavedBuffers;
 				var interleavedBuffer = interleavedBuffers[uuid];
 				var buffer = getArrayBuffer(json, interleavedBuffer.buffer);
-				var array = new TYPED_ARRAYS[interleavedBuffer.type](buffer);
+				var array = getTypedArray(interleavedBuffer.type, buffer);
 				var ib = new InterleavedBuffer(array, interleavedBuffer.stride);
 				ib.uuid = interleavedBuffer.uuid;
 				interleavedBufferMap[uuid] = ib;
@@ -29648,7 +29952,7 @@
 			var index = json.data.index;
 
 			if (index !== undefined) {
-				var typedArray = new TYPED_ARRAYS[index.type](index.array);
+				var typedArray = getTypedArray(index.type, index.array);
 				geometry.setIndex(new BufferAttribute(typedArray, 1));
 			}
 
@@ -29662,7 +29966,7 @@
 					var interleavedBuffer = getInterleavedBuffer(json.data, attribute.data);
 					bufferAttribute = new InterleavedBufferAttribute(interleavedBuffer, attribute.itemSize, attribute.offset, attribute.normalized);
 				} else {
-					var _typedArray = new TYPED_ARRAYS[attribute.type](attribute.array);
+					var _typedArray = getTypedArray(attribute.type, attribute.array);
 
 					var bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
 					bufferAttribute = new bufferAttributeConstr(_typedArray, attribute.itemSize, attribute.normalized);
@@ -29689,7 +29993,7 @@
 
 							_bufferAttribute = new InterleavedBufferAttribute(_interleavedBuffer, _attribute.itemSize, _attribute.offset, _attribute.normalized);
 						} else {
-							var _typedArray2 = new TYPED_ARRAYS[_attribute.type](_attribute.array);
+							var _typedArray2 = getTypedArray(_attribute.type, _attribute.array);
 
 							_bufferAttribute = new BufferAttribute(_typedArray2, _attribute.itemSize, _attribute.normalized);
 						}
@@ -29734,18 +30038,6 @@
 			return geometry;
 		}
 	});
-	var TYPED_ARRAYS = {
-		Int8Array: Int8Array,
-		Uint8Array: Uint8Array,
-		// Workaround for IE11 pre KB2929437. See #11440
-		Uint8ClampedArray: typeof Uint8ClampedArray !== 'undefined' ? Uint8ClampedArray : Uint8Array,
-		Int16Array: Int16Array,
-		Uint16Array: Uint16Array,
-		Int32Array: Int32Array,
-		Uint32Array: Uint32Array,
-		Float32Array: Float32Array,
-		Float64Array: Float64Array
-	};
 
 	var ObjectLoader = /*#__PURE__*/function (_Loader) {
 		_inheritsLoose(ObjectLoader, _Loader);
@@ -29787,6 +30079,7 @@
 		};
 
 		_proto.parse = function parse(json, onLoad) {
+			var animations = this.parseAnimations(json.animations);
 			var shapes = this.parseShapes(json.shapes);
 			var geometries = this.parseGeometries(json.geometries, shapes);
 			var images = this.parseImages(json.images, function () {
@@ -29794,16 +30087,21 @@
 			});
 			var textures = this.parseTextures(json.textures, images);
 			var materials = this.parseMaterials(json.materials, textures);
-			var object = this.parseObject(json.object, geometries, materials);
+			var object = this.parseObject(json.object, geometries, materials, animations);
 			var skeletons = this.parseSkeletons(json.skeletons, object);
-			this.bindSkeletons(object, skeletons);
+			this.bindSkeletons(object, skeletons); //
 
-			if (json.animations) {
-				object.animations = this.parseAnimations(json.animations);
-			}
+			if (onLoad !== undefined) {
+				var hasImages = false;
 
-			if (json.images === undefined || json.images.length === 0) {
-				if (onLoad !== undefined) onLoad(object);
+				for (var uuid in images) {
+					if (images[uuid] instanceof HTMLImageElement) {
+						hasImages = true;
+						break;
+					}
+				}
+
+				if (hasImages === false) onLoad(object);
 			}
 
 			return object;
@@ -30022,13 +30320,14 @@
 		};
 
 		_proto.parseAnimations = function parseAnimations(json) {
-			var animations = [];
+			var animations = {};
 
-			for (var i = 0; i < json.length; i++) {
-				var data = json[i];
-				var clip = AnimationClip.parse(data);
-				if (data.uuid !== undefined) clip.uuid = data.uuid;
-				animations.push(clip);
+			if (json !== undefined) {
+				for (var i = 0; i < json.length; i++) {
+					var data = json[i];
+					var clip = AnimationClip.parse(data);
+					animations[clip.uuid] = clip;
+				}
 			}
 
 			return animations;
@@ -30049,6 +30348,24 @@
 				});
 			}
 
+			function deserializeImage(image) {
+				if (typeof image === 'string') {
+					var url = image;
+					var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test(url) ? url : scope.resourcePath + url;
+					return loadImage(path);
+				} else {
+					if (image.data) {
+						return {
+							data: getTypedArray(image.type, image.data),
+							width: image.width,
+							height: image.height
+						};
+					} else {
+						return null;
+					}
+				}
+			}
+
 			if (json !== undefined && json.length > 0) {
 				var manager = new LoadingManager(onLoad);
 				loader = new ImageLoader(manager);
@@ -30064,14 +30381,24 @@
 
 						for (var j = 0, jl = url.length; j < jl; j++) {
 							var currentUrl = url[j];
-							var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test(currentUrl) ? currentUrl : scope.resourcePath + currentUrl;
-							images[image.uuid].push(loadImage(path));
+							var deserializedImage = deserializeImage(currentUrl);
+
+							if (deserializedImage !== null) {
+								if (deserializedImage instanceof HTMLImageElement) {
+									images[image.uuid].push(deserializedImage);
+								} else {
+									// special case: handle array of data textures for cube textures
+									images[image.uuid].push(new DataTexture(deserializedImage.data, deserializedImage.width, deserializedImage.height));
+								}
+							}
 						}
 					} else {
 						// load single image
-						var _path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test(image.url) ? image.url : scope.resourcePath + image.url;
+						var _deserializedImage = deserializeImage(image.url);
 
-						images[image.uuid] = loadImage(_path);
+						if (_deserializedImage !== null) {
+							images[image.uuid] = _deserializedImage;
+						}
 					}
 				}
 			}
@@ -30101,14 +30428,21 @@
 					}
 
 					var texture = void 0;
+					var image = images[data.image];
 
-					if (Array.isArray(images[data.image])) {
-						texture = new CubeTexture(images[data.image]);
+					if (Array.isArray(image)) {
+						texture = new CubeTexture(image);
+						if (image.length === 6) texture.needsUpdate = true;
 					} else {
-						texture = new Texture(images[data.image]);
+						if (image && image.data) {
+							texture = new DataTexture(image.data, image.width, image.height);
+						} else {
+							texture = new Texture(image);
+						}
+
+						if (image) texture.needsUpdate = true; // textures can have undefined image data
 					}
 
-					texture.needsUpdate = true;
 					texture.uuid = data.uuid;
 					if (data.name !== undefined) texture.name = data.name;
 					if (data.mapping !== undefined) texture.mapping = parseConstant(data.mapping, TEXTURE_MAPPING);
@@ -30138,7 +30472,7 @@
 			return textures;
 		};
 
-		_proto.parseObject = function parseObject(data, geometries, materials) {
+		_proto.parseObject = function parseObject(data, geometries, materials, animations) {
 			var object;
 
 			function getGeometry(name) {
@@ -30336,7 +30670,16 @@
 				var children = data.children;
 
 				for (var i = 0; i < children.length; i++) {
-					object.add(this.parseObject(children[i], geometries, materials));
+					object.add(this.parseObject(children[i], geometries, materials, animations));
+				}
+			}
+
+			if (data.animations !== undefined) {
+				var objectAnimations = data.animations;
+
+				for (var _i = 0; _i < objectAnimations.length; _i++) {
+					var uuid = objectAnimations[_i];
+					object.animations.push(animations[uuid]);
 				}
 			}
 

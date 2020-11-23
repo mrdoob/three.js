@@ -2,7 +2,7 @@ import { PolyhedronBufferGeometry } from './PolyhedronBufferGeometry.js';
 
 class TetrahedronBufferGeometry extends PolyhedronBufferGeometry {
 
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
 		const vertices = [
 			1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1

@@ -4,7 +4,7 @@ import { ShapeUtils } from '../extras/ShapeUtils.js';
 
 class ShapeBufferGeometry extends BufferGeometry {
 
-	constructor( shapes, curveSegments ) {
+	constructor( shapes, curveSegments = 12 ) {
 
 		super();
 		this.type = 'ShapeBufferGeometry';
@@ -13,8 +13,6 @@ class ShapeBufferGeometry extends BufferGeometry {
 			shapes: shapes,
 			curveSegments: curveSegments
 		};
-
-		curveSegments = curveSegments || 12;
 
 		// buffers
 

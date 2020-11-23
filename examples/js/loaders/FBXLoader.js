@@ -495,7 +495,7 @@ THREE.FBXLoader = ( function () {
 
 				parameters.color = new THREE.Color().fromArray( materialNode.Diffuse.value );
 
-			} else if ( materialNode.DiffuseColor && materialNode.DiffuseColor.type === 'Color' ) {
+			} else if ( materialNode.DiffuseColor && ( materialNode.DiffuseColor.type === 'Color' || materialNode.DiffuseColor.type === 'ColorRGB' ) ) {
 
 				// The blender exporter exports diffuse here instead of in materialNode.Diffuse
 				parameters.color = new THREE.Color().fromArray( materialNode.DiffuseColor.value );
@@ -512,7 +512,7 @@ THREE.FBXLoader = ( function () {
 
 				parameters.emissive = new THREE.Color().fromArray( materialNode.Emissive.value );
 
-			} else if ( materialNode.EmissiveColor && materialNode.EmissiveColor.type === 'Color' ) {
+			} else if ( materialNode.EmissiveColor && ( materialNode.EmissiveColor.type === 'Color' || materialNode.EmissiveColor.type === 'ColorRGB' ) ) {
 
 				// The blender exporter exports emissive color here instead of in materialNode.Emissive
 				parameters.emissive = new THREE.Color().fromArray( materialNode.EmissiveColor.value );

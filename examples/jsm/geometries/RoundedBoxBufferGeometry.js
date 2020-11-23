@@ -39,19 +39,18 @@ function getUv( faceDirVector, normal, uvAxis, projectionAxis, radius, sideLengt
 
 class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 
-	constructor( width = 1, height = 1, depth = 1, segments = 1, radius = 1 ) {
+	constructor( width = 1, height = 1, depth = 1, segments = 2, radius = 0.1 ) {
 
 		// ensure segments is odd so we have a plane connecting the rounded corners
-		segments = segments % 2 === 0 ? segments + 1 : segments;
+		segments = segments * 2 + 1;
+
+		// ensure radius isn't bigger than shortest side
+		radius = Math.min( width / 2, height / 2, depth / 2, radius );
 
 		super( 1, 1, 1, segments, segments, segments );
 
-		// if we just have one segment we'r the same as a regular box
-		if ( segments === 1 ) {
-
-			return;
-
-		}
+		// if we just have one segment we're the same as a regular box
+		if ( segments === 1 ) return;
 
 		const geometry2 = this.toNonIndexed();
 
@@ -78,17 +77,15 @@ class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 		for ( let i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
 
 			position.fromArray( positions, i );
-			normal.copy( position ).normalize();
-
-			positions[ i + 0 ] = box.x * Math.sign( position.x ) + normal.x * radius;
-			positions[ i + 1 ] = box.y * Math.sign( position.y ) + normal.y * radius;
-			positions[ i + 2 ] = box.z * Math.sign( position.z ) + normal.z * radius;
-
 			normal.copy( position );
 			normal.x -= Math.sign( normal.x ) * halfSegmentSize;
 			normal.y -= Math.sign( normal.y ) * halfSegmentSize;
 			normal.z -= Math.sign( normal.z ) * halfSegmentSize;
 			normal.normalize();
+
+			positions[ i + 0 ] = box.x * Math.sign( position.x ) + normal.x * radius;
+			positions[ i + 1 ] = box.y * Math.sign( position.y ) + normal.y * radius;
+			positions[ i + 2 ] = box.z * Math.sign( position.z ) + normal.z * radius;
 
 			normals[ i + 0 ] = normal.x;
 			normals[ i + 1 ] = normal.y;
@@ -125,7 +122,7 @@ class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 				case 3: // bottom
 
 					// generate UVs along X then Z
-					faceDirVector.set( 0, -1, 0 );
+					faceDirVector.set( 0, - 1, 0 );
 					uvs[ j + 0 ] = 1.0 - getUv( faceDirVector, normal, 'x', 'z', radius, width );
 					uvs[ j + 1 ] = 1.0 - getUv( faceDirVector, normal, 'z', 'x', radius, depth );
 					break;

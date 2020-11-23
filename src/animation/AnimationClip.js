@@ -118,7 +118,10 @@ Object.assign( AnimationClip, {
 
 		}
 
-		return new AnimationClip( json.name, json.duration, tracks, json.blendMode );
+		const clip = new AnimationClip( json.name, json.duration, tracks, json.blendMode );
+		clip.uuid = json.uuid;
+
+		return clip;
 
 	},
 
@@ -459,6 +462,12 @@ Object.assign( AnimationClip.prototype, {
 		}
 
 		return new AnimationClip( this.name, this.duration, tracks, this.blendMode );
+
+	},
+
+	toJSON: function () {
+
+		return AnimationClip.toJSON( this );
 
 	}
 

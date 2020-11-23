@@ -169,6 +169,12 @@ var EdgeSplitModifier = function () {
 
 		if ( geometry.index == null ) {
 
+			if ( BufferGeometryUtils === undefined ) {
+
+			 	throw 'THREE.EdgeSplitModifier relies on BufferGeometryUtils';
+
+			}
+
 			geometry = BufferGeometryUtils.mergeVertices( geometry );
 
 		}
