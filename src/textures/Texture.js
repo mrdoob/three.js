@@ -17,7 +17,7 @@ import { ImageUtils } from '../extras/ImageUtils.js';
 
 let textureId = 0;
 
-function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+function Texture( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1, encoding = LinearEncoding ) {
 
 	Object.defineProperty( this, 'id', { value: textureId ++ } );
 
@@ -25,22 +25,22 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.name = '';
 
-	this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
+	this.image = image;
 	this.mipmaps = [];
 
-	this.mapping = mapping !== undefined ? mapping : Texture.DEFAULT_MAPPING;
+	this.mapping = mapping;
 
-	this.wrapS = wrapS !== undefined ? wrapS : ClampToEdgeWrapping;
-	this.wrapT = wrapT !== undefined ? wrapT : ClampToEdgeWrapping;
+	this.wrapS = wrapS;
+	this.wrapT = wrapT;
 
-	this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
-	this.minFilter = minFilter !== undefined ? minFilter : LinearMipmapLinearFilter;
+	this.magFilter = magFilter;
+	this.minFilter = minFilter;
 
-	this.anisotropy = anisotropy !== undefined ? anisotropy : 1;
+	this.anisotropy = anisotropy;
 
-	this.format = format !== undefined ? format : RGBAFormat;
+	this.format = format;
 	this.internalFormat = null;
-	this.type = type !== undefined ? type : UnsignedByteType;
+	this.type = type;
 
 	this.offset = new Vector2( 0, 0 );
 	this.repeat = new Vector2( 1, 1 );
@@ -59,7 +59,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	//
 	// Also changing the encoding after already used by a Material will not automatically make the Material
 	// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
-	this.encoding = encoding !== undefined ? encoding : LinearEncoding;
+	this.encoding = encoding;
 
 	this.version = 0;
 	this.onUpdate = null;
