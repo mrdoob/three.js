@@ -1,6 +1,6 @@
 import { WebGLRenderer } from '../WebGLRenderer';
 
-export class WebGLCubeMaps {
+export class WebGLCubeUVMaps {
 
 	constructor( renderer: WebGLRenderer );
 

@@ -2,6 +2,7 @@ import { WebGLRenderer } from './../WebGLRenderer';
 import { WebGLProgram } from './WebGLProgram';
 import { WebGLCapabilities } from './WebGLCapabilities';
 import { WebGLCubeMaps } from './WebGLCubeMaps';
+import { WebGLCubeUVMaps } from './WebGLCubeUVMaps';
 import { WebGLExtensions } from './WebGLExtensions';
 import { WebGLClipping } from './WebGLClipping';
 import { WebGLBindingStates } from './WebGLBindingStates';
@@ -10,7 +11,7 @@ import { Scene } from './../../scenes/Scene';
 
 export class WebGLPrograms {
 
-	constructor( renderer: WebGLRenderer, cubemaps: WebGLCubeMaps, extensions: WebGLExtensions, capabilities: WebGLCapabilities, bindingStates: WebGLBindingStates, clipping: WebGLClipping );
+	constructor( renderer: WebGLRenderer, cubemaps: WebGLCubeMaps, cubeuvmaps: WebGLCubeUVMaps, extensions: WebGLExtensions, capabilities: WebGLCapabilities, bindingStates: WebGLBindingStates, clipping: WebGLClipping );
 
 	programs: WebGLProgram[];
 

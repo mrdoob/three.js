@@ -7,10 +7,11 @@ import { WebGLRenderList } from './WebGLRenderLists';
 import { Scene } from '../../scenes/Scene';
 import { Camera } from '../../cameras/Camera';
 import { WebGLCubeMaps } from './WebGLCubeMaps';
+import { WebGLCubeUVMaps } from './WebGLCubeUVMaps';
 
 export class WebGLBackground {
 
-	constructor( renderer: WebGLRenderer, cubemaps: WebGLCubeMaps, state: WebGLState, objects: WebGLObjects, premultipliedAlpha: boolean );
+	constructor( renderer: WebGLRenderer, cubemaps: WebGLCubeMaps, cubeuvmaps: WebGLCubeUVMaps, state: WebGLState, objects: WebGLObjects, premultipliedAlpha: boolean );
 
 	setBlurriness( blurriness: number ): void;
 	getClearColor(): Color;

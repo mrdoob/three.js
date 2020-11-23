@@ -7,7 +7,7 @@ import { Mesh } from '../../objects/Mesh.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { cloneUniforms } from '../shaders/UniformsUtils.js';
 
-function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha ) {
+function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, premultipliedAlpha ) {
 
 	let blurriness = 0;
 
@@ -28,7 +28,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 		if ( background && background.isTexture ) {
 
 			const isPBR = blurriness > 0; // use PBR workflow if the user wants to blur the background
-			background = cubemaps.get( background, isPBR );
+			background = ( isPBR ? cubeuvmaps : cubemaps ).get( background );
 
 		}
 
