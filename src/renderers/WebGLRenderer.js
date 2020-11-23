@@ -47,21 +47,30 @@ function createCanvasElement() {
 
 }
 
-function WebGLRenderer( parameters ) {
+function WebGLRenderer( {
+	canvas = createCanvasElement(),
+	context = null,
+	alpha = false,
+	depth = true,
+	stencil = true,
+	antialias = false,
+	premultipliedAlpha = true,
+	preserveDrawingBuffer = false,
+	powerPreference = 'default',
+	failIfMajorPerformanceCaveat = false
+} ) {
 
-	parameters = parameters || {};
+	const _canvas = canvas,
+		_context = context,
 
-	const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
-		_context = parameters.context !== undefined ? parameters.context : null,
-
-		_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
-		_depth = parameters.depth !== undefined ? parameters.depth : true,
-		_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
-		_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
-		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
-		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
-		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default',
-		_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false;
+		_alpha = alpha,
+		_depth = depth,
+		_stencil = stencil,
+		_antialias = antialias,
+		_premultipliedAlpha = premultipliedAlpha,
+		_preserveDrawingBuffer = preserveDrawingBuffer,
+		_powerPreference = powerPreference,
+		_failIfMajorPerformanceCaveat = failIfMajorPerformanceCaveat;
 
 	let currentRenderList = null;
 	let currentRenderState = null;
