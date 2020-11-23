@@ -483,9 +483,7 @@ function MenubarFile( editor ) {
 
 		scene.traverse( function ( object ) {
 
-			var objectAnimations = editor.animations[ object.uuid ];
-
-			if ( objectAnimations !== undefined ) animations.push( ... objectAnimations );
+			animations.push( ... object.animations );
 
 		} );
 
