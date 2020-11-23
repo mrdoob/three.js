@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+  pull_request:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -26,6 +27,7 @@ jobs:
           LESSON_BUILDER_ENV: production
 
       - name: Deploy 📦
+        if: ${{ github.event_name === 'push' }}
         uses: JamesIves/github-pages-deploy-action@3.6.2
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
