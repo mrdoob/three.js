@@ -826,11 +826,11 @@ GLTFExporter.prototype = {
 
 						data = new Uint8ClampedArray( image.height * image.width * 4 );
 
-						for ( var i = 0; i < data.length; i += 4 ) {
+						for ( var i = 0, j = 0; i < data.length; i += 4, j += 3 ) {
 
-							data[ i + 0 ] = image.data[ i + 0 ];
-							data[ i + 1 ] = image.data[ i + 1 ];
-							data[ i + 2 ] = image.data[ i + 2 ];
+							data[ i + 0 ] = image.data[ j + 0 ];
+							data[ i + 1 ] = image.data[ j + 1 ];
+							data[ i + 2 ] = image.data[ j + 2 ];
 							data[ i + 3 ] = 255;
 
 						}
