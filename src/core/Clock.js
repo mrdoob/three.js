@@ -14,7 +14,7 @@ class Clock {
 
 	start() {
 
-		this.startTime = ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
+		this.startTime = now();
 
 		this.oldTime = this.startTime;
 		this.elapsedTime = 0;
@@ -50,7 +50,7 @@ class Clock {
 
 		if ( this.running ) {
 
-			const newTime = ( typeof performance === 'undefined' ? Date : performance ).now();
+			const newTime = now();
 
 			diff = ( newTime - this.oldTime ) / 1000;
 			this.oldTime = newTime;
@@ -62,6 +62,12 @@ class Clock {
 		return diff;
 
 	}
+
+}
+
+function now() {
+
+	return ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
 
 }
 
