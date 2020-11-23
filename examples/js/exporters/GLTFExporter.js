@@ -244,7 +244,7 @@ THREE.GLTFExporter.prototype = {
 			for ( var i = 0, il = normal.count; i < il; i ++ ) {
 
 				// 0.0005 is from glTF-validator
-				if ( Math.abs( v.fromArray( normal.array, i * 3 ).length() - 1.0 ) > 0.0005 ) return false;
+				if ( Math.abs( v.fromBufferAttribute( normal, i ).length() - 1.0 ) > 0.0005 ) return false;
 
 			}
 
@@ -273,7 +273,7 @@ THREE.GLTFExporter.prototype = {
 
 			for ( var i = 0, il = attribute.count; i < il; i ++ ) {
 
-				v.fromArray( attribute.array, i * 3 );
+				v.fromBufferAttribute( attribute, i );
 
 				if ( v.x === 0 && v.y === 0 && v.z === 0 ) {
 
@@ -286,7 +286,7 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				v.toArray( attribute.array, i * 3 );
+				attribute.setXYZ( i, v.x, v.y, v.z );
 
 			}
 
