@@ -127,10 +127,10 @@ function WebGLRenderList( properties ) {
 
 	}
 
-	function sort( customOpaqueSort, customTransparentSort ) {
+	function sort( customOpaqueSort = painterSortStable, customTransparentSort = reversePainterSortStable ) {
 
-		if ( opaque.length > 1 ) opaque.sort( customOpaqueSort || painterSortStable );
-		if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
+		if ( opaque.length > 1 ) opaque.sort( customOpaqueSort );
+		if ( transparent.length > 1 ) transparent.sort( customTransparentSort );
 
 	}
 

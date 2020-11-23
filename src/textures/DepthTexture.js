@@ -1,9 +1,7 @@
 import { Texture } from './Texture.js';
 import { NearestFilter, UnsignedShortType, UnsignedInt248Type, DepthFormat, DepthStencilFormat } from '../constants.js';
 
-function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
-
-	format = format !== undefined ? format : DepthFormat;
+function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, format = DepthFormat ) {
 
 	if ( format !== DepthFormat && format !== DepthStencilFormat ) {
 
@@ -18,11 +16,8 @@ function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, mi
 
 	this.image = { width: width, height: height };
 
-	this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
-
 	this.flipY = false;
-	this.generateMipmaps	= false;
+	this.generateMipmaps = false;
 
 }
 
