@@ -60,6 +60,8 @@ function SidebarAnimation( editor ) {
 
 		actions[ animationsSelect.getValue() ].stop();
 
+		signals.animationStopped.dispatch();
+
 	}
 
 	function changeTimeScale() {
