@@ -837,15 +837,15 @@ class ObjectLoader extends Loader {
 
 		}
 
-		function getTexture( name ) {
+		function getTexture( uuid ) {
 
-			if ( textures[ name ] === undefined ) {
+			if ( textures[ uuid ] === undefined ) {
 
-				console.warn( 'THREE.ObjectLoader: Undefined texture', name );
+				console.warn( 'THREE.ObjectLoader: Undefined texture', uuid );
 
 			}
 
-			return textures[ name ];
+			return textures[ uuid ];
 
 		}
 
