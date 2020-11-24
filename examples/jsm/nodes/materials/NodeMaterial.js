@@ -63,9 +63,15 @@ NodeMaterial.prototype.onBeforeCompile = function ( shader, renderer ) {
 
 	this.build( { renderer: renderer } );
 
+	shader.defines = this.defines;
 	shader.uniforms = this.uniforms;
 	shader.vertexShader = this.vertexShader;
 	shader.fragmentShader = this.fragmentShader;
+
+	shader.extensionDerivatives = ( this.extensions.derivatives === true );
+	shader.extensionFragDepth = ( this.extensions.fragDepth === true );
+	shader.extensionDrawBuffers = ( this.extensions.drawBuffers === true );
+	shader.extensionShaderTextureLOD = ( this.extensions.shaderTextureLOD === true );
 
 };
 

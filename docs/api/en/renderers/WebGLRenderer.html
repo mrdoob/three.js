@@ -191,9 +191,13 @@
 			</li>
 		</ul>
 		</p>
-		<p>By default these data are reset at each render calls, but when using the composer or mirrors it can be preferred to reset them with a custom pattern :
+		<p>By default these data are reset at each render call but when having multiple render passes per frame (e.g. when using post processing) it can be preferred to reset with a custom pattern.
+			First, set *autoReset* to *false*.
 		<code>
 		renderer.info.autoReset = false;
+		</code>
+		Call *reset()* whenever you have finished to render a single frame.
+		<code>
 		renderer.info.reset();
 		</code>
 		</p>

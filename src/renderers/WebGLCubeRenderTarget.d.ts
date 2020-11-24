@@ -14,4 +14,6 @@ export class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 	fromEquirectangularTexture( renderer: WebGLRenderer, texture: Texture ): this;
 
+	clear( renderer: WebGLRenderer, color: boolean, depth: boolean, stencil: boolean ): void;
+
 }

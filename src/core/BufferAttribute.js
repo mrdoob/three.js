@@ -278,9 +278,7 @@ Object.assign( BufferAttribute.prototype, {
 
 	},
 
-	set: function ( value, offset ) {
-
-		if ( offset === undefined ) offset = 0;
+	set: function ( value, offset = 0 ) {
 
 		this.array.set( value, offset );
 
@@ -478,6 +476,15 @@ function Uint32BufferAttribute( array, itemSize, normalized ) {
 Uint32BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 Uint32BufferAttribute.prototype.constructor = Uint32BufferAttribute;
 
+function Float16BufferAttribute( array, itemSize, normalized ) {
+
+	BufferAttribute.call( this, new Uint16Array( array ), itemSize, normalized );
+
+}
+
+Float16BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+Float16BufferAttribute.prototype.constructor = Float16BufferAttribute;
+Float16BufferAttribute.prototype.isFloat16BufferAttribute = true;
 
 function Float32BufferAttribute( array, itemSize, normalized ) {
 
@@ -503,6 +510,7 @@ Float64BufferAttribute.prototype.constructor = Float64BufferAttribute;
 export {
 	Float64BufferAttribute,
 	Float32BufferAttribute,
+	Float16BufferAttribute,
 	Uint32BufferAttribute,
 	Int32BufferAttribute,
 	Uint16BufferAttribute,

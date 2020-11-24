@@ -113,7 +113,7 @@ var SSAOPass = function ( scene, camera, width, height ) {
 	this.ssaoMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 	this.ssaoMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
 	this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-	this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+	this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 
 	// normal material
 
@@ -352,7 +352,7 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.ssaoMaterial.uniforms[ 'resolution' ].value.set( width, height );
 		this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-		this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+		this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 
 		this.blurMaterial.uniforms[ 'resolution' ].value.set( width, height );
 

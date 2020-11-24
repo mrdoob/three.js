@@ -1,5 +1,3 @@
-console.warn( "THREE.SSAOPass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.SSAOPass = function ( scene, camera, width, height ) {
 
 	THREE.Pass.call( this );
@@ -85,7 +83,7 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 	this.ssaoMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 	this.ssaoMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
 	this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-	this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+	this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 
 	// normal material
 
@@ -324,7 +322,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		this.ssaoMaterial.uniforms[ 'resolution' ].value.set( width, height );
 		this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-		this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+		this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 
 		this.blurMaterial.uniforms[ 'resolution' ].value.set( width, height );
 

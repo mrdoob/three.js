@@ -29,6 +29,9 @@
 
 	<h2>属性</h2>
 
+	<h3>[property:AnimationClip animations]</h3>
+	<p>Array with object's animation clips.</p>
+
 	<h3>[property:Boolean castShadow]</h3>
 	<p>对象是否被渲染到阴影贴图中。默认值为*false*。</p>
 
@@ -96,13 +99,13 @@
 		另一方面，modelViewMatrix矩阵中的位移部分和法线的计算无关，因此Matrix3就已经足够了。
 	</p>
 
-	<h3>[property:function onAfterRender]</h3>
+	<h3>[property:Function onAfterRender]</h3>
 	<p>
 		一个可选的回调函数，在Object3D渲染之后直接执行。
 		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
 	</p>
 
-	<h3>[property:function onBeforeRender]</h3>
+	<h3>[property:Function onBeforeRender]</h3>
 	<p>
 		一个可选的回调函数，在Object3D渲染之前直接执行。
 		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
@@ -144,7 +147,7 @@
 		默认值是[page:Object3D.DefaultUp]，即( 0, 1, 0 )。
 	</p>
 
-	<h3>[property:object userData]</h3>
+	<h3>[property:Object userData]</h3>
 	<p>
 		一个用于存储Object3D自定义数据的对象。
 		它不应当包含对函数的引用，因为这些函数将不会被克隆。
@@ -360,7 +363,7 @@
 		将所给的四元数复制到[page:.quaternion]中。
 	</p>
 
-	<h3>[method:Object toJSON]( [param:object meta] )</h3>
+	<h3>[method:Object toJSON]( [param:Object meta] )</h3>
 	<p>
 		meta -- 包含有元数据的对象，例如该对象的材质、纹理或图片。
 		将对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。

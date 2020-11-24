@@ -1,9 +1,11 @@
 import {
+	BufferGeometry,
 	Face3,
 	Geometry,
 	Vector2,
 	Vector3
 } from "../../../build/three.module.js";
+
 /**
  *	Subdivision Geometry Modifier
  *		using Loop Subdivision Scheme
@@ -26,7 +28,9 @@ var SubdivisionModifier = function ( subdivisions ) {
 // Applies the "modify" pattern
 SubdivisionModifier.prototype.modify = function ( geometry ) {
 
-	if ( geometry.isBufferGeometry ) {
+	var isBufferGeometry = geometry.isBufferGeometry;
+
+	if ( isBufferGeometry ) {
 
 		geometry = new Geometry().fromBufferGeometry( geometry );
 
@@ -36,7 +40,7 @@ SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 	}
 
-	geometry.mergeVertices();
+	geometry.mergeVertices( 6 );
 
 	var repeats = this.subdivisions;
 
@@ -49,7 +53,15 @@ SubdivisionModifier.prototype.modify = function ( geometry ) {
 	geometry.computeFaceNormals();
 	geometry.computeVertexNormals();
 
-	return geometry;
+	if ( isBufferGeometry ) {
+
+		return new BufferGeometry().fromGeometry( geometry );
+
+	} else {
+
+		return geometry;
+
+	}
 
 };
 

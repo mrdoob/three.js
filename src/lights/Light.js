@@ -1,14 +1,14 @@
 import { Object3D } from '../core/Object3D.js';
 import { Color } from '../math/Color.js';
 
-function Light( color, intensity ) {
+function Light( color, intensity = 1 ) {
 
 	Object3D.call( this );
 
 	this.type = 'Light';
 
 	this.color = new Color( color );
-	this.intensity = intensity !== undefined ? intensity : 1;
+	this.intensity = intensity;
 
 }
 

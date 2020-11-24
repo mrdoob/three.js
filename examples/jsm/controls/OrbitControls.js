@@ -135,7 +135,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		// so camera.up is the orbit axis
 		var quat = new Quaternion().setFromUnitVectors( object.up, new Vector3( 0, 1, 0 ) );
-		var quatInverse = quat.clone().inverse();
+		var quatInverse = quat.clone().invert();
 
 		var lastPosition = new Vector3();
 		var lastQuaternion = new Quaternion();
@@ -183,7 +183,7 @@ var OrbitControls = function ( object, domElement ) {
 
 				if ( max < - Math.PI ) max += twoPI; else if ( max > Math.PI ) max -= twoPI;
 
-				if ( min < max ) {
+				if ( min <= max ) {
 
 					spherical.theta = Math.max( min, Math.min( max, spherical.theta ) );
 
@@ -810,8 +810,6 @@ var OrbitControls = function ( object, domElement ) {
 
 	function onPointerUp( event ) {
 
-		if ( scope.enabled === false ) return;
-
 		switch ( event.pointerType ) {
 
 			case 'mouse':
@@ -971,12 +969,12 @@ var OrbitControls = function ( object, domElement ) {
 
 	function onMouseUp( event ) {
 
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
+
 		if ( scope.enabled === false ) return;
 
 		handleMouseUp( event );
-
-		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
-		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
 
 		scope.dispatchEvent( endEvent );
 
@@ -1182,14 +1180,6 @@ var OrbitControls = function ( object, domElement ) {
 	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
 
 	scope.domElement.addEventListener( 'keydown', onKeyDown, false );
-
-	// make sure element can receive keys.
-
-	if ( scope.domElement.tabIndex === - 1 ) {
-
-		scope.domElement.tabIndex = 0;
-
-	}
 
 	// force an update at start
 

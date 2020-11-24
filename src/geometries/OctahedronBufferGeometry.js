@@ -2,7 +2,7 @@ import { PolyhedronBufferGeometry } from './PolyhedronBufferGeometry.js';
 
 class OctahedronBufferGeometry extends PolyhedronBufferGeometry {
 
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
 		const vertices = [
 			1, 0, 0, 	- 1, 0, 0,	0, 1, 0,

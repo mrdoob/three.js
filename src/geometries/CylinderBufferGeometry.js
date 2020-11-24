@@ -5,7 +5,7 @@ import { Vector2 } from '../math/Vector2.js';
 
 class CylinderBufferGeometry extends BufferGeometry {
 
-	constructor( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 		this.type = 'CylinderBufferGeometry';
@@ -23,16 +23,8 @@ class CylinderBufferGeometry extends BufferGeometry {
 
 		const scope = this;
 
-		radiusTop = radiusTop !== undefined ? radiusTop : 1;
-		radiusBottom = radiusBottom !== undefined ? radiusBottom : 1;
-		height = height || 1;
-
-		radialSegments = Math.floor( radialSegments ) || 8;
-		heightSegments = Math.floor( heightSegments ) || 1;
-
-		openEnded = openEnded !== undefined ? openEnded : false;
-		thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
-		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+		radialSegments = Math.floor( radialSegments );
+		heightSegments = Math.floor( heightSegments );
 
 		// buffers
 

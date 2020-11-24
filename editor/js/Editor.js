@@ -105,7 +105,6 @@ function Editor() {
 
 	this.materialsRefCounter = new Map(); // tracks how often is a material used by a 3D object
 
-	this.animations = {};
 	this.mixer = new THREE.AnimationMixer( this.scene );
 
 	this.selected = null;
@@ -354,16 +353,6 @@ Editor.prototype = {
 	addTexture: function ( texture ) {
 
 		this.textures[ texture.uuid ] = texture;
-
-	},
-
-	addAnimations: function ( object, animations ) {
-
-		if ( animations.length > 0 ) {
-
-			this.animations[ object.uuid ] = animations;
-
-		}
 
 	},
 

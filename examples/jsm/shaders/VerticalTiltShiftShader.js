@@ -1,4 +1,3 @@
-
 /**
  * Simple fake tilt-shift effect, modulating two pass Gaussian blur (see above) by vertical position
  *

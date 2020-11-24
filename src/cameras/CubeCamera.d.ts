@@ -13,6 +13,4 @@ export class CubeCamera extends Object3D {
 
 	update( renderer: WebGLRenderer, scene: Scene ): void;
 
-	clear( renderer: WebGLRenderer, color: boolean, depth: boolean, stencil: boolean ): void;
-
 }

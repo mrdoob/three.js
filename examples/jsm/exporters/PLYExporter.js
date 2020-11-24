@@ -3,6 +3,7 @@ import {
 	Matrix3,
 	Vector3
 } from "../../../build/three.module.js";
+
 /**
  * https://github.com/gkjohnson/ply-exporter-js
  *
@@ -50,7 +51,7 @@ PLYExporter.prototype = {
 
 					if ( geometry.isBufferGeometry === true ) {
 
-						if ( geometry.getAttribute( 'position' ) !== undefined ) {
+						if ( geometry.hasAttribute( 'position' ) === true ) {
 
 							cb( mesh, geometry );
 

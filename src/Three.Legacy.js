@@ -112,9 +112,7 @@ export function MeshFaceMaterial( materials ) {
 
 }
 
-export function MultiMaterial( materials ) {
-
-	if ( materials === undefined ) materials = [];
+export function MultiMaterial( materials = [] ) {
 
 	console.warn( 'THREE.MultiMaterial has been removed. Use an Array instead.' );
 	materials.isMultiMaterial = true;
@@ -610,6 +608,12 @@ Object.assign( Matrix3.prototype, {
 
 		console.error( 'THREE.Matrix3: .applyToVector3Array() has been removed.' );
 
+	},
+	getInverse: function ( matrix ) {
+
+		console.warn( 'THREE.Matrix3: .getInverse() has been removed. Use matrixInv.copy( matrix ).invert(); instead.' );
+		return this.copy( matrix ).invert();
+
 	}
 
 } );
@@ -715,6 +719,12 @@ Object.assign( Matrix4.prototype, {
 		console.warn( 'THREE.Matrix4: .makeFrustum() has been removed. Use .makePerspective( left, right, top, bottom, near, far ) instead.' );
 		return this.makePerspective( left, right, top, bottom, near, far );
 
+	},
+	getInverse: function ( matrix ) {
+
+		console.warn( 'THREE.Matrix4: .getInverse() has been removed. Use matrixInv.copy( matrix ).invert(); instead.' );
+		return this.copy( matrix ).invert();
+
 	}
 
 } );
@@ -726,12 +736,22 @@ Plane.prototype.isIntersectionLine = function ( line ) {
 
 };
 
-Quaternion.prototype.multiplyVector3 = function ( vector ) {
+Object.assign( Quaternion.prototype, {
 
-	console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
-	return vector.applyQuaternion( this );
+	multiplyVector3: function ( vector ) {
 
-};
+		console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
+		return vector.applyQuaternion( this );
+
+	},
+	inverse: function ( ) {
+
+		console.warn( 'THREE.Quaternion: .inverse() has been renamed to invert().' );
+		return this.invert();
+
+	}
+
+} );
 
 Object.assign( Ray.prototype, {
 
@@ -2103,6 +2123,13 @@ CubeCamera.prototype.updateCubeMap = function ( renderer, scene ) {
 
 	console.warn( 'THREE.CubeCamera: .updateCubeMap() is now .update().' );
 	return this.update( renderer, scene );
+
+};
+
+CubeCamera.prototype.clear = function ( renderer, color, depth, stencil ) {
+
+	console.warn( 'THREE.CubeCamera: .clear() is now .renderTarget.clear().' );
+	return this.renderTarget.clear( renderer, color, depth, stencil );
 
 };
 

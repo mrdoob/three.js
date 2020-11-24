@@ -170,9 +170,13 @@
 			</li>
 		</ul>
 		</p>
-		<p>默认情况下，每次调用渲染时这些数据都会重置。 但当时用一个或多个镜像时，最好使用自定义模式重置它们：
+		<p>By default these data are reset at each render call but when having multiple render passes per frame (e.g. when using post processing) it can be preferred to reset with a custom pattern.
+			First, set *autoReset* to *false*.
 		<code>
 		renderer.info.autoReset = false;
+		</code>
+		Call *reset()* whenever you have finished to render a single frame.
+		<code>
 		renderer.info.reset();
 		</code>
 		</p>
@@ -273,7 +277,7 @@
 		<h3>[method:null clearStencil]( )</h3>
 		<p>清除模板缓存。相当于调用[page:WebGLRenderer.clear .clear]( false, false, true )</p>
 
-		<h3>[method:null clearTarget]([param:WebGLRenderTarget renderTarget], [param:boolean color], [param:boolean depth], [param:boolean stencil])</h3>
+		<h3>[method:null clearTarget]([param:WebGLRenderTarget renderTarget], [param:Boolean color], [param:Boolean depth], [param:Boolean stencil])</h3>
 		<p>
 		renderTarget -- 需要被清除的[page:WebGLRenderTarget renderTarget]<br />
 		color -- 如果设置, 颜色会被清除 <br />

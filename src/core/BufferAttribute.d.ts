@@ -251,6 +251,16 @@ export class Uint32BufferAttribute extends BufferAttribute {
 
 }
 
+export class Float16BufferAttribute extends BufferAttribute {
+
+	constructor(
+		array: Iterable<number> | ArrayLike<number> | ArrayBuffer | number,
+		itemSize: number,
+		normalized?: boolean
+	);
+
+}
+
 export class Float32BufferAttribute extends BufferAttribute {
 
 	constructor(

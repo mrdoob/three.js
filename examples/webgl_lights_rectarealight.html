@@ -46,23 +46,6 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
-				// Check for float-RT support
-				// TODO (abelnation): figure out fall-back for float textures
-
-				if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'OES_texture_float' ) ) {
-
-					alert( 'OES_texture_float not supported' );
-					throw 'missing webgl extension';
-
-				}
-
-				if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'OES_texture_float_linear' ) ) {
-
-					alert( 'OES_texture_float_linear not supported' );
-					throw 'missing webgl extension';
-
-				}
-
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 20, 35 );
 

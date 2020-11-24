@@ -2,6 +2,8 @@ import { Scene } from '../../scenes/Scene';
 import { Camera } from '../../cameras/Camera';
 import { Light } from '../../lights/Light';
 import { WebGLLights } from './WebGLLights';
+import { WebGLExtensions } from './WebGLExtensions';
+import { WebGLCapabilities } from './WebGLCapabilities';
 
 interface WebGLRenderState {
 
@@ -21,8 +23,11 @@ interface WebGLRenderState {
 
 export class WebGLRenderStates {
 
+	constructor( extensions: WebGLExtensions, capabilities: WebGLCapabilities );
+
 	// renderCallDepth indexes start from 0.
 	get( scene: Scene, renderCallDepth?: number ): WebGLRenderState;
+
 	dispose(): void;
 
 }

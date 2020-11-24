@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lottie loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lottie<br/></br>
+			<input id="scrubber" type="range" value="0" style="width: 300px">
+		</div>
+
+		<script src="js/libs/lottie_canvas.js"></script>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
+			import { RoundedBoxBufferGeometry } from './jsm/geometries/RoundedBoxBufferGeometry.js';
+			import { LottieLoader } from './jsm/loaders/LottieLoader.js';
+
+			let renderer, scene, camera;
+			let mesh;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.z = 2.5;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
+
+				const loader = new LottieLoader();
+				loader.setQuality( 2 );
+				loader.load( 'textures/lottie/24017-lottie-logo-animation.json', function ( texture ) {
+
+					setupControls( texture.animation );
+
+					// texture = new THREE.TextureLoader().load( 'textures/uv_grid_directx.jpg' );
+
+					const geometry = new RoundedBoxBufferGeometry( 1, 1, 1, 7, 0.2 );
+					const material = new THREE.MeshStandardMaterial( { roughness: 0.1, map: texture } );
+					mesh = new THREE.Mesh( geometry, material );
+					scene.add( mesh );
+
+				} );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene.environment = pmremGenerator.fromScene( environment ).texture;
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function setupControls( animation ) {
+
+				// Lottie animation API
+				// https://airbnb.io/lottie/#/web
+
+				// There are a few undocumented properties:
+				// console.log( animation );
+
+				const scrubber = document.getElementById( 'scrubber' );
+				scrubber.max = animation.totalFrames;
+
+				scrubber.addEventListener( 'pointerdown', function () {
+
+					animation.pause();
+
+				} );
+
+				scrubber.addEventListener( 'pointerup', function () {
+
+					animation.play();
+
+				} );
+
+				scrubber.addEventListener( 'input', function () {
+
+					animation.goToAndStop( parseFloat( scrubber.value ), true );
+
+				} );
+
+				animation.addEventListener( 'enterFrame', function () {
+
+					scrubber.value = animation.currentFrame;
+
+				} );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				if ( mesh ) {
+
+					mesh.rotation.y -= 0.001;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
