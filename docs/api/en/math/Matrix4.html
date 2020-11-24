@@ -138,8 +138,8 @@ m.elements = [ 11, 21, 31, 41,
 
 		<h3>[method:null decompose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
 		<p>
-		Decomposes this matrix into it's [page:Vector3 position], [page:Quaternion quaternion] and
-		[page:Vector3 scale] components.
+		Decomposes this matrix into it's [page:Vector3 position], [page:Quaternion quaternion] and [page:Vector3 scale] components.
+		The method can't be used to decompose an object's world matrix if its parent has a non-uniform scale.
 		</p>
 
 		<h3>[method:Float determinant]()</h3>
