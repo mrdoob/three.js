@@ -40,7 +40,7 @@ Many linting errors can be fixed automatically by running
 
 If you’d like to make a minified version of the build files i.e. ‘build/three.min.js’ run:
         
-    npm run-script build-closure
+    npm run build
 
 ## Making changes
 
@@ -75,7 +75,6 @@ When you’ve decided to make changes, start with the following:
 
       npm run make-screenshot <example_1_name> ...<example_N_name>
 
-* Watch out for Closure compiler warnings when building the libs, there should not be any.
 * Once done with a patch / feature do not add more commits to a feature branch
 * Create separate branches per patch or feature.
 * If you make a PR but it is not actually ready to be pulled into the dev branch, add `[Draft]` into the PR title and/or convert it to a draft PR
