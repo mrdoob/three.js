@@ -6,12 +6,10 @@ import { Color } from '../math/Color.js';
 
 class GridHelper extends LineSegments {
 
-	constructor( size, divisions, color1, color2 ) {
+	constructor( size = 10, divisions = 10, color1 = 0x444444, color2 = 0x888888 ) {
 
-		size = size || 10;
-		divisions = divisions || 10;
-		color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
-		color2 = new Color( color2 !== undefined ? color2 : 0x888888 );
+		color1 = new Color( color1 );
+		color2 = new Color( color2 );
 
 		const center = divisions / 2;
 		const step = size / divisions;
