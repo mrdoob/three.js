@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>씬(scene) 생성하기</h1>
+
+		<p>이 섹션의 목표는 three.js에 대한 간략한 소개를 제공하는 것입니다. 우리는 회전하는 큐브를 씬에 추가해보록 하겠습니다. 문제가 발생하여 도움이 필요한 경우 페이지 하단에 작동 예제가 제공됩니다.</p>
+		
+
+		<h2>시작하기 전에</h2>
+
+		<p>three.js를 시작하기 전에 예제를 실행할 곳이 필요합니다. 아래 HTML을 js/ 폴더 안 [link:https://threejs.org/build/three.js three.js]의 복사본과 함께 컴퓨터의 파일로 저장하시고 브라우저에서 열어주세요.</p>
+		
+		<code>
+		&lt;!DOCTYPE html&gt;
+		&lt;html&gt;
+			&lt;head&gt;
+				&lt;meta charset="utf-8"&gt;
+				&lt;title&gt;My first three.js app&lt;/title&gt;
+				&lt;style&gt;
+					body { margin: 0; }
+				&lt;/style&gt;
+			&lt;/head&gt;
+			&lt;body&gt;
+				&lt;script src="js/three.js"&gt;&lt;/script&gt;
+				&lt;script&gt;
+					// Our Javascript will go here.
+				&lt;/script&gt;
+			&lt;/body&gt;
+		&lt;/html&gt;
+		</code>
+
+		<p>준비는 끝났습니다. 이제 아래에 나올 모든 코드들은 비어있는 &lt;script&gt; 태그안으로 들어갑니다.</p>
+
+		<h2>씬(Scene) 생성하기</h2>
+
+		<p>three.js에서는 카메라에 렌더링하기 위해서는 장면, 카메라, 레더러 총 3가지가 필요합니다.</p>
+
+		<code>
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+		</code>
+
+		<p>여기서 무슨 일이 일어나고 있는지 잠시 설명해봅시다. 우리는 이제 장면, 카메라, 렌더러를 설정했습니다.</p>
+
+		<p>three.js에서는 여러가지의 카메라들이 존재합니다. 먼저, <strong>PerspectiveCamera</strong>를 사용해봅시다.</p>
+
+		<p>첫 번째 속성은 <strong>시야각(Field of View)</strong>입니다. <strong>시야각</strong>은 주어진 순간에 디스플레이에서 볼 수 있는 장면의 범위입니다 (이 값은 각도입니다).</p>
+
+		<p>두 번째 속성은 <strong>화면비율(가로 세로의 비율)</strong>입니다. 거의 높이로 나눠진 엘리먼트의 너비를 사용하겠지만, 그렇지 않다면 와이드 스크린에서 오래된 영화를 볼 때와 비슷한 느낌이 나타납니다. (이미지가 찌그러진 것처럼 보입니다)</p>
+
+		<p>다음 두가지 속성은 <strong>near</strong>와 <strong>far</strong>을 의미합니다. 이것은 <strong>far</strong>보다 멀거나 <strong>near</strong>보다 작은 오브젝트는 렌더링되지 않습니다. 지금 당장은 이부분에 대해 걱정할 필요가 없지만, 나중에 더 나은 성능을 위해서 다른 값들을 사용할수도 있습니다.</p>
+
+		<p>다음 단계는 <strong>렌더러(renderer)</strong>입니다. 이곳에서는 신비한 일이 일어납니다. 이곳에서 사용하는 WebGLRenderer뿐만 아니라, three.js를 오래된 브라우저에서 사용하거나 어떤 이유로 WebGL을 지원하지 않는 브라우저를 위해 폴백 (fallback)으로 사용되는 몇 가지 기능등을 함께 제공됩니다.</p>
+		<p>렌더러 인스턴스를 만드는 것 외에도, 앱을 렌더링 할 때의 크기를 설정해야합니다. 좋은 생각으로 채우고 싶은 너비와 높이로 설정하면 됩니다. (이곳에서는 브라우저 창의 너비와 높이로 설정하도록 하겠습니다.) 성능을 최적화할 앱들은 <strong>setSize</strong>를 이용해 절반의 사이즈로 앱을 렌더링할 <strong>window.innerWidth/2</strong>, <strong>window.innerHeight/2</strong> 와 같은 값들을 사용할 수 있습니다.</p>
+
+		<p>만약 앱의 크기를 유지하면서 낮은 해상도로 렌더링하고 싶다면 <strong>setSize</strong>에서 <strong>updateStyle</strong>(3번째 인자)를 false로 설정하면 됩니다. 예를 들어, <strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong> 는<br>본인의 &lt;canvas&gt;가 100% 폭과 높이를 가지고 있다는 것을 감안할 때 당신의 앱을 절반의 해상도로 렌더링할 것 입니다.</p>
+
+		<p>마지막으로, 우리는 HTML 문서에 <strong>렌더러 엘리먼트</strong>를 추가했습니다. 이것은 렌더러가 &lt;canvas&gt;에 실제 장면을 표시하는 엘리먼트 입니다.</p> 
+
+		<p><em>"좋습니다만, 우리가 그리고자 했던 큐브는 도대체 어디있는 겁니까? "</em> 걱정마세요, 지금부터 큐브를 그릴겁니다.</p>
+
+		<code>
+		const geometry = new THREE.BoxGeometry();
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
+
+		camera.position.z = 5;
+		</code>
+
+		<p>큐브를 생성하기 위해서는 <strong>BoxGeometry</strong>가 필요합니다. 이 오브젝트는 큐브의 모든 정점(<strong>vertices</strong>)들과 단면(<strong>faces</strong>)들을 구성하고 있습니다. 우리는 나중에 이 부분을 더 알아보도록 하겠습니다.</p>
+
+		<p>지오메트리 이외에, 추가적으로 큐브를 만들기 위해서는 색깔 머테리얼(material)이 필요합니다. three.js에서는 여러 머테리얼들을 제공하지만, 지금 당장은 <strong>MeshBasicMaterial</strong>을 사용하겠습니다.
+		아주 간단하게, 우리는 녹색 색깔<strong>(0x00ff00)</strong>의 속성만 적용하도록 하겠습니다. 이 색상은 CSS 또는 포토샵에서 사용하는 것과 같은 방식으로 작동합니다 (<strong>HEX colors</strong>).</p>
+
+		<p>세 번째로 필요한 것은 <strong>메쉬(Mesh)</strong>입니다. 메쉬는 지오메트리에 머테리얼을 입힌 오브젝트를 의미합니다. 따라서, 우리는 이제 씬(Scene) 상에서 추가하거나 자유롭게 움직일 수 있습니다.</p>
+
+		<p>기본적으로 <strong>scene.add()</strong>을 호출하게 되면 우리가 추가한 것들은 <strong>(0,0,0)</strong>좌표에 위치하게 됩니다. 이는 카메라와 큐브 모두 서로 겹치게될 것입니다. 이를 방지하기 위해 카메라를 약간 빼내줘야합니다.</p>
+
+		<h2>씬 렌더링하기</h2>
+
+		<p>우리가 이전에 만든 HTML 파일에 위의 코드를 복사 한 경우, 당신은 아무것도 볼 수 없을 것입니다. 왜냐하면 아직 아무것도 랜더링하고 있지 않기 때문입니다. 그러기 위해서는 <strong>렌더링이나 애니메이션 루프</strong>라고 불리는 것이 필요합니다.</p>
+		
+		<code>
+		function animate() {
+			requestAnimationFrame( animate );
+			renderer.render( scene, camera );
+		}
+		animate();
+		</code>
+		
+		<p>이렇게하면 화면이 새로 고쳐질 때마다 렌더러가 장면을 그리는 루프를 생성됩니다.(일반적으로 초당 60회 반복).
+		만약 여러분이 브라우저에 새로운 게임을 만들거라면, 여러분은 <em>"setInterval을 그냥 만드는 게 어때?"</em> 라고 생각할지도 모릅니다. 중요한 것은 가능하겠지만 <strong>requestAnimationFrame</strong>을 사용하면 많은 장점이 있다는 것입니다. 아마도 가장 중요한 것은 사용자가 다른 브라우저 탭으로 이동할 때 일시 중지되므로 귀중한 처리 능력과 배터리 수명을 낭비하지 않는 것입니다.</p>
+		
+		<h2>큐브 움직이기</h2>
+
+		<p>시작하기 전에 위에 코드를 모두 입력하면 녹색 상자가 표시되어야 합니다. 상자를 회전시켜서 좀 더 재밌게 만들어 보겠습니다.</p>
+
+		<p><strong>animate()</strong> 함수에서 <strong>renderer.render</strong> 호출 바로 위에 다음을 추가합니다:</p>
+
+		<code>
+		cube.rotation.x += 0.01;
+		cube.rotation.y += 0.01;
+		</code>
+
+		<p>이 코드는 매프레임마다 실행되며 (일반적으로 초당 60회) 큐브에 멋진 회전 애니메이션을 볼 수 있습니다. 기본적으로 앱이 실행되는 동안 움직이거나 바꾸고 싶은 것은 무엇이든 애니메이트 루프를 거쳐야합니다. 물론 거기서 다른 함수들을 호출할 수 있기 때문에 수백 줄에 달하는 <strong>애니메이션</strong> 함수가 되지 않도록 할 수 있습니다.</p>
+		
+		<h2>결과</h2>
+		<p>축하합니다! 이제 당신은 첫 three.js 앱을 완성했습니다. 아주 간단하기에 어디서든 시작해보세요.</p>
+
+		<p>수정 가능한 전체코드는 다음 링크에서 확인할 수 있습니다 [link:https://jsfiddle.net/mkba0ecu/ live example]. 어떻게 작동하는지 더 알아보고 싶으시다면 좀 더 가지고 놀아보세요!</p>
+
+		<code>
+		&lt;!DOCTYPE html&gt;
+		&lt;html&gt;
+			&lt;head&gt;
+				&lt;title&gt;My first three.js app&lt;/title&gt;
+				&lt;style&gt;
+					body { margin: 0; }
+				&lt;/style&gt;
+			&lt;/head&gt;
+			&lt;body&gt;
+				&lt;script src="js/three.js"&gt;&lt;/script&gt;
+				&lt;script&gt;
+					const scene = new THREE.Scene();
+					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+					const renderer = new THREE.WebGLRenderer();
+					renderer.setSize( window.innerWidth, window.innerHeight );
+					document.body.appendChild( renderer.domElement );
+
+					const geometry = new THREE.BoxGeometry();
+					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+					const cube = new THREE.Mesh( geometry, material );
+					scene.add( cube );
+
+					camera.position.z = 5;
+
+					const animate = function () {
+						requestAnimationFrame( animate );
+
+						cube.rotation.x += 0.01;
+						cube.rotation.y += 0.01;
+
+						renderer.render( scene, camera );
+					};
+
+					animate();
+				&lt;/script&gt;
+			&lt;/body&gt;
+		&lt;/html&gt;
+		</code>
+	</body>
+</html>

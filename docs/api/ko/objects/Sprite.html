@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A sprite is a plane that always faces towards the camera, generally with a
+			partially transparent texture applied.<br /><br />
+
+			Sprites do not cast shadows, setting <code>castShadow = true</code> will have no effect.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const map = new THREE.TextureLoader().load( 'sprite.png' );
+		const material = new THREE.SpriteMaterial( { map: map } );
+
+		const sprite = new THREE.Sprite( material );
+		scene.add( sprite );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Material material] )</h3>
+		<p>
+    [page:Material material] - (optional) an instance of [page:SpriteMaterial]. Default is a white [page:SpriteMaterial].<br /><br />
+
+		Creates a new [name].
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:Object3D] class for common properties.</p>
+
+
+		<h3>[property:SpriteMaterial material]</h3>
+		<p>
+		An instance of [page:SpriteMaterial], defining the object's appearance.
+		Default is a white [page:SpriteMaterial].
+		</p>
+
+
+		<h3>[property:Vector2 center]</h3>
+		<p>
+		The sprite's anchor point, and the point around which the sprite rotates. A value of (0.5, 0.5) corresponds to the midpoint of the sprite.
+		A value of (0, 0) corresponds to the lower left corner of the sprite. The default is (0.5, 0.5).
+		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Object3D] class for common methods.</p>
+
+		<h3>[method:Sprite clone]()</h3>
+		<p>
+		Returns a clone of this Sprite object and any descendants.
+		</p>
+
+		<h3>[method:Sprite copy]( [param:Sprite sprite] )</h3>
+		<p>
+		Copies the properties of the passed sprite to this one.
+		</p>
+
+		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<p>
+		Get intersections between a casted ray and this sprite. [page:Raycaster.intersectObject]() will call this method.
+		The raycaster must be initialized by calling [page:Raycaster.setFromCamera]() before raycasting against sprites.
+		</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

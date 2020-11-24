@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr; [page:ShaderMaterial] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			This class works just like [page:ShaderMaterial], except that definitions of
+			built-in uniforms and attributes are not automatically prepended to the GLSL shader code.
+		</p>
+
+		<h2>Code Example</h2>
+		<code>
+		const material = new THREE.RawShaderMaterial( {
+
+			uniforms: {
+				time: { value: 1.0 }
+			},
+			vertexShader: document.getElementById( 'vertexShader' ).textContent,
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+
+		} );
+		</code>
+
+		<h2>Examples</h2>
+		<p>
+			[example:webgl_buffergeometry_rawshader WebGL / buffergeometry / rawshader]<br />
+			[example:webgl_buffergeometry_instancing_billboards WebGL / buffergeometry / instancing / billboards]<br />
+			[example:webgl_buffergeometry_instancing_dynamic WebGL / buffergeometry / instancing / dynamic]<br />
+			[example:webgl_buffergeometry_instancing_interleaved_dynamic WebGL / buffergeometry / instancing / interleaved / dynamic]<br />
+			[example:webgl_buffergeometry_instancing WebGL / buffergeometry / instancing]<br />
+			[example:webgl_interactive_instances_gpu WebGL / interactive / instances /gpu]<br />
+			[example:webgl_raymarching_reflect WebGL / raymarching / reflect]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
+			Any property of the material (including any property inherited from [page:Material] and [page:ShaderMaterial]) can be passed in here.<br /><br />
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:Material] and [page:ShaderMaterial] classes for common properties.</p>
+
+
+		<h2>Methods</h2>
+		<p>See the base [page:Material] and [page:ShaderMaterial] classes for common methods.</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

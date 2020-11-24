@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:WebGLRenderTarget] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Used by the [page:CubeCamera] as its [page:WebGLRenderTarget].
+		</p>
+
+		<h2>Examples</h2>
+
+		<p>See [page:CubeCamera] for examples.</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([param:Number size], [param:Object options])</h3>
+		<p>
+		[page:Float size] - the size, in pixels. <br />
+		options - (optional) object that holds texture parameters for an auto-generated target
+		texture and depthBuffer/stencilBuffer booleans.
+
+		For an explanation of the texture parameters see [page:Texture Texture]. The following are
+		valid options:<br /><br />
+
+		[page:Constant wrapS] - default is [page:Textures ClampToEdgeWrapping]. <br />
+		[page:Constant wrapT] - default is [page:Textures ClampToEdgeWrapping]. <br />
+		[page:Constant magFilter] - default is [page:Textures .LinearFilter]. <br />
+		[page:Constant minFilter] - default is [page:Textures LinearFilter]. <br />
+		[page:Constant format] - default is [page:Textures RGBAFormat]. <br />
+		[page:Constant type] - default is [page:Textures UnsignedByteType]. <br />
+		[page:Number anisotropy] - default is *1*. See [page:Texture.anistropy]<br />
+		[page:Constant encoding] - default is [page:Textures LinearEncoding]. <br />
+		[page:Boolean depthBuffer] - default is *true*. Set this to false if you don't need it. <br />
+		[page:Boolean stencilBuffer] - default is *false*. Set this to true if you need it.<br /><br />
+
+		Creates a new [name]
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>See [page:WebGLRenderTarget] for inherited properties</h3>
+
+
+		<h2>Methods</h2>
+
+		<h3>See [page:WebGLRenderTarget] for inherited methods</h3>
+
+		<h3>[method:WebGLCubeRenderTarget fromEquirectangularTexture]( [param:WebGLRenderer renderer], [param:Texture texture] )</h3>
+		<p>
+			[page:WebGLRenderer renderer] — the renderer.<br/>
+			[page:Texture texture] — the equirectangular texture.
+		</p>
+		<p>
+			Use this method if you want to convert an equirectangular panorama to the cubemap format.
+		</p>
+
+		<h3>[method:undefined clear]( [param:WebGLRenderer renderer], [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
+		<p>
+			Call this to clear the renderTarget's color, depth, and/or stencil buffers.
+			The color buffer is set to the renderer's current clear color. Arguments default to *true*.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Level of Detail - show meshes with more or less geometry based on distance from the camera.<br /><br />
+
+		  Every level is associated with an object, and rendering can be switched between them at the distances
+			specified. Typically you would create, say, three meshes, one for far away (low detail), one for mid range (medium detail)
+			and one for close up (high detail).
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const lod = new THREE.LOD();
+
+		//Create spheres with 3 levels of detail and create new LOD levels for them
+		for( let i = 0; i < 3; i++ ) {
+
+			const geometry = new THREE.IcosahedronBufferGeometry( 10, 3 - i )
+
+			const mesh = new THREE.Mesh( geometry, material );
+
+			lod.addLevel( mesh, i * 75 );
+
+		}
+
+		scene.add( lod );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_lod webgl / lod ]
+		</p>
+
+		<h2>Constructor</h2>
+		<h3>[name]( )</h3>
+		<p>
+			Creates a new [name].
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:Object3D] class for common properties.</p>
+
+		<h3>[property:Boolean autoUpdate]</h3>
+		<p>
+		Whether the LOD object is updated automatically by the renderer per frame or not.
+		If set to false, you have to call [page:LOD.update]() in the render loop by yourself.
+		Default is true.
+		</p>
+
+		<h3>[property:Array levels]</h3>
+		<p>
+		An array of [page:Object level] objects<br /><br />
+
+		Each level is an object with two properties:<br />
+		[page:Object3D object] - The [page:Object3D] to display at this level.<br />
+		[page:Float distance] - The distance at which to display this level of detail.
+		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Object3D] class for common methods.</p>
+
+		<h3>[method:this addLevel]( [param:Object3D object], [param:Float distance] )</h3>
+		<p>
+		[page:Object3D object] - The [page:Object3D] to display at this level.<br />
+		[page:Float distance] - The distance at which to display this level of detail.<br /><br />
+
+		Adds a mesh that will display at a certain distance and greater. Typically the further away the distance,
+		the lower the detail on the mesh.
+		</p>
+
+		<h3>[method:LOD clone]()</h3>
+		<p>
+		Returns a clone of this LOD object and its associated distance specific objects.
+		</p>
+
+
+		<h3>[method:Integer getCurrentLevel]()</h3>
+		<p>
+		Get the currently active LOD level. As index of the levels array.
+		</p>
+
+
+
+		<h3>[method:Object3D getObjectForDistance]( [param:Float distance] )</h3>
+		<p>
+		Get a reference to the first [page:Object3D] (mesh) that is greater than [page:Float distance].
+		</p>
+
+		<h3>[method:Array raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<p>
+		Get intersections between a casted [page:Ray] and this LOD.
+		[page:Raycaster.intersectObject] will call this method.
+		</p>
+
+
+
+		<h3>[method:Object toJSON]( meta )</h3>
+		<p>
+		Create a JSON structure with details of this LOD object.
+		</p>
+
+		<h3>[method:null update]( [param:Camera camera] )</h3>
+		<p>
+			Set the visibility of each [page:levels level]'s [page:Object3D object] based on
+			distance from the [page:Camera camera].
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

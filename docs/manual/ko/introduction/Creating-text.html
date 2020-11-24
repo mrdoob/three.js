@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+		<div>
+			<p>
+				There are often times when you might need to use text in your three.js application - here are
+				a couple of ways that you can do so.
+			</p>
+		</div>
+
+		<h2>1. DOM + CSS</h2>
+		<div>
+			<p>
+				Using HTML is generally the easiest and fastest manner to add text. This is the method
+				used for descriptive overlays in most three.js examples.
+			</p>
+			<p>You can add content to a</p>
+			<code>&lt;div id="info"&gt;Description&lt;/div&gt;</code>
+
+			<p>
+				and use CSS markup to position absolutely at a position above all others with a
+				z-index especially if you are running three.js full screen.
+			</p>
+
+			<code>
+#info {
+	position: absolute;
+	top: 10px;
+	width: 100%;
+	text-align: center;
+	z-index: 100;
+	display:block;
+}
+			</code>
+
+		</div>
+
+
+
+		<h2>2. Draw text to canvas and use as a [page:Texture]</h2>
+		<div>
+			<p>Use this method if you wish to draw text easily on a plane in your three.js scene.</p>
+		</div>
+
+
+		<h2>3. Create a model in your favourite 3D application and export to three.js</h2>
+		<div>
+			<p>Use this method if you prefer working with your 3d applications and importing the models to three.js</p>
+		</div>
+
+
+
+		<h2>4. Procedural Text Geometry</h2>
+		<div>
+			<p>
+				If you prefer to work purely in THREE.js or to create procedural and dynamic 3D
+				text geometries, you can create a mesh whose geometry is an instance of THREE.TextGeometry:
+			</p>
+			<p>
+				<code>new THREE.TextGeometry( text, parameters );</code>
+			</p>
+			<p>
+				In order for this to work, however, your TextGeometry will need an instance of THREE.Font
+				to be set on its "font" parameter.
+
+				See the [page:TextGeometry] page for more info on how this can be done, descriptions of each
+				accepted parameter, and a list of the JSON fonts that come with the THREE.js distribution itself.
+			</p>
+
+			<h3>Examples</h3>
+
+			<p>
+				[example:webgl_geometry_text WebGL / geometry / text]<br />
+				[example:webgl_shadowmap WebGL / shadowmap]
+			</p>
+
+			<p>
+				If Typeface is down, or you want to use a font that is not there, there's a tutorial
+				with a python script for blender that allows you to export text to Three.js's JSON format:
+				[link:http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html]
+			</p>
+
+		</div>
+
+
+
+		<h2>5. Bitmap Fonts</h2>
+		<div>
+			<p>
+				BMFonts (bitmap fonts) allow batching glyphs into a single BufferGeometry. BMFont rendering
+				supports word-wrapping, letter spacing, kerning, signed distance fields with standard
+				derivatives, multi-channel signed distance fields, multi-texture fonts, and more.
+				See [link:https://github.com/Jam3/three-bmfont-text three-bmfont-text].
+			</p>
+			<p>
+				Stock fonts are available in projects like
+				[link:https://github.com/etiennepinchon/aframe-fonts A-Frame Fonts], or you can create your own
+				from any .TTF font, optimizing to include only characters required for a project.
+			</p>
+			<p>
+				Some helpful tools:
+			</p>
+			<ul>
+				<li>[link:http://msdf-bmfont.donmccurdy.com/ msdf-bmfont-web] <i>(web-based)</i></li>
+				<li>[link:https://github.com/soimy/msdf-bmfont-xml msdf-bmfont-xml] <i>(commandline)</i></li>
+				<li>[link:https://github.com/libgdx/libgdx/wiki/Hiero hiero] <i>(desktop app)</i></li>
+			</ul>
+		</div>
+
+
+
+	</body>
+</html>

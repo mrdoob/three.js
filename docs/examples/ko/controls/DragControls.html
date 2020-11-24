@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:EventDispatcher] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		This class can be used to provide a drag'n'drop interaction.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const controls = new DragControls( objects, camera, renderer.domElement );
+
+		// add event listener to highlight dragged objects
+
+		controls.addEventListener( 'dragstart', function ( event ) {
+
+			event.object.material.emissive.set( 0xaaaaaa );
+
+		} );
+
+		controls.addEventListener( 'dragend', function ( event ) {
+
+			event.object.material.emissive.set( 0x000000 );
+
+		} );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>[example:misc_controls_drag misc / controls / drag ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Array objects], [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+				[page:Array objects]: An array of draggable 3D objects.
+			</p>
+			<p>
+			[page:Camera camera]: The camera of the rendered scene.
+			</p>
+			<p>
+			[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+			</p>
+			<p>
+				Creates a new instance of [name].
+			</p>
+		</p>
+
+		<h2>Events</h2>
+
+		<h3>dragstart</h3>
+		<p>
+			Fires when the user starts to drag a 3D object.
+		</p>
+
+		<h3>drag</h3>
+		<p>
+			Fires when the user drags a 3D object.
+		</p>
+
+		<h3>dragend</h3>
+		<p>
+			Fires when the user has finished dragging a 3D object.
+		</p>
+
+		<h3>hoveron</h3>
+		<p>
+			Fires when the pointer is moved onto a 3D object, or onto one of its children.
+		</p>
+
+		<h3>hoveroff</h3>
+		<p>
+			Fires when the pointer is moved out of a 3D object.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			Whether or not the controls are enabled.
+		</p>
+
+		<h3>[property:Boolean transformGroup]</h3>
+		<p>
+			This option only works if the [page:DragControls.objects] array contains a single draggable group object.
+			If set to *true*, [name] does not transform individual objects but the entire group. Default is *false*.
+		</p>
+
+		<h2>Methods</h2>
+
+		<p>See the base [page:EventDispatcher] class for common methods.</p>
+
+		<h3>[method:null activate] ()</h3>
+		<p>
+			Adds the event listeners of the controls.
+		</p>
+
+		<h3>[method:null deactivate] ()</h3>
+		<p>
+			Removes the event listeners of the controls.
+		</p>
+
+		<h3>[method:null dispose] ()</h3>
+		<p>
+			Should be called if the controls is no longer required.
+		</p>
+
+		<h3>[method:Array getObjects] ()</h3>
+		<p>
+			Returns the array of draggable objects.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/DragControls.js examples/jsm/controls/DragControls.js]
+		</p>
+	</body>
+</html>
