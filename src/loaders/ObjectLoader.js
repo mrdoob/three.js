@@ -131,7 +131,6 @@ class ObjectLoader extends Loader {
 		const object = this.parseObject( json.object, geometries, materials, animations, textures );
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
-
 		this.bindSkeletons( object, skeletons );
 
 		//
@@ -787,7 +786,6 @@ class ObjectLoader extends Loader {
 	}
 
 	parseObject( data, geometries, materials, animations, textures ) {
-
 
 		let object;
 
