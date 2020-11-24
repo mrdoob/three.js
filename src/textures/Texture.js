@@ -64,6 +64,8 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	this.version = 0;
 	this.onUpdate = null;
 
+	this.isRenderTargetTexture = false;
+
 }
 
 Texture.DEFAULT_IMAGE = undefined;
