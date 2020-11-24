@@ -1177,22 +1177,62 @@
 	var textureId = 0;
 
 	function Texture(image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding) {
+		if (image === void 0) {
+			image = Texture.DEFAULT_IMAGE;
+		}
+
+		if (mapping === void 0) {
+			mapping = Texture.DEFAULT_MAPPING;
+		}
+
+		if (wrapS === void 0) {
+			wrapS = ClampToEdgeWrapping;
+		}
+
+		if (wrapT === void 0) {
+			wrapT = ClampToEdgeWrapping;
+		}
+
+		if (magFilter === void 0) {
+			magFilter = LinearFilter;
+		}
+
+		if (minFilter === void 0) {
+			minFilter = LinearMipmapLinearFilter;
+		}
+
+		if (format === void 0) {
+			format = RGBAFormat;
+		}
+
+		if (type === void 0) {
+			type = UnsignedByteType;
+		}
+
+		if (anisotropy === void 0) {
+			anisotropy = 1;
+		}
+
+		if (encoding === void 0) {
+			encoding = LinearEncoding;
+		}
+
 		Object.defineProperty(this, 'id', {
 			value: textureId++
 		});
 		this.uuid = MathUtils.generateUUID();
 		this.name = '';
-		this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
+		this.image = image;
 		this.mipmaps = [];
-		this.mapping = mapping !== undefined ? mapping : Texture.DEFAULT_MAPPING;
-		this.wrapS = wrapS !== undefined ? wrapS : ClampToEdgeWrapping;
-		this.wrapT = wrapT !== undefined ? wrapT : ClampToEdgeWrapping;
-		this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
-		this.minFilter = minFilter !== undefined ? minFilter : LinearMipmapLinearFilter;
-		this.anisotropy = anisotropy !== undefined ? anisotropy : 1;
-		this.format = format !== undefined ? format : RGBAFormat;
+		this.mapping = mapping;
+		this.wrapS = wrapS;
+		this.wrapT = wrapT;
+		this.magFilter = magFilter;
+		this.minFilter = minFilter;
+		this.anisotropy = anisotropy;
+		this.format = format;
 		this.internalFormat = null;
-		this.type = type !== undefined ? type : UnsignedByteType;
+		this.type = type;
 		this.offset = new Vector2(0, 0);
 		this.repeat = new Vector2(1, 1);
 		this.center = new Vector2(0, 0);
@@ -1208,7 +1248,7 @@
 		// Also changing the encoding after already used by a Material will not automatically make the Material
 		// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
 
-		this.encoding = encoding !== undefined ? encoding : LinearEncoding;
+		this.encoding = encoding;
 		this.version = 0;
 		this.onUpdate = null;
 	}
@@ -6715,6 +6755,10 @@
 
 	var Face3 = /*#__PURE__*/function () {
 		function Face3(a, b, c, normal, color, materialIndex) {
+			if (materialIndex === void 0) {
+				materialIndex = 0;
+			}
+
 			this.a = a;
 			this.b = b;
 			this.c = c;
@@ -6722,7 +6766,7 @@
 			this.vertexNormals = Array.isArray(normal) ? normal : [];
 			this.color = color && color.isColor ? color : new Color();
 			this.vertexColors = Array.isArray(color) ? color : [];
-			this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
+			this.materialIndex = materialIndex;
 		}
 
 		var _proto = Face3.prototype;
@@ -7779,10 +7823,14 @@
 			return this.attributes[name] !== undefined;
 		},
 		addGroup: function addGroup(start, count, materialIndex) {
+			if (materialIndex === void 0) {
+				materialIndex = 0;
+			}
+
 			this.groups.push({
 				start: start,
 				count: count,
-				materialIndex: materialIndex !== undefined ? materialIndex : 0
+				materialIndex: materialIndex
 			});
 		},
 		clearGroups: function clearGroups() {
@@ -9320,14 +9368,30 @@
 	});
 
 	function PerspectiveCamera(fov, aspect, near, far) {
+		if (fov === void 0) {
+			fov = 50;
+		}
+
+		if (aspect === void 0) {
+			aspect = 1;
+		}
+
+		if (near === void 0) {
+			near = 0.1;
+		}
+
+		if (far === void 0) {
+			far = 2000;
+		}
+
 		Camera.call(this);
 		this.type = 'PerspectiveCamera';
-		this.fov = fov !== undefined ? fov : 50;
+		this.fov = fov;
 		this.zoom = 1;
-		this.near = near !== undefined ? near : 0.1;
-		this.far = far !== undefined ? far : 2000;
+		this.near = near;
+		this.far = far;
 		this.focus = 10;
-		this.aspect = aspect !== undefined ? aspect : 1;
+		this.aspect = aspect;
 		this.view = null;
 		this.filmGauge = 35; // width of the film (default in millimeters)
 
@@ -11043,8 +11107,12 @@
 				return clearColor;
 			},
 			setClearColor: function setClearColor(color, alpha) {
+				if (alpha === void 0) {
+					alpha = 1;
+				}
+
 				clearColor.set(color);
-				clearAlpha = alpha !== undefined ? alpha : 1;
+				clearAlpha = alpha;
 				setClear(clearColor, clearAlpha);
 			},
 			getClearAlpha: function getClearAlpha() {
@@ -12193,12 +12261,28 @@
 	}
 
 	function DataTexture2DArray(data, width, height, depth) {
+		if (data === void 0) {
+			data = null;
+		}
+
+		if (width === void 0) {
+			width = 1;
+		}
+
+		if (height === void 0) {
+			height = 1;
+		}
+
+		if (depth === void 0) {
+			depth = 1;
+		}
+
 		Texture.call(this, null);
 		this.image = {
-			data: data || null,
-			width: width || 1,
-			height: height || 1,
-			depth: depth || 1
+			data: data,
+			width: width,
+			height: height,
+			depth: depth
 		};
 		this.magFilter = NearestFilter;
 		this.minFilter = NearestFilter;
@@ -12213,6 +12297,22 @@
 	DataTexture2DArray.prototype.isDataTexture2DArray = true;
 
 	function DataTexture3D(data, width, height, depth) {
+		if (data === void 0) {
+			data = null;
+		}
+
+		if (width === void 0) {
+			width = 1;
+		}
+
+		if (height === void 0) {
+			height = 1;
+		}
+
+		if (depth === void 0) {
+			depth = 1;
+		}
+
 		// We're going to add .setXXX() methods for setting properties later.
 		// Users can still set in DataTexture3D directly.
 		//
@@ -12222,10 +12322,10 @@
 		// See #14839
 		Texture.call(this, null);
 		this.image = {
-			data: data || null,
-			width: width || 1,
-			height: height || 1,
-			depth: depth || 1
+			data: data,
+			width: width,
+			height: height,
+			depth: depth
 		};
 		this.magFilter = NearestFilter;
 		this.minFilter = NearestFilter;
@@ -16338,8 +16438,12 @@
 	}
 
 	function ArrayCamera(array) {
+		if (array === void 0) {
+			array = [];
+		}
+
 		PerspectiveCamera.call(this);
-		this.cameras = array || [];
+		this.cameras = array;
 	}
 
 	ArrayCamera.prototype = Object.assign(Object.create(PerspectiveCamera.prototype), {
@@ -25753,7 +25857,10 @@
 			}
 		},
 		subclip: function subclip(sourceClip, name, startFrame, endFrame, fps) {
-			fps = fps || 30;
+			if (fps === void 0) {
+				fps = 30;
+			}
+
 			var clip = sourceClip.clone();
 			clip.name = name;
 			var tracks = [];
@@ -28080,12 +28187,28 @@
 			pz = new CubicPoly();
 
 	function CatmullRomCurve3(points, closed, curveType, tension) {
+		if (points === void 0) {
+			points = [];
+		}
+
+		if (closed === void 0) {
+			closed = false;
+		}
+
+		if (curveType === void 0) {
+			curveType = 'centripetal';
+		}
+
+		if (tension === void 0) {
+			tension = 0.5;
+		}
+
 		Curve.call(this);
 		this.type = 'CatmullRomCurve3';
-		this.points = points || [];
-		this.closed = closed || false;
-		this.curveType = curveType || 'centripetal';
-		this.tension = tension !== undefined ? tension : 0.5;
+		this.points = points;
+		this.closed = closed;
+		this.curveType = curveType;
+		this.tension = tension;
 	}
 
 	CatmullRomCurve3.prototype = Object.create(Curve.prototype);
@@ -28093,7 +28216,11 @@
 	CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
 
 	CatmullRomCurve3.prototype.getPoint = function (t, optionalTarget) {
-		var point = optionalTarget || new Vector3();
+		if (optionalTarget === void 0) {
+			optionalTarget = new Vector3();
+		}
+
+		var point = optionalTarget;
 		var points = this.points;
 		var l = points.length;
 		var p = (l - (this.closed ? 0 : 1)) * t;
@@ -28250,12 +28377,28 @@
 	}
 
 	function CubicBezierCurve(v0, v1, v2, v3) {
+		if (v0 === void 0) {
+			v0 = new Vector2();
+		}
+
+		if (v1 === void 0) {
+			v1 = new Vector2();
+		}
+
+		if (v2 === void 0) {
+			v2 = new Vector2();
+		}
+
+		if (v3 === void 0) {
+			v3 = new Vector2();
+		}
+
 		Curve.call(this);
 		this.type = 'CubicBezierCurve';
-		this.v0 = v0 || new Vector2();
-		this.v1 = v1 || new Vector2();
-		this.v2 = v2 || new Vector2();
-		this.v3 = v3 || new Vector2();
+		this.v0 = v0;
+		this.v1 = v1;
+		this.v2 = v2;
+		this.v3 = v3;
 	}
 
 	CubicBezierCurve.prototype = Object.create(Curve.prototype);
@@ -28263,7 +28406,11 @@
 	CubicBezierCurve.prototype.isCubicBezierCurve = true;
 
 	CubicBezierCurve.prototype.getPoint = function (t, optionalTarget) {
-		var point = optionalTarget || new Vector2();
+		if (optionalTarget === void 0) {
+			optionalTarget = new Vector2();
+		}
+
+		var point = optionalTarget;
 		var v0 = this.v0,
 				v1 = this.v1,
 				v2 = this.v2,
@@ -28300,12 +28447,28 @@
 	};
 
 	function CubicBezierCurve3(v0, v1, v2, v3) {
+		if (v0 === void 0) {
+			v0 = new Vector3();
+		}
+
+		if (v1 === void 0) {
+			v1 = new Vector3();
+		}
+
+		if (v2 === void 0) {
+			v2 = new Vector3();
+		}
+
+		if (v3 === void 0) {
+			v3 = new Vector3();
+		}
+
 		Curve.call(this);
 		this.type = 'CubicBezierCurve3';
-		this.v0 = v0 || new Vector3();
-		this.v1 = v1 || new Vector3();
-		this.v2 = v2 || new Vector3();
-		this.v3 = v3 || new Vector3();
+		this.v0 = v0;
+		this.v1 = v1;
+		this.v2 = v2;
+		this.v3 = v3;
 	}
 
 	CubicBezierCurve3.prototype = Object.create(Curve.prototype);
@@ -28313,7 +28476,11 @@
 	CubicBezierCurve3.prototype.isCubicBezierCurve3 = true;
 
 	CubicBezierCurve3.prototype.getPoint = function (t, optionalTarget) {
-		var point = optionalTarget || new Vector3();
+		if (optionalTarget === void 0) {
+			optionalTarget = new Vector3();
+		}
+
+		var point = optionalTarget;
 		var v0 = this.v0,
 				v1 = this.v1,
 				v2 = this.v2,
@@ -28350,10 +28517,18 @@
 	};
 
 	function LineCurve(v1, v2) {
+		if (v1 === void 0) {
+			v1 = new Vector2();
+		}
+
+		if (v2 === void 0) {
+			v2 = new Vector2();
+		}
+
 		Curve.call(this);
 		this.type = 'LineCurve';
-		this.v1 = v1 || new Vector2();
-		this.v2 = v2 || new Vector2();
+		this.v1 = v1;
+		this.v2 = v2;
 	}
 
 	LineCurve.prototype = Object.create(Curve.prototype);
@@ -28361,7 +28536,11 @@
 	LineCurve.prototype.isLineCurve = true;
 
 	LineCurve.prototype.getPoint = function (t, optionalTarget) {
-		var point = optionalTarget || new Vector2();
+		if (optionalTarget === void 0) {
+			optionalTarget = new Vector2();
+		}
+
+		var point = optionalTarget;
 
 		if (t === 1) {
 			point.copy(this.v2);
@@ -28406,10 +28585,18 @@
 	};
 
 	function LineCurve3(v1, v2) {
+		if (v1 === void 0) {
+			v1 = new Vector3();
+		}
+
+		if (v2 === void 0) {
+			v2 = new Vector3();
+		}
+
 		Curve.call(this);
 		this.type = 'LineCurve3';
-		this.v1 = v1 || new Vector3();
-		this.v2 = v2 || new Vector3();
+		this.v1 = v1;
+		this.v2 = v2;
 	}
 
 	LineCurve3.prototype = Object.create(Curve.prototype);
@@ -28417,7 +28604,11 @@
 	LineCurve3.prototype.isLineCurve3 = true;
 
 	LineCurve3.prototype.getPoint = function (t, optionalTarget) {
-		var point = optionalTarget || new Vector3();
+		if (optionalTarget === void 0) {
+			optionalTarget = new Vector3();
+		}
+
+		var point = optionalTarget;
 
 		if (t === 1) {
 			point.copy(this.v2);
@@ -28456,11 +28647,23 @@
 	};
 
 	function QuadraticBezierCurve(v0, v1, v2) {
+		if (v0 === void 0) {
+			v0 = new Vector2();
+		}
+
+		if (v1 === void 0) {
+			v1 = new Vector2();
+		}
+
+		if (v2 === void 0) {
+			v2 = new Vector2();
+		}
+
 		Curve.call(this);
 		this.type = 'QuadraticBezierCurve';
-		this.v0 = v0 || new Vector2();
-		this.v1 = v1 || new Vector2();
-		this.v2 = v2 || new Vector2();
+		this.v0 = v0;
+		this.v1 = v1;
+		this.v2 = v2;
 	}
 
 	QuadraticBezierCurve.prototype = Object.create(Curve.prototype);
@@ -28468,7 +28671,11 @@
 	QuadraticBezierCurve.prototype.isQuadraticBezierCurve = true;
 
 	QuadraticBezierCurve.prototype.getPoint = function (t, optionalTarget) {
-		var point = optionalTarget || new Vector2();
+		if (optionalTarget === void 0) {
+			optionalTarget = new Vector2();
+		}
+
+		var point = optionalTarget;
 		var v0 = this.v0,
 				v1 = this.v1,
 				v2 = this.v2;
@@ -28501,11 +28708,23 @@
 	};
 
 	function QuadraticBezierCurve3(v0, v1, v2) {
+		if (v0 === void 0) {
+			v0 = new Vector3();
+		}
+
+		if (v1 === void 0) {
+			v1 = new Vector3();
+		}
+
+		if (v2 === void 0) {
+			v2 = new Vector3();
+		}
+
 		Curve.call(this);
 		this.type = 'QuadraticBezierCurve3';
-		this.v0 = v0 || new Vector3();
-		this.v1 = v1 || new Vector3();
-		this.v2 = v2 || new Vector3();
+		this.v0 = v0;
+		this.v1 = v1;
+		this.v2 = v2;
 	}
 
 	QuadraticBezierCurve3.prototype = Object.create(Curve.prototype);
@@ -28513,7 +28732,11 @@
 	QuadraticBezierCurve3.prototype.isQuadraticBezierCurve3 = true;
 
 	QuadraticBezierCurve3.prototype.getPoint = function (t, optionalTarget) {
-		var point = optionalTarget || new Vector3();
+		if (optionalTarget === void 0) {
+			optionalTarget = new Vector3();
+		}
+
+		var point = optionalTarget;
 		var v0 = this.v0,
 				v1 = this.v1,
 				v2 = this.v2;
@@ -28546,9 +28769,13 @@
 	};
 
 	function SplineCurve(points) {
+		if (points === void 0) {
+			points = [];
+		}
+
 		Curve.call(this);
 		this.type = 'SplineCurve';
-		this.points = points || [];
+		this.points = points;
 	}
 
 	SplineCurve.prototype = Object.create(Curve.prototype);
@@ -28556,7 +28783,11 @@
 	SplineCurve.prototype.isSplineCurve = true;
 
 	SplineCurve.prototype.getPoint = function (t, optionalTarget) {
-		var point = optionalTarget || new Vector2();
+		if (optionalTarget === void 0) {
+			optionalTarget = new Vector2();
+		}
+
+		var point = optionalTarget;
 		var points = this.points;
 		var p = (points.length - 1) * t;
 		var intPoint = Math.floor(p);
@@ -28723,7 +28954,10 @@
 			return points;
 		},
 		getPoints: function getPoints(divisions) {
-			divisions = divisions || 12;
+			if (divisions === void 0) {
+				divisions = 12;
+			}
+
 			var points = [];
 			var last;
 
@@ -28951,10 +29185,14 @@
 	});
 
 	function Light(color, intensity) {
+		if (intensity === void 0) {
+			intensity = 1;
+		}
+
 		Object3D.call(this);
 		this.type = 'Light';
 		this.color = new Color(color);
-		this.intensity = intensity !== undefined ? intensity : 1;
+		this.intensity = intensity;
 	}
 
 	Light.prototype = Object.assign(Object.create(Object3D.prototype), {
@@ -31332,8 +31570,7 @@
 		var _proto = Clock.prototype;
 
 		_proto.start = function start() {
-			this.startTime = (typeof performance === 'undefined' ? Date : performance).now(); // see #10732
-
+			this.startTime = now();
 			this.oldTime = this.startTime;
 			this.elapsedTime = 0;
 			this.running = true;
@@ -31359,7 +31596,7 @@
 			}
 
 			if (this.running) {
-				var newTime = (typeof performance === 'undefined' ? Date : performance).now();
+				var newTime = now();
 				diff = (newTime - this.oldTime) / 1000;
 				this.oldTime = newTime;
 				this.elapsedTime += diff;
@@ -31370,6 +31607,10 @@
 
 		return Clock;
 	}();
+
+	function now() {
+		return (typeof performance === 'undefined' ? Date : performance).now(); // see #10732
+	}
 
 	var _position$2 = /*@__PURE__*/new Vector3();
 
@@ -31857,8 +32098,12 @@
 
 	var AudioAnalyser = /*#__PURE__*/function () {
 		function AudioAnalyser(audio, fftSize) {
+			if (fftSize === void 0) {
+				fftSize = 2048;
+			}
+
 			this.analyser = audio.context.createAnalyser();
-			this.analyser.fftSize = fftSize !== undefined ? fftSize : 2048;
+			this.analyser.fftSize = fftSize;
 			this.data = new Uint8Array(this.analyser.frequencyBinCount);
 			audio.getOutput().connect(this.analyser);
 		}
@@ -32802,10 +33047,18 @@
 
 	var AnimationAction = /*#__PURE__*/function () {
 		function AnimationAction(mixer, clip, localRoot, blendMode) {
+			if (localRoot === void 0) {
+				localRoot = null;
+			}
+
+			if (blendMode === void 0) {
+				blendMode = clip.blendMode;
+			}
+
 			this._mixer = mixer;
 			this._clip = clip;
-			this._localRoot = localRoot || null;
-			this.blendMode = blendMode || clip.blendMode;
+			this._localRoot = localRoot;
+			this.blendMode = blendMode;
 			var tracks = clip.tracks,
 					nTracks = tracks.length,
 					interpolants = new Array(nTracks);
@@ -34709,10 +34962,24 @@
 		function GridHelper(size, divisions, color1, color2) {
 			var _this;
 
-			size = size || 10;
-			divisions = divisions || 10;
-			color1 = new Color(color1 !== undefined ? color1 : 0x444444);
-			color2 = new Color(color2 !== undefined ? color2 : 0x888888);
+			if (size === void 0) {
+				size = 10;
+			}
+
+			if (divisions === void 0) {
+				divisions = 10;
+			}
+
+			if (color1 === void 0) {
+				color1 = 0x444444;
+			}
+
+			if (color2 === void 0) {
+				color2 = 0x888888;
+			}
+
+			color1 = new Color(color1);
+			color2 = new Color(color2);
 			var center = divisions / 2;
 			var step = size / divisions;
 			var halfSize = size / 2;
@@ -34754,12 +35021,32 @@
 		function PolarGridHelper(radius, radials, circles, divisions, color1, color2) {
 			var _this;
 
-			radius = radius || 10;
-			radials = radials || 16;
-			circles = circles || 8;
-			divisions = divisions || 64;
-			color1 = new Color(color1 !== undefined ? color1 : 0x444444);
-			color2 = new Color(color2 !== undefined ? color2 : 0x888888);
+			if (radius === void 0) {
+				radius = 10;
+			}
+
+			if (radials === void 0) {
+				radials = 16;
+			}
+
+			if (circles === void 0) {
+				circles = 8;
+			}
+
+			if (divisions === void 0) {
+				divisions = 64;
+			}
+
+			if (color1 === void 0) {
+				color1 = 0x444444;
+			}
+
+			if (color2 === void 0) {
+				color2 = 0x888888;
+			}
+
+			color1 = new Color(color1);
+			color2 = new Color(color2);
 			var vertices = [];
 			var colors = []; // create the radials
 
