@@ -8,7 +8,7 @@ export class SubdivisionModifier {
 	constructor( subdivisions?: number );
 	subdivisions: number;
 
-	modify( geometry: BufferGeometry | Geometry ): Geometry;
+	modify( geometry: Geometry | BufferGeometry ): Geometry | BufferGeometry;
 	smooth( geometry: Geometry ): void;
 
 }

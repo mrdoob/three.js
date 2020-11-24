@@ -10,6 +10,20 @@ import {
 
 export class CompressedTexture extends Texture {
 
+	/**
+	 * @param mipmaps
+	 * @param width
+	 * @param height
+	 * @param [format=THREE.RGBAFormat]
+	 * @param [type=THREE.UnsignedByteType]
+	 * @param [mapping=THREE.Texture.DEFAULT_MAPPING]
+	 * @param [wrapS=THREE.ClampToEdgeWrapping]
+	 * @param [wrapT=THREE.ClampToEdgeWrapping]
+	 * @param [magFilter=THREE.LinearFilter]
+	 * @param [minFilter=THREE.LinearMipmapLinearFilter]
+	 * @param [anisotropy=1]
+	 * @param [encoding=THREE.LinearEncoding]
+	 */
 	constructor(
 		mipmaps: ImageData[],
 		width: number,
@@ -26,5 +40,19 @@ export class CompressedTexture extends Texture {
 	);
 
 	image: { width: number; height: number };
+
+	mipmaps: ImageData[];
+
+	/**
+	 * @default false
+	 */
+	flipY: boolean;
+
+	/**
+	 * @default false
+	 */
+	generateMipmaps: boolean;
+
+	readonly isCompressedTexture: true;
 
 }

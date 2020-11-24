@@ -1,11 +1,6 @@
 import { Light } from './Light.js';
 import { PointLightShadow } from './PointLightShadow.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-
 function PointLight( color, intensity, distance, decay ) {
 
 	Light.call( this, color, intensity );

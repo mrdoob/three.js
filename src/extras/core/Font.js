@@ -1,10 +1,4 @@
-/**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { ShapePath } from './ShapePath.js';
-
 
 function Font( data ) {
 
@@ -18,9 +12,7 @@ Object.assign( Font.prototype, {
 
 	isFont: true,
 
-	generateShapes: function ( text, size ) {
-
-		if ( size === undefined ) size = 100;
+	generateShapes: function ( text, size = 100 ) {
 
 		const shapes = [];
 		const paths = createPaths( text, size, this.data );

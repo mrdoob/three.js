@@ -1,10 +1,5 @@
-/**
- * @author thespite / http://clicktorelease.com/
- */
-
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
-
 
 function ImageBitmapLoader( manager ) {
 
@@ -68,7 +63,10 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		}
 
-		fetch( url ).then( function ( res ) {
+		const fetchOptions = {};
+		fetchOptions.credentials = ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include';
+
+		fetch( url, fetchOptions ).then( function ( res ) {
 
 			return res.blob();
 

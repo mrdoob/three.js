@@ -1,7 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
 import { EdgesGeometry } from '../../../../src/geometries/EdgesGeometry';
@@ -289,7 +285,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( "three triangles, coplanar first", ( assert ) => {
 
-			testEdges( vertList, [ 0, 1, 2, 0, 2, 3, 0, 4, 2 ], 7, assert );
+			testEdges( vertList, [ 0, 2, 3, 0, 1, 2, 0, 4, 2 ], 7, assert );
 
 		} );
 

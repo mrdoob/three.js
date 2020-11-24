@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { WebGLBackground } from '../../../../../src/renderers/webgl/WebGLBackground';

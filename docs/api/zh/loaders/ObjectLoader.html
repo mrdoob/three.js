@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,7 +20,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var loader = new THREE.ObjectLoader();
+		const loader = new THREE.ObjectLoader();
 
 		loader.load(
 			// 资源的URL
@@ -47,7 +46,7 @@
 
 
 		// 或者，解析先前加载的JSON结构
-		var object = loader.parse( a_json_object );
+		const object = loader.parse( a_json_object );
 
 		scene.add( object );
 		</code>
@@ -129,9 +128,12 @@
 			此函数通过[page:.parse]来解析JSON结构中任意纹理。
 		</p>
 
-		<h3>[method:Object3D parseObject]( [param:Object json] )</h3>
+		<h3>[method:Object3D parseObject]( [param:Object json], [param:BufferGeometry geometries], [param:Material materials], [param:AnimationClip animations] )</h3>
 		<p>
-		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
+		[page:Object json] —  必选参数，需要被解析的JSON源。<br />
+		[page:BufferGeometry geometries] — required. The geometries of the JSON.<br />
+		[page:Material materials] — required. The materials of the JSON.<br />
+		[page:AnimationClip animations] — required. The animations of the JSON.<br /><br />
 
 			此函数通过[page:.parse]来解析JSON结构中任意对象。
 		对象可以为如下类型：

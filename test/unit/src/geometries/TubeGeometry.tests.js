@@ -1,11 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import {
-	TubeBufferGeometry
-} from '../../../../src/geometries/TubeGeometry';
+import { TubeBufferGeometry } from '../../../../src/geometries/TubeBufferGeometry';
 
 import { LineCurve3 } from '../../../../src/extras/curves/LineCurve3';
 import { Vector3 } from '../../../../src/math/Vector3';

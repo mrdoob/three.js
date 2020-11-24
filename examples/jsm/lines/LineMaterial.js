@@ -1,17 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- * parameters = {
- *  color: <hex>,
- *  linewidth: <float>,
- *  dashed: <boolean>,
- *  dashScale: <float>,
- *  dashSize: <float>,
- *  gapSize: <float>,
- *  resolution: <Vector2>, // to be set by renderer
- * }
- */
-
 import {
 	ShaderLib,
 	ShaderMaterial,
@@ -20,12 +6,26 @@ import {
 	Vector2
 } from "../../../build/three.module.js";
 
+/**
+ * parameters = {
+ *  color: <hex>,
+ *  linewidth: <float>,
+ *  dashed: <boolean>,
+ *  dashScale: <float>,
+ *  dashSize: <float>,
+ *  dashOffset: <float>,
+ *  gapSize: <float>,
+ *  resolution: <Vector2>, // to be set by renderer
+ * }
+ */
+
 UniformsLib.line = {
 
 	linewidth: { value: 1 },
 	resolution: { value: new Vector2( 1, 1 ) },
 	dashScale: { value: 1 },
 	dashSize: { value: 1 },
+	dashOffset: { value: 0 },
 	gapSize: { value: 1 }, // todo FIX - maybe change to totalSize
 	opacity: { value: 1 }
 
@@ -194,6 +194,7 @@ ShaderLib[ 'line' ] = {
 		#ifdef USE_DASH
 
 			uniform float dashSize;
+			uniform float dashOffset;
 			uniform float gapSize;
 
 		#endif
@@ -216,7 +217,7 @@ ShaderLib[ 'line' ] = {
 
 				if ( vUv.y < - 1.0 || vUv.y > 1.0 ) discard; // discard endcaps
 
-				if ( mod( vLineDistance, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
+				if ( mod( vLineDistance + dashOffset, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
 
 			#endif
 
@@ -337,6 +338,24 @@ var LineMaterial = function ( parameters ) {
 
 		},
 
+		dashOffset: {
+
+			enumerable: true,
+
+			get: function () {
+
+				return this.uniforms.dashOffset.value;
+
+			},
+
+			set: function ( value ) {
+
+				this.uniforms.dashOffset.value = value;
+
+			}
+
+		},
+
 		gapSize: {
 
 			enumerable: true,
@@ -401,6 +420,5 @@ LineMaterial.prototype = Object.create( ShaderMaterial.prototype );
 LineMaterial.prototype.constructor = LineMaterial;
 
 LineMaterial.prototype.isLineMaterial = true;
-
 
 export { LineMaterial };

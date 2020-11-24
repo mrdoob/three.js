@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { ColladaExporter } from '../../examples/jsm/exporters/ColladaExporter.js';
@@ -236,7 +232,7 @@ function MenubarFile( editor ) {
 		var exporter = new DRACOExporter();
 
 		// TODO: Change to DRACOExporter's parse( geometry, onParse )?
-		var result = exporter.parse( object.geometry );
+		var result = exporter.parse( object );
 		saveArrayBuffer( result, 'model.drc' );
 
 	} );
@@ -249,13 +245,16 @@ function MenubarFile( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/file/export/glb' ) );
 	option.onClick( function () {
 
+		var scene = editor.scene;
+		var animations = getAnimations( scene );
+
 		var exporter = new GLTFExporter();
 
-		exporter.parse( editor.scene, function ( result ) {
+		exporter.parse( scene, function ( result ) {
 
 			saveArrayBuffer( result, 'scene.glb' );
 
-		}, { binary: true } );
+		}, { binary: true, animations: animations } );
 
 	} );
 	options.add( option );
@@ -267,13 +266,16 @@ function MenubarFile( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/file/export/gltf' ) );
 	option.onClick( function () {
 
+		var scene = editor.scene;
+		var animations = getAnimations( scene );
+
 		var exporter = new GLTFExporter();
 
-		exporter.parse( editor.scene, function ( result ) {
+		exporter.parse( scene, function ( result ) {
 
 			saveString( JSON.stringify( result, null, 2 ), 'scene.gltf' );
 
-		} );
+		}, { animations: animations } );
 
 
 	} );
@@ -472,6 +474,20 @@ function MenubarFile( editor ) {
 	function saveString( text, filename ) {
 
 		save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+	}
+
+	function getAnimations( scene ) {
+
+		var animations = [];
+
+		scene.traverse( function ( object ) {
+
+			animations.push( ... object.animations );
+
+		} );
+
+		return animations;
 
 	}
 

@@ -1,7 +1,4 @@
 /**
- * @author Lewy Blue / https://github.com/looeee
- * @author Guilherme Avila / https://github/sciecode
- *
  * === IFFParser ===
  * - Parses data from the IFF buffer.
  * - LWO3 files are in IFF format and can contain the following data types, referred to by shorthand codes

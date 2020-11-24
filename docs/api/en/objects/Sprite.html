@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,9 +21,10 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var spriteMap = new THREE.TextureLoader().load( "sprite.png" );
-		var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap } );
-		var sprite = new THREE.Sprite( spriteMaterial );
+		const map = new THREE.TextureLoader().load( 'sprite.png' );
+		const material = new THREE.SpriteMaterial( { map: map } );
+
+		const sprite = new THREE.Sprite( material );
 		scene.add( sprite );
 		</code>
 

@@ -60,14 +60,14 @@ export default /* glsl */`
 
 		#ifdef ENVMAP_MODE_REFLECTION
 
-		  vec3 reflectVec = reflect( -viewDir, normal );
+			vec3 reflectVec = reflect( -viewDir, normal );
 
-		  // Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
-		  reflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );
+			// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
+			reflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );
 
 		#else
 
-		  vec3 reflectVec = refract( -viewDir, normal, refractionRatio );
+			vec3 reflectVec = refract( -viewDir, normal, refractionRatio );
 
 		#endif
 
@@ -94,22 +94,6 @@ export default /* glsl */`
 		#elif defined( ENVMAP_TYPE_CUBE_UV )
 
 			vec4 envMapColor = textureCubeUV( envMap, reflectVec, roughness );
-
-		#elif defined( ENVMAP_TYPE_EQUIREC )
-
-			vec2 sampleUV = equirectUv( reflectVec );
-
-			#ifdef TEXTURE_LOD_EXT
-
-				vec4 envMapColor = texture2DLodEXT( envMap, sampleUV, specularMIPLevel );
-
-			#else
-
-				vec4 envMapColor = texture2D( envMap, sampleUV, specularMIPLevel );
-
-			#endif
-
-			envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
 
 		#endif
 

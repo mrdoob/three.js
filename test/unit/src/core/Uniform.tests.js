@@ -1,6 +1,3 @@
-/**
- * @author moraxy / https://github.com/moraxy
- */
 /* global QUnit */
 
 import { Uniform } from '../../../../src/core/Uniform';

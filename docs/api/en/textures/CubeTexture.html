@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,16 +16,16 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var loader = new THREE.CubeTextureLoader();
+		const loader = new THREE.CubeTextureLoader();
 		loader.setPath( 'textures/cube/pisa/' );
 
-		var textureCube = loader.load( [
+		const textureCube = loader.load( [
 			'px.png', 'nx.png',
 			'py.png', 'ny.png',
 			'pz.png', 'nz.png'
 		] );
 
-		var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 		</code>
 
 		<h2>Constructor</h2>

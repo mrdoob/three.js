@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -85,13 +84,13 @@
 		<h3>[property:Texture map]</h3>
 		<p>The color map. Default is  null.</p>
 
-		<h3>[property:boolean morphTargets]</h3>
+		<h3>[property:Boolean morphTargets]</h3>
 		<p>Define whether the material uses morphTargets. Default is false.</p>
 
 		<h3>[property:Boolean skinning]</h3>
 		<p>Define whether the material uses skinning. Default is false.</p>
 
-		<h3>[property:boolean wireframe]</h3>
+		<h3>[property:Boolean wireframe]</h3>
 		<p>Render geometry as wireframe. Default is false (i.e. render as smooth shaded).</p>
 
 		<h3>[property:Float wireframeLinewidth]</h3>

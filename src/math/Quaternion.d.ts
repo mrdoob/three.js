@@ -21,9 +21,24 @@ export class Quaternion {
 	 */
 	constructor( x?: number, y?: number, z?: number, w?: number );
 
+	/**
+	 * @default 0
+	 */
 	x: number;
+
+	/**
+	 * @default 0
+	 */
 	y: number;
+
+	/**
+	 * @default 0
+	 */
 	z: number;
+
+	/**
+	 * @default 1
+	 */
 	w: number;
 	readonly isQuaternion: true;
 
@@ -62,10 +77,12 @@ export class Quaternion {
 	angleTo( q: Quaternion ): number;
 	rotateTowards( q: Quaternion, step: number ): Quaternion;
 
+	identity(): Quaternion;
+
 	/**
 	 * Inverts this quaternion.
 	 */
-	inverse(): Quaternion;
+	invert(): Quaternion;
 
 	conjugate(): Quaternion;
 	dot( v: Quaternion ): number;
@@ -162,5 +179,10 @@ export class Quaternion {
 	 * @deprecated Use {@link Vector#applyQuaternion vector.applyQuaternion( quaternion )} instead.
 	 */
 	multiplyVector3( v: any ): any;
+
+	/**
+	 * @deprecated Use {@link Quaternion#invert .invert()} instead.
+	 */
+	inverse(): Quaternion;
 
 }

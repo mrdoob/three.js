@@ -11,6 +11,20 @@ import { TypedArray } from '../polyfills';
 
 export class DataTexture extends Texture {
 
+	/**
+	 * @param data
+	 * @param width
+	 * @param height
+	 * @param [format=THREE.RGBAFormat]
+	 * @param [type=THREE.UnsignedByteType]
+	 * @param [mapping=THREE.Texture.DEFAULT_MAPPING]
+	 * @param [wrapS=THREE.ClampToEdgeWrapping]
+	 * @param [wrapT=THREE.ClampToEdgeWrapping]
+	 * @param [magFilter=THREE.NearestFilter]
+	 * @param [minFilter=THREE.NearestFilter]
+	 * @param [anisotropy=1]
+	 * @param [encoding=THREE.LinearEncoding]
+	 */
 	constructor(
 		data: TypedArray,
 		width: number,
@@ -27,5 +41,27 @@ export class DataTexture extends Texture {
 	);
 
 	image: ImageData;
+
+	/**
+	 * @default false
+	 */
+	flipY: boolean;
+
+	/**
+	 * @default false
+	 */
+	generateMipmaps: boolean;
+
+	/**
+	 * @default 1
+	 */
+	unpackAlignment: number;
+
+	/**
+	 * @default THREE.DepthFormat
+	 */
+	format: PixelFormat;
+
+	readonly isDataTexture: true;
 
 }

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -39,12 +38,12 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var a = new THREE.Vector3( 0, 1, 0 );
+		const a = new THREE.Vector3( 0, 1, 0 );
 
 		//no arguments; will be initialised to (0, 0, 0)
-		var b = new THREE.Vector3( );
+		const b = new THREE.Vector3( );
 
-		var d = a.distanceTo( b );
+		const d = a.distanceTo( b );
 		</code>
 
 
@@ -104,6 +103,9 @@
 		<p>
 			将该向量乘以四阶矩阵m（第四个维度隐式地为1），and divides by perspective.
 		</p>
+
+		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
+		<p>Multiplies this vector by normal matrix [page:Matrix3 m] and normalizes the result.</p>
 
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>
@@ -311,7 +313,7 @@
 		normal from this vector.
 		</p>
 
-		<h3>[method:this projectOnVector]( [param:Vector3] )</h3>
+		<h3>[method:this projectOnVector]( [param:Vector3 v] )</h3>
 		<p>投影（[link:https://en.wikipedia.org/wiki/Vector_projection Projects]）该向量到向量[page:Vector3 v]上。</p>
 
 		<h3>[method:this reflect]( [param:Vector3 normal] )</h3>
@@ -355,6 +357,11 @@
 		<p>
 		从传入的四阶矩阵[page:Matrix4 matrix]由[page:Integer index]指定的列中，
 		设置该向量的[page:.x x]值、[page:.y y]值和[page:.z z]值。
+		</p>
+
+		<h3>[method:this setFromMatrix3Column]( [param:Matrix3 matrix], [param:Integer index] )</h3>
+		<p>
+		Sets this vector's [page:.x x], [page:.y y] and [page:.z z] components from [page:Integer index] column of [page:Matrix3 matrix].
 		</p>
 
 		<h3>[method:this setFromMatrixPosition]( [param:Matrix4 m] )</h3>

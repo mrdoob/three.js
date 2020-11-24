@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,7 +20,7 @@
 
 		<code>
 		// load a texture, set wrap mode to repeat
-		var texture = new THREE.TextureLoader().load( "textures/water.jpg" );
+		const texture = new THREE.TextureLoader().load( "textures/water.jpg" );
 		texture.wrapS = THREE.RepeatWrapping;
 		texture.wrapT = THREE.RepeatWrapping;
 		texture.repeat.set( 4, 4 );
@@ -54,7 +53,7 @@
 		并在视频播放时不断地更新这个纹理贴图。——[page:VideoTexture VideoTexture] 类会对此自动进行处理。
 		</p>
 
-		<h3>[property:array mipmaps]</h3>
+		<h3>[property:Array mipmaps]</h3>
 		<p>
 		用户所给定的mipmap数组（可选）。
 		</p>
@@ -117,6 +116,17 @@
 		请参阅[page:Textures texture constants]页面来了解其它格式。
 		</p>
 
+		<h3>[property:String internalFormat]</h3>
+		<p>
+		The default value is obtained using a combination of [page:Texture.format .format] and
+		[page:Texture.type .type].<br />
+
+		The GPU format allows the developer to specify how the data is going to be
+		stored on the GPU.<br /><br />
+
+		See the [page:Textures texture constants] page for details regarding all supported internal formats.
+		</p>
+
 		<h3>[property:number type]</h3>
 		<p>
 			这个值必须与[page:Texture.format .format]相对应。默认值为[page:Textures THREE.UnsignedByteType]，
@@ -154,7 +164,7 @@
 		旋转中心点。(0.5, 0.5)对应纹理的正中心。默认值为(0,0)，即左下角。
 		</p>
 
-		<h3>[property:boolean matrixAutoUpdate]</h3>
+		<h3>[property:Boolean matrixAutoUpdate]</h3>
 		<p>
 		是否从纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、[page:Texture.rotation .rotation]和[page:Texture.center .center]属性更新纹理的UV变换矩阵（uv-transform [page:Texture.matrix .matrix]）。
 		默认值为true。
@@ -170,21 +180,21 @@
 			默认值为单位矩阵。
 		</p>
 
-		<h3>[property:boolean generateMipmaps]</h3>
+		<h3>[property:Boolean generateMipmaps]</h3>
 		<p>
 			是否为纹理生成mipmap（如果可用）。默认为true。
 			如果你手动生成mipmap，请将其设为false。
 		</p>
 
-		<h3>[property:boolean premultiplyAlpha]</h3>
+		<h3>[property:Boolean premultiplyAlpha]</h3>
 		<p>
-		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Defaut is *false*.<br /><br />
+		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Default is *false*.<br /><br />
 
 		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
 		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
-		<h3>[property:boolean flipY]</h3>
+		<h3>[property:Boolean flipY]</h3>
 		<p>
 		If set to *true*, the texture is flipped along the vertical axis when uploaded to the GPU. Default is *true*.<br /><br />
 

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -24,7 +23,7 @@
 
 		<code>
 		// instantiate a loader
-		var loader = new PRWMLoader();
+		const loader = new PRWMLoader();
 
 		// load a resource
 		loader.load(
@@ -33,7 +32,7 @@
 			// called when resource is loaded
 			function ( bufferGeometry ) {
 
-				var object = new THREE.Mesh( bufferGeometry, new THREE.MeshNormalMaterial() );
+				const object = new THREE.Mesh( bufferGeometry, new THREE.MeshNormalMaterial() );
 				scene.add( object );
 
 			},

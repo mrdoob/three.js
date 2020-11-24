@@ -4,6 +4,8 @@ import { Matrix3 } from './Matrix3';
 import { BufferAttribute } from './../core/BufferAttribute';
 import { Vector } from './Vector2';
 
+type Vector4Tuple = [number, number, number, number];
+
 /**
  * 4D vector.
  *
@@ -13,10 +15,26 @@ export class Vector4 implements Vector {
 
 	constructor( x?: number, y?: number, z?: number, w?: number );
 
+	/**
+	 * @default 0
+	 */
 	x: number;
+
+	/**
+	 * @default 0
+	 */
 	y: number;
+
+	/**
+	 * @default 0
+	 */
 	z: number;
+
+	/**
+	 * @default 0
+	 */
 	w: number;
+
 	width: number;
 	height: number;
 	readonly isVector4: true;
@@ -195,6 +213,7 @@ export class Vector4 implements Vector {
 	 * @return The created or provided array.
 	 */
 	toArray( array?: number[], offset?: number ): number[];
+	toArray( array?: Vector4Tuple, offset?: 0 ): Vector4Tuple;
 
 	/**
 	 * Copies x, y, z and w into the provided array-like.

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,7 +21,7 @@
 		<code>
 		// white spotlight shining from the side, casting a shadow
 
-		var spotLight = new THREE.SpotLight( 0xffffff );
+		const spotLight = new THREE.SpotLight( 0xffffff );
 		spotLight.position.set( 100, 1000, 100 );
 
 		spotLight.castShadow = true;
@@ -132,7 +131,7 @@
 
 			它也可以设置target为场景中的其他对象(任意拥有 [page:Object3D.position position] 属性的对象), 示例如下:
 			<code>
-var targetObject = new THREE.Object3D();
+const targetObject = new THREE.Object3D();
 scene.add(targetObject);
 
 light.target = targetObject;

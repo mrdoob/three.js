@@ -8,8 +8,6 @@ import { WrapAroundEnding, ZeroSlopeEnding } from '../../constants.js';
  * It was derived from a Hermitian construction setting the first derivative
  * at each sample position to the linear slope between neighboring positions
  * over their parameter interval.
- *
- * @author tschw
  */
 
 function CubicInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
@@ -36,8 +34,8 @@ CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype
 
 	intervalChanged_: function ( i1, t0, t1 ) {
 
-		let pp = this.parameterPositions,
-			iPrev = i1 - 2,
+		const pp = this.parameterPositions;
+		let iPrev = i1 - 2,
 			iNext = i1 + 1,
 
 			tPrev = pp[ iPrev ],

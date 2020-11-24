@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
 import { UIOutliner, UITexture } from './libs/ui.three.js';
 
@@ -187,7 +183,7 @@ function SidebarScene( editor ) {
 	backgroundRow.add( new UIText( strings.getKey( 'sidebar/scene/background' ) ).setWidth( '90px' ) );
 	backgroundRow.add( backgroundType );
 
-	var backgroundColor = new UIColor().setValue( '#000000' ).setMarginLeft( '8px' ).onChange( onBackgroundChanged );
+	var backgroundColor = new UIColor().setValue( '#000000' ).setMarginLeft( '8px' ).onInput( onBackgroundChanged );
 	backgroundRow.add( backgroundColor );
 
 	var backgroundTexture = new UITexture().setMarginLeft( '8px' ).onChange( onBackgroundChanged );
@@ -289,7 +285,7 @@ function SidebarScene( editor ) {
 	container.add( fogPropertiesRow );
 
 	var fogColor = new UIColor().setValue( '#aaaaaa' );
-	fogColor.onChange( onFogSettingsChanged );
+	fogColor.onInput( onFogSettingsChanged );
 	fogPropertiesRow.add( fogColor );
 
 	// fog near

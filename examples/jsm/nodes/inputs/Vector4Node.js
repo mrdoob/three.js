@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { Vector4 } from '../../../../build/three.module.js';
 
 import { InputNode } from '../core/InputNode.js';

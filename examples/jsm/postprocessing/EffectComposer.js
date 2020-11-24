@@ -1,7 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 import {
 	Clock,
 	LinearFilter,
@@ -26,8 +22,7 @@ var EffectComposer = function ( renderer, renderTarget ) {
 		var parameters = {
 			minFilter: LinearFilter,
 			magFilter: LinearFilter,
-			format: RGBAFormat,
-			stencilBuffer: false
+			format: RGBAFormat
 		};
 
 		var size = renderer.getSize( new Vector2() );
@@ -98,6 +93,18 @@ Object.assign( EffectComposer.prototype, {
 
 		this.passes.splice( index, 0, pass );
 		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
+
+	},
+
+	removePass: function ( pass ) {
+
+		const index = this.passes.indexOf( pass );
+
+		if ( index !== - 1 ) {
+
+			this.passes.splice( index, 1 );
+
+		}
 
 	},
 

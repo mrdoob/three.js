@@ -4,8 +4,19 @@ export class Spherical {
 
 	constructor( radius?: number, phi?: number, theta?: number );
 
+	/**
+	 * @default 1
+	 */
 	radius: number;
+
+	/**
+	 * @default 0
+	 */
 	phi: number;
+
+	/**
+	 * @default 0
+	 */
 	theta: number;
 
 	set( radius: number, phi: number, theta: number ): this;

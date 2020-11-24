@@ -1,9 +1,6 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
+import { Rhino3dmLoader } from '../../examples/jsm/loaders/3DMLoader.js';
 import { ThreeMFLoader } from '../../examples/jsm/loaders/3MFLoader.js';
 import { AMFLoader } from '../../examples/jsm/loaders/AMFLoader.js';
 import { ColladaLoader } from '../../examples/jsm/loaders/ColladaLoader.js';
@@ -20,6 +17,9 @@ import { SVGLoader } from '../../examples/jsm/loaders/SVGLoader.js';
 import { TDSLoader } from '../../examples/jsm/loaders/TDSLoader.js';
 import { VTKLoader } from '../../examples/jsm/loaders/VTKLoader.js';
 import { VRMLLoader } from '../../examples/jsm/loaders/VRMLLoader.js';
+import { XYZLoader } from '../../examples/jsm/loaders/XYZLoader.js';
+
+import { TGALoader } from '../../examples/jsm/loaders/TGALoader.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 import { SetSceneCommand } from './commands/SetSceneCommand.js';
@@ -53,6 +53,8 @@ function Loader( editor ) {
 			var manager = new THREE.LoadingManager();
 			manager.setURLModifier( function ( url ) {
 
+				url = url.replace( /^(\.?\/)/, '' ); // remove './'
+
 				var file = filesMap[ url ];
 
 				if ( file ) {
@@ -66,6 +68,8 @@ function Loader( editor ) {
 				return url;
 
 			} );
+
+			manager.addHandler( /\.tga$/i, new TGALoader() );
 
 			for ( var i = 0; i < files.length; i ++ ) {
 
@@ -93,6 +97,25 @@ function Loader( editor ) {
 		} );
 
 		switch ( extension ) {
+
+			case '3dm':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var loader = new Rhino3dmLoader();
+					loader.setLibraryPath( '../examples/jsm/libs/rhino3dm/' );
+					loader.parse( contents, function ( object ) {
+
+						editor.execute( new AddObjectCommand( editor, object ) );
+
+					} );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
 
 			case '3ds':
 
@@ -147,7 +170,7 @@ function Loader( editor ) {
 
 					collada.scene.name = filename;
 
-					editor.addAnimation( collada.scene, collada.animations );
+					collada.scene.animations.push( ...collada.animations );
 					editor.execute( new AddObjectCommand( editor, collada.scene ) );
 
 				}, false );
@@ -165,12 +188,27 @@ function Loader( editor ) {
 					loader.setDecoderPath( '../examples/js/libs/draco/' );
 					loader.decodeDracoFile( contents, function ( geometry ) {
 
-						var material = new THREE.MeshStandardMaterial();
+						var object;
 
-						var mesh = new THREE.Mesh( geometry, material );
-						mesh.name = filename;
+						if ( geometry.index !== null ) {
 
-						editor.execute( new AddObjectCommand( editor, mesh ) );
+							var material = new THREE.MeshStandardMaterial();
+
+							object = new THREE.Mesh( geometry, material );
+							object.name = filename;
+
+						} else {
+
+							var material = new THREE.PointsMaterial( { size: 0.01 } );
+
+							if ( geometry.hasAttribute( 'color' ) === true ) material.vertexColors = true;
+
+							object = new THREE.Points( geometry, material );
+							object.name = filename;
+
+						}
+
+						editor.execute( new AddObjectCommand( editor, object ) );
 
 					} );
 
@@ -188,7 +226,6 @@ function Loader( editor ) {
 					var loader = new FBXLoader( manager );
 					var object = loader.parse( contents );
 
-					editor.addAnimation( object, object.animations );
 					editor.execute( new AddObjectCommand( editor, object ) );
 
 				}, false );
@@ -212,7 +249,7 @@ function Loader( editor ) {
 						var scene = result.scene;
 						scene.name = filename;
 
-						editor.addAnimation( scene, result.animations );
+						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
@@ -249,7 +286,7 @@ function Loader( editor ) {
 						var scene = result.scene;
 						scene.name = filename;
 
-						editor.addAnimation( scene, result.animations );
+						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
@@ -348,7 +385,7 @@ function Loader( editor ) {
 					mesh.mixer = new THREE.AnimationMixer( mesh );
 					mesh.name = filename;
 
-					editor.addAnimation( mesh, geometry.animations );
+					mesh.animations.push( ...geometry.animations );
 					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
@@ -489,7 +526,7 @@ function Loader( editor ) {
 					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
-				reader.readAsText( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 
@@ -502,6 +539,28 @@ function Loader( editor ) {
 					var result = new VRMLLoader().parse( contents );
 
 					editor.execute( new SetSceneCommand( editor, result ) );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
+			case 'xyz':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var geometry = new XYZLoader().parse( contents );
+
+					var material = new THREE.PointsMaterial();
+
+					if ( geometry.hasAttribute( 'color' ) === true ) material.vertexColors = true;
+
+					var points = new THREE.Points( geometry, material );
+					points.name = filename;
+
+					editor.execute( new AddObjectCommand( editor, points ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -650,12 +709,17 @@ function Loader( editor ) {
 
 				case 'glb':
 
+					var dracoLoader = new DRACOLoader();
+					dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+
 					var loader = new GLTFLoader();
+					loader.setDRACOLoader( dracoLoader );
+
 					loader.parse( file.asArrayBuffer(), '', function ( result ) {
 
 						var scene = result.scene;
 
-						editor.addAnimation( scene, result.animations );
+						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
@@ -664,12 +728,16 @@ function Loader( editor ) {
 
 				case 'gltf':
 
+					var dracoLoader = new DRACOLoader();
+					dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+
 					var loader = new GLTFLoader( manager );
+					loader.setDRACOLoader( dracoLoader );
 					loader.parse( file.asText(), '', function ( result ) {
 
 						var scene = result.scene;
 
-						editor.addAnimation( scene, result.animations );
+						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );

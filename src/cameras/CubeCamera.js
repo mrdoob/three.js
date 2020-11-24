@@ -2,13 +2,6 @@ import { Object3D } from '../core/Object3D.js';
 import { Vector3 } from '../math/Vector3.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
-/**
- * Camera for rendering cube maps
- *	- renders scene into axis-aligned cube
- *
- * @author alteredq / http://alteredqualia.com/
- */
-
 const fov = 90, aspect = 1;
 
 function CubeCamera( near, far, renderTarget ) {
@@ -98,22 +91,6 @@ function CubeCamera( near, far, renderTarget ) {
 		renderer.setRenderTarget( currentRenderTarget );
 
 		renderer.xr.enabled = currentXrEnabled;
-
-	};
-
-	this.clear = function ( renderer, color, depth, stencil ) {
-
-		const currentRenderTarget = renderer.getRenderTarget();
-
-		for ( let i = 0; i < 6; i ++ ) {
-
-			renderer.setRenderTarget( renderTarget, i );
-
-			renderer.clear( color, depth, stencil );
-
-		}
-
-		renderer.setRenderTarget( currentRenderTarget );
 
 	};
 

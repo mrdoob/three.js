@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+			AnimationClip عبارة عن مجموعة قابلة لإعادة الاستخدام من مسارات الإطارات الرئيسية التي تمثل رسمًا متحركًا.<br /><br />
+
+			للحصول على نظرة عامة حول العناصر المختلفة لنظام الرسوم المتحركة three.js ، راجع مقالة "نظام الحركات" في قسم "الخطوات التالية" من الدليل.
+		</p>
+
+
+		<h2>المنشئ (Constructor)</h2>
+
+
+		<h3>[name]( [param:String name], [param:Number duration], [param:Array tracks] )</h3>
+		<p>
+			[page:String name] - اسم لهذا المقطع.<br />
+			[page:Number duration] - مدة هذا المقطع (بالثواني). إذا تم تمرير قيمة سالبة ، فسيتم حساب المدة من *tracks* التي تم تمريرها.<br />
+			[page:Array tracks] - مجموعة (جدول) من [page:KeyframeTrack KeyframeTracks].<br /><br />
+
+			ملاحظة: بدلاً من إنشاء AnimationClip مباشرةً مع المُنشئ ، يمكنك استخدام إحدى طرقه الثابتة لإنشاء AnimationClips: من JSON ([page:.parse parse]) ، من تسلسلات الهدف التحويلية ([page:.CreateFromMorphTargetSequence CreateFromMorphTargetSequence] ،
+			[page:.CreateClipsFromMorphTargetSequences CreateClipsFromMorphTargetSequences]) أو من التسلسلات الهرمية للرسوم المتحركة ([page:.parseAnimation parseAnimation]) - إذا كان النموذج الخاص بك لا يحتوي بالفعل على AnimationClips في مجموعة الرسوم المتحركة الخاصة بهندسة.
+		</p>
+
+
+		<h2>الخصائص (Properties)</h2>
+
+
+		<h3>[property:Number duration]</h3>
+		<p>
+			مدة هذا المقطع (بالثواني). يمكن حساب ذلك من مجموعة [page:.tracks tracks]  عبر [page:.resetDuration resetDuration].
+		</p>
+
+		<h3>[property:String name]</h3>
+		<p>
+			اسم لهذا المقطع. يمكن البحث عن مقطع معين طريق بإستعمال [page:.findByName findByName].
+		</p>
+
+		<h3>[property:Array tracks]</h3>
+		<p>
+			جدول يحتوي على [page:KeyframeTrack] لكل خاصية يتم تحريكها بواسطة هذا المقطع.
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+			[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] لهذا المقطع. يتم تعيينه تلقائيًا ولا يجب تحريره.
+		</p>
+
+
+		<h2>الوظائف (Methods)</h2>
+
+
+		<h3>[method:AnimationClip clone]()</h3>
+		<p>
+			إرجاع نسخة من هذا المقطع.
+		</p>
+
+		<h3>[method:this optimize]()</h3>
+		<p>
+			يحسن من أداء كل مسار عن طريق إزالة المفاتيح المتسلسلة المتكررة (الشائعة في تسلسلات هدف التحويل - morph target sequences).
+		</p>
+
+		<h3>[method:this resetDuration]()</h3>
+		<p>
+			يضبط [page:.duration duration] للمقطع على أطول مدة [page:KeyframeTrack] ممكنة.
+		</p>
+
+		<h3>[method:Object toJSON]()</h3>
+		<p>
+			Returns a JSON object representing the serialized animation clip.
+		</p>
+
+		<h3>[method:this trim]()</h3>
+		<p>
+			اقتطاع كل المسارات حسب مدة المقطع.
+		</p>
+
+		<h3>[method:Boolean validate]()</h3>
+		<p>
+			يقوم بتأدية الحد الأدنى من التحقق من الصحة على كل مسار في المقطع. إرجاع *true* إذا كانت جميع المسارات صالحة.
+		</p>
+
+
+		<h2>الوظائف الساكنة (Static Methods)</h2>
+
+
+		<h3>[method:Array CreateClipsFromMorphTargetSequences]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
+		<p>
+			تُرجع مصفوفة من AnimationClips الجديدة التي تم إنشاؤها من [page:Geometry.morphTargets morph target sequences] من الشكل الهندسي ، في محاولة لفرز أسماء الأهداف التحويلية إلى أنماط قائمة على مجموعة الرسوم المتحركة مثل "Walk_001 ، Walk_002 ، Run_001 ، Run_002 ...".
+		</p>
+
+		<h3>[method:AnimationClip CreateFromMorphTargetSequence]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
+		<p>
+			يُرجع مقطع رسوم متحركة جديدًا من [page:Geometry.morphTargets morph targets array] تم تمريره لشكل هندسي ، مع أخذ اسم وعدد الإطارات في الثانية.<br /><br />
+
+			ملاحظة: قيمة fps مطلوبة و ضرورية ، ولكن يمكن إعادة ضبظ سرعة الرسوم المتحركة في *AnimationAction* عبر [page:AnimationAction.setDuration animationAction.setDuration].
+		</p>
+
+		<h3>[method:AnimationClip findByName]( [param:Object objectOrClipArray], [param:String name] )</h3>
+		<p>
+			يبحث عن AnimationClip بالاسم ، مع الأخذ كقيمة إما مصفوفة من AnimationClips ، أو شبكة أو شكل هندسي يحتوي على جدول مسمى "animations".
+		</p>
+
+		<h3>[method:AnimationClip parse]( [param:Object json] )</h3>
+		<p>
+			يترجم تمثيل JSON لمقطع ويعيد AnimationClip.
+		</p>
+
+		<h3>[method:AnimationClip parseAnimation]( [param:Object animation], [param:Array bones] )</h3>
+		<p>
+			يوزع تنسيق animation.hierarchy ويعيد AnimationClip.
+		</p>
+
+		<h3>[method:Object toJSON]( [param:AnimationClip clip] )</h3>
+		<p>
+			يأخذ AnimationClip ويعيد كائن JSON.
+		</p>
+
+
+		<h2>المصدر (Source)</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

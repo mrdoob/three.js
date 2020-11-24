@@ -23,8 +23,8 @@
 			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var container, stats, clock, controls;
-			var camera, scene, renderer, mixer;
+			let container, stats, clock, controls;
+			let camera, scene, renderer, mixer;
 
 			init();
 			animate();
@@ -42,11 +42,11 @@
 
 				// collada
 
-				var loader = new ColladaLoader();
+				const loader = new ColladaLoader();
 				loader.load( './models/collada/stormtrooper/stormtrooper.dae', function ( collada ) {
 
-					var animations = collada.animations;
-					var avatar = collada.scene;
+					const animations = collada.animations;
+					const avatar = collada.scene;
 
 					avatar.traverse( function ( node ) {
 
@@ -67,15 +67,15 @@
 
 				//
 
-				var gridHelper = new THREE.GridHelper( 10, 20 );
+				const gridHelper = new THREE.GridHelper( 10, 20, 0x888888, 0x444444 );
 				scene.add( gridHelper );
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				scene.add( camera );
 				camera.add( pointLight );
 
@@ -126,7 +126,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( mixer !== undefined ) {
 
