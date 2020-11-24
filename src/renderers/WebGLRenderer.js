@@ -1768,18 +1768,6 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.getRenderState = function () {
-
-		return currentRenderState;
-
-	};
-
-	this.setRenderState = function ( renderState ) {
-
-		currentRenderState = renderState;
-
-	};
-
 	this.getRenderTarget = function () {
 
 		return _currentRenderTarget;
