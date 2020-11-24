@@ -18,6 +18,9 @@ function WebXRManager( renderer, gl ) {
 	let referenceSpaceType = 'local-floor';
 
 	let pose = null;
+	let glBinding = null;
+	let glFramebuffer = null;
+	let glProjLayer = null;
 
 	const controllers = [];
 	const inputSourcesMap = new Map();
@@ -199,18 +202,37 @@ function WebXRManager( renderer, gl ) {
 
 			}
 
-			const layerInit = {
-				antialias: attributes.antialias,
-				alpha: attributes.alpha,
-				depth: attributes.depth,
-				stencil: attributes.stencil,
-				framebufferScaleFactor: framebufferScaleFactor
-			};
+			if ( session.renderState.layers === undefined ) {
 
-			// eslint-disable-next-line no-undef
-			const baseLayer = new XRWebGLLayer( session, gl, layerInit );
+				const layerInit = {
+					antialias: attributes.antialias,
+					alpha: attributes.alpha,
+					depth: attributes.depth,
+					stencil: attributes.stencil,
+					framebufferScaleFactor: framebufferScaleFactor
+				};
 
-			session.updateRenderState( { baseLayer: baseLayer } );
+				// eslint-disable-next-line no-undef
+				const baseLayer = new XRWebGLLayer( session, gl, layerInit );
+
+				session.updateRenderState( { baseLayer: baseLayer } );
+
+			} else {
+
+				const projectionlayerInit = {
+					// TODO pass texture formats once they are suppported
+					scaleFactor: framebufferScaleFactor
+				};
+
+				glBinding = new XRWebGLBinding( session, gl );
+
+				glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
+
+				glFramebuffer = gl.createFramebuffer();
+
+				session.updateRenderState( { layers: [ glProjLayer ] } );
+
+			}
 
 			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
 
@@ -414,9 +436,12 @@ function WebXRManager( renderer, gl ) {
 		if ( pose !== null ) {
 
 			const views = pose.views;
-			const baseLayer = session.renderState.baseLayer;
 
-			renderer.setFramebuffer( baseLayer.framebuffer );
+			if ( session.renderState.layers === undefined ) {
+
+				renderer.setFramebuffer( session.renderState.baseLayer );
+
+			}
 
 			let cameraVRNeedsUpdate = false;
 
@@ -425,6 +450,7 @@ function WebXRManager( renderer, gl ) {
 			if ( views.length !== cameraVR.cameras.length ) {
 
 				cameraVR.cameras.length = 0;
+
 				cameraVRNeedsUpdate = true;
 
 			}
@@ -432,11 +458,39 @@ function WebXRManager( renderer, gl ) {
 			for ( let i = 0; i < views.length; i ++ ) {
 
 				const view = views[ i ];
-				const viewport = baseLayer.getViewport( view );
+
+				let viewport = null;
+
+				if ( session.renderState.layers === undefined ) {
+
+					viewport = session.renderState.baseLayer.getViewport( view );
+
+				} else {
+
+					const glSubImage = glBinding.getViewSubImage( glProjLayer, view );
+
+					gl.bindFramebuffer( gl.FRAMEBUFFER, glFramebuffer );
+
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0 );
+
+					if ( glSubImage.depthStencilTexture !== undefined ) {
+
+						gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0 );
+
+					}
+
+					renderer.setFramebuffer( glFramebuffer );
+
+					viewport = glSubImage.viewport;
+
+				}
 
 				const camera = cameras[ i ];
+
 				camera.matrix.fromArray( view.transform.matrix );
+
 				camera.projectionMatrix.fromArray( view.projectionMatrix );
+
 				camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
 				if ( i === 0 ) {
@@ -462,6 +516,7 @@ function WebXRManager( renderer, gl ) {
 		for ( let i = 0; i < controllers.length; i ++ ) {
 
 			const controller = controllers[ i ];
+
 			const inputSource = inputSources[ i ];
 
 			controller.update( inputSource, frame, referenceSpace );
@@ -473,6 +528,7 @@ function WebXRManager( renderer, gl ) {
 	}
 
 	const animation = new WebGLAnimation();
+
 	animation.setAnimationLoop( onAnimationFrame );
 
 	this.setAnimationLoop = function ( callback ) {
