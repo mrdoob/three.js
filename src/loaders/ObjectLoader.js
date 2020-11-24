@@ -128,7 +128,7 @@ class ObjectLoader extends Loader {
 		const textures = this.parseTextures( json.textures, images );
 		const materials = this.parseMaterials( json.materials, textures );
 		
-    const object = this.parseObject( json.object, geometries, materials, animations, textures );
+		const object = this.parseObject( json.object, geometries, materials, animations, textures );
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
 
@@ -852,7 +852,6 @@ class ObjectLoader extends Loader {
 		}
 
 		let geometry, material;
-
 
 		switch ( data.type ) {
 
