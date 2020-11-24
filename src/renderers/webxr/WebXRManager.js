@@ -16,7 +16,6 @@ class WebXRManager extends EventDispatcher {
 		const state = renderer.state;
 
 		let session = null;
-
 		let framebufferScaleFactor = 1.0;
 
 		let referenceSpace = null;
@@ -441,6 +440,7 @@ class WebXRManager extends EventDispatcher {
 
 					cameraVR.cameras.length = 0;
 					cameraVRNeedsUpdate = true;
+
 
 				}
 
