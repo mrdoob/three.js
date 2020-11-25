@@ -17,18 +17,16 @@ class WebGPUNodeUniformsGroup extends WebGPUUniformsGroup {
 			
 		this.setVisibility( shaderStageVisibility );
 		
-		this.setOnBeforeUpdate( this._onBeforeUpdate );
+		//this.setOnBeforeUpdate( this._onBeforeUpdate );
 		
 	}
-	
+	/*
 	_onBeforeUpdate( object, camera ) {
 		
 		const material = object.material;
 		
-		console.log( 1 );
-		
 	}
-	
+	*/
 }
 
 class WebGPUNodeBuilder extends NodeBuilder {
@@ -140,8 +138,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		finalCode += shaderCodes.defines;
 
 		finalCode += code.substr( versionStrIndex );
-
-		console.log( finalCode );
 
 		return finalCode;
 		
