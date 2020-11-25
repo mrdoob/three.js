@@ -3,18 +3,15 @@ Description: 如何让你的three.js适应不同尺寸的显示器。
 TOC: 响应式设计
 
 这是three.js系列文章的第二篇。
-第一篇是[关于基础](threejs-fundamentals.html).
+第一篇是[关于基础](threejs-fundamentals.html)。
 如果你还没有阅读第一篇那你应该从第一篇开始。
 
-这篇文章是关于如何让你的three.js应用能适应任何情况。
-让一个网页是响应式的通常是指让网页能在从桌面到平板再到手机
-不同尺寸的显示器上显示良好。
+本篇文章是关于如何让你的three.js应用自适应各种情况。
+网页的响应式是指让其在桌面、平板及手机等不同尺寸的屏幕上显示良好。
 
-对three.js来说有更多的情况要考虑。例如，在左侧、右侧、顶部或底部
-具有控件的三维编辑器是我们可能需要处理的。文档中部的在线例子
-是我们要处理的另一个例子。
+对three.js来说有更多的情况要考虑。例如，我们可能需要处理控件在左侧、右侧、顶部或底部的三维编辑器。本文的中间部分展示了另一个例子。
 
-上一个例子中我们使用了一个没有设置css和尺寸的canvas。
+上一个例子中我们使用了一个没有设置样式和尺寸的。
 
 ```html
 <canvas id="c"></canvas>
@@ -22,7 +19,7 @@ TOC: 响应式设计
 
 那个canvas默认300x150像素。
 
-在web平台推荐使用css来设置物体的尺寸。
+在web平台推荐使用CSS来设置物体的尺寸。
 
 我们通过添加CSS来让canvas填充整个页面。
 
@@ -54,10 +51,8 @@ HTML中的body默认有5个像素的margin值所以设置margin为0来移除marg
 
 {{{example url="../threejs-responsive-no-resize.html" }}}
 
-你可以看到canvas充满了整个页面但是有两个问题。
-第一是我们的立方体被拉伸了。他们不是立方体了更像是个盒子
-太高或者太宽。 在新标签中打开它然后改变尺寸你就能看到立方体
-是怎么在宽高上被拉伸的。
+你可以看到canvas充满了整个页面，但是有两个问题。
+第一是我们的立方体被拉伸了。他们不是立方体了更像是个盒子，太高或者太宽。 在新标签中打开它然后改变尺寸你就能看到立方体是怎么在宽高上被拉伸的。
 
 <img src="resources/images/resize-incorrect-aspect.png" width="407" class="threejs_center nobg">
 
@@ -66,7 +61,7 @@ HTML中的body默认有5个像素的margin值所以设置margin为0来移除marg
 
 <img src="resources/images/resize-low-res.png" class="threejs_center nobg">
 
-我们先解决拉伸的问题。为此我们要将相机的aspect设置为canvas的宽高比。
+我们先解决拉伸的问题。为此我们要将相机的宽高比设置为canvas的宽高比。
 我们可以通过canvas的`clientWidth`和`clientHeight`属性来实现。
 
 我们需要将渲染循环变成这样。
@@ -94,8 +89,7 @@ function render(time) {
 我们现在来解决块状化的问题。
 
 canvas元素有两个尺寸。一个是canvas在页面上的显示尺寸，
-是我们用CSS来设置的。另一个尺寸是
-canvas本身像素的数量。这和图片一样。
+是我们用CSS来设置的。另一个尺寸是canvas本身像素的数量。这和图片一样。
 比如我们有一个128x64像素的图片然后我们可以通过CSS让它显示为
 400x200像素。
 
@@ -103,10 +97,10 @@ canvas本身像素的数量。这和图片一样。
 <img src="some128x64image.jpg" style="width:400px; height:200px">
 ```
 
-一个canvas的内部尺寸，它的分辨率，通常被叫做drawingbuffer尺寸。
-在three.js中我们可以通过调用`renderer.setSize`来设置canvas的drawingbuffer。
+一个canvas的内部尺寸，它的分辨率，通常被叫做绘图缓冲区(drawingbuffer)尺寸。
+在three.js中我们可以通过调用`renderer.setSize`来设置canvas的绘图缓冲区。
 我们应该选择什么尺寸? 最显而易见的是"和canvas的显示尺寸一样"。
-再一次，我们可以使用canvas的`clientWidth`和`clientHeight`属性。
+即可以直接用canvas的`clientWidth`和`clientHeight`属性。
 
 我们写一个函数来检查渲染器的canvas尺寸是不是和canvas的显示尺寸不一样
 如果不一样就设置它。
@@ -150,15 +144,14 @@ function render(time) {
   ...
 ```
 
-因为只有canvas的显示尺寸变化时aspect值才变化所以我们
-只在`resizeRendererToDisplaySize`函数返回`true`时才设置摄像机的aspect。
+因为只有canvas的显示尺寸变化时宽高比才变化所以我们
+只在`resizeRendererToDisplaySize`函数返回`true`时才设置摄像机的宽高比。
 
 {{{example url="../threejs-responsive.html" }}}
 
 现在渲染的分辨率应该是和canvas的显示尺寸一样的。
 
-为了说清楚让CSS处理调整尺寸我们将代码
-放进[separate `.js` file](../threejs-responsive.js)。
+为了说清楚让CSS处理调整尺寸我们将代码放进[一个单独的js文件](../threejs-responsive.js)。
 这里还有一些例子我们让CSS决定尺寸的大小并且注意我们并没有改变任何
 代码来让他们工作。
 
@@ -218,7 +211,7 @@ HD-DPI代表每英寸高密度点显示器(视网膜显示器)。它指的是当
 ```
 
 第二章方法从客观上来说更好。为什么？因为我拿到了我想要的。
-在使用three.js时有很多种情况下我们需要知道canvas的drawingBuffer的确切尺寸。
+在使用three.js时有很多种情况下我们需要知道canvas的绘图缓冲区的确切尺寸。
 比如制作后期处理滤镜或者我们在操作着色器需要访问gl_FragCoord变量，如果我们截屏或者给GPU
 读取像素，绘制到二维的canvas等等。
 通过我们自己处理我们会一直知道使用的尺寸是不是我们需要的。
