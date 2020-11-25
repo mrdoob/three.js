@@ -55,7 +55,7 @@
 
 				materialBox.colorNode = new OperatorNode( '+', new FloatNode( .5 ).setConst( true ), new Vector3Node( new THREE.Vector3( 0, 0, 1 ) ) );
 				materialBox.opacityNode = new FloatNode( .5 );
-				materialBox.transparent = true;
+				//materialBox.transparent = true;
 
 				box = new THREE.Mesh( geometryBox, materialBox );
 				box.position.set( 0, 1, 0 );
