@@ -1,23 +1,23 @@
 import Node from '../core/Node.js';
 
- class OperatorNode extends Node {
+class OperatorNode extends Node {
 
 	constructor( op, a, b ) {
 
 		super();
 
 		this.op = op;
-		
+
 		this.a = a;
 		this.b = b;
-		
+
 	}
 
 	getType( builder ) {
-		
+
 		const typeA = this.a.getType( builder );
 		const typeB = this.b.getType( builder );
-		
+
 		if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
 
 			// use the greater length vector
@@ -27,7 +27,7 @@ import Node from '../core/Node.js';
 		}
 
 		return typeA;
-		
+
 	}
 
 	generate( builder, output ) {
@@ -40,7 +40,7 @@ import Node from '../core/Node.js';
 		return builder.format( '( ' + a + ' ' + this.op + ' ' + b + ' )', type, output );
 
 	}
-		
- }
+
+}
 
 export default OperatorNode;

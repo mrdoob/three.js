@@ -10,15 +10,15 @@ class NodeUniform {
 	}
 
 	get value() {
-		
+
 		return this.node.value;
-		
+
 	}
-	
+
 	set value( val ) {
-		
+
 		this.node.value = val;
-		
+
 	}
 
 }
