@@ -11,10 +11,12 @@ var WEBGL_CONSTANTS = {
 	TRIANGLE_STRIP: 0x0005,
 	TRIANGLE_FAN: 0x0006,
 
-	UNSIGNED_BYTE: 0x1401,
-	UNSIGNED_SHORT: 0x1403,
-	FLOAT: 0x1406,
-	UNSIGNED_INT: 0x1405,
+	BYTE: 0x1400, // 5120
+	UNSIGNED_BYTE: 0x1401, // 5121
+	SHORT: 0x1402, // 5122
+	UNSIGNED_SHORT: 0x1403, // 5123
+	UNSIGNED_INT: 0x1405, // 5125
+	FLOAT: 0x1406, // 5126
 	ARRAY_BUFFER: 0x8892,
 	ELEMENT_ARRAY_BUFFER: 0x8893,
 
@@ -106,6 +108,7 @@ THREE.GLTFExporter.prototype = {
 		var nodeMap = new Map();
 		var skins = [];
 		var extensionsUsed = {};
+		var extensionsRequired = {};
 		var cachedData = {
 
 			meshes: new Map(),
@@ -495,11 +498,11 @@ THREE.GLTFExporter.prototype = {
 
 			var componentSize;
 
-			if ( componentType === WEBGL_CONSTANTS.UNSIGNED_BYTE ) {
+			if ( componentType === WEBGL_CONSTANTS.UNSIGNED_BYTE || componentType === WEBGL_CONSTANTS.BYTE ) {
 
 				componentSize = 1;
 
-			} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ) {
+			} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT || componentType === WEBGL_CONSTANTS.SHORT ) {
 
 				componentSize = 2;
 
@@ -546,9 +549,17 @@ THREE.GLTFExporter.prototype = {
 
 						dataView.setUint16( offset, value, true );
 
+					} else if ( componentType === WEBGL_CONSTANTS.SHORT ) {
+
+						dataView.setInt16( offset, value, true );
+
 					} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_BYTE ) {
 
 						dataView.setUint8( offset, value );
+
+					} else if ( componentType === WEBGL_CONSTANTS.BYTE ) {
+
+						dataView.setInt8( offset, value );
 
 					}
 
@@ -665,9 +676,17 @@ THREE.GLTFExporter.prototype = {
 
 				componentType = WEBGL_CONSTANTS.UNSIGNED_SHORT;
 
+			} else if ( attribute.array.constructor === Int16Array ) {
+
+				componentType = WEBGL_CONSTANTS.SHORT;
+
 			} else if ( attribute.array.constructor === Uint8Array ) {
 
 				componentType = WEBGL_CONSTANTS.UNSIGNED_BYTE;
+
+			} else if ( attribute.array.constructor === Int8Array ) {
+
+				componentType = WEBGL_CONSTANTS.BYTE;
 
 			} else {
 
@@ -2042,7 +2061,9 @@ THREE.GLTFExporter.prototype = {
 
 			// Declare extensions.
 			var extensionsUsedList = Object.keys( extensionsUsed );
+			var extensionsRequiredList = Object.keys( extensionsRequired );
 			if ( extensionsUsedList.length > 0 ) outputJSON.extensionsUsed = extensionsUsedList;
+			if ( extensionsRequiredList.length > 0 ) outputJSON.extensionsRequired = extensionsRequiredList;
 
 			// Update bytelength of the single buffer.
 			if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) outputJSON.buffers[ 0 ].byteLength = blob.size;
