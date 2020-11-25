@@ -511,6 +511,12 @@ function Viewport( editor ) {
 
 	} );
 
+	signals.animationStopped.add( function () {
+
+		render();
+
+	} );
+
 	// background
 
 	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, environmentType ) {

@@ -1325,7 +1325,7 @@ var MMDPhysics = ( function () {
 						.copy( mesh.matrixWorld )
 						.decompose( position, quaternion, scale )
 						.compose( position, quaternion, scale.set( 1, 1, 1 ) )
-						.getInverse( matrixWorldInv );
+						.invert();
 
 					for ( var i = 0, il = bodies.length; i < il; i ++ ) {
 

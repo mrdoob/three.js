@@ -34,7 +34,6 @@
 				const container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
-				camera.target = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
@@ -178,16 +177,11 @@
 				phi = THREE.MathUtils.degToRad( 90 - lat );
 				theta = THREE.MathUtils.degToRad( lon );
 
-				camera.target.x = 500 * Math.sin( phi ) * Math.cos( theta );
-				camera.target.y = 500 * Math.cos( phi );
-				camera.target.z = 500 * Math.sin( phi ) * Math.sin( theta );
+				const x = 500 * Math.sin( phi ) * Math.cos( theta );
+				const y = 500 * Math.cos( phi );
+				const z = 500 * Math.sin( phi ) * Math.sin( theta );
 
-				camera.lookAt( camera.target );
-
-				/*
-				// distortion
-				camera.position.copy( camera.target ).negate();
-				*/
+				camera.lookAt( x, y, z );
 
 				renderer.render( scene, camera );
 

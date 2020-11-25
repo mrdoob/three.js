@@ -1,4 +1,4 @@
-// r122
+// r123
 
 const assets = [
 	'./',
@@ -47,6 +47,7 @@ const assets = [
 	'../examples/jsm/loaders/TDSLoader.js',
 	'../examples/jsm/loaders/VRMLLoader.js',
 	'../examples/jsm/loaders/VTKLoader.js',
+	'../examples/jsm/loaders/XYZLoader.js',
 
 	'../examples/jsm/curves/NURBSCurve.js',
 	'../examples/jsm/curves/NURBSUtils.js',

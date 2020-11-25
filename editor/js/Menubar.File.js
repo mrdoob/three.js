@@ -232,7 +232,7 @@ function MenubarFile( editor ) {
 		var exporter = new DRACOExporter();
 
 		// TODO: Change to DRACOExporter's parse( geometry, onParse )?
-		var result = exporter.parse( object.geometry );
+		var result = exporter.parse( object );
 		saveArrayBuffer( result, 'model.drc' );
 
 	} );
@@ -483,9 +483,7 @@ function MenubarFile( editor ) {
 
 		scene.traverse( function ( object ) {
 
-			var objectAnimations = editor.animations[ object.uuid ];
-
-			if ( objectAnimations !== undefined ) animations.push( ... objectAnimations );
+			animations.push( ... object.animations );
 
 		} );
 

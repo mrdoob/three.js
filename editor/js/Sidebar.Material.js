@@ -24,7 +24,8 @@ var materialClasses = {
 	'RawShaderMaterial': THREE.RawShaderMaterial,
 	'ShaderMaterial': THREE.ShaderMaterial,
 	'ShadowMaterial': THREE.ShadowMaterial,
-	'SpriteMaterial': THREE.SpriteMaterial
+	'SpriteMaterial': THREE.SpriteMaterial,
+	'PointsMaterial': THREE.PointsMaterial
 };
 
 function SidebarMaterial( editor ) {
@@ -59,25 +60,7 @@ function SidebarMaterial( editor ) {
 	// type
 
 	var materialClassRow = new UIRow();
-	var materialClass = new UISelect().setOptions( {
-
-		'LineBasicMaterial': 'LineBasicMaterial',
-		'LineDashedMaterial': 'LineDashedMaterial',
-		'MeshBasicMaterial': 'MeshBasicMaterial',
-		'MeshDepthMaterial': 'MeshDepthMaterial',
-		'MeshNormalMaterial': 'MeshNormalMaterial',
-		'MeshLambertMaterial': 'MeshLambertMaterial',
-		'MeshMatcapMaterial': 'MeshMatcapMaterial',
-		'MeshPhongMaterial': 'MeshPhongMaterial',
-		'MeshToonMaterial': 'MeshToonMaterial',
-		'MeshStandardMaterial': 'MeshStandardMaterial',
-		'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
-		'RawShaderMaterial': 'RawShaderMaterial',
-		'ShaderMaterial': 'ShaderMaterial',
-		'ShadowMaterial': 'ShadowMaterial',
-		'SpriteMaterial': 'SpriteMaterial'
-
-	} ).setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
+	var materialClass = new UISelect().setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
 
 	materialClassRow.add( new UIText( strings.getKey( 'sidebar/material/type' ) ).setWidth( '90px' ) );
 	materialClassRow.add( materialClass );
@@ -500,6 +483,26 @@ function SidebarMaterial( editor ) {
 	materialSideRow.add( materialSide );
 
 	container.add( materialSideRow );
+
+	// size
+
+	var materialSizeRow = new UIRow();
+	var materialSize = new UINumber( 1 ).setWidth( '60px' ).setRange( 0, Infinity ).onChange( update );
+
+	materialSizeRow.add( new UIText( strings.getKey( 'sidebar/material/size' ) ).setWidth( '90px' ) );
+	materialSizeRow.add( materialSize );
+
+	container.add( materialSizeRow );
+
+	// sizeAttenuation
+
+	var materialSizeAttenuationRow = new UIRow();
+	var materialSizeAttenuation = new UICheckbox( true ).onChange( update );
+
+	materialSizeAttenuationRow.add( new UIText( strings.getKey( 'sidebar/material/sizeAttenuation' ) ).setWidth( '90px' ) );
+	materialSizeAttenuationRow.add( materialSizeAttenuation );
+
+	container.add( materialSizeAttenuationRow );
 
 	// shading
 
@@ -1120,6 +1123,28 @@ function SidebarMaterial( editor ) {
 
 			}
 
+			if ( material.size !== undefined ) {
+
+				var size = materialSize.getValue();
+				if ( material.size !== size ) {
+
+					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'size', size, currentMaterialSlot ) );
+
+				}
+
+			}
+
+			if ( material.sizeAttenuation !== undefined ) {
+
+				var sizeAttenuation = materialSizeAttenuation.getValue();
+				if ( material.sizeAttenuation !== sizeAttenuation ) {
+
+					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'sizeAttenuation', sizeAttenuation, currentMaterialSlot ) );
+
+				}
+
+			}
+
 			if ( material.flatShading !== undefined ) {
 
 				var flatShading = materialShading.getValue();
@@ -1248,6 +1273,8 @@ function SidebarMaterial( editor ) {
 			'emissiveMap': materialEmissiveMapRow,
 			'gradientMap': materialGradientMapRow,
 			'side': materialSideRow,
+			'size': materialSize,
+			'sizeAttenuation': materialSizeAttenuation,
 			'flatShading': materialShadingRow,
 			'blending': materialBlendingRow,
 			'opacity': materialOpacityRow,
@@ -1319,7 +1346,26 @@ function SidebarMaterial( editor ) {
 
 		}
 
+		if ( currentObject.isMesh ) {
+
+			materialClass.setOptions( meshMaterialOptions );
+
+		} else if ( currentObject.isSprite ) {
+
+			materialClass.setOptions( spriteMaterialOptions );
+
+		} else if ( currentObject.isPoints ) {
+
+			materialClass.setOptions( pointsMaterialOptions );
+
+		} else if ( currentObject.isLine ) {
+
+			lineMaterialOptions.setOptions( lineMaterialOptions );
+
+		}
+
 		materialClass.setValue( material.type );
+
 
 		if ( material.color !== undefined ) {
 
@@ -1602,6 +1648,18 @@ function SidebarMaterial( editor ) {
 
 		}
 
+		if ( material.size !== undefined ) {
+
+			materialSize.setValue( material.size );
+
+		}
+
+		if ( material.sizeAttenuation !== undefined ) {
+
+			materialSizeAttenuation.setValue( material.sizeAttenuation );
+
+		}
+
 		if ( material.flatShading !== undefined ) {
 
 			materialShading.setValue( material.flatShading );
@@ -1700,6 +1758,40 @@ function SidebarMaterial( editor ) {
 		'uniform mat4 modelViewMatrix;\n',
 		'attribute vec3 position;\n\n',
 	].join( '\n' );
+
+	var meshMaterialOptions = {
+		'MeshBasicMaterial': 'MeshBasicMaterial',
+		'MeshDepthMaterial': 'MeshDepthMaterial',
+		'MeshNormalMaterial': 'MeshNormalMaterial',
+		'MeshLambertMaterial': 'MeshLambertMaterial',
+		'MeshMatcapMaterial': 'MeshMatcapMaterial',
+		'MeshPhongMaterial': 'MeshPhongMaterial',
+		'MeshToonMaterial': 'MeshToonMaterial',
+		'MeshStandardMaterial': 'MeshStandardMaterial',
+		'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
+		'RawShaderMaterial': 'RawShaderMaterial',
+		'ShaderMaterial': 'ShaderMaterial',
+		'ShadowMaterial': 'ShadowMaterial'
+	};
+
+	var lineMaterialOptions = {
+		'LineBasicMaterial': 'LineBasicMaterial',
+		'LineDashedMaterial': 'LineDashedMaterial',
+		'RawShaderMaterial': 'RawShaderMaterial',
+		'ShaderMaterial': 'ShaderMaterial'
+	};
+
+	var spriteMaterialOptions = {
+		'SpriteMaterial': 'SpriteMaterial',
+		'RawShaderMaterial': 'RawShaderMaterial',
+		'ShaderMaterial': 'ShaderMaterial'
+	};
+
+	var pointsMaterialOptions = {
+		'PointsMaterial': 'PointsMaterial',
+		'RawShaderMaterial': 'RawShaderMaterial',
+		'ShaderMaterial': 'ShaderMaterial'
+	};
 
 	return container;
 

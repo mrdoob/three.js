@@ -130,9 +130,12 @@
 		This is used [page:.parse] to parse any textures in the JSON structure.
 		</p>
 
-		<h3>[method:Object3D parseObject]( [param:Object json] )</h3>
+		<h3>[method:Object3D parseObject]( [param:Object json], [param:BufferGeometry geometries], [param:Material materials], [param:AnimationClip animations] )</h3>
 		<p>
-		[page:Object json] — required. The JSON source to parse.<br /><br />
+		[page:Object json] — required. The JSON source to parse.<br />
+		[page:BufferGeometry geometries] — required. The geometries of the JSON.<br />
+		[page:Material materials] — required. The materials of the JSON.<br />
+		[page:AnimationClip animations] — required. The animations of the JSON.<br /><br />
 
 		This is used [page:.parse] to parse any objects in the JSON structure.
 		Objects can be of the following types:

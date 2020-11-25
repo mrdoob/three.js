@@ -407,7 +407,7 @@ THREE.NRRDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototyp
 		}
 
 		volume.inverseMatrix = new THREE.Matrix4();
-		volume.inverseMatrix.getInverse( volume.matrix );
+		volume.inverseMatrix.copy( volume.matrix ).invert();
 		volume.RASDimensions = ( new THREE.Vector3( volume.xLength, volume.yLength, volume.zLength ) ).applyMatrix4( volume.matrix ).round().toArray().map( Math.abs );
 
 		// .. and set the default threshold
