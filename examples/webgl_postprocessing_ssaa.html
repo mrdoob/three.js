@@ -31,7 +31,8 @@
 			let gui, stats;
 
 			const param = {
-				sampleLevel: 2
+				sampleLevel: 2,
+				unbiased: false
 			};
 
 			init();
@@ -53,6 +54,8 @@
 					'Level 4: 16 Samples': 4,
 					'Level 5: 32 Samples': 5
 				} );
+				
+				gui.add( param, 'unbiased' );
 
 				gui.open();
 
@@ -75,7 +78,7 @@
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.BoxBufferGeometry( 120, 120, 120 );
+				const geometry = new THREE.SphereBufferGeometry( 60, 40, 40 );
 				const material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
 				const mesh1 = new THREE.Mesh( geometry, material1 );
@@ -88,18 +91,21 @@
 				texture.anisotropy = 1;
 				texture.generateMipmaps = false;
 
-				const material2 = new THREE.MeshBasicMaterial( { map: texture } );
+				const material2 = new THREE.MeshStandardMaterial( { map: texture } );
 
 				const mesh2 = new THREE.Mesh( geometry, material2 );
 				mesh2.position.x = 100;
 				scene.add( mesh2 );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 1 );
+				light.position.set( 1, 2, 3 );
+				scene.add( light );
 
 				// postprocessing
 
 				composer = new EffectComposer( renderer );
 
 				ssaaRenderPass = new SSAARenderPass( scene, camera );
-				ssaaRenderPass.unbiased = false;
 				composer.addPass( ssaaRenderPass );
 
 				copyPass = new ShaderPass( CopyShader );
@@ -138,6 +144,7 @@
 				}
 
 				ssaaRenderPass.sampleLevel = param.sampleLevel;
+				ssaaRenderPass.unbiased = param.unbiased;
 
 				composer.render();
 				stats.end();
