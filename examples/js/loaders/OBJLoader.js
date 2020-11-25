@@ -875,7 +875,7 @@ THREE.OBJLoader = ( function () {
 
 					buffergeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( state.vertices, 3 ) );
 
-					if ( state.colors.length > 0 ) {
+					if ( state.colors.length > 0 && state.colors[ 0 ] !== undefined ) {
 
 						buffergeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( state.colors, 3 ) );
 						material.vertexColors = true;
