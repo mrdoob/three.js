@@ -30,12 +30,36 @@ const ShaderLib = {
 		layout(set = 0, binding = 3) uniform sampler mySampler;
 		layout(set = 0, binding = 4) uniform texture2D myTexture;
 
+		#ifdef NODE_UNIFORMS
+
+		layout(set = 0, binding = 5) uniform NodeUniforms {
+			NODE_UNIFORMS
+		} nodeUniforms;
+
+		#endif
+
 		layout(location = 0) in vec2 vUv;
 		layout(location = 0) out vec4 outColor;
 
 		void main() {
+
 			outColor = texture( sampler2D( myTexture, mySampler ), vUv );
+
+			#ifdef NODE_COLOR
+
+				/* NODE_COLOR_CODE ignore (node code group) for now */
+				outColor.rgb *= NODE_COLOR;
+
+			#endif
+
+			#ifdef NODE_OPACITY
+
+				outColor.a *= NODE_OPACITY;
+
+			#endif
+
 			outColor.a *= opacityUniforms.opacity;
+
 		}`
 	},
 	pointsBasic: {
@@ -60,8 +84,30 @@ const ShaderLib = {
 
 		layout(location = 0) out vec4 outColor;
 
+		#ifdef NODE_UNIFORMS
+
+		layout(set = 0, binding = 2) uniform NodeUniforms {
+			NODE_UNIFORMS
+		} nodeUniforms;
+
+		#endif
+
 		void main() {
+
 			outColor = vec4( 1.0, 0.0, 0.0, 1.0 );
+
+			#ifdef NODE_COLOR
+
+				outColor.rgb = NODE_COLOR;
+
+			#endif
+
+			#ifdef NODE_OPACITY
+
+				outColor.a *= NODE_OPACITY;
+
+			#endif
+
 		}`
 	},
 	lineBasic: {
