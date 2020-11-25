@@ -411,7 +411,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.add( object );
 
-		object.updateWorldMatrix( false, false );
+		object.updateWorldMatrix( false, true );
 
 		return this;
 
