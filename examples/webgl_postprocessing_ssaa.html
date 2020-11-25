@@ -80,10 +80,9 @@
 				const width = window.innerWidth || 1;
 				const height = window.innerHeight || 1;
 				const aspect = width / height;
-				const devicePixelRatio = window.devicePixelRatio || 1;
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( devicePixelRatio );
+				renderer.setPixelRatio( 1 ); // ensure pixel ratio is always 1 for performance reasons
 				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );
 
