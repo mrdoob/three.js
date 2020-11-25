@@ -72,7 +72,7 @@ class NodeBuilder {
 
 	}
 	
-	createDataFromNode( node, shaderStage = null ) {
+	getDataFromNode( node, shaderStage = null ) {
 		
 		let nodeData = this.nodesData.get( node );
 		
@@ -88,9 +88,9 @@ class NodeBuilder {
 		
 	}
 	
-	createUniformFromNode( node, shaderStage, type ) {
+	getUniformFromNode( node, shaderStage, type ) {
 		
-		const nodeData = this.createDataFromNode( node, shaderStage );
+		const nodeData = this.getDataFromNode( node, shaderStage );
 		
 		let nodeUniform = nodeData.uniform;
 		
