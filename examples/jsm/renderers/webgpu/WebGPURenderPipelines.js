@@ -23,7 +23,7 @@ class WebGPURenderPipelines {
 		this.glslang = glslang;
 		this.sampleCount = sampleCount;
 
-		this.nodeBindings = new WeakMap();
+		this.bindings = new WeakMap();
 
 		this.pipelines = new WeakMap();
 		this.shaderAttributes = new WeakMap();
@@ -85,7 +85,7 @@ class WebGPURenderPipelines {
 
 			shader = nodeBuilder.parse( shader.vertexShader, shader.fragmentShader );
 
-			this.nodeBindings.set( object, nodeBuilder.getBindings() );
+			this.bindings.set( object, nodeBuilder.getBindings() );
 
 			// shader modules
 
@@ -228,9 +228,9 @@ class WebGPURenderPipelines {
 
 	}
 
-	getNodeBindings( object ) {
+	getBindings( object ) {
 
-		return this.nodeBindings.get( object );
+		return this.bindings.get( object );
 
 	}
 

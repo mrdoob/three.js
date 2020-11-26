@@ -55,11 +55,9 @@ class WebGPUBindings {
 
 			}
 
-			// append node material bindings
+			// append node bindings
 
-			const nodeBindings = this.pipelines.getNodeBindings( object );
-
-			bindings = bindings.concat( nodeBindings );
+			bindings = bindings.concat( this.pipelines.getBindings( object ) );
 
 			// setup (static) binding layout and (dynamic) binding group
 
