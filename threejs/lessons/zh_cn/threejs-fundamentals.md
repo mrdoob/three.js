@@ -80,7 +80,7 @@ import * as THREE from './resources/threejs/r122/build/three.module.js';
 </script>
 ```
 
-拿到canvas后我们需要创建一个[WebGL渲染器(`WebGLRenderer`)](WebGLRenderer)。渲染器负责将你提供的所有数据渲染绘制到canvas上。之前还有其他渲染器，比如[CSS渲染器(`CSSRenderer`)](CSSRenderer)、[Canvas渲染器(`CanvasRenderer`)](CanvasRenderer)。将来也可能会有[WebGL2渲染器(`WebGL2Renderer`)](WebGL2Renderer)或[WebGPU渲染器(`WebGPURenderer`)](WebGPURenderer)。目前的话是[WebGL渲染器(`WebGLRenderer`)](WebGLRenderer)，它通过WebGL将三维空间渲染到canvas上。
+拿到canvas后我们需要创建一个[WebGL渲染器(`WebGLRenderer`)](WebGLRenderer)。渲染器负责将你提供的所有数据渲染绘制到canvas上。之前还有其他渲染器，比如CSS渲染器(`CSSRenderer`)、Canvas渲染器(`CanvasRenderer`)。将来也可能会有WebGL2渲染器(`WebGL2Renderer`)或WebGPU渲染器(`WebGPURenderer`)。目前的话是[WebGL渲染器(`WebGLRenderer`)](WebGLRenderer)，它通过WebGL将三维空间渲染到canvas上。
 
 注意这里有一些细节。如果你没有给three.js传canvas，three.js会自己创建一个 ，但是你必须手动把它添加到文档中。在哪里添加可能会不一样这取决你怎么使用， 我发现给three.js传一个canvas会更灵活一些。我可以将canvas放到任何地方， 代码都会找到它，假如我有一段代码是将canvas插入到文档中，那么当需求变化时， 我很可能必须去修改这段代码。
 
