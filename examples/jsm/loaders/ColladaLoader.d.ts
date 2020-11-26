@@ -7,7 +7,6 @@ import {
 
 
 export interface Collada {
-	animations: AnimationClip[];
 	kinematics: object;
 	library: object;
 	scene: Scene;

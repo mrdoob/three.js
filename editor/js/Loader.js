@@ -170,7 +170,6 @@ function Loader( editor ) {
 
 					collada.scene.name = filename;
 
-					collada.scene.animations.push( ...collada.animations );
 					editor.execute( new AddObjectCommand( editor, collada.scene ) );
 
 				}, false );
