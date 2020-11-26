@@ -13,7 +13,7 @@
       "args": ["buildlessons"],
       "console": "internalConsole",
       "env": {
-        "ARTICLE_FILTER": "tips"
+        "ARTICLE_FILTER": "fundamentals"
       }
     }
   ]
