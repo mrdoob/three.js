@@ -101,15 +101,15 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			let uniformGroup;
+			let uniform;
 
 			if ( type === 'float' ) {
 
-				uniformGroup = new FloatUniform( uniformNode.name, uniformNode.value );
+				uniform = new FloatUniform( uniformNode.name, uniformNode.value );
 
 			} else if ( type === 'vec3' ) {
 
-				uniformGroup = new Vector3Uniform( uniformNode.name, uniformNode.value );
+				uniform = new Vector3Uniform( uniformNode.name, uniformNode.value );
 
 			} else {
 
@@ -117,9 +117,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			uniformsGroup.addUniform( uniformGroup );
+			uniformsGroup.addUniform( uniform );
 
-			nodeData.uniformGroup = uniformGroup;
+			nodeData.uniform = uniform;
 
 		}
 
