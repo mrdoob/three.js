@@ -29,21 +29,21 @@ ES6的语法。[点击这里查看你需要提前掌握的东西](threejs-prereq
 
 上图需要注意的事项：
 
-* 首先有一个[渲染器](`Renderer`)。这可以说是three.js的主要对象。你传入一个[场景](`Scene`)和一个[摄像机](`Camera`)到[渲染器](`Renderer`)中，然后它会将摄像机视椎体中的三维场景渲染成一个二维图片显示在画布上。
+* 首先有一个[渲染器(`Renderer`)](Renderer)。这可以说是three.js的主要对象。你传入一个[场景(`Scene`)](Scene)和一个[摄像机(`Camera`)](Camera)到[渲染器(`Renderer`)](Renderer)中，然后它会将摄像机视椎体中的三维场景渲染成一个二维图片显示在画布上。
 
-* 其次有一个[场景图](threejs-scenegraph.html) 它是一个树状结构，由很多对象组成，比如图中包含了一个[场景](`Scene`)对象 ，多个[网格](`Mesh`)对象，[光源](`Light`)对象，[群组](`Group`)，[三维物体](`Object3D`)，和[摄像机](`Camera`)对象。一个[场景](`Scene`)对象定义了场景图最基本的要素，并包了含背景色和雾等属性。这些对象通过一个层级关系明确的树状结构来展示出各自的位置和方向。子对象的位置和方向总是相对于父对象而言的。比如说汽车的轮子是汽车的子对象，这样移动和定位汽车时就会自动移动轮子。你可以在[场景图](threejs-scenegraph.html)的这篇文章中了解更多内容。
+* 其次有一个[场景图](threejs-scenegraph.html) 它是一个树状结构，由很多对象组成，比如图中包含了一个[场景(`Scene`)](Scene)对象 ，多个[网格(`Mesh`)](Mesh)对象，[光源(`Light`)](Light)对象，[群组(`Group`)](Group)，[三维物体(`Object3D`)](Object3D)，和[摄像机(`Camera`)](Camera)对象。一个[场景(`Scene`)](Scene)对象定义了场景图最基本的要素，并包了含背景色和雾等属性。这些对象通过一个层级关系明确的树状结构来展示出各自的位置和方向。子对象的位置和方向总是相对于父对象而言的。比如说汽车的轮子是汽车的子对象，这样移动和定位汽车时就会自动移动轮子。你可以在[场景图](threejs-scenegraph.html)的这篇文章中了解更多内容。
 
-  注意图中[摄像机](`Camera`)是一半在场景图中，一半在场景图外的。这表示在three.js中，[摄像机](`Camera`)和其他对象不同的是，它不一定要在场景图中才能起作用。相同的是，[摄像机](`Camera`)作为其他对象的子对象，同样会继承它父对象的位置和朝向。在[场景图](threejs-scenegraph.html)这篇文章的结尾部分有放置多个[摄像机](`Camera`)在一个场景中的例子。
+  注意图中[摄像机(`Camera`)](Camera)是一半在场景图中，一半在场景图外的。这表示在three.js中，[摄像机(`Camera`)](Camera)和其他对象不同的是，它不一定要在场景图中才能起作用。相同的是，[摄像机(`Camera`)](Camera)作为其他对象的子对象，同样会继承它父对象的位置和朝向。在[场景图](threejs-scenegraph.html)这篇文章的结尾部分有放置多个[摄像机(`Camera`)](Camera)在一个场景中的例子。
 
-* [网格](`Mesh`)对象可以理解为用一种特定的[材质](`Material`)来绘制的一个特定的[几何体](`Geometry`)。[材质](`Material`)和[几何体](`Geometry`)可以被多个[网格](`Mesh`)对象使用。比如在不同的位置画两个蓝色立方体，我们会需要两个[网格](`Mesh`)对象来代表每一个立方体的位置和方向。但只需一个[几何体](`Geometry`)来存放立方体的顶点数据，和一种[材质](`Material`)来定义立方体的颜色为蓝色就可以了。两个[网格](`Mesh`)对象都引用了相同的[几何体](`Geometry`)和[材质](`Material`)。
+* [网格(`Mesh`)](Mesh)对象可以理解为用一种特定的[材质(`Material`)](Material)来绘制的一个特定的[几何体(`Geometry`)](Geometry)。[材质(`Material`)](Material)和[几何体(`Geometry`)](Geometry)可以被多个[网格(`Mesh`)](Mesh)对象使用。比如在不同的位置画两个蓝色立方体，我们会需要两个[网格(`Mesh`)](Mesh)对象来代表每一个立方体的位置和方向。但只需一个[几何体(`Geometry`)](Geometry)来存放立方体的顶点数据，和一种[材质(`Material`)](Material)来定义立方体的颜色为蓝色就可以了。两个[网格(`Mesh`)](Mesh)对象都引用了相同的[几何体(`Geometry`)](Geometry)和[材质(`Material`)](Material)。
 
-* [几何体](`Geometry`)对象顾名思义代表一些几何体，如球体、立方体、平面、狗、猫、人、树、建筑等物体的顶点信息。Three.js内置了许多[基本几何体](threejs-primitives.html) 。你也可以[创建自定义几何体](threejs-custom-geometry.html)或[从文件中加载几何体](threejs-load-obj.html)。
+* [几何体(`Geometry`)](Geometry)对象顾名思义代表一些几何体，如球体、立方体、平面、狗、猫、人、树、建筑等物体的顶点信息。Three.js内置了许多[基本几何体](threejs-primitives.html) 。你也可以[创建自定义几何体](threejs-custom-geometry.html)或[从文件中加载几何体](threejs-load-obj.html)。
 
-* [材质](`Material`)对象代表[绘制几何体的表面属性](threejs-materials.html)，包括使用的颜色，和光亮程度。一个[材质](`Material`)可以引用一个或多个[纹理](`Texture`)，这些纹理可以用来，打个比方，将图像包裹到几何体的表面。
+* [材质(`Material`)](Material)对象代表[绘制几何体的表面属性](threejs-materials.html)，包括使用的颜色，和光亮程度。一个[材质(`Material`)](Material)可以引用一个或多个[纹理(`Texture`)](Texture)，这些纹理可以用来，打个比方，将图像包裹到几何体的表面。
 
-* [纹理](`Texture`)对象通常表示一幅要么[从文件中加载](threejs-textures.html)，要么[在画布上生成](threejs-canvas-textures.html)，要么[由另一个场景渲染出](threejs-rendertargets.html)的图像。
+* [纹理(`Texture`)](Texture)对象通常表示一幅要么[从文件中加载](threejs-textures.html)，要么[在画布上生成](threejs-canvas-textures.html)，要么[由另一个场景渲染出](threejs-rendertargets.html)的图像。
 
-* [光源](`Light`)对象代表[不同种类的光](threejs-lights.html)。
+* [光源(`Light`)](Light)对象代表[不同种类的光](threejs-lights.html)。
 
 有了以上基本概念，我们接下来就来画个下图所示的*"Hello Cube"*吧。
 
@@ -80,11 +80,11 @@ import * as THREE from './resources/threejs/r122/build/three.module.js';
 </script>
 ```
 
-拿到canvas后我们需要创建一个[WebGL渲染器](`WebGLRenderer`)。渲染器负责将你提供的所有数据渲染绘制到canvas上。之前还有其他渲染器，比如[CSS渲染器](`CSSRenderer`)、[Canvas渲染器](`CanvasRenderer`)。将来也可能会有[WebGL2渲染器](`WebGL2Renderer`)或[WebGPU渲染器](`WebGPURenderer`)。目前的话是[WebGL渲染器](`WebGLRenderer`)，它通过WebGL将三维空间渲染到canvas上。
+拿到canvas后我们需要创建一个[WebGL渲染器(`WebGLRenderer`)](WebGLRenderer)。渲染器负责将你提供的所有数据渲染绘制到canvas上。之前还有其他渲染器，比如[CSS渲染器(`CSSRenderer`)](CSSRenderer)、[Canvas渲染器(`CanvasRenderer`)](CanvasRenderer)。将来也可能会有[WebGL2渲染器(`WebGL2Renderer`)](WebGL2Renderer)或[WebGPU渲染器(`WebGPURenderer`)](WebGPURenderer)。目前的话是[WebGL渲染器(`WebGLRenderer`)](WebGLRenderer)，它通过WebGL将三维空间渲染到canvas上。
 
 注意这里有一些细节。如果你没有给three.js传canvas，three.js会自己创建一个 ，但是你必须手动把它添加到文档中。在哪里添加可能会不一样这取决你怎么使用， 我发现给three.js传一个canvas会更灵活一些。我可以将canvas放到任何地方， 代码都会找到它，假如我有一段代码是将canvas插入到文档中，那么当需求变化时， 我很可能必须去修改这段代码。
 
-接下来我们需要一个[透视摄像机](`PerspectiveCamera`)。
+接下来我们需要一个[透视摄像机(`PerspectiveCamera`)](PerspectiveCamera)。
 
 ```js
 const fov = 75;
@@ -123,13 +123,13 @@ camera.position.z = 2;
 
 我们能看到摄像机的位置在`z = 2`。它朝向Z轴负方向。我们的视椎体范围从摄像机前方0.1到5。因为这张图是俯视图，视野范围会受到宽高比的影响。画布的宽度是高度的两倍，所以水平视角会比我们设置的垂直视角75度要大。
 
-然后我们创建一个[场景](`Scene`)。[场景](`Scene`)是three.js的基本的组成部分。需要three.js绘制的东西都需要加入到scene中。 我们将会在[场景是如何工作的](threejs-scenegraph.html)一文中详细讨论。
+然后我们创建一个[场景(`Scene`)](Scene)。[场景(`Scene`)](Scene)是three.js的基本的组成部分。需要three.js绘制的东西都需要加入到scene中。 我们将会在[场景是如何工作的](threejs-scenegraph.html)一文中详细讨论。
 
 ```js
 const scene = new THREE.Scene();
 ```
 
-然后创建一个包含盒子信息的[立方几何体](`BoxGeometry`)。几乎所有希望在three.js中显示的物体都需要一个包含了组成三维物体的顶点信息的几何体。
+然后创建一个包含盒子信息的[立方几何体(`BoxGeometry`)](BoxGeometry)。几乎所有希望在three.js中显示的物体都需要一个包含了组成三维物体的顶点信息的几何体。
 
 ```js
 const boxWidth = 1;
@@ -144,10 +144,10 @@ const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
 ```
 
-再创建一个[网格](`Mesh`)对象，它包含了：
+再创建一个[网格(`Mesh`)](Mesh)对象，它包含了：
 
-1. [几何体](`Geometry`)(物体的形状)
-2. [材质](`Material`)(如何绘制物体，光滑还是平整，什么颜色，什么贴图等等)
+1. [几何体(`Geometry`)](Geometry)(物体的形状)
+2. [材质(`Material`)](Material)(如何绘制物体，光滑还是平整，什么颜色，什么贴图等等)
 3. 对象在场景中相对于他父对象的位置、朝向、和缩放。下面的代码中父对象即为场景对象。
 
 ```js
@@ -290,7 +290,7 @@ function render(time) {
 
 <div class="threejs_center"><img src="resources/images/threejs-3cubes-scene.svg" style="width: 610px;"></div>
 
-正如你看见的那样，我们有三个[网格](`Mesh`)引用了相同的[立方几何体](`BoxGeometry`)。每个[网格](`Mesh`)引用了一个单独的`MeshPhongMaterial`材质来显示不同的颜色。
+正如你看见的那样，我们有三个[网格(`Mesh`)](Mesh)引用了相同的[立方几何体(`BoxGeometry`)](BoxGeometry)。每个[网格(`Mesh`)](Mesh)引用了一个单独的`MeshPhongMaterial`材质来显示不同的颜色。
 
 希望这个简短的介绍能帮助你起步。[接下来我们将介绍如何使我们的代码具有响应性，从而使其能够适应多种情况](threejs-responsive.html).
 
