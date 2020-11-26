@@ -140,15 +140,6 @@ module.exports = function(grunt) {
       'zh': true,
     };
 
-    /*
-    const dom = new JSDOM(html, {
-      //url: "https://example.org/",
-      //referrer: "https://example.com/",
-      //contentType: "text/html",
-    });
-    global.window = dom.window;
-    global.document = dom.window.document;f
-    */
     global.document.open('text/html', 'replace');
     global.document.write(html);
     global.document.close();
