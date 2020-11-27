@@ -20,7 +20,9 @@ THREE.SubdivisionModifier = function ( subdivisions ) {
 // Applies the "modify" pattern
 THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
-	if ( geometry.isBufferGeometry ) {
+	var isBufferGeometry = geometry.isBufferGeometry;
+
+	if ( isBufferGeometry ) {
 
 		geometry = new THREE.Geometry().fromBufferGeometry( geometry );
 
@@ -30,7 +32,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 	}
 
-	geometry.mergeVertices();
+	geometry.mergeVertices( 6 );
 
 	var repeats = this.subdivisions;
 
@@ -43,7 +45,15 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 	geometry.computeFaceNormals();
 	geometry.computeVertexNormals();
 
-	return geometry;
+	if ( isBufferGeometry ) {
+
+		return new THREE.BufferGeometry().fromGeometry( geometry );
+
+	} else {
+
+		return geometry;
+
+	}
 
 };
 

@@ -800,8 +800,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onPointerUp( event ) {
 
-		if ( scope.enabled === false ) return;
-
 		switch ( event.pointerType ) {
 
 			case 'mouse':
@@ -961,12 +959,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onMouseUp( event ) {
 
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
+
 		if ( scope.enabled === false ) return;
 
 		handleMouseUp( event );
-
-		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
-		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
 
 		scope.dispatchEvent( endEvent );
 

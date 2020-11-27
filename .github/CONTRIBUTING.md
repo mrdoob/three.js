@@ -28,7 +28,7 @@ As per the npm standard, ‘start’ is the place to begin the package.
 
 This script will start a local server similar to [threejs.org](https://threejs.org/), but instead will be hosted on your local machine. Browse to http://localhost:8080/ to check it out. It also automatically creates the ‘build/three.js’ and ‘build/three.module.js’ scripts anytime there is a change within your three.js directory.
 
-The next most important script runs all the appropriate testing.
+The next most important script runs all the appropriate testing. The E-2-E testing is intended to be run by github actions.
 
     npm test
 
@@ -40,7 +40,7 @@ Many linting errors can be fixed automatically by running
 
 If you’d like to make a minified version of the build files i.e. ‘build/three.min.js’ run:
         
-    npm run-script build-closure
+    npm run build
 
 ## Making changes
 
@@ -75,7 +75,6 @@ When you’ve decided to make changes, start with the following:
 
       npm run make-screenshot <example_1_name> ...<example_N_name>
 
-* Watch out for Closure compiler warnings when building the libs, there should not be any.
 * Once done with a patch / feature do not add more commits to a feature branch
 * Create separate branches per patch or feature.
 * If you make a PR but it is not actually ready to be pulled into the dev branch, add `[Draft]` into the PR title and/or convert it to a draft PR

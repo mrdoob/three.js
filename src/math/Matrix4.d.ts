@@ -2,6 +2,14 @@ import { Vector3 } from './Vector3';
 import { Euler } from './Euler';
 import { Quaternion } from './Quaternion';
 import { Matrix } from './Matrix3';
+
+type Matrix4Tuple = [
+	number, number, number, number,
+	number, number, number, number,
+	number, number, number, number,
+	number, number, number, number,
+];
+
 /**
  * A 4x4 Matrix.
  *
@@ -117,7 +125,7 @@ export class Matrix4 implements Matrix {
 	/**
 	 * Inverts this matrix.
 	 */
-	invert(): Matrix;
+	invert(): Matrix4;
 
 	/**
 	 * Multiplies the columns of this matrix by vector v.
@@ -235,6 +243,7 @@ export class Matrix4 implements Matrix {
 	 * @return The created or provided array.
 	 */
 	toArray( array?: number[], offset?: number ): number[];
+	toArray( array?: Matrix4Tuple, offset?: 0 ): Matrix4Tuple;
 
 	/**
 	 * Copies he values of this matrix into the provided array-like.

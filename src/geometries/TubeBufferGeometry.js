@@ -5,7 +5,7 @@ import { Vector3 } from '../math/Vector3.js';
 
 class TubeBufferGeometry extends BufferGeometry {
 
-	constructor( path, tubularSegments, radius, radialSegments, closed ) {
+	constructor( path, tubularSegments = 64, radius = 1, radialSegments = 8, closed = false ) {
 
 		super();
 		this.type = 'TubeBufferGeometry';
@@ -17,11 +17,6 @@ class TubeBufferGeometry extends BufferGeometry {
 			radialSegments: radialSegments,
 			closed: closed
 		};
-
-		tubularSegments = tubularSegments || 64;
-		radius = radius || 1;
-		radialSegments = radialSegments || 8;
-		closed = closed || false;
 
 		const frames = path.computeFrenetFrames( tubularSegments, closed );
 

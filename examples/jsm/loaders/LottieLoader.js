@@ -1,7 +1,8 @@
 import {
 	FileLoader,
 	Loader,
-	CanvasTexture
+	CanvasTexture,
+	NearestFilter
 } from "../../../build/three.module.js";
 
 var LottieLoader = function ( manager ) {
@@ -25,6 +26,7 @@ LottieLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		const quality = this._quality || 1;
 
 		const texture = new CanvasTexture();
+		texture.minFilter = NearestFilter;
 
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );

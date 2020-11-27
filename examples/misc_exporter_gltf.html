@@ -20,7 +20,6 @@
 			<label><input id="option_visible" name="visible" type="checkbox" checked="checked"/>Only Visible</label>
 			<label><input id="option_drawrange" name="visible" type="checkbox" checked="checked"/>Truncate drawRange</label><br/>
 			<label><input id="option_binary" name="visible" type="checkbox">Binary (<code>.glb</code>)</label>
-			<label><input id="option_forcepot" name="visible" type="checkbox">Force POT textures</label>
 			<label><input id="option_maxsize" name="maxSize" type="number" value="4096" min="2" max="8192" step="1"> Max texture size</label>
 		</div>
 
@@ -40,7 +39,6 @@
 					onlyVisible: document.getElementById( 'option_visible' ).checked,
 					truncateDrawRange: document.getElementById( 'option_drawrange' ).checked,
 					binary: document.getElementById( 'option_binary' ).checked,
-					forcePowerOfTwoTextures: document.getElementById( 'option_forcepot' ).checked,
 					maxTextureSize: Number( document.getElementById( 'option_maxsize' ).value ) || Infinity // To prevent NaN value
 				};
 				gltfExporter.parse( input, function ( result ) {
@@ -138,6 +136,23 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				// Make linear gradient texture
+				const data = new Uint8ClampedArray( 100 * 100 * 3 );
+				for ( let y = 0; y < 100; y ++ ) {
+
+					for ( let x = 0; x < 100; x ++ ) {
+
+						data[ 3 * ( 100 * y + x ) ] = Math.round( 255 * y / 99 );
+						data[ 3 * ( 100 * y + x ) + 1 ] = Math.round( 255 - 255 * y / 99 );
+
+					}
+
+				}
+
+				const gradientTexture = new THREE.DataTexture( data, 100, 100, THREE.RGBFormat );
+				gradientTexture.minFilter = THREE.LinearFilter;
+				gradientTexture.magFilter = THREE.LinearFilter;
+
 				scene1 = new THREE.Scene();
 				scene1.name = 'Scene1';
 
@@ -230,6 +245,7 @@
 					roughness: 1.0,
 					flatShading: true
 				} );
+				material.map = gradientTexture;
 				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 70, 10, 10 ), material );
 				sphere.position.set( 0, 0, 0 );
 				sphere.name = "Sphere";

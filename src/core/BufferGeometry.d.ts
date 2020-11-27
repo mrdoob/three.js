@@ -98,6 +98,7 @@ export class BufferGeometry extends EventDispatcher {
 	setAttribute( name: string, attribute: BufferAttribute | InterleavedBufferAttribute ): BufferGeometry;
 	getAttribute( name: string ): BufferAttribute | InterleavedBufferAttribute;
 	deleteAttribute( name: string ): BufferGeometry;
+	hasAttribute( name: string ): boolean;
 
 	addGroup( start: number, count: number, materialIndex?: number ): void;
 	clearGroups(): void;
