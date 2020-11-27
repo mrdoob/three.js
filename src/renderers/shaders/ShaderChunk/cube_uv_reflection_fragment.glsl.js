@@ -141,41 +141,41 @@ export default /* glsl */`
 
 	// These defines must match with PMREMGenerator
 
-	#define r0 1.0
-	#define v0 0.339
-	#define m0 - 2.0
-	#define r1 0.8
-	#define v1 0.276
-	#define m1 - 1.0
-	#define r4 0.4
-	#define v4 0.046
-	#define m4 2.0
-	#define r5 0.305
-	#define v5 0.016
-	#define m5 3.0
-	#define r6 0.21
-	#define v6 0.0038
-	#define m6 4.0
+	#define cube_uv_r0 1.0
+	#define cube_uv_v0 0.339
+	#define cube_uv_m0 - 2.0
+	#define cube_uv_r1 0.8
+	#define cube_uv_v1 0.276
+	#define cube_uv_m1 - 1.0
+	#define cube_uv_r4 0.4
+	#define cube_uv_v4 0.046
+	#define cube_uv_m4 2.0
+	#define cube_uv_r5 0.305
+	#define cube_uv_v5 0.016
+	#define cube_uv_m5 3.0
+	#define cube_uv_r6 0.21
+	#define cube_uv_v6 0.0038
+	#define cube_uv_m6 4.0
 
 	float roughnessToMip( float roughness ) {
 
 		float mip = 0.0;
 
-		if ( roughness >= r1 ) {
+		if ( roughness >= cube_uv_r1 ) {
 
-			mip = ( r0 - roughness ) * ( m1 - m0 ) / ( r0 - r1 ) + m0;
+			mip = ( cube_uv_r0 - roughness ) * ( cube_uv_m1 - cube_uv_m0 ) / ( cube_uv_r0 - cube_uv_r1 ) + cube_uv_m0;
 
-		} else if ( roughness >= r4 ) {
+		} else if ( roughness >= cube_uv_r4 ) {
 
-			mip = ( r1 - roughness ) * ( m4 - m1 ) / ( r1 - r4 ) + m1;
+			mip = ( cube_uv_r1 - roughness ) * ( cube_uv_m4 - cube_uv_m1 ) / ( cube_uv_r1 - cube_uv_r4 ) + cube_uv_m1;
 
-		} else if ( roughness >= r5 ) {
+		} else if ( roughness >= cube_uv_r5 ) {
 
-			mip = ( r4 - roughness ) * ( m5 - m4 ) / ( r4 - r5 ) + m4;
+			mip = ( cube_uv_r4 - roughness ) * ( cube_uv_m5 - cube_uv_m4 ) / ( cube_uv_r4 - cube_uv_r5 ) + cube_uv_m4;
 
-		} else if ( roughness >= r6 ) {
+		} else if ( roughness >= cube_uv_r6 ) {
 
-			mip = ( r5 - roughness ) * ( m6 - m5 ) / ( r5 - r6 ) + m5;
+			mip = ( cube_uv_r5 - roughness ) * ( cube_uv_m6 - cube_uv_m5 ) / ( cube_uv_r5 - cube_uv_r6 ) + cube_uv_m5;
 
 		} else {
 
@@ -188,7 +188,7 @@ export default /* glsl */`
 
 	vec4 textureCubeUV( sampler2D envMap, vec3 sampleDir, float roughness ) {
 
-		float mip = clamp( roughnessToMip( roughness ), m0, cubeUV_maxMipLevel );
+		float mip = clamp( roughnessToMip( roughness ), cube_uv_m0, cubeUV_maxMipLevel );
 
 		float mipF = fract( mip );
 
