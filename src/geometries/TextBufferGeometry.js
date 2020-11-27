@@ -33,7 +33,15 @@ class TextBufferGeometry extends ExtrudeBufferGeometry {
 
 		}
 
-		const shapes = font.generateShapes( text, parameters.size );
+		const fontParameters = {
+
+			letterSpacing: parameters.letterSpacing,
+
+			fixedWidth: parameters.fixedWidth
+
+		};
+
+		const shapes = font.generateShapes( text, parameters.size, fontParameters );
 
 		// translate parameters to ExtrudeGeometry API
 
