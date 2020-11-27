@@ -192,11 +192,6 @@ export class WebGLRenderer implements Renderer {
 	toneMappingExposure: number;
 
 	/**
-	 * @default false
-	 */
-	shadowMapDebug: boolean;
-
-	/**
 	 * @default 8
 	 */
 	maxMorphTargets: number;
