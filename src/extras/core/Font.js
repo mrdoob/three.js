@@ -36,7 +36,7 @@ function createPaths( text, size, paramaters = {} ) {
 	const chars = Array.from ? Array.from( text ) : String( text ).split( '' ); // workaround for IE11, see #13988
 	const scale = size / this.data.resolution;
 	const lineHeight = ( this.data.boundingBox.yMax - this.data.boundingBox.yMin + this.data.underlineThickness ) * scale;
-	const fixedWidth = Boolean(paramaters.fixedWidth);
+	const fixedWidth = Boolean( paramaters.fixedWidth );
 	let letterSpacing = paramaters.letterSpacing;
 	let widthScale = 1.0;
 
@@ -46,7 +46,7 @@ function createPaths( text, size, paramaters = {} ) {
 
 		const percentageSpacing = Number( letterSpacing.substr( 0, letterSpacing.length - 1 ) );
 
-		if ( !isNaN( percentageSpacing ) ) {
+		if ( ! isNaN( percentageSpacing ) ) {
 
 			widthScale = percentageSpacing / 100;
 
@@ -61,7 +61,7 @@ function createPaths( text, size, paramaters = {} ) {
 	}
 
 	const paths = [];
-	
+
 	let offsetX = 0, offsetY = 0, stepX = 0;
 
 	for ( let i = 0; i < chars.length; i ++ ) {
@@ -91,7 +91,7 @@ function createPaths( text, size, paramaters = {} ) {
 			stepX += letterSpacing;
 
 			offsetX += stepX;
-			
+
 			paths.push( ret.path );
 
 		}
@@ -181,7 +181,7 @@ function createPath( char, scale, offsetX, offsetY, data ) {
 }
 
 function getFixedFontWidth( data, scale, userData ) {
-	
+
 	if ( userData.fixedFontWidth ) {
 
 		return userData.fixedFontWidth;
@@ -200,11 +200,11 @@ function getFixedFontWidth( data, scale, userData ) {
 
 	for ( const key in data.glyphs ) {
 
-		userData.fixedFontWidth = Math.max( userData.fixedFontWidth, data.glyphs[key].ha * scale );
+		userData.fixedFontWidth = Math.max( userData.fixedFontWidth, data.glyphs[ key ].ha * scale );
 
 	}
 
-	if ( isNaN(userData.fixedFontWidth) ) {
+	if ( isNaN( userData.fixedFontWidth ) ) {
 
 		console.warn( 'THREE.Font: font family ' + data.familyName + ' includes invalid glyphs. Using 100.0 as fixed width.' );
 
