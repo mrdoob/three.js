@@ -1,45 +1,41 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
+class Timer {
 
-function Timer() {
+	constructor() {
 
-	this._previousTime = 0;
-	this._currentTime = 0;
+		this._previousTime = 0;
+		this._currentTime = 0;
 
-	this._delta = 0;
-	this._elapsed = 0;
+		this._delta = 0;
+		this._elapsed = 0;
 
-	this._timescale = 1;
+		this._timescale = 1;
 
-	this._useFixedDelta = false;
-	this._fixedDelta = 16.67; // ms, corresponds to approx. 60 FPS
+		this._useFixedDelta = false;
+		this._fixedDelta = 16.67; // ms, corresponds to approx. 60 FPS
 
-	// use Page Visibility API to avoid large time delta values
+		// use Page Visibility API to avoid large time delta values
 
-	this._usePageVisibilityAPI = ( typeof document !== 'undefined' && document.hidden !== undefined );
+		this._usePageVisibilityAPI = ( typeof document !== 'undefined' && document.hidden !== undefined );
 
-	if ( this._usePageVisibilityAPI === true ) {
+		if ( this._usePageVisibilityAPI === true ) {
 
-		this._pageVisibilityHandler = handleVisibilityChange.bind( this );
+			this._pageVisibilityHandler = handleVisibilityChange.bind( this );
 
-		document.addEventListener( 'visibilitychange', this._pageVisibilityHandler, false );
+			document.addEventListener( 'visibilitychange', this._pageVisibilityHandler, false );
+
+		}
 
 	}
 
-}
-
-Object.assign( Timer.prototype, {
-
-	disableFixedDelta: function () {
+	disableFixedDelta() {
 
 		this._useFixedDelta = false;
 
 		return this;
 
-	},
+	}
 
-	dispose: function () {
+	dispose() {
 
 		if ( this._usePageVisibilityAPI === true ) {
 
@@ -49,65 +45,65 @@ Object.assign( Timer.prototype, {
 
 		return this;
 
-	},
+	}
 
-	enableFixedDelta: function () {
+	enableFixedDelta() {
 
 		this._useFixedDelta = true;
 
 		return this;
 
-	},
+	}
 
-	getDelta: function () {
+	getDelta() {
 
 		return this._delta / 1000;
 
-	},
+	}
 
-	getElapsed: function () {
+	getElapsed() {
 
 		return this._elapsed / 1000;
 
-	},
+	}
 
-	getFixedDelta: function () {
+	getFixedDelta() {
 
 		return this._fixedDelta / 1000;
 
-	},
+	}
 
-	getTimescale: function () {
+	getTimescale() {
 
 		return this._timescale;
 
-	},
+	}
 
-	reset: function () {
+	reset() {
 
 		this._currentTime = this._now();
 
 		return this;
 
-	},
+	}
 
-	setFixedDelta: function ( fixedDelta ) {
+	setFixedDelta( fixedDelta ) {
 
 		this._fixedDelta = fixedDelta * 1000;
 
 		return this;
 
-	},
+	}
 
-	setTimescale: function ( timescale ) {
+	setTimescale( timescale ) {
 
 		this._timescale = timescale;
 
 		return this;
 
-	},
+	}
 
-	update: function () {
+	update() {
 
 		if ( this._useFixedDelta === true ) {
 
@@ -128,17 +124,17 @@ Object.assign( Timer.prototype, {
 
 		return this;
 
-	},
+	}
 
 	// private
 
-	_now: function () {
+	_now() {
 
 		return ( typeof performance === 'undefined' ? Date : performance ).now();
 
-	},
+	}
 
-} );
+}
 
 function handleVisibilityChange() {
 
