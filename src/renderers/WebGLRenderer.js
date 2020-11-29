@@ -980,7 +980,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( camera !== undefined && camera.isCamera !== true ) {
+		if ( camera !== undefined && camera.isCamera === false ) {
 
 			console.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
@@ -1304,7 +1304,7 @@ function WebGLRenderer( parameters ) {
 
 	function initMaterial( material, scene, object ) {
 
-		if ( scene.isScene !== true ) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
+		if ( scene.isScene === false ) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
 
 		const materialProperties = properties.get( material );
 
@@ -1420,7 +1420,7 @@ function WebGLRenderer( parameters ) {
 
 	function setProgram( camera, scene, material, object ) {
 
-		if ( scene.isScene !== true ) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
+		if ( scene.isScene === false ) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
 
 		textures.resetTextureUnits();
 
