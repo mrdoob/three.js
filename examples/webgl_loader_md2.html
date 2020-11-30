@@ -40,8 +40,6 @@
 
 			};
 
-			let controls;
-
 			const clock = new THREE.Clock();
 
 			let stats;
@@ -131,9 +129,9 @@
 
 				// CONTROLS
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 50, 0 );
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.target.set( 0, 50, 0 );
+				orbitControls.update();
 
 				// GUI
 

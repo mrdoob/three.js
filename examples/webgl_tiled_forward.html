@@ -202,9 +202,9 @@
 			const stats = new Stats();
 			container.appendChild( stats.dom );
 
-			const controls = new OrbitControls( camera, renderer.domElement );
-			controls.minDistance = 120;
-			controls.maxDistance = 320;
+			const orbitControls = new OrbitControls( camera, renderer.domElement );
+			orbitControls.minDistance = 120;
+			orbitControls.maxDistance = 320;
 
 			const materials = [];
 
@@ -222,7 +222,7 @@
 
 				Object.keys( Heads ).forEach( function ( t, index ) {
 
-					let g = new THREE.Group();
+					const g = new THREE.Group();
 					const conf = Heads[ t ];
 					const ml = THREE.ShaderLib[ conf.type ];
 					const mtl = new THREE.ShaderMaterial( {

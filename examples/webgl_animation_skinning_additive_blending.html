@@ -160,11 +160,11 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100 );
 				camera.position.set( - 1, 2, 3 );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.enablePan = false;
-				controls.enableZoom = false;
-				controls.target.set( 0, 1, 0 );
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.enablePan = false;
+				orbitControls.enableZoom = false;
+				orbitControls.target.set( 0, 1, 0 );
+				orbitControls.update();
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

@@ -118,9 +118,9 @@
 
 				//
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.y = 0.5;
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.target.y = 0.5;
+				orbitControls.update();
 
 				animate();
 

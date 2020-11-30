@@ -17,7 +17,7 @@
 			import { AsciiEffect } from './jsm/effects/AsciiEffect.js';
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
-			let camera, controls, scene, renderer, effect;
+			let camera, trackballControls, scene, renderer, effect;
 
 			let sphere, plane;
 
@@ -66,7 +66,7 @@
 
 				document.body.appendChild( effect.domElement );
 
-				controls = new TrackballControls( camera, effect.domElement );
+				trackballControls = new TrackballControls( camera, effect.domElement );
 
 				//
 
@@ -102,7 +102,7 @@
 				sphere.rotation.x = timer * 0.0003;
 				sphere.rotation.z = timer * 0.0002;
 
-				controls.update();
+				trackballControls.update();
 
 				effect.render( scene, camera );
 

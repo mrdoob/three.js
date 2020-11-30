@@ -62,7 +62,7 @@
 
 			import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
 
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer, pointerLockControls;
 
 			const objects = [];
 
@@ -96,32 +96,32 @@
 				light.position.set( 0.5, 1, 0.75 );
 				scene.add( light );
 
-				controls = new PointerLockControls( camera, document.body );
+				pointerLockControls = new PointerLockControls( camera, document.body );
 
 				const blocker = document.getElementById( 'blocker' );
 				const instructions = document.getElementById( 'instructions' );
 
 				instructions.addEventListener( 'click', function () {
 
-					controls.lock();
+					pointerLockControls.lock();
 
 				}, false );
 
-				controls.addEventListener( 'lock', function () {
+				pointerLockControls.addEventListener( 'lock', function () {
 
 					instructions.style.display = 'none';
 					blocker.style.display = 'none';
 
 				} );
 
-				controls.addEventListener( 'unlock', function () {
+				pointerLockControls.addEventListener( 'unlock', function () {
 
 					blocker.style.display = 'block';
 					instructions.style.display = '';
 
 				} );
 
-				scene.add( controls.getObject() );
+				scene.add( pointerLockControls.getObject() );
 
 				const onKeyDown = function ( event ) {
 
@@ -288,9 +288,9 @@
 
 				const time = performance.now();
 
-				if ( controls.isLocked === true ) {
+				if ( pointerLockControls.isLocked === true ) {
 
-					raycaster.ray.origin.copy( controls.getObject().position );
+					raycaster.ray.origin.copy( pointerLockControls.getObject().position );
 					raycaster.ray.origin.y -= 10;
 
 					const intersections = raycaster.intersectObjects( objects );
@@ -318,15 +318,15 @@
 
 					}
 
-					controls.moveRight( - velocity.x * delta );
-					controls.moveForward( - velocity.z * delta );
+					pointerLockControls.moveRight( - velocity.x * delta );
+					pointerLockControls.moveForward( - velocity.z * delta );
 
-					controls.getObject().position.y += ( velocity.y * delta ); // new behavior
+					pointerLockControls.getObject().position.y += ( velocity.y * delta ); // new behavior
 
-					if ( controls.getObject().position.y < 10 ) {
+					if ( pointerLockControls.getObject().position.y < 10 ) {
 
 						velocity.y = 0;
-						controls.getObject().position.y = 10;
+						pointerLockControls.getObject().position.y = 10;
 
 						canJump = true;
 

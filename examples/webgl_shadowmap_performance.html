@@ -31,7 +31,7 @@
 
 			const ANIMATION_GROUPS = 25;
 
-			let camera, controls, scene, renderer;
+			let camera, firstPersonControls, scene, renderer;
 			let stats;
 
 			const NEAR = 5, FAR = 3000;
@@ -100,14 +100,14 @@
 
 				// CONTROLS
 
-				controls = new FirstPersonControls( camera, renderer.domElement );
+				firstPersonControls = new FirstPersonControls( camera, renderer.domElement );
 
-				controls.lookSpeed = 0.0125;
-				controls.movementSpeed = 500;
-				controls.noFly = false;
-				controls.lookVertical = true;
+				firstPersonControls.lookSpeed = 0.0125;
+				firstPersonControls.movementSpeed = 500;
+				firstPersonControls.noFly = false;
+				firstPersonControls.lookVertical = true;
 
-				controls.lookAt( scene.position );
+				firstPersonControls.lookAt( scene.position );
 
 				// STATS
 
@@ -130,7 +130,7 @@
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				controls.handleResize();
+				firstPersonControls.handleResize();
 
 			}
 
@@ -321,7 +321,7 @@
 
 				}
 
-				controls.update( delta );
+				firstPersonControls.update( delta );
 
 				renderer.clear();
 				renderer.render( scene, camera );

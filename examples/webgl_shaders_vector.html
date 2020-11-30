@@ -68,7 +68,7 @@
 
 			let stats;
 
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer;
 
 			let group;
 
@@ -284,9 +284,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 50, 100, 0 );
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.target.set( 50, 100, 0 );
+				orbitControls.update();
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );

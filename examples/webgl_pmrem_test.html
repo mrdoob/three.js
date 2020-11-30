@@ -28,7 +28,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
-			let scene, camera, controls, renderer;
+			let scene, camera, renderer;
 
 			function init() {
 
@@ -64,10 +64,10 @@
 
 				// controls
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
-				controls.minDistance = 4;
-				controls.maxDistance = 20;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render ); // use if there is no animation loop
+				orbitControls.minDistance = 4;
+				orbitControls.maxDistance = 20;
 
 				// light
 

@@ -28,7 +28,7 @@
 			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
 			// Graphics variables
-			let camera, controls, scene, renderer, stats;
+			let camera, scene, renderer, stats;
 			let directionalLight;
 			let mesh, sphere, material, nodeMaterial;
 
@@ -91,9 +91,9 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 2, 0 );
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.target.set( 0, 2, 0 );
+				orbitControls.update();
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, .5 );
 				directionalLight.position.set( 0, 10, 0 );

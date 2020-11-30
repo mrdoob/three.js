@@ -112,12 +112,12 @@
 					camera.position.z = 2;
 					scene.userData.camera = camera;
 
-					const controls = new OrbitControls( scene.userData.camera, scene.userData.element );
-					controls.minDistance = 2;
-					controls.maxDistance = 5;
-					controls.enablePan = false;
-					controls.enableZoom = false;
-					scene.userData.controls = controls;
+					const orbitControls = new OrbitControls( scene.userData.camera, scene.userData.element );
+					orbitControls.minDistance = 2;
+					orbitControls.maxDistance = 5;
+					orbitControls.enablePan = false;
+					orbitControls.enableZoom = false;
+					scene.userData.controls = orbitControls;
 
 					// add one random mesh to each scene
 					const geometry = geometries[ geometries.length * Math.random() | 0 ];

@@ -39,8 +39,8 @@
 			camera.lookAt( scene.position );
 			scene.add( camera );
 
-			const controls = new OrbitControls( camera, renderer.domElement );
-			controls.autoRotate = true;
+			const orbitControls = new OrbitControls( camera, renderer.domElement );
+			orbitControls.autoRotate = true;
 
 			// PlaneBufferGeometry UVs assume flipY=true, which compressed textures don't support.
 			const geometry = flipY( new THREE.PlaneBufferGeometry() );
@@ -83,7 +83,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				orbitControls.update();
 
 				renderer.render( scene, camera );
 

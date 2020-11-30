@@ -335,10 +335,10 @@
 
 				// Controls
 
-				const controls = new OrbitControls( scene.userData.camera, renderer.domElement );
-				controls.target.y = ( conesDistance + coneHeight ) * 0.5;
-				controls.enableDamping = true;
-				controls.dampingFactor = 0.05;
+				const orbitControls = new OrbitControls( scene.userData.camera, renderer.domElement );
+				orbitControls.target.y = ( conesDistance + coneHeight ) * 0.5;
+				orbitControls.enableDamping = true;
+				orbitControls.dampingFactor = 0.05;
 
 				scene.userData.render = function ( time ) {
 
@@ -352,7 +352,7 @@
 
 					lightningStrike.update( time );
 
-					controls.update();
+					orbitControls.update();
 
 					// Update point light position to the middle of the ray
 					posLight.position.lerpVectors( lightningStrike.rayParameters.sourceOffset, lightningStrike.rayParameters.destOffset, 0.5 );
@@ -548,7 +548,7 @@
 
 					lightningStrike.update( time );
 
-					controls.update();
+					orbitControls.update();
 
 					outlinePass.enabled = scene.userData.outlineEnabled;
 
@@ -558,10 +558,10 @@
 
 				// Controls
 
-				const controls = new OrbitControls( scene.userData.camera, renderer.domElement );
-				controls.target.copy( sphereMesh.position );
-				controls.enableDamping = true;
-				controls.dampingFactor = 0.05;
+				const orbitControls = new OrbitControls( scene.userData.camera, renderer.domElement );
+				orbitControls.target.copy( sphereMesh.position );
+				orbitControls.enableDamping = true;
+				orbitControls.dampingFactor = 0.05;
 
 				// THREE.Sphere mouse raycasting
 
@@ -748,16 +748,16 @@
 
 				// Controls
 
-				const controls = new OrbitControls( scene.userData.camera, renderer.domElement );
-				controls.target.y = GROUND_SIZE * 0.05;
-				controls.enableDamping = true;
-				controls.dampingFactor = 0.05;
+				const orbitControls = new OrbitControls( scene.userData.camera, renderer.domElement );
+				orbitControls.target.y = GROUND_SIZE * 0.05;
+				orbitControls.enableDamping = true;
+				orbitControls.dampingFactor = 0.05;
 
 				scene.userData.render = function ( time ) {
 
 					storm.update( time );
 
-					controls.update();
+					orbitControls.update();
 
 					if ( scene.userData.outlineEnabled ) {
 

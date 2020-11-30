@@ -81,11 +81,11 @@
 			camera.position.set( 0, 0, 20 );
 			camera.lookAt( 0, 0, 0 );
 
-			const controls = new OrbitControls( camera, renderer.domElement );
-			controls.maxPolarAngle = Math.PI * 0.5;
-			controls.minDistance = 1;
-			controls.maxDistance = 100;
-			controls.addEventListener( 'change', render );
+			const orbitControls = new OrbitControls( camera, renderer.domElement );
+			orbitControls.maxPolarAngle = Math.PI * 0.5;
+			orbitControls.minDistance = 1;
+			orbitControls.maxDistance = 100;
+			orbitControls.addEventListener( 'change', render );
 
 			scene.add( new THREE.AmbientLight( 0x404040 ) );
 

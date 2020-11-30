@@ -22,7 +22,7 @@
 			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 
 			let camera, scene, renderer;
-			let cameraControls;
+			let orbitControls;
 			let effectController;
 			const teapotSize = 400;
 			let ambientLight, light;
@@ -74,8 +74,8 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				// CONTROLS
-				cameraControls = new OrbitControls( camera, renderer.domElement );
-				cameraControls.addEventListener( 'change', render );
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
 				const textureMap = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );

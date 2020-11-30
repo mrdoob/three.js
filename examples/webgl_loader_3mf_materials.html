@@ -105,13 +105,13 @@
 
 				//
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render );
-				controls.minDistance = 50;
-				controls.maxDistance = 200;
-				controls.enablePan = false;
-				controls.target.set( 0, 20, 0 );
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render );
+				orbitControls.minDistance = 50;
+				orbitControls.maxDistance = 200;
+				orbitControls.enablePan = false;
+				orbitControls.target.set( 0, 20, 0 );
+				orbitControls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

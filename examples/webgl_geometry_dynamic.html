@@ -26,7 +26,7 @@
 
 			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 
-			let camera, controls, scene, renderer, stats;
+			let camera, firstPersonControls, scene, renderer, stats;
 
 			let mesh, geometry, material, clock;
 
@@ -73,10 +73,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				controls = new FirstPersonControls( camera, renderer.domElement );
+				firstPersonControls = new FirstPersonControls( camera, renderer.domElement );
 
-				controls.movementSpeed = 500;
-				controls.lookSpeed = 0.1;
+				firstPersonControls.movementSpeed = 500;
+				firstPersonControls.lookSpeed = 0.1;
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
@@ -94,7 +94,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls.handleResize();
+				firstPersonControls.handleResize();
 
 			}
 
@@ -125,7 +125,7 @@
 
 				position.needsUpdate = true;
 
-				controls.update( delta );
+				firstPersonControls.update( delta );
 				renderer.render( scene, camera );
 
 			}

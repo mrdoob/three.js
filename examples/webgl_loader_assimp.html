@@ -54,9 +54,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 750;
-				controls.maxDistance = 2500;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 750;
+				orbitControls.maxDistance = 2500;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

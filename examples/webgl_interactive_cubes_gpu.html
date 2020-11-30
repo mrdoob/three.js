@@ -33,7 +33,7 @@
 			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			let container, stats;
-			let camera, controls, scene, renderer;
+			let camera, trackballControls, scene, renderer;
 			let pickingTexture, pickingScene;
 			let highlightBox;
 
@@ -153,14 +153,14 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-				controls.noZoom = false;
-				controls.noPan = false;
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
+				trackballControls = new TrackballControls( camera, renderer.domElement );
+				trackballControls.rotateSpeed = 1.0;
+				trackballControls.zoomSpeed = 1.2;
+				trackballControls.panSpeed = 0.8;
+				trackballControls.noZoom = false;
+				trackballControls.noPan = false;
+				trackballControls.staticMoving = true;
+				trackballControls.dynamicDampingFactor = 0.3;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -240,7 +240,7 @@
 
 			function render() {
 
-				controls.update();
+				trackballControls.update();
 
 				pick();
 

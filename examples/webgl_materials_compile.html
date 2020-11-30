@@ -58,7 +58,6 @@
 			const clock = new THREE.Clock(), fov = 50;
 			const frame = new NodeFrame();
 			let teapot;
-			let controls;
 			const meshes = [];
 
 			document.getElementById( "preload" ).addEventListener( 'click', function () {
@@ -95,9 +94,9 @@
 				camera.position.z = - 300;
 				camera.position.y = 200;
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 50;
-				controls.maxDistance = 400;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 50;
+				orbitControls.maxDistance = 400;
 
 				scene.add( new THREE.AmbientLight( 0x464646 ) );
 

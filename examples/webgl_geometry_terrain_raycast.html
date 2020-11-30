@@ -31,7 +31,7 @@
 
 			let container, stats;
 
-			let camera, controls, scene, renderer;
+			let camera, scene, renderer;
 
 			let mesh, texture;
 
@@ -61,19 +61,19 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 10, 20000 );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 1000;
-				controls.maxDistance = 10000;
-				controls.maxPolarAngle = Math.PI / 2;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 1000;
+				orbitControls.maxDistance = 10000;
+				orbitControls.maxPolarAngle = Math.PI / 2;
 
 				//
 
 				const data = generateHeight( worldWidth, worldDepth );
 
-				controls.target.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
-				camera.position.y = controls.target.y + 2000;
+				orbitControls.target.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
+				camera.position.y = orbitControls.target.y + 2000;
 				camera.position.x = 2000;
-				controls.update();
+				orbitControls.update();
 
 				const geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );

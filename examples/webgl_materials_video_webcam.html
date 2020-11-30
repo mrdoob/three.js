@@ -60,9 +60,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableZoom = false;
-				controls.enablePan = false;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.enableZoom = false;
+				orbitControls.enablePan = false;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

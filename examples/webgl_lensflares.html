@@ -26,7 +26,7 @@
 			let container, stats;
 
 			let camera, scene, renderer;
-			let controls;
+			let flyControls;
 
 			const clock = new THREE.Clock();
 
@@ -120,13 +120,13 @@
 
 				//
 
-				controls = new FlyControls( camera, renderer.domElement );
+				flyControls = new FlyControls( camera, renderer.domElement );
 
-				controls.movementSpeed = 2500;
-				controls.domElement = container;
-				controls.rollSpeed = Math.PI / 6;
-				controls.autoForward = false;
-				controls.dragToLook = false;
+				flyControls.movementSpeed = 2500;
+				flyControls.domElement = container;
+				flyControls.rollSpeed = Math.PI / 6;
+				flyControls.autoForward = false;
+				flyControls.dragToLook = false;
 
 				// stats
 
@@ -165,7 +165,7 @@
 
 				const delta = clock.getDelta();
 
-				controls.update( delta );
+				flyControls.update( delta );
 				renderer.render( scene, camera );
 
 			}

@@ -53,10 +53,10 @@
 				camera.position.set( 0, 0, 13 );
 
 				// controls
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render );
-				controls.enableZoom = false;
-				controls.enablePan = false;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render );
+				orbitControls.enableZoom = false;
+				orbitControls.enablePan = false;
 
 				// manager
 				const manager = new THREE.LoadingManager( render );

@@ -30,7 +30,7 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			let camera, scene, renderer, clock, controls, stats, raycaster, hitbox;
+			let camera, scene, renderer, clock, orbitControls, stats, raycaster, hitbox;
 
 			const objects = [], mouse = new THREE.Vector2();
 
@@ -101,8 +101,8 @@
 
 				//
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableDamping = true;
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.enableDamping = true;
 
 				//
 
@@ -185,7 +185,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				orbitControls.update();
 
 				// transform cubes
 

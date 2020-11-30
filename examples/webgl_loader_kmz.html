@@ -57,9 +57,9 @@
 
 				} );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render );
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render );
+				orbitControls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

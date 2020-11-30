@@ -31,7 +31,7 @@
 
 			let container;
 			let camera, scene, renderer;
-			let controls, group;
+			let dragControls, group;
 			let enableSelection = false;
 
 			const objects = [];
@@ -104,8 +104,8 @@
 
 				container.appendChild( renderer.domElement );
 
-				controls = new DragControls( [ ... objects ], camera, renderer.domElement );
-				controls.addEventListener( 'drag', render );
+				dragControls = new DragControls( [ ... objects ], camera, renderer.domElement );
+				dragControls.addEventListener( 'drag', render );
 
 				//
 
@@ -148,7 +148,7 @@
 
 				if ( enableSelection === true ) {
 
-					const draggableObjects = controls.getObjects();
+					const draggableObjects = dragControls.getObjects();
 					draggableObjects.length = 0;
 
 					mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -174,14 +174,14 @@
 
 						}
 
-						controls.transformGroup = true;
+						dragControls.transformGroup = true;
 						draggableObjects.push( group );
 
 					}
 
 					if ( group.children.length === 0 ) {
 
-						controls.transformGroup = false;
+						dragControls.transformGroup = false;
 						draggableObjects.push( ...objects );
 
 					}

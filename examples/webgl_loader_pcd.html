@@ -25,7 +25,7 @@
 			import { PCDLoader } from './jsm/loaders/PCDLoader.js';
 
 			let container, stats;
-			let camera, controls, scene, renderer;
+			let camera, trackballControls, scene, renderer;
 
 			init();
 			animate();
@@ -51,8 +51,8 @@
 
 					scene.add( points );
 					const center = points.geometry.boundingSphere.center;
-					controls.target.set( center.x, center.y, center.z );
-					controls.update();
+					trackballControls.target.set( center.x, center.y, center.z );
+					trackballControls.update();
 
 				} );
 
@@ -60,16 +60,16 @@
 				document.body.appendChild( container );
 				container.appendChild( renderer.domElement );
 
-				controls = new TrackballControls( camera, renderer.domElement );
+				trackballControls = new TrackballControls( camera, renderer.domElement );
 
-				controls.rotateSpeed = 2.0;
-				controls.zoomSpeed = 0.3;
-				controls.panSpeed = 0.2;
+				trackballControls.rotateSpeed = 2.0;
+				trackballControls.zoomSpeed = 0.3;
+				trackballControls.panSpeed = 0.2;
 
-				controls.staticMoving = true;
+				trackballControls.staticMoving = true;
 
-				controls.minDistance = 0.3;
-				controls.maxDistance = 0.3 * 100;
+				trackballControls.minDistance = 0.3;
+				trackballControls.maxDistance = 0.3 * 100;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -85,7 +85,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				controls.handleResize();
+				trackballControls.handleResize();
 
 			}
 
@@ -117,7 +117,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-				controls.update();
+				trackballControls.update();
 				renderer.render( scene, camera );
 				stats.update();
 

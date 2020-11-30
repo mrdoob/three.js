@@ -30,7 +30,7 @@
 
 		// Graphics variables
 		let container, stats;
-		let camera, controls, scene, renderer;
+		let camera, scene, renderer;
 		let textureLoader;
 		const clock = new THREE.Clock();
 
@@ -113,9 +113,9 @@
 			renderer.shadowMap.enabled = true;
 			container.appendChild( renderer.domElement );
 
-			controls = new OrbitControls( camera, renderer.domElement );
-			controls.target.set( 0, 2, 0 );
-			controls.update();
+			const orbitControls = new OrbitControls( camera, renderer.domElement );
+			orbitControls.target.set( 0, 2, 0 );
+			orbitControls.update();
 
 			textureLoader = new THREE.TextureLoader();
 

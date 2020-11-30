@@ -102,8 +102,8 @@
 				camera.position.z = terrainDepthExtents / 2;
 				camera.lookAt( 0, 0, 0 );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableZoom = false;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.enableZoom = false;
 
 				const geometry = new THREE.PlaneBufferGeometry( terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );

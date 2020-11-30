@@ -80,7 +80,7 @@
 				this.camera = null;
 				this.cameraTarget = this.cameraDefaults.posCameraTarget;
 
-				this.controls = null;
+				this.trackballControls = null;
 
 				this.flatShading = false;
 				this.doubleSide = false;
@@ -109,7 +109,7 @@
 
 					this.camera = new THREE.PerspectiveCamera( this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far );
 					this.resetCamera();
-					this.controls = new TrackballControls( this.camera, this.renderer.domElement );
+					this.trackballControls = new TrackballControls( this.camera, this.renderer.domElement );
 
 					const ambientLight = new THREE.AmbientLight( 0x404040 );
 					const directionalLight1 = new THREE.DirectionalLight( 0xC0C090 );
@@ -387,7 +387,7 @@
 
 				resizeDisplayGL: function () {
 
-					this.controls.handleResize();
+					this.trackballControls.handleResize();
 
 					this.recalcAspectRatio();
 					this.renderer.setSize( this.canvas.offsetWidth, this.canvas.offsetHeight, false );
@@ -423,7 +423,7 @@
 
 					if ( ! this.renderer.autoClear ) this.renderer.clear();
 
-					this.controls.update();
+					this.trackballControls.update();
 
 					this.cube.rotation.x += 0.05;
 					this.cube.rotation.y += 0.05;

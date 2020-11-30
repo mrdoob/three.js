@@ -94,9 +94,9 @@
 
 				//
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 50;
-				controls.maxDistance = 400;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 50;
+				orbitControls.maxDistance = 400;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

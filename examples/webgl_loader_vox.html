@@ -19,7 +19,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { VOXLoader } from './jsm/loaders/VOXLoader.js';
 
-			let camera, controls, scene, renderer;
+			let camera, orbitControls, scene, renderer;
 
 			init();
 			animate();
@@ -97,9 +97,9 @@
 
 				// controls
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = .1;
-				controls.maxDistance = 0.5;
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = .1;
+				orbitControls.maxDistance = 0.5;
 
 				//
 
@@ -151,7 +151,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				orbitControls.update();
 
 				renderer.render( scene, camera );
 

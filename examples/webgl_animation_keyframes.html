@@ -57,11 +57,11 @@
 			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 			camera.position.set( 5, 2, 8 );
 
-			const controls = new OrbitControls( camera, renderer.domElement );
-			controls.target.set( 0, 0.5, 0 );
-			controls.update();
-			controls.enablePan = false;
-			controls.enableDamping = true;
+			const orbitControls = new OrbitControls( camera, renderer.domElement );
+			orbitControls.target.set( 0, 0.5, 0 );
+			orbitControls.update();
+			orbitControls.enablePan = false;
+			orbitControls.enableDamping = true;
 
 			scene.add( new THREE.HemisphereLight( 0xffffff, 0x000000, 0.4 ) );
 
@@ -126,7 +126,7 @@
 
 				mixer.update( delta );
 
-				controls.update();
+				orbitControls.update();
 
 				stats.update();
 

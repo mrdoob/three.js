@@ -39,8 +39,6 @@
 
 			let camera, scene, renderer;
 
-			let cameraControls;
-
 			let sphereGroup, smallSphere;
 
 			init();
@@ -63,11 +61,11 @@
 				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
 				camera.position.set( 0, 75, 160 );
 
-				cameraControls = new OrbitControls( camera, renderer.domElement );
-				cameraControls.target.set( 0, 40, 0 );
-				cameraControls.maxDistance = 400;
-				cameraControls.minDistance = 10;
-				cameraControls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.target.set( 0, 40, 0 );
+				orbitControls.maxDistance = 400;
+				orbitControls.minDistance = 10;
+				orbitControls.update();
 
 				//
 

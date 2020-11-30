@@ -91,9 +91,9 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 1.33, 10, - 6.7 );
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.target.set( 1.33, 10, - 6.7 );
+				orbitControls.update();
 
 				renderer.setAnimationLoop( function () {
 

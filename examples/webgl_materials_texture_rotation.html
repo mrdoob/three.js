@@ -48,11 +48,11 @@
 				camera.position.set( 10, 15, 25 );
 				scene.add( camera );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render );
-				controls.minDistance = 20;
-				controls.maxDistance = 50;
-				controls.maxPolarAngle = Math.PI / 2;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render );
+				orbitControls.minDistance = 20;
+				orbitControls.maxDistance = 50;
+				orbitControls.maxPolarAngle = Math.PI / 2;
 
 				const geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
 

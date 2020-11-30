@@ -49,7 +49,7 @@
 			let SCREEN_HEIGHT = window.innerHeight - MARGIN * 2;
 			let SCREEN_WIDTH = window.innerWidth;
 
-			let camera, controls, scene, renderer, stats;
+			let camera, flyControls, scene, renderer, stats;
 			let geometry, meshPlanet, meshClouds, meshMoon;
 			let dirLight;
 
@@ -192,13 +192,13 @@
 
 				//
 
-				controls = new FlyControls( camera, renderer.domElement );
+				flyControls = new FlyControls( camera, renderer.domElement );
 
-				controls.movementSpeed = 1000;
-				controls.domElement = renderer.domElement;
-				controls.rollSpeed = Math.PI / 24;
-				controls.autoForward = false;
-				controls.dragToLook = false;
+				flyControls.movementSpeed = 1000;
+				flyControls.domElement = renderer.domElement;
+				flyControls.rollSpeed = Math.PI / 24;
+				flyControls.autoForward = false;
+				flyControls.dragToLook = false;
 
 				//
 
@@ -267,8 +267,8 @@
 
 				}
 
-				controls.movementSpeed = 0.33 * d;
-				controls.update( delta );
+				flyControls.movementSpeed = 0.33 * d;
+				flyControls.update( delta );
 
 				composer.render( delta );
 

@@ -70,10 +70,10 @@
 				camera.position.set( - 5, 2.5, - 3.5 );
 				scene.add( camera );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.maxPolarAngle = Math.PI * 0.5;
-				controls.minDistance = 1;
-				controls.maxDistance = 10;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.maxPolarAngle = Math.PI * 0.5;
+				orbitControls.minDistance = 1;
+				orbitControls.maxDistance = 10;
 
 				scene.add( new THREE.AmbientLight( 0x404040 ) );
 

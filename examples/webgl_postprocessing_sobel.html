@@ -94,9 +94,9 @@
 				effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
 				composer.addPass( effectSobel );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 10;
-				controls.maxDistance = 100;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 10;
+				orbitControls.maxDistance = 100;
 
 				//
 

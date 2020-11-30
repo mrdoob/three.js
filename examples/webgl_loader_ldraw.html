@@ -31,7 +31,7 @@
 
 			let container, progressBarDiv;
 
-			let camera, scene, renderer, controls, gui, guiData;
+			let camera, scene, renderer, orbitControls, gui, guiData;
 
 			let model, textureCube;
 
@@ -89,7 +89,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				orbitControls = new OrbitControls( camera, renderer.domElement );
 
 				//
 
@@ -227,9 +227,9 @@
 
 						if ( resetCamera ) {
 
-							controls.target0.copy( bbox.getCenter( new THREE.Vector3() ) );
-							controls.position0.set( - 2.3, 2, 2 ).multiplyScalar( radius ).add( controls.target0 );
-							controls.reset();
+							orbitControls.target0.copy( bbox.getCenter( new THREE.Vector3() ) );
+							orbitControls.position0.set( - 2.3, 2, 2 ).multiplyScalar( radius ).add( orbitControls.target0 );
+							orbitControls.reset();
 
 						}
 

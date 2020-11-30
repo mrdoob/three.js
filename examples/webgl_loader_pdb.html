@@ -51,7 +51,7 @@
 			import { CSS2DRenderer, CSS2DObject } from './jsm/renderers/CSS2DRenderer.js';
 
 			let camera, scene, renderer, labelRenderer;
-			let controls;
+			let trackballControls;
 
 			let root;
 
@@ -119,9 +119,9 @@
 
 				//
 
-				controls = new TrackballControls( camera, renderer.domElement );
-				controls.minDistance = 500;
-				controls.maxDistance = 2000;
+				trackballControls = new TrackballControls( camera, renderer.domElement );
+				trackballControls.minDistance = 500;
+				trackballControls.maxDistance = 2000;
 
 				//
 
@@ -275,7 +275,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-				controls.update();
+				trackballControls.update();
 
 				const time = Date.now() * 0.0004;
 

@@ -93,6 +93,7 @@
 			import { OBJLoader2 } from "../../../jsm/loaders/OBJLoader2.js";
 
 			const OBJLoaderVerify = function ( elementToBindTo ) {
+
 				this.renderer = null;
 				this.canvas = elementToBindTo;
 				this.aspectRatio = 1;
@@ -109,14 +110,16 @@
 				this.camera = null;
 				this.cameraTarget = this.cameraDefaults.posCameraTarget;
 
-				this.controls = null;
+				this.trackballControls = null;
+
 			};
 
-				OBJLoaderVerify.prototype = {
+			OBJLoaderVerify.prototype = {
 
-					constructor: OBJLoaderVerify,
+				constructor: OBJLoaderVerify,
 
-					initGL: function () {
+				initGL: function () {
+
 					this.renderer = new WebGLRenderer( {
 						canvas: this.canvas,
 						antialias: true,
@@ -128,104 +131,130 @@
 
 					this.camera = new PerspectiveCamera( this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far );
 					this.resetCamera();
-					this.controls = new TrackballControls( this.camera, this.renderer.domElement );
+					this.trackballControls = new TrackballControls( this.camera, this.renderer.domElement );
 
-					let ambientLight = new AmbientLight( 0x404040 );
-					let directionalLight1 = new DirectionalLight( 0xC0C090 );
-					let directionalLight2 = new DirectionalLight( 0xC0C090 );
+					const ambientLight = new AmbientLight( 0x404040 );
+					const directionalLight1 = new DirectionalLight( 0xC0C090 );
+					const directionalLight2 = new DirectionalLight( 0xC0C090 );
 
-					directionalLight1.position.set( -100, -50, 100 );
-					directionalLight2.position.set( 100, 50, -100 );
+					directionalLight1.position.set( - 100, - 50, 100 );
+					directionalLight2.position.set( 100, 50, - 100 );
 
 					this.scene.add( directionalLight1 );
 					this.scene.add( directionalLight2 );
 					this.scene.add( ambientLight );
 
-					let helper = new GridHelper( 1200, 60, 0xFF4444, 0x404040 );
+					const helper = new GridHelper( 1200, 60, 0xFF4444, 0x404040 );
 					this.scene.add( helper );
+
 				},
 
 				initContent: function () {
-					let modelName = 'verificationCubes';
+
+					const modelName = 'verificationCubes';
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
-					let objLoader = new OBJLoader();
+					const objLoader = new OBJLoader();
 
-					let objLoader2 = new OBJLoader2();
+					const objLoader2 = new OBJLoader2();
 					objLoader2.setModelName( modelName );
 					objLoader2.setLogging( true, false );
 					objLoader2.setUseOAsMesh( true );
 
-					let scope = this;
-					let callbackOnLoad = function ( object3d ) {
+					const scope = this;
+					const callbackOnLoad = function ( object3d ) {
+
 						scope.scene.add( object3d );
 						console.log( 'Loading complete: ' + modelName );
 						scope._reportProgress( { detail: { text: '' } } );
+
 					};
 
-					let onLoadMtl = function ( mtlParseResult ) {
+					const onLoadMtl = function ( mtlParseResult ) {
+
 						objLoader.setMaterials( mtlParseResult );
 						objLoader.load( './verify.obj', function ( object ) {
-							object.position.y = -100;
+
+							object.position.y = - 100;
 							scope.scene.add( object );
+
 						} );
 
 						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ) );
 						objLoader2.load( './verify.obj', callbackOnLoad, null, null, null );
+
 					};
 
-					let mtlLoader = new MTLLoader();
+					const mtlLoader = new MTLLoader();
 					mtlLoader.load( './verify.mtl', onLoadMtl );
+
 				},
 
-				_reportProgress: function( event ) {
-					let output = ( event.detail !== undefined && event.detail !== null && event.detail.text !== undefined && event.detail.text !== null ) ? event.detail.text : '';
+				_reportProgress: function ( event ) {
+
+					const output = ( event.detail !== undefined && event.detail !== null && event.detail.text !== undefined && event.detail.text !== null ) ? event.detail.text : '';
 					console.log( 'Progress: ' + output );
 					document.getElementById( 'feedback' ).innerHTML = output;
+
 				},
 
 				resizeDisplayGL: function () {
-					this.controls.handleResize();
+
+					this.trackballControls.handleResize();
 
 					this.recalcAspectRatio();
 					this.renderer.setSize( this.canvas.offsetWidth, this.canvas.offsetHeight, false );
 
 					this.updateCamera();
+
 				},
 
 				recalcAspectRatio: function () {
+
 					this.aspectRatio = ( this.canvas.offsetHeight === 0 ) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
+
 				},
 
 				resetCamera: function () {
+
 					this.camera.position.copy( this.cameraDefaults.posCamera );
 					this.cameraTarget.copy( this.cameraDefaults.posCameraTarget );
 
 					this.updateCamera();
+
 				},
 
 				updateCamera: function () {
+
 					this.camera.aspect = this.aspectRatio;
 					this.camera.lookAt( this.cameraTarget );
 					this.camera.updateProjectionMatrix();
+
 				},
 
 				render: function () {
+
 					if ( ! this.renderer.autoClear ) this.renderer.clear();
-					this.controls.update();
+					this.trackballControls.update();
 					this.renderer.render( this.scene, this.camera );
+
 				}
+
 			};
 
-			let app = new OBJLoaderVerify( document.getElementById( 'example' ) );
+			const app = new OBJLoaderVerify( document.getElementById( 'example' ) );
 
-			let resizeWindow = function () {
+			const resizeWindow = function () {
+
 				app.resizeDisplayGL();
+
 			};
 
-			let render = function () {
+			const render = function () {
+
 				requestAnimationFrame( render );
 				app.render();
+
 			};
 
 			window.addEventListener( 'resize', resizeWindow, false );

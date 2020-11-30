@@ -21,7 +21,7 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			let container, controls;
+			let container, orbitControls;
 			let camera, scene, renderer;
 			let gui;
 
@@ -63,7 +63,7 @@
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, container );
+				orbitControls = new OrbitControls( camera, container );
 
 				window.addEventListener( 'resize', resize, false );
 
@@ -83,7 +83,7 @@
 
 			function animate() {
 
-				controls.update();
+				orbitControls.update();
 				renderer.render( scene, camera );
 
 				requestAnimationFrame( animate );

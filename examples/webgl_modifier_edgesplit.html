@@ -49,12 +49,12 @@
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
-				controls.enableDamping = true;
-				controls.dampingFactor = 0.25;
-				controls.rotateSpeed = 0.35;
-				controls.minZoom = 1;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render ); // use if there is no animation loop
+				orbitControls.enableDamping = true;
+				orbitControls.dampingFactor = 0.25;
+				orbitControls.rotateSpeed = 0.35;
+				orbitControls.minZoom = 1;
 				camera.position.set( 0, 0, 4 );
 
 				scene.add( new THREE.HemisphereLight( 0xffffff, 0x444444 ) );

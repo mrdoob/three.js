@@ -27,7 +27,7 @@
 			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
 
 			let container, stats;
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer, orbitControls;
 			let composer, effectFXAA, outlinePass;
 
 			let selectedObjects = [];
@@ -126,12 +126,12 @@
 				camera = new THREE.PerspectiveCamera( 45, width / height, 0.1, 100 );
 				camera.position.set( 0, 0, 8 );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 5;
-				controls.maxDistance = 20;
-				controls.enablePan = false;
-				controls.enableDamping = true;
-				controls.dampingFactor = 0.05;
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 5;
+				orbitControls.maxDistance = 20;
+				orbitControls.enablePan = false;
+				orbitControls.enableDamping = true;
+				orbitControls.dampingFactor = 0.05;
 
 				//
 
@@ -334,7 +334,7 @@
 
 				}
 
-				controls.update();
+				orbitControls.update();
 
 				composer.render();
 

@@ -58,11 +58,11 @@
 				camera.position.set( 0, 0, 30 );
 
 				// controls
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render );
-				controls.minDistance = 10;
-				controls.maxDistance = 50;
-				controls.enablePan = false;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render );
+				orbitControls.minDistance = 10;
+				orbitControls.maxDistance = 50;
+				orbitControls.enablePan = false;
 
 				// probe
 				lightProbe = new THREE.LightProbe();

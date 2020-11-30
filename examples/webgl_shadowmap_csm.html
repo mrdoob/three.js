@@ -23,7 +23,7 @@
 			import { CSM } from './jsm/csm/CSM.js';
 			import { CSMHelper } from './jsm/csm/CSMHelper.js';
 
-			let renderer, scene, camera, orthoCamera, controls, csm, csmHelper;
+			let renderer, scene, camera, orthoCamera, orbitControls, csm, csmHelper;
 
 			const params = {
 				orthographic: false,
@@ -49,7 +49,7 @@
 
 			function updateOrthoCamera() {
 
-				const size = controls.target.distanceTo( camera.position );
+				const size = orbitControls.target.distanceTo( camera.position );
 				const aspect = camera.aspect;
 
 				orthoCamera.left = size * aspect / - 2;
@@ -76,11 +76,11 @@
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.maxPolarAngle = Math.PI / 2;
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.maxPolarAngle = Math.PI / 2;
 				camera.position.set( 60, 60, 0 );
-				controls.target = new THREE.Vector3( - 100, 10, 0 );
-				controls.update();
+				orbitControls.target = new THREE.Vector3( - 100, 10, 0 );
+				orbitControls.update();
 
 				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.5 );
 				scene.add( ambientLight );
@@ -258,7 +258,7 @@
 
 				camera.updateMatrixWorld();
 				csm.update();
-				controls.update();
+				orbitControls.update();
 
 				if ( params.orthographic ) {
 

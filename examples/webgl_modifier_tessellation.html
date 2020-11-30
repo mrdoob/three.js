@@ -64,7 +64,7 @@
 
 			let renderer, scene, camera, stats;
 
-			let controls;
+			let trackballControls;
 
 			let mesh, uniforms;
 
@@ -178,7 +178,7 @@
 				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				controls = new TrackballControls( camera, renderer.domElement );
+				trackballControls = new TrackballControls( camera, renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -214,7 +214,7 @@
 
 				uniforms.amplitude.value = 1.0 + Math.sin( time * 0.5 );
 
-				controls.update();
+				trackballControls.update();
 
 				renderer.render( scene, camera );
 

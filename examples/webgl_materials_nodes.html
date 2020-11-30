@@ -33,7 +33,6 @@
 			const clock = new THREE.Clock(), fov = 50;
 			const frame = new Nodes.NodeFrame();
 			let teapot, mesh;
-			let controls;
 			let move = false;
 			let rtTexture, rtMaterial;
 			let gui;
@@ -129,9 +128,9 @@
 				camera.position.z = - 50;
 				camera.position.y = 30;
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 50;
-				controls.maxDistance = 200;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 50;
+				orbitControls.maxDistance = 200;
 
 				lightGroup = new THREE.Group();
 				scene.add( lightGroup );

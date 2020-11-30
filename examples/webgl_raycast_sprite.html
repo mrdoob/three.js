@@ -25,7 +25,7 @@
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 		let renderer, scene, camera;
-		let controls, group;
+		let group;
 
 		init();
 		animate();
@@ -50,8 +50,8 @@
 			camera.position.set( 15, 15, 15 );
 			camera.lookAt( scene.position );
 
-			controls = new OrbitControls( camera, renderer.domElement );
-			controls.enableRotate = true;
+			const orbitControls = new OrbitControls( camera, renderer.domElement );
+			orbitControls.enableRotate = true;
 
 			// add sprites
 

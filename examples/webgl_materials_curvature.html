@@ -130,9 +130,9 @@
 				renderer.autoClear = false;
 				document.body.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 20;
-				controls.maxDistance = 100;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 20;
+				orbitControls.maxDistance = 100;
 
 				const loader = new OBJLoader();
 				//load the obj

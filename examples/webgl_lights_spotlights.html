@@ -26,7 +26,7 @@
 
 			const camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 2000 );
 
-			const controls = new OrbitControls( camera, renderer.domElement );
+			const orbitControls = new OrbitControls( camera, renderer.domElement );
 
 			const scene = new THREE.Scene();
 
@@ -83,9 +83,9 @@
 				onResize();
 				window.addEventListener( 'resize', onResize, false );
 
-				controls.target.set( 0, 7, 0 );
-				controls.maxPolarAngle = Math.PI / 2;
-				controls.update();
+				orbitControls.target.set( 0, 7, 0 );
+				orbitControls.maxPolarAngle = Math.PI / 2;
+				orbitControls.update();
 
 			}
 

@@ -24,7 +24,7 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
-			let mesh, renderer, scene, camera, controls;
+			let mesh, renderer, scene, camera;
 			let gui, guiExposure = null;
 
 			const params = {
@@ -77,12 +77,12 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( - 1.8, 0.6, 2.7 );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
-				controls.enableZoom = false;
-				controls.enablePan = false;
-				controls.target.set( 0, 0, - 0.2 );
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render ); // use if there is no animation loop
+				orbitControls.enableZoom = false;
+				orbitControls.enablePan = false;
+				orbitControls.target.set( 0, 0, - 0.2 );
+				orbitControls.update();
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();

@@ -147,12 +147,12 @@
 
 			//
 
-			const controls = new OrbitControls( camera, renderer.domElement );
-			controls.target.set( 0, 0.1, 0 );
-			controls.update();
-			controls.minDistance = 0.5;
-			controls.maxDistance = 10;
-			controls.maxPolarAngle = 0.5 * Math.PI;
+			const orbitControls = new OrbitControls( camera, renderer.domElement );
+			orbitControls.target.set( 0, 0.1, 0 );
+			orbitControls.update();
+			orbitControls.minDistance = 0.5;
+			orbitControls.maxDistance = 10;
+			orbitControls.maxPolarAngle = 0.5 * Math.PI;
 
 			//
 

@@ -31,7 +31,6 @@
 		let renderer,
 			scene,
 			camera,
-			controls,
 			material,
 			volconfig,
 			cmtextures;
@@ -56,12 +55,12 @@
 			camera.up.set( 0, 0, 1 ); // In our data, z is up
 
 			// Create controls
-			controls = new OrbitControls( camera, renderer.domElement );
-			controls.addEventListener( 'change', render );
-			controls.target.set( 64, 64, 128 );
-			controls.minZoom = 0.5;
-			controls.maxZoom = 4;
-			controls.update();
+			const orbitControls = new OrbitControls( camera, renderer.domElement );
+			orbitControls.addEventListener( 'change', render );
+			orbitControls.target.set( 64, 64, 128 );
+			orbitControls.minZoom = 0.5;
+			orbitControls.maxZoom = 4;
+			orbitControls.update();
 
 			// scene.add( new AxesHelper( 128 ) );
 

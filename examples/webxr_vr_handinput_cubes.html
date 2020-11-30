@@ -27,8 +27,6 @@
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
 
-			let controls;
-
 			let grabbing = false;
 			const scaling = {
 				active: false,
@@ -53,9 +51,9 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 1.6, 3 );
 
-				controls = new OrbitControls( camera, container );
-				controls.target.set( 0, 1.6, 0 );
-				controls.update();
+				const orbitControls = new OrbitControls( camera, container );
+				orbitControls.target.set( 0, 1.6, 0 );
+				orbitControls.update();
 
 				const floorGeometry = new THREE.PlaneBufferGeometry( 4, 4 );
 				const floorMaterial = new THREE.MeshStandardMaterial( { color: 0x222222 } );

@@ -29,7 +29,7 @@
 			import { CSS3DRenderer, CSS3DSprite } from './jsm/renderers/CSS3DRenderer.js';
 
 			let camera, scene, renderer;
-			let controls;
+			let trackballControls;
 
 			const particlesTotal = 512;
 			const positions = [];
@@ -138,7 +138,7 @@
 
 				//
 
-				controls = new TrackballControls( camera, renderer.domElement );
+				trackballControls = new TrackballControls( camera, renderer.domElement );
 
 				//
 
@@ -189,7 +189,7 @@
 				requestAnimationFrame( animate );
 
 				TWEEN.update();
-				controls.update();
+				trackballControls.update();
 
 				const time = performance.now();
 

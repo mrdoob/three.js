@@ -27,7 +27,7 @@
 
 			let container, stats;
 
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer, trackballControls;
 
 			init();
 			animate();
@@ -53,7 +53,7 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 1000 );
 				camera.position.z = 2;
 
-				controls = new TrackballControls( camera, renderer.domElement );
+				trackballControls = new TrackballControls( camera, renderer.domElement );
 
 				//
 
@@ -148,7 +148,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				trackballControls.update();
 				renderer.render( scene, camera );
 
 				if ( statsEnabled ) stats.update();

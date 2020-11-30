@@ -30,7 +30,7 @@
 
 			const clock = new THREE.Clock();
 
-			let camera, controls, scene, renderer;
+			let camera, scene, renderer;
 			let mixer, skeletonHelper;
 
 			init();
@@ -70,9 +70,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 300;
-				controls.maxDistance = 700;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 300;
+				orbitControls.maxDistance = 700;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

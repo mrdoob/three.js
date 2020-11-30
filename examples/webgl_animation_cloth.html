@@ -560,10 +560,10 @@
 				renderer.shadowMap.enabled = true;
 
 				// controls
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.maxPolarAngle = Math.PI * 0.5;
-				controls.minDistance = 1000;
-				controls.maxDistance = 5000;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.maxPolarAngle = Math.PI * 0.5;
+				orbitControls.minDistance = 1000;
+				orbitControls.maxDistance = 5000;
 
 				// performance monitor
 

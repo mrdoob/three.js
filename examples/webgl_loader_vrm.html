@@ -24,7 +24,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { VRMLoader } from './jsm/loaders/VRMLoader.js';
 
-			let container, stats, controls;
+			let container, stats, orbitControls;
 			let camera, scene, renderer, light;
 
 			init();
@@ -96,12 +96,12 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 1;
-				controls.maxDistance = 5;
-				controls.enableDamping = true;
-				controls.target.set( 0, 0.9, 0 );
-				controls.update();
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 1;
+				orbitControls.maxDistance = 5;
+				orbitControls.enableDamping = true;
+				orbitControls.target.set( 0, 0.9, 0 );
+				orbitControls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -126,7 +126,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update(); // to support damping
+				orbitControls.update(); // to support damping
 
 				renderer.render( scene, camera );
 

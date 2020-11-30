@@ -31,7 +31,6 @@
 				const clock = new THREE.Clock(), fov = 50;
 				const frame = new NodeFrame();
 				let teapot, mesh, cloud;
-				let controls;
 				let gui;
 
 				const param = { load: 'caustic' };
@@ -55,9 +54,9 @@
 					cloud = new THREE.TextureLoader().load( 'textures/lava/cloud.png' );
 					cloud.wrapS = cloud.wrapT = THREE.RepeatWrapping;
 
-					controls = new OrbitControls( camera, renderer.domElement );
-					controls.minDistance = 50;
-					controls.maxDistance = 200;
+					const orbitControls = new OrbitControls( camera, renderer.domElement );
+					orbitControls.minDistance = 50;
+					orbitControls.maxDistance = 200;
 
 					scene.add( new THREE.AmbientLight( 0x464646 ) );
 

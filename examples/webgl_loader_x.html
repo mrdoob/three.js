@@ -27,7 +27,7 @@
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { XLoader } from './jsm/loaders/XLoader.js';
 
-		let container, stats, controls;
+		let container, stats;
 		let camera, scene, renderer;
 		const clock = new THREE.Clock();
 		let manager = null;
@@ -80,9 +80,9 @@
 			camera.position.set( 2, 10, - 28 );
 			camera.up.set( 0, 1, 0 );
 
-			controls = new OrbitControls( camera, renderer.domElement );
-			controls.target.set( 0, 5, 0 );
-			controls.update();
+			const orbitControls = new OrbitControls( camera, renderer.domElement );
+			orbitControls.target.set( 0, 5, 0 );
+			orbitControls.update();
 
 			const light = new THREE.DirectionalLight( 0xffffff, 1 );
 			light.position.set( 10, 100, - 10 ).normalize();

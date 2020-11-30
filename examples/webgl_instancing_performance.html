@@ -35,7 +35,7 @@
 		import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 		let container, stats, gui, guiStatsEl;
-		let camera, controls, scene, renderer, material;
+		let camera, orbitControls, scene, renderer, material;
 
 		// gui
 
@@ -257,8 +257,8 @@
 
 			// controls
 
-			controls = new OrbitControls( camera, renderer.domElement );
-			controls.autoRotate = true;
+			orbitControls = new OrbitControls( camera, renderer.domElement );
+			orbitControls.autoRotate = true;
 
 			// stats
 
@@ -305,7 +305,7 @@
 
 			requestAnimationFrame( animate );
 
-			controls.update();
+			orbitControls.update();
 			stats.update();
 
 			render();

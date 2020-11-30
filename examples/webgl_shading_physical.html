@@ -28,7 +28,7 @@
 
 			let mesh;
 
-			let controls;
+			let trackballControls;
 
 			let cubeCamera;
 
@@ -245,16 +245,16 @@
 
 				//
 
-				controls = new TrackballControls( camera, renderer.domElement );
-				controls.target.set( 0, 120, 0 );
+				trackballControls = new TrackballControls( camera, renderer.domElement );
+				trackballControls.target.set( 0, 120, 0 );
 
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
+				trackballControls.rotateSpeed = 1.0;
+				trackballControls.zoomSpeed = 1.2;
+				trackballControls.panSpeed = 0.8;
 
-				controls.staticMoving = true;
+				trackballControls.staticMoving = true;
 
-				controls.keys = [ 65, 83, 68 ];
+				trackballControls.keys = [ 65, 83, 68 ];
 
 
 				// STATS
@@ -315,7 +315,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls.handleResize();
+				trackballControls.handleResize();
 
 			}
 
@@ -337,7 +337,7 @@
 
 				const delta = clock.getDelta();
 
-				controls.update();
+				trackballControls.update();
 
 				if ( mixer ) {
 

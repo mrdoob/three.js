@@ -26,7 +26,7 @@
 
 			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 
-			let camera, controls, scene, renderer, light;
+			let camera, firstPersonControls, scene, renderer, light;
 
 			let material1, material2, material3;
 
@@ -209,12 +209,12 @@
 
 				//
 
-				controls = new FirstPersonControls( camera, renderer.domElement );
+				firstPersonControls = new FirstPersonControls( camera, renderer.domElement );
 
-				controls.movementSpeed = 70;
-				controls.lookSpeed = 0.05;
-				controls.noFly = true;
-				controls.lookVertical = false;
+				firstPersonControls.movementSpeed = 70;
+				firstPersonControls.lookSpeed = 0.05;
+				firstPersonControls.noFly = true;
+				firstPersonControls.lookVertical = false;
 
 				//
 
@@ -231,7 +231,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls.handleResize();
+				firstPersonControls.handleResize();
 
 			}
 
@@ -247,7 +247,7 @@
 
 				const delta = clock.getDelta();
 
-				controls.update( delta );
+				firstPersonControls.update( delta );
 
 				material1.emissive.b = analyser1.getAverageFrequency() / 256;
 				material2.emissive.b = analyser2.getAverageFrequency() / 256;

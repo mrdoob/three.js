@@ -61,8 +61,8 @@
 				} );
 				container.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableZoom = false;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.enableZoom = false;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

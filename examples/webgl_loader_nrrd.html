@@ -42,7 +42,7 @@
 			let container,
 				stats,
 				camera,
-				controls,
+				trackballControls,
 				scene,
 				renderer,
 				container2,
@@ -166,12 +166,12 @@
 				document.body.appendChild( container );
 				container.appendChild( renderer.domElement );
 
-				controls = new TrackballControls( camera, renderer.domElement );
-				controls.minDistance = 100;
-				controls.maxDistance = 500;
-				controls.rotateSpeed = 5.0;
-				controls.zoomSpeed = 5;
-				controls.panSpeed = 2;
+				trackballControls = new TrackballControls( camera, renderer.domElement );
+				trackballControls.minDistance = 100;
+				trackballControls.maxDistance = 500;
+				trackballControls.rotateSpeed = 5.0;
+				trackballControls.zoomSpeed = 5;
+				trackballControls.panSpeed = 2;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -191,7 +191,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls.handleResize();
+				trackballControls.handleResize();
 
 			}
 
@@ -199,11 +199,11 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				trackballControls.update();
 
 				//copy position of the camera into inset
 				camera2.position.copy( camera.position );
-				camera2.position.sub( controls.target );
+				camera2.position.sub( trackballControls.target );
 				camera2.position.setLength( 300 );
 				camera2.lookAt( scene2.position );
 

@@ -20,7 +20,7 @@
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
 			let camera, scene, renderer;
-			let controls;
+			let deviceOrientationControls;
 
 			const startButton = document.getElementById( 'startButton' );
 			startButton.addEventListener( 'click', function () {
@@ -37,7 +37,7 @@
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
 
-				controls = new DeviceOrientationControls( camera );
+				deviceOrientationControls = new DeviceOrientationControls( camera );
 
 				scene = new THREE.Scene();
 
@@ -115,7 +115,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				deviceOrientationControls.update();
 				renderer.render( scene, camera );
 
 			}

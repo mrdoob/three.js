@@ -27,7 +27,7 @@
 			import { ThreeMFLoader } from './jsm/loaders/3MFLoader.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			let camera, scene, renderer, object, loader, controls;
+			let camera, scene, renderer, object, loader, orbitControls;
 
 			const params = {
 				asset: 'cube_gears'
@@ -62,12 +62,12 @@
 				camera.position.set( - 100, - 250, 100 );
 				scene.add( camera );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render );
-				controls.minDistance = 50;
-				controls.maxDistance = 400;
-				controls.enablePan = false;
-				controls.update();
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render );
+				orbitControls.minDistance = 50;
+				orbitControls.maxDistance = 400;
+				orbitControls.enablePan = false;
+				orbitControls.update();
 
 				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
@@ -83,7 +83,7 @@
 					object.position.y += ( object.position.y - center.y );
 					object.position.z += ( object.position.z - center.z );
 
-					controls.reset();
+					orbitControls.reset();
 
 					scene.add( object );
 					render();

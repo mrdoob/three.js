@@ -58,7 +58,7 @@
 			import { TypedArrayUtils } from './jsm/utils/TypedArrayUtils.js';
 
 			let camera, scene, renderer;
-			let controls;
+			let firstPersonControls;
 
 			const amountOfParticles = 500000, maxDistance = Math.pow( 120, 2 );
 			let positions, alphas, particles, _particleGeom;
@@ -95,11 +95,11 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				controls = new FirstPersonControls( camera, renderer.domElement );
-				controls.movementSpeed = 100;
-				controls.lookSpeed = 0.1;
+				firstPersonControls = new FirstPersonControls( camera, renderer.domElement );
+				firstPersonControls.movementSpeed = 100;
+				firstPersonControls.lookSpeed = 0.1;
 
-				controls.lookAt( 500, 500, 500 );
+				firstPersonControls.lookAt( 500, 500, 500 );
 
 				// create the custom shader
 
@@ -163,7 +163,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls.handleResize();
+				firstPersonControls.handleResize();
 
 			}
 
@@ -174,7 +174,7 @@
 				//
 				displayNearest( camera.position );
 
-				controls.update( clock.getDelta() );
+				firstPersonControls.update( clock.getDelta() );
 
 				renderer.render( scene, camera );
 

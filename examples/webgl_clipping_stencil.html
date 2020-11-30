@@ -218,10 +218,10 @@
 				renderer.localClippingEnabled = true;
 
 				// Controls
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 2;
-				controls.maxDistance = 20;
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 2;
+				orbitControls.maxDistance = 20;
+				orbitControls.update();
 
 				// GUI
 				const gui = new GUI();

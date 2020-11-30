@@ -21,7 +21,7 @@
 
 			import { DeviceOrientationControls } from './jsm/controls/DeviceOrientationControls.js';
 
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer, deviceOrientationControls;
 
 			const startButton = document.getElementById( 'startButton' );
 			startButton.addEventListener( 'click', function () {
@@ -38,7 +38,7 @@
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
 
-				controls = new DeviceOrientationControls( camera );
+				deviceOrientationControls = new DeviceOrientationControls( camera );
 
 				scene = new THREE.Scene();
 
@@ -76,7 +76,7 @@
 
 				window.requestAnimationFrame( animate );
 
-				controls.update();
+				deviceOrientationControls.update();
 				renderer.render( scene, camera );
 
 			}

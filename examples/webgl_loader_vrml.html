@@ -22,7 +22,7 @@
 			import { VRMLLoader } from './jsm/loaders/VRMLLoader.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			let camera, scene, renderer, stats, controls, loader;
+			let camera, scene, renderer, stats, orbitControls, loader;
 
 			const params = {
 				asset: 'house'
@@ -78,10 +78,10 @@
 
 				// controls
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 1;
-				controls.maxDistance = 200;
-				controls.enableDamping = true;
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 1;
+				orbitControls.maxDistance = 200;
+				orbitControls.enableDamping = true;
 
 				//
 
@@ -123,7 +123,7 @@
 
 					vrmlScene = object;
 					scene.add( object );
-					controls.reset();
+					orbitControls.reset();
 
 				} );
 
@@ -142,7 +142,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update(); // to support damping
+				orbitControls.update(); // to support damping
 
 				renderer.render( scene, camera );
 

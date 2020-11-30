@@ -71,7 +71,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			let camera, scene, renderer, controls, stats;
+			let camera, scene, renderer, orbitControls, stats;
 			let target;
 			let postScene, postCamera, postMaterial;
 			let supportsExtension = true;
@@ -111,8 +111,8 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
 				camera.position.z = 4;
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableDamping = true;
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.enableDamping = true;
 
 				// Create a render target with depth texture
 				setupRenderTarget();
@@ -234,7 +234,7 @@
 				renderer.setRenderTarget( null );
 				renderer.render( postScene, postCamera );
 
-				controls.update(); // required because damping is enabled
+				orbitControls.update(); // required because damping is enabled
 
 				stats.update();
 

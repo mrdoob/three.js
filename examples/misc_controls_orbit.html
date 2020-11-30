@@ -28,7 +28,7 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			let camera, controls, scene, renderer;
+			let camera, orbitControls, scene, renderer;
 
 			init();
 			//render(); // remove when using next line for animation loop (requestAnimationFrame)
@@ -50,19 +50,19 @@
 
 				// controls
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				orbitControls = new OrbitControls( camera, renderer.domElement );
 
-				//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
+				//orbitControls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
 
-				controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
-				controls.dampingFactor = 0.05;
+				orbitControls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+				orbitControls.dampingFactor = 0.05;
 
-				controls.screenSpacePanning = false;
+				orbitControls.screenSpacePanning = false;
 
-				controls.minDistance = 100;
-				controls.maxDistance = 500;
+				orbitControls.minDistance = 100;
+				orbitControls.maxDistance = 500;
 
-				controls.maxPolarAngle = Math.PI / 2;
+				orbitControls.maxPolarAngle = Math.PI / 2;
 
 				// world
 
@@ -113,7 +113,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+				orbitControls.update(); // only required if orbitControls.enableDamping = true, or if orbitControls.autoRotate = true
 
 				render();
 

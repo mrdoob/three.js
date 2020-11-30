@@ -26,7 +26,7 @@
 			}
 
 			let renderer, scene, camera;
-			let controls;
+			let orbitControls;
 
 			init();
 			animate();
@@ -43,10 +43,10 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
 				camera.position.set( 0, 0, 4 );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.autoRotate = true;
-				controls.autoRotateSpeed = - 1.0;
-				controls.enableDamping = true;
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.autoRotate = true;
+				orbitControls.autoRotateSpeed = - 1.0;
+				orbitControls.enableDamping = true;
 
 				// Material
 
@@ -244,7 +244,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				orbitControls.update();
 
 				renderer.render( scene, camera );
 

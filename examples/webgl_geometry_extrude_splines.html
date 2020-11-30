@@ -259,9 +259,9 @@
 				} );
 				folderCamera.open();
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 100;
-				controls.maxDistance = 2000;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 100;
+				orbitControls.maxDistance = 2000;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

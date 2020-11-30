@@ -228,6 +228,7 @@
 									y1 = 2 * y - y1;
 
 								}
+
 								nx = eatNum();
 								ny = eatNum();
 								path.quadraticCurveTo( x1, y1, nx, ny );
@@ -431,9 +432,9 @@
 
 				//
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 100;
-				controls.maxDistance = 1000;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 100;
+				orbitControls.maxDistance = 1000;
 
 				//
 

@@ -32,7 +32,7 @@
 
 			let container, stats;
 
-			let camera, controls, scene, renderer;
+			let camera, firstPersonControls, scene, renderer;
 
 			const worldWidth = 128, worldDepth = 128;
 			const worldHalfWidth = worldWidth / 2;
@@ -159,11 +159,11 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new FirstPersonControls( camera, renderer.domElement );
+				firstPersonControls = new FirstPersonControls( camera, renderer.domElement );
 
-				controls.movementSpeed = 1000;
-				controls.lookSpeed = 0.125;
-				controls.lookVertical = true;
+				firstPersonControls.movementSpeed = 1000;
+				firstPersonControls.lookSpeed = 0.125;
+				firstPersonControls.lookVertical = true;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -181,7 +181,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls.handleResize();
+				firstPersonControls.handleResize();
 
 			}
 
@@ -231,7 +231,7 @@
 
 			function render() {
 
-				controls.update( clock.getDelta() );
+				firstPersonControls.update( clock.getDelta() );
 				renderer.render( scene, camera );
 
 			}

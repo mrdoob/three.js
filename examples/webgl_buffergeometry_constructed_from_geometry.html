@@ -20,7 +20,7 @@
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
-			let camera, scene, renderer, controls, stats;
+			let camera, scene, renderer, trackballControls, stats;
 
 			init();
 			animate();
@@ -38,10 +38,10 @@
 				camera.position.z = 480.0;
 				scene.add( camera );
 
-				controls = new TrackballControls( camera, renderer.domElement );
-				controls.minDistance = 100.0;
-				controls.maxDistance = 800.0;
-				controls.dynamicDampingFactor = 0.1;
+				trackballControls = new TrackballControls( camera, renderer.domElement );
+				trackballControls.minDistance = 100.0;
+				trackballControls.maxDistance = 800.0;
+				trackballControls.dynamicDampingFactor = 0.1;
 
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
 
@@ -176,7 +176,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				trackballControls.update();
 				stats.update();
 
 				renderer.render( scene, camera );

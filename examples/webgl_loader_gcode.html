@@ -49,10 +49,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
-				controls.minDistance = 10;
-				controls.maxDistance = 100;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render ); // use if there is no animation loop
+				orbitControls.minDistance = 10;
+				orbitControls.maxDistance = 100;
 
 				window.addEventListener( 'resize', resize, false );
 

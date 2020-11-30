@@ -47,11 +47,11 @@
 
 				camera.position.set( - 1.5, 2.5, 3.0 );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use only if there is no animation loop
-				controls.minDistance = 1;
-				controls.maxDistance = 10;
-				controls.enablePan = false;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render ); // use only if there is no animation loop
+				orbitControls.minDistance = 1;
+				orbitControls.maxDistance = 10;
+				orbitControls.enablePan = false;
 
 				const light = new THREE.HemisphereLight( 0xffffff, 0x080808, 1.5 );
 				light.position.set( - 1.25, 1, 1.25 );

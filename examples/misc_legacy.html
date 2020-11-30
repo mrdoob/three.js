@@ -17,7 +17,7 @@
 		<script>
 
 			var camera, scene, renderer;
-			var controls;
+			var orbitControls;
 
 			init();
 			animate();
@@ -36,9 +36,9 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 20 );
 				camera.position.set( 1.5, 0.2, 1.5 );
 
-				controls = new THREE.OrbitControls( camera, document.body );
-				controls.autoRotate = true;
-				controls.autoRotateSpeed = - 1.0;
+				orbitControls = new THREE.OrbitControls( camera, document.body );
+				orbitControls.autoRotate = true;
+				orbitControls.autoRotateSpeed = - 1.0;
 
 				var pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
@@ -84,7 +84,7 @@
 
 				renderer.setAnimationLoop( animate );
 
-				controls.update();
+				orbitControls.update();
 				renderer.render( scene, camera );
 
 			}

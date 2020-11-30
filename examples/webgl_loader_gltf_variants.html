@@ -97,12 +97,12 @@
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
-				controls.minDistance = 2;
-				controls.maxDistance = 10;
-				controls.target.set( 0, 0.5, - 0.2 );
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render ); // use if there is no animation loop
+				orbitControls.minDistance = 2;
+				orbitControls.maxDistance = 10;
+				orbitControls.target.set( 0, 0.5, - 0.2 );
+				orbitControls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

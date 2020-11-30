@@ -27,7 +27,7 @@
 
 			let container, stats, gui;
 
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer, orbitControls;
 
 			const lights = [];
 
@@ -84,7 +84,7 @@
 				camera.position.y = 2 * radius;
 				camera.position.z = 2 * radius;
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				orbitControls = new OrbitControls( camera, renderer.domElement );
 
 				//
 
@@ -224,7 +224,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				orbitControls.update();
 				updateLightsPossition();
 
 				renderer.render( scene, camera );

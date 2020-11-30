@@ -26,7 +26,7 @@
 			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
 			import { PixelShader } from './jsm/shaders/PixelShader.js';
 
-			let camera, scene, renderer, gui, composer, controls;
+			let camera, scene, renderer, gui, composer, trackballControls;
 			let pixelPass, params;
 
 			let group;
@@ -60,10 +60,10 @@
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 0, 30 );
-				controls = new TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 2.0;
-				controls.panSpeed = 0.8;
-				controls.zoomSpeed = 1.5;
+				trackballControls = new TrackballControls( camera, renderer.domElement );
+				trackballControls.rotateSpeed = 2.0;
+				trackballControls.panSpeed = 0.8;
+				trackballControls.zoomSpeed = 1.5;
 
 				scene = new THREE.Scene();
 
@@ -136,7 +136,7 @@
 
 			function update() {
 
-				controls.update();
+				trackballControls.update();
 				updateGUI();
 
 				group.rotation.y += .0015;

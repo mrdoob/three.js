@@ -23,7 +23,7 @@
 			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			let container, stats, clock, controls;
+			let container, stats, clock;
 			let camera, scene, renderer, mixer;
 
 			init();
@@ -88,12 +88,12 @@
 
 				//
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.screenSpacePanning = true;
-				controls.minDistance = 5;
-				controls.maxDistance = 40;
-				controls.target.set( 0, 2, 0 );
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.screenSpacePanning = true;
+				orbitControls.minDistance = 5;
+				orbitControls.maxDistance = 40;
+				orbitControls.target.set( 0, 2, 0 );
+				orbitControls.update();
 
 				//
 

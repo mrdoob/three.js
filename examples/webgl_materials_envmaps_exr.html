@@ -30,7 +30,7 @@
 			};
 
 			let container, stats;
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer;
 			let torusMesh, planeMesh;
 			let pngCubeRenderTarget, exrCubeRenderTarget;
 			let pngBackground, exrBackground;
@@ -113,9 +113,9 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 50;
-				controls.maxDistance = 300;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 50;
+				orbitControls.maxDistance = 300;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

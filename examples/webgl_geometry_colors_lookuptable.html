@@ -94,8 +94,8 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				const controls = new OrbitControls( perpCamera, renderer.domElement );
-				controls.addEventListener( 'change', render );
+				const orbitControls = new OrbitControls( perpCamera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render );
 
 				const gui = new GUI();
 

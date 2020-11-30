@@ -92,9 +92,9 @@
 				mshStdKnot.receiveShadow = true;
 				scene.add( mshStdKnot );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.copy( mshStdBox.position );
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.target.copy( mshStdBox.position );
+				orbitControls.update();
 
 				// GUI
 

@@ -28,7 +28,6 @@
 			/*global window */
 
 			let camera, scene, renderer;
-			let cameraControls;
 			let effectController;
 			const teapotSize = 400;
 			let ambientLight, light;
@@ -80,8 +79,8 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				// CONTROLS
-				cameraControls = new OrbitControls( camera, renderer.domElement );
-				cameraControls.addEventListener( 'change', render );
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
 				const loader = new THREE.TextureLoader();

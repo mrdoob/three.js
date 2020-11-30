@@ -187,9 +187,9 @@
 
 				new SimpleGI( renderer, scene );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 1;
-				controls.maxDistance = 10;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 1;
+				orbitControls.maxDistance = 10;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

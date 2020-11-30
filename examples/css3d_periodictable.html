@@ -221,7 +221,7 @@
 			];
 
 			let camera, scene, renderer;
-			let controls;
+			let trackballControls;
 
 			const objects = [];
 			const targets = { table: [], sphere: [], helix: [], grid: [] };
@@ -341,10 +341,10 @@
 
 				//
 
-				controls = new TrackballControls( camera, renderer.domElement );
-				controls.minDistance = 500;
-				controls.maxDistance = 6000;
-				controls.addEventListener( 'change', render );
+				trackballControls = new TrackballControls( camera, renderer.domElement );
+				trackballControls.minDistance = 500;
+				trackballControls.maxDistance = 6000;
+				trackballControls.addEventListener( 'change', render );
 
 				const buttonTable = document.getElementById( 'table' );
 				buttonTable.addEventListener( 'click', function () {
@@ -427,7 +427,7 @@
 
 				TWEEN.update();
 
-				controls.update();
+				trackballControls.update();
 
 			}
 

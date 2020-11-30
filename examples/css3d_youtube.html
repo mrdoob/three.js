@@ -31,7 +31,7 @@
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
 			let camera, scene, renderer;
-			let controls;
+			let trackballControls;
 
 			function Element( id, x, y, z, ry ) {
 
@@ -53,7 +53,7 @@
 
 				return object;
 
-			};
+			}
 
 			init();
 			animate();
@@ -78,8 +78,8 @@
 				group.add( new Element( '9ubytEsCaS0', - 240, 0, 0, - Math.PI / 2 ) );
 				scene.add( group );
 
-				controls = new TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 4;
+				trackballControls = new TrackballControls( camera, renderer.domElement );
+				trackballControls.rotateSpeed = 4;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -88,12 +88,12 @@
 				const blocker = document.getElementById( 'blocker' );
 				blocker.style.display = 'none';
 
-				controls.addEventListener( 'start', function () {
+				trackballControls.addEventListener( 'start', function () {
 
 					blocker.style.display = '';
 
 				} );
-				controls.addEventListener( 'end', function () {
+				trackballControls.addEventListener( 'end', function () {
 
 					blocker.style.display = 'none';
 
@@ -112,7 +112,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-				controls.update();
+				trackballControls.update();
 				renderer.render( scene, camera );
 
 			}

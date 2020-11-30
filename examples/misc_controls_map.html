@@ -30,7 +30,7 @@
 
 			import { MapControls } from './jsm/controls/OrbitControls.js';
 
-			let camera, controls, scene, renderer;
+			let camera, mapControls, scene, renderer;
 
 			init();
 			//render(); // remove when using next line for animation loop (requestAnimationFrame)
@@ -52,19 +52,19 @@
 
 				// controls
 
-				controls = new MapControls( camera, renderer.domElement );
+				mapControls = new MapControls( camera, renderer.domElement );
 
-				//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
+				//mapControls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
 
-				controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
-				controls.dampingFactor = 0.05;
+				mapControls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+				mapControls.dampingFactor = 0.05;
 
-				controls.screenSpacePanning = false;
+				mapControls.screenSpacePanning = false;
 
-				controls.minDistance = 100;
-				controls.maxDistance = 500;
+				mapControls.minDistance = 100;
+				mapControls.maxDistance = 500;
 
-				controls.maxPolarAngle = Math.PI / 2;
+				mapControls.maxPolarAngle = Math.PI / 2;
 
 				// world
 
@@ -106,7 +106,7 @@
 
 
 				const gui = new GUI();
-				gui.add( controls, 'screenSpacePanning' );
+				gui.add( mapControls, 'screenSpacePanning' );
 
 			}
 
@@ -123,7 +123,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+				mapControls.update(); // only required if mapControls.enableDamping = true, or if mapControls.autoRotate = true
 
 				render();
 

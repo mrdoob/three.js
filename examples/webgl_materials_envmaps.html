@@ -21,7 +21,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			let controls, camera, scene, renderer;
+			let camera, scene, renderer;
 			let textureEquirec, textureCube;
 			let sphereMesh, sphereMaterial;
 
@@ -77,9 +77,9 @@
 
 				//
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 500;
-				controls.maxDistance = 2500;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 500;
+				orbitControls.maxDistance = 2500;
 
 				//
 

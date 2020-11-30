@@ -99,11 +99,11 @@
 				container.appendChild( renderer.domElement );
 
 				//controls
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableZoom = false;
-				controls.enablePan = false;
-				controls.minPolarAngle = Math.PI / 4;
-				controls.maxPolarAngle = Math.PI / 1.5;
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.enableZoom = false;
+				orbitControls.enablePan = false;
+				orbitControls.minPolarAngle = Math.PI / 4;
+				orbitControls.maxPolarAngle = Math.PI / 1.5;
 
 				//stats
 				stats = new Stats();

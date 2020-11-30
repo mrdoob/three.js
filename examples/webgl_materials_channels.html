@@ -40,7 +40,7 @@
 			};
 
 			let cameraOrtho, cameraPerspective;
-			let controlsOrtho, controlsPerspective;
+			let orbitControlsOrtho, orbitControlsPerspective;
 
 			let mesh, materialStandard, materialDepthBasic, materialDepthRGBA, materialNormal;
 
@@ -87,17 +87,17 @@
 
 				camera = cameraPerspective;
 
-				controlsPerspective = new OrbitControls( cameraPerspective, renderer.domElement );
-				controlsPerspective.minDistance = 1000;
-				controlsPerspective.maxDistance = 2400;
-				controlsPerspective.enablePan = false;
-				controlsPerspective.enableDamping = true;
+				orbitControlsPerspective = new OrbitControls( cameraPerspective, renderer.domElement );
+				orbitControlsPerspective.minDistance = 1000;
+				orbitControlsPerspective.maxDistance = 2400;
+				orbitControlsPerspective.enablePan = false;
+				orbitControlsPerspective.enableDamping = true;
 
-				controlsOrtho = new OrbitControls( cameraOrtho, renderer.domElement );
-				controlsOrtho.minZoom = 0.5;
-				controlsOrtho.maxZoom = 1.5;
-				controlsOrtho.enablePan = false;
-				controlsOrtho.enableDamping = true;
+				orbitControlsOrtho = new OrbitControls( cameraOrtho, renderer.domElement );
+				orbitControlsOrtho.minZoom = 0.5;
+				orbitControlsOrtho.maxZoom = 1.5;
+				orbitControlsOrtho.enablePan = false;
+				orbitControlsOrtho.enableDamping = true;
 
 				// lights
 
@@ -280,8 +280,8 @@
 
 				}
 
-				controlsPerspective.update();
-				controlsOrtho.update(); // must update both controls for damping to complete
+				orbitControlsPerspective.update();
+				orbitControlsOrtho.update(); // must update both controls for damping to complete
 
 				renderer.render( scene, camera );
 

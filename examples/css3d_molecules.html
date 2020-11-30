@@ -73,7 +73,7 @@
 			import { CSS3DRenderer, CSS3DObject, CSS3DSprite } from './jsm/renderers/CSS3DRenderer.js';
 
 			let camera, scene, renderer;
-			let controls;
+			let trackballControls;
 			let root;
 
 			const objects = [];
@@ -133,8 +133,8 @@
 
 				//
 
-				controls = new TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 0.5;
+				trackballControls = new TrackballControls( camera, renderer.domElement );
+				trackballControls.rotateSpeed = 0.5;
 
 				//
 
@@ -492,7 +492,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-				controls.update();
+				trackballControls.update();
 
 				const time = Date.now() * 0.0004;
 

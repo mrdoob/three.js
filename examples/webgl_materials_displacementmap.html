@@ -25,7 +25,7 @@
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			let stats;
 
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer, orbitControls;
 			const settings = {
 				metalness: 1.0,
 				roughness: 0.4,
@@ -117,9 +117,9 @@
 				camera.position.z = 1500;
 				scene.add( camera );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableZoom = false;
-				controls.enableDamping = true;
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.enableZoom = false;
+				orbitControls.enableDamping = true;
 
 				// lights
 
@@ -230,7 +230,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				orbitControls.update();
 
 				stats.begin();
 				render();

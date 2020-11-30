@@ -20,7 +20,7 @@
 
 			let container;
 
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer, flyControls;
 
 			const clock = new THREE.Clock();
 
@@ -89,9 +89,9 @@
 
 				//
 
-				controls = new FlyControls( camera, renderer.domElement );
-				controls.movementSpeed = 1000;
-				controls.rollSpeed = Math.PI / 10;
+				flyControls = new FlyControls( camera, renderer.domElement );
+				flyControls.movementSpeed = 1000;
+				flyControls.rollSpeed = Math.PI / 10;
 
 				//
 
@@ -117,7 +117,7 @@
 
 			function render() {
 
-				controls.update( clock.getDelta() );
+				flyControls.update( clock.getDelta() );
 
 				renderer.render( scene, camera );
 

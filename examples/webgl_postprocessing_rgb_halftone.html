@@ -50,9 +50,9 @@
 				document.body.appendChild( stats.dom );
 
 				// camera controls
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.target.set( 0, 0, 0 );
+				orbitControls.update();
 
 				// scene
 

@@ -42,8 +42,6 @@
 			const characters = [];
 			let nCharacters = 0;
 
-			let cameraControls;
-
 			const controls = {
 
 				moveForward: false,
@@ -143,10 +141,10 @@
 
 				// CONTROLS
 
-				cameraControls = new OrbitControls( camera, renderer.domElement );
-				cameraControls.target.set( 0, 50, 0 );
-				cameraControls.enableKeys = false;
-				cameraControls.update();
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.target.set( 0, 50, 0 );
+				orbitControls.enableKeys = false;
+				orbitControls.update();
 
 				// CHARACTER
 
