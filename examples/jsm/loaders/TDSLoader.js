@@ -895,7 +895,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	/**
 	 * Read percentage value.
 	 *
-	 * @method readWord
+	 * @method readPercentage
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
