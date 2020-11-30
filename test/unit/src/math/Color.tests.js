@@ -2,6 +2,7 @@
 
 import { Color } from '../../../../src/math/Color';
 import { eps } from './Constants.tests';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -483,7 +484,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setStyleRGBARed", ( assert ) => {
 
 			var c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
 			c.setStyle( 'rgba(255,0,0,0.5)' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok( c.r == 1, "Red: " + c.r );
 			assert.ok( c.g === 0, "Green: " + c.g );
 			assert.ok( c.b === 0, "Blue: " + c.b );
