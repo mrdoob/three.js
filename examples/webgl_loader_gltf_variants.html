@@ -24,6 +24,8 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
+			import GLTFMaterialsVariantsExtension from './jsm/loaders/gltf_plugins/KHR_materials_variants.js';
+
 			let camera, scene, renderer;
 			let gui;
 
@@ -59,7 +61,12 @@
 
 						// model
 
-						const loader = new GLTFLoader().setPath( 'models/gltf/MaterialsVariantsShoe/glTF/' );
+						const loader = new GLTFLoader().register( function ( parser ) {
+
+							return new GLTFMaterialsVariantsExtension( parser );
+
+						} ).setPath( 'models/gltf/MaterialsVariantsShoe/glTF/' );
+
 						loader.load( 'MaterialsVariantsShoe.gltf', function ( gltf ) {
 
 							gltf.scene.scale.set( 10.0, 10.0, 10.0 );
