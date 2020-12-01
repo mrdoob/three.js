@@ -31,6 +31,16 @@
 
 			let renderer, stats, scene, camera, gui, guiData;
 
+			const extrudeSettings = {
+				steps: 2,
+				depth: 16,
+				bevelEnabled: true,
+				bevelThickness: 1,
+				bevelSize: 1,
+				bevelOffset: 0,
+				bevelSegments: 1
+			};
+
 			init();
 			animate();
 
@@ -71,7 +81,9 @@
 					drawFillShapes: true,
 					drawStrokes: true,
 					fillShapesWireframe: false,
-					strokesWireframe: false
+					strokesWireframe: false,
+					extrudeFillShapes: false,
+					extrudeStrokes: false,
 				};
 
 				loadSVG( guiData.currentURL );
@@ -116,6 +128,10 @@
 				gui.add( guiData, 'strokesWireframe' ).name( 'Wireframe strokes' ).onChange( update );
 
 				gui.add( guiData, 'fillShapesWireframe' ).name( 'Wireframe fill shapes' ).onChange( update );
+
+				gui.add( guiData, 'extrudeFillShapes' ).name( 'Extrude fill shapes' ).onChange( update );
+
+				gui.add( guiData, 'extrudeStrokes' ).name( 'Extrude strokes' ).onChange( update );
 
 				function update() {
 
@@ -174,7 +190,7 @@
 
 								const shape = shapes[ j ];
 
-								const geometry = new THREE.ShapeBufferGeometry( shape );
+								const geometry = guiData.extrudeFillShapes ? new THREE.ExtrudeBufferGeometry( shape, extrudeSettings ) : new THREE.ShapeBufferGeometry( shape );
 								const mesh = new THREE.Mesh( geometry, material );
 
 								group.add( mesh );
@@ -200,7 +216,7 @@
 
 								const subPath = path.subPaths[ j ];
 
-								const geometry = SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
+								const geometry = SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style, undefined, undefined, guiData.extrudeStrokes, extrudeSettings );
 
 								if ( geometry ) {
 

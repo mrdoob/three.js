@@ -30,7 +30,7 @@ export class SVGLoader extends Loader {
 	parse( text: string ) : SVGResult;
 
 	static getStrokeStyle( width?: number, color?: string, lineJoin?: string, lineCap?: string, miterLimit?: number ): StrokeStyle;
-	static pointsToStroke( points: Vector3[], style: StrokeStyle, arcDivisions?: number, minDistance?: number ): BufferGeometry;
+	static pointsToStroke( points: Vector3[], style: StrokeStyle, arcDivisions?: number, minDistance?: number, extrude?: boolean, extrudeOptions?: { steps: number, depth: number } ): BufferGeometry;
 	static pointsToStrokeWithBuffers( points: Vector3[], style: StrokeStyle, arcDivisions?: number, minDistance?: number, vertices?: number[], normals?: number[], uvs?: number[], vertexOffset?: number ): number;
 
 }
