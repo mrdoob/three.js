@@ -174,7 +174,7 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 			this.renderTargetsHorizontal[ i ].setSize( resx, resy );
 			this.renderTargetsVertical[ i ].setSize( resx, resy );
 
-			this.separableBlurMaterials[ i ].uniforms[ "texSize" ].value = new THREE.Vector2( resx, resy );
+			this.separableBlurMaterials[ i ].uniforms[ "texSize" ].value = new THREE.Vector2( resx / window.devicePixelRatio, resy / window.devicePixelRatio );
 
 			resx = Math.round( resx / 2 );
 			resy = Math.round( resy / 2 );

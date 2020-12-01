@@ -190,7 +190,7 @@ UnrealBloomPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 			this.renderTargetsHorizontal[ i ].setSize( resx, resy );
 			this.renderTargetsVertical[ i ].setSize( resx, resy );
 
-			this.separableBlurMaterials[ i ].uniforms[ "texSize" ].value = new Vector2( resx, resy );
+			this.separableBlurMaterials[ i ].uniforms[ "texSize" ].value = new Vector2( resx / window.devicePixelRatio, resy / window.devicePixelRatio );
 
 			resx = Math.round( resx / 2 );
 			resy = Math.round( resy / 2 );
