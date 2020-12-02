@@ -209,6 +209,7 @@ Continuing that same pattern let's add a moon.
 
 const earthMaterial = new THREE.MeshPhongMaterial({color: 0x2233FF, emissive: 0x112244});
 const earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial);
+-earthMesh.position.x = 10; // note that this offset is already set in its parent's THREE.Object3D object "earthOrbit"
 -solarSystem.add(earthMesh);
 +earthOrbit.add(earthMesh);
 objects.push(earthMesh);
