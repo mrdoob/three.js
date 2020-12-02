@@ -42,14 +42,17 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			let camera, scene, renderer;
-			let mesh, sprite, texture;
+			let line, sprite, texture;
 
 			let cameraOrtho, sceneOrtho;
+
+			let offset = 0;
 
 			const dpr = window.devicePixelRatio;
 
 			const textureSize = 128 * dpr;
 			const vector = new THREE.Vector2();
+			const color = new THREE.Color();
 
 			init();
 			animate();
@@ -68,24 +71,26 @@
 				cameraOrtho.position.z = 10;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x20252f );
 				sceneOrtho = new THREE.Scene();
 
 				//
 
-				const geometry = new THREE.TorusKnotBufferGeometry( 3, 1, 256, 32 );
-				const material = new THREE.MeshStandardMaterial( { color: 0x6083c2 } );
+				const points = generatePoints();
 
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+				const geometry = new THREE.BufferGeometry();
+				const positionAttribute = new THREE.Float32BufferAttribute( points, 3 );
+				geometry.setAttribute( 'position', positionAttribute );
+				geometry.center();
 
-				//
-				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
-				scene.add( ambientLight );
+				const colorAttribute = new THREE.BufferAttribute( new Float32Array( positionAttribute.array.length ), 3 );
+				colorAttribute.setUsage( THREE.DynamicDrawUsage );
+				geometry.setAttribute( 'color', colorAttribute );
 
-				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-				camera.add( pointLight );
-				scene.add( camera );
+				const material = new THREE.LineBasicMaterial( { vertexColors: true } );
+
+				line = new THREE.Line( geometry, material );
+				line.scale.setScalar( 0.05 );
+				scene.add( line );
 
 				//
 
@@ -160,8 +165,10 @@
 
 				requestAnimationFrame( animate );
 
-				mesh.rotation.x += 0.005;
-				mesh.rotation.y += 0.01;
+				const colorAttribute = line.geometry.getAttribute( 'color' );
+				updateColors( colorAttribute );
+
+				// scene rendering
 
 				renderer.clear();
 				renderer.render( scene, camera );
@@ -175,6 +182,118 @@
 
 				renderer.clearDepth();
 				renderer.render( sceneOrtho, cameraOrtho );
+
+			}
+
+			function updateColors( colorAttribute ) {
+
+				const l = colorAttribute.count;
+
+				for ( let i = 0; i < l; i ++ ) {
+
+					const h = ( ( offset + i ) % l ) / l;
+
+					color.setHSL( h, 1, 0.5 );
+					colorAttribute.setX( i, color.r );
+					colorAttribute.setY( i, color.g );
+					colorAttribute.setZ( i, color.b );
+
+				}
+
+				colorAttribute.needsUpdate = true;
+
+				offset -= 25;
+
+			}
+
+			//
+
+			function generatePoints() {
+
+				// generate gosper curve (from https://gist.github.com/nitaku/6521802)
+
+				const gosper = fractalize( {
+					axiom: 'A',
+					steps: 4,
+					rules: {
+						A: 'A+BF++BF-FA--FAFA-BF+',
+						B: '-FA+BFBF++BF+FA--FA-B'
+					}
+				} );
+
+				const points = toPoints( {
+					fractal: gosper,
+					side: 8,
+					angle: Math.PI / 3
+				} );
+
+				return points;
+
+			}
+
+			function fractalize( config ) {
+
+				let output;
+				let input = config.axiom;
+
+				for ( let i = 0, il = config.steps; 0 <= il ? i < il : i > il; 0 <= il ? i ++ : i -- ) {
+
+					output = '';
+
+					for ( let j = 0, jl = input.length; j < jl; j ++ ) {
+
+						const char = input[ j ];
+
+						if ( char in config.rules ) {
+
+							output += config.rules[ char ];
+
+						} else {
+
+							output += char;
+
+						}
+
+					}
+
+					input = output;
+
+				}
+
+				return output;
+
+			}
+
+			function toPoints( config ) {
+
+				let currX = 0, currY = 0;
+				let angle = 0;
+				const path = [ 0, 0, 0 ];
+				const fractal = config.fractal;
+
+				for ( let i = 0, l = fractal.length; i < l; i ++ ) {
+
+					const char = fractal[ i ];
+
+					if ( char === '+' ) {
+
+						angle += config.angle;
+
+					} else if ( char === '-' ) {
+
+						angle -= config.angle;
+
+					} else if ( char === 'F' ) {
+
+						currX += config.side * Math.cos( angle );
+						currY += - config.side * Math.sin( angle );
+						path.push( currX, currY, 0 );
+
+					}
+
+				}
+
+				return path;
 
 			}
 
