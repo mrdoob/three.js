@@ -70,7 +70,6 @@ export class GLTFParser {
 
 export interface GLTFLoaderPlugin {
 
-	_markDefs?: () => void;
 	loadMesh?: ( meshIndex: number ) => Promise<Group | Mesh | SkinnedMesh> | null;
 	loadBufferView?: ( bufferViewIndex: number ) => Promise<ArrayBuffer> | null;
 	loadMaterial?: ( materialIndex: number ) => Promise<Material> | null;
