@@ -48,6 +48,7 @@ import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { Scene } from '../scenes/Scene.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
 import { Texture } from '../textures/Texture.js';
+import { CompressedTexture } from '../textures/CompressedTexture.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { ImageLoader } from './ImageLoader.js';
 import { LoadingManager } from './LoadingManager.js';
@@ -615,7 +616,10 @@ class ObjectLoader extends Loader {
 
 				} else {
 
-					return null;
+					return {
+						width: image.width || 0,
+						height: image.height || 0
+					};
 
 				}
 
@@ -733,14 +737,35 @@ class ObjectLoader extends Loader {
 					if ( image && image.data ) {
 
 						texture = new DataTexture( image.data, image.width, image.height );
+						texture.needsUpdate = true;
+
+					} else if ( image && Array.isArray( data.mipmaps ) ) {
+
+						const mipmaps = [];
+
+						for ( let i = 0, l = data.mipmaps.length; i < l; i ++ ) {
+
+							const mipmap = data.mipmaps[ i ];
+
+							mipmaps.push( {
+								data: getTypedArray( mipmap.type, mipmap.data ),
+								width: mipmap.width,
+								height: mipmap.height
+							} );
+
+						}
+
+						texture = new CompressedTexture( mipmaps, image.width, image.height );
+
+						if ( mipmaps.length > 0 ) texture.needsUpdate = true;
 
 					} else {
 
 						texture = new Texture( image );
 
-					}
+						if ( image ) texture.needsUpdate = true; // textures can have undefined image data
 
-					if ( image ) texture.needsUpdate = true; // textures can have undefined image data
+					}
 
 				}
 

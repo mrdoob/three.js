@@ -228,6 +228,22 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		}
 
+		const mipmaps = this.mipmaps;
+
+		if ( Array.isArray( mipmaps ) === true ) {
+
+			output.mipmaps = [];
+
+			for ( let i = 0, l = mipmaps.length; i < l; i ++ ) {
+
+				const mipmap = mipmaps[ i ];
+
+				output.mipmaps.push( serializeImage( mipmap ) );
+
+			}
+
+		}
+
 		if ( ! isRootObject ) {
 
 			meta.textures[ this.uuid ] = output;
@@ -350,7 +366,7 @@ function serializeImage( image ) {
 
 		if ( image.data ) {
 
-			// images of DataTexture
+			// images of DataTexture and mipmaps of CompressedTexture
 
 			return {
 				data: Array.prototype.slice.call( image.data ),
@@ -361,8 +377,10 @@ function serializeImage( image ) {
 
 		} else {
 
-			console.warn( 'THREE.Texture: Unable to serialize Texture.' );
-			return {};
+			return {
+				width: image.width || 0,
+				height: image.height || 0
+			};
 
 		}
 
