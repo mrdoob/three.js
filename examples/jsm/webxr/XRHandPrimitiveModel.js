@@ -36,13 +36,13 @@ class XRHandPrimitiveModel {
 			const tipMaterial = new MeshStandardMaterial( { color: 0x999999, roughness: 1, metalness: 0 } );
 
 			const tipIndexes = [
-				window.XRHand.THUMB_PHALANX_TIP,
-				window.XRHand.INDEX_PHALANX_TIP,
-				window.XRHand.MIDDLE_PHALANX_TIP,
-				window.XRHand.RING_PHALANX_TIP,
-				window.XRHand.LITTLE_PHALANX_TIP
+				4,
+				9,
+				14,
+				19,
+				24,
 			];
-			for ( let i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
+			for ( let i = 0; i <= 24; i ++ ) {
 
 				var cube = new Mesh( geometry, tipIndexes.indexOf( i ) !== - 1 ? tipMaterial : jointMaterial );
 				cube.castShadow = true;
