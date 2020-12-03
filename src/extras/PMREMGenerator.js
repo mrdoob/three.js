@@ -297,6 +297,7 @@ class PMREMGenerator {
 				cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
 
 			}
+
 			cubeCamera.position.copy( origin );
 
 			_setViewport( cubeUVRenderTarget,
