@@ -2,20 +2,20 @@ import { Camera } from './Camera.js';
 import { Object3D } from '../core/Object3D.js';
 import { MathUtils } from '../math/MathUtils.js';
 
-function PerspectiveCamera( fov, aspect, near, far ) {
+function PerspectiveCamera( fov = 50, aspect = 1, near = 0.1, far = 2000 ) {
 
 	Camera.call( this );
 
 	this.type = 'PerspectiveCamera';
 
-	this.fov = fov !== undefined ? fov : 50;
+	this.fov = fov;
 	this.zoom = 1;
 
-	this.near = near !== undefined ? near : 0.1;
-	this.far = far !== undefined ? far : 2000;
+	this.near = near;
+	this.far = far;
 	this.focus = 10;
 
-	this.aspect = aspect !== undefined ? aspect : 1;
+	this.aspect = aspect;
 	this.view = null;
 
 	this.filmGauge = 35;	// width of the film (default in millimeters)

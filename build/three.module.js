@@ -1,5 +1,5 @@
 // threejs.org/license
-const REVISION = '123dev';
+const REVISION = '123';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -1374,7 +1374,7 @@ const ImageUtils = {
 
 let textureId = 0;
 
-function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+function Texture( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1, encoding = LinearEncoding ) {
 
 	Object.defineProperty( this, 'id', { value: textureId ++ } );
 
@@ -1382,22 +1382,22 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.name = '';
 
-	this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
+	this.image = image;
 	this.mipmaps = [];
 
-	this.mapping = mapping !== undefined ? mapping : Texture.DEFAULT_MAPPING;
+	this.mapping = mapping;
 
-	this.wrapS = wrapS !== undefined ? wrapS : ClampToEdgeWrapping;
-	this.wrapT = wrapT !== undefined ? wrapT : ClampToEdgeWrapping;
+	this.wrapS = wrapS;
+	this.wrapT = wrapT;
 
-	this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
-	this.minFilter = minFilter !== undefined ? minFilter : LinearMipmapLinearFilter;
+	this.magFilter = magFilter;
+	this.minFilter = minFilter;
 
-	this.anisotropy = anisotropy !== undefined ? anisotropy : 1;
+	this.anisotropy = anisotropy;
 
-	this.format = format !== undefined ? format : RGBAFormat;
+	this.format = format;
 	this.internalFormat = null;
-	this.type = type !== undefined ? type : UnsignedByteType;
+	this.type = type;
 
 	this.offset = new Vector2( 0, 0 );
 	this.repeat = new Vector2( 1, 1 );
@@ -1416,7 +1416,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	//
 	// Also changing the encoding after already used by a Material will not automatically make the Material
 	// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
-	this.encoding = encoding !== undefined ? encoding : LinearEncoding;
+	this.encoding = encoding;
 
 	this.version = 0;
 	this.onUpdate = null;
@@ -1552,7 +1552,17 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 					for ( let i = 0, l = image.length; i < l; i ++ ) {
 
-						url.push( ImageUtils.getDataURL( image[ i ] ) );
+						// check cube texture with data textures
+
+						if ( image[ i ].isDataTexture ) {
+
+							url.push( serializeImage( image[ i ].image ) );
+
+						} else {
+
+							url.push( serializeImage( image[ i ] ) );
+
+						}
 
 					}
 
@@ -1560,7 +1570,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 					// process single image
 
-					url = ImageUtils.getDataURL( image );
+					url = serializeImage( image );
 
 				}
 
@@ -1682,6 +1692,40 @@ Object.defineProperty( Texture.prototype, "needsUpdate", {
 	}
 
 } );
+
+function serializeImage( image ) {
+
+	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
+
+		// default images
+
+		return ImageUtils.getDataURL( image );
+
+	} else {
+
+		if ( image.data ) {
+
+			// images of DataTexture
+
+			return {
+				data: Array.prototype.slice.call( image.data ),
+				width: image.width,
+				height: image.height,
+				type: image.data.constructor.name
+			};
+
+		} else {
+
+			console.warn( 'THREE.Texture: Unable to serialize Texture.' );
+			return {};
+
+		}
+
+	}
+
+}
 
 class Vector4 {
 
@@ -6366,6 +6410,8 @@ function Object3D() {
 	this.frustumCulled = true;
 	this.renderOrder = 0;
 
+	this.animations = [];
+
 	this.userData = {};
 
 }
@@ -6922,7 +6968,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 				textures: {},
 				images: {},
 				shapes: {},
-				skeletons: {}
+				skeletons: {},
+				animations: {}
 			};
 
 			output.metadata = {
@@ -7058,6 +7105,22 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
+		//
+
+		if ( this.animations.length > 0 ) {
+
+			object.animations = [];
+
+			for ( let i = 0; i < this.animations.length; i ++ ) {
+
+				const animation = this.animations[ i ];
+
+				object.animations.push( serialize( meta.animations, animation ) );
+
+			}
+
+		}
+
 		if ( isRootObject ) {
 
 			const geometries = extractFromCache( meta.geometries );
@@ -7066,6 +7129,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			const images = extractFromCache( meta.images );
 			const shapes = extractFromCache( meta.shapes );
 			const skeletons = extractFromCache( meta.skeletons );
+			const animations = extractFromCache( meta.animations );
 
 			if ( geometries.length > 0 ) output.geometries = geometries;
 			if ( materials.length > 0 ) output.materials = materials;
@@ -7073,6 +7137,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			if ( images.length > 0 ) output.images = images;
 			if ( shapes.length > 0 ) output.shapes = shapes;
 			if ( skeletons.length > 0 ) output.skeletons = skeletons;
+			if ( animations.length > 0 ) output.animations = animations;
 
 		}
 
@@ -8294,7 +8359,7 @@ Color.prototype.b = 1;
 
 class Face3 {
 
-	constructor( a, b, c, normal, color, materialIndex ) {
+	constructor( a, b, c, normal, color, materialIndex = 0 ) {
 
 		this.a = a;
 		this.b = b;
@@ -8306,7 +8371,7 @@ class Face3 {
 		this.color = ( color && color.isColor ) ? color : new Color();
 		this.vertexColors = Array.isArray( color ) ? color : [];
 
-		this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
+		this.materialIndex = materialIndex;
 
 	}
 
@@ -9694,6 +9759,25 @@ function arrayMax( array ) {
 
 }
 
+const TYPED_ARRAYS = {
+	Int8Array: Int8Array,
+	Uint8Array: Uint8Array,
+	// Workaround for IE11 pre KB2929437. See #11440
+	Uint8ClampedArray: typeof Uint8ClampedArray !== 'undefined' ? Uint8ClampedArray : Uint8Array,
+	Int16Array: Int16Array,
+	Uint16Array: Uint16Array,
+	Int32Array: Int32Array,
+	Uint32Array: Uint32Array,
+	Float32Array: Float32Array,
+	Float64Array: Float64Array
+};
+
+function getTypedArray( type, buffer ) {
+
+	return new TYPED_ARRAYS[ type ]( buffer );
+
+}
+
 let _bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
 
 const _m1$2 = new Matrix4();
@@ -9779,13 +9863,19 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
-	addGroup: function ( start, count, materialIndex ) {
+	hasAttribute: function ( name ) {
+
+		return this.attributes[ name ] !== undefined;
+
+	},
+
+	addGroup: function ( start, count, materialIndex = 0 ) {
 
 		this.groups.push( {
 
 			start: start,
 			count: count,
-			materialIndex: materialIndex !== undefined ? materialIndex : 0
+			materialIndex: materialIndex
 
 		} );
 
@@ -11877,20 +11967,20 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 } );
 
-function PerspectiveCamera( fov, aspect, near, far ) {
+function PerspectiveCamera( fov = 50, aspect = 1, near = 0.1, far = 2000 ) {
 
 	Camera.call( this );
 
 	this.type = 'PerspectiveCamera';
 
-	this.fov = fov !== undefined ? fov : 50;
+	this.fov = fov;
 	this.zoom = 1;
 
-	this.near = near !== undefined ? near : 0.1;
-	this.far = far !== undefined ? far : 2000;
+	this.near = near;
+	this.far = far;
 	this.focus = 10;
 
-	this.aspect = aspect !== undefined ? aspect : 1;
+	this.aspect = aspect;
 	this.view = null;
 
 	this.filmGauge = 35;	// width of the film (default in millimeters)
@@ -12810,7 +12900,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 class PlaneBufferGeometry extends BufferGeometry {
 
-	constructor( width, height, widthSegments, heightSegments ) {
+	constructor( width = 1, height = 1, widthSegments = 1, heightSegments = 1 ) {
 
 		super();
 		this.type = 'PlaneBufferGeometry';
@@ -12822,14 +12912,11 @@ class PlaneBufferGeometry extends BufferGeometry {
 			heightSegments: heightSegments
 		};
 
-		width = width || 1;
-		height = height || 1;
-
 		const width_half = width / 2;
 		const height_half = height / 2;
 
-		const gridX = Math.floor( widthSegments ) || 1;
-		const gridY = Math.floor( heightSegments ) || 1;
+		const gridX = Math.floor( widthSegments );
+		const gridY = Math.floor( heightSegments );
 
 		const gridX1 = gridX + 1;
 		const gridY1 = gridY + 1;
@@ -12837,14 +12924,12 @@ class PlaneBufferGeometry extends BufferGeometry {
 		const segment_width = width / gridX;
 		const segment_height = height / gridY;
 
-		// buffers
+		//
 
 		const indices = [];
 		const vertices = [];
 		const normals = [];
 		const uvs = [];
-
-		// generate vertices, normals and uvs
 
 		for ( let iy = 0; iy < gridY1; iy ++ ) {
 
@@ -12865,8 +12950,6 @@ class PlaneBufferGeometry extends BufferGeometry {
 
 		}
 
-		// indices
-
 		for ( let iy = 0; iy < gridY; iy ++ ) {
 
 			for ( let ix = 0; ix < gridX; ix ++ ) {
@@ -12876,16 +12959,12 @@ class PlaneBufferGeometry extends BufferGeometry {
 				const c = ( ix + 1 ) + gridX1 * ( iy + 1 );
 				const d = ( ix + 1 ) + gridX1 * iy;
 
-				// faces
-
 				indices.push( a, b, d );
 				indices.push( b, c, d );
 
 			}
 
 		}
-
-		// build geometry
 
 		this.setIndex( indices );
 		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
@@ -13994,10 +14073,10 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 			return clearColor;
 
 		},
-		setClearColor: function ( color, alpha ) {
+		setClearColor: function ( color, alpha = 1 ) {
 
 			clearColor.set( color );
-			clearAlpha = alpha !== undefined ? alpha : 1;
+			clearAlpha = alpha;
 			setClear( clearColor, clearAlpha );
 
 		},
@@ -15567,13 +15646,13 @@ function WebGLMorphtargets( gl ) {
 
 			} else {
 
-				if ( morphTargets && geometry.getAttribute( 'morphTarget' + i ) !== undefined ) {
+				if ( morphTargets && geometry.hasAttribute( 'morphTarget' + i ) === true ) {
 
 					geometry.deleteAttribute( 'morphTarget' + i );
 
 				}
 
-				if ( morphNormals && geometry.getAttribute( 'morphNormal' + i ) !== undefined ) {
+				if ( morphNormals && geometry.hasAttribute( 'morphNormal' + i ) === true ) {
 
 					geometry.deleteAttribute( 'morphNormal' + i );
 
@@ -15661,11 +15740,11 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 }
 
-function DataTexture2DArray( data, width, height, depth ) {
+function DataTexture2DArray( data = null, width = 1, height = 1, depth = 1 ) {
 
 	Texture.call( this, null );
 
-	this.image = { data: data || null, width: width || 1, height: height || 1, depth: depth || 1 };
+	this.image = { data, width, height, depth };
 
 	this.magFilter = NearestFilter;
 	this.minFilter = NearestFilter;
@@ -15683,7 +15762,7 @@ DataTexture2DArray.prototype = Object.create( Texture.prototype );
 DataTexture2DArray.prototype.constructor = DataTexture2DArray;
 DataTexture2DArray.prototype.isDataTexture2DArray = true;
 
-function DataTexture3D( data, width, height, depth ) {
+function DataTexture3D( data = null, width = 1, height = 1, depth = 1 ) {
 
 	// We're going to add .setXXX() methods for setting properties later.
 	// Users can still set in DataTexture3D directly.
@@ -15695,7 +15774,7 @@ function DataTexture3D( data, width, height, depth ) {
 
 	Texture.call( this, null );
 
-	this.image = { data: data || null, width: width || 1, height: height || 1, depth: depth || 1 };
+	this.image = { data, width, height, depth };
 
 	this.magFilter = NearestFilter;
 	this.minFilter = NearestFilter;
@@ -20171,10 +20250,23 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		currentProgram = null;
 
+		currentBlendingEnabled = null;
 		currentBlending = null;
+		currentBlendEquation = null;
+		currentBlendSrc = null;
+		currentBlendDst = null;
+		currentBlendEquationAlpha = null;
+		currentBlendSrcAlpha = null;
+		currentBlendDstAlpha = null;
+		currentPremultipledAlpha = false;
 
 		currentFlipSided = null;
 		currentCullFace = null;
+
+		currentLineWidth = null;
+
+		currentPolygonOffsetFactor = null;
+		currentPolygonOffsetUnits = null;
 
 		colorBuffer.reset();
 		depthBuffer.reset();
@@ -21682,11 +21774,11 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 }
 
-function ArrayCamera( array ) {
+function ArrayCamera( array = [] ) {
 
 	PerspectiveCamera.call( this );
 
-	this.cameras = array || [];
+	this.cameras = array;
 
 }
 
@@ -21847,7 +21939,7 @@ Object.assign( WebXRController.prototype, {
 		const grip = this._grip;
 		const hand = this._hand;
 
-		if ( inputSource ) {
+		if ( inputSource && frame.session.visibilityState !== 'visible-blurred' ) {
 
 			if ( hand && inputSource.hand ) {
 
@@ -27359,7 +27451,7 @@ function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, mi
 	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
 
 	this.flipY = false;
-	this.generateMipmaps	= false;
+	this.generateMipmaps = false;
 
 }
 
@@ -28756,7 +28848,7 @@ class BoxGeometry extends Geometry {
 
 class CircleBufferGeometry extends BufferGeometry {
 
-	constructor( radius, segments, thetaStart, thetaLength ) {
+	constructor( radius = 1, segments = 8, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
@@ -28769,11 +28861,7 @@ class CircleBufferGeometry extends BufferGeometry {
 			thetaLength: thetaLength
 		};
 
-		radius = radius || 1;
-		segments = segments !== undefined ? Math.max( 3, segments ) : 8;
-
-		thetaStart = thetaStart !== undefined ? thetaStart : 0;
-		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+		segments = Math.max( 3, segments );
 
 		// buffers
 
@@ -28859,7 +28947,7 @@ class CircleGeometry extends Geometry {
 
 class CylinderBufferGeometry extends BufferGeometry {
 
-	constructor( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 		this.type = 'CylinderBufferGeometry';
@@ -28877,16 +28965,8 @@ class CylinderBufferGeometry extends BufferGeometry {
 
 		const scope = this;
 
-		radiusTop = radiusTop !== undefined ? radiusTop : 1;
-		radiusBottom = radiusBottom !== undefined ? radiusBottom : 1;
-		height = height || 1;
-
-		radialSegments = Math.floor( radialSegments ) || 8;
-		heightSegments = Math.floor( heightSegments ) || 1;
-
-		openEnded = openEnded !== undefined ? openEnded : false;
-		thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
-		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+		radialSegments = Math.floor( radialSegments );
+		heightSegments = Math.floor( heightSegments );
 
 		// buffers
 
@@ -29175,9 +29255,10 @@ class ConeGeometry extends CylinderGeometry {
 
 class ConeBufferGeometry extends CylinderBufferGeometry {
 
-	constructor( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+	constructor( radius = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super( 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
+
 		this.type = 'ConeBufferGeometry';
 
 		this.parameters = {
@@ -29196,7 +29277,7 @@ class ConeBufferGeometry extends CylinderBufferGeometry {
 
 class PolyhedronBufferGeometry extends BufferGeometry {
 
-	constructor( vertices, indices, radius, detail ) {
+	constructor( vertices, indices, radius = 1, detail = 0 ) {
 
 		super();
 
@@ -29208,9 +29289,6 @@ class PolyhedronBufferGeometry extends BufferGeometry {
 			radius: radius,
 			detail: detail
 		};
-
-		radius = radius || 1;
-		detail = detail || 0;
 
 		// default buffer data
 
@@ -29496,7 +29574,7 @@ class PolyhedronBufferGeometry extends BufferGeometry {
 
 class DodecahedronBufferGeometry extends PolyhedronBufferGeometry {
 
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
 		const t = ( 1 + Math.sqrt( 5 ) ) / 2;
 		const r = 1 / t;
@@ -31444,7 +31522,7 @@ function toJSON$1( shapes, options, data ) {
 
 class IcosahedronBufferGeometry extends PolyhedronBufferGeometry {
 
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
 		const t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
@@ -31496,7 +31574,7 @@ class IcosahedronGeometry extends Geometry {
 
 class LatheBufferGeometry extends BufferGeometry {
 
-	constructor( points, segments, phiStart, phiLength ) {
+	constructor( points, segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
 
 		super();
 
@@ -31509,14 +31587,11 @@ class LatheBufferGeometry extends BufferGeometry {
 			phiLength: phiLength
 		};
 
-		segments = Math.floor( segments ) || 12;
-		phiStart = phiStart || 0;
-		phiLength = phiLength || Math.PI * 2;
+		segments = Math.floor( segments );
 
 		// clamp phiLength so it's in range of [ 0, 2PI ]
 
 		phiLength = MathUtils.clamp( phiLength, 0, Math.PI * 2 );
-
 
 		// buffers
 
@@ -31663,7 +31738,7 @@ class LatheGeometry extends Geometry {
 
 class OctahedronBufferGeometry extends PolyhedronBufferGeometry {
 
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
 		const vertices = [
 			1, 0, 0, 	- 1, 0, 0,	0, 1, 0,
@@ -31907,7 +31982,7 @@ class PolyhedronGeometry extends Geometry {
 
 class RingBufferGeometry extends BufferGeometry {
 
-	constructor( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+	constructor( innerRadius = 0.5, outerRadius = 1, thetaSegments = 8, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
@@ -31922,14 +31997,8 @@ class RingBufferGeometry extends BufferGeometry {
 			thetaLength: thetaLength
 		};
 
-		innerRadius = innerRadius || 0.5;
-		outerRadius = outerRadius || 1;
-
-		thetaStart = thetaStart !== undefined ? thetaStart : 0;
-		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
-
-		thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 8;
-		phiSegments = phiSegments !== undefined ? Math.max( 1, phiSegments ) : 1;
+		thetaSegments = Math.max( 3, thetaSegments );
+		phiSegments = Math.max( 1, phiSegments );
 
 		// buffers
 
@@ -32042,7 +32111,7 @@ class RingGeometry extends Geometry {
 
 class ShapeBufferGeometry extends BufferGeometry {
 
-	constructor( shapes, curveSegments ) {
+	constructor( shapes, curveSegments = 12 ) {
 
 		super();
 		this.type = 'ShapeBufferGeometry';
@@ -32051,8 +32120,6 @@ class ShapeBufferGeometry extends BufferGeometry {
 			shapes: shapes,
 			curveSegments: curveSegments
 		};
-
-		curveSegments = curveSegments || 12;
 
 		// buffers
 
@@ -32266,7 +32333,7 @@ function toJSON$3( shapes, data ) {
 
 class SphereBufferGeometry extends BufferGeometry {
 
-	constructor( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+	constructor( radius = 1, widthSegments = 8, heightSegments = 6, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI ) {
 
 		super();
 		this.type = 'SphereBufferGeometry';
@@ -32281,16 +32348,8 @@ class SphereBufferGeometry extends BufferGeometry {
 			thetaLength: thetaLength
 		};
 
-		radius = radius || 1;
-
-		widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
-		heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
-
-		phiStart = phiStart !== undefined ? phiStart : 0;
-		phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
-
-		thetaStart = thetaStart !== undefined ? thetaStart : 0;
-		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
+		widthSegments = Math.max( 3, Math.floor( widthSegments ) );
+		heightSegments = Math.max( 2, Math.floor( heightSegments ) );
 
 		const thetaEnd = Math.min( thetaStart + thetaLength, Math.PI );
 
@@ -32413,7 +32472,7 @@ class SphereGeometry extends Geometry {
 
 class TetrahedronBufferGeometry extends PolyhedronBufferGeometry {
 
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
 		const vertices = [
 			1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1
@@ -32474,9 +32533,7 @@ class TetrahedronGeometry extends Geometry {
 
 class TextBufferGeometry extends ExtrudeBufferGeometry {
 
-	constructor( text, parameters ) {
-
-		parameters = parameters || {};
+	constructor( text, parameters = {} ) {
 
 		const font = parameters.font;
 
@@ -32545,7 +32602,7 @@ class TextGeometry extends Geometry {
 
 class TorusBufferGeometry extends BufferGeometry {
 
-	constructor( radius, tube, radialSegments, tubularSegments, arc ) {
+	constructor( radius = 1, tube = 0.4, radialSegments = 8, tubularSegments = 6, arc = Math.PI * 2 ) {
 
 		super();
 		this.type = 'TorusBufferGeometry';
@@ -32558,11 +32615,8 @@ class TorusBufferGeometry extends BufferGeometry {
 			arc: arc
 		};
 
-		radius = radius || 1;
-		tube = tube || 0.4;
-		radialSegments = Math.floor( radialSegments ) || 8;
-		tubularSegments = Math.floor( tubularSegments ) || 6;
-		arc = arc || Math.PI * 2;
+		radialSegments = Math.floor( radialSegments );
+		tubularSegments = Math.floor( tubularSegments );
 
 		// buffers
 
@@ -32668,7 +32722,7 @@ class TorusGeometry extends Geometry {
 
 class TorusKnotBufferGeometry extends BufferGeometry {
 
-	constructor( radius, tube, tubularSegments, radialSegments, p, q ) {
+	constructor( radius = 1, tube = 0.4, tubularSegments = 64, radialSegments = 8, p = 2, q = 3 ) {
 
 		super();
 		this.type = 'TorusKnotBufferGeometry';
@@ -32682,12 +32736,8 @@ class TorusKnotBufferGeometry extends BufferGeometry {
 			q: q
 		};
 
-		radius = radius || 1;
-		tube = tube || 0.4;
-		tubularSegments = Math.floor( tubularSegments ) || 64;
-		radialSegments = Math.floor( radialSegments ) || 8;
-		p = p || 2;
-		q = q || 3;
+		tubularSegments = Math.floor( tubularSegments );
+		radialSegments = Math.floor( radialSegments );
 
 		// buffers
 
@@ -32842,7 +32892,7 @@ class TorusKnotGeometry extends Geometry {
 
 class TubeBufferGeometry extends BufferGeometry {
 
-	constructor( path, tubularSegments, radius, radialSegments, closed ) {
+	constructor( path, tubularSegments = 64, radius = 1, radialSegments = 8, closed = false ) {
 
 		super();
 		this.type = 'TubeBufferGeometry';
@@ -32854,11 +32904,6 @@ class TubeBufferGeometry extends BufferGeometry {
 			radialSegments: radialSegments,
 			closed: closed
 		};
-
-		tubularSegments = tubularSegments || 64;
-		radius = radius || 1;
-		radialSegments = radialSegments || 8;
-		closed = closed || false;
 
 		const frames = path.computeFrenetFrames( tubularSegments, closed );
 
@@ -34412,9 +34457,7 @@ const AnimationUtils = {
 
 	},
 
-	subclip: function ( sourceClip, name, startFrame, endFrame, fps ) {
-
-		fps = fps || 30;
+	subclip: function ( sourceClip, name, startFrame, endFrame, fps = 30 ) {
 
 		const clip = sourceClip.clone();
 
@@ -35831,7 +35874,10 @@ Object.assign( AnimationClip, {
 
 		}
 
-		return new AnimationClip( json.name, json.duration, tracks, json.blendMode );
+		const clip = new AnimationClip( json.name, json.duration, tracks, json.blendMode );
+		clip.uuid = json.uuid;
+
+		return clip;
 
 	},
 
@@ -36172,6 +36218,12 @@ Object.assign( AnimationClip.prototype, {
 		}
 
 		return new AnimationClip( this.name, this.duration, tracks, this.blendMode );
+
+	},
+
+	toJSON: function () {
+
+		return AnimationClip.toJSON( this );
 
 	}
 
@@ -37829,16 +37881,16 @@ function CubicPoly() {
 const tmp = new Vector3();
 const px = new CubicPoly(), py = new CubicPoly(), pz = new CubicPoly();
 
-function CatmullRomCurve3( points, closed, curveType, tension ) {
+function CatmullRomCurve3( points = [], closed = false, curveType = 'centripetal', tension = 0.5 ) {
 
 	Curve.call( this );
 
 	this.type = 'CatmullRomCurve3';
 
-	this.points = points || [];
-	this.closed = closed || false;
-	this.curveType = curveType || 'centripetal';
-	this.tension = ( tension !== undefined ) ? tension : 0.5;
+	this.points = points;
+	this.closed = closed;
+	this.curveType = curveType;
+	this.tension = tension;
 
 }
 
@@ -37847,9 +37899,9 @@ CatmullRomCurve3.prototype.constructor = CatmullRomCurve3;
 
 CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
 
-CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
+CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget = new Vector3() ) {
 
-	const point = optionalTarget || new Vector3();
+	const point = optionalTarget;
 
 	const points = this.points;
 	const l = points.length;
@@ -38075,16 +38127,16 @@ function CubicBezier( t, p0, p1, p2, p3 ) {
 
 }
 
-function CubicBezierCurve( v0, v1, v2, v3 ) {
+function CubicBezierCurve( v0 = new Vector2(), v1 = new Vector2(), v2 = new Vector2(), v3 = new Vector2() ) {
 
 	Curve.call( this );
 
 	this.type = 'CubicBezierCurve';
 
-	this.v0 = v0 || new Vector2();
-	this.v1 = v1 || new Vector2();
-	this.v2 = v2 || new Vector2();
-	this.v3 = v3 || new Vector2();
+	this.v0 = v0;
+	this.v1 = v1;
+	this.v2 = v2;
+	this.v3 = v3;
 
 }
 
@@ -38093,9 +38145,9 @@ CubicBezierCurve.prototype.constructor = CubicBezierCurve;
 
 CubicBezierCurve.prototype.isCubicBezierCurve = true;
 
-CubicBezierCurve.prototype.getPoint = function ( t, optionalTarget ) {
+CubicBezierCurve.prototype.getPoint = function ( t, optionalTarget = new Vector2() ) {
 
-	const point = optionalTarget || new Vector2();
+	const point = optionalTarget;
 
 	const v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
 
@@ -38147,16 +38199,16 @@ CubicBezierCurve.prototype.fromJSON = function ( json ) {
 
 };
 
-function CubicBezierCurve3( v0, v1, v2, v3 ) {
+function CubicBezierCurve3( v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3(), v3 = new Vector3() ) {
 
 	Curve.call( this );
 
 	this.type = 'CubicBezierCurve3';
 
-	this.v0 = v0 || new Vector3();
-	this.v1 = v1 || new Vector3();
-	this.v2 = v2 || new Vector3();
-	this.v3 = v3 || new Vector3();
+	this.v0 = v0;
+	this.v1 = v1;
+	this.v2 = v2;
+	this.v3 = v3;
 
 }
 
@@ -38165,9 +38217,9 @@ CubicBezierCurve3.prototype.constructor = CubicBezierCurve3;
 
 CubicBezierCurve3.prototype.isCubicBezierCurve3 = true;
 
-CubicBezierCurve3.prototype.getPoint = function ( t, optionalTarget ) {
+CubicBezierCurve3.prototype.getPoint = function ( t, optionalTarget = new Vector3() ) {
 
-	const point = optionalTarget || new Vector3();
+	const point = optionalTarget;
 
 	const v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
 
@@ -38220,14 +38272,14 @@ CubicBezierCurve3.prototype.fromJSON = function ( json ) {
 
 };
 
-function LineCurve( v1, v2 ) {
+function LineCurve( v1 = new Vector2(), v2 = new Vector2() ) {
 
 	Curve.call( this );
 
 	this.type = 'LineCurve';
 
-	this.v1 = v1 || new Vector2();
-	this.v2 = v2 || new Vector2();
+	this.v1 = v1;
+	this.v2 = v2;
 
 }
 
@@ -38236,9 +38288,9 @@ LineCurve.prototype.constructor = LineCurve;
 
 LineCurve.prototype.isLineCurve = true;
 
-LineCurve.prototype.getPoint = function ( t, optionalTarget ) {
+LineCurve.prototype.getPoint = function ( t, optionalTarget = new Vector2() ) {
 
-	const point = optionalTarget || new Vector2();
+	const point = optionalTarget;
 
 	if ( t === 1 ) {
 
@@ -38306,14 +38358,14 @@ LineCurve.prototype.fromJSON = function ( json ) {
 
 };
 
-function LineCurve3( v1, v2 ) {
+function LineCurve3( v1 = new Vector3(), v2 = new Vector3() ) {
 
 	Curve.call( this );
 
 	this.type = 'LineCurve3';
 
-	this.v1 = v1 || new Vector3();
-	this.v2 = v2 || new Vector3();
+	this.v1 = v1;
+	this.v2 = v2;
 
 }
 
@@ -38322,9 +38374,9 @@ LineCurve3.prototype.constructor = LineCurve3;
 
 LineCurve3.prototype.isLineCurve3 = true;
 
-LineCurve3.prototype.getPoint = function ( t, optionalTarget ) {
+LineCurve3.prototype.getPoint = function ( t, optionalTarget = new Vector3() ) {
 
-	const point = optionalTarget || new Vector3();
+	const point = optionalTarget;
 
 	if ( t === 1 ) {
 
@@ -38382,15 +38434,15 @@ LineCurve3.prototype.fromJSON = function ( json ) {
 
 };
 
-function QuadraticBezierCurve( v0, v1, v2 ) {
+function QuadraticBezierCurve( v0 = new Vector2(), v1 = new Vector2(), v2 = new Vector2() ) {
 
 	Curve.call( this );
 
 	this.type = 'QuadraticBezierCurve';
 
-	this.v0 = v0 || new Vector2();
-	this.v1 = v1 || new Vector2();
-	this.v2 = v2 || new Vector2();
+	this.v0 = v0;
+	this.v1 = v1;
+	this.v2 = v2;
 
 }
 
@@ -38399,9 +38451,9 @@ QuadraticBezierCurve.prototype.constructor = QuadraticBezierCurve;
 
 QuadraticBezierCurve.prototype.isQuadraticBezierCurve = true;
 
-QuadraticBezierCurve.prototype.getPoint = function ( t, optionalTarget ) {
+QuadraticBezierCurve.prototype.getPoint = function ( t, optionalTarget = new Vector2() ) {
 
-	const point = optionalTarget || new Vector2();
+	const point = optionalTarget;
 
 	const v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
@@ -38450,15 +38502,15 @@ QuadraticBezierCurve.prototype.fromJSON = function ( json ) {
 
 };
 
-function QuadraticBezierCurve3( v0, v1, v2 ) {
+function QuadraticBezierCurve3( v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3() ) {
 
 	Curve.call( this );
 
 	this.type = 'QuadraticBezierCurve3';
 
-	this.v0 = v0 || new Vector3();
-	this.v1 = v1 || new Vector3();
-	this.v2 = v2 || new Vector3();
+	this.v0 = v0;
+	this.v1 = v1;
+	this.v2 = v2;
 
 }
 
@@ -38467,9 +38519,9 @@ QuadraticBezierCurve3.prototype.constructor = QuadraticBezierCurve3;
 
 QuadraticBezierCurve3.prototype.isQuadraticBezierCurve3 = true;
 
-QuadraticBezierCurve3.prototype.getPoint = function ( t, optionalTarget ) {
+QuadraticBezierCurve3.prototype.getPoint = function ( t, optionalTarget = new Vector3() ) {
 
-	const point = optionalTarget || new Vector3();
+	const point = optionalTarget;
 
 	const v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
@@ -38519,13 +38571,13 @@ QuadraticBezierCurve3.prototype.fromJSON = function ( json ) {
 
 };
 
-function SplineCurve( points ) {
+function SplineCurve( points = [] ) {
 
 	Curve.call( this );
 
 	this.type = 'SplineCurve';
 
-	this.points = points || [];
+	this.points = points;
 
 }
 
@@ -38534,9 +38586,9 @@ SplineCurve.prototype.constructor = SplineCurve;
 
 SplineCurve.prototype.isSplineCurve = true;
 
-SplineCurve.prototype.getPoint = function ( t, optionalTarget ) {
+SplineCurve.prototype.getPoint = function ( t, optionalTarget = new Vector2() ) {
 
-	const point = optionalTarget || new Vector2();
+	const point = optionalTarget;
 
 	const points = this.points;
 	const p = ( points.length - 1 ) * t;
@@ -38777,9 +38829,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 	},
 
-	getPoints: function ( divisions ) {
-
-		divisions = divisions || 12;
+	getPoints: function ( divisions = 12 ) {
 
 		const points = [];
 		let last;
@@ -39162,14 +39212,14 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 } );
 
-function Light( color, intensity ) {
+function Light( color, intensity = 1 ) {
 
 	Object3D.call( this );
 
 	this.type = 'Light';
 
 	this.color = new Color( color );
-	this.intensity = intensity !== undefined ? intensity : 1;
+	this.intensity = intensity;
 
 }
 
@@ -40621,7 +40671,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 			const buffer = getArrayBuffer( json, interleavedBuffer.buffer );
 
-			const array = new TYPED_ARRAYS[ interleavedBuffer.type ]( buffer );
+			const array = getTypedArray( interleavedBuffer.type, buffer );
 			const ib = new InterleavedBuffer( array, interleavedBuffer.stride );
 			ib.uuid = interleavedBuffer.uuid;
 
@@ -40652,7 +40702,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		if ( index !== undefined ) {
 
-			const typedArray = new TYPED_ARRAYS[ index.type ]( index.array );
+			const typedArray = getTypedArray( index.type, index.array );
 			geometry.setIndex( new BufferAttribute( typedArray, 1 ) );
 
 		}
@@ -40671,7 +40721,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 			} else {
 
-				const typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+				const typedArray = getTypedArray( attribute.type, attribute.array );
 				const bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
 				bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
 
@@ -40704,7 +40754,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 					} else {
 
-						const typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+						const typedArray = getTypedArray( attribute.type, attribute.array );
 						bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
 
 					}
@@ -40767,19 +40817,6 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 } );
 
-const TYPED_ARRAYS = {
-	Int8Array: Int8Array,
-	Uint8Array: Uint8Array,
-	// Workaround for IE11 pre KB2929437. See #11440
-	Uint8ClampedArray: typeof Uint8ClampedArray !== 'undefined' ? Uint8ClampedArray : Uint8Array,
-	Int16Array: Int16Array,
-	Uint16Array: Uint16Array,
-	Int32Array: Int32Array,
-	Uint32Array: Uint32Array,
-	Float32Array: Float32Array,
-	Float64Array: Float64Array
-};
-
 class ObjectLoader extends Loader {
 
 	constructor( manager ) {
@@ -40834,6 +40871,7 @@ class ObjectLoader extends Loader {
 
 	parse( json, onLoad ) {
 
+		const animations = this.parseAnimations( json.animations );
 		const shapes = this.parseShapes( json.shapes );
 		const geometries = this.parseGeometries( json.geometries, shapes );
 
@@ -40846,20 +40884,29 @@ class ObjectLoader extends Loader {
 		const textures = this.parseTextures( json.textures, images );
 		const materials = this.parseMaterials( json.materials, textures );
 
-		const object = this.parseObject( json.object, geometries, materials );
+		const object = this.parseObject( json.object, geometries, materials, animations );
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
 		this.bindSkeletons( object, skeletons );
 
-		if ( json.animations ) {
+		//
 
-			object.animations = this.parseAnimations( json.animations );
+		if ( onLoad !== undefined ) {
 
-		}
+			let hasImages = false;
 
-		if ( json.images === undefined || json.images.length === 0 ) {
+			for ( const uuid in images ) {
 
-			if ( onLoad !== undefined ) onLoad( object );
+				if ( images[ uuid ] instanceof HTMLImageElement ) {
+
+					hasImages = true;
+					break;
+
+				}
+
+			}
+
+			if ( hasImages === false ) onLoad( object );
 
 		}
 
@@ -41258,17 +41305,19 @@ class ObjectLoader extends Loader {
 
 	parseAnimations( json ) {
 
-		const animations = [];
+		const animations = {};
 
-		for ( let i = 0; i < json.length; i ++ ) {
+		if ( json !== undefined ) {
 
-			const data = json[ i ];
+			for ( let i = 0; i < json.length; i ++ ) {
 
-			const clip = AnimationClip.parse( data );
+				const data = json[ i ];
 
-			if ( data.uuid !== undefined ) clip.uuid = data.uuid;
+				const clip = AnimationClip.parse( data );
 
-			animations.push( clip );
+				animations[ clip.uuid ] = clip;
+
+			}
 
 		}
 
@@ -41300,6 +41349,36 @@ class ObjectLoader extends Loader {
 
 		}
 
+		function deserializeImage( image ) {
+
+			if ( typeof image === 'string' ) {
+
+				const url = image;
+
+				const path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( url ) ? url : scope.resourcePath + url;
+
+				return loadImage( path );
+
+			} else {
+
+				if ( image.data ) {
+
+					return {
+						data: getTypedArray( image.type, image.data ),
+						width: image.width,
+						height: image.height
+					};
+
+				} else {
+
+					return null;
+
+				}
+
+			}
+
+		}
+
 		if ( json !== undefined && json.length > 0 ) {
 
 			const manager = new LoadingManager( onLoad );
@@ -41322,9 +41401,23 @@ class ObjectLoader extends Loader {
 
 						const currentUrl = url[ j ];
 
-						const path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( currentUrl ) ? currentUrl : scope.resourcePath + currentUrl;
+						const deserializedImage = deserializeImage( currentUrl );
 
-						images[ image.uuid ].push( loadImage( path ) );
+						if ( deserializedImage !== null ) {
+
+							if ( deserializedImage instanceof HTMLImageElement ) {
+
+								images[ image.uuid ].push( deserializedImage );
+
+							} else {
+
+								// special case: handle array of data textures for cube textures
+
+								images[ image.uuid ].push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
+
+							}
+
+						}
 
 					}
 
@@ -41332,9 +41425,13 @@ class ObjectLoader extends Loader {
 
 					// load single image
 
-					const path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.resourcePath + image.url;
+					const deserializedImage = deserializeImage( image.url );
 
-					images[ image.uuid ] = loadImage( path );
+					if ( deserializedImage !== null ) {
+
+						images[ image.uuid ] = deserializedImage;
+
+					}
 
 				}
 
@@ -41379,18 +41476,29 @@ class ObjectLoader extends Loader {
 				}
 
 				let texture;
+				const image = images[ data.image ];
 
-				if ( Array.isArray( images[ data.image ] ) ) {
+				if ( Array.isArray( image ) ) {
 
-					texture = new CubeTexture( images[ data.image ] );
+					texture = new CubeTexture( image );
+
+					if ( image.length === 6 ) texture.needsUpdate = true;
 
 				} else {
 
-					texture = new Texture( images[ data.image ] );
+					if ( image && image.data ) {
+
+						texture = new DataTexture( image.data, image.width, image.height );
+
+					} else {
+
+						texture = new Texture( image );
+
+					}
+
+					if ( image ) texture.needsUpdate = true; // textures can have undefined image data
 
 				}
-
-				texture.needsUpdate = true;
 
 				texture.uuid = data.uuid;
 
@@ -41433,7 +41541,7 @@ class ObjectLoader extends Loader {
 
 	}
 
-	parseObject( data, geometries, materials ) {
+	parseObject( data, geometries, materials, animations ) {
 
 		let object;
 
@@ -41716,7 +41824,21 @@ class ObjectLoader extends Loader {
 
 			for ( let i = 0; i < children.length; i ++ ) {
 
-				object.add( this.parseObject( children[ i ], geometries, materials ) );
+				object.add( this.parseObject( children[ i ], geometries, materials, animations ) );
+
+			}
+
+		}
+
+		if ( data.animations !== undefined ) {
+
+			const objectAnimations = data.animations;
+
+			for ( let i = 0; i < objectAnimations.length; i ++ ) {
+
+				const uuid = objectAnimations[ i ];
+
+				object.animations.push( animations[ uuid ] );
 
 			}
 
@@ -42654,7 +42776,7 @@ class Clock {
 
 	start() {
 
-		this.startTime = ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
+		this.startTime = now();
 
 		this.oldTime = this.startTime;
 		this.elapsedTime = 0;
@@ -42690,7 +42812,7 @@ class Clock {
 
 		if ( this.running ) {
 
-			const newTime = ( typeof performance === 'undefined' ? Date : performance ).now();
+			const newTime = now();
 
 			diff = ( newTime - this.oldTime ) / 1000;
 			this.oldTime = newTime;
@@ -42702,6 +42824,12 @@ class Clock {
 		return diff;
 
 	}
+
+}
+
+function now() {
+
+	return ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
 
 }
 
@@ -43350,10 +43478,10 @@ class PositionalAudio extends Audio {
 
 class AudioAnalyser {
 
-	constructor( audio, fftSize ) {
+	constructor( audio, fftSize = 2048 ) {
 
 		this.analyser = audio.context.createAnalyser();
-		this.analyser.fftSize = fftSize !== undefined ? fftSize : 2048;
+		this.analyser.fftSize = fftSize;
 
 		this.data = new Uint8Array( this.analyser.frequencyBinCount );
 
@@ -44769,12 +44897,12 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 class AnimationAction {
 
-	constructor( mixer, clip, localRoot, blendMode ) {
+	constructor( mixer, clip, localRoot = null, blendMode = clip.blendMode ) {
 
 		this._mixer = mixer;
 		this._clip = clip;
-		this._localRoot = localRoot || null;
-		this.blendMode = blendMode || clip.blendMode;
+		this._localRoot = localRoot;
+		this.blendMode = blendMode;
 
 		const tracks = clip.tracks,
 			nTracks = tracks.length,
@@ -47369,12 +47497,10 @@ class HemisphereLightHelper extends Object3D {
 
 class GridHelper extends LineSegments {
 
-	constructor( size, divisions, color1, color2 ) {
+	constructor( size = 10, divisions = 10, color1 = 0x444444, color2 = 0x888888 ) {
 
-		size = size || 10;
-		divisions = divisions || 10;
-		color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
-		color2 = new Color( color2 !== undefined ? color2 : 0x888888 );
+		color1 = new Color( color1 );
+		color2 = new Color( color2 );
 
 		const center = divisions / 2;
 		const step = size / divisions;
@@ -47412,14 +47538,10 @@ class GridHelper extends LineSegments {
 
 class PolarGridHelper extends LineSegments {
 
-	constructor( radius, radials, circles, divisions, color1, color2 ) {
+	constructor( radius = 10, radials = 16, circles = 8, divisions = 64, color1 = 0x444444, color2 = 0x888888 ) {
 
-		radius = radius || 10;
-		radials = radials || 16;
-		circles = circles || 8;
-		divisions = divisions || 64;
-		color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
-		color2 = new Color( color2 !== undefined ? color2 : 0x888888 );
+		color1 = new Color( color1 );
+		color2 = new Color( color2 );
 
 		const vertices = [];
 		const colors = [];
