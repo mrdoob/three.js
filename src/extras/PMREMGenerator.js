@@ -106,12 +106,12 @@ class PMREMGenerator {
 	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
 	 * is placed at the origin).
 	 */
-	fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
+	fromScene( scene, sigma = 0, near = 0.1, far = 100, origin = new Vector3() ) {
 
 		_oldTarget = this._renderer.getRenderTarget();
 		const cubeUVRenderTarget = this._allocateTargets();
 
-		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
+		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget, origin );
 		if ( sigma > 0 ) {
 
 			this._blur( cubeUVRenderTarget, 0, 0, sigma );
@@ -246,7 +246,7 @@ class PMREMGenerator {
 
 	}
 
-	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
+	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget, origin ) {
 
 		const fov = 90;
 		const aspect = 1;
@@ -279,6 +279,7 @@ class PMREMGenerator {
 
 		for ( let i = 0; i < 6; i ++ ) {
 
+			cubeCamera.position.set( 0, 0, 0 );
 			const col = i % 3;
 			if ( col == 0 ) {
 
@@ -296,6 +297,7 @@ class PMREMGenerator {
 				cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
 
 			}
+			cubeCamera.position.copy( origin );
 
 			_setViewport( cubeUVRenderTarget,
 				col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
