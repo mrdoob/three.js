@@ -27,15 +27,16 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:WebGLRenderTarget fromScene]( [param:Scene scene], [param:Number sigma], [param:Number near], [param:Number far] )</h3>
+		<h3>[method:WebGLRenderTarget fromScene]( [param:Scene scene], [param:Number sigma], [param:Number near], [param:Number far], [param:Vector3 origin] )</h3>
 		<p>
 			[page:Scene scene] - The given scene.<br>
 			[page:Number sigma] - (optional) Specifies a blur radius in radians to be applied to the scene before PMREM generation. Default is *0*.<br>
 			[page:Number near] - (optional) The near plane value. Default is *0.1*.<br>
 			[page:Number far] - (optional) The far plane value. Default is *100*.<br /><br />
+			[page:Number origin] - (optional) The position to render the scene from. Default is *0, 0, 0*.<br /><br />
 
 			Generates a PMREM from a supplied Scene, which can be faster than using an image if networking bandwidth is low.
-			Optional near and far planes ensure the scene is rendered in its entirety (the cubeCamera is placed at the origin).
+			Optional near and far planes ensure the scene is rendered in its entirety.
 		</p>
 
 		<h3>[method:WebGLRenderTarget fromEquirectangular]( [param:Texture equirectangular] )</h3>
