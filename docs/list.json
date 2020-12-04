@@ -422,7 +422,8 @@
 
 			"Math": {
 				"LookupTable": "examples/en/math/Lut",
-				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler"
+				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler",
+				"OBB": "examples/en/math/OBB"
 			},
 
 			"ConvexHull": {
@@ -957,7 +958,8 @@
 
 			"数学库": {
 				"LookupTable": "examples/zh/math/Lut",
-				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler"
+				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler",
+				"OBB": "examples/en/math/OBB"
 			},
 
 			"QuickHull": {
