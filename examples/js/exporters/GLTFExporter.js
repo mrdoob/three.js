@@ -93,8 +93,8 @@ THREE.GLTFExporter.prototype = {
 
 			asset: {
 
-				version: "2.0",
-				generator: "THREE.GLTFExporter"
+				version: '2.0',
+				generator: 'THREE.GLTFExporter'
 
 			}
 
@@ -761,7 +761,7 @@ THREE.GLTFExporter.prototype = {
 
 			var cachedImages = cachedData.images.get( image );
 			var mimeType = format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
-			var key = mimeType + ":flipY/" + flipY.toString();
+			var key = mimeType + ':flipY/' + flipY.toString();
 
 			if ( cachedImages[ key ] !== undefined ) {
 

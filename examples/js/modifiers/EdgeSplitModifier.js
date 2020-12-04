@@ -173,7 +173,7 @@ THREE.EdgeSplitModifier = function () {
 		}
 
 		indexes = geometry.index.array;
-		positions = geometry.getAttribute( "position" ).array;
+		positions = geometry.getAttribute( 'position' ).array;
 
 		computeNormals();
 		mapPositionsToIndexes();
