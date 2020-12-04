@@ -612,10 +612,10 @@ var OBJLoader = ( function () {
 
 				} else if ( lineFirstChar === 'l' ) {
 
-					var lineParts = line.substring( 1 ).trim().split( " " );
+					var lineParts = line.substring( 1 ).trim().split( ' ' );
 					var lineVertices = [], lineUVs = [];
 
-					if ( line.indexOf( "/" ) === - 1 ) {
+					if ( line.indexOf( '/' ) === - 1 ) {
 
 						lineVertices = lineParts;
 
@@ -623,10 +623,10 @@ var OBJLoader = ( function () {
 
 						for ( var li = 0, llen = lineParts.length; li < llen; li ++ ) {
 
-							var parts = lineParts[ li ].split( "/" );
+							var parts = lineParts[ li ].split( '/' );
 
-							if ( parts[ 0 ] !== "" ) lineVertices.push( parts[ 0 ] );
-							if ( parts[ 1 ] !== "" ) lineUVs.push( parts[ 1 ] );
+							if ( parts[ 0 ] !== '' ) lineVertices.push( parts[ 0 ] );
+							if ( parts[ 1 ] !== '' ) lineUVs.push( parts[ 1 ] );
 
 						}
 
@@ -637,7 +637,7 @@ var OBJLoader = ( function () {
 				} else if ( lineFirstChar === 'p' ) {
 
 					var lineData = line.substr( 1 ).trim();
-					var pointData = lineData.split( " " );
+					var pointData = lineData.split( ' ' );
 
 					state.addPointGeometry( pointData );
 
@@ -649,7 +649,7 @@ var OBJLoader = ( function () {
 
 					// WORKAROUND: https://bugs.chromium.org/p/v8/issues/detail?id=2869
 					// var name = result[ 0 ].substr( 1 ).trim();
-					var name = ( " " + result[ 0 ].substr( 1 ).trim() ).substr( 1 );
+					var name = ( ' ' + result[ 0 ].substr( 1 ).trim() ).substr( 1 );
 
 					state.startObject( name );
 

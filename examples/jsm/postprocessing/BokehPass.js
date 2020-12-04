@@ -37,7 +37,7 @@ var BokehPass = function ( scene, camera, params ) {
 		magFilter: NearestFilter
 	} );
 
-	this.renderTargetDepth.texture.name = "BokehPass.depth";
+	this.renderTargetDepth.texture.name = 'BokehPass.depth';
 
 	// depth material
 
@@ -49,21 +49,21 @@ var BokehPass = function ( scene, camera, params ) {
 
 	if ( BokehShader === undefined ) {
 
-		console.error( "BokehPass relies on BokehShader" );
+		console.error( 'THREE.BokehPass relies on BokehShader' );
 
 	}
 
 	var bokehShader = BokehShader;
 	var bokehUniforms = UniformsUtils.clone( bokehShader.uniforms );
 
-	bokehUniforms[ "tDepth" ].value = this.renderTargetDepth.texture;
+	bokehUniforms[ 'tDepth' ].value = this.renderTargetDepth.texture;
 
-	bokehUniforms[ "focus" ].value = focus;
-	bokehUniforms[ "aspect" ].value = aspect;
-	bokehUniforms[ "aperture" ].value = aperture;
-	bokehUniforms[ "maxblur" ].value = maxblur;
-	bokehUniforms[ "nearClip" ].value = camera.near;
-	bokehUniforms[ "farClip" ].value = camera.far;
+	bokehUniforms[ 'focus' ].value = focus;
+	bokehUniforms[ 'aspect' ].value = aspect;
+	bokehUniforms[ 'aperture' ].value = aperture;
+	bokehUniforms[ 'maxblur' ].value = maxblur;
+	bokehUniforms[ 'nearClip' ].value = camera.near;
+	bokehUniforms[ 'farClip' ].value = camera.far;
 
 	this.materialBokeh = new ShaderMaterial( {
 		defines: Object.assign( {}, bokehShader.defines ),
@@ -104,9 +104,9 @@ BokehPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		// Render bokeh composite
 
-		this.uniforms[ "tColor" ].value = readBuffer.texture;
-		this.uniforms[ "nearClip" ].value = this.camera.near;
-		this.uniforms[ "farClip" ].value = this.camera.far;
+		this.uniforms[ 'tColor' ].value = readBuffer.texture;
+		this.uniforms[ 'nearClip' ].value = this.camera.near;
+		this.uniforms[ 'farClip' ].value = this.camera.far;
 
 		if ( this.renderToScreen ) {
 

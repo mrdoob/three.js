@@ -13,7 +13,7 @@ import {
 var DeviceOrientationControls = function ( object ) {
 
 	var scope = this;
-	var changeEvent = { type: "change" };
+	var changeEvent = { type: 'change' };
 	var EPS = 0.000001;
 
 	this.object = object;
