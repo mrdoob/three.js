@@ -7,7 +7,7 @@ import { Scene } from '../scenes/Scene';
 export class PMREMGenerator {
 
 	constructor( renderer:WebGLRenderer );
-	fromScene( scene:Scene, sigma?:number, near?:number, far?:number ): WebGLRenderTarget;
+	fromScene( scene:Scene, sigma?:number, near?:number, far?:number, origin?:Vector3 ): WebGLRenderTarget;
 	fromEquirectangular( equirectangular:Texture ): WebGLRenderTarget;
 	fromCubemap( cubemap:CubeTexture ): WebGLRenderTarget;
 	compileCubemapShader(): void;
