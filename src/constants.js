@@ -196,5 +196,5 @@ export const StaticCopyUsage = 35046;
 export const DynamicCopyUsage = 35050;
 export const StreamCopyUsage = 35042;
 
-export const GLSL1 = "100";
-export const GLSL3 = "300 es";
+export const GLSL1 = '100';
+export const GLSL3 = '300 es';
