@@ -7,7 +7,7 @@ They assume you know how to program in JavaScript. They assume
 you know what the DOM is, how to write HTML as well as create DOM elements
 in JavaScript. They assume you know how to use
 [es6 modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) 
-oth via import and via `<script type="module">` tags.
+via import and via `<script type="module">` tags.
 They assume you know some CSS and that you know what
 [CSS selectors are](https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors). 
 They also assume you know ES5, ES6 and maybe some ES7.
