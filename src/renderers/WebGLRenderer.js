@@ -38,6 +38,7 @@ import { WebGLUniforms } from './webgl/WebGLUniforms.js';
 import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from "./webgl/WebGLMaterials.js";
+import { Color } from '../math/Color.js';
 
 function createCanvasElement() {
 
