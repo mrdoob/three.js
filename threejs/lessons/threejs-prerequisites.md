@@ -283,7 +283,7 @@ loader.load((texture) => {
 });
 ```
 
-Arrow functions bind `this` of the context in which you create the arrow function.
+Arrow functions bind `this` to the context in which you create the arrow function.
 
 ```js
 const foo = (args) => {/* code */};
