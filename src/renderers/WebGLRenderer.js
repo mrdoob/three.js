@@ -13,6 +13,7 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
+import { Color } from '../math/Color.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
 import { WebGLAttributes } from './webgl/WebGLAttributes.js';
 import { WebGLBackground } from './webgl/WebGLBackground.js';
@@ -37,8 +38,7 @@ import { WebGLTextures } from './webgl/WebGLTextures.js';
 import { WebGLUniforms } from './webgl/WebGLUniforms.js';
 import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
-import { WebGLMaterials } from "./webgl/WebGLMaterials.js";
-import { Color } from '../math/Color.js';
+import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 
 function createCanvasElement() {
 

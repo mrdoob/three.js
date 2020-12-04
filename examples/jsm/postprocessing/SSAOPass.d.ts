@@ -13,6 +13,15 @@ import {
 
 import { Pass } from './Pass';
 
+export enum OUTPUT {
+	Default,
+	SSAO,
+	Blur,
+	Beauty,
+	Depth,
+	Normal
+}
+
 export class SSAOPass extends Pass {
 
 	constructor( scene: Scene, camera: Camera, width?: number, height?: number );
@@ -25,7 +34,7 @@ export class SSAOPass extends Pass {
 	kernelSize: number;
 	kernel: Vector3[];
 	noiseTexture: DataTexture;
-	output: number;
+	output: OUTPUT;
 	minDistance: number;
 	maxDistance: number;
 	beautyRenderTarget: WebGLRenderTarget;
@@ -40,14 +49,7 @@ export class SSAOPass extends Pass {
 	fsQuad: object;
 	originalClearColor: Color;
 
-	static OUTPUT: {
-		Default: number;
-		SSAO: number;
-		Blur: number;
-		Beauty: number;
-		Depth: number;
-		Normal: number;
-	};
+	static OUTPUT: OUTPUT;
 
 	dipose(): void;
 	generateSampleKernel(): Vector3[];

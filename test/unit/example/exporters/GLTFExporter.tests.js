@@ -6,6 +6,7 @@ import { AnimationClip } from '../../../../src/animation/AnimationClip';
 import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
+import { DirectionalLight } from '../../../../src/lights/DirectionalLight';
 import { Mesh } from '../../../../src/objects/Mesh';
 import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial';
 import { MeshStandardMaterial } from '../../../../src/materials/MeshStandardMaterial';
@@ -38,8 +39,6 @@ export default QUnit.module( 'Exporters', () => {
 			var exporter = new GLTFExporter();
 
 			exporter.parse( object, function ( gltf ) {
-
-				console.log( gltf );
 
 				assert.equal( '2.0', gltf.asset.version, 'asset.version' );
 				assert.equal( 'GLTFExporter', gltf.asset.generator, 'asset.generator' );
@@ -337,6 +336,86 @@ export default QUnit.module( 'Exporters', () => {
 				assert.numEqual( track.values[ i ], expectedValues[ i ], 'all values are merged or interpolated - ' + i );
 
 			}
+
+		} );
+
+		QUnit.test( 'parse - KHR_lights_punctual extension', ( assert ) => {
+
+			const done = assert.async();
+
+			const scene = new Scene();
+			const light = new DirectionalLight( 0xffffff );
+			light.position.set( 1, 2, 3 );
+			scene.add( light );
+			scene.updateMatrixWorld();
+
+			const exporter = new GLTFExporter();
+
+			exporter.parse( scene, gltf => {
+
+				const extensionName = 'KHR_lights_punctual';
+				const extensionsUsed = gltf.extensionsUsed || [];
+				const extensions = gltf.extensions || {};
+				const lightsDef = extensions[ extensionName ] || {};
+				const lights = lightsDef.lights || [];
+				const lightDef = lights[ 0 ] || {};
+
+				const nodes = gltf.nodes || [];
+				const lightNodeDefsNum = nodes.filter( nodeDef => nodeDef.extensions && nodeDef.extensions[ extensionName ] ).length;
+				const lightNodeDef = nodes.find( nodeDef => nodeDef.extensions && nodeDef.extensions[ extensionName ] ) || {};
+				const lightNodeExtensions = lightNodeDef.extensions || {};
+				const lightNodeExtensionDef = lightNodeExtensions[ extensionName ] || {};
+
+				assert.ok( extensionsUsed.indexOf( extensionName ) >= 0, `${extensionName} exists in extensionsUsed` );
+				assert.equal( 1, lights.length, 'one light' );
+				assert.smartEqual( [ 1, 1, 1 ], lightDef.color, 'correct color' );
+				assert.equal( light.intensity, lightDef.intensity, 'correct intensity' );
+				assert.equal( 'directional', lightDef.type, 'correct type' );
+
+				assert.equal( 1, lightNodeDefsNum, `one node having ${extensionName} extension` );
+				assert.equal( 0, lightNodeExtensionDef.light, 'correct light node index' );
+				assert.smartEqual( light.matrix.elements,
+					lightNodeDef.matrix, 'correct light node transform' );
+
+				// @TODO: Add PointLight and SpotLight tests
+
+				done();
+
+			} );
+
+		} );
+
+		QUnit.test( 'parse - KHR_materials_unlit extension', ( assert ) => {
+
+			const done = assert.async();
+
+			const scene = new Scene();
+			const mesh = new Mesh(
+				new BoxBufferGeometry( 1, 1, 1 ),
+				new MeshBasicMaterial()
+			);
+			scene.add( mesh );
+
+			const exporter = new GLTFExporter();
+
+			exporter.parse( scene, gltf => {
+
+				const extensionName = 'KHR_materials_unlit';
+				const extensionsUsed = gltf.extensionsUsed || [];
+				const materials = gltf.materials || [];
+				const materialDef = materials[ 0 ] || {};
+				const pbrMetallicRoughness = materialDef.pbrMetallicRoughness || {};
+				const extensions = materialDef.extensions || {};
+
+				assert.ok( extensionsUsed.indexOf( extensionName ) >= 0, `${extensionName} exists in extensionsUsed` );
+				assert.equal( 1, materials.length, 'one material' );
+				assert.ok( extensions[ extensionName ], `material has ${extensionName} extension` );
+				assert.equal( 0.0, pbrMetallicRoughness.metallicFactor, 'correct metallicFactor' );
+				assert.equal( 0.9, pbrMetallicRoughness.roughnessFactor, 'correct roughnessFactor' );
+
+				done();
+
+			} );
 
 		} );
 

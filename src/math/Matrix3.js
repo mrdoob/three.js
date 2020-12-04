@@ -239,6 +239,8 @@ class Matrix3 {
 			0, 0, 1
 		);
 
+		return this;
+
 	}
 
 	scale( sx, sy ) {

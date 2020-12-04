@@ -132,18 +132,18 @@ export function modifyShader( material, uniforms, numberOfCurves = 1 ) {
 		${shader.vertexShader}
 		`
 		// chunk import moved in front of modified shader below
-		.replace('#include <beginnormal_vertex>', ``)
+			.replace( '#include <beginnormal_vertex>', `` )
 
-		// vec3 transformedNormal declaration overriden below
-		.replace('#include <defaultnormal_vertex>', ``)
+			// vec3 transformedNormal declaration overriden below
+			.replace( '#include <defaultnormal_vertex>', `` )
 
-		// vec3 transformed declaration overriden below
-		.replace('#include <begin_vertex>', ``)
+			// vec3 transformed declaration overriden below
+			.replace( '#include <begin_vertex>', `` )
 
-		// shader override
-		.replace(
-			/void\s*main\s*\(\)\s*\{/,
-`
+			// shader override
+			.replace(
+				/void\s*main\s*\(\)\s*\{/,
+				`
 void main() {
 #include <beginnormal_vertex>
 
@@ -180,13 +180,11 @@ vec3 transformed = basis
 	+ spinePos;
 
 vec3 transformedNormal = normalMatrix * (basis * objectNormal);
-`).replace(
-	'#include <project_vertex>',
-`
-vec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );
-gl_Position = projectionMatrix * mvPosition;
-`
-);
+			` ).replace(
+				'#include <project_vertex>',
+				`vec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );
+				gl_Position = projectionMatrix * mvPosition;`
+			);
 
 		shader.vertexShader = vertexShader;
 

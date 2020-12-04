@@ -732,6 +732,165 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( "updateWorldMatrix", ( assert ) => {
+
+			const object = new Object3D();
+			const parent = new Object3D();
+			const child = new Object3D();
+
+			const m = new Matrix4();
+			const v = new Vector3();
+
+			parent.add( object );
+			object.add( child );
+
+			parent.position.set( 1, 2, 3 );
+			object.position.set( 4, 5, 6 );
+			child.position.set( 7, 8, 9 );
+
+			// Update the world matrix of an object
+
+			object.updateWorldMatrix();
+
+			assert.deepEqual( parent.matrix.elements,
+				m.elements,
+				"No effect to parents' local matrices" );
+
+			assert.deepEqual( parent.matrixWorld.elements,
+				m.elements,
+				"No effect to parents' world matrices" );
+
+			assert.deepEqual( object.matrix.elements,
+				m.setPosition( object.position ).elements,
+				"Object's local matrix is updated" );
+
+			assert.deepEqual( object.matrixWorld.elements,
+				m.setPosition( object.position ).elements,
+				"Object's world matrix is updated" );
+
+			assert.deepEqual( child.matrix.elements,
+				m.identity().elements,
+				"No effect to children's local matrices" );
+
+			assert.deepEqual( child.matrixWorld.elements,
+				m.elements,
+				"No effect to children's world matrices" );
+
+			// Update the world matrices of an object and its parents
+
+			object.matrix.identity();
+			object.matrixWorld.identity();
+
+			object.updateWorldMatrix( true, false );
+
+			assert.deepEqual( parent.matrix.elements,
+				m.setPosition( parent.position ).elements,
+				"Parents' local matrices are updated" );
+
+			assert.deepEqual( parent.matrixWorld.elements,
+				m.setPosition( parent.position ).elements,
+				"Parents' world matrices are updated" );
+
+			assert.deepEqual( object.matrix.elements,
+				m.setPosition( object.position ).elements,
+				"Object's local matrix is updated" );
+
+			assert.deepEqual( object.matrixWorld.elements,
+				m.setPosition( v.copy( parent.position ).add( object.position ) ).elements,
+				"Object's world matrix is updated" );
+
+			assert.deepEqual( child.matrix.elements,
+				m.identity().elements,
+				"No effect to children's local matrices" );
+
+			assert.deepEqual( child.matrixWorld.elements,
+				m.identity().elements,
+				"No effect to children's world matrices" );
+
+			// Update the world matrices of an object and its children
+
+			parent.matrix.identity();
+			parent.matrixWorld.identity();
+			object.matrix.identity();
+			object.matrixWorld.identity();
+
+			object.updateWorldMatrix( false, true );
+
+			assert.deepEqual( parent.matrix.elements,
+				m.elements,
+				"No effect to parents' local matrices" );
+
+			assert.deepEqual( parent.matrixWorld.elements,
+				m.elements,
+				"No effect to parents' world matrices" );
+
+			assert.deepEqual( object.matrix.elements,
+				m.setPosition( object.position ).elements,
+				"Object's local matrix is updated" );
+
+			assert.deepEqual( object.matrixWorld.elements,
+				m.setPosition( object.position ).elements,
+				"Object's world matrix is updated" );
+
+			assert.deepEqual( child.matrix.elements,
+				m.setPosition( child.position ).elements,
+				"Children's local matrices are updated" );
+
+			assert.deepEqual( child.matrixWorld.elements,
+				m.setPosition( v.copy( object.position ).add( child.position ) ).elements,
+				"Children's world matrices are updated" );
+
+			// Update the world matrices of an object and its parents and children
+
+			object.matrix.identity();
+			object.matrixWorld.identity();
+			child.matrix.identity();
+			child.matrixWorld.identity();
+
+			object.updateWorldMatrix( true, true );
+
+			assert.deepEqual( parent.matrix.elements,
+				m.setPosition( parent.position ).elements,
+				"Parents' local matrices are updated" );
+
+			assert.deepEqual( parent.matrixWorld.elements,
+				m.setPosition( parent.position ).elements,
+				"Parents' world matrices are updated" );
+
+			assert.deepEqual( object.matrix.elements,
+				m.setPosition( object.position ).elements,
+				"Object's local matrix is updated" );
+
+			assert.deepEqual( object.matrixWorld.elements,
+				m.setPosition( v.copy( parent.position ).add( object.position ) ).elements,
+				"Object's world matrix is updated" );
+
+			assert.deepEqual( child.matrix.elements,
+				m.setPosition( child.position ).elements,
+				"Children's local matrices are updated" );
+
+			assert.deepEqual( child.matrixWorld.elements,
+				m.setPosition( v.copy( parent.position ).add( object.position ).add( child.position ) ).elements,
+				"Children's world matrices are updated" );
+
+			// object.matrixAutoUpdate = false test
+
+			object.matrix.identity();
+			object.matrixWorld.identity();
+
+			object.matrixAutoUpdate = false;
+			object.updateWorldMatrix( true, false );
+
+			assert.deepEqual( object.matrix.elements,
+				m.identity().elements,
+				"No effect to object's local matrix if matrixAutoUpdate is false" );
+
+			assert.deepEqual( object.matrixWorld.elements,
+				m.setPosition( parent.position ).elements,
+				"object's world matrix is updated even if matrixAutoUpdate is false" );
+
+		} );
+
 		QUnit.test( "toJSON", ( assert ) => {
 
 			var a = new Object3D();

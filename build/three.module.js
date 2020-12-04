@@ -197,8 +197,8 @@ const StaticCopyUsage = 35046;
 const DynamicCopyUsage = 35050;
 const StreamCopyUsage = 35042;
 
-const GLSL1 = "100";
-const GLSL3 = "300 es";
+const GLSL1 = '100';
+const GLSL3 = '300 es';
 
 /**
  * https://github.com/mrdoob/eventdispatcher.js/
@@ -1216,6 +1216,8 @@ class Matrix3 {
 			0, 0, 1
 		);
 
+		return this;
+
 	}
 
 	scale( sx, sy ) {
@@ -1683,7 +1685,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 } );
 
-Object.defineProperty( Texture.prototype, "needsUpdate", {
+Object.defineProperty( Texture.prototype, 'needsUpdate', {
 
 	set: function ( value ) {
 
@@ -6622,7 +6624,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( object === this ) {
 
-			console.error( "THREE.Object3D.add: object can't be added as a child of itself.", object );
+			console.error( 'THREE.Object3D.add: object can\'t be added as a child of itself.', object );
 			return this;
 
 		}
@@ -6642,7 +6644,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		} else {
 
-			console.error( "THREE.Object3D.add: object not an instance of THREE.Object3D.", object );
+			console.error( 'THREE.Object3D.add: object not an instance of THREE.Object3D.', object );
 
 		}
 
@@ -8504,7 +8506,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			if ( newValue === undefined ) {
 
-				console.warn( "THREE.Material: '" + key + "' parameter is undefined." );
+				console.warn( 'THREE.Material: \'' + key + '\' parameter is undefined.' );
 				continue;
 
 			}
@@ -8522,7 +8524,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			if ( currentValue === undefined ) {
 
-				console.warn( "THREE." + this.type + ": '" + key + "' is not a property of this material." );
+				console.warn( 'THREE.' + this.type + ': \'' + key + '\' is not a property of this material.' );
 				continue;
 
 			}
@@ -16945,19 +16947,19 @@ function loopReplacer( match, start, end, snippet ) {
 
 function generatePrecision( parameters ) {
 
-	let precisionstring = "precision " + parameters.precision + " float;\nprecision " + parameters.precision + " int;";
+	let precisionstring = 'precision ' + parameters.precision + ' float;\nprecision ' + parameters.precision + ' int;';
 
-	if ( parameters.precision === "highp" ) {
+	if ( parameters.precision === 'highp' ) {
 
-		precisionstring += "\n#define HIGH_PRECISION";
+		precisionstring += '\n#define HIGH_PRECISION';
 
-	} else if ( parameters.precision === "mediump" ) {
+	} else if ( parameters.precision === 'mediump' ) {
 
-		precisionstring += "\n#define MEDIUM_PRECISION";
+		precisionstring += '\n#define MEDIUM_PRECISION';
 
-	} else if ( parameters.precision === "lowp" ) {
+	} else if ( parameters.precision === 'lowp' ) {
 
-		precisionstring += "\n#define LOW_PRECISION";
+		precisionstring += '\n#define LOW_PRECISION';
 
 	}
 
@@ -17087,7 +17089,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	const program = gl.createProgram();
 
 	let prefixVertex, prefixFragment;
-	let versionString = parameters.glslVersion ? '#version ' + parameters.glslVersion + "\n" : '';
+	let versionString = parameters.glslVersion ? '#version ' + parameters.glslVersion + '\n' : '';
 
 	if ( parameters.isRawShaderMaterial ) {
 
@@ -17566,19 +17568,19 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 	};
 
 	const parameterNames = [
-		"precision", "isWebGL2", "supportsVertexTextures", "outputEncoding", "instancing", "instancingColor",
-		"map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding", "envMapCubeUV",
-		"lightMap", "lightMapEncoding", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatMap", "clearcoatRoughnessMap", "clearcoatNormalMap", "displacementMap", "specularMap",
-		"roughnessMap", "metalnessMap", "gradientMap",
-		"alphaMap", "combine", "vertexColors", "vertexTangents", "vertexUvs", "uvsVertexOnly", "fog", "useFog", "fogExp2",
-		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
-		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
-		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
-		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
-		"numDirLightShadows", "numPointLightShadows", "numSpotLightShadows",
-		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
-		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering",
-		"sheen", "transmissionMap"
+		'precision', 'isWebGL2', 'supportsVertexTextures', 'outputEncoding', 'instancing', 'instancingColor',
+		'map', 'mapEncoding', 'matcap', 'matcapEncoding', 'envMap', 'envMapMode', 'envMapEncoding', 'envMapCubeUV',
+		'lightMap', 'lightMapEncoding', 'aoMap', 'emissiveMap', 'emissiveMapEncoding', 'bumpMap', 'normalMap', 'objectSpaceNormalMap', 'tangentSpaceNormalMap', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap', 'displacementMap', 'specularMap',
+		'roughnessMap', 'metalnessMap', 'gradientMap',
+		'alphaMap', 'combine', 'vertexColors', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
+		'flatShading', 'sizeAttenuation', 'logarithmicDepthBuffer', 'skinning',
+		'maxBones', 'useVertexTexture', 'morphTargets', 'morphNormals',
+		'maxMorphTargets', 'maxMorphNormals', 'premultipliedAlpha',
+		'numDirLights', 'numPointLights', 'numSpotLights', 'numHemiLights', 'numRectAreaLights',
+		'numDirLightShadows', 'numPointLightShadows', 'numSpotLightShadows',
+		'shadowMapEnabled', 'shadowMapType', 'toneMapping', 'physicallyCorrectLights',
+		'alphaTest', 'doubleSided', 'flipSided', 'numClippingPlanes', 'numClipIntersection', 'depthPacking', 'dithering',
+		'sheen', 'transmissionMap'
 	];
 
 	function getMaxBones( object ) {
@@ -17631,7 +17633,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 		} else if ( map.isWebGLRenderTarget ) {
 
-			console.warn( "THREE.WebGLPrograms.getTextureEncodingFromMap: don't use render targets as textures. Use their .texture property instead." );
+			console.warn( 'THREE.WebGLPrograms.getTextureEncodingFromMap: don\'t use render targets as textures. Use their .texture property instead.' );
 			encoding = map.texture.encoding;
 
 		}
@@ -18975,7 +18977,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	const fullScreenTri = new BufferGeometry();
 	fullScreenTri.setAttribute(
-		"position",
+		'position',
 		new BufferAttribute(
 			new Float32Array( [ - 1, - 1, 0.5, 3, - 1, 0.5, - 1, 3, 0.5 ] ),
 			3
@@ -19061,7 +19063,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 				const pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat };
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
-				shadow.map.texture.name = light.name + ".shadowMap";
+				shadow.map.texture.name = light.name + '.shadowMap';
 
 				shadow.mapPass = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 
@@ -19074,7 +19076,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 				const pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
-				shadow.map.texture.name = light.name + ".shadowMap";
+				shadow.map.texture.name = light.name + '.shadowMap';
 
 				shadow.camera.updateProjectionMatrix();
 
@@ -20334,7 +20336,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	try {
 
 		useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined'
-			&& ( new OffscreenCanvas( 1, 1 ).getContext( "2d" ) ) !== null;
+			&& ( new OffscreenCanvas( 1, 1 ).getContext( '2d' ) ) !== null;
 
 	} catch ( err ) {
 
@@ -21530,7 +21532,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( warnedTexture2D === false ) {
 
-				console.warn( "THREE.WebGLTextures.safeSetTexture2D: don't use render targets as textures. Use their .texture property instead." );
+				console.warn( 'THREE.WebGLTextures.safeSetTexture2D: don\'t use render targets as textures. Use their .texture property instead.' );
 				warnedTexture2D = true;
 
 			}
@@ -21549,7 +21551,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( warnedTextureCube === false ) {
 
-				console.warn( "THREE.WebGLTextures.safeSetTextureCube: don't use cube render targets as textures. Use their .texture property instead." );
+				console.warn( 'THREE.WebGLTextures.safeSetTextureCube: don\'t use cube render targets as textures. Use their .texture property instead.' );
 				warnedTextureCube = true;
 
 			}
@@ -21977,7 +21979,7 @@ Object.assign( WebXRController.prototype, {
 
 							hand.inputState.pinching = false;
 							this.dispatchEvent( {
-								type: "pinchend",
+								type: 'pinchend',
 								handedness: inputSource.handedness,
 								target: this
 							} );
@@ -21986,7 +21988,7 @@ Object.assign( WebXRController.prototype, {
 
 							hand.inputState.pinching = true;
 							this.dispatchEvent( {
-								type: "pinchstart",
+								type: 'pinchstart',
 								handedness: inputSource.handedness,
 								target: this
 							} );
@@ -30835,7 +30837,7 @@ class ExtrudeBufferGeometry extends BufferGeometry {
 
 			function scalePt2( pt, vec, size ) {
 
-				if ( ! vec ) console.error( "THREE.ExtrudeGeometry: vec does not exist" );
+				if ( ! vec ) console.error( 'THREE.ExtrudeGeometry: vec does not exist' );
 
 				return vec.clone().multiplyScalar( size ).add( pt );
 
@@ -35233,8 +35235,8 @@ Object.assign( KeyframeTrack.prototype, {
 
 		if ( factoryMethod === undefined ) {
 
-			const message = "unsupported interpolation for " +
-				this.ValueTypeName + " keyframe track named " + this.name;
+			const message = 'unsupported interpolation for ' +
+				this.ValueTypeName + ' keyframe track named ' + this.name;
 
 			if ( this.createInterpolant === undefined ) {
 
@@ -36852,7 +36854,6 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 		const images = [];
 
 		const texture = new CompressedTexture();
-		texture.image = images;
 
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
@@ -36879,9 +36880,9 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 
 				if ( loaded === 6 ) {
 
-					if ( texDatas.mipmapCount === 1 )
-						texture.minFilter = LinearFilter;
+					if ( texDatas.mipmapCount === 1 ) texture.minFilter = LinearFilter;
 
+					texture.image = images;
 					texture.format = texDatas.format;
 					texture.needsUpdate = true;
 
@@ -36927,6 +36928,8 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 						}
 
 					}
+
+					texture.image = images;
 
 				} else {
 
@@ -44019,7 +44022,7 @@ Object.assign( PropertyBinding, {
 
 	findNode: function ( root, nodeName ) {
 
-		if ( ! nodeName || nodeName === "" || nodeName === "." || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
+		if ( ! nodeName || nodeName === '' || nodeName === '.' || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
 
 			return root;
 
@@ -44422,7 +44425,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			// access a sub element of the property array (only primitives are supported right now)
 
-			if ( propertyName === "morphTargetInfluences" ) {
+			if ( propertyName === 'morphTargetInfluences' ) {
 
 				// potential optimization, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
 
@@ -49686,7 +49689,7 @@ Object.assign( Matrix3.prototype, {
 
 	flattenToArrayOffset: function ( array, offset ) {
 
-		console.warn( "THREE.Matrix3: .flattenToArrayOffset() has been deprecated. Use .toArray() instead." );
+		console.warn( 'THREE.Matrix3: .flattenToArrayOffset() has been deprecated. Use .toArray() instead.' );
 		return this.toArray( array, offset );
 
 	},
@@ -49731,7 +49734,7 @@ Object.assign( Matrix4.prototype, {
 	},
 	flattenToArrayOffset: function ( array, offset ) {
 
-		console.warn( "THREE.Matrix4: .flattenToArrayOffset() has been deprecated. Use .toArray() instead." );
+		console.warn( 'THREE.Matrix4: .flattenToArrayOffset() has been deprecated. Use .toArray() instead.' );
 		return this.toArray( array, offset );
 
 	},
@@ -50221,8 +50224,8 @@ Object.defineProperty( Curve.prototype, '__arcLengthDivisions', {
 
 PerspectiveCamera.prototype.setLens = function ( focalLength, filmGauge ) {
 
-	console.warn( "THREE.PerspectiveCamera.setLens is deprecated. " +
-			"Use .setFocalLength and .filmGauge for a photographic setup." );
+	console.warn( 'THREE.PerspectiveCamera.setLens is deprecated. ' +
+			'Use .setFocalLength and .filmGauge for a photographic setup.' );
 
 	if ( filmGauge !== undefined ) this.filmGauge = filmGauge;
 	this.setFocalLength( focalLength );
