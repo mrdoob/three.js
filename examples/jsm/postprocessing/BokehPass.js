@@ -91,7 +91,7 @@ BokehPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.scene.overrideMaterial = this.materialDepth;
 
-		this.oldClearColor.copy( renderer.getClearColor() );
+		renderer.getClearColor( this.oldClearColor );
 		var oldClearAlpha = renderer.getClearAlpha();
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;

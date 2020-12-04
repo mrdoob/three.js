@@ -296,7 +296,7 @@ OutlinePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		if ( this.selectedObjects.length > 0 ) {
 
-			this.oldClearColor.copy( renderer.getClearColor() );
+			renderer.getClearColor( this.oldClearColor );
 			this.oldClearAlpha = renderer.getClearAlpha();
 			var oldAutoClear = renderer.autoClear;
 
