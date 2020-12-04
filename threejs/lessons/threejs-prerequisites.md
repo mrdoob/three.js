@@ -385,8 +385,8 @@ Above you can see I mis-spelled `doTheThing` as `doThing`. There's a red squiggl
 under `doThing` and hovering over it it tells me it's undefined. One error
 avoided.
 
-You'll get warnings using `THREE` so add `/* global THREE */` at the top of your
-JavaScript files to tell eslint that `THREE` exists.
+If you're using `<script>` tags to include three.js you'll get warnings using `THREE` so add `/* global THREE */` at the top of your
+JavaScript files to tell eslint that `THREE` exists. (or better, use `import` 😉)
 
 <div class="threejs_center"><img style="width: 615px;" src="resources/images/vscode-eslint-not-a-constructor.png"></div>
 
