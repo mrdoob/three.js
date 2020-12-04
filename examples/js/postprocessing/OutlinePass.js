@@ -96,7 +96,7 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 	this.enabled = true;
 	this.needsSwap = false;
 
-	this.oldClearColor = new THREE.Color();
+	this._oldClearColor = new THREE.Color();
 	this.oldClearAlpha = 1;
 
 	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
@@ -276,7 +276,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 		if ( this.selectedObjects.length > 0 ) {
 
-			this.oldClearColor.copy( renderer.getClearColor() );
+			renderer.getClearColor( this._oldClearColor );
 			this.oldClearAlpha = renderer.getClearAlpha();
 			var oldAutoClear = renderer.autoClear;
 
@@ -391,7 +391,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 			renderer.setRenderTarget( readBuffer );
 			this.fsQuad.render( renderer );
 
-			renderer.setClearColor( this.oldClearColor, this.oldClearAlpha );
+			renderer.setClearColor( this._oldClearColor, this.oldClearAlpha );
 			renderer.autoClear = oldAutoClear;
 
 		}

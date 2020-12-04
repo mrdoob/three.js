@@ -77,7 +77,7 @@ var BokehPass = function ( scene, camera, params ) {
 
 	this.fsQuad = new Pass.FullScreenQuad( this.materialBokeh );
 
-	this.oldClearColor = new Color();
+	this._oldClearColor = new Color();
 
 };
 
@@ -91,7 +91,7 @@ BokehPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.scene.overrideMaterial = this.materialDepth;
 
-		this.oldClearColor.copy( renderer.getClearColor() );
+		renderer.getClearColor( this._oldClearColor );
 		var oldClearAlpha = renderer.getClearAlpha();
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
@@ -122,7 +122,7 @@ BokehPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		}
 
 		this.scene.overrideMaterial = null;
-		renderer.setClearColor( this.oldClearColor );
+		renderer.setClearColor( this._oldClearColor );
 		renderer.setClearAlpha( oldClearAlpha );
 		renderer.autoClear = oldAutoClear;
 
