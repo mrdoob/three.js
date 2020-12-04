@@ -33,7 +33,7 @@ var SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 	// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
 	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
 	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
-	this.oldClearColor = new Color();
+	this._oldClearColor = new Color();
 
 	if ( CopyShader === undefined ) console.error( "SSAARenderPass relies on CopyShader" );
 
@@ -90,7 +90,7 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		renderer.getClearColor( this.oldClearColor );
+		renderer.getClearColor( this._oldClearColor );
 		var oldClearAlpha = renderer.getClearAlpha();
 
 		var baseSampleWeight = 1.0 / jitterOffsets.length;
@@ -147,7 +147,7 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
 
 		renderer.autoClear = autoClear;
-		renderer.setClearColor( this.oldClearColor, oldClearAlpha );
+		renderer.setClearColor( this._oldClearColor, oldClearAlpha );
 
 	}
 

@@ -18,7 +18,7 @@ var RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAl
 	this.clear = true;
 	this.clearDepth = false;
 	this.needsSwap = false;
-	this.oldClearColor = new Color();
+	this._oldClearColor = new Color();
 
 };
 
@@ -43,7 +43,7 @@ RenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		if ( this.clearColor ) {
 
-			renderer.getClearColor( this.oldClearColor );
+			renderer.getClearColor( this._oldClearColor );
 			oldClearAlpha = renderer.getClearAlpha();
 
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
@@ -64,7 +64,7 @@ RenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		if ( this.clearColor ) {
 
-			renderer.setClearColor( this.oldClearColor, oldClearAlpha );
+			renderer.setClearColor( this._oldClearColor, oldClearAlpha );
 
 		}
 
