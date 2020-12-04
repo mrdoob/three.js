@@ -532,9 +532,17 @@ function WebGLRenderer( parameters ) {
 
 	// Clearing
 
-	this.getClearColor = function () {
+	this.getClearColor = function ( target ) {
 
-		return background.getClearColor();
+		if ( target === undefined ) {
+
+			console.warn( 'WebGLRenderer: .getClearColor() now requires a Color as an argument' );
+
+			target = new Color();
+
+		}
+
+		return target.copy( background.getClearColor() );
 
 	};
 
