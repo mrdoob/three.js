@@ -16,7 +16,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 	this.supportsNormalTexture = ( useNormals !== undefined ) ? useNormals : false;
 
 	this.originalClearColor = new THREE.Color();
-	this.oldClearColor = new THREE.Color();
+	this._oldClearColor = new THREE.Color();
 	this.oldClearAlpha = 1;
 
 	this.params = {
@@ -192,7 +192,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 
 		}
 
-		renderer.getClearColor( this.oldClearColor );
+		renderer.getClearColor( this._oldClearColor );
 		this.oldClearAlpha = renderer.getClearAlpha();
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
@@ -303,7 +303,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		// Rendering SAOPass result on top of previous pass
 		this.renderPass( renderer, outputMaterial, this.renderToScreen ? null : readBuffer );
 
-		renderer.setClearColor( this.oldClearColor, this.oldClearAlpha );
+		renderer.setClearColor( this._oldClearColor, this.oldClearAlpha );
 		renderer.autoClear = oldAutoClear;
 
 	},

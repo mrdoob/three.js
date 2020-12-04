@@ -64,7 +64,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 
 	this.fsQuad = new THREE.Pass.FullScreenQuad( this.materialBokeh );
 
-	this.oldClearColor = new THREE.Color();
+	this._oldClearColor = new THREE.Color();
 
 };
 
@@ -78,7 +78,7 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 		this.scene.overrideMaterial = this.materialDepth;
 
-		renderer.getClearColor( this.oldClearColor );
+		renderer.getClearColor( this._oldClearColor );
 		var oldClearAlpha = renderer.getClearAlpha();
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
@@ -109,7 +109,7 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 		}
 
 		this.scene.overrideMaterial = null;
-		renderer.setClearColor( this.oldClearColor );
+		renderer.setClearColor( this._oldClearColor );
 		renderer.setClearAlpha( oldClearAlpha );
 		renderer.autoClear = oldAutoClear;
 
