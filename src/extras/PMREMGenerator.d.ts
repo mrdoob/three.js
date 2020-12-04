@@ -3,6 +3,7 @@ import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget';
 import { Texture } from '../textures/Texture';
 import { CubeTexture } from '../textures/CubeTexture';
 import { Scene } from '../scenes/Scene';
+import { Vector3 } from '../math/Vector3';
 
 export class PMREMGenerator {
 
