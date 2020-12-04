@@ -358,7 +358,7 @@ ConvexObjectBreaker.prototype = {
 					if ( intersection === undefined ) {
 
 						// Shouldn't happen
-						console.error( "Internal error: segment does not intersect plane." );
+						console.error( 'Internal error: segment does not intersect plane.' );
 						output.segmentedObject1 = null;
 						output.segmentedObject2 = null;
 						return 0;

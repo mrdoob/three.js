@@ -8,7 +8,7 @@ var ShaderPass = function ( shader, textureID ) {
 
 	Pass.call( this );
 
-	this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
+	this.textureID = ( textureID !== undefined ) ? textureID : 'tDiffuse';
 
 	if ( shader instanceof ShaderMaterial ) {
 

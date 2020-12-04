@@ -126,7 +126,7 @@ THREE.OBJExporter.prototype = {
 						}
 
 						// transform the face to export format
-						output += 'f ' + face.join( ' ' ) + "\n";
+						output += 'f ' + face.join( ' ' ) + '\n';
 
 					}
 
@@ -143,7 +143,7 @@ THREE.OBJExporter.prototype = {
 						}
 
 						// transform the face to export format
-						output += 'f ' + face.join( ' ' ) + "\n";
+						output += 'f ' + face.join( ' ' ) + '\n';
 
 					}
 

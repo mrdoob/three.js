@@ -33,7 +33,7 @@ var SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
 	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
 
-	if ( CopyShader === undefined ) console.error( "SSAARenderPass relies on CopyShader" );
+	if ( CopyShader === undefined ) console.error( 'THREE.SSAARenderPass relies on CopyShader' );
 
 	var copyShader = CopyShader;
 	this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
@@ -79,7 +79,7 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		if ( ! this.sampleRenderTarget ) {
 
 			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat } );
-			this.sampleRenderTarget.texture.name = "SSAARenderPass.sample";
+			this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
 
 		}
 
@@ -93,7 +93,7 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		var baseSampleWeight = 1.0 / jitterOffsets.length;
 		var roundingRange = 1 / 32;
-		this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
+		this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
 
 		var width = readBuffer.width, height = readBuffer.height;
 
@@ -123,7 +123,7 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 			}
 
-			this.copyUniforms[ "opacity" ].value = sampleWeight;
+			this.copyUniforms[ 'opacity' ].value = sampleWeight;
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
 			renderer.setRenderTarget( this.sampleRenderTarget );
 			renderer.clear();

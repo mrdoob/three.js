@@ -10,7 +10,7 @@ var FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, gr
 	Pass.call( this );
 
 	if ( FilmShader === undefined )
-		console.error( "FilmPass relies on FilmShader" );
+		console.error( 'THREE.FilmPass relies on FilmShader' );
 
 	var shader = FilmShader;
 
@@ -39,8 +39,8 @@ FilmPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	render: function ( renderer, writeBuffer, readBuffer, deltaTime /*, maskActive */ ) {
 
-		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
-		this.uniforms[ "time" ].value += deltaTime;
+		this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
+		this.uniforms[ 'time' ].value += deltaTime;
 
 		if ( this.renderToScreen ) {
 

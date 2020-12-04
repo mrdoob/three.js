@@ -43,12 +43,12 @@ Sky.prototype = Object.create( Mesh.prototype );
 Sky.SkyShader = {
 
 	uniforms: {
-		"turbidity": { value: 2 },
-		"rayleigh": { value: 1 },
-		"mieCoefficient": { value: 0.005 },
-		"mieDirectionalG": { value: 0.8 },
-		"sunPosition": { value: new Vector3() },
-		"up": { value: new Vector3( 0, 1, 0 ) }
+		'turbidity': { value: 2 },
+		'rayleigh': { value: 1 },
+		'mieCoefficient': { value: 0.005 },
+		'mieDirectionalG': { value: 0.8 },
+		'sunPosition': { value: new Vector3() },
+		'up': { value: new Vector3( 0, 1, 0 ) }
 	},
 
 	vertexShader: [
