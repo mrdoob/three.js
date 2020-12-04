@@ -27,6 +27,7 @@
     "test": "test"
   },
   "eslintConfig": {
+    "root": true,
     "parser": "@typescript-eslint/parser",
     "extends": "mdcs",
     "plugins": [
@@ -43,6 +44,10 @@
         {
           "SwitchCase": 1
         }
+      ],
+      "quotes": [
+        "error",
+        "single"
       ],
       "prefer-const": [
         "error",
