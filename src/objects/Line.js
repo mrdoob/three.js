@@ -13,7 +13,7 @@ const _inverseMatrix = new Matrix4();
 const _ray = new Ray();
 const _sphere = new Sphere();
 
-function Line( geometry, material, mode ) {
+function Line( geometry = new BufferGeometry(), material = new LineBasicMaterial(), mode ) {
 
 	if ( mode === 1 ) {
 
@@ -25,8 +25,8 @@ function Line( geometry, material, mode ) {
 
 	this.type = 'Line';
 
-	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new LineBasicMaterial();
+	this.geometry = geometry;
+	this.material = material;
 
 	this.updateMorphTargets();
 
