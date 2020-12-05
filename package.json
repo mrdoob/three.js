@@ -105,7 +105,9 @@
     "typescript": "^4.1.2"
   },
   "dependencies": {
-    "xmlhttprequest":"1.8.0"
+    "xmlhttprequest":"1.8.0",
+    "jsdom":"16.4.0",
+    "fs-extra":"9.0.1"
   },
   "jspm": {
     "files": [
