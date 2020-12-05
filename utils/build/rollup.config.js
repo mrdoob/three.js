@@ -380,5 +380,20 @@ export default [
 				file: 'build/three.module.js'
 			}
 		]
+	},
+	{
+		input: 'src/Three.node.js',
+		plugins: [
+			addons(),
+			glconstants(),
+			glsl(),
+			header()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.module.node.js'
+			}
+		]
 	}
 ];
