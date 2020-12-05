@@ -2,6 +2,8 @@ import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
 
 import { XMLHttpRequest } from "xmlhttprequest";
+import { atob, Blob, DOMParser } from "../polyfill-node"
+
 
 const loading = {};
 
