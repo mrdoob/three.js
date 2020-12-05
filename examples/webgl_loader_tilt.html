@@ -28,8 +28,8 @@
 
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
 
-				camera.position.y = 5;
-				camera.position.z = 10;
+				camera.position.y = 43;
+				camera.position.z = 100;
 
 				scene.add( camera );
 
@@ -51,6 +51,7 @@
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
+				controls.target.y = camera.position.y;
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
