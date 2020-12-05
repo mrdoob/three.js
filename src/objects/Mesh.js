@@ -410,7 +410,7 @@ function checkBufferGeometryIntersection( object, material, raycaster, ray, posi
 
 	}
 
-	if ( object.isSkinnedMesh ) {
+	if ( object.isSkinnedMesh && material.skinning ) {
 
 		object.boneTransform( a, _vA );
 		object.boneTransform( b, _vB );
