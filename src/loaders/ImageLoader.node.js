@@ -1,6 +1,9 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
 
+import { document } from "../polyfill-node";
+import { readFile } from "fs";
+
 function ImageLoader( manager ) {
 
 	Loader.call( this, manager );
@@ -17,67 +20,83 @@ ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		url = this.manager.resolveURL( url );
 
-		const scope = this;
+		if (url.startsWith("data:")) {
+			console.log("IS datauri");
+		  } else {
+			console.log("IS not datauri ");
+			let imageData = null;
+			readFile(url, (err, data) => {
+				if(err){
+					throw err;
+				} else{
+					imageData = data;
+					url = `data:image/jpeg;base64,${imageData.toString("base64")}`;
 
-		const cached = Cache.get( url );
+					const scope = this;
 
-		if ( cached !== undefined ) {
+					const cached = Cache.get( url );
 
-			scope.manager.itemStart( url );
+					if ( cached !== undefined ) {
 
-			setTimeout( function () {
+						scope.manager.itemStart( url );
 
-				if ( onLoad ) onLoad( cached );
+						setTimeout( function () {
 
-				scope.manager.itemEnd( url );
+							if ( onLoad ) onLoad( cached );
 
-			}, 0 );
+							scope.manager.itemEnd( url );
 
-			return cached;
+						}, 0 );
 
-		}
+						return cached;
 
-		const image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
+					}
 
-		function onImageLoad() {
+					const image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 
-			image.removeEventListener( 'load', onImageLoad, false );
-			image.removeEventListener( 'error', onImageError, false );
+					function onImageLoad() {
 
-			Cache.add( url, this );
+						image.removeEventListener( 'load', onImageLoad, false );
+						image.removeEventListener( 'error', onImageError, false );
 
-			if ( onLoad ) onLoad( this );
+						Cache.add( url, this );
 
-			scope.manager.itemEnd( url );
+						if ( onLoad ) onLoad( this );
 
-		}
+						scope.manager.itemEnd( url );
 
-		function onImageError( event ) {
+					}
 
-			image.removeEventListener( 'load', onImageLoad, false );
-			image.removeEventListener( 'error', onImageError, false );
+					function onImageError( event ) {
 
-			if ( onError ) onError( event );
+						image.removeEventListener( 'load', onImageLoad, false );
+						image.removeEventListener( 'error', onImageError, false );
 
-			scope.manager.itemError( url );
-			scope.manager.itemEnd( url );
+						if ( onError ) onError( event );
 
-		}
+						scope.manager.itemError( url );
+						scope.manager.itemEnd( url );
 
-		image.addEventListener( 'load', onImageLoad, false );
-		image.addEventListener( 'error', onImageError, false );
+					}
 
-		if ( url.substr( 0, 5 ) !== 'data:' ) {
+					image.addEventListener( 'load', onImageLoad, false );
+					image.addEventListener( 'error', onImageError, false );
 
-			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+					if ( url.substr( 0, 5 ) !== 'data:' ) {
 
-		}
+						if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
 
-		scope.manager.itemStart( url );
+					}
 
-		image.src = url;
+					scope.manager.itemStart( url );
 
-		return image;
+					image.src = url;
+
+					return image;
+				}
+			})
+		  }
+
 
 	}
 
