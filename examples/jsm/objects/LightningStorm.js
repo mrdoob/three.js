@@ -3,8 +3,8 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	Object3D
-} from "../../../build/three.module.js";
-import { LightningStrike } from "../geometries/LightningStrike.js";
+} from '../../../build/three.module.js';
+import { LightningStrike } from '../geometries/LightningStrike.js';
 
 /**
  * @fileoverview Lightning strike object generator

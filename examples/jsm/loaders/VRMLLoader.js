@@ -33,8 +33,8 @@ import {
 	TextureLoader,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
-import { chevrotain } from "../libs/chevrotain.module.min.js";
+} from '../../../build/three.module.js';
+import { chevrotain } from '../libs/chevrotain.module.min.js';
 
 var VRMLLoader = ( function () {
 

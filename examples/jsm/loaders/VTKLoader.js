@@ -5,8 +5,8 @@ import {
 	Float32BufferAttribute,
 	Loader,
 	LoaderUtils
-} from "../../../build/three.module.js";
-import { Inflate } from "../libs/inflate.module.min.js";
+} from '../../../build/three.module.js';
+import { Inflate } from '../libs/inflate.module.min.js';
 
 var VTKLoader = function ( manager ) {
 

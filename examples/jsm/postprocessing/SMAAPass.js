@@ -7,11 +7,11 @@ import {
 	Texture,
 	UniformsUtils,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
-import { SMAAEdgesShader } from "../shaders/SMAAShader.js";
-import { SMAAWeightsShader } from "../shaders/SMAAShader.js";
-import { SMAABlendShader } from "../shaders/SMAAShader.js";
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
+import { SMAAEdgesShader } from '../shaders/SMAAShader.js';
+import { SMAAWeightsShader } from '../shaders/SMAAShader.js';
+import { SMAABlendShader } from '../shaders/SMAAShader.js';
 
 var SMAAPass = function ( width, height ) {
 
