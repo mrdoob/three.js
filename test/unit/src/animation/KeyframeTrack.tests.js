@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { KeyframeTrack } from '../../../../src/animation/KeyframeTrack';
 import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper';
 
 export default QUnit.module( 'Animation', () => {
 
@@ -100,7 +100,10 @@ export default QUnit.module( 'Animation', () => {
 			var invalidTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, NaN ] );
 
 			assert.ok( validTrack.validate() );
+
+			console.level = CONSOLE_LEVEL.OFF;
 			assert.notOk( invalidTrack.validate() );
+			console.level = CONSOLE_LEVEL.DEFAULT;
 
 		} );
 
