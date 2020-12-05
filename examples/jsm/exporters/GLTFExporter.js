@@ -9,6 +9,7 @@ import {
 	LinearMipmapLinearFilter,
 	LinearMipmapNearestFilter,
 	MathUtils,
+	Matrix4,
 	MirroredRepeatWrapping,
 	NearestFilter,
 	NearestMipmapLinearFilter,
@@ -178,7 +179,7 @@ GLTFExporter.prototype = {
 		/**
 		 * Is identity matrix
 		 *
-		 * @param {THREE.Matrix4} matrix
+		 * @param {Matrix4} matrix
 		 * @returns {Boolean} Returns true, if parameter is identity matrix
 		 */
 		function isIdentityMatrix( matrix ) {
@@ -1716,7 +1717,7 @@ GLTFExporter.prototype = {
 
 			var joints = [];
 			var inverseBindMatrices = new Float32Array( skeleton.bones.length * 16 );
-			var temporaryBoneInverse = new THREE.Matrix4();
+			var temporaryBoneInverse = new Matrix4();
 
 			for ( var i = 0; i < skeleton.bones.length; ++ i ) {
 
