@@ -614,7 +614,7 @@ THREE.ColladaExporter.prototype = {
 		var libraryMaterials = [];
 		var libraryVisualScenes = processObject( object );
 
-		var specLink = version === '1.4.1' ? 'http://www.collada.org/2005/11/COLLADASchema' : 'https://www.khronos.org/collada/';
+		var specLink = version === '1.4.1' ? 'https://www.collada.org/2005/11/COLLADASchema' : 'https://www.khronos.org/collada/';
 		var dae =
 			'<?xml version="1.0" encoding="UTF-8" standalone="no" ?>' +
 			`<COLLADA xmlns="${ specLink }" version="${ version }">` +
