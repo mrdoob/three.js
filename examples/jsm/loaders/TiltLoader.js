@@ -2,13 +2,16 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	Color,
+	DoubleSide,
 	FileLoader,
 	Group,
 	Loader,
-	Points,
-	PointsMaterial
-} from "../../../build/three.module.js";
-import { JSZip } from "../libs/jszip.module.min.js";
+	Mesh,
+	MeshBasicMaterial,
+	Quaternion,
+	Vector3
+} from '../../../build/three.module.js';
+import { JSZip } from '../libs/jszip.module.min.js';
 
 class TiltLoader extends Loader {
 
@@ -76,7 +79,7 @@ class TiltLoader extends Loader {
 
 		for ( let i = 0; i < num_strokes; i ++ ) {
 
-			const brush_index = data.getInt32( offset, true );
+			// const brush_index = data.getInt32( offset, true );
 			const brush_color = [
 				data.getFloat32( offset + 4, true ),
 				data.getFloat32( offset + 8, true ),
@@ -92,6 +95,8 @@ class TiltLoader extends Loader {
 
 			for ( let j = 0; j < 4; j ++ ) {
 
+				// TOFIX: I don't understand these masks yet
+
 				const byte = 1 << j;
 				if ( ( stroke_mask & byte ) > 0 ) offset_stroke_mask += 4;
 				if ( ( controlpoint_mask & byte ) > 0 ) offset_controlpoint_mask += 4;
@@ -101,7 +106,7 @@ class TiltLoader extends Loader {
 			// console.log( { brush_index, brush_color, brush_size, stroke_mask, controlpoint_mask } );
 			// console.log( offset_stroke_mask, offset_controlpoint_mask );
 
-			offset = offset + 28 + offset_stroke_mask + 4; // TOFIX
+			offset = offset + 28 + offset_stroke_mask + 4; // TOFIX: This is wrong
 
 			const num_control_points = data.getInt32( offset, true );
 
@@ -123,20 +128,85 @@ class TiltLoader extends Loader {
 				quaternions[ k + 2 ] = data.getFloat32( offset + 20, true );
 				quaternions[ k + 3 ] = data.getFloat32( offset + 24, true );
 
-				offset = offset + 28 + offset_controlpoint_mask;
+				offset = offset + 28 + offset_controlpoint_mask; // TOFIX: This is wrong
 
 			}
 
 			// console.log( positions, quaternions );
 
-			const geometry = new BufferGeometry();
-			geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
-			const material = new PointsMaterial( { color: new Color().fromArray( brush_color ), size: brush_size } );
-			group.add( new Points( geometry, material ) );
+			const color = new Color().fromArray( brush_color );
+			const opacity = brush_color[ 3 ];
+
+			const geometry = new StrokeGeometry( positions, quaternions, brush_size );
+			const material = new MeshBasicMaterial( {
+				color: color, opacity: opacity, transparent: opacity < 1, side: DoubleSide
+			} );
+			group.add( new Mesh( geometry, material ) );
 
 		}
 
 		return group;
+
+	}
+
+}
+
+class StrokeGeometry extends BufferGeometry {
+
+	constructor( positions, quaternions, size ) {
+
+		super();
+
+		const vertices = [];
+
+		const position = new Vector3();
+		const prevPosition = new Vector3().fromArray( positions, 0 );
+
+		const quaternion = new Quaternion();
+		const prevQuaternion = new Quaternion().fromArray( quaternions, 0 );
+
+		const vector1 = new Vector3();
+		const vector2 = new Vector3();
+		const vector3 = new Vector3();
+		const vector4 = new Vector3();
+
+		size = size / 2;
+
+		for ( let i = 3, j = 4; i <= positions.length; i += 3, j += 4 ) {
+
+			position.fromArray( positions, i );
+			quaternion.fromArray( quaternions, j );
+
+			vector1.set( - size, 0, 0 );
+			vector1.applyQuaternion( quaternion );
+			vector1.add( position );
+
+			vector2.set( size, 0, 0 );
+			vector2.applyQuaternion( quaternion );
+			vector2.add( position );
+
+			vector3.set( size, 0, 0 );
+			vector3.applyQuaternion( prevQuaternion );
+			vector3.add( prevPosition );
+
+			vector4.set( - size, 0, 0 );
+			vector4.applyQuaternion( prevQuaternion );
+			vector4.add( prevPosition );
+
+			vertices.push( vector1.x, vector1.y, - vector1.z );
+			vertices.push( vector2.x, vector2.y, - vector2.z );
+			vertices.push( vector4.x, vector4.y, - vector4.z );
+
+			vertices.push( vector2.x, vector2.y, - vector2.z );
+			vertices.push( vector3.x, vector3.y, - vector3.z );
+			vertices.push( vector4.x, vector4.y, - vector4.z );
+
+			prevPosition.copy( position );
+			prevQuaternion.copy( quaternion );
+
+		}
+
+		this.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
 
 	}
 

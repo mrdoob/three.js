@@ -26,11 +26,6 @@
 
 				scene = new THREE.Scene();
 
-				const light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0.5, 1.0, 0.5 ).normalize();
-
-				scene.add( light );
-
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
 
 				camera.position.y = 5;
