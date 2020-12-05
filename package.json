@@ -3,7 +3,7 @@
   "version": "0.123.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
-  "module": "build/three.module.js",
+  "module": "build/three.module.node.js",
   "types": "src/Three.d.ts",
   "repository": {
     "type": "git",
@@ -103,6 +103,9 @@
     "rollup-plugin-terser": "^7.0.2",
     "servez": "^1.11.0",
     "typescript": "^4.1.2"
+  },
+  "dependencies": {
+    "xmlhttprequest":"1.8.0"
   },
   "jspm": {
     "files": [
