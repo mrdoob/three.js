@@ -117,6 +117,8 @@
 					transparent: true,
 				} );
 				plane = new THREE.Mesh( planeGeometry, planeMaterial );
+				plane.material.polygonOffset = true;
+				plane.material.polygonOffsetFactor = -.1;
 				shadowGroup.add( plane );
 
 				// the y from the texture is flipped!
