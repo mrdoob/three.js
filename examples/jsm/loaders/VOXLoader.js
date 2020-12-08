@@ -1,7 +1,7 @@
 import {
 	FileLoader,
 	Loader
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 function VOXLoader( manager ) {
 
