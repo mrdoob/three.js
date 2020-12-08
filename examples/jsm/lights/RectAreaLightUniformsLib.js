@@ -9,7 +9,7 @@ import {
 	RGBAFormat,
 	UVMapping,
 	UniformsLib
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * Uniforms library for RectAreaLight shared webgl shaders

@@ -7,11 +7,11 @@ import {
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
-import { CopyShader } from "../shaders/CopyShader.js";
-import { LuminosityShader } from "../shaders/LuminosityShader.js";
-import { ToneMapShader } from "../shaders/ToneMapShader.js";
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
+import { CopyShader } from '../shaders/CopyShader.js';
+import { LuminosityShader } from '../shaders/LuminosityShader.js';
+import { ToneMapShader } from '../shaders/ToneMapShader.js';
 
 /**
  * Generate a texture that represents the luminosity of the current scene, adapted over time

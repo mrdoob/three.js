@@ -16,8 +16,8 @@ import {
 	Vector2,
 	Vector3,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
-import { OceanShaders } from "../shaders/OceanShaders.js";
+} from '../../../build/three.module.js';
+import { OceanShaders } from '../shaders/OceanShaders.js';
 
 var Ocean = function ( renderer, camera, scene, options ) {
 

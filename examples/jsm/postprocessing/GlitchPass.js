@@ -5,9 +5,9 @@ import {
 	RGBFormat,
 	ShaderMaterial,
 	UniformsUtils
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
-import { DigitalGlitch } from "../shaders/DigitalGlitch.js";
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
+import { DigitalGlitch } from '../shaders/DigitalGlitch.js';
 
 var GlitchPass = function ( dt_size ) {
 

@@ -1,7 +1,7 @@
 import {
 	Color
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
 
 var RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
 
