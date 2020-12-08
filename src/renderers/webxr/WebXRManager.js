@@ -219,11 +219,21 @@ function WebXRManager( renderer, gl ) {
 
 			} else {
 
+				let depthFormat = 0;
+
+				if ( attributes.depth ) {
+
+					depthFormat = attributes.stencil ? gl.DEPTH_STENCIL : gl.DEPTH_COMPONENT;
+
+				}
+
 				const projectionlayerInit = {
-					// TODO pass texture formats once they are suppported
+					colorFormat: attributes.alpha ? gl.RGBA : gl.RGB,
+					depthFormat: depthFormat,
 					scaleFactor: framebufferScaleFactor
 				};
 
+				// eslint-disable-next-line no-undef
 				glBinding = new XRWebGLBinding( session, gl );
 
 				glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
