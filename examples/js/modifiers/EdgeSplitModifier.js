@@ -1,5 +1,3 @@
-import { BufferGeometry } from "../../../build/three.module";
-
 THREE.EdgeSplitModifier = function () {
 
 	var A = new THREE.Vector3();
@@ -157,7 +155,7 @@ THREE.EdgeSplitModifier = function () {
 		const wasNotBufferGeometry = ! geometry.isBufferGeometry;
 		if ( ! geometry.isBufferGeometry ) {
 
-			geometry = new BufferGeometry().fromGeometry( geometry );
+			geometry = new THREE.BufferGeometry().fromGeometry( geometry );
 
 		}
 
