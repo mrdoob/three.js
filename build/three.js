@@ -13519,13 +13519,13 @@
 		function getTextureEncodingFromMap(map) {
 			var encoding;
 
-			if (!map) {
-				encoding = LinearEncoding;
-			} else if (map.isTexture) {
+			if (map && map.isTexture) {
 				encoding = map.encoding;
-			} else if (map.isWebGLRenderTarget) {
+			} else if (map && map.isWebGLRenderTarget) {
 				console.warn('THREE.WebGLPrograms.getTextureEncodingFromMap: don\'t use render targets as textures. Use their .texture property instead.');
 				encoding = map.texture.encoding;
+			} else {
+				encoding = LinearEncoding;
 			}
 
 			return encoding;
@@ -17822,8 +17822,13 @@
 		}; // Clearing
 
 
-		this.getClearColor = function () {
-			return background.getClearColor();
+		this.getClearColor = function (target) {
+			if (target === undefined) {
+				console.warn('WebGLRenderer: .getClearColor() now requires a Color as an argument');
+				target = new Color();
+			}
+
+			return target.copy(background.getClearColor());
 		};
 
 		this.setClearColor = function () {
@@ -35742,6 +35747,8 @@
 			_sizeLods = _createPlanes2._sizeLods,
 			_sigmas = _createPlanes2._sigmas;
 
+	var _clearColor = /*@__PURE__*/new Color();
+
 	var _oldTarget = null; // Golden Ratio
 
 	var PHI = (1 + Math.sqrt(5)) / 2;
@@ -35934,7 +35941,7 @@
 			var renderer = this._renderer;
 			var outputEncoding = renderer.outputEncoding;
 			var toneMapping = renderer.toneMapping;
-			var clearColor = renderer.getClearColor();
+			renderer.getClearColor(_clearColor);
 			var clearAlpha = renderer.getClearAlpha();
 			renderer.toneMapping = NoToneMapping;
 			renderer.outputEncoding = LinearEncoding;
@@ -35973,7 +35980,7 @@
 
 			renderer.toneMapping = toneMapping;
 			renderer.outputEncoding = outputEncoding;
-			renderer.setClearColor(clearColor, clearAlpha);
+			renderer.setClearColor(_clearColor, clearAlpha);
 		};
 
 		_proto._textureToCubeUV = function _textureToCubeUV(texture, cubeUVRenderTarget) {

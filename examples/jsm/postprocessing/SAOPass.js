@@ -18,13 +18,13 @@ import {
 	Vector2,
 	WebGLRenderTarget,
 	ZeroFactor
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
-import { SAOShader } from "../shaders/SAOShader.js";
-import { DepthLimitedBlurShader } from "../shaders/DepthLimitedBlurShader.js";
-import { BlurShaderUtils } from "../shaders/DepthLimitedBlurShader.js";
-import { CopyShader } from "../shaders/CopyShader.js";
-import { UnpackDepthRGBAShader } from "../shaders/UnpackDepthRGBAShader.js";
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
+import { SAOShader } from '../shaders/SAOShader.js';
+import { DepthLimitedBlurShader } from '../shaders/DepthLimitedBlurShader.js';
+import { BlurShaderUtils } from '../shaders/DepthLimitedBlurShader.js';
+import { CopyShader } from '../shaders/CopyShader.js';
+import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader.js';
 
 /**
  * SAO implementation inspired from bhouston previous SAO work

@@ -172,7 +172,7 @@ class StrokeGeometry extends BufferGeometry {
 
 		size = size / 2;
 
-		for ( let i = 3, j = 4; i <= positions.length; i += 3, j += 4 ) {
+		for ( let i = 0, j = 0; i < positions.length; i += 3, j += 4 ) {
 
 			position.fromArray( positions, i );
 			quaternion.fromArray( quaternions, j );

@@ -18,7 +18,7 @@ import {
 	Vector2,
 	Vector3,
 	Vector4
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var RenderableObject = function () {
 
