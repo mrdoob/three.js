@@ -450,6 +450,11 @@ export class WebGLRenderer implements Renderer {
 	initTexture( texture: Texture ): void;
 
 	/**
+	 * Can be used to reset the internal WebGL state.
+	 */
+	resetState(): void;
+
+	/**
 	 * @deprecated
 	 */
 	gammaFactor: number;
