@@ -18,3 +18,5 @@ export const Blob = window.Blob;
 export const atob = window.atob;
 export const DOMParser = window.DOMParser;
 export const document = window.document;
+export const XMLHttpRequest = window.XMLHttpRequest;
+export const decodeURIComponent = window.decodeURIComponent;

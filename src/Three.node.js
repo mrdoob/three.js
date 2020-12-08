@@ -49,7 +49,7 @@ export { ImageBitmapLoader } from './loaders/ImageBitmapLoader.js';
 export { FontLoader } from './loaders/FontLoader.js';
 export { FileLoader } from './loaders/FileLoader.node.js';
 export { Loader } from './loaders/Loader.js';
-export { LoaderUtils } from './loaders/LoaderUtils.js';
+export { LoaderUtils } from './loaders/LoaderUtils.node.js';
 export { Cache } from './loaders/Cache.js';
 export { AudioLoader } from './loaders/AudioLoader.js';
 export { SpotLight } from './lights/SpotLight.js';
