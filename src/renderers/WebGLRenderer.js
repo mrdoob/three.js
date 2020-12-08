@@ -67,6 +67,11 @@ function WebGLRenderer( parameters ) {
 	let currentRenderList = null;
 	let currentRenderState = null;
 
+	// render() can be called from within a callback triggered by another render.
+	// We track this so that the nested render call gets its state isolated from the parent render call.
+
+	const renderStateStack = [];
+
 	// public properties
 
 	this.domElement = _canvas;
@@ -133,7 +138,6 @@ function WebGLRenderer( parameters ) {
 	let _currentMaterialId = - 1;
 
 	let _currentCamera = null;
-	let _currentArrayCamera = null;
 
 	const _currentViewport = new Vector4();
 	const _currentScissor = new Vector4();
@@ -887,7 +891,7 @@ function WebGLRenderer( parameters ) {
 
 	this.compile = function ( scene, camera ) {
 
-		currentRenderState = renderStates.get( scene, camera );
+		currentRenderState = renderStates.get( scene );
 		currentRenderState.init();
 
 		scene.traverseVisible( function ( object ) {
@@ -906,7 +910,7 @@ function WebGLRenderer( parameters ) {
 
 		} );
 
-		currentRenderState.setupLights( camera );
+		currentRenderState.setupLights();
 
 		const compiled = new WeakMap();
 
@@ -1021,8 +1025,10 @@ function WebGLRenderer( parameters ) {
 		//
 		if ( scene.isScene === true ) scene.onBeforeRender( _this, scene, camera, renderTarget || _currentRenderTarget );
 
-		currentRenderState = renderStates.get( scene, camera );
+		currentRenderState = renderStates.get( scene, renderStateStack.length );
 		currentRenderState.init();
+
+		renderStateStack.push( currentRenderState );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromProjectionMatrix( _projScreenMatrix );
@@ -1051,7 +1057,8 @@ function WebGLRenderer( parameters ) {
 
 		shadowMap.render( shadowsArray, scene, camera );
 
-		currentRenderState.setupLights( camera );
+		currentRenderState.setupLights();
+		currentRenderState.setupLightsView( camera );
 
 		if ( _clippingEnabled === true ) clipping.endShadows();
 
@@ -1105,8 +1112,18 @@ function WebGLRenderer( parameters ) {
 
 		// _gl.finish();
 
+		renderStateStack.pop();
+		if ( renderStateStack.length > 0 ) {
+
+			currentRenderState = renderStateStack[ renderStateStack.length - 1 ];
+
+		} else {
+
+			currentRenderState = null;
+
+		}
+
 		currentRenderList = null;
-		currentRenderState = null;
 
 	};
 
@@ -1250,8 +1267,6 @@ function WebGLRenderer( parameters ) {
 
 			if ( camera.isArrayCamera ) {
 
-				_currentArrayCamera = camera;
-
 				const cameras = camera.cameras;
 
 				for ( let j = 0, jl = cameras.length; j < jl; j ++ ) {
@@ -1262,7 +1277,7 @@ function WebGLRenderer( parameters ) {
 
 						state.viewport( _currentViewport.copy( camera2.viewport ) );
 
-						currentRenderState.setupLights( camera2 );
+						currentRenderState.setupLightsView( camera2 );
 
 						renderObject( object, scene, camera2, geometry, material, group );
 
@@ -1271,8 +1286,6 @@ function WebGLRenderer( parameters ) {
 				}
 
 			} else {
-
-				_currentArrayCamera = null;
 
 				renderObject( object, scene, camera, geometry, material, group );
 
@@ -1285,7 +1298,6 @@ function WebGLRenderer( parameters ) {
 	function renderObject( object, scene, camera, geometry, material, group ) {
 
 		object.onBeforeRender( _this, scene, camera, geometry, material, group );
-		currentRenderState = renderStates.get( scene, _currentArrayCamera || camera );
 
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
@@ -1307,7 +1319,6 @@ function WebGLRenderer( parameters ) {
 		}
 
 		object.onAfterRender( _this, scene, camera, geometry, material, group );
-		currentRenderState = renderStates.get( scene, _currentArrayCamera || camera );
 
 	}
 
@@ -1763,18 +1774,6 @@ function WebGLRenderer( parameters ) {
 	this.setRenderList = function ( renderList ) {
 
 		currentRenderList = renderList;
-
-	};
-
-	this.getRenderState = function () {
-
-		return currentRenderState;
-
-	};
-
-	this.setRenderState = function ( renderState ) {
-
-		currentRenderState = renderState;
 
 	};
 
