@@ -626,7 +626,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				} else if ( geometry.isLinearLight ) {
 
-					console.warn( `THREE.3DMLoader:  No conversion exists for linear lights.` );
+					console.warn( 'THREE.3DMLoader:  No conversion exists for linear lights.' );
 
 					return;
 

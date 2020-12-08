@@ -132,13 +132,13 @@ export function modifyShader( material, uniforms, numberOfCurves = 1 ) {
 		${shader.vertexShader}
 		`
 		// chunk import moved in front of modified shader below
-			.replace( '#include <beginnormal_vertex>', `` )
+			.replace( '#include <beginnormal_vertex>', '' )
 
 			// vec3 transformedNormal declaration overriden below
-			.replace( '#include <defaultnormal_vertex>', `` )
+			.replace( '#include <defaultnormal_vertex>', '' )
 
 			// vec3 transformed declaration overriden below
-			.replace( '#include <begin_vertex>', `` )
+			.replace( '#include <begin_vertex>', '' )
 
 			// shader override
 			.replace(
@@ -315,7 +315,7 @@ export class InstancedFlow extends Flow {
 	 */
 	setCurve( index, curveNo ) {
 
-		if ( isNaN( curveNo ) ) throw Error( "curve index being set is Not a Number (NaN)" );
+		if ( isNaN( curveNo ) ) throw Error( 'curve index being set is Not a Number (NaN)' );
 		this.whichCurve[ index ] = curveNo;
 		this.writeChanges( index );
 

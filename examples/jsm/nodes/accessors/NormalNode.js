@@ -15,7 +15,7 @@ NormalNode.VIEW = 'view';
 
 NormalNode.prototype = Object.create( TempNode.prototype );
 NormalNode.prototype.constructor = NormalNode;
-NormalNode.prototype.nodeType = "Normal";
+NormalNode.prototype.nodeType = 'Normal';
 
 NormalNode.prototype.getShared = function () {
 
