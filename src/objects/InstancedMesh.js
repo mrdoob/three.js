@@ -112,6 +112,12 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	updateMorphTargets: function () {
 
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
 	}
 
 } );
