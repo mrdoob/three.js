@@ -308,13 +308,13 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	// core imports
 
-	if ( keys ) imports.push( `import {${keys}\n} from "${pathPrefix}../../build/three.module.js";` );
+	if ( keys ) imports.push( `import {${keys}\n} from '${pathPrefix}../../build/three.module.js';` );
 
 	// example imports
 
 	for ( var dependency of exampleDependencies ) {
 
-		imports.push( `import { ${dependency.name} } from "${pathPrefix}${dependency.path}";` );
+		imports.push( `import { ${dependency.name} } from '${pathPrefix}${dependency.path}';` );
 
 	}
 

@@ -1,8 +1,8 @@
 import {
 	ShaderMaterial,
 	UniformsUtils
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
 
 var ShaderPass = function ( shader, textureID ) {
 

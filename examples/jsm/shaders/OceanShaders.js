@@ -1,6 +1,6 @@
 import {
 	Vector2
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 // Description: A deep water ocean shader set
 // based on an implementation of a Tessendorf Waves

@@ -19,8 +19,8 @@ import {
 	RepeatWrapping,
 	TextureLoader,
 	sRGBEncoding
-} from "../../../build/three.module.js";
-import { JSZip } from "../libs/jszip.module.min.js";
+} from '../../../build/three.module.js';
+import { JSZip } from '../libs/jszip.module.min.js';
 
 /**
  *
