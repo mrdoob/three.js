@@ -66,10 +66,7 @@
 					function ( group ) {
 
 						const cerberus = group.children[ 0 ];
-
-						// Retrieve Cerberus vertex positions only
 						const modelGeometry = cerberus.geometry;
-						modelGeometry.deleteAttribute( 'normal' );
 
 						modifier = new EdgeSplitModifier();
 						baseGeometry = modelGeometry;
@@ -140,11 +137,9 @@
 
 				} else {
 
-					geometry = BufferGeometryUtils.mergeVertices( baseGeometry );
+					geometry = baseGeometry;
 
 				}
-
-				geometry.computeVertexNormals();
 
 				return geometry;
 

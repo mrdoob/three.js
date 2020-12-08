@@ -1,3 +1,4 @@
+import { BufferGeometry } from "../../../build/three.module";
 
 THREE.EdgeSplitModifier = function () {
 
@@ -153,9 +154,23 @@ THREE.EdgeSplitModifier = function () {
 
 	this.modify = function ( geometry, cutOffAngle ) {
 
+		const wasNotBufferGeometry = ! geometry.isBufferGeometry;
 		if ( ! geometry.isBufferGeometry ) {
 
-			geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+			geometry = new BufferGeometry().fromGeometry( geometry );
+
+		}
+
+
+		let hadNormals = false;
+		if ( geometry.attributes.normal ) {
+
+			hadNormals = true;
+
+			if ( ! wasNotBufferGeometry )
+				geometry = geometry.clone();
+
+			geometry.deleteAttribute( 'normal' );
 
 		}
 
@@ -229,6 +244,12 @@ THREE.EdgeSplitModifier = function () {
 		for ( const name of Object.keys( newAttributes ) ) {
 
 			geometry.setAttribute( name, newAttributes[ name ] );
+
+		}
+
+		if ( hadNormals ) {
+
+			geometry.computeVertexNormals();
 
 		}
 

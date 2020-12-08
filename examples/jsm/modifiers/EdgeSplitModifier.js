@@ -160,6 +160,7 @@ var EdgeSplitModifier = function () {
 
 	this.modify = function ( geometry, cutOffAngle ) {
 
+		const wasNotBufferGeometry = ! geometry.isBufferGeometry;
 		if ( ! geometry.isBufferGeometry ) {
 
 			geometry = new BufferGeometry().fromGeometry( geometry );
@@ -167,7 +168,13 @@ var EdgeSplitModifier = function () {
 		}
 
 
+		let hadNormals = false;
 		if ( geometry.attributes.normal ) {
+
+			hadNormals = true;
+
+			if ( ! wasNotBufferGeometry )
+				geometry = geometry.clone();
 
 			geometry.deleteAttribute( 'normal' );
 
@@ -243,6 +250,12 @@ var EdgeSplitModifier = function () {
 		for ( const name of Object.keys( newAttributes ) ) {
 
 			geometry.setAttribute( name, newAttributes[ name ] );
+
+		}
+
+		if ( hadNormals ) {
+
+			geometry.computeVertexNormals();
 
 		}
 
