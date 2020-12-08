@@ -75,7 +75,7 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 			var projectionMatrix = camera.projectionMatrix;
 
 			var geometry = this.geometry;
-			var material = this.material;
+			var material = Array.isArray( this.material ) ? this.material[ 0 ] : this.material;
 			var resolution = material.resolution;
 			var lineWidth = material.linewidth + threshold;
 
