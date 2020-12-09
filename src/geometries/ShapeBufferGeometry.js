@@ -67,7 +67,7 @@ class ShapeBufferGeometry extends BufferGeometry {
 
 			// check direction of vertices
 
-			if ( ShapeUtils.isClockWise( shapeVertices ) === false ) {
+			if ( ShapeUtils.isCounterClockWise( shapeVertices ) === false ) {
 
 				shapeVertices = shapeVertices.reverse();
 
@@ -77,7 +77,7 @@ class ShapeBufferGeometry extends BufferGeometry {
 
 				const shapeHole = shapeHoles[ i ];
 
-				if ( ShapeUtils.isClockWise( shapeHole ) === true ) {
+				if ( ShapeUtils.isCounterClockWise( shapeHole ) === true ) {
 
 					shapeHoles[ i ] = shapeHole.reverse();
 

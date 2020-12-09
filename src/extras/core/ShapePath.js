@@ -139,8 +139,6 @@ Object.assign( ShapePath.prototype, {
 
 		}
 
-		const isClockWise = ShapeUtils.isClockWise;
-
 		const subPaths = this.subPaths;
 		if ( subPaths.length === 0 ) return [];
 
@@ -160,7 +158,7 @@ Object.assign( ShapePath.prototype, {
 
 		}
 
-		let holesFirst = ! isClockWise( subPaths[ 0 ].getPoints() );
+		let holesFirst = ! ShapeUtils.isCounterClockWise( subPaths[ 0 ].getPoints() );
 		holesFirst = isCCW ? ! holesFirst : holesFirst;
 
 		// console.log("Holes first", holesFirst);
@@ -178,7 +176,7 @@ Object.assign( ShapePath.prototype, {
 
 			tmpPath = subPaths[ i ];
 			tmpPoints = tmpPath.getPoints();
-			solid = isClockWise( tmpPoints );
+			solid = ShapeUtils.isCounterClockWise( tmpPoints );
 			solid = isCCW ? ! solid : solid;
 
 			if ( solid ) {

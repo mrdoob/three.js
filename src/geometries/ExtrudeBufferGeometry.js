@@ -135,7 +135,7 @@ class ExtrudeBufferGeometry extends BufferGeometry {
 			let vertices = shapePoints.shape;
 			const holes = shapePoints.holes;
 
-			const reverse = ! ShapeUtils.isClockWise( vertices );
+			const reverse = ! ShapeUtils.isCounterClockWise( vertices );
 
 			if ( reverse ) {
 
@@ -147,7 +147,7 @@ class ExtrudeBufferGeometry extends BufferGeometry {
 
 					const ahole = holes[ h ];
 
-					if ( ShapeUtils.isClockWise( ahole ) ) {
+					if ( ShapeUtils.isCounterClockWise( ahole ) ) {
 
 						holes[ h ] = ahole.reverse();
 

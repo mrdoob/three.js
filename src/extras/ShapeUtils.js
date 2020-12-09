@@ -19,7 +19,7 @@ const ShapeUtils = {
 
 	},
 
-	isClockWise: function ( pts ) {
+	isCounterClockWise: function ( pts ) {
 
 		return ShapeUtils.area( pts ) < 0;
 
