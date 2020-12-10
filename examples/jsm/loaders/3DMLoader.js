@@ -325,7 +325,8 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					} else {
 
-						var _object = this._createObject( obj, null );
+						var material = this._createMaterial( );
+						var _object = this._createObject( obj, material );
 
 					}
 
@@ -1241,7 +1242,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		}
 
-		if ( geometry ) {
+		if ( ( geometry && ! Array.isArray( geometry ) ) || ( Array.isArray( geometry ) && geometry.length ) ) {
 
 			var attributes = extractProperties( _attributes );
 			attributes.geometry = extractProperties( _geometry );
@@ -1265,6 +1266,10 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			attributes.geometry.objectType = objectType;
 
 			return { geometry, attributes, objectType };
+
+		} else {
+
+			console.warn( 'THREE.3DMLoader: Object has no mesh geometry. Consider opening this in Rhino, using a shaded display mode, and exporting again.' );
 
 		}
 
