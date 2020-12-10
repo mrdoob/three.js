@@ -1001,9 +1001,9 @@
 	},
 
 	"kr": {
-
+	
 		"매뉴얼": {
-
+	
 			"시작하기": {
 				"장면 만들기": "manual/kr/introduction/Creating-a-scene",
 				"설치": "manual/kr/introduction/Installation",
@@ -1017,7 +1017,7 @@
 				"FAQ": "manual/kr/introduction/FAQ",
 				"참고 링크": "manual/kr/introduction/Useful-links"
 			},
-
+	
 			"심화 과정": {
 				"오브젝트를 업데이트하는 방법": "manual/kr/introduction/How-to-update-things",
 				"오브젝트를 폐기하는 방법": "manual/kr/introduction/How-to-dispose-of-objects",
@@ -1026,13 +1026,14 @@
 				"행렬 변환": "manual/kr/introduction/Matrix-transformations",
 				"애니메이션 시스템": "manual/kr/introduction/Animation-system"
 			},
-
+	
 			"빌드 도구": {
 				"NPM 테스트": "manual/kr/buildTools/Testing-with-NPM"
 			}
-
+	
 		}
-
-
+	
+	
 	}
+
 }
