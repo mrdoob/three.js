@@ -1724,7 +1724,7 @@ GLTFExporter.prototype = {
 				joints.push( nodeMap.get( skeleton.bones[ i ] ) );
 
 				temporaryBoneInverse.copy( skeleton.boneInverses[ i ] );
-				
+
 				temporaryBoneInverse.multiply( object.bindMatrix ).toArray( inverseBindMatrices, i * 16 );
 
 			}
