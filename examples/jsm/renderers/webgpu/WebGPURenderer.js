@@ -66,7 +66,7 @@ class WebGPURenderer {
 
 		// public
 
-		this.domElement = ( parameters.canvas !== undefined ) ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
+		this.domElement = ( parameters.canvas !== undefined ) ? parameters.canvas : this._createCanvasElement();
 
 		this.autoClear = true;
 		this.autoClearColor = true;
@@ -453,9 +453,9 @@ class WebGPURenderer {
 
 	}
 
-	getClearColor() {
+	getClearColor( target ) {
 
-		return this._clearColor;
+		return target.copy( this._clearColor );
 
 	}
 
@@ -870,6 +870,14 @@ class WebGPURenderer {
 			} );
 
 		}
+
+	}
+
+	_createCanvasElement() {
+
+		const canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
+		canvas.style.display = 'block';
+		return canvas;
 
 	}
 

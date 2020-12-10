@@ -91,7 +91,6 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 120;
-				camera.target = new THREE.Vector3();
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;

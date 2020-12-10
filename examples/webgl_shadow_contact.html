@@ -117,6 +117,8 @@
 					transparent: true,
 				} );
 				plane = new THREE.Mesh( planeGeometry, planeMaterial );
+				plane.material.polygonOffset = true;
+				plane.material.polygonOffsetFactor = -.1;
 				shadowGroup.add( plane );
 
 				// the y from the texture is flipped!
@@ -135,7 +137,6 @@
 				} );
 				fillPlane = new THREE.Mesh( planeGeometry, fillPlaneMaterial );
 				fillPlane.rotateX( Math.PI );
-				fillPlane.position.y -= 0.00001;
 				shadowGroup.add( fillPlane );
 
 				// the camera to render the depth material from

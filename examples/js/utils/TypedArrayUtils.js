@@ -494,7 +494,7 @@ THREE.TypedArrayUtils.Kdtree.BinaryHeap.prototype = {
 
 		}
 
-		throw new Error( "Node not found." );
+		throw new Error( 'Node not found.' );
 
 	},
 

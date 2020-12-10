@@ -23,6 +23,7 @@ export class EffectComposer {
 	swapBuffers(): void;
 	addPass( pass: Pass ): void;
 	insertPass( pass: Pass, index: number ): void;
+	removePass( pass: Pass ): void;
 	isLastEnabledPass( passIndex: number ): boolean;
 	render( deltaTime?: number ): void;
 	reset( renderTarget?: WebGLRenderTarget ): void;

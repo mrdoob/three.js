@@ -20,9 +20,7 @@ import { ExtrudeBufferGeometry } from './ExtrudeBufferGeometry.js';
 
 class TextBufferGeometry extends ExtrudeBufferGeometry {
 
-	constructor( text, parameters ) {
-
-		parameters = parameters || {};
+	constructor( text, parameters = {} ) {
 
 		const font = parameters.font;
 

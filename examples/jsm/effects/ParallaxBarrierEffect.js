@@ -9,7 +9,7 @@ import {
 	ShaderMaterial,
 	StereoCamera,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var ParallaxBarrierEffect = function ( renderer ) {
 
@@ -28,47 +28,47 @@ var ParallaxBarrierEffect = function ( renderer ) {
 
 		uniforms: {
 
-			"mapLeft": { value: _renderTargetL.texture },
-			"mapRight": { value: _renderTargetR.texture }
+			'mapLeft': { value: _renderTargetL.texture },
+			'mapRight': { value: _renderTargetR.texture }
 
 		},
 
 		vertexShader: [
 
-			"varying vec2 vUv;",
+			'varying vec2 vUv;',
 
-			"void main() {",
+			'void main() {',
 
-			"	vUv = vec2( uv.x, uv.y );",
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			'	vUv = vec2( uv.x, uv.y );',
+			'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
-			"}"
+			'}'
 
-		].join( "\n" ),
+		].join( '\n' ),
 
 		fragmentShader: [
 
-			"uniform sampler2D mapLeft;",
-			"uniform sampler2D mapRight;",
-			"varying vec2 vUv;",
+			'uniform sampler2D mapLeft;',
+			'uniform sampler2D mapRight;',
+			'varying vec2 vUv;',
 
-			"void main() {",
+			'void main() {',
 
-			"	vec2 uv = vUv;",
+			'	vec2 uv = vUv;',
 
-			"	if ( ( mod( gl_FragCoord.y, 2.0 ) ) > 1.00 ) {",
+			'	if ( ( mod( gl_FragCoord.y, 2.0 ) ) > 1.00 ) {',
 
-			"		gl_FragColor = texture2D( mapLeft, uv );",
+			'		gl_FragColor = texture2D( mapLeft, uv );',
 
-			"	} else {",
+			'	} else {',
 
-			"		gl_FragColor = texture2D( mapRight, uv );",
+			'		gl_FragColor = texture2D( mapRight, uv );',
 
-			"	}",
+			'	}',
 
-			"}"
+			'}'
 
-		].join( "\n" )
+		].join( '\n' )
 
 	} );
 

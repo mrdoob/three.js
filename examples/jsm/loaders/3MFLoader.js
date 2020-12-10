@@ -19,8 +19,8 @@ import {
 	RepeatWrapping,
 	TextureLoader,
 	sRGBEncoding
-} from "../../../build/three.module.js";
-import { JSZip } from "../libs/jszip.module.min.js";
+} from '../../../build/three.module.js';
+import { JSZip } from '../libs/jszip.module.min.js';
 
 /**
  *
@@ -1411,11 +1411,24 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		function fetch3DModelPart( rels ) {
+
+			for ( var i = 0; i < rels.length; i ++ ) {
+
+				var rel = rels[ i ];
+				var extension = rel.target.split( '.' ).pop();
+
+				if ( extension.toLowerCase() === 'model' ) return rel;
+
+			}
+
+		}
+
 		function build( objects, data3mf ) {
 
 			var group = new Group();
 
-			var relationship = data3mf[ 'rels' ][ 0 ];
+			var relationship = fetch3DModelPart( data3mf[ 'rels' ] );
 			var buildData = data3mf.model[ relationship[ 'target' ].substring( 1 ) ][ 'build' ];
 
 			for ( var i = 0; i < buildData.length; i ++ ) {

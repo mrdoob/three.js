@@ -1,12 +1,14 @@
 import {
 	BufferGeometry,
+	Color,
 	Geometry,
 	Line,
 	Matrix3,
 	Mesh,
+	Points,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var OBJExporter = function () {};
 
@@ -23,6 +25,7 @@ OBJExporter.prototype = {
 		var indexNormals = 0;
 
 		var vertex = new Vector3();
+		var color = new Color();
 		var normal = new Vector3();
 		var uv = new Vector2();
 
@@ -135,7 +138,7 @@ OBJExporter.prototype = {
 						}
 
 						// transform the face to export format
-						output += 'f ' + face.join( ' ' ) + "\n";
+						output += 'f ' + face.join( ' ' ) + '\n';
 
 					}
 
@@ -152,7 +155,7 @@ OBJExporter.prototype = {
 						}
 
 						// transform the face to export format
-						output += 'f ' + face.join( ' ' ) + "\n";
+						output += 'f ' + face.join( ' ' ) + '\n';
 
 					}
 
@@ -245,6 +248,69 @@ OBJExporter.prototype = {
 
 		};
 
+		var parsePoints = function ( points ) {
+
+			var nbVertex = 0;
+
+			var geometry = points.geometry;
+
+			if ( geometry instanceof Geometry ) {
+
+				geometry = new BufferGeometry().setFromObject( points );
+
+			}
+
+			if ( geometry instanceof BufferGeometry ) {
+
+				var vertices = geometry.getAttribute( 'position' );
+				var colors = geometry.getAttribute( 'color' );
+
+				output += 'o ' + points.name + '\n';
+
+				if ( vertices !== undefined ) {
+
+					for ( i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
+
+						vertex.fromBufferAttribute( vertices, i );
+						vertex.applyMatrix4( points.matrixWorld );
+
+						output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z;
+
+						if ( colors !== undefined ) {
+
+							color.fromBufferAttribute( colors, i );
+
+							output += ' ' + color.r + ' ' + color.g + ' ' + color.b;
+
+						}
+
+						output += '\n';
+
+					}
+
+				}
+
+				output += 'p ';
+
+				for ( j = 1, l = vertices.count; j <= l; j ++ ) {
+
+					output += ( indexVertex + j ) + ' ';
+
+				}
+
+				output += '\n';
+
+			} else {
+
+				console.warn( 'THREE.OBJExporter.parsePoints(): geometry type unsupported', geometry );
+
+			}
+
+			// update index
+			indexVertex += nbVertex;
+
+		};
+
 		object.traverse( function ( child ) {
 
 			if ( child instanceof Mesh ) {
@@ -256,6 +322,12 @@ OBJExporter.prototype = {
 			if ( child instanceof Line ) {
 
 				parseLine( child );
+
+			}
+
+			if ( child instanceof Points ) {
+
+				parsePoints( child );
 
 			}
 

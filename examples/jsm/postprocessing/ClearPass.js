@@ -1,4 +1,7 @@
-import { Pass } from "../postprocessing/Pass.js";
+import {
+	Color
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
 
 var ClearPass = function ( clearColor, clearAlpha ) {
 
@@ -8,6 +11,7 @@ var ClearPass = function ( clearColor, clearAlpha ) {
 
 	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
 	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
+	this._oldClearColor = new Color();
 
 };
 
@@ -17,11 +21,11 @@ ClearPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
-		var oldClearColor, oldClearAlpha;
+		var oldClearAlpha;
 
 		if ( this.clearColor ) {
 
-			oldClearColor = renderer.getClearColor().getHex();
+			renderer.getClearColor( this._oldClearColor );
 			oldClearAlpha = renderer.getClearAlpha();
 
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
@@ -33,7 +37,7 @@ ClearPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		if ( this.clearColor ) {
 
-			renderer.setClearColor( oldClearColor, oldClearAlpha );
+			renderer.setClearColor( this._oldClearColor, oldClearAlpha );
 
 		}
 

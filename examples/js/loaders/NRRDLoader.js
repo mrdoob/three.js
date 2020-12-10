@@ -374,7 +374,7 @@ THREE.NRRDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototyp
 		var _spaceY = 1;
 		var _spaceZ = 1;
 
-		if ( headerObject.space == "left-posterior-superior" ) {
+		if ( headerObject.space == 'left-posterior-superior' ) {
 
 			_spaceX = - 1;
 			_spaceY = - 1;
@@ -407,7 +407,7 @@ THREE.NRRDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototyp
 		}
 
 		volume.inverseMatrix = new THREE.Matrix4();
-		volume.inverseMatrix.getInverse( volume.matrix );
+		volume.inverseMatrix.copy( volume.matrix ).invert();
 		volume.RASDimensions = ( new THREE.Vector3( volume.xLength, volume.yLength, volume.zLength ) ).applyMatrix4( volume.matrix ).round().toArray().map( Math.abs );
 
 		// .. and set the default threshold
@@ -563,7 +563,7 @@ THREE.NRRDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototyp
 
 		'space origin': function ( data ) {
 
-			return this.space_origin = data.split( "(" )[ 1 ].split( ")" )[ 0 ].split( "," );
+			return this.space_origin = data.split( '(' )[ 1 ].split( ')' )[ 0 ].split( ',' );
 
 		},
 

@@ -884,10 +884,23 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		currentProgram = null;
 
+		currentBlendingEnabled = null;
 		currentBlending = null;
+		currentBlendEquation = null;
+		currentBlendSrc = null;
+		currentBlendDst = null;
+		currentBlendEquationAlpha = null;
+		currentBlendSrcAlpha = null;
+		currentBlendDstAlpha = null;
+		currentPremultipledAlpha = false;
 
 		currentFlipSided = null;
 		currentCullFace = null;
+
+		currentLineWidth = null;
+
+		currentPolygonOffsetFactor = null;
+		currentPolygonOffsetUnits = null;
 
 		colorBuffer.reset();
 		depthBuffer.reset();

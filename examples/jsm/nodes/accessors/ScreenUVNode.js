@@ -11,7 +11,7 @@ function ScreenUVNode( resolution ) {
 
 ScreenUVNode.prototype = Object.create( TempNode.prototype );
 ScreenUVNode.prototype.constructor = ScreenUVNode;
-ScreenUVNode.prototype.nodeType = "ScreenUV";
+ScreenUVNode.prototype.nodeType = 'ScreenUV';
 
 ScreenUVNode.prototype.generate = function ( builder, output ) {
 
@@ -23,7 +23,7 @@ ScreenUVNode.prototype.generate = function ( builder, output ) {
 
 	} else {
 
-		console.warn( "THREE.ScreenUVNode is not compatible with " + builder.shader + " shader." );
+		console.warn( 'THREE.ScreenUVNode is not compatible with ' + builder.shader + ' shader.' );
 
 		result = 'vec2( 0.0 )';
 

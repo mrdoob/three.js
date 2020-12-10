@@ -2,16 +2,16 @@ import { Curve } from '../core/Curve.js';
 import { CubicBezier } from '../core/Interpolations.js';
 import { Vector2 } from '../../math/Vector2.js';
 
-function CubicBezierCurve( v0, v1, v2, v3 ) {
+function CubicBezierCurve( v0 = new Vector2(), v1 = new Vector2(), v2 = new Vector2(), v3 = new Vector2() ) {
 
 	Curve.call( this );
 
 	this.type = 'CubicBezierCurve';
 
-	this.v0 = v0 || new Vector2();
-	this.v1 = v1 || new Vector2();
-	this.v2 = v2 || new Vector2();
-	this.v3 = v3 || new Vector2();
+	this.v0 = v0;
+	this.v1 = v1;
+	this.v2 = v2;
+	this.v3 = v3;
 
 }
 
@@ -20,9 +20,9 @@ CubicBezierCurve.prototype.constructor = CubicBezierCurve;
 
 CubicBezierCurve.prototype.isCubicBezierCurve = true;
 
-CubicBezierCurve.prototype.getPoint = function ( t, optionalTarget ) {
+CubicBezierCurve.prototype.getPoint = function ( t, optionalTarget = new Vector2() ) {
 
-	const point = optionalTarget || new Vector2();
+	const point = optionalTarget;
 
 	const v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
 

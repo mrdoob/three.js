@@ -47,7 +47,6 @@
 				const container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
-				camera.target = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
@@ -134,7 +133,7 @@
 				camera.position.y = distance * Math.cos( phi );
 				camera.position.z = distance * Math.sin( phi ) * Math.sin( theta );
 
-				camera.lookAt( camera.target );
+				camera.lookAt( 0, 0, 0 );
 
 				renderer.render( scene, camera );
 

@@ -22,6 +22,7 @@ import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { RawShaderMaterial } from '../materials/RawShaderMaterial.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
+import { Color } from '../math/Color.js';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
 
 const LOD_MIN = 4;
@@ -52,6 +53,7 @@ const ENCODINGS = {
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
 const { _lodPlanes, _sizeLods, _sigmas } = /*@__PURE__*/ _createPlanes();
+const _clearColor = /*@__PURE__*/ new Color();
 let _oldTarget = null;
 
 // Golden Ratio
@@ -257,7 +259,7 @@ class PMREMGenerator {
 
 		const outputEncoding = renderer.outputEncoding;
 		const toneMapping = renderer.toneMapping;
-		const clearColor = renderer.getClearColor();
+		renderer.getClearColor( _clearColor );
 		const clearAlpha = renderer.getClearAlpha();
 
 		renderer.toneMapping = NoToneMapping;
@@ -306,7 +308,7 @@ class PMREMGenerator {
 
 		renderer.toneMapping = toneMapping;
 		renderer.outputEncoding = outputEncoding;
-		renderer.setClearColor( clearColor, clearAlpha );
+		renderer.setClearColor( _clearColor, clearAlpha );
 
 	}
 

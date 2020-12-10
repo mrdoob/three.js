@@ -95,13 +95,19 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
-	addGroup: function ( start, count, materialIndex ) {
+	hasAttribute: function ( name ) {
+
+		return this.attributes[ name ] !== undefined;
+
+	},
+
+	addGroup: function ( start, count, materialIndex = 0 ) {
 
 		this.groups.push( {
 
 			start: start,
 			count: count,
-			materialIndex: materialIndex !== undefined ? materialIndex : 0
+			materialIndex: materialIndex
 
 		} );
 

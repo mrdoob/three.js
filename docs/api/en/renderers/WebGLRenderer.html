@@ -191,9 +191,13 @@
 			</li>
 		</ul>
 		</p>
-		<p>By default these data are reset at each render calls, but when using the composer or mirrors it can be preferred to reset them with a custom pattern :
+		<p>By default these data are reset at each render call but when having multiple render passes per frame (e.g. when using post processing) it can be preferred to reset with a custom pattern.
+			First, set *autoReset* to *false*.
 		<code>
 		renderer.info.autoReset = false;
+		</code>
+		Call *reset()* whenever you have finished to render a single frame.
+		<code>
 		renderer.info.reset();
 		</code>
 		</p>
@@ -331,7 +335,7 @@
 		<h3>[method:Float getClearAlpha]()</h3>
 		<p>Returns a [page:Float float] with the current clear alpha. Ranges from 0 to 1.</p>
 
-		<h3>[method:Color getClearColor]()</h3>
+		<h3>[method:Color getClearColor]( [param:Color target] )</h3>
 		<p>Returns a [page:Color THREE.Color] instance with the current clear color.</p>
 
 		<h3>[method:WebGLRenderingContext getContext]()</h3>

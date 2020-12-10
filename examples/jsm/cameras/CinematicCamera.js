@@ -9,9 +9,9 @@ import {
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
-import { BokehShader } from "../shaders/BokehShader2.js";
-import { BokehDepthShader } from "../shaders/BokehShader2.js";
+} from '../../../build/three.module.js';
+import { BokehShader } from '../shaders/BokehShader2.js';
+import { BokehDepthShader } from '../shaders/BokehShader2.js';
 
 var CinematicCamera = function ( fov, aspect, near, far ) {
 
@@ -140,27 +140,27 @@ CinematicCamera.prototype.initPostProcessing = function () {
 
 		this.postprocessing.bokeh_uniforms = UniformsUtils.clone( bokeh_shader.uniforms );
 
-		this.postprocessing.bokeh_uniforms[ "tColor" ].value = this.postprocessing.rtTextureColor.texture;
-		this.postprocessing.bokeh_uniforms[ "tDepth" ].value = this.postprocessing.rtTextureDepth.texture;
+		this.postprocessing.bokeh_uniforms[ 'tColor' ].value = this.postprocessing.rtTextureColor.texture;
+		this.postprocessing.bokeh_uniforms[ 'tDepth' ].value = this.postprocessing.rtTextureDepth.texture;
 
-		this.postprocessing.bokeh_uniforms[ "manualdof" ].value = 0;
-		this.postprocessing.bokeh_uniforms[ "shaderFocus" ].value = 0;
+		this.postprocessing.bokeh_uniforms[ 'manualdof' ].value = 0;
+		this.postprocessing.bokeh_uniforms[ 'shaderFocus' ].value = 0;
 
-		this.postprocessing.bokeh_uniforms[ "fstop" ].value = 2.8;
+		this.postprocessing.bokeh_uniforms[ 'fstop' ].value = 2.8;
 
-		this.postprocessing.bokeh_uniforms[ "showFocus" ].value = 1;
+		this.postprocessing.bokeh_uniforms[ 'showFocus' ].value = 1;
 
-		this.postprocessing.bokeh_uniforms[ "focalDepth" ].value = 0.1;
+		this.postprocessing.bokeh_uniforms[ 'focalDepth' ].value = 0.1;
 
 		//console.log( this.postprocessing.bokeh_uniforms[ "focalDepth" ].value );
 
-		this.postprocessing.bokeh_uniforms[ "znear" ].value = this.near;
-		this.postprocessing.bokeh_uniforms[ "zfar" ].value = this.near;
+		this.postprocessing.bokeh_uniforms[ 'znear' ].value = this.near;
+		this.postprocessing.bokeh_uniforms[ 'zfar' ].value = this.near;
 
 
-		this.postprocessing.bokeh_uniforms[ "textureWidth" ].value = window.innerWidth;
+		this.postprocessing.bokeh_uniforms[ 'textureWidth' ].value = window.innerWidth;
 
-		this.postprocessing.bokeh_uniforms[ "textureHeight" ].value = window.innerHeight;
+		this.postprocessing.bokeh_uniforms[ 'textureHeight' ].value = window.innerHeight;
 
 		this.postprocessing.materialBokeh = new ShaderMaterial( {
 			uniforms: this.postprocessing.bokeh_uniforms,

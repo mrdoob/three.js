@@ -33,7 +33,8 @@ THREE.DecalGeometry = function ( mesh, position, orientation, size ) {
 	projectorMatrix.makeRotationFromEuler( orientation );
 	projectorMatrix.setPosition( position );
 
-	var projectorMatrixInverse = new THREE.Matrix4().getInverse( projectorMatrix );
+	var projectorMatrixInverse = new THREE.Matrix4();
+	projectorMatrixInverse.copy( projectorMatrix ).invert();
 
 	// generate buffers
 
