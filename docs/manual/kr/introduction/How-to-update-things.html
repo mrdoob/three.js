@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="kr">
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>화면을 업데이트하는 방법([name])</h1>
+		<h1>오브젝트를 업데이트하는 방법([name])</h1>
 		<div>
 			<p>모든 오브젝트들은 기본적으로 자동으로 장면에 추가됐을 때 자신들의 행렬구조를 업데이트합니다.</p>
 			<code>
@@ -74,7 +74,7 @@ const line = new THREE.Line( geometry,  material );
 scene.add( line );
 			</code>
 		 	<p>
-				그 다음으로 우리는 다음가 같은 패턴으로 무작위로 선에 점을 생성해 줄 것입니다:
+				그 다음, 아래와 같은 패턴으로 무작위로 선에 점을 생성해 줄 것입니다:
 			</p>
 			<code>
 const positions = line.geometry.attributes.position.array;
