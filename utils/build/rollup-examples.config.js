@@ -33,7 +33,7 @@ function createOutput( file, externalFiles ) {
 
 		plugins: [ {
 
-			generateBundle: function( options, bundle ) {
+			generateBundle: function ( options, bundle ) {
 
 				for ( var key in bundle ) {
 
