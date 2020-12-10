@@ -12,32 +12,32 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			This class can be used to transform objects in 3D space by adapting a similar interaction model of DCC tools like Blender.
-			Unlike other controls, it is not intended to transform the scene's camera.<br /><br />
+			해당 클래스는 DCC 툴인 블렌더의 상호 작용 모델과 비슷한 기능을 3D 공간에서 객체를 변환하는데 사용할 수 있습니다.
+			다른 컨트롤과 달리, 해당 기능은 카메라의 장면 변환을 의미하지 않습니다.<br /><br />
 
-			[name] expects that its attached 3D object is part of the scene graph.
+			[name] 는 연결된 3D 객체가 씬(scene) 그래프의 일부 입니다.
+		
 		</p>
 
-		<h2>Examples</h2>
+		<h2>예시</h2>
 
 		<p>[example:misc_controls_transform misc / controls / transform ]</p>
 
-		<h2>Constructor</h2>
+		<h2>생성자</h2>
 
 		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
 		<p>
 			<p>
-				[page:Camera camera]: The camera of the rendered scene.
+				[page:Camera camera]: 렌더링 된 장면의 카메라입니다.
 			</p>
 			<p>
-				[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
-			</p>
+				[page:HTMLDOMElement domElement]: 이벤트 리스너에 사용되는 HTML 엘리먼트입니다.
 			<p>
-				Creates a new instance of [name].
+				새로운 [name] 객체를 생성합니다.
 			</p>
 		</p>
 
-		<h2>Events</h2>
+		<h2>이벤트</h2>
 
 		<h3>change</h3>
 		<p>
