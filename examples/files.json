@@ -200,7 +200,6 @@
 		"webgl_multiple_renderers",
 		"webgl_multiple_scenes_comparison",
 		"webgl_multiple_views",
-		"webgl_nearestneighbour",
 		"webgl_panorama_cube",
 		"webgl_panorama_equirectangular",
 		"webgl_performance",
