@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -13,74 +13,73 @@
 
 		<p class="desc">
 			<p>
-				[name] is similar to [page:OrbitControls]. However, it does not maintain a constant camera [page:Object3D.up up] vector.
-				That means if the camera orbits over the “north” and “south” poles, it does not flip to stay "right side up".
+				[name] 는 [page:OrbitControls] 와 유사하지만, 카메라의 일정한 [page:Object3D.up up] vector 값을 유지하지 않습니다.
+				이 말인즉슨, 카메라가 위쪽 방향이나 아럐쪽 방향으로 회전할 경우, "오른쪽을 위로" 유지하기 위해 뒤집을 수 없습니다.
 			</p>
 		</p>
 
-		<h2>Examples</h2>
+		<h2>예시</h2>
 
 		<p>[example:misc_controls_trackball misc / controls / trackball ]</p>
 
-		<h2>Constructor</h2>
+		<h2>생성자</h2>
 
 		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
 		<p>
 			<p>
-				[page:Camera camera]: The camera of the rendered scene.
+				[page:Camera camera]: 렌더링 된 장면의 카메라입니다.
 			</p>
 			<p>
-				[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+				[page:HTMLDOMElement domElement]: 이벤트 리스너에 사용되는 HTML 엘리먼트입니다.
 			</p>
 			<p>
-				Creates a new instance of [name].
+				새로운 [name] 객체를 생성합니다.
 			</p>
 		</p>
 
-		<h2>Events</h2>
+		<h2>이벤트</h2>
 
 		<h3>change</h3>
 		<p>
-			Fires when the camera has been transformed by the controls.
+			컨트롤에 의해 카메라가 변환될 경우 호출됩니다.
 		</p>
 
 		<h3>start</h3>
 		<p>
-			Fires when an interaction (e.g. touch) was initiated.
+			처음으로 상호 작용이 실행되면 호출됩니다. (e.g. 터치패드)
 		</p>
 
 		<h3>end</h3>
 		<p>
-			Fires when an interaction has finished.
+			상호 작용이 완료되면 호출됩니다.
 		</p>
 
-		<h2>Properties</h2>
+		<h2>특성</h2>
 
 		<h3>[property:HTMLDOMElement domElement]</h3>
 		<p>
-			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
-			not set up new event listeners.
+			마우스 / 터치 이벤트를 수신하는 데 사용되는 HTMLDOMElement입니다. 이것은 생성자에 의해 설정되어야 합니다; 생성자를 통해 설정되지 않을 경우 새 이벤트 리스너에 설정되지 않습니다.
 		</p>
 
 		<h3>[property:Number dynamicDampingFactor]</h3>
 		<p>
-			Defines the intensity of damping. Only considered if [page:.staticMoving staticMoving] is set to *false*. Default is *0.2*.
+			댐핑의 강도를 조절합니다. [page:.staticMoving staticMoving] 이 * false * 로 설정된 경우에만 고려됩니다. 기본값은 *0.2* 입니다.
 		</p>
 
 		<h3>[property:Boolean enabled]</h3>
 		<p>
-			Whether or not the controls are enabled.
+			컨트롤이 활성화인지 비활성화인지 나타냅니다.
 		</p>
 
 		<h3>[property:Array keys]</h3>
 		<p>
-			This array holds keycodes for controlling interactions.
+			이 배열은 상호 작용을 제어하기위한 키 코드를 보유합니다.
 			<ul>
-				<li>When the first defined key is pressed, all mouse interactions (left, middle, right) performs orbiting.</li>
-				<li>When the second defined key is pressed, all mouse interactions (left, middle, right) performs zooming.</li>
-				<li>When the third defined key is pressed, all mouse interactions (left, middle, right) performs panning.</li>
+				<li>처음 정의 된 키를 누르면 모든 마우스 상호 작용 (왼쪽, 가운데, 오른쪽)이 궤도를 회전합니다.</li>
+				<li>두 번째로 정의 된 키를 누르면 모든 마우스 상호 작용 (왼쪽, 가운데, 오른쪽)이 확대 / 축소를 수행합니다.</li>
+				<li>세 번째로 정의 된 키를 누르면 모든 마우스 상호 작용 (왼쪽, 가운데, 오른쪽)이 패닝을 수행합니다.</li>
 			</ul>
-			Default is *65, 83, 68* which represents A, S, D.
+			기본값은 A, S, D를 나타내는 * 65, 83, 68 *입니다.
 		</p>
 
 		<h3>[property:Number maxDistance]</h3>

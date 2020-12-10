@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -112,90 +112,90 @@
 
 		<h3>[property:Boolean enableKeys]</h3>
 		<p>
-			Enable or disable the use of keyboard controls.
+			키보드 컨트롤의 활성화 또는 비활성화를 설정합니다.
 		</p>
 
 		<h3>[property:Boolean enablePan]</h3>
 		<p>
-			Enable or disable camera panning. Default is true.
+			카매라 패닝의 활성화 또는 비활성화를 설정합니다. 기본값은 *true* 입니다.
 		</p>
 
 		<h3>[property:Boolean enableRotate]</h3>
 		<p>
-			Enable or disable horizontal and vertical rotation of the camera. Default is true.<br>
-			Note that it is possible to disable a single axis by setting the min and max of the
-			[page:.minPolarAngle polar angle] or [page:.minAzimuthAngle azimuth angle] to the same value,
-			which will cause the vertical or horizontal rotation to be fixed at that value.
+			카메라의 수직 및 수평 회전의 활성화 또는 비활성화를 설정합니다. 기본값은 *true* 입니다.<br>
+			[page:.minPolarAngle polar angle] 또는 page:.minAzimuthAngle azimuth angle]의 최소 및 최대를 동일한 값으로 설정하여 단일 축을 비활성화 할 수 있습니다. 
+			그러면 수직 또는 수평 회전이 해당 값으로 고정됩니다.
+			
 		</p>
 
 		<h3>[property:Boolean enableZoom]</h3>
 		<p>
-			Enable or disable zooming (dollying) of the camera.
+			카메라 확대 / 축소 (dollying)를 활성화 또는 비활성화를 설정합니다.
 		</p>
 
 		<h3>[property:Float keyPanSpeed]</h3>
 		<p>
-			How fast to pan the camera when the keyboard is used. Default is 7.0 pixels per keypress.
+			키보드를 사용할 때 카메라를 패닝하는 속도를 설정합니다. 기본값은 키 누름 당 7.0 픽셀입니다.
 		</p>
 
 		<h3>[property:Object keys]</h3>
 		<p>
-			This object contains references to the keycodes for controlling camera panning. Default is the 4 arrow keys.
+			해당 객체는 카메라 패닝을 제어하기위한 키 코드에 대한 참조를 포함합니다. 기본값은 4 개의 화살표 키입니다.
 			<code>
 controls.keys = {
-	LEFT: 37, //left arrow
-	UP: 38, // up arrow
-	RIGHT: 39, // right arrow
-	BOTTOM: 40 // down arrow
+	LEFT: 37, // 왼쪽 화살표
+	UP: 38, // 위쪽 화살표
+	RIGHT: 39, // 오른쪽 화살표
+	BOTTOM: 40 // 아래쪽 화살표
 }
-			 </code> See [link:https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode this page] for a full
-			list of keycodes.
+			 </code> 
+			 전체 키코드 목록은 [link:https://developer.mozilla.org/ko/docs/Web/API/KeyboardEvent/keyCode this page] 를 참조하세요.
 		</p>
 
 		<h3>[property:Float maxAzimuthAngle]</h3>
 		<p>
-			How far you can orbit horizontally, upper limit. If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI ). Default is Infinity.
+			수평으로 궤도를 얼마나 돌 수 있는지 상한을 설정합니다. [ min, max ] 	의 간격은 ( max - min < 2 PI ) 와 함께 ( max - min < 2 PI ) 의 하위 간격이어야 합니다. 기본값은 무한대입니다.
 		</p>
 
 		<h3>[property:Float maxDistance]</h3>
 		<p>
-			How far you can dolly out ( [page:PerspectiveCamera] only ). Default is Infinity.
+			달리 아웃(dolly out)할 수 있는 최대 거리를 설정합니다. ([page:PerspectiveCamera] only). 기본값은 무한대입니다.
 		</p>
 
 		<h3>[property:Float maxPolarAngle]</h3>
 		<p>
-			How far you can orbit vertically, upper limit. Range is 0 to Math.PI radians, and default is Math.PI.
+			수직으로 궤도를 얼마나 돌 수 있는지 상한을 설정합니다. 0 부터 Math.PI radians 까지 범위를 가질 수 있습니다. 기본값은 Math.PI 입니다.
 		</p>
 
 		<h3>[property:Float maxZoom]</h3>
 		<p>
-			How far you can zoom out ( [page:OrthographicCamera] only ). Default is Infinity.
+			축소 할 수 있는 범위를 설정합니다.( [page:OrthographicCamera] only ). 기본값은 무한대입니다.
 		</p>
 
 		<h3>[property:Float minAzimuthAngle]</h3>
 		<p>
-			How far you can orbit horizontally, lower limit. If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI ). Default is Infinity.
+			수평으로 궤도를 얼마나 돌 수 있는지 하한을 설정합니다. [ min, max ] 의 간격은 ( max - min < 2 PI ) 와 함께 ( max - min < 2 PI ) 의 하위 간격이어야 합니다. 기본값은 무한대입니다.
 		</p>
 
 		<h3>[property:Float minDistance]</h3>
 		<p>
-			 How far you can dolly in ( [page:PerspectiveCamera] only ). Default is 0.
+			달리 인(dolly in)할 수 있는 최소 거리를 설정합니다. ([page:PerspectiveCamera] only). 기본값은 0 입니다.
 		</p>
 
 		<h3>[property:Float minPolarAngle]</h3>
 		<p>
-			How far you can orbit vertically, lower limit. Range is 0 to Math.PI radians, and default is 0.
+			수직으로 궤도를 얼마나 돌 수 있는지 하한을 설정합니다. 0 부터 Math.PI radians 까지 범위를 가질 수 있습니다. 기본값은 0 입니다.
 		</p>
 
 		<h3>[property:Float minZoom]</h3>
 		<p>
-			How far you can zoom in ( [page:OrthographicCamera] only ). Default is 0.
+			확대 할 수 있는 범위를 설정합니다. ( [page:OrthographicCamera] only ). 기본값은 0 입니다.
 		</p>
 
 		<h3>
 			[property:Object mouseButtons]</h3>
 		<p>
-			This object contains references to the mouse actions used by the controls.
+			해당 객체는 컨트롤에서 사용하는 마우스 동작에 대한 참조를 포함합니다.
 			<code>
 controls.mouseButtons = {
 	LEFT: THREE.MOUSE.ROTATE,
@@ -207,45 +207,44 @@ controls.mouseButtons = {
 
 		<h3>[property:Camera object]</h3>
 		<p>
-			The camera being controlled.
+			제어할 카메라 객체입니다.
 		</p>
 
 		<h3>[property:Float panSpeed]</h3>
 		<p>
-			Speed of panning. Default is 1.
+			패닝 속도를 설정합니다. 기본값은 1입니다.
 		</p>
 
 		<h3>[property:Vector3 position0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			해당 프로퍼티는 [method:saveState] 및 [method:reset] 메서드에서 내부적으로 사용합니다.
 		</p>
 
 		<h3>[property:Float rotateSpeed]</h3>
 		<p>
-			Speed of rotation. Default is 1.
+			회전 속도를 설정합니다. 기본값은 1입니다.
 		</p>
 
 		<h3>[property:Boolean screenSpacePanning]</h3>
 		<p>
-		Defines how the camera's position is translated when panning. If true, the camera pans in screen space.
+		패닝할 떄, 카메라 위치가 변환되는 방식를 정의합니다. 만약 true일 경우, 카메라가 화면 공간에서 이동합니다.
 		Otherwise, the camera pans in the plane orthogonal to the camera's up direction.
-		Default is true for OrbitControls; false for MapControls.
+		OrbitControls의 경우 기본값은 true 이고, MapControls의 경우 기본값은 false 입니다.
 		</p>
 
 		<h3>[property:Vector3 target0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			[method:saveState] 및 [method:rest] 메서드에서 내부적으로 사용합니다.
 		</p>
 
 		<h3>[property:Vector3 target]</h3>
 		<p>
-			The focus point of the controls, the [page:.object] orbits around this. It can be updated manually at any point to change
-			the focus of the controls.
+			컨트롤의 중요 포인트는, [page:.object] 를 중심으로 회전하는 것입니다. 컨트롤의 중요 포인트는 언제든지 수동으로 변경할 수 있습니다.
 		</p>
 
 		<h3>[property:Object touches]</h3>
 		<p>
-			This object contains references to the touch actions used by the controls.
+			해당 객체는 컨트롤에 사용되는 터치 동작에 대한 참조를 포함합니다.
 			<code>
 controls.touches = {
 	ONE: THREE.TOUCH.ROTATE,
@@ -256,47 +255,47 @@ controls.touches = {
 
 		<h3>[property:Float zoom0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			[method:saveState] 및 [method:reset] 메서드에서 내부적으로 사용합니다.
 		</p>
 
 		<h3>[property:Float zoomSpeed]</h3>
 		<p>
-			Speed of zooming / dollying. Default is 1.
+			줌잉(Zooming)과 달링(Dollying)의 속도를 설정합니다. 기본값은 1 입니다.
 		</p>
 
 
 
-		<h2>Methods</h2>
+		<h2>메서드</h2>
 
 		<h3>[method:null dispose] ()</h3>
 		<p>
+			모든 이벤트 리스너를 삭제합니다.
 			Remove all the event listeners.
 		</p>
 
 		<h3>[method:radians getAzimuthalAngle] ()</h3>
 		<p>
-			Get the current horizontal rotation, in radians.
+			라디안 단위로 현재 수평 회전값을 가져옵니다.
 		</p>
 
 		<h3>[method:radians getPolarAngle] ()</h3>
 		<p>
-			Get the current vertical rotation, in radians.
+			라디안 단위로 현재 수직 회전값을 가져옵니다.
 		</p>
 
 		<h3>[method:null reset] ()</h3>
 		<p>
-			Reset the controls to their state from either the last time the [page:.saveState] was called, or the initial state.
+			컨트롤이 마지막으로 호출된 [page:.saveState] 시점으로 돌리거나, 초기상태로 재설정합니다.
 		</p>
 
 		<h3>[method:null saveState] ()</h3>
 		<p>
-			Save the current state of the controls. This can later be recovered with [page:.reset].
+			컨트롤의 현재 상태를 저장합니다. 나중에 [page:.rest]을 이용하여 현재 상태로 복구할 수 있습니다.
 		</p>
 
 		<h3>[method:Boolean update] ()</h3>
 		<p>
-			Update the controls. Must be called after any manual changes to the camera's transform,
-			or in the update loop if [page:.autoRotate] or [page:.enableDamping] are set.
+			컨트롤을 업데이트합니다. 카메라를 수동으로 변환하거나, [page:.autoRotate] 또는 [page:.enableDamping]을 설정할 경우 업데이트 루프에서 호출해야 합니다.
 		</p>
 
 		<h2>Source</h2>
