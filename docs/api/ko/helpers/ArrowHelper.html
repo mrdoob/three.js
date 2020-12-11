@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">An 3D arrow object for visualizing directions.</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const dir = new THREE.Vector3( 1, 2, 0 );
+
+		//normalize the direction vector (convert to vector of length 1)
+		dir.normalize();
+
+		const origin = new THREE.Vector3( 0, 0, 0 );
+		const length = 1;
+		const hex = 0xffff00;
+
+		const arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+		scene.add( arrowHelper );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_shadowmesh WebGL / shadowmesh]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]([param:Vector3 dir], [param:Vector3 origin], [param:Number length], [param:Number hex], [param:Number headLength], [param:Number headWidth] )</h3>
+		<p>
+		[page:Vector3 dir] -- direction from origin. Must be a unit vector. <br />
+		[page:Vector3 origin] -- Point at which the arrow starts.<br />
+		[page:Number length] -- length of the arrow. Default is *1*.<br />
+		[page:Number hex] -- hexadecimal value to define color. Default is 0xffff00.<br />
+		[page:Number headLength] -- The length of the head of the arrow. Default is 0.2 * length.<br />
+		[page:Number headWidth] -- The width of the head of the arrow. Default is 0.2 * headLength.<br />
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Object3D] class for common properties.</p>
+
+		<h3>[property:Line line]</h3>
+		<p>Contains the line part of the arrowHelper.</p>
+
+		<h3>[property:Mesh cone]</h3>
+		<p>Contains the cone part of the arrowHelper.</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Object3D] class for common methods.</p>
+
+		<h3>[method:null setColor]([param:Color color])</h3>
+		<p>
+		color -- The desired color.<br /><br />
+
+		Sets the color of the arrowHelper.
+		</p>
+
+		<h3>[method:null setLength]([param:Number length], [param:Number headLength], [param:Number headWidth])</h3>
+		<p>
+		length -- The desired length.<br />
+		headLength -- The length of the head of the arrow.<br />
+		headWidth -- The width of the head of the arrow.<br /><br />
+
+		Sets the length of the arrowhelper.
+		</p>
+
+		<h3>[method:null setDirection]([param:Vector3 dir])</h3>
+		<p>
+		dir -- The desired direction. Must be a unit vector.<br /><br />
+
+		Sets the direction of the arrowhelper.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

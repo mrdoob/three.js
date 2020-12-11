@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Class for loading a [page:CubeTexture CubeTexture].
+			This uses the [page:ImageLoader] internally for loading files.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+const scene = new THREE.Scene();
+scene.background = new THREE.CubeTextureLoader()
+	.setPath( 'textures/cubeMaps/' )
+	.load( [
+				'px.png',
+				'nx.png',
+				'py.png',
+				'ny.png',
+				'pz.png',
+				'nz.png'
+			] );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_materials_cubemap materials / cubemap]<br />
+			[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection]<br />
+			[example:webgl_materials_cubemap_balls_refraction materials / cubemap / balls / refraction]<br />
+			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic]<br />
+			[example:webgl_materials_cubemap_refraction materials / cubemap / refraction]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+
+		Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Loader] class for common properties.</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
+
+		<h3>[method:CubeTexture load]( [param:String urls], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String urls] — array of 6 urls to images, one for each side of the CubeTexture.
+		The urls should be specified in the following order: pos-x, neg-x, pos-y, neg-y, pos-z, neg-z.
+		They can also be [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URIs].<br />
+		Note that, by convention, cube maps are specified in a coordinate system in which positive-x is to the right
+		when looking up the positive-z axis -- in other words, using a left-handed coordinate system.
+		Since three.js uses a right-handed coordinate system, environment maps used in three.js will have pos-x and neg-x swapped.<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Texture texture].<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — Will be called when load errors.<br />
+		</p>
+		<p>
+		Begin loading from url and pass the loaded [page:CubeTexture texture] to onLoad.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

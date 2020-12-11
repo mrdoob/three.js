@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		Represents a lookup table for colormaps. It is used to determine the color values from a range of data values.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const lut = new Lut( 'rainbow', 512 );
+		const color = lut.getColor( 0.5 );
+		</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( colormap, numberOfColors )</h3>
+		<p>
+		colormap - optional argument that sets a colormap from predefined colormaps. Available colormaps are : "rainbow", "cooltowarm", "blackbody".
+		numberOfColors - optional argument that sets the number of colors used to represent the data array.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Float minV]</h3>
+		<p>
+		The minimum value to be represented with the lookup table. Default is 0.
+		</p>
+
+		<h3>[property:Float maxV]</h3>
+		<p>
+		The maximum value to be represented with the lookup table. Default is 1.
+		</p>
+
+		<h3>.[legend]</h3>
+		<p>
+		The legend of the lookup table.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null copy]( [param:Lut lut] ) [param:Lut this]</h3>
+		<p>
+		color — Lut to copy.
+		</p>
+		<p>
+		Copies given lut.
+		</p>
+
+		<h3>.setLegendOn [parameters]</h3>
+		<p>
+		parameters - { layout: value, position: { x: value, y: value, z: value }, dimensions: { width: value, height: value } }
+		layout — Horizontal or vertical layout. Default is vertical.<br />
+		position — The position x,y,z of the legend.<br />
+		dimensions — The dimensions (width and height) of the legend.<br />
+		</p>
+		<p>
+		Sets this Lut with the legend on.
+		</p>
+
+		<h3>.setLegendOff</h3>
+		<p>
+		</p>
+		<p>
+		Sets this Lut with the legend off.
+		</p>
+
+    <h3>.setLegendLabels [parameters, callback]</h3>
+		<p>
+		parameters - { fontsize: value, fontface: value, title: value, um: value, ticks: value, decimal: value, notation: value }
+		fontsize — Font size to be used for labels.<br />
+		fontface — Font type to be used for labels.<br />
+		title — The title of the legend.<br />
+		um — The unit of measurements of the legend.<br />
+		ticks — The number of ticks to be displayed.<br />
+		decimal — The number of decimals to be used for legend values.<br />
+		notation — Legend notation: standard (default) or scientific.<br />
+		callback — An optional callback to be used to format the legend labels.<br />
+		</p>
+		<p>
+		Sets the labels of the legend of this Lut.
+		</p>
+
+		<h3>[method:Lut setMin]( [param:Float minV] )</h3>
+		<p>
+		minV — The minimum value to be represented with the lookup table.<br />
+		</p>
+		<p>
+		Sets this Lut with the minimum value to be represented.
+		</p>
+
+		<h3>[method:Lut setMax]( [param:Float maxV] )</h3>
+		<p>
+		maxV — The maximum value to be represented with the lookup table.<br />
+		</p>
+		<p>
+		Sets this Lut with the maximum value to be represented.
+		</p>
+
+		<h3>[method:Lut changeNumberOfColors]( [param:Float numberOfColors] )</h3>
+		<p>
+		numberOfColors — The number of colors to be used to represent the data array.<br />
+		</p>
+		<p>
+		Sets this Lut with the number of colors to be used.
+		</p>
+
+		<h3>[method:Lut changeColorMap]( [param:Float colorMap] )</h3>
+		<p>
+		colorMap — The name of the color map to be used to represent the data array.<br />
+		</p>
+		<p>
+		Sets this Lut with the colormap to be used.
+		</p>
+
+		<h3>[method:Lut addColorMap]( colorMapName, arrayOfColors )</h3>
+		<p>
+		Insert a new color map into the set of available color maps.
+		</p>
+
+		<h3>[method:Lut getColor]( value ) [param:Lut this]</h3>
+		<p>
+		value -- the data value to be displayed as a color.
+		</p>
+		<p>
+		Returns a [page:Color].
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/[path].js examples/jsm/math/[path].js]
+		</p>
+	</body>
+</html>
