@@ -41,7 +41,7 @@ export default QUnit.module( 'Exporters', () => {
 			exporter.parse( object, function ( gltf ) {
 
 				assert.equal( '2.0', gltf.asset.version, 'asset.version' );
-				assert.equal( 'GLTFExporter', gltf.asset.generator, 'asset.generator' );
+				assert.equal( 'THREE.GLTFExporter', gltf.asset.generator, 'asset.generator' );
 
 				done();
 
