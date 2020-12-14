@@ -1,5 +1,4 @@
 import {
-	AnimationClip,
 	Loader,
 	LoadingManager,
 	Scene

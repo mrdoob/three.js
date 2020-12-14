@@ -26,5 +26,6 @@ export class InstancedMesh <
 	getMatrixAt( index: number, matrix: Matrix4 ): void;
 	setColorAt( index: number, color: Color ): void;
 	setMatrixAt( index: number, matrix: Matrix4 ): void;
+	dispose(): void;
 
 }

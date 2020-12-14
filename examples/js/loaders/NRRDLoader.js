@@ -374,7 +374,7 @@ THREE.NRRDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototyp
 		var _spaceY = 1;
 		var _spaceZ = 1;
 
-		if ( headerObject.space == "left-posterior-superior" ) {
+		if ( headerObject.space == 'left-posterior-superior' ) {
 
 			_spaceX = - 1;
 			_spaceY = - 1;
@@ -563,7 +563,7 @@ THREE.NRRDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototyp
 
 		'space origin': function ( data ) {
 
-			return this.space_origin = data.split( "(" )[ 1 ].split( ")" )[ 0 ].split( "," );
+			return this.space_origin = data.split( '(' )[ 1 ].split( ')' )[ 0 ].split( ',' );
 
 		},
 

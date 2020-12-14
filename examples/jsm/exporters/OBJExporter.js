@@ -8,7 +8,7 @@ import {
 	Points,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var OBJExporter = function () {};
 
@@ -138,7 +138,7 @@ OBJExporter.prototype = {
 						}
 
 						// transform the face to export format
-						output += 'f ' + face.join( ' ' ) + "\n";
+						output += 'f ' + face.join( ' ' ) + '\n';
 
 					}
 
@@ -155,7 +155,7 @@ OBJExporter.prototype = {
 						}
 
 						// transform the face to export format
-						output += 'f ' + face.join( ' ' ) + "\n";
+						output += 'f ' + face.join( ' ' ) + '\n';
 
 					}
 

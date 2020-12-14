@@ -114,7 +114,7 @@ TempNode.prototype.getUuid = function ( unique ) {
 
 	var uuid = unique || unique == undefined ? this.constructor.uuid || this.uuid : this.uuid;
 
-	if ( typeof this.scope === "string" ) uuid = this.scope + '-' + uuid;
+	if ( typeof this.scope === 'string' ) uuid = this.scope + '-' + uuid;
 
 	return uuid;
 
@@ -132,7 +132,7 @@ TempNode.prototype.getTemp = function ( builder, uuid ) {
 
 TempNode.prototype.generate = function ( builder, output, uuid, type, ns ) {
 
-	if ( ! this.getShared( builder, output ) ) console.error( "THREE.TempNode is not shared!" );
+	if ( ! this.getShared( builder, output ) ) console.error( 'THREE.TempNode is not shared!' );
 
 	uuid = uuid || this.uuid;
 

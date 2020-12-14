@@ -21,6 +21,7 @@ import {
 	y,
 	z
 } from '../math/Constants.tests';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper';
 
 var DegToRad = Math.PI / 180;
 
@@ -769,7 +770,10 @@ export default QUnit.module( 'Core', () => {
 
 			}
 
+			console.level = CONSOLE_LEVEL.ERROR;
 			geometry1.merge( geometry2 );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok( attr[ 0 ] === 4 && attr[ 1 ] === 5 && attr[ 2 ] === 6, "copied the 3 attributes without offset" );
 
 		} );

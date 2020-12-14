@@ -2,8 +2,8 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	Vector3
-} from "../../../build/three.module.js";
-import { BufferGeometryUtils } from "../utils/BufferGeometryUtils.js";
+} from '../../../build/three.module.js';
+import { BufferGeometryUtils } from '../utils/BufferGeometryUtils.js';
 
 
 var EdgeSplitModifier = function () {
@@ -180,7 +180,7 @@ var EdgeSplitModifier = function () {
 		}
 
 		indexes = geometry.index.array;
-		positions = geometry.getAttribute( "position" ).array;
+		positions = geometry.getAttribute( 'position' ).array;
 
 		computeNormals();
 		mapPositionsToIndexes();

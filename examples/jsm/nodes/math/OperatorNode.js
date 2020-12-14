@@ -17,7 +17,7 @@ OperatorNode.DIV = '/';
 
 OperatorNode.prototype = Object.create( TempNode.prototype );
 OperatorNode.prototype.constructor = OperatorNode;
-OperatorNode.prototype.nodeType = "Operator";
+OperatorNode.prototype.nodeType = 'Operator';
 
 OperatorNode.prototype.getType = function ( builder ) {
 

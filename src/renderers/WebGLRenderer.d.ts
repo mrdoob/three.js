@@ -192,11 +192,6 @@ export class WebGLRenderer implements Renderer {
 	toneMappingExposure: number;
 
 	/**
-	 * @default false
-	 */
-	shadowMapDebug: boolean;
-
-	/**
 	 * @default 8
 	 */
 	maxMorphTargets: number;
@@ -295,7 +290,7 @@ export class WebGLRenderer implements Renderer {
 	/**
 	 * Returns a THREE.Color instance with the current clear color.
 	 */
-	getClearColor(): Color;
+	getClearColor( target: Color ): Color;
 
 	/**
 	 * Sets the clear color, using color for the color and alpha for the opacity.
