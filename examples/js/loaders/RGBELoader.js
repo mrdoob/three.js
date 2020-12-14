@@ -99,7 +99,7 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 				var line, match,
 
 					// regexes to parse header info fields
-					magic_token_re = /^#\?(\S+)$/,
+					magic_token_re = /^#\?(\S+)/,
 					gamma_re = /^\s*GAMMA\s*=\s*(\d+(\.\d+)?)\s*$/,
 					exposure_re = /^\s*EXPOSURE\s*=\s*(\d+(\.\d+)?)\s*$/,
 					format_re = /^\s*FORMAT=(\S+)\s*$/,
