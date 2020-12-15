@@ -1242,7 +1242,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		}
 
-		if ( ( geometry && ! Array.isArray( geometry ) ) || ( Array.isArray( geometry ) && geometry.length ) ) {
+		if ( Array.isArray( geometry ) === false || geometry.length > 0 ) {
 
 			var attributes = extractProperties( _attributes );
 			attributes.geometry = extractProperties( _geometry );
