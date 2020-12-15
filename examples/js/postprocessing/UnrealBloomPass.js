@@ -162,7 +162,7 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 	},
 
-	setSize: function ( width, height ) {
+	setSize: function ( width, height, pixelRatio ) {
 
 		var resx = Math.round( width / 2 );
 		var resy = Math.round( height / 2 );
@@ -174,7 +174,7 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 			this.renderTargetsHorizontal[ i ].setSize( resx, resy );
 			this.renderTargetsVertical[ i ].setSize( resx, resy );
 
-			this.separableBlurMaterials[ i ].uniforms[ 'texSize' ].value = new THREE.Vector2( resx, resy );
+			this.separableBlurMaterials[ i ].uniforms[ 'texSize' ].value = new THREE.Vector2( resx, resy ).divideScalar( pixelRatio );
 
 			resx = Math.round( resx / 2 );
 			resy = Math.round( resy / 2 );

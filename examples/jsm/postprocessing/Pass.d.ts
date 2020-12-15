@@ -12,7 +12,7 @@ export class Pass {
 	clear: boolean;
 	renderToScreen: boolean;
 
-	setSize( width: number, height: number ): void;
+	setSize( width: number, height: number, pixelRatio: number ): void;
 	render( renderer: WebGLRenderer, writeBuffer: WebGLRenderTarget, readBuffer: WebGLRenderTarget, deltaTime: number, maskActive: boolean ): void;
 
 }

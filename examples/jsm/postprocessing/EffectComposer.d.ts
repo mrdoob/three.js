@@ -27,7 +27,7 @@ export class EffectComposer {
 	isLastEnabledPass( passIndex: number ): boolean;
 	render( deltaTime?: number ): void;
 	reset( renderTarget?: WebGLRenderTarget ): void;
-	setSize( width: number, height: number ): void;
+	setSize( width: number, height: number, pixelRatio: number ): void;
 	setPixelRatio( pixelRatio: number ): void;
 
 }
