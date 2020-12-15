@@ -25259,6 +25259,13 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.resetState = function () {
+
+		state.reset();
+		bindingStates.reset();
+
+	};
+
 	if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 		__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) ); // eslint-disable-line no-undef
@@ -26228,6 +26235,14 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 } );
 
+const _basePosition = new Vector3();
+
+const _skinIndex = new Vector4();
+const _skinWeight = new Vector4();
+
+const _vector$7 = new Vector3();
+const _matrix$1 = new Matrix4();
+
 function SkinnedMesh( geometry, material ) {
 
 	if ( geometry && geometry.isGeometry ) {
@@ -26342,49 +26357,37 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
-	boneTransform: ( function () {
+	boneTransform: function ( index, target ) {
 
-		const basePosition = new Vector3();
+		const skeleton = this.skeleton;
+		const geometry = this.geometry;
 
-		const skinIndex = new Vector4();
-		const skinWeight = new Vector4();
+		_skinIndex.fromBufferAttribute( geometry.attributes.skinIndex, index );
+		_skinWeight.fromBufferAttribute( geometry.attributes.skinWeight, index );
 
-		const vector = new Vector3();
-		const matrix = new Matrix4();
+		_basePosition.fromBufferAttribute( geometry.attributes.position, index ).applyMatrix4( this.bindMatrix );
 
-		return function ( index, target ) {
+		target.set( 0, 0, 0 );
 
-			const skeleton = this.skeleton;
-			const geometry = this.geometry;
+		for ( let i = 0; i < 4; i ++ ) {
 
-			skinIndex.fromBufferAttribute( geometry.attributes.skinIndex, index );
-			skinWeight.fromBufferAttribute( geometry.attributes.skinWeight, index );
+			const weight = _skinWeight.getComponent( i );
 
-			basePosition.fromBufferAttribute( geometry.attributes.position, index ).applyMatrix4( this.bindMatrix );
+			if ( weight !== 0 ) {
 
-			target.set( 0, 0, 0 );
+				const boneIndex = _skinIndex.getComponent( i );
 
-			for ( let i = 0; i < 4; i ++ ) {
+				_matrix$1.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
 
-				const weight = skinWeight.getComponent( i );
-
-				if ( weight !== 0 ) {
-
-					const boneIndex = skinIndex.getComponent( i );
-
-					matrix.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
-
-					target.addScaledVector( vector.copy( basePosition ).applyMatrix4( matrix ), weight );
-
-				}
+				target.addScaledVector( _vector$7.copy( _basePosition ).applyMatrix4( _matrix$1 ), weight );
 
 			}
 
-			return target.applyMatrix4( this.bindMatrixInverse );
+		}
 
-		};
+		return target.applyMatrix4( this.bindMatrixInverse );
 
-	}() )
+	}
 
 } );
 
@@ -46842,7 +46845,7 @@ class Cylindrical {
 
 }
 
-const _vector$7 = /*@__PURE__*/ new Vector2();
+const _vector$8 = /*@__PURE__*/ new Vector2();
 
 class Box2 {
 
@@ -46880,7 +46883,7 @@ class Box2 {
 
 	setFromCenterAndSize( center, size ) {
 
-		const halfSize = _vector$7.copy( size ).multiplyScalar( 0.5 );
+		const halfSize = _vector$8.copy( size ).multiplyScalar( 0.5 );
 		this.min.copy( center ).sub( halfSize );
 		this.max.copy( center ).add( halfSize );
 
@@ -47030,7 +47033,7 @@ class Box2 {
 
 	distanceToPoint( point ) {
 
-		const clampedPoint = _vector$7.copy( point ).clamp( this.min, this.max );
+		const clampedPoint = _vector$8.copy( point ).clamp( this.min, this.max );
 		return clampedPoint.sub( point ).length();
 
 	}
@@ -47235,7 +47238,7 @@ ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;
 
 ImmediateRenderObject.prototype.isImmediateRenderObject = true;
 
-const _vector$8 = /*@__PURE__*/ new Vector3();
+const _vector$9 = /*@__PURE__*/ new Vector3();
 
 class SpotLightHelper extends Object3D {
 
@@ -47299,9 +47302,9 @@ class SpotLightHelper extends Object3D {
 
 		this.cone.scale.set( coneWidth, coneWidth, coneLength );
 
-		_vector$8.setFromMatrixPosition( this.light.target.matrixWorld );
+		_vector$9.setFromMatrixPosition( this.light.target.matrixWorld );
 
-		this.cone.lookAt( _vector$8 );
+		this.cone.lookAt( _vector$9 );
 
 		if ( this.color !== undefined ) {
 
@@ -47317,7 +47320,7 @@ class SpotLightHelper extends Object3D {
 
 }
 
-const _vector$9 = /*@__PURE__*/ new Vector3();
+const _vector$a = /*@__PURE__*/ new Vector3();
 const _boneMatrix = /*@__PURE__*/ new Matrix4();
 const _matrixWorldInv = /*@__PURE__*/ new Matrix4();
 
@@ -47385,12 +47388,12 @@ class SkeletonHelper extends LineSegments {
 			if ( bone.parent && bone.parent.isBone ) {
 
 				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.matrixWorld );
-				_vector$9.setFromMatrixPosition( _boneMatrix );
-				position.setXYZ( j, _vector$9.x, _vector$9.y, _vector$9.z );
+				_vector$a.setFromMatrixPosition( _boneMatrix );
+				position.setXYZ( j, _vector$a.x, _vector$a.y, _vector$a.z );
 
 				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.parent.matrixWorld );
-				_vector$9.setFromMatrixPosition( _boneMatrix );
-				position.setXYZ( j + 1, _vector$9.x, _vector$9.y, _vector$9.z );
+				_vector$a.setFromMatrixPosition( _boneMatrix );
+				position.setXYZ( j + 1, _vector$a.x, _vector$a.y, _vector$a.z );
 
 				j += 2;
 
@@ -47512,7 +47515,7 @@ class PointLightHelper extends Mesh {
 
 }
 
-const _vector$a = /*@__PURE__*/ new Vector3();
+const _vector$b = /*@__PURE__*/ new Vector3();
 const _color1 = /*@__PURE__*/ new Color();
 const _color2 = /*@__PURE__*/ new Color();
 
@@ -47580,7 +47583,7 @@ class HemisphereLightHelper extends Object3D {
 
 		}
 
-		mesh.lookAt( _vector$a.setFromMatrixPosition( this.light.matrixWorld ).negate() );
+		mesh.lookAt( _vector$b.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 
 	}
 
@@ -47783,7 +47786,7 @@ class DirectionalLightHelper extends Object3D {
 
 }
 
-const _vector$b = /*@__PURE__*/ new Vector3();
+const _vector$c = /*@__PURE__*/ new Vector3();
 const _camera = /*@__PURE__*/ new Camera();
 
 /**
@@ -47959,7 +47962,7 @@ class CameraHelper extends LineSegments {
 
 function setPoint( point, pointMap, geometry, camera, x, y, z ) {
 
-	_vector$b.set( x, y, z ).unproject( camera );
+	_vector$c.set( x, y, z ).unproject( camera );
 
 	const points = pointMap[ point ];
 
@@ -47969,7 +47972,7 @@ function setPoint( point, pointMap, geometry, camera, x, y, z ) {
 
 		for ( let i = 0, l = points.length; i < l; i ++ ) {
 
-			position.setXYZ( points[ i ], _vector$b.x, _vector$b.y, _vector$b.z );
+			position.setXYZ( points[ i ], _vector$c.x, _vector$c.y, _vector$c.z );
 
 		}
 
