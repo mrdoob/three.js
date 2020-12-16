@@ -156,9 +156,32 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	parse: function ( data, onLoad, onError ) {
 
+		if ( ! ( data instanceof ArrayBuffer ) ) {
+
+			data = this._objToUint( data ).buffer;
+
+		}
+
 		this.decodeObjects( data, '' )
 			.then( onLoad )
 			.catch( onError );
+
+	},
+
+	// from https://stackoverflow.com/questions/35971566/store-a-json-object-in-arraybuffer/35971686#35971686
+	_objToUint: function ( obj ) {
+
+		var string = btoa( unescape( JSON.stringify( obj ) ) ),
+			charList = string.split( '' ),
+			uintArray = [];
+
+		for ( var i = 0; i < charList.length; i ++ ) {
+
+			uintArray.push( charList[ i ].charCodeAt( 0 ) );
+
+		}
+
+		return new Uint8Array( uintArray );
 
 	},
 
@@ -833,6 +856,16 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 	};
 
+	// from https://stackoverflow.com/questions/35971566/store-a-json-object-in-arraybuffer/35971686#35971686
+	function uintToObj( uintArray ) {
+
+		var encodedString = String.fromCharCode.apply( null, uintArray ),
+			decodedString = decodeURIComponent( escape( atob( encodedString ) ) );
+
+		return JSON.parse( decodedString );
+
+	}
+
 	function decodeObjects( rhino, buffer ) {
 
 		var arr = new Uint8Array( buffer );
@@ -846,6 +879,15 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		var groups = [];
 
 		//Handle objects
+
+		if ( doc === null ) {
+
+			doc = new rhino.File3dm();
+			var obj = uintToObj( arr );
+			var rObj = rhino.CommonObject.decode( obj );
+			doc.objects().add( rObj, null );
+
+		}
 
 		var objs = doc.objects();
 		var cnt = objs.count;
