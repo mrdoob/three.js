@@ -132,15 +132,9 @@
 		<h3>[property:Float emissiveIntensity]</h3>
 		<p>放射光强度。调节发光颜色。默认为1。</p>
 
-		<h3>[property:TextureCube envMap]</h3>
-		<p> 环境贴图。默认值为null。
-			请注意，为了使材质粗糙度属性能够正确地模糊环境贴图，shader必须能够访问环境纹理的mipmaps。
-			使用默认设置创建的TextureCubes已正确配置; 如果手动调整纹理参数，
-			请确保将minFilter设置为其中一个MipMap选项，并且未强制禁用mip贴图。</p>
-		<p>
-			注意：MeshStandardMaterial 仅支持[link:https://threejs.org/docs/#api/textures/CubeTexture cube environment maps]。
-			如果要使用equirectangular贴图，则需要使用 [page:WebGLCubeRenderTarget.fromEquirectangularTexture WebGLCubeRenderTarget.fromEquirectangularTexture]()。
-			详细信息请参阅此示例[link:https://threejs.org/examples/webgl_materials_envmaps_exr.html example]。
+		<h3>[property:Texture envMap]</h3>
+		<p>The environment map. To ensure a physically correct rendering, you should only add
+			environment maps which were preprocessed by [page:PMREMGenerator]. Default is null.
 		</p>
 
 		<h3>[property:Float envMapIntensity]</h3>

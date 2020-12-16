@@ -164,17 +164,9 @@
 		<h3>[property:Float emissiveIntensity]</h3>
 		<p>Intensity of the emissive light. Modulates the emissive color. Default is 1.</p>
 
-		<h3>[property:TextureCube envMap]</h3>
-		<p>The environment map. Default is null.  Note that in order for the material roughness
-		property to correctly blur out the environment map, the shader must have access to mipmaps
-		of the env texture.  TextureCubes created with default settings are correctly configured;
-		if adjusting texture parameters manually, ensure minFilter is set to one of the MipMap options,
-		and that mip maps have not been otherwise forcibly disabled.</p>
-		<p>
-		Note: only [link:https://threejs.org/docs/#api/textures/CubeTexture cube environment maps] are supported
-		for MeshStandardMaterial. If you want to use an equirectangular map you will need to use
-		[page:WebGLCubeRenderTarget.fromEquirectangularTexture WebGLCubeRenderTarget.fromEquirectangularTexture]().
-		See this [link:https://threejs.org/examples/webgl_materials_envmaps_exr.html example] for details.
+		<h3>[property:Texture envMap]</h3>
+		<p>The environment map. To ensure a physically correct rendering, you should only add
+			environment maps which were preprocessed by [page:PMREMGenerator]. Default is null.
 		</p>
 
 		<h3>[property:Float envMapIntensity]</h3>
