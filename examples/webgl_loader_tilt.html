@@ -37,7 +37,7 @@
 				const grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
 				scene.add( grid );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGL1Renderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -45,6 +45,7 @@
 				const loader = new TiltLoader();
 				loader.load( './models/tilt/BRUSH_DOME.tilt', function ( object ) {
 
+					// console.log( object.children.length );
 					scene.add( object );
 					render();
 

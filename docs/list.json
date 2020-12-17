@@ -999,364 +999,49 @@
 		}
 
 	},
+  
 		"ko": {
-
-		"Manual": {
-
-			"Getting Started": {
-				"Creating a scene": "manual/ko/introduction/Creating-a-scene",
-				"Installation": "manual/ko/introduction/Installation",
-				"Browser support": "manual/ko/introduction/Browser-support",
-				"WebGL compatibility check": "manual/ko/introduction/WebGL-compatibility-check",
-				"How to run things locally": "manual/ko/introduction/How-to-run-things-locally",
-				"Typescript setup": "manual/ko/introduction/Typescript-setup",
-				"Drawing lines": "manual/ko/introduction/Drawing-lines",
-				"Creating text": "manual/ko/introduction/Creating-text",
-				"Loading 3D models": "manual/ko/introduction/Loading-3D-models",
+	
+		"매뉴얼": {
+	
+			"시작하기": {
+				"장면 만들기": "manual/ko/introduction/Creating-a-scene",
+				"설치": "manual/ko/introduction/Installation",
+				"브라우저 지원": "manual/ko/introduction/Browser-support",
+				"WebGL 호환성 검사": "manual/ko/introduction/WebGL-compatibility-check",
+				"로컬 환경에서 구동 방법": "manual/ko/introduction/How-to-run-things-locally",
+				"Typescript 설정": "manual/ko/introduction/Typescript-setup",
+				"선 그리기": "manual/ko/introduction/Drawing-lines",
+				"텍스트 만들기": "manual/ko/introduction/Creating-text",
+				"3D 모델 불러오기": "manual/ko/introduction/Loading-3D-models",
 				"FAQ": "manual/ko/introduction/FAQ",
-				"Useful links": "manual/ko/introduction/Useful-links"
+				"참고 링크": "manual/ko/introduction/Useful-links"
 			},
-
-			"Next Steps": {
-				"How to update things": "manual/ko/introduction/How-to-update-things",
-				"How to dispose of objects": "manual/ko/introduction/How-to-dispose-of-objects",
-				"How to create VR content": "manual/ko/introduction/How-to-create-VR-content",
-				"How to use post-processing": "manual/ko/introduction/How-to-use-post-processing",
-				"Matrix transformations": "manual/ko/introduction/Matrix-transformations",
-				"Animation system": "manual/ko/introduction/Animation-system"
+	
+			"심화 과정": {
+				"오브젝트를 업데이트하는 방법": "manual/ko/introduction/How-to-update-things",
+				"오브젝트를 폐기하는 방법": "manual/ko/introduction/How-to-dispose-of-objects",
+				"VR 컨텐츠를 만드는 방법": "manual/ko/introduction/How-to-create-VR-content",
+				"후처리 사용 방법": "manual/ko/introduction/How-to-use-post-processing",
+				"행렬 변환": "manual/ko/introduction/Matrix-transformations",
+				"애니메이션 시스템": "manual/ko/introduction/Animation-system"
 			},
-
-			"Build Tools": {
-				"Testing with NPM": "manual/ko/buildTools/Testing-with-NPM"
+	
+			"빌드 도구": {
+				"NPM 테스트": "manual/ko/buildTools/Testing-with-NPM"
+				
 			}
-
+	
 		},
 
 		"레퍼런스": {
 
 			"애니메이션": {
 				"AnimationAction": "api/ko/animation/AnimationAction",
-				"AnimationClip": "api/ko/animation/AnimationClip",
-				"AnimationMixer": "api/ko/animation/AnimationMixer",
-				"AnimationObjectGroup": "api/ko/animation/AnimationObjectGroup",
-				"AnimationUtils": "api/ko/animation/AnimationUtils",
-				"KeyframeTrack": "api/ko/animation/KeyframeTrack",
-				"PropertyBinding": "api/ko/animation/PropertyBinding",
-				"PropertyMixer": "api/ko/animation/PropertyMixer"
+
 			},
-
-			"Animation / Tracks": {
-				"BooleanKeyframeTrack": "api/ko/animation/tracks/BooleanKeyframeTrack",
-				"ColorKeyframeTrack": "api/ko/animation/tracks/ColorKeyframeTrack",
-				"NumberKeyframeTrack": "api/ko/animation/tracks/NumberKeyframeTrack",
-				"QuaternionKeyframeTrack": "api/ko/animation/tracks/QuaternionKeyframeTrack",
-				"StringKeyframeTrack": "api/ko/animation/tracks/StringKeyframeTrack",
-				"VectorKeyframeTrack": "api/ko/animation/tracks/VectorKeyframeTrack"
-			},
-
-			"Audio": {
-				"Audio": "api/ko/audio/Audio",
-				"AudioAnalyser": "api/ko/audio/AudioAnalyser",
-				"AudioContext": "api/ko/audio/AudioContext",
-				"AudioListener": "api/ko/audio/AudioListener",
-				"PositionalAudio": "api/ko/audio/PositionalAudio"
-			},
-
-			"Cameras": {
-				"ArrayCamera": "api/ko/cameras/ArrayCamera",
-				"Camera": "api/ko/cameras/Camera",
-				"CubeCamera": "api/ko/cameras/CubeCamera",
-				"OrthographicCamera": "api/ko/cameras/OrthographicCamera",
-				"PerspectiveCamera": "api/ko/cameras/PerspectiveCamera",
-				"StereoCamera": "api/ko/cameras/StereoCamera"
-			},
-
-			"Constants": {
-				"Animation": "api/ko/constants/Animation",
-				"Core": "api/ko/constants/Core",
-				"CustomBlendingEquation": "api/ko/constants/CustomBlendingEquations",
-				"Materials": "api/ko/constants/Materials",
-				"Renderer": "api/ko/constants/Renderer",
-				"Textures": "api/ko/constants/Textures"
-			},
-
-			"Core": {
-				"BufferAttribute": "api/ko/core/BufferAttribute",
-				"BufferGeometry": "api/ko/core/BufferGeometry",
-				"Clock": "api/ko/core/Clock",
-				"DirectGeometry": "api/ko/core/DirectGeometry",
-				"EventDispatcher": "api/ko/core/EventDispatcher",
-				"Face3": "api/ko/core/Face3",
-				"Geometry": "api/ko/core/Geometry",
-				"GLBufferAttribute": "api/ko/core/GLBufferAttribute",
-				"InstancedBufferAttribute": "api/ko/core/InstancedBufferAttribute",
-				"InstancedBufferGeometry": "api/ko/core/InstancedBufferGeometry",
-				"InstancedInterleavedBuffer": "api/ko/core/InstancedInterleavedBuffer",
-				"InterleavedBuffer": "api/ko/core/InterleavedBuffer",
-				"InterleavedBufferAttribute": "api/ko/core/InterleavedBufferAttribute",
-				"Layers": "api/ko/core/Layers",
-				"Object3D": "api/ko/core/Object3D",
-				"Raycaster": "api/ko/core/Raycaster",
-				"Uniform": "api/ko/core/Uniform"
-			},
-
-			"Core / BufferAttributes": {
-				"BufferAttribute Types": "api/ko/core/bufferAttributeTypes/BufferAttributeTypes"
-			},
-
-			"Extras": {
-				"DataUtils": "api/ko/extras/DataUtils",
-				"Earcut": "api/ko/extras/Earcut",
-				"ImageUtils": "api/ko/extras/ImageUtils",
-				"PMREMGenerator": "api/ko/extras/PMREMGenerator",
-				"ShapeUtils": "api/ko/extras/ShapeUtils"
-			},
-
-			"Extras / Core": {
-				"Curve": "api/ko/extras/core/Curve",
-				"CurvePath": "api/ko/extras/core/CurvePath",
-				"Font": "api/ko/extras/core/Font",
-				"Interpolations": "api/ko/extras/core/Interpolations",
-				"Path": "api/ko/extras/core/Path",
-				"Shape": "api/ko/extras/core/Shape",
-				"ShapePath": "api/ko/extras/core/ShapePath"
-			},
-
-			"Extras / Curves": {
-				"ArcCurve": "api/ko/extras/curves/ArcCurve",
-				"CatmullRomCurve3": "api/ko/extras/curves/CatmullRomCurve3",
-				"CubicBezierCurve": "api/ko/extras/curves/CubicBezierCurve",
-				"CubicBezierCurve3": "api/ko/extras/curves/CubicBezierCurve3",
-				"EllipseCurve": "api/ko/extras/curves/EllipseCurve",
-				"LineCurve": "api/ko/extras/curves/LineCurve",
-				"LineCurve3": "api/ko/extras/curves/LineCurve3",
-				"QuadraticBezierCurve": "api/ko/extras/curves/QuadraticBezierCurve",
-				"QuadraticBezierCurve3": "api/ko/extras/curves/QuadraticBezierCurve3",
-				"SplineCurve": "api/ko/extras/curves/SplineCurve"
-			},
-
-			"Extras / Objects": {
-				"ImmediateRenderObject": "api/ko/extras/objects/ImmediateRenderObject"
-			},
-
-			"Geometries": {
-				"BoxBufferGeometry": "api/ko/geometries/BoxBufferGeometry",
-				"BoxGeometry": "api/ko/geometries/BoxGeometry",
-				"CircleBufferGeometry": "api/ko/geometries/CircleBufferGeometry",
-				"CircleGeometry": "api/ko/geometries/CircleGeometry",
-				"ConeBufferGeometry": "api/ko/geometries/ConeBufferGeometry",
-				"ConeGeometry": "api/ko/geometries/ConeGeometry",
-				"CylinderBufferGeometry": "api/ko/geometries/CylinderBufferGeometry",
-				"CylinderGeometry": "api/ko/geometries/CylinderGeometry",
-				"DodecahedronBufferGeometry": "api/ko/geometries/DodecahedronBufferGeometry",
-				"DodecahedronGeometry": "api/ko/geometries/DodecahedronGeometry",
-				"EdgesGeometry": "api/ko/geometries/EdgesGeometry",
-				"ExtrudeBufferGeometry": "api/ko/geometries/ExtrudeBufferGeometry",
-				"ExtrudeGeometry": "api/ko/geometries/ExtrudeGeometry",
-				"IcosahedronBufferGeometry": "api/ko/geometries/IcosahedronBufferGeometry",
-				"IcosahedronGeometry": "api/ko/geometries/IcosahedronGeometry",
-				"LatheBufferGeometry": "api/ko/geometries/LatheBufferGeometry",
-				"LatheGeometry": "api/ko/geometries/LatheGeometry",
-				"OctahedronBufferGeometry": "api/ko/geometries/OctahedronBufferGeometry",
-				"OctahedronGeometry": "api/ko/geometries/OctahedronGeometry",
-				"ParametricBufferGeometry": "api/ko/geometries/ParametricBufferGeometry",
-				"ParametricGeometry": "api/ko/geometries/ParametricGeometry",
-				"PlaneBufferGeometry": "api/ko/geometries/PlaneBufferGeometry",
-				"PlaneGeometry": "api/ko/geometries/PlaneGeometry",
-				"PolyhedronBufferGeometry": "api/ko/geometries/PolyhedronBufferGeometry",
-				"PolyhedronGeometry": "api/ko/geometries/PolyhedronGeometry",
-				"RingBufferGeometry": "api/ko/geometries/RingBufferGeometry",
-				"RingGeometry": "api/ko/geometries/RingGeometry",
-				"ShapeBufferGeometry": "api/ko/geometries/ShapeBufferGeometry",
-				"ShapeGeometry": "api/ko/geometries/ShapeGeometry",
-				"SphereBufferGeometry": "api/ko/geometries/SphereBufferGeometry",
-				"SphereGeometry": "api/ko/geometries/SphereGeometry",
-				"TetrahedronBufferGeometry": "api/ko/geometries/TetrahedronBufferGeometry",
-				"TetrahedronGeometry": "api/ko/geometries/TetrahedronGeometry",
-				"TextBufferGeometry": "api/ko/geometries/TextBufferGeometry",
-				"TextGeometry": "api/ko/geometries/TextGeometry",
-				"TorusBufferGeometry": "api/ko/geometries/TorusBufferGeometry",
-				"TorusGeometry": "api/ko/geometries/TorusGeometry",
-				"TorusKnotBufferGeometry": "api/ko/geometries/TorusKnotBufferGeometry",
-				"TorusKnotGeometry": "api/ko/geometries/TorusKnotGeometry",
-				"TubeBufferGeometry": "api/ko/geometries/TubeBufferGeometry",
-				"TubeGeometry": "api/ko/geometries/TubeGeometry",
-				"WireframeGeometry": "api/ko/geometries/WireframeGeometry"
-			},
-
-			"Helpers": {
-				"ArrowHelper": "api/ko/helpers/ArrowHelper",
-				"AxesHelper": "api/ko/helpers/AxesHelper",
-				"BoxHelper": "api/ko/helpers/BoxHelper",
-				"Box3Helper": "api/ko/helpers/Box3Helper",
-				"CameraHelper": "api/ko/helpers/CameraHelper",
-				"DirectionalLightHelper": "api/ko/helpers/DirectionalLightHelper",
-				"GridHelper": "api/ko/helpers/GridHelper",
-				"PolarGridHelper": "api/ko/helpers/PolarGridHelper",
-				"HemisphereLightHelper": "api/ko/helpers/HemisphereLightHelper",
-				"PlaneHelper": "api/ko/helpers/PlaneHelper",
-				"PointLightHelper": "api/ko/helpers/PointLightHelper",
-				"SkeletonHelper": "api/ko/helpers/SkeletonHelper",
-				"SpotLightHelper": "api/ko/helpers/SpotLightHelper"
-			},
-
-			"Lights": {
-				"AmbientLight": "api/ko/lights/AmbientLight",
-				"AmbientLightProbe": "api/ko/lights/AmbientLightProbe",
-				"DirectionalLight": "api/ko/lights/DirectionalLight",
-				"HemisphereLight": "api/ko/lights/HemisphereLight",
-				"HemisphereLightProbe": "api/ko/lights/HemisphereLightProbe",
-				"Light": "api/ko/lights/Light",
-				"LightProbe": "api/ko/lights/LightProbe",
-				"PointLight": "api/ko/lights/PointLight",
-				"RectAreaLight": "api/ko/lights/RectAreaLight",
-				"SpotLight": "api/ko/lights/SpotLight"
-			},
-
-			"Lights / Shadows": {
-				"LightShadow": "api/ko/lights/shadows/LightShadow",
-				"PointLightShadow": "api/ko/lights/shadows/PointLightShadow",
-				"DirectionalLightShadow": "api/ko/lights/shadows/DirectionalLightShadow",
-				"SpotLightShadow": "api/ko/lights/shadows/SpotLightShadow"
-			},
-
-			"Loaders": {
-				"AnimationLoader": "api/ko/loaders/AnimationLoader",
-				"AudioLoader": "api/ko/loaders/AudioLoader",
-				"BufferGeometryLoader": "api/ko/loaders/BufferGeometryLoader",
-				"Cache": "api/ko/loaders/Cache",
-				"CompressedTextureLoader": "api/ko/loaders/CompressedTextureLoader",
-				"CubeTextureLoader": "api/ko/loaders/CubeTextureLoader",
-				"DataTextureLoader": "api/ko/loaders/DataTextureLoader",
-				"FileLoader": "api/ko/loaders/FileLoader",
-				"FontLoader": "api/ko/loaders/FontLoader",
-				"ImageBitmapLoader": "api/ko/loaders/ImageBitmapLoader",
-				"ImageLoader": "api/ko/loaders/ImageLoader",
-				"Loader": "api/ko/loaders/Loader",
-				"LoaderUtils": "api/ko/loaders/LoaderUtils",
-				"MaterialLoader": "api/ko/loaders/MaterialLoader",
-				"ObjectLoader": "api/ko/loaders/ObjectLoader",
-				"TextureLoader": "api/ko/loaders/TextureLoader"
-			},
-
-			"Loaders / Managers": {
-				"DefaultLoadingManager": "api/ko/loaders/managers/DefaultLoadingManager",
-				"LoadingManager": "api/ko/loaders/managers/LoadingManager"
-			},
-
-			"Materials": {
-				"LineBasicMaterial": "api/ko/materials/LineBasicMaterial",
-				"LineDashedMaterial": "api/ko/materials/LineDashedMaterial",
-				"Material": "api/ko/materials/Material",
-				"MeshBasicMaterial": "api/ko/materials/MeshBasicMaterial",
-				"MeshDepthMaterial": "api/ko/materials/MeshDepthMaterial",
-				"MeshDistanceMaterial": "api/ko/materials/MeshDistanceMaterial",
-				"MeshLambertMaterial": "api/ko/materials/MeshLambertMaterial",
-				"MeshMatcapMaterial": "api/ko/materials/MeshMatcapMaterial",
-				"MeshNormalMaterial": "api/ko/materials/MeshNormalMaterial",
-				"MeshPhongMaterial": "api/ko/materials/MeshPhongMaterial",
-				"MeshPhysicalMaterial": "api/ko/materials/MeshPhysicalMaterial",
-				"MeshStandardMaterial": "api/ko/materials/MeshStandardMaterial",
-				"MeshToonMaterial": "api/ko/materials/MeshToonMaterial",
-				"PointsMaterial": "api/ko/materials/PointsMaterial",
-				"RawShaderMaterial": "api/ko/materials/RawShaderMaterial",
-				"ShaderMaterial": "api/ko/materials/ShaderMaterial",
-				"ShadowMaterial": "api/ko/materials/ShadowMaterial",
-				"SpriteMaterial": "api/ko/materials/SpriteMaterial"
-			},
-
-			"Math": {
-				"Box2": "api/ko/math/Box2",
-				"Box3": "api/ko/math/Box3",
-				"Color": "api/ko/math/Color",
-				"Cylindrical": "api/ko/math/Cylindrical",
-				"Euler": "api/ko/math/Euler",
-				"Frustum": "api/ko/math/Frustum",
-				"Interpolant": "api/ko/math/Interpolant",
-				"Line3": "api/ko/math/Line3",
-				"MathUtils": "api/ko/math/MathUtils",
-				"Matrix3": "api/ko/math/Matrix3",
-				"Matrix4": "api/ko/math/Matrix4",
-				"Plane": "api/ko/math/Plane",
-				"Quaternion": "api/ko/math/Quaternion",
-				"Ray": "api/ko/math/Ray",
-				"Sphere": "api/ko/math/Sphere",
-				"Spherical": "api/ko/math/Spherical",
-				"SphericalHarmonics3": "api/ko/math/SphericalHarmonics3",
-				"Triangle": "api/ko/math/Triangle",
-				"Vector2": "api/ko/math/Vector2",
-				"Vector3": "api/ko/math/Vector3",
-				"Vector4": "api/ko/math/Vector4"
-			},
-
-			"Math / Interpolants": {
-				"CubicInterpolant": "api/ko/math/interpolants/CubicInterpolant",
-				"DiscreteInterpolant": "api/ko/math/interpolants/DiscreteInterpolant",
-				"LinearInterpolant": "api/ko/math/interpolants/LinearInterpolant",
-				"QuaternionLinearInterpolant": "api/ko/math/interpolants/QuaternionLinearInterpolant"
-			},
-
-			"Objects": {
-				"Bone": "api/ko/objects/Bone",
-				"Group": "api/ko/objects/Group",
-				"InstancedMesh": "api/ko/objects/InstancedMesh",
-				"Line": "api/ko/objects/Line",
-				"LineLoop": "api/ko/objects/LineLoop",
-				"LineSegments": "api/ko/objects/LineSegments",
-				"LOD": "api/ko/objects/LOD",
-				"Mesh": "api/ko/objects/Mesh",
-				"Points": "api/ko/objects/Points",
-				"Skeleton": "api/ko/objects/Skeleton",
-				"SkinnedMesh": "api/ko/objects/SkinnedMesh",
-				"Sprite": "api/ko/objects/Sprite"
-			},
-
-			"Renderers": {
-				"WebGLMultisampleRenderTarget": "api/ko/renderers/WebGLMultisampleRenderTarget",
-				"WebGLRenderer": "api/ko/renderers/WebGLRenderer",
-				"WebGL1Renderer": "api/ko/renderers/WebGL1Renderer",
-				"WebGLRenderTarget": "api/ko/renderers/WebGLRenderTarget",
-				"WebGLCubeRenderTarget": "api/ko/renderers/WebGLCubeRenderTarget"
-			},
-
-			"Renderers / Shaders": {
-				"ShaderChunk": "api/ko/renderers/shaders/ShaderChunk",
-				"ShaderLib": "api/ko/renderers/shaders/ShaderLib",
-				"UniformsLib": "api/ko/renderers/shaders/UniformsLib",
-				"UniformsUtils": "api/ko/renderers/shaders/UniformsUtils"
-			},
-
-			"Renderers / WebXR": {
-				"WebXRManager": "api/ko/renderers/webxr/WebXRManager"
-			},
-
-			"Scenes": {
-				"Fog": "api/ko/scenes/Fog",
-				"FogExp2": "api/ko/scenes/FogExp2",
-				"Scene": "api/ko/scenes/Scene"
-			},
-
-			"Textures": {
-				"CanvasTexture": "api/ko/textures/CanvasTexture",
-				"CompressedTexture": "api/ko/textures/CompressedTexture",
-				"CubeTexture": "api/ko/textures/CubeTexture",
-				"DataTexture": "api/ko/textures/DataTexture",
-				"DataTexture2DArray": "api/ko/textures/DataTexture2DArray",
-				"DataTexture3D": "api/ko/textures/DataTexture3D",
-				"DepthTexture": "api/ko/textures/DepthTexture",
-				"Texture": "api/ko/textures/Texture",
-				"VideoTexture": "api/ko/textures/VideoTexture"
-			}
-
-		},
 
 		"예제": {
-
-			"Animations": {
-				"CCDIKSolver": "examples/ko/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/ko/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/ko/animations/MMDPhysics"
-			},
 
 			"컨트롤": {
 				"DeviceOrientationControls": "examples/ko/controls/DeviceOrientationControls",
@@ -1367,99 +1052,8 @@
 				"PointerLockControls": "examples/ko/controls/PointerLockControls",
 				"TrackballControls": "examples/ko/controls/TrackballControls",
 				"TransformControls": "examples/ko/controls/TransformControls"
-			},
-
-			"Geometries": {
-				"ConvexBufferGeometry": "examples/ko/geometries/ConvexBufferGeometry",
-				"ConvexGeometry": "examples/ko/geometries/ConvexGeometry",
-				"DecalGeometry": "examples/ko/geometries/DecalGeometry"
-			},
-
-			"Helpers": {
-				"FaceNormalsHelper": "examples/ko/helpers/FaceNormalsHelper",
-				"LightProbeHelper": "examples/ko/helpers/LightProbeHelper",
-				"PositionalAudioHelper": "examples/ko/helpers/PositionalAudioHelper",
-				"RectAreaLightHelper": "examples/ko/helpers/RectAreaLightHelper",
-				"VertexNormalsHelper": "examples/ko/helpers/VertexNormalsHelper",
-				"VertexTangentsHelper": "examples/ko/helpers/VertexTangentsHelper"
-			},
-
-			"Lights": {
-				"LightProbeGenerator": "examples/ko/lights/LightProbeGenerator"
-			},
-
-			"Loaders": {
-				"3DMLoader": "examples/ko/loaders/3DMLoader",
-				"BasisTextureLoader": "examples/ko/loaders/BasisTextureLoader",
-				"DRACOLoader": "examples/ko/loaders/DRACOLoader",
-				"GLTFLoader": "examples/ko/loaders/GLTFLoader",
-				"MMDLoader": "examples/ko/loaders/MMDLoader",
-				"MTLLoader": "examples/ko/loaders/MTLLoader",
-				"OBJLoader": "examples/ko/loaders/OBJLoader",
-				"OBJLoader2": "examples/ko/loaders/OBJLoader2",
-				"OBJLoader2Parallel": "examples/ko/loaders/OBJLoader2Parallel",
-				"PCDLoader": "examples/ko/loaders/PCDLoader",
-				"PDBLoader": "examples/ko/loaders/PDBLoader",
-				"PRWMLoader": "examples/ko/loaders/PRWMLoader",
-				"SVGLoader": "examples/ko/loaders/SVGLoader",
-				"TGALoader": "examples/ko/loaders/TGALoader"
-			},
-
-			"Objects": {
-				"Lensflare": "examples/ko/objects/Lensflare"
-			},
-
-			"Post-Processing": {
-				"EffectComposer": "examples/ko/postprocessing/EffectComposer"
-			},
-
-			"Exporters": {
-				"GLTFExporter": "examples/ko/exporters/GLTFExporter",
-				"PLYExporter": "examples/ko/exporters/PLYExporter",
-				"ColladaExporter": "examples/ko/exporters/ColladaExporter"
-			},
-
-			"Math": {
-				"LookupTable": "examples/ko/math/Lut",
-				"MeshSurfaceSampler": "examples/ko/math/MeshSurfaceSampler",
-				"OBB": "examples/ko/math/OBB"
-			},
-
-			"ConvexHull": {
-				"Face": "examples/ko/math/convexhull/Face",
-				"HalfEdge": "examples/ko/math/convexhull/HalfEdge",
-				"ConvexHull": "examples/ko/math/convexhull/ConvexHull",
-				"VertexNode": "examples/ko/math/convexhull/VertexNode",
-				"VertexList": "examples/ko/math/convexhull/VertexList"
-			},
-
-			"Renderers": {
-				"CSS2DRenderer": "examples/ko/renderers/CSS2DRenderer",
-				"CSS3DRenderer": "examples/ko/renderers/CSS3DRenderer",
-				"SVGRenderer": "examples/ko/renderers/SVGRenderer"
-
-			},
-
-			"Utils": {
-				"BufferGeometryUtils": "examples/ko/utils/BufferGeometryUtils",
-				"SceneUtils": "examples/ko/utils/SceneUtils",
-				"SkeletonUtils": "examples/ko/utils/SkeletonUtils"
 			}
-
-		},
-
-		"Developer Reference": {
-
-			"Polyfills": {
-				"Polyfills": "api/ko/Polyfills"
-			},
-
-			"WebGLRenderer": {
-				"WebGLProgram": "api/ko/renderers/webgl/WebGLProgram",
-				"WebGLShader": "api/ko/renderers/webgl/WebGLShader",
-				"WebGLState": "api/ko/renderers/webgl/WebGLState"
-			}
-
+	
 		}
 
 	}

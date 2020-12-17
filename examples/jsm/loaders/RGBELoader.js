@@ -10,7 +10,7 @@ import {
 	RGBEFormat,
 	RGBFormat,
 	UnsignedByteType
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 // https://github.com/mrdoob/three.js/issues/5552
 // http://en.wikipedia.org/wiki/RGBE_image_format
@@ -113,7 +113,7 @@ RGBELoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype
 				var line, match,
 
 					// regexes to parse header info fields
-					magic_token_re = /^#\?(\S+)$/,
+					magic_token_re = /^#\?(\S+)/,
 					gamma_re = /^\s*GAMMA\s*=\s*(\d+(\.\d+)?)\s*$/,
 					exposure_re = /^\s*EXPOSURE\s*=\s*(\d+(\.\d+)?)\s*$/,
 					format_re = /^\s*FORMAT=(\S+)\s*$/,

@@ -7,7 +7,7 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	MeshLambertMaterial
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * https://github.com/gkjohnson/collada-exporter-js

@@ -3,9 +3,9 @@ import {
 	Loader,
 	Matrix4,
 	Vector3
-} from "../../../build/three.module.js";
-import { Zlib } from "../libs/gunzip.module.min.js";
-import { Volume } from "../misc/Volume.js";
+} from '../../../build/three.module.js';
+import { Zlib } from '../libs/gunzip.module.min.js';
+import { Volume } from '../misc/Volume.js';
 
 var NRRDLoader = function ( manager ) {
 

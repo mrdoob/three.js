@@ -127,11 +127,11 @@ NodePostProcessing.prototype = {
 			var data = {};
 
 			data.uuid = this.uuid;
-			data.type = "NodePostProcessing";
+			data.type = 'NodePostProcessing';
 
 			meta.post[ this.uuid ] = data;
 
-			if ( this.name !== "" ) data.name = this.name;
+			if ( this.name !== '' ) data.name = this.name;
 
 			if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 

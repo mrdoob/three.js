@@ -8,7 +8,7 @@ function SpriteNodeMaterial() {
 
 	NodeMaterial.call( this, node, node );
 
-	this.type = "SpriteNodeMaterial";
+	this.type = 'SpriteNodeMaterial';
 
 }
 

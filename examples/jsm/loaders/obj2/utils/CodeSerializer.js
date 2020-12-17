@@ -100,7 +100,7 @@ const CodeSerializer = {
 				} else if ( typeof objectPart === 'object' ) {
 
 					console.log( 'Omitting object "' + funcInstructions.getName() + '" and replace it with empty object.' );
-					funcInstructions.setCode( "{}" );
+					funcInstructions.setCode( '{}' );
 
 				} else {
 

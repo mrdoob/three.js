@@ -1,6 +1,6 @@
 import {
 	Color
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var Lut = function ( colormap, numberofcolors ) {
 

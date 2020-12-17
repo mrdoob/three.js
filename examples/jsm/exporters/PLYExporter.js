@@ -2,7 +2,7 @@ import {
 	BufferGeometry,
 	Matrix3,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * https://github.com/gkjohnson/ply-exporter-js

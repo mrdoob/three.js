@@ -1,5 +1,5 @@
 // threejs.org/license
-const REVISION = '123';
+const REVISION = '124dev';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -15064,7 +15064,6 @@ function WebGLCubeMaps( renderer ) {
 
 						const currentRenderList = renderer.getRenderList();
 						const currentRenderTarget = renderer.getRenderTarget();
-						const currentRenderState = renderer.getRenderState();
 
 						const renderTarget = new WebGLCubeRenderTarget( image.height / 2 );
 						renderTarget.fromEquirectangularTexture( renderer, texture );
@@ -15072,7 +15071,6 @@ function WebGLCubeMaps( renderer ) {
 
 						renderer.setRenderTarget( currentRenderTarget );
 						renderer.setRenderList( currentRenderList );
-						renderer.setRenderState( currentRenderState );
 
 						texture.addEventListener( 'dispose', onTextureDispose );
 
@@ -15713,6 +15711,12 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 		if ( object.isInstancedMesh ) {
 
+			if ( object.hasEventListener( 'dispose', onInstancedMeshDispose ) === false ) {
+
+				object.addEventListener( 'dispose', onInstancedMeshDispose );
+
+			}
+
 			attributes.update( object.instanceMatrix, 34962 );
 
 			if ( object.instanceColor !== null ) {
@@ -15730,6 +15734,18 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 	function dispose() {
 
 		updateMap = new WeakMap();
+
+	}
+
+	function onInstancedMeshDispose( event ) {
+
+		const instancedMesh = event.target;
+
+		instancedMesh.removeEventListener( 'dispose', onInstancedMeshDispose );
+
+		attributes.remove( instancedMesh.instanceMatrix );
+
+		if ( instancedMesh.instanceColor !== null ) attributes.remove( instancedMesh.instanceColor );
 
 	}
 
@@ -18393,7 +18409,7 @@ function WebGLLights( extensions, capabilities ) {
 	const matrix4 = new Matrix4();
 	const matrix42 = new Matrix4();
 
-	function setup( lights, shadows, camera ) {
+	function setup( lights ) {
 
 		let r = 0, g = 0, b = 0;
 
@@ -18408,8 +18424,6 @@ function WebGLLights( extensions, capabilities ) {
 		let numDirectionalShadows = 0;
 		let numPointShadows = 0;
 		let numSpotShadows = 0;
-
-		const viewMatrix = camera.matrixWorldInverse;
 
 		lights.sort( shadowCastingLightsFirst );
 
@@ -18442,10 +18456,6 @@ function WebGLLights( extensions, capabilities ) {
 				const uniforms = cache.get( light );
 
 				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
-				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
-				vector3.setFromMatrixPosition( light.target.matrixWorld );
-				uniforms.direction.sub( vector3 );
-				uniforms.direction.transformDirection( viewMatrix );
 
 				if ( light.castShadow ) {
 
@@ -18475,15 +18485,9 @@ function WebGLLights( extensions, capabilities ) {
 				const uniforms = cache.get( light );
 
 				uniforms.position.setFromMatrixPosition( light.matrixWorld );
-				uniforms.position.applyMatrix4( viewMatrix );
 
 				uniforms.color.copy( color ).multiplyScalar( intensity );
 				uniforms.distance = distance;
-
-				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
-				vector3.setFromMatrixPosition( light.target.matrixWorld );
-				uniforms.direction.sub( vector3 );
-				uniforms.direction.transformDirection( viewMatrix );
 
 				uniforms.coneCos = Math.cos( light.angle );
 				uniforms.penumbraCos = Math.cos( light.angle * ( 1 - light.penumbra ) );
@@ -18522,23 +18526,8 @@ function WebGLLights( extensions, capabilities ) {
 				// (b) intensity is the brightness of the light
 				uniforms.color.copy( color ).multiplyScalar( intensity );
 
-				uniforms.position.setFromMatrixPosition( light.matrixWorld );
-				uniforms.position.applyMatrix4( viewMatrix );
-
-				// extract local rotation of light to derive width/height half vectors
-				matrix42.identity();
-				matrix4.copy( light.matrixWorld );
-				matrix4.premultiply( viewMatrix );
-				matrix42.extractRotation( matrix4 );
-
 				uniforms.halfWidth.set( light.width * 0.5, 0.0, 0.0 );
 				uniforms.halfHeight.set( 0.0, light.height * 0.5, 0.0 );
-
-				uniforms.halfWidth.applyMatrix4( matrix42 );
-				uniforms.halfHeight.applyMatrix4( matrix42 );
-
-				// TODO (abelnation): RectAreaLight distance?
-				// uniforms.distance = distance;
 
 				state.rectArea[ rectAreaLength ] = uniforms;
 
@@ -18547,9 +18536,6 @@ function WebGLLights( extensions, capabilities ) {
 			} else if ( light.isPointLight ) {
 
 				const uniforms = cache.get( light );
-
-				uniforms.position.setFromMatrixPosition( light.matrixWorld );
-				uniforms.position.applyMatrix4( viewMatrix );
 
 				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
 				uniforms.distance = light.distance;
@@ -18583,10 +18569,6 @@ function WebGLLights( extensions, capabilities ) {
 			} else if ( light.isHemisphereLight ) {
 
 				const uniforms = cache.get( light );
-
-				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
-				uniforms.direction.transformDirection( viewMatrix );
-				uniforms.direction.normalize();
 
 				uniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
 				uniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
@@ -18679,8 +18661,94 @@ function WebGLLights( extensions, capabilities ) {
 
 	}
 
+	function setupView( lights, camera ) {
+
+		let directionalLength = 0;
+		let pointLength = 0;
+		let spotLength = 0;
+		let rectAreaLength = 0;
+		let hemiLength = 0;
+
+		const viewMatrix = camera.matrixWorldInverse;
+
+		for ( let i = 0, l = lights.length; i < l; i ++ ) {
+
+			const light = lights[ i ];
+
+			if ( light.isDirectionalLight ) {
+
+				const uniforms = state.directional[ directionalLength ];
+
+				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
+				vector3.setFromMatrixPosition( light.target.matrixWorld );
+				uniforms.direction.sub( vector3 );
+				uniforms.direction.transformDirection( viewMatrix );
+
+				directionalLength ++;
+
+			} else if ( light.isSpotLight ) {
+
+				const uniforms = state.spot[ spotLength ];
+
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
+
+				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
+				vector3.setFromMatrixPosition( light.target.matrixWorld );
+				uniforms.direction.sub( vector3 );
+				uniforms.direction.transformDirection( viewMatrix );
+
+				spotLength ++;
+
+			} else if ( light.isRectAreaLight ) {
+
+				const uniforms = state.rectArea[ rectAreaLength ];
+
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
+
+				// extract local rotation of light to derive width/height half vectors
+				matrix42.identity();
+				matrix4.copy( light.matrixWorld );
+				matrix4.premultiply( viewMatrix );
+				matrix42.extractRotation( matrix4 );
+
+				uniforms.halfWidth.set( light.width * 0.5, 0.0, 0.0 );
+				uniforms.halfHeight.set( 0.0, light.height * 0.5, 0.0 );
+
+				uniforms.halfWidth.applyMatrix4( matrix42 );
+				uniforms.halfHeight.applyMatrix4( matrix42 );
+
+				rectAreaLength ++;
+
+			} else if ( light.isPointLight ) {
+
+				const uniforms = state.point[ pointLength ];
+
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
+
+				pointLength ++;
+
+			} else if ( light.isHemisphereLight ) {
+
+				const uniforms = state.hemi[ hemiLength ];
+
+				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
+				uniforms.direction.transformDirection( viewMatrix );
+				uniforms.direction.normalize();
+
+				hemiLength ++;
+
+			}
+
+		}
+
+	}
+
 	return {
 		setup: setup,
+		setupView: setupView,
 		state: state
 	};
 
@@ -18712,9 +18780,15 @@ function WebGLRenderState( extensions, capabilities ) {
 
 	}
 
-	function setupLights( camera ) {
+	function setupLights() {
 
-		lights.setup( lightsArray, shadowsArray, camera );
+		lights.setup( lightsArray );
+
+	}
+
+	function setupLightsView( camera ) {
+
+		lights.setupView( lightsArray, camera );
 
 	}
 
@@ -18729,6 +18803,7 @@ function WebGLRenderState( extensions, capabilities ) {
 		init: init,
 		state: state,
 		setupLights: setupLights,
+		setupLightsView: setupLightsView,
 
 		pushLight: pushLight,
 		pushShadow: pushShadow
@@ -18740,26 +18815,26 @@ function WebGLRenderStates( extensions, capabilities ) {
 
 	let renderStates = new WeakMap();
 
-	function get( scene, camera ) {
+	function get( scene, renderCallDepth = 0 ) {
 
 		let renderState;
 
 		if ( renderStates.has( scene ) === false ) {
 
 			renderState = new WebGLRenderState( extensions, capabilities );
-			renderStates.set( scene, new WeakMap() );
-			renderStates.get( scene ).set( camera, renderState );
+			renderStates.set( scene, [] );
+			renderStates.get( scene ).push( renderState );
 
 		} else {
 
-			if ( renderStates.get( scene ).has( camera ) === false ) {
+			if ( renderCallDepth >= renderStates.get( scene ).length ) {
 
 				renderState = new WebGLRenderState( extensions, capabilities );
-				renderStates.get( scene ).set( camera, renderState );
+				renderStates.get( scene ).push( renderState );
 
 			} else {
 
-				renderState = renderStates.get( scene ).get( camera );
+				renderState = renderStates.get( scene )[ renderCallDepth ];
 
 			}
 
@@ -23258,6 +23333,11 @@ function WebGLRenderer( parameters ) {
 	let currentRenderList = null;
 	let currentRenderState = null;
 
+	// render() can be called from within a callback triggered by another render.
+	// We track this so that the nested render call gets its state isolated from the parent render call.
+
+	const renderStateStack = [];
+
 	// public properties
 
 	this.domElement = _canvas;
@@ -23324,7 +23404,6 @@ function WebGLRenderer( parameters ) {
 	let _currentMaterialId = - 1;
 
 	let _currentCamera = null;
-	let _currentArrayCamera = null;
 
 	const _currentViewport = new Vector4();
 	const _currentScissor = new Vector4();
@@ -24078,7 +24157,7 @@ function WebGLRenderer( parameters ) {
 
 	this.compile = function ( scene, camera ) {
 
-		currentRenderState = renderStates.get( scene, camera );
+		currentRenderState = renderStates.get( scene );
 		currentRenderState.init();
 
 		scene.traverseVisible( function ( object ) {
@@ -24097,7 +24176,7 @@ function WebGLRenderer( parameters ) {
 
 		} );
 
-		currentRenderState.setupLights( camera );
+		currentRenderState.setupLights();
 
 		const compiled = new WeakMap();
 
@@ -24212,8 +24291,10 @@ function WebGLRenderer( parameters ) {
 		//
 		if ( scene.isScene === true ) scene.onBeforeRender( _this, scene, camera, renderTarget || _currentRenderTarget );
 
-		currentRenderState = renderStates.get( scene, camera );
+		currentRenderState = renderStates.get( scene, renderStateStack.length );
 		currentRenderState.init();
+
+		renderStateStack.push( currentRenderState );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromProjectionMatrix( _projScreenMatrix );
@@ -24242,7 +24323,8 @@ function WebGLRenderer( parameters ) {
 
 		shadowMap.render( shadowsArray, scene, camera );
 
-		currentRenderState.setupLights( camera );
+		currentRenderState.setupLights();
+		currentRenderState.setupLightsView( camera );
 
 		if ( _clippingEnabled === true ) clipping.endShadows();
 
@@ -24296,8 +24378,18 @@ function WebGLRenderer( parameters ) {
 
 		// _gl.finish();
 
+		renderStateStack.pop();
+		if ( renderStateStack.length > 0 ) {
+
+			currentRenderState = renderStateStack[ renderStateStack.length - 1 ];
+
+		} else {
+
+			currentRenderState = null;
+
+		}
+
 		currentRenderList = null;
-		currentRenderState = null;
 
 	};
 
@@ -24441,8 +24533,6 @@ function WebGLRenderer( parameters ) {
 
 			if ( camera.isArrayCamera ) {
 
-				_currentArrayCamera = camera;
-
 				const cameras = camera.cameras;
 
 				for ( let j = 0, jl = cameras.length; j < jl; j ++ ) {
@@ -24453,7 +24543,7 @@ function WebGLRenderer( parameters ) {
 
 						state.viewport( _currentViewport.copy( camera2.viewport ) );
 
-						currentRenderState.setupLights( camera2 );
+						currentRenderState.setupLightsView( camera2 );
 
 						renderObject( object, scene, camera2, geometry, material, group );
 
@@ -24462,8 +24552,6 @@ function WebGLRenderer( parameters ) {
 				}
 
 			} else {
-
-				_currentArrayCamera = null;
 
 				renderObject( object, scene, camera, geometry, material, group );
 
@@ -24476,7 +24564,6 @@ function WebGLRenderer( parameters ) {
 	function renderObject( object, scene, camera, geometry, material, group ) {
 
 		object.onBeforeRender( _this, scene, camera, geometry, material, group );
-		currentRenderState = renderStates.get( scene, _currentArrayCamera || camera );
 
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
@@ -24498,7 +24585,6 @@ function WebGLRenderer( parameters ) {
 		}
 
 		object.onAfterRender( _this, scene, camera, geometry, material, group );
-		currentRenderState = renderStates.get( scene, _currentArrayCamera || camera );
 
 	}
 
@@ -24957,18 +25043,6 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.getRenderState = function () {
-
-		return currentRenderState;
-
-	};
-
-	this.setRenderState = function ( renderState ) {
-
-		currentRenderState = renderState;
-
-	};
-
 	this.getRenderTarget = function () {
 
 		return _currentRenderTarget;
@@ -25182,6 +25256,13 @@ function WebGLRenderer( parameters ) {
 		textures.setTexture2D( texture, 0 );
 
 		state.unbindTexture();
+
+	};
+
+	this.resetState = function () {
+
+		state.reset();
+		bindingStates.reset();
 
 	};
 
@@ -26154,6 +26235,14 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 } );
 
+const _basePosition = new Vector3();
+
+const _skinIndex = new Vector4();
+const _skinWeight = new Vector4();
+
+const _vector$7 = new Vector3();
+const _matrix$1 = new Matrix4();
+
 function SkinnedMesh( geometry, material ) {
 
 	if ( geometry && geometry.isGeometry ) {
@@ -26268,49 +26357,37 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
-	boneTransform: ( function () {
+	boneTransform: function ( index, target ) {
 
-		const basePosition = new Vector3();
+		const skeleton = this.skeleton;
+		const geometry = this.geometry;
 
-		const skinIndex = new Vector4();
-		const skinWeight = new Vector4();
+		_skinIndex.fromBufferAttribute( geometry.attributes.skinIndex, index );
+		_skinWeight.fromBufferAttribute( geometry.attributes.skinWeight, index );
 
-		const vector = new Vector3();
-		const matrix = new Matrix4();
+		_basePosition.fromBufferAttribute( geometry.attributes.position, index ).applyMatrix4( this.bindMatrix );
 
-		return function ( index, target ) {
+		target.set( 0, 0, 0 );
 
-			const skeleton = this.skeleton;
-			const geometry = this.geometry;
+		for ( let i = 0; i < 4; i ++ ) {
 
-			skinIndex.fromBufferAttribute( geometry.attributes.skinIndex, index );
-			skinWeight.fromBufferAttribute( geometry.attributes.skinWeight, index );
+			const weight = _skinWeight.getComponent( i );
 
-			basePosition.fromBufferAttribute( geometry.attributes.position, index ).applyMatrix4( this.bindMatrix );
+			if ( weight !== 0 ) {
 
-			target.set( 0, 0, 0 );
+				const boneIndex = _skinIndex.getComponent( i );
 
-			for ( let i = 0; i < 4; i ++ ) {
+				_matrix$1.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
 
-				const weight = skinWeight.getComponent( i );
-
-				if ( weight !== 0 ) {
-
-					const boneIndex = skinIndex.getComponent( i );
-
-					matrix.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
-
-					target.addScaledVector( vector.copy( basePosition ).applyMatrix4( matrix ), weight );
-
-				}
+				target.addScaledVector( _vector$7.copy( _basePosition ).applyMatrix4( _matrix$1 ), weight );
 
 			}
 
-			return target.applyMatrix4( this.bindMatrixInverse );
+		}
 
-		};
+		return target.applyMatrix4( this.bindMatrixInverse );
 
-	}() )
+	}
 
 } );
 
@@ -26683,6 +26760,12 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 	},
 
 	updateMorphTargets: function () {
+
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
@@ -46762,7 +46845,7 @@ class Cylindrical {
 
 }
 
-const _vector$7 = /*@__PURE__*/ new Vector2();
+const _vector$8 = /*@__PURE__*/ new Vector2();
 
 class Box2 {
 
@@ -46800,7 +46883,7 @@ class Box2 {
 
 	setFromCenterAndSize( center, size ) {
 
-		const halfSize = _vector$7.copy( size ).multiplyScalar( 0.5 );
+		const halfSize = _vector$8.copy( size ).multiplyScalar( 0.5 );
 		this.min.copy( center ).sub( halfSize );
 		this.max.copy( center ).add( halfSize );
 
@@ -46950,7 +47033,7 @@ class Box2 {
 
 	distanceToPoint( point ) {
 
-		const clampedPoint = _vector$7.copy( point ).clamp( this.min, this.max );
+		const clampedPoint = _vector$8.copy( point ).clamp( this.min, this.max );
 		return clampedPoint.sub( point ).length();
 
 	}
@@ -47155,7 +47238,7 @@ ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;
 
 ImmediateRenderObject.prototype.isImmediateRenderObject = true;
 
-const _vector$8 = /*@__PURE__*/ new Vector3();
+const _vector$9 = /*@__PURE__*/ new Vector3();
 
 class SpotLightHelper extends Object3D {
 
@@ -47219,9 +47302,9 @@ class SpotLightHelper extends Object3D {
 
 		this.cone.scale.set( coneWidth, coneWidth, coneLength );
 
-		_vector$8.setFromMatrixPosition( this.light.target.matrixWorld );
+		_vector$9.setFromMatrixPosition( this.light.target.matrixWorld );
 
-		this.cone.lookAt( _vector$8 );
+		this.cone.lookAt( _vector$9 );
 
 		if ( this.color !== undefined ) {
 
@@ -47237,7 +47320,7 @@ class SpotLightHelper extends Object3D {
 
 }
 
-const _vector$9 = /*@__PURE__*/ new Vector3();
+const _vector$a = /*@__PURE__*/ new Vector3();
 const _boneMatrix = /*@__PURE__*/ new Matrix4();
 const _matrixWorldInv = /*@__PURE__*/ new Matrix4();
 
@@ -47305,12 +47388,12 @@ class SkeletonHelper extends LineSegments {
 			if ( bone.parent && bone.parent.isBone ) {
 
 				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.matrixWorld );
-				_vector$9.setFromMatrixPosition( _boneMatrix );
-				position.setXYZ( j, _vector$9.x, _vector$9.y, _vector$9.z );
+				_vector$a.setFromMatrixPosition( _boneMatrix );
+				position.setXYZ( j, _vector$a.x, _vector$a.y, _vector$a.z );
 
 				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.parent.matrixWorld );
-				_vector$9.setFromMatrixPosition( _boneMatrix );
-				position.setXYZ( j + 1, _vector$9.x, _vector$9.y, _vector$9.z );
+				_vector$a.setFromMatrixPosition( _boneMatrix );
+				position.setXYZ( j + 1, _vector$a.x, _vector$a.y, _vector$a.z );
 
 				j += 2;
 
@@ -47432,7 +47515,7 @@ class PointLightHelper extends Mesh {
 
 }
 
-const _vector$a = /*@__PURE__*/ new Vector3();
+const _vector$b = /*@__PURE__*/ new Vector3();
 const _color1 = /*@__PURE__*/ new Color();
 const _color2 = /*@__PURE__*/ new Color();
 
@@ -47500,7 +47583,7 @@ class HemisphereLightHelper extends Object3D {
 
 		}
 
-		mesh.lookAt( _vector$a.setFromMatrixPosition( this.light.matrixWorld ).negate() );
+		mesh.lookAt( _vector$b.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 
 	}
 
@@ -47703,7 +47786,7 @@ class DirectionalLightHelper extends Object3D {
 
 }
 
-const _vector$b = /*@__PURE__*/ new Vector3();
+const _vector$c = /*@__PURE__*/ new Vector3();
 const _camera = /*@__PURE__*/ new Camera();
 
 /**
@@ -47879,7 +47962,7 @@ class CameraHelper extends LineSegments {
 
 function setPoint( point, pointMap, geometry, camera, x, y, z ) {
 
-	_vector$b.set( x, y, z ).unproject( camera );
+	_vector$c.set( x, y, z ).unproject( camera );
 
 	const points = pointMap[ point ];
 
@@ -47889,7 +47972,7 @@ function setPoint( point, pointMap, geometry, camera, x, y, z ) {
 
 		for ( let i = 0, l = points.length; i < l; i ++ ) {
 
-			position.setXYZ( points[ i ], _vector$b.x, _vector$b.y, _vector$b.z );
+			position.setXYZ( points[ i ], _vector$c.x, _vector$c.y, _vector$c.z );
 
 		}
 

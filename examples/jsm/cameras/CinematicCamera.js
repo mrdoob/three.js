@@ -9,9 +9,9 @@ import {
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
-import { BokehShader } from "../shaders/BokehShader2.js";
-import { BokehDepthShader } from "../shaders/BokehShader2.js";
+} from '../../../build/three.module.js';
+import { BokehShader } from '../shaders/BokehShader2.js';
+import { BokehDepthShader } from '../shaders/BokehShader2.js';
 
 var CinematicCamera = function ( fov, aspect, near, far ) {
 

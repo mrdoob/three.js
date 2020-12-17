@@ -1,4 +1,4 @@
-import { BufferGeometry, Geometry } from "../../../src/Three";
+import { BufferGeometry, Geometry } from '../../../src/Three';
 
 export class EdgeSplitModifier {
 

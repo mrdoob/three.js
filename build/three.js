@@ -63,7 +63,7 @@
 		};
 	}
 
-	var REVISION = '123';
+	var REVISION = '124dev';
 	var MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -11787,13 +11787,11 @@
 						if (image && image.height > 0) {
 							var currentRenderList = renderer.getRenderList();
 							var currentRenderTarget = renderer.getRenderTarget();
-							var currentRenderState = renderer.getRenderState();
 							var renderTarget = new WebGLCubeRenderTarget(image.height / 2);
 							renderTarget.fromEquirectangularTexture(renderer, texture);
 							cubemaps.set(texture, renderTarget);
 							renderer.setRenderTarget(currentRenderTarget);
 							renderer.setRenderList(currentRenderList);
-							renderer.setRenderState(currentRenderState);
 							texture.addEventListener('dispose', onTextureDispose);
 							return mapTextureMapping(renderTarget.texture, texture.mapping);
 						} else {
@@ -12241,6 +12239,10 @@
 			}
 
 			if (object.isInstancedMesh) {
+				if (object.hasEventListener('dispose', onInstancedMeshDispose) === false) {
+					object.addEventListener('dispose', onInstancedMeshDispose);
+				}
+
 				attributes.update(object.instanceMatrix, 34962);
 
 				if (object.instanceColor !== null) {
@@ -12253,6 +12255,13 @@
 
 		function dispose() {
 			updateMap = new WeakMap();
+		}
+
+		function onInstancedMeshDispose(event) {
+			var instancedMesh = event.target;
+			instancedMesh.removeEventListener('dispose', onInstancedMeshDispose);
+			attributes.remove(instancedMesh.instanceMatrix);
+			if (instancedMesh.instanceColor !== null) attributes.remove(instancedMesh.instanceColor);
 		}
 
 		return {
@@ -14083,7 +14092,7 @@
 		var matrix4 = new Matrix4();
 		var matrix42 = new Matrix4();
 
-		function setup(lights, shadows, camera) {
+		function setup(lights) {
 			var r = 0,
 					g = 0,
 					b = 0;
@@ -14100,7 +14109,6 @@
 			var numDirectionalShadows = 0;
 			var numPointShadows = 0;
 			var numSpotShadows = 0;
-			var viewMatrix = camera.matrixWorldInverse;
 			lights.sort(shadowCastingLightsFirst);
 
 			for (var _i2 = 0, l = lights.length; _i2 < l; _i2++) {
@@ -14121,10 +14129,6 @@
 				} else if (light.isDirectionalLight) {
 					var uniforms = cache.get(light);
 					uniforms.color.copy(light.color).multiplyScalar(light.intensity);
-					uniforms.direction.setFromMatrixPosition(light.matrixWorld);
-					vector3.setFromMatrixPosition(light.target.matrixWorld);
-					uniforms.direction.sub(vector3);
-					uniforms.direction.transformDirection(viewMatrix);
 
 					if (light.castShadow) {
 						var shadow = light.shadow;
@@ -14146,20 +14150,9 @@
 
 					_uniforms.position.setFromMatrixPosition(light.matrixWorld);
 
-					_uniforms.position.applyMatrix4(viewMatrix);
-
 					_uniforms.color.copy(color).multiplyScalar(intensity);
 
 					_uniforms.distance = distance;
-
-					_uniforms.direction.setFromMatrixPosition(light.matrixWorld);
-
-					vector3.setFromMatrixPosition(light.target.matrixWorld);
-
-					_uniforms.direction.sub(vector3);
-
-					_uniforms.direction.transformDirection(viewMatrix);
-
 					_uniforms.coneCos = Math.cos(light.angle);
 					_uniforms.penumbraCos = Math.cos(light.angle * (1 - light.penumbra));
 					_uniforms.decay = light.decay;
@@ -14189,34 +14182,14 @@
 
 					_uniforms2.color.copy(color).multiplyScalar(intensity);
 
-					_uniforms2.position.setFromMatrixPosition(light.matrixWorld);
-
-					_uniforms2.position.applyMatrix4(viewMatrix); // extract local rotation of light to derive width/height half vectors
-
-
-					matrix42.identity();
-					matrix4.copy(light.matrixWorld);
-					matrix4.premultiply(viewMatrix);
-					matrix42.extractRotation(matrix4);
-
 					_uniforms2.halfWidth.set(light.width * 0.5, 0.0, 0.0);
 
 					_uniforms2.halfHeight.set(0.0, light.height * 0.5, 0.0);
-
-					_uniforms2.halfWidth.applyMatrix4(matrix42);
-
-					_uniforms2.halfHeight.applyMatrix4(matrix42); // TODO (abelnation): RectAreaLight distance?
-					// uniforms.distance = distance;
-
 
 					state.rectArea[rectAreaLength] = _uniforms2;
 					rectAreaLength++;
 				} else if (light.isPointLight) {
 					var _uniforms3 = cache.get(light);
-
-					_uniforms3.position.setFromMatrixPosition(light.matrixWorld);
-
-					_uniforms3.position.applyMatrix4(viewMatrix);
 
 					_uniforms3.color.copy(light.color).multiplyScalar(light.intensity);
 
@@ -14244,12 +14217,6 @@
 					pointLength++;
 				} else if (light.isHemisphereLight) {
 					var _uniforms4 = cache.get(light);
-
-					_uniforms4.direction.setFromMatrixPosition(light.matrixWorld);
-
-					_uniforms4.direction.transformDirection(viewMatrix);
-
-					_uniforms4.direction.normalize();
 
 					_uniforms4.skyColor.copy(light.color).multiplyScalar(intensity);
 
@@ -14311,8 +14278,87 @@
 			}
 		}
 
+		function setupView(lights, camera) {
+			var directionalLength = 0;
+			var pointLength = 0;
+			var spotLength = 0;
+			var rectAreaLength = 0;
+			var hemiLength = 0;
+			var viewMatrix = camera.matrixWorldInverse;
+
+			for (var _i3 = 0, l = lights.length; _i3 < l; _i3++) {
+				var light = lights[_i3];
+
+				if (light.isDirectionalLight) {
+					var uniforms = state.directional[directionalLength];
+					uniforms.direction.setFromMatrixPosition(light.matrixWorld);
+					vector3.setFromMatrixPosition(light.target.matrixWorld);
+					uniforms.direction.sub(vector3);
+					uniforms.direction.transformDirection(viewMatrix);
+					directionalLength++;
+				} else if (light.isSpotLight) {
+					var _uniforms5 = state.spot[spotLength];
+
+					_uniforms5.position.setFromMatrixPosition(light.matrixWorld);
+
+					_uniforms5.position.applyMatrix4(viewMatrix);
+
+					_uniforms5.direction.setFromMatrixPosition(light.matrixWorld);
+
+					vector3.setFromMatrixPosition(light.target.matrixWorld);
+
+					_uniforms5.direction.sub(vector3);
+
+					_uniforms5.direction.transformDirection(viewMatrix);
+
+					spotLength++;
+				} else if (light.isRectAreaLight) {
+					var _uniforms6 = state.rectArea[rectAreaLength];
+
+					_uniforms6.position.setFromMatrixPosition(light.matrixWorld);
+
+					_uniforms6.position.applyMatrix4(viewMatrix); // extract local rotation of light to derive width/height half vectors
+
+
+					matrix42.identity();
+					matrix4.copy(light.matrixWorld);
+					matrix4.premultiply(viewMatrix);
+					matrix42.extractRotation(matrix4);
+
+					_uniforms6.halfWidth.set(light.width * 0.5, 0.0, 0.0);
+
+					_uniforms6.halfHeight.set(0.0, light.height * 0.5, 0.0);
+
+					_uniforms6.halfWidth.applyMatrix4(matrix42);
+
+					_uniforms6.halfHeight.applyMatrix4(matrix42);
+
+					rectAreaLength++;
+				} else if (light.isPointLight) {
+					var _uniforms7 = state.point[pointLength];
+
+					_uniforms7.position.setFromMatrixPosition(light.matrixWorld);
+
+					_uniforms7.position.applyMatrix4(viewMatrix);
+
+					pointLength++;
+				} else if (light.isHemisphereLight) {
+					var _uniforms8 = state.hemi[hemiLength];
+
+					_uniforms8.direction.setFromMatrixPosition(light.matrixWorld);
+
+					_uniforms8.direction.transformDirection(viewMatrix);
+
+					_uniforms8.direction.normalize();
+
+					hemiLength++;
+				}
+			}
+		}
+
 		return {
 			setup: setup,
+			setupView: setupView,
 			state: state
 		};
 	}
@@ -14335,8 +14381,12 @@
 			shadowsArray.push(shadowLight);
 		}
 
-		function setupLights(camera) {
-			lights.setup(lightsArray, shadowsArray, camera);
+		function setupLights() {
+			lights.setup(lightsArray);
+		}
+
+		function setupLightsView(camera) {
+			lights.setupView(lightsArray, camera);
 		}
 
 		var state = {
@@ -14348,6 +14398,7 @@
 			init: init,
 			state: state,
 			setupLights: setupLights,
+			setupLightsView: setupLightsView,
 			pushLight: pushLight,
 			pushShadow: pushShadow
 		};
@@ -14356,19 +14407,23 @@
 	function WebGLRenderStates(extensions, capabilities) {
 		var renderStates = new WeakMap();
 
-		function get(scene, camera) {
+		function get(scene, renderCallDepth) {
+			if (renderCallDepth === void 0) {
+				renderCallDepth = 0;
+			}
+
 			var renderState;
 
 			if (renderStates.has(scene) === false) {
 				renderState = new WebGLRenderState(extensions, capabilities);
-				renderStates.set(scene, new WeakMap());
-				renderStates.get(scene).set(camera, renderState);
+				renderStates.set(scene, []);
+				renderStates.get(scene).push(renderState);
 			} else {
-				if (renderStates.get(scene).has(camera) === false) {
+				if (renderCallDepth >= renderStates.get(scene).length) {
 					renderState = new WebGLRenderState(extensions, capabilities);
-					renderStates.get(scene).set(camera, renderState);
+					renderStates.get(scene).push(renderState);
 				} else {
-					renderState = renderStates.get(scene).get(camera);
+					renderState = renderStates.get(scene)[renderCallDepth];
 				}
 			}
 
@@ -17481,7 +17536,10 @@
 				_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false;
 
 		var currentRenderList = null;
-		var currentRenderState = null; // public properties
+		var currentRenderState = null; // render() can be called from within a callback triggered by another render.
+		// We track this so that the nested render call gets its state isolated from the parent render call.
+
+		var renderStateStack = []; // public properties
 
 		this.domElement = _canvas; // Debug configuration container
 
@@ -17528,7 +17586,6 @@
 		var _currentMaterialId = -1;
 
 		var _currentCamera = null;
-		var _currentArrayCamera = null;
 
 		var _currentViewport = new Vector4();
 
@@ -18065,7 +18122,7 @@
 
 
 		this.compile = function (scene, camera) {
-			currentRenderState = renderStates.get(scene, camera);
+			currentRenderState = renderStates.get(scene);
 			currentRenderState.init();
 			scene.traverseVisible(function (object) {
 				if (object.isLight && object.layers.test(camera.layers)) {
@@ -18076,7 +18133,7 @@
 					}
 				}
 			});
-			currentRenderState.setupLights(camera);
+			currentRenderState.setupLights();
 			var compiled = new WeakMap();
 			scene.traverse(function (object) {
 				var material = object.material;
@@ -18152,8 +18209,9 @@
 
 
 			if (scene.isScene === true) scene.onBeforeRender(_this, scene, camera, renderTarget || _currentRenderTarget);
-			currentRenderState = renderStates.get(scene, camera);
+			currentRenderState = renderStates.get(scene, renderStateStack.length);
 			currentRenderState.init();
+			renderStateStack.push(currentRenderState);
 
 			_projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
 
@@ -18174,7 +18232,8 @@
 			if (_clippingEnabled === true) clipping.beginShadows();
 			var shadowsArray = currentRenderState.state.shadowsArray;
 			shadowMap.render(shadowsArray, scene, camera);
-			currentRenderState.setupLights(camera);
+			currentRenderState.setupLights();
+			currentRenderState.setupLightsView(camera);
 			if (_clippingEnabled === true) clipping.endShadows(); //
 
 			if (this.info.autoReset === true) this.info.reset();
@@ -18206,8 +18265,15 @@
 			state.buffers.color.setMask(true);
 			state.setPolygonOffset(false); // _gl.finish();
 
+			renderStateStack.pop();
+
+			if (renderStateStack.length > 0) {
+				currentRenderState = renderStateStack[renderStateStack.length - 1];
+			} else {
+				currentRenderState = null;
+			}
+
 			currentRenderList = null;
-			currentRenderState = null;
 		};
 
 		function projectObject(object, camera, groupOrder, sortObjects) {
@@ -18298,7 +18364,6 @@
 				var group = renderItem.group;
 
 				if (camera.isArrayCamera) {
-					_currentArrayCamera = camera;
 					var cameras = camera.cameras;
 
 					for (var j = 0, jl = cameras.length; j < jl; j++) {
@@ -18306,12 +18371,11 @@
 
 						if (object.layers.test(camera2.layers)) {
 							state.viewport(_currentViewport.copy(camera2.viewport));
-							currentRenderState.setupLights(camera2);
+							currentRenderState.setupLightsView(camera2);
 							renderObject(object, scene, camera2, geometry, material, group);
 						}
 					}
 				} else {
-					_currentArrayCamera = null;
 					renderObject(object, scene, camera, geometry, material, group);
 				}
 			}
@@ -18319,7 +18383,6 @@
 
 		function renderObject(object, scene, camera, geometry, material, group) {
 			object.onBeforeRender(_this, scene, camera, geometry, material, group);
-			currentRenderState = renderStates.get(scene, _currentArrayCamera || camera);
 			object.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, object.matrixWorld);
 			object.normalMatrix.getNormalMatrix(object.modelViewMatrix);
 
@@ -18333,7 +18396,6 @@
 			}
 
 			object.onAfterRender(_this, scene, camera, geometry, material, group);
-			currentRenderState = renderStates.get(scene, _currentArrayCamera || camera);
 		}
 
 		function initMaterial(material, scene, object) {
@@ -18636,14 +18698,6 @@
 			currentRenderList = renderList;
 		};
 
-		this.getRenderState = function () {
-			return currentRenderState;
-		};
-
-		this.setRenderState = function (renderState) {
-			currentRenderState = renderState;
-		};
-
 		this.getRenderTarget = function () {
 			return _currentRenderTarget;
 		};
@@ -18816,6 +18870,11 @@
 		this.initTexture = function (texture) {
 			textures.setTexture2D(texture, 0);
 			state.unbindTexture();
+		};
+
+		this.resetState = function () {
+			state.reset();
+			bindingStates.reset();
 		};
 
 		if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
@@ -19507,6 +19566,16 @@
 		}
 	});
 
+	var _basePosition = new Vector3();
+
+	var _skinIndex = new Vector4();
+
+	var _skinWeight = new Vector4();
+
+	var _vector$7 = new Vector3();
+
+	var _matrix$1 = new Matrix4();
+
 	function SkinnedMesh(geometry, material) {
 		if (geometry && geometry.isGeometry) {
 			console.error('THREE.SkinnedMesh no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
@@ -19576,33 +19645,32 @@
 				console.warn('THREE.SkinnedMesh: Unrecognized bindMode: ' + this.bindMode);
 			}
 		},
-		boneTransform: function () {
-			var basePosition = new Vector3();
-			var skinIndex = new Vector4();
-			var skinWeight = new Vector4();
-			var vector = new Vector3();
-			var matrix = new Matrix4();
-			return function (index, target) {
-				var skeleton = this.skeleton;
-				var geometry = this.geometry;
-				skinIndex.fromBufferAttribute(geometry.attributes.skinIndex, index);
-				skinWeight.fromBufferAttribute(geometry.attributes.skinWeight, index);
-				basePosition.fromBufferAttribute(geometry.attributes.position, index).applyMatrix4(this.bindMatrix);
-				target.set(0, 0, 0);
+		boneTransform: function boneTransform(index, target) {
+			var skeleton = this.skeleton;
+			var geometry = this.geometry;
 
-				for (var i = 0; i < 4; i++) {
-					var weight = skinWeight.getComponent(i);
+			_skinIndex.fromBufferAttribute(geometry.attributes.skinIndex, index);
 
-					if (weight !== 0) {
-						var boneIndex = skinIndex.getComponent(i);
-						matrix.multiplyMatrices(skeleton.bones[boneIndex].matrixWorld, skeleton.boneInverses[boneIndex]);
-						target.addScaledVector(vector.copy(basePosition).applyMatrix4(matrix), weight);
-					}
+			_skinWeight.fromBufferAttribute(geometry.attributes.skinWeight, index);
+
+			_basePosition.fromBufferAttribute(geometry.attributes.position, index).applyMatrix4(this.bindMatrix);
+
+			target.set(0, 0, 0);
+
+			for (var i = 0; i < 4; i++) {
+				var weight = _skinWeight.getComponent(i);
+
+				if (weight !== 0) {
+					var boneIndex = _skinIndex.getComponent(i);
+
+					_matrix$1.multiplyMatrices(skeleton.bones[boneIndex].matrixWorld, skeleton.boneInverses[boneIndex]);
+
+					target.addScaledVector(_vector$7.copy(_basePosition).applyMatrix4(_matrix$1), weight);
 				}
+			}
 
-				return target.applyMatrix4(this.bindMatrixInverse);
-			};
-		}()
+			return target.applyMatrix4(this.bindMatrixInverse);
+		}
 	});
 
 	function Bone() {
@@ -19851,7 +19919,12 @@
 		setMatrixAt: function setMatrixAt(index, matrix) {
 			matrix.toArray(this.instanceMatrix.array, index * 16);
 		},
-		updateMorphTargets: function updateMorphTargets() {}
+		updateMorphTargets: function updateMorphTargets() {},
+		dispose: function dispose() {
+			this.dispatchEvent({
+				type: 'dispose'
+			});
+		}
 	});
 
 	/**
@@ -34371,7 +34444,7 @@
 		return Cylindrical;
 	}();
 
-	var _vector$7 = /*@__PURE__*/new Vector2();
+	var _vector$8 = /*@__PURE__*/new Vector2();
 
 	var Box2 = /*#__PURE__*/function () {
 		function Box2(min, max) {
@@ -34401,7 +34474,7 @@
 		};
 
 		_proto.setFromCenterAndSize = function setFromCenterAndSize(center, size) {
-			var halfSize = _vector$7.copy(size).multiplyScalar(0.5);
+			var halfSize = _vector$8.copy(size).multiplyScalar(0.5);
 
 			this.min.copy(center).sub(halfSize);
 			this.max.copy(center).add(halfSize);
@@ -34499,7 +34572,7 @@
 		};
 
 		_proto.distanceToPoint = function distanceToPoint(point) {
-			var clampedPoint = _vector$7.copy(point).clamp(this.min, this.max);
+			var clampedPoint = _vector$8.copy(point).clamp(this.min, this.max);
 
 			return clampedPoint.sub(point).length();
 		};
@@ -34657,7 +34730,7 @@
 	ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;
 	ImmediateRenderObject.prototype.isImmediateRenderObject = true;
 
-	var _vector$8 = /*@__PURE__*/new Vector3();
+	var _vector$9 = /*@__PURE__*/new Vector3();
 
 	var SpotLightHelper = /*#__PURE__*/function (_Object3D) {
 		_inheritsLoose(SpotLightHelper, _Object3D);
@@ -34709,9 +34782,9 @@
 			var coneWidth = coneLength * Math.tan(this.light.angle);
 			this.cone.scale.set(coneWidth, coneWidth, coneLength);
 
-			_vector$8.setFromMatrixPosition(this.light.target.matrixWorld);
+			_vector$9.setFromMatrixPosition(this.light.target.matrixWorld);
 
-			this.cone.lookAt(_vector$8);
+			this.cone.lookAt(_vector$9);
 
 			if (this.color !== undefined) {
 				this.cone.material.color.set(this.color);
@@ -34723,7 +34796,7 @@
 		return SpotLightHelper;
 	}(Object3D);
 
-	var _vector$9 = /*@__PURE__*/new Vector3();
+	var _vector$a = /*@__PURE__*/new Vector3();
 
 	var _boneMatrix = /*@__PURE__*/new Matrix4();
 
@@ -34787,15 +34860,15 @@
 				if (bone.parent && bone.parent.isBone) {
 					_boneMatrix.multiplyMatrices(_matrixWorldInv, bone.matrixWorld);
 
-					_vector$9.setFromMatrixPosition(_boneMatrix);
+					_vector$a.setFromMatrixPosition(_boneMatrix);
 
-					position.setXYZ(j, _vector$9.x, _vector$9.y, _vector$9.z);
+					position.setXYZ(j, _vector$a.x, _vector$a.y, _vector$a.z);
 
 					_boneMatrix.multiplyMatrices(_matrixWorldInv, bone.parent.matrixWorld);
 
-					_vector$9.setFromMatrixPosition(_boneMatrix);
+					_vector$a.setFromMatrixPosition(_boneMatrix);
 
-					position.setXYZ(j + 1, _vector$9.x, _vector$9.y, _vector$9.z);
+					position.setXYZ(j + 1, _vector$a.x, _vector$a.y, _vector$a.z);
 					j += 2;
 				}
 			}
@@ -34892,7 +34965,7 @@
 		return PointLightHelper;
 	}(Mesh);
 
-	var _vector$a = /*@__PURE__*/new Vector3();
+	var _vector$b = /*@__PURE__*/new Vector3();
 
 	var _color1 = /*@__PURE__*/new Color();
 
@@ -34958,7 +35031,7 @@
 				colors.needsUpdate = true;
 			}
 
-			mesh.lookAt(_vector$a.setFromMatrixPosition(this.light.matrixWorld).negate());
+			mesh.lookAt(_vector$b.setFromMatrixPosition(this.light.matrixWorld).negate());
 		};
 
 		return HemisphereLightHelper;
@@ -35184,7 +35257,7 @@
 		return DirectionalLightHelper;
 	}(Object3D);
 
-	var _vector$b = /*@__PURE__*/new Vector3();
+	var _vector$c = /*@__PURE__*/new Vector3();
 
 	var _camera = /*@__PURE__*/new Camera();
 	/**
@@ -35324,7 +35397,7 @@
 	}(LineSegments);
 
 	function setPoint(point, pointMap, geometry, camera, x, y, z) {
-		_vector$b.set(x, y, z).unproject(camera);
+		_vector$c.set(x, y, z).unproject(camera);
 
 		var points = pointMap[point];
 
@@ -35332,7 +35405,7 @@
 			var position = geometry.getAttribute('position');
 
 			for (var i = 0, l = points.length; i < l; i++) {
-				position.setXYZ(points[i], _vector$b.x, _vector$b.y, _vector$b.z);
+				position.setXYZ(points[i], _vector$c.x, _vector$c.y, _vector$c.z);
 			}
 		}
 	}

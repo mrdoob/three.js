@@ -1,9 +1,9 @@
 import {
 	ShaderMaterial,
 	UniformsUtils
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
-import { CopyShader } from "../shaders/CopyShader.js";
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
+import { CopyShader } from '../shaders/CopyShader.js';
 
 var TexturePass = function ( map, opacity ) {
 

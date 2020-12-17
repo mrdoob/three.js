@@ -7,7 +7,7 @@ import {
 	MaterialLoader,
 	MeshStandardMaterial,
 	PointsMaterial
-} from "../../../../../build/three.module.js";
+} from '../../../../../build/three.module.js';
 
 
 const MaterialHandler = function () {
@@ -96,7 +96,7 @@ MaterialHandler.prototype = {
 		if ( materialCloneInstructions !== undefined && materialCloneInstructions !== null ) {
 
 			let materialNameOrg = materialCloneInstructions.materialNameOrg;
-			materialNameOrg = ( materialNameOrg !== undefined && materialNameOrg !== null ) ? materialNameOrg : "";
+			materialNameOrg = ( materialNameOrg !== undefined && materialNameOrg !== null ) ? materialNameOrg : '';
 			const materialOrg = this.materials[ materialNameOrg ];
 			if ( materialOrg ) {
 
