@@ -6,8 +6,8 @@ import {
 	Material,
 	ShaderMaterial,
 	Wrapping,
-	TextureFilter
-
+	TextureFilter,
+	TextureDataType
 } from '../../../src/Three';
 
 export interface Variable {
@@ -25,6 +25,8 @@ export interface Variable {
 export class GPUComputationRenderer {
 
 	constructor( sizeX: number, sizeY: number, renderer: WebGLRenderer );
+
+	setDataType ( type: TextureDataType ): void;
 
 	addVariable( variableName: string, computeFragmentShader: string, initialValueTexture: Texture ): Variable;
 	setVariableDependencies( variable: Variable, dependencies: Variable[] | null ): void;

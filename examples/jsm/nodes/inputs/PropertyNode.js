@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { InputNode } from '../core/InputNode.js';
 
 function PropertyNode( object, property, type ) {
@@ -15,7 +11,7 @@ function PropertyNode( object, property, type ) {
 
 PropertyNode.prototype = Object.create( InputNode.prototype );
 PropertyNode.prototype.constructor = PropertyNode;
-PropertyNode.prototype.nodeType = "Property";
+PropertyNode.prototype.nodeType = 'Property';
 
 Object.defineProperties( PropertyNode.prototype, {
 

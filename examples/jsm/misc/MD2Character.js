@@ -1,7 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 import {
 	AnimationMixer,
 	Box3,
@@ -11,8 +7,8 @@ import {
 	TextureLoader,
 	UVMapping,
 	sRGBEncoding
-} from "../../../build/three.module.js";
-import { MD2Loader } from "../loaders/MD2Loader.js";
+} from '../../../build/three.module.js';
+import { MD2Loader } from '../loaders/MD2Loader.js';
 
 var MD2Character = function () {
 
@@ -47,8 +43,8 @@ var MD2Character = function () {
 		for ( var i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ];
 		// SKINS
 
-		this.skinsBody = loadTextures( config.baseUrl + "skins/", config.skins );
-		this.skinsWeapon = loadTextures( config.baseUrl + "skins/", weaponsTextures );
+		this.skinsBody = loadTextures( config.baseUrl + 'skins/', config.skins );
+		this.skinsWeapon = loadTextures( config.baseUrl + 'skins/', weaponsTextures );
 
 		// BODY
 

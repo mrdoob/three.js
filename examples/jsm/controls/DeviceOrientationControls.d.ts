@@ -1,8 +1,6 @@
-import {
-	Camera
-} from '../../../src/Three';
+import { Camera, EventDispatcher } from '../../../src/Three';
 
-export class DeviceOrientationControls {
+export class DeviceOrientationControls extends EventDispatcher {
 
 	constructor( object: Camera );
 

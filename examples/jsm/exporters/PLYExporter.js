@@ -1,5 +1,10 @@
+import {
+	BufferGeometry,
+	Matrix3,
+	Vector3
+} from '../../../build/three.module.js';
+
 /**
- * @author Garrett Johnson / http://gkjohnson.github.io/
  * https://github.com/gkjohnson/ply-exporter-js
  *
  * Usage:
@@ -11,12 +16,6 @@
  * Format Definition:
  * http://paulbourke.net/dataformats/ply/
  */
-
-import {
-	BufferGeometry,
-	Matrix3,
-	Vector3
-} from "../../../build/three.module.js";
 
 var PLYExporter = function () {};
 
@@ -52,7 +51,7 @@ PLYExporter.prototype = {
 
 					if ( geometry.isBufferGeometry === true ) {
 
-						if ( geometry.getAttribute( 'position' ) !== undefined ) {
+						if ( geometry.hasAttribute( 'position' ) === true ) {
 
 							cb( mesh, geometry );
 
@@ -197,7 +196,7 @@ PLYExporter.prototype = {
 			// faces
 			header +=
 				`element face ${faceCount}\n` +
-				`property list uchar int vertex_index\n`;
+				'property list uchar int vertex_index\n';
 
 		}
 

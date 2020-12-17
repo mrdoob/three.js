@@ -1,7 +1,4 @@
 /**
- * @author Lewy Blue / https://github.com/looeee
- * @author Guilherme Avila / https://github/sciecode
- *
  * === IFFParser ===
  * - Parses data from the IFF buffer.
  * - LWO3 files are in IFF format and can contain the following data types, referred to by shorthand codes
@@ -35,9 +32,9 @@
  *
  **/
 
-import { LoaderUtils } from "../../../../build/three.module.js";
-import { LWO2Parser } from "./LWO2Parser.js";
-import { LWO3Parser } from "./LWO3Parser.js";
+import { LoaderUtils } from '../../../../build/three.module.js';
+import { LWO2Parser } from './LWO2Parser.js';
+import { LWO3Parser } from './LWO3Parser.js';
 
 function IFFParser( ) {
 
@@ -96,7 +93,7 @@ IFFParser.prototype = {
 
 		if ( topForm !== 'FORM' ) {
 
-			console.warn( "LWOLoader: Top-level FORM missing." );
+			console.warn( 'LWOLoader: Top-level FORM missing.' );
 			return;
 
 		}
@@ -580,7 +577,7 @@ IFFParser.prototype = {
 
 		var texture = {
 			index: this.reader.getUint32(),
-			fileName: ""
+			fileName: ''
 		};
 
 		// seach STIL block
@@ -1140,27 +1137,27 @@ Debugger.prototype = {
 		switch ( this.node ) {
 
 			case 0:
-				nodeType = "FORM";
+				nodeType = 'FORM';
 				break;
 
 			case 1:
-				nodeType = "CHK";
+				nodeType = 'CHK';
 				break;
 
 			case 2:
-				nodeType = "S-CHK";
+				nodeType = 'S-CHK';
 				break;
 
 		}
 
 		console.log(
-			"| ".repeat( this.depth ) +
+			'| '.repeat( this.depth ) +
 			nodeType,
 			this.nodeID,
 			`( ${this.offset} ) -> ( ${this.dataOffset + this.length} )`,
-			( ( this.node == 0 ) ? " {" : "" ),
-			( ( this.skipped ) ? "SKIPPED" : "" ),
-			( ( this.node == 0 && this.skipped ) ? "}" : "" )
+			( ( this.node == 0 ) ? ' {' : '' ),
+			( ( this.skipped ) ? 'SKIPPED' : '' ),
+			( ( this.node == 0 && this.skipped ) ? '}' : '' )
 		);
 
 		if ( this.node == 0 && ! this.skipped ) {
@@ -1183,7 +1180,7 @@ Debugger.prototype = {
 			if ( this.offset >= this.formList[ i ] ) {
 
 				this.depth -= 1;
-				console.log( "| ".repeat( this.depth ) + "}" );
+				console.log( '| '.repeat( this.depth ) + '}' );
 				this.formList.splice( - 1, 1 );
 
 			}

@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { TransformControls } from '../../examples/jsm/controls/TransformControls.js';
@@ -45,21 +41,6 @@ function Viewport( editor ) {
 	// helpers
 
 	var grid = new THREE.GridHelper( 30, 30, 0x444444, 0x888888 );
-
-	var array = grid.geometry.attributes.color.array;
-
-	for ( var i = 0; i < array.length; i += 60 ) {
-
-		for ( var j = 0; j < 12; j ++ ) {
-
-			array[ i + j ] = 0.26;
-
-		}
-
-	}
-
-	//
-
 	var viewHelper = new ViewHelper( camera, container );
 
 	//
@@ -372,12 +353,14 @@ function Viewport( editor ) {
 			mediaQuery.addListener( function ( event ) {
 
 				renderer.setClearColor( event.matches ? 0x333333 : 0xaaaaaa );
+				updateGridColors( grid, event.matches ? [ 0x888888, 0x222222 ] : [ 0x282828, 0x888888 ] );
 
-				if ( scene.background === null ) render();
+				render();
 
 			} );
 
 			renderer.setClearColor( mediaQuery.matches ? 0x333333 : 0xaaaaaa );
+			updateGridColors( grid, mediaQuery.matches ? [ 0x888888, 0x222222 ] : [ 0x282828, 0x888888 ] );
 
 		}
 
@@ -523,6 +506,12 @@ function Viewport( editor ) {
 	} );
 
 	signals.materialChanged.add( function () {
+
+		render();
+
+	} );
+
+	signals.animationStopped.add( function () {
 
 		render();
 
@@ -765,6 +754,30 @@ function Viewport( editor ) {
 	}
 
 	return container;
+
+}
+
+function updateGridColors( grid, colors ) {
+
+	const color1 = new THREE.Color( colors[ 0 ] );
+	const color2 = new THREE.Color( colors[ 1 ] );
+
+	const attribute = grid.geometry.attributes.color;
+	const array = attribute.array;
+
+	for ( var i = 0; i < array.length; i += 12 ) {
+
+		const color = ( i % ( 12 * 5 ) === 0 ) ? color1 : color2;
+
+		for ( var j = 0; j < 12; j += 3 ) {
+
+			color.toArray( array, i + j );
+
+		}
+
+	}
+
+	attribute.needsUpdate = true;
 
 }
 

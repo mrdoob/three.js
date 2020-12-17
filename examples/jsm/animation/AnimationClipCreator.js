@@ -1,11 +1,3 @@
-/**
- *
- * Creator of typical test AnimationClips / KeyframeTracks
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- */
-
 import {
 	AnimationClip,
 	BooleanKeyframeTrack,
@@ -13,7 +5,7 @@ import {
 	NumberKeyframeTrack,
 	Vector3,
 	VectorKeyframeTrack
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var AnimationClipCreator = function () {};
 

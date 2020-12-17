@@ -1,10 +1,6 @@
 import { MathUtils } from '../math/MathUtils.js';
 import { StaticDrawUsage } from '../constants.js';
 
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- */
-
 function InterleavedBuffer( array, stride ) {
 
 	this.array = array;
@@ -70,9 +66,7 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	},
 
-	set: function ( value, offset ) {
-
-		if ( offset === undefined ) offset = 0;
+	set: function ( value, offset = 0 ) {
 
 		this.array.set( value, offset );
 

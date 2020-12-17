@@ -2,16 +2,20 @@ import { Scene } from '../../scenes/Scene';
 import { Camera } from '../../cameras/Camera';
 import { Light } from '../../lights/Light';
 import { WebGLLights } from './WebGLLights';
+import { WebGLExtensions } from './WebGLExtensions';
+import { WebGLCapabilities } from './WebGLCapabilities';
 
 interface WebGLRenderState {
 
 	init(): void;
+
 	state: {
 		lightsArray: Light[];
 		shadowsArray: Light[];
 		lights: WebGLLights;
 	};
-	setupLights( camera: Camera ): void;
+	setupLights(): void;
+	setupLightsView( camera: Camera ): void;
 	pushLight( light: Light ): void;
 	pushShadow( shadowLight: Light ): void;
 
@@ -19,7 +23,11 @@ interface WebGLRenderState {
 
 export class WebGLRenderStates {
 
-	get( scene: Scene, camera: Camera ): WebGLRenderState;
+	constructor( extensions: WebGLExtensions, capabilities: WebGLCapabilities );
+
+	// renderCallDepth indexes start from 0.
+	get( scene: Scene, renderCallDepth?: number ): WebGLRenderState;
+
 	dispose(): void;
 
 }

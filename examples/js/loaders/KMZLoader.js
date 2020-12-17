@@ -1,8 +1,3 @@
-console.warn( "THREE.KMZLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 THREE.KMZLoader = function ( manager ) {
 
 	THREE.Loader.call( this, manager );
@@ -21,6 +16,7 @@ THREE.KMZLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -83,7 +79,7 @@ THREE.KMZLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		//
 
-		var zip = new JSZip( data );
+		var zip = new JSZip( data ); // eslint-disable-line no-undef
 
 		if ( zip.files[ 'doc.kml' ] ) {
 

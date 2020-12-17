@@ -6,11 +6,6 @@ import { CubicBezierCurve } from '../curves/CubicBezierCurve.js';
 import { QuadraticBezierCurve } from '../curves/QuadraticBezierCurve.js';
 import { LineCurve } from '../curves/LineCurve.js';
 
-/**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * Creates free form 2d path using series of points, lines or curves.
- **/
-
 function Path( points ) {
 
 	CurvePath.call( this );

@@ -1,7 +1,3 @@
-/**
- * @author Slayvin / http://slayvin.net
- */
-
 import {
 	Color,
 	LinearFilter,
@@ -16,7 +12,7 @@ import {
 	Vector3,
 	Vector4,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var Reflector = function ( geometry, options ) {
 
@@ -54,8 +50,7 @@ var Reflector = function ( geometry, options ) {
 	var parameters = {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
-		format: RGBFormat,
-		stencilBuffer: false
+		format: RGBFormat
 	};
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
@@ -72,9 +67,9 @@ var Reflector = function ( geometry, options ) {
 		vertexShader: shader.vertexShader
 	} );
 
-	material.uniforms[ "tDiffuse" ].value = renderTarget.texture;
-	material.uniforms[ "color" ].value = color;
-	material.uniforms[ "textureMatrix" ].value = textureMatrix;
+	material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
+	material.uniforms[ 'color' ].value = color;
+	material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 
 	this.material = material;
 

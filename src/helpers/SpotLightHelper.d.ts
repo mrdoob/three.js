@@ -10,6 +10,10 @@ export class SpotLightHelper extends Object3D {
 
 	light: Light;
 	matrix: Matrix4;
+
+	/**
+	 * @default false
+	 */
 	matrixAutoUpdate: boolean;
 	color: Color | string | number | undefined;
 	cone: LineSegments;

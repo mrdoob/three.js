@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UISelect } from './libs/ui.js';
 
 function ViewportCamera( editor ) {

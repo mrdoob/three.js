@@ -1,7 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- */
-
 import {
 	Color,
 	LightProbe,
@@ -9,7 +5,7 @@ import {
 	SphericalHarmonics3,
 	Vector3,
 	sRGBEncoding
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var LightProbeGenerator = {
 

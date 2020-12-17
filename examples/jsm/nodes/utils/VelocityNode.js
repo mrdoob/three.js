@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { Vector3 } from '../../../../build/three.module.js';
 
 import { Vector3Node } from '../inputs/Vector3Node.js';
@@ -21,7 +17,7 @@ function VelocityNode( target, params ) {
 
 VelocityNode.prototype = Object.create( Vector3Node.prototype );
 VelocityNode.prototype.constructor = VelocityNode;
-VelocityNode.prototype.nodeType = "Velocity";
+VelocityNode.prototype.nodeType = 'Velocity';
 
 VelocityNode.prototype.getReadonly = function ( /*builder*/ ) {
 
@@ -33,7 +29,7 @@ VelocityNode.prototype.setParams = function ( params ) {
 
 	switch ( this.params.type ) {
 
-		case "elastic":
+		case 'elastic':
 
 			delete this.moment;
 
@@ -50,7 +46,7 @@ VelocityNode.prototype.setParams = function ( params ) {
 
 	switch ( this.params.type ) {
 
-		case "elastic":
+		case 'elastic':
 
 			this.moment = new Vector3();
 
@@ -103,7 +99,7 @@ VelocityNode.prototype.updateFrame = function ( frame ) {
 
 	switch ( this.params.type ) {
 
-		case "elastic":
+		case 'elastic':
 
 			// convert to real scale: 0 at 1 values
 			var deltaFps = frame.delta * ( this.params.fps || 60 );

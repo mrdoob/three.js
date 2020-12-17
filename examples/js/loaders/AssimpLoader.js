@@ -1,8 +1,3 @@
-console.warn( "THREE.AssimpLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-/**
- * @author Virtulous / https://virtulo.us/
- */
-
 THREE.AssimpLoader = function ( manager ) {
 
 	THREE.Loader.call( this, manager );
@@ -23,6 +18,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 
 		loader.load( url, function ( buffer ) {
 
@@ -531,7 +527,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			rootBone.quaternion.copy( root.quaternion );
 			rootBone.scale.copy( root.scale );
 			scene.nodeCount ++;
-			rootBone.name = "bone_" + root.name + scene.nodeCount.toString();
+			rootBone.name = 'bone_' + root.name + scene.nodeCount.toString();
 
 			if ( ! scene.nodeToBoneMap[ root.name ] )
 				scene.nodeToBoneMap[ root.name ] = [];
@@ -599,7 +595,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 		function findMatchingBone( root, name ) {
 
-			if ( root.name.indexOf( "bone_" + name ) == 0 )
+			if ( root.name.indexOf( 'bone_' + name ) == 0 )
 				return root;
 
 			for ( var i in root.children ) {
@@ -920,7 +916,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 		function aiMaterialProperty() {
 
-			this.mKey = "";
+			this.mKey = '';
 			this.mSemantic = 0;
 			this.mIndex = 0;
 			this.mData = [];
@@ -985,39 +981,39 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 		var namePropMapping = {
 
-			"?mat.name": "name",
-			"$mat.shadingm": "shading",
-			"$mat.twosided": "twoSided",
-			"$mat.wireframe": "wireframe",
-			"$clr.ambient": "ambient",
-			"$clr.diffuse": "color",
-			"$clr.specular": "specular",
-			"$clr.emissive": "emissive",
-			"$clr.transparent": "transparent",
-			"$clr.reflective": "reflect",
-			"$mat.shininess": "shininess",
-			"$mat.reflectivity": "reflectivity",
-			"$mat.refracti": "refraction",
-			"$tex.file": "map"
+			'?mat.name': 'name',
+			'$mat.shadingm': 'shading',
+			'$mat.twosided': 'twoSided',
+			'$mat.wireframe': 'wireframe',
+			'$clr.ambient': 'ambient',
+			'$clr.diffuse': 'color',
+			'$clr.specular': 'specular',
+			'$clr.emissive': 'emissive',
+			'$clr.transparent': 'transparent',
+			'$clr.reflective': 'reflect',
+			'$mat.shininess': 'shininess',
+			'$mat.reflectivity': 'reflectivity',
+			'$mat.refracti': 'refraction',
+			'$tex.file': 'map'
 
 		};
 
 		var nameTypeMapping = {
 
-			"?mat.name": "string",
-			"$mat.shadingm": "bool",
-			"$mat.twosided": "bool",
-			"$mat.wireframe": "bool",
-			"$clr.ambient": "color",
-			"$clr.diffuse": "color",
-			"$clr.specular": "color",
-			"$clr.emissive": "color",
-			"$clr.transparent": "color",
-			"$clr.reflective": "color",
-			"$mat.shininess": "float",
-			"$mat.reflectivity": "float",
-			"$mat.refracti": "float",
-			"$tex.file": "map"
+			'?mat.name': 'string',
+			'$mat.shadingm': 'bool',
+			'$mat.twosided': 'bool',
+			'$mat.wireframe': 'bool',
+			'$clr.ambient': 'color',
+			'$clr.diffuse': 'color',
+			'$clr.specular': 'color',
+			'$clr.emissive': 'color',
+			'$clr.transparent': 'color',
+			'$clr.reflective': 'color',
+			'$mat.shininess': 'float',
+			'$mat.reflectivity': 'float',
+			'$mat.refracti': 'float',
+			'$tex.file': 'map'
 
 		};
 
@@ -1137,15 +1133,15 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 		function aiNodeAnim() {
 
-			this.mNodeName = "";
+			this.mNodeName = '';
 			this.mNumPositionKeys = 0;
 			this.mNumRotationKeys = 0;
 			this.mNumScalingKeys = 0;
 			this.mPositionKeys = [];
 			this.mRotationKeys = [];
 			this.mScalingKeys = [];
-			this.mPreState = "";
-			this.mPostState = "";
+			this.mPreState = '';
+			this.mPostState = '';
 			this.init = function ( tps ) {
 
 				if ( ! tps ) tps = 1;
@@ -1242,7 +1238,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 		function aiAnimation() {
 
-			this.mName = "";
+			this.mName = '';
 			this.mDuration = 0;
 			this.mTicksPerSecond = 0;
 			this.mNumChannels = 0;
@@ -1566,14 +1562,14 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 		function ReadBounds( stream, T /*p*/, n ) {
 
 			// not sure what to do here, the data isn't really useful.
-			return stream.Seek( sizeof( T ) * n, aiOrigin_CUR );
+			return stream.Seek( sizeof( T ) * n, aiOrigin_CUR ); // eslint-disable-line no-undef
 
 		}
 
 		function ai_assert( bool ) {
 
 			if ( ! bool )
-				throw ( "asset failed" );
+				throw ( 'asset failed' );
 
 		}
 
@@ -1832,7 +1828,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 					} else {
 
-						throw ( new Error( "Sorry, can't currently triangulate polys. Use the triangulate preprocessor in Assimp." ) );
+						throw ( new Error( 'Sorry, can\'t currently triangulate polys. Use the triangulate preprocessor in Assimp.' ) );
 
 					}
 
@@ -2257,7 +2253,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			shortened = Read_uint16_t( stream ) > 0;
 			compressed = Read_uint16_t( stream ) > 0;
 			if ( shortened )
-				throw "Shortened binaries are not supported!";
+				throw 'Shortened binaries are not supported!';
 			stream.Seek( 256, aiOrigin_CUR ); // original filename
 			stream.Seek( 128, aiOrigin_CUR ); // options
 			stream.Seek( 64, aiOrigin_CUR ); // padding
@@ -2268,7 +2264,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				var compressedData = [];
 				stream.Read( compressedData, 1, compressedSize );
 				var uncompressedData = [];
-				uncompress( uncompressedData, uncompressedSize, compressedData, compressedSize );
+				uncompress( uncompressedData, uncompressedSize, compressedData, compressedSize ); // eslint-disable-line no-undef
 				var buff = new ArrayBuffer( uncompressedData );
 				ReadBinaryScene( buff, pScene );
 

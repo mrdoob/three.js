@@ -1,11 +1,6 @@
 import { Curve } from './Curve.js';
 import * as Curves from '../curves/Curves.js';
 
-/**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- *
- **/
-
 /**************************************************************
  *	Curved Path - a curve path is simply a array of connected
  *  curves, but retains the api of a curve
@@ -139,9 +134,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 	},
 
-	getSpacedPoints: function ( divisions ) {
-
-		if ( divisions === undefined ) divisions = 40;
+	getSpacedPoints: function ( divisions = 40 ) {
 
 		const points = [];
 
@@ -161,9 +154,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 	},
 
-	getPoints: function ( divisions ) {
-
-		divisions = divisions || 12;
+	getPoints: function ( divisions = 12 ) {
 
 		const points = [];
 		let last;

@@ -1,7 +1,7 @@
 // Renderers / WebGL /////////////////////////////////////////////////////////////////////
-import { WebGLExtensions } from "./WebGLExtensions";
-import { WebGLInfo } from "./WebGLInfo";
-import { WebGLCapabilities } from "./WebGLCapabilities";
+import { WebGLExtensions } from './WebGLExtensions';
+import { WebGLInfo } from './WebGLInfo';
+import { WebGLCapabilities } from './WebGLCapabilities';
 
 export class WebGLBufferRenderer {
 
@@ -9,6 +9,10 @@ export class WebGLBufferRenderer {
 
 	setMode( value: any ): void;
 	render( start: any, count: number ): void;
-	renderInstances( geometry: any ): void;
+	renderInstances(
+		start: any,
+		count: number,
+		primcount: number
+	): void;
 
 }

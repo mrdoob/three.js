@@ -6,7 +6,7 @@ import { BufferGeometry } from '../core/BufferGeometry';
 export class LineLoop <
 	TGeometry extends Geometry | BufferGeometry = Geometry | BufferGeometry,
 	TMaterial extends Material | Material[] = Material | Material[]
-> extends Line {
+> extends Line<TGeometry, TMaterial> {
 
 	constructor(
 		geometry?: TGeometry,

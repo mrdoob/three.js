@@ -23,35 +23,35 @@
 			import { KTX2Loader } from './jsm/loaders/KTX2Loader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var width = window.innerWidth;
-			var height = window.innerHeight;
+			const width = window.innerWidth;
+			const height = window.innerHeight;
 
-			var renderer = new THREE.WebGLRenderer( { antialias: true } );
+			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setSize( width, height );
 			renderer.outputEncoding = THREE.sRGBEncoding;
 			document.body.appendChild( renderer.domElement );
 
-			var scene = new THREE.Scene();
+			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x202020 );
 
-			var camera = new THREE.PerspectiveCamera( 60, width / height, 0.1, 100 );
+			const camera = new THREE.PerspectiveCamera( 60, width / height, 0.1, 100 );
 			camera.position.set( 2, 1.5, 1 );
 			camera.lookAt( scene.position );
 			scene.add( camera );
 
-			var controls = new OrbitControls( camera, renderer.domElement );
+			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.autoRotate = true;
 
 			// PlaneBufferGeometry UVs assume flipY=true, which compressed textures don't support.
-			var geometry = flipY( new THREE.PlaneBufferGeometry() );
-			var material = new THREE.MeshBasicMaterial( {
+			const geometry = flipY( new THREE.PlaneBufferGeometry() );
+			const material = new THREE.MeshBasicMaterial( {
 				color: 0xFFFFFF,
 				side: THREE.DoubleSide
 			} );
-			var mesh = new THREE.Mesh( geometry, material );
+			const mesh = new THREE.Mesh( geometry, material );
 			scene.add( mesh );
 
-			var formatStrings = {
+			const formatStrings = {
 				[ THREE.RGBAFormat ]: "RGBA32",
 				[ THREE.RGBA_ASTC_4x4_Format ]: "RGBA_ASTC_4x4",
 				[ THREE.RGB_S3TC_DXT1_Format ]: "RGB_S3TC_DXT1",
@@ -91,8 +91,8 @@
 
 			window.addEventListener( 'resize', () => {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -103,9 +103,9 @@
 			/** Correct UVs to be compatible with `flipY=false` textures. */
 			function flipY( geometry ) {
 
-				var uv = geometry.attributes.uv;
+				const uv = geometry.attributes.uv;
 
-				for ( var i = 0; i < uv.count; i ++ ) {
+				for ( let i = 0; i < uv.count; i ++ ) {
 
 					uv.setY( i, 1 - uv.getY( i ) );
 

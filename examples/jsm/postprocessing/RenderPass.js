@@ -1,9 +1,7 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-
-import { Pass } from "../postprocessing/Pass.js";
+import {
+	Color
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
 
 var RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
 
@@ -20,6 +18,7 @@ var RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAl
 	this.clear = true;
 	this.clearDepth = false;
 	this.needsSwap = false;
+	this._oldClearColor = new Color();
 
 };
 
@@ -32,7 +31,7 @@ RenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		var oldClearColor, oldClearAlpha, oldOverrideMaterial;
+		var oldClearAlpha, oldOverrideMaterial;
 
 		if ( this.overrideMaterial !== undefined ) {
 
@@ -44,7 +43,7 @@ RenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		if ( this.clearColor ) {
 
-			oldClearColor = renderer.getClearColor().getHex();
+			renderer.getClearColor( this._oldClearColor );
 			oldClearAlpha = renderer.getClearAlpha();
 
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
@@ -65,7 +64,7 @@ RenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		if ( this.clearColor ) {
 
-			renderer.setClearColor( oldClearColor, oldClearAlpha );
+			renderer.setClearColor( this._oldClearColor, oldClearAlpha );
 
 		}
 

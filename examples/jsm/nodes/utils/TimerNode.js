@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { FloatNode } from '../inputs/FloatNode.js';
 import { NodeLib } from '../core/NodeLib.js';
 
@@ -22,7 +18,7 @@ TimerNode.DELTA = 'delta';
 
 TimerNode.prototype = Object.create( FloatNode.prototype );
 TimerNode.prototype.constructor = TimerNode;
-TimerNode.prototype.nodeType = "Timer";
+TimerNode.prototype.nodeType = 'Timer';
 
 TimerNode.prototype.getReadonly = function () {
 

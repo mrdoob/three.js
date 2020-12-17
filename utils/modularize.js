@@ -1,9 +1,5 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 var fs = require( 'fs' );
+var os = require('os'), EOL = os.EOL;
 THREE = require( '../build/three.js' );
 
 var srcFolder = __dirname + '/../examples/js/';
@@ -14,7 +10,6 @@ var files = [
 	{ path: 'animation/CCDIKSolver.js', dependencies: [], ignoreList: [ 'SkinnedMesh' ] },
 	{ path: 'animation/MMDAnimationHelper.js', dependencies: [ { name: 'CCDIKSolver', path: 'animation/CCDIKSolver.js' }, { name: 'MMDPhysics', path: 'animation/MMDPhysics.js' } ], ignoreList: [ 'AnimationClip', 'Audio', 'Camera', 'SkinnedMesh' ] },
 	{ path: 'animation/MMDPhysics.js', dependencies: [], ignoreList: [ 'SkinnedMesh' ] },
-	{ path: 'animation/TimelinerController.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'cameras/CinematicCamera.js', dependencies: [ { name: 'BokehShader', path: 'shaders/BokehShader2.js' }, { name: 'BokehDepthShader', path: 'shaders/BokehShader2.js' } ], ignoreList: [] },
 
@@ -41,12 +36,11 @@ var files = [
 
 	{ path: 'exporters/ColladaExporter.js', dependencies: [], ignoreList: [] },
 	{ path: 'exporters/DRACOExporter.js', dependencies: [], ignoreList: [ 'Geometry' ] },
-	{ path: 'exporters/GLTFExporter.js', dependencies: [], ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial' ] },
+	{ path: 'exporters/GLTFExporter.js', dependencies: [], ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'Scenes', 'ShaderMaterial'] },
 	{ path: 'exporters/MMDExporter.js', dependencies: [ { name: 'MMDParser', path: 'libs/mmdparser.module.js' } ], ignoreList: [] },
 	{ path: 'exporters/OBJExporter.js', dependencies: [], ignoreList: [] },
 	{ path: 'exporters/PLYExporter.js', dependencies: [], ignoreList: [] },
 	{ path: 'exporters/STLExporter.js', dependencies: [], ignoreList: [] },
-	{ path: 'exporters/TypedGeometryExporter.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'geometries/BoxLineGeometry.js', dependencies: [], ignoreList: [] },
 	{ path: 'geometries/ConvexGeometry.js', dependencies: [ { name: 'ConvexHull', path: 'math/ConvexHull.js' } ], ignoreList: [] },
@@ -124,12 +118,11 @@ var files = [
 	{ path: 'misc/Volume.js', dependencies: [ { name: 'VolumeSlice', path: 'misc/VolumeSlice.js' } ], ignoreList: [] },
 	{ path: 'misc/VolumeSlice.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'modifiers/ExplodeModifier.js', dependencies: [], ignoreList: [] },
+	{ path: 'modifiers/EdgeSplitModifier.js', dependencies: [ { name: 'BufferGeometryUtils', path: 'utils/BufferGeometryUtils.js' } ], ignoreList: [] },
 	{ path: 'modifiers/SimplifyModifier.js', dependencies: [], ignoreList: [] },
 	{ path: 'modifiers/SubdivisionModifier.js', dependencies: [], ignoreList: [] },
 	{ path: 'modifiers/TessellateModifier.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'objects/Fire.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Lensflare.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/LightningStorm.js', dependencies: [ { name: 'LightningStrike', path: 'geometries/LightningStrike.js' } ], ignoreList: [ 'Material' ] },
 	{ path: 'objects/MarchingCubes.js', dependencies: [], ignoreList: [] },
@@ -250,18 +243,6 @@ function convert( path, exampleDependencies, ignoreList ) {
 	var classNames = [];
 	var coreDependencies = {};
 
-	// remove examples/js deprecation warning
-
-	contents = contents.replace( /^console\.warn.*\n/, '' );
-
-	// imports
-
-	contents = contents.replace( /^\/\*+[^*]*\*+(?:[^/*][^*]*\*+)*\//, function ( match ) {
-
-		return `${match}\n\n_IMPORTS_`;
-
-	} );
-
 	// class name
 
 	contents = contents.replace( /THREE\.([a-zA-Z0-9]+) = /g, function ( match, p1 ) {
@@ -315,11 +296,11 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	var keys = Object.keys( coreDependencies )
 		.filter( value => ! classNames.includes( value ) )
-		.map( value => '\n\t' + value )
+		.map( value => EOL + '\t' + value )
 		.sort()
 		.toString();
 
-	var imports = '';
+	var imports = [];
 
 	// compute path prefix for imports/exports
 
@@ -328,21 +309,21 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	// core imports
 
-	if ( keys ) imports += `import {${keys}\n} from "${pathPrefix}../../build/three.module.js";`;
+	if ( keys ) imports.push( `import {${keys}${EOL}} from '${pathPrefix}../../build/three.module.js';` );
 
 	// example imports
 
 	for ( var dependency of exampleDependencies ) {
 
-		imports += `\nimport { ${dependency.name} } from "${pathPrefix}${dependency.path}";`;
+		imports.push( `import { ${dependency.name} } from '${pathPrefix}${dependency.path}';` );
 
 	}
 
-	// exports
+	var output = '';
 
-	var exports = `export { ${classNames.join( ", " )} };\n`;
+	if ( imports.length > 0 ) output += imports.join( EOL ) + EOL + EOL;
 
-	var output = contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
+	output += contents + `${EOL}export { ${classNames.join( ', ' )} };${EOL}`;
 
 	// console.log( output );
 

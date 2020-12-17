@@ -1,5 +1,4 @@
 /**
- * @author Kai Salmen / https://kaisalmen.de
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
@@ -9,7 +8,7 @@ import {
 	LineSegments,
 	Mesh,
 	Points
-} from "../../../../../build/three.module.js";
+} from '../../../../../build/three.module.js';
 
 
 /**
@@ -79,10 +78,10 @@ MeshReceiver.prototype = {
 	 */
 	buildMeshes: function ( meshPayload ) {
 
-		let meshName = meshPayload.params.meshName;
-		let buffers = meshPayload.buffers;
+		const meshName = meshPayload.params.meshName;
+		const buffers = meshPayload.buffers;
 
-		let bufferGeometry = new BufferGeometry();
+		const bufferGeometry = new BufferGeometry();
 		if ( buffers.vertices !== undefined && buffers.vertices !== null ) {
 
 			bufferGeometry.setAttribute( 'position', new BufferAttribute( new Float32Array( buffers.vertices ), 3 ) );
@@ -130,9 +129,9 @@ MeshReceiver.prototype = {
 		}
 
 		let material, materialName, key;
-		let materialNames = meshPayload.materials.materialNames;
-		let createMultiMaterial = meshPayload.materials.multiMaterial;
-		let multiMaterials = [];
+		const materialNames = meshPayload.materials.materialNames;
+		const createMultiMaterial = meshPayload.materials.multiMaterial;
+		const multiMaterials = [];
 
 		for ( key in materialNames ) {
 
@@ -145,7 +144,7 @@ MeshReceiver.prototype = {
 		if ( createMultiMaterial ) {
 
 			material = multiMaterials;
-			let materialGroups = meshPayload.materials.materialGroups;
+			const materialGroups = meshPayload.materials.materialGroups;
 			let materialGroup;
 			for ( key in materialGroups ) {
 
@@ -156,11 +155,11 @@ MeshReceiver.prototype = {
 
 		}
 
-		let meshes = [];
+		const meshes = [];
 		let mesh;
 		let callbackOnMeshAlterResult;
 		let useOrgMesh = true;
-		let geometryType = meshPayload.geometryType === null ? 0 : meshPayload.geometryType;
+		const geometryType = meshPayload.geometryType === null ? 0 : meshPayload.geometryType;
 
 		if ( this.callbacks.onMeshAlter ) {
 
@@ -186,7 +185,7 @@ MeshReceiver.prototype = {
 
 			} else if ( callbackOnMeshAlterResult.providesAlteredMeshes() ) {
 
-				for ( let i in callbackOnMeshAlterResult.meshes ) {
+				for ( const i in callbackOnMeshAlterResult.meshes ) {
 
 					meshes.push( callbackOnMeshAlterResult.meshes[ i ] );
 
@@ -223,8 +222,8 @@ MeshReceiver.prototype = {
 		let progressMessage = meshPayload.params.meshName;
 		if ( meshes.length > 0 ) {
 
-			let meshNames = [];
-			for ( let i in meshes ) {
+			const meshNames = [];
+			for ( const i in meshes ) {
 
 				mesh = meshes[ i ];
 				meshNames[ i ] = mesh.name;

@@ -9,7 +9,15 @@ export class AnimationClip {
 
 	name: string;
 	tracks: KeyframeTrack[];
+
+	/**
+	 * @default THREE.NormalAnimationBlendMode
+	 */
 	blendMode: AnimationBlendMode;
+
+	/**
+	 * @default -1
+	 */
 	duration: number;
 	uuid: string;
 	results: any[];
@@ -19,6 +27,7 @@ export class AnimationClip {
 	validate(): boolean;
 	optimize(): AnimationClip;
 	clone(): AnimationClip;
+	toJSON( clip: AnimationClip ): any;
 
 	static CreateFromMorphTargetSequence(
 		name: string,
@@ -37,6 +46,6 @@ export class AnimationClip {
 		animation: any,
 		bones: Bone[]
 	): AnimationClip;
-	static toJSON(): any;
+	static toJSON( clip: AnimationClip ): any;
 
 }

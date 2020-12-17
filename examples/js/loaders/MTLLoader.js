@@ -1,8 +1,5 @@
-console.warn( "THREE.MTLLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Loads a Wavefront .mtl file specifying materials
- *
- * @author angelxuanchang
  */
 
 THREE.MTLLoader = function ( manager ) {
@@ -37,6 +34,7 @@ THREE.MTLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -392,7 +390,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Diffuse texture map
 
-					setMapForType( "map", value );
+					setMapForType( 'map', value );
 
 					break;
 
@@ -400,7 +398,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Specular map
 
-					setMapForType( "specularMap", value );
+					setMapForType( 'specularMap', value );
 
 					break;
 
@@ -408,13 +406,13 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Emissive map
 
-					setMapForType( "emissiveMap", value );
+					setMapForType( 'emissiveMap', value );
 
 					break;
 
 				case 'norm':
 
-					setMapForType( "normalMap", value );
+					setMapForType( 'normalMap', value );
 
 					break;
 
@@ -423,7 +421,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Bump texture map
 
-					setMapForType( "bumpMap", value );
+					setMapForType( 'bumpMap', value );
 
 					break;
 
@@ -431,7 +429,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Alpha map
 
-					setMapForType( "alphaMap", value );
+					setMapForType( 'alphaMap', value );
 					params.transparent = true;
 
 					break;

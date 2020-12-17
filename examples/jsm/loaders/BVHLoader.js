@@ -1,13 +1,3 @@
-/**
- * @author herzig / http://github.com/herzig
- * @author Mugen87 / https://github.com/Mugen87
- *
- * Description: reads BVH files and outputs a single Skeleton and an AnimationClip
- *
- * Currently only supports bvh files containing a single root.
- *
- */
-
 import {
 	AnimationClip,
 	Bone,
@@ -18,7 +8,14 @@ import {
 	Skeleton,
 	Vector3,
 	VectorKeyframeTrack
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
+
+/**
+ * Description: reads BVH files and outputs a single Skeleton and an AnimationClip
+ *
+ * Currently only supports bvh files containing a single root.
+ *
+ */
 
 var BVHLoader = function ( manager ) {
 
@@ -40,6 +37,7 @@ BVHLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {

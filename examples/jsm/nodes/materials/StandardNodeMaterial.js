@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { StandardNode } from './nodes/StandardNode.js';
 import { NodeMaterial } from './NodeMaterial.js';
 import { NodeUtils } from '../core/NodeUtils.js';
@@ -12,7 +8,7 @@ function StandardNodeMaterial() {
 
 	NodeMaterial.call( this, node, node );
 
-	this.type = "StandardNodeMaterial";
+	this.type = 'StandardNodeMaterial';
 
 }
 

@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
@@ -19,22 +15,22 @@ function CameraNode( scope, camera ) {
 CameraNode.Nodes = ( function () {
 
 	var depthColor = new FunctionNode( [
-		"float depthColor( float mNear, float mFar ) {",
+		'float depthColor( float mNear, float mFar ) {',
 
-		"	#ifdef USE_LOGDEPTHBUF_EXT",
+		'	#ifdef USE_LOGDEPTHBUF_EXT',
 
-		"		float depth = gl_FragDepthEXT / gl_FragCoord.w;",
+		'		float depth = gl_FragDepthEXT / gl_FragCoord.w;',
 
-		"	#else",
+		'	#else',
 
-		"		float depth = gl_FragCoord.z / gl_FragCoord.w;",
+		'		float depth = gl_FragCoord.z / gl_FragCoord.w;',
 
-		"	#endif",
+		'	#endif',
 
-		"	return 1.0 - smoothstep( mNear, mFar, depth );",
+		'	return 1.0 - smoothstep( mNear, mFar, depth );',
 
-		"}"
-	].join( "\n" ) );
+		'}'
+	].join( '\n' ) );
 
 	return {
 		depthColor: depthColor
@@ -48,7 +44,7 @@ CameraNode.TO_VERTEX = 'toVertex';
 
 CameraNode.prototype = Object.create( TempNode.prototype );
 CameraNode.prototype.constructor = CameraNode;
-CameraNode.prototype.nodeType = "Camera";
+CameraNode.prototype.nodeType = 'Camera';
 
 CameraNode.prototype.setCamera = function ( camera ) {
 

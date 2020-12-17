@@ -1,15 +1,11 @@
-/*
- *  three.js NRRD file loader
- */
-
 import {
 	FileLoader,
 	Loader,
 	Matrix4,
 	Vector3
-} from "../../../build/three.module.js";
-import { Zlib } from "../libs/gunzip.module.min.js";
-import { Volume } from "../misc/Volume.js";
+} from '../../../build/three.module.js';
+import { Zlib } from '../libs/gunzip.module.min.js';
+import { Volume } from '../misc/Volume.js';
 
 var NRRDLoader = function ( manager ) {
 
@@ -29,6 +25,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( data ) {
 
 			try {
@@ -386,7 +383,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var _spaceY = 1;
 		var _spaceZ = 1;
 
-		if ( headerObject.space == "left-posterior-superior" ) {
+		if ( headerObject.space == 'left-posterior-superior' ) {
 
 			_spaceX = - 1;
 			_spaceY = - 1;
@@ -419,7 +416,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		}
 
 		volume.inverseMatrix = new Matrix4();
-		volume.inverseMatrix.getInverse( volume.matrix );
+		volume.inverseMatrix.copy( volume.matrix ).invert();
 		volume.RASDimensions = ( new Vector3( volume.xLength, volume.yLength, volume.zLength ) ).applyMatrix4( volume.matrix ).round().toArray().map( Math.abs );
 
 		// .. and set the default threshold
@@ -575,7 +572,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		'space origin': function ( data ) {
 
-			return this.space_origin = data.split( "(" )[ 1 ].split( ")" )[ 0 ].split( "," );
+			return this.space_origin = data.split( '(' )[ 1 ].split( ')' )[ 0 ].split( ',' );
 
 		},
 

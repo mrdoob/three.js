@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { Node } from '../core/Node.js';
 
 function BypassNode( code, value ) {
@@ -15,7 +11,7 @@ function BypassNode( code, value ) {
 
 BypassNode.prototype = Object.create( Node.prototype );
 BypassNode.prototype.constructor = BypassNode;
-BypassNode.prototype.nodeType = "Bypass";
+BypassNode.prototype.nodeType = 'Bypass';
 
 BypassNode.prototype.getType = function ( builder ) {
 

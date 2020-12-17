@@ -1,19 +1,17 @@
+import {
+	BufferGeometry,
+	Float32BufferAttribute,
+	Geometry,
+	Vector3
+} from '../../../build/three.module.js';
+
 /**
- *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
- *
  *	Simplification Geometry Modifier
  *    - based on code and technique
  *	  - by Stan Melax in 1998
  *	  - Progressive Mesh type Polygon Reduction Algorithm
  *    - http://www.melax.com/polychop/
  */
-
-import {
-	BufferGeometry,
-	Float32BufferAttribute,
-	Geometry,
-	Vector3
-} from "../../../build/three.module.js";
 
 var SimplifyModifier = function () {};
 

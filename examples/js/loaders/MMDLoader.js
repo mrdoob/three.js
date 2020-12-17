@@ -1,7 +1,4 @@
-console.warn( "THREE.MMDLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author takahiro / https://github.com/takahirox
- *
  * Dependencies
  *  - mmd-parser https://github.com/takahirox/mmd-parser
  *  - THREE.TGALoader
@@ -186,6 +183,7 @@ THREE.MMDLoader = ( function () {
 				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
 				.setRequestHeader( this.requestHeader )
+				.setWithCredentials( this.withCredentials )
 				.load( url, function ( buffer ) {
 
 					onLoad( parser.parsePmd( buffer, true ) );
@@ -211,6 +209,7 @@ THREE.MMDLoader = ( function () {
 				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
 				.setRequestHeader( this.requestHeader )
+				.setWithCredentials( this.withCredentials )
 				.load( url, function ( buffer ) {
 
 					onLoad( parser.parsePmx( buffer, true ) );
@@ -241,7 +240,8 @@ THREE.MMDLoader = ( function () {
 				.setMimeType( undefined )
 				.setPath( this.animationPath )
 				.setResponseType( 'arraybuffer' )
-				.setRequestHeader( this.requestHeader );
+				.setRequestHeader( this.requestHeader )
+				.setWithCredentials( this.withCredentials );
 
 			for ( var i = 0, il = urls.length; i < il; i ++ ) {
 
@@ -275,6 +275,7 @@ THREE.MMDLoader = ( function () {
 				.setPath( this.animationPath )
 				.setResponseType( 'text' )
 				.setRequestHeader( this.requestHeader )
+				.setWithCredentials( this.withCredentials )
 				.load( url, function ( text ) {
 
 					onLoad( parser.parseVpd( text, true ) );
@@ -302,7 +303,7 @@ THREE.MMDLoader = ( function () {
 
 				}
 
-				this.parser = new MMDParser.Parser();
+				this.parser = new MMDParser.Parser(); // eslint-disable-line no-undef
 
 			}
 
@@ -1020,7 +1021,6 @@ THREE.MMDLoader = ( function () {
 				 *
 				 * MMD         MeshToonMaterial
 				 * diffuse  -  color
-				 * specular -  specular
 				 * ambient  -  emissive * a
 				 *               (a = 1.0 without map texture or 0.2 with map texture)
 				 *
@@ -1029,9 +1029,7 @@ THREE.MMDLoader = ( function () {
 				 */
 				params.color = new THREE.Color().fromArray( material.diffuse );
 				params.opacity = material.diffuse[ 3 ];
-				params.specular = new THREE.Color().fromArray( material.specular );
 				params.emissive = new THREE.Color().fromArray( material.ambient );
-				params.shininess = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
 				params.transparent = params.opacity !== 1.0;
 
 				//

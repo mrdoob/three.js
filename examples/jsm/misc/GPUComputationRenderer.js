@@ -1,6 +1,18 @@
+import {
+	Camera,
+	ClampToEdgeWrapping,
+	DataTexture,
+	FloatType,
+	Mesh,
+	NearestFilter,
+	PlaneBufferGeometry,
+	RGBAFormat,
+	Scene,
+	ShaderMaterial,
+	WebGLRenderTarget
+} from '../../../build/three.module.js';
+
 /**
- * @author yomboprime https://github.com/yomboprime
- *
  * GPUComputationRenderer, based on SimulationRenderer by zz85
  *
  * The GPUComputationRenderer uses the concept of variables. These variables are RGBA float textures that hold 4 floats
@@ -97,26 +109,13 @@
  * @param {WebGLRenderer} renderer The renderer
   */
 
-import {
-	Camera,
-	ClampToEdgeWrapping,
-	DataTexture,
-	FloatType,
-	HalfFloatType,
-	Mesh,
-	NearestFilter,
-	PlaneBufferGeometry,
-	RGBAFormat,
-	Scene,
-	ShaderMaterial,
-	WebGLRenderTarget
-} from "../../../build/three.module.js";
-
 var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.variables = [];
 
 	this.currentTextureIndex = 0;
+
+	var dataType = FloatType;
 
 	var scene = new Scene();
 
@@ -132,6 +131,13 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 	var mesh = new Mesh( new PlaneBufferGeometry( 2, 2 ), passThruShader );
 	scene.add( mesh );
 
+
+	this.setDataType = function ( type ) {
+
+		dataType = type;
+		return this;
+
+	};
 
 	this.addVariable = function ( variableName, computeFragmentShader, initialValueTexture ) {
 
@@ -163,16 +169,15 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.init = function () {
 
-		if ( ! renderer.capabilities.isWebGL2 &&
-			 ! renderer.extensions.get( "OES_texture_float" ) ) {
+		if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'OES_texture_float' ) === false ) {
 
-			return "No OES_texture_float support for float textures.";
+			return 'No OES_texture_float support for float textures.';
 
 		}
 
 		if ( renderer.capabilities.maxVertexTextures === 0 ) {
 
-			return "No support for vertex shader textures.";
+			return 'No support for vertex shader textures.';
 
 		}
 
@@ -213,7 +218,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 						if ( ! found ) {
 
-							return "Variable dependency not found. Variable=" + variable.name + ", dependency=" + depVar.name;
+							return 'Variable dependency not found. Variable=' + variable.name + ', dependency=' + depVar.name;
 
 						}
 
@@ -221,7 +226,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 					uniforms[ depVar.name ] = { value: null };
 
-					material.fragmentShader = "\nuniform sampler2D " + depVar.name + ";\n" + material.fragmentShader;
+					material.fragmentShader = '\nuniform sampler2D ' + depVar.name + ';\n' + material.fragmentShader;
 
 				}
 
@@ -281,7 +286,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	function addResolutionDefine( materialShader ) {
 
-		materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + " )";
+		materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + ' )';
 
 	}
 
@@ -325,8 +330,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 			minFilter: minFilter,
 			magFilter: magFilter,
 			format: RGBAFormat,
-			type: ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) ? HalfFloatType : FloatType,
-			stencilBuffer: false,
+			type: dataType,
 			depthBuffer: false
 		} );
 
@@ -372,25 +376,25 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	function getPassThroughVertexShader() {
 
-		return	"void main()	{\n" +
-				"\n" +
-				"	gl_Position = vec4( position, 1.0 );\n" +
-				"\n" +
-				"}\n";
+		return	'void main()	{\n' +
+				'\n' +
+				'	gl_Position = vec4( position, 1.0 );\n' +
+				'\n' +
+				'}\n';
 
 	}
 
 	function getPassThroughFragmentShader() {
 
-		return	"uniform sampler2D passThruTexture;\n" +
-				"\n" +
-				"void main() {\n" +
-				"\n" +
-				"	vec2 uv = gl_FragCoord.xy / resolution.xy;\n" +
-				"\n" +
-				"	gl_FragColor = texture2D( passThruTexture, uv );\n" +
-				"\n" +
-				"}\n";
+		return	'uniform sampler2D passThruTexture;\n' +
+				'\n' +
+				'void main() {\n' +
+				'\n' +
+				'	vec2 uv = gl_FragCoord.xy / resolution.xy;\n' +
+				'\n' +
+				'	gl_FragColor = texture2D( passThruTexture, uv );\n' +
+				'\n' +
+				'}\n';
 
 	}
 

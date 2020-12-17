@@ -1,6 +1,17 @@
+import {
+	BufferGeometry,
+	Color,
+	FileLoader,
+	Float32BufferAttribute,
+	Group,
+	Loader,
+	LoaderUtils,
+	Mesh,
+	MeshPhongMaterial
+} from '../../../build/three.module.js';
+import { JSZip } from '../libs/jszip.module.min.js';
+
 /**
- * @author tamarintech / https://tamarintech.com
- *
  * Description: Early release of an AMF Loader following the pattern of the
  * example loaders in the three.js project.
  *
@@ -17,19 +28,6 @@
  * No constellation support (yet)!
  *
  */
-
-import {
-	BufferGeometry,
-	Color,
-	FileLoader,
-	Float32BufferAttribute,
-	Group,
-	Loader,
-	LoaderUtils,
-	Mesh,
-	MeshPhongMaterial
-} from "../../../build/three.module.js";
-import { JSZip } from "../libs/jszip.module.min.js";
 
 var AMFLoader = function ( manager ) {
 
@@ -49,6 +47,7 @@ AMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -91,7 +90,7 @@ AMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				try {
 
-					zip = new JSZip( data );
+					zip = new JSZip( data ); // eslint-disable-line no-undef
 
 				} catch ( e ) {
 

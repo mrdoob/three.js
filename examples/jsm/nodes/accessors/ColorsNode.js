@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 
 var vertexDict = [ 'color', 'color2' ],
@@ -17,7 +13,7 @@ function ColorsNode( index ) {
 
 ColorsNode.prototype = Object.create( TempNode.prototype );
 ColorsNode.prototype.constructor = ColorsNode;
-ColorsNode.prototype.nodeType = "Colors";
+ColorsNode.prototype.nodeType = 'Colors';
 
 ColorsNode.prototype.generate = function ( builder, output ) {
 

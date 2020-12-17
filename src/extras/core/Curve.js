@@ -4,8 +4,7 @@ import { Vector3 } from '../../math/Vector3.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 
 /**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * Extensible curve object
+ * Extensible curve object.
  *
  * Some common of curve methods:
  * .getPoint( t, optionalTarget ), .getTangent( t, optionalTarget )
@@ -33,10 +32,6 @@ import { Matrix4 } from '../../math/Matrix4.js';
  * A series of curves can be represented as a THREE.CurvePath.
  *
  **/
-
-/**************************************************************
- *	Abstract Curve base class
- **************************************************************/
 
 function Curve() {
 
@@ -70,9 +65,7 @@ Object.assign( Curve.prototype, {
 
 	// Get sequence of points using getPoint( t )
 
-	getPoints: function ( divisions ) {
-
-		if ( divisions === undefined ) divisions = 5;
+	getPoints: function ( divisions = 5 ) {
 
 		const points = [];
 
@@ -88,9 +81,7 @@ Object.assign( Curve.prototype, {
 
 	// Get sequence of points using getPointAt( u )
 
-	getSpacedPoints: function ( divisions ) {
-
-		if ( divisions === undefined ) divisions = 5;
+	getSpacedPoints: function ( divisions = 5 ) {
 
 		const points = [];
 
@@ -163,7 +154,8 @@ Object.assign( Curve.prototype, {
 
 		const arcLengths = this.getLengths();
 
-		let i = 0, il = arcLengths.length;
+		let i = 0;
+		const il = arcLengths.length;
 
 		let targetArcLength; // The targeted u distance value to get
 

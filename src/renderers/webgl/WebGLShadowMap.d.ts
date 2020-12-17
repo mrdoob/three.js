@@ -2,8 +2,8 @@ import { Scene } from './../../scenes/Scene';
 import { Camera } from './../../cameras/Camera';
 import { WebGLRenderer } from '../WebGLRenderer';
 import { ShadowMapType } from '../../constants';
-import { WebGLObjects } from "./WebGLObjects";
-import { Light } from "../../lights/Light";
+import { WebGLObjects } from './WebGLObjects';
+import { Light } from '../../lights/Light';
 
 export class WebGLShadowMap {
 
@@ -13,15 +13,30 @@ export class WebGLShadowMap {
 		maxTextureSize: number
 	);
 
+	/**
+	 * @default false
+	 */
 	enabled: boolean;
+
+	/**
+	 * @default true
+	 */
 	autoUpdate: boolean;
+
+	/**
+	 * @default false
+	 */
 	needsUpdate: boolean;
+
+	/**
+	 * @default THREE.PCFShadowMap
+	 */
 	type: ShadowMapType;
 
 	render( shadowsArray: Light[], scene: Scene, camera: Camera ): void;
 
 	/**
-	 * @deprecated Use {@link WebGLShadowMap#renderReverseSided .shadowMap.renderReverseSided} instead.
+	 * @deprecated Use {@link Material#shadowSide} instead.
 	 */
 	cullFace: any;
 

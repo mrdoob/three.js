@@ -1,7 +1,4 @@
-console.warn( "THREE.Sky: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author zz85 / https://github.com/zz85
- *
  * Based on "A Practical Analytic Model for Daylight"
  * aka The Preetham Model, the de facto standard analytic skydome model
  * https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight
@@ -37,12 +34,12 @@ THREE.Sky.prototype = Object.create( THREE.Mesh.prototype );
 THREE.Sky.SkyShader = {
 
 	uniforms: {
-		"turbidity": { value: 2 },
-		"rayleigh": { value: 1 },
-		"mieCoefficient": { value: 0.005 },
-		"mieDirectionalG": { value: 0.8 },
-		"sunPosition": { value: new THREE.Vector3() },
-		"up": { value: new THREE.Vector3( 0, 1, 0 ) }
+		'turbidity': { value: 2 },
+		'rayleigh': { value: 1 },
+		'mieCoefficient': { value: 0.005 },
+		'mieDirectionalG': { value: 0.8 },
+		'sunPosition': { value: new THREE.Vector3() },
+		'up': { value: new THREE.Vector3( 0, 1, 0 ) }
 	},
 
 	vertexShader: [

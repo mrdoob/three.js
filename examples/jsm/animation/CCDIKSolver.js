@@ -1,6 +1,19 @@
+import {
+	BufferAttribute,
+	BufferGeometry,
+	Color,
+	Line,
+	LineBasicMaterial,
+	Matrix4,
+	Mesh,
+	MeshBasicMaterial,
+	Object3D,
+	Quaternion,
+	SphereBufferGeometry,
+	Vector3
+} from '../../../build/three.module.js';
+
 /**
- * @author takahiro / https://github.com/takahirox
- *
  * CCD Algorithm
  *  - https://sites.google.com/site/auraliusproject/ccd-algorithm
  *
@@ -19,21 +32,6 @@
  *	maxAngle: 1.0,
  * } ];
  */
-
-import {
-	BufferAttribute,
-	BufferGeometry,
-	Color,
-	Line,
-	LineBasicMaterial,
-	Matrix4,
-	Mesh,
-	MeshBasicMaterial,
-	Object3D,
-	Quaternion,
-	SphereBufferGeometry,
-	Vector3
-} from "../../../build/three.module.js";
 
 var CCDIKSolver = ( function () {
 
@@ -112,7 +110,7 @@ var CCDIKSolver = ( function () {
 							// don't use getWorldPosition/Quaternion() here for the performance
 							// because they call updateMatrixWorld( true ) inside.
 							link.matrixWorld.decompose( linkPos, invLinkQ, linkScale );
-							invLinkQ.inverse();
+							invLinkQ.invert();
 							effectorPos.setFromMatrixPosition( effector.matrixWorld );
 
 							// work in link world
@@ -349,7 +347,7 @@ var CCDIKSolver = ( function () {
 					var iks = this.iks;
 					var bones = mesh.skeleton.bones;
 
-					matrix.getInverse( mesh.matrixWorld );
+					matrix.copy( mesh.matrixWorld ).invert();
 
 					for ( var i = 0, il = iks.length; i < il; i ++ ) {
 

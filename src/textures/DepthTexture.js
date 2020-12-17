@@ -1,8 +1,3 @@
-/**
- * @author Matt DesLauriers / @mattdesl
- * @author atix / arthursilber.de
- */
-
 import { Texture } from './Texture.js';
 import { NearestFilter, UnsignedShortType, UnsignedInt248Type, DepthFormat, DepthStencilFormat } from '../constants.js';
 
@@ -27,7 +22,7 @@ function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, mi
 	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
 
 	this.flipY = false;
-	this.generateMipmaps	= false;
+	this.generateMipmaps = false;
 
 }
 

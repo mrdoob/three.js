@@ -42,58 +42,71 @@
 
 		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
 
-		<script src="files.js"></script>
-
 		<script>
 
-		var panel = document.getElementById( 'panel' );
-		var content = document.getElementById( 'content' );
-		var viewer = document.getElementById( 'viewer' );
-		var filterInput = document.getElementById( 'filterInput' );
-		var exitSearchButton = document.getElementById( 'exitSearchButton' );
-		var expandButton = document.getElementById( 'expandButton' );
-		var viewSrcButton = document.getElementById( 'button' );
-		var panelScrim = document.getElementById( 'panelScrim' );
+		const panel = document.getElementById( 'panel' );
+		const content = document.getElementById( 'content' );
+		const viewer = document.getElementById( 'viewer' );
+		const filterInput = document.getElementById( 'filterInput' );
+		const exitSearchButton = document.getElementById( 'exitSearchButton' );
+		const expandButton = document.getElementById( 'expandButton' );
+		const viewSrcButton = document.getElementById( 'button' );
+		const panelScrim = document.getElementById( 'panelScrim' );
 
-		var previewsToggler = document.getElementById( 'previewsToggler' );
+		const previewsToggler = document.getElementById( 'previewsToggler' );
 
-		var links = {};
-		var selected = null;
-		var container = document.createElement( 'div' );
+		const links = {};
+		const validRedirects = new Map();
+		const container = document.createElement( 'div' );
+
+		let selected = null;
 
 		init();
 
-		function init() {
+		async function init() {
 
 			content.appendChild( container );
 
 			viewSrcButton.style.display = 'none';
 
-			for ( var key in files ) {
+			const files = await ( await fetch( 'files.json' ) ).json();
+			const tags = await ( await fetch( 'tags.json' ) ).json();
 
-				var section = files[ key ];
+			for ( const key in files ) {
 
-				var header = document.createElement( 'h2' );
+				const section = files[ key ];
+
+				const header = document.createElement( 'h2' );
 				header.textContent = key;
 				header.setAttribute( 'data-category', key );
 				container.appendChild( header );
 
-				for ( var i = 0; i < section.length; i ++ ) {
+				for ( let i = 0; i < section.length; i ++ ) {
 
-					var file = section[ i ];
+					const file = section[ i ];
 
-					var link = createLink( file );
+					const link = createLink( file );
 					container.appendChild( link );
 
 					links[ file ] = link;
+					validRedirects.set( file, file + '.html' );
 
 				}
 
 			}
 
-			if ( window.location.hash !== '' && links[ window.location.hash.substring( 1 ) ] ) {
+			if ( window.location.hash !== '' ) {
 
-				loadFile( window.location.hash.substring( 1 ) );
+				const file = window.location.hash.substring( 1 );
+
+				// use a predefined map of redirects to avoid untrusted URL redirection due to user-provided value
+
+				if ( validRedirects.has( file ) === true ) {
+
+					selectFile( file );
+					viewer.src = validRedirects.get( file );
+
+				}
 
 			}
 
@@ -105,7 +118,7 @@
 
 			}
 
-			updateFilter();
+			updateFilter( files, tags );
 
 			// Events
 
@@ -128,14 +141,14 @@
 			exitSearchButton.onclick = function ( ) {
 
 				filterInput.value = '';
-				updateFilter();
+				updateFilter( files, tags );
 				panel.classList.remove( 'searchFocused' );
 
 			};
 
 			filterInput.addEventListener( 'input', function () {
 
-				updateFilter();
+				updateFilter( files, tags );
 
 			} );
 
@@ -175,19 +188,18 @@
 
 		function createLink( file ) {
 
+			const template = `
+				<div class="card">
+					<a href="${file}.html" target="viewer">
+						<div class="cover">
+							<img src="screenshots/${ file }.jpg" loading="lazy" width="400" />
+						</div>
+						<div class="title">${getName( file )}</div>
+					</a>
+				</div>
+			`;
 
-			var template = [
-				'<div class="card">',
-				'	<a href="' + file + '.html" target="viewer">',
-				'		<div class="cover">',
-				'			<img src="screenshots/' + file + '.jpg" loading="lazy" width="400" />',
-				'		</div>',
-				'		<div class="title">' + getName( file ) + '</div>',
-				'	</a>',
-				'</div>'
-			].join( "\n" );
-
-			var link = createElementFromHTML( template );
+			const link = createElementFromHTML( template );
 
 			link.querySelector( 'a[target="viewer"]' ).addEventListener( 'click', function ( event ) {
 
@@ -198,13 +210,6 @@
 			} );
 
 			return link;
-
-		}
-
-		function loadFile( file ) {
-
-			selectFile( file );
-			viewer.src = file + '.html';
 
 		}
 
@@ -228,9 +233,10 @@
 
 		}
 
-		function updateFilter() {
+		function updateFilter( files, tags ) {
 
-			var v = filterInput.value.trim();
+			let v = filterInput.value.trim();
+			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
 
 			if ( v !== '' ) {
 
@@ -242,37 +248,37 @@
 
 			}
 
-			var exp = new RegExp( v, 'gi' );
+			const exp = new RegExp( v, 'gi' );
 
-			for ( var key in files ) {
+			for ( const key in files ) {
 
-				var section = files[ key ];
+				const section = files[ key ];
 
-				for ( var i = 0; i < section.length; i ++ ) {
+				for ( let i = 0; i < section.length; i ++ ) {
 
-					filterExample( section[ i ], exp );
+					filterExample( section[ i ], exp, tags );
 
 				}
 
 			}
 
-			layoutList();
+			layoutList( files );
 
 		}
 
-		function filterExample( file, exp ) {
+		function filterExample( file, exp, tags ) {
 
-			var link = links[ file ];
-			var name = getName( file );
+			const link = links[ file ];
+			const name = getName( file );
 			if ( file in tags ) file += ' ' + tags[ file ].join( ' ' );
-			var res = file.match( exp );
-			var text;
+			const res = file.match( exp );
+			let text;
 
 			if ( res && res.length > 0 ) {
 
 				link.classList.remove( 'hidden' );
 
-				for ( var i = 0; i < res.length; i ++ ) {
+				for ( let i = 0; i < res.length; i ++ ) {
 
 					text = name.replace( res[ i ], '<b>' + res[ i ] + '</b>' );
 
@@ -291,23 +297,23 @@
 
 		function getName( file ) {
 
-			var name = file.split( '_' );
+			const name = file.split( '_' );
 			name.shift();
 			return name.join( ' / ' );
 
 		}
 
-		function layoutList() {
+		function layoutList( files ) {
 
-			for ( var key in files ) {
+			for ( const key in files ) {
 
-				var collapsed = true;
+				let collapsed = true;
 
-				var section = files[ key ];
+				const section = files[ key ];
 
-				for ( var i = 0; i < section.length; i ++ ) {
+				for ( let i = 0; i < section.length; i ++ ) {
 
-					var file = section[ i ];
+					const file = section[ i ];
 
 					if ( links[ file ].classList.contains( 'hidden' ) === false ) {
 
@@ -318,7 +324,7 @@
 
 				}
 
-				var element = document.querySelector( 'h2[data-category="' + key + '"]' );
+				const element = document.querySelector( 'h2[data-category="' + key + '"]' );
 
 				if ( collapsed ) {
 
@@ -336,11 +342,11 @@
 
 		function extractQuery() {
 
-			var p = window.location.search.indexOf( '?q=' );
+			const p = window.location.search.indexOf( '?q=' );
 
 			if ( p !== - 1 ) {
 
-				return window.location.search.substr( 3 );
+				return decodeURI( window.location.search.substr( 3 ) );
 
 			}
 
@@ -351,7 +357,7 @@
 
 		function createElementFromHTML( htmlString ) {
 
-			var div = document.createElement( 'div' );
+			const div = document.createElement( 'div' );
 			div.innerHTML = htmlString.trim();
 			return div.firstChild;
 

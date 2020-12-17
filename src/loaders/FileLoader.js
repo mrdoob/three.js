@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
 
@@ -286,13 +282,6 @@ FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	setResponseType: function ( value ) {
 
 		this.responseType = value;
-		return this;
-
-	},
-
-	setWithCredentials: function ( value ) {
-
-		this.withCredentials = value;
 		return this;
 
 	},

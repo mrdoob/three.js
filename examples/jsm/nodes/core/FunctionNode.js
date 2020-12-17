@@ -1,8 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- * @thanks bhouston / https://clara.io/
- */
-
 import { TempNode } from './TempNode.js';
 import { NodeLib } from './NodeLib.js';
 
@@ -22,7 +17,7 @@ function FunctionNode( src, includes, extensions, keywords, type ) {
 
 FunctionNode.prototype = Object.create( TempNode.prototype );
 FunctionNode.prototype.constructor = FunctionNode;
-FunctionNode.prototype.nodeType = "Function";
+FunctionNode.prototype.nodeType = 'Function';
 
 FunctionNode.prototype.useKeywords = true;
 

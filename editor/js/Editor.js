@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { Config } from './Config.js';
@@ -83,7 +79,9 @@ function Editor() {
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
-		viewportCameraChanged: new Signal()
+		viewportCameraChanged: new Signal(),
+
+		animationStopped: new Signal()
 
 	};
 
@@ -109,7 +107,6 @@ function Editor() {
 
 	this.materialsRefCounter = new Map(); // tracks how often is a material used by a 3D object
 
-	this.animations = {};
 	this.mixer = new THREE.AnimationMixer( this.scene );
 
 	this.selected = null;
@@ -358,16 +355,6 @@ Editor.prototype = {
 	addTexture: function ( texture ) {
 
 		this.textures[ texture.uuid ] = texture;
-
-	},
-
-	addAnimation: function ( object, animations ) {
-
-		if ( animations.length > 0 ) {
-
-			this.animations[ object.uuid ] = animations;
-
-		}
 
 	},
 

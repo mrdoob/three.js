@@ -1,26 +1,25 @@
 /**
- * @author Kai Salmen / https://kaisalmen.de
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
 // Imports only related to wrapper
 import {
 	Object3D
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 import {
 	CodeBuilderInstructions,
 	WorkerExecutionSupport
-} from "./obj2/worker/main/WorkerExecutionSupport.js";
-import { CodeSerializer } from "./obj2/utils/CodeSerializer.js";
-import { OBJLoader2 } from "./OBJLoader2.js";
+} from './obj2/worker/main/WorkerExecutionSupport.js';
+import { CodeSerializer } from './obj2/utils/CodeSerializer.js';
+import { OBJLoader2 } from './OBJLoader2.js';
 
 // Imports only related to worker (when standard workers (modules aren't supported) are used)
-import { OBJLoader2Parser } from "./obj2/OBJLoader2Parser.js";
+import { OBJLoader2Parser } from './obj2/OBJLoader2Parser.js';
 import {
 	WorkerRunner,
 	DefaultWorkerPayloadHandler,
 	ObjectManipulator
-} from "./obj2/worker/parallel/WorkerRunner.js";
+} from './obj2/worker/parallel/WorkerRunner.js';
 
 
 /**
@@ -74,7 +73,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 		if ( jsmWorkerUrl === undefined || jsmWorkerUrl === null ) {
 
-			throw "The url to the jsm worker is not valid. Aborting...";
+			throw 'The url to the jsm worker is not valid. Aborting...';
 
 		}
 
@@ -100,7 +99,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	 */
 	buildWorkerCode: function () {
 
-		let codeBuilderInstructions = new CodeBuilderInstructions( true, true, this.preferJsmWorker );
+		const codeBuilderInstructions = new CodeBuilderInstructions( true, true, this.preferJsmWorker );
 
 		if ( codeBuilderInstructions.isSupportsJsmWorker() ) {
 
@@ -110,15 +109,15 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 		if ( codeBuilderInstructions.isSupportsStandardWorker() ) {
 
-			let objectManipulator = new ObjectManipulator();
-			let defaultWorkerPayloadHandler = new DefaultWorkerPayloadHandler( this.parser );
-			let workerRunner = new WorkerRunner( {} );
+			const objectManipulator = new ObjectManipulator();
+			const defaultWorkerPayloadHandler = new DefaultWorkerPayloadHandler( this.parser );
+			const workerRunner = new WorkerRunner( {} );
 			codeBuilderInstructions.addCodeFragment( CodeSerializer.serializeClass( OBJLoader2Parser, this.parser ) );
 			codeBuilderInstructions.addCodeFragment( CodeSerializer.serializeClass( ObjectManipulator, objectManipulator ) );
 			codeBuilderInstructions.addCodeFragment( CodeSerializer.serializeClass( DefaultWorkerPayloadHandler, defaultWorkerPayloadHandler ) );
 			codeBuilderInstructions.addCodeFragment( CodeSerializer.serializeClass( WorkerRunner, workerRunner ) );
 
-			let startCode = 'new ' + workerRunner.constructor.name + '( new ' + defaultWorkerPayloadHandler.constructor.name + '( new ' + this.parser.constructor.name + '() ) );';
+			const startCode = 'new ' + workerRunner.constructor.name + '( new ' + defaultWorkerPayloadHandler.constructor.name + '( new ' + this.parser.constructor.name + '() ) );';
 			codeBuilderInstructions.addStartCode( startCode );
 
 		}
@@ -132,7 +131,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	 */
 	load: function ( content, onLoad, onFileLoadProgress, onError, onMeshAlter ) {
 
- 		let scope = this;
+ 		const scope = this;
 		function interceptOnLoad( object3d, message ) {
 
 			if ( object3d.name === 'OBJLoader2ParallelDummy' ) {
@@ -166,7 +165,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 			if ( this.parser.callbacks.onLoad === this.parser._onLoad ) {
 
-				throw "No callback other than the default callback was provided! Aborting!";
+				throw 'No callback other than the default callback was provided! Aborting!';
 
 			}
 
@@ -175,8 +174,8 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 				this.workerExecutionSupport.buildWorker( this.buildWorkerCode() );
 
-				let scope = this;
-				let scopedOnAssetAvailable = function ( payload ) {
+				const scope = this;
+				const scopedOnAssetAvailable = function ( payload ) {
 
 					scope._onAssetAvailable( payload );
 
@@ -216,7 +215,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 					}
 				} );
 
-			let dummy = new Object3D();
+			const dummy = new Object3D();
 			dummy.name = 'OBJLoader2ParallelDummy';
 			return dummy;
 

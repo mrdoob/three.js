@@ -1,5 +1,4 @@
 /**
- * @author Kai Salmen / https://kaisalmen.de
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
@@ -13,7 +12,7 @@ const OBJLoader2Parser = function () {
 		debug: false
 	};
 
-	let scope = this;
+	const scope = this;
 	this.callbacks = {
 		onProgress: function ( text ) {
 
@@ -251,7 +250,7 @@ OBJLoader2Parser.prototype = {
 	 */
 	_onProgress: function ( text ) {
 
-		let message = text ? text : '';
+		const message = text ? text : '';
 		if ( this.logging.enabled && this.logging.debug ) {
 
 			console.log( message );
@@ -276,9 +275,9 @@ OBJLoader2Parser.prototype = {
 
 	},
 
-	_onAssetAvailable: function ( payload ) {
+	_onAssetAvailable: function ( /*payload*/ ) {
 
-		let errorMessage = 'OBJLoader2Parser does not provide implementation for onAssetAvailable. Aborting...';
+		const errorMessage = 'OBJLoader2Parser does not provide implementation for onAssetAvailable. Aborting...';
 		this.callbacks.onError( errorMessage );
 		throw errorMessage;
 
@@ -286,7 +285,7 @@ OBJLoader2Parser.prototype = {
 
 	_onLoad: function ( object3d, message ) {
 
-		console.log( "You reached parser default onLoad callback: " + message );
+		console.log( 'You reached parser default onLoad callback: ' + message );
 
 	},
 
@@ -311,8 +310,8 @@ OBJLoader2Parser.prototype = {
 		this._pushSmoothingGroup( 1 );
 		if ( this.logging.enabled ) {
 
-			let matKeys = Object.keys( this.materials );
-			let matNames = ( matKeys.length > 0 ) ? '\n\tmaterialNames:\n\t\t- ' + matKeys.join( '\n\t\t- ' ) : '\n\tmaterialNames: None';
+			const matKeys = Object.keys( this.materials );
+			const matNames = ( matKeys.length > 0 ) ? '\n\tmaterialNames:\n\t\t- ' + matKeys.join( '\n\t\t- ' ) : '\n\tmaterialNames: None';
 			let printedConfig = 'OBJLoader.Parser configuration:'
 				+ matNames
 				+ '\n\tmaterialPerSmoothingGroup: ' + this.materialPerSmoothingGroup
@@ -338,17 +337,17 @@ OBJLoader2Parser.prototype = {
 		if ( this.logging.enabled ) console.time( 'OBJLoader2Parser.execute' );
 		this._configure();
 
-		let arrayBufferView = new Uint8Array( arrayBuffer );
+		const arrayBufferView = new Uint8Array( arrayBuffer );
 		this.contentRef = arrayBufferView;
-		let length = arrayBufferView.byteLength;
+		const length = arrayBufferView.byteLength;
 		this.globalCounts.totalBytes = length;
-		let buffer = new Array( 128 );
+		const buffer = new Array( 128 );
 
 		let bufferPointer = 0;
 		let slashesCount = 0;
 		let word = '';
 		let currentByte = 0;
-		for ( let code, currentByte = 0; currentByte < length; currentByte ++ ) {
+		for ( let code; currentByte < length; currentByte ++ ) {
 
 			code = arrayBufferView[ currentByte ];
 			switch ( code ) {
@@ -402,9 +401,9 @@ OBJLoader2Parser.prototype = {
 		this._configure();
 		this.legacyMode = true;
 		this.contentRef = text;
-		let length = text.length;
+		const length = text.length;
 		this.globalCounts.totalBytes = length;
-		let buffer = new Array( 128 );
+		const buffer = new Array( 128 );
 
 		let bufferPointer = 0;
 		let slashesCount = 0;
@@ -457,7 +456,7 @@ OBJLoader2Parser.prototype = {
 
 		if ( word.length > 0 ) buffer[ bufferPointer ++ ] = word;
 
-		let reconstructString = function ( content, legacyMode, start, stop ) {
+		const reconstructString = function ( content, legacyMode, start, stop ) {
 
 			let line = '';
 			if ( stop > start ) {
@@ -482,8 +481,8 @@ OBJLoader2Parser.prototype = {
 
 		};
 
-		let bufferLength, length, i, lineDesignation;
-		lineDesignation = buffer[ 0 ];
+		let bufferLength, length, i;
+		const lineDesignation = buffer[ 0 ];
 		switch ( lineDesignation ) {
 
 			case 'v':
@@ -607,7 +606,7 @@ OBJLoader2Parser.prototype = {
 				break;
 
 			case 'usemtl':
-				let mtlName = reconstructString( this.contentRef, this.legacyMode, this.globalCounts.lineByte + 7, this.globalCounts.currentByte );
+				const mtlName = reconstructString( this.contentRef, this.legacyMode, this.globalCounts.lineByte + 7, this.globalCounts.currentByte );
 				if ( mtlName !== '' && this.rawMesh.activeMtlName !== mtlName ) {
 
 					this.rawMesh.activeMtlName = mtlName;
@@ -630,11 +629,11 @@ OBJLoader2Parser.prototype = {
 		let smoothingGroupInt = parseInt( smoothingGroup );
 		if ( isNaN( smoothingGroupInt ) ) {
 
-			smoothingGroupInt = smoothingGroup === "off" ? 0 : 1;
+			smoothingGroupInt = smoothingGroup === 'off' ? 0 : 1;
 
 		}
 
-		let smoothCheck = this.rawMesh.smoothingGroup.normalized;
+		const smoothCheck = this.rawMesh.smoothingGroup.normalized;
 		this.rawMesh.smoothingGroup.normalized = this.rawMesh.smoothingGroup.splitMaterials ? smoothingGroupInt : ( smoothingGroupInt === 0 ) ? 0 : 1;
 		this.rawMesh.smoothingGroup.real = smoothingGroupInt;
 
@@ -671,7 +670,7 @@ OBJLoader2Parser.prototype = {
 
 	_checkSubGroup: function () {
 
-		let index = this.rawMesh.activeMtlName + '|' + this.rawMesh.smoothingGroup.normalized;
+		const index = this.rawMesh.activeMtlName + '|' + this.rawMesh.smoothingGroup.normalized;
 		this.rawMesh.subGroupInUse = this.rawMesh.subGroups[ index ];
 
 		if ( this.rawMesh.subGroupInUse === undefined || this.rawMesh.subGroupInUse === null ) {
@@ -698,22 +697,22 @@ OBJLoader2Parser.prototype = {
 
 	_buildFace: function ( faceIndexV, faceIndexU, faceIndexN ) {
 
-		let subGroupInUse = this.rawMesh.subGroupInUse;
-		let scope = this;
-		let updateSubGroupInUse = function () {
+		const subGroupInUse = this.rawMesh.subGroupInUse;
+		const scope = this;
+		const updateSubGroupInUse = function () {
 
-			let faceIndexVi = parseInt( faceIndexV );
+			const faceIndexVi = parseInt( faceIndexV );
 			let indexPointerV = 3 * ( faceIndexVi > 0 ? faceIndexVi - 1 : faceIndexVi + scope.vertices.length / 3 );
 			let indexPointerC = scope.colors.length > 0 ? indexPointerV : null;
 
-			let vertices = subGroupInUse.vertices;
+			const vertices = subGroupInUse.vertices;
 			vertices.push( scope.vertices[ indexPointerV ++ ] );
 			vertices.push( scope.vertices[ indexPointerV ++ ] );
 			vertices.push( scope.vertices[ indexPointerV ] );
 
 			if ( indexPointerC !== null ) {
 
-				let colors = subGroupInUse.colors;
+				const colors = subGroupInUse.colors;
 				colors.push( scope.colors[ indexPointerC ++ ] );
 				colors.push( scope.colors[ indexPointerC ++ ] );
 				colors.push( scope.colors[ indexPointerC ] );
@@ -722,9 +721,9 @@ OBJLoader2Parser.prototype = {
 
 			if ( faceIndexU ) {
 
-				let faceIndexUi = parseInt( faceIndexU );
+				const faceIndexUi = parseInt( faceIndexU );
 				let indexPointerU = 2 * ( faceIndexUi > 0 ? faceIndexUi - 1 : faceIndexUi + scope.uvs.length / 2 );
-				let uvs = subGroupInUse.uvs;
+				const uvs = subGroupInUse.uvs;
 				uvs.push( scope.uvs[ indexPointerU ++ ] );
 				uvs.push( scope.uvs[ indexPointerU ] );
 
@@ -732,9 +731,9 @@ OBJLoader2Parser.prototype = {
 
 			if ( faceIndexN && ! scope.disregardNormals ) {
 
-				let faceIndexNi = parseInt( faceIndexN );
+				const faceIndexNi = parseInt( faceIndexN );
 				let indexPointerN = 3 * ( faceIndexNi > 0 ? faceIndexNi - 1 : faceIndexNi + scope.normals.length / 3 );
-				let normals = subGroupInUse.normals;
+				const normals = subGroupInUse.normals;
 				normals.push( scope.normals[ indexPointerN ++ ] );
 				normals.push( scope.normals[ indexPointerN ++ ] );
 				normals.push( scope.normals[ indexPointerN ] );
@@ -746,7 +745,7 @@ OBJLoader2Parser.prototype = {
 		if ( this.useIndices ) {
 
 			if ( this.disregardNormals ) faceIndexN = undefined;
-			let mappingName = faceIndexV + ( faceIndexU ? '_' + faceIndexU : '_n' ) + ( faceIndexN ? '_' + faceIndexN : '_n' );
+			const mappingName = faceIndexV + ( faceIndexU ? '_' + faceIndexU : '_n' ) + ( faceIndexN ? '_' + faceIndexN : '_n' );
 			let indicesPointer = subGroupInUse.indexMappings[ mappingName ];
 			if ( indicesPointer === undefined || indicesPointer === null ) {
 
@@ -793,7 +792,7 @@ OBJLoader2Parser.prototype = {
 	 */
 	_finalizeRawMesh: function () {
 
-		let meshOutputGroupTemp = [];
+		const meshOutputGroupTemp = [];
 		let meshOutputGroup;
 		let absoluteVertexCount = 0;
 		let absoluteIndexMappingsCount = 0;
@@ -802,7 +801,7 @@ OBJLoader2Parser.prototype = {
 		let absoluteNormalCount = 0;
 		let absoluteUvCount = 0;
 		let indices;
-		for ( let name in this.rawMesh.subGroups ) {
+		for ( const name in this.rawMesh.subGroups ) {
 
 			meshOutputGroup = this.rawMesh.subGroups[ name ];
 			if ( meshOutputGroup.vertices.length > 0 ) {
@@ -854,8 +853,8 @@ OBJLoader2Parser.prototype = {
 
 	_processCompletedMesh: function () {
 
-		let result = this._finalizeRawMesh();
-		let haveMesh = result !== null;
+		const result = this._finalizeRawMesh();
+		const haveMesh = result !== null;
 		if ( haveMesh ) {
 
 			if ( this.colors.length > 0 && this.colors.length !== this.vertices.length ) {
@@ -868,7 +867,7 @@ OBJLoader2Parser.prototype = {
 			this.inputObjectCount ++;
 
 			this._buildMesh( result );
-			let progressBytesPercent = this.globalCounts.currentByte / this.globalCounts.totalBytes;
+			const progressBytesPercent = this.globalCounts.currentByte / this.globalCounts.totalBytes;
 			this._onProgress( 'Completed [o: ' + this.rawMesh.objectName + ' g:' + this.rawMesh.groupName + '' +
 				'] Total progress: ' + ( progressBytesPercent * 100 ).toFixed( 2 ) + '%' );
 			this._resetRawMesh();
@@ -887,27 +886,27 @@ OBJLoader2Parser.prototype = {
 	 */
 	_buildMesh: function ( result ) {
 
-		let meshOutputGroups = result.subGroups;
+		const meshOutputGroups = result.subGroups;
 
-		let vertexFA = new Float32Array( result.absoluteVertexCount );
+		const vertexFA = new Float32Array( result.absoluteVertexCount );
 		this.globalCounts.vertices += result.absoluteVertexCount / 3;
 		this.globalCounts.faces += result.faceCount;
 		this.globalCounts.doubleIndicesCount += result.doubleIndicesCount;
-		let indexUA = ( result.absoluteIndexCount > 0 ) ? new Uint32Array( result.absoluteIndexCount ) : null;
-		let colorFA = ( result.absoluteColorCount > 0 ) ? new Float32Array( result.absoluteColorCount ) : null;
-		let normalFA = ( result.absoluteNormalCount > 0 ) ? new Float32Array( result.absoluteNormalCount ) : null;
-		let uvFA = ( result.absoluteUvCount > 0 ) ? new Float32Array( result.absoluteUvCount ) : null;
-		let haveVertexColors = colorFA !== null;
+		const indexUA = ( result.absoluteIndexCount > 0 ) ? new Uint32Array( result.absoluteIndexCount ) : null;
+		const colorFA = ( result.absoluteColorCount > 0 ) ? new Float32Array( result.absoluteColorCount ) : null;
+		const normalFA = ( result.absoluteNormalCount > 0 ) ? new Float32Array( result.absoluteNormalCount ) : null;
+		const uvFA = ( result.absoluteUvCount > 0 ) ? new Float32Array( result.absoluteUvCount ) : null;
+		const haveVertexColors = colorFA !== null;
 
 		let meshOutputGroup;
-		let materialNames = [];
+		const materialNames = [];
 
-		let createMultiMaterial = ( meshOutputGroups.length > 1 );
+		const createMultiMaterial = ( meshOutputGroups.length > 1 );
 		let materialIndex = 0;
-		let materialIndexMapping = [];
+		const materialIndexMapping = [];
 		let selectedMaterialIndex;
 		let materialGroup;
-		let materialGroups = [];
+		const materialGroups = [];
 
 		let vertexFAOffset = 0;
 		let indexUAOffset = 0;
@@ -919,7 +918,7 @@ OBJLoader2Parser.prototype = {
 
 		let materialOrg, material, materialName, materialNameOrg;
 		// only one specific face type
-		for ( let oodIndex in meshOutputGroups ) {
+		for ( const oodIndex in meshOutputGroups ) {
 
 			if ( ! meshOutputGroups.hasOwnProperty( oodIndex ) ) continue;
 			meshOutputGroup = meshOutputGroups[ oodIndex ];
@@ -956,7 +955,7 @@ OBJLoader2Parser.prototype = {
 
 			if ( material === undefined || material === null ) {
 
-				let materialCloneInstructions = {
+				const materialCloneInstructions = {
 					materialNameOrg: materialNameOrg,
 					materialName: materialName,
 					materialProperties: {
@@ -964,7 +963,7 @@ OBJLoader2Parser.prototype = {
 						flatShading: meshOutputGroup.smoothingGroup === 0
 					}
 				};
-				let payload = {
+				const payload = {
 					cmd: 'assetAvailable',
 					type: 'material',
 					materials: {
@@ -974,7 +973,7 @@ OBJLoader2Parser.prototype = {
 				this.callbacks.onAssetAvailable( payload );
 
 				// only set materials if they don't exist, yet
-				let matCheck = this.materials[ materialName ];
+				const matCheck = this.materials[ materialName ];
 				if ( matCheck === undefined || matCheck === null ) {
 
 					this.materials[ materialName ] = materialCloneInstructions;
@@ -1051,7 +1050,7 @@ OBJLoader2Parser.prototype = {
 
 				}
 
-				let createdReport = '\tOutput Object no.: ' + this.outputObjectCount +
+				const createdReport = '\tOutput Object no.: ' + this.outputObjectCount +
 					'\n\t\tgroupName: ' + meshOutputGroup.groupName +
 					'\n\t\tIndex: ' + meshOutputGroup.index +
 					'\n\t\tfaceType: ' + this.rawMesh.faceType +
@@ -1110,7 +1109,7 @@ OBJLoader2Parser.prototype = {
 		if ( this.logging.enabled ) console.info( 'Global output object count: ' + this.outputObjectCount );
 		if ( this._processCompletedMesh() && this.logging.enabled ) {
 
-			let parserFinalReport = 'Overall counts: ' +
+			const parserFinalReport = 'Overall counts: ' +
 				'\n\tVertices: ' + this.globalCounts.vertices +
 				'\n\tFaces: ' + this.globalCounts.faces +
 				'\n\tMultiple definitions: ' + this.globalCounts.doubleIndicesCount;

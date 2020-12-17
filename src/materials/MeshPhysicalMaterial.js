@@ -1,10 +1,9 @@
 import { Vector2 } from '../math/Vector2.js';
 import { MeshStandardMaterial } from './MeshStandardMaterial.js';
 import { Color } from '../math/Color.js';
+import { MathUtils } from '../math/MathUtils.js';
 
 /**
- * @author WestLangley / http://github.com/WestLangley
- *
  * parameters = {
  *  clearcoat: <float>,
  *  clearcoatMap: new THREE.Texture( <Image> ),
@@ -14,6 +13,7 @@ import { Color } from '../math/Color.js';
  *  clearcoatNormalMap: new THREE.Texture( <Image> ),
  *
  *  reflectivity: <float>,
+ *  ior: <float>,
  *
  *  sheen: <Color>,
  *
@@ -43,6 +43,19 @@ function MeshPhysicalMaterial( parameters ) {
 	this.clearcoatNormalMap = null;
 
 	this.reflectivity = 0.5; // maps to F0 = 0.04
+
+	Object.defineProperty( this, 'ior', {
+		get: function () {
+
+			return ( 1 + 0.4 * this.reflectivity ) / ( 1 - 0.4 * this.reflectivity );
+
+		},
+		set: function ( ior ) {
+
+			this.reflectivity = MathUtils.clamp( 2.5 * ( ior - 1 ) / ( ior + 1 ), 0, 1 );
+
+		}
+	} );
 
 	this.sheen = null; // null will disable sheen bsdf
 

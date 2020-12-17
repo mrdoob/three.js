@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function LoadingManager( onLoad, onProgress, onError ) {
 
 	const scope = this;

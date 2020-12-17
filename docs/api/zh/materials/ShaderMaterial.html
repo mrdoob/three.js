@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -44,7 +43,7 @@
 						循环变量必须是*i*。
 					</li>
 					<li>
-						循环必须使用某种空格格式。
+						The value *UNROLLED_LOOP_INDEX* will be replaced with the explicity value of *i* for the given iteration and can be used in preprocessor statements.
 					</li>
 				</ul>
 				<code>
@@ -63,7 +62,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var material = new THREE.ShaderMaterial( {
+		const material = new THREE.ShaderMaterial( {
 
 			uniforms: {
 
@@ -108,7 +107,6 @@
 			[example:webgl_materials_texture_hdr webgl / materials / texture / hdr]<br />
 			[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
 			[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
-			[example:webgl_nearestneighbour webgl / nearestneighbour]<br />
 			[example:webgl_postprocessing_dof2 webgl / postprocessing / dof2]<br />
 			[example:webgl_postprocessing_godrays webgl / postprocessing / godrays]
 		</p>
@@ -310,6 +308,12 @@ this.extensions = {
 			它也可以作为一个字符串直接传递或者通过AJAX加载。
 		</p>
 
+		<h3>[property:String glslVersion]</h3>
+		<p>
+		Defines the GLSL version of custom shader code. Only relevant for WebGL 2 in order to define whether to specify
+		GLSL 3.0 or not. Valid values are *THREE.GLSL1* or *THREE.GLSL3*. Default is *null*.
+		</p>
+
 		<h3>[property:String index0AttributeName]</h3>
 		<p> 如果设置，则调用[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation gl.bindAttribLocation]
 			将通用顶点索引绑定到属性变量。默认值未定义。
@@ -329,12 +333,8 @@ this.extensions = {
 		<p> When set to true, morph target attributes are available in the vertex shader. Default is *false*.
 		</p>
 
-		<h3>[property:boolean morphNormals]</h3>
+		<h3>[property:Boolean morphNormals]</h3>
 		<p> When set to true, morph normal attributes are available in the vertex shader. Default is *false*.
-		</p>
-
-		<h3>[property:WebGLProgram program]</h3>
-		<p> 与此材质相关联的编译后的shader程序，由[page:WebGLRenderer]生成。您应该不需要访问此属性。
 		</p>
 
 		<h3>[property:Boolean flatShading]</h3>

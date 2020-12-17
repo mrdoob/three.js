@@ -1,12 +1,8 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import {
 	Matrix4,
 	Object3D,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var CSS2DObject = function ( element ) {
 

@@ -1,8 +1,3 @@
-/**
-* @author Prashant Sharma / spidersharma03
-* @author Ben Houston / http://clara.io / bhouston
-*/
-
 import {
 	CubeTexture,
 	DataTexture,
@@ -17,8 +12,8 @@ import {
 	RGBEEncoding,
 	RGBFormat,
 	UnsignedByteType
-} from "../../../build/three.module.js";
-import { RGBELoader } from "../loaders/RGBELoader.js";
+} from '../../../build/three.module.js';
+import { RGBELoader } from '../loaders/RGBELoader.js';
 
 var HDRCubeTextureLoader = function ( manager ) {
 
@@ -92,6 +87,7 @@ HDRCubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype 
 			new FileLoader( scope.manager )
 				.setPath( scope.path )
 				.setResponseType( 'arraybuffer' )
+				.setWithCredentials( scope.withCredentials )
 				.load( urls[ i ], function ( buffer ) {
 
 					loaded ++;

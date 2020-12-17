@@ -1,16 +1,3 @@
-/**
- * @author takahiro / https://github.com/takahirox
- *
- * Dependencies
- *  - Ammo.js https://github.com/kripken/ammo.js
- *
- * MMDPhysics calculates physics with Ammo(Bullet based JavaScript Physics engine)
- * for MMD model loaded by MMDLoader.
- *
- * TODO
- *  - Physics in Worker
- */
-
 import {
 	Bone,
 	BoxBufferGeometry,
@@ -24,7 +11,18 @@ import {
 	Quaternion,
 	SphereBufferGeometry,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
+
+/**
+ * Dependencies
+ *  - Ammo.js https://github.com/kripken/ammo.js
+ *
+ * MMDPhysics calculates physics with Ammo(Bullet based JavaScript Physics engine)
+ * for MMD model loaded by MMDLoader.
+ *
+ * TODO
+ *  - Physics in Worker
+ */
 
 /* global Ammo */
 
@@ -1327,7 +1325,7 @@ var MMDPhysics = ( function () {
 						.copy( mesh.matrixWorld )
 						.decompose( position, quaternion, scale )
 						.compose( position, quaternion, scale.set( 1, 1, 1 ) )
-						.getInverse( matrixWorldInv );
+						.invert();
 
 					for ( var i = 0, il = bodies.length; i < il; i ++ ) {
 

@@ -1,10 +1,14 @@
+import {
+	BufferAttribute,
+	BufferGeometry,
+	FileLoader,
+	Float32BufferAttribute,
+	Loader,
+	LoaderUtils,
+	Vector3
+} from '../../../build/three.module.js';
+
 /**
- * @author aleeper / http://adamleeper.com/
- * @author mrdoob / http://mrdoob.com/
- * @author gero3 / https://github.com/gero3
- * @author Mugen87 / https://github.com/Mugen87
- * @author neverhood311 / https://github.com/neverhood311
- *
  * Description: A THREE loader for STL ASCII files, as created by Solidworks and other CAD programs.
  *
  * Supports both binary and ASCII encoded files, with automatic detection of type.
@@ -55,16 +59,6 @@
  *  var mesh = new THREE.Mesh(geometry, materials);
  */
 
-import {
-	BufferAttribute,
-	BufferGeometry,
-	FileLoader,
-	Float32BufferAttribute,
-	Loader,
-	LoaderUtils,
-	Vector3
-} from "../../../build/three.module.js";
-
 
 var STLLoader = function ( manager ) {
 
@@ -80,10 +74,12 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		var scope = this;
 
-		var loader = new FileLoader( scope.manager );
-		loader.setPath( scope.path );
+		var loader = new FileLoader( this.manager );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
+
 		loader.load( url, function ( text ) {
 
 			try {

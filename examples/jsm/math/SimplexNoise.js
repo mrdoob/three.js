@@ -5,7 +5,6 @@
 // Sean McCullough banksean@gmail.com
 //
 // Added 4D noise
-// Joshua Koo zz85nus@gmail.com
 
 /**
  * You can pass in a random number generator object if you like.

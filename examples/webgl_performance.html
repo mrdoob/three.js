@@ -19,16 +19,16 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var container, stats;
+			let stats;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var objects;
+			let objects;
 
-			var mouseX = 0, mouseY = 0;
+			let mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -38,7 +38,7 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -49,16 +49,16 @@
 
 				objects = [];
 
-				var material = new THREE.MeshNormalMaterial();
+				const material = new THREE.MeshNormalMaterial();
 
-				var loader = new THREE.BufferGeometryLoader();
+				const loader = new THREE.BufferGeometryLoader();
 				loader.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
-					for ( var i = 0; i < 5000; i ++ ) {
+					for ( let i = 0; i < 5000; i ++ ) {
 
-						var mesh = new THREE.Mesh( geometry, material );
+						const mesh = new THREE.Mesh( geometry, material );
 
 						mesh.position.x = Math.random() * 8000 - 4000;
 						mesh.position.y = Math.random() * 8000 - 4000;
@@ -125,7 +125,7 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, il = objects.length; i < il; i ++ ) {
+				for ( let i = 0, il = objects.length; i < il; i ++ ) {
 
 					objects[ i ].rotation.x += 0.01;
 					objects[ i ].rotation.y += 0.02;

@@ -31,29 +31,74 @@ export class BufferGeometry extends EventDispatcher {
 	 */
 	id: number;
 	uuid: string;
+
+	/**
+	 * @default ''
+	 */
 	name: string;
+
+	/**
+	 * @default 'BufferGeometry'
+	 */
 	type: string;
+
+	/**
+	 * @default null
+	 */
 	index: BufferAttribute | null;
+
+	/**
+	 * @default {}
+	 */
 	attributes: {
 		[name: string]: BufferAttribute | InterleavedBufferAttribute;
 	};
+
+	/**
+	 * @default {}
+	 */
 	morphAttributes: {
 		[name: string]: ( BufferAttribute | InterleavedBufferAttribute )[];
 	};
+
+	/**
+	 * @default false
+	 */
 	morphTargetsRelative: boolean;
+
+	/**
+	 * @default []
+	 */
 	groups: { start: number; count: number; materialIndex?: number }[];
+
+	/**
+	 * @default null
+	 */
 	boundingBox: Box3 | null;
+
+	/**
+	 * @default null
+	 */
 	boundingSphere: Sphere | null;
+
+	/**
+	 * @default { start: 0, count: Infinity }
+	 */
 	drawRange: { start: number; count: number };
+
+	/**
+	 * @default {}
+	 */
 	userData: {[key: string]: any};
 	readonly isBufferGeometry: true;
 
 	getIndex(): BufferAttribute | null;
-	setIndex( index: BufferAttribute | number[] | null ): void;
+	setIndex( index: BufferAttribute | number[] | null ): BufferGeometry;
 
 	setAttribute( name: string, attribute: BufferAttribute | InterleavedBufferAttribute ): BufferGeometry;
 	getAttribute( name: string ): BufferAttribute | InterleavedBufferAttribute;
 	deleteAttribute( name: string ): BufferGeometry;
+	hasAttribute( name: string ): boolean;
 
 	addGroup( start: number, count: number, materialIndex?: number ): void;
 	clearGroups(): void;

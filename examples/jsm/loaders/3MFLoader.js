@@ -1,23 +1,3 @@
-/**
- * @author technohippy / https://github.com/technohippy
- * @author Mugen87 / https://github.com/Mugen87
- *
- * 3D Manufacturing Format (3MF) specification: https://3mf.io/specification/
- *
- * The following features from the core specification are supported:
- *
- * - 3D Models
- * - Object Resources (Meshes and Components)
- * - Material Resources (Base Materials)
- *
- * 3MF Materials and Properties Extension are only partially supported.
- *
- * - Texture 2D
- * - Texture 2D Groups
- * - Color Groups (Vertex Colors)
- * - Metallic Display Properties (PBR)
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,
@@ -39,8 +19,26 @@ import {
 	RepeatWrapping,
 	TextureLoader,
 	sRGBEncoding
-} from "../../../build/three.module.js";
-import { JSZip } from "../libs/jszip.module.min.js";
+} from '../../../build/three.module.js';
+import { JSZip } from '../libs/jszip.module.min.js';
+
+/**
+ *
+ * 3D Manufacturing Format (3MF) specification: https://3mf.io/specification/
+ *
+ * The following features from the core specification are supported:
+ *
+ * - 3D Models
+ * - Object Resources (Meshes and Components)
+ * - Material Resources (Base Materials)
+ *
+ * 3MF Materials and Properties Extension are only partially supported.
+ *
+ * - Texture 2D
+ * - Texture 2D Groups
+ * - Color Groups (Vertex Colors)
+ * - Metallic Display Properties (PBR)
+ */
 
 var ThreeMFLoader = function ( manager ) {
 
@@ -61,6 +59,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			try {
@@ -113,7 +112,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			try {
 
-				zip = new JSZip( data );
+				zip = new JSZip( data ); // eslint-disable-line no-undef
 
 			} catch ( e ) {
 
@@ -1412,11 +1411,24 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		function fetch3DModelPart( rels ) {
+
+			for ( var i = 0; i < rels.length; i ++ ) {
+
+				var rel = rels[ i ];
+				var extension = rel.target.split( '.' ).pop();
+
+				if ( extension.toLowerCase() === 'model' ) return rel;
+
+			}
+
+		}
+
 		function build( objects, data3mf ) {
 
 			var group = new Group();
 
-			var relationship = data3mf[ 'rels' ][ 0 ];
+			var relationship = fetch3DModelPart( data3mf[ 'rels' ] );
 			var buildData = data3mf.model[ relationship[ 'target' ].substring( 1 ) ][ 'build' ];
 
 			for ( var i = 0; i < buildData.length; i ++ ) {

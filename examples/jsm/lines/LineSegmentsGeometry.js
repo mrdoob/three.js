@@ -1,8 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
 import {
 	Box3,
 	Float32BufferAttribute,
@@ -12,7 +7,7 @@ import {
 	Sphere,
 	Vector3,
 	WireframeGeometry
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var LineSegmentsGeometry = function () {
 

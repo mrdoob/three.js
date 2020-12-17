@@ -1,8 +1,4 @@
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 var APP = {
 
 	Player: function () {
