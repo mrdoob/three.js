@@ -15,6 +15,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { EdgeSplitModifier } from './jsm/modifiers/EdgeSplitModifier.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
@@ -27,6 +28,7 @@
 				edgeSplit: true,
 				cutOffAngle: 20,
 				showMap: false,
+				tryKeepNormals: true,
 			};
 
 			init();
@@ -68,7 +70,7 @@
 						const modelGeometry = cerberus.geometry;
 
 						modifier = new EdgeSplitModifier();
-						baseGeometry = modelGeometry;
+						baseGeometry = BufferGeometryUtils.mergeVertices( modelGeometry );
 
 						mesh = new THREE.Mesh( getGeometry(), new THREE.MeshStandardMaterial() );
 						mesh.material.flatShading = ! params.smoothShading;
@@ -111,6 +113,7 @@
 				gui.add( params, 'smoothShading' ).onFinishChange( updateMesh );
 				gui.add( params, 'edgeSplit' ).onFinishChange( updateMesh );
 				gui.add( params, 'cutOffAngle' ).min( 0 ).max( 180 ).onFinishChange( updateMesh );
+				gui.add( params, 'tryKeepNormals' ).onFinishChange( updateMesh );
 
 			}
 
@@ -132,7 +135,11 @@
 
 				if ( params.edgeSplit ) {
 
-					geometry = modifier.modify( baseGeometry, params.cutOffAngle * Math.PI / 180 );
+					geometry = modifier.modify(
+						baseGeometry,
+						params.cutOffAngle * Math.PI / 180,
+						params.tryKeepNormals
+					);
 
 				} else {
 
