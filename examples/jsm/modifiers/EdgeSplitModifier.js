@@ -160,7 +160,7 @@ var EdgeSplitModifier = function () {
 
 	this.modify = function ( geometry, cutOffAngle ) {
 
-		const wasNotBufferGeometry = ! geometry.isBufferGeometry;
+		const wasNotBufferGeometry = geometry.isBufferGeometry === undefined;
 		if ( ! geometry.isBufferGeometry ) {
 
 			geometry = new BufferGeometry().fromGeometry( geometry );
@@ -173,7 +173,7 @@ var EdgeSplitModifier = function () {
 
 			hadNormals = true;
 
-			if ( ! wasNotBufferGeometry )
+			if ( wasNotBufferGeometry === false )
 				geometry = geometry.clone();
 
 			geometry.deleteAttribute( 'normal' );
