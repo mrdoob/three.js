@@ -156,9 +156,6 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	parse: function ( data, onLoad, onError ) {
 
-		// issue: https://github.com/mcneel/rhino3dm/issues/338
-		// issue: https://github.com/emscripten-core/emscripten/issues/13065
-
 		if ( data instanceof Uint8Array ) {
 
 			data = new Uint8Array( data ).buffer;
