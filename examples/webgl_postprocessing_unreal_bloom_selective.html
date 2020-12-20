@@ -125,7 +125,7 @@
 
 			var mouse = new THREE.Vector2();
 
-			window.addEventListener( 'click', onDocumentMouseClick, false );
+			window.addEventListener( 'pointerdown', onDocumentPointerDown, false );
 
 			var gui = new GUI();
 
@@ -181,7 +181,7 @@
 
 			setupScene();
 
-			function onDocumentMouseClick( event ) {
+			function onDocumentPointerDown( event ) {
 
 				event.preventDefault();
 
