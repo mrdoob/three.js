@@ -156,7 +156,7 @@ function Viewport( editor ) {
 
 	function getIntersects( point, objects ) {
 
-		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
+		mouse.set( point.x * 2 - 1, - point.y * 2 + 1 );
 
 		raycaster.setFromCamera( mouse, camera );
 

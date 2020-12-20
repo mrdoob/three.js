@@ -302,18 +302,18 @@ class Vector4 {
 			m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ],
 			m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ];
 
-		if ( ( Math.abs( m12 - m21 ) < epsilon ) &&
-		     ( Math.abs( m13 - m31 ) < epsilon ) &&
-		     ( Math.abs( m23 - m32 ) < epsilon ) ) {
+		if ( Math.abs( m12 - m21 ) < epsilon &&
+		     Math.abs( m13 - m31 ) < epsilon &&
+		     Math.abs( m23 - m32 ) < epsilon ) {
 
 			// singularity found
 			// first check for identity matrix which must have +1 for all terms
 			// in leading diagonal and zero in other terms
 
-			if ( ( Math.abs( m12 + m21 ) < epsilon2 ) &&
-			     ( Math.abs( m13 + m31 ) < epsilon2 ) &&
-			     ( Math.abs( m23 + m32 ) < epsilon2 ) &&
-			     ( Math.abs( m11 + m22 + m33 - 3 ) < epsilon2 ) ) {
+			if ( Math.abs( m12 + m21 ) < epsilon2 &&
+			     Math.abs( m13 + m31 ) < epsilon2 &&
+			     Math.abs( m23 + m32 ) < epsilon2 &&
+			     Math.abs( m11 + m22 + m33 - 3 ) < epsilon2 ) {
 
 				// this singularity is identity matrix so angle = 0
 
@@ -334,7 +334,7 @@ class Vector4 {
 			const xz = ( m13 + m31 ) / 4;
 			const yz = ( m23 + m32 ) / 4;
 
-			if ( ( xx > yy ) && ( xx > zz ) ) {
+			if ( xx > yy && xx > zz ) {
 
 				// m11 is the largest diagonal term
 
@@ -585,7 +585,7 @@ class Vector4 {
 
 	equals( v ) {
 
-		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
+		return v.x === this.x && v.y === this.y && v.z === this.z && v.w === this.w;
 
 	}
 

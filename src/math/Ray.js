@@ -374,7 +374,7 @@ class Ray {
 
 		}
 
-		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
+		if ( tmin > tymax || tymin > tmax ) return null;
 
 		// These lines also handle the case where tmin or tmax is NaN
 		// (result of 0 * Infinity). x !== x returns true if x is NaN
@@ -395,7 +395,7 @@ class Ray {
 
 		}
 
-		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
+		if ( tmin > tzmax || tzmin > tmax ) return null;
 
 		if ( tzmin > tmin || tmin !== tmin ) tmin = tzmin;
 

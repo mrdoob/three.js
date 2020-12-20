@@ -769,7 +769,7 @@ var BufferGeometryUtils = {
 
 			}
 
-			if ( ( newIndices.length / 3 ) !== numberOfTriangles ) {
+			if ( newIndices.length / 3 !== numberOfTriangles ) {
 
 				console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Unable to generate correct amount of triangles.' );
 
