@@ -1,10 +1,10 @@
 import { JSDOM } from "jsdom";
 
 const jsdomOptions = {
-  pretendToBeVisual: true,
-  storageQuota: 1e9,
-  resources: "usable",
-  runScripts: "dangerously"
+	pretendToBeVisual: true,
+	storageQuota: 1e9,
+	resources: "usable",
+	runScripts: "dangerously"
 };
 
 const jsdom = new JSDOM(
@@ -13,7 +13,6 @@ const jsdom = new JSDOM(
 );
 
 const window = jsdom.window;
-
 export const Blob = window.Blob;
 export const atob = window.atob;
 export const DOMParser = window.DOMParser;
