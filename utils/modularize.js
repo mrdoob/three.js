@@ -3,7 +3,7 @@ THREE = require( '../build/three.js' );
 
 var srcFolder = __dirname + '/../examples/js/';
 var dstFolder = __dirname + '/../examples/jsm/';
-var dstFolderNode = __dirname + '/../examples/node/jsm/';
+var dstFolderNode = __dirname + '/../examples/node/';
 
 var files = [
 	{ path: 'animation/AnimationClipCreator.js', dependencies: [], ignoreList: [] },
@@ -74,8 +74,7 @@ var files = [
 	{ path: 'loaders/EXRLoader.js', dependencies: [ { name: 'Inflate', path: 'libs/inflate.module.min.js' } ], ignoreList: [] },
 	{ path: 'loaders/FBXLoader.js', dependencies: [ { name: 'Inflate', path: 'libs/inflate.module.min.js' }, { name: 'NURBSCurve', path: 'curves/NURBSCurve.js' } ], ignoreList: [] },
 	{ path: 'loaders/GCodeLoader.js', dependencies: [], ignoreList: [] },
-	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'Camera', 'Texture' ] },
-	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'Camera', 'Texture' ], nodeVersion: "yes" },
+	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'Camera', 'Texture' ], nodeVersion: 'loaders/GLTFLoader.js' },
 	{ path: 'loaders/HDRCubeTextureLoader.js', dependencies: [ { name: 'RGBELoader', path: 'loaders/RGBELoader.js' } ], ignoreList: [] },
 	{ path: 'loaders/KMZLoader.js', dependencies: [ { name: 'ColladaLoader', path: 'loaders/ColladaLoader.js' }, { name: 'JSZip', path: 'libs/jszip.module.min.js' } ], ignoreList: [] },
 	{ path: 'loaders/LDrawLoader.js', dependencies: [], ignoreList: [ 'Cache', 'Material', 'Object3D' ] },
@@ -231,13 +230,20 @@ var files = [
 for ( var i = 0; i < files.length; i ++ ) {
 
 	var file = files[ i ];
-	convert( file.path, file.dependencies, file.ignoreList, file.nodeVersion );
+	convert( file.path, file.dependencies, file.ignoreList, false );
+
+	if ( file.nodeVersion ) {
+
+		convert( file.nodeVersion, file.dependencies, file.ignoreList, true );
+
+	}
+
 
 }
 
 //
 
-function convert( path, exampleDependencies, ignoreList, nodeVersion ) {
+function convert( path, exampleDependencies, ignoreList, isNode ) {
 
 	var contents = fs.readFileSync( srcFolder + path, 'utf8' );
 
@@ -312,7 +318,7 @@ function convert( path, exampleDependencies, ignoreList, nodeVersion ) {
 
 	if ( keys ) {
 
-		if ( nodeVersion ) {
+		if ( isNode ) {
 
 			imports.push( `import {${keys}\n} from "${pathPrefix}../../../build/three.module.node.js";` );
 
@@ -341,7 +347,7 @@ function convert( path, exampleDependencies, ignoreList, nodeVersion ) {
 	// console.log( output );
 	if ( keys ) {
 
-		if ( nodeVersion ) {
+		if ( isNode ) {
 
 			fs.writeFileSync( dstFolderNode + path, output, 'utf-8' );
 
