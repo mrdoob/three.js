@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			AnimationClip은 재활용 가능한 키프레임 트랙 모음으로, 애니메이션을 대표하는 단위입니다.<br /><br />
+
+			three.js 애니메이션 시스템의 다양한 엘레먼트에 관해서는 매뉴얼의 "심화과정" 중 "애니메이션 시스템" 문서를 참고하세요.
+		</p>
+
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]( [param:String name], [param:Number duration], [param:Array tracks] )</h3>
+		<p>
+			[page:String name] - 클립의 이름.<br />
+			[page:Number duration] - 클립의 길이 (초 단위). 음수 값을 입력하면 길이는 *tracks* 배열에서 계산됩니다.<br />
+			[page:Array tracks] - [page:KeyframeTrack KeyframeTracks] 배열.<br /><br />
+
+			참고: AnimationClip를 직접 인스턴스로 만드는 것보다, 정적 메서드를 활용하여 AnimationClips를 만드는 것이 좋습니다: 
+			JSON ([page:.parse parse]), 모프 타겟 시퀀스 ([page:.CreateFromMorphTargetSequence CreateFromMorphTargetSequence],
+			[page:.CreateClipsFromMorphTargetSequences CreateClipsFromMorphTargetSequences]) 혹은
+			애니메이션 계층 ([page:.parseAnimation parseAnimation])을 활용하세요. - 모델의 기하학 애니메이션 배열에 AnimationClips가 없을 경우.
+		</p>
+
+
+		<h2>프로퍼티</h2>
+
+
+		<h3>[property:Number duration]</h3>
+		<p>
+			클립의 길이입니다(초 단위). 이 값은 [page:.tracks tracks] 배열에서 [page:.resetDuration resetDuration]를 통해 계산할 수 있습니다.
+		</p>
+
+		<h3>[property:String name]</h3>
+		<p>
+			클립의 이름입니다. 특정 클립은 [page:.findByName findByName]으로 찾을 수 있습니다.
+		</p>
+
+		<h3>[property:Array tracks]</h3>
+		<p>
+			이 클립에서 재생되는 각 프로퍼티에 [page:KeyframeTrack]을 포함하고 있는 배열입니다.
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+			클립 인스턴스의 [link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]입니다.
+			자동으로 할당되며 수정할 수 없습니다.
+		</p>
+
+
+		<h2>메서드</h2>
+
+
+		<h3>[method:AnimationClip clone]()</h3>
+		<p>
+			클립의 복사본을 리턴합니다.
+		</p>
+
+		<h3>[method:this optimize]()</h3>
+		<p>
+			동일한 시퀀스 키를 제거해 각 트랙을 최적화합니다(모프 타겟 시퀀스에서는 흔한 작업입니다).
+		</p>
+
+		<h3>[method:this resetDuration]()</h3>
+		<p>
+			클립의 [page:.duration duration]을 가장 긴 [page:KeyframeTrack]의 길이로 설정합니다.
+		</p>
+
+		<h3>[method:Object toJSON]()</h3>
+		<p>
+			애니메이션 클립을 직렬화한 JSON object를 리턴합니다.
+		</p>
+
+		<h3>[method:this trim]()</h3>
+		<p>
+			클립의 길이에 맞춰 모든 트랙의 공백을 제거합니다.
+		</p>
+
+		<h3>[method:Boolean validate]()</h3>
+		<p>
+			클립에 있는 트랙들의 최소 유효성 검사를 시행합니다. 모든 트랙이 유효하면 true를 리턴합니다.
+		</p>
+
+
+		<h2>정적 메서드</h2>
+
+
+		<h3>[method:Array CreateClipsFromMorphTargetSequences]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
+		<p>
+			geometry의 [page:Geometry.morphTargets morph
+			target sequences]를 통해 생성된 새 AnimationClips 배열을 리턴하고 , 
+			모프 타겟 이름을 애니메이션-그룹-기반의 "Walk_001, Walk_002, Run_001, Run_002 ..."와 같은 패턴으로 정리합니다.
+		</p>
+
+		<h3>[method:AnimationClip CreateFromMorphTargetSequence]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
+		<p>
+			geometry에서 넘어온 [page:Geometry.morphTargets morph targets array]를 통해 
+			초 단위의 프레임 수와 이름을 받아 새 AnimationClip을 리턴합니다.
+			<br /><br />
+
+			참고: fps 파라미터가 필요하지만, 애니메이션 속도는 [page:AnimationAction.setDuration animationAction.setDuration]을 통한 
+			*AnimationAction*에 의해 오버라이딩될 수 있습니다.
+		</p>
+
+		<h3>[method:AnimationClip findByName]( [param:Object objectOrClipArray], [param:String name] )</h3>
+		<p>
+			Searches for an AnimationClip을 위한 검색기로, 첫 파라미터 혹은 AnimationClips 배열, "animations"라는 이름을 가진 mesh, geometry 베열로부터 이름을 기반으로 검색합니다.
+		</p>
+
+		<h3>[method:AnimationClip parse]( [param:Object json] )</h3>
+		<p>
+			클립의 JSON 파일을 파싱하고 AnimationClip을 리턴합니다.
+		</p>
+
+		<h3>[method:AnimationClip parseAnimation]( [param:Object animation], [param:Array bones] )</h3>
+		<p>
+			animation.hierarchy 포맷을 파싱하고 AnimationClip을 리턴합니다.
+		</p>
+
+		<h3>[method:Object toJSON]( [param:AnimationClip clip] )</h3>
+		<p>
+			AnimationClip을 받아 JSON 객체를 리턴합니다.
+		</p>
+
+
+		<h2>소스 코드</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

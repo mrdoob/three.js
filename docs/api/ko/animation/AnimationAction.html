@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			AnimationActions는 [page:AnimationClip AnimationClips]에 저장되어 있는 애니메이션들의 실행 스케쥴을 관리합니다.<br /><br />
+
+			참고: 대부분의 AnimationAction 메서드들은 서로 연결될 수 있습니다.<br /><br />
+
+			three.js 애니메이션 시스템의 다양한 엘레먼트에 관해서는 매뉴얼의 "심화과정" 중 "애니메이션 시스템" 문서를 참고하세요
+		</p>
+
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]( [param:AnimationMixer mixer], [param:AnimationClip clip], [param:Object3D localRoot] )</h3>
+		<p>
+			[page:AnimationMixer mixer] - 해당 동작에 의해 실행되는 *AnimationMixer*.<br />
+			[page:AnimationClip clip] - 해당 동작의 애니메이션 데이터를 담고 있는 *AnimationClip*.<br />
+			[page:Object3D localRoot] - 동작이 수행되는 루트 오브젝트<br /><br />
+
+			Note: 생성자를 직접 호출하는 것보다, [page:AnimationMixer.clipAction] 인스턴스를 생성해야 이 메서드들의 캐싱 퍼포먼스가 더 좋아집니다.
+		</p>
+
+
+		<h2>프로퍼티</h2>
+
+
+		<h3>[property:Boolean clampWhenFinished]</h3>
+		<p>
+			*clampWhenFinished* 값이 true면 애니메이션은 마지막 프레임에서 자동으로 [page:.paused paused]
+			상태가 됩니다.<br /><br />
+
+			*clampWhenFinished* 값이 false면, 동작의 마지막 루프가 끝나면 자동으로 [page:.enabled enabled] 가 false로 변경돼 동작이 더 이상 영향을 미치지 않을 것입니다.<br /><br />
+
+			기본값은 false입니다.<br /><br />
+
+			참고: *clampWhenFinished*는 동작이 중단되면 아무 영향을 미치지 않습니다 (마지막 루프가 실제로 끝나야 작동합니다.)
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			*enabled* 를 *false*로 바꾸면 해당 동작을 비활성화하고 아무런 영향이 없게 만듭니다. 기본값은 *true*입니다.<br /><br />
+
+			동작이 다시 활성화되면 애니메이션은 현재 [page:.time time]부터 다시 재생됩니다(*enabled*를 *false*로 설정하는 것은 동작을 리셋시키지 않습니다).<br /><br />
+
+			참고: *enabled*를 *true*로 설정해도, 애니메이션을 자동으로 재시작시키는 않습니다. *enabled*를 *true*로 설정하는 것은
+			다음 조건을 만족해야만 애니메이션을 재시작할 것입니다:
+			[page:.paused paused]가 *false*이며, 실행 도중에 비활성화 된 적이 없어야 하고([page:.stop stop] 혹은 [page:.reset reset] 명령어를 사용), 
+			[page:.weight weight]와 [page:.timeScale timeScale]가 모두 0이어야 합니다.
+		</p>
+
+		<h3>[property:Number loop]</h3>
+		<p>
+			루프 모드에 관한 프로퍼티입니다([page:.setLoop setLoop]로 변경 가능합니다). 기본값은 [page:Animation THREE.LoopRepeat]([page:.repetitions repetitions]의 무한대값)입니다. 
+			<br /><br />
+
+			반드시 아래 상수 중 하나여야 합니다:<br /><br />
+			[page:Animation THREE.LoopOnce] - 한 번 반복합니다.<br />
+			[page:Animation THREE.LoopRepeat] - *repetitions*의 수만큼 반복합니다.
+			마지막 시점마다 맨 처음으로 돌아갑니다.<br />
+			[page:Animation THREE.LoopPingPong] - *repetitions*의 수만큼 반복하고,
+			재생과 역재생을 번갈아가며 합니다.
+		</p>
+
+		<h3>[property:Boolean paused]</h3>
+		<p>
+			*paused*를 *true*로 설정하면 활성화된 시간 배속을 0으로 만들어 동작 실행을 중지시킵니다. 기본값은 *false*입니다.<br /><br />
+		</p>
+
+		<h3>[property:Number repetitions]</h3>
+		<p>
+			해당 동작에서 수행된 [page:AnimationClip] 반복 횟수를 나타냅니다.
+			[page:.setLoop setLoop]를 통해 설정합니다. 기본값은 *Infinity*입니다.<br /><br />
+			[page:.loop loop mode]가 [page:Animation THREE.LoopOnce]로 되어 있으면
+			수치를 변경해도 아무런 영향을 주지 않습니다.
+		</p>
+
+		<h3>[property:Number time]</h3>
+		<p>
+			해당 동작의 로컬타임입니다. (0부터 시작해 초 단위).<br /><br />
+
+			이 값은 0부터 clop.curation(루프 설정에 따라)로 지정됩니다.
+			이 값은 [page:.timeScale timeScale]을 [page:.setEffectiveTimeScale setEffectiveTimeScale] 및 [page:.setDuration setDuration]을 
+			통해 글로벌 시간 배속에 맞춰 적용될 수 있습니다.<br />
+		</p>
+
+		<h3>[property:Number timeScale]</h3>
+		<p>
+			[page:.time time]의 배속입니다. 0으로 설정하면 애니메이션을 정지시킵니다. 
+			음수 값은 애니메이션을 역재생시킵니다. 기본값은 1입니다.<br /><br />
+			*timeScale*과 관련된 (각각의 *time*에 대해) 프로퍼티/메서드는 다음과 같습니다:
+			[page:.getEffectiveTimeScale getEffectiveTimeScale],
+			[page:.halt halt],
+			[page:.paused paused],
+			[page:.setDuration setDuration],
+			[page:.setEffectiveTimeScale setEffectiveTimeScale],
+			[page:.stopWarping stopWarping],
+			[page:.syncWith syncWith],
+			[page:.warp warp].
+		</p>
+
+		<h3>[property:Number weight]</h3>
+		<p>
+			동작의 영향 가중치입니다. (값 범위 [0, 1]). 0(영향 없음)과 1(최대 영향) 값은 여러 동작간에 사용될 수 있습니다. 기본값은 1입니다. <br /><br />
+			*weight*와 관련된 프로퍼티/메서드는 다음과 같습니다:
+			[page:.crossFadeFrom crossFadeFrom],
+			[page:.crossFadeTo crossFadeTo],
+			[page:.enabled enabled],
+			[page:.fadeIn fadeIn],
+			[page:.fadeOut fadeOut],
+			[page:.getEffectiveWeight getEffectiveWeight],
+			[page:.setEffectiveWeight setEffectiveWeight],
+			[page:.stopFading stopFading].
+		</p>
+
+		<h3>[property:Boolean zeroSlopeAtEnd]</h3>
+		<p>
+			개별 클립의 시작, 루프, 끝과 상관없이 부드러운 보간법을 가능하게 합니다. 기본값은 *true*입니다.
+		</p>
+
+		<h3>[property:Boolean zeroSlopeAtStart]</h3>
+		<p>
+			개별 클립의 시작, 루프, 끝과 상관없이 부드러운 보간법을 가능하게 합니다. 기본값은 *true*입니다.
+		</p>
+
+
+		<h2>메서드</h2>
+
+
+		<h3>[method:AnimationAction crossFadeFrom]( [param:AnimationAction fadeOutAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
+		<p>
+			해당 동작을 [page:.fadeIn fade in]에서 사용하면, 다른 동작으로 동시에 페이드 아웃되고, 시간 인터벌도 이어집니다.
+			이 메서드는 연결해서 사용할 수 있습니다.<br /><br />
+
+			warpBoolean이 true면, 추가 [page:.warp warping] (점진적 시간 배속 변경)이 적용될 것입니다.
+			<br /><br />
+
+			참고: *fadeIn*/*fadeOut*처럼, 페이딩의 시작/끝은 가중치가 1입니다.
+
+		</p>
+
+		<h3>[method:AnimationAction crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
+		<p>
+			해당 동작을 [page:.fadeOut fade out]에서 사용하면, 다른 동작으로 페이드 인 되고 시간 인터벌도 이어집니다.
+			이 메서드는 연결해서 사용할 수 있습니다.<br /><br />
+			
+			warpBoolean이 true면, 추가 [page:.warp warping] (점진적 시간 배속 변경)이 적용될 것입니다.
+			<br /><br />
+
+			참고: *fadeIn*/*fadeOut*처럼, 페이딩의 시작/끝은 가중치가 1입니다.
+		</p>
+
+		<h3>[method:AnimationAction fadeIn]( [param:Number durationInSeconds] )</h3>
+		<p>
+			해당 동작의 [page:.weight weight]를 0 부터 1까지 점진적으로 올리고 시간 인터벌도 이어집니다.
+			이 메서드는 연결해서 사용할 수 있습니다.
+		</p>
+
+		<h3>[method:AnimationAction fadeOut]( [param:Number durationInSeconds] )</h3>
+		<p>
+			해당 동작의 [page:.weight weight]를 1 부터 0까지 점진적으로 내리고 시간 인터벌도 이어집니다.
+			이 메서드는 연결해서 사용할 수 있습니다.
+		</p>
+
+		<h3>[method:Number getEffectiveTimeScale]()</h3>
+		<p>
+			활성화된 시간 배속을 리턴합니다. (현 상태의 워핑과 [page:.paused paused]를 반영한 값).
+		</p>
+
+		<h3>[method:number getEffectiveWeight]()</h3>
+		<p>
+			활성화된 가중치를 리턴합니다. (연 상태의 페이딩과 [page:.enabled enabled]를 반영한 값).
+		</p>
+
+		<h3>[method:AnimationClip getClip]()</h3>
+		<p>
+			해당 동작의 애니메이션 데이터를 담고있는 클립을 리턴합니다.
+		</p>
+
+		<h3>[method:AnimationMixer getMixer]()</h3>
+		<p>
+			해당 동작과 관련된 믹서를 리턴합니다.
+		</p>
+
+		<h3>[method:Object3D getRoot]()</h3>
+		<p>
+			해당 동작이 수행된 루트 오브젝트를 리턴합니다.
+		</p>
+
+		<h3>[method:AnimationAction halt]( [param:Number durationInSeconds] )</h3>
+		<p>
+			해당 애니메이션의 속도를 [page:.timeScale timeScale]을 점진적으로 줄여(현재값부터 시작해서) 0으로 만듭니다.
+			시간 인터벌도 이어지며 이 메서드는 연결해서 사용할 수 있습니다.
+		</p>
+
+		<h3>[method:Boolean isRunning]()</h3>
+		<p>
+			해당 동작의 [page:.time time] 이 재생중이면 true를 리턴합니다.<br /><br />
+
+			믹서를 통한 활성화([page:.isScheduled isScheduled] 참고)와 더불어, 아래 조건이 만족되어야 합니다:
+			[page:.paused paused]가 false이고, [page:.enabled enabled]가 true이며,
+			[page:.timeScale timeScale]이 0이 아니어야 하고, 지연 시작 예정([page:.startAt startAt])이 없어야 합니다.
+			<br /><br />
+
+			참고: *isRunning* 의 true 값은 애니메이션이 실제로 보여지는지에 대해서는 상관이 없습니다.
+			이 값은 [page:.weight weight]가 0이 아닌 값으로 설정되었을 때에만 적용됩니다.
+		</p>
+
+		<h3>[method:Boolean isScheduled]()</h3>
+		<p>
+			믹서에서 해당 동작이 활성화되었으면 true를 리턴합니다.<br /><br />
+			참고: 애니메이션이 실제로 동작하는지를 무조건적으로 의미하는 것이 아닙니다 ([page:.isRunning isRunning]의 추가 조건과 비교해 보세요).
+		</p>
+
+		<h3>[method:AnimationAction play]()</h3>
+		<p>
+			믹서에게 동작을 수행하도록 명령합니다. 이 메서드는 연결해서 사용할 수 있습니다.<br /><br />
+
+			참고: 이 메서드를 실행한다고 애니메이션이 무조건 즉시 실행되는 것은 아닙니다:
+			동작이 이전에 종료되었거나(마지막 루프의 끝에 도착한 경우), 지연 시작이 설정되었을 경우([page:.startAt startAt]를 통해), 
+			[page:.reset reset] 이 반드시 먼저 실행되어야 합니다. 
+			다른 몇몇 설정들도([page:.paused paused]=true, [page:.enabled enabled]=false,
+			[page:.weight weight]=0, [page:.timeScale timeScale]=0) 애니메이션 재생을 막을 수 있습니다.
+		</p>
+
+		<h3>[method:AnimationAction reset]()</h3>
+		<p>
+			동작을 리셋합니다. 이 메서드는 연결해서 사용할 수 있습니다.<br /><br />
+
+			이 메서드는 [page:.paused paused]를 false로, [page:.enabled enabled] 를 true로 만들고,
+			[page:.time time]을 0으로, 예약된 페이징이나 워핑을 중단하고, 인터벌 루프 카운트와 지연 시작 예약을 제거합니다.<br /><br />
+
+			참고: .*reset*은 언제나 [page:.stop stop]에서 호출되지만, .*reset*은 .*stop* 자신을 호출하지 않습니다.
+			이 말은 즉, 만약 리셋과 정지를 둘 다 하고 싶으면 .*reset*;을 호출하지 말고 .*stop*을 호출하세요.
+		</p>
+
+		<h3>[method:AnimationAction setDuration]( [param:Number durationInSeconds] )</h3>
+		<p>
+			해당 동작의 단일 루프 길이를 설정합니다([page:.timeScale timeScale] 조정 및 예약 워핑 중지를 통해). 이 메서드는 연결해서 사용할 수 있습니다.
+		</p>
+
+		<h3>[method:AnimationAction setEffectiveTimeScale]( [param:Number timeScale] )</h3>
+		<p>
+			[page:.timeScale timeScale]을 설정하고 모든 예약 워핑을 중지합니다. 이 메서드는 연결해서 사용할 수 있습니다.<br /><br />
+
+			[page:.paused paused]가 false면, 활성화된 시간 배속(인터벌 프로퍼티)도 이 값으로 설정될 것입니다. 
+			그 외의 경우에는 시간 배속(해당 시점의 애니이션에 직접 영향을 주는)은 0으로 설정될 것입니다.
+			<br /><br />
+
+			참고: *timeScale*이 이 메서드로 0으로 설정되면 .*paused*가 자동으로 *true* 로 바뀌지 않습니다.
+		</p>
+
+		<h3>[method:AnimationAction setEffectiveWeight]( [param:Number weight] )</h3>
+		<p>
+			[page:.weight weight]를 성정하고 모든 예약 페이딩을 중지합니다. 이 메서드는 연결해서 사용할 수 있습니다.<br /><br />
+
+			[page:.enabled enabled]가 true면, 활성화된 weight (인터벌 프로퍼티)도 이 값으로 설정될 것입니다.
+			그 외의 경우에는 활성화된 weight(해당 시점의 애니이션에 직접 영향을 주는)는 0으로 설정될 것입니다.<br /><br />
+
+			참고: .*weight*가 이 메서드로 0으로 설정되면, .*enabled*가 자동으로 *false* 바뀌지 않습니다.
+		</p>
+
+		<h3>[method:AnimationAction setLoop]( [param:Number loopMode], [param:Number repetitions] )</h3>
+		<p>
+			[page:.loop loop mode]와 [page:.repetitions repetitions]의 수치를 설정합니다. 이 메서드는 연결해서 사용할 수 있습니다.
+		</p>
+
+		<h3>[method:AnimationAction startAt]( [param:Number startTimeInSeconds] )</h3>
+		<p>
+			지연 시작 시간을 정의합니다(대부분 [page:AnimationMixer.time] +	deltaTimeInSeconds를 통해). 이 메서드는 연결해서 사용할 수 있습니다.<br /><br />
+
+			참고: *startAt*이 [page:.play play]와 연결되어 있거나, 
+			믹서에서 동작이 이미 활성화되었을 경우(해당 시점에서 정지 혹은 리셋 없이 이전 시점의 .*play* 호출로),
+			애니메이션은 해당 시간에만 시작될 것입니다.
+		</p>
+
+		<h3>[method:AnimationAction stop]()</h3>
+		<p>
+			믹서에게 해당 동작을 비활성화 하도록 명령합니다. 이 메서드는 연결해서 사용할 수 있습니다.<br /><br />
+
+			해당 동작은 완전히 정지되고 [page:.reset reset]될 것입니다.<br /><br />
+
+			참고: 동일 믹서의 모든 활성화 동작은 [page:AnimationMixer.stopAllAction mixer.stopAllAction]를 통해 한꺼번에 정지할 수 있습니다.
+		</p>
+
+		<h3>[method:AnimationAction stopFading]()</h3>
+		<p>
+			해당 동작에 적용된 모든 [page:.fadeIn fading]을 정지시킵니다. 이 메서드는 연결해서 사용할 수 있습니다.
+		</p>
+
+		<h3>[method:AnimationAction stopWarping]()</h3>
+		<p>
+			해당 동작에 적용된 모든 [page:.warp warping]을 정지시킵니다. 이 메서드는 연결해서 사용할 수 있습니다.
+		</p>
+
+		<h3>[method:AnimationAction syncWith]( [param:AnimationAction otherAction] )</h3>
+		<p>
+			전달된 동작과 해당 동작의 싱크를 맞춥니다. 이 메서드는 연결해서 사용할 수 있습니다.<br /><br />
+
+			해당 동작의 [page:.time time] 과 [page:.timeScale timeScale] 값을 다른 동작과의 값과 맞춰 
+			동기화할 수 있습니다.(모든 예약 워핑을 정지합니다).<br /><br />
+
+			참고: 다른 동작들의 *time* and *timeScale*의 미래 시점의 변화는 알 수 없습니다.
+		</p>
+
+		<h3>[method:AnimationAction warp]( [param:Number startTimeScale], [param:Number endTimeScale], [param:Number durationInSeconds] )</h3>
+		<p>
+			[page:.timeScale timeScale]를 *startTimeScale*에서 *endTimeScale*로 점진적으로 수정해 연결된 타임 인터벌에서 재생 속도를 변경합니다. 
+			이 메서드는 연결해서 사용할 수 있습니다.
+		</p>
+
+
+		<h2>이벤트</h2>
+
+
+		<p class="desc">
+			동작의 단일 루프 종료와 전체 동작 종료를 알려주는 두 가지 이벤트가 있습니다. 다음과 같이 활용할 수 있습니다:
+		</p>
+		<code>
+		mixer.addEventListener( 'loop', function( e ) { …} ); // properties of e: type, action and loopDelta
+		mixer.addEventListener( 'finished', function( e ) { …} ); // properties of e: type, action and direction
+		</code>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
