@@ -428,13 +428,17 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'PointSet':
 
 				var geometry = loader.parse( obj.geometry );
-				var _color = attributes.drawColor;
-				var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
-				var material = new PointsMaterial( { color: color, sizeAttenuation: false, size: 2 } );
 
+				var material = null;
 				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
 
-					material.vertexColors = true;
+					material = new PointsMaterial( { vertexColors: true, sizeAttenuation: false, size: 2 } );
+
+				} else {
+
+					var _color = attributes.drawColor;
+					var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+					material = new PointsMaterial( { color: color, sizeAttenuation: false, size: 2 } );
 
 				}
 
