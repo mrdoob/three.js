@@ -63,6 +63,7 @@
     "lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
     "test-lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
     "test-unit": "npm run unit --prefix test",
+    "test-unit-node": "npm run unit-node --prefix test",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "make-screenshot": "node test/e2e/puppeteer.js --make"
