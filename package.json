@@ -3,7 +3,7 @@
   "version": "0.123.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
-  "module": "build/three.module.node.js",
+  "module": "build/three.module.js",
   "types": "src/Three.d.ts",
   "repository": {
     "type": "git",
