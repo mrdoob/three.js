@@ -424,7 +424,7 @@ function Loader( editor ) {
 					var { PLYLoader } = await import( '../../examples/jsm/loaders/PLYLoader.js' );
 
 					var geometry = new PLYLoader().parse( contents );
-					geometry.sourceType = "ply";
+					geometry.sourceType = 'ply';
 					geometry.sourceFile = file.name;
 
 					var material = new THREE.MeshStandardMaterial();
@@ -448,7 +448,7 @@ function Loader( editor ) {
 					var { STLLoader } = await import( '../../examples/jsm/loaders/STLLoader.js' );
 
 					var geometry = new STLLoader().parse( contents );
-					geometry.sourceType = "stl";
+					geometry.sourceType = 'stl';
 					geometry.sourceFile = file.name;
 
 					var material = new THREE.MeshStandardMaterial();
@@ -529,7 +529,7 @@ function Loader( editor ) {
 					var { VTKLoader } = await import( '../../examples/jsm/loaders/VTKLoader.js' );
 
 					var geometry = new VTKLoader().parse( contents );
-					geometry.sourceType = "vtk";
+					geometry.sourceType = 'vtk';
 					geometry.sourceFile = file.name;
 
 					var material = new THREE.MeshStandardMaterial();
