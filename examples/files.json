@@ -356,7 +356,7 @@
 		"webxr_vr_sandbox",
 		"webxr_vr_sculpt",
 		"webxr_vr_video",
-		"webxr_layers"
+		"webxr_vr_layers"
 	],
 	"games": [
 		"games_fps"
