@@ -156,12 +156,6 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	parse: function ( data, onLoad, onError ) {
 
-		if ( data instanceof Uint8Array ) {
-
-			data = new Uint8Array( data ).buffer;
-
-		}
-
 		this.decodeObjects( data, '' )
 			.then( onLoad )
 			.catch( onError );
@@ -1355,11 +1349,17 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		if ( curve instanceof rhino.NurbsCurve && curve.degree === 1 ) {
 
-			if ( curve.segmentCount === undefined || curve.segmentCount === 1 ) {
+			const pLine = curve.tryGetPolyline();
 
-				return [ curve.pointAtStart, curve.pointAtEnd ];
+			for ( var i = 0; i < pLine.count; i ++ ) {
+
+				rc.push( pLine.get( i ) );
 
 			}
+
+			pLine.delete();
+
+			return rc;
 
 		}
 
