@@ -1,0 +1,9 @@
+export const Blob = window.Blob;
+export const atob = window.atob;
+export const btoa = window.btoa;
+export const DOMParser = window.DOMParser;
+export const document = window.document;
+export const XMLHttpRequest = window.XMLHttpRequest;
+export const TextEncoder = window.TextEncoder;
+export const TextDecoder = window.TextDecoder;
+export const decodeURIComponent = window.decodeURIComponent;
