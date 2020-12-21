@@ -13,6 +13,8 @@ import {
 	MeshPhongMaterial,
 	MeshStandardMaterial,
 	ShaderMaterial,
+	UniformsLib,
+	UniformsUtils,
 	Vector3
 } from '../../../build/three.module.js';
 
@@ -1016,14 +1018,18 @@ var LDrawLoader = ( function () {
 				edgeMaterial.userData.conditionalEdgeMaterial = new ShaderMaterial( {
 					vertexShader: conditionalLineVertShader,
 					fragmentShader: conditionalLineFragShader,
-					uniforms: {
-						diffuse: {
-							value: new Color( edgeColour )
-						},
-						opacity: {
-							value: alpha
+					uniforms: UniformsUtils.merge( [
+						UniformsLib.fog,
+						{
+							diffuse: {
+								value: new Color( edgeColour )
+							},
+							opacity: {
+								value: alpha
+							}
 						}
-					},
+					] ),
+					fog: true,
 					transparent: isTransparent,
 					depthWrite: ! isTransparent
 				} );
