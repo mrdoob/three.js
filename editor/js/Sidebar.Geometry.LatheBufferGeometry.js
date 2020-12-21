@@ -5,7 +5,7 @@ import { UIPoints2 } from './libs/ui.three.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-function SidebarGeometryLatheGeometry( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -69,4 +69,4 @@ function SidebarGeometryLatheGeometry( editor, object ) {
 
 }
 
-export { SidebarGeometryLatheGeometry };
+export { GeometryParametersPanel };

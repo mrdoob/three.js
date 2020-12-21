@@ -5,7 +5,7 @@ import { UIPoints3 } from './libs/ui.three.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-function SidebarGeometryTubeGeometry( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -102,4 +102,4 @@ function SidebarGeometryTubeGeometry( editor, object ) {
 
 }
 
-export { SidebarGeometryTubeGeometry };
+export { GeometryParametersPanel };

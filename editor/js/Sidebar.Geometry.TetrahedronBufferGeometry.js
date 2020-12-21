@@ -4,7 +4,7 @@ import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-function SidebarGeometryIcosahedronGeometry( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -20,7 +20,7 @@ function SidebarGeometryIcosahedronGeometry( editor, object ) {
 	var radiusRow = new UIRow();
 	var radius = new UINumber( parameters.radius ).onChange( update );
 
-	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/radius' ) ).setWidth( '90px' ) );
+	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/tetrahedron_geometry/radius' ) ).setWidth( '90px' ) );
 	radiusRow.add( radius );
 
 	container.add( radiusRow );
@@ -30,16 +30,17 @@ function SidebarGeometryIcosahedronGeometry( editor, object ) {
 	var detailRow = new UIRow();
 	var detail = new UIInteger( parameters.detail ).setRange( 0, Infinity ).onChange( update );
 
-	detailRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/detail' ) ).setWidth( '90px' ) );
+	detailRow.add( new UIText( strings.getKey( 'sidebar/geometry/tetrahedron_geometry/detail' ) ).setWidth( '90px' ) );
 	detailRow.add( detail );
 
 	container.add( detailRow );
+
 
 	//
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.IcosahedronBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.TetrahedronBufferGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );
@@ -52,4 +53,4 @@ function SidebarGeometryIcosahedronGeometry( editor, object ) {
 
 }
 
-export { SidebarGeometryIcosahedronGeometry };
+export { GeometryParametersPanel };

@@ -4,7 +4,7 @@ import { UIRow, UIText, UINumber, UIInteger } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-function SidebarGeometryBoxGeometry( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -92,4 +92,4 @@ function SidebarGeometryBoxGeometry( editor, object ) {
 
 }
 
-export { SidebarGeometryBoxGeometry };
+export { GeometryParametersPanel };
