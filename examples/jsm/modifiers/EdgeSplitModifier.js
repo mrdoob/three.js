@@ -16,6 +16,8 @@ var EdgeSplitModifier = function () {
 	var indexes;
 	var pointToIndexMap, splitIndexes;
 
+	let oldNormals;
+
 
 	function computeNormals() {
 
@@ -158,7 +160,7 @@ var EdgeSplitModifier = function () {
 	}
 
 
-	this.modify = function ( geometry, cutOffAngle ) {
+	this.modify = function ( geometry, cutOffAngle, tryKeepNormals = true ) {
 
 		const wasNotBufferGeometry = geometry.isBufferGeometry === undefined;
 		if ( ! geometry.isBufferGeometry ) {
@@ -169,12 +171,16 @@ var EdgeSplitModifier = function () {
 
 
 		let hadNormals = false;
+		oldNormals = null;
 		if ( geometry.attributes.normal ) {
 
 			hadNormals = true;
 
 			if ( wasNotBufferGeometry === false )
 				geometry = geometry.clone();
+
+			if ( tryKeepNormals && geometry.index )
+				oldNormals = geometry.attributes.normal.array;
 
 			geometry.deleteAttribute( 'normal' );
 
@@ -256,6 +262,27 @@ var EdgeSplitModifier = function () {
 		if ( hadNormals ) {
 
 			geometry.computeVertexNormals();
+
+			if ( oldNormals !== null ) {
+
+				const changedNormals = new Array( oldNormals.length / 3 ).fill( false );
+
+				for ( const splitData of splitIndexes )
+					changedNormals[ splitData.original ] = true;
+
+				for ( let i = 0; i < changedNormals.length; i ++ ) {
+
+					if ( changedNormals[ i ] === false ) {
+
+						for ( let j = 0; j < 3; j ++ )
+							geometry.attributes.normal.array[ 3 * i + j ] = oldNormals[ 3 * i + j ];
+
+					}
+
+				}
+
+
+			}
 
 		}
 
