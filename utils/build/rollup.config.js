@@ -382,12 +382,13 @@ export default [
 		]
 	},
 	{
-		input: 'src/Three.node.js',
+		input: 'src/Three.js',
 		plugins: [
 			addons(),
 			glconstants(),
 			glsl(),
-			header()
+			header(),
+			//TODO: alias({entries: [{find: /^.*dom-globals.js$/, replacement: "$1dom-globals.node.js"}, {find: /^.*FileLoader.js$/, replacement: "$1FileLoader.node.js"}]})
 		],
 		output: [
 			{
