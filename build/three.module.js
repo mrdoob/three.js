@@ -6629,7 +6629,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		if ( ( object && object.isObject3D ) ) {
+		if ( object && object.isObject3D ) {
 
 			if ( object.parent !== null ) {
 
@@ -19008,7 +19008,7 @@ MeshDistanceMaterial.prototype.copy = function ( source ) {
 
 };
 
-var vsm_frag = "uniform sampler2D shadow_pass;\nuniform vec2 resolution;\nuniform float radius;\n#include <packing>\nvoid main() {\n\tfloat mean = 0.0;\n\tfloat squared_mean = 0.0;\n\tfloat depth = unpackRGBAToDepth( texture2D( shadow_pass, ( gl_FragCoord.xy ) / resolution ) );\n\tfor ( float i = -1.0; i < 1.0 ; i += SAMPLE_RATE) {\n\t\t#ifdef HORIZONAL_PASS\n\t\t\tvec2 distribution = unpackRGBATo2Half( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( i, 0.0 ) * radius ) / resolution ) );\n\t\t\tmean += distribution.x;\n\t\t\tsquared_mean += distribution.y * distribution.y + distribution.x * distribution.x;\n\t\t#else\n\t\t\tfloat depth = unpackRGBAToDepth( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( 0.0, i ) * radius ) / resolution ) );\n\t\t\tmean += depth;\n\t\t\tsquared_mean += depth * depth;\n\t\t#endif\n\t}\n\tmean = mean * HALF_SAMPLE_RATE;\n\tsquared_mean = squared_mean * HALF_SAMPLE_RATE;\n\tfloat std_dev = sqrt( squared_mean - mean * mean );\n\tgl_FragColor = pack2HalfToRGBA( vec2( mean, std_dev ) );\n}";
+var vsm_frag = "uniform sampler2D shadow_pass;\nuniform vec2 resolution;\nuniform float radius;\n#include <packing>\nvoid main() {\n\tfloat mean = 0.0;\n\tfloat squared_mean = 0.0;\n\tfloat depth = unpackRGBAToDepth( texture2D( shadow_pass, ( gl_FragCoord.xy ) / resolution ) );\n\tfor ( float i = -1.0; i < 1.0 ; i += SAMPLE_RATE) {\n\t\t#ifdef HORIZONTAL_PASS\n\t\t\tvec2 distribution = unpackRGBATo2Half( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( i, 0.0 ) * radius ) / resolution ) );\n\t\t\tmean += distribution.x;\n\t\t\tsquared_mean += distribution.y * distribution.y + distribution.x * distribution.x;\n\t\t#else\n\t\t\tfloat depth = unpackRGBAToDepth( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( 0.0, i ) * radius ) / resolution ) );\n\t\t\tmean += depth;\n\t\t\tsquared_mean += depth * depth;\n\t\t#endif\n\t}\n\tmean = mean * HALF_SAMPLE_RATE;\n\tsquared_mean = squared_mean * HALF_SAMPLE_RATE;\n\tfloat std_dev = sqrt( squared_mean - mean * mean );\n\tgl_FragColor = pack2HalfToRGBA( vec2( mean, std_dev ) );\n}";
 
 var vsm_vert = "void main() {\n\tgl_Position = vec4( position, 1.0 );\n}";
 
@@ -19047,8 +19047,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	} );
 
-	const shadowMaterialHorizonal = shadowMaterialVertical.clone();
-	shadowMaterialHorizonal.defines.HORIZONAL_PASS = 1;
+	const shadowMaterialHorizontal = shadowMaterialVertical.clone();
+	shadowMaterialHorizontal.defines.HORIZONTAL_PASS = 1;
 
 	const fullScreenTri = new BufferGeometry();
 	fullScreenTri.setAttribute(
@@ -19214,14 +19214,14 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		_renderer.clear();
 		_renderer.renderBufferDirect( camera, null, geometry, shadowMaterialVertical, fullScreenMesh, null );
 
-		// horizonal pass
+		// horizontal pass
 
-		shadowMaterialHorizonal.uniforms.shadow_pass.value = shadow.mapPass.texture;
-		shadowMaterialHorizonal.uniforms.resolution.value = shadow.mapSize;
-		shadowMaterialHorizonal.uniforms.radius.value = shadow.radius;
+		shadowMaterialHorizontal.uniforms.shadow_pass.value = shadow.mapPass.texture;
+		shadowMaterialHorizontal.uniforms.resolution.value = shadow.mapSize;
+		shadowMaterialHorizontal.uniforms.radius.value = shadow.radius;
 		_renderer.setRenderTarget( shadow.map );
 		_renderer.clear();
-		_renderer.renderBufferDirect( camera, null, geometry, shadowMaterialHorizonal, fullScreenMesh, null );
+		_renderer.renderBufferDirect( camera, null, geometry, shadowMaterialHorizontal, fullScreenMesh, null );
 
 	}
 
@@ -46645,13 +46645,13 @@ Object.assign( Raycaster.prototype, {
 
 	setFromCamera: function ( coords, camera ) {
 
-		if ( ( camera && camera.isPerspectiveCamera ) ) {
+		if ( camera && camera.isPerspectiveCamera ) {
 
 			this.ray.origin.setFromMatrixPosition( camera.matrixWorld );
 			this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( this.ray.origin ).normalize();
 			this.camera = camera;
 
-		} else if ( ( camera && camera.isOrthographicCamera ) ) {
+		} else if ( camera && camera.isOrthographicCamera ) {
 
 			this.ray.origin.set( coords.x, coords.y, ( camera.near + camera.far ) / ( camera.near - camera.far ) ).unproject( camera ); // set origin in plane of camera
 			this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
