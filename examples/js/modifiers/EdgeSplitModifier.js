@@ -1,4 +1,3 @@
-
 THREE.EdgeSplitModifier = function () {
 
 	var A = new THREE.Vector3();
@@ -153,9 +152,23 @@ THREE.EdgeSplitModifier = function () {
 
 	this.modify = function ( geometry, cutOffAngle ) {
 
+		const wasNotBufferGeometry = geometry.isBufferGeometry === undefined;
 		if ( ! geometry.isBufferGeometry ) {
 
 			geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+
+		}
+
+
+		let hadNormals = false;
+		if ( geometry.attributes.normal ) {
+
+			hadNormals = true;
+
+			if ( wasNotBufferGeometry === false )
+				geometry = geometry.clone();
+
+			geometry.deleteAttribute( 'normal' );
 
 		}
 
@@ -178,7 +191,6 @@ THREE.EdgeSplitModifier = function () {
 		computeNormals();
 		mapPositionsToIndexes();
 
-
 		splitIndexes = [];
 
 		for ( var vertexIndexes of pointToIndexMap ) {
@@ -187,9 +199,15 @@ THREE.EdgeSplitModifier = function () {
 
 		}
 
-		var newPositions = new Float32Array( positions.length + 3 * splitIndexes.length );
-		newPositions.set( positions );
-		var offset = positions.length;
+		const newAttributes = {};
+		for ( const name of Object.keys( geometry.attributes ) ) {
+
+			const oldAttribute = geometry.attributes[ name ];
+			const newArray = new oldAttribute.array.constructor( ( indexes.length + splitIndexes.length ) * oldAttribute.itemSize );
+			newArray.set( oldAttribute.array );
+			newAttributes[ name ] = new THREE.BufferAttribute( newArray, oldAttribute.itemSize, oldAttribute.normalized );
+
+		}
 
 		var newIndexes = new Uint32Array( indexes.length );
 		newIndexes.set( indexes );
@@ -199,21 +217,39 @@ THREE.EdgeSplitModifier = function () {
 			var split = splitIndexes[ i ];
 			var index = indexes[ split.original ];
 
-			newPositions[ offset + 3 * i ] = positions[ 3 * index ];
-			newPositions[ offset + 3 * i + 1 ] = positions[ 3 * index + 1 ];
-			newPositions[ offset + 3 * i + 2 ] = positions[ 3 * index + 2 ];
+			for ( const attribute of Object.values( newAttributes ) ) {
+
+				for ( let j = 0; j < attribute.itemSize; j ++ ) {
+
+					attribute.array[ ( indexes.length + i ) * attribute.itemSize + j ] =
+						attribute.array[ index * attribute.itemSize + j ];
+
+				}
+
+			}
 
 			for ( var j of split.indexes ) {
 
-				newIndexes[ j ] = offset / 3 + i;
+				newIndexes[ j ] = indexes.length + i;
 
 			}
 
 		}
 
 		geometry = new THREE.BufferGeometry();
-		geometry.setAttribute( 'position', new THREE.BufferAttribute( newPositions, 3, true ) );
 		geometry.setIndex( new THREE.BufferAttribute( newIndexes, 1 ) );
+
+		for ( const name of Object.keys( newAttributes ) ) {
+
+			geometry.setAttribute( name, newAttributes[ name ] );
+
+		}
+
+		if ( hadNormals ) {
+
+			geometry.computeVertexNormals();
+
+		}
 
 		return geometry;
 
