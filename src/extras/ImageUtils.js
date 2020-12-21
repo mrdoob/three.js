@@ -1,3 +1,5 @@
+import { document } from "../dom-globals.js";
+
 let _canvas;
 
 const ImageUtils = {

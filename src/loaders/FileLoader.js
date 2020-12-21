@@ -1,6 +1,8 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
 
+import { Blob, atob, DOMParser, XMLHttpRequest, decodeURIComponent } from "../dom-globals.js";
+
 const loading = {};
 
 function FileLoader( manager ) {

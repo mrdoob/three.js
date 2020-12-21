@@ -1,3 +1,5 @@
+import { TextDecoder, decodeURIComponent } from "../dom-globals.js";
+
 const LoaderUtils = {
 
 	decodeText: function ( array ) {

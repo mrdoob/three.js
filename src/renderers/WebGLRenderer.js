@@ -39,6 +39,8 @@ import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from "./webgl/WebGLMaterials.js";
 
+import { document } from "../dom-globals.js";
+
 function createCanvasElement() {
 
 	const canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );

@@ -1,6 +1,8 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
 
+import { document } from "../dom-globals.js";
+
 function ImageLoader( manager ) {
 
 	Loader.call( this, manager );
