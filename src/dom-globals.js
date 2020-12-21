@@ -7,3 +7,4 @@ export const XMLHttpRequest = window.XMLHttpRequest;
 export const TextEncoder = window.TextEncoder;
 export const TextDecoder = window.TextDecoder;
 export const decodeURIComponent = window.decodeURIComponent;
+export const CustomEvent = window.CustomEvent;

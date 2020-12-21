@@ -1,5 +1,7 @@
 import { Object3D } from '../core/Object3D.js';
 
+import { CustomEvent } from '../dom-globals.js';
+
 class Scene extends Object3D {
 
 	constructor() {

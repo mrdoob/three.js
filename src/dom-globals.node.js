@@ -19,3 +19,4 @@ export const DOMParser = window.DOMParser;
 export const document = window.document;
 export const XMLHttpRequest = window.XMLHttpRequest;
 export const decodeURIComponent = window.decodeURIComponent;
+export const CustomEvent = window.CustomEvent;

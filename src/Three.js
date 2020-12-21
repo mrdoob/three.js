@@ -1,4 +1,5 @@
 import { REVISION } from './constants.js';
+import { CustomEvent } from './dom-globals.js';
 
 export { WebGLMultisampleRenderTarget } from './renderers/WebGLMultisampleRenderTarget.js';
 export { WebGLCubeRenderTarget } from './renderers/WebGLCubeRenderTarget.js';
