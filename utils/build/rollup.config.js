@@ -1,5 +1,6 @@
 import babel from "@rollup/plugin-babel";
 import { terser } from "rollup-plugin-terser";
+import alias from "@rollup/plugin-alias";
 
 if ( String.prototype.replaceAll === undefined ) {
 
@@ -384,11 +385,15 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
+			alias( {
+				entries: [
+					{ find: /^(.*)dom-globals.js$/, replacement: `${__dirname}/../../src/dom-globals.js` }
+				]
+			} ),
 			addons(),
 			glconstants(),
 			glsl(),
-			header(),
-			//TODO: alias({entries: [{find: /^.*dom-globals.js$/, replacement: "$1dom-globals.node.js"}, {find: /^.*FileLoader.js$/, replacement: "$1FileLoader.node.js"}]})
+			header()
 		],
 		output: [
 			{

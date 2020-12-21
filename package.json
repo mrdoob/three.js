@@ -93,6 +93,7 @@
     "@babel/plugin-proposal-class-properties": "^7.12.1",
     "@babel/preset-env": "^7.12.7",
     "@rollup/plugin-babel": "^5.2.1",
+    "@rollup/plugin-alias": "2.2.0",
     "@typescript-eslint/eslint-plugin": "^4.8.2",
     "@typescript-eslint/parser": "^4.8.2",
     "concurrently": "^5.3.0",
