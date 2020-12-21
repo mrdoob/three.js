@@ -1,7 +1,7 @@
 import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping } from '../../constants.js';
 import { MathUtils } from '../../math/MathUtils.js';
 
-import { document } from "../dom-globals.js";
+import { document } from "../../dom-globals.js";
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
