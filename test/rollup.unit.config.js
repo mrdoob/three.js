@@ -1,3 +1,5 @@
+import alias from "@rollup/plugin-alias";
+
 try {
 
 	require( 'qunit' );
@@ -84,6 +86,29 @@ export default [
 				format: 'umd',
 				name: 'THREE',
 				file: 'unit/build/three.source.unit.js',
+				intro: 'QUnit.module( "Source", () => {',
+				outro: '} );',
+				indent: '\t',
+			}
+		]
+	},
+	// node source unit conf
+	{
+		input: 'unit/three.source.node.unit.js',
+		plugins: [
+			alias( {
+				entries: [
+					{ find: /^(.*)dom-globals.js$/, replacement: `${__dirname}/../src/dom-globals.node.js` }
+				]
+			} ),
+			glsl()
+		],
+		// sourceMap: true,
+		output: [
+			{
+				format: 'umd',
+				name: 'THREE',
+				file: 'unit/build/three.source.unit.node.js',
 				intro: 'QUnit.module( "Source", () => {',
 				outro: '} );',
 				indent: '\t',
