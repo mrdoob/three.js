@@ -210,7 +210,7 @@ export default QUnit.module( 'Loaders', () => {
 			const done = assert.async();
 			const fileLoader = new FileLoader();
 			fileLoader.load(
-				"file:///Users/etiennedupont/Code/three.js/test/unit/docs/data.txt",
+				`file://${__dirname}/../data/data.txt`,
 				// onLoad callback
 				function ( data ) {
 
