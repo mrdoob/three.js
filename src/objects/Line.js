@@ -13,13 +13,7 @@ const _inverseMatrix = new Matrix4();
 const _ray = new Ray();
 const _sphere = new Sphere();
 
-function Line( geometry = new BufferGeometry(), material = new LineBasicMaterial(), mode ) {
-
-	if ( mode === 1 ) {
-
-		console.error( 'THREE.Line: parameter THREE.LinePieces no longer supported. Use THREE.LineSegments instead.' );
-
-	}
+function Line( geometry = new BufferGeometry(), material = new LineBasicMaterial() ) {
 
 	Object3D.call( this );
 
