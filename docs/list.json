@@ -1026,7 +1026,7 @@
 				"행렬 변환": "manual/ko/introduction/Matrix-transformations",
 				"애니메이션 시스템": "manual/ko/introduction/Animation-system"
 			},
-	
+
 			"빌드 도구": {
 				"NPM 테스트": "manual/ko/buildTools/Testing-with-NPM"
 				
@@ -1045,8 +1045,9 @@
 				"KeyframeTrack": "api/ko/animation/KeyframeTrack",
 				"PropertyBinding": "api/ko/animation/PropertyBinding",
 				"PropertyMixer": "api/ko/animation/PropertyMixer"
+			}
 
-			},
+		},
 
 		"예제": {
 
