@@ -40,7 +40,7 @@ THREE.ShadowMapViewer = function ( light ) {
 		height: 256
 	};
 
-	var camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 10 );
+	var camera = new THREE.OrthographicCamera( THREE.innerWidth / - 2, THREE.innerWidth / 2, THREE.innerHeight / 2, THREE.innerHeight / - 2, 1, 10 );
 	camera.position.set( 0, 0, 2 );
 	var scene = new THREE.Scene();
 
@@ -64,7 +64,7 @@ THREE.ShadowMapViewer = function ( light ) {
 
 	if ( doRenderLabel ) {
 
-		labelCanvas = document.createElement( 'canvas' );
+		labelCanvas = THREE.document.createElement( 'canvas' );
 
 		var context = labelCanvas.getContext( '2d' );
 		context.font = 'Bold 20px Arial';
@@ -132,7 +132,7 @@ THREE.ShadowMapViewer = function ( light ) {
 			var width = scope.size.width;
 			var height = scope.size.height;
 
-			mesh.position.set( - window.innerWidth / 2 + width / 2 + this.x, window.innerHeight / 2 - height / 2 - this.y, 0 );
+			mesh.position.set( - THREE.innerWidth / 2 + width / 2 + this.x, THREE.innerHeight / 2 - height / 2 - this.y, 0 );
 
 			if ( doRenderLabel ) labelMesh.position.set( mesh.position.x, mesh.position.y - scope.size.height / 2 + labelCanvas.height / 2, 0 );
 
@@ -164,10 +164,10 @@ THREE.ShadowMapViewer = function ( light ) {
 
 		if ( this.enabled ) {
 
-			 camera.left = window.innerWidth / - 2;
-			 camera.right = window.innerWidth / 2;
-			 camera.top = window.innerHeight / 2;
-			 camera.bottom = window.innerHeight / - 2;
+			 camera.left = THREE.innerWidth / - 2;
+			 camera.right = THREE.innerWidth / 2;
+			 camera.top = THREE.innerHeight / 2;
+			 camera.bottom = THREE.innerHeight / - 2;
 			 camera.updateProjectionMatrix();
 
 			 this.update();

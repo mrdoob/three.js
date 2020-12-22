@@ -113,13 +113,13 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 
 		this.postprocessing.scene = new THREE.Scene();
 
-		this.postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2,	window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
+		this.postprocessing.camera = new THREE.OrthographicCamera( THREE.innerWidth / - 2, THREE.innerWidth / 2,	THREE.innerHeight / 2, THREE.innerHeight / - 2, - 10000, 10000 );
 
 		this.postprocessing.scene.add( this.postprocessing.camera );
 
 		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
-		this.postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-		this.postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+		this.postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( THREE.innerWidth, THREE.innerHeight, pars );
+		this.postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( THREE.innerWidth, THREE.innerHeight, pars );
 
 		var bokeh_shader = THREE.BokehShader;
 
@@ -143,9 +143,9 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 		this.postprocessing.bokeh_uniforms[ "zfar" ].value = this.near;
 
 
-		this.postprocessing.bokeh_uniforms[ "textureWidth" ].value = window.innerWidth;
+		this.postprocessing.bokeh_uniforms[ "textureWidth" ].value = THREE.innerWidth;
 
-		this.postprocessing.bokeh_uniforms[ "textureHeight" ].value = window.innerHeight;
+		this.postprocessing.bokeh_uniforms[ "textureHeight" ].value = THREE.innerHeight;
 
 		this.postprocessing.materialBokeh = new THREE.ShaderMaterial( {
 			uniforms: this.postprocessing.bokeh_uniforms,
@@ -158,7 +158,7 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 			}
 		} );
 
-		this.postprocessing.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight ), this.postprocessing.materialBokeh );
+		this.postprocessing.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( THREE.innerWidth, THREE.innerHeight ), this.postprocessing.materialBokeh );
 		this.postprocessing.quad.position.z = - 500;
 		this.postprocessing.scene.add( this.postprocessing.quad );
 

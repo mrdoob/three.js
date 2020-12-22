@@ -22,7 +22,7 @@ THREE.UVsDebug = function ( geometry, size ) {
 
 	var face = [];
 
-	var canvas = document.createElement( 'canvas' );
+	var canvas = THREE.document.createElement( 'canvas' );
 	var width = size || 1024; // power of 2 required for wrapping
 	var height = size || 1024;
 	canvas.width = width;

@@ -205,7 +205,7 @@ THREE.PLYExporter.prototype = {
 		if ( options.binary === true ) {
 
 			// Binary File Generation
-			var headerBin = new TextEncoder().encode( header );
+			var headerBin = new THREE.TextEncoder().encode( header );
 
 			// 3 position values at 4 bytes
 			// 3 normal values at 4 bytes

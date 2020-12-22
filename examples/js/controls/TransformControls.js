@@ -3,7 +3,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 	if ( domElement === undefined ) {
 
 		console.warn( 'THREE.TransformControls: The second parameter "domElement" is now mandatory.' );
-		domElement = document;
+		domElement = THREE.document;
 
 	}
 

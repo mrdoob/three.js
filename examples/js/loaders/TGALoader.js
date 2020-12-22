@@ -523,7 +523,7 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		var useOffscreen = typeof OffscreenCanvas !== 'undefined';
 
-		var canvas = useOffscreen ? new OffscreenCanvas( header.width, header.height ) : document.createElement( 'canvas' );
+		var canvas = useOffscreen ? new OffscreenCanvas( header.width, header.height ) : THREE.document.createElement( 'canvas' );
 		canvas.width = header.width;
 		canvas.height = header.height;
 

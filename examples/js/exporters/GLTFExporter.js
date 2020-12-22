@@ -171,9 +171,9 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function stringToArrayBuffer( text ) {
 
-			if ( window.TextEncoder !== undefined ) {
+			if ( THREE.TextEncoder !== undefined ) {
 
-				return new TextEncoder().encode( text ).buffer;
+				return new THREE.TextEncoder().encode( text ).buffer;
 
 			}
 
@@ -606,7 +606,7 @@ THREE.GLTFExporter.prototype = {
 
 			return new Promise( function ( resolve ) {
 
-				var reader = new window.FileReader();
+				var reader = new THREE.FileReader();
 				reader.readAsArrayBuffer( blob );
 				reader.onloadend = function () {
 
@@ -779,7 +779,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( options.embedImages ) {
 
-				var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
+				var canvas = cachedCanvas = cachedCanvas || THREE.document.createElement( 'canvas' );
 
 				canvas.width = Math.min( image.width, options.maxTextureSize );
 				canvas.height = Math.min( image.height, options.maxTextureSize );
@@ -2038,7 +2038,7 @@ THREE.GLTFExporter.prototype = {
 		Promise.all( pending ).then( function () {
 
 			// Merge buffers.
-			var blob = new Blob( buffers, { type: 'application/octet-stream' } );
+			var blob = new THREE.Blob( buffers, { type: 'application/octet-stream' } );
 
 			// Declare extensions.
 			var extensionsUsedList = Object.keys( extensionsUsed );
@@ -2059,7 +2059,7 @@ THREE.GLTFExporter.prototype = {
 				var GLB_CHUNK_TYPE_JSON = 0x4E4F534A;
 				var GLB_CHUNK_TYPE_BIN = 0x004E4942;
 
-				var reader = new window.FileReader();
+				var reader = new THREE.FileReader();
 				reader.readAsArrayBuffer( blob );
 				reader.onloadend = function () {
 
@@ -2085,7 +2085,7 @@ THREE.GLTFExporter.prototype = {
 						+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
 					headerView.setUint32( 8, totalByteLength, true );
 
-					var glbBlob = new Blob( [
+					var glbBlob = new THREE.Blob( [
 						header,
 						jsonChunkPrefix,
 						jsonChunk,
@@ -2093,7 +2093,7 @@ THREE.GLTFExporter.prototype = {
 						binaryChunk
 					], { type: 'application/octet-stream' } );
 
-					var glbReader = new window.FileReader();
+					var glbReader = new THREE.FileReader();
 					glbReader.readAsArrayBuffer( glbBlob );
 					glbReader.onloadend = function () {
 
@@ -2107,7 +2107,7 @@ THREE.GLTFExporter.prototype = {
 
 				if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
 
-					var reader = new window.FileReader();
+					var reader = new THREE.FileReader();
 					reader.readAsDataURL( blob );
 					reader.onloadend = function () {
 

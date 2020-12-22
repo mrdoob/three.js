@@ -42,14 +42,14 @@ THREE.VolumeSlice = function ( volume, index, axis ) {
 	/**
 	 * @member {CanvasRenderingContext2D} ctx Context of the canvas
 	 */
-	this.canvas = document.createElement( 'canvas' );
+	this.canvas = THREE.document.createElement( 'canvas' );
 	/**
 	 * @member {HTMLCanvasElement} canvasBuffer The intermediary canvas used to paint the data
 	 */
 	/**
 	 * @member {CanvasRenderingContext2D} ctxBuffer Context of the canvas buffer
 	 */
-	this.canvasBuffer = document.createElement( 'canvas' );
+	this.canvasBuffer = THREE.document.createElement( 'canvas' );
 	this.updateGeometry();
 
 

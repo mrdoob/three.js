@@ -3,7 +3,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	if ( domElement === undefined ) {
 
 		console.warn( 'THREE.FirstPersonControls: The second parameter "domElement" is now mandatory.' );
-		domElement = document;
+		domElement = THREE.document;
 
 	}
 
@@ -59,7 +59,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	//
 
-	if ( this.domElement !== document ) {
+	if ( this.domElement !== THREE.document ) {
 
 		this.domElement.setAttribute( 'tabindex', - 1 );
 
@@ -69,10 +69,10 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.handleResize = function () {
 
-		if ( this.domElement === document ) {
+		if ( this.domElement === THREE.document ) {
 
-			this.viewHalfX = window.innerWidth / 2;
-			this.viewHalfY = window.innerHeight / 2;
+			this.viewHalfX = THREE.innerWidth / 2;
+			this.viewHalfY = THREE.innerHeight / 2;
 
 		} else {
 
@@ -85,7 +85,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.onMouseDown = function ( event ) {
 
-		if ( this.domElement !== document ) {
+		if ( this.domElement !== THREE.document ) {
 
 			this.domElement.focus();
 
@@ -131,7 +131,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.onMouseMove = function ( event ) {
 
-		if ( this.domElement === document ) {
+		if ( this.domElement === THREE.document ) {
 
 			this.mouseX = event.pageX - this.viewHalfX;
 			this.mouseY = event.pageY - this.viewHalfY;
@@ -298,8 +298,8 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		this.domElement.removeEventListener( 'mousemove', _onMouseMove, false );
 		this.domElement.removeEventListener( 'mouseup', _onMouseUp, false );
 
-		window.removeEventListener( 'keydown', _onKeyDown, false );
-		window.removeEventListener( 'keyup', _onKeyUp, false );
+		THREE.removeEventListener( 'keydown', _onKeyDown, false );
+		THREE.removeEventListener( 'keyup', _onKeyUp, false );
 
 	};
 
@@ -314,8 +314,8 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'mousedown', _onMouseDown, false );
 	this.domElement.addEventListener( 'mouseup', _onMouseUp, false );
 
-	window.addEventListener( 'keydown', _onKeyDown, false );
-	window.addEventListener( 'keyup', _onKeyUp, false );
+	THREE.addEventListener( 'keydown', _onKeyDown, false );
+	THREE.addEventListener( 'keyup', _onKeyUp, false );
 
 	function bind( scope, fn ) {
 

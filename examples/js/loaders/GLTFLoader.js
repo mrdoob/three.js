@@ -2435,7 +2435,7 @@ THREE.GLTFLoader = ( function () {
 				}
 
 				isObjectURL = true;
-				var blob = new Blob( [ bufferView ], { type: source.mimeType } );
+				var blob = new THREE.Blob( [ bufferView ], { type: source.mimeType } );
 				sourceURI = URL.createObjectURL( blob );
 				return sourceURI;
 

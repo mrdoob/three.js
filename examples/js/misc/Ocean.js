@@ -232,7 +232,7 @@ THREE.Ocean.prototype.generateSeedPhaseTexture = function () {
 
 	// Setup the seed texture
 	this.pingPhase = true;
-	var phaseArray = new window.Float32Array( this.resolution * this.resolution * 4 );
+	var phaseArray = new Float32Array( this.resolution * this.resolution * 4 );
 	for ( var i = 0; i < this.resolution; i ++ ) {
 
 		for ( var j = 0; j < this.resolution; j ++ ) {

@@ -90,7 +90,7 @@ THREE.PLYLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 			if ( result !== null ) {
 
 				headerText = result[ 1 ];
-				headerLength = new Blob( [ result[ 0 ] ] ).size;
+				headerLength = new THREE.Blob( [ result[ 0 ] ] ).size;
 
 			}
 

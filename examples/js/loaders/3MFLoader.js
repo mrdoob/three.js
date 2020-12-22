@@ -155,7 +155,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 				var view = new Uint8Array( zip.file( modelPart ).asArrayBuffer() );
 
 				var fileText = THREE.LoaderUtils.decodeText( view );
-				var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
+				var xmlData = new THREE.DOMParser().parseFromString( fileText, 'application/xml' );
 
 				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
 
@@ -214,7 +214,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			var relationships = [];
 
-			var relsXmlData = new DOMParser().parseFromString( relsFileText, 'application/xml' );
+			var relsXmlData = new THREE.DOMParser().parseFromString( relsFileText, 'application/xml' );
 
 			var relsNodes = relsXmlData.querySelectorAll( 'Relationship' );
 
@@ -770,7 +770,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 				var data = textureData[ texture2d.path ];
 				var type = texture2d.contenttype;
 
-				var blob = new Blob( [ data ], { type: type } );
+				var blob = new THREE.Blob( [ data ], { type: type } );
 				var sourceURI = URL.createObjectURL( blob );
 
 				var texture = textureLoader.load( sourceURI, function () {

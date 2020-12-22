@@ -3,7 +3,7 @@ THREE.FlyControls = function ( object, domElement ) {
 	if ( domElement === undefined ) {
 
 		console.warn( 'THREE.FlyControls: The second parameter "domElement" is now mandatory.' );
-		domElement = document;
+		domElement = THREE.document;
 
 	}
 
@@ -108,7 +108,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.mousedown = function ( event ) {
 
-		if ( this.domElement !== document ) {
+		if ( this.domElement !== THREE.document ) {
 
 			this.domElement.focus();
 
@@ -237,7 +237,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.getContainerDimensions = function () {
 
-		if ( this.domElement != document ) {
+		if ( this.domElement != THREE.document ) {
 
 			return {
 				size: [ this.domElement.offsetWidth, this.domElement.offsetHeight ],
@@ -247,7 +247,7 @@ THREE.FlyControls = function ( object, domElement ) {
 		} else {
 
 			return {
-				size: [ window.innerWidth, window.innerHeight ],
+				size: [ THREE.innerWidth, THREE.innerHeight ],
 				offset: [ 0, 0 ]
 			};
 
@@ -278,8 +278,8 @@ THREE.FlyControls = function ( object, domElement ) {
 		this.domElement.removeEventListener( 'mousemove', _mousemove, false );
 		this.domElement.removeEventListener( 'mouseup', _mouseup, false );
 
-		window.removeEventListener( 'keydown', _keydown, false );
-		window.removeEventListener( 'keyup', _keyup, false );
+		THREE.removeEventListener( 'keydown', _keydown, false );
+		THREE.removeEventListener( 'keyup', _keyup, false );
 
 	};
 
@@ -295,8 +295,8 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'mousedown', _mousedown, false );
 	this.domElement.addEventListener( 'mouseup', _mouseup, false );
 
-	window.addEventListener( 'keydown', _keydown, false );
-	window.addEventListener( 'keyup', _keyup, false );
+	THREE.addEventListener( 'keydown', _keydown, false );
+	THREE.addEventListener( 'keyup', _keyup, false );
 
 	this.updateMovementVector();
 	this.updateRotationVector();

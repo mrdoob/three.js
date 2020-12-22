@@ -115,7 +115,7 @@ THREE.Lut.prototype = {
 
 	createCanvas: function () {
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = THREE.document.createElement( 'canvas' );
 		canvas.width = 1;
 		canvas.height = this.n;
 

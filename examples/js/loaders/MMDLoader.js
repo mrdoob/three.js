@@ -1355,7 +1355,7 @@ THREE.MMDLoader = ( function () {
 
 		_getRotatedImage: function ( image ) {
 
-			var canvas = document.createElement( 'canvas' );
+			var canvas = THREE.document.createElement( 'canvas' );
 			var context = canvas.getContext( '2d' );
 
 			var width = image.width;
@@ -1382,7 +1382,7 @@ THREE.MMDLoader = ( function () {
 				// Is there any efficient ways?
 				function createImageData( image ) {
 
-					var canvas = document.createElement( 'canvas' );
+					var canvas = THREE.document.createElement( 'canvas' );
 					canvas.width = image.width;
 					canvas.height = image.height;
 

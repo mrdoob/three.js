@@ -26,7 +26,7 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	var onScreenOrientationChangeEvent = function () {
 
-		scope.screenOrientation = window.orientation || 0;
+		scope.screenOrientation = THREE.orientation || 0;
 
 	};
 
@@ -62,14 +62,14 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 		// iOS 13+
 
-		if ( window.DeviceOrientationEvent !== undefined && typeof window.DeviceOrientationEvent.requestPermission === 'function' ) {
+		if ( THREE.DeviceOrientationEvent !== undefined && typeof THREE.DeviceOrientationEvent.requestPermission === 'function' ) {
 
-			window.DeviceOrientationEvent.requestPermission().then( function ( response ) {
+			THREE.DeviceOrientationEvent.requestPermission().then( function ( response ) {
 
 				if ( response == 'granted' ) {
 
-					window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
-					window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+					THREE.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+					THREE.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
 
 				}
 
@@ -81,8 +81,8 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 		} else {
 
-			window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
-			window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+			THREE.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+			THREE.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
 
 		}
 
@@ -92,8 +92,8 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	this.disconnect = function () {
 
-		window.removeEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
-		window.removeEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+		THREE.removeEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+		THREE.removeEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
 
 		scope.enabled = false;
 

@@ -2,7 +2,7 @@ THREE.SelectionHelper = ( function () {
 
 	function SelectionHelper( selectionBox, renderer, cssClassName ) {
 
-		this.element = document.createElement( 'div' );
+		this.element = THREE.document.createElement( 'div' );
 		this.element.classList.add( cssClassName );
 		this.element.style.pointerEvents = 'none';
 

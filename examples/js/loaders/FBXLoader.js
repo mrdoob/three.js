@@ -291,7 +291,7 @@ THREE.FBXLoader = ( function () {
 			} else { // Binary Format
 
 				var array = new Uint8Array( content );
-				return window.URL.createObjectURL( new Blob( [ array ], { type: type } ) );
+				return THREE.URL.createObjectURL( new THREE.Blob( [ array ], { type: type } ) );
 
 			}
 
@@ -994,8 +994,8 @@ THREE.FBXLoader = ( function () {
 				}
 
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				var width = THREE.innerWidth;
+				var height = THREE.innerHeight;
 
 				if ( cameraAttribute.AspectWidth !== undefined && cameraAttribute.AspectHeight !== undefined ) {
 

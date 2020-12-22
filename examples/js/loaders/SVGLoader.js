@@ -1393,7 +1393,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		var currentTransform = new THREE.Matrix3();
 
-		var xml = new DOMParser().parseFromString( text, 'image/svg+xml' ); // application/xml
+		var xml = new THREE.DOMParser().parseFromString( text, 'image/svg+xml' ); // application/xml
 
 		parseNode( xml.documentElement, {
 			fill: '#000',

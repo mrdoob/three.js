@@ -6,7 +6,7 @@ THREE.CSS3DObject = function ( element ) {
 
 	THREE.Object3D.call( this );
 
-	this.element = element || document.createElement( 'div' );
+	this.element = element || THREE.document.createElement( 'div' );
 	this.element.style.position = 'absolute';
 	this.element.style.pointerEvents = 'auto';
 
@@ -67,12 +67,12 @@ THREE.CSS3DRenderer = function () {
 		objects: new WeakMap()
 	};
 
-	var domElement = document.createElement( 'div' );
+	var domElement = THREE.document.createElement( 'div' );
 	domElement.style.overflow = 'hidden';
 
 	this.domElement = domElement;
 
-	var cameraElement = document.createElement( 'div' );
+	var cameraElement = THREE.document.createElement( 'div' );
 
 	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	cameraElement.style.transformStyle = 'preserve-3d';

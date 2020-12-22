@@ -14,7 +14,7 @@ THREE.SVGRenderer = function () {
 	var _this = this,
 		_renderData, _elements, _lights,
 		_projector = new THREE.Projector(),
-		_svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' ),
+		_svg = THREE.document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' ),
 		_svgWidth, _svgHeight, _svgWidthHalf, _svgHeightHalf,
 
 		_v1, _v2, _v3,
@@ -507,7 +507,7 @@ THREE.SVGRenderer = function () {
 
 		if ( _svgPathPool[ id ] == null ) {
 
-			_svgPathPool[ id ] = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
+			_svgPathPool[ id ] = THREE.document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
 
 			if ( _quality == 0 ) {
 
