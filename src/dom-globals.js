@@ -1,16 +1,18 @@
-let _Blob
-let _atob
-let _btoa
-let _DOMParser
-let _document
-let _XMLHttpRequest
-let _TextEncoder
-let _TextDecoder
-let _decodeURIComponent
-let _CustomEvent
+let _Blob;
+let _atob;
+let _btoa;
+let _DOMParser;
+let _document;
+let _XMLHttpRequest;
+let _TextEncoder;
+let _TextDecoder;
+let _decodeURIComponent;
+let _CustomEvent;
 
-function defineGlobals(){
-	try{
+function defineGlobals() {
+
+	try {
+
 		_Blob = window.Blob;
 		_atob = window.atob;
 		_btoa = window.btoa;
@@ -21,11 +23,12 @@ function defineGlobals(){
 		_TextDecoder = window.TextDecoder;
 		_decodeURIComponent = window.decodeURIComponent;
 		_CustomEvent = window.CustomEvent;
-	}
-	finally{ }
+
+	} finally { }
+
 }
 
-defineGlobals()
+defineGlobals();
 
 export const Blob = _Blob;
 export const atob = _atob;
