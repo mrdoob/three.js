@@ -179,8 +179,81 @@ export default QUnit.module( 'Loaders', () => {
 				function ( data ) {
 
 					// output the text to the console
-					console.log( JSON.stringify( data ) );
+					// console.log( JSON.stringify( data ) );
 					assert.ok( JSON.stringify( data ) === `{"a":"bcd"}`, "Passed!" );
+					done();
+
+				},
+
+				// onProgress callback
+				function ( xhr ) {
+
+					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+				},
+
+				// onError callback
+				function ( err ) {
+
+					console.error( 'An error happened' );
+					console.error( err );
+					assert.ok( false, "Failed with error" );
+					done();
+
+				}
+			);
+
+		} );
+
+		QUnit.test( "load file url => undefined", ( assert ) => {
+
+			const done = assert.async();
+			const fileLoader = new FileLoader();
+			fileLoader.load(
+				"file:///Users/etiennedupont/Code/three.js/test/unit/docs/data.txt",
+				// onLoad callback
+				function ( data ) {
+
+					// output the text to the console
+					// console.log( data );
+					assert.ok( data === "Hello, World!\n", "Passed!" );
+					done();
+
+				},
+
+				// onProgress callback
+				function ( xhr ) {
+
+					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+				},
+
+				// onError callback
+				function ( err ) {
+
+					console.error( 'An error happened' );
+					console.error( err );
+					assert.ok( false, "Failed with error" );
+					done();
+
+				}
+			);
+
+		} );
+
+		QUnit.test( "load regular url => json", ( assert ) => {
+
+			const done = assert.async();
+			const fileLoader = new FileLoader();
+			fileLoader.responseType = "json";
+			fileLoader.load(
+				"https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/json/suzanne_buffergeometry.json",
+				// onLoad callback
+				function ( data ) {
+
+					// output the text to the console
+					// console.log( data );
+					assert.ok( data.metadata.position === 505, "Passed!" );
 					done();
 
 				},
