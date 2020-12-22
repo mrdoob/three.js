@@ -822,11 +822,17 @@ THREE.FBXLoader = ( function () {
 
 				if ( node.userData.transformData ) {
 
-					if ( node.parent ) node.userData.transformData.parentMatrixWorld = node.parent.matrix;
+					if ( node.parent ) {
+
+						node.userData.transformData.parentMatrix = node.parent.matrix;
+						node.userData.transformData.parentMatrixWorld = node.parent.matrixWorld;
+
+					}
 
 					var transform = generateTransform( node.userData.transformData );
 
 					node.applyMatrix4( transform );
+					node.updateWorldMatrix();
 
 				}
 
@@ -3980,6 +3986,7 @@ THREE.FBXLoader = ( function () {
 		var lRotationPivotM = new THREE.Matrix4();
 
 		var lParentGX = new THREE.Matrix4();
+		var lParentLX = new THREE.Matrix4();
 		var lGlobalT = new THREE.Matrix4();
 
 		var inheritType = ( transformData.inheritType ) ? transformData.inheritType : 0;
@@ -4007,6 +4014,7 @@ THREE.FBXLoader = ( function () {
 			var array = transformData.postRotation.map( THREE.MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
+			lPostRotationM.invert();
 
 		}
 
@@ -4019,37 +4027,44 @@ THREE.FBXLoader = ( function () {
 		if ( transformData.rotationPivot ) lRotationPivotM.setPosition( tempVec.fromArray( transformData.rotationPivot ) );
 
 		// parent transform
-		if ( transformData.parentMatrixWorld ) lParentGX = transformData.parentMatrixWorld;
+		if ( transformData.parentMatrixWorld ) {
 
+			lParentLX.copy( transformData.parentMatrix );
+			lParentGX.copy( transformData.parentMatrixWorld );
+
+		}
+
+		var lLRM = new THREE.Matrix4().copy( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM );
 		// Global Rotation
-		var lLRM = lPreRotationM.multiply( lRotationM ).multiply( lPostRotationM );
 		var lParentGRM = new THREE.Matrix4();
-		lParentGX.extractRotation( lParentGRM );
+		lParentGRM.extractRotation( lParentGX );
 
 		// Global Shear*Scaling
 		var lParentTM = new THREE.Matrix4();
 		lParentTM.copyPosition( lParentGX );
 
 		var lParentGSM = new THREE.Matrix4();
-		lParentGSM.copy( lParentGRM ).invert().multiply( lParentGX );
+		var lParentGRSM = new THREE.Matrix4().copy( lParentTM ).invert().multiply( lParentGX );
+		lParentGSM.copy( lParentGRM ).invert().multiply( lParentGRSM );
+		var lLSM = lScalingM;
 
 		var lGlobalRS = new THREE.Matrix4();
 
 		if ( inheritType === 0 ) {
 
-			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM ).multiply( lScalingM );
+			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM ).multiply( lLSM );
 
 		} else if ( inheritType === 1 ) {
 
-			lGlobalRS.copy( lParentGRM ).multiply( lParentGSM ).multiply( lLRM ).multiply( lScalingM );
+			lGlobalRS.copy( lParentGRM ).multiply( lParentGSM ).multiply( lLRM ).multiply( lLSM );
 
 		} else {
 
-			var lParentLSM_inv = new THREE.Matrix4();
-			lParentLSM_inv.copy( lScalingM ).invert();
-			var lParentGSM_noLocal = new THREE.Matrix4().multiply( lParentGSM ).multiply( lParentLSM_inv );
+			var lParentLSM = new THREE.Matrix4().scale( new THREE.Vector3().setFromMatrixScale( lParentLX ) );
+			var lParentLSM_inv = new THREE.Matrix4().copy( lParentLSM ).invert();
+			var lParentGSM_noLocal = new THREE.Matrix4().copy( lParentGSM ).multiply( lParentLSM_inv );
 
-			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lScalingM );
+			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lLSM );
 
 		}
 
@@ -4066,7 +4081,10 @@ THREE.FBXLoader = ( function () {
 		var lGlobalTranslation = new THREE.Matrix4().copy( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
 		lGlobalT.copyPosition( lGlobalTranslation );
 
-		lTransform = new THREE.Matrix4().multiply( lGlobalT ).multiply( lGlobalRS );
+		lTransform = new THREE.Matrix4().copy( lGlobalT ).multiply( lGlobalRS );
+
+		// from global to local
+		lTransform.premultiply( lParentGX.invert() );
 
 		return lTransform;
 
