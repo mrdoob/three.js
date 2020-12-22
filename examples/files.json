@@ -384,7 +384,8 @@
 		"misc_exporter_ply",
 		"misc_exporter_stl",
 		"misc_legacy",
-		"misc_lookat"
+		"misc_lookat",
+		"misc_octree_collisions"
 	],
 	"css2d": [
 		"css2d_label"
