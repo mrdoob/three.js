@@ -36,3 +36,6 @@ export const pageYOffset = window.pageYOffset;
 export const FileReader = window.FileReader;
 export const URL = window.URL;
 export const ActiveXObject = window.ActiveXObject;
+export const AudioContext = window.AudioContext;
+export const webkitAudioContext = window.webkitAudioContext;
+export const XRHand = window.XRHand;

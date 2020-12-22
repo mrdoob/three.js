@@ -22,6 +22,9 @@ let _pageYOffset;
 let _FileReader;
 let _URL;
 let _ActiveXObject;
+let _AudioContext;
+let _webkitAudioContext;
+let _XRHand;
 
 function defineGlobals() {
 
@@ -51,6 +54,9 @@ function defineGlobals() {
 		_FileReader = window.FileReader;
 		_URL = window.URL;
 		_ActiveXObject = window.ActiveXObject;
+		_AudioContext = window.AudioContext;
+		_webkitAudioContext = window.webkitAudioContext;
+		_XRHand = window.XRHand;
 
 	} catch ( e ) { }
 
@@ -82,3 +88,6 @@ export const pageYOffset = _pageYOffset;
 export const FileReader = _FileReader;
 export const URL = _URL;
 export const ActiveXObject = _ActiveXObject;
+export const AudioContext = _AudioContext;
+export const webkitAudioContext = _webkitAudioContext;
+export const XRHand = _XRHand;

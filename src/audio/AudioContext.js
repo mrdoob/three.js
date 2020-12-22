@@ -1,3 +1,5 @@
+import { AudioContext, webkitAudioContext } from '../dom-globals';
+
 let _context;
 
 const AudioContext = {
@@ -6,7 +8,7 @@ const AudioContext = {
 
 		if ( _context === undefined ) {
 
-			_context = new ( window.AudioContext || window.webkitAudioContext )();
+			_context = new ( AudioContext || webkitAudioContext )();
 
 		}
 
