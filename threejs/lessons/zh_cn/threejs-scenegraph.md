@@ -4,7 +4,7 @@ TOC: 场景图
 
 本文是关于 three.js 系列文章的一部分。第一篇文章是 [three.js 基础](threejs-fundamentals.html)。 如果你还没有读过它，建议先从那里开始。
 
-Three.js 的核心可以说是它的场景图。场景图在 3D 引擎是一个图中节点的层次结构，其中每个节点代表了一个局部空间（local space）。
+Three.js 的核心可以说是它的场景图（scene gprah）。场景图在 3D 引擎是一个图中节点的层次结构，其中每个节点代表了一个局部空间（local space）。
 
 <img src="resources/images/scenegraph-generic.svg" align="center">
 
@@ -294,11 +294,11 @@ class AxisGridHelper {
 
 <img src="resources/images/scenegraph-human.svg" align="center">
 
-你可以看到对于人来说，场景图会变得很复杂。事实上，上面的场景图已经被简化了。例如，你可以把它扩展到覆盖每根手指（至少还有 28 个节点）和每个脚趾（还有 28 个节点），再加上脸部和下巴、眼睛，也许还有更多。
+你可以看到对于人类来说，场景图会变得很复杂。事实上，上面的场景图已经被简化了。例如，你可以把它扩展到覆盖每根手指（至少还有 28 个节点）和每个脚趾（还有 28 个节点），再加上脸部和下巴、眼睛，也许还有更多。
 
 我们来做一个稍微复杂的场景图。我们来做一辆坦克。坦克将有 6 个轮子和一个炮塔。坦克会沿着一条路径行驶。会有一个球体在周围移动，坦克会瞄准球体。
 
-这是场景图。网格的颜色为绿色，`Object3D` 为蓝色，灯光为金色，摄像机为紫色。还有一台摄像机未被添加进场景图。
+这是场景图。网格（mesh）的颜色为绿色，`Object3D` 为蓝色，灯光（light）为金色，摄像机（camera）为紫色。其中一台摄像机没有被添加进场景图。
 
 <div class="threejs_center"><img src="resources/images/scenegraph-tank.svg" style="width: 800px;"></div>
 
@@ -316,7 +316,7 @@ targetMaterial.emissive.setHSL((time * 10) % 1, 1, 0.25);
 targetMaterial.color.setHSL((time * 10) % 1, 1, 0.25);
 ```
 
-对于坦克来说，有一个叫做 `tank` 的 `Object3D`，用来移动它下面的所有东西。代码中使用了 `SplineCurve`，其接受用来定义曲线的一系列坐标为参数。0.0 是曲线的起始点，1.0 是曲线的终点。它首先获取当前的位置，也就是放置坦克的位置。然后获取在曲线稍远处的位置，并使用 `Object3D.lookAt` 将坦克指向该方向。
+对于坦克来说，有一个叫做 `tank` 的 `Object3D`，用来移动它下面的所有子节点。代码中使用了 `SplineCurve`，其接受用来定义曲线的一系列坐标为参数。0.0 是曲线的起始点，1.0 是曲线的终点。它首先获取当前的位置，也就是放置坦克的位置。然后获取在曲线稍远处的位置，并使用 `Object3D.lookAt` 将坦克指向该方向。
 
 ```js
 const tankPosition = new THREE.Vector2();
@@ -332,9 +332,7 @@ tank.position.set(tankPosition.x, 0, tankPosition.y);
 tank.lookAt(tankTarget.x, 0, tankTarget.y);
 ```
 
-The turret on top of the tank is moved automatically by being a child
-of the tank. To point it at the target we just ask for the target's world position
-and then again use `Object3D.lookAt`
+由于坦克顶部的炮塔是坦克的子节点，所以它会自动移动。如果要将它指向目标，我们只需要获取目标的世界位置（world position），然后再次使用 `Object3D.lookAt`。
 
 ```js
 const targetPosition = new THREE.Vector3();
@@ -361,7 +359,7 @@ tank.getWorldPosition(targetPosition);
 targetCameraPivot.lookAt(targetPosition);
 ```
 
-最后，我们旋转所有的轮子
+最后，我们旋转所有的车轮
 
 ```js
 wheelMeshes.forEach((obj) => {
