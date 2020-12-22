@@ -108,6 +108,7 @@
   },
   "dependencies": {
     "jsdom": "16.4.0",
+    "canvas": "^2.5.0",
     "fs-extra": "9.0.1"
   },
   "jspm": {
