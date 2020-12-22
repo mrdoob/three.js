@@ -1,7 +1,7 @@
 import { Camera } from './Camera.js';
 import { Object3D } from '../core/Object3D.js';
 
-function OrthographicCamera( left, right, top, bottom, near, far ) {
+function OrthographicCamera( left = - 1, right = 1, top = 1, bottom = - 1, near = 0.1, far = 2000 ) {
 
 	Camera.call( this );
 
@@ -10,13 +10,13 @@ function OrthographicCamera( left, right, top, bottom, near, far ) {
 	this.zoom = 1;
 	this.view = null;
 
-	this.left = ( left !== undefined ) ? left : - 1;
-	this.right = ( right !== undefined ) ? right : 1;
-	this.top = ( top !== undefined ) ? top : 1;
-	this.bottom = ( bottom !== undefined ) ? bottom : - 1;
+	this.left = left;
+	this.right = right;
+	this.top = top;
+	this.bottom = bottom;
 
-	this.near = ( near !== undefined ) ? near : 0.1;
-	this.far = ( far !== undefined ) ? far : 2000;
+	this.near = near;
+	this.far = far;
 
 	this.updateProjectionMatrix();
 
