@@ -30,7 +30,7 @@
 	"webgl_lights_hemisphere": [ "directional" ],
 	"webgl_lights_pointlights": [ "multiple" ],
 	"webgl_loader_ttf": [ "text", "font" ],
-	"webgl_loader_pdb": [ "molecules" ],
+	"webgl_loader_pdb": [ "molecules", "css2d" ],
 	"webgl_lod": [ "level", "details" ],
 	"webgl_materials_blending": [ "alpha" ],
 	"webgl_materials_blending_custom": [ "alpha" ],
