@@ -1038,6 +1038,13 @@
 
 			"애니메이션": {
 				"AnimationAction": "api/ko/animation/AnimationAction",
+				"AnimationClip": "api/ko/animation/AnimationClip",
+				"AnimationMixer": "api/ko/animation/AnimationMixer",
+				"AnimationObjectGroup": "api/ko/animation/AnimationObjectGroup",
+				"AnimationUtils": "api/ko/animation/AnimationUtils",
+				"KeyframeTrack": "api/ko/animation/KeyframeTrack",
+				"PropertyBinding": "api/ko/animation/PropertyBinding",
+				"PropertyMixer": "api/ko/animation/PropertyMixer"
 
 			},
 
