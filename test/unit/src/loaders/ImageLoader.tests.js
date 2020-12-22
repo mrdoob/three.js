@@ -95,14 +95,14 @@ export default QUnit.module( 'Loaders', () => {
 			const done = assert.async();
 			const imageLoader = new ImageLoader();
 			imageLoader.load(
-				`file://${__dirname}/../data/image.jpg`,
+				"https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/screenshots/css3d_orthographic.jpg",
 				// onLoad callback
 				function ( data ) {
 
 					// output the text to the console
 					// console.log( data );
-					assert.ok( data.naturalHeight === 30, "height ok!" );
-					assert.ok( data.naturalWidth === 30, "height ok!" );
+					assert.ok( data.naturalHeight === 250, "height ok!" );
+					assert.ok( data.naturalWidth === 400, "height ok!" );
 					done();
 
 				},
