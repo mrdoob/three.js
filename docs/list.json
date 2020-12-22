@@ -1037,9 +1037,9 @@
 		"레퍼런스": {
 
 			"애니메이션": {
-				"AnimationAction": "api/ko/animation/AnimationAction",
-
-			},
+				"AnimationAction": "api/ko/animation/AnimationAction"
+			}
+		},
 
 		"예제": {
 
