@@ -89,7 +89,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		const uniformNode = super.getUniformFromNode( node, shaderStage, type );
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
-		if ( nodeData.uniformGroup === undefined ) {
+		if ( nodeData.uniform === undefined ) {
 
 			let uniformsGroup = this.uniformsGroup[ shaderStage ];
 
