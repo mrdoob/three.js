@@ -24,7 +24,7 @@ function defineGlobals() {
 		_decodeURIComponent = window.decodeURIComponent;
 		_CustomEvent = window.CustomEvent;
 
-	} finally { }
+	} catch ( e ) { }
 
 }
 
