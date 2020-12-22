@@ -105,8 +105,6 @@ var files = [
 	{ path: 'math/ImprovedNoise.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
-	{ path: 'math/Capsule.js', dependencies: [], ignoreList: [] },
-	{ path: 'math/Octree.js', dependencies: [ { name: 'Capsule', path: 'math/Capsule.js' } ], ignoreList: [] },
 
 	{ path: 'misc/ConvexObjectBreaker.js', dependencies: [ { name: 'ConvexBufferGeometry', path: 'geometries/ConvexGeometry.js' } ], ignoreList: [ 'Matrix4' ] },
 	{ path: 'misc/GPUComputationRenderer.js', dependencies: [], ignoreList: [] },
