@@ -999,11 +999,11 @@
 		}
 
 	},
-  
+
 	"ko": {
-	
+
 		"매뉴얼": {
-	
+
 			"시작하기": {
 				"장면 만들기": "manual/ko/introduction/Creating-a-scene",
 				"설치": "manual/ko/introduction/Installation",
@@ -1017,7 +1017,7 @@
 				"FAQ": "manual/ko/introduction/FAQ",
 				"참고 링크": "manual/ko/introduction/Useful-links"
 			},
-	
+
 			"심화 과정": {
 				"오브젝트를 업데이트하는 방법": "manual/ko/introduction/How-to-update-things",
 				"오브젝트를 폐기하는 방법": "manual/ko/introduction/How-to-dispose-of-objects",
@@ -1029,14 +1029,15 @@
 
 			"빌드 도구": {
 				"NPM 테스트": "manual/ko/buildTools/Testing-with-NPM"
-				
+
 			}
-	
+
 		},
 
 		"레퍼런스": {
 
 			"애니메이션": {
+				"AnimationAction": "api/ko/animation/AnimationAction",
 				"AnimationAction": "api/ko/animation/AnimationAction",
 				"AnimationClip": "api/ko/animation/AnimationClip",
 				"AnimationMixer": "api/ko/animation/AnimationMixer",
@@ -1046,7 +1047,6 @@
 				"PropertyBinding": "api/ko/animation/PropertyBinding",
 				"PropertyMixer": "api/ko/animation/PropertyMixer"
 			}
-
 		},
 
 		"예제": {
@@ -1061,7 +1061,7 @@
 				"TrackballControls": "examples/ko/controls/TrackballControls",
 				"TransformControls": "examples/ko/controls/TransformControls"
 			}
-	
+
 		}
 
 	}
