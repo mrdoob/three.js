@@ -324,7 +324,7 @@ function convert( path, exampleDependencies, ignoreList, isNode ) {
 
 		if ( isNode ) {
 
-			imports.push( `import {${keys}\n} from "${pathPrefix}../../../build/three.module.node.js";` );
+			imports.push( `import {${keys}\n} from "${pathPrefix}../../build/three.module.node.js";` );
 
 		} else {
 
