@@ -456,11 +456,11 @@ var customWebGLContext = function () {
 
 export default QUnit.module( 'Renderers', () => {
 
-	QUnit.module( 'WebGLRenderer', () => {
+	QUnit.module( 'WebGLRenderer-webonly', () => {
 
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.test( "Instancing", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( new WebGLRenderer(), "Can instantiate a renderer." );
 
 		} );
 

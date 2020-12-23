@@ -998,14 +998,18 @@ THREE.LDrawLoader = ( function () {
 				edgeMaterial.userData.conditionalEdgeMaterial = new THREE.ShaderMaterial( {
 					vertexShader: conditionalLineVertShader,
 					fragmentShader: conditionalLineFragShader,
-					uniforms: {
-						diffuse: {
-							value: new THREE.Color( edgeColour )
-						},
-						opacity: {
-							value: alpha
+					uniforms: THREE.UniformsUtils.merge( [
+						THREE.UniformsLib.fog,
+						{
+							diffuse: {
+								value: new THREE.Color( edgeColour )
+							},
+							opacity: {
+								value: alpha
+							}
 						}
-					},
+					] ),
+					fog: true,
 					transparent: isTransparent,
 					depthWrite: ! isTransparent
 				} );

@@ -52,7 +52,7 @@ var NodeUtils = {
 
 			for ( var i = 0; i < list.length; ++ i ) {
 
-				var data = list[ i ].split( "." ),
+				var data = list[ i ].split( '.' ),
 					property = data[ 0 ],
 					subProperty = data[ 1 ];
 

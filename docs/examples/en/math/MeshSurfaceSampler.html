@@ -24,14 +24,13 @@
 		const sampleMesh = new THREE.InstancedMesh( sampleGeometry, sampleMaterial, 100 );
 
 		const _position = new THREE.Vector3();
-		const _normal = new THREE.Vector3();
 		const _matrix = new THREE.Matrix4();
 
 		// Sample randomly from the surface, creating an instance of the sample
 		// geometry at each sample point.
 		for ( let i = 0; i < 100; i ++ ) {
 
-			sampler.sample( _position, _normal );
+			sampler.sample( _position );
 
 			_matrix.makeTranslation( _position.x, _position.y, _position.z );
 

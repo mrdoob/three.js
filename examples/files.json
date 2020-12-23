@@ -200,7 +200,6 @@
 		"webgl_multiple_renderers",
 		"webgl_multiple_scenes_comparison",
 		"webgl_multiple_views",
-		"webgl_nearestneighbour",
 		"webgl_panorama_cube",
 		"webgl_panorama_equirectangular",
 		"webgl_performance",
@@ -357,6 +356,9 @@
 		"webxr_vr_sandbox",
 		"webxr_vr_sculpt",
 		"webxr_vr_video"
+	],
+	"games": [
+		"games_fps"
 	],
 	"physics": [
 		"physics_ammo_break",

@@ -259,7 +259,7 @@ var XRControllerModelFactory = ( function () {
 
 						if ( ! this.gltfLoader ) {
 
-							throw new Error( `GLTFLoader not set.` );
+							throw new Error( 'GLTFLoader not set.' );
 
 						}
 

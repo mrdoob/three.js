@@ -119,9 +119,9 @@ CodeBuilderInstructions.prototype = {
 const WorkerExecutionSupport = function () {
 
 	// check worker support first
-	if ( window.Worker === undefined ) throw "This browser does not support web workers!";
-	if ( window.Blob === undefined ) throw "This browser does not support Blob!";
-	if ( typeof window.URL.createObjectURL !== 'function' ) throw "This browser does not support Object creation from URL!";
+	if ( window.Worker === undefined ) throw 'This browser does not support web workers!';
+	if ( window.Blob === undefined ) throw 'This browser does not support Blob!';
+	if ( typeof window.URL.createObjectURL !== 'function' ) throw 'This browser does not support Object creation from URL!';
 
 	this._reset();
 
@@ -296,7 +296,7 @@ WorkerExecutionSupport.prototype = {
 
 			try {
 
-				const worker = new Worker( codeBuilderInstructions.jsmWorkerUrl.href, { type: "module" } );
+				const worker = new Worker( codeBuilderInstructions.jsmWorkerUrl.href, { type: 'module' } );
 				this._configureWorkerCommunication( worker, true, codeBuilderInstructions.defaultGeometryType, timeLabel );
 
 			} catch ( e ) {
@@ -305,7 +305,7 @@ WorkerExecutionSupport.prototype = {
 				// Chrome throws this exception, but Firefox currently does not complain, but can't execute the worker afterwards
 				if ( e instanceof TypeError || e instanceof SyntaxError ) {
 
-					console.error( "Modules are not supported in workers." );
+					console.error( 'Modules are not supported in workers.' );
 
 				}
 
@@ -426,7 +426,7 @@ WorkerExecutionSupport.prototype = {
 	_receiveWorkerMessage: function ( event ) {
 
 		// fast-fail in case of error
-		if ( event.type === "error" ) {
+		if ( event.type === 'error' ) {
 
 			console.error( event );
 			return;

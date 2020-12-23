@@ -32,20 +32,6 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TransformControls } from './jsm/controls/TransformControls.js';
 
-			String.prototype.format = function () {
-
-				let str = this;
-
-				for ( let i = 0; i < arguments.length; i ++ ) {
-
-					str = str.replace( '{' + i + '}', arguments[ i ] );
-
-				}
-
-				return str;
-
-			};
-
 			let container, stats;
 			let camera, scene, renderer;
 			const splineHelperObjects = [];
@@ -311,7 +297,7 @@
 				for ( let i = 0; i < splinePointsLength; i ++ ) {
 
 					const p = splineHelperObjects[ i ].position;
-					strplace.push( 'new THREE.Vector3({0}, {1}, {2})'.format( p.x, p.y, p.z ) );
+					strplace.push( `new THREE.Vector3(${p.x}, ${p.y}, ${p.z})` );
 
 				}
 

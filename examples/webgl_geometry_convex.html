@@ -43,11 +43,13 @@
 				controls.minDistance = 20;
 				controls.maxDistance = 50;
 				controls.maxPolarAngle = Math.PI / 2;
-
+				
+				// ambient light
+				
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
-
-				// light
-
+				
+				// point light
+				
 				const light = new THREE.PointLight( 0xffffff, 1 );
 				camera.add( light );
 
