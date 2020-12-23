@@ -204,7 +204,7 @@ THREE.GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 						if ( ! found ) {
 
-							return "Variable dependency not found. Variable=" + variable.name + ", dependency=" + depVar.name;
+							return 'Variable dependency not found. Variable=' + variable.name + ', dependency=' + depVar.name;
 
 						}
 
@@ -212,7 +212,7 @@ THREE.GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 					uniforms[ depVar.name ] = { value: null };
 
-					material.fragmentShader = "\nuniform sampler2D " + depVar.name + ";\n" + material.fragmentShader;
+					material.fragmentShader = '\nuniform sampler2D ' + depVar.name + ';\n' + material.fragmentShader;
 
 				}
 
@@ -272,7 +272,7 @@ THREE.GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	function addResolutionDefine( materialShader ) {
 
-		materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + " )";
+		materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + ' )';
 
 	}
 
@@ -362,25 +362,25 @@ THREE.GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	function getPassThroughVertexShader() {
 
-		return	"void main()	{\n" +
-				"\n" +
-				"	gl_Position = vec4( position, 1.0 );\n" +
-				"\n" +
-				"}\n";
+		return	'void main()	{\n' +
+				'\n' +
+				'	gl_Position = vec4( position, 1.0 );\n' +
+				'\n' +
+				'}\n';
 
 	}
 
 	function getPassThroughFragmentShader() {
 
-		return	"uniform sampler2D passThruTexture;\n" +
-				"\n" +
-				"void main() {\n" +
-				"\n" +
-				"	vec2 uv = gl_FragCoord.xy / resolution.xy;\n" +
-				"\n" +
-				"	gl_FragColor = texture2D( passThruTexture, uv );\n" +
-				"\n" +
-				"}\n";
+		return	'uniform sampler2D passThruTexture;\n' +
+				'\n' +
+				'void main() {\n' +
+				'\n' +
+				'	vec2 uv = gl_FragCoord.xy / resolution.xy;\n' +
+				'\n' +
+				'	gl_FragColor = texture2D( passThruTexture, uv );\n' +
+				'\n' +
+				'}\n';
 
 	}
 

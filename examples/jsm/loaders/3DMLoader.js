@@ -22,7 +22,7 @@ import {
 	LinearFilter,
 	ClampToEdgeWrapping,
 	TextureLoader
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var Rhino3dmLoader = function ( manager ) {
 
@@ -325,7 +325,8 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					} else {
 
-						var _object = this._createObject( obj, null );
+						var material = this._createMaterial( );
+						var _object = this._createObject( obj, material );
 
 					}
 
@@ -626,7 +627,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				} else if ( geometry.isLinearLight ) {
 
-					console.warn( `THREE.3DMLoader:  No conversion exists for linear lights.` );
+					console.warn( 'THREE.3DMLoader:  No conversion exists for linear lights.' );
 
 					return;
 
@@ -1241,7 +1242,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		}
 
-		if ( geometry ) {
+		if ( Array.isArray( geometry ) === false || geometry.length > 0 ) {
 
 			var attributes = extractProperties( _attributes );
 			attributes.geometry = extractProperties( _geometry );
@@ -1265,6 +1266,10 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			attributes.geometry.objectType = objectType;
 
 			return { geometry, attributes, objectType };
+
+		} else {
+
+			console.warn( 'THREE.3DMLoader: Object has no mesh geometry. Consider opening this in Rhino, using a shaded display mode, and exporting again.' );
 
 		}
 

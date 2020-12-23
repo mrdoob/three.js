@@ -114,6 +114,7 @@
 		"webgl_loader_prwm",
 		"webgl_loader_stl",
 		"webgl_loader_svg",
+		"webgl_loader_tilt",
 		"webgl_loader_texture_basis",
 		"webgl_loader_texture_dds",
 		"webgl_loader_texture_exr",
@@ -199,7 +200,6 @@
 		"webgl_multiple_renderers",
 		"webgl_multiple_scenes_comparison",
 		"webgl_multiple_views",
-		"webgl_nearestneighbour",
 		"webgl_panorama_cube",
 		"webgl_panorama_equirectangular",
 		"webgl_performance",
@@ -356,6 +356,9 @@
 		"webxr_vr_sandbox",
 		"webxr_vr_sculpt",
 		"webxr_vr_video"
+	],
+	"games": [
+		"games_fps"
 	],
 	"physics": [
 		"physics_ammo_break",

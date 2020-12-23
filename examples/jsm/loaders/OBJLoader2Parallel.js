@@ -5,21 +5,21 @@
 // Imports only related to wrapper
 import {
 	Object3D
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 import {
 	CodeBuilderInstructions,
 	WorkerExecutionSupport
-} from "./obj2/worker/main/WorkerExecutionSupport.js";
-import { CodeSerializer } from "./obj2/utils/CodeSerializer.js";
-import { OBJLoader2 } from "./OBJLoader2.js";
+} from './obj2/worker/main/WorkerExecutionSupport.js';
+import { CodeSerializer } from './obj2/utils/CodeSerializer.js';
+import { OBJLoader2 } from './OBJLoader2.js';
 
 // Imports only related to worker (when standard workers (modules aren't supported) are used)
-import { OBJLoader2Parser } from "./obj2/OBJLoader2Parser.js";
+import { OBJLoader2Parser } from './obj2/OBJLoader2Parser.js';
 import {
 	WorkerRunner,
 	DefaultWorkerPayloadHandler,
 	ObjectManipulator
-} from "./obj2/worker/parallel/WorkerRunner.js";
+} from './obj2/worker/parallel/WorkerRunner.js';
 
 
 /**
@@ -73,7 +73,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 		if ( jsmWorkerUrl === undefined || jsmWorkerUrl === null ) {
 
-			throw "The url to the jsm worker is not valid. Aborting...";
+			throw 'The url to the jsm worker is not valid. Aborting...';
 
 		}
 
@@ -165,7 +165,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 			if ( this.parser.callbacks.onLoad === this.parser._onLoad ) {
 
-				throw "No callback other than the default callback was provided! Aborting!";
+				throw 'No callback other than the default callback was provided! Aborting!';
 
 			}
 

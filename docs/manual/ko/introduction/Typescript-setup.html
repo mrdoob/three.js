@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>타입스크립트 설정([name])</h1>
+
+		<p>
+			three.js는 자바스크립트 기반 라이브러리입니다. 하지만 TypeScript 프로젝트에도 사용이 가능한데, [link:https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html Declaration Files] (*d.ts* 파일)의 라이브러리 노출 설정을 통해 가능합니다.
+		</p>
+
+		<p>
+			컴파일러가 three.js의 타입을 확인하기 위해 약간의 설정이 필요합니다.<br>
+			[link:https://www.typescriptlang.org/docs/handbook/module-resolution.html moduleResolution]옵션을 *노드*에 설정하고
+			[link:https://www.typescriptlang.org/docs/handbook/compiler-options.html target] 옵션을 *es6* 혹은 최신 버전으로 설정합니다.
+		</p>
+
+		<code>
+		// Example of minimal `tsconfig.json` file
+		{
+			"compilerOptions": {
+				"target": "es6",
+				"moduleResolution": "node",
+			},
+			"include": [ "./src/**/*.ts" ],
+		}
+		</code>
+
+		<p>
+			주의: 현 시점에서 three.js는 위 두 설정을 하지 않고서는 사용할 수 없습니다.
+		</p>
+
+		<p>
+			주의: 몇몇 선언들은 틀리거나 찾을 수 없음으로 나올 것입니다. 선언문 파일들에 대한 교정 작업 지원은 커뮤니티와 three.js를 보다 정확하고 좋게 만드는 데에 도움이 될 것입니다.
+		</p>
+	</body>
+</html>

@@ -27,6 +27,7 @@
     "test": "test"
   },
   "eslintConfig": {
+    "root": true,
     "parser": "@typescript-eslint/parser",
     "extends": "mdcs",
     "plugins": [
@@ -44,6 +45,10 @@
           "SwitchCase": 1
         }
       ],
+      "quotes": [
+        "error",
+        "single"
+      ],
       "prefer-const": [
         "error",
         {
@@ -58,11 +63,12 @@
     "test": "npm run test-lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
-    "lint-fix": "eslint src --ext js --ext ts --fix && eslint examples/js/ --ext js --ext ts --ignore-pattern libs --fix",
+    "lint-fix": "eslint src --ext js --ext ts --fix && eslint examples/js examples/jsm --ext js --ext ts --ignore-pattern libs --fix",
     "lint-docs": "eslint docs --ext html",
-    "lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
+    "lint-examples": "eslint examples/js examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
     "test-lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
     "test-unit": "npm run unit --prefix test",
+    "test-unit-examples": "npm run unit-examples --prefix test",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "make-screenshot": "node test/e2e/puppeteer.js --make"

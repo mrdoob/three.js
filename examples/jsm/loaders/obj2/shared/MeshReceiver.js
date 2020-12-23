@@ -8,7 +8,7 @@ import {
 	LineSegments,
 	Mesh,
 	Points
-} from "../../../../../build/three.module.js";
+} from '../../../../../build/three.module.js';
 
 
 /**

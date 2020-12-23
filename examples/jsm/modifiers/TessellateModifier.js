@@ -2,7 +2,7 @@ import {
 	BufferGeometry,
 	Face3,
 	Geometry
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * Break faces with edges longer than maxEdgeLength

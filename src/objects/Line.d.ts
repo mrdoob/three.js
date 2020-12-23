@@ -12,8 +12,7 @@ export class Line <
 
 	constructor(
 		geometry?: TGeometry,
-		material?: TMaterial,
-		mode?: number
+		material?: TMaterial
 	);
 
 	geometry: TGeometry;

@@ -3,7 +3,7 @@ import {
 	Float32BufferAttribute,
 	Geometry,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  *	Simplification Geometry Modifier

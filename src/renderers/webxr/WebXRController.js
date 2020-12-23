@@ -140,11 +140,11 @@ Object.assign( WebXRController.prototype, {
 				handPose = true;
 				let i = 0;
 
-				for ( let inputjoint of inputSource.hand.values() ) {
+				for ( const inputjoint of inputSource.hand.values() ) {
 
 					// Update the joints groups with the XRJoint poses
 					const jointPose = frame.getJointPose( inputjoint, referenceSpace );
-					const joint = hand.joints[ i++ ];
+					const joint = hand.joints[ i ++ ];
 
 					if ( jointPose !== null ) {
 
@@ -170,7 +170,7 @@ Object.assign( WebXRController.prototype, {
 
 						hand.inputState.pinching = false;
 						this.dispatchEvent( {
-							type: "pinchend",
+							type: 'pinchend',
 							handedness: inputSource.handedness,
 							target: this
 						} );
@@ -179,7 +179,7 @@ Object.assign( WebXRController.prototype, {
 
 						hand.inputState.pinching = true;
 						this.dispatchEvent( {
-							type: "pinchstart",
+							type: 'pinchstart',
 							handedness: inputSource.handedness,
 							target: this
 						} );

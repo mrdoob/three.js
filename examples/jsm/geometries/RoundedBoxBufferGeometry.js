@@ -1,7 +1,7 @@
 import {
 	BoxBufferGeometry,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 const tempNormal = new Vector3();
 function getUv( faceDirVector, normal, uvAxis, projectionAxis, radius, sideLength ) {

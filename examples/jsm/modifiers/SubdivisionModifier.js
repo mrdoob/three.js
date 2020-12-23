@@ -4,7 +4,7 @@ import {
 	Geometry,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  *	Subdivision Geometry Modifier
@@ -76,7 +76,7 @@ SubdivisionModifier.prototype.modify = function ( geometry ) {
 		var vertexIndexA = Math.min( a, b );
 		var vertexIndexB = Math.max( a, b );
 
-		var key = vertexIndexA + "_" + vertexIndexB;
+		var key = vertexIndexA + '_' + vertexIndexB;
 
 		return map[ key ];
 
@@ -88,7 +88,7 @@ SubdivisionModifier.prototype.modify = function ( geometry ) {
 		var vertexIndexA = Math.min( a, b );
 		var vertexIndexB = Math.max( a, b );
 
-		var key = vertexIndexA + "_" + vertexIndexB;
+		var key = vertexIndexA + '_' + vertexIndexB;
 
 		var edge;
 

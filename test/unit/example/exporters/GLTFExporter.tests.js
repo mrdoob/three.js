@@ -6,6 +6,7 @@ import { AnimationClip } from '../../../../src/animation/AnimationClip';
 import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
+import { DirectionalLight } from '../../../../src/lights/DirectionalLight';
 import { Mesh } from '../../../../src/objects/Mesh';
 import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial';
 import { MeshStandardMaterial } from '../../../../src/materials/MeshStandardMaterial';
@@ -29,6 +30,113 @@ export default QUnit.module( 'Exporters', () => {
 
 		} );
 
+		QUnit.test( 'utils - insertKeyframe', ( assert ) => {
+
+			var track;
+			var index;
+
+			function createTrack() {
+
+				return new VectorKeyframeTrack(
+					'foo.bar',
+					[ 5,		10,	 15,	 20,	 25,	 30 ],
+					[ 0, 5, 1, 4, 2, 3, 3, 2, 4, 1, 5, 0 ],
+					InterpolateLinear
+				);
+
+			}
+
+			track = createTrack();
+			index = GLTFExporter.Utils.insertKeyframe( track, 0 );
+			assert.equal( index, 0, 'prepend - index' );
+			assert.smartEqual( Array.from( track.times ), [ 0, 5, 10, 15, 20, 25, 30 ], 'prepend - time' );
+			assert.smartEqual( Array.from( track.values ), [ 0, 5, 0, 5, 1, 4, 2, 3, 3, 2, 4, 1, 5, 0 ], 'prepend - value' );
+
+			track = createTrack();
+			index = GLTFExporter.Utils.insertKeyframe( track, 7.5 );
+			assert.equal( index, 1, 'insert - index (linear)' );
+			assert.smartEqual( Array.from( track.times ), [ 5, 7.5, 10, 15, 20, 25, 30 ], 'insert - time (linear)' );
+			assert.smartEqual( Array.from( track.values ), [ 0, 5, 0.5, 4.5, 1, 4, 2, 3, 3, 2, 4, 1, 5, 0 ], 'insert - value (linear)' );
+
+			track = createTrack();
+			track.setInterpolation( InterpolateDiscrete );
+			index = GLTFExporter.Utils.insertKeyframe( track, 16 );
+			assert.equal( index, 3, 'insert - index (linear)' );
+			assert.smartEqual( Array.from( track.times ), [ 5, 10, 15, 16, 20, 25, 30 ], 'insert - time (discrete)' );
+			assert.smartEqual( Array.from( track.values ), [ 0, 5, 1, 4, 2, 3, 2, 3, 3, 2, 4, 1, 5, 0 ], 'insert - value (discrete)' );
+
+			track = createTrack();
+			index = GLTFExporter.Utils.insertKeyframe( track, 100 );
+			assert.equal( index, 6, 'append - index' );
+			assert.smartEqual( Array.from( track.times ), [ 5, 10, 15, 20, 25, 30, 100 ], 'append time' );
+			assert.smartEqual( Array.from( track.values ), [ 0, 5, 1, 4, 2, 3, 3, 2, 4, 1, 5, 0, 5, 0 ], 'append value' );
+
+			track = createTrack();
+			index = GLTFExporter.Utils.insertKeyframe( track, 15 );
+			assert.equal( index, 2, 'existing - index' );
+			assert.smartEqual( Array.from( track.times ), [ 5, 10, 15, 20, 25, 30 ], 'existing - time' );
+			assert.smartEqual( Array.from( track.values ), [ 0, 5, 1, 4, 2, 3, 3, 2, 4, 1, 5, 0 ], 'existing - value' );
+
+			track = createTrack();
+			index = GLTFExporter.Utils.insertKeyframe( track, 20.000005 );
+			assert.equal( index, 3, 'tolerance - index' );
+			assert.smartEqual( Array.from( track.times ), [ 5, 10, 15, 20, 25, 30 ], 'tolerance - time' );
+			assert.smartEqual( Array.from( track.values ), [ 0, 5, 1, 4, 2, 3, 3, 2, 4, 1, 5, 0 ], 'tolerance - value' );
+
+		} );
+
+		QUnit.test( 'utils - mergeMorphTargetTracks', ( assert ) => {
+
+			var trackA = new NumberKeyframeTrack(
+				'foo.morphTargetInfluences[a]',
+				[ 5, 10, 15, 20, 25, 30 ],
+				[ 0, 0.2, 0.4, 0.6, 0.8, 1.0 ],
+				InterpolateLinear
+			);
+
+			var trackB = new NumberKeyframeTrack(
+				'foo.morphTargetInfluences[b]',
+				[ 10, 50 ],
+				[ 0.25, 0.75 ],
+				InterpolateLinear
+			);
+
+			var geometry = new BufferGeometry();
+			var position = new BufferAttribute( new Float32Array( [ 0, 0, 0, 0, 0, 1, 1, 0, 1 ] ), 3 );
+			geometry.setAttribute( 'position',	position );
+			geometry.morphAttributes.position = [ position, position ];
+
+			var mesh = new Mesh( geometry );
+			mesh.name = 'foo';
+			mesh.morphTargetDictionary.a = 0;
+			mesh.morphTargetDictionary.b = 1;
+
+			var root = new Object3D();
+			root.add( mesh );
+
+			var clip = new AnimationClip( 'waltz', undefined, [ trackA, trackB ] );
+			clip = GLTFExporter.Utils.mergeMorphTargetTracks( clip, root );
+
+			assert.equal( clip.tracks.length, 1, 'tracks are merged' );
+
+			var track = clip.tracks[ 0 ];
+
+			assert.smartEqual( Array.from( track.times ), [ 5, 10, 15, 20, 25, 30, 50 ], 'all keyframes are present' );
+
+			var expectedValues = [ 0, 0.25, 0.2, 0.25, 0.4, 0.3125, 0.6, 0.375, 0.8, 0.4375, 1.0, 0.5, 1.0, 0.75 ];
+
+			for ( var i = 0; i < track.values.length; i ++ ) {
+
+				assert.numEqual( track.values[ i ], expectedValues[ i ], 'all values are merged or interpolated - ' + i );
+
+			}
+
+		} );
+
+	} );
+
+	QUnit.module( 'GLTFExporter-webonly', () => {
+
 		QUnit.test( 'parse - metadata', ( assert ) => {
 
 			var done = assert.async();
@@ -39,10 +147,8 @@ export default QUnit.module( 'Exporters', () => {
 
 			exporter.parse( object, function ( gltf ) {
 
-				console.log( gltf );
-
 				assert.equal( '2.0', gltf.asset.version, 'asset.version' );
-				assert.equal( 'GLTFExporter', gltf.asset.generator, 'asset.generator' );
+				assert.equal( 'THREE.GLTFExporter', gltf.asset.generator, 'asset.generator' );
 
 				done();
 
@@ -237,106 +343,83 @@ export default QUnit.module( 'Exporters', () => {
 
 		} );
 
-		QUnit.test( 'utils - insertKeyframe', ( assert ) => {
+		QUnit.test( 'parse - KHR_lights_punctual extension', ( assert ) => {
 
-			var track;
-			var index;
+			const done = assert.async();
 
-			function createTrack() {
+			const scene = new Scene();
+			const light = new DirectionalLight( 0xffffff );
+			light.position.set( 1, 2, 3 );
+			scene.add( light );
+			scene.updateMatrixWorld();
 
-				return new VectorKeyframeTrack(
-					'foo.bar',
-					[ 5,		10,	 15,	 20,	 25,	 30 ],
-					[ 0, 5, 1, 4, 2, 3, 3, 2, 4, 1, 5, 0 ],
-					InterpolateLinear
-				);
+			const exporter = new GLTFExporter();
 
-			}
+			exporter.parse( scene, gltf => {
 
-			track = createTrack();
-			index = GLTFExporter.Utils.insertKeyframe( track, 0 );
-			assert.equal( index, 0, 'prepend - index' );
-			assert.smartEqual( Array.from( track.times ), [ 0, 5, 10, 15, 20, 25, 30 ], 'prepend - time' );
-			assert.smartEqual( Array.from( track.values ), [ 0, 5, 0, 5, 1, 4, 2, 3, 3, 2, 4, 1, 5, 0 ], 'prepend - value' );
+				const extensionName = 'KHR_lights_punctual';
+				const extensionsUsed = gltf.extensionsUsed || [];
+				const extensions = gltf.extensions || {};
+				const lightsDef = extensions[ extensionName ] || {};
+				const lights = lightsDef.lights || [];
+				const lightDef = lights[ 0 ] || {};
 
-			track = createTrack();
-			index = GLTFExporter.Utils.insertKeyframe( track, 7.5 );
-			assert.equal( index, 1, 'insert - index (linear)' );
-			assert.smartEqual( Array.from( track.times ), [ 5, 7.5, 10, 15, 20, 25, 30 ], 'insert - time (linear)' );
-			assert.smartEqual( Array.from( track.values ), [ 0, 5, 0.5, 4.5, 1, 4, 2, 3, 3, 2, 4, 1, 5, 0 ], 'insert - value (linear)' );
+				const nodes = gltf.nodes || [];
+				const lightNodeDefsNum = nodes.filter( nodeDef => nodeDef.extensions && nodeDef.extensions[ extensionName ] ).length;
+				const lightNodeDef = nodes.find( nodeDef => nodeDef.extensions && nodeDef.extensions[ extensionName ] ) || {};
+				const lightNodeExtensions = lightNodeDef.extensions || {};
+				const lightNodeExtensionDef = lightNodeExtensions[ extensionName ] || {};
 
-			track = createTrack();
-			track.setInterpolation( InterpolateDiscrete );
-			index = GLTFExporter.Utils.insertKeyframe( track, 16 );
-			assert.equal( index, 3, 'insert - index (linear)' );
-			assert.smartEqual( Array.from( track.times ), [ 5, 10, 15, 16, 20, 25, 30 ], 'insert - time (discrete)' );
-			assert.smartEqual( Array.from( track.values ), [ 0, 5, 1, 4, 2, 3, 2, 3, 3, 2, 4, 1, 5, 0 ], 'insert - value (discrete)' );
+				assert.ok( extensionsUsed.indexOf( extensionName ) >= 0, `${extensionName} exists in extensionsUsed` );
+				assert.equal( 1, lights.length, 'one light' );
+				assert.smartEqual( [ 1, 1, 1 ], lightDef.color, 'correct color' );
+				assert.equal( light.intensity, lightDef.intensity, 'correct intensity' );
+				assert.equal( 'directional', lightDef.type, 'correct type' );
 
-			track = createTrack();
-			index = GLTFExporter.Utils.insertKeyframe( track, 100 );
-			assert.equal( index, 6, 'append - index' );
-			assert.smartEqual( Array.from( track.times ), [ 5, 10, 15, 20, 25, 30, 100 ], 'append time' );
-			assert.smartEqual( Array.from( track.values ), [ 0, 5, 1, 4, 2, 3, 3, 2, 4, 1, 5, 0, 5, 0 ], 'append value' );
+				assert.equal( 1, lightNodeDefsNum, `one node having ${extensionName} extension` );
+				assert.equal( 0, lightNodeExtensionDef.light, 'correct light node index' );
+				assert.smartEqual( light.matrix.elements,
+					lightNodeDef.matrix, 'correct light node transform' );
 
-			track = createTrack();
-			index = GLTFExporter.Utils.insertKeyframe( track, 15 );
-			assert.equal( index, 2, 'existing - index' );
-			assert.smartEqual( Array.from( track.times ), [ 5, 10, 15, 20, 25, 30 ], 'existing - time' );
-			assert.smartEqual( Array.from( track.values ), [ 0, 5, 1, 4, 2, 3, 3, 2, 4, 1, 5, 0 ], 'existing - value' );
+				// @TODO: Add PointLight and SpotLight tests
 
-			track = createTrack();
-			index = GLTFExporter.Utils.insertKeyframe( track, 20.000005 );
-			assert.equal( index, 3, 'tolerance - index' );
-			assert.smartEqual( Array.from( track.times ), [ 5, 10, 15, 20, 25, 30 ], 'tolerance - time' );
-			assert.smartEqual( Array.from( track.values ), [ 0, 5, 1, 4, 2, 3, 3, 2, 4, 1, 5, 0 ], 'tolerance - value' );
+				done();
+
+			} );
 
 		} );
 
-		QUnit.test( 'utils - mergeMorphTargetTracks', ( assert ) => {
+		QUnit.test( 'parse - KHR_materials_unlit extension', ( assert ) => {
 
-			var trackA = new NumberKeyframeTrack(
-				'foo.morphTargetInfluences[a]',
-				[ 5, 10, 15, 20, 25, 30 ],
-				[ 0, 0.2, 0.4, 0.6, 0.8, 1.0 ],
-				InterpolateLinear
+			const done = assert.async();
+
+			const scene = new Scene();
+			const mesh = new Mesh(
+				new BoxBufferGeometry( 1, 1, 1 ),
+				new MeshBasicMaterial()
 			);
+			scene.add( mesh );
 
-			var trackB = new NumberKeyframeTrack(
-				'foo.morphTargetInfluences[b]',
-				[ 10, 50 ],
-				[ 0.25, 0.75 ],
-				InterpolateLinear
-			);
+			const exporter = new GLTFExporter();
 
-			var geometry = new BufferGeometry();
-			var position = new BufferAttribute( new Float32Array( [ 0, 0, 0, 0, 0, 1, 1, 0, 1 ] ), 3 );
-			geometry.setAttribute( 'position',	position );
-			geometry.morphAttributes.position = [ position, position ];
+			exporter.parse( scene, gltf => {
 
-			var mesh = new Mesh( geometry );
-			mesh.name = 'foo';
-			mesh.morphTargetDictionary.a = 0;
-			mesh.morphTargetDictionary.b = 1;
+				const extensionName = 'KHR_materials_unlit';
+				const extensionsUsed = gltf.extensionsUsed || [];
+				const materials = gltf.materials || [];
+				const materialDef = materials[ 0 ] || {};
+				const pbrMetallicRoughness = materialDef.pbrMetallicRoughness || {};
+				const extensions = materialDef.extensions || {};
 
-			var root = new Object3D();
-			root.add( mesh );
+				assert.ok( extensionsUsed.indexOf( extensionName ) >= 0, `${extensionName} exists in extensionsUsed` );
+				assert.equal( 1, materials.length, 'one material' );
+				assert.ok( extensions[ extensionName ], `material has ${extensionName} extension` );
+				assert.equal( 0.0, pbrMetallicRoughness.metallicFactor, 'correct metallicFactor' );
+				assert.equal( 0.9, pbrMetallicRoughness.roughnessFactor, 'correct roughnessFactor' );
 
-			var clip = new AnimationClip( 'waltz', undefined, [ trackA, trackB ] );
-			clip = GLTFExporter.Utils.mergeMorphTargetTracks( clip, root );
+				done();
 
-			assert.equal( clip.tracks.length, 1, 'tracks are merged' );
-
-			var track = clip.tracks[ 0 ];
-
-			assert.smartEqual( Array.from( track.times ), [ 5, 10, 15, 20, 25, 30, 50 ], 'all keyframes are present' );
-
-			var expectedValues = [ 0, 0.25, 0.2, 0.25, 0.4, 0.3125, 0.6, 0.375, 0.8, 0.4375, 1.0, 0.5, 1.0, 0.75 ];
-
-			for ( var i = 0; i < track.values.length; i ++ ) {
-
-				assert.numEqual( track.values[ i ], expectedValues[ i ], 'all values are merged or interpolated - ' + i );
-
-			}
+			} );
 
 		} );
 

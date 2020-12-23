@@ -19,7 +19,7 @@ import {
 	SphereBufferGeometry,
 	TorusBufferGeometry,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var TransformControls = function ( camera, domElement ) {
 
@@ -47,25 +47,25 @@ var TransformControls = function ( camera, domElement ) {
 	// Setting the defined property will automatically trigger change event
 	// Defined properties are passed down to gizmo and plane
 
-	defineProperty( "camera", camera );
-	defineProperty( "object", undefined );
-	defineProperty( "enabled", true );
-	defineProperty( "axis", null );
-	defineProperty( "mode", "translate" );
-	defineProperty( "translationSnap", null );
-	defineProperty( "rotationSnap", null );
-	defineProperty( "scaleSnap", null );
-	defineProperty( "space", "world" );
-	defineProperty( "size", 1 );
-	defineProperty( "dragging", false );
-	defineProperty( "showX", true );
-	defineProperty( "showY", true );
-	defineProperty( "showZ", true );
+	defineProperty( 'camera', camera );
+	defineProperty( 'object', undefined );
+	defineProperty( 'enabled', true );
+	defineProperty( 'axis', null );
+	defineProperty( 'mode', 'translate' );
+	defineProperty( 'translationSnap', null );
+	defineProperty( 'rotationSnap', null );
+	defineProperty( 'scaleSnap', null );
+	defineProperty( 'space', 'world' );
+	defineProperty( 'size', 1 );
+	defineProperty( 'dragging', false );
+	defineProperty( 'showX', true );
+	defineProperty( 'showY', true );
+	defineProperty( 'showZ', true );
 
-	var changeEvent = { type: "change" };
-	var mouseDownEvent = { type: "mouseDown" };
-	var mouseUpEvent = { type: "mouseUp", mode: scope.mode };
-	var objectChangeEvent = { type: "objectChange" };
+	var changeEvent = { type: 'change' };
+	var mouseDownEvent = { type: 'mouseDown' };
+	var mouseUpEvent = { type: 'mouseUp', mode: scope.mode };
+	var objectChangeEvent = { type: 'objectChange' };
 
 	// Reusable utility variables
 
@@ -132,32 +132,32 @@ var TransformControls = function ( camera, domElement ) {
 
 	// TODO: remove properties unused in plane and gizmo
 
-	defineProperty( "worldPosition", worldPosition );
-	defineProperty( "worldPositionStart", worldPositionStart );
-	defineProperty( "worldQuaternion", worldQuaternion );
-	defineProperty( "worldQuaternionStart", worldQuaternionStart );
-	defineProperty( "cameraPosition", cameraPosition );
-	defineProperty( "cameraQuaternion", cameraQuaternion );
-	defineProperty( "pointStart", pointStart );
-	defineProperty( "pointEnd", pointEnd );
-	defineProperty( "rotationAxis", rotationAxis );
-	defineProperty( "rotationAngle", rotationAngle );
-	defineProperty( "eye", eye );
+	defineProperty( 'worldPosition', worldPosition );
+	defineProperty( 'worldPositionStart', worldPositionStart );
+	defineProperty( 'worldQuaternion', worldQuaternion );
+	defineProperty( 'worldQuaternionStart', worldQuaternionStart );
+	defineProperty( 'cameraPosition', cameraPosition );
+	defineProperty( 'cameraQuaternion', cameraQuaternion );
+	defineProperty( 'pointStart', pointStart );
+	defineProperty( 'pointEnd', pointEnd );
+	defineProperty( 'rotationAxis', rotationAxis );
+	defineProperty( 'rotationAngle', rotationAngle );
+	defineProperty( 'eye', eye );
 
 	{
 
-		domElement.addEventListener( "pointerdown", onPointerDown, false );
-		domElement.addEventListener( "pointermove", onPointerHover, false );
-		scope.domElement.ownerDocument.addEventListener( "pointerup", onPointerUp, false );
+		domElement.addEventListener( 'pointerdown', onPointerDown, false );
+		domElement.addEventListener( 'pointermove', onPointerHover, false );
+		scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
 
 	}
 
 	this.dispose = function () {
 
-		domElement.removeEventListener( "pointerdown", onPointerDown );
-		domElement.removeEventListener( "pointermove", onPointerHover );
-		scope.domElement.ownerDocument.removeEventListener( "pointermove", onPointerMove );
-		scope.domElement.ownerDocument.removeEventListener( "pointerup", onPointerUp );
+		domElement.removeEventListener( 'pointerdown', onPointerDown );
+		domElement.removeEventListener( 'pointermove', onPointerHover );
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
 
 		this.traverse( function ( child ) {
 
@@ -210,7 +210,7 @@ var TransformControls = function ( camera, domElement ) {
 					_plane[ propName ] = value;
 					_gizmo[ propName ] = value;
 
-					scope.dispatchEvent( { type: propName + "-changed", value: value } );
+					scope.dispatchEvent( { type: propName + '-changed', value: value } );
 					scope.dispatchEvent( changeEvent );
 
 				}
@@ -650,7 +650,7 @@ var TransformControls = function ( camera, domElement ) {
 		if ( ! scope.enabled ) return;
 
 		scope.domElement.style.touchAction = 'none'; // disable touch scroll
-		scope.domElement.ownerDocument.addEventListener( "pointermove", onPointerMove, false );
+		scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
 
 		scope.pointerHover( getPointer( event ) );
 		scope.pointerDown( getPointer( event ) );
@@ -670,7 +670,7 @@ var TransformControls = function ( camera, domElement ) {
 		if ( ! scope.enabled ) return;
 
 		scope.domElement.style.touchAction = '';
-		scope.domElement.ownerDocument.removeEventListener( "pointermove", onPointerMove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
 
 		scope.pointerUp( getPointer( event ) );
 
@@ -1152,21 +1152,21 @@ var TransformControlsGizmo = function () {
 	this.picker = {};
 	this.helper = {};
 
-	this.add( this.gizmo[ "translate" ] = setupGizmo( gizmoTranslate ) );
-	this.add( this.gizmo[ "rotate" ] = setupGizmo( gizmoRotate ) );
-	this.add( this.gizmo[ "scale" ] = setupGizmo( gizmoScale ) );
-	this.add( this.picker[ "translate" ] = setupGizmo( pickerTranslate ) );
-	this.add( this.picker[ "rotate" ] = setupGizmo( pickerRotate ) );
-	this.add( this.picker[ "scale" ] = setupGizmo( pickerScale ) );
-	this.add( this.helper[ "translate" ] = setupGizmo( helperTranslate ) );
-	this.add( this.helper[ "rotate" ] = setupGizmo( helperRotate ) );
-	this.add( this.helper[ "scale" ] = setupGizmo( helperScale ) );
+	this.add( this.gizmo[ 'translate' ] = setupGizmo( gizmoTranslate ) );
+	this.add( this.gizmo[ 'rotate' ] = setupGizmo( gizmoRotate ) );
+	this.add( this.gizmo[ 'scale' ] = setupGizmo( gizmoScale ) );
+	this.add( this.picker[ 'translate' ] = setupGizmo( pickerTranslate ) );
+	this.add( this.picker[ 'rotate' ] = setupGizmo( pickerRotate ) );
+	this.add( this.picker[ 'scale' ] = setupGizmo( pickerScale ) );
+	this.add( this.helper[ 'translate' ] = setupGizmo( helperTranslate ) );
+	this.add( this.helper[ 'rotate' ] = setupGizmo( helperRotate ) );
+	this.add( this.helper[ 'scale' ] = setupGizmo( helperScale ) );
 
 	// Pickers should be hidden always
 
-	this.picker[ "translate" ].visible = false;
-	this.picker[ "rotate" ].visible = false;
-	this.picker[ "scale" ].visible = false;
+	this.picker[ 'translate' ].visible = false;
+	this.picker[ 'rotate' ].visible = false;
+	this.picker[ 'scale' ].visible = false;
 
 	// updateMatrixWorld will update transformations and appearance of individual handles
 
@@ -1176,17 +1176,17 @@ var TransformControlsGizmo = function () {
 
 		if ( this.mode === 'scale' ) space = 'local'; // scale always oriented to local rotation
 
-		var quaternion = space === "local" ? this.worldQuaternion : identityQuaternion;
+		var quaternion = space === 'local' ? this.worldQuaternion : identityQuaternion;
 
 		// Show only gizmos for current transform mode
 
-		this.gizmo[ "translate" ].visible = this.mode === "translate";
-		this.gizmo[ "rotate" ].visible = this.mode === "rotate";
-		this.gizmo[ "scale" ].visible = this.mode === "scale";
+		this.gizmo[ 'translate' ].visible = this.mode === 'translate';
+		this.gizmo[ 'rotate' ].visible = this.mode === 'rotate';
+		this.gizmo[ 'scale' ].visible = this.mode === 'scale';
 
-		this.helper[ "translate" ].visible = this.mode === "translate";
-		this.helper[ "rotate" ].visible = this.mode === "rotate";
-		this.helper[ "scale" ].visible = this.mode === "scale";
+		this.helper[ 'translate' ].visible = this.mode === 'translate';
+		this.helper[ 'rotate' ].visible = this.mode === 'rotate';
+		this.helper[ 'scale' ].visible = this.mode === 'scale';
 
 
 		var handles = [];
@@ -1485,7 +1485,7 @@ var TransformControlsGizmo = function () {
 				tempQuaternion2.copy( quaternion );
 				alignVector.copy( this.eye ).applyQuaternion( tempQuaternion.copy( quaternion ).invert() );
 
-				if ( handle.name.search( "E" ) !== - 1 ) {
+				if ( handle.name.search( 'E' ) !== - 1 ) {
 
 					handle.quaternion.setFromRotationMatrix( lookAtMatrix.lookAt( this.eye, zeroVector, unitY ) );
 
@@ -1518,10 +1518,10 @@ var TransformControlsGizmo = function () {
 			}
 
 			// Hide disabled axes
-			handle.visible = handle.visible && ( handle.name.indexOf( "X" ) === - 1 || this.showX );
-			handle.visible = handle.visible && ( handle.name.indexOf( "Y" ) === - 1 || this.showY );
-			handle.visible = handle.visible && ( handle.name.indexOf( "Z" ) === - 1 || this.showZ );
-			handle.visible = handle.visible && ( handle.name.indexOf( "E" ) === - 1 || ( this.showX && this.showY && this.showZ ) );
+			handle.visible = handle.visible && ( handle.name.indexOf( 'X' ) === - 1 || this.showX );
+			handle.visible = handle.visible && ( handle.name.indexOf( 'Y' ) === - 1 || this.showY );
+			handle.visible = handle.visible && ( handle.name.indexOf( 'Z' ) === - 1 || this.showZ );
+			handle.visible = handle.visible && ( handle.name.indexOf( 'E' ) === - 1 || ( this.showX && this.showY && this.showZ ) );
 
 			// highlight selected axis
 
@@ -1607,9 +1607,9 @@ var TransformControlsPlane = function () {
 
 		if ( this.mode === 'scale' ) space = 'local'; // scale always oriented to local rotation
 
-		unitX.set( 1, 0, 0 ).applyQuaternion( space === "local" ? this.worldQuaternion : identityQuaternion );
-		unitY.set( 0, 1, 0 ).applyQuaternion( space === "local" ? this.worldQuaternion : identityQuaternion );
-		unitZ.set( 0, 0, 1 ).applyQuaternion( space === "local" ? this.worldQuaternion : identityQuaternion );
+		unitX.set( 1, 0, 0 ).applyQuaternion( space === 'local' ? this.worldQuaternion : identityQuaternion );
+		unitY.set( 0, 1, 0 ).applyQuaternion( space === 'local' ? this.worldQuaternion : identityQuaternion );
+		unitZ.set( 0, 0, 1 ).applyQuaternion( space === 'local' ? this.worldQuaternion : identityQuaternion );
 
 		// Align the plane for current transform mode, axis and space.
 

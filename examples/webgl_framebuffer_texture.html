@@ -40,6 +40,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
 			let camera, scene, renderer;
 			let line, sprite, texture;
@@ -75,7 +76,7 @@
 
 				//
 
-				const points = generatePoints();
+				const points = GeometryUtils.gosper( 8 );
 
 				const geometry = new THREE.BufferGeometry();
 				const positionAttribute = new THREE.Float32BufferAttribute( points, 3 );
@@ -203,97 +204,6 @@
 				colorAttribute.needsUpdate = true;
 
 				offset -= 25;
-
-			}
-
-			//
-
-			function generatePoints() {
-
-				// generate gosper curve (from https://gist.github.com/nitaku/6521802)
-
-				const gosper = fractalize( {
-					axiom: 'A',
-					steps: 4,
-					rules: {
-						A: 'A+BF++BF-FA--FAFA-BF+',
-						B: '-FA+BFBF++BF+FA--FA-B'
-					}
-				} );
-
-				const points = toPoints( {
-					fractal: gosper,
-					side: 8,
-					angle: Math.PI / 3
-				} );
-
-				return points;
-
-			}
-
-			function fractalize( config ) {
-
-				let output;
-				let input = config.axiom;
-
-				for ( let i = 0, il = config.steps; 0 <= il ? i < il : i > il; 0 <= il ? i ++ : i -- ) {
-
-					output = '';
-
-					for ( let j = 0, jl = input.length; j < jl; j ++ ) {
-
-						const char = input[ j ];
-
-						if ( char in config.rules ) {
-
-							output += config.rules[ char ];
-
-						} else {
-
-							output += char;
-
-						}
-
-					}
-
-					input = output;
-
-				}
-
-				return output;
-
-			}
-
-			function toPoints( config ) {
-
-				let currX = 0, currY = 0;
-				let angle = 0;
-				const path = [ 0, 0, 0 ];
-				const fractal = config.fractal;
-
-				for ( let i = 0, l = fractal.length; i < l; i ++ ) {
-
-					const char = fractal[ i ];
-
-					if ( char === '+' ) {
-
-						angle += config.angle;
-
-					} else if ( char === '-' ) {
-
-						angle -= config.angle;
-
-					} else if ( char === 'F' ) {
-
-						currX += config.side * Math.cos( angle );
-						currY += - config.side * Math.sin( angle );
-						path.push( currX, currY, 0 );
-
-					}
-
-				}
-
-				return path;
 
 			}
 

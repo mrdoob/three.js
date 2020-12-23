@@ -32,6 +32,7 @@
 					<select id="language">
 						<option value="en">en</option>
 						<option value="ar">ar</option>
+						<option value="ko">한국어</option>
 						<option value="zh">中文</option>
 					</select>
 				</div>
@@ -72,7 +73,7 @@
 
 			if ( /^(api|manual|examples)/.test( hash ) ) {
 
-				const hashLanguage = /^(api|manual|examples)\/(en|ar|zh)\//.exec( hash );
+				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh)\//.exec( hash );
 
 				if ( hashLanguage === null ) {
 

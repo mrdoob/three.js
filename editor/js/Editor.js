@@ -604,7 +604,7 @@ Editor.prototype = {
 		this.camera.copy( _DEFAULT_CAMERA );
 		this.signals.cameraResetted.dispatch();
 
-		this.scene.name = "Scene";
+		this.scene.name = 'Scene';
 		this.scene.userData = {};
 		this.scene.background = null;
 		this.scene.environment = null;
