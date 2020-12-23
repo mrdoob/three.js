@@ -88,9 +88,31 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			var projectionMatrix = camera.projectionMatrix;
 
 			var geometry = this.geometry;
-			var material = Array.isArray( this.material ) ? this.material[ 0 ] : this.material;
-			var resolution = material.resolution;
-			var lineWidth = material.linewidth + threshold;
+			var material = this.material;
+
+			var resolution, lineWidth;
+			if ( Array.isArray( material ) ) {
+
+				// get the largest line width out of the multiple materials
+				lineWidth = - Infinity;
+				for ( var i = 0, l = material.length; i < l; i ++ ) {
+
+					var mat = material[ i ];
+					if ( mat.linewidth > lineWidth ) {
+
+						lineWidth = mat.lineWidth;
+						resolution = mat.resolution;
+
+					}
+
+				}
+
+			} else {
+
+				resolution = material.resolution;
+				lineWidth = material.linewidth + threshold;
+
+			}
 
 			var instanceStart = geometry.attributes.instanceStart;
 			var instanceEnd = geometry.attributes.instanceEnd;
