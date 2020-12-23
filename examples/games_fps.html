@@ -26,7 +26,7 @@
 
 			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x88ccff );
- 
+
 			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			camera.rotation.order = 'YXZ';
 
@@ -34,7 +34,7 @@
 			scene.add( ambientlight );
 
 			const fillLight1 = new THREE.DirectionalLight( 0xff9999, 0.5 );
-			fillLight1.position.set( -1, 1, 2 );
+			fillLight1.position.set( - 1, 1, 2 );
 			scene.add( fillLight1 );
 
 			const fillLight2 = new THREE.DirectionalLight( 0x8888ff, 0.2 );
@@ -53,11 +53,11 @@
 			directionalLight.shadow.mapSize.width = 1024;
 			directionalLight.shadow.mapSize.height = 1024;
 			directionalLight.shadow.radius = 4;
-			directionalLight.shadow.bias =  - 0.00006;
+			directionalLight.shadow.bias = - 0.00006;
 			scene.add( directionalLight );
 
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setPixelRatio( 1 );
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
 			renderer.shadowMap.type = THREE.VSMShadowMap;
@@ -85,7 +85,7 @@
 
 			for ( let i = 0; i < NUM_SPHERES; i ++ ) {
 
-				let sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+				const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
 				sphere.castShadow = true;
 				sphere.receiveShadow = true;
 
@@ -118,7 +118,7 @@
 
 			}, false );
 
-			document.addEventListener( 'mousedown', ( event ) => {
+			document.addEventListener( 'mousedown', () => {
 
 				document.body.requestPointerLock();
 
@@ -167,7 +167,7 @@
 
 					playerOnFloor = result.normal.y > 0;
 
-					if( ! playerOnFloor ) {
+					if ( ! playerOnFloor ) {
 
 						playerVelocity.addScaledVector( result.normal, - result.normal.dot( playerVelocity ) );
 
@@ -201,29 +201,29 @@
 
 			}
 
-			function spheresCollisions(){
+			function spheresCollisions() {
 
-				for( let i = 0; i < spheres.length; i ++ ){
+				for ( let i = 0; i < spheres.length; i ++ ) {
 
-					let s1 = spheres[ i ];
+					const s1 = spheres[ i ];
 
-					for( let j = i + 1; j < spheres.length; j ++ ){
+					for ( let j = i + 1; j < spheres.length; j ++ ) {
 
-						let s2 = spheres[ j ];
+						const s2 = spheres[ j ];
 
-						let d2 = s1.collider.center.distanceToSquared( s2.collider.center );
-						let r = s1.collider.radius + s2.collider.radius;
-						let r2 = r * r;
+						const d2 = s1.collider.center.distanceToSquared( s2.collider.center );
+						const r = s1.collider.radius + s2.collider.radius;
+						const r2 = r * r;
 
-						if( d2 < r2 ){
+						if ( d2 < r2 ) {
 
-							let normal = s1.collider.clone().center.sub( s2.collider.center ).normalize();
-							let v1 = normal.clone().multiplyScalar( normal.dot( s1.velocity ) );
-							let v2 = normal.clone().multiplyScalar( normal.dot( s2.velocity ) );
-							s1.velocity.add(v2).sub(v1);
-							s2.velocity.add(v1).sub(v2);
+							const normal = s1.collider.clone().center.sub( s2.collider.center ).normalize();
+							const v1 = normal.clone().multiplyScalar( normal.dot( s1.velocity ) );
+							const v2 = normal.clone().multiplyScalar( normal.dot( s2.velocity ) );
+							s1.velocity.add( v2 ).sub( v1 );
+							s2.velocity.add( v1 ).sub( v2 );
 
-							var d = ( r - Math.sqrt(d2) ) / 2;
+							const d = ( r - Math.sqrt( d2 ) ) / 2;
 
 							s1.collider.center.addScaledVector( normal, d );
 							s2.collider.center.addScaledVector( normal, - d );
@@ -231,6 +231,7 @@
 						}
 
 					}
+
 				}
 
 			}
@@ -336,10 +337,16 @@
 
 				gltf.scene.traverse( child => {
 
-					if ( child.type === 'Mesh' ) {
+					if ( child.isMesh ) {
 
 						child.castShadow = true;
 						child.receiveShadow = true;
+
+						if ( child.material.map ) {
+
+							child.material.map.anisotropy = 8;
+
+						}
 
 					}
 
@@ -347,7 +354,7 @@
 
 				animate();
 
-			});
+			} );
 
 			function animate() {
 
