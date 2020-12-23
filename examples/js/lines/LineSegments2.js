@@ -87,7 +87,7 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 					var mat = material[ i ];
 					if ( mat.linewidth > lineWidth ) {
 
-						lineWidth = mat.lineWidth;
+						lineWidth = mat.linewidth;
 						resolution = mat.resolution;
 
 					}

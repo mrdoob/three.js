@@ -100,7 +100,7 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 					var mat = material[ i ];
 					if ( mat.linewidth > lineWidth ) {
 
-						lineWidth = mat.lineWidth;
+						lineWidth = mat.linewidth;
 						resolution = mat.resolution;
 
 					}
