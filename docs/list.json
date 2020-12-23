@@ -1046,6 +1046,23 @@
 				"KeyframeTrack": "api/ko/animation/KeyframeTrack",
 				"PropertyBinding": "api/ko/animation/PropertyBinding",
 				"PropertyMixer": "api/ko/animation/PropertyMixer"
+			},
+
+			"애니메이션 / 트랙": {
+				"BooleanKeyframeTrack": "api/ko/animation/tracks/BooleanKeyframeTrack",
+				"ColorKeyframeTrack": "api/ko/animation/tracks/ColorKeyframeTrack",
+				"NumberKeyframeTrack": "api/ko/animation/tracks/NumberKeyframeTrack",
+				"QuaternionKeyframeTrack": "api/ko/animation/tracks/QuaternionKeyframeTrack",
+				"StringKeyframeTrack": "api/ko/animation/tracks/StringKeyframeTrack",
+				"VectorKeyframeTrack": "api/ko/animation/tracks/VectorKeyframeTrack"
+			},
+
+			"오디오": {
+				"Audio": "api/ko/audio/Audio",
+				"AudioAnalyser": "api/ko/audio/AudioAnalyser",
+				"AudioContext": "api/ko/audio/AudioContext",
+				"AudioListener": "api/ko/audio/AudioListener",
+				"PositionalAudio": "api/ko/audio/PositionalAudio"
 			}
 		},
 
