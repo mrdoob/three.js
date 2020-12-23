@@ -76,6 +76,8 @@ class TiltLoader extends Loader {
 
 		const num_strokes = data.getInt32( 16, true );
 
+		const brushes = {};
+
 		let offset = 20;
 
 		for ( let i = 0; i < num_strokes; i ++ ) {
@@ -134,13 +136,22 @@ class TiltLoader extends Loader {
 
 			}
 
-			// console.log( positions, quaternions );
+			if ( brush_index in brushes === false ) {
 
-			const geometry = new StrokeGeometry( positions, quaternions, brush_size, brush_color );
+				brushes[ brush_index ] = [];
+
+			}
+
+			brushes[ brush_index ].push( [ positions, quaternions, brush_size, brush_color ] );
+
+		}
+
+		for ( const brush_index in brushes ) {
+
+			const geometry = new StrokeGeometry( brushes[ brush_index ] );
 			const material = getMaterial( metadata.BrushIndex[ brush_index ] );
 
 			group.add( new Mesh( geometry, material ) );
-
 
 		}
 
@@ -152,7 +163,7 @@ class TiltLoader extends Loader {
 
 class StrokeGeometry extends BufferGeometry {
 
-	constructor( positions, quaternions, size, color ) {
+	constructor( strokes ) {
 
 		super();
 
@@ -161,10 +172,10 @@ class StrokeGeometry extends BufferGeometry {
 		const uvs = [];
 
 		const position = new Vector3();
-		const prevPosition = new Vector3().fromArray( positions, 0 );
+		const prevPosition = new Vector3();
 
 		const quaternion = new Quaternion();
-		const prevQuaternion = new Quaternion().fromArray( quaternions, 0 );
+		const prevQuaternion = new Quaternion();
 
 		const vector1 = new Vector3();
 		const vector2 = new Vector3();
@@ -173,56 +184,69 @@ class StrokeGeometry extends BufferGeometry {
 
 		// size = size / 2;
 
-		for ( let i = 0, j = 0, l = positions.length; i < l; i += 3, j += 4 ) {
+		for ( const k in strokes ) {
 
-			position.fromArray( positions, i );
-			quaternion.fromArray( quaternions, j );
+			const stroke = strokes[ k ];
+			const positions = stroke[ 0 ];
+			const quaternions = stroke[ 1 ];
+			const size = stroke[ 2 ];
+			const color = stroke[ 3 ];
 
-			vector1.set( - size, 0, 0 );
-			vector1.applyQuaternion( quaternion );
-			vector1.add( position );
+			prevPosition.fromArray( positions, 0 );
+			prevQuaternion.fromArray( quaternions, 0 );
 
-			vector2.set( size, 0, 0 );
-			vector2.applyQuaternion( quaternion );
-			vector2.add( position );
+			for ( let i = 3, j = 4, l = positions.length; i < l; i += 3, j += 4 ) {
 
-			vector3.set( size, 0, 0 );
-			vector3.applyQuaternion( prevQuaternion );
-			vector3.add( prevPosition );
+				position.fromArray( positions, i );
+				quaternion.fromArray( quaternions, j );
 
-			vector4.set( - size, 0, 0 );
-			vector4.applyQuaternion( prevQuaternion );
-			vector4.add( prevPosition );
+				vector1.set( - size, 0, 0 );
+				vector1.applyQuaternion( quaternion );
+				vector1.add( position );
 
-			vertices.push( vector1.x, vector1.y, - vector1.z );
-			vertices.push( vector2.x, vector2.y, - vector2.z );
-			vertices.push( vector4.x, vector4.y, - vector4.z );
+				vector2.set( size, 0, 0 );
+				vector2.applyQuaternion( quaternion );
+				vector2.add( position );
 
-			vertices.push( vector2.x, vector2.y, - vector2.z );
-			vertices.push( vector3.x, vector3.y, - vector3.z );
-			vertices.push( vector4.x, vector4.y, - vector4.z );
+				vector3.set( size, 0, 0 );
+				vector3.applyQuaternion( prevQuaternion );
+				vector3.add( prevPosition );
 
-			prevPosition.copy( position );
-			prevQuaternion.copy( quaternion );
+				vector4.set( - size, 0, 0 );
+				vector4.applyQuaternion( prevQuaternion );
+				vector4.add( prevPosition );
 
-			colors.push( ...color );
-			colors.push( ...color );
-			colors.push( ...color );
+				vertices.push( vector1.x, vector1.y, - vector1.z );
+				vertices.push( vector2.x, vector2.y, - vector2.z );
+				vertices.push( vector4.x, vector4.y, - vector4.z );
 
-			colors.push( ...color );
-			colors.push( ...color );
-			colors.push( ...color );
+				vertices.push( vector2.x, vector2.y, - vector2.z );
+				vertices.push( vector3.x, vector3.y, - vector3.z );
+				vertices.push( vector4.x, vector4.y, - vector4.z );
 
-			const p1 = i / l;
-			const p2 = ( i - 3 ) / l;
+				prevPosition.copy( position );
+				prevQuaternion.copy( quaternion );
 
-			uvs.push( p1, 0 );
-			uvs.push( p1, 1 );
-			uvs.push( p2, 0 );
+				colors.push( ...color );
+				colors.push( ...color );
+				colors.push( ...color );
 
-			uvs.push( p1, 1 );
-			uvs.push( p2, 1 );
-			uvs.push( p2, 0 );
+				colors.push( ...color );
+				colors.push( ...color );
+				colors.push( ...color );
+
+				const p1 = i / l;
+				const p2 = ( i - 3 ) / l;
+
+				uvs.push( p1, 0 );
+				uvs.push( p1, 1 );
+				uvs.push( p2, 0 );
+
+				uvs.push( p1, 1 );
+				uvs.push( p2, 1 );
+				uvs.push( p2, 0 );
+
+			}
 
 		}
 
