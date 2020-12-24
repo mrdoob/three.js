@@ -1063,6 +1063,15 @@
 				"AudioContext": "api/ko/audio/AudioContext",
 				"AudioListener": "api/ko/audio/AudioListener",
 				"PositionalAudio": "api/ko/audio/PositionalAudio"
+			},
+
+			"카메라": {
+				"ArrayCamera": "api/ko/cameras/ArrayCamera",
+				"Camera": "api/ko/cameras/Camera",
+				"CubeCamera": "api/ko/cameras/CubeCamera",
+				"OrthographicCamera": "api/ko/cameras/OrthographicCamera",
+				"PerspectiveCamera": "api/ko/cameras/PerspectiveCamera",
+				"StereoCamera": "api/ko/cameras/StereoCamera"
 			}
 		},
 
