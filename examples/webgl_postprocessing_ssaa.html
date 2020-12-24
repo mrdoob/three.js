@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - postprocessing ssaa</title>
+		<title>three.js webgl - postprocessing manual ssaa</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Manual Supersampling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
-			This manual approach to SSAA re-renders the scene once for each sample with camera jitter and accumulates the results.<br/><br/>
-			Texture interpolation, mipmapping and anistropic sampling is disabled to emphasize<br/> the effect SSAA levels have one the resulting render quality.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Unbiased Manual Supersamling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
+			This example shows how to unbias the rounding errors accumulated using high number of SSAA samples on a 8-bit per channel buffer.<br/><br/>
+			Turn off the "unbiased" feature to see the banding that results from accumulated rounding errors.
 		</div>
 
 		<div id="container"></div>
@@ -27,11 +27,20 @@
 			import { SSAARenderPass } from './jsm/postprocessing/SSAARenderPass.js';
 			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
-			let camera, scene, renderer, composer, copyPass, ssaaRenderPass;
+			let scene, renderer, composer, copyPass;
+			let cameraP, ssaaRenderPassP;
+			let cameraO, ssaaRenderPassO;
 			let gui, stats;
 
-			const param = {
-				sampleLevel: 2
+			const params = {
+				sampleLevel: 4,
+				renderToScreen: false,
+				unbiased: true,
+				camera: 'perspective',
+				clearColor: 'black',
+				clearAlpha: 1.0,
+				autoRotate: true
+
 			};
 
 			init();
@@ -45,7 +54,9 @@
 
 				gui = new GUI();
 
-				gui.add( param, 'sampleLevel', {
+				gui.add( params, "unbiased" );
+				gui.add( params, "renderToScreen" );
+				gui.add( params, 'sampleLevel', {
 					'Level 0: 1 Sample': 0,
 					'Level 1: 2 Samples': 1,
 					'Level 2: 4 Samples': 2,
@@ -53,6 +64,10 @@
 					'Level 4: 16 Samples': 4,
 					'Level 5: 32 Samples': 5
 				} );
+				gui.add( params, 'camera', [ 'perspective', 'orthographic' ] );
+				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );
+				gui.add( params, "clearAlpha", 0, 1 );
+				gui.add( params, "autoRotate" );
 
 				gui.open();
 
@@ -62,46 +77,87 @@
 
 				const container = document.getElementById( "container" );
 
+				const width = window.innerWidth || 1;
+				const height = window.innerHeight || 1;
+				const aspect = width / height;
+				const devicePixelRatio = window.devicePixelRatio || 1;
+
 				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setPixelRatio( devicePixelRatio );
+				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.z = 300;
+				cameraP = new THREE.PerspectiveCamera( 65, aspect, 3, 10 );
+				cameraP.position.z = 7;
+
+				cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 3, 10 );
+				cameraO.position.z = 7;
+
+				const fov = THREE.MathUtils.degToRad( cameraP.fov );
+				const hyperfocus = ( cameraP.near + cameraP.far ) / 2;
+				const _height = 2 * Math.tan( fov / 2 ) * hyperfocus;
+				cameraO.zoom = height / _height;
+
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.BoxBufferGeometry( 120, 120, 120 );
-				const material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+				const group = new THREE.Group();
+				scene.add( group );
 
-				const mesh1 = new THREE.Mesh( geometry, material1 );
-				mesh1.position.x = - 100;
-				scene.add( mesh1 );
+				const light = new THREE.PointLight( 0xddffdd, 1.0 );
+				light.position.z = 70;
+				light.position.y = - 70;
+				light.position.x = - 70;
+				scene.add( light );
 
-				const texture = new THREE.TextureLoader().load( "textures/brick_diffuse.jpg" );
-				texture.minFilter = THREE.NearestFilter;
-				texture.magFilter = THREE.NearestFilter;
-				texture.anisotropy = 1;
-				texture.generateMipmaps = false;
+				const light2 = new THREE.PointLight( 0xffdddd, 1.0 );
+				light2.position.z = 70;
+				light2.position.x = - 70;
+				light2.position.y = 70;
+				scene.add( light2 );
 
-				const material2 = new THREE.MeshBasicMaterial( { map: texture } );
+				const light3 = new THREE.PointLight( 0xddddff, 1.0 );
+				light3.position.z = 70;
+				light3.position.x = 70;
+				light3.position.y = - 70;
+				scene.add( light3 );
 
-				const mesh2 = new THREE.Mesh( geometry, material2 );
-				mesh2.position.x = 100;
-				scene.add( mesh2 );
+				const light4 = new THREE.AmbientLight( 0xffffff, 0.05 );
+				scene.add( light4 );
+
+				const geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
+
+				for ( let i = 0; i < 120; i ++ ) {
+
+					const material = new THREE.MeshStandardMaterial();
+					material.roughness = 0.5 * Math.random() + 0.25;
+					material.metalness = 0;
+					material.color.setHSL( Math.random(), 1.0, 0.3 );
+
+					const mesh = new THREE.Mesh( geometry, material );
+					mesh.position.x = Math.random() * 4 - 2;
+					mesh.position.y = Math.random() * 4 - 2;
+					mesh.position.z = Math.random() * 4 - 2;
+					mesh.rotation.x = Math.random();
+					mesh.rotation.y = Math.random();
+					mesh.rotation.z = Math.random();
+
+					mesh.scale.setScalar( Math.random() * 0.2 + 0.05 );
+					group.add( mesh );
+
+				}
 
 				// postprocessing
 
 				composer = new EffectComposer( renderer );
-
-				ssaaRenderPass = new SSAARenderPass( scene, camera );
-				ssaaRenderPass.unbiased = false;
-				composer.addPass( ssaaRenderPass );
-
+				composer.setPixelRatio( 1 ); // ensure pixel ratio is always 1 for performance reasons
+				ssaaRenderPassP = new SSAARenderPass( scene, cameraP );
+				composer.addPass( ssaaRenderPassP );
+				ssaaRenderPassO = new SSAARenderPass( scene, cameraO );
+				composer.addPass( ssaaRenderPassO );
 				copyPass = new ShaderPass( CopyShader );
 				composer.addPass( copyPass );
 
@@ -113,9 +169,16 @@
 
 				const width = window.innerWidth;
 				const height = window.innerHeight;
+				const aspect = width / height;
 
-				camera.aspect = width / height;
-				camera.updateProjectionMatrix();
+				cameraP.aspect = aspect;
+				cameraO.updateProjectionMatrix();
+
+				cameraO.left = - height * aspect;
+				cameraO.right = height * aspect;
+				cameraO.top = height;
+				cameraO.bottom = - height;
+				cameraO.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
 				composer.setSize( width, height );
@@ -128,18 +191,44 @@
 
 				stats.begin();
 
-				for ( let i = 0; i < scene.children.length; i ++ ) {
+				if ( params.autoRotate ) {
 
-					const child = scene.children[ i ];
+					for ( let i = 0; i < scene.children.length; i ++ ) {
 
-					child.rotation.x += 0.005;
-					child.rotation.y += 0.01;
+						const child = scene.children[ i ];
+
+						child.rotation.x += 0.005;
+						child.rotation.y += 0.01;
+
+					}
 
 				}
 
-				ssaaRenderPass.sampleLevel = param.sampleLevel;
+				let newColor = ssaaRenderPassP.clearColor;
+
+				switch ( params.clearColor ) {
+
+					case 'blue': newColor = 0x0000ff; break;
+					case 'red': newColor = 0xff0000; break;
+					case 'green': newColor = 0x00ff00; break;
+					case 'white': newColor = 0xffffff; break;
+					case 'black': newColor = 0x000000; break;
+
+				}
+
+				ssaaRenderPassP.clearColor = ssaaRenderPassO.clearColor = newColor;
+				ssaaRenderPassP.clearAlpha = ssaaRenderPassO.clearAlpha = params.clearAlpha;
+
+				ssaaRenderPassP.sampleLevel = ssaaRenderPassO.sampleLevel = params.sampleLevel;
+				ssaaRenderPassP.unbiased = ssaaRenderPassO.unbiased = params.unbiased;
+
+				ssaaRenderPassP.enabled = ( params.camera === 'perspective' );
+				ssaaRenderPassO.enabled = ( params.camera === 'orthographic' );
+
+				copyPass.enabled = ! params.renderToScreen;
 
 				composer.render();
+
 				stats.end();
 
 			}

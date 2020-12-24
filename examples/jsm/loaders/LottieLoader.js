@@ -3,25 +3,17 @@ import {
 	Loader,
 	CanvasTexture,
 	NearestFilter
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
-var LottieLoader = function ( manager ) {
+class LottieLoader extends Loader {
 
-	Loader.call( this, manager );
-
-};
-
-LottieLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
-
-	constructor: LottieLoader,
-
-	setQuality: function ( value ) {
+	setQuality( value ) {
 
 		this._quality = value;
 
-	},
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const quality = this._quality || 1;
 
@@ -44,6 +36,7 @@ LottieLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			container.style.height = data.h + 'px';
 			document.body.appendChild( container );
 
+			// eslint-disable-next-line no-undef
 			const animation = bodymovin.loadAnimation( {
 				container: container,
 				animType: 'canvas',
@@ -76,6 +69,6 @@ LottieLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 export { LottieLoader };

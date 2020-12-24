@@ -46,18 +46,8 @@
 				const video = document.getElementById( 'video' );
 				video.play();
 
-				const texture = new THREE.Texture( video );
-
-				setInterval( function () {
-
-					if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
-
-						texture.needsUpdate = true;
-
-					}
-
-				}, 1000 / 24 );
-
+				const texture = new THREE.VideoTexture( video );
+        
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x101010 );
 

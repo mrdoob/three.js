@@ -4,7 +4,7 @@ import {
 	Object3D,
 	Quaternion,
 	SphereBufferGeometry,
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 import { GLTFLoader } from '../loaders/GLTFLoader.js';
 
@@ -259,7 +259,7 @@ var XRControllerModelFactory = ( function () {
 
 						if ( ! this.gltfLoader ) {
 
-							throw new Error( `GLTFLoader not set.` );
+							throw new Error( 'GLTFLoader not set.' );
 
 						}
 

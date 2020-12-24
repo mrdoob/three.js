@@ -13,7 +13,7 @@ import {
 	NearestFilter,
 	DynamicDrawUsage,
 	Matrix4
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * Make a new DataTexture to store the descriptions of the curves.
@@ -132,18 +132,18 @@ export function modifyShader( material, uniforms, numberOfCurves = 1 ) {
 		${shader.vertexShader}
 		`
 		// chunk import moved in front of modified shader below
-		.replace('#include <beginnormal_vertex>', ``)
+			.replace( '#include <beginnormal_vertex>', '' )
 
-		// vec3 transformedNormal declaration overriden below
-		.replace('#include <defaultnormal_vertex>', ``)
+			// vec3 transformedNormal declaration overriden below
+			.replace( '#include <defaultnormal_vertex>', '' )
 
-		// vec3 transformed declaration overriden below
-		.replace('#include <begin_vertex>', ``)
+			// vec3 transformed declaration overriden below
+			.replace( '#include <begin_vertex>', '' )
 
-		// shader override
-		.replace(
-			/void\s*main\s*\(\)\s*\{/,
-`
+			// shader override
+			.replace(
+				/void\s*main\s*\(\)\s*\{/,
+				`
 void main() {
 #include <beginnormal_vertex>
 
@@ -169,10 +169,10 @@ float rowOffset = floor(mt);
 rowOffset += instanceMatrix[3][1] * ${TEXTURE_HEIGHT}.;
 #endif
 
-vec3 spinePos = texture(spineTexture, vec2(mt, (0. + rowOffset + 0.5) / textureLayers)).xyz;
-vec3 a =        texture(spineTexture, vec2(mt, (1. + rowOffset + 0.5) / textureLayers)).xyz;
-vec3 b =        texture(spineTexture, vec2(mt, (2. + rowOffset + 0.5) / textureLayers)).xyz;
-vec3 c =        texture(spineTexture, vec2(mt, (3. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 spinePos = texture2D(spineTexture, vec2(mt, (0. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 a =        texture2D(spineTexture, vec2(mt, (1. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 b =        texture2D(spineTexture, vec2(mt, (2. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 c =        texture2D(spineTexture, vec2(mt, (3. + rowOffset + 0.5) / textureLayers)).xyz;
 mat3 basis = mat3(a, b, c);
 
 vec3 transformed = basis
@@ -180,13 +180,11 @@ vec3 transformed = basis
 	+ spinePos;
 
 vec3 transformedNormal = normalMatrix * (basis * objectNormal);
-`).replace(
-	'#include <project_vertex>',
-`
-vec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );
-gl_Position = projectionMatrix * mvPosition;
-`
-);
+			` ).replace(
+				'#include <project_vertex>',
+				`vec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );
+				gl_Position = projectionMatrix * mvPosition;`
+			);
 
 		shader.vertexShader = vertexShader;
 
@@ -317,7 +315,7 @@ export class InstancedFlow extends Flow {
 	 */
 	setCurve( index, curveNo ) {
 
-		if ( isNaN( curveNo ) ) throw Error( "curve index being set is Not a Number (NaN)" );
+		if ( isNaN( curveNo ) ) throw Error( 'curve index being set is Not a Number (NaN)' );
 		this.whichCurve[ index ] = curveNo;
 		this.writeChanges( index );
 

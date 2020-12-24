@@ -37,7 +37,7 @@ function RTTNode( width, height, input, options ) {
 
 RTTNode.prototype = Object.create( TextureNode.prototype );
 RTTNode.prototype.constructor = RTTNode;
-RTTNode.prototype.nodeType = "RTT";
+RTTNode.prototype.nodeType = 'RTT';
 
 RTTNode.prototype.build = function ( builder, output, uuid ) {
 
@@ -119,7 +119,7 @@ RTTNode.prototype.updateFrame = function ( frame ) {
 
 	} else {
 
-		console.warn( "RTTNode need a renderer in NodeFrame" );
+		console.warn( 'RTTNode need a renderer in NodeFrame' );
 
 	}
 
