@@ -1081,6 +1081,14 @@
 
 		}
 
+	},
+	
+	"ja": {
+		"マニュアル": {
+			"はじめてみましょう": {
+				"Creating a scene": "manual/ja/introduction/Creating-a-scene"
+			}
+		}
 	}
 
 }
