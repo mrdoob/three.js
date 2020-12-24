@@ -34,52 +34,32 @@
 
 				// light
 
-				const hemiLight = new THREE.HemisphereLight( 0x888888, 0x000000, 1 );
+				const hemiLight = new THREE.HemisphereLight( 0x888888, 0x444444, 1 );
 				scene.add( hemiLight );
 
 				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.75 );
 				dirLight.position.set( 1.5, 3, 2.5 );
 				scene.add( dirLight );
 
+				const dirLight2 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				dirLight2.position.set( - 1.5, - 3, - 2.5 );
+				scene.add( dirLight2 );
+
 				const loader = new VOXLoader();
 				loader.load( 'models/vox/monu10.vox', function ( chunks ) {
-
-					const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-					const material = new THREE.MeshStandardMaterial();
-
-					const color = new THREE.Color();
-					const matrix = new THREE.Matrix4();
 
 					for ( let i = 0; i < chunks.length; i ++ ) {
 
 						const chunk = chunks[ i ];
 
-						const size = chunk.size;
-						const data = chunk.data;
-						const palette = chunk.palette;
+						const geometry = buildGeometry( chunk );
+						const material = new THREE.MeshStandardMaterial( {
+							vertexColors: geometry.hasAttribute( 'color' )
+						} );
 
-						// displayPalette( palette );
-
-						const mesh = new THREE.InstancedMesh( geometry, material, data.length / 4 );
+						const mesh = new THREE.Mesh( geometry, material );
 						mesh.scale.setScalar( 0.0015 );
 						scene.add( mesh );
-
-						for ( let j = 0, k = 0; j < data.length; j += 4, k ++ ) {
-
-							const x = data[ j + 0 ] - size.x / 2;
-							const y = data[ j + 1 ] - size.y / 2;
-							const z = data[ j + 2 ] - size.z / 2;
-							const c = data[ j + 3 ];
-
-							const hex = palette[ c ];
-							const r = ( hex >> 0 & 0xff ) / 0xff;
-							const g = ( hex >> 8 & 0xff ) / 0xff;
-							const b = ( hex >> 16 & 0xff ) / 0xff;
-
-							mesh.setColorAt( k, color.setRGB( r, g, b ) );
-							mesh.setMatrixAt( k, matrix.setPosition( x, z, - y ) );
-
-						}
 
 					}
 
@@ -90,10 +70,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				const container = document.createElement( 'div' );
-				document.body.appendChild( container );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				// controls
 
@@ -104,6 +81,97 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function buildGeometry( chunk ) {
+
+				const data = chunk.data;
+				const size = chunk.size;
+				const palette = chunk.palette;
+
+				// displayPalette( palette );
+
+				const vertices = [];
+				const colors = [];
+
+				const nx = [ 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1 ];
+				const px = [ 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0 ];
+				const py = [ 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1 ];
+				const ny = [ 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0 ];
+				const nz = [ 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0 ];
+				const pz = [ 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1 ];
+
+				function add( tile, x, y, z, r, g, b ) {
+
+					x -= size.x / 2;
+					y -= size.z / 2;
+					z += size.y / 2;
+
+					for ( let i = 0; i < 18; i += 3 ) {
+
+						vertices.push( tile[ i + 0 ] + x, tile[ i + 1 ] + y, tile[ i + 2 ] + z );
+						colors.push( r, g, b );
+
+					}
+
+				}
+
+				// Store data in a volume for sampling
+
+				const offsety = size.x;
+				const offsetz = size.x * size.y;
+
+				const array = new Uint8Array( size.x * size.y * size.z );
+
+				for ( let j = 0; j < data.length; j += 4 ) {
+
+					const x = data[ j + 0 ];
+					const y = data[ j + 1 ];
+					const z = data[ j + 2 ];
+
+					const index = x + ( y * offsety ) + ( z * offsetz );
+
+					array[ index ] = 255;
+
+				}
+
+				// Construct geometry
+
+				let hasColors = false;
+
+				for ( let j = 0; j < data.length; j += 4 ) {
+
+					const x = data[ j + 0 ];
+					const y = data[ j + 1 ];
+					const z = data[ j + 2 ];
+					const c = data[ j + 3 ];
+
+					const hex = palette[ c ];
+					const r = ( hex >> 0 & 0xff ) / 0xff;
+					const g = ( hex >> 8 & 0xff ) / 0xff;
+					const b = ( hex >> 16 & 0xff ) / 0xff;
+
+					if ( r > 0 || g > 0 || b > 0 ) hasColors = true;
+
+					const index = x + ( y * offsety ) + ( z * offsetz );
+
+					if ( array[ index + 1 ] === 0 || x === size.x - 1 ) add( px, x, z, - y, r, g, b );
+					if ( array[ index - 1 ] === 0 || x === 0 ) add( nx, x, z, - y, r, g, b );
+					if ( array[ index + offsety ] === 0 || y === size.y - 1 ) add( ny, x, z, - y, r, g, b );
+					if ( array[ index - offsety ] === 0 || y === 0 ) add( py, x, z, - y, r, g, b );
+					if ( array[ index + offsetz ] === 0 || z === size.z - 1 ) add( pz, x, z, - y, r, g, b );
+					if ( array[ index - offsetz ] === 0 || z === 0 ) add( nz, x, z, - y, r, g, b );
+
+				}
+
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.computeVertexNormals();
+
+				if ( hasColors ) geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+				return geometry;
 
 			}
 
