@@ -520,6 +520,35 @@ function Loader( editor ) {
 
 				break;
 
+			case 'vox':
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					var contents = event.target.result;
+
+					var { VOXLoader, VOXMesh } = await import( '../../examples/jsm/loaders/VOXLoader.js' );
+
+					var chunks = new VOXLoader().parse( contents );
+
+					var group = new THREE.Group();
+					group.name = filename;
+
+					for ( let i = 0; i < chunks.length; i ++ ) {
+
+						const chunk = chunks[ i ];
+
+						const mesh = new VOXMesh( chunk );
+						group.add( mesh );
+
+					}
+
+					editor.execute( new AddObjectCommand( editor, group ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
 			case 'vtk':
 
 				reader.addEventListener( 'load', async function ( event ) {
