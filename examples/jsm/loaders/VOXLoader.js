@@ -1,15 +1,19 @@
 import {
+	BufferGeometry,
 	FileLoader,
-	Loader
+	Float32BufferAttribute,
+	Loader,
+	Mesh,
+	MeshStandardMaterial
 } from '../../../build/three.module.js';
 
 class VOXLoader extends Loader {
 
 	load( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		const scope = this;
 
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
@@ -156,4 +160,101 @@ class VOXLoader extends Loader {
 
 }
 
-export { VOXLoader };
+class VOXMesh extends Mesh {
+
+	constructor( chunk ) {
+
+		const data = chunk.data;
+		const size = chunk.size;
+		const palette = chunk.palette;
+
+		//
+
+		const vertices = [];
+		const colors = [];
+
+		const nx = [ 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1 ];
+		const px = [ 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0 ];
+		const py = [ 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1 ];
+		const ny = [ 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0 ];
+		const nz = [ 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0 ];
+		const pz = [ 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1 ];
+
+		function add( tile, x, y, z, r, g, b ) {
+
+			x -= size.x / 2;
+			y -= size.z / 2;
+			z += size.y / 2;
+
+			for ( let i = 0; i < 18; i += 3 ) {
+
+				vertices.push( tile[ i + 0 ] + x, tile[ i + 1 ] + y, tile[ i + 2 ] + z );
+				colors.push( r, g, b );
+
+			}
+
+		}
+
+		// Store data in a volume for sampling
+
+		const offsety = size.x;
+		const offsetz = size.x * size.y;
+
+		const array = new Uint8Array( size.x * size.y * size.z );
+
+		for ( let j = 0; j < data.length; j += 4 ) {
+
+			const x = data[ j + 0 ];
+			const y = data[ j + 1 ];
+			const z = data[ j + 2 ];
+
+			const index = x + ( y * offsety ) + ( z * offsetz );
+
+			array[ index ] = 255;
+
+		}
+
+		// Construct geometry
+
+		let hasColors = false;
+
+		for ( let j = 0; j < data.length; j += 4 ) {
+
+			const x = data[ j + 0 ];
+			const y = data[ j + 1 ];
+			const z = data[ j + 2 ];
+			const c = data[ j + 3 ];
+
+			const hex = palette[ c ];
+			const r = ( hex >> 0 & 0xff ) / 0xff;
+			const g = ( hex >> 8 & 0xff ) / 0xff;
+			const b = ( hex >> 16 & 0xff ) / 0xff;
+
+			if ( r > 0 || g > 0 || b > 0 ) hasColors = true;
+
+			const index = x + ( y * offsety ) + ( z * offsetz );
+
+			if ( array[ index + 1 ] === 0 || x === size.x - 1 ) add( px, x, z, - y, r, g, b );
+			if ( array[ index - 1 ] === 0 || x === 0 ) add( nx, x, z, - y, r, g, b );
+			if ( array[ index + offsety ] === 0 || y === size.y - 1 ) add( ny, x, z, - y, r, g, b );
+			if ( array[ index - offsety ] === 0 || y === 0 ) add( py, x, z, - y, r, g, b );
+			if ( array[ index + offsetz ] === 0 || z === size.z - 1 ) add( pz, x, z, - y, r, g, b );
+			if ( array[ index - offsetz ] === 0 || z === 0 ) add( nz, x, z, - y, r, g, b );
+
+		}
+
+		const geometry = new BufferGeometry();
+		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		geometry.computeVertexNormals();
+
+		if ( hasColors ) geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+
+		const material = new MeshStandardMaterial( { vertexColors: hasColors } );
+
+		super( geometry, material );
+
+	}
+
+}
+
+export { VOXLoader, VOXMesh };
