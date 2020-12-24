@@ -424,9 +424,6 @@ function Loader( editor ) {
 					var { PLYLoader } = await import( '../../examples/jsm/loaders/PLYLoader.js' );
 
 					var geometry = new PLYLoader().parse( contents );
-					geometry.sourceType = 'ply';
-					geometry.sourceFile = file.name;
-
 					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
@@ -448,9 +445,6 @@ function Loader( editor ) {
 					var { STLLoader } = await import( '../../examples/jsm/loaders/STLLoader.js' );
 
 					var geometry = new STLLoader().parse( contents );
-					geometry.sourceType = 'stl';
-					geometry.sourceFile = file.name;
-
 					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
@@ -558,9 +552,6 @@ function Loader( editor ) {
 					var { VTKLoader } = await import( '../../examples/jsm/loaders/VTKLoader.js' );
 
 					var geometry = new VTKLoader().parse( contents );
-					geometry.sourceType = 'vtk';
-					geometry.sourceFile = file.name;
-
 					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
@@ -601,8 +592,7 @@ function Loader( editor ) {
 					var geometry = new XYZLoader().parse( contents );
 
 					var material = new THREE.PointsMaterial();
-
-					if ( geometry.hasAttribute( 'color' ) === true ) material.vertexColors = true;
+					material.vertexColors = geometry.hasAttribute( 'color' );
 
 					var points = new THREE.Points( geometry, material );
 					points.name = filename;
