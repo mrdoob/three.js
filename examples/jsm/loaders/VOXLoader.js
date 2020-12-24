@@ -3,17 +3,9 @@ import {
 	Loader
 } from '../../../build/three.module.js';
 
-function VOXLoader( manager ) {
+class VOXLoader extends Loader {
 
-	Loader.call( this, manager );
-
-}
-
-VOXLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
-
-	constructor: VOXLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -45,9 +37,9 @@ VOXLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( buffer ) {
+	parse( buffer ) {
 
 		const data = new DataView( buffer );
 
@@ -162,6 +154,6 @@ VOXLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 export { VOXLoader };
