@@ -128,7 +128,7 @@ export interface Vector {
 	/**
 	 * clone():T;
 	 */
-	clone(): this;
+	clone(): Vector;
 }
 
 /**
@@ -186,7 +186,7 @@ export class Vector2 implements Vector {
 	/**
 	 * Returns a new Vector2 instance with the same `x` and `y` values.
 	 */
-	clone(): this;
+	clone(): Vector2;
 
 	/**
 	 * Copies value of v to this vector.

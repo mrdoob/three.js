@@ -355,7 +355,7 @@ export class Material extends EventDispatcher {
 	/**
 	 * Return a new material with the same parameters as this material.
 	 */
-	clone(): this;
+	clone(): Material;
 
 	/**
 	 * Copy the parameters from the passed material into this material.

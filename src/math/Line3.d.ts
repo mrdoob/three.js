@@ -16,7 +16,7 @@ export class Line3 {
 	end: Vector3;
 
 	set( start?: Vector3, end?: Vector3 ): Line3;
-	clone(): this;
+	clone(): Line3;
 	copy( line: Line3 ): this;
 	getCenter( target: Vector3 ): Vector3;
 	delta( target: Vector3 ): Vector3;

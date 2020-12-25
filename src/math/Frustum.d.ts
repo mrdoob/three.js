@@ -33,7 +33,7 @@ export class Frustum {
 		p4: Plane,
 		p5: Plane
 	): Frustum;
-	clone(): this;
+	clone(): Frustum;
 	copy( frustum: Frustum ): this;
 	setFromProjectionMatrix( m: Matrix4 ): this;
 	intersectsObject( object: Object3D ): boolean;

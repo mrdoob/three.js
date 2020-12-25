@@ -379,7 +379,7 @@ export class Object3D extends EventDispatcher {
 		images: any;
 	} ): any;
 
-	clone( recursive?: boolean ): this;
+	clone( recursive?: boolean ): Object3D;
 
 	/**
 	 *
