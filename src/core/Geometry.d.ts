@@ -256,7 +256,7 @@ export class Geometry extends EventDispatcher {
 	/**
 	 * Creates a new clone of the Geometry.
 	 */
-	clone(): this;
+	clone(): Geometry;
 
 	copy( source: Geometry ): this;
 

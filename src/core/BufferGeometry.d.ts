@@ -150,7 +150,7 @@ export class BufferGeometry extends EventDispatcher {
 	toNonIndexed(): BufferGeometry;
 
 	toJSON(): any;
-	clone(): this;
+	clone(): BufferGeometry;
 	copy( source: BufferGeometry ): this;
 
 	/**

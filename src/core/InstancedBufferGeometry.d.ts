@@ -12,6 +12,8 @@ export class InstancedBufferGeometry extends BufferGeometry {
 	 */
 	type: string;
 
+	isInstancedBufferGeometry: boolean;
+
 	groups: { start: number; count: number; instances: number }[];
 
 	/**

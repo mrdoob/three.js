@@ -19,7 +19,7 @@ export class Cylindrical {
 	 */
 	y: number;
 
-	clone(): this;
+	clone(): Cylindrical;
 	copy( other: Cylindrical ): this;
 	set( radius: number, theta: number, y: number ): this;
 	setFromVector3( vec3: Vector3 ): this;
