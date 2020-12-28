@@ -13,6 +13,7 @@ import { ViewHelper } from './Viewport.ViewHelper.js';
 import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
+import { OrbitControls } from '../../examples/jsm/controls/OrbitControls.js';
 
 function Viewport( editor ) {
 
@@ -22,7 +23,20 @@ function Viewport( editor ) {
 	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
 
-	container.add( new ViewportCamera( editor ) );
+	var viewportCameraHelper = new ViewportCamera( editor );
+	viewportCameraHelper.dom.addEventListener( 'pointerdown', function ( ) {
+
+		enabledControls.enabled = false;
+
+	} );
+
+	viewportCameraHelper.dom.addEventListener( 'pointerup', function ( ) {
+
+		enabledControls.enabled = true;
+
+	} );
+
+	container.add( viewportCameraHelper );
 	container.add( new ViewportInfo( editor ) );
 
 	//
@@ -35,6 +49,9 @@ function Viewport( editor ) {
 	var scene = editor.scene;
 	var sceneHelpers = editor.sceneHelpers;
 	var showSceneHelpers = true;
+	var viewportSceneHelpers = new THREE.Scene();
+	var enabledControls = null;
+	var enabledTransformControls = null;
 
 	var objects = [];
 
@@ -57,10 +74,10 @@ function Viewport( editor ) {
 	var objectRotationOnDown = null;
 	var objectScaleOnDown = null;
 
-	var transformControls = new TransformControls( camera, container.dom );
-	transformControls.addEventListener( 'change', function () {
+	function transformControlsChange() {
 
-		var object = transformControls.object;
+		if ( ! enabledTransformControls.enabled ) return;
+		var object = enabledTransformControls.object;
 
 		if ( object !== undefined ) {
 
@@ -80,25 +97,29 @@ function Viewport( editor ) {
 
 		render();
 
-	} );
-	transformControls.addEventListener( 'mouseDown', function () {
+	}
 
-		var object = transformControls.object;
+	function transformControlsMouseDown() {
+
+		if ( ! enabledTransformControls.enabled ) return;
+		var object = enabledTransformControls.object;
 
 		objectPositionOnDown = object.position.clone();
 		objectRotationOnDown = object.rotation.clone();
 		objectScaleOnDown = object.scale.clone();
 
-		controls.enabled = false;
+		enabledControls.enabled = false;
 
-	} );
-	transformControls.addEventListener( 'mouseUp', function () {
+	}
 
-		var object = transformControls.object;
+	function transformControlsMouseUp() {
+
+		if ( ! enabledTransformControls.enabled ) return;
+		var object = enabledTransformControls.object;
 
 		if ( object !== undefined ) {
 
-			switch ( transformControls.getMode() ) {
+			switch ( enabledTransformControls.getMode() ) {
 
 				case 'translate':
 
@@ -134,11 +155,25 @@ function Viewport( editor ) {
 
 		}
 
-		controls.enabled = true;
+		enabledControls.enabled = true;
 
-	} );
+	}
+
+	var transformControls = new TransformControls( camera, container.dom );
+	transformControls.addEventListener( 'change', transformControlsChange );
+	transformControls.addEventListener( 'mouseDown', transformControlsMouseDown );
+	transformControls.addEventListener( 'mouseUp', transformControlsMouseUp );
 
 	sceneHelpers.add( transformControls );
+
+	enabledTransformControls = transformControls;
+
+	var previewTransformControls = new TransformControls( camera, container.dom );
+	transformControls.addEventListener( 'change', transformControlsChange );
+	transformControls.addEventListener( 'mouseDown', transformControlsMouseDown );
+	transformControls.addEventListener( 'mouseUp', transformControlsMouseUp );
+
+	viewportSceneHelpers.add( previewTransformControls );
 
 	// object picking
 
@@ -216,7 +251,7 @@ function Viewport( editor ) {
 		var array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onDownPosition.fromArray( array );
 
-		document.addEventListener( 'mouseup', onMouseUp, false );
+		document.addEventListener( 'pointerup', onMouseUp, false );
 
 	}
 
@@ -227,7 +262,7 @@ function Viewport( editor ) {
 
 		handleClick();
 
-		document.removeEventListener( 'mouseup', onMouseUp, false );
+		document.removeEventListener( 'pointerup', onMouseUp, false );
 
 	}
 
@@ -272,46 +307,59 @@ function Viewport( editor ) {
 
 	}
 
-	container.dom.addEventListener( 'mousedown', onMouseDown, false );
+	container.dom.addEventListener( 'pointerdown', onMouseDown, false );
 	container.dom.addEventListener( 'touchstart', onTouchStart, false );
 	container.dom.addEventListener( 'dblclick', onDoubleClick, false );
 
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.
 
-	var controls = new EditorControls( camera, container.dom );
-	controls.addEventListener( 'change', function () {
+	var editorControls = new EditorControls( camera, container.dom );
+	editorControls.addEventListener( 'change', function () {
 
+		if ( ! editorControls.enabled ) return;
 		signals.cameraChanged.dispatch( camera );
 		signals.refreshSidebarObject3D.dispatch( camera );
 
 	} );
-	viewHelper.controls = controls;
+	enabledControls = editorControls;
+
+	var orbitControls = new OrbitControls( camera, container.dom );
+	orbitControls.update();
+	orbitControls.addEventListener( 'change', function ( ) {
+
+		if ( ! orbitControls.enabled ) return;
+		render();
+
+	} );
+	orbitControls.enabled = false;
+
+	viewHelper.controls = enabledControls;
 
 	// signals
 
 	signals.editorCleared.add( function () {
 
-		controls.center.set( 0, 0, 0 );
+		editorControls.center.set( 0, 0, 0 );
 		render();
 
 	} );
 
 	signals.transformModeChanged.add( function ( mode ) {
 
-		transformControls.setMode( mode );
+		enabledTransformControls.setMode( mode );
 
 	} );
 
 	signals.snapChanged.add( function ( dist ) {
 
-		transformControls.setTranslationSnap( dist );
+		enabledTransformControls.setTranslationSnap( dist );
 
 	} );
 
 	signals.spaceChanged.add( function ( space ) {
 
-		transformControls.setSpace( space );
+		enabledTransformControls.setSpace( space );
 
 	} );
 
@@ -391,7 +439,7 @@ function Viewport( editor ) {
 	signals.objectSelected.add( function ( object ) {
 
 		selectionBox.visible = false;
-		transformControls.detach();
+		enabledTransformControls.detach();
 
 		if ( object !== null && object !== scene && object !== camera ) {
 
@@ -404,7 +452,7 @@ function Viewport( editor ) {
 
 			}
 
-			transformControls.attach( object );
+			enabledTransformControls.attach( object );
 
 		}
 
@@ -414,7 +462,11 @@ function Viewport( editor ) {
 
 	signals.objectFocused.add( function ( object ) {
 
-		controls.focus( object );
+		if ( enabledControls === editorControls ) {
+
+			editorControls.focus( object );
+
+		}
 
 	} );
 
@@ -466,10 +518,10 @@ function Viewport( editor ) {
 
 	signals.objectRemoved.add( function ( object ) {
 
-		controls.enabled = true; // see #14180
-		if ( object === transformControls.object ) {
+		enabledControls.enabled = true; // see #14180
+		if ( object === enabledTransformControls.object ) {
 
-			transformControls.detach();
+			enabledTransformControls.detach();
 
 		}
 
@@ -640,20 +692,25 @@ function Viewport( editor ) {
 
 		var viewportCamera = editor.viewportCamera;
 
-		if ( viewportCamera.isPerspectiveCamera ) {
+		enabledControls.enabled = false;
+		enabledTransformControls.enabled = false;
+		if ( editor.camera === viewportCamera ) {
 
-			viewportCamera.aspect = editor.camera.aspect;
-			viewportCamera.projectionMatrix.copy( editor.camera.projectionMatrix );
+			enabledControls = editorControls;
+			enabledTransformControls = transformControls;
 
-		} else if ( viewportCamera.isOrthographicCamera ) {
+		} else {
 
-			// TODO
+			enabledControls = orbitControls;
+			enabledTransformControls = previewTransformControls;
 
 		}
 
-		// disable EditorControls when setting a user camera
+		enabledTransformControls.camera = viewportCamera;
+		enabledControls.enabled = true;
+		enabledTransformControls.enabled = true;
 
-		controls.enabled = ( viewportCamera === editor.camera );
+		camera = viewportCamera;
 
 		render();
 
@@ -680,10 +737,14 @@ function Viewport( editor ) {
 
 	signals.showHelpersChanged.add( function ( showHelpers ) {
 
-		showSceneHelpers = showHelpers;
-		transformControls.enabled = showHelpers;
+		if ( enabledTransformControls === transformControls ) {
 
-		render();
+			showSceneHelpers = showHelpers;
+			enabledTransformControls.enabled = showHelpers;
+
+			render();
+
+		}
 
 	} );
 
@@ -736,14 +797,20 @@ function Viewport( editor ) {
 
 		scene.add( grid );
 		renderer.setViewport( 0, 0, container.dom.offsetWidth, container.dom.offsetHeight );
-		renderer.render( scene, editor.viewportCamera );
+		renderer.render( scene, camera );
 		scene.remove( grid );
 
-		if ( camera === editor.viewportCamera ) {
+		if ( camera === editor.camera ) {
 
 			renderer.autoClear = false;
 			if ( showSceneHelpers === true ) renderer.render( sceneHelpers, camera );
 			viewHelper.render( renderer );
+			renderer.autoClear = true;
+
+		} else {
+
+			renderer.autoClear = false;
+			renderer.render( viewportSceneHelpers, camera );
 			renderer.autoClear = true;
 
 		}
