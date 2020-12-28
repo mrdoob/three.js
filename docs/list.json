@@ -1072,6 +1072,15 @@
 				"OrthographicCamera": "api/ko/cameras/OrthographicCamera",
 				"PerspectiveCamera": "api/ko/cameras/PerspectiveCamera",
 				"StereoCamera": "api/ko/cameras/StereoCamera"
+			},
+
+			"상수": {
+				"Animation": "api/ko/constants/Animation",
+				"Core": "api/ko/constants/Core",
+				"CustomBlendingEquation": "api/ko/constants/CustomBlendingEquations",
+				"Materials": "api/ko/constants/Materials",
+				"Renderer": "api/ko/constants/Renderer",
+				"Textures": "api/ko/constants/Textures"
 			}
 		},
 
