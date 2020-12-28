@@ -1132,7 +1132,7 @@ THREE.LDrawLoader = ( function () {
 						this.subobjectCache[ currentEmbeddedFileName.toLowerCase() ] = currentEmbeddedText;
 
 						// New embedded text file
-						currentEmbeddedFileName = line.substring( 7 );
+						currentEmbeddedFileName = line.substring( 7 ).trim().replace( /\\/g, '/' );
 						currentEmbeddedText = '';
 
 					} else {
@@ -1255,7 +1255,7 @@ THREE.LDrawLoader = ( function () {
 
 										// Start embedded text files parsing
 										parsingEmbeddedFiles = true;
-										currentEmbeddedFileName = lp.getRemainingString();
+										currentEmbeddedFileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
 										currentEmbeddedText = '';
 
 										bfcCertified = false;
