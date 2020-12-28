@@ -20,24 +20,8 @@ Object.assign( WebXRController.prototype, {
 			this._hand.matrixAutoUpdate = false;
 			this._hand.visible = false;
 
-			this._hand.joints = [];
+			this._hand.joints = {};
 			this._hand.inputState = { pinching: false };
-
-			if ( window.XRHand ) {
-
-				for ( let i = 0; i <= 24; i ++ ) {
-
-					// The transform of this joint will be updated with the joint pose on each frame
-					const joint = new Group();
-					joint.matrixAutoUpdate = false;
-					joint.visible = false;
-					this._hand.joints.push( joint );
-					// ??
-					this._hand.add( joint );
-
-				}
-
-			}
 
 		}
 
@@ -138,13 +122,25 @@ Object.assign( WebXRController.prototype, {
 			if ( hand && inputSource.hand ) {
 
 				handPose = true;
-				let i = 0;
 
 				for ( const inputjoint of inputSource.hand.values() ) {
 
 					// Update the joints groups with the XRJoint poses
 					const jointPose = frame.getJointPose( inputjoint, referenceSpace );
-					const joint = hand.joints[ i ++ ];
+
+					if ( hand.joints[ inputjoint.jointName ] === undefined ) {
+
+						// The transform of this joint will be updated with the joint pose on each frame
+						const joint = new Group();
+						joint.matrixAutoUpdate = false;
+						joint.visible = false;
+						hand.joints[ inputjoint.jointName ] = joint;
+						// ??
+						hand.add( joint );
+
+					}
+
+					const joint = hand.joints[ inputjoint.jointName ];
 
 					if ( jointPose !== null ) {
 
@@ -156,35 +152,35 @@ Object.assign( WebXRController.prototype, {
 
 					joint.visible = jointPose !== null;
 
-					// Custom events
+				}
 
-					// Check pinchz
-					const indexTip = hand.joints[ 9 ];
-					const thumbTip = hand.joints[ 4 ];
-					const distance = indexTip.position.distanceTo( thumbTip.position );
+				// Custom events
 
-					const distanceToPinch = 0.02;
-					const threshold = 0.005;
+				// Check pinchz
+				const indexTip = hand.joints[ 'index-finger-tip' ];
+				const thumbTip = hand.joints[ 'thumb-tip' ];
+				const distance = indexTip.position.distanceTo( thumbTip.position );
 
-					if ( hand.inputState.pinching && distance > distanceToPinch + threshold ) {
+				const distanceToPinch = 0.02;
+				const threshold = 0.005;
 
-						hand.inputState.pinching = false;
-						this.dispatchEvent( {
-							type: 'pinchend',
-							handedness: inputSource.handedness,
-							target: this
-						} );
+				if ( hand.inputState.pinching && distance > distanceToPinch + threshold ) {
 
-					} else if ( ! hand.inputState.pinching && distance <= distanceToPinch - threshold ) {
+					hand.inputState.pinching = false;
+					this.dispatchEvent( {
+						type: 'pinchend',
+						handedness: inputSource.handedness,
+						target: this
+					} );
 
-						hand.inputState.pinching = true;
-						this.dispatchEvent( {
-							type: 'pinchstart',
-							handedness: inputSource.handedness,
-							target: this
-						} );
+				} else if ( ! hand.inputState.pinching && distance <= distanceToPinch - threshold ) {
 
-					}
+					hand.inputState.pinching = true;
+					this.dispatchEvent( {
+						type: 'pinchstart',
+						handedness: inputSource.handedness,
+						target: this
+					} );
 
 				}
 

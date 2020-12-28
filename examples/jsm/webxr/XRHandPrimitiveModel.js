@@ -35,18 +35,40 @@ class XRHandPrimitiveModel {
 			const jointMaterial = new MeshStandardMaterial( { color: 0xffffff, roughness: 1, metalness: 0 } );
 			const tipMaterial = new MeshStandardMaterial( { color: 0x999999, roughness: 1, metalness: 0 } );
 
-			const tipIndexes = [
-				4,
-				9,
-				14,
-				19,
-				24,
+			const joints = [
+				'wrist',
+				'thumb-metacarpal',
+				'thumb-phalanx-proximal',
+				'thumb-phalanx-distal',
+				'thumb-tip',
+				'index-finger-metacarpal',
+				'index-finger-phalanx-proximal',
+				'index-finger-phalanx-intermediate',
+				'index-finger-phalanx-distal',
+				'index-finger-tip',
+				'middle-finger-metacarpal',
+				'middle-finger-phalanx-proximal',
+				'middle-finger-phalanx-intermediate',
+				'middle-finger-phalanx-distal',
+				'middle-finger-tip',
+				'ring-finger-metacarpal',
+				'ring-finger-phalanx-proximal',
+				'ring-finger-phalanx-intermediate',
+				'ring-finger-phalanx-distal',
+				'ring-finger-tip',
+				'pinky-finger-metacarpal',
+				'pinky-finger-phalanx-proximal',
+				'pinky-finger-phalanx-intermediate',
+				'pinky-finger-phalanx-distal',
+				'pinky-finger-tip'
 			];
-			for ( let i = 0; i <= 24; i ++ ) {
 
-				var cube = new Mesh( geometry, tipIndexes.indexOf( i ) !== - 1 ? tipMaterial : jointMaterial );
+			for ( const jointName of joints ) {
+
+				var cube = new Mesh( geometry, jointName.indexOf( 'tip' ) !== - 1 ? tipMaterial : jointMaterial );
 				cube.castShadow = true;
 				cube.receiveShadow = true;
+				cube.jointName = jointName;
 				this.handMesh.add( cube );
 
 			}
@@ -66,7 +88,7 @@ class XRHandPrimitiveModel {
 		for ( let i = 0; i < objects.length; i ++ ) {
 
 			const jointMesh = objects[ i ];
-			const XRJoint = XRJoints[ i ];
+			const XRJoint = XRJoints[ jointMesh.jointName ];
 
 			if ( XRJoint.visible ) {
 
