@@ -20,7 +20,7 @@ type Vector3Tuple = [number, number, number];
  * const c = new THREE.Vector3();
  * c.crossVectors( a, b );
  *
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/Vector3.js|src/math/Vector3.js}
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/Vector3.js}
  *
  * ( class Vector3 implements Vector<Vector3> )
  */
