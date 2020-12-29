@@ -713,7 +713,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const isCompressed = ( texture && ( texture.isCompressedTexture || texture.image[ 0 ].isCompressedTexture ) );
 		const isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
 
-		if ( texture.image[ 0 ] ) _gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 		const cubeImage = [];
 
