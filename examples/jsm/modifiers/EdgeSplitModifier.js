@@ -5,7 +5,6 @@ import {
 } from '../../../build/three.module.js';
 import { BufferGeometryUtils } from '../utils/BufferGeometryUtils.js';
 
-
 var EdgeSplitModifier = function () {
 
 	var A = new Vector3();
@@ -15,7 +14,6 @@ var EdgeSplitModifier = function () {
 	var positions, normals;
 	var indexes;
 	var pointToIndexMap, splitIndexes;
-
 	let oldNormals;
 
 
@@ -187,7 +185,7 @@ var EdgeSplitModifier = function () {
 		}
 
 
-		if ( ! geometry.index ) {
+		if ( geometry.index == null ) {
 
 			if ( BufferGeometryUtils === undefined ) {
 
