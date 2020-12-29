@@ -45,19 +45,14 @@
 			are separate events you can add event listeners to. The event type is "propertyname-changed".
 		</p>
 
-		<h3>mouseDown</h3>
+		<h3>dragging-changed</h3>
 		<p>
-			Fires if a pointer (mouse/touch) becomes active.
+			Fires at the begining and the end of dragging gesture.
 		</p>
 
-		<h3>mouseUp</h3>
+		<h3>transform-changed</h3>
 		<p>
-			Fires if a pointer (mouse/touch) is no longer active.
-		</p>
-
-		<h3>objectChange</h3>
-		<p>
-			Fires if the controlled 3D object is changed.
+			Fires when the controlled 3D object is changed.
 		</p>
 
 		<h2>Properties</h2>
@@ -90,20 +85,24 @@
 			Whether or not the controls are enabled.
 		</p>
 
-		<h3>[property:String mode]</h3>
+		<h3>[property:String showTranslate]</h3>
 		<p>
-			The current transformation mode. Possible values are "translate", "rotate" and "scale". Default is *translate*.
+			Whether or not the translate gizmo is visible.
+		</p>
+
+		<h3>[property:String showRotate]</h3>
+		<p>
+			Whether or not the rotate gizmo is visible.
+		</p>
+
+		<h3>[property:String showScale]</h3>
+		<p>
+			Whether or not the scale gizmo is visible.
 		</p>
 
 		<h3>[property:Object3D object]</h3>
 		<p>
 			The 3D object being controlled.
-		</p>
-
-		<h3>[property:Number rotationSnap]</h3>
-		<p>
-			By default, 3D objects are continuously rotated. If you set this property to a numeric value (radians), you can define in which
-			steps the 3D object should be rotated. Deault is *null*.
 		</p>
 
 		<h3>[property:Boolean showX]</h3>
@@ -137,6 +136,35 @@
 			steps the 3D object should be translated. Deault is *null*.
 		</p>
 
+		<h3>[property:Number rotationSnap]</h3>
+		<p>
+			By default, 3D objects are continuously rotated. If you set this property to a numeric value (radians), you can define in which
+			steps the 3D object should be rotated. Deault is *null*.
+		</p>
+
+		<h3>[property:Number scaleSnap]</h3>
+		<p>
+			By default, 3D objects are continously scaled. If you set this property to a numeric value (world units), you can define in which
+			steps the 3D object should be scaled. Deault is *null*.
+		</p>
+
+		<h3>[property:Number minGrazingAngle]</h3>
+		<p>
+			Set to adjust grazing angle avoidance algorithm which prevents extreme transformation changes when principal transformation axis is sharply aligned with the camera.
+			Default is 30.
+		</p>
+
+		<h3>[property:Boolean enableDamping]</h3>
+		<p>
+			Set to true to enable damping (inertia), which can be used to give a sense of weight to the controls. Default is false.
+		</p>
+
+		<h3>
+			[property:Float dampingFactor]</h3>
+		<p>
+			The damping inertia used if [page:.enableDamping] is set to true.
+		</p>
+
 		<h2>Methods</h2>
 
 		<p>See the base [page:Object3D] class for common methods.</p>
@@ -159,61 +187,6 @@
 		<h3>[method:null dispose] ()</h3>
 		<p>
 			Should be called if the controls is no longer required.
-		</p>
-
-		<h3>[method:String getMode] ()</h3>
-		<p>
-			Returns the transformation mode.
-		</p>
-
-		<h3>[method:null setMode] ( [param:String mode] )</h3>
-		<p>
-			<p>
-				[page:String mode]: The transformation mode.
-			</p>
-			<p>
-				Sets the transformation mode.
-			</p>
-		</p>
-
-		<h3>[method:null setRotationSnap] ( [param:Number rotationSnap] )</h3>
-		<p>
-			<p>
-				[page:Number rotationSnap]: The rotation snap.
-			</p>
-			<p>
-				Sets the rotation snap.
-			</p>
-		</p>
-
-		<h3>[method:null setSize] ( [param:Number size] )</h3>
-		<p>
-			<p>
-				[page:Number size]: The size of the helper UI.
-			</p>
-			<p>
-				Sets the size of the helper UI.
-			</p>
-		</p>
-
-		<h3>[method:null setSpace] ( [param:String space] )</h3>
-		<p>
-			<p>
-				[page:String space]: The coordinate space in which transformations are applied.
-			</p>
-			<p>
-				Sets the coordinate space in which transformations are applied.
-			</p>
-		</p>
-
-		<h3>[method:null setTranslationSnap] ( [param:Number translationSnap] )</h3>
-		<p>
-			<p>
-				[page:Number translationSnap]: The translation snap.
-			</p>
-			<p>
-				Sets the translation snap.
-			</p>
 		</p>
 
 		<h2>Source</h2>

@@ -5,47 +5,149 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			html, body {
+				width: 100%;
+				height: 100%;
+			}
+
+			body {
+				background-color: black;
+			}
+
+			#info {
+				color: #08f;
+			}
+
+			#viewports {
+				width: 100%;
+				height: 100%;
+				max-width: 100%;
+				max-height: 100%;
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				grid-template-rows: repeat(2, 1fr);
+				padding: 2px;
+				gap: 3px;
+				box-sizing: border-box;
+				overflow: hidden;
+			}
+			canvas {
+				width: 100%;
+				height: 100%;
+				outline: 1px solid #666;
+				image-rendering: pixelated;
+				overflow: hidden;
+			}
+			canvas:focus {
+				outline: 1px solid #6ff;
+			}
+			canvas button {
+				z-index: 1000;
+			}
+
+			@media only screen and (max-width: 840px) {
+				#viewports {
+					grid-template-columns: repeat(3, 1fr);
+					grid-template-rows: repeat(4, 1fr);
+				}
+				#viewport1 {
+					grid-column: 1 / 4;
+					grid-row: 1 / 4;
+				}
+			}
+
+		</style>
 	</head>
 	<body>
-
 		<div id="info">
-			"W" translate | "E" rotate | "R" scale | "+/-" adjust size<br />
-			"Q" toggle world/local space |  "Shift" snap to grid<br />
-			"X" toggle X | "Y" toggle Y | "Z" toggle Z | "Spacebar" toggle enabled<br />
-			"C" toggle camera | "V" random zoom
+			"W" translate | "E" rotate | "R" scale | "T" multi | "+/-" adjust size<br />
+			"Q" toggle world/local space | "D" toggle damping | "Shift" snap to grid<br />
+			"X" toggle X | "Y" toggle Y | "Z" toggle Z | "C" toggle E (camera)<br />
+			"Spacebar" toggle enabled | "O" toggle offset<br />
 		</div>
-
+		<div id="viewports">
+			<canvas id="viewport1" tabindex="0"></canvas>
+			<canvas id="viewport2" tabindex="0"></canvas>
+			<canvas id="viewport3" tabindex="0"></canvas>
+			<canvas id="viewport4" tabindex="0"></canvas>
+		</div>
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-
+			import { VRButton } from './jsm/webxr/VRButton.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TransformControls } from './jsm/controls/TransformControls.js';
+			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 
-			let cameraPersp, cameraOrtho, currentCamera;
-			let scene, renderer, control, orbit;
+			let scene, renderer, transformControls, rendered;
+
+			class View {
+				constructor ( id, renderer, camera ) {
+					this.renderer = renderer;
+					this.camera = camera;
+					this.canvas = document.getElementById( id );
+					this.context = this.canvas.getContext( '2d' );
+					this.cameraControls = new OrbitControls( camera, this.canvas );
+					this.cameraControls.addEventListener( 'change', render );
+					this.resize();
+				}
+				resize() {
+					this.canvas.width = this.canvas.clientWidth * window.devicePixelRatio;
+					this.canvas.height = this.canvas.clientHeight * window.devicePixelRatio;
+					const aspect = this.canvas.width / this.canvas.height;
+					if ( this.camera instanceof THREE.PerspectiveCamera ) {
+						this.camera.aspect = aspect;
+					} else {
+						this.camera.left = this.camera.bottom * aspect;
+						this.camera.right = this.camera.top * aspect;
+					}
+					this.camera.updateProjectionMatrix();
+				}
+				render( scene ) {
+					this.renderer.setSize( this.canvas.width, this.canvas.height );
+					this.renderer.render( scene, this.camera );
+					this.context.drawImage( this.renderer.domElement, 0, 0 );
+				}
+			}
+
+			let viewport1, viewport2, viewport3, viewport4;
 
 			init();
 			render();
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.xr.enabled = true;
 
-				const aspect = window.innerWidth / window.innerHeight;
+				const perspectiveCamera = new THREE.PerspectiveCamera( 50, 1, 0.001, 1000 );
+				perspectiveCamera.position.set( 5, 2.5, 5 );
+				perspectiveCamera.lookAt( 0, 1, 0 );
 
-				cameraPersp = new THREE.PerspectiveCamera( 50, aspect, 0.01, 30000 );
-				cameraOrtho = new THREE.OrthographicCamera( - 600 * aspect, 600 * aspect, 600, - 600, 0.01, 30000 );
-				currentCamera = cameraPersp;
+				const topCamera = new THREE.OrthographicCamera( - 3, 3, 3, - 3, 0.001, 1000 );
+				topCamera.position.set( 0, 500, 0 );
+				topCamera.lookAt( 0, 0, 0 );
 
-				currentCamera.position.set( 1000, 500, 1000 );
-				currentCamera.lookAt( 0, 200, 0 );
+				const frontCamera = new THREE.OrthographicCamera( - 3, 3, 3, - 3, 0.001, 1000 );
+				frontCamera.position.set( 0, 0, 500 );
+				frontCamera.lookAt( 0, 0, 0 );
+
+				const sideCamera = new THREE.OrthographicCamera( - 3, 3, 3, - 3, 0.001, 1000 );
+				sideCamera.position.set( 500, 0, 0 );
+				sideCamera.lookAt( 0, 0, 0 );
+
+				viewport1 = new View( 'viewport1', renderer, perspectiveCamera );
+				viewport2 = new View( 'viewport2', renderer, topCamera );
+				viewport3 = new View( 'viewport3', renderer, frontCamera );
+				viewport4 = new View( 'viewport4', renderer, sideCamera );
+
+				viewport2.cameraControls.enableRotate = false;
+				viewport3.cameraControls.enableRotate = false;
+				viewport4.cameraControls.enableRotate = false;
 
 				scene = new THREE.Scene();
-				scene.add( new THREE.GridHelper( 1000, 10, 0x888888, 0x444444 ) );
+				scene.add( new THREE.GridHelper( 5, 10, 0x888888, 0x444444 ) );
 
 				const light = new THREE.DirectionalLight( 0xffffff, 2 );
 				light.position.set( 1, 1, 1 );
@@ -54,27 +156,63 @@
 				const texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
 				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
+				const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 				const material = new THREE.MeshLambertMaterial( { map: texture, transparent: true } );
 
-				orbit = new OrbitControls( currentCamera, renderer.domElement );
-				orbit.update();
-				orbit.addEventListener( 'change', render );
+				// WebXR
 
-				control = new TransformControls( currentCamera, renderer.domElement );
-				control.addEventListener( 'change', render );
+				document.querySelector( '#viewports' ).appendChild( VRButton.createButton( renderer ) );
 
-				control.addEventListener( 'dragging-changed', function ( event ) {
+				const controller1 = renderer.xr.getController( 0 );
+				scene.add( controller1 );
 
-					orbit.enabled = ! event.value;
+				const controller2 = renderer.xr.getController( 1 );
+				scene.add( controller2 );
+
+				const controllerModelFactory = new XRControllerModelFactory();
+
+				const controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				const controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
+
+				const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] ) );
+				line.material.transparent = true;
+				line.material.depthTest = false;
+				line.name = 'line';
+				line.scale.z = 5;
+
+				controller1.add( line.clone() );
+				controller2.add( line.clone() );
+
+				// Controls
+
+				transformControls = new TransformControls( perspectiveCamera, viewport1.canvas );
+				transformControls.space = 'local';
+				transformControls.enableDamping = true;
+				transformControls.addEventListener( 'change', render );
+
+				transformControls.registerViewport( topCamera, viewport2.canvas );
+				transformControls.registerViewport( frontCamera, viewport3.canvas );
+				transformControls.registerViewport( sideCamera, viewport4.canvas );
+
+				transformControls.addEventListener( 'dragging-changed', function ( event ) {
+
+					viewport1.cameraControls.enabled = ! event.value;
+					viewport2.cameraControls.enabled = ! event.value;
+					viewport3.cameraControls.enabled = ! event.value;
+					viewport4.cameraControls.enabled = ! event.value;
 
 				} );
 
 				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				control.attach( mesh );
-				scene.add( control );
+				transformControls.attach( mesh );
+				scene.add( transformControls );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -83,79 +221,76 @@
 					switch ( event.keyCode ) {
 
 						case 81: // Q
-							control.setSpace( control.space === "local" ? "world" : "local" );
+							transformControls.space = transformControls.space === "local" ? "world" : "local";
 							break;
 
 						case 16: // Shift
-							control.setTranslationSnap( 100 );
-							control.setRotationSnap( THREE.MathUtils.degToRad( 15 ) );
-							control.setScaleSnap( 0.25 );
+							transformControls.translationSnap = 0.5;
+							transformControls.rotationSnap = THREE.MathUtils.degToRad( 15 );
+							transformControls.scaleSnap = 0.25;
 							break;
 
 						case 87: // W
-							control.setMode( "translate" );
+							transformControls.showTranslate = true;
+							transformControls.showRotate = false;
+							transformControls.showScale = false;
 							break;
 
 						case 69: // E
-							control.setMode( "rotate" );
+							transformControls.showTranslate = false;
+							transformControls.showRotate = true;
+							transformControls.showScale = false;
 							break;
 
 						case 82: // R
-							control.setMode( "scale" );
+							transformControls.showTranslate = false;
+							transformControls.showRotate = false;
+							transformControls.showScale = true;
 							break;
 
-						case 67: // C
-							const position = currentCamera.position.clone();
-
-							currentCamera = currentCamera.isPerspectiveCamera ? cameraOrtho : cameraPersp;
-							currentCamera.position.copy( position );
-
-							orbit.object = currentCamera;
-							control.camera = currentCamera;
-
-							currentCamera.lookAt( orbit.target.x, orbit.target.y, orbit.target.z );
-							onWindowResize();
+						case 84: // T
+							transformControls.showTranslate = true;
+							transformControls.showRotate = true;
+							transformControls.showScale = true;
 							break;
 
-						case 86: // V
-							const randomFoV = Math.random() + 0.1;
-							const randomZoom = Math.random() + 0.1;
-
-							cameraPersp.fov = randomFoV * 160;
-							cameraOrtho.bottom = - randomFoV * 500;
-							cameraOrtho.top = randomFoV * 500;
-
-							cameraPersp.zoom = randomZoom * 5;
-							cameraOrtho.zoom = randomZoom * 5;
-							onWindowResize();
+						case 68: // D
+							transformControls.enableDamping = ! transformControls.enableDamping;
 							break;
 
 						case 187:
 						case 107: // +, =, num+
-							control.setSize( control.size + 0.1 );
+							if ( !event.metaKey ) transformControls.size = transformControls.size + 0.1;
 							break;
 
 						case 189:
 						case 109: // -, _, num-
-							control.setSize( Math.max( control.size - 0.1, 0.1 ) );
+							if ( !event.metaKey ) transformControls.size = Math.max( transformControls.size - 0.1, 0.1 );
 							break;
 
 						case 88: // X
-							control.showX = ! control.showX;
+							transformControls.showX = ! transformControls.showX;
 							break;
 
 						case 89: // Y
-							control.showY = ! control.showY;
+							transformControls.showY = ! transformControls.showY;
 							break;
 
 						case 90: // Z
-							control.showZ = ! control.showZ;
+							transformControls.showZ = ! transformControls.showZ;
+							break;
+
+						case 67: // C
+							transformControls.showE = ! transformControls.showE;
 							break;
 
 						case 32: // Spacebar
-							control.enabled = ! control.enabled;
+							transformControls.enabled = ! transformControls.enabled;
 							break;
 
+						case 79: // O
+							transformControls.showOffset = ! transformControls.showOffset;
+							break;
 					}
 
 				} );
@@ -165,9 +300,9 @@
 					switch ( event.keyCode ) {
 
 						case 16: // Shift
-							control.setTranslationSnap( null );
-							control.setRotationSnap( null );
-							control.setScaleSnap( null );
+							transformControls.translationSnap = null;
+							transformControls.rotationSnap = null;
+							transformControls.scaleSnap = null;
 							break;
 
 					}
@@ -178,26 +313,54 @@
 
 			function onWindowResize() {
 
-				const aspect = window.innerWidth / window.innerHeight;
-
-				cameraPersp.aspect = aspect;
-				cameraPersp.updateProjectionMatrix();
-
-				cameraOrtho.left = cameraOrtho.bottom * aspect;
-				cameraOrtho.right = cameraOrtho.top * aspect;
-				cameraOrtho.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				viewport1.resize();
+				viewport2.resize();
+				viewport3.resize();
+				viewport4.resize();
 				render();
 
 			}
 
 			function render() {
 
-				renderer.render( scene, currentCamera );
+				if ( rendered ) return;
+
+				if (renderer.xr.isPresenting) {
+
+					transformControls.camera = renderer.xr.getCamera( viewport1.camera );
+					renderer.render( scene, viewport1.camera );
+
+				} else {
+
+					transformControls.domElement = viewport1.canvas;
+					transformControls.camera = viewport1.camera;
+					viewport1.render( scene );
+
+					transformControls.domElement = viewport2.canvas;
+					transformControls.camera = viewport2.camera;
+					viewport2.render( scene );
+
+					transformControls.domElement = viewport3.canvas;
+					transformControls.camera = viewport3.camera;
+					viewport3.render( scene );
+
+					transformControls.domElement = viewport4.canvas;
+					transformControls.camera = viewport4.camera;
+					viewport4.render( scene );
+
+				}
+
+				rendered = true;
 
 			}
+
+			renderer.setAnimationLoop( () => {
+
+				rendered = false;
+
+				if (renderer.xr.isPresenting) render();
+
+			} );
 
 		</script>
 

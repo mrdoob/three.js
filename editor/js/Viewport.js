@@ -53,11 +53,9 @@ function Viewport( editor ) {
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
-	var objectPositionOnDown = null;
-	var objectRotationOnDown = null;
-	var objectScaleOnDown = null;
-
 	var transformControls = new TransformControls( camera, container.dom );
+	transformControls.showRotate = false;
+	transformControls.showScale = false;
 	transformControls.addEventListener( 'change', function () {
 
 		var object = transformControls.object;
@@ -81,30 +79,22 @@ function Viewport( editor ) {
 		render();
 
 	} );
-	transformControls.addEventListener( 'mouseDown', function () {
-
-		var object = transformControls.object;
-
-		objectPositionOnDown = object.position.clone();
-		objectRotationOnDown = object.rotation.clone();
-		objectScaleOnDown = object.scale.clone();
+	transformControls.addEventListener( 'start', function () {
 
 		controls.enabled = false;
 
 	} );
-	transformControls.addEventListener( 'mouseUp', function () {
+	transformControls.addEventListener( 'end', function ( event ) {
 
-		var object = transformControls.object;
+		if ( event.object !== undefined ) {
 
-		if ( object !== undefined ) {
-
-			switch ( transformControls.getMode() ) {
+			switch ( event.mode ) {
 
 				case 'translate':
 
-					if ( ! objectPositionOnDown.equals( object.position ) ) {
+					if ( ! event.positionStart.equals( event.position ) ) {
 
-						editor.execute( new SetPositionCommand( editor, object, object.position, objectPositionOnDown ) );
+						editor.execute( new SetPositionCommand( editor, event.object, event.position, event.positionStart ) );
 
 					}
 
@@ -112,9 +102,11 @@ function Viewport( editor ) {
 
 				case 'rotate':
 
-					if ( ! objectRotationOnDown.equals( object.rotation ) ) {
+					if ( ! event.quaternionStart.equals( event.quaternion ) ) {
 
-						editor.execute( new SetRotationCommand( editor, object, object.rotation, objectRotationOnDown ) );
+						const rotation = new THREE.Euler().setFromQuaternion( event.quaternion );
+						const rotationEnd = new THREE.Euler().setFromQuaternion( event.quaternionStart );
+						editor.execute( new SetRotationCommand( editor, event.object, rotation, rotationEnd ) );
 
 					}
 
@@ -122,9 +114,9 @@ function Viewport( editor ) {
 
 				case 'scale':
 
-					if ( ! objectScaleOnDown.equals( object.scale ) ) {
+					if ( ! event.scaleStart.equals( event.scale ) ) {
 
-						editor.execute( new SetScaleCommand( editor, object, object.scale, objectScaleOnDown ) );
+						editor.execute( new SetScaleCommand( editor, event.object, event.scale, event.scaleStart ) );
 
 					}
 
@@ -299,19 +291,22 @@ function Viewport( editor ) {
 
 	signals.transformModeChanged.add( function ( mode ) {
 
-		transformControls.setMode( mode );
+		// TODO: implement "combined mode in UI";
+		transformControls.showTranslate = mode === 'translate' || mode === 'combined';
+		transformControls.showRotate = mode === 'rotate' || mode === 'combined';
+		transformControls.showScale = mode === 'scale' || mode === 'combined';
 
 	} );
 
 	signals.snapChanged.add( function ( dist ) {
 
-		transformControls.setTranslationSnap( dist );
+		transformControls.translationSnap = dist;
 
 	} );
 
 	signals.spaceChanged.add( function ( space ) {
 
-		transformControls.setSpace( space );
+		transformControls.space = space;
 
 	} );
 

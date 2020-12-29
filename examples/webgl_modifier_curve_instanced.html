@@ -30,7 +30,7 @@
 				camera,
 				renderer,
 				rayCaster,
-				control,
+				transformControls,
 				flow,
 				action = ACTION_NONE;
 
@@ -164,8 +164,10 @@
 				renderer.domElement.addEventListener( 'pointerdown', onPointerDown );
 
 				rayCaster = new THREE.Raycaster();
-				control = new TransformControls( camera, renderer.domElement );
-				control.addEventListener( "dragging-changed", function ( event ) {
+				transformControls = new TransformControls( camera, renderer.domElement );
+				transformControls.showRotate = false;
+				transformControls.showScale = false;
+				transformControls.addEventListener( "end", function ( event ) {
 
 					if ( ! event.value ) {
 
@@ -217,8 +219,8 @@
 					if ( intersects.length ) {
 
 						const target = intersects[ 0 ].object;
-						control.attach( target );
-						scene.add( control );
+						transformControls.attach( target );
+						scene.add( transformControls );
 
 					}
 

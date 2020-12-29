@@ -44,8 +44,8 @@
 			const onUpPosition = new THREE.Vector2();
 			const onDownPosition = new THREE.Vector2();
 
-			const geometry = new THREE.BoxGeometry( 20, 20, 20 );
-			let transformControl;
+			const geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+			let transformControls;
 
 			const ARC_SEGMENTS = 200;
 
@@ -132,16 +132,18 @@
 				controls.damping = 0.2;
 				controls.addEventListener( 'change', render );
 
-				transformControl = new TransformControls( camera, renderer.domElement );
-				transformControl.addEventListener( 'change', render );
-				transformControl.addEventListener( 'dragging-changed', function ( event ) {
+				transformControls = new TransformControls( camera, renderer.domElement );
+				transformControls.showRotate = false;
+				transformControls.showScale = false;
+				transformControls.addEventListener( 'change', render );
+				transformControls.addEventListener( 'dragging-changed', function ( event ) {
 
 					controls.enabled = ! event.value;
 
 				} );
-				scene.add( transformControl );
+				scene.add( transformControls );
 
-				transformControl.addEventListener( 'objectChange', function () {
+				transformControls.addEventListener( 'transform-changed', function () {
 
 					updateSplineOutline();
 
@@ -260,7 +262,7 @@
 				splinePointsLength --;
 				positions.pop();
 
-				if ( transformControl.object === point ) transformControl.detach();
+				if ( transformControls.object === point ) transformControls.detach();
 				scene.remove( point );
 
 				updateSplineOutline();
@@ -360,7 +362,7 @@
 				onUpPosition.x = event.clientX;
 				onUpPosition.y = event.clientY;
 
-				if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) transformControl.detach();
+				if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) transformControls.detach();
 
 			}
 
@@ -377,9 +379,9 @@
 
 					const object = intersects[ 0 ].object;
 
-					if ( object !== transformControl.object ) {
+					if ( object !== transformControls.object ) {
 
-						transformControl.attach( object );
+						transformControls.attach( object );
 
 					}
 
