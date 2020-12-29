@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,7 +16,7 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var physics;
+		let physics;
 
 		// Load MMD resources and instantiate MMDPhysics
 		new MMDLoader().load(
@@ -32,7 +31,7 @@
 
 		function render() {
 
-			var delta = clock.getDelta();
+			const delta = clock.getDelta();
 			animate( delta );  // update bones
 			if ( physics !== undefined ) physics.update( delta );
 			renderer.render( scene, camera );
@@ -79,7 +78,7 @@
 
 		<h3>[method:CCDIKSolver reset]()</h3>
 		<p>
-		Resets Rigid bodies transorm to current bone's.
+		Resets Rigid bodies transform to current bone's.
 		</p>
 
 		<h3>[method:CCDIKSolver setGravity]( [param:Vector3 gravity] )</h3>

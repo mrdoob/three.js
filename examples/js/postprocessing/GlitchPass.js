@@ -1,10 +1,8 @@
-console.warn( "THREE.GlitchPass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.GlitchPass = function ( dt_size ) {
 
 	THREE.Pass.call( this );
 
-	if ( THREE.DigitalGlitch === undefined ) console.error( "THREE.GlitchPass relies on THREE.DigitalGlitch" );
+	if ( THREE.DigitalGlitch === undefined ) console.error( 'THREE.GlitchPass relies on THREE.DigitalGlitch' );
 
 	var shader = THREE.DigitalGlitch;
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
@@ -12,7 +10,7 @@ THREE.GlitchPass = function ( dt_size ) {
 	if ( dt_size == undefined ) dt_size = 64;
 
 
-	this.uniforms[ "tDisp" ].value = this.generateHeightmap( dt_size );
+	this.uniforms[ 'tDisp' ].value = this.generateHeightmap( dt_size );
 
 
 	this.material = new THREE.ShaderMaterial( {
@@ -35,7 +33,7 @@ THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
-		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
+		this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
 		this.uniforms[ 'seed' ].value = Math.random();//default seeding
 		this.uniforms[ 'byp' ].value = 0;
 

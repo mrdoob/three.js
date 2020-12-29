@@ -93,11 +93,12 @@ export class BufferGeometry extends EventDispatcher {
 	readonly isBufferGeometry: true;
 
 	getIndex(): BufferAttribute | null;
-	setIndex( index: BufferAttribute | number[] | null ): void;
+	setIndex( index: BufferAttribute | number[] | null ): BufferGeometry;
 
 	setAttribute( name: string, attribute: BufferAttribute | InterleavedBufferAttribute ): BufferGeometry;
 	getAttribute( name: string ): BufferAttribute | InterleavedBufferAttribute;
 	deleteAttribute( name: string ): BufferGeometry;
+	hasAttribute( name: string ): boolean;
 
 	addGroup( start: number, count: number, materialIndex?: number ): void;
 	clearGroups(): void;
@@ -149,7 +150,7 @@ export class BufferGeometry extends EventDispatcher {
 	toNonIndexed(): BufferGeometry;
 
 	toJSON(): any;
-	clone(): this;
+	clone(): BufferGeometry;
 	copy( source: BufferGeometry ): this;
 
 	/**

@@ -27,6 +27,7 @@ export class AnimationClip {
 	validate(): boolean;
 	optimize(): AnimationClip;
 	clone(): AnimationClip;
+	toJSON( clip: AnimationClip ): any;
 
 	static CreateFromMorphTargetSequence(
 		name: string,
@@ -45,6 +46,6 @@ export class AnimationClip {
 		animation: any,
 		bones: Bone[]
 	): AnimationClip;
-	static toJSON(): any;
+	static toJSON( clip: AnimationClip ): any;
 
 }

@@ -1,4 +1,3 @@
-console.warn( "THREE.KTXLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * for description see https://www.khronos.org/opengles/sdk/tools/KTX/
  * for file layout see https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/
@@ -147,7 +146,7 @@ var KhronosTextureContainer = ( function () {
 
 				var byteArray = new Uint8Array( this.arrayBuffer, dataOffset, imageSize );
 
-				mipmaps.push( { "data": byteArray, "width": width, "height": height } );
+				mipmaps.push( { 'data': byteArray, 'width': width, 'height': height } );
 
 				dataOffset += imageSize;
 				dataOffset += 3 - ( ( imageSize + 3 ) % 4 ); // add padding for odd sized image

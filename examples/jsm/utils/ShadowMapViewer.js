@@ -9,8 +9,9 @@ import {
 	ShaderMaterial,
 	Texture,
 	UniformsUtils
-} from "../../../build/three.module.js";
-import { UnpackDepthRGBAShader } from "../shaders/UnpackDepthRGBAShader.js";
+} from '../../../build/three.module.js';
+import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader.js';
+
 /**
  * This is a helper for visualising a given light's shadow map.
  * It works for shadow casting lights: DirectionalLight and SpotLight.

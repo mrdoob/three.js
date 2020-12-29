@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -35,6 +34,8 @@
 			<li>KHR_lights_punctual<sup>1</sup></li>
 			<li>KHR_texture_basisu <i>(experimental)</i></li>
 			<li>KHR_texture_transform<sup>2</sup></li>
+			<li>EXT_texture_webp</li>
+			<li>EXT_meshopt_compression</li>
 			<li>MSFT_texture_dds</li>
 		</ul>
 
@@ -56,10 +57,10 @@
 
 		<code>
 		// Instantiate a loader
-		var loader = new GLTFLoader();
+		const loader = new GLTFLoader();
 
 		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
-		var dracoLoader = new DRACOLoader();
+		const dracoLoader = new DRACOLoader();
 		dracoLoader.setDecoderPath( '/examples/js/libs/draco/' );
 		loader.setDRACOLoader( dracoLoader );
 
@@ -137,11 +138,11 @@
 		<code>
 		loader.load('foo.gltf', function ( gltf ) {
 
-			var scene = gltf.scene;
+			const scene = gltf.scene;
 
-			var mesh = scene.children[ 3 ];
+			const mesh = scene.children[ 3 ];
 
-			var fooExtension = mesh.userData.gltfExtensions.EXT_foo;
+			const fooExtension = mesh.userData.gltfExtensions.EXT_foo;
 
 			gltf.parser.getDependency( 'bufferView', fooExtension.bufferView )
 				.then( function ( fooBuffer ) { ... } );
@@ -200,7 +201,7 @@
 		[page:Function onError] — （可选）若在解析过程发生错误，将被调用的函数。该函数接收error来作为参数。<br />
 		</p>
 		<p>
-		解析基于glTF的ArrayBuffer或<em>JSON</em>字符串，并在完成后触发[page:Function onLoad]回调。[page:Function onLoad]的参数将是一个包含有已加载部分的[page:object]：.[page:Group scene]、 .[page:Array scenes]、 .[page:Array cameras]、 .[page:Array animations] 和 .[page:Object asset]。
+		解析基于glTF的ArrayBuffer或<em>JSON</em>字符串，并在完成后触发[page:Function onLoad]回调。[page:Function onLoad]的参数将是一个包含有已加载部分的[page:Object]：.[page:Group scene]、 .[page:Array scenes]、 .[page:Array cameras]、 .[page:Array animations] 和 .[page:Object asset]。
 		</p>
 
 		<h2>源代码</h2>

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -18,21 +17,20 @@
 
 		<code>
 		// Create a sampler for a Mesh surface.
-		var sampler = new MeshSurfaceSampler( surfaceMesh )
+		const sampler = new MeshSurfaceSampler( surfaceMesh )
 			.setWeightAttribute( 'color' )
 			.build();
 
-		var sampleMesh = new THREE.InstancedMesh( sampleGeometry, sampleMaterial, 100 );
+		const sampleMesh = new THREE.InstancedMesh( sampleGeometry, sampleMaterial, 100 );
 
-		var _position = new THREE.Vector3();
-		var _normal = new THREE.Vector3();
-		var _matrix = new THREE.Matrix4();
+		const _position = new THREE.Vector3();
+		const _matrix = new THREE.Matrix4();
 
 		// Sample randomly from the surface, creating an instance of the sample
 		// geometry at each sample point.
-		for ( var i = 0; i < 100; i ++ ) {
+		for ( let i = 0; i < 100; i ++ ) {
 
-			sampler.sample( _position, _normal );
+			sampler.sample( _position );
 
 			_matrix.makeTranslation( _position.x, _position.y, _position.z );
 
@@ -73,9 +71,9 @@
 		Processes the input geometry and prepares to return samples. Any configuration of the geometry or sampler must occur before this method is called. Time complexity is <i>O(n)</i> for a surface with <i>n</i> faces.
 		</p>
 
-		<h3>[method:this sample]( [param:Vector3 targetPosition], [param:Vector3 targetNormal] )</h3>
+		<h3>[method:this sample]( [param:Vector3 targetPosition], [param:Vector3 targetNormal], [param:Color targetColor] )</h3>
 		<p>
-		Selects a random point on the surface of the input geometry, returning the position and normal vector at that point. Time complexity is <i>O(log n)</i> for a surface with <i>n</i> faces.</i></p>
+		Selects a random point on the surface of the input geometry, returning the position and optionally the normal vector and color at that point. Time complexity is <i>O(log n)</i> for a surface with <i>n</i> faces.</i></p>
 
 		<h2>Source</h2>
 

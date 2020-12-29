@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -41,7 +40,7 @@
 		在平面上应用矩阵。矩阵必须是仿射齐次变换。<br />
 		如果提供一个optionalNormalMatrix，可以这样创建:
 		<code>
-		var optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+		const optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 		</code>
 		</p>
 

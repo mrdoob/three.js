@@ -4,7 +4,7 @@ import {
 	MathUtils,
 	Quaternion,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * W3C Device Orientation control (http://w3c.github.io/deviceorientation/spec-source-orientation.html)
@@ -13,7 +13,7 @@ import {
 var DeviceOrientationControls = function ( object ) {
 
 	var scope = this;
-	var changeEvent = { type: "change" };
+	var changeEvent = { type: 'change' };
 	var EPS = 0.000001;
 
 	this.object = object;

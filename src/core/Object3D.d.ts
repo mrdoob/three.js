@@ -14,8 +14,7 @@ import { Raycaster } from './Raycaster';
 import { EventDispatcher } from './EventDispatcher';
 import { BufferGeometry } from './BufferGeometry';
 import { Intersection } from './Raycaster';
-
-export let Object3DIdCount: number;
+import { AnimationClip } from '../animation/AnimationClip';
 
 /**
  * Base class for scene graph objects
@@ -76,7 +75,7 @@ export class Object3D extends EventDispatcher {
 	readonly rotation: Euler;
 
 	/**
-	 * Global rotation.
+	 * Object's local rotation as a Quaternion.
 	 * @default new THREE.Quaternion()
 	 */
 	readonly quaternion: Quaternion;
@@ -154,6 +153,12 @@ export class Object3D extends EventDispatcher {
 	 * @default 0
 	 */
 	renderOrder: number;
+
+	/**
+	 * Array with animation clips.
+	 * @default []
+	 */
+	animations: AnimationClip[];
 
 	/**
 	 * An object that can be used to store custom data about the Object3d. It should not hold references to functions as these will not be cloned.
@@ -319,6 +324,11 @@ export class Object3D extends EventDispatcher {
 	remove( ...object: Object3D[] ): this;
 
 	/**
+	 * Removes all child objects.
+	 */
+	clear(): this;
+
+	/**
 	 * Adds object as a child of this, while maintaining the object's world transform.
 	 */
 	attach( object: Object3D ): this;
@@ -369,7 +379,7 @@ export class Object3D extends EventDispatcher {
 		images: any;
 	} ): any;
 
-	clone( recursive?: boolean ): this;
+	clone( recursive?: boolean ): Object3D;
 
 	/**
 	 *

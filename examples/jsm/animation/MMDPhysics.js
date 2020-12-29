@@ -11,7 +11,8 @@ import {
 	Quaternion,
 	SphereBufferGeometry,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
+
 /**
  * Dependencies
  *  - Ammo.js https://github.com/kripken/ammo.js
@@ -1324,7 +1325,7 @@ var MMDPhysics = ( function () {
 						.copy( mesh.matrixWorld )
 						.decompose( position, quaternion, scale )
 						.compose( position, quaternion, scale.set( 1, 1, 1 ) )
-						.getInverse( matrixWorldInv );
+						.invert();
 
 					for ( var i = 0, il = bodies.length; i < il; i ++ ) {
 

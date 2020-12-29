@@ -27,11 +27,10 @@ This code creates a scene, a camera, and a geometric cube, and it adds the cube 
 ```javascript
 import * as THREE from './js/three.module.js';
 
-var camera, scene, renderer;
-var geometry, material, mesh;
+let camera, scene, renderer;
+let geometry, material, mesh;
 
 init();
-animate();
 
 function init() {
 
@@ -48,23 +47,22 @@ function init() {
 
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setAnimationLoop( animation );
 	document.body.appendChild( renderer.domElement );
 
 }
 
-function animate() {
+function animation( time ) {
 
-	requestAnimationFrame( animate );
-
-	mesh.rotation.x += 0.01;
-	mesh.rotation.y += 0.02;
+	mesh.rotation.x = time / 2000;
+	mesh.rotation.y = time / 1000;
 
 	renderer.render( scene, camera );
 
 }
 ```
 
-If everything went well, you should see [this](https://jsfiddle.net/8kubjpL5/).
+If everything went well, you should see [this](https://jsfiddle.net/yf6nks2o/).
 
 ### Cloning this repository ###
 

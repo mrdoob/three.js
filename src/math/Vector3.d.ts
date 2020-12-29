@@ -6,7 +6,11 @@ import { Camera } from './../cameras/Camera';
 import { Spherical } from './Spherical';
 import { Cylindrical } from './Cylindrical';
 import { BufferAttribute } from './../core/BufferAttribute';
+import { InterleavedBufferAttribute } from './../core/InterleavedBufferAttribute';
 import { Vector } from './Vector2';
+
+type Vector3Tuple = [number, number, number];
+
 /**
  * 3D vector.
  *
@@ -16,7 +20,7 @@ import { Vector } from './Vector2';
  * const c = new THREE.Vector3();
  * c.crossVectors( a, b );
  *
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/Vector3.js|src/math/Vector3.js}
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/Vector3.js}
  *
  * ( class Vector3 implements Vector<Vector3> )
  */
@@ -72,7 +76,7 @@ export class Vector3 implements Vector {
 	/**
 	 * Clones this vector.
 	 */
-	clone(): this;
+	clone(): Vector3;
 
 	/**
 	 * Copies value of v to this vector.
@@ -283,6 +287,7 @@ export class Vector3 implements Vector {
 	 * @return The created or provided array.
 	 */
 	toArray( array?: number[], offset?: number ): number[];
+	toArray( array?: Vector3Tuple, offset?: 0 ): Vector3Tuple;
 
 	/**
 	 * Copies x, y and z into the provided array-like.
@@ -293,7 +298,7 @@ export class Vector3 implements Vector {
 	toArray( array: ArrayLike<number>, offset?: number ): ArrayLike<number>;
 
 	fromBufferAttribute(
-		attribute: BufferAttribute,
+		attribute: BufferAttribute | InterleavedBufferAttribute,
 		index: number
 	): this;
 

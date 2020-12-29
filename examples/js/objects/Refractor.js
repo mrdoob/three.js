@@ -1,5 +1,3 @@
-console.warn( "THREE.Refractor: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.Refractor = function ( geometry, options ) {
 
 	THREE.Mesh.call( this, geometry );
@@ -52,9 +50,9 @@ THREE.Refractor = function ( geometry, options ) {
 		transparent: true // ensures, refractors are drawn from farthest to closest
 	} );
 
-	this.material.uniforms[ "color" ].value = color;
-	this.material.uniforms[ "tDiffuse" ].value = renderTarget.texture;
-	this.material.uniforms[ "textureMatrix" ].value = textureMatrix;
+	this.material.uniforms[ 'color' ].value = color;
+	this.material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
+	this.material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 
 	// functions
 
@@ -116,7 +114,7 @@ THREE.Refractor = function ( geometry, options ) {
 		return function updateVirtualCamera( camera ) {
 
 			virtualCamera.matrixWorld.copy( camera.matrixWorld );
-			virtualCamera.matrixWorldInverse.getInverse( virtualCamera.matrixWorld );
+			virtualCamera.matrixWorldInverse.copy( virtualCamera.matrixWorld ).invert();
 			virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 			virtualCamera.far = camera.far; // used in WebGLBackground
 

@@ -18,7 +18,7 @@ InputNode.prototype.setReadonly = function ( value ) {
 
 	this.readonly = value;
 
-	this.hashProperties = this.readonly ? [ "value" ] : undefined;
+	this.hashProperties = this.readonly ? [ 'value' ] : undefined;
 
 	return this;
 

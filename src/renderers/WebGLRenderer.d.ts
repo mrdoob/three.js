@@ -20,6 +20,7 @@ import { RenderTarget } from './webgl/WebGLRenderLists';
 import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 import { Texture } from '../textures/Texture';
+import { XRAnimationLoopCallback } from './webxr/WebXR';
 
 export interface Renderer {
 	domElement: HTMLCanvasElement;
@@ -191,11 +192,6 @@ export class WebGLRenderer implements Renderer {
 	toneMappingExposure: number;
 
 	/**
-	 * @default false
-	 */
-	shadowMapDebug: boolean;
-
-	/**
 	 * @default 8
 	 */
 	maxMorphTargets: number;
@@ -294,7 +290,7 @@ export class WebGLRenderer implements Renderer {
 	/**
 	 * Returns a THREE.Color instance with the current clear color.
 	 */
-	getClearColor(): Color;
+	getClearColor( target: Color ): Color;
 
 	/**
 	 * Sets the clear color, using color for the color and alpha for the opacity.
@@ -348,7 +344,7 @@ export class WebGLRenderer implements Renderer {
 	 * A build in function that can be used instead of requestAnimationFrame. For WebXR projects this function must be used.
 	 * @param callback The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.
 	 */
-	setAnimationLoop( callback: Function | null ): void;
+	setAnimationLoop( callback: XRAnimationLoopCallback | null ): void;
 
 	/**
 	 * @deprecated Use {@link WebGLRenderer#setAnimationLoop .setAnimationLoop()} instead.
@@ -452,6 +448,11 @@ export class WebGLRenderer implements Renderer {
 	 * @param texture The texture to Initialize.
 	 */
 	initTexture( texture: Texture ): void;
+
+	/**
+	 * Can be used to reset the internal WebGL state.
+	 */
+	resetState(): void;
 
 	/**
 	 * @deprecated

@@ -1,4 +1,3 @@
-console.warn( "THREE.AsciiEffect: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Ascii generation is based on http://www.nihilogic.dk/labs/jsascii/
  * Maybe more about this later with a blog post at http://lab4games.net/zz85/blog
@@ -34,7 +33,7 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 	var domElement = document.createElement( 'div' );
 	domElement.style.cursor = 'default';
 
-	var oAscii = document.createElement( "table" );
+	var oAscii = document.createElement( 'table' );
 	domElement.appendChild( oAscii );
 
 	var iWidth, iHeight;
@@ -94,36 +93,36 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 		oAscii.cellPadding = 0;
 
 		var oStyle = oAscii.style;
-		oStyle.display = "inline";
-		oStyle.width = Math.round( iWidth / fResolution * iScale ) + "px";
-		oStyle.height = Math.round( iHeight / fResolution * iScale ) + "px";
-		oStyle.whiteSpace = "pre";
-		oStyle.margin = "0px";
-		oStyle.padding = "0px";
-		oStyle.letterSpacing = fLetterSpacing + "px";
+		oStyle.display = 'inline';
+		oStyle.width = Math.round( iWidth / fResolution * iScale ) + 'px';
+		oStyle.height = Math.round( iHeight / fResolution * iScale ) + 'px';
+		oStyle.whiteSpace = 'pre';
+		oStyle.margin = '0px';
+		oStyle.padding = '0px';
+		oStyle.letterSpacing = fLetterSpacing + 'px';
 		oStyle.fontFamily = strFont;
-		oStyle.fontSize = fFontSize + "px";
-		oStyle.lineHeight = fLineHeight + "px";
-		oStyle.textAlign = "left";
-		oStyle.textDecoration = "none";
+		oStyle.fontSize = fFontSize + 'px';
+		oStyle.lineHeight = fLineHeight + 'px';
+		oStyle.textAlign = 'left';
+		oStyle.textDecoration = 'none';
 
 	}
 
 
-	var aDefaultCharList = ( " .,:;i1tfLCG08@" ).split( "" );
-	var aDefaultColorCharList = ( " CGO08@" ).split( "" );
-	var strFont = "courier new, monospace";
+	var aDefaultCharList = ( ' .,:;i1tfLCG08@' ).split( '' );
+	var aDefaultColorCharList = ( ' CGO08@' ).split( '' );
+	var strFont = 'courier new, monospace';
 
 	var oCanvasImg = renderer.domElement;
 
-	var oCanvas = document.createElement( "canvas" );
+	var oCanvas = document.createElement( 'canvas' );
 	if ( ! oCanvas.getContext ) {
 
 		return;
 
 	}
 
-	var oCtx = oCanvas.getContext( "2d" );
+	var oCtx = oCanvas.getContext( '2d' );
 	if ( ! oCtx.getImageData ) {
 
 		return;
@@ -138,9 +137,9 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 
 	switch ( strResolution ) {
 
-		case "low" : 	fResolution = 0.25; break;
-		case "medium" : fResolution = 0.5; break;
-		case "high" : 	fResolution = 1; break;
+		case 'low' : 	fResolution = 0.25; break;
+		case 'medium' : fResolution = 0.5; break;
+		case 'high' : 	fResolution = 1; break;
 
 	}
 
@@ -155,7 +154,7 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 
 	var fLetterSpacing = 0;
 
-	if ( strResolution == "low" ) {
+	if ( strResolution == 'low' ) {
 
 		switch ( iScale ) {
 
@@ -169,7 +168,7 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 
 	}
 
-	if ( strResolution == "medium" ) {
+	if ( strResolution == 'medium' ) {
 
 		switch ( iScale ) {
 
@@ -183,7 +182,7 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 
 	}
 
-	if ( strResolution == "high" ) {
+	if ( strResolution == 'high' ) {
 
 		switch ( iScale ) {
 
@@ -210,7 +209,7 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 		var oImgData = oCtx.getImageData( 0, 0, iWidth, iHeight ).data;
 
 		// Coloring loop starts now
-		var strChars = "";
+		var strChars = '';
 
 		// console.time('rendering');
 
@@ -253,16 +252,16 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 
 				var strThisChar = aCharList[ iCharIdx ];
 
-				if ( strThisChar === undefined || strThisChar == " " )
-					strThisChar = "&nbsp;";
+				if ( strThisChar === undefined || strThisChar == ' ' )
+					strThisChar = '&nbsp;';
 
 				if ( bColor ) {
 
-					strChars += "<span style='"
-						+ "color:rgb(" + iRed + "," + iGreen + "," + iBlue + ");"
-						+ ( bBlock ? "background-color:rgb(" + iRed + "," + iGreen + "," + iBlue + ");" : "" )
-						+ ( bAlpha ? "opacity:" + ( iAlpha / 255 ) + ";" : "" )
-						+ "'>" + strThisChar + "</span>";
+					strChars += '<span style=\''
+						+ 'color:rgb(' + iRed + ',' + iGreen + ',' + iBlue + ');'
+						+ ( bBlock ? 'background-color:rgb(' + iRed + ',' + iGreen + ',' + iBlue + ');' : '' )
+						+ ( bAlpha ? 'opacity:' + ( iAlpha / 255 ) + ';' : '' )
+						+ '\'>' + strThisChar + '</span>';
 
 				} else {
 
@@ -272,11 +271,11 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 
 			}
 
-			strChars += "<br/>";
+			strChars += '<br/>';
 
 		}
 
-		oAscii.innerHTML = "<tr><td>" + strChars + "</td></tr>";
+		oAscii.innerHTML = '<tr><td>' + strChars + '</td></tr>';
 
 		// console.timeEnd('rendering');
 

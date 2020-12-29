@@ -1,12 +1,5 @@
 import * as THREE from '../../build/three.module.js';
 
-import { ColladaExporter } from '../../examples/jsm/exporters/ColladaExporter.js';
-import { DRACOExporter } from '../../examples/jsm/exporters/DRACOExporter.js';
-import { GLTFExporter } from '../../examples/jsm/exporters/GLTFExporter.js';
-import { OBJExporter } from '../../examples/jsm/exporters/OBJExporter.js';
-import { PLYExporter } from '../../examples/jsm/exporters/PLYExporter.js';
-import { STLExporter } from '../../examples/jsm/exporters/STLExporter.js';
-
 import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
 
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
@@ -200,7 +193,9 @@ function MenubarFile( editor ) {
 	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/dae' ) );
-	option.onClick( function () {
+	option.onClick( async function () {
+
+		var { ColladaExporter } = await import( '../../examples/jsm/exporters/ColladaExporter.js' );
 
 		var exporter = new ColladaExporter();
 
@@ -218,7 +213,7 @@ function MenubarFile( editor ) {
 	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/drc' ) );
-	option.onClick( function () {
+	option.onClick( async function () {
 
 		var object = editor.selected;
 
@@ -229,10 +224,12 @@ function MenubarFile( editor ) {
 
 		}
 
+		var { DRACOExporter } = await import( '../../examples/jsm/exporters/DRACOExporter.js' );
+
 		var exporter = new DRACOExporter();
 
 		// TODO: Change to DRACOExporter's parse( geometry, onParse )?
-		var result = exporter.parse( object.geometry );
+		var result = exporter.parse( object );
 		saveArrayBuffer( result, 'model.drc' );
 
 	} );
@@ -243,15 +240,20 @@ function MenubarFile( editor ) {
 	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/glb' ) );
-	option.onClick( function () {
+	option.onClick( async function () {
+
+		var scene = editor.scene;
+		var animations = getAnimations( scene );
+
+		var { GLTFExporter } = await import( '../../examples/jsm/exporters/GLTFExporter.js' );
 
 		var exporter = new GLTFExporter();
 
-		exporter.parse( editor.scene, function ( result ) {
+		exporter.parse( scene, function ( result ) {
 
 			saveArrayBuffer( result, 'scene.glb' );
 
-		}, { binary: true } );
+		}, { binary: true, animations: animations } );
 
 	} );
 	options.add( option );
@@ -261,15 +263,20 @@ function MenubarFile( editor ) {
 	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/gltf' ) );
-	option.onClick( function () {
+	option.onClick( async function () {
+
+		var scene = editor.scene;
+		var animations = getAnimations( scene );
+
+		var { GLTFExporter } = await import( '../../examples/jsm/exporters/GLTFExporter.js' );
 
 		var exporter = new GLTFExporter();
 
-		exporter.parse( editor.scene, function ( result ) {
+		exporter.parse( scene, function ( result ) {
 
 			saveString( JSON.stringify( result, null, 2 ), 'scene.gltf' );
 
-		} );
+		}, { animations: animations } );
 
 
 	} );
@@ -280,7 +287,7 @@ function MenubarFile( editor ) {
 	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/obj' ) );
-	option.onClick( function () {
+	option.onClick( async function () {
 
 		var object = editor.selected;
 
@@ -290,6 +297,8 @@ function MenubarFile( editor ) {
 			return;
 
 		}
+
+		var { OBJExporter } = await import( '../../examples/jsm/exporters/OBJExporter.js' );
 
 		var exporter = new OBJExporter();
 
@@ -303,7 +312,9 @@ function MenubarFile( editor ) {
 	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/ply' ) );
-	option.onClick( function () {
+	option.onClick( async function () {
+
+		var { PLYExporter } = await import( '../../examples/jsm/exporters/PLYExporter.js' );
 
 		var exporter = new PLYExporter();
 
@@ -321,7 +332,9 @@ function MenubarFile( editor ) {
 	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/ply_binary' ) );
-	option.onClick( function () {
+	option.onClick( async function () {
+
+		var { PLYExporter } = await import( '../../examples/jsm/exporters/PLYExporter.js' );
 
 		var exporter = new PLYExporter();
 
@@ -339,7 +352,9 @@ function MenubarFile( editor ) {
 	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/stl' ) );
-	option.onClick( function () {
+	option.onClick( async function () {
+
+		var { STLExporter } = await import( '../../examples/jsm/exporters/STLExporter.js' );
 
 		var exporter = new STLExporter();
 
@@ -353,7 +368,9 @@ function MenubarFile( editor ) {
 	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/stl_binary' ) );
-	option.onClick( function () {
+	option.onClick( async function () {
+
+		var { STLExporter } = await import( '../../examples/jsm/exporters/STLExporter.js' );
 
 		var exporter = new STLExporter();
 
@@ -468,6 +485,20 @@ function MenubarFile( editor ) {
 	function saveString( text, filename ) {
 
 		save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+	}
+
+	function getAnimations( scene ) {
+
+		var animations = [];
+
+		scene.traverse( function ( object ) {
+
+			animations.push( ... object.animations );
+
+		} );
+
+		return animations;
 
 	}
 

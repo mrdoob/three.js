@@ -14,12 +14,12 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var camera, scene, renderer, stats, group;
+			let camera, scene, renderer, stats, group;
 
-			var mouseX = 0, mouseY = 0;
+			let mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -33,14 +33,14 @@
 				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
 
-				var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
-				var material = new THREE.MeshNormalMaterial();
+				const geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
+				const material = new THREE.MeshNormalMaterial();
 
 				group = new THREE.Group();
 
-				for ( var i = 0; i < 1000; i ++ ) {
+				for ( let i = 0; i < 1000; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 2000 - 1000;
 					mesh.position.y = Math.random() * 2000 - 1000;
 					mesh.position.z = Math.random() * 2000 - 1000;
@@ -111,9 +111,9 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
-				var rx = Math.sin( time * 0.7 ) * 0.5,
+				const rx = Math.sin( time * 0.7 ) * 0.5,
 					ry = Math.sin( time * 0.3 ) * 0.5,
 					rz = Math.sin( time * 0.2 ) * 0.5;
 

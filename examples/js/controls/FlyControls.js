@@ -1,5 +1,3 @@
-console.warn( "THREE.FlyControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.FlyControls = function ( object, domElement ) {
 
 	if ( domElement === undefined ) {
@@ -27,7 +25,7 @@ THREE.FlyControls = function ( object, domElement ) {
 	// internals
 
 	var scope = this;
-	var changeEvent = { type: "change" };
+	var changeEvent = { type: 'change' };
 	var EPS = 0.000001;
 
 	this.tmpQuaternion = new THREE.Quaternion();

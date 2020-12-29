@@ -1,4 +1,3 @@
-console.warn( "THREE.Water: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Work based on :
  * http://slayvin.net : Flat mirror for three.js
@@ -67,17 +66,17 @@ THREE.Water = function ( geometry, options ) {
 			THREE.UniformsLib[ 'fog' ],
 			THREE.UniformsLib[ 'lights' ],
 			{
-				"normalSampler": { value: null },
-				"mirrorSampler": { value: null },
-				"alpha": { value: 1.0 },
-				"time": { value: 0.0 },
-				"size": { value: 1.0 },
-				"distortionScale": { value: 20.0 },
-				"textureMatrix": { value: new THREE.Matrix4() },
-				"sunColor": { value: new THREE.Color( 0x7F7F7F ) },
-				"sunDirection": { value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
-				"eye": { value: new THREE.Vector3() },
-				"waterColor": { value: new THREE.Color( 0x555555 ) }
+				'normalSampler': { value: null },
+				'mirrorSampler': { value: null },
+				'alpha': { value: 1.0 },
+				'time': { value: 0.0 },
+				'size': { value: 1.0 },
+				'distortionScale': { value: 20.0 },
+				'textureMatrix': { value: new THREE.Matrix4() },
+				'sunColor': { value: new THREE.Color( 0x7F7F7F ) },
+				'sunDirection': { value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
+				'eye': { value: new THREE.Vector3() },
+				'waterColor': { value: new THREE.Color( 0x555555 ) }
 			}
 		] ),
 
@@ -193,17 +192,17 @@ THREE.Water = function ( geometry, options ) {
 		fog: fog
 	} );
 
-	material.uniforms[ "mirrorSampler" ].value = renderTarget.texture;
-	material.uniforms[ "textureMatrix" ].value = textureMatrix;
-	material.uniforms[ "alpha" ].value = alpha;
-	material.uniforms[ "time" ].value = time;
-	material.uniforms[ "normalSampler" ].value = normalSampler;
-	material.uniforms[ "sunColor" ].value = sunColor;
-	material.uniforms[ "waterColor" ].value = waterColor;
-	material.uniforms[ "sunDirection" ].value = sunDirection;
-	material.uniforms[ "distortionScale" ].value = distortionScale;
+	material.uniforms[ 'mirrorSampler' ].value = renderTarget.texture;
+	material.uniforms[ 'textureMatrix' ].value = textureMatrix;
+	material.uniforms[ 'alpha' ].value = alpha;
+	material.uniforms[ 'time' ].value = time;
+	material.uniforms[ 'normalSampler' ].value = normalSampler;
+	material.uniforms[ 'sunColor' ].value = sunColor;
+	material.uniforms[ 'waterColor' ].value = waterColor;
+	material.uniforms[ 'sunDirection' ].value = sunDirection;
+	material.uniforms[ 'distortionScale' ].value = distortionScale;
 
-	material.uniforms[ "eye" ].value = eye;
+	material.uniforms[ 'eye' ].value = eye;
 
 	scope.material = material;
 

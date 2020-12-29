@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -45,7 +44,7 @@
 		</p>
 
 		<h3>[property:Integer blendDstAlpha]</h3>
-		<p>The transparency of the [page:.blendDst]. Default is *null*.</p>
+		<p>The transparency of the [page:.blendDst]. Uses [page:.blendDst] value if null. Default is *null*.</p>
 
 		<h3>[property:Integer blendEquation]</h3>
 		<p>
@@ -55,7 +54,7 @@
 		</p>
 
 		<h3>[property:Integer blendEquationAlpha]</h3>
-		<p>The tranparency of the [page:.blendEquation]. Default is *null*.</p>
+		<p>The transparency of the [page:.blendEquation]. Uses [page:.blendEquation] value if null. Default is *null*.</p>
 
 		<h3>[property:Blending blending]</h3>
 		<p>
@@ -72,7 +71,7 @@
 		</p>
 
 		<h3>[property:Integer blendSrcAlpha]</h3>
-		<p>The tranparency of the [page:.blendSrc]. Default is *null*.</p>
+		<p>The transparency of the [page:.blendSrc]. Uses [page:.blendSrc] value if null. Default is *null*.</p>
 
 		<h3>[property:Boolean clipIntersection]</h3>
 		<p>
@@ -303,7 +302,7 @@
 		Defines whether this material is visible. Default is *true*.
 		</p>
 
-		<h3>[property:object userData]</h3>
+		<h3>[property:Object userData]</h3>
 		<p>
 		An object that can be used to store custom data about the Material. It should not hold
 		references to functions as these will not be cloned.
@@ -364,13 +363,13 @@
 		Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
 		</p>
 
-		<h3>[method:null setValues]( [param:object values] )</h3>
+		<h3>[method:null setValues]( [param:Object values] )</h3>
 		<p>
 		values -- a container with parameters.<br />
 		Sets the properties based on the *values*.
 		</p>
 
-		<h3>[method:Object toJSON]( [param:object meta] )</h3>
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
 		<p>
 		meta -- object containing metadata such as textures or images for the material.<br />
 		Convert the material to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].

@@ -1,21 +1,6 @@
-import { PolyhedronGeometry, PolyhedronBufferGeometry } from './PolyhedronGeometry';
+import { Geometry } from './../core/Geometry';
 
-export class TetrahedronBufferGeometry extends PolyhedronBufferGeometry {
-
-	/**
-	 * @param [radius=1]
-	 * @param [detail=0]
-	 */
-	constructor( radius?: number, detail?: number );
-
-	/**
-	 * @default 'TetrahedronBufferGeometry'
-	 */
-	type: string;
-
-}
-
-export class TetrahedronGeometry extends PolyhedronGeometry {
+export class TetrahedronGeometry extends Geometry {
 
 	/**
 	 * @param [radius=1]

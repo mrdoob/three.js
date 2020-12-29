@@ -6,7 +6,7 @@ import {
 	TOUCH,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -135,7 +135,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		// so camera.up is the orbit axis
 		var quat = new Quaternion().setFromUnitVectors( object.up, new Vector3( 0, 1, 0 ) );
-		var quatInverse = quat.clone().inverse();
+		var quatInverse = quat.clone().invert();
 
 		var lastPosition = new Vector3();
 		var lastQuaternion = new Quaternion();
@@ -183,7 +183,7 @@ var OrbitControls = function ( object, domElement ) {
 
 				if ( max < - Math.PI ) max += twoPI; else if ( max > Math.PI ) max -= twoPI;
 
-				if ( min < max ) {
+				if ( min <= max ) {
 
 					spherical.theta = Math.max( min, Math.min( max, spherical.theta ) );
 
@@ -781,6 +781,7 @@ var OrbitControls = function ( object, domElement ) {
 		switch ( event.pointerType ) {
 
 			case 'mouse':
+			case 'pen':
 				onMouseDown( event );
 				break;
 
@@ -797,6 +798,7 @@ var OrbitControls = function ( object, domElement ) {
 		switch ( event.pointerType ) {
 
 			case 'mouse':
+			case 'pen':
 				onMouseMove( event );
 				break;
 
@@ -808,11 +810,10 @@ var OrbitControls = function ( object, domElement ) {
 
 	function onPointerUp( event ) {
 
-		if ( scope.enabled === false ) return;
-
 		switch ( event.pointerType ) {
 
 			case 'mouse':
+			case 'pen':
 				onMouseUp( event );
 				break;
 
@@ -821,8 +822,6 @@ var OrbitControls = function ( object, domElement ) {
 		}
 
 	}
-
-	var isMouseDown = false;
 
 	function onMouseDown( event ) {
 
@@ -923,7 +922,8 @@ var OrbitControls = function ( object, domElement ) {
 
 		if ( state !== STATE.NONE ) {
 
-			isMouseDown = true;
+			scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
+			scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
 
 			scope.dispatchEvent( startEvent );
 
@@ -933,7 +933,7 @@ var OrbitControls = function ( object, domElement ) {
 
 	function onMouseMove( event ) {
 
-		if ( isMouseDown === false ) return;
+		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
 
@@ -969,15 +969,16 @@ var OrbitControls = function ( object, domElement ) {
 
 	function onMouseUp( event ) {
 
-		if ( isMouseDown === false ) return;
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
+
+		if ( scope.enabled === false ) return;
 
 		handleMouseUp( event );
 
 		scope.dispatchEvent( endEvent );
 
 		state = STATE.NONE;
-
-		isMouseDown = false;
 
 	}
 
@@ -1178,18 +1179,7 @@ var OrbitControls = function ( object, domElement ) {
 	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
 	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
 
-	scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
-	scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
-
 	scope.domElement.addEventListener( 'keydown', onKeyDown, false );
-
-	// make sure element can receive keys.
-
-	if ( scope.domElement.tabIndex === - 1 ) {
-
-		scope.domElement.tabIndex = 0;
-
-	}
 
 	// force an update at start
 

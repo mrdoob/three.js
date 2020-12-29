@@ -36,7 +36,7 @@ export class InterleavedBuffer {
 	uuid: string;
 
 	setUsage( usage: Usage ): InterleavedBuffer;
-	clone( data: object ): this;
+	clone( data: object ): InterleavedBuffer;
 	copy( source: InterleavedBuffer ): this;
 	copyAt(
 		index1: number,

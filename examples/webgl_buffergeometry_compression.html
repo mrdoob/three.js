@@ -23,16 +23,16 @@
 			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			var statsEnabled = true;
+			const statsEnabled = true;
 
-			var container, stats, gui;
+			let container, stats, gui;
 
-			var camera, scene, renderer, controls;
+			let camera, scene, renderer, controls;
 
-			var lights = [];
+			const lights = [];
 
 			// options
-			var data = {
+			const data = {
 				"model": "Icosahedron",
 				"wireframe": false,
 				"texture": false,
@@ -45,17 +45,17 @@
 
 				"totalGPUMemory": "0 bytes"
 			};
-			var memoryDisplay;
+			let memoryDisplay;
 
 			// geometry params
-			var radius = 100;
+			const radius = 100;
 
 			// materials
-			var lineMaterial = new THREE.LineBasicMaterial( { color: 0xaaaaaa, transparent: true, opacity: 0.8 } );
-			var meshMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x111111 } );
+			const lineMaterial = new THREE.LineBasicMaterial( { color: 0xaaaaaa, transparent: true, opacity: 0.8 } );
+			const meshMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x111111 } );
 
 			// texture
-			var texture = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
+			const texture = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 			texture.wrapS = THREE.RepeatWrapping;
 			texture.wrapT = THREE.RepeatWrapping;
 
@@ -106,10 +106,10 @@
 
 				//
 
-				var geom = newGeometry( data );
+				let geom = newGeometry( data );
 
-				var mesh = new THREE.Mesh( geom, meshMaterial );
-				var lineSegments = new THREE.LineSegments( new THREE.WireframeGeometry( geom ), lineMaterial );
+				const mesh = new THREE.Mesh( geom, meshMaterial );
+				const lineSegments = new THREE.LineSegments( new THREE.WireframeGeometry( geom ), lineMaterial );
 				lineSegments.visible = data.wireframe;
 
 				scene.add( mesh );
@@ -156,7 +156,7 @@
 
 				}
 
-				var folder = gui.addFolder( 'Scene' );
+				let folder = gui.addFolder( 'Scene' );
 				folder.add( data, 'model', [ "Icosahedron", "Cylinder", "TorusKnot", "Teapot" ] ).onChange( generateGeometry );
 				folder.add( data, 'wireframe', false ).onChange( updateLineSegments );
 				folder.add( data, 'texture', false ).onChange( generateGeometry );
@@ -210,7 +210,7 @@
 
 				lights.forEach( light => {
 
-					var direction = light.position.clone();
+					const direction = light.position.clone();
 					direction.applyAxisAngle( new THREE.Vector3( 1, 1, 0 ), data.rotationSpeed / 180 * Math.PI );
 					light.position.add( direction.sub( light.position ) );
 

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -37,6 +36,8 @@
 			<li>KHR_lights_punctual<sup>1</sup></li>
 			<li>KHR_texture_basisu <i>(experimental)</i></li>
 			<li>KHR_texture_transform<sup>2</sup></li>
+			<li>EXT_texture_webp</li>
+			<li>EXT_meshopt_compression</li>
 			<li>MSFT_texture_dds</li>
 		</ul>
 
@@ -57,10 +58,10 @@
 
 		<code>
 		// Instantiate a loader
-		var loader = new GLTFLoader();
+		const loader = new GLTFLoader();
 
 		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
-		var dracoLoader = new DRACOLoader();
+		const dracoLoader = new DRACOLoader();
 		dracoLoader.setDecoderPath( '/examples/js/libs/draco/' );
 		loader.setDRACOLoader( dracoLoader );
 
@@ -142,11 +143,11 @@
 		<code>
 		loader.load('foo.gltf', function ( gltf ) {
 
-			var scene = gltf.scene;
+			const scene = gltf.scene;
 
-			var mesh = scene.children[ 3 ];
+			const mesh = scene.children[ 3 ];
 
-			var fooExtension = mesh.userData.gltfExtensions.EXT_foo;
+			const fooExtension = mesh.userData.gltfExtensions.EXT_foo;
 
 			gltf.parser.getDependency( 'bufferView', fooExtension.bufferView )
 				.then( function ( fooBuffer ) { ... } );
@@ -206,7 +207,7 @@
 		[page:Function onError] — (optional) A function to be called if an error occurs during parsing. The function receives error as an argument.<br />
 		</p>
 		<p>
-		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Group scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
+		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:Object] that contains loaded parts: .[page:Group scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
 		</p>
 
 		<h2>Source</h2>

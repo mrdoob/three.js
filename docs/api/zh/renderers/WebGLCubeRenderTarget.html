@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -60,6 +59,12 @@
 		</p>
 		<p>
 			如果你想将一张equirectangular格式的全景图转换到cubemap格式，则使用此方法。
+		</p>
+
+		<h3>[method:undefined clear]( [param:WebGLRenderer renderer], [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
+		<p>
+			这个方法用来来清除renderTarget的颜色、深度和/或模板缓冲区。
+			颜色缓冲区设置为渲染器当前的“清除”色。参数默认值均为*true*。
 		</p>
 
 		<h2>源码</h2>

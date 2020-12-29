@@ -79,7 +79,9 @@ function Editor() {
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
-		viewportCameraChanged: new Signal()
+		viewportCameraChanged: new Signal(),
+
+		animationStopped: new Signal()
 
 	};
 
@@ -105,7 +107,6 @@ function Editor() {
 
 	this.materialsRefCounter = new Map(); // tracks how often is a material used by a 3D object
 
-	this.animations = {};
 	this.mixer = new THREE.AnimationMixer( this.scene );
 
 	this.selected = null;
@@ -357,16 +358,6 @@ Editor.prototype = {
 
 	},
 
-	addAnimation: function ( object, animations ) {
-
-		if ( animations.length > 0 ) {
-
-			this.animations[ object.uuid ] = animations;
-
-		}
-
-	},
-
 	//
 
 	addCamera: function ( camera ) {
@@ -613,7 +604,7 @@ Editor.prototype = {
 		this.camera.copy( _DEFAULT_CAMERA );
 		this.signals.cameraResetted.dispatch();
 
-		this.scene.name = "Scene";
+		this.scene.name = 'Scene';
 		this.scene.userData = {};
 		this.scene.background = null;
 		this.scene.environment = null;

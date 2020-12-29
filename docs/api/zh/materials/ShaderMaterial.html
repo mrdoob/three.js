@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -43,6 +42,9 @@
 					<li>
 						循环变量必须是*i*。
 					</li>
+					<li>
+						The value *UNROLLED_LOOP_INDEX* will be replaced with the explicity value of *i* for the given iteration and can be used in preprocessor statements.
+					</li>
 				</ul>
 				<code>
 		#pragma unroll_loop_start
@@ -60,7 +62,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var material = new THREE.ShaderMaterial( {
+		const material = new THREE.ShaderMaterial( {
 
 			uniforms: {
 
@@ -105,7 +107,6 @@
 			[example:webgl_materials_texture_hdr webgl / materials / texture / hdr]<br />
 			[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
 			[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
-			[example:webgl_nearestneighbour webgl / nearestneighbour]<br />
 			[example:webgl_postprocessing_dof2 webgl / postprocessing / dof2]<br />
 			[example:webgl_postprocessing_godrays webgl / postprocessing / godrays]
 		</p>
@@ -332,7 +333,7 @@ this.extensions = {
 		<p> When set to true, morph target attributes are available in the vertex shader. Default is *false*.
 		</p>
 
-		<h3>[property:boolean morphNormals]</h3>
+		<h3>[property:Boolean morphNormals]</h3>
 		<p> When set to true, morph normal attributes are available in the vertex shader. Default is *false*.
 		</p>
 

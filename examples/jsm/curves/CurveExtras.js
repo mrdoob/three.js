@@ -1,7 +1,8 @@
 import {
 	Curve,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
+
 /**
  * A bunch of parametric curves
  *

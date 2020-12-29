@@ -2,7 +2,7 @@ import {
 	EventDispatcher,
 	Quaternion,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var FlyControls = function ( object, domElement ) {
 
@@ -31,7 +31,7 @@ var FlyControls = function ( object, domElement ) {
 	// internals
 
 	var scope = this;
-	var changeEvent = { type: "change" };
+	var changeEvent = { type: 'change' };
 	var EPS = 0.000001;
 
 	this.tmpQuaternion = new Quaternion();

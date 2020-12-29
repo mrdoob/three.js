@@ -17,15 +17,15 @@ const CodeSerializer = {
 	serializeClass: function ( targetPrototype, targetPrototypeInstance, basePrototypeName, overrideFunctions ) {
 
 		let objectPart, constructorString, i, funcInstructions, funcTemp;
-		let fullObjectName = targetPrototypeInstance.constructor.name;
-		let prototypeFunctions = [];
-		let objectProperties = [];
-		let objectFunctions = [];
-		let isExtended = ( basePrototypeName !== null && basePrototypeName !== undefined );
+		const fullObjectName = targetPrototypeInstance.constructor.name;
+		const prototypeFunctions = [];
+		const objectProperties = [];
+		const objectFunctions = [];
+		const isExtended = ( basePrototypeName !== null && basePrototypeName !== undefined );
 
 		if ( ! Array.isArray( overrideFunctions ) ) overrideFunctions = [];
 
-		for ( let name in targetPrototype.prototype ) {
+		for ( const name in targetPrototype.prototype ) {
 
 			objectPart = targetPrototype.prototype[ name ];
 			funcInstructions = new CodeSerializationInstruction( name, fullObjectName + '.prototype.' + name );
@@ -67,7 +67,7 @@ const CodeSerializer = {
 
 		}
 
-		for ( let name in targetPrototype ) {
+		for ( const name in targetPrototype ) {
 
 			objectPart = targetPrototype[ name ];
 			funcInstructions = new CodeSerializationInstruction( name, fullObjectName + '.' + name );
@@ -100,7 +100,7 @@ const CodeSerializer = {
 				} else if ( typeof objectPart === 'object' ) {
 
 					console.log( 'Omitting object "' + funcInstructions.getName() + '" and replace it with empty object.' );
-					funcInstructions.setCode( "{}" );
+					funcInstructions.setCode( '{}' );
 
 				} else {
 

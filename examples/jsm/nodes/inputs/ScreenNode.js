@@ -9,7 +9,7 @@ function ScreenNode( uv ) {
 
 ScreenNode.prototype = Object.create( TextureNode.prototype );
 ScreenNode.prototype.constructor = ScreenNode;
-ScreenNode.prototype.nodeType = "Screen";
+ScreenNode.prototype.nodeType = 'Screen';
 
 ScreenNode.prototype.getUnique = function () {
 
