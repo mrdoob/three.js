@@ -58,9 +58,29 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( "DefaultMatrixAutoUpdate", ( assert ) => {
+		QUnit.test( "DefaultMatrixAutoUpdate", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const currentDefaultMatrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
+
+			try {
+
+				assert.equal( currentDefaultMatrixAutoUpdate, true, "default DefaultMatrixAutoUpdate is true" );
+
+				const object = new Object3D();
+
+				assert.equal( object.matrixAutoUpdate, true, ".matrixAutoUpdate of a new object inherits Object3D.DefaultMatrixAutoUpdate = true" );
+
+				Object3D.DefaultMatrixAutoUpdate = false;
+
+				const object2 = new Object3D();
+
+				assert.equal( object2.matrixAutoUpdate, false, ".matrixAutoUpdate of a new object inherits Object3D.DefaultMatrixAutoUpdate = false" );
+
+			} finally {
+
+				Object3D.DefaultMatrixAutoUpdate = currentDefaultMatrixAutoUpdate;
+
+			}
 
 		} );
 
