@@ -11,7 +11,7 @@
  *	});
  *
  * Materials now supported, material colors supported
- * Zip support, requires jszip
+ * Zip support, requires fflate
  * No constellation support (yet)!
  *
  */
@@ -77,20 +77,20 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				try {
 
-					zip = new JSZip( data ); // eslint-disable-line no-undef
+					zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
 
 				} catch ( e ) {
 
 					if ( e instanceof ReferenceError ) {
 
-						console.log( 'THREE.AMFLoader: jszip missing and file is compressed.' );
+						console.log( 'THREE.AMFLoader: fflate missing and file is compressed.' );
 						return null;
 
 					}
 
 				}
 
-				for ( file in zip.files ) {
+				for ( var file in zip ) {
 
 					if ( file.toLowerCase().substr( - 4 ) === '.amf' ) {
 
@@ -101,7 +101,7 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 				}
 
 				console.log( 'THREE.AMFLoader: Trying to load file asset: ' + file );
-				view = new DataView( zip.file( file ).asArrayBuffer() );
+				view = new DataView( zip[ file ].buffer );
 
 			}
 
