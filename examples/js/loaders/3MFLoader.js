@@ -133,7 +133,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			//
 
-			var relsView = new Uint8Array( zip[ relsName ].buffer );
+			var relsView = zip[ relsName ];
 			var relsFileText = THREE.LoaderUtils.decodeText( relsView );
 			rels = parseRelsXml( relsFileText );
 
@@ -141,7 +141,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			if ( modelRelsName ) {
 
-				var relsView = new Uint8Array( zip[ modelRelsName ].buffer );
+				var relsView = zip[ modelRelsName ];
 				var relsFileText = THREE.LoaderUtils.decodeText( relsView );
 				modelRels = parseRelsXml( relsFileText );
 
@@ -152,7 +152,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 			for ( var i = 0; i < modelPartNames.length; i ++ ) {
 
 				var modelPart = modelPartNames[ i ];
-				var view = new Uint8Array( zip[ modelPart ].buffer );
+				var view = zip[ modelPart ];
 
 				var fileText = THREE.LoaderUtils.decodeText( view );
 				var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
