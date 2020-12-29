@@ -13,6 +13,7 @@ const assets = [
 	'../examples/jsm/controls/TransformControls.js',
 
 	'../examples/jsm/libs/chevrotain.module.min.js',
+	'../examples/jsm/libs/fflate.module.min.js',
 	'../examples/jsm/libs/inflate.module.min.js',
 	'../examples/jsm/libs/jszip.module.min.js',
 

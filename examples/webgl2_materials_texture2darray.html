@@ -56,7 +56,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
-			import { JSZip } from './jsm/libs/jszip.module.min.js';
+			import { unzipSync } from './jsm/libs/fflate.module.min.js';
 
 			import { WEBGL } from './jsm/WebGL.js';
 
@@ -92,8 +92,8 @@
 					.setResponseType( 'arraybuffer' )
 					.load( 'textures/3d/head256x256x109.zip', function ( data ) {
 
-						const zip = new JSZip( data );
-						const array = zip.files[ 'head256x256x109' ].asUint8Array();
+						const zip = unzipSync( new Uint8Array( data ) );
+						const array = new Uint8Array( zip[ 'head256x256x109' ].buffer );
 
 						const texture = new THREE.DataTexture2DArray( array, 256, 256, 109 );
 						texture.format = THREE.RedFormat;
