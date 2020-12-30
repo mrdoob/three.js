@@ -1612,8 +1612,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 				var compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.rleCompressedSize );
 				var data = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
-				var acBuffer = new Uint16Array( data.buffer );
-				var rleBuffer = decodeRunLength( acBuffer.buffer );
+				var rleBuffer = decodeRunLength( data.buffer );
 
 				inOffset.value += dwaHeader.rleCompressedSize;
 
