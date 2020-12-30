@@ -63,7 +63,7 @@
 		};
 	}
 
-	var REVISION = '124';
+	var REVISION = '125dev';
 	var MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -15983,6 +15983,10 @@
 			state.bindTexture(34067, textureProperties.__webglTexture);
 
 			_gl.pixelStorei(37440, texture.flipY);
+
+			_gl.pixelStorei(37441, texture.premultiplyAlpha);
+
+			_gl.pixelStorei(3317, texture.unpackAlignment);
 
 			var isCompressed = texture && (texture.isCompressedTexture || texture.image[0].isCompressedTexture);
 			var isDataTexture = texture.image[0] && texture.image[0].isDataTexture;
