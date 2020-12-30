@@ -3563,14 +3563,14 @@ THREE.FBXLoader = ( function () {
 
 					}
 
-					if ( typeof Inflate === 'undefined' ) {
+					if ( typeof fflate === 'undefined' ) {
 
-						console.error( 'THREE.FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
+						console.error( 'THREE.FBXLoader: External library fflate.min.js required.' );
 
 					}
 
-					var inflate = new Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
-					var reader2 = new BinaryReader( inflate.decompress().buffer );
+					var data = fflate.unzlibSync( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
+					var reader2 = new BinaryReader( data.buffer );
 
 					switch ( type ) {
 

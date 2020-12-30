@@ -14,7 +14,6 @@ const assets = [
 
 	'../examples/jsm/libs/chevrotain.module.min.js',
 	'../examples/jsm/libs/fflate.module.min.js',
-	'../examples/jsm/libs/inflate.module.min.js',
 	'../examples/jsm/libs/jszip.module.min.js',
 
 	'../examples/js/libs/draco/draco_decoder.js',
