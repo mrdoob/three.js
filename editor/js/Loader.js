@@ -7,7 +7,7 @@ import { SetSceneCommand } from './commands/SetSceneCommand.js';
 
 import { LoaderUtils } from './LoaderUtils.js';
 
-import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
+import { unzipSync, strFromU8 } from '../../examples/jsm/libs/fflate.module.min.js';
 
 function Loader( editor ) {
 
@@ -611,7 +611,7 @@ function Loader( editor ) {
 					handleZIP( event.target.result );
 
 				}, false );
-				reader.readAsBinaryString( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 
@@ -697,35 +697,37 @@ function Loader( editor ) {
 
 	async function handleZIP( contents ) {
 
-		var zip = new JSZip( contents );
+		var zip = unzipSync( new Uint8Array( contents ) );
 
 		// Poly
 
-		if ( zip.files[ 'model.obj' ] && zip.files[ 'materials.mtl' ] ) {
+		if ( zip[ 'model.obj' ] && zip[ 'materials.mtl' ] ) {
 
 			var { MTLLoader } = await import( '../../examples/jsm/loaders/MTLLoader.js' );
 			var { OBJLoader } = await import( '../../examples/jsm/loaders/OBJLoader.js' );
 
-			var materials = new MTLLoader().parse( zip.file( 'materials.mtl' ).asText() );
-			var object = new OBJLoader().setMaterials( materials ).parse( zip.file( 'model.obj' ).asText() );
+			var materials = new MTLLoader().parse( strFromU8( zip[ 'materials.mtl' ] ) );
+			var object = new OBJLoader().setMaterials( materials ).parse( strFromU8( zip[ 'model.obj' ] ) );
 			editor.execute( new AddObjectCommand( editor, object ) );
 
 		}
 
 		//
 
-		zip.filter( async function ( path, file ) {
+		for ( var path in zip ) {
+
+			var file = zip[ path ];
 
 			var manager = new THREE.LoadingManager();
 			manager.setURLModifier( function ( url ) {
 
-				var file = zip.files[ url ];
+				var file = zip[ url ];
 
 				if ( file ) {
 
 					console.log( 'Loading', url );
 
-					var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-stream' } );
+					var blob = new Blob( [ file.buffer ], { type: 'application/octet-stream' } );
 					return URL.createObjectURL( blob );
 
 				}
@@ -734,7 +736,7 @@ function Loader( editor ) {
 
 			} );
 
-			var extension = file.name.split( '.' ).pop().toLowerCase();
+			var extension = path.split( '.' ).pop().toLowerCase();
 
 			switch ( extension ) {
 
@@ -743,7 +745,7 @@ function Loader( editor ) {
 					var { FBXLoader } = await import( '../../examples/jsm/loaders/FBXLoader.js' );
 
 					var loader = new FBXLoader( manager );
-					var object = loader.parse( file.asArrayBuffer() );
+					var object = loader.parse( file.buffer );
 
 					editor.execute( new AddObjectCommand( editor, object ) );
 
@@ -760,7 +762,7 @@ function Loader( editor ) {
 					var loader = new GLTFLoader();
 					loader.setDRACOLoader( dracoLoader );
 
-					loader.parse( file.asArrayBuffer(), '', function ( result ) {
+					loader.parse( file.buffer, '', function ( result ) {
 
 						var scene = result.scene;
 
@@ -781,7 +783,7 @@ function Loader( editor ) {
 
 					var loader = new GLTFLoader( manager );
 					loader.setDRACOLoader( dracoLoader );
-					loader.parse( file.asText(), '', function ( result ) {
+					loader.parse( strFromU8( file ), '', function ( result ) {
 
 						var scene = result.scene;
 
@@ -794,7 +796,7 @@ function Loader( editor ) {
 
 			}
 
-		} );
+		}
 
 	}
 
