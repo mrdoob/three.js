@@ -54,6 +54,7 @@ const ENCODINGS = {
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
 const { _lodPlanes, _sizeLods, _sigmas } = /*@__PURE__*/ _createPlanes();
 const _clearColor = /*@__PURE__*/ new Color();
+const _backgroundColor = /*@__PURE__*/ new Color();
 let _oldTarget = null;
 
 // Golden Ratio
@@ -261,23 +262,33 @@ class PMREMGenerator {
 		const toneMapping = renderer.toneMapping;
 		renderer.getClearColor( _clearColor );
 		const clearAlpha = renderer.getClearAlpha();
+		const originalBackground = scene.background;
 
 		renderer.toneMapping = NoToneMapping;
 		renderer.outputEncoding = LinearEncoding;
 
-		let background = scene.background;
+		const background = scene.background;
 		if ( background && background.isColor ) {
 
-			background.convertSRGBToLinear();
-			// Convert linear to RGBE
-			const maxComponent = Math.max( background.r, background.g, background.b );
-			const fExp = Math.min( Math.max( Math.ceil( Math.log2( maxComponent ) ), - 128.0 ), 127.0 );
-			background = background.multiplyScalar( Math.pow( 2.0, - fExp ) );
-			const alpha = ( fExp + 128.0 ) / 255.0;
-			renderer.setClearColor( background, alpha );
-			scene.background = null;
+			_backgroundColor.copy( background );
+
+		} else {
+
+			_backgroundColor.copy( _clearColor );
 
 		}
+
+
+		_backgroundColor.convertSRGBToLinear();
+
+		// Convert linear to RGBE
+		const maxComponent = Math.max( _backgroundColor.r, _backgroundColor.g, _backgroundColor.b );
+		const fExp = Math.min( Math.max( Math.ceil( Math.log2( maxComponent ) ), - 128.0 ), 127.0 );
+		_backgroundColor.multiplyScalar( Math.pow( 2.0, - fExp ) );
+		const alpha = ( fExp + 128.0 ) / 255.0;
+		renderer.setClearColor( _backgroundColor, alpha );
+		scene.background = null;
+
 
 		for ( let i = 0; i < 6; i ++ ) {
 
@@ -309,6 +320,7 @@ class PMREMGenerator {
 		renderer.toneMapping = toneMapping;
 		renderer.outputEncoding = outputEncoding;
 		renderer.setClearColor( _clearColor, clearAlpha );
+		scene.background = originalBackground;
 
 	}
 
