@@ -722,17 +722,23 @@ UIPoints2.prototype.constructor = UIPoints2;
 
 UIPoints2.addRow = function () {
 
-	if ( this.pointsUI.length === 0 ) {
+	var x = 0, y = 0;
 
-		this.pointsList.add( this.createPointRow( 0, 0 ) );
+	for ( var i = this.pointsUI.length - 1; i >= 0; i -- ) {
 
-	} else {
+		var pointUI = this.pointsUI[ i ];
 
-		var point = this.pointsUI[ this.pointsUI.length - 1 ];
+		if ( pointUI != null ) {
 
-		this.pointsList.add( this.createPointRow( point.x.getValue(), point.y.getValue() ) );
+			x = pointUI.x.getValue();
+			y = pointUI.y.getValue();
+			break;
+
+		}
 
 	}
+
+	this.pointsList.add( this.createPointRow( x, y ) );
 
 	this.update();
 
