@@ -14,7 +14,6 @@ const assets = [
 
 	'../examples/jsm/libs/chevrotain.module.min.js',
 	'../examples/jsm/libs/fflate.module.min.js',
-	'../examples/jsm/libs/jszip.module.min.js',
 
 	'../examples/js/libs/draco/draco_decoder.js',
 	'../examples/js/libs/draco/draco_decoder.wasm',
@@ -100,6 +99,7 @@ const assets = [
 	'./js/libs/tern-threejs/threejs.js',
 
 	'./js/libs/signals.min.js',
+	'./js/libs/jszip.min.js',
 	'./js/libs/ui.js',
 	'./js/libs/ui.three.js',
 

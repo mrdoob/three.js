@@ -1,7 +1,5 @@
 import * as THREE from '../../build/three.module.js';
 
-import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
-
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 function MenubarFile( editor ) {
@@ -390,7 +388,7 @@ function MenubarFile( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/file/publish' ) );
 	option.onClick( function () {
 
-		var zip = new JSZip();
+		var zip = new JSZip(); // eslint-disable-line no-undef
 
 		//
 
