@@ -271,6 +271,7 @@ class PMREMGenerator {
 		if ( background && background.isColor ) {
 
 			_backgroundColor.copy( background );
+			scene.background = null;
 
 		} else {
 
@@ -287,7 +288,6 @@ class PMREMGenerator {
 		_backgroundColor.multiplyScalar( Math.pow( 2.0, - fExp ) );
 		const alpha = ( fExp + 128.0 ) / 255.0;
 		renderer.setClearColor( _backgroundColor, alpha );
-		scene.background = null;
 
 
 		for ( let i = 0; i < 6; i ++ ) {
