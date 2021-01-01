@@ -99,7 +99,7 @@ const assets = [
 	'./js/libs/tern-threejs/threejs.js',
 
 	'./js/libs/signals.min.js',
-	'./js/libs/jszip.min.js',
+	'./js/libs/fflate-deflate.min.module.js',
 	'./js/libs/ui.js',
 	'./js/libs/ui.three.js',
 
