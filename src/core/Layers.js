@@ -44,7 +44,9 @@ class Layers {
 
 	test( layers ) {
 
-		return ( this.mask & layers.mask ) !== 0;
+		const mask = ( typeof layers === 'number' ) ? ( 1 << layers | 0 ) : layers.mask;
+
+		return ( this.mask & mask ) !== 0;
 
 	}
 

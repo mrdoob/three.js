@@ -13,6 +13,6 @@ export class Layers {
 	toggle( channel: number ): void;
 	disable( channel: number ): void;
 	disableAll(): void;
-	test( layers: Layers ): boolean;
+	test( layers: Layers | number ): boolean;
 
 }
