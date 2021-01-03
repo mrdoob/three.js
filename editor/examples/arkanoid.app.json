@@ -265,7 +265,7 @@
 		"6D660D49-39B8-40C3-95F6-E4E007AA8D79": [
 			{
 				"name": "User",
-				"source": "function mousemove( event ) {\n\n\tthis.position.x = ( event.clientX / player.width ) * 30 - 15;\n\n}\n\n// function update( event ) {}"
+				"source": "function pointermove( event ) {\n\n\tthis.position.x = ( event.clientX / player.width ) * 30 - 15;\n\n}\n\n// function update( event ) {}"
 			}],
 		"31517222-A9A7-4EAF-B5F6-60751C0BABA3": [
 			{
