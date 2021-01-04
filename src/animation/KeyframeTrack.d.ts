@@ -13,8 +13,8 @@ export class KeyframeTrack {
 	 */
 	constructor(
 		name: string,
-		times: Record<number, any>,
-		values: Record<number, any>,
+		times: ArrayLike<any>,
+		values: ArrayLike<any>,
 		interpolation?: InterpolationModes
 	);
 
