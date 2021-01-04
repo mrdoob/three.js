@@ -11,4 +11,6 @@ export class TGALoader extends Loader {
 	load( url: string, onLoad: ( texture: Texture ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
 	parse( data: ArrayBuffer ) : Texture;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Texture>;
+
 }

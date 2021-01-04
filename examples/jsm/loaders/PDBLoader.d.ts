@@ -20,4 +20,6 @@ export class PDBLoader extends Loader {
 	load( url: string, onLoad: ( pdb: PDB ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
 	parse( text: string ) : PDB;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<PDB>;
+
 }

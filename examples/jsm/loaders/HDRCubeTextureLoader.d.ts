@@ -16,4 +16,6 @@ export class HDRCubeTextureLoader extends Loader {
 	load( urls: string[], onLoad: ( texture: CubeTexture ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
 	setDataType( type: TextureDataType ): this;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<CubeTexture>;
+
 }

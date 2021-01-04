@@ -16,4 +16,6 @@ export class XLoader extends Loader {
 	load( url: string, onLoad: ( object: XResult ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
 	parse( data: ArrayBuffer | string, onLoad: ( object: object ) => void ): object;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<XResult>;
+
 }

@@ -18,4 +18,6 @@ export class LDrawLoader extends Loader {
 	addMaterial( material: Material ): void;
 	getMaterial( colourCode: string ): Material | null;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Group>;
+
 }

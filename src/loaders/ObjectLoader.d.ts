@@ -31,4 +31,6 @@ export class ObjectLoader extends Loader {
 		animations: AnimationClip[]
 	): T;
 
+	loadAsync<ObjectType extends Object3D>( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<ObjectType>;
+
 }

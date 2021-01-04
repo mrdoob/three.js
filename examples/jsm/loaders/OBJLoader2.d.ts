@@ -42,4 +42,6 @@ export class OBJLoader2 extends Loader {
 	load( url: string, onLoad: ( object3d: Object3D ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void, onMeshAlter?: ( meshData: object ) => void ): void;
 	parse( content: ArrayBuffer | string ): Object3D;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Object3D>;
+
 }

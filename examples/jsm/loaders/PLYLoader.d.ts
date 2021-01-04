@@ -14,4 +14,6 @@ export class PLYLoader extends Loader {
 	setPropertyNameMapping( mapping: object ) : void;
 	parse( data: ArrayBuffer | string ) : BufferGeometry;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<BufferGeometry>;
+
 }

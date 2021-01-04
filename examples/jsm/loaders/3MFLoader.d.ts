@@ -13,4 +13,6 @@ export class ThreeMFLoader extends Loader {
 	parse( data: ArrayBuffer ): Group;
 	addExtension( extension: object ):void
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Group>;
+
 }

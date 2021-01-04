@@ -15,4 +15,6 @@ export class DRACOLoader extends Loader {
 	preload(): DRACOLoader;
 	dispose(): DRACOLoader;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<BufferGeometry>;
+
 }

@@ -18,4 +18,6 @@ export class ColladaLoader extends Loader {
 	load( url: string, onLoad: ( collada: Collada ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
 	parse( text: string, path: string ) : Collada;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Collada>;
+
 }

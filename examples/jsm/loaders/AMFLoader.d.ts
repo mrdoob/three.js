@@ -11,4 +11,6 @@ export class AMFLoader extends Loader {
 	load( url: string, onLoad: ( object: Group ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
 	parse( data: ArrayBuffer ): Group;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Group>;
+
 }
