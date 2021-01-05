@@ -73,11 +73,19 @@ ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		if ( this.priorityHint ) image.importance = this.priorityHint;
+
 		scope.manager.itemStart( url );
 
 		image.src = url;
 
 		return image;
+
+	},
+
+	setPriorityHint: function ( priorityHint ) {
+
+		this.priorityHint = priorityHint;
 
 	}
 
