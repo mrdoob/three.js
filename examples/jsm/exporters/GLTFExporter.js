@@ -1,6 +1,5 @@
 import {
 	BufferAttribute,
-	BufferGeometry,
 	ClampToEdgeWrapping,
 	DoubleSide,
 	InterpolateDiscrete,
@@ -657,7 +656,7 @@ GLTFExporter.prototype = {
 		/**
 		 * Process attribute to generate an accessor
 		 * @param  {BufferAttribute} attribute Attribute to process
-		 * @param  {BufferGeometry} geometry (Optional) Geometry used for truncated draw range
+		 * @param  {THREE.BufferGeometry} geometry (Optional) Geometry used for truncated draw range
 		 * @param  {Integer} start (Optional)
 		 * @param  {Integer} count (Optional)
 		 * @return {Integer}           Index of the processed accessor on the "accessors" array
@@ -1263,10 +1262,9 @@ GLTFExporter.prototype = {
 
 			}
 
-			if ( ! geometry.isBufferGeometry ) {
+			if ( geometry.isBufferGeometry !== true ) {
 
-				console.warn( 'GLTFExporter: Exporting THREE.Geometry will increase file size. Use BufferGeometry instead.' );
-				geometry = new BufferGeometry().setFromObject( mesh );
+				throw new Error( 'THREE.GLTFExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 			}
 
