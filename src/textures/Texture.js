@@ -64,6 +64,8 @@ function Texture( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPI
 	this.version = 0;
 	this.onUpdate = null;
 
+	this.isRenderTargetTexture = false;
+
 }
 
 Texture.DEFAULT_IMAGE = undefined;

@@ -1,6 +1,7 @@
 export default /* glsl */`
 #ifdef USE_ENVMAP
 
+	uniform float envMapBlurriness;
 	uniform float envMapIntensity;
 	uniform float flipEnvMap;
 	uniform int maxMipLevel;
@@ -10,6 +11,6 @@ export default /* glsl */`
 	#else
 		uniform sampler2D envMap;
 	#endif
-	
+
 #endif
 `;

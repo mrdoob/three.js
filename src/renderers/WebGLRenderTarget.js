@@ -29,6 +29,8 @@ function WebGLRenderTarget( width, height, options ) {
 	this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
 	this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 
+	this.texture.isRenderTargetTexture = true;
+
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
 	this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
