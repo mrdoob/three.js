@@ -1,7 +1,3 @@
-import {
-	BufferGeometry
-} from '../../../build/three.module.js';
-
 /**
  * Export draco compressed files from threejs geometry objects.
  *
@@ -64,7 +60,7 @@ DRACOExporter.prototype = {
 
 		if ( geometry.isBufferGeometry !== true ) {
 
-			throw new Error( 'THREE.DRACOExporter.parse(geometry, options): geometry is not a BufferGeometry instance.' );
+			throw new Error( 'THREE.DRACOExporter.parse(geometry, options): geometry is not a THREE.BufferGeometry instance.' );
 
 		}
 

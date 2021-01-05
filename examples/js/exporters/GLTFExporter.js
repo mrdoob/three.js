@@ -1239,10 +1239,9 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( ! geometry.isBufferGeometry ) {
+			if ( geometry.isBufferGeometry !== true ) {
 
-				console.warn( 'GLTFExporter: Exporting THREE.Geometry will increase file size. Use THREE.BufferGeometry instead.' );
-				geometry = new THREE.BufferGeometry().setFromObject( mesh );
+				throw new Error( 'THREE.GLTFExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 			}
 
