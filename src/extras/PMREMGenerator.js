@@ -87,6 +87,17 @@ const _axisDirections = [
  * interpolate diffuse lighting while limiting sampling computation.
  */
 
+function convertLinearToRGBE( color ) {
+
+	const maxComponent = Math.max( color.r, color.g, color.b );
+	const fExp = Math.min( Math.max( Math.ceil( Math.log2( maxComponent ) ), - 128.0 ), 127.0 );
+	color.multiplyScalar( Math.pow( 2.0, - fExp ) );
+
+	const alpha = ( fExp + 128.0 ) / 255.0;
+	return alpha;
+
+}
+
 class PMREMGenerator {
 
 	constructor( renderer ) {
@@ -268,26 +279,28 @@ class PMREMGenerator {
 		renderer.outputEncoding = LinearEncoding;
 
 		const background = scene.background;
-		if ( background && background.isColor ) {
+		if ( background ) {
 
-			_backgroundColor.copy( background );
-			scene.background = null;
+			if ( background.isColor ) {
+
+				_backgroundColor.copy( background ).convertSRGBToLinear();
+				scene.background = null;
+
+				const alpha = convertLinearToRGBE( _backgroundColor );
+				renderer.setClearColor( _backgroundColor );
+				renderer.setClearAlpha( alpha );
+
+			}
 
 		} else {
 
-			_backgroundColor.copy( _clearColor );
+			_backgroundColor.copy( _clearColor ).convertSRGBToLinear();
+
+			const alpha = convertLinearToRGBE( _backgroundColor );
+			renderer.setClearColor( _backgroundColor );
+			renderer.setClearAlpha( alpha );
 
 		}
-
-
-		_backgroundColor.convertSRGBToLinear();
-
-		// Convert linear to RGBE
-		const maxComponent = Math.max( _backgroundColor.r, _backgroundColor.g, _backgroundColor.b );
-		const fExp = Math.min( Math.max( Math.ceil( Math.log2( maxComponent ) ), - 128.0 ), 127.0 );
-		_backgroundColor.multiplyScalar( Math.pow( 2.0, - fExp ) );
-		const alpha = ( fExp + 128.0 ) / 255.0;
-		renderer.setClearColor( _backgroundColor, alpha );
 
 
 		for ( let i = 0; i < 6; i ++ ) {
