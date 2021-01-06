@@ -13,8 +13,7 @@ export class BufferGeometryLoader extends Loader {
 		onProgress?: ( request: ProgressEvent ) => void,
 		onError?: ( event: ErrorEvent ) => void
 	): void;
-	parse( json: any ): InstancedBufferGeometry | BufferGeometry;
-
 	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<InstancedBufferGeometry | BufferGeometry>;
+	parse( json: any ): InstancedBufferGeometry | BufferGeometry;
 
 }

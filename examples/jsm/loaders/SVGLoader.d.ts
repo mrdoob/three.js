@@ -27,9 +27,8 @@ export class SVGLoader extends Loader {
 	defaultUnit: string;
 
 	load( url: string, onLoad: ( data: SVGResult ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
-	parse( text: string ) : SVGResult;
-
 	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<SVGResult>;
+	parse( text: string ) : SVGResult;
 
 	static getStrokeStyle( width?: number, color?: string, lineJoin?: string, lineCap?: string, miterLimit?: number ): StrokeStyle;
 	static pointsToStroke( points: Vector3[], style: StrokeStyle, arcDivisions?: number, minDistance?: number ): BufferGeometry;

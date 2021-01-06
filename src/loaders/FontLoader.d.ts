@@ -12,8 +12,7 @@ export class FontLoader extends Loader {
 		onProgress?: ( event: ProgressEvent ) => void,
 		onError?: ( event: ErrorEvent ) => void
 	): void;
-	parse( json: any ): Font;
-
 	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Font>;
+	parse( json: any ): Font;
 
 }

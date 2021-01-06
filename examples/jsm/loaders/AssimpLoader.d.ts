@@ -15,8 +15,7 @@ export class AssimpLoader extends Loader {
 	constructor( manager?: LoadingManager );
 
 	load( url: string, onLoad: ( result: Assimp ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
-	parse( buffer: ArrayBuffer, path: string ) : Assimp;
-
 	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Assimp>;
+	parse( buffer: ArrayBuffer, path: string ) : Assimp;
 
 }

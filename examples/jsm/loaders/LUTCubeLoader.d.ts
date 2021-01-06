@@ -27,8 +27,7 @@ export class LUTCubeLoader extends Loader {
 		onProgress?: ( event: ProgressEvent ) => void,
 		onError?: ( event: Error ) => void
 	);
-	parse( data: string ): LUTCubeResult;
-
 	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<LUTCubeResult>;
+	parse( data: string ): LUTCubeResult;
 
 }

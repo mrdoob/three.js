@@ -18,9 +18,8 @@ export class MaterialLoader extends Loader {
 		onProgress?: ( event: ProgressEvent ) => void,
 		onError?: ( event: Error | ErrorEvent ) => void
 	): void;
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Material>;
 	setTextures( textures: { [key: string]: Texture } ): this;
 	parse( json: any ): Material;
-
-	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Material>;
 
 }

@@ -9,8 +9,7 @@ export class TTFLoader extends Loader {
 	reversed: boolean;
 
 	load( url: string, onLoad: ( json: object ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
-	parse( arraybuffer: ArrayBuffer ): object;
-
 	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<object>;
+	parse( arraybuffer: ArrayBuffer ): object;
 
 }
