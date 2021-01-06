@@ -4120,6 +4120,12 @@
 			return this;
 		};
 
+		_proto.setFromMatrix3 = function setFromMatrix3(m) {
+			var me = m.elements;
+			this.set(me[0], me[3], me[6], 0, me[1], me[4], me[7], 0, me[2], me[5], me[8], 0, 0, 0, 0, 1);
+			return this;
+		};
+
 		_proto.extractBasis = function extractBasis(xAxis, yAxis, zAxis) {
 			xAxis.setFromMatrixColumn(this, 0);
 			yAxis.setFromMatrixColumn(this, 1);
@@ -20033,14 +20039,7 @@
 					console.warn('THREE.Line.computeLineDistances(): Computation only possible with non-indexed BufferGeometry.');
 				}
 			} else if (geometry.isGeometry) {
-				var vertices = geometry.vertices;
-				var _lineDistances = geometry.lineDistances;
-				_lineDistances[0] = 0;
-
-				for (var _i = 1, _l = vertices.length; _i < _l; _i++) {
-					_lineDistances[_i] = _lineDistances[_i - 1];
-					_lineDistances[_i] += vertices[_i - 1].distanceTo(vertices[_i]);
-				}
+				console.error('THREE.Line.computeLineDistances() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
 			}
 
 			return this;
@@ -20104,9 +20103,9 @@
 						});
 					}
 				} else {
-					for (var _i2 = 0, _l2 = positionAttribute.count - 1; _i2 < _l2; _i2 += step) {
-						vStart.fromBufferAttribute(positionAttribute, _i2);
-						vEnd.fromBufferAttribute(positionAttribute, _i2 + 1);
+					for (var _i = 0, _l = positionAttribute.count - 1; _i < _l; _i += step) {
+						vStart.fromBufferAttribute(positionAttribute, _i);
+						vEnd.fromBufferAttribute(positionAttribute, _i + 1);
 
 						var _distSq = _ray$1.distanceSqToSegment(vStart, vEnd, interRay, interSegment);
 
@@ -20121,7 +20120,7 @@
 							// What do we want? intersection point on the ray or on the segment??
 							// point: raycaster.ray.at( distance ),
 							point: interSegment.clone().applyMatrix4(this.matrixWorld),
-							index: _i2,
+							index: _i,
 							face: null,
 							faceIndex: null,
 							object: this
@@ -20132,8 +20131,8 @@
 				var vertices = geometry.vertices;
 				var nbVertices = vertices.length;
 
-				for (var _i3 = 0; _i3 < nbVertices - 1; _i3 += step) {
-					var _distSq2 = _ray$1.distanceSqToSegment(vertices[_i3], vertices[_i3 + 1], interRay, interSegment);
+				for (var _i2 = 0; _i2 < nbVertices - 1; _i2 += step) {
+					var _distSq2 = _ray$1.distanceSqToSegment(vertices[_i2], vertices[_i2 + 1], interRay, interSegment);
 
 					if (_distSq2 > localThresholdSq) continue;
 					interRay.applyMatrix4(this.matrixWorld); //Move back to world space for distance calculation
@@ -20146,7 +20145,7 @@
 						// What do we want? intersection point on the ray or on the segment??
 						// point: raycaster.ray.at( distance ),
 						point: interSegment.clone().applyMatrix4(this.matrixWorld),
-						index: _i3,
+						index: _i2,
 						face: null,
 						faceIndex: null,
 						object: this
@@ -20220,17 +20219,7 @@
 					console.warn('THREE.LineSegments.computeLineDistances(): Computation only possible with non-indexed BufferGeometry.');
 				}
 			} else if (geometry.isGeometry) {
-				var vertices = geometry.vertices;
-				var _lineDistances = geometry.lineDistances;
-
-				for (var _i = 0, _l = vertices.length; _i < _l; _i += 2) {
-					_start$1.copy(vertices[_i]);
-
-					_end$1.copy(vertices[_i + 1]);
-
-					_lineDistances[_i] = _i === 0 ? 0 : _lineDistances[_i - 1];
-					_lineDistances[_i + 1] = _lineDistances[_i] + _start$1.distanceTo(_end$1);
-				}
+				console.error('THREE.LineSegments.computeLineDistances() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
 			}
 
 			return this;

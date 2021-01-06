@@ -5162,6 +5162,23 @@ class Matrix4 {
 
 	}
 
+	setFromMatrix3( m ) {
+
+		const me = m.elements;
+
+		this.set(
+
+			me[ 0 ], me[ 3 ], me[ 6 ], 0,
+			me[ 1 ], me[ 4 ], me[ 7 ], 0,
+			me[ 2 ], me[ 5 ], me[ 8 ], 0,
+			0, 0, 0, 1
+
+		);
+
+		return this;
+
+	}
+
 	extractBasis( xAxis, yAxis, zAxis ) {
 
 		xAxis.setFromMatrixColumn( this, 0 );
@@ -26892,17 +26909,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		} else if ( geometry.isGeometry ) {
 
-			const vertices = geometry.vertices;
-			const lineDistances = geometry.lineDistances;
-
-			lineDistances[ 0 ] = 0;
-
-			for ( let i = 1, l = vertices.length; i < l; i ++ ) {
-
-				lineDistances[ i ] = lineDistances[ i - 1 ];
-				lineDistances[ i ] += vertices[ i - 1 ].distanceTo( vertices[ i ] );
-
-			}
+			console.error( 'THREE.Line.computeLineDistances() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 		}
 
@@ -27150,18 +27157,7 @@ LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 
 		} else if ( geometry.isGeometry ) {
 
-			const vertices = geometry.vertices;
-			const lineDistances = geometry.lineDistances;
-
-			for ( let i = 0, l = vertices.length; i < l; i += 2 ) {
-
-				_start$1.copy( vertices[ i ] );
-				_end$1.copy( vertices[ i + 1 ] );
-
-				lineDistances[ i ] = ( i === 0 ) ? 0 : lineDistances[ i - 1 ];
-				lineDistances[ i + 1 ] = lineDistances[ i ] + _start$1.distanceTo( _end$1 );
-
-			}
+			console.error( 'THREE.LineSegments.computeLineDistances() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 		}
 
