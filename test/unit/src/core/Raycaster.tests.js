@@ -3,7 +3,7 @@
 import { Raycaster } from '../../../../src/core/Raycaster';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Mesh } from '../../../../src/objects/Mesh';
-import { SphereGeometry } from '../../../../src/geometries/SphereGeometry';
+import { SphereBufferGeometry } from '../../../../src/geometries/SphereBufferGeometry';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
 import { Line } from '../../../../src/objects/Line.js';
 import { Points } from '../../../../src/objects/Points.js';
@@ -64,7 +64,7 @@ function getObjectsToCheck() {
 
 function getSphere() {
 
-	return new Mesh( new SphereGeometry( 1, 100, 100 ) );
+	return new Mesh( new SphereBufferGeometry( 1, 100, 100 ) );
 
 }
 
