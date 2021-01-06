@@ -316,7 +316,7 @@ function main() {
       return {name, attribute};
     });
     const material = new THREE.MeshBasicMaterial({
-      vertexColors: THREE.VertexColors,
+      vertexColors: true,
       morphTargets: true,
     });
     const vertexShaderReplacements = [

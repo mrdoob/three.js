@@ -265,7 +265,7 @@ First let's change `addBoxes` to just make and return the merged geometry.
 -  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
--    vertexColors: THREE.VertexColors,
+-    vertexColors: true,
 -  });
 -  const mesh = new THREE.Mesh(mergedGeometry, material);
 -  scene.add(mesh);
@@ -331,7 +331,7 @@ and setup morphtargets
 +  return attribute;
 +});
 +const material = new THREE.MeshBasicMaterial({
-+  vertexColors: THREE.VertexColors,
++  vertexColors: true,
 +  morphTargets: true,
 +});
 +const mesh = new THREE.Mesh(baseGeometry, material);
@@ -537,7 +537,7 @@ baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) => {
 +  return {name, attribute};
 +});
 const material = new THREE.MeshBasicMaterial({
-  vertexColors: THREE.VertexColors,
+  vertexColors: true,
   morphTargets: true,
 });
 ```
@@ -595,7 +595,7 @@ To do that we'll make a simple array of replacements and apply them in `Material
 
 ```js
 const material = new THREE.MeshBasicMaterial({
-  vertexColors: THREE.VertexColors,
+  vertexColors: true,
   morphTargets: true,
 });
 +const vertexShaderReplacements = [

@@ -95,7 +95,7 @@ function main() {
   geometry.faces[10].color = geometry.faces[11].color = new THREE.Color('magenta');
 
   function makeInstance(geometry, color, x) {
-    const material = new THREE.MeshBasicMaterial({vertexColors: THREE.FaceColors});
+    const material = new THREE.MeshBasicMaterial({vertexColors: true});
 
     const cube = new THREE.Mesh(geometry, material);
     scene.add(cube);

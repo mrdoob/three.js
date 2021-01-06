@@ -497,7 +497,7 @@ const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
     geometries, false);
 -const material = new THREE.MeshBasicMaterial({color:'red'});
 +const material = new THREE.MeshBasicMaterial({
-+  vertexColors: THREE.VertexColors,
++  vertexColors: true,
 +});
 const mesh = new THREE.Mesh(mergedGeometry, material);
 scene.add(mesh);

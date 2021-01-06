@@ -98,7 +98,7 @@ function main() {
   geometry.computeFaceNormals();
 
   function makeInstance(geometry, color, x) {
-    const material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors});
+    const material = new THREE.MeshBasicMaterial({vertexColors: true});
 
     const cube = new THREE.Mesh(geometry, material);
     scene.add(cube);

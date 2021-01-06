@@ -179,17 +179,17 @@ geometry.faces[ 8].color = geometry.faces[ 9].color = new THREE.Color('blue');
 geometry.faces[10].color = geometry.faces[11].color = new THREE.Color('magenta');
 ```
 
-note we need to tell the material we want to use `FaceColors`
+note we need to tell the material we want to use vertex colors
 
 ```js
 -const material = new THREE.MeshBasicMaterial({color});
-+const material = new THREE.MeshBasicMaterial({vertexColors: THREE.FaceColors});
++const material = new THREE.MeshBasicMaterial({vertexColors: true});
 ```
 
 {{{example url="../threejs-custom-geometry-cube-face-colors.html" }}}
 
 We can instead set the color of each individual vertex by setting the `vertexColors`
-property to an array of the 3 colors for the 3 vertices.
+property of a `Face` to an array of the 3 colors for the 3 vertices.
 
 ```js
 geometry.faces.forEach((face, ndx) => {
@@ -199,13 +199,6 @@ geometry.faces.forEach((face, ndx) => {
     (new THREE.Color()).setHSL(ndx / 12 + 0.2, 1, 0.5),
   ];
 });
-```
-
-and we need to tell the material to use vertex colors
-
-```js
--const material = new THREE.MeshBasicMaterial({vertexColors: THREE.FaceColors});
-+const material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors});
 ```
 
 {{{example url="../threejs-custom-geometry-cube-vertex-colors.html" }}}
@@ -241,7 +234,7 @@ geometry.computeFaceNormals();
 Removing the vertex color stuff and changing the material back to `MeshPhongMaterial`
 
 ```js
--const material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors});
+-const material = new THREE.MeshBasicMaterial({vertexColors: true});
 +const material = new THREE.MeshPhongMaterial({color});
 ```
 

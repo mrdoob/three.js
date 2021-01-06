@@ -310,7 +310,7 @@ function main() {
       return attribute;
     });
     const material = new THREE.MeshBasicMaterial({
-      vertexColors: THREE.VertexColors,
+      vertexColors: true,
       morphTargets: true,
     });
     const mesh = new THREE.Mesh(baseGeometry, material);

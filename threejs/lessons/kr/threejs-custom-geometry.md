@@ -167,16 +167,16 @@ geometry.faces[ 8].color = geometry.faces[ 9].color = new THREE.Color('blue');
 geometry.faces[10].color = geometry.faces[11].color = new THREE.Color('magenta');
 ```
 
-추가로 재질을 생성할 때 `FaceColors`를 사용한다고 명시해야 하죠.
+추가로 재질을 생성할 때 `vertexColors`를 사용한다고 명시해야 하죠.
 
 ```js
 -const material = new THREE.MeshBasicMaterial({ color });
-+const material = new THREE.MeshBasicMaterial({ vertexColors: THREE.FaceColors });
++const material = new THREE.MeshBasicMaterial({ vertexColors: true });
 ```
 
 {{{example url="../threejs-custom-geometry-cube-face-colors.html" }}}
 
-또는 삼각형 면의 `vertextColors` 속성에 각 꼭지점의 색상을 지정할 수도 있습니다.
+또는 삼각형 면의 `vertexColors` 속성에 각 꼭지점의 색상을 지정할 수도 있습니다.
 
 ```js
 geometry.faces.forEach((face, ndx) => {
@@ -186,13 +186,6 @@ geometry.faces.forEach((face, ndx) => {
     (new THREE.Color()).setHSL(ndx / 12 + 0.2, 1, 0.5),
   ];
 });
-```
-
-이 또한 꼭지점 색을 사용한다고 명시해야 하죠.
-
-```js
--const material = new THREE.MeshBasicMaterial({vertexColors: THREE.FaceColors});
-+const material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors});
 ```
 
 {{{example url="../threejs-custom-geometry-cube-vertex-colors.html" }}}
@@ -226,7 +219,7 @@ geometry.computeFaceNormals();
 꼭지점 색을 제거하고 다시 재질을 `MeshPhongMaterial`로 바꾸겠습니다.
 
 ```js
--const material = new THREE.MeshBasicMaterial({ vertexColors: THREE.VertexColors });
+-const material = new THREE.MeshBasicMaterial({ vertexColors: true });
 +const material = new THREE.MeshPhongMaterial({ color });
 ```
 

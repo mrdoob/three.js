@@ -155,11 +155,11 @@ geometry.faces[ 8].color = geometry.faces[ 9].color = new THREE.Color('blue');
 geometry.faces[10].color = geometry.faces[11].color = new THREE.Color('magenta');
 ```
 
-マテリアルには`FaceColors`を使うように設定します。
+マテリアルには`vertexColors`を使うように設定します。
 
 ```js
 -const material = new THREE.MeshBasicMaterial({color});
-+const material = new THREE.MeshBasicMaterial({vertexColors: THREE.FaceColors});
++const material = new THREE.MeshBasicMaterial({vertexColors: true});
 ```
 
 {{{example url="../threejs-custom-geometry-cube-face-colors.html" }}}
@@ -175,13 +175,6 @@ geometry.faces.forEach((face, ndx) => {
     (new THREE.Color()).setHSL(ndx / 12 + 0.2, 1, 0.5),
   ];
 });
-```
-
-マテリアルにはvertex colorを使うように設定します。
-
-```js
--const material = new THREE.MeshBasicMaterial({vertexColors: THREE.FaceColors});
-+const material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors});
 ```
 
 {{{example url="../threejs-custom-geometry-cube-vertex-colors.html" }}}
@@ -213,7 +206,7 @@ geometry.computeFaceNormals();
 vertex colorを消してマテリアルを`MeshPhongMaterial`に戻します。
 
 ```js
--const material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors});
+-const material = new THREE.MeshBasicMaterial({vertexColors: true});
 +const material = new THREE.MeshPhongMaterial({color});
 ```
 

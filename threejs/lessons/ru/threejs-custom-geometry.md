@@ -141,11 +141,11 @@ geometry.faces[ 8].color = geometry.faces[ 9].color = new THREE.Color('blue');
 geometry.faces[10].color = geometry.faces[11].color = new THREE.Color('magenta');
 ```
 
-обратите внимание, что мы должны указать материал, который мы хотим использовать `FaceColors`
+обратите внимание, что мы должны указать материал, который мы хотим использовать `vertexColors`
 
 ```js
 -const material = new THREE.MeshBasicMaterial({color});
-+const material = new THREE.MeshBasicMaterial({vertexColors: THREE.FaceColors});
++const material = new THREE.MeshBasicMaterial({vertexColors: true});
 ```
 
 {{{example url="../threejs-custom-geometry-cube-face-colors.html" }}}
@@ -160,12 +160,6 @@ geometry.faces.forEach((face, ndx) => {
     (new THREE.Color()).setHSL(ndx / 12 + 0.2, 1, 0.5),
   ];
 });
-```
-
-и мы должны сказать материалу использовать цвета вершин
-```js
--const material = new THREE.MeshBasicMaterial({vertexColors: THREE.FaceColors});
-+const material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors});
 ```
 
 {{{example url="../threejs-custom-geometry-cube-vertex-colors.html" }}}
@@ -198,7 +192,7 @@ geometry.computeFaceNormals();
 
 Удаление цвета вершин и изменение материала обратно на `MeshPhongMaterial`
 ```js
--const material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors});
+-const material = new THREE.MeshBasicMaterial({vertexColors: true});
 +const material = new THREE.MeshPhongMaterial({color});
 ```
 

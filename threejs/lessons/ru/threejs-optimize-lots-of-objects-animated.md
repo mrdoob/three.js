@@ -261,7 +261,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 -  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
--    vertexColors: THREE.VertexColors,
+-    vertexColors: true,
 -  });
 -  const mesh = new THREE.Mesh(mergedGeometry, material);
 -  scene.add(mesh);
@@ -323,7 +323,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 +  return attribute;
 +});
 +const material = new THREE.MeshBasicMaterial({
-+  vertexColors: THREE.VertexColors,
++  vertexColors: true,
 +  morphTargets: true,
 +});
 +const mesh = new THREE.Mesh(baseGeometry, material);
@@ -524,7 +524,7 @@ baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) => {
 +  return {name, attribute};
 +});
 const material = new THREE.MeshBasicMaterial({
-  vertexColors: THREE.VertexColors,
+  vertexColors: true,
   morphTargets: true,
 });
 ```
@@ -581,7 +581,7 @@ void main() {
 
 ```js
 const material = new THREE.MeshBasicMaterial({
-  vertexColors: THREE.VertexColors,
+  vertexColors: true,
   morphTargets: true,
 });
 +const vertexShaderReplacements = [
