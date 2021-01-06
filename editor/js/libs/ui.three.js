@@ -699,13 +699,16 @@ UIPoints.prototype.deletePointRow = function ( idx, dontUpdate ) {
 	if ( ! this.pointsUI[ idx ] ) return;
 
 	this.pointsList.remove( this.pointsUI[ idx ].row );
-	this.pointsUI[ idx ] = null;
+
+	this.pointsUI.splice( idx, 1 );
 
 	if ( dontUpdate !== true ) {
 
 		this.update();
 
 	}
+
+	this.lastPointIdx --;
 
 };
 
@@ -782,11 +785,12 @@ UIPoints2.prototype.createPointRow = function ( x, y ) {
 	var txtX = new UINumber( x ).setWidth( '30px' ).onChange( this.update );
 	var txtY = new UINumber( y ).setWidth( '30px' ).onChange( this.update );
 
-	var idx = this.lastPointIdx;
 	var scope = this;
 	var btn = new UIButton( '-' ).onClick( function () {
 
 		if ( scope.isEditing ) return;
+
+		var idx = scope.pointsList.getIndexOfChild( pointRow );
 		scope.deletePointRow( idx );
 
 	} );
@@ -873,11 +877,12 @@ UIPoints3.prototype.createPointRow = function ( x, y, z ) {
 	var txtY = new UINumber( y ).setWidth( '30px' ).onChange( this.update );
 	var txtZ = new UINumber( z ).setWidth( '30px' ).onChange( this.update );
 
-	var idx = this.lastPointIdx;
 	var scope = this;
 	var btn = new UIButton( '-' ).onClick( function () {
 
 		if ( scope.isEditing ) return;
+
+		var idx = scope.pointsList.getIndexOfChild( pointRow );
 		scope.deletePointRow( idx );
 
 	} );
