@@ -76,17 +76,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		} else if ( geometry.isGeometry ) {
 
-			const vertices = geometry.vertices;
-			const lineDistances = geometry.lineDistances;
-
-			lineDistances[ 0 ] = 0;
-
-			for ( let i = 1, l = vertices.length; i < l; i ++ ) {
-
-				lineDistances[ i ] = lineDistances[ i - 1 ];
-				lineDistances[ i ] += vertices[ i - 1 ].distanceTo( vertices[ i ] );
-
-			}
+			console.error( 'THREE.Line.computeLineDistances() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 		}
 
