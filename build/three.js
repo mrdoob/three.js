@@ -8843,40 +8843,7 @@
 					}
 				}
 			} else if (geometry.isGeometry) {
-				var isMultiMaterial = Array.isArray(material);
-				var vertices = geometry.vertices;
-				var faces = geometry.faces;
-				var uvs;
-				var faceVertexUvs = geometry.faceVertexUvs[0];
-				if (faceVertexUvs.length > 0) uvs = faceVertexUvs;
-
-				for (var f = 0, fl = faces.length; f < fl; f++) {
-					var face = faces[f];
-					var faceMaterial = isMultiMaterial ? material[face.materialIndex] : material;
-					if (faceMaterial === undefined) continue;
-					var fvA = vertices[face.a];
-					var fvB = vertices[face.b];
-					var fvC = vertices[face.c];
-					intersection = checkIntersection(this, faceMaterial, raycaster, _ray, fvA, fvB, fvC, _intersectionPoint);
-
-					if (intersection) {
-						if (uvs && uvs[f]) {
-							var uvs_f = uvs[f];
-
-							_uvA.copy(uvs_f[0]);
-
-							_uvB.copy(uvs_f[1]);
-
-							_uvC.copy(uvs_f[2]);
-
-							intersection.uv = Triangle.getUV(_intersectionPoint, fvA, fvB, fvC, _uvA, _uvB, _uvC, new Vector2());
-						}
-
-						intersection.face = face;
-						intersection.faceIndex = f;
-						intersects.push(intersection);
-					}
-				}
+				console.error('THREE.Mesh.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
 			}
 		}
 	});
@@ -20128,29 +20095,7 @@
 					}
 				}
 			} else if (geometry.isGeometry) {
-				var vertices = geometry.vertices;
-				var nbVertices = vertices.length;
-
-				for (var _i2 = 0; _i2 < nbVertices - 1; _i2 += step) {
-					var _distSq2 = _ray$1.distanceSqToSegment(vertices[_i2], vertices[_i2 + 1], interRay, interSegment);
-
-					if (_distSq2 > localThresholdSq) continue;
-					interRay.applyMatrix4(this.matrixWorld); //Move back to world space for distance calculation
-
-					var _distance2 = raycaster.ray.origin.distanceTo(interRay);
-
-					if (_distance2 < raycaster.near || _distance2 > raycaster.far) continue;
-					intersects.push({
-						distance: _distance2,
-						// What do we want? intersection point on the ray or on the segment??
-						// point: raycaster.ray.at( distance ),
-						point: interSegment.clone().applyMatrix4(this.matrixWorld),
-						index: _i2,
-						face: null,
-						faceIndex: null,
-						object: this
-					});
-				}
+				console.error('THREE.Line.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
 			}
 		},
 		updateMorphTargets: function updateMorphTargets() {
@@ -20354,11 +20299,7 @@
 					}
 				}
 			} else {
-				var vertices = geometry.vertices;
-
-				for (var _i2 = 0, _l = vertices.length; _i2 < _l; _i2++) {
-					testPoint(vertices[_i2], _i2, localThresholdSq, matrixWorld, raycaster, intersects, this);
-				}
+				console.error('THREE.Points.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
 			}
 		},
 		updateMorphTargets: function updateMorphTargets() {

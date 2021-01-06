@@ -11310,48 +11310,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		} else if ( geometry.isGeometry ) {
 
-			const isMultiMaterial = Array.isArray( material );
-
-			const vertices = geometry.vertices;
-			const faces = geometry.faces;
-			let uvs;
-
-			const faceVertexUvs = geometry.faceVertexUvs[ 0 ];
-			if ( faceVertexUvs.length > 0 ) uvs = faceVertexUvs;
-
-			for ( let f = 0, fl = faces.length; f < fl; f ++ ) {
-
-				const face = faces[ f ];
-				const faceMaterial = isMultiMaterial ? material[ face.materialIndex ] : material;
-
-				if ( faceMaterial === undefined ) continue;
-
-				const fvA = vertices[ face.a ];
-				const fvB = vertices[ face.b ];
-				const fvC = vertices[ face.c ];
-
-				intersection = checkIntersection( this, faceMaterial, raycaster, _ray, fvA, fvB, fvC, _intersectionPoint );
-
-				if ( intersection ) {
-
-					if ( uvs && uvs[ f ] ) {
-
-						const uvs_f = uvs[ f ];
-						_uvA.copy( uvs_f[ 0 ] );
-						_uvB.copy( uvs_f[ 1 ] );
-						_uvC.copy( uvs_f[ 2 ] );
-
-						intersection.uv = Triangle.getUV( _intersectionPoint, fvA, fvB, fvC, _uvA, _uvB, _uvC, new Vector2() );
-
-					}
-
-					intersection.face = face;
-					intersection.faceIndex = f;
-					intersects.push( intersection );
-
-				}
-
-			}
+			console.error( 'THREE.Mesh.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 		}
 
@@ -27026,35 +26985,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		} else if ( geometry.isGeometry ) {
 
-			const vertices = geometry.vertices;
-			const nbVertices = vertices.length;
-
-			for ( let i = 0; i < nbVertices - 1; i += step ) {
-
-				const distSq = _ray$1.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
-
-				if ( distSq > localThresholdSq ) continue;
-
-				interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
-
-				const distance = raycaster.ray.origin.distanceTo( interRay );
-
-				if ( distance < raycaster.near || distance > raycaster.far ) continue;
-
-				intersects.push( {
-
-					distance: distance,
-					// What do we want? intersection point on the ray or on the segment??
-					// point: raycaster.ray.at( distance ),
-					point: interSegment.clone().applyMatrix4( this.matrixWorld ),
-					index: i,
-					face: null,
-					faceIndex: null,
-					object: this
-
-				} );
-
-			}
+			console.error( 'THREE.Line.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 		}
 
@@ -27335,13 +27266,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		} else {
 
-			const vertices = geometry.vertices;
-
-			for ( let i = 0, l = vertices.length; i < l; i ++ ) {
-
-				testPoint( vertices[ i ], i, localThresholdSq, matrixWorld, raycaster, intersects, this );
-
-			}
+			console.error( 'THREE.Points.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 		}
 
