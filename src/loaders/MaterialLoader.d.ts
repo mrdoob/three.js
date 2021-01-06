@@ -21,4 +21,6 @@ export class MaterialLoader extends Loader {
 	setTextures( textures: { [key: string]: Texture } ): this;
 	parse( json: any ): Material;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Material>;
+
 }

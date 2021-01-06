@@ -16,4 +16,6 @@ export class OBJLoader extends Loader {
 	parse( data: string ) : Group;
 	setMaterials( materials: MTLLoader.MaterialCreator ) : this;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Group>;
+
 }

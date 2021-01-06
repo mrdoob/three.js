@@ -25,4 +25,6 @@ export class LUT3dlLoader extends Loader {
 	);
 	parse( data: string ): LUT3dlResult;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<LUT3dlResult>;
+
 }

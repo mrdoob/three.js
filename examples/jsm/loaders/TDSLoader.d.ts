@@ -21,6 +21,8 @@ export class TDSLoader extends Loader {
 	load( url: string, onLoad: ( object: Group ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
 	parse( arraybuffer: ArrayBuffer, path: string ): Group;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Group>;
+
 	debugMessage( message: object ): void;
 	endChunk( chunk: object ): void;
 	nextChunk( data: DataView, chunk: object ): void;

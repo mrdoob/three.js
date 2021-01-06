@@ -12,4 +12,6 @@ export class LottieLoader extends Loader {
 
 	setQuality( value: Number ) : void;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<CanvasTexture>;
+
 }

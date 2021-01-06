@@ -13,4 +13,6 @@ export class DataTextureLoader extends Loader {
 		onError?: ( event: ErrorEvent ) => void
 	): void;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<DataTexture>;
+
 }

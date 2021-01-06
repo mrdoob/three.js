@@ -11,4 +11,6 @@ export class MD2Loader extends Loader {
 	load( url: string, onLoad: ( geometry: BufferGeometry ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
 	parse( data: ArrayBuffer ): BufferGeometry;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<BufferGeometry>;
+
 }

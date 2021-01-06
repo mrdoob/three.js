@@ -15,4 +15,6 @@ export class VRMLoader extends Loader {
 	parse( gltf: GLTF, onLoad: ( scene: GLTF ) => void ): void;
 	setDRACOLoader( dracoLoader: DRACOLoader ): this;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<GLTF>;
+
 }

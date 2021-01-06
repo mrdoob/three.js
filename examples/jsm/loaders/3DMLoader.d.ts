@@ -14,4 +14,6 @@ export class Rhino3dmLoader extends Loader {
 	setWorkerLimit( workerLimit: number ): Rhino3dmLoader;
 	dispose(): Rhino3dmLoader;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Object3D>;
+
 }

@@ -11,4 +11,6 @@ export class VRMLLoader extends Loader {
 	load( url: string, onLoad: ( scene: Scene ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
 	parse( data: string, path: string ) : Scene;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Scene>;
+
 }

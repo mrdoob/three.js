@@ -26,4 +26,6 @@ export class LWOLoader extends Loader {
 	load( url: string, onLoad: ( lwo: LWO ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
 	parse( data: ArrayBuffer, path: string, modelName: string ): LWO;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<LWO>;
+
 }
