@@ -1,6 +1,6 @@
-Title: Three.js Custom BufferGeometry
-Description: How to make your own BufferGeometry.
-TOC: Custom BufferGeometry
+Title: Three.jsのカスタムバッファジオメトリ
+Description: カスタムバッファジオメトリを作る
+TOC: カスタムバッファジオメトリ
 
 A [previous article](threejs-custom-geometry.html) covered
 how to use `Geometry`. This article is about `BufferGeometry`.
