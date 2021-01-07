@@ -37,7 +37,7 @@ class OperatorNode extends Node {
 		const a = this.a.build( builder, type );
 		const b = this.b.build( builder, type );
 
-		return builder.format( '( ' + a + ' ' + this.op + ' ' + b + ' )', type, output );
+		return builder.format( `( ${a} ${this.op} ${b} )`, type, output );
 
 	}
 
