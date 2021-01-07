@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { PropertyBinding } from '../../../../src/animation/PropertyBinding';
-import { BoxBufferGeometry } from '../../../../src/geometries/BoxGeometry';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
 import { Mesh } from '../../../../src/objects/Mesh';
 import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial';
 
