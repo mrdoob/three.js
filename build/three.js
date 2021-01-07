@@ -18393,7 +18393,11 @@
 			var parameters = programCache.getParameters(material, lights.state, shadowsArray, scene, object);
 			var programCacheKey = programCache.getProgramCacheKey(parameters);
 			var program = materialProperties.program;
-			var programChange = true;
+			var programChange = true; // always update environment and fog - changing these trigger an initMaterial call, but it's possible that the program doesn't change
+
+			materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
+			materialProperties.fog = scene.fog;
+			materialProperties.envMap = cubemaps.get(material.envMap || materialProperties.environment);
 
 			if (program === undefined) {
 				// new material
@@ -18404,9 +18408,7 @@
 			} else if (materialProperties.lightsStateVersion !== lightsStateVersion) {
 				programChange = false;
 			} else if (parameters.shaderID !== undefined) {
-				// same glsl and uniform list, envMap still needs the update here to avoid a frame-late effect
-				var environment = material.isMeshStandardMaterial ? scene.environment : null;
-				materialProperties.envMap = cubemaps.get(material.envMap || environment);
+				// same glsl and uniform list
 				return;
 			} else {
 				// only rebuild uniform list
@@ -18428,11 +18430,8 @@
 				materialProperties.numClippingPlanes = clipping.numPlanes;
 				materialProperties.numIntersection = clipping.numIntersection;
 				uniforms.clippingPlanes = clipping.uniform;
-			}
+			} // store the light setup it was created for
 
-			materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
-			materialProperties.fog = scene.fog;
-			materialProperties.envMap = cubemaps.get(material.envMap || materialProperties.environment); // store the light setup it was created for
 
 			materialProperties.needsLights = materialNeedsLights(material);
 			materialProperties.lightsStateVersion = lightsStateVersion;
