@@ -1,8 +1,10 @@
 class Node {
 
-	constructor( type ) {
+	constructor( type = null ) {
 
 		this.type = type;
+
+		//this.onBeforeUpdate = function ( /*object, scene, camera, geometry, material, group*/ ) {};
 
 		Object.defineProperty( this, 'isNode', { value: true } );
 
@@ -21,6 +23,8 @@ class Node {
 	}
 
 	build( builder, output ) {
+
+		builder.addNode( this );
 
 		return this.generate( builder, output );
 

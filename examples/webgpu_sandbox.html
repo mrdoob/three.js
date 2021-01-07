@@ -21,9 +21,14 @@
 
 			import FloatNode from './jsm/renderers/nodes/inputs/FloatNode.js';
 			import Vector3Node from './jsm/renderers/nodes/inputs/Vector3Node.js';
+			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
+			import UVNode from './jsm/renderers/nodes/accessors/UVNode.js';
 			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
+			import TimerNode from './jsm/renderers/nodes/utils/TimerNode.js';
 
 			let camera, scene, renderer;
+			
+			let timerNode;
 
 			let box;
 
@@ -49,13 +54,23 @@
 
 				const textureLoader = new THREE.TextureLoader();
 				const texture = textureLoader.load( './textures/uv_grid_opengl.jpg' );
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
 
 				const geometryBox = new THREE.BoxBufferGeometry();
 				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
 
-				materialBox.colorNode = new OperatorNode( '+', new FloatNode( .5 ).setConst( true ), new Vector3Node( new THREE.Vector3( 0, 0, 1 ) ) );
-				materialBox.opacityNode = new FloatNode( .5 );
-				//materialBox.transparent = true;
+				timerNode = new TimerNode();
+				
+				const timerScaleNode = new OperatorNode( '*', timerNode, new FloatNode( .5 ).setConst( true ) );
+				const animateUV = new OperatorNode( '+', new UVNode(), timerScaleNode );
+
+				//materialBox.colorNode = new OperatorNode( '+', new FloatNode( .5 ).setConst( true ), new Vector3Node( new THREE.Vector3( 0, 0, 1 ) ) );
+				materialBox.colorNode = new OperatorNode( '+', new TextureNode( texture, animateUV ), new Vector3Node( new THREE.Vector3( 0, 0, 1 ) ) );
+				//materialBox.colorNode = new Vector3Node( new THREE.Vector3( 1, 1, 1 ) );
+				//materialBox.colorNode = new TextureNode( texture );
+				//materialBox.opacityNode = timerNode;
+				materialBox.transparent = true;
 
 				box = new THREE.Mesh( geometryBox, materialBox );
 				box.position.set( 0, 1, 0 );
@@ -68,7 +83,7 @@
 
 				const plane = new THREE.Mesh( geometryPlane, materialPlane );
 				plane.position.set( 0, - 1, 0 );
-				scene.add( plane );
+				//scene.add( plane );
 
 				// compressed texture
 
@@ -79,7 +94,7 @@
 
 				const boxCompressed = new THREE.Mesh( geometryBox, materialCompressed );
 				boxCompressed.position.set( - 2, 1, 0 );
-				scene.add( boxCompressed );
+				//scene.add( boxCompressed );
 
 				// points
 
@@ -99,7 +114,7 @@
 
 				const pointCloud = new THREE.Points( geometryPoints, materialPoints );
 				pointCloud.position.set( 2, - 1, 0 );
-				scene.add( pointCloud );
+				//scene.add( pointCloud );
 
 				// lines
 
@@ -112,7 +127,7 @@
 				const materialLine = new THREE.LineBasicMaterial();
 				const line = new THREE.Line( geometryLine, materialLine );
 				line.position.set( 2, 1, 0 );
-				scene.add( line );
+				//scene.add( line );
 
 				//
 
@@ -139,6 +154,8 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				timerNode.update();
 
 				box.rotation.x += 0.01;
 				box.rotation.y += 0.02;

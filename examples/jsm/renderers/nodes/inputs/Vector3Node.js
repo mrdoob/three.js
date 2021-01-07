@@ -10,12 +10,6 @@ class Vector3Node extends InputNode {
 
 	}
 
-	generateConst( builder ) {
-
-		return builder.generateVec3( this.value.x, this.value.y, this.value.z );
-
-	}
-
 }
 
 export default Vector3Node;

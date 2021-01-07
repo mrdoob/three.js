@@ -26,9 +26,9 @@ class InputNode extends Node {
 
 	}
 
-	generateConst( /*builder*/ ) {
+	generateConst( builder ) {
 
-		console.warn( "Abstract function" );
+		return builder.getConst( this.getType( builder ), this.value );
 
 	}
 
@@ -43,9 +43,9 @@ class InputNode extends Node {
 		} else {
 
 			const nodeUniform = builder.getUniformFromNode( this, builder.shaderStage, this.getType( builder ) );
-			const nsName = builder.getUniformNSName( nodeUniform );
+			const propertyName = builder.getPropertyName( nodeUniform );
 
-			return builder.format( nsName, type, output );
+			return builder.format( propertyName, type, output );
 
 		}
 

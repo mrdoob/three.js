@@ -127,7 +127,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		let updated = false;
 
 		const a = this.array;
-		const v = uniform.value;
+		const v = uniform.getValue();
 		const offset = uniform.offset;
 
 		if ( a[ offset ] !== v ) {

@@ -23,6 +23,7 @@ class WebGPURenderPipelines {
 		this.glslang = glslang;
 		this.sampleCount = sampleCount;
 
+		this.nodes = new WeakMap();
 		this.bindings = new WeakMap();
 
 		this.pipelines = new WeakMap();
@@ -85,7 +86,9 @@ class WebGPURenderPipelines {
 
 			shader = nodeBuilder.parse( shader.vertexShader, shader.fragmentShader );
 
-			this.bindings.set( object, nodeBuilder.getBindings() );
+			this.nodes.set( material, nodeBuilder.nodes );
+
+			this.bindings.set( object, nodeBuilder.getBindings( 'fragment' ) );
 
 			// shader modules
 
@@ -109,7 +112,7 @@ class WebGPURenderPipelines {
 			let moduleFragment = this.shaderModules.fragment.get( shader );
 
 			if ( moduleFragment === undefined ) {
-
+console.log( shader.fragmentShader );
 				const byteCodeFragment = glslang.compileGLSL( shader.fragmentShader, 'fragment' );
 
 				moduleFragment = {
@@ -225,6 +228,12 @@ class WebGPURenderPipelines {
 		}
 
 		return pipeline;
+
+	}
+
+	getNodes( material ) {
+
+		return this.nodes.get( material );
 
 	}
 

@@ -19,20 +19,34 @@ class WebGPUUniform {
 		this.value = value;
 
 	}
+	
+	getValue() {
+		
+		return this.value;
+		
+	}
 
 }
 
 class FloatUniform extends WebGPUUniform {
 
-	constructor( name, value = 0 ) {
+	constructor( nodeUniform ) {
 
-		super( name, value );
+		super( nodeUniform.name, nodeUniform.value );
+
+		this.nodeUniform = nodeUniform;
 
 		this.boundary = 4;
 		this.itemSize = 1;
 
 		Object.defineProperty( this, 'isFloatUniform', { value: true } );
 
+	}
+	
+	getValue() {
+		
+		return this.nodeUniform.value;
+		
 	}
 
 }

@@ -39,7 +39,7 @@ class WebGPUBindings {
 
 			if ( material.isMeshBasicMaterial ) {
 
-				bindings = this._getMeshBasicBindings();
+				bindings = this._getMeshBasicBindings( object );
 
 			} else if ( material.isPointsMaterial ) {
 
@@ -57,7 +57,7 @@ class WebGPUBindings {
 
 			// append node bindings
 
-			bindings = bindings.concat( this.pipelines.getBindings( object ) );
+//			bindings = bindings.concat( this.pipelines.getBindings( object ) );
 
 			// setup (static) binding layout and (dynamic) binding group
 
@@ -155,39 +155,31 @@ class WebGPUBindings {
 			} else if ( binding.isSampler ) {
 
 				const material = object.material;
-				const texture = material[ binding.name ];
+				const texture = binding.texture;
 
-				if ( texture !== null ) {
+				textures.updateSampler( texture );
 
-					textures.updateSampler( texture );
+				const samplerGPU = textures.getSampler( texture );
 
-					const samplerGPU = textures.getSampler( texture );
+				if ( binding.samplerGPU !== samplerGPU ) {
 
-					if ( binding.samplerGPU !== samplerGPU ) {
-
-						binding.samplerGPU = samplerGPU;
-						needsBindGroupRefresh = true;
-
-					}
+					binding.samplerGPU = samplerGPU;
+					needsBindGroupRefresh = true;
 
 				}
 
 			} else if ( binding.isSampledTexture ) {
 
 				const material = object.material;
-				const texture = material[ binding.name ];
+				const texture = binding.texture;
 
-				if ( texture !== null ) {
+				const forceUpdate = textures.updateTexture( texture );
+				const textureGPU = textures.getTextureGPU( texture );
 
-					const forceUpdate = textures.updateTexture( texture );
-					const textureGPU = textures.getTextureGPU( texture );
+				if ( binding.textureGPU !== textureGPU || forceUpdate === true ) {
 
-					if ( binding.textureGPU !== textureGPU || forceUpdate === true ) {
-
-						binding.textureGPU = textureGPU;
-						needsBindGroupRefresh = true;
-
-					}
+					binding.textureGPU = textureGPU;
+					needsBindGroupRefresh = true;
 
 				}
 
@@ -288,9 +280,9 @@ class WebGPUBindings {
 
 	}
 
-	_getMeshBasicBindings() {
+	_getMeshBasicBindings( object ) {
 
-		const bindings = [];
+		let bindings = [];
 
 		// UBOs
 
@@ -332,21 +324,13 @@ class WebGPUBindings {
 
 		} );
 
-		// sampler
-
-		const diffuseSampler = new WebGPUSampler( 'map' );
-
-		// texture
-
-		const diffuseTexture = new WebGPUSampledTexture( 'map' );
-
 		// the order of WebGPUBinding objects must match the binding order in the shader
 
 		bindings.push( modelGroup );
 		bindings.push( cameraGroup );
-		bindings.push( opacityGroup );
-		bindings.push( diffuseSampler );
-		bindings.push( diffuseTexture );
+		bindings = bindings.concat( this.pipelines.getBindings( object ) );
+		//bindings.push( diffuseSampler );
+		//bindings.push( diffuseTexture );
 
 		return bindings;
 

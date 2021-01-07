@@ -1,5 +1,7 @@
 import WebGPUUniformsGroup from './WebGPUUniformsGroup.js';
 import { FloatUniform, Vector3Uniform } from './WebGPUUniform.js';
+import WebGPUSampler from './WebGPUSampler.js';
+import { WebGPUSampledTexture } from './WebGPUSampledTexture.js';
 
 import NodeSlot from '../nodes/core/NodeSlot.js';
 import NodeBuilder from '../nodes/core/NodeBuilder.js';
@@ -36,6 +38,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		super( material, renderer );
 
+		this.bindingIndex = 2;
+		this.bindings = { vertex: [], fragment: [] };
+
 		this.uniformsGroup = {};
 
 		this._parseMaterial();
@@ -64,23 +69,29 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getUniformNSName( nodeUniform ) {
+	getTexture( textureSnippet, uvSnippet ) {
+		
+		return `texture( sampler2D( ${textureSnippet}, ${textureSnippet}_sampler ), ${uvSnippet} )`;
+		
+	}
 
-		return `nodeUniforms.${nodeUniform.name}`;
+	getPropertyName( nodeUniform ) {
+
+		if ( nodeUniform.type === 'texture' ) {
+
+			return nodeUniform.name;
+			
+		} else {
+			
+			return `nodeUniforms.${nodeUniform.name}`;
+			
+		}
 
 	}
 
-	getBindings() {
+	getBindings( shaderStage ) {
 
-		const bindings = [];
-
-		const uniformsVertexGroup = this.uniformsGroup[ 'vertex' ];
-		const uniformsFragmentGroup = this.uniformsGroup[ 'fragment' ];
-
-		if ( uniformsVertexGroup ) bindings.push( uniformsVertexGroup );
-		if ( uniformsFragmentGroup ) bindings.push( uniformsFragmentGroup );
-
-		return bindings;
+		return this.bindings[ shaderStage ];
 
 	}
 
@@ -91,40 +102,99 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		if ( nodeData.webgpuUniform === undefined ) {
 
-			let uniformsGroup = this.uniformsGroup[ shaderStage ];
-
-			if ( uniformsGroup === undefined ) {
-
-				uniformsGroup = new WebGPUNodeUniformsGroup( shaderStage );
-
-				this.uniformsGroup[ shaderStage ] = uniformsGroup;
-
-			}
-
 			let uniform;
 
-			if ( type === 'float' ) {
-
-				uniform = new FloatUniform( uniformNode.name, uniformNode.value );
-
-			} else if ( type === 'vec3' ) {
-
-				uniform = new Vector3Uniform( uniformNode.name, uniformNode.value );
-
+			if ( type === 'texture' ) {
+				
+				const sampler = new WebGPUSampler( `${uniformNode.name}_sampler`, uniformNode.value );
+				const texture = new WebGPUSampledTexture( uniformNode.name, uniformNode.value );
+				
+				// Array.unshift: add first textures in sequence
+				
+				this.bindings[ shaderStage ].unshift( sampler, texture );
+				
 			} else {
 
-				console.error( `Uniform "${type}" not declared.` );
+				let uniformsGroup = this.uniformsGroup[ shaderStage ];
+
+				if ( uniformsGroup === undefined ) {
+
+					uniformsGroup = new WebGPUNodeUniformsGroup( shaderStage );
+
+					this.uniformsGroup[ shaderStage ] = uniformsGroup;
+
+					this.bindings[ shaderStage ].push( uniformsGroup );
+
+				}
+
+				if ( type === 'float' ) {
+
+					uniform = new FloatUniform( uniformNode );
+
+				} else if ( type === 'vec3' ) {
+
+					uniform = new Vector3Uniform( uniformNode.name, uniformNode.value );
+
+				} else {
+
+					throw new Error( `Uniform "${type}" not declared.` );
+
+				}
+
+				uniformsGroup.addUniform( uniform );
 
 			}
-
-			uniformsGroup.addUniform( uniform );
-
+			
 			nodeData.webgpuUniform = uniform;
 
 		}
 
 		return uniformNode;
 
+	}
+
+	getUniformsOutput( shaderStage ) {
+		
+		const uniforms = this.uniforms[ shaderStage ];
+		
+		let uniformsCode = '';
+		let uniformGroupCode = '';
+		
+		let bindingIndex = this.bindingIndex;
+
+		for ( let uniform of uniforms ) {
+
+			if (uniform.type === 'texture') {
+
+				uniformsCode += `layout(set = 0, binding = ${bindingIndex++}) uniform sampler ${uniform.name}_sampler;`;
+				uniformsCode += `layout(set = 0, binding = ${bindingIndex++}) uniform texture2D ${uniform.name};`;
+
+			} else {
+		
+				if (!uniformGroupCode) {
+					
+					uniformGroupCode = `layout(set = 0, binding = ${bindingIndex++}) uniform NodeUniforms {`;
+					
+				}
+				
+				uniformGroupCode += `uniform ${uniform.type} ${uniform.name};`;
+				
+			}
+
+		}
+		
+		if (uniformGroupCode) {
+			
+			uniformGroupCode += `} nodeUniforms;`;
+			
+			uniformsCode += uniformGroupCode;
+			
+		}
+		
+		console.log( uniformsCode );
+		
+		return uniformsCode;
+		
 	}
 
 	buildShader( shaderStage, code ) {

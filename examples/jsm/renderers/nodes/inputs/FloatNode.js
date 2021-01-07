@@ -2,17 +2,11 @@ import InputNode from '../core/InputNode.js';
 
 class FloatNode extends InputNode {
 
-	constructor( value ) {
+	constructor( value = 0 ) {
 
 		super( 'float' );
 
 		this.value = value;
-
-	}
-
-	generateConst( builder ) {
-
-		return builder.generateFloat( this.value );
 
 	}
 

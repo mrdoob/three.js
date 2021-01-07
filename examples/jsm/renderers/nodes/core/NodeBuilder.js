@@ -9,6 +9,8 @@ class NodeBuilder {
 		this.material = material;
 		this.renderer = renderer;
 
+		this.nodes = [];
+
 		this.slots = { vertex: [], fragment: [] };
 		this.defines = { vertex: {}, fragment: {} };
 		this.uniforms = { vertex: [], fragment: [] };
@@ -19,43 +21,51 @@ class NodeBuilder {
 
 	}
 
-	addSlot( shader, slot ) {
+	addNode( node ) {
+		
+		if ( this.nodes.indexOf( node ) === -1 ) {
+			
+			this.nodes.push( node );
+			
+		}
+		
+	}
 
-		this.slots[ shader ].push( slot );
+	addSlot( shaderStage, slot ) {
+
+		this.slots[ shaderStage ].push( slot );
 
 	}
 
-	define( shader, name, value = '' ) {
+	define( shaderStage, name, value = '' ) {
 
-		this.defines[ shader ][ name ] = value;
-
-	}
-
-	generateVec2( x, y ) {
-
-		return `vec2( ${x}, ${y})`;
+		this.defines[ shaderStage ][ name ] = value;
 
 	}
 
-	generateVec3( x, y, z ) {
-
-		return `vec3( ${x}, ${y}, ${z} )`;
-
+	getTexture( textureSnippet, uvSnippet ) {
+		
+		
+		
 	}
 
-	generateVec4( x, y, z, w ) {
-
-		return `vec4( ${x}, ${y}, ${z}, ${w} )`;
-
+	getConst( type, value ) {
+		
+		if ( type === 'float' ) return value + ( value % 1 ? '' : '.0' );
+		if ( type === 'vec2' ) return `vec2( ${value.x}, ${value.y} )`;
+		if ( type === 'vec3' ) return `vec3( ${value.x}, ${value.y}, ${value.z} )`;
+		if ( type === 'vec4' ) return `vec4( ${value.x}, ${value.y}, ${value.z}, ${value.w} )`;
+		
+	}
+	
+	getUV( /*index*/ ) {
+		
+		// uv1 only for now
+		return 'vUv';
+		
 	}
 
-	generateFloat( value ) {
-
-		return value + ( value % 1 ? '' : '.0' );
-
-	}
-
-	getUniformNSName( nodeUniform ) {
+	getPropertyName( nodeUniform ) {
 
 		return nodeUniform.name;
 
@@ -127,7 +137,7 @@ class NodeBuilder {
 
 	}
 
-	buildDefines( shader ) {
+	_buildDefines( shader ) {
 
 		const defines = this.defines[ shader ];
 
@@ -143,13 +153,30 @@ class NodeBuilder {
 
 	}
 
+	getUniformsOutput( shaderStage ) {
+		
+		const uniforms = this.uniforms[ shaderStage ];
+		
+		let uniformsCode = '';
+
+		for ( let i = 0; i < uniforms.length; i ++ ) {
+
+			let uniform = uniforms[ i ];
+
+			uniformsCode += `${uniform.type} ${uniform.name}; `;
+
+		}
+		
+		return uniformsCode;
+		
+	}
+
 	build( shaderStage ) {
 
 		this.shaderStage = shaderStage;
 
 		const slots = this.slots[ shaderStage ];
-		const uniforms = this.uniforms[ shaderStage ];
-
+		
 		if ( slots.length ) {
 
 			this.define( shaderStage, 'NODE', VERSION );
@@ -164,41 +191,54 @@ class NodeBuilder {
 
 			}
 
-			let uniformsCode = '';
-
-			for ( let i = 0; i < uniforms.length; i ++ ) {
-
-				let uniform = uniforms[ i ];
-
-				uniformsCode += `${uniform.type} ${uniform.name}; `;
-
-			}
-
-			this.define( shaderStage, 'NODE_UNIFORMS', uniformsCode );
+			this.define( shaderStage, 'NODE_UNIFORMS', this.getUniformsOutput( shaderStage ) );
 
 		}
 
-		let defines = this.buildDefines( shaderStage );
+		let defines = this._buildDefines( shaderStage );
 
 		return {
 			defines
 		};
 
 	}
+	
+	getVectorType( type ) {
+		
+		if ( type === 'texture' ) return 'vec4';
+		
+		return type;
+		
+	}
+	
+	format( snippet, fromType, toType ) {
 
-	format( code, fromType, toType ) {
+		fromType = this.getVectorType( fromType );
+		toType = this.getVectorType( toType );
 
-		const typeToType = `${fromType} -> ${toType}`;
+		const typeToType = `${fromType} to ${toType}`;
 
 		switch ( typeToType ) {
 
-			case 'float -> vec3' : return `vec3( ${code} )`;
+			case 'float to vec2' : return `vec2( ${snippet} )`;
+			case 'float to vec3' : return `vec3( ${snippet} )`;
+			case 'float to vec4' : return `vec4( vec3( ${snippet} ), 1.0 )`;
 
-			case 'vec3 -> float' : return `${code}.x`;
+			case 'vec2 to float' : return `${snippet}.x`;
+			case 'vec2 to vec3' : return `vec3( ${snippet}.x, ${snippet}.y, 0.0 )`;
+			case 'vec2 to vec4' : return `vec4( ${snippet}.x, ${snippet}.y, 0.0, 1.0 )`;
+
+			case 'vec3 to float' : return `${snippet}.x`;
+			case 'vec3 to vec2' : return `${snippet}.xy`;
+			case 'vec3 to vec4' : return `vec4( ${snippet}.x, ${snippet}.y, ${snippet}.z, 1.0 )`;
+			
+			case 'vec4 to float' : return `${snippet}.x`;
+			case 'vec4 to vec2' : return `${snippet}.xy`;
+			case 'vec4 to vec3' : return `${snippet}.xyz`;
 
 		}
 
-		return code;
+		return snippet;
 
 	}
 
