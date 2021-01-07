@@ -37,6 +37,8 @@ TextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
+			texture.dispatchEvent( { type: 'load' } );
+
 		}, onProgress, onError );
 
 		return texture;
