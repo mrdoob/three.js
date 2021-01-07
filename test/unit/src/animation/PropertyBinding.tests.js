@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { PropertyBinding } from '../../../../src/animation/PropertyBinding';
-import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
 import { Mesh } from '../../../../src/objects/Mesh';
 import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial';
 
@@ -331,7 +331,7 @@ export default QUnit.module( 'Animation', () => {
 				var originalValue = 0;
 				var expectedValue = 1;
 
-				var geometry = new BoxGeometry();
+				var geometry = new BoxBufferGeometry();
 				var material = new MeshBasicMaterial();
 				material.opacity = originalValue;
 				var mesh = new Mesh( geometry, material );

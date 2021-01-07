@@ -2,8 +2,8 @@
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
 import { BoxHelper } from '../../../../src/helpers/BoxHelper';
-import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
-import { SphereGeometry } from '../../../../src/geometries/SphereGeometry';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
+import { SphereBufferGeometry } from '../../../../src/geometries/SphereBufferGeometry';
 import { Mesh } from '../../../../src/objects/Mesh';
 
 export default QUnit.module( 'Helpers', () => {
@@ -14,12 +14,12 @@ export default QUnit.module( 'Helpers', () => {
 		hooks.beforeEach( function () {
 
 			// Test with a normal cube and a box helper
-			var boxGeometry = new BoxGeometry();
+			var boxGeometry = new BoxBufferGeometry();
 			var box = new Mesh( boxGeometry );
 			var boxHelper = new BoxHelper( box );
 
 			// The same should happen with a comparable sphere
-			var sphereGeometry = new SphereGeometry();
+			var sphereGeometry = new SphereBufferGeometry();
 			var sphere = new Mesh( sphereGeometry );
 			var sphereBoxHelper = new BoxHelper( sphere );
 

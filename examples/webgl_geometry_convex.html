@@ -16,6 +16,7 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { ConvexBufferGeometry } from './jsm/geometries/ConvexGeometry.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			let group, camera, scene, renderer;
 
@@ -43,13 +44,13 @@
 				controls.minDistance = 20;
 				controls.maxDistance = 50;
 				controls.maxPolarAngle = Math.PI / 2;
-				
+
 				// ambient light
-				
+
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
-				
+
 				// point light
-				
+
 				const light = new THREE.PointLight( 0xffffff, 1 );
 				camera.add( light );
 
@@ -67,11 +68,23 @@
 
 				// points
 
-				const vertices = new THREE.DodecahedronGeometry( 10 ).vertices;
+				let dodecahedronGeometry = new THREE.DodecahedronBufferGeometry( 10 );
 
-				for ( let i = 0; i < vertices.length; i ++ ) {
+				// if normal and uv attributes are not removed, mergeVertices() can't consolidate indentical vertices with different normal/uv data
 
-					//vertices[ i ].add( randomPoint().multiplyScalar( 2 ) ); // wiggle the points
+				dodecahedronGeometry.deleteAttribute( 'normal' );
+				dodecahedronGeometry.deleteAttribute( 'uv' );
+
+				dodecahedronGeometry = BufferGeometryUtils.mergeVertices( dodecahedronGeometry );
+
+				const vertices = [];
+				const positionAttribute = dodecahedronGeometry.getAttribute( 'position' );
+
+				for ( let i = 0; i < positionAttribute.count; i ++ ) {
+
+					const vertex = new THREE.Vector3();
+					vertex.fromBufferAttribute( positionAttribute, i );
+					vertices.push( vertex );
 
 				}
 
