@@ -9,7 +9,7 @@ import { Matrix3 } from '../math/Matrix3.js';
 import { MathUtils } from '../math/MathUtils.js';
 import { arrayMax } from '../utils.js';
 
-let _bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
+let _id = 0;
 
 const _m1 = new Matrix4();
 const _obj = new Object3D();
@@ -20,7 +20,7 @@ const _vector = new Vector3();
 
 function BufferGeometry() {
 
-	Object.defineProperty( this, 'id', { value: _bufferGeometryId += 2 } );
+	Object.defineProperty( this, 'id', { value: _id ++ } );
 
 	this.uuid = MathUtils.generateUUID();
 
