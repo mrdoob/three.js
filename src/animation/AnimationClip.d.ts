@@ -1,7 +1,11 @@
 import { KeyframeTrack } from './KeyframeTrack';
 import { Bone } from './../objects/Bone';
-import { MorphTarget } from '../core/Geometry';
 import { AnimationBlendMode } from '../constants';
+
+interface MorphTarget {
+	name: string;
+	vertices: Vector3[];
+}
 
 export class AnimationClip {
 
