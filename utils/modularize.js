@@ -44,7 +44,7 @@ var files = [
 
 	{ path: 'geometries/BoxLineGeometry.js', dependencies: [], ignoreList: [] },
 	{ path: 'geometries/ConvexGeometry.js', dependencies: [ { name: 'ConvexHull', path: 'math/ConvexHull.js' } ], ignoreList: [] },
-	{ path: 'geometries/DecalGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/DecalGeometry.js', dependencies: [], ignoreList: [ 'Geometry' ] },
 	{ path: 'geometries/LightningStrike.js', dependencies: [ { name: 'SimplexNoise', path: 'math/SimplexNoise.js' } ], ignoreList: [ 'Mesh' ] },
 	{ path: 'geometries/ParametricGeometries.js', dependencies: [], ignoreList: [] },
 	{ path: 'geometries/TeapotBufferGeometry.js', dependencies: [], ignoreList: [] },

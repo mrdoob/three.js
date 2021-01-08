@@ -19855,6 +19855,7 @@
 		copy: function copy(source) {
 			Mesh.prototype.copy.call(this, source);
 			this.instanceMatrix.copy(source.instanceMatrix);
+			if (source.instanceColor !== null) this.instanceColor = source.instanceColor.clone();
 			this.count = source.count;
 			return this;
 		},
@@ -22097,8 +22098,9 @@
 			};
 			thresholdAngle = thresholdAngle !== undefined ? thresholdAngle : 1;
 
-			if (geometry.isGeometry) {
-				geometry = new BufferGeometry().fromGeometry(geometry);
+			if (geometry.isGeometry === true) {
+				console.error('THREE.EdgesGeometry no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
+				return _assertThisInitialized(_this);
 			}
 
 			var precisionPoints = 4;
@@ -24823,34 +24825,55 @@
 			var _this;
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'WireframeGeometry'; // buffer
+			_this.type = 'WireframeGeometry';
+
+			if (geometry.isGeometry === true) {
+				console.error('THREE.WireframeGeometry no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
+				return _assertThisInitialized(_this);
+			} // buffer
+
 
 			var vertices = []; // helper variables
 
 			var edge = [0, 0],
 					edges = {};
-			var keys = ['a', 'b', 'c']; // different logic for Geometry and BufferGeometry
+			var vertex = new Vector3();
 
-			if (geometry && geometry.isGeometry) {
-				// create a data structure that contains all edges without duplicates
-				var faces = geometry.faces;
+			if (geometry.index !== null) {
+				// indexed BufferGeometry
+				var position = geometry.attributes.position;
+				var indices = geometry.index;
+				var groups = geometry.groups;
 
-				for (var i = 0, l = faces.length; i < l; i++) {
-					var face = faces[i];
+				if (groups.length === 0) {
+					groups = [{
+						start: 0,
+						count: indices.count,
+						materialIndex: 0
+					}];
+				} // create a data structure that contains all eges without duplicates
 
-					for (var j = 0; j < 3; j++) {
-						var edge1 = face[keys[j]];
-						var edge2 = face[keys[(j + 1) % 3]];
-						edge[0] = Math.min(edge1, edge2); // sorting prevents duplicates
 
-						edge[1] = Math.max(edge1, edge2);
-						var key = edge[0] + ',' + edge[1];
+				for (var o = 0, ol = groups.length; o < ol; ++o) {
+					var group = groups[o];
+					var start = group.start;
+					var count = group.count;
 
-						if (edges[key] === undefined) {
-							edges[key] = {
-								index1: edge[0],
-								index2: edge[1]
-							};
+					for (var i = start, l = start + count; i < l; i += 3) {
+						for (var j = 0; j < 3; j++) {
+							var edge1 = indices.getX(i + j);
+							var edge2 = indices.getX(i + (j + 1) % 3);
+							edge[0] = Math.min(edge1, edge2); // sorting prevents duplicates
+
+							edge[1] = Math.max(edge1, edge2);
+							var key = edge[0] + ',' + edge[1];
+
+							if (edges[key] === undefined) {
+								edges[key] = {
+									index1: edge[0],
+									index2: edge[1]
+								};
+							}
 						}
 					}
 				} // generate vertices
@@ -24858,87 +24881,25 @@
 
 				for (var _key in edges) {
 					var e = edges[_key];
-					var vertex = geometry.vertices[e.index1];
+					vertex.fromBufferAttribute(position, e.index1);
 					vertices.push(vertex.x, vertex.y, vertex.z);
-					vertex = geometry.vertices[e.index2];
+					vertex.fromBufferAttribute(position, e.index2);
 					vertices.push(vertex.x, vertex.y, vertex.z);
 				}
-			} else if (geometry && geometry.isBufferGeometry) {
-				var _vertex = new Vector3();
+			} else {
+				// non-indexed BufferGeometry
+				var _position = geometry.attributes.position;
 
-				if (geometry.index !== null) {
-					// indexed BufferGeometry
-					var position = geometry.attributes.position;
-					var indices = geometry.index;
-					var groups = geometry.groups;
-
-					if (groups.length === 0) {
-						groups = [{
-							start: 0,
-							count: indices.count,
-							materialIndex: 0
-						}];
-					} // create a data structure that contains all eges without duplicates
-
-
-					for (var o = 0, ol = groups.length; o < ol; ++o) {
-						var group = groups[o];
-						var start = group.start;
-						var count = group.count;
-
-						for (var _i = start, _l = start + count; _i < _l; _i += 3) {
-							for (var _j = 0; _j < 3; _j++) {
-								var _edge = indices.getX(_i + _j);
-
-								var _edge2 = indices.getX(_i + (_j + 1) % 3);
-
-								edge[0] = Math.min(_edge, _edge2); // sorting prevents duplicates
-
-								edge[1] = Math.max(_edge, _edge2);
-
-								var _key2 = edge[0] + ',' + edge[1];
-
-								if (edges[_key2] === undefined) {
-									edges[_key2] = {
-										index1: edge[0],
-										index2: edge[1]
-									};
-								}
-							}
-						}
-					} // generate vertices
-
-
-					for (var _key3 in edges) {
-						var _e = edges[_key3];
-
-						_vertex.fromBufferAttribute(position, _e.index1);
-
-						vertices.push(_vertex.x, _vertex.y, _vertex.z);
-
-						_vertex.fromBufferAttribute(position, _e.index2);
-
-						vertices.push(_vertex.x, _vertex.y, _vertex.z);
-					}
-				} else {
-					// non-indexed BufferGeometry
-					var _position = geometry.attributes.position;
-
-					for (var _i2 = 0, _l2 = _position.count / 3; _i2 < _l2; _i2++) {
-						for (var _j2 = 0; _j2 < 3; _j2++) {
-							// three edges per triangle, an edge is represented as (index1, index2)
-							// e.g. the first triangle has the following edges: (0,1),(1,2),(2,0)
-							var index1 = 3 * _i2 + _j2;
-
-							_vertex.fromBufferAttribute(_position, index1);
-
-							vertices.push(_vertex.x, _vertex.y, _vertex.z);
-							var index2 = 3 * _i2 + (_j2 + 1) % 3;
-
-							_vertex.fromBufferAttribute(_position, index2);
-
-							vertices.push(_vertex.x, _vertex.y, _vertex.z);
-						}
+				for (var _i = 0, _l = _position.count / 3; _i < _l; _i++) {
+					for (var _j = 0; _j < 3; _j++) {
+						// three edges per triangle, an edge is represented as (index1, index2)
+						// e.g. the first triangle has the following edges: (0,1),(1,2),(2,0)
+						var index1 = 3 * _i + _j;
+						vertex.fromBufferAttribute(_position, index1);
+						vertices.push(vertex.x, vertex.y, vertex.z);
+						var index2 = 3 * _i + (_j + 1) % 3;
+						vertex.fromBufferAttribute(_position, index2);
+						vertices.push(vertex.x, vertex.y, vertex.z);
 					}
 				}
 			} // build geometry

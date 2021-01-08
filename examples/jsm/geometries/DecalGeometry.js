@@ -56,7 +56,7 @@ var DecalGeometry = function ( mesh, position, orientation, size ) {
 	function generate() {
 
 		var i;
-		var geometry = new BufferGeometry();
+
 		var decalVertices = [];
 
 		var vertex = new Vector3();
@@ -64,15 +64,14 @@ var DecalGeometry = function ( mesh, position, orientation, size ) {
 
 		// handle different geometry types
 
-		if ( mesh.geometry.isGeometry ) {
+		if ( mesh.geometry.isGeometry === true ) {
 
-			geometry.fromGeometry( mesh.geometry );
-
-		} else {
-
-			geometry.copy( mesh.geometry );
+			console.error( 'THREE.DecalGeometry no longer supports THREE.Geometry. Use BufferGeometry instead.' );
+			return;
 
 		}
+
+		var geometry = mesh.geometry;
 
 		var positionAttribute = geometry.attributes.position;
 		var normalAttribute = geometry.attributes.normal;
