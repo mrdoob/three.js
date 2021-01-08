@@ -20441,957 +20441,6 @@
 	DepthTexture.prototype.constructor = DepthTexture;
 	DepthTexture.prototype.isDepthTexture = true;
 
-	var _geometryId = 0; // Geometry uses even numbers as Id
-
-	var _m1$3 = new Matrix4();
-
-	var _obj$1 = new Object3D();
-
-	var _offset$1 = new Vector3();
-
-	function Geometry() {
-		Object.defineProperty(this, 'id', {
-			value: _geometryId += 2
-		});
-		this.uuid = MathUtils.generateUUID();
-		this.name = '';
-		this.type = 'Geometry';
-		this.vertices = [];
-		this.colors = [];
-		this.faces = [];
-		this.faceVertexUvs = [[]];
-		this.morphTargets = [];
-		this.morphNormals = [];
-		this.skinWeights = [];
-		this.skinIndices = [];
-		this.lineDistances = [];
-		this.boundingBox = null;
-		this.boundingSphere = null; // update flags
-
-		this.elementsNeedUpdate = false;
-		this.verticesNeedUpdate = false;
-		this.uvsNeedUpdate = false;
-		this.normalsNeedUpdate = false;
-		this.colorsNeedUpdate = false;
-		this.lineDistancesNeedUpdate = false;
-		this.groupsNeedUpdate = false;
-	}
-
-	Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
-		constructor: Geometry,
-		isGeometry: true,
-		applyMatrix4: function applyMatrix4(matrix) {
-			var normalMatrix = new Matrix3().getNormalMatrix(matrix);
-
-			for (var i = 0, il = this.vertices.length; i < il; i++) {
-				var vertex = this.vertices[i];
-				vertex.applyMatrix4(matrix);
-			}
-
-			for (var _i = 0, _il = this.faces.length; _i < _il; _i++) {
-				var face = this.faces[_i];
-				face.normal.applyMatrix3(normalMatrix).normalize();
-
-				for (var j = 0, jl = face.vertexNormals.length; j < jl; j++) {
-					face.vertexNormals[j].applyMatrix3(normalMatrix).normalize();
-				}
-			}
-
-			if (this.boundingBox !== null) {
-				this.computeBoundingBox();
-			}
-
-			if (this.boundingSphere !== null) {
-				this.computeBoundingSphere();
-			}
-
-			this.verticesNeedUpdate = true;
-			this.normalsNeedUpdate = true;
-			return this;
-		},
-		rotateX: function rotateX(angle) {
-			// rotate geometry around world x-axis
-			_m1$3.makeRotationX(angle);
-
-			this.applyMatrix4(_m1$3);
-			return this;
-		},
-		rotateY: function rotateY(angle) {
-			// rotate geometry around world y-axis
-			_m1$3.makeRotationY(angle);
-
-			this.applyMatrix4(_m1$3);
-			return this;
-		},
-		rotateZ: function rotateZ(angle) {
-			// rotate geometry around world z-axis
-			_m1$3.makeRotationZ(angle);
-
-			this.applyMatrix4(_m1$3);
-			return this;
-		},
-		translate: function translate(x, y, z) {
-			// translate geometry
-			_m1$3.makeTranslation(x, y, z);
-
-			this.applyMatrix4(_m1$3);
-			return this;
-		},
-		scale: function scale(x, y, z) {
-			// scale geometry
-			_m1$3.makeScale(x, y, z);
-
-			this.applyMatrix4(_m1$3);
-			return this;
-		},
-		lookAt: function lookAt(vector) {
-			_obj$1.lookAt(vector);
-
-			_obj$1.updateMatrix();
-
-			this.applyMatrix4(_obj$1.matrix);
-			return this;
-		},
-		fromBufferGeometry: function fromBufferGeometry(geometry) {
-			var scope = this;
-			var index = geometry.index !== null ? geometry.index : undefined;
-			var attributes = geometry.attributes;
-
-			if (attributes.position === undefined) {
-				console.error('THREE.Geometry.fromBufferGeometry(): Position attribute required for conversion.');
-				return this;
-			}
-
-			var position = attributes.position;
-			var normal = attributes.normal;
-			var color = attributes.color;
-			var uv = attributes.uv;
-			var uv2 = attributes.uv2;
-			if (uv2 !== undefined) this.faceVertexUvs[1] = [];
-
-			for (var i = 0; i < position.count; i++) {
-				scope.vertices.push(new Vector3().fromBufferAttribute(position, i));
-
-				if (color !== undefined) {
-					scope.colors.push(new Color().fromBufferAttribute(color, i));
-				}
-			}
-
-			function addFace(a, b, c, materialIndex) {
-				var vertexColors = color === undefined ? [] : [scope.colors[a].clone(), scope.colors[b].clone(), scope.colors[c].clone()];
-				var vertexNormals = normal === undefined ? [] : [new Vector3().fromBufferAttribute(normal, a), new Vector3().fromBufferAttribute(normal, b), new Vector3().fromBufferAttribute(normal, c)];
-				var face = new Face3(a, b, c, vertexNormals, vertexColors, materialIndex);
-				scope.faces.push(face);
-
-				if (uv !== undefined) {
-					scope.faceVertexUvs[0].push([new Vector2().fromBufferAttribute(uv, a), new Vector2().fromBufferAttribute(uv, b), new Vector2().fromBufferAttribute(uv, c)]);
-				}
-
-				if (uv2 !== undefined) {
-					scope.faceVertexUvs[1].push([new Vector2().fromBufferAttribute(uv2, a), new Vector2().fromBufferAttribute(uv2, b), new Vector2().fromBufferAttribute(uv2, c)]);
-				}
-			}
-
-			var groups = geometry.groups;
-
-			if (groups.length > 0) {
-				for (var _i2 = 0; _i2 < groups.length; _i2++) {
-					var group = groups[_i2];
-					var start = group.start;
-					var count = group.count;
-
-					for (var j = start, jl = start + count; j < jl; j += 3) {
-						if (index !== undefined) {
-							addFace(index.getX(j), index.getX(j + 1), index.getX(j + 2), group.materialIndex);
-						} else {
-							addFace(j, j + 1, j + 2, group.materialIndex);
-						}
-					}
-				}
-			} else {
-				if (index !== undefined) {
-					for (var _i3 = 0; _i3 < index.count; _i3 += 3) {
-						addFace(index.getX(_i3), index.getX(_i3 + 1), index.getX(_i3 + 2));
-					}
-				} else {
-					for (var _i4 = 0; _i4 < position.count; _i4 += 3) {
-						addFace(_i4, _i4 + 1, _i4 + 2);
-					}
-				}
-			}
-
-			this.computeFaceNormals();
-
-			if (geometry.boundingBox !== null) {
-				this.boundingBox = geometry.boundingBox.clone();
-			}
-
-			if (geometry.boundingSphere !== null) {
-				this.boundingSphere = geometry.boundingSphere.clone();
-			}
-
-			return this;
-		},
-		center: function center() {
-			this.computeBoundingBox();
-			this.boundingBox.getCenter(_offset$1).negate();
-			this.translate(_offset$1.x, _offset$1.y, _offset$1.z);
-			return this;
-		},
-		normalize: function normalize() {
-			this.computeBoundingSphere();
-			var center = this.boundingSphere.center;
-			var radius = this.boundingSphere.radius;
-			var s = radius === 0 ? 1 : 1.0 / radius;
-			var matrix = new Matrix4();
-			matrix.set(s, 0, 0, -s * center.x, 0, s, 0, -s * center.y, 0, 0, s, -s * center.z, 0, 0, 0, 1);
-			this.applyMatrix4(matrix);
-			return this;
-		},
-		computeFaceNormals: function computeFaceNormals() {
-			var cb = new Vector3(),
-					ab = new Vector3();
-
-			for (var f = 0, fl = this.faces.length; f < fl; f++) {
-				var face = this.faces[f];
-				var vA = this.vertices[face.a];
-				var vB = this.vertices[face.b];
-				var vC = this.vertices[face.c];
-				cb.subVectors(vC, vB);
-				ab.subVectors(vA, vB);
-				cb.cross(ab);
-				cb.normalize();
-				face.normal.copy(cb);
-			}
-		},
-		computeVertexNormals: function computeVertexNormals(areaWeighted) {
-			if (areaWeighted === void 0) {
-				areaWeighted = true;
-			}
-
-			var vertices = new Array(this.vertices.length);
-
-			for (var v = 0, vl = this.vertices.length; v < vl; v++) {
-				vertices[v] = new Vector3();
-			}
-
-			if (areaWeighted) {
-				// vertex normals weighted by triangle areas
-				// http://www.iquilezles.org/www/articles/normals/normals.htm
-				var cb = new Vector3(),
-						ab = new Vector3();
-
-				for (var f = 0, fl = this.faces.length; f < fl; f++) {
-					var face = this.faces[f];
-					var vA = this.vertices[face.a];
-					var vB = this.vertices[face.b];
-					var vC = this.vertices[face.c];
-					cb.subVectors(vC, vB);
-					ab.subVectors(vA, vB);
-					cb.cross(ab);
-					vertices[face.a].add(cb);
-					vertices[face.b].add(cb);
-					vertices[face.c].add(cb);
-				}
-			} else {
-				this.computeFaceNormals();
-
-				for (var _f = 0, _fl = this.faces.length; _f < _fl; _f++) {
-					var _face = this.faces[_f];
-
-					vertices[_face.a].add(_face.normal);
-
-					vertices[_face.b].add(_face.normal);
-
-					vertices[_face.c].add(_face.normal);
-				}
-			}
-
-			for (var _v = 0, _vl = this.vertices.length; _v < _vl; _v++) {
-				vertices[_v].normalize();
-			}
-
-			for (var _f2 = 0, _fl2 = this.faces.length; _f2 < _fl2; _f2++) {
-				var _face2 = this.faces[_f2];
-				var vertexNormals = _face2.vertexNormals;
-
-				if (vertexNormals.length === 3) {
-					vertexNormals[0].copy(vertices[_face2.a]);
-					vertexNormals[1].copy(vertices[_face2.b]);
-					vertexNormals[2].copy(vertices[_face2.c]);
-				} else {
-					vertexNormals[0] = vertices[_face2.a].clone();
-					vertexNormals[1] = vertices[_face2.b].clone();
-					vertexNormals[2] = vertices[_face2.c].clone();
-				}
-			}
-
-			if (this.faces.length > 0) {
-				this.normalsNeedUpdate = true;
-			}
-		},
-		computeFlatVertexNormals: function computeFlatVertexNormals() {
-			this.computeFaceNormals();
-
-			for (var f = 0, fl = this.faces.length; f < fl; f++) {
-				var face = this.faces[f];
-				var vertexNormals = face.vertexNormals;
-
-				if (vertexNormals.length === 3) {
-					vertexNormals[0].copy(face.normal);
-					vertexNormals[1].copy(face.normal);
-					vertexNormals[2].copy(face.normal);
-				} else {
-					vertexNormals[0] = face.normal.clone();
-					vertexNormals[1] = face.normal.clone();
-					vertexNormals[2] = face.normal.clone();
-				}
-			}
-
-			if (this.faces.length > 0) {
-				this.normalsNeedUpdate = true;
-			}
-		},
-		computeMorphNormals: function computeMorphNormals() {
-			// save original normals
-			// - create temp variables on first access
-			//	 otherwise just copy (for faster repeated calls)
-			for (var f = 0, fl = this.faces.length; f < fl; f++) {
-				var face = this.faces[f];
-
-				if (!face.__originalFaceNormal) {
-					face.__originalFaceNormal = face.normal.clone();
-				} else {
-					face.__originalFaceNormal.copy(face.normal);
-				}
-
-				if (!face.__originalVertexNormals) face.__originalVertexNormals = [];
-
-				for (var i = 0, il = face.vertexNormals.length; i < il; i++) {
-					if (!face.__originalVertexNormals[i]) {
-						face.__originalVertexNormals[i] = face.vertexNormals[i].clone();
-					} else {
-						face.__originalVertexNormals[i].copy(face.vertexNormals[i]);
-					}
-				}
-			} // use temp geometry to compute face and vertex normals for each morph
-
-
-			var tmpGeo = new Geometry();
-			tmpGeo.faces = this.faces;
-
-			for (var _i5 = 0, _il2 = this.morphTargets.length; _i5 < _il2; _i5++) {
-				// create on first access
-				if (!this.morphNormals[_i5]) {
-					this.morphNormals[_i5] = {};
-					this.morphNormals[_i5].faceNormals = [];
-					this.morphNormals[_i5].vertexNormals = [];
-					var dstNormalsFace = this.morphNormals[_i5].faceNormals;
-					var dstNormalsVertex = this.morphNormals[_i5].vertexNormals;
-
-					for (var _f3 = 0, _fl3 = this.faces.length; _f3 < _fl3; _f3++) {
-						var faceNormal = new Vector3();
-						var vertexNormals = {
-							a: new Vector3(),
-							b: new Vector3(),
-							c: new Vector3()
-						};
-						dstNormalsFace.push(faceNormal);
-						dstNormalsVertex.push(vertexNormals);
-					}
-				}
-
-				var morphNormals = this.morphNormals[_i5]; // set vertices to morph target
-
-				tmpGeo.vertices = this.morphTargets[_i5].vertices; // compute morph normals
-
-				tmpGeo.computeFaceNormals();
-				tmpGeo.computeVertexNormals(); // store morph normals
-
-				for (var _f4 = 0, _fl4 = this.faces.length; _f4 < _fl4; _f4++) {
-					var _face3 = this.faces[_f4];
-					var _faceNormal = morphNormals.faceNormals[_f4];
-					var _vertexNormals = morphNormals.vertexNormals[_f4];
-
-					_faceNormal.copy(_face3.normal);
-
-					_vertexNormals.a.copy(_face3.vertexNormals[0]);
-
-					_vertexNormals.b.copy(_face3.vertexNormals[1]);
-
-					_vertexNormals.c.copy(_face3.vertexNormals[2]);
-				}
-			} // restore original normals
-
-
-			for (var _f5 = 0, _fl5 = this.faces.length; _f5 < _fl5; _f5++) {
-				var _face4 = this.faces[_f5];
-				_face4.normal = _face4.__originalFaceNormal;
-				_face4.vertexNormals = _face4.__originalVertexNormals;
-			}
-		},
-		computeBoundingBox: function computeBoundingBox() {
-			if (this.boundingBox === null) {
-				this.boundingBox = new Box3();
-			}
-
-			this.boundingBox.setFromPoints(this.vertices);
-		},
-		computeBoundingSphere: function computeBoundingSphere() {
-			if (this.boundingSphere === null) {
-				this.boundingSphere = new Sphere();
-			}
-
-			this.boundingSphere.setFromPoints(this.vertices);
-		},
-		merge: function merge(geometry, matrix, materialIndexOffset) {
-			if (materialIndexOffset === void 0) {
-				materialIndexOffset = 0;
-			}
-
-			if (!(geometry && geometry.isGeometry)) {
-				console.error('THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry);
-				return;
-			}
-
-			var normalMatrix;
-			var vertexOffset = this.vertices.length,
-					vertices1 = this.vertices,
-					vertices2 = geometry.vertices,
-					faces1 = this.faces,
-					faces2 = geometry.faces,
-					colors1 = this.colors,
-					colors2 = geometry.colors;
-
-			if (matrix !== undefined) {
-				normalMatrix = new Matrix3().getNormalMatrix(matrix);
-			} // vertices
-
-
-			for (var i = 0, il = vertices2.length; i < il; i++) {
-				var vertex = vertices2[i];
-				var vertexCopy = vertex.clone();
-				if (matrix !== undefined) vertexCopy.applyMatrix4(matrix);
-				vertices1.push(vertexCopy);
-			} // colors
-
-
-			for (var _i6 = 0, _il3 = colors2.length; _i6 < _il3; _i6++) {
-				colors1.push(colors2[_i6].clone());
-			} // faces
-
-
-			for (var _i7 = 0, _il4 = faces2.length; _i7 < _il4; _i7++) {
-				var face = faces2[_i7];
-				var normal = void 0,
-						color = void 0;
-				var faceVertexNormals = face.vertexNormals,
-						faceVertexColors = face.vertexColors;
-				var faceCopy = new Face3(face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset);
-				faceCopy.normal.copy(face.normal);
-
-				if (normalMatrix !== undefined) {
-					faceCopy.normal.applyMatrix3(normalMatrix).normalize();
-				}
-
-				for (var j = 0, jl = faceVertexNormals.length; j < jl; j++) {
-					normal = faceVertexNormals[j].clone();
-
-					if (normalMatrix !== undefined) {
-						normal.applyMatrix3(normalMatrix).normalize();
-					}
-
-					faceCopy.vertexNormals.push(normal);
-				}
-
-				faceCopy.color.copy(face.color);
-
-				for (var _j = 0, _jl = faceVertexColors.length; _j < _jl; _j++) {
-					color = faceVertexColors[_j];
-					faceCopy.vertexColors.push(color.clone());
-				}
-
-				faceCopy.materialIndex = face.materialIndex + materialIndexOffset;
-				faces1.push(faceCopy);
-			} // uvs
-
-
-			for (var _i8 = 0, _il5 = geometry.faceVertexUvs.length; _i8 < _il5; _i8++) {
-				var faceVertexUvs2 = geometry.faceVertexUvs[_i8];
-				if (this.faceVertexUvs[_i8] === undefined) this.faceVertexUvs[_i8] = [];
-
-				for (var _j2 = 0, _jl2 = faceVertexUvs2.length; _j2 < _jl2; _j2++) {
-					var uvs2 = faceVertexUvs2[_j2],
-							uvsCopy = [];
-
-					for (var k = 0, kl = uvs2.length; k < kl; k++) {
-						uvsCopy.push(uvs2[k].clone());
-					}
-
-					this.faceVertexUvs[_i8].push(uvsCopy);
-				}
-			}
-		},
-		mergeMesh: function mergeMesh(mesh) {
-			if (!(mesh && mesh.isMesh)) {
-				console.error('THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh);
-				return;
-			}
-
-			if (mesh.matrixAutoUpdate) mesh.updateMatrix();
-			this.merge(mesh.geometry, mesh.matrix);
-		},
-
-		/*
-		 * Checks for duplicate vertices with hashmap.
-		 * Duplicated vertices are removed
-		 * and faces' vertices are updated.
-		 */
-		mergeVertices: function mergeVertices(precisionPoints) {
-			if (precisionPoints === void 0) {
-				precisionPoints = 4;
-			}
-
-			var verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
-
-			var unique = [],
-					changes = [];
-			var precision = Math.pow(10, precisionPoints);
-
-			for (var i = 0, il = this.vertices.length; i < il; i++) {
-				var v = this.vertices[i];
-				var key = Math.round(v.x * precision) + '_' + Math.round(v.y * precision) + '_' + Math.round(v.z * precision);
-
-				if (verticesMap[key] === undefined) {
-					verticesMap[key] = i;
-					unique.push(this.vertices[i]);
-					changes[i] = unique.length - 1;
-				} else {
-					//console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
-					changes[i] = changes[verticesMap[key]];
-				}
-			} // if faces are completely degenerate after merging vertices, we
-			// have to remove them from the geometry.
-
-
-			var faceIndicesToRemove = [];
-
-			for (var _i9 = 0, _il6 = this.faces.length; _i9 < _il6; _i9++) {
-				var face = this.faces[_i9];
-				face.a = changes[face.a];
-				face.b = changes[face.b];
-				face.c = changes[face.c];
-				var indices = [face.a, face.b, face.c]; // if any duplicate vertices are found in a Face3
-				// we have to remove the face as nothing can be saved
-
-				for (var n = 0; n < 3; n++) {
-					if (indices[n] === indices[(n + 1) % 3]) {
-						faceIndicesToRemove.push(_i9);
-						break;
-					}
-				}
-			}
-
-			for (var _i10 = faceIndicesToRemove.length - 1; _i10 >= 0; _i10--) {
-				var idx = faceIndicesToRemove[_i10];
-				this.faces.splice(idx, 1);
-
-				for (var j = 0, jl = this.faceVertexUvs.length; j < jl; j++) {
-					this.faceVertexUvs[j].splice(idx, 1);
-				}
-			} // Use unique set of vertices
-
-
-			var diff = this.vertices.length - unique.length;
-			this.vertices = unique;
-			return diff;
-		},
-		setFromPoints: function setFromPoints(points) {
-			this.vertices = [];
-
-			for (var i = 0, l = points.length; i < l; i++) {
-				var point = points[i];
-				this.vertices.push(new Vector3(point.x, point.y, point.z || 0));
-			}
-
-			return this;
-		},
-		sortFacesByMaterialIndex: function sortFacesByMaterialIndex() {
-			var faces = this.faces;
-			var length = faces.length; // tag faces
-
-			for (var i = 0; i < length; i++) {
-				faces[i]._id = i;
-			} // sort faces
-
-
-			function materialIndexSort(a, b) {
-				return a.materialIndex - b.materialIndex;
-			}
-
-			faces.sort(materialIndexSort); // sort uvs
-
-			var uvs1 = this.faceVertexUvs[0];
-			var uvs2 = this.faceVertexUvs[1];
-			var newUvs1, newUvs2;
-			if (uvs1 && uvs1.length === length) newUvs1 = [];
-			if (uvs2 && uvs2.length === length) newUvs2 = [];
-
-			for (var _i11 = 0; _i11 < length; _i11++) {
-				var id = faces[_i11]._id;
-				if (newUvs1) newUvs1.push(uvs1[id]);
-				if (newUvs2) newUvs2.push(uvs2[id]);
-			}
-
-			if (newUvs1) this.faceVertexUvs[0] = newUvs1;
-			if (newUvs2) this.faceVertexUvs[1] = newUvs2;
-		},
-		toJSON: function toJSON() {
-			var data = {
-				metadata: {
-					version: 4.5,
-					type: 'Geometry',
-					generator: 'Geometry.toJSON'
-				}
-			}; // standard Geometry serialization
-
-			data.uuid = this.uuid;
-			data.type = this.type;
-			if (this.name !== '') data.name = this.name;
-
-			if (this.parameters !== undefined) {
-				var parameters = this.parameters;
-
-				for (var key in parameters) {
-					if (parameters[key] !== undefined) data[key] = parameters[key];
-				}
-
-				return data;
-			}
-
-			var vertices = [];
-
-			for (var i = 0; i < this.vertices.length; i++) {
-				var vertex = this.vertices[i];
-				vertices.push(vertex.x, vertex.y, vertex.z);
-			}
-
-			var faces = [];
-			var normals = [];
-			var normalsHash = {};
-			var colors = [];
-			var colorsHash = {};
-			var uvs = [];
-			var uvsHash = {};
-
-			for (var _i12 = 0; _i12 < this.faces.length; _i12++) {
-				var face = this.faces[_i12];
-				var hasMaterial = true;
-				var hasFaceUv = false; // deprecated
-
-				var hasFaceVertexUv = this.faceVertexUvs[0][_i12] !== undefined;
-				var hasFaceNormal = face.normal.length() > 0;
-				var hasFaceVertexNormal = face.vertexNormals.length > 0;
-				var hasFaceColor = face.color.r !== 1 || face.color.g !== 1 || face.color.b !== 1;
-				var hasFaceVertexColor = face.vertexColors.length > 0;
-				var faceType = 0;
-				faceType = setBit(faceType, 0, 0); // isQuad
-
-				faceType = setBit(faceType, 1, hasMaterial);
-				faceType = setBit(faceType, 2, hasFaceUv);
-				faceType = setBit(faceType, 3, hasFaceVertexUv);
-				faceType = setBit(faceType, 4, hasFaceNormal);
-				faceType = setBit(faceType, 5, hasFaceVertexNormal);
-				faceType = setBit(faceType, 6, hasFaceColor);
-				faceType = setBit(faceType, 7, hasFaceVertexColor);
-				faces.push(faceType);
-				faces.push(face.a, face.b, face.c);
-				faces.push(face.materialIndex);
-
-				if (hasFaceVertexUv) {
-					var faceVertexUvs = this.faceVertexUvs[0][_i12];
-					faces.push(getUvIndex(faceVertexUvs[0]), getUvIndex(faceVertexUvs[1]), getUvIndex(faceVertexUvs[2]));
-				}
-
-				if (hasFaceNormal) {
-					faces.push(getNormalIndex(face.normal));
-				}
-
-				if (hasFaceVertexNormal) {
-					var vertexNormals = face.vertexNormals;
-					faces.push(getNormalIndex(vertexNormals[0]), getNormalIndex(vertexNormals[1]), getNormalIndex(vertexNormals[2]));
-				}
-
-				if (hasFaceColor) {
-					faces.push(getColorIndex(face.color));
-				}
-
-				if (hasFaceVertexColor) {
-					var vertexColors = face.vertexColors;
-					faces.push(getColorIndex(vertexColors[0]), getColorIndex(vertexColors[1]), getColorIndex(vertexColors[2]));
-				}
-			}
-
-			function setBit(value, position, enabled) {
-				return enabled ? value | 1 << position : value & ~(1 << position);
-			}
-
-			function getNormalIndex(normal) {
-				var hash = normal.x.toString() + normal.y.toString() + normal.z.toString();
-
-				if (normalsHash[hash] !== undefined) {
-					return normalsHash[hash];
-				}
-
-				normalsHash[hash] = normals.length / 3;
-				normals.push(normal.x, normal.y, normal.z);
-				return normalsHash[hash];
-			}
-
-			function getColorIndex(color) {
-				var hash = color.r.toString() + color.g.toString() + color.b.toString();
-
-				if (colorsHash[hash] !== undefined) {
-					return colorsHash[hash];
-				}
-
-				colorsHash[hash] = colors.length;
-				colors.push(color.getHex());
-				return colorsHash[hash];
-			}
-
-			function getUvIndex(uv) {
-				var hash = uv.x.toString() + uv.y.toString();
-
-				if (uvsHash[hash] !== undefined) {
-					return uvsHash[hash];
-				}
-
-				uvsHash[hash] = uvs.length / 2;
-				uvs.push(uv.x, uv.y);
-				return uvsHash[hash];
-			}
-
-			data.data = {};
-			data.data.vertices = vertices;
-			data.data.normals = normals;
-			if (colors.length > 0) data.data.colors = colors;
-			if (uvs.length > 0) data.data.uvs = [uvs]; // temporal backward compatibility
-
-			data.data.faces = faces;
-			return data;
-		},
-		clone: function clone() {
-			/*
-			 // Handle primitives
-				 const parameters = this.parameters;
-				 if ( parameters !== undefined ) {
-				 const values = [];
-				 for ( const key in parameters ) {
-				 values.push( parameters[ key ] );
-				 }
-				 const geometry = Object.create( this.constructor.prototype );
-			 this.constructor.apply( geometry, values );
-			 return geometry;
-				 }
-				 return new this.constructor().copy( this );
-			 */
-			return new Geometry().copy(this);
-		},
-		copy: function copy(source) {
-			// reset
-			this.vertices = [];
-			this.colors = [];
-			this.faces = [];
-			this.faceVertexUvs = [[]];
-			this.morphTargets = [];
-			this.morphNormals = [];
-			this.skinWeights = [];
-			this.skinIndices = [];
-			this.lineDistances = [];
-			this.boundingBox = null;
-			this.boundingSphere = null; // name
-
-			this.name = source.name; // vertices
-
-			var vertices = source.vertices;
-
-			for (var i = 0, il = vertices.length; i < il; i++) {
-				this.vertices.push(vertices[i].clone());
-			} // colors
-
-
-			var colors = source.colors;
-
-			for (var _i13 = 0, _il7 = colors.length; _i13 < _il7; _i13++) {
-				this.colors.push(colors[_i13].clone());
-			} // faces
-
-
-			var faces = source.faces;
-
-			for (var _i14 = 0, _il8 = faces.length; _i14 < _il8; _i14++) {
-				this.faces.push(faces[_i14].clone());
-			} // face vertex uvs
-
-
-			for (var _i15 = 0, _il9 = source.faceVertexUvs.length; _i15 < _il9; _i15++) {
-				var faceVertexUvs = source.faceVertexUvs[_i15];
-
-				if (this.faceVertexUvs[_i15] === undefined) {
-					this.faceVertexUvs[_i15] = [];
-				}
-
-				for (var j = 0, jl = faceVertexUvs.length; j < jl; j++) {
-					var uvs = faceVertexUvs[j],
-							uvsCopy = [];
-
-					for (var k = 0, kl = uvs.length; k < kl; k++) {
-						var uv = uvs[k];
-						uvsCopy.push(uv.clone());
-					}
-
-					this.faceVertexUvs[_i15].push(uvsCopy);
-				}
-			} // morph targets
-
-
-			var morphTargets = source.morphTargets;
-
-			for (var _i16 = 0, _il10 = morphTargets.length; _i16 < _il10; _i16++) {
-				var morphTarget = {};
-				morphTarget.name = morphTargets[_i16].name; // vertices
-
-				if (morphTargets[_i16].vertices !== undefined) {
-					morphTarget.vertices = [];
-
-					for (var _j3 = 0, _jl3 = morphTargets[_i16].vertices.length; _j3 < _jl3; _j3++) {
-						morphTarget.vertices.push(morphTargets[_i16].vertices[_j3].clone());
-					}
-				} // normals
-
-
-				if (morphTargets[_i16].normals !== undefined) {
-					morphTarget.normals = [];
-
-					for (var _j4 = 0, _jl4 = morphTargets[_i16].normals.length; _j4 < _jl4; _j4++) {
-						morphTarget.normals.push(morphTargets[_i16].normals[_j4].clone());
-					}
-				}
-
-				this.morphTargets.push(morphTarget);
-			} // morph normals
-
-
-			var morphNormals = source.morphNormals;
-
-			for (var _i17 = 0, _il11 = morphNormals.length; _i17 < _il11; _i17++) {
-				var morphNormal = {}; // vertex normals
-
-				if (morphNormals[_i17].vertexNormals !== undefined) {
-					morphNormal.vertexNormals = [];
-
-					for (var _j5 = 0, _jl5 = morphNormals[_i17].vertexNormals.length; _j5 < _jl5; _j5++) {
-						var srcVertexNormal = morphNormals[_i17].vertexNormals[_j5];
-						var destVertexNormal = {};
-						destVertexNormal.a = srcVertexNormal.a.clone();
-						destVertexNormal.b = srcVertexNormal.b.clone();
-						destVertexNormal.c = srcVertexNormal.c.clone();
-						morphNormal.vertexNormals.push(destVertexNormal);
-					}
-				} // face normals
-
-
-				if (morphNormals[_i17].faceNormals !== undefined) {
-					morphNormal.faceNormals = [];
-
-					for (var _j6 = 0, _jl6 = morphNormals[_i17].faceNormals.length; _j6 < _jl6; _j6++) {
-						morphNormal.faceNormals.push(morphNormals[_i17].faceNormals[_j6].clone());
-					}
-				}
-
-				this.morphNormals.push(morphNormal);
-			} // skin weights
-
-
-			var skinWeights = source.skinWeights;
-
-			for (var _i18 = 0, _il12 = skinWeights.length; _i18 < _il12; _i18++) {
-				this.skinWeights.push(skinWeights[_i18].clone());
-			} // skin indices
-
-
-			var skinIndices = source.skinIndices;
-
-			for (var _i19 = 0, _il13 = skinIndices.length; _i19 < _il13; _i19++) {
-				this.skinIndices.push(skinIndices[_i19].clone());
-			} // line distances
-
-
-			var lineDistances = source.lineDistances;
-
-			for (var _i20 = 0, _il14 = lineDistances.length; _i20 < _il14; _i20++) {
-				this.lineDistances.push(lineDistances[_i20]);
-			} // bounding box
-
-
-			var boundingBox = source.boundingBox;
-
-			if (boundingBox !== null) {
-				this.boundingBox = boundingBox.clone();
-			} // bounding sphere
-
-
-			var boundingSphere = source.boundingSphere;
-
-			if (boundingSphere !== null) {
-				this.boundingSphere = boundingSphere.clone();
-			} // update flags
-
-
-			this.elementsNeedUpdate = source.elementsNeedUpdate;
-			this.verticesNeedUpdate = source.verticesNeedUpdate;
-			this.uvsNeedUpdate = source.uvsNeedUpdate;
-			this.normalsNeedUpdate = source.normalsNeedUpdate;
-			this.colorsNeedUpdate = source.colorsNeedUpdate;
-			this.lineDistancesNeedUpdate = source.lineDistancesNeedUpdate;
-			this.groupsNeedUpdate = source.groupsNeedUpdate;
-			return this;
-		},
-		dispose: function dispose() {
-			this.dispatchEvent({
-				type: 'dispose'
-			});
-		}
-	});
-
-	var BoxGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(BoxGeometry, _Geometry);
-
-		function BoxGeometry(width, height, depth, widthSegments, heightSegments, depthSegments) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'BoxGeometry';
-			_this.parameters = {
-				width: width,
-				height: height,
-				depth: depth,
-				widthSegments: widthSegments,
-				heightSegments: heightSegments,
-				depthSegments: depthSegments
-			};
-
-			_this.fromBufferGeometry(new BoxBufferGeometry(width, height, depth, widthSegments, heightSegments, depthSegments));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return BoxGeometry;
-	}(Geometry);
-
 	var CircleBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
 		_inheritsLoose(CircleBufferGeometry, _BufferGeometry);
 
@@ -21469,31 +20518,6 @@
 
 		return CircleBufferGeometry;
 	}(BufferGeometry);
-
-	var CircleGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(CircleGeometry, _Geometry);
-
-		function CircleGeometry(radius, segments, thetaStart, thetaLength) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'CircleGeometry';
-			_this.parameters = {
-				radius: radius,
-				segments: segments,
-				thetaStart: thetaStart,
-				thetaLength: thetaLength
-			};
-
-			_this.fromBufferGeometry(new CircleBufferGeometry(radius, segments, thetaStart, thetaLength));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return CircleGeometry;
-	}(Geometry);
 
 	var CylinderBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
 		_inheritsLoose(CylinderBufferGeometry, _BufferGeometry);
@@ -21707,58 +20731,6 @@
 
 		return CylinderBufferGeometry;
 	}(BufferGeometry);
-
-	var CylinderGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(CylinderGeometry, _Geometry);
-
-		function CylinderGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'CylinderGeometry';
-			_this.parameters = {
-				radiusTop: radiusTop,
-				radiusBottom: radiusBottom,
-				height: height,
-				radialSegments: radialSegments,
-				heightSegments: heightSegments,
-				openEnded: openEnded,
-				thetaStart: thetaStart,
-				thetaLength: thetaLength
-			};
-
-			_this.fromBufferGeometry(new CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return CylinderGeometry;
-	}(Geometry);
-
-	var ConeGeometry = /*#__PURE__*/function (_CylinderGeometry) {
-		_inheritsLoose(ConeGeometry, _CylinderGeometry);
-
-		function ConeGeometry(radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
-			var _this;
-
-			_this = _CylinderGeometry.call(this, 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) || this;
-			_this.type = 'ConeGeometry';
-			_this.parameters = {
-				radius: radius,
-				height: height,
-				radialSegments: radialSegments,
-				heightSegments: heightSegments,
-				openEnded: openEnded,
-				thetaStart: thetaStart,
-				thetaLength: thetaLength
-			};
-			return _this;
-		}
-
-		return ConeGeometry;
-	}(CylinderGeometry);
 
 	var ConeBufferGeometry = /*#__PURE__*/function (_CylinderBufferGeomet) {
 		_inheritsLoose(ConeBufferGeometry, _CylinderBufferGeomet);
@@ -22053,29 +21025,6 @@
 
 		return DodecahedronBufferGeometry;
 	}(PolyhedronBufferGeometry);
-
-	var DodecahedronGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(DodecahedronGeometry, _Geometry);
-
-		function DodecahedronGeometry(radius, detail) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'DodecahedronGeometry';
-			_this.parameters = {
-				radius: radius,
-				detail: detail
-			};
-
-			_this.fromBufferGeometry(new DodecahedronBufferGeometry(radius, detail));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return DodecahedronGeometry;
-	}(Geometry);
 
 	var _v0$2 = new Vector3();
 
@@ -23360,55 +22309,6 @@
 		return data;
 	}
 
-	var ExtrudeGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(ExtrudeGeometry, _Geometry);
-
-		function ExtrudeGeometry(shapes, options) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'ExtrudeGeometry';
-			_this.parameters = {
-				shapes: shapes,
-				options: options
-			};
-
-			_this.fromBufferGeometry(new ExtrudeBufferGeometry(shapes, options));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		var _proto = ExtrudeGeometry.prototype;
-
-		_proto.toJSON = function toJSON() {
-			var data = _Geometry.prototype.toJSON.call(this);
-
-			var shapes = this.parameters.shapes;
-			var options = this.parameters.options;
-			return _toJSON$1(shapes, options, data);
-		};
-
-		return ExtrudeGeometry;
-	}(Geometry);
-
-	function _toJSON$1(shapes, options, data) {
-		data.shapes = [];
-
-		if (Array.isArray(shapes)) {
-			for (var i = 0, l = shapes.length; i < l; i++) {
-				var shape = shapes[i];
-				data.shapes.push(shape.uuid);
-			}
-		} else {
-			data.shapes.push(shapes.uuid);
-		}
-
-		if (options.extrudePath !== undefined) data.options.extrudePath = options.extrudePath.toJSON();
-		return data;
-	}
-
 	var IcosahedronBufferGeometry = /*#__PURE__*/function (_PolyhedronBufferGeom) {
 		_inheritsLoose(IcosahedronBufferGeometry, _PolyhedronBufferGeom);
 
@@ -23437,29 +22337,6 @@
 
 		return IcosahedronBufferGeometry;
 	}(PolyhedronBufferGeometry);
-
-	var IcosahedronGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(IcosahedronGeometry, _Geometry);
-
-		function IcosahedronGeometry(radius, detail) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'IcosahedronGeometry';
-			_this.parameters = {
-				radius: radius,
-				detail: detail
-			};
-
-			_this.fromBufferGeometry(new IcosahedronBufferGeometry(radius, detail));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return IcosahedronGeometry;
-	}(Geometry);
 
 	var LatheBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
 		_inheritsLoose(LatheBufferGeometry, _BufferGeometry);
@@ -23575,31 +22452,6 @@
 		return LatheBufferGeometry;
 	}(BufferGeometry);
 
-	var LatheGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(LatheGeometry, _Geometry);
-
-		function LatheGeometry(points, segments, phiStart, phiLength) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'LatheGeometry';
-			_this.parameters = {
-				points: points,
-				segments: segments,
-				phiStart: phiStart,
-				phiLength: phiLength
-			};
-
-			_this.fromBufferGeometry(new LatheBufferGeometry(points, segments, phiStart, phiLength));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return LatheGeometry;
-	}(Geometry);
-
 	var OctahedronBufferGeometry = /*#__PURE__*/function (_PolyhedronBufferGeom) {
 		_inheritsLoose(OctahedronBufferGeometry, _PolyhedronBufferGeom);
 
@@ -23627,29 +22479,6 @@
 
 		return OctahedronBufferGeometry;
 	}(PolyhedronBufferGeometry);
-
-	var OctahedronGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(OctahedronGeometry, _Geometry);
-
-		function OctahedronGeometry(radius, detail) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'OctahedronGeometry';
-			_this.parameters = {
-				radius: radius,
-				detail: detail
-			};
-
-			_this.fromBufferGeometry(new OctahedronBufferGeometry(radius, detail));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return OctahedronGeometry;
-	}(Geometry);
 
 	/**
 	 * Parametric Surfaces Geometry
@@ -23739,76 +22568,6 @@
 
 	ParametricBufferGeometry.prototype = Object.create(BufferGeometry.prototype);
 	ParametricBufferGeometry.prototype.constructor = ParametricBufferGeometry;
-
-	/**
-	 * Parametric Surfaces Geometry
-	 * based on the brilliant article by @prideout https://prideout.net/blog/old/blog/index.html@p=44.html
-	 */
-
-	function ParametricGeometry(func, slices, stacks) {
-		Geometry.call(this);
-		this.type = 'ParametricGeometry';
-		this.parameters = {
-			func: func,
-			slices: slices,
-			stacks: stacks
-		};
-		this.fromBufferGeometry(new ParametricBufferGeometry(func, slices, stacks));
-		this.mergeVertices();
-	}
-
-	ParametricGeometry.prototype = Object.create(Geometry.prototype);
-	ParametricGeometry.prototype.constructor = ParametricGeometry;
-
-	var PlaneGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(PlaneGeometry, _Geometry);
-
-		function PlaneGeometry(width, height, widthSegments, heightSegments) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'PlaneGeometry';
-			_this.parameters = {
-				width: width,
-				height: height,
-				widthSegments: widthSegments,
-				heightSegments: heightSegments
-			};
-
-			_this.fromBufferGeometry(new PlaneBufferGeometry(width, height, widthSegments, heightSegments));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return PlaneGeometry;
-	}(Geometry);
-
-	var PolyhedronGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(PolyhedronGeometry, _Geometry);
-
-		function PolyhedronGeometry(vertices, indices, radius, detail) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'PolyhedronGeometry';
-			_this.parameters = {
-				vertices: vertices,
-				indices: indices,
-				radius: radius,
-				detail: detail
-			};
-
-			_this.fromBufferGeometry(new PolyhedronBufferGeometry(vertices, indices, radius, detail));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return PolyhedronGeometry;
-	}(Geometry);
 
 	var RingBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
 		_inheritsLoose(RingBufferGeometry, _BufferGeometry);
@@ -23915,33 +22674,6 @@
 		return RingBufferGeometry;
 	}(BufferGeometry);
 
-	var RingGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(RingGeometry, _Geometry);
-
-		function RingGeometry(innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'RingGeometry';
-			_this.parameters = {
-				innerRadius: innerRadius,
-				outerRadius: outerRadius,
-				thetaSegments: thetaSegments,
-				phiSegments: phiSegments,
-				thetaStart: thetaStart,
-				thetaLength: thetaLength
-			};
-
-			_this.fromBufferGeometry(new RingBufferGeometry(innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return RingGeometry;
-	}(Geometry);
-
 	var ShapeBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
 		_inheritsLoose(ShapeBufferGeometry, _BufferGeometry);
 
@@ -24043,65 +22775,13 @@
 		_proto.toJSON = function toJSON() {
 			var data = BufferGeometry.prototype.toJSON.call(this);
 			var shapes = this.parameters.shapes;
-			return _toJSON$2(shapes, data);
+			return _toJSON$1(shapes, data);
 		};
 
 		return ShapeBufferGeometry;
 	}(BufferGeometry);
 
-	function _toJSON$2(shapes, data) {
-		data.shapes = [];
-
-		if (Array.isArray(shapes)) {
-			for (var i = 0, l = shapes.length; i < l; i++) {
-				var shape = shapes[i];
-				data.shapes.push(shape.uuid);
-			}
-		} else {
-			data.shapes.push(shapes.uuid);
-		}
-
-		return data;
-	}
-
-	var ShapeGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(ShapeGeometry, _Geometry);
-
-		function ShapeGeometry(shapes, curveSegments) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'ShapeGeometry';
-
-			if (typeof curveSegments === 'object') {
-				console.warn('THREE.ShapeGeometry: Options parameter has been removed.');
-				curveSegments = curveSegments.curveSegments;
-			}
-
-			_this.parameters = {
-				shapes: shapes,
-				curveSegments: curveSegments
-			};
-
-			_this.fromBufferGeometry(new ShapeBufferGeometry(shapes, curveSegments));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		var _proto = ShapeGeometry.prototype;
-
-		_proto.toJSON = function toJSON() {
-			var data = Geometry.prototype.toJSON.call(this);
-			var shapes = this.parameters.shapes;
-			return _toJSON$3(shapes, data);
-		};
-
-		return ShapeGeometry;
-	}(Geometry);
-
-	function _toJSON$3(shapes, data) {
+	function _toJSON$1(shapes, data) {
 		data.shapes = [];
 
 		if (Array.isArray(shapes)) {
@@ -24231,34 +22911,6 @@
 		return SphereBufferGeometry;
 	}(BufferGeometry);
 
-	var SphereGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(SphereGeometry, _Geometry);
-
-		function SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'SphereGeometry';
-			_this.parameters = {
-				radius: radius,
-				widthSegments: widthSegments,
-				heightSegments: heightSegments,
-				phiStart: phiStart,
-				phiLength: phiLength,
-				thetaStart: thetaStart,
-				thetaLength: thetaLength
-			};
-
-			_this.fromBufferGeometry(new SphereBufferGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return SphereGeometry;
-	}(Geometry);
-
 	var TetrahedronBufferGeometry = /*#__PURE__*/function (_PolyhedronBufferGeom) {
 		_inheritsLoose(TetrahedronBufferGeometry, _PolyhedronBufferGeom);
 
@@ -24286,29 +22938,6 @@
 
 		return TetrahedronBufferGeometry;
 	}(PolyhedronBufferGeometry);
-
-	var TetrahedronGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(TetrahedronGeometry, _Geometry);
-
-		function TetrahedronGeometry(radius, detail) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'TetrahedronGeometry';
-			_this.parameters = {
-				radius: radius,
-				detail: detail
-			};
-
-			_this.fromBufferGeometry(new TetrahedronBufferGeometry(radius, detail));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return TetrahedronGeometry;
-	}(Geometry);
 
 	var TextBufferGeometry = /*#__PURE__*/function (_ExtrudeBufferGeometr) {
 		_inheritsLoose(TextBufferGeometry, _ExtrudeBufferGeometr);
@@ -24341,29 +22970,6 @@
 
 		return TextBufferGeometry;
 	}(ExtrudeBufferGeometry);
-
-	var TextGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(TextGeometry, _Geometry);
-
-		function TextGeometry(text, parameters) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'TextGeometry';
-			_this.parameters = {
-				text: text,
-				parameters: parameters
-			};
-
-			_this.fromBufferGeometry(new TextBufferGeometry(text, parameters));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return TextGeometry;
-	}(Geometry);
 
 	var TorusBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
 		_inheritsLoose(TorusBufferGeometry, _BufferGeometry);
@@ -24460,32 +23066,6 @@
 
 		return TorusBufferGeometry;
 	}(BufferGeometry);
-
-	var TorusGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(TorusGeometry, _Geometry);
-
-		function TorusGeometry(radius, tube, radialSegments, tubularSegments, arc) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'TorusGeometry';
-			_this.parameters = {
-				radius: radius,
-				tube: tube,
-				radialSegments: radialSegments,
-				tubularSegments: tubularSegments,
-				arc: arc
-			};
-
-			_this.fromBufferGeometry(new TorusBufferGeometry(radius, tube, radialSegments, tubularSegments, arc));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return TorusGeometry;
-	}(Geometry);
 
 	var TorusKnotBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
 		_inheritsLoose(TorusKnotBufferGeometry, _BufferGeometry);
@@ -24619,34 +23199,6 @@
 
 		return TorusKnotBufferGeometry;
 	}(BufferGeometry);
-
-	var TorusKnotGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(TorusKnotGeometry, _Geometry);
-
-		function TorusKnotGeometry(radius, tube, tubularSegments, radialSegments, p, q, heightScale) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'TorusKnotGeometry';
-			_this.parameters = {
-				radius: radius,
-				tube: tube,
-				tubularSegments: tubularSegments,
-				radialSegments: radialSegments,
-				p: p,
-				q: q
-			};
-			if (heightScale !== undefined) console.warn('THREE.TorusKnotGeometry: heightScale has been deprecated. Use .scale( x, y, z ) instead.');
-
-			_this.fromBufferGeometry(new TorusKnotBufferGeometry(radius, tube, tubularSegments, radialSegments, p, q));
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return TorusKnotGeometry;
-	}(Geometry);
 
 	var TubeBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
 		_inheritsLoose(TubeBufferGeometry, _BufferGeometry);
@@ -24786,38 +23338,6 @@
 		return TubeBufferGeometry;
 	}(BufferGeometry);
 
-	var TubeGeometry = /*#__PURE__*/function (_Geometry) {
-		_inheritsLoose(TubeGeometry, _Geometry);
-
-		function TubeGeometry(path, tubularSegments, radius, radialSegments, closed, taper) {
-			var _this;
-
-			_this = _Geometry.call(this) || this;
-			_this.type = 'TubeGeometry';
-			_this.parameters = {
-				path: path,
-				tubularSegments: tubularSegments,
-				radius: radius,
-				radialSegments: radialSegments,
-				closed: closed
-			};
-			if (taper !== undefined) console.warn('THREE.TubeGeometry: taper has been removed.');
-			var bufferGeometry = new TubeBufferGeometry(path, tubularSegments, radius, radialSegments, closed); // expose internals
-
-			_this.tangents = bufferGeometry.tangents;
-			_this.normals = bufferGeometry.normals;
-			_this.binormals = bufferGeometry.binormals; // create geometry
-
-			_this.fromBufferGeometry(bufferGeometry);
-
-			_this.mergeVertices();
-
-			return _this;
-		}
-
-		return TubeGeometry;
-	}(Geometry);
-
 	var WireframeGeometry = /*#__PURE__*/function (_BufferGeometry) {
 		_inheritsLoose(WireframeGeometry, _BufferGeometry);
 
@@ -24915,46 +23435,26 @@
 
 	var Geometries = /*#__PURE__*/Object.freeze({
 		__proto__: null,
-		BoxGeometry: BoxGeometry,
 		BoxBufferGeometry: BoxBufferGeometry,
-		CircleGeometry: CircleGeometry,
 		CircleBufferGeometry: CircleBufferGeometry,
-		ConeGeometry: ConeGeometry,
 		ConeBufferGeometry: ConeBufferGeometry,
-		CylinderGeometry: CylinderGeometry,
 		CylinderBufferGeometry: CylinderBufferGeometry,
-		DodecahedronGeometry: DodecahedronGeometry,
 		DodecahedronBufferGeometry: DodecahedronBufferGeometry,
 		EdgesGeometry: EdgesGeometry,
-		ExtrudeGeometry: ExtrudeGeometry,
 		ExtrudeBufferGeometry: ExtrudeBufferGeometry,
-		IcosahedronGeometry: IcosahedronGeometry,
 		IcosahedronBufferGeometry: IcosahedronBufferGeometry,
-		LatheGeometry: LatheGeometry,
 		LatheBufferGeometry: LatheBufferGeometry,
-		OctahedronGeometry: OctahedronGeometry,
 		OctahedronBufferGeometry: OctahedronBufferGeometry,
-		ParametricGeometry: ParametricGeometry,
 		ParametricBufferGeometry: ParametricBufferGeometry,
-		PlaneGeometry: PlaneGeometry,
 		PlaneBufferGeometry: PlaneBufferGeometry,
-		PolyhedronGeometry: PolyhedronGeometry,
 		PolyhedronBufferGeometry: PolyhedronBufferGeometry,
-		RingGeometry: RingGeometry,
 		RingBufferGeometry: RingBufferGeometry,
-		ShapeGeometry: ShapeGeometry,
 		ShapeBufferGeometry: ShapeBufferGeometry,
-		SphereGeometry: SphereGeometry,
 		SphereBufferGeometry: SphereBufferGeometry,
-		TetrahedronGeometry: TetrahedronGeometry,
 		TetrahedronBufferGeometry: TetrahedronBufferGeometry,
-		TextGeometry: TextGeometry,
 		TextBufferGeometry: TextBufferGeometry,
-		TorusGeometry: TorusGeometry,
 		TorusBufferGeometry: TorusBufferGeometry,
-		TorusKnotGeometry: TorusKnotGeometry,
 		TorusKnotBufferGeometry: TorusKnotBufferGeometry,
-		TubeGeometry: TubeGeometry,
 		TubeBufferGeometry: TubeBufferGeometry,
 		WireframeGeometry: WireframeGeometry
 	});
@@ -34114,6 +32614,930 @@
 		return Uniform;
 	}();
 
+	var _geometryId = 0; // Geometry uses even numbers as Id
+
+	var _m1$3 = new Matrix4();
+
+	var _obj$1 = new Object3D();
+
+	var _offset$1 = new Vector3();
+
+	function Geometry() {
+		Object.defineProperty(this, 'id', {
+			value: _geometryId += 2
+		});
+		this.uuid = MathUtils.generateUUID();
+		this.name = '';
+		this.type = 'Geometry';
+		this.vertices = [];
+		this.colors = [];
+		this.faces = [];
+		this.faceVertexUvs = [[]];
+		this.morphTargets = [];
+		this.morphNormals = [];
+		this.skinWeights = [];
+		this.skinIndices = [];
+		this.lineDistances = [];
+		this.boundingBox = null;
+		this.boundingSphere = null; // update flags
+
+		this.elementsNeedUpdate = false;
+		this.verticesNeedUpdate = false;
+		this.uvsNeedUpdate = false;
+		this.normalsNeedUpdate = false;
+		this.colorsNeedUpdate = false;
+		this.lineDistancesNeedUpdate = false;
+		this.groupsNeedUpdate = false;
+	}
+
+	Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
+		constructor: Geometry,
+		isGeometry: true,
+		applyMatrix4: function applyMatrix4(matrix) {
+			var normalMatrix = new Matrix3().getNormalMatrix(matrix);
+
+			for (var i = 0, il = this.vertices.length; i < il; i++) {
+				var vertex = this.vertices[i];
+				vertex.applyMatrix4(matrix);
+			}
+
+			for (var _i = 0, _il = this.faces.length; _i < _il; _i++) {
+				var face = this.faces[_i];
+				face.normal.applyMatrix3(normalMatrix).normalize();
+
+				for (var j = 0, jl = face.vertexNormals.length; j < jl; j++) {
+					face.vertexNormals[j].applyMatrix3(normalMatrix).normalize();
+				}
+			}
+
+			if (this.boundingBox !== null) {
+				this.computeBoundingBox();
+			}
+
+			if (this.boundingSphere !== null) {
+				this.computeBoundingSphere();
+			}
+
+			this.verticesNeedUpdate = true;
+			this.normalsNeedUpdate = true;
+			return this;
+		},
+		rotateX: function rotateX(angle) {
+			// rotate geometry around world x-axis
+			_m1$3.makeRotationX(angle);
+
+			this.applyMatrix4(_m1$3);
+			return this;
+		},
+		rotateY: function rotateY(angle) {
+			// rotate geometry around world y-axis
+			_m1$3.makeRotationY(angle);
+
+			this.applyMatrix4(_m1$3);
+			return this;
+		},
+		rotateZ: function rotateZ(angle) {
+			// rotate geometry around world z-axis
+			_m1$3.makeRotationZ(angle);
+
+			this.applyMatrix4(_m1$3);
+			return this;
+		},
+		translate: function translate(x, y, z) {
+			// translate geometry
+			_m1$3.makeTranslation(x, y, z);
+
+			this.applyMatrix4(_m1$3);
+			return this;
+		},
+		scale: function scale(x, y, z) {
+			// scale geometry
+			_m1$3.makeScale(x, y, z);
+
+			this.applyMatrix4(_m1$3);
+			return this;
+		},
+		lookAt: function lookAt(vector) {
+			_obj$1.lookAt(vector);
+
+			_obj$1.updateMatrix();
+
+			this.applyMatrix4(_obj$1.matrix);
+			return this;
+		},
+		fromBufferGeometry: function fromBufferGeometry(geometry) {
+			var scope = this;
+			var index = geometry.index !== null ? geometry.index : undefined;
+			var attributes = geometry.attributes;
+
+			if (attributes.position === undefined) {
+				console.error('THREE.Geometry.fromBufferGeometry(): Position attribute required for conversion.');
+				return this;
+			}
+
+			var position = attributes.position;
+			var normal = attributes.normal;
+			var color = attributes.color;
+			var uv = attributes.uv;
+			var uv2 = attributes.uv2;
+			if (uv2 !== undefined) this.faceVertexUvs[1] = [];
+
+			for (var i = 0; i < position.count; i++) {
+				scope.vertices.push(new Vector3().fromBufferAttribute(position, i));
+
+				if (color !== undefined) {
+					scope.colors.push(new Color().fromBufferAttribute(color, i));
+				}
+			}
+
+			function addFace(a, b, c, materialIndex) {
+				var vertexColors = color === undefined ? [] : [scope.colors[a].clone(), scope.colors[b].clone(), scope.colors[c].clone()];
+				var vertexNormals = normal === undefined ? [] : [new Vector3().fromBufferAttribute(normal, a), new Vector3().fromBufferAttribute(normal, b), new Vector3().fromBufferAttribute(normal, c)];
+				var face = new Face3(a, b, c, vertexNormals, vertexColors, materialIndex);
+				scope.faces.push(face);
+
+				if (uv !== undefined) {
+					scope.faceVertexUvs[0].push([new Vector2().fromBufferAttribute(uv, a), new Vector2().fromBufferAttribute(uv, b), new Vector2().fromBufferAttribute(uv, c)]);
+				}
+
+				if (uv2 !== undefined) {
+					scope.faceVertexUvs[1].push([new Vector2().fromBufferAttribute(uv2, a), new Vector2().fromBufferAttribute(uv2, b), new Vector2().fromBufferAttribute(uv2, c)]);
+				}
+			}
+
+			var groups = geometry.groups;
+
+			if (groups.length > 0) {
+				for (var _i2 = 0; _i2 < groups.length; _i2++) {
+					var group = groups[_i2];
+					var start = group.start;
+					var count = group.count;
+
+					for (var j = start, jl = start + count; j < jl; j += 3) {
+						if (index !== undefined) {
+							addFace(index.getX(j), index.getX(j + 1), index.getX(j + 2), group.materialIndex);
+						} else {
+							addFace(j, j + 1, j + 2, group.materialIndex);
+						}
+					}
+				}
+			} else {
+				if (index !== undefined) {
+					for (var _i3 = 0; _i3 < index.count; _i3 += 3) {
+						addFace(index.getX(_i3), index.getX(_i3 + 1), index.getX(_i3 + 2));
+					}
+				} else {
+					for (var _i4 = 0; _i4 < position.count; _i4 += 3) {
+						addFace(_i4, _i4 + 1, _i4 + 2);
+					}
+				}
+			}
+
+			this.computeFaceNormals();
+
+			if (geometry.boundingBox !== null) {
+				this.boundingBox = geometry.boundingBox.clone();
+			}
+
+			if (geometry.boundingSphere !== null) {
+				this.boundingSphere = geometry.boundingSphere.clone();
+			}
+
+			return this;
+		},
+		center: function center() {
+			this.computeBoundingBox();
+			this.boundingBox.getCenter(_offset$1).negate();
+			this.translate(_offset$1.x, _offset$1.y, _offset$1.z);
+			return this;
+		},
+		normalize: function normalize() {
+			this.computeBoundingSphere();
+			var center = this.boundingSphere.center;
+			var radius = this.boundingSphere.radius;
+			var s = radius === 0 ? 1 : 1.0 / radius;
+			var matrix = new Matrix4();
+			matrix.set(s, 0, 0, -s * center.x, 0, s, 0, -s * center.y, 0, 0, s, -s * center.z, 0, 0, 0, 1);
+			this.applyMatrix4(matrix);
+			return this;
+		},
+		computeFaceNormals: function computeFaceNormals() {
+			var cb = new Vector3(),
+					ab = new Vector3();
+
+			for (var f = 0, fl = this.faces.length; f < fl; f++) {
+				var face = this.faces[f];
+				var vA = this.vertices[face.a];
+				var vB = this.vertices[face.b];
+				var vC = this.vertices[face.c];
+				cb.subVectors(vC, vB);
+				ab.subVectors(vA, vB);
+				cb.cross(ab);
+				cb.normalize();
+				face.normal.copy(cb);
+			}
+		},
+		computeVertexNormals: function computeVertexNormals(areaWeighted) {
+			if (areaWeighted === void 0) {
+				areaWeighted = true;
+			}
+
+			var vertices = new Array(this.vertices.length);
+
+			for (var v = 0, vl = this.vertices.length; v < vl; v++) {
+				vertices[v] = new Vector3();
+			}
+
+			if (areaWeighted) {
+				// vertex normals weighted by triangle areas
+				// http://www.iquilezles.org/www/articles/normals/normals.htm
+				var cb = new Vector3(),
+						ab = new Vector3();
+
+				for (var f = 0, fl = this.faces.length; f < fl; f++) {
+					var face = this.faces[f];
+					var vA = this.vertices[face.a];
+					var vB = this.vertices[face.b];
+					var vC = this.vertices[face.c];
+					cb.subVectors(vC, vB);
+					ab.subVectors(vA, vB);
+					cb.cross(ab);
+					vertices[face.a].add(cb);
+					vertices[face.b].add(cb);
+					vertices[face.c].add(cb);
+				}
+			} else {
+				this.computeFaceNormals();
+
+				for (var _f = 0, _fl = this.faces.length; _f < _fl; _f++) {
+					var _face = this.faces[_f];
+
+					vertices[_face.a].add(_face.normal);
+
+					vertices[_face.b].add(_face.normal);
+
+					vertices[_face.c].add(_face.normal);
+				}
+			}
+
+			for (var _v = 0, _vl = this.vertices.length; _v < _vl; _v++) {
+				vertices[_v].normalize();
+			}
+
+			for (var _f2 = 0, _fl2 = this.faces.length; _f2 < _fl2; _f2++) {
+				var _face2 = this.faces[_f2];
+				var vertexNormals = _face2.vertexNormals;
+
+				if (vertexNormals.length === 3) {
+					vertexNormals[0].copy(vertices[_face2.a]);
+					vertexNormals[1].copy(vertices[_face2.b]);
+					vertexNormals[2].copy(vertices[_face2.c]);
+				} else {
+					vertexNormals[0] = vertices[_face2.a].clone();
+					vertexNormals[1] = vertices[_face2.b].clone();
+					vertexNormals[2] = vertices[_face2.c].clone();
+				}
+			}
+
+			if (this.faces.length > 0) {
+				this.normalsNeedUpdate = true;
+			}
+		},
+		computeFlatVertexNormals: function computeFlatVertexNormals() {
+			this.computeFaceNormals();
+
+			for (var f = 0, fl = this.faces.length; f < fl; f++) {
+				var face = this.faces[f];
+				var vertexNormals = face.vertexNormals;
+
+				if (vertexNormals.length === 3) {
+					vertexNormals[0].copy(face.normal);
+					vertexNormals[1].copy(face.normal);
+					vertexNormals[2].copy(face.normal);
+				} else {
+					vertexNormals[0] = face.normal.clone();
+					vertexNormals[1] = face.normal.clone();
+					vertexNormals[2] = face.normal.clone();
+				}
+			}
+
+			if (this.faces.length > 0) {
+				this.normalsNeedUpdate = true;
+			}
+		},
+		computeMorphNormals: function computeMorphNormals() {
+			// save original normals
+			// - create temp variables on first access
+			//	 otherwise just copy (for faster repeated calls)
+			for (var f = 0, fl = this.faces.length; f < fl; f++) {
+				var face = this.faces[f];
+
+				if (!face.__originalFaceNormal) {
+					face.__originalFaceNormal = face.normal.clone();
+				} else {
+					face.__originalFaceNormal.copy(face.normal);
+				}
+
+				if (!face.__originalVertexNormals) face.__originalVertexNormals = [];
+
+				for (var i = 0, il = face.vertexNormals.length; i < il; i++) {
+					if (!face.__originalVertexNormals[i]) {
+						face.__originalVertexNormals[i] = face.vertexNormals[i].clone();
+					} else {
+						face.__originalVertexNormals[i].copy(face.vertexNormals[i]);
+					}
+				}
+			} // use temp geometry to compute face and vertex normals for each morph
+
+
+			var tmpGeo = new Geometry();
+			tmpGeo.faces = this.faces;
+
+			for (var _i5 = 0, _il2 = this.morphTargets.length; _i5 < _il2; _i5++) {
+				// create on first access
+				if (!this.morphNormals[_i5]) {
+					this.morphNormals[_i5] = {};
+					this.morphNormals[_i5].faceNormals = [];
+					this.morphNormals[_i5].vertexNormals = [];
+					var dstNormalsFace = this.morphNormals[_i5].faceNormals;
+					var dstNormalsVertex = this.morphNormals[_i5].vertexNormals;
+
+					for (var _f3 = 0, _fl3 = this.faces.length; _f3 < _fl3; _f3++) {
+						var faceNormal = new Vector3();
+						var vertexNormals = {
+							a: new Vector3(),
+							b: new Vector3(),
+							c: new Vector3()
+						};
+						dstNormalsFace.push(faceNormal);
+						dstNormalsVertex.push(vertexNormals);
+					}
+				}
+
+				var morphNormals = this.morphNormals[_i5]; // set vertices to morph target
+
+				tmpGeo.vertices = this.morphTargets[_i5].vertices; // compute morph normals
+
+				tmpGeo.computeFaceNormals();
+				tmpGeo.computeVertexNormals(); // store morph normals
+
+				for (var _f4 = 0, _fl4 = this.faces.length; _f4 < _fl4; _f4++) {
+					var _face3 = this.faces[_f4];
+					var _faceNormal = morphNormals.faceNormals[_f4];
+					var _vertexNormals = morphNormals.vertexNormals[_f4];
+
+					_faceNormal.copy(_face3.normal);
+
+					_vertexNormals.a.copy(_face3.vertexNormals[0]);
+
+					_vertexNormals.b.copy(_face3.vertexNormals[1]);
+
+					_vertexNormals.c.copy(_face3.vertexNormals[2]);
+				}
+			} // restore original normals
+
+
+			for (var _f5 = 0, _fl5 = this.faces.length; _f5 < _fl5; _f5++) {
+				var _face4 = this.faces[_f5];
+				_face4.normal = _face4.__originalFaceNormal;
+				_face4.vertexNormals = _face4.__originalVertexNormals;
+			}
+		},
+		computeBoundingBox: function computeBoundingBox() {
+			if (this.boundingBox === null) {
+				this.boundingBox = new Box3();
+			}
+
+			this.boundingBox.setFromPoints(this.vertices);
+		},
+		computeBoundingSphere: function computeBoundingSphere() {
+			if (this.boundingSphere === null) {
+				this.boundingSphere = new Sphere();
+			}
+
+			this.boundingSphere.setFromPoints(this.vertices);
+		},
+		merge: function merge(geometry, matrix, materialIndexOffset) {
+			if (materialIndexOffset === void 0) {
+				materialIndexOffset = 0;
+			}
+
+			if (!(geometry && geometry.isGeometry)) {
+				console.error('THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry);
+				return;
+			}
+
+			var normalMatrix;
+			var vertexOffset = this.vertices.length,
+					vertices1 = this.vertices,
+					vertices2 = geometry.vertices,
+					faces1 = this.faces,
+					faces2 = geometry.faces,
+					colors1 = this.colors,
+					colors2 = geometry.colors;
+
+			if (matrix !== undefined) {
+				normalMatrix = new Matrix3().getNormalMatrix(matrix);
+			} // vertices
+
+
+			for (var i = 0, il = vertices2.length; i < il; i++) {
+				var vertex = vertices2[i];
+				var vertexCopy = vertex.clone();
+				if (matrix !== undefined) vertexCopy.applyMatrix4(matrix);
+				vertices1.push(vertexCopy);
+			} // colors
+
+
+			for (var _i6 = 0, _il3 = colors2.length; _i6 < _il3; _i6++) {
+				colors1.push(colors2[_i6].clone());
+			} // faces
+
+
+			for (var _i7 = 0, _il4 = faces2.length; _i7 < _il4; _i7++) {
+				var face = faces2[_i7];
+				var normal = void 0,
+						color = void 0;
+				var faceVertexNormals = face.vertexNormals,
+						faceVertexColors = face.vertexColors;
+				var faceCopy = new Face3(face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset);
+				faceCopy.normal.copy(face.normal);
+
+				if (normalMatrix !== undefined) {
+					faceCopy.normal.applyMatrix3(normalMatrix).normalize();
+				}
+
+				for (var j = 0, jl = faceVertexNormals.length; j < jl; j++) {
+					normal = faceVertexNormals[j].clone();
+
+					if (normalMatrix !== undefined) {
+						normal.applyMatrix3(normalMatrix).normalize();
+					}
+
+					faceCopy.vertexNormals.push(normal);
+				}
+
+				faceCopy.color.copy(face.color);
+
+				for (var _j = 0, _jl = faceVertexColors.length; _j < _jl; _j++) {
+					color = faceVertexColors[_j];
+					faceCopy.vertexColors.push(color.clone());
+				}
+
+				faceCopy.materialIndex = face.materialIndex + materialIndexOffset;
+				faces1.push(faceCopy);
+			} // uvs
+
+
+			for (var _i8 = 0, _il5 = geometry.faceVertexUvs.length; _i8 < _il5; _i8++) {
+				var faceVertexUvs2 = geometry.faceVertexUvs[_i8];
+				if (this.faceVertexUvs[_i8] === undefined) this.faceVertexUvs[_i8] = [];
+
+				for (var _j2 = 0, _jl2 = faceVertexUvs2.length; _j2 < _jl2; _j2++) {
+					var uvs2 = faceVertexUvs2[_j2],
+							uvsCopy = [];
+
+					for (var k = 0, kl = uvs2.length; k < kl; k++) {
+						uvsCopy.push(uvs2[k].clone());
+					}
+
+					this.faceVertexUvs[_i8].push(uvsCopy);
+				}
+			}
+		},
+		mergeMesh: function mergeMesh(mesh) {
+			if (!(mesh && mesh.isMesh)) {
+				console.error('THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh);
+				return;
+			}
+
+			if (mesh.matrixAutoUpdate) mesh.updateMatrix();
+			this.merge(mesh.geometry, mesh.matrix);
+		},
+
+		/*
+		 * Checks for duplicate vertices with hashmap.
+		 * Duplicated vertices are removed
+		 * and faces' vertices are updated.
+		 */
+		mergeVertices: function mergeVertices(precisionPoints) {
+			if (precisionPoints === void 0) {
+				precisionPoints = 4;
+			}
+
+			var verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
+
+			var unique = [],
+					changes = [];
+			var precision = Math.pow(10, precisionPoints);
+
+			for (var i = 0, il = this.vertices.length; i < il; i++) {
+				var v = this.vertices[i];
+				var key = Math.round(v.x * precision) + '_' + Math.round(v.y * precision) + '_' + Math.round(v.z * precision);
+
+				if (verticesMap[key] === undefined) {
+					verticesMap[key] = i;
+					unique.push(this.vertices[i]);
+					changes[i] = unique.length - 1;
+				} else {
+					//console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
+					changes[i] = changes[verticesMap[key]];
+				}
+			} // if faces are completely degenerate after merging vertices, we
+			// have to remove them from the geometry.
+
+
+			var faceIndicesToRemove = [];
+
+			for (var _i9 = 0, _il6 = this.faces.length; _i9 < _il6; _i9++) {
+				var face = this.faces[_i9];
+				face.a = changes[face.a];
+				face.b = changes[face.b];
+				face.c = changes[face.c];
+				var indices = [face.a, face.b, face.c]; // if any duplicate vertices are found in a Face3
+				// we have to remove the face as nothing can be saved
+
+				for (var n = 0; n < 3; n++) {
+					if (indices[n] === indices[(n + 1) % 3]) {
+						faceIndicesToRemove.push(_i9);
+						break;
+					}
+				}
+			}
+
+			for (var _i10 = faceIndicesToRemove.length - 1; _i10 >= 0; _i10--) {
+				var idx = faceIndicesToRemove[_i10];
+				this.faces.splice(idx, 1);
+
+				for (var j = 0, jl = this.faceVertexUvs.length; j < jl; j++) {
+					this.faceVertexUvs[j].splice(idx, 1);
+				}
+			} // Use unique set of vertices
+
+
+			var diff = this.vertices.length - unique.length;
+			this.vertices = unique;
+			return diff;
+		},
+		setFromPoints: function setFromPoints(points) {
+			this.vertices = [];
+
+			for (var i = 0, l = points.length; i < l; i++) {
+				var point = points[i];
+				this.vertices.push(new Vector3(point.x, point.y, point.z || 0));
+			}
+
+			return this;
+		},
+		sortFacesByMaterialIndex: function sortFacesByMaterialIndex() {
+			var faces = this.faces;
+			var length = faces.length; // tag faces
+
+			for (var i = 0; i < length; i++) {
+				faces[i]._id = i;
+			} // sort faces
+
+
+			function materialIndexSort(a, b) {
+				return a.materialIndex - b.materialIndex;
+			}
+
+			faces.sort(materialIndexSort); // sort uvs
+
+			var uvs1 = this.faceVertexUvs[0];
+			var uvs2 = this.faceVertexUvs[1];
+			var newUvs1, newUvs2;
+			if (uvs1 && uvs1.length === length) newUvs1 = [];
+			if (uvs2 && uvs2.length === length) newUvs2 = [];
+
+			for (var _i11 = 0; _i11 < length; _i11++) {
+				var id = faces[_i11]._id;
+				if (newUvs1) newUvs1.push(uvs1[id]);
+				if (newUvs2) newUvs2.push(uvs2[id]);
+			}
+
+			if (newUvs1) this.faceVertexUvs[0] = newUvs1;
+			if (newUvs2) this.faceVertexUvs[1] = newUvs2;
+		},
+		toJSON: function toJSON() {
+			var data = {
+				metadata: {
+					version: 4.5,
+					type: 'Geometry',
+					generator: 'Geometry.toJSON'
+				}
+			}; // standard Geometry serialization
+
+			data.uuid = this.uuid;
+			data.type = this.type;
+			if (this.name !== '') data.name = this.name;
+
+			if (this.parameters !== undefined) {
+				var parameters = this.parameters;
+
+				for (var key in parameters) {
+					if (parameters[key] !== undefined) data[key] = parameters[key];
+				}
+
+				return data;
+			}
+
+			var vertices = [];
+
+			for (var i = 0; i < this.vertices.length; i++) {
+				var vertex = this.vertices[i];
+				vertices.push(vertex.x, vertex.y, vertex.z);
+			}
+
+			var faces = [];
+			var normals = [];
+			var normalsHash = {};
+			var colors = [];
+			var colorsHash = {};
+			var uvs = [];
+			var uvsHash = {};
+
+			for (var _i12 = 0; _i12 < this.faces.length; _i12++) {
+				var face = this.faces[_i12];
+				var hasMaterial = true;
+				var hasFaceUv = false; // deprecated
+
+				var hasFaceVertexUv = this.faceVertexUvs[0][_i12] !== undefined;
+				var hasFaceNormal = face.normal.length() > 0;
+				var hasFaceVertexNormal = face.vertexNormals.length > 0;
+				var hasFaceColor = face.color.r !== 1 || face.color.g !== 1 || face.color.b !== 1;
+				var hasFaceVertexColor = face.vertexColors.length > 0;
+				var faceType = 0;
+				faceType = setBit(faceType, 0, 0); // isQuad
+
+				faceType = setBit(faceType, 1, hasMaterial);
+				faceType = setBit(faceType, 2, hasFaceUv);
+				faceType = setBit(faceType, 3, hasFaceVertexUv);
+				faceType = setBit(faceType, 4, hasFaceNormal);
+				faceType = setBit(faceType, 5, hasFaceVertexNormal);
+				faceType = setBit(faceType, 6, hasFaceColor);
+				faceType = setBit(faceType, 7, hasFaceVertexColor);
+				faces.push(faceType);
+				faces.push(face.a, face.b, face.c);
+				faces.push(face.materialIndex);
+
+				if (hasFaceVertexUv) {
+					var faceVertexUvs = this.faceVertexUvs[0][_i12];
+					faces.push(getUvIndex(faceVertexUvs[0]), getUvIndex(faceVertexUvs[1]), getUvIndex(faceVertexUvs[2]));
+				}
+
+				if (hasFaceNormal) {
+					faces.push(getNormalIndex(face.normal));
+				}
+
+				if (hasFaceVertexNormal) {
+					var vertexNormals = face.vertexNormals;
+					faces.push(getNormalIndex(vertexNormals[0]), getNormalIndex(vertexNormals[1]), getNormalIndex(vertexNormals[2]));
+				}
+
+				if (hasFaceColor) {
+					faces.push(getColorIndex(face.color));
+				}
+
+				if (hasFaceVertexColor) {
+					var vertexColors = face.vertexColors;
+					faces.push(getColorIndex(vertexColors[0]), getColorIndex(vertexColors[1]), getColorIndex(vertexColors[2]));
+				}
+			}
+
+			function setBit(value, position, enabled) {
+				return enabled ? value | 1 << position : value & ~(1 << position);
+			}
+
+			function getNormalIndex(normal) {
+				var hash = normal.x.toString() + normal.y.toString() + normal.z.toString();
+
+				if (normalsHash[hash] !== undefined) {
+					return normalsHash[hash];
+				}
+
+				normalsHash[hash] = normals.length / 3;
+				normals.push(normal.x, normal.y, normal.z);
+				return normalsHash[hash];
+			}
+
+			function getColorIndex(color) {
+				var hash = color.r.toString() + color.g.toString() + color.b.toString();
+
+				if (colorsHash[hash] !== undefined) {
+					return colorsHash[hash];
+				}
+
+				colorsHash[hash] = colors.length;
+				colors.push(color.getHex());
+				return colorsHash[hash];
+			}
+
+			function getUvIndex(uv) {
+				var hash = uv.x.toString() + uv.y.toString();
+
+				if (uvsHash[hash] !== undefined) {
+					return uvsHash[hash];
+				}
+
+				uvsHash[hash] = uvs.length / 2;
+				uvs.push(uv.x, uv.y);
+				return uvsHash[hash];
+			}
+
+			data.data = {};
+			data.data.vertices = vertices;
+			data.data.normals = normals;
+			if (colors.length > 0) data.data.colors = colors;
+			if (uvs.length > 0) data.data.uvs = [uvs]; // temporal backward compatibility
+
+			data.data.faces = faces;
+			return data;
+		},
+		clone: function clone() {
+			/*
+			 // Handle primitives
+				 const parameters = this.parameters;
+				 if ( parameters !== undefined ) {
+				 const values = [];
+				 for ( const key in parameters ) {
+				 values.push( parameters[ key ] );
+				 }
+				 const geometry = Object.create( this.constructor.prototype );
+			 this.constructor.apply( geometry, values );
+			 return geometry;
+				 }
+				 return new this.constructor().copy( this );
+			 */
+			return new Geometry().copy(this);
+		},
+		copy: function copy(source) {
+			// reset
+			this.vertices = [];
+			this.colors = [];
+			this.faces = [];
+			this.faceVertexUvs = [[]];
+			this.morphTargets = [];
+			this.morphNormals = [];
+			this.skinWeights = [];
+			this.skinIndices = [];
+			this.lineDistances = [];
+			this.boundingBox = null;
+			this.boundingSphere = null; // name
+
+			this.name = source.name; // vertices
+
+			var vertices = source.vertices;
+
+			for (var i = 0, il = vertices.length; i < il; i++) {
+				this.vertices.push(vertices[i].clone());
+			} // colors
+
+
+			var colors = source.colors;
+
+			for (var _i13 = 0, _il7 = colors.length; _i13 < _il7; _i13++) {
+				this.colors.push(colors[_i13].clone());
+			} // faces
+
+
+			var faces = source.faces;
+
+			for (var _i14 = 0, _il8 = faces.length; _i14 < _il8; _i14++) {
+				this.faces.push(faces[_i14].clone());
+			} // face vertex uvs
+
+
+			for (var _i15 = 0, _il9 = source.faceVertexUvs.length; _i15 < _il9; _i15++) {
+				var faceVertexUvs = source.faceVertexUvs[_i15];
+
+				if (this.faceVertexUvs[_i15] === undefined) {
+					this.faceVertexUvs[_i15] = [];
+				}
+
+				for (var j = 0, jl = faceVertexUvs.length; j < jl; j++) {
+					var uvs = faceVertexUvs[j],
+							uvsCopy = [];
+
+					for (var k = 0, kl = uvs.length; k < kl; k++) {
+						var uv = uvs[k];
+						uvsCopy.push(uv.clone());
+					}
+
+					this.faceVertexUvs[_i15].push(uvsCopy);
+				}
+			} // morph targets
+
+
+			var morphTargets = source.morphTargets;
+
+			for (var _i16 = 0, _il10 = morphTargets.length; _i16 < _il10; _i16++) {
+				var morphTarget = {};
+				morphTarget.name = morphTargets[_i16].name; // vertices
+
+				if (morphTargets[_i16].vertices !== undefined) {
+					morphTarget.vertices = [];
+
+					for (var _j3 = 0, _jl3 = morphTargets[_i16].vertices.length; _j3 < _jl3; _j3++) {
+						morphTarget.vertices.push(morphTargets[_i16].vertices[_j3].clone());
+					}
+				} // normals
+
+
+				if (morphTargets[_i16].normals !== undefined) {
+					morphTarget.normals = [];
+
+					for (var _j4 = 0, _jl4 = morphTargets[_i16].normals.length; _j4 < _jl4; _j4++) {
+						morphTarget.normals.push(morphTargets[_i16].normals[_j4].clone());
+					}
+				}
+
+				this.morphTargets.push(morphTarget);
+			} // morph normals
+
+
+			var morphNormals = source.morphNormals;
+
+			for (var _i17 = 0, _il11 = morphNormals.length; _i17 < _il11; _i17++) {
+				var morphNormal = {}; // vertex normals
+
+				if (morphNormals[_i17].vertexNormals !== undefined) {
+					morphNormal.vertexNormals = [];
+
+					for (var _j5 = 0, _jl5 = morphNormals[_i17].vertexNormals.length; _j5 < _jl5; _j5++) {
+						var srcVertexNormal = morphNormals[_i17].vertexNormals[_j5];
+						var destVertexNormal = {};
+						destVertexNormal.a = srcVertexNormal.a.clone();
+						destVertexNormal.b = srcVertexNormal.b.clone();
+						destVertexNormal.c = srcVertexNormal.c.clone();
+						morphNormal.vertexNormals.push(destVertexNormal);
+					}
+				} // face normals
+
+
+				if (morphNormals[_i17].faceNormals !== undefined) {
+					morphNormal.faceNormals = [];
+
+					for (var _j6 = 0, _jl6 = morphNormals[_i17].faceNormals.length; _j6 < _jl6; _j6++) {
+						morphNormal.faceNormals.push(morphNormals[_i17].faceNormals[_j6].clone());
+					}
+				}
+
+				this.morphNormals.push(morphNormal);
+			} // skin weights
+
+
+			var skinWeights = source.skinWeights;
+
+			for (var _i18 = 0, _il12 = skinWeights.length; _i18 < _il12; _i18++) {
+				this.skinWeights.push(skinWeights[_i18].clone());
+			} // skin indices
+
+
+			var skinIndices = source.skinIndices;
+
+			for (var _i19 = 0, _il13 = skinIndices.length; _i19 < _il13; _i19++) {
+				this.skinIndices.push(skinIndices[_i19].clone());
+			} // line distances
+
+
+			var lineDistances = source.lineDistances;
+
+			for (var _i20 = 0, _il14 = lineDistances.length; _i20 < _il14; _i20++) {
+				this.lineDistances.push(lineDistances[_i20]);
+			} // bounding box
+
+
+			var boundingBox = source.boundingBox;
+
+			if (boundingBox !== null) {
+				this.boundingBox = boundingBox.clone();
+			} // bounding sphere
+
+
+			var boundingSphere = source.boundingSphere;
+
+			if (boundingSphere !== null) {
+				this.boundingSphere = boundingSphere.clone();
+			} // update flags
+
+
+			this.elementsNeedUpdate = source.elementsNeedUpdate;
+			this.verticesNeedUpdate = source.verticesNeedUpdate;
+			this.uvsNeedUpdate = source.uvsNeedUpdate;
+			this.normalsNeedUpdate = source.normalsNeedUpdate;
+			this.colorsNeedUpdate = source.colorsNeedUpdate;
+			this.lineDistancesNeedUpdate = source.lineDistancesNeedUpdate;
+			this.groupsNeedUpdate = source.groupsNeedUpdate;
+			return this;
+		},
+		dispose: function dispose() {
+			this.dispatchEvent({
+				type: 'dispose'
+			});
+		}
+	});
+
 	function InstancedInterleavedBuffer(array, stride, meshPerAttribute) {
 		InterleavedBuffer.call(this, array, stride);
 		this.meshPerAttribute = meshPerAttribute || 1;
@@ -36824,12 +36248,12 @@
 			return this.extractPoints(divisions);
 		},
 		extrude: function extrude(options) {
-			console.warn('THREE.Shape: .extrude() has been removed. Use ExtrudeGeometry() instead.');
-			return new ExtrudeGeometry(this, options);
+			console.warn('THREE.Shape: .extrude() has been removed. Use ExtrudeBufferGeometry() instead.');
+			return new ExtrudeBufferGeometry(this, options);
 		},
 		makeGeometry: function makeGeometry(options) {
-			console.warn('THREE.Shape: .makeGeometry() has been removed. Use ShapeGeometry() instead.');
-			return new ShapeGeometry(this, options);
+			console.warn('THREE.Shape: .makeGeometry() has been removed. Use ShapeBufferGeometry() instead.');
+			return new ShapeBufferGeometry(this, options);
 		}
 	});
 	Object.assign(Vector2.prototype, {
@@ -36905,6 +36329,87 @@
 			return this.applyMatrix4(matrix);
 		}
 	});
+	function BoxGeometry(width, height, depth, widthSegments, heightSegments, depthSegments) {
+		console.warn('THREE.BoxGeometry has been removed. Use THREE.BoxBufferGeometry instead.');
+		return new BoxBufferGeometry(width, height, depth, widthSegments, heightSegments, depthSegments);
+	}
+	function CircleGeometry(radius, segments, thetaStart, thetaLength) {
+		console.warn('THREE.CircleGeometry has been removed. Use THREE.CircleBufferGeometry instead.');
+		return new CircleBufferGeometry(radius, segments, thetaStart, thetaLength);
+	}
+	function ConeGeometry(radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
+		console.warn('THREE.CircleGeometry has been removed. Use THREE.ConeBufferGeometry instead.');
+		return new ConeBufferGeometry(radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength);
+	}
+	function CylinderGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
+		console.warn('THREE.CylinderGeometry has been removed. Use THREE.CylinderBufferGeometry instead.');
+		return new CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength);
+	}
+	function DodecahedronGeometry(radius, detail) {
+		console.warn('THREE.DodecahedronGeometry has been removed. Use THREE.DodecahedronBufferGeometry instead.');
+		return new DodecahedronBufferGeometry(radius, detail);
+	}
+	function ExtrudeGeometry(shapes, options) {
+		console.warn('THREE.ExtrudeGeometry has been removed. Use THREE.ExtrudeBufferGeometry instead.');
+		return new ExtrudeBufferGeometry(shapes, options);
+	}
+	function IcosahedronGeometry(radius, detail) {
+		console.warn('THREE.IcosahedronGeometry has been removed. Use THREE.IcosahedronBufferGeometry instead.');
+		return new IcosahedronBufferGeometry(radius, detail);
+	}
+	function LatheGeometry(points, segments, phiStart, phiLength) {
+		console.warn('THREE.LatheGeometry has been removed. Use THREE.LatheBufferGeometry instead.');
+		return new LatheBufferGeometry(points, segments, phiStart, phiLength);
+	}
+	function OctahedronGeometry(radius, detail) {
+		console.warn('THREE.OctahedronGeometry has been removed. Use THREE.OctahedronBufferGeometry instead.');
+		return new OctahedronBufferGeometry(radius, detail);
+	}
+	function ParametricGeometry(func, slices, stacks) {
+		console.warn('THREE.ParametricGeometry has been removed. Use THREE.ParametricBufferGeometry instead.');
+		return new ParametricBufferGeometry(func, slices, stacks);
+	}
+	function PlaneGeometry(width, height, widthSegments, heightSegments) {
+		console.warn('THREE.PlaneGeometry has been removed. Use THREE.PlaneBufferGeometry instead.');
+		return new PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+	}
+	function PolyhedronGeometry(vertices, indices, radius, detail) {
+		console.warn('THREE.PolyhedronGeometry has been removed. Use THREE.PolyhedronBufferGeometry instead.');
+		return new PolyhedronBufferGeometry(vertices, indices, radius, detail);
+	}
+	function RingGeometry(innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength) {
+		console.warn('THREE.RingGeometry has been removed. Use THREE.RingBufferGeometry instead.');
+		return new RingBufferGeometry(innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength);
+	}
+	function ShapeGeometry(shapes, curveSegments) {
+		console.warn('THREE.ShapeGeometry has been removed. Use THREE.ShapeBufferGeometry instead.');
+		return new ShapeBufferGeometry(shapes, curveSegments);
+	}
+	function SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength) {
+		console.warn('THREE.SphereGeometry has been removed. Use THREE.SphereBufferGeometry instead.');
+		return new SphereBufferGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength);
+	}
+	function TetrahedronGeometry(radius, detail) {
+		console.warn('THREE.TetrahedronGeometry has been removed. Use THREE.TetrahedronBufferGeometry instead.');
+		return new TetrahedronBufferGeometry(radius, detail);
+	}
+	function TextGeometry(text, parameters) {
+		console.warn('THREE.TextGeometry has been removed. Use THREE.TextBufferGeometry instead.');
+		return new TextBufferGeometry(text, parameters);
+	}
+	function TorusGeometry(radius, tube, radialSegments, tubularSegments, arc) {
+		console.warn('THREE.TorusGeometry has been removed. Use THREE.TorusBufferGeometry instead.');
+		return new TorusBufferGeometry(radius, tube, radialSegments, tubularSegments, arc);
+	}
+	function TorusKnotGeometry(radius, tube, tubularSegments, radialSegments, p, q, heightScale) {
+		console.warn('THREE.TorusKnotGeometry has been removed. Use THREE.TorusKnotBufferGeometry instead.');
+		return new TorusKnotBufferGeometry(radius, tube, tubularSegments, radialSegments, p, q, heightScale);
+	}
+	function TubeGeometry(path, tubularSegments, radius, radialSegments, closed, taper) {
+		console.warn('THREE.TubeGeometry has been removed. Use THREE.TubeBufferGeometry instead.');
+		return new TubeBufferGeometry(path, tubularSegments, radius, radialSegments, closed, taper);
+	} //
+
 	Object.assign(Object3D.prototype, {
 		getChildByName: function getChildByName(name) {
 			console.warn('THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().');
@@ -37826,7 +37331,6 @@
 	exports.ConeBufferGeometry = ConeBufferGeometry;
 	exports.ConeGeometry = ConeGeometry;
 	exports.CubeCamera = CubeCamera;
-	exports.CubeGeometry = BoxGeometry;
 	exports.CubeReflectionMapping = CubeReflectionMapping;
 	exports.CubeRefractionMapping = CubeRefractionMapping;
 	exports.CubeTexture = CubeTexture;
