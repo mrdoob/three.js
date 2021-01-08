@@ -39,7 +39,7 @@ function init() {
 
 	scene = new THREE.Scene();
 
-	geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+	geometry = new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 );
 	material = new THREE.MeshNormalMaterial();
 
 	mesh = new THREE.Mesh( geometry, material );
@@ -62,7 +62,7 @@ function animation( time ) {
 }
 ```
 
-If everything went well, you should see [this](https://jsfiddle.net/yf6nks2o/).
+If everything went well, you should see [this](https://jsfiddle.net/9v7eqwu1/).
 
 ### Cloning this repository ###
 
