@@ -35807,6 +35807,8 @@
 
 	var _clearColor = /*@__PURE__*/new Color();
 
+	var _backgroundColor = /*@__PURE__*/new Color();
+
 	var _oldTarget = null; // Golden Ratio
 
 	var PHI = (1 + Math.sqrt(5)) / 2;
@@ -35825,6 +35827,14 @@
 	 * higher roughness levels. In this way we maintain resolution to smoothly
 	 * interpolate diffuse lighting while limiting sampling computation.
 	 */
+
+	function convertLinearToRGBE(color) {
+		var maxComponent = Math.max(color.r, color.g, color.b);
+		var fExp = Math.min(Math.max(Math.ceil(Math.log2(maxComponent)), -128.0), 127.0);
+		color.multiplyScalar(Math.pow(2.0, -fExp));
+		var alpha = (fExp + 128.0) / 255.0;
+		return alpha;
+	}
 
 	var PMREMGenerator = /*#__PURE__*/function () {
 		function PMREMGenerator(renderer) {
@@ -36001,19 +36011,27 @@
 			var toneMapping = renderer.toneMapping;
 			renderer.getClearColor(_clearColor);
 			var clearAlpha = renderer.getClearAlpha();
+			var originalBackground = scene.background;
 			renderer.toneMapping = NoToneMapping;
 			renderer.outputEncoding = LinearEncoding;
 			var background = scene.background;
 
-			if (background && background.isColor) {
-				background.convertSRGBToLinear(); // Convert linear to RGBE
+			if (background) {
+				if (background.isColor) {
+					_backgroundColor.copy(background).convertSRGBToLinear();
 
-				var maxComponent = Math.max(background.r, background.g, background.b);
-				var fExp = Math.min(Math.max(Math.ceil(Math.log2(maxComponent)), -128.0), 127.0);
-				background = background.multiplyScalar(Math.pow(2.0, -fExp));
-				var alpha = (fExp + 128.0) / 255.0;
-				renderer.setClearColor(background, alpha);
-				scene.background = null;
+					scene.background = null;
+					var alpha = convertLinearToRGBE(_backgroundColor);
+					renderer.setClearColor(_backgroundColor);
+					renderer.setClearAlpha(alpha);
+				}
+			} else {
+				_backgroundColor.copy(_clearColor).convertSRGBToLinear();
+
+				var _alpha = convertLinearToRGBE(_backgroundColor);
+
+				renderer.setClearColor(_backgroundColor);
+				renderer.setClearAlpha(_alpha);
 			}
 
 			for (var i = 0; i < 6; i++) {
@@ -36039,6 +36057,7 @@
 			renderer.toneMapping = toneMapping;
 			renderer.outputEncoding = outputEncoding;
 			renderer.setClearColor(_clearColor, clearAlpha);
+			scene.background = originalBackground;
 		};
 
 		_proto._textureToCubeUV = function _textureToCubeUV(texture, cubeUVRenderTarget) {
