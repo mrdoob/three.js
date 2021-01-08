@@ -1,4 +1,5 @@
 import { KeyframeTrack } from './KeyframeTrack';
+import { Vector3 } from './../math/Vector3';
 import { Bone } from './../objects/Bone';
 import { AnimationBlendMode } from '../constants';
 

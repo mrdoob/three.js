@@ -8,8 +8,8 @@ export class WebGLGeometries {
 
 	constructor( gl: WebGLRenderingContext, attributes: WebGLAttributes, info: WebGLInfo );
 
-	get( object: Object3D, geometry: Geometry | BufferGeometry ): BufferGeometry;
+	get( object: Object3D, geometry: BufferGeometry ): BufferGeometry;
 	update( geometry: BufferGeometry ): void;
-	getWireframeAttribute( geometry: Geometry | BufferGeometry ): BufferAttribute;
+	getWireframeAttribute( geometry: BufferGeometry ): BufferAttribute;
 
 }

@@ -4,18 +4,15 @@ import { Object3D } from './../core/Object3D';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Intersection } from '../core/Raycaster';
 
-export class Line <
-	BufferGeometry,
-	TMaterial extends Material | Material[] = Material | Material[]
-> extends Object3D {
+export class Line extends Object3D {
 
 	constructor(
 		geometry?: BufferGeometry,
-		material?: TMaterial
+		material?: Material | Material[]
 	);
 
-	geometry: TGeometry;
-	material: TMaterial;
+	geometry: BufferGeometry;
+	material: Material | Material[];
 
 	type: 'Line' | 'LineLoop' | 'LineSegments' | string;
 	readonly isLine: true;

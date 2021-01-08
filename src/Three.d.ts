@@ -92,7 +92,6 @@ export * from './animation/AnimationAction';
 export * from './core/Uniform';
 export * from './core/InstancedBufferGeometry';
 export * from './core/BufferGeometry';
-export * from './core/Geometry';
 export * from './core/InterleavedBufferAttribute';
 export * from './core/InstancedInterleavedBuffer';
 export * from './core/InterleavedBuffer';

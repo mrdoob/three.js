@@ -11,14 +11,11 @@ export const LineStrip: number;
  */
 export const LinePieces: number;
 
-export class LineSegments <
-	BufferGeometry,
-	TMaterial extends Material | Material[] = Material | Material[]
-> extends Line<BufferGeometry, TMaterial> {
+export class LineSegments extends Line {
 
 	constructor(
 		geometry?: BufferGeometry,
-		material?: TMaterial
+		material?: Material | Material[]
 	);
 
 	/**

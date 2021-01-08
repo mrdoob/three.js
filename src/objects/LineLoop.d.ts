@@ -2,14 +2,11 @@ import { Line } from './Line';
 import { Material } from './../materials/Material';
 import { BufferGeometry } from '../core/BufferGeometry';
 
-export class LineLoop <
-	BufferGeometry,
-	TMaterial extends Material | Material[] = Material | Material[]
-> extends Line<BufferGeometry, TMaterial> {
+export class LineLoop extends Line {
 
 	constructor(
 		geometry?: BufferGeometry,
-		material?: TMaterial
+		material?: Material | Material[]
 	);
 
 	type: 'LineLoop';

@@ -5,14 +5,11 @@ import { Mesh } from './Mesh';
 import { Matrix4 } from './../math/Matrix4';
 import { Color } from './../math/Color';
 
-export class InstancedMesh <
-	BufferGeometry,
-	TMaterial extends Material | Material[] = Material | Material[]
-> extends Mesh<BufferGeometry, TMaterial> {
+export class InstancedMesh extends Mesh {
 
 	constructor(
 		geometry: BufferGeometry,
-		material: TMaterial,
+		material: Material | Material[],
 		count: number
 	);
 

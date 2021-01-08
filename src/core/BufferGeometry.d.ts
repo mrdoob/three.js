@@ -4,7 +4,6 @@ import { Sphere } from './../math/Sphere';
 import { Matrix4 } from './../math/Matrix4';
 import { Vector2 } from './../math/Vector2';
 import { Vector3 } from './../math/Vector3';
-import { Object3D } from './Object3D';
 import { EventDispatcher } from './EventDispatcher';
 import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
 
