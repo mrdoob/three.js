@@ -1,5 +1,4 @@
 import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute.js';
-import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { arrayMax } from '../../utils.js';
 
 function WebGLGeometries( gl, attributes, info, bindingStates ) {
@@ -63,15 +62,9 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 			buffergeometry = geometry;
 
-		} else if ( geometry.isGeometry ) {
+		} else {
 
-			if ( geometry._bufferGeometry === undefined ) {
-
-				geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
-
-			}
-
-			buffergeometry = geometry._bufferGeometry;
+			console.log( 'TODO: Remove this', geometry );
 
 		}
 
