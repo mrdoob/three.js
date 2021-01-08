@@ -117,9 +117,7 @@ export class BufferGeometry extends EventDispatcher {
 
 	center(): BufferGeometry;
 
-	setFromObject( object: Object3D ): BufferGeometry;
 	setFromPoints( points: Vector3[] | Vector2[] ): BufferGeometry;
-	updateFromObject( object: Object3D ): void;
 
 	/**
 	 * Computes bounding box of the geometry, updating Geometry.boundingBox attribute.
