@@ -642,7 +642,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	toJSON: function ( meta ) {
+	toJSON: function ( meta, cloneTransferableTypes = true ) {
 
 		// meta is a string when called from JSON.stringify
 		const isRootObject = ( meta === undefined || typeof meta === 'string' );
@@ -709,7 +709,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			if ( library[ element.uuid ] === undefined ) {
 
-				library[ element.uuid ] = element.toJSON( meta );
+				library[ element.uuid ] = element.toJSON( meta, cloneTransferableTypes );
 
 			}
 
@@ -792,7 +792,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			for ( let i = 0; i < this.children.length; i ++ ) {
 
-				object.children.push( this.children[ i ].toJSON( meta ).object );
+				object.children.push( this.children[ i ].toJSON( meta, cloneTransferableTypes ).object );
 
 			}
 

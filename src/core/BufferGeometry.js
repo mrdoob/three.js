@@ -988,7 +988,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
-	toJSON: function () {
+	toJSON: function ( meta, cloneTransferableTypes = true ) {
 
 		const data = {
 			metadata: {
@@ -1027,7 +1027,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			data.data.index = {
 				type: index.array.constructor.name,
-				array: Array.prototype.slice.call( index.array )
+				array: cloneTransferableTypes ? Array.prototype.slice.call( index.array ) : index.array,
 			};
 
 		}
@@ -1038,7 +1038,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			const attribute = attributes[ key ];
 
-			const attributeData = attribute.toJSON( data.data );
+			const attributeData = attribute.toJSON( data.data, cloneTransferableTypes );
 
 			if ( attribute.name !== '' ) attributeData.name = attribute.name;
 

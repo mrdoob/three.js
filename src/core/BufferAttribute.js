@@ -392,12 +392,12 @@ Object.assign( BufferAttribute.prototype, {
 
 	},
 
-	toJSON: function () {
+	toJSON: function ( meta, cloneTransferableTypes = true ) {
 
 		return {
 			itemSize: this.itemSize,
 			type: this.array.constructor.name,
-			array: Array.prototype.slice.call( this.array ),
+			array: cloneTransferableTypes ? Array.prototype.slice.call( this.array ) : this.array,
 			normalized: this.normalized
 		};
 
