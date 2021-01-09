@@ -1,11 +1,11 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { PolyhedronBufferGeometry } from '../../../../src/geometries/PolyhedronBufferGeometry';
+import { PolyhedronGeometry } from '../../../../src/geometries/PolyhedronGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'PolyhedronBufferGeometry', ( hooks ) => {
+	QUnit.module( 'PolyhedronGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -19,7 +19,7 @@ export default QUnit.module( 'Geometries', () => {
 			];
 
 			geometries = [
-				new PolyhedronBufferGeometry( vertices, indices )
+				new PolyhedronGeometry( vertices, indices )
 			];
 
 		} );

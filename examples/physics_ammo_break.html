@@ -24,7 +24,7 @@
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { ConvexObjectBreaker } from './jsm/misc/ConvexObjectBreaker.js';
-		import { ConvexBufferGeometry } from './jsm/geometries/ConvexGeometry.js';
+		import { ConvexGeometry } from './jsm/geometries/ConvexGeometry.js';
 
 		// - Global variables -
 
@@ -236,7 +236,7 @@
 			mountainPoints.push( new THREE.Vector3( mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
 			mountainPoints.push( new THREE.Vector3( - mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
 			mountainPoints.push( new THREE.Vector3( 0, mountainHalfExtents.y, 0 ) );
-			const mountain = new THREE.Mesh( new ConvexBufferGeometry( mountainPoints ), createMaterial( 0xB03814 ) );
+			const mountain = new THREE.Mesh( new ConvexGeometry( mountainPoints ), createMaterial( 0xB03814 ) );
 			mountain.position.copy( pos );
 			mountain.quaternion.copy( quat );
 			convexBreaker.prepareBreakableObject( mountain, mountainMass, new THREE.Vector3(), new THREE.Vector3(), true );

@@ -70,7 +70,7 @@
 		<p><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</p>
 
 		<code>
-		const geometry = new THREE.BoxBufferGeometry();
+		const geometry = new THREE.BoxGeometry();
 		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		const cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );
@@ -78,7 +78,7 @@
 		camera.position.z = 5;
 		</code>
 
-		<p>To create a cube, we need a <strong>BoxBufferGeometry</strong>. This is an object that contains all the points (<strong>vertices</strong>) and fill (<strong>faces</strong>) of the cube. We'll explore this more in the future.</p>
+		<p>To create a cube, we need a <strong>BoxGeometry</strong>. This is an object that contains all the points (<strong>vertices</strong>) and fill (<strong>faces</strong>) of the cube. We'll explore this more in the future.</p>
 
 		<p>In addition to the geometry, we need a material to color it. Three.js comes with several materials, but we'll stick to the <strong>MeshBasicMaterial</strong> for now. All materials take an object of properties which will be applied to them. To keep things very simple, we only supply a color attribute of <strong>0x00ff00</strong>, which is green. This works the same way that colors work in CSS or Photoshop (<strong>hex colors</strong>).</p>
 
@@ -116,7 +116,7 @@
 		<h2>The result</h2>
 		<p>Congratulations! You have now completed your first three.js application. It's simple, you have to start somewhere.</p>
 
-		<p>The full code is available below and as an editable [link:https://jsfiddle.net/zpcswh8m/ live example]. Play around with it to get a better understanding of how it works.</p>
+		<p>The full code is available below and as an editable [link:https://jsfiddle.net/fxurzeb4/ live example]. Play around with it to get a better understanding of how it works.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -137,7 +137,7 @@
 					renderer.setSize( window.innerWidth, window.innerHeight );
 					document.body.appendChild( renderer.domElement );
 
-					const geometry = new THREE.BoxBufferGeometry();
+					const geometry = new THREE.BoxGeometry();
 					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 					const cube = new THREE.Mesh( geometry, material );
 					scene.add( cube );

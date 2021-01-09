@@ -3,8 +3,8 @@
 import { Geometry } from '../../../../src/core/Geometry';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
-import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
-import { DodecahedronBufferGeometry } from '../../../../src/geometries/DodecahedronBufferGeometry';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
+import { DodecahedronGeometry } from '../../../../src/geometries/DodecahedronGeometry';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Face3 } from '../../../../src/core/Face3';
@@ -320,7 +320,7 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( "computeBoundingBox", ( assert ) => {
 
-			var a = new Geometry().fromBufferGeometry( new DodecahedronBufferGeometry() );
+			var a = new Geometry().fromBufferGeometry( new DodecahedronGeometry() );
 
 			a.computeBoundingBox();
 			assert.strictEqual( a.boundingBox.isEmpty(), false, "Bounding box isn't empty" );
@@ -341,7 +341,7 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( "computeBoundingSphere", ( assert ) => {
 
-			var a = new Geometry().fromBufferGeometry( new DodecahedronBufferGeometry() );
+			var a = new Geometry().fromBufferGeometry( new DodecahedronGeometry() );
 
 			a.computeBoundingSphere();
 
@@ -374,7 +374,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( "mergeVertices", ( assert ) => {
 
 			var a = new Geometry();
-			var b = new BoxBufferGeometry( 1, 1, 1 );
+			var b = new BoxGeometry( 1, 1, 1 );
 			var verts, faces, removed;
 
 			a.fromBufferGeometry( b );
@@ -391,7 +391,7 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( "sortFacesByMaterialIndex", ( assert ) => {
 
-			var box = new BoxBufferGeometry( 1, 1, 1 );
+			var box = new BoxGeometry( 1, 1, 1 );
 			var a = new Geometry().fromBufferGeometry( box );
 			var expected = [ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5 ];
 
