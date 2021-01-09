@@ -1,7 +1,6 @@
 import {
 	BufferGeometry,
-	Face3,
-	Geometry
+	Face3
 } from '../../../build/three.module.js';
 
 /**

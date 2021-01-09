@@ -1,6 +1,5 @@
 import {
 	Curve,
-	Geometry,
 	ParametricGeometry,
 	Vector3
 } from '../../../build/three.module.js';

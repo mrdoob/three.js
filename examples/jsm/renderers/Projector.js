@@ -6,7 +6,6 @@ import {
 	DoubleSide,
 	FrontSide,
 	Frustum,
-	Geometry,
 	Light,
 	Line,
 	LineSegments,
