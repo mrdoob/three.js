@@ -1,19 +1,3 @@
-// ConvexGeometry
-
-THREE.ConvexGeometry = function ( points ) {
-
-	THREE.Geometry.call( this );
-
-	this.fromBufferGeometry( new THREE.ConvexBufferGeometry( points ) );
-	this.mergeVertices();
-
-};
-
-THREE.ConvexGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.ConvexGeometry.prototype.constructor = THREE.ConvexGeometry;
-
-// ConvexBufferGeometry
-
 THREE.ConvexBufferGeometry = function ( points ) {
 
 	THREE.BufferGeometry.call( this );
