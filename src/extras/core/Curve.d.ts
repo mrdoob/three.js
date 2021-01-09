@@ -76,7 +76,7 @@ export class Curve<T extends Vector> {
 	 * getTangentAt(u: number, optionalTarget?: T): T;
 	 */
 	getTangentAt( u: number, optionalTarget?: T ): T;
-	
+
 	/**
 	 * Generate Frenet frames of the curve
 	 */
