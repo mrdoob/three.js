@@ -121,7 +121,7 @@
 		</p>
 
 		<code>
-		const geometry = new THREE.BoxBufferGeometry();
+		const geometry = new THREE.BoxGeometry();
 		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		const cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );
@@ -130,7 +130,7 @@
 		</code>
 
 		<p>
-			لكي نقوم بإنشاء مكعب، نحتاج مكون <strong>BoxBufferGeometry</strong>. هذا الأخير مسؤول عن حفض أماكن كل النقاط
+			لكي نقوم بإنشاء مكعب، نحتاج مكون <strong>BoxGeometry</strong>. هذا الأخير مسؤول عن حفض أماكن كل النقاط
 			(<strong>vertices</strong>) و تعبئة كل الأوجه
 			(<strong>faces</strong>) المكونة للمكعب. سنقوم بالتعمق في هذا الموضوع مستقبلا.
 		</p>
@@ -218,7 +218,7 @@
 		</p>
 
 		<p>
-			الشفرة البرمجية الكاملة في الأسفل إلى جانب محرر مباشر [link:https://jsfiddle.net/zpcswh8m/ live example].
+			الشفرة البرمجية الكاملة في الأسفل إلى جانب محرر مباشر [link:https://jsfiddle.net/fxurzeb4/ live example].
 			أنت
 			مدعو للعب بالأوامر البرمجية لكي تصبح صورة كيفية عملها أوضح من قبل.
 		</p>
@@ -241,7 +241,7 @@
 					renderer.setSize( window.innerWidth, window.innerHeight );
 					document.body.appendChild( renderer.domElement );
 
-					const geometry = new THREE.BoxBufferGeometry();
+					const geometry = new THREE.BoxGeometry();
 					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 					const cube = new THREE.Mesh( geometry, material );
 					scene.add( cube );

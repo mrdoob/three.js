@@ -106,7 +106,7 @@ var files = [
 	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'misc/ConvexObjectBreaker.js', dependencies: [ { name: 'ConvexBufferGeometry', path: 'geometries/ConvexGeometry.js' } ], ignoreList: [ 'Matrix4' ] },
+	{ path: 'misc/ConvexObjectBreaker.js', dependencies: [ { name: 'ConvexGeometry', path: 'geometries/ConvexGeometry.js' } ], ignoreList: [ 'Matrix4' ] },
 	{ path: 'misc/GPUComputationRenderer.js', dependencies: [], ignoreList: [] },
 	{ path: 'misc/Gyroscope.js', dependencies: [], ignoreList: [] },
 	{ path: 'misc/MD2Character.js', dependencies: [ { name: 'MD2Loader', path: 'loaders/MD2Loader.js' } ], ignoreList: [] },

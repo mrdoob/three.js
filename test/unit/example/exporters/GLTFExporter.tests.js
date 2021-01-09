@@ -3,7 +3,7 @@
 import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter';
 
 import { AnimationClip } from '../../../../src/animation/AnimationClip';
-import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
 import { DirectionalLight } from '../../../../src/lights/DirectionalLight';
@@ -161,7 +161,7 @@ export default QUnit.module( 'Exporters', () => {
 			var done = assert.async();
 
 			var box = new Mesh(
-				new BoxBufferGeometry( 1, 1, 1 ),
+				new BoxGeometry( 1, 1, 1 ),
 				new MeshStandardMaterial( { color: 0xFF0000 } )
 			);
 

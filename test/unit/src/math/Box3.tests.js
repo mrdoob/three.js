@@ -8,7 +8,7 @@ import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Mesh } from '../../../../src/objects/Mesh';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
 import {
 	negInf3,
 	posInf3,
@@ -155,8 +155,8 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setFromObject/BufferGeometry", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), one3.clone() );
-			var object = new Mesh( new BoxBufferGeometry( 2, 2, 2 ) );
-			var child = new Mesh( new BoxBufferGeometry( 1, 1, 1 ) );
+			var object = new Mesh( new BoxGeometry( 2, 2, 2 ) );
+			var child = new Mesh( new BoxGeometry( 1, 1, 1 ) );
 			object.add( child );
 
 			a.setFromObject( object );
@@ -304,9 +304,9 @@ export default QUnit.module( 'Maths', () => {
 
 			var a = new Box3( zero3.clone(), one3.clone() );
 			var b = a.clone();
-			var bigger = new Mesh( new BoxBufferGeometry( 2, 2, 2 ) );
-			var smaller = new Mesh( new BoxBufferGeometry( 0.5, 0.5, 0.5 ) );
-			var child = new Mesh( new BoxBufferGeometry( 1, 1, 1 ) );
+			var bigger = new Mesh( new BoxGeometry( 2, 2, 2 ) );
+			var smaller = new Mesh( new BoxGeometry( 0.5, 0.5, 0.5 ) );
+			var child = new Mesh( new BoxGeometry( 1, 1, 1 ) );
 
 			// just a bigger box to begin with
 			a.expandByObject( bigger );
