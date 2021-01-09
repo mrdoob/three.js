@@ -36,27 +36,9 @@ import { AxesHelper } from './helpers/AxesHelper.js';
 import { BoxHelper } from './helpers/BoxHelper.js';
 import { GridHelper } from './helpers/GridHelper.js';
 import { SkeletonHelper } from './helpers/SkeletonHelper.js';
-import { BoxBufferGeometry } from './geometries/BoxBufferGeometry.js';
-import { CircleBufferGeometry } from './geometries/CircleBufferGeometry.js';
-import { ConeBufferGeometry } from './geometries/ConeBufferGeometry.js';
-import { CylinderBufferGeometry } from './geometries/CylinderBufferGeometry.js';
-import { DodecahedronBufferGeometry } from './geometries/DodecahedronBufferGeometry.js';
 import { EdgesGeometry } from './geometries/EdgesGeometry.js';
-import { ExtrudeBufferGeometry } from './geometries/ExtrudeBufferGeometry.js';
-import { IcosahedronBufferGeometry } from './geometries/IcosahedronBufferGeometry.js';
-import { LatheBufferGeometry } from './geometries/LatheBufferGeometry.js';
-import { OctahedronBufferGeometry } from './geometries/OctahedronBufferGeometry.js';
-import { ParametricBufferGeometry } from './geometries/ParametricBufferGeometry.js';
-import { PlaneBufferGeometry } from './geometries/PlaneBufferGeometry.js';
-import { PolyhedronBufferGeometry } from './geometries/PolyhedronBufferGeometry.js';
-import { RingBufferGeometry } from './geometries/RingBufferGeometry.js';
-import { ShapeBufferGeometry } from './geometries/ShapeBufferGeometry.js';
-import { SphereBufferGeometry } from './geometries/SphereBufferGeometry.js';
-import { TetrahedronBufferGeometry } from './geometries/TetrahedronBufferGeometry.js';
-import { TextBufferGeometry } from './geometries/TextBufferGeometry.js';
-import { TorusBufferGeometry } from './geometries/TorusBufferGeometry.js';
-import { TorusKnotBufferGeometry } from './geometries/TorusKnotBufferGeometry.js';
-import { TubeBufferGeometry } from './geometries/TubeBufferGeometry.js';
+import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
+import { ShapeGeometry } from './geometries/ShapeGeometry.js';
 import { WireframeGeometry } from './geometries/WireframeGeometry.js';
 import { Light } from './lights/Light.js';
 import { Loader } from './loaders/Loader.js';
@@ -835,14 +817,14 @@ Object.assign( Shape.prototype, {
 	},
 	extrude: function ( options ) {
 
-		console.warn( 'THREE.Shape: .extrude() has been removed. Use ExtrudeBufferGeometry() instead.' );
-		return new ExtrudeBufferGeometry( this, options );
+		console.warn( 'THREE.Shape: .extrude() has been removed. Use ExtrudeGeometry() instead.' );
+		return new ExtrudeGeometry( this, options );
 
 	},
 	makeGeometry: function ( options ) {
 
-		console.warn( 'THREE.Shape: .makeGeometry() has been removed. Use ShapeBufferGeometry() instead.' );
-		return new ShapeBufferGeometry( this, options );
+		console.warn( 'THREE.Shape: .makeGeometry() has been removed. Use ShapeGeometry() instead.' );
+		return new ShapeGeometry( this, options );
 
 	}
 
@@ -944,148 +926,6 @@ Object.assign( Vector4.prototype, {
 	}
 
 } );
-
-//
-
-export function BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
-
-	console.warn( 'THREE.BoxGeometry has been removed. Use THREE.BoxBufferGeometry instead.' );
-	return new BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
-
-}
-
-export function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
-
-	console.warn( 'THREE.CircleGeometry has been removed. Use THREE.CircleBufferGeometry instead.' );
-	return new CircleBufferGeometry( radius, segments, thetaStart, thetaLength );
-
-}
-
-export function ConeGeometry( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
-
-	console.warn( 'THREE.CircleGeometry has been removed. Use THREE.ConeBufferGeometry instead.' );
-	return new ConeBufferGeometry( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
-
-}
-
-export function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
-
-	console.warn( 'THREE.CylinderGeometry has been removed. Use THREE.CylinderBufferGeometry instead.' );
-	return new CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
-
-}
-
-export function DodecahedronGeometry( radius, detail ) {
-
-	console.warn( 'THREE.DodecahedronGeometry has been removed. Use THREE.DodecahedronBufferGeometry instead.' );
-	return new DodecahedronBufferGeometry( radius, detail );
-
-}
-
-export function ExtrudeGeometry( shapes, options ) {
-
-	console.warn( 'THREE.ExtrudeGeometry has been removed. Use THREE.ExtrudeBufferGeometry instead.' );
-	return new ExtrudeBufferGeometry( shapes, options );
-
-}
-
-export function IcosahedronGeometry( radius, detail ) {
-
-	console.warn( 'THREE.IcosahedronGeometry has been removed. Use THREE.IcosahedronBufferGeometry instead.' );
-	return new IcosahedronBufferGeometry( radius, detail );
-
-}
-
-export function LatheGeometry( points, segments, phiStart, phiLength ) {
-
-	console.warn( 'THREE.LatheGeometry has been removed. Use THREE.LatheBufferGeometry instead.' );
-	return new LatheBufferGeometry( points, segments, phiStart, phiLength );
-
-}
-
-export function OctahedronGeometry( radius, detail ) {
-
-	console.warn( 'THREE.OctahedronGeometry has been removed. Use THREE.OctahedronBufferGeometry instead.' );
-	return new OctahedronBufferGeometry( radius, detail );
-
-}
-
-export function ParametricGeometry( func, slices, stacks ) {
-
-	console.warn( 'THREE.ParametricGeometry has been removed. Use THREE.ParametricBufferGeometry instead.' );
-	return new ParametricBufferGeometry( func, slices, stacks );
-
-}
-
-export function PlaneGeometry( width, height, widthSegments, heightSegments ) {
-
-	console.warn( 'THREE.PlaneGeometry has been removed. Use THREE.PlaneBufferGeometry instead.' );
-	return new PlaneBufferGeometry( width, height, widthSegments, heightSegments );
-
-}
-
-export function PolyhedronGeometry( vertices, indices, radius, detail ) {
-
-	console.warn( 'THREE.PolyhedronGeometry has been removed. Use THREE.PolyhedronBufferGeometry instead.' );
-	return new PolyhedronBufferGeometry( vertices, indices, radius, detail );
-
-}
-
-export function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
-
-	console.warn( 'THREE.RingGeometry has been removed. Use THREE.RingBufferGeometry instead.' );
-	return new RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength );
-
-}
-
-export function ShapeGeometry( shapes, curveSegments ) {
-
-	console.warn( 'THREE.ShapeGeometry has been removed. Use THREE.ShapeBufferGeometry instead.' );
-	return new ShapeBufferGeometry( shapes, curveSegments );
-
-}
-
-export function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
-
-	console.warn( 'THREE.SphereGeometry has been removed. Use THREE.SphereBufferGeometry instead.' );
-	return new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
-
-}
-
-export function TetrahedronGeometry( radius, detail ) {
-
-	console.warn( 'THREE.TetrahedronGeometry has been removed. Use THREE.TetrahedronBufferGeometry instead.' );
-	return new TetrahedronBufferGeometry( radius, detail );
-
-}
-
-export function TextGeometry( text, parameters ) {
-
-	console.warn( 'THREE.TextGeometry has been removed. Use THREE.TextBufferGeometry instead.' );
-	return new TextBufferGeometry( text, parameters );
-
-}
-
-export function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
-
-	console.warn( 'THREE.TorusGeometry has been removed. Use THREE.TorusBufferGeometry instead.' );
-	return new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc );
-
-}
-
-export function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
-
-	console.warn( 'THREE.TorusKnotGeometry has been removed. Use THREE.TorusKnotBufferGeometry instead.' );
-	return new TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale );
-
-}
-
-export function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, taper ) {
-
-	console.warn( 'THREE.TubeGeometry has been removed. Use THREE.TubeBufferGeometry instead.' );
-	return new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed, taper );
-
-}
 
 //
 
@@ -1570,23 +1410,23 @@ Object.assign( InterleavedBuffer.prototype, {
 
 //
 
-Object.assign( ExtrudeBufferGeometry.prototype, {
+Object.assign( ExtrudeGeometry.prototype, {
 
 	getArrays: function () {
 
-		console.error( 'THREE.ExtrudeBufferGeometry: .getArrays() has been removed.' );
+		console.error( 'THREE.ExtrudeGeometry: .getArrays() has been removed.' );
 
 	},
 
 	addShapeList: function () {
 
-		console.error( 'THREE.ExtrudeBufferGeometry: .addShapeList() has been removed.' );
+		console.error( 'THREE.ExtrudeGeometry: .addShapeList() has been removed.' );
 
 	},
 
 	addShape: function () {
 
-		console.error( 'THREE.ExtrudeBufferGeometry: .addShape() has been removed.' );
+		console.error( 'THREE.ExtrudeGeometry: .addShape() has been removed.' );
 
 	}
 

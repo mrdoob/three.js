@@ -1,4 +1,6 @@
-THREE.ConvexBufferGeometry = function ( points ) {
+// ConvexGeometry
+
+THREE.ConvexGeometry = function ( points ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -46,5 +48,5 @@ THREE.ConvexBufferGeometry = function ( points ) {
 
 };
 
-THREE.ConvexBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.ConvexBufferGeometry.prototype.constructor = THREE.ConvexBufferGeometry;
+THREE.ConvexGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.ConvexGeometry.prototype.constructor = THREE.ConvexGeometry;

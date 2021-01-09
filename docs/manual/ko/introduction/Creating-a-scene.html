@@ -71,7 +71,7 @@
 		<p><em>"그건 그렇고, 아까 말했던 큐브는 어디에 있죠?"</em> 바로 추가해 봅시다.</p>
 
 		<code>
-		const geometry = new THREE.BoxBufferGeometry();
+		const geometry = new THREE.BoxGeometry();
 		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		const cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );
@@ -79,7 +79,7 @@
 		camera.position.z = 5;
 		</code>
 
-		<p>큐브를 만드려면, <strong>BoxBufferGeometry</strong>가 필요합니다. 여기에는 큐브에 필요한 모든 꼭짓점 (<strong>vertices</strong>) 와 면(<strong>faces</strong>)이 포함돼 있습니다. 여기에 대해서는 나중에 더 자세히 알아봅시다.</p>
+		<p>큐브를 만드려면, <strong>BoxGeometry</strong>가 필요합니다. 여기에는 큐브에 필요한 모든 꼭짓점 (<strong>vertices</strong>) 와 면(<strong>faces</strong>)이 포함돼 있습니다. 여기에 대해서는 나중에 더 자세히 알아봅시다.</p>
 
 		<p>geometry와 더불어, 무언가를 색칠해줄 요소가 필요합니다. Three.js에서는 여러 방법을 고려했지만, 현재로서는<strong>MeshBasicMaterial</strong>을 고수하고자 합니다. 이 속성이 적용된 오브젝트들은 모두 영향을 받을 것입니다. 가장 단순하게 알아볼 수 있도록, 여기에서는 녹색인 <strong>0x00ff00</strong>만을 속성으로 사용하겠습니다. CSS 나 Photoshop에서처럼 (<strong>hex colors</strong>)로 동일하게 작동합니다.</p>
 
@@ -117,7 +117,7 @@
 		<h2>결과 화면</h2>
 		<p>축하합니다! 첫 three.js이 완성되었네요. 이제 본격적으로 시작해보면 됩니다.</p>
 
-		<p>전체 코드는 아래에 나와 있고 [link:https://jsfiddle.net/zpcswh8m/ live example]로도 확인해볼 수 있습니다. 잘 살펴보고 어떻게 구동되는지 확인해 보세요.</p>
+		<p>전체 코드는 아래에 나와 있고 [link:https://jsfiddle.net/fxurzeb4/ live example]로도 확인해볼 수 있습니다. 잘 살펴보고 어떻게 구동되는지 확인해 보세요.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -139,7 +139,7 @@
 					renderer.setSize( window.innerWidth, window.innerHeight );
 					document.body.appendChild( renderer.domElement );
 
-					const geometry = new THREE.BoxBufferGeometry();
+					const geometry = new THREE.BoxGeometry();
 					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 					const cube = new THREE.Mesh( geometry, material );
 					scene.add( cube );

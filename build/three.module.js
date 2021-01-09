@@ -11439,13 +11439,13 @@ function checkBufferGeometryIntersection( object, material, raycaster, ray, posi
 
 }
 
-class BoxBufferGeometry extends BufferGeometry {
+class BoxGeometry extends BufferGeometry {
 
 	constructor( width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1 ) {
 
 		super();
 
-		this.type = 'BoxBufferGeometry';
+		this.type = 'BoxGeometry';
 
 		this.parameters = {
 			width: width,
@@ -12399,7 +12399,7 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 		`
 	};
 
-	const geometry = new BoxBufferGeometry( 5, 5, 5 );
+	const geometry = new BoxGeometry( 5, 5, 5 );
 
 	const material = new ShaderMaterial( {
 
@@ -12876,12 +12876,12 @@ function WebGLAttributes( gl, capabilities ) {
 
 }
 
-class PlaneBufferGeometry extends BufferGeometry {
+class PlaneGeometry extends BufferGeometry {
 
 	constructor( width = 1, height = 1, widthSegments = 1, heightSegments = 1 ) {
 
 		super();
-		this.type = 'PlaneBufferGeometry';
+		this.type = 'PlaneGeometry';
 
 		this.parameters = {
 			width: width,
@@ -13910,7 +13910,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 			if ( boxMesh === undefined ) {
 
 				boxMesh = new Mesh(
-					new BoxBufferGeometry( 1, 1, 1 ),
+					new BoxGeometry( 1, 1, 1 ),
 					new ShaderMaterial( {
 						name: 'BackgroundCubeMaterial',
 						uniforms: cloneUniforms( ShaderLib.cube.uniforms ),
@@ -13978,7 +13978,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 			if ( planeMesh === undefined ) {
 
 				planeMesh = new Mesh(
-					new PlaneBufferGeometry( 2, 2 ),
+					new PlaneGeometry( 2, 2 ),
 					new ShaderMaterial( {
 						name: 'BackgroundMaterial',
 						uniforms: cloneUniforms( ShaderLib.background.uniforms ),
@@ -27470,13 +27470,13 @@ DepthTexture.prototype = Object.create( Texture.prototype );
 DepthTexture.prototype.constructor = DepthTexture;
 DepthTexture.prototype.isDepthTexture = true;
 
-class CircleBufferGeometry extends BufferGeometry {
+class CircleGeometry extends BufferGeometry {
 
 	constructor( radius = 1, segments = 8, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
-		this.type = 'CircleBufferGeometry';
+		this.type = 'CircleGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -27548,12 +27548,12 @@ class CircleBufferGeometry extends BufferGeometry {
 
 }
 
-class CylinderBufferGeometry extends BufferGeometry {
+class CylinderGeometry extends BufferGeometry {
 
 	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
-		this.type = 'CylinderBufferGeometry';
+		this.type = 'CylinderGeometry';
 
 		this.parameters = {
 			radiusTop: radiusTop,
@@ -27810,13 +27810,13 @@ class CylinderBufferGeometry extends BufferGeometry {
 
 }
 
-class ConeBufferGeometry extends CylinderBufferGeometry {
+class ConeGeometry extends CylinderGeometry {
 
 	constructor( radius = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super( 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
 
-		this.type = 'ConeBufferGeometry';
+		this.type = 'ConeGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -27832,13 +27832,13 @@ class ConeBufferGeometry extends CylinderBufferGeometry {
 
 }
 
-class PolyhedronBufferGeometry extends BufferGeometry {
+class PolyhedronGeometry extends BufferGeometry {
 
 	constructor( vertices, indices, radius = 1, detail = 0 ) {
 
 		super();
 
-		this.type = 'PolyhedronBufferGeometry';
+		this.type = 'PolyhedronGeometry';
 
 		this.parameters = {
 			vertices: vertices,
@@ -28129,7 +28129,7 @@ class PolyhedronBufferGeometry extends BufferGeometry {
 
 }
 
-class DodecahedronBufferGeometry extends PolyhedronBufferGeometry {
+class DodecahedronGeometry extends PolyhedronGeometry {
 
 	constructor( radius = 1, detail = 0 ) {
 
@@ -28174,7 +28174,7 @@ class DodecahedronBufferGeometry extends PolyhedronBufferGeometry {
 
 		super( vertices, indices, radius, detail );
 
-		this.type = 'DodecahedronBufferGeometry';
+		this.type = 'DodecahedronGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -29225,13 +29225,13 @@ function addContour( vertices, contour ) {
  * }
  */
 
-class ExtrudeBufferGeometry extends BufferGeometry {
+class ExtrudeGeometry extends BufferGeometry {
 
 	constructor( shapes, options ) {
 
 		super();
 
-		this.type = 'ExtrudeBufferGeometry';
+		this.type = 'ExtrudeGeometry';
 
 		this.parameters = {
 			shapes: shapes,
@@ -29980,7 +29980,7 @@ function toJSON( shapes, options, data ) {
 
 }
 
-class IcosahedronBufferGeometry extends PolyhedronBufferGeometry {
+class IcosahedronGeometry extends PolyhedronGeometry {
 
 	constructor( radius = 1, detail = 0 ) {
 
@@ -30001,7 +30001,7 @@ class IcosahedronBufferGeometry extends PolyhedronBufferGeometry {
 
 		super( vertices, indices, radius, detail );
 
-		this.type = 'IcosahedronBufferGeometry';
+		this.type = 'IcosahedronGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -30012,13 +30012,13 @@ class IcosahedronBufferGeometry extends PolyhedronBufferGeometry {
 
 }
 
-class LatheBufferGeometry extends BufferGeometry {
+class LatheGeometry extends BufferGeometry {
 
 	constructor( points, segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
 
 		super();
 
-		this.type = 'LatheBufferGeometry';
+		this.type = 'LatheGeometry';
 
 		this.parameters = {
 			points: points,
@@ -30154,7 +30154,7 @@ class LatheBufferGeometry extends BufferGeometry {
 
 }
 
-class OctahedronBufferGeometry extends PolyhedronBufferGeometry {
+class OctahedronGeometry extends PolyhedronGeometry {
 
 	constructor( radius = 1, detail = 0 ) {
 
@@ -30171,7 +30171,7 @@ class OctahedronBufferGeometry extends PolyhedronBufferGeometry {
 
 		super( vertices, indices, radius, detail );
 
-		this.type = 'OctahedronBufferGeometry';
+		this.type = 'OctahedronGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -30187,11 +30187,11 @@ class OctahedronBufferGeometry extends PolyhedronBufferGeometry {
  * based on the brilliant article by @prideout https://prideout.net/blog/old/blog/index.html@p=44.html
  */
 
-function ParametricBufferGeometry( func, slices, stacks ) {
+function ParametricGeometry( func, slices, stacks ) {
 
 	BufferGeometry.call( this );
 
-	this.type = 'ParametricBufferGeometry';
+	this.type = 'ParametricGeometry';
 
 	this.parameters = {
 		func: func,
@@ -30306,16 +30306,16 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 }
 
-ParametricBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-ParametricBufferGeometry.prototype.constructor = ParametricBufferGeometry;
+ParametricGeometry.prototype = Object.create( BufferGeometry.prototype );
+ParametricGeometry.prototype.constructor = ParametricGeometry;
 
-class RingBufferGeometry extends BufferGeometry {
+class RingGeometry extends BufferGeometry {
 
 	constructor( innerRadius = 0.5, outerRadius = 1, thetaSegments = 8, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
-		this.type = 'RingBufferGeometry';
+		this.type = 'RingGeometry';
 
 		this.parameters = {
 			innerRadius: innerRadius,
@@ -30414,12 +30414,12 @@ class RingBufferGeometry extends BufferGeometry {
 
 }
 
-class ShapeBufferGeometry extends BufferGeometry {
+class ShapeGeometry extends BufferGeometry {
 
 	constructor( shapes, curveSegments = 12 ) {
 
 		super();
-		this.type = 'ShapeBufferGeometry';
+		this.type = 'ShapeGeometry';
 
 		this.parameters = {
 			shapes: shapes,
@@ -30575,12 +30575,12 @@ function toJSON$1( shapes, data ) {
 
 }
 
-class SphereBufferGeometry extends BufferGeometry {
+class SphereGeometry extends BufferGeometry {
 
 	constructor( radius = 1, widthSegments = 8, heightSegments = 6, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI ) {
 
 		super();
-		this.type = 'SphereBufferGeometry';
+		this.type = 'SphereGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -30690,7 +30690,7 @@ class SphereBufferGeometry extends BufferGeometry {
 
 }
 
-class TetrahedronBufferGeometry extends PolyhedronBufferGeometry {
+class TetrahedronGeometry extends PolyhedronGeometry {
 
 	constructor( radius = 1, detail = 0 ) {
 
@@ -30704,7 +30704,7 @@ class TetrahedronBufferGeometry extends PolyhedronBufferGeometry {
 
 		super( vertices, indices, radius, detail );
 
-		this.type = 'TetrahedronBufferGeometry';
+		this.type = 'TetrahedronGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -30732,7 +30732,7 @@ class TetrahedronBufferGeometry extends PolyhedronBufferGeometry {
  * }
  */
 
-class TextBufferGeometry extends ExtrudeBufferGeometry {
+class TextGeometry extends ExtrudeGeometry {
 
 	constructor( text, parameters = {} ) {
 
@@ -30759,18 +30759,18 @@ class TextBufferGeometry extends ExtrudeBufferGeometry {
 
 		super( shapes, parameters );
 
-		this.type = 'TextBufferGeometry';
+		this.type = 'TextGeometry';
 
 	}
 
 }
 
-class TorusBufferGeometry extends BufferGeometry {
+class TorusGeometry extends BufferGeometry {
 
 	constructor( radius = 1, tube = 0.4, radialSegments = 8, tubularSegments = 6, arc = Math.PI * 2 ) {
 
 		super();
-		this.type = 'TorusBufferGeometry';
+		this.type = 'TorusGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -30863,12 +30863,12 @@ class TorusBufferGeometry extends BufferGeometry {
 
 }
 
-class TorusKnotBufferGeometry extends BufferGeometry {
+class TorusKnotGeometry extends BufferGeometry {
 
 	constructor( radius = 1, tube = 0.4, tubularSegments = 64, radialSegments = 8, p = 2, q = 3 ) {
 
 		super();
-		this.type = 'TorusKnotBufferGeometry';
+		this.type = 'TorusKnotGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -31008,12 +31008,12 @@ class TorusKnotBufferGeometry extends BufferGeometry {
 
 }
 
-class TubeBufferGeometry extends BufferGeometry {
+class TubeGeometry extends BufferGeometry {
 
 	constructor( path, tubularSegments = 64, radius = 1, radialSegments = 8, closed = false ) {
 
 		super();
-		this.type = 'TubeBufferGeometry';
+		this.type = 'TubeGeometry';
 
 		this.parameters = {
 			path: path,
@@ -31298,27 +31298,47 @@ class WireframeGeometry extends BufferGeometry {
 
 var Geometries = /*#__PURE__*/Object.freeze({
 	__proto__: null,
-	BoxBufferGeometry: BoxBufferGeometry,
-	CircleBufferGeometry: CircleBufferGeometry,
-	ConeBufferGeometry: ConeBufferGeometry,
-	CylinderBufferGeometry: CylinderBufferGeometry,
-	DodecahedronBufferGeometry: DodecahedronBufferGeometry,
+	BoxGeometry: BoxGeometry,
+	BoxBufferGeometry: BoxGeometry,
+	CircleGeometry: CircleGeometry,
+	CircleBufferGeometry: CircleGeometry,
+	ConeGeometry: ConeGeometry,
+	ConeBufferGeometry: ConeGeometry,
+	CylinderGeometry: CylinderGeometry,
+	CylinderBufferGeometry: CylinderGeometry,
+	DodecahedronGeometry: DodecahedronGeometry,
+	DodecahedronBufferGeometry: DodecahedronGeometry,
 	EdgesGeometry: EdgesGeometry,
-	ExtrudeBufferGeometry: ExtrudeBufferGeometry,
-	IcosahedronBufferGeometry: IcosahedronBufferGeometry,
-	LatheBufferGeometry: LatheBufferGeometry,
-	OctahedronBufferGeometry: OctahedronBufferGeometry,
-	ParametricBufferGeometry: ParametricBufferGeometry,
-	PlaneBufferGeometry: PlaneBufferGeometry,
-	PolyhedronBufferGeometry: PolyhedronBufferGeometry,
-	RingBufferGeometry: RingBufferGeometry,
-	ShapeBufferGeometry: ShapeBufferGeometry,
-	SphereBufferGeometry: SphereBufferGeometry,
-	TetrahedronBufferGeometry: TetrahedronBufferGeometry,
-	TextBufferGeometry: TextBufferGeometry,
-	TorusBufferGeometry: TorusBufferGeometry,
-	TorusKnotBufferGeometry: TorusKnotBufferGeometry,
-	TubeBufferGeometry: TubeBufferGeometry,
+	ExtrudeGeometry: ExtrudeGeometry,
+	ExtrudeBufferGeometry: ExtrudeGeometry,
+	IcosahedronGeometry: IcosahedronGeometry,
+	IcosahedronBufferGeometry: IcosahedronGeometry,
+	LatheGeometry: LatheGeometry,
+	LatheBufferGeometry: LatheGeometry,
+	OctahedronGeometry: OctahedronGeometry,
+	OctahedronBufferGeometry: OctahedronGeometry,
+	ParametricGeometry: ParametricGeometry,
+	ParametricBufferGeometry: ParametricGeometry,
+	PlaneGeometry: PlaneGeometry,
+	PlaneBufferGeometry: PlaneGeometry,
+	PolyhedronGeometry: PolyhedronGeometry,
+	PolyhedronBufferGeometry: PolyhedronGeometry,
+	RingGeometry: RingGeometry,
+	RingBufferGeometry: RingGeometry,
+	ShapeGeometry: ShapeGeometry,
+	ShapeBufferGeometry: ShapeGeometry,
+	SphereGeometry: SphereGeometry,
+	SphereBufferGeometry: SphereGeometry,
+	TetrahedronGeometry: TetrahedronGeometry,
+	TetrahedronBufferGeometry: TetrahedronGeometry,
+	TextGeometry: TextGeometry,
+	TextBufferGeometry: TextGeometry,
+	TorusGeometry: TorusGeometry,
+	TorusBufferGeometry: TorusGeometry,
+	TorusKnotGeometry: TorusKnotGeometry,
+	TorusKnotBufferGeometry: TorusKnotGeometry,
+	TubeGeometry: TubeGeometry,
+	TubeBufferGeometry: TubeGeometry,
 	WireframeGeometry: WireframeGeometry
 });
 
@@ -39017,7 +39037,6 @@ class ObjectLoader extends Loader {
 
 					case 'BoxGeometry':
 					case 'BoxBufferGeometry':
-					case 'CubeGeometry': // backwards compatible
 
 						geometry = new Geometries[ data.type ](
 							data.width,
@@ -46725,7 +46744,7 @@ class PointLightHelper extends Mesh {
 
 	constructor( light, sphereSize, color ) {
 
-		const geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
+		const geometry = new SphereGeometry( sphereSize, 4, 2 );
 		const material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );
 
 		super( geometry, material );
@@ -46823,7 +46842,7 @@ class HemisphereLightHelper extends Object3D {
 
 		this.color = color;
 
-		const geometry = new OctahedronBufferGeometry( size );
+		const geometry = new OctahedronGeometry( size );
 		geometry.rotateY( Math.PI * 0.5 );
 
 		this.material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );
@@ -47484,7 +47503,7 @@ class ArrowHelper extends Object3D {
 			_lineGeometry = new BufferGeometry();
 			_lineGeometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
 
-			_coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
+			_coneGeometry = new CylinderGeometry( 0, 0.5, 1, 5, 1 );
 			_coneGeometry.translate( 0, - 0.5, 0 );
 
 		}
@@ -49352,14 +49371,14 @@ Object.assign( Shape.prototype, {
 	},
 	extrude: function ( options ) {
 
-		console.warn( 'THREE.Shape: .extrude() has been removed. Use ExtrudeBufferGeometry() instead.' );
-		return new ExtrudeBufferGeometry( this, options );
+		console.warn( 'THREE.Shape: .extrude() has been removed. Use ExtrudeGeometry() instead.' );
+		return new ExtrudeGeometry( this, options );
 
 	},
 	makeGeometry: function ( options ) {
 
-		console.warn( 'THREE.Shape: .makeGeometry() has been removed. Use ShapeBufferGeometry() instead.' );
-		return new ShapeBufferGeometry( this, options );
+		console.warn( 'THREE.Shape: .makeGeometry() has been removed. Use ShapeGeometry() instead.' );
+		return new ShapeGeometry( this, options );
 
 	}
 
@@ -49484,146 +49503,6 @@ Object.assign( Geometry.prototype, {
 	}
 
 } );
-
-function BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
-
-	console.warn( 'THREE.BoxGeometry has been removed. Use THREE.BoxBufferGeometry instead.' );
-	return new BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
-
-}
-
-function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
-
-	console.warn( 'THREE.CircleGeometry has been removed. Use THREE.CircleBufferGeometry instead.' );
-	return new CircleBufferGeometry( radius, segments, thetaStart, thetaLength );
-
-}
-
-function ConeGeometry( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
-
-	console.warn( 'THREE.CircleGeometry has been removed. Use THREE.ConeBufferGeometry instead.' );
-	return new ConeBufferGeometry( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
-
-}
-
-function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
-
-	console.warn( 'THREE.CylinderGeometry has been removed. Use THREE.CylinderBufferGeometry instead.' );
-	return new CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
-
-}
-
-function DodecahedronGeometry( radius, detail ) {
-
-	console.warn( 'THREE.DodecahedronGeometry has been removed. Use THREE.DodecahedronBufferGeometry instead.' );
-	return new DodecahedronBufferGeometry( radius, detail );
-
-}
-
-function ExtrudeGeometry( shapes, options ) {
-
-	console.warn( 'THREE.ExtrudeGeometry has been removed. Use THREE.ExtrudeBufferGeometry instead.' );
-	return new ExtrudeBufferGeometry( shapes, options );
-
-}
-
-function IcosahedronGeometry( radius, detail ) {
-
-	console.warn( 'THREE.IcosahedronGeometry has been removed. Use THREE.IcosahedronBufferGeometry instead.' );
-	return new IcosahedronBufferGeometry( radius, detail );
-
-}
-
-function LatheGeometry( points, segments, phiStart, phiLength ) {
-
-	console.warn( 'THREE.LatheGeometry has been removed. Use THREE.LatheBufferGeometry instead.' );
-	return new LatheBufferGeometry( points, segments, phiStart, phiLength );
-
-}
-
-function OctahedronGeometry( radius, detail ) {
-
-	console.warn( 'THREE.OctahedronGeometry has been removed. Use THREE.OctahedronBufferGeometry instead.' );
-	return new OctahedronBufferGeometry( radius, detail );
-
-}
-
-function ParametricGeometry( func, slices, stacks ) {
-
-	console.warn( 'THREE.ParametricGeometry has been removed. Use THREE.ParametricBufferGeometry instead.' );
-	return new ParametricBufferGeometry( func, slices, stacks );
-
-}
-
-function PlaneGeometry( width, height, widthSegments, heightSegments ) {
-
-	console.warn( 'THREE.PlaneGeometry has been removed. Use THREE.PlaneBufferGeometry instead.' );
-	return new PlaneBufferGeometry( width, height, widthSegments, heightSegments );
-
-}
-
-function PolyhedronGeometry( vertices, indices, radius, detail ) {
-
-	console.warn( 'THREE.PolyhedronGeometry has been removed. Use THREE.PolyhedronBufferGeometry instead.' );
-	return new PolyhedronBufferGeometry( vertices, indices, radius, detail );
-
-}
-
-function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
-
-	console.warn( 'THREE.RingGeometry has been removed. Use THREE.RingBufferGeometry instead.' );
-	return new RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength );
-
-}
-
-function ShapeGeometry( shapes, curveSegments ) {
-
-	console.warn( 'THREE.ShapeGeometry has been removed. Use THREE.ShapeBufferGeometry instead.' );
-	return new ShapeBufferGeometry( shapes, curveSegments );
-
-}
-
-function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
-
-	console.warn( 'THREE.SphereGeometry has been removed. Use THREE.SphereBufferGeometry instead.' );
-	return new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
-
-}
-
-function TetrahedronGeometry( radius, detail ) {
-
-	console.warn( 'THREE.TetrahedronGeometry has been removed. Use THREE.TetrahedronBufferGeometry instead.' );
-	return new TetrahedronBufferGeometry( radius, detail );
-
-}
-
-function TextGeometry( text, parameters ) {
-
-	console.warn( 'THREE.TextGeometry has been removed. Use THREE.TextBufferGeometry instead.' );
-	return new TextBufferGeometry( text, parameters );
-
-}
-
-function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
-
-	console.warn( 'THREE.TorusGeometry has been removed. Use THREE.TorusBufferGeometry instead.' );
-	return new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc );
-
-}
-
-function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
-
-	console.warn( 'THREE.TorusKnotGeometry has been removed. Use THREE.TorusKnotBufferGeometry instead.' );
-	return new TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale );
-
-}
-
-function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, taper ) {
-
-	console.warn( 'THREE.TubeGeometry has been removed. Use THREE.TubeBufferGeometry instead.' );
-	return new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed, taper );
-
-}
 
 //
 
@@ -50108,23 +49987,23 @@ Object.assign( InterleavedBuffer.prototype, {
 
 //
 
-Object.assign( ExtrudeBufferGeometry.prototype, {
+Object.assign( ExtrudeGeometry.prototype, {
 
 	getArrays: function () {
 
-		console.error( 'THREE.ExtrudeBufferGeometry: .getArrays() has been removed.' );
+		console.error( 'THREE.ExtrudeGeometry: .getArrays() has been removed.' );
 
 	},
 
 	addShapeList: function () {
 
-		console.error( 'THREE.ExtrudeBufferGeometry: .addShapeList() has been removed.' );
+		console.error( 'THREE.ExtrudeGeometry: .addShapeList() has been removed.' );
 
 	},
 
 	addShape: function () {
 
-		console.error( 'THREE.ExtrudeBufferGeometry: .addShape() has been removed.' );
+		console.error( 'THREE.ExtrudeGeometry: .addShape() has been removed.' );
 
 	}
 
@@ -50922,4 +50801,4 @@ if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 }
 
-export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, AxisHelper, BackSide, BasicDepthPacking, BasicShadowMap, BinaryTextureLoader, Bone, BooleanKeyframeTrack, BoundingBoxHelper, Box2, Box3, Box3Helper, BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasRenderer, CanvasTexture, CatmullRomCurve3, CineonToneMapping, CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, ClosedSplineCurve3, Color, ColorKeyframeTrack, CompressedTexture, CompressedTextureLoader, ConeBufferGeometry, ConeGeometry, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubeUVRefractionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderBufferGeometry, CylinderGeometry, Cylindrical, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicBufferAttribute, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EdgesHelper, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeBufferGeometry, ExtrudeGeometry, Face3, Face4, FaceColors, FileLoader, FlatShading, Float16BufferAttribute, Float32Attribute, Float32BufferAttribute, Float64Attribute, Float64BufferAttribute, FloatType, Fog, FogExp2, Font, FontLoader, FrontSide, Frustum, GLBufferAttribute, GLSL1, GLSL3, GammaEncoding, Geometry, GeometryUtils, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16Attribute, Int16BufferAttribute, Int32Attribute, Int32BufferAttribute, Int8Attribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, JSONLoader, KeepStencilOp, KeyframeTrack, LOD, LatheBufferGeometry, LatheGeometry, Layers, LensFlare, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LinePieces, LineSegments, LineStrip, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LogLuvEncoding, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, MathUtils as Math, MathUtils, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshFaceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiMaterial, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColors, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, ParametricBufferGeometry, ParametricGeometry, Particle, ParticleBasicMaterial, ParticleSystem, ParticleSystemMaterial, Path, PerspectiveCamera, Plane, PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointCloud, PointCloudMaterial, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDEncoding, RGBEEncoding, RGBEFormat, RGBFormat, RGBIntegerFormat, RGBM16Encoding, RGBM7Encoding, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingBufferGeometry, RingGeometry, SRGB8_ALPHA8_ASTC_10x10_Format, SRGB8_ALPHA8_ASTC_10x5_Format, SRGB8_ALPHA8_ASTC_10x6_Format, SRGB8_ALPHA8_ASTC_10x8_Format, SRGB8_ALPHA8_ASTC_12x10_Format, SRGB8_ALPHA8_ASTC_12x12_Format, SRGB8_ALPHA8_ASTC_4x4_Format, SRGB8_ALPHA8_ASTC_5x4_Format, SRGB8_ALPHA8_ASTC_5x5_Format, SRGB8_ALPHA8_ASTC_6x5_Format, SRGB8_ALPHA8_ASTC_6x6_Format, SRGB8_ALPHA8_ASTC_8x5_Format, SRGB8_ALPHA8_ASTC_8x6_Format, SRGB8_ALPHA8_ASTC_8x8_Format, Scene, SceneUtils, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SmoothShading, Sphere, SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, Spline, SplineCurve, SplineCurve3, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronBufferGeometry, TetrahedronGeometry, TextBufferGeometry, TextGeometry, Texture, TextureLoader, TorusBufferGeometry, TorusGeometry, TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeBufferGeometry, TubeGeometry, UVMapping, Uint16Attribute, Uint16BufferAttribute, Uint32Attribute, Uint32BufferAttribute, Uint8Attribute, Uint8BufferAttribute, Uint8ClampedAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, Vertex, VertexColors, VideoTexture, WebGL1Renderer, WebGLCubeRenderTarget, WebGLMultisampleRenderTarget, WebGLRenderTarget, WebGLRenderTargetCube, WebGLRenderer, WebGLUtils, WireframeGeometry, WireframeHelper, WrapAroundEnding, XHRLoader, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, sRGBEncoding };
+export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, AxisHelper, BackSide, BasicDepthPacking, BasicShadowMap, BinaryTextureLoader, Bone, BooleanKeyframeTrack, BoundingBoxHelper, Box2, Box3, Box3Helper, BoxGeometry as BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasRenderer, CanvasTexture, CatmullRomCurve3, CineonToneMapping, CircleGeometry as CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, ClosedSplineCurve3, Color, ColorKeyframeTrack, CompressedTexture, CompressedTextureLoader, ConeGeometry as ConeBufferGeometry, ConeGeometry, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubeUVRefractionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry as CylinderBufferGeometry, CylinderGeometry, Cylindrical, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry as DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicBufferAttribute, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EdgesHelper, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeGeometry as ExtrudeBufferGeometry, ExtrudeGeometry, Face3, Face4, FaceColors, FileLoader, FlatShading, Float16BufferAttribute, Float32Attribute, Float32BufferAttribute, Float64Attribute, Float64BufferAttribute, FloatType, Fog, FogExp2, Font, FontLoader, FrontSide, Frustum, GLBufferAttribute, GLSL1, GLSL3, GammaEncoding, Geometry, GeometryUtils, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronGeometry as IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16Attribute, Int16BufferAttribute, Int32Attribute, Int32BufferAttribute, Int8Attribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, JSONLoader, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry as LatheBufferGeometry, LatheGeometry, Layers, LensFlare, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LinePieces, LineSegments, LineStrip, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LogLuvEncoding, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, MathUtils as Math, MathUtils, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshFaceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiMaterial, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColors, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry as OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, ParametricGeometry as ParametricBufferGeometry, ParametricGeometry, Particle, ParticleBasicMaterial, ParticleSystem, ParticleSystemMaterial, Path, PerspectiveCamera, Plane, PlaneGeometry as PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointCloud, PointCloudMaterial, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry as PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDEncoding, RGBEEncoding, RGBEFormat, RGBFormat, RGBIntegerFormat, RGBM16Encoding, RGBM7Encoding, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingGeometry as RingBufferGeometry, RingGeometry, SRGB8_ALPHA8_ASTC_10x10_Format, SRGB8_ALPHA8_ASTC_10x5_Format, SRGB8_ALPHA8_ASTC_10x6_Format, SRGB8_ALPHA8_ASTC_10x8_Format, SRGB8_ALPHA8_ASTC_12x10_Format, SRGB8_ALPHA8_ASTC_12x12_Format, SRGB8_ALPHA8_ASTC_4x4_Format, SRGB8_ALPHA8_ASTC_5x4_Format, SRGB8_ALPHA8_ASTC_5x5_Format, SRGB8_ALPHA8_ASTC_6x5_Format, SRGB8_ALPHA8_ASTC_6x6_Format, SRGB8_ALPHA8_ASTC_8x5_Format, SRGB8_ALPHA8_ASTC_8x6_Format, SRGB8_ALPHA8_ASTC_8x8_Format, Scene, SceneUtils, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry as ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SmoothShading, Sphere, SphereGeometry as SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, Spline, SplineCurve, SplineCurve3, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry as TetrahedronBufferGeometry, TetrahedronGeometry, TextGeometry as TextBufferGeometry, TextGeometry, Texture, TextureLoader, TorusGeometry as TorusBufferGeometry, TorusGeometry, TorusKnotGeometry as TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry as TubeBufferGeometry, TubeGeometry, UVMapping, Uint16Attribute, Uint16BufferAttribute, Uint32Attribute, Uint32BufferAttribute, Uint8Attribute, Uint8BufferAttribute, Uint8ClampedAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, Vertex, VertexColors, VideoTexture, WebGL1Renderer, WebGLCubeRenderTarget, WebGLMultisampleRenderTarget, WebGLRenderTarget, WebGLRenderTargetCube, WebGLRenderer, WebGLUtils, WireframeGeometry, WireframeHelper, WrapAroundEnding, XHRLoader, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, sRGBEncoding };

@@ -239,7 +239,6 @@ class ObjectLoader extends Loader {
 
 					case 'BoxGeometry':
 					case 'BoxBufferGeometry':
-					case 'CubeGeometry': // backwards compatible
 
 						geometry = new Geometries[ data.type ](
 							data.width,

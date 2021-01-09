@@ -70,7 +70,7 @@
 		<p><em>“嗯，看起来很不错，那你说的那个立方体在哪儿？”</em>接下来，我们就来添加立方体。</p>
 
 		<code>
-		const geometry = new THREE.BoxBufferGeometry();
+		const geometry = new THREE.BoxGeometry();
 		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		const cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );
@@ -78,7 +78,7 @@
 		camera.position.z = 5;
 		</code>
 
-		<p>要创建一个立方体，我们需要一个<strong>BoxBufferGeometry</strong>（立方体）对象. 这个对象包含了一个立方体中所有的顶点（<strong>vertices</strong>）和面（<strong>faces</strong>）。未来我们将在这方面进行更多的探索。</p>
+		<p>要创建一个立方体，我们需要一个<strong>BoxGeometry</strong>（立方体）对象. 这个对象包含了一个立方体中所有的顶点（<strong>vertices</strong>）和面（<strong>faces</strong>）。未来我们将在这方面进行更多的探索。</p>
 
 		<p>接下来，对于这个立方体，我们需要给它一个材质，来让它有颜色。Three.js自带了几种材质，在这里我们使用的是<strong>MeshBasicMaterial</strong>。所有的材质都存有应用于他们的属性的对象。在这里为了简单起见，我们只设置一个color属性，值为<strong>0x00ff00</strong>，也就是绿色。这里所做的事情，和在CSS或者Photoshop中使用十六进制(<strong>hex colors</strong>)颜色格式来设置颜色的方式一致。</p>
 
@@ -117,7 +117,7 @@
 		<h2>结果</h2>
 		<p>祝贺你！你现在已经成功完成了你的第一个Three.js应用程序。虽然它很简单，但现在你已经有了一个入门的起点。</p>
 
-		<p>下面是完整的代码，可在[link:https://jsfiddle.net/zpcswh8m/ live example]运行、编辑；运行或者修改代码有助于你更好的理解它是如何工作的。</p>
+		<p>下面是完整的代码，可在[link:https://jsfiddle.net/fxurzeb4/ live example]运行、编辑；运行或者修改代码有助于你更好的理解它是如何工作的。</p>
 
 		<code>
 		&lt;html&gt;
@@ -137,7 +137,7 @@
 					renderer.setSize( window.innerWidth, window.innerHeight );
 					document.body.appendChild( renderer.domElement );
 
-					const geometry = new THREE.BoxBufferGeometry();
+					const geometry = new THREE.BoxGeometry();
 					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 					const cube = new THREE.Mesh( geometry, material );
 					scene.add( cube );

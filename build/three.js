@@ -8958,10 +8958,10 @@
 		return intersection;
 	}
 
-	var BoxBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
-		_inheritsLoose(BoxBufferGeometry, _BufferGeometry);
+	var BoxGeometry = /*#__PURE__*/function (_BufferGeometry) {
+		_inheritsLoose(BoxGeometry, _BufferGeometry);
 
-		function BoxBufferGeometry(width, height, depth, widthSegments, heightSegments, depthSegments) {
+		function BoxGeometry(width, height, depth, widthSegments, heightSegments, depthSegments) {
 			var _this;
 
 			if (width === void 0) {
@@ -8989,7 +8989,7 @@
 			}
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'BoxBufferGeometry';
+			_this.type = 'BoxGeometry';
 			_this.parameters = {
 				width: width,
 				height: height,
@@ -9101,7 +9101,7 @@
 			return _this;
 		}
 
-		return BoxBufferGeometry;
+		return BoxGeometry;
 	}(BufferGeometry);
 
 	/**
@@ -9674,7 +9674,7 @@
 			/* glsl */
 			"\n\n\t\t\tuniform sampler2D tEquirect;\n\n\t\t\tvarying vec3 vWorldDirection;\n\n\t\t\t#include <common>\n\n\t\t\tvoid main() {\n\n\t\t\t\tvec3 direction = normalize( vWorldDirection );\n\n\t\t\t\tvec2 sampleUV = equirectUv( direction );\n\n\t\t\t\tgl_FragColor = texture2D( tEquirect, sampleUV );\n\n\t\t\t}\n\t\t"
 		};
-		var geometry = new BoxBufferGeometry(5, 5, 5);
+		var geometry = new BoxGeometry(5, 5, 5);
 		var material = new ShaderMaterial({
 			name: 'CubemapFromEquirect',
 			uniforms: cloneUniforms(shader.uniforms),
@@ -10005,10 +10005,10 @@
 		};
 	}
 
-	var PlaneBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
-		_inheritsLoose(PlaneBufferGeometry, _BufferGeometry);
+	var PlaneGeometry = /*#__PURE__*/function (_BufferGeometry) {
+		_inheritsLoose(PlaneGeometry, _BufferGeometry);
 
-		function PlaneBufferGeometry(width, height, widthSegments, heightSegments) {
+		function PlaneGeometry(width, height, widthSegments, heightSegments) {
 			var _this;
 
 			if (width === void 0) {
@@ -10028,7 +10028,7 @@
 			}
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'PlaneBufferGeometry';
+			_this.type = 'PlaneGeometry';
 			_this.parameters = {
 				width: width,
 				height: height,
@@ -10083,7 +10083,7 @@
 			return _this;
 		}
 
-		return PlaneBufferGeometry;
+		return PlaneGeometry;
 	}(BufferGeometry);
 
 	var alphamap_fragment = "#ifdef USE_ALPHAMAP\n\tdiffuseColor.a *= texture2D( alphaMap, vUv ).g;\n#endif";
@@ -10995,7 +10995,7 @@
 
 			if (background && (background.isCubeTexture || background.isWebGLCubeRenderTarget || background.mapping === CubeUVReflectionMapping)) {
 				if (boxMesh === undefined) {
-					boxMesh = new Mesh(new BoxBufferGeometry(1, 1, 1), new ShaderMaterial({
+					boxMesh = new Mesh(new BoxGeometry(1, 1, 1), new ShaderMaterial({
 						name: 'BackgroundCubeMaterial',
 						uniforms: cloneUniforms(ShaderLib.cube.uniforms),
 						vertexShader: ShaderLib.cube.vertexShader,
@@ -11040,7 +11040,7 @@
 				renderList.unshift(boxMesh, boxMesh.geometry, boxMesh.material, 0, 0, null);
 			} else if (background && background.isTexture) {
 				if (planeMesh === undefined) {
-					planeMesh = new Mesh(new PlaneBufferGeometry(2, 2), new ShaderMaterial({
+					planeMesh = new Mesh(new PlaneGeometry(2, 2), new ShaderMaterial({
 						name: 'BackgroundMaterial',
 						uniforms: cloneUniforms(ShaderLib.background.uniforms),
 						vertexShader: ShaderLib.background.vertexShader,
@@ -20441,10 +20441,10 @@
 	DepthTexture.prototype.constructor = DepthTexture;
 	DepthTexture.prototype.isDepthTexture = true;
 
-	var CircleBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
-		_inheritsLoose(CircleBufferGeometry, _BufferGeometry);
+	var CircleGeometry = /*#__PURE__*/function (_BufferGeometry) {
+		_inheritsLoose(CircleGeometry, _BufferGeometry);
 
-		function CircleBufferGeometry(radius, segments, thetaStart, thetaLength) {
+		function CircleGeometry(radius, segments, thetaStart, thetaLength) {
 			var _this;
 
 			if (radius === void 0) {
@@ -20464,7 +20464,7 @@
 			}
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'CircleBufferGeometry';
+			_this.type = 'CircleGeometry';
 			_this.parameters = {
 				radius: radius,
 				segments: segments,
@@ -20516,13 +20516,13 @@
 			return _this;
 		}
 
-		return CircleBufferGeometry;
+		return CircleGeometry;
 	}(BufferGeometry);
 
-	var CylinderBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
-		_inheritsLoose(CylinderBufferGeometry, _BufferGeometry);
+	var CylinderGeometry = /*#__PURE__*/function (_BufferGeometry) {
+		_inheritsLoose(CylinderGeometry, _BufferGeometry);
 
-		function CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
+		function CylinderGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
 			var _this;
 
 			if (radiusTop === void 0) {
@@ -20558,7 +20558,7 @@
 			}
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'CylinderBufferGeometry';
+			_this.type = 'CylinderGeometry';
 			_this.parameters = {
 				radiusTop: radiusTop,
 				radiusBottom: radiusBottom,
@@ -20729,13 +20729,13 @@
 			return _this;
 		}
 
-		return CylinderBufferGeometry;
+		return CylinderGeometry;
 	}(BufferGeometry);
 
-	var ConeBufferGeometry = /*#__PURE__*/function (_CylinderBufferGeomet) {
-		_inheritsLoose(ConeBufferGeometry, _CylinderBufferGeomet);
+	var ConeGeometry = /*#__PURE__*/function (_CylinderGeometry) {
+		_inheritsLoose(ConeGeometry, _CylinderGeometry);
 
-		function ConeBufferGeometry(radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
+		function ConeGeometry(radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
 			var _this;
 
 			if (radius === void 0) {
@@ -20766,8 +20766,8 @@
 				thetaLength = Math.PI * 2;
 			}
 
-			_this = _CylinderBufferGeomet.call(this, 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) || this;
-			_this.type = 'ConeBufferGeometry';
+			_this = _CylinderGeometry.call(this, 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) || this;
+			_this.type = 'ConeGeometry';
 			_this.parameters = {
 				radius: radius,
 				height: height,
@@ -20780,13 +20780,13 @@
 			return _this;
 		}
 
-		return ConeBufferGeometry;
-	}(CylinderBufferGeometry);
+		return ConeGeometry;
+	}(CylinderGeometry);
 
-	var PolyhedronBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
-		_inheritsLoose(PolyhedronBufferGeometry, _BufferGeometry);
+	var PolyhedronGeometry = /*#__PURE__*/function (_BufferGeometry) {
+		_inheritsLoose(PolyhedronGeometry, _BufferGeometry);
 
-		function PolyhedronBufferGeometry(vertices, indices, radius, detail) {
+		function PolyhedronGeometry(vertices, indices, radius, detail) {
 			var _this;
 
 			if (radius === void 0) {
@@ -20798,7 +20798,7 @@
 			}
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'PolyhedronBufferGeometry';
+			_this.type = 'PolyhedronGeometry';
 			_this.parameters = {
 				vertices: vertices,
 				indices: indices,
@@ -20989,13 +20989,13 @@
 			return _this;
 		}
 
-		return PolyhedronBufferGeometry;
+		return PolyhedronGeometry;
 	}(BufferGeometry);
 
-	var DodecahedronBufferGeometry = /*#__PURE__*/function (_PolyhedronBufferGeom) {
-		_inheritsLoose(DodecahedronBufferGeometry, _PolyhedronBufferGeom);
+	var DodecahedronGeometry = /*#__PURE__*/function (_PolyhedronGeometry) {
+		_inheritsLoose(DodecahedronGeometry, _PolyhedronGeometry);
 
-		function DodecahedronBufferGeometry(radius, detail) {
+		function DodecahedronGeometry(radius, detail) {
 			var _this;
 
 			if (radius === void 0) {
@@ -21014,8 +21014,8 @@
 			-r, -t, 0, -r, t, 0, r, -t, 0, r, t, 0, // (±φ, 0, ±1/φ)
 			-t, 0, -r, t, 0, -r, -t, 0, r, t, 0, r];
 			var indices = [3, 11, 7, 3, 7, 15, 3, 15, 13, 7, 19, 17, 7, 17, 6, 7, 6, 15, 17, 4, 8, 17, 8, 10, 17, 10, 6, 8, 0, 16, 8, 16, 2, 8, 2, 10, 0, 12, 1, 0, 1, 18, 0, 18, 16, 6, 10, 2, 6, 2, 13, 6, 13, 15, 2, 16, 18, 2, 18, 3, 2, 3, 13, 18, 1, 9, 18, 9, 11, 18, 11, 3, 4, 14, 12, 4, 12, 0, 4, 0, 8, 11, 9, 5, 11, 5, 19, 11, 19, 7, 19, 5, 14, 19, 14, 4, 19, 4, 17, 1, 12, 14, 1, 14, 5, 1, 5, 9];
-			_this = _PolyhedronBufferGeom.call(this, vertices, indices, radius, detail) || this;
-			_this.type = 'DodecahedronBufferGeometry';
+			_this = _PolyhedronGeometry.call(this, vertices, indices, radius, detail) || this;
+			_this.type = 'DodecahedronGeometry';
 			_this.parameters = {
 				radius: radius,
 				detail: detail
@@ -21023,8 +21023,8 @@
 			return _this;
 		}
 
-		return DodecahedronBufferGeometry;
-	}(PolyhedronBufferGeometry);
+		return DodecahedronGeometry;
+	}(PolyhedronGeometry);
 
 	var _v0$2 = new Vector3();
 
@@ -21799,14 +21799,14 @@
 		}
 	}
 
-	var ExtrudeBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
-		_inheritsLoose(ExtrudeBufferGeometry, _BufferGeometry);
+	var ExtrudeGeometry = /*#__PURE__*/function (_BufferGeometry) {
+		_inheritsLoose(ExtrudeGeometry, _BufferGeometry);
 
-		function ExtrudeBufferGeometry(shapes, options) {
+		function ExtrudeGeometry(shapes, options) {
 			var _this;
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'ExtrudeBufferGeometry';
+			_this.type = 'ExtrudeGeometry';
 			_this.parameters = {
 				shapes: shapes,
 				options: options
@@ -22249,7 +22249,7 @@
 			return _this;
 		}
 
-		var _proto = ExtrudeBufferGeometry.prototype;
+		var _proto = ExtrudeGeometry.prototype;
 
 		_proto.toJSON = function toJSON() {
 			var data = BufferGeometry.prototype.toJSON.call(this);
@@ -22258,7 +22258,7 @@
 			return _toJSON(shapes, options, data);
 		};
 
-		return ExtrudeBufferGeometry;
+		return ExtrudeGeometry;
 	}(BufferGeometry);
 
 	var WorldUVGenerator = {
@@ -22309,10 +22309,10 @@
 		return data;
 	}
 
-	var IcosahedronBufferGeometry = /*#__PURE__*/function (_PolyhedronBufferGeom) {
-		_inheritsLoose(IcosahedronBufferGeometry, _PolyhedronBufferGeom);
+	var IcosahedronGeometry = /*#__PURE__*/function (_PolyhedronGeometry) {
+		_inheritsLoose(IcosahedronGeometry, _PolyhedronGeometry);
 
-		function IcosahedronBufferGeometry(radius, detail) {
+		function IcosahedronGeometry(radius, detail) {
 			var _this;
 
 			if (radius === void 0) {
@@ -22326,8 +22326,8 @@
 			var t = (1 + Math.sqrt(5)) / 2;
 			var vertices = [-1, t, 0, 1, t, 0, -1, -t, 0, 1, -t, 0, 0, -1, t, 0, 1, t, 0, -1, -t, 0, 1, -t, t, 0, -1, t, 0, 1, -t, 0, -1, -t, 0, 1];
 			var indices = [0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11, 1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8, 3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9, 4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1];
-			_this = _PolyhedronBufferGeom.call(this, vertices, indices, radius, detail) || this;
-			_this.type = 'IcosahedronBufferGeometry';
+			_this = _PolyhedronGeometry.call(this, vertices, indices, radius, detail) || this;
+			_this.type = 'IcosahedronGeometry';
 			_this.parameters = {
 				radius: radius,
 				detail: detail
@@ -22335,13 +22335,13 @@
 			return _this;
 		}
 
-		return IcosahedronBufferGeometry;
-	}(PolyhedronBufferGeometry);
+		return IcosahedronGeometry;
+	}(PolyhedronGeometry);
 
-	var LatheBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
-		_inheritsLoose(LatheBufferGeometry, _BufferGeometry);
+	var LatheGeometry = /*#__PURE__*/function (_BufferGeometry) {
+		_inheritsLoose(LatheGeometry, _BufferGeometry);
 
-		function LatheBufferGeometry(points, segments, phiStart, phiLength) {
+		function LatheGeometry(points, segments, phiStart, phiLength) {
 			var _this;
 
 			if (segments === void 0) {
@@ -22357,7 +22357,7 @@
 			}
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'LatheBufferGeometry';
+			_this.type = 'LatheGeometry';
 			_this.parameters = {
 				points: points,
 				segments: segments,
@@ -22449,13 +22449,13 @@
 			return _this;
 		}
 
-		return LatheBufferGeometry;
+		return LatheGeometry;
 	}(BufferGeometry);
 
-	var OctahedronBufferGeometry = /*#__PURE__*/function (_PolyhedronBufferGeom) {
-		_inheritsLoose(OctahedronBufferGeometry, _PolyhedronBufferGeom);
+	var OctahedronGeometry = /*#__PURE__*/function (_PolyhedronGeometry) {
+		_inheritsLoose(OctahedronGeometry, _PolyhedronGeometry);
 
-		function OctahedronBufferGeometry(radius, detail) {
+		function OctahedronGeometry(radius, detail) {
 			var _this;
 
 			if (radius === void 0) {
@@ -22468,8 +22468,8 @@
 
 			var vertices = [1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1];
 			var indices = [0, 2, 4, 0, 4, 3, 0, 3, 5, 0, 5, 2, 1, 2, 5, 1, 5, 3, 1, 3, 4, 1, 4, 2];
-			_this = _PolyhedronBufferGeom.call(this, vertices, indices, radius, detail) || this;
-			_this.type = 'OctahedronBufferGeometry';
+			_this = _PolyhedronGeometry.call(this, vertices, indices, radius, detail) || this;
+			_this.type = 'OctahedronGeometry';
 			_this.parameters = {
 				radius: radius,
 				detail: detail
@@ -22477,17 +22477,17 @@
 			return _this;
 		}
 
-		return OctahedronBufferGeometry;
-	}(PolyhedronBufferGeometry);
+		return OctahedronGeometry;
+	}(PolyhedronGeometry);
 
 	/**
 	 * Parametric Surfaces Geometry
 	 * based on the brilliant article by @prideout https://prideout.net/blog/old/blog/index.html@p=44.html
 	 */
 
-	function ParametricBufferGeometry(func, slices, stacks) {
+	function ParametricGeometry(func, slices, stacks) {
 		BufferGeometry.call(this);
-		this.type = 'ParametricBufferGeometry';
+		this.type = 'ParametricGeometry';
 		this.parameters = {
 			func: func,
 			slices: slices,
@@ -22566,13 +22566,13 @@
 		this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
 	}
 
-	ParametricBufferGeometry.prototype = Object.create(BufferGeometry.prototype);
-	ParametricBufferGeometry.prototype.constructor = ParametricBufferGeometry;
+	ParametricGeometry.prototype = Object.create(BufferGeometry.prototype);
+	ParametricGeometry.prototype.constructor = ParametricGeometry;
 
-	var RingBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
-		_inheritsLoose(RingBufferGeometry, _BufferGeometry);
+	var RingGeometry = /*#__PURE__*/function (_BufferGeometry) {
+		_inheritsLoose(RingGeometry, _BufferGeometry);
 
-		function RingBufferGeometry(innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength) {
+		function RingGeometry(innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength) {
 			var _this;
 
 			if (innerRadius === void 0) {
@@ -22600,7 +22600,7 @@
 			}
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'RingBufferGeometry';
+			_this.type = 'RingGeometry';
 			_this.parameters = {
 				innerRadius: innerRadius,
 				outerRadius: outerRadius,
@@ -22671,13 +22671,13 @@
 			return _this;
 		}
 
-		return RingBufferGeometry;
+		return RingGeometry;
 	}(BufferGeometry);
 
-	var ShapeBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
-		_inheritsLoose(ShapeBufferGeometry, _BufferGeometry);
+	var ShapeGeometry = /*#__PURE__*/function (_BufferGeometry) {
+		_inheritsLoose(ShapeGeometry, _BufferGeometry);
 
-		function ShapeBufferGeometry(shapes, curveSegments) {
+		function ShapeGeometry(shapes, curveSegments) {
 			var _this;
 
 			if (curveSegments === void 0) {
@@ -22685,7 +22685,7 @@
 			}
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'ShapeBufferGeometry';
+			_this.type = 'ShapeGeometry';
 			_this.parameters = {
 				shapes: shapes,
 				curveSegments: curveSegments
@@ -22770,7 +22770,7 @@
 			return _this;
 		}
 
-		var _proto = ShapeBufferGeometry.prototype;
+		var _proto = ShapeGeometry.prototype;
 
 		_proto.toJSON = function toJSON() {
 			var data = BufferGeometry.prototype.toJSON.call(this);
@@ -22778,7 +22778,7 @@
 			return _toJSON$1(shapes, data);
 		};
 
-		return ShapeBufferGeometry;
+		return ShapeGeometry;
 	}(BufferGeometry);
 
 	function _toJSON$1(shapes, data) {
@@ -22796,10 +22796,10 @@
 		return data;
 	}
 
-	var SphereBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
-		_inheritsLoose(SphereBufferGeometry, _BufferGeometry);
+	var SphereGeometry = /*#__PURE__*/function (_BufferGeometry) {
+		_inheritsLoose(SphereGeometry, _BufferGeometry);
 
-		function SphereBufferGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength) {
+		function SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength) {
 			var _this;
 
 			if (radius === void 0) {
@@ -22831,7 +22831,7 @@
 			}
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'SphereBufferGeometry';
+			_this.type = 'SphereGeometry';
 			_this.parameters = {
 				radius: radius,
 				widthSegments: widthSegments,
@@ -22908,13 +22908,13 @@
 			return _this;
 		}
 
-		return SphereBufferGeometry;
+		return SphereGeometry;
 	}(BufferGeometry);
 
-	var TetrahedronBufferGeometry = /*#__PURE__*/function (_PolyhedronBufferGeom) {
-		_inheritsLoose(TetrahedronBufferGeometry, _PolyhedronBufferGeom);
+	var TetrahedronGeometry = /*#__PURE__*/function (_PolyhedronGeometry) {
+		_inheritsLoose(TetrahedronGeometry, _PolyhedronGeometry);
 
-		function TetrahedronBufferGeometry(radius, detail) {
+		function TetrahedronGeometry(radius, detail) {
 			var _this;
 
 			if (radius === void 0) {
@@ -22927,8 +22927,8 @@
 
 			var vertices = [1, 1, 1, -1, -1, 1, -1, 1, -1, 1, -1, -1];
 			var indices = [2, 1, 0, 0, 3, 2, 1, 3, 0, 2, 3, 1];
-			_this = _PolyhedronBufferGeom.call(this, vertices, indices, radius, detail) || this;
-			_this.type = 'TetrahedronBufferGeometry';
+			_this = _PolyhedronGeometry.call(this, vertices, indices, radius, detail) || this;
+			_this.type = 'TetrahedronGeometry';
 			_this.parameters = {
 				radius: radius,
 				detail: detail
@@ -22936,13 +22936,13 @@
 			return _this;
 		}
 
-		return TetrahedronBufferGeometry;
-	}(PolyhedronBufferGeometry);
+		return TetrahedronGeometry;
+	}(PolyhedronGeometry);
 
-	var TextBufferGeometry = /*#__PURE__*/function (_ExtrudeBufferGeometr) {
-		_inheritsLoose(TextBufferGeometry, _ExtrudeBufferGeometr);
+	var TextGeometry = /*#__PURE__*/function (_ExtrudeGeometry) {
+		_inheritsLoose(TextGeometry, _ExtrudeGeometry);
 
-		function TextBufferGeometry(text, parameters) {
+		function TextGeometry(text, parameters) {
 			var _this;
 
 			if (parameters === void 0) {
@@ -22963,18 +22963,18 @@
 			if (parameters.bevelThickness === undefined) parameters.bevelThickness = 10;
 			if (parameters.bevelSize === undefined) parameters.bevelSize = 8;
 			if (parameters.bevelEnabled === undefined) parameters.bevelEnabled = false;
-			_this = _ExtrudeBufferGeometr.call(this, shapes, parameters) || this;
-			_this.type = 'TextBufferGeometry';
+			_this = _ExtrudeGeometry.call(this, shapes, parameters) || this;
+			_this.type = 'TextGeometry';
 			return _this;
 		}
 
-		return TextBufferGeometry;
-	}(ExtrudeBufferGeometry);
+		return TextGeometry;
+	}(ExtrudeGeometry);
 
-	var TorusBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
-		_inheritsLoose(TorusBufferGeometry, _BufferGeometry);
+	var TorusGeometry = /*#__PURE__*/function (_BufferGeometry) {
+		_inheritsLoose(TorusGeometry, _BufferGeometry);
 
-		function TorusBufferGeometry(radius, tube, radialSegments, tubularSegments, arc) {
+		function TorusGeometry(radius, tube, radialSegments, tubularSegments, arc) {
 			var _this;
 
 			if (radius === void 0) {
@@ -22998,7 +22998,7 @@
 			}
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'TorusBufferGeometry';
+			_this.type = 'TorusGeometry';
 			_this.parameters = {
 				radius: radius,
 				tube: tube,
@@ -23064,13 +23064,13 @@
 			return _this;
 		}
 
-		return TorusBufferGeometry;
+		return TorusGeometry;
 	}(BufferGeometry);
 
-	var TorusKnotBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
-		_inheritsLoose(TorusKnotBufferGeometry, _BufferGeometry);
+	var TorusKnotGeometry = /*#__PURE__*/function (_BufferGeometry) {
+		_inheritsLoose(TorusKnotGeometry, _BufferGeometry);
 
-		function TorusKnotBufferGeometry(radius, tube, tubularSegments, radialSegments, p, q) {
+		function TorusKnotGeometry(radius, tube, tubularSegments, radialSegments, p, q) {
 			var _this;
 
 			if (radius === void 0) {
@@ -23098,7 +23098,7 @@
 			}
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'TorusKnotBufferGeometry';
+			_this.type = 'TorusKnotGeometry';
 			_this.parameters = {
 				radius: radius,
 				tube: tube,
@@ -23197,13 +23197,13 @@
 			return _this;
 		}
 
-		return TorusKnotBufferGeometry;
+		return TorusKnotGeometry;
 	}(BufferGeometry);
 
-	var TubeBufferGeometry = /*#__PURE__*/function (_BufferGeometry) {
-		_inheritsLoose(TubeBufferGeometry, _BufferGeometry);
+	var TubeGeometry = /*#__PURE__*/function (_BufferGeometry) {
+		_inheritsLoose(TubeGeometry, _BufferGeometry);
 
-		function TubeBufferGeometry(path, tubularSegments, radius, radialSegments, closed) {
+		function TubeGeometry(path, tubularSegments, radius, radialSegments, closed) {
 			var _this;
 
 			if (tubularSegments === void 0) {
@@ -23223,7 +23223,7 @@
 			}
 
 			_this = _BufferGeometry.call(this) || this;
-			_this.type = 'TubeBufferGeometry';
+			_this.type = 'TubeGeometry';
 			_this.parameters = {
 				path: path,
 				tubularSegments: tubularSegments,
@@ -23327,7 +23327,7 @@
 			return _this;
 		}
 
-		var _proto = TubeBufferGeometry.prototype;
+		var _proto = TubeGeometry.prototype;
 
 		_proto.toJSON = function toJSON() {
 			var data = BufferGeometry.prototype.toJSON.call(this);
@@ -23335,7 +23335,7 @@
 			return data;
 		};
 
-		return TubeBufferGeometry;
+		return TubeGeometry;
 	}(BufferGeometry);
 
 	var WireframeGeometry = /*#__PURE__*/function (_BufferGeometry) {
@@ -23435,27 +23435,47 @@
 
 	var Geometries = /*#__PURE__*/Object.freeze({
 		__proto__: null,
-		BoxBufferGeometry: BoxBufferGeometry,
-		CircleBufferGeometry: CircleBufferGeometry,
-		ConeBufferGeometry: ConeBufferGeometry,
-		CylinderBufferGeometry: CylinderBufferGeometry,
-		DodecahedronBufferGeometry: DodecahedronBufferGeometry,
+		BoxGeometry: BoxGeometry,
+		BoxBufferGeometry: BoxGeometry,
+		CircleGeometry: CircleGeometry,
+		CircleBufferGeometry: CircleGeometry,
+		ConeGeometry: ConeGeometry,
+		ConeBufferGeometry: ConeGeometry,
+		CylinderGeometry: CylinderGeometry,
+		CylinderBufferGeometry: CylinderGeometry,
+		DodecahedronGeometry: DodecahedronGeometry,
+		DodecahedronBufferGeometry: DodecahedronGeometry,
 		EdgesGeometry: EdgesGeometry,
-		ExtrudeBufferGeometry: ExtrudeBufferGeometry,
-		IcosahedronBufferGeometry: IcosahedronBufferGeometry,
-		LatheBufferGeometry: LatheBufferGeometry,
-		OctahedronBufferGeometry: OctahedronBufferGeometry,
-		ParametricBufferGeometry: ParametricBufferGeometry,
-		PlaneBufferGeometry: PlaneBufferGeometry,
-		PolyhedronBufferGeometry: PolyhedronBufferGeometry,
-		RingBufferGeometry: RingBufferGeometry,
-		ShapeBufferGeometry: ShapeBufferGeometry,
-		SphereBufferGeometry: SphereBufferGeometry,
-		TetrahedronBufferGeometry: TetrahedronBufferGeometry,
-		TextBufferGeometry: TextBufferGeometry,
-		TorusBufferGeometry: TorusBufferGeometry,
-		TorusKnotBufferGeometry: TorusKnotBufferGeometry,
-		TubeBufferGeometry: TubeBufferGeometry,
+		ExtrudeGeometry: ExtrudeGeometry,
+		ExtrudeBufferGeometry: ExtrudeGeometry,
+		IcosahedronGeometry: IcosahedronGeometry,
+		IcosahedronBufferGeometry: IcosahedronGeometry,
+		LatheGeometry: LatheGeometry,
+		LatheBufferGeometry: LatheGeometry,
+		OctahedronGeometry: OctahedronGeometry,
+		OctahedronBufferGeometry: OctahedronGeometry,
+		ParametricGeometry: ParametricGeometry,
+		ParametricBufferGeometry: ParametricGeometry,
+		PlaneGeometry: PlaneGeometry,
+		PlaneBufferGeometry: PlaneGeometry,
+		PolyhedronGeometry: PolyhedronGeometry,
+		PolyhedronBufferGeometry: PolyhedronGeometry,
+		RingGeometry: RingGeometry,
+		RingBufferGeometry: RingGeometry,
+		ShapeGeometry: ShapeGeometry,
+		ShapeBufferGeometry: ShapeGeometry,
+		SphereGeometry: SphereGeometry,
+		SphereBufferGeometry: SphereGeometry,
+		TetrahedronGeometry: TetrahedronGeometry,
+		TetrahedronBufferGeometry: TetrahedronGeometry,
+		TextGeometry: TextGeometry,
+		TextBufferGeometry: TextGeometry,
+		TorusGeometry: TorusGeometry,
+		TorusBufferGeometry: TorusGeometry,
+		TorusKnotGeometry: TorusKnotGeometry,
+		TorusKnotBufferGeometry: TorusKnotGeometry,
+		TubeGeometry: TubeGeometry,
+		TubeBufferGeometry: TubeGeometry,
 		WireframeGeometry: WireframeGeometry
 	});
 
@@ -28922,8 +28942,6 @@
 
 						case 'BoxGeometry':
 						case 'BoxBufferGeometry':
-						case 'CubeGeometry':
-							// backwards compatible
 							geometry = new Geometries[data.type](data.width, data.height, data.depth, data.widthSegments, data.heightSegments, data.depthSegments);
 							break;
 
@@ -34271,7 +34289,7 @@
 		function PointLightHelper(light, sphereSize, color) {
 			var _this;
 
-			var geometry = new SphereBufferGeometry(sphereSize, 4, 2);
+			var geometry = new SphereGeometry(sphereSize, 4, 2);
 			var material = new MeshBasicMaterial({
 				wireframe: true,
 				fog: false,
@@ -34355,7 +34373,7 @@
 			_this.matrix = light.matrixWorld;
 			_this.matrixAutoUpdate = false;
 			_this.color = color;
-			var geometry = new OctahedronBufferGeometry(size);
+			var geometry = new OctahedronGeometry(size);
 			geometry.rotateY(Math.PI * 0.5);
 			_this.material = new MeshBasicMaterial({
 				wireframe: true,
@@ -35010,7 +35028,7 @@
 
 				_lineGeometry.setAttribute('position', new Float32BufferAttribute([0, 0, 0, 0, 1, 0], 3));
 
-				_coneGeometry = new CylinderBufferGeometry(0, 0.5, 1, 5, 1);
+				_coneGeometry = new CylinderGeometry(0, 0.5, 1, 5, 1);
 
 				_coneGeometry.translate(0, -0.5, 0);
 			}
@@ -36248,12 +36266,12 @@
 			return this.extractPoints(divisions);
 		},
 		extrude: function extrude(options) {
-			console.warn('THREE.Shape: .extrude() has been removed. Use ExtrudeBufferGeometry() instead.');
-			return new ExtrudeBufferGeometry(this, options);
+			console.warn('THREE.Shape: .extrude() has been removed. Use ExtrudeGeometry() instead.');
+			return new ExtrudeGeometry(this, options);
 		},
 		makeGeometry: function makeGeometry(options) {
-			console.warn('THREE.Shape: .makeGeometry() has been removed. Use ShapeBufferGeometry() instead.');
-			return new ShapeBufferGeometry(this, options);
+			console.warn('THREE.Shape: .makeGeometry() has been removed. Use ShapeGeometry() instead.');
+			return new ShapeGeometry(this, options);
 		}
 	});
 	Object.assign(Vector2.prototype, {
@@ -36328,87 +36346,7 @@
 			console.warn('THREE.Geometry: .applyMatrix() has been renamed to .applyMatrix4().');
 			return this.applyMatrix4(matrix);
 		}
-	});
-	function BoxGeometry(width, height, depth, widthSegments, heightSegments, depthSegments) {
-		console.warn('THREE.BoxGeometry has been removed. Use THREE.BoxBufferGeometry instead.');
-		return new BoxBufferGeometry(width, height, depth, widthSegments, heightSegments, depthSegments);
-	}
-	function CircleGeometry(radius, segments, thetaStart, thetaLength) {
-		console.warn('THREE.CircleGeometry has been removed. Use THREE.CircleBufferGeometry instead.');
-		return new CircleBufferGeometry(radius, segments, thetaStart, thetaLength);
-	}
-	function ConeGeometry(radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
-		console.warn('THREE.CircleGeometry has been removed. Use THREE.ConeBufferGeometry instead.');
-		return new ConeBufferGeometry(radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength);
-	}
-	function CylinderGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
-		console.warn('THREE.CylinderGeometry has been removed. Use THREE.CylinderBufferGeometry instead.');
-		return new CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength);
-	}
-	function DodecahedronGeometry(radius, detail) {
-		console.warn('THREE.DodecahedronGeometry has been removed. Use THREE.DodecahedronBufferGeometry instead.');
-		return new DodecahedronBufferGeometry(radius, detail);
-	}
-	function ExtrudeGeometry(shapes, options) {
-		console.warn('THREE.ExtrudeGeometry has been removed. Use THREE.ExtrudeBufferGeometry instead.');
-		return new ExtrudeBufferGeometry(shapes, options);
-	}
-	function IcosahedronGeometry(radius, detail) {
-		console.warn('THREE.IcosahedronGeometry has been removed. Use THREE.IcosahedronBufferGeometry instead.');
-		return new IcosahedronBufferGeometry(radius, detail);
-	}
-	function LatheGeometry(points, segments, phiStart, phiLength) {
-		console.warn('THREE.LatheGeometry has been removed. Use THREE.LatheBufferGeometry instead.');
-		return new LatheBufferGeometry(points, segments, phiStart, phiLength);
-	}
-	function OctahedronGeometry(radius, detail) {
-		console.warn('THREE.OctahedronGeometry has been removed. Use THREE.OctahedronBufferGeometry instead.');
-		return new OctahedronBufferGeometry(radius, detail);
-	}
-	function ParametricGeometry(func, slices, stacks) {
-		console.warn('THREE.ParametricGeometry has been removed. Use THREE.ParametricBufferGeometry instead.');
-		return new ParametricBufferGeometry(func, slices, stacks);
-	}
-	function PlaneGeometry(width, height, widthSegments, heightSegments) {
-		console.warn('THREE.PlaneGeometry has been removed. Use THREE.PlaneBufferGeometry instead.');
-		return new PlaneBufferGeometry(width, height, widthSegments, heightSegments);
-	}
-	function PolyhedronGeometry(vertices, indices, radius, detail) {
-		console.warn('THREE.PolyhedronGeometry has been removed. Use THREE.PolyhedronBufferGeometry instead.');
-		return new PolyhedronBufferGeometry(vertices, indices, radius, detail);
-	}
-	function RingGeometry(innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength) {
-		console.warn('THREE.RingGeometry has been removed. Use THREE.RingBufferGeometry instead.');
-		return new RingBufferGeometry(innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength);
-	}
-	function ShapeGeometry(shapes, curveSegments) {
-		console.warn('THREE.ShapeGeometry has been removed. Use THREE.ShapeBufferGeometry instead.');
-		return new ShapeBufferGeometry(shapes, curveSegments);
-	}
-	function SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength) {
-		console.warn('THREE.SphereGeometry has been removed. Use THREE.SphereBufferGeometry instead.');
-		return new SphereBufferGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength);
-	}
-	function TetrahedronGeometry(radius, detail) {
-		console.warn('THREE.TetrahedronGeometry has been removed. Use THREE.TetrahedronBufferGeometry instead.');
-		return new TetrahedronBufferGeometry(radius, detail);
-	}
-	function TextGeometry(text, parameters) {
-		console.warn('THREE.TextGeometry has been removed. Use THREE.TextBufferGeometry instead.');
-		return new TextBufferGeometry(text, parameters);
-	}
-	function TorusGeometry(radius, tube, radialSegments, tubularSegments, arc) {
-		console.warn('THREE.TorusGeometry has been removed. Use THREE.TorusBufferGeometry instead.');
-		return new TorusBufferGeometry(radius, tube, radialSegments, tubularSegments, arc);
-	}
-	function TorusKnotGeometry(radius, tube, tubularSegments, radialSegments, p, q, heightScale) {
-		console.warn('THREE.TorusKnotGeometry has been removed. Use THREE.TorusKnotBufferGeometry instead.');
-		return new TorusKnotBufferGeometry(radius, tube, tubularSegments, radialSegments, p, q, heightScale);
-	}
-	function TubeGeometry(path, tubularSegments, radius, radialSegments, closed, taper) {
-		console.warn('THREE.TubeGeometry has been removed. Use THREE.TubeBufferGeometry instead.');
-		return new TubeBufferGeometry(path, tubularSegments, radius, radialSegments, closed, taper);
-	} //
+	}); //
 
 	Object.assign(Object3D.prototype, {
 		getChildByName: function getChildByName(name) {
@@ -36731,15 +36669,15 @@
 		}
 	}); //
 
-	Object.assign(ExtrudeBufferGeometry.prototype, {
+	Object.assign(ExtrudeGeometry.prototype, {
 		getArrays: function getArrays() {
-			console.error('THREE.ExtrudeBufferGeometry: .getArrays() has been removed.');
+			console.error('THREE.ExtrudeGeometry: .getArrays() has been removed.');
 		},
 		addShapeList: function addShapeList() {
-			console.error('THREE.ExtrudeBufferGeometry: .addShapeList() has been removed.');
+			console.error('THREE.ExtrudeGeometry: .addShapeList() has been removed.');
 		},
 		addShape: function addShape() {
-			console.error('THREE.ExtrudeBufferGeometry: .addShape() has been removed.');
+			console.error('THREE.ExtrudeGeometry: .addShape() has been removed.');
 		}
 	}); //
 
@@ -37305,7 +37243,7 @@
 	exports.Box2 = Box2;
 	exports.Box3 = Box3;
 	exports.Box3Helper = Box3Helper;
-	exports.BoxBufferGeometry = BoxBufferGeometry;
+	exports.BoxBufferGeometry = BoxGeometry;
 	exports.BoxGeometry = BoxGeometry;
 	exports.BoxHelper = BoxHelper;
 	exports.BufferAttribute = BufferAttribute;
@@ -37319,7 +37257,7 @@
 	exports.CanvasTexture = CanvasTexture;
 	exports.CatmullRomCurve3 = CatmullRomCurve3;
 	exports.CineonToneMapping = CineonToneMapping;
-	exports.CircleBufferGeometry = CircleBufferGeometry;
+	exports.CircleBufferGeometry = CircleGeometry;
 	exports.CircleGeometry = CircleGeometry;
 	exports.ClampToEdgeWrapping = ClampToEdgeWrapping;
 	exports.Clock = Clock;
@@ -37328,7 +37266,7 @@
 	exports.ColorKeyframeTrack = ColorKeyframeTrack;
 	exports.CompressedTexture = CompressedTexture;
 	exports.CompressedTextureLoader = CompressedTextureLoader;
-	exports.ConeBufferGeometry = ConeBufferGeometry;
+	exports.ConeBufferGeometry = ConeGeometry;
 	exports.ConeGeometry = ConeGeometry;
 	exports.CubeCamera = CubeCamera;
 	exports.CubeReflectionMapping = CubeReflectionMapping;
@@ -37348,7 +37286,7 @@
 	exports.CurvePath = CurvePath;
 	exports.CustomBlending = CustomBlending;
 	exports.CustomToneMapping = CustomToneMapping;
-	exports.CylinderBufferGeometry = CylinderBufferGeometry;
+	exports.CylinderBufferGeometry = CylinderGeometry;
 	exports.CylinderGeometry = CylinderGeometry;
 	exports.Cylindrical = Cylindrical;
 	exports.DataTexture = DataTexture;
@@ -37365,7 +37303,7 @@
 	exports.DirectionalLight = DirectionalLight;
 	exports.DirectionalLightHelper = DirectionalLightHelper;
 	exports.DiscreteInterpolant = DiscreteInterpolant;
-	exports.DodecahedronBufferGeometry = DodecahedronBufferGeometry;
+	exports.DodecahedronBufferGeometry = DodecahedronGeometry;
 	exports.DodecahedronGeometry = DodecahedronGeometry;
 	exports.DoubleSide = DoubleSide;
 	exports.DstAlphaFactor = DstAlphaFactor;
@@ -37383,7 +37321,7 @@
 	exports.EquirectangularRefractionMapping = EquirectangularRefractionMapping;
 	exports.Euler = Euler;
 	exports.EventDispatcher = EventDispatcher;
-	exports.ExtrudeBufferGeometry = ExtrudeBufferGeometry;
+	exports.ExtrudeBufferGeometry = ExtrudeGeometry;
 	exports.ExtrudeGeometry = ExtrudeGeometry;
 	exports.Face3 = Face3;
 	exports.Face4 = Face4;
@@ -37418,7 +37356,7 @@
 	exports.HemisphereLight = HemisphereLight;
 	exports.HemisphereLightHelper = HemisphereLightHelper;
 	exports.HemisphereLightProbe = HemisphereLightProbe;
-	exports.IcosahedronBufferGeometry = IcosahedronBufferGeometry;
+	exports.IcosahedronBufferGeometry = IcosahedronGeometry;
 	exports.IcosahedronGeometry = IcosahedronGeometry;
 	exports.ImageBitmapLoader = ImageBitmapLoader;
 	exports.ImageLoader = ImageLoader;
@@ -37448,7 +37386,7 @@
 	exports.KeepStencilOp = KeepStencilOp;
 	exports.KeyframeTrack = KeyframeTrack;
 	exports.LOD = LOD;
-	exports.LatheBufferGeometry = LatheBufferGeometry;
+	exports.LatheBufferGeometry = LatheGeometry;
 	exports.LatheGeometry = LatheGeometry;
 	exports.Layers = Layers;
 	exports.LensFlare = LensFlare;
@@ -37529,7 +37467,7 @@
 	exports.Object3D = Object3D;
 	exports.ObjectLoader = ObjectLoader;
 	exports.ObjectSpaceNormalMap = ObjectSpaceNormalMap;
-	exports.OctahedronBufferGeometry = OctahedronBufferGeometry;
+	exports.OctahedronBufferGeometry = OctahedronGeometry;
 	exports.OctahedronGeometry = OctahedronGeometry;
 	exports.OneFactor = OneFactor;
 	exports.OneMinusDstAlphaFactor = OneMinusDstAlphaFactor;
@@ -37540,7 +37478,7 @@
 	exports.PCFShadowMap = PCFShadowMap;
 	exports.PCFSoftShadowMap = PCFSoftShadowMap;
 	exports.PMREMGenerator = PMREMGenerator;
-	exports.ParametricBufferGeometry = ParametricBufferGeometry;
+	exports.ParametricBufferGeometry = ParametricGeometry;
 	exports.ParametricGeometry = ParametricGeometry;
 	exports.Particle = Particle;
 	exports.ParticleBasicMaterial = ParticleBasicMaterial;
@@ -37549,7 +37487,7 @@
 	exports.Path = Path;
 	exports.PerspectiveCamera = PerspectiveCamera;
 	exports.Plane = Plane;
-	exports.PlaneBufferGeometry = PlaneBufferGeometry;
+	exports.PlaneBufferGeometry = PlaneGeometry;
 	exports.PlaneGeometry = PlaneGeometry;
 	exports.PlaneHelper = PlaneHelper;
 	exports.PointCloud = PointCloud;
@@ -37559,7 +37497,7 @@
 	exports.Points = Points;
 	exports.PointsMaterial = PointsMaterial;
 	exports.PolarGridHelper = PolarGridHelper;
-	exports.PolyhedronBufferGeometry = PolyhedronBufferGeometry;
+	exports.PolyhedronBufferGeometry = PolyhedronGeometry;
 	exports.PolyhedronGeometry = PolyhedronGeometry;
 	exports.PositionalAudio = PositionalAudio;
 	exports.PropertyBinding = PropertyBinding;
@@ -37618,7 +37556,7 @@
 	exports.RepeatWrapping = RepeatWrapping;
 	exports.ReplaceStencilOp = ReplaceStencilOp;
 	exports.ReverseSubtractEquation = ReverseSubtractEquation;
-	exports.RingBufferGeometry = RingBufferGeometry;
+	exports.RingBufferGeometry = RingGeometry;
 	exports.RingGeometry = RingGeometry;
 	exports.SRGB8_ALPHA8_ASTC_10x10_Format = SRGB8_ALPHA8_ASTC_10x10_Format;
 	exports.SRGB8_ALPHA8_ASTC_10x5_Format = SRGB8_ALPHA8_ASTC_10x5_Format;
@@ -37641,7 +37579,7 @@
 	exports.ShaderMaterial = ShaderMaterial;
 	exports.ShadowMaterial = ShadowMaterial;
 	exports.Shape = Shape;
-	exports.ShapeBufferGeometry = ShapeBufferGeometry;
+	exports.ShapeBufferGeometry = ShapeGeometry;
 	exports.ShapeGeometry = ShapeGeometry;
 	exports.ShapePath = ShapePath;
 	exports.ShapeUtils = ShapeUtils;
@@ -37651,7 +37589,7 @@
 	exports.SkinnedMesh = SkinnedMesh;
 	exports.SmoothShading = SmoothShading;
 	exports.Sphere = Sphere;
-	exports.SphereBufferGeometry = SphereBufferGeometry;
+	exports.SphereBufferGeometry = SphereGeometry;
 	exports.SphereGeometry = SphereGeometry;
 	exports.Spherical = Spherical;
 	exports.SphericalHarmonics3 = SphericalHarmonics3;
@@ -37677,21 +37615,21 @@
 	exports.SubtractiveBlending = SubtractiveBlending;
 	exports.TOUCH = TOUCH;
 	exports.TangentSpaceNormalMap = TangentSpaceNormalMap;
-	exports.TetrahedronBufferGeometry = TetrahedronBufferGeometry;
+	exports.TetrahedronBufferGeometry = TetrahedronGeometry;
 	exports.TetrahedronGeometry = TetrahedronGeometry;
-	exports.TextBufferGeometry = TextBufferGeometry;
+	exports.TextBufferGeometry = TextGeometry;
 	exports.TextGeometry = TextGeometry;
 	exports.Texture = Texture;
 	exports.TextureLoader = TextureLoader;
-	exports.TorusBufferGeometry = TorusBufferGeometry;
+	exports.TorusBufferGeometry = TorusGeometry;
 	exports.TorusGeometry = TorusGeometry;
-	exports.TorusKnotBufferGeometry = TorusKnotBufferGeometry;
+	exports.TorusKnotBufferGeometry = TorusKnotGeometry;
 	exports.TorusKnotGeometry = TorusKnotGeometry;
 	exports.Triangle = Triangle;
 	exports.TriangleFanDrawMode = TriangleFanDrawMode;
 	exports.TriangleStripDrawMode = TriangleStripDrawMode;
 	exports.TrianglesDrawMode = TrianglesDrawMode;
-	exports.TubeBufferGeometry = TubeBufferGeometry;
+	exports.TubeBufferGeometry = TubeGeometry;
 	exports.TubeGeometry = TubeGeometry;
 	exports.UVMapping = UVMapping;
 	exports.Uint16Attribute = Uint16Attribute;

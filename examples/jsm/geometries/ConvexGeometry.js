@@ -4,7 +4,9 @@ import {
 } from '../../../build/three.module.js';
 import { ConvexHull } from '../math/ConvexHull.js';
 
-var ConvexBufferGeometry = function ( points ) {
+// ConvexGeometry
+
+var ConvexGeometry = function ( points ) {
 
 	BufferGeometry.call( this );
 
@@ -52,7 +54,7 @@ var ConvexBufferGeometry = function ( points ) {
 
 };
 
-ConvexBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-ConvexBufferGeometry.prototype.constructor = ConvexBufferGeometry;
+ConvexGeometry.prototype = Object.create( BufferGeometry.prototype );
+ConvexGeometry.prototype.constructor = ConvexGeometry;
 
-export { ConvexBufferGeometry };
+export { ConvexGeometry };
