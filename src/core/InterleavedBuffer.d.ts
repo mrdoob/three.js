@@ -2,7 +2,7 @@ import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
 import { Usage } from '../constants';
 
 /**
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/InterleavedBuffer.js|src/core/InterleavedBuffer.js}
+ * see {@link https://github.com/mrdoob/three.js/blob/master/src/core/InterleavedBuffer.js|src/core/InterleavedBuffer.js}
  */
 export class InterleavedBuffer {
 
