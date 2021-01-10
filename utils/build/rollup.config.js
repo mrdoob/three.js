@@ -209,7 +209,7 @@ function glsl() {
 
 			if ( /\.glsl.js$/.test( id ) === false ) return;
 
-			code = code.replace( /\/\* glsl \*\/\`((.|\n)*)\`/, function ( match, p1 ) {
+			code = code.replace( /\/\* glsl \*\/\`((.|\r|\n)*)\`/, function ( match, p1 ) {
 
 				return JSON.stringify(
 					p1
@@ -274,7 +274,7 @@ function polyfills() {
 
 		transform( code, filePath ) {
 
-			if ( filePath.endsWith( 'src/Three.js' ) ) {
+			if ( filePath.endsWith( 'src/Three.js' ) || filePath.endsWith( 'src\\Three.js' ) ) {
 
 				code = "import './polyfills';\n" + code;
 
