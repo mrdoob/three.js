@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { ExtrudeGeometry } from '../../../../src/geometries/ExtrudeGeometry';
+import { ExtrudeGeometry, ExtrudeBufferGeometry } from '../../../../src/geometries/ExtrudeGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 

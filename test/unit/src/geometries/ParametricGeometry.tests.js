@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { ParametricGeometry } from '../../../../src/geometries/ParametricGeometry';
+import { ParametricGeometry, ParametricBufferGeometry } from '../../../../src/geometries/ParametricGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -10,7 +10,8 @@ export default QUnit.module( 'Geometries', () => {
 		hooks.beforeEach( function () {
 
 			geometries = [
-				new ParametricGeometry()
+				new ParametricGeometry(),
+				new ParametricBufferGeometry()
 			];
 
 		} );

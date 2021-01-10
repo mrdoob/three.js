@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
+import { BoxGeometry, BoxBufferGeometry } from '../../../../src/geometries/BoxGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -22,7 +22,8 @@ export default QUnit.module( 'Geometries', () => {
 			geometries = [
 				new BoxGeometry(),
 				new BoxGeometry( parameters.width, parameters.height, parameters.depth ),
-				new BoxGeometry( parameters.width, parameters.height, parameters.depth, parameters.widthSegments, parameters.heightSegments, parameters.depthSegments )
+				new BoxGeometry( parameters.width, parameters.height, parameters.depth, parameters.widthSegments, parameters.heightSegments, parameters.depthSegments ),
+				new BoxBufferGeometry()
 			];
 
 		} );
