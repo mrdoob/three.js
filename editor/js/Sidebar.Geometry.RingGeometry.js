@@ -77,7 +77,7 @@ function GeometryParametersPanel( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.RingBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.RingGeometry(
 			innerRadius.getValue(),
 			outerRadius.getValue(),
 			thetaSegments.getValue(),

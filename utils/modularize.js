@@ -47,7 +47,7 @@ var files = [
 	{ path: 'geometries/DecalGeometry.js', dependencies: [], ignoreList: [ 'Geometry' ] },
 	{ path: 'geometries/LightningStrike.js', dependencies: [ { name: 'SimplexNoise', path: 'math/SimplexNoise.js' } ], ignoreList: [ 'Mesh' ] },
 	{ path: 'geometries/ParametricGeometries.js', dependencies: [], ignoreList: [] },
-	{ path: 'geometries/TeapotBufferGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/TeapotGeometry.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'interactive/SelectionBox.js', dependencies: [], ignoreList: [] },
 	{ path: 'interactive/SelectionHelper.js', dependencies: [], ignoreList: [] },

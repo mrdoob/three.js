@@ -1,6 +1,6 @@
 import { UIRow, UIText, UIInteger, UICheckbox, UINumber } from './libs/ui.js';
 
-import { TeapotBufferGeometry } from '../../examples/jsm/geometries/TeapotBufferGeometry.js';
+import { TeapotGeometry } from '../../examples/jsm/geometries/TeapotGeometry.js';
 
 function GeometryParametersPanel( signals, object ) {
 
@@ -82,7 +82,7 @@ function GeometryParametersPanel( signals, object ) {
 
 		object.geometry.dispose();
 
-		object.geometry = new TeapotBufferGeometry(
+		object.geometry = new TeapotGeometry(
 			size.getValue(),
 			segments.getValue(),
 			bottom.getValue(),
