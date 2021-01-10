@@ -221,7 +221,7 @@ var files = [
 	{ path: 'utils/SceneUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/ShadowMapViewer.js', dependencies: [ { name: 'UnpackDepthRGBAShader', path: 'shaders/UnpackDepthRGBAShader.js' } ], ignoreList: [] },
 	{ path: 'utils/SkeletonUtils.js', dependencies: [], ignoreList: [] },
-	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereBufferGeometry' ] },
+	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereGeometry' ] },
 
 	{ path: 'WebGL.js', dependencies: [], ignoreList: [] },
 ];

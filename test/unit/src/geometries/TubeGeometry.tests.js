@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { TubeGeometry } from '../../../../src/geometries/TubeGeometry';
+import { TubeGeometry, TubeBufferGeometry } from '../../../../src/geometries/TubeGeometry';
 
 import { LineCurve3 } from '../../../../src/extras/curves/LineCurve3';
 import { Vector3 } from '../../../../src/math/Vector3';
@@ -15,7 +15,8 @@ export default QUnit.module( 'Geometries', () => {
 			var path = new LineCurve3( new Vector3( 0, 0, 0 ), new Vector3( 0, 1, 0 ) );
 
 			geometries = [
-				new TubeGeometry( path )
+				new TubeGeometry( path ),
+				new TubeBufferGeometry( path )
 			];
 
 		} );

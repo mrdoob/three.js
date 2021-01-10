@@ -2,7 +2,7 @@ import {
 	LinearFilter,
 	Mesh,
 	OrthographicCamera,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	RGBAFormat,
 	Scene,
 	Vector2,
@@ -36,7 +36,7 @@ function NodePostProcessing( renderer, renderTarget ) {
 	this.camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene = new Scene();
 
-	this.quad = new Mesh( new PlaneBufferGeometry( 2, 2 ), this.material );
+	this.quad = new Mesh( new PlaneGeometry( 2, 2 ), this.material );
 	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 

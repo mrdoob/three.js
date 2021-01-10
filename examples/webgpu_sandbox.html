@@ -46,7 +46,7 @@
 				const textureLoader = new THREE.TextureLoader();
 				const texture = textureLoader.load( './textures/uv_grid_opengl.jpg' );
 
-				const geometryBox = new THREE.BoxBufferGeometry();
+				const geometryBox = new THREE.BoxGeometry();
 				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
 
 				box = new THREE.Mesh( geometryBox, materialBox );
@@ -55,7 +55,7 @@
 
 				// data texture
 
-				const geometryPlane = new THREE.PlaneBufferGeometry();
+				const geometryPlane = new THREE.PlaneGeometry();
 				const materialPlane = new THREE.MeshBasicMaterial( { map: createDataTexture(), transparent: true, opacity: 0.5 } );
 
 				const plane = new THREE.Mesh( geometryPlane, materialPlane );

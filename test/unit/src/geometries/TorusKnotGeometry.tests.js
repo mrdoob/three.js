@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { TorusKnotGeometry } from '../../../../src/geometries/TorusKnotGeometry';
+import { TorusKnotGeometry, TorusKnotBufferGeometry } from '../../../../src/geometries/TorusKnotGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -26,6 +26,7 @@ export default QUnit.module( 'Geometries', () => {
 				new TorusKnotGeometry( parameters.radius, parameters.tube, parameters.tubularSegments ),
 				new TorusKnotGeometry( parameters.radius, parameters.tube, parameters.tubularSegments, parameters.radialSegments ),
 				new TorusKnotGeometry( parameters.radius, parameters.tube, parameters.tubularSegments, parameters.radialSegments, parameters.p, parameters.q ),
+				new TorusKnotBufferGeometry()
 			];
 
 		} );

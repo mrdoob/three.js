@@ -3,7 +3,7 @@ import {
 	Mesh,
 	OrthographicCamera,
 	PerspectiveCamera,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	RGBFormat,
 	Scene,
 	ShaderMaterial,
@@ -173,7 +173,7 @@ CinematicCamera.prototype.initPostProcessing = function () {
 			}
 		} );
 
-		this.postprocessing.quad = new Mesh( new PlaneBufferGeometry( window.innerWidth, window.innerHeight ), this.postprocessing.materialBokeh );
+		this.postprocessing.quad = new Mesh( new PlaneGeometry( window.innerWidth, window.innerHeight ), this.postprocessing.materialBokeh );
 		this.postprocessing.quad.position.z = - 500;
 		this.postprocessing.scene.add( this.postprocessing.quad );
 

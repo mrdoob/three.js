@@ -60,7 +60,7 @@
 				scene.background = new THREE.Color( 0x444444 );
 
 				group = new THREE.Group();
-				const floor = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 1, 100 ), new THREE.MeshPhongMaterial( {} ) );
+				const floor = new THREE.Mesh( new THREE.BoxGeometry( 100, 1, 100 ), new THREE.MeshPhongMaterial( {} ) );
 				floor.position.y = - 10;
 				const light = new THREE.PointLight( 0xffffff, 1.0, 50, 2 );
 				light.position.y = 2;
@@ -100,7 +100,7 @@
 				for ( let i = 0; i < 50; ++ i ) {
 
 					// fill scene with coloured cubes
-					const mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 2, 2, 2 ), mat );
+					const mesh = new THREE.Mesh( new THREE.BoxGeometry( 2, 2, 2 ), mat );
 					mesh.position.set( Math.random() * 16 - 8, Math.random() * 16 - 8, Math.random() * 16 - 8 );
 					mesh.rotation.set( Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2 );
 					group.add( mesh );

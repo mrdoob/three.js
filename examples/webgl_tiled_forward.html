@@ -217,7 +217,7 @@
 
 			function init( geom ) {
 
-				const sphereGeom = new THREE.SphereBufferGeometry( 0.5, 32, 32 );
+				const sphereGeom = new THREE.SphereGeometry( 0.5, 32, 32 );
 				const tIndex = Math.round( Math.random() * 3 );
 
 				Object.keys( Heads ).forEach( function ( t, index ) {
