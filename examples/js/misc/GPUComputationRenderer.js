@@ -114,7 +114,7 @@ THREE.GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	var passThruShader = createShaderMaterial( getPassThroughFragmentShader(), passThruUniforms );
 
-	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), passThruShader );
+	var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), passThruShader );
 	scene.add( mesh );
 
 

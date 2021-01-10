@@ -191,7 +191,7 @@
 
 				// floor
 
-				let floorGeometry = new THREE.PlaneBufferGeometry( 2000, 2000, 100, 100 );
+				let floorGeometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
 				floorGeometry.rotateX( - Math.PI / 2 );
 
 				// vertex displacement
@@ -231,7 +231,7 @@
 
 				// objects
 
-				const boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 ).toNonIndexed();
+				const boxGeometry = new THREE.BoxGeometry( 20, 20, 20 ).toNonIndexed();
 
 				position = boxGeometry.attributes.position;
 				const colorsBox = [];

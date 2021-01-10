@@ -157,7 +157,7 @@
 
 				// torus knot
 
-				const torusGeometry = new THREE.TorusKnotBufferGeometry( 0.75, 0.3, 128, 32, 1 );
+				const torusGeometry = new THREE.TorusKnotGeometry( 0.75, 0.3, 128, 32, 1 );
 				const material = new THREE.MeshBasicMaterial( { vertexColors: true } );
 
 				const torusKnot = new GIMesh( torusGeometry, material );
@@ -173,7 +173,7 @@
 
 				}
 
-				const boxGeometry = new THREE.BoxBufferGeometry( 3, 3, 3 );
+				const boxGeometry = new THREE.BoxGeometry( 3, 3, 3 );
 
 				const box = new THREE.Mesh( boxGeometry, materials );
 				scene.add( box );

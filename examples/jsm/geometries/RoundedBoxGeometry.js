@@ -1,5 +1,5 @@
 import {
-	BoxBufferGeometry,
+	BoxGeometry,
 	Vector3
 } from '../../../build/three.module.js';
 
@@ -37,7 +37,7 @@ function getUv( faceDirVector, normal, uvAxis, projectionAxis, radius, sideLengt
 
 }
 
-class RoundedBoxBufferGeometry extends BoxBufferGeometry {
+class RoundedBoxGeometry extends BoxGeometry {
 
 	constructor( width = 1, height = 1, depth = 1, segments = 2, radius = 0.1 ) {
 
@@ -151,4 +151,4 @@ class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 
 }
 
-export { RoundedBoxBufferGeometry };
+export { RoundedBoxGeometry };

@@ -158,7 +158,7 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 			}
 		} );
 
-		this.postprocessing.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight ), this.postprocessing.materialBokeh );
+		this.postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), this.postprocessing.materialBokeh );
 		this.postprocessing.quad.position.z = - 500;
 		this.postprocessing.scene.add( this.postprocessing.quad );
 

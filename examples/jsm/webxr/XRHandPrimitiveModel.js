@@ -1,6 +1,6 @@
 import {
-	SphereBufferGeometry,
-	BoxBufferGeometry,
+	SphereGeometry,
+	BoxGeometry,
 	MeshStandardMaterial,
 	Mesh,
 	Group
@@ -24,11 +24,11 @@ class XRHandPrimitiveModel {
 
 			if ( ! options || ! options.primitive || options.primitive === 'sphere' ) {
 
-				geometry = new SphereBufferGeometry( 1, 10, 10 );
+				geometry = new SphereGeometry( 1, 10, 10 );
 
 			} else if ( options.primitive === 'box' ) {
 
-				geometry = new BoxBufferGeometry( 1, 1, 1 );
+				geometry = new BoxGeometry( 1, 1, 1 );
 
 			}
 

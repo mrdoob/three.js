@@ -172,7 +172,7 @@
 				loadFont();
 
 				const plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 10000, 10000 ),
+					new THREE.PlaneGeometry( 10000, 10000 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
 				);
 				plane.position.y = 100;
@@ -339,7 +339,7 @@
 
 			function createText() {
 
-				textGeo = new THREE.TextBufferGeometry( text, {
+				textGeo = new THREE.TextGeometry( text, {
 
 					font: font,
 

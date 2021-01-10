@@ -103,7 +103,7 @@
 				//  GROUND
 
 				const gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
-				const gg = new THREE.PlaneBufferGeometry( 16000, 16000 );
+				const gg = new THREE.PlaneGeometry( 16000, 16000 );
 				const gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
 				const ground = new THREE.Mesh( gg, gm );
