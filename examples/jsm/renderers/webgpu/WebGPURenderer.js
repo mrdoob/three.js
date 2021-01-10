@@ -11,6 +11,8 @@ import WebGPURenderLists from './WebGPURenderLists.js';
 import WebGPUTextures from './WebGPUTextures.js';
 import WebGPUBackground from './WebGPUBackground.js';
 
+import WebGPUNodes from './nodes/WebGPUNodes.js';
+
 import { Frustum, Matrix4, Vector3, Color } from '../../../../build/three.module.js';
 
 console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
@@ -97,6 +99,7 @@ class WebGPURenderer {
 		this._properties = null;
 		this._attributes = null;
 		this._geometries = null;
+		this._nodes = null;
 		this._bindings = null;
 		this._objects = null;
 		this._renderPipelines = null;
@@ -177,6 +180,7 @@ class WebGPURenderer {
 		this._objects = new WebGPUObjects( this._geometries, this._info );
 		this._renderPipelines = new WebGPURenderPipelines( this, this._properties, device, compiler, parameters.sampleCount );
 		this._computePipelines = new WebGPUComputePipelines( device, compiler );
+		this._nodes = new WebGPUNodes()
 		this._bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes );
 		this._renderLists = new WebGPURenderLists();
 		this._background = new WebGPUBackground( this );
@@ -514,6 +518,7 @@ class WebGPURenderer {
 		this._properties.dispose();
 		this._renderPipelines.dispose();
 		this._computePipelines.dispose();
+		this._nodes.dispose();
 		this._bindings.dispose();
 		this._info.dispose();
 		this._renderLists.dispose();
@@ -720,6 +725,7 @@ class WebGPURenderer {
 
 						passEncoder.setViewport( vp.x, vp.y, vp.width, vp.height, minDepth, maxDepth );
 
+						this._nodes.update( object, camera2 );
 						this._bindings.update( object, camera2 );
 						this._renderObject( object, passEncoder );
 
@@ -729,6 +735,7 @@ class WebGPURenderer {
 
 			} else {
 
+				this._nodes.update( object, camera );
 				this._bindings.update( object, camera );
 				this._renderObject( object, passEncoder );
 

@@ -43,7 +43,7 @@ class WebGPUBindings {
 
 			} else if ( material.isPointsMaterial ) {
 
-				bindings = this._getPointsBasicBindings();
+				bindings = this._getPointsBasicBindings( object );
 
 			} else if ( material.isLineBasicMaterial ) {
 
@@ -54,10 +54,6 @@ class WebGPUBindings {
 				console.error( 'THREE.WebGPURenderer: Unknwon shader type.' );
 
 			}
-
-			// append node bindings
-
-//			bindings = bindings.concat( this.pipelines.getBindings( object ) );
 
 			// setup (static) binding layout and (dynamic) binding group
 
@@ -308,37 +304,19 @@ class WebGPUBindings {
 
 		const cameraGroup = this.sharedUniformsGroups.get( 'cameraUniforms' );
 
-		// material (opacity for testing)
-
-		const opacityUniform = new FloatUniform( 'opacity', 1 );
-
-		const opacityGroup = new WebGPUUniformsGroup( 'opacityUniforms' );
-		opacityGroup.addUniform( opacityUniform );
-		opacityGroup.setVisibility( GPUShaderStage.FRAGMENT );
-		opacityGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
-
-			const material = object.material;
-			const opacity = ( material.transparent === true ) ? material.opacity : 1.0;
-
-			opacityUniform.setValue( opacity );
-
-		} );
-
 		// the order of WebGPUBinding objects must match the binding order in the shader
 
 		bindings.push( modelGroup );
 		bindings.push( cameraGroup );
 		bindings = bindings.concat( this.pipelines.getBindings( object ) );
-		//bindings.push( diffuseSampler );
-		//bindings.push( diffuseTexture );
 
 		return bindings;
 
 	}
 
-	_getPointsBasicBindings() {
+	_getPointsBasicBindings( object ) {
 
-		const bindings = [];
+		let bindings = [];
 
 		// UBOs
 
@@ -361,6 +339,7 @@ class WebGPUBindings {
 
 		bindings.push( modelGroup );
 		bindings.push( cameraGroup );
+		bindings = bindings.concat( this.pipelines.getBindings( object ) );
 
 		return bindings;
 

@@ -30,11 +30,9 @@ class WebGPUUniform {
 
 class FloatUniform extends WebGPUUniform {
 
-	constructor( nodeUniform ) {
+	constructor( name, value = 0 ) {
 
-		super( nodeUniform.name, nodeUniform.value );
-
-		this.nodeUniform = nodeUniform;
+		super( name, value );
 
 		this.boundary = 4;
 		this.itemSize = 1;

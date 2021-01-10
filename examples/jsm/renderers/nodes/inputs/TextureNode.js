@@ -14,12 +14,14 @@ class TextureNode extends InputNode {
 	
 	generate( builder, output ) {
 	
-		const textureSnippet = super.generate( builder );
-		const uvSnippet = this.uv.build( builder );
+		const type = this.getType( builder );
+	
+		const textureSnippet = super.generate( builder, type );
+		const uvSnippet = this.uv.build( builder, 'vec2' );
 
-		const textureCall = builder.getTexture( textureSnippet, uvSnippet );
+		const textureCallSnippet = builder.getTexture( textureSnippet, uvSnippet );
 
-		return builder.format( textureCall, 'vec4', output );
+		return builder.format( textureCallSnippet, type, output );
 		
 	}
 

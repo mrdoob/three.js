@@ -11,7 +11,7 @@ import {
 
 import ShaderLib from './ShaderLib.js';
 
-import WebGPUNodeBuilder from './WebGPUNodeBuilder.js';
+import WebGPUNodeBuilder from './nodes/WebGPUNodeBuilder.js';
 
 class WebGPURenderPipelines {
 
@@ -112,7 +112,7 @@ class WebGPURenderPipelines {
 			let moduleFragment = this.shaderModules.fragment.get( shader );
 
 			if ( moduleFragment === undefined ) {
-console.log( shader.fragmentShader );
+
 				const byteCodeFragment = glslang.compileGLSL( shader.fragmentShader, 'fragment' );
 
 				moduleFragment = {
@@ -787,7 +787,7 @@ console.log( shader.fragmentShader );
 
 		// find "layout (location = num) in type name" in vertex shader
 
-		const regex = /^\s*layout\s*\(\s*location\s*=\s*(?<location>[0-9]+)\s*\)\s*in\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
+		const regex = /\s*layout\s*\(\s*location\s*=\s*(?<location>[0-9]+)\s*\)\s*in\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
 		let shaderAttribute = null;
 
 		const attributes = [];

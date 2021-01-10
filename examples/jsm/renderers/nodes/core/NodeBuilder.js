@@ -1,7 +1,5 @@
 import NodeUniform from './NodeUniform.js';
 
-const VERSION = '1';
-
 class NodeBuilder {
 
 	constructor( material, renderer ) {
@@ -14,6 +12,8 @@ class NodeBuilder {
 		this.slots = { vertex: [], fragment: [] };
 		this.defines = { vertex: {}, fragment: {} };
 		this.uniforms = { vertex: [], fragment: [] };
+		this.attributes = {};
+		this.attributeCount = 0;
 
 		this.nodesData = new WeakMap();
 
@@ -58,10 +58,32 @@ class NodeBuilder {
 		
 	}
 	
-	getUV( /*index*/ ) {
+	getAttribute( type, name, property = null ) {
 		
-		// uv1 only for now
-		return 'vUv';
+		let attribute = this.attributes[ name ];
+		
+		if ( attribute === undefined ) {
+			
+			const index = this.attributeCount++;
+			
+			if ( property === null ) {
+				
+				property = `node_A${index}`;
+				
+			}
+			
+			attribute = {
+				type,
+				name,
+				index,
+				property
+			};
+			
+			this.attributes[ name ] = attribute;
+			
+		}
+		
+		return attribute;
 		
 	}
 
@@ -153,53 +175,70 @@ class NodeBuilder {
 
 	}
 
-	getUniformsOutput( shaderStage ) {
+	getAttributesBodySnippet( /*shaderStage*/ ) {
 		
-		const uniforms = this.uniforms[ shaderStage ];
 		
-		let uniformsCode = '';
-
-		for ( let i = 0; i < uniforms.length; i ++ ) {
-
-			let uniform = uniforms[ i ];
-
-			uniformsCode += `${uniform.type} ${uniform.name}; `;
-
-		}
-		
-		return uniformsCode;
 		
 	}
 
-	build( shaderStage ) {
-
-		this.shaderStage = shaderStage;
-
-		const slots = this.slots[ shaderStage ];
+	getAttributesHeaderSnippet( /*shaderStage*/ ) {
 		
-		if ( slots.length ) {
+		
+		
+	}
 
-			this.define( shaderStage, 'NODE', VERSION );
+	getUniformsHeaderSnippet( shaderStage ) {
+		
+		const uniforms = this.uniforms[ shaderStage ];
+		
+		let snippet = '';
+			
+		for ( let uniform of uniforms ) {			
 
-			for ( let i = 0; i < slots.length; i ++ ) {
+			snippet += `${uniform.type} ${uniform.name}; `;
 
-				let slot = slots[ i ];
+		}
+		
+		return snippet;
+		
+	}
+
+	build() {
+
+		const shaderStages = [ 'vertex', 'fragment' ];
+		const shaderData = {};
+
+		for ( let shaderStage of shaderStages ) {
+			
+			this.shaderStage = shaderStage;
+			
+			let slots = this.slots[ shaderStage ];
+			
+			for ( let slot of slots ) {
 
 				let flowData = this.flowNode( slot.node, slot.output );
 
 				this.define( shaderStage, `NODE_${slot.name}`, flowData.result );
 
 			}
-
-			this.define( shaderStage, 'NODE_UNIFORMS', this.getUniformsOutput( shaderStage ) );
-
+			
 		}
 
-		let defines = this._buildDefines( shaderStage );
+		for ( let shaderStage of shaderStages ) {
 
-		return {
-			defines
-		};
+			this.shaderStage = shaderStage;
+
+			this.define( shaderStage, 'NODE_HEADER_UNIFORMS', this.getUniformsHeaderSnippet( shaderStage ) );
+			this.define( shaderStage, 'NODE_HEADER_ATTRIBUTES', this.getAttributesHeaderSnippet( shaderStage ) );
+			this.define( shaderStage, 'NODE_BODY_ATTRIBUTES', this.getAttributesBodySnippet( shaderStage ) );
+			
+			shaderData[ shaderStage ] = this._buildDefines( shaderStage );
+			
+		}
+		
+		this.shaderStage = null;
+		
+		return shaderData;
 
 	}
 	

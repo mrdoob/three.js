@@ -7,7 +7,7 @@ class WebGPUNodes {
 
 	}
 
-	get( material ) {
+	get( object ) {
 
 		let data = this.uniformsData.get( object );
 
