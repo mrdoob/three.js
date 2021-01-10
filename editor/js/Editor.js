@@ -388,7 +388,7 @@ Editor.prototype = {
 
 	addHelper: function () {
 
-		var geometry = new THREE.SphereBufferGeometry( 2, 4, 2 );
+		var geometry = new THREE.SphereGeometry( 2, 4, 2 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: false } );
 
 		return function ( object, helper ) {

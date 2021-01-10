@@ -56,7 +56,7 @@ function GeometryParametersPanel( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.LatheBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.LatheGeometry(
 			points.getValue(),
 			segments.getValue(),
 			phiStart.getValue() / 180 * Math.PI,

@@ -31,7 +31,7 @@ function GeometryParametersPanel( editor, object ) {
 
 	function changeShape() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.ShapeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ShapeGeometry(
 			parameters.shapes,
 			curveSegments.getValue()
 		) ) );
@@ -40,7 +40,7 @@ function GeometryParametersPanel( editor, object ) {
 
 	function toExtrude() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.ExtrudeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ExtrudeGeometry(
 			parameters.shapes, {
 				curveSegments: curveSegments.getValue()
 			}

@@ -113,7 +113,7 @@ function GeometryParametersPanel( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.ExtrudeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ExtrudeGeometry(
 			parameters.shapes,
 			{
 				curveSegments: curveSegments.getValue(),
@@ -131,7 +131,7 @@ function GeometryParametersPanel( editor, object ) {
 
 	function toShape() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.ShapeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ShapeGeometry(
 			parameters.shapes,
 			options.curveSegments
 		) ) );

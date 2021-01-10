@@ -40,7 +40,7 @@ function GeometryParametersPanel( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.OctahedronBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.OctahedronGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );

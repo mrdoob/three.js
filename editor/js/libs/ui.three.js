@@ -943,7 +943,7 @@ function renderToCanvas( texture ) {
 	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
 	var material = new THREE.MeshBasicMaterial( { map: texture } );
-	var quad = new THREE.PlaneBufferGeometry( 2, 2 );
+	var quad = new THREE.PlaneGeometry( 2, 2 );
 	var mesh = new THREE.Mesh( quad, material );
 	scene.add( mesh );
 
