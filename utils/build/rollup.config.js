@@ -1,5 +1,5 @@
-import babel from "@rollup/plugin-babel";
-import { terser } from "rollup-plugin-terser";
+import babel from '@rollup/plugin-babel';
+import { terser } from 'rollup-plugin-terser';
 
 if ( String.prototype.replaceAll === undefined ) {
 
@@ -260,7 +260,7 @@ function header() {
 
 		renderChunk( code ) {
 
-			return "// threejs.org/license\n" + code;
+			return '// threejs.org/license\n' + code;
 
 		}
 
@@ -276,7 +276,7 @@ function polyfills() {
 
 			if ( filePath.endsWith( 'src/Three.js' ) || filePath.endsWith( 'src\\Three.js' ) ) {
 
-				code = "import './polyfills';\n" + code;
+				code = 'import \'./polyfills\';\n' + code;
 
 			}
 
