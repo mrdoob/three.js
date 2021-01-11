@@ -218,6 +218,17 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		this color and 1.0 is the first argument.
 		</p>
 
+		<h3>[method:this lerpColors]( [param:Color color1], [param:Color color2], [param:Float alpha] )</h3>
+		<p>
+		[page:Color color1] - the starting [page:Color].<br />
+		[page:Color color2] - [page:Color] to interpolate towards.<br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
+
+		Sets this color to be the color linearly interpolated between [page:Color color1] and
+		[page:Color color2] where alpha is the percent distance along the line connecting the two colors
+		- alpha = 0 will be [page:Color color1], and alpha = 1 will be [page:Color color2].
+		</p>
+
 		<h3>[method:Color lerpHSL]( [param:Color color], [param:Float alpha] ) </h3>
 		<p>
 		[page:Color color] - color to converge on.<br />
