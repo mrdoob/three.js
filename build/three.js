@@ -6693,6 +6693,13 @@
 			return this;
 		};
 
+		_proto.lerpColors = function lerpColors(color1, color2, alpha) {
+			this.r = color1.r + (color2.r - color1.r) * alpha;
+			this.g = color1.g + (color2.g - color1.g) * alpha;
+			this.b = color1.b + (color2.b - color1.b) * alpha;
+			return this;
+		};
+
 		_proto.lerpHSL = function lerpHSL(color, alpha) {
 			this.getHSL(_hslA);
 			color.getHSL(_hslB);
@@ -9408,7 +9415,7 @@
 		 * Values for focal length and film gauge must have the same unit.
 		 */
 		setFocalLength: function setFocalLength(focalLength) {
-			// see http://www.bobatkins.com/photography/technical/field_of_view.html
+			/** see {@link http://www.bobatkins.com/photography/technical/field_of_view.html} */
 			var vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
 			this.fov = MathUtils.RAD2DEG * 2 * Math.atan(vExtentSlope);
 			this.updateProjectionMatrix();
@@ -29796,14 +29803,18 @@
 		}
 	});
 
-	function Font(data) {
-		this.type = 'Font';
-		this.data = data;
-	}
+	var Font = /*#__PURE__*/function () {
+		function Font(data) {
+			Object.defineProperty(this, 'isFont', {
+				value: true
+			});
+			this.type = 'Font';
+			this.data = data;
+		}
 
-	Object.assign(Font.prototype, {
-		isFont: true,
-		generateShapes: function generateShapes(text, size) {
+		var _proto = Font.prototype;
+
+		_proto.generateShapes = function generateShapes(text, size) {
 			if (size === void 0) {
 				size = 100;
 			}
@@ -29816,8 +29827,10 @@
 			}
 
 			return shapes;
-		}
-	});
+		};
+
+		return Font;
+	}();
 
 	function createPaths(text, size, data) {
 		var chars = Array.from ? Array.from(text) : String(text).split(''); // workaround for IE11, see #13988

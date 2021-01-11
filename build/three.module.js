@@ -8302,6 +8302,16 @@ class Color {
 
 	}
 
+	lerpColors( color1, color2, alpha ) {
+
+		this.r = color1.r + ( color2.r - color1.r ) * alpha;
+		this.g = color1.g + ( color2.g - color1.g ) * alpha;
+		this.b = color1.b + ( color2.b - color1.b ) * alpha;
+
+		return this;
+
+	}
+
 	lerpHSL( color, alpha ) {
 
 		this.getHSL( _hslA );
@@ -12005,7 +12015,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 	 */
 	setFocalLength: function ( focalLength ) {
 
-		// see http://www.bobatkins.com/photography/technical/field_of_view.html
+		/** see {@link http://www.bobatkins.com/photography/technical/field_of_view.html} */
 		const vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
 
 		this.fov = MathUtils.RAD2DEG * 2 * Math.atan( vExtentSlope );
@@ -40356,19 +40366,19 @@ Object.assign( ShapePath.prototype, {
 
 } );
 
-function Font( data ) {
+class Font {
 
-	this.type = 'Font';
+	constructor( data ) {
 
-	this.data = data;
+		Object.defineProperty( this, 'isFont', { value: true } );
 
-}
+		this.type = 'Font';
 
-Object.assign( Font.prototype, {
+		this.data = data;
 
-	isFont: true,
+	}
 
-	generateShapes: function ( text, size = 100 ) {
+	generateShapes( text, size = 100 ) {
 
 		const shapes = [];
 		const paths = createPaths( text, size, this.data );
@@ -40383,7 +40393,7 @@ Object.assign( Font.prototype, {
 
 	}
 
-} );
+}
 
 function createPaths( text, size, data ) {
 
