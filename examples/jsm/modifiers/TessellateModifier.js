@@ -48,25 +48,12 @@ TessellateModifier.prototype.modify = function ( geometry ) {
 	const cm = new Color();
 	const cs = [ ca, cb, cc, cm ];
 
-	/*TOFIX?*/
-
-	Color.prototype.lerpColors = function lerpColors( color1, color2, alpha ) {
-
-		this.r += ( color1.r - color2.r ) * alpha;
-		this.g += ( color1.g - color2.g ) * alpha;
-		this.b += ( color1.b - color2.b ) * alpha;
-
-		return this;
-
-	};
-
 	const attributes = geometry.attributes;
-	let positions = attributes.position.array;
-
 	const hasNormals = attributes.normal !== undefined;
-	let normals = hasNormals ? attributes.normal.array : null;
-
 	const hasColors = attributes.color !== undefined;
+
+	let positions = attributes.position.array;
+	let normals = hasNormals ? attributes.normal.array : null;
 	let colors = hasColors ? attributes.color.array : null;
 
 	let positions2 = positions;
