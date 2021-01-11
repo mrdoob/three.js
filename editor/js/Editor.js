@@ -554,7 +554,7 @@ Editor.prototype = {
 
 		}
 
-		this.select( this.scene.getObjectById( id, true ) );
+		this.select( this.scene.getObjectById( id ) );
 
 	},
 
@@ -592,7 +592,7 @@ Editor.prototype = {
 
 	focusById: function ( id ) {
 
-		this.focus( this.scene.getObjectById( id, true ) );
+		this.focus( this.scene.getObjectById( id ) );
 
 	},
 
