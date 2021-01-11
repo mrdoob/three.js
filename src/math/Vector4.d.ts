@@ -107,6 +107,8 @@ export class Vector4 implements Vector {
 	 */
 	subVectors( a: Vector4, b: Vector4 ): this;
 
+	multiply( v: Vector4 ): this;
+
 	/**
 	 * Multiplies this vector by scalar s.
 	 */

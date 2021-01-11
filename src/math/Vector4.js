@@ -227,6 +227,24 @@ class Vector4 {
 
 	}
 
+	multiply( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'THREE.Vector4: .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
+			return this.multiplyVectors( v, w );
+
+		}
+
+		this.x *= v.x;
+		this.y *= v.y;
+		this.z *= v.z;
+		this.w *= v.w;
+
+		return this;
+
+	}
+
 	multiplyScalar( scalar ) {
 
 		this.x *= scalar;
