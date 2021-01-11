@@ -11,9 +11,9 @@ THREE.TessellateModifier = function ( maxEdgeLength = 0.1, maxIterations = 6 ) {
 
 THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 
-	if ( geometry.isBufferGeometry !== true ) {
+	if ( geometry.isGeometry === true ) {
 
-		console.warn( 'TessellateModifier: geometry is not a BufferGeometry.', geometry );
+		console.error( 'THREE.TessellateModifier no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 		return geometry;
 
 	}
