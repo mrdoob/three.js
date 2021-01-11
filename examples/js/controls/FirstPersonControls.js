@@ -149,22 +149,22 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		//event.preventDefault();
 
-		switch ( event.keyCode ) {
+		switch ( event.code ) {
 
-			case 38: /*up*/
-			case 87: /*W*/ this.moveForward = true; break;
+			case 'ArrowUp': /*up*/
+			case 'KeyW': /*W*/ this.moveForward = true; break;
 
-			case 37: /*left*/
-			case 65: /*A*/ this.moveLeft = true; break;
+			case 'ArrowLeft': /*left*/
+			case 'KeyA': /*A*/ this.moveLeft = true; break;
 
-			case 40: /*down*/
-			case 83: /*S*/ this.moveBackward = true; break;
+			case 'ArrowDown': /*down*/
+			case 'KeyS': /*S*/ this.moveBackward = true; break;
 
-			case 39: /*right*/
-			case 68: /*D*/ this.moveRight = true; break;
+			case 'ArrowRight': /*right*/
+			case 'KeyD': /*D*/ this.moveRight = true; break;
 
-			case 82: /*R*/ this.moveUp = true; break;
-			case 70: /*F*/ this.moveDown = true; break;
+			case 'KeyR': /*R*/ this.moveUp = true; break;
+			case 'KeyF': /*F*/ this.moveDown = true; break;
 
 		}
 
@@ -172,22 +172,22 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.onKeyUp = function ( event ) {
 
-		switch ( event.keyCode ) {
+		switch ( event.code ) {
 
-			case 38: /*up*/
-			case 87: /*W*/ this.moveForward = false; break;
+			case 'ArrowUp': /*up*/
+			case 'KeyW': /*W*/ this.moveForward = false; break;
 
-			case 37: /*left*/
-			case 65: /*A*/ this.moveLeft = false; break;
+			case 'ArrowLeft': /*left*/
+			case 'KeyA': /*A*/ this.moveLeft = false; break;
 
-			case 40: /*down*/
-			case 83: /*S*/ this.moveBackward = false; break;
+			case 'ArrowDown': /*down*/
+			case 'KeyS': /*S*/ this.moveBackward = false; break;
 
-			case 39: /*right*/
-			case 68: /*D*/ this.moveRight = false; break;
+			case 'ArrowRight': /*right*/
+			case 'KeyD': /*D*/ this.moveRight = false; break;
 
-			case 82: /*R*/ this.moveUp = false; break;
-			case 70: /*F*/ this.moveDown = false; break;
+			case 'KeyR': /*R*/ this.moveUp = false; break;
+			case 'KeyF': /*F*/ this.moveDown = false; break;
 
 		}
 

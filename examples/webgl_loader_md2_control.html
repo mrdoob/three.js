@@ -248,23 +248,24 @@
 
 			function onKeyDown( event ) {
 
-				switch ( event.keyCode ) {
+				switch ( event.code ) {
 
-					case 38: /*up*/
-					case 87: /*W*/ 	controls.moveForward = true; break;
+					case 'ArrowUp': /*up*/
+					case 'KeyW': /*W*/ 	controls.moveForward = true; break;
 
-					case 40: /*down*/
-					case 83: /*S*/ 	 controls.moveBackward = true; break;
+					case 'ArrowDown': /*down*/
+					case 'KeyS': /*S*/ 	 controls.moveBackward = true; break;
 
-					case 37: /*left*/
-					case 65: /*A*/ controls.moveLeft = true; break;
+					case 'ArrowLeft': /*left*/
+					case 'KeyA': /*A*/ controls.moveLeft = true; break;
 
-					case 39: /*right*/
-					case 68: /*D*/ controls.moveRight = true; break;
+					case 'ArrowRight': /*right*/
+					case 'KeyD': /*D*/ controls.moveRight = true; break;
 
-					//case 67: /*C*/     controls.crouch = true; break;
-					//case 32: /*space*/ controls.jump = true; break;
-					//case 17: /*ctrl*/  controls.attack = true; break;
+					// case 'KeyC': /*C*/ controls.crouch = true; break;
+					//case 'Space': /*space*/ controls.jump = true; break;
+					//case 'ControlLeft': /*ctrl*/
+					//case 'ControlRight': controls.attack = true; break;
 
 				}
 
@@ -272,23 +273,24 @@
 
 			function onKeyUp( event ) {
 
-				switch ( event.keyCode ) {
+				switch ( event.code ) {
 
-					case 38: /*up*/
-					case 87: /*W*/ controls.moveForward = false; break;
+					case 'ArrowUp': /*up*/
+					case 'KeyW': /*W*/ controls.moveForward = false; break;
 
-					case 40: /*down*/
-					case 83: /*S*/ 	 controls.moveBackward = false; break;
+					case 'ArrowDown': /*down*/
+					case 'KeyS': /*S*/ 	 controls.moveBackward = false; break;
 
-					case 37: /*left*/
-					case 65: /*A*/ 	 controls.moveLeft = false; break;
+					case 'ArrowLeft': /*left*/
+					case 'KeyA': /*A*/ 	 controls.moveLeft = false; break;
 
-					case 39: /*right*/
-					case 68: /*D*/ controls.moveRight = false; break;
+					case 'ArrowRight': /*right*/
+					case 'KeyD': /*D*/ controls.moveRight = false; break;
 
-					//case 67: /*C*/     controls.crouch = false; break;
-					//case 32: /*space*/ controls.jump = false; break;
-					//case 17: /*ctrl*/  controls.attack = false; break;
+					// case 'KeyC': /*C*/ controls.crouch = false; break;
+					//case 'Space': /*space*/ controls.jump = false; break;
+					//case 'ControlLeft': /*ctrl*/
+					//case 'ControlRight': controls.attack = false; break;
 
 				}
 
