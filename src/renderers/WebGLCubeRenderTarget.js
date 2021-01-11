@@ -9,7 +9,7 @@ import { CubeTexture } from '../textures/CubeTexture.js';
 
 class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
-	constructor ( size, options, dummy ) {
+	constructor( size, options, dummy ) {
 
 		if ( Number.isInteger( options ) ) {
 
@@ -31,7 +31,7 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 	}
 
-	fromEquirectangularTexture ( renderer, texture ) {
+	fromEquirectangularTexture( renderer, texture ) {
 
 		this.texture.type = texture.type;
 		this.texture.format = RGBAFormat; // see #18859
@@ -122,7 +122,7 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 	}
 
-	clear ( renderer, color, depth, stencil ) {
+	clear( renderer, color, depth, stencil ) {
 
 		const currentRenderTarget = renderer.getRenderTarget();
 
@@ -137,6 +137,7 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		renderer.setRenderTarget( currentRenderTarget );
 
 	}
+
 }
 
 

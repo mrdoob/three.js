@@ -2,7 +2,7 @@ import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 
 class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 
-	constructor ( width, height, options ) {
+	constructor( width, height, options ) {
 
 		super( width, height, options );
 
@@ -12,7 +12,7 @@ class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 
 	}
 
-	copy ( source ) {
+	copy( source ) {
 
 		super.copy.call( this, source );
 

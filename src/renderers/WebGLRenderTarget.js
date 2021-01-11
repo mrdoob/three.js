@@ -10,7 +10,7 @@ import { Vector4 } from '../math/Vector4.js';
 */
 class WebGLRenderTarget extends EventDispatcher {
 
-	constructor ( width, height, options ) {
+	constructor( width, height, options ) {
 
 		super();
 
@@ -41,7 +41,7 @@ class WebGLRenderTarget extends EventDispatcher {
 
 	}
 
-	setSize ( width, height ) {
+	setSize( width, height ) {
 
 		if ( this.width !== width || this.height !== height ) {
 
@@ -60,13 +60,13 @@ class WebGLRenderTarget extends EventDispatcher {
 
 	}
 
-	clone () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
 	}
 
-	copy ( source ) {
+	copy( source ) {
 
 		this.width = source.width;
 		this.height = source.height;
@@ -83,7 +83,7 @@ class WebGLRenderTarget extends EventDispatcher {
 
 	}
 
-	dispose () {
+	dispose() {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
