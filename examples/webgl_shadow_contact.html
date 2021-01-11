@@ -115,10 +115,11 @@
 					map: renderTarget.texture,
 					opacity: state.shadow.opacity,
 					transparent: true,
+					depthWrite: false,
 				} );
 				plane = new THREE.Mesh( planeGeometry, planeMaterial );
-				plane.material.polygonOffset = true;
-				plane.material.polygonOffsetFactor = -.1;
+				// make sure it's rendered ahead the fillPlane
+				plane.renderOrder = 1;
 				shadowGroup.add( plane );
 
 				// the y from the texture is flipped!
@@ -134,6 +135,7 @@
 					color: state.plane.color,
 					opacity: state.plane.opacity,
 					transparent: true,
+					depthWrite: false,
 				} );
 				fillPlane = new THREE.Mesh( planeGeometry, fillPlaneMaterial );
 				fillPlane.rotateX( Math.PI );
