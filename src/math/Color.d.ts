@@ -156,6 +156,7 @@ export class Color {
 	multiply( color: Color ): this;
 	multiplyScalar( s: number ): this;
 	lerp( color: Color, alpha: number ): this;
+	lerpColors( color1: Color, color2: Color, alpha: number ): this;
 	lerpHSL( color: Color, alpha: number ): this;
 	equals( color: Color ): boolean;
 
