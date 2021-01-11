@@ -118,7 +118,7 @@
 					depthWrite: false,
 				} );
 				plane = new THREE.Mesh( planeGeometry, planeMaterial );
-				// make sure it's rendered ahead the fillPlane
+				// make sure it's rendered after the fillPlane
 				plane.renderOrder = 1;
 				shadowGroup.add( plane );
 
