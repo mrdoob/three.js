@@ -2,273 +2,216 @@
  * Break faces with edges longer than maxEdgeLength
  */
 
-THREE.TessellateModifier = function ( maxEdgeLength = 0.1, maxIterations = 6, maxFaces = Infinity ) {
+THREE.TessellateModifier = function ( maxEdgeLength = 0.1, maxIterations = 6 ) {
 
 	this.maxEdgeLength = maxEdgeLength;
 	this.maxIterations = maxIterations;
-	this.maxFaces = maxFaces;
 
 };
 
-// Applies the "modify" pattern
 THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 
-	const isBufferGeometry = geometry.isBufferGeometry;
+	if ( geometry.isBufferGeometry !== true ) {
 
-	if ( isBufferGeometry ) {
-
-		geometry = new THREE.Geometry().fromBufferGeometry( geometry );
-
-	} else {
-
-		geometry = geometry.clone();
+		console.warn( 'TessellateModifier: geometry is not a BufferGeometry.', geometry );
+		return geometry;
 
 	}
 
-	geometry.mergeVertices( 6 );
+	//
 
-	let finalized = false;
-	let iteration = 0;
+	const maxIterations = this.maxIterations;
 	const maxEdgeLengthSquared = this.maxEdgeLength * this.maxEdgeLength;
 
-	let edge;
+	const va = new THREE.Vector3();
+	const vb = new THREE.Vector3();
+	const vc = new THREE.Vector3();
+	const vm = new THREE.Vector3();
+	const vs = [ va, vb, vc, vm ];
 
-	while ( ! finalized && iteration < this.maxIterations && geometry.faces.length < this.maxFaces ) {
+	const na = new THREE.Vector3();
+	const nb = new THREE.Vector3();
+	const nc = new THREE.Vector3();
+	const nm = new THREE.Vector3();
+	const ns = [ na, nb, nc, nm ];
 
-		const faces = [];
-		const faceVertexUvs = [];
+	const ca = new THREE.Color();
+	const cb = new THREE.Color();
+	const cc = new THREE.Color();
+	const cm = new THREE.Color();
+	const cs = [ ca, cb, cc, cm ];
 
-		finalized = true;
-		iteration ++;
+	/*TOFIX?*/
 
-		for ( var i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
+	THREE.Color.prototype.lerpColors = function lerpColors( color1, color2, alpha ) {
 
-			faceVertexUvs[ i ] = [];
+		this.r += ( color1.r - color2.r ) * alpha;
+		this.g += ( color1.g - color2.g ) * alpha;
+		this.b += ( color1.b - color2.b ) * alpha;
+
+		return this;
+
+	};
+
+	const attributes = geometry.attributes;
+	let positions = attributes.position.array;
+
+	const hasNormals = attributes.normal !== undefined;
+	let normals = hasNormals ? attributes.normal.array : null;
+
+	const hasColors = attributes.color !== undefined;
+	let colors = hasColors ? attributes.color.array : null;
+
+	let positions2 = positions;
+	let normals2 = normals;
+	let colors2 = colors;
+
+	let iteration = 0;
+	let tessellating = true;
+
+	function addTriangle( a, b, c ) {
+
+		const v1 = vs[ a ];
+		const v2 = vs[ b ];
+		const v3 = vs[ c ];
+
+		positions2.push( v1.x, v1.y, v1.z );
+		positions2.push( v2.x, v2.y, v2.z );
+		positions2.push( v3.x, v3.y, v3.z );
+
+		if ( hasNormals ) {
+
+			const n1 = ns[ a ];
+			const n2 = ns[ b ];
+			const n3 = ns[ c ];
+
+			normals2.push( n1.x, n1.y, n1.z );
+			normals2.push( n2.x, n2.y, n2.z );
+			normals2.push( n3.x, n3.y, n3.z );
 
 		}
 
-		for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
+		if ( hasColors ) {
 
-			const face = geometry.faces[ i ];
+			const c1 = cs[ a ];
+			const c2 = cs[ b ];
+			const c3 = cs[ c ];
 
-			if ( face instanceof THREE.Face3 ) {
+			colors2.push( c1.x, c1.y, c1.z );
+			colors2.push( c2.x, c2.y, c2.z );
+			colors2.push( c3.x, c3.y, c3.z );
 
-				const a = face.a;
-				const b = face.b;
-				const c = face.c;
+		}
 
-				const va = geometry.vertices[ a ];
-				const vb = geometry.vertices[ b ];
-				const vc = geometry.vertices[ c ];
+	}
 
-				const dab = va.distanceToSquared( vb );
-				const dbc = vb.distanceToSquared( vc );
-				const dac = va.distanceToSquared( vc );
+	while ( tessellating && iteration < maxIterations ) {
 
-				const limitReached = ( faces.length + il - i ) >= this.maxFaces;
+		iteration ++;
+		tessellating = false;
 
-				if ( ! limitReached && ( dab > maxEdgeLengthSquared || dbc > maxEdgeLengthSquared || dac > maxEdgeLengthSquared ) ) {
+		positions = positions2;
+		positions2 = [];
 
-					finalized = false;
+		if ( hasNormals ) {
 
-					const m = geometry.vertices.length;
+			normals = normals2;
+			normals2 = [];
 
-					const triA = face.clone();
-					const triB = face.clone();
+		}
 
-					if ( dab >= dbc && dab >= dac ) {
+		if ( hasColors ) {
 
-						var vm = va.clone();
-						vm.lerp( vb, 0.5 );
+			colors = colors2;
+			colors2 = [];
 
-						triA.a = a;
-						triA.b = m;
-						triA.c = c;
+		}
 
-						triB.a = m;
-						triB.b = b;
-						triB.c = c;
+		for ( var i = 0, il = positions.length; i < il; i += 9 ) {
 
-						if ( face.vertexNormals.length === 3 ) {
+			va.fromArray( positions, i + 0 );
+			vb.fromArray( positions, i + 3 );
+			vc.fromArray( positions, i + 6 );
 
-							var vnm = face.vertexNormals[ 0 ].clone();
-							vnm.lerp( face.vertexNormals[ 1 ], 0.5 );
+			if ( hasNormals ) {
 
-							triA.vertexNormals[ 1 ].copy( vnm );
-							triB.vertexNormals[ 0 ].copy( vnm );
+				na.fromArray( normals, i + 0 );
+				nb.fromArray( normals, i + 3 );
+				nc.fromArray( normals, i + 6 );
 
-						}
+			}
 
-						if ( face.vertexColors.length === 3 ) {
+			if ( hasColors ) {
 
-							var vcm = face.vertexColors[ 0 ].clone();
-							vcm.lerp( face.vertexColors[ 1 ], 0.5 );
+				ca.fromArray( colors, i + 0 );
+				cb.fromArray( colors, i + 3 );
+				cc.fromArray( colors, i + 6 );
 
-							triA.vertexColors[ 1 ].copy( vcm );
-							triB.vertexColors[ 0 ].copy( vcm );
+			}
 
-						}
+			const dab = va.distanceToSquared( vb );
+			const dbc = vb.distanceToSquared( vc );
+			const dac = va.distanceToSquared( vc );
 
-						edge = 0;
+			if ( dab > maxEdgeLengthSquared || dbc > maxEdgeLengthSquared || dac > maxEdgeLengthSquared ) {
 
-					} else if ( dbc >= dab && dbc >= dac ) {
+				tessellating = true;
 
-						var vm = vb.clone();
-						vm.lerp( vc, 0.5 );
+				if ( dab >= dbc && dab >= dac ) {
 
-						triA.a = a;
-						triA.b = b;
-						triA.c = m;
+					vm.lerpVectors( va, vb, 0.5 );
+					if ( hasNormals ) nm.lerpVectors( na, nb, 0.5 );
+					if ( hasColors ) cm.lerpColors( ca, cb, 0.5 );
 
-						triB.a = m;
-						triB.b = c;
-						triB.c = a;
+					addTriangle( 0, 3, 2 );
+					addTriangle( 3, 1, 2 );
 
-						if ( face.vertexNormals.length === 3 ) {
+				} else if ( dbc >= dab && dbc >= dac ) {
 
-							var vnm = face.vertexNormals[ 1 ].clone();
-							vnm.lerp( face.vertexNormals[ 2 ], 0.5 );
+					vm.lerpVectors( vb, vc, 0.5 );
+					if ( hasNormals ) nm.lerpVectors( nb, nc, 0.5 );
+					if ( hasColors ) cm.lerpColors( cb, cc, 0.5 );
 
-							triA.vertexNormals[ 2 ].copy( vnm );
-
-							triB.vertexNormals[ 0 ].copy( vnm );
-							triB.vertexNormals[ 1 ].copy( face.vertexNormals[ 2 ] );
-							triB.vertexNormals[ 2 ].copy( face.vertexNormals[ 0 ] );
-
-						}
-
-						if ( face.vertexColors.length === 3 ) {
-
-							var vcm = face.vertexColors[ 1 ].clone();
-							vcm.lerp( face.vertexColors[ 2 ], 0.5 );
-
-							triA.vertexColors[ 2 ].copy( vcm );
-
-							triB.vertexColors[ 0 ].copy( vcm );
-							triB.vertexColors[ 1 ].copy( face.vertexColors[ 2 ] );
-							triB.vertexColors[ 2 ].copy( face.vertexColors[ 0 ] );
-
-						}
-
-						edge = 1;
-
-					} else {
-
-						var vm = va.clone();
-						vm.lerp( vc, 0.5 );
-
-						triA.a = a;
-						triA.b = b;
-						triA.c = m;
-
-						triB.a = m;
-						triB.b = b;
-						triB.c = c;
-
-						if ( face.vertexNormals.length === 3 ) {
-
-							var vnm = face.vertexNormals[ 0 ].clone();
-							vnm.lerp( face.vertexNormals[ 2 ], 0.5 );
-
-							triA.vertexNormals[ 2 ].copy( vnm );
-							triB.vertexNormals[ 0 ].copy( vnm );
-
-						}
-
-						if ( face.vertexColors.length === 3 ) {
-
-							var vcm = face.vertexColors[ 0 ].clone();
-							vcm.lerp( face.vertexColors[ 2 ], 0.5 );
-
-							triA.vertexColors[ 2 ].copy( vcm );
-							triB.vertexColors[ 0 ].copy( vcm );
-
-						}
-
-						edge = 2;
-
-					}
-
-					faces.push( triA, triB );
-					geometry.vertices.push( vm );
-
-					for ( var j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
-
-						if ( geometry.faceVertexUvs[ j ].length ) {
-
-							const uvs = geometry.faceVertexUvs[ j ][ i ];
-
-							const uvA = uvs[ 0 ];
-							const uvB = uvs[ 1 ];
-							const uvC = uvs[ 2 ];
-
-							// AB
-
-							if ( edge === 0 ) {
-
-								var uvM = uvA.clone();
-								uvM.lerp( uvB, 0.5 );
-
-								var uvsTriA = [ uvA.clone(), uvM.clone(), uvC.clone() ];
-								var uvsTriB = [ uvM.clone(), uvB.clone(), uvC.clone() ];
-
-								// BC
-
-							} else if ( edge === 1 ) {
-
-								var uvM = uvB.clone();
-								uvM.lerp( uvC, 0.5 );
-
-								var uvsTriA = [ uvA.clone(), uvB.clone(), uvM.clone() ];
-								var uvsTriB = [ uvM.clone(), uvC.clone(), uvA.clone() ];
-
-								// AC
-
-							} else {
-
-								var uvM = uvA.clone();
-								uvM.lerp( uvC, 0.5 );
-
-								var uvsTriA = [ uvA.clone(), uvB.clone(), uvM.clone() ];
-								var uvsTriB = [ uvM.clone(), uvB.clone(), uvC.clone() ];
-
-							}
-
-							faceVertexUvs[ j ].push( uvsTriA, uvsTriB );
-
-						}
-
-					}
+					addTriangle( 0, 1, 3 );
+					addTriangle( 3, 2, 0 );
 
 				} else {
 
-					faces.push( face );
+					vm.lerpVectors( va, vc, 0.5 );
+					if ( hasNormals ) nm.lerpVectors( na, nc, 0.5 );
+					if ( hasColors ) cm.lerpColors( ca, cc, 0.5 );
 
-					for ( var j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
-
-						faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
-
-					}
+					addTriangle( 0, 1, 3 );
+					addTriangle( 3, 1, 2 );
 
 				}
+
+			} else {
+
+				addTriangle( 0, 1, 2 );
 
 			}
 
 		}
 
-		geometry.faces = faces;
-		geometry.faceVertexUvs = faceVertexUvs;
+	}
+
+	const geometry2 = new THREE.BufferGeometry();
+
+	geometry2.setAttribute( 'position', new THREE.Float32BufferAttribute( positions2, 3 ) );
+
+	if ( hasNormals ) {
+
+		geometry2.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals2, 3 ) );
 
 	}
 
-	if ( isBufferGeometry ) {
+	if ( hasColors ) {
 
-		return new THREE.BufferGeometry().fromGeometry( geometry );
-
-	} else {
-
-		return geometry;
+		geometry2.setAttribute( 'color', new THREE.Float32BufferAttribute( colors2, 3 ) );
 
 	}
+
+	return geometry2;
 
 };
