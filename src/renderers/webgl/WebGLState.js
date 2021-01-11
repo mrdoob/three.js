@@ -213,17 +213,15 @@ function WebGLState( gl, extensions, capabilities ) {
 
 			setTest: function ( stencilTest ) {
 
-				if ( ! locked ) {
+				if ( locked ) return;
 
-					if ( stencilTest ) {
+				if ( stencilTest ) {
 
-						enable( gl.STENCIL_TEST );
+					enable( gl.STENCIL_TEST );
 
-					} else {
+				} else {
 
-						disable( gl.STENCIL_TEST );
-
-					}
+					disable( gl.STENCIL_TEST );
 
 				}
 
@@ -231,7 +229,9 @@ function WebGLState( gl, extensions, capabilities ) {
 
 			setMask: function ( stencilMask ) {
 
-				if ( currentStencilMask !== stencilMask && ! locked ) {
+				if ( locked ) return;
+
+				if ( currentStencilMask !== stencilMask ) {
 
 					gl.stencilMask( stencilMask );
 					currentStencilMask = stencilMask;
@@ -241,6 +241,8 @@ function WebGLState( gl, extensions, capabilities ) {
 			},
 
 			setFunc: function ( stencilFunc, stencilRef, stencilMask ) {
+
+				if ( locked ) return;
 
 				if ( currentStencilFunc !== stencilFunc ||
 				     currentStencilRef !== stencilRef ||
@@ -257,6 +259,8 @@ function WebGLState( gl, extensions, capabilities ) {
 			},
 
 			setOp: function ( stencilFail, stencilZFail, stencilZPass ) {
+
+				if ( locked ) return;
 
 				if ( currentStencilFail !== stencilFail ||
 				     currentStencilZFail !== stencilZFail ||
