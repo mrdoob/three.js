@@ -25,7 +25,7 @@ import { Vector3 } from '../math/Vector3.js';
 import { Color } from '../math/Color.js';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
-import { BoxBufferGeometry } from '../geometries/BoxBufferGeometry.js';
+import { BoxBufferGeometry } from '../geometries/BoxGeometry.js';
 import { BackSide } from '../constants.js';
 
 const LOD_MIN = 4;
