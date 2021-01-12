@@ -1894,9 +1894,11 @@ function WebGLRenderer( parameters ) {
 
 				}
 
+				const halfFloatSupportedByExt = textureType === HalfFloatType && ( extensions.get( 'EXT_color_buffer_half_float' ) || ( capabilities.isWebGL2 && extensions.get( 'EXT_color_buffer_float' ) ) );
+
 				if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // IE11, Edge and Chrome Mac < 52 (#9513)
 					! ( textureType === FloatType && ( capabilities.isWebGL2 || extensions.get( 'OES_texture_float' ) || extensions.get( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
-					! ( textureType === HalfFloatType && ( capabilities.isWebGL2 ? extensions.get( 'EXT_color_buffer_float' ) : extensions.get( 'EXT_color_buffer_half_float' ) ) ) ) {
+					! halfFloatSupportedByExt ) {
 
 					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
 					return;
