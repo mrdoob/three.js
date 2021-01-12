@@ -157,20 +157,20 @@ var FirstPersonControls = function ( object, domElement ) {
 
 		switch ( event.code ) {
 
-			case 'ArrowUp': /*up*/
-			case 'KeyW': /*W*/ this.moveForward = true; break;
+			case 'ArrowUp':
+			case 'KeyW': this.moveForward = true; break;
 
-			case 'ArrowLeft': /*left*/
-			case 'KeyA': /*A*/ this.moveLeft = true; break;
+			case 'ArrowLeft':
+			case 'KeyA': this.moveLeft = true; break;
 
-			case 'ArrowDown': /*down*/
-			case 'KeyS': /*S*/ this.moveBackward = true; break;
+			case 'ArrowDown':
+			case 'KeyS': this.moveBackward = true; break;
 
-			case 'ArrowRight': /*right*/
-			case 'KeyD': /*D*/ this.moveRight = true; break;
+			case 'ArrowRight':
+			case 'KeyD': this.moveRight = true; break;
 
-			case 'KeyR': /*R*/ this.moveUp = true; break;
-			case 'KeyF': /*F*/ this.moveDown = true; break;
+			case 'KeyR': this.moveUp = true; break;
+			case 'KeyF': this.moveDown = true; break;
 
 		}
 
@@ -180,20 +180,20 @@ var FirstPersonControls = function ( object, domElement ) {
 
 		switch ( event.code ) {
 
-			case 'ArrowUp': /*up*/
-			case 'KeyW': /*W*/ this.moveForward = false; break;
+			case 'ArrowUp':
+			case 'KeyW': this.moveForward = false; break;
 
-			case 'ArrowLeft': /*left*/
-			case 'KeyA': /*A*/ this.moveLeft = false; break;
+			case 'ArrowLeft':
+			case 'KeyA': this.moveLeft = false; break;
 
-			case 'ArrowDown': /*down*/
-			case 'KeyS': /*S*/ this.moveBackward = false; break;
+			case 'ArrowDown':
+			case 'KeyS': this.moveBackward = false; break;
 
-			case 'ArrowRight': /*right*/
-			case 'KeyD': /*D*/ this.moveRight = false; break;
+			case 'ArrowRight':
+			case 'KeyD': this.moveRight = false; break;
 
-			case 'KeyR': /*R*/ this.moveUp = false; break;
-			case 'KeyF': /*F*/ this.moveDown = false; break;
+			case 'KeyR': this.moveUp = false; break;
+			case 'KeyF': this.moveDown = false; break;
 
 		}
 

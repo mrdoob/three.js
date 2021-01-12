@@ -48,26 +48,26 @@ THREE.FlyControls = function ( object, domElement ) {
 
 		switch ( event.code ) {
 
-			case 'ShiftLeft': /* shift left */
-			case 'ShiftRight': /* shift right */ this.movementSpeedMultiplier = .1; break;
+			case 'ShiftLeft':
+			case 'ShiftRight': this.movementSpeedMultiplier = .1; break;
 
-			case 'KeyW': /*W*/ this.moveState.forward = 1; break;
-			case 'KeyS': /*S*/ this.moveState.back = 1; break;
+			case 'KeyW': this.moveState.forward = 1; break;
+			case 'KeyS': this.moveState.back = 1; break;
 
-			case 'KeyA': /*A*/ this.moveState.left = 1; break;
-			case 'KeyD': /*D*/ this.moveState.right = 1; break;
+			case 'KeyA': this.moveState.left = 1; break;
+			case 'KeyD': this.moveState.right = 1; break;
 
-			case 'KeyR': /*R*/ this.moveState.up = 1; break;
-			case 'KeyF': /*F*/ this.moveState.down = 1; break;
+			case 'KeyR': this.moveState.up = 1; break;
+			case 'KeyF': this.moveState.down = 1; break;
 
-			case 'ArrowUp': /*up*/ this.moveState.pitchUp = 1; break;
-			case 'ArrowDown': /*down*/ this.moveState.pitchDown = 1; break;
+			case 'ArrowUp': this.moveState.pitchUp = 1; break;
+			case 'ArrowDown': this.moveState.pitchDown = 1; break;
 
-			case 'ArrowLeft': /*left*/ this.moveState.yawLeft = 1; break;
-			case 'ArrowRight': /*right*/ this.moveState.yawRight = 1; break;
+			case 'ArrowLeft': this.moveState.yawLeft = 1; break;
+			case 'ArrowRight': this.moveState.yawRight = 1; break;
 
-			case 'KeyQ': /*Q*/ this.moveState.rollLeft = 1; break;
-			case 'KeyE': /*E*/ this.moveState.rollRight = 1; break;
+			case 'KeyQ': this.moveState.rollLeft = 1; break;
+			case 'KeyE': this.moveState.rollRight = 1; break;
 
 		}
 
@@ -80,26 +80,26 @@ THREE.FlyControls = function ( object, domElement ) {
 
 		switch ( event.code ) {
 
-			case 'ShiftLeft': /* shift left */
-			case 'ShiftRight': /* shift right */ this.movementSpeedMultiplier = 1; break;
+			case 'ShiftLeft':
+			case 'ShiftRight': this.movementSpeedMultiplier = 1; break;
 
-			case 'KeyW': /*W*/ this.moveState.forward = 0; break;
-			case 'KeyS': /*S*/ this.moveState.back = 0; break;
+			case 'KeyW': this.moveState.forward = 0; break;
+			case 'KeyS': this.moveState.back = 0; break;
 
-			case 'KeyA': /*A*/ this.moveState.left = 0; break;
-			case 'KeyD': /*D*/ this.moveState.right = 0; break;
+			case 'KeyA': this.moveState.left = 0; break;
+			case 'KeyD': this.moveState.right = 0; break;
 
-			case 'KeyR': /*R*/ this.moveState.up = 0; break;
-			case 'KeyF': /*F*/ this.moveState.down = 0; break;
+			case 'KeyR': this.moveState.up = 0; break;
+			case 'KeyF': this.moveState.down = 0; break;
 
-			case 'ArrowUp': /*up*/ this.moveState.pitchUp = 0; break;
-			case 'ArrowDown': /*down*/ this.moveState.pitchDown = 0; break;
+			case 'ArrowUp': this.moveState.pitchUp = 0; break;
+			case 'ArrowDown': this.moveState.pitchDown = 0; break;
 
-			case 'ArrowLeft': /*left*/ this.moveState.yawLeft = 0; break;
-			case 'ArrowRight': /*right*/ this.moveState.yawRight = 0; break;
+			case 'ArrowLeft': this.moveState.yawLeft = 0; break;
+			case 'ArrowRight': this.moveState.yawRight = 0; break;
 
-			case 'KeyQ': /*Q*/ this.moveState.rollLeft = 0; break;
-			case 'KeyE': /*E*/ this.moveState.rollRight = 0; break;
+			case 'KeyQ': this.moveState.rollLeft = 0; break;
+			case 'KeyE': this.moveState.rollRight = 0; break;
 
 		}
 
