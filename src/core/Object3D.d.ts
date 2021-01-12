@@ -15,6 +15,7 @@ import { EventDispatcher } from './EventDispatcher';
 import { BufferGeometry } from './BufferGeometry';
 import { Intersection } from './Raycaster';
 import { AnimationClip } from '../animation/AnimationClip';
+import { Mesh } from '../objects/Mesh'
 
 /**
  * Base class for scene graph objects
@@ -54,7 +55,7 @@ export class Object3D extends EventDispatcher {
 	 * Array with object's children.
 	 * @default []
 	 */
-	children: Object3D[];
+	children: Mesh[];
 
 	/**
 	 * Up direction.
