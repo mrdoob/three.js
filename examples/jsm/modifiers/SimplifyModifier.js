@@ -397,7 +397,7 @@ var SimplifyModifier = function () {
 
 		if ( geometry.isGeometry === true ) {
 
-			console.error( 'THREE.EdgeSplitModifier no longer supports Geometry. Use BufferGeometry instead.' );
+			console.error( 'THREE.SimplifyModifier no longer supports Geometry. Use BufferGeometry instead.' );
 			return;
 
 		}
@@ -415,21 +415,18 @@ var SimplifyModifier = function () {
 
 		geometry = BufferGeometryUtils.mergeVertices( geometry );
 
-		// conversion
-		var vertices = [];
-		var faces = [];
-
-		var i, il;
-
 		//
 		// put data of original geometry in different data structures
 		//
+
+		var vertices = [];
+		var faces = [];
 
 		// add vertices
 
 		var positionAttribute = geometry.getAttribute( 'position' );
 
-		for ( i = 0; i < positionAttribute.count; i ++ ) {
+		for ( var i = 0; i < positionAttribute.count; i ++ ) {
 
 			var v = new Vector3().fromBufferAttribute( positionAttribute, i );
 
@@ -444,7 +441,7 @@ var SimplifyModifier = function () {
 
 		if ( index !== null ) {
 
-			for ( i = 0; i < index.count; i += 3 ) {
+			for ( var i = 0; i < index.count; i += 3 ) {
 
 				var a = index.getX( i );
 				var b = index.getX( i + 1 );
@@ -457,7 +454,7 @@ var SimplifyModifier = function () {
 
 		} else {
 
-			for ( i = 0; i < positionAttribute.count; i += 3 ) {
+			for ( var i = 0; i < positionAttribute.count; i += 3 ) {
 
 				var a = i;
 				var b = i + 1;
@@ -472,7 +469,7 @@ var SimplifyModifier = function () {
 
 		// compute all edge collapse costs
 
-		for ( i = 0, il = vertices.length; i < il; i ++ ) {
+		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
 			computeEdgeCostAtVertex( vertices[ i ] );
 
@@ -505,7 +502,7 @@ var SimplifyModifier = function () {
 
 		//
 
-		for ( i = 0; i < vertices.length; i ++ ) {
+		for ( var i = 0; i < vertices.length; i ++ ) {
 
 			var vertex = vertices[ i ].position;
 			position.push( vertex.x, vertex.y, vertex.z );
@@ -514,7 +511,7 @@ var SimplifyModifier = function () {
 
 		//
 
-		for ( i = 0; i < faces.length; i ++ ) {
+		for ( var i = 0; i < faces.length; i ++ ) {
 
 			var face = faces[ i ];
 

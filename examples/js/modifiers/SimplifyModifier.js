@@ -389,7 +389,7 @@ THREE.SimplifyModifier = function () {
 
 		if ( geometry.isGeometry === true ) {
 
-			console.error( 'THREE.EdgeSplitModifier no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
+			console.error( 'THREE.SimplifyModifier no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 			return;
 
 		}
