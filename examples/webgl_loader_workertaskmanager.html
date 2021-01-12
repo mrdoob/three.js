@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - WorkerTaskManager prototype</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<canvas id="example" style="width: 100%; height: 100vh;"></canvas>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WorkerTaskManager prototype
+			<div id="feedback" style="color: darkorange"></div>
+		</div>
+		<div id="dat" style="user-select: none; position: absolute; left: 0; top: 0; z-Index: 200;"></div>
+
+		<script type="module">
+
+			'use strict';
+
+			import * as THREE from '../build/three.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { TrackballControls } from "./jsm/controls/TrackballControls.js";
+			import { WorkerTaskManager } from "./jsm/loaders/workerTaskManager/WorkerTaskManager.js";
+			import { MeshReceiver } from "./jsm/loaders/workerTaskManager/shared/MeshReceiver.js";
+			import {
+				MeshMessageStructure,
+				ObjectManipulator
+			} from "./jsm/loaders/workerTaskManager/utils/TransferableUtils.js"
+			import { MaterialHandler } from "./jsm/loaders/workerTaskManager/shared/MaterialHandler.js";
+			import { TransferableUtils } from "./jsm/loaders/workerTaskManager/utils/TransferableUtils.js";
+			import { FileLoader } from "../src/loaders/FileLoader.js";
+			import { MTLLoader } from "./jsm/loaders/MTLLoader.js";
+			import { OBJLoaderWorker } from "./jsm/loaders/workerTaskManager/worker/tmOBJLoader.js";
+
+			/**
+			 * The aim of this example is to show all possible ways how to use the {@link WorkerTaskManager}:
+			 * - Standard Workers with dependency loading
+			 * - Module Workers with and without additional dependencies
+			 * - Main Fallback without dependencies
+			 * - It also allows to use OBJLoader2Parser with and without modules.
+			 *
+			 * Via dat.gui it is possible to control various parameters of the example:
+			 * - The quantity of workers created for each task (default: 4)
+			 * - The absolute overall count of task executions (default: 1000000)
+			 * - The maximum amount of task executions per loop (=number of promises returned, default: 1000)
+			 * - How many meshes shall be kept as otherwise the continuous loading will (default: 750)
+			 *
+			 * The tasks perform the same loading operation over and over again. This shall demonstrate:
+			 * - A good CPU utilization can be achieved permanently if the selected amount of workers match the logical CPUs available
+			 * - No memory is leaked
+			 * - The exmaple is able
+			 */
+			class TaskManagerPrototypeExample {
+
+				constructor ( elementToBindTo ) {
+					this.renderer = null;
+					this.canvas = elementToBindTo;
+					this.aspectRatio = 1;
+
+					this.scene = null;
+					this.cameraDefaults = {
+						posCamera: new THREE.Vector3( 1000.0, 1000.0, 1000.0 ),
+						posCameraTarget: new THREE.Vector3( 0, 0, 0 ),
+						near: 0.1,
+						far: 10000,
+						fov: 45
+					};
+					this.camera = null;
+					this.cameraTarget = this.cameraDefaults.posCameraTarget;
+					this.controls = null;
+
+					this.workerTaskManager = null;
+					this.materialHandler = null;
+					this.meshReceiver = null;
+
+					this.taskDescriptions = new Map ();
+					this.tasksToUse = [];
+					this.executions = [];
+					this.objectsUsed = new Map();
+					this.meshesAdded = [];
+					this.meshCount = 0;
+					this.removeCount = 50;
+					this.numberOfMeshesToKeep = 750;
+					this.overallExecutionCount = 1000000;
+
+					// overall executions: maxPerLoop * loopCount
+					this.maxPerLoop = 1000;
+					// number of Promises kept in one go
+					this.loopCount = this.overallExecutionCount / this.maxPerLoop;
+					this.abort = false;
+					this.reset = null;
+
+					// sphere positions
+					this.baseFactor = 750;
+					this.baseVectorX = new THREE.Vector3( 1, 0, 0 );
+					this.baseVectorY = new THREE.Vector3( 0, 1, 0 );
+					this.baseVectorZ = new THREE.Vector3( 0, 0, 1 );
+				}
+
+				resetAppContext () {
+					this.workerTaskManager = new WorkerTaskManager();
+					this.workerTaskManager.setVerbose( true );
+
+					this.materialHandler = new MaterialHandler();
+					this.materialHandler.createDefaultMaterials( true );
+					let meshNormalMaterial = new THREE.MeshNormalMaterial();
+					meshNormalMaterial.name = 'meshNormalMaterial';
+					this.materialHandler.addMaterials( { meshNormalMaterial: meshNormalMaterial }, true )
+					this.meshReceiver = new MeshReceiver( this.materialHandler );
+
+					this.taskDescriptions.clear();
+					this.taskDescriptions.set( 'tmProtoExample', {
+						name: 'tmProtoExample',
+						use: false,
+						fallback: false,
+						funcInit: WorkerFunctions.workerStandardInit,
+						funcExec: WorkerFunctions.workerStandardExec
+					} );
+					this.taskDescriptions.set( 'tmProtoExampleModule', {
+						name: 'tmProtoExampleModule',
+						use: false,
+						fallback: false,
+						module: './jsm/loaders/workerTaskManager/worker/tmModuleExample.js'
+					} );
+					this.taskDescriptions.set( 'tmProtoExampleModuleNoThree', {
+						name: 'tmProtoExampleModuleNoThree',
+						use: false,
+						fallback: false,
+						module: './jsm/loaders/workerTaskManager/worker/tmModuleExampleNoThree.js'
+					} );
+					this.taskDescriptions.set( 'tmProtoExampleMain', {
+						name: 'tmProtoExampleMain',
+						use: false,
+						fallback: true,
+						funcInit: WorkerFunctions.workerStandardInit,
+						funcExec: WorkerFunctions.workerStandardExec
+					} );
+					this.taskDescriptions.set( 'tmOBJLoaderModule', {
+						name: 'tmOBJLoaderModule',
+						use: true,
+						fallback: false,
+						module: './jsm/loaders/workerTaskManager/worker/tmOBJLoader.js',
+						filenameMtl: './models/obj/female02/female02.mtl',
+						filenameObj: './models/obj/female02/female02.obj',
+						materials: {}
+					} );
+					this.taskDescriptions.set( 'tmOBJLoaderStandard', {
+						name: 'tmOBJLoaderStandard',
+						use: true,
+						fallback: false,
+						funcInit: OBJLoaderWorker.init,
+						funcExec: OBJLoaderWorker.execute,
+						filenameMtl: './models/obj/male02/male02.mtl',
+						filenameObj: './models/obj/male02/male02.obj',
+						materials: {}
+					} );
+
+					this.tasksToUse = [];
+					this.executions = [];
+					this.objectsUsed = new Map();
+
+					if ( this.reset !== null ) {
+
+						this._deleteMeshRange( this.meshesAdded.length );
+						this.reset();
+						this.reset = null;
+
+					}
+					this.meshesAdded = [];
+					this.meshCount = 0;
+					this.removeCount = 50;
+					this.numberOfMeshesToKeep = 750;
+
+					this.overallExecutionCount = 1000000;
+
+					// overall executions: maxPerLoop * loopCount
+					this.maxPerLoop = 1000;
+					// number of Promises kept in one go
+					this.loopCount = this.overallExecutionCount / this.maxPerLoop;
+					this.abort = false;
+
+					// sphere positions
+					this.baseFactor = 750;
+					this.baseVectorX = new THREE.Vector3( 1, 0, 0 );
+					this.baseVectorY = new THREE.Vector3( 0, 1, 0 );
+					this.baseVectorZ = new THREE.Vector3( 0, 0, 1 );
+				}
+
+				initGL () {
+					this.renderer = new THREE.WebGLRenderer( {
+						canvas: this.canvas,
+						antialias: true,
+						autoClear: true
+					} );
+					this.renderer.setClearColor( 0x050505 );
+
+					this.scene = new THREE.Scene();
+
+					this.recalcAspectRatio();
+					this.camera = new THREE.PerspectiveCamera( this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far );
+					this.resetCamera();
+					this.controls = new TrackballControls( this.camera, this.renderer.domElement );
+
+					let ambientLight = new THREE.AmbientLight( 0x404040 );
+					let directionalLight1 = new THREE.DirectionalLight( 0xC0C090 );
+					let directionalLight2 = new THREE.DirectionalLight( 0xC0C090 );
+
+					directionalLight1.position.set( - 100, - 50, 100 );
+					directionalLight2.position.set( 100, 50, - 100 );
+
+					this.scene.add( directionalLight1 );
+					this.scene.add( directionalLight2 );
+					this.scene.add( ambientLight );
+
+					let helper = new THREE.GridHelper( 1000, 30, 0xFF4444, 0x404040 );
+					this.scene.add( helper );
+				}
+
+				/**
+				 * Registers any selected task at the {@link WorkerTaskManager} and initializes them.
+				 *
+				 * @return {Promise<any>}
+				 */
+				async initContent () {
+					let awaiting = [];
+					this.tasksToUse = [];
+					let taskDescr = this.taskDescriptions.get( 'tmProtoExample' );
+					if ( taskDescr.use ) {
+
+						this.tasksToUse.push( taskDescr );
+						this.workerTaskManager.registerTaskType( taskDescr.name, taskDescr.funcInit, taskDescr.funcExec, null, false, [ { url: "../build/three.js" } ] );
+						awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, { param1: 'param1value' } ).catch( e => console.error( e ) ) );
+
+					}
+					taskDescr = this.taskDescriptions.get( 'tmProtoExampleModule' );
+					if ( taskDescr.use ) {
+
+						this.tasksToUse.push( taskDescr );
+						this.workerTaskManager.registerTaskTypeModule( taskDescr.name, taskDescr.module );
+						awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, { param1: 'param1value' } ).catch( e => console.error( e ) ) );
+
+					}
+					taskDescr = this.taskDescriptions.get( 'tmProtoExampleModuleNoThree' );
+					if ( taskDescr.use ) {
+
+						let torus = new THREE.TorusBufferGeometry( 25, 8, 16, 100 );
+						let torusPayload = TransferableUtils.packageBufferGeometry( torus, '0', 'torus', 0 );
+						this.tasksToUse.push( taskDescr );
+						this.workerTaskManager.registerTaskTypeModule( taskDescr.name, taskDescr.module );
+						awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, torusPayload, torusPayload.transferables ).catch( e => console.error( e ) ) );
+
+					}
+					taskDescr = this.taskDescriptions.get( 'tmProtoExampleMain' );
+					if ( taskDescr.use ) {
+
+						this.tasksToUse.push( taskDescr );
+						this.workerTaskManager.registerTaskType( taskDescr.name, taskDescr.funcInit, taskDescr.funcExec, null, true );
+						awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, { param1: 'param1value' } ).catch( e => console.error( e ) ) );
+
+					}
+					taskDescr = this.taskDescriptions.get( 'tmOBJLoaderModule' );
+					if ( taskDescr.use ) {
+
+						this.tasksToUse.push( taskDescr );
+						this.workerTaskManager.registerTaskTypeModule( taskDescr.name, taskDescr.module );
+						await this.loadObjMtl( taskDescr )
+						.then( buffer => {
+							let config = { buffer: buffer }
+							awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, config, { buffer: buffer } ).catch( e => console.error( e ) ) );
+						} );
+
+					}
+					taskDescr = this.taskDescriptions.get( 'tmOBJLoaderStandard' );
+					if ( taskDescr.use ) {
+
+						this.tasksToUse.push( taskDescr );
+						let transferableUtils = TransferableUtils.toString() + ';\n\n';
+						let meshMessageStructure = MeshMessageStructure.toString() + ';\n\n';
+
+						this.workerTaskManager.registerTaskType( taskDescr.name, taskDescr.funcInit, taskDescr.funcExec, null, false,
+								[
+									{ url: '../build/three.js' },
+									{ code: '\n\nconst MaterialLoader = THREE.MaterialLoader;\n\n' },
+									{ url: '../examples/js/loaders/OBJLoader.js' },
+									{ code: '\n\nconst OBJLoader = THREE.OBJLoader;\n\n' },
+									{ code: transferableUtils },
+									{ code: meshMessageStructure }
+								] );
+						await this.loadObjMtl( taskDescr )
+							.then( buffer => {
+								let config = { buffer: buffer }
+								awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, config, { buffer: buffer } ).catch( e => console.error( e ) ) );
+							} );
+
+					}
+					if ( awaiting.length > 0 ) {
+
+						return await Promise.all( awaiting );
+
+					}
+					else {
+
+						return new Promise( ( resolve, reject ) => { reject ( 'No task type has been configured' ) } )
+
+					}
+				}
+
+				async loadObjMtl ( taskDescr ) {
+
+					let fileLoader = new FileLoader();
+					fileLoader.setResponseType( 'arraybuffer' );
+
+					let loadMtl = new Promise(resolve => {
+
+						let mtlLoader = new MTLLoader();
+						mtlLoader.load( taskDescr.filenameMtl, resolve );
+
+					} );
+					await loadMtl.then( materialCreator => {
+
+						materialCreator.preload();
+						this.materialHandler.addMaterials( materialCreator.materials, false );
+						taskDescr.materials = this.materialHandler.getMaterialsJSON()
+
+					} ) ;
+					return await fileLoader.loadAsync( taskDescr.filenameObj );
+
+				}
+
+				/**
+				 * Once all tasks are initialized a number of tasks (maxPerLoop) are enqueued.
+				 * This is repeated a configured number of times (loopCount) or the abort flag is set.
+				 *
+				 * @return {Promise<void>}
+				 */
+				async executeWorkers () {
+
+					if ( this.tasksToUse.length === 0 ) throw "No Tasks have been selected. Aborting..."
+
+					console.time( 'start' );
+					let globalCount = 0;
+					let taskToUseIndex = 0;
+					for ( let j = 0; j < this.loopCount && !this.abort; j++ ) {
+
+						console.time( 'Completed ' + ( this.maxPerLoop + j * this.maxPerLoop ) );
+						for ( let i = 0; i < this.maxPerLoop; i ++ ) {
+
+							let taskDescr = this.tasksToUse[ taskToUseIndex ];
+							let promise = this.workerTaskManager.enqueueForExecution( taskDescr.name, {
+									id: globalCount,
+									params: {
+										materials: taskDescr.materials
+									}
+								},
+								data => this._processMessage( data ) )
+									.then( data => this._processMessage( data ) )
+									.catch( e => console.error( e ) )
+							this.executions.push( promise );
+
+							globalCount++;
+							taskToUseIndex++;
+							if ( taskToUseIndex === this.tasksToUse.length ) taskToUseIndex = 0;
+
+						}
+						await Promise.all( this.executions ).then( x => {
+
+							this.executions = [];
+							console.timeEnd( 'Completed ' + ( this.maxPerLoop + j * this.maxPerLoop ) );
+
+						} );
+					}
+					this.workerTaskManager.dispose();
+					console.timeEnd( 'start' );
+
+					if ( this.reset ) {
+
+						this.resetAppContext();
+
+					}
+
+				}
+
+				_processMessage ( payload ) {
+					switch ( payload.cmd ) {
+						case 'init':
+							console.log( 'Init Completed: ' + payload.id );
+							break;
+
+						case 'execComplete':
+						case 'assetAvailable':
+							switch ( payload.type ) {
+
+								case 'mesh':
+									let meshes = this.meshReceiver.buildMeshes( payload );
+									this._addMesh( meshes[ 0 ], payload.id, payload.params );
+									break;
+
+								case 'material':
+									this.materialHandler.addPayloadMaterials( payload );
+									break;
+
+								case 'void':
+									break;
+
+								default:
+									console.error( 'Provided payload.type was neither mesh nor assetAvailable: ' + payload.cmd );
+									break;
+
+							}
+							this._cleanMeshes();
+							break;
+
+						default:
+							console.error( payload.id + ': Received unknown command: ' + payload.cmd );
+							break;
+					}
+				}
+
+				_addMesh( mesh, id, params ) {
+
+					let storedPos = this.objectsUsed.get( id );
+					let pos;
+					if ( storedPos ) {
+
+						pos = storedPos.pos;
+					}
+					else {
+
+						pos = new THREE.Vector3( this.baseFactor * Math.random(), this.baseFactor * Math.random(), this.baseFactor * Math.random() );
+						pos.applyAxisAngle( this.baseVectorX, 2 * Math.PI * Math.random() );
+						pos.applyAxisAngle( this.baseVectorY, 2 * Math.PI * Math.random() );
+						pos.applyAxisAngle( this.baseVectorZ, 2 * Math.PI * Math.random() );
+						this.objectsUsed.set( id, { name: mesh.name, pos: pos } );
+
+					}
+					mesh.position.set( pos.x, pos.y, pos.z );
+					mesh.name = id + '' + mesh.name;
+					if ( params.color !== undefined ) {
+
+						mesh.material.color = new THREE.Color( params.color.r, params.color.g, params.color.b );
+
+					}
+
+					this.scene.add( mesh );
+					this.meshesAdded.push( mesh.name );
+					this.meshCount ++;
+
+				}
+
+				_cleanMeshes() {
+
+					if ( this.meshesAdded.length >= this.numberOfMeshesToKeep ) {
+
+						this._deleteMeshRange( this.removeCount );
+
+					}
+
+				}
+
+				_deleteMeshRange( deleteRange )  {
+
+					let toBeRemoved;
+					let deleteCount = 0;
+					let i = 0;
+					while ( deleteCount < deleteRange && i < this.meshesAdded.length ) {
+
+						let meshName = this.meshesAdded[ i ];
+						toBeRemoved = this.scene.getObjectByName( meshName );
+						if ( toBeRemoved ) {
+
+							toBeRemoved.geometry.dispose();
+							if ( toBeRemoved.material !== undefined && toBeRemoved.material !== null && toBeRemoved.material.dispose instanceof Function ) {
+
+								toBeRemoved.material.dispose();
+
+							}
+							this.scene.remove( toBeRemoved );
+							this.meshesAdded.splice( i, 1 );
+							deleteCount++;
+
+						}
+						else {
+
+							i++;
+							console.log( 'Unable to remove: ' + meshName );
+
+						}
+
+					}
+
+				}
+
+				resizeDisplayGL () {
+					this.controls.handleResize();
+
+					this.recalcAspectRatio();
+					this.renderer.setSize( this.canvas.offsetWidth, this.canvas.offsetHeight, false );
+
+					this.updateCamera();
+				}
+
+				recalcAspectRatio () {
+					this.aspectRatio = (this.canvas.offsetHeight === 0) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
+				}
+
+				resetCamera () {
+					this.camera.position.copy( this.cameraDefaults.posCamera );
+					this.cameraTarget.copy( this.cameraDefaults.posCameraTarget );
+
+					this.updateCamera();
+				}
+
+				updateCamera () {
+					this.camera.aspect = this.aspectRatio;
+					this.camera.lookAt( this.cameraTarget );
+					this.camera.updateProjectionMatrix();
+				}
+
+				render() {
+					if ( !this.renderer.autoClear ) this.renderer.clear();
+					this.controls.update();
+					this.renderer.render( this.scene, this.camera );
+				}
+
+			}
+
+			const WorkerFunctions = {
+
+				workerStandardInit: function ( context, id, config ) {
+					context.storage = {
+						whoami: config.id,
+					};
+
+					context.postMessage( {
+						cmd: "init",
+						id: id
+					} );
+
+				},
+
+				workerStandardExec: function ( context, id, config ) {
+
+					let bufferGeometry = new THREE.SphereBufferGeometry( 40, 64, 64 );
+
+					let vertexBA = bufferGeometry.getAttribute( 'position' );
+					let indexBA = bufferGeometry.getIndex();
+					let colorBA = bufferGeometry.getAttribute( 'color' );
+					let normalBA = bufferGeometry.getAttribute( 'normal' );
+					let uvBA = bufferGeometry.getAttribute( 'uv' );
+
+					let vertexArray = vertexBA.array;
+					for ( let i = 0; i < vertexArray.length; i ++ ) {
+
+						vertexArray[ i ] = vertexArray[ i ] * Math.random() * 0.48;
+
+					}
+					let vertexFA = vertexArray;
+					let indexUA = (indexBA !== null && indexBA !== undefined) ? indexBA.array : null;
+					let colorFA = (colorBA !== null && colorBA !== undefined) ? colorBA.array : null;
+					let normalFA = (normalBA !== null && normalBA !== undefined) ? normalBA.array : null;
+					let uvFA = (uvBA !== null && uvBA !== undefined) ? uvBA.array : null;
+
+					context.postMessage( {
+								cmd: 'execComplete',
+								type: 'mesh',
+								meshName: 'tmProto' + config.id,
+								id: config.id,
+								params: {
+									geometryType: 0
+								},
+								buffers: {
+									vertices: vertexFA,
+									indices: indexUA,
+									colors: colorFA,
+									normals: normalFA,
+									uvs: uvFA,
+								},
+								materials: {
+									materialNames: ['meshNormalMaterial']
+								}
+							},
+							[vertexFA.buffer],
+							indexUA !== null ? [indexUA.buffer] : null,
+							colorFA !== null ? [colorFA.buffer] : null,
+							normalFA !== null ? [normalFA.buffer] : null,
+							uvFA !== null ? [uvFA.buffer] : null
+					);
+
+				}
+
+			}
+
+			let app = new TaskManagerPrototypeExample( document.getElementById( 'example' ) );
+			app.resetAppContext();
+
+			let tmControls = {
+				controls: [],
+				controlStop: null,
+				controlReset: null,
+				started: false,
+				tmProtoExampleName: false,
+				tmProtoExampleModule: false,
+				tmProtoExampleModuleNoThree: false,
+				tmProtoExampleMain: false,
+				tmOBJLoaderModule: false,
+				tmOBJLoaderStandard: false,
+				maxParallelExecutions: 0,
+				overallExecutionCount: 0,
+				numberOfMeshesToKeep: 0,
+				maxPerLoop: 0,
+				resetContent () {
+
+					this.tmProtoExampleName = app.taskDescriptions.get( 'tmProtoExample' ).use;
+					this.tmProtoExampleModule = app.taskDescriptions.get( 'tmProtoExampleModule' ).use;
+					this.tmProtoExampleModuleNoThree = app.taskDescriptions.get( 'tmProtoExampleModuleNoThree' ).use;
+					this.tmProtoExampleMain = app.taskDescriptions.get( 'tmProtoExampleMain' ).use;
+					this.tmOBJLoaderModule = app.taskDescriptions.get( 'tmOBJLoaderModule' ).use;
+					this.tmOBJLoaderStandard = app.taskDescriptions.get( 'tmOBJLoaderStandard' ).use;
+					this.maxParallelExecutions = app.workerTaskManager.getMaxParallelExecutions();
+					this.overallExecutionCount = app.overallExecutionCount;
+					this.numberOfMeshesToKeep = app.numberOfMeshesToKeep;
+					this.maxPerLoop = app.maxPerLoop;
+					for ( let control of this.controls ) {
+
+						this.enableElement( control );
+						control.updateDisplay();
+
+					}
+					this.disableElement( this.controlStop );
+
+				},
+				blockEvent ( event ) {
+
+					event.stopPropagation();
+
+				},
+				disableElement ( elementHandle ) {
+
+					elementHandle.domElement.addEventListener( 'click', this.blockEvent, true );
+					elementHandle.domElement.parentElement.style.pointerEvents = 'none';
+					elementHandle.domElement.parentElement.style.opacity = 0.5;
+
+				},
+				enableElement ( elementHandle ) {
+
+					elementHandle.domElement.removeEventListener( 'click', this.blockEvent, true );
+					elementHandle.domElement.parentElement.style.pointerEvents = 'auto';
+					elementHandle.domElement.parentElement.style.opacity = 1.0;
+
+				},
+				executeLoading () {
+
+					this.started = true;
+					for ( let control of this.controls ) this.disableElement( control );
+					this.enableElement( this.controlStop );
+					console.time( 'All tasks have been initialized' );
+					app.initContent().then( x => {
+						console.timeEnd( 'All tasks have been initialized' );
+						app.executeWorkers();
+					} ).catch( x => alert( x ) );
+
+				},
+				stopExecution () {
+
+					this.started = false;
+					app.abort = true;
+
+				},
+				resetExecution () {
+
+					let scope = this;
+					function scopeReset() {
+						scope.resetContent();
+					}
+					app.reset = scopeReset;
+					if ( this.started ) {
+
+						this.stopExecution();
+
+					}
+					else {
+
+						app.resetAppContext();
+						this.resetContent();
+
+					}
+
+				}
+			};
+
+			let menuDiv = document.getElementById( 'dat' );
+			let gui = new GUI( {
+				autoPlace: false,
+				width: 400
+			} );
+			menuDiv.appendChild( gui.domElement );
+
+			let taskName0 = 'tmProtoExample';
+			let index = 0;
+			tmControls.controls[ index ] = gui.add( tmControls, taskName0 + 'Name' ).name( 'Worker Standard + three' );
+			tmControls.controls[ index ].onChange( value => { app.taskDescriptions.get( taskName0 ).use = value; } );
+
+			let taskName1 = 'tmProtoExampleModule';
+			index++;
+			tmControls.controls[ index ] = gui.add( tmControls, taskName1 ).name( 'Worker Module + three' );
+			tmControls.controls[ index ].onChange( value => { app.taskDescriptions.get( taskName1 ).use = value; } );
+
+			let taskName2 = 'tmProtoExampleModuleNoThree';
+			index++;
+			tmControls.controls[ index ] = gui.add( tmControls, taskName2 ).name( 'Worker Module solo' );
+			tmControls.controls[ index ].onChange( value => { app.taskDescriptions.get( taskName2 ).use = value; } );
+
+			let taskName3 = 'tmProtoExampleMain';
+			index++;
+			tmControls.controls[ index ] = gui.add( tmControls, taskName3 ).name( 'Worker Standard Main' );
+			tmControls.controls[ index ].onChange( value => { app.taskDescriptions.get( taskName3 ).use = value; } );
+
+			let taskName4 = 'tmOBJLoaderModule';
+			index++;
+			tmControls.controls[ index ] = gui.add( tmControls, taskName4 ).name( 'OBJLoader Module' );
+			tmControls.controls[ index ].onChange( value => { app.taskDescriptions.get( taskName4 ).use = value; } );
+
+			let taskName5 = 'tmOBJLoaderStandard';
+			index++;
+			tmControls.controls[ index ] = gui.add( tmControls, taskName5 ).name( 'OBJLoader Standard' );
+			tmControls.controls[ index ].onChange( value => { app.taskDescriptions.get( taskName5 ).use = value; } );
+
+			index++;
+			tmControls.controls[ index ] = gui.add( tmControls, 'maxParallelExecutions', 1, 32 ).step( 1 ).name( 'Maximum Parallel Executions' );
+			tmControls.controls[ index ].onChange( value => { app.workerTaskManager.setMaxParallelExecutions( value ) } );
+
+			index++;
+			tmControls.controls[ index ] = gui.add( tmControls, 'overallExecutionCount', 0, 10000000 ).step( 1000 ).name( 'Overall Execution Count' );
+			tmControls.controls[ index ].onChange( value => { app.overallExecutionCount = value } );
+
+			index++;
+			tmControls.controls[ index ] = gui.add( tmControls, 'maxPerLoop', 0, 10000 ).step( 100 ).name( 'Loop executions' );
+			tmControls.controls[ index ].onChange( value => { app.maxPerLoop = value } );
+
+			index++;
+			tmControls.controls[ index ] = gui.add( tmControls, 'numberOfMeshesToKeep', 100, 10000 ).step( 25 ).name( 'Keep N Meshes' );
+			tmControls.controls[ index ].onChange( value => { app.numberOfMeshesToKeep = value } );
+
+			index++;
+			tmControls.controls[ index ] = gui.add( tmControls, 'executeLoading' ).name( 'Engage' );
+			tmControls.controls[ index ].domElement.id = 'startButton';
+
+			tmControls.controlStop = gui.add( tmControls, 'stopExecution' ).name( 'Stop' );
+			tmControls.controlReset = gui.add( tmControls, 'resetExecution' ).name( 'Reset' );
+
+			tmControls.resetContent();
+
+			let resizeWindow = function () {
+				app.resizeDisplayGL();
+			};
+
+			let render = function () {
+				requestAnimationFrame( render );
+				app.render();
+			};
+
+			window.addEventListener( 'resize', resizeWindow, false );
+
+			console.log( 'Starting initialisation phase...' );
+			app.initGL();
+			app.resizeDisplayGL();
+
+			render();
+
+		</script>
+	</body>
+</html>
