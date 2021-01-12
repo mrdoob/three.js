@@ -276,7 +276,11 @@ function WebGLRenderer( parameters ) {
 
 		capabilities = new WebGLCapabilities( _gl, extensions, parameters );
 
-		if ( capabilities.isWebGL2 === false ) {
+		if ( capabilities.isWebGL2 ) {
+
+			extensions.get( 'EXT_color_buffer_float' );
+
+		} else {
 
 			extensions.get( 'WEBGL_depth_texture' );
 			extensions.get( 'OES_texture_float' );
@@ -290,6 +294,7 @@ function WebGLRenderer( parameters ) {
 		}
 
 		extensions.get( 'OES_texture_float_linear' );
+		extensions.get( 'EXT_color_buffer_half_float' );
 
 		utils = new WebGLUtils( _gl, extensions, capabilities );
 
