@@ -17693,7 +17693,9 @@
 			extensions = new WebGLExtensions(_gl);
 			capabilities = new WebGLCapabilities(_gl, extensions, parameters);
 
-			if (capabilities.isWebGL2 === false) {
+			if (capabilities.isWebGL2) {
+				extensions.get('EXT_color_buffer_float');
+			} else {
 				extensions.get('WEBGL_depth_texture');
 				extensions.get('OES_texture_float');
 				extensions.get('OES_texture_half_float');
@@ -17705,6 +17707,7 @@
 			}
 
 			extensions.get('OES_texture_float_linear');
+			extensions.get('EXT_color_buffer_half_float');
 			utils = new WebGLUtils(_gl, extensions, capabilities);
 			state = new WebGLState(_gl, extensions, capabilities);
 			state.scissor(_currentScissor.copy(_scissor).multiplyScalar(_pixelRatio).floor());
@@ -18786,9 +18789,11 @@
 						return;
 					}
 
+					var halfFloatSupportedByExt = textureType === HalfFloatType && (extensions.get('EXT_color_buffer_half_float') || capabilities.isWebGL2 && extensions.get('EXT_color_buffer_float'));
+
 					if (textureType !== UnsignedByteType && utils.convert(textureType) !== _gl.getParameter(35738) && // IE11, Edge and Chrome Mac < 52 (#9513)
 					!(textureType === FloatType && (capabilities.isWebGL2 || extensions.get('OES_texture_float') || extensions.get('WEBGL_color_buffer_float'))) && // Chrome Mac >= 52 and Firefox
-					!(textureType === HalfFloatType && (capabilities.isWebGL2 ? extensions.get('EXT_color_buffer_float') : extensions.get('EXT_color_buffer_half_float')))) {
+					!halfFloatSupportedByExt) {
 						console.error('THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.');
 						return;
 					}
