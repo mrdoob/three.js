@@ -119,7 +119,7 @@ var files = [
 	{ path: 'misc/VolumeSlice.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'modifiers/EdgeSplitModifier.js', dependencies: [ { name: 'BufferGeometryUtils', path: 'utils/BufferGeometryUtils.js' } ], ignoreList: [ 'Geometry' ] },
-	{ path: 'modifiers/SimplifyModifier.js', dependencies: [], ignoreList: [] },
+	{ path: 'modifiers/SimplifyModifier.js', dependencies: [ { name: 'BufferGeometryUtils', path: 'utils/BufferGeometryUtils.js' } ], ignoreList: [] },
 	{ path: 'modifiers/SubdivisionModifier.js', dependencies: [], ignoreList: [] },
 	{ path: 'modifiers/TessellateModifier.js', dependencies: [], ignoreList: [] },
 
