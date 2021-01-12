@@ -15,7 +15,7 @@ import { EventDispatcher } from './EventDispatcher';
 import { BufferGeometry } from './BufferGeometry';
 import { Intersection } from './Raycaster';
 import { AnimationClip } from '../animation/AnimationClip';
-import { Mesh } from '../objects/Mesh'
+import { Mesh } from '../objects/Mesh';
 
 /**
  * Base class for scene graph objects
