@@ -1637,6 +1637,14 @@
 			return this;
 		};
 
+		_proto.multiply = function multiply(v) {
+			this.x *= v.x;
+			this.y *= v.y;
+			this.z *= v.z;
+			this.w *= v.w;
+			return this;
+		};
+
 		_proto.multiplyScalar = function multiplyScalar(scalar) {
 			this.x *= scalar;
 			this.y *= scalar;
