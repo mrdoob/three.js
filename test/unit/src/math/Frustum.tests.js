@@ -8,7 +8,7 @@ import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Box3 } from '../../../../src/math/Box3';
 import { Mesh } from '../../../../src/objects/Mesh';
-import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
 import { zero3, one3, eps } from './Constants.tests';
 
 const unit3 = new Vector3( 1, 0, 0 );
@@ -204,7 +204,7 @@ export default QUnit.module( 'Maths', () => {
 
 			var m = new Matrix4().makePerspective( - 1, 1, 1, - 1, 1, 100 );
 			var a = new Frustum().setFromProjectionMatrix( m );
-			var object = new Mesh( new BoxBufferGeometry( 1, 1, 1 ) );
+			var object = new Mesh( new BoxGeometry( 1, 1, 1 ) );
 			var intersects;
 
 			intersects = a.intersectsObject( object );

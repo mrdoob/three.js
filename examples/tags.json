@@ -86,6 +86,7 @@
 	"webgl_postprocessing_ssao": [ "ambient occlusion" ],
 	"webgl_postprocessing_unreal_bloom": [ "glow" ],
 	"webgl_postprocessing_unreal_bloom_selective": [ "glow" ],
+	"webgl_postprocessing_3dlut": [ "color grading" ],
 	"webgl_materials_modified": [ "onBeforeCompile" ],
 	"webgl_shadowmap_csm": [ "cascade" ],
 	"webgl_shadowmap_pcss": [ "soft" ],

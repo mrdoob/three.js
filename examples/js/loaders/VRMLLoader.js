@@ -868,7 +868,7 @@ THREE.VRMLLoader = ( function () {
 
 				if ( skyColor ) {
 
-					var skyGeometry = new THREE.SphereBufferGeometry( radius, 32, 16 );
+					var skyGeometry = new THREE.SphereGeometry( radius, 32, 16 );
 					var skyMaterial = new THREE.MeshBasicMaterial( { fog: false, side: THREE.BackSide, depthWrite: false, depthTest: false } );
 
 					if ( skyColor.length > 3 ) {
@@ -893,7 +893,7 @@ THREE.VRMLLoader = ( function () {
 
 					if ( groundColor.length > 0 ) {
 
-						var groundGeometry = new THREE.SphereBufferGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
+						var groundGeometry = new THREE.SphereGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
 						var groundMaterial = new THREE.MeshBasicMaterial( { fog: false, side: THREE.BackSide, vertexColors: true, depthWrite: false, depthTest: false } );
 
 						paintFaces( groundGeometry, radius, groundAngle, toColorArray( groundColor ), false );
@@ -1974,7 +1974,7 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new THREE.BoxBufferGeometry( size.x, size.y, size.z );
+				var geometry = new THREE.BoxGeometry( size.x, size.y, size.z );
 
 				return geometry;
 
@@ -2018,7 +2018,7 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new THREE.ConeBufferGeometry( radius, height, 16, 1, openEnded );
+				var geometry = new THREE.ConeGeometry( radius, height, 16, 1, openEnded );
 
 				return geometry;
 
@@ -2066,7 +2066,7 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new THREE.CylinderBufferGeometry( radius, radius, height, 16, 1 );
+				var geometry = new THREE.CylinderGeometry( radius, radius, height, 16, 1 );
 
 				return geometry;
 
@@ -2098,7 +2098,7 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new THREE.SphereBufferGeometry( radius, 16, 16 );
+				var geometry = new THREE.SphereGeometry( radius, 16, 16 );
 
 				return geometry;
 

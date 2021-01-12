@@ -64,7 +64,7 @@
 
 				const matrix = new THREE.Matrix4();
 
-				const pxGeometry = new THREE.PlaneBufferGeometry( 100, 100 ).toNonIndexed();
+				const pxGeometry = new THREE.PlaneGeometry( 100, 100 ).toNonIndexed();
 				pxGeometry.setAttribute( 'color', pxGeometry.attributes.position.clone() );
 				pxGeometry.attributes.color.copyColorsArray( [ light, shadow, light, shadow, shadow, light ] );
 				pxGeometry.attributes.uv.array[ 1 ] = 0.5;
@@ -73,7 +73,7 @@
 				pxGeometry.rotateY( Math.PI / 2 );
 				pxGeometry.translate( 50, 0, 0 );
 
-				const nxGeometry = new THREE.PlaneBufferGeometry( 100, 100 ).toNonIndexed();
+				const nxGeometry = new THREE.PlaneGeometry( 100, 100 ).toNonIndexed();
 				nxGeometry.setAttribute( 'color', nxGeometry.attributes.position.clone() );
 				nxGeometry.attributes.color.copyColorsArray( [ light, shadow, light, shadow, shadow, light ] );
 				nxGeometry.attributes.uv.array[ 1 ] = 0.5;
@@ -82,7 +82,7 @@
 				nxGeometry.rotateY( - Math.PI / 2 );
 				nxGeometry.translate( - 50, 0, 0 );
 
-				const pyGeometry = new THREE.PlaneBufferGeometry( 100, 100 ).toNonIndexed();
+				const pyGeometry = new THREE.PlaneGeometry( 100, 100 ).toNonIndexed();
 				pyGeometry.setAttribute( 'color', pyGeometry.attributes.position.clone() );
 				pyGeometry.attributes.color.copyColorsArray( [ light, light, light, light, light, light ] );
 				pyGeometry.attributes.uv.array[ 3 ] = 0.5;
@@ -91,7 +91,7 @@
 				pyGeometry.rotateX( - Math.PI / 2 );
 				pyGeometry.translate( 0, 50, 0 );
 
-				const py2Geometry = new THREE.PlaneBufferGeometry( 100, 100 ).toNonIndexed();
+				const py2Geometry = new THREE.PlaneGeometry( 100, 100 ).toNonIndexed();
 				py2Geometry.setAttribute( 'color', py2Geometry.attributes.position.clone() );
 				py2Geometry.attributes.color.copyColorsArray( [ light, light, light, light, light, light ] );
 				py2Geometry.attributes.uv.array[ 3 ] = 0.5;
@@ -101,7 +101,7 @@
 				py2Geometry.rotateY( Math.PI / 2 );
 				py2Geometry.translate( 0, 50, 0 );
 
-				const pzGeometry = new THREE.PlaneBufferGeometry( 100, 100 ).toNonIndexed();
+				const pzGeometry = new THREE.PlaneGeometry( 100, 100 ).toNonIndexed();
 				pzGeometry.setAttribute( 'color', pzGeometry.attributes.position.clone() );
 				pzGeometry.attributes.color.copyColorsArray( [ light, shadow, light, shadow, shadow, light ] );
 				pzGeometry.attributes.uv.array[ 1 ] = 0.5;
@@ -109,7 +109,7 @@
 				pzGeometry.attributes.uv.array[ 11 ] = 0.5;
 				pzGeometry.translate( 0, 0, 50 );
 
-				const nzGeometry = new THREE.PlaneBufferGeometry( 100, 100 ).toNonIndexed();
+				const nzGeometry = new THREE.PlaneGeometry( 100, 100 ).toNonIndexed();
 				nzGeometry.setAttribute( 'color', nzGeometry.attributes.position.clone() );
 				nzGeometry.attributes.color.copyColorsArray( [ light, shadow, light, shadow, shadow, light ] );
 				nzGeometry.attributes.uv.array[ 1 ] = 0.5;

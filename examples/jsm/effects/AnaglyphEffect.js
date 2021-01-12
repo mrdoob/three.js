@@ -4,7 +4,7 @@ import {
 	Mesh,
 	NearestFilter,
 	OrthographicCamera,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	RGBAFormat,
 	Scene,
 	ShaderMaterial,
@@ -121,7 +121,7 @@ var AnaglyphEffect = function ( renderer, width, height ) {
 
 	} );
 
-	var _mesh = new Mesh( new PlaneBufferGeometry( 2, 2 ), _material );
+	var _mesh = new Mesh( new PlaneGeometry( 2, 2 ), _material );
 	_scene.add( _mesh );
 
 	this.setSize = function ( width, height ) {

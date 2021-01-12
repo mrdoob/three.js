@@ -65,7 +65,7 @@
 				// ground
 
 				const ground = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 2000, 2000 ),
+					new THREE.PlaneGeometry( 2000, 2000 ),
 					new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } )
 				);
 				ground.rotation.x = - Math.PI / 2;
@@ -81,7 +81,7 @@
 
 				// export mesh
 
-				const geometry = new THREE.TorusKnotBufferGeometry( 50, 15, 200, 30 );
+				const geometry = new THREE.TorusKnotGeometry( 50, 15, 200, 30 );
 				const material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;

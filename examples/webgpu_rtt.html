@@ -49,7 +49,7 @@
 				const loader = new THREE.TextureLoader();
 				const texture = loader.load( './textures/uv_grid_opengl.jpg' );
 
-				const geometryBox = new THREE.BoxBufferGeometry();
+				const geometryBox = new THREE.BoxGeometry();
 				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
 
 				box = new THREE.Mesh( geometryBox, materialBox );
@@ -72,7 +72,7 @@
 				cameraFX = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 				sceneFX = new THREE.Scene();
 
-				const geometryFX = new THREE.PlaneBufferGeometry( 2, 2 );
+				const geometryFX = new THREE.PlaneGeometry( 2, 2 );
 
 				// @TODO Until NodeMaterial is available just copy the beauty pass to screen
 

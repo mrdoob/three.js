@@ -60,12 +60,12 @@
 				scene.add( new RectAreaLightHelper( rectLight2 ) );
 				scene.add( new RectAreaLightHelper( rectLight3 ) );
 
-				const geoFloor = new THREE.BoxBufferGeometry( 2000, 0.1, 2000 );
+				const geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
 				const matStdFloor = new THREE.MeshStandardMaterial( { color: 0x808080, roughness: 0.1, metalness: 0 } );
 				const mshStdFloor = new THREE.Mesh( geoFloor, matStdFloor );
 				scene.add( mshStdFloor );
 
-				const geoKnot = new THREE.TorusKnotBufferGeometry( 1.5, 0.5, 200, 16 );
+				const geoKnot = new THREE.TorusKnotGeometry( 1.5, 0.5, 200, 16 );
 				const matKnot = new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0, metalness: 0 } );
 				const meshKnot = new THREE.Mesh( geoKnot, matKnot );
 				meshKnot.name = 'meshKnot';

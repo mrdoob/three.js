@@ -1,6 +1,6 @@
 import {
 	BackSide,
-	BoxBufferGeometry,
+	BoxGeometry,
 	Mesh,
 	PerspectiveCamera,
 	Scene,
@@ -19,7 +19,7 @@ var CubeTexturePass = function ( camera, envMap, opacity ) {
 
 	this.cubeShader = ShaderLib[ 'cube' ];
 	this.cubeMesh = new Mesh(
-		new BoxBufferGeometry( 10, 10, 10 ),
+		new BoxGeometry( 10, 10, 10 ),
 		new ShaderMaterial( {
 			uniforms: this.cubeShader.uniforms,
 			vertexShader: this.cubeShader.vertexShader,

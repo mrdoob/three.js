@@ -15,7 +15,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { ConvexBufferGeometry } from './jsm/geometries/ConvexGeometry.js';
+			import { ConvexGeometry } from './jsm/geometries/ConvexGeometry.js';
 			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			let group, camera, scene, renderer;
@@ -68,7 +68,7 @@
 
 				// points
 
-				let dodecahedronGeometry = new THREE.DodecahedronBufferGeometry( 10 );
+				let dodecahedronGeometry = new THREE.DodecahedronGeometry( 10 );
 
 				// if normal and uv attributes are not removed, mergeVertices() can't consolidate indentical vertices with different normal/uv data
 
@@ -110,7 +110,7 @@
 					transparent: true
 				} );
 
-				const meshGeometry = new ConvexBufferGeometry( vertices );
+				const meshGeometry = new ConvexGeometry( vertices );
 
 				const mesh1 = new THREE.Mesh( meshGeometry, meshMaterial );
 				mesh1.material.side = THREE.BackSide; // back faces

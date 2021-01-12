@@ -8,7 +8,7 @@ import { Geometry } from './Geometry';
 import { MorphTarget } from './Geometry';
 
 /**
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/DirectGeometry.js|src/core/DirectGeometry.js}
+ * see {@link https://github.com/mrdoob/three.js/blob/master/src/core/DirectGeometry.js|src/core/DirectGeometry.js}
  */
 export class DirectGeometry {
 

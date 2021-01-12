@@ -45,7 +45,7 @@
 				light2.position.set( - 1, - 1.5, - 1 );
 				scene.add( light2 );
 
-				const geometry = new THREE.IcosahedronBufferGeometry( 0.5, 3 );
+				const geometry = new THREE.IcosahedronGeometry( 0.5, 3 );
 				const material = new THREE.MeshPhongMaterial();
 
 				mesh = new THREE.InstancedMesh( geometry, material, count );

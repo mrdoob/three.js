@@ -7,7 +7,7 @@ import {
 	Mesh,
 	NearestFilter,
 	OrthographicCamera,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	RGBAFormat,
 	RepeatWrapping,
 	Scene,
@@ -209,7 +209,7 @@ var Ocean = function ( renderer, camera, scene, options ) {
 	this.materialOcean.blending = 0;
 
 	// Create the simulation plane
-	this.screenQuad = new Mesh( new PlaneBufferGeometry( 2, 2 ) );
+	this.screenQuad = new Mesh( new PlaneGeometry( 2, 2 ) );
 	this.scene.add( this.screenQuad );
 
 	// Initialise spectrum data
@@ -222,7 +222,7 @@ var Ocean = function ( renderer, camera, scene, options ) {
 
 Ocean.prototype.generateMesh = function () {
 
-	var geometry = new PlaneBufferGeometry( this.geometrySize, this.geometrySize, this.geometryResolution, this.geometryResolution );
+	var geometry = new PlaneGeometry( this.geometrySize, this.geometrySize, this.geometryResolution, this.geometryResolution );
 
 	geometry.rotateX( - Math.PI / 2 );
 

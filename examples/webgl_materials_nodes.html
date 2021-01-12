@@ -21,7 +21,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
+			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
 			import { NodeMaterialLoader, NodeMaterialLoaderUtils } from './jsm/loaders/NodeMaterialLoader.js';
 
@@ -148,7 +148,7 @@
 				light.position.set( - 1, 0.75, - 0.5 );
 				lightGroup.add( light );
 
-				teapot = new TeapotBufferGeometry( 15, 18 );
+				teapot = new TeapotGeometry( 15, 18 );
 
 				mesh = new THREE.Mesh( teapot );
 				scene.add( mesh );

@@ -524,8 +524,8 @@ class KTX2Container {
 
 		for ( var level = 0; level < this.header.levelCount; level ++ ) {
 
-			var levelWidth = Math.ceil( width / Math.pow( 2, level ) );
-			var levelHeight = Math.ceil( height / Math.pow( 2, level ) );
+			var levelWidth = Math.max( 1, Math.floor( width / Math.pow( 2, level ) ) );
+			var levelHeight = Math.max( 1, Math.floor( height / Math.pow( 2, level ) ) );
 
 			var numImagesInLevel = 1; // TODO(donmccurdy): Support cubemaps, arrays and 3D.
 			var imageOffsetInLevel = 0;

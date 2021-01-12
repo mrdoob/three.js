@@ -1,7 +1,7 @@
 import {
 	Mesh,
 	OrthographicCamera,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	Scene,
 	WebGLRenderTarget
 } from '../../../../build/three.module.js';
@@ -25,7 +25,7 @@ function RTTNode( width, height, input, options ) {
 	this.camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene = new Scene();
 
-	this.quad = new Mesh( new PlaneBufferGeometry( 2, 2 ), this.material );
+	this.quad = new Mesh( new PlaneGeometry( 2, 2 ), this.material );
 	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
@@ -66,7 +66,7 @@ RTTNode.prototype.updateFramesaveTo = function ( frame ) {
 
 		var scene = new Scene();
 
-		var quad = new Mesh( new PlaneBufferGeometry( 2, 2 ), material );
+		var quad = new Mesh( new PlaneGeometry( 2, 2 ), material );
 		quad.frustumCulled = false; // Avoid getting clipped
 		scene.add( quad );
 

@@ -153,36 +153,37 @@ THREE.EdgeSplitModifier = function () {
 
 	this.modify = function ( geometry, cutOffAngle, tryKeepNormals = true ) {
 
-		const wasNotBufferGeometry = geometry.isBufferGeometry === undefined;
-		if ( ! geometry.isBufferGeometry ) {
+		if ( geometry.isGeometry === true ) {
 
-			geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+			console.error( 'THREE.EdgeSplitModifier no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
+			return;
 
 		}
 
-
 		let hadNormals = false;
 		oldNormals = null;
+
 		if ( geometry.attributes.normal ) {
 
 			hadNormals = true;
 
-			if ( wasNotBufferGeometry === false )
-				geometry = geometry.clone();
+			geometry = geometry.clone();
 
-			if ( tryKeepNormals && geometry.index )
+			if ( tryKeepNormals === true && geometry.index !== null ) {
+
 				oldNormals = geometry.attributes.normal.array;
+
+			}
 
 			geometry.deleteAttribute( 'normal' );
 
 		}
 
-
 		if ( geometry.index == null ) {
 
 			if ( THREE.BufferGeometryUtils === undefined ) {
 
-			 	throw 'THREE.EdgeSplitModifier relies on THREE.BufferGeometryUtils';
+				throw 'THREE.EdgeSplitModifier relies on THREE.BufferGeometryUtils';
 
 			}
 
