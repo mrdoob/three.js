@@ -6,7 +6,8 @@ import {
 	InterleavedBufferAttribute,
 	TriangleFanDrawMode,
 	TriangleStripDrawMode,
-	TrianglesDrawMode
+	TrianglesDrawMode,
+	Vector3
 } from '../../../build/three.module.js';
 
 var BufferGeometryUtils = {
@@ -596,7 +597,6 @@ var BufferGeometryUtils = {
 						newIndices.push( index.getX( i + 1 ) );
 						newIndices.push( index.getX( i + 2 ) );
 
-
 					} else {
 
 						newIndices.push( index.getX( i + 2 ) );
@@ -630,7 +630,7 @@ var BufferGeometryUtils = {
 
 		}
 
-	}
+	},
 
 	/**
 	 * Calculates the morphed attributes of a morphed/skinned BufferGeometry.
