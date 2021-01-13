@@ -1330,11 +1330,6 @@ Object.assign( BufferGeometry.prototype, {
 		this.clearGroups();
 
 	},
-	computeTangents: function () {
-
-		console.warn( 'THREE.BufferGeometry: .computeTangents() has been removed.' );
-
-	},
 	computeOffsets: function () {
 
 		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.' );

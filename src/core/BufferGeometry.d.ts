@@ -140,6 +140,11 @@ export class BufferGeometry extends EventDispatcher {
 	computeBoundingSphere(): void;
 
 	/**
+	 * Computes and adds tangent attribute to this geometry.
+	 */
+	computeTangents(): void;
+
+	/**
 	 * Computes vertex normals by averaging face normals.
 	 */
 	computeVertexNormals(): void;
