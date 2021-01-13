@@ -41,17 +41,35 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 	const cm = new THREE.Color();
 	const cs = [ ca, cb, cc, cm ];
 
+	const ua = new THREE.Vector2();
+	const ub = new THREE.Vector2();
+	const uc = new THREE.Vector2();
+	const um = new THREE.Vector2();
+	const us = [ ua, ub, uc, um ];
+
+	const u2a = new THREE.Vector2();
+	const u2b = new THREE.Vector2();
+	const u2c = new THREE.Vector2();
+	const u2m = new THREE.Vector2();
+	const u2s = [ u2a, u2b, u2c, u2m ];
+
 	const attributes = geometry.attributes;
 	const hasNormals = attributes.normal !== undefined;
 	const hasColors = attributes.color !== undefined;
+	const hasUVs = attributes.uv !== undefined;
+	const hasUV2s = attributes.uv2 !== undefined;
 
 	let positions = attributes.position.array;
 	let normals = hasNormals ? attributes.normal.array : null;
 	let colors = hasColors ? attributes.color.array : null;
+	let uvs = hasUVs ? attributes.uv.array : null;
+	let uv2s = hasUV2s ? attributes.uv2.array : null;
 
 	let positions2 = positions;
 	let normals2 = normals;
 	let colors2 = colors;
+	let uvs2 = uvs;
+	let uv2s2 = uv2s;
 
 	let iteration = 0;
 	let tessellating = true;
@@ -90,6 +108,30 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 
 		}
 
+		if ( hasUVs ) {
+
+			const u1 = us[ a ];
+			const u2 = us[ b ];
+			const u3 = us[ c ];
+
+			uvs2.push( u1.x, u1.y );
+			uvs2.push( u2.x, u2.y );
+			uvs2.push( u3.x, u3.y );
+
+		}
+
+		if ( hasUV2s ) {
+
+			const u21 = u2s[ a ];
+			const u22 = u2s[ b ];
+			const u23 = u2s[ c ];
+
+			uv2s2.push( u21.x, u21.y );
+			uv2s2.push( u22.x, u22.y );
+			uv2s2.push( u23.x, u23.y );
+
+		}
+
 	}
 
 	while ( tessellating && iteration < maxIterations ) {
@@ -114,7 +156,21 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 
 		}
 
-		for ( var i = 0, il = positions.length; i < il; i += 9 ) {
+		if ( hasUVs ) {
+
+			uvs = uvs2;
+			uvs2 = [];
+
+		}
+
+		if ( hasUV2s ) {
+
+			uv2s = uv2s2;
+			uv2s2 = [];
+
+		}
+
+		for ( var i = 0, i2 = 0, il = positions.length; i < il; i += 9, i2 += 6 ) {
 
 			va.fromArray( positions, i + 0 );
 			vb.fromArray( positions, i + 3 );
@@ -136,6 +192,22 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 
 			}
 
+			if ( hasUVs ) {
+
+				ua.fromArray( uvs, i2 + 0 );
+				ub.fromArray( uvs, i2 + 2 );
+				uc.fromArray( uvs, i2 + 4 );
+
+			}
+
+			if ( hasUV2s ) {
+
+				u2a.fromArray( uv2s, i2 + 0 );
+				u2b.fromArray( uv2s, i2 + 2 );
+				u2c.fromArray( uv2s, i2 + 4 );
+
+			}
+
 			const dab = va.distanceToSquared( vb );
 			const dbc = vb.distanceToSquared( vc );
 			const dac = va.distanceToSquared( vc );
@@ -149,6 +221,8 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 					vm.lerpVectors( va, vb, 0.5 );
 					if ( hasNormals ) nm.lerpVectors( na, nb, 0.5 );
 					if ( hasColors ) cm.lerpColors( ca, cb, 0.5 );
+					if ( hasUVs ) um.lerpVectors( ua, ub, 0.5 );
+					if ( hasUV2s ) u2m.lerpVectors( u2a, u2b, 0.5 );
 
 					addTriangle( 0, 3, 2 );
 					addTriangle( 3, 1, 2 );
@@ -158,6 +232,8 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 					vm.lerpVectors( vb, vc, 0.5 );
 					if ( hasNormals ) nm.lerpVectors( nb, nc, 0.5 );
 					if ( hasColors ) cm.lerpColors( cb, cc, 0.5 );
+					if ( hasUVs ) um.lerpVectors( ub, uc, 0.5 );
+					if ( hasUV2s ) u2m.lerpVectors( u2b, u2c, 0.5 );
 
 					addTriangle( 0, 1, 3 );
 					addTriangle( 3, 2, 0 );
@@ -167,6 +243,8 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 					vm.lerpVectors( va, vc, 0.5 );
 					if ( hasNormals ) nm.lerpVectors( na, nc, 0.5 );
 					if ( hasColors ) cm.lerpColors( ca, cc, 0.5 );
+					if ( hasUVs ) um.lerpVectors( ua, uc, 0.5 );
+					if ( hasUV2s ) u2m.lerpVectors( u2a, u2c, 0.5 );
 
 					addTriangle( 0, 1, 3 );
 					addTriangle( 3, 1, 2 );
@@ -196,6 +274,18 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 	if ( hasColors ) {
 
 		geometry2.setAttribute( 'color', new THREE.Float32BufferAttribute( colors2, 3 ) );
+
+	}
+
+	if ( hasUVs ) {
+
+		geometry2.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs2, 2 ) );
+
+	}
+
+	if ( hasUV2s ) {
+
+		geometry2.setAttribute( 'uv2', new THREE.Float32BufferAttribute( uv2s2, 2 ) );
 
 	}
 
