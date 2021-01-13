@@ -1,17 +1,19 @@
-import { Vector3 } from './../math/Vector3';
-import { Color } from './../math/Color';
-import { Face3 } from './Face3';
-import { Vector2 } from './../math/Vector2';
-import { Vector4 } from './../math/Vector4';
-import { Box3 } from './../math/Box3';
-import { Sphere } from './../math/Sphere';
-import { Matrix4 } from './../math/Matrix4';
-import { BufferGeometry } from './BufferGeometry';
-import { Matrix } from './../math/Matrix3';
-import { Mesh } from './../objects/Mesh';
-import { Bone } from './../objects/Bone';
-import { AnimationClip } from './../animation/AnimationClip';
-import { EventDispatcher } from './EventDispatcher';
+import {
+	Vector3,
+	Color,
+	Face3,
+	Vector2,
+	Vector4,
+	Box3,
+	Sphere,
+	Matrix4,
+	BufferGeometry,
+	Matrix,
+	Mesh,
+	Bone,
+	AnimationClip,
+	EventDispatcher
+} from '../../../src/Three';
 
 /**
  * @deprecated Use {@link Face3} instead.
@@ -250,6 +252,8 @@ export class Geometry extends EventDispatcher {
 	setFromPoints( points: Array<Vector2> | Array<Vector3> ): this;
 
 	sortFacesByMaterialIndex(): void;
+
+	toBufferGeometry(): BufferGeometry;
 
 	toJSON(): any;
 
