@@ -11589,44 +11589,68 @@
 
 	function WebGLExtensions(gl) {
 		var extensions = {};
+
+		function getExtension(name) {
+			if (extensions[name] !== undefined) {
+				return extensions[name];
+			}
+
+			var extension;
+
+			switch (name) {
+				case 'WEBGL_depth_texture':
+					extension = gl.getExtension('WEBGL_depth_texture') || gl.getExtension('MOZ_WEBGL_depth_texture') || gl.getExtension('WEBKIT_WEBGL_depth_texture');
+					break;
+
+				case 'EXT_texture_filter_anisotropic':
+					extension = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('MOZ_EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
+					break;
+
+				case 'WEBGL_compressed_texture_s3tc':
+					extension = gl.getExtension('WEBGL_compressed_texture_s3tc') || gl.getExtension('MOZ_WEBGL_compressed_texture_s3tc') || gl.getExtension('WEBKIT_WEBGL_compressed_texture_s3tc');
+					break;
+
+				case 'WEBGL_compressed_texture_pvrtc':
+					extension = gl.getExtension('WEBGL_compressed_texture_pvrtc') || gl.getExtension('WEBKIT_WEBGL_compressed_texture_pvrtc');
+					break;
+
+				default:
+					extension = gl.getExtension(name);
+			}
+
+			extensions[name] = extension;
+			return extension;
+		}
+
 		return {
 			has: function has(name) {
-				if (extensions[name] !== undefined) {
-					return extensions[name] !== null;
+				return getExtension(name) !== null;
+			},
+			init: function init(capabilities) {
+				if (capabilities.isWebGL2) {
+					getExtension('EXT_color_buffer_float');
+				} else {
+					getExtension('WEBGL_depth_texture');
+					getExtension('OES_texture_float');
+					getExtension('OES_texture_half_float');
+					getExtension('OES_texture_half_float_linear');
+					getExtension('OES_standard_derivatives');
+					getExtension('OES_element_index_uint');
+					getExtension('OES_vertex_array_object');
+					getExtension('ANGLE_instanced_arrays');
 				}
 
-				var extension;
-
-				switch (name) {
-					case 'WEBGL_depth_texture':
-						extension = gl.getExtension('WEBGL_depth_texture') || gl.getExtension('MOZ_WEBGL_depth_texture') || gl.getExtension('WEBKIT_WEBGL_depth_texture');
-						break;
-
-					case 'EXT_texture_filter_anisotropic':
-						extension = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('MOZ_EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
-						break;
-
-					case 'WEBGL_compressed_texture_s3tc':
-						extension = gl.getExtension('WEBGL_compressed_texture_s3tc') || gl.getExtension('MOZ_WEBGL_compressed_texture_s3tc') || gl.getExtension('WEBKIT_WEBGL_compressed_texture_s3tc');
-						break;
-
-					case 'WEBGL_compressed_texture_pvrtc':
-						extension = gl.getExtension('WEBGL_compressed_texture_pvrtc') || gl.getExtension('WEBKIT_WEBGL_compressed_texture_pvrtc');
-						break;
-
-					default:
-						extension = gl.getExtension(name);
-				}
-
-				extensions[name] = extension;
-				return extension !== null;
+				getExtension('OES_texture_float_linear');
+				getExtension('EXT_color_buffer_half_float');
 			},
 			get: function get(name) {
-				if (!this.has(name)) {
+				var extension = getExtension(name);
+
+				if (extension === null) {
 					console.warn('THREE.WebGLRenderer: ' + name + ' extension not supported.');
 				}
 
-				return extensions[name];
+				return extension;
 			}
 		};
 	}
@@ -17448,22 +17472,7 @@
 		function initGLContext() {
 			extensions = new WebGLExtensions(_gl);
 			capabilities = new WebGLCapabilities(_gl, extensions, parameters);
-
-			if (capabilities.isWebGL2) {
-				extensions.get('EXT_color_buffer_float');
-			} else {
-				extensions.get('WEBGL_depth_texture');
-				extensions.get('OES_texture_float');
-				extensions.get('OES_texture_half_float');
-				extensions.get('OES_texture_half_float_linear');
-				extensions.get('OES_standard_derivatives');
-				extensions.get('OES_element_index_uint');
-				extensions.get('OES_vertex_array_object');
-				extensions.get('ANGLE_instanced_arrays');
-			}
-
-			extensions.get('OES_texture_float_linear');
-			extensions.get('EXT_color_buffer_half_float');
+			extensions.init(capabilities);
 			utils = new WebGLUtils(_gl, extensions, capabilities);
 			state = new WebGLState(_gl, extensions, capabilities);
 			state.scissor(_currentScissor.copy(_scissor).multiplyScalar(_pixelRatio).floor());
