@@ -276,25 +276,7 @@ function WebGLRenderer( parameters ) {
 
 		capabilities = new WebGLCapabilities( _gl, extensions, parameters );
 
-		if ( capabilities.isWebGL2 ) {
-
-			extensions.get( 'EXT_color_buffer_float' );
-
-		} else {
-
-			extensions.get( 'WEBGL_depth_texture' );
-			extensions.get( 'OES_texture_float' );
-			extensions.get( 'OES_texture_half_float' );
-			extensions.get( 'OES_texture_half_float_linear' );
-			extensions.get( 'OES_standard_derivatives' );
-			extensions.get( 'OES_element_index_uint' );
-			extensions.get( 'OES_vertex_array_object' );
-			extensions.get( 'ANGLE_instanced_arrays' );
-
-		}
-
-		extensions.get( 'OES_texture_float_linear' );
-		extensions.get( 'EXT_color_buffer_half_float' );
+		extensions.init( capabilities );
 
 		utils = new WebGLUtils( _gl, extensions, capabilities );
 
