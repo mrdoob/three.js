@@ -1,19 +1,12 @@
 import {
 	BackSide,
 	Box3,
-	BufferGeometry,
 	Color,
 	DoubleSide,
 	FrontSide,
 	Frustum,
-	Light,
-	Line,
-	LineSegments,
 	Matrix3,
 	Matrix4,
-	Mesh,
-	Points,
-	Sprite,
 	Vector2,
 	Vector3,
 	Vector4
@@ -368,18 +361,18 @@ var Projector = function () {
 
 		if ( object.visible === false ) return;
 
-		if ( object instanceof Light ) {
+		if ( object.isLight ) {
 
 			_renderData.lights.push( object );
 
-		} else if ( object instanceof Mesh || object instanceof Line || object instanceof Points ) {
+		} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
 			if ( object.material.visible === false ) return;
 			if ( object.frustumCulled === true && _frustum.intersectsObject( object ) === false ) return;
 
 			addObject( object );
 
-		} else if ( object instanceof Sprite ) {
+		} else if ( object.isSprite ) {
 
 			if ( object.material.visible === false ) return;
 			if ( object.frustumCulled === true && _frustum.intersectsSprite( object ) === false ) return;
@@ -459,9 +452,9 @@ var Projector = function () {
 
 			_vertexCount = 0;
 
-			if ( object instanceof Mesh ) {
+			if ( object.isMesh ) {
 
-				if ( geometry instanceof BufferGeometry ) {
+				if ( geometry.isBufferGeometry ) {
 
 					var material = object.material;
 
@@ -620,7 +613,7 @@ var Projector = function () {
 
 					}
 
-				} else if ( geometry instanceof Geometry ) {
+				} else if ( geometry.isGeometry ) {
 
 					var vertices = geometry.vertices;
 					var faces = geometry.faces;
@@ -751,11 +744,11 @@ var Projector = function () {
 
 				}
 
-			} else if ( object instanceof Line ) {
+			} else if ( object.isLine ) {
 
 				_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
 
-				if ( geometry instanceof BufferGeometry ) {
+				if ( geometry.isBufferGeometry ) {
 
 					var attributes = geometry.attributes;
 
@@ -793,7 +786,7 @@ var Projector = function () {
 
 						} else {
 
-							var step = object instanceof LineSegments ? 2 : 1;
+							var step = object.isLineSegments ? 2 : 1;
 
 							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i += step ) {
 
@@ -805,7 +798,7 @@ var Projector = function () {
 
 					}
 
-				} else if ( geometry instanceof Geometry ) {
+				} else if ( geometry.isGeometry ) {
 
 					var vertices = object.geometry.vertices;
 
@@ -814,7 +807,7 @@ var Projector = function () {
 					v1 = getNextVertexInPool();
 					v1.positionScreen.copy( vertices[ 0 ] ).applyMatrix4( _modelViewProjectionMatrix );
 
-					var step = object instanceof LineSegments ? 2 : 1;
+					var step = object.isLineSegments ? 2 : 1;
 
 					for ( var v = 1, vl = vertices.length; v < vl; v ++ ) {
 
@@ -860,11 +853,11 @@ var Projector = function () {
 
 				}
 
-			} else if ( object instanceof Points ) {
+			} else if ( object.isPoints ) {
 
 				_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
 
-				if ( geometry instanceof Geometry ) {
+				if ( geometry.isGeometry ) {
 
 					var vertices = object.geometry.vertices;
 
@@ -879,7 +872,7 @@ var Projector = function () {
 
 					}
 
-				} else if ( geometry instanceof BufferGeometry ) {
+				} else if ( geometry.isBufferGeometry ) {
 
 					var attributes = geometry.attributes;
 
@@ -900,7 +893,7 @@ var Projector = function () {
 
 				}
 
-			} else if ( object instanceof Sprite ) {
+			} else if ( object.isSprite ) {
 
 				object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 				_vector4.set( _modelMatrix.elements[ 12 ], _modelMatrix.elements[ 13 ], _modelMatrix.elements[ 14 ], 1 );

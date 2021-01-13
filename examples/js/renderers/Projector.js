@@ -347,18 +347,18 @@ THREE.Projector = function () {
 
 		if ( object.visible === false ) return;
 
-		if ( object instanceof THREE.Light ) {
+		if ( object.isLight ) {
 
 			_renderData.lights.push( object );
 
-		} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points ) {
+		} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
 			if ( object.material.visible === false ) return;
 			if ( object.frustumCulled === true && _frustum.intersectsObject( object ) === false ) return;
 
 			addObject( object );
 
-		} else if ( object instanceof THREE.Sprite ) {
+		} else if ( object.isSprite ) {
 
 			if ( object.material.visible === false ) return;
 			if ( object.frustumCulled === true && _frustum.intersectsSprite( object ) === false ) return;
@@ -438,9 +438,9 @@ THREE.Projector = function () {
 
 			_vertexCount = 0;
 
-			if ( object instanceof THREE.Mesh ) {
+			if ( object.isMesh ) {
 
-				if ( geometry instanceof THREE.BufferGeometry ) {
+				if ( geometry.isBufferGeometry ) {
 
 					var material = object.material;
 
@@ -599,7 +599,7 @@ THREE.Projector = function () {
 
 					}
 
-				} else if ( geometry instanceof THREE.Geometry ) {
+				} else if ( geometry.isGeometry ) {
 
 					var vertices = geometry.vertices;
 					var faces = geometry.faces;
@@ -730,11 +730,11 @@ THREE.Projector = function () {
 
 				}
 
-			} else if ( object instanceof THREE.Line ) {
+			} else if ( object.isLine ) {
 
 				_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
 
-				if ( geometry instanceof THREE.BufferGeometry ) {
+				if ( geometry.isBufferGeometry ) {
 
 					var attributes = geometry.attributes;
 
@@ -772,7 +772,7 @@ THREE.Projector = function () {
 
 						} else {
 
-							var step = object instanceof THREE.LineSegments ? 2 : 1;
+							var step = object.isLineSegments ? 2 : 1;
 
 							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i += step ) {
 
@@ -784,7 +784,7 @@ THREE.Projector = function () {
 
 					}
 
-				} else if ( geometry instanceof THREE.Geometry ) {
+				} else if ( geometry.isGeometry ) {
 
 					var vertices = object.geometry.vertices;
 
@@ -793,7 +793,7 @@ THREE.Projector = function () {
 					v1 = getNextVertexInPool();
 					v1.positionScreen.copy( vertices[ 0 ] ).applyMatrix4( _modelViewProjectionMatrix );
 
-					var step = object instanceof THREE.LineSegments ? 2 : 1;
+					var step = object.isLineSegments ? 2 : 1;
 
 					for ( var v = 1, vl = vertices.length; v < vl; v ++ ) {
 
@@ -839,11 +839,11 @@ THREE.Projector = function () {
 
 				}
 
-			} else if ( object instanceof THREE.Points ) {
+			} else if ( object.isPoints ) {
 
 				_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
 
-				if ( geometry instanceof THREE.Geometry ) {
+				if ( geometry.isGeometry ) {
 
 					var vertices = object.geometry.vertices;
 
@@ -858,7 +858,7 @@ THREE.Projector = function () {
 
 					}
 
-				} else if ( geometry instanceof THREE.BufferGeometry ) {
+				} else if ( geometry.isBufferGeometry ) {
 
 					var attributes = geometry.attributes;
 
@@ -879,7 +879,7 @@ THREE.Projector = function () {
 
 				}
 
-			} else if ( object instanceof THREE.Sprite ) {
+			} else if ( object.isSprite ) {
 
 				object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 				_vector4.set( _modelMatrix.elements[ 12 ], _modelMatrix.elements[ 13 ], _modelMatrix.elements[ 14 ], 1 );
