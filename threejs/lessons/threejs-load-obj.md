@@ -43,19 +43,19 @@ the hemispherical lighting example so I ended up with one
 related to adjusting the lights. I also removed the cube and sphere
 that were being added to the scene.
 
-From that the first thing we need to do is include the `OBJLoader2` loader in our script.
+From that the first thing we need to do is include the `OBJLoader` loader in our script.
 
 ```js
-import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
 ```
 
-Then to load the .OBJ file we create an instance of `OBJLoader2`,
+Then to load the .OBJ file we create an instance of `OBJLoader`,
 pass it the URL of our .OBJ file, and pass in a callback that adds
 the loaded model to our scene.
 
 ```js
 {
-  const objLoader = new OBJLoader2();
+  const objLoader = new OBJLoader();
   objLoader.load('resources/models/windmill/windmill.obj', (root) => {
     scene.add(root);
   });
@@ -140,26 +140,25 @@ file to.
 
 Now that we have the textures available we can load the .MTL file.
 
-First we need to include the `MTLLoader` and the `MtlObjBridge`;
+First we need to include the `MTLLoader`;
 
 ```js
 import * as THREE from './resources/three/r122/build/three.module.js';
 import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
-import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
 +import {MTLLoader} from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
-+import {MtlObjBridge} from './resources/threejs/r122/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
 ```
 
 Then we first load the .MTL file. When it's finished loading we add
-the just loaded materials on to the `OBJLoader2` itself via the `MtlObjBridge`
+the just loaded materials on to the `OBJLoader` itself via the `setMaterials`
 and then load the .OBJ file.
 
 ```js
 {
 +  const mtlLoader = new MTLLoader();
-+  mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
-+    const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-+    objLoader.addMaterials(materials);
++  mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) => {
++    mtl.preload();
++    objLoader.setMaterials(mtl);
     objLoader.load('resources/models/windmill/windmill.obj', (root) => {
       scene.add(root);
     });
@@ -184,9 +183,9 @@ head I can think of 3 ways to fix this.
 1. Loop over all the materials after loading them and set them all to double sided.
 
         const mtlLoader = new MTLLoader();
-        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
-          const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-          for (const material of Object.values(materials)) {
+        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) => {
+          mtl.preload();
+          for (const material of Object.values(mtl.materials)) {
             material.side = THREE.DoubleSide;
           }
           ...
@@ -203,19 +202,30 @@ head I can think of 3 ways to fix this.
    that one specifically 
 
         const mtlLoader = new MTLLoader();
-        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
-          const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-          materials.Material.side = THREE.DoubleSide;
+        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) => {
+          mtl.preload();
+          mtl.materials.Material.side = THREE.DoubleSide;
           ...
 
 3. Realizing that the .MTL file is limited we could just not use it
-   and instead create materials ourselves 
+   and instead create materials ourselves.
 
-        const materials = {
-          Material: new THREE.MeshPhongMaterial({...}),
-          windmill: new THREE.MeshPhongMaterial({...}),
-        };
-        objLoader.setMaterials(materials);
+   In this case we'd need to look up the `Mesh` object after
+   loading the obj file.
+
+        objLoader.load('resources/models/windmill/windmill.obj', (root) => {
+          const materials = {
+            Material: new THREE.MeshPhongMaterial({...}),
+            windmill: new THREE.MeshPhongMaterial({...}),
+          };
+          root.traverse(node => {
+            const material = materials[node.material?.name];
+            if (material) {
+              node.material = material;
+            }
+          })
+          scene.add(root);
+        });
 
 Which one you pick is up to you. 1 is easiest. 3 is most flexible.
 2 somewhere in between. For now I'll pick 2.
@@ -391,7 +401,7 @@ larger size.
 
 ```js
 {
-  const objLoader = new OBJLoader2();
+  const objLoader = new OBJLoader();
   objLoader.load('resources/models/windmill_2/windmill.obj', (root) => {
     scene.add(root);
 +    // compute the box that contains all the stuff
@@ -550,15 +560,15 @@ illum 2
 ```
 
 Now that the .MTL file points to some reasonable size textures we need to load it so we'll just do like we did above, first load the materials
-and then set them on the `OBJLoader2`
+and then set them on the `OBJLoader`
 
 ```js
 {
 +  const mtlLoader = new MTLLoader();
-+  mtlLoader.load('resources/models/windmill_2/windmill-fixed.mtl', (mtlParseResult) => {
-+    const objLoader = new OBJLoader2();
-+    const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-+    objLoader.addMaterials(materials);
++  mtlLoader.load('resources/models/windmill_2/windmill-fixed.mtl', (mtl) => {
++    mtl.preload();
++    const objLoader = new OBJLoader();
++    objLoader.setMaterials(mtl);
     objLoader.load('resources/models/windmill/windmill.obj', (root) => {
       root.updateMatrixWorld();
       scene.add(root);
@@ -675,5 +685,5 @@ This is one of the main reasons why .OBJ is not really a good format. If I was t
 is because it's simple and doesn't support many features it works more often than not. Especially if you're making something still like
 an architectural image and there's no need to animate anything it's not a bad way to get static props into a scene.
 
-Next up we'll try loading a gLTF scene. The gLTF format supports many more features.
+Next up we'll try [loading a gLTF scene](threejs-load-gltf.html). The gLTF format supports many more features.
 

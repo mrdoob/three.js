@@ -25,17 +25,17 @@ TOC: 加载 .OBJ 文件
 
 基于[光线文章](threejs-lights.html)中的定向光线（`DirectionalLight`）示例，结合半球光线（`HemisphereLight`）示例。相对于示例，我删除了所有与调整灯光相关的GUI内容，还删除了添加到场景中的立方体和球体。
 
-第一件要做的事就是将`OBJLoader2`添加到代码中。
+第一件要做的事就是将`OBJLoader`添加到代码中。
 
 ```js
-import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
 ```
 
-然后创建`OBJLoader2`的实例并通过URL加载我们的.OBJ文件，并在回调函数中将已加载完的模型添加到场景（scene）里。
+然后创建`OBJLoader`的实例并通过URL加载我们的.OBJ文件，并在回调函数中将已加载完的模型添加到场景（scene）里。
 
 ```js
 {
-  const objLoader = new OBJLoader2();
+  const objLoader = new OBJLoader();
   objLoader.load('resources/models/windmill/windmill.obj', (root) => {
     scene.add(root);
   });
@@ -106,24 +106,25 @@ map_Ns windmill_001_base_SPEC.jpg
 
 现在.MTL文件就能加载到这些纹理。
 
-首先要引用 `MTLLoader` 和 `MtlObjBridge`;
+首先要引用 `MTLLoader`;
 
 ```js
 import * as THREE from './resources/three/r122/build/three.module.js';
 import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
-import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
 +import {MTLLoader} from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
-+import {MtlObjBridge} from './resources/threejs/r122/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
 ```
 
-然后我们先加载.MTL文件，在它加载完材质后利用`MtlObjBridge`将材质传给`OBJLoader2`，再加载.OBJ文件。
+{{{warning msgId="badTranslation"}}}
+
+然后我们先加载.MTL文件，在它加载完材质后利用`MtlObjBridge`将材质传给`OBJLoader`，再加载.OBJ文件。
 
 ```js
 {
 +  const mtlLoader = new MTLLoader();
-+  mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
-+    const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-+    objLoader.addMaterials(materials);
++  mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) => {
++    mtl.preload();
++    objLoader.setMaterials(mtl);
     objLoader.load('resources/models/windmill/windmill.obj', (root) => {
       scene.add(root);
     });
@@ -145,9 +146,9 @@ import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoade
 1. 加载模型后，遍历所有材质，设置成双面。
 
         const mtlLoader = new MTLLoader();
-        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
-          const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-          for (const material of Object.values(materials)) {
+        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) => {
+          mtl.preload();
+          for (const material of Object.values(mtl.materials)) {
             material.side = THREE.DoubleSide;
           }
           ...
@@ -159,18 +160,26 @@ import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoade
    看到.MTL里有两个材质，一个是`"windmill"`另一个是`"Material"`。经过反复尝试，发现可以单独设置一个材质。
 
         const mtlLoader = new MTLLoader();
-        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
-          const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-          materials.Material.side = THREE.DoubleSide;
+        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) => {
+          mtl.preload();
+          mtl.materials.Material.side = THREE.DoubleSide;
           ...
 
 3. 在.MTL文件上无法解决，可以不使用它而使用自行创建的材质。
 
-        const materials = {
-          Material: new THREE.MeshPhongMaterial({...}),
-          windmill: new THREE.MeshPhongMaterial({...}),
-        };
-        objLoader.setMaterials(materials);
+        objLoader.load('resources/models/windmill/windmill.obj', (root) => {
+          const materials = {
+            Material: new THREE.MeshPhongMaterial({...}),
+            windmill: new THREE.MeshPhongMaterial({...}),
+          };
+          root.traverse(node => {
+            const material = materials[node.material?.name];
+            if (material) {
+              node.material = material;
+            }
+          })
+          scene.add(root);
+        });
 
 采用哪个方案取决于你。1是最简单，3是最灵活，2是两者之间，现在我选择2 。
 
@@ -315,7 +324,7 @@ function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
 
 ```js
 {
-  const objLoader = new OBJLoader2();
+  const objLoader = new OBJLoader();
   objLoader.load('resources/models/windmill_2/windmill.obj', (root) => {
     scene.add(root);
 +    // compute the box that contains all the stuff
@@ -445,15 +454,15 @@ illum 2
 +bump windmill_normal.jpg 
 ```
 
-现在。mtl文件指向一些合理大小的纹理，我们需要加载它，所以我们就像上面做的那样，首先加载材质，然后将它们设置在`OBJLoader2`上。
+现在。mtl文件指向一些合理大小的纹理，我们需要加载它，所以我们就像上面做的那样，首先加载材质，然后将它们设置在`OBJLoader`上。
 
 ```js
 {
 +  const mtlLoader = new MTLLoader();
-+  mtlLoader.load('resources/models/windmill_2/windmill-fixed.mtl', (mtlParseResult) => {
-+    const objLoader = new OBJLoader2();
-+    const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-+    objLoader.addMaterials(materials);
++  mtlLoader.load('resources/models/windmill_2/windmill-fixed.mtl', (mtl) => {
++    mtl.preload();
++    const objLoader = new OBJLoader();
++    objLoader.setMaterials(mtl);
     objLoader.load('resources/models/windmill/windmill.obj', (root) => {
       root.updateMatrixWorld();
       scene.add(root);

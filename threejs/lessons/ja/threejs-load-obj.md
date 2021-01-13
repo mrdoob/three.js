@@ -29,17 +29,17 @@ blendファイルをダウンロードし[Blender](https://blender.org)で読み
 [ライティングの記事](threejs-lights.html) にあるディレクショナルライティングの例から始めて、半球ライティングの例と組み合わせて `HemisphereLight` と `DirectionalLight` を1つ作る事にしました。その結果として `HemisphereLight` は1つ、`DirectionalLight` は1つになりました。
 また、ライトの調整に関連する全てのGUIを削除しました。シーンに追加していたキューブとスフィアも削除しました。
 
-まず最初に `OBJLoader2` のローダーをコードに含める必要があります。
+まず最初に `OBJLoader` のローダーをコードに含める必要があります。
 
 ```js
-import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
 ```
 
-次にOBJファイルをロードするために `OBJLoader2` のインスタンスを作成し、OBJファイルのURLを渡し、ロードされたモデルをシーンに追加するコールバックを渡します。
+次にOBJファイルをロードするために `OBJLoader` のインスタンスを作成し、OBJファイルのURLを渡し、ロードされたモデルをシーンに追加するコールバックを渡します。
 
 ```js
 {
-  const objLoader = new OBJLoader2();
+  const objLoader = new OBJLoader();
   objLoader.load('resources/models/windmill/windmill.obj', (root) => {
     scene.add(root);
   });
@@ -115,25 +115,24 @@ blenderで **File->External Data->Unpack All Into Files** を選択し、これ�
 <div class="threejs_center"><img style="width: 757px;" src="resources/images/windmill-exported-files-with-textures.png"></div>
 
 テクスチャを利用できるようになったのでMTLファイルをロードします。
-`MTLLoader` と `MtlObjBridge` をimportする必要があります。
+`MTLLoader` をimportする必要があります。
 
 ```js
 import * as THREE from './resources/three/r122/build/three.module.js';
 import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
-import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
 +import {MTLLoader} from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
-+import {MtlObjBridge} from './resources/threejs/r122/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
 ```
 
 まず、MTLファイルをロードします。
-読込後にロードしたマテリアルを `MtlObjBridge` を通して `OBJLoader2` をロードしOBJファイルをロードします。
+読込後にロードしたマテリアルを `OBJLoader`に設定して、`OBJLoader` でOBJファイルをロードします。
 
 ```js
 {
 +  const mtlLoader = new MTLLoader();
-+  mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
-+    const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-+    objLoader.addMaterials(materials);
++  mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) => {
++    mtl.preload();
++    objLoader.setMaterials(mtl);
     objLoader.load('resources/models/windmill/windmill.obj', (root) => {
       scene.add(root);
     });
@@ -156,9 +155,9 @@ MTLファイルを簡単に修正する方法はありません。
 1. マテリアルの読込後、全てのマテリアルをループさせて両面を適用する
 
         const mtlLoader = new MTLLoader();
-        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
-          const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-          for (const material of Object.values(materials)) {
+        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) => {
+          mtl.preload()
+          for (const material of Object.values(mtl.materials)) {
             material.side = THREE.DoubleSide;
           }
           ...
@@ -172,18 +171,26 @@ MTLファイルを簡単に修正する方法はありません。
   試行錯誤の結果、風車の羽根は `"Material"` というマテリアル名を使う事が分かりました。
 
         const mtlLoader = new MTLLoader();
-        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
-          const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-          materials.Material.side = THREE.DoubleSide;
+        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) => {
+          mtl.perload();
+          mtl.materials.Material.side = THREE.DoubleSide;
           ...
 
 3. MTLファイルには制限がある事に気付き、MTLファイルを使わず自前でマテリアルを作成する
 
-        const materials = {
-          Material: new THREE.MeshPhongMaterial({...}),
-          windmill: new THREE.MeshPhongMaterial({...}),
-        };
-        objLoader.setMaterials(materials);
+        objLoader.load('resources/models/windmill/windmill.obj', (root) => {
+          const materials = {
+            Material: new THREE.MeshPhongMaterial({...}),
+            windmill: new THREE.MeshPhongMaterial({...}),
+          };
+          root.traverse(node => {
+            const material = materials[node.material?.name];
+            if (material) {
+              node.material = material;
+            }
+          })
+          scene.add(root);
+        });
 
 どれを選ぶかはあなた次第です。
 1が1番簡単です。3が最も柔軟です。2はその中間で今回は2を選びます。
@@ -354,7 +361,7 @@ function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
 
 ```js
 {
-  const objLoader = new OBJLoader2();
+  const objLoader = new OBJLoader();
   objLoader.load('resources/models/windmill_2/windmill.obj', (root) => {
     scene.add(root);
 +    // compute the box that contains all the stuff
@@ -511,15 +518,15 @@ illum 2
 ```
 
 MTLファイルが適度なサイズのテクスチャを指しているので、それをロードする必要があります。
-上記で行ったようにまずマテリアルをロードしてから `OBJLoader2` に設定します。
+上記で行ったようにまずマテリアルをロードしてから `OBJLoader` に設定します。
 
 ```js
 {
 +  const mtlLoader = new MTLLoader();
-+  mtlLoader.load('resources/models/windmill_2/windmill-fixed.mtl', (mtlParseResult) => {
-+    const objLoader = new OBJLoader2();
-+    const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-+    objLoader.addMaterials(materials);
++  mtlLoader.load('resources/models/windmill_2/windmill-fixed.mtl', (mtl) => {
++    const objLoader = new OBJLoader();
++    mtl.preload();
++    objLoader.setMaterials(mtl);
     objLoader.load('resources/models/windmill/windmill.obj', (root) => {
       root.updateMatrixWorld();
       scene.add(root);

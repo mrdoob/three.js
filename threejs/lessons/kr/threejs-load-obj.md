@@ -38,19 +38,19 @@ Three.js로 프로젝트를 진행할 때, 3D 모델 파일을 불러와 사용�
 하나, `DirectionalLight` 하나가 있는 셈입니다. 또 GUI 관련 코드와 정육면체,
 구체 관련 코드도 지웁니다.
 
-다음으로 먼저 `OBJLoader2` 모듈을 스크립트에 로드합니다.
+다음으로 먼저 `OBJLoader` 모듈을 스크립트에 로드합니다.
 
 ```js
-import { OBJLoader2 } from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+import { OBJLoader } from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
 ```
 
-`OBJLoader2`의 인스턴스를 생성한 뒤 .OBJ 파일의 경로와 콜백 함수를 넘겨
+`OBJLoader`의 인스턴스를 생성한 뒤 .OBJ 파일의 경로와 콜백 함수를 넘겨
 `load` 메서드를 실행합니다. 그리고 콜백 함수에서 불러온 모델을 장면에
 추가합니다.
 
 ```js
 {
-  const objLoader = new OBJLoader2();
+  const objLoader = new OBJLoader();
   objLoader.load('resources/models/windmill/windmill.obj', (root) => {
     scene.add(root);
   });
@@ -130,25 +130,26 @@ map_Ns windmill_001_base_SPEC.jpg
 
 이제 .MTL 파일에서 사용할 텍스처를 생성했으니 .MTL 파일을 불러오도록 합시다.
 
-`MTLLoader`와 `MTLObjBridge` 모듈을 불러옵니다.
+`MTLLoader` 모듈을 불러옵니다.
 
 ```js
 import * as THREE from './resources/three/r122/build/three.module.js';
 import { OrbitControls } from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
-import { OBJLoader2 } from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+import { OBJLoader } from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
 +import { MTLLoader } from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
-+import { MtlObjBridge } from './resources/threejs/r122/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
 ```
 
-우선 .MTL 파일을 불러와 `MtlObjBridge`로 재질을 만듭니다. 그리고 `OBJLoader2`
+{{{warning msgId="badTranslation"}}}
+
+우선 .MTL 파일을 불러와 `MtlObjBridge`로 재질을 만듭니다. 그리고 `OBJLoader`
 인스턴스에 방금 만든 재질을 추가한 뒤 .OBJ 파일을 불러옵니다.
 
 ```js
 {
 +  const mtlLoader = new MTLLoader();
-+  mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
-+    const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-+    objLoader.addMaterials(materials);
++  mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) => {
++    mtl.preload();
++    objLoader.setMaterials(mtl);
     objLoader.load('resources/models/windmill/windmill.obj', (root) => {
       scene.add(root);
     });
@@ -171,9 +172,9 @@ import { OBJLoader2 } from './resources/threejs/r122/examples/jsm/loaders/OBJLoa
 1. 모든 재질을 불러온 뒤 반복문으로 처리한다.
 
         const mtlLoader = new MTLLoader();
-        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
-          const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-          for (const material of Object.values(materials)) {
+        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) => {
+          mtl.preload();
+          for (const material of Object.values(mtl.materials)) {
             material.side = THREE.DoubleSide;
           }
           ...
@@ -188,18 +189,26 @@ import { OBJLoader2 } from './resources/threejs/r122/examples/jsm/loaders/OBJLoa
   양면 속성을 설정할 수도 있을 겁니다.
 
         const mtlLoader = new MTLLoader();
-        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
-          const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-          materials.Material.side = THREE.DoubleSide;
+        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) => {
+          mtl.preload();
+          mtl.materials.Material.side = THREE.DoubleSide;
           ...
 
 3. .MTL 파일의 한계에 굴복하고 직접 재질을 만든다.
 
-        const materials = {
-          Material: new THREE.MeshPhongMaterial({...}),
-          windmill: new THREE.MeshPhongMaterial({...}),
-        };
-        objLoader.setMaterials(materials);
+        objLoader.load('resources/models/windmill/windmill.obj', (root) => {
+          const materials = {
+            Material: new THREE.MeshPhongMaterial({...}),
+            windmill: new THREE.MeshPhongMaterial({...}),
+          };
+          root.traverse(node => {
+            const material = materials[node.material?.name];
+            if (material) {
+              node.material = material;
+            }
+          })
+          scene.add(root);
+        });
 
 뭘 선택하든 그건 여러분의 선택입니다. 1번이 가장 간단하고, 3번이 가장
 확장성이 좋죠. 2번은 그 중간입니다. 지금은 2번 해결책을 사용하도록 하죠.
@@ -375,7 +384,7 @@ function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
 
 ```js
 {
-  const objLoader = new OBJLoader2();
+  const objLoader = new OBJLoader();
   objLoader.load('resources/models/windmill_2/windmill.obj', (root) => {
     scene.add(root);
 +    // 모든 요소를 포함하는 육면체를 계산합니다
@@ -524,15 +533,15 @@ illum 2
 ```
 
 텍스처의 용량을 최적화했으니 이제 불러올 일만 남았습니다. 먼저 아까 했던 것처럼
-재질을 불러와 `OBJLoader2`에 지정합니다.
+재질을 불러와 `OBJLoader`에 지정합니다.
 
 ```js
 {
 +  const mtlLoader = new MTLLoader();
-+  mtlLoader.load('resources/models/windmill_2/windmill-fixed.mtl', (mtlParseResult) => {
-+    const objLoader = new OBJLoader2();
-+    const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-+    objLoader.addMaterials(materials);
++  mtlLoader.load('resources/models/windmill_2/windmill-fixed.mtl', (mtl) => {
++    mtl.preload();
++    const objLoader = new OBJLoader();
++    objLoader.setMaterials(mtl);
     objLoader.load('resources/models/windmill/windmill.obj', (root) => {
       root.updateMatrixWorld();
       scene.add(root);

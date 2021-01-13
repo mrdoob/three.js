@@ -18,6 +18,11 @@ table {
     margin-bottom: 1em;
 }
 
+.warning {
+  padding: 1em;
+  background: red;
+}
+
 .footnote {
   font-size: smaller;
   vertical-align: baseline;
@@ -544,6 +549,9 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
   }
   a {
     color: #56d3fd;
+  }
+  .warning {
+    background: darkred;
   }
   pre.prettyprint, code.prettyprint, .dos {
     box-shadow: 10px 10px 0px #292929;

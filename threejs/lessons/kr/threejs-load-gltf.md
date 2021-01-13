@@ -71,10 +71,11 @@ glTF는 특정 목적으로 고안되었기에 대부분의 경우 glTF 파일�
 아래의 기존 코드를
 
 ```js
-const objLoader = new OBJLoader2();
-objLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', null, (materials) => {
-  materials.Material.side = THREE.DoubleSide;
-  objLoader.setMaterials(materials);
+const mtlLoader = new MTLLoader();
+mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) => {
+  mtl.preload();
+  mtl.materials.Material.side = THREE.DoubleSide;
+  objLoader.setMaterials(mtl);
   objLoader.load('resources/models/windmill/windmill.obj', (event) => {
     const root = event.detail.loaderRootNode;
     scene.add(root);
@@ -98,12 +99,12 @@ objLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', null, (materia
 
 자동으로 카메라의 시야를 조정하는 코드는 그대로 두었습니다.
 
-모듈이 바뀌었으니 import 문도 변경해야 합니다. `OBJLoader2`를 제거하고 `GLTFLoader`를
+모듈이 바뀌었으니 import 문도 변경해야 합니다. `OBJLoader`를 제거하고 `GLTFLoader`를
 추가합니다.
 
 ```html
 -import { LoaderSupport } from './resources/threejs/r122/examples/jsm/loaders/LoaderSupport.js';
--import { OBJLoader2 } from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+-import { OBJLoader } from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
 -import { MTLLoader } from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
 +import { GLTFLoader } from './resources/threejs/r122/examples/jsm/loaders/GLTFLoader.js';
 ```

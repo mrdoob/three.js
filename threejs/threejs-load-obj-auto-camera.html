@@ -23,7 +23,7 @@
 <script type="module">
 import * as THREE from './resources/threejs/r122/build/three.module.js';
 import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
-import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -105,7 +105,7 @@ function main() {
   }
 
   {
-    const objLoader = new OBJLoader2();
+    const objLoader = new OBJLoader();
     objLoader.load('resources/models/windmill_2/windmill.obj', (root) => {
       scene.add(root);
       // compute the box that contains all the stuff

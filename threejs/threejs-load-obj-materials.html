@@ -23,9 +23,8 @@
 <script type="module">
 import * as THREE from './resources/threejs/r122/build/three.module.js';
 import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
-import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
 import {MTLLoader} from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
-import {MtlObjBridge} from './resources/threejs/r122/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -85,10 +84,10 @@ function main() {
 
   {
     const mtlLoader = new MTLLoader();
-    mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
-      const objLoader = new OBJLoader2();
-      const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
-      objLoader.addMaterials(materials);
+    mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) => {
+      mtl.preload();
+      const objLoader = new OBJLoader();
+      objLoader.setMaterials(mtl);
       objLoader.load('resources/models/windmill/windmill.obj', (root) => {
         scene.add(root);
       });

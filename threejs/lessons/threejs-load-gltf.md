@@ -72,10 +72,11 @@ for loading .OBJ and replaced it with code for loading .GLTF
 The old .OBJ code was
 
 ```js
-const objLoader = new OBJLoader2();
-objLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', null, (materials) => {
-  materials.Material.side = THREE.DoubleSide;
-  objLoader.setMaterials(materials);
+const mtlLoader = new MTLLoader();
+mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) => {
+  mtl.preload();
+  mtl.materials.Material.side = THREE.DoubleSide;
+  objLoader.setMaterials(mtl);
   objLoader.load('resources/models/windmill/windmill.obj', (event) => {
     const root = event.detail.loaderRootNode;
     scene.add(root);
@@ -99,11 +100,11 @@ The new .GLTF code is
 
 I kept the auto framing code as before
 
-We also need to include the `GLTFLoader` and we can get rid of the `OBJLoader2`.
+We also need to include the `GLTFLoader` and we can get rid of the `OBJLoader`.
 
 ```html
 -import {LoaderSupport} from './resources/threejs/r122/examples/jsm/loaders/LoaderSupport.js';
--import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+-import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
 -import {MTLLoader} from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
 +import {GLTFLoader} from './resources/threejs/r122/examples/jsm/loaders/GLTFLoader.js';
 ```
