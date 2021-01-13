@@ -4,9 +4,6 @@ import { Sphere } from './../math/Sphere';
 import { Matrix4 } from './../math/Matrix4';
 import { Vector2 } from './../math/Vector2';
 import { Vector3 } from './../math/Vector3';
-import { Object3D } from './Object3D';
-import { Geometry } from './Geometry';
-import { DirectGeometry } from './DirectGeometry';
 import { EventDispatcher } from './EventDispatcher';
 import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
 
@@ -119,13 +116,7 @@ export class BufferGeometry extends EventDispatcher {
 
 	center(): BufferGeometry;
 
-	setFromObject( object: Object3D ): BufferGeometry;
 	setFromPoints( points: Vector3[] | Vector2[] ): BufferGeometry;
-	updateFromObject( object: Object3D ): void;
-
-	fromGeometry( geometry: Geometry, settings?: any ): BufferGeometry;
-
-	fromDirectGeometry( geometry: DirectGeometry ): BufferGeometry;
 
 	/**
 	 * Computes bounding box of the geometry, updating Geometry.boundingBox attribute.

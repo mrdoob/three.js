@@ -17,7 +17,6 @@ import { Material } from './../materials/Material';
 import { ToneMapping, ShadowMapType, CullFace, TextureEncoding } from '../constants';
 import { WebXRManager } from '../renderers/webxr/WebXRManager';
 import { RenderTarget } from './webgl/WebGLRenderLists';
-import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 import { Texture } from '../textures/Texture';
 import { XRAnimationLoopCallback } from './webxr/WebXR';
@@ -334,7 +333,7 @@ export class WebGLRenderer implements Renderer {
 	renderBufferDirect(
 		camera: Camera,
 		scene: Scene,
-		geometry: Geometry | BufferGeometry,
+		geometry: BufferGeometry,
 		material: Material,
 		object: Object3D,
 		geometryGroup: any

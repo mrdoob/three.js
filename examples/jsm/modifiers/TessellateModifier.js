@@ -2,7 +2,6 @@ import {
 	BufferGeometry,
 	Color,
 	Float32BufferAttribute,
-	Geometry,
 	Vector2,
 	Vector3
 } from '../../../build/three.module.js';
