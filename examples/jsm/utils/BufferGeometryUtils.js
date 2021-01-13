@@ -1,6 +1,7 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
+	Float32BufferAttribute,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
 	TriangleFanDrawMode,
@@ -820,17 +821,17 @@ var BufferGeometryUtils = {
 
 		}
 
-		var _vA = new THREE.Vector3();
-		var _vB = new THREE.Vector3();
-		var _vC = new THREE.Vector3();
+		var _vA = new Vector3();
+		var _vB = new Vector3();
+		var _vC = new Vector3();
 
-		var _tempA = new THREE.Vector3();
-		var _tempB = new THREE.Vector3();
-		var _tempC = new THREE.Vector3();
+		var _tempA = new Vector3();
+		var _tempB = new Vector3();
+		var _tempC = new Vector3();
 
-		var _morphA = new THREE.Vector3();
-		var _morphB = new THREE.Vector3();
-		var _morphC = new THREE.Vector3();
+		var _morphA = new Vector3();
+		var _morphB = new Vector3();
+		var _morphC = new Vector3();
 
 		function _calculateMorphedAttributeData(
 			object,
@@ -1089,8 +1090,8 @@ var BufferGeometryUtils = {
 
 		}
 
-		var morphedPositionAttribute = new THREE.Float32BufferAttribute( modifiedPosition, 3 );
-		var morphedNormalAttribute = new THREE.Float32BufferAttribute( modifiedNormal, 3 );
+		var morphedPositionAttribute = new Float32BufferAttribute( modifiedPosition, 3 );
+		var morphedNormalAttribute = new Float32BufferAttribute( modifiedNormal, 3 );
 
 		return {
 
