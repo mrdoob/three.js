@@ -120,7 +120,6 @@ var files = [
 
 	{ path: 'modifiers/EdgeSplitModifier.js', dependencies: [ { name: 'BufferGeometryUtils', path: 'utils/BufferGeometryUtils.js' } ], ignoreList: [ 'Geometry' ] },
 	{ path: 'modifiers/SimplifyModifier.js', dependencies: [ { name: 'BufferGeometryUtils', path: 'utils/BufferGeometryUtils.js' } ], ignoreList: [] },
-	{ path: 'modifiers/SubdivisionModifier.js', dependencies: [], ignoreList: [] },
 	{ path: 'modifiers/TessellateModifier.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'objects/Lensflare.js', dependencies: [], ignoreList: [] },
