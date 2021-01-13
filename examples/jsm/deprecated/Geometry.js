@@ -1491,6 +1491,50 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 } );
 
+Geometry.createBufferGeometryFromObject = function ( object ) {
+
+	let buffergeometry = new BufferGeometry();
+
+	const geometry = object.geometry;
+
+	if ( object.isPoints || object.isLine ) {
+
+		const positions = new Float32BufferAttribute( geometry.vertices.length * 3, 3 );
+		const colors = new Float32BufferAttribute( geometry.colors.length * 3, 3 );
+
+		buffergeometry.setAttribute( 'position', positions.copyVector3sArray( geometry.vertices ) );
+		buffergeometry.setAttribute( 'color', colors.copyColorsArray( geometry.colors ) );
+
+		if ( geometry.lineDistances && geometry.lineDistances.length === geometry.vertices.length ) {
+
+			const lineDistances = new Float32BufferAttribute( geometry.lineDistances.length, 1 );
+
+			buffergeometry.setAttribute( 'lineDistance', lineDistances.copyArray( geometry.lineDistances ) );
+
+		}
+
+		if ( geometry.boundingSphere !== null ) {
+
+			buffergeometry.boundingSphere = geometry.boundingSphere.clone();
+
+		}
+
+		if ( geometry.boundingBox !== null ) {
+
+			buffergeometry.boundingBox = geometry.boundingBox.clone();
+
+		}
+
+	} else if ( object.isMesh ) {
+
+		buffergeometry = geometry.toBufferGeometry();
+
+	}
+
+	return buffergeometry;
+
+};
+
 class DirectGeometry {
 
 	constructor() {

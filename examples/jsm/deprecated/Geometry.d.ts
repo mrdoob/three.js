@@ -12,7 +12,8 @@ import {
 	Mesh,
 	Bone,
 	AnimationClip,
-	EventDispatcher
+	EventDispatcher,
+	Object3D
 } from '../../../src/Three';
 
 /**
@@ -254,6 +255,8 @@ export class Geometry extends EventDispatcher {
 	sortFacesByMaterialIndex(): void;
 
 	toBufferGeometry(): BufferGeometry;
+
+	static createBufferGeometryFromObject( object: Object3D ): BufferGeometry;
 
 	toJSON(): any;
 
