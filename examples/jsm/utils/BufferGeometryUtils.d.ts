@@ -2,7 +2,6 @@ import { BufferAttribute, BufferGeometry, InterleavedBufferAttribute, TrianglesD
 
 export namespace BufferGeometryUtils {
 	export function mergeBufferGeometries( geometries: BufferGeometry[], useGroups?: boolean ): BufferGeometry;
-	export function computeTangents( geometry: BufferGeometry ): null;
 	export function mergeBufferAttributes( attributes: BufferAttribute[] ): BufferAttribute;
 	export function interleaveAttributes( attributes: BufferAttribute[] ): InterleavedBufferAttribute;
 	export function estimateBytesUsed( geometry: BufferGeometry ): number;
