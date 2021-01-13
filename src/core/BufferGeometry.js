@@ -733,12 +733,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
-	computeFaceNormals: function () {
-
-		// backwards compatibility
-
-	},
-
 	computeVertexNormals: function () {
 
 		const index = this.index;
@@ -926,7 +920,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( this.index === null ) {
 
-			console.warn( 'THREE.BufferGeometry.toNonIndexed(): Geometry is already non-indexed.' );
+			console.warn( 'THREE.BufferGeometry.toNonIndexed(): BufferGeometry is already non-indexed.' );
 			return this;
 
 		}
