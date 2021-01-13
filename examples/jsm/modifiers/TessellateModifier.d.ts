@@ -1,5 +1,4 @@
 import {
-	Geometry,
 	BufferGeometry
 } from '../../../src/Three';
 
