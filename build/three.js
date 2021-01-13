@@ -24854,7 +24854,7 @@
 				var time = times[i];
 				var timeNext = times[i + 1]; // remove adjacent keyframes scheduled at the same time
 
-				if (time !== timeNext && (i !== 1 || time !== time[0])) {
+				if (time !== timeNext && (i !== 1 || time !== times[0])) {
 					if (!smoothInterpolation) {
 						// remove unnecessary keyframes same as their neighbors
 						var offset = i * stride,
