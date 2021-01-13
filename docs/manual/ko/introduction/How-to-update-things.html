@@ -35,7 +35,7 @@ object.updateMatrix();
 		<div>
 			<p>
 				BufferGeometries는 [page:BufferAttribute buffers]에 다양한 정보(꼭짓점 위치, 면 순서, 법선, 색깔,
-				UV, 모든 커스텀 속성들)를 저장합니다. - 이는  
+				UV, 모든 커스텀 속성들)를 저장합니다. - 이는
 				[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays typed arrays]라는 의미입니다.
 				이는 기본 Geometries보다 빠르게 작동하지만, 그 대신 작업하기가 더 어렵습니다.
 			</p>
@@ -45,7 +45,7 @@ object.updateMatrix();
 				그 대신에 buffers의 내용을 변경할 수 있습니다.
 			</p>
 			<p>
-				이는 곧 만약 BufferGeometry의 속성이 증가할 것이라고 예측이 된다면, 예를 들어 꼭짓점의 갯수라면, 
+				이는 곧 만약 BufferGeometry의 속성이 증가할 것이라고 예측이 된다면, 예를 들어 꼭짓점의 갯수라면,
 				만들어질 수 있는 새로운 꼭짓점들을 담을 수 있는 충분한 buffer를 미리 준비해 놓아야 합니다.
 				물론 이는 당신이 사용할 BufferGeometry의 상한치가 있을 것이라는 뜻이기도 합니다 - 효율적으로 무한대로 확장되는 BufferGeometry를 만드는 방법은 없습니다.
 			</p>
@@ -108,7 +108,7 @@ line.geometry.attributes.position.needsUpdate = true; // required after the firs
 			</code>
 
 			<p>
-				첫 렌더링 이후에 position 데이터 수치를 변경한다면, bounding volumes를 재계산해서 
+				첫 렌더링 이후에 position 데이터 수치를 변경한다면, bounding volumes를 재계산해서
 				다른 엔진의 절두체 컬링 혹은 헬퍼같은 특성들이 적절히 작동하도록 해야합니다.
 			</p>
 			<code>
@@ -126,36 +126,6 @@ line.geometry.computeBoundingSphere();
 				[example:webgl_custom_attributes WebGL / custom / attributes]<br />
 				[example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
 			</p>
-
-		</div>
-
-		<h2>Geometry</h2>
-		<div>
-			<p>
-				아래의 플래그는 다양한 geometry 속성의 업데이트를 제어합니다. 업데이트가 필요한 속성의 플래그만 사용한다면 업데이트에 자원이 비효율적으로 사용될 것입니다. 
-				한 번 buffers가 변경되면, 이 플래그들은 자동으로 false로 리셋될 것입니다. buffers의 업데이트 상태를 유지하고 싶으면 항상 true값으로 설정해주어야 합니다.
-				이 점은 [page:Geometry]에만 적용되고 [page:BufferGeometry]에는 적용되지 않는다는 점도 주의해주세요.
-			</p>
-			<code>
-const geometry = new THREE.Geometry();
-geometry.verticesNeedUpdate = true;
-geometry.elementsNeedUpdate = true;
-geometry.morphTargetsNeedUpdate = true;
-geometry.uvsNeedUpdate = true;
-geometry.normalsNeedUpdate = true;
-geometry.colorsNeedUpdate = true;
-geometry.tangentsNeedUpdate = true;
-			</code>
-
-			<p>
-				[link:https://github.com/mrdoob/three.js/releases/tag/r66 r66] 이전 버전에서는 meshes
-				에 추가적으로 <em>dynamic</em> 플래그가 true여야 합니다. (내부 typed arrays 유지를 위해):
-			</p>
-
-			<code>
-// removed after r66
-geometry.dynamic = true;
-			</code>
 
 		</div>
 
