@@ -1,12 +1,12 @@
 import {
 	BackSide,
-	BoxBufferGeometry,
+	BoxGeometry,
 	BufferAttribute,
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
-	ConeBufferGeometry,
-	CylinderBufferGeometry,
+	ConeGeometry,
+	CylinderGeometry,
 	DataTexture,
 	DoubleSide,
 	FileLoader,
@@ -29,7 +29,7 @@ import {
 	RepeatWrapping,
 	Scene,
 	ShapeUtils,
-	SphereBufferGeometry,
+	SphereGeometry,
 	TextureLoader,
 	Vector2,
 	Vector3
@@ -906,7 +906,7 @@ var VRMLLoader = ( function () {
 
 				if ( skyColor ) {
 
-					var skyGeometry = new SphereBufferGeometry( radius, 32, 16 );
+					var skyGeometry = new SphereGeometry( radius, 32, 16 );
 					var skyMaterial = new MeshBasicMaterial( { fog: false, side: BackSide, depthWrite: false, depthTest: false } );
 
 					if ( skyColor.length > 3 ) {
@@ -931,7 +931,7 @@ var VRMLLoader = ( function () {
 
 					if ( groundColor.length > 0 ) {
 
-						var groundGeometry = new SphereBufferGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
+						var groundGeometry = new SphereGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
 						var groundMaterial = new MeshBasicMaterial( { fog: false, side: BackSide, vertexColors: true, depthWrite: false, depthTest: false } );
 
 						paintFaces( groundGeometry, radius, groundAngle, toColorArray( groundColor ), false );
@@ -2012,7 +2012,7 @@ var VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new BoxBufferGeometry( size.x, size.y, size.z );
+				var geometry = new BoxGeometry( size.x, size.y, size.z );
 
 				return geometry;
 
@@ -2056,7 +2056,7 @@ var VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new ConeBufferGeometry( radius, height, 16, 1, openEnded );
+				var geometry = new ConeGeometry( radius, height, 16, 1, openEnded );
 
 				return geometry;
 
@@ -2104,7 +2104,7 @@ var VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new CylinderBufferGeometry( radius, radius, height, 16, 1 );
+				var geometry = new CylinderGeometry( radius, radius, height, 16, 1 );
 
 				return geometry;
 
@@ -2136,7 +2136,7 @@ var VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new SphereBufferGeometry( radius, 16, 16 );
+				var geometry = new SphereGeometry( radius, 16, 16 );
 
 				return geometry;
 

@@ -68,7 +68,7 @@ function GeometryParametersPanel( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.TorusBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.TorusGeometry(
 			radius.getValue(),
 			tube.getValue(),
 			radialSegments.getValue(),

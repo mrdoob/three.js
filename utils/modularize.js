@@ -47,7 +47,7 @@ var files = [
 	{ path: 'geometries/DecalGeometry.js', dependencies: [], ignoreList: [ 'Geometry' ] },
 	{ path: 'geometries/LightningStrike.js', dependencies: [ { name: 'SimplexNoise', path: 'math/SimplexNoise.js' } ], ignoreList: [ 'Mesh' ] },
 	{ path: 'geometries/ParametricGeometries.js', dependencies: [], ignoreList: [] },
-	{ path: 'geometries/TeapotBufferGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/TeapotGeometry.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'interactive/SelectionBox.js', dependencies: [], ignoreList: [] },
 	{ path: 'interactive/SelectionHelper.js', dependencies: [], ignoreList: [] },
@@ -118,9 +118,8 @@ var files = [
 	{ path: 'misc/Volume.js', dependencies: [ { name: 'VolumeSlice', path: 'misc/VolumeSlice.js' } ], ignoreList: [] },
 	{ path: 'misc/VolumeSlice.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'modifiers/EdgeSplitModifier.js', dependencies: [ { name: 'BufferGeometryUtils', path: 'utils/BufferGeometryUtils.js' } ], ignoreList: [] },
-	{ path: 'modifiers/SimplifyModifier.js', dependencies: [], ignoreList: [] },
-	{ path: 'modifiers/SubdivisionModifier.js', dependencies: [], ignoreList: [] },
+	{ path: 'modifiers/EdgeSplitModifier.js', dependencies: [ { name: 'BufferGeometryUtils', path: 'utils/BufferGeometryUtils.js' } ], ignoreList: [ 'Geometry' ] },
+	{ path: 'modifiers/SimplifyModifier.js', dependencies: [ { name: 'BufferGeometryUtils', path: 'utils/BufferGeometryUtils.js' } ], ignoreList: [] },
 	{ path: 'modifiers/TessellateModifier.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'objects/Lensflare.js', dependencies: [], ignoreList: [] },
@@ -221,7 +220,7 @@ var files = [
 	{ path: 'utils/SceneUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/ShadowMapViewer.js', dependencies: [ { name: 'UnpackDepthRGBAShader', path: 'shaders/UnpackDepthRGBAShader.js' } ], ignoreList: [] },
 	{ path: 'utils/SkeletonUtils.js', dependencies: [], ignoreList: [] },
-	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereBufferGeometry' ] },
+	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereGeometry' ] },
 
 	{ path: 'WebGL.js', dependencies: [], ignoreList: [] },
 ];

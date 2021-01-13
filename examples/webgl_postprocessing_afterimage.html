@@ -46,7 +46,7 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1, 1000 );
 
-				const geometry = new THREE.BoxBufferGeometry( 150, 150, 150, 2, 2, 2 );
+				const geometry = new THREE.BoxGeometry( 150, 150, 150, 2, 2, 2 );
 				const material = new THREE.MeshNormalMaterial();
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );

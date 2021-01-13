@@ -8,7 +8,7 @@ THREE.CubeTexturePass = function ( camera, envMap, opacity ) {
 
 	this.cubeShader = THREE.ShaderLib[ 'cube' ];
 	this.cubeMesh = new THREE.Mesh(
-		new THREE.BoxBufferGeometry( 10, 10, 10 ),
+		new THREE.BoxGeometry( 10, 10, 10 ),
 		new THREE.ShaderMaterial( {
 			uniforms: this.cubeShader.uniforms,
 			vertexShader: this.cubeShader.vertexShader,

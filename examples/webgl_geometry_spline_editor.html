@@ -44,7 +44,7 @@
 			const onUpPosition = new THREE.Vector2();
 			const onDownPosition = new THREE.Vector2();
 
-			const geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+			const geometry = new THREE.BoxGeometry( 20, 20, 20 );
 			let transformControl;
 
 			const ARC_SEGMENTS = 200;
@@ -87,7 +87,7 @@
 				light.shadow.mapSize.height = 1024;
 				scene.add( light );
 
-				const planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
+				const planeGeometry = new THREE.PlaneGeometry( 2000, 2000 );
 				planeGeometry.rotateX( - Math.PI / 2 );
 				const planeMaterial = new THREE.ShadowMaterial( { opacity: 0.2 } );
 

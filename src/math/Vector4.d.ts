@@ -107,6 +107,8 @@ export class Vector4 implements Vector {
 	 */
 	subVectors( a: Vector4, b: Vector4 ): this;
 
+	multiply( v: Vector4 ): this;
+
 	/**
 	 * Multiplies this vector by scalar s.
 	 */
@@ -164,9 +166,9 @@ export class Vector4 implements Vector {
 	/**
 	 * Computes the Manhattan length of this vector.
 	 *
-	 * @return {number}
+	 * see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
 	 *
-	 * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
+	 * @return {number}
 	 */
 	manhattanLength(): number;
 

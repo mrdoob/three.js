@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { TetrahedronGeometry } from '../../../../src/geometries/TetrahedronGeometry';
+import { TetrahedronGeometry, TetrahedronBufferGeometry } from '../../../../src/geometries/TetrahedronGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -18,7 +18,8 @@ export default QUnit.module( 'Geometries', () => {
 			geometries = [
 				new TetrahedronGeometry(),
 				new TetrahedronGeometry( parameters.radius ),
-				new TetrahedronGeometry( parameters.radius, parameters.detail )
+				new TetrahedronGeometry( parameters.radius, parameters.detail ),
+				new TetrahedronBufferGeometry()
 			];
 
 		} );

@@ -1,6 +1,6 @@
 import {
 	BackSide,
-	BoxBufferGeometry,
+	BoxGeometry,
 	Mesh,
 	ShaderMaterial,
 	UniformsUtils,
@@ -34,7 +34,7 @@ var Sky = function () {
 		depthWrite: false
 	} );
 
-	Mesh.call( this, new BoxBufferGeometry( 1, 1, 1 ), material );
+	Mesh.call( this, new BoxGeometry( 1, 1, 1 ), material );
 
 };
 

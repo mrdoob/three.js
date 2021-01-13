@@ -270,6 +270,36 @@
 	var GLSL1 = '100';
 	var GLSL3 = '300 es';
 
+	function _defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];
+			descriptor.enumerable = descriptor.enumerable || false;
+			descriptor.configurable = true;
+			if ("value" in descriptor) descriptor.writable = true;
+			Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}
+
+	function _createClass(Constructor, protoProps, staticProps) {
+		if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+		if (staticProps) _defineProperties(Constructor, staticProps);
+		return Constructor;
+	}
+
+	function _inheritsLoose(subClass, superClass) {
+		subClass.prototype = Object.create(superClass.prototype);
+		subClass.prototype.constructor = subClass;
+		subClass.__proto__ = superClass;
+	}
+
+	function _assertThisInitialized(self) {
+		if (self === void 0) {
+			throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+		}
+
+		return self;
+	}
+
 	/**
 	 * https://github.com/mrdoob/eventdispatcher.js/
 	 */
@@ -452,36 +482,6 @@
 			}
 		}
 	};
-
-	function _defineProperties(target, props) {
-		for (var i = 0; i < props.length; i++) {
-			var descriptor = props[i];
-			descriptor.enumerable = descriptor.enumerable || false;
-			descriptor.configurable = true;
-			if ("value" in descriptor) descriptor.writable = true;
-			Object.defineProperty(target, descriptor.key, descriptor);
-		}
-	}
-
-	function _createClass(Constructor, protoProps, staticProps) {
-		if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-		if (staticProps) _defineProperties(Constructor, staticProps);
-		return Constructor;
-	}
-
-	function _inheritsLoose(subClass, superClass) {
-		subClass.prototype = Object.create(superClass.prototype);
-		subClass.prototype.constructor = subClass;
-		subClass.__proto__ = superClass;
-	}
-
-	function _assertThisInitialized(self) {
-		if (self === void 0) {
-			throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-		}
-
-		return self;
-	}
 
 	var Vector2 = /*#__PURE__*/function () {
 		function Vector2(x, y) {
@@ -1637,6 +1637,14 @@
 			return this;
 		};
 
+		_proto.multiply = function multiply(v) {
+			this.x *= v.x;
+			this.y *= v.y;
+			this.z *= v.z;
+			this.w *= v.w;
+			return this;
+		};
+
 		_proto.multiplyScalar = function multiplyScalar(scalar) {
 			this.x *= scalar;
 			this.y *= scalar;
@@ -1969,28 +1977,37 @@
 	 * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
 	*/
 
-	function WebGLRenderTarget(width, height, options) {
-		this.width = width;
-		this.height = height;
-		this.scissor = new Vector4(0, 0, width, height);
-		this.scissorTest = false;
-		this.viewport = new Vector4(0, 0, width, height);
-		options = options || {};
-		this.texture = new Texture(undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding);
-		this.texture.image = {};
-		this.texture.image.width = width;
-		this.texture.image.height = height;
-		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
-		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
-		this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
-		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
-		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
-	}
+	var WebGLRenderTarget = /*#__PURE__*/function (_EventDispatcher) {
+		_inheritsLoose(WebGLRenderTarget, _EventDispatcher);
 
-	WebGLRenderTarget.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
-		constructor: WebGLRenderTarget,
-		isWebGLRenderTarget: true,
-		setSize: function setSize(width, height) {
+		function WebGLRenderTarget(width, height, options) {
+			var _this;
+
+			_this = _EventDispatcher.call(this) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isWebGLRenderTarget', {
+				value: true
+			});
+			_this.width = width;
+			_this.height = height;
+			_this.scissor = new Vector4(0, 0, width, height);
+			_this.scissorTest = false;
+			_this.viewport = new Vector4(0, 0, width, height);
+			options = options || {};
+			_this.texture = new Texture(undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding);
+			_this.texture.image = {};
+			_this.texture.image.width = width;
+			_this.texture.image.height = height;
+			_this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
+			_this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
+			_this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
+			_this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
+			_this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
+			return _this;
+		}
+
+		var _proto = WebGLRenderTarget.prototype;
+
+		_proto.setSize = function setSize(width, height) {
 			if (this.width !== width || this.height !== height) {
 				this.width = width;
 				this.height = height;
@@ -2001,11 +2018,13 @@
 
 			this.viewport.set(0, 0, width, height);
 			this.scissor.set(0, 0, width, height);
-		},
-		clone: function clone() {
+		};
+
+		_proto.clone = function clone() {
 			return new this.constructor().copy(this);
-		},
-		copy: function copy(source) {
+		};
+
+		_proto.copy = function copy(source) {
 			this.width = source.width;
 			this.height = source.height;
 			this.viewport.copy(source.viewport);
@@ -2014,28 +2033,42 @@
 			this.stencilBuffer = source.stencilBuffer;
 			this.depthTexture = source.depthTexture;
 			return this;
-		},
-		dispose: function dispose() {
+		};
+
+		_proto.dispose = function dispose() {
 			this.dispatchEvent({
 				type: 'dispose'
 			});
+		};
+
+		return WebGLRenderTarget;
+	}(EventDispatcher);
+
+	var WebGLMultisampleRenderTarget = /*#__PURE__*/function (_WebGLRenderTarget) {
+		_inheritsLoose(WebGLMultisampleRenderTarget, _WebGLRenderTarget);
+
+		function WebGLMultisampleRenderTarget(width, height, options) {
+			var _this;
+
+			_this = _WebGLRenderTarget.call(this, width, height, options) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isWebGLMultisampleRenderTarget', {
+				value: true
+			});
+			_this.samples = 4;
+			return _this;
 		}
-	});
 
-	function WebGLMultisampleRenderTarget(width, height, options) {
-		WebGLRenderTarget.call(this, width, height, options);
-		this.samples = 4;
-	}
+		var _proto = WebGLMultisampleRenderTarget.prototype;
 
-	WebGLMultisampleRenderTarget.prototype = Object.assign(Object.create(WebGLRenderTarget.prototype), {
-		constructor: WebGLMultisampleRenderTarget,
-		isWebGLMultisampleRenderTarget: true,
-		copy: function copy(source) {
-			WebGLRenderTarget.prototype.copy.call(this, source);
+		_proto.copy = function copy(source) {
+			_WebGLRenderTarget.prototype.copy.call(this, source);
+
 			this.samples = source.samples;
 			return this;
-		}
-	});
+		};
+
+		return WebGLMultisampleRenderTarget;
+	}(WebGLRenderTarget);
 
 	var Quaternion = /*#__PURE__*/function () {
 		function Quaternion(x, y, z, w) {
@@ -6693,6 +6726,13 @@
 			return this;
 		};
 
+		_proto.lerpColors = function lerpColors(color1, color2, alpha) {
+			this.r = color1.r + (color2.r - color1.r) * alpha;
+			this.g = color1.g + (color2.g - color1.g) * alpha;
+			this.b = color1.b + (color2.b - color1.b) * alpha;
+			return this;
+		};
+
 		_proto.lerpHSL = function lerpHSL(color, alpha) {
 			this.getHSL(_hslA);
 			color.getHSL(_hslB);
@@ -9408,7 +9448,7 @@
 		 * Values for focal length and film gauge must have the same unit.
 		 */
 		setFocalLength: function setFocalLength(focalLength) {
-			// see http://www.bobatkins.com/photography/technical/field_of_view.html
+			/** see {@link http://www.bobatkins.com/photography/technical/field_of_view.html} */
 			var vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
 			this.fov = MathUtils.RAD2DEG * 2 * Math.atan(vExtentSlope);
 			this.updateProjectionMatrix();
@@ -9637,75 +9677,85 @@
 		}
 	});
 
-	function WebGLCubeRenderTarget(size, options, dummy) {
-		if (Number.isInteger(options)) {
-			console.warn('THREE.WebGLCubeRenderTarget: constructor signature is now WebGLCubeRenderTarget( size, options )');
-			options = dummy;
+	var WebGLCubeRenderTarget = /*#__PURE__*/function (_WebGLRenderTarget) {
+		_inheritsLoose(WebGLCubeRenderTarget, _WebGLRenderTarget);
+
+		function WebGLCubeRenderTarget(size, options, dummy) {
+			var _this;
+
+			if (Number.isInteger(options)) {
+				console.warn('THREE.WebGLCubeRenderTarget: constructor signature is now WebGLCubeRenderTarget( size, options )');
+				options = dummy;
+			}
+
+			_this = _WebGLRenderTarget.call(this, size, size, options) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isWebGLCubeRenderTarget', {
+				value: true
+			});
+			options = options || {};
+			_this.texture = new CubeTexture(undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding);
+			_this.texture._needsFlipEnvMap = false;
+			return _this;
 		}
 
-		WebGLRenderTarget.call(this, size, size, options);
-		options = options || {};
-		this.texture = new CubeTexture(undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding);
-		this.texture._needsFlipEnvMap = false;
-	}
+		var _proto = WebGLCubeRenderTarget.prototype;
 
-	WebGLCubeRenderTarget.prototype = Object.create(WebGLRenderTarget.prototype);
-	WebGLCubeRenderTarget.prototype.constructor = WebGLCubeRenderTarget;
-	WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
+		_proto.fromEquirectangularTexture = function fromEquirectangularTexture(renderer, texture) {
+			this.texture.type = texture.type;
+			this.texture.format = RGBAFormat; // see #18859
 
-	WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function (renderer, texture) {
-		this.texture.type = texture.type;
-		this.texture.format = RGBAFormat; // see #18859
+			this.texture.encoding = texture.encoding;
+			this.texture.generateMipmaps = texture.generateMipmaps;
+			this.texture.minFilter = texture.minFilter;
+			this.texture.magFilter = texture.magFilter;
+			var shader = {
+				uniforms: {
+					tEquirect: {
+						value: null
+					}
+				},
+				vertexShader:
+				/* glsl */
+				"\n\n\t\t\t\tvarying vec3 vWorldDirection;\n\n\t\t\t\tvec3 transformDirection( in vec3 dir, in mat4 matrix ) {\n\n\t\t\t\t\treturn normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );\n\n\t\t\t\t}\n\n\t\t\t\tvoid main() {\n\n\t\t\t\t\tvWorldDirection = transformDirection( position, modelMatrix );\n\n\t\t\t\t\t#include <begin_vertex>\n\t\t\t\t\t#include <project_vertex>\n\n\t\t\t\t}\n\t\t\t",
+				fragmentShader:
+				/* glsl */
+				"\n\n\t\t\t\tuniform sampler2D tEquirect;\n\n\t\t\t\tvarying vec3 vWorldDirection;\n\n\t\t\t\t#include <common>\n\n\t\t\t\tvoid main() {\n\n\t\t\t\t\tvec3 direction = normalize( vWorldDirection );\n\n\t\t\t\t\tvec2 sampleUV = equirectUv( direction );\n\n\t\t\t\t\tgl_FragColor = texture2D( tEquirect, sampleUV );\n\n\t\t\t\t}\n\t\t\t"
+			};
+			var geometry = new BoxGeometry(5, 5, 5);
+			var material = new ShaderMaterial({
+				name: 'CubemapFromEquirect',
+				uniforms: cloneUniforms(shader.uniforms),
+				vertexShader: shader.vertexShader,
+				fragmentShader: shader.fragmentShader,
+				side: BackSide,
+				blending: NoBlending
+			});
+			material.uniforms.tEquirect.value = texture;
+			var mesh = new Mesh(geometry, material);
+			var currentMinFilter = texture.minFilter; // Avoid blurred poles
 
-		this.texture.encoding = texture.encoding;
-		this.texture.generateMipmaps = texture.generateMipmaps;
-		this.texture.minFilter = texture.minFilter;
-		this.texture.magFilter = texture.magFilter;
-		var shader = {
-			uniforms: {
-				tEquirect: {
-					value: null
-				}
-			},
-			vertexShader:
-			/* glsl */
-			"\n\n\t\t\tvarying vec3 vWorldDirection;\n\n\t\t\tvec3 transformDirection( in vec3 dir, in mat4 matrix ) {\n\n\t\t\t\treturn normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );\n\n\t\t\t}\n\n\t\t\tvoid main() {\n\n\t\t\t\tvWorldDirection = transformDirection( position, modelMatrix );\n\n\t\t\t\t#include <begin_vertex>\n\t\t\t\t#include <project_vertex>\n\n\t\t\t}\n\t\t",
-			fragmentShader:
-			/* glsl */
-			"\n\n\t\t\tuniform sampler2D tEquirect;\n\n\t\t\tvarying vec3 vWorldDirection;\n\n\t\t\t#include <common>\n\n\t\t\tvoid main() {\n\n\t\t\t\tvec3 direction = normalize( vWorldDirection );\n\n\t\t\t\tvec2 sampleUV = equirectUv( direction );\n\n\t\t\t\tgl_FragColor = texture2D( tEquirect, sampleUV );\n\n\t\t\t}\n\t\t"
+			if (texture.minFilter === LinearMipmapLinearFilter) texture.minFilter = LinearFilter;
+			var camera = new CubeCamera(1, 10, this);
+			camera.update(renderer, mesh);
+			texture.minFilter = currentMinFilter;
+			mesh.geometry.dispose();
+			mesh.material.dispose();
+			return this;
 		};
-		var geometry = new BoxGeometry(5, 5, 5);
-		var material = new ShaderMaterial({
-			name: 'CubemapFromEquirect',
-			uniforms: cloneUniforms(shader.uniforms),
-			vertexShader: shader.vertexShader,
-			fragmentShader: shader.fragmentShader,
-			side: BackSide,
-			blending: NoBlending
-		});
-		material.uniforms.tEquirect.value = texture;
-		var mesh = new Mesh(geometry, material);
-		var currentMinFilter = texture.minFilter; // Avoid blurred poles
 
-		if (texture.minFilter === LinearMipmapLinearFilter) texture.minFilter = LinearFilter;
-		var camera = new CubeCamera(1, 10, this);
-		camera.update(renderer, mesh);
-		texture.minFilter = currentMinFilter;
-		mesh.geometry.dispose();
-		mesh.material.dispose();
-		return this;
-	};
+		_proto.clear = function clear(renderer, color, depth, stencil) {
+			var currentRenderTarget = renderer.getRenderTarget();
 
-	WebGLCubeRenderTarget.prototype.clear = function (renderer, color, depth, stencil) {
-		var currentRenderTarget = renderer.getRenderTarget();
+			for (var i = 0; i < 6; i++) {
+				renderer.setRenderTarget(this, i);
+				renderer.clear(color, depth, stencil);
+			}
 
-		for (var i = 0; i < 6; i++) {
-			renderer.setRenderTarget(this, i);
-			renderer.clear(color, depth, stencil);
-		}
+			renderer.setRenderTarget(currentRenderTarget);
+		};
 
-		renderer.setRenderTarget(currentRenderTarget);
-	};
+		return WebGLCubeRenderTarget;
+	}(WebGLRenderTarget);
 
 	function DataTexture(data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding) {
 		Texture.call(this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding);
@@ -17686,7 +17736,9 @@
 			extensions = new WebGLExtensions(_gl);
 			capabilities = new WebGLCapabilities(_gl, extensions, parameters);
 
-			if (capabilities.isWebGL2 === false) {
+			if (capabilities.isWebGL2) {
+				extensions.get('EXT_color_buffer_float');
+			} else {
 				extensions.get('WEBGL_depth_texture');
 				extensions.get('OES_texture_float');
 				extensions.get('OES_texture_half_float');
@@ -17698,6 +17750,7 @@
 			}
 
 			extensions.get('OES_texture_float_linear');
+			extensions.get('EXT_color_buffer_half_float');
 			utils = new WebGLUtils(_gl, extensions, capabilities);
 			state = new WebGLState(_gl, extensions, capabilities);
 			state.scissor(_currentScissor.copy(_scissor).multiplyScalar(_pixelRatio).floor());
@@ -18779,9 +18832,11 @@
 						return;
 					}
 
+					var halfFloatSupportedByExt = textureType === HalfFloatType && (extensions.has('EXT_color_buffer_half_float') || capabilities.isWebGL2 && extensions.has('EXT_color_buffer_float'));
+
 					if (textureType !== UnsignedByteType && utils.convert(textureType) !== _gl.getParameter(35738) && // IE11, Edge and Chrome Mac < 52 (#9513)
-					!(textureType === FloatType && (capabilities.isWebGL2 || extensions.get('OES_texture_float') || extensions.get('WEBGL_color_buffer_float'))) && // Chrome Mac >= 52 and Firefox
-					!(textureType === HalfFloatType && (capabilities.isWebGL2 ? extensions.get('EXT_color_buffer_float') : extensions.get('EXT_color_buffer_half_float')))) {
+					!(textureType === FloatType && (capabilities.isWebGL2 || extensions.has('OES_texture_float') || extensions.has('WEBGL_color_buffer_float'))) && // Chrome Mac >= 52 and Firefox
+					!halfFloatSupportedByExt) {
 						console.error('THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.');
 						return;
 					}
@@ -29796,14 +29851,18 @@
 		}
 	});
 
-	function Font(data) {
-		this.type = 'Font';
-		this.data = data;
-	}
+	var Font = /*#__PURE__*/function () {
+		function Font(data) {
+			Object.defineProperty(this, 'isFont', {
+				value: true
+			});
+			this.type = 'Font';
+			this.data = data;
+		}
 
-	Object.assign(Font.prototype, {
-		isFont: true,
-		generateShapes: function generateShapes(text, size) {
+		var _proto = Font.prototype;
+
+		_proto.generateShapes = function generateShapes(text, size) {
 			if (size === void 0) {
 				size = 100;
 			}
@@ -29816,8 +29875,10 @@
 			}
 
 			return shapes;
-		}
-	});
+		};
+
+		return Font;
+	}();
 
 	function createPaths(text, size, data) {
 		var chars = Array.from ? Array.from(text) : String(text).split(''); // workaround for IE11, see #13988

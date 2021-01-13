@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { DodecahedronGeometry } from '../../../../src/geometries/DodecahedronGeometry';
+import { DodecahedronGeometry, DodecahedronBufferGeometry } from '../../../../src/geometries/DodecahedronGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -19,6 +19,7 @@ export default QUnit.module( 'Geometries', () => {
 				new DodecahedronGeometry(),
 				new DodecahedronGeometry( parameters.radius ),
 				new DodecahedronGeometry( parameters.radius, parameters.detail ),
+				new DodecahedronBufferGeometry()
 			];
 
 		} );

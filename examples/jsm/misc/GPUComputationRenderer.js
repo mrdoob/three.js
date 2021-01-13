@@ -5,7 +5,7 @@ import {
 	FloatType,
 	Mesh,
 	NearestFilter,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	RGBAFormat,
 	Scene,
 	ShaderMaterial,
@@ -128,7 +128,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	var passThruShader = createShaderMaterial( getPassThroughFragmentShader(), passThruUniforms );
 
-	var mesh = new Mesh( new PlaneBufferGeometry( 2, 2 ), passThruShader );
+	var mesh = new Mesh( new PlaneGeometry( 2, 2 ), passThruShader );
 	scene.add( mesh );
 
 

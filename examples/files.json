@@ -185,7 +185,6 @@
 		"webgl_modifier_curve_instanced",
 		"webgl_modifier_edgesplit",
 		"webgl_modifier_simplifier",
-		"webgl_modifier_subdivision",
 		"webgl_modifier_tessellation",
 		"webgl_morphtargets",
 		"webgl_morphtargets_horse",

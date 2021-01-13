@@ -88,7 +88,7 @@ function GeometryParametersPanel( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.SphereBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.SphereGeometry(
 			radius.getValue(),
 			widthSegments.getValue(),
 			heightSegments.getValue(),

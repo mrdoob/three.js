@@ -108,7 +108,7 @@
 
 				radius = 200;
 
-				let boxGeometry1 = new THREE.BoxBufferGeometry( radius, 0.1 * radius, 0.1 * radius, 50, 5, 5 );
+				let boxGeometry1 = new THREE.BoxGeometry( radius, 0.1 * radius, 0.1 * radius, 50, 5, 5 );
 
 				// if normal and uv attributes are not removed, mergeVertices() can't consolidate indentical vertices with different normal/uv data
 
@@ -158,7 +158,7 @@
 
 				// corner edges
 
-				let boxGeometry2 = new THREE.BoxBufferGeometry( 0.1 * radius, radius * 1.2, 0.1 * radius, 5, 60, 5 );
+				let boxGeometry2 = new THREE.BoxGeometry( 0.1 * radius, radius * 1.2, 0.1 * radius, 5, 60, 5 );
 
 				boxGeometry2.deleteAttribute( 'normal' );
 				boxGeometry2.deleteAttribute( 'uv' );

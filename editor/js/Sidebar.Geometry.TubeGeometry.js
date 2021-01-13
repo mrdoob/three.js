@@ -88,7 +88,7 @@ function GeometryParametersPanel( editor, object ) {
 
 		tensionRow.setDisplay( curveType.getValue() == 'catmullrom' ? '' : 'none' );
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.TubeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.TubeGeometry(
 			new THREE.CatmullRomCurve3( points.getValue(), closed.getValue(), curveType.getValue(), tension.getValue() ),
 			tubularSegments.getValue(),
 			radius.getValue(),

@@ -40,7 +40,7 @@ function GeometryParametersPanel( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.TetrahedronBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.TetrahedronGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );

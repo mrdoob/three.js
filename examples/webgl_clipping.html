@@ -78,14 +78,14 @@
 
 				} );
 
-				const geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.08, 95, 20 );
+				const geometry = new THREE.TorusKnotGeometry( 0.4, 0.08, 95, 20 );
 
 				object = new THREE.Mesh( geometry, material );
 				object.castShadow = true;
 				scene.add( object );
 
 				const ground = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 9, 9, 1, 1 ),
+					new THREE.PlaneGeometry( 9, 9, 1, 1 ),
 					new THREE.MeshPhongMaterial( { color: 0xa0adaf, shininess: 150 } )
 				);
 

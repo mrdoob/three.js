@@ -115,11 +115,6 @@
 			Note that if this is enabled, you must call [page:.update] () in your animation loop.
 		</p>
 
-		<h3>[property:Boolean enableKeys]</h3>
-		<p>
-			Enable or disable the use of keyboard controls.
-		</p>
-
 		<h3>[property:Boolean enablePan]</h3>
 		<p>
 			Enable or disable camera panning. Default is true.
@@ -286,6 +281,11 @@ controls.touches = {
 		<h3>[method:radians getPolarAngle] ()</h3>
 		<p>
 			Get the current vertical rotation, in radians.
+		</p>
+
+		<h3>[method:void listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			Adds key event listeners to the given DOM element. *window* is a recommended argument for using this method.
 		</p>
 
 		<h3>[method:null reset] ()</h3>

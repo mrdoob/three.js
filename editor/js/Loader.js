@@ -498,7 +498,7 @@ function Loader( editor ) {
 
 							var shape = shapes[ j ];
 
-							var geometry = new THREE.ShapeBufferGeometry( shape );
+							var geometry = new THREE.ShapeGeometry( shape );
 							var mesh = new THREE.Mesh( geometry, material );
 
 							group.add( mesh );

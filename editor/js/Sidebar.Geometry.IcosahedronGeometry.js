@@ -8,6 +8,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
+	var signals = editor.signals;
+
 	var container = new UIRow();
 
 	var geometry = object.geometry;
@@ -18,7 +20,7 @@ function GeometryParametersPanel( editor, object ) {
 	var radiusRow = new UIRow();
 	var radius = new UINumber( parameters.radius ).onChange( update );
 
-	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/dodecahedron_geometry/radius' ) ).setWidth( '90px' ) );
+	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/radius' ) ).setWidth( '90px' ) );
 	radiusRow.add( radius );
 
 	container.add( radiusRow );
@@ -28,7 +30,7 @@ function GeometryParametersPanel( editor, object ) {
 	var detailRow = new UIRow();
 	var detail = new UIInteger( parameters.detail ).setRange( 0, Infinity ).onChange( update );
 
-	detailRow.add( new UIText( strings.getKey( 'sidebar/geometry/dodecahedron_geometry/detail' ) ).setWidth( '90px' ) );
+	detailRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/detail' ) ).setWidth( '90px' ) );
 	detailRow.add( detail );
 
 	container.add( detailRow );
@@ -37,10 +39,12 @@ function GeometryParametersPanel( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.DodecahedronBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.IcosahedronGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );
+
+		signals.objectChanged.dispatch( object );
 
 	}
 

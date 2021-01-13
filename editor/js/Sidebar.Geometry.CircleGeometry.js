@@ -57,7 +57,7 @@ function GeometryParametersPanel( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.CircleBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.CircleGeometry(
 			radius.getValue(),
 			segments.getValue(),
 			thetaStart.getValue() * THREE.MathUtils.DEG2RAD,

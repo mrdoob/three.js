@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { TextGeometry } from '../../../../src/geometries/TextGeometry';
+import { TextGeometry, TextBufferGeometry } from '../../../../src/geometries/TextGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 

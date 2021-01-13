@@ -6,8 +6,14 @@ import {
 	Vector3
 } from '../../../src/Three';
 
+interface SVGResultPaths extends ShapePath {
+	userData?: {
+		[key: string]: any
+	}
+}
+
 export interface SVGResult {
-	paths: ShapePath[];
+	paths: SVGResultPaths[];
 	xml: XMLDocument;
 }
 

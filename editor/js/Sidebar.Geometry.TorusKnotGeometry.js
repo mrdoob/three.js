@@ -78,7 +78,7 @@ function GeometryParametersPanel( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.TorusKnotBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.TorusKnotGeometry(
 			radius.getValue(),
 			tube.getValue(),
 			tubularSegments.getValue(),
