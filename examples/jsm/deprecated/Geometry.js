@@ -1,6 +1,7 @@
 import {
 	Box3,
 	BufferAttribute,
+	BufferGeometry,
 	Color,
 	EventDispatcher,
 	Face3,
@@ -1370,40 +1371,42 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		const geometry = new DirectGeometry().fromGeometry( this );
 
+		const buffergeometry = new BufferGeometry();
+
 		const positions = new Float32Array( geometry.vertices.length * 3 );
-		this.setAttribute( 'position', new BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
+		buffergeometry.setAttribute( 'position', new BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
 
 		if ( geometry.normals.length > 0 ) {
 
 			const normals = new Float32Array( geometry.normals.length * 3 );
-			this.setAttribute( 'normal', new BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
+			buffergeometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
 
 		}
 
 		if ( geometry.colors.length > 0 ) {
 
 			const colors = new Float32Array( geometry.colors.length * 3 );
-			this.setAttribute( 'color', new BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
+			buffergeometry.setAttribute( 'color', new BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
 
 		}
 
 		if ( geometry.uvs.length > 0 ) {
 
 			const uvs = new Float32Array( geometry.uvs.length * 2 );
-			this.setAttribute( 'uv', new BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
+			buffergeometry.setAttribute( 'uv', new BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
 
 		}
 
 		if ( geometry.uvs2.length > 0 ) {
 
 			const uvs2 = new Float32Array( geometry.uvs2.length * 2 );
-			this.setAttribute( 'uv2', new BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 ) );
+			buffergeometry.setAttribute( 'uv2', new BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 ) );
 
 		}
 
 		// groups
 
-		this.groups = geometry.groups;
+		buffergeometry.groups = geometry.groups;
 
 		// morphs
 
@@ -1423,7 +1426,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			}
 
-			this.morphAttributes[ name ] = array;
+			buffergeometry.morphAttributes[ name ] = array;
 
 		}
 
@@ -1432,14 +1435,14 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( geometry.skinIndices.length > 0 ) {
 
 			const skinIndices = new Float32BufferAttribute( geometry.skinIndices.length * 4, 4 );
-			this.setAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
+			buffergeometry.setAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
 
 		}
 
 		if ( geometry.skinWeights.length > 0 ) {
 
 			const skinWeights = new Float32BufferAttribute( geometry.skinWeights.length * 4, 4 );
-			this.setAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
+			buffergeometry.setAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
 
 		}
 
@@ -1447,17 +1450,17 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( geometry.boundingSphere !== null ) {
 
-			this.boundingSphere = geometry.boundingSphere.clone();
+			buffergeometry.boundingSphere = geometry.boundingSphere.clone();
 
 		}
 
 		if ( geometry.boundingBox !== null ) {
 
-			this.boundingBox = geometry.boundingBox.clone();
+			buffergeometry.boundingBox = geometry.boundingBox.clone();
 
 		}
 
-		return this;
+		return buffergeometry;
 
 	},
 
