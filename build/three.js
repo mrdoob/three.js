@@ -11632,31 +11632,30 @@
 	}
 
 	function WebGLGeometries(gl, attributes, info, bindingStates) {
-		var geometries = new WeakMap();
+		var geometries = {};
 		var wireframeAttributes = new WeakMap();
 
 		function onGeometryDispose(event) {
 			var geometry = event.target;
-			var buffergeometry = geometries.get(geometry);
 
-			if (buffergeometry.index !== null) {
-				attributes.remove(buffergeometry.index);
+			if (geometry.index !== null) {
+				attributes.remove(geometry.index);
 			}
 
-			for (var name in buffergeometry.attributes) {
-				attributes.remove(buffergeometry.attributes[name]);
+			for (var name in geometry.attributes) {
+				attributes.remove(geometry.attributes[name]);
 			}
 
 			geometry.removeEventListener('dispose', onGeometryDispose);
-			geometries.delete(geometry);
-			var attribute = wireframeAttributes.get(buffergeometry);
+			delete geometries[geometry.id];
+			var attribute = wireframeAttributes.get(geometry);
 
 			if (attribute) {
 				attributes.remove(attribute);
-				wireframeAttributes.delete(buffergeometry);
+				wireframeAttributes.delete(geometry);
 			}
 
-			bindingStates.releaseStatesOfGeometry(buffergeometry);
+			bindingStates.releaseStatesOfGeometry(geometry);
 
 			if (geometry.isInstancedBufferGeometry === true) {
 				delete geometry._maxInstanceCount;
@@ -11667,19 +11666,11 @@
 		}
 
 		function get(object, geometry) {
-			var buffergeometry = geometries.get(geometry);
-			if (buffergeometry) return buffergeometry;
+			if (geometries[geometry.id] === true) return geometry;
 			geometry.addEventListener('dispose', onGeometryDispose);
-
-			if (geometry.isBufferGeometry) {
-				buffergeometry = geometry;
-			} else {
-				console.log('TODO: Remove this', geometry);
-			}
-
-			geometries.set(geometry, buffergeometry);
+			geometries[geometry.id] = true;
 			info.memory.geometries++;
-			return buffergeometry;
+			return geometry;
 		}
 
 		function update(geometry) {
