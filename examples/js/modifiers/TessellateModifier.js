@@ -18,6 +18,12 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 
 	}
 
+	if ( geometry.index !== null ) {
+
+		geometry = geometry.toNonIndexed();
+
+	}
+
 	//
 
 	const maxIterations = this.maxIterations;
