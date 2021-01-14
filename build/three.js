@@ -34755,21 +34755,6 @@
 	}; //
 
 
-	Object.assign(CurvePath.prototype, {
-		createPointsGeometry: function createPointsGeometry(divisions) {
-			console.warn('THREE.CurvePath: .createPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.'); // generate geometry from path points (for Line or Points objects)
-
-			var pts = this.getPoints(divisions);
-			return this.createGeometry(pts);
-		},
-		createSpacedPointsGeometry: function createSpacedPointsGeometry(divisions) {
-			console.warn('THREE.CurvePath: .createSpacedPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.'); // generate geometry from equidistant sampling along the path
-
-			var pts = this.getSpacedPoints(divisions);
-			return this.createGeometry(pts);
-		}
-	}); //
-
 	Object.assign(Path.prototype, {
 		fromPoints: function fromPoints(points) {
 			console.warn('THREE.Path: .fromPoints() has been renamed to .setFromPoints().');

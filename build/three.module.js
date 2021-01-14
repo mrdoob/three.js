@@ -47062,34 +47062,6 @@ Curve.create = function ( construct, getPoint ) {
 
 //
 
-Object.assign( CurvePath.prototype, {
-
-	createPointsGeometry: function ( divisions ) {
-
-		console.warn( 'THREE.CurvePath: .createPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
-
-		// generate geometry from path points (for Line or Points objects)
-
-		const pts = this.getPoints( divisions );
-		return this.createGeometry( pts );
-
-	},
-
-	createSpacedPointsGeometry: function ( divisions ) {
-
-		console.warn( 'THREE.CurvePath: .createSpacedPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
-
-		// generate geometry from equidistant sampling along the path
-
-		const pts = this.getSpacedPoints( divisions );
-		return this.createGeometry( pts );
-
-	}
-
-} );
-
-//
-
 Object.assign( Path.prototype, {
 
 	fromPoints: function ( points ) {
