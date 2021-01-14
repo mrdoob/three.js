@@ -10,7 +10,7 @@
 		<h1>矩阵变换（[name]）</h1>
 
 		<p>
-				Three.js使用*matrix*编码3D变换 —— 平移（位置），旋转和缩放。
+				three.js使用*matrix*编码3D变换 —— 平移（位置），旋转和缩放。
 				[page:Object3D]的每个实例都有一个[page:Object3D.matrix matrix]，用于存储该对象的位置，旋转和比例。本页介绍如何更新对象的变换。
 		</p>
 
@@ -58,7 +58,7 @@ object.matrixAutoUpdate = false;
 
 		<h2>旋转和四元数（Rotation and Quaternion）</h2>
 		<p>
-		Three.js提供了两种表示3D旋转的方式：[page:Euler Euler angles]（欧拉角）和[page:Quaternion Quaternions]（四元数），以及两者之间的转换方法。 欧拉角有称为“万向节锁定”的问题，其中某些配置可能失去一定程度的自由度（防止物体绕一个轴旋转）。 因此，对象旋转<em> 始终 </em>存储在对象的[page:Object3D.quaternion quaternion]中。
+		three.js提供了两种表示3D旋转的方式：[page:Euler Euler angles]（欧拉角）和[page:Quaternion Quaternions]（四元数），以及两者之间的转换方法。 欧拉角有称为“万向节锁定”的问题，其中某些配置可能失去一定程度的自由度（防止物体绕一个轴旋转）。 因此，对象旋转<em> 始终 </em>存储在对象的[page:Object3D.quaternion quaternion]中。
 		</p>
 		<p>
 		该库的早期版本包含*useQuaternion*属性，当设置为false时，将导致对象的[page:Object3D.matrix matrix]从欧拉角计算。这种做法已被弃用 - 作为代替，您应该使用[page:Object3D.setRotationFromEuler setRotationFromEuler]方法，该方法将更新四元数。
