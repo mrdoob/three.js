@@ -159,7 +159,7 @@ var files = [
 
 	{ path: 'renderers/CSS2DRenderer.js', dependencies: [], ignoreList: [] },
 	{ path: 'renderers/CSS3DRenderer.js', dependencies: [], ignoreList: [] },
-	{ path: 'renderers/Projector.js', dependencies: [], ignoreList: [] },
+	{ path: 'renderers/Projector.js', dependencies: [], ignoreList: [ 'BufferGeometry' ] },
 	{ path: 'renderers/SVGRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
 
 	{ path: 'shaders/ACESFilmicToneMappingShader.js', dependencies: [], ignoreList: [] },
