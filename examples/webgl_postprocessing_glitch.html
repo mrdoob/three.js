@@ -6,8 +6,20 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
+	<style>
+		#overlay {
+			flex-direction: column;
+		}
+	</style>
 	<body>
 
+		<div id="overlay">
+			<h3>Photosensitive Epilepsy Warning</h3>
+			<p class="warning">
+				This demo contains strong and frequent flashes which may trigger a potential <strong>Photosensitive Epilepsy.</strong>
+			</p>
+			<button id="startButton">Play</button>
+		</div>
 		<div id="info">
 			<label for="dotScreen">Glitch me wild:</label><input id="wildGlitch" type="checkbox"/><br />
 		</div>
@@ -25,8 +37,11 @@
 
 			let glitchPass;
 
-			init();
-			animate();
+			const btn = document.querySelector('#startButton');
+			btn.addEventListener('click', function() {
+				init();
+				animate();
+			});
 
 			function updateOptions() {
 
@@ -36,6 +51,8 @@
 			}
 
 			function init() {
+				const overlay = document.getElementById( 'overlay' );
+				overlay.remove();
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
