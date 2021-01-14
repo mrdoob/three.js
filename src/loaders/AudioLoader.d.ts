@@ -12,4 +12,6 @@ export class AudioLoader extends Loader {
 		onError?: ( event: ErrorEvent ) => void
 	): void;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<AudioBuffer>;
+
 }

@@ -39,6 +39,7 @@ export class WebGLLights {
 	};
 
 	get( light: any ): any;
-	setup( lights: any, shadows: any, camera: any ): void;
+	setup( lights: any ): void;
+	setupView( lights: any, camera: any ): void;
 
 }

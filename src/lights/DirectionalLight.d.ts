@@ -5,13 +5,13 @@ import { Light } from './Light';
 import { Vector3 } from '../math/Vector3';
 
 /**
+ * see {@link https://github.com/mrdoob/three.js/blob/master/src/lights/DirectionalLight.js|src/lights/DirectionalLight.js}
+ *
  * @example
  * // White directional light at half intensity shining from the top.
  * const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
  * directionalLight.position.set( 0, 1, 0 );
  * scene.add( directionalLight );
- *
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/lights/DirectionalLight.js|src/lights/DirectionalLight.js}
  */
 export class DirectionalLight extends Light {
 

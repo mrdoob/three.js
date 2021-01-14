@@ -45,8 +45,8 @@
 				const loader = new ColladaLoader();
 				loader.load( './models/collada/stormtrooper/stormtrooper.dae', function ( collada ) {
 
-					const animations = collada.animations;
 					const avatar = collada.scene;
+					const animations = avatar.animations;
 
 					avatar.traverse( function ( node ) {
 

@@ -1,4 +1,4 @@
-// r122
+// r124
 
 const assets = [
 	'./',
@@ -13,8 +13,7 @@ const assets = [
 	'../examples/jsm/controls/TransformControls.js',
 
 	'../examples/jsm/libs/chevrotain.module.min.js',
-	'../examples/jsm/libs/inflate.module.min.js',
-	'../examples/jsm/libs/jszip.module.min.js',
+	'../examples/jsm/libs/fflate.module.min.js',
 
 	'../examples/js/libs/draco/draco_decoder.js',
 	'../examples/js/libs/draco/draco_decoder.wasm',
@@ -45,6 +44,7 @@ const assets = [
 	'../examples/jsm/loaders/SVGLoader.js',
 	'../examples/jsm/loaders/TGALoader.js',
 	'../examples/jsm/loaders/TDSLoader.js',
+	'../examples/jsm/loaders/VOXLoader.js',
 	'../examples/jsm/loaders/VRMLLoader.js',
 	'../examples/jsm/loaders/VTKLoader.js',
 	'../examples/jsm/loaders/XYZLoader.js',
@@ -61,7 +61,7 @@ const assets = [
 
 	'../examples/jsm/helpers/VertexNormalsHelper.js',
 
-	'../examples/jsm/geometries/TeapotBufferGeometry.js',
+	'../examples/jsm/geometries/TeapotGeometry.js',
 
 	'../examples/jsm/webxr/VRButton.js',
 
@@ -99,6 +99,7 @@ const assets = [
 	'./js/libs/tern-threejs/threejs.js',
 
 	'./js/libs/signals.min.js',
+	'./js/libs/fflate-deflate.min.module.js',
 	'./js/libs/ui.js',
 	'./js/libs/ui.three.js',
 
@@ -136,7 +137,6 @@ const assets = [
 	'./js/Sidebar.Properties.js',
 	'./js/Sidebar.Object.js',
 	'./js/Sidebar.Geometry.js',
-	'./js/Sidebar.Geometry.Geometry.js',
 	'./js/Sidebar.Geometry.BufferGeometry.js',
 	'./js/Sidebar.Geometry.Modifiers.js',
 	'./js/Sidebar.Geometry.BoxGeometry.js',
@@ -145,6 +145,7 @@ const assets = [
 	'./js/Sidebar.Geometry.DodecahedronGeometry.js',
 	'./js/Sidebar.Geometry.ExtrudeGeometry.js',
 	'./js/Sidebar.Geometry.IcosahedronGeometry.js',
+	'./js/Sidebar.Geometry.LatheGeometry.js',
 	'./js/Sidebar.Geometry.OctahedronGeometry.js',
 	'./js/Sidebar.Geometry.PlaneGeometry.js',
 	'./js/Sidebar.Geometry.RingGeometry.js',
@@ -154,8 +155,7 @@ const assets = [
 	'./js/Sidebar.Geometry.TorusGeometry.js',
 	'./js/Sidebar.Geometry.TorusKnotGeometry.js',
 	'./js/Sidebar.Geometry.TubeGeometry.js',
-	'./js/Sidebar.Geometry.TeapotBufferGeometry.js',
-	'./js/Sidebar.Geometry.LatheGeometry.js',
+	'./js/Sidebar.Geometry.TeapotGeometry.js',
 	'./js/Sidebar.Material.js',
 	'./js/Sidebar.Animation.js',
 	'./js/Sidebar.Script.js',

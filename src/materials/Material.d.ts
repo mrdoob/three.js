@@ -49,7 +49,8 @@ export interface MaterialParameters {
 	stencilWrite?: boolean;
 	stencilFunc?: StencilFunc;
 	stencilRef?: number;
-	stencilMask?: number;
+	stencilWriteMask?: number;
+	stencilFuncMask?: number;
 	stencilFail?: StencilOp;
 	stencilZFail?: StencilOp;
 	stencilZPass?: StencilOp;
@@ -173,45 +174,51 @@ export class Material extends EventDispatcher {
 	id: number;
 
 	/**
-   * Whether rendering this material has any effect on the stencil buffer. Default is *false*.
+	 * Whether rendering this material has any effect on the stencil buffer. Default is *false*.
 	 * @default false
-   */
+	 */
 	stencilWrite: boolean;
 
 	/**
-   * The stencil comparison function to use. Default is {@link AlwaysStencilFunc}. See stencil operation constants for all possible values.
+	 * The stencil comparison function to use. Default is {@link AlwaysStencilFunc}. See stencil operation constants for all possible values.
 	 * @default THREE.AlwaysStencilFunc
-   */
+	 */
 	stencilFunc: StencilFunc;
 
 	/**
-   * The value to use when performing stencil comparisons or stencil operations. Default is *0*.
+	 * The value to use when performing stencil comparisons or stencil operations. Default is *0*.
 	 * @default 0
-   */
+	 */
 	stencilRef: number;
 
 	/**
-   * The bit mask to use when comparing against or writing to the stencil buffer. Default is *0xFF*.
+	 * The bit mask to use when writing to the stencil buffer. Default is *0xFF*.
 	 * @default 0xff
-   */
-	stencilMask: number;
+	 */
+	stencilWriteMask: number;
 
 	/**
-   * Which stencil operation to perform when the comparison function returns false. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
+	 * The bit mask to use when comparing against the stencil buffer. Default is *0xFF*.
+	 * @default 0xff
+	 */
+	stencilFuncMask: number;
+
+	/**
+	 * Which stencil operation to perform when the comparison function returns false. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
 	 * @default THREE.KeepStencilOp
-   */
+	 */
 	stencilFail: StencilOp;
 
 	/**
-   * Which stencil operation to perform when the comparison function returns true but the depth test fails. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
+	 * Which stencil operation to perform when the comparison function returns true but the depth test fails. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
 	 * @default THREE.KeepStencilOp
-   */
+	 */
 	stencilZFail: StencilOp;
 
 	/**
-   * Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
+	 * Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
 	 * @default THREE.KeepStencilOp
-   */
+	 */
 	stencilZPass: StencilOp;
 
 	/**
@@ -348,7 +355,7 @@ export class Material extends EventDispatcher {
 	/**
 	 * Return a new material with the same parameters as this material.
 	 */
-	clone(): this;
+	clone(): Material;
 
 	/**
 	 * Copy the parameters from the passed material into this material.

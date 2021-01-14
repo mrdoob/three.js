@@ -22,6 +22,7 @@ import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { RawShaderMaterial } from '../materials/RawShaderMaterial.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
+import { Color } from '../math/Color.js';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
 
 const LOD_MIN = 4;
@@ -52,6 +53,8 @@ const ENCODINGS = {
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
 const { _lodPlanes, _sizeLods, _sigmas } = /*@__PURE__*/ _createPlanes();
+const _clearColor = /*@__PURE__*/ new Color();
+const _backgroundColor = /*@__PURE__*/ new Color();
 let _oldTarget = null;
 
 // Golden Ratio
@@ -83,6 +86,17 @@ const _axisDirections = [
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
  */
+
+function convertLinearToRGBE( color ) {
+
+	const maxComponent = Math.max( color.r, color.g, color.b );
+	const fExp = Math.min( Math.max( Math.ceil( Math.log2( maxComponent ) ), - 128.0 ), 127.0 );
+	color.multiplyScalar( Math.pow( 2.0, - fExp ) );
+
+	const alpha = ( fExp + 128.0 ) / 255.0;
+	return alpha;
+
+}
 
 class PMREMGenerator {
 
@@ -257,25 +271,37 @@ class PMREMGenerator {
 
 		const outputEncoding = renderer.outputEncoding;
 		const toneMapping = renderer.toneMapping;
-		const clearColor = renderer.getClearColor();
+		renderer.getClearColor( _clearColor );
 		const clearAlpha = renderer.getClearAlpha();
+		const originalBackground = scene.background;
 
 		renderer.toneMapping = NoToneMapping;
 		renderer.outputEncoding = LinearEncoding;
 
-		let background = scene.background;
-		if ( background && background.isColor ) {
+		const background = scene.background;
+		if ( background ) {
 
-			background.convertSRGBToLinear();
-			// Convert linear to RGBE
-			const maxComponent = Math.max( background.r, background.g, background.b );
-			const fExp = Math.min( Math.max( Math.ceil( Math.log2( maxComponent ) ), - 128.0 ), 127.0 );
-			background = background.multiplyScalar( Math.pow( 2.0, - fExp ) );
-			const alpha = ( fExp + 128.0 ) / 255.0;
-			renderer.setClearColor( background, alpha );
-			scene.background = null;
+			if ( background.isColor ) {
+
+				_backgroundColor.copy( background ).convertSRGBToLinear();
+				scene.background = null;
+
+				const alpha = convertLinearToRGBE( _backgroundColor );
+				renderer.setClearColor( _backgroundColor );
+				renderer.setClearAlpha( alpha );
+
+			}
+
+		} else {
+
+			_backgroundColor.copy( _clearColor ).convertSRGBToLinear();
+
+			const alpha = convertLinearToRGBE( _backgroundColor );
+			renderer.setClearColor( _backgroundColor );
+			renderer.setClearAlpha( alpha );
 
 		}
+
 
 		for ( let i = 0; i < 6; i ++ ) {
 
@@ -306,7 +332,8 @@ class PMREMGenerator {
 
 		renderer.toneMapping = toneMapping;
 		renderer.outputEncoding = outputEncoding;
-		renderer.setClearColor( clearColor, clearAlpha );
+		renderer.setClearColor( _clearColor, clearAlpha );
+		scene.background = originalBackground;
 
 	}
 

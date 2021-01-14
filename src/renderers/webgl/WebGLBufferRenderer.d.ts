@@ -1,7 +1,7 @@
 // Renderers / WebGL /////////////////////////////////////////////////////////////////////
-import { WebGLExtensions } from "./WebGLExtensions";
-import { WebGLInfo } from "./WebGLInfo";
-import { WebGLCapabilities } from "./WebGLCapabilities";
+import { WebGLExtensions } from './WebGLExtensions';
+import { WebGLInfo } from './WebGLInfo';
+import { WebGLCapabilities } from './WebGLCapabilities';
 
 export class WebGLBufferRenderer {
 

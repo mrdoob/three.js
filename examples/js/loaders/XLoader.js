@@ -4,7 +4,7 @@ THREE.XLoader = ( function () {
 
 		if ( ! ( instance instanceof Constructor ) ) {
 
-			throw new TypeError( "Cannot call a class as a function" );
+			throw new TypeError( 'Cannot call a class as a function' );
 
 		}
 
@@ -19,7 +19,7 @@ THREE.XLoader = ( function () {
 				var descriptor = props[ i ];
 				descriptor.enumerable = descriptor.enumerable || false;
 				descriptor.configurable = true;
-				if ( "value" in descriptor ) descriptor.writable = true;
+				if ( 'value' in descriptor ) descriptor.writable = true;
 				Object.defineProperty( target, descriptor.key, descriptor );
 
 			}
@@ -40,7 +40,7 @@ THREE.XLoader = ( function () {
 
 		classCallCheck( this, XboneInf );
 
-		this.boneName = "";
+		this.boneName = '';
 		this.BoneIndex = 0;
 		this.Indeces = [];
 		this.Weights = [];
@@ -53,8 +53,8 @@ THREE.XLoader = ( function () {
 
 		classCallCheck( this, XAnimationInfo );
 
-		this.animeName = "";
-		this.boneName = "";
+		this.animeName = '';
+		this.boneName = '';
 		this.targetBone = null;
 		this.keyType = 4;
 		this.frameStartLv = 0;
@@ -95,7 +95,7 @@ THREE.XLoader = ( function () {
 		}
 
 		createClass( XAnimationObj, [ {
-			key: "make",
+			key: 'make',
 			value: function make( XAnimationInfoArray ) {
 
 				for ( var i = 0; i < XAnimationInfoArray.length; i ++ ) {
@@ -108,19 +108,19 @@ THREE.XLoader = ( function () {
 
 			}
 		}, {
-			key: "clone",
+			key: 'clone',
 			value: function clone() {
 
 				return Object.assign( {}, this );
 
 			}
 		}, {
-			key: "makeBonekeys",
+			key: 'makeBonekeys',
 			value: function makeBonekeys( XAnimationInfo ) {
 
 				var refObj = {};
 				refObj.name = XAnimationInfo.boneName;
-				refObj.parent = "";
+				refObj.parent = '';
 				refObj.keys = this.keyFrameRefactor( XAnimationInfo );
 				refObj.copy = function () {
 
@@ -132,7 +132,7 @@ THREE.XLoader = ( function () {
 
 			}
 		}, {
-			key: "keyFrameRefactor",
+			key: 'keyFrameRefactor',
 			value: function keyFrameRefactor( XAnimationInfo ) {
 
 				var keys = [];
@@ -214,10 +214,10 @@ THREE.XLoader = ( function () {
 
 			this.debug = false;
 			this.texloader = new THREE.TextureLoader( this.manager );
-			this.url = "";
+			this.url = '';
 			this._putMatLength = 0;
 			this._nowMat = null;
-			this._nowFrameName = "";
+			this._nowFrameName = '';
 			this.frameHierarchie = [];
 			this.Hierarchies = {};
 			this.HieStack = [];
@@ -324,21 +324,21 @@ THREE.XLoader = ( function () {
 					if ( find > - 1 && find < 2 ) {
 
 						var foundNewLine = - 1;
-						foundNewLine = line.indexOf( "\r\n", readed );
+						foundNewLine = line.indexOf( '\r\n', readed );
 						if ( foundNewLine > 0 ) {
 
 							readed = foundNewLine + 2;
 
 						} else {
 
-							foundNewLine = line.indexOf( "\r", readed );
+							foundNewLine = line.indexOf( '\r', readed );
 							if ( foundNewLine > 0 ) {
 
 								readed = foundNewLine + 1;
 
 							} else {
 
-								readed = line.indexOf( "\n", readed ) + 1;
+								readed = line.indexOf( '\n', readed ) + 1;
 
 							}
 
@@ -373,21 +373,21 @@ THREE.XLoader = ( function () {
 					if ( find > - 1 && find < 2 ) {
 
 						var foundNewLine = - 1;
-						foundNewLine = line.indexOf( "\r\n", readed );
+						foundNewLine = line.indexOf( '\r\n', readed );
 						if ( foundNewLine > 0 ) {
 
 							readed = foundNewLine + 2;
 
 						} else {
 
-							foundNewLine = line.indexOf( "\r", readed );
+							foundNewLine = line.indexOf( '\r', readed );
 							if ( foundNewLine > 0 ) {
 
 								readed = foundNewLine + 1;
 
 							} else {
 
-								readed = line.indexOf( "\n", readed ) + 1;
+								readed = line.indexOf( '\n', readed ) + 1;
 
 							}
 
@@ -436,7 +436,7 @@ THREE.XLoader = ( function () {
 			key: '_ensureBinary',
 			value: function _ensureBinary( buf ) {
 
-				if ( typeof buf === "string" ) {
+				if ( typeof buf === 'string' ) {
 
 					var array_buffer = new Uint8Array( buf.length );
 					for ( var i = 0; i < buf.length; i ++ ) {
@@ -458,7 +458,7 @@ THREE.XLoader = ( function () {
 			key: '_ensureString',
 			value: function _ensureString( buf ) {
 
-				if ( typeof buf !== "string" ) {
+				if ( typeof buf !== 'string' ) {
 
 					return THREE.LoaderUtils.decodeText( new Uint8Array( buf ) );
 
@@ -548,11 +548,11 @@ THREE.XLoader = ( function () {
 						} else {
 
 							_currentObject.name = nameData;
-							_currentObject.type = "";
+							_currentObject.type = '';
 
 						}
 
-						if ( _currentObject.type === "Animation" ) {
+						if ( _currentObject.type === 'Animation' ) {
 
 							_currentObject.data = this._data.substr( findNext, findEnd - findNext ).trim();
 							var refs = this._hierarchieParse( _currentObject, findEnd + 1 );
@@ -579,7 +579,7 @@ THREE.XLoader = ( function () {
 						}
 
 						_currentObject.parent = _parent;
-						if ( _currentObject.type != "template" ) {
+						if ( _currentObject.type != 'template' ) {
 
 							_parent.children.push( _currentObject );
 
@@ -640,18 +640,18 @@ THREE.XLoader = ( function () {
 
 						switch ( this._currentObject.type ) {
 
-							case "template":
+							case 'template':
 								break;
-							case "AnimTicksPerSecond":
+							case 'AnimTicksPerSecond':
 								this.animTicksPerSecond = parseInt( this._currentObject.data );
 								break;
-							case "Frame":
+							case 'Frame':
 								this._setFrame();
 								break;
-							case "FrameTransformMatrix":
+							case 'FrameTransformMatrix':
 								this._setFrameTransformMatrix();
 								break;
-							case "Mesh":
+							case 'Mesh':
 								this._changeRoot();
 								this._currentGeo = {};
 								this._currentGeo.name = this._currentObject.name.trim();
@@ -674,30 +674,30 @@ THREE.XLoader = ( function () {
 								this._readVertexDatas();
 								breakFlag = true;
 								break;
-							case "MeshNormals":
+							case 'MeshNormals':
 								this._readVertexDatas();
 								break;
-							case "MeshTextureCoords":
+							case 'MeshTextureCoords':
 								this._setMeshTextureCoords();
 								break;
-							case "VertexDuplicationIndices":
+							case 'VertexDuplicationIndices':
 								break;
-							case "MeshMaterialList":
+							case 'MeshMaterialList':
 								this._setMeshMaterialList();
 								break;
-							case "Material":
+							case 'Material':
 								this._setMaterial();
 								break;
-							case "SkinWeights":
+							case 'SkinWeights':
 								this._setSkinWeights();
 								break;
-							case "AnimationSet":
+							case 'AnimationSet':
 								this._changeRoot();
 								this._currentAnime = {};
 								this._currentAnime.name = this._currentObject.name.trim();
 								this._currentAnime.AnimeFrames = [];
 								break;
-							case "Animation":
+							case 'Animation':
 								if ( this._currentAnimeFrames ) {
 
 									this._currentAnime.AnimeFrames.push( this._currentAnimeFrames );
@@ -707,7 +707,7 @@ THREE.XLoader = ( function () {
 								this._currentAnimeFrames = new XAnimationInfo();
 								this._currentAnimeFrames.boneName = this._currentObject.data.trim();
 								break;
-							case "AnimationKey":
+							case 'AnimationKey':
 								this._readAnimationKey();
 								breakFlag = true;
 								break;
@@ -805,7 +805,7 @@ THREE.XLoader = ( function () {
 
 				} else {
 
-					return "";
+					return '';
 
 				}
 
@@ -833,7 +833,7 @@ THREE.XLoader = ( function () {
 			value: function _setFrameTransformMatrix() {
 
 				this._currentFrame.FrameTransformMatrix = new THREE.Matrix4();
-				var data = this._currentObject.data.split( "," );
+				var data = this._currentObject.data.split( ',' );
 				this._ParseMatrixData( this._currentFrame.FrameTransformMatrix, data );
 				this._makeBoneFrom_CurrentFrame();
 
@@ -916,7 +916,7 @@ THREE.XLoader = ( function () {
 
 						switch ( this._currentObject.type ) {
 
-							case "Mesh":
+							case 'Mesh':
 								switch ( mode ) {
 
 									case 0:
@@ -929,7 +929,7 @@ THREE.XLoader = ( function () {
 								}
 
 								break;
-							case "MeshNormals":
+							case 'MeshNormals':
 								switch ( mode ) {
 
 									case 0:
@@ -975,7 +975,7 @@ THREE.XLoader = ( function () {
 			key: '_readVertex1',
 			value: function _readVertex1( line ) {
 
-				var data = this._readLine( line.trim() ).substr( 0, line.length - 2 ).split( ";" );
+				var data = this._readLine( line.trim() ).substr( 0, line.length - 2 ).split( ';' );
 				this._currentGeo.GeometryData.vertices.push( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ), parseFloat( data[ 2 ] ) );
 				this._currentGeo.GeometryData.skinIndices.push( 0, 0, 0, 0 );
 				this._currentGeo.GeometryData.skinWeights.push( 1, 0, 0, 0 );
@@ -986,7 +986,7 @@ THREE.XLoader = ( function () {
 			key: '_readFace1',
 			value: function _readFace1( line ) {
 
-				var data = this._readLine( line.trim() ).substr( 2, line.length - 4 ).split( "," );
+				var data = this._readLine( line.trim() ).substr( 2, line.length - 4 ).split( ',' );
 				this._currentGeo.GeometryData.indices.push( parseInt( data[ 0 ], 10 ), parseInt( data[ 1 ], 10 ), parseInt( data[ 2 ], 10 ) );
 
 			}
@@ -994,7 +994,7 @@ THREE.XLoader = ( function () {
 			key: '_readNormalVector1',
 			value: function _readNormalVector1( line ) {
 
-				var data = this._readLine( line.trim() ).substr( 0, line.length - 2 ).split( ";" );
+				var data = this._readLine( line.trim() ).substr( 0, line.length - 2 ).split( ';' );
 				this._currentGeo.GeometryData.normals.push( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ), parseFloat( data[ 2 ] ) );
 
 			}
@@ -1112,7 +1112,7 @@ THREE.XLoader = ( function () {
 								}
 
 								var line = this._currentObject.data.substr( endRead, find - endRead );
-								var data = this._readLine( line.trim() ).split( ";" );
+								var data = this._readLine( line.trim() ).split( ';' );
 								if ( this.IsUvYReverse ) {
 
 									this._currentGeo.GeometryData.uvs.push( parseFloat( data[ 0 ] ), 1 - parseFloat( data[ 1 ] ) );
@@ -1167,7 +1167,7 @@ THREE.XLoader = ( function () {
 						}
 
 						var line = this._currentObject.data.substr( endRead, find - endRead );
-						var data = this._readLine( line.trim() ).split( "," );
+						var data = this._readLine( line.trim() ).split( ',' );
 						for ( var i = 0; i < data.length; i ++ ) {
 
 							this._currentGeo.GeometryData.materialIndices[ i ] = parseInt( data[ i ] );
@@ -1199,7 +1199,7 @@ THREE.XLoader = ( function () {
 				var endRead = 0;
 				var find = this._currentObject.data.indexOf( ';;', endRead );
 				var line = this._currentObject.data.substr( endRead, find - endRead );
-				var data = this._readLine( line.trim() ).split( ";" );
+				var data = this._readLine( line.trim() ).split( ';' );
 				_nowMat.color.r = parseFloat( data[ 0 ] );
 				_nowMat.color.g = parseFloat( data[ 1 ] );
 				_nowMat.color.b = parseFloat( data[ 2 ] );
@@ -1210,7 +1210,7 @@ THREE.XLoader = ( function () {
 				endRead = find + 1;
 				find = this._currentObject.data.indexOf( ';;', endRead );
 				line = this._currentObject.data.substr( endRead, find - endRead );
-				var data2 = this._readLine( line.trim() ).split( ";" );
+				var data2 = this._readLine( line.trim() ).split( ';' );
 				_nowMat.specular.r = parseFloat( data2[ 0 ] );
 				_nowMat.specular.g = parseFloat( data2[ 1 ] );
 				_nowMat.specular.b = parseFloat( data2[ 2 ] );
@@ -1223,7 +1223,7 @@ THREE.XLoader = ( function () {
 				}
 
 				line = this._currentObject.data.substr( endRead, find - endRead );
-				var data3 = this._readLine( line.trim() ).split( ";" );
+				var data3 = this._readLine( line.trim() ).split( ';' );
 				_nowMat.emissive.r = parseFloat( data3[ 0 ] );
 				_nowMat.emissive.g = parseFloat( data3[ 1 ] );
 				_nowMat.emissive.b = parseFloat( data3[ 2 ] );
@@ -1242,21 +1242,21 @@ THREE.XLoader = ( function () {
 						var fileName = localObject.data.substr( 1, localObject.data.length - 2 );
 						switch ( localObject.type ) {
 
-							case "TextureFilename":
+							case 'TextureFilename':
 								_nowMat.map = this.texloader.load( fileName );
 								break;
-							case "BumpMapFilename":
+							case 'BumpMapFilename':
 								_nowMat.bumpMap = this.texloader.load( fileName );
 								_nowMat.bumpScale = 0.05;
 								break;
-							case "NormalMapFilename":
+							case 'NormalMapFilename':
 								_nowMat.normalMap = this.texloader.load( fileName );
 								_nowMat.normalScale = new THREE.Vector2( 2, 2 );
 								break;
-							case "EmissiveMapFilename":
+							case 'EmissiveMapFilename':
 								_nowMat.emissiveMap = this.texloader.load( fileName );
 								break;
-							case "LightMapFilename":
+							case 'LightMapFilename':
 								_nowMat.lightMap = this.texloader.load( fileName );
 								break;
 
@@ -1288,7 +1288,7 @@ THREE.XLoader = ( function () {
 				endRead = find + 1;
 				find = this._currentObject.data.indexOf( ';', endRead );
 				line = this._currentObject.data.substr( endRead, find - endRead );
-				var data = this._readLine( line.trim() ).split( "," );
+				var data = this._readLine( line.trim() ).split( ',' );
 				for ( var i = 0; i < data.length; i ++ ) {
 
 					boneInf.Indeces.push( parseInt( data[ i ] ) );
@@ -1298,7 +1298,7 @@ THREE.XLoader = ( function () {
 				endRead = find + 1;
 				find = this._currentObject.data.indexOf( ';', endRead );
 				line = this._currentObject.data.substr( endRead, find - endRead );
-				var data2 = this._readLine( line.trim() ).split( "," );
+				var data2 = this._readLine( line.trim() ).split( ',' );
 				for ( var _i = 0; _i < data2.length; _i ++ ) {
 
 					boneInf.Weights.push( parseFloat( data2[ _i ] ) );
@@ -1314,7 +1314,7 @@ THREE.XLoader = ( function () {
 				}
 
 				line = this._currentObject.data.substr( endRead, find - endRead );
-				var data3 = this._readLine( line.trim() ).split( "," );
+				var data3 = this._readLine( line.trim() ).split( ',' );
 				boneInf.OffsetMatrix = new THREE.Matrix4();
 				this._ParseMatrixData( boneInf.OffsetMatrix, data3 );
 				this._currentGeo.BoneInfs.push( boneInf );
@@ -1541,10 +1541,10 @@ THREE.XLoader = ( function () {
 				find = this._currentObject.data.indexOf( ';', endRead );
 				endRead = find + 1;
 				line = this._currentObject.data.substr( endRead );
-				var data = this._readLine( line.trim() ).split( ";;," );
+				var data = this._readLine( line.trim() ).split( ';;,' );
 				for ( var i = 0; i < data.length; i ++ ) {
 
-					var data2 = data[ i ].split( ";" );
+					var data2 = data[ i ].split( ';' );
 					var keyInfo = new XKeyFrameInfo();
 					keyInfo.type = nowKeyType;
 					keyInfo.Frame = parseInt( data2[ 0 ] );
@@ -1565,7 +1565,7 @@ THREE.XLoader = ( function () {
 
 						}
 
-						var frameValue = data2[ 2 ].split( "," );
+						var frameValue = data2[ 2 ].split( ',' );
 						switch ( nowKeyType ) {
 
 							case 0:
@@ -1589,7 +1589,7 @@ THREE.XLoader = ( function () {
 					} else {
 
 						keyInfo.matrix = new THREE.Matrix4();
-						this._ParseMatrixData( keyInfo.matrix, data2[ 2 ].split( "," ) );
+						this._ParseMatrixData( keyInfo.matrix, data2[ 2 ].split( ',' ) );
 						this._currentAnimeFrames.keyFrames.push( keyInfo );
 
 					}
@@ -1647,7 +1647,7 @@ THREE.XLoader = ( function () {
 							findAnimation = true;
 							var c_key = animation.hierarchy[ i ].copy();
 							c_key.parent = - 1;
-							if ( model.skeleton.bones[ b ].parent && model.skeleton.bones[ b ].parent.type === "Bone" ) {
+							if ( model.skeleton.bones[ b ].parent && model.skeleton.bones[ b ].parent.type === 'Bone' ) {
 
 								for ( var bb = 0; bb < put.hierarchy.length; bb ++ ) {
 

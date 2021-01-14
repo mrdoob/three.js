@@ -3,9 +3,9 @@ import {
 	InterleavedBufferAttribute,
 	Mesh,
 	Vector3
-} from "../../../build/three.module.js";
-import { LineSegmentsGeometry } from "../lines/LineSegmentsGeometry.js";
-import { LineMaterial } from "../lines/LineMaterial.js";
+} from '../../../build/three.module.js';
+import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
+import { LineMaterial } from '../lines/LineMaterial.js';
 
 var Wireframe = function ( geometry, material ) {
 

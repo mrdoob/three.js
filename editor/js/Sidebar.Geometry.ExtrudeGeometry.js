@@ -4,7 +4,7 @@ import { UIRow, UIText, UIInteger, UICheckbox, UIButton, UINumber } from './libs
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-function SidebarGeometryExtrudeGeometry( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -113,7 +113,7 @@ function SidebarGeometryExtrudeGeometry( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.ExtrudeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ExtrudeGeometry(
 			parameters.shapes,
 			{
 				curveSegments: curveSegments.getValue(),
@@ -131,7 +131,7 @@ function SidebarGeometryExtrudeGeometry( editor, object ) {
 
 	function toShape() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.ShapeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ShapeGeometry(
 			parameters.shapes,
 			options.curveSegments
 		) ) );
@@ -142,4 +142,4 @@ function SidebarGeometryExtrudeGeometry( editor, object ) {
 
 }
 
-export { SidebarGeometryExtrudeGeometry };
+export { GeometryParametersPanel };

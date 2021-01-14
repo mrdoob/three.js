@@ -22,7 +22,7 @@ import {
 	LinearFilter,
 	ClampToEdgeWrapping,
 	TextureLoader
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var Rhino3dmLoader = function ( manager ) {
 
@@ -325,7 +325,8 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					} else {
 
-						var _object = this._createObject( obj, null );
+						var material = this._createMaterial( );
+						var _object = this._createObject( obj, material );
 
 					}
 
@@ -442,9 +443,13 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var points = new Points( geometry, material );
 				points.userData[ 'attributes' ] = attributes;
 				points.userData[ 'objectType' ] = obj.objectType;
-				if( attributes.name ) {
+
+				if ( attributes.name ) {
+
 					points.name = attributes.name;
+
 				}
+
 				return points;
 
 			case 'Mesh':
@@ -471,8 +476,11 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				mesh.receiveShadow = attributes.receivesShadows;
 				mesh.userData[ 'attributes' ] = attributes;
 				mesh.userData[ 'objectType' ] = obj.objectType;
-				if( attributes.name ) {
+
+				if ( attributes.name ) {
+
 					mesh.name = attributes.name;
+
 				}
 
 				return mesh;
@@ -494,8 +502,11 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				brepObject.userData[ 'attributes' ] = attributes;
 				brepObject.userData[ 'objectType' ] = obj.objectType;
-				if( attributes.name ) {
+
+				if ( attributes.name ) {
+
 					brepObject.name = attributes.name;
+
 				}
 
 				return brepObject;
@@ -513,8 +524,11 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var lines = new Line( geometry, material );
 				lines.userData[ 'attributes' ] = attributes;
 				lines.userData[ 'objectType' ] = obj.objectType;
-				if( attributes.name ) {
+
+				if ( attributes.name ) {
+
 					lines.name = attributes.name;
+
 				}
 
 				return lines;
@@ -558,8 +572,11 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				sprite.userData[ 'attributes' ] = attributes;
 				sprite.userData[ 'objectType' ] = obj.objectType;
-				if( attributes.name ) {
+
+				if ( attributes.name ) {
+
 					sprite.name = attributes.name;
+
 				}
 
 				return sprite;
@@ -610,7 +627,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				} else if ( geometry.isLinearLight ) {
 
-					console.warn( `THREE.3DMLoader:  No conversion exists for linear lights.` );
+					console.warn( 'THREE.3DMLoader:  No conversion exists for linear lights.' );
 
 					return;
 
@@ -1225,7 +1242,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		}
 
-		if ( geometry ) {
+		if ( Array.isArray( geometry ) === false || geometry.length > 0 ) {
 
 			var attributes = extractProperties( _attributes );
 			attributes.geometry = extractProperties( _geometry );
@@ -1249,6 +1266,10 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			attributes.geometry.objectType = objectType;
 
 			return { geometry, attributes, objectType };
+
+		} else {
+
+			console.warn( 'THREE.3DMLoader: Object has no mesh geometry. Consider opening this in Rhino, using a shaded display mode, and exporting again.' );
 
 		}
 

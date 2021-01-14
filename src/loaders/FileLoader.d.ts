@@ -14,6 +14,7 @@ export class FileLoader extends Loader {
 		onProgress?: ( request: ProgressEvent ) => void,
 		onError?: ( event: ErrorEvent ) => void
 	): any;
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<string | ArrayBuffer>;
 	setMimeType( mimeType: MimeType ): FileLoader;
 	setResponseType( responseType: string ): FileLoader;
 

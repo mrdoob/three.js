@@ -17,7 +17,7 @@
 			You may want to use a custom shader if you need to:
 		<ul>
 			<li>implement an effect not included with any of the built-in [page:Material materials]</li>
-			<li>combine many objects into a single [page:Geometry] or [page:BufferGeometry] in order to improve performance</li>
+			<li>combine many objects into a single [page:BufferGeometry] in order to improve performance</li>
 		</ul>
 		There are the following notes to bear in mind when using a *ShaderMaterial*:
 
@@ -30,8 +30,7 @@
 			</li>
 			<li>
 				As of THREE r72, directly assigning attributes in a ShaderMaterial is no longer supported.
-				A [page:BufferGeometry] instance (instead of a [page:Geometry] instance) must be used instead,
-				using [page:BufferAttribute] instances to define custom attributes.
+				A [page:BufferGeometry] instance  must be used instead, using [page:BufferAttribute] instances to define custom attributes.
 			</li>
 			<li>
 				As of THREE r77, [page:WebGLRenderTarget] or [page:WebGLCubeRenderTarget] instances
@@ -117,7 +116,6 @@
 			[example:webgl_materials_skin webgl / materials / skin]<br />
 			[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
 			[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
-			[example:webgl_nearestneighbour webgl / nearestneighbour]<br />
 			[example:webgl_postprocessing_dof2 webgl / postprocessing / dof2]<br />
 			[example:webgl_postprocessing_godrays webgl / postprocessing / godrays]
 		</p>

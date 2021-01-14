@@ -25,22 +25,18 @@ import { BufferGeometry } from './core/BufferGeometry.js';
 import { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 import { InterleavedBuffer } from './core/InterleavedBuffer.js';
 import { Face3 } from './core/Face3.js';
-import { Geometry } from './core/Geometry.js';
 import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform.js';
 import { Raycaster } from './core/Raycaster.js';
 import { Curve } from './extras/core/Curve.js';
-import { CurvePath } from './extras/core/CurvePath.js';
 import { Path } from './extras/core/Path.js';
 import { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 import { AxesHelper } from './helpers/AxesHelper.js';
 import { BoxHelper } from './helpers/BoxHelper.js';
 import { GridHelper } from './helpers/GridHelper.js';
 import { SkeletonHelper } from './helpers/SkeletonHelper.js';
-import { BoxGeometry } from './geometries/BoxGeometry.js';
 import { EdgesGeometry } from './geometries/EdgesGeometry.js';
 import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
-import { ExtrudeBufferGeometry } from './geometries/ExtrudeBufferGeometry.js';
 import { ShapeGeometry } from './geometries/ShapeGeometry.js';
 import { WireframeGeometry } from './geometries/WireframeGeometry.js';
 import { Light } from './lights/Light.js';
@@ -89,7 +85,6 @@ import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
 import { Scene } from './scenes/Scene.js';
 
-export { BoxGeometry as CubeGeometry };
 export { MathUtils as Math };
 
 export function Face4( a, b, c, d, normal, color, materialIndex ) {
@@ -261,51 +256,6 @@ Curve.create = function ( construct, getPoint ) {
 	return construct;
 
 };
-
-//
-
-Object.assign( CurvePath.prototype, {
-
-	createPointsGeometry: function ( divisions ) {
-
-		console.warn( 'THREE.CurvePath: .createPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
-
-		// generate geometry from path points (for Line or Points objects)
-
-		const pts = this.getPoints( divisions );
-		return this.createGeometry( pts );
-
-	},
-
-	createSpacedPointsGeometry: function ( divisions ) {
-
-		console.warn( 'THREE.CurvePath: .createSpacedPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
-
-		// generate geometry from equidistant sampling along the path
-
-		const pts = this.getSpacedPoints( divisions );
-		return this.createGeometry( pts );
-
-	},
-
-	createGeometry: function ( points ) {
-
-		console.warn( 'THREE.CurvePath: .createGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
-
-		const geometry = new Geometry();
-
-		for ( let i = 0, l = points.length; i < l; i ++ ) {
-
-			const point = points[ i ];
-			geometry.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
-
-		}
-
-		return geometry;
-
-	}
-
-} );
 
 //
 
@@ -583,7 +533,7 @@ Object.assign( Matrix3.prototype, {
 
 	flattenToArrayOffset: function ( array, offset ) {
 
-		console.warn( "THREE.Matrix3: .flattenToArrayOffset() has been deprecated. Use .toArray() instead." );
+		console.warn( 'THREE.Matrix3: .flattenToArrayOffset() has been deprecated. Use .toArray() instead.' );
 		return this.toArray( array, offset );
 
 	},
@@ -628,7 +578,7 @@ Object.assign( Matrix4.prototype, {
 	},
 	flattenToArrayOffset: function ( array, offset ) {
 
-		console.warn( "THREE.Matrix4: .flattenToArrayOffset() has been deprecated. Use .toArray() instead." );
+		console.warn( 'THREE.Matrix4: .flattenToArrayOffset() has been deprecated. Use .toArray() instead.' );
 		return this.toArray( array, offset );
 
 	},
@@ -950,27 +900,6 @@ Object.assign( Vector4.prototype, {
 
 //
 
-Object.assign( Geometry.prototype, {
-
-	computeTangents: function () {
-
-		console.error( 'THREE.Geometry: .computeTangents() has been removed.' );
-
-	},
-	computeLineDistances: function () {
-
-		console.error( 'THREE.Geometry: .computeLineDistances() has been removed. Use THREE.Line.computeLineDistances() instead.' );
-
-	},
-	applyMatrix: function ( matrix ) {
-
-		console.warn( 'THREE.Geometry: .applyMatrix() has been renamed to .applyMatrix4().' );
-		return this.applyMatrix4( matrix );
-
-	}
-
-} );
-
 Object.assign( Object3D.prototype, {
 
 	getChildByName: function ( name ) {
@@ -1118,8 +1047,8 @@ Object.defineProperty( Curve.prototype, '__arcLengthDivisions', {
 
 PerspectiveCamera.prototype.setLens = function ( focalLength, filmGauge ) {
 
-	console.warn( "THREE.PerspectiveCamera.setLens is deprecated. " +
-			"Use .setFocalLength and .filmGauge for a photographic setup." );
+	console.warn( 'THREE.PerspectiveCamera.setLens is deprecated. ' +
+			'Use .setFocalLength and .filmGauge for a photographic setup.' );
 
 	if ( filmGauge !== undefined ) this.filmGauge = filmGauge;
 	this.setFocalLength( focalLength );
@@ -1331,11 +1260,6 @@ Object.assign( BufferGeometry.prototype, {
 		this.clearGroups();
 
 	},
-	computeTangents: function () {
-
-		console.warn( 'THREE.BufferGeometry: .computeTangents() has been removed.' );
-
-	},
 	computeOffsets: function () {
 
 		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.' );
@@ -1452,23 +1376,23 @@ Object.assign( InterleavedBuffer.prototype, {
 
 //
 
-Object.assign( ExtrudeBufferGeometry.prototype, {
+Object.assign( ExtrudeGeometry.prototype, {
 
 	getArrays: function () {
 
-		console.error( 'THREE.ExtrudeBufferGeometry: .getArrays() has been removed.' );
+		console.error( 'THREE.ExtrudeGeometry: .getArrays() has been removed.' );
 
 	},
 
 	addShapeList: function () {
 
-		console.error( 'THREE.ExtrudeBufferGeometry: .addShapeList() has been removed.' );
+		console.error( 'THREE.ExtrudeGeometry: .addShapeList() has been removed.' );
 
 	},
 
 	addShape: function () {
 
-		console.error( 'THREE.ExtrudeBufferGeometry: .addShape() has been removed.' );
+		console.error( 'THREE.ExtrudeGeometry: .addShape() has been removed.' );
 
 	}
 

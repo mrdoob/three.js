@@ -12,6 +12,7 @@ export class AnimationLoader extends Loader {
 		onProgress?: ( request: ProgressEvent ) => void,
 		onError?: ( event: ErrorEvent ) => void
 	): void;
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<AnimationClip[]>;
 	parse( json: any ): AnimationClip[];
 
 }

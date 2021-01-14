@@ -57,7 +57,7 @@ export class LightShadow {
 	needsUpdate: boolean;
 
 	copy( source: LightShadow ): this;
-	clone( recursive?: boolean ): this;
+	clone( recursive?: boolean ): LightShadow;
 	toJSON(): any;
 	getFrustum(): number;
 	updateMatrices( light: Light, viewportIndex?: number ): void;

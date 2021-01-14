@@ -172,7 +172,7 @@ zAxis = (c, g, k)
 			使用基于列优先格式[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]的数组来设置该矩阵。
 		</p>
 
-		<h3>[method:this invert()]()</h3>
+		<h3>[method:this invert]()</h3>
 		<p>
 		Inverts this matrix, using the [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method].
 
@@ -350,6 +350,9 @@ x, y, 1, 0,
 		<p>
 			以行优先的格式将传入的数值设置给该矩阵中的元素[page:.elements elements]。
 		</p>
+
+		<h3>[method:this setFromMatrix3]( [param:Matrix3 m] )</h3>
+		<p>Set the upper 3x3 elements of this matrix to the values of the Matrix3 [page:Matrix3 m].</p>
 
 		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
 		<h3>[method:this setPosition]( [param:Float x], [param:Float y], [param:Float z] ) // optional API</h3>

@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.122.0",
+  "version": "0.124.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "module": "build/three.module.js",
@@ -27,6 +27,7 @@
     "test": "test"
   },
   "eslintConfig": {
+    "root": true,
     "parser": "@typescript-eslint/parser",
     "extends": "mdcs",
     "plugins": [
@@ -44,6 +45,10 @@
           "SwitchCase": 1
         }
       ],
+      "quotes": [
+        "error",
+        "single"
+      ],
       "prefer-const": [
         "error",
         {
@@ -58,11 +63,12 @@
     "test": "npm run test-lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
-    "lint-fix": "eslint src --ext js --ext ts --fix && eslint examples/js/ --ext js --ext ts --ignore-pattern libs --fix",
+    "lint-fix": "eslint src --ext js --ext ts --fix && eslint examples/js examples/jsm --ext js --ext ts --ignore-pattern libs --fix",
     "lint-docs": "eslint docs --ext html",
-    "lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
+    "lint-examples": "eslint examples/js examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
     "test-lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
     "test-unit": "npm run unit --prefix test",
+    "test-unit-examples": "npm run unit-examples --prefix test",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "make-screenshot": "node test/e2e/puppeteer.js --make"
@@ -89,20 +95,20 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@babel/core": "^7.12.3",
+    "@babel/core": "^7.12.10",
     "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-env": "^7.12.11",
+    "@rollup/plugin-babel": "^5.2.2",
+    "@typescript-eslint/eslint-plugin": "^4.11.0",
+    "@typescript-eslint/parser": "^4.11.0",
     "concurrently": "^5.3.0",
-    "@rollup/plugin-babel": "^5.2.1",
-    "@typescript-eslint/eslint-plugin": "^4.6.0",
-    "@typescript-eslint/parser": "^4.6.0",
-    "eslint": "^7.12.1",
+    "eslint": "^7.16.0",
     "eslint-config-mdcs": "^5.0.0",
-    "eslint-plugin-html": "^6.0.3",
-    "rollup": "^2.32.1",
+    "eslint-plugin-html": "^6.1.1",
+    "rollup": "^2.35.1",
     "rollup-plugin-terser": "^7.0.2",
     "servez": "^1.11.0",
-    "typescript": "^4.0.5"
+    "typescript": "^4.1.3"
   },
   "jspm": {
     "files": [

@@ -1,6 +1,6 @@
-import { Geometry } from './../core/Geometry';
+import { BufferGeometry } from './../core/BufferGeometry';
 
-export class TorusKnotGeometry extends Geometry {
+export class TorusKnotGeometry extends BufferGeometry {
 
 	/**
 	 * @param [radius=1]
@@ -34,3 +34,5 @@ export class TorusKnotGeometry extends Geometry {
 	};
 
 }
+
+export { TorusKnotGeometry as TorusKnotBufferGeometry };

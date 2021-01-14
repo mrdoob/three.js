@@ -17,7 +17,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { VOXLoader } from './jsm/loaders/VOXLoader.js';
+			import { VOXLoader, VOXMesh } from './jsm/loaders/VOXLoader.js';
 
 			let camera, controls, scene, renderer;
 
@@ -34,52 +34,29 @@
 
 				// light
 
-				const hemiLight = new THREE.HemisphereLight( 0x888888, 0x000000, 1 );
+				const hemiLight = new THREE.HemisphereLight( 0x888888, 0x444444, 1 );
 				scene.add( hemiLight );
 
 				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.75 );
 				dirLight.position.set( 1.5, 3, 2.5 );
 				scene.add( dirLight );
 
+				const dirLight2 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				dirLight2.position.set( - 1.5, - 3, - 2.5 );
+				scene.add( dirLight2 );
+
 				const loader = new VOXLoader();
 				loader.load( 'models/vox/monu10.vox', function ( chunks ) {
-
-					const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-					const material = new THREE.MeshStandardMaterial();
-
-					const color = new THREE.Color();
-					const matrix = new THREE.Matrix4();
 
 					for ( let i = 0; i < chunks.length; i ++ ) {
 
 						const chunk = chunks[ i ];
 
-						const size = chunk.size;
-						const data = chunk.data;
-						const palette = chunk.palette;
+						// displayPalette( chunk.palette );
 
-						// displayPalette( palette );
-
-						const mesh = new THREE.InstancedMesh( geometry, material, data.length / 4 );
+						const mesh = new VOXMesh( chunk );
 						mesh.scale.setScalar( 0.0015 );
 						scene.add( mesh );
-
-						for ( let j = 0, k = 0; j < data.length; j += 4, k ++ ) {
-
-							const x = data[ j + 0 ] - size.x / 2;
-							const y = data[ j + 1 ] - size.y / 2;
-							const z = data[ j + 2 ] - size.z / 2;
-							const c = data[ j + 3 ];
-
-							const hex = palette[ c ];
-							const r = ( hex >> 0 & 0xff ) / 0xff;
-							const g = ( hex >> 8 & 0xff ) / 0xff;
-							const b = ( hex >> 16 & 0xff ) / 0xff;
-
-							mesh.setColorAt( k, color.setRGB( r, g, b ) );
-							mesh.setMatrixAt( k, matrix.setPosition( x, z, - y ) );
-
-						}
 
 					}
 
@@ -90,10 +67,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				const container = document.createElement( 'div' );
-				document.body.appendChild( container );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				// controls
 

@@ -13,8 +13,16 @@ import {
 
 import { Pass } from './Pass';
 
+export enum OUTPUT {
+	Beauty,
+	Default,
+	SAO,
+	Depth,
+	Normal
+}
+
 interface SAOPassParams {
-	output: SAOPass.OUTPUT;
+	output: OUTPUT;
 	saoBias: number;
 	saoIntensity: number;
 	saoScale: number;
@@ -52,13 +60,7 @@ export class SAOPass extends Pass {
 	fsQuad: object;
 	params: SAOPassParams;
 
-	static OUTPUT: {
-		Beauty: number;
-		Default: number;
-		SAO: number;
-		Depth: number;
-		Normal: number;
-	};
+	static OUTPUT: OUTPUT;
 
 	renderPass( renderer: WebGLRenderer, passMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: Color | string | number, clearAlpha?: number ): void;
 	renderOverride( renderer: WebGLRenderer, overrideMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: Color | string | number, clearAlpha?: number ): void;

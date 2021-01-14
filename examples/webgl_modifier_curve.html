@@ -57,7 +57,7 @@
 					{ x: - 1, y: 0, z: - 1 },
 				];
 
-				const boxGeometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1 );
+				const boxGeometry = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
 				const boxMaterial = new THREE.MeshBasicMaterial();
 
 				for ( const handlePos of initialPoints ) {
@@ -102,7 +102,7 @@
 					font
 				) {
 
-					const geometry = new THREE.TextBufferGeometry( "Hello three.js!", {
+					const geometry = new THREE.TextGeometry( "Hello three.js!", {
 						font: font,
 						size: 0.2,
 						height: 0.05,

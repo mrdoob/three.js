@@ -7,7 +7,6 @@ import { Layers } from './Layers';
 import { WebGLRenderer } from './../renderers/WebGLRenderer';
 import { Scene } from './../scenes/Scene';
 import { Camera } from './../cameras/Camera';
-import { Geometry } from './Geometry';
 import { Material } from './../materials/Material';
 import { Group } from './../objects/Group';
 import { Raycaster } from './Raycaster';
@@ -192,7 +191,7 @@ export class Object3D extends EventDispatcher {
 		renderer: WebGLRenderer,
 		scene: Scene,
 		camera: Camera,
-		geometry: Geometry | BufferGeometry,
+		geometry: BufferGeometry,
 		material: Material,
 		group: Group
 	) => void;
@@ -204,7 +203,7 @@ export class Object3D extends EventDispatcher {
 		renderer: WebGLRenderer,
 		scene: Scene,
 		camera: Camera,
-		geometry: Geometry | BufferGeometry,
+		geometry: BufferGeometry,
 		material: Material,
 		group: Group
 	) => void;
@@ -379,7 +378,7 @@ export class Object3D extends EventDispatcher {
 		images: any;
 	} ): any;
 
-	clone( recursive?: boolean ): this;
+	clone( recursive?: boolean ): Object3D;
 
 	/**
 	 *

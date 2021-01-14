@@ -1,6 +1,5 @@
 import {
 	BufferAttribute,
-	BufferGeometry,
 	ClampToEdgeWrapping,
 	DoubleSide,
 	InterpolateDiscrete,
@@ -9,6 +8,7 @@ import {
 	LinearMipmapLinearFilter,
 	LinearMipmapNearestFilter,
 	MathUtils,
+	Matrix4,
 	MirroredRepeatWrapping,
 	NearestFilter,
 	NearestMipmapLinearFilter,
@@ -19,7 +19,7 @@ import {
 	RepeatWrapping,
 	Scene,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 //------------------------------------------------------------------------------
 // Constants
@@ -116,8 +116,8 @@ GLTFExporter.prototype = {
 
 			asset: {
 
-				version: "2.0",
-				generator: "GLTFExporter"
+				version: '2.0',
+				generator: 'THREE.GLTFExporter'
 
 			}
 
@@ -178,7 +178,7 @@ GLTFExporter.prototype = {
 		/**
 		 * Is identity matrix
 		 *
-		 * @param {THREE.Matrix4} matrix
+		 * @param {Matrix4} matrix
 		 * @returns {Boolean} Returns true, if parameter is identity matrix
 		 */
 		function isIdentityMatrix( matrix ) {
@@ -656,7 +656,7 @@ GLTFExporter.prototype = {
 		/**
 		 * Process attribute to generate an accessor
 		 * @param  {BufferAttribute} attribute Attribute to process
-		 * @param  {BufferGeometry} geometry (Optional) Geometry used for truncated draw range
+		 * @param  {THREE.BufferGeometry} geometry (Optional) Geometry used for truncated draw range
 		 * @param  {Integer} start (Optional)
 		 * @param  {Integer} count (Optional)
 		 * @return {Integer}           Index of the processed accessor on the "accessors" array
@@ -784,7 +784,7 @@ GLTFExporter.prototype = {
 
 			var cachedImages = cachedData.images.get( image );
 			var mimeType = format === RGBAFormat ? 'image/png' : 'image/jpeg';
-			var key = mimeType + ":flipY/" + flipY.toString();
+			var key = mimeType + ':flipY/' + flipY.toString();
 
 			if ( cachedImages[ key ] !== undefined ) {
 
@@ -818,6 +818,7 @@ GLTFExporter.prototype = {
 
 				if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 					( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+					( typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas ) ||
 					( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
 					ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
@@ -1262,10 +1263,9 @@ GLTFExporter.prototype = {
 
 			}
 
-			if ( ! geometry.isBufferGeometry ) {
+			if ( geometry.isBufferGeometry !== true ) {
 
-				console.warn( 'GLTFExporter: Exporting THREE.Geometry will increase file size. Use BufferGeometry instead.' );
-				geometry = new BufferGeometry().setFromObject( mesh );
+				throw new Error( 'THREE.GLTFExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 			}
 
@@ -1716,12 +1716,15 @@ GLTFExporter.prototype = {
 
 			var joints = [];
 			var inverseBindMatrices = new Float32Array( skeleton.bones.length * 16 );
+			var temporaryBoneInverse = new Matrix4();
 
 			for ( var i = 0; i < skeleton.bones.length; ++ i ) {
 
 				joints.push( nodeMap.get( skeleton.bones[ i ] ) );
 
-				skeleton.boneInverses[ i ].toArray( inverseBindMatrices, i * 16 );
+				temporaryBoneInverse.copy( skeleton.boneInverses[ i ] );
+
+				temporaryBoneInverse.multiply( object.bindMatrix ).toArray( inverseBindMatrices, i * 16 );
 
 			}
 
@@ -2305,7 +2308,7 @@ GLTFExporter.Utils = {
 
 				// We need to take into consideration the intended target node
 				// of our original un-merged morphTarget animation.
-				mergedTrack.name = sourceTrackBinding.nodeName + '.morphTargetInfluences';
+				mergedTrack.name = ( sourceTrackBinding.nodeName || '' ) + '.morphTargetInfluences';
 				mergedTrack.values = values;
 
 				mergedTracks[ sourceTrackNode.uuid ] = mergedTrack;

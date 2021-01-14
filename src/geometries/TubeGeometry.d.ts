@@ -1,8 +1,8 @@
 import { Curve } from './../extras/core/Curve';
 import { Vector3 } from './../math/Vector3';
-import { Geometry } from './../core/Geometry';
+import { BufferGeometry } from './../core/BufferGeometry';
 
-export class TubeGeometry extends Geometry {
+export class TubeGeometry extends BufferGeometry {
 
 	/**
 	 * @param path
@@ -19,6 +19,11 @@ export class TubeGeometry extends Geometry {
 		closed?: boolean
 	);
 
+	/**
+	 * @default 'TubeGeometry'
+	 */
+	type: string;
+
 	parameters: {
 		path: Curve<Vector3>;
 		tubularSegments: number;
@@ -31,3 +36,5 @@ export class TubeGeometry extends Geometry {
 	binormals: Vector3[];
 
 }
+
+export { TubeGeometry as TubeBufferGeometry };

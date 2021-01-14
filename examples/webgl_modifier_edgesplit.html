@@ -13,19 +13,22 @@
 			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { OBJLoader } from "./jsm/loaders/OBJLoader.js";
-			import { BufferGeometryUtils } from "./jsm/utils/BufferGeometryUtils.js";
-			import { EdgeSplitModifier } from "./jsm/modifiers/EdgeSplitModifier.js";
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { EdgeSplitModifier } from './jsm/modifiers/EdgeSplitModifier.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
-			import { GUI } from "./jsm/libs/dat.gui.module.js";
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			let renderer, scene, camera;
 			let modifier, mesh, baseGeometry;
+			let map;
 
 			const params = {
 				smoothShading: true,
 				edgeSplit: true,
 				cutOffAngle: 20,
+				showMap: false,
+				tryKeepNormals: true,
 			};
 
 			init();
@@ -63,13 +66,11 @@
 					'./models/obj/cerberus/Cerberus.obj',
 					function ( group ) {
 
-						// Retrieve Cerberus vertex positions only
-						const modelGeometry = group.children[ 0 ].geometry;
-						modelGeometry.deleteAttribute( 'normal' );
-						modelGeometry.deleteAttribute( 'uv' );
+						const cerberus = group.children[ 0 ];
+						const modelGeometry = cerberus.geometry;
 
 						modifier = new EdgeSplitModifier();
-						baseGeometry = modelGeometry;
+						baseGeometry = BufferGeometryUtils.mergeVertices( modelGeometry );
 
 						mesh = new THREE.Mesh( getGeometry(), new THREE.MeshStandardMaterial() );
 						mesh.material.flatShading = ! params.smoothShading;
@@ -78,6 +79,13 @@
 						mesh.translateZ( 1.5 );
 						scene.add( mesh );
 
+						if ( map !== undefined && params.showMap ) {
+
+							mesh.material.map = map;
+							mesh.material.needsUpdate = true;
+
+						}
+
 						render();
 
 					}
@@ -85,12 +93,27 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				new THREE.TextureLoader().load( './models/obj/cerberus/Cerberus_A.jpg', function ( texture ) {
 
-				const gui = new GUI( { name: "Edge split modifier parameters" } );
+					map = texture;
 
-				gui.add( params, "smoothShading" ).onFinishChange( updateMesh );
-				gui.add( params, "edgeSplit" ).onFinishChange( updateMesh );
-				gui.add( params, "cutOffAngle" ).min( 0 ).max( 180 ).onFinishChange( updateMesh );
+					if ( mesh !== undefined && params.showMap ) {
+
+						mesh.material.map = map;
+						mesh.material.needsUpdate = true;
+
+					}
+
+				} );
+
+
+				const gui = new GUI( { name: 'Edge split modifier parameters' } );
+
+				gui.add( params, 'showMap' ).onFinishChange( updateMesh );
+				gui.add( params, 'smoothShading' ).onFinishChange( updateMesh );
+				gui.add( params, 'edgeSplit' ).onFinishChange( updateMesh );
+				gui.add( params, 'cutOffAngle' ).min( 0 ).max( 180 ).onFinishChange( updateMesh );
+				gui.add( params, 'tryKeepNormals' ).onFinishChange( updateMesh );
 
 			}
 
@@ -112,15 +135,17 @@
 
 				if ( params.edgeSplit ) {
 
-					geometry = modifier.modify( baseGeometry, params.cutOffAngle * Math.PI / 180 );
+					geometry = modifier.modify(
+						baseGeometry,
+						params.cutOffAngle * Math.PI / 180,
+						params.tryKeepNormals
+					);
 
 				} else {
 
-					geometry = BufferGeometryUtils.mergeVertices( baseGeometry );
+					geometry = baseGeometry;
 
 				}
-
-				geometry.computeVertexNormals();
 
 				return geometry;
 
@@ -129,12 +154,25 @@
 
 			function updateMesh() {
 
-				mesh.geometry = getGeometry();
+				if ( mesh !== undefined ) {
 
-				mesh.material.flatShading = params.smoothShading === false;
-				mesh.material.needsUpdate = true;
+					mesh.geometry = getGeometry();
 
-				render();
+					let needsUpdate = mesh.material.flatShading === params.smoothShading;
+					mesh.material.flatShading = params.smoothShading === false;
+
+					if ( map !== undefined ) {
+
+						needsUpdate = needsUpdate || mesh.material.map !== ( params.showMap ? map : null );
+						mesh.material.map = params.showMap ? map : null;
+
+					}
+
+					mesh.material.needsUpdate = needsUpdate;
+
+					render();
+
+				}
 
 			}
 
