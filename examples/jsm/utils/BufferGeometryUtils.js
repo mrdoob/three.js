@@ -638,25 +638,21 @@ var BufferGeometryUtils = {
 	 * @param {Object3D} object
 	 * @return {Object} An Object with original position/normal attributes and morphed ones.
 	 */
-	computeMorphedBufferGeometry: function ( object ) {
+	computeMorphedAttributes: function ( object ) {
 
 		if ( ! object ) {
 
-			console.error( 'Please provide an object' );
+			console.warn( 'Please provide an object' );
 			return null;
 
-		}
+		} else if ( ! object.geometry ) {
 
-		if ( ! object.geometry ) {
-
-			console.error( 'Please provide an object with a geometry' );
+			console.warn( 'Please provide an object with a geometry' );
 			return null;
 
-		}
+		} else if ( ! object.geometry.isBufferGeometry ) {
 
-		if ( ! object.geometry.isBufferGeometry ) {
-
-			console.error( 'Geometry is not a BufferGeometry' );
+			console.warn( 'Geometry is not a BufferGeometry' );
 			return null;
 
 		}

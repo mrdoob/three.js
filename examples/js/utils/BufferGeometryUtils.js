@@ -626,23 +626,19 @@ THREE.BufferGeometryUtils = {
 	 * @param {Object3D} object
 	 * @return {Object} An Object with original position/normal attributes and morphed ones.
 	 */
-	computeMorphedBufferGeometry: function ( object ) {
+	computeMorphedAttributes: function ( object ) {
 
 		if ( ! object ) {
 
 			console.error( 'Please provide an object' );
 			return null;
 
-		}
-
-		if ( ! object.geometry ) {
+		} else if ( ! object.geometry ) {
 
 			console.error( 'Please provide an object with a geometry' );
 			return null;
 
-		}
-
-		if ( ! object.geometry.isBufferGeometry ) {
+		} else if ( ! object.geometry.isBufferGeometry ) {
 
 			console.error( 'Geometry is not a BufferGeometry' );
 			return null;

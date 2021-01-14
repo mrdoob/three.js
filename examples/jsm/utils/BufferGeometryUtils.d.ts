@@ -7,5 +7,5 @@ export namespace BufferGeometryUtils {
 	export function estimateBytesUsed( geometry: BufferGeometry ): number;
 	export function mergeVertices( geometry: BufferGeometry, tolerance?: number ): BufferGeometry;
 	export function toTrianglesDrawMode( geometry: BufferGeometry, drawMode: TrianglesDrawModes ): BufferGeometry;
-	export function computeMorphedBufferGeometry( object: Object3D ): Object;
+	export function computeMorphedAttributes( object: Object3D ): Object;
 }
