@@ -137,7 +137,6 @@ const assets = [
 	'./js/Sidebar.Properties.js',
 	'./js/Sidebar.Object.js',
 	'./js/Sidebar.Geometry.js',
-	'./js/Sidebar.Geometry.Geometry.js',
 	'./js/Sidebar.Geometry.BufferGeometry.js',
 	'./js/Sidebar.Geometry.Modifiers.js',
 	'./js/Sidebar.Geometry.BoxGeometry.js',
