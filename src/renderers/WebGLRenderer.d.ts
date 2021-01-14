@@ -17,7 +17,6 @@ import { Material } from './../materials/Material';
 import { ToneMapping, ShadowMapType, CullFace, TextureEncoding } from '../constants';
 import { WebXRManager } from '../renderers/webxr/WebXRManager';
 import { RenderTarget } from './webgl/WebGLRenderLists';
-import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 import { Texture } from '../textures/Texture';
 import { XRAnimationLoopCallback } from './webxr/WebXR';
@@ -101,7 +100,7 @@ export interface WebGLDebug {
  * The WebGL renderer displays your beautifully crafted scenes using WebGL, if your device supports it.
  * This renderer has way better performance than CanvasRenderer.
  *
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js|src/renderers/WebGLRenderer.js}
+ * see {@link https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js|src/renderers/WebGLRenderer.js}
  */
 export class WebGLRenderer implements Renderer {
 
@@ -334,7 +333,7 @@ export class WebGLRenderer implements Renderer {
 	renderBufferDirect(
 		camera: Camera,
 		scene: Scene,
-		geometry: Geometry | BufferGeometry,
+		geometry: BufferGeometry,
 		material: Material,
 		object: Object3D,
 		geometryGroup: any

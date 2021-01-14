@@ -13,12 +13,6 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 		if ( updateMap.get( buffergeometry ) !== frame ) {
 
-			if ( geometry.isGeometry ) {
-
-				buffergeometry.updateFromObject( object );
-
-			}
-
 			geometries.update( buffergeometry );
 
 			updateMap.set( buffergeometry, frame );

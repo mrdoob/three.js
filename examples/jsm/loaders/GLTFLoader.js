@@ -3305,6 +3305,21 @@ var GLTFLoader = ( function () {
 						? new SkinnedMesh( geometry, material )
 						: new Mesh( geometry, material );
 
+					// Fix double sided rendered models on certain mobile devices, see https://github.com/mrdoob/three.js/issues/20997#issuecomment-756082184
+
+					if ( material.isMeshStandardMaterial === true &&
+						material.side === DoubleSide &&
+						geometry.getIndex() !== null &&
+						geometry.hasAttribute( 'position' ) === true &&
+						geometry.hasAttribute( 'normal' ) === true &&
+						geometry.hasAttribute( 'uv' ) === true &&
+						geometry.hasAttribute( 'tangent' ) === false ) {
+
+						geometry.computeTangents();
+						material.vertexTangents = true;
+
+					}
+
 					if ( mesh.isSkinnedMesh === true && ! mesh.geometry.attributes.skinWeight.normalized ) {
 
 						// we normalize floating point skin weight array to fix malformed assets (see #15319)

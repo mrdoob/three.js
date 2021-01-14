@@ -21,6 +21,7 @@ export class MMDLoader extends Loader {
 	parser: object | null;
 
 	load( url: string, onLoad: ( mesh: SkinnedMesh ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<SkinnedMesh>;
 	loadAnimation( url: string, object: SkinnedMesh | THREE.Camera, onLoad: ( object: SkinnedMesh | AnimationClip ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
 	loadPMD( url: string, onLoad: ( object: object ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
 	loadPMX( url: string, onLoad: ( object: object ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;

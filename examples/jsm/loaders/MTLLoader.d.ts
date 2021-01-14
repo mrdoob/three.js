@@ -48,6 +48,8 @@ export class MTLLoader extends Loader {
 	parse( text: string, path: string ) : MTLLoader.MaterialCreator;
 	setMaterialOptions( value: MaterialCreatorOptions ) : void;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<MTLLoader.MaterialCreator>;
+
 }
 
 export interface MaterialInfo {

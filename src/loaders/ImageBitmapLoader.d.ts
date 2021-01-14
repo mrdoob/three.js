@@ -20,4 +20,6 @@ export class ImageBitmapLoader extends Loader {
 		onError?: ( event: ErrorEvent ) => void
 	): any;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<ImageBitmap>;
+
 }

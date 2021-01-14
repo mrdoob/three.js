@@ -62,7 +62,7 @@ function animation( time ) {
 }
 ```
 
-If everything went well, you should see [this](https://jsfiddle.net/yf6nks2o/).
+If everything went well, you should see [this](https://jsfiddle.net/zdjankqw/).
 
 ### Cloning this repository ###
 

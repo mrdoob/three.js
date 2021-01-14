@@ -80,13 +80,13 @@
 				} else if ( type === 2 ) {
 
 					const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-					const geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
+					const geometry = new THREE.BoxGeometry( 100, 100, 100 );
 					scene.add( new THREE.Mesh( geometry, material ) );
 
 				} else if ( type === 3 ) {
 
 					const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-					const geometry = new THREE.CylinderBufferGeometry( 50, 50, 100, 30, 1 );
+					const geometry = new THREE.CylinderGeometry( 50, 50, 100, 30, 1 );
 					scene.add( new THREE.Mesh( geometry, material ) );
 
 				} else if ( type === 4 || type === 5 ) {
@@ -98,11 +98,11 @@
 					mesh.position.x = - 200;
 					scene.add( mesh );
 
-					const geometry2 = new THREE.BoxBufferGeometry( 100, 100, 100 );
+					const geometry2 = new THREE.BoxGeometry( 100, 100, 100 );
 					const mesh2 = new THREE.Mesh( geometry2, material );
 					scene.add( mesh2 );
 
-					const geometry3 = new THREE.CylinderBufferGeometry( 50, 50, 100, 30, 1 );
+					const geometry3 = new THREE.CylinderGeometry( 50, 50, 100, 30, 1 );
 					const mesh3 = new THREE.Mesh( geometry3, material );
 					mesh3.position.x = 200;
 					scene.add( mesh3 );

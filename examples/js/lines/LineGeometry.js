@@ -68,7 +68,8 @@ THREE.LineGeometry.prototype = Object.assign( Object.create( THREE.LineSegmentsG
 
 		if ( geometry.isGeometry ) {
 
-			this.setPositions( geometry.vertices );
+			console.error( 'THREE.LineGeometry no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
+			return;
 
 		} else if ( geometry.isBufferGeometry ) {
 

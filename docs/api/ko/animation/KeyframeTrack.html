@@ -49,12 +49,12 @@
 		</ul>
 
 		<p>
-			다른 종류의 KeyframeTracks으로 [page:AnimationClip AnimationClips]를 직접 만드는 예제는 
+			다른 종류의 KeyframeTracks으로 [page:AnimationClip AnimationClips]를 직접 만드는 예제는
 			[link:https://threejs.org/examples/jsm/animation/AnimationClipCreator.js AnimationClipCreator]를 참고하세요.
 		</p>
 
 		<p>
-			명시적 값은 시간 배열에 저장된 시간 이산 지점에 특정되기 때문에, 모든 중간 값들은 보간이 되어야 합니다. 
+			명시적 값은 시간 배열에 저장된 시간 이산 지점에 특정되기 때문에, 모든 중간 값들은 보간이 되어야 합니다.
 		</p>
 
 		<p>
@@ -68,7 +68,7 @@
 		<h3>[name]( [param:String name], [param:Array times], [param:Array values], [param:Constant interpolation] )</h3>
 		<p>
 			[page:String name] - *KeyframeTrack*의 식별자.<br />
-			[page:Array times] - 키프레임 시간 배열, 내부적으로 
+			[page:Array times] - 키프레임 시간 배열, 내부적으로
 			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array]로 변환됩니다.<br />
 			[page:Array values] - 시간 배열과 관련된 값을 가진 배열, 내부적으로
 			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array]로 변환됩니다.<br />
@@ -82,24 +82,24 @@
 
 		<h3>[property:String name]</h3>
 		<p>
-			트랙의 이름은 [page:Geometry.morphTargets morph targets] 혹은 [page:SkinnedMesh bones] 및 
+			트랙의 이름은 morph targets 혹은 [page:SkinnedMesh bones] 및 
 			다른 애니메이션 오브젝트에 들어있는 값들을 참조할 수 있습니다. See
 			프로퍼티로 파싱될 수 있는 문자열 폼에 대해서는 [page:PropertyBinding.parseTrackName] 를 참고하세요.
 		</p>
 
 		<p>
-			트랙의 이름은 노드의 이름을 사용하거나 노드의 uuid(믹서에 전달된 장면 그래프 노드의 서브트리 안에 있어야 하지만)를 사용해서 노드를 특정할 수 있습니다. 
+			트랙의 이름은 노드의 이름을 사용하거나 노드의 uuid(믹서에 전달된 장면 그래프 노드의 서브트리 안에 있어야 하지만)를 사용해서 노드를 특정할 수 있습니다.
 			혹은 만약 트랙 이름이 .으로 시작한다면, 트랙은  믹서에 전달된 루트 노드를 적용할 것입니다.
 		</p>
 
 		<p>
-			보통 노드 다음에는 프로퍼티가 직접 특정됩니다. 하지만 float 트랙을 통해 회전의 X 컴포넌트를 조절하려면 
+			보통 노드 다음에는 프로퍼티가 직접 특정됩니다. 하지만 float 트랙을 통해 회전의 X 컴포넌트를 조절하려면
 			.rotation[x]같은 서브프로퍼티를 특정할 수도 있습니다.
 		</p>
 
 		<p>
 			오브젝트 이름으로 골자나 다중 재질을 특정할 수도 있습니다. 예시:
-			.bones[R_hand].scale; 
+			.bones[R_hand].scale;
 			추가적으로, 재질 배열의 네 번째 재질의 확상광 중 레드 채널은 .materials[3].diffuse[r]로 접근할 수 있습니다.
 		</p>
 
@@ -223,7 +223,7 @@
 		</p>
 
 		<p>
-			이 메서드는 트랙이 비었거나, [page:.valueSize value size] 값이 부적절하거나, 
+			이 메서드는 트랙이 비었거나, [page:.valueSize value size] 값이 부적절하거나,
 			[page:.times times] 혹은 [page:.values values] 배열의 값이 부적절하거나, *times* 배열의 순서가 어긋나면 에러 로그를 콘솔에 출력합니다.
 		</p>
 

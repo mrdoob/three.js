@@ -34,20 +34,20 @@ var files = [
 	{ path: 'effects/PeppersGhostEffect.js', dependencies: [], ignoreList: [] },
 	{ path: 'effects/StereoEffect.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'exporters/ColladaExporter.js', dependencies: [], ignoreList: [] },
-	{ path: 'exporters/DRACOExporter.js', dependencies: [], ignoreList: [ 'Geometry' ] },
-	{ path: 'exporters/GLTFExporter.js', dependencies: [], ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'Scenes', 'ShaderMaterial' ] },
+	{ path: 'exporters/ColladaExporter.js', dependencies: [], ignoreList: [ 'BufferGeometry' ] },
+	{ path: 'exporters/DRACOExporter.js', dependencies: [], ignoreList: [ 'Geometry', 'BufferGeometry' ] },
+	{ path: 'exporters/GLTFExporter.js', dependencies: [], ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'Scenes', 'ShaderMaterial', 'BufferGeometry' ] },
 	{ path: 'exporters/MMDExporter.js', dependencies: [ { name: 'MMDParser', path: 'libs/mmdparser.module.js' } ], ignoreList: [] },
-	{ path: 'exporters/OBJExporter.js', dependencies: [], ignoreList: [] },
-	{ path: 'exporters/PLYExporter.js', dependencies: [], ignoreList: [] },
-	{ path: 'exporters/STLExporter.js', dependencies: [], ignoreList: [] },
+	{ path: 'exporters/OBJExporter.js', dependencies: [], ignoreList: [ 'BufferGeometry' ] },
+	{ path: 'exporters/PLYExporter.js', dependencies: [], ignoreList: [ 'BufferGeometry' ] },
+	{ path: 'exporters/STLExporter.js', dependencies: [], ignoreList: [ 'BufferGeometry' ] },
 
 	{ path: 'geometries/BoxLineGeometry.js', dependencies: [], ignoreList: [] },
 	{ path: 'geometries/ConvexGeometry.js', dependencies: [ { name: 'ConvexHull', path: 'math/ConvexHull.js' } ], ignoreList: [] },
-	{ path: 'geometries/DecalGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/DecalGeometry.js', dependencies: [], ignoreList: [ 'Geometry' ] },
 	{ path: 'geometries/LightningStrike.js', dependencies: [ { name: 'SimplexNoise', path: 'math/SimplexNoise.js' } ], ignoreList: [ 'Mesh' ] },
 	{ path: 'geometries/ParametricGeometries.js', dependencies: [], ignoreList: [] },
-	{ path: 'geometries/TeapotBufferGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/TeapotGeometry.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'interactive/SelectionBox.js', dependencies: [], ignoreList: [] },
 	{ path: 'interactive/SelectionHelper.js', dependencies: [], ignoreList: [] },
@@ -56,10 +56,10 @@ var files = [
 	{ path: 'lights/RectAreaLightUniformsLib.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'lines/Line2.js', dependencies: [ { name: 'LineSegments2', path: 'lines/LineSegments2.js' }, { name: 'LineGeometry', path: 'lines/LineGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
-	{ path: 'lines/LineGeometry.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [] },
+	{ path: 'lines/LineGeometry.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [ 'BufferGeometry' ] },
 	{ path: 'lines/LineMaterial.js', dependencies: [], ignoreList: [] },
 	{ path: 'lines/LineSegments2.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
-	{ path: 'lines/LineSegmentsGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'lines/LineSegmentsGeometry.js', dependencies: [], ignoreList: [ 'BufferGeometry' ] },
 	{ path: 'lines/Wireframe.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
 	{ path: 'lines/WireframeGeometry2.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [] },
 
@@ -101,12 +101,12 @@ var files = [
 	{ path: 'loaders/XLoader.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'math/ColorConverter.js', dependencies: [], ignoreList: [] },
-	{ path: 'math/ConvexHull.js', dependencies: [], ignoreList: [] },
+	{ path: 'math/ConvexHull.js', dependencies: [], ignoreList: [ 'BufferGeometry' ] },
 	{ path: 'math/ImprovedNoise.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'misc/ConvexObjectBreaker.js', dependencies: [ { name: 'ConvexBufferGeometry', path: 'geometries/ConvexGeometry.js' } ], ignoreList: [ 'Matrix4' ] },
+	{ path: 'misc/ConvexObjectBreaker.js', dependencies: [ { name: 'ConvexGeometry', path: 'geometries/ConvexGeometry.js' } ], ignoreList: [ 'Matrix4' ] },
 	{ path: 'misc/GPUComputationRenderer.js', dependencies: [], ignoreList: [] },
 	{ path: 'misc/Gyroscope.js', dependencies: [], ignoreList: [] },
 	{ path: 'misc/MD2Character.js', dependencies: [ { name: 'MD2Loader', path: 'loaders/MD2Loader.js' } ], ignoreList: [] },
@@ -118,9 +118,8 @@ var files = [
 	{ path: 'misc/Volume.js', dependencies: [ { name: 'VolumeSlice', path: 'misc/VolumeSlice.js' } ], ignoreList: [] },
 	{ path: 'misc/VolumeSlice.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'modifiers/EdgeSplitModifier.js', dependencies: [ { name: 'BufferGeometryUtils', path: 'utils/BufferGeometryUtils.js' } ], ignoreList: [] },
-	{ path: 'modifiers/SimplifyModifier.js', dependencies: [], ignoreList: [] },
-	{ path: 'modifiers/SubdivisionModifier.js', dependencies: [], ignoreList: [] },
+	{ path: 'modifiers/EdgeSplitModifier.js', dependencies: [ { name: 'BufferGeometryUtils', path: 'utils/BufferGeometryUtils.js' } ], ignoreList: [ 'Geometry' ] },
+	{ path: 'modifiers/SimplifyModifier.js', dependencies: [ { name: 'BufferGeometryUtils', path: 'utils/BufferGeometryUtils.js' } ], ignoreList: [] },
 	{ path: 'modifiers/TessellateModifier.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'objects/Lensflare.js', dependencies: [], ignoreList: [] },
@@ -160,7 +159,7 @@ var files = [
 
 	{ path: 'renderers/CSS2DRenderer.js', dependencies: [], ignoreList: [] },
 	{ path: 'renderers/CSS3DRenderer.js', dependencies: [], ignoreList: [] },
-	{ path: 'renderers/Projector.js', dependencies: [], ignoreList: [] },
+	{ path: 'renderers/Projector.js', dependencies: [], ignoreList: [ 'BufferGeometry' ] },
 	{ path: 'renderers/SVGRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
 
 	{ path: 'shaders/ACESFilmicToneMappingShader.js', dependencies: [], ignoreList: [] },
@@ -221,7 +220,7 @@ var files = [
 	{ path: 'utils/SceneUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/ShadowMapViewer.js', dependencies: [ { name: 'UnpackDepthRGBAShader', path: 'shaders/UnpackDepthRGBAShader.js' } ], ignoreList: [] },
 	{ path: 'utils/SkeletonUtils.js', dependencies: [], ignoreList: [] },
-	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereBufferGeometry' ] },
+	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereGeometry', 'BufferGeometry' ] },
 
 	{ path: 'WebGL.js', dependencies: [], ignoreList: [] },
 ];

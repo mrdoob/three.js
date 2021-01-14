@@ -45,7 +45,7 @@
 
 				material = new THREE.MeshBasicMaterial();
 
-				mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 200, 200, 200 ), material );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), material );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );

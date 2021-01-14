@@ -124,6 +124,12 @@ UIElement.prototype = {
 
 		return this;
 
+	},
+
+	getIndexOfChild: function ( element ) {
+
+		return Array.prototype.indexOf.call( this.dom.children, element.dom );
+
 	}
 
 };

@@ -1,6 +1,6 @@
-import { Geometry } from './../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
 
-export class CylinderGeometry extends Geometry {
+export class CylinderGeometry extends BufferGeometry {
 
 	/**
 	 * @param [radiusTop=1] — Radius of the cylinder at the top.
@@ -40,3 +40,5 @@ export class CylinderGeometry extends Geometry {
 	};
 
 }
+
+export { CylinderGeometry as CylinderBufferGeometry };

@@ -202,7 +202,7 @@
 
 				object = new THREE.Group();
 
-				const geometry = new THREE.BoxBufferGeometry( 0.18, 0.18, 0.18 );
+				const geometry = new THREE.BoxGeometry( 0.18, 0.18, 0.18 );
 
 				for ( let z = - 2; z <= 2; ++ z )
 					for ( let y = - 2; y <= 2; ++ y )
@@ -218,7 +218,7 @@
 				scene.add( object );
 
 
-				const planeGeometry = new THREE.PlaneBufferGeometry( 3, 3, 1, 1 ),
+				const planeGeometry = new THREE.PlaneGeometry( 3, 3, 1, 1 ),
 
 					color = new THREE.Color();
 

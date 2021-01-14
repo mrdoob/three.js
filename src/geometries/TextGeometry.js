@@ -15,26 +15,41 @@
  * }
  */
 
-import { Geometry } from '../core/Geometry.js';
-import { TextBufferGeometry } from './TextBufferGeometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { ExtrudeGeometry } from './ExtrudeGeometry.js';
 
-class TextGeometry extends Geometry {
+class TextGeometry extends ExtrudeGeometry {
 
-	constructor( text, parameters ) {
+	constructor( text, parameters = {} ) {
 
-		super();
+		const font = parameters.font;
+
+		if ( ! ( font && font.isFont ) ) {
+
+			console.error( 'THREE.TextGeometry: font parameter is not an instance of THREE.Font.' );
+			return new BufferGeometry();
+
+		}
+
+		const shapes = font.generateShapes( text, parameters.size );
+
+		// translate parameters to ExtrudeGeometry API
+
+		parameters.depth = parameters.height !== undefined ? parameters.height : 50;
+
+		// defaults
+
+		if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
+		if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
+		if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
+
+		super( shapes, parameters );
+
 		this.type = 'TextGeometry';
-
-		this.parameters = {
-			text: text,
-			parameters: parameters
-		};
-
-		this.fromBufferGeometry( new TextBufferGeometry( text, parameters ) );
-		this.mergeVertices();
 
 	}
 
 }
 
-export { TextGeometry };
+
+export { TextGeometry, TextGeometry as TextBufferGeometry };

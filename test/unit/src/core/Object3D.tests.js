@@ -52,9 +52,30 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// STATIC STUFF
-		QUnit.todo( "DefaultUp", ( assert ) => {
+		QUnit.test( "DefaultUp", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const currentDefaultUp = new Vector3().copy( Object3D.DefaultUp );
+			const v = new Vector3();
+
+			try {
+
+				assert.deepEqual( Object3D.DefaultUp, v.set( 0, 1, 0 ), "default DefaultUp is Y-up" );
+
+				const object = new Object3D();
+
+				assert.deepEqual( object.up, v.set( 0, 1, 0 ), ".up of a new object inherits Object3D.DefaultUp = Y-up" );
+
+				Object3D.DefaultUp.set( 0, 0, 1 );
+
+				const object2 = new Object3D();
+
+				assert.deepEqual( object2.up, v.set( 0, 0, 1 ), ".up of a new object inherits Object3D.DefaultUp = Z-up" );
+
+			} finally {
+
+				Object3D.DefaultUp.copy( currentDefaultUp );
+
+			}
 
 		} );
 

@@ -1,6 +1,6 @@
-import { Geometry } from './../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
 
-export class CircleGeometry extends Geometry {
+export class CircleGeometry extends BufferGeometry {
 
 	/**
 	 * @param [radius=1]
@@ -28,3 +28,5 @@ export class CircleGeometry extends Geometry {
 	};
 
 }
+
+export { CircleGeometry as CircleBufferGeometry };

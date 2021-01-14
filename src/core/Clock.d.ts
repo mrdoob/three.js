@@ -1,7 +1,7 @@
 /**
  * Object for keeping track of time.
  *
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js|src/core/Clock.js}
+ * see {@link https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js|src/core/Clock.js}
  */
 export class Clock {
 
