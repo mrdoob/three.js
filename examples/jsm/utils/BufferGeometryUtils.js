@@ -635,17 +635,12 @@ var BufferGeometryUtils = {
 	/**
 	 * Calculates the morphed attributes of a morphed/skinned BufferGeometry.
 	 * Helpful for Raytracing or Decals.
-	 * @param {Object3D} object
+	 * @param {Mesh | Line | Points} object An instance of Mesh, Line or Points.
 	 * @return {Object} An Object with original position/normal attributes and morphed ones.
 	 */
 	computeMorphedAttributes: function ( object ) {
 
-		if ( ! object ) {
-
-			console.warn( 'Please provide an object' );
-			return null;
-
-		} else if ( ! object.geometry ) {
+		if ( ! object.geometry ) {
 
 			console.warn( 'Please provide an object with a geometry' );
 			return null;
