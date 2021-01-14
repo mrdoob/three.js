@@ -29,7 +29,6 @@ import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform.js';
 import { Raycaster } from './core/Raycaster.js';
 import { Curve } from './extras/core/Curve.js';
-import { CurvePath } from './extras/core/CurvePath.js';
 import { Path } from './extras/core/Path.js';
 import { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 import { AxesHelper } from './helpers/AxesHelper.js';
@@ -257,34 +256,6 @@ Curve.create = function ( construct, getPoint ) {
 	return construct;
 
 };
-
-//
-
-Object.assign( CurvePath.prototype, {
-
-	createPointsGeometry: function ( divisions ) {
-
-		console.warn( 'THREE.CurvePath: .createPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
-
-		// generate geometry from path points (for Line or Points objects)
-
-		const pts = this.getPoints( divisions );
-		return this.createGeometry( pts );
-
-	},
-
-	createSpacedPointsGeometry: function ( divisions ) {
-
-		console.warn( 'THREE.CurvePath: .createSpacedPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
-
-		// generate geometry from equidistant sampling along the path
-
-		const pts = this.getSpacedPoints( divisions );
-		return this.createGeometry( pts );
-
-	}
-
-} );
 
 //
 

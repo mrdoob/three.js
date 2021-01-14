@@ -56,10 +56,10 @@ var files = [
 	{ path: 'lights/RectAreaLightUniformsLib.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'lines/Line2.js', dependencies: [ { name: 'LineSegments2', path: 'lines/LineSegments2.js' }, { name: 'LineGeometry', path: 'lines/LineGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
-	{ path: 'lines/LineGeometry.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [] },
+	{ path: 'lines/LineGeometry.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [ 'BufferGeometry' ] },
 	{ path: 'lines/LineMaterial.js', dependencies: [], ignoreList: [] },
 	{ path: 'lines/LineSegments2.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
-	{ path: 'lines/LineSegmentsGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'lines/LineSegmentsGeometry.js', dependencies: [], ignoreList: [ 'BufferGeometry' ] },
 	{ path: 'lines/Wireframe.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
 	{ path: 'lines/WireframeGeometry2.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [] },
 
@@ -101,7 +101,7 @@ var files = [
 	{ path: 'loaders/XLoader.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'math/ColorConverter.js', dependencies: [], ignoreList: [] },
-	{ path: 'math/ConvexHull.js', dependencies: [], ignoreList: [] },
+	{ path: 'math/ConvexHull.js', dependencies: [], ignoreList: [ 'BufferGeometry' ] },
 	{ path: 'math/ImprovedNoise.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
@@ -159,7 +159,7 @@ var files = [
 
 	{ path: 'renderers/CSS2DRenderer.js', dependencies: [], ignoreList: [] },
 	{ path: 'renderers/CSS3DRenderer.js', dependencies: [], ignoreList: [] },
-	{ path: 'renderers/Projector.js', dependencies: [], ignoreList: [] },
+	{ path: 'renderers/Projector.js', dependencies: [], ignoreList: [ 'BufferGeometry' ] },
 	{ path: 'renderers/SVGRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
 
 	{ path: 'shaders/ACESFilmicToneMappingShader.js', dependencies: [], ignoreList: [] },
@@ -220,7 +220,7 @@ var files = [
 	{ path: 'utils/SceneUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/ShadowMapViewer.js', dependencies: [ { name: 'UnpackDepthRGBAShader', path: 'shaders/UnpackDepthRGBAShader.js' } ], ignoreList: [] },
 	{ path: 'utils/SkeletonUtils.js', dependencies: [], ignoreList: [] },
-	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereGeometry' ] },
+	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereGeometry', 'BufferGeometry' ] },
 
 	{ path: 'WebGL.js', dependencies: [], ignoreList: [] },
 ];
