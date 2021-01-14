@@ -640,12 +640,7 @@ var BufferGeometryUtils = {
 	 */
 	computeMorphedAttributes: function ( object ) {
 
-		if ( ! object.geometry ) {
-
-			console.warn( 'Please provide an object with a geometry' );
-			return null;
-
-		} else if ( ! object.geometry.isBufferGeometry ) {
+		if ( ! object.geometry.isBufferGeometry ) {
 
 			console.warn( 'Geometry is not a BufferGeometry' );
 			return null;
