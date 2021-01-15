@@ -125,29 +125,29 @@
 
 				const onKeyDown = function ( event ) {
 
-					switch ( event.keyCode ) {
+					switch ( event.code ) {
 
-						case 38: // up
-						case 87: // w
+						case 'ArrowUp':
+						case 'KeyW':
 							moveForward = true;
 							break;
 
-						case 37: // left
-						case 65: // a
+						case 'ArrowLeft':
+						case 'KeyA':
 							moveLeft = true;
 							break;
 
-						case 40: // down
-						case 83: // s
+						case 'ArrowDown':
+						case 'KeyS':
 							moveBackward = true;
 							break;
 
-						case 39: // right
-						case 68: // d
+						case 'ArrowRight':
+						case 'KeyD':
 							moveRight = true;
 							break;
 
-						case 32: // space
+						case 'Space':
 							if ( canJump === true ) velocity.y += 350;
 							canJump = false;
 							break;
@@ -158,25 +158,25 @@
 
 				const onKeyUp = function ( event ) {
 
-					switch ( event.keyCode ) {
+					switch ( event.code ) {
 
-						case 38: // up
-						case 87: // w
+						case 'ArrowUp':
+						case 'KeyW':
 							moveForward = false;
 							break;
 
-						case 37: // left
-						case 65: // a
+						case 'ArrowLeft':
+						case 'KeyA':
 							moveLeft = false;
 							break;
 
-						case 40: // down
-						case 83: // s
+						case 'ArrowDown':
+						case 'KeyS':
 							moveBackward = false;
 							break;
 
-						case 39: // right
-						case 68: // d
+						case 'ArrowRight':
+						case 'KeyD':
 							moveRight = false;
 							break;
 

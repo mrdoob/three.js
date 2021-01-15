@@ -28,5 +28,5 @@ export namespace SkeletonUtils {
 
 	export function getEqualsBonesNames( skeleton: Skeleton, targetSkeleton: Skeleton ): string[];
 
-	export function clone( source: Object3D | Skeleton ): Object3D | Skeleton;
+	export function clone( source: Object3D ): Object3D;
 }

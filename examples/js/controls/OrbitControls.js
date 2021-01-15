@@ -62,9 +62,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.autoRotate = false;
 	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
-	// Set to false to disable use of the keys
-	this.enableKeys = true;
-
 	// The four arrow keys
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
@@ -79,6 +76,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.position0 = this.object.position.clone();
 	this.zoom0 = this.object.zoom;
 
+	// the target DOM element for key events
+	this._domElementKeyEvents = null;
+
 	//
 	// public methods
 	//
@@ -92,6 +92,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.getAzimuthalAngle = function () {
 
 		return spherical.theta;
+
+	};
+
+	this.listenToKeyEvents = function ( domElement ) {
+
+		domElement.addEventListener( 'keydown', onKeyDown, false );
+		this._domElementKeyEvents = domElement;
 
 	};
 
@@ -274,7 +281,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
 		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
 
-		scope.domElement.removeEventListener( 'keydown', onKeyDown, false );
+
+		if ( scope._domElementKeyEvents !== null ) {
+
+			scope._domElementKeyEvents.removeEventListener( 'keydown', onKeyDown, false );
+
+		}
 
 		//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
 
@@ -989,7 +1001,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onKeyDown( event ) {
 
-		if ( scope.enabled === false || scope.enableKeys === false || scope.enablePan === false ) return;
+		if ( scope.enabled === false || scope.enablePan === false ) return;
 
 		handleKeyDown( event );
 
@@ -1168,8 +1180,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	scope.domElement.addEventListener( 'touchstart', onTouchStart, false );
 	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
 	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
-
-	scope.domElement.addEventListener( 'keydown', onKeyDown, false );
 
 	// force an update at start
 
