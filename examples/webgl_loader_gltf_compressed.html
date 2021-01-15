@@ -14,8 +14,6 @@
 			<a href="https://sketchfab.com/OFFcours1" target="_blank" rel="noopener">Roman Red</a>
 		</div>
 
-		<script src="./js/libs/basis/msc_basis_transcoder.js"></script>
-
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -61,8 +59,12 @@
 				grid.material.transparent = true;
 				scene.add( grid );
 
+				const ktx2Loader = new KTX2Loader()
+					.setTranscoderPath( 'js/libs/basis/' )
+					.detectSupport( renderer );
+
 				const loader = new GLTFLoader().setPath( 'models/gltf/' );
-				loader.setKTX2Loader( new KTX2Loader().detectSupport( renderer ) );
+				loader.setKTX2Loader( ktx2Loader );
 				loader.setMeshoptDecoder( MeshoptDecoder );
 				loader.load( 'coffeemat.glb', function ( gltf ) {
 
