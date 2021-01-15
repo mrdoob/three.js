@@ -62,11 +62,11 @@ Things to notice about the diagram above.
 
 * `Mesh` objects represent drawing a specific `Geometry` with a specific
    `Material`. Both `Material` objects and `Geometry` objects can be used by
-   multiple `Mesh` objects. For example to draw 2 blue cubes in different
-   locations we could need 2 `Mesh` objects to represent the position and
-   orientation of each cube. We would only need 1 `Geometry` to hold the vertex
-   data for a cube and we would only need 1 `Material` to specify the color
-   blue. Both `Mesh` objects could reference the same`Geometry` object and the
+   multiple `Mesh` objects. For example to draw two blue cubes in different
+   locations we could need two `Mesh` objects to represent the position and
+   orientation of each cube. We would only need one `Geometry` to hold the vertex
+   data for a cube and we would only need one `Material` to specify the color
+   blue. Both `Mesh` objects could reference the same `Geometry` object and the
    same `Material` object.
 
 * `Geometry` objects represent the vertex data of some piece of geometry like
@@ -107,7 +107,7 @@ Modules have the advantage that they can easily import other modules
 they need. That saves us from having to manually load extra scripts
 they are dependent on.
 
-Next we need is a `<canvas>` tag so
+Next we need is a `<canvas>` tag so...
 
 ```html
 <body>
@@ -140,7 +140,7 @@ into three.js it will create one for you but then you have to add it
 to your document. Where to add it may change depending on your use case
 and you'll have to change your code so I find that passing a canvas
 to three.js feels a little more flexible. I can put the canvas anywhere
-and the code will find it where as if I had code to insert the canvas
+and the code will find it whereas if I had code to insert the canvas
 into to the document I'd likely have to change that code if my use case
 changed.
 
@@ -166,7 +166,7 @@ reason the perspective camera takes degrees.
 that will be rendered. Anything before that range or after that range
 will be clipped (not drawn).
 
-Those 4 settings define a *"frustum"*. A *frustum* is the name of
+Those four settings define a *"frustum"*. A *frustum* is the name of
 a 3d shape that is like a pyramid with the tip sliced off. In other
 words think of the word "frustum" as another 3D shape like sphere,
 cube, prism, frustum.
@@ -195,7 +195,7 @@ In the diagram above we can see our camera is at `z = 2`. It's looking
 down the -Z axis. Our frustum starts 0.1 units from the front of the camera
 and goes to 5 units in front of the camera. Because in this diagram we are looking down,
 the field of view is affected by the aspect. Our canvas is twice as wide
-as it is tall so across view the field of view will be much wider than
+as it is tall so across the canvas the field of view will be much wider than
 our specified 75 degrees which is the vertical field of view.
 
 Next we make a `Scene`. A `Scene` in three.js is the root of a form of scene graph.
@@ -466,16 +466,16 @@ import * as THREE from '../../../build/three.module.js';
 </pre>
 <p>
 Using the same structure assures then when you import both three and one of the example
-libraries they'll both reference the same three.module.js file.
+libraries they'll both reference the same <code>three.module.js</code> file.
 </p>
 <pre class="prettyprint">
 import * as THREE from './someFolder/build/three.module.js';
 import {OrbitControls} from './someFolder/examples/jsm/controls/OrbitControls.js';
 </pre>
-<p>This includes when using a CDN. Be sure your path to <code>three.modules.js</code> ends with
+<p>This includes when using a CDN. Be sure your path to <code>three.module.js</code> ends with
 <code>/build/three.modules.js</code>. For example</p>
 <pre class="prettyprint">
-import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
+import * as THREE from 'https://unpkg.com/three@0.108.0<b>/build/three.module.js</b>';
 import {OrbitControls} from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
 </pre>
 <p>If you'd prefer the old <code>&lt;script src="path/to/three.js"&gt;&lt;/script&gt;</code> style
