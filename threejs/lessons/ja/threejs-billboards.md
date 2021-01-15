@@ -1,14 +1,15 @@
-Title: Three.js Billboards
-Description: How to make things always face the camera.
+Title: Three.jsのビルボード
+Description: 常にカメラの方を向かせる
 TOC: Billboards and Facades
+
+[前回のページでは](threejs-canvas-textures.html) `CanvasTexture`を使ってラベルとバッジを作りました。バッジなどが常にカメラの方向を向いて文字が読める状態になっているという効果が欲しい時があります（訳註：ビルボード効果と言います）。Three.jsは`Sprite`と`SpriteMaterial` を使ってビルボード効果を実現できます。
 
 In [a previous article](threejs-canvas-textures.html) we used a `CanvasTexture`
 to make labels / badges on characters. Sometimes we'd like to make labels or
 other things that always face the camera. Three.js provides the `Sprite` and
 `SpriteMaterial` to make this happen.
 
-Let's change the badge example from [the article on canvas textures](threejs-canvas-textures.html)
-to use `Sprite` and `SpriteMaterial`
+[この記事](threejs-canvas-textures.html)からサンプルを拝借して`Sprite`と`SpriteMaterial`を使ってみましょう。
 
 ```js
 function makePerson(x, labelWidth, size, name, color) {
@@ -45,17 +46,15 @@ function makePerson(x, labelWidth, size, name, color) {
   label.position.z = bodyRadiusTop * 1.01;
 
 ```
-
-and the labels now always face the camera
+はい、常にラベルがカメラの方を向くようになりました。
 
 {{{example url="../threejs-billboard-labels-w-sprites.html" }}}
 
-One problem is from certain angles the labels now intersect the
-characters. 
+しかし角度によってはラベルがオブジェクトに食い込んでしまうことがあります。
 
 <div class="threejs_center"><img src="resources/images/billboard-label-z-issue.png" style="width: 455px;"></div>
 
-We can move the position of the labels to fix.
+ラベルの位置を動かしましょう。
 
 ```js
 +// if units are meters then 0.01 here makes size
@@ -76,16 +75,13 @@ label.scale.y = canvas.height * labelBaseScale;
 
 {{{example url="../threejs-billboard-labels-w-sprites-adjust-height.html" }}}
 
-Another thing we can do with billboards is draw facades.
+ビルボード効果を使ってファケード（訳註：ハリボテのようなもの）を作ることもできます。
 
-Instead of drawing 3D objects we draw 2D planes with an image
-of 3D objects. This is often faster than drawing 3D objects.
+つまり３Dオブジェクトは重いので３Dオブジェクトを描画する代わりに同じ絵を描いた板を用意するということです。
 
-For example let's make a scene with grid of trees. We'll make each
-tree from a cylinder for the base and a cone for the top.
+さっそくやってみます。たくさんの木があるシーンを作ってみます。１つの木はシリンダーとコーンでできています。
 
-First we make the cone and cylinder geometry and materials that
-all the trees will share
+まずはファケードを使わずに単純に３Dオブジェクトを並べてみます。
 
 ```js
 const trunkRadius = .2;
@@ -104,8 +100,7 @@ const trunkMaterial = new THREE.MeshPhongMaterial({color: 'brown'});
 const topMaterial = new THREE.MeshPhongMaterial({color: 'green'});
 ```
 
-Then we'll make a function that makes a `Mesh` each for the trunk and top
-of a tree and parents both to an `Object3D`.
+草の部分と幹の部分をそれぞれ`Mesh`で作り親オブジェクト`Object3D`に加えます。
 
 ```js
 function makeTree(x, z) {
@@ -125,7 +120,7 @@ function makeTree(x, z) {
 }
 ```
 
-Then we'll make a loop to place a grid of trees.
+たくさん作ってみましょう。
 
 ```js
 for (let z = -50; z <= 50; z += 10) {
@@ -135,7 +130,7 @@ for (let z = -50; z <= 50; z += 10) {
 }
 ```
 
-Let's also add a ground plane while we're at it
+地面も一応作ります。
 
 ```js
 // add ground
@@ -149,7 +144,7 @@ Let's also add a ground plane while we're at it
 }
 ```
 
-and change the background to light blue
+空の色は青にします。
 
 ```js
 const scene = new THREE.Scene();
@@ -157,24 +152,19 @@ const scene = new THREE.Scene();
 +scene.background = new THREE.Color('lightblue');
 ```
 
-and we get a grid of trees
+はい、木がたくさんできました。
 
 {{{example url="../threejs-billboard-trees-no-billboards.html" }}}
 
-There are 11x11 or 121 trees. Each tree is made from a 12 polygon
-cone and a 48 polygon trunk so each tree is 60 polygons. 121 * 60
-is 7260 polygons. That's not that many but of course a more detailed
-3D tree might be 1000-3000 polygons. If they were 3000 polygons each
-then 121 trees would be 363000 polygons to draw.
+１２１個の木があります。１つにつき１２ポリゴンのコーンと４８ポリゴンのシリンダーがあるので１つの木は６０ポリゴンです。
+これが１２１個あるので７２６０ポリゴンです。このシンプルな木ならそれほど問題ありませんが、リアルな木を作ろうとしたら１つの木につき１０００から３０００のポリゴンがあるのが普通です。ということは１２１個表示するには３６万３千ポリゴン必要です。木を表示するだけで動作が重くなるかもしれません。
 
-Using facades we can bring that number down.
+そこでファケードを使ってポリゴン数を落とします。
 
-We could manually create a facade in some painting program but let's write 
-some code to try to generate one.
+ペイントソフトで描いた絵をPlaneにはってもいいのですがここは学んだことを使いましょう。
 
-Let's write some code to render an object to a texture
-using a `RenderTarget`. We covered rendering to a `RenderTarget`
-in [the article on render targets](threejs-rendertargets.html).
+`RenderTarget`を使ってThree.js内で絵を描き、Planeに貼ってみます。
+[この記事](threejs-rendertargets.html)が参考になります。
 
 ```js
 function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
@@ -228,43 +218,22 @@ function makeSpriteTexture(textureSize, obj) {
 }
 ```
 
-Some things to note about the code above:
+まずフィールドオブビュー（`fov`）を設定しています。カメラの視野範囲におさまる木を[この記事](threejs-load-obj.html)と同じ方法で計算しています。
 
-We're using the field of view (`fov`) defined above this code.
+さらに`frameArea`を使っています。これは木を表示する最も近いカメラの位置を計算してカメラに設定しています。仮想的なスタジオで木の写真をとっているような状態です。
 
-We're computing a box that contains the tree the same way
-we did in [the article on loading a .obj file](threejs-load-obj.html)
-with a few minor changes.
+レンダーターゲットに木がおさまるようにサイズを1.1倍（`fudge`倍)しています。ここで注意が必要なのはカメラで撮影した木の映像がレンダーターゲットをはみ出したり逆に小さすぎたりする場合です。もちろんこうした状態は事前に精緻な計算をしておけば良いのですがここでは`fudge`で調整しています。
 
-We call `frameArea` again adapted [the article on loading a .obj file](threejs-load-obj.html).
-In this case we compute how far the camera needs to be away from the object
-given its field of view to contain the object. We then position the camera -z that distance
-from the center of the box that contains the object.
+木の撮影ができたのでレンダーターゲットにレンダリングして元の３Dオブジェクトは消しておきます。
 
-We multiply the size we want to fit by 1.1 (`fudge`) to make sure the tree fits
-completely in the render target. The issue here is the size we're using to
-calculate if the object fits in the camera's view is not taking into account
-that the very edges of the object will end up dipping outside area we
-calculated. We could compute how to make 100% of the box fit but that would
-waste space as well so instead we just *fudge* it.
-
-Then we render to the render target and remove the object from
-the scene. 
-
-It's important to note we need the lights in the scene but we
-need to make sure nothing else is in the scene.
-
-We also need to not set a background color on the scene
+シーンにはライトだけがある状態です。
 
 ```js
 const scene = new THREE.Scene();
 -scene.background = new THREE.Color('lightblue');
 ```
 
-Finally we've made the texture we return it and the position and scale we
-need to make the facade so that it will appear to be in the same place.
-
-We then make a tree and call this code and pass it in
+最後にテクスチャを作って位置とサイズを調整します。
 
 ```js
 // make billboard texture
@@ -273,7 +242,7 @@ const facadeSize = 64;
 const treeSpriteInfo = makeSpriteTexture(facadeSize, tree);
 ```
 
-We can then make a grid of facades instead of a grid of tree models
+これで重い３Dモデルの木の代わりにファケードを使った木ができました。
 
 ```js
 +function makeSprite(spriteInfo, x, z) {
@@ -299,30 +268,16 @@ for (let z = -50; z <= 50; z += 10) {
 }
 ```
 
-In the code above we apply the offset and scale needed to position the facade so it
-appears the same place the original tree would have appeared.
-
-Now that we're done making the tree facade texture we can set the background again
+背景も変えてみます。
 
 ```js
 scene.background = new THREE.Color('lightblue');
 ```
 
-and now we get a scene of tree facades
+完成です。
 
 {{{example url="../threejs-billboard-trees-static-billboards.html" }}}
 
-Compare to the trees models above and you can see it looks fairly similar.
-We used a low-res texture, just 64x64 pixels so the facades are blocky.
-You could increase the resolution. Often facades are used only in the far
-distance when they are fairly small so a low-res texture is enough and
-it saves on drawing detailed trees that are only a few pixels big when
-far away.
+３Dモデルと違って近づくとハリボテであることがバレてしまいます。今回は64x64ピクセルで作りましたがもちろん高解像にすることもできます。しかしそれでも３Dモデルのように近づいてもエッジが綺麗というわけにはいかないので、通常はカメラが近づくことがない遠く離れた木や山に使います。
 
-Another issue is we are only viewing the tree from one side. This is often
-solved by rendering more facades, say from 8 directions around the object
-and then setting which facade to show based on which direction the camera
-is looking at the facade.
-
-Whether or not you use facades is up to you but hopefully this article
-gave you some ideas and suggested some solutions if you decide to use them.
+他にはカメラの向きを変えても同じように見える問題がありますが、これは８個のファケードを用意して別の角度から見たときに別のファケードが見えるようにすればいいでしょう。
