@@ -628,9 +628,9 @@ THREE.BufferGeometryUtils = {
 	 */
 	computeMorphedAttributes: function ( object ) {
 
-		if ( ! object.geometry.isBufferGeometry ) {
+		if ( object.geometry.isBufferGeometry !== true ) {
 
-			console.error( 'Geometry is not a BufferGeometry' );
+			console.error( 'THREE.BufferGeometryUtils: Geometry is not of type THREE.BufferGeometry.' );
 			return null;
 
 		}
