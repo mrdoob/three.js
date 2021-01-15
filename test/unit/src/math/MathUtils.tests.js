@@ -157,7 +157,7 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.strictEqual( MathUtils.pingPong( 2.5 ), 0.5, "Value at 2.5 is 0.5" );
 			assert.strictEqual( MathUtils.pingPong( 2.5, 2 ), 1.5, "Value at 2.5 with length of 2 is 1.5" );
-			assert.strictEqual( MathUtils.pingPong( - 2 ), 0, "Value at -2 is 0" );
+			assert.strictEqual( MathUtils.pingPong( - 1.5 ), 0.5, "Value at -1.5 is 0.5" );
 
 		} );
 

@@ -66,7 +66,7 @@ const MathUtils = {
 
 	pingPong: function ( x, length = 1 ) {
 
-		return length - Math.abs( x % ( length * 2 ) - length );
+		return length - Math.abs( MathUtils.euclideanModulo( x, length * 2 ) - length );
 
 	},
 
