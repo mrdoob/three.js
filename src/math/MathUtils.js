@@ -62,6 +62,14 @@ const MathUtils = {
 
 	},
 
+	// https://www.desmos.com/calculator/vcsjnyz7x4
+
+	pingPong: function ( x, length = 1 ) {
+
+		return length - Math.abs( x % ( length * 2 ) - length );
+
+	},
+
 	// http://en.wikipedia.org/wiki/Smoothstep
 
 	smoothstep: function ( x, min, max ) {
