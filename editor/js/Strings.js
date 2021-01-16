@@ -21,6 +21,7 @@ function Strings( config ) {
 			'menubar/file/export/ply_binary': 'Export PLY (Binary)',
 			'menubar/file/export/stl': 'Export STL',
 			'menubar/file/export/stl_binary': 'Export STL (Binary)',
+			'menubar/file/export/usdz': 'Export USDZ',
 			'menubar/file/publish': 'Publish',
 
 			'menubar/edit': 'Edit',
@@ -344,6 +345,7 @@ function Strings( config ) {
 			'menubar/file/export/ply_binary': 'Exporter PLY (Binaire)',
 			'menubar/file/export/stl': 'Exporter STL',
 			'menubar/file/export/stl_binary': 'Exporter STL (Binaire)',
+			'menubar/file/export/usdz': 'Exporter USDZ',
 			'menubar/file/publish': 'Publier',
 
 			'menubar/edit': 'Edition',
@@ -667,6 +669,7 @@ function Strings( config ) {
 			'menubar/file/export/ply_binary': '导出PLY(二进制)',
 			'menubar/file/export/stl': '导出STL',
 			'menubar/file/export/stl_binary': '导出STL(二进制)',
+			'menubar/file/export/usdz': '导出USDZ',
 			'menubar/file/publish': '发布',
 
 			'menubar/edit': '编辑',
