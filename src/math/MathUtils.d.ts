@@ -88,11 +88,11 @@ export namespace MathUtils {
 	/**
 	 * Returns a value that alternates between 0 and length.
 	 *
-	 * @param x The value to pingPong.
-	 * @param length The positive value the function will pingPong to. Default is 1.
+	 * @param x The value to pingpong.
+	 * @param length The positive value the function will pingpong to. Default is 1.
 	 * @return {number}
 	 */
-	export function pingPong( x: number, length?: number ): number;
+	export function pingpong( x: number, length?: number ): number;
 
 	/**
 	 * @deprecated Use {@link Math#floorPowerOfTwo .floorPowerOfTwo()}

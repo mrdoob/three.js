@@ -64,7 +64,7 @@ const MathUtils = {
 
 	// https://www.desmos.com/calculator/vcsjnyz7x4
 
-	pingPong: function ( x, length = 1 ) {
+	pingpong: function ( x, length = 1 ) {
 
 		return length - Math.abs( MathUtils.euclideanModulo( x, length * 2 ) - length );
 
