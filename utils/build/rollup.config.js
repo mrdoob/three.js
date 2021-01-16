@@ -1,4 +1,5 @@
 import babel from '@rollup/plugin-babel';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 
 if ( String.prototype.replaceAll === undefined ) {
@@ -276,6 +277,7 @@ function polyfills() {
 
 			if ( filePath.endsWith( 'src/Three.js' ) || filePath.endsWith( 'src\\Three.js' ) ) {
 
+				code = 'import \'regenerator-runtime\';\n' + code;
 				code = 'import \'./polyfills\';\n' + code;
 
 			}
@@ -321,6 +323,7 @@ export default [
 		input: 'src/Three.js',
 		plugins: [
 			polyfills(),
+			nodeResolve(),
 			addons(),
 			glconstants(),
 			glsl(),
@@ -346,6 +349,7 @@ export default [
 		input: 'src/Three.js',
 		plugins: [
 			polyfills(),
+			nodeResolve(),
 			addons(),
 			glconstants(),
 			glsl(),
