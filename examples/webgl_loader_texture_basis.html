@@ -18,6 +18,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import { BasisTextureLoader } from './jsm/loaders/BasisTextureLoader.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			let camera, scene, renderer;
 			let mesh;
@@ -25,7 +26,7 @@
 			const clock = new THREE.Clock();
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -35,12 +36,16 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 500;
-
 				scene = new THREE.Scene();
 
-				const geometry = flipY( new THREE.PlaneBufferGeometry( 200, 200 ) );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 0, 1 );
+				camera.lookAt( scene.position );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
+
+				const geometry = flipY( new THREE.PlaneBufferGeometry() );
 				const material = new THREE.MeshBasicMaterial( { side: THREE.DoubleSide } );
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -55,6 +60,8 @@
 					texture.encoding = THREE.sRGBEncoding;
 					material.map = texture;
 					material.needsUpdate = true;
+
+					render();
 
 				}, undefined, function ( error ) {
 
@@ -73,15 +80,11 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				render();
+
 			}
 
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				const delta = clock.getDelta() * 0.5;
-
-				mesh.rotation.y += delta;
+			function render() {
 
 				renderer.render( scene, camera );
 
