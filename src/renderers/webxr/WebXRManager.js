@@ -128,19 +128,6 @@ function WebXRManager( renderer, gl ) {
 
 	}
 
-	function onRequestReferenceSpace( value ) {
-
-		referenceSpace = value;
-
-		animation.setContext( session );
-		animation.start();
-
-		scope.isPresenting = true;
-
-		scope.dispatchEvent( { type: 'sessionstart' } );
-
-	}
-
 	this.setFramebufferScaleFactor = function ( value ) {
 
 		framebufferScaleFactor = value;
@@ -177,7 +164,7 @@ function WebXRManager( renderer, gl ) {
 
 	};
 
-	this.setSession = function ( value ) {
+	this.setSession = async function ( value ) {
 
 		session = value;
 
@@ -190,12 +177,13 @@ function WebXRManager( renderer, gl ) {
 			session.addEventListener( 'squeezestart', onSessionEvent );
 			session.addEventListener( 'squeezeend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
+			session.addEventListener( 'inputsourceschange', onInputSourcesChange );
 
 			const attributes = gl.getContextAttributes();
 
 			if ( attributes.xrCompatible !== true ) {
 
-				gl.makeXRCompatible();
+				await gl.makeXRCompatible();
 
 			}
 
@@ -212,17 +200,20 @@ function WebXRManager( renderer, gl ) {
 
 			session.updateRenderState( { baseLayer: baseLayer } );
 
-			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
+			referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
 
-			//
+			animation.setContext( session );
+			animation.start();
 
-			session.addEventListener( 'inputsourceschange', updateInputSources );
+			scope.isPresenting = true;
+
+			scope.dispatchEvent( { type: 'sessionstart' } );
 
 		}
 
 	};
 
-	function updateInputSources( event ) {
+	function onInputSourcesChange( event ) {
 
 		const inputSources = session.inputSources;
 
