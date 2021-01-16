@@ -14,6 +14,7 @@ const assets = [
 
 	'../examples/jsm/libs/chevrotain.module.min.js',
 	'../examples/jsm/libs/fflate.module.min.js',
+	'../examples/jsm/libs/fflate.module.js', // TODO: Optimize 
 
 	'../examples/js/libs/draco/draco_decoder.js',
 	'../examples/js/libs/draco/draco_decoder.wasm',
@@ -58,6 +59,7 @@ const assets = [
 	'../examples/jsm/exporters/OBJExporter.js',
 	'../examples/jsm/exporters/PLYExporter.js',
 	'../examples/jsm/exporters/STLExporter.js',
+	'../examples/jsm/exporters/USDZExporter.js',
 
 	'../examples/jsm/helpers/VertexNormalsHelper.js',
 

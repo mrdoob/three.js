@@ -379,6 +379,22 @@ function MenubarFile( editor ) {
 	} );
 	options.add( option );
 
+	// Export USDZ
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/usdz' ) );
+	option.onClick( async function () {
+
+		var { USDZExporter } = await import( '../../examples/jsm/exporters/USDZExporter.js' );
+
+		var exporter = new USDZExporter();
+
+		saveArrayBuffer( exporter.parse( editor.scene, { binary: true } ), 'model.usdz' );
+
+	} );
+	options.add( option );
+
 	//
 
 	options.add( new UIHorizontalRule() );
