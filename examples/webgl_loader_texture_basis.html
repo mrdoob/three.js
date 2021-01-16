@@ -40,8 +40,8 @@
 
 				scene = new THREE.Scene();
 
-				const geometry = flipY( new THREE.BoxGeometry( 200, 200, 200 ) );
-				const material = new THREE.MeshBasicMaterial();
+				const geometry = flipY( new THREE.PlaneBufferGeometry( 200, 200, 200 ) );
+				const material = new THREE.MeshBasicMaterial( { side: THREE.DoubleSide } );
 
 				mesh = new THREE.Mesh( geometry, material );
 
@@ -50,7 +50,7 @@
 				const loader = new BasisTextureLoader();
 				loader.setTranscoderPath( 'js/libs/basis/' );
 				loader.detectSupport( renderer );
-				loader.load( 'textures/compressed/PavingStones.basis', function ( texture ) {
+				loader.load( 'textures/compressed/canestra_di_frutta_caravaggio.basis', function ( texture ) {
 
 					texture.encoding = THREE.sRGBEncoding;
 					material.map = texture;
@@ -81,7 +81,6 @@
 
 				const delta = clock.getDelta() * 0.5;
 
-				mesh.rotation.x += delta;
 				mesh.rotation.y += delta;
 
 				renderer.render( scene, camera );
