@@ -1147,6 +1147,14 @@
 		lerp: function lerp(x, y, t) {
 			return (1 - t) * x + t * y;
 		},
+		// https://www.desmos.com/calculator/vcsjnyz7x4
+		pingpong: function pingpong(x, length) {
+			if (length === void 0) {
+				length = 1;
+			}
+
+			return length - Math.abs(MathUtils.euclideanModulo(x, length * 2) - length);
+		},
 		// http://en.wikipedia.org/wiki/Smoothstep
 		smoothstep: function smoothstep(x, min, max) {
 			if (x <= min) return 0;
