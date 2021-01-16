@@ -40,7 +40,7 @@
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
+				const geometry = flipY( new THREE.BoxGeometry( 200, 200, 200 ) );
 				const material = new THREE.MeshBasicMaterial();
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -85,6 +85,21 @@
 				mesh.rotation.y += delta;
 
 				renderer.render( scene, camera );
+
+			}
+
+			/** Correct UVs to be compatible with `flipY=false` textures. */
+			function flipY( geometry ) {
+
+				const uv = geometry.attributes.uv;
+
+				for ( let i = 0; i < uv.count; i ++ ) {
+
+					uv.setY( i, 1 - uv.getY( i ) );
+
+				}
+
+				return geometry;
 
 			}
 
