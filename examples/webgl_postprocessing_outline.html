@@ -263,7 +263,7 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 				renderer.domElement.style.touchAction = 'none';
-				renderer.domElement.addEventListener( 'pointermove', onPointerMove, false );
+				renderer.domElement.addEventListener( 'pointermove', onPointerMove );
 
 				function onPointerMove( event ) {
 

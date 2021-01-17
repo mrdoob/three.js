@@ -93,10 +93,10 @@
 
 				//
 
-				document.addEventListener( 'pointerdown', onPointerDown, false );
-				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+				document.addEventListener( 'pointerdown', onPointerDown );
+				document.addEventListener( 'wheel', onDocumentMouseWheel );
 
-				window.addEventListener( 'resize', onWindowResized, false );
+				window.addEventListener( 'resize', onWindowResized );
 
 			}
 
@@ -119,8 +119,8 @@
 				onPointerDownLon = lon;
 				onPointerDownLat = lat;
 
-				document.addEventListener( 'pointermove', onPointerMove, false );
-				document.addEventListener( 'pointerup', onPointerUp, false );
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerup', onPointerUp );
 
 			}
 

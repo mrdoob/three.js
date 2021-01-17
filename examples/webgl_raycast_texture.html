@@ -93,7 +93,7 @@
 
 					that._draw();
 
-				}, false );
+				} );
 				this._background.crossOrigin = '';
 				this._background.src = "textures/uv_grid_opengl.jpg";
 
@@ -275,7 +275,7 @@
 				scene.add( circle );
 
 				window.addEventListener( 'resize', onWindowResize );
-				container.addEventListener( 'mousemove', onMouseMove, false );
+				container.addEventListener( 'mousemove', onMouseMove );
 
 				document.getElementById( 'setwrapS' ).addEventListener( 'change', setwrapS );
 				document.getElementById( 'setwrapT' ).addEventListener( 'change', setwrapT );
