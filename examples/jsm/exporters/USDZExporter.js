@@ -1,4 +1,4 @@
-import { zipSync, strToU8 } from '../libs/fflate.module.js';
+import { zipSync, strToU8 } from '../libs/fflate.module.min.js';
 
 class USDZExporter {
 
