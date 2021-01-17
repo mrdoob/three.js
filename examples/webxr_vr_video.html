@@ -47,7 +47,7 @@
 				video.play();
 
 				const texture = new THREE.VideoTexture( video );
-        
+
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x101010 );
 
@@ -106,7 +106,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

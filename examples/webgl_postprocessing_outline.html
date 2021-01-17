@@ -260,7 +260,7 @@
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 				composer.addPass( effectFXAA );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				renderer.domElement.style.touchAction = 'none';
 				renderer.domElement.addEventListener( 'pointermove', onPointerMove, false );

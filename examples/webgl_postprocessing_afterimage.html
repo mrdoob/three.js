@@ -59,7 +59,7 @@
 				afterimagePass = new AfterimagePass();
 				composer.addPass( afterimagePass );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				if ( typeof TESTING !== 'undefined' ) { for ( let i = 0; i < 45; i ++ ) { render(); }; };
 

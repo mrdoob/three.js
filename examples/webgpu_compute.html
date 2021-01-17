@@ -160,7 +160,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 				window.addEventListener( 'mousemove', onMouseMove, false );
 
 				return renderer.init();
