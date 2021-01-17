@@ -95,6 +95,18 @@ export namespace MathUtils {
 	export function pingpong( x: number, length?: number ): number;
 
 	/**
+	 * Smoothly interpolate a number from x toward y in a spring-like
+	 * manner using the dt to maintain frame rate independent movement.
+	 *
+	 * @param x Current point.
+	 * @param y Target point.
+	 * @param lambda A higher lambda value will make the movement more sudden, and a lower value will make the movement more gradual.
+	 * @param dt Delta time in seconds.
+	 * @return {number}
+	 */
+	export function damp( x: number, y: number, lambda: number, dt: number ): number;
+
+	/**
 	 * @deprecated Use {@link Math#floorPowerOfTwo .floorPowerOfTwo()}
 	 */
 	export function nearestPowerOfTwo( value: number ): number;
