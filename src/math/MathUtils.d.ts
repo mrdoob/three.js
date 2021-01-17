@@ -86,15 +86,6 @@ export namespace MathUtils {
 	export function lerp( x: number, y: number, t: number ): number;
 
 	/**
-	 * Returns a value that alternates between 0 and length.
-	 *
-	 * @param x The value to pingpong.
-	 * @param length The positive value the function will pingpong to. Default is 1.
-	 * @return {number}
-	 */
-	export function pingpong( x: number, length?: number ): number;
-
-	/**
 	 * Smoothly interpolate a number from x toward y in a spring-like
 	 * manner using the dt to maintain frame rate independent movement.
 	 *
@@ -105,6 +96,15 @@ export namespace MathUtils {
 	 * @return {number}
 	 */
 	export function damp( x: number, y: number, lambda: number, dt: number ): number;
+
+	/**
+	 * Returns a value that alternates between 0 and length.
+	 *
+	 * @param x The value to pingpong.
+	 * @param length The positive value the function will pingpong to. Default is 1.
+	 * @return {number}
+	 */
+	export function pingpong( x: number, length?: number ): number;
 
 	/**
 	 * @deprecated Use {@link Math#floorPowerOfTwo .floorPowerOfTwo()}

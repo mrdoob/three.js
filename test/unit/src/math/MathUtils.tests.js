@@ -55,6 +55,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "damp", ( assert ) => {
+
+			assert.strictEqual( MathUtils.damp( 1, 2, 0, 0.016 ), 1, "Value equal to lower boundary" );
+			assert.strictEqual( MathUtils.damp( 1, 2, 10, 0.016 ), 1.1478562110337887, "Value within range" );
+
+		} );
+
 		QUnit.test( "smoothstep", ( assert ) => {
 
 			assert.strictEqual( MathUtils.smoothstep( - 1, 0, 2 ), 0, "Value lower than minimum" );

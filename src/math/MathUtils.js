@@ -62,19 +62,19 @@ const MathUtils = {
 
 	},
 
-	// https://www.desmos.com/calculator/vcsjnyz7x4
-
-	pingpong: function ( x, length = 1 ) {
-
-		return length - Math.abs( MathUtils.euclideanModulo( x, length * 2 ) - length );
-
-	},
-
 	// http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/
 
 	damp: function ( x, y, lambda, dt ) {
 
 		return MathUtils.lerp( x, y, 1 - Math.exp( - lambda * dt ) );
+
+	},
+
+	// https://www.desmos.com/calculator/vcsjnyz7x4
+
+	pingpong: function ( x, length = 1 ) {
+
+		return length - Math.abs( MathUtils.euclideanModulo( x, length * 2 ) - length );
 
 	},
 
