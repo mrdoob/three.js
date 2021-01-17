@@ -4,8 +4,8 @@ import {
 	Quaternion,
 	Vector3
 } from '../../../build/three.module.js';
-import { CCDIKSolver } from '../animation/CCDIKSolver.js';
-import { MMDPhysics } from '../animation/MMDPhysics.js';
+import { CCDIKSolver } from './CCDIKSolver.js';
+import { MMDPhysics } from './MMDPhysics.js';
 
 /**
  * MMDAnimationHelper handles animation of MMD assets loaded by MMDLoader

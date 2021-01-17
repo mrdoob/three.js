@@ -30,7 +30,7 @@ import {
 	Vector3,
 	VectorKeyframeTrack
 } from '../../../build/three.module.js';
-import { TGALoader } from '../loaders/TGALoader.js';
+import { TGALoader } from './TGALoader.js';
 import { MMDParser } from '../libs/mmdparser.module.js';
 
 /**

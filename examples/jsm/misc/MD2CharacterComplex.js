@@ -8,7 +8,7 @@ import {
 	sRGBEncoding
 } from '../../../build/three.module.js';
 import { MD2Loader } from '../loaders/MD2Loader.js';
-import { MorphBlendMesh } from '../misc/MorphBlendMesh.js';
+import { MorphBlendMesh } from './MorphBlendMesh.js';
 
 var MD2CharacterComplex = function () {
 

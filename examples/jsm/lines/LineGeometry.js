@@ -1,4 +1,4 @@
-import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
+import { LineSegmentsGeometry } from './LineSegmentsGeometry.js';
 
 var LineGeometry = function () {
 

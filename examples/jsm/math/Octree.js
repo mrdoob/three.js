@@ -6,7 +6,7 @@ import {
 	Triangle,
 	Vector3
 } from '../../../build/three.module.js';
-import { Capsule } from '../math/Capsule.js';
+import { Capsule } from './Capsule.js';
 
 
 var Octree = ( function () {

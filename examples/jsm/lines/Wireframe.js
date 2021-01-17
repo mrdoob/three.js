@@ -4,8 +4,8 @@ import {
 	Mesh,
 	Vector3
 } from '../../../build/three.module.js';
-import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
-import { LineMaterial } from '../lines/LineMaterial.js';
+import { LineSegmentsGeometry } from './LineSegmentsGeometry.js';
+import { LineMaterial } from './LineMaterial.js';
 
 var Wireframe = function ( geometry, material ) {
 

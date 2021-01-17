@@ -7,10 +7,7 @@ import {
 	Object3D,
 	Vector3
 } from '../../../build/three.module.js';
-import { Projector } from '../renderers/Projector.js';
-import { RenderableFace } from '../renderers/Projector.js';
-import { RenderableLine } from '../renderers/Projector.js';
-import { RenderableSprite } from '../renderers/Projector.js';
+import { Projector, RenderableFace, RenderableLine, RenderableSprite } from './Projector.js';
 
 var SVGObject = function ( node ) {
 

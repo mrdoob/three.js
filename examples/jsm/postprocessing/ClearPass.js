@@ -1,7 +1,7 @@
 import {
 	Color
 } from '../../../build/three.module.js';
-import { Pass } from '../postprocessing/Pass.js';
+import { Pass } from './Pass.js';
 
 var ClearPass = function ( clearColor, clearAlpha ) {
 

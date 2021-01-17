@@ -8,7 +8,7 @@ import {
 	UniformsUtils,
 	WebGLRenderTarget
 } from '../../../build/three.module.js';
-import { Pass } from '../postprocessing/Pass.js';
+import { Pass } from './Pass.js';
 import { BokehShader } from '../shaders/BokehShader.js';
 
 /**
