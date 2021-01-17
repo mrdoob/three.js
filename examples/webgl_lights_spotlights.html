@@ -80,8 +80,8 @@
 				scene.add( lightHelper1, lightHelper2, lightHelper3 );
 
 				document.body.appendChild( renderer.domElement );
-				onResize();
-				window.addEventListener( 'resize', onResize, false );
+				onWindowResize();
+				window.addEventListener( 'resize', onWindowResize );
 
 				controls.target.set( 0, 7, 0 );
 				controls.maxPolarAngle = Math.PI / 2;
@@ -103,7 +103,7 @@
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

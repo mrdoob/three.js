@@ -78,14 +78,14 @@
 
 				//
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				camera.aspect = ( window.innerWidth / window.innerHeight );

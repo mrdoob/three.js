@@ -50,7 +50,7 @@
 
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// scene
 
@@ -169,7 +169,7 @@
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				const width = window.innerWidth;
 				const height = window.innerHeight;
