@@ -5,8 +5,8 @@ import {
 export class TessellateModifier {
 
 	constructor( maxEdgeLength?: number, maxIterations?: number );
-	maxEdgeLength: number = 0.1;
-	maxIterations: number = 6;
+	maxEdgeLength: number;
+	maxIterations: number;
 
 	modify( geometry: BufferGeometry ): BufferGeometry;
 
