@@ -198,6 +198,16 @@ function SidebarMaterial( editor ) {
 
 	container.add( materialSpecularRow );
 
+	// glossiness
+
+	var materialGlossinessRow = new UIRow();
+	var materialGlossiness = new UINumber( 0.5 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+
+	materialGlossinessRow.add( new UIText( strings.getKey( 'sidebar/material/glossiness' ) ).setWidth( '90px' ) );
+	materialGlossinessRow.add( materialGlossiness );
+
+	container.add( materialGlossinessRow );
+
 	// shininess
 
 	var materialShininessRow = new UIRow();
@@ -403,6 +413,18 @@ function SidebarMaterial( editor ) {
 	materialSpecularMapRow.add( materialSpecularMap );
 
 	container.add( materialSpecularMapRow );
+
+	// glossiness map
+
+	var materialGlossinessMapRow = new UIRow();
+	var materialGlossinessMapEnabled = new UICheckbox( false ).onChange( update );
+	var materialGlossinessMap = new UITexture().onChange( update );
+
+	materialGlossinessMapRow.add( new UIText( strings.getKey( 'sidebar/material/glossinessmap' ) ).setWidth( '90px' ) );
+	materialGlossinessMapRow.add( materialGlossinessMapEnabled );
+	materialGlossinessMapRow.add( materialGlossinessMap );
+
+	container.add( materialGlossinessMapRow );
 
 	// env map
 
@@ -710,6 +732,12 @@ function SidebarMaterial( editor ) {
 
 			}
 
+			if ( material.glossiness !== undefined && material.glossiness !== materialGlossiness.getValue() ) {
+
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'glossiness', materialGlossiness.getValue(), currentMaterialSlot ) );
+
+			}
+
 			if ( material.shininess !== undefined && Math.abs( material.shininess - materialShininess.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'shininess', materialShininess.getValue(), currentMaterialSlot ) );
@@ -1002,6 +1030,27 @@ function SidebarMaterial( editor ) {
 
 			}
 
+			if ( material.glossinessMap !== undefined ) {
+
+				var glossinessMapEnabled = materialGlossinessMapEnabled.getValue() === true;
+
+				if ( objectHasUvs ) {
+
+					var glossinessMap = glossinessMapEnabled ? materialGlossinessMap.getValue() : null;
+					if ( material.glossinessMap !== glossinessMap ) {
+
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'glossinessMap', glossinessMap, currentMaterialSlot ) );
+
+					}
+
+				} else {
+
+					if ( glossinessMapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
 			if ( material.envMap !== undefined ) {
 
 				var envMapEnabled = materialEnvMapEnabled.getValue() === true;
@@ -1249,6 +1298,7 @@ function SidebarMaterial( editor ) {
 			'emissive': materialEmissiveRow,
 			// 'sheen': materialSheenRow,
 			'specular': materialSpecularRow,
+			'glossiness': materialGlossinessRow,
 			'shininess': materialShininessRow,
 			'clearcoat': materialClearcoatRow,
 			'clearcoatRoughness': materialClearcoatRoughnessRow,
@@ -1267,6 +1317,7 @@ function SidebarMaterial( editor ) {
 			'roughnessMap': materialRoughnessMapRow,
 			'metalnessMap': materialMetalnessMapRow,
 			'specularMap': materialSpecularMapRow,
+			'glossinessMap': materialGlossinessMapRow,
 			'envMap': materialEnvMapRow,
 			'lightMap': materialLightMapRow,
 			'aoMap': materialAOMapRow,
@@ -1405,6 +1456,12 @@ function SidebarMaterial( editor ) {
 		if ( material.specular !== undefined ) {
 
 			materialSpecular.setHexValue( material.specular.getHexString() );
+
+		}
+
+		if ( material.glossiness !== undefined ) {
+
+			materialGlossiness.setValue( material.glossiness );
 
 		}
 
@@ -1569,6 +1626,18 @@ function SidebarMaterial( editor ) {
 			if ( material.specularMap !== null || resetTextureSelectors ) {
 
 				materialSpecularMap.setValue( material.specularMap );
+
+			}
+
+		}
+
+		if ( material.glossinessMap !== undefined ) {
+
+			materialGlossinessMapEnabled.setValue( material.glossinessMap !== null );
+
+			if ( material.glossinessMap !== null || resetTextureSelectors ) {
+
+				materialGlossinessMap.setValue( material.glossinessMap );
 
 			}
 
