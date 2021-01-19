@@ -13,16 +13,16 @@ export class XRHandModel extends Object3D {
 
 }
 
-export class XRControllerModelFactory {
+export class XRHandModelFactory {
 
 	constructor( gltfLoader?: GLTFLoader );
 	gltfLoader: GLTFLoader | null;
 	path: string;
 
 	createHandModel(
-    controller: Group,
-    profile?: 'spheres' | 'boxes' | 'oculus',
-    options?: { primitive: 'sphere' | 'box' }
-  ): XRHandModel;
+		controller: Group,
+		profile?: 'spheres' | 'boxes' | 'oculus',
+		options?: { primitive: 'sphere' | 'box' }
+	): XRHandModel;
 
 }
