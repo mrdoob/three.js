@@ -975,7 +975,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		function parseFloats( string ) {
 
-			var array = string.split( /[\s,]+|(?=\s?[+\-])/ );
+			var array = string.split( /[\s,]+/ );
 
 			for ( var i = 0; i < array.length; i ++ ) {
 
