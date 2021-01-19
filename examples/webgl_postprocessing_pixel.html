@@ -40,16 +40,6 @@
 
 			}
 
-			function resize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				pixelPass.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
-
-			}
-
 			function init() {
 
 				const container = document.getElementById( 'container' );
@@ -122,7 +112,7 @@
 				pixelPass.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
 				composer.addPass( pixelPass );
 
-				window.addEventListener( 'resize', resize );
+				window.addEventListener( 'resize', onWindowResize );
 
 				params = {
 					pixelSize: 16,
@@ -131,6 +121,16 @@
 				gui = new GUI();
 				gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
 				gui.add( params, 'postprocessing' );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				pixelPass.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
 
 			}
 

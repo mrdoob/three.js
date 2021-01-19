@@ -274,7 +274,7 @@
 				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 				container.appendChild( renderer.domElement );
 				// Clipping setup:
 				globalClippingPlanes = createPlanes( GlobalClippingPlanes.length );

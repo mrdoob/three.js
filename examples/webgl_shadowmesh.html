@@ -61,7 +61,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.getElementById( "container" ).appendChild( renderer.domElement );
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				camera.position.set( 0, 2.5, 10 );
 				scene.add( camera );
