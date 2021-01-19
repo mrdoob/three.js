@@ -3,8 +3,6 @@ import {
 	Object3D,
 } from '../../../src/Three';
 
-import { GLTFLoader } from '../loaders/GLTFLoader';
-
 export class XRHandModel extends Object3D {
 
 	constructor();
@@ -15,14 +13,13 @@ export class XRHandModel extends Object3D {
 
 export class XRHandModelFactory {
 
-	constructor( gltfLoader?: GLTFLoader );
-	gltfLoader: GLTFLoader | null;
+	constructor();
 	path: string;
 
 	createHandModel(
 		controller: Group,
 		profile?: 'spheres' | 'boxes' | 'oculus',
-		options?: { primitive: 'sphere' | 'box' }
+		options?: { model?: 'lowpoly', primitive?: 'sphere' | 'box' }
 	): XRHandModel;
 
 }
