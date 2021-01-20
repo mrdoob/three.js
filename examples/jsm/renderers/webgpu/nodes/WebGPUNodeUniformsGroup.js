@@ -26,4 +26,4 @@ class WebGPUNodeUniformsGroup extends WebGPUUniformsGroup {
 
 }
 
-export default WebGPUUniformsGroup;
+export default WebGPUNodeUniformsGroup;

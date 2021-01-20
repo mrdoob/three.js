@@ -183,12 +183,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		let attributeIndex = this.attributeIndex;
 		let varyIndex = this.varyIndex;
 
-		for ( let name in attributes ) {
+		for ( const name in attributes ) {
 
-			let attribute = attributes[ name ];
+			const attribute = attributes[ name ];
 
-			let type = attribute.type;
-			let property = attribute.property;
+			const type = attribute.type;
+			const property = attribute.property;
 
 			if ( shaderStage === 'vertex' ) {
 
@@ -207,17 +207,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getAttributesBodySnippet( shaderStage ) {
+	getAttributesBodySnippet( /* shaderStage */ ) {
 
 		let snippet = '';
 
 		const attributes = this.attributes;
 
-		for ( let name in attributes ) {
+		for ( const name in attributes ) {
 
-			let attribute = attributes[ name ];
+			const attribute = attributes[ name ];
 
-			let property = attribute.property;
+			const property = attribute.property;
 
 			snippet += `${property} = ${name};`;
 
@@ -236,7 +236,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		let bindingIndex = this.bindingIndex;
 
-		for ( let uniform of uniforms ) {
+		for ( const uniform of uniforms ) {
 
 			if ( uniform.type === 'texture' ) {
 
@@ -245,7 +245,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			} else {
 
-				let vectorType = this.getVectorType( uniform.type );
+				const vectorType = this.getVectorType( uniform.type );
 
 				groupSnippet += `uniform ${vectorType} ${uniform.name};`;
 
@@ -266,9 +266,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 	composeShaderCode( code, snippet ) {
 
 		// use regex maybe for security?
-		const versionStrIndex = code.indexOf( "\n" );
+		const versionStrIndex = code.indexOf( '\n' );
 
-		let finalCode = code.substr( 0, versionStrIndex ) + "\n\n";
+		let finalCode = code.substr( 0, versionStrIndex ) + '\n\n';
 
 		finalCode += snippet;
 

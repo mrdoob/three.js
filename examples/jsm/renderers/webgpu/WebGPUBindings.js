@@ -1,7 +1,5 @@
 import WebGPUUniformsGroup from './WebGPUUniformsGroup.js';
-import { FloatUniform, Matrix3Uniform, Matrix4Uniform } from './WebGPUUniform.js';
-import WebGPUSampler from './WebGPUSampler.js';
-import { WebGPUSampledTexture } from './WebGPUSampledTexture.js';
+import { Matrix3Uniform, Matrix4Uniform } from './WebGPUUniform.js';
 
 class WebGPUBindings {
 
@@ -39,7 +37,7 @@ class WebGPUBindings {
 
 			// each material defines an array of bindings (ubos, textures, samplers etc.)
 
-			let bindings = this.composeBindings( object, nodeBuilder.getBindings( 'fragment' ) );
+			const bindings = this.composeBindings( object, nodeBuilder.getBindings( 'fragment' ) );
 
 			// setup (static) binding layout and (dynamic) binding group
 
@@ -136,7 +134,6 @@ class WebGPUBindings {
 
 			} else if ( binding.isSampler ) {
 
-				const material = object.material;
 				const texture = binding.texture;
 
 				textures.updateSampler( texture );
@@ -152,7 +149,6 @@ class WebGPUBindings {
 
 			} else if ( binding.isSampledTexture ) {
 
-				const material = object.material;
 				const texture = binding.texture;
 
 				const forceUpdate = textures.updateTexture( texture );
@@ -264,7 +260,7 @@ class WebGPUBindings {
 
 	composeBindings( object, uniforms ) {
 
-		let bindings = [];
+		const bindings = [];
 
 		// UBOs
 

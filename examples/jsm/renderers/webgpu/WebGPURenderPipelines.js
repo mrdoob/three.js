@@ -22,7 +22,7 @@ class WebGPURenderPipelines {
 
 		this.pipelines = new WeakMap();
 		this.shaderAttributes = new WeakMap();
-		
+
 		this.shaderModules = {
 			vertex: new Map(),
 			fragment: new Map()

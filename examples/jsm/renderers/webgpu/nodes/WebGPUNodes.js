@@ -41,7 +41,7 @@ class WebGPUNodes {
 
 	}
 
-	update( object, camera ) {
+	update( object/*, camera*/ ) {
 
 		const material = object.material;
 
@@ -49,7 +49,7 @@ class WebGPUNodes {
 
 		this.nodeFrame.material = object.material;
 
-		for ( let node of nodeBuilder.updateNodes ) {
+		for ( const node of nodeBuilder.updateNodes ) {
 
 			this.nodeFrame.updateNode( node );
 
