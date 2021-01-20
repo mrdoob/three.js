@@ -3,9 +3,9 @@ const ShaderLib = {
 		vertexShader: `#version 450
 
 		layout(location = 0) in vec3 position;
-		layout(location = 1) in vec2 uv;
 
-		layout(location = 0) out vec2 vUv;
+		NODE_HEADER_ATTRIBUTES
+		NODE_HEADER_UNIFORMS
 
 		layout(set = 0, binding = 0) uniform ModelUniforms {
 			mat4 modelMatrix;
@@ -19,23 +19,32 @@ const ShaderLib = {
 		} cameraUniforms;
 
 		void main(){
-			vUv = uv;
+			NODE_BODY_ATTRIBUTES
 			gl_Position = cameraUniforms.projectionMatrix * modelUniforms.modelViewMatrix * vec4( position, 1.0 );
 		}`,
 		fragmentShader: `#version 450
-		layout(set = 0, binding = 2) uniform OpacityUniforms {
-			float opacity;
-		} opacityUniforms;
 
-		layout(set = 0, binding = 3) uniform sampler mySampler;
-		layout(set = 0, binding = 4) uniform texture2D myTexture;
+		NODE_HEADER_ATTRIBUTES
+		NODE_HEADER_UNIFORMS
 
-		layout(location = 0) in vec2 vUv;
 		layout(location = 0) out vec4 outColor;
 
 		void main() {
-			outColor = texture( sampler2D( myTexture, mySampler ), vUv );
-			outColor.a *= opacityUniforms.opacity;
+
+			outColor = vec4( 1.0, 1.0, 1.0, 1.0 );
+
+			#ifdef NODE_COLOR
+
+				outColor = NODE_COLOR;
+
+			#endif
+
+			#ifdef NODE_OPACITY
+
+				outColor.a *= NODE_OPACITY;
+
+			#endif
+
 		}`
 	},
 	pointsBasic: {
@@ -43,6 +52,9 @@ const ShaderLib = {
 
 		layout(location = 0) in vec3 position;
 
+		NODE_HEADER_ATTRIBUTES
+		NODE_HEADER_UNIFORMS
+
 		layout(set = 0, binding = 0) uniform ModelUniforms {
 			mat4 modelMatrix;
 			mat4 modelViewMatrix;
@@ -54,14 +66,32 @@ const ShaderLib = {
 		} cameraUniforms;
 
 		void main(){
+			NODE_BODY_ATTRIBUTES
 			gl_Position = cameraUniforms.projectionMatrix * modelUniforms.modelViewMatrix * vec4( position, 1.0 );
 		}`,
 		fragmentShader: `#version 450
 
+		NODE_HEADER_ATTRIBUTES
+		NODE_HEADER_UNIFORMS
+
 		layout(location = 0) out vec4 outColor;
 
 		void main() {
-			outColor = vec4( 1.0, 0.0, 0.0, 1.0 );
+
+			outColor = vec4( 1.0, 1.0, 1.0, 1.0 );
+
+			#ifdef NODE_COLOR
+
+				outColor = NODE_COLOR;
+
+			#endif
+
+			#ifdef NODE_OPACITY
+
+				outColor.a = NODE_OPACITY;
+
+			#endif
+
 		}`
 	},
 	lineBasic: {
@@ -69,6 +99,9 @@ const ShaderLib = {
 
 		layout(location = 0) in vec3 position;
 
+		NODE_HEADER_ATTRIBUTES
+		NODE_HEADER_UNIFORMS
+
 		layout(set = 0, binding = 0) uniform ModelUniforms {
 			mat4 modelMatrix;
 			mat4 modelViewMatrix;
@@ -80,14 +113,32 @@ const ShaderLib = {
 		} cameraUniforms;
 
 		void main(){
+			NODE_BODY_ATTRIBUTES
 			gl_Position = cameraUniforms.projectionMatrix * modelUniforms.modelViewMatrix * vec4( position, 1.0 );
 		}`,
 		fragmentShader: `#version 450
 
+		NODE_HEADER_ATTRIBUTES
+		NODE_HEADER_UNIFORMS
+
 		layout(location = 0) out vec4 outColor;
 
 		void main() {
-			outColor = vec4( 1.0, 0.0, 0.0, 1.0 );
+
+			outColor = vec4( 1.0, 1.0, 1.0, 1.0 );
+
+			#ifdef NODE_COLOR
+
+				outColor = NODE_COLOR;
+
+			#endif
+
+			#ifdef NODE_OPACITY
+
+				outColor.a = NODE_OPACITY;
+
+			#endif
+
 		}`
 	}
 };
