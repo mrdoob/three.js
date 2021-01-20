@@ -61,7 +61,7 @@
 				init();
 				animate();
 
-			}, false );
+			} );
 
 			function init() {
 
@@ -91,7 +91,7 @@
 
 					this.currentTime = 3;
 
-				}, false );
+				} );
 
 				texture = new THREE.VideoTexture( video );
 
@@ -152,7 +152,7 @@
 
 				renderer.autoClear = false;
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 				// postprocessing
 

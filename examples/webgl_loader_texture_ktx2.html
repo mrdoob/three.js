@@ -89,7 +89,9 @@
 
 			}
 
-			window.addEventListener( 'resize', () => {
+			window.addEventListener( 'resize', onWindowResize );
+
+			function onWindowResize() {
 
 				const width = window.innerWidth;
 				const height = window.innerHeight;
@@ -98,7 +100,7 @@
 				camera.updateProjectionMatrix();
 				renderer.setSize( width, height );
 
-			}, false );
+			}
 
 			/** Correct UVs to be compatible with `flipY=false` textures. */
 			function flipY( geometry ) {

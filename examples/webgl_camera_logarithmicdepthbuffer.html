@@ -127,9 +127,9 @@
 				border = document.getElementById( 'renderer_border' );
 				border.addEventListener( 'pointerdown', onBorderPointerDown );
 
-				window.addEventListener( 'mousemove', onMouseMove, false );
+				window.addEventListener( 'mousemove', onMouseMove );
 				window.addEventListener( 'resize', onWindowResize );
-				window.addEventListener( 'wheel', onMouseWheel, false );
+				window.addEventListener( 'wheel', onMouseWheel );
 
 			}
 

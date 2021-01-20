@@ -110,19 +110,19 @@
 
 				keyStates[ event.code ] = true;
 
-			}, false );
+			} );
 
 			document.addEventListener( 'keyup', ( event ) => {
 
 				keyStates[ event.code ] = false;
 
-			}, false );
+			} );
 
 			document.addEventListener( 'mousedown', () => {
 
 				document.body.requestPointerLock();
 
-			}, false );
+			} );
 
 			document.body.addEventListener( 'mousemove', ( event ) => {
 
@@ -133,7 +133,7 @@
 
 				}
 
-			}, false );
+			} );
 
 			window.addEventListener( 'resize', onWindowResize );
 
@@ -157,7 +157,7 @@
 
 				sphereIdx = ( sphereIdx + 1 ) % spheres.length;
 
-			}, false );
+			} );
 
 			function playerCollitions() {
 
