@@ -27,6 +27,9 @@
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
 
+			const tmpVector1 = new THREE.Vector3();
+			const tmpVector2 = new THREE.Vector3();
+
 			let controls;
 
 			let grabbing = false;
@@ -205,7 +208,7 @@
 				for ( let i = 0; i < spheres.length; i ++ ) {
 
 					const sphere = spheres[ i ];
-					const distance = indexTip.getWorldPosition().distanceTo( sphere.getWorldPosition() );
+					const distance = indexTip.getWorldPosition( tmpVector1 ).distanceTo( sphere.getWorldPosition( tmpVector2 ) );
 
 					if ( distance < sphere.geometry.boundingSphere.radius * sphere.scale.x ) {
 
