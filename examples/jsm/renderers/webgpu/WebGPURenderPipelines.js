@@ -9,28 +9,23 @@ import {
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor
 } from '../../../../build/three.module.js';
 
-import ShaderLib from './ShaderLib.js';
-
-import WebGPUNodeBuilder from './nodes/WebGPUNodeBuilder.js';
-
 class WebGPURenderPipelines {
 
-	constructor( renderer, properties, device, glslang, sampleCount ) {
+	constructor( renderer, properties, device, glslang, sampleCount, nodes ) {
 
 		this.renderer = renderer;
 		this.properties = properties;
 		this.device = device;
 		this.glslang = glslang;
 		this.sampleCount = sampleCount;
-
-		this.nodes = new WeakMap();
-		this.bindings = new WeakMap();
+		this.nodes = nodes;
 
 		this.pipelines = new WeakMap();
 		this.shaderAttributes = new WeakMap();
+		
 		this.shaderModules = {
-			vertex: new WeakMap(),
-			fragment: new WeakMap()
+			vertex: new Map(),
+			fragment: new Map()
 		};
 
 	}
@@ -56,77 +51,60 @@ class WebGPURenderPipelines {
 		if ( pipeline === undefined ) {
 
 			const device = this.device;
+			const properties = this.properties;
+
 			const material = object.material;
 
-			// shader source
+			// get shader
 
-			let shader;
-
-			if ( material.isMeshBasicMaterial ) {
-
-				shader = ShaderLib.meshBasic;
-
-			} else if ( material.isPointsMaterial ) {
-
-				shader = ShaderLib.pointsBasic;
-
-			} else if ( material.isLineBasicMaterial ) {
-
-				shader = ShaderLib.lineBasic;
-
-			} else {
-
-				console.error( 'THREE.WebGPURenderer: Unknwon shader type.' );
-
-			}
-
-			// parse nodes
-
-			const nodeBuilder = new WebGPUNodeBuilder( material, this.renderer );
-
-			shader = nodeBuilder.parse( shader.vertexShader, shader.fragmentShader );
-
-			this.nodes.set( material, nodeBuilder.nodes );
-
-			this.bindings.set( object, nodeBuilder.getBindings( 'fragment' ) );
+			const nodeBuilder = this.nodes.get( material );
 
 			// shader modules
 
 			const glslang = this.glslang;
 
-			let moduleVertex = this.shaderModules.vertex.get( shader );
+			let moduleVertex = this.shaderModules.vertex.get( nodeBuilder.vertexShader );
 
 			if ( moduleVertex === undefined ) {
 
-				const byteCodeVertex = glslang.compileGLSL( shader.vertexShader, 'vertex' );
+				const byteCodeVertex = glslang.compileGLSL( nodeBuilder.vertexShader, 'vertex' );
 
 				moduleVertex = {
 					module: device.createShaderModule( { code: byteCodeVertex } ),
 					entryPoint: 'main'
 				};
 
-				this.shaderModules.vertex.set( shader, moduleVertex );
+				this.shaderModules.vertex.set( nodeBuilder.vertexShader, moduleVertex );
 
 			}
 
-			let moduleFragment = this.shaderModules.fragment.get( shader );
+			let moduleFragment = this.shaderModules.fragment.get( nodeBuilder.fragmentShader );
 
 			if ( moduleFragment === undefined ) {
 
-				const byteCodeFragment = glslang.compileGLSL( shader.fragmentShader, 'fragment' );
+				const byteCodeFragment = glslang.compileGLSL( nodeBuilder.fragmentShader, 'fragment' );
 
 				moduleFragment = {
 					module: device.createShaderModule( { code: byteCodeFragment } ),
 					entryPoint: 'main'
 				};
 
-				this.shaderModules.fragment.set( shader, moduleFragment );
+				this.shaderModules.fragment.set( nodeBuilder.fragmentShader, moduleFragment );
 
 			}
 
+			// dispose material
+
+			const materialProperties = properties.get( material );
+
+			const disposeCallback = onMaterialDispose.bind( this );
+			materialProperties.disposeCallback = disposeCallback;
+
+			material.addEventListener( 'dispose', onMaterialDispose.bind( this ) );
+
 			// determine shader attributes
 
-			const shaderAttributes = this._parseShaderAttributes( shader.vertexShader );
+			const shaderAttributes = this._parseShaderAttributes( nodeBuilder.vertexShader );
 
 			// vertex buffers
 
@@ -231,18 +209,6 @@ class WebGPURenderPipelines {
 
 	}
 
-	getNodes( material ) {
-
-		return this.nodes.get( material );
-
-	}
-
-	getBindings( object ) {
-
-		return this.bindings.get( object );
-
-	}
-
 	getShaderAttributes( pipeline ) {
 
 		return this.shaderAttributes.get( pipeline );
@@ -254,8 +220,8 @@ class WebGPURenderPipelines {
 		this.pipelines = new WeakMap();
 		this.shaderAttributes = new WeakMap();
 		this.shaderModules = {
-			vertex: new WeakMap(),
-			fragment: new WeakMap()
+			vertex: new Map(),
+			fragment: new Map()
 		};
 
 	}
@@ -816,6 +782,27 @@ class WebGPURenderPipelines {
 		} );
 
 	}
+
+}
+
+function onMaterialDispose( event ) {
+
+	const properties = this.properties;
+	const nodes = this.nodes;
+	const shaderModules = this.shaderModules;
+
+	const material = event.target;
+	const nodeBuilder = nodes.get( material );
+
+	material.removeEventListener( 'dispose', onMaterialDispose );
+
+	properties.remove( material );
+	nodes.remove( material );
+
+	shaderModules.vertex.delete( nodeBuilder.vertexShader );
+	shaderModules.fragment.delete( nodeBuilder.fragmentShader );
+
+	// @TODO: need implement pipeline
 
 }
 

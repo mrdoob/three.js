@@ -1,35 +1,65 @@
+import WebGPUNodeBuilder from './WebGPUNodeBuilder.js';
+import NodeFrame from '../../nodes/core/NodeFrame.js';
 
 class WebGPUNodes {
 
-	constructor( ) {
+	constructor( renderer ) {
 
-		this.uniformsData = new WeakMap();
+		this.renderer = renderer;
+
+		this.nodeFrame = new NodeFrame();
+
+		this.builders = new WeakMap();
 
 	}
 
-	get( object ) {
+	get( material ) {
 
-		let data = this.uniformsData.get( object );
+		let nodeBuilder = this.builders.get( material );
 
-		if ( data === undefined ) {
-			
-			this.uniformsData.set( object, data );
+		if ( nodeBuilder === undefined ) {
+
+			nodeBuilder = new WebGPUNodeBuilder( material, this.renderer ).build();
+
+			this.builders.set( material, nodeBuilder );
 
 		}
 
-		return data;
+		return nodeBuilder;
+
+	}
+
+	remove( object ) {
+
+		this.builders.delete( object );
+
+	}
+
+	updateFrame() {
+
+		this.nodeFrame.update();
 
 	}
 
 	update( object, camera ) {
 
-		
+		const material = object.material;
+
+		const nodeBuilder = this.get( material );
+
+		this.nodeFrame.material = object.material;
+
+		for ( let node of nodeBuilder.updateNodes ) {
+
+			this.nodeFrame.updateNode( node );
+
+		}
 
 	}
 
 	dispose() {
 
-		this.uniformsData = new WeakMap();
+		this.builders = new WeakMap();
 
 	}
 

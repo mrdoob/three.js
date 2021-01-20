@@ -11,18 +11,18 @@ class TextureNode extends InputNode {
 		this.uv = uv;
 
 	}
-	
+
 	generate( builder, output ) {
-	
+
 		const type = this.getType( builder );
-	
-		const textureSnippet = super.generate( builder, type );
+
+		const textureProperty = super.generate( builder, type );
 		const uvSnippet = this.uv.build( builder, 'vec2' );
 
-		const textureCallSnippet = builder.getTexture( textureSnippet, uvSnippet );
+		const textureCallSnippet = builder.getTexture( textureProperty, uvSnippet );
 
 		return builder.format( textureCallSnippet, type, output );
-		
+
 	}
 
 }

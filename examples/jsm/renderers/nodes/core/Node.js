@@ -4,7 +4,7 @@ class Node {
 
 		this.type = type;
 
-		//this.onBeforeUpdate = function ( /*object, scene, camera, geometry, material, group*/ ) {};
+		this.needsUpdate = false;
 
 		Object.defineProperty( this, 'isNode', { value: true } );
 
@@ -16,9 +16,15 @@ class Node {
 
 	}
 
+	update( /*frame*/ ) {
+
+		console.warn( "Abstract function." );
+
+	}
+
 	generate( /*builder, output*/ ) {
 
-		console.warn( "Abstract function" );
+		console.warn( "Abstract function." );
 
 	}
 

@@ -6,18 +6,14 @@ class TimerNode extends FloatNode {
 
 		super();
 
-		this.time = performance.now();
+		this.needsUpdate = true;
 
 	}
-	
-	update() {
-		
-		const time = performance.now();
-		
-		this.value += ( time - this.time ) / 1000;
-		
-		this.time = time;
-		
+
+	update( frame ) {
+
+		this.value = frame.time;
+
 	}
 
 }

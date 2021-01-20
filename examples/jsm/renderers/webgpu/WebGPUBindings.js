@@ -5,7 +5,7 @@ import { WebGPUSampledTexture } from './WebGPUSampledTexture.js';
 
 class WebGPUBindings {
 
-	constructor( device, info, properties, textures, pipelines, computePipelines, attributes ) {
+	constructor( device, info, properties, textures, pipelines, computePipelines, attributes, nodes ) {
 
 		this.device = device;
 		this.info = info;
@@ -14,6 +14,7 @@ class WebGPUBindings {
 		this.pipelines = pipelines;
 		this.computePipelines = computePipelines;
 		this.attributes = attributes;
+		this.nodes = nodes;
 
 		this.uniformsData = new WeakMap();
 
@@ -33,27 +34,12 @@ class WebGPUBindings {
 
 			const pipeline = this.pipelines.get( object );
 			const material = object.material;
-			let bindings;
+
+			const nodeBuilder = this.nodes.get( material );
 
 			// each material defines an array of bindings (ubos, textures, samplers etc.)
 
-			if ( material.isMeshBasicMaterial ) {
-
-				bindings = this._getMeshBasicBindings( object );
-
-			} else if ( material.isPointsMaterial ) {
-
-				bindings = this._getPointsBasicBindings( object );
-
-			} else if ( material.isLineBasicMaterial ) {
-
-				bindings = this._getLinesBasicBindings();
-
-			} else {
-
-				console.error( 'THREE.WebGPURenderer: Unknwon shader type.' );
-
-			}
+			let bindings = this.composeBindings( object, nodeBuilder.getBindings( 'fragment' ) );
 
 			// setup (static) binding layout and (dynamic) binding group
 
@@ -276,7 +262,7 @@ class WebGPUBindings {
 
 	}
 
-	_getMeshBasicBindings( object ) {
+	composeBindings( object, uniforms ) {
 
 		let bindings = [];
 
@@ -308,68 +294,8 @@ class WebGPUBindings {
 
 		bindings.push( modelGroup );
 		bindings.push( cameraGroup );
-		bindings = bindings.concat( this.pipelines.getBindings( object ) );
 
-		return bindings;
-
-	}
-
-	_getPointsBasicBindings( object ) {
-
-		let bindings = [];
-
-		// UBOs
-
-		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
-		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
-
-		const modelGroup = new WebGPUUniformsGroup( 'modelUniforms' );
-		modelGroup.addUniform( modelViewUniform );
-		modelGroup.addUniform( modelViewMatrixUniform );
-		modelGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
-
-			modelViewUniform.setValue( object.matrixWorld );
-			modelViewMatrixUniform.setValue( object.modelViewMatrix );
-
-		} );
-
-		const cameraGroup = this.sharedUniformsGroups.get( 'cameraUniforms' );
-
-		//
-
-		bindings.push( modelGroup );
-		bindings.push( cameraGroup );
-		bindings = bindings.concat( this.pipelines.getBindings( object ) );
-
-		return bindings;
-
-	}
-
-	_getLinesBasicBindings() {
-
-		const bindings = [];
-
-		// UBOs
-
-		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
-		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
-
-		const modelGroup = new WebGPUUniformsGroup( 'modelUniforms' );
-		modelGroup.addUniform( modelViewUniform );
-		modelGroup.addUniform( modelViewMatrixUniform );
-		modelGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
-
-			modelViewUniform.setValue( object.matrixWorld );
-			modelViewMatrixUniform.setValue( object.modelViewMatrix );
-
-		} );
-
-		const cameraGroup = this.sharedUniformsGroups.get( 'cameraUniforms' );
-
-		//
-
-		bindings.push( modelGroup );
-		bindings.push( cameraGroup );
+		bindings.push( ... uniforms );
 
 		return bindings;
 

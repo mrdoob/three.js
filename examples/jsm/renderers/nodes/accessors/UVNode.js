@@ -9,28 +9,28 @@ class UVNode extends AttributeNode {
 		this.index = index;
 
 	}
-	
+
 	getIndexProperty( prefix ) {
-		
+
 		return prefix + ( this.index > 0 ? this.index + 1 : '' );
-		
+
 	}
-	
+
 	getAttributeName( /*builder*/ ) {
 
 		return this.getIndexProperty( 'uv' );
 
 	}
-	
+
 	getAttributeProperty( builder ) {
-		
+
 		// customize 'uv' property
 		const property = this.getIndexProperty( 'vUv' );
-		
+
 		this.setAttributeProperty( property );
-		
+
 		return super.getAttributeProperty( builder );
-		
+
 	}
 
 }

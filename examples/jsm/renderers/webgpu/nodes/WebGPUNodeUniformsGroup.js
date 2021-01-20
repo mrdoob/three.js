@@ -1,4 +1,4 @@
-import WebGPUUniformsGroup from '../WebGPUUniformsGroup.js'
+import WebGPUUniformsGroup from '../WebGPUUniformsGroup.js';
 
 class WebGPUNodeUniformsGroup extends WebGPUUniformsGroup {
 

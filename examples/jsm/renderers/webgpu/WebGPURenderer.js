@@ -178,10 +178,10 @@ class WebGPURenderer {
 		this._geometries = new WebGPUGeometries( this._attributes, this._info );
 		this._textures = new WebGPUTextures( device, this._properties, this._info, compiler );
 		this._objects = new WebGPUObjects( this._geometries, this._info );
-		this._renderPipelines = new WebGPURenderPipelines( this, this._properties, device, compiler, parameters.sampleCount );
+		this._nodes = new WebGPUNodes( this );
+		this._renderPipelines = new WebGPURenderPipelines( this, this._properties, device, compiler, parameters.sampleCount, this._nodes );
 		this._computePipelines = new WebGPUComputePipelines( device, compiler );
-		this._nodes = new WebGPUNodes()
-		this._bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes );
+		this._bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
 		this._renderLists = new WebGPURenderLists();
 		this._background = new WebGPUBackground( this );
 
@@ -204,6 +204,12 @@ class WebGPURenderer {
 	}
 
 	render( scene, camera ) {
+
+		// @TODO: move this to animation loop
+
+		this._nodes.updateFrame();
+
+		//
 
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 

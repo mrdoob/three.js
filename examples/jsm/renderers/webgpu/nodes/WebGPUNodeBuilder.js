@@ -1,10 +1,12 @@
 import WebGPUNodeUniformsGroup from './WebGPUNodeUniformsGroup.js';
-import { FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform } from './WebGPUNodeUniform.js';
+import { FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform, ColorNodeUniform } from './WebGPUNodeUniform.js';
 import WebGPUSampler from '../WebGPUSampler.js';
 import { WebGPUSampledTexture } from '../WebGPUSampledTexture.js';
 
 import NodeSlot from '../../nodes/core/NodeSlot.js';
 import NodeBuilder from '../../nodes/core/NodeBuilder.js';
+
+import ShaderLib from './ShaderLib.js';
 
 class WebGPUNodeBuilder extends NodeBuilder {
 
@@ -19,7 +21,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		this.varyIndex = 0;
 
 		this.uniformsGroup = {};
-		
+
+		this.nativeShader = null;
+
 		this._parseMaterial();
 
 	}
@@ -28,11 +32,33 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		const material = this.material;
 
-		if ( material.isMeshBasicMaterial || material.isPointsMaterial ) {
+		// get shader
+
+		if ( material.isMeshBasicMaterial ) {
+
+			this.nativeShader = ShaderLib.meshBasic;
+
+		} else if ( material.isPointsMaterial ) {
+
+			this.nativeShader = ShaderLib.pointsBasic;
+
+		} else if ( material.isLineBasicMaterial ) {
+
+			this.nativeShader = ShaderLib.lineBasic;
+
+		} else {
+
+			console.error( 'THREE.WebGPURenderer: Unknwon shader type.' );
+
+		}
+
+		// parse inputs
+
+		if ( material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
 
 			if ( material.colorNode !== undefined ) {
 
-				this.addSlot( 'fragment', new NodeSlot( material.colorNode, 'COLOR', 'vec3' ) );
+				this.addSlot( 'fragment', new NodeSlot( material.colorNode, 'COLOR', 'vec4' ) );
 
 			}
 
@@ -46,10 +72,10 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( textureSnippet, uvSnippet ) {
-		
-		return `texture( sampler2D( ${textureSnippet}, ${textureSnippet}_sampler ), ${uvSnippet} )`;
-		
+	getTexture( textureProperty, uvSnippet ) {
+
+		return `texture( sampler2D( ${textureProperty}, ${textureProperty}_sampler ), ${uvSnippet} )`;
+
 	}
 
 	getPropertyName( nodeUniform ) {
@@ -57,11 +83,11 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		if ( nodeUniform.type === 'texture' ) {
 
 			return nodeUniform.name;
-			
+
 		} else {
-			
+
 			return `nodeUniforms.${nodeUniform.name}`;
-			
+
 		}
 
 	}
@@ -77,19 +103,25 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		const uniformNode = super.getUniformFromNode( node, shaderStage, type );
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
-		if ( nodeData.webgpuUniform === undefined ) {
+		if ( nodeData.uniformGPU === undefined ) {
 
-			let uniform;
+			let uniformGPU;
+
+			const bindings = this.bindings[ shaderStage ];
 
 			if ( type === 'texture' ) {
-				
+
 				const sampler = new WebGPUSampler( `${uniformNode.name}_sampler`, uniformNode.value );
 				const texture = new WebGPUSampledTexture( uniformNode.name, uniformNode.value );
-				
-				// Array.unshift: add first textures in sequence
-				
-				this.bindings[ shaderStage ].unshift( sampler, texture );
-				
+
+				// add first textures in sequence and group for last
+				const lastBinding = bindings[ bindings.length - 1 ];
+				const index = lastBinding && lastBinding.isUniformsGroup ? bindings.length - 1 : bindings.length;
+
+				bindings.splice( index, 0, sampler, texture );
+
+				uniformGPU = { sampler, texture };
+
 			} else {
 
 				let uniformsGroup = this.uniformsGroup[ shaderStage ];
@@ -100,25 +132,29 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 					this.uniformsGroup[ shaderStage ] = uniformsGroup;
 
-					this.bindings[ shaderStage ].push( uniformsGroup );
+					bindings.push( uniformsGroup );
 
 				}
 
 				if ( type === 'float' ) {
 
-					uniform = new FloatNodeUniform( uniformNode );
+					uniformGPU = new FloatNodeUniform( uniformNode );
 
 				} else if ( type === 'vec2' ) {
 
-					uniform = new Vector2NodeUniform( uniformNode );
+					uniformGPU = new Vector2NodeUniform( uniformNode );
 
 				} else if ( type === 'vec3' ) {
 
-					uniform = new Vector3NodeUniform( uniformNode );
+					uniformGPU = new Vector3NodeUniform( uniformNode );
 
 				} else if ( type === 'vec4' ) {
 
-					uniform = new Vector4NodeUniform( uniformNode );
+					uniformGPU = new Vector4NodeUniform( uniformNode );
+
+				} else if ( type === 'color' ) {
+
+					uniformGPU = new ColorNodeUniform( uniformNode );
 
 				} else {
 
@@ -126,11 +162,11 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-				uniformsGroup.addUniform( uniform );
+				uniformsGroup.addUniform( uniformGPU );
 
 			}
-			
-			nodeData.webgpuUniform = uniform;
+
+			nodeData.uniformGPU = uniformGPU;
 
 		}
 
@@ -139,45 +175,45 @@ class WebGPUNodeBuilder extends NodeBuilder {
 	}
 
 	getAttributesHeaderSnippet( shaderStage ) {
-		
+
 		let snippet = '';
-		
+
 		const attributes = this.attributes;
-		
+
 		let attributeIndex = this.attributeIndex;
 		let varyIndex = this.varyIndex;
 
-		for ( let name in attributes ) {			
+		for ( let name in attributes ) {
 
 			let attribute = attributes[ name ];
-			
+
 			let type = attribute.type;
 			let property = attribute.property;
 
 			if ( shaderStage === 'vertex' ) {
-				
-				snippet += `layout(location = ${attributeIndex++}) in ${type} ${name};`;
-				snippet += `layout(location = ${varyIndex++}) out ${type} ${property};`;
-				
+
+				snippet += `layout(location = ${attributeIndex ++}) in ${type} ${name};`;
+				snippet += `layout(location = ${varyIndex ++}) out ${type} ${property};`;
+
 			} else if ( shaderStage === 'fragment' ) {
-				
-				snippet += `layout(location = ${varyIndex++}) in ${type} ${property};`;
-				
+
+				snippet += `layout(location = ${varyIndex ++}) in ${type} ${property};`;
+
 			}
 
 		}
-		
+
 		return snippet;
-		
+
 	}
 
 	getAttributesBodySnippet( shaderStage ) {
-		
+
 		let snippet = '';
-		
+
 		const attributes = this.attributes;
-		
-		for ( let name in attributes ) {			
+
+		for ( let name in attributes ) {
 
 			let attribute = attributes[ name ];
 
@@ -186,55 +222,48 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			snippet += `${property} = ${name};`;
 
 		}
-		
+
 		return snippet;
-		
+
 	}
-	
 
 	getUniformsHeaderSnippet( shaderStage ) {
-		
+
 		const uniforms = this.uniforms[ shaderStage ];
-		
+
 		let snippet = '';
 		let groupSnippet = '';
-		
+
 		let bindingIndex = this.bindingIndex;
 
 		for ( let uniform of uniforms ) {
 
-			if (uniform.type === 'texture') {
+			if ( uniform.type === 'texture' ) {
 
-				snippet += `layout(set = 0, binding = ${bindingIndex++}) uniform sampler ${uniform.name}_sampler;`;
-				snippet += `layout(set = 0, binding = ${bindingIndex++}) uniform texture2D ${uniform.name};`;
+				snippet += `layout(set = 0, binding = ${bindingIndex ++}) uniform sampler ${uniform.name}_sampler;`;
+				snippet += `layout(set = 0, binding = ${bindingIndex ++}) uniform texture2D ${uniform.name};`;
 
 			} else {
-		
-				if (!groupSnippet) {
-					
-					groupSnippet = `layout(set = 0, binding = ${bindingIndex++}) uniform NodeUniforms {`;
-					
-				}
-				
-				groupSnippet += `uniform ${uniform.type} ${uniform.name};`;
-				
+
+				let vectorType = this.getVectorType( uniform.type );
+
+				groupSnippet += `uniform ${vectorType} ${uniform.name};`;
+
 			}
 
 		}
-		
-		if (groupSnippet) {
-			
-			groupSnippet += `} nodeUniforms;`;
-			
-			snippet += groupSnippet;
-			
+
+		if ( groupSnippet ) {
+
+			snippet += `layout(set = 0, binding = ${bindingIndex ++}) uniform NodeUniforms { ${groupSnippet} } nodeUniforms;`;
+
 		}
-		
+
 		return snippet;
-		
+
 	}
 
-	buildShader( code, snippet ) {
+	composeShaderCode( code, snippet ) {
 
 		// use regex maybe for security?
 		const versionStrIndex = code.indexOf( "\n" );
@@ -249,17 +278,14 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	parse( vertexShader, fragmentShader ) {
-		
-		const shader = this.build();
+	build() {
 
-		vertexShader = this.buildShader( vertexShader, shader.vertex );
-		fragmentShader = this.buildShader( fragmentShader, shader.fragment );
+		super.build();
 
-		return {
-			vertexShader,
-			fragmentShader
-		};
+		this.vertexShader = this.composeShaderCode( this.nativeShader.vertexShader, this.vertexShader );
+		this.fragmentShader = this.composeShaderCode( this.nativeShader.fragmentShader, this.fragmentShader );
+
+		return this;
 
 	}
 

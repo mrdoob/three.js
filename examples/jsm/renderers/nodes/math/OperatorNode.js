@@ -18,9 +18,9 @@ class OperatorNode extends Node {
 		const typeA = this.a.getType( builder );
 		const typeB = this.b.getType( builder );
 
-		if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+		// use the greater length vector
 
-			// use the greater length vector
+		if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
 
 			return typeB;
 
