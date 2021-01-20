@@ -22,7 +22,6 @@
 			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
 			import FloatNode from './jsm/renderers/nodes/inputs/FloatNode.js';
 			import Vector2Node from './jsm/renderers/nodes/inputs/Vector2Node.js';
-			import Vector3Node from './jsm/renderers/nodes/inputs/Vector3Node.js';
 			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
 			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
 			import UVNode from './jsm/renderers/nodes/accessors/UVNode.js';
@@ -73,7 +72,7 @@
 				const timerNode = new TimerNode();
 
 				// birection speed
-				const timerScaleNode = new OperatorNode( '*', timerNode, new Vector2Node( new THREE.Vector2( - .5, .1 ) ).setConst( true ) );
+				const timerScaleNode = new OperatorNode( '*', timerNode, new Vector2Node( new THREE.Vector2( - 0.5, 0.1 ) ).setConst( true ) );
 				const animateUV = new OperatorNode( '+', new UVNode(), timerScaleNode );
 
 				materialBox.colorNode = new TextureNode( texture, animateUV );
