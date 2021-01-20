@@ -24,6 +24,10 @@
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
+			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
+			import Vector3Node from './jsm/renderers/nodes/inputs/Vector3Node.js';
+			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
+
 			const statsEnabled = true;
 
 			let container, stats;
@@ -75,13 +79,15 @@
 						material.metalness = 1; // attenuates metalnessMap
 
 						const diffuseMap = loader.load( 'Cerberus_A.jpg' );
+						diffuseMap.wrapS = THREE.RepeatWrapping;
 						diffuseMap.encoding = THREE.sRGBEncoding;
-						material.map = diffuseMap;
+						//material.map = diffuseMap;
+
+						material.colorNode = new OperatorNode( '*', new TextureNode( diffuseMap ), new Vector3Node( new THREE.Vector3( 1, 1, 1 ) ) );
 						// roughness is in G channel, metalness is in B channel
 						material.metalnessMap = material.roughnessMap = loader.load( 'Cerberus_RM.jpg' );
 						material.normalMap = loader.load( 'Cerberus_N.jpg' );
 
-						material.map.wrapS = THREE.RepeatWrapping;
 						material.roughnessMap.wrapS = THREE.RepeatWrapping;
 						material.metalnessMap.wrapS = THREE.RepeatWrapping;
 						material.normalMap.wrapS = THREE.RepeatWrapping;

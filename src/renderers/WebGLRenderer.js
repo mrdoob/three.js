@@ -40,6 +40,8 @@ import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 
+import { WebGLNodeBuilder } from '../../examples/jsm/renderers/webgl/nodes/WebGLNodeBuilder.js';
+
 function createCanvasElement() {
 
 	const canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
@@ -1363,6 +1365,8 @@ function WebGLRenderer( parameters ) {
 			parameters.uniforms = programCache.getUniforms( material );
 
 			material.onBeforeCompile( parameters, _this );
+
+			new WebGLNodeBuilder( material, this, parameters ).build();
 
 			program = programCache.acquireProgram( parameters, programCacheKey );
 
