@@ -53,7 +53,7 @@ class NodeBuilder {
 
 	}
 
-	getTexture( textureProperty, uvSnippet ) {
+	getTexture( /* textureProperty, uvSnippet */ ) {
 
 
 
@@ -67,7 +67,7 @@ class NodeBuilder {
 		if ( type === 'vec4' ) return `vec4( ${value.x}, ${value.y}, ${value.z}, ${value.w} )`;
 		if ( type === 'color' ) return `vec3( ${value.r}, ${value.g}, ${value.b} )`;
 
-		throw new Error(`Type '${type}' not found in generate constant attempt.`);
+		throw new Error( `Type '${type}' not found in generate constant attempt.` );
 
 	}
 
@@ -187,7 +187,7 @@ class NodeBuilder {
 
 	flowNode( node, output ) {
 
-		let flowData = {};
+		const flowData = {};
 		flowData.result = node.build( this, output );
 
 		return flowData;
@@ -200,7 +200,7 @@ class NodeBuilder {
 
 		let code = '';
 
-		for ( let name in defines ) {
+		for ( const name in defines ) {
 
 			code += `#define ${name} ${defines[ name ]}\n`;
 
@@ -228,7 +228,7 @@ class NodeBuilder {
 
 		let snippet = '';
 
-		for ( let uniform of uniforms ) {
+		for ( const uniform of uniforms ) {
 
 			snippet += `${uniform.type} ${uniform.name}; `;
 
@@ -280,15 +280,15 @@ class NodeBuilder {
 		const shaderStages = [ 'vertex', 'fragment' ];
 		const shaderData = {};
 
-		for ( let shaderStage of shaderStages ) {
+		for ( const shaderStage of shaderStages ) {
 
 			this.shaderStage = shaderStage;
 
-			let slots = this.slots[ shaderStage ];
+			const slots = this.slots[ shaderStage ];
 
-			for ( let slot of slots ) {
+			for ( const slot of slots ) {
 
-				let flowData = this.flowNode( slot.node, slot.output );
+				const flowData = this.flowNode( slot.node, slot.output );
 
 				this.define( shaderStage, `NODE_${slot.name}`, flowData.result );
 
@@ -298,7 +298,7 @@ class NodeBuilder {
 
 		this.shaderStage = null;
 
-		for ( let shaderStage of shaderStages ) {
+		for ( const shaderStage of shaderStages ) {
 
 			this.define( shaderStage, 'NODE_HEADER_UNIFORMS', this.getUniformsHeaderSnippet( shaderStage ) );
 			this.define( shaderStage, 'NODE_HEADER_ATTRIBUTES', this.getAttributesHeaderSnippet( shaderStage ) );

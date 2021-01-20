@@ -18,13 +18,13 @@ class Node {
 
 	update( /*frame*/ ) {
 
-		console.warn( "Abstract function." );
+		console.warn( 'Abstract function.' );
 
 	}
 
 	generate( /*builder, output*/ ) {
 
-		console.warn( "Abstract function." );
+		console.warn( 'Abstract function.' );
 
 	}
 

@@ -23,7 +23,7 @@
 			import Vector2Node from './jsm/renderers/nodes/inputs/Vector2Node.js';
 
 			let camera, scene, renderer;
-			let mouse = new THREE.Vector2();
+			const mouse = new THREE.Vector2();
 
 			let cameraFX, sceneFX, textureRenderer;
 
@@ -83,9 +83,9 @@
 
 				const geometryFX = new THREE.PlaneGeometry( 2, 2 );
 
-				// @TODO Until NodeMaterial is available just copy the beauty pass to screen
+				// modulate the final color based on the mouse position
 
-				const screenFXNode = new OperatorNode( '+', new Vector2Node( mouse ), new Vector2Node( new THREE.Vector2( .5, .5 ) ).setConst( true ) );
+				const screenFXNode = new OperatorNode( '+', new Vector2Node( mouse ), new Vector2Node( new THREE.Vector2( 0.5, 0.5 ) ).setConst( true ) );
 
 				const materialFX = new THREE.MeshBasicMaterial();
 				materialFX.colorNode = new OperatorNode( '*', new TextureNode( textureRenderer.getTexture() ), screenFXNode );
