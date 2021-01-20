@@ -64,7 +64,7 @@ export class Matrix4 implements Matrix {
 	 * Resets this matrix to identity.
 	 */
 	identity(): Matrix4;
-	clone(): this;
+	clone(): Matrix4;
 	copy( m: Matrix4 ): this;
 	copyPosition( m: Matrix4 ): Matrix4;
 	extractBasis( xAxis: Vector3, yAxis: Vector3, zAxis: Vector3 ): Matrix4;
@@ -125,7 +125,7 @@ export class Matrix4 implements Matrix {
 	/**
 	 * Inverts this matrix.
 	 */
-	invert(): Matrix;
+	invert(): Matrix4;
 
 	/**
 	 * Multiplies the columns of this matrix by vector v.

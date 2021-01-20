@@ -1,6 +1,6 @@
-import { Geometry } from './../core/Geometry';
+import { BufferGeometry } from './../core/BufferGeometry';
 
-export class PlaneGeometry extends Geometry {
+export class PlaneGeometry extends BufferGeometry {
 
 	/**
 	 * @param [width=1] — Width of the sides on the X axis.
@@ -28,3 +28,5 @@ export class PlaneGeometry extends Geometry {
 	};
 
 }
+
+export { PlaneGeometry as PlaneBufferGeometry };

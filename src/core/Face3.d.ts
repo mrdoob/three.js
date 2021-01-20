@@ -94,7 +94,7 @@ export class Face3 {
 	 */
 	materialIndex: number;
 
-	clone(): this;
+	clone(): Face3;
 	copy( source: Face3 ): this;
 
 }

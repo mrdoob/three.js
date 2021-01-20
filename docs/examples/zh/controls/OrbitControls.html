@@ -113,11 +113,6 @@
 			请注意，如果该值被启用，你将必须在你的动画循环里调用[page:.update]()。
 		</p>
 
-		<h3>[property:Boolean enableKeys]</h3>
-		<p>
-			启用或禁用键盘控制。
-		</p>
-
 		<h3>[property:Boolean enablePan]</h3>
 		<p>
 			启用或禁用摄像机平移，默认为true。
@@ -286,6 +281,11 @@ controls.touches = {
 		<h3>[method:radians getPolarAngle] ()</h3>
 		<p>
 			获得当前的垂直旋转，单位为弧度。
+		</p>
+
+		<h3>[method:void listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			Adds key event listeners to the given DOM element. *window* is a recommended argument for using this method.
 		</p>
 
 		<h3>[method:null reset] ()</h3>

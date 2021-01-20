@@ -1,7 +1,7 @@
 import { Vector2 } from './../math/Vector2';
-import { Geometry } from './../core/Geometry';
+import { BufferGeometry } from './../core/BufferGeometry';
 
-export class LatheGeometry extends Geometry {
+export class LatheGeometry extends BufferGeometry {
 
 	/**
 	 * @param points
@@ -16,7 +16,6 @@ export class LatheGeometry extends Geometry {
 		phiLength?: number
 	);
 
-
 	/**
 	 * @default 'LatheGeometry'
 	 */
@@ -30,3 +29,5 @@ export class LatheGeometry extends Geometry {
 	};
 
 }
+
+export { LatheGeometry as LatheBufferGeometry };

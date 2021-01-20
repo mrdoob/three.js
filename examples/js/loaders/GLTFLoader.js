@@ -460,7 +460,7 @@ THREE.GLTFLoader = ( function () {
 				break;
 
 			default:
-				throw new Error( 'THREE.GLTFLoader: Unexpected light type, "' + lightDef.type + '".' );
+				throw new Error( 'THREE.GLTFLoader: Unexpected light type: ' + lightDef.type );
 
 		}
 
@@ -2846,11 +2846,13 @@ THREE.GLTFLoader = ( function () {
 	/** When Object3D instances are targeted by animation, they need unique names. */
 	GLTFParser.prototype.createUniqueName = function ( originalName ) {
 
-		var name = THREE.PropertyBinding.sanitizeNodeName( originalName || '' );
+		var sanitizedName = THREE.PropertyBinding.sanitizeNodeName( originalName || '' );
+
+		var name = sanitizedName;
 
 		for ( var i = 1; this.nodeNamesUsed[ name ]; ++ i ) {
 
-			name = originalName + '_' + i;
+			name = sanitizedName + '_' + i;
 
 		}
 
@@ -3237,6 +3239,21 @@ THREE.GLTFLoader = ( function () {
 					mesh = meshDef.isSkinnedMesh === true
 						? new THREE.SkinnedMesh( geometry, material )
 						: new THREE.Mesh( geometry, material );
+
+					// Fix double sided rendered models on certain mobile devices, see https://github.com/mrdoob/three.js/issues/20997#issuecomment-756082184
+
+					if ( material.isMeshStandardMaterial === true &&
+						material.side === THREE.DoubleSide &&
+						geometry.getIndex() !== null &&
+						geometry.hasAttribute( 'position' ) === true &&
+						geometry.hasAttribute( 'normal' ) === true &&
+						geometry.hasAttribute( 'uv' ) === true &&
+						geometry.hasAttribute( 'tangent' ) === false ) {
+
+						geometry.computeTangents();
+						material.vertexTangents = true;
+
+					}
 
 					if ( mesh.isSkinnedMesh === true && ! mesh.geometry.attributes.skinWeight.normalized ) {
 

@@ -5,7 +5,7 @@ import {
 	Raycaster,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var DragControls = function ( _objects, _camera, _domElement ) {
 
@@ -27,25 +27,25 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	function activate() {
 
-		_domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
-		_domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
-		_domElement.addEventListener( 'mouseup', onDocumentMouseCancel, false );
-		_domElement.addEventListener( 'mouseleave', onDocumentMouseCancel, false );
-		_domElement.addEventListener( 'touchmove', onDocumentTouchMove, false );
-		_domElement.addEventListener( 'touchstart', onDocumentTouchStart, false );
-		_domElement.addEventListener( 'touchend', onDocumentTouchEnd, false );
+		_domElement.addEventListener( 'pointermove', onPointerMove, false );
+		_domElement.addEventListener( 'pointerdown', onPointerDown, false );
+		_domElement.addEventListener( 'pointerup', onPointerCancel, false );
+		_domElement.addEventListener( 'pointerleave', onPointerCancel, false );
+		_domElement.addEventListener( 'touchmove', onTouchMove, false );
+		_domElement.addEventListener( 'touchstart', onTouchStart, false );
+		_domElement.addEventListener( 'touchend', onTouchEnd, false );
 
 	}
 
 	function deactivate() {
 
-		_domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-		_domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
-		_domElement.removeEventListener( 'mouseup', onDocumentMouseCancel, false );
-		_domElement.removeEventListener( 'mouseleave', onDocumentMouseCancel, false );
-		_domElement.removeEventListener( 'touchmove', onDocumentTouchMove, false );
-		_domElement.removeEventListener( 'touchstart', onDocumentTouchStart, false );
-		_domElement.removeEventListener( 'touchend', onDocumentTouchEnd, false );
+		_domElement.removeEventListener( 'pointermove', onPointerMove, false );
+		_domElement.removeEventListener( 'pointerdown', onPointerDown, false );
+		_domElement.removeEventListener( 'pointerup', onPointerCancel, false );
+		_domElement.removeEventListener( 'pointerleave', onPointerCancel, false );
+		_domElement.removeEventListener( 'touchmove', onTouchMove, false );
+		_domElement.removeEventListener( 'touchstart', onTouchStart, false );
+		_domElement.removeEventListener( 'touchend', onTouchEnd, false );
 
 		_domElement.style.cursor = '';
 
@@ -63,9 +63,24 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
-	function onDocumentMouseMove( event ) {
+	function onPointerMove( event ) {
 
 		event.preventDefault();
+
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+			case 'pen':
+				onMouseMove( event );
+				break;
+
+			// TODO touch
+
+		}
+
+	}
+
+	function onMouseMove( event ) {
 
 		var rect = _domElement.getBoundingClientRect();
 
@@ -123,7 +138,24 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
-	function onDocumentMouseDown( event ) {
+	function onPointerDown( event ) {
+
+		event.preventDefault();
+
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+			case 'pen':
+				onMouseDown( event );
+				break;
+
+			// TODO touch
+
+		}
+
+	}
+
+	function onMouseDown( event ) {
 
 		event.preventDefault();
 
@@ -152,7 +184,24 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
-	function onDocumentMouseCancel( event ) {
+	function onPointerCancel( event ) {
+
+		event.preventDefault();
+
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+			case 'pen':
+				onMouseCancel( event );
+				break;
+
+			// TODO touch
+
+		}
+
+	}
+
+	function onMouseCancel( event ) {
 
 		event.preventDefault();
 
@@ -168,7 +217,7 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
-	function onDocumentTouchMove( event ) {
+	function onTouchMove( event ) {
 
 		event.preventDefault();
 		event = event.changedTouches[ 0 ];
@@ -196,7 +245,7 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
-	function onDocumentTouchStart( event ) {
+	function onTouchStart( event ) {
 
 		event.preventDefault();
 		event = event.changedTouches[ 0 ];
@@ -233,7 +282,7 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
-	function onDocumentTouchEnd( event ) {
+	function onTouchEnd( event ) {
 
 		event.preventDefault();
 

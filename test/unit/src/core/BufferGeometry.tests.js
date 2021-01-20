@@ -6,21 +6,15 @@ import {
 	Uint16BufferAttribute,
 	Uint32BufferAttribute
 } from '../../../../src/core/BufferAttribute';
-import { Color } from '../../../../src/math/Color';
-import { Vector2 } from '../../../../src/math/Vector2';
 import { Vector3 } from '../../../../src/math/Vector3';
-import { Vector4 } from '../../../../src/math/Vector4';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Sphere } from '../../../../src/math/Sphere';
-import { Geometry } from '../../../../src/core/Geometry';
-import { Face3 } from '../../../../src/core/Face3';
-import { Mesh } from '../../../../src/objects/Mesh';
-import { Line } from '../../../../src/objects/Line.js';
 import {
 	x,
 	y,
 	z
 } from '../math/Constants.tests';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper';
 
 var DegToRad = Math.PI / 180;
 
@@ -82,36 +76,6 @@ function getNormalsForVertices( vertices, assert ) {
 	assert.ok( geometry.attributes.normal !== undefined, "normal attribute was created" );
 
 	return geometry.attributes.normal.array;
-
-}
-
-function comparePositions( pos, v ) {
-
-	return (
-		pos[ 0 ] === v[ 0 ].x && pos[ 1 ] === v[ 0 ].y && pos[ 2 ] === v[ 0 ].z &&
-		pos[ 3 ] === v[ 1 ].x && pos[ 4 ] === v[ 1 ].y && pos[ 5 ] === v[ 1 ].z &&
-		pos[ 6 ] === v[ 2 ].x && pos[ 7 ] === v[ 2 ].y && pos[ 8 ] === v[ 2 ].z
-	);
-
-}
-
-function compareColors( col, c ) {
-
-	return (
-		col[ 0 ] === c[ 0 ].r && col[ 1 ] === c[ 0 ].g && col[ 2 ] === c[ 0 ].b &&
-		col[ 3 ] === c[ 1 ].r && col[ 4 ] === c[ 1 ].g && col[ 5 ] === c[ 1 ].b &&
-		col[ 6 ] === c[ 2 ].r && col[ 7 ] === c[ 2 ].g && col[ 8 ] === c[ 2 ].b
-	);
-
-}
-
-function compareUvs( uvs, u ) {
-
-	return (
-		uvs[ 0 ] === u[ 0 ].x && uvs[ 1 ] === u[ 0 ].y &&
-		uvs[ 2 ] === u[ 1 ].x && uvs[ 3 ] === u[ 1 ].y &&
-		uvs[ 4 ] === u[ 2 ].x && uvs[ 5 ] === u[ 2 ].y
-	);
 
 }
 
@@ -355,278 +319,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setFromObject", ( assert ) => {
-
-			var lineGeo = new Geometry();
-			lineGeo.vertices.push(
-				new Vector3( - 10, 0, 0 ),
-				new Vector3( 0, 10, 0 ),
-				new Vector3( 10, 0, 0 )
-			);
-
-			lineGeo.colors.push(
-				new Color( 1, 0, 0 ),
-				new Color( 0, 1, 0 ),
-				new Color( 0, 0, 1 )
-			);
-
-			var line = new Line( lineGeo, null );
-			var geometry = new BufferGeometry().setFromObject( line );
-
-			var pos = geometry.attributes.position.array;
-			var col = geometry.attributes.color.array;
-			var v = lineGeo.vertices;
-			var c = lineGeo.colors;
-
-			assert.ok(
-				// position exists
-				pos !== undefined &&
-
-				// vertex arrays have the same size
-				v.length * 3 === pos.length &&
-
-				// there are three complete vertices (each vertex contains three values)
-				geometry.attributes.position.count === 3 &&
-
-				// check if both arrays contains the same data
-				pos[ 0 ] === v[ 0 ].x && pos[ 1 ] === v[ 0 ].y && pos[ 2 ] === v[ 0 ].z &&
-				pos[ 3 ] === v[ 1 ].x && pos[ 4 ] === v[ 1 ].y && pos[ 5 ] === v[ 1 ].z &&
-				pos[ 6 ] === v[ 2 ].x && pos[ 7 ] === v[ 2 ].y && pos[ 8 ] === v[ 2 ].z
-				, "positions are equal" );
-
-			assert.ok(
-				// color exists
-				col !== undefined &&
-
-				// color arrays have the same size
-				c.length * 3 === col.length &&
-
-				// there are three complete colors (each color contains three values)
-				geometry.attributes.color.count === 3 &&
-
-				// check if both arrays contains the same data
-				col[ 0 ] === c[ 0 ].r && col[ 1 ] === c[ 0 ].g && col[ 2 ] === c[ 0 ].b &&
-				col[ 3 ] === c[ 1 ].r && col[ 4 ] === c[ 1 ].g && col[ 5 ] === c[ 1 ].b &&
-				col[ 6 ] === c[ 2 ].r && col[ 7 ] === c[ 2 ].g && col[ 8 ] === c[ 2 ].b
-				, "colors are equal" );
-
-		} );
-		QUnit.test( "setFromObject (more)", ( assert ) => {
-
-			var lineGeo = new Geometry();
-			lineGeo.vertices.push(
-				new Vector3( - 10, 0, 0 ),
-				new Vector3( 0, 10, 0 ),
-				new Vector3( 10, 0, 0 )
-			);
-
-			lineGeo.colors.push(
-				new Color( 1, 0, 0 ),
-				new Color( 0, 1, 0 ),
-				new Color( 0, 0, 1 )
-			);
-
-			lineGeo.computeBoundingBox();
-			lineGeo.computeBoundingSphere();
-
-			var line = new Line( lineGeo );
-			var geometry = new BufferGeometry().setFromObject( line );
-
-			assert.ok( geometry.boundingBox.equals( lineGeo.boundingBox ), "BoundingBox was set correctly" );
-			assert.ok( geometry.boundingSphere.equals( lineGeo.boundingSphere ), "BoundingSphere was set correctly" );
-
-			var pos = geometry.attributes.position.array;
-			var col = geometry.attributes.color.array;
-			var v = lineGeo.vertices;
-			var c = lineGeo.colors;
-
-			// adapted from setFromObject QUnit.test (way up)
-			assert.notStrictEqual( pos, undefined, "Position attribute exists" );
-			assert.strictEqual( v.length * 3, pos.length, "Vertex arrays have the same size" );
-			assert.strictEqual( geometry.attributes.position.count, 3, "Correct number of vertices" );
-			assert.ok( comparePositions( pos, v ), "Positions are identical" );
-
-			assert.notStrictEqual( col, undefined, "Color attribute exists" );
-			assert.strictEqual( c.length * 3, col.length, "Color arrays have the same size" );
-			assert.strictEqual( geometry.attributes.color.count, 3, "Correct number of colors" );
-			assert.ok( compareColors( col, c ), "Colors are identical" );
-
-			// setFromObject with a Mesh as object
-			lineGeo.faces.push( new Face3( 0, 1, 2 ) );
-			var lineMesh = new Mesh( lineGeo );
-			var geometry = new BufferGeometry().setFromObject( lineMesh );
-
-			// no colors
-			var pos = geometry.attributes.position.array;
-			var v = lineGeo.vertices;
-
-			assert.notStrictEqual( pos, undefined, "Mesh: position attribute exists" );
-			assert.strictEqual( v.length * 3, pos.length, "Mesh: vertex arrays have the same size" );
-			assert.strictEqual( geometry.attributes.position.count, 3, "Mesh: correct number of vertices" );
-			assert.ok( comparePositions( pos, v ), "Mesh: positions are identical" );
-
-		} );
-
-		QUnit.test( "updateFromObject", ( assert ) => {
-
-			var geo = new Geometry();
-
-			geo.vertices.push(
-				new Vector3( - 10, 0, 0 ),
-				new Vector3( 0, 10, 0 ),
-				new Vector3( 10, 0, 0 )
-			);
-
-			geo.faces.push( new Face3( 0, 1, 2 ) );
-
-			geo.faces[ 0 ].vertexColors.push(
-				new Color( 1, 0, 0 ),
-				new Color( 0, 1, 0 ),
-				new Color( 0, 0, 1 )
-			);
-
-			geo.faceVertexUvs[ 0 ] = [
-				[
-					new Vector2( 0, 0 ),
-					new Vector2( 1, 0 ),
-					new Vector2( 1, 1 )
-				]
-			];
-
-			geo.computeFaceNormals();
-			geo.computeVertexNormals();
-
-			geo.verticesNeedUpdate = true;
-			geo.normalsNeedUpdate = true;
-			geo.colorsNeedUpdate = true;
-			geo.uvsNeedUpdate = true;
-			geo.groupsNeedUpdate = true;
-
-			var mesh = new Mesh( geo );
-			var geometry = new BufferGeometry();
-
-			geometry.updateFromObject( mesh ); // first call to create the underlying structure (DirectGeometry)
-			geometry.updateFromObject( mesh ); // second time to actually go thru the motions and update
-
-			var pos = geometry.attributes.position.array;
-			var col = geometry.attributes.color.array;
-			var norm = geometry.attributes.normal.array;
-			var uvs = geometry.attributes.uv.array;
-			var v = geo.vertices;
-			var c = geo.faces[ 0 ].vertexColors;
-			var n = geo.faces[ 0 ].vertexNormals;
-			var u = geo.faceVertexUvs[ 0 ][ 0 ];
-
-			assert.notStrictEqual( pos, undefined, "Position attribute exists" );
-			assert.strictEqual( v.length * 3, pos.length, "Both arrays have the same size" );
-			assert.strictEqual( geometry.attributes.position.count, v.length, "Correct number of vertices" );
-			assert.ok( comparePositions( pos, v ), "Positions are identical" );
-
-			assert.notStrictEqual( col, undefined, "Color attribute exists" );
-			assert.strictEqual( c.length * 3, col.length, "Both arrays have the same size" );
-			assert.strictEqual( geometry.attributes.color.count, c.length, "Correct number of colors" );
-			assert.ok( compareColors( col, c ), "Colors are identical" );
-
-			assert.notStrictEqual( norm, undefined, "Normal attribute exists" );
-			assert.strictEqual( n.length * 3, norm.length, "Both arrays have the same size" );
-			assert.strictEqual( geometry.attributes.normal.count, n.length, "Correct number of normals" );
-			assert.ok( comparePositions( norm, n ), "Normals are identical" );
-
-			assert.notStrictEqual( uvs, undefined, "UV attribute exists" );
-			assert.strictEqual( u.length * 2, uvs.length, "Both arrays have the same size" );
-			assert.strictEqual( geometry.attributes.uv.count, u.length, "Correct number of UV coordinates" );
-			assert.ok( compareUvs( uvs, u ), "UVs are identical" );
-
-		} );
-
-		QUnit.test( "fromGeometry/fromDirectGeometry", ( assert ) => {
-
-			// geometry definition
-
-			var geometry = new Geometry();
-
-			// vertices
-
-			var v1 = new Vector3( 1, - 1, 0 );
-			var v2 = new Vector3( 1, 1, 0 );
-			var v3 = new Vector3( - 1, 1, 0 );
-			var v4 = new Vector3( - 1, - 1, 0 );
-
-			// faces, normals and colors
-
-			geometry.vertices.push( v1, v2, v3, v4 );
-
-			var f1 = new Face3( 0, 1, 2 );
-			f1.normal.set( 0, 0, 1 );
-			f1.color.set( 0xff0000 );
-			var f2 = new Face3( 2, 3, 0 );
-			f2.normal.set( 0, 0, 1 );
-			f2.color.set( 0xff0000 );
-
-			geometry.faces.push( f1, f2 );
-
-			// uvs
-
-			var uvs = geometry.faceVertexUvs[ 0 ];
-			uvs.length = 0;
-
-			uvs.push( [
-				new Vector2( 1, 0 ),
-			  new Vector2( 1, 1 ),
-			  new Vector2( 0, 1 )
-			] );
-
-			uvs.push( [
-				new Vector2( 0, 1 ),
-			  new Vector2( 0, 0 ),
-			  new Vector2( 1, 0 )
-			] );
-
-			// skin weights
-
-			var sw1 = new Vector4( 0.8, 0.2, 0, 0 );
-			var sw2 = new Vector4( 0.7, 0.2, 0.1, 0 );
-			var sw3 = new Vector4( 0.8, 0.1, 0.1, 0 );
-			var sw4 = new Vector4( 1, 0, 0, 0 );
-
-			geometry.skinWeights.push( sw1, sw2, sw3, sw4 );
-
-			 // skin indices
-
-			var si1 = new Vector4( 0, 1, 2, 3 );
-			var si2 = new Vector4( 2, 3, 4, 5 );
-			var si3 = new Vector4( 4, 5, 6, 7 );
-			var si4 = new Vector4( 6, 7, 8, 9 );
-
-			geometry.skinIndices.push( si1, si2, si3, si4 );
-
-			// create BufferGeometry
-
-			var bufferGeometry = new BufferGeometry().fromGeometry( geometry );
-
-			// expected values
-
-			var vertices = new Float32Array( [ 1, - 1, 0, 1, 1, 0, - 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ] );
-			var normals = new Float32Array( [ 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 ] );
-			var colors = new Float32Array( [ 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 ] );
-			var uvs = new Float32Array( [ 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0 ] );
-			var skinIndices = new Float32Array( [ 0, 1, 2, 3, 2, 3, 4, 5, 4, 5, 6, 7, 4, 5, 6, 7, 6, 7, 8, 9, 0, 1, 2, 3 ] );
-			var skindWeights = new Float32Array( [
-				0.8, 0.2, 0, 0, 0.7, 0.2, 0.1, 0, 0.8, 0.1, 0.1, 0,
-				0.8, 0.1, 0.1, 0, 1, 0, 0, 0, 0.8, 0.2, 0, 0
-			] );
-
-			var attributes = bufferGeometry.attributes;
-
-			assert.deepEqual( attributes.position.array, vertices, "Vertices are as expected" );
-			assert.deepEqual( attributes.normal.array, normals, "Normals are as expected" );
-			assert.deepEqual( attributes.color.array, colors, "Colors are as expected" );
-			assert.deepEqual( attributes.uv.array, uvs, "Texture coordinates are as expected" );
-			assert.deepEqual( attributes.skinIndex.array, skinIndices, "Skin indices are as expected" );
-			assert.deepEqual( attributes.skinWeight.array, skindWeights, "Skin weights are as expected" );
-
-		} );
-
 		QUnit.test( "computeBoundingBox", ( assert ) => {
 
 			var bb = getBBForVertices( [ - 1, - 2, - 3, 13, - 2, - 3.5, - 1, - 20, 0, - 4, 5, 6 ] );
@@ -769,7 +461,10 @@ export default QUnit.module( 'Core', () => {
 
 			}
 
+			console.level = CONSOLE_LEVEL.ERROR;
 			geometry1.merge( geometry2 );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok( attr[ 0 ] === 4 && attr[ 1 ] === 5 && attr[ 2 ] === 6, "copied the 3 attributes without offset" );
 
 		} );

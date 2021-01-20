@@ -69,7 +69,7 @@
 
 				//
 
-				const geometryBox = new THREE.BoxBufferGeometry();
+				const geometryBox = new THREE.BoxGeometry();
 				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
 
 				const timerNode = new TimerNode();
@@ -157,7 +157,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				return renderer.init();
 

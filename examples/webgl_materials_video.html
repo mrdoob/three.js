@@ -116,7 +116,7 @@
 						ox = i;
 						oy = j;
 
-						geometry = new THREE.BoxBufferGeometry( xsize, ysize, xsize );
+						geometry = new THREE.BoxGeometry( xsize, ysize, xsize );
 
 						change_uvs( geometry, ux, uy, ox, oy );
 
@@ -168,7 +168,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

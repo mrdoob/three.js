@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			AnimationMixer는 장면에 있는 특정 오브젝트의 애니메이션 플레이어입니다. 한 장면에서 여러 개의 오브젝트들이 
+			독립적으로 움직인다면, 각각 다른 AnimationMixer가 사용되고 있다고 볼 수 있습니다.<br /><br />
+
+			three.js 애니메이션 시스템의 다양한 엘레먼트에 관해서는 매뉴얼의 "심화과정" 중 "애니메이션 시스템" 문서를 참고하세요.
+		</p>
+
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]( [param:Object3D rootObject] )</h3>
+		<p>
+			[page:Object3D rootObject] - 믹서의 애니메이션이 재생될 오브젝트.<br />
+		</p>
+
+
+		<h2>프로퍼티</h2>
+
+
+		<h3>[property:Number time]</h3>
+		<p>
+			글로벌 믹서의 시간 (초 단위, 믹서 생성시에 0부터 시작함).
+		</p>
+
+		<h3>[property:Number timeScale]</h3>
+		<p>
+			글로벌 배속 [page:.time mixer time].<br /><br />
+
+			참고: 믹서의 timeScale를 0으로 설정했다가 나중에 1로 설정하는 방식으로 정지/재생 기능을 
+			믹서를 통해 사용할 수 있습니다.
+		</p>
+
+
+		<h2>메서드</h2>
+
+
+		<h3>[method:AnimationAction clipAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
+		<p>
+			전달받은 클립의 [page:AnimationAction]을 리턴하며, 믹서의 루트 경로가 아닌 다른 루트 경로를 사용할 수도 있습니다. 
+			첫 번째 파라미터는 [page:AnimationClip] 오브젝트 및 AnimationClip 이름으로 사용할 수 있습니다.<br /><br />
+
+			클립에 동작은 설정되었는데 루트 파라미터가 아직 존재하지 않는다면, 이 메서드를 통해 자동으로 생성될 것입니다.
+			이 메서드를 같은 클립과 루트 파라미터로 여러 번 호출해도 항상 같은 클립 인스턴스를 리턴할 것입니다.
+		</p>
+
+		<h3>[method:AnimationAction existingAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
+		<p>
+			전달받은 클립에 존재하는 [page:AnimationAction]을 리턴하며 믹서의 루트 경로가 아닌 다른 루트 경로를 사용할 수도 있습니다.<br /><br />
+
+			첫 번째 파라미터는 [page:AnimationClip] 오브젝트 및 AnimationClip 이름으로 사용할 수 있습니다.
+		</p>
+
+		<h3>[method:Object3D getRoot]()</h3>
+		<p>
+			믹서의 루트 오브젝트를 리턴합니다.
+		</p>
+
+		<h3>[method:AnimationMixer stopAllAction]()</h3>
+		<p>
+			믹서의 모든 이전 예약 동작들을 비활성화합니다.
+		</p>
+
+		<h3>[method:AnimationMixer update]([param:Number deltaTimeInSeconds]) </h3>
+		<p>
+			글로벌 믹서 시간을 되돌리고 애니메이션을 업데이트합니다.<br /><br />
+
+			주로 렌더 루프에서 사용되며, [page:.timeScale timeScale]로 설정된 배율로 [page:Clock.getDelta clock.getDelta]를 넘겨줍니다.
+		</p>
+
+		<h3>[method:AnimationMixer setTime]([param:Number timeInSeconds]) </h3>
+		<p>
+			글로벌 믹서의 특정 시간을 설정하고 그에 따라 애니메이션을 업데이트합니다.<br /><br />
+
+			애니메이션의 정확한 시간대로 이동할 때 유용합니다. 입력되는 파라미터는 믹서의 [page:.timeScale timeScale]의 배율을 따라갑니다.
+		</p>
+
+		<h3>[method:null uncacheClip]([param:AnimationClip clip])</h3>
+
+		<p>
+			클립에 있는 모든 메모리 리소스를 할당 해제합니다.
+		</p>
+
+		<h3>[method:null uncacheRoot]([param:Object3D root]) </h3>
+		<p>
+			루트 오브젝트의 모든 메모리 리소스를 할당 해제합니다.
+		</p>
+
+		<h3>[method:null uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
+		<p>
+			동작의 모든 메모리 리소스를 할당 해제합니다.
+		</p>
+
+
+		<h2>소스 코드</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

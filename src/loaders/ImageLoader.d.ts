@@ -16,4 +16,6 @@ export class ImageLoader extends Loader {
 		onError?: ( event: ErrorEvent ) => void
 	): HTMLImageElement;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<HTMLImageElement>;
+
 }

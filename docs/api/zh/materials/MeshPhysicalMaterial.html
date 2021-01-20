@@ -62,6 +62,7 @@
 			[example:webgl_materials_variations_physical materials / variations / physical]<br />
 			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
 			[example:webgl_materials_physical_reflectivity materials / physical / reflectivity]<br />
+			[example:webgl_materials_physical_sheen materials / physical / sheen]<br />
 			[example:webgl_materials_physical_transmission materials / physical / transmission]
 		</p>
 
@@ -127,6 +128,12 @@
 			Degree of reflectivity, from *0.0* to *1.0*. Default is *0.5*, which corresponds to an index-of-refraction of 1.5.<br />
 
 			这模拟了非金属材质的反射率。当[page:MeshStandardMaterial]为*1.0*时，此属性无效。
+		</p>
+
+		<h3>[property:Color sheen]</h3>
+		<p>
+			If a color is assigned to this property, the material will use a special sheen BRDF intended for rendering cloth materials such as velvet.
+			The sheen color provides the ability to create two-tone specular materials. *null* by default.
 		</p>
 
 		<h3>[property:Float transmission]</h3>

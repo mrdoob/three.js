@@ -14,7 +14,8 @@ interface WebGLRenderState {
 		shadowsArray: Light[];
 		lights: WebGLLights;
 	};
-	setupLights( camera: Camera ): void;
+	setupLights(): void;
+	setupLightsView( camera: Camera ): void;
 	pushLight( light: Light ): void;
 	pushShadow( shadowLight: Light ): void;
 
@@ -24,7 +25,9 @@ export class WebGLRenderStates {
 
 	constructor( extensions: WebGLExtensions, capabilities: WebGLCapabilities );
 
-	get( scene: Scene, camera: Camera ): WebGLRenderState;
+	// renderCallDepth indexes start from 0.
+	get( scene: Scene, renderCallDepth?: number ): WebGLRenderState;
+
 	dispose(): void;
 
 }

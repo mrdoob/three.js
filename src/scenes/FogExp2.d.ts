@@ -22,7 +22,7 @@ export class FogExp2 implements IFog {
 
 	readonly isFogExp2: true;
 
-	clone(): this;
+	clone(): FogExp2;
 	toJSON(): any;
 
 }

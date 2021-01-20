@@ -1,9 +1,9 @@
 class AudioAnalyser {
 
-	constructor( audio, fftSize ) {
+	constructor( audio, fftSize = 2048 ) {
 
 		this.analyser = audio.context.createAnalyser();
-		this.analyser.fftSize = fftSize !== undefined ? fftSize : 2048;
+		this.analyser.fftSize = fftSize;
 
 		this.data = new Uint8Array( this.analyser.frequencyBinCount );
 

@@ -38,7 +38,7 @@
 				//
 
 				const loader = new TGALoader();
-				const geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				const geometry = new THREE.BoxGeometry( 50, 50, 50 );
 
 				// add box 1 - grey8 texture
 
@@ -88,7 +88,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

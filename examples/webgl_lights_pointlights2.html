@@ -63,14 +63,14 @@
 
 				// GROUND
 
-				const mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 800, 400, 2, 2 ), groundMaterial );
+				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 800, 400, 2, 2 ), groundMaterial );
 				mesh.position.y = - 5;
 				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
 				// OBJECTS
 
-				const objectGeometry = new THREE.TorusBufferGeometry( 1.5, 0.4, 8, 16 );
+				const objectGeometry = new THREE.TorusGeometry( 1.5, 0.4, 8, 16 );
 
 				for ( let i = 0; i < 5000; i ++ ) {
 
@@ -97,7 +97,7 @@
 
 				const c1 = 0xff0040, c2 = 0x0040ff, c3 = 0x80ff80, c4 = 0xffaa00, c5 = 0x00ffaa, c6 = 0xff1100;
 
-				const sphere = new THREE.SphereBufferGeometry( 0.25, 16, 8 );
+				const sphere = new THREE.SphereGeometry( 0.25, 16, 8 );
 
 				light1 = new THREE.PointLight( c1, intensity, distance, decay );
 				light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c1 } ) ) );
@@ -154,7 +154,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

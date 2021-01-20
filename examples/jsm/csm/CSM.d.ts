@@ -35,4 +35,4 @@ export class CSM {
 
 }
 
-import Frustum from "./Frustum.js";
+import Frustum from './Frustum.js';

@@ -35,10 +35,10 @@
 				const scene1 = new THREE.Scene();
 				const scene2 = new THREE.Scene();
 
-				box = new THREE.Mesh( new THREE.BoxBufferGeometry( 4, 4, 4 ) );
+				box = new THREE.Mesh( new THREE.BoxGeometry( 4, 4, 4 ) );
 				scene1.add( box );
 
-				torus = new THREE.Mesh( new THREE.TorusBufferGeometry( 3, 1, 16, 32 ) );
+				torus = new THREE.Mesh( new THREE.TorusGeometry( 3, 1, 16, 32 ) );
 				scene2.add( torus );
 
 				renderer = new THREE.WebGLRenderer();
@@ -85,7 +85,7 @@
 				composer.addPass( clearMaskPass );
 				composer.addPass( outputPass );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

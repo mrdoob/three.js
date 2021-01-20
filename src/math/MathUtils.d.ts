@@ -86,6 +86,15 @@ export namespace MathUtils {
 	export function lerp( x: number, y: number, t: number ): number;
 
 	/**
+	 * Returns a value that alternates between 0 and length.
+	 *
+	 * @param x The value to pingpong.
+	 * @param length The positive value the function will pingpong to. Default is 1.
+	 * @return {number}
+	 */
+	export function pingpong( x: number, length?: number ): number;
+
+	/**
 	 * @deprecated Use {@link Math#floorPowerOfTwo .floorPowerOfTwo()}
 	 */
 	export function nearestPowerOfTwo( value: number ): number;

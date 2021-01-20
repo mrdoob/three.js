@@ -1,6 +1,5 @@
 import { Matrix4 } from './Matrix4';
 import { Quaternion } from './Quaternion';
-import { Matrix3 } from './Matrix3';
 import { BufferAttribute } from './../core/BufferAttribute';
 import { Vector } from './Vector2';
 
@@ -76,7 +75,7 @@ export class Vector4 implements Vector {
 	/**
 	 * Clones this vector.
 	 */
-	clone(): this;
+	clone(): Vector4;
 
 	/**
 	 * Copies value of v to this vector.
@@ -108,6 +107,8 @@ export class Vector4 implements Vector {
 	 */
 	subVectors( a: Vector4, b: Vector4 ): this;
 
+	multiply( v: Vector4 ): this;
+
 	/**
 	 * Multiplies this vector by scalar s.
 	 */
@@ -131,7 +132,7 @@ export class Vector4 implements Vector {
 	 * http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm
 	 * @param m assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 	 */
-	setAxisAngleFromRotationMatrix( m: Matrix3 ): this;
+	setAxisAngleFromRotationMatrix( m: Matrix4 ): this;
 
 	min( v: Vector4 ): this;
 	max( v: Vector4 ): this;
@@ -165,9 +166,9 @@ export class Vector4 implements Vector {
 	/**
 	 * Computes the Manhattan length of this vector.
 	 *
-	 * @return {number}
+	 * see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
 	 *
-	 * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
+	 * @return {number}
 	 */
 	manhattanLength(): number;
 

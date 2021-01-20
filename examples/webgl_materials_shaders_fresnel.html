@@ -60,7 +60,7 @@
 
 				//
 
-				const geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
+				const geometry = new THREE.SphereGeometry( 100, 32, 16 );
 
 				const shader = FresnelShader;
 				const uniforms = THREE.UniformsUtils.clone( shader.uniforms );
@@ -98,7 +98,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

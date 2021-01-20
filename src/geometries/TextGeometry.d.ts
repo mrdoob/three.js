@@ -1,38 +1,39 @@
 import { Font } from './../extras/core/Font';
-import { Geometry } from './../core/Geometry';
-import { TextGeometryParameters } from './TextBufferGeometry';
+import { ExtrudeGeometry } from './ExtrudeGeometry';
 
-export class TextGeometry extends Geometry {
+export interface TextGeometryParameters {
+	font: Font;
+	size?: number;
+	height?: number;
+	curveSegments?: number;
+	bevelEnabled?: boolean;
+	bevelThickness?: number;
+	bevelSize?: number;
+	bevelOffset?: number;
+	bevelSegments?: number;
+}
 
-	constructor( text: string, parameters: TextGeometryParameters );
+export class TextGeometry extends ExtrudeGeometry {
 
 	/**
 	 * @default 'TextGeometry'
 	 */
 	type: string;
 
+	constructor( text: string, parameters: TextGeometryParameters );
+
 	parameters: {
 		font: Font;
 		size: number;
-		/**
-		 * @default 50
-		 */
 		height: number;
 		curveSegments: number;
-		/**
-		 * @default false
-		 */
 		bevelEnabled: boolean;
-		/**
-		 * @default 10
-		 */
 		bevelThickness: number;
-		/**
-		 * @default 8
-		 */
 		bevelSize: number;
 		bevelOffset: number;
 		bevelSegments: number;
 	};
 
 }
+
+export { TextGeometry as TextBufferGeometry };

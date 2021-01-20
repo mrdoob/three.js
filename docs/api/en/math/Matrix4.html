@@ -138,8 +138,8 @@ m.elements = [ 11, 21, 31, 41,
 
 		<h3>[method:null decompose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
 		<p>
-		Decomposes this matrix into it's [page:Vector3 position], [page:Quaternion quaternion] and
-		[page:Vector3 scale] components.
+		Decomposes this matrix into it's [page:Vector3 position], [page:Quaternion quaternion] and [page:Vector3 scale] components.
+		The method can't be used to decompose an object's world matrix if its parent has a non-uniform scale.
 		</p>
 
 		<h3>[method:Float determinant]()</h3>
@@ -186,7 +186,7 @@ zAxis = (c, g, k)
 		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
 		</p>
 
-		<h3>[method:this invert()]()</h3>
+		<h3>[method:this invert]()</h3>
 		<p>
 		Inverts this matrix, using the [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method].
 
@@ -367,6 +367,9 @@ x, y, 1, 0,
 			Set the [page:.elements elements] of this matrix to the supplied row-major values [page:Float n11],
 			[page:Float n12], ... [page:Float n44].
 		</p>
+
+		<h3>[method:this setFromMatrix3]( [param:Matrix3 m] )</h3>
+		<p>Set the upper 3x3 elements of this matrix to the values of the Matrix3 [page:Matrix3 m].</p>
 
 		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
 		<h3>[method:this setPosition]( [param:Float x], [param:Float y], [param:Float z] ) // optional API</h3>

@@ -7,13 +7,13 @@ import { Layers } from './Layers';
 import { WebGLRenderer } from './../renderers/WebGLRenderer';
 import { Scene } from './../scenes/Scene';
 import { Camera } from './../cameras/Camera';
-import { Geometry } from './Geometry';
 import { Material } from './../materials/Material';
 import { Group } from './../objects/Group';
 import { Raycaster } from './Raycaster';
 import { EventDispatcher } from './EventDispatcher';
 import { BufferGeometry } from './BufferGeometry';
 import { Intersection } from './Raycaster';
+import { AnimationClip } from '../animation/AnimationClip';
 
 /**
  * Base class for scene graph objects
@@ -74,7 +74,7 @@ export class Object3D extends EventDispatcher {
 	readonly rotation: Euler;
 
 	/**
-	 * Global rotation.
+	 * Object's local rotation as a Quaternion.
 	 * @default new THREE.Quaternion()
 	 */
 	readonly quaternion: Quaternion;
@@ -154,6 +154,12 @@ export class Object3D extends EventDispatcher {
 	renderOrder: number;
 
 	/**
+	 * Array with animation clips.
+	 * @default []
+	 */
+	animations: AnimationClip[];
+
+	/**
 	 * An object that can be used to store custom data about the Object3d. It should not hold references to functions as these will not be cloned.
 	 * @default {}
 	 */
@@ -185,7 +191,7 @@ export class Object3D extends EventDispatcher {
 		renderer: WebGLRenderer,
 		scene: Scene,
 		camera: Camera,
-		geometry: Geometry | BufferGeometry,
+		geometry: BufferGeometry,
 		material: Material,
 		group: Group
 	) => void;
@@ -197,7 +203,7 @@ export class Object3D extends EventDispatcher {
 		renderer: WebGLRenderer,
 		scene: Scene,
 		camera: Camera,
-		geometry: Geometry | BufferGeometry,
+		geometry: BufferGeometry,
 		material: Material,
 		group: Group
 	) => void;
@@ -372,7 +378,7 @@ export class Object3D extends EventDispatcher {
 		images: any;
 	} ): any;
 
-	clone( recursive?: boolean ): this;
+	clone( recursive?: boolean ): Object3D;
 
 	/**
 	 *

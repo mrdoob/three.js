@@ -1,7 +1,7 @@
 import { BufferGeometry } from './BufferGeometry';
 
 /**
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/InstancedBufferGeometry.js|src/core/InstancedBufferGeometry.js}
+ * see {@link https://github.com/mrdoob/three.js/blob/master/src/core/InstancedBufferGeometry.js|src/core/InstancedBufferGeometry.js}
  */
 export class InstancedBufferGeometry extends BufferGeometry {
 
@@ -11,6 +11,8 @@ export class InstancedBufferGeometry extends BufferGeometry {
 	 * @default 'InstancedBufferGeometry
 	 */
 	type: string;
+
+	isInstancedBufferGeometry: boolean;
 
 	groups: { start: number; count: number; instances: number }[];
 

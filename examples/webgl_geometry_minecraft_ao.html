@@ -30,6 +30,7 @@
 
 			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			let container, stats;
 
@@ -63,63 +64,63 @@
 
 				const matrix = new THREE.Matrix4();
 
-				const pxGeometry = new THREE.PlaneGeometry( 100, 100 );
-				pxGeometry.faces[ 0 ].vertexColors = [ light, shadow, light ];
-				pxGeometry.faces[ 1 ].vertexColors = [ shadow, shadow, light ];
-				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
-				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
-				pxGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
+				const pxGeometry = new THREE.PlaneGeometry( 100, 100 ).toNonIndexed();
+				pxGeometry.setAttribute( 'color', pxGeometry.attributes.position.clone() );
+				pxGeometry.attributes.color.copyColorsArray( [ light, shadow, light, shadow, shadow, light ] );
+				pxGeometry.attributes.uv.array[ 1 ] = 0.5;
+				pxGeometry.attributes.uv.array[ 5 ] = 0.5;
+				pxGeometry.attributes.uv.array[ 11 ] = 0.5;
 				pxGeometry.rotateY( Math.PI / 2 );
 				pxGeometry.translate( 50, 0, 0 );
 
-				const nxGeometry = new THREE.PlaneGeometry( 100, 100 );
-				nxGeometry.faces[ 0 ].vertexColors = [ light, shadow, light ];
-				nxGeometry.faces[ 1 ].vertexColors = [ shadow, shadow, light ];
-				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
-				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
-				nxGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
+				const nxGeometry = new THREE.PlaneGeometry( 100, 100 ).toNonIndexed();
+				nxGeometry.setAttribute( 'color', nxGeometry.attributes.position.clone() );
+				nxGeometry.attributes.color.copyColorsArray( [ light, shadow, light, shadow, shadow, light ] );
+				nxGeometry.attributes.uv.array[ 1 ] = 0.5;
+				nxGeometry.attributes.uv.array[ 5 ] = 0.5;
+				nxGeometry.attributes.uv.array[ 11 ] = 0.5;
 				nxGeometry.rotateY( - Math.PI / 2 );
 				nxGeometry.translate( - 50, 0, 0 );
 
-				const pyGeometry = new THREE.PlaneGeometry( 100, 100 );
-				pyGeometry.faces[ 0 ].vertexColors = [ light, light, light ];
-				pyGeometry.faces[ 1 ].vertexColors = [ light, light, light ];
-				pyGeometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
-				pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 0 ].y = 0.5;
-				pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 1 ].y = 0.5;
+				const pyGeometry = new THREE.PlaneGeometry( 100, 100 ).toNonIndexed();
+				pyGeometry.setAttribute( 'color', pyGeometry.attributes.position.clone() );
+				pyGeometry.attributes.color.copyColorsArray( [ light, light, light, light, light, light ] );
+				pyGeometry.attributes.uv.array[ 3 ] = 0.5;
+				pyGeometry.attributes.uv.array[ 7 ] = 0.5;
+				pyGeometry.attributes.uv.array[ 9 ] = 0.5;
 				pyGeometry.rotateX( - Math.PI / 2 );
 				pyGeometry.translate( 0, 50, 0 );
 
-				const py2Geometry = new THREE.PlaneGeometry( 100, 100 );
-				py2Geometry.faces[ 0 ].vertexColors = [ light, light, light ];
-				py2Geometry.faces[ 1 ].vertexColors = [ light, light, light ];
-				py2Geometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
-				py2Geometry.faceVertexUvs[ 0 ][ 1 ][ 0 ].y = 0.5;
-				py2Geometry.faceVertexUvs[ 0 ][ 1 ][ 1 ].y = 0.5;
+				const py2Geometry = new THREE.PlaneGeometry( 100, 100 ).toNonIndexed();
+				py2Geometry.setAttribute( 'color', py2Geometry.attributes.position.clone() );
+				py2Geometry.attributes.color.copyColorsArray( [ light, light, light, light, light, light ] );
+				py2Geometry.attributes.uv.array[ 3 ] = 0.5;
+				py2Geometry.attributes.uv.array[ 7 ] = 0.5;
+				py2Geometry.attributes.uv.array[ 9 ] = 0.5;
 				py2Geometry.rotateX( - Math.PI / 2 );
 				py2Geometry.rotateY( Math.PI / 2 );
 				py2Geometry.translate( 0, 50, 0 );
 
-				const pzGeometry = new THREE.PlaneGeometry( 100, 100 );
-				pzGeometry.faces[ 0 ].vertexColors = [ light, shadow, light ];
-				pzGeometry.faces[ 1 ].vertexColors = [ shadow, shadow, light ];
-				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
-				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
-				pzGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
+				const pzGeometry = new THREE.PlaneGeometry( 100, 100 ).toNonIndexed();
+				pzGeometry.setAttribute( 'color', pzGeometry.attributes.position.clone() );
+				pzGeometry.attributes.color.copyColorsArray( [ light, shadow, light, shadow, shadow, light ] );
+				pzGeometry.attributes.uv.array[ 1 ] = 0.5;
+				pzGeometry.attributes.uv.array[ 5 ] = 0.5;
+				pzGeometry.attributes.uv.array[ 11 ] = 0.5;
 				pzGeometry.translate( 0, 0, 50 );
 
-				const nzGeometry = new THREE.PlaneGeometry( 100, 100 );
-				nzGeometry.faces[ 0 ].vertexColors = [ light, shadow, light ];
-				nzGeometry.faces[ 1 ].vertexColors = [ shadow, shadow, light ];
-				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
-				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
-				nzGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
+				const nzGeometry = new THREE.PlaneGeometry( 100, 100 ).toNonIndexed();
+				nzGeometry.setAttribute( 'color', nzGeometry.attributes.position.clone() );
+				nzGeometry.attributes.color.copyColorsArray( [ light, shadow, light, shadow, shadow, light ] );
+				nzGeometry.attributes.uv.array[ 1 ] = 0.5;
+				nzGeometry.attributes.uv.array[ 5 ] = 0.5;
+				nzGeometry.attributes.uv.array[ 11 ] = 0.5;
 				nzGeometry.rotateY( Math.PI );
 				nzGeometry.translate( 0, 0, - 50 );
 
 				//
 
-				let geometry = new THREE.Geometry();
+				const geometries = [];
 
 				for ( let z = 0; z < worldDepth; z ++ ) {
 
@@ -150,83 +151,95 @@
 
 						if ( a + c > b + d ) {
 
-							let colors = py2Geometry.faces[ 0 ].vertexColors;
+							const colors = [];
+
 							colors[ 0 ] = b === 0 ? shadow : light;
 							colors[ 1 ] = c === 0 ? shadow : light;
 							colors[ 2 ] = a === 0 ? shadow : light;
+							colors[ 3 ] = c === 0 ? shadow : light;
+							colors[ 4 ] = d === 0 ? shadow : light;
+							colors[ 5 ] = a === 0 ? shadow : light;
 
-							colors = py2Geometry.faces[ 1 ].vertexColors;
-							colors[ 0 ] = c === 0 ? shadow : light;
-							colors[ 1 ] = d === 0 ? shadow : light;
-							colors[ 2 ] = a === 0 ? shadow : light;
-
-							geometry.merge( py2Geometry, matrix );
+							py2Geometry.attributes.color.copyColorsArray( colors );
+							geometries.push( py2Geometry.clone().applyMatrix4( matrix ) );
 
 						} else {
 
-							let colors = pyGeometry.faces[ 0 ].vertexColors;
+							const colors = [];
+
 							colors[ 0 ] = a === 0 ? shadow : light;
 							colors[ 1 ] = b === 0 ? shadow : light;
 							colors[ 2 ] = d === 0 ? shadow : light;
+							colors[ 3 ] = b === 0 ? shadow : light;
+							colors[ 4 ] = c === 0 ? shadow : light;
+							colors[ 5 ] = d === 0 ? shadow : light;
 
-							colors = pyGeometry.faces[ 1 ].vertexColors;
-							colors[ 0 ] = b === 0 ? shadow : light;
-							colors[ 1 ] = c === 0 ? shadow : light;
-							colors[ 2 ] = d === 0 ? shadow : light;
-
-							geometry.merge( pyGeometry, matrix );
+							pyGeometry.attributes.color.copyColorsArray( colors );
+							geometries.push( pyGeometry.clone().applyMatrix4( matrix ) );
 
 						}
 
 						if ( ( px != h && px != h + 1 ) || x == 0 ) {
 
-							let colors = pxGeometry.faces[ 0 ].vertexColors;
+							const colors = [];
+
 							colors[ 0 ] = pxpz > px && x > 0 ? shadow : light;
+							colors[ 1 ] = shadow;
 							colors[ 2 ] = pxnz > px && x > 0 ? shadow : light;
+							colors[ 3 ] = shadow;
+							colors[ 4 ] = shadow;
+							colors[ 5 ] = pxnz > px && x > 0 ? shadow : light;
 
-							colors = pxGeometry.faces[ 1 ].vertexColors;
-							colors[ 2 ] = pxnz > px && x > 0 ? shadow : light;
-
-							geometry.merge( pxGeometry, matrix );
+							pxGeometry.attributes.color.copyColorsArray( colors );
+							geometries.push( pxGeometry.clone().applyMatrix4( matrix ) );
 
 						}
 
 						if ( ( nx != h && nx != h + 1 ) || x == worldWidth - 1 ) {
 
-							let colors = nxGeometry.faces[ 0 ].vertexColors;
+							const colors = [];
+
 							colors[ 0 ] = nxnz > nx && x < worldWidth - 1 ? shadow : light;
+							colors[ 1 ] = shadow;
 							colors[ 2 ] = nxpz > nx && x < worldWidth - 1 ? shadow : light;
+							colors[ 3 ] = shadow;
+							colors[ 4 ] = shadow;
+							colors[ 5 ] = nxpz > nx && x < worldWidth - 1 ? shadow : light;
 
-							colors = nxGeometry.faces[ 1 ].vertexColors;
-							colors[ 2 ] = nxpz > nx && x < worldWidth - 1 ? shadow : light;
-
-							geometry.merge( nxGeometry, matrix );
+							nxGeometry.attributes.color.copyColorsArray( colors );
+							geometries.push( nxGeometry.clone().applyMatrix4( matrix ) );
 
 						}
 
 						if ( ( pz != h && pz != h + 1 ) || z == worldDepth - 1 ) {
 
-							let colors = pzGeometry.faces[ 0 ].vertexColors;
+							const colors = [];
+
 							colors[ 0 ] = nxpz > pz && z < worldDepth - 1 ? shadow : light;
+							colors[ 1 ] = shadow;
 							colors[ 2 ] = pxpz > pz && z < worldDepth - 1 ? shadow : light;
+							colors[ 3 ] = shadow;
+							colors[ 4 ] = shadow;
+							colors[ 5 ] = pxpz > pz && z < worldDepth - 1 ? shadow : light;
 
-							colors = pzGeometry.faces[ 1 ].vertexColors;
-							colors[ 2 ] = pxpz > pz && z < worldDepth - 1 ? shadow : light;
-
-							geometry.merge( pzGeometry, matrix );
+							pzGeometry.attributes.color.copyColorsArray( colors );
+							geometries.push( pzGeometry.clone().applyMatrix4( matrix ) );
 
 						}
 
 						if ( ( nz != h && nz != h + 1 ) || z == 0 ) {
 
-							let colors = nzGeometry.faces[ 0 ].vertexColors;
+							const colors = [];
+
 							colors[ 0 ] = pxnz > nz && z > 0 ? shadow : light;
+							colors[ 1 ] = shadow;
 							colors[ 2 ] = nxnz > nz && z > 0 ? shadow : light;
+							colors[ 3 ] = shadow;
+							colors[ 4 ] = shadow;
+							colors[ 5 ] = nxnz > nz && z > 0 ? shadow : light;
 
-							colors = nzGeometry.faces[ 1 ].vertexColors;
-							colors[ 2 ] = nxnz > nz && z > 0 ? shadow : light;
-
-							geometry.merge( nzGeometry, matrix );
+							nzGeometry.attributes.color.copyColorsArray( colors );
+							geometries.push( nzGeometry.clone().applyMatrix4( matrix ) );
 
 						}
 
@@ -234,11 +247,11 @@
 
 				}
 
-				geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+				const geometry = BufferGeometryUtils.mergeBufferGeometries( geometries );
+				geometry.computeBoundingSphere();
 
 				const texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
 				texture.magFilter = THREE.NearestFilter;
-				texture.minFilter = THREE.LinearMipmapLinearFilter;
 
 				const mesh = new THREE.Mesh(
 					geometry,
@@ -272,7 +285,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

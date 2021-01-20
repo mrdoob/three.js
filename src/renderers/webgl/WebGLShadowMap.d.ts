@@ -2,8 +2,8 @@ import { Scene } from './../../scenes/Scene';
 import { Camera } from './../../cameras/Camera';
 import { WebGLRenderer } from '../WebGLRenderer';
 import { ShadowMapType } from '../../constants';
-import { WebGLObjects } from "./WebGLObjects";
-import { Light } from "../../lights/Light";
+import { WebGLObjects } from './WebGLObjects';
+import { Light } from '../../lights/Light';
 
 export class WebGLShadowMap {
 

@@ -463,9 +463,9 @@ class WebGPURenderer {
 
 	}
 
-	getClearColor() {
+	getClearColor( target ) {
 
-		return this._clearColor;
+		return target.copy( this._clearColor );
 
 	}
 

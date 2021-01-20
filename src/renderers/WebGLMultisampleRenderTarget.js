@@ -1,22 +1,20 @@
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 
-function WebGLMultisampleRenderTarget( width, height, options ) {
+class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 
-	WebGLRenderTarget.call( this, width, height, options );
+	constructor( width, height, options ) {
 
-	this.samples = 4;
+		super( width, height, options );
 
-}
+		Object.defineProperty( this, 'isWebGLMultisampleRenderTarget', { value: true } );
 
-WebGLMultisampleRenderTarget.prototype = Object.assign( Object.create( WebGLRenderTarget.prototype ), {
+		this.samples = 4;
 
-	constructor: WebGLMultisampleRenderTarget,
+	}
 
-	isWebGLMultisampleRenderTarget: true,
+	copy( source ) {
 
-	copy: function ( source ) {
-
-		WebGLRenderTarget.prototype.copy.call( this, source );
+		super.copy.call( this, source );
 
 		this.samples = source.samples;
 
@@ -24,7 +22,7 @@ WebGLMultisampleRenderTarget.prototype = Object.assign( Object.create( WebGLRend
 
 	}
 
-} );
+}
 
 
 export { WebGLMultisampleRenderTarget };

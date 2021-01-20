@@ -6,10 +6,10 @@ import {
 	UniformsUtils,
 	Vector2,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
-import { CopyShader } from "../shaders/CopyShader.js";
-import { ConvolutionShader } from "../shaders/ConvolutionShader.js";
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
+import { CopyShader } from '../shaders/CopyShader.js';
+import { ConvolutionShader } from '../shaders/ConvolutionShader.js';
 
 var BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
@@ -25,20 +25,20 @@ var BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 	var pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat };
 
 	this.renderTargetX = new WebGLRenderTarget( resolution, resolution, pars );
-	this.renderTargetX.texture.name = "BloomPass.x";
+	this.renderTargetX.texture.name = 'BloomPass.x';
 	this.renderTargetY = new WebGLRenderTarget( resolution, resolution, pars );
-	this.renderTargetY.texture.name = "BloomPass.y";
+	this.renderTargetY.texture.name = 'BloomPass.y';
 
 	// copy material
 
 	if ( CopyShader === undefined )
-		console.error( "BloomPass relies on CopyShader" );
+		console.error( 'THREE.BloomPass relies on CopyShader' );
 
 	var copyShader = CopyShader;
 
 	this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
 
-	this.copyUniforms[ "opacity" ].value = strength;
+	this.copyUniforms[ 'opacity' ].value = strength;
 
 	this.materialCopy = new ShaderMaterial( {
 
@@ -53,14 +53,14 @@ var BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 	// convolution material
 
 	if ( ConvolutionShader === undefined )
-		console.error( "BloomPass relies on ConvolutionShader" );
+		console.error( 'THREE.BloomPass relies on ConvolutionShader' );
 
 	var convolutionShader = ConvolutionShader;
 
 	this.convolutionUniforms = UniformsUtils.clone( convolutionShader.uniforms );
 
-	this.convolutionUniforms[ "uImageIncrement" ].value = BloomPass.blurX;
-	this.convolutionUniforms[ "cKernel" ].value = ConvolutionShader.buildKernel( sigma );
+	this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPass.blurX;
+	this.convolutionUniforms[ 'cKernel' ].value = ConvolutionShader.buildKernel( sigma );
 
 	this.materialConvolution = new ShaderMaterial( {
 
@@ -68,8 +68,8 @@ var BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 		vertexShader: convolutionShader.vertexShader,
 		fragmentShader: convolutionShader.fragmentShader,
 		defines: {
-			"KERNEL_SIZE_FLOAT": kernelSize.toFixed( 1 ),
-			"KERNEL_SIZE_INT": kernelSize.toFixed( 0 )
+			'KERNEL_SIZE_FLOAT': kernelSize.toFixed( 1 ),
+			'KERNEL_SIZE_INT': kernelSize.toFixed( 0 )
 		}
 
 	} );
@@ -92,8 +92,8 @@ BloomPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.fsQuad.material = this.materialConvolution;
 
-		this.convolutionUniforms[ "tDiffuse" ].value = readBuffer.texture;
-		this.convolutionUniforms[ "uImageIncrement" ].value = BloomPass.blurX;
+		this.convolutionUniforms[ 'tDiffuse' ].value = readBuffer.texture;
+		this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPass.blurX;
 
 		renderer.setRenderTarget( this.renderTargetX );
 		renderer.clear();
@@ -102,8 +102,8 @@ BloomPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		// Render quad with blured scene into texture (convolution pass 2)
 
-		this.convolutionUniforms[ "tDiffuse" ].value = this.renderTargetX.texture;
-		this.convolutionUniforms[ "uImageIncrement" ].value = BloomPass.blurY;
+		this.convolutionUniforms[ 'tDiffuse' ].value = this.renderTargetX.texture;
+		this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPass.blurY;
 
 		renderer.setRenderTarget( this.renderTargetY );
 		renderer.clear();
@@ -113,7 +113,7 @@ BloomPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.fsQuad.material = this.materialCopy;
 
-		this.copyUniforms[ "tDiffuse" ].value = this.renderTargetY.texture;
+		this.copyUniforms[ 'tDiffuse' ].value = this.renderTargetY.texture;
 
 		if ( maskActive ) renderer.state.buffers.stencil.setTest( true );
 

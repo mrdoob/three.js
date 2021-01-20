@@ -1,5 +1,6 @@
-import babel from "@rollup/plugin-babel";
-import { terser } from "rollup-plugin-terser";
+import babel from '@rollup/plugin-babel';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import { terser } from 'rollup-plugin-terser';
 
 if ( String.prototype.replaceAll === undefined ) {
 
@@ -209,7 +210,7 @@ function glsl() {
 
 			if ( /\.glsl.js$/.test( id ) === false ) return;
 
-			code = code.replace( /\/\* glsl \*\/\`((.|\n)*)\`/, function ( match, p1 ) {
+			code = code.replace( /\/\* glsl \*\/\`((.|\r|\n)*)\`/, function ( match, p1 ) {
 
 				return JSON.stringify(
 					p1
@@ -260,7 +261,7 @@ function header() {
 
 		renderChunk( code ) {
 
-			return "// threejs.org/license\n" + code;
+			return '// threejs.org/license\n' + code;
 
 		}
 
@@ -274,9 +275,10 @@ function polyfills() {
 
 		transform( code, filePath ) {
 
-			if ( filePath.endsWith( 'src/Three.js' ) ) {
+			if ( filePath.endsWith( 'src/Three.js' ) || filePath.endsWith( 'src\\Three.js' ) ) {
 
-				code = "import './polyfills';\n" + code;
+				code = 'import \'regenerator-runtime\';\n' + code;
+				code = 'import \'./polyfills\';\n' + code;
 
 			}
 
@@ -321,6 +323,7 @@ export default [
 		input: 'src/Three.js',
 		plugins: [
 			polyfills(),
+			nodeResolve(),
 			addons(),
 			glconstants(),
 			glsl(),
@@ -346,6 +349,7 @@ export default [
 		input: 'src/Three.js',
 		plugins: [
 			polyfills(),
+			nodeResolve(),
 			addons(),
 			glconstants(),
 			glsl(),

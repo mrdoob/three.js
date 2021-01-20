@@ -30,7 +30,7 @@ export class Euler {
 	_onChangeCallback: Function;
 
 	set( x: number, y: number, z: number, order?: string ): Euler;
-	clone(): this;
+	clone(): Euler;
 	copy( euler: Euler ): this;
 	setFromRotationMatrix( m: Matrix4, order?: string ): Euler;
 	setFromQuaternion( q: Quaternion, order?: string ): Euler;

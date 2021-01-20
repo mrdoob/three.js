@@ -8,6 +8,14 @@
 	</head>
 	<body>
 
+		<div id="overlay">
+			<h2>WARNING</h2>
+			<p style="text-align: center; max-width:450px; margin-bottom:40px;">
+				This example may potentially trigger seizures for people with <strong>photosensitive epilepsy</strong>.
+			</p>
+			<button id="startButton">Okay</button>
+		</div>
+
 		<div id="info">
 			<label for="dotScreen">Glitch me wild:</label><input id="wildGlitch" type="checkbox"/><br />
 		</div>
@@ -25,8 +33,16 @@
 
 			let glitchPass;
 
-			init();
-			animate();
+			const button = document.querySelector( '#startButton' );
+			button.addEventListener( 'click', function () {
+
+				const overlay = document.getElementById( 'overlay' );
+				overlay.remove();
+
+				init();
+				animate();
+
+			} );
 
 			function updateOptions() {
 
@@ -53,7 +69,7 @@
 				object = new THREE.Object3D();
 				scene.add( object );
 
-				const geometry = new THREE.SphereBufferGeometry( 1, 4, 4 );
+				const geometry = new THREE.SphereGeometry( 1, 4, 4 );
 
 				for ( let i = 0; i < 100; i ++ ) {
 
@@ -85,7 +101,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				const wildGlitchOption = document.getElementById( 'wildGlitch' );
 				wildGlitchOption.addEventListener( 'change', updateOptions );

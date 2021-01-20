@@ -50,8 +50,8 @@
 				camera.position.set( 2, 2, 4 );
 				camera.lookAt( scene.position );
 
-				const boxGeometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1 );
-				const boxMaterial = new THREE.MeshBasicMaterial( 0x99ff99 );
+				const boxGeometry = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
+				const boxMaterial = new THREE.MeshBasicMaterial();
 
 				const curves = [[
 					{ x: 1, y: - 0.5, z: - 1 },
@@ -115,7 +115,7 @@
 					font
 				) {
 
-					const geometry = new THREE.TextBufferGeometry( "Hello three.js!", {
+					const geometry = new THREE.TextGeometry( "Hello three.js!", {
 						font: font,
 						size: 0.2,
 						height: 0.05,

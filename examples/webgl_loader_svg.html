@@ -64,7 +64,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				guiData = {
 					currentURL: 'models/svg/tiger.svg',
@@ -174,7 +174,7 @@
 
 								const shape = shapes[ j ];
 
-								const geometry = new THREE.ShapeBufferGeometry( shape );
+								const geometry = new THREE.ShapeGeometry( shape );
 								const mesh = new THREE.Mesh( geometry, material );
 
 								group.add( mesh );

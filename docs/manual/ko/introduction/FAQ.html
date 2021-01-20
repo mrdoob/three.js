@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<h2>어떤 3D 모델 포맷이 가장 잘 지원되나요?</h2>
+		<div>
+			<p>
+				불러오기 및 내보내기 용으로 추천되는 포맷은 glTF (GL Transmission Format)입니다. glTF는 런타임 에셋 딜리버리에 초점이 맞추어져 있기 때문에, 전송에 적합하고 로딩이 빠릅니다.
+			</p>
+			<p>
+				three.js 널리 쓰이는 포맷인 FBX, Collada 나 OBJ 도 지원합니다. 하지만 첫 프로젝트에서는 glTF 기반의 워크플로우로 작업해야 합니다. 더 자세한 내용은, [link:#manual/introduction/Loading-3D-models 3D 모델 로딩]을 참고하세요.
+			</p>
+		</div>
+
+		<h2>예제에 왜 meta viewport 태그가 있나요?</h2>
+		<div>
+				<code>&lt;meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;</code>
+
+				<p>이 태그들은 모바일 브라우저들의 뷰포트 크기와 확대정도를 조절합니다(페이지 내용이 뷰포트 영역과 다른 사이즈로 렌더링 된 경우).</p>
+
+				<p>[link:https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html Safari: Using the Viewport]</p>
+
+				<p>[link:https://developer.mozilla.org/en/Mobile/Viewport_meta_tag MDN: Using the viewport meta tag]</p>
+		</div>
+
+		<h2>화면 확대 정도가 리사이징 시에 유지될 수 있나요?</h2>
+		<p>
+			모든 오브젝트들이 카메라의 거리와 상관 없이, 화면 사이즈가 변경된다고 해도, 같은 크기로 보여지고 싶다고 가정합시다.
+
+			이 공식을 풀기 위한 핵심 방정식은 가시 높이와 거리와 관련된 아래 공식입니다.
+
+			<code>
+visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;
+			</code>
+            화면 높이를 특정 비율로 늘리면, 모든 가시 높이와 거리가 같은 비율로 증가해야 합니다.
+
+			이는 카메라 위치를 변경하는 것으로는 불가능합니다. 대신에 카메라 field-of-view를 변경해야합니다..
+			[link:http://jsfiddle.net/Q4Jpu/ 예제].
+		</p>
+
+		<h2>왜 오브젝트 일부가 안 보일까요?</h2>
+		<p>
+			이는 페이스 컬링 문제일 수 있습니다. 각 면들은 어느 방향이 어느 방향인지에 대한 정보를 가지고 있습니다. 그리고 컬링은 일반적으로 뒷편의 면을 제거해 버립니다. 이 문제가 의심된다면 재질의 면을 THREE.DoubleSide로 변경해 보세요.
+			<code>material.side = THREE.DoubleSide</code>
+		</p>
+	</body>
+</html>

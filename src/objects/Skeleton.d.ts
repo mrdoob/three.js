@@ -15,7 +15,7 @@ export class Skeleton {
 	frame: number;
 
 	init(): void;
-	calculateInverses( bone: Bone ): void;
+	calculateInverses(): void;
 	pose(): void;
 	update(): void;
 	clone(): Skeleton;

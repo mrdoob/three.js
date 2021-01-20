@@ -78,7 +78,7 @@
 
 				//
 
-				const geometry = new THREE.SphereBufferGeometry( 20, 64, 32 );
+				const geometry = new THREE.SphereGeometry( 20, 64, 32 );
 
 				const texture = new THREE.CanvasTexture( generateTexture() );
 				texture.magFilter = THREE.NearestFilter;
@@ -149,7 +149,7 @@
 				controls.minDistance = 10;
 				controls.maxDistance = 150;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 

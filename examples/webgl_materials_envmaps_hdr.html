@@ -45,7 +45,7 @@
 
 				const envScene = new THREE.Scene();
 
-				const geometry = new THREE.BoxBufferGeometry();
+				const geometry = new THREE.BoxGeometry();
 				geometry.deleteAttribute( 'uv' );
 				const roomMaterial = new THREE.MeshStandardMaterial( { metalness: 0, side: THREE.BackSide } );
 				const room = new THREE.Mesh( geometry, roomMaterial );
@@ -96,8 +96,8 @@
 
 				//
 
-				let geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
-				// let geometry = new THREE.SphereBufferGeometry( 26, 64, 32 );
+				let geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
+				// let geometry = new THREE.SphereGeometry( 26, 64, 32 );
 				let material = new THREE.MeshStandardMaterial( {
 					color: 0xffffff,
 					metalness: params.metalness,
@@ -108,7 +108,7 @@
 				scene.add( torusMesh );
 
 
-				geometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				geometry = new THREE.PlaneGeometry( 200, 200 );
 				material = new THREE.MeshBasicMaterial();
 
 				planeMesh = new THREE.Mesh( geometry, material );
@@ -182,7 +182,7 @@
 				controls.minDistance = 50;
 				controls.maxDistance = 300;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				const gui = new GUI();
 

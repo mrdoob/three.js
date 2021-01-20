@@ -82,7 +82,7 @@
 
 				scene = new THREE.Scene();
 
-				const bulbGeometry = new THREE.SphereBufferGeometry( 0.02, 16, 8 );
+				const bulbGeometry = new THREE.SphereGeometry( 0.02, 16, 8 );
 				bulbLight = new THREE.PointLight( 0xffee88, 1, 100, 2 );
 
 				bulbMat = new THREE.MeshStandardMaterial( {
@@ -187,20 +187,20 @@
 
 				} );
 
-				const floorGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+				const floorGeometry = new THREE.PlaneGeometry( 20, 20 );
 				const floorMesh = new THREE.Mesh( floorGeometry, floorMat );
 				floorMesh.receiveShadow = true;
 				floorMesh.rotation.x = - Math.PI / 2.0;
 				scene.add( floorMesh );
 
-				const ballGeometry = new THREE.SphereBufferGeometry( 0.25, 32, 32 );
+				const ballGeometry = new THREE.SphereGeometry( 0.25, 32, 32 );
 				const ballMesh = new THREE.Mesh( ballGeometry, ballMat );
 				ballMesh.position.set( 1, 0.25, 1 );
 				ballMesh.rotation.y = Math.PI;
 				ballMesh.castShadow = true;
 				scene.add( ballMesh );
 
-				const boxGeometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5 );
+				const boxGeometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
 				const boxMesh = new THREE.Mesh( boxGeometry, cubeMat );
 				boxMesh.position.set( - 0.5, 0.25, - 1 );
 				boxMesh.castShadow = true;
@@ -231,7 +231,7 @@
 				controls.minDistance = 1;
 				controls.maxDistance = 20;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 
 				const gui = new GUI();
