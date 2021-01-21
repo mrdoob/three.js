@@ -48,8 +48,8 @@ Three.js에서 요소를 최적화하는 방법은 아주 다양합니다. 가�
 
 ```js
 async function loadFile(url) {
-  const req = await fetch(url);
-  return req.text();
+  const res = await fetch(url);
+  return res.text();
 }
 ```
 

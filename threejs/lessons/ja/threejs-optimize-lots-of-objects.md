@@ -46,8 +46,8 @@ three.jsには最適化する方法は多々あります。1つの方法は*ジ�
 
 ```js
 async function loadFile(url) {
-  const req = await fetch(url);
-  return req.text();
+  const res = await fetch(url);
+  return res.text();
 }
 ```
 

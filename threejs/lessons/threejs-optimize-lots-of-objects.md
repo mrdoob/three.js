@@ -57,8 +57,8 @@ First some code to load the text file
 
 ```js
 async function loadFile(url) {
-  const req = await fetch(url);
-  return req.text();
+  const res = await fetch(url);
+  return res.text();
 }
 ```
 

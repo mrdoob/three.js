@@ -52,8 +52,8 @@ TOC: Оптимизация большого количества объекто
 
 ```js
 async function loadFile(url) {
-  const req = await fetch(url);
-  return req.text();
+  const res = await fetch(url);
+  return res.text();
 }
 ```
 
