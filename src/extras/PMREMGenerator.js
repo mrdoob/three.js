@@ -24,6 +24,9 @@ import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Color } from '../math/Color.js';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { BoxBufferGeometry } from '../geometries/BoxGeometry.js';
+import { BackSide } from '../constants.js';
 
 const LOD_MIN = 4;
 const LOD_MAX = 8;
@@ -51,10 +54,16 @@ const ENCODINGS = {
 	[ GammaEncoding ]: 6
 };
 
+const backgroundMaterial = new MeshBasicMaterial( {
+	side: BackSide,
+	depthWrite: false,
+	depthTest: false,
+} );
+const backgroundBox = new Mesh( new BoxBufferGeometry(), backgroundMaterial );
+
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
 const { _lodPlanes, _sizeLods, _sigmas } = /*@__PURE__*/ _createPlanes();
 const _clearColor = /*@__PURE__*/ new Color();
-const _backgroundColor = /*@__PURE__*/ new Color();
 let _oldTarget = null;
 
 // Golden Ratio
@@ -269,36 +278,37 @@ class PMREMGenerator {
 		const forwardSign = [ 1, 1, 1, - 1, - 1, - 1 ];
 		const renderer = this._renderer;
 
+		const originalAutoClear = renderer.autoClear;
 		const outputEncoding = renderer.outputEncoding;
 		const toneMapping = renderer.toneMapping;
 		renderer.getClearColor( _clearColor );
-		const clearAlpha = renderer.getClearAlpha();
-		const originalBackground = scene.background;
 
 		renderer.toneMapping = NoToneMapping;
 		renderer.outputEncoding = LinearEncoding;
+		renderer.autoClear = false;
 
+		let useSolidColor = false;
 		const background = scene.background;
 		if ( background ) {
 
 			if ( background.isColor ) {
 
-				_backgroundColor.copy( background ).convertSRGBToLinear();
+				backgroundMaterial.color.copy( background ).convertSRGBToLinear();
 				scene.background = null;
 
-				const alpha = convertLinearToRGBE( _backgroundColor );
-				renderer.setClearColor( _backgroundColor );
-				renderer.setClearAlpha( alpha );
+				const alpha = convertLinearToRGBE( backgroundMaterial.color );
+				backgroundMaterial.opacity = alpha;
+				useSolidColor = true;
 
 			}
 
 		} else {
 
-			_backgroundColor.copy( _clearColor ).convertSRGBToLinear();
+			backgroundMaterial.color.copy( _clearColor ).convertSRGBToLinear();
 
-			const alpha = convertLinearToRGBE( _backgroundColor );
-			renderer.setClearColor( _backgroundColor );
-			renderer.setClearAlpha( alpha );
+			const alpha = convertLinearToRGBE( backgroundMaterial.color );
+			backgroundMaterial.opacity = alpha;
+			useSolidColor = true;
 
 		}
 
@@ -326,14 +336,20 @@ class PMREMGenerator {
 			_setViewport( cubeUVRenderTarget,
 				col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
 			renderer.setRenderTarget( cubeUVRenderTarget );
+
+			if ( useSolidColor ) {
+
+				renderer.render( backgroundBox, cubeCamera );
+
+			}
+
 			renderer.render( scene, cubeCamera );
 
 		}
 
 		renderer.toneMapping = toneMapping;
 		renderer.outputEncoding = outputEncoding;
-		renderer.setClearColor( _clearColor, clearAlpha );
-		scene.background = originalBackground;
+		renderer.autoClear = originalAutoClear;
 
 	}
 
