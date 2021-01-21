@@ -299,13 +299,13 @@ var FirstPersonControls = function ( object, domElement ) {
 
 	this.dispose = function () {
 
-		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
-		this.domElement.removeEventListener( 'mousedown', _onMouseDown, false );
-		this.domElement.removeEventListener( 'mousemove', _onMouseMove, false );
-		this.domElement.removeEventListener( 'mouseup', _onMouseUp, false );
+		this.domElement.removeEventListener( 'contextmenu', contextmenu );
+		this.domElement.removeEventListener( 'mousedown', _onMouseDown );
+		this.domElement.removeEventListener( 'mousemove', _onMouseMove );
+		this.domElement.removeEventListener( 'mouseup', _onMouseUp );
 
-		window.removeEventListener( 'keydown', _onKeyDown, false );
-		window.removeEventListener( 'keyup', _onKeyUp, false );
+		window.removeEventListener( 'keydown', _onKeyDown );
+		window.removeEventListener( 'keyup', _onKeyUp );
 
 	};
 
@@ -315,13 +315,13 @@ var FirstPersonControls = function ( object, domElement ) {
 	var _onKeyDown = bind( this, this.onKeyDown );
 	var _onKeyUp = bind( this, this.onKeyUp );
 
-	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
-	this.domElement.addEventListener( 'mousemove', _onMouseMove, false );
-	this.domElement.addEventListener( 'mousedown', _onMouseDown, false );
-	this.domElement.addEventListener( 'mouseup', _onMouseUp, false );
+	this.domElement.addEventListener( 'contextmenu', contextmenu );
+	this.domElement.addEventListener( 'mousemove', _onMouseMove );
+	this.domElement.addEventListener( 'mousedown', _onMouseDown );
+	this.domElement.addEventListener( 'mouseup', _onMouseUp );
 
-	window.addEventListener( 'keydown', _onKeyDown, false );
-	window.addEventListener( 'keyup', _onKeyUp, false );
+	window.addEventListener( 'keydown', _onKeyDown );
+	window.addEventListener( 'keyup', _onKeyUp );
 
 	function bind( scope, fn ) {
 
