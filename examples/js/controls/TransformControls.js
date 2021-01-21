@@ -123,9 +123,9 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	{
 
-		domElement.addEventListener( 'pointerdown', onPointerDown, false );
-		domElement.addEventListener( 'pointermove', onPointerHover, false );
-		scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
+		domElement.addEventListener( 'pointerdown', onPointerDown );
+		domElement.addEventListener( 'pointermove', onPointerHover );
+		scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp );
 
 	}
 
@@ -627,7 +627,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 		if ( ! scope.enabled ) return;
 
 		scope.domElement.style.touchAction = 'none'; // disable touch scroll
-		scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
+		scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove );
 
 		scope.pointerHover( getPointer( event ) );
 		scope.pointerDown( getPointer( event ) );
@@ -647,7 +647,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 		if ( ! scope.enabled ) return;
 
 		scope.domElement.style.touchAction = '';
-		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
 
 		scope.pointerUp( getPointer( event ) );
 
