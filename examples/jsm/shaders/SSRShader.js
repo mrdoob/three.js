@@ -183,11 +183,14 @@ var SSRShader = {
 				float cW = cameraProjectionMatrix[2][3] * vZ+cameraProjectionMatrix[3][3];
 				vec3 vP=getViewPosition( uv, d, cW );
 
+				float fresnel=(dot(viewIncidenceDir,viewReflectDir)+1.)/2.;
+
 				#ifdef isPerspectiveCamera
 					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 					float recipVPZ=1./viewPosition.z;
 					float viewReflectRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
-					float sD=surfDist*cW;
+					// float sD=surfDist*cW;
+					float sD=surfDist*cW*(1.+pow(fresnel,20.)*9.);
 				#else
 				float viewReflectRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
 					float sD=surfDist;
@@ -211,7 +214,6 @@ var SSRShader = {
 						op=opacity*attenuation;
 					#endif
 					#ifdef isFresnel
-						float fresnel=(dot(viewIncidenceDir,viewReflectDir)+1.)/2.;
 						op*=fresnel;
 					#endif
 					vec4 reflectColor=texture2D(tDiffuse,uv);
