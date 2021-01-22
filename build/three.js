@@ -34850,6 +34850,12 @@
 
 	var MAX_SAMPLES = 20;
 	var ENCODINGS = (_ENCODINGS = {}, _ENCODINGS[LinearEncoding] = 0, _ENCODINGS[sRGBEncoding] = 1, _ENCODINGS[RGBEEncoding] = 2, _ENCODINGS[RGBM7Encoding] = 3, _ENCODINGS[RGBM16Encoding] = 4, _ENCODINGS[RGBDEncoding] = 5, _ENCODINGS[GammaEncoding] = 6, _ENCODINGS);
+	var backgroundMaterial = new MeshBasicMaterial({
+		side: BackSide,
+		depthWrite: false,
+		depthTest: false
+	});
+	var backgroundBox = new Mesh(new BoxGeometry(), backgroundMaterial);
 
 	var _flatCamera = /*@__PURE__*/new OrthographicCamera();
 
@@ -34859,8 +34865,6 @@
 			_sigmas = _createPlanes2._sigmas;
 
 	var _clearColor = /*@__PURE__*/new Color();
-
-	var _backgroundColor = /*@__PURE__*/new Color();
 
 	var _oldTarget = null; // Golden Ratio
 
@@ -35060,31 +35064,31 @@
 			var upSign = [1, -1, 1, 1, 1, 1];
 			var forwardSign = [1, 1, 1, -1, -1, -1];
 			var renderer = this._renderer;
+			var originalAutoClear = renderer.autoClear;
 			var outputEncoding = renderer.outputEncoding;
 			var toneMapping = renderer.toneMapping;
 			renderer.getClearColor(_clearColor);
-			var clearAlpha = renderer.getClearAlpha();
-			var originalBackground = scene.background;
 			renderer.toneMapping = NoToneMapping;
 			renderer.outputEncoding = LinearEncoding;
+			renderer.autoClear = false;
+			var useSolidColor = false;
 			var background = scene.background;
 
 			if (background) {
 				if (background.isColor) {
-					_backgroundColor.copy(background).convertSRGBToLinear();
-
+					backgroundMaterial.color.copy(background).convertSRGBToLinear();
 					scene.background = null;
-					var alpha = convertLinearToRGBE(_backgroundColor);
-					renderer.setClearColor(_backgroundColor);
-					renderer.setClearAlpha(alpha);
+					var alpha = convertLinearToRGBE(backgroundMaterial.color);
+					backgroundMaterial.opacity = alpha;
+					useSolidColor = true;
 				}
 			} else {
-				_backgroundColor.copy(_clearColor).convertSRGBToLinear();
+				backgroundMaterial.color.copy(_clearColor).convertSRGBToLinear();
 
-				var _alpha = convertLinearToRGBE(_backgroundColor);
+				var _alpha = convertLinearToRGBE(backgroundMaterial.color);
 
-				renderer.setClearColor(_backgroundColor);
-				renderer.setClearAlpha(_alpha);
+				backgroundMaterial.opacity = _alpha;
+				useSolidColor = true;
 			}
 
 			for (var i = 0; i < 6; i++) {
@@ -35104,13 +35108,17 @@
 				_setViewport(cubeUVRenderTarget, col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX);
 
 				renderer.setRenderTarget(cubeUVRenderTarget);
+
+				if (useSolidColor) {
+					renderer.render(backgroundBox, cubeCamera);
+				}
+
 				renderer.render(scene, cubeCamera);
 			}
 
 			renderer.toneMapping = toneMapping;
 			renderer.outputEncoding = outputEncoding;
-			renderer.setClearColor(_clearColor, clearAlpha);
-			scene.background = originalBackground;
+			renderer.autoClear = originalAutoClear;
 		};
 
 		_proto._textureToCubeUV = function _textureToCubeUV(texture, cubeUVRenderTarget) {
@@ -36814,6 +36822,14 @@
 		}));
 		/* eslint-enable no-undef */
 
+	}
+
+	if (window) {
+		if (window.__THREE__) {
+			console.warn('WARNING: Multiple instances of Three.js being imported.');
+		} else {
+			window.__THREE__ = REVISION;
+		}
 	}
 
 	exports.ACESFilmicToneMapping = ACESFilmicToneMapping;
