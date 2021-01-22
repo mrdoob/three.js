@@ -35,6 +35,7 @@
 		import { GUI } from './jsm/libs/dat.gui.module.js';
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 		import { SSRPass } from './jsm/postprocessing/SSRPass.js';
+		import { Reflector } from './jsm/objects/Reflector.js';
 
 		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
@@ -42,6 +43,7 @@
 			enableSSR: true,
 			isOrbitControls: false,
 			isOtherMeshes: true,
+			isReflector: false,
 		}
 		let composer
 		let ssrPass
@@ -52,6 +54,7 @@
 		let controls;
 		let camera, scene, renderer;
 		let otherMeshes = []
+		let reflector
 
 		const container = document.querySelector('#container');
 
@@ -132,6 +135,19 @@
 				scene.add(mesh)
 				otherMeshes.push(mesh)
 			}
+			{
+				const geometry = new THREE.PlaneBufferGeometry(100, 100);
+				reflector = new Reflector(geometry, {
+					clipBias: 0.003,
+					textureWidth: window.innerWidth,
+					textureHeight: window.innerHeight,
+					color: 0x888888
+				});
+				reflector.position.y = plane.position.y + .0001;
+				reflector.rotation.x = -Math.PI / 2
+				reflector.visible = params.isReflector
+				scene.add(reflector);
+			}
 
 			// renderer
 			renderer = new THREE.WebGLRenderer({ antialias: false });
@@ -176,6 +192,13 @@
 			gui.add(ssrPass, 'isDistanceAttenuation');
 			ssrPass.maxDistance = .1
 			gui.add(ssrPass, 'maxDistance').min(0).max(1).step(.01);
+			gui.add(params, 'isReflector').onChange(() => {
+				if (params.isReflector) {
+					reflector.visible = true
+				} else {
+					reflector.visible = false
+				}
+			})
 			gui.add(params, 'isOrbitControls').onChange(() => {
 				controls.enabled = params.isOrbitControls
 			})
