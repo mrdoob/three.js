@@ -165,13 +165,16 @@ if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 }
 
-if ( typeof __THREE__ !== undefined ) {
+if ( window ) {
 
-	console.warn( 'WARNING: Multiple instances of Three.js being imported.' );
+	if ( window.__THREE__ ) {
 
-} else {
+		console.warn( 'WARNING: Multiple instances of Three.js being imported.' );
 
-	// eslint-disable-next-line no-undef
-	__THREE__ = REVISION;
+	} else {
+
+		window.__THREE__ = REVISION;
+
+	}
 
 }
