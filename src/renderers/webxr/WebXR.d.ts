@@ -264,47 +264,44 @@ export interface XRPlane {
 	lastChangedTime: number;
 }
 
-export interface XRJointSpace extends XRSpace {}
-
-export interface XRJointPose extends XRPose {
-	radius: number | undefined;
+export declare enum XRHandJoint {
+	'wrist',
+	'thumb-metacarpal',
+	'thumb-phalanx-proximal',
+	'thumb-phalanx-distal',
+	'thumb-tip',
+	'index-finger-metacarpal',
+	'index-finger-phalanx-proximal',
+	'index-finger-phalanx-intermediate',
+	'index-finger-phalanx-distal',
+	'index-finger-tip',
+	'middle-finger-metacarpal',
+	'middle-finger-phalanx-proximal',
+	'middle-finger-phalanx-intermediate',
+	'middle-finger-phalanx-distal',
+	'middle-finger-tip',
+	'ring-finger-metacarpal',
+	'ring-finger-phalanx-proximal',
+	'ring-finger-phalanx-intermediate',
+	'ring-finger-phalanx-distal',
+	'ring-finger-tip',
+	'pinky-finger-metacarpal',
+	'pinky-finger-phalanx-proximal',
+	'pinky-finger-phalanx-intermediate',
+	'pinky-finger-phalanx-distal',
+	'pinky-finger-tip'
 }
 
-export declare class XRHand extends Array<XRJointSpace> {
+export interface XRJointSpace extends XRSpace {
+	readonly jointName: XRHandJoint;
+}
 
-	readonly length: number;
+export interface XRJointPose extends XRPose {
+	readonly radius: number | undefined;
+}
 
-	static readonly WRIST = 0;
-
-	static readonly THUMB_METACARPAL = 1;
-	static readonly THUMB_PHALANX_PROXIMAL = 2;
-	static readonly THUMB_PHALANX_DISTAL = 3;
-	static readonly THUMB_PHALANX_TIP = 4;
-
-	static readonly INDEX_METACARPAL = 5;
-	static readonly INDEX_PHALANX_PROXIMAL = 6;
-	static readonly INDEX_PHALANX_INTERMEDIATE = 7;
-	static readonly INDEX_PHALANX_DISTAL = 8;
-	static readonly INDEX_PHALANX_TIP = 9;
-
-	static readonly MIDDLE_METACARPAL = 10;
-	static readonly MIDDLE_PHALANX_PROXIMAL = 11;
-	static readonly MIDDLE_PHALANX_INTERMEDIATE = 12;
-	static readonly MIDDLE_PHALANX_DISTAL = 13;
-	static readonly MIDDLE_PHALANX_TIP = 14;
-
-	static readonly RING_METACARPAL = 15;
-	static readonly RING_PHALANX_PROXIMAL = 16;
-	static readonly RING_PHALANX_INTERMEDIATE = 17;
-	static readonly RING_PHALANX_DISTAL = 18;
-	static readonly RING_PHALANX_TIP = 19;
-
-	static readonly LITTLE_METACARPAL = 20;
-	static readonly LITTLE_PHALANX_PROXIMAL = 21;
-	static readonly LITTLE_PHALANX_INTERMEDIATE = 22;
-	static readonly LITTLE_PHALANX_DISTAL = 23;
-	static readonly LITTLE_PHALANX_TIP = 24;
-
+export interface XRHand extends Map<XRHandJoint, XRJointSpace> {
+	readonly size: number;
 }
 
 declare type Constructor<T = object> = {
