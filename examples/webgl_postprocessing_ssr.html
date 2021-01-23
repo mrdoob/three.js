@@ -35,7 +35,7 @@
 		import { GUI } from './jsm/libs/dat.gui.module.js';
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 		import { SSRPass } from './jsm/postprocessing/SSRPass.js';
-		import { Reflector } from './jsm/objects/Reflector.js';
+		import { Reflector } from './jsm/objects/ReflectorForSSRPass.js';
 
 		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
@@ -141,7 +141,8 @@
 					clipBias: 0.003,
 					textureWidth: window.innerWidth,
 					textureHeight: window.innerHeight,
-					color: 0x888888
+					color: 0x888888,
+					useDepthTexture: true,
 				});
 				reflector.position.y = plane.position.y + .0001;
 				reflector.rotation.x = -Math.PI / 2
