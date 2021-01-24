@@ -15,6 +15,7 @@ import {
   UniformsUtils,
   UnsignedShortType,
   WebGLRenderTarget,
+	HalfFloatType,
 } from "../../../build/three.module.js";
 import { Pass } from "../postprocessing/Pass.js";
 import { SSRShader } from "../shaders/SSRShader.js";
@@ -145,7 +146,8 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   this.normalRenderTarget = new WebGLRenderTarget(this.width, this.height, {
     minFilter: NearestFilter,
     magFilter: NearestFilter,
-    format: RGBAFormat
+		format: RGBAFormat,
+		type: HalfFloatType,
   });
 
   // metalness render target

@@ -161,6 +161,7 @@
 			//
 
 			controls = new OrbitControls(camera, renderer.domElement);
+			controls.enableDamping = true
 			controls.target.set(0, 0.1, 0);
 			controls.update()
 			controls.enabled = params.isOrbitControls
@@ -264,7 +265,9 @@
 
 		function render() {
 
-			if (!params.isOrbitControls) {
+			if(params.isOrbitControls){
+				controls.update()
+			}else {
 				const timer = Date.now() * 0.0003;
 
 				camera.position.x = Math.sin(timer) * 0.5;
