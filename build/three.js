@@ -1058,6 +1058,48 @@
 		return self;
 	}
 
+	function _unsupportedIterableToArray(o, minLen) {
+		if (!o) return;
+		if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+		var n = Object.prototype.toString.call(o).slice(8, -1);
+		if (n === "Object" && o.constructor) n = o.constructor.name;
+		if (n === "Map" || n === "Set") return Array.from(o);
+		if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+	}
+
+	function _arrayLikeToArray(arr, len) {
+		if (len == null || len > arr.length) len = arr.length;
+
+		for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+		return arr2;
+	}
+
+	function _createForOfIteratorHelperLoose(o, allowArrayLike) {
+		var it;
+
+		if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
+			if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+				if (it) o = it;
+				var i = 0;
+				return function () {
+					if (i >= o.length) return {
+						done: true
+					};
+					return {
+						done: false,
+						value: o[i++]
+					};
+				};
+			}
+
+			throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+		}
+
+		it = o[Symbol.iterator]();
+		return it.next.bind(it);
+	}
+
 	/**
 	 * https://github.com/mrdoob/eventdispatcher.js/
 	 */
@@ -17068,24 +17110,10 @@
 				this._hand = new Group();
 				this._hand.matrixAutoUpdate = false;
 				this._hand.visible = false;
-				this._hand.joints = [];
+				this._hand.joints = {};
 				this._hand.inputState = {
 					pinching: false
 				};
-
-				if (window.XRHand) {
-					for (var i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i++) {
-						// The transform of this joint will be updated with the joint pose on each frame
-						var joint = new Group();
-						joint.matrixAutoUpdate = false;
-						joint.visible = false;
-
-						this._hand.joints.push(joint); // ??
-
-
-						this._hand.add(joint);
-					}
-				}
 			}
 
 			return this._hand;
@@ -17155,43 +17183,55 @@
 				if (hand && inputSource.hand) {
 					handPose = true;
 
-					for (var i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i++) {
-						if (inputSource.hand[i]) {
-							// Update the joints groups with the XRJoint poses
-							var jointPose = frame.getJointPose(inputSource.hand[i], referenceSpace);
-							var joint = hand.joints[i];
+					for (var _iterator = _createForOfIteratorHelperLoose(inputSource.hand.values()), _step; !(_step = _iterator()).done;) {
+						var inputjoint = _step.value;
+						// Update the joints groups with the XRJoint poses
+						var jointPose = frame.getJointPose(inputjoint, referenceSpace);
 
-							if (jointPose !== null) {
-								joint.matrix.fromArray(jointPose.transform.matrix);
-								joint.matrix.decompose(joint.position, joint.rotation, joint.scale);
-								joint.jointRadius = jointPose.radius;
-							}
+						if (hand.joints[inputjoint.jointName] === undefined) {
+							// The transform of this joint will be updated with the joint pose on each frame
+							var _joint = new Group();
 
-							joint.visible = jointPose !== null; // Custom events
-							// Check pinch
+							_joint.matrixAutoUpdate = false;
+							_joint.visible = false;
+							hand.joints[inputjoint.jointName] = _joint; // ??
 
-							var indexTip = hand.joints[window.XRHand.INDEX_PHALANX_TIP];
-							var thumbTip = hand.joints[window.XRHand.THUMB_PHALANX_TIP];
-							var distance = indexTip.position.distanceTo(thumbTip.position);
-							var distanceToPinch = 0.02;
-							var threshold = 0.005;
-
-							if (hand.inputState.pinching && distance > distanceToPinch + threshold) {
-								hand.inputState.pinching = false;
-								this.dispatchEvent({
-									type: 'pinchend',
-									handedness: inputSource.handedness,
-									target: this
-								});
-							} else if (!hand.inputState.pinching && distance <= distanceToPinch - threshold) {
-								hand.inputState.pinching = true;
-								this.dispatchEvent({
-									type: 'pinchstart',
-									handedness: inputSource.handedness,
-									target: this
-								});
-							}
+							hand.add(_joint);
 						}
+
+						var joint = hand.joints[inputjoint.jointName];
+
+						if (jointPose !== null) {
+							joint.matrix.fromArray(jointPose.transform.matrix);
+							joint.matrix.decompose(joint.position, joint.rotation, joint.scale);
+							joint.jointRadius = jointPose.radius;
+						}
+
+						joint.visible = jointPose !== null;
+					} // Custom events
+					// Check pinchz
+
+
+					var indexTip = hand.joints['index-finger-tip'];
+					var thumbTip = hand.joints['thumb-tip'];
+					var distance = indexTip.position.distanceTo(thumbTip.position);
+					var distanceToPinch = 0.02;
+					var threshold = 0.005;
+
+					if (hand.inputState.pinching && distance > distanceToPinch + threshold) {
+						hand.inputState.pinching = false;
+						this.dispatchEvent({
+							type: 'pinchend',
+							handedness: inputSource.handedness,
+							target: this
+						});
+					} else if (!hand.inputState.pinching && distance <= distanceToPinch - threshold) {
+						hand.inputState.pinching = true;
+						this.dispatchEvent({
+							type: 'pinchstart',
+							handedness: inputSource.handedness,
+							target: this
+						});
 					}
 				} else {
 					if (targetRay !== null) {
@@ -36824,7 +36864,7 @@
 
 	}
 
-	if (window) {
+	if (typeof window !== 'undefined') {
 		if (window.__THREE__) {
 			console.warn('WARNING: Multiple instances of Three.js being imported.');
 		} else {
