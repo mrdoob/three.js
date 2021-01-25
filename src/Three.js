@@ -165,7 +165,7 @@ if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 }
 
-if ( window ) {
+if ( typeof window !== 'undefined' ) {
 
 	if ( window.__THREE__ ) {
 
