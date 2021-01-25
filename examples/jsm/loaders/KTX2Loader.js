@@ -19,10 +19,6 @@ import {
 	CompressedTextureLoader,
 	FileLoader,
 	LinearEncoding,
-	LinearFilter,
-	LinearMipmapLinearFilter,
-	MathUtils,
-	UnsignedByteType,
 	sRGBEncoding,
 } from '../../../build/three.module.js';
 
@@ -54,11 +50,11 @@ var DFDChannel = {
 
 var SupercompressionScheme = {
 	ZSTD: 2
-}
+};
 
 var Transfer = {
 	SRGB: 2
-}
+};
 
 //
 
@@ -86,7 +82,7 @@ class KTX2Loader extends CompressedTextureLoader {
 
 	}
 
-	setTranscoderPath ( path ) {
+	setTranscoderPath( path ) {
 
 		this.basisLoader.setTranscoderPath( path );
 
@@ -94,7 +90,7 @@ class KTX2Loader extends CompressedTextureLoader {
 
 	}
 
-	setWorkerLimit ( path ) {
+	setWorkerLimit( path ) {
 
 		this.basisLoader.setWorkerLimit( path );
 
@@ -102,7 +98,7 @@ class KTX2Loader extends CompressedTextureLoader {
 
 	}
 
-	detectSupport ( renderer ) {
+	detectSupport( renderer ) {
 
 		this.basisLoader.detectSupport( renderer );
 
@@ -110,7 +106,7 @@ class KTX2Loader extends CompressedTextureLoader {
 
 	}
 
-	dispose () {
+	dispose() {
 
 		this.basisLoader.dispose();
 
@@ -131,7 +127,7 @@ class KTX2Loader extends CompressedTextureLoader {
 				.setResponseType( 'arraybuffer' )
 				.load( url, resolve, onProgress, reject );
 
-		} )
+		} );
 
 		bufferPending
 			.then( function ( buffer ) {
@@ -211,7 +207,7 @@ class KTX2Loader extends CompressedTextureLoader {
 
 			onLoad( texture );
 
-		} );
+		} ).catch( onError );
 
 		return this;
 
@@ -306,6 +302,6 @@ var KTX2Utils = {
 
 	},
 
-}
+};
 
 export { KTX2Loader };
