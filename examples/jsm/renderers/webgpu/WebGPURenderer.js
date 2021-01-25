@@ -157,6 +157,7 @@ class WebGPURenderer {
 
 		const device = await adapter.requestDevice( deviceDescriptor );
 
+		// https://cdn.jsdelivr.net/npm/@webgpu/glslang@0.0.15/dist/web-devel/glslang.js
 		const glslang = await import( '../../libs/glslang.js' );
 		const compiler = await glslang.default();
 
