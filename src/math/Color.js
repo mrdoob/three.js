@@ -169,14 +169,14 @@ class Color {
 
 			let color;
 			const name = m[ 1 ];
-			const components = m[ 2 ];
+			const components = m[ 2 ].replace(/^\s*/, '');
 
 			switch ( name ) {
 
 				case 'rgb':
 				case 'rgba':
 
-					if ( color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// rgb(255,0,0) rgba(255,0,0,0.5)
 						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
