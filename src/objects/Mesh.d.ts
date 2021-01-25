@@ -4,7 +4,7 @@ import { Object3D } from './../core/Object3D';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Intersection } from '../core/Raycaster';
 
-export class Mesh extends Object3D {
+export class Mesh<TChild extends Object3D = Object3D> extends Object3D<TChild> {
 
 	constructor(
 		geometry?: BufferGeometry,
