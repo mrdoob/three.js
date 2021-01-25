@@ -41,10 +41,28 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   this.maxDistance = SSRShader.uniforms.maxDistance.value;
   this.surfDist = SSRShader.uniforms.maxDistance.value;
 
-  this.selects = selects
-  this.isSelective = Array.isArray(this.selects)
+	this.encoding = encoding
 
-  this.encoding = encoding
+	this._selects = selects
+  this.isSelective = Array.isArray(this._selects)
+	Object.defineProperty(this, 'selects', {
+		get() {
+			return this._selects
+		},
+		set(val) {
+      if (this._selects === val) return
+      this._selects = val
+			if (Array.isArray(val)) {
+				this.isSelective = true
+				this.ssrMaterial.defines.isSelective = true
+				this.ssrMaterial.needsUpdate = true
+			} else {
+				this.isSelective = false
+				this.ssrMaterial.defines.isSelective = false
+				this.ssrMaterial.needsUpdate = true
+			}
+		}
+	})
 
   this._isBouncing = isBouncing
   Object.defineProperty(this, 'isBouncing', {
@@ -152,13 +170,13 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
 
   // metalness render target
 
-  if (this.isSelective) {
+  // if (this.isSelective) {
     this.metalnessRenderTarget = new WebGLRenderTarget(this.width, this.height, {
       minFilter: NearestFilter,
       magFilter: NearestFilter,
       format: RGBAFormat
     });
-  }
+  // }
 
 
 
@@ -198,11 +216,11 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
 
   this.ssrMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
   this.ssrMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
-  if (this.isSelective) {
+  // if (this.isSelective) {
     this.ssrMaterial.defines.isSelective = this.isSelective
     this.ssrMaterial.needsUpdate = true
     this.ssrMaterial.uniforms['tMetalness'].value = this.metalnessRenderTarget.texture;
-  }
+  // }
   this.ssrMaterial.uniforms['tDepth'].value = this.beautyRenderTarget.depthTexture;
   this.ssrMaterial.uniforms['cameraNear'].value = this.camera.near;
   this.ssrMaterial.uniforms['cameraFar'].value = this.camera.far;
@@ -216,7 +234,7 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   this.normalMaterial = new MeshNormalMaterial({ morphTargets });
   this.normalMaterial.blending = NoBlending;
 
-  if (this.isSelective) {
+  // if (this.isSelective) {
     // metalnessOn material
 
     this.metalnessOnMaterial = new MeshBasicMaterial({
@@ -228,7 +246,7 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
     this.metalnessOffMaterial = new MeshBasicMaterial({
       color: 'black'
     });
-  }
+  // }
 
   // blur material
 
@@ -311,7 +329,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.beautyRenderTarget.dispose();
     this.prevRenderTarget.dispose();
     this.normalRenderTarget.dispose();
-    if (this.isSelective) this.metalnessRenderTarget.dispose();
+		// if (this.isSelective)
+			this.metalnessRenderTarget.dispose();
     this.ssrRenderTarget.dispose();
     this.blurRenderTarget.dispose();
     this.blurRenderTarget2.dispose();
@@ -320,10 +339,10 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     // dispose materials
 
     this.normalMaterial.dispose();
-    if (this.isSelective) {
+    // if (this.isSelective) {
       this.metalnessOnMaterial.dispose();
       this.metalnessOffMaterial.dispose();
-    }
+    // }
     this.blurMaterial.dispose();
     this.blurMaterial2.dispose();
     this.copyMaterial.dispose();
@@ -551,7 +570,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     this.scene.traverseVisible(child => {
       child._SSRPassMaterialBack = child.material
-      if (this.selects.includes(child)) {
+      if (this._selects.includes(child)) {
         child.material = this.metalnessOnMaterial
       } else {
         child.material = this.metalnessOffMaterial
@@ -581,7 +600,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.prevRenderTarget.setSize(width, height);
     this.ssrRenderTarget.setSize(width, height);
     this.normalRenderTarget.setSize(width, height);
-    if (this.isSelective) this.metalnessRenderTarget.setSize(width, height);
+		// if (this.isSelective)
+			this.metalnessRenderTarget.setSize(width, height);
     this.blurRenderTarget.setSize(width, height);
     this.blurRenderTarget2.setSize(width, height);
     // this.blurRenderTarget3.setSize(width, height);

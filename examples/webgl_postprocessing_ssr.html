@@ -41,7 +41,7 @@
 
 		let params = {
 			enableSSR: true,
-			isOrbitControls: false,
+			autoRotate: true,
 			isOtherMeshes: true,
 			isReflector: false,
 		}
@@ -55,6 +55,7 @@
 		let camera, scene, renderer;
 		let otherMeshes = []
 		let reflector
+		let selects=[]
 
 		const container = document.querySelector('#container');
 
@@ -105,6 +106,7 @@
 				// mesh.castShadow = true;
 				// mesh.receiveShadow = true;
 				scene.add(mesh);
+				selects.push(mesh)
 
 				// Release decoder resources.
 				dracoLoader.dispose();
@@ -118,6 +120,7 @@
 				mesh.position.set(-.12, plane.position.y + .025, .015)
 				scene.add(mesh)
 				otherMeshes.push(mesh)
+				selects.push(mesh)
 			}
 			{
 				const geometry = new THREE.IcosahedronBufferGeometry(.025, 4);
@@ -126,6 +129,7 @@
 				mesh.position.set(-.05, plane.position.y + .025, .08)
 				scene.add(mesh)
 				otherMeshes.push(mesh)
+				selects.push(mesh)
 			}
 			{
 				const geometry = new THREE.ConeBufferGeometry(.025, .05, 64);
@@ -134,6 +138,7 @@
 				mesh.position.set(-.05, plane.position.y + .025, -.055)
 				scene.add(mesh)
 				otherMeshes.push(mesh)
+				selects.push(mesh)
 			}
 			{
 				const geometry = new THREE.PlaneBufferGeometry(100, 100);
@@ -164,7 +169,7 @@
 			controls.enableDamping = true
 			controls.target.set(0, 0.1, 0);
 			controls.update()
-			controls.enabled = params.isOrbitControls
+			controls.enabled = !params.autoRotate
 
 			// STATS
 
@@ -183,26 +188,30 @@
 				height: innerHeight,
 				encoding: THREE.sRGBEncoding,
 				isPerspectiveCamera: isPerspectiveCamera,
+				selects: params.isReflector ? selects : null,
 				// morphTargets: true,
 			});
+			// window.ssrPass = ssrPass
 			composer.addPass(ssrPass);
 
 			// GUI
 
 			gui = new GUI({ width: 400 });
 			gui.add(params, 'enableSSR').name('Enable SSR');
+			gui.add(params, 'autoRotate').onChange(() => {
+				controls.enabled = !params.autoRotate
+			})
 			gui.add(ssrPass, 'isDistanceAttenuation');
 			ssrPass.maxDistance = .1
 			gui.add(ssrPass, 'maxDistance').min(0).max(1).step(.01);
 			gui.add(params, 'isReflector').onChange(() => {
 				if (params.isReflector) {
 					reflector.visible = true
+					ssrPass.selects = selects
 				} else {
 					reflector.visible = false
+					ssrPass.selects = null
 				}
-			})
-			gui.add(params, 'isOrbitControls').onChange(() => {
-				controls.enabled = params.isOrbitControls
 			})
 			gui.add(params, 'isOtherMeshes').onChange(() => {
 				if (params.isOtherMeshes) {
@@ -265,15 +274,15 @@
 
 		function render() {
 
-			if(params.isOrbitControls){
-				controls.update()
-			}else {
+			if(params.autoRotate){
 				const timer = Date.now() * 0.0003;
 
 				camera.position.x = Math.sin(timer) * 0.5;
 				camera.position.y = 0.25;
 				camera.position.z = Math.cos(timer) * 0.5;
 				camera.lookAt(0, 0.1, 0);
+			}else {
+				controls.update()
 			}
 
 			if (params.enableSSR) {
