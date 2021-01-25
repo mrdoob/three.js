@@ -70,6 +70,11 @@ var SSRShader = {
 		uniform mat4 cameraInverseProjectionMatrix;
 		uniform float thickTolerance;
 		#include <packing>
+		float pointToLineDistance(vec3 x0, vec3 x1, vec3 x2) {
+			//x0: point, x1: linePointA, x2: linePointB
+			//https://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+			return length(cross(x0-x1,x0-x2))/length(x2-x1);
+		}
 		float pointPlaneDistance(vec3 point,vec3 planePoint,vec3 planeNormal){
 			// https://mathworld.wolfram.com/Point-PlaneDistance.html
 			//// https://en.wikipedia.org/wiki/Plane_(geometry)
@@ -178,20 +183,23 @@ var SSRShader = {
 				float fresnel=(dot(viewIncidenceDir,viewReflectDir)+1.)/2.;
 
 				#ifdef isPerspectiveCamera
-					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
-					float recipVPZ=1./viewPosition.z;
-					float viewReflectRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
-					// float sD=surfDist*cW;
-					float sD=surfDist*cW*(1.+pow(fresnel,20.)*9.);
+					#ifdef isInfiniteThick
+						// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
+						float recipVPZ=1./viewPosition.z;
+						float viewReflectRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
+					#endif
+					float sD=surfDist*cW;
 				#else
-				float viewReflectRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
+					#ifdef isInfiniteThick
+						float viewReflectRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
+					#endif
 					float sD=surfDist;
 				#endif
 
 				#ifdef isInfiniteThick
 					if(viewReflectRayZ+thickTolerance*clipW<vP.z) break;
 				#endif
-				float away=abs(viewReflectRayZ-vZ);
+				float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
 
 				float op=opacity;
 
