@@ -116,6 +116,9 @@ function WebXRManager( renderer, gl ) {
 
 		inputSourcesMap.clear();
 
+		_currentDepthNear = null;
+		_currentDepthFar = null;
+
 		//
 
 		renderer.setFramebuffer( null );
