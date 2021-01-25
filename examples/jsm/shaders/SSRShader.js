@@ -15,7 +15,6 @@ var SSRShader = {
     isDistanceAttenuation: true,
     isFresnel: true,
     isInfiniteThick: false,
-    isNoise: false,
     isSelective: false,
   },
 
@@ -35,7 +34,6 @@ var SSRShader = {
     "cameraRange": { value: 0 },
     "surfDist": { value: .007 },
     "thickTolerance": { value: .03 },
-    "noiseIntensity": { value: .1 },
 
   },
 
@@ -71,7 +69,6 @@ var SSRShader = {
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
 		uniform float thickTolerance;
-		uniform float noiseIntensity;
 		#include <packing>
 		float pointPlaneDistance(vec3 point,vec3 planePoint,vec3 planeNormal){
 			// https://mathworld.wolfram.com/Point-PlaneDistance.html
@@ -133,11 +130,6 @@ var SSRShader = {
 			vec2 d1;
 
 			vec3 viewNormal=getViewNormal( vUv );
-
-			#ifdef isNoise
-				viewNormal+=(hash3(viewPosition.x+viewPosition.y+viewPosition.z)-.5)*noiseIntensity;
-				viewNormal=normalize(viewNormal);
-			#endif
 
 			#ifdef isPerspectiveCamera
 				vec3 viewIncidenceDir=normalize(viewPosition);
