@@ -15,10 +15,12 @@ import { BufferGeometry } from './BufferGeometry';
 import { Intersection } from './Raycaster';
 import { AnimationClip } from '../animation/AnimationClip';
 
+type AliasObject3D = Object3D;
+
 /**
  * Base class for scene graph objects
  */
-export class Object3D extends EventDispatcher {
+export class Object3D<TChild extends Object3D = AliasObject3D> extends EventDispatcher {
 
 	constructor();
 
@@ -53,7 +55,7 @@ export class Object3D extends EventDispatcher {
 	 * Array with object's children.
 	 * @default []
 	 */
-	children: Object3D[];
+	children: TChild[];
 
 	/**
 	 * Up direction.
@@ -315,12 +317,12 @@ export class Object3D extends EventDispatcher {
 	/**
 	 * Adds object as child of this object.
 	 */
-	add( ...object: Object3D[] ): this;
+	add( ...object: TChild[] ): this;
 
 	/**
 	 * Removes object as child of this object.
 	 */
-	remove( ...object: Object3D[] ): this;
+	remove( ...object: TChild[] ): this;
 
 	/**
 	 * Removes all child objects.
@@ -330,21 +332,21 @@ export class Object3D extends EventDispatcher {
 	/**
 	 * Adds object as a child of this, while maintaining the object's world transform.
 	 */
-	attach( object: Object3D ): this;
+	attach( object: TChild ): this;
 
 	/**
 	 * Searches through the object's children and returns the first with a matching id.
 	 * @param id	Unique number of the object instance
 	 */
-	getObjectById( id: number ): Object3D | undefined;
+	getObjectById( id: number ): TChild | undefined;
 
 	/**
 	 * Searches through the object's children and returns the first with a matching name.
 	 * @param name	String to match to the children's Object3d.name property.
 	 */
-	getObjectByName( name: string ): Object3D | undefined;
+	getObjectByName( name: string ): TChild | undefined;
 
-	getObjectByProperty( name: string, value: string ): Object3D | undefined;
+	getObjectByProperty( name: string, value: string ): TChild | undefined;
 
 	getWorldPosition( target: Vector3 ): Vector3;
 	getWorldQuaternion( target: Quaternion ): Quaternion;
