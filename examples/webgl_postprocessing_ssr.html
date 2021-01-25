@@ -77,9 +77,10 @@
 			scene.fog = new THREE.Fog(0x443333, 1, 4);
 
 			// Ground
+			const planeMaterial = new THREE.MeshPhongMaterial({ color: 0x999999, specular: 0x101010 })
 			const plane = new THREE.Mesh(
 				new THREE.PlaneGeometry(8, 8),
-				new THREE.MeshPhongMaterial({ color: 0x999999, specular: 0x101010 })
+				planeMaterial
 			);
 			plane.rotation.x = - Math.PI / 2;
 			plane.position.y = 0.0365;
@@ -149,7 +150,7 @@
 					color: 0x888888,
 					useDepthTexture: true,
 				});
-				reflector.position.y = plane.position.y + .0001;
+				reflector.position.y = plane.position.y;
 				reflector.rotation.x = -Math.PI / 2
 				reflector.visible = params.isReflector
 				scene.add(reflector);
@@ -208,9 +209,11 @@
 				if (params.isReflector) {
 					reflector.visible = true
 					ssrPass.selects = selects
+					planeMaterial.depthWrite = false
 				} else {
 					reflector.visible = false
 					ssrPass.selects = null
+					planeMaterial.depthWrite = true
 				}
 			})
 			gui.add(params, 'isOtherMeshes').onChange(() => {
@@ -237,8 +240,8 @@
 			ssrPass.opacity = .8
 			gui.add(ssrPass, 'opacity').min(0).max(1);
 			if (isPerspectiveCamera) {
-				ssrPass.surfDist = 0.0021
-				gui.add(ssrPass, 'surfDist').min(0).max(.02).step(.0001);
+				ssrPass.surfDist = 0.0015
+				gui.add(ssrPass, 'surfDist').min(0).max(.005).step(.0001);
 			} else {
 				ssrPass.surfDist = 2
 				gui.add(ssrPass, 'surfDist').min(0).max(7).step(.01);
