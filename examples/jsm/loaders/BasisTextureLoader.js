@@ -42,6 +42,7 @@ var BasisTextureLoader = function ( manager ) {
 	this.workerNextTaskID = 1;
 	this.workerSourceURL = '';
 	this.workerConfig = null;
+
 };
 
 BasisTextureLoader.taskCache = new WeakMap();
@@ -123,7 +124,7 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 	/** Low-level transcoding API, exposed for use by KTX2Loader. */
 	parseInternalAsync: function ( options ) {
 
-		var { levels, hasAlpha, basisFormat } = options;
+		var { levels } = options;
 
 		var buffers = new Set();
 
@@ -172,8 +173,6 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 			} )
 			.then( ( message ) => {
-
-				var config = this.workerConfig;
 
 				var { mipmaps, width, height, format } = message;
 
@@ -449,7 +448,7 @@ BasisTextureLoader.BasisWorker = function () {
 
 	}
 
-	function transcodeLowLevel ( taskConfig ) {
+	function transcodeLowLevel( taskConfig ) {
 
 		var { basisFormat, width, height, hasAlpha } = taskConfig;
 
@@ -536,7 +535,7 @@ BasisTextureLoader.BasisWorker = function () {
 					hasAlpha,
 					false,
 					0, 0,
-					-1, -1
+					- 1, - 1
 				);
 
 				assert( ok, 'THREE.BasisTextureLoader: transcodeUASTCImage() failed for level ' + level.index + '.' );
@@ -630,64 +629,72 @@ BasisTextureLoader.BasisWorker = function () {
 	var FORMAT_OPTIONS = [
 		{
 			if: 'astcSupported',
-			basisFormat: [BasisFormat.UASTC_4x4],
-			transcoderFormat: [TranscoderFormat.ASTC_4x4, TranscoderFormat.ASTC_4x4],
-			engineFormat: [EngineFormat.RGBA_ASTC_4x4_Format, EngineFormat.RGBA_ASTC_4x4_Format],
+			basisFormat: [ BasisFormat.UASTC_4x4 ],
+			transcoderFormat: [ TranscoderFormat.ASTC_4x4, TranscoderFormat.ASTC_4x4 ],
+			engineFormat: [ EngineFormat.RGBA_ASTC_4x4_Format, EngineFormat.RGBA_ASTC_4x4_Format ],
 			priorityETC1S: Infinity,
 			priorityUASTC: 1,
 			needsPowerOfTwo: false,
 		},
 		{
 			if: 'bptcSupported',
-			basisFormat: [BasisFormat.ETC1S, BasisFormat.UASTC_4x4],
-			transcoderFormat: [TranscoderFormat.BC7_M5, TranscoderFormat.BC7_M5],
-			engineFormat: [EngineFormat.RGBA_BPTC_Format, EngineFormat.RGBA_BPTC_Format],
+			basisFormat: [ BasisFormat.ETC1S, BasisFormat.UASTC_4x4 ],
+			transcoderFormat: [ TranscoderFormat.BC7_M5, TranscoderFormat.BC7_M5 ],
+			engineFormat: [ EngineFormat.RGBA_BPTC_Format, EngineFormat.RGBA_BPTC_Format ],
 			priorityETC1S: 3,
 			priorityUASTC: 2,
 			needsPowerOfTwo: false,
 		},
 		{
 			if: 'dxtSupported',
-			basisFormat: [BasisFormat.ETC1S, BasisFormat.UASTC_4x4],
-			transcoderFormat: [TranscoderFormat.BC1, TranscoderFormat.BC3],
-			engineFormat: [EngineFormat.RGB_S3TC_DXT1_Format, EngineFormat.RGBA_S3TC_DXT5_Format],
+			basisFormat: [ BasisFormat.ETC1S, BasisFormat.UASTC_4x4 ],
+			transcoderFormat: [ TranscoderFormat.BC1, TranscoderFormat.BC3 ],
+			engineFormat: [ EngineFormat.RGB_S3TC_DXT1_Format, EngineFormat.RGBA_S3TC_DXT5_Format ],
 			priorityETC1S: 4,
 			priorityUASTC: 5,
 			needsPowerOfTwo: false,
 		},
 		{
 			if: 'etc2Supported',
-			basisFormat: [BasisFormat.ETC1S, BasisFormat.UASTC_4x4],
-			transcoderFormat: [TranscoderFormat.ETC1, TranscoderFormat.ETC2],
-			engineFormat: [EngineFormat.RGB_ETC2_Format, EngineFormat.RGBA_ETC2_EAC_Format],
+			basisFormat: [ BasisFormat.ETC1S, BasisFormat.UASTC_4x4 ],
+			transcoderFormat: [ TranscoderFormat.ETC1, TranscoderFormat.ETC2 ],
+			engineFormat: [ EngineFormat.RGB_ETC2_Format, EngineFormat.RGBA_ETC2_EAC_Format ],
 			priorityETC1S: 1,
 			priorityUASTC: 3,
 			needsPowerOfTwo: false,
 		},
 		{
 			if: 'etc1Supported',
-			basisFormat: [BasisFormat.ETC1S, BasisFormat.UASTC_4x4],
-			transcoderFormat: [TranscoderFormat.ETC1, TranscoderFormat.ETC1],
-			engineFormat: [EngineFormat.RGB_ETC1_Format, EngineFormat.RGB_ETC1_Format],
+			basisFormat: [ BasisFormat.ETC1S, BasisFormat.UASTC_4x4 ],
+			transcoderFormat: [ TranscoderFormat.ETC1, TranscoderFormat.ETC1 ],
+			engineFormat: [ EngineFormat.RGB_ETC1_Format, EngineFormat.RGB_ETC1_Format ],
 			priorityETC1S: 2,
 			priorityUASTC: 4,
 			needsPowerOfTwo: false,
 		},
 		{
 			if: 'pvrtcSupported',
-			basisFormat: [BasisFormat.ETC1S, BasisFormat.UASTC_4x4],
-			transcoderFormat: [TranscoderFormat.PVRTC1_4_RGB, TranscoderFormat.PVRTC1_4_RGBA],
-			engineFormat: [EngineFormat.RGB_PVRTC_4BPPV1_Format, EngineFormat.RGBA_PVRTC_4BPPV1_Format],
+			basisFormat: [ BasisFormat.ETC1S, BasisFormat.UASTC_4x4 ],
+			transcoderFormat: [ TranscoderFormat.PVRTC1_4_RGB, TranscoderFormat.PVRTC1_4_RGBA ],
+			engineFormat: [ EngineFormat.RGB_PVRTC_4BPPV1_Format, EngineFormat.RGBA_PVRTC_4BPPV1_Format ],
 			priorityETC1S: 5,
 			priorityUASTC: 6,
 			needsPowerOfTwo: true,
 		},
 	];
 
-	var ETC1S_OPTIONS = FORMAT_OPTIONS.sort( function ( a, b ) { return a.priorityETC1S - b.priorityETC1S; } );
-	var UASTC_OPTIONS = FORMAT_OPTIONS.sort( function ( a, b ) { return a.priorityUASTC - b.priorityUASTC; } );
+	var ETC1S_OPTIONS = FORMAT_OPTIONS.sort( function ( a, b ) {
 
-	function getTranscoderFormat ( basisFormat, width, height, hasAlpha ) {
+		return a.priorityETC1S - b.priorityETC1S;
+
+	} );
+	var UASTC_OPTIONS = FORMAT_OPTIONS.sort( function ( a, b ) {
+
+		return a.priorityUASTC - b.priorityUASTC;
+
+	} );
+
+	function getTranscoderFormat( basisFormat, width, height, hasAlpha ) {
 
 		var transcoderFormat;
 		var engineFormat;
@@ -718,25 +725,25 @@ BasisTextureLoader.BasisWorker = function () {
 
 	}
 
-	function assert ( ok, message ) {
+	function assert( ok, message ) {
 
 		if ( ! ok ) throw new Error( message );
 
 	}
 
-	function getWidthInBlocks ( transcoderFormat, width ) {
+	function getWidthInBlocks( transcoderFormat, width ) {
 
 		return Math.ceil( width / BasisModule.getFormatBlockWidth( transcoderFormat ) );
 
 	}
 
-	function getHeightInBlocks ( transcoderFormat, height ) {
+	function getHeightInBlocks( transcoderFormat, height ) {
 
 		return Math.ceil( height / BasisModule.getFormatBlockHeight( transcoderFormat ) );
 
 	}
 
-	function getTranscodedImageByteLength ( transcoderFormat, width, height ) {
+	function getTranscodedImageByteLength( transcoderFormat, width, height ) {
 
 		var blockByteLength = BasisModule.getBytesPerBlockOrPixel( transcoderFormat );
 
@@ -764,7 +771,7 @@ BasisTextureLoader.BasisWorker = function () {
 
 	}
 
-	function isPowerOfTwo ( value ) {
+	function isPowerOfTwo( value ) {
 
 		if ( value <= 2 ) return true;
 
