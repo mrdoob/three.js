@@ -163,7 +163,7 @@ class Color {
 
 		let m;
 
-		if ( m = /^((?:rgb|hsl)a?)\(\s*([^\)]*)\)/.exec( style ) ) {
+		if ( m = /^((?:rgb|hsl)a?)\(\s*([^\)\s]*)\)/.exec( style ) ) {
 
 			// rgb / hsl
 
