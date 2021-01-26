@@ -114,10 +114,6 @@ var SSRShader = {
 			xy*=resolution;//screen
 			return xy;
 		}
-		vec3 hash3( float n ){
-			// http://glslsandbox.com/e#61476.1
-			return fract(sin(vec3(n,n+1.0,n+2.0))*vec3(43758.5453123,22578.1459123,19642.3490423));
-		}
 		void main(){
 			#ifdef isSelective
 				float metalness=texture2D(tMetalness,vUv).r;
@@ -180,21 +176,16 @@ var SSRShader = {
 				float cW = cameraProjectionMatrix[2][3] * vZ+cameraProjectionMatrix[3][3];
 				vec3 vP=getViewPosition( uv, d, cW );
 
-				float fresnel=(dot(viewIncidenceDir,viewReflectDir)+1.)/2.;
-
 				#ifdef isPerspectiveCamera
-					#ifdef isInfiniteThick
-						// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
-						float recipVPZ=1./viewPosition.z;
-						float viewReflectRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
-					#endif
+					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
+					float recipVPZ=1./viewPosition.z;
+					float viewReflectRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
 					float sD=surfDist*cW;
 				#else
-					#ifdef isInfiniteThick
-						float viewReflectRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
-					#endif
+					float viewReflectRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
 					float sD=surfDist;
 				#endif
+				if(viewReflectRayZ-sD>vZ) continue;
 
 				#ifdef isInfiniteThick
 					if(viewReflectRayZ+thickTolerance*clipW<vP.z) break;
@@ -214,6 +205,7 @@ var SSRShader = {
 						op=opacity*attenuation;
 					#endif
 					#ifdef isFresnel
+						float fresnel=(dot(viewIncidenceDir,viewReflectDir)+1.)/2.;
 						op*=fresnel;
 					#endif
 					vec4 reflectColor=texture2D(tDiffuse,uv);
