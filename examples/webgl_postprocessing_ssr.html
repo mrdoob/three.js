@@ -17,14 +17,6 @@
 		<a href="https://github.com/mrdoob/three.js/pull/20156" target="_blank" rel="noopener">SSRPass</a> demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
 	</div>
 
-	<!-- <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
-<script>
-  var vConsole = new VConsole();
-</script> -->
-
-	<!-- <script>window.THREE=true</script> -->
-	<!-- <script src="/lib/vs_util/vs_util.js"></script> -->
-
 	<script type="module">
 		import * as THREE from '../build/three.module.js';
 
@@ -55,6 +47,7 @@
 		let camera, scene, renderer;
 		let otherMeshes = []
 		let reflector
+		let reflectorRenderTarget
 		let selects=[]
 
 		const container = document.querySelector('#container');
@@ -141,7 +134,7 @@
 				selects.push(mesh)
 			}
 			{
-				const geometry = new THREE.PlaneBufferGeometry(100, 100);
+				const geometry = new THREE.PlaneBufferGeometry(8, 8);
 				reflector = new Reflector(geometry, {
 					clipBias: 0.003,
 					textureWidth: window.innerWidth,
@@ -149,6 +142,7 @@
 					color: 0x888888,
 					useDepthTexture: true,
 				});
+				reflectorRenderTarget = reflector.getRenderTarget()
 				reflector.position.y = plane.position.y + .0001;
 				reflector.rotation.x = -Math.PI / 2
 				reflector.visible = params.isReflector
@@ -228,7 +222,7 @@
 				'Beauty': SSRPass.OUTPUT.Beauty,
 				'Depth': SSRPass.OUTPUT.Depth,
 				'Normal': SSRPass.OUTPUT.Normal,
-				// 'Metalness': SSRPass.OUTPUT.Metalness,
+				'Metalness': SSRPass.OUTPUT.Metalness,
 			}).onChange(function (value) {
 
 				ssrPass.output = parseInt(value);
@@ -257,6 +251,7 @@
 
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			composer.setSize(window.innerWidth, window.innerHeight);
+			reflectorRenderTarget.setSize(window.innerWidth, window.innerHeight);
 
 		}
 

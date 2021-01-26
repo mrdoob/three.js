@@ -37,21 +37,21 @@ var SSRShader = {
 
   },
 
-  vertexShader: [
+  vertexShader: /* glsl */`
 
-    "varying vec2 vUv;",
+    varying vec2 vUv;
 
-    "void main() {",
+    void main() {
 
-    "	vUv = uv;",
+			vUv = uv;
 
-    "	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-    "}"
+    }
 
-  ].join("\n"),
+  `,
 
-  fragmentShader: `
+  fragmentShader: /* glsl */`
 		// precision highp float;
 		precision highp sampler2D;
 		varying vec2 vUv;
@@ -233,54 +233,54 @@ var SSRDepthShader = {
 
   },
 
-  vertexShader: [
+  vertexShader: /* glsl */`
 
-    "varying vec2 vUv;",
+    varying vec2 vUv;
 
-    "void main() {",
+    void main() {
 
-    "	vUv = uv;",
-    "	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+    	vUv = uv;
+    	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-    "}"
+    }
 
-  ].join("\n"),
+  `,
 
-  fragmentShader: [
+  fragmentShader: /* glsl */`
 
-    "uniform sampler2D tDepth;",
+    uniform sampler2D tDepth;
 
-    "uniform float cameraNear;",
-    "uniform float cameraFar;",
+    uniform float cameraNear;
+    uniform float cameraFar;
 
-    "varying vec2 vUv;",
+    varying vec2 vUv;
 
-    "#include <packing>",
+    #include <packing>
 
-		"float getLinearDepth( const in vec2 uv ) {",
+		float getLinearDepth( const in vec2 uv ) {
 
-		"	#if PERSPECTIVE_CAMERA == 1",
+			#if PERSPECTIVE_CAMERA == 1
 
-		"		float fragCoordZ = texture2D( tDepth, uv ).x;",
-		"		float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );",
-		"		return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );",
+				float fragCoordZ = texture2D( tDepth, uv ).x;
+				float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
+				return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
 
-		"	#else",
+			#else
 
-		"		return texture2D( tDepth, uv ).x;",
+				return texture2D( tDepth, uv ).x;
 
-		"	#endif",
+			#endif
 
-		"}",
+		}
 
-    "void main() {",
+    void main() {
 
-    "	float depth = getLinearDepth( vUv );",
-    "	gl_FragColor = vec4( vec3( 1.0 - depth ), 1.0 );",
+    	float depth = getLinearDepth( vUv );
+    	gl_FragColor = vec4( vec3( 1.0 - depth ), 1.0 );
 
-    "}"
+    }
 
-  ].join("\n")
+  `
 
 };
 
@@ -294,20 +294,20 @@ var SSRBlurShader = {
 
   },
 
-  vertexShader: [
+  vertexShader: /* glsl */`
 
-    "varying vec2 vUv;",
+    varying vec2 vUv;
 
-    "void main() {",
+    void main() {
 
-    "	vUv = uv;",
-    "	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+    	vUv = uv;
+    	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-    "}"
+    }
 
-  ].join("\n"),
+  `,
 
-  fragmentShader: `
+  fragmentShader: /* glsl */`
 
     uniform sampler2D tDiffuse;
     uniform vec2 resolution;
