@@ -620,6 +620,7 @@ THREE.GLTFLoader = ( function () {
 
 				var scale = extension.clearcoatNormalTexture.scale;
 
+				// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
 				materialParams.clearcoatNormalScale = new THREE.Vector2( scale, -scale );
 
 			}
@@ -2774,6 +2775,7 @@ THREE.GLTFLoader = ( function () {
 
 			pending.push( parser.assignTexture( materialParams, 'normalMap', materialDef.normalTexture ) );
 
+			// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
 			materialParams.normalScale = new THREE.Vector2( 1, -1 );
 
 			if ( materialDef.normalTexture.scale !== undefined ) {
