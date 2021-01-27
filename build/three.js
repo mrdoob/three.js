@@ -785,7 +785,7 @@
 		Function("r", "regeneratorRuntime = r")(runtime);
 	}
 
-	var REVISION = '125dev';
+	var REVISION = '125';
 	var MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
