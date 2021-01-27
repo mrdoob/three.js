@@ -1189,6 +1189,10 @@
 		lerp: function lerp(x, y, t) {
 			return (1 - t) * x + t * y;
 		},
+		// http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/
+		damp: function damp(x, y, lambda, dt) {
+			return MathUtils.lerp(x, y, 1 - Math.exp(-lambda * dt));
+		},
 		// https://www.desmos.com/calculator/vcsjnyz7x4
 		pingpong: function pingpong(x, length) {
 			if (length === void 0) {
@@ -7263,7 +7267,7 @@
 
 			var m;
 
-			if (m = /^((?:rgb|hsl)a?)\(\s*([^\)]*)\)/.exec(style)) {
+			if (m = /^((?:rgb|hsl)a?)\(([^\)]*)\)/.exec(style)) {
 				// rgb / hsl
 				var color;
 				var name = m[1];
@@ -7272,7 +7276,7 @@
 				switch (name) {
 					case 'rgb':
 					case 'rgba':
-						if (color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec(components)) {
+						if (color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec(components)) {
 							// rgb(255,0,0) rgba(255,0,0,0.5)
 							this.r = Math.min(255, parseInt(color[1], 10)) / 255;
 							this.g = Math.min(255, parseInt(color[2], 10)) / 255;
@@ -7281,7 +7285,7 @@
 							return this;
 						}
 
-						if (color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec(components)) {
+						if (color = /^\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec(components)) {
 							// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
 							this.r = Math.min(100, parseInt(color[1], 10)) / 100;
 							this.g = Math.min(100, parseInt(color[2], 10)) / 100;
@@ -7294,7 +7298,7 @@
 
 					case 'hsl':
 					case 'hsla':
-						if (color = /^(\d*\.?\d+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec(components)) {
+						if (color = /^\s*(\d*\.?\d+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec(components)) {
 							// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
 							var h = parseFloat(color[1]) / 360;
 							var s = parseInt(color[2], 10) / 100;
@@ -17345,7 +17349,9 @@
 			inputSourcesMap.forEach(function (controller, inputSource) {
 				controller.disconnect(inputSource);
 			});
-			inputSourcesMap.clear(); //
+			inputSourcesMap.clear();
+			_currentDepthNear = null;
+			_currentDepthFar = null; //
 
 			renderer.setFramebuffer(null);
 			renderer.setRenderTarget(renderer.getRenderTarget()); // Hack #15830
@@ -17570,6 +17576,8 @@
 
 
 			camera.matrixWorld.copy(cameraVR.matrixWorld);
+			camera.matrix.copy(cameraVR.matrix);
+			camera.matrix.decompose(camera.position, camera.quaternion, camera.scale);
 			var children = camera.children;
 
 			for (var _i3 = 0, l = children.length; _i3 < l; _i3++) {
@@ -26799,6 +26807,14 @@
 				texture.magFilter = texData.magFilter !== undefined ? texData.magFilter : LinearFilter;
 				texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearFilter;
 				texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
+
+				if (texData.encoding !== undefined) {
+					texture.encoding = texData.encoding;
+				}
+
+				if (texData.flipY !== undefined) {
+					texture.flipY = texData.flipY;
+				}
 
 				if (texData.format !== undefined) {
 					texture.format = texData.format;

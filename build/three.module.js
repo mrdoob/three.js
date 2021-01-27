@@ -349,6 +349,14 @@ const MathUtils = {
 
 	},
 
+	// http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/
+
+	damp: function ( x, y, lambda, dt ) {
+
+		return MathUtils.lerp( x, y, 1 - Math.exp( - lambda * dt ) );
+
+	},
+
 	// https://www.desmos.com/calculator/vcsjnyz7x4
 
 	pingpong: function ( x, length = 1 ) {
@@ -7958,7 +7966,7 @@ class Color {
 
 		let m;
 
-		if ( m = /^((?:rgb|hsl)a?)\(\s*([^\)]*)\)/.exec( style ) ) {
+		if ( m = /^((?:rgb|hsl)a?)\(([^\)]*)\)/.exec( style ) ) {
 
 			// rgb / hsl
 
@@ -7971,7 +7979,7 @@ class Color {
 				case 'rgb':
 				case 'rgba':
 
-					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// rgb(255,0,0) rgba(255,0,0,0.5)
 						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
@@ -7984,7 +7992,7 @@ class Color {
 
 					}
 
-					if ( color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
 						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
@@ -8002,7 +8010,7 @@ class Color {
 				case 'hsl':
 				case 'hsla':
 
-					if ( color = /^(\d*\.?\d+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
 						const h = parseFloat( color[ 1 ] ) / 360;
@@ -21858,6 +21866,9 @@ function WebXRManager( renderer, gl ) {
 
 		inputSourcesMap.clear();
 
+		_currentDepthNear = null;
+		_currentDepthFar = null;
+
 		//
 
 		renderer.setFramebuffer( null );
@@ -22109,6 +22120,8 @@ function WebXRManager( renderer, gl ) {
 		// update camera and its children
 
 		camera.matrixWorld.copy( cameraVR.matrixWorld );
+		camera.matrix.copy( cameraVR.matrix );
+		camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
 
 		const children = camera.children;
 
@@ -34805,6 +34818,18 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 			texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearFilter;
 
 			texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
+
+			if ( texData.encoding !== undefined ) {
+
+				texture.encoding = texData.encoding;
+
+			}
+
+			if ( texData.flipY !== undefined ) {
+
+				texture.flipY = texData.flipY;
+
+			}
 
 			if ( texData.format !== undefined ) {
 
