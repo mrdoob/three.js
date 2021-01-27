@@ -25,7 +25,7 @@ THREE.Sky = function () {
 		depthWrite: false
 	} );
 
-	THREE.Mesh.call( this, new THREE.BoxBufferGeometry( 1, 1, 1 ), material );
+	THREE.Mesh.call( this, new THREE.BoxGeometry( 1, 1, 1 ), material );
 
 };
 

@@ -1,12 +1,8 @@
 import {
-	BufferGeometry,
 	Color,
 	DoubleSide,
-	Geometry,
 	Matrix4,
-	Mesh,
-	MeshBasicMaterial,
-	MeshLambertMaterial
+	MeshBasicMaterial
 } from '../../../build/three.module.js';
 
 /**
@@ -212,9 +208,10 @@ ColladaExporter.prototype = {
 
 				// convert the geometry to bufferGeometry if it isn't already
 				var bufferGeometry = g;
-				if ( bufferGeometry instanceof Geometry ) {
 
-					bufferGeometry = ( new BufferGeometry() ).fromGeometry( bufferGeometry );
+				if ( bufferGeometry.isBufferGeometry !== true ) {
+
+					throw new Error( 'THREE.ColladaExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 				}
 
@@ -374,11 +371,11 @@ ColladaExporter.prototype = {
 
 				var type = 'phong';
 
-				if ( m instanceof MeshLambertMaterial ) {
+				if ( m.isMeshLambertMaterial === true ) {
 
 					type = 'lambert';
 
-				} else if ( m instanceof MeshBasicMaterial ) {
+				} else if ( m.isMeshBasicMaterial === true ) {
 
 					type = 'constant';
 
@@ -554,7 +551,7 @@ ColladaExporter.prototype = {
 
 			node += getTransform( o );
 
-			if ( o instanceof Mesh && o.geometry != null ) {
+			if ( o.isMesh === true && o.geometry !== null ) {
 
 				// function returns the id associated with the mesh and a "BufferGeometry" version
 				// of the geometry in case it's not a geometry.

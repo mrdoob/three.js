@@ -94,8 +94,8 @@
 
 					lightProbe.copy( LightProbeGenerator.fromCubeTexture( cubeTexture ) );
 
-					const geometry = new THREE.SphereBufferGeometry( 5, 64, 32 );
-					//const geometry = new TorusKnotBufferGeometry( 4, 1.5, 256, 32, 2, 3 );
+					const geometry = new THREE.SphereGeometry( 5, 64, 32 );
+					//const geometry = new THREE.TorusKnotGeometry( 4, 1.5, 256, 32, 2, 3 );
 
 					const material = new THREE.MeshStandardMaterial( {
 						color: 0xffffff,
@@ -150,7 +150,7 @@
 				fl.open();
 
 				// listener
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -80,7 +80,7 @@
 		<h3>[property:Boolean autoRotate]</h3>
 		<p>
 			대상 주위를 자동으로 회전하려면 true로 설정합니다.<br> autoRotate를 활성할 경우, 애니메이션 루프에서 [page:.update()]를 호출해야 합니다.
-			
+
 		</p>
 
 		<h3>[property:Float autoRotateSpeed]</h3>
@@ -110,11 +110,6 @@
 			만약 enableDamping을 활성화 할 경우, 애니메이션 루프에서 [page:.update]를 호출해야 합니다.
 		</p>
 
-		<h3>[property:Boolean enableKeys]</h3>
-		<p>
-			키보드 컨트롤의 활성화 또는 비활성화를 설정합니다. 기본값은 *true* 입니다.
-		</p>
-
 		<h3>[property:Boolean enablePan]</h3>
 		<p>
 			카매라 패닝의 활성화 또는 비활성화를 설정합니다. 기본값은 *true* 입니다.
@@ -123,9 +118,9 @@
 		<h3>[property:Boolean enableRotate]</h3>
 		<p>
 			카메라의 수직 및 수평 회전의 활성화 또는 비활성화를 설정합니다. 기본값은 *true* 입니다.<br>
-			[page:.minPolarAngle polar angle] 또는 page:.minAzimuthAngle azimuth angle]의 최소 및 최대를 동일한 값으로 설정하여 단일 축을 비활성화 할 수 있습니다. 
+			[page:.minPolarAngle polar angle] 또는 page:.minAzimuthAngle azimuth angle]의 최소 및 최대를 동일한 값으로 설정하여 단일 축을 비활성화 할 수 있습니다.
 			그러면 수직 또는 수평 회전이 해당 값으로 고정됩니다.
-			
+
 		</p>
 
 		<h3>[property:Boolean enableZoom]</h3>
@@ -148,7 +143,7 @@ controls.keys = {
 	RIGHT: 39, // 오른쪽 화살표
 	BOTTOM: 40 // 아래쪽 화살표
 }
-			 </code> 
+			 </code>
 			 전체 키코드 목록은 [link:https://developer.mozilla.org/ko/docs/Web/API/KeyboardEvent/keyCode this page] 를 참조하세요.
 		</p>
 
@@ -281,6 +276,11 @@ controls.touches = {
 		<h3>[method:radians getPolarAngle] ()</h3>
 		<p>
 			라디안 단위로 현재 수직 회전값을 가져옵니다.
+		</p>
+
+		<h3>[method:void listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			Adds key event listeners to the given DOM element. *window* is a recommended argument for using this method.
 		</p>
 
 		<h3>[method:null reset] ()</h3>

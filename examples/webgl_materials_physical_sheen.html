@@ -77,7 +77,7 @@
 				//
 
 				sphere = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 1, 100, 100 ),
+					new THREE.SphereGeometry( 1, 100, 100 ),
 					material
 				);
 				scene.add( sphere );
@@ -100,7 +100,7 @@
 				directionalLight.castShadow = true;
 				directionalLight.add(
 					new THREE.Mesh(
-						new THREE.SphereBufferGeometry( .5 ),
+						new THREE.SphereGeometry( .5 ),
 						new THREE.MeshBasicMaterial( { color: 0xffffff } )
 					)
 				);
@@ -112,7 +112,7 @@
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				const gui = new GUI();
 

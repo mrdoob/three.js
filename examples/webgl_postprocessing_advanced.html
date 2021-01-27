@@ -99,7 +99,7 @@
 					depthTest: false
 				} );
 
-				quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), materialColor );
+				quadBG = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), materialColor );
 				quadBG.position.z = - 500;
 				quadBG.scale.set( width, height, 1 );
 				sceneBG.add( quadBG );
@@ -108,7 +108,7 @@
 
 				const sceneMask = new THREE.Scene();
 
-				quadMask = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
+				quadMask = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				quadMask.position.z = - 300;
 				quadMask.scale.set( width / 2, height / 2, 1 );
 				sceneMask.add( quadMask );
@@ -247,7 +247,7 @@
 
 				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.texture;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

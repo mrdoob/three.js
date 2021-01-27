@@ -12,7 +12,7 @@ import {
 	Quaternion,
 	Vector3
 } from '../../../build/three.module.js';
-import { JSZip } from '../libs/jszip.module.min.js';
+import { unzipSync, strFromU8 } from '../libs/fflate.module.min.js';
 
 class TiltLoader extends Loader {
 
@@ -56,23 +56,23 @@ class TiltLoader extends Loader {
 		const group = new Group();
 		// https://docs.google.com/document/d/11ZsHozYn9FnWG7y3s3WAyKIACfbfwb4PbaS8cZ_xjvo/edit#
 
-		const zip = new JSZip( buffer.slice( 16 ) ); // eslint-disable-line no-undef
+		const zip = unzipSync( new Uint8Array( buffer.slice( 16 ) ) );
 
 		/*
-		const thumbnail = zip.files[ 'thumbnail.png' ].asArrayBuffer();
+		const thumbnail = zip[ 'thumbnail.png' ].buffer;
 		const img = document.createElement( 'img' );
 		img.src = URL.createObjectURL( new Blob( [ thumbnail ] ) );
 		document.body.appendChild( img );
 		*/
 
-		const metadata = JSON.parse( zip.files[ 'metadata.json' ].asText() );
+		const metadata = JSON.parse( strFromU8( zip[ 'metadata.json' ] ) );
 
 		/*
-		const blob = new Blob( [ zip.files[ 'data.sketch' ].asArrayBuffer() ], { type: 'application/octet-stream' } );
+		const blob = new Blob( [ zip[ 'data.sketch' ].buffer ], { type: 'application/octet-stream' } );
 		window.open( URL.createObjectURL( blob ) );
 		*/
 
-		const data = new DataView( zip.files[ 'data.sketch' ].asArrayBuffer() );
+		const data = new DataView( zip[ 'data.sketch' ].buffer );
 
 		const num_strokes = data.getInt32( 16, true );
 

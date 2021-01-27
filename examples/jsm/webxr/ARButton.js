@@ -40,13 +40,14 @@ class ARButton {
 
 			let currentSession = null;
 
-			function onSessionStarted( session ) {
+			async function onSessionStarted( session ) {
 
 				session.addEventListener( 'end', onSessionEnded );
 
 				renderer.xr.setReferenceSpaceType( 'local' );
-				renderer.xr.setSession( session );
 
+				await renderer.xr.setSession( session );
+        
 				button.textContent = 'STOP AR';
 				sessionInit.domOverlay.root.style.display = '';
 

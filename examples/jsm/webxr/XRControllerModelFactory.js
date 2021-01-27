@@ -3,7 +3,7 @@ import {
 	MeshBasicMaterial,
 	Object3D,
 	Quaternion,
-	SphereBufferGeometry,
+	SphereGeometry,
 } from '../../../build/three.module.js';
 
 import { GLTFLoader } from '../loaders/GLTFLoader.js';
@@ -127,7 +127,7 @@ function findNodes( motionController, scene ) {
 			if ( component.touchPointNode ) {
 
 				// Attach a touch dot to the touchpad.
-				const sphereGeometry = new SphereBufferGeometry( 0.001 );
+				const sphereGeometry = new SphereGeometry( 0.001 );
 				const material = new MeshBasicMaterial( { color: 0x0000FF } );
 				const sphere = new Mesh( sphereGeometry, material );
 				component.touchPointNode.add( sphere );

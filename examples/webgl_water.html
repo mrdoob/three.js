@@ -53,7 +53,7 @@
 
 				// mesh
 
-				const torusKnotGeometry = new THREE.TorusKnotBufferGeometry( 3, 1, 256, 32 );
+				const torusKnotGeometry = new THREE.TorusKnotGeometry( 3, 1, 256, 32 );
 				const torusKnotMaterial = new THREE.MeshNormalMaterial();
 
 				torusKnot = new THREE.Mesh( torusKnotGeometry, torusKnotMaterial );
@@ -63,7 +63,7 @@
 
 				// ground
 
-				const groundGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+				const groundGeometry = new THREE.PlaneGeometry( 20, 20 );
 				const groundMaterial = new THREE.MeshStandardMaterial( { roughness: 0.8, metalness: 0.4 } );
 				const ground = new THREE.Mesh( groundGeometry, groundMaterial );
 				ground.rotation.x = Math.PI * - 0.5;
@@ -83,7 +83,7 @@
 
 				// water
 
-				const waterGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+				const waterGeometry = new THREE.PlaneGeometry( 20, 20 );
 
 				water = new Water( waterGeometry, {
 					color: params.color,
@@ -163,11 +163,11 @@
 
 				//
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

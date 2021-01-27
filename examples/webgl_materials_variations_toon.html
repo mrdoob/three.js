@@ -53,7 +53,7 @@
 				const sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
 				const stepSize = 1.0 / numberOfSphersPerSide;
 
-				const geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
+				const geometry = new THREE.SphereGeometry( sphereRadius, 32, 16 );
 
 				for ( let alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
 
@@ -98,7 +98,7 @@
 
 				function addLabel( name, location ) {
 
-					const textGeo = new THREE.TextBufferGeometry( name, {
+					const textGeo = new THREE.TextGeometry( name, {
 
 						font: font,
 
@@ -122,7 +122,7 @@
 				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
 
 				particleLight = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 4, 8, 8 ),
+					new THREE.SphereGeometry( 4, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff } )
 				);
 				scene.add( particleLight );
@@ -153,7 +153,7 @@
 				controls.minDistance = 200;
 				controls.maxDistance = 2000;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

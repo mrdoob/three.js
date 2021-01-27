@@ -77,7 +77,7 @@
 			const NUM_SPHERES = 20;
 			const SPHERE_RADIUS = 0.2;
 
-			const sphereGeometry = new THREE.SphereBufferGeometry( SPHERE_RADIUS, 32, 32 );
+			const sphereGeometry = new THREE.SphereGeometry( SPHERE_RADIUS, 32, 32 );
 			const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0x888855, roughness: 0.8, metalness: 0.5 } );
 
 			const spheres = [];
@@ -110,19 +110,19 @@
 
 				keyStates[ event.code ] = true;
 
-			}, false );
+			} );
 
 			document.addEventListener( 'keyup', ( event ) => {
 
 				keyStates[ event.code ] = false;
 
-			}, false );
+			} );
 
 			document.addEventListener( 'mousedown', () => {
 
 				document.body.requestPointerLock();
 
-			}, false );
+			} );
 
 			document.body.addEventListener( 'mousemove', ( event ) => {
 
@@ -133,16 +133,18 @@
 
 				}
 
-			}, false );
+			} );
 
-			window.addEventListener( 'resize', () => {
+			window.addEventListener( 'resize', onWindowResize );
+
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			}, false );
+			}
 
 			document.addEventListener( 'click', () => {
 
@@ -155,7 +157,7 @@
 
 				sphereIdx = ( sphereIdx + 1 ) % spheres.length;
 
-			}, false );
+			} );
 
 			function playerCollitions() {
 

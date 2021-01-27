@@ -22,7 +22,7 @@ THREE.DRACOExporter.prototype = {
 
 	parse: function ( object, options ) {
 
-		if ( object.isBufferGeometry === true || object.isGeometry === true ) {
+		if ( object.isBufferGeometry === true ) {
 
 			throw new Error( 'DRACOExporter: The first parameter of parse() is now an instance of Mesh or Points.' );
 
@@ -57,17 +57,10 @@ THREE.DRACOExporter.prototype = {
 		var builder;
 		var dracoObject;
 
-		if ( geometry.isGeometry === true ) {
-
-			var bufferGeometry = new THREE.BufferGeometry();
-			bufferGeometry.setFromObject( object );
-			geometry = bufferGeometry;
-
-		}
 
 		if ( geometry.isBufferGeometry !== true ) {
 
-			throw new Error( 'THREE.DRACOExporter.parse(geometry, options): geometry is not a THREE.Geometry or THREE.BufferGeometry instance.' );
+			throw new Error( 'THREE.DRACOExporter.parse(geometry, options): geometry is not a THREE.BufferGeometry instance.' );
 
 		}
 

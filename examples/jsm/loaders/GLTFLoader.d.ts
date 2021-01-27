@@ -39,6 +39,8 @@ export class GLTFLoader extends Loader {
 	ddsLoader: DDSLoader | null;
 
 	load( url: string, onLoad: ( gltf: GLTF ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<GLTF>;
+
 	setDRACOLoader( dracoLoader: DRACOLoader ): GLTFLoader;
 	setDDSLoader( ddsLoader: DDSLoader ): GLTFLoader;
 
@@ -65,6 +67,7 @@ export class GLTFParser {
 
 	getDependency: ( type: string, index: number ) => Promise<any>;
 	getDependencies: ( type: string ) => Promise<any[]>;
+	assignFinalMaterial: ( object: Mesh ) => void;
 
 }
 

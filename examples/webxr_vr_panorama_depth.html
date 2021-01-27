@@ -40,7 +40,7 @@
 				scene.add( camera );
 
 				// Create the panoramic sphere geometery
-				const panoSphereGeo = new THREE.SphereBufferGeometry( 6, 256, 256 );
+				const panoSphereGeo = new THREE.SphereGeometry( 6, 256, 256 );
 
 				// Create the panoramic sphere material
 				const panoSphereMat = new THREE.MeshStandardMaterial( {
@@ -89,7 +89,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

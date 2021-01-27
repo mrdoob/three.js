@@ -21,6 +21,7 @@ function Strings( config ) {
 			'menubar/file/export/ply_binary': 'Export PLY (Binary)',
 			'menubar/file/export/stl': 'Export STL',
 			'menubar/file/export/stl_binary': 'Export STL (Binary)',
+			'menubar/file/export/usdz': 'Export USDZ',
 			'menubar/file/publish': 'Publish',
 
 			'menubar/edit': 'Edit',
@@ -159,9 +160,6 @@ function Strings( config ) {
 			'sidebar/geometry/extrude_geometry/bevelOffset': 'Offset',
 			'sidebar/geometry/extrude_geometry/bevelSegments': 'Segments',
 			'sidebar/geometry/extrude_geometry/shape': 'Convert to Shape',
-
-			'sidebar/geometry/geometry/vertices': 'Vertices',
-			'sidebar/geometry/geometry/faces': 'Faces',
 
 			'sidebar/geometry/dodecahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/dodecahedron_geometry/detail': 'Detail',
@@ -347,6 +345,7 @@ function Strings( config ) {
 			'menubar/file/export/ply_binary': 'Exporter PLY (Binaire)',
 			'menubar/file/export/stl': 'Exporter STL',
 			'menubar/file/export/stl_binary': 'Exporter STL (Binaire)',
+			'menubar/file/export/usdz': 'Exporter USDZ',
 			'menubar/file/publish': 'Publier',
 
 			'menubar/edit': 'Edition',
@@ -485,9 +484,6 @@ function Strings( config ) {
 			'sidebar/geometry/extrude_geometry/bevelOffset': 'Décalage',
 			'sidebar/geometry/extrude_geometry/bevelSegments': 'Segments',
 			'sidebar/geometry/extrude_geometry/shape': 'Convertir en forme',
-
-			'sidebar/geometry/geometry/vertices': 'Sommets',
-			'sidebar/geometry/geometry/faces': 'Faces',
 
 			'sidebar/geometry/dodecahedron_geometry/radius': 'Rayon',
 			'sidebar/geometry/dodecahedron_geometry/detail': 'Détail',
@@ -673,6 +669,7 @@ function Strings( config ) {
 			'menubar/file/export/ply_binary': '导出PLY(二进制)',
 			'menubar/file/export/stl': '导出STL',
 			'menubar/file/export/stl_binary': '导出STL(二进制)',
+			'menubar/file/export/usdz': '导出USDZ',
 			'menubar/file/publish': '发布',
 
 			'menubar/edit': '编辑',
@@ -801,9 +798,6 @@ function Strings( config ) {
 			'sidebar/geometry/cylinder_geometry/radialsegments': '径向分段',
 			'sidebar/geometry/cylinder_geometry/heightsegments': '高度分段',
 			'sidebar/geometry/cylinder_geometry/openended': '开端',
-
-			'sidebar/geometry/geometry/vertices': '顶点',
-			'sidebar/geometry/geometry/faces': '面',
 
 			'sidebar/geometry/dodecahedron_geometry/radius': '半径',
 			'sidebar/geometry/dodecahedron_geometry/detail': '面片分段',

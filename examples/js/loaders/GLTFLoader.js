@@ -620,7 +620,8 @@ THREE.GLTFLoader = ( function () {
 
 				var scale = extension.clearcoatNormalTexture.scale;
 
-				materialParams.clearcoatNormalScale = new THREE.Vector2( scale, scale );
+				// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
+				materialParams.clearcoatNormalScale = new THREE.Vector2( scale, -scale );
 
 			}
 
@@ -899,10 +900,11 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
+		var chunkContentsLength = this.header.length - BINARY_EXTENSION_HEADER_LENGTH;
 		var chunkView = new DataView( data, BINARY_EXTENSION_HEADER_LENGTH );
 		var chunkIndex = 0;
 
-		while ( chunkIndex < chunkView.byteLength ) {
+		while ( chunkIndex < chunkContentsLength ) {
 
 			var chunkLength = chunkView.getUint32( chunkIndex, true );
 			chunkIndex += 4;
@@ -2620,11 +2622,20 @@ THREE.GLTFLoader = ( function () {
 				cachedMaterial = material.clone();
 
 				if ( useSkinning ) cachedMaterial.skinning = true;
-				if ( useVertexTangents ) cachedMaterial.vertexTangents = true;
 				if ( useVertexColors ) cachedMaterial.vertexColors = true;
 				if ( useFlatShading ) cachedMaterial.flatShading = true;
 				if ( useMorphTargets ) cachedMaterial.morphTargets = true;
 				if ( useMorphNormals ) cachedMaterial.morphNormals = true;
+				
+				if ( useVertexTangents ) {
+
+					cachedMaterial.vertexTangents = true;
+
+					// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
+					if ( material.normalScale ) material.normalScale.y *= -1;
+					if ( material.clearcoatNormalScale ) material.clearcoatNormalScale.y *= -1;
+
+				}
 
 				this.cache.add( cacheKey, cachedMaterial );
 
@@ -2641,19 +2652,6 @@ THREE.GLTFLoader = ( function () {
 		if ( material.aoMap && geometry.attributes.uv2 === undefined && geometry.attributes.uv !== undefined ) {
 
 			geometry.setAttribute( 'uv2', geometry.attributes.uv );
-
-		}
-
-		// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-		if ( material.normalScale && ! useVertexTangents ) {
-
-			material.normalScale.y = - material.normalScale.y;
-
-		}
-
-		if ( material.clearcoatNormalScale && ! useVertexTangents ) {
-
-			material.clearcoatNormalScale.y = - material.clearcoatNormalScale.y;
 
 		}
 
@@ -2777,11 +2775,12 @@ THREE.GLTFLoader = ( function () {
 
 			pending.push( parser.assignTexture( materialParams, 'normalMap', materialDef.normalTexture ) );
 
-			materialParams.normalScale = new THREE.Vector2( 1, 1 );
+			// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
+			materialParams.normalScale = new THREE.Vector2( 1, -1 );
 
 			if ( materialDef.normalTexture.scale !== undefined ) {
 
-				materialParams.normalScale.set( materialDef.normalTexture.scale, materialDef.normalTexture.scale );
+				materialParams.normalScale.set( materialDef.normalTexture.scale, -materialDef.normalTexture.scale );
 
 			}
 
@@ -3239,6 +3238,21 @@ THREE.GLTFLoader = ( function () {
 					mesh = meshDef.isSkinnedMesh === true
 						? new THREE.SkinnedMesh( geometry, material )
 						: new THREE.Mesh( geometry, material );
+
+					// Fix double sided rendered models on certain mobile devices, see https://github.com/mrdoob/three.js/issues/20997#issuecomment-756082184
+
+					if ( material.isMeshStandardMaterial === true &&
+						material.side === THREE.DoubleSide &&
+						geometry.getIndex() !== null &&
+						geometry.hasAttribute( 'position' ) === true &&
+						geometry.hasAttribute( 'normal' ) === true &&
+						geometry.hasAttribute( 'uv' ) === true &&
+						geometry.hasAttribute( 'tangent' ) === false ) {
+
+						geometry.computeTangents();
+						material.vertexTangents = true;
+
+					}
 
 					if ( mesh.isSkinnedMesh === true && ! mesh.geometry.attributes.skinWeight.normalized ) {
 

@@ -112,7 +112,7 @@
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -217,7 +217,7 @@
 				const clothNumSegmentsY = clothHeight * 5;
 				const clothPos = new THREE.Vector3( - 3, 3, 2 );
 
-				const clothGeometry = new THREE.PlaneBufferGeometry( clothWidth, clothHeight, clothNumSegmentsZ, clothNumSegmentsY );
+				const clothGeometry = new THREE.PlaneGeometry( clothWidth, clothHeight, clothNumSegmentsZ, clothNumSegmentsY );
 				clothGeometry.rotateY( Math.PI * 0.5 );
 				clothGeometry.translate( clothPos.x, clothPos.y + clothHeight * 0.5, clothPos.z - clothWidth * 0.5 );
 
@@ -289,7 +289,7 @@
 
 			function createParalellepiped( sx, sy, sz, mass, pos, quat, material ) {
 
-				const threeObject = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
+				const threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
 				const shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 				shape.setMargin( margin );
 
@@ -363,13 +363,13 @@
 
 					}
 
-				}, false );
+				} );
 
 				window.addEventListener( 'keyup', function () {
 
 					armMovement = 0;
 
-				}, false );
+				} );
 
 			}
 

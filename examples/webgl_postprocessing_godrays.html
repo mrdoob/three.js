@@ -76,7 +76,7 @@
 
 				// sphere
 
-				const geo = new THREE.SphereBufferGeometry( 1, 20, 10 );
+				const geo = new THREE.SphereGeometry( 1, 20, 10 );
 				sphereMesh = new THREE.Mesh( geo, materialScene );
 				sphereMesh.scale.multiplyScalar( 20 );
 				scene.add( sphereMesh );
@@ -102,7 +102,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
@@ -209,7 +209,7 @@
 				postprocessing.godrayCombineUniforms.fGodRayIntensity.value = 0.75;
 
 				postprocessing.quad = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 1.0, 1.0 ),
+					new THREE.PlaneGeometry( 1.0, 1.0 ),
 					postprocessing.materialGodraysGenerate
 				);
 				postprocessing.quad.position.z = - 9900;

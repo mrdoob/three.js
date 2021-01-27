@@ -103,7 +103,7 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
 				container.appendChild( renderer.domElement );
-				
+
 				const target = new THREE.WebGLRenderTarget( {
 					minFilter: THREE.LinearFilter,
 					magFilter: THREE.LinearFilter,
@@ -145,7 +145,7 @@
 
 				}
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

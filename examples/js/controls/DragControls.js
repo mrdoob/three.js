@@ -18,25 +18,25 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 	function activate() {
 
-		_domElement.addEventListener( 'pointermove', onPointerMove, false );
-		_domElement.addEventListener( 'pointerdown', onPointerDown, false );
-		_domElement.addEventListener( 'pointerup', onPointerCancel, false );
-		_domElement.addEventListener( 'pointerleave', onPointerCancel, false );
-		_domElement.addEventListener( 'touchmove', onTouchMove, false );
-		_domElement.addEventListener( 'touchstart', onTouchStart, false );
-		_domElement.addEventListener( 'touchend', onTouchEnd, false );
+		_domElement.addEventListener( 'pointermove', onPointerMove );
+		_domElement.addEventListener( 'pointerdown', onPointerDown );
+		_domElement.addEventListener( 'pointerup', onPointerCancel );
+		_domElement.addEventListener( 'pointerleave', onPointerCancel );
+		_domElement.addEventListener( 'touchmove', onTouchMove );
+		_domElement.addEventListener( 'touchstart', onTouchStart );
+		_domElement.addEventListener( 'touchend', onTouchEnd );
 
 	}
 
 	function deactivate() {
 
-		_domElement.removeEventListener( 'pointermove', onPointerMove, false );
-		_domElement.removeEventListener( 'pointerdown', onPointerDown, false );
-		_domElement.removeEventListener( 'pointerup', onPointerCancel, false );
-		_domElement.removeEventListener( 'pointerleave', onPointerCancel, false );
-		_domElement.removeEventListener( 'touchmove', onTouchMove, false );
-		_domElement.removeEventListener( 'touchstart', onTouchStart, false );
-		_domElement.removeEventListener( 'touchend', onTouchEnd, false );
+		_domElement.removeEventListener( 'pointermove', onPointerMove );
+		_domElement.removeEventListener( 'pointerdown', onPointerDown );
+		_domElement.removeEventListener( 'pointerup', onPointerCancel );
+		_domElement.removeEventListener( 'pointerleave', onPointerCancel );
+		_domElement.removeEventListener( 'touchmove', onTouchMove );
+		_domElement.removeEventListener( 'touchstart', onTouchStart );
+		_domElement.removeEventListener( 'touchend', onTouchEnd );
 
 		_domElement.style.cursor = '';
 

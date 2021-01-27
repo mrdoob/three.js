@@ -54,7 +54,7 @@
 				const texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
 				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-				const geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
 				const material = new THREE.MeshLambertMaterial( { map: texture, transparent: true } );
 
 				orbit = new OrbitControls( currentCamera, renderer.domElement );
@@ -76,7 +76,7 @@
 				control.attach( mesh );
 				scene.add( control );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				window.addEventListener( 'keydown', function ( event ) {
 
