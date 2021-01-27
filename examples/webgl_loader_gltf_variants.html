@@ -132,10 +132,11 @@
 					if ( mapping ) {
 
 						object.material = await parser.getDependency( 'material', mapping.material );
+						parser.assignFinalMaterial(object);
 
 					} else {
 
-						object.material = object.originalMaterial;
+						object.material = object.userData.originalMaterial;
 
 					}
 
