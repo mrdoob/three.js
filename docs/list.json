@@ -370,6 +370,7 @@
 				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
+				"KTX2Loader": "examples/en/loaders/KTX2Loader",
 				"MMDLoader": "examples/en/loaders/MMDLoader",
 				"MTLLoader": "examples/en/loaders/MTLLoader",
 				"OBJLoader": "examples/en/loaders/OBJLoader",
