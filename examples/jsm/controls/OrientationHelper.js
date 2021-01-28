@@ -79,7 +79,12 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 		set( v ) {
 
 			_enabled = !! v;
-			if ( scope._internalControls ) { scope._internalControls = _enabled; }
+			if ( scope._internalControls ) {
+
+				scope._internalControls = _enabled;
+
+			}
+
 			scope.dispatchEvent( { type: 'enabled', value: _enabled } );
 
 		}
@@ -101,7 +106,7 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 
 		}
 
-	} );	
+	} );
 
 	Object.defineProperty( scope, 'scene', {
 
@@ -186,9 +191,9 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 
 					type: 'change',
 					direction: scope._camera.position.clone().normalize()
-	
+
 				} );
-			
+
 			} );
 
 			scope._internalControls = _internalControls;
@@ -196,10 +201,10 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 		}
 
 		gizmo = new Group();
-		gizmo.name = "orientation-helper-gizmo";
+		gizmo.name = 'orientation-helper-gizmo';
 		scope._scene.add( gizmo );
 
-		setGizmo( _options.model3D, _options.addRing );		
+		setGizmo( _options.model3D, _options.addRing );
 
 		if ( _options.addLights ) {
 
@@ -303,7 +308,9 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 
 		// Remove old gizmo objects
 		for ( var i = gizmo.children.length; i >= 0; i -= 1 ) {
+
 			gizmo.remove( gizmo.children[ i ] );
+
 		}
 
 		// Default: Cube
@@ -326,7 +333,7 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 
 			var ring = _createCircle();
 			ring.layers.set( 0 );
-			gizmo.add( ring );	
+			gizmo.add( ring );
 
 		}
 
@@ -337,19 +344,19 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 			var side = _options.boxCanvasSide,
 				sideHalf = side * 0.5,
 				font = _options.boxFontSize + 'px ' + _options.boxFontFamily;
-	
+
 			var opacityOptions = opacity < 1 ? { transparent: true, opacity: opacity } : {};
-	
+
 			function _createCanvasSide( background, color, text ) {
-	
+
 				var cnv = document.createElement( 'canvas' ),
 					ctx = cnv.getContext( '2d' ),
 					dpi = Math.round( window.devicePixelRatio );
-	
+
 				cnv.width = side * dpi;
 				cnv.height = side * dpi;
 				ctx.scale( dpi, dpi );
-	
+
 				ctx.beginPath();
 				ctx.fillStyle = background;
 				ctx.rect( 0, 0, side, side );
@@ -359,39 +366,39 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 				ctx.textBaseline = 'middle';
 				ctx.font = font;
 				ctx.fillText( text, sideHalf, sideHalf );
-	
+
 				var texture = new CanvasTexture( cnv );
 				var material = new MeshPhysicalMaterial( Object.assign( { map: texture }, opacityOptions ) );
 				material.name = 'mat-' + text;
 				material.needsUpdate = true;
-	
+
 				return material;
-	
+
 			}
-	
+
 			var materials = _options.labels.map(
-	
+
 				function ( label ) {
-	
+
 					return _createCanvasSide( _options.boxBackground, _options.boxColor, label );
-	
+
 				}
-	
+
 			);
-	
+
 			var cube = new Mesh( new BoxBufferGeometry( 50, 50, 50, 1, 1, 1 ), materials );
 			cube.name = 'orientation-helper-cube';
-			
+
 			cube.geometry.computeBoundingBox();
 			cube.updateMatrixWorld();
 			cube.matrixAutoUpdate = false;
-	
+
 			return cube;
-	
+
 		}
-	
+
 		function _createCircle() {
-	
+
 			var geometry = new RingGeometry( 50, 60, 32 );
 			var material = new MeshPhysicalMaterial( {
 				color: 0xdddddd,
@@ -399,17 +406,18 @@ var OrientationHelper = function ( camera, controls, options, labels ) {
 				transparent: true,
 				opacity: 0.45
 			} );
-	
+
 			var circle = new Mesh( geometry, material );
 			circle.name = 'orientation-helper-ring';
 			circle.rotation.x = Math.PI / 2;
 			circle.position.y = - 20;
 			circle.updateMatrixWorld();
 			circle.matrixAutoUpdate = false;
-	
+
 			return circle;
-	
+
 		}
+
 	}
 
 	function _addLights() {
