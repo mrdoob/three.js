@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		The Orientation Helper provides a visual clue of the space and camera facing position. It also acts like an Orbit controls in the scene.<br><br>
+
+		To use this, as with all files in the /examples directory, you will have to
+		include the file separately in your HTML.
+
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+// orientation helper
+const ohOptions = {
+    className: 'orientation-helper-in-scene'
+    }, 
+    ohLabels = {
+        px: 'East', nx: 'West',
+        pz: 'South', nz: 'North',
+        py: 'Sky', ny: 'Ground'
+    };
+
+orientationHelper = new THREE.OrientationHelper( 
+    camera, controls, ohOptions, ohLabels
+);
+
+orientationHelper.addEventListener( 'change', onOrientationHelperChange );
+orientationHelper.addEventListener( 'click', onOrientationHelperClick );
+
+document.body.appendChild(orientationHelper.domElement);
+
+function onOrientationHelperChange( ev ) {
+
+    translateCamera( ev.direction );
+
+}
+
+function onOrientationHelperClick( ev ) {
+
+    translateCamera( ev.normal );
+
+}
+
+function translateCamera( direction ) {
+
+    controls.enabled = false;
+
+    const dist = camera.position.distanceTo( controls.target ),
+        newCameraPos = controls.target.clone()
+            .add( direction.multiplyScalar( dist ) );
+
+    camera.position.set(
+        newCameraPos.x, 
+        newCameraPos.y, 
+        newCameraPos.z
+    );
+
+    controls.enabled = true;
+
+}
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>[example:misc_controls_orbit_orientation misc / controls / orbit / orientation ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Camera camera], [param:OrbitControls controls], [param:Object options], [param:Object labels] )</h3>
+		<p>
+			[page:Camera camera]: (required) The camera to be controlled.<br><br>
+
+            [page:OrbitControls controls]: The orbit controls in use.<br><br>
+
+            [page:Object options]: Options.
+            <code>
+// defaults
+{
+    width: 100,
+    height: 100,
+    className: '',
+    backgroundColor: 0xffffff,
+    backgroundOpacity: 0,
+    cameraFov: 50,
+    cameraNear: 1,
+    cameraFar: 1000,
+    cameraDistance: 150,
+    boxBackground: '#ddd',
+    boxColor: '#222',
+    boxCanvasSide: 128,
+    boxFontSize: 28,
+    boxFontFamily: 'Arial',
+    model3D: null,
+    addRing: true,
+    addLights: true,
+    addOrbitControls: true
+}
+            </code>
+
+            [page:Object labels]: Labels for the cube.
+            <code>
+// defaults
+{
+    px: 'East',
+    nx: 'West',
+    pz: 'South',
+    nz: 'North',
+    py: 'Above',
+    ny: 'Below'
+}
+        </code>
+		</p>
+
+		<h2>Events</h2>
+
+		<h3>change</h3>
+		<p>
+			Fires when the camera has been transformed by the <em><strong>INTERNAL</strong></em> orbit controls.
+		</p>
+
+		<h3>click</h3>
+		<p>
+			Fires when the user clicks on the gizmo.
+		</p>
+
+		<h3>enabled</h3>
+		<p>
+			Fires when it's enabled/disabled.
+		</p>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Boolean visible]</h3>
+		<p>
+			Displays or hides the domElement.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			When false, the camera position is not updated.
+		</p>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			The HTMLDOMElement used to listen for mouse / touch events.
+		</p>
+
+		<h3>[property:Scene scene]</h3>
+		<p>
+			Gives access to the Scene, to allow for manual set-up of the gizmo and lights.
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null dispose] () alias of [method:null deactivate]</h3>
+		<p>
+			Remove all the event listeners.
+		</p>
+
+		<h3>[method:void activate] ()</h3>
+		<p>
+			Add all the event listeners.
+		</p>
+
+		<h3>[method:void setGizmo] ([param:Mesh model3D], [param:Boolean addRing])</h3>
+		<p>
+			Remove the current gizmo and replace it with the model3D.
+		</p>
+
+		<h3>[method:DOMString takePicture] ( [param:string imageFormat] )</h3>
+		<p>
+            Takes a picture. Image format should be "image/png" or "image/jpeg".<br />
+            Use as Promise.
+		</p>
+
+
+		<h3>[method:void update] ()</h3>
+		<p>
+			Update the camera position and render the scene.
+		</p>
+
+		<h2>See also</h2>
+		<p>
+			[page:OrbitControls]
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrientationHelper.js examples/jsm/controls/OrientationHelper.js]
+		</p>
+	</body>
+</html>

@@ -344,6 +344,7 @@
 				"FirstPersonControls": "examples/en/controls/FirstPersonControls",
 				"FlyControls": "examples/en/controls/FlyControls",
 				"OrbitControls": "examples/en/controls/OrbitControls",
+				"OrientationHelper": "examples/en/controls/OrientationHelper",
 				"PointerLockControls": "examples/en/controls/PointerLockControls",
 				"TrackballControls": "examples/en/controls/TrackballControls",
 				"TransformControls": "examples/en/controls/TransformControls"

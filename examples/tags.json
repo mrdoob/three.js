@@ -98,6 +98,7 @@
 	"misc_controls_drag": [ "translate" ],
 	"misc_controls_map": [ "drag" ],
 	"misc_controls_orbit": [ "rotation" ],
+	"misc_controls_orbit_orientation": [ "rotation", "orientation" ],
 	"misc_controls_trackball": [ "rotation" ],
 	"misc_controls_transform": [ "scale", "rotate", "translate" ]
 }

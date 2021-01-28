@@ -373,6 +373,7 @@
 		"misc_controls_fly",
 		"misc_controls_map",
 		"misc_controls_orbit",
+		"misc_controls_orbit_orientation",
 		"misc_controls_pointerlock",
 		"misc_controls_trackball",
 		"misc_controls_transform",
