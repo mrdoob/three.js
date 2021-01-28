@@ -1,3 +1,5 @@
+import { Object3D } from '../../../src/Three';
+
 export class USDZExporter {
 
 	constructor();
