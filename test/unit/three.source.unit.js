@@ -48,7 +48,6 @@ import './src/core/BufferAttribute.tests';
 import './src/core/BufferGeometry.tests';
 import './src/core/Clock.tests';
 import './src/core/EventDispatcher.tests';
-import './src/core/Face3.tests';
 import './src/core/InstancedBufferAttribute.tests';
 import './src/core/InstancedBufferGeometry.tests';
 import './src/core/InstancedInterleavedBuffer.tests';

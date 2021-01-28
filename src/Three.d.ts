@@ -98,7 +98,6 @@ export * from './core/InstancedInterleavedBuffer';
 export * from './core/InterleavedBuffer';
 export * from './core/InstancedBufferAttribute';
 export * from './core/BufferAttribute';
-export * from './core/Face3';
 export * from './core/Object3D';
 export * from './core/Raycaster';
 export * from './core/Layers';

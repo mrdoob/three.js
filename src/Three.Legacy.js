@@ -24,7 +24,6 @@ import {
 import { BufferGeometry } from './core/BufferGeometry.js';
 import { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 import { InterleavedBuffer } from './core/InterleavedBuffer.js';
-import { Face3 } from './core/Face3.js';
 import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform.js';
 import { Raycaster } from './core/Raycaster.js';
@@ -86,13 +85,6 @@ import { CubeCamera } from './cameras/CubeCamera.js';
 import { Scene } from './scenes/Scene.js';
 
 export { MathUtils as Math };
-
-export function Face4( a, b, c, d, normal, color, materialIndex ) {
-
-	console.warn( 'THREE.Face4 has been removed. A THREE.Face3 will be created instead.' );
-	return new Face3( a, b, c, normal, color, materialIndex );
-
-}
 
 export const LineStrip = 0;
 export const LinePieces = 1;
