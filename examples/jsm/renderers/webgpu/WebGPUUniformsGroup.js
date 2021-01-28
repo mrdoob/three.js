@@ -197,7 +197,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 			a[ offset + 0 ] = v.x;
 			a[ offset + 1 ] = v.y;
 			a[ offset + 2 ] = v.z;
-			a[ offset + 3 ] = v.z;
+			a[ offset + 3 ] = v.w;
 
 			updated = true;
 
