@@ -105,13 +105,11 @@ var OrbitControls = function ( object, domElement ) {
 
 	};
 
-
 	this.getDistance = function () {
 
 		return spherical.radius;
 
 	};
-
 
 	this.listenToKeyEvents = function ( domElement ) {
 
