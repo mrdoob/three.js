@@ -2632,8 +2632,8 @@ THREE.GLTFLoader = ( function () {
 					cachedMaterial.vertexTangents = true;
 
 					// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-					if ( material.normalScale ) material.normalScale.y *= -1;
-					if ( material.clearcoatNormalScale ) material.clearcoatNormalScale.y *= -1;
+					if ( cachedMaterial.normalScale ) cachedMaterial.normalScale.y *= -1;
+					if ( cachedMaterial.clearcoatNormalScale ) cachedMaterial.clearcoatNormalScale.y *= -1;
 
 				}
 

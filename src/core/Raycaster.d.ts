@@ -1,17 +1,24 @@
 import { Vector3 } from './../math/Vector3';
-import { Face3 } from './Face3';
 import { Object3D } from './Object3D';
 import { Vector2 } from './../math/Vector2';
 import { Ray } from './../math/Ray';
 import { Camera } from './../cameras/Camera';
 import { Layers } from './Layers';
 
+export interface Face {
+	a: number;
+	b: number;
+	c: number;
+	normal: Vector3;
+	materialIndex: number;
+}
+
 export interface Intersection {
 	distance: number;
 	distanceToRay?: number;
 	point: Vector3;
 	index?: number;
-	face?: Face3 | null;
+	face?: Face | null;
 	faceIndex?: number;
 	object: Object3D;
 	uv?: Vector2;
