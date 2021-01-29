@@ -3,11 +3,12 @@ import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget';
 import { Texture } from '../textures/Texture';
 import { CubeTexture } from '../textures/CubeTexture';
 import { Scene } from '../scenes/Scene';
+import { Vector3 } from '../math/Vector3';
 
 export class PMREMGenerator {
 
 	constructor( renderer:WebGLRenderer );
-	fromScene( scene:Scene, sigma?:number, near?:number, far?:number ): WebGLRenderTarget;
+	fromScene( scene:Scene, sigma?:number, near?:number, far?:number, origin?:Vector3 ): WebGLRenderTarget;
 	fromEquirectangular( equirectangular:Texture ): WebGLRenderTarget;
 	fromCubemap( cubemap:CubeTexture ): WebGLRenderTarget;
 	compileCubemapShader(): void;
