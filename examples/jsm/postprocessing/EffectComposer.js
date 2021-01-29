@@ -85,14 +85,14 @@ Object.assign( EffectComposer.prototype, {
 	addPass: function ( pass ) {
 
 		this.passes.push( pass );
-		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
+		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio, this._pixelRatio );
 
 	},
 
 	insertPass: function ( pass, index ) {
 
 		this.passes.splice( index, 0, pass );
-		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
+		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio, this._pixelRatio );
 
 	},
 
@@ -227,7 +227,7 @@ Object.assign( EffectComposer.prototype, {
 
 		for ( var i = 0; i < this.passes.length; i ++ ) {
 
-			this.passes[ i ].setSize( effectiveWidth, effectiveHeight );
+			this.passes[ i ].setSize( effectiveWidth, effectiveHeight, this._pixelRatio );
 
 		}
 
