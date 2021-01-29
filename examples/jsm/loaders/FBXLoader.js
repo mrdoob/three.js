@@ -2886,11 +2886,21 @@ var FBXLoader = ( function () {
 			var yIndex = - 1;
 			var zIndex = - 1;
 
+			const indexMap = {}
+            for(const k of ['x', 'y', 'z']) {
+                const map = indexMap[k] = new Map()
+                curves[k].times.forEach((item, index) => {
+                    if (!map.has(item)) {
+                        map.set(item, index)
+                    }
+                })
+            }
+
 			times.forEach( function ( time ) {
 
-				if ( curves.x ) xIndex = curves.x.times.indexOf( time );
-				if ( curves.y ) yIndex = curves.y.times.indexOf( time );
-				if ( curves.z ) zIndex = curves.z.times.indexOf( time );
+				if ( curves.x ) xIndex = indexMap.x.get(time)
+                if ( curves.y ) yIndex = indexMap.y.get(time)
+                if ( curves.z ) zIndex = indexMap.z.get(time)
 
 				// if there is an x value defined for this frame, use that
 				if ( xIndex !== - 1 ) {
