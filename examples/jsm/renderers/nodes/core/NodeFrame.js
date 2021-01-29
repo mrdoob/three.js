@@ -1,3 +1,5 @@
+import { NodeUpdateType } from './constants.js';
+
 class NodeFrame {
 
 	constructor() {
@@ -13,14 +15,24 @@ class NodeFrame {
 
 		this.renderer = null;
 		this.material = null;
+		this.camera = null;
+		this.object = null;
 
 	}
 
 	updateNode( node ) {
 
-		if ( this.updateMap.get( node ) !== this.frameId ) {
+		if ( node.updateType === NodeUpdateType.Frame ) {
 
-			this.updateMap.set( node, this.frameId );
+			if ( this.updateMap.get( node ) !== this.frameId ) {
+
+				this.updateMap.set( node, this.frameId );
+
+				node.update( this );
+
+			}
+
+		} else if ( node.updateType === NodeUpdateType.Object ) {
 
 			node.update( this );
 

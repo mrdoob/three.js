@@ -22,9 +22,14 @@
 			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
 			import FloatNode from './jsm/renderers/nodes/inputs/FloatNode.js';
 			import Vector2Node from './jsm/renderers/nodes/inputs/Vector2Node.js';
+			import Vector3Node from './jsm/renderers/nodes/inputs/Vector3Node.js';
+			import Vector4Node from './jsm/renderers/nodes/inputs/Vector4Node.js';
+			import Matrix4Node from './jsm/renderers/nodes/inputs/Matrix4Node.js';
 			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
 			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
 			import UVNode from './jsm/renderers/nodes/accessors/UVNode.js';
+			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
+			import WVPNode from './jsm/renderers/nodes/accessors/WVPNode.js';
 			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
 			import SwitchNode from './jsm/renderers/nodes/utils/SwitchNode.js';
 			import TimerNode from './jsm/renderers/nodes/utils/TimerNode.js';
@@ -59,6 +64,11 @@
 				texture.wrapT = THREE.RepeatWrapping;
 				texture.name = 'uv_grid';
 
+				const textureDisplaceLoader = new THREE.TextureLoader();
+				const textureDisplace = textureLoader.load( './textures/transition/transition1.png' );
+				textureDisplace.wrapS = THREE.RepeatWrapping;
+				textureDisplace.wrapT = THREE.RepeatWrapping;
+
 				// compressed texture
 
 				const ddsLoader = new DDSLoader();
@@ -67,6 +77,7 @@
 				//
 
 				const geometryBox = new THREE.BoxGeometry();
+				const geometrySphere = new THREE.SphereGeometry( .5, 64, 64 );
 				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
 
 				const timerNode = new TimerNode();
@@ -75,13 +86,18 @@
 				const timerScaleNode = new OperatorNode( '*', timerNode, new Vector2Node( new THREE.Vector2( - 0.5, 0.1 ) ).setConst( true ) );
 				const animateUV = new OperatorNode( '+', new UVNode(), timerScaleNode );
 
-				materialBox.colorNode = new TextureNode( texture, animateUV );
+				//materialBox.colorNode = new TextureNode( texture, animateUV );
+
+				const displaceScaled = new OperatorNode( '*', new TextureNode( textureDisplace, animateUV ), new FloatNode( .1 ) );
+
+				materialBox.positionNode = new OperatorNode( '+', new PositionNode(), displaceScaled );
+				materialBox.colorNode = new TextureNode( textureDisplace, animateUV );
 
 				// test uv 2
 				//geometryBox.setAttribute( 'uv2', geometryBox.getAttribute( 'uv' ) );
 				//materialBox.colorNode = new TextureNode( texture, new UVNode( 1 ) );
 
-				box = new THREE.Mesh( geometryBox, materialBox );
+				box = new THREE.Mesh( geometrySphere, materialBox );
 				box.position.set( 0, 1, 0 );
 				scene.add( box );
 
@@ -121,9 +137,7 @@
 				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
 				const materialPoints = new THREE.PointsMaterial();
 
-				geometryPoints.setAttribute( 'color', geometryPoints.getAttribute( 'position' ) );
-
-				materialPoints.colorNode = new OperatorNode( '*', new AttributeNode( 'vec3', 'color' ), new FloatNode( 3 ).setConst( true ) );
+				materialPoints.colorNode = new OperatorNode( '*', new PositionNode(), new FloatNode( 3 ).setConst( true ) );
 
 				const pointCloud = new THREE.Points( geometryPoints, materialPoints );
 				pointCloud.position.set( 2, - 1, 0 );
@@ -141,7 +155,7 @@
 				geometryLine.setAttribute( 'color', geometryLine.getAttribute( 'position' ) );
 
 				const materialLine = new THREE.LineBasicMaterial();
-				materialLine.colorNode = new AttributeNode( 'vec3', 'color' );
+				materialLine.colorNode = new AttributeNode( 'color', 'vec3' );
 
 				const line = new THREE.Line( geometryLine, materialLine );
 				line.position.set( 2, 1, 0 );
