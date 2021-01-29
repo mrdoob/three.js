@@ -33,6 +33,8 @@ var Rhino3dmLoader = function ( manager ) {
 	this.libraryBinary = null;
 	this.libraryConfig = {};
 
+	this.url = '';
+
 	this.workerLimit = 4;
 	this.workerPool = [];
 	this.workerNextTaskID = 1;
@@ -72,6 +74,8 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
+
+		this.url = url;
 
 		loader.load( url, ( buffer ) => {
 
@@ -291,6 +295,8 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		object.userData[ 'layers' ] = data.layers;
 		object.userData[ 'groups' ] = data.groups;
 		object.userData[ 'settings' ] = data.settings;
+		object.userData[ 'objectType' ] = 'File3dm';
+		object.name = this.url;
 
 		var objects = data.objects;
 		var materials = data.materials;
@@ -1273,7 +1279,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		} else {
 
-			console.warn( 'THREE.3DMLoader: Object has no mesh geometry. Consider opening this in Rhino, using a shaded display mode, and exporting again.' );
+			console.warn( 'THREE.3DMLoader: Object has no associated mesh geometry.' );
 
 		}
 
