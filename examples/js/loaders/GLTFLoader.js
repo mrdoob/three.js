@@ -2443,6 +2443,10 @@ THREE.GLTFLoader = ( function () {
 
 			} );
 
+		} else if ( source.uri === undefined ) {
+
+			throw new Error( 'THREE.GLTFLoader: Image ' + textureIndex + ' is missing URI and bufferView' );
+
 		}
 
 		return Promise.resolve( sourceURI ).then( function ( sourceURI ) {
@@ -2626,7 +2630,7 @@ THREE.GLTFLoader = ( function () {
 				if ( useFlatShading ) cachedMaterial.flatShading = true;
 				if ( useMorphTargets ) cachedMaterial.morphTargets = true;
 				if ( useMorphNormals ) cachedMaterial.morphNormals = true;
-				
+
 				if ( useVertexTangents ) {
 
 					cachedMaterial.vertexTangents = true;
