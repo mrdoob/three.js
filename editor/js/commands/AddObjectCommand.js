@@ -4,20 +4,33 @@ import * as THREE from '../../../build/three.module.js';
 /**
  * @param editor Editor
  * @param object THREE.Object3D
+ * @param parent THREE.Object3D
+ * @param index number
  * @constructor
  */
-function AddObjectCommand( editor, object ) {
+function AddObjectCommand( editor, object, parent, index ) {
 
 	Command.call( this, editor );
 
 	this.type = 'AddObjectCommand';
 
 	this.object = object;
+
 	if ( object !== undefined ) {
 
 		this.name = 'Add Object: ' + object.name;
 
 	}
+
+	this.parent = parent
+
+	if ( parent !== undefined && index === undefined) {
+
+		index = parent.children.length
+
+	}
+
+	this.index = index
 
 }
 
@@ -25,7 +38,7 @@ AddObjectCommand.prototype = {
 
 	execute: function () {
 
-		this.editor.addObject( this.object );
+		this.editor.addObject( this.object, this.parent, this.index );
 		this.editor.select( this.object );
 
 	},
