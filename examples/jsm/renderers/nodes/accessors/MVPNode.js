@@ -4,7 +4,7 @@ import ModelNode from '../accessors/ModelNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 
-class WVPNode extends Node {
+class MVPNode extends Node {
 
 	constructor( position = new PositionNode() ) {
 
@@ -12,7 +12,7 @@ class WVPNode extends Node {
 
 		this.position = position;
 
-		this._wvpMatrix = new OperatorNode( '*', new CameraNode( CameraNode.PROJECTION ), new ModelNode( ModelNode.VIEW ) );
+		this._mvpMatrix = new OperatorNode( '*', new CameraNode( CameraNode.PROJECTION ), new ModelNode( ModelNode.VIEW ) );
 
 	}
 
@@ -20,13 +20,13 @@ class WVPNode extends Node {
 
 		const type = this.getType( builder );
 
-		const wvpSnipped = this._wvpMatrix.build( builder );
+		const mvpSnipped = this._mvpMatrix.build( builder );
 		const positionSnipped = this.position.build( builder, 'vec3' );
 
-		return builder.format( `( ${wvpSnipped} * vec4( ${positionSnipped}, 1.0 ) )`, type, output );
+		return builder.format( `( ${mvpSnipped} * vec4( ${positionSnipped}, 1.0 ) )`, type, output );
 
 	}
 
 }
 
-export default WVPNode;
+export default MVPNode;
