@@ -69,13 +69,13 @@ class CameraNode extends Node {
 
 			if ( scope === CameraNode.PROJECTION || scope === CameraNode.VIEW ) {
 
-				if ( !inputNode || !inputNode.isMatrix4Node !== true ) {
+				if ( inputNode === undefined || !inputNode.isMatrix4Node !== true ) {
 
 					inputNode = new Matrix4Node( null );
 
 				}
 
-			} else if ( !inputNode || !inputNode.isVector3Node !== true ) {
+			} else if ( inputNode === undefined || !inputNode.isVector3Node !== true ) {
 
 				inputNode = new Vector3Node();
 
