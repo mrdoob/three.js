@@ -15,7 +15,7 @@ class ModelNode extends Node {
 
 		this.updateType = NodeUpdateType.Object;
 
-		this._inputNode = null;
+		this._inputNode = new Matrix4Node( null );
 
 	}
 
@@ -30,21 +30,7 @@ class ModelNode extends Node {
 
 	generate( builder, output ) {
 
-		const nodeData = builder.getDataFromNode( this );
-
-		let inputNode = this._inputNode;
-
-		if ( nodeData.inputNode === undefined ) {
-
-			inputNode = new Matrix4Node( null );
-
-			this._inputNode = inputNode;
-
-			nodeData.inputNode = inputNode;
-
-		}
-
-		return inputNode.build( builder, output );
+		return this._inputNode.build( builder, output );
 
 	}
 
