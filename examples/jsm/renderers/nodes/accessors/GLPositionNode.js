@@ -4,7 +4,7 @@ import ModelNode from '../accessors/ModelNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 
-class MVPNode extends Node {
+class GLPositionNode extends Node {
 
 	constructor( position = new PositionNode() ) {
 
@@ -29,4 +29,4 @@ class MVPNode extends Node {
 
 }
 
-export default MVPNode;
+export default GLPositionNode;

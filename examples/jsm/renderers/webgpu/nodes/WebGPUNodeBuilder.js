@@ -8,7 +8,7 @@ import { WebGPUSampledTexture } from '../WebGPUSampledTexture.js';
 
 import NodeSlot from '../../nodes/core/NodeSlot.js';
 import NodeBuilder from '../../nodes/core/NodeBuilder.js';
-import MVPNode from '../../nodes/accessors/MVPNode.js';
+import GLPositionNode from '../../nodes/accessors/GLPositionNode.js';
 
 import ShaderLib from './ShaderLib.js';
 
@@ -41,15 +41,15 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		if ( material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
 
-			const mvpNode = new MVPNode();
+			const glPositionNode = new GLPositionNode();
 
 			if ( material.positionNode !== undefined ) {
 
-				mvpNode.position = material.positionNode;
+				glPositionNode.position = material.positionNode;
 
 			}
 
-			this.addSlot( 'vertex', new NodeSlot( mvpNode, 'GL_POSITION', 'vec4' ) );
+			this.addSlot( 'vertex', new NodeSlot( glPositionNode, 'GL_POSITION', 'vec4' ) );
 
 			if ( material.colorNode !== undefined ) {
 
