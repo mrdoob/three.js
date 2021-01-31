@@ -33,6 +33,26 @@ class Quaternion {
 			z1 = src1[ srcOffset1 + 2 ],
 			w1 = src1[ srcOffset1 + 3 ];
 
+		if ( t === 0 ) {
+
+			dst[ dstOffset ] = x0;
+			dst[ dstOffset + 1 ] = y0;
+			dst[ dstOffset + 2 ] = z0;
+			dst[ dstOffset + 3 ] = w0;
+			return;
+
+		}
+
+		if ( t === 1 ) {
+
+			dst[ dstOffset ] = x1;
+			dst[ dstOffset + 1 ] = y1;
+			dst[ dstOffset + 2 ] = z1;
+			dst[ dstOffset + 3 ] = w1;
+			return;
+
+		}
+
 		if ( w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1 ) {
 
 			let s = 1 - t;
