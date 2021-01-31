@@ -17,12 +17,15 @@
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		<a href="https://github.com/mrdoob/three.js/pull/20156" target="_blank" rel="noopener">SSRPass</a> demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
 	</div> -->
-	<span id="dom_wrap" style="position: relative; z-index: 1000;display:none;">
-		<label for="">width:<input id="dom_width" type="number" value="100" style="width:50px;"></label>
-		<label for="">height:<input id="dom_height" type="number" value="100" style="width:50px;"></label>
-		<button onclick="render(dom_width.value,dom_height.value)">render</button>
+	<span style="background:rgba(0,0,0,.7);position: relative; z-index: 1000;padding:5px;padding-left: 0;">
+		<span id="dom_wrap" style="display:none;">
+			<button onclick="setToWindowSize()">set to window size</button>
+			<label for="">width:<input id="dom_width" type="number" value="100" style="width:50px;"></label>
+			<label for="">height:<input id="dom_height" type="number" value="100" style="width:50px;"></label>
+			<button onclick="render(dom_width.value,dom_height.value)">render</button>
+		</span>
+		<span id="dom_info" style="color:white;">loading...</span>
 	</span>
-	<span id="dom_info" style="position: relative; z-index: 1000;color:white;">loading...</span>
 
 	<script type="module">
 		import * as THREE from '../build/three.module.js';
@@ -60,8 +63,7 @@
 		let reflector
 		let reflectorRenderTarget
 		let mesh_bunny
-		let inited=false
-		let rendered=false
+		let state='initial'
 		window.readed = new Float32Array( 4 );
 		window.readedVec3=new THREE.Vector3()
 		window.reflectVec3=new THREE.Vector3()
@@ -204,19 +206,10 @@
 			pixelRenderer.outputEncoding = THREE.sRGBEncoding;
 			// container.appendChild(pixelRenderer.domElement);
 
-			// window.pixelCamera = new THREE.OrthographicCamera( -1, 1, 1, -1, .001, 1000 );
+			let pixelCameraSize=.000001
+			window.pixelCamera = new THREE.OrthographicCamera( -pixelCameraSize, pixelCameraSize, pixelCameraSize, -pixelCameraSize, .001, 10 );
 
-			window.pixelCount=render_width*render_height
-				// window.pixelCount=100
-
-				window.pixelCameras=[]
-				let pixelCameraSize=.000001
-				for(let i=0;i<pixelCount;i++){
-					let pixelCamera = new THREE.OrthographicCamera( -pixelCameraSize, pixelCameraSize, pixelCameraSize, -pixelCameraSize, .001, 10 );
-					pixelCameras.push(pixelCamera)
-				}
-
-			inited=true
+			state='inited'
 		}
 
 		function animate() {
@@ -231,70 +224,64 @@
 
 		window.render=render
 		async function render(width=100,height=100) {
-			if(rendered) return
-			dom_info.innerText='rendering...'
-			await new Promise(resolve=>setTimeout(resolve, 0))
+			if(state==='rendering') return
+			if(state==='rendered'){
+				alert('Please reload page to re-render.')
+				return
+			}
 			render_width=width
 			render_height=height
-			if(!inited) init()
+			if(state==='initial') init()
+
+			state='rendering'
+			dom_info.innerText='rendering...'
+			await new Promise(resolve=>setTimeout(resolve, 0))
 
 			if (params.enableSSR) {
 
-				ssrPass.outputType=0
 				composer.render();
 				// ctx2d.drawImage(renderer.domElement,0,0);return;
+
 				for(let y=0;y<render_height;y++){
 					for(let x=0;x<render_width;x++){
 						let i=y*render_width+x
+
 						renderer.readRenderTargetPixels( ssrPass.worldPositionRenderTarget, x, y, 1, 1, readed );
 						// if(y===60) debugger
-						pixelCameras[i].position.set(
-							readed[0],
-							readed[1],
-							readed[2],
-						)
-					}
-				}
-				ssrPass.outputType=1
-				composer.render();
-				// ctx2d.drawImage(renderer.domElement,0,0);return;
-				for(let y=0;y<render_height;y++){
-					for(let x=0;x<render_width;x++){
-						let i=y*render_width+x
-						renderer.readRenderTargetPixels( ssrPass.worldPositionRenderTarget, x, y, 1, 1, readed );
+						pixelCamera.position.set( readed[0], readed[1], readed[2], )
+						
+						renderer.readRenderTargetPixels( ssrPass.worldNormalRenderTarget, x, y, 1, 1, readed );
 						// if(y===60) debugger
-						readedVec3.x=readed[0]
-						readedVec3.y=readed[1]
-						readedVec3.z=readed[2]
-						// pixelCameras[i].rotation.setFromVector3(readedVec3.normalize())
-						// pixelCameras[i].rotation.setFromVector3(readedVec3)
-						// pixelCameras[i].lookAt(readedVec3.add(pixelCameras[i].position))
-						// pixelCameras[i].lookAt(reflectVec3.copy(camera.position).normalize().multiplyScalar(-1).reflect(readedVec3))
-						// pixelCameras[i].lookAt(reflectVec3.copy(camera.position).normalize().multiplyScalar(-1).reflect(readedVec3).add(pixelCameras[i].position))
-						pixelCameras[i].lookAt(reflectVec3.copy(camera.position).sub(pixelCameras[i].position).normalize().multiplyScalar(-1).reflect(readedVec3).add(pixelCameras[i].position))
-						// pixelCameras[i].rotation.setFromVector3(reflectVec3.copy(camera.position).normalize().multiplyScalar(-1).reflect(readedVec3))
-					}
-				}
-				for(let y=0;y<render_height;y++){
-					for(let x=0;x<render_width;x++){
-						let i=y*render_width+x
-						pixelRenderer.render(scene,pixelCameras[i])
+						readedVec3.set( readed[0], readed[1], readed[2], )
+						pixelCamera.lookAt(reflectVec3.copy(pixelCamera.position).sub(camera.position).reflect(readedVec3).add(pixelCamera.position))
+
+						pixelRenderer.render(scene,pixelCamera)
 						ctx2d.drawImage(pixelRenderer.domElement,x,render_height-y,1,1)
-						// ctx2d.fillRect(x,y,1,1)
+
 					}
+					dom_info.innerText=`rendering... line: ${y}`
+					await new Promise(resolve=>setTimeout(resolve, 0))
+				}
+				{/* solve line gap problem */
+					cvs2d.style.display='none'
+					await new Promise(resolve=>setTimeout(resolve, 300))
+					cvs2d.style.display='block'
 				}
 			} else {
 				renderer.render(scene, camera)
 			}
 
-
-			// pixelCameras.forEach((n,i)=>{
-			// 	pixelRenderer.render(scene,pixelCameras[i])
-			// })
-
 			console.log('rendered')
 			dom_info.innerText='rendered'
-			rendered=true
+			state='rendered'
+		}
+
+		
+		window.setToWindowSize=setToWindowSize
+		function setToWindowSize(){
+			if(!confirm('May cause very long render time! Are you sure?')) return
+			dom_width.value=window.innerWidth
+			dom_height.value=window.innerHeight
 		}
 	</script>
 </body>

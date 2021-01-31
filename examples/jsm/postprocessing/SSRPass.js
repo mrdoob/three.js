@@ -18,7 +18,7 @@ import {
 	FloatType,
 } from "../../../build/three.module.js";
 import { Pass } from "../postprocessing/Pass.js";
-import { worldPositionShader, WorldNormalShader } from "../shaders/SSRShader.js";
+import { WorldPositionShader, WorldNormalShader } from "../shaders/SSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
 var SSRPass = function({ scene, camera, width, height, encoding,}) {
@@ -38,22 +38,6 @@ var SSRPass = function({ scene, camera, width, height, encoding,}) {
 	this.cameraRotationMatrix = new THREE.Matrix4()
 
 	this.tempColor = new Color()
-
-  this._outputType = 0
-  Object.defineProperty(this, 'outputType', {
-    get() {
-      return this._outputType
-    },
-    set(val) {
-      if (this._outputType === val) return
-      this._outputType = val
-      if (val) {
-        this.worldPositionMaterial.uniforms['uOutputType'].value = val;
-      } else {
-        this.worldPositionMaterial.uniforms['uOutputType'].value = val;
-      }
-    }
-  })
 
   // beauty render target with depth buffer
 
@@ -79,14 +63,7 @@ var SSRPass = function({ scene, camera, width, height, encoding,}) {
 		type: HalfFloatType,
   });
 
-  // worldNormal render target
-
-  this.worldNormalRenderTarget = new WebGLRenderTarget(this.width, this.height, {
-    minFilter: NearestFilter,
-    magFilter: NearestFilter,
-		format: RGBAFormat,
-		type: HalfFloatType,
-	});
+  // worldPosition
 
   this.worldPositionRenderTarget = new WebGLRenderTarget(this.width, this.height, {
     minFilter: LinearFilter,
@@ -95,31 +72,40 @@ var SSRPass = function({ scene, camera, width, height, encoding,}) {
 		type:FloatType,
   });
 
-	// this.worldNormalMaterial = new ShaderMaterial({
-  //   defines: Object.assign({}, WorldNormalShader.defines),
-  //   uniforms: UniformsUtils.clone(WorldNormalShader.uniforms),
-  //   vertexShader: WorldNormalShader.vertexShader,
-  //   fragmentShader: WorldNormalShader.fragmentShader,
-  //   blending: NoBlending
-	// })
-
-
-  // ssr material
-
   this.worldPositionMaterial = new ShaderMaterial({
-    defines: Object.assign({}, worldPositionShader.defines),
-    uniforms: UniformsUtils.clone(worldPositionShader.uniforms),
-    vertexShader: worldPositionShader.vertexShader,
-    fragmentShader: worldPositionShader.fragmentShader,
+    defines: Object.assign({}, WorldPositionShader.defines),
+    uniforms: UniformsUtils.clone(WorldPositionShader.uniforms),
+    vertexShader: WorldPositionShader.vertexShader,
+    fragmentShader: WorldPositionShader.fragmentShader,
     blending: NoBlending
   });
 
-  this.worldPositionMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
   this.worldPositionMaterial.uniforms['tDepth'].value = this.beautyRenderTarget.depthTexture;
   this.worldPositionMaterial.uniforms['cameraNear'].value = this.camera.near;
   this.worldPositionMaterial.uniforms['cameraFar'].value = this.camera.far;
+	this.worldPositionMaterial.uniforms['cameraMatrix'].value = this.camera.matrixWorld
   this.worldPositionMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
   this.worldPositionMaterial.uniforms['cameraInverseProjectionMatrix'].value.copy(this.camera.projectionMatrixInverse);
+
+  // worldNormal
+
+  this.worldNormalRenderTarget = new WebGLRenderTarget(this.width, this.height, {
+    minFilter: LinearFilter,
+    magFilter: LinearFilter,
+		format: RGBAFormat,
+		type:FloatType,
+  });
+
+  this.worldNormalMaterial = new ShaderMaterial({
+    defines: Object.assign({}, WorldNormalShader.defines),
+    uniforms: UniformsUtils.clone(WorldNormalShader.uniforms),
+    vertexShader: WorldNormalShader.vertexShader,
+    fragmentShader: WorldNormalShader.fragmentShader,
+    blending: NoBlending
+  });
+
+  this.worldNormalMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
+	this.worldNormalMaterial.uniforms['cameraRotationMatrix'].value = this.cameraRotationMatrix.extractRotation(camera.matrixWorld)
 
   // normal material
 
@@ -160,8 +146,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     this.beautyRenderTarget.dispose();
     this.normalRenderTarget.dispose();
-    this.worldNormalRenderTarget.dispose();
     this.worldPositionRenderTarget.dispose();
+    this.worldNormalRenderTarget.dispose();
 
     // dispose materials
 
@@ -189,9 +175,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     // render SSR
 
-    this.worldPositionMaterial.uniforms['cameraMatrix'].value = this.camera.matrixWorld
-    this.worldPositionMaterial.uniforms['cameraRotationMatrix'].value = this.cameraRotationMatrix.extractRotation(camera.matrixWorld)
     this.renderPass(renderer, this.worldPositionMaterial, this.worldPositionRenderTarget);
+    this.renderPass(renderer, this.worldNormalMaterial, this.worldNormalRenderTarget);
 
     // output result to screen
 
