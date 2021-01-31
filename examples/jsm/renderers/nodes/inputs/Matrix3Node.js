@@ -9,6 +9,8 @@ class Matrix3Node extends InputNode {
 
 		this.value = value;
 
+		Object.defineProperty( this, 'isMatrix3Node', { value: true } );
+
 	}
 
 }

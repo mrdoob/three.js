@@ -8,6 +8,8 @@ class ColorNode extends InputNode {
 
 		this.value = value;
 
+		Object.defineProperty( this, 'isColorNode', { value: true } );
+
 	}
 
 }

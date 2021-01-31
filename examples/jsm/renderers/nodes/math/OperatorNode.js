@@ -41,11 +41,11 @@ class OperatorNode extends Node {
 		return typeA;
 
 	}
-	
+
 	getVectorFromMatrix( type ) {
-		
+
 		return 'vec' + type.substr( 3 );
-		
+
 	}
 
 	generate( builder, output ) {
@@ -56,25 +56,25 @@ class OperatorNode extends Node {
 		let type = this.getType( builder );
 
 		if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
-			
+
 			// matrix x vector
-			
+
 			type = typeB = this.getVectorFromMatrix( typeA );
 
 		} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
-			
+
 			// vector x matrix
-			
+
 			type = typeB = this.getVectorFromMatrix( typeB );
 
 		} else {
-			
+
 			// anytype x anytype
-			
+
 			typeA = typeB = type;
-			
+
 		}
-		
+
 		const a = this.a.build( builder, typeA );
 		const b = this.b.build( builder, typeB );
 

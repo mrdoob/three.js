@@ -1,6 +1,6 @@
 import WebGPUNodeUniformsGroup from './WebGPUNodeUniformsGroup.js';
-import { 
-	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform, 
+import {
+	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from './WebGPUNodeUniform.js';
 import WebGPUSampler from '../WebGPUSampler.js';
@@ -75,7 +75,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	getPropertyName( node ) {
 
-		if (node.isNodeUniform) {
+		if ( node.isNodeUniform ) {
 
 			const name = node.name;
 			const type = node.type;
@@ -89,9 +89,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				return `nodeUniforms.${name}`;
 
 			}
-			
+
 		}
-		
+
 		return super.getPropertyName( node );
 
 	}
@@ -183,9 +183,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			nodeData.uniformGPU = uniformGPU;
 
 			if ( shaderStage === 'vertex' ) {
-				
+
 				this.bindingsOffset[ 'fragment' ] = bindings.length;
-				
+
 			}
 
 		}
@@ -202,14 +202,14 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			const attributes = this.attributes;
 
-			for ( let index = 0; index < attributes.length; index++ ) {
-				
+			for ( let index = 0; index < attributes.length; index ++ ) {
+
 				const attribute = attributes[ index ];
-				
+
 				snippet += `layout(location = ${index}) in ${attribute.type} ${attribute.name};`;
-			
+
 			}
-			
+
 		}
 
 		return snippet;
@@ -224,12 +224,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		const ioStage = shaderStage === 'vertex' ? 'out' : 'in';
 
-		for ( let index = 0; index < varys.length; index++ ) {
-				
+		for ( let index = 0; index < varys.length; index ++ ) {
+
 			const vary = varys[ index ];
-			
+
 			snippet += `layout(location = ${index}) ${ioStage} ${vary.type} ${vary.name};`;
-		
+
 		}
 
 		return snippet;
@@ -247,7 +247,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				snippet += `${vary.name} = ${vary.value};`;
 
 			}
-			
+
 		}
 
 		return snippet;
@@ -311,8 +311,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		this.vertexShader = this.composeShaderCode( this.nativeShader.vertexShader, this.vertexShader );
 		this.fragmentShader = this.composeShaderCode( this.nativeShader.fragmentShader, this.fragmentShader );
-console.log( this.vertexShader );
-console.log( this.fragmentShader );
+
 		return this;
 
 	}

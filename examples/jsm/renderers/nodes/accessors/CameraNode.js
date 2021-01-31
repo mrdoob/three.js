@@ -16,40 +16,43 @@ class CameraNode extends Node {
 		this.updateType = NodeUpdateType.Frame;
 
 		this.scope = scope;
-		
-		this.inputNode = null;
+
+		this._inputNode = null;
 
 	}
 
 	getType() {
 
-		if ( this.scope === CameraNode.PROJECTION || this.scope === CameraNode.VIEW ) {
-			
+		const scope = this.scope;
+
+		if ( scope === CameraNode.PROJECTION || scope === CameraNode.VIEW ) {
+
 			return 'mat4';
-			
+
 		}
 
 		return 'vec3';
 
 	}
-	
+
 	update( frame ) {
 
 		const camera = frame.camera;
-		const inputNode = this.inputNode;
+		const inputNode = this._inputNode;
+		const scope = this.scope;
 
-		if ( this.scope === CameraNode.PROJECTION ) {
-			
+		if ( scope === CameraNode.PROJECTION ) {
+
 			inputNode.value = camera.projectionMatrix;
-			
-		} else if ( this.scope === CameraNode.VIEW ) {
-			
+
+		} else if ( scope === CameraNode.VIEW ) {
+
 			inputNode.value = camera.matrixWorldInverse;
-			
-		} else if ( this.scope === CameraNode.POSITION ) {
-			
+
+		} else if ( scope === CameraNode.POSITION ) {
+
 			camera.getWorldPosition( inputNode.value );
-			
+
 		}
 
 	}
@@ -58,23 +61,33 @@ class CameraNode extends Node {
 
 		const nodeData = builder.getDataFromNode( this );
 
-		if ( this.initialized !== true ) {
-			
-			if ( this.scope === CameraNode.PROJECTION || this.scope === CameraNode.VIEW ) {
-				
-				this.inputNode = new Matrix4Node( null );
-				
-			} else {
-				
-				this.inputNode = new Vector3Node();
-				
+		let inputNode = this._inputNode;
+
+		if ( nodeData.inputNode === undefined ) {
+
+			const scope = this.scope;
+
+			if ( scope === CameraNode.PROJECTION || scope === CameraNode.VIEW ) {
+
+				if ( !inputNode || !inputNode.isMatrix4Node ) {
+
+					inputNode = new Matrix4Node( null );
+
+				}
+
+			} else if ( !inputNode || !inputNode.isVector3Node ) {
+
+				inputNode = new Vector3Node();
+
 			}
-			
-			nodeData.initialized = true;
-			
+
+			this._inputNode = inputNode;
+
+			nodeData.inputNode = inputNode;
+
 		}
 
-		return this.inputNode.build( builder, output );
+		return inputNode.build( builder, output );
 
 	}
 

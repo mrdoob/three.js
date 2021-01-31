@@ -21,9 +21,9 @@ class PositionNode extends Node {
 		let positionNode = nodeData.positionNode;
 
 		if ( positionNode === undefined ) {
-			
+
 			positionNode = new AttributeNode( 'position', 'vec3' );
-			
+
 			nodeData.positionNode = positionNode;
 
 		}

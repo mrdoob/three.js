@@ -1,6 +1,3 @@
-import WebGPUUniformsGroup from './WebGPUUniformsGroup.js';
-import { Matrix3Uniform, Matrix4Uniform } from './WebGPUUniform.js';
-
 class WebGPUBindings {
 
 	constructor( device, info, properties, textures, pipelines, computePipelines, attributes, nodes ) {
@@ -95,7 +92,7 @@ class WebGPUBindings {
 
 		for ( const binding of bindings ) {
 
-			const isShared = binding.isShared;;
+			const isShared = binding.isShared;
 			const isUpdated = updateMap.get( binding ) === frame;
 
 			if ( isShared && isUpdated ) continue;

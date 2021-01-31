@@ -11,11 +11,11 @@ class VaryNode extends Node {
 	}
 
 	getType( builder ) {
-		
+
 		// VaryNode is auto type
-		
+
 		return this.value.getType( builder );
-		
+
 	}
 
 	generate( builder, output ) {

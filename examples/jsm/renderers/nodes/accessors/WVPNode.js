@@ -8,7 +8,7 @@ class WVPNode extends Node {
 
 	constructor( position = new PositionNode() ) {
 
-		super('vec4');
+		super( 'vec4' );
 
 		this.position = position;
 

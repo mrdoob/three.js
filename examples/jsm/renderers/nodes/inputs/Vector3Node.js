@@ -9,6 +9,8 @@ class Vector3Node extends InputNode {
 
 		this.value = value;
 
+		Object.defineProperty( this, 'isVector3Node', { value: true } );
+
 	}
 
 }

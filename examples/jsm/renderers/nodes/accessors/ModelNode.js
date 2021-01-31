@@ -15,14 +15,14 @@ class ModelNode extends Node {
 
 		this.updateType = NodeUpdateType.Object;
 
-		this.inputNode = null;
+		this._inputNode = null;
 
 	}
 
 	update( frame ) {
 
 		const object = frame.object;
-		const inputNode = this.inputNode;
+		const inputNode = this._inputNode;
 
 		inputNode.value = object.modelViewMatrix;
 
@@ -32,15 +32,19 @@ class ModelNode extends Node {
 
 		const nodeData = builder.getDataFromNode( this );
 
-		if ( this.initialized !== true ) {
-			
-			this.inputNode = new Matrix4Node( null );
+		let inputNode = this._inputNode;
 
-			nodeData.initialized = true;
-			
+		if ( nodeData.inputNode === undefined ) {
+
+			inputNode = new Matrix4Node( null );
+
+			this._inputNode = inputNode;
+
+			nodeData.inputNode = inputNode;
+
 		}
 
-		return this.inputNode.build( builder, output );
+		return inputNode.build( builder, output );
 
 	}
 

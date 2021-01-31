@@ -2,7 +2,7 @@ export const NodeUpdateType = {
 	None: 'none',
 	Frame: 'frame',
 	Object: 'object'
-}
+};
 
 export const NodeType = {
 	Float: 'float',

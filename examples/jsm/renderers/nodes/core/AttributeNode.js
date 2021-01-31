@@ -32,27 +32,27 @@ class AttributeNode extends Node {
 		const attribute = builder.getAttribute( attributeName, attributeType );
 
 		if ( builder.isShaderStage( 'vertex' ) ) {
-		
-			return builder.format( attributeName, attributeType, output );
-			
+
+			return builder.format( attribute.name, attribute.type, output );
+
 		} else {
-			
+
 			const nodeData = builder.getDataFromNode( this, builder.shaderStage );
-			
+
 			let nodeVary = nodeData.varyNode;
-			
+
 			if ( nodeVary === undefined ) {
-				
-				nodeVary = builder.getVaryFromNode( this, attributeType, attributeName );
-				
+
+				nodeVary = builder.getVaryFromNode( this, attribute.type, attributeName );
+
 				nodeData.nodeVary = nodeVary;
-				
+
 			}
-			
+
 			const varyName = builder.getPropertyName( nodeVary );
-			
-			return builder.format( varyName, attributeType, output );
-			
+
+			return builder.format( varyName, attribute.type, output );
+
 		}
 
 	}
