@@ -22,14 +22,10 @@
 			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
 			import FloatNode from './jsm/renderers/nodes/inputs/FloatNode.js';
 			import Vector2Node from './jsm/renderers/nodes/inputs/Vector2Node.js';
-			import Vector3Node from './jsm/renderers/nodes/inputs/Vector3Node.js';
-			import Vector4Node from './jsm/renderers/nodes/inputs/Vector4Node.js';
-			import Matrix4Node from './jsm/renderers/nodes/inputs/Matrix4Node.js';
 			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
 			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
 			import UVNode from './jsm/renderers/nodes/accessors/UVNode.js';
 			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
-			import WVPNode from './jsm/renderers/nodes/accessors/WVPNode.js';
 			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
 			import SwitchNode from './jsm/renderers/nodes/utils/SwitchNode.js';
 			import TimerNode from './jsm/renderers/nodes/utils/TimerNode.js';
@@ -56,7 +52,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
-				// textured mesh
+				// textures
 
 				const textureLoader = new THREE.TextureLoader();
 				const texture = textureLoader.load( './textures/uv_grid_opengl.jpg' );
@@ -64,7 +60,6 @@
 				texture.wrapT = THREE.RepeatWrapping;
 				texture.name = 'uv_grid';
 
-				const textureDisplaceLoader = new THREE.TextureLoader();
 				const textureDisplace = textureLoader.load( './textures/transition/transition1.png' );
 				textureDisplace.wrapS = THREE.RepeatWrapping;
 				textureDisplace.wrapT = THREE.RepeatWrapping;
@@ -74,11 +69,10 @@
 				const ddsLoader = new DDSLoader();
 				const dxt5Texture = ddsLoader.load( './textures/compressed/explosion_dxt5_mip.dds' );
 
-				//
+				// box mesh
 
 				const geometryBox = new THREE.BoxGeometry();
-				const geometrySphere = new THREE.SphereGeometry( .5, 64, 64 );
-				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
+				const materialBox = new THREE.MeshBasicMaterial();
 
 				const timerNode = new TimerNode();
 
@@ -86,20 +80,29 @@
 				const timerScaleNode = new OperatorNode( '*', timerNode, new Vector2Node( new THREE.Vector2( - 0.5, 0.1 ) ).setConst( true ) );
 				const animateUV = new OperatorNode( '+', new UVNode(), timerScaleNode );
 
-				//materialBox.colorNode = new TextureNode( texture, animateUV );
-
-				const displaceScaled = new OperatorNode( '*', new TextureNode( textureDisplace, animateUV ), new FloatNode( .1 ) );
-
-				materialBox.positionNode = new OperatorNode( '+', new PositionNode(), displaceScaled );
-				materialBox.colorNode = new TextureNode( textureDisplace, animateUV );
+				materialBox.colorNode = new TextureNode( texture, animateUV );
 
 				// test uv 2
 				//geometryBox.setAttribute( 'uv2', geometryBox.getAttribute( 'uv' ) );
 				//materialBox.colorNode = new TextureNode( texture, new UVNode( 1 ) );
 
-				box = new THREE.Mesh( geometrySphere, materialBox );
+				box = new THREE.Mesh( geometryBox, materialBox );
 				box.position.set( 0, 1, 0 );
 				scene.add( box );
+
+				// displace example
+
+				const geometrySphere = new THREE.SphereGeometry( .5, 64, 64 );
+				const materialSphere = new THREE.MeshBasicMaterial();
+
+				const displaceScaled = new OperatorNode( '*', new TextureNode( textureDisplace ), new FloatNode( .2 ) );
+
+				materialSphere.colorNode = new TextureNode( textureDisplace );
+				materialSphere.positionNode = new OperatorNode( '+', new PositionNode(), displaceScaled );
+
+				const sphere = new THREE.Mesh( geometrySphere, materialSphere );
+				sphere.position.set( - 2, - 1, 0 );
+				scene.add( sphere );
 
 				// data texture
 
