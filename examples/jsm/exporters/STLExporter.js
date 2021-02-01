@@ -1,7 +1,6 @@
 import {
-	BufferGeometry,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * Usage:
@@ -35,9 +34,9 @@ STLExporter.prototype = {
 
 				var geometry = object.geometry;
 
-				if ( geometry.isGeometry ) {
+				if ( geometry.isBufferGeometry !== true ) {
 
-					geometry = new BufferGeometry().fromGeometry( geometry );
+					throw new Error( 'THREE.STLExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 				}
 

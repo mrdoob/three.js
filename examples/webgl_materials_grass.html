@@ -26,7 +26,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x003300 );
 
-				const geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const geometry = new THREE.PlaneGeometry( 100, 100 );
 
 				const texture = new THREE.CanvasTexture( generateTexture() );
 
@@ -58,7 +58,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

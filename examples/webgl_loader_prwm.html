@@ -135,7 +135,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 				//
 
@@ -156,7 +156,7 @@
 				// * is automatically replaced by 'le' or 'be' depending on the client platform's endianness
 				loadGeometry( './models/prwm/smooth-suzanne.*.prwm' );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

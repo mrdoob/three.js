@@ -11,7 +11,7 @@
 
 		<p class="desc">
 			[link:http://en.wikipedia.org/wiki/Frustum Frustums] are used to determine what is
-			inside the camera's field of view. They help speed up the rendering process - object which lie
+			inside the camera's field of view. They help speed up the rendering process - objects which lie
 			outside a camera's frustum can safely be excluded from rendering.<br /><br />
 
 			This class is mainly intended for use internally by a renderer for calculating
@@ -70,10 +70,9 @@
 
 		<h3>[method:Boolean intersectsObject]( [param:Object3D object] )</h3>
 		<p>
-			Checks whether the [page:Object3D object]'s [page:Geometry.boundingSphere bounding sphere] is intersecting the Frustum.<br /><br />
+			Checks whether the [page:Object3D object]'s [page:BufferGeometry.boundingSphere bounding sphere] is intersecting the Frustum.<br /><br />
 
-			Note that the object must have a [page:Geometry] or [page:BufferGeometry] so that the bounding sphere
-			can be calculated.
+			Note that the object must have a [page:BufferGeometry geometry] so that the bounding sphere can be calculated.
 		</p>
 
 		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>

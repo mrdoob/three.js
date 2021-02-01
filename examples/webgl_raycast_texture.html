@@ -93,7 +93,7 @@
 
 					that._draw();
 
-				}, false );
+				} );
 				this._background.crossOrigin = '';
 				this._background.src = "textures/uv_grid_opengl.jpg";
 
@@ -215,7 +215,7 @@
 				cubeTexture = new THREE.Texture( undefined, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
 				canvas = new CanvasTexture( cubeTexture );
 				const cubeMaterial = new THREE.MeshBasicMaterial( { map: cubeTexture } );
-				const cubeGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				const cubeGeometry = new THREE.BoxGeometry( 20, 20, 20 );
 				let uvs = cubeGeometry.attributes.uv.array;
 				// Set a specific texture mapping.
 				for ( let i = 0; i < uvs.length; i ++ ) {
@@ -235,7 +235,7 @@
 				planeTexture = new THREE.Texture( undefined, THREE.UVMapping, THREE.MirroredRepeatWrapping, THREE.MirroredRepeatWrapping );
 				canvas.addParent( planeTexture );
 				const planeMaterial = new THREE.MeshBasicMaterial( { map: planeTexture } );
-				const planeGeometry = new THREE.PlaneBufferGeometry( 25, 25, 1, 1 );
+				const planeGeometry = new THREE.PlaneGeometry( 25, 25, 1, 1 );
 				uvs = planeGeometry.attributes.uv.array;
 
 				// Set a specific texture mapping.
@@ -257,7 +257,7 @@
 				circleTexture = new THREE.Texture( undefined, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
 				canvas.addParent( circleTexture );
 				const circleMaterial = new THREE.MeshBasicMaterial( { map: circleTexture } );
-				const circleGeometry = new THREE.CircleBufferGeometry( 25, 40, 0, Math.PI * 2 );
+				const circleGeometry = new THREE.CircleGeometry( 25, 40, 0, Math.PI * 2 );
 				uvs = circleGeometry.attributes.uv.array;
 
 				// Set a specific texture mapping.
@@ -274,8 +274,8 @@
 				circle.position.z = 0;
 				scene.add( circle );
 
-				window.addEventListener( 'resize', onWindowResize, false );
-				container.addEventListener( 'mousemove', onMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize );
+				container.addEventListener( 'mousemove', onMouseMove );
 
 				document.getElementById( 'setwrapS' ).addEventListener( 'change', setwrapS );
 				document.getElementById( 'setwrapT' ).addEventListener( 'change', setwrapT );

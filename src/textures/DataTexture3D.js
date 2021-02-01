@@ -3,7 +3,7 @@ import { ClampToEdgeWrapping, NearestFilter } from '../constants.js';
 
 class DataTexture3D extends Texture {
 
-	constructor( data, width, height, depth ) {
+	constructor( data = null, width = 1, height = 1, depth = 1 ) {
 
 		// We're going to add .setXXX() methods for setting properties later.
 		// Users can still set in DataTexture3D directly.
@@ -17,7 +17,7 @@ class DataTexture3D extends Texture {
 
 		Object.defineProperty( this, 'isDataTexture3D', { value: true } );
 
-		this.image = { data: data || null, width: width || 1, height: height || 1, depth: depth || 1 };
+		this.image = { data, width, height, depth };
 
 		this.magFilter = NearestFilter;
 		this.minFilter = NearestFilter;

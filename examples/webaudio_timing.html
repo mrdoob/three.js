@@ -80,7 +80,7 @@
 
 			// floor
 
-			const floorGeometry = new THREE.PlaneBufferGeometry( 10, 10 );
+			const floorGeometry = new THREE.PlaneGeometry( 10, 10 );
 			const floorMaterial = new THREE.MeshLambertMaterial( { color: 0x4676b6 } );
 
 			const floor = new THREE.Mesh( floorGeometry, floorMaterial );
@@ -93,7 +93,7 @@
 			const count = 5;
 			const radius = 3;
 
-			const ballGeometry = new THREE.SphereBufferGeometry( 0.3, 32, 16 );
+			const ballGeometry = new THREE.SphereGeometry( 0.3, 32, 16 );
 			ballGeometry.translate( 0, 0.3, 0 );
 			const ballMaterial = new THREE.MeshLambertMaterial( { color: 0xcccccc } );
 
@@ -142,7 +142,7 @@
 
 			//
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 		}
 

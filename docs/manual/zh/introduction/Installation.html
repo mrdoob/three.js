@@ -36,14 +36,12 @@
 		</p>
 
 		<code>
-		///////////////////////////////////////////////////////
 		// 方式 1: 导入整个 three.js核心库
 		import * as THREE from 'three';
 
 		const scene = new THREE.Scene();
 
 
-		///////////////////////////////////////////////////////
 		// 方式 2: 仅导入你所需要的部分
 		import { Scene } from 'three';
 
@@ -71,9 +69,9 @@
 		<code>
 		&lt;script type="module">
 
-		  // 通过访问 https://unpkg.com/three 来查找最新版本。 
+		  // 通过访问 https://unpkg.com/three 来查找最新版本。
 		  // 该URL将会重定向到最新的稳定版本。
-		  import * as THREE from 'https://unpkg.com/three@&lt;VERSION>/build/three.module.js';
+		  import * as THREE from 'https://unpkg.com/three/build/three.module.js';
 
 		  const scene = new THREE.Scene();
 
@@ -109,9 +107,9 @@
 		<code>
 		&lt;script type="module">
 
-		  // 通过访问 https://unpkg.com/three 来查找最新版本。 
+		  // 通过访问 https://unpkg.com/three 来查找最新版本。
 		  // 该URL将会重定向到最新的稳定版本。
-		  import { OrbitControls } from 'https://unpkg.com/three@&lt;VERSION>/examples/jsm/controls/OrbitControls.js';
+		  import { OrbitControls } from 'https://unpkg.com/three/examples/jsm/controls/OrbitControls.js';
 
 		  const controls = new OrbitControls();
 

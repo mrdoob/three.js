@@ -13,7 +13,7 @@ function StructNode( src ) {
 
 StructNode.prototype = Object.create( TempNode.prototype );
 StructNode.prototype.constructor = StructNode;
-StructNode.prototype.nodeType = "Struct";
+StructNode.prototype.nodeType = 'Struct';
 
 StructNode.prototype.getType = function ( builder ) {
 

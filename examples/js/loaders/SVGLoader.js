@@ -6,7 +6,7 @@ THREE.SVGLoader = function ( manager ) {
 	this.defaultDPI = 90;
 
 	// Accepted units: 'mm', 'cm', 'in', 'pt', 'pc', 'px'
-	this.defaultUnit = "px";
+	this.defaultUnit = 'px';
 
 };
 
@@ -124,7 +124,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 					} else {
 
-						console.warn( "SVGLoader: 'use node' references non-existent node id: " + usedNodeId );
+						console.warn( 'SVGLoader: \'use node\' references non-existent node id: ' + usedNodeId );
 
 					}
 
@@ -387,6 +387,9 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
 
+							// skip command if start point == end point
+							if ( numbers[ j + 5 ] == point.x && numbers[ j + 6 ] == point.y ) continue;
+
 							var start = point.clone();
 							point.x = numbers[ j + 5 ];
 							point.y = numbers[ j + 6 ];
@@ -576,6 +579,9 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
 
+							// skip command if no displacement
+							if ( numbers[ j + 5 ] == 0 && numbers[ j + 6 ] == 0 ) continue;
+
 							var start = point.clone();
 							point.x += numbers[ j + 5 ];
 							point.y += numbers[ j + 6 ];
@@ -659,6 +665,14 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		 */
 
 		function parseArcCommand( path, rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, start, end ) {
+
+			if ( rx == 0 || ry == 0 ) {
+
+				// draw a line if either of the radii == 0
+				path.lineTo( end.x, end.y );
+				return;
+
+			}
 
 			x_axis_rotation = x_axis_rotation * Math.PI / 180;
 
@@ -912,7 +926,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				if ( adjustFunction === undefined ) adjustFunction = function copy( v ) {
 
-					if ( v.startsWith( 'url' ) ) console.warn( "SVGLoader: url access in attributes is not implemented." );
+					if ( v.startsWith( 'url' ) ) console.warn( 'SVGLoader: url access in attributes is not implemented.' );
 
 					return v;
 
@@ -998,55 +1012,55 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		// Conversion: [ fromUnit ][ toUnit ] (-1 means dpi dependent)
 		var unitConversion = {
 
-			"mm": {
-				"mm": 1,
-				"cm": 0.1,
-				"in": 1 / 25.4,
-				"pt": 72 / 25.4,
-				"pc": 6 / 25.4,
-				"px": - 1
+			'mm': {
+				'mm': 1,
+				'cm': 0.1,
+				'in': 1 / 25.4,
+				'pt': 72 / 25.4,
+				'pc': 6 / 25.4,
+				'px': - 1
 			},
-			"cm": {
-				"mm": 10,
-				"cm": 1,
-				"in": 1 / 2.54,
-				"pt": 72 / 2.54,
-				"pc": 6 / 2.54,
-				"px": - 1
+			'cm': {
+				'mm': 10,
+				'cm': 1,
+				'in': 1 / 2.54,
+				'pt': 72 / 2.54,
+				'pc': 6 / 2.54,
+				'px': - 1
 			},
-			"in": {
-				"mm": 25.4,
-				"cm": 2.54,
-				"in": 1,
-				"pt": 72,
-				"pc": 6,
-				"px": - 1
+			'in': {
+				'mm': 25.4,
+				'cm': 2.54,
+				'in': 1,
+				'pt': 72,
+				'pc': 6,
+				'px': - 1
 			},
-			"pt": {
-				"mm": 25.4 / 72,
-				"cm": 2.54 / 72,
-				"in": 1 / 72,
-				"pt": 1,
-				"pc": 6 / 72,
-				"px": - 1
+			'pt': {
+				'mm': 25.4 / 72,
+				'cm': 2.54 / 72,
+				'in': 1 / 72,
+				'pt': 1,
+				'pc': 6 / 72,
+				'px': - 1
 			},
-			"pc": {
-				"mm": 25.4 / 6,
-				"cm": 2.54 / 6,
-				"in": 1 / 6,
-				"pt": 72 / 6,
-				"pc": 1,
-				"px": - 1
+			'pc': {
+				'mm': 25.4 / 6,
+				'cm': 2.54 / 6,
+				'in': 1 / 6,
+				'pt': 72 / 6,
+				'pc': 1,
+				'px': - 1
 			},
-			"px": {
-				"px": 1
+			'px': {
+				'px': 1
 			}
 
 		};
 
 		function parseFloatWithUnits( string ) {
 
-			var theUnit = "px";
+			var theUnit = 'px';
 
 			if ( typeof string === 'string' || string instanceof String ) {
 
@@ -1068,11 +1082,11 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			var scale = undefined;
 
-			if ( theUnit === "px" && scope.defaultUnit !== "px" ) {
+			if ( theUnit === 'px' && scope.defaultUnit !== 'px' ) {
 
 				// Conversion scale from  pixels to inches, then to default units
 
-				scale = unitConversion[ "in" ][ scope.defaultUnit ] / scope.defaultDPI;
+				scale = unitConversion[ 'in' ][ scope.defaultUnit ] / scope.defaultDPI;
 
 			} else {
 
@@ -1082,7 +1096,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 					// Conversion scale to pixels
 
-					scale = unitConversion[ theUnit ][ "in" ] * scope.defaultDPI;
+					scale = unitConversion[ theUnit ][ 'in' ] * scope.defaultDPI;
 
 				}
 
@@ -1154,7 +1168,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 						switch ( transformType ) {
 
-							case "translate":
+							case 'translate':
 
 								if ( array.length >= 1 ) {
 
@@ -1173,7 +1187,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 								break;
 
-							case "rotate":
+							case 'rotate':
 
 								if ( array.length >= 1 ) {
 
@@ -1203,7 +1217,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 								break;
 
-							case "scale":
+							case 'scale':
 
 								if ( array.length >= 1 ) {
 
@@ -1222,7 +1236,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 								break;
 
-							case "skewX":
+							case 'skewX':
 
 								if ( array.length === 1 ) {
 
@@ -1236,7 +1250,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 								break;
 
-							case "skewY":
+							case 'skewY':
 
 								if ( array.length === 1 ) {
 
@@ -1250,7 +1264,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 								break;
 
-							case "matrix":
+							case 'matrix':
 
 								if ( array.length === 6 ) {
 
@@ -1323,7 +1337,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 						if ( isRotated ) {
 
-							console.warn( "SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented." );
+							console.warn( 'SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented.' );
 
 						}
 

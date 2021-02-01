@@ -46,7 +46,7 @@
 					for ( let j = 0; j < shapes.length; j ++ ) {
 
 						const shape = shapes[ j ];
-						const geometry = new THREE.ShapeBufferGeometry( shape );
+						const geometry = new THREE.ShapeGeometry( shape );
 						const mesh = new THREE.Mesh( geometry, material );
 						group.add( mesh );
 

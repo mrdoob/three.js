@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>WebGLRenderer 상수</h1>
+
+		<h2>페이스 컬링 모드</h2>
+		<code>
+		THREE.CullFaceNone
+		THREE.CullFaceBack
+		THREE.CullFaceFront
+		THREE.CullFaceFrontBack
+		</code>
+		<p>
+		[page:constant CullFaceNone]은 페이스 컬링을 비활성화 합니다.<br />
+		[page:constant CullFaceBack]은 후면 페이스 컬링을 합니다(기본값).<br />
+		[page:constant CullFaceFront]는 전면 페이스 컬링을 합니다.<br />
+		[page:constant CullFaceFrontBack]은 전면 후면 모두 페이스 컬링을 합니다.
+		</p>
+
+		<h2>그립자 타입</h2>
+		<code>
+		THREE.BasicShadowMap
+		THREE.PCFShadowMap
+		THREE.PCFSoftShadowMap
+		THREE.VSMShadowMap
+		</code>
+		<p>
+		WebGLRenderer의 [page:WebGLRenderer.shadowMap.type shadowMap.type] 프로퍼티를 정의합니다.<br /><br />
+
+		[page:constant BasicShadowMap]은 필터링 안 된 그림자 맵을 사용하며 빠르지만 품질이 가장 낮습니다.<br />
+		[page:constant PCFShadowMap]은 Percentage-Closer Filtering (PCF) 알고리즘을 사용해 그림자 맵을 필터링합니다 (기본값).<br />
+		[page:constant PCFSoftShadowMap]은 Percentage-Closer Filtering (PCF) 알고리즘을 사용해 특히 저해상도 그림자 맵에서 보다 부드러운 그림자로 나타나는 그림자 맵을 필터링합니다.<br />
+		[page:constant VSMShadowMap]은 Variance Shadow Map (VSM) 알고리즘을 사용해 그림자 맵을 필터링합니다. VSMShadowMap를 사용하면 보든 리시버도 그림자를 만들 것입니다.
+		</p>
+
+		<h2>톤 맵핑</h2>
+		<code>
+		THREE.NoToneMapping
+		THREE.LinearToneMapping
+		THREE.ReinhardToneMapping
+		THREE.CineonToneMapping
+		THREE.ACESFilmicToneMapping
+		</code>
+		<p>
+		WebGLRenderer의 [page:WebGLRenderer.toneMapping toneMapping] 프로퍼티를 정의합니다.
+		일반 컴퓨터 모니터 또는 모바일 기기 화면의 저수준 밝기 범위에서 고수준 밝기 범위(HDR) 화면을 추정하는데에 사용됩니다.<br /><br />
+
+		[example:webgl_tonemapping WebGL / tonemapping] 예제를 참고하세요.
+
+		</p>
+
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

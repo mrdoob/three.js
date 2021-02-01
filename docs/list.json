@@ -14,6 +14,7 @@
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
 				"Creating text": "manual/en/introduction/Creating-text",
 				"Loading 3D models": "manual/en/introduction/Loading-3D-models",
+				"Libraries and Plugins": "manual/en/introduction/Libraries-and-Plugins",
 				"FAQ": "manual/en/introduction/FAQ",
 				"Useful links": "manual/en/introduction/Useful-links"
 			},
@@ -85,10 +86,7 @@
 				"BufferAttribute": "api/en/core/BufferAttribute",
 				"BufferGeometry": "api/en/core/BufferGeometry",
 				"Clock": "api/en/core/Clock",
-				"DirectGeometry": "api/en/core/DirectGeometry",
 				"EventDispatcher": "api/en/core/EventDispatcher",
-				"Face3": "api/en/core/Face3",
-				"Geometry": "api/en/core/Geometry",
 				"GLBufferAttribute": "api/en/core/GLBufferAttribute",
 				"InstancedBufferAttribute": "api/en/core/InstancedBufferAttribute",
 				"InstancedBufferGeometry": "api/en/core/InstancedBufferGeometry",
@@ -141,46 +139,26 @@
 			},
 
 			"Geometries": {
-				"BoxBufferGeometry": "api/en/geometries/BoxBufferGeometry",
 				"BoxGeometry": "api/en/geometries/BoxGeometry",
-				"CircleBufferGeometry": "api/en/geometries/CircleBufferGeometry",
 				"CircleGeometry": "api/en/geometries/CircleGeometry",
-				"ConeBufferGeometry": "api/en/geometries/ConeBufferGeometry",
 				"ConeGeometry": "api/en/geometries/ConeGeometry",
-				"CylinderBufferGeometry": "api/en/geometries/CylinderBufferGeometry",
 				"CylinderGeometry": "api/en/geometries/CylinderGeometry",
-				"DodecahedronBufferGeometry": "api/en/geometries/DodecahedronBufferGeometry",
 				"DodecahedronGeometry": "api/en/geometries/DodecahedronGeometry",
 				"EdgesGeometry": "api/en/geometries/EdgesGeometry",
-				"ExtrudeBufferGeometry": "api/en/geometries/ExtrudeBufferGeometry",
 				"ExtrudeGeometry": "api/en/geometries/ExtrudeGeometry",
-				"IcosahedronBufferGeometry": "api/en/geometries/IcosahedronBufferGeometry",
 				"IcosahedronGeometry": "api/en/geometries/IcosahedronGeometry",
-				"LatheBufferGeometry": "api/en/geometries/LatheBufferGeometry",
 				"LatheGeometry": "api/en/geometries/LatheGeometry",
-				"OctahedronBufferGeometry": "api/en/geometries/OctahedronBufferGeometry",
 				"OctahedronGeometry": "api/en/geometries/OctahedronGeometry",
-				"ParametricBufferGeometry": "api/en/geometries/ParametricBufferGeometry",
 				"ParametricGeometry": "api/en/geometries/ParametricGeometry",
-				"PlaneBufferGeometry": "api/en/geometries/PlaneBufferGeometry",
 				"PlaneGeometry": "api/en/geometries/PlaneGeometry",
-				"PolyhedronBufferGeometry": "api/en/geometries/PolyhedronBufferGeometry",
 				"PolyhedronGeometry": "api/en/geometries/PolyhedronGeometry",
-				"RingBufferGeometry": "api/en/geometries/RingBufferGeometry",
 				"RingGeometry": "api/en/geometries/RingGeometry",
-				"ShapeBufferGeometry": "api/en/geometries/ShapeBufferGeometry",
 				"ShapeGeometry": "api/en/geometries/ShapeGeometry",
-				"SphereBufferGeometry": "api/en/geometries/SphereBufferGeometry",
 				"SphereGeometry": "api/en/geometries/SphereGeometry",
-				"TetrahedronBufferGeometry": "api/en/geometries/TetrahedronBufferGeometry",
 				"TetrahedronGeometry": "api/en/geometries/TetrahedronGeometry",
-				"TextBufferGeometry": "api/en/geometries/TextBufferGeometry",
 				"TextGeometry": "api/en/geometries/TextGeometry",
-				"TorusBufferGeometry": "api/en/geometries/TorusBufferGeometry",
 				"TorusGeometry": "api/en/geometries/TorusGeometry",
-				"TorusKnotBufferGeometry": "api/en/geometries/TorusKnotBufferGeometry",
 				"TorusKnotGeometry": "api/en/geometries/TorusKnotGeometry",
-				"TubeBufferGeometry": "api/en/geometries/TubeBufferGeometry",
 				"TubeGeometry": "api/en/geometries/TubeGeometry",
 				"WireframeGeometry": "api/en/geometries/WireframeGeometry"
 			},
@@ -371,13 +349,11 @@
 			},
 
 			"Geometries": {
-				"ConvexBufferGeometry": "examples/en/geometries/ConvexBufferGeometry",
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/en/geometries/DecalGeometry"
 			},
 
 			"Helpers": {
-				"FaceNormalsHelper": "examples/en/helpers/FaceNormalsHelper",
 				"LightProbeHelper": "examples/en/helpers/LightProbeHelper",
 				"PositionalAudioHelper": "examples/en/helpers/PositionalAudioHelper",
 				"RectAreaLightHelper": "examples/en/helpers/RectAreaLightHelper",
@@ -394,11 +370,10 @@
 				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
+				"KTX2Loader": "examples/en/loaders/KTX2Loader",
 				"MMDLoader": "examples/en/loaders/MMDLoader",
 				"MTLLoader": "examples/en/loaders/MTLLoader",
 				"OBJLoader": "examples/en/loaders/OBJLoader",
-				"OBJLoader2": "examples/en/loaders/OBJLoader2",
-				"OBJLoader2Parallel": "examples/en/loaders/OBJLoader2Parallel",
 				"PCDLoader": "examples/en/loaders/PCDLoader",
 				"PDBLoader": "examples/en/loaders/PDBLoader",
 				"PRWMLoader": "examples/en/loaders/PRWMLoader",
@@ -422,7 +397,8 @@
 
 			"Math": {
 				"LookupTable": "examples/en/math/Lut",
-				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler"
+				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler",
+				"OBB": "examples/en/math/OBB"
 			},
 
 			"ConvexHull": {
@@ -622,10 +598,7 @@
 				"BufferAttribute": "api/zh/core/BufferAttribute",
 				"BufferGeometry": "api/zh/core/BufferGeometry",
 				"Clock": "api/zh/core/Clock",
-				"DirectGeometry": "api/zh/core/DirectGeometry",
 				"EventDispatcher": "api/zh/core/EventDispatcher",
-				"Face3": "api/zh/core/Face3",
-				"Geometry": "api/zh/core/Geometry",
 				"GLBufferAttribute": "api/zh/core/GLBufferAttribute",
 				"InstancedBufferAttribute": "api/zh/core/InstancedBufferAttribute",
 				"InstancedBufferGeometry": "api/zh/core/InstancedBufferGeometry",
@@ -677,46 +650,26 @@
 			},
 
 			"几何体": {
-				"BoxBufferGeometry": "api/zh/geometries/BoxBufferGeometry",
 				"BoxGeometry": "api/zh/geometries/BoxGeometry",
-				"CircleBufferGeometry": "api/zh/geometries/CircleBufferGeometry",
 				"CircleGeometry": "api/zh/geometries/CircleGeometry",
-				"ConeBufferGeometry": "api/zh/geometries/ConeBufferGeometry",
 				"ConeGeometry": "api/zh/geometries/ConeGeometry",
-				"CylinderBufferGeometry": "api/zh/geometries/CylinderBufferGeometry",
 				"CylinderGeometry": "api/zh/geometries/CylinderGeometry",
-				"DodecahedronBufferGeometry": "api/zh/geometries/DodecahedronBufferGeometry",
 				"DodecahedronGeometry": "api/zh/geometries/DodecahedronGeometry",
 				"EdgesGeometry": "api/zh/geometries/EdgesGeometry",
-				"ExtrudeBufferGeometry": "api/zh/geometries/ExtrudeBufferGeometry",
 				"ExtrudeGeometry": "api/zh/geometries/ExtrudeGeometry",
-				"IcosahedronBufferGeometry": "api/zh/geometries/IcosahedronBufferGeometry",
 				"IcosahedronGeometry": "api/zh/geometries/IcosahedronGeometry",
-				"LatheBufferGeometry": "api/zh/geometries/LatheBufferGeometry",
 				"LatheGeometry": "api/zh/geometries/LatheGeometry",
-				"OctahedronBufferGeometry": "api/zh/geometries/OctahedronBufferGeometry",
 				"OctahedronGeometry": "api/zh/geometries/OctahedronGeometry",
-				"ParametricBufferGeometry": "api/zh/geometries/ParametricBufferGeometry",
 				"ParametricGeometry": "api/zh/geometries/ParametricGeometry",
-				"PlaneBufferGeometry": "api/zh/geometries/PlaneBufferGeometry",
 				"PlaneGeometry": "api/zh/geometries/PlaneGeometry",
-				"PolyhedronBufferGeometry": "api/zh/geometries/PolyhedronBufferGeometry",
 				"PolyhedronGeometry": "api/zh/geometries/PolyhedronGeometry",
-				"RingBufferGeometry": "api/zh/geometries/RingBufferGeometry",
 				"RingGeometry": "api/zh/geometries/RingGeometry",
-				"ShapeBufferGeometry": "api/zh/geometries/ShapeBufferGeometry",
 				"ShapeGeometry": "api/zh/geometries/ShapeGeometry",
-				"SphereBufferGeometry": "api/zh/geometries/SphereBufferGeometry",
 				"SphereGeometry": "api/zh/geometries/SphereGeometry",
-				"TetrahedronBufferGeometry": "api/zh/geometries/TetrahedronBufferGeometry",
 				"TetrahedronGeometry": "api/zh/geometries/TetrahedronGeometry",
-				"TextBufferGeometry": "api/zh/geometries/TextBufferGeometry",
 				"TextGeometry": "api/zh/geometries/TextGeometry",
-				"TorusBufferGeometry": "api/zh/geometries/TorusBufferGeometry",
 				"TorusGeometry": "api/zh/geometries/TorusGeometry",
-				"TorusKnotBufferGeometry": "api/zh/geometries/TorusKnotBufferGeometry",
 				"TorusKnotGeometry": "api/zh/geometries/TorusKnotGeometry",
-				"TubeBufferGeometry": "api/zh/geometries/TubeBufferGeometry",
 				"TubeGeometry": "api/zh/geometries/TubeGeometry",
 				"WireframeGeometry": "api/zh/geometries/WireframeGeometry"
 			},
@@ -907,13 +860,11 @@
 			},
 
 			"几何体": {
-				"ConvexBufferGeometry": "examples/zh/geometries/ConvexBufferGeometry",
 				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry"
 			},
 
 			"辅助对象": {
-				"FaceNormalsHelper": "examples/zh/helpers/FaceNormalsHelper",
 				"LightProbeHelper": "examples/zh/helpers/LightProbeHelper",
 				"PositionalAudioHelper": "examples/zh/helpers/PositionalAudioHelper",
 				"RectAreaLightHelper": "examples/zh/helpers/RectAreaLightHelper",
@@ -932,8 +883,6 @@
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
-				"OBJLoader2": "examples/zh/loaders/OBJLoader2",
-				"OBJLoader2Parallel": "examples/zh/loaders/OBJLoader2Parallel",
 				"PCDLoader": "examples/zh/loaders/PCDLoader",
 				"PDBLoader": "examples/zh/loaders/PDBLoader",
 				"PRWMLoader": "examples/zh/loaders/PRWMLoader",
@@ -957,7 +906,8 @@
 
 			"数学库": {
 				"LookupTable": "examples/zh/math/Lut",
-				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler"
+				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler",
+				"OBB": "examples/en/math/OBB"
 			},
 
 			"QuickHull": {
@@ -992,6 +942,107 @@
 				"WebGLProgram": "api/zh/renderers/webgl/WebGLProgram",
 				"WebGLShader": "api/zh/renderers/webgl/WebGLShader",
 				"WebGLState": "api/zh/renderers/webgl/WebGLState"
+			}
+
+		}
+
+	},
+
+	"ko": {
+
+		"매뉴얼": {
+
+			"시작하기": {
+				"장면 만들기": "manual/ko/introduction/Creating-a-scene",
+				"설치": "manual/ko/introduction/Installation",
+				"브라우저 지원": "manual/ko/introduction/Browser-support",
+				"WebGL 호환성 검사": "manual/ko/introduction/WebGL-compatibility-check",
+				"로컬 환경에서 구동 방법": "manual/ko/introduction/How-to-run-things-locally",
+				"Typescript 설정": "manual/ko/introduction/Typescript-setup",
+				"선 그리기": "manual/ko/introduction/Drawing-lines",
+				"텍스트 만들기": "manual/ko/introduction/Creating-text",
+				"3D 모델 불러오기": "manual/ko/introduction/Loading-3D-models",
+				"FAQ": "manual/ko/introduction/FAQ",
+				"참고 링크": "manual/ko/introduction/Useful-links"
+			},
+
+			"심화 과정": {
+				"오브젝트를 업데이트하는 방법": "manual/ko/introduction/How-to-update-things",
+				"오브젝트를 폐기하는 방법": "manual/ko/introduction/How-to-dispose-of-objects",
+				"VR 컨텐츠를 만드는 방법": "manual/ko/introduction/How-to-create-VR-content",
+				"후처리 사용 방법": "manual/ko/introduction/How-to-use-post-processing",
+				"행렬 변환": "manual/ko/introduction/Matrix-transformations",
+				"애니메이션 시스템": "manual/ko/introduction/Animation-system"
+			},
+
+			"빌드 도구": {
+				"NPM 테스트": "manual/ko/buildTools/Testing-with-NPM"
+
+			}
+
+		},
+
+		"레퍼런스": {
+
+			"애니메이션": {
+				"AnimationAction": "api/ko/animation/AnimationAction",
+				"AnimationAction": "api/ko/animation/AnimationAction",
+				"AnimationClip": "api/ko/animation/AnimationClip",
+				"AnimationMixer": "api/ko/animation/AnimationMixer",
+				"AnimationObjectGroup": "api/ko/animation/AnimationObjectGroup",
+				"AnimationUtils": "api/ko/animation/AnimationUtils",
+				"KeyframeTrack": "api/ko/animation/KeyframeTrack",
+				"PropertyBinding": "api/ko/animation/PropertyBinding",
+				"PropertyMixer": "api/ko/animation/PropertyMixer"
+			},
+
+			"애니메이션 / 트랙": {
+				"BooleanKeyframeTrack": "api/ko/animation/tracks/BooleanKeyframeTrack",
+				"ColorKeyframeTrack": "api/ko/animation/tracks/ColorKeyframeTrack",
+				"NumberKeyframeTrack": "api/ko/animation/tracks/NumberKeyframeTrack",
+				"QuaternionKeyframeTrack": "api/ko/animation/tracks/QuaternionKeyframeTrack",
+				"StringKeyframeTrack": "api/ko/animation/tracks/StringKeyframeTrack",
+				"VectorKeyframeTrack": "api/ko/animation/tracks/VectorKeyframeTrack"
+			},
+
+			"오디오": {
+				"Audio": "api/ko/audio/Audio",
+				"AudioAnalyser": "api/ko/audio/AudioAnalyser",
+				"AudioContext": "api/ko/audio/AudioContext",
+				"AudioListener": "api/ko/audio/AudioListener",
+				"PositionalAudio": "api/ko/audio/PositionalAudio"
+			},
+
+			"카메라": {
+				"ArrayCamera": "api/ko/cameras/ArrayCamera",
+				"Camera": "api/ko/cameras/Camera",
+				"CubeCamera": "api/ko/cameras/CubeCamera",
+				"OrthographicCamera": "api/ko/cameras/OrthographicCamera",
+				"PerspectiveCamera": "api/ko/cameras/PerspectiveCamera",
+				"StereoCamera": "api/ko/cameras/StereoCamera"
+			},
+
+			"상수": {
+				"Animation": "api/ko/constants/Animation",
+				"Core": "api/ko/constants/Core",
+				"CustomBlendingEquation": "api/ko/constants/CustomBlendingEquations",
+				"Materials": "api/ko/constants/Materials",
+				"Renderer": "api/ko/constants/Renderer",
+				"Textures": "api/ko/constants/Textures"
+			}
+		},
+
+		"예제": {
+
+			"컨트롤": {
+				"DeviceOrientationControls": "examples/ko/controls/DeviceOrientationControls",
+				"DragControls": "examples/ko/controls/DragControls",
+				"FirstPersonControls": "examples/ko/controls/FirstPersonControls",
+				"FlyControls": "examples/ko/controls/FlyControls",
+				"OrbitControls": "examples/ko/controls/OrbitControls",
+				"PointerLockControls": "examples/ko/controls/PointerLockControls",
+				"TrackballControls": "examples/ko/controls/TrackballControls",
+				"TransformControls": "examples/ko/controls/TransformControls"
 			}
 
 		}

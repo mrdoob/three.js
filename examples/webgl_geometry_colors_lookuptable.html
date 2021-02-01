@@ -92,7 +92,7 @@
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				const controls = new OrbitControls( perpCamera, renderer.domElement );
 				controls.addEventListener( 'change', render );

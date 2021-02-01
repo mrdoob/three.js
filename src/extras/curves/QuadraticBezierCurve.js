@@ -2,15 +2,15 @@ import { Curve } from '../core/Curve.js';
 import { QuadraticBezier } from '../core/Interpolations.js';
 import { Vector2 } from '../../math/Vector2.js';
 
-function QuadraticBezierCurve( v0, v1, v2 ) {
+function QuadraticBezierCurve( v0 = new Vector2(), v1 = new Vector2(), v2 = new Vector2() ) {
 
 	Curve.call( this );
 
 	this.type = 'QuadraticBezierCurve';
 
-	this.v0 = v0 || new Vector2();
-	this.v1 = v1 || new Vector2();
-	this.v2 = v2 || new Vector2();
+	this.v0 = v0;
+	this.v1 = v1;
+	this.v2 = v2;
 
 }
 
@@ -19,9 +19,9 @@ QuadraticBezierCurve.prototype.constructor = QuadraticBezierCurve;
 
 QuadraticBezierCurve.prototype.isQuadraticBezierCurve = true;
 
-QuadraticBezierCurve.prototype.getPoint = function ( t, optionalTarget ) {
+QuadraticBezierCurve.prototype.getPoint = function ( t, optionalTarget = new Vector2() ) {
 
-	const point = optionalTarget || new Vector2();
+	const point = optionalTarget;
 
 	const v0 = this.v0, v1 = this.v1, v2 = this.v2;
 

@@ -3,9 +3,9 @@ import {
 	Loader,
 	Matrix4,
 	Vector3
-} from "../../../build/three.module.js";
-import { Zlib } from "../libs/gunzip.module.min.js";
-import { Volume } from "../misc/Volume.js";
+} from '../../../build/three.module.js';
+import * as fflate from '../libs/fflate.module.min.js';
+import { Volume } from '../misc/Volume.js';
 
 var NRRDLoader = function ( manager ) {
 
@@ -322,8 +322,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			// we need to decompress the datastream
 			// here we start the unzipping and get a typed Uint8Array back
-			var inflate = new Zlib.Gunzip( new Uint8Array( _data ) ); // eslint-disable-line no-undef
-			_data = inflate.decompress();
+			_data = fflate.gunzipSync( new Uint8Array( _data ) );// eslint-disable-line no-undef
 
 		} else if ( headerObject.encoding === 'ascii' || headerObject.encoding === 'text' || headerObject.encoding === 'txt' || headerObject.encoding === 'hex' ) {
 
@@ -383,7 +382,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var _spaceY = 1;
 		var _spaceZ = 1;
 
-		if ( headerObject.space == "left-posterior-superior" ) {
+		if ( headerObject.space == 'left-posterior-superior' ) {
 
 			_spaceX = - 1;
 			_spaceY = - 1;
@@ -572,7 +571,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		'space origin': function ( data ) {
 
-			return this.space_origin = data.split( "(" )[ 1 ].split( ")" )[ 0 ].split( "," );
+			return this.space_origin = data.split( '(' )[ 1 ].split( ')' )[ 0 ].split( ',' );
 
 		},
 

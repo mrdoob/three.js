@@ -34,7 +34,7 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 1.6, 2 );
 
-				const torusGeometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.15, 150, 20 );
+				const torusGeometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );
 				const torusMaterial = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2, envMap: background } );
 				const torus = new THREE.Mesh( torusGeometry, torusMaterial );
 				torus.position.y = 0.75;
@@ -43,7 +43,7 @@
 				torus.receiveShadow = true;
 				scene.add( torus );
 
-				const boxGeometry = new THREE.BoxBufferGeometry( 1.5, 0.1, 1.5 );
+				const boxGeometry = new THREE.BoxGeometry( 1.5, 0.1, 1.5 );
 				const boxMaterial = new THREE.MeshPhongMaterial();
 				const box = new THREE.Mesh( boxGeometry, boxMaterial );
 				box.position.y = - 0.2;
@@ -90,7 +90,7 @@
 
 				//
 
-				reflector = new Reflector( new THREE.PlaneBufferGeometry( 1.4, 1.4 ), {
+				reflector = new Reflector( new THREE.PlaneGeometry( 1.4, 1.4 ), {
 					textureWidth: window.innerWidth * window.devicePixelRatio,
 					textureHeight: window.innerHeight * window.devicePixelRatio
 				} );
@@ -100,7 +100,7 @@
 				reflector.rotation.y = - Math.PI / 4;
 				scene.add( reflector );
 
-				const frameGeometry = new THREE.BoxBufferGeometry( 1.5, 1.5, 0.1 );
+				const frameGeometry = new THREE.BoxGeometry( 1.5, 1.5, 0.1 );
 				const frameMaterial = new THREE.MeshPhongMaterial();
 				const frame = new THREE.Mesh( frameGeometry, frameMaterial );
 				frame.position.z = - 0.07;
@@ -122,7 +122,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

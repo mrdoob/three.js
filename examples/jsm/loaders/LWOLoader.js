@@ -37,9 +37,9 @@ import {
 	RepeatWrapping,
 	TextureLoader,
 	Vector2
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
-import { IFFParser } from "./lwo/IFFParser.js";
+import { IFFParser } from './lwo/IFFParser.js';
 
 var lwoTree;
 
