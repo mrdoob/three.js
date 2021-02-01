@@ -82,7 +82,7 @@
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+				const geometry = new THREE.PlaneGeometry( 2, 2 );
 
 				uniforms = {
 					time: { value: 1.0 }
@@ -105,7 +105,7 @@
 
 				onWindowResize();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

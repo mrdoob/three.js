@@ -117,7 +117,7 @@
 				attractor.add( light );
 
 				const ground = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 10, 10 ),
+					new THREE.PlaneGeometry( 10, 10 ),
 					new THREE.MeshPhongMaterial()
 				);
 				ground.geometry.rotateX( - 90 * Math.PI / 180 );
@@ -135,7 +135,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 

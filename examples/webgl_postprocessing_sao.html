@@ -75,7 +75,7 @@
 				const light4 = new THREE.AmbientLight( 0xffffff, 0.05 );
 				scene.add( light4 );
 
-				const geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
+				const geometry = new THREE.SphereGeometry( 3, 48, 24 );
 
 				for ( let i = 0; i < 120; i ++ ) {
 
@@ -129,7 +129,7 @@
 				gui.add( saoPass.params, 'saoBlurStdDev', 0.5, 150 );
 				gui.add( saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1 );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

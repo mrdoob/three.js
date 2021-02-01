@@ -72,6 +72,11 @@
 			يضبط [page:.duration duration] للمقطع على أطول مدة [page:KeyframeTrack] ممكنة.
 		</p>
 
+		<h3>[method:Object toJSON]()</h3>
+		<p>
+			Returns a JSON object representing the serialized animation clip.
+		</p>
+
 		<h3>[method:this trim]()</h3>
 		<p>
 			اقتطاع كل المسارات حسب مدة المقطع.
@@ -88,12 +93,12 @@
 
 		<h3>[method:Array CreateClipsFromMorphTargetSequences]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
 		<p>
-			تُرجع مصفوفة من AnimationClips الجديدة التي تم إنشاؤها من [page:Geometry.morphTargets morph target sequences] من الشكل الهندسي ، في محاولة لفرز أسماء الأهداف التحويلية إلى أنماط قائمة على مجموعة الرسوم المتحركة مثل "Walk_001 ، Walk_002 ، Run_001 ، Run_002 ...".
+			تُرجع مصفوفة من AnimationClips الجديدة التي تم إنشاؤها من morph target sequences من الشكل الهندسي ، في محاولة لفرز أسماء الأهداف التحويلية إلى أنماط قائمة على مجموعة الرسوم المتحركة مثل "Walk_001 ، Walk_002 ، Run_001 ، Run_002 ...".
 		</p>
 
 		<h3>[method:AnimationClip CreateFromMorphTargetSequence]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
 		<p>
-			يُرجع مقطع رسوم متحركة جديدًا من [page:Geometry.morphTargets morph targets array] تم تمريره لشكل هندسي ، مع أخذ اسم وعدد الإطارات في الثانية.<br /><br />
+			يُرجع مقطع رسوم متحركة جديدًا من morph targets array تم تمريره لشكل هندسي ، مع أخذ اسم وعدد الإطارات في الثانية.<br /><br />
 
 			ملاحظة: قيمة fps مطلوبة و ضرورية ، ولكن يمكن إعادة ضبظ سرعة الرسوم المتحركة في *AnimationAction* عبر [page:AnimationAction.setDuration animationAction.setDuration].
 		</p>

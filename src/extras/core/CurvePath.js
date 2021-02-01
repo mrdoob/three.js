@@ -151,9 +151,7 @@ class CurvePath extends Curve {
 
 	}
 
-	getPoints( divisions ) {
-
-		divisions = divisions || 12;
+	getPoints( divisions = 12 ) {
 
 		const points = [];
 		let last;

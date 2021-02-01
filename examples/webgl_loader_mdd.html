@@ -41,7 +41,7 @@
 					const clip = result.clip;
 					// clip.optimize(); // optional
 
-					const geometry = new THREE.BoxBufferGeometry();
+					const geometry = new THREE.BoxGeometry();
 					geometry.morphAttributes.position = morphTargets; // apply morph targets
 
 					const material = new THREE.MeshNormalMaterial( { morphTargets: true } );
@@ -63,7 +63,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

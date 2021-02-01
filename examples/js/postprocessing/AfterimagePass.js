@@ -3,13 +3,13 @@ THREE.AfterimagePass = function ( damp ) {
 	THREE.Pass.call( this );
 
 	if ( THREE.AfterimageShader === undefined )
-		console.error( "THREE.AfterimagePass relies on THREE.AfterimageShader" );
+		console.error( 'THREE.AfterimagePass relies on THREE.AfterimageShader' );
 
 	this.shader = THREE.AfterimageShader;
 
 	this.uniforms = THREE.UniformsUtils.clone( this.shader.uniforms );
 
-	this.uniforms[ "damp" ].value = damp !== undefined ? damp : 0.96;
+	this.uniforms[ 'damp' ].value = damp !== undefined ? damp : 0.96;
 
 	this.textureComp = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
 
@@ -48,8 +48,8 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 	render: function ( renderer, writeBuffer, readBuffer ) {
 
-		this.uniforms[ "tOld" ].value = this.textureOld.texture;
-		this.uniforms[ "tNew" ].value = readBuffer.texture;
+		this.uniforms[ 'tOld' ].value = this.textureOld.texture;
+		this.uniforms[ 'tNew' ].value = readBuffer.texture;
 
 		renderer.setRenderTarget( this.textureComp );
 		this.compFsQuad.render( renderer );

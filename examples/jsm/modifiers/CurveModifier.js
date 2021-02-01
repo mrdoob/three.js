@@ -13,7 +13,7 @@ import {
 	NearestFilter,
 	DynamicDrawUsage,
 	Matrix4
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * Make a new DataTexture to store the descriptions of the curves.
@@ -130,54 +130,61 @@ export function modifyShader( material, uniforms, numberOfCurves = 1 ) {
 		float textureStacks = ${TEXTURE_HEIGHT / 4}.;
 
 		${shader.vertexShader}
-		`.replace(
-		'#include <defaultnormal_vertex>',
 		`
-		vec4 worldPos = modelMatrix * vec4(position, 1.);
+		// chunk import moved in front of modified shader below
+			.replace( '#include <beginnormal_vertex>', '' )
 
-		bool bend = flow > 0;
-		float xWeight = bend ? 0. : 1.;
+			// vec3 transformedNormal declaration overriden below
+			.replace( '#include <defaultnormal_vertex>', '' )
 
-		#ifdef USE_INSTANCING
-		float pathOffsetFromInstanceMatrix = instanceMatrix[3][2];
-		float spineLengthFromInstanceMatrix = instanceMatrix[3][0];
-		float spinePortion = bend ? (worldPos.x + spineOffset) / spineLengthFromInstanceMatrix : 0.;
-		float mt = (spinePortion * pathSegment + pathOffset + pathOffsetFromInstanceMatrix)*textureStacks;
-		#else
-		float spinePortion = bend ? (worldPos.x + spineOffset) / spineLength : 0.;
-		float mt = (spinePortion * pathSegment + pathOffset)*textureStacks;
-		#endif
+			// vec3 transformed declaration overriden below
+			.replace( '#include <begin_vertex>', '' )
 
-		mt = mod(mt, textureStacks);
-		float rowOffset = floor(mt);
+			// shader override
+			.replace(
+				/void\s*main\s*\(\)\s*\{/,
+				`
+void main() {
+#include <beginnormal_vertex>
 
-		#ifdef USE_INSTANCING
-		rowOffset += instanceMatrix[3][1] * ${TEXTURE_HEIGHT}.;
-		#endif
+vec4 worldPos = modelMatrix * vec4(position, 1.);
 
-		vec3 spinePos = texture(spineTexture, vec2(mt, (0. + rowOffset + 0.5) / textureLayers)).xyz;
-		vec3 a =        texture(spineTexture, vec2(mt, (1. + rowOffset + 0.5) / textureLayers)).xyz;
-		vec3 b =        texture(spineTexture, vec2(mt, (2. + rowOffset + 0.5) / textureLayers)).xyz;
-		vec3 c =        texture(spineTexture, vec2(mt, (3. + rowOffset + 0.5) / textureLayers)).xyz;
-		mat3 basis = mat3(a, b, c);
+bool bend = flow > 0;
+float xWeight = bend ? 0. : 1.;
 
-		vec3 transformed = basis
-			* vec3(worldPos.x * xWeight, worldPos.y * 1., worldPos.z * 1.)
-			+ spinePos;
+#ifdef USE_INSTANCING
+float pathOffsetFromInstanceMatrix = instanceMatrix[3][2];
+float spineLengthFromInstanceMatrix = instanceMatrix[3][0];
+float spinePortion = bend ? (worldPos.x + spineOffset) / spineLengthFromInstanceMatrix : 0.;
+float mt = (spinePortion * pathSegment + pathOffset + pathOffsetFromInstanceMatrix)*textureStacks;
+#else
+float spinePortion = bend ? (worldPos.x + spineOffset) / spineLength : 0.;
+float mt = (spinePortion * pathSegment + pathOffset)*textureStacks;
+#endif
 
-		vec3 transformedNormal = normalMatrix * (basis * objectNormal);
-		`
-	).replace(
-		'#include <begin_vertex>',
-		''
-	).replace(
-		'#include <project_vertex>',
-		`
-			vec4 mvPosition = viewMatrix * vec4( transformed, 1.0 );
-			// vec4 mvPosition = viewMatrix * worldPos;
-			gl_Position = projectionMatrix * mvPosition;
-			`
-	);
+mt = mod(mt, textureStacks);
+float rowOffset = floor(mt);
+
+#ifdef USE_INSTANCING
+rowOffset += instanceMatrix[3][1] * ${TEXTURE_HEIGHT}.;
+#endif
+
+vec3 spinePos = texture2D(spineTexture, vec2(mt, (0. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 a =        texture2D(spineTexture, vec2(mt, (1. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 b =        texture2D(spineTexture, vec2(mt, (2. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 c =        texture2D(spineTexture, vec2(mt, (3. + rowOffset + 0.5) / textureLayers)).xyz;
+mat3 basis = mat3(a, b, c);
+
+vec3 transformed = basis
+	* vec3(worldPos.x * xWeight, worldPos.y * 1., worldPos.z * 1.)
+	+ spinePos;
+
+vec3 transformedNormal = normalMatrix * (basis * objectNormal);
+			` ).replace(
+				'#include <project_vertex>',
+				`vec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );
+				gl_Position = projectionMatrix * mvPosition;`
+			);
 
 		shader.vertexShader = vertexShader;
 
@@ -308,7 +315,7 @@ export class InstancedFlow extends Flow {
 	 */
 	setCurve( index, curveNo ) {
 
-		if ( isNaN( curveNo ) ) throw Error( "curve index being set is Not a Number (NaN)" );
+		if ( isNaN( curveNo ) ) throw Error( 'curve index being set is Not a Number (NaN)' );
 		this.whichCurve[ index ] = curveNo;
 		this.writeChanges( index );
 

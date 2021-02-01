@@ -41,7 +41,7 @@
 
 				// Cube
 
-				const geometry = new THREE.BoxBufferGeometry().toNonIndexed(); // ensure unique vertices for each triangle
+				const geometry = new THREE.BoxGeometry().toNonIndexed(); // ensure unique vertices for each triangle
 
 				const position = geometry.attributes.position;
 				const colors = [];
@@ -90,7 +90,7 @@
 				effect.setSize( window.innerWidth, window.innerHeight );
 				effect.cameraDistance = 5;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

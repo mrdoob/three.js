@@ -59,7 +59,7 @@
 				light.shadow.camera.zoom = 4; // tighter shadow map
 				scene.add( light );
 
-				const geometryBackground = new THREE.PlaneBufferGeometry( 100, 100 );
+				const geometryBackground = new THREE.PlaneGeometry( 100, 100 );
 				const materialBackground = new THREE.MeshPhongMaterial( { color: 0x000066 } );
 
 				const background = new THREE.Mesh( geometryBackground, materialBackground );
@@ -67,7 +67,7 @@
 				background.position.set( 0, 0, - 1 );
 				scene.add( background );
 
-				const geometryCylinder = new THREE.CylinderBufferGeometry( 0.5, 0.5, 1, 32 );
+				const geometryCylinder = new THREE.CylinderGeometry( 0.5, 0.5, 1, 32 );
 				const materialCylinder = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
 
 				mesh = new THREE.Mesh( geometryCylinder, materialCylinder );
@@ -83,7 +83,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

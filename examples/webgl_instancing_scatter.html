@@ -43,8 +43,8 @@
 			const _normal = new THREE.Vector3();
 			const _scale = new THREE.Vector3();
 
-			// let surfaceGeometry = new THREE.BoxBufferGeometry( 10, 10, 10 ).toNonIndexed();
-			const surfaceGeometry = new THREE.TorusKnotBufferGeometry( 10, 3, 100, 16 ).toNonIndexed();
+			// let surfaceGeometry = new THREE.BoxGeometry( 10, 10, 10 ).toNonIndexed();
+			const surfaceGeometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 ).toNonIndexed();
 			const surfaceMaterial = new THREE.MeshLambertMaterial( { color: api.surfaceColor, wireframe: false } );
 			const surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
 
@@ -178,7 +178,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

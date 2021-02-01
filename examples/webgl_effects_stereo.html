@@ -27,7 +27,7 @@
 			let windowHalfX = window.innerWidth / 2;
 			let windowHalfY = window.innerHeight / 2;
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			init();
 			animate();
@@ -45,7 +45,7 @@
 					.setPath( 'textures/cube/Park3Med/' )
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
-				const geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
+				const geometry = new THREE.SphereGeometry( 100, 32, 16 );
 
 				const textureCube = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/Park3Med/' )
@@ -78,7 +78,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

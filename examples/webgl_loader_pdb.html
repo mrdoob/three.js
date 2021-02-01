@@ -130,7 +130,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -179,8 +179,8 @@
 					const geometryBonds = pdb.geometryBonds;
 					const json = pdb.json;
 
-					const boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-					const sphereGeometry = new THREE.IcosahedronBufferGeometry( 1, 3 );
+					const boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+					const sphereGeometry = new THREE.IcosahedronGeometry( 1, 3 );
 
 					geometryAtoms.computeBoundingBox();
 					geometryAtoms.boundingBox.getCenter( offset ).negate();

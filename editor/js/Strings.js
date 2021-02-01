@@ -21,6 +21,7 @@ function Strings( config ) {
 			'menubar/file/export/ply_binary': 'Export PLY (Binary)',
 			'menubar/file/export/stl': 'Export STL',
 			'menubar/file/export/stl_binary': 'Export STL (Binary)',
+			'menubar/file/export/usdz': 'Export USDZ',
 			'menubar/file/publish': 'Publish',
 
 			'menubar/edit': 'Edit',
@@ -160,9 +161,6 @@ function Strings( config ) {
 			'sidebar/geometry/extrude_geometry/bevelSegments': 'Segments',
 			'sidebar/geometry/extrude_geometry/shape': 'Convert to Shape',
 
-			'sidebar/geometry/geometry/vertices': 'Vertices',
-			'sidebar/geometry/geometry/faces': 'Faces',
-
 			'sidebar/geometry/dodecahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/dodecahedron_geometry/detail': 'Detail',
 
@@ -268,6 +266,8 @@ function Strings( config ) {
 			'sidebar/material/side/front': 'Front',
 			'sidebar/material/side/back': 'Back',
 			'sidebar/material/side/double': 'Double',
+			'sidebar/material/size': 'Size',
+			'sidebar/material/sizeAttenuation': 'Size Attenuation',
 			'sidebar/material/flatshaded': 'Flat Shaded',
 			'sidebar/material/blending': 'Blending',
 			'sidebar/material/blending/no': 'No',
@@ -345,6 +345,7 @@ function Strings( config ) {
 			'menubar/file/export/ply_binary': 'Exporter PLY (Binaire)',
 			'menubar/file/export/stl': 'Exporter STL',
 			'menubar/file/export/stl_binary': 'Exporter STL (Binaire)',
+			'menubar/file/export/usdz': 'Exporter USDZ',
 			'menubar/file/publish': 'Publier',
 
 			'menubar/edit': 'Edition',
@@ -484,9 +485,6 @@ function Strings( config ) {
 			'sidebar/geometry/extrude_geometry/bevelSegments': 'Segments',
 			'sidebar/geometry/extrude_geometry/shape': 'Convertir en forme',
 
-			'sidebar/geometry/geometry/vertices': 'Sommets',
-			'sidebar/geometry/geometry/faces': 'Faces',
-
 			'sidebar/geometry/dodecahedron_geometry/radius': 'Rayon',
 			'sidebar/geometry/dodecahedron_geometry/detail': 'Détail',
 
@@ -592,6 +590,8 @@ function Strings( config ) {
 			'sidebar/material/side/front': 'Face avant',
 			'sidebar/material/side/back': 'Face Arrière',
 			'sidebar/material/side/double': 'Double face',
+			'sidebar/material/size': 'Size',
+			'sidebar/material/sizeAttenuation': 'Size Attenuation',
 			'sidebar/material/flatshaded': 'Rendu plat',
 			'sidebar/material/blending': 'Mélange',
 			'sidebar/material/blending/no': 'Non',
@@ -669,6 +669,7 @@ function Strings( config ) {
 			'menubar/file/export/ply_binary': '导出PLY(二进制)',
 			'menubar/file/export/stl': '导出STL',
 			'menubar/file/export/stl_binary': '导出STL(二进制)',
+			'menubar/file/export/usdz': '导出USDZ',
 			'menubar/file/publish': '发布',
 
 			'menubar/edit': '编辑',
@@ -798,9 +799,6 @@ function Strings( config ) {
 			'sidebar/geometry/cylinder_geometry/heightsegments': '高度分段',
 			'sidebar/geometry/cylinder_geometry/openended': '开端',
 
-			'sidebar/geometry/geometry/vertices': '顶点',
-			'sidebar/geometry/geometry/faces': '面',
-
 			'sidebar/geometry/dodecahedron_geometry/radius': '半径',
 			'sidebar/geometry/dodecahedron_geometry/detail': '面片分段',
 
@@ -900,6 +898,8 @@ function Strings( config ) {
 			'sidebar/material/side/front': '正面',
 			'sidebar/material/side/back': '背面',
 			'sidebar/material/side/double': '双面',
+			'sidebar/material/size': '大小',
+			'sidebar/material/sizeAttenuation': '大小衰减',
 			'sidebar/material/flatshaded': '平面着色',
 			'sidebar/material/blending': '混合',
 			'sidebar/material/blending/no': '无',

@@ -43,7 +43,7 @@
 				object = new THREE.Object3D();
 				scene.add( object );
 
-				const geometry = new THREE.SphereBufferGeometry( 1, 4, 4 );
+				const geometry = new THREE.SphereGeometry( 1, 4, 4 );
 				const material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				for ( let i = 0; i < 100; i ++ ) {
@@ -78,7 +78,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
