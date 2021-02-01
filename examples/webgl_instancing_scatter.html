@@ -8,6 +8,8 @@
 	</head>
 	<body>
 
+		<script src="./js/libs/tweakpane.min.js"></script>
+
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -15,17 +17,15 @@
 			import { MeshSurfaceSampler } from './jsm/math/MeshSurfaceSampler.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			let camera, scene, renderer, stats;
 
 			const api = {
 
 				count: 2000,
-				distribution: 'random',
-				resample: resample,
-				surfaceColor: 0xFFF784,
-				backgroundColor: 0xE39469,
+				dist: 'random',
+				surface: '#FFF784',
+				background: '#E39469',
 
 			};
 
@@ -45,7 +45,7 @@
 
 			// let surfaceGeometry = new THREE.BoxGeometry( 10, 10, 10 ).toNonIndexed();
 			const surfaceGeometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 ).toNonIndexed();
-			const surfaceMaterial = new THREE.MeshLambertMaterial( { color: api.surfaceColor, wireframe: false } );
+			const surfaceMaterial = new THREE.MeshLambertMaterial( { color: api.surface, wireframe: false } );
 			const surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
 
 			// Source: https://gist.github.com/gre/1650294
@@ -124,7 +124,7 @@
 				//
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( api.backgroundColor );
+				scene.background = new THREE.Color( api.background );
 
 				const pointLight = new THREE.PointLight( 0xAA8899, 0.75 );
 				pointLight.position.set( 50, - 25, 75 );
@@ -141,28 +141,35 @@
 
 				//
 
-				const gui = new GUI();
-				gui.add( api, 'count', 0, count ).onChange( function () {
+				const pane = new Tweakpane();
+				pane.addInput( api, 'count', { min: 0, max: count, step: 1 } ).on( 'change', function () {
 
 					stemMesh.count = api.count;
 					blossomMesh.count = api.count;
 
 				} );
 
-				// gui.addColor( api, 'backgroundColor' ).onChange( function () {
+				pane.addInput( api, 'background' ).on( 'change', function () {
 
-				// 	scene.background.setHex( api.backgroundColor );
+					scene.background.setStyle( api.background );
 
-				// } );
+				} );
 
-				// gui.addColor( api, 'surfaceColor' ).onChange( function () {
+				pane.addInput( api, 'surface' ).on( 'change', function () {
 
-				// 	surfaceMaterial.color.setHex( api.surfaceColor );
+					surfaceMaterial.color.setStyle( api.surface );
 
-				// } );
+				} );
 
-				gui.add( api, 'distribution' ).options( [ 'random', 'weighted' ] ).onChange( resample );
-				gui.add( api, 'resample' );
+				pane.addInput( api, 'dist', {
+
+					options: { random: 'random', weighted: 'weighted' }
+
+				} ).on( 'change', resample );
+
+				pane.addSeparator();
+
+				pane.addButton( { title: 'resample' } ).on( 'click', resample );
 
 				//
 
@@ -193,7 +200,7 @@
 				console.time( '.build()' );
 
 				sampler = new MeshSurfaceSampler( surface )
-					.setWeightAttribute( api.distribution === 'weighted' ? 'uv' : null )
+					.setWeightAttribute( api.dist === 'weighted' ? 'uv' : null )
 					.build();
 
 				console.timeEnd( '.build()' );
