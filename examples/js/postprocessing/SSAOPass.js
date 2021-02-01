@@ -1,5 +1,3 @@
-console.warn( "THREE.SSAOPass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.SSAOPass = function ( scene, camera, width, height ) {
 
 	THREE.Pass.call( this );
@@ -21,12 +19,14 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 	this.minDistance = 0.005;
 	this.maxDistance = 0.1;
 
+	this._visibilityCache = new Map();
+
 	//
 
 	this.generateSampleKernel();
 	this.generateRandomKernelRotations();
 
-	// beauty render target with depth buffer
+	// beauty render target
 
 	var depthTexture = new THREE.DepthTexture();
 	depthTexture.type = THREE.UnsignedShortType;
@@ -36,17 +36,16 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 	this.beautyRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
-		format: THREE.RGBAFormat,
-		depthTexture: depthTexture,
-		depthBuffer: true
+		format: THREE.RGBAFormat
 	} );
 
-	// normal render target
+	// normal render target with depth buffer
 
 	this.normalRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
 		minFilter: THREE.NearestFilter,
 		magFilter: THREE.NearestFilter,
-		format: THREE.RGBAFormat
+		format: THREE.RGBAFormat,
+		depthTexture: depthTexture
 	} );
 
 	// ssao render target
@@ -77,14 +76,14 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 
 	this.ssaoMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 	this.ssaoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
-	this.ssaoMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+	this.ssaoMaterial.uniforms[ 'tDepth' ].value = this.normalRenderTarget.depthTexture;
 	this.ssaoMaterial.uniforms[ 'tNoise' ].value = this.noiseTexture;
 	this.ssaoMaterial.uniforms[ 'kernel' ].value = this.kernel;
 	this.ssaoMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 	this.ssaoMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 	this.ssaoMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
 	this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-	this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+	this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 
 	// normal material
 
@@ -111,7 +110,7 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 		fragmentShader: THREE.SSAODepthShader.fragmentShader,
 		blending: THREE.NoBlending
 	} );
-	this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+	this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.normalRenderTarget.depthTexture;
 	this.depthRenderMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 	this.depthRenderMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 
@@ -166,15 +165,17 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 	render: function ( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
 
-		// render beauty and depth
+		// render beauty
 
 		renderer.setRenderTarget( this.beautyRenderTarget );
 		renderer.clear();
 		renderer.render( this.scene, this.camera );
 
-		// render normals
+		// render normals and depth (honor only meshes, points and lines do not contribute to SSAO)
 
+		this.overrideVisibility();
 		this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0 );
+		this.restoreVisibility();
 
 		// render SSAO
 
@@ -251,7 +252,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 	renderPass: function ( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
-		this.originalClearColor.copy( renderer.getClearColor() );
+		renderer.getClearColor( this.originalClearColor );
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
@@ -279,7 +280,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 	renderOverride: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
-		this.originalClearColor.copy( renderer.getClearColor() );
+		renderer.getClearColor( this.originalClearColor );
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
@@ -321,7 +322,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		this.ssaoMaterial.uniforms[ 'resolution' ].value.set( width, height );
 		this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-		this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+		this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 
 		this.blurMaterial.uniforms[ 'resolution' ].value.set( width, height );
 
@@ -386,6 +387,37 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 		this.noiseTexture = new THREE.DataTexture( data, width, height, THREE.RGBAFormat, THREE.FloatType );
 		this.noiseTexture.wrapS = THREE.RepeatWrapping;
 		this.noiseTexture.wrapT = THREE.RepeatWrapping;
+
+	},
+
+	overrideVisibility: function () {
+
+		var scene = this.scene;
+		var cache = this._visibilityCache;
+
+		scene.traverse( function ( object ) {
+
+			cache.set( object, object.visible );
+
+			if ( object.isPoints || object.isLine ) object.visible = false;
+
+		} );
+
+	},
+
+	restoreVisibility: function () {
+
+		var scene = this.scene;
+		var cache = this._visibilityCache;
+
+		scene.traverse( function ( object ) {
+
+			var visible = cache.get( object );
+			object.visible = visible;
+
+		} );
+
+		cache.clear();
 
 	}
 

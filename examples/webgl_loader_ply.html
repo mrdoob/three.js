@@ -21,9 +21,9 @@
 
 			import { PLYLoader } from './jsm/loaders/PLYLoader.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, cameraTarget, scene, renderer;
+			let camera, cameraTarget, scene, renderer;
 
 			init();
 			animate();
@@ -45,8 +45,8 @@
 
 				// Ground
 
-				var plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 40, 40 ),
+				const plane = new THREE.Mesh(
+					new THREE.PlaneGeometry( 40, 40 ),
 					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 				);
 				plane.rotation.x = - Math.PI / 2;
@@ -58,13 +58,13 @@
 
 				// PLY file
 
-				var loader = new PLYLoader();
+				const loader = new PLYLoader();
 				loader.load( './models/ply/ascii/dolphins.ply', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
-					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
-					var mesh = new THREE.Mesh( geometry, material );
+					const material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.y = - 0.2;
 					mesh.position.z = 0.3;
@@ -82,8 +82,8 @@
 
 					geometry.computeVertexNormals();
 
-					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
-					var mesh = new THREE.Mesh( geometry, material );
+					const material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = - 0.2;
 					mesh.position.y = - 0.02;
@@ -122,19 +122,19 @@
 
 				// resize
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function addShadowedLight( x, y, z, color, intensity ) {
 
-				var directionalLight = new THREE.DirectionalLight( color, intensity );
+				const directionalLight = new THREE.DirectionalLight( color, intensity );
 				directionalLight.position.set( x, y, z );
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;
 
-				var d = 1;
+				const d = 1;
 				directionalLight.shadow.camera.left = - d;
 				directionalLight.shadow.camera.right = d;
 				directionalLight.shadow.camera.top = d;
@@ -170,7 +170,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.0005;
+				const timer = Date.now() * 0.0005;
 
 				camera.position.x = Math.sin( timer ) * 2.5;
 				camera.position.z = Math.cos( timer ) * 2.5;

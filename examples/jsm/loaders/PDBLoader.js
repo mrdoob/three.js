@@ -3,7 +3,7 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var PDBLoader = function ( manager ) {
 
@@ -22,6 +22,7 @@ PDBLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {

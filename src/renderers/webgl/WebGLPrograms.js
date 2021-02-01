@@ -34,19 +34,19 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 	};
 
 	const parameterNames = [
-		"precision", "isWebGL2", "supportsVertexTextures", "outputEncoding", "instancing", "instancingColor",
-		"map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding", "envMapCubeUV",
-		"lightMap", "lightMapEncoding", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatMap", "clearcoatRoughnessMap", "clearcoatNormalMap", "displacementMap", "specularMap",
-		"roughnessMap", "metalnessMap", "gradientMap",
-		"alphaMap", "combine", "vertexColors", "vertexTangents", "vertexUvs", "uvsVertexOnly", "fog", "useFog", "fogExp2",
-		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
-		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
-		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
-		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
-		"numDirLightShadows", "numPointLightShadows", "numSpotLightShadows",
-		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
-		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering",
-		"sheen", "transmissionMap"
+		'precision', 'isWebGL2', 'supportsVertexTextures', 'outputEncoding', 'instancing', 'instancingColor',
+		'map', 'mapEncoding', 'matcap', 'matcapEncoding', 'envMap', 'envMapMode', 'envMapEncoding', 'envMapCubeUV',
+		'lightMap', 'lightMapEncoding', 'aoMap', 'emissiveMap', 'emissiveMapEncoding', 'bumpMap', 'normalMap', 'objectSpaceNormalMap', 'tangentSpaceNormalMap', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap', 'displacementMap', 'specularMap',
+		'roughnessMap', 'metalnessMap', 'gradientMap',
+		'alphaMap', 'combine', 'vertexColors', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
+		'flatShading', 'sizeAttenuation', 'logarithmicDepthBuffer', 'skinning',
+		'maxBones', 'useVertexTexture', 'morphTargets', 'morphNormals',
+		'maxMorphTargets', 'maxMorphNormals', 'premultipliedAlpha',
+		'numDirLights', 'numPointLights', 'numSpotLights', 'numHemiLights', 'numRectAreaLights',
+		'numDirLightShadows', 'numPointLightShadows', 'numSpotLightShadows',
+		'shadowMapEnabled', 'shadowMapType', 'toneMapping', 'physicallyCorrectLights',
+		'alphaTest', 'doubleSided', 'flipSided', 'numClippingPlanes', 'numClipIntersection', 'depthPacking', 'dithering',
+		'sheen', 'transmissionMap'
 	];
 
 	function getMaxBones( object ) {
@@ -89,18 +89,18 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 		let encoding;
 
-		if ( ! map ) {
-
-			encoding = LinearEncoding;
-
-		} else if ( map.isTexture ) {
+		if ( map && map.isTexture ) {
 
 			encoding = map.encoding;
 
-		} else if ( map.isWebGLRenderTarget ) {
+		} else if ( map && map.isWebGLRenderTarget ) {
 
-			console.warn( "THREE.WebGLPrograms.getTextureEncodingFromMap: don't use render targets as textures. Use their .texture property instead." );
+			console.warn( 'THREE.WebGLPrograms.getTextureEncodingFromMap: don\'t use render targets as textures. Use their .texture property instead.' );
 			encoding = map.texture.encoding;
+
+		} else {
+
+			encoding = LinearEncoding;
 
 		}
 
@@ -163,8 +163,8 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			fragmentShader: fragmentShader,
 			defines: material.defines,
 
-			isRawShaderMaterial: material.isRawShaderMaterial,
-			isShaderMaterial: material.isShaderMaterial,
+			isRawShaderMaterial: material.isRawShaderMaterial === true,
+			glslVersion: material.glslVersion,
 
 			precision: precision,
 
@@ -266,13 +266,11 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			extensionDrawBuffers: material.extensions && material.extensions.drawBuffers,
 			extensionShaderTextureLOD: material.extensions && material.extensions.shaderTextureLOD,
 
-			rendererExtensionFragDepth: isWebGL2 || extensions.get( 'EXT_frag_depth' ) !== null,
-			rendererExtensionDrawBuffers: isWebGL2 || extensions.get( 'WEBGL_draw_buffers' ) !== null,
-			rendererExtensionShaderTextureLod: isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) !== null,
+			rendererExtensionFragDepth: isWebGL2 || extensions.has( 'EXT_frag_depth' ),
+			rendererExtensionDrawBuffers: isWebGL2 || extensions.has( 'WEBGL_draw_buffers' ),
+			rendererExtensionShaderTextureLod: isWebGL2 || extensions.has( 'EXT_shader_texture_lod' ),
 
-			customProgramCacheKey: material.customProgramCacheKey(),
-
-			glslVersion: material.glslVersion
+			customProgramCacheKey: material.customProgramCacheKey()
 
 		};
 
@@ -306,7 +304,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 		}
 
-		if ( parameters.isRawShaderMaterial === undefined ) {
+		if ( parameters.isRawShaderMaterial === false ) {
 
 			for ( let i = 0; i < parameterNames.length; i ++ ) {
 

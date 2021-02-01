@@ -1,13 +1,11 @@
-console.warn( "THREE.LineSegments2: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.LineSegments2 = function ( geometry, material ) {
 
-	THREE.Mesh.call( this );
+	if ( geometry === undefined ) geometry = new THREE.LineSegmentsGeometry();
+	if ( material === undefined ) material = new THREE.LineMaterial( { color: Math.random() * 0xffffff } );
+
+	THREE.Mesh.call( this, geometry, material );
 
 	this.type = 'LineSegments2';
-
-	this.geometry = geometry !== undefined ? geometry : new THREE.LineSegmentsGeometry();
-	this.material = material !== undefined ? material : new THREE.LineMaterial( { color: Math.random() * 0xffffff } );
 
 };
 
@@ -70,6 +68,8 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 
 			}
 
+			var threshold = ( raycaster.params.Line2 !== undefined ) ? raycaster.params.Line2.threshold || 0 : 0;
+
 			var ray = raycaster.ray;
 			var camera = raycaster.camera;
 			var projectionMatrix = camera.projectionMatrix;
@@ -77,10 +77,13 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 			var geometry = this.geometry;
 			var material = this.material;
 			var resolution = material.resolution;
-			var lineWidth = material.linewidth;
+			var lineWidth = material.linewidth + threshold;
 
 			var instanceStart = geometry.attributes.instanceStart;
 			var instanceEnd = geometry.attributes.instanceEnd;
+
+			// camera forward is negative
+			var near = - camera.near;
 
 			// pick a point 1 unit out along the ray to avoid the ray origin
 			// sitting at the camera origin which will cause "w" to be 0 when
@@ -115,6 +118,29 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 				start.applyMatrix4( mvMatrix );
 				end.applyMatrix4( mvMatrix );
 
+				// skip the segment if it's entirely behind the camera
+				var isBehindCameraNear = start.z > near && end.z > near;
+				if ( isBehindCameraNear ) {
+
+					continue;
+
+				}
+
+				// trim the segment if it extends behind camera near
+				if ( start.z > near ) {
+
+					const deltaDist = start.z - end.z;
+					const t = ( start.z - near ) / deltaDist;
+					start.lerp( end, t );
+
+				} else if ( end.z > near ) {
+
+					const deltaDist = end.z - start.z;
+					const t = ( end.z - near ) / deltaDist;
+					end.lerp( start, t );
+
+				}
+
 				// clip space
 				start.applyMatrix4( projectionMatrix );
 				end.applyMatrix4( projectionMatrix );
@@ -122,15 +148,6 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 				// ndc space [ - 1.0, 1.0 ]
 				start.multiplyScalar( 1 / start.w );
 				end.multiplyScalar( 1 / end.w );
-
-				// skip the segment if it's outside the camera near and far planes
-				var isBehindCameraNear = start.z < - 1 && end.z < - 1;
-				var isPastCameraFar = start.z > 1 && end.z > 1;
-				if ( isBehindCameraNear || isPastCameraFar ) {
-
-					continue;
-
-				}
 
 				// screen space
 				start.x *= resolution.x / 2;

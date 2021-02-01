@@ -4,19 +4,19 @@ import { Vector2 } from '../../math/Vector2.js';
 
 class SplineCurve extends Curve {
 
-	constructor( points ) {
+	constructor( points = [] ) {
 
 		super();
 
 		this.type = 'SplineCurve';
 		Object.defineProperty( this, 'isSplineCurve', { value: true } );
 
-		this.points = points || [];
+		this.points = points;
 
 	}
-	getPoint( t, optionalTarget ) {
+	getPoint( t, optionalTarget = new Vector2() ) {
 
-		const point = optionalTarget || new Vector2();
+		const point = optionalTarget;
 
 		const points = this.points;
 		const p = ( points.length - 1 ) * t;

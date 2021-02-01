@@ -1,12 +1,12 @@
 import {
 	BackSide,
-	BoxBufferGeometry,
+	BoxGeometry,
 	BufferAttribute,
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
-	ConeBufferGeometry,
-	CylinderBufferGeometry,
+	ConeGeometry,
+	CylinderGeometry,
 	DataTexture,
 	DoubleSide,
 	FileLoader,
@@ -29,20 +29,18 @@ import {
 	RepeatWrapping,
 	Scene,
 	ShapeUtils,
-	SphereBufferGeometry,
+	SphereGeometry,
 	TextureLoader,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
-import { chevrotain } from "../libs/chevrotain.module.min.js";
-
-/* global chevrotain */
+} from '../../../build/three.module.js';
+import { chevrotain } from '../libs/chevrotain.module.min.js';
 
 var VRMLLoader = ( function () {
 
 	// dependency check
 
-	if ( typeof chevrotain === 'undefined' ) {
+	if ( typeof chevrotain === 'undefined' ) { // eslint-disable-line no-undef
 
 		throw Error( 'THREE.VRMLLoader: External library chevrotain.min.js required.' );
 
@@ -69,6 +67,7 @@ var VRMLLoader = ( function () {
 			var loader = new FileLoader( scope.manager );
 			loader.setPath( scope.path );
 			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 			loader.load( url, function ( text ) {
 
 				try {
@@ -136,7 +135,7 @@ var VRMLLoader = ( function () {
 
 			function createTokens() {
 
-				var createToken = chevrotain.createToken;
+				var createToken = chevrotain.createToken; // eslint-disable-line no-undef
 
 				// from http://gun.teipir.gr/VRML-amgem/spec/part1/concepts.html#SyntaxBasics
 
@@ -198,7 +197,7 @@ var VRMLLoader = ( function () {
 
 				//
 
-				var StringLiteral = createToken( { name: "StringLiteral", pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/ } );
+				var StringLiteral = createToken( { name: 'StringLiteral', pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/ } );
 				var HexLiteral = createToken( { name: 'HexLiteral', pattern: /0[xX][0-9a-fA-F]+/ } );
 				var NumberLiteral = createToken( { name: 'NumberLiteral', pattern: /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/ } );
 				var TrueLiteral = createToken( { name: 'TrueLiteral', pattern: /TRUE/ } );
@@ -211,7 +210,7 @@ var VRMLLoader = ( function () {
 				var Comment = createToken( {
 					name: 'Comment',
 					pattern: /#.*/,
-					group: chevrotain.Lexer.SKIPPED
+					group: chevrotain.Lexer.SKIPPED // eslint-disable-line no-undef
 				} );
 
 				// commas, blanks, tabs, newlines and carriage returns are whitespace characters wherever they appear outside of string fields
@@ -219,7 +218,7 @@ var VRMLLoader = ( function () {
 				var WhiteSpace = createToken( {
 					name: 'WhiteSpace',
 					pattern: /[ ,\s]/,
-					group: chevrotain.Lexer.SKIPPED
+					group: chevrotain.Lexer.SKIPPED // eslint-disable-line no-undef
 				} );
 
 				var tokens = [
@@ -907,7 +906,7 @@ var VRMLLoader = ( function () {
 
 				if ( skyColor ) {
 
-					var skyGeometry = new SphereBufferGeometry( radius, 32, 16 );
+					var skyGeometry = new SphereGeometry( radius, 32, 16 );
 					var skyMaterial = new MeshBasicMaterial( { fog: false, side: BackSide, depthWrite: false, depthTest: false } );
 
 					if ( skyColor.length > 3 ) {
@@ -932,7 +931,7 @@ var VRMLLoader = ( function () {
 
 					if ( groundColor.length > 0 ) {
 
-						var groundGeometry = new SphereBufferGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
+						var groundGeometry = new SphereGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
 						var groundMaterial = new MeshBasicMaterial( { fog: false, side: BackSide, vertexColors: true, depthWrite: false, depthTest: false } );
 
 						paintFaces( groundGeometry, radius, groundAngle, toColorArray( groundColor ), false );
@@ -1267,26 +1266,26 @@ var VRMLLoader = ( function () {
 
 					case TEXTURE_TYPE.INTENSITY_ALPHA:
 						// Intensity+Alpha texture: A two-component image specifies the intensity in the first (high) byte and the alpha opacity in the second (low) byte.
-						var value = parseInt( "0x" + hex.substring( 2, 4 ) );
+						var value = parseInt( '0x' + hex.substring( 2, 4 ) );
 						color.r = value;
 						color.g = value;
 						color.b = value;
-						color.a = parseInt( "0x" + hex.substring( 4, 6 ) );
+						color.a = parseInt( '0x' + hex.substring( 4, 6 ) );
 						break;
 
 					case TEXTURE_TYPE.RGB:
 						// RGB texture: Pixels in a three-component image specify the red component in the first (high) byte, followed by the green and blue components
-						color.r = parseInt( "0x" + hex.substring( 2, 4 ) );
-						color.g = parseInt( "0x" + hex.substring( 4, 6 ) );
-						color.b = parseInt( "0x" + hex.substring( 6, 8 ) );
+						color.r = parseInt( '0x' + hex.substring( 2, 4 ) );
+						color.g = parseInt( '0x' + hex.substring( 4, 6 ) );
+						color.b = parseInt( '0x' + hex.substring( 6, 8 ) );
 						break;
 
 					case TEXTURE_TYPE.RGBA:
 						// RGBA texture: Four-component images specify the alpha opacity byte after red/green/blue
-						color.r = parseInt( "0x" + hex.substring( 2, 4 ) );
-						color.g = parseInt( "0x" + hex.substring( 4, 6 ) );
-						color.b = parseInt( "0x" + hex.substring( 6, 8 ) );
-						color.a = parseInt( "0x" + hex.substring( 8, 10 ) );
+						color.r = parseInt( '0x' + hex.substring( 2, 4 ) );
+						color.g = parseInt( '0x' + hex.substring( 4, 6 ) );
+						color.b = parseInt( '0x' + hex.substring( 6, 8 ) );
+						color.a = parseInt( '0x' + hex.substring( 8, 10 ) );
 						break;
 
 					default:
@@ -2013,7 +2012,7 @@ var VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new BoxBufferGeometry( size.x, size.y, size.z );
+				var geometry = new BoxGeometry( size.x, size.y, size.z );
 
 				return geometry;
 
@@ -2057,7 +2056,7 @@ var VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new ConeBufferGeometry( radius, height, 16, 1, openEnded );
+				var geometry = new ConeGeometry( radius, height, 16, 1, openEnded );
 
 				return geometry;
 
@@ -2105,7 +2104,7 @@ var VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new CylinderBufferGeometry( radius, radius, height, 16, 1 );
+				var geometry = new CylinderGeometry( radius, radius, height, 16, 1 );
 
 				return geometry;
 
@@ -2137,7 +2136,7 @@ var VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new SphereBufferGeometry( radius, 16, 16 );
+				var geometry = new SphereGeometry( radius, 16, 16 );
 
 				return geometry;
 
@@ -3214,7 +3213,7 @@ var VRMLLoader = ( function () {
 
 	function VRMLLexer( tokens ) {
 
-		this.lexer = new chevrotain.Lexer( tokens );
+		this.lexer = new chevrotain.Lexer( tokens ); // eslint-disable-line no-undef
 
 	}
 
@@ -3242,7 +3241,7 @@ var VRMLLoader = ( function () {
 
 	function VRMLParser( tokenVocabulary ) {
 
-		chevrotain.Parser.call( this, tokenVocabulary );
+		chevrotain.Parser.call( this, tokenVocabulary ); // eslint-disable-line no-undef
 
 		var $ = this;
 
@@ -3469,7 +3468,7 @@ var VRMLLoader = ( function () {
 
 	}
 
-	VRMLParser.prototype = Object.create( chevrotain.Parser.prototype );
+	VRMLParser.prototype = Object.create( chevrotain.Parser.prototype ); // eslint-disable-line no-undef
 	VRMLParser.prototype.constructor = VRMLParser;
 
 	function Face( a, b, c ) {

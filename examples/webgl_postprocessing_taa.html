@@ -29,11 +29,11 @@
 			import { TAARenderPass } from './jsm/postprocessing/TAARenderPass.js';
 			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
-			var camera, scene, renderer, composer, copyPass, taaRenderPass, renderPass;
-			var gui, stats;
-			var index = 0;
+			let camera, scene, renderer, composer, copyPass, taaRenderPass, renderPass;
+			let gui, stats;
+			let index = 0;
 
-			var param = { TAAEnabled: "1", TAASampleLevel: 0 };
+			const param = { TAAEnabled: "1", TAASampleLevel: 0 };
 
 			init();
 			animate();
@@ -83,7 +83,7 @@
 
 			function init() {
 
-				var container = document.getElementById( "container" );
+				const container = document.getElementById( "container" );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -100,24 +100,24 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.BoxBufferGeometry( 120, 120, 120 );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+				const geometry = new THREE.BoxGeometry( 120, 120, 120 );
+				const material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = - 100;
-				scene.add( mesh );
+				const mesh1 = new THREE.Mesh( geometry, material1 );
+				mesh1.position.x = - 100;
+				scene.add( mesh1 );
 
-				var texture = new THREE.TextureLoader().load( "textures/brick_diffuse.jpg" );
+				const texture = new THREE.TextureLoader().load( "textures/brick_diffuse.jpg" );
 				texture.minFilter = THREE.NearestFilter;
 				texture.magFilter = THREE.NearestFilter;
 				texture.anisotropy = 1;
 				texture.generateMipmaps = false;
 
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				const material2 = new THREE.MeshBasicMaterial( { map: texture } );
 
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = 100;
-				scene.add( mesh );
+				const mesh2 = new THREE.Mesh( geometry, material2 );
+				mesh2.position.x = 100;
+				scene.add( mesh2 );
 
 				// postprocessing
 
@@ -134,14 +134,14 @@
 				copyPass = new ShaderPass( CopyShader );
 				composer.addPass( copyPass );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -159,14 +159,15 @@
 
 				if ( Math.round( index / 200 ) % 2 === 0 ) {
 
-					for ( var i = 0; i < scene.children.length; i ++ ) {
+					for ( let i = 0; i < scene.children.length; i ++ ) {
 
-						var child = scene.children[ i ];
+						const child = scene.children[ i ];
 
 						child.rotation.x += 0.005;
 						child.rotation.y += 0.01;
 
 					}
+
 					if ( taaRenderPass ) taaRenderPass.accumulate = false;
 
 				} else {

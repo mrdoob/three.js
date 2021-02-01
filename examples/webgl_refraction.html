@@ -21,7 +21,7 @@
 			import { Refractor } from './jsm/objects/Refractor.js';
 			import { WaterRefractionShader } from './jsm/shaders/WaterRefractionShader.js';
 
-			var scene, camera, clock, renderer, refractor;
+			let scene, camera, clock, renderer, refractor;
 
 			init();
 
@@ -43,15 +43,15 @@
 
 				// mesh
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 3, 1, 256, 32 );
-				var material = new THREE.MeshStandardMaterial( { color: 0x6083c2 } );
+				const geometry = new THREE.TorusKnotGeometry( 3, 1, 256, 32 );
+				const material = new THREE.MeshStandardMaterial( { color: 0x6083c2 } );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				// refractor
 
-				var refractorGeometry = new THREE.PlaneBufferGeometry( 10, 10 );
+				const refractorGeometry = new THREE.PlaneGeometry( 10, 10 );
 
 				refractor = new Refractor( refractorGeometry, {
 					color: 0x999999,
@@ -66,7 +66,7 @@
 
 				// load dudv map for distortion effect
 
-				var dudvMap = new THREE.TextureLoader().load( 'textures/waterdudv.jpg', function () {
+				const dudvMap = new THREE.TextureLoader().load( 'textures/waterdudv.jpg', function () {
 
 					animate();
 
@@ -77,10 +77,10 @@
 
 				// light
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
@@ -94,17 +94,17 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 10;
 				controls.maxDistance = 100;
 
 				//
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

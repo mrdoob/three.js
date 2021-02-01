@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -12,20 +11,20 @@
 		<div>
 			<p>All objects by default automatically update their matrices if they have been added to the scene with</p>
 			<code>
-var object = new THREE.Object3D();
+const object = new THREE.Object3D();
 scene.add( object );
 			</code>
 			or if they are the child of another object that has been added to the scene:
 			<code>
-var object1 = new THREE.Object3D();
-var object2 = new THREE.Object3D();
+const object1 = new THREE.Object3D();
+const object2 = new THREE.Object3D();
 
 object1.add( object2 );
 scene.add( object1 ); //object1 and object2 will automatically update their matrices
 			</code>
 		</div>
 
-		<p>However, if you know object will be static, you can disable this and update the transform matrix manually just when needed.</p>
+		<p>However, if you know the object will be static, you can disable this and update the transform matrix manually just when needed.</p>
 
 		<code>
 object.matrixAutoUpdate  = false;
@@ -57,36 +56,36 @@ object.updateMatrix();
 				in the buffer for 500 vertices but draw only two at first, using [page:BufferGeometry.drawRange].
 			</p>
 			<code>
-var MAX_POINTS = 500;
+const MAX_POINTS = 500;
 
 // geometry
-var geometry = new THREE.BufferGeometry();
+const geometry = new THREE.BufferGeometry();
 
 // attributes
-var positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+const positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
 geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 // draw range
-var drawCount = 2; // draw the first 2 points, only
+const drawCount = 2; // draw the first 2 points, only
 geometry.setDrawRange( 0, drawCount );
 
 // material
-var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 // line
-var line = new THREE.Line( geometry,  material );
+const line = new THREE.Line( geometry,  material );
 scene.add( line );
 			</code>
 		 	<p>
 				Next we'll randomly add points to the line using a pattern like:
 			</p>
 			<code>
-var positions = line.geometry.attributes.position.array;
+const positions = line.geometry.attributes.position.array;
 
-var x, y, z, index;
+let x, y, z, index;
 x = y = z = index = 0;
 
-for ( var i = 0, l = MAX_POINTS; i < l; i ++ ) {
+for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
 
     positions[ index ++ ] = x;
     positions[ index ++ ] = y;
@@ -113,15 +112,16 @@ line.geometry.attributes.position.needsUpdate = true; // required after the firs
 			</code>
 
 			<p>
-				If you change the position data values after the initial render, you may need to
-				call `.computeBoundingSphere()` in order to recalculate the geometry's bounding sphere.
+				If you change the position data values after the initial render, you may need to recompute
+				bounding volumes so other features of the engine like view frustum culling or helpers properly work.
 			</p>
 			<code>
+line.geometry.computeBoundingBox();
 line.geometry.computeBoundingSphere();
 			</code>
 
 			<p>
-				[link:http://jsfiddle.net/w67tzfhx/ Here is a fiddle] showing an animated line which you can adapt to your use case.
+				[link:https://jsfiddle.net/xvnctbL0/2/ Here is a fiddle] showing an animated line which you can adapt to your use case.
 			</p>
 
 			<h3>Examples</h3>
@@ -130,38 +130,6 @@ line.geometry.computeBoundingSphere();
 				[example:webgl_custom_attributes WebGL / custom / attributes]<br />
 				[example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
 			</p>
-
-		</div>
-
-		<h2>Geometry</h2>
-		<div>
-			<p>
-				The following flags control updating of various geometry attributes. Set flags only
-				for attributes that you need to update, updates are costly. Once buffers
-				change, these flags reset automatically back to false. You need to keep setting them to
-				true if you want to keep updating buffers. Note that this applies only to [page:Geometry]
-				and not to [page:BufferGeometry].
-			</p>
-			<code>
-var geometry = new THREE.Geometry();
-geometry.verticesNeedUpdate = true;
-geometry.elementsNeedUpdate = true;
-geometry.morphTargetsNeedUpdate = true;
-geometry.uvsNeedUpdate = true;
-geometry.normalsNeedUpdate = true;
-geometry.colorsNeedUpdate = true;
-geometry.tangentsNeedUpdate = true;
-			</code>
-
-			<p>
-				In versions prior to [link:https://github.com/mrdoob/three.js/releases/tag/r66 r66] meshes
-				additionally need the <em>dynamic</em> flag enabled (to keep internal typed arrays):
-			</p>
-
-			<code>
-	//removed after r66
-	geometry.dynamic = true;
-			</code>
 
 		</div>
 

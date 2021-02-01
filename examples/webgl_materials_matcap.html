@@ -22,10 +22,10 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
 
-			var mesh, renderer, scene, camera;
+			let mesh, renderer, scene, camera;
 
-			var API = {
-				color: 0xffffff,
+			const API = {
+				color: 0xffffff, // sRGB
 				exposure: 1.0
 			};
 
@@ -53,21 +53,24 @@
 				camera.position.set( 0, 0, 13 );
 
 				// controls
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.enableZoom = false;
 				controls.enablePan = false;
 
 				// manager
-				var manager = new THREE.LoadingManager( render );
+				const manager = new THREE.LoadingManager( render );
 
 				// matcap
-				var loader = new EXRLoader( manager );
-				var matcap = loader.load( 'textures/matcaps/040full.exr' );
+				const loaderEXR = new EXRLoader( manager )
+					.setDataType( THREE.UnsignedByteType ); // default: FloatType
+
+				const matcap = loaderEXR.load( 'textures/matcaps/040full.exr' );
 
 				// normalmap
-				var loader = new THREE.TextureLoader( manager );
-				var normalmap = loader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' );
+				const loader = new THREE.TextureLoader( manager );
+
+				const normalmap = loader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' );
 
 				// model
 				new GLTFLoader( manager ).load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
@@ -77,7 +80,7 @@
 
 					mesh.material = new THREE.MeshMatcapMaterial( {
 
-						color: API.color,
+						color: new THREE.Color().setHex( API.color ).convertSRGBToLinear(),
 						matcap: matcap,
 						normalMap: normalmap
 
@@ -88,20 +91,22 @@
 				} );
 
 				// gui
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.addColor( API, 'color' )
 					.listen()
 					.onChange( function () {
 
-						mesh.material.color.set( API.color ); render();
+						mesh.material.color.set( API.color ).convertSRGBToLinear();
+						render();
 
 					} );
 
 				gui.add( API, 'exposure', 0, 2 )
 					.onChange( function () {
 
-						renderer.toneMappingExposure = API.exposure; render();
+						renderer.toneMappingExposure = API.exposure;
+						render();
 
 					} );
 
@@ -110,7 +115,7 @@
 				// drag 'n drop
 				initDragAndDrop();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -157,7 +162,7 @@
 
 				function imgCallback( event ) {
 
-					var texture = new THREE.Texture( event.target );
+					const texture = new THREE.Texture( event.target );
 
 					texture.encoding = THREE.sRGBEncoding;
 
@@ -165,7 +170,7 @@
 
 				}
 
-				var img = new Image();
+				const img = new Image();
 
 				img.onload = imgCallback;
 
@@ -175,13 +180,15 @@
 
 			function handleEXR( event ) {
 
-				var contents = event.target.result;
+				const contents = event.target.result;
 
-				var loader = new EXRLoader();
+				const loader = new EXRLoader();
 
-				var texData = loader.parse( contents );
+				loader.setDataType( THREE.UnsignedByteType ); // default: FloatType
 
-				var texture = new THREE.DataTexture();
+				const texData = loader.parse( contents );
+
+				const texture = new THREE.DataTexture();
 
 				texture.image.width = texData.width;
 				texture.image.height = texData.height;
@@ -190,9 +197,28 @@
 				texture.format = texData.format;
 				texture.type = texData.type;
 
-				texture.generateMipmaps = false;
-				texture.magFilter = THREE.LinearFilter;
-				texture.minFilter = THREE.LinearFilter;
+				switch ( texture.type ) {
+
+					case THREE.UnsignedByteType:
+
+						texture.encoding = THREE.RGBEEncoding;
+						texture.minFilter = THREE.NearestFilter;
+						texture.magFilter = THREE.NearestFilter;
+						texture.generateMipmaps = false;
+						texture.flipY = false;
+						break;
+
+					case THREE.FloatType:
+					case THREE.HalfFloatType:
+
+						texture.encoding = THREE.LinearEncoding;
+						texture.minFilter = THREE.LinearFilter;
+						texture.magFilter = THREE.LinearFilter;
+						texture.generateMipmaps = false;
+						texture.flipY = false;
+						break;
+
+				}
 
 				updateMatcap( texture );
 
@@ -200,30 +226,30 @@
 
 			function loadFile( file ) {
 
-				var filename = file.name;
-				var extension = filename.split( '.' ).pop().toLowerCase();
+				const filename = file.name;
+				const extension = filename.split( '.' ).pop().toLowerCase();
 
 				if ( extension === 'exr' ) {
 
-					var reader = new FileReader();
+					const reader = new FileReader();
 
 					reader.addEventListener( 'load', function ( event ) {
 
 						handleEXR( event );
 
-					}, false );
+					} );
 
 					reader.readAsArrayBuffer( file );
 
 				} else { // 'jpg', 'png'
 
-					var reader = new FileReader();
+					const reader = new FileReader();
 
 					reader.addEventListener( 'load', function ( event ) {
 
 						handleJPG( event );
 
-					}, false );
+					} );
 
 					reader.readAsDataURL( file );
 
@@ -238,7 +264,7 @@
 					event.preventDefault();
 					event.dataTransfer.dropEffect = 'copy';
 
-				}, false );
+				} );
 
 				document.addEventListener( 'drop', function ( event ) {
 
@@ -246,7 +272,7 @@
 
 					loadFile( event.dataTransfer.files[ 0 ] );
 
-				}, false );
+				} );
 
 			}
 

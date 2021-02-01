@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -29,7 +28,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -61,7 +60,7 @@
 		</p>
 
 		<h3>[property:Texture aoMap]</h3>
-		<p>该纹理的红色通道用作环境遮挡贴图。默认值为null。aoMap需要第二组UVs，因此将忽略[page:Texture repeat]和[page:Texture offset]属性。</p>
+		<p>该纹理的红色通道用作环境遮挡贴图。默认值为null。aoMap需要第二组UV。</p>
 
 		<h3>[property:Float aoMapIntensity]</h3>
 		<p>环境遮挡效果的强度。默认值为1。零是不遮挡效果。</p>
@@ -110,12 +109,12 @@
 		<h3>[property:Float emissiveIntensity]</h3>
 		<p>放射光强度。调节发光颜色。默认为1。</p>
 
-		<h3>[property:TextureCube envMap]</h3>
+		<h3>[property:Texture envMap]</h3>
 		<p>环境贴图。默认值为null。</p>
 
 
 		<h3>[property:Texture lightMap]</h3>
-		<p>光照贴图。默认值为null。lightMap需要第二组UVs，因此将忽略[page:Texture repeat]和[page:Texture offset]纹理属性。</p>
+		<p>光照贴图。默认值为null。lightMap需要第二组UV。</p>
 
 		<h3>[property:Float lightMapIntensity]</h3>
 		<p>烘焙光的强度。默认值为1。</p>
@@ -123,8 +122,8 @@
 		<h3>[property:Texture map]</h3>
 		<p>颜色贴图。默认为null。纹理贴图颜色由漫反射颜色[page:.color]调节。</p>
 
-		<h3>[property:boolean morphNormals]</h3>
-		<p> 定义是否使用morphNormals。设置为true可将morphNormal属性从[page:Geometry]传递到shader。默认值为*false*。
+		<h3>[property:Boolean morphNormals]</h3>
+		<p> 定义是否使用morphNormals。设置为true可将morphNormal属性从geometry传递到shader。默认值为*false*。
 		</p>
 
 		<h3>[property:Boolean morphTargets]</h3>
@@ -132,6 +131,8 @@
 
 		<h3>[property:Texture normalMap]</h3>
 		<p> 用于创建法线贴图的纹理。RGB值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
+			In case the material has a normal map authored using the left handed convention, the y component of normalScale
+			should be negated to compensate for the different handedness.
 		</p>
 
 		<h3>[property:Integer normalMapType]</h3>

@@ -19,7 +19,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { KMZLoader } from './jsm/loaders/KMZLoader.js';
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
 
@@ -28,7 +28,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x999999 );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				const light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0.5, 1.0, 0.5 ).normalize();
 
 				scene.add( light );
@@ -40,7 +40,7 @@
 
 				scene.add( camera );
 
-				var grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
+				const grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
 				scene.add( grid );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -48,7 +48,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var loader = new KMZLoader();
+				const loader = new KMZLoader();
 				loader.load( './models/kmz/Box.kmz', function ( kmz ) {
 
 					kmz.scene.position.y = 0.5;
@@ -57,11 +57,11 @@
 
 				} );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.update();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

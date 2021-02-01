@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -26,7 +25,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -57,7 +56,7 @@
 		</p>
 
 		<h3>[property:Texture aoMap]</h3>
-		<p>该纹理的红色通道用作环境遮挡贴图。默认值为null。aoMap需要第二组UVs，因此将忽略[page:Texture repeat]和[page:Texture offset]属性。</p>
+		<p>该纹理的红色通道用作环境遮挡贴图。默认值为null。aoMap需要第二组UV。</p>
 
 		<h3>[property:Float aoMapIntensity]</h3>
 		<p>环境遮挡效果的强度。默认值为1。零是不遮挡效果。</p>
@@ -71,11 +70,11 @@
 			[page:Materials THREE.AddOperation]。如果选择多个，则使用[page:.reflectivity]在两种颜色之间进行混合。
 		</p>
 
-		<h3>[property:TextureCube envMap]</h3>
+		<h3>[property:Texture envMap]</h3>
 		<p>环境贴图。默认值为null。</p>
 
 		<h3>[property:Texture lightMap]</h3>
-		<p>光照贴图。默认值为null。lightMap需要第二组UVs，因此将忽略[page:Texture repeat]和[page:Texture offset]纹理属性。</p>
+		<p>光照贴图。默认值为null。lightMap需要第二组UV。</p>
 
 		<h3>[property:Float lightMapIntensity]</h3>
 		<p>烘焙光的强度。默认值为1。</p>

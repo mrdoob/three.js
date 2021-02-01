@@ -21,9 +21,9 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var container;
+			let container;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
 			animate();
@@ -31,14 +31,14 @@
 			//load customized cube texture
 			async function loadCubeTextureWithMipmaps() {
 
-				var path = 'textures/cube/angus/';
-				var format = '.jpg';
-				var mipmaps = [];
-				var maxLevel = 8;
+				const path = 'textures/cube/angus/';
+				const format = '.jpg';
+				const mipmaps = [];
+				const maxLevel = 8;
 
 				async function loadCubeTexture( urls ) {
 
-					return new Promise( function ( resolve, reject) {
+					return new Promise( function ( resolve ) {
 
 						new THREE.CubeTextureLoader().load( urls, function ( cubeTexture ) {
 
@@ -52,19 +52,19 @@
 				}
 
 				// load mipmaps
-				var pendings = [];
+				const pendings = [];
 
-				for ( var level = 0; level <= maxLevel; ++ level ) {
+				for ( let level = 0; level <= maxLevel; ++ level ) {
 
-					var urls = [];
+					const urls = [];
 
-					for ( var face = 0; face < 6; ++ face ) {
+					for ( let face = 0; face < 6; ++ face ) {
 
 						urls.push( path + 'cube_m0' + level + '_c0' + face + format );
 
 					}
 
-					let mipmapLevel = level;
+					const mipmapLevel = level;
 
 					pendings.push( loadCubeTexture( urls ).then( function ( cubeTexture ) {
 
@@ -76,7 +76,7 @@
 
 				await Promise.all( pendings );
 
-				var customizedCubeTexture = mipmaps.shift();
+				const customizedCubeTexture = mipmaps.shift();
 				customizedCubeTexture.mipmaps = mipmaps;
 				customizedCubeTexture.minFilter = THREE.LinearMipMapLinearFilter;
 				customizedCubeTexture.magFilter = THREE.LinearFilter;
@@ -100,13 +100,13 @@
 				loadCubeTextureWithMipmaps().then( function ( cubeTexture ) {
 
 					//model
-					var sphere = new THREE.SphereBufferGeometry( 100, 128, 128 );
+					const sphere = new THREE.SphereGeometry( 100, 128, 128 );
 
 					//manual mipmaps
-					var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: cubeTexture } );
+					let material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: cubeTexture } );
 					material.name = 'manual mipmaps';
 
-					var mesh = new THREE.Mesh( sphere, material );
+					let mesh = new THREE.Mesh( sphere, material );
 					mesh.position.set( 100, 0, 0 );
 					scene.add( mesh );
 
@@ -115,7 +115,7 @@
 					material = material.clone();
 					material.name = 'auto mipmaps';
 
-					var autoCubeTexture = cubeTexture.clone();
+					const autoCubeTexture = cubeTexture.clone();
 					autoCubeTexture.mipmaps = [];
 					autoCubeTexture.generateMipmaps = true;
 					autoCubeTexture.needsUpdate = true;
@@ -135,11 +135,11 @@
 				container.appendChild( renderer.domElement );
 
 				//controls
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minPolarAngle = Math.PI / 4;
 				controls.maxPolarAngle = Math.PI / 1.5;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

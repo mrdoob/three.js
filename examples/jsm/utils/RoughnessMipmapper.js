@@ -11,15 +11,15 @@ import {
 	Mesh,
 	NoBlending,
 	OrthographicCamera,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	RawShaderMaterial,
 	Vector2,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var _mipmapMaterial = _getMipmapMaterial();
 
-var _mesh = new Mesh( new PlaneBufferGeometry( 2, 2 ), _mipmapMaterial );
+var _mesh = new Mesh( new PlaneGeometry( 2, 2 ), _mipmapMaterial );
 
 var _flatCamera = new OrthographicCamera( 0, 1, 0, 1, 0, 1 );
 
@@ -40,6 +40,8 @@ RoughnessMipmapper.prototype = {
 	constructor: RoughnessMipmapper,
 
 	generateMipmaps: function ( material ) {
+
+		if ( 'roughnessMap' in material === false ) return;
 
 		var { roughnessMap, normalMap } = material;
 
@@ -71,7 +73,15 @@ RoughnessMipmapper.prototype = {
 
 		if ( width !== roughnessMap.image.width || height !== roughnessMap.image.height ) {
 
-			var newRoughnessTarget = new WebGLRenderTarget( width, height, { wrapS: roughnessMap.wrapS, wrapT: roughnessMap.wrapT, magFilter: roughnessMap.magFilter, minFilter: roughnessMap.minFilter, depthBuffer: false } );
+			var params = {
+				wrapS: roughnessMap.wrapS,
+				wrapT: roughnessMap.wrapT,
+				magFilter: roughnessMap.magFilter,
+				minFilter: roughnessMap.minFilter,
+				depthBuffer: false
+			};
+
+			var newRoughnessTarget = new WebGLRenderTarget( width, height, params );
 
 			newRoughnessTarget.texture.generateMipmaps = true;
 

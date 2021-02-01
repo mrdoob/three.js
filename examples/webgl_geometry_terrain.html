@@ -29,16 +29,16 @@
 			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, controls, scene, renderer;
+			let camera, controls, scene, renderer;
 
-			var mesh, texture;
+			let mesh, texture;
 
-			var worldWidth = 256, worldDepth = 256,
+			const worldWidth = 256, worldDepth = 256,
 				worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -52,16 +52,16 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbfd1e5 );
 
-				var data = generateHeight( worldWidth, worldDepth );
+				const data = generateHeight( worldWidth, worldDepth );
 
 				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 
-				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				const geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
-				var vertices = geometry.attributes.position.array;
+				const vertices = geometry.attributes.position.array;
 
-				for ( var i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
+				for ( let i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
 
 					vertices[ j + 1 ] = data[ i ] * 10;
 
@@ -88,7 +88,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -105,14 +105,16 @@
 
 			function generateHeight( width, height ) {
 
-				var size = width * height, data = new Uint8Array( size ),
-					perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
+				const size = width * height, data = new Uint8Array( size ),
+					perlin = new ImprovedNoise(), z = Math.random() * 100;
 
-				for ( var j = 0; j < 4; j ++ ) {
+				let quality = 1;
 
-					for ( var i = 0; i < size; i ++ ) {
+				for ( let j = 0; j < 4; j ++ ) {
 
-						var x = i % width, y = ~ ~ ( i / width );
+					for ( let i = 0; i < size; i ++ ) {
+
+						const x = i % width, y = ~ ~ ( i / width );
 						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
 
 					}
@@ -127,14 +129,14 @@
 
 			function generateTexture( data, width, height ) {
 
-				var canvas, canvasScaled, context, image, imageData, vector3, sun, shade;
+				let context, image, imageData, shade;
 
-				vector3 = new THREE.Vector3( 0, 0, 0 );
+				const vector3 = new THREE.Vector3( 0, 0, 0 );
 
-				sun = new THREE.Vector3( 1, 1, 1 );
+				const sun = new THREE.Vector3( 1, 1, 1 );
 				sun.normalize();
 
-				canvas = document.createElement( 'canvas' );
+				const canvas = document.createElement( 'canvas' );
 				canvas.width = width;
 				canvas.height = height;
 
@@ -145,7 +147,7 @@
 				image = context.getImageData( 0, 0, canvas.width, canvas.height );
 				imageData = image.data;
 
-				for ( var i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++ ) {
+				for ( let i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++ ) {
 
 					vector3.x = data[ j - 2 ] - data[ j + 2 ];
 					vector3.y = 2;
@@ -164,7 +166,7 @@
 
 				// Scaled 4x
 
-				canvasScaled = document.createElement( 'canvas' );
+				const canvasScaled = document.createElement( 'canvas' );
 				canvasScaled.width = width * 4;
 				canvasScaled.height = height * 4;
 
@@ -175,9 +177,9 @@
 				image = context.getImageData( 0, 0, canvasScaled.width, canvasScaled.height );
 				imageData = image.data;
 
-				for ( var i = 0, l = imageData.length; i < l; i += 4 ) {
+				for ( let i = 0, l = imageData.length; i < l; i += 4 ) {
 
-					var v = ~ ~ ( Math.random() * 5 );
+					const v = ~ ~ ( Math.random() * 5 );
 
 					imageData[ i ] += v;
 					imageData[ i + 1 ] += v;

@@ -31,20 +31,20 @@
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
-			var perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
+			let perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
 
-			var params = {
+			const params = {
 				orthographicCamera: false
 			};
 
-			var frustumSize = 400;
+			const frustumSize = 400;
 
 			init();
 			animate();
 
 			function init() {
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 
 				perspectiveCamera = new THREE.PerspectiveCamera( 60, aspect, 1, 1000 );
 				perspectiveCamera.position.z = 500;
@@ -58,12 +58,12 @@
 				scene.background = new THREE.Color( 0xcccccc );
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
-				var geometry = new THREE.CylinderBufferGeometry( 0, 10, 30, 4, 1 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+				const geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
+				const material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
-				for ( var i = 0; i < 500; i ++ ) {
+				for ( let i = 0; i < 500; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = ( Math.random() - 0.5 ) * 1000;
 					mesh.position.y = ( Math.random() - 0.5 ) * 1000;
 					mesh.position.z = ( Math.random() - 0.5 ) * 1000;
@@ -75,16 +75,16 @@
 
 				// lights
 
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 1, 1, 1 );
-				scene.add( light );
+				const dirLight1 = new THREE.DirectionalLight( 0xffffff );
+				dirLight1.position.set( 1, 1, 1 );
+				scene.add( dirLight1 );
 
-				var light = new THREE.DirectionalLight( 0x002288 );
-				light.position.set( - 1, - 1, - 1 );
-				scene.add( light );
+				const dirLight2 = new THREE.DirectionalLight( 0x002288 );
+				dirLight2.position.set( - 1, - 1, - 1 );
+				scene.add( dirLight2 );
 
-				var light = new THREE.AmbientLight( 0x222222 );
-				scene.add( light );
+				const ambientLight = new THREE.AmbientLight( 0x222222 );
+				scene.add( ambientLight );
 
 				// renderer
 
@@ -98,7 +98,7 @@
 
 				//
 
-				var gui = new GUI();
+				const gui = new GUI();
 				gui.add( params, 'orthographicCamera' ).name( 'use orthographic' ).onChange( function ( value ) {
 
 					controls.dispose();
@@ -109,7 +109,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				createControls( perspectiveCamera );
 
@@ -129,7 +129,7 @@
 
 			function onWindowResize() {
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 
 				perspectiveCamera.aspect = aspect;
 				perspectiveCamera.updateProjectionMatrix();
@@ -160,7 +160,7 @@
 
 			function render() {
 
-				var camera = ( params.orthographicCamera ) ? orthographicCamera : perspectiveCamera;
+				const camera = ( params.orthographicCamera ) ? orthographicCamera : perspectiveCamera;
 
 				renderer.render( scene, camera );
 

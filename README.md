@@ -11,8 +11,8 @@ three.js
 
 The aim of the project is to create an easy to use, lightweight, 3D library with a default WebGL renderer. The library also provides Canvas 2D, SVG and CSS3D renderers in the examples.
 
-[Examples](http://threejs.org/examples/) &mdash;
-[Documentation](http://threejs.org/docs/) &mdash;
+[Examples](https://threejs.org/examples/) &mdash;
+[Documentation](https://threejs.org/docs/) &mdash;
 [Wiki](https://github.com/mrdoob/three.js/wiki) &mdash;
 [Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
 [Questions](http://stackoverflow.com/questions/tagged/three.js) &mdash;
@@ -25,13 +25,12 @@ The aim of the project is to create an easy to use, lightweight, 3D library with
 This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a `WebGL` renderer for the scene and camera, and it adds that viewport to the `document.body` element. Finally, it animates the cube within the scene for the camera.
 
 ```javascript
-import * as THREE from 'js/three.module.js';
+import * as THREE from './js/three.module.js';
 
-var camera, scene, renderer;
-var geometry, material, mesh;
+let camera, scene, renderer;
+let geometry, material, mesh;
 
 init();
-animate();
 
 function init() {
 
@@ -48,27 +47,26 @@ function init() {
 
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setAnimationLoop( animation );
 	document.body.appendChild( renderer.domElement );
 
 }
 
-function animate() {
+function animation( time ) {
 
-	requestAnimationFrame( animate );
-
-	mesh.rotation.x += 0.01;
-	mesh.rotation.y += 0.02;
+	mesh.rotation.x = time / 2000;
+	mesh.rotation.y = time / 1000;
 
 	renderer.render( scene, camera );
 
 }
 ```
 
-If everything went well, you should see [this](https://jsfiddle.net/8kubjpL5/).
+If everything went well, you should see [this](https://jsfiddle.net/zdjankqw/).
 
 ### Cloning this repository ###
 
-Cloning the repo with all its history results in a ~2GB download. If you don't need the whole history you can use the `depth` parameter to significantly reduce download size.
+Cloning the repo with all its history results in a ~2 GB download. If you don't need the whole history you can use the `depth` parameter to significantly reduce download size.
 
 ```sh
 git clone --depth=1 https://github.com/mrdoob/three.js.git

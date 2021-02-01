@@ -1,4 +1,3 @@
-console.warn( "THREE.MarchingCubes: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Port of http://webglsamples.org/blob/blob.html
  */
@@ -898,7 +897,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 	this.generateGeometry = function () {
 
 		console.warn(
-			"THREE.MarchingCubes: generateGeometry() now returns THREE.BufferGeometry"
+			'THREE.MarchingCubes: generateGeometry() now returns THREE.BufferGeometry'
 		);
 		return this.generateBufferGeometry();
 
@@ -952,13 +951,13 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		this.render( geo_callback );
 
 		if ( this.hasPositions )
-			geo.setAttribute( "position", new THREE.BufferAttribute( posArray, 3 ) );
+			geo.setAttribute( 'position', new THREE.BufferAttribute( posArray, 3 ) );
 		if ( this.hasNormals )
-			geo.setAttribute( "normal", new THREE.BufferAttribute( normArray, 3 ) );
+			geo.setAttribute( 'normal', new THREE.BufferAttribute( normArray, 3 ) );
 		if ( this.hasColors )
-			geo.setAttribute( "color", new THREE.BufferAttribute( colorArray, 3 ) );
+			geo.setAttribute( 'color', new THREE.BufferAttribute( colorArray, 3 ) );
 		if ( this.hasUvs )
-			geo.setAttribute( "uv", new THREE.BufferAttribute( uvArray, 2 ) );
+			geo.setAttribute( 'uv', new THREE.BufferAttribute( uvArray, 2 ) );
 
 		return geo;
 

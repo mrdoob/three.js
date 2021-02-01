@@ -12,7 +12,7 @@ function Matrix4Node( matrix ) {
 
 Matrix4Node.prototype = Object.create( InputNode.prototype );
 Matrix4Node.prototype.constructor = Matrix4Node;
-Matrix4Node.prototype.nodeType = "Matrix4";
+Matrix4Node.prototype.nodeType = 'Matrix4';
 
 Object.defineProperties( Matrix4Node.prototype, {
 
@@ -36,7 +36,7 @@ Object.defineProperties( Matrix4Node.prototype, {
 
 Matrix4Node.prototype.generateReadonly = function ( builder, output, uuid, type /*, ns, needsUpdate */ ) {
 
-	return builder.format( "mat4( " + this.value.elements.join( ", " ) + " )", type, output );
+	return builder.format( 'mat4( ' + this.value.elements.join( ', ' ) + ' )', type, output );
 
 };
 

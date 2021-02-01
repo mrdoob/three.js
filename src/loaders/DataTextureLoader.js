@@ -29,6 +29,7 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setPath( this.path );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			const texData = scope.parse( buffer );
@@ -54,6 +55,18 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 			texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearFilter;
 
 			texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
+
+			if ( texData.encoding !== undefined ) {
+
+				texture.encoding = texData.encoding;
+
+			}
+
+			if ( texData.flipY !== undefined ) {
+
+				texture.flipY = texData.flipY;
+
+			}
 
 			if ( texData.format !== undefined ) {
 

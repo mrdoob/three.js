@@ -21,26 +21,27 @@
 
 			import { BokehShader, BokehDepthShader } from './jsm/shaders/BokehShader2.js';
 
-			var container, stats;
-			var camera, scene, renderer, materialDepth;
+			let container, stats;
+			let camera, scene, renderer, materialDepth;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
-			var postprocessing = { enabled: true };
+			let distance = 100;
+			let effectController;
 
-			var shaderSettings = {
+			const postprocessing = { enabled: true };
+
+			const shaderSettings = {
 				rings: 3,
 				samples: 4
 			};
 
-			var mouse = new THREE.Vector2();
-			var raycaster = new THREE.Raycaster();
-			var distance = 100;
-			var target = new THREE.Vector3( 0, 20, - 50 );
-			var effectController;
-			var planes = [];
-			var leaves = 100;
+			const mouse = new THREE.Vector2();
+			const raycaster = new THREE.Raycaster();
+			const target = new THREE.Vector3( 0, 20, - 50 );
+			const planes = [];
+			const leaves = 100;
 
 			init();
 			animate();
@@ -64,7 +65,7 @@
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
-				var depthShader = BokehDepthShader;
+				const depthShader = BokehDepthShader;
 
 				materialDepth = new THREE.ShaderMaterial( {
 					uniforms: depthShader.uniforms,
@@ -77,20 +78,20 @@
 
 				// skybox
 
-				var r = 'textures/cube/Bridge2/';
-				var urls = [ r + 'posx.jpg', r + 'negx.jpg',
+				const r = 'textures/cube/Bridge2/';
+				const urls = [ r + 'posx.jpg', r + 'negx.jpg',
 							 r + 'posy.jpg', r + 'negy.jpg',
 							 r + 'posz.jpg', r + 'negz.jpg' ];
 
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				const textureCube = new THREE.CubeTextureLoader().load( urls );
 
 				scene.background = textureCube;
 
 				// plane particles
 
-				var planePiece = new THREE.PlaneBufferGeometry( 10, 10, 1, 1 );
+				const planePiece = new THREE.PlaneGeometry( 10, 10, 1, 1 );
 
-				var planeMat = new THREE.MeshPhongMaterial( {
+				const planeMat = new THREE.MeshPhongMaterial( {
 					color: 0xffffff * 0.4,
 					shininess: 0.5,
 					specular: 0xffffff,
@@ -98,11 +99,11 @@
 					side: THREE.DoubleSide
 				} );
 
-				var rand = Math.random;
+				const rand = Math.random;
 
-				for ( var i = 0; i < leaves; i ++ ) {
+				for ( let i = 0; i < leaves; i ++ ) {
 
-					var plane = new THREE.Mesh( planePiece, planeMat );
+					const plane = new THREE.Mesh( planePiece, planeMat );
 					plane.rotation.set( rand(), rand(), rand() );
 					plane.rotation.dx = rand() * 0.1;
 					plane.rotation.dy = rand() * 0.1;
@@ -118,12 +119,12 @@
 
 				// adding Monkeys
 
-				var loader2 = new THREE.BufferGeometryLoader();
+				const loader2 = new THREE.BufferGeometryLoader();
 				loader2.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
-					var material = new THREE.MeshPhongMaterial( {
+					const material = new THREE.MeshPhongMaterial( {
 						specular: 0xffffff,
 						envMap: textureCube,
 						shininess: 50,
@@ -131,11 +132,11 @@
 						flatShading: true
 					} );
 
-					var monkeys = 20;
+					const monkeys = 20;
 
-					for ( var i = 0; i < monkeys; i ++ ) {
+					for ( let i = 0; i < monkeys; i ++ ) {
 
-						var mesh = new THREE.Mesh( geometry, material );
+						const mesh = new THREE.Mesh( geometry, material );
 
 						mesh.position.z = Math.cos( i / monkeys * Math.PI * 2 ) * 200;
 						mesh.position.y = Math.sin( i / monkeys * Math.PI * 3 ) * 20;
@@ -153,17 +154,17 @@
 
 				// add balls
 
-				var geometry = new THREE.SphereBufferGeometry( 1, 20, 20 );
+				const geometry = new THREE.SphereGeometry( 1, 20, 20 );
 
-				for ( var i = 0; i < 20; i ++ ) {
+				for ( let i = 0; i < 20; i ++ ) {
 
-					var ballmaterial = new THREE.MeshPhongMaterial( {
+					const ballmaterial = new THREE.MeshPhongMaterial( {
 						color: 0xffffff * Math.random(),
 						shininess: 0.5,
 						specular: 0xffffff,
 						envMap: textureCube } );
 
-					var mesh = new THREE.Mesh( geometry, ballmaterial );
+					const mesh = new THREE.Mesh( geometry, ballmaterial );
 
 					mesh.position.x = ( Math.random() - 0.5 ) * 200;
 					mesh.position.y = Math.random() * 50;
@@ -177,22 +178,21 @@
 
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
-				directionalLight.position.set( 2, 1.2, 10 ).normalize();
-				scene.add( directionalLight );
+				const directionalLight1 = new THREE.DirectionalLight( 0xffffff, 2 );
+				directionalLight1.position.set( 2, 1.2, 10 ).normalize();
+				scene.add( directionalLight1 );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.set( - 2, 1.2, - 10 ).normalize();
-				scene.add( directionalLight );
+				const directionalLight2 = new THREE.DirectionalLight( 0xffffff, 1 );
+				directionalLight2.position.set( - 2, 1.2, - 10 ).normalize();
+				scene.add( directionalLight2 );
 
 				initPostprocessing();
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				container.style.touchAction = 'none';
+				container.addEventListener( 'pointermove', onPointerMove );
 
 				effectController = {
 
@@ -222,9 +222,9 @@
 
 				};
 
-				var matChanger = function () {
+				const matChanger = function () {
 
-					for ( var e in effectController ) {
+					for ( const e in effectController ) {
 
 						if ( e in postprocessing.bokeh_uniforms ) {
 
@@ -241,7 +241,7 @@
 
 				};
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( effectController, 'enabled' ).onChange( matChanger );
 				gui.add( effectController, 'jsDepthCalculation' ).onChange( matChanger );
@@ -275,7 +275,7 @@
 
 				matChanger();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -297,38 +297,14 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
+
+				if ( event.isPrimary === false ) return;
 
 				mouse.x = ( event.clientX - windowHalfX ) / windowHalfX;
 				mouse.y = - ( event.clientY - windowHalfY ) / windowHalfY;
 
 				postprocessing.bokeh_uniforms[ 'focusCoords' ].value.set( event.clientX / window.innerWidth, 1 - ( event.clientY / window.innerHeight ) );
-
-			}
-
-			function onDocumentTouchStart( event ) {
-
-				if ( event.touches.length == 1 ) {
-
-					event.preventDefault();
-
-					mouse.x = ( event.touches[ 0 ].pageX - windowHalfX ) / windowHalfX;
-					mouse.y = - ( event.touches[ 0 ].pageY - windowHalfY ) / windowHalfY;
-
-				}
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length == 1 ) {
-
-					event.preventDefault();
-
-					mouse.x = ( event.touches[ 0 ].pageX - windowHalfX ) / windowHalfX;
-					mouse.y = - ( event.touches[ 0 ].pageY - windowHalfY ) / windowHalfY;
-
-				}
 
 			}
 
@@ -341,11 +317,11 @@
 
 				postprocessing.scene.add( postprocessing.camera );
 
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+				const pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 				postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 
-				var bokeh_shader = BokehShader;
+				const bokeh_shader = BokehShader;
 
 				postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
@@ -366,7 +342,7 @@
 
 				} );
 
-				postprocessing.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
+				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
 				postprocessing.quad.position.z = - 500;
 				postprocessing.scene.add( postprocessing.quad );
 
@@ -391,15 +367,15 @@
 
 			function linearize( depth ) {
 
-				var zfar = camera.far;
-				var znear = camera.near;
+				const zfar = camera.far;
+				const znear = camera.near;
 				return - zfar * znear / ( depth * ( zfar - znear ) - zfar );
 
 			}
 
 			function smoothstep( near, far, depth ) {
 
-				var x = saturate( ( depth - near ) / ( far - near ) );
+				const x = saturate( ( depth - near ) / ( far - near ) );
 				return x * x * ( 3 - 2 * x );
 
 			}
@@ -412,7 +388,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.00015;
+				const time = Date.now() * 0.00015;
 
 				camera.position.x = Math.cos( time ) * 400;
 				camera.position.z = Math.sin( time ) * 500;
@@ -426,15 +402,15 @@
 
 					raycaster.setFromCamera( mouse, camera );
 
-					var intersects = raycaster.intersectObjects( scene.children, true );
+					const intersects = raycaster.intersectObjects( scene.children, true );
 
-					var targetDistance = ( intersects.length > 0 ) ? intersects[ 0 ].distance : 1000;
+					const targetDistance = ( intersects.length > 0 ) ? intersects[ 0 ].distance : 1000;
 
 					distance += ( targetDistance - distance ) * 0.03;
 
-					var sdistance = smoothstep( camera.near, camera.far, distance );
+					const sdistance = smoothstep( camera.near, camera.far, distance );
 
-					var ldistance = linearize( 1 - sdistance );
+					const ldistance = linearize( 1 - sdistance );
 
 					postprocessing.bokeh_uniforms[ 'focalDepth' ].value = ldistance;
 
@@ -442,9 +418,9 @@
 
 				}
 
-				for ( var i = 0; i < leaves; i ++ ) {
+				for ( let i = 0; i < leaves; i ++ ) {
 
-					var plane = planes[ i ];
+					const plane = planes[ i ];
 					plane.rotation.x += plane.rotation.dx;
 					plane.rotation.y += plane.rotation.dy;
 					plane.rotation.z += plane.rotation.dz;

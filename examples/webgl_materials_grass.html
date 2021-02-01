@@ -13,7 +13,7 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
 			animate();
@@ -26,13 +26,13 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x003300 );
 
-				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const geometry = new THREE.PlaneGeometry( 100, 100 );
 
-				var texture = new THREE.CanvasTexture( generateTexture() );
+				const texture = new THREE.CanvasTexture( generateTexture() );
 
-				for ( var i = 0; i < 15; i ++ ) {
+				for ( let i = 0; i < 15; i ++ ) {
 
-					var material = new THREE.MeshBasicMaterial( {
+					const material = new THREE.MeshBasicMaterial( {
 						color: new THREE.Color().setHSL( 0.3, 0.75, ( i / 15 ) * 0.4 + 0.1 ),
 						map: texture,
 						depthTest: false,
@@ -40,7 +40,7 @@
 						transparent: true
 					} );
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.y = i * 0.25;
 					mesh.rotation.x = - Math.PI / 2;
@@ -58,7 +58,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -73,13 +73,13 @@
 
 			function generateTexture() {
 
-				var canvas = document.createElement( 'canvas' );
+				const canvas = document.createElement( 'canvas' );
 				canvas.width = 512;
 				canvas.height = 512;
 
-				var context = canvas.getContext( '2d' );
+				const context = canvas.getContext( '2d' );
 
-				for ( var i = 0; i < 20000; i ++ ) {
+				for ( let i = 0; i < 20000; i ++ ) {
 
 					context.fillStyle = 'hsl(0,0%,' + ( Math.random() * 50 + 50 ) + '%)';
 					context.beginPath();
@@ -107,16 +107,16 @@
 
 			function render() {
 
-				var time = Date.now() / 6000;
+				const time = Date.now() / 6000;
 
 				camera.position.x = 80 * Math.cos( time );
 				camera.position.z = 80 * Math.sin( time );
 
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+				for ( let i = 0, l = scene.children.length; i < l; i ++ ) {
 
-					var mesh = scene.children[ i ];
+					const mesh = scene.children[ i ];
 					mesh.position.x = Math.sin( time * 4 ) * i * i * 0.005;
 					mesh.position.z = Math.cos( time * 6 ) * i * i * 0.005;
 

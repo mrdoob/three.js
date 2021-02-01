@@ -1,22 +1,6 @@
-console.warn( "THREE.ConvexGeometry: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 // ConvexGeometry
 
 THREE.ConvexGeometry = function ( points ) {
-
-	THREE.Geometry.call( this );
-
-	this.fromBufferGeometry( new THREE.ConvexBufferGeometry( points ) );
-	this.mergeVertices();
-
-};
-
-THREE.ConvexGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.ConvexGeometry.prototype.constructor = THREE.ConvexGeometry;
-
-// ConvexBufferGeometry
-
-THREE.ConvexBufferGeometry = function ( points ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -64,5 +48,5 @@ THREE.ConvexBufferGeometry = function ( points ) {
 
 };
 
-THREE.ConvexBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.ConvexBufferGeometry.prototype.constructor = THREE.ConvexBufferGeometry;
+THREE.ConvexGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.ConvexGeometry.prototype.constructor = THREE.ConvexGeometry;

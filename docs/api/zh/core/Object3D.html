@@ -4,7 +4,6 @@
 <head>
 	<meta charset="utf-8" />
 	<base href="../../../" />
-	<script src="list.js"></script>
 	<script src="page.js"></script>
 	<link type="text/css" rel="stylesheet" href="page.css" />
 </head>
@@ -29,6 +28,9 @@
 
 
 	<h2>属性</h2>
+
+	<h3>[property:AnimationClip animations]</h3>
+	<p>Array with object's animation clips.</p>
 
 	<h3>[property:Boolean castShadow]</h3>
 	<p>对象是否被渲染到阴影贴图中。默认值为*false*。</p>
@@ -97,16 +99,26 @@
 		另一方面，modelViewMatrix矩阵中的位移部分和法线的计算无关，因此Matrix3就已经足够了。
 	</p>
 
-	<h3>[property:function onAfterRender]</h3>
+	<h3>[property:Function onAfterRender]</h3>
 	<p>
 		一个可选的回调函数，在Object3D渲染之后直接执行。
 		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
 	</p>
+	<p>
+	Please notice that this callback is only executed for *renderable* 3D objects. Meaning 3D objects which define their visual
+	appearance with geometries and materials like instances of [page:Mesh], [page:Line], [page:Points] or [page:Sprite].
+	Instances of [page:Object3D], [page:Group] or [page:Bone] are not renderable and thus this callback is not executed for such objects.
+	</p>
 
-	<h3>[property:function onBeforeRender]</h3>
+	<h3>[property:Function onBeforeRender]</h3>
 	<p>
 		一个可选的回调函数，在Object3D渲染之前直接执行。
 		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
+	</p>
+	<p>
+	Please notice that this callback is only executed for *renderable* 3D objects. Meaning 3D objects which define their visual
+	appearance with geometries and materials like instances of [page:Mesh], [page:Line], [page:Points] or [page:Sprite].
+	Instances of [page:Object3D], [page:Group] or [page:Bone] are not renderable and thus this callback is not executed for such objects.
 	</p>
 
 	<h3>[property:Object3D parent]</h3>
@@ -145,7 +157,7 @@
 		默认值是[page:Object3D.DefaultUp]，即( 0, 1, 0 )。
 	</p>
 
-	<h3>[property:object userData]</h3>
+	<h3>[property:Object userData]</h3>
 	<p>
 		一个用于存储Object3D自定义数据的对象。
 		它不应当包含对函数的引用，因为这些函数将不会被克隆。
@@ -224,7 +236,7 @@
 	<p>
 		id —— 标识该对象实例的唯一数字。<br /><br />
 
-		搜索该对象的子级，返回第一个带有匹配id的子对象。<br />
+		从该对象开始，搜索一个对象及其子级，返回第一个带有匹配id的子对象。<br />
 		请注意，id是按照时间顺序来分配的：1、2、3、……，每增加一个新的对象就自增1。
 	</p>
 
@@ -232,7 +244,7 @@
 	<p>
 		name —— 用于来匹配子物体中Object3D.name属性的字符串。<br /><br />
 
-		搜索该对象的子级，返回第一个带有匹配name的子对象。<br />
+		从该对象开始，搜索一个对象及其子级，返回第一个带有匹配name的子对象。<br />
 		请注意，大多数的对象中name默认是一个空字符串，要使用这个方法，你将需要手动地设置name属性。
 	</p>
 
@@ -240,7 +252,7 @@
 	<p>
 		name —— 将要用于查找的属性的名称。<br />
 		value —— 给定的属性的值。 <br /><br />
-		搜索该对象的子级，返回第一个给定的属性中包含有匹配的值的子对象。
+		从该对象开始，搜索一个对象及其子级，返回第一个给定的属性中包含有匹配的值的子对象。
 	</p>
 
 	<h3>[method:Vector3 getWorldPosition]( [param:Vector3 target] )</h3>
@@ -270,9 +282,9 @@
 
 	<h3>[method:Vector3 localToWorld]( [param:Vector3 vector] )</h3>
 	<p>
-		vector - A vector representing a position in this object's local space.<br /><br />
+		vector - 一个表示在该物体局部空间中位置的向量。<br /><br />
 
-		Converts the vector from this object's local space to world space.
+		将该向量从物体的局部空间转换到世界空间。
 	</p>
 
 	<h3>[method:null lookAt]( [param:Vector3 vector] )<br />
@@ -361,7 +373,7 @@
 		将所给的四元数复制到[page:.quaternion]中。
 	</p>
 
-	<h3>[method:Object toJSON]( [param:object meta] )</h3>
+	<h3>[method:Object toJSON]( [param:Object meta] )</h3>
 	<p>
 		meta -- 包含有元数据的对象，例如该对象的材质、纹理或图片。
 		将对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
@@ -423,9 +435,9 @@
 
 	<h3>[method:Vector3 worldToLocal]( [param:Vector3 vector] )</h3>
 	<p>
-		vector - A vector representing a position in world space.<br /><br />
+		vector - 一个表示在世界空间中位置的向量。<br /><br />
 
-		Converts the vector from world space to this object's local space.
+		将该向量从世界空间转换到物体的局部空间。
 	</p>
 
 	<h2>源代码</h2>

@@ -4,21 +4,21 @@ import { Vector3 } from '../../math/Vector3.js';
 
 class QuadraticBezierCurve3 extends Curve {
 
-	constructor( v0, v1, v2 ) {
+	constructor( v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3() ) {
 
 		super();
 
 		this.type = 'QuadraticBezierCurve3';
 		Object.defineProperty( this, 'isQuadraticBezierCurve3', { value: true } );
 
-		this.v0 = v0 || new Vector3();
-		this.v1 = v1 || new Vector3();
-		this.v2 = v2 || new Vector3();
+		this.v0 = v0;
+		this.v1 = v1;
+		this.v2 = v2;
 
 	}
-	getPoint( t, optionalTarget ) {
+	getPoint( t, optionalTarget = new Vector3() ) {
 
-		const point = optionalTarget || new Vector3();
+		const point = optionalTarget;
 
 		const v0 = this.v0, v1 = this.v1, v2 = this.v2;
 

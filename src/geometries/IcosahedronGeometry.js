@@ -1,33 +1,8 @@
-import { Geometry } from '../core/Geometry.js';
-import { PolyhedronBufferGeometry } from './PolyhedronGeometry.js';
+import { PolyhedronGeometry } from './PolyhedronGeometry.js';
 
-// IcosahedronGeometry
+class IcosahedronGeometry extends PolyhedronGeometry {
 
-class IcosahedronGeometry extends Geometry {
-
-	constructor( radius, detail ) {
-
-		super();
-
-		this.type = 'IcosahedronGeometry';
-
-		this.parameters = {
-			radius: radius,
-			detail: detail
-		};
-
-		this.fromBufferGeometry( new IcosahedronBufferGeometry( radius, detail ) );
-		this.mergeVertices();
-
-	}
-
-}
-
-// IcosahedronBufferGeometry
-
-class IcosahedronBufferGeometry extends PolyhedronBufferGeometry {
-
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
 		const t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
@@ -46,7 +21,7 @@ class IcosahedronBufferGeometry extends PolyhedronBufferGeometry {
 
 		super( vertices, indices, radius, detail );
 
-		this.type = 'IcosahedronBufferGeometry';
+		this.type = 'IcosahedronGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -58,4 +33,4 @@ class IcosahedronBufferGeometry extends PolyhedronBufferGeometry {
 }
 
 
-export { IcosahedronGeometry, IcosahedronBufferGeometry };
+export { IcosahedronGeometry, IcosahedronGeometry as IcosahedronBufferGeometry };

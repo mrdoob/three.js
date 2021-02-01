@@ -1,15 +1,11 @@
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
-// PlaneGeometry
+class PlaneGeometry extends BufferGeometry {
 
-class PlaneGeometry extends Geometry {
-
-	constructor( width, height, widthSegments, heightSegments ) {
+	constructor( width = 1, height = 1, widthSegments = 1, heightSegments = 1 ) {
 
 		super();
-
 		this.type = 'PlaneGeometry';
 
 		this.parameters = {
@@ -19,37 +15,11 @@ class PlaneGeometry extends Geometry {
 			heightSegments: heightSegments
 		};
 
-		this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
-		this.mergeVertices();
-
-	}
-
-}
-
-// PlaneBufferGeometry
-
-class PlaneBufferGeometry extends BufferGeometry {
-
-	constructor( width, height, widthSegments, heightSegments ) {
-
-		super();
-		this.type = 'PlaneBufferGeometry';
-
-		this.parameters = {
-			width: width,
-			height: height,
-			widthSegments: widthSegments,
-			heightSegments: heightSegments
-		};
-
-		width = width || 1;
-		height = height || 1;
-
 		const width_half = width / 2;
 		const height_half = height / 2;
 
-		const gridX = Math.floor( widthSegments ) || 1;
-		const gridY = Math.floor( heightSegments ) || 1;
+		const gridX = Math.floor( widthSegments );
+		const gridY = Math.floor( heightSegments );
 
 		const gridX1 = gridX + 1;
 		const gridY1 = gridY + 1;
@@ -57,14 +27,12 @@ class PlaneBufferGeometry extends BufferGeometry {
 		const segment_width = width / gridX;
 		const segment_height = height / gridY;
 
-		// buffers
+		//
 
 		const indices = [];
 		const vertices = [];
 		const normals = [];
 		const uvs = [];
-
-		// generate vertices, normals and uvs
 
 		for ( let iy = 0; iy < gridY1; iy ++ ) {
 
@@ -85,8 +53,6 @@ class PlaneBufferGeometry extends BufferGeometry {
 
 		}
 
-		// indices
-
 		for ( let iy = 0; iy < gridY; iy ++ ) {
 
 			for ( let ix = 0; ix < gridX; ix ++ ) {
@@ -96,16 +62,12 @@ class PlaneBufferGeometry extends BufferGeometry {
 				const c = ( ix + 1 ) + gridX1 * ( iy + 1 );
 				const d = ( ix + 1 ) + gridX1 * iy;
 
-				// faces
-
 				indices.push( a, b, d );
 				indices.push( b, c, d );
 
 			}
 
 		}
-
-		// build geometry
 
 		this.setIndex( indices );
 		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
@@ -116,5 +78,4 @@ class PlaneBufferGeometry extends BufferGeometry {
 
 }
 
-
-export { PlaneGeometry, PlaneBufferGeometry };
+export { PlaneGeometry, PlaneGeometry as PlaneBufferGeometry };

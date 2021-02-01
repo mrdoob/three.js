@@ -1,13 +1,10 @@
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector3 } from '../math/Vector3.js';
 
-// SphereGeometry
+class SphereGeometry extends BufferGeometry {
 
-class SphereGeometry extends Geometry {
-
-	constructor( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+	constructor( radius = 1, widthSegments = 8, heightSegments = 6, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI ) {
 
 		super();
 		this.type = 'SphereGeometry';
@@ -22,42 +19,8 @@ class SphereGeometry extends Geometry {
 			thetaLength: thetaLength
 		};
 
-		this.fromBufferGeometry( new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
-		this.mergeVertices();
-
-	}
-
-}
-
-// SphereBufferGeometry
-
-class SphereBufferGeometry extends BufferGeometry {
-
-	constructor( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
-
-		super();
-		this.type = 'SphereBufferGeometry';
-
-		this.parameters = {
-			radius: radius,
-			widthSegments: widthSegments,
-			heightSegments: heightSegments,
-			phiStart: phiStart,
-			phiLength: phiLength,
-			thetaStart: thetaStart,
-			thetaLength: thetaLength
-		};
-
-		radius = radius || 1;
-
-		widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
-		heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
-
-		phiStart = phiStart !== undefined ? phiStart : 0;
-		phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
-
-		thetaStart = thetaStart !== undefined ? thetaStart : 0;
-		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
+		widthSegments = Math.max( 3, Math.floor( widthSegments ) );
+		heightSegments = Math.max( 2, Math.floor( heightSegments ) );
 
 		const thetaEnd = Math.min( thetaStart + thetaLength, Math.PI );
 
@@ -154,5 +117,4 @@ class SphereBufferGeometry extends BufferGeometry {
 
 }
 
-
-export { SphereGeometry, SphereBufferGeometry };
+export { SphereGeometry, SphereGeometry as SphereBufferGeometry };

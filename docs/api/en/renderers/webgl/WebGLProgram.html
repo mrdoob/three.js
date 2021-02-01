@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -90,6 +89,16 @@
 		#ifdef USE_SKINNING
 			attribute vec4 skinIndex;
 			attribute vec4 skinWeight;
+		#endif
+		</code>
+		<code>
+		#ifdef USE_INSTANCING
+			// Note that modelViewMatrix is not set when rendering an instanced model,
+			// but can be calculated from viewMatrix * modelMatrix.
+			//
+			// Basic Usage:
+			//   gl_Position = projectionMatrix * viewMatrix * modelMatrix * instanceMatrix * vec4(position, 1.0);
+			attribute mat4 instanceMatrix;
 		#endif
 		</code>
 		</div>

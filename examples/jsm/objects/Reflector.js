@@ -12,7 +12,7 @@ import {
 	Vector3,
 	Vector4,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var Reflector = function ( geometry, options ) {
 
@@ -67,9 +67,9 @@ var Reflector = function ( geometry, options ) {
 		vertexShader: shader.vertexShader
 	} );
 
-	material.uniforms[ "tDiffuse" ].value = renderTarget.texture;
-	material.uniforms[ "color" ].value = color;
-	material.uniforms[ "textureMatrix" ].value = textureMatrix;
+	material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
+	material.uniforms[ 'color' ].value = color;
+	material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 
 	this.material = material;
 

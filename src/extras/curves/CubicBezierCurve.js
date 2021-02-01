@@ -4,22 +4,23 @@ import { Vector2 } from '../../math/Vector2.js';
 
 class CubicBezierCurve extends Curve {
 
-	constructor( v0, v1, v2, v3 ) {
+	constructor( v0 = new Vector2(), v1 = new Vector2(), v2 = new Vector2(), v3 = new Vector2() ) {
 
 		super();
 
 		this.type = 'CubicBezierCurve';
 		Object.defineProperty( this, 'isCubicBezierCurve', { value: true } );
 
-		this.v0 = v0 || new Vector2();
-		this.v1 = v1 || new Vector2();
-		this.v2 = v2 || new Vector2();
-		this.v3 = v3 || new Vector2();
+		this.v0 = v0;
+		this.v1 = v1;
+		this.v2 = v2;
+		this.v3 = v3;
 
 	}
-	getPoint( t, optionalTarget ) {
 
-		const point = optionalTarget || new Vector2();
+	getPoint( t, optionalTarget = new Vector2() ) {
+
+		const point = optionalTarget;
 
 		const v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
 

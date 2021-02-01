@@ -1,15 +1,13 @@
-console.warn( "THREE.SavePass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.SavePass = function ( renderTarget ) {
 
 	THREE.Pass.call( this );
 
 	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.SavePass relies on THREE.CopyShader" );
+		console.error( 'THREE.SavePass relies on THREE.CopyShader' );
 
 	var shader = THREE.CopyShader;
 
-	this.textureID = "tDiffuse";
+	this.textureID = 'tDiffuse';
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -26,7 +24,7 @@ THREE.SavePass = function ( renderTarget ) {
 	if ( this.renderTarget === undefined ) {
 
 		this.renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat } );
-		this.renderTarget.texture.name = "SavePass.rt";
+		this.renderTarget.texture.name = 'SavePass.rt';
 
 	}
 

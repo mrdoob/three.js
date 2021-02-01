@@ -17,9 +17,9 @@
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			var camera, scene, renderer, stats;
+			let camera, scene, renderer, stats;
 
-			var api = {
+			const api = {
 
 				count: 2000,
 				distribution: 'random',
@@ -29,27 +29,27 @@
 
 			};
 
-			var stemMesh, blossomMesh;
-			var stemGeometry, blossomGeometry;
-			var stemMaterial, blossomMaterial;
+			let stemMesh, blossomMesh;
+			let stemGeometry, blossomGeometry;
+			let stemMaterial, blossomMaterial;
 
-			var sampler;
-			var count = api.count;
-			var ages = new Float32Array( count );
-			var scales = new Float32Array( count );
-			var dummy = new THREE.Object3D();
+			let sampler;
+			const count = api.count;
+			const ages = new Float32Array( count );
+			const scales = new Float32Array( count );
+			const dummy = new THREE.Object3D();
 
-			var _position = new THREE.Vector3();
-			var _normal = new THREE.Vector3();
-			var _scale = new THREE.Vector3();
+			const _position = new THREE.Vector3();
+			const _normal = new THREE.Vector3();
+			const _scale = new THREE.Vector3();
 
-			// var surfaceGeometry = new THREE.BoxBufferGeometry( 10, 10, 10 ).toNonIndexed();
-			var surfaceGeometry = new THREE.TorusKnotBufferGeometry( 10, 3, 100, 16 ).toNonIndexed();
-			var surfaceMaterial = new THREE.MeshLambertMaterial( { color: api.surfaceColor, wireframe: false } );
-			var surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
+			// let surfaceGeometry = new THREE.BoxGeometry( 10, 10, 10 ).toNonIndexed();
+			const surfaceGeometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 ).toNonIndexed();
+			const surfaceMaterial = new THREE.MeshLambertMaterial( { color: api.surfaceColor, wireframe: false } );
+			const surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
 
 			// Source: https://gist.github.com/gre/1650294
-			var easeOutCubic = function ( t ) {
+			const easeOutCubic = function ( t ) {
 
 				return ( -- t ) * t * t + 1;
 
@@ -57,18 +57,18 @@
 
 			// Scaling curve causes particles to grow quickly, ease gradually into full scale, then
 			// disappear quickly. More of the particle's lifetime is spent around full scale.
-			var scaleCurve = function ( t ) {
+			const scaleCurve = function ( t ) {
 
 				return Math.abs( easeOutCubic( ( t > 0.5 ? 1 - t : t ) * 2 ) );
 
 			};
 
-			var loader = new GLTFLoader();
+			const loader = new GLTFLoader();
 
 			loader.load( './models/gltf/Flower/Flower.glb', function ( gltf ) {
 
-				var _stemMesh = gltf.scene.getObjectByName( 'Stem' );
-				var _blossomMesh = gltf.scene.getObjectByName( 'Blossom' );
+				const _stemMesh = gltf.scene.getObjectByName( 'Stem' );
+				const _blossomMesh = gltf.scene.getObjectByName( 'Blossom' );
 
 				stemGeometry = new THREE.InstancedBufferGeometry();
 				blossomGeometry = new THREE.InstancedBufferGeometry();
@@ -76,7 +76,7 @@
 				THREE.BufferGeometry.prototype.copy.call( stemGeometry, _stemMesh.geometry );
 				THREE.BufferGeometry.prototype.copy.call( blossomGeometry, _blossomMesh.geometry );
 
-				var defaultTransform = new THREE.Matrix4()
+				const defaultTransform = new THREE.Matrix4()
 					.makeRotationX( Math.PI )
 					.multiply( new THREE.Matrix4().makeScale( 7, 7, 7 ) );
 
@@ -87,11 +87,11 @@
 				blossomMaterial = _blossomMesh.material;
 
 				// Assign random colors to the blossoms.
-				var _color = new THREE.Color();
-				var color = new Float32Array( count * 3 );
-				var blossomPalette = [ 0xF20587, 0xF2D479, 0xF2C879, 0xF2B077, 0xF24405 ];
+				const _color = new THREE.Color();
+				const color = new Float32Array( count * 3 );
+				const blossomPalette = [ 0xF20587, 0xF2D479, 0xF2C879, 0xF2B077, 0xF24405 ];
 
-				for ( var i = 0; i < count; i ++ ) {
+				for ( let i = 0; i < count; i ++ ) {
 
 					_color.setHex( blossomPalette[ Math.floor( Math.random() * blossomPalette.length ) ] );
 					_color.toArray( color, i * 3 );
@@ -126,7 +126,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( api.backgroundColor );
 
-				var pointLight = new THREE.PointLight( 0xAA8899, 0.75 );
+				const pointLight = new THREE.PointLight( 0xAA8899, 0.75 );
 				pointLight.position.set( 50, - 25, 75 );
 				scene.add( pointLight );
 
@@ -141,7 +141,7 @@
 
 				//
 
-				var gui = new GUI();
+				const gui = new GUI();
 				gui.add( api, 'count', 0, count ).onChange( function () {
 
 					stemMesh.count = api.count;
@@ -178,13 +178,13 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function resample() {
 
-				var vertexCount = surface.geometry.getAttribute( 'position' ).count;
+				const vertexCount = surface.geometry.getAttribute( 'position' ).count;
 
 				console.info( 'Sampling ' + count + ' points from a surface with ' + vertexCount + ' vertices...' );
 
@@ -202,7 +202,7 @@
 
 				console.time( '.sample()' );
 
-				for ( var i = 0; i < count; i ++ ) {
+				for ( let i = 0; i < count; i ++ ) {
 
 					ages[ i ] = Math.random();
 					scales[ i ] = scaleCurve( ages[ i ] );
@@ -252,7 +252,7 @@
 
 				// Update scale.
 
-				var prevScale = scales[ i ];
+				const prevScale = scales[ i ];
 				scales[ i ] = scaleCurve( ages[ i ] );
 				_scale.set( scales[ i ] / prevScale, scales[ i ] / prevScale, scales[ i ] / prevScale );
 
@@ -290,12 +290,12 @@
 
 				if ( stemMesh && blossomMesh ) {
 
-					var time = Date.now() * 0.001;
+					const time = Date.now() * 0.001;
 
 					scene.rotation.x = Math.sin( time / 4 );
 					scene.rotation.y = Math.sin( time / 2 );
 
-					for ( var i = 0; i < api.count; i ++ ) {
+					for ( let i = 0; i < api.count; i ++ ) {
 
 						updateParticle( i );
 

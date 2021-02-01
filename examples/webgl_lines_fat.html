@@ -26,15 +26,15 @@
 			import { LineGeometry } from './jsm/lines/LineGeometry.js';
 			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
-			var line, renderer, scene, camera, camera2, controls;
-			var line1;
-			var matLine, matLineBasic, matLineDashed;
-			var stats;
-			var gui;
+			let line, renderer, scene, camera, camera2, controls;
+			let line1;
+			let matLine, matLineBasic, matLineDashed;
+			let stats;
+			let gui;
 
 			// viewport
-			var insetWidth;
-			var insetHeight;
+			let insetWidth;
+			let insetHeight;
 
 			init();
 			animate();
@@ -62,19 +62,19 @@
 
 				// Position and THREE.Color Data
 
-				var positions = [];
-				var colors = [];
+				const positions = [];
+				const colors = [];
 
-				var points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				const points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
-				var spline = new THREE.CatmullRomCurve3( points );
-				var divisions = Math.round( 12 * points.length );
-				var point = new THREE.Vector3();
-				var color = new THREE.Color();
+				const spline = new THREE.CatmullRomCurve3( points );
+				const divisions = Math.round( 12 * points.length );
+				const point = new THREE.Vector3();
+				const color = new THREE.Color();
 
-				for ( var i = 0, l = divisions; i < l; i ++ ) {
+				for ( let i = 0, l = divisions; i < l; i ++ ) {
 
-					var t = i / l;
+					const t = i / l;
 
 					spline.getPoint( t, point );
 					positions.push( point.x, point.y, point.z );
@@ -87,7 +87,7 @@
 
 				// Line2 ( LineGeometry, LineMaterial )
 
-				var geometry = new LineGeometry();
+				const geometry = new LineGeometry();
 				geometry.setPositions( positions );
 				geometry.setColors( colors );
 
@@ -109,7 +109,7 @@
 
 				// THREE.Line ( THREE.BufferGeometry, THREE.LineBasicMaterial ) - rendered with gl.LINE_STRIP
 
-				var geo = new THREE.BufferGeometry();
+				const geo = new THREE.BufferGeometry();
 				geo.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 				geo.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
@@ -123,7 +123,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
 
 				stats = new Stats();
@@ -195,14 +195,13 @@
 
 				gui = new GUI();
 
-				var param = {
+				const param = {
 					'line type': 0,
 					'width (px)': 5,
 					'dashed': false,
 					'dash scale': 1,
 					'dash / gap': 1
 				};
-
 
 				gui.add( param, 'line type', { 'LineGeometry': 0, 'gl.LINE': 1 } ).onChange( function ( val ) {
 

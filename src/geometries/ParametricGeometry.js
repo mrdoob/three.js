@@ -1,42 +1,17 @@
-import { Geometry } from '../core/Geometry.js';
-import { BufferGeometry } from '../core/BufferGeometry.js';
-import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector3 } from '../math/Vector3.js';
-
 /**
  * Parametric Surfaces Geometry
  * based on the brilliant article by @prideout https://prideout.net/blog/old/blog/index.html@p=44.html
  */
 
-// ParametricGeometry
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector3 } from '../math/Vector3.js';
 
 function ParametricGeometry( func, slices, stacks ) {
 
-	Geometry.call( this );
-
-	this.type = 'ParametricGeometry';
-
-	this.parameters = {
-		func: func,
-		slices: slices,
-		stacks: stacks
-	};
-
-	this.fromBufferGeometry( new ParametricBufferGeometry( func, slices, stacks ) );
-	this.mergeVertices();
-
-}
-
-ParametricGeometry.prototype = Object.create( Geometry.prototype );
-ParametricGeometry.prototype.constructor = ParametricGeometry;
-
-// ParametricBufferGeometry
-
-function ParametricBufferGeometry( func, slices, stacks ) {
-
 	BufferGeometry.call( this );
 
-	this.type = 'ParametricBufferGeometry';
+	this.type = 'ParametricGeometry';
 
 	this.parameters = {
 		func: func,
@@ -151,8 +126,8 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 }
 
-ParametricBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-ParametricBufferGeometry.prototype.constructor = ParametricBufferGeometry;
+ParametricGeometry.prototype = Object.create( BufferGeometry.prototype );
+ParametricGeometry.prototype.constructor = ParametricGeometry;
 
 
-export { ParametricGeometry, ParametricBufferGeometry };
+export { ParametricGeometry, ParametricGeometry as ParametricBufferGeometry };

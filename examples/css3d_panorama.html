@@ -15,13 +15,13 @@
 
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
-			var camera, scene, renderer;
-			var target = new THREE.Vector3();
+			let camera, scene, renderer;
+			const target = new THREE.Vector3();
 
-			var lon = 90, lat = 0;
-			var phi = 0, theta = 0;
+			let lon = 90, lat = 0;
+			let phi = 0, theta = 0;
 
-			var touchX, touchY;
+			let pointerX, pointerY;
 
 			init();
 			animate();
@@ -32,7 +32,7 @@
 
 				scene = new THREE.Scene();
 
-				var sides = [
+				const sides = [
 					{
 						url: 'textures/cube/Bridge2/posx.jpg',
 						position: [ - 512, 0, 0 ],
@@ -65,15 +65,16 @@
 					}
 				];
 
-				for ( var i = 0; i < sides.length; i ++ ) {
+				for ( let i = 0; i < sides.length; i ++ ) {
 
-					var side = sides[ i ];
+					const side = sides[ i ];
 
-					var element = document.createElement( 'img' );
+					const element = document.createElement( 'img' );
+					element.draggable = false;
 					element.width = 1026; // 2 pixels extra to close the gap.
 					element.src = side.url;
 
-					var object = new CSS3DObject( element );
+					const object = new CSS3DObject( element );
 					object.position.fromArray( side.position );
 					object.rotation.fromArray( side.rotation );
 					scene.add( object );
@@ -86,13 +87,12 @@
 
 				//
 
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+				document.body.style.touchAction = 'none';
+				document.body.addEventListener( 'pointerdown', onPointerDown );
 
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				document.addEventListener( 'wheel', onDocumentMouseWheel );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -105,64 +105,46 @@
 
 			}
 
-			function onDocumentMouseDown( event ) {
+			function onPointerDown( event ) {
 
-				event.preventDefault();
+				if ( event.isPrimary === false ) return;
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				pointerX = event.clientX;
+				pointerY = event.clientY;
 
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-				var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-
-				lon -= movementX * 0.1;
-				lat += movementY * 0.1;
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerup', onPointerUp );
 
 			}
 
-			function onDocumentMouseUp() {
+			function onPointerMove( event ) {
 
-				document.removeEventListener( 'mousemove', onDocumentMouseMove );
-				document.removeEventListener( 'mouseup', onDocumentMouseUp );
+				if ( event.isPrimary === false ) return;
+
+				lon -= ( event.clientX - pointerX ) * 0.1;
+				lat += ( event.clientY - pointerY ) * 0.1;
+
+				pointerX = event.clientX;
+				pointerY = event.clientY;
+
+			}
+
+			function onPointerUp() {
+
+				if ( event.isPrimary === false ) return;
+
+				document.removeEventListener( 'pointermove', onPointerMove );
+				document.removeEventListener( 'pointerup', onPointerUp );
 
 			}
 
 			function onDocumentMouseWheel( event ) {
 
-				var fov = camera.fov + event.deltaY * 0.05;
+				const fov = camera.fov + event.deltaY * 0.05;
 
 				camera.fov = THREE.MathUtils.clamp( fov, 10, 75 );
 
 				camera.updateProjectionMatrix();
-
-			}
-
-			function onDocumentTouchStart( event ) {
-
-				event.preventDefault();
-
-				var touch = event.touches[ 0 ];
-
-				touchX = touch.screenX;
-				touchY = touch.screenY;
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				event.preventDefault();
-
-				var touch = event.touches[ 0 ];
-
-				lon -= ( touch.screenX - touchX ) * 0.1;
-				lat += ( touch.screenY - touchY ) * 0.1;
-
-				touchX = touch.screenX;
-				touchY = touch.screenY;
 
 			}
 

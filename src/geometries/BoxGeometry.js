@@ -1,43 +1,14 @@
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector3 } from '../math/Vector3.js';
 
-// BoxGeometry
-
-class BoxGeometry extends Geometry {
-
-	constructor( width, height, depth, widthSegments, heightSegments, depthSegments ) {
-
-		super();
-
-		this.type = 'BoxGeometry';
-
-		this.parameters = {
-			width: width,
-			height: height,
-			depth: depth,
-			widthSegments: widthSegments,
-			heightSegments: heightSegments,
-			depthSegments: depthSegments
-		};
-
-		this.fromBufferGeometry( new BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) );
-		this.mergeVertices();
-
-	}
-
-}
-
-// BoxBufferGeometry
-
-class BoxBufferGeometry extends BufferGeometry {
+class BoxGeometry extends BufferGeometry {
 
 	constructor( width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1 ) {
 
 		super();
 
-		this.type = 'BoxBufferGeometry';
+		this.type = 'BoxGeometry';
 
 		this.parameters = {
 			width: width,
@@ -190,4 +161,4 @@ class BoxBufferGeometry extends BufferGeometry {
 
 }
 
-export { BoxGeometry, BoxBufferGeometry };
+export { BoxGeometry, BoxGeometry as BoxBufferGeometry };

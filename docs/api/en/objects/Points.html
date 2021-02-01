@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,10 +20,9 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
 		<p>
-			[page:Geometry geometry] — (optional) an instance of [page:Geometry] or [page:BufferGeometry].
-				Default is a new [page:BufferGeometry].<br />
+			[page:BufferGeometry geometry] — (optional) an instance of [page:BufferGeometry].	Default is a new [page:BufferGeometry].<br />
 			[page:Material material] — (optional) a [page:Material]. Default is a new [page:PointsMaterial].
 		</p>
 
@@ -32,12 +30,9 @@
 		<h2>Properties</h2>
 		<p>See the base [page:Object3D] class for common properties.</p>
 
-		<h3>[property:Geometry geometry]</h3>
+		<h3>[property:BufferGeometry geometry]</h3>
 		<p>
-			An instance of [page:Geometry] or [page:BufferGeometry] (or derived classes),
-			defining the object's structure.<br /><br />
-
-			Its recommended to always use a [page:BufferGeometry] if possible for best performance.
+			An instance of [page:BufferGeometry] (or derived classes), defining the object's structure.
 		</p>
 
 		<h3>[property:Material material]</h3>

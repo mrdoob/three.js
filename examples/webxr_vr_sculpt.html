@@ -19,13 +19,13 @@
 			import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
 
-			var container;
-			var camera, scene, renderer;
-			var controller1, controller2;
+			let container;
+			let camera, scene, renderer;
+			let controller1, controller2;
 
-			var controls, blob;
+			let controls, blob;
 
-			var points = [];
+			let points = [];
 
 			init();
 			initBlob();
@@ -46,34 +46,34 @@
 				controls.target.set( 0, 1.6, 0 );
 				controls.update();
 
-				var geometry = new THREE.BoxBufferGeometry( 0.5, 0.8, 0.5 );
-				var material = new THREE.MeshStandardMaterial( {
+				const tableGeometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
+				const tableMaterial = new THREE.MeshStandardMaterial( {
 					color: 0x444444,
 					roughness: 1.0,
 					metalness: 0.0
 				} );
-				var table = new THREE.Mesh( geometry, material );
+				const table = new THREE.Mesh( tableGeometry, tableMaterial );
 				table.position.y = 0.35;
 				table.position.z = 0.85;
 				scene.add( table );
 
-				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
-				var material = new THREE.MeshStandardMaterial( {
+				const floorGometry = new THREE.PlaneGeometry( 4, 4 );
+				const floorMaterial = new THREE.MeshStandardMaterial( {
 					color: 0x222222,
 					roughness: 1.0,
 					metalness: 0.0
 				} );
-				var floor = new THREE.Mesh( geometry, material );
+				const floor = new THREE.Mesh( floorGometry, floorMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				scene.add( floor );
 
-				var grid = new THREE.GridHelper( 10, 20, 0x111111, 0x111111 );
+				const grid = new THREE.GridHelper( 10, 20, 0x111111, 0x111111 );
 				// grid.material.depthTest = false; // avoid z-fighting
 				scene.add( grid );
 
 				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				const light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 6, 0 );
 				scene.add( light );
 
@@ -116,12 +116,12 @@
 
 				//
 
-				var geometry = new THREE.CylinderBufferGeometry( 0.01, 0.02, 0.08, 5 );
+				const geometry = new THREE.CylinderGeometry( 0.01, 0.02, 0.08, 5 );
 				geometry.rotateX( - Math.PI / 2 );
-				var material = new THREE.MeshStandardMaterial( { flatShading: true } );
-				var mesh = new THREE.Mesh( geometry, material );
+				const material = new THREE.MeshStandardMaterial( { flatShading: true } );
+				const mesh = new THREE.Mesh( geometry, material );
 
-				var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 2 ) );
+				const pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.01, 3 ) );
 				pivot.name = 'pivot';
 				pivot.position.z = - 0.05;
 				mesh.add( pivot );
@@ -131,25 +131,25 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function initBlob() {
 
 				/*
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
+				let path = "textures/cube/SwedishRoyalCastle/";
+				let format = '.jpg';
+				let urls = [
 					path + 'px' + format, path + 'nx' + format,
 					path + 'py' + format, path + 'ny' + format,
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var reflectionCube = new CubeTextureLoader().load( urls );
+				let reflectionCube = new CubeTextureLoader().load( urls );
 				*/
 
-				var material = new THREE.MeshStandardMaterial( {
+				const material = new THREE.MeshStandardMaterial( {
 					color: 0xffffff,
 					// envMap: reflectionCube,
 					roughness: 0.9,
@@ -201,21 +201,21 @@
 
 			function handleController( controller ) {
 
-				var pivot = controller.getObjectByName( 'pivot' );
+				const pivot = controller.getObjectByName( 'pivot' );
 
 				if ( pivot ) {
 
-					var id = controller.userData.id;
-					var matrix = pivot.matrixWorld;
+					const id = controller.userData.id;
+					const matrix = pivot.matrixWorld;
 
 					points[ id ].position.setFromMatrixPosition( matrix );
 					transformPoint( points[ id ].position );
 
 					if ( controller.userData.isSelecting ) {
 
-						var strength = points[ id ].strength / 2;
+						const strength = points[ id ].strength / 2;
 
-						var vector = new THREE.Vector3().setFromMatrixPosition( matrix );
+						const vector = new THREE.Vector3().setFromMatrixPosition( matrix );
 
 						transformPoint( vector );
 
@@ -231,10 +231,10 @@
 
 				blob.reset();
 
-				for ( var i = 0; i < points.length; i ++ ) {
+				for ( let i = 0; i < points.length; i ++ ) {
 
-					var point = points[ i ];
-					var position = point.position;
+					const point = points[ i ];
+					const position = point.position;
 
 					blob.addBall( position.x, position.y, position.z, point.strength, point.subtract );
 

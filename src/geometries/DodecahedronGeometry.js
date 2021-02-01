@@ -1,32 +1,8 @@
-import { Geometry } from '../core/Geometry.js';
-import { PolyhedronBufferGeometry } from './PolyhedronGeometry.js';
+import { PolyhedronGeometry } from './PolyhedronGeometry.js';
 
-// DodecahedronGeometry
+class DodecahedronGeometry extends PolyhedronGeometry {
 
-class DodecahedronGeometry extends Geometry {
-
-	constructor( radius, detail ) {
-
-		super();
-		this.type = 'DodecahedronGeometry';
-
-		this.parameters = {
-			radius: radius,
-			detail: detail
-		};
-
-		this.fromBufferGeometry( new DodecahedronBufferGeometry( radius, detail ) );
-		this.mergeVertices();
-
-	}
-
-}
-
-// DodecahedronBufferGeometry
-
-class DodecahedronBufferGeometry extends PolyhedronBufferGeometry {
-
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
 		const t = ( 1 + Math.sqrt( 5 ) ) / 2;
 		const r = 1 / t;
@@ -69,7 +45,7 @@ class DodecahedronBufferGeometry extends PolyhedronBufferGeometry {
 
 		super( vertices, indices, radius, detail );
 
-		this.type = 'DodecahedronBufferGeometry';
+		this.type = 'DodecahedronGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -81,4 +57,4 @@ class DodecahedronBufferGeometry extends PolyhedronBufferGeometry {
 }
 
 
-export { DodecahedronGeometry, DodecahedronBufferGeometry };
+export { DodecahedronGeometry, DodecahedronGeometry as DodecahedronBufferGeometry };

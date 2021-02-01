@@ -22,8 +22,8 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TransformControls } from './jsm/controls/TransformControls.js';
 
-			var cameraPersp, cameraOrtho, currentCamera;
-			var scene, renderer, control, orbit;
+			let cameraPersp, cameraOrtho, currentCamera;
+			let scene, renderer, control, orbit;
 
 			init();
 			render();
@@ -45,17 +45,17 @@
 				currentCamera.lookAt( 0, 200, 0 );
 
 				scene = new THREE.Scene();
-				scene.add( new THREE.GridHelper( 1000, 10 ) );
+				scene.add( new THREE.GridHelper( 1000, 10, 0x888888, 0x444444 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 2 );
+				const light = new THREE.DirectionalLight( 0xffffff, 2 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-				var texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
+				const texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
 				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-				var material = new THREE.MeshLambertMaterial( { map: texture, transparent: true } );
+				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
+				const material = new THREE.MeshLambertMaterial( { map: texture, transparent: true } );
 
 				orbit = new OrbitControls( currentCamera, renderer.domElement );
 				orbit.update();
@@ -70,13 +70,13 @@
 
 				} );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				control.attach( mesh );
 				scene.add( control );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				window.addEventListener( 'keydown', function ( event ) {
 

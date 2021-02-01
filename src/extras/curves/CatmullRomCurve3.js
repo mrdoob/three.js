@@ -83,22 +83,22 @@ const px = new CubicPoly(), py = new CubicPoly(), pz = new CubicPoly();
 
 class CatmullRomCurve3 extends Curve {
 
-	constructor( points, closed, curveType, tension ) {
+	constructor( points = [], closed = false, curveType = 'centripetal', tension = 0.5 ) {
 
 		super();
 
 		this.type = 'CatmullRomCurve3';
 		Object.defineProperty( this, 'isCatmullRomCurve3', { value: true } );
-
-		this.points = points || [];
-		this.closed = closed || false;
-		this.curveType = curveType || 'centripetal';
-		this.tension = ( tension !== undefined ) ? tension : 0.5;
+    this.points = points;
+    this.closed = closed;
+    this.curveType = curveType;
+    this.tension = tension;
 
 	}
-	getPoint( t, optionalTarget ) {
 
-		const point = optionalTarget || new Vector3();
+	getPoint( t, optionalTarget = new Vector3() ) {
+
+		const point = optionalTarget;
 
 		const points = this.points;
 		const l = points.length;

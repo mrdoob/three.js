@@ -26,20 +26,20 @@
 		import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
 		import { ToonShader1, ToonShader2, ToonShaderHatching, ToonShaderDotted } from './jsm/shaders/ToonShader.js';
 
-		var container, stats;
+		let container, stats;
 
-		var camera, scene, renderer;
+		let camera, scene, renderer;
 
-		var materials, current_material;
+		let materials, current_material;
 
-		var light, pointLight, ambientLight;
+		let light, pointLight, ambientLight;
 
-		var effect, resolution;
+		let effect, resolution;
 
-		var effectController;
+		let effectController;
 
-		var time = 0;
-		var clock = new THREE.Clock();
+		let time = 0;
+		const clock = new THREE.Clock();
 
 		init();
 		animate();
@@ -99,7 +99,7 @@
 
 			// CONTROLS
 
-			var controls = new OrbitControls( camera, renderer.domElement );
+			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.minDistance = 500;
 			controls.maxDistance = 5000;
 
@@ -114,7 +114,7 @@
 
 			// EVENTS
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 		}
 
@@ -133,32 +133,32 @@
 
 			// environment map
 
-			var path = "textures/cube/SwedishRoyalCastle/";
-			var format = '.jpg';
-			var urls = [
+			const path = "textures/cube/SwedishRoyalCastle/";
+			const format = '.jpg';
+			const urls = [
 				path + 'px' + format, path + 'nx' + format,
 				path + 'py' + format, path + 'ny' + format,
 				path + 'pz' + format, path + 'nz' + format
 			];
 
-			var cubeTextureLoader = new THREE.CubeTextureLoader();
+			const cubeTextureLoader = new THREE.CubeTextureLoader();
 
-			var reflectionCube = cubeTextureLoader.load( urls );
-			var refractionCube = cubeTextureLoader.load( urls );
+			const reflectionCube = cubeTextureLoader.load( urls );
+			const refractionCube = cubeTextureLoader.load( urls );
 			refractionCube.mapping = THREE.CubeRefractionMapping;
 
 			// toons
 
-			var toonMaterial1 = createShaderMaterial( ToonShader1, light, ambientLight );
-			var toonMaterial2 = createShaderMaterial( ToonShader2, light, ambientLight );
-			var hatchingMaterial = createShaderMaterial( ToonShaderHatching, light, ambientLight );
-			var dottedMaterial = createShaderMaterial( ToonShaderDotted, light, ambientLight );
+			const toonMaterial1 = createShaderMaterial( ToonShader1, light, ambientLight );
+			const toonMaterial2 = createShaderMaterial( ToonShader2, light, ambientLight );
+			const hatchingMaterial = createShaderMaterial( ToonShaderHatching, light, ambientLight );
+			const dottedMaterial = createShaderMaterial( ToonShaderDotted, light, ambientLight );
 
-			var texture = new THREE.TextureLoader().load( "textures/uv_grid_opengl.jpg" );
+			const texture = new THREE.TextureLoader().load( "textures/uv_grid_opengl.jpg" );
 			texture.wrapS = THREE.RepeatWrapping;
 			texture.wrapT = THREE.RepeatWrapping;
 
-			var materials = {
+			const materials = {
 
 				"chrome": {
 					m: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } ),
@@ -233,12 +233,12 @@
 
 		function createShaderMaterial( shader, light, ambientLight ) {
 
-			var u = THREE.UniformsUtils.clone( shader.uniforms );
+			const u = THREE.UniformsUtils.clone( shader.uniforms );
 
-			var vs = shader.vertexShader;
-			var fs = shader.fragmentShader;
+			const vs = shader.vertexShader;
+			const fs = shader.fragmentShader;
 
-			var material = new THREE.ShaderMaterial( { uniforms: u, vertexShader: vs, fragmentShader: fs } );
+			const material = new THREE.ShaderMaterial( { uniforms: u, vertexShader: vs, fragmentShader: fs } );
 
 			material.uniforms[ "uDirLightPos" ].value = light.position;
 			material.uniforms[ "uDirLightColor" ].value = light.color;
@@ -253,18 +253,18 @@
 
 		function setupGui() {
 
-			var createHandler = function ( id ) {
+			const createHandler = function ( id ) {
 
 				return function () {
 
-					var mat_old = materials[ current_material ];
+					const mat_old = materials[ current_material ];
 					mat_old.h = m_h.getValue();
 					mat_old.s = m_s.getValue();
 					mat_old.l = m_l.getValue();
 
 					current_material = id;
 
-					var mat = materials[ id ];
+					const mat = materials[ id ];
 					effect.material = mat.m;
 
 					m_h.setValue( mat.h );
@@ -307,15 +307,15 @@
 
 			};
 
-			var h, m_h, m_s, m_l;
+			let h;
 
-			var gui = new GUI();
+			const gui = new GUI();
 
 			// material (type)
 
 			h = gui.addFolder( "Materials" );
 
-			for ( var m in materials ) {
+			for ( const m in materials ) {
 
 				effectController[ m ] = createHandler( m );
 				h.add( effectController, m ).name( m );
@@ -326,9 +326,9 @@
 
 			h = gui.addFolder( "Material color" );
 
-			m_h = h.add( effectController, "hue", 0.0, 1.0, 0.025 );
-			m_s = h.add( effectController, "saturation", 0.0, 1.0, 0.025 );
-			m_l = h.add( effectController, "lightness", 0.0, 1.0, 0.025 );
+			const m_h = h.add( effectController, "hue", 0.0, 1.0, 0.025 );
+			const m_s = h.add( effectController, "saturation", 0.0, 1.0, 0.025 );
+			const m_l = h.add( effectController, "lightness", 0.0, 1.0, 0.025 );
 
 			// light (point)
 
@@ -369,8 +369,7 @@
 
 			// fill the field with some metaballs
 
-			var i, ballx, bally, ballz, subtract, strength;
-			var rainbow = [
+			const rainbow = [
 				new THREE.Color( 0xff0000 ),
 				new THREE.Color( 0xff7f00 ),
 				new THREE.Color( 0xffff00 ),
@@ -379,14 +378,14 @@
 				new THREE.Color( 0x4b0082 ),
 				new THREE.Color( 0x9400d3 )
 			];
-			subtract = 12;
-			strength = 1.2 / ( ( Math.sqrt( numblobs ) - 1 ) / 4 + 1 );
+			const subtract = 12;
+			const strength = 1.2 / ( ( Math.sqrt( numblobs ) - 1 ) / 4 + 1 );
 
-			for ( i = 0; i < numblobs; i ++ ) {
+			for ( let i = 0; i < numblobs; i ++ ) {
 
-				ballx = Math.sin( i + 1.26 * time * ( 1.03 + 0.5 * Math.cos( 0.21 * i ) ) ) * 0.27 + 0.5;
-				bally = Math.abs( Math.cos( i + 1.12 * time * Math.cos( 1.22 + 0.1424 * i ) ) ) * 0.77; // dip into the floor
-				ballz = Math.cos( i + 1.32 * time * 0.1 * Math.sin( ( 0.92 + 0.53 * i ) ) ) * 0.27 + 0.5;
+				const ballx = Math.sin( i + 1.26 * time * ( 1.03 + 0.5 * Math.cos( 0.21 * i ) ) ) * 0.27 + 0.5;
+				const bally = Math.abs( Math.cos( i + 1.12 * time * Math.cos( 1.22 + 0.1424 * i ) ) ) * 0.77; // dip into the floor
+				const ballz = Math.cos( i + 1.32 * time * 0.1 * Math.sin( ( 0.92 + 0.53 * i ) ) ) * 0.27 + 0.5;
 
 				if ( current_material === 'multiColors' ) {
 
@@ -419,7 +418,7 @@
 
 		function render() {
 
-			var delta = clock.getDelta();
+			const delta = clock.getDelta();
 
 			time += delta * effectController.speed * 0.5;
 

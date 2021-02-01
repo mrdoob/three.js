@@ -20,15 +20,16 @@
 			import { VRButton } from './jsm/webxr/VRButton.js';
 			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
-			var container;
-			var camera, scene, raycaster, renderer;
+			let container;
+			let camera, scene, raycaster, renderer;
 
-			var room;
+			let room;
 
-			var controller, controllerGrip, tempMatrix = new THREE.Matrix4();
-			var INTERSECTED;
+			let controller, controllerGrip;
+			let INTERSECTED;
+			const tempMatrix = new THREE.Matrix4();
 
 			init();
 			animate();
@@ -53,15 +54,15 @@
 
 				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				const light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxBufferGeometry( 0.15, 0.15, 0.15 );
+				const geometry = new THREE.BoxGeometry( 0.15, 0.15, 0.15 );
 
-				for ( var i = 0; i < 200; i ++ ) {
+				for ( let i = 0; i < 200; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 4 - 2;
 					object.position.y = Math.random() * 4;
@@ -122,13 +123,13 @@
 				} );
 				scene.add( controller );
 
-				var controllerModelFactory = new XRControllerModelFactory();
+				const controllerModelFactory = new XRControllerModelFactory();
 
 				controllerGrip = renderer.xr.getControllerGrip( 0 );
 				controllerGrip.add( controllerModelFactory.createControllerModel( controllerGrip ) );
 				scene.add( controllerGrip );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
@@ -138,22 +139,24 @@
 
 			function buildController( data ) {
 
+				let geometry, material;
+
 				switch ( data.targetRayMode ) {
 
 					case 'tracked-pointer':
 
-						var geometry = new THREE.BufferGeometry();
+						geometry = new THREE.BufferGeometry();
 						geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 1 ], 3 ) );
 						geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( [ 0.5, 0.5, 0.5, 0, 0, 0 ], 3 ) );
 
-						var material = new THREE.LineBasicMaterial( { vertexColors: true, blending: THREE.AdditiveBlending } );
+						material = new THREE.LineBasicMaterial( { vertexColors: true, blending: THREE.AdditiveBlending } );
 
 						return new THREE.Line( geometry, material );
 
 					case 'gaze':
 
-						var geometry = new THREE.RingBufferGeometry( 0.02, 0.04, 32 ).translate( 0, 0, - 1 );
-						var material = new THREE.MeshBasicMaterial( { opacity: 0.5, transparent: true } );
+						geometry = new THREE.RingGeometry( 0.02, 0.04, 32 ).translate( 0, 0, - 1 );
+						material = new THREE.MeshBasicMaterial( { opacity: 0.5, transparent: true } );
 						return new THREE.Mesh( geometry, material );
 
 				}
@@ -179,11 +182,11 @@
 
 			function render() {
 
-				var delta = clock.getDelta() * 60;
+				const delta = clock.getDelta() * 60;
 
 				if ( controller.userData.isSelecting === true ) {
 
-					var cube = room.children[ 0 ];
+					const cube = room.children[ 0 ];
 					room.remove( cube );
 
 					cube.position.copy( controller.position );
@@ -202,7 +205,7 @@
 				raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
 				raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
 
-				var intersects = raycaster.intersectObjects( room.children );
+				const intersects = raycaster.intersectObjects( room.children );
 
 				if ( intersects.length > 0 ) {
 
@@ -226,9 +229,9 @@
 
 				// Keep cubes inside room
 
-				for ( var i = 0; i < room.children.length; i ++ ) {
+				for ( let i = 0; i < room.children.length; i ++ ) {
 
-					var cube = room.children[ i ];
+					const cube = room.children[ i ];
 
 					cube.userData.velocity.multiplyScalar( 1 - ( 0.001 * delta ) );
 

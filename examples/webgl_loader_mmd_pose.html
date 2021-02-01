@@ -37,12 +37,10 @@
 			import { MMDLoader } from './jsm/loaders/MMDLoader.js';
 			import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
 
-			var container;
+			let camera, scene, renderer, effect;
+			let mesh, helper;
 
-			var camera, scene, renderer, effect;
-			var mesh, helper;
-
-			var vpds = [];
+			const vpds = [];
 
 			Ammo().then( function ( AmmoLib ) {
 
@@ -55,7 +53,7 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -66,10 +64,10 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
-				var ambient = new THREE.AmbientLight( 0x666666 );
+				const ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0x887766 );
+				const directionalLight = new THREE.DirectionalLight( 0x887766 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
@@ -88,15 +86,15 @@
 
 					if ( xhr.lengthComputable ) {
 
-						var percentComplete = xhr.loaded / xhr.total * 100;
+						const percentComplete = xhr.loaded / xhr.total * 100;
 						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
 
 					}
 
 				}
 
-				var modelFile = 'models/mmd/miku/miku_v2.pmd';
-				var vpdFiles = [
+				const modelFile = 'models/mmd/miku/miku_v2.pmd';
+				const vpdFiles = [
 					'models/mmd/vpds/01.vpd',
 					'models/mmd/vpds/02.vpd',
 					'models/mmd/vpds/03.vpd',
@@ -112,7 +110,7 @@
 
 				helper = new MMDAnimationHelper();
 
-				var loader = new MMDLoader();
+				const loader = new MMDLoader();
 
 				loader.load( modelFile, function ( object ) {
 
@@ -121,11 +119,11 @@
 
 					scene.add( mesh );
 
-					var vpdIndex = 0;
+					let vpdIndex = 0;
 
 					function loadVpd() {
 
-						var vpdFile = vpdFiles[ vpdIndex ];
+						const vpdFile = vpdFiles[ vpdIndex ];
 
 						loader.loadVPD( vpdFile, false, function ( vpd ) {
 
@@ -153,19 +151,19 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				function initGui() {
 
-					var gui = new GUI();
+					const gui = new GUI();
 
-					var dictionary = mesh.morphTargetDictionary;
+					const dictionary = mesh.morphTargetDictionary;
 
-					var controls = {};
-					var keys = [];
+					const controls = {};
+					const keys = [];
 
-					var poses = gui.addFolder( 'Poses' );
-					var morphs = gui.addFolder( 'Morphs' );
+					const poses = gui.addFolder( 'Poses' );
+					const morphs = gui.addFolder( 'Morphs' );
 
 					function getBaseName( s ) {
 
@@ -175,7 +173,7 @@
 
 					function initControls() {
 
-						for ( var key in dictionary ) {
+						for ( const key in dictionary ) {
 
 							controls[ key ] = 0.0;
 
@@ -183,7 +181,7 @@
 
 						controls.pose = - 1;
 
-						for ( var i = 0; i < vpdFiles.length; i ++ ) {
+						for ( let i = 0; i < vpdFiles.length; i ++ ) {
 
 							controls[ getBaseName( vpdFiles[ i ] ) ] = false;
 
@@ -193,7 +191,7 @@
 
 					function initKeys() {
 
-						for ( var key in dictionary ) {
+						for ( const key in dictionary ) {
 
 							keys.push( key );
 
@@ -203,9 +201,9 @@
 
 					function initPoses() {
 
-						var files = { default: - 1 };
+						const files = { default: - 1 };
 
-						for ( var i = 0; i < vpdFiles.length; i ++ ) {
+						for ( let i = 0; i < vpdFiles.length; i ++ ) {
 
 							files[ getBaseName( vpdFiles[ i ] ) ] = i;
 
@@ -217,7 +215,7 @@
 
 					function initMorphs() {
 
-						for ( var key in dictionary ) {
+						for ( const key in dictionary ) {
 
 							morphs.add( controls, key, 0.0, 1.0, 0.01 ).onChange( onChangeMorph );
 
@@ -227,10 +225,10 @@
 
 					function onChangeMorph() {
 
-						for ( var i = 0; i < keys.length; i ++ ) {
+						for ( let i = 0; i < keys.length; i ++ ) {
 
-							var key = keys[ i ];
-							var value = controls[ key ];
+							const key = keys[ i ];
+							const value = controls[ key ];
 							mesh.morphTargetInfluences[ i ] = value;
 
 						}
@@ -239,7 +237,7 @@
 
 					function onChangePose() {
 
-						var index = parseInt( controls.pose );
+						const index = parseInt( controls.pose );
 
 						if ( index === - 1 ) {
 

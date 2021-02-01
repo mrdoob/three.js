@@ -1,4 +1,3 @@
-console.warn( "THREE.MirrorShader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Mirror Shader
  * Copies half the input to the other half
@@ -10,48 +9,48 @@ THREE.MirrorShader = {
 
 	uniforms: {
 
-		"tDiffuse": { value: null },
-		"side": { value: 1 }
+		'tDiffuse': { value: null },
+		'side': { value: 1 }
 
 	},
 
 	vertexShader: [
 
-		"varying vec2 vUv;",
+		'varying vec2 vUv;',
 
-		"void main() {",
+		'void main() {',
 
-		"	vUv = uv;",
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		'	vUv = uv;',
+		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
-		"}"
+		'}'
 
-	].join( "\n" ),
+	].join( '\n' ),
 
 	fragmentShader: [
 
-		"uniform sampler2D tDiffuse;",
-		"uniform int side;",
+		'uniform sampler2D tDiffuse;',
+		'uniform int side;',
 
-		"varying vec2 vUv;",
+		'varying vec2 vUv;',
 
-		"void main() {",
+		'void main() {',
 
-		"	vec2 p = vUv;",
-		"	if (side == 0){",
-		"		if (p.x > 0.5) p.x = 1.0 - p.x;",
-		"	}else if (side == 1){",
-		"		if (p.x < 0.5) p.x = 1.0 - p.x;",
-		"	}else if (side == 2){",
-		"		if (p.y < 0.5) p.y = 1.0 - p.y;",
-		"	}else if (side == 3){",
-		"		if (p.y > 0.5) p.y = 1.0 - p.y;",
-		"	} ",
-		"	vec4 color = texture2D(tDiffuse, p);",
-		"	gl_FragColor = color;",
+		'	vec2 p = vUv;',
+		'	if (side == 0){',
+		'		if (p.x > 0.5) p.x = 1.0 - p.x;',
+		'	}else if (side == 1){',
+		'		if (p.x < 0.5) p.x = 1.0 - p.x;',
+		'	}else if (side == 2){',
+		'		if (p.y < 0.5) p.y = 1.0 - p.y;',
+		'	}else if (side == 3){',
+		'		if (p.y > 0.5) p.y = 1.0 - p.y;',
+		'	} ',
+		'	vec4 color = texture2D(tDiffuse, p);',
+		'	gl_FragColor = color;',
 
-		"}"
+		'}'
 
-	].join( "\n" )
+	].join( '\n' )
 
 };

@@ -22,12 +22,12 @@
 
 			import { FlakesTexture } from './jsm/textures/FlakesTexture.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var particleLight;
-			var group;
+			let particleLight;
+			let group;
 
 			init();
 			animate();
@@ -51,41 +51,41 @@
 					.load( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ],
 						function ( hdrCubeMap ) {
 
-							var hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+							const hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
 							hdrCubeMap.dispose();
 							pmremGenerator.dispose();
 
-							var geometry = new THREE.SphereBufferGeometry( 80, 64, 32 );
+							const geometry = new THREE.SphereGeometry( 80, 64, 32 );
 
-							var textureLoader = new THREE.TextureLoader();
+							const textureLoader = new THREE.TextureLoader();
 
-							var diffuse = textureLoader.load( "textures/carbon/Carbon.png" );
+							const diffuse = textureLoader.load( "textures/carbon/Carbon.png" );
 							diffuse.encoding = THREE.sRGBEncoding;
 							diffuse.wrapS = THREE.RepeatWrapping;
 							diffuse.wrapT = THREE.RepeatWrapping;
 							diffuse.repeat.x = 10;
 							diffuse.repeat.y = 10;
 
-							var normalMap = textureLoader.load( "textures/carbon/Carbon_Normal.png" );
+							const normalMap = textureLoader.load( "textures/carbon/Carbon_Normal.png" );
 							normalMap.wrapS = THREE.RepeatWrapping;
 							normalMap.wrapT = THREE.RepeatWrapping;
 
-							var normalMap2 = textureLoader.load( "textures/water/Water_1_M_Normal.jpg" );
+							const normalMap2 = textureLoader.load( "textures/water/Water_1_M_Normal.jpg" );
 
-							var normalMap3 = new THREE.CanvasTexture( new FlakesTexture() );
+							const normalMap3 = new THREE.CanvasTexture( new FlakesTexture() );
 							normalMap3.wrapS = THREE.RepeatWrapping;
 							normalMap3.wrapT = THREE.RepeatWrapping;
 							normalMap3.repeat.x = 10;
 							normalMap3.repeat.y = 6;
 							normalMap3.anisotropy = 16;
 
-							var normalMap4 = textureLoader.load( "textures/golfball.jpg" );
+							const normalMap4 = textureLoader.load( "textures/golfball.jpg" );
 
-							var clearcoatNormaMap = textureLoader.load( "textures/pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png" );
+							const clearcoatNormaMap = textureLoader.load( "textures/pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png" );
 
 							// car paint
 
-							var material = new THREE.MeshPhysicalMaterial( {
+							let material = new THREE.MeshPhysicalMaterial( {
 								clearcoat: 1.0,
 								clearcoatRoughness: 0.1,
 								metalness: 0.9,
@@ -95,28 +95,28 @@
 								normalScale: new THREE.Vector2( 0.15, 0.15 )
 							} );
 
-							var mesh = new THREE.Mesh( geometry, material );
+							let mesh = new THREE.Mesh( geometry, material );
 							mesh.position.x = - 100;
 							mesh.position.y = 100;
 							group.add( mesh );
 
 							// fibers
 
-							var material = new THREE.MeshPhysicalMaterial( {
+							material = new THREE.MeshPhysicalMaterial( {
 								roughness: 0.5,
 								clearcoat: 1.0,
 								clearcoatRoughness: 0.1,
 								map: diffuse,
 								normalMap: normalMap
 							} );
-							var mesh = new THREE.Mesh( geometry, material );
+							mesh = new THREE.Mesh( geometry, material );
 							mesh.position.x = 100;
 							mesh.position.y = 100;
 							group.add( mesh );
 
 							// golf
 
-							var material = new THREE.MeshPhysicalMaterial( {
+							material = new THREE.MeshPhysicalMaterial( {
 								metalness: 0.0,
 								roughness: 0.1,
 								clearcoat: 1.0,
@@ -126,14 +126,14 @@
 								// y scale is negated to compensate for normal map handedness.
 								clearcoatNormalScale: new THREE.Vector2( 2.0, - 2.0 )
 							} );
-							var mesh = new THREE.Mesh( geometry, material );
+							mesh = new THREE.Mesh( geometry, material );
 							mesh.position.x = - 100;
 							mesh.position.y = - 100;
 							group.add( mesh );
 
 							// clearcoat + normalmap
 
-							var material = new THREE.MeshPhysicalMaterial( {
+							material = new THREE.MeshPhysicalMaterial( {
 								clearcoat: 1.0,
 								metalness: 1.0,
 								color: 0xff0000,
@@ -144,7 +144,7 @@
 								// y scale is negated to compensate for normal map handedness.
 								clearcoatNormalScale: new THREE.Vector2( 2.0, - 2.0 )
 							} );
-							var mesh = new THREE.Mesh( geometry, material );
+							mesh = new THREE.Mesh( geometry, material );
 							mesh.position.x = 100;
 							mesh.position.y = - 100;
 							group.add( mesh );
@@ -161,7 +161,7 @@
 				// LIGHTS
 
 				particleLight = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 4, 8, 8 ),
+					new THREE.SphereGeometry( 4, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff } )
 				);
 				scene.add( particleLight );
@@ -184,7 +184,7 @@
 
 				//
 
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
 				//
@@ -196,7 +196,7 @@
 
 				new OrbitControls( camera, renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -204,8 +204,8 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -228,15 +228,15 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.00025;
+				const timer = Date.now() * 0.00025;
 
 				particleLight.position.x = Math.sin( timer * 7 ) * 300;
 				particleLight.position.y = Math.cos( timer * 5 ) * 400;
 				particleLight.position.z = Math.cos( timer * 3 ) * 300;
 
-				for ( var i = 0; i < group.children.length; i ++ ) {
+				for ( let i = 0; i < group.children.length; i ++ ) {
 
-					var child = group.children[ i ];
+					const child = group.children[ i ];
 					child.rotation.y += 0.005;
 
 				}

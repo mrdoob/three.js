@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -20,7 +19,7 @@
 
 		<code>
 		//Create a closed wavey loop
-		var curve = new THREE.CatmullRomCurve3( [
+		const curve = new THREE.CatmullRomCurve3( [
 			new THREE.Vector3( -10, 0, 10 ),
 			new THREE.Vector3( -5, 5, 5 ),
 			new THREE.Vector3( 0, 0, 0 ),
@@ -28,13 +27,13 @@
 			new THREE.Vector3( 10, 0, 10 )
 		] );
 
-		var points = curve.getPoints( 50 );
-		var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		const points = curve.getPoints( 50 );
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-		var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+		const material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
 		// Create the final object to add to the scene
-		var curveObject = new THREE.Line( geometry, material );
+		const curveObject = new THREE.Line( geometry, material );
 		</code>
 
 		<h2>例子</h2>
@@ -66,8 +65,8 @@
 		<h3>[property:String curveType]</h3>
 		<p>可能的值为*centripetal*、*chordal*和*catmullrom*。</p>
 
-		<h3>[property:float tension]</h3>
-		<p>当[page:.type]为*catmullrom*时，定义catmullrom的张力。</p>
+		<h3>[property:Float tension]</h3>
+		<p>当[page:.curveType]为*catmullrom*时，定义catmullrom的张力。</p>
 
 
 		<h2>方法</h2>

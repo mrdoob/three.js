@@ -19,10 +19,10 @@
 
 			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
-			var renderer, scene, camera, stats;
-			var objects = [];
+			let renderer, scene, camera, stats;
+			const objects = [];
 
-			var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
+			const WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
 
 			init();
 			animate();
@@ -36,24 +36,24 @@
 				scene.background = new THREE.Color( 0x111111 );
 				scene.fog = new THREE.Fog( 0x111111, 150, 200 );
 
-				var subdivisions = 6;
-				var recursion = 1;
+				const subdivisions = 6;
+				const recursion = 1;
 
-				var points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
-				var spline = new THREE.CatmullRomCurve3( points );
+				const points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
+				const spline = new THREE.CatmullRomCurve3( points );
 
-				var samples = spline.getPoints( points.length * subdivisions );
-				var geometrySpline = new THREE.BufferGeometry().setFromPoints( samples );
+				const samples = spline.getPoints( points.length * subdivisions );
+				const geometrySpline = new THREE.BufferGeometry().setFromPoints( samples );
 
-				var line = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ) );
+				const line = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ) );
 				line.computeLineDistances();
 
 				objects.push( line );
 				scene.add( line );
 
-				var geometryBox = box( 50, 50, 50 );
+				const geometryBox = box( 50, 50, 50 );
 
-				var lineSegments = new THREE.LineSegments( geometryBox, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1 } ) );
+				const lineSegments = new THREE.LineSegments( geometryBox, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1 } ) );
 				lineSegments.computeLineDistances();
 
 				objects.push( lineSegments );
@@ -63,7 +63,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -71,7 +71,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -81,8 +81,8 @@
 				height = height * 0.5,
 				depth = depth * 0.5;
 
-				var geometry = new THREE.BufferGeometry();
-				var position = [];
+				const geometry = new THREE.BufferGeometry();
+				const position = [];
 
 				position.push(
 					- width, - height, - depth,
@@ -148,7 +148,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
 				scene.traverse( function ( object ) {
 

@@ -1,5 +1,3 @@
-console.warn( "THREE.SVGRenderer: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.SVGObject = function ( node ) {
 
 	THREE.Object3D.call( this );
@@ -69,8 +67,8 @@ THREE.SVGRenderer = function () {
 
 		switch ( quality ) {
 
-			case "high": _quality = 1; break;
-			case "low": _quality = 0; break;
+			case 'high': _quality = 1; break;
+			case 'low': _quality = 0; break;
 
 		}
 
@@ -364,7 +362,7 @@ THREE.SVGRenderer = function () {
 		}
 
 		var path = 'M' + convert( v1.x - scaleX * 0.5 ) + ',' + convert( v1.y - scaleY * 0.5 ) + 'h' + convert( scaleX ) + 'v' + convert( scaleY ) + 'h' + convert( - scaleX ) + 'z';
-		var style = "";
+		var style = '';
 
 		if ( material.isSpriteMaterial || material.isPointsMaterial ) {
 
@@ -386,7 +384,7 @@ THREE.SVGRenderer = function () {
 
 			if ( material.isLineDashedMaterial ) {
 
-				style = style + ';stroke-dasharray:' + material.dashSize + "," + material.gapSize;
+				style = style + ';stroke-dasharray:' + material.dashSize + ',' + material.gapSize;
 
 			}
 

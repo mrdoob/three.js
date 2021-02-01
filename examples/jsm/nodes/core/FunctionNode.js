@@ -17,7 +17,7 @@ function FunctionNode( src, includes, extensions, keywords, type ) {
 
 FunctionNode.prototype = Object.create( TempNode.prototype );
 FunctionNode.prototype.constructor = FunctionNode;
-FunctionNode.prototype.nodeType = "Function";
+FunctionNode.prototype.nodeType = 'Function';
 
 FunctionNode.prototype.useKeywords = true;
 

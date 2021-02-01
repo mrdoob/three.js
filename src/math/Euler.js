@@ -280,10 +280,7 @@ class Euler {
 
 	}
 
-	toArray( array, offset ) {
-
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+	toArray( array = [], offset = 0 ) {
 
 		array[ offset ] = this._x;
 		array[ offset + 1 ] = this._y;
@@ -323,8 +320,8 @@ class Euler {
 Euler.DefaultOrder = 'XYZ';
 Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
-const _matrix = new Matrix4();
-const _quaternion = new Quaternion();
+const _matrix = /*@__PURE__*/ new Matrix4();
+const _quaternion = /*@__PURE__*/ new Quaternion();
 
 
 export { Euler };

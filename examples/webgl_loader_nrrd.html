@@ -39,7 +39,7 @@
 			import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
 			import { VTKLoader } from './jsm/loaders/VTKLoader.js';
 
-			var container,
+			let container,
 				stats,
 				camera,
 				controls,
@@ -65,42 +65,36 @@
 
 				// light
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000 , 1 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
 				scene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				dirLight.position.set( 200, 200, 200 );
 				scene.add( dirLight );
 
-				var loader = new NRRDLoader();
+				const loader = new NRRDLoader();
 				loader.load( "models/nrrd/I.nrrd", function ( volume ) {
 
-					var geometry,
-						material,
-						sliceZ,
-						sliceY,
-						sliceX;
-
 					//box helper to see the extend of the volume
-					var geometry = new THREE.BoxBufferGeometry( volume.xLength, volume.yLength, volume.zLength );
-					var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-					var cube = new THREE.Mesh( geometry, material );
+					const geometry = new THREE.BoxGeometry( volume.xLength, volume.yLength, volume.zLength );
+					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+					const cube = new THREE.Mesh( geometry, material );
 					cube.visible = false;
-					var box = new THREE.BoxHelper( cube );
+					const box = new THREE.BoxHelper( cube );
 					scene.add( box );
 					box.applyMatrix4( volume.matrix );
 					scene.add( cube );
 
 					//z plane
-					sliceZ = volume.extractSlice( 'z', Math.floor( volume.RASDimensions[ 2 ] / 4 ) );
+					const sliceZ = volume.extractSlice( 'z', Math.floor( volume.RASDimensions[ 2 ] / 4 ) );
 					scene.add( sliceZ.mesh );
 
 					//y plane
-					sliceY = volume.extractSlice( 'y', Math.floor( volume.RASDimensions[ 1 ] / 2 ) );
+					const sliceY = volume.extractSlice( 'y', Math.floor( volume.RASDimensions[ 1 ] / 2 ) );
 					scene.add( sliceY.mesh );
 
 					//x plane
-					sliceX = volume.extractSlice( 'x', Math.floor( volume.RASDimensions[ 0 ] / 2 ) );
+					const sliceX = volume.extractSlice( 'x', Math.floor( volume.RASDimensions[ 0 ] / 2 ) );
 					scene.add( sliceX.mesh );
 
 					gui.add( sliceX, "index", 0, volume.RASDimensions[ 0 ], 1 ).name( "indexX" ).onChange( function () {
@@ -142,16 +136,16 @@
 
 				} );
 
-				var vtkmaterial = new THREE.MeshLambertMaterial( { wireframe: false, morphTargets: false, side: THREE.DoubleSide, color: 0xff0000 } );
+				const vtkmaterial = new THREE.MeshLambertMaterial( { wireframe: false, morphTargets: false, side: THREE.DoubleSide, color: 0xff0000 } );
 
-				var vtkloader = new VTKLoader();
+				const vtkloader = new VTKLoader();
 				vtkloader.load( "models/vtk/liver.vtk", function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
-					var mesh = new THREE.Mesh( geometry, vtkmaterial );
+					const mesh = new THREE.Mesh( geometry, vtkmaterial );
 					scene.add( mesh );
-					var visibilityControl = {
+					const visibilityControl = {
 						visible: true
 					};
 					gui.add( visibilityControl, "visible" ).name( "Model Visible" ).onChange( function () {
@@ -182,11 +176,11 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				setupInset();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -222,8 +216,7 @@
 
 			function setupInset() {
 
-				var insetWidth = 150,
-					insetHeight = 150;
+				const insetWidth = 150, insetHeight = 150;
 				container2 = document.getElementById( 'inset' );
 				container2.width = insetWidth;
 				container2.height = insetHeight;

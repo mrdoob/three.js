@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -50,7 +49,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -82,7 +81,7 @@
 		</p>
 
 		<h3>[property:Texture aoMap]</h3>
-		<p>该纹理的红色通道用作环境遮挡贴图。默认值为null。aoMap需要第二组UVs，因此将忽略[page:Texture repeat]和[page:Texture offset]属性。</p>
+		<p>该纹理的红色通道用作环境遮挡贴图。默认值为null。aoMap需要第二组UV。</p>
 
 		<h3>[property:Float aoMapIntensity]</h3>
 		<p>环境遮挡效果的强度。默认值为1。零是不遮挡效果。</p>
@@ -133,15 +132,9 @@
 		<h3>[property:Float emissiveIntensity]</h3>
 		<p>放射光强度。调节发光颜色。默认为1。</p>
 
-		<h3>[property:TextureCube envMap]</h3>
-		<p> 环境贴图。默认值为null。
-			请注意，为了使材质粗糙度属性能够正确地模糊环境贴图，shader必须能够访问环境纹理的mipmaps。
-			使用默认设置创建的TextureCubes已正确配置; 如果手动调整纹理参数，
-			请确保将minFilter设置为其中一个MipMap选项，并且未强制禁用mip贴图。</p>
-		<p>
-			注意：MeshStandardMaterial 仅支持[link:https://threejs.org/docs/#api/textures/CubeTexture cube environment maps]。
-			如果要使用equirectangular贴图，则需要使用 [page:WebGLCubeRenderTarget.fromEquirectangularTexture WebGLCubeRenderTarget.fromEquirectangularTexture]().。
-			详细信息请参阅此示例[link:https://threejs.org/examples/webgl_materials_envmaps_exr.html example]。
+		<h3>[property:Texture envMap]</h3>
+		<p>The environment map. To ensure a physically correct rendering, you should only add
+			environment maps which were preprocessed by [page:PMREMGenerator]. Default is null.
 		</p>
 
 		<h3>[property:Float envMapIntensity]</h3>
@@ -149,7 +142,7 @@
 
 
 		<h3>[property:Texture lightMap]</h3>
-		<p>光照贴图。默认值为null。lightMap需要第二组UVs，因此将忽略[page:Texture repeat]和[page:Texture offset]纹理属性。</p>
+		<p>光照贴图。默认值为null。lightMap需要第二组UV。</p>
 
 		<h3>[property:Float lightMapIntensity]</h3>
 		<p>烘焙光的强度。默认值为1。</p>
@@ -165,8 +158,8 @@
 		<h3>[property:Texture metalnessMap]</h3>
 		<p> 该纹理的蓝色通道用于改变材质的金属度。</p>
 
-		<h3>[property:boolean morphNormals]</h3>
-		<p> 定义是否使用morphNormals。设置为true可将morphNormal属性从[page:Geometry]传递到shader。默认值为*false*。
+		<h3>[property:Boolean morphNormals]</h3>
+		<p> 定义是否使用morphNormals。设置为true可将morphNormal属性从geometry传递到shader。默认值为*false*。
 		</p>
 
 		<h3>[property:Boolean morphTargets]</h3>
@@ -174,6 +167,8 @@
 
 		<h3>[property:Texture normalMap]</h3>
 		<p>用于创建法线贴图的纹理。RGB值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
+			In case the material has a normal map authored using the left handed convention, the y component of normalScale
+			should be negated to compensate for the different handedness.
 		</p>
 
 		<h3>[property:Integer normalMapType]</h3>
@@ -204,10 +199,12 @@
 		<p>材质是否使用蒙皮。默认值为false。</p>
 
 		<h3>[property:Boolean vertexTangents]</h3>
-		<p>	Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
-			are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
-			more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
+		<p>
+		Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
+		are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
+		more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
 		</p>
+
 
 		<h3>[property:Boolean wireframe]</h3>
 		<p>将几何体渲染为线框。默认值为*false*（即渲染为平面多边形）。</p>

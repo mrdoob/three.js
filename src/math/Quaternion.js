@@ -410,7 +410,7 @@ class Quaternion {
 
 	}
 
-	inverse() {
+	invert() {
 
 		// quaternion is assumed to have unit length
 
@@ -589,9 +589,7 @@ class Quaternion {
 
 	}
 
-	fromArray( array, offset ) {
-
-		if ( offset === undefined ) offset = 0;
+	fromArray( array, offset = 0 ) {
 
 		this._x = array[ offset ];
 		this._y = array[ offset + 1 ];
@@ -604,10 +602,7 @@ class Quaternion {
 
 	}
 
-	toArray( array, offset ) {
-
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+	toArray( array = [], offset = 0 ) {
 
 		array[ offset ] = this._x;
 		array[ offset + 1 ] = this._y;
@@ -640,6 +635,5 @@ class Quaternion {
 	_onChangeCallback() {}
 
 }
-
 
 export { Quaternion };

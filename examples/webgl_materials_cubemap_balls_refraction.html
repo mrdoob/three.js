@@ -16,18 +16,18 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var container;
+			let container;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var spheres = [];
+			const spheres = [];
 
-			var mouseX = 0, mouseY = 0;
+			let mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			init();
 			animate();
@@ -45,14 +45,14 @@
 					.setPath( 'textures/cube/Park3Med/' )
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
-				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
+				const geometry = new THREE.SphereGeometry( 100, 32, 16 );
 
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: scene.background, refractionRatio: 0.95 } );
+				const material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: scene.background, refractionRatio: 0.95 } );
 				material.envMap.mapping = THREE.CubeRefractionMapping;
 
-				for ( var i = 0; i < 500; i ++ ) {
+				for ( let i = 0; i < 500; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
@@ -75,7 +75,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -110,11 +110,11 @@
 
 			function render() {
 
-				var timer = 0.0001 * Date.now();
+				const timer = 0.0001 * Date.now();
 
-				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
+				for ( let i = 0, il = spheres.length; i < il; i ++ ) {
 
-					var sphere = spheres[ i ];
+					const sphere = spheres[ i ];
 
 					sphere.position.x = 5000 * Math.cos( timer + i );
 					sphere.position.y = 5000 * Math.sin( timer + i * 1.1 );

@@ -1,11 +1,9 @@
-console.warn( "THREE.TexturePass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.TexturePass = function ( map, opacity ) {
 
 	THREE.Pass.call( this );
 
 	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.TexturePass relies on THREE.CopyShader" );
+		console.error( 'THREE.TexturePass relies on THREE.CopyShader' );
 
 	var shader = THREE.CopyShader;
 
@@ -41,8 +39,8 @@ THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 		this.fsQuad.material = this.material;
 
-		this.uniforms[ "opacity" ].value = this.opacity;
-		this.uniforms[ "tDiffuse" ].value = this.map;
+		this.uniforms[ 'opacity' ].value = this.opacity;
+		this.uniforms[ 'tDiffuse' ].value = this.map;
 		this.material.transparent = ( this.opacity < 1.0 );
 
 		renderer.setRenderTarget( this.renderToScreen ? null : readBuffer );

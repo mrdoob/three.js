@@ -157,20 +157,13 @@ class Matrix3 {
 
 	}
 
-	getInverse( matrix, throwOnDegenerate ) {
+	invert() {
 
-		if ( throwOnDegenerate !== undefined ) {
+		const te = this.elements,
 
-			console.warn( "THREE.Matrix3: .getInverse() can no longer be configured to throw on degenerate." );
-
-		}
-
-		const me = matrix.elements,
-			te = this.elements,
-
-			n11 = me[ 0 ], n21 = me[ 1 ], n31 = me[ 2 ],
-			n12 = me[ 3 ], n22 = me[ 4 ], n32 = me[ 5 ],
-			n13 = me[ 6 ], n23 = me[ 7 ], n33 = me[ 8 ],
+			n11 = te[ 0 ], n21 = te[ 1 ], n31 = te[ 2 ],
+			n12 = te[ 3 ], n22 = te[ 4 ], n32 = te[ 5 ],
+			n13 = te[ 6 ], n23 = te[ 7 ], n33 = te[ 8 ],
 
 			t11 = n33 * n22 - n32 * n23,
 			t12 = n32 * n13 - n33 * n12,
@@ -213,7 +206,7 @@ class Matrix3 {
 
 	getNormalMatrix( matrix4 ) {
 
-		return this.setFromMatrix4( matrix4 ).getInverse( this ).transpose();
+		return this.setFromMatrix4( matrix4 ).copy( this ).invert().transpose();
 
 	}
 
@@ -245,6 +238,8 @@ class Matrix3 {
 			- sy * s, sy * c, - sy * ( - s * cx + c * cy ) + cy + ty,
 			0, 0, 1
 		);
+
+		return this;
 
 	}
 
@@ -307,9 +302,7 @@ class Matrix3 {
 
 	}
 
-	fromArray( array, offset ) {
-
-		if ( offset === undefined ) offset = 0;
+	fromArray( array, offset = 0 ) {
 
 		for ( let i = 0; i < 9; i ++ ) {
 
@@ -321,10 +314,7 @@ class Matrix3 {
 
 	}
 
-	toArray( array, offset ) {
-
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+	toArray( array = [], offset = 0 ) {
 
 		const te = this.elements;
 
@@ -345,6 +335,5 @@ class Matrix3 {
 	}
 
 }
-
 
 export { Matrix3 };

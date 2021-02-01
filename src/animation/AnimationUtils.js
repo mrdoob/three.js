@@ -157,9 +157,7 @@ const AnimationUtils = {
 
 	},
 
-	subclip: function ( sourceClip, name, startFrame, endFrame, fps ) {
-
-		fps = fps || 30;
+	subclip: function ( sourceClip, name, startFrame, endFrame, fps = 30 ) {
 
 		const clip = sourceClip.clone();
 
@@ -230,13 +228,11 @@ const AnimationUtils = {
 
 	},
 
-	makeClipAdditive: function ( targetClip, referenceFrame, referenceClip, fps ) {
+	makeClipAdditive: function ( targetClip, referenceFrame = 0, referenceClip = targetClip, fps = 30 ) {
 
-		if ( referenceFrame === undefined ) referenceFrame = 0;
-		if ( referenceClip === undefined ) referenceClip = targetClip;
-		if ( fps === undefined || fps <= 0 ) fps = 30;
+		if ( fps <= 0 ) fps = 30;
 
-		const numTracks = targetClip.tracks.length;
+		const numTracks = referenceClip.tracks.length;
 		const referenceTime = referenceFrame / fps;
 
 		// Make each track's values relative to the values at the reference frame

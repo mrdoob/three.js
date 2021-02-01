@@ -80,16 +80,16 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var materialBg;
-			var materials = [];
+			let materialBg;
+			const materials = [];
 
-			var mapsPre = [];
-			var mapsNoPre = [];
+			const mapsPre = [];
+			const mapsNoPre = [];
 
-			var currentMaps = mapsNoPre;
-			var currentIndex = 4;
+			let currentMaps = mapsNoPre;
+			let currentIndex = 4;
 
 			init();
 			animate();
@@ -107,12 +107,12 @@
 
 				// TEXTURE LOADER
 
-				var textureLoader = new THREE.TextureLoader();
+				const textureLoader = new THREE.TextureLoader();
 
 				// BACKGROUND IMAGES
 
-				var canvas1 = document.createElement( 'canvas' );
-				var ctx1 = canvas1.getContext( '2d' );
+				const canvas1 = document.createElement( 'canvas' );
+				const ctx1 = canvas1.getContext( '2d' );
 				canvas1.width = canvas1.height = 128;
 				ctx1.fillStyle = '#eee';
 				ctx1.fillRect( 0, 0, 128, 128 );
@@ -127,8 +127,8 @@
 
 				document.getElementById( 'bg_1' ).appendChild( canvas1 );
 
-				var canvas2 = document.createElement( 'canvas' );
-				var ctx2 = canvas2.getContext( '2d' );
+				const canvas2 = document.createElement( 'canvas' );
+				const ctx2 = canvas2.getContext( '2d' );
 				canvas2.width = canvas2.height = 128;
 				ctx2.fillStyle = '#444';
 				ctx2.fillRect( 0, 0, 128, 128 );
@@ -143,31 +143,31 @@
 
 				document.getElementById( 'bg_2' ).appendChild( canvas2 );
 
-				var mapBg0 = new THREE.CanvasTexture( canvas1 );
+				const mapBg0 = new THREE.CanvasTexture( canvas1 );
 				mapBg0.wrapS = mapBg0.wrapT = THREE.RepeatWrapping;
 				mapBg0.repeat.set( 128, 64 );
 
-				var mapBg1 = new THREE.CanvasTexture( canvas2 );
+				const mapBg1 = new THREE.CanvasTexture( canvas2 );
 				mapBg1.wrapS = mapBg1.wrapT = THREE.RepeatWrapping;
 				mapBg1.repeat.set( 128, 64 );
 
-				var mapBg2 = textureLoader.load( 'textures/disturb.jpg' );
+				const mapBg2 = textureLoader.load( 'textures/disturb.jpg' );
 				mapBg2.wrapS = mapBg2.wrapT = THREE.RepeatWrapping;
 				mapBg2.repeat.set( 8, 4 );
 
-				var mapBg3 = textureLoader.load( 'textures/crate.gif' );
+				const mapBg3 = textureLoader.load( 'textures/crate.gif' );
 				mapBg3.wrapS = mapBg3.wrapT = THREE.RepeatWrapping;
 				mapBg3.repeat.set( 32, 16 );
 
-				var mapBg4 = textureLoader.load( 'textures/lava/lavatile.jpg' );
+				const mapBg4 = textureLoader.load( 'textures/lava/lavatile.jpg' );
 				mapBg4.wrapS = mapBg4.wrapT = THREE.RepeatWrapping;
 				mapBg4.repeat.set( 8, 4 );
 
-				var mapBg5 = textureLoader.load( 'textures/water.jpg' );
+				const mapBg5 = textureLoader.load( 'textures/water.jpg' );
 				mapBg5.wrapS = mapBg5.wrapT = THREE.RepeatWrapping;
 				mapBg5.repeat.set( 8, 4 );
 
-				var mapBg6 = textureLoader.load( 'textures/lava/cloud.png' );
+				const mapBg6 = textureLoader.load( 'textures/lava/cloud.png' );
 				mapBg6.wrapS = mapBg6.wrapT = THREE.RepeatWrapping;
 				mapBg6.repeat.set( 2, 1 );
 
@@ -175,26 +175,26 @@
 
 				materialBg = new THREE.MeshBasicMaterial( { map: mapBg1 } );
 
-				var meshBg = new THREE.Mesh( new THREE.PlaneBufferGeometry( 4000, 2000 ), materialBg );
+				const meshBg = new THREE.Mesh( new THREE.PlaneGeometry( 4000, 2000 ), materialBg );
 				meshBg.position.set( 0, 0, - 1 );
 				scene.add( meshBg );
 
 				// FOREGROUND IMAGES
 
-				var images = [ 'textures/disturb.jpg',
-							   'textures/sprite0.jpg',
-							   'textures/sprite0.png',
-							   'textures/lensflare/lensflare0.png',
-							   'textures/lensflare/lensflare0_alpha.png',
-							   'textures/sprites/ball.png',
-							   'textures/sprites/snowflake7_alpha.png' ];
+				const images = [ 'textures/disturb.jpg',
+					'textures/sprite0.jpg',
+					'textures/sprite0.png',
+					'textures/lensflare/lensflare0.png',
+					'textures/lensflare/lensflare0_alpha.png',
+					'textures/sprites/ball.png',
+					'textures/sprites/snowflake7_alpha.png' ];
 
-				for ( var i = 0; i < images.length; i ++ ) {
+				for ( let i = 0; i < images.length; i ++ ) {
 
-					var map = textureLoader.load( images[ i ] );
+					const map = textureLoader.load( images[ i ] );
 					mapsNoPre.push( map );
 
-					var mapPre = textureLoader.load( images[ i ] );
+					const mapPre = textureLoader.load( images[ i ] );
 					mapPre.premultiplyAlpha = true;
 					mapPre.needsUpdate = true;
 					mapsPre.push( mapPre );
@@ -202,7 +202,7 @@
 				}
 
 				// FOREGROUND OBJECTS
-				var src = [
+				const src = [
 					{ name: 'Zero', constant: THREE.ZeroFactor },
 					{ name: 'One', constant: THREE.OneFactor },
 					{ name: 'SrcColor', constant: THREE.SrcColorFactor },
@@ -216,7 +216,7 @@
 					{ name: 'SrcAlphaSaturate', constant: THREE.SrcAlphaSaturateFactor }
 				];
 
-				var dst = [
+				const dst = [
 					{ name: 'Zero', constant: THREE.ZeroFactor },
 					{ name: 'One', constant: THREE.OneFactor },
 					{ name: 'SrcColor', constant: THREE.SrcColorFactor },
@@ -229,18 +229,18 @@
 					{ name: 'OneMinusDstColor', constant: THREE.OneMinusDstColorFactor }
 				];
 
-				var geo1 = new THREE.PlaneBufferGeometry( 100, 100 );
-				var geo2 = new THREE.PlaneBufferGeometry( 100, 25 );
+				const geo1 = new THREE.PlaneGeometry( 100, 100 );
+				const geo2 = new THREE.PlaneGeometry( 100, 25 );
 
-				for ( var i = 0; i < dst.length; i ++ ) {
+				for ( let i = 0; i < dst.length; i ++ ) {
 
-					var blendDst = dst[ i ];
+					const blendDst = dst[ i ];
 
-					for ( var j = 0; j < src.length; j ++ ) {
+					for ( let j = 0; j < src.length; j ++ ) {
 
-						var blendSrc = src[ j ];
+						const blendSrc = src[ j ];
 
-						var material = new THREE.MeshBasicMaterial( { map: currentMaps[ currentIndex ] } );
+						const material = new THREE.MeshBasicMaterial( { map: currentMaps[ currentIndex ] } );
 						material.transparent = true;
 
 						material.blending = THREE.CustomBlending;
@@ -248,11 +248,11 @@
 						material.blendDst = blendDst.constant;
 						material.blendEquation = THREE.AddEquation;
 
-						var x = ( j - src.length / 2 ) * 110;
-						var z = 0;
-						var y = ( i - dst.length / 2 ) * 110 + 50;
+						const x = ( j - src.length / 2 ) * 110;
+						const z = 0;
+						const y = ( i - dst.length / 2 ) * 110 + 50;
 
-						var mesh = new THREE.Mesh( geo1, material );
+						const mesh = new THREE.Mesh( geo1, material );
 						mesh.position.set( x, - y, z );
 						mesh.matrixAutoUpdate = false;
 						mesh.updateMatrix();
@@ -264,15 +264,15 @@
 
 				}
 
-				for ( var j = 0; j < src.length; j ++ ) {
+				for ( let j = 0; j < src.length; j ++ ) {
 
-					var blendSrc = src[ j ];
+					const blendSrc = src[ j ];
 
-					var x = ( j - src.length / 2 ) * 110;
-					var z = 0;
-					var y = ( 0 - dst.length / 2 ) * 110 + 50;
+					const x = ( j - src.length / 2 ) * 110;
+					const z = 0;
+					const y = ( 0 - dst.length / 2 ) * 110 + 50;
 
-					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendSrc.name, 'rgba( 0, 150, 0, 1 )' ) );
+					const mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendSrc.name, 'rgba( 0, 150, 0, 1 )' ) );
 					mesh.position.set( x, - ( y - 70 ), z );
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
@@ -280,15 +280,15 @@
 
 				}
 
-				for ( var i = 0; i < dst.length; i ++ ) {
+				for ( let i = 0; i < dst.length; i ++ ) {
 
-					var blendDst = dst[ i ];
+					const blendDst = dst[ i ];
 
-					var x = ( 0 - src.length / 2 ) * 110 - 125;
-					var z = 0;
-					var y = ( i - dst.length / 2 ) * 110 + 165;
+					const x = ( 0 - src.length / 2 ) * 110 - 125;
+					const z = 0;
+					const y = ( i - dst.length / 2 ) * 110 + 165;
 
-					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendDst.name, 'rgba( 150, 0, 0, 1 )' ) );
+					const mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendDst.name, 'rgba( 150, 0, 0, 1 )' ) );
 					mesh.position.set( x, - ( y - 120 ), z );
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
@@ -309,7 +309,7 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				addImgHandler( 'img_0', 0 );
 				addImgHandler( 'img_1', 1 );
@@ -342,11 +342,11 @@
 
 			function addImgHandler( id, index ) {
 
-				var el = document.getElementById( id );
+				const el = document.getElementById( id );
 
 				el.addEventListener( 'click', function () {
 
-					for ( var i = 0; i < materials.length; i ++ ) {
+					for ( let i = 0; i < materials.length; i ++ ) {
 
 						materials[ i ].map = currentMaps[ index ];
 
@@ -360,11 +360,11 @@
 
 			function addEqHandler( id, eq ) {
 
-				var el = document.getElementById( id );
+				const el = document.getElementById( id );
 
 				el.addEventListener( 'click', function () {
 
-					for ( var i = 0; i < materials.length; i ++ ) {
+					for ( let i = 0; i < materials.length; i ++ ) {
 
 						materials[ i ].blendEquation = eq;
 
@@ -384,7 +384,7 @@
 
 			function addBgHandler( id, map ) {
 
-				var el = document.getElementById( id );
+				const el = document.getElementById( id );
 				el.addEventListener( 'click', function () {
 
 					materialBg.map = map;
@@ -395,12 +395,12 @@
 
 			function addPreHandler( id, marray ) {
 
-				var el = document.getElementById( id );
+				const el = document.getElementById( id );
 				el.addEventListener( 'click', function () {
 
 					currentMaps = marray;
 
-					for ( var i = 0; i < materials.length; i ++ ) {
+					for ( let i = 0; i < materials.length; i ++ ) {
 
 						materials[ i ].map = currentMaps[ currentIndex ];
 
@@ -430,8 +430,8 @@
 
 			function generateLabelMaterial( text, bg ) {
 
-				var canvas = document.createElement( 'canvas' );
-				var ctx = canvas.getContext( '2d' );
+				const canvas = document.createElement( 'canvas' );
+				const ctx = canvas.getContext( '2d' );
 				canvas.width = 128;
 				canvas.height = 32;
 
@@ -442,9 +442,9 @@
 				ctx.font = '12pt arial bold';
 				ctx.fillText( text, 8, 22 );
 
-				var map = new THREE.CanvasTexture( canvas );
+				const map = new THREE.CanvasTexture( canvas );
 
-				var material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
+				const material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
 				return material;
 
 			}
@@ -453,9 +453,9 @@
 
 				requestAnimationFrame( animate );
 
-				var time = Date.now() * 0.00025;
-				var ox = ( time * - 0.01 * materialBg.map.repeat.x ) % 1;
-				var oy = ( time * - 0.01 * materialBg.map.repeat.y ) % 1;
+				const time = Date.now() * 0.00025;
+				const ox = ( time * - 0.01 * materialBg.map.repeat.x ) % 1;
+				const oy = ( time * - 0.01 * materialBg.map.repeat.y ) % 1;
 
 				materialBg.map.offset.set( ox, oy );
 

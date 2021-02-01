@@ -24,8 +24,8 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { VRMLoader } from './jsm/loaders/VRMLoader.js';
 
-			var container, stats, controls;
-			var camera, scene, renderer, light;
+			let container, stats, controls;
+			let camera, scene, renderer, light;
 
 			init();
 			animate();
@@ -45,7 +45,7 @@
 				scene.add( light );
 
 				// model
-				var loader = new VRMLoader();
+				const loader = new VRMLoader();
 				loader.load( 'models/vrm/Alicia/AliciaSolid.vrm', function ( vrm ) {
 
 					// VRMLoader doesn't support VRM Unlit extension yet so
@@ -56,9 +56,9 @@
 
 							if ( Array.isArray( object.material ) ) {
 
-								for ( var i = 0, il = object.material.length; i < il; i ++ ) {
+								for ( let i = 0, il = object.material.length; i < il; i ++ ) {
 
-									var material = new THREE.MeshBasicMaterial();
+									const material = new THREE.MeshBasicMaterial();
 									THREE.Material.prototype.copy.call( material, object.material[ i ] );
 									material.color.copy( object.material[ i ].color );
 									material.map = object.material[ i ].map;
@@ -71,7 +71,7 @@
 
 							} else {
 
-								var material = new THREE.MeshBasicMaterial();
+								const material = new THREE.MeshBasicMaterial();
 								THREE.Material.prototype.copy.call( material, object.material );
 								material.color.copy( object.material.color );
 								material.map = object.material.map;
@@ -103,7 +103,7 @@
 				controls.target.set( 0, 0.9, 0 );
 				controls.update();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// stats
 				stats = new Stats();

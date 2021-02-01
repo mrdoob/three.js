@@ -163,7 +163,7 @@ class Color {
 
 		let m;
 
-		if ( m = /^((?:rgb|hsl)a?)\(\s*([^\)]*)\)/.exec( style ) ) {
+		if ( m = /^((?:rgb|hsl)a?)\(([^\)]*)\)/.exec( style ) ) {
 
 			// rgb / hsl
 
@@ -176,27 +176,27 @@ class Color {
 				case 'rgb':
 				case 'rgba':
 
-					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(,\s*([0-9]*\.?[0-9]+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// rgb(255,0,0) rgba(255,0,0,0.5)
 						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
 						this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
 						this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
 
-						handleAlpha( color[ 5 ] );
+						handleAlpha( color[ 4 ] );
 
 						return this;
 
 					}
 
-					if ( color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(,\s*([0-9]*\.?[0-9]+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
 						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
 						this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
 						this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
 
-						handleAlpha( color[ 5 ] );
+						handleAlpha( color[ 4 ] );
 
 						return this;
 
@@ -207,14 +207,14 @@ class Color {
 				case 'hsl':
 				case 'hsla':
 
-					if ( color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(,\s*([0-9]*\.?[0-9]+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
 						const h = parseFloat( color[ 1 ] ) / 360;
 						const s = parseInt( color[ 2 ], 10 ) / 100;
 						const l = parseInt( color[ 3 ], 10 ) / 100;
 
-						handleAlpha( color[ 5 ] );
+						handleAlpha( color[ 4 ] );
 
 						return this.setHSL( h, s, l );
 
@@ -224,7 +224,7 @@ class Color {
 
 			}
 
-		} else if ( m = /^\#([A-Fa-f0-9]+)$/.exec( style ) ) {
+		} else if ( m = /^\#([A-Fa-f\d]+)$/.exec( style ) ) {
 
 			// hex color
 
@@ -300,9 +300,7 @@ class Color {
 
 	}
 
-	copyGammaToLinear( color, gammaFactor ) {
-
-		if ( gammaFactor === undefined ) gammaFactor = 2.0;
+	copyGammaToLinear( color, gammaFactor = 2.0 ) {
 
 		this.r = Math.pow( color.r, gammaFactor );
 		this.g = Math.pow( color.g, gammaFactor );
@@ -312,9 +310,7 @@ class Color {
 
 	}
 
-	copyLinearToGamma( color, gammaFactor ) {
-
-		if ( gammaFactor === undefined ) gammaFactor = 2.0;
+	copyLinearToGamma( color, gammaFactor = 2.0 ) {
 
 		const safeInverse = ( gammaFactor > 0 ) ? ( 1.0 / gammaFactor ) : 1.0;
 
@@ -528,6 +524,16 @@ class Color {
 
 	}
 
+	lerpColors( color1, color2, alpha ) {
+
+		this.r = color1.r + ( color2.r - color1.r ) * alpha;
+		this.g = color1.g + ( color2.g - color1.g ) * alpha;
+		this.b = color1.b + ( color2.b - color1.b ) * alpha;
+
+		return this;
+
+	}
+
 	lerpHSL( color, alpha ) {
 
 		this.getHSL( _hslA );
@@ -549,9 +555,7 @@ class Color {
 
 	}
 
-	fromArray( array, offset ) {
-
-		if ( offset === undefined ) offset = 0;
+	fromArray( array, offset = 0 ) {
 
 		this.r = array[ offset ];
 		this.g = array[ offset + 1 ];
@@ -561,10 +565,7 @@ class Color {
 
 	}
 
-	toArray( array, offset ) {
-
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+	toArray( array = [], offset = 0 ) {
 
 		array[ offset ] = this.r;
 		array[ offset + 1 ] = this.g;

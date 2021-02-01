@@ -13,20 +13,14 @@ const _inverseMatrix = new Matrix4();
 const _ray = new Ray();
 const _sphere = new Sphere();
 
-function Line( geometry, material, mode ) {
-
-	if ( mode === 1 ) {
-
-		console.error( 'THREE.Line: parameter THREE.LinePieces no longer supported. Use THREE.LineSegments instead.' );
-
-	}
+function Line( geometry = new BufferGeometry(), material = new LineBasicMaterial() ) {
 
 	Object3D.call( this );
 
 	this.type = 'Line';
 
-	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new LineBasicMaterial();
+	this.geometry = geometry;
+	this.material = material;
 
 	this.updateMorphTargets();
 
@@ -82,17 +76,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		} else if ( geometry.isGeometry ) {
 
-			const vertices = geometry.vertices;
-			const lineDistances = geometry.lineDistances;
-
-			lineDistances[ 0 ] = 0;
-
-			for ( let i = 1, l = vertices.length; i < l; i ++ ) {
-
-				lineDistances[ i ] = lineDistances[ i - 1 ];
-				lineDistances[ i ] += vertices[ i - 1 ].distanceTo( vertices[ i ] );
-
-			}
+			console.error( 'THREE.Line.computeLineDistances() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 		}
 
@@ -118,7 +102,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		//
 
-		_inverseMatrix.getInverse( matrixWorld );
+		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
 		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
@@ -128,13 +112,13 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		const vEnd = new Vector3();
 		const interSegment = new Vector3();
 		const interRay = new Vector3();
-		const step = ( this && this.isLineSegments ) ? 2 : 1;
+		const step = this.isLineSegments ? 2 : 1;
 
 		if ( geometry.isBufferGeometry ) {
 
 			const index = geometry.index;
 			const attributes = geometry.attributes;
-			const positions = attributes.position.array;
+			const positionAttribute = attributes.position;
 
 			if ( index !== null ) {
 
@@ -145,8 +129,8 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					const a = indices[ i ];
 					const b = indices[ i + 1 ];
 
-					vStart.fromArray( positions, a * 3 );
-					vEnd.fromArray( positions, b * 3 );
+					vStart.fromBufferAttribute( positionAttribute, a );
+					vEnd.fromBufferAttribute( positionAttribute, b );
 
 					const distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
@@ -175,10 +159,10 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			} else {
 
-				for ( let i = 0, l = positions.length / 3 - 1; i < l; i += step ) {
+				for ( let i = 0, l = positionAttribute.count - 1; i < l; i += step ) {
 
-					vStart.fromArray( positions, 3 * i );
-					vEnd.fromArray( positions, 3 * i + 3 );
+					vStart.fromBufferAttribute( positionAttribute, i );
+					vEnd.fromBufferAttribute( positionAttribute, i + 1 );
 
 					const distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
@@ -209,35 +193,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		} else if ( geometry.isGeometry ) {
 
-			const vertices = geometry.vertices;
-			const nbVertices = vertices.length;
-
-			for ( let i = 0; i < nbVertices - 1; i += step ) {
-
-				const distSq = _ray.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
-
-				if ( distSq > localThresholdSq ) continue;
-
-				interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
-
-				const distance = raycaster.ray.origin.distanceTo( interRay );
-
-				if ( distance < raycaster.near || distance > raycaster.far ) continue;
-
-				intersects.push( {
-
-					distance: distance,
-					// What do we want? intersection point on the ray or on the segment??
-					// point: raycaster.ray.at( distance ),
-					point: interSegment.clone().applyMatrix4( this.matrixWorld ),
-					index: i,
-					face: null,
-					faceIndex: null,
-					object: this
-
-				} );
-
-			}
+			console.error( 'THREE.Line.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 		}
 

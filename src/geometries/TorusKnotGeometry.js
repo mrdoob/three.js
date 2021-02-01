@@ -1,13 +1,10 @@
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector3 } from '../math/Vector3.js';
 
-// TorusKnotGeometry
+class TorusKnotGeometry extends BufferGeometry {
 
-class TorusKnotGeometry extends Geometry {
-
-	constructor( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
+	constructor( radius = 1, tube = 0.4, tubularSegments = 64, radialSegments = 8, p = 2, q = 3 ) {
 
 		super();
 		this.type = 'TorusKnotGeometry';
@@ -21,40 +18,8 @@ class TorusKnotGeometry extends Geometry {
 			q: q
 		};
 
-		if ( heightScale !== undefined ) console.warn( 'THREE.TorusKnotGeometry: heightScale has been deprecated. Use .scale( x, y, z ) instead.' );
-
-		this.fromBufferGeometry( new TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) );
-		this.mergeVertices();
-
-	}
-
-}
-
-
-// TorusKnotBufferGeometry
-
-class TorusKnotBufferGeometry extends BufferGeometry {
-
-	constructor( radius, tube, tubularSegments, radialSegments, p, q ) {
-
-		super();
-		this.type = 'TorusKnotBufferGeometry';
-
-		this.parameters = {
-			radius: radius,
-			tube: tube,
-			tubularSegments: tubularSegments,
-			radialSegments: radialSegments,
-			p: p,
-			q: q
-		};
-
-		radius = radius || 1;
-		tube = tube || 0.4;
-		tubularSegments = Math.floor( tubularSegments ) || 64;
-		radialSegments = Math.floor( radialSegments ) || 8;
-		p = p || 2;
-		q = q || 3;
+		tubularSegments = Math.floor( tubularSegments );
+		radialSegments = Math.floor( radialSegments );
 
 		// buffers
 
@@ -182,5 +147,4 @@ class TorusKnotBufferGeometry extends BufferGeometry {
 
 }
 
-
-export { TorusKnotGeometry, TorusKnotBufferGeometry };
+export { TorusKnotGeometry, TorusKnotGeometry as TorusKnotBufferGeometry };

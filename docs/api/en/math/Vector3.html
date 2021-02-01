@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -40,12 +39,12 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var a = new THREE.Vector3( 0, 1, 0 );
+		const a = new THREE.Vector3( 0, 1, 0 );
 
 		//no arguments; will be initialised to (0, 0, 0)
-		var b = new THREE.Vector3( );
+		const b = new THREE.Vector3( );
 
-		var d = a.distanceTo( b );
+		const d = a.distanceTo( b );
 		</code>
 
 
@@ -139,9 +138,8 @@
 		[page:Float min] - the minimum value the length will be clamped to <br />
 		[page:Float max] - the maximum value the length will be clamped to<br /><br />
 
-		If this vector's length is greater than the max value, it is replaced by the max value. <br /><br />
-		If this vector's length is less than the min value, it is replaced by the min value.
-		</p>
+		If this vector's length is greater than the max value, the vector will be scaled down so its length is the max value. <br /><br />
+		If this vector's length is less than the min value, the vector will be scaled up so its length is the min value.</p>
 
 		<h3>[method:this clampScalar]( [param:Float min], [param:Float max] )</h3>
 		<p>

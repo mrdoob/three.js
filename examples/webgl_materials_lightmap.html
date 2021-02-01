@@ -50,11 +50,11 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
+			const SCREEN_WIDTH = window.innerWidth;
+			const SCREEN_HEIGHT = window.innerHeight;
 
-			var container, stats;
-			var camera, scene, renderer;
+			let container, stats;
+			let camera, scene, renderer;
 
 			init();
 			animate();
@@ -75,7 +75,7 @@
 
 				// LIGHTS
 
-				var light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
+				const light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
 				light.position.x = 300;
 				light.position.y = 250;
 				light.position.z = - 500;
@@ -83,9 +83,9 @@
 
 				// SKYDOME
 
-				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
-				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
-				var uniforms = {
+				const vertexShader = document.getElementById( 'vertexShader' ).textContent;
+				const fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
+				const uniforms = {
 					topColor: { value: new THREE.Color( 0x0077ff ) },
 					bottomColor: { value: new THREE.Color( 0xffffff ) },
 					offset: { value: 400 },
@@ -93,15 +93,15 @@
 				};
 				uniforms.topColor.value.copy( light.color );
 
-				var skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
-				var skyMat = new THREE.ShaderMaterial( {
+				const skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
+				const skyMat = new THREE.ShaderMaterial( {
 					uniforms: uniforms,
 					vertexShader: vertexShader,
 					fragmentShader: fragmentShader,
 					side: THREE.BackSide
 				} );
 
-				var sky = new THREE.Mesh( skyGeo, skyMat );
+				const sky = new THREE.Mesh( skyGeo, skyMat );
 				scene.add( sky );
 
 				// RENDERER
@@ -114,7 +114,7 @@
 
 				// CONTROLS
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxPolarAngle = 0.9 * Math.PI / 2;
 				controls.enableZoom = false;
 
@@ -125,7 +125,7 @@
 
 				// MODEL
 
-				var loader = new THREE.ObjectLoader();
+				const loader = new THREE.ObjectLoader();
 				loader.load( "models/json/lightmap/lightmap.json", function ( object ) {
 
 					scene.add( object );
@@ -134,7 +134,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

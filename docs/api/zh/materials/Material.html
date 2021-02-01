@@ -3,7 +3,6 @@
 <head>
 	<meta charset="utf-8"/>
 	<base href="../../../"/>
-	<script src="list.js"></script>
 	<script src="page.js"></script>
 	<link type="text/css" rel="stylesheet" href="page.css"/>
 </head>
@@ -105,7 +104,8 @@
 
 <h3>[property:Boolean stencilWrite]</h3>
 <p>
-Whether stencil operations are performed against the stencil buffer. In order to perform writes or comparisons against the stencil buffer this value must be *true*. Default is *false*.</p>
+Whether stencil operations are performed against the stencil buffer. In order to perform writes or comparisons against the stencil buffer this value must be *true*. Default is *false*.
+</p>
 
 <h3>[property:Integer stencilWriteMask]</h3>
 <p>
@@ -254,14 +254,14 @@ This starts at *0* and counts how many times [property:Boolean needsUpdate] is s
 
 <h3>[property:Boolean vertexColors]</h3>
 <p>
-Defines whether vertex coloring is used. Default is *false*.
+是否使用顶点着色。默认值为false。
 </p>
 
 <h3>[property:Boolean visible]</h3>
 <p> 此材质是否可见。默认为*true*。
 </p>
 
-<h3>[property:object userData]</h3>
+<h3>[property:Object userData]</h3>
 <p> 一个对象，可用于存储有关Material的自定义数据。它不应该包含对函数的引用，因为这些函数不会被克隆。
 </p>
 
@@ -286,12 +286,42 @@ Defines whether vertex coloring is used. Default is *false*.
 Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
 </p>
 
-<h3>[method:null setValues]( [param:object values] )</h3>
+<h3>[method:String customProgramCacheKey]()</h3>
+<p>
+In case onBeforeCompile is used, this callback can be used to identify values of settings used in onBeforeCompile, so three.js can reuse a cached shader or recompile the shader for this material as needed.
+</p>
+
+<p>
+For example, if onBeforeCompile contains a conditional statement like:<br />
+
+<code>if ( black ) {
+
+	shader.fragmentShader = shader.fragmentShader.replace('gl_FragColor = vec4(1)', 'gl_FragColor = vec4(0)')
+
+}
+</code>
+
+then customProgramCacheKey should be set like this:<br />
+
+<code>material.customProgramCacheKey = function() {
+
+	return black ? '1' : '0';
+
+}
+</code>
+
+</p>
+
+<p>
+Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
+</p>
+
+<h3>[method:null setValues]( [param:Object values] )</h3>
 <p> values -- 具有参数的容器。
 	根据*values*设置属性。<br/>
 </p>
 
-<h3>[method:Object toJSON]( [param:object meta] )</h3>
+<h3>[method:Object toJSON]( [param:Object meta] )</h3>
 <p>
 	meta -- 包含有元数据的对象，例如该对象的纹理或图片。
 	将material对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。

@@ -22,12 +22,13 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { LWOLoader } from './jsm/loaders/LWOLoader.js';
 
-			var container, controls;
-			var camera, scene, renderer;
+			let camera, scene, renderer;
+
+			init();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
@@ -36,45 +37,45 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
 
-				var ambientLight = new THREE.AmbientLight( 0xaaaaaa, 1.75 );
+				const ambientLight = new THREE.AmbientLight( 0xaaaaaa, 1.75 );
 				scene.add( ambientLight );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
-				light.position.set( 0, 200, 100 );
-				light.castShadow = true;
-				light.shadow.camera.top = 180;
-				light.shadow.camera.bottom = - 100;
-				light.shadow.camera.left = - 120;
-				light.shadow.camera.right = 120;
-				scene.add( light );
+				const light1 = new THREE.DirectionalLight( 0xffffff, 1 );
+				light1.position.set( 0, 200, 100 );
+				light1.castShadow = true;
+				light1.shadow.camera.top = 180;
+				light1.shadow.camera.bottom = - 100;
+				light1.shadow.camera.left = - 120;
+				light1.shadow.camera.right = 120;
+				scene.add( light1 );
 
-				light = new THREE.DirectionalLight( 0xffffff, 0.7 );
-				light.position.set( - 100, 200, - 100 );
-				scene.add( light );
+				const light2 = new THREE.DirectionalLight( 0xffffff, 0.7 );
+				light2.position.set( - 100, 200, - 100 );
+				scene.add( light2 );
 
-				light = new THREE.DirectionalLight( 0xffffff, 0.4 );
-				light.position.set( 100, - 200, 100 );
-				scene.add( light );
+				const light3 = new THREE.DirectionalLight( 0xffffff, 0.4 );
+				light3.position.set( 100, - 200, 100 );
+				scene.add( light3 );
 
-				light = new THREE.DirectionalLight( 0xffffff, 1 );
-				light.position.set( - 100, - 100, 100 );
-				scene.add( light );
+				const light4 = new THREE.DirectionalLight( 0xffffff, 1 );
+				light4.position.set( - 100, - 100, 100 );
+				scene.add( light4 );
 
-				var grid = new THREE.GridHelper( 200, 20, 0x000000, 0x000000 );
+				const grid = new THREE.GridHelper( 200, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.3;
 				grid.material.transparent = true;
 				scene.add( grid );
 
-				var loader = new LWOLoader();
+				const loader = new LWOLoader();
 				loader.load( 'models/lwo/Objects/LWO3/Demo.lwo', function ( object ) {
 
-					var phong = object.meshes[ 0 ];
+					const phong = object.meshes[ 0 ];
 					phong.position.set( - 2, 12, 0 );
 
-					var standard = object.meshes[ 1 ];
+					const standard = object.meshes[ 1 ];
 					standard.position.set( 2, 12, 0 );
 
-					var rocket = object.meshes[ 2 ];
+					const rocket = object.meshes[ 2 ];
 					rocket.position.set( 0, 10.5, - 1 );
 
 					scene.add( phong, standard, rocket );
@@ -90,7 +91,7 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 1.33, 10, - 6.7 );
 				controls.update();
 
@@ -100,7 +101,7 @@
 
 				} );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -112,8 +113,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
-
-			init();
 
 		</script>
 

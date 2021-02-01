@@ -1,5 +1,3 @@
-console.warn( "THREE.MorphBlendMesh: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.MorphBlendMesh = function ( geometry, material ) {
 
 	THREE.Mesh.call( this, geometry, material );
@@ -220,7 +218,7 @@ THREE.MorphBlendMesh.prototype = Object.assign( Object.create( THREE.Mesh.protot
 
 		} else {
 
-			console.warn( "THREE.MorphBlendMesh: animation[" + name + "] undefined in .playAnimation()" );
+			console.warn( 'THREE.MorphBlendMesh: animation[' + name + '] undefined in .playAnimation()' );
 
 		}
 

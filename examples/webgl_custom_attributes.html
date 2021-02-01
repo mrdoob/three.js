@@ -62,11 +62,11 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var renderer, scene, camera, stats;
+			let renderer, scene, camera, stats;
 
-			var sphere, uniforms;
+			let sphere, uniforms;
 
-			var displacement, noise;
+			let displacement, noise;
 
 			init();
 			animate();
@@ -89,7 +89,7 @@
 
 				uniforms[ "colorTexture" ].value.wrapS = uniforms[ "colorTexture" ].value.wrapT = THREE.RepeatWrapping;
 
-				var shaderMaterial = new THREE.ShaderMaterial( {
+				const shaderMaterial = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
@@ -98,14 +98,14 @@
 				} );
 
 
-				var radius = 50, segments = 128, rings = 64;
+				const radius = 50, segments = 128, rings = 64;
 
-				var geometry = new THREE.SphereBufferGeometry( radius, segments, rings );
+				const geometry = new THREE.SphereGeometry( radius, segments, rings );
 
 				displacement = new Float32Array( geometry.attributes.position.count );
 				noise = new Float32Array( geometry.attributes.position.count );
 
-				for ( var i = 0; i < displacement.length; i ++ ) {
+				for ( let i = 0; i < displacement.length; i ++ ) {
 
 					noise[ i ] = Math.random() * 5;
 
@@ -120,7 +120,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -128,7 +128,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -152,14 +152,14 @@
 
 			function render() {
 
-				var time = Date.now() * 0.01;
+				const time = Date.now() * 0.01;
 
 				sphere.rotation.y = sphere.rotation.z = 0.01 * time;
 
 				uniforms[ "amplitude" ].value = 2.5 * Math.sin( sphere.rotation.y * 0.125 );
 				uniforms[ "color" ].value.offsetHSL( 0.0005, 0, 0 );
 
-				for ( var i = 0; i < displacement.length; i ++ ) {
+				for ( let i = 0; i < displacement.length; i ++ ) {
 
 					displacement[ i ] = Math.sin( 0.1 * i + time );
 

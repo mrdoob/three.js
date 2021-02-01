@@ -5,6 +5,11 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				touch-action: none;
+			}
+		</style>
 	</head>
 	<body>
 
@@ -14,21 +19,22 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer;
-			var cube, sphere, torus, material;
+			let camera, scene, renderer;
+			let cube, sphere, torus, material;
 
-			var count = 0, cubeCamera1, cubeCamera2, cubeRenderTarget1, cubeRenderTarget2;
+			let count = 0, cubeCamera1, cubeCamera2, cubeRenderTarget1, cubeRenderTarget2;
 
-			var onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
+			let onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
 
-			var lon = 0, lat = 0;
-			var phi = 0, theta = 0;
+			let lon = 0, lat = 0;
+			let phi = 0, theta = 0;
 
-			var textureLoader = new THREE.TextureLoader();
+			const textureLoader = new THREE.TextureLoader();
 
 			textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg', function ( texture ) {
 
 				texture.encoding = THREE.sRGBEncoding;
+				texture.mapping = THREE.EquirectangularReflectionMapping;
 
 				init( texture );
 				animate();
@@ -40,18 +46,13 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
-
 				scene = new THREE.Scene();
+				scene.background = texture;
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-
-				// background
-
-				var options = {}; // none required
-				scene.background = new THREE.WebGLCubeRenderTarget( 1024, options ).fromEquirectangularTexture( renderer, texture );
 
 				//
 
@@ -81,21 +82,21 @@
 					reflectivity: 1
 				} );
 
-				sphere = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 20, 3 ), material );
+				sphere = new THREE.Mesh( new THREE.IcosahedronGeometry( 20, 8 ), material );
 				scene.add( sphere );
 
-				cube = new THREE.Mesh( new THREE.BoxBufferGeometry( 20, 20, 20 ), material );
+				cube = new THREE.Mesh( new THREE.BoxGeometry( 20, 20, 20 ), material );
 				scene.add( cube );
 
-				torus = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 10, 5, 128, 16 ), material );
+				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 10, 5, 128, 16 ), material );
 				scene.add( torus );
 
 				//
 
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+				document.addEventListener( 'pointerdown', onPointerDown );
+				document.addEventListener( 'wheel', onDocumentMouseWheel );
 
-				window.addEventListener( 'resize', onWindowResized, false );
+				window.addEventListener( 'resize', onWindowResized );
 
 			}
 
@@ -108,7 +109,7 @@
 
 			}
 
-			function onDocumentMouseDown( event ) {
+			function onPointerDown( event ) {
 
 				event.preventDefault();
 
@@ -118,28 +119,28 @@
 				onPointerDownLon = lon;
 				onPointerDownLat = lat;
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerup', onPointerUp );
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
 
 				lon = ( event.clientX - onPointerDownPointerX ) * 0.1 + onPointerDownLon;
 				lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
 
 			}
 
-			function onDocumentMouseUp() {
+			function onPointerUp() {
 
-				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.removeEventListener( 'pointermove', onPointerMove );
+				document.removeEventListener( 'pointerup', onPointerUp );
 
 			}
 
 			function onDocumentMouseWheel( event ) {
 
-				var fov = camera.fov + event.deltaY * 0.05;
+				const fov = camera.fov + event.deltaY * 0.05;
 
 				camera.fov = THREE.MathUtils.clamp( fov, 10, 75 );
 
@@ -156,7 +157,7 @@
 
 			function render() {
 
-				var time = Date.now();
+				const time = Date.now();
 
 				lon += .15;
 

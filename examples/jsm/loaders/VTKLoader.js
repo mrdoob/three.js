@@ -5,8 +5,8 @@ import {
 	Float32BufferAttribute,
 	Loader,
 	LoaderUtils
-} from "../../../build/three.module.js";
-import { Inflate } from "../libs/inflate.module.min.js";
+} from '../../../build/three.module.js';
+import * as fflate from '../libs/fflate.module.min.js';
 
 var VTKLoader = function ( manager ) {
 
@@ -26,6 +26,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -794,9 +795,8 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					for ( var i = 0; i < dataOffsets.length - 1; i ++ ) {
 
-						var inflate = new Inflate( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ), { resize: true, verify: true } ); // eslint-disable-line no-undef
-						content = inflate.decompress();
-						content = content.buffer;
+						var data = fflate.unzlibSync( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ) ); // eslint-disable-line no-undef
+						content = data.buffer;
 
 						if ( ele.attributes.type === 'Float32' ) {
 
@@ -1160,33 +1160,16 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function getStringFile( data ) {
-
-			var stringFile = '';
-			var charArray = new Uint8Array( data );
-			var i = 0;
-			var len = charArray.length;
-
-			while ( len -- ) {
-
-				stringFile += String.fromCharCode( charArray[ i ++ ] );
-
-			}
-
-			return stringFile;
-
-		}
-
 		// get the 5 first lines of the files to check if there is the key word binary
 		var meta = LoaderUtils.decodeText( new Uint8Array( data, 0, 250 ) ).split( '\n' );
 
 		if ( meta[ 0 ].indexOf( 'xml' ) !== - 1 ) {
 
-			return parseXML( getStringFile( data ) );
+			return parseXML( LoaderUtils.decodeText( data ) );
 
 		} else if ( meta[ 2 ].includes( 'ASCII' ) ) {
 
-			return parseASCII( getStringFile( data ) );
+			return parseASCII( LoaderUtils.decodeText( data ) );
 
 		} else {
 

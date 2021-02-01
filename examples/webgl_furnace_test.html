@@ -19,13 +19,13 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var scene, camera, renderer, radianceMap;
+			let scene, camera, renderer, radianceMap;
 
 			function init() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
-				var aspect = width / height;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+				const aspect = width / height;
 
 				// renderer
 
@@ -34,7 +34,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				document.body.addEventListener( 'mouseover', function () {
 
@@ -69,13 +69,13 @@
 
 			function createObjects() {
 
-				var geometry = new THREE.SphereBufferGeometry( 0.4, 32, 32 );
+				const geometry = new THREE.SphereGeometry( 0.4, 32, 32 );
 
-				for ( var x = 0; x <= 10; x ++ ) {
+				for ( let x = 0; x <= 10; x ++ ) {
 
-					for ( var y = 0; y <= 10; y ++ ) {
+					for ( let y = 0; y <= 10; y ++ ) {
 
-						var material = new THREE.MeshPhysicalMaterial( {
+						const material = new THREE.MeshPhysicalMaterial( {
 							roughness: x / 10,
 							metalness: y / 10,
 							color: 0xffffff,
@@ -84,7 +84,7 @@
 							reflectivity: 1
 						} );
 
-						var mesh = new THREE.Mesh( geometry, material );
+						const mesh = new THREE.Mesh( geometry, material );
 						mesh.position.x = x - 5;
 						mesh.position.y = 5 - y;
 						scene.add( mesh );
@@ -99,10 +99,10 @@
 
 				return new Promise( function ( resolve ) {
 
-					var envScene = new THREE.Scene();
+					const envScene = new THREE.Scene();
 					envScene.background = new THREE.Color( 0xcccccc );
 
-					var pmremGenerator = new THREE.PMREMGenerator( renderer );
+					const pmremGenerator = new THREE.PMREMGenerator( renderer );
 					radianceMap = pmremGenerator.fromScene( envScene ).texture;
 					pmremGenerator.dispose();
 
@@ -114,10 +114,10 @@
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();

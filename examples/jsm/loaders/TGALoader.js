@@ -2,7 +2,7 @@ import {
 	FileLoader,
 	Loader,
 	Texture
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var TGALoader = function ( manager ) {
 
@@ -23,6 +23,7 @@ TGALoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setPath( this.path );
+		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, function ( buffer ) {
 
@@ -540,7 +541,7 @@ TGALoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		context.putImageData( imageData, 0, 0 );
 
-		return useOffscreen ? canvas.transferToImageBitmap() : canvas;
+		return canvas;
 
 	}
 

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -15,19 +14,17 @@
 		<p class="desc">
 			Renders [page:ArrowHelper arrows] to visualize an object's vertex normal vectors.
 			Requires that normals have been specified in a [page:BufferAttribute custom attribute] or
-			have been calculated using [page:Geometry.computeVertexNormals computeVertexNormals].<br /><br />
-
-			Unlike [page:FaceNormalsHelper], this works with [page:BufferGeometry].
+			have been calculated using [page:BufferGeometry.computeVertexNormals computeVertexNormals].<br /><br />
 		</p>
 
 		<h2>Code Example</h2>
 
 		<code>
-		var geometry = new THREE.BoxBufferGeometry( 10, 10, 10, 2, 2, 2 );
-		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-		var box = new THREE.Mesh( geometry, material );
+		const geometry = new THREE.BoxGeometry( 10, 10, 10, 2, 2, 2 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		const box = new THREE.Mesh( geometry, material );
 
-		var helper = new VertexNormalsHelper( box, 2, 0x00ff00, 1 );
+		const helper = new VertexNormalsHelper( box, 2, 0x00ff00, 1 );
 
 		scene.add( box );
 		scene.add( helper );
@@ -53,10 +50,10 @@
 		<h2>Properties</h2>
 		<p>See the base [page:LineSegments] class for common properties.</p>
 
-		<h3>[property:object matrixAutoUpdate]</h3>
+		<h3>[property:Object matrixAutoUpdate]</h3>
 		<p>
 			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
-			objects's [page:Object3D.matrixWorld matrixWorld].
+			object's [page:Object3D.matrixWorld matrixWorld].
 		</p>
 
 		<h3>[property:Object3D object]</h3>

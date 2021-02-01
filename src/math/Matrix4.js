@@ -83,6 +83,23 @@ class Matrix4 {
 
 	}
 
+	setFromMatrix3( m ) {
+
+		const me = m.elements;
+
+		this.set(
+
+			me[ 0 ], me[ 3 ], me[ 6 ], 0,
+			me[ 1 ], me[ 4 ], me[ 7 ], 0,
+			me[ 2 ], me[ 5 ], me[ 8 ], 0,
+			0, 0, 0, 1
+
+		);
+
+		return this;
+
+	}
+
 	extractBasis( xAxis, yAxis, zAxis ) {
 
 		xAxis.setFromMatrixColumn( this, 0 );
@@ -483,22 +500,15 @@ class Matrix4 {
 
 	}
 
-	getInverse( m, throwOnDegenerate ) {
-
-		if ( throwOnDegenerate !== undefined ) {
-
-			console.warn( "THREE.Matrix4: .getInverse() can no longer be configured to throw on degenerate." );
-
-		}
+	invert() {
 
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
 		const te = this.elements,
-			me = m.elements,
 
-			n11 = me[ 0 ], n21 = me[ 1 ], n31 = me[ 2 ], n41 = me[ 3 ],
-			n12 = me[ 4 ], n22 = me[ 5 ], n32 = me[ 6 ], n42 = me[ 7 ],
-			n13 = me[ 8 ], n23 = me[ 9 ], n33 = me[ 10 ], n43 = me[ 11 ],
-			n14 = me[ 12 ], n24 = me[ 13 ], n34 = me[ 14 ], n44 = me[ 15 ],
+			n11 = te[ 0 ], n21 = te[ 1 ], n31 = te[ 2 ], n41 = te[ 3 ],
+			n12 = te[ 4 ], n22 = te[ 5 ], n32 = te[ 6 ], n42 = te[ 7 ],
+			n13 = te[ 8 ], n23 = te[ 9 ], n33 = te[ 10 ], n43 = te[ 11 ],
+			n14 = te[ 12 ], n24 = te[ 13 ], n34 = te[ 14 ], n44 = te[ 15 ],
 
 			t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44,
 			t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44,
@@ -822,9 +832,7 @@ class Matrix4 {
 
 	}
 
-	fromArray( array, offset ) {
-
-		if ( offset === undefined ) offset = 0;
+	fromArray( array, offset = 0 ) {
 
 		for ( let i = 0; i < 16; i ++ ) {
 
@@ -836,10 +844,7 @@ class Matrix4 {
 
 	}
 
-	toArray( array, offset ) {
-
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+	toArray( array = [], offset = 0 ) {
 
 		const te = this.elements;
 
@@ -869,13 +874,12 @@ class Matrix4 {
 
 }
 
-const _v1 = new Vector3();
-const _m1 = new Matrix4();
-const _zero = new Vector3( 0, 0, 0 );
-const _one = new Vector3( 1, 1, 1 );
-const _x = new Vector3();
-const _y = new Vector3();
-const _z = new Vector3();
-
+const _v1 = /*@__PURE__*/ new Vector3();
+const _m1 = /*@__PURE__*/ new Matrix4();
+const _zero = /*@__PURE__*/ new Vector3( 0, 0, 0 );
+const _one = /*@__PURE__*/ new Vector3( 1, 1, 1 );
+const _x = /*@__PURE__*/ new Vector3();
+const _y = /*@__PURE__*/ new Vector3();
+const _z = /*@__PURE__*/ new Vector3();
 
 export { Matrix4 };

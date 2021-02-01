@@ -53,6 +53,7 @@
 			import { Player } from './js/Player.js';
 			import { Sidebar } from './js/Sidebar.js';
 			import { Menubar } from './js/Menubar.js';
+			import { Resizer } from './js/Resizer.js';
 			import { VRButton } from '../examples/jsm/webxr/VRButton.js';
 
 			window.URL = window.URL || window.webkitURL;
@@ -89,6 +90,9 @@
 
 			var menubar = new Menubar( editor );
 			document.body.appendChild( menubar.dom );
+
+			var resizer = new Resizer( editor );
+			document.body.appendChild( resizer.dom );
 
 			//
 

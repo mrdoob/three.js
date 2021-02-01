@@ -1,4 +1,3 @@
-console.warn( "THREE.RectAreaLightUniformsLib: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Uniforms library for RectAreaLight shared webgl shaders
  *
@@ -28,11 +27,30 @@ THREE.RectAreaLightUniformsLib = {
 
 		// data textures
 
-		var ltc_1 = new THREE.DataTexture( new Float32Array( LTC_MAT_1 ), 64, 64, THREE.RGBAFormat, THREE.FloatType, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.NearestFilter, 1 );
-		var ltc_2 = new THREE.DataTexture( new Float32Array( LTC_MAT_2 ), 64, 64, THREE.RGBAFormat, THREE.FloatType, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.NearestFilter, 1 );
+		const ltc_float_1 = new Float32Array( LTC_MAT_1 );
+		const ltc_float_2 = new Float32Array( LTC_MAT_2 );
 
-		THREE.UniformsLib.LTC_1 = ltc_1;
-		THREE.UniformsLib.LTC_2 = ltc_2;
+		THREE.UniformsLib.LTC_FLOAT_1 = new THREE.DataTexture( ltc_float_1, 64, 64, THREE.RGBAFormat, THREE.FloatType, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.NearestFilter, 1 );
+		THREE.UniformsLib.LTC_FLOAT_2 = new THREE.DataTexture( ltc_float_2, 64, 64, THREE.RGBAFormat, THREE.FloatType, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.NearestFilter, 1 );
+
+		const ltc_half_1 = new Uint16Array( LTC_MAT_1.length );
+
+		LTC_MAT_1.forEach( function ( x, index ) {
+
+			ltc_half_1[ index ] = THREE.DataUtils.toHalfFloat( x );
+
+		} );
+
+		const ltc_half_2 = new Uint16Array( LTC_MAT_2.length );
+
+		LTC_MAT_2.forEach( function ( x, index ) {
+
+			ltc_half_2[ index ] = THREE.DataUtils.toHalfFloat( x );
+
+		} );
+
+		THREE.UniformsLib.LTC_HALF_1 = new THREE.DataTexture( ltc_half_1, 64, 64, THREE.RGBAFormat, THREE.HalfFloatType, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.NearestFilter, 1 );
+		THREE.UniformsLib.LTC_HALF_2 = new THREE.DataTexture( ltc_half_2, 64, 64, THREE.RGBAFormat, THREE.HalfFloatType, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.NearestFilter, 1 );
 
 	}
 

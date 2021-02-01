@@ -1,14 +1,11 @@
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 
-// TubeGeometry
+class TubeGeometry extends BufferGeometry {
 
-class TubeGeometry extends Geometry {
-
-	constructor( path, tubularSegments, radius, radialSegments, closed, taper ) {
+	constructor( path, tubularSegments = 64, radius = 1, radialSegments = 8, closed = false ) {
 
 		super();
 		this.type = 'TubeGeometry';
@@ -20,48 +17,6 @@ class TubeGeometry extends Geometry {
 			radialSegments: radialSegments,
 			closed: closed
 		};
-
-		if ( taper !== undefined ) console.warn( 'THREE.TubeGeometry: taper has been removed.' );
-
-		const bufferGeometry = new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed );
-
-		// expose internals
-
-		this.tangents = bufferGeometry.tangents;
-		this.normals = bufferGeometry.normals;
-		this.binormals = bufferGeometry.binormals;
-
-		// create geometry
-
-		this.fromBufferGeometry( bufferGeometry );
-		this.mergeVertices();
-
-	}
-
-}
-
-
-// TubeBufferGeometry
-
-class TubeBufferGeometry extends BufferGeometry {
-
-	constructor( path, tubularSegments, radius, radialSegments, closed ) {
-
-		super();
-		this.type = 'TubeBufferGeometry';
-
-		this.parameters = {
-			path: path,
-			tubularSegments: tubularSegments,
-			radius: radius,
-			radialSegments: radialSegments,
-			closed: closed
-		};
-
-		tubularSegments = tubularSegments || 64;
-		radius = radius || 1;
-		radialSegments = radialSegments || 8;
-		closed = closed || false;
 
 		const frames = path.computeFrenetFrames( tubularSegments, closed );
 
@@ -218,4 +173,4 @@ class TubeBufferGeometry extends BufferGeometry {
 }
 
 
-export { TubeGeometry, TubeBufferGeometry };
+export { TubeGeometry, TubeGeometry as TubeBufferGeometry };

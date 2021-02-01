@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -45,10 +44,21 @@
 		<p>
 		[page:Float x] - 起始点。 <br />
 		[page:Float y] - 终点。 <br />
-		[page:Float t] - 封闭区间[0,1]内的插值因子。<br><br />
+		[page:Float t] - 闭区间 [0,1] 内的插值因子。<br><br />
 
 		返回给定区间的线性插值[link:https://en.wikipedia.org/wiki/Linear_interpolation linearly interpolated]结果 - [page:Float t] = 0 将会返回 [page:Float x]
 		如果 [page:Float t] = 1 将会返回 [page:Float y].
+		</p>
+
+		<h3>[method:Float damp]( [param:Float x], [param:Float y], [param:Float lambda], [param:Float dt] )</h3>
+		<p>
+		[page:Float x] - Current point. <br />
+		[page:Float y] - Target point. <br />
+		[page:Float lambda] - A higher lambda value will make the movement more sudden, and a lower value will make the movement more gradual. <br />
+		[page:Float dt] - Delta time in seconds.<br><br />
+
+		Smoothly interpolate a number from [page:Float x] toward [page:Float y] in a spring-like manner using the [page:Float dt] to maintain frame rate independent movement.
+		For details, see [link:http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/ Frame rate independent damping using lerp].
 		</p>
 
 		<h3>[method:Float mapLinear]( [param:Float x], [param:Float a1], [param:Float a2], [param:Float b1], [param:Float b2] )</h3>
@@ -62,6 +72,13 @@
 		x从范围[[page:Float a1], [page:Float a2]] 到范围[[page:Float b1], [page:Float b2]]的线性映射。
 		</p>
 
+		<h3>[method:Float pingpong]( [param:Float x], [param:Float length] )</h3>
+		<p>
+		[page:Float x] — The value to pingpong.<br />
+		[page:Float length] — The positive value the function will pingpong to. Default is 1.<br /><br />
+
+		Returns a value that alternates between 0 and [param:Float length].</p>
+
 		<h3>[method:Integer ceilPowerOfTwo]( [param:Number n] )</h3>
 		<p>返回大于等于 [page:Number n] 的2的最小次幂。</p>
 
@@ -72,16 +89,16 @@
 		<p>将弧度转换为角度。</p>
 
 		<h3>[method:Float randFloat]( [param:Float low], [param:Float high] )</h3>
-		<p>在区间[page:Float low] 到 [page:Float high]随机一个浮点数。</p>
+		<p>在区间 [[page:Float low], [page:Float high]] 内随机一个浮点数。</p>
 
 		<h3>[method:Float randFloatSpread]( [param:Float range] )</h3>
-		<p>在区间*- [page:Float range] / 2* 到 *[page:Float range] / 2*随机一个浮点数。</p>
+		<p>在区间 [- [page:Float range] / 2, [page:Float range] / 2] 内随机一个浮点数。</p>
 
 		<h3>[method:Integer randInt]( [param:Integer low], [param:Integer high] )</h3>
-		<p>在区间[page:Float low] 到 [page:Float high]随机一个整数。</p>
+		<p>在区间 [[page:Float low], [page:Float high]] 内随机一个整数。</p>
 
 		<h3>[method:Float seededRandom]( [param:Integer seed] )</h3>
-		<p>Deterministic pseudo-random float in the interval [ 0, 1 ]. The integer [page:Integer seed] is optional.</p>
+		<p>在区间 [0, 1] 中生成确定性的伪随机浮点数。 整数种子是可选的。</p>
 
 		<h3>[method:Float smoothstep]( [param:Float x], [param:Float min], [param:Float max] )</h3>
 		<p>

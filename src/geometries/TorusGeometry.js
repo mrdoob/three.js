@@ -1,13 +1,10 @@
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector3 } from '../math/Vector3.js';
 
-// TorusGeometry
+class TorusGeometry extends BufferGeometry {
 
-class TorusGeometry extends Geometry {
-
-	constructor( radius, tube, radialSegments, tubularSegments, arc ) {
+	constructor( radius = 1, tube = 0.4, radialSegments = 8, tubularSegments = 6, arc = Math.PI * 2 ) {
 
 		super();
 		this.type = 'TorusGeometry';
@@ -20,36 +17,8 @@ class TorusGeometry extends Geometry {
 			arc: arc
 		};
 
-		this.fromBufferGeometry( new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) );
-		this.mergeVertices();
-
-	}
-
-}
-
-
-// TorusBufferGeometry
-
-class TorusBufferGeometry extends BufferGeometry {
-
-	constructor( radius, tube, radialSegments, tubularSegments, arc ) {
-
-		super();
-		this.type = 'TorusBufferGeometry';
-
-		this.parameters = {
-			radius: radius,
-			tube: tube,
-			radialSegments: radialSegments,
-			tubularSegments: tubularSegments,
-			arc: arc
-		};
-
-		radius = radius || 1;
-		tube = tube || 0.4;
-		radialSegments = Math.floor( radialSegments ) || 8;
-		tubularSegments = Math.floor( tubularSegments ) || 6;
-		arc = arc || Math.PI * 2;
+		radialSegments = Math.floor( radialSegments );
+		tubularSegments = Math.floor( tubularSegments );
 
 		// buffers
 
@@ -131,5 +100,4 @@ class TorusBufferGeometry extends BufferGeometry {
 
 }
 
-
-export { TorusGeometry, TorusBufferGeometry };
+export { TorusGeometry, TorusGeometry as TorusBufferGeometry };

@@ -3,20 +3,20 @@ import { Curve } from '../core/Curve.js';
 
 class LineCurve extends Curve {
 
-	constructor( v1, v2 ) {
+	constructor( v1 = new Vector2(), v2 = new Vector2() ) {
 
 		super();
 
 		this.type = 'LineCurve';
 		Object.defineProperty( this, 'isLineCurve', { value: true } );
 
-		this.v1 = v1 || new Vector2();
-		this.v2 = v2 || new Vector2();
+		this.v1 = v1;
+		this.v2 = v2;
 
 	}
-	getPoint( t, optionalTarget ) {
+	getPoint( t, optionalTarget = new Vector2() ) {
 
-		const point = optionalTarget || new Vector2();
+		const point = optionalTarget;
 
 		if ( t === 1 ) {
 

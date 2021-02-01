@@ -3,14 +3,13 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
-		<h1>圆环几何体（[name]）</h1>
+		<h1>圆环缓冲几何体（[name]）</h1>
 
 		<p class="desc">一个用于生成圆环几何体的类。</p>
 
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -34,9 +33,9 @@
 
 		<h2>代码示例</h2>
 
-		<code>var geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
-		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-		var torus = new THREE.Mesh( geometry, material );
+		<code>const geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const torus = new THREE.Mesh( geometry, material );
 		scene.add( torus );
 		</code>
 
@@ -44,23 +43,23 @@
 
 		<h3>[name]([param:Float radius], [param:Float tube], [param:Integer radialSegments], [param:Integer tubularSegments], [param:Float arc])</h3>
 		<p>
-		radius - 圆环的半径，从圆环的中心到管道（横截面）的中心。默认值是1。<br />
-		tube — 管道的半径，默认值为0.4。<br />
-		radialSegments — 圆环的分段数，默认值为8。<br />
-		tubularSegments — 管道的分段数，默认值为6。<br />
-		arc — 圆环的中心角（单位是弧度），默认值为Math.PI * 2。
-		</p>
+				radius - 圆环的半径，从圆环的中心到管道（横截面）的中心。默认值是1。<br />
+				tube — 管道的半径，默认值为0.4。<br />
+				radialSegments — 圆环的分段数，默认值为8。<br />
+				tubularSegments — 管道的分段数，默认值为6。<br />
+				arc — 圆环的圆心角（单位是弧度），默认值为Math.PI * 2。
+				</p>
 
 		<h2>属性</h2>
-		<p>共有属性请参见其基类[page:Geometry]。</p>
+		<p>共有属性请参见其基类[page:BufferGeometry]。</p>
 
 		<h3>.parameters</h3>
 		<p>
-			一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
+				一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
 		</p>
 
 		<h2>方法(Methods)</h2>
-		<p>共有方法请参见其基类[page:Geometry]。</p>
+		<p>共有方法请参见其基类[page:BufferGeometry]。</p>
 
 		<h2>源代码</h2>
 

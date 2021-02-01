@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -134,10 +133,10 @@
 		<h3>[property:Texture map]</h3>
 		<p>The color map. Default is null. The texture map color is modulated by the diffuse [page:.color].</p>
 
-		<h3>[property:boolean morphNormals]</h3>
+		<h3>[property:Boolean morphNormals]</h3>
 		<p>
 			Defines whether the material uses morphNormals. Set as true to pass morphNormal
-			attributes from the [page:Geometry]	to the shader. Default is *false*.
+			attributes from the geometry to the shader. Default is *false*.
 		</p>
 
 		<h3>[property:Boolean morphTargets]</h3>

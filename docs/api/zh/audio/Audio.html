@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,14 +21,14 @@
 
 		<code>
 		// create an AudioListener and add it to the camera
-		var listener = new THREE.AudioListener();
+		const listener = new THREE.AudioListener();
 		camera.add( listener );
 
 		// create a global audio source
-		var sound = new THREE.Audio( listener );
+		const sound = new THREE.Audio( listener );
 
 		// load a sound and set it as the Audio object's buffer
-		var audioLoader = new THREE.AudioLoader();
+		const audioLoader = new THREE.AudioLoader();
 		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 			sound.setBuffer( buffer );
 			sound.setLoop( true );
@@ -75,14 +74,14 @@
 		<p>是否可以使用 [page:Audio.play play](),
 			[page:Audio.pause pause]()等方法控制播放. 默认为 *true*.</p>
 
+		<h3>[property:Boolean isPlaying]</h3>	
+		<p>是否正在播放</p>	
+
+		<h3>[property:AudioListener listener]</h3>	
+		<p>A reference to the listener object of this audio.</p>
+
 		<h3>[property:Number playbackRate]</h3>
 		<p>播放速率. 默认为 *1*.</p>
-
-		<h3>[property:Boolean isPlaying]</h3>
-		<p>是否正在播放</p>
-
-		<h3>[property:AudioListener listener]</h3>
-		<p>A reference to the listener object of this audio.</p>
 
 		<h3>[property:Number offset]</h3>
 		<p>音频开始播放的偏移时间. 和[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start]()的*offset*参数一样. 默认为 *0*.</p>

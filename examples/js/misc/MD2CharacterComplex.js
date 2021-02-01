@@ -1,5 +1,3 @@
-console.warn( "THREE.MD2CharacterComplex: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.MD2CharacterComplex = function () {
 
 	var scope = this;
@@ -145,8 +143,8 @@ THREE.MD2CharacterComplex = function () {
 
 		// SKINS
 
-		this.skinsBody = loadTextures( config.baseUrl + "skins/", config.skins );
-		this.skinsWeapon = loadTextures( config.baseUrl + "skins/", weaponsTextures );
+		this.skinsBody = loadTextures( config.baseUrl + 'skins/', config.skins );
+		this.skinsWeapon = loadTextures( config.baseUrl + 'skins/', weaponsTextures );
 
 		// BODY
 
@@ -340,13 +338,13 @@ THREE.MD2CharacterComplex = function () {
 
 		if ( controls.crouch ) {
 
-			moveAnimation = animations[ "crouchMove" ];
-			idleAnimation = animations[ "crouchIdle" ];
+			moveAnimation = animations[ 'crouchMove' ];
+			idleAnimation = animations[ 'crouchIdle' ];
 
 		} else {
 
-			moveAnimation = animations[ "move" ];
-			idleAnimation = animations[ "idle" ];
+			moveAnimation = animations[ 'move' ];
+			idleAnimation = animations[ 'idle' ];
 
 		}
 
@@ -354,8 +352,8 @@ THREE.MD2CharacterComplex = function () {
 
 		if ( controls.jump ) {
 
-			moveAnimation = animations[ "jump" ];
-			idleAnimation = animations[ "jump" ];
+			moveAnimation = animations[ 'jump' ];
+			idleAnimation = animations[ 'jump' ];
 
 		}
 
@@ -363,13 +361,13 @@ THREE.MD2CharacterComplex = function () {
 
 			if ( controls.crouch ) {
 
-				moveAnimation = animations[ "crouchAttack" ];
-				idleAnimation = animations[ "crouchAttack" ];
+				moveAnimation = animations[ 'crouchAttack' ];
+				idleAnimation = animations[ 'crouchAttack' ];
 
 			} else {
 
-				moveAnimation = animations[ "attack" ];
-				idleAnimation = animations[ "attack" ];
+				moveAnimation = animations[ 'attack' ];
+				idleAnimation = animations[ 'attack' ];
 
 			}
 

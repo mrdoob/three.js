@@ -1,4 +1,3 @@
-console.warn( "THREE.ConvexObjectBreaker: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * @fileoverview This class can be used to subdivide a convex Geometry object into pieces.
  *
@@ -17,7 +16,7 @@ console.warn( "THREE.ConvexObjectBreaker: As part of the transition to ES6 Modul
  *  - Vertex normals must be planar (not smoothed)
  *
  *  - The geometry must be convex (this is not checked in the library). You can create convex
- *  geometries with THREE.ConvexBufferGeometry. The BoxBufferGeometry, SphereBufferGeometry and other convex primitives
+ *  geometries with THREE.ConvexGeometry. The BoxGeometry, SphereGeometry and other convex primitives
  *  can also be used.
  *
  * Note: This lib adds member variables to object's userData member (see prepareBreakableObject function)
@@ -351,7 +350,7 @@ THREE.ConvexObjectBreaker.prototype = {
 					if ( intersection === undefined ) {
 
 						// Shouldn't happen
-						console.error( "Internal error: segment does not intersect plane." );
+						console.error( 'Internal error: segment does not intersect plane.' );
 						output.segmentedObject1 = null;
 						output.segmentedObject2 = null;
 						return 0;
@@ -419,7 +418,7 @@ THREE.ConvexObjectBreaker.prototype = {
 
 		if ( numPoints1 > 4 ) {
 
-			object1 = new THREE.Mesh( new THREE.ConvexBufferGeometry( points1 ), object.material );
+			object1 = new THREE.Mesh( new THREE.ConvexGeometry( points1 ), object.material );
 			object1.position.copy( this.tempCM1 );
 			object1.quaternion.copy( object.quaternion );
 
@@ -431,7 +430,7 @@ THREE.ConvexObjectBreaker.prototype = {
 
 		if ( numPoints2 > 4 ) {
 
-			object2 = new THREE.Mesh( new THREE.ConvexBufferGeometry( points2 ), object.material );
+			object2 = new THREE.Mesh( new THREE.ConvexGeometry( points2 ), object.material );
 			object2.position.copy( this.tempCM2 );
 			object2.quaternion.copy( object.quaternion );
 

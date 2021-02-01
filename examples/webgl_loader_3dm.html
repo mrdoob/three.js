@@ -15,16 +15,15 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-			import { CSS2DRenderer } from './jsm/renderers/CSS2DRenderer.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Rhino3dmLoader } from './jsm/loaders/3DMLoader.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			var container, controls;
-			var camera, scene, renderer, labelRenderer;
-			var gui;
+			let container, controls;
+			let camera, scene, renderer;
+			let gui;
 
 			init();
 			animate();
@@ -40,15 +39,13 @@
 
 				scene = new THREE.Scene();
 
-				scene.add( new THREE.AmbientLight( { intensity: 0.0001 } ) );
-
-				var directionalLight = new THREE.DirectionalLight( 0xffffff );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, 0, 2 );
 				directionalLight.castShadow = true;
 				directionalLight.intensity = 2;
 				scene.add( directionalLight );
 
-				var loader = new Rhino3dmLoader();
+				const loader = new Rhino3dmLoader();
 				loader.setLibraryPath( 'jsm/libs/rhino3dm/' );
 
 				loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
@@ -58,36 +55,29 @@
 
 				} );
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 
-				labelRenderer = new CSS2DRenderer();
-				labelRenderer.setSize( width, height );
-				labelRenderer.domElement.style.position = 'absolute';
-				labelRenderer.domElement.style.top = '0px';
-				container.appendChild( labelRenderer.domElement );
-
 				controls = new OrbitControls( camera, container );
 
-				window.addEventListener( 'resize', resize, false );
+				window.addEventListener( 'resize', resize );
 
 			}
 
 			function resize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-				labelRenderer.setSize( width, height );
 
 			}
 
@@ -95,7 +85,6 @@
 
 				controls.update();
 				renderer.render( scene, camera );
-				labelRenderer.render( scene, camera );
 
 				requestAnimationFrame( animate );
 
@@ -104,15 +93,15 @@
 			function initGUI( layers ) {
 
 				gui = new GUI( { width: 300 } );
-				var layersControl = gui.addFolder( 'layers' );
+				const layersControl = gui.addFolder( 'layers' );
 				layersControl.open();
 
-				for ( var i = 0; i < layers.length; i ++ ) {
+				for ( let i = 0; i < layers.length; i ++ ) {
 
-					var layer = layers[ i ];
+					const layer = layers[ i ];
 					layersControl.add( layer, 'visible' ).name( layer.name ).onChange( function ( val ) {
 
-						var name = this.object.name;
+						const name = this.object.name;
 
 						scene.traverse( function ( child ) {
 
@@ -120,7 +109,7 @@
 
 								if ( 'layerIndex' in child.userData.attributes ) {
 
-									var layerName = layers[ child.userData.attributes.layerIndex ].name;
+									const layerName = layers[ child.userData.attributes.layerIndex ].name;
 
 									if ( layerName === name ) {
 

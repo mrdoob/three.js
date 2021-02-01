@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,13 +18,13 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
-		planeGeometry.rotateX( - Math.PI / 2 );
+		const geometry = new THREE.PlaneGeometry( 2000, 2000 );
+		geometry.rotateX( - Math.PI / 2 );
 
-		var planeMaterial = new THREE.ShadowMaterial();
-		planeMaterial.opacity = 0.2;
+		const material = new THREE.ShadowMaterial();
+		material.opacity = 0.2;
 
-		var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+		const plane = new THREE.Mesh( geometry, material );
 		plane.position.y = -200;
 		plane.receiveShadow = true;
 		scene.add( plane );
@@ -41,7 +40,7 @@
 
 		<h3>[name]( [param:Object parameters] )</h3>
 		<p> [page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
-			材质的任何属性都可以从此处传入(包括从[page:Material]]继承的任何属性)。<br /><br />
+			材质的任何属性都可以从此处传入(包括从[page:Material]继承的任何属性)。<br /><br />
 		</p>
 
 
