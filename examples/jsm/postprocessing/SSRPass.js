@@ -105,7 +105,6 @@ var SSRPass = function({ scene, camera, width, height, encoding,}) {
   });
 
   this.worldNormalMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
-	this.worldNormalMaterial.uniforms['cameraRotationMatrix'].value = this.cameraRotationMatrix.extractRotation(camera.matrixWorld)
 
   // normal material
 
@@ -160,7 +159,9 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
   },
 
-  render: function(renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
+	render: function (renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */) {
+
+		this.worldNormalMaterial.uniforms['cameraRotationMatrix'].value = this.cameraRotationMatrix.extractRotation(camera.matrixWorld)
 
     // render beauty and depth
 
@@ -179,42 +180,10 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.renderPass(renderer, this.worldNormalMaterial, this.worldNormalRenderTarget);
 
     // output result to screen
-
-    switch (this.output) {
-
-      case SSRPass.OUTPUT.Default:
-				this.copyMaterial.blending = NoBlending;
-				this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
-
-				this.copyMaterial.blending = NormalBlending;
-				this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
-
-        break;
-      case SSRPass.OUTPUT.SSR:
-
-        this.copyMaterial.blending = NoBlending;
-        this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
-
-        break;
-
-      case SSRPass.OUTPUT.Beauty:
-
-        this.copyMaterial.blending = NoBlending;
-        this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
-
-        break;
-
-      case SSRPass.OUTPUT.Normal:
-
-        this.copyMaterial.blending = NoBlending;
-        this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
-
-        break;
-
-      default:
-        console.warn('THREE.SSRPass: Unknown output type.');
-
-    }
+		// this.copyMaterial.uniforms['tDiffuse'].value = this.worldNormalRenderTarget.texture;
+		// // this.copyMaterial.uniforms['tDiffuse'].value = this.worldPositionRenderTarget.texture;
+		// this.copyMaterial.blending = NoBlending;
+		// this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
   },
 

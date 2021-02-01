@@ -4,14 +4,19 @@
 <head>
 
 	<head>
-		<title>three.js webgl - postprocessing - Screen Space Reflection</title>
+		<title>three.js webgl - ViewPortReflector</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			button{
+				text-transform: none;
+			}
+		</style>
 	</head>
 
 <body>
-	<div id="container"><canvas id="cvs3d" style="display:none;"></canvas></div>
+	<div id="container"><canvas id="cvs3d" style="position:absolute;left:0;top:0;width:100%;height:100%;"></canvas></div>
 	<canvas id="cvs2d" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events: none;z-index: 1000;"></canvas>
 	<!-- <div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
@@ -19,12 +24,12 @@
 	</div> -->
 	<span style="background:rgba(0,0,0,.7);position: relative; z-index: 1000;padding:5px;padding-left: 0;">
 		<span id="dom_wrap" style="display:none;">
-			<button onclick="setToWindowSize()">set to window size</button>
-			<label for="">width:<input id="dom_width" type="number" value="100" style="width:50px;"></label>
-			<label for="">height:<input id="dom_height" type="number" value="100" style="width:50px;"></label>
-			<button onclick="render(dom_width.value,dom_height.value)">render</button>
+			<span id="dom_width"></span>
+			<span id="dom_height"></span>
+			<button onclick="renderVPReflector()">render</button>
 		</span>
 		<span id="dom_info" style="color:white;">loading...</span>
+		<button id="dom_toggleVPReflector" onclick="toggleVPReflector()" style="display:none;">toggle VPReflector</button>
 	</span>
 
 	<script type="module">
@@ -41,9 +46,10 @@
 
 		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
-		let render_width
-		let render_height
-		dom_width.value=Math.round(window.innerWidth*100/window.innerHeight)
+		window.render_height=parseInt(getQueryStringByName('height'))||100
+		window.render_width=Math.round(window.innerWidth*render_height/window.innerHeight)
+		dom_width.innerText='width: '+render_width
+		dom_height.innerText='height: '+render_height
 
 		window.params = {
 			enableSSR: true,
@@ -63,10 +69,10 @@
 		let reflector
 		let reflectorRenderTarget
 		let mesh_bunny
-		let state='initial'
+		window.state='initial'
 		window.readed = new Float32Array( 4 );
 		window.readedVec3=new THREE.Vector3()
-		window.reflectVec3=new THREE.Vector3()
+		window.tempVec3=new THREE.Vector3()
 
 		const container = document.querySelector('#container');
 
@@ -80,7 +86,6 @@
 
 			const material = new THREE.MeshStandardMaterial({ color: 0x606060 });
 			const mesh = new THREE.Mesh(geometry, material);
-			mesh.position.y=-0.0365
 			// mesh.castShadow = true;
 			// mesh.receiveShadow = true;
 			mesh_bunny=mesh
@@ -92,10 +97,10 @@
 			dom_info.innerText=''
 			dom_wrap.style.display='inline'
 
-		});
+			init();
+			animate();
 
-		// init();
-		// animate();
+		});
 
 		function init() {
 
@@ -110,7 +115,8 @@
 			// camera.position.set(.5, 0, 0).applyAxisAngle(new THREE.Vector3(0,0,1),Math.PI/4);
 			// camera.position.set(0.18829417135451876, 0.08142276408283763, -0.10567413852928587);
 			// camera.position.set(0.03563935501962898, 0.22116787374986915, -0.0553714098215656);
-			camera.position.set(0.09323919966209626, 0.09299305784167794, 0.25949967775832036);
+			// camera.position.set(0.09323919966209626, 0.09299305784167794, 0.25949967775832036);
+			camera.position.set(0.14703025254066782, 0.30918298189203564, 0.42221350369381716);
 
 			scene = new THREE.Scene();
 			// scene.background = new THREE.Color(0x443333);
@@ -124,7 +130,7 @@
 				new THREE.MeshPhongMaterial({ color: 0x999999, specular: 0x101010 })
 			);
 			plane.rotation.x = - Math.PI / 2;
-			// plane.position.y = 0.0365;
+			plane.position.y = 0.0365;
 			// plane.receiveShadow = true;
 			scene.add(plane);
 
@@ -141,16 +147,16 @@
 
 
 			{
-				const geometry = new THREE.BoxBufferGeometry(.05, .05, .05);
-				const material = new THREE.MeshStandardMaterial({ color: 'green' })
+				const geometry = new THREE.BoxBufferGeometry(.05, .3, .3);
+				const material = new THREE.MeshStandardMaterial({ color: 'cyan' })
 				const mesh = new THREE.Mesh(geometry, material)
-				mesh.position.set(-.12, plane.position.y + .025, .015)
+				mesh.position.set(-.13, plane.position.y + .15, .015)
 				scene.add(mesh)
 				otherMeshes.push(mesh)
 			}
 			{
 				const geometry = new THREE.IcosahedronBufferGeometry(.025, 4);
-				const material = new THREE.MeshStandardMaterial({ color: 'cyan' })
+				const material = new THREE.MeshStandardMaterial({ color: 'green' })
 				const mesh = new THREE.Mesh(geometry, material)
 				mesh.position.set(-.05, plane.position.y + .025, .08)
 				scene.add(mesh)
@@ -168,7 +174,7 @@
 			// renderer
 			renderer = new THREE.WebGLRenderer({ antialias: false, canvas:cvs3d });
 			// renderer.setPixelRatio(window.devicePixelRatio);
-			renderer.setSize(render_width, render_height);
+			renderer.setSize(render_width, render_height, false);
 			renderer.outputEncoding = THREE.sRGBEncoding;
 			// renderer.shadowMap.enabled = true;
 			container.appendChild(renderer.domElement);
@@ -176,8 +182,9 @@
 			//
 
 			controls = new OrbitControls(camera, renderer.domElement);
+			window.controls=controls
 			// controls.enableDamping = true
-			// controls.target.set(0, 0.05, 0);
+			controls.target.set(-0.08137769989670579, 0.060094131763247, 0.002092414710654196);
 			controls.update()
 			controls.enabled = !params.autoRotate
 
@@ -201,20 +208,24 @@
 			window.ssrPass = ssrPass
 			composer.addPass(ssrPass);
 
-			window.pixelRenderer=new THREE.WebGLRenderer({ antialias: false });
+			window.pixelRenderer=new THREE.WebGLRenderer({ antialias: false, alpha: true });
 			pixelRenderer.setSize(1,1);
 			pixelRenderer.outputEncoding = THREE.sRGBEncoding;
 			// container.appendChild(pixelRenderer.domElement);
 
-			let pixelCameraSize=.000001
+			let pixelCameraSize
+			// pixelCameraSize=.00000000000000000000000000000000000001
+			// pixelCameraSize=.0000000000000000000000000000000000001
+			pixelCameraSize=.000001
 			window.pixelCamera = new THREE.OrthographicCamera( -pixelCameraSize, pixelCameraSize, pixelCameraSize, -pixelCameraSize, .001, 10 );
 
 			state='inited'
 		}
 
 		function animate() {
+			// console.log('animate')
 
-			requestAnimationFrame(animate);
+			window.raf=requestAnimationFrame(animate);
 
 			stats.begin();
 			render();
@@ -222,66 +233,89 @@
 
 		}
 
-		window.render=render
-		async function render(width=100,height=100) {
+		function render() {
+			renderer.render(scene, camera)
+			// composer.render()
+		}
+
+		window.opacity=.5
+		window.fresnel=1
+		window.incidenceDir=new THREE.Vector3()
+		window.reflectDir=new THREE.Vector3()
+		window.renderVPReflector=renderVPReflector
+		async function renderVPReflector() {
+			cancelAnimationFrame(raf)
 			if(state==='rendering') return
 			if(state==='rendered'){
 				alert('Please reload page to re-render.')
 				return
 			}
-			render_width=width
-			render_height=height
-			if(state==='initial') init()
 
 			state='rendering'
+			controls.enabled = false
 			dom_info.innerText='rendering...'
 			await new Promise(resolve=>setTimeout(resolve, 0))
 
-			if (params.enableSSR) {
+			console.time('renderVPReflector')
 
-				composer.render();
-				// ctx2d.drawImage(renderer.domElement,0,0);return;
+			renderer.render(scene, camera)
+			ctx2d.drawImage(renderer.domElement,0,0);
 
-				for(let y=0;y<render_height;y++){
-					for(let x=0;x<render_width;x++){
-						let i=y*render_width+x
+			composer.render();
+			for(let y=0;y<render_height;y++){
+				for(let x=0;x<render_width;x++){
+					let i=y*render_width+x
 
-						renderer.readRenderTargetPixels( ssrPass.worldPositionRenderTarget, x, y, 1, 1, readed );
-						// if(y===60) debugger
-						pixelCamera.position.set( readed[0], readed[1], readed[2], )
-						
-						renderer.readRenderTargetPixels( ssrPass.worldNormalRenderTarget, x, y, 1, 1, readed );
-						// if(y===60) debugger
-						readedVec3.set( readed[0], readed[1], readed[2], )
-						pixelCamera.lookAt(reflectVec3.copy(pixelCamera.position).sub(camera.position).reflect(readedVec3).add(pixelCamera.position))
+					renderer.readRenderTargetPixels( ssrPass.worldPositionRenderTarget, x, y, 1, 1, readed );
+					// if(y===60) debugger
+					pixelCamera.position.set( readed[0], readed[1], readed[2], )
+					
+					renderer.readRenderTargetPixels( ssrPass.worldNormalRenderTarget, x, y, 1, 1, readed );
+					// if(y===60) debugger
+					readedVec3.set( readed[0], readed[1], readed[2], )
+					incidenceDir.copy(pixelCamera.position).sub(camera.position).normalize()
+					reflectDir.copy(incidenceDir).reflect(readedVec3)
+					pixelCamera.lookAt(tempVec3.copy(reflectDir).add(pixelCamera.position))
 
-						pixelRenderer.render(scene,pixelCamera)
-						ctx2d.drawImage(pixelRenderer.domElement,x,render_height-y,1,1)
+					fresnel=(tempVec3.copy(incidenceDir).dot(reflectDir)+1)/2
+					ctx2d.globalAlpha=opacity*fresnel
 
-					}
-					dom_info.innerText=`rendering... line: ${y}`
-					await new Promise(resolve=>setTimeout(resolve, 0))
+					pixelRenderer.render(scene,pixelCamera)
+					ctx2d.drawImage(pixelRenderer.domElement,x,render_height-y,1,1)
+
 				}
-				{/* solve line gap problem */
-					cvs2d.style.display='none'
-					await new Promise(resolve=>setTimeout(resolve, 300))
-					cvs2d.style.display='block'
-				}
-			} else {
-				renderer.render(scene, camera)
+				console.log(`line: ${y}/${render_height}`)
+				dom_info.innerText=`rendering... line: ${y}/${render_height}`
+				await new Promise(resolve=>setTimeout(resolve, 0))
+			}
+			console.timeEnd('renderVPReflector')
+			{/* solve line gap problem */
+				cvs2d.style.display='none'
+				await new Promise(resolve=>setTimeout(resolve, 300))
+				cvs2d.style.display='block'
 			}
 
 			console.log('rendered')
 			dom_info.innerText='rendered'
+			dom_toggleVPReflector.style.display='inline'
 			state='rendered'
 		}
 
-		
-		window.setToWindowSize=setToWindowSize
-		function setToWindowSize(){
-			if(!confirm('May cause very long render time! Are you sure?')) return
-			dom_width.value=window.innerWidth
-			dom_height.value=window.innerHeight
+		window.toggleVPReflector=toggleVPReflector
+		function toggleVPReflector(){
+			if(cvs2d.style.display==='none'){
+				cvs2d.style.display='block'
+			}else{
+				cvs2d.style.display='none'
+			}
+		}
+
+		function getQueryStringByName(name) {
+			var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+			if (result == null || result.length < 1) {
+				return "";
+			}
+			return result[1];
 		}
 	</script>
 </body>
