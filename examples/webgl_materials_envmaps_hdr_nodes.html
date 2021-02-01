@@ -24,6 +24,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
 			import { RGBMLoader } from './jsm/loaders/RGBMLoader.js';
+			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
 
 			import { MeshStandardNodeMaterial } from './jsm/nodes/Nodes.js';
 
@@ -45,41 +46,6 @@
 
 			init();
 			animate();
-
-			function getEnvScene() {
-
-				const envScene = new THREE.Scene();
-
-				const geometry = new THREE.BoxGeometry();
-				geometry.deleteAttribute( 'uv' );
-				const roomMaterial = new THREE.MeshStandardMaterial( { metalness: 0, side: THREE.BackSide } );
-				const room = new THREE.Mesh( geometry, roomMaterial );
-				room.scale.setScalar( 10 );
-				envScene.add( room );
-
-				const mainLight = new THREE.PointLight( 0xffffff, 50, 0, 2 );
-				envScene.add( mainLight );
-
-				const lightMaterial = new THREE.MeshLambertMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 10 } );
-
-				const light1 = new THREE.Mesh( geometry, lightMaterial );
-				light1.position.set( - 5, 2, 0 );
-				light1.scale.set( 0.1, 1, 1 );
-				envScene.add( light1 );
-
-				const light2 = new THREE.Mesh( geometry, lightMaterial );
-				light2.position.set( 0, 5, 0 );
-				light2.scale.set( 1, 0.1, 1 );
-				envScene.add( light2 );
-
-				const light3 = new THREE.Mesh( geometry, lightMaterial );
-				light3.position.set( 2, 1, 5 );
-				light3.scale.set( 1.5, 2, 0.1 );
-				envScene.add( light3 );
-
-				return envScene;
-
-			}
 
 			function init() {
 
@@ -168,8 +134,8 @@
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileCubemapShader();
 
-				const envScene = getEnvScene();
-				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene, 0.04 );
+				const envScene = new RoomEnvironment();
+				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene );
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
