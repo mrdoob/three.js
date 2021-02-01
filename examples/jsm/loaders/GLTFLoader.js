@@ -2508,6 +2508,10 @@ var GLTFLoader = ( function () {
 
 			} );
 
+		} else if ( source.uri === undefined ) {
+
+			throw new Error( 'THREE.GLTFLoader: Image ' + textureIndex + ' is missing URI and bufferView' );
+
 		}
 
 		return Promise.resolve( sourceURI ).then( function ( sourceURI ) {
