@@ -465,6 +465,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'Mesh':
 			case 'Extrusion':
 			case 'SubD':
+			case 'Brep':
 
 				var geometry = loader.parse( obj.geometry );
 
@@ -494,32 +495,6 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				}
 
 				return mesh;
-
-			case 'Brep':
-
-				var brepObject = new Object3D();
-
-				for ( var j = 0; j < obj.geometry.length; j ++ ) {
-
-					geometry = loader.parse( obj.geometry[ j ] );
-					var mesh = new Mesh( geometry, mat );
-					mesh.castShadow = attributes.castsShadows;
-					mesh.receiveShadow = attributes.receivesShadows;
-
-					brepObject.add( mesh );
-
-				}
-
-				brepObject.userData[ 'attributes' ] = attributes;
-				brepObject.userData[ 'objectType' ] = obj.objectType;
-
-				if ( attributes.name ) {
-
-					brepObject.name = attributes.name;
-
-				}
-
-				return brepObject;
 
 			case 'Curve':
 
@@ -1171,17 +1146,17 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			case rhino.ObjectType.Brep:
 
 				var faces = _geometry.faces();
-				geometry = [];
+				var mesh = new rhino.Mesh();
 
 				for ( var faceIndex = 0; faceIndex < faces.count; faceIndex ++ ) {
 
 					var face = faces.get( faceIndex );
-					var mesh = face.getMesh( rhino.MeshType.Any );
+					var _mesh = face.getMesh( rhino.MeshType.Any );
 
-					if ( mesh ) {
+					if ( _mesh ) {
 
-						geometry.push( mesh.toThreejsJSON() );
-						mesh.delete();
+						mesh.append( _mesh );
+						_mesh.delete();
 
 					}
 
@@ -1189,7 +1164,10 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 				}
 
+				mesh.compact();
+				geometry = mesh.toThreejsJSON();
 				faces.delete();
+				mesh.delete();
 
 				break;
 
