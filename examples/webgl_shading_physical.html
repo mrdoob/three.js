@@ -105,7 +105,7 @@
 					map: textureSquares
 				} );
 
-				const planeGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const planeGeometry = new THREE.PlaneGeometry( 100, 100 );
 
 				const ground = new THREE.Mesh( planeGeometry, groundMaterial );
 				ground.position.set( 0, 0, 0 );
@@ -122,9 +122,9 @@
 
 				// OBJECTS
 
-				const sphereGeometry = new THREE.SphereBufferGeometry( 100, 64, 32 );
-				const torusGeometry = new THREE.TorusBufferGeometry( 240, 60, 32, 64 );
-				const cubeGeometry = new THREE.BoxBufferGeometry( 150, 150, 150 );
+				const sphereGeometry = new THREE.SphereGeometry( 100, 64, 32 );
+				const torusGeometry = new THREE.TorusGeometry( 240, 60, 32, 64 );
+				const cubeGeometry = new THREE.BoxGeometry( 150, 150, 150 );
 
 				addObject( torusGeometry, materialPhong, 0, 100, 0, 0 );
 				addObject( cubeGeometry, materialLambert, 350, 75, 300, 0 );
@@ -159,9 +159,9 @@
 
 				}
 
-				const bigCube = new THREE.BoxBufferGeometry( 50, 500, 50 );
-				const midCube = new THREE.BoxBufferGeometry( 50, 200, 50 );
-				const smallCube = new THREE.BoxBufferGeometry( 100, 100, 100 );
+				const bigCube = new THREE.BoxGeometry( 50, 500, 50 );
+				const midCube = new THREE.BoxGeometry( 50, 200, 50 );
+				const smallCube = new THREE.BoxGeometry( 100, 100, 100 );
 
 				addObjectColor( bigCube, 0xff0000, - 500, 250, 0, 0 );
 				addObjectColor( smallCube, 0xff0000, - 500, 50, - 150, 0 );
@@ -175,10 +175,10 @@
 				addObjectColor( midCube, 0xff00ff, 0, 100, 500, 0 );
 				addObjectColor( smallCube, 0xff00ff, - 150, 50, 500, 0 );
 
-				addObjectColor( new THREE.BoxBufferGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI / 4 );
-				addObjectColor( new THREE.BoxBufferGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
+				addObjectColor( new THREE.BoxGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI / 4 );
+				addObjectColor( new THREE.BoxGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
 
-				addObjectColor( new THREE.SphereBufferGeometry( 100, 32, 26 ), 0xffffff, - 300, 100, 300, 0 );
+				addObjectColor( new THREE.SphereGeometry( 100, 32, 26 ), 0xffffff, - 300, 100, 300, 0 );
 
 				// MORPHS
 
@@ -264,7 +264,7 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// GUI
 

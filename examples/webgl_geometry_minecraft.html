@@ -58,30 +58,30 @@
 
 				const matrix = new THREE.Matrix4();
 
-				const pxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const pxGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pxGeometry.attributes.uv.array[ 1 ] = 0.5;
 				pxGeometry.attributes.uv.array[ 3 ] = 0.5;
 				pxGeometry.rotateY( Math.PI / 2 );
 				pxGeometry.translate( 50, 0, 0 );
 
-				const nxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const nxGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nxGeometry.attributes.uv.array[ 1 ] = 0.5;
 				nxGeometry.attributes.uv.array[ 3 ] = 0.5;
 				nxGeometry.rotateY( - Math.PI / 2 );
 				nxGeometry.translate( - 50, 0, 0 );
 
-				const pyGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const pyGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pyGeometry.attributes.uv.array[ 5 ] = 0.5;
 				pyGeometry.attributes.uv.array[ 7 ] = 0.5;
 				pyGeometry.rotateX( - Math.PI / 2 );
 				pyGeometry.translate( 0, 50, 0 );
 
-				const pzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const pzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pzGeometry.attributes.uv.array[ 1 ] = 0.5;
 				pzGeometry.attributes.uv.array[ 3 ] = 0.5;
 				pzGeometry.translate( 0, 0, 50 );
 
-				const nzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const nzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nzGeometry.attributes.uv.array[ 1 ] = 0.5;
 				nzGeometry.attributes.uv.array[ 3 ] = 0.5;
 				nzGeometry.rotateY( Math.PI );
@@ -170,7 +170,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

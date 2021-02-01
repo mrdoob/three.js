@@ -105,7 +105,7 @@
 
 					controls.lock();
 
-				}, false );
+				} );
 
 				controls.addEventListener( 'lock', function () {
 
@@ -125,29 +125,29 @@
 
 				const onKeyDown = function ( event ) {
 
-					switch ( event.keyCode ) {
+					switch ( event.code ) {
 
-						case 38: // up
-						case 87: // w
+						case 'ArrowUp':
+						case 'KeyW':
 							moveForward = true;
 							break;
 
-						case 37: // left
-						case 65: // a
+						case 'ArrowLeft':
+						case 'KeyA':
 							moveLeft = true;
 							break;
 
-						case 40: // down
-						case 83: // s
+						case 'ArrowDown':
+						case 'KeyS':
 							moveBackward = true;
 							break;
 
-						case 39: // right
-						case 68: // d
+						case 'ArrowRight':
+						case 'KeyD':
 							moveRight = true;
 							break;
 
-						case 32: // space
+						case 'Space':
 							if ( canJump === true ) velocity.y += 350;
 							canJump = false;
 							break;
@@ -158,25 +158,25 @@
 
 				const onKeyUp = function ( event ) {
 
-					switch ( event.keyCode ) {
+					switch ( event.code ) {
 
-						case 38: // up
-						case 87: // w
+						case 'ArrowUp':
+						case 'KeyW':
 							moveForward = false;
 							break;
 
-						case 37: // left
-						case 65: // a
+						case 'ArrowLeft':
+						case 'KeyA':
 							moveLeft = false;
 							break;
 
-						case 40: // down
-						case 83: // s
+						case 'ArrowDown':
+						case 'KeyS':
 							moveBackward = false;
 							break;
 
-						case 39: // right
-						case 68: // d
+						case 'ArrowRight':
+						case 'KeyD':
 							moveRight = false;
 							break;
 
@@ -184,14 +184,14 @@
 
 				};
 
-				document.addEventListener( 'keydown', onKeyDown, false );
-				document.addEventListener( 'keyup', onKeyUp, false );
+				document.addEventListener( 'keydown', onKeyDown );
+				document.addEventListener( 'keyup', onKeyUp );
 
 				raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
 
 				// floor
 
-				let floorGeometry = new THREE.PlaneBufferGeometry( 2000, 2000, 100, 100 );
+				let floorGeometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
 				floorGeometry.rotateX( - Math.PI / 2 );
 
 				// vertex displacement
@@ -231,7 +231,7 @@
 
 				// objects
 
-				const boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 ).toNonIndexed();
+				const boxGeometry = new THREE.BoxGeometry( 20, 20, 20 ).toNonIndexed();
 
 				position = boxGeometry.attributes.position;
 				const colorsBox = [];
@@ -269,7 +269,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

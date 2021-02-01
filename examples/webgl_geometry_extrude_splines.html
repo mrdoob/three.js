@@ -119,7 +119,7 @@
 
 				const extrudePath = splines[ params.spline ];
 
-				tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, params.extrusionSegments, 2, params.radiusSegments, params.closed );
+				tubeGeometry = new THREE.TubeGeometry( extrudePath, params.extrusionSegments, 2, params.radiusSegments, params.closed );
 
 				addGeometry( tubeGeometry );
 
@@ -191,7 +191,7 @@
 
 				// debug camera
 
-				cameraEye = new THREE.Mesh( new THREE.SphereBufferGeometry( 5 ), new THREE.MeshBasicMaterial( { color: 0xdddddd } ) );
+				cameraEye = new THREE.Mesh( new THREE.SphereGeometry( 5 ), new THREE.MeshBasicMaterial( { color: 0xdddddd } ) );
 				parent.add( cameraEye );
 
 				cameraHelper.visible = params.cameraHelper;
@@ -263,7 +263,7 @@
 				controls.minDistance = 100;
 				controls.maxDistance = 2000;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

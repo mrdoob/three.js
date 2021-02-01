@@ -19,7 +19,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl gpgpu birds + GLTF mesh<br/>
-			Flamingo by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a><br/>
+			Flamingo by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="http://www.ro.me/" target="_blank" rel="noopener">rome</a><br/>
 			Move mouse to disturb birds.
 		</div>
 
@@ -179,7 +179,9 @@
 
 							// Attraction / Cohesion - move closer
 							float threshDelta = 1.0 - alignmentThresh;
-							float adjustedPercent = ( percent - alignmentThresh ) / threshDelta;
+							float adjustedPercent;
+							if( threshDelta == 0. ) adjustedPercent = 1.;
+							else adjustedPercent = ( percent - alignmentThresh ) / threshDelta;
 
 							f = ( 0.5 - ( cos( adjustedPercent * PI_2 ) * -0.5 + 0.5 ) ) * delta;
 
@@ -385,9 +387,9 @@
 				container.appendChild( stats.dom );
 
 				container.style.touchAction = 'none';
-				container.addEventListener( 'pointermove', onPointerMove, false );
+				container.addEventListener( 'pointermove', onPointerMove );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				const gui = new GUI();
 
@@ -422,7 +424,7 @@
 				gui.add( effectController, "count", 0, BIRDS, 1 ).onChange( valuesChanger );
 				gui.close();
 
-				initBirds();
+				initBirds( effectController );
 
 			}
 
@@ -483,7 +485,7 @@
 
 			}
 
-			function initBirds() {
+			function initBirds( effectController ) {
 
 				const geometry = BirdGeometry;
 
@@ -500,7 +502,7 @@
 					shader.uniforms.textureVelocity = { value: null };
 					shader.uniforms.textureAnimation = { value: textureAnimation };
 					shader.uniforms.time = { value: 1.0 };
-					shader.uniforms.size = { value: 0.1 };
+					shader.uniforms.size = { value: effectController.size };
 					shader.uniforms.delta = { value: 0.0 };
 
 					let token = '#define STANDARD';
@@ -525,7 +527,7 @@
 
 						vec3 pos = tmpPos.xyz;
 						vec3 velocity = normalize(texture2D( textureVelocity, reference.xy ).xyz);
-						vec3 aniPos = texture2D( textureAnimation, vec2( reference.z, mod( ( time + seeds.x ) * ( ( 0.0004 + seeds.y / 10000.0) + normalize( velocity ) / 20000.0 ), reference.w ) ) ).xyz;
+						vec3 aniPos = texture2D( textureAnimation, vec2( reference.z, mod( time + ( seeds.x ) * ( ( 0.0004 + seeds.y / 10000.0) + normalize( velocity ) / 20000.0 ), reference.w ) ) ).xyz;
 						vec3 newPosition = position;
 
 						newPosition = mat3( modelMatrix ) * ( newPosition + aniPos );
@@ -649,7 +651,7 @@
 				positionUniforms[ "delta" ].value = delta;
 				velocityUniforms[ "time" ].value = now;
 				velocityUniforms[ "delta" ].value = delta;
-				if ( materialShader ) materialShader.uniforms[ "time" ].value = now;
+				if ( materialShader ) materialShader.uniforms[ "time" ].value = now / 1000;
 				if ( materialShader ) materialShader.uniforms[ "delta" ].value = delta;
 
 				velocityUniforms[ "predator" ].value.set( 0.5 * mouseX / windowHalfX, - 0.5 * mouseY / windowHalfY, 0 );

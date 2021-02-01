@@ -492,7 +492,7 @@
 				object = new THREE.Object3D();
 				scene.add( object );
 
-				const geometry = new THREE.SphereBufferGeometry( 1, 4, 4 );
+				const geometry = new THREE.SphereGeometry( 1, 4, 4 );
 
 				for ( let i = 0; i < 100; i ++ ) {
 
@@ -516,7 +516,7 @@
 
 				updateMaterial();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -64,7 +64,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				guiData = {
 					currentURL: 'models/svg/tiger.svg',
@@ -104,8 +104,8 @@
 					"Defs": 'models/svg/tests/testDefs/Svg-defs.svg',
 					"Defs2": 'models/svg/tests/testDefs/Svg-defs2.svg',
 					"Defs3": 'models/svg/tests/testDefs/Wave-defs.svg',
-					"Defs4": 'models/svg/tests/testDefs/defs4.svg'
-
+					"Defs4": 'models/svg/tests/testDefs/defs4.svg',
+					"Zero Radius": 'models/svg/zero-radius.svg'
 
 				} ).name( 'SVG File' ).onChange( update );
 
@@ -174,7 +174,7 @@
 
 								const shape = shapes[ j ];
 
-								const geometry = new THREE.ShapeBufferGeometry( shape );
+								const geometry = new THREE.ShapeGeometry( shape );
 								const mesh = new THREE.Mesh( geometry, material );
 
 								group.add( mesh );

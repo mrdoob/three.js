@@ -49,7 +49,7 @@
 
 				} );
 
-				const sphere = new THREE.SphereBufferGeometry( 0.5, 16, 8 );
+				const sphere = new THREE.SphereGeometry( 0.5, 16, 8 );
 
 				//lights
 
@@ -81,7 +81,7 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

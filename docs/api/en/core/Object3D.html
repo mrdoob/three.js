@@ -29,6 +29,9 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:AnimationClip animations]</h3>
+		<p>Array with object's animation clips.</p>
+
 		<h3>[property:Boolean castShadow]</h3>
 		<p>Whether the object gets rendered into shadow map. Default is *false*.</p>
 
@@ -102,16 +105,26 @@
 
 		<h3>[property:Function onAfterRender]</h3>
 		<p>
-		An optional callback that is executed immediately after the Object3D is rendered.
+		An optional callback that is executed immediately after a 3D object is rendered.
 		This function is called with the following parameters: renderer, scene, camera, geometry,
 		material, group.
+		</p>
+		<p>
+		Please notice that this callback is only executed for *renderable* 3D objects. Meaning 3D objects which define their visual
+		appearance with geometries and materials like instances of [page:Mesh], [page:Line], [page:Points] or [page:Sprite].
+		Instances of [page:Object3D], [page:Group] or [page:Bone] are not renderable and thus this callback is not executed for such objects.
 		</p>
 
 		<h3>[property:Function onBeforeRender]</h3>
 		<p>
-		An optional callback that is executed immediately before the Object3D is rendered.
+		An optional callback that is executed immediately before a 3D object is rendered.
 		This function is called with the following parameters: renderer, scene, camera, geometry,
 		material, group.
+		</p>
+		<p>
+		Please notice that this callback is only executed for *renderable* 3D objects. Meaning 3D objects which define their visual
+		appearance with geometries and materials like instances of [page:Mesh], [page:Line], [page:Points] or [page:Sprite].
+		Instances of [page:Object3D], [page:Group] or [page:Bone] are not renderable and thus this callback is not executed for such objects.
 		</p>
 
 		<h3>[property:Object3D parent]</h3>

@@ -3,7 +3,7 @@ import { Color } from '../math/Color.js';
 
 class Light extends Object3D {
 
-	constructor( color, intensity ) {
+	constructor( color, intensity = 1 ) {
 
 		super();
 
@@ -11,7 +11,7 @@ class Light extends Object3D {
 		Object.defineProperty( this, 'isLight', { value: true } );
 
 		this.color = new Color( color );
-		this.intensity = intensity !== undefined ? intensity : 1;
+		this.intensity = intensity;
 
 		this.receiveShadow = undefined;
 
