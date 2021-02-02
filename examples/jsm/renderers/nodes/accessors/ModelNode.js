@@ -1,5 +1,4 @@
 import Node from '../core/Node.js';
-import Vector3Node from '../inputs/Vector3Node.js';
 import Matrix4Node from '../inputs/Matrix4Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 
