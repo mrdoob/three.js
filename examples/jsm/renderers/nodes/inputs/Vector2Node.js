@@ -8,6 +8,8 @@ class Vector2Node extends InputNode {
 
 		this.value = value;
 
+		Object.defineProperty( this, 'isVector2Node', { value: true } );
+
 	}
 
 }

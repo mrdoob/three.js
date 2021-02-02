@@ -1,4 +1,5 @@
 import FloatNode from '../inputs/FloatNode.js';
+import { NodeUpdateType } from '../core/constants.js';
 
 class TimerNode extends FloatNode {
 
@@ -6,7 +7,7 @@ class TimerNode extends FloatNode {
 
 		super();
 
-		this.needsUpdate = true;
+		this.updateType = NodeUpdateType.Frame;
 
 	}
 

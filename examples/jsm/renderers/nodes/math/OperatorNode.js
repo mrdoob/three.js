@@ -18,9 +18,21 @@ class OperatorNode extends Node {
 		const typeA = this.a.getType( builder );
 		const typeB = this.b.getType( builder );
 
-		// use the greater length vector
+		if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
 
-		if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+			// matrix x vector
+
+			return typeB;
+
+		} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
+
+			// vector x matrix
+
+			return typeA;
+
+		} else if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+
+			// anytype x anytype: use the greater length vector
 
 			return typeB;
 
@@ -30,12 +42,41 @@ class OperatorNode extends Node {
 
 	}
 
+	getVectorFromMatrix( type ) {
+
+		return 'vec' + type.substr( 3 );
+
+	}
+
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
+		let typeA = this.a.getType( builder );
+		let typeB = this.b.getType( builder );
 
-		const a = this.a.build( builder, type );
-		const b = this.b.build( builder, type );
+		let type = this.getType( builder );
+
+		if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
+
+			// matrix x vector
+
+			type = typeB = this.getVectorFromMatrix( typeA );
+
+		} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
+
+			// vector x matrix
+
+			type = typeB = this.getVectorFromMatrix( typeB );
+
+		} else {
+
+			// anytype x anytype
+
+			typeA = typeB = type;
+
+		}
+
+		const a = this.a.build( builder, typeA );
+		const b = this.b.build( builder, typeB );
 
 		return builder.format( `( ${a} ${this.op} ${b} )`, type, output );
 

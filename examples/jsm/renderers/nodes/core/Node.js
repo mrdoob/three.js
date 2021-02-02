@@ -1,12 +1,20 @@
+import { NodeUpdateType } from './constants.js';
+
 class Node {
 
 	constructor( type = null ) {
 
 		this.type = type;
 
-		this.needsUpdate = false;
+		this.updateType = NodeUpdateType.None;
 
 		Object.defineProperty( this, 'isNode', { value: true } );
+
+	}
+
+	getUpdateType( /*builder*/ ) {
+
+		return this.updateType;
 
 	}
 

@@ -10,6 +10,8 @@ class TextureNode extends InputNode {
 		this.value = value;
 		this.uv = uv;
 
+		Object.defineProperty( this, 'isTextureNode', { value: true } );
+
 	}
 
 	generate( builder, output ) {
