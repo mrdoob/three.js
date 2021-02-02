@@ -101,16 +101,16 @@
 
 				let material = new THREE.MeshStandardMaterial();
 				material.color = new THREE.Color( 0xffffff );
-				material.roughness = params.metalness;
-				material.metalness = params.roguhness;
+				material.roughness = params.roughness;
+				material.metalness = params.metalness;
 
 				torusMesh = new THREE.Mesh( geometry, material );
 				scene.add( torusMesh );
 
 				material = new MeshStandardNodeMaterial();
 				material.color = new THREE.Color( 0xffffff );
-				material.roughness = params.metalness;
-				material.metalness = params.roguhness;
+				material.roughness = params.roughness;
+				material.metalness = params.metalness;
 
 				torusMeshNode = new THREE.Mesh( geometry, material );
 				scene.add( torusMeshNode );
