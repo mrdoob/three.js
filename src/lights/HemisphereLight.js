@@ -11,8 +11,6 @@ class HemisphereLight extends Light {
 		this.type = 'HemisphereLight';
 		Object.defineProperty( this, 'isHemisphereLight', { value: true } );
 
-		this.castShadow = undefined;
-
 		this.position.copy( Object3D.DefaultUp );
 		this.updateMatrix();
 
