@@ -53,7 +53,7 @@
 		并在视频播放时不断地更新这个纹理贴图。——[page:VideoTexture VideoTexture] 类会对此自动进行处理。
 		</p>
 
-		<h3>[property:array mipmaps]</h3>
+		<h3>[property:Array mipmaps]</h3>
 		<p>
 		用户所给定的mipmap数组（可选）。
 		</p>
@@ -164,7 +164,7 @@
 		旋转中心点。(0.5, 0.5)对应纹理的正中心。默认值为(0,0)，即左下角。
 		</p>
 
-		<h3>[property:boolean matrixAutoUpdate]</h3>
+		<h3>[property:Boolean matrixAutoUpdate]</h3>
 		<p>
 		是否从纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、[page:Texture.rotation .rotation]和[page:Texture.center .center]属性更新纹理的UV变换矩阵（uv-transform [page:Texture.matrix .matrix]）。
 		默认值为true。
@@ -180,13 +180,13 @@
 			默认值为单位矩阵。
 		</p>
 
-		<h3>[property:boolean generateMipmaps]</h3>
+		<h3>[property:Boolean generateMipmaps]</h3>
 		<p>
 			是否为纹理生成mipmap（如果可用）。默认为true。
 			如果你手动生成mipmap，请将其设为false。
 		</p>
 
-		<h3>[property:boolean premultiplyAlpha]</h3>
+		<h3>[property:Boolean premultiplyAlpha]</h3>
 		<p>
 		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Default is *false*.<br /><br />
 
@@ -194,7 +194,7 @@
 		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
-		<h3>[property:boolean flipY]</h3>
+		<h3>[property:Boolean flipY]</h3>
 		<p>
 		If set to *true*, the texture is flipped along the vertical axis when uploaded to the GPU. Default is *true*.<br /><br />
 

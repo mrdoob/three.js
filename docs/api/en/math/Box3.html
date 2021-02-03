@@ -19,7 +19,7 @@
 		const box = new THREE.Box3();
 
 		const mesh = new THREE.Mesh(
-			new THREE.SphereBufferGeometry(),
+			new THREE.SphereGeometry(),
 			new THREE.MeshBasicMaterial()
 		);
 
@@ -138,11 +138,11 @@
 		Expands the boundaries of this box to include [page:Vector3 point].
 		</p>
 
-		<h3>[method:this expandByScalar]( [param:float scalar] )</h3>
+		<h3>[method:this expandByScalar]( [param:Float scalar] )</h3>
 		<p>
-		[page:float scalar] - Distance to expand the box by.<br /><br />
+		[page:Float scalar] - Distance to expand the box by.<br /><br />
 
-		Expands each dimension of the box by [page:float scalar]. If negative, the dimensions of the box
+		Expands each dimension of the box by [page:Float scalar]. If negative, the dimensions of the box
 		will be contracted.
 		</p>
 

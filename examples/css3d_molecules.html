@@ -149,7 +149,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -175,7 +175,7 @@
 
 					const url = "models/pdb/" + MOLECULES[ m ];
 
-					button.addEventListener( 'click', generateButtonCallback( url ), false );
+					button.addEventListener( 'click', generateButtonCallback( url ) );
 
 				}
 

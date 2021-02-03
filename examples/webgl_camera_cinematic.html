@@ -55,7 +55,7 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				const geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				const geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
 				for ( let i = 0; i < 1500; i ++ ) {
 
@@ -79,9 +79,9 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				const effectController = {
 
@@ -141,7 +141,7 @@
 
 				matChanger();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

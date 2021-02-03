@@ -56,6 +56,18 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 			texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
 
+			if ( texData.encoding !== undefined ) {
+
+				texture.encoding = texData.encoding;
+
+			}
+
+			if ( texData.flipY !== undefined ) {
+
+				texture.flipY = texData.flipY;
+
+			}
+
 			if ( texData.format !== undefined ) {
 
 				texture.format = texData.format;

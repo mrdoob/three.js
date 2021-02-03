@@ -58,7 +58,7 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				const geometry = new THREE.BoxBufferGeometry( 0.15, 0.15, 0.15 );
+				const geometry = new THREE.BoxGeometry( 0.15, 0.15, 0.15 );
 
 				for ( let i = 0; i < 200; i ++ ) {
 
@@ -129,7 +129,7 @@
 				controllerGrip.add( controllerModelFactory.createControllerModel( controllerGrip ) );
 				scene.add( controllerGrip );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
@@ -155,7 +155,7 @@
 
 					case 'gaze':
 
-						geometry = new THREE.RingBufferGeometry( 0.02, 0.04, 32 ).translate( 0, 0, - 1 );
+						geometry = new THREE.RingGeometry( 0.02, 0.04, 32 ).translate( 0, 0, - 1 );
 						material = new THREE.MeshBasicMaterial( { opacity: 0.5, transparent: true } );
 						return new THREE.Mesh( geometry, material );
 

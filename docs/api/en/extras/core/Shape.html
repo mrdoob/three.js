@@ -31,7 +31,7 @@
 
 		const extrudeSettings = { amount: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
 
-		const geometry = new THREE.ExtrudeBufferGeometry( heartShape, extrudeSettings );
+		const geometry = new THREE.ExtrudeGeometry( heartShape, extrudeSettings );
 
 		const mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		</code>
@@ -68,7 +68,7 @@
 		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this instance. This gets automatically assigned, so this shouldn't be edited.
 		</p>
 
-		<h3>[property:array holes]</h3>
+		<h3>[property:Array holes]</h3>
 		<p>An array of [page:Path paths] that define the holes in the shape.</p>
 
 		<h2>Methods</h2>

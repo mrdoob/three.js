@@ -47,7 +47,7 @@ function MenubarHelp( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/help/about' ) );
 	option.onClick( function () {
 
-		window.open( 'http://threejs.org', '_blank' );
+		window.open( 'https://threejs.org', '_blank' );
 
 	} );
 	options.add( option );

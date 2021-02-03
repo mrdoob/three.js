@@ -22,7 +22,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		const geometry = new THREE.BoxBufferGeometry( 10, 10, 10, 2, 2, 2 );
+		const geometry = new THREE.BoxGeometry( 10, 10, 10, 2, 2, 2 );
 		const material = new THREE.MeshNormalMaterial();
 		const box = new THREE.Mesh( geometry, material );
 
@@ -52,7 +52,7 @@
 		<h2>Properties</h2>
 		<p>See the base [page:LineSegments] class for common properties.</p>
 
-		<h3>[property:object matrixAutoUpdate]</h3>
+		<h3>[property:Object matrixAutoUpdate]</h3>
 		<p>
 			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
 			objects's [page:Object3D.matrixWorld matrixWorld].

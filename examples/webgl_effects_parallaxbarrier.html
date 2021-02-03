@@ -29,7 +29,7 @@
 			let windowHalfX = window.innerWidth / 2;
 			let windowHalfY = window.innerHeight / 2;
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			init();
 			animate();
@@ -56,7 +56,7 @@
 				scene = new THREE.Scene();
 				scene.background = textureCube;
 
-				const geometry = new THREE.SphereBufferGeometry( 0.1, 32, 16 );
+				const geometry = new THREE.SphereGeometry( 0.1, 32, 16 );
 				const material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 
 				for ( let i = 0; i < 500; i ++ ) {
@@ -89,7 +89,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

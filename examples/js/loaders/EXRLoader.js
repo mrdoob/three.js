@@ -1231,7 +1231,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			for ( var i = 0; i < 64; ++ i ) {
 
-				dst[ idx + i ] = encodeFloat16( toLinear( src[ i ] ) );
+				dst[ idx + i ] = THREE.DataUtils.toHalfFloat( toLinear( src[ i ] ) );
 
 			}
 
@@ -1276,15 +1276,13 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			var compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
 
-			if ( typeof Inflate === 'undefined' ) {
+			if ( typeof fflate === 'undefined' ) {
 
-				console.error( 'THREE.EXRLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
+				console.error( 'THREE.EXRLoader: External library fflate.min.js required.' );
 
 			}
 
-			var inflate = new Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
-
-			var rawBuffer = new Uint8Array( inflate.decompress().buffer );
+			var rawBuffer = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
 			var tmpBuffer = new Uint8Array( rawBuffer.length );
 
 			predictor( rawBuffer ); // revert predictor
@@ -1401,14 +1399,13 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			var compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
 
-			if ( typeof Inflate === 'undefined' ) {
+			if ( typeof fflate === 'undefined' ) {
 
-				console.error( 'THREE.EXRLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
+				console.error( 'THREE.EXRLoader: External library fflate.min.js required.' );
 
 			}
 
-			const inflate = new Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
-			const rawBuffer = new Uint8Array( inflate.decompress().buffer );
+			var rawBuffer = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
 
 			const sz = info.lines * info.channels * info.width;
 			const tmpBuffer = ( info.type == 1 ) ? new Uint16Array( sz ) : new Uint32Array( sz );
@@ -1587,8 +1584,8 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 					case DEFLATE:
 
 						var compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.totalAcUncompressedCount );
-						var inflate = new Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
-						var acBuffer = new Uint16Array( inflate.decompress().buffer );
+						var data = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+						var acBuffer = new Uint16Array( data.buffer );
 						inOffset.value += dwaHeader.totalAcUncompressedCount;
 						break;
 
@@ -1614,8 +1611,8 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			if ( dwaHeader.rleRawSize > 0 ) {
 
 				var compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.rleCompressedSize );
-				var inflate = new Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
-				var rleBuffer = decodeRunLength( inflate.decompress().buffer );
+				var data = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+				var rleBuffer = decodeRunLength( data.buffer );
 
 				inOffset.value += dwaHeader.rleCompressedSize;
 
@@ -1816,7 +1813,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		function decodeFloat32( dataView, offset ) {
 
-			return encodeFloat16( parseFloat32( dataView, offset ) );
+			return THREE.DataUtils.toHalfFloat( parseFloat32( dataView, offset ) );
 
 		}
 
@@ -1835,55 +1832,6 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 					) :
 					6.103515625e-5 * ( fraction / 0x400 )
 			);
-
-		}
-
-		// http://gamedev.stackexchange.com/questions/17326/conversion-of-a-number-from-single-precision-floating-point-representation-to-a/17410#17410
-		function encodeFloat16( val ) {
-
-			/* This method is faster than the OpenEXR implementation (very often
-			 * used, eg. in Ogre), with the additional benefit of rounding, inspired
-			 * by James Tursa?s half-precision code.
-			*/
-
-			tmpDataView.setFloat32( 0, val );
-			var x = tmpDataView.getInt32( 0 );
-
-			var bits = ( x >> 16 ) & 0x8000; /* Get the sign */
-			var m = ( x >> 12 ) & 0x07ff; /* Keep one extra bit for rounding */
-			var e = ( x >> 23 ) & 0xff; /* Using int is faster here */
-
-			/* If zero, or denormal, or exponent underflows too much for a denormal
-				* half, return signed zero. */
-			if ( e < 103 ) return bits;
-
-			/* If NaN, return NaN. If Inf or exponent overflow, return Inf. */
-			if ( e > 142 ) {
-
-				bits |= 0x7c00;
-				/* If exponent was 0xff and one mantissa bit was set, it means NaN,
-							* not Inf, so make sure we set one mantissa bit too. */
-				bits |= ( ( e == 255 ) ? 0 : 1 ) && ( x & 0x007fffff );
-				return bits;
-
-			}
-
-			/* If exponent underflows but not too much, return a denormal */
-			if ( e < 113 ) {
-
-				m |= 0x0800;
-				/* Extra rounding may overflow and set mantissa to 0 and exponent
-					* to 1, which is OK. */
-				bits |= ( m >> ( 114 - e ) ) + ( ( m >> ( 113 - e ) ) & 1 );
-				return bits;
-
-			}
-
-			bits |= ( ( e - 112 ) << 10 ) | ( m >> 1 );
-			/* Extra rounding. An overflow will set mantissa to 0 and increment
-				* the exponent, which is OK. */
-			bits += m & 1;
-			return bits;
 
 		}
 

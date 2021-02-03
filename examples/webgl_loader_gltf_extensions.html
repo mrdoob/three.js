@@ -154,7 +154,7 @@
 				renderer.physicallyCorrectLights = true;
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// Load background and generate envMap
 
@@ -242,7 +242,7 @@
 				if ( sceneInfo.addGround ) {
 
 					const groundMaterial = new THREE.MeshPhongMaterial( { color: 0xFFFFFF } );
-					const ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 512, 512 ), groundMaterial );
+					const ground = new THREE.Mesh( new THREE.PlaneGeometry( 512, 512 ), groundMaterial );
 					ground.receiveShadow = !! sceneInfo.shadows;
 
 					if ( sceneInfo.groundPos ) {

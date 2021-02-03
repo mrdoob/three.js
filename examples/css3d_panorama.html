@@ -88,11 +88,11 @@
 				//
 
 				document.body.style.touchAction = 'none';
-				document.body.addEventListener( 'pointerdown', onPointerDown, false );
+				document.body.addEventListener( 'pointerdown', onPointerDown );
 
-				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+				document.addEventListener( 'wheel', onDocumentMouseWheel );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -112,8 +112,8 @@
 				pointerX = event.clientX;
 				pointerY = event.clientY;
 
-				document.addEventListener( 'pointermove', onPointerMove, false );
-				document.addEventListener( 'pointerup', onPointerUp, false );
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerup', onPointerUp );
 
 			}
 

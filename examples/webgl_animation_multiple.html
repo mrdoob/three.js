@@ -359,7 +359,7 @@
 
 				// ground
 				const groundMesh = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 40, 40 ),
+					new THREE.PlaneGeometry( 40, 40 ),
 					new THREE.MeshPhongMaterial( {
 						color: 0x999999,
 						depthWrite: false
@@ -369,7 +369,7 @@
 				groundMesh.rotation.x = - Math.PI / 2;
 				groundMesh.receiveShadow = true;
 				worldScene.add( groundMesh );
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

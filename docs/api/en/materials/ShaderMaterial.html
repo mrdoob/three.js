@@ -17,7 +17,7 @@
 			You may want to use a custom shader if you need to:
 		<ul>
 			<li>implement an effect not included with any of the built-in [page:Material materials]</li>
-			<li>combine many objects into a single [page:Geometry] or [page:BufferGeometry] in order to improve performance</li>
+			<li>combine many objects into a single [page:BufferGeometry] in order to improve performance</li>
 		</ul>
 		There are the following notes to bear in mind when using a *ShaderMaterial*:
 
@@ -30,8 +30,7 @@
 			</li>
 			<li>
 				As of THREE r72, directly assigning attributes in a ShaderMaterial is no longer supported.
-				A [page:BufferGeometry] instance (instead of a [page:Geometry] instance) must be used instead,
-				using [page:BufferAttribute] instances to define custom attributes.
+				A [page:BufferGeometry] instance  must be used instead, using [page:BufferAttribute] instances to define custom attributes.
 			</li>
 			<li>
 				As of THREE r77, [page:WebGLRenderTarget] or [page:WebGLCubeRenderTarget] instances
@@ -104,20 +103,16 @@
 			[example:webgl_gpgpu_birds webgl / gpgpu / birds]<br />
 			[example:webgl_gpgpu_protoplanet webgl / gpgpu / protoplanet]<br />
 			[example:webgl_gpgpu_water webgl / gpgpu / water]<br />
-			[example:webgl_hdr webgl / hdr]<br />
 			[example:webgl_interactive_points webgl / interactive / points]<br />
-			[example:webgl_kinect webgl / kinect]<br />
+			[example:webgl_video_kinect webgl / video / kinect]<br />
 			[example:webgl_lights_hemisphere webgl / lights / hemisphere]<br />
 			[example:webgl_marchingcubes webgl / marchingcubes]<br />
-			[example:webgl_materials_bumpmap_skin webgl / materials / bumpmap / skin]<br />
 			[example:webgl_materials_envmaps webgl / materials / envmaps]<br />
 			[example:webgl_materials_lightmap webgl / materials / lightmap]<br />
 			[example:webgl_materials_parallaxmap webgl / materials / parallaxmap]<br />
 			[example:webgl_materials_shaders_fresnel webgl / materials / shaders / fresnel]<br />
-			[example:webgl_materials_skin webgl / materials / skin]<br />
 			[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
 			[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
-			[example:webgl_nearestneighbour webgl / nearestneighbour]<br />
 			[example:webgl_postprocessing_dof2 webgl / postprocessing / dof2]<br />
 			[example:webgl_postprocessing_godrays webgl / postprocessing / godrays]
 		</p>
@@ -378,7 +373,7 @@ this.extensions = {
 		When set to true, morph target attributes are available in the vertex shader. Default is *false*.
 		</p>
 
-		<h3>[property:boolean morphNormals]</h3>
+		<h3>[property:Boolean morphNormals]</h3>
 		<p>
 		When set to true, morph normal attributes are available in the vertex shader. Default is *false*.
 		</p>

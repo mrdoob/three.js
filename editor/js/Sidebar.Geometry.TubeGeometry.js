@@ -5,7 +5,7 @@ import { UIPoints3 } from './libs/ui.three.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-function SidebarGeometryTubeGeometry( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -88,7 +88,7 @@ function SidebarGeometryTubeGeometry( editor, object ) {
 
 		tensionRow.setDisplay( curveType.getValue() == 'catmullrom' ? '' : 'none' );
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.TubeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.TubeGeometry(
 			new THREE.CatmullRomCurve3( points.getValue(), closed.getValue(), curveType.getValue(), tension.getValue() ),
 			tubularSegments.getValue(),
 			radius.getValue(),
@@ -102,4 +102,4 @@ function SidebarGeometryTubeGeometry( editor, object ) {
 
 }
 
-export { SidebarGeometryTubeGeometry };
+export { GeometryParametersPanel };

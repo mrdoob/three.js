@@ -82,7 +82,7 @@
 
 				//
 
-				const geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				const geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
 
 				nodeMaterial = new StandardNodeMaterial();
 				nodeMaterial.color.value = new THREE.Color( 0xffffff );
@@ -98,7 +98,7 @@
 				torusMesh = new THREE.Mesh( geometry, nodeMaterial );
 				scene.add( torusMesh );
 
-				planeMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 200, 200 ), new THREE.MeshBasicMaterial() );
+				planeMesh = new THREE.Mesh( new THREE.PlaneGeometry( 200, 200 ), new THREE.MeshBasicMaterial() );
 				planeMesh.position.y = - 50;
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
@@ -141,7 +141,7 @@
 				controls.minDistance = 50;
 				controls.maxDistance = 300;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				const gui = new GUI();
 

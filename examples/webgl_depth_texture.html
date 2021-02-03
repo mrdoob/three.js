@@ -91,7 +91,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 
-				if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
+				if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'WEBGL_depth_texture' ) === false ) {
 
 					supportsExtension = false;
 					document.querySelector( '#error' ).style.display = 'block';
@@ -124,7 +124,7 @@
 				setupPost();
 
 				onWindowResize();
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 				const gui = new GUI( { width: 300 } );
@@ -169,7 +169,7 @@
 						tDepth: { value: null }
 					}
 				} );
-				const postPlane = new THREE.PlaneBufferGeometry( 2, 2 );
+				const postPlane = new THREE.PlaneGeometry( 2, 2 );
 				const postQuad = new THREE.Mesh( postPlane, postMaterial );
 				postScene = new THREE.Scene();
 				postScene.add( postQuad );
@@ -180,7 +180,7 @@
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.TorusKnotBufferGeometry( 1, 0.3, 128, 64 );
+				const geometry = new THREE.TorusKnotGeometry( 1, 0.3, 128, 64 );
 				const material = new THREE.MeshBasicMaterial( { color: 'blue' } );
 
 				const count = 50;

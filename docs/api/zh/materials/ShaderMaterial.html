@@ -16,7 +16,7 @@
 			您可能需要使用自定义shader，如果你要：
 		<ul>
 			<li>要实现内置 [page:Material materials] 之外的效果。</li>
-			<li>将许多对象组合成单个[page:Geometry]或[page:BufferGeometry]以提高性能。</li>
+			<li>将许多对象组合成单个[page:BufferGeometry]以提高性能。</li>
 		</ul>
 		使用*ShaderMaterial*时需要注意以下注意事项：
 		<ul>
@@ -26,7 +26,7 @@
 				属性中GLSL代码必须使用WebGL来编译并运行在GPU中。
 			</li>
 			<li> 从 THREE r72开始，不再支持在ShaderMaterial中直接分配属性。
-				必须使用 [page:BufferGeometry]实例 (而不是 [page:Geometry] 实例)，使用[page:BufferAttribute]实例来定义自定义属性。
+				必须使用 [page:BufferGeometry]实例，使用[page:BufferAttribute]实例来定义自定义属性。
 			</li>
 			<li> 从 THREE r77开始，[page:WebGLRenderTarget] 或 [page:WebGLCubeRenderTarget] 实例不再被用作uniforms。
 				必须使用它们的[page:Texture texture] 属性。
@@ -93,21 +93,16 @@
 			[example:webgl_gpgpu_birds webgl / gpgpu / birds]<br />
 			[example:webgl_gpgpu_protoplanet webgl / gpgpu / protoplanet]<br />
 			[example:webgl_gpgpu_water webgl / gpgpu / water]<br />
-			[example:webgl_hdr webgl / hdr]<br />
 			[example:webgl_interactive_points webgl / interactive / points]<br />
-			[example:webgl_kinect webgl / kinect]<br />
+			[example:webgl_video_kinect webgl / video / kinect]<br />
 			[example:webgl_lights_hemisphere webgl / lights / hemisphere]<br />
 			[example:webgl_marchingcubes webgl / marchingcubes]<br />
-			[example:webgl_materials_bumpmap_skin webgl / materials / bumpmap / skin]<br />
 			[example:webgl_materials_envmaps webgl / materials / envmaps]<br />
 			[example:webgl_materials_lightmap webgl / materials / lightmap]<br />
 			[example:webgl_materials_parallaxmap webgl / materials / parallaxmap]<br />
 			[example:webgl_materials_shaders_fresnel webgl / materials / shaders / fresnel]<br />
-			[example:webgl_materials_skin webgl / materials / skin]<br />
-			[example:webgl_materials_texture_hdr webgl / materials / texture / hdr]<br />
 			[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
 			[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
-			[example:webgl_nearestneighbour webgl / nearestneighbour]<br />
 			[example:webgl_postprocessing_dof2 webgl / postprocessing / dof2]<br />
 			[example:webgl_postprocessing_godrays webgl / postprocessing / godrays]
 		</p>
@@ -334,7 +329,7 @@ this.extensions = {
 		<p> When set to true, morph target attributes are available in the vertex shader. Default is *false*.
 		</p>
 
-		<h3>[property:boolean morphNormals]</h3>
+		<h3>[property:Boolean morphNormals]</h3>
 		<p> When set to true, morph normal attributes are available in the vertex shader. Default is *false*.
 		</p>
 

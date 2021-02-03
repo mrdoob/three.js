@@ -58,7 +58,7 @@
 				scene.background = new THREE.Color( 0xcccccc );
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
-				const geometry = new THREE.CylinderBufferGeometry( 0, 10, 30, 4, 1 );
+				const geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
 				const material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				for ( let i = 0; i < 500; i ++ ) {
@@ -109,7 +109,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				createControls( perspectiveCamera );
 

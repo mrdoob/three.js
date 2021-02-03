@@ -232,7 +232,7 @@
 				} );
 
 
-				const earthGeo = new THREE.SphereBufferGeometry( 600, 24, 24 );
+				const earthGeo = new THREE.SphereGeometry( 600, 24, 24 );
 				const sphereMesh = new THREE.Mesh( earthGeo, earthMat );
 				scene.add( sphereMesh );
 
@@ -295,13 +295,13 @@
 					// blending: THREE.NoBlending
 				} );
 
-				let quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.1, 0.1 ), currentLuminanceMat );
+				let quadBG = new THREE.Mesh( new THREE.PlaneGeometry( 0.1, 0.1 ), currentLuminanceMat );
 				quadBG.position.z = - 500;
 				quadBG.position.x = - window.innerWidth * 0.5 + window.innerWidth * 0.05;
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
 				debugScene.add( quadBG );
 
-				quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.1, 0.1 ), adaptiveLuminanceMat );
+				quadBG = new THREE.Mesh( new THREE.PlaneGeometry( 0.1, 0.1 ), adaptiveLuminanceMat );
 				quadBG.position.z = - 500;
 				quadBG.position.x = - window.innerWidth * 0.5 + window.innerWidth * 0.15;
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
@@ -333,7 +333,7 @@
 
 				parameters.type = THREE.FloatType;
 
-				if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
+				if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'OES_texture_half_float_linear' ) === false ) {
 
 					parameters.type = undefined; // avoid usage of floating point textures
 
@@ -394,7 +394,7 @@
 
 				gui.open();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

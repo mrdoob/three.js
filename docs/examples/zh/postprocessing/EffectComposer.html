@@ -98,13 +98,21 @@
 			将传入的过程插入到过程链中所给定的索引处。
 		</p>
 
-		<h3>[method:boolean isLastEnabledPass]( [param:Integer passIndex] )</h3>
+		<h3>[method:Boolean isLastEnabledPass]( [param:Integer passIndex] )</h3>
 
 		<p>
 			passIndex -- 被用于检查的过程<br /><br />
 
 			如果给定索引的过程在过程链中是最后一个启用的过程，则返回true。
 			由[name]所使用，来决定哪一个过程应当被渲染到屏幕上。
+		</p>
+
+		<h3>[method:void removePass]( [param:Pass pass] )</h3>
+
+		<p>
+			pass -- The pass to remove from the pass chain.<br /><br />
+
+			Removes the given pass from the pass chain.
 		</p>
 
 		<h3>[method:void render]( [param:Float deltaTime] )</h3>
