@@ -49,7 +49,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			this.addSlot( 'vertex', new NodeSlot( mvpNode, 'GL_POSITION', 'vec4' ) );
+			this.addSlot( 'vertex', new NodeSlot( mvpNode, 'MVP', 'vec4' ) );
 
 			if ( material.colorNode !== undefined ) {
 

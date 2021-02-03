@@ -8,7 +8,7 @@ NODE_HEADER_VARYS
 
 void main(){
 	NODE_BODY_VARYS
-	gl_Position = NODE_GL_POSITION;
+	gl_Position = NODE_MVP;
 }`,
 		fragmentShader: `#version 450
 
