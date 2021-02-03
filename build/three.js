@@ -785,7 +785,7 @@
 		Function("r", "regeneratorRuntime = r")(runtime);
 	}
 
-	var REVISION = '125';
+	var REVISION = '126dev';
 	var MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -2923,6 +2923,22 @@
 					y1 = src1[srcOffset1 + 1],
 					z1 = src1[srcOffset1 + 2],
 					w1 = src1[srcOffset1 + 3];
+
+			if (t === 0) {
+				dst[dstOffset + 0] = x0;
+				dst[dstOffset + 1] = y0;
+				dst[dstOffset + 2] = z0;
+				dst[dstOffset + 3] = w0;
+				return;
+			}
+
+			if (t === 1) {
+				dst[dstOffset + 0] = x1;
+				dst[dstOffset + 1] = y1;
+				dst[dstOffset + 2] = z1;
+				dst[dstOffset + 3] = w1;
+				return;
+			}
 
 			if (w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1) {
 				var s = 1 - t;
@@ -20143,10 +20159,6 @@
 	var _matrix$1 = new Matrix4();
 
 	function SkinnedMesh(geometry, material) {
-		if (geometry && geometry.isGeometry) {
-			console.error('THREE.SkinnedMesh no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
-		}
-
 		Mesh.call(this, geometry, material);
 		this.type = 'SkinnedMesh';
 		this.bindMode = 'attached';
@@ -36751,27 +36763,8 @@
 	CubeCamera.prototype.clear = function (renderer, color, depth, stencil) {
 		console.warn('THREE.CubeCamera: .clear() is now .renderTarget.clear().');
 		return this.renderTarget.clear(renderer, color, depth, stencil);
-	}; //
-
-
-	var GeometryUtils = {
-		merge: function merge(geometry1, geometry2, materialIndexOffset) {
-			console.warn('THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.');
-			var matrix;
-
-			if (geometry2.isMesh) {
-				geometry2.matrixAutoUpdate && geometry2.updateMatrix();
-				matrix = geometry2.matrix;
-				geometry2 = geometry2.geometry;
-			}
-
-			geometry1.merge(geometry2, matrix, materialIndexOffset);
-		},
-		center: function center(geometry) {
-			console.warn('THREE.GeometryUtils: .center() has been moved to Geometry. Use geometry.center() instead.');
-			return geometry.center();
-		}
 	};
+
 	ImageUtils.crossOrigin = undefined;
 
 	ImageUtils.loadTexture = function (url, mapping, onLoad, onError) {
@@ -36984,7 +36977,6 @@
 	exports.GLSL1 = GLSL1;
 	exports.GLSL3 = GLSL3;
 	exports.GammaEncoding = GammaEncoding;
-	exports.GeometryUtils = GeometryUtils;
 	exports.GreaterDepth = GreaterDepth;
 	exports.GreaterEqualDepth = GreaterEqualDepth;
 	exports.GreaterEqualStencilFunc = GreaterEqualStencilFunc;

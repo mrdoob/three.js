@@ -35,7 +35,7 @@ class Quaternion {
 
 		if ( t === 0 ) {
 
-			dst[ dstOffset ] = x0;
+			dst[ dstOffset + 0 ] = x0;
 			dst[ dstOffset + 1 ] = y0;
 			dst[ dstOffset + 2 ] = z0;
 			dst[ dstOffset + 3 ] = w0;
@@ -45,7 +45,7 @@ class Quaternion {
 
 		if ( t === 1 ) {
 
-			dst[ dstOffset ] = x1;
+			dst[ dstOffset + 0 ] = x1;
 			dst[ dstOffset + 1 ] = y1;
 			dst[ dstOffset + 2 ] = z1;
 			dst[ dstOffset + 3 ] = w1;
