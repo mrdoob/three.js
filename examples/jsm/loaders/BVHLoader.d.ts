@@ -18,6 +18,7 @@ export class BVHLoader extends Loader {
 	animateBoneRotations: boolean;
 
 	load( url: string, onLoad: ( bvh: BVH ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<BVH>;
 	parse( text: string ) : BVH;
 
 }

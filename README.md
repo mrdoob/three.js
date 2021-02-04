@@ -31,7 +31,6 @@ let camera, scene, renderer;
 let geometry, material, mesh;
 
 init();
-animate();
 
 function init() {
 
@@ -48,27 +47,26 @@ function init() {
 
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setAnimationLoop( animation );
 	document.body.appendChild( renderer.domElement );
 
 }
 
-function animate() {
+function animation( time ) {
 
-	requestAnimationFrame( animate );
-
-	mesh.rotation.x += 0.01;
-	mesh.rotation.y += 0.02;
+	mesh.rotation.x = time / 2000;
+	mesh.rotation.y = time / 1000;
 
 	renderer.render( scene, camera );
 
 }
 ```
 
-If everything went well, you should see [this](https://jsfiddle.net/ruc3h17j/).
+If everything went well, you should see [this](https://jsfiddle.net/zdjankqw/).
 
 ### Cloning this repository ###
 
-Cloning the repo with all its history results in a ~2GB download. If you don't need the whole history you can use the `depth` parameter to significantly reduce download size.
+Cloning the repo with all its history results in a ~2 GB download. If you don't need the whole history you can use the `depth` parameter to significantly reduce download size.
 
 ```sh
 git clone --depth=1 https://github.com/mrdoob/three.js.git

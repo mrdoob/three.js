@@ -86,14 +86,14 @@
 
 		<h3>[property:Float autoRotateSpeed]</h3>
 		<p>
-			当[property:Boolean autoRotate]为true时，围绕目标旋转的速度将有多快，默认值为2.0，相当于在60fps时每旋转一次需要30秒。<br>
-			请注意，如果[property:Boolean autoRotate]被启用，你必须在你的动画循环里调用[page:.update]()。
+			当[page:.autoRotate]为true时，围绕目标旋转的速度将有多快，默认值为2.0，相当于在60fps时每旋转一周需要30秒。<br>
+			请注意，如果[page:.autoRotate]被启用，你必须在你的动画循环里调用[page:.update]()。
 		</p>
 
 		<h3>
 			[property:Float dampingFactor]</h3>
 		<p>
-			当[property:Boolean enableDamping]设置为true的时候，阻尼惯性有多大。<br>
+			当[page:.enableDamping]设置为true的时候，阻尼惯性有多大。<br>
 			请注意，要使得这一值生效，你必须在你的动画循环里调用[page:.update]()。
 		</p>
 
@@ -104,18 +104,13 @@
 
 		<h3>[property:Boolean enabled]</h3>
 		<p>
-			When set to *false*, the controls will not respond to user input. Default is *true*.
+			当设置为false时，控制器将不会响应用户的操作。默认值为true。
 		</p>
 
 		<h3>[property:Boolean enableDamping]</h3>
 		<p>
 			将其设置为true以启用阻尼（惯性），这将给控制器带来重量感。默认值为false。<br>
 			请注意，如果该值被启用，你将必须在你的动画循环里调用[page:.update]()。
-		</p>
-
-		<h3>[property:Boolean enableKeys]</h3>
-		<p>
-			启用或禁用键盘控制。
 		</p>
 
 		<h3>[property:Boolean enablePan]</h3>
@@ -156,7 +151,7 @@ controls.keys = {
 
 		<h3>[property:Float maxAzimuthAngle]</h3>
 		<p>
-			How far you can orbit horizontally, upper limit. If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI ). Default is Infinity.
+			你能够水平旋转的角度上限。如果设置，其有效值范围为[-2 * Math.PI，2 * Math.PI]，且旋转角度的上限和下限差值小于2 * Math.PI。默认值为无穷大。
 		</p>
 
 		<h3>[property:Float maxDistance]</h3>
@@ -176,7 +171,7 @@ controls.keys = {
 
 		<h3>[property:Float minAzimuthAngle]</h3>
 		<p>
-			How far you can orbit horizontally, lower limit. If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI ). Default is Infinity.
+			你能够水平旋转的角度下限。如果设置，其有效值范围为[-2 * Math.PI，2 * Math.PI]，且旋转角度的上限和下限差值小于2 * Math.PI。默认值为无穷大。
 		</p>
 
 		<h3>[property:Float minDistance]</h3>
@@ -230,10 +225,8 @@ controls.mouseButtons = {
 		<h3>[property:Boolean screenSpacePanning]</h3>
 		<p>
 			定义当平移的时候摄像机的位置将如何移动。如果为true，摄像机将在屏幕空间内平移。
-			否则，摄像机将在与摄像机向上方向垂直的平面中平移。
-			Defines how the camera's position is translated when panning. If true, the camera pans in screen space.
-			Otherwise, the camera pans in the plane orthogonal to the camera's up direction.
-			Default is true for OrbitControls; false for MapControls.
+			否则，摄像机将在与摄像机向上方向垂直的平面中平移。当使用 OrbitControls 时，
+			默认值为true；当使用 MapControls 时，默认值为false。
 		</p>
 
 		<h3>[property:Vector3 target0]</h3>
@@ -249,7 +242,7 @@ controls.mouseButtons = {
 
 		<h3>[property:Object touches]</h3>
 		<p>
-			This object contains references to the touch actions used by the controls.
+			该对象包含由控件所使用的触摸操作的引用。
 			<code>
 controls.touches = {
 	ONE: THREE.TOUCH.ROTATE,
@@ -266,7 +259,6 @@ controls.touches = {
 		<h3>[property:Float zoomSpeed]</h3>
 		<p>
 			摄像机缩放的速度，其默认值为1。
-			Speed of zooming / dollying. Default is 1.
 		</p>
 
 
@@ -286,6 +278,11 @@ controls.touches = {
 		<h3>[method:radians getPolarAngle] ()</h3>
 		<p>
 			获得当前的垂直旋转，单位为弧度。
+		</p>
+
+		<h3>[method:void listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			为指定的DOM元素添加按键监听。推荐将window作为指定的DOM元素。
 		</p>
 
 		<h3>[method:null reset] ()</h3>

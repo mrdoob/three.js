@@ -1,6 +1,6 @@
-import { Geometry } from './../core/Geometry';
+import { BufferGeometry } from './../core/BufferGeometry';
 
-export class SphereGeometry extends Geometry {
+export class SphereGeometry extends BufferGeometry {
 
 	/**
 	 * @param [radius=50] — sphere radius. Default is 50.
@@ -37,3 +37,5 @@ export class SphereGeometry extends Geometry {
 	};
 
 }
+
+export { SphereGeometry as SphereBufferGeometry };

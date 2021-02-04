@@ -1,12 +1,13 @@
 import {
-	Geometry
+	BufferGeometry
 } from '../../../src/Three';
 
 export class TessellateModifier {
 
-	constructor( maxEdgeLength: number );
+	constructor( maxEdgeLength?: number, maxIterations?: number );
 	maxEdgeLength: number;
+	maxIterations: number;
 
-	modify( geometry: Geometry ): void;
+	modify( geometry: BufferGeometry ): BufferGeometry;
 
 }

@@ -50,7 +50,7 @@ export class Quaternion {
 	/**
 	 * Clones this quaternion.
 	 */
-	clone(): this;
+	clone(): Quaternion;
 
 	/**
 	 * Copies values of q to this quaternion.
@@ -82,7 +82,7 @@ export class Quaternion {
 	/**
 	 * Inverts this quaternion.
 	 */
-	inverse(): Quaternion;
+	invert(): Quaternion;
 
 	conjugate(): Quaternion;
 	dot( v: Quaternion ): number;
@@ -179,5 +179,10 @@ export class Quaternion {
 	 * @deprecated Use {@link Vector#applyQuaternion vector.applyQuaternion( quaternion )} instead.
 	 */
 	multiplyVector3( v: any ): any;
+
+	/**
+	 * @deprecated Use {@link Quaternion#invert .invert()} instead.
+	 */
+	inverse(): Quaternion;
 
 }

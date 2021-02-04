@@ -91,7 +91,7 @@
 
 				for ( let i = 0; i < 5000; i ++ ) {
 
-					let geometry = new THREE.BoxBufferGeometry();
+					let geometry = new THREE.BoxGeometry();
 
 					const position = new THREE.Vector3();
 					position.x = Math.random() * 10000 - 5000;
@@ -143,7 +143,7 @@
 				pickingScene.add( new THREE.Mesh( BufferGeometryUtils.mergeBufferGeometries( geometriesPicking ), pickingMaterial ) );
 
 				highlightBox = new THREE.Mesh(
-					new THREE.BoxBufferGeometry(),
+					new THREE.BoxGeometry(),
 					new THREE.MeshLambertMaterial( { color: 0xffff00 }
 					) );
 				scene.add( highlightBox );

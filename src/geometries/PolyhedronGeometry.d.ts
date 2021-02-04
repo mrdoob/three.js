@@ -1,6 +1,6 @@
-import { Geometry } from './../core/Geometry';
+import { BufferGeometry } from './../core/BufferGeometry';
 
-export class PolyhedronGeometry extends Geometry {
+export class PolyhedronGeometry extends BufferGeometry {
 
 	/**
 	 * @param vertices
@@ -28,3 +28,5 @@ export class PolyhedronGeometry extends Geometry {
 	};
 
 }
+
+export { PolyhedronGeometry as PolyhedronBufferGeometry };

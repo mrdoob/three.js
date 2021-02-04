@@ -115,7 +115,7 @@
 				// drag 'n drop
 				initDragAndDrop();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -237,7 +237,7 @@
 
 						handleEXR( event );
 
-					}, false );
+					} );
 
 					reader.readAsArrayBuffer( file );
 
@@ -249,7 +249,7 @@
 
 						handleJPG( event );
 
-					}, false );
+					} );
 
 					reader.readAsDataURL( file );
 
@@ -264,7 +264,7 @@
 					event.preventDefault();
 					event.dataTransfer.dropEffect = 'copy';
 
-				}, false );
+				} );
 
 				document.addEventListener( 'drop', function ( event ) {
 
@@ -272,7 +272,7 @@
 
 					loadFile( event.dataTransfer.files[ 0 ] );
 
-				}, false );
+				} );
 
 			}
 

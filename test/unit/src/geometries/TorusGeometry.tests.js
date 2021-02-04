@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { TorusBufferGeometry } from '../../../../src/geometries/TorusBufferGeometry';
+import { TorusGeometry, TorusBufferGeometry } from '../../../../src/geometries/TorusGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -19,12 +19,13 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				new TorusBufferGeometry(),
-				new TorusBufferGeometry( parameters.radius ),
-				new TorusBufferGeometry( parameters.radius, parameters.tube ),
-				new TorusBufferGeometry( parameters.radius, parameters.tube, parameters.radialSegments ),
-				new TorusBufferGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments ),
-				new TorusBufferGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments, parameters.arc ),
+				new TorusGeometry(),
+				new TorusGeometry( parameters.radius ),
+				new TorusGeometry( parameters.radius, parameters.tube ),
+				new TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments ),
+				new TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments ),
+				new TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments, parameters.arc ),
+				new TorusBufferGeometry()
 			];
 
 		} );

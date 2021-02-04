@@ -29,7 +29,7 @@ export class Triangle {
 		i1: number,
 		i2: number
 	): Triangle;
-	clone(): this;
+	clone(): Triangle;
 	copy( triangle: Triangle ): this;
 	getArea(): number;
 	getMidpoint( target: Vector3 ): Vector3;

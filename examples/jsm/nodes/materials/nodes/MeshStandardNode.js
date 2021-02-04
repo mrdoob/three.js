@@ -31,7 +31,7 @@ function MeshStandardNode() {
 
 MeshStandardNode.prototype = Object.create( StandardNode.prototype );
 MeshStandardNode.prototype.constructor = MeshStandardNode;
-MeshStandardNode.prototype.nodeType = "MeshStandard";
+MeshStandardNode.prototype.nodeType = 'MeshStandard';
 
 MeshStandardNode.prototype.build = function ( builder ) {
 
@@ -56,7 +56,7 @@ MeshStandardNode.prototype.build = function ( builder ) {
 		var roughness = builder.findNode( props.roughness, inputs.roughness ),
 			roughnessMap = builder.resolve( props.roughnessMap );
 
-		this.roughness = roughnessMap ? new OperatorNode( roughness, new SwitchNode( roughnessMap, "g" ), OperatorNode.MUL ) : roughness;
+		this.roughness = roughnessMap ? new OperatorNode( roughness, new SwitchNode( roughnessMap, 'g' ), OperatorNode.MUL ) : roughness;
 
 		// slots
 		// * metalness
@@ -65,7 +65,7 @@ MeshStandardNode.prototype.build = function ( builder ) {
 		var metalness = builder.findNode( props.metalness, inputs.metalness ),
 			metalnessMap = builder.resolve( props.metalnessMap );
 
-		this.metalness = metalnessMap ? new OperatorNode( metalness, new SwitchNode( metalnessMap, "b" ), OperatorNode.MUL ) : metalness;
+		this.metalness = metalnessMap ? new OperatorNode( metalness, new SwitchNode( metalnessMap, 'b' ), OperatorNode.MUL ) : metalness;
 
 		// slots
 		// * normalMap
@@ -103,7 +103,7 @@ MeshStandardNode.prototype.toJSON = function ( meta ) {
 
 		data = this.createJSONNode( meta );
 
-		console.warn( ".toJSON not implemented in", this );
+		console.warn( '.toJSON not implemented in', this );
 
 	}
 

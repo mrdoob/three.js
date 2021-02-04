@@ -537,7 +537,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "inverse/conjugate", ( assert ) => {
+		QUnit.test( "invert/conjugate", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
 

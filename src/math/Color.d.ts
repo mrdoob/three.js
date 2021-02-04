@@ -9,10 +9,10 @@ export interface HSL {
 /**
  * Represents a color. See also {@link ColorUtils}.
  *
+ * see {@link https://github.com/mrdoob/three.js/blob/master/src/math/Color.js|src/math/Color.js}
+ *
  * @example
  * const color = new THREE.Color( 0xff0000 );
- *
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/Color.js|src/math/Color.js}
  */
 export class Color {
 
@@ -77,7 +77,7 @@ export class Color {
 	/**
 	 * Clones this color.
 	 */
-	clone(): this;
+	clone(): Color;
 
 	/**
 	 * Copies given color.
@@ -156,6 +156,7 @@ export class Color {
 	multiply( color: Color ): this;
 	multiplyScalar( s: number ): this;
 	lerp( color: Color, alpha: number ): this;
+	lerpColors( color1: Color, color2: Color, alpha: number ): this;
 	lerpHSL( color: Color, alpha: number ): this;
 	equals( color: Color ): boolean;
 

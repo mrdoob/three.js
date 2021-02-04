@@ -13,4 +13,6 @@ export class CompressedTextureLoader extends Loader {
 		onError?: ( event: ErrorEvent ) => void
 	): CompressedTexture;
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<CompressedTexture>;
+
 }

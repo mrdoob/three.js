@@ -95,7 +95,7 @@ THREE.CCDIKSolver = ( function () {
 							// don't use getWorldPosition/Quaternion() here for the performance
 							// because they call updateMatrixWorld( true ) inside.
 							link.matrixWorld.decompose( linkPos, invLinkQ, linkScale );
-							invLinkQ.inverse();
+							invLinkQ.invert();
 							effectorPos.setFromMatrixPosition( effector.matrixWorld );
 
 							// work in link world
@@ -257,7 +257,7 @@ THREE.CCDIKSolver = ( function () {
 		this.matrix.copy( mesh.matrixWorld );
 		this.matrixAutoUpdate = false;
 
-		this.sphereGeometry = new THREE.SphereBufferGeometry( 0.25, 16, 8 );
+		this.sphereGeometry = new THREE.SphereGeometry( 0.25, 16, 8 );
 
 		this.targetSphereMaterial = new THREE.MeshBasicMaterial( {
 			color: new THREE.Color( 0xff8888 ),
@@ -332,7 +332,7 @@ THREE.CCDIKSolver = ( function () {
 					var iks = this.iks;
 					var bones = mesh.skeleton.bones;
 
-					matrix.getInverse( mesh.matrixWorld );
+					matrix.copy( mesh.matrixWorld ).invert();
 
 					for ( var i = 0, il = iks.length; i < il; i ++ ) {
 

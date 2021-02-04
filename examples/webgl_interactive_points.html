@@ -57,6 +57,8 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
+
 			let renderer, scene, camera, stats;
 
 			let particles;
@@ -80,19 +82,25 @@
 
 				//
 
-				const vertices = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 ).vertices;
+				let boxGeometry = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 );
 
-				const positions = new Float32Array( vertices.length * 3 );
-				const colors = new Float32Array( vertices.length * 3 );
-				const sizes = new Float32Array( vertices.length );
+				// if normal and uv attributes are not removed, mergeVertices() can't consolidate indentical vertices with different normal/uv data
 
-				let vertex;
+				boxGeometry.deleteAttribute( 'normal' );
+				boxGeometry.deleteAttribute( 'uv' );
+
+				boxGeometry = BufferGeometryUtils.mergeVertices( boxGeometry );
+
+				//
+
+				const positionAttribute = boxGeometry.getAttribute( 'position' );
+
+				const colors = [];
+				const sizes = [];
+
 				const color = new THREE.Color();
 
-				for ( let i = 0, l = vertices.length; i < l; i ++ ) {
-
-					vertex = vertices[ i ];
-					vertex.toArray( positions, i * 3 );
+				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
 
 					color.setHSL( 0.01 + 0.1 * ( i / l ), 1.0, 0.5 );
 					color.toArray( colors, i * 3 );
@@ -102,9 +110,9 @@
 				}
 
 				const geometry = new THREE.BufferGeometry();
-				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.setAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
-				geometry.setAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
+				geometry.setAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'customColor', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ) );
 
 				//
 
@@ -112,7 +120,7 @@
 
 					uniforms: {
 						color: { value: new THREE.Color( 0xffffff ) },
-						pointTexture: { value: new THREE.TextureLoader().load( "textures/sprites/disc.png" ) }
+						pointTexture: { value: new THREE.TextureLoader().load( 'textures/sprites/disc.png' ) }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
@@ -145,8 +153,8 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			}
 

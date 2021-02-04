@@ -19,6 +19,7 @@ export class WebXRManager extends EventDispatcher {
 
 	getController( id: number ): Group;
 	getControllerGrip( id: number ): Group;
+	getHand( id: number ): Group;
 	setFramebufferScaleFactor( value: number ): void;
 	setReferenceSpaceType( value: XRReferenceSpaceType ): void;
 	getReferenceSpace(): XRReferenceSpace;

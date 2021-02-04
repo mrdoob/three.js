@@ -1,13 +1,14 @@
 import {
 	BackSide,
-	BoxBufferGeometry,
+	BoxGeometry,
 	Mesh,
 	PerspectiveCamera,
 	Scene,
 	ShaderLib,
-	ShaderMaterial
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
+	ShaderMaterial,
+	UniformsUtils
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
 
 var CubeTexturePass = function ( camera, envMap, opacity ) {
 
@@ -19,9 +20,9 @@ var CubeTexturePass = function ( camera, envMap, opacity ) {
 
 	this.cubeShader = ShaderLib[ 'cube' ];
 	this.cubeMesh = new Mesh(
-		new BoxBufferGeometry( 10, 10, 10 ),
+		new BoxGeometry( 10, 10, 10 ),
 		new ShaderMaterial( {
-			uniforms: this.cubeShader.uniforms,
+			uniforms: UniformsUtils.clone( this.cubeShader.uniforms ),
 			vertexShader: this.cubeShader.vertexShader,
 			fragmentShader: this.cubeShader.fragmentShader,
 			depthTest: false,
@@ -62,6 +63,7 @@ CubeTexturePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.cubeCamera.quaternion.setFromRotationMatrix( this.camera.matrixWorld );
 
 		this.cubeMesh.material.uniforms.envMap.value = this.envMap;
+		this.cubeMesh.material.uniforms.flipEnvMap.value = ( this.envMap.isCubeTexture && this.envMap._needsFlipEnvMap ) ? - 1 : 1;
 		this.cubeMesh.material.uniforms.opacity.value = this.opacity;
 		this.cubeMesh.material.transparent = ( this.opacity < 1.0 );
 

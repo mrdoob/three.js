@@ -3,7 +3,7 @@ import { Color } from './../math/Color';
 export interface IFog {
 	name: string;
 	color: Color;
-	clone(): this;
+	clone(): IFog;
 	toJSON(): any;
 }
 
@@ -38,7 +38,7 @@ export class Fog implements IFog {
 
 	readonly isFog: true;
 
-	clone(): this;
+	clone(): Fog;
 	toJSON(): any;
 
 }

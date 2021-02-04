@@ -78,7 +78,7 @@
 				controls.target.set( 0, 1.6, 0 );
 				controls.update();
 
-				const floorGeometry = new THREE.PlaneBufferGeometry( 4, 4 );
+				const floorGeometry = new THREE.PlaneGeometry( 4, 4 );
 				const floorMaterial = new THREE.MeshStandardMaterial( {
 					color: 0xeeeeee,
 					roughness: 1.0,
@@ -111,7 +111,7 @@
 					const w = 0.1;
 					const h = 0.1;
 					const minH = 1;
-					const geometry = new THREE.BoxBufferGeometry( w, h * i + minH, w );
+					const geometry = new THREE.BoxGeometry( w, h * i + minH, w );
 					const material = new THREE.MeshStandardMaterial( {
 						color: new THREE.Color( intensity, 0.1, 0.1 ),
 						roughness: 0.7,
@@ -173,7 +173,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

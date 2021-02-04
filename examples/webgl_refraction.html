@@ -43,7 +43,7 @@
 
 				// mesh
 
-				const geometry = new THREE.TorusKnotBufferGeometry( 3, 1, 256, 32 );
+				const geometry = new THREE.TorusKnotGeometry( 3, 1, 256, 32 );
 				const material = new THREE.MeshStandardMaterial( { color: 0x6083c2 } );
 
 				const mesh = new THREE.Mesh( geometry, material );
@@ -51,7 +51,7 @@
 
 				// refractor
 
-				const refractorGeometry = new THREE.PlaneBufferGeometry( 10, 10 );
+				const refractorGeometry = new THREE.PlaneGeometry( 10, 10 );
 
 				refractor = new Refractor( refractorGeometry, {
 					color: 0x999999,
@@ -100,11 +100,11 @@
 
 				//
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

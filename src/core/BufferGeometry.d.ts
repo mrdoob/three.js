@@ -4,9 +4,6 @@ import { Sphere } from './../math/Sphere';
 import { Matrix4 } from './../math/Matrix4';
 import { Vector2 } from './../math/Vector2';
 import { Vector3 } from './../math/Vector3';
-import { Object3D } from './Object3D';
-import { Geometry } from './Geometry';
-import { DirectGeometry } from './DirectGeometry';
 import { EventDispatcher } from './EventDispatcher';
 import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
 
@@ -15,7 +12,7 @@ import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
  * It reduces memory costs and cpu cycles. But it is not as easy to work with because of all the necessary buffer calculations.
  * It is mainly interesting when working with static objects.
  *
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/BufferGeometry.js|src/core/BufferGeometry.js}
+ * see {@link https://github.com/mrdoob/three.js/blob/master/src/core/BufferGeometry.js|src/core/BufferGeometry.js}
  */
 export class BufferGeometry extends EventDispatcher {
 
@@ -98,6 +95,7 @@ export class BufferGeometry extends EventDispatcher {
 	setAttribute( name: string, attribute: BufferAttribute | InterleavedBufferAttribute ): BufferGeometry;
 	getAttribute( name: string ): BufferAttribute | InterleavedBufferAttribute;
 	deleteAttribute( name: string ): BufferGeometry;
+	hasAttribute( name: string ): boolean;
 
 	addGroup( start: number, count: number, materialIndex?: number ): void;
 	clearGroups(): void;
@@ -118,13 +116,7 @@ export class BufferGeometry extends EventDispatcher {
 
 	center(): BufferGeometry;
 
-	setFromObject( object: Object3D ): BufferGeometry;
 	setFromPoints( points: Vector3[] | Vector2[] ): BufferGeometry;
-	updateFromObject( object: Object3D ): void;
-
-	fromGeometry( geometry: Geometry, settings?: any ): BufferGeometry;
-
-	fromDirectGeometry( geometry: DirectGeometry ): BufferGeometry;
 
 	/**
 	 * Computes bounding box of the geometry, updating Geometry.boundingBox attribute.
@@ -139,6 +131,11 @@ export class BufferGeometry extends EventDispatcher {
 	computeBoundingSphere(): void;
 
 	/**
+	 * Computes and adds tangent attribute to this geometry.
+	 */
+	computeTangents(): void;
+
+	/**
 	 * Computes vertex normals by averaging face normals.
 	 */
 	computeVertexNormals(): void;
@@ -149,7 +146,7 @@ export class BufferGeometry extends EventDispatcher {
 	toNonIndexed(): BufferGeometry;
 
 	toJSON(): any;
-	clone(): this;
+	clone(): BufferGeometry;
 	copy( source: BufferGeometry ): this;
 
 	/**

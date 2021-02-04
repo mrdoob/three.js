@@ -84,13 +84,13 @@
 
 		<h2>Properties</h2>
 
-		<h3>[property:float far]</h3>
+		<h3>[property:Float far]</h3>
 		<p>
 		The far factor of the raycaster. This value indicates which objects can be discarded based on the distance.
 		This value shouldn't be negative and should be larger than the near property.
 		</p>
 
-		<h3>[property:float near]</h3>
+		<h3>[property:Float near]</h3>
 		<p>
 		The near factor of the raycaster. This value indicates which objects can be discarded based on the distance.
 		This value shouldn't be negative and should be smaller than the far property.
@@ -145,7 +145,7 @@
 		[page:Vector3 direction] — The normalized direction vector that gives direction to the ray.
 		</p>
 		<p>
-		Updates the ray with a new origin and direction.
+		Updates the ray with a new origin and direction. Please note that this method only copies the values from the arguments.
 		</p>
 
 		<h3>[method:null setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
@@ -172,7 +172,7 @@
 		<p>
 			[page:Float distance] – distance between the origin of the ray and the intersection<br />
 			[page:Vector3 point] – point of intersection, in world coordinates<br />
-			[page:Face3 face] – intersected face<br />
+			[page:Object face] – intersected face<br />
 			[page:Integer faceIndex] – index of the intersected face<br />
 			[page:Object3D object] – the intersected object<br />
 			[page:Vector2 uv] - U,V coordinates at point of intersection<br />

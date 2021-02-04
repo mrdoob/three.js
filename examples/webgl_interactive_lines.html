@@ -51,7 +51,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				const geometry = new THREE.SphereBufferGeometry( 5 );
+				const geometry = new THREE.SphereGeometry( 5 );
 				const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 
 				sphereInter = new THREE.Mesh( geometry, material );
@@ -136,11 +136,11 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

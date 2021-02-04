@@ -10,6 +10,7 @@ export class LDrawLoader extends Loader {
 	constructor( manager?: LoadingManager );
 
 	load( url: string, onLoad: ( data: Group ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<Group>;
 	setFileMap( fileMap: Record<string, string> ): void;
 	setMaterials( materials: Material[] ): void;
 

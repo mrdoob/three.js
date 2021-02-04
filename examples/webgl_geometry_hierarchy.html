@@ -33,7 +33,7 @@
 				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
 
-				const geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
+				const geometry = new THREE.BoxGeometry( 100, 100, 100 );
 				const material = new THREE.MeshNormalMaterial();
 
 				group = new THREE.Group();
@@ -71,11 +71,11 @@
 
 				//
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

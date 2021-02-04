@@ -76,7 +76,7 @@
 				loader.load( "models/nrrd/I.nrrd", function ( volume ) {
 
 					//box helper to see the extend of the volume
-					const geometry = new THREE.BoxBufferGeometry( volume.xLength, volume.yLength, volume.zLength );
+					const geometry = new THREE.BoxGeometry( volume.xLength, volume.yLength, volume.zLength );
 					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 					const cube = new THREE.Mesh( geometry, material );
 					cube.visible = false;
@@ -180,7 +180,7 @@
 
 				setupInset();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

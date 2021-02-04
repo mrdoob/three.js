@@ -1,6 +1,6 @@
-import { Geometry } from './../core/Geometry';
+import { PolyhedronGeometry } from './PolyhedronGeometry';
 
-export class OctahedronGeometry extends Geometry {
+export class OctahedronGeometry extends PolyhedronGeometry {
 
 	/**
 	 * @param [radius=1]
@@ -14,3 +14,5 @@ export class OctahedronGeometry extends Geometry {
 	type: string;
 
 }
+
+export { OctahedronGeometry as OctahedronBufferGeometry };

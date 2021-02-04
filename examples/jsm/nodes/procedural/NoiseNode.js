@@ -12,17 +12,17 @@ function NoiseNode( uv ) {
 
 NoiseNode.prototype = Object.create( TempNode.prototype );
 NoiseNode.prototype.constructor = NoiseNode;
-NoiseNode.prototype.nodeType = "Noise";
+NoiseNode.prototype.nodeType = 'Noise';
 
 NoiseNode.Nodes = ( function () {
 
 	var snoise = new FunctionNode( [
-		"float snoise(vec2 co) {",
+		'float snoise(vec2 co) {',
 
-		"	return fract( sin( dot( co.xy, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );",
+		'	return fract( sin( dot( co.xy, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );',
 
-		"}"
-	].join( "\n" ) );
+		'}'
+	].join( '\n' ) );
 
 	return {
 		snoise: snoise

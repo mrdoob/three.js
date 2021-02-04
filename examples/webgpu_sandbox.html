@@ -19,6 +19,16 @@
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
 			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
 
+			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
+			import FloatNode from './jsm/renderers/nodes/inputs/FloatNode.js';
+			import Vector2Node from './jsm/renderers/nodes/inputs/Vector2Node.js';
+			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
+			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
+			import UVNode from './jsm/renderers/nodes/accessors/UVNode.js';
+			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
+			import SwitchNode from './jsm/renderers/nodes/utils/SwitchNode.js';
+			import TimerNode from './jsm/renderers/nodes/utils/TimerNode.js';
+
 			let camera, scene, renderer;
 
 			let box;
@@ -45,9 +55,31 @@
 
 				const textureLoader = new THREE.TextureLoader();
 				const texture = textureLoader.load( './textures/uv_grid_opengl.jpg' );
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+				texture.name = 'uv_grid';
 
-				const geometryBox = new THREE.BoxBufferGeometry();
+				// compressed texture
+
+				const ddsLoader = new DDSLoader();
+				const dxt5Texture = ddsLoader.load( './textures/compressed/explosion_dxt5_mip.dds' );
+
+				//
+
+				const geometryBox = new THREE.BoxGeometry();
 				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
+
+				const timerNode = new TimerNode();
+
+				// birection speed
+				const timerScaleNode = new OperatorNode( '*', timerNode, new Vector2Node( new THREE.Vector2( - 0.5, 0.1 ) ).setConst( true ) );
+				const animateUV = new OperatorNode( '+', new UVNode(), timerScaleNode );
+
+				materialBox.colorNode = new TextureNode( texture, animateUV );
+
+				// test uv 2
+				//geometryBox.setAttribute( 'uv2', geometryBox.getAttribute( 'uv' ) );
+				//materialBox.colorNode = new TextureNode( texture, new UVNode( 1 ) );
 
 				box = new THREE.Mesh( geometryBox, materialBox );
 				box.position.set( 0, 1, 0 );
@@ -56,7 +88,10 @@
 				// data texture
 
 				const geometryPlane = new THREE.PlaneBufferGeometry();
-				const materialPlane = new THREE.MeshBasicMaterial( { map: createDataTexture(), transparent: true, opacity: 0.5 } );
+				const materialPlane = new THREE.MeshBasicMaterial();
+				materialPlane.colorNode = new OperatorNode( '+', new TextureNode( createDataTexture() ), new ColorNode( new THREE.Color( 0x0000FF ) ) );
+				materialPlane.opacityNode = new SwitchNode( new TextureNode( dxt5Texture ), 'a' );
+				materialPlane.transparent = true;
 
 				const plane = new THREE.Mesh( geometryPlane, materialPlane );
 				plane.position.set( 0, - 1, 0 );
@@ -64,10 +99,9 @@
 
 				// compressed texture
 
-				const ddsLoader = new DDSLoader();
-				const dxt5Texture = ddsLoader.load( './textures/compressed/explosion_dxt5_mip.dds' );
-
-				const materialCompressed = new THREE.MeshBasicMaterial( { map: dxt5Texture, transparent: true } );
+				const materialCompressed = new THREE.MeshBasicMaterial();
+				materialCompressed.colorNode = new TextureNode( dxt5Texture );
+				materialCompressed.transparent = true;
 
 				const boxCompressed = new THREE.Mesh( geometryBox, materialCompressed );
 				boxCompressed.position.set( - 2, 1, 0 );
@@ -87,6 +121,10 @@
 				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
 				const materialPoints = new THREE.PointsMaterial();
 
+				geometryPoints.setAttribute( 'color', geometryPoints.getAttribute( 'position' ) );
+
+				materialPoints.colorNode = new OperatorNode( '*', new AttributeNode( 'vec3', 'color' ), new FloatNode( 3 ).setConst( true ) );
+
 				const pointCloud = new THREE.Points( geometryPoints, materialPoints );
 				pointCloud.position.set( 2, - 1, 0 );
 				scene.add( pointCloud );
@@ -99,7 +137,12 @@
 					new THREE.Vector3( 0.5, 0.5, 0 ),
 					new THREE.Vector3( - 0.5, 0.5, 0 )
 				] );
+
+				geometryLine.setAttribute( 'color', geometryLine.getAttribute( 'position' ) );
+
 				const materialLine = new THREE.LineBasicMaterial();
+				materialLine.colorNode = new AttributeNode( 'vec3', 'color' );
+
 				const line = new THREE.Line( geometryLine, materialLine );
 				line.position.set( 2, 1, 0 );
 				scene.add( line );
@@ -111,7 +154,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				return renderer.init();
 

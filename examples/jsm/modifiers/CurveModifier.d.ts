@@ -1,16 +1,13 @@
-import { Geometry, Material, Mesh, Spline } from '../../../build/three.module';
 import {
 	DataTexture,
 	Curve,
 	Uniform,
 	Material,
-	InstancedMesh
+	InstancedMesh,
+	Geometry,
+	Mesh,
+	Vector3
 } from '../../../src/Three';
-import { Flow } from './CurveModifier';
-import { modifyShader } from './CurveModifier';
-import { getUniforms } from './CurveModifier';
-import { updateSplineTexture } from './CurveModifier';
-import { initSplineTexture } from "./CurveModifier";
 
 interface SplineUniform {
 	spineTexture: Uniform,
@@ -20,31 +17,35 @@ interface SplineUniform {
 	Uniform,
 	flow: Uniform,
 }
-export function initSplineTexture(size?: number): DataTexture;
+export function initSplineTexture( size?: number ): DataTexture;
 
-export function updateSplineTexture(texture: DataTexture, splineCurve: Curve, offset?: number);
+export function updateSplineTexture( texture: DataTexture, splineCurve: Curve<Vector3>, offset?: number );
 
-export function getUniforms(splineTexture: DataTexture): SplineUniform;
+export function getUniforms( splineTexture: DataTexture ): SplineUniform;
 
-export function modifyShader(material: Material, uniforms: SplineUniform, numberOfCurves?: number);
+export function modifyShader( material: Material, uniforms: SplineUniform, numberOfCurves?: number );
 
 export class Flow {
-	constructor(mesh: Mesh, numberOfCurves?: number);
+
+	constructor( mesh: Mesh, numberOfCurves?: number );
 	curveArray: number[];
 	curveLengthArray: number[];
 	object3D: Mesh;
 	splineTexure: DataTexture;
 	uniforms: SplineUniform;
-	updateCurve(index: number, curve: Curve);
-	moveAlongCurve(amount: number);
+	updateCurve( index: number, curve: Curve<Vector3> );
+	moveAlongCurve( amount: number );
+
 }
 
 export class InstancedFlow extends Flow {
-	constructor(count:Number, curveCount:Number, geometry: Geometry, material: Material);
+
+	constructor( count: Number, curveCount: Number, geometry: Geometry, material: Material );
 	object3D: InstancedMesh;
 	offsets: number[];
 	whichCurve: number[];
 
-	moveIndividualAlongCurve(index: number, offset: number);
+	moveIndividualAlongCurve( index: number, offset: number );
 	setCurve( index: number, curveNo: number )
+
 }

@@ -47,7 +47,7 @@ function ViewHelper( editorCamera, container ) {
 	var camera = new THREE.OrthographicCamera( - 2, 2, 2, - 2, 0, 4 );
 	camera.position.set( 0, 0, 2 );
 
-	var geometry = new THREE.BoxBufferGeometry( 0.8, 0.05, 0.05 ).translate( 0.4, 0, 0 );
+	var geometry = new THREE.BoxGeometry( 0.8, 0.05, 0.05 ).translate( 0.4, 0, 0 );
 
 	var xAxis = new THREE.Mesh( geometry, getAxisMaterial( color1 ) );
 	var yAxis = new THREE.Mesh( geometry, getAxisMaterial( color2 ) );
@@ -103,7 +103,7 @@ function ViewHelper( editorCamera, container ) {
 
 	this.render = function ( renderer ) {
 
-		this.quaternion.copy( editorCamera.quaternion ).inverse();
+		this.quaternion.copy( editorCamera.quaternion ).invert();
 		this.updateMatrixWorld();
 
 		point.set( 0, 0, 1 );

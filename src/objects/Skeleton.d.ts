@@ -6,21 +6,25 @@ export class Skeleton {
 
 	constructor( bones: Bone[], boneInverses?: Matrix4[] );
 
-	/**
-	 * @deprecated This property has been removed completely.
-	 */
-	useVertexTexture: boolean;
+	uuid: string;
 	bones: Bone[];
-	boneMatrices: Float32Array;
-	boneTexture: undefined | DataTexture;
 	boneInverses: Matrix4[];
+	boneMatrices: Float32Array;
+	boneTexture: null | DataTexture;
+	boneTextureSize: number;
+	frame: number;
 
-	calculateInverses( bone: Bone ): void;
+	init(): void;
+	calculateInverses(): void;
 	pose(): void;
 	update(): void;
 	clone(): Skeleton;
 	getBoneByName( name: string ): undefined | Bone;
+	dispose() :void;
 
-	dispose() :void ;
+	/**
+	 * @deprecated This property has been removed completely.
+	 */
+	useVertexTexture: boolean;
 
 }

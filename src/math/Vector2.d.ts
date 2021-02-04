@@ -1,6 +1,8 @@
 import { Matrix3 } from './Matrix3';
 import { BufferAttribute } from './../core/BufferAttribute';
 
+type Vector2tuple = [number, number];
+
 /**
  * ( interface Vector<T> )
  *
@@ -126,7 +128,7 @@ export interface Vector {
 	/**
 	 * clone():T;
 	 */
-	clone(): this;
+	clone(): Vector;
 }
 
 /**
@@ -184,7 +186,7 @@ export class Vector2 implements Vector {
 	/**
 	 * Returns a new Vector2 instance with the same `x` and `y` values.
 	 */
-	clone(): this;
+	clone(): Vector2;
 
 	/**
 	 * Copies value of v to this vector.
@@ -339,9 +341,9 @@ export class Vector2 implements Vector {
 	/**
 	 * Computes the Manhattan length of this vector.
 	 *
-	 * @return {number}
+	 * see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
 	 *
-	 * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
+	 * @return {number}
 	 */
 	manhattanLength(): number;
 
@@ -373,11 +375,11 @@ export class Vector2 implements Vector {
 	/**
 	 * Computes the Manhattan length (distance) from this vector to the given vector v
 	 *
+	 * see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
+	 *
 	 * @param {Vector2} v
 	 *
 	 * @return {number}
-	 *
-	 * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
 	 */
 	manhattanDistanceTo( v: Vector2 ): number;
 
@@ -427,6 +429,7 @@ export class Vector2 implements Vector {
 	 * @return The created or provided array.
 	 */
 	toArray( array?: number[], offset?: number ): number[];
+	toArray( array?: Vector2tuple, offset?: 0 ): Vector2tuple;
 
 	/**
 	 * Copies x and y into the provided array-like.

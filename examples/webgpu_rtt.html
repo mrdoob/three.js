@@ -15,11 +15,17 @@
 			import * as THREE from '../build/three.module.js';
 
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPUTextureRenderer from './jsm/renderers/webgpu/WebGPUTextureRenderer.js';
 			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
 
-			let camera, scene, renderer;
+			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
+			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
+			import Vector2Node from './jsm/renderers/nodes/inputs/Vector2Node.js';
 
-			let cameraFX, sceneFX, renderTarget;
+			let camera, scene, renderer;
+			const mouse = new THREE.Vector2();
+
+			let cameraFX, sceneFX, textureRenderer;
 
 			let box;
 
@@ -49,7 +55,10 @@
 				const texture = loader.load( './textures/uv_grid_opengl.jpg' );
 
 				const geometryBox = new THREE.BoxBufferGeometry();
-				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
+				const materialBox = new THREE.MeshBasicMaterial();
+				materialBox.colorNode = new TextureNode( texture );
+
+				//
 
 				box = new THREE.Mesh( geometryBox, materialBox );
 				scene.add( box );
@@ -61,10 +70,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				// @TODO Rename WebGLRenderTarget to RenderTarget? Or introduce WebGPURenderTarget?
+				textureRenderer = new WebGPUTextureRenderer( renderer );
+				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 
-				renderTarget = new THREE.WebGLRenderTarget( window.innerWidth * dpr, window.innerHeight * dpr );
-
+				window.addEventListener( 'mousemove', onWindowMouseMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				// FX
@@ -72,11 +81,14 @@
 				cameraFX = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 				sceneFX = new THREE.Scene();
 
-				const geometryFX = new THREE.PlaneBufferGeometry( 2, 2 );
+				const geometryFX = new THREE.PlaneGeometry( 2, 2 );
 
-				// @TODO Until NodeMaterial is available just copy the beauty pass to screen
+				// modulate the final color based on the mouse position
 
-				const materialFX = new THREE.MeshBasicMaterial( { map: renderTarget.texture } );
+				const screenFXNode = new OperatorNode( '+', new Vector2Node( mouse ), new Vector2Node( new THREE.Vector2( 0.5, 0.5 ) ).setConst( true ) );
+
+				const materialFX = new THREE.MeshBasicMaterial();
+				materialFX.colorNode = new OperatorNode( '*', new TextureNode( textureRenderer.getTexture() ), screenFXNode );
 
 				const quad = new THREE.Mesh( geometryFX, materialFX );
 				sceneFX.add( quad );
@@ -87,13 +99,20 @@
 
 			}
 
+			function onWindowMouseMove( e ) {
+
+				mouse.x = e.offsetX / screen.width;
+				mouse.y = e.offsetY / screen.height;
+
+			}
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderTarget.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
+				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 
 			}
 
@@ -104,10 +123,7 @@
 				box.rotation.x += 0.01;
 				box.rotation.y += 0.02;
 
-				renderer.setRenderTarget( renderTarget );
-				renderer.render( scene, camera );
-
-				renderer.setRenderTarget( null );
+				textureRenderer.render( scene, camera );
 				renderer.render( sceneFX, cameraFX );
 
 			}

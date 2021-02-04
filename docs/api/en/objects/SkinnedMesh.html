@@ -37,7 +37,7 @@
 		<h2>Code Example</h2>
 
 		<code>
-		const geometry = new THREE.CylinderBufferGeometry( 5, 5, 5, 5, 15, 5, 30 );
+		const geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
 
 		// create the skin indices and skin weights
 
@@ -90,18 +90,14 @@
 		<h2>Constructor</h2>
 		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
 		<p>
-		[page:Geometry geometry] - an instance of [page:BufferGeometry].<br />
+		[page:BufferGeometry geometry] - an instance of [page:BufferGeometry].<br />
 		[page:Material material] - (optional) an instance of [page:Material]. Default is a new [page:MeshBasicMaterial].
 		</p>
-
-
-
-
 
 		<h2>Properties</h2>
 		<p>See the base [page:Mesh] class for common properties.</p>
 
-		<h3>[property:string bindMode]</h3>
+		<h3>[property:String bindMode]</h3>
 		<p>
 		Either "attached" or "detached". "attached" uses the [page:SkinnedMesh.matrixWorld]
 		property for the base transform	matrix of the bones. "detached" uses the

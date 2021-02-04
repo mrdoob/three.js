@@ -15,6 +15,7 @@ export class ObjectLoader extends Loader {
 		onProgress?: ( event: ProgressEvent ) => void,
 		onError?: ( event: Error | ErrorEvent ) => void
 	): void;
+	loadAsync<ObjectType extends Object3D>( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<ObjectType>;
 	parse<T extends Object3D>( json: any, onLoad?: ( object: Object3D ) => void ): T;
 	parseGeometries( json: any ): any[]; // Array of BufferGeometry or Geometry or Geometry2.
 	parseMaterials( json: any, textures: Texture[] ): Material[]; // Array of Classes that inherits from Matrial.
@@ -27,7 +28,8 @@ export class ObjectLoader extends Loader {
 	parseObject<T extends Object3D>(
 		data: any,
 		geometries: any[],
-		materials: Material[]
+		materials: Material[],
+		animations: AnimationClip[]
 	): T;
 
 }

@@ -19,8 +19,6 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - draco<br/><br/>
-			<button id="createGeometry">Geometry</button>
-			<button id="createBufferGeometry">BufferGeometry</button> |
 			<button id="exportFile">Export DRC</button>
 		</div>
 
@@ -37,32 +35,6 @@
 
 			init();
 			animate();
-
-			function createBufferGeometry() {
-
-				scene.remove( mesh );
-
-				const geometry = new THREE.TorusKnotBufferGeometry( 50, 15, 200, 30 );
-				const material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.castShadow = true;
-				mesh.position.y = 25;
-				scene.add( mesh );
-
-			}
-
-			function createGeometry() {
-
-				scene.remove( mesh );
-
-				const geometry = new THREE.TorusKnotGeometry( 50, 15, 200, 30 );
-				const material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.castShadow = true;
-				mesh.position.y = 25;
-				scene.add( mesh );
-
-			}
 
 			function init() {
 
@@ -93,7 +65,7 @@
 				// ground
 
 				const ground = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 2000, 2000 ),
+					new THREE.PlaneGeometry( 2000, 2000 ),
 					new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } )
 				);
 				ground.rotation.x = - Math.PI / 2;
@@ -109,7 +81,7 @@
 
 				// export mesh
 
-				const geometry = new THREE.TorusKnotBufferGeometry( 50, 15, 200, 30 );
+				const geometry = new THREE.TorusKnotGeometry( 50, 15, 200, 30 );
 				const material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
@@ -132,13 +104,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
-
-				const createGeometryButton = document.getElementById( 'createGeometry' );
-				createGeometryButton.addEventListener( 'click', createGeometry );
-
-				const createBufferGeometryButton = document.getElementById( 'createBufferGeometry' );
-				createBufferGeometryButton.addEventListener( 'click', createBufferGeometry );
+				window.addEventListener( 'resize', onWindowResize );
 
 				const exportButton = document.getElementById( 'exportFile' );
 				exportButton.addEventListener( 'click', exportFile );
@@ -163,7 +129,7 @@
 
 			function exportFile() {
 
-				const result = exporter.parse( mesh.geometry );
+				const result = exporter.parse( mesh );
 				saveArrayBuffer( result, 'file.drc' );
 
 			}
