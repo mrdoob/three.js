@@ -57,11 +57,11 @@ class Texture extends EventDispatcher {
 		this.matrixAutoUpdate = true;
 		this.matrix = new Matrix3();
 
-    // Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
-    //
-    // Also changing the encoding after already used by a Material will not automatically make the Material
-    // update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
-    this.encoding = encoding;
+		// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
+		//
+		// Also changing the encoding after already used by a Material will not automatically make the Material
+		// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
+		this.encoding = encoding;
 
 		this.generateMipmaps = true;
 		this.premultiplyAlpha = false;
@@ -334,39 +334,40 @@ class Texture extends EventDispatcher {
 
 	}
 
-  serializeImage( image ) {
+	serializeImage( image ) {
 
-    if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+		if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
       ( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
       ( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
-      // default images
+			// default images
 
-      return ImageUtils.getDataURL( image );
+			return ImageUtils.getDataURL( image );
 
-    } else {
+		} else {
 
-      if ( image.data ) {
+			if ( image.data ) {
 
-        // images of DataTexture
+				// images of DataTexture
 
-        return {
-          data: Array.prototype.slice.call( image.data ),
-          width: image.width,
-          height: image.height,
-          type: image.data.constructor.name
-        };
+				return {
+					data: Array.prototype.slice.call( image.data ),
+					width: image.width,
+					height: image.height,
+					type: image.data.constructor.name
+				};
 
-      } else {
+			} else {
 
-        console.warn( 'THREE.Texture: Unable to serialize Texture.' );
-        return {};
+				console.warn( 'THREE.Texture: Unable to serialize Texture.' );
+				return {};
 
-      }
+			}
 
-    }
+		}
 
-  }
+	}
+
 }
 
 export { Texture };
