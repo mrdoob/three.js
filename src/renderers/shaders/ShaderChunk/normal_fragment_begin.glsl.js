@@ -8,37 +8,39 @@ vec3 fdy = vec3( dFdy( vViewPosition.x ), dFdy( vViewPosition.y ), dFdy( vViewPo
 
 	vec3 normal = normalize( cross( fdx, fdy ) );
 
+	bool isFrontFacing = dot( vec3( 0, 0, 1 ), normalize( cross( fdx, fdy ) ) ) > 0.0;
+
 #else
 
 	vec3 normal = normalize( vNormal );
 
-#endif
+	// Workaround for Adreno GPUs gl_FrontFacing bug. See #10331 and #15850.
 
-// Workaround for Adreno GPUs gl_FrontFacing bug. See #10331 and #15850.
-
-bool isFrontFacing = dot( normal, normalize( cross( fdx, fdy ) ) ) > 0.0;
-
-#ifdef DOUBLE_SIDED
-
-	normal = normal * ( float( isFrontFacing ) * 2.0 - 1.0 );
-
-#endif
-
-#ifdef USE_TANGENT
-
-	vec3 tangent = normalize( vTangent );
-	vec3 bitangent = normalize( vBitangent );
+	bool isFrontFacing = dot( normal, normalize( cross( fdx, fdy ) ) ) > 0.0;
 
 	#ifdef DOUBLE_SIDED
 
-		tangent = tangent * ( float( isFrontFacing ) * 2.0 - 1.0 );
-		bitangent = bitangent * ( float( isFrontFacing ) * 2.0 - 1.0 );
+		normal = normal * ( float( isFrontFacing ) * 2.0 - 1.0 );
 
 	#endif
 
-	#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP )
+	#ifdef USE_TANGENT
 
-		mat3 vTBN = mat3( tangent, bitangent, normal );
+		vec3 tangent = normalize( vTangent );
+		vec3 bitangent = normalize( vBitangent );
+
+		#ifdef DOUBLE_SIDED
+
+			tangent = tangent * ( float( isFrontFacing ) * 2.0 - 1.0 );
+			bitangent = bitangent * ( float( isFrontFacing ) * 2.0 - 1.0 );
+
+		#endif
+
+		#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP )
+
+			mat3 vTBN = mat3( tangent, bitangent, normal );
+
+		#endif
 
 	#endif
 
