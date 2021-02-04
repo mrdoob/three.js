@@ -22,7 +22,7 @@ export default /* glsl */`
 
 	}
 
-	vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {
+	vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy, bool isFrontFacing ) {
 
 		// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
@@ -35,7 +35,7 @@ export default /* glsl */`
 
 		float fDet = dot( vSigmaX, R1 );
 
-		fDet *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+		fDet *= ( float( isFrontFacing ) * 2.0 - 1.0 );
 
 		vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );
 		return normalize( abs( fDet ) * surf_norm - vGrad );

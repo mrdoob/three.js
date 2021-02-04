@@ -17,7 +17,7 @@ export default /* glsl */`
 	// Per-Pixel Tangent Space Normal Mapping
 	// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
 
-	vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 mapN ) {
+	vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 mapN, bool isFrontFacing ) {
 
 		// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
@@ -34,7 +34,7 @@ export default /* glsl */`
 
 		mat3 tsn = mat3( S, T, N );
 
-		mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+		mapN.xy *= ( float( isFrontFacing ) * 2.0 - 1.0 );
 
 		return normalize( tsn * mapN );
 
