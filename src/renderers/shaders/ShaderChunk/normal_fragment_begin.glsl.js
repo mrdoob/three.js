@@ -8,13 +8,14 @@ vec3 fdy = vec3( dFdy( vViewPosition.x ), dFdy( vViewPosition.y ), dFdy( vViewPo
 
 	vec3 normal = normalize( cross( fdx, fdy ) );
 
-	bool isFrontFacing = dot( vec3( 0, 0, 1 ), normalize( cross( fdx, fdy ) ) ) > 0.0;
+	bool isFrontFacing = dot( vec3( 0, 0, 1 ), normal ) > 0.0;
 
 #else
 
 	vec3 normal = normalize( vNormal );
 
-	// Workaround for Adreno GPUs gl_FrontFacing bug. See #10331 and #15850.
+	// Workaround for Adreno GPUs broken gl_FrontFacing implementation
+	// https://stackoverflow.com/a/32621243
 
 	bool isFrontFacing = dot( normal, normalize( cross( fdx, fdy ) ) ) > 0.0;
 
