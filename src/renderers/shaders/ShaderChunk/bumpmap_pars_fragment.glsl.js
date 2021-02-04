@@ -22,7 +22,7 @@ export default /* glsl */`
 
 	}
 
-	vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {
+	vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy, bool isFrontFacing ) {
 
 		// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 

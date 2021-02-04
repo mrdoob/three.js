@@ -1,5 +1,5 @@
 export default /* glsl */`
-// Workaround for Adreno/Nexus5 not able able to do dFdx( vViewPosition ) ...
+// Workaround for Adreno GPUs not able to do dFdx( vViewPosition )
 
 vec3 fdx = vec3( dFdx( vViewPosition.x ), dFdx( vViewPosition.y ), dFdx( vViewPosition.z ) );
 vec3 fdy = vec3( dFdy( vViewPosition.x ), dFdy( vViewPosition.y ), dFdy( vViewPosition.z ) );
@@ -14,7 +14,7 @@ vec3 fdy = vec3( dFdy( vViewPosition.x ), dFdy( vViewPosition.y ), dFdy( vViewPo
 
 #endif
 
-// Workaround for Adreno GPUs gl_FrontFacing bug. See #10331 and #15850
+// Workaround for Adreno GPUs gl_FrontFacing bug. See #10331 and #15850.
 
 bool isFrontFacing = dot( normal, normalize( cross( fdx, fdy ) ) ) > 0.0;
 
