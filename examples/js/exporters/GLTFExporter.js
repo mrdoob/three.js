@@ -925,7 +925,7 @@ THREE.GLTFExporter = ( function () {
 
 			var cachedImages = cache.images.get( image );
 			var mimeType = format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
-			var key = mimeType + ":flipY/" + flipY.toString();
+			var key = mimeType + ':flipY/' + flipY.toString();
 
 			if ( cachedImages[ key ] !== undefined ) return cachedImages[ key ];
 
@@ -951,6 +951,7 @@ THREE.GLTFExporter = ( function () {
 
 				if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 					( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+					( typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas ) ||
 					( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
 					ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
@@ -1310,10 +1311,9 @@ THREE.GLTFExporter = ( function () {
 
 			}
 
-			if ( ! geometry.isBufferGeometry ) {
+			if ( geometry.isBufferGeometry !== true ) {
 
-				console.warn( 'GLTFExporter: Exporting THREE.Geometry will increase file size. Use THREE.BufferGeometry instead.' );
-				geometry = new THREE.BufferGeometry().setFromObject( mesh );
+				throw new Error( 'THREE.GLTFExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 			}
 

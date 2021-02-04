@@ -5,7 +5,7 @@ import {
 	RGBA_S3TC_DXT5_Format,
 	RGB_ETC1_Format,
 	RGB_S3TC_DXT1_Format
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var DDSLoader = function ( manager ) {
 
@@ -106,10 +106,10 @@ DDSLoader.prototype = Object.assign( Object.create( CompressedTextureLoader.prot
 
 		}
 
-		var FOURCC_DXT1 = fourCCToInt32( "DXT1" );
-		var FOURCC_DXT3 = fourCCToInt32( "DXT3" );
-		var FOURCC_DXT5 = fourCCToInt32( "DXT5" );
-		var FOURCC_ETC1 = fourCCToInt32( "ETC1" );
+		var FOURCC_DXT1 = fourCCToInt32( 'DXT1' );
+		var FOURCC_DXT3 = fourCCToInt32( 'DXT3' );
+		var FOURCC_DXT5 = fourCCToInt32( 'DXT5' );
+		var FOURCC_ETC1 = fourCCToInt32( 'ETC1' );
 
 		var headerLengthInt = 31; // The header length in 32 bit ints
 
@@ -260,7 +260,7 @@ DDSLoader.prototype = Object.assign( Object.create( CompressedTextureLoader.prot
 
 				}
 
-				var mipmap = { "data": byteArray, "width": width, "height": height };
+				var mipmap = { 'data': byteArray, 'width': width, 'height': height };
 				dds.mipmaps.push( mipmap );
 
 				dataOffset += dataLength;

@@ -65,7 +65,7 @@
 					object.scale.y = Math.random() + 0.5;
 					scene2.add( object );
 
-					const geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+					const geometry = new THREE.PlaneGeometry( 100, 100 );
 					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.copy( object.position );
 					mesh.rotation.copy( object.rotation );
@@ -89,7 +89,7 @@
 
 				controls = new TrackballControls( camera, renderer2.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

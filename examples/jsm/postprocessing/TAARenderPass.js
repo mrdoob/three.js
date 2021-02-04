@@ -1,7 +1,7 @@
 import {
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
-import { SSAARenderPass } from "../postprocessing/SSAARenderPass.js";
+} from '../../../build/three.module.js';
+import { SSAARenderPass } from '../postprocessing/SSAARenderPass.js';
 
 /**
  *
@@ -19,7 +19,7 @@ var TAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 
 	if ( SSAARenderPass === undefined ) {
 
-		console.error( "TAARenderPass relies on SSAARenderPass" );
+		console.error( 'THREE.TAARenderPass relies on SSAARenderPass' );
 
 	}
 
@@ -52,14 +52,14 @@ TAARenderPass.prototype = Object.assign( Object.create( SSAARenderPass.prototype
 		if ( ! this.sampleRenderTarget ) {
 
 			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
-			this.sampleRenderTarget.texture.name = "TAARenderPass.sample";
+			this.sampleRenderTarget.texture.name = 'TAARenderPass.sample';
 
 		}
 
 		if ( ! this.holdRenderTarget ) {
 
 			this.holdRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
-			this.holdRenderTarget.texture.name = "TAARenderPass.hold";
+			this.holdRenderTarget.texture.name = 'TAARenderPass.hold';
 
 		}
 
@@ -78,8 +78,8 @@ TAARenderPass.prototype = Object.assign( Object.create( SSAARenderPass.prototype
 
 		if ( this.accumulateIndex >= 0 && this.accumulateIndex < jitterOffsets.length ) {
 
-			this.copyUniforms[ "opacity" ].value = sampleWeight;
-			this.copyUniforms[ "tDiffuse" ].value = writeBuffer.texture;
+			this.copyUniforms[ 'opacity' ].value = sampleWeight;
+			this.copyUniforms[ 'tDiffuse' ].value = writeBuffer.texture;
 
 			// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 			var numSamplesPerFrame = Math.pow( 2, this.sampleLevel );
@@ -118,8 +118,8 @@ TAARenderPass.prototype = Object.assign( Object.create( SSAARenderPass.prototype
 
 		if ( accumulationWeight > 0 ) {
 
-			this.copyUniforms[ "opacity" ].value = 1.0;
-			this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
+			this.copyUniforms[ 'opacity' ].value = 1.0;
+			this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
 			renderer.setRenderTarget( writeBuffer );
 			renderer.clear();
 			this.fsQuad.render( renderer );
@@ -128,8 +128,8 @@ TAARenderPass.prototype = Object.assign( Object.create( SSAARenderPass.prototype
 
 		if ( accumulationWeight < 1.0 ) {
 
-			this.copyUniforms[ "opacity" ].value = 1.0 - accumulationWeight;
-			this.copyUniforms[ "tDiffuse" ].value = this.holdRenderTarget.texture;
+			this.copyUniforms[ 'opacity' ].value = 1.0 - accumulationWeight;
+			this.copyUniforms[ 'tDiffuse' ].value = this.holdRenderTarget.texture;
 			renderer.setRenderTarget( writeBuffer );
 			if ( accumulationWeight === 0 ) renderer.clear();
 			this.fsQuad.render( renderer );

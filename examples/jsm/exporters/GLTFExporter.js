@@ -1,6 +1,5 @@
 import {
 	BufferAttribute,
-	BufferGeometry,
 	ClampToEdgeWrapping,
 	DoubleSide,
 	InterpolateDiscrete,
@@ -20,7 +19,7 @@ import {
 	RepeatWrapping,
 	Scene,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var GLTFExporter = ( function () {
 
@@ -832,7 +831,7 @@ var GLTFExporter = ( function () {
 		/**
 		 * Process attribute to generate an accessor
 		 * @param  {BufferAttribute} attribute Attribute to process
-		 * @param  {BufferGeometry} geometry (Optional) Geometry used for truncated draw range
+		 * @param  {THREE.BufferGeometry} geometry (Optional) Geometry used for truncated draw range
 		 * @param  {Integer} start (Optional)
 		 * @param  {Integer} count (Optional)
 		 * @return {Integer|null} Index of the processed accessor on the "accessors" array
@@ -949,7 +948,7 @@ var GLTFExporter = ( function () {
 
 			var cachedImages = cache.images.get( image );
 			var mimeType = format === RGBAFormat ? 'image/png' : 'image/jpeg';
-			var key = mimeType + ":flipY/" + flipY.toString();
+			var key = mimeType + ':flipY/' + flipY.toString();
 
 			if ( cachedImages[ key ] !== undefined ) return cachedImages[ key ];
 
@@ -975,6 +974,7 @@ var GLTFExporter = ( function () {
 
 				if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 					( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+					( typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas ) ||
 					( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
 					ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
@@ -1334,10 +1334,9 @@ var GLTFExporter = ( function () {
 
 			}
 
-			if ( ! geometry.isBufferGeometry ) {
+			if ( geometry.isBufferGeometry !== true ) {
 
-				console.warn( 'GLTFExporter: Exporting THREE.Geometry will increase file size. Use BufferGeometry instead.' );
-				geometry = new BufferGeometry().setFromObject( mesh );
+				throw new Error( 'THREE.GLTFExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 			}
 

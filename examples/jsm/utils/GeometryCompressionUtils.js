@@ -14,7 +14,7 @@ import {
 	ShaderLib,
 	UniformsUtils,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var GeometryCompressionUtils = {
 
@@ -30,7 +30,7 @@ var GeometryCompressionUtils = {
 
 		if ( ! mesh.geometry ) {
 
-			console.error( "Mesh must contain geometry. " );
+			console.error( 'Mesh must contain geometry. ' );
 
 		}
 
@@ -38,7 +38,7 @@ var GeometryCompressionUtils = {
 
 		if ( ! normal ) {
 
-			console.error( "Geometry must contain normal attribute. " );
+			console.error( 'Geometry must contain normal attribute. ' );
 
 		}
 
@@ -46,7 +46,7 @@ var GeometryCompressionUtils = {
 
 		if ( normal.itemSize != 3 ) {
 
-			console.error( "normal.itemSize is not 3, which cannot be encoded. " );
+			console.error( 'normal.itemSize is not 3, which cannot be encoded. ' );
 
 		}
 
@@ -54,7 +54,7 @@ var GeometryCompressionUtils = {
 		const count = normal.count;
 
 		let result;
-		if ( encodeMethod == "DEFAULT" ) {
+		if ( encodeMethod == 'DEFAULT' ) {
 
 			// TODO: Add 1 byte to the result, making the encoded length to be 4 bytes.
 			result = new Uint8Array( count * 3 );
@@ -72,7 +72,7 @@ var GeometryCompressionUtils = {
 			mesh.geometry.setAttribute( 'normal', new BufferAttribute( result, 3, true ) );
 			mesh.geometry.attributes.normal.bytes = result.length * 1;
 
-		} else if ( encodeMethod == "OCT1Byte" ) {
+		} else if ( encodeMethod == 'OCT1Byte' ) {
 
 			/**
 			* It is not recommended to use 1-byte octahedron normals encoding unless you want to extremely reduce the memory usage
@@ -94,7 +94,7 @@ var GeometryCompressionUtils = {
 			mesh.geometry.setAttribute( 'normal', new BufferAttribute( result, 2, true ) );
 			mesh.geometry.attributes.normal.bytes = result.length * 1;
 
-		} else if ( encodeMethod == "OCT2Byte" ) {
+		} else if ( encodeMethod == 'OCT2Byte' ) {
 
 			result = new Int16Array( count * 2 );
 
@@ -110,7 +110,7 @@ var GeometryCompressionUtils = {
 			mesh.geometry.setAttribute( 'normal', new BufferAttribute( result, 2, true ) );
 			mesh.geometry.attributes.normal.bytes = result.length * 2;
 
-		} else if ( encodeMethod == "ANGLES" ) {
+		} else if ( encodeMethod == 'ANGLES' ) {
 
 			result = new Uint16Array( count * 2 );
 
@@ -128,7 +128,7 @@ var GeometryCompressionUtils = {
 
 		} else {
 
-			console.error( "Unrecognized encoding method, should be `DEFAULT` or `ANGLES` or `OCT`. " );
+			console.error( 'Unrecognized encoding method, should be `DEFAULT` or `ANGLES` or `OCT`. ' );
 
 		}
 
@@ -143,25 +143,25 @@ var GeometryCompressionUtils = {
 
 		}
 
-		if ( encodeMethod == "ANGLES" ) {
+		if ( encodeMethod == 'ANGLES' ) {
 
 			mesh.material.defines.USE_PACKED_NORMAL = 0;
 
 		}
 
-		if ( encodeMethod == "OCT1Byte" ) {
+		if ( encodeMethod == 'OCT1Byte' ) {
 
 			mesh.material.defines.USE_PACKED_NORMAL = 1;
 
 		}
 
-		if ( encodeMethod == "OCT2Byte" ) {
+		if ( encodeMethod == 'OCT2Byte' ) {
 
 			mesh.material.defines.USE_PACKED_NORMAL = 1;
 
 		}
 
-		if ( encodeMethod == "DEFAULT" ) {
+		if ( encodeMethod == 'DEFAULT' ) {
 
 			mesh.material.defines.USE_PACKED_NORMAL = 2;
 
@@ -181,7 +181,7 @@ var GeometryCompressionUtils = {
 
 		if ( ! mesh.geometry ) {
 
-			console.error( "Mesh must contain geometry. " );
+			console.error( 'Mesh must contain geometry. ' );
 
 		}
 
@@ -189,7 +189,7 @@ var GeometryCompressionUtils = {
 
 		if ( ! position ) {
 
-			console.error( "Geometry must contain position attribute. " );
+			console.error( 'Geometry must contain position attribute. ' );
 
 		}
 
@@ -197,7 +197,7 @@ var GeometryCompressionUtils = {
 
 		if ( position.itemSize != 3 ) {
 
-			console.error( "position.itemSize is not 3, which cannot be packed. " );
+			console.error( 'position.itemSize is not 3, which cannot be packed. ' );
 
 		}
 
@@ -243,7 +243,7 @@ var GeometryCompressionUtils = {
 
 		if ( ! mesh.geometry ) {
 
-			console.error( "Mesh must contain geometry property. " );
+			console.error( 'Mesh must contain geometry property. ' );
 
 		}
 
@@ -251,7 +251,7 @@ var GeometryCompressionUtils = {
 
 		if ( ! uvs ) {
 
-			console.error( "Geometry must contain uv attribute. " );
+			console.error( 'Geometry must contain uv attribute. ' );
 
 		}
 
@@ -342,7 +342,7 @@ var GeometryCompressionUtils = {
 
 			} else {
 
-				console.error( "number of bytes must be 1 or 2" );
+				console.error( 'number of bytes must be 1 or 2' );
 
 			}
 
@@ -368,7 +368,7 @@ var GeometryCompressionUtils = {
 
 			} else {
 
-				console.error( "number of bytes must be 1 or 2" );
+				console.error( 'number of bytes must be 1 or 2' );
 
 			}
 
@@ -390,11 +390,11 @@ var GeometryCompressionUtils = {
 
 			// Test various combinations of ceil and floor
 			// to minimize rounding errors
-			best = oct = octEncodeVec3( x, y, z, "floor", "floor" );
+			best = oct = octEncodeVec3( x, y, z, 'floor', 'floor' );
 			dec = octDecodeVec2( oct );
 			bestCos = dot( x, y, z, dec );
 
-			oct = octEncodeVec3( x, y, z, "ceil", "floor" );
+			oct = octEncodeVec3( x, y, z, 'ceil', 'floor' );
 			dec = octDecodeVec2( oct );
 			currentCos = dot( x, y, z, dec );
 
@@ -405,7 +405,7 @@ var GeometryCompressionUtils = {
 
 			}
 
-			oct = octEncodeVec3( x, y, z, "floor", "ceil" );
+			oct = octEncodeVec3( x, y, z, 'floor', 'ceil' );
 			dec = octDecodeVec2( oct );
 			currentCos = dot( x, y, z, dec );
 
@@ -416,7 +416,7 @@ var GeometryCompressionUtils = {
 
 			}
 
-			oct = octEncodeVec3( x, y, z, "ceil", "ceil" );
+			oct = octEncodeVec3( x, y, z, 'ceil', 'ceil' );
 			dec = octDecodeVec2( oct );
 			currentCos = dot( x, y, z, dec );
 
@@ -535,7 +535,7 @@ var GeometryCompressionUtils = {
 
 			} else {
 
-				console.error( "number of bytes error! " );
+				console.error( 'number of bytes error! ' );
 
 			}
 
@@ -609,7 +609,7 @@ var GeometryCompressionUtils = {
 
 			} else {
 
-				console.error( "number of bytes error! " );
+				console.error( 'number of bytes error! ' );
 
 			}
 
@@ -687,13 +687,13 @@ function PackedPhongMaterial( parameters ) {
 	] );
 
 	this.vertexShader = [
-		"#define PHONG",
+		'#define PHONG',
 
-		"varying vec3 vViewPosition;",
+		'varying vec3 vViewPosition;',
 
-		"#ifndef FLAT_SHADED",
-		"varying vec3 vNormal;",
-		"#endif",
+		'#ifndef FLAT_SHADED',
+		'varying vec3 vNormal;',
+		'#endif',
 
 		ShaderChunk.common,
 		ShaderChunk.uv_pars_vertex,
@@ -771,7 +771,7 @@ function PackedPhongMaterial( parameters ) {
 			#endif
 		#endif`,
 
-		"void main() {",
+		'void main() {',
 
 		ShaderChunk.uv_vertex,
 
@@ -799,9 +799,9 @@ function PackedPhongMaterial( parameters ) {
 		ShaderChunk.skinnormal_vertex,
 		ShaderChunk.defaultnormal_vertex,
 
-		"#ifndef FLAT_SHADED",
-		"	vNormal = normalize( transformedNormal );",
-		"#endif",
+		'#ifndef FLAT_SHADED',
+		'	vNormal = normalize( transformedNormal );',
+		'#endif',
 
 		ShaderChunk.begin_vertex,
 
@@ -818,25 +818,25 @@ function PackedPhongMaterial( parameters ) {
 		ShaderChunk.logdepthbuf_vertex,
 		ShaderChunk.clipping_planes_vertex,
 
-		"vViewPosition = - mvPosition.xyz;",
+		'vViewPosition = - mvPosition.xyz;',
 
 		ShaderChunk.worldpos_vertex,
 		ShaderChunk.envmap_vertex,
 		ShaderChunk.shadowmap_vertex,
 		ShaderChunk.fog_vertex,
 
-		"}",
-	].join( "\n" );
+		'}',
+	].join( '\n' );
 
 	// Use the original MeshPhongMaterial's fragmentShader.
 	this.fragmentShader = [
-		"#define PHONG",
+		'#define PHONG',
 
-		"uniform vec3 diffuse;",
-		"uniform vec3 emissive;",
-		"uniform vec3 specular;",
-		"uniform float shininess;",
-		"uniform float opacity;",
+		'uniform vec3 diffuse;',
+		'uniform vec3 emissive;',
+		'uniform vec3 specular;',
+		'uniform float shininess;',
+		'uniform float opacity;',
 
 		ShaderChunk.common,
 		ShaderChunk.packing,
@@ -863,13 +863,13 @@ function PackedPhongMaterial( parameters ) {
 		ShaderChunk.logdepthbuf_pars_fragment,
 		ShaderChunk.clipping_planes_pars_fragment,
 
-		"void main() {",
+		'void main() {',
 
 		ShaderChunk.clipping_planes_fragment,
 
-		"vec4 diffuseColor = vec4( diffuse, opacity );",
-		"ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
-		"vec3 totalEmissiveRadiance = emissive;",
+		'vec4 diffuseColor = vec4( diffuse, opacity );',
+		'ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );',
+		'vec3 totalEmissiveRadiance = emissive;',
 
 		ShaderChunk.logdepthbuf_fragment,
 		ShaderChunk.map_fragment,
@@ -890,19 +890,19 @@ function PackedPhongMaterial( parameters ) {
 		// modulation
 		ShaderChunk.aomap_fragment,
 
-		"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;",
+		'vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;',
 
 		ShaderChunk.envmap_fragment,
 
-		"gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
+		'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
 
 		ShaderChunk.tonemapping_fragment,
 		ShaderChunk.encodings_fragment,
 		ShaderChunk.fog_fragment,
 		ShaderChunk.premultiplied_alpha_fragment,
 		ShaderChunk.dithering_fragment,
-		"}",
-	].join( "\n" );
+		'}',
+	].join( '\n' );
 
 	this.setValues( parameters );
 

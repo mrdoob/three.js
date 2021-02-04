@@ -1,16 +1,16 @@
 import {
 	ShaderMaterial,
 	UniformsUtils
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
-import { CopyShader } from "../shaders/CopyShader.js";
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
+import { CopyShader } from '../shaders/CopyShader.js';
 
 var TexturePass = function ( map, opacity ) {
 
 	Pass.call( this );
 
 	if ( CopyShader === undefined )
-		console.error( "TexturePass relies on CopyShader" );
+		console.error( 'THREE.TexturePass relies on CopyShader' );
 
 	var shader = CopyShader;
 
@@ -46,8 +46,8 @@ TexturePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.fsQuad.material = this.material;
 
-		this.uniforms[ "opacity" ].value = this.opacity;
-		this.uniforms[ "tDiffuse" ].value = this.map;
+		this.uniforms[ 'opacity' ].value = this.opacity;
+		this.uniforms[ 'tDiffuse' ].value = this.map;
 		this.material.transparent = ( this.opacity < 1.0 );
 
 		renderer.setRenderTarget( this.renderToScreen ? null : readBuffer );

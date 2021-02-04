@@ -45,7 +45,7 @@
 					light.shadow.camera.far = 60;
 					light.shadow.bias = - 0.005; // reduces self-shadowing on double-sided objects
 
-					let geometry = new THREE.SphereBufferGeometry( 0.3, 12, 6 );
+					let geometry = new THREE.SphereGeometry( 0.3, 12, 6 );
 					let material = new THREE.MeshBasicMaterial( { color: color } );
 					material.color.multiplyScalar( intensity );
 					let sphere = new THREE.Mesh( geometry, material );
@@ -57,7 +57,7 @@
 					texture.wrapS = THREE.RepeatWrapping;
 					texture.repeat.set( 1, 4.5 );
 
-					geometry = new THREE.SphereBufferGeometry( 2, 32, 8 );
+					geometry = new THREE.SphereGeometry( 2, 32, 8 );
 					material = new THREE.MeshPhongMaterial( {
 						side: THREE.DoubleSide,
 						alphaMap: texture,
@@ -87,7 +87,7 @@
 				scene.add( pointLight2 );
 				//
 
-				const geometry = new THREE.BoxBufferGeometry( 30, 30, 30 );
+				const geometry = new THREE.BoxGeometry( 30, 30, 30 );
 
 				const material = new THREE.MeshPhongMaterial( {
 					color: 0xa0adaf,
@@ -119,7 +119,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -55,7 +55,7 @@
 
 				// Water
 
-				const waterGeometry = new THREE.PlaneBufferGeometry( 10000, 10000 );
+				const waterGeometry = new THREE.PlaneGeometry( 10000, 10000 );
 
 				water = new Water(
 					waterGeometry,
@@ -120,7 +120,7 @@
 
 				//
 
-				const geometry = new THREE.BoxBufferGeometry( 30, 30, 30 );
+				const geometry = new THREE.BoxGeometry( 30, 30, 30 );
 				const material = new THREE.MeshStandardMaterial( { roughness: 0 } );
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -159,7 +159,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

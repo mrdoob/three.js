@@ -20,13 +20,13 @@ import {
 	Vector3,
 	WebGLRenderTarget,
 	ZeroFactor
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
-import { SimplexNoise } from "../math/SimplexNoise.js";
-import { SSAOShader } from "../shaders/SSAOShader.js";
-import { SSAOBlurShader } from "../shaders/SSAOShader.js";
-import { SSAODepthShader } from "../shaders/SSAOShader.js";
-import { CopyShader } from "../shaders/CopyShader.js";
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
+import { SimplexNoise } from '../math/SimplexNoise.js';
+import { SSAOShader } from '../shaders/SSAOShader.js';
+import { SSAOBlurShader } from '../shaders/SSAOShader.js';
+import { SSAODepthShader } from '../shaders/SSAOShader.js';
+import { CopyShader } from '../shaders/CopyShader.js';
 
 var SSAOPass = function ( scene, camera, width, height ) {
 
@@ -282,7 +282,7 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 	renderPass: function ( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
-		this.originalClearColor.copy( renderer.getClearColor() );
+		renderer.getClearColor( this.originalClearColor );
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
@@ -310,7 +310,7 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	renderOverride: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
-		this.originalClearColor.copy( renderer.getClearColor() );
+		renderer.getClearColor( this.originalClearColor );
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 

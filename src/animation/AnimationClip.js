@@ -9,12 +9,12 @@ import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
 import { MathUtils } from '../math/MathUtils.js';
 import { NormalAnimationBlendMode } from '../constants.js';
 
-function AnimationClip( name, duration, tracks, blendMode ) {
+function AnimationClip( name, duration = - 1, tracks, blendMode = NormalAnimationBlendMode ) {
 
 	this.name = name;
 	this.tracks = tracks;
-	this.duration = ( duration !== undefined ) ? duration : - 1;
-	this.blendMode = ( blendMode !== undefined ) ? blendMode : NormalAnimationBlendMode;
+	this.duration = duration;
+	this.blendMode = blendMode;
 
 	this.uuid = MathUtils.generateUUID();
 

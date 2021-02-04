@@ -32,20 +32,6 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TransformControls } from './jsm/controls/TransformControls.js';
 
-			String.prototype.format = function () {
-
-				let str = this;
-
-				for ( let i = 0; i < arguments.length; i ++ ) {
-
-					str = str.replace( '{' + i + '}', arguments[ i ] );
-
-				}
-
-				return str;
-
-			};
-
 			let container, stats;
 			let camera, scene, renderer;
 			const splineHelperObjects = [];
@@ -58,7 +44,7 @@
 			const onUpPosition = new THREE.Vector2();
 			const onDownPosition = new THREE.Vector2();
 
-			const geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+			const geometry = new THREE.BoxGeometry( 20, 20, 20 );
 			let transformControl;
 
 			const ARC_SEGMENTS = 200;
@@ -101,7 +87,7 @@
 				light.shadow.mapSize.height = 1024;
 				scene.add( light );
 
-				const planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
+				const planeGeometry = new THREE.PlaneGeometry( 2000, 2000 );
 				planeGeometry.rotateX( - Math.PI / 2 );
 				const planeMaterial = new THREE.ShadowMaterial( { opacity: 0.2 } );
 
@@ -161,9 +147,9 @@
 
 				} );
 
-				document.addEventListener( 'pointerdown', onPointerDown, false );
-				document.addEventListener( 'pointerup', onPointerUp, false );
-				document.addEventListener( 'pointermove', onPointerMove, false );
+				document.addEventListener( 'pointerdown', onPointerDown );
+				document.addEventListener( 'pointerup', onPointerUp );
+				document.addEventListener( 'pointermove', onPointerMove );
 
 				/*******
 				 * Curves
@@ -311,7 +297,7 @@
 				for ( let i = 0; i < splinePointsLength; i ++ ) {
 
 					const p = splineHelperObjects[ i ].position;
-					strplace.push( 'new THREE.Vector3({0}, {1}, {2})'.format( p.x, p.y, p.z ) );
+					strplace.push( `new THREE.Vector3(${p.x}, ${p.y}, ${p.z})` );
 
 				}
 

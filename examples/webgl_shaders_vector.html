@@ -101,7 +101,7 @@
 
 				const textShapes = font.generateShapes( theText, 180 );
 
-				let geometry = new THREE.ShapeBufferGeometry( textShapes );
+				let geometry = new THREE.ShapeGeometry( textShapes );
 
 				let text = new THREE.Mesh( geometry, textMaterial );
 				text.position.x = - 200;
@@ -239,13 +239,13 @@
 				bezierGeometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 				bezierGeometry.setAttribute( 'invert', new THREE.Float32BufferAttribute( invert, 1 ) );
 
-				geometry = new THREE.ShapeBufferGeometry( convexhullShapeGroup );
+				geometry = new THREE.ShapeGeometry( convexhullShapeGroup );
 
 				text = new THREE.Mesh( geometry, textMaterial );
 				text.position.x = 200;
 				group.add( text );
 
-				geometry = new THREE.ShapeBufferGeometry( solidShapeGroup );
+				geometry = new THREE.ShapeGeometry( solidShapeGroup );
 
 				text = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: new THREE.Color( 1, 0, 0 ), side: THREE.DoubleSide, wireframe: true } ) );
 				text.position.x = 200;
@@ -270,7 +270,7 @@
 				//
 
 
-				geometry = new THREE.ShapeBufferGeometry( solidShapeGroup );
+				geometry = new THREE.ShapeGeometry( solidShapeGroup );
 
 				text = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0.45 * 0xffffff, side: THREE.DoubleSide } ) );
 				text.rotation.y = Math.PI * 2;
@@ -291,7 +291,7 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

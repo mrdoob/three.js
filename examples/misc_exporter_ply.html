@@ -52,7 +52,7 @@
 
 				// ground
 
-				const ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.receiveShadow = true;
 				scene.add( ground );
@@ -64,7 +64,7 @@
 
 				// export mesh
 
-				const geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				const geometry = new THREE.BoxGeometry( 50, 50, 50 );
 				const material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -88,7 +88,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				const buttonExportASCII = document.getElementById( 'exportASCII' );
 				buttonExportASCII.addEventListener( 'click', exportASCII );

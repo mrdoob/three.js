@@ -189,7 +189,7 @@
 					}
 				`;
 
-				const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 				const material = new THREE.RawShaderMaterial( {
 					glslVersion: THREE.GLSL3,
 					uniforms: {
@@ -221,7 +221,7 @@
 				gui.add( parameters, 'threshold', 0, 1, 0.01 ).onChange( update );
 				gui.add( parameters, 'steps', 0, 300, 1 ).onChange( update );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

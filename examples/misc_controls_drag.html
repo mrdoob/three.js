@@ -68,7 +68,7 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				const geometry = new THREE.BoxBufferGeometry( 40, 40, 40 );
+				const geometry = new THREE.BoxGeometry( 40, 40, 40 );
 
 				for ( let i = 0; i < 200; i ++ ) {
 
@@ -109,11 +109,11 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				document.addEventListener( 'click', onClick, false );
-				window.addEventListener( 'keydown', onKeyDown, false );
-				window.addEventListener( 'keyup', onKeyUp, false );
+				document.addEventListener( 'click', onClick );
+				window.addEventListener( 'keydown', onKeyDown );
+				window.addEventListener( 'keyup', onKeyUp );
 
 				render();
 

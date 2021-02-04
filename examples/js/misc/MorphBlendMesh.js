@@ -218,7 +218,7 @@ THREE.MorphBlendMesh.prototype = Object.assign( Object.create( THREE.Mesh.protot
 
 		} else {
 
-			console.warn( "THREE.MorphBlendMesh: animation[" + name + "] undefined in .playAnimation()" );
+			console.warn( 'THREE.MorphBlendMesh: animation[' + name + '] undefined in .playAnimation()' );
 
 		}
 

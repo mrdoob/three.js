@@ -6,7 +6,7 @@ import {
 	TOUCH,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -70,10 +70,7 @@ var OrbitControls = function ( object, domElement ) {
 	// Set to true to automatically rotate around the target
 	// If auto-rotate is enabled, you must call controls.update() in your animation loop
 	this.autoRotate = false;
-	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
-
-	// Set to false to disable use of the keys
-	this.enableKeys = true;
+	this.autoRotateSpeed = 2.0; // 30 seconds per orbit when fps is 60
 
 	// The four arrow keys
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
@@ -89,6 +86,9 @@ var OrbitControls = function ( object, domElement ) {
 	this.position0 = this.object.position.clone();
 	this.zoom0 = this.object.zoom;
 
+	// the target DOM element for key events
+	this._domElementKeyEvents = null;
+
 	//
 	// public methods
 	//
@@ -102,6 +102,13 @@ var OrbitControls = function ( object, domElement ) {
 	this.getAzimuthalAngle = function () {
 
 		return spherical.theta;
+
+	};
+
+	this.listenToKeyEvents = function ( domElement ) {
+
+		domElement.addEventListener( 'keydown', onKeyDown );
+		this._domElementKeyEvents = domElement;
 
 	};
 
@@ -272,19 +279,24 @@ var OrbitControls = function ( object, domElement ) {
 
 	this.dispose = function () {
 
-		scope.domElement.removeEventListener( 'contextmenu', onContextMenu, false );
+		scope.domElement.removeEventListener( 'contextmenu', onContextMenu );
 
-		scope.domElement.removeEventListener( 'pointerdown', onPointerDown, false );
-		scope.domElement.removeEventListener( 'wheel', onMouseWheel, false );
+		scope.domElement.removeEventListener( 'pointerdown', onPointerDown );
+		scope.domElement.removeEventListener( 'wheel', onMouseWheel );
 
-		scope.domElement.removeEventListener( 'touchstart', onTouchStart, false );
-		scope.domElement.removeEventListener( 'touchend', onTouchEnd, false );
-		scope.domElement.removeEventListener( 'touchmove', onTouchMove, false );
+		scope.domElement.removeEventListener( 'touchstart', onTouchStart );
+		scope.domElement.removeEventListener( 'touchend', onTouchEnd );
+		scope.domElement.removeEventListener( 'touchmove', onTouchMove );
 
-		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
-		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
 
-		scope.domElement.removeEventListener( 'keydown', onKeyDown, false );
+
+		if ( scope._domElementKeyEvents !== null ) {
+
+			scope._domElementKeyEvents.removeEventListener( 'keydown', onKeyDown );
+
+		}
 
 		//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
 
@@ -922,8 +934,8 @@ var OrbitControls = function ( object, domElement ) {
 
 		if ( state !== STATE.NONE ) {
 
-			scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
-			scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
+			scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove );
+			scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp );
 
 			scope.dispatchEvent( startEvent );
 
@@ -969,8 +981,8 @@ var OrbitControls = function ( object, domElement ) {
 
 	function onMouseUp( event ) {
 
-		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
-		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
 
 		if ( scope.enabled === false ) return;
 
@@ -999,7 +1011,7 @@ var OrbitControls = function ( object, domElement ) {
 
 	function onKeyDown( event ) {
 
-		if ( scope.enabled === false || scope.enableKeys === false || scope.enablePan === false ) return;
+		if ( scope.enabled === false || scope.enablePan === false ) return;
 
 		handleKeyDown( event );
 
@@ -1170,16 +1182,14 @@ var OrbitControls = function ( object, domElement ) {
 
 	//
 
-	scope.domElement.addEventListener( 'contextmenu', onContextMenu, false );
+	scope.domElement.addEventListener( 'contextmenu', onContextMenu );
 
-	scope.domElement.addEventListener( 'pointerdown', onPointerDown, false );
-	scope.domElement.addEventListener( 'wheel', onMouseWheel, false );
+	scope.domElement.addEventListener( 'pointerdown', onPointerDown );
+	scope.domElement.addEventListener( 'wheel', onMouseWheel );
 
-	scope.domElement.addEventListener( 'touchstart', onTouchStart, false );
-	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
-	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
-
-	scope.domElement.addEventListener( 'keydown', onKeyDown, false );
+	scope.domElement.addEventListener( 'touchstart', onTouchStart );
+	scope.domElement.addEventListener( 'touchend', onTouchEnd );
+	scope.domElement.addEventListener( 'touchmove', onTouchMove );
 
 	// force an update at start
 

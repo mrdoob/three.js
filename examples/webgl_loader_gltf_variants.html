@@ -104,7 +104,7 @@
 				controls.target.set( 0, 0.5, - 0.2 );
 				controls.update();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -132,10 +132,11 @@
 					if ( mapping ) {
 
 						object.material = await parser.getDependency( 'material', mapping.material );
+						parser.assignFinalMaterial(object);
 
 					} else {
 
-						object.material = object.originalMaterial;
+						object.material = object.userData.originalMaterial;
 
 					}
 
