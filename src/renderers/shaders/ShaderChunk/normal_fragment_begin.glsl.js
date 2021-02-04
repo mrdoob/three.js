@@ -1,5 +1,5 @@
 export default /* glsl */`
-bool isFrontFacing = true;
+float faceDirection = 1.0;
 
 #ifdef FLAT_SHADED
 
@@ -9,7 +9,7 @@ bool isFrontFacing = true;
 	vec3 fdy = vec3( dFdy( vViewPosition.x ), dFdy( vViewPosition.y ), dFdy( vViewPosition.z ) );
 	vec3 normal = normalize( cross( fdx, fdy ) );
 
-	isFrontFacing = dot( vec3( 0, 0, 1 ), normal ) > 0.0;
+	faceDirection = sign( dot( vec3( 0, 0, 1 ), normal ) );
 
 #else
 
@@ -25,9 +25,9 @@ bool isFrontFacing = true;
 		// Workaround for Adreno GPUs broken gl_FrontFacing implementation
 		// https://stackoverflow.com/a/32621243
 
-		isFrontFacing = dot( normal, normalize( cross( fdx, fdy ) ) ) > 0.0;
+		faceDirection = sign( dot( normal, normalize( cross( fdx, fdy ) ) ) );
 
-		normal = normal * ( float( isFrontFacing ) * 2.0 - 1.0 );
+		normal = normal * faceDirection;
 
 	#endif
 
@@ -38,8 +38,8 @@ bool isFrontFacing = true;
 
 		#ifdef DOUBLE_SIDED
 
-			tangent = tangent * ( float( isFrontFacing ) * 2.0 - 1.0 );
-			bitangent = bitangent * ( float( isFrontFacing ) * 2.0 - 1.0 );
+			tangent = tangent * faceDirection;
+			bitangent = bitangent * faceDirection;
 
 		#endif
 
