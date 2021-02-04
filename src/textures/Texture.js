@@ -203,11 +203,11 @@ class Texture extends EventDispatcher {
 
 						if ( image[ i ].isDataTexture ) {
 
-							url.push( serializeImage( image[ i ].image ) );
+							url.push( this.serializeImage( image[ i ].image ) );
 
 						} else {
 
-							url.push( serializeImage( image[ i ] ) );
+							url.push( this.serializeImage( image[ i ] ) );
 
 						}
 
@@ -217,7 +217,7 @@ class Texture extends EventDispatcher {
 
 					// process single image
 
-					url = serializeImage( image );
+					url = this.serializeImage( image );
 
 				}
 
