@@ -93,7 +93,7 @@
 				} );
 
 
-				const geometry = new THREE.TextBufferGeometry( 'three.js', {
+				const geometry = new THREE.TextGeometry( 'three.js', {
 
 					font: font,
 
@@ -143,7 +143,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

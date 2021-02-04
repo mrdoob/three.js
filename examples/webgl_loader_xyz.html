@@ -42,7 +42,9 @@
 
 					geometry.center();
 
-					const material = new THREE.PointsMaterial( { size: 0.1 } );
+					const vertexColors = ( geometry.hasAttribute( 'color' ) === true );
+
+					const material = new THREE.PointsMaterial( { size: 0.1, vertexColors: vertexColors } );
 
 					points = new THREE.Points( geometry, material );
 					scene.add( points );
@@ -58,7 +60,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

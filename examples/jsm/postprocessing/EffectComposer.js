@@ -3,15 +3,15 @@ import {
 	LinearFilter,
 	Mesh,
 	OrthographicCamera,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	RGBAFormat,
 	Vector2,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
-import { CopyShader } from "../shaders/CopyShader.js";
-import { ShaderPass } from "../postprocessing/ShaderPass.js";
-import { MaskPass } from "../postprocessing/MaskPass.js";
-import { ClearMaskPass } from "../postprocessing/MaskPass.js";
+} from '../../../build/three.module.js';
+import { CopyShader } from '../shaders/CopyShader.js';
+import { ShaderPass } from '../postprocessing/ShaderPass.js';
+import { MaskPass } from '../postprocessing/MaskPass.js';
+import { ClearMaskPass } from '../postprocessing/MaskPass.js';
 
 var EffectComposer = function ( renderer, renderTarget ) {
 
@@ -276,7 +276,7 @@ Object.assign( Pass.prototype, {
 Pass.FullScreenQuad = ( function () {
 
 	var camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	var geometry = new PlaneBufferGeometry( 2, 2 );
+	var geometry = new PlaneGeometry( 2, 2 );
 
 	var FullScreenQuad = function ( material ) {
 

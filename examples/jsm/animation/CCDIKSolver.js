@@ -9,9 +9,9 @@ import {
 	MeshBasicMaterial,
 	Object3D,
 	Quaternion,
-	SphereBufferGeometry,
+	SphereGeometry,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * CCD Algorithm
@@ -272,7 +272,7 @@ var CCDIKSolver = ( function () {
 		this.matrix.copy( mesh.matrixWorld );
 		this.matrixAutoUpdate = false;
 
-		this.sphereGeometry = new SphereBufferGeometry( 0.25, 16, 8 );
+		this.sphereGeometry = new SphereGeometry( 0.25, 16, 8 );
 
 		this.targetSphereMaterial = new MeshBasicMaterial( {
 			color: new Color( 0xff8888 ),

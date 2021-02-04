@@ -44,7 +44,7 @@
 				controls.target.set( 0, 1.6, 0 );
 				controls.update();
 
-				const tableGeometry = new THREE.BoxBufferGeometry( 0.5, 0.8, 0.5 );
+				const tableGeometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
 				const tableMaterial = new THREE.MeshStandardMaterial( {
 					color: 0x444444,
 					roughness: 1.0,
@@ -55,7 +55,7 @@
 				table.position.z = 0.85;
 				scene.add( table );
 
-				const floorGometry = new THREE.PlaneBufferGeometry( 4, 4 );
+				const floorGometry = new THREE.PlaneGeometry( 4, 4 );
 				const floorMaterial = new THREE.MeshStandardMaterial( {
 					color: 0x222222,
 					roughness: 1.0,
@@ -140,12 +140,12 @@
 
 				//
 
-				const geometry = new THREE.CylinderBufferGeometry( 0.01, 0.02, 0.08, 5 );
+				const geometry = new THREE.CylinderGeometry( 0.01, 0.02, 0.08, 5 );
 				geometry.rotateX( - Math.PI / 2 );
 				const material = new THREE.MeshStandardMaterial( { flatShading: true } );
 				const mesh = new THREE.Mesh( geometry, material );
 
-				const pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 3 ) );
+				const pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.01, 3 ) );
 				pivot.name = 'pivot';
 				pivot.position.z = - 0.05;
 				mesh.add( pivot );
@@ -155,7 +155,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

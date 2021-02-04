@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			해당 클래스는 [page:FlyControls] 의 대안적인 구현 방법입니다.
+		</p>
+
+		<h2>예시</h2>
+
+		<p>[example:webgl_geometry_terrain webgl / geometry / terrain ]</p>
+
+		<h2>생성자</h2>
+
+		<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+				[page:Camera object]: 제어 할 카메라 객체 입니다.
+			</p>
+			<p>
+				[page:HTMLDOMElement domElement]: 이벤트 리스너에 사용되는 HTML 엘리먼트입니다.
+			</p>
+			<p>
+				새로운 [name] 객체를 생성합니다.
+			</p>
+		</p>
+
+		<h2>속성</h2>
+
+		<h3>[property:Boolean activeLook]</h3>
+		<p>
+			주위를 둘러 볼 수 있는지 설정합니다. 기본 값은 *true* 입니다.
+		</p>
+
+		<h3>[property:Boolean autoForward]</h3>
+		<p>
+			카메라가 자동으로 앞으로 이동 할 수 있는지 설정합니다. 기본 값은 *false* 입니다.
+		</p>
+
+		<h3>[property:Boolean constrainVertical]</h3>
+		<p>
+			[[page:.verticalMin], [page:verticalMax]]값을 수직으로 카메라를 고정할 수 있습니다. 기본 값은 *false* 입니다.
+		</p>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			마우스 / 터치 이벤트를 수신하는 데 사용되는 HTMLDOMElement입니다. 이것은 생성자에 의해 설정되어야 합니다; 
+			생성자를 통해 설정되지 않을 경우 새 이벤트 리스너에 설정되지 않습니다.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			컨트롤의 활성화 여부를 설정합니다. 기본 값은 *true* 입니다.
+		</p>
+
+		<h3>[property:Number heightCoef]</h3>
+		<p>
+			y-컴포넌트가 [page:.heightMax]에 가까울 경우 카메라가 얼마만큼 빠르게 움직이는 지 설정 합니다. 기본 값은 *1* 입니다.
+		</p>
+
+		<h3>[property:Number heightMax]</h3>
+		<p>
+			속도 조절에 사용되는 상단 카메라 높이를 설정합니다. 기본 값은 *1* 입니다.
+		</p>
+
+		<h3>[property:Number heightMin]</h3>
+		<p>
+			속도 조절에 사용되는 하단 카메라 높이를 설정합니다. 기본 값은 *0* 입니다.
+		</p>
+
+		<h3>[property:Boolean heightSpeed]</h3>
+		<p>
+			카메라의 높이가 이동 속도에 영향을 주는지 설정합니다. 기본 값은 *false* 입니다.
+			해당 속성을 사용하기 위해서는 [page:.heightCoef], [page:.heightMin] and [page:.heightMax]를 설정해야 합니다.
+		</p>
+
+		<h3>[property:Boolean lookVertical]</h3>
+		<p>
+			세로 축을 기준으로 주위를 둘러 볼 수 있는지 설정합니다. 기본 값은 *true* 입니다.
+		</p>
+
+		<h3>[property:Number lookSpeed]</h3>
+		<p>
+			카메라의 look around 속도를 설정합니다. 기본 값은 *0.005* 입니다.
+		</p>
+
+		<h3>[property:Boolean mouseDragOn]</h3>
+		<p>
+			마우스를 눌러진 상태인지 나타냅니다. 해당 프로퍼티는 읽기 전용 입니다.
+		</p>
+
+		<h3>[property:Number movementSpeed]</h3>
+		<p>
+			카메라의 이동속도를 설정합니다. 기본 값은 *1* 입니다.
+		</p>
+
+		<h3>[property:Camera object]</h3>
+		<p>
+			제어 할 카메라 객체 입니다.
+		</p>
+
+		<h3>[property:Number verticalMax]</h3>
+		<p>
+			수직으로 주위를 둘러볼 수 있는 상한 범위를 지정합니다. 0 부터 Math.PI.radians 의 범위를 가집니다. 기본 값은 *Math.PI* 입니다.
+		</p>
+
+		<h3>[property:Number verticalMin]</h3>
+		<p>
+			수직으로 주위를 둘러볼 수 있는 하한 범위를 지정합니다. 0 부터 Math.PI.radians 의 범위를 가집니다. 기본 값은 *0* 입니다.
+		</p>
+
+		<h2>메소드</h2>
+
+		<h3>[method:null dispose] ()</h3>
+		<p>
+			컨트롤이 더 이상 필요하지 않을 경우 호출해야 합니다.
+		</p>
+
+		<h3>[method:null handleResize] ()</h3>
+		<p>
+			어플리케이션의 창 크기를 조절 하려면 호출해야 합니다.
+		</p>
+
+		<h3>[method:FirstPersonControls lookAt]( [param:Vector3 vector] )<br />
+		[method:FirstPersonControls lookAt]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+			<p>
+				<p>
+					vector - 타겟 좌표를 설정합니다.
+				</p>
+				<p>
+					Optionally, x,y,z 컴포넌트는 특정 월드 좌표계 위치를 설정합니다.
+				</p>
+			</p>
+			<p>
+				카메라는 정의 된 타겟 좌표 쪽으로 가리키도록 합니다.
+			</p>
+		</p>
+
+		<h3>[method:null update] ( [param:Number delta] )</h3>
+		<p>
+			<p>
+				[page:Number delta]: 변화할 시간 값 입니다.
+			</p>
+			<p>
+				컨트롤을 업데이트 합니다. 보통 애니메이션 루프에서 호출 됩니다.
+			</p>
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/FirstPersonControls.js examples/jsm/controls/FirstPersonControls.js]
+		</p>
+	</body>
+</html>

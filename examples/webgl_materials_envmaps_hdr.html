@@ -23,6 +23,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { RGBMLoader } from './jsm/loaders/RGBMLoader.js';
 
 			const params = {
 				envMap: 'HDR',
@@ -45,7 +46,7 @@
 
 				const envScene = new THREE.Scene();
 
-				const geometry = new THREE.BoxBufferGeometry();
+				const geometry = new THREE.BoxGeometry();
 				geometry.deleteAttribute( 'uv' );
 				const roomMaterial = new THREE.MeshStandardMaterial( { metalness: 0, side: THREE.BackSide } );
 				const room = new THREE.Mesh( geometry, roomMaterial );
@@ -96,8 +97,8 @@
 
 				//
 
-				let geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
-				// let geometry = new THREE.SphereBufferGeometry( 26, 64, 32 );
+				let geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
+				// let geometry = new THREE.SphereGeometry( 26, 64, 32 );
 				let material = new THREE.MeshStandardMaterial( {
 					color: 0xffffff,
 					metalness: params.metalness,
@@ -108,7 +109,7 @@
 				scene.add( torusMesh );
 
 
-				geometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				geometry = new THREE.PlaneGeometry( 200, 200 );
 				material = new THREE.MeshBasicMaterial();
 
 				planeMesh = new THREE.Mesh( geometry, material );
@@ -148,17 +149,13 @@
 
 
 				const rgbmUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
-				rgbmCubeMap = new THREE.CubeTextureLoader()
+				rgbmCubeMap = new RGBMLoader()
 					.setPath( './textures/cube/pisaRGBM16/' )
-					.load( rgbmUrls, function () {
+					.loadCubemap( rgbmUrls, function () {
 
 						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
-						rgbmCubeMap.format = THREE.RGBAFormat;
 
 						rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
-
-						rgbmCubeMap.magFilter = THREE.LinearFilter;
-						rgbmCubeMap.needsUpdate = true;
 
 					} );
 
@@ -182,7 +179,7 @@
 				controls.minDistance = 50;
 				controls.maxDistance = 300;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				const gui = new GUI();
 

@@ -28,7 +28,7 @@
 			let windowHalfX = window.innerWidth / 2;
 			let windowHalfY = window.innerHeight / 2;
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			init();
 			animate();
@@ -46,7 +46,7 @@
 					.setPath( 'textures/cube/pisa/' )
 					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ] );
 
-				const geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
+				const geometry = new THREE.SphereGeometry( 100, 32, 16 );
 				const material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: scene.background } );
 
 				for ( let i = 0; i < 500; i ++ ) {
@@ -74,7 +74,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

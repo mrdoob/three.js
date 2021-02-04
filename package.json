@@ -1,10 +1,9 @@
 {
   "name": "three",
-  "version": "0.123.0",
+  "version": "0.125.2",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "module": "build/three.module.js",
-  "types": "src/Three.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/mrdoob/three.js"
@@ -27,22 +26,15 @@
     "test": "test"
   },
   "eslintConfig": {
-    "parser": "@typescript-eslint/parser",
+    "root": true,
     "extends": "mdcs",
     "plugins": [
-      "html",
-      "@typescript-eslint"
+      "html"
     ],
     "rules": {
-      "@typescript-eslint/no-unused-vars": [
-        "error"
-      ],
-      "@typescript-eslint/indent": [
+      "quotes": [
         "error",
-        "tab",
-        {
-          "SwitchCase": 1
-        }
+        "single"
       ],
       "prefer-const": [
         "error",
@@ -58,11 +50,12 @@
     "test": "npm run test-lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
-    "lint-fix": "eslint src --ext js --ext ts --fix && eslint examples/js/ --ext js --ext ts --ignore-pattern libs --fix",
+    "lint-fix": "eslint src --ext js --fix && eslint examples/js examples/jsm --ext js --ignore-pattern libs --fix",
     "lint-docs": "eslint docs --ext html",
-    "lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
-    "test-lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
+    "lint-examples": "eslint examples/js examples/jsm --ext js --ignore-pattern libs",
+    "test-lint": "eslint src --ext js",
     "test-unit": "npm run unit --prefix test",
+    "test-unit-examples": "npm run unit-examples --prefix test",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "make-screenshot": "node test/e2e/puppeteer.js --make"
@@ -89,20 +82,19 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@babel/core": "^7.12.9",
+    "@babel/core": "^7.12.10",
     "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/preset-env": "^7.12.7",
-    "@rollup/plugin-babel": "^5.2.1",
-    "@typescript-eslint/eslint-plugin": "^4.8.2",
-    "@typescript-eslint/parser": "^4.8.2",
+    "@babel/preset-env": "^7.12.11",
+    "@rollup/plugin-babel": "^5.2.2",
+    "@rollup/plugin-node-resolve": "^11.1.0",
     "concurrently": "^5.3.0",
-    "eslint": "^7.14.0",
+    "eslint": "^7.18.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-html": "^6.1.1",
-    "rollup": "^2.33.3",
+    "regenerator-runtime": "^0.13.7",
+    "rollup": "^2.38.0",
     "rollup-plugin-terser": "^7.0.2",
-    "servez": "^1.11.0",
-    "typescript": "^4.1.2"
+    "servez": "^1.11.0"
   },
   "jspm": {
     "files": [

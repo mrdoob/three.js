@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lottie<br/></br>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lottie<br/></br>
 			<input id="scrubber" type="range" value="0" style="width: 300px">
 		</div>
 
@@ -19,7 +19,7 @@
 
 			import * as THREE from '../build/three.module.js';
 			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
-			import { RoundedBoxBufferGeometry } from './jsm/geometries/RoundedBoxBufferGeometry.js';
+			import { RoundedBoxGeometry } from './jsm/geometries/RoundedBoxGeometry.js';
 			import { LottieLoader } from './jsm/loaders/LottieLoader.js';
 
 			let renderer, scene, camera;
@@ -44,7 +44,7 @@
 
 					// texture = new THREE.TextureLoader().load( 'textures/uv_grid_directx.jpg' );
 
-					const geometry = new RoundedBoxBufferGeometry( 1, 1, 1, 7, 0.2 );
+					const geometry = new RoundedBoxGeometry( 1, 1, 1, 7, 0.2 );
 					const material = new THREE.MeshStandardMaterial( { roughness: 0.1, map: texture } );
 					mesh = new THREE.Mesh( geometry, material );
 					scene.add( mesh );
@@ -63,7 +63,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

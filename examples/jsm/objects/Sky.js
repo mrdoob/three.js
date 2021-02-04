@@ -1,11 +1,11 @@
 import {
 	BackSide,
-	BoxBufferGeometry,
+	BoxGeometry,
 	Mesh,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * Based on "A Practical Analytic Model for Daylight"
@@ -34,7 +34,7 @@ var Sky = function () {
 		depthWrite: false
 	} );
 
-	Mesh.call( this, new BoxBufferGeometry( 1, 1, 1 ), material );
+	Mesh.call( this, new BoxGeometry( 1, 1, 1 ), material );
 
 };
 
@@ -43,12 +43,12 @@ Sky.prototype = Object.create( Mesh.prototype );
 Sky.SkyShader = {
 
 	uniforms: {
-		"turbidity": { value: 2 },
-		"rayleigh": { value: 1 },
-		"mieCoefficient": { value: 0.005 },
-		"mieDirectionalG": { value: 0.8 },
-		"sunPosition": { value: new Vector3() },
-		"up": { value: new Vector3( 0, 1, 0 ) }
+		'turbidity': { value: 2 },
+		'rayleigh': { value: 1 },
+		'mieCoefficient': { value: 0.005 },
+		'mieDirectionalG': { value: 0.8 },
+		'sunPosition': { value: new Vector3() },
+		'up': { value: new Vector3( 0, 1, 0 ) }
 	},
 
 	vertexShader: [

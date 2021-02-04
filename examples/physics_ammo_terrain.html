@@ -105,7 +105,7 @@
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableZoom = false;
 
-				const geometry = new THREE.PlaneBufferGeometry( terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1 );
+				const geometry = new THREE.PlaneGeometry( terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
 				const vertices = geometry.attributes.position.array;
@@ -156,7 +156,7 @@
 				scene.add( light );
 
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -312,7 +312,7 @@
 					case 1:
 						// Sphere
 						radius = 1 + Math.random() * objectSize;
-						threeObject = new THREE.Mesh( new THREE.SphereBufferGeometry( radius, 20, 20 ), createObjectMaterial() );
+						threeObject = new THREE.Mesh( new THREE.SphereGeometry( radius, 20, 20 ), createObjectMaterial() );
 						shape = new Ammo.btSphereShape( radius );
 						shape.setMargin( margin );
 						break;
@@ -321,7 +321,7 @@
 						const sx = 1 + Math.random() * objectSize;
 						const sy = 1 + Math.random() * objectSize;
 						const sz = 1 + Math.random() * objectSize;
-						threeObject = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), createObjectMaterial() );
+						threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), createObjectMaterial() );
 						shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 						shape.setMargin( margin );
 						break;
@@ -329,7 +329,7 @@
 						// Cylinder
 						radius = 1 + Math.random() * objectSize;
 						height = 1 + Math.random() * objectSize;
-						threeObject = new THREE.Mesh( new THREE.CylinderBufferGeometry( radius, radius, height, 20, 1 ), createObjectMaterial() );
+						threeObject = new THREE.Mesh( new THREE.CylinderGeometry( radius, radius, height, 20, 1 ), createObjectMaterial() );
 						shape = new Ammo.btCylinderShape( new Ammo.btVector3( radius, height * 0.5, radius ) );
 						shape.setMargin( margin );
 						break;
@@ -337,7 +337,7 @@
 						// Cone
 						radius = 1 + Math.random() * objectSize;
 						height = 2 + Math.random() * objectSize;
-						threeObject = new THREE.Mesh( new THREE.ConeBufferGeometry( radius, height, 20, 2 ), createObjectMaterial() );
+						threeObject = new THREE.Mesh( new THREE.ConeGeometry( radius, height, 20, 2 ), createObjectMaterial() );
 						shape = new Ammo.btConeShape( radius, height );
 						break;
 

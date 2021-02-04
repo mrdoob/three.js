@@ -208,7 +208,7 @@
 					map: mapGrid
 				} );
 
-				object = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 75, 0 ), material );
+				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 75, 0 ), material );
 				object.position.set( - 200, 0, 200 );
 				object.name = 'Icosahedron';
 				scene1.add( object );
@@ -218,7 +218,7 @@
 					color: 0x0000ff,
 					wireframe: true
 				} );
-				object = new THREE.Mesh( new THREE.OctahedronBufferGeometry( 75, 1 ), material );
+				object = new THREE.Mesh( new THREE.OctahedronGeometry( 75, 1 ), material );
 				object.position.set( 0, 0, 200 );
 				object.name = 'Octahedron';
 				scene1.add( object );
@@ -230,7 +230,7 @@
 					opacity: 0.5
 				} );
 
-				object = new THREE.Mesh( new THREE.TetrahedronBufferGeometry( 75, 0 ), material );
+				object = new THREE.Mesh( new THREE.TetrahedronGeometry( 75, 0 ), material );
 				object.position.set( 200, 0, 200 );
 				object.name = 'Tetrahedron';
 				scene1.add( object );
@@ -246,7 +246,7 @@
 					flatShading: true
 				} );
 				material.map = gradientTexture;
-				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 70, 10, 10 ), material );
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( 70, 10, 10 ), material );
 				sphere.position.set( 0, 0, 0 );
 				sphere.name = "Sphere";
 				scene1.add( sphere );
@@ -256,7 +256,7 @@
 					color: 0xff00ff,
 					flatShading: true
 				} );
-				object = new THREE.Mesh( new THREE.CylinderBufferGeometry( 10, 80, 100 ), material );
+				object = new THREE.Mesh( new THREE.CylinderGeometry( 10, 80, 100 ), material );
 				object.position.set( 200, 0, 0 );
 				object.name = "Cylinder";
 				scene1.add( object );
@@ -266,7 +266,7 @@
 					color: 0xff0000,
 					roughness: 1
 				} );
-				object = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 50, 15, 40, 10 ), material );
+				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 15, 40, 10 ), material );
 				object.position.set( - 200, 0, 0 );
 				object.name = "Cylinder";
 				scene1.add( object );
@@ -278,12 +278,12 @@
 				const mapWood = new THREE.TextureLoader().load( 'textures/hardwood2_diffuse.jpg' );
 				material = new THREE.MeshStandardMaterial( { map: mapWood, side: THREE.DoubleSide } );
 
-				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 100, 100 ), material );
+				object = new THREE.Mesh( new THREE.BoxGeometry( 40, 100, 100 ), material );
 				object.position.set( - 200, 0, 400 );
 				object.name = "Cube";
 				scene1.add( object );
 
-				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 40, 40, 2, 2, 2 ), material );
+				object2 = new THREE.Mesh( new THREE.BoxGeometry( 40, 40, 40, 2, 2, 2 ), material );
 				object2.position.set( 0, 0, 50 );
 				object2.rotation.set( 0, 45, 0 );
 				object2.name = "SubCube";
@@ -302,7 +302,7 @@
 				group2.position.set( 0, 50, 0 );
 				group1.add( group2 );
 
-				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
+				object2 = new THREE.Mesh( new THREE.BoxGeometry( 30, 30, 30 ), material );
 				object2.name = "Cube in group";
 				object2.position.set( 0, 0, 400 );
 				group2.add( object2 );
@@ -422,15 +422,15 @@
 					side: THREE.DoubleSide
 				} );
 
-				object = new THREE.Mesh( new THREE.CircleBufferGeometry( 50, 20, 0, Math.PI * 2 ), material );
+				object = new THREE.Mesh( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), material );
 				object.position.set( 200, 0, - 400 );
 				scene1.add( object );
 
-				object = new THREE.Mesh( new THREE.RingBufferGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
+				object = new THREE.Mesh( new THREE.RingGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
 				object.position.set( 0, 0, - 400 );
 				scene1.add( object );
 
-				object = new THREE.Mesh( new THREE.CylinderBufferGeometry( 25, 75, 100, 40, 5 ), material );
+				object = new THREE.Mesh( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), material );
 				object.position.set( - 200, 0, - 400 );
 				scene1.add( object );
 
@@ -443,7 +443,7 @@
 
 				}
 
-				object = new THREE.Mesh( new THREE.LatheBufferGeometry( points, 20 ), material );
+				object = new THREE.Mesh( new THREE.LatheGeometry( points, 20 ), material );
 				object.position.set( 200, 0, 400 );
 				scene1.add( object );
 
@@ -453,7 +453,7 @@
 				material = new THREE.MeshBasicMaterial( {
 					color: 0xff0000
 				} );
-				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 200, 200, 200 ), material );
+				object = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), material );
 				object.position.set( 0, 0, 0 );
 				object.name = "CubeHidden";
 				object.visible = false;
@@ -477,7 +477,7 @@
 				// 2nd THREE.Scene
 				// ---------------------------------------------------------------------
 				scene2 = new THREE.Scene();
-				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), material );
+				object = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
 				object.position.set( 0, 0, 0 );
 				object.name = "Cube2ndScene";
 				scene2.name = 'Scene2';
@@ -493,7 +493,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
