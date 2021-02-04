@@ -12,7 +12,7 @@ export default /* glsl */`
 
 	#ifdef DOUBLE_SIDED
 
-		// We can't compute isFrontFacing if the model doesn't have normals
+		// We can't compute faceDirection if the model doesn't have normals
 
 		normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
 
@@ -31,13 +31,13 @@ export default /* glsl */`
 
 	#else
 
-		normal = perturbNormal2Arb( -vViewPosition, normal, mapN, isFrontFacing );
+		normal = perturbNormal2Arb( -vViewPosition, normal, mapN, faceDirection );
 
 	#endif
 
 #elif defined( USE_BUMPMAP )
 
-	normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd(), isFrontFacing );
+	normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd(), faceDirection );
 
 #endif
 `;
