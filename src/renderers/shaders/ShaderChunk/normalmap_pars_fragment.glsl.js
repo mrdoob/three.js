@@ -34,11 +34,7 @@ export default /* glsl */`
 
 		mat3 tsn = mat3( S, T, N );
 
-		#ifdef DOUBLE_SIDED
-
-			mapN.xy *= ( float( isFrontFacing ) * 2.0 - 1.0 );
-
-		#endif
+		mapN.xy *= ( float( isFrontFacing ) * 2.0 - 1.0 );
 
 		return normalize( tsn * mapN );
 
