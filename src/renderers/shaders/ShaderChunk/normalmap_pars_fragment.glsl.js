@@ -34,7 +34,7 @@ export default /* glsl */`
 
 		mat3 tsn = mat3( S, T, N );
 
-		mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+		if ( dot( surf_norm, normalize( cross( q0, q1 ) ) ) < 0.0 ) mapN.xy *= - 1.0;
 
 		return normalize( tsn * mapN );
 
