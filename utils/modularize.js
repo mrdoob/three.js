@@ -34,6 +34,8 @@ var files = [
 	{ path: 'effects/PeppersGhostEffect.js', dependencies: [], ignoreList: [] },
 	{ path: 'effects/StereoEffect.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'exporters/ColladaExporter.js', dependencies: [], ignoreList: [ 'BufferGeometry' ] },
+	{ path: 'exporters/DRACOExporter.js', dependencies: [], ignoreList: [ 'Geometry', 'BufferGeometry' ] },
 	{ path: 'exporters/GLTFExporter.js', dependencies: [], ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'Scenes', 'ShaderMaterial', 'BufferGeometry', 'Texture' ] },
 	{ path: 'exporters/MMDExporter.js', dependencies: [ { name: 'MMDParser', path: 'libs/mmdparser.module.js' } ], ignoreList: [] },
 	{ path: 'exporters/OBJExporter.js', dependencies: [], ignoreList: [ 'BufferGeometry' ] },
