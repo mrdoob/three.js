@@ -12,7 +12,7 @@ export default /* glsl */`
 
 	#ifdef DOUBLE_SIDED
 
-		normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+		normal = normal * ( float( isFrontFacing ) * 2.0 - 1.0 );
 
 	#endif
 
@@ -29,13 +29,13 @@ export default /* glsl */`
 
 	#else
 
-		normal = perturbNormal2Arb( -vViewPosition, normal, mapN );
+		normal = perturbNormal2Arb( -vViewPosition, normal, mapN, isFrontFacing );
 
 	#endif
 
 #elif defined( USE_BUMPMAP )
 
-	normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );
+	normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd(), isFrontFacing );
 
 #endif
 `;
