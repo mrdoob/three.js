@@ -1,11 +1,7 @@
 export default /* glsl */`
 #define NORMAL
 
-#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )
-
-	varying vec3 vViewPosition;
-
-#endif
+varying vec3 vViewPosition;
 
 #ifndef FLAT_SHADED
 
