@@ -137,6 +137,12 @@ class Line3 {
 		return line.start.equals( this.start ) && line.end.equals( this.end );
 
 	}
+	
+	equalsLoose( line ) {
+
+		return (line.start.equals( this.start ) && line.end.equals( this.end )) || (line.start.equals( this.end ) && line.end.equals( this.start ));
+
+	}
 
 }
 
