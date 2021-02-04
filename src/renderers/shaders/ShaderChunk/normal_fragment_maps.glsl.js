@@ -12,7 +12,9 @@ export default /* glsl */`
 
 	#ifdef DOUBLE_SIDED
 
-		normal = normal * ( float( isFrontFacing ) * 2.0 - 1.0 );
+		// We can't compute isFrontFacing if the model doesn't have normals
+
+		normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
 
 	#endif
 
