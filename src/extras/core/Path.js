@@ -8,8 +8,9 @@ import { LineCurve } from '../curves/LineCurve.js';
 
 class Path extends CurvePath {
 
-	constructor ( points ) {
-		super()
+	constructor( points ) {
+
+		super();
 		this.type = 'Path';
 
 		this.currentPoint = new Vector2();
@@ -19,6 +20,7 @@ class Path extends CurvePath {
 			this.setFromPoints( points );
 
 		}
+
 	}
 
 	setFromPoints( points ) {
@@ -159,7 +161,7 @@ class Path extends CurvePath {
 
 	copy( source ) {
 
-		super.copy(  source );
+		super.copy( source );
 
 		this.currentPoint.copy( source.currentPoint );
 
@@ -179,13 +181,14 @@ class Path extends CurvePath {
 
 	fromJSON( json ) {
 
-		super.fromJSON(  json );
+		super.fromJSON( json );
 
 		this.currentPoint.fromArray( json.currentPoint );
 
 		return this;
 
 	}
+
 }
 
 

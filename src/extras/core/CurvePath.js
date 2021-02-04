@@ -9,12 +9,14 @@ import * as Curves from '../curves/Curves.js';
 class CurvePath extends Curve {
 
 	constructor() {
+
 		super();
 
 		this.type = 'CurvePath';
 
 		this.curves = [];
 		this.autoClose = false; // Automatically closes the path
+
 	}
 
 	add( curve ) {
@@ -243,6 +245,7 @@ class CurvePath extends Curve {
 		return this;
 
 	}
+
 }
 
 

@@ -3,7 +3,8 @@ import { MathUtils } from '../../math/MathUtils.js';
 
 class Shape extends Path {
 
-	constructor ( points ) {
+	constructor( points ) {
+
 		super( points );
 
 		this.uuid = MathUtils.generateUUID();
@@ -11,6 +12,7 @@ class Shape extends Path {
 		this.type = 'Shape';
 
 		this.holes = [];
+
 	}
 
 	getPointsHoles( divisions ) {
@@ -42,7 +44,7 @@ class Shape extends Path {
 
 	copy( source ) {
 
-		super.copy(  source );
+		super.copy( source );
 
 		this.holes = [];
 
@@ -78,7 +80,7 @@ class Shape extends Path {
 
 	fromJSON( json ) {
 
-		super.fromJSON(  json );
+		super.fromJSON( json );
 
 		this.uuid = json.uuid;
 		this.holes = [];
@@ -93,6 +95,7 @@ class Shape extends Path {
 		return this;
 
 	}
+
 }
 
 

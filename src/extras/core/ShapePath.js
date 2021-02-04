@@ -5,7 +5,8 @@ import { ShapeUtils } from '../ShapeUtils.js';
 
 class ShapePath {
 
-	constructor () {
+	constructor() {
+
 		this.type = 'ShapePath';
 
 		this.color = new Color();
@@ -287,6 +288,7 @@ class ShapePath {
 		return shapes;
 
 	}
+
 }
 
 
