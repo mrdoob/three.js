@@ -3,7 +3,11 @@ export default /* glsl */`
 
 uniform float opacity;
 
-varying vec3 vViewPosition;
+#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )
+
+	varying vec3 vViewPosition;
+
+#endif
 
 #ifndef FLAT_SHADED
 

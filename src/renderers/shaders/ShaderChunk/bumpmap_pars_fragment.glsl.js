@@ -35,7 +35,11 @@ export default /* glsl */`
 
 		float fDet = dot( vSigmaX, R1 );
 
-		fDet *= ( float( isFrontFacing ) * 2.0 - 1.0 );
+		#ifdef DOUBLE_SIDED
+
+			fDet *= ( float( isFrontFacing ) * 2.0 - 1.0 );
+
+		#endif
 
 		vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );
 		return normalize( abs( fDet ) * surf_norm - vGrad );
