@@ -35,7 +35,7 @@
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.ConeBufferGeometry( 0.1, 0.5, 8 );
+				const geometry = new THREE.ConeGeometry( 0.1, 0.5, 8 );
 				geometry.rotateX( Math.PI * 0.5 );
 				const material = new THREE.MeshNormalMaterial();
 
@@ -44,14 +44,14 @@
 
 				//
 
-				const targetGeometry = new THREE.SphereBufferGeometry( 0.05 );
+				const targetGeometry = new THREE.SphereGeometry( 0.05 );
 				const targetMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 				target = new THREE.Mesh( targetGeometry, targetMaterial );
 				scene.add( target );
 
 				//
 
-				const sphereGeometry = new THREE.SphereBufferGeometry( 2, 32, 32 );
+				const sphereGeometry = new THREE.SphereGeometry( 2, 32, 32 );
 				const sphereMaterial = new THREE.MeshBasicMaterial( { color: 0xcccccc, wireframe: true, transparent: true, opacity: 0.3 } );
 				const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
 				scene.add( sphere );
@@ -65,7 +65,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
@@ -73,7 +73,7 @@
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

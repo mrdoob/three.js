@@ -40,7 +40,7 @@
 
 				// ground
 
-				const groundGeometry = new THREE.PlaneBufferGeometry( 20, 20, 10, 10 );
+				const groundGeometry = new THREE.PlaneGeometry( 20, 20, 10, 10 );
 				const groundMaterial = new THREE.MeshBasicMaterial( { color: 0xcccccc } );
 				const ground = new THREE.Mesh( groundGeometry, groundMaterial );
 				ground.rotation.x = Math.PI * - 0.5;
@@ -60,7 +60,7 @@
 
 				// water
 
-				const waterGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+				const waterGeometry = new THREE.PlaneGeometry( 20, 20 );
 				const flowMap = textureLoader.load( 'textures/water/Water_1_M_Flow.jpg' );
 
 				water = new Water( waterGeometry, {
@@ -76,7 +76,7 @@
 
 				// flow map helper
 
-				const helperGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+				const helperGeometry = new THREE.PlaneGeometry( 20, 20 );
 				const helperMaterial = new THREE.MeshBasicMaterial( { map: flowMap } );
 				const helper = new THREE.Mesh( helperGeometry, helperMaterial );
 				helper.position.y = 1.01;
@@ -105,11 +105,11 @@
 
 				//
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

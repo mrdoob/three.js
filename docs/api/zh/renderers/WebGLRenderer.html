@@ -170,9 +170,13 @@
 			</li>
 		</ul>
 		</p>
-		<p>默认情况下，每次调用渲染时这些数据都会重置。 但当时用一个或多个镜像时，最好使用自定义模式重置它们：
+		<p>By default these data are reset at each render call but when having multiple render passes per frame (e.g. when using post processing) it can be preferred to reset with a custom pattern.
+			First, set *autoReset* to *false*.
 		<code>
 		renderer.info.autoReset = false;
+		</code>
+		Call *reset()* whenever you have finished to render a single frame.
+		<code>
 		renderer.info.reset();
 		</code>
 		</p>
@@ -318,7 +322,7 @@
 		<h3>[method:Float getClearAlpha]()</h3>
 		<p>返回一个表示当前alpha值的[page:Float float]，范围0到1</p>
 
-		<h3>[method:Color getClearColor]()</h3>
+		<h3>[method:Color getClearColor]( [param:Color target] )</h3>
 		<p>返回一个表示当前颜色值的[page:Color THREE.Color]实例</p>
 
 		<h3>[method:WebGLRenderingContext getContext]()</h3>
@@ -371,7 +375,7 @@
 			即便forceClear设为true, 也可以通过将[page:WebGLRenderer.autoClearColor autoClearColor]、[page:WebGLRenderer.autoClearStencil autoClearStencil]或[page:WebGLRenderer.autoClearDepth autoClearDepth]属性的值设为false来阻止对应缓存被清除。
 		</p>
 
-		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:Geometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
+		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:BufferGeometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
 		<p>使用相机和指定材质渲染缓冲几何组。</p>
 
 		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:WebGLProgram program] )</h3>
@@ -380,6 +384,9 @@
 
 		Renders an instance of [page:ImmediateRenderObject]，由renderObjectImmediate对象调用。
 		</p>
+
+		<h3>[method:null resetState]()</h3>
+		<p>Can be used to reset the internal WebGL state. This method is mostly relevant for applications which share a single WebGL context across multiple WebGL libraries.</p>
 
 		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
 		<p>[page:Function callback] — 每个可用帧都会调用的函数。 如果传入‘null’,所有正在进行的动画都会停止。</p>

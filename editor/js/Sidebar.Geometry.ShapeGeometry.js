@@ -4,7 +4,7 @@ import { UIRow, UIText, UIInteger, UIButton } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-function SidebarGeometryShapeGeometry( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -31,7 +31,7 @@ function SidebarGeometryShapeGeometry( editor, object ) {
 
 	function changeShape() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.ShapeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ShapeGeometry(
 			parameters.shapes,
 			curveSegments.getValue()
 		) ) );
@@ -40,7 +40,7 @@ function SidebarGeometryShapeGeometry( editor, object ) {
 
 	function toExtrude() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.ExtrudeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ExtrudeGeometry(
 			parameters.shapes, {
 				curveSegments: curveSegments.getValue()
 			}
@@ -52,4 +52,4 @@ function SidebarGeometryShapeGeometry( editor, object ) {
 
 }
 
-export { SidebarGeometryShapeGeometry };
+export { GeometryParametersPanel };

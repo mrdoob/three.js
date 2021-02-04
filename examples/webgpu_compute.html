@@ -21,6 +21,10 @@
 			import WebGPUUniformsGroup from './jsm/renderers/webgpu/WebGPUUniformsGroup.js';
 			import { Vector2Uniform } from './jsm/renderers/webgpu/WebGPUUniform.js';
 
+			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
+			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
+			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
+
 			let camera, scene, renderer;
 			let pointer;
 
@@ -151,7 +155,10 @@
 				const pointsGeometry = new THREE.BufferGeometry().setAttribute(
 					'position', particleBuffer.attribute
 				);
+
 				const pointsMaterial = new THREE.PointsMaterial();
+				pointsMaterial.colorNode = new OperatorNode( '+', new PositionNode(), new ColorNode( new THREE.Color( 0x0000FF ) ) );
+
 				const mesh = new THREE.Points( pointsGeometry, pointsMaterial );
 				scene.add( mesh );
 
@@ -160,8 +167,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
-				window.addEventListener( 'mousemove', onMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize );
+				window.addEventListener( 'mousemove', onMouseMove );
 
 				return renderer.init();
 

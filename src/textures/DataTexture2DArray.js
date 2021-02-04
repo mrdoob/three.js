@@ -1,11 +1,11 @@
 import { Texture } from './Texture.js';
 import { ClampToEdgeWrapping, NearestFilter } from '../constants.js';
 
-function DataTexture2DArray( data, width, height, depth ) {
+function DataTexture2DArray( data = null, width = 1, height = 1, depth = 1 ) {
 
 	Texture.call( this, null );
 
-	this.image = { data: data || null, width: width || 1, height: height || 1, depth: depth || 1 };
+	this.image = { data, width, height, depth };
 
 	this.magFilter = NearestFilter;
 	this.minFilter = NearestFilter;

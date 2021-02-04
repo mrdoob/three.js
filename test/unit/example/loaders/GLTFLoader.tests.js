@@ -22,6 +22,10 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
+	} );
+
+	QUnit.module( 'GLTFLoader-webonly', () => {
+
 		QUnit.test( 'parse - basic', ( assert ) => {
 
 			var done = assert.async();

@@ -1,11 +1,11 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { RingBufferGeometry } from '../../../../src/geometries/RingBufferGeometry';
+import { RingGeometry, RingBufferGeometry } from '../../../../src/geometries/RingGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'RingBufferGeometry', ( hooks ) => {
+	QUnit.module( 'RingGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -20,13 +20,14 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				new RingBufferGeometry(),
-				new RingBufferGeometry( parameters.innerRadius ),
-				new RingBufferGeometry( parameters.innerRadius, parameters.outerRadius ),
-				new RingBufferGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments ),
-				new RingBufferGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments ),
-				new RingBufferGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments, parameters.thetaStart ),
-				new RingBufferGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments, parameters.thetaStart, parameters.thetaLength ),
+				new RingGeometry(),
+				new RingGeometry( parameters.innerRadius ),
+				new RingGeometry( parameters.innerRadius, parameters.outerRadius ),
+				new RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments ),
+				new RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments ),
+				new RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments, parameters.thetaStart ),
+				new RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments, parameters.thetaStart, parameters.thetaLength ),
+				new RingBufferGeometry()
 			];
 
 		} );

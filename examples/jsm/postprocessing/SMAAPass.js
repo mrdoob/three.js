@@ -7,11 +7,11 @@ import {
 	Texture,
 	UniformsUtils,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
-import { SMAAEdgesShader } from "../shaders/SMAAShader.js";
-import { SMAAWeightsShader } from "../shaders/SMAAShader.js";
-import { SMAABlendShader } from "../shaders/SMAAShader.js";
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
+import { SMAAEdgesShader } from '../shaders/SMAAShader.js';
+import { SMAAWeightsShader } from '../shaders/SMAAShader.js';
+import { SMAABlendShader } from '../shaders/SMAAShader.js';
 
 var SMAAPass = function ( width, height ) {
 
@@ -25,7 +25,7 @@ var SMAAPass = function ( width, height ) {
 		minFilter: LinearFilter,
 		format: RGBFormat
 	} );
-	this.edgesRT.texture.name = "SMAAPass.edges";
+	this.edgesRT.texture.name = 'SMAAPass.edges';
 
 	this.weightsRT = new WebGLRenderTarget( width, height, {
 		depthBuffer: false,
@@ -33,7 +33,7 @@ var SMAAPass = function ( width, height ) {
 		minFilter: LinearFilter,
 		format: RGBAFormat
 	} );
-	this.weightsRT.texture.name = "SMAAPass.weights";
+	this.weightsRT.texture.name = 'SMAAPass.weights';
 
 	// textures
 	var scope = this;
@@ -48,7 +48,7 @@ var SMAAPass = function ( width, height ) {
 	};
 
 	this.areaTexture = new Texture();
-	this.areaTexture.name = "SMAAPass.area";
+	this.areaTexture.name = 'SMAAPass.area';
 	this.areaTexture.image = areaTextureImage;
 	this.areaTexture.format = RGBFormat;
 	this.areaTexture.minFilter = LinearFilter;
@@ -65,7 +65,7 @@ var SMAAPass = function ( width, height ) {
 	};
 
 	this.searchTexture = new Texture();
-	this.searchTexture.name = "SMAAPass.search";
+	this.searchTexture.name = 'SMAAPass.search';
 	this.searchTexture.image = searchTextureImage;
 	this.searchTexture.magFilter = NearestFilter;
 	this.searchTexture.minFilter = NearestFilter;
@@ -76,13 +76,13 @@ var SMAAPass = function ( width, height ) {
 
 	if ( SMAAEdgesShader === undefined ) {
 
-		console.error( "SMAAPass relies on SMAAShader" );
+		console.error( 'THREE.SMAAPass relies on SMAAShader' );
 
 	}
 
 	this.uniformsEdges = UniformsUtils.clone( SMAAEdgesShader.uniforms );
 
-	this.uniformsEdges[ "resolution" ].value.set( 1 / width, 1 / height );
+	this.uniformsEdges[ 'resolution' ].value.set( 1 / width, 1 / height );
 
 	this.materialEdges = new ShaderMaterial( {
 		defines: Object.assign( {}, SMAAEdgesShader.defines ),
@@ -95,10 +95,10 @@ var SMAAPass = function ( width, height ) {
 
 	this.uniformsWeights = UniformsUtils.clone( SMAAWeightsShader.uniforms );
 
-	this.uniformsWeights[ "resolution" ].value.set( 1 / width, 1 / height );
-	this.uniformsWeights[ "tDiffuse" ].value = this.edgesRT.texture;
-	this.uniformsWeights[ "tArea" ].value = this.areaTexture;
-	this.uniformsWeights[ "tSearch" ].value = this.searchTexture;
+	this.uniformsWeights[ 'resolution' ].value.set( 1 / width, 1 / height );
+	this.uniformsWeights[ 'tDiffuse' ].value = this.edgesRT.texture;
+	this.uniformsWeights[ 'tArea' ].value = this.areaTexture;
+	this.uniformsWeights[ 'tSearch' ].value = this.searchTexture;
 
 	this.materialWeights = new ShaderMaterial( {
 		defines: Object.assign( {}, SMAAWeightsShader.defines ),
@@ -111,8 +111,8 @@ var SMAAPass = function ( width, height ) {
 
 	this.uniformsBlend = UniformsUtils.clone( SMAABlendShader.uniforms );
 
-	this.uniformsBlend[ "resolution" ].value.set( 1 / width, 1 / height );
-	this.uniformsBlend[ "tDiffuse" ].value = this.weightsRT.texture;
+	this.uniformsBlend[ 'resolution' ].value.set( 1 / width, 1 / height );
+	this.uniformsBlend[ 'tDiffuse' ].value = this.weightsRT.texture;
 
 	this.materialBlend = new ShaderMaterial( {
 		uniforms: this.uniformsBlend,
@@ -134,7 +134,7 @@ SMAAPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		// pass 1
 
-		this.uniformsEdges[ "tDiffuse" ].value = readBuffer.texture;
+		this.uniformsEdges[ 'tDiffuse' ].value = readBuffer.texture;
 
 		this.fsQuad.material = this.materialEdges;
 
@@ -152,7 +152,7 @@ SMAAPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		// pass 3
 
-		this.uniformsBlend[ "tColor" ].value = readBuffer.texture;
+		this.uniformsBlend[ 'tColor' ].value = readBuffer.texture;
 
 		this.fsQuad.material = this.materialBlend;
 

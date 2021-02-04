@@ -89,7 +89,7 @@
 
 				//
 
-				let geometry = new THREE.TextGeometry( "THREE.JS", {
+				let geometry = new THREE.TextGeometry( 'THREE.JS', {
 
 					font: font,
 
@@ -110,8 +110,6 @@
 				geometry = tessellateModifier.modify( geometry );
 
 				//
-
-				geometry = new THREE.BufferGeometry().fromGeometry( geometry );
 
 				const numFaces = geometry.attributes.position.count / 3;
 
@@ -185,7 +183,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

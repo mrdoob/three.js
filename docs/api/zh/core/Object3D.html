@@ -29,6 +29,9 @@
 
 	<h2>属性</h2>
 
+	<h3>[property:AnimationClip animations]</h3>
+	<p>Array with object's animation clips.</p>
+
 	<h3>[property:Boolean castShadow]</h3>
 	<p>对象是否被渲染到阴影贴图中。默认值为*false*。</p>
 
@@ -101,11 +104,21 @@
 		一个可选的回调函数，在Object3D渲染之后直接执行。
 		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
 	</p>
+	<p>
+	Please notice that this callback is only executed for *renderable* 3D objects. Meaning 3D objects which define their visual
+	appearance with geometries and materials like instances of [page:Mesh], [page:Line], [page:Points] or [page:Sprite].
+	Instances of [page:Object3D], [page:Group] or [page:Bone] are not renderable and thus this callback is not executed for such objects.
+	</p>
 
 	<h3>[property:Function onBeforeRender]</h3>
 	<p>
 		一个可选的回调函数，在Object3D渲染之前直接执行。
 		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
+	</p>
+	<p>
+	Please notice that this callback is only executed for *renderable* 3D objects. Meaning 3D objects which define their visual
+	appearance with geometries and materials like instances of [page:Mesh], [page:Line], [page:Points] or [page:Sprite].
+	Instances of [page:Object3D], [page:Group] or [page:Bone] are not renderable and thus this callback is not executed for such objects.
 	</p>
 
 	<h3>[property:Object3D parent]</h3>

@@ -23,9 +23,10 @@ class EdgesGeometry extends BufferGeometry {
 
 		thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
 
-		if ( geometry.isGeometry ) {
+		if ( geometry.isGeometry === true ) {
 
-			geometry = new BufferGeometry().fromGeometry( geometry );
+			console.error( 'THREE.EdgesGeometry no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
+			return;
 
 		}
 

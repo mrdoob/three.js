@@ -154,9 +154,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 	},
 
-	getPoints: function ( divisions ) {
-
-		divisions = divisions || 12;
+	getPoints: function ( divisions = 12 ) {
 
 		const points = [];
 		let last;

@@ -11,15 +11,15 @@ import {
 	Mesh,
 	NoBlending,
 	OrthographicCamera,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	RawShaderMaterial,
 	Vector2,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var _mipmapMaterial = _getMipmapMaterial();
 
-var _mesh = new Mesh( new PlaneBufferGeometry( 2, 2 ), _mipmapMaterial );
+var _mesh = new Mesh( new PlaneGeometry( 2, 2 ), _mipmapMaterial );
 
 var _flatCamera = new OrthographicCamera( 0, 1, 0, 1, 0, 1 );
 

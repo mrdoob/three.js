@@ -481,7 +481,7 @@
 
 				// sphere
 
-				const ballGeo = new THREE.SphereBufferGeometry( ballSize, 32, 16 );
+				const ballGeo = new THREE.SphereGeometry( ballSize, 32, 16 );
 				const ballMaterial = new THREE.MeshLambertMaterial();
 
 				sphere = new THREE.Mesh( ballGeo, ballMaterial );
@@ -500,7 +500,7 @@
 
 				const groundMaterial = new THREE.MeshLambertMaterial( { map: groundTexture } );
 
-				let mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
+				let mesh = new THREE.Mesh( new THREE.PlaneGeometry( 20000, 20000 ), groundMaterial );
 				mesh.position.y = - 250;
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;
@@ -508,7 +508,7 @@
 
 				// poles
 
-				const poleGeo = new THREE.BoxBufferGeometry( 5, 375, 5 );
+				const poleGeo = new THREE.BoxGeometry( 5, 375, 5 );
 				const poleMat = new THREE.MeshLambertMaterial();
 
 				mesh = new THREE.Mesh( poleGeo, poleMat );
@@ -525,14 +525,14 @@
 				mesh.castShadow = true;
 				scene.add( mesh );
 
-				mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 255, 5, 5 ), poleMat );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 255, 5, 5 ), poleMat );
 				mesh.position.y = - 250 + ( 750 / 2 );
 				mesh.position.x = 0;
 				mesh.receiveShadow = true;
 				mesh.castShadow = true;
 				scene.add( mesh );
 
-				const gg = new THREE.BoxBufferGeometry( 10, 10, 10 );
+				const gg = new THREE.BoxGeometry( 10, 10, 10 );
 				mesh = new THREE.Mesh( gg, poleMat );
 				mesh.position.y = - 250;
 				mesh.position.x = 125;
@@ -572,7 +572,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
