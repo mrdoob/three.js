@@ -75,7 +75,7 @@ var BokehShader = {
 
 		'void main() {',
 
-		'	vec2 aspectcorrect = vec2( 1.0, aspect );',
+		'	vec2 aspectcorrect = vec2( 1.0 / aspect, 1.0 );',
 
 		'	float viewZ = getViewZ( getDepth( vUv ) );',
 
