@@ -36,7 +36,21 @@ class Node {
 
 	}
 
-	build( builder, output ) {
+	buildStage( builder, shaderStage, output = null ) {
+		
+		const oldShaderStage = builder.shaderStage;
+		
+		builder.shaderStage = shaderStage;
+		
+		const snippet = this.build( builder, output );
+		
+		builder.shaderStage = oldShaderStage;
+		
+		return snippet;
+		
+	}
+
+	build( builder, output = null ) {
 
 		builder.addNode( this );
 
