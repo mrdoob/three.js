@@ -318,7 +318,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		parseHeader( _header );
 
 		var _data = _bytes.subarray( _data_start ); // the data without header
-		if ( headerObject.encoding === 'gzip' || headerObject.encoding === 'gz' ) {
+		if ( headerObject.encoding === 'gzip' || headerObject.encoding === 'gz' || headerObject.encoding === 'gzi' ) {
 
 			// we need to decompress the datastream
 			// here we start the unzipping and get a typed Uint8Array back
