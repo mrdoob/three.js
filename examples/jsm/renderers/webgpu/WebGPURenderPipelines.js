@@ -99,8 +99,9 @@ class WebGPURenderPipelines {
 
 			const disposeCallback = onMaterialDispose.bind( this );
 			materialProperties.disposeCallback = disposeCallback;
+			materialProperties.object = object;
 
-			material.addEventListener( 'dispose', onMaterialDispose.bind( this ) );
+			material.addEventListener( 'dispose', disposeCallback );
 
 			// determine shader attributes
 
@@ -792,9 +793,10 @@ function onMaterialDispose( event ) {
 	const shaderModules = this.shaderModules;
 
 	const material = event.target;
+	const materialProperties = properties.get( material );
 	const nodeBuilder = nodes.get( material );
 
-	material.removeEventListener( 'dispose', onMaterialDispose );
+	material.removeEventListener( 'dispose', materialProperties.disposeCallback );
 
 	properties.remove( material );
 	nodes.remove( material );
@@ -802,7 +804,11 @@ function onMaterialDispose( event ) {
 	shaderModules.vertex.delete( nodeBuilder.vertexShader );
 	shaderModules.fragment.delete( nodeBuilder.fragmentShader );
 
-	// @TODO: need implement pipeline
+	// @TODO: draft implementation
+
+	this.renderer._bindings.remove( materialProperties.object );
+
+	this.pipelines.delete( materialProperties.object );
 
 }
 
