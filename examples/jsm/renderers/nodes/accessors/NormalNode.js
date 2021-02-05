@@ -8,11 +8,11 @@ import MathNode from '../math/MathNode.js';
 
 class NormalNode extends Node {
 
-	static VIEW = 'view';
 	static LOCAL = 'local';
 	static WORLD = 'world';
+	static VIEW = 'view';
 
-	constructor( scope = NormalNode.VIEW ) {
+	constructor( scope = NormalNode.LOCAL ) {
 
 		super( 'vec3' );
 

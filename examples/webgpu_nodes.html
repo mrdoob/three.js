@@ -133,14 +133,14 @@
 
 					case 'normal':
 
-						const normalNode = new NormalNode( NormalNode.VIEW );
+						const normalNode = new NormalNode( NormalNode.LOCAL );
 
 						material.colorNode = normalNode;
 
-						addGui( 'scope', {
-							view: NormalNode.VIEW,
+						addGui( 'scope', {							
 							local: NormalNode.LOCAL,
-							world: NormalNode.WORLD
+							world: NormalNode.WORLD,
+							view: NormalNode.VIEW
 						}, function ( val ) {
 
 							normalNode.scope = val;
