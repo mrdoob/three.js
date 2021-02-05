@@ -19,6 +19,7 @@ TextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		const loader = new ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
+		loader.setWithCredentials( this.withCredentials );
 		loader.setPath( this.path );
 
 		loader.load( url, function ( image ) {
