@@ -3,7 +3,7 @@ import AttributeNode from '../core/AttributeNode.js';
 
 class PositionNode extends Node {
 
-	static LOCAL = 'position';
+	static LOCAL = 'local';
 
 	constructor( scope = PositionNode.POSITION ) {
 
