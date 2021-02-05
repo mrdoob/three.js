@@ -830,7 +830,7 @@ var VRMLLoader = ( function () {
 					}
 
 				}
-
+				object.name=node.DEF;
 				return object;
 
 			}
@@ -1800,7 +1800,7 @@ var VRMLLoader = ( function () {
 
 				geometry._solid = solid;
 				geometry._type = 'mesh';
-
+				geometry.name=node.DEF;
 				return geometry;
 
 			}
