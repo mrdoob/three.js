@@ -27994,19 +27994,27 @@
 	 *	curves, but retains the api of a curve
 	 **************************************************************/
 
-	function CurvePath() {
-		Curve.call(this);
-		this.type = 'CurvePath';
-		this.curves = [];
-		this.autoClose = false; // Automatically closes the path
-	}
+	var CurvePath = /*#__PURE__*/function (_Curve) {
+		_inheritsLoose(CurvePath, _Curve);
 
-	CurvePath.prototype = Object.assign(Object.create(Curve.prototype), {
-		constructor: CurvePath,
-		add: function add(curve) {
+		function CurvePath() {
+			var _this;
+
+			_this = _Curve.call(this) || this;
+			_this.type = 'CurvePath';
+			_this.curves = [];
+			_this.autoClose = false; // Automatically closes the path
+
+			return _this;
+		}
+
+		var _proto = CurvePath.prototype;
+
+		_proto.add = function add(curve) {
 			this.curves.push(curve);
-		},
-		closePath: function closePath() {
+		};
+
+		_proto.closePath = function closePath() {
 			// Add a line curve if start and end of lines are not connected
 			var startPoint = this.curves[0].getPoint(0);
 			var endPoint = this.curves[this.curves.length - 1].getPoint(1);
@@ -28014,15 +28022,16 @@
 			if (!startPoint.equals(endPoint)) {
 				this.curves.push(new LineCurve(endPoint, startPoint));
 			}
-		},
-		// To get accurate point with reference to
+		} // To get accurate point with reference to
 		// entire path distance at time t,
 		// following has to be done:
 		// 1. Length of each sub path have to be known
 		// 2. Locate and identify type of curve
 		// 3. Get t for the curve
 		// 4. Return curve.getPointAt(t')
-		getPoint: function getPoint(t) {
+		;
+
+		_proto.getPoint = function getPoint(t) {
 			var d = t * this.getLength();
 			var curveLengths = this.getCurveLengths();
 			var i = 0; // To think about boundaries points.
@@ -28040,23 +28049,26 @@
 			}
 
 			return null; // loop where sum != 0, sum > d , sum+1 <d
-		},
-		// We cannot use the default THREE.Curve getPoint() with getLength() because in
+		} // We cannot use the default THREE.Curve getPoint() with getLength() because in
 		// THREE.Curve, getLength() depends on getPoint() but in THREE.CurvePath
 		// getPoint() depends on getLength
-		getLength: function getLength() {
+		;
+
+		_proto.getLength = function getLength() {
 			var lens = this.getCurveLengths();
 			return lens[lens.length - 1];
-		},
-		// cacheLengths must be recalculated.
-		updateArcLengths: function updateArcLengths() {
+		} // cacheLengths must be recalculated.
+		;
+
+		_proto.updateArcLengths = function updateArcLengths() {
 			this.needsUpdate = true;
 			this.cacheLengths = null;
 			this.getCurveLengths();
-		},
-		// Compute lengths and cache them
+		} // Compute lengths and cache them
 		// We cannot overwrite getLengths() because UtoT mapping uses it.
-		getCurveLengths: function getCurveLengths() {
+		;
+
+		_proto.getCurveLengths = function getCurveLengths() {
 			// We use cache values if curves and cache array are same length
 			if (this.cacheLengths && this.cacheLengths.length === this.curves.length) {
 				return this.cacheLengths;
@@ -28074,8 +28086,9 @@
 
 			this.cacheLengths = lengths;
 			return lengths;
-		},
-		getSpacedPoints: function getSpacedPoints(divisions) {
+		};
+
+		_proto.getSpacedPoints = function getSpacedPoints(divisions) {
 			if (divisions === void 0) {
 				divisions = 40;
 			}
@@ -28091,8 +28104,9 @@
 			}
 
 			return points;
-		},
-		getPoints: function getPoints(divisions) {
+		};
+
+		_proto.getPoints = function getPoints(divisions) {
 			if (divisions === void 0) {
 				divisions = 12;
 			}
@@ -28119,9 +28133,11 @@
 			}
 
 			return points;
-		},
-		copy: function copy(source) {
-			Curve.prototype.copy.call(this, source);
+		};
+
+		_proto.copy = function copy(source) {
+			_Curve.prototype.copy.call(this, source);
+
 			this.curves = [];
 
 			for (var i = 0, l = source.curves.length; i < l; i++) {
@@ -28131,9 +28147,11 @@
 
 			this.autoClose = source.autoClose;
 			return this;
-		},
-		toJSON: function toJSON() {
-			var data = Curve.prototype.toJSON.call(this);
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = _Curve.prototype.toJSON.call(this);
+
 			data.autoClose = this.autoClose;
 			data.curves = [];
 
@@ -28143,9 +28161,11 @@
 			}
 
 			return data;
-		},
-		fromJSON: function fromJSON(json) {
-			Curve.prototype.fromJSON.call(this, json);
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			_Curve.prototype.fromJSON.call(this, json);
+
 			this.autoClose = json.autoClose;
 			this.curves = [];
 
@@ -28155,22 +28175,31 @@
 			}
 
 			return this;
+		};
+
+		return CurvePath;
+	}(Curve);
+
+	var Path = /*#__PURE__*/function (_CurvePath) {
+		_inheritsLoose(Path, _CurvePath);
+
+		function Path(points) {
+			var _this;
+
+			_this = _CurvePath.call(this) || this;
+			_this.type = 'Path';
+			_this.currentPoint = new Vector2();
+
+			if (points) {
+				_this.setFromPoints(points);
+			}
+
+			return _this;
 		}
-	});
 
-	function Path(points) {
-		CurvePath.call(this);
-		this.type = 'Path';
-		this.currentPoint = new Vector2();
+		var _proto = Path.prototype;
 
-		if (points) {
-			this.setFromPoints(points);
-		}
-	}
-
-	Path.prototype = Object.assign(Object.create(CurvePath.prototype), {
-		constructor: Path,
-		setFromPoints: function setFromPoints(points) {
+		_proto.setFromPoints = function setFromPoints(points) {
 			this.moveTo(points[0].x, points[0].y);
 
 			for (var i = 1, l = points.length; i < l; i++) {
@@ -28178,31 +28207,36 @@
 			}
 
 			return this;
-		},
-		moveTo: function moveTo(x, y) {
+		};
+
+		_proto.moveTo = function moveTo(x, y) {
 			this.currentPoint.set(x, y); // TODO consider referencing vectors instead of copying?
 
 			return this;
-		},
-		lineTo: function lineTo(x, y) {
+		};
+
+		_proto.lineTo = function lineTo(x, y) {
 			var curve = new LineCurve(this.currentPoint.clone(), new Vector2(x, y));
 			this.curves.push(curve);
 			this.currentPoint.set(x, y);
 			return this;
-		},
-		quadraticCurveTo: function quadraticCurveTo(aCPx, aCPy, aX, aY) {
+		};
+
+		_proto.quadraticCurveTo = function quadraticCurveTo(aCPx, aCPy, aX, aY) {
 			var curve = new QuadraticBezierCurve(this.currentPoint.clone(), new Vector2(aCPx, aCPy), new Vector2(aX, aY));
 			this.curves.push(curve);
 			this.currentPoint.set(aX, aY);
 			return this;
-		},
-		bezierCurveTo: function bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY) {
+		};
+
+		_proto.bezierCurveTo = function bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY) {
 			var curve = new CubicBezierCurve(this.currentPoint.clone(), new Vector2(aCP1x, aCP1y), new Vector2(aCP2x, aCP2y), new Vector2(aX, aY));
 			this.curves.push(curve);
 			this.currentPoint.set(aX, aY);
 			return this;
-		},
-		splineThru: function splineThru(pts
+		};
+
+		_proto.splineThru = function splineThru(pts
 		/*Array of Vector*/
 		) {
 			var npts = [this.currentPoint.clone()].concat(pts);
@@ -28210,24 +28244,28 @@
 			this.curves.push(curve);
 			this.currentPoint.copy(pts[pts.length - 1]);
 			return this;
-		},
-		arc: function arc(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
+		};
+
+		_proto.arc = function arc(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
 			var x0 = this.currentPoint.x;
 			var y0 = this.currentPoint.y;
 			this.absarc(aX + x0, aY + y0, aRadius, aStartAngle, aEndAngle, aClockwise);
 			return this;
-		},
-		absarc: function absarc(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
+		};
+
+		_proto.absarc = function absarc(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
 			this.absellipse(aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise);
 			return this;
-		},
-		ellipse: function ellipse(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
+		};
+
+		_proto.ellipse = function ellipse(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
 			var x0 = this.currentPoint.x;
 			var y0 = this.currentPoint.y;
 			this.absellipse(aX + x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation);
 			return this;
-		},
-		absellipse: function absellipse(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
+		};
+
+		_proto.absellipse = function absellipse(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
 			var curve = new EllipseCurve(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation);
 
 			if (this.curves.length > 0) {
@@ -28243,34 +28281,48 @@
 			var lastPoint = curve.getPoint(1);
 			this.currentPoint.copy(lastPoint);
 			return this;
-		},
-		copy: function copy(source) {
-			CurvePath.prototype.copy.call(this, source);
+		};
+
+		_proto.copy = function copy(source) {
+			_CurvePath.prototype.copy.call(this, source);
+
 			this.currentPoint.copy(source.currentPoint);
 			return this;
-		},
-		toJSON: function toJSON() {
-			var data = CurvePath.prototype.toJSON.call(this);
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = _CurvePath.prototype.toJSON.call(this);
+
 			data.currentPoint = this.currentPoint.toArray();
 			return data;
-		},
-		fromJSON: function fromJSON(json) {
-			CurvePath.prototype.fromJSON.call(this, json);
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			_CurvePath.prototype.fromJSON.call(this, json);
+
 			this.currentPoint.fromArray(json.currentPoint);
 			return this;
+		};
+
+		return Path;
+	}(CurvePath);
+
+	var Shape = /*#__PURE__*/function (_Path) {
+		_inheritsLoose(Shape, _Path);
+
+		function Shape(points) {
+			var _this;
+
+			_this = _Path.call(this, points) || this;
+			_this.uuid = MathUtils.generateUUID();
+			_this.type = 'Shape';
+			_this.holes = [];
+			return _this;
 		}
-	});
 
-	function Shape(points) {
-		Path.call(this, points);
-		this.uuid = MathUtils.generateUUID();
-		this.type = 'Shape';
-		this.holes = [];
-	}
+		var _proto = Shape.prototype;
 
-	Shape.prototype = Object.assign(Object.create(Path.prototype), {
-		constructor: Shape,
-		getPointsHoles: function getPointsHoles(divisions) {
+		_proto.getPointsHoles = function getPointsHoles(divisions) {
 			var holesPts = [];
 
 			for (var i = 0, l = this.holes.length; i < l; i++) {
@@ -28278,16 +28330,19 @@
 			}
 
 			return holesPts;
-		},
-		// get points of shape and holes (keypoints based on segments parameter)
-		extractPoints: function extractPoints(divisions) {
+		} // get points of shape and holes (keypoints based on segments parameter)
+		;
+
+		_proto.extractPoints = function extractPoints(divisions) {
 			return {
 				shape: this.getPoints(divisions),
 				holes: this.getPointsHoles(divisions)
 			};
-		},
-		copy: function copy(source) {
-			Path.prototype.copy.call(this, source);
+		};
+
+		_proto.copy = function copy(source) {
+			_Path.prototype.copy.call(this, source);
+
 			this.holes = [];
 
 			for (var i = 0, l = source.holes.length; i < l; i++) {
@@ -28296,9 +28351,11 @@
 			}
 
 			return this;
-		},
-		toJSON: function toJSON() {
-			var data = Path.prototype.toJSON.call(this);
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = _Path.prototype.toJSON.call(this);
+
 			data.uuid = this.uuid;
 			data.holes = [];
 
@@ -28308,9 +28365,11 @@
 			}
 
 			return data;
-		},
-		fromJSON: function fromJSON(json) {
-			Path.prototype.fromJSON.call(this, json);
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			_Path.prototype.fromJSON.call(this, json);
+
 			this.uuid = json.uuid;
 			this.holes = [];
 
@@ -28320,8 +28379,10 @@
 			}
 
 			return this;
-		}
-	});
+		};
+
+		return Shape;
+	}(Path);
 
 	function Light(color, intensity) {
 		if (intensity === void 0) {
@@ -30204,37 +30265,44 @@
 		}
 	});
 
-	function ShapePath() {
-		this.type = 'ShapePath';
-		this.color = new Color();
-		this.subPaths = [];
-		this.currentPath = null;
-	}
+	var ShapePath = /*#__PURE__*/function () {
+		function ShapePath() {
+			this.type = 'ShapePath';
+			this.color = new Color();
+			this.subPaths = [];
+			this.currentPath = null;
+		}
 
-	Object.assign(ShapePath.prototype, {
-		moveTo: function moveTo(x, y) {
+		var _proto = ShapePath.prototype;
+
+		_proto.moveTo = function moveTo(x, y) {
 			this.currentPath = new Path();
 			this.subPaths.push(this.currentPath);
 			this.currentPath.moveTo(x, y);
 			return this;
-		},
-		lineTo: function lineTo(x, y) {
+		};
+
+		_proto.lineTo = function lineTo(x, y) {
 			this.currentPath.lineTo(x, y);
 			return this;
-		},
-		quadraticCurveTo: function quadraticCurveTo(aCPx, aCPy, aX, aY) {
+		};
+
+		_proto.quadraticCurveTo = function quadraticCurveTo(aCPx, aCPy, aX, aY) {
 			this.currentPath.quadraticCurveTo(aCPx, aCPy, aX, aY);
 			return this;
-		},
-		bezierCurveTo: function bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY) {
+		};
+
+		_proto.bezierCurveTo = function bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY) {
 			this.currentPath.bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY);
 			return this;
-		},
-		splineThru: function splineThru(pts) {
+		};
+
+		_proto.splineThru = function splineThru(pts) {
 			this.currentPath.splineThru(pts);
 			return this;
-		},
-		toShapes: function toShapes(isCCW, noHoles) {
+		};
+
+		_proto.toShapes = function toShapes(isCCW, noHoles) {
 			function toShapesNoHoles(inSubpaths) {
 				var shapes = [];
 
@@ -30409,8 +30477,10 @@
 
 
 			return shapes;
-		}
-	});
+		};
+
+		return ShapePath;
+	}();
 
 	var Font = /*#__PURE__*/function () {
 		function Font(data) {
