@@ -212,7 +212,7 @@ class CurvePath extends Curve {
 
 	toJSON() {
 
-		const data = super.toJSON( );
+		const data = super.toJSON();
 
 		data.autoClose = this.autoClose;
 		data.curves = [];
