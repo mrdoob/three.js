@@ -1,0 +1,268 @@
+<html lang="en">
+	<head>
+		<title>WebGPU Nodes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - nodes<br/>(Chrome Canary with flag: --enable-unsafe-webgpu)
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+
+			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
+			import NormalNode from './jsm/renderers/nodes/accessors/NormalNode.js';
+			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
+
+			let gui;
+
+			let controls, camera, scene, renderer;
+
+			let teapot, material, texture;
+
+			let rotateTeapot = false;
+
+			const param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'texture' };
+
+			init().then( animate ).catch( error );
+
+			function addGui( name, value, callback, isColor, min, max ) {
+
+				let node;
+
+				param[ name ] = value;
+
+				if ( isColor ) {
+
+					node = gui.addColor( param, name ).onChange( function () {
+
+						callback( param[ name ] );
+
+					} );
+
+				} else if ( typeof value === 'object' ) {
+
+					param[ name ] = value[ Object.keys( value )[ 0 ] ];
+
+					node = gui.add( param, name, value ).onChange( function () {
+
+						callback( param[ name ] );
+
+					} );
+
+				} else {
+
+					node = gui.add( param, name, min, max ).onChange( function () {
+
+						callback( param[ name ] );
+
+					} );
+
+				}
+
+				return node;
+
+			}
+
+			function clearGui() {
+
+				if ( gui ) gui.destroy();
+
+				gui = new GUI();
+
+				gui.add( param, 'example', {
+					'texture': 'texture',
+					'position': 'position',
+					'normal': 'normal',
+					'empty': 'empty'
+				} ).onFinishChange( function () {
+
+					updateMaterial();
+
+				} );
+
+				gui.open();
+
+			}
+
+			function updateMaterial() {
+
+				clearGui();
+
+				rotateTeapot = false;
+
+				const name = param.example;
+
+				switch ( name ) {
+
+					case 'texture':
+
+						material.colorNode = new TextureNode( texture );
+
+						break;
+
+					case 'position':
+
+						const positionNode = new PositionNode( PositionNode.VIEW );
+
+						material.colorNode = positionNode;
+
+						addGui( 'scope', {
+							local: PositionNode.LOCAL
+						}, function ( val ) {
+
+							positionNode.scope = val;
+
+							material.dispose();
+
+						} );
+
+						break;
+
+					case 'normal':
+
+						const normalNode = new NormalNode( NormalNode.VIEW );
+
+						material.colorNode = normalNode;
+
+						addGui( 'scope', {
+							view: NormalNode.VIEW,
+							local: NormalNode.LOCAL,
+							world: NormalNode.WORLD
+						}, function ( val ) {
+
+							normalNode.scope = val;
+
+							material.dispose();
+
+						} );
+
+						addGui( 'rotate', false, function ( val ) {
+
+							rotateTeapot = val;
+
+						} );
+
+						break;
+
+					case 'empty':
+
+						material.colorNode = undefined;
+
+						break;
+						
+				}
+
+				material.dispose();
+
+			}
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw 'No WebGPU support';
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.y = 3;
+				camera.position.z = 6;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				// textures
+
+				const textureLoader = new THREE.TextureLoader();
+
+				texture = textureLoader.load( './textures/uv_grid_opengl.jpg' );
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+				texture.name = 'uv_grid';
+
+				// teapot mesh
+
+				const geometryTeapot = new TeapotGeometry( 1, 18 );
+
+				material = new THREE.MeshBasicMaterial();
+
+				teapot = new THREE.Mesh( geometryTeapot, material );
+				scene.add( teapot );
+
+				//
+
+				renderer = new WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 3;
+				controls.maxDistance = 8;
+
+				//
+
+				updateMaterial();
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				return renderer.init();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				if ( rotateTeapot ) {
+
+					teapot.rotation.x += 0.01;
+
+				} else {
+
+					teapot.rotation.x = 0;
+
+				}
+				//teapot.rotation.y += 0.02;
+
+				renderer.render( scene, camera );
+
+			}
+
+			function error( error ) {
+
+				console.error( error );
+
+			}
+
+		</script>
+	</body>
+</html>
