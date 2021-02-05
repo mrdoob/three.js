@@ -244,7 +244,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			for ( const vary of this.varys ) {
 
-				snippet += `${vary.name} = ${vary.value};`;
+				snippet += `${vary.name} = ${vary.snippet};`;
 
 			}
 
