@@ -99,7 +99,6 @@ class WebGPURenderPipelines {
 
 			const disposeCallback = onMaterialDispose.bind( this );
 			materialProperties.disposeCallback = disposeCallback;
-			materialProperties.object = object;
 
 			material.addEventListener( 'dispose', disposeCallback );
 
@@ -804,11 +803,7 @@ function onMaterialDispose( event ) {
 	shaderModules.vertex.delete( nodeBuilder.vertexShader );
 	shaderModules.fragment.delete( nodeBuilder.fragmentShader );
 
-	// @TODO: draft implementation
-
-	this.renderer._bindings.remove( materialProperties.object );
-
-	this.pipelines.delete( materialProperties.object );
+	// @TODO: still needed remove bindings and pipeline
 
 }
 
