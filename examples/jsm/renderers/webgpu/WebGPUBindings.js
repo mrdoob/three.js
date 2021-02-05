@@ -51,12 +51,6 @@ class WebGPUBindings {
 
 	}
 
-	remove( object ) {
-
-		this.uniformsData.delete( object );
-
-	}
-
 	getForCompute( param ) {
 
 		let data = this.uniformsData.get( param );
