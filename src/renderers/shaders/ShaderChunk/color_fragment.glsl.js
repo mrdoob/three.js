@@ -4,10 +4,4 @@ export default /* glsl */`
 	diffuseColor.rgb *= vColor;
 
 #endif
-
-#ifdef NODE_COLOR
-
-	diffuseColor *= NODE_COLOR;
-
-#endif
 `;

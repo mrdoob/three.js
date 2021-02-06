@@ -650,12 +650,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.depthPacking ? '#define DEPTH_PACKING ' + parameters.depthPacking : '',
 
-			`#ifdef NODE_HEADER_UNIFORMS
-				
-				NODE_HEADER_UNIFORMS 
-				
-			#endif`,
-
 			'\n'
 
 		].filter( filterEmptyLine ).join( '\n' );
