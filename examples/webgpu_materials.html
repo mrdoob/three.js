@@ -101,9 +101,8 @@
 				material.transparent = true;
 				materials.push( material );
 
-				// Spheres geometry
+				// Geometry
 
-				//const geometry = new THREE.SphereGeometry( 70, 32, 16 );
 				const geometry = new TeapotGeometry( 50, 18 );
 
 				for ( let i = 0, l = materials.length; i < l; i ++ ) {
@@ -155,35 +154,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function generateTexture() {
-
-				const canvas = document.createElement( 'canvas' );
-				canvas.width = 256;
-				canvas.height = 256;
-
-				const context = canvas.getContext( '2d' );
-				const image = context.getImageData( 0, 0, 256, 256 );
-
-				let x = 0, y = 0;
-
-				for ( let i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
-
-					x = j % 256;
-					y = ( x === 0 ) ? y + 1 : y;
-
-					image.data[ i ] = 255;
-					image.data[ i + 1 ] = 255;
-					image.data[ i + 2 ] = 255;
-					image.data[ i + 3 ] = Math.floor( x ^ y );
-
-				}
-
-				context.putImageData( image, 0, 0 );
-
-				return canvas;
 
 			}
 
