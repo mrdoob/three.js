@@ -2,6 +2,8 @@ Title: Three.jsのカスタムバッファジオメトリ
 Description: カスタムバッファジオメトリを作る
 TOC: カスタムバッファジオメトリ
 
+{{{warning msgId="updateNeeded" issue="https://github.com/gfxfundamentals/threejsfundamentals/issues/185"}}}
+
 [前回の記事](threejs-custom-geometry.html)では`Geometry`を紹介しました。この記事では`BufferGeometry`を紹介します。`BufferGeometry`とは*一般的に*高速で動きメモリ消費も低く抑えられます。が、設定は少し難しいです。
 
 [ジオメトリの記事](threejs-custom-geometry.html) のおさらいをしましょう。`Geometry`には`Vector3`を設定する必要がありました。これは頂点を表す三次元上の点です。次に`Face3`を設定することで面を定義しました。これはvertexの配列のインデックス情報を使って３つの点を指定することで面を定義しています。光の反射方向などの設定するためにfaceにはnormal（法線）が必要でした。faceに対して１つのnormalを設定することもできますし、vertexに指定して滑らかな面を擬似的に作ることもできました。colorもnormalと同じようにfaceに指定したりvertexに指定したりできました。記事の最後では配列の配列を使ってテクスチャ座標（UV）を設定しました。配列の中の配列の１つが１つのfaceに対応しておりその配列の１つの要素がvertex１つに対応しています。

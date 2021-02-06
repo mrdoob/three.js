@@ -2,6 +2,8 @@ Title: Three.js 사용자 지정 BufferGeometry
 Description: 사용자 지정 BufferGeometry를 만드는 법에 대해 알아봅니다
 TOC: 사용자 지정 BufferGeometry
 
+{{{warning msgId="updateNeeded" issue="https://github.com/gfxfundamentals/threejsfundamentals/issues/187"}}}
+
 [이전 글](threejs-custom-geometry.html)에서는 `Geometry`의 사용법에 대해
 알아보았습니다. 예고한 대로 이번에는 `BufferGeometry`에 대해 살펴보도록 하죠.
 `BufferGeometry`는 비교적 쓰기가 어렵지만 *일반적으로* 초기화 속도가 빠르고

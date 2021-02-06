@@ -2,6 +2,8 @@ Title: Three.js Пользовательская BufferGeometry
 Description: Создание собственной геометрии BufferGeometry.
 TOC: Пользовательская BufferGeometry
 
+{{{warning msgId="updateNeeded" issue="https://github.com/gfxfundamentals/threejsfundamentals/issues/186"}}}
+
 В [предыдущей статье](threejs-custom-geometry.html) рассказывалось, как использовать `Geometry`. Эта статья о `BufferGeometry`. `BufferGeometry` обычно быстрее запускается и использует меньше памяти, но может быть сложнее в настройке. 
 
 В [статье о Geometry](threejs-custom-geometry.html) мы рассказали, что для использования `Geometry` вы предоставляете массив вершин `Vector3` (позиций). 
