@@ -168,20 +168,7 @@ function unselectAllCountries() {
   });
 }
 
-canvas.addEventListener('mouseup', pickCountry);
-
-let lastTouch;
-canvas.addEventListener('touchstart', (event) => {
-  // 스크롤 이벤트를 방지합니다.
-  event.preventDefault();
-  lastTouch = event.touches[0];
-}, { passive: false });
-canvas.addEventListener('touchmove', (event) => {
-  lastTouch = event.touches[0];
-});
-canvas.addEventListener('touchend', () => {
-  pickCountry(lastTouch);
-});
+canvas.addEventListener('pointerup', pickCountry);
 ```
 
 위 코드는 나라 배열에 속한 나라의 `selected` 속성을 켜고 끕니다. `shift`, `ctrl`, `cmd` 중 하나를 누르면 하나 이상의 나라를 선택할 수 있죠.
@@ -570,19 +557,8 @@ function unselectAllCountries() {
   resetPalette();
 }
 
-+canvas.addEventListener('mousedown', recordStartTimeAndPosition);
-canvas.addEventListener('mouseup', pickCountry);
-
-let lastTouch;
-canvas.addEventListener('touchstart', (event) => {
-  // 스크롤 이벤트를 방지합니다.
-  event.preventDefault();
-  lastTouch = event.touches[0];
-+  recordStartTimeAndPosition(event.touches[0]);
-}, { passive: false });
-canvas.addEventListener('touchmove', (event) => {
-  lastTouch = event.touches[0];
-});
++canvas.addEventListener('pointerdown', recordStartTimeAndPosition);
+canvas.addEventListener('pointerup', pickCountry);
 ```
 
 제 기준에서는 이 정도면 충분한 *듯하네요*.

@@ -190,20 +190,7 @@ function unselectAllCountries() {
   });
 }
 
-canvas.addEventListener('mouseup', pickCountry);
-
-let lastTouch;
-canvas.addEventListener('touchstart', (event) => {
-  // prevent the window from scrolling
-  event.preventDefault();
-  lastTouch = event.touches[0];
-}, {passive: false});
-canvas.addEventListener('touchmove', (event) => {
-  lastTouch = event.touches[0];
-});
-canvas.addEventListener('touchend', () => {
-  pickCountry(lastTouch);
-});
+canvas.addEventListener('pointerup', pickCountry);
 ```
 
 上記のコードでは、国の配列に `selected` プロパティを設定/解除しています。
@@ -622,19 +609,8 @@ function unselectAllCountries() {
   resetPalette();
 }
 
-+canvas.addEventListener('mousedown', recordStartTimeAndPosition);
-canvas.addEventListener('mouseup', pickCountry);
-
-let lastTouch;
-canvas.addEventListener('touchstart', (event) => {
-  // prevent the window from scrolling
-  event.preventDefault();
-  lastTouch = event.touches[0];
-+  recordStartTimeAndPosition(event.touches[0]);
-}, {passive: false});
-canvas.addEventListener('touchmove', (event) => {
-  lastTouch = event.touches[0];
-});
++canvas.addEventListener('pointerdown', recordStartTimeAndPosition);
+canvas.addEventListener('pointerup', pickCountry);
 ```
 
 これらの変更を加えると私にはそれが機能しているように*見えます*。

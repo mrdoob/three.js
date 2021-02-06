@@ -200,20 +200,7 @@ function unselectAllCountries() {
   });
 }
 
-canvas.addEventListener('mouseup', pickCountry);
-
-let lastTouch;
-canvas.addEventListener('touchstart', (event) => {
-  // prevent the window from scrolling
-  event.preventDefault();
-  lastTouch = event.touches[0];
-}, {passive: false});
-canvas.addEventListener('touchmove', (event) => {
-  lastTouch = event.touches[0];
-});
-canvas.addEventListener('touchend', () => {
-  pickCountry(lastTouch);
-});
+canvas.addEventListener('pointerup', pickCountry);
 ```
 
 The code above sets/unsets the `selected` property on
@@ -661,19 +648,8 @@ function unselectAllCountries() {
   resetPalette();
 }
 
-+canvas.addEventListener('mousedown', recordStartTimeAndPosition);
-canvas.addEventListener('mouseup', pickCountry);
-
-let lastTouch;
-canvas.addEventListener('touchstart', (event) => {
-  // prevent the window from scrolling
-  event.preventDefault();
-  lastTouch = event.touches[0];
-+  recordStartTimeAndPosition(event.touches[0]);
-}, {passive: false});
-canvas.addEventListener('touchmove', (event) => {
-  lastTouch = event.touches[0];
-});
++canvas.addEventListener('pointerdown', recordStartTimeAndPosition);
+canvas.addEventListener('pointerup', pickCountry);
 ```
 
 and with those changes it *seems* like it works to me.

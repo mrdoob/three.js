@@ -314,20 +314,7 @@ function main() {
     });
   }
 
-  canvas.addEventListener('mouseup', pickCountry);
-
-  let lastTouch;
-  canvas.addEventListener('touchstart', (event) => {
-    // prevent the window from scrolling
-    event.preventDefault();
-    lastTouch = event.touches[0];
-  }, {passive: false});
-  canvas.addEventListener('touchmove', (event) => {
-    lastTouch = event.touches[0];
-  });
-  canvas.addEventListener('touchend', () => {
-    pickCountry(lastTouch);
-  });
+  canvas.addEventListener('pointerup', pickCountry);
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
