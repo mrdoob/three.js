@@ -409,9 +409,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		object.applyMatrix4( _m1 );
 
-		object.updateWorldMatrix( false, false );
-
 		this.add( object );
+
+		object.updateWorldMatrix( false, true );
 
 		return this;
 
