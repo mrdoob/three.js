@@ -116,6 +116,9 @@ function WebXRManager( renderer, gl ) {
 
 		inputSourcesMap.clear();
 
+		_currentDepthNear = null;
+		_currentDepthFar = null;
+
 		//
 
 		renderer.setFramebuffer( null );
@@ -367,6 +370,8 @@ function WebXRManager( renderer, gl ) {
 		// update camera and its children
 
 		camera.matrixWorld.copy( cameraVR.matrixWorld );
+		camera.matrix.copy( cameraVR.matrix );
+		camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
 
 		const children = camera.children;
 

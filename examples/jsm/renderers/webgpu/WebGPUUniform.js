@@ -19,11 +19,11 @@ class WebGPUUniform {
 		this.value = value;
 
 	}
-	
+
 	getValue() {
-		
+
 		return this.value;
-		
+
 	}
 
 }
@@ -39,12 +39,6 @@ class FloatUniform extends WebGPUUniform {
 
 		Object.defineProperty( this, 'isFloatUniform', { value: true } );
 
-	}
-	
-	getValue() {
-		
-		return this.nodeUniform.value;
-		
 	}
 
 }

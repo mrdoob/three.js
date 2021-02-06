@@ -5,7 +5,6 @@ import { Ray } from '../math/Ray.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
 import { Triangle } from '../math/Triangle.js';
-import { Face3 } from '../core/Face3.js';
 import { DoubleSide, BackSide } from '../constants.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
@@ -369,7 +368,7 @@ function checkBufferGeometryIntersection( object, material, raycaster, ray, posi
 
 	}
 
-	if ( object.isSkinnedMesh ) {
+	if ( object.isSkinnedMesh && material.skinning ) {
 
 		object.boneTransform( a, _vA );
 		object.boneTransform( b, _vB );
@@ -401,7 +400,14 @@ function checkBufferGeometryIntersection( object, material, raycaster, ray, posi
 
 		}
 
-		const face = new Face3( a, b, c );
+		const face = {
+			a: a,
+			b: a,
+			c: c,
+			normal: new Vector3(),
+			materialIndex: 0
+		};
+
 		Triangle.getNormal( _vA, _vB, _vC, face.normal );
 
 		intersection.face = face;

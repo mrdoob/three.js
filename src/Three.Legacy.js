@@ -24,7 +24,6 @@ import {
 import { BufferGeometry } from './core/BufferGeometry.js';
 import { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 import { InterleavedBuffer } from './core/InterleavedBuffer.js';
-import { Face3 } from './core/Face3.js';
 import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform.js';
 import { Raycaster } from './core/Raycaster.js';
@@ -86,13 +85,6 @@ import { CubeCamera } from './cameras/CubeCamera.js';
 import { Scene } from './scenes/Scene.js';
 
 export { MathUtils as Math };
-
-export function Face4( a, b, c, d, normal, color, materialIndex ) {
-
-	console.warn( 'THREE.Face4 has been removed. A THREE.Face3 will be created instead.' );
-	return new Face3( a, b, c, normal, color, materialIndex );
-
-}
 
 export const LineStrip = 0;
 export const LinePieces = 1;
@@ -2054,37 +2046,6 @@ CubeCamera.prototype.clear = function ( renderer, color, depth, stencil ) {
 
 	console.warn( 'THREE.CubeCamera: .clear() is now .renderTarget.clear().' );
 	return this.renderTarget.clear( renderer, color, depth, stencil );
-
-};
-
-//
-
-export const GeometryUtils = {
-
-	merge: function ( geometry1, geometry2, materialIndexOffset ) {
-
-		console.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
-		let matrix;
-
-		if ( geometry2.isMesh ) {
-
-			geometry2.matrixAutoUpdate && geometry2.updateMatrix();
-
-			matrix = geometry2.matrix;
-			geometry2 = geometry2.geometry;
-
-		}
-
-		geometry1.merge( geometry2, matrix, materialIndexOffset );
-
-	},
-
-	center: function ( geometry ) {
-
-		console.warn( 'THREE.GeometryUtils: .center() has been moved to Geometry. Use geometry.center() instead.' );
-		return geometry.center();
-
-	}
 
 };
 

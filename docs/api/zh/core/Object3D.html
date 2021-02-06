@@ -51,8 +51,7 @@
 
 	<h3>[property:Boolean frustumCulled]</h3>
 	<p>
-		当这个属性被设置的时候，它将在渲染物体之前，检查每一帧的物体是否在摄像机的视锥体中。
-		否则，即使该物体不可见，它也将在每一帧中被渲染，默认值为*true*。
+		When this is set, it checks every frame if the object is in the frustum of the camera before rendering the object. If set to `false` the object gets rendered every frame even if it is not in the frustum of the camera. Default is `true`.
 	</p>
 
 	<h3>[property:Integer id]</h3>
@@ -104,11 +103,21 @@
 		一个可选的回调函数，在Object3D渲染之后直接执行。
 		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
 	</p>
+	<p>
+	Please notice that this callback is only executed for *renderable* 3D objects. Meaning 3D objects which define their visual
+	appearance with geometries and materials like instances of [page:Mesh], [page:Line], [page:Points] or [page:Sprite].
+	Instances of [page:Object3D], [page:Group] or [page:Bone] are not renderable and thus this callback is not executed for such objects.
+	</p>
 
 	<h3>[property:Function onBeforeRender]</h3>
 	<p>
 		一个可选的回调函数，在Object3D渲染之前直接执行。
 		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
+	</p>
+	<p>
+	Please notice that this callback is only executed for *renderable* 3D objects. Meaning 3D objects which define their visual
+	appearance with geometries and materials like instances of [page:Mesh], [page:Line], [page:Points] or [page:Sprite].
+	Instances of [page:Object3D], [page:Group] or [page:Bone] are not renderable and thus this callback is not executed for such objects.
 	</p>
 
 	<h3>[property:Object3D parent]</h3>

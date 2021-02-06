@@ -1,8 +1,3 @@
-import WebGPUUniformsGroup from './WebGPUUniformsGroup.js';
-import { FloatUniform, Matrix3Uniform, Matrix4Uniform } from './WebGPUUniform.js';
-import WebGPUSampler from './WebGPUSampler.js';
-import { WebGPUSampledTexture } from './WebGPUSampledTexture.js';
-
 class WebGPUBindings {
 
 	constructor( device, info, properties, textures, pipelines, computePipelines, attributes, nodes ) {
@@ -18,11 +13,7 @@ class WebGPUBindings {
 
 		this.uniformsData = new WeakMap();
 
-		this.sharedUniformsGroups = new Map();
-
 		this.updateMap = new WeakMap();
-
-		this._setupSharedUniformsGroups();
 
 	}
 
@@ -39,7 +30,7 @@ class WebGPUBindings {
 
 			// each material defines an array of bindings (ubos, textures, samplers etc.)
 
-			let bindings = this.composeBindings( object, nodeBuilder.getBindings( 'fragment' ) );
+			const bindings = nodeBuilder.getBindings();
 
 			// setup (static) binding layout and (dynamic) binding group
 
@@ -94,7 +85,6 @@ class WebGPUBindings {
 
 		const updateMap = this.updateMap;
 		const frame = this.info.render.frame;
-		const sharedUniformsGroups = this.sharedUniformsGroups;
 
 		let needsBindGroupRefresh = false;
 
@@ -102,12 +92,12 @@ class WebGPUBindings {
 
 		for ( const binding of bindings ) {
 
+			const isShared = binding.isShared;
+			const isUpdated = updateMap.get( binding ) === frame;
+
+			if ( isShared && isUpdated ) continue;
+
 			if ( binding.isUniformsGroup ) {
-
-				const isShared = sharedUniformsGroups.has( binding.name );
-				const isUpdated = updateMap.get( binding ) === frame;
-
-				if ( isShared && isUpdated ) continue;
 
 				const array = binding.array;
 				const bufferGPU = binding.bufferGPU;
@@ -118,7 +108,7 @@ class WebGPUBindings {
 
 				if ( needsBufferWrite === true ) {
 
-					this.device.defaultQueue.writeBuffer(
+					this.device.queue.writeBuffer(
 						bufferGPU,
 						0,
 						array,
@@ -127,8 +117,6 @@ class WebGPUBindings {
 
 				}
 
-				updateMap.set( binding, frame );
-
 			} else if ( binding.isStorageBuffer ) {
 
 				const attribute = binding.attribute;
@@ -136,7 +124,6 @@ class WebGPUBindings {
 
 			} else if ( binding.isSampler ) {
 
-				const material = object.material;
 				const texture = binding.texture;
 
 				textures.updateSampler( texture );
@@ -152,7 +139,6 @@ class WebGPUBindings {
 
 			} else if ( binding.isSampledTexture ) {
 
-				const material = object.material;
 				const texture = binding.texture;
 
 				const forceUpdate = textures.updateTexture( texture );
@@ -166,6 +152,8 @@ class WebGPUBindings {
 				}
 
 			}
+
+			updateMap.set( binding, frame );
 
 		}
 
@@ -259,64 +247,6 @@ class WebGPUBindings {
 			layout: layout,
 			entries: entries
 		} );
-
-	}
-
-	composeBindings( object, uniforms ) {
-
-		let bindings = [];
-
-		// UBOs
-
-		// model
-
-		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
-		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
-		const normalMatrixUniform = new Matrix3Uniform( 'normalMatrix' );
-
-		const modelGroup = new WebGPUUniformsGroup( 'modelUniforms' );
-		modelGroup.addUniform( modelViewUniform );
-		modelGroup.addUniform( modelViewMatrixUniform );
-		modelGroup.addUniform( normalMatrixUniform );
-		modelGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
-
-			modelViewUniform.setValue( object.matrixWorld );
-			modelViewMatrixUniform.setValue( object.modelViewMatrix );
-			normalMatrixUniform.setValue( object.normalMatrix );
-
-		} );
-
-		// camera
-
-		const cameraGroup = this.sharedUniformsGroups.get( 'cameraUniforms' );
-
-		// the order of WebGPUBinding objects must match the binding order in the shader
-
-		bindings.push( modelGroup );
-		bindings.push( cameraGroup );
-
-		bindings.push( ... uniforms );
-
-		return bindings;
-
-	}
-
-	_setupSharedUniformsGroups() {
-
-		const projectionMatrixUniform = new Matrix4Uniform( 'projectionMatrix' );
-		const viewMatrixUniform = new Matrix4Uniform( 'viewMatrix' );
-
-		const cameraGroup = new WebGPUUniformsGroup( 'cameraUniforms' );
-		cameraGroup.addUniform( projectionMatrixUniform );
-		cameraGroup.addUniform( viewMatrixUniform );
-		cameraGroup.setOnBeforeUpdate( function ( object, camera ) {
-
-			projectionMatrixUniform.setValue( camera.projectionMatrix );
-			viewMatrixUniform.setValue( camera.matrixWorldInverse );
-
-		} );
-
-		this.sharedUniformsGroups.set( cameraGroup.name, cameraGroup );
 
 	}
 

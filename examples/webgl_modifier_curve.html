@@ -135,7 +135,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				renderer.domElement.addEventListener( 'pointerdown', onPointerDown, false );
+				renderer.domElement.addEventListener( 'pointerdown', onPointerDown );
 
 				rayCaster = new THREE.Raycaster();
 				control = new TransformControls( camera, renderer.domElement );

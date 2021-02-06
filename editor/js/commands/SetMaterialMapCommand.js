@@ -31,6 +31,8 @@ SetMaterialMapCommand.prototype = {
 
 	execute: function () {
 
+		if ( this.oldMap !== null && this.oldMap !== undefined ) this.oldMap.dispose();
+
 		this.material[ this.mapName ] = this.newMap;
 		this.material.needsUpdate = true;
 

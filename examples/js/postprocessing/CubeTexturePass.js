@@ -10,7 +10,7 @@ THREE.CubeTexturePass = function ( camera, envMap, opacity ) {
 	this.cubeMesh = new THREE.Mesh(
 		new THREE.BoxGeometry( 10, 10, 10 ),
 		new THREE.ShaderMaterial( {
-			uniforms: this.cubeShader.uniforms,
+			uniforms: THREE.UniformsUtils.clone( this.cubeShader.uniforms ),
 			vertexShader: this.cubeShader.vertexShader,
 			fragmentShader: this.cubeShader.fragmentShader,
 			depthTest: false,
@@ -51,6 +51,7 @@ THREE.CubeTexturePass.prototype = Object.assign( Object.create( THREE.Pass.proto
 		this.cubeCamera.quaternion.setFromRotationMatrix( this.camera.matrixWorld );
 
 		this.cubeMesh.material.uniforms.envMap.value = this.envMap;
+		this.cubeMesh.material.uniforms.flipEnvMap.value = ( this.envMap.isCubeTexture && this.envMap._needsFlipEnvMap ) ? - 1 : 1;
 		this.cubeMesh.material.uniforms.opacity.value = this.opacity;
 		this.cubeMesh.material.transparent = ( this.opacity < 1.0 );
 

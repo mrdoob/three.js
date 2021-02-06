@@ -108,10 +108,10 @@
 				// EVENTS
 
 				container.style.touchAction = 'none';
-				container.addEventListener( 'pointerdown', onPointerDown, false );
+				container.addEventListener( 'pointerdown', onPointerDown );
 
-				document.addEventListener( 'keypress', onDocumentKeyPress, false );
-				document.addEventListener( 'keydown', onDocumentKeyDown, false );
+				document.addEventListener( 'keypress', onDocumentKeyPress );
+				document.addEventListener( 'keydown', onDocumentKeyDown );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -242,8 +242,8 @@
 				pointerXOnPointerDown = event.clientX - windowHalfX;
 				targetRotationOnPointerDown = targetRotation;
 
-				document.addEventListener( 'pointermove', onPointerMove, false );
-				document.addEventListener( 'pointerup', onPointerUp, false );
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerup', onPointerUp );
 
 			}
 

@@ -163,7 +163,7 @@ class Color {
 
 		let m;
 
-		if ( m = /^((?:rgb|hsl)a?)\(\s*([^\)]*)\)/.exec( style ) ) {
+		if ( m = /^((?:rgb|hsl)a?)\(([^\)]*)\)/.exec( style ) ) {
 
 			// rgb / hsl
 
@@ -176,7 +176,7 @@ class Color {
 				case 'rgb':
 				case 'rgba':
 
-					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// rgb(255,0,0) rgba(255,0,0,0.5)
 						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
@@ -189,7 +189,7 @@ class Color {
 
 					}
 
-					if ( color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
 						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
@@ -207,7 +207,7 @@ class Color {
 				case 'hsl':
 				case 'hsla':
 
-					if ( color = /^(\d*\.?\d+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
 						const h = parseFloat( color[ 1 ] ) / 360;

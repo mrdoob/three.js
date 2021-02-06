@@ -281,13 +281,13 @@ var FlyControls = function ( object, domElement ) {
 
 	this.dispose = function () {
 
-		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
-		this.domElement.removeEventListener( 'mousedown', _mousedown, false );
-		this.domElement.removeEventListener( 'mousemove', _mousemove, false );
-		this.domElement.removeEventListener( 'mouseup', _mouseup, false );
+		this.domElement.removeEventListener( 'contextmenu', contextmenu );
+		this.domElement.removeEventListener( 'mousedown', _mousedown );
+		this.domElement.removeEventListener( 'mousemove', _mousemove );
+		this.domElement.removeEventListener( 'mouseup', _mouseup );
 
-		window.removeEventListener( 'keydown', _keydown, false );
-		window.removeEventListener( 'keyup', _keyup, false );
+		window.removeEventListener( 'keydown', _keydown );
+		window.removeEventListener( 'keyup', _keyup );
 
 	};
 
@@ -297,14 +297,14 @@ var FlyControls = function ( object, domElement ) {
 	var _keydown = bind( this, this.keydown );
 	var _keyup = bind( this, this.keyup );
 
-	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
+	this.domElement.addEventListener( 'contextmenu', contextmenu );
 
-	this.domElement.addEventListener( 'mousemove', _mousemove, false );
-	this.domElement.addEventListener( 'mousedown', _mousedown, false );
-	this.domElement.addEventListener( 'mouseup', _mouseup, false );
+	this.domElement.addEventListener( 'mousemove', _mousemove );
+	this.domElement.addEventListener( 'mousedown', _mousedown );
+	this.domElement.addEventListener( 'mouseup', _mouseup );
 
-	window.addEventListener( 'keydown', _keydown, false );
-	window.addEventListener( 'keyup', _keyup, false );
+	window.addEventListener( 'keydown', _keydown );
+	window.addEventListener( 'keyup', _keyup );
 
 	this.updateMovementVector();
 	this.updateRotationVector();

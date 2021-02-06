@@ -194,10 +194,10 @@
 				// EVENTS
 
 				container.style.touchAction = 'none';
-				container.addEventListener( 'pointerdown', onPointerDown, false );
+				container.addEventListener( 'pointerdown', onPointerDown );
 
-				document.addEventListener( 'keypress', onDocumentKeyPress, false );
-				document.addEventListener( 'keydown', onDocumentKeyDown, false );
+				document.addEventListener( 'keypress', onDocumentKeyPress );
+				document.addEventListener( 'keydown', onDocumentKeyDown );
 
 				document.getElementById( "color" ).addEventListener( 'click', function () {
 
@@ -206,7 +206,7 @@
 
 					updatePermalink();
 
-				}, false );
+				} );
 
 				document.getElementById( "font" ).addEventListener( 'click', function () {
 
@@ -216,7 +216,7 @@
 
 					loadFont();
 
-				}, false );
+				} );
 
 
 				document.getElementById( "weight" ).addEventListener( 'click', function () {
@@ -233,7 +233,7 @@
 
 					loadFont();
 
-				}, false );
+				} );
 
 				document.getElementById( "bevel" ).addEventListener( 'click', function () {
 
@@ -241,7 +241,7 @@
 
 					refreshText();
 
-				}, false );
+				} );
 
 				//
 
@@ -405,8 +405,8 @@
 				pointerXOnPointerDown = event.clientX - windowHalfX;
 				targetRotationOnPointerDown = targetRotation;
 
-				document.addEventListener( 'pointermove', onPointerMove, false );
-				document.addEventListener( 'pointerup', onPointerUp, false );
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerup', onPointerUp );
 
 			}
 

@@ -54,9 +54,9 @@
 				container.appendChild( renderer.domElement );
 
 				container.style.touchAction = 'none';
-				container.addEventListener( 'pointerdown', onPointerDown, false );
+				container.addEventListener( 'pointerdown', onPointerDown );
 
-				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+				document.addEventListener( 'wheel', onDocumentMouseWheel );
 
 				//
 
@@ -65,19 +65,19 @@
 					event.preventDefault();
 					event.dataTransfer.dropEffect = 'copy';
 
-				}, false );
+				} );
 
 				document.addEventListener( 'dragenter', function () {
 
 					document.body.style.opacity = 0.5;
 
-				}, false );
+				} );
 
 				document.addEventListener( 'dragleave', function () {
 
 					document.body.style.opacity = 1;
 
-				}, false );
+				} );
 
 				document.addEventListener( 'drop', function ( event ) {
 
@@ -89,12 +89,12 @@
 						material.map.image.src = event.target.result;
 						material.map.needsUpdate = true;
 
-					}, false );
+					} );
 					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
 
 					document.body.style.opacity = 1;
 
-				}, false );
+				} );
 
 				//
 
@@ -123,8 +123,8 @@
 				onPointerDownLon = lon;
 				onPointerDownLat = lat;
 
-				document.addEventListener( 'pointermove', onPointerMove, false );
-				document.addEventListener( 'pointerup', onPointerUp, false );
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerup', onPointerUp );
 
 			}
 

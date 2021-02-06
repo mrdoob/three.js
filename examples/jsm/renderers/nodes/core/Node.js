@@ -1,12 +1,20 @@
+import { NodeUpdateType } from './constants.js';
+
 class Node {
 
 	constructor( type = null ) {
 
 		this.type = type;
 
-		this.needsUpdate = false;
+		this.updateType = NodeUpdateType.None;
 
 		Object.defineProperty( this, 'isNode', { value: true } );
+
+	}
+
+	getUpdateType( /*builder*/ ) {
+
+		return this.updateType;
 
 	}
 
@@ -18,13 +26,13 @@ class Node {
 
 	update( /*frame*/ ) {
 
-		console.warn( "Abstract function." );
+		console.warn( 'Abstract function.' );
 
 	}
 
 	generate( /*builder, output*/ ) {
 
-		console.warn( "Abstract function." );
+		console.warn( 'Abstract function.' );
 
 	}
 

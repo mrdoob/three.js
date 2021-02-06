@@ -29,9 +29,9 @@ class WebGPUNodes {
 
 	}
 
-	remove( object ) {
+	remove( material ) {
 
-		this.builders.delete( object );
+		this.builders.delete( material );
 
 	}
 
@@ -46,12 +46,15 @@ class WebGPUNodes {
 		const material = object.material;
 
 		const nodeBuilder = this.get( material );
+		const nodeFrame = this.nodeFrame;
 
-		this.nodeFrame.material = object.material;
+		nodeFrame.material = material;
+		nodeFrame.camera = camera;
+		nodeFrame.object = object;
 
-		for ( let node of nodeBuilder.updateNodes ) {
+		for ( const node of nodeBuilder.updateNodes ) {
 
-			this.nodeFrame.updateNode( node );
+			nodeFrame.updateNode( node );
 
 		}
 
