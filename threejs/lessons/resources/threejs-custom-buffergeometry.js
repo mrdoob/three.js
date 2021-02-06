@@ -1,4 +1,4 @@
-import * as THREE from '../../resources/threejs/r122/build/three.module.js';
+import * as THREE from '../../resources/threejs/r125/build/three.module.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
@@ -20,38 +20,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
   threejsLessonUtils.addDiagrams({
     geometryCylinder: {
       create() {
-        const numSegments = 24;
-        const geometry = new THREE.Geometry();
-        const wrap = ndx => ndx % (numSegments * 2);
-        for (let s = 0; s < numSegments; ++s) {
-          const u = s / numSegments;
-          const a = u * Math.PI * 2;
-          const x = Math.sin(a);
-          const z = Math.cos(a);
-          geometry.vertices.push(new THREE.Vector3(x, -1, z));
-          geometry.vertices.push(new THREE.Vector3(x,  1, z));
-
-          // share the start and end positions
-          const ndx = s * 2;
-          geometry.faces.push(new THREE.Face3(ndx, wrap(ndx + 2), ndx + 1));
-          geometry.faces.push(new THREE.Face3(ndx + 1, wrap(ndx + 2), wrap(ndx + 3)));
-
-          const u2 = (s + 1) / numSegments;
-          geometry.faceVertexUvs[0].push([
-            new THREE.Vector2(u, 0),
-            new THREE.Vector2(u2, 0),
-            new THREE.Vector2(u, 1),
-          ]);
-          geometry.faceVertexUvs[0].push([
-            new THREE.Vector2(u, 1),
-            new THREE.Vector2(u2, 0),
-            new THREE.Vector2(u2, 1),
-          ]);
-        }
-
-        geometry.computeVertexNormals();
-        geometry.scale(5, 5, 5);
-        return makeMesh(geometry);
+        return new THREE.Object3D();
       },
     },
     bufferGeometryCylinder: {

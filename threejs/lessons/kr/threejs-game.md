@@ -181,10 +181,10 @@ function init() {
 [이전 glTF 파일 예제](threejs-load-gltf.html)와 달리 이번에는 각 모델을 하나 이상 배치할 계획입니다. 그러니 파일을 불러온 뒤 바로 장면에 넣는 대신 각 glTF의 씬 그래프(scene), 이 경우에는 움직이는 캐릭터를 복사해야 합니다. 다행히 Three.js에는 `SkeletonUtil.clone`이라는 함수가 있어 이를 쉽게 구현할 수 있죠. 먼저 해당 모듈을 불러오겠습니다.
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-import { OrbitControls } from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from './resources/threejs/r122/examples/jsm/loaders/GLTFLoader.js';
-+import { SkeletonUtils } from './resources/threejs/r122/examples/jsm/utils/SkeletonUtils.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
+import { OrbitControls } from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from './resources/threejs/r125/examples/jsm/loaders/GLTFLoader.js';
++import { SkeletonUtils } from './resources/threejs/r125/examples/jsm/utils/SkeletonUtils.js';
 ```
 
 그리고 아까 불러왔던 모델을 복사합니다.
@@ -1492,10 +1492,10 @@ class Animal extends Component {
 추가로 dat.GUI를 이용해 위 디버깅 요소들를 켜고 끌 수 있도록 합니다.
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-import { OrbitControls } from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from './resources/threejs/r122/examples/jsm/loaders/GLTFLoader.js';
-import { SkeletonUtils } from './resources/threejs/r122/examples/jsm/utils/SkeletonUtils.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
+import { OrbitControls } from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from './resources/threejs/r125/examples/jsm/loaders/GLTFLoader.js';
+import { SkeletonUtils } from './resources/threejs/r125/examples/jsm/utils/SkeletonUtils.js';
 +import { GUI } from '../3rdparty/dat.gui.module.js';
 ```
 

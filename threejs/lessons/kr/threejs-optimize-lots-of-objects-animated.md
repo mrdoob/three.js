@@ -313,10 +313,10 @@ showFileInfo(fileInfos, fileInfos[0]);
 먼저 라이브러리를 불러옵니다.
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-import { BufferGeometryUtils } from './resources/threejs/r122/examples/jsm/utils/BufferGeometryUtils.js';
-import { OrbitControls } from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
-+import { TWEEN } from './resources/threejs/r122/examples/jsm/libs/tween.min.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
+import { BufferGeometryUtils } from './resources/threejs/r125/examples/jsm/utils/BufferGeometryUtils.js';
+import { OrbitControls } from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
++import { TWEEN } from './resources/threejs/r125/examples/jsm/libs/tween.min.js';
 ```
 
 그리고 `Tween`으로 influence 속성에 애니메이션을 줍니다.

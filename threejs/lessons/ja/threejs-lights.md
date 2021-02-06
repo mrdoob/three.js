@@ -26,8 +26,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 `OrbitControls` はthree.jsのオプション機能なので、importする必要があります。
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
 ```
 
 これでOrbitControlsを利用できます。
@@ -434,9 +434,9 @@ gui.add(light, 'penumbra', 0, 1, 0.01);
 ライトを可視化するために `RectAreaLightHelper` をimportします。
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-+import {RectAreaLightUniformsLib} from './resources/threejs/r122/examples/jsm/lights/RectAreaLightUniformsLib.js';
-+import {RectAreaLightHelper} from './resources/threejs/r122/examples/jsm/helpers/RectAreaLightHelper.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
++import {RectAreaLightUniformsLib} from './resources/threejs/r125/examples/jsm/lights/RectAreaLightUniformsLib.js';
++import {RectAreaLightHelper} from './resources/threejs/r125/examples/jsm/helpers/RectAreaLightHelper.js';
 ```
 
 `RectAreaLightUniformsLib.init` を呼び出します。

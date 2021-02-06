@@ -373,10 +373,10 @@ because the original webgl globe uses
 We need to include the library
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-import {BufferGeometryUtils} from './resources/threejs/r122/examples/jsm/utils/BufferGeometryUtils.js';
-import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
-+import {TWEEN} from './resources/threejs/r122/examples/jsm/libs/tween.min.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
+import {BufferGeometryUtils} from './resources/threejs/r125/examples/jsm/utils/BufferGeometryUtils.js';
+import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
++import {TWEEN} from './resources/threejs/r125/examples/jsm/libs/tween.min.js';
 ```
 
 And then create a `Tween` to animate the influences.

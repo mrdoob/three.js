@@ -85,7 +85,7 @@ Three.js는 3차원 세계를 다루므로, 우리는 정육면체(cube)를 3차
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r122/build/three.module.js';
+import * as THREE from './resources/threejs/r125/build/three.module.js';
 </script>
 ```
 
@@ -107,7 +107,7 @@ import * as THREE from './resources/threejs/r122/build/three.module.js';
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r122/build/three.module.js';
+import * as THREE from './resources/threejs/r125/build/three.module.js';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
@@ -389,7 +389,7 @@ es6 모듈은 js 파일이나 인라인 <code>&lt;script type="module"&gt;</code
 </p>
 <pre class=prettyprint>
 &lt;script type="module"&gt;
-import * as THREE from './resources/threejs/r122/build/three.module.js';
+import * as THREE from './resources/threejs/r125/build/three.module.js';
 
 ...
 

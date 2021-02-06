@@ -269,27 +269,24 @@ geometry.setAttribute(
 
 {{{example url="../threejs-custom-buffergeometry-cube-indexed.html"}}}
 
-Just like `Geometry`, `BufferGeometry` has a [`computeVertexNormals`](BufferGeometry.computeVertexNormals) method for computing normals if you
-are not supplying them. Unlike the `Geometry` version of the same function,
+`BufferGeometry` has a [`computeVertexNormals`](BufferGeometry.computeVertexNormals) method for computing normals if you
+are not supplying them. Unfortunately, 
 since positions can not be shared if any other part of a vertex is different
-the results of calling `computeVertexNormals` will be different.
+the results of calling `computeVertexNormals` will generate seams if your
+geometry is supposed to connect to itself like a sphere or a cylinder.
 
 <div class="spread">
   <div>
     <div data-diagram="bufferGeometryCylinder"></div>
-    <div class="code">BufferGeometry</div>
-  </div>
-  <div>
-    <div data-diagram="geometryCylinder"></div>
-    <div class="code">Geometry</div>
   </div>
 </div>
 
-Here are 2 cylinders where the normals were created using `computeVertexNormals`.
-If you look closely there is a seam on the left cylinder. This is because there
+For the cylinder above the normals were created using `computeVertexNormals`.
+If you look closely there is a seam on the cylinder. This is because there
 is no way to share the vertices at the start and end of the cylinder since they
-require different UVs. Just a small thing to be aware of. The solution is
-to supply your own normals.
+require different UVs so the function to compute them has no idea those are
+the same vertices and to smooth over them. Just a small thing to be aware of.
+The solution is to supply your own normals.
 
 We can also use [TypedArrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) from the start instead of native JavaScript arrays.
 The disadvantage to TypedArrays is you must specify their size up front. Of

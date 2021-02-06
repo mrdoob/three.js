@@ -375,7 +375,7 @@ function addBoxes(file) {
 물론 `BufferGeometryUtils`을 불러와야죠.
 
 ```js
-import { BufferGeometryUtils } from './resources/threejs/r122/examples/jsm/utils/BufferGeometryUtils.js';
+import { BufferGeometryUtils } from './resources/threejs/r125/examples/jsm/utils/BufferGeometryUtils.js';
 ```
 
 이제 제 컴퓨터에서는 적어도 60 프레임 이상이 나오네요.

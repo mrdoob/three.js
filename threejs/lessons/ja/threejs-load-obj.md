@@ -32,7 +32,7 @@ blendファイルをダウンロードし[Blender](https://blender.org)で読み
 まず最初に `OBJLoader` のローダーをコードに含める必要があります。
 
 ```js
-import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
+import {OBJLoader} from './resources/threejs/r125/examples/jsm/loaders/OBJLoader.js';
 ```
 
 次にOBJファイルをロードするために `OBJLoader` のインスタンスを作成し、OBJファイルのURLを渡し、ロードされたモデルをシーンに追加するコールバックを渡します。
@@ -118,10 +118,10 @@ blenderで **File->External Data->Unpack All Into Files** を選択し、これ�
 `MTLLoader` をimportする必要があります。
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
-import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
-+import {MTLLoader} from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
+import {OBJLoader} from './resources/threejs/r125/examples/jsm/loaders/OBJLoader.js';
++import {MTLLoader} from './resources/threejs/r125/examples/jsm/loaders/MTLLoader.js';
 ```
 
 まず、MTLファイルをロードします。

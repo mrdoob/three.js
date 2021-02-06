@@ -445,7 +445,7 @@ No change to the visuals but the code is even more generic.
 Adding interactively, for example a `TrackballControls` is just as easy. First we add the script for the control.
 
 ```js
-import {TrackballControls} from './resources/threejs/r122/examples/jsm/controls/TrackballControls.js';
+import {TrackballControls} from './resources/threejs/r125/examples/jsm/controls/TrackballControls.js';
 ```
 
 And then we can add a `TrackballControls` to each scene passing in the element associated with that scene.

@@ -1,5 +1,5 @@
-import * as THREE from './resources/threejs/r122/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/threejs/r125/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
 
 export function init(data) {   /* eslint-disable-line no-unused-vars */
   const {canvas, inputElement} = data;

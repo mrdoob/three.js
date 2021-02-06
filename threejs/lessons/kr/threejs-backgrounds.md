@@ -172,7 +172,7 @@ function render(time) {
 카메라도 조작이 가능하도록 만듭니다.
 
 ```js
-import { OrbitControls } from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
+import { OrbitControls } from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
 ```
 
 ```js

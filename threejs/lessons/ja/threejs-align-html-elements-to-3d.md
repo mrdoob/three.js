@@ -37,8 +37,8 @@ TOC: HTML要素を3Dに揃える
 [ライティングの記事](threejs-lights.html)のように `OrbitControls` を追加します。
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
 ```
 
 ```js
@@ -701,8 +701,8 @@ for (const countryInfo of countryInfos) {
 値を操作できるようにGUIを追加します。
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
 +import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 

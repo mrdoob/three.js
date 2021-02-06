@@ -28,7 +28,7 @@ TOC: 加载 .OBJ 文件
 第一件要做的事就是将`OBJLoader`添加到代码中。
 
 ```js
-import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
+import {OBJLoader} from './resources/threejs/r125/examples/jsm/loaders/OBJLoader.js';
 ```
 
 然后创建`OBJLoader`的实例并通过URL加载我们的.OBJ文件，并在回调函数中将已加载完的模型添加到场景（scene）里。
@@ -109,10 +109,10 @@ map_Ns windmill_001_base_SPEC.jpg
 首先要引用 `MTLLoader`;
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
-import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
-+import {MTLLoader} from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
+import {OBJLoader} from './resources/threejs/r125/examples/jsm/loaders/OBJLoader.js';
++import {MTLLoader} from './resources/threejs/r125/examples/jsm/loaders/MTLLoader.js';
 ```
 
 {{{warning msgId="badTranslation"}}}

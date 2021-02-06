@@ -103,10 +103,10 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) => {
 추가합니다.
 
 ```html
--import { LoaderSupport } from './resources/threejs/r122/examples/jsm/loaders/LoaderSupport.js';
--import { OBJLoader } from './resources/threejs/r122/examples/jsm/loaders/OBJLoader.js';
--import { MTLLoader } from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
-+import { GLTFLoader } from './resources/threejs/r122/examples/jsm/loaders/GLTFLoader.js';
+-import { LoaderSupport } from './resources/threejs/r125/examples/jsm/loaders/LoaderSupport.js';
+-import { OBJLoader } from './resources/threejs/r125/examples/jsm/loaders/OBJLoader.js';
+-import { MTLLoader } from './resources/threejs/r125/examples/jsm/loaders/MTLLoader.js';
++import { GLTFLoader } from './resources/threejs/r125/examples/jsm/loaders/GLTFLoader.js';
 ```
 
 이제 실행해보죠.

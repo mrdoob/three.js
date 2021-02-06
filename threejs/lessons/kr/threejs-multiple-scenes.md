@@ -455,7 +455,7 @@ document.querySelectorAll('[data-diagram]').forEach((elem) => {
 불러옵니다.
 
 ```js
-import { TrackballControls } from './resources/threejs/r122/examples/jsm/controls/TrackballControls.js';
+import { TrackballControls } from './resources/threejs/r125/examples/jsm/controls/TrackballControls.js';
 ```
 
 그리고 각 장면에 대응하는 요소에 `TrackballControls`를 추가합니다.

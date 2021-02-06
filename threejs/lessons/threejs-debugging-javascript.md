@@ -415,11 +415,6 @@ is a math bug somewhere.
 THREE.js is Open Source. Don't be afraid to look inside the code!
 You can look inside on [github](https://github.com/mrdoob/three.js).
 You can also look inside by stepping into functions in the debugger.
-When you do that consider using `three.js` instead of the more common
-`three.min.js`. `three.min.js` is the minified, compressed, and therefore
-smaller to download version. `three.js` is the larger but easier to
-debug version. I often switch my code to use `three.js` to step through
-the code and see what is going on.
 
 ## Put `requestAnimationFrame` at bottom of your render function.
 

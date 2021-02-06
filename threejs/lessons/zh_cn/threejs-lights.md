@@ -20,8 +20,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 然后我们添加一个 `OrbitControls`。`OrbitControls` 让我们可以围绕某一个点旋转控制相机。`OrbitControls` 是 three.js 的可选模块，所以我们首先需要引入这个模块。
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
 ```
 
 然后我们就可以使用了。创建 `OrbitControls` 时传入两个参数，一个是要控制的相机对象，第二个是检测事件的 DOM 元素。
@@ -392,9 +392,9 @@ Three.js 中还有一种类型的光照，矩形区域光（`RectAreaLight`）, 
 为了使用 `RectAreaLight`，我们需要引入 three.js 的`RectAreaLightUniformsLib` 模块，同时使用 `RectAreaLightHelper` 来辅助查看灯光对象。
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-+import {RectAreaLightUniformsLib} from './resources/threejs/r122/examples/jsm/lights/RectAreaLightUniformsLib.js';
-+import {RectAreaLightHelper} from './resources/threejs/r122/examples/jsm/helpers/RectAreaLightHelper.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
++import {RectAreaLightUniformsLib} from './resources/threejs/r125/examples/jsm/lights/RectAreaLightUniformsLib.js';
++import {RectAreaLightHelper} from './resources/threejs/r125/examples/jsm/helpers/RectAreaLightHelper.js';
 ```
 
 我们需要先调用 `RectAreaLightUniformsLib.init`

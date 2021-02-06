@@ -1,4 +1,4 @@
-import * as THREE from '../../resources/threejs/r122/build/three.module.js';
+import * as THREE from '../../resources/threejs/r125/build/three.module.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
@@ -812,8 +812,7 @@ const geometry = new THREE.WireframeGeometry(
     const promise = (result instanceof Promise) ? result : Promise.resolve(result);
 
     let diagramInfo = await promise;
-    if (diagramInfo instanceof THREE.BufferGeometry ||
-        diagramInfo instanceof THREE.Geometry) {
+    if (diagramInfo instanceof THREE.BufferGeometry) {
       const geometry = diagramInfo;
       diagramInfo = {
         geometry,

@@ -62,7 +62,7 @@ triangulaire à un <code>WireframeGeometry</code> vous obtenez une nouvelle géo
 3 segments de lignes utilisant 6 points.</div>
 
 Nous reviendrons sur la création de géométrie personnalisée dans
-[un autre article](threejs-custom-buffer-geometry.html). Pour l'instant,
+[un autre article](threejs-custom-buffergeometry.html). Pour l'instant,
 faisons un exemple en créant chaque type de primitive. Nous
 commencerons par les [exemples vus dans l'article précédent](threejs-responsive.html).
 

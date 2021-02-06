@@ -450,7 +450,7 @@ document.querySelectorAll('[data-diagram]').forEach((elem) => {
 最初にコントロール用のスクリプトを追加します。
 
 ```js
-import {TrackballControls} from './resources/threejs/r122/examples/jsm/controls/TrackballControls.js';
+import {TrackballControls} from './resources/threejs/r125/examples/jsm/controls/TrackballControls.js';
 ```
 
 そして `TrackballControls` を各シーンに追加し、シーンに関連付けられた要素を渡します。
