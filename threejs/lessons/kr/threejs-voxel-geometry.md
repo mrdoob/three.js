@@ -959,29 +959,19 @@ function placeVoxelIfNoMovement(event) {
   if (mouse.moveX < 5 && mouse.moveY < 5) {
     placeVoxel(event);
   }
-  window.removeEventListener('mousemove', recordMovement);
-  window.removeEventListener('mouseup', placeVoxelIfNoMovement);
+  window.removeEventListener('pointermove', recordMovement);
+  window.removeEventListener('pointerup', placeVoxelIfNoMovement);
 }
-canvas.addEventListener('mousedown', (event) => {
+canvas.addEventListener('pointerdown', (event) => {
   event.preventDefault();
   recordStartPosition(event);
-  window.addEventListener('mousemove', recordMovement);
-  window.addEventListener('mouseup', placeVoxelIfNoMovement);
+  window.addEventListener('pointermove', recordMovement);
+  window.addEventListener('pointerup', placeVoxelIfNoMovement);
 }, { passive: false });
 canvas.addEventListener('touchstart', (event) => {
+  // prevent scrolling
   event.preventDefault();
-  recordStartPosition(event.touches[0]);
 }, { passive: false });
-canvas.addEventListener('touchmove', (event) => {
-  event.preventDefault();
-  recordMovement(event.touches[0]);
-}, { passive: false });
-canvas.addEventListener('touchend', () => {
-  placeVoxelIfNoMovement({
-    clientX: mouse.x,
-    clientY: mouse.y,
-  });
-});
 ```
 
 마우스는 두 가지 용도로 사용합니다. 하나는 카메라를 움직이는 용도이고, 다른 하나는 복셀을 수정하는 용도이죠. 복셀의 추가/제거 액션은 마우스를 누르고 전혀 움직이지 않았을 때만 발생합니다. 마우스를 누른 뒤 움직였다면 카메라를 돌리려는 의도로 간주한 것이죠. `moveX`와 `moveY`는 절대값으로, 왼쪽으로 10픽셀, 오른쪽으로 다시 10픽셀을 움직였다면 `moveX`는 20픽셀이 됩니다. 이러면 화면을 돌렸다가 다시 제자리에 놓는 경우에도 복셀의 추가/제거 액션이 발생하지 않을 겁니다. 5픽셀 이상 움직이지 않았을 경우 클릭으로 간주했는데, 별도 테스트는 진행하지 않은 임의의 값이니 참고 바랍니다.

@@ -1022,29 +1022,19 @@ function placeVoxelIfNoMovement(event) {
   if (mouse.moveX < 5 && mouse.moveY < 5) {
     placeVoxel(event);
   }
-  window.removeEventListener('mousemove', recordMovement);
-  window.removeEventListener('mouseup', placeVoxelIfNoMovement);
+  window.removeEventListener('pointermove', recordMovement);
+  window.removeEventListener('pointerup', placeVoxelIfNoMovement);
 }
-canvas.addEventListener('mousedown', (event) => {
+canvas.addEventListener('pointerdown', (event) => {
   event.preventDefault();
   recordStartPosition(event);
-  window.addEventListener('mousemove', recordMovement);
-  window.addEventListener('mouseup', placeVoxelIfNoMovement);
+  window.addEventListener('pointermove', recordMovement);
+  window.addEventListener('pointerup', placeVoxelIfNoMovement);
 }, {passive: false});
 canvas.addEventListener('touchstart', (event) => {
+  // stop scrolling
   event.preventDefault();
-  recordStartPosition(event.touches[0]);
 }, {passive: false});
-canvas.addEventListener('touchmove', (event) => {
-  event.preventDefault();
-  recordMovement(event.touches[0]);
-}, {passive: false});
-canvas.addEventListener('touchend', () => {
-  placeVoxelIfNoMovement({
-    clientX: mouse.x,
-    clientY: mouse.y,
-  });
-});
 ```
 
 There's a lot going on in the code above. Basically the mouse
