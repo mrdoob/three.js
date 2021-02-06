@@ -259,7 +259,7 @@ const viewProjection = new THREE.Matrix4();
 // 좌표 확인 전
 camera.updateMatrix();
 camera.updateMatrixWorld();
-camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
 
 ...
 

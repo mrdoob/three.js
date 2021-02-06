@@ -278,7 +278,7 @@ const viewProjection = new THREE.Matrix4();
 // before checking
 camera.updateMatrix();
 camera.updateMatrixWorld();
-camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
 
 ...
 
