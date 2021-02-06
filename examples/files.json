@@ -326,7 +326,7 @@
 		"webgpu_sandbox",
 		"webgpu_rtt",
 		"webgpu_compute",
-		"webgpu_nodes"
+		"webgpu_materials"
 	],
 	"webaudio": [
 		"webaudio_orientation",
