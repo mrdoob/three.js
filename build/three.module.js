@@ -2451,7 +2451,7 @@ class WebGLRenderTarget extends EventDispatcher {
 
 	}
 
-	setSize ( width, height, depth = 1 ) {
+	setSize( width, height, depth = 1 ) {
 
 		if ( this.width !== width || this.height !== height || this.depth !== depth ) {
 
