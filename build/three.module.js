@@ -20261,8 +20261,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function deallocateRenderTarget( renderTarget ) {
 
+		const texture = renderTarget.texture;
+
 		const renderTargetProperties = properties.get( renderTarget );
-		const textureProperties = properties.get( renderTarget.texture );
+		const textureProperties = properties.get( texture );
 
 		if ( ! renderTarget ) return;
 
@@ -20297,7 +20299,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		properties.remove( renderTarget.texture );
+		properties.remove( texture );
 		properties.remove( renderTarget );
 
 	}
@@ -20849,9 +20851,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	// Setup storage for target texture and bind it to correct framebuffer
 	function setupFrameBufferTexture( framebuffer, renderTarget, attachment, textureTarget ) {
 
-		const glFormat = utils.convert( renderTarget.texture.format );
-		const glType = utils.convert( renderTarget.texture.type );
-		const glInternalFormat = getInternalFormat( renderTarget.texture.internalFormat, glFormat, glType );
+		const texture = renderTarget.texture;
+
+		const glFormat = utils.convert( texture.format );
+		const glType = utils.convert( texture.type );
+		const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
 
 		if ( textureTarget === 32879 || textureTarget === 35866 ) {
 
@@ -20864,7 +20868,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		}
 
 		_gl.bindFramebuffer( 36160, framebuffer );
-		_gl.framebufferTexture2D( 36160, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
+		_gl.framebufferTexture2D( 36160, attachment, textureTarget, properties.get( texture ).__webglTexture, 0 );
 		_gl.bindFramebuffer( 36160, null );
 
 	}
@@ -20927,9 +20931,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else {
 
-			const glFormat = utils.convert( renderTarget.texture.format );
-			const glType = utils.convert( renderTarget.texture.type );
-			const glInternalFormat = getInternalFormat( renderTarget.texture.internalFormat, glFormat, glType );
+			const texture = renderTarget.texture;
+
+			const glFormat = utils.convert( texture.format );
+			const glType = utils.convert( texture.type );
+			const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
 
 			if ( isMultisample ) {
 
@@ -21188,6 +21194,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function updateRenderTargetMipmap( renderTarget ) {
 
 		const texture = renderTarget.texture;
+
 		const supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
 		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {

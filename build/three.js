@@ -16241,8 +16241,9 @@
 		}
 
 		function deallocateRenderTarget(renderTarget) {
+			var texture = renderTarget.texture;
 			var renderTargetProperties = properties.get(renderTarget);
-			var textureProperties = properties.get(renderTarget.texture);
+			var textureProperties = properties.get(texture);
 			if (!renderTarget) return;
 
 			if (textureProperties.__webglTexture !== undefined) {
@@ -16268,7 +16269,7 @@
 				if (renderTargetProperties.__webglDepthRenderbuffer) _gl.deleteRenderbuffer(renderTargetProperties.__webglDepthRenderbuffer);
 			}
 
-			properties.remove(renderTarget.texture);
+			properties.remove(texture);
 			properties.remove(renderTarget);
 		} //
 
@@ -16635,9 +16636,10 @@
 
 
 		function setupFrameBufferTexture(framebuffer, renderTarget, attachment, textureTarget) {
-			var glFormat = utils.convert(renderTarget.texture.format);
-			var glType = utils.convert(renderTarget.texture.type);
-			var glInternalFormat = getInternalFormat(renderTarget.texture.internalFormat, glFormat, glType);
+			var texture = renderTarget.texture;
+			var glFormat = utils.convert(texture.format);
+			var glType = utils.convert(texture.type);
+			var glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType);
 
 			if (textureTarget === 32879 || textureTarget === 35866) {
 				state.texImage3D(textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, renderTarget.depth, 0, glFormat, glType, null);
@@ -16647,7 +16649,7 @@
 
 			_gl.bindFramebuffer(36160, framebuffer);
 
-			_gl.framebufferTexture2D(36160, attachment, textureTarget, properties.get(renderTarget.texture).__webglTexture, 0);
+			_gl.framebufferTexture2D(36160, attachment, textureTarget, properties.get(texture).__webglTexture, 0);
 
 			_gl.bindFramebuffer(36160, null);
 		} // Setup storage for internal depth/stencil buffers and bind to correct framebuffer
@@ -16689,10 +16691,11 @@
 
 				_gl.framebufferRenderbuffer(36160, 33306, 36161, renderbuffer);
 			} else {
-				var glFormat = utils.convert(renderTarget.texture.format);
-				var glType = utils.convert(renderTarget.texture.type);
+				var texture = renderTarget.texture;
+				var glFormat = utils.convert(texture.format);
+				var glType = utils.convert(texture.type);
 
-				var _glInternalFormat = getInternalFormat(renderTarget.texture.internalFormat, glFormat, glType);
+				var _glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType);
 
 				if (isMultisample) {
 					var _samples2 = getRenderTargetSamples(renderTarget);
