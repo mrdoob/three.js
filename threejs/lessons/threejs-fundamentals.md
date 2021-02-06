@@ -490,3 +490,4 @@ to support legacy browsers look into a <a href="https://babeljs.io">transpiler</
 
 <!-- needed for out of date translations -->
 <a href="threejs-geometry.html"></a>
+<a href="Geometry"></a>
