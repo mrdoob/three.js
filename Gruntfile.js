@@ -195,7 +195,6 @@ module.exports = function(grunt) {
       DirectGeometry: 'https://threejs.org/docs/#api/core/DirectGeometry',
       EventDispatcher: 'https://threejs.org/docs/#api/core/EventDispatcher',
       Face3: 'https://threejs.org/docs/#api/core/Face3',
-      Geometry: 'https://threejs.org/docs/#api/core/Geometry',
       InstancedBufferAttribute: 'https://threejs.org/docs/#api/core/InstancedBufferAttribute',
       InstancedBufferGeometry: 'https://threejs.org/docs/#api/core/InstancedBufferGeometry',
       InstancedInterleavedBuffer: 'https://threejs.org/docs/#api/core/InstancedInterleavedBuffer',
