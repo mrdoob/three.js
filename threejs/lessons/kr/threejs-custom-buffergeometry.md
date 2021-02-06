@@ -2,7 +2,7 @@ Title: Three.js 사용자 지정 BufferGeometry
 Description: 사용자 지정 BufferGeometry를 만드는 법에 대해 알아봅니다
 TOC: 사용자 지정 BufferGeometry
 
-{{{warning msgId="updateNeeded" issue="https://github.com/gfxfundamentals/threejsfundamentals/issues/187"}}}
+{{{warning msgId="updateNeeded" link="https://github.com/gfxfundamentals/threejsfundamentals/issues/187"}}}
 
 [이전 글](threejs-custom-geometry.html)에서는 `Geometry`의 사용법에 대해
 알아보았습니다. 예고한 대로 이번에는 `BufferGeometry`에 대해 살펴보도록 하죠.

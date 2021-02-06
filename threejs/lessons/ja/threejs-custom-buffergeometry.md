@@ -2,7 +2,7 @@ Title: Three.jsのカスタムバッファジオメトリ
 Description: カスタムバッファジオメトリを作る
 TOC: カスタムバッファジオメトリ
 
-{{{warning msgId="updateNeeded" issue="https://github.com/gfxfundamentals/threejsfundamentals/issues/185"}}}
+{{{warning msgId="updateNeeded" link="https://github.com/gfxfundamentals/threejsfundamentals/issues/185"}}}
 
 [前回の記事](threejs-custom-geometry.html)では`Geometry`を紹介しました。この記事では`BufferGeometry`を紹介します。`BufferGeometry`とは*一般的に*高速で動きメモリ消費も低く抑えられます。が、設定は少し難しいです。
 

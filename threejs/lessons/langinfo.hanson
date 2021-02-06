@@ -25,8 +25,8 @@
   `,
   contribTemplate: 'Thank you <a href="${html_url}"><img src="${avatar_url}"> ${login}</a><br>for <a href="https://github.com/${owner}/${repo}/commits?author=${login}">${contributions} contributions</a>',
   translations: {
-    badTranslation: 'Sorry, the translation of this area is out of date. <a href="{{packageJSON.homepage}}/blob/master/{{contentFileName}}">Please consider helping to fix it</a>.',
-    updateNeeded: 'The translation of this article is out of date.  <a href="{{packageJSON.homepage}}/blob/master/{{contentFileName}}">Please consider helping to fix it</a>.',
+    badTranslation: 'Sorry, the translation of this area is out of date. <a href="{{link}}">Please consider helping to fix it</a>.',
+    updateNeeded: 'The translation of this article is out of date.  <a href="{{link}}">Please consider helping to fix it</a>.',
   },
   toc: 'Table of Contents',
   categoryMapping: {
