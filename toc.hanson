@@ -15,7 +15,6 @@
     'threejs-shadows.md',
     'threejs-fog.md',
     'threejs-rendertargets.md',
-    'threejs-custom-geometry.md',
     'threejs-custom-buffergeometry.md',
   ],
   'tips': [
