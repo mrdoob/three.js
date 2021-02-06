@@ -25,51 +25,32 @@ Three.jsは多くのプリミティブがあります。
 そのため、必要に応じて、上手く使い分けることができます。
 
 
-<div id="Diagram-BoxBufferGeometry" data-primitive="BoxBufferGeometry">立方体</div>
-<div id="Diagram-CircleBufferGeometry" data-primitive="CircleBufferGeometry">2次元の円</div>
-<div id="Diagram-ConeBufferGeometry" data-primitive="ConeBufferGeometry">円錐</div>
-<div id="Diagram-CylinderBufferGeometry" data-primitive="CylinderBufferGeometry">円筒</div>
-<div id="Diagram-DodecahedronBufferGeometry" data-primitive="DodecahedronBufferGeometry">十二面体（12面のもの）</div>
-<div id="Diagram-ExtrudeBufferGeometry" data-primitive="ExtrudeBufferGeometry">
+<div id="Diagram-BoxGeometry" data-primitive="BoxGeometry">立方体</div>
+<div id="Diagram-CircleGeometry" data-primitive="CircleGeometry">2次元の円</div>
+<div id="Diagram-ConeGeometry" data-primitive="ConeGeometry">円錐</div>
+<div id="Diagram-CylinderGeometry" data-primitive="CylinderGeometry">円筒</div>
+<div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">十二面体（12面のもの）</div>
+<div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">
 押し出しでできた2次元形状、ベベルオプション付き。
-これは<code>TextBufferGeometry</code>と<code>TextGeometry</code>のそれぞれの基礎になることに注意してください。</div>
-<div id="Diagram-IcosahedronBufferGeometry" data-primitive="IcosahedronBufferGeometry">二十面体（20面のもの）</div>
-<div id="Diagram-LatheBufferGeometry" data-primitive="LatheBufferGeometry">線を回転させてできる形状。例としてはこんなところでしょうか：ランプやボーリングのピン、ろうそく、ろうそく立て、ワイングラス、ドリンクグラス、などなど...。点の連続として2次元の輪郭を与え、その輪郭を軸の周りで回転させる際に、どのくらい細分化するかthree.jsに指示することができます。</div>
-<div id="Diagram-OctahedronBufferGeometry" data-primitive="OctahedronBufferGeometry">八面体（8面）</div>
-<div id="Diagram-ParametricBufferGeometry" data-primitive="ParametricBufferGeometry">関数を与えることでできる表面。この関数は、グリッド上2次元の点を引数に取り、対応する3次元の点を返す。</div>
-<div id="Diagram-PlaneBufferGeometry" data-primitive="PlaneBufferGeometry">2次元の四角形</div>
-<div id="Diagram-PolyhedronBufferGeometry" data-primitive="PolyhedronBufferGeometry">三角形を点の周りに集めて球体にする</div>
-<div id="Diagram-RingBufferGeometry" data-primitive="RingBufferGeometry">真ん中に穴のあいた円盤</div>
-<div id="Diagram-ShapeBufferGeometry" data-primitive="ShapeBufferGeometry">三角形分割された2次元の輪郭</div>
-<div id="Diagram-SphereBufferGeometry" data-primitive="SphereBufferGeometry">球体</div>
-<div id="Diagram-TetrahedronBufferGeometry" data-primitive="TetrahedronBufferGeometry">四面体（4面のもの）</div>
-<div id="Diagram-TextBufferGeometry" data-primitive="TextBufferGeometry">3Dフォントと文字列からできた、3Dテキスト</div>
-<div id="Diagram-TorusBufferGeometry" data-primitive="TorusBufferGeometry">円環（ドーナツ）</div>
-<div id="Diagram-TorusKnotBufferGeometry" data-primitive="TorusKnotBufferGeometry">円環（結び目）</div>
-<div id="Diagram-TubeBufferGeometry" data-primitive="TubeBufferGeometry">経路をなぞらせた管</div>
+これは<code>TextGeometry</code>と<code>TextGeometry</code>のそれぞれの基礎になることに注意してください。</div>
+<div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">二十面体（20面のもの）</div>
+<div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">線を回転させてできる形状。例としてはこんなところでしょうか：ランプやボーリングのピン、ろうそく、ろうそく立て、ワイングラス、ドリンクグラス、などなど...。点の連続として2次元の輪郭を与え、その輪郭を軸の周りで回転させる際に、どのくらい細分化するかthree.jsに指示することができます。</div>
+<div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">八面体（8面）</div>
+<div id="Diagram-ParametricGeometry" data-primitive="ParametricGeometry">関数を与えることでできる表面。この関数は、グリッド上2次元の点を引数に取り、対応する3次元の点を返す。</div>
+<div id="Diagram-PlaneGeometry" data-primitive="PlaneGeometry">2次元の四角形</div>
+<div id="Diagram-PolyhedronGeometry" data-primitive="PolyhedronGeometry">三角形を点の周りに集めて球体にする</div>
+<div id="Diagram-RingGeometry" data-primitive="RingGeometry">真ん中に穴のあいた円盤</div>
+<div id="Diagram-ShapeGeometry" data-primitive="ShapeGeometry">三角形分割された2次元の輪郭</div>
+<div id="Diagram-SphereGeometry" data-primitive="SphereGeometry">球体</div>
+<div id="Diagram-TetrahedronGeometry" data-primitive="TetrahedronGeometry">四面体（4面のもの）</div>
+<div id="Diagram-TextGeometry" data-primitive="TextGeometry">3Dフォントと文字列からできた、3Dテキスト</div>
+<div id="Diagram-TorusGeometry" data-primitive="TorusGeometry">円環（ドーナツ）</div>
+<div id="Diagram-TorusKnotGeometry" data-primitive="TorusKnotGeometry">円環（結び目）</div>
+<div id="Diagram-TubeGeometry" data-primitive="TubeGeometry">経路をなぞらせた管</div>
 <div id="Diagram-EdgesGeometry" data-primitive="EdgesGeometry">異なるジオメトリを入力として、その面同士の角度が閾値以上なら角を作り出す、補助オブジェクト。例えば、記事の最初の方で紹介した立方体を見てみると、それぞれの面に、立方体を作っている全ての三角形の線が表示されています。<code>EdgesGeometry</code>を代わりに使うことで、面内の線は全て除去されます。下記のthresholdAngleを調整してみてください。閾値以下の角が消えて見えるでしょう。</div>
 <div id="Diagram-WireframeGeometry" data-primitive="WireframeGeometry">1つの角ごとに1つの線分（2点）を持つジオメトリを生成する。WebGLは線分を作るのに2点が必要なので、この機能がないと、しばしば角を忘れたり、余分な角を作ってしまうでしょう。例えば、たった3点しかない1つの三角形あるとします。<code>wireframe: true</code>のマテリアルを使ってそれを描こうとした場合、1本の線分しか得られません。<code>WireframeGeometry</code>にその三角形のジオメトリを渡すと、6点からなる3つの線分を持った新しいジオメトリを生成します。</div>
 
-ほとんどのプリミティブは`Geometry`か`BufferGeometry`の2つの種類があることに気づいたかもしれません。
-この2つの違いは、高い柔軟性とパフォーマンスです。
-
-`BufferGeometry`に基づいたプリミティブはパフォーマンス志向の種類です。
-ジオメトリの頂点は、GPUにアップロードして描画するのに適した配列形式へ、直接変換されます。
-これは、起動が速く省メモリであることを意味しますが、データの修正により複雑なプログラミングが必要になることが多いです。
-
-`Geometry`に基づいたプリミティブは柔軟で、操作しやすい種類です。
-これらは、3次元の点のための`Vector3`、三角形のための`Face3`のようなJavaScriptに基づくクラスからできています。結構メモリを必要としますし、three.jsにレンダリングされる前に、対応する`BufferGeometry`表現に似たものに変換する必要があります。
-
-プリミティブを操作しないことが分かっているか、計算をして内部を操作することに抵抗がないなら、
-`BufferGeometry`に基づいたプリミティブを使うのがベストです。
-一方で、描画前に多少の変更をしたいなら、`Geometry`に基づいたプリミティブを使うと、
-より簡単に扱うことができます。
-
-単純な例だと、`BufferGeometry`は新しい頂点群を簡単に追加できません。
-使う頂点の数は作成時に宣言され、記憶領域が確保され、データが書き込まれます。
-一方、`Geometry`は、みなさんがしたいように頂点群を追加できます。
-
-[別の記事](threejs-custom-geometry.html)で、カスタムジオメトリの作成について説明します。
+[別の記事](threejs-custom-buffergeometry.html)で、カスタムジオメトリの作成について説明します。
 今はそれぞれの種類のプリミティブを作成する例を作ってみます。
 [以前の記事](threejs-responsive.html)を例に始めましょう。
 
@@ -139,7 +120,7 @@ function createMaterial() {
 これはthreeに形状を作るときに三角形の両面を描くように指示します。
 球体や立方体のような立体形状には、形状の内側を向いている裏側を描く
 理由はありません。
-しかしこの例だと、2次元で裏側が存在しない`PlaneBufferGeometry`や`ShapeBufferGeometry`のようなものも描こうとしています。
+しかしこの例だと、2次元で裏側が存在しない`PlaneGeometry`や`ShapeGeometry`のようなものも描こうとしています。
 `side: THREE.DoubleSide`を設定しないと、裏側を見たときに消えてしまうことでしょう。
 
 `side: THREE.DoubleSide`に**not**が設定された方が、描画が速くなります。
@@ -163,7 +144,7 @@ function addSolidGeometry(x, y, geometry) {
   const width = 8;
   const height = 8;
   const depth = 8;
-  addSolidGeometry(-2, -2, new THREE.BoxBufferGeometry(width, height, depth));
+  addSolidGeometry(-2, -2, new THREE.BoxGeometry(width, height, depth));
 }
 ```
 
@@ -174,7 +155,7 @@ function addSolidGeometry(x, y, geometry) {
 {{{example url="../threejs-primitives.html" }}}
 
 上記のパターンには、2つの特筆すべき例外があります。
-一番大きなものは、たぶん`TextBufferGeometry`です。テキストのメッシュを作るときは、事前に3Dフォントデータを読み込む必要があります。このデータの読み込みは非同期的に行われるので、ジオメトリを作ろうとする前に、読み込みを待つ必要があります。フォントの読み込みにpromiseを使うと、もっと速く読み込むことができます。
+一番大きなものは、たぶん`TextGeometry`です。テキストのメッシュを作るときは、事前に3Dフォントデータを読み込む必要があります。このデータの読み込みは非同期的に行われるので、ジオメトリを作ろうとする前に、読み込みを待つ必要があります。フォントの読み込みにpromiseを使うと、もっと速く読み込むことができます。
 `FontLoader`を作成し、読み込みが完了するとフォントを提供してくれるpromiseを返す`loadFont`関数を作ります。
 次に、`doit` と呼ばれる`async`関数を作り、`await`を使ってフォントを読み込みます。
 最後に、ジオメトリを作り、`addObject`を呼んでシーンに追加します。
@@ -191,7 +172,7 @@ function addSolidGeometry(x, y, geometry) {
 
   async function doit() {
     const font = await loadFont('resources/threejs/fonts/helvetiker_regular.typeface.json');  /* threejsfundamentals: url */
-    const geometry = new THREE.TextBufferGeometry('three.js', {
+    const geometry = new THREE.TextGeometry('three.js', {
       font: font,
       size: 3.0,
       height: .2,
@@ -265,7 +246,7 @@ threeが知る手助けをします。
 const radius = 7;
 const widthSegments = 12;
 const heightSegments = 8;
-const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
 const material = new THREE.PointsMaterial({
     color: 'red',
     size: 0.2,     // in world units
@@ -301,9 +282,9 @@ const material = new THREE.PointsMaterial({
 例えば、
 
 <div class="spread">
-<div data-diagram="SphereBufferGeometryLow"></div>
-<div data-diagram="SphereBufferGeometryMedium"></div>
-<div data-diagram="SphereBufferGeometryHigh"></div>
+<div data-diagram="SphereGeometryLow"></div>
+<div data-diagram="SphereGeometryMedium"></div>
+<div data-diagram="SphereGeometryHigh"></div>
 </div>
 
 最初の球体は、15セグメントまたは30個の三角形になる、周囲に5セグメント、高さ3です。
@@ -315,9 +296,9 @@ const material = new THREE.PointsMaterial({
 影をならすことで、このようになります。
 
 <div class="spread">
-<div data-diagram="SphereBufferGeometryLowSmooth"></div>
-<div data-diagram="SphereBufferGeometryMediumSmooth"></div>
-<div data-diagram="SphereBufferGeometryHighSmooth"></div>
+<div data-diagram="SphereGeometryLowSmooth"></div>
+<div data-diagram="SphereGeometryMediumSmooth"></div>
+<div data-diagram="SphereGeometryHighSmooth"></div>
 </div>
 
 5000個の三角形からできる右側の球体が、たった480個の三角形からできる真ん中の球体よりも良いかは、明らかではありません。
@@ -332,8 +313,8 @@ const material = new THREE.PointsMaterial({
 選ぶのが簡単なときもあります。例えば、平面の細分化を選ぶこともできます。
 
 <div class="spread">
-<div data-diagram="PlaneBufferGeometryLow"></div>
-<div data-diagram="PlaneBufferGeometryHigh"></div>
+<div data-diagram="PlaneGeometryLow"></div>
+<div data-diagram="PlaneGeometryHigh"></div>
 </div>
 
 左側の四角形は2個の三角形からできています。右側の四角形は200個の三角形からできています。
@@ -347,8 +328,7 @@ const material = new THREE.PointsMaterial({
 
 みなさんの用途に適した形状がないなら、例えば、[.obj file](threejs-load-obj.html)
 や[.gltf file](threejs-load-gltf.html)からジオメトリを読み込むことができます。
-[カスタムジオメトリ](threejs-custom-geometry.html) 
-や[カスタムBufferGeometry](threejs-custom-buffergeometry.html)を作ることもできます。
+[カスタムBufferGeometry](threejs-custom-buffergeometry.html)を作ることもできます。
 
 次は、[threeのシーングラフの動き方と使い方](threejs-scenegraph.html)を説明します。
 

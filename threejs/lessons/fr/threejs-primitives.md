@@ -26,26 +26,26 @@ La plupart des primitives ci-dessous ont des valeurs par défaut
 pour certains ou tous leurs paramètres. Vous pouvez donc les
 utiliser en fonction de vos besoins.
 
-<div id="Diagram-BoxBufferGeometry" data-primitive="BoxBufferGeometry">Une Boîte</div>
-<div id="Diagram-CircleBufferGeometry" data-primitive="CircleBufferGeometry">Un Cercle plat</div>
-<div id="Diagram-ConeBufferGeometry" data-primitive="ConeBufferGeometry">Un Cône</div>
-<div id="Diagram-CylinderBufferGeometry" data-primitive="CylinderBufferGeometry">Un Cylindre</div>
-<div id="Diagram-DodecahedronBufferGeometry" data-primitive="DodecahedronBufferGeometry">Un Dodécaèdre (12 côtés)</div>
-<div id="Diagram-ExtrudeBufferGeometry" data-primitive="ExtrudeBufferGeometry">Une forme 2D extrudée avec un biseautage optionnel. Ici, nous extrudons une forme de cœur. Notez qu'il s'agit du principe de fonctionnement pour les <code>TextBufferGeometry</code> et les <code>TextGeometry</code>.</div>
-<div id="Diagram-IcosahedronBufferGeometry" data-primitive="IcosahedronBufferGeometry">Un Icosaèdre (20 côtés)</div>
-<div id="Diagram-LatheBufferGeometry" data-primitive="LatheBufferGeometry">Une forme généré par la rotation d'une ligne pour, par exemple, dessiner une lampe, une quille, bougies, bougeoirs, verres à vin, verres à boire, etc. Vous fournissez une silhouette en deux dimensions comme une série de points et vous indiquez ensuite à three.js combien de subdivisions sont nécessaires en faisant tourner la silhouette autour d'un axe.</div>
-<div id="Diagram-OctahedronBufferGeometry" data-primitive="OctahedronBufferGeometry">Un Octaèdre (8 côtés)</div>
-<div id="Diagram-ParametricBufferGeometry" data-primitive="ParametricBufferGeometry">Une surface générée en fournissant à la fonction un point 2D d'une grille et retourne le point 3D correspondant.</div>
-<div id="Diagram-PlaneBufferGeometry" data-primitive="PlaneBufferGeometry">Un plan 2D</div>
-<div id="Diagram-PolyhedronBufferGeometry" data-primitive="PolyhedronBufferGeometry">Prend un ensemble de triangles centrés autour d'un point et les projette sur une sphère</div>
-<div id="Diagram-RingBufferGeometry" data-primitive="RingBufferGeometry">Un disque 2D avec un trou au centre</div>
-<div id="Diagram-ShapeBufferGeometry" data-primitive="ShapeBufferGeometry">Un tracé 2D qui se triangule</div>
-<div id="Diagram-SphereBufferGeometry" data-primitive="SphereBufferGeometry">une sphère</div>
-<div id="Diagram-TetrahedronBufferGeometry" data-primitive="TetrahedronBufferGeometry">Un tétraèdre (4 côtés)</div>
-<div id="Diagram-TextBufferGeometry" data-primitive="TextBufferGeometry">Texte 3D généré à partir d'une police 3D et d'une chaîne de caractères</div>
-<div id="Diagram-TorusBufferGeometry" data-primitive="TorusBufferGeometry">Un tore (donut)</div>
-<div id="Diagram-TorusKnotBufferGeometry" data-primitive="TorusKnotBufferGeometry">Un nœud torique</div>
-<div id="Diagram-TubeBufferGeometry" data-primitive="TubeBufferGeometry">Extrusion contrôlée d'un cercle le long d'un tracé</div>
+<div id="Diagram-BoxGeometry" data-primitive="BoxGeometry">Une Boîte</div>
+<div id="Diagram-CircleGeometry" data-primitive="CircleGeometry">Un Cercle plat</div>
+<div id="Diagram-ConeGeometry" data-primitive="ConeGeometry">Un Cône</div>
+<div id="Diagram-CylinderGeometry" data-primitive="CylinderGeometry">Un Cylindre</div>
+<div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">Un Dodécaèdre (12 côtés)</div>
+<div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">Une forme 2D extrudée avec un biseautage optionnel. Ici, nous extrudons une forme de cœur. Notez qu'il s'agit du principe de fonctionnement pour les <code>TextGeometry</code> et les <code>TextGeometry</code>.</div>
+<div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">Un Icosaèdre (20 côtés)</div>
+<div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">Une forme généré par la rotation d'une ligne pour, par exemple, dessiner une lampe, une quille, bougies, bougeoirs, verres à vin, verres à boire, etc. Vous fournissez une silhouette en deux dimensions comme une série de points et vous indiquez ensuite à three.js combien de subdivisions sont nécessaires en faisant tourner la silhouette autour d'un axe.</div>
+<div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">Un Octaèdre (8 côtés)</div>
+<div id="Diagram-ParametricGeometry" data-primitive="ParametricGeometry">Une surface générée en fournissant à la fonction un point 2D d'une grille et retourne le point 3D correspondant.</div>
+<div id="Diagram-PlaneGeometry" data-primitive="PlaneGeometry">Un plan 2D</div>
+<div id="Diagram-PolyhedronGeometry" data-primitive="PolyhedronGeometry">Prend un ensemble de triangles centrés autour d'un point et les projette sur une sphère</div>
+<div id="Diagram-RingGeometry" data-primitive="RingGeometry">Un disque 2D avec un trou au centre</div>
+<div id="Diagram-ShapeGeometry" data-primitive="ShapeGeometry">Un tracé 2D qui se triangule</div>
+<div id="Diagram-SphereGeometry" data-primitive="SphereGeometry">une sphère</div>
+<div id="Diagram-TetrahedronGeometry" data-primitive="TetrahedronGeometry">Un tétraèdre (4 côtés)</div>
+<div id="Diagram-TextGeometry" data-primitive="TextGeometry">Texte 3D généré à partir d'une police 3D et d'une chaîne de caractères</div>
+<div id="Diagram-TorusGeometry" data-primitive="TorusGeometry">Un tore (donut)</div>
+<div id="Diagram-TorusKnotGeometry" data-primitive="TorusKnotGeometry">Un nœud torique</div>
+<div id="Diagram-TubeGeometry" data-primitive="TubeGeometry">Extrusion contrôlée d'un cercle le long d'un tracé</div>
 <div id="Diagram-EdgesGeometry" data-primitive="EdgesGeometry">Un objet d'aide qui prend une autre
 géométrie en entrée et génère des arêtes que si l'angle entre les faces est supérieur à un certain
 seuil. Par exemple, si vous regardez en haut de la boîte, elle montre une ligne passant par chaque
@@ -61,36 +61,8 @@ n'y aurait que 3 points. Si vous essayez de le dessiner en utilisant un matéria
 triangulaire à un <code>WireframeGeometry</code> vous obtenez une nouvelle géométrie qui comporte
 3 segments de lignes utilisant 6 points.</div>
 
-Vous remarquerez que la plupart d'entre eux proviennent soit du type `Geometry` soit
-du type `BufferGeometry`. Le choix entre ces deux types est question de compromis entre flexibilité et performance.
-
-Le choix des primitives basées sur le type `BufferGeometry` s'oriente sur le critère de la performance. Les
-sommets de la géométrie sont générés directement dans un format de tableau typé efficace, prêt à
-être envoyé au GPU pour le rendu. Cela signifie qu'ils sont plus rapides à démarrer et prennent
-moins de mémoire, mais si vous voulez modifier leurs données, ils nécessitent ce qui est souvent
-considéré comme une programmation plus ardue.
-
-Le choix des primitives basées sur le type `Geometry` s'oriente sur le critère de la flexiblité car elles sont les plus faciles à manipuler.
-Elles sont construites à partir de classes JavaScript comme `Vector3` pour les points 3D et `Face3`
-pour les triangles.
-Elles demandent beaucoup de mémoire et avant de pouvoir être rendues à l'écran, three.js devra les convertir
-en une représentation correspondante à `BufferGeometry`.
-
-Si vous savez que vous n'allez pas manipuler une primitive
-ou si vous êtes à l'aise pour appliquer des calculs modifiant
-leurs données internes, alors il est préférable d'opter pour les primitives
-basées sur `BufferGeometry`. Si, par contre, vous
-souhaitez modifier certaines choses avant le rendu, vous trouverez
-peut-être les primitives basées sur la `Geometry` plus faciles à manipuler.
-
-Pour prendre un exemple simple, une `BufferGeometry` ne peut pas facilement
-avoir de nouveaux sommets ajoutés. Le nombre de sommets utilisés
-est décidé au moment de la création, le stockage est créé, puis les données
-relatives aux sommets sont fournies. Alors que pour `Geometry`, vous
-pouvez ajouter des sommets au fur et à mesure.
-
 Nous reviendrons sur la création de géométrie personnalisée dans
-[un autre article](threejs-custom-geometry.html). Pour l'instant,
+[un autre article](threejs-custom-buffer-geometry.html). Pour l'instant,
 faisons un exemple en créant chaque type de primitive. Nous
 commencerons par les [exemples vus dans l'article précédent](threejs-responsive.html).
 
@@ -167,7 +139,7 @@ qui constituent une forme. Pour un solide comme une sphère
 ou un cube, il n'y a généralement pas de raison de dessiner les
 côtés arrières des triangles car ils sont tous tournés ver l'intérieur
 de la forme. Dans notre cas, cependant, nous dessinons des objets
-comme la `PlaneBufferGeometry` ou la `ShapeBufferGeometry`
+comme la `PlaneGeometry` ou la `ShapeGeometry`
 qui sont bidimensionnnels et n'ont donc pas d'intérieur.
 Sans le paramètre `side: THREE.DoubleSide` elle disparaîtraient
 quand on regarderait leur dos.
@@ -197,7 +169,7 @@ Par exemple, la création d'une boîte :
   const width = 8; // largeur
   const height = 8; // hauteur
   const depth = 8; // profondeur
-  addSolidGeometry(-2, -2, new THREE.BoxBufferGeometry(width, height, depth));
+  addSolidGeometry(-2, -2, new THREE.BoxGeometry(width, height, depth));
 }
 ```
 
@@ -208,7 +180,7 @@ Voici le résultat :
 {{{example url="../threejs-primitives.html" }}}
 
 Il y a quelques exceptions notables au modèle ci-dessus.
-La plus grande est probablement le `TextBufferGeometry`. Il doit charger
+La plus grande est probablement le `TextGeometry`. Il doit charger
 des données de police en 3D avant de pouvoir générer un maillage pour le texte.
 Ces données se chargent de manière asynchrone, nous devons donc attendre
 qu'elles soient chargées avant d'essayer de créer la géométrie. En "promettant"
@@ -230,7 +202,7 @@ Et enfin, nous créons la géométrie et appelons `addObject` pour l'ajouter à 
 
   async function doit() {
     const font = await loadFont('../resources/threejs/fonts/helvetiker_regular.typeface.json');  /* threejsfundamentals: url */
-    const geometry = new THREE.TextBufferGeometry('three.js', {
+    const geometry = new THREE.TextGeometry('three.js', {
       font: font,
       size: 3.0,
       height: .2,
@@ -317,7 +289,7 @@ prend une taille ([`size`](PointsMaterial.size)) pour la grosseur des points.
 const radius = 7; // rayon
 const widthSegments = 12;
 const heightSegments = 8;
-const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
 const material = new THREE.PointsMaterial({
     color: 'red',
     size: 0.2, // en unités du monde
@@ -354,9 +326,9 @@ géométries des sphères prennant en paramètres le nombre de divisions à fair
 haut en bas. Par exemple :
 
 <div class="spread">
-<div data-diagram="SphereBufferGeometryLow"></div>
-<div data-diagram="SphereBufferGeometryMedium"></div>
-<div data-diagram="SphereBufferGeometryHigh"></div>
+<div data-diagram="SphereGeometryLow"></div>
+<div data-diagram="SphereGeometryMedium"></div>
+<div data-diagram="SphereGeometryHigh"></div>
 </div>
 
 La première sphère a un tour de 5 segments et 3 de haut, soit 15 segments ou 30 triangles.
@@ -368,9 +340,9 @@ ayez besoin d'un grand nombre de segments, mais si vous enlevez les lignes et le
 nous obtenons ceci :
 
 <div class="spread">
-<div data-diagram="SphereBufferGeometryLowSmooth"></div>
-<div data-diagram="SphereBufferGeometryMediumSmooth"></div>
-<div data-diagram="SphereBufferGeometryHighSmooth"></div>
+<div data-diagram="SphereGeometryLowSmooth"></div>
+<div data-diagram="SphereGeometryMediumSmooth"></div>
+<div data-diagram="SphereGeometryHighSmooth"></div>
 </div>
 
 Il est moins perceptible que celle de droite avec 5000 triangles est meilleure que celle avec
@@ -385,8 +357,8 @@ Parfois, il est facile de choisir. Par exemple, vous pouvez aussi choisir
 de subdiviser un plan.
 
 <div class="spread">
-<div data-diagram="PlaneBufferGeometryLow"></div>
-<div data-diagram="PlaneBufferGeometryHigh"></div>
+<div data-diagram="PlaneGeometryLow"></div>
+<div data-diagram="PlaneGeometryHigh"></div>
 </div>
 
 Le plan à gauche est composé de 2 triangles. Le plan de droite est composé de 200 triangles.
@@ -401,8 +373,7 @@ Vous devrez décider vous-même du compromis qui convient le mieux à cas d'util
 Si aucune des formes ci-dessus ne correspond à votre cas d'utilisation, vous pouvez
 charger la géométrie par exemple à partir d'un [fichier .obj](threejs-load-obj.html)
 ou d'un [fichier .gltf](threejs-load-gltf.html).
-Vous pouvez également créer votre [Geometry](threejs-custom-geometry.html)
-ou votre [BufferGeometry](threejs-custom-buffergeometry.html).
+Vous pouvez également créer votre [BufferGeometry](threejs-custom-buffergeometry.html).
 
 Voyons maintenant l'article traitant sur [comment fonctionne un graphe de scène three.js et comment l'utiliser](threejs-scenegraph.html).
 

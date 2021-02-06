@@ -22,59 +22,32 @@ Three.js에는 다양한 원시 모델이 있습니다. 먼저 Three.js의 원�
 앞으로 소개할 원시 모델들은 대부분 기본값이 있으므로 필요에 따라
 인자를 넣어주면 됩니다.
 
-<div id="Diagram-BoxBufferGeometry" data-primitive="BoxBufferGeometry">육면체(Box)</div>
-<div id="Diagram-CircleBufferGeometry" data-primitive="CircleBufferGeometry">원(flat circle)</div>
-<div id="Diagram-ConeBufferGeometry" data-primitive="ConeBufferGeometry">원뿔(Cone)</div>
-<div id="Diagram-CylinderBufferGeometry" data-primitive="CylinderBufferGeometry">원통(Cylinder)</div>
-<div id="Diagram-DodecahedronBufferGeometry" data-primitive="DodecahedronBufferGeometry">십이면체(Dodecahedron)</div>
-<div id="Diagram-ExtrudeBufferGeometry" data-primitive="ExtrudeBufferGeometry">사각(bevel)을 주어 깍아낸(extruded) 2D 모양입니다.
-아래에서는 하트 모양으로 깍아냈죠. <code>ExtrudedBufferGeometry</code>는 나중에 설명할
-<code>TextBufferGeometry</code>과 <code>TextGeometry</code>의 기초 모델입니다.</div>
-<div id="Diagram-IcosahedronBufferGeometry" data-primitive="IcosahedronBufferGeometry">이십면체(Icosahedron)</div>
-<div id="Diagram-LatheBufferGeometry" data-primitive="LatheBufferGeometry">선(line)을 회전시켜 만든 모양입니다. 램프, 볼링핀, 초, 초 받침, 와인잔, 유리잔 등이 있죠(물레로 도자기를 만드는 것처럼. 역주). 2D 형태를 점(point, Vector2 클래스를 말함. 역주)을 사용해 지정하고, Three.js에게 축을 따라 세분값(아래 예제의 <code>segments</code> 값. 역주)과 회전값(아래 예제의 <code>phiLength</code> 값. 역주)을 지정해주면 됩니다.</div>
-<div id="Diagram-OctahedronBufferGeometry" data-primitive="OctahedronBufferGeometry">팔면체(Octahedron)</div>
-<div id="Diagram-ParametricBufferGeometry" data-primitive="ParametricBufferGeometry">2D 격자값(격자 하나의 벡터값)을 받아 3D 값을 반환하는 함수를 인자로 전달하여 면을 만듭니다.</div>
-<div id="Diagram-PlaneBufferGeometry" data-primitive="PlaneBufferGeometry">2D 평면(2D plane)</div>
-<div id="Diagram-PolyhedronBufferGeometry" data-primitive="PolyhedronBufferGeometry">다면체입니다. 주어진 3D 점들(아래 <code>verticesOfCube</code>. 역주)을 중심으로 삼각형(아래 <code>indicesOfFaces</code>. 역주)을 구 형태로 잇습니다.</div>
-<div id="Diagram-RingBufferGeometry" data-primitive="RingBufferGeometry">중앙이 빈 2D 디스크(disc)입니다.</div>
-<div id="Diagram-ShapeBufferGeometry" data-primitive="ShapeBufferGeometry">삼각형으로 이루어진 2D 윤곽선입니다.</div>
-<div id="Diagram-SphereBufferGeometry" data-primitive="SphereBufferGeometry">구(Sphere)</div>
-<div id="Diagram-TetrahedronBufferGeometry" data-primitive="TetrahedronBufferGeometry">사면체(tetrahedron)</div>
-<div id="Diagram-TextBufferGeometry" data-primitive="TextBufferGeometry">3D 폰트와 문자열로 만든 3D 텍스트입니다.</div>
-<div id="Diagram-TorusBufferGeometry" data-primitive="TorusBufferGeometry">원환체(torus), 도넛(donut)</div>
-<div id="Diagram-TorusKnotBufferGeometry" data-primitive="TorusKnotBufferGeometry">원환체 매듭(torus knot)</div>
-<div id="Diagram-TubeBufferGeometry" data-primitive="TubeBufferGeometry">패스를 따라 이어진 원입니다.</div>
+<div id="Diagram-BoxGeometry" data-primitive="BoxGeometry">육면체(Box)</div>
+<div id="Diagram-CircleGeometry" data-primitive="CircleGeometry">원(flat circle)</div>
+<div id="Diagram-ConeGeometry" data-primitive="ConeGeometry">원뿔(Cone)</div>
+<div id="Diagram-CylinderGeometry" data-primitive="CylinderGeometry">원통(Cylinder)</div>
+<div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">십이면체(Dodecahedron)</div>
+<div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">사각(bevel)을 주어 깍아낸(extruded) 2D 모양입니다.
+아래에서는 하트 모양으로 깍아냈죠. <code>ExtrudedGeometry</code>는 나중에 설명할
+<code>TextGeometry</code>과 <code>TextGeometry</code>의 기초 모델입니다.</div>
+<div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">이십면체(Icosahedron)</div>
+<div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">선(line)을 회전시켜 만든 모양입니다. 램프, 볼링핀, 초, 초 받침, 와인잔, 유리잔 등이 있죠(물레로 도자기를 만드는 것처럼. 역주). 2D 형태를 점(point, Vector2 클래스를 말함. 역주)을 사용해 지정하고, Three.js에게 축을 따라 세분값(아래 예제의 <code>segments</code> 값. 역주)과 회전값(아래 예제의 <code>phiLength</code> 값. 역주)을 지정해주면 됩니다.</div>
+<div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">팔면체(Octahedron)</div>
+<div id="Diagram-ParametricGeometry" data-primitive="ParametricGeometry">2D 격자값(격자 하나의 벡터값)을 받아 3D 값을 반환하는 함수를 인자로 전달하여 면을 만듭니다.</div>
+<div id="Diagram-PlaneGeometry" data-primitive="PlaneGeometry">2D 평면(2D plane)</div>
+<div id="Diagram-PolyhedronGeometry" data-primitive="PolyhedronGeometry">다면체입니다. 주어진 3D 점들(아래 <code>verticesOfCube</code>. 역주)을 중심으로 삼각형(아래 <code>indicesOfFaces</code>. 역주)을 구 형태로 잇습니다.</div>
+<div id="Diagram-RingGeometry" data-primitive="RingGeometry">중앙이 빈 2D 디스크(disc)입니다.</div>
+<div id="Diagram-ShapeGeometry" data-primitive="ShapeGeometry">삼각형으로 이루어진 2D 윤곽선입니다.</div>
+<div id="Diagram-SphereGeometry" data-primitive="SphereGeometry">구(Sphere)</div>
+<div id="Diagram-TetrahedronGeometry" data-primitive="TetrahedronGeometry">사면체(tetrahedron)</div>
+<div id="Diagram-TextGeometry" data-primitive="TextGeometry">3D 폰트와 문자열로 만든 3D 텍스트입니다.</div>
+<div id="Diagram-TorusGeometry" data-primitive="TorusGeometry">원환체(torus), 도넛(donut)</div>
+<div id="Diagram-TorusKnotGeometry" data-primitive="TorusKnotGeometry">원환체 매듭(torus knot)</div>
+<div id="Diagram-TubeGeometry" data-primitive="TubeGeometry">패스를 따라 이어진 원입니다.</div>
 <div id="Diagram-EdgesGeometry" data-primitive="EdgesGeometry">다른 <code>geometry</code>를 받는 헬퍼 객체로, 각 면 사이의 각이 일정 값 이상일 때만 모서리를 표시합니다. 상단의 육면체 예제를 보면 육면체를 만드는 삼각형이 표면에 전부 표시된 것을 확인할 수 있는데, <code>EdgesGeometry</code>를 사용할 경우 표면에 있던 선들이 전부 사라집니다. 아래 예제의 <code>thresholdAngle</code> 값을 조정해 해당 값 이하인 모서리가 전부 사라지는 것을 확인해보세요.</div>
 <div id="Diagram-WireframeGeometry" data-primitive="WireframeGeometry">매개변수로 받은 <code>geometry</code>의 모서리 하나당 하나의 선분(2개의 점)을 가진 <code>geometry</code>를 생성합니다. WebGl은 보통 선분 하나당 2개의 점을 필요로 합니다. 때문에 이 모델을 사용하지 않는 경우, 모서리가 없어지거나 추가되는 현상이 발생할 수 있습니다. 예를 들어 2D 삼각형을 만드는 경우, 대부분 3개의 점을 이용해 삼각형을 만들려고 할 겁니다. <code>wireframe: true</code>라는 옵션이 있기는 하나, 이를 이용해 삼각형을 만들면 (WebGl은 삼각형을 만들 때 6개의 점을 요구하므로. 역주) 출력되는 건 선 하나 뿐일 겁니다. 삼각형 <code>geometry</code>를 <code>WireframeGeometry</code>에 넘겨주면 6개의 점과 3개의 선분을 가진 새 <code>geometry</code>를 생성합니다.</div>
 
-눈치채셨겠지만 대부분의 원시 모델은 `Geometry`와 `BufferGeometry`가
-짝을 이룹니다. 다른 차이점들도 있지만 둘의 가장 큰 차이점은 성능과
-확장성입니다.
-
-`BufferGeometry` 기반의 원시 모델은 성능에 최적화된 모델입니다.
-`geometry`의 정점들은 바로 렌더링 시 GPU에서 불러오기 좋은 배열
-형태로 최적화됩니다. 때문에 초기화 속도도 빠르고 메모리 점유율도
-낮지만, 이 `geometry`의 데이터를 수정하려면 복잡한 프로그래밍 과정을
-거쳐야 합니다.
-
-이에 반해 `Geometry` 기반의 원시 모델은 훨씬 다루기 쉽습니다.
-3D 정점을 만드는 데는 `Vector3` 클래스, 삼각형을 만드는 데는
-`Face3` 클래스 등 자바스크립트 기반 클래스로 이루어져 있죠.
-다만 `BufferGeometry`에 비해 약간 많은 메모리를 더 차지하고,
-렌더링을 위해 Three.js가 이 모델과 유사한 `BufferGeometry`로
-변형시키는 과정이 들어간다는 것이 단점입니다.
-
-원시 모델을 사용하지 않을 계획이거나, 기하학 모델을 수학적으로
-계산하는 데 익숙하다면, `BufferGeometry` 기반의 원시 모델을
-사용하는 것이 좋습니다. 렌더링 전에 어떤 값을 수정해야 한다면
-`Geometry`가 훨씬 다루기 쉽겠죠.
-
-하나 예를 들면, `BufferGeometry`는 정점을 추가하는 것이 어렵습니다.
-`BufferGeometry`는 생성 시에 정점의 수가 정해지며, 메모리에 할당되고,
-그 다음 정점 데이터를 채워 넣습니다. 반면에 `Geometry`는 생성 후에도
-얼마든지 정점을 추가할 수 있죠.
-
-[커스텀 geometry를 만드는 법](threejs-custom-geometry.html)에 대해서는
+[커스텀 geometry를 만드는 법](threejs-custom-buffergeometry.html)에 대해서는
 나중에 자세히 다룰 것이므로, 지금은 각 원시 모델로 예제를 만들어 보겠습니다.
 예제 코드는 [지난 글](threejs-responsive.html)에서 썼던 예제를 쓸 거에요.
 
@@ -146,8 +119,8 @@ function createMaterial() {
 위 예제에서는 `material`에 `side: THREE.DoubleSide` 옵션을
 지정했습니다. 이는 Three.js에게 삼각형의 양면 모두를 렌더링하라고
 알려주는 것이죠. 구나 정육면체 같은 물체는 보이지 않는 안쪽 면을
-굳이 렌더링할 이유가 없지만, 예제의 경우 `PlaneBufferGeometry`나
-`ShapeBufferGeometry` 등 안쪽 면이 없는 물체를 만들 것이므로
+굳이 렌더링할 이유가 없지만, 예제의 경우 `PlaneGeometry`나
+`ShapeGeometry` 등 안쪽 면이 없는 물체를 만들 것이므로
 `side: THREE.DoubleSide` 옵션을 설정하지 않으면 반대편에서 봤을 때
 물체가 사라진 것처럼 보일 겁니다.
 
@@ -174,7 +147,7 @@ function addSolidGeometry(x, y, geometry) {
   const width = 8;
   const height = 8;
   const depth = 8;
-  addSolidGeometry(-2, -2, new THREE.BoxBufferGeometry(width, height, depth));
+  addSolidGeometry(-2, -2, new THREE.BoxGeometry(width, height, depth));
 }
 ```
 
@@ -182,8 +155,8 @@ function addSolidGeometry(x, y, geometry) {
 
 {{{example url="../threejs-primitives.html" }}}
 
-몇몇 예외가 보일 텐데, 가장 크게 두드러진 것은 아마 `TextBufferGeometry`일 겁니다.
-`TextBufferGeometry`는 텍스트의 `mesh`를 생성하기 위해 3D 폰트 데이터를 필요로 합니다.
+몇몇 예외가 보일 텐데, 가장 크게 두드러진 것은 아마 `TextGeometry`일 겁니다.
+`TextGeometry`는 텍스트의 `mesh`를 생성하기 위해 3D 폰트 데이터를 필요로 합니다.
 이 데이터는 비동기로 로드되므로, 객체를 생성하기 전에 3D 폰트 데이터가 로드되기를 기다려야
 하죠. 폰트 로드 과정을 프로미스화 하면 이 과정를 더 쉽게 만들 수 있습니다. 먼저 `FontLoader`를
 생성하고, Promise를 반환하는 `loadFont` 함수를 만들어 요청을 Promise로 감쌉니다.
@@ -202,7 +175,7 @@ function addSolidGeometry(x, y, geometry) {
 
   async function doit() {
     const font = await loadFont('resources/threejs/fonts/helvetiker_regular.typeface.json');  /* threejsfundamentals: url */
-    const geometry = new THREE.TextBufferGeometry('three.js', {
+    const geometry = new THREE.TextGeometry('three.js', {
       font: font,
       size: 3.0,
       height: .2,
@@ -278,7 +251,7 @@ function addLineGeometry(x, y, geometry) {
 const radius = 7;
 const widthSegments = 12;
 const heightSegments = 8;
-const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
 const material = new THREE.PointsMaterial({
     color: 'red',
     size: 0.2,     // 글로벌 단위
@@ -314,9 +287,9 @@ const material = new THREE.PointsMaterial({
 받습니다.
 
 <div class="spread">
-<div data-diagram="SphereBufferGeometryLow"></div>
-<div data-diagram="SphereBufferGeometryMedium"></div>
-<div data-diagram="SphereBufferGeometryHigh"></div>
+<div data-diagram="SphereGeometryLow"></div>
+<div data-diagram="SphereGeometryMedium"></div>
+<div data-diagram="SphereGeometryHigh"></div>
 </div>
 
 위 그림에서 첫 번째 구체는 둘레로 5개, 높이로 3개의 면으로 분할되었습니다.
@@ -329,9 +302,9 @@ const material = new THREE.PointsMaterial({
 아래와 같은 결과가 나옵니다.
 
 <div class="spread">
-<div data-diagram="SphereBufferGeometryLowSmooth"></div>
-<div data-diagram="SphereBufferGeometryMediumSmooth"></div>
-<div data-diagram="SphereBufferGeometryHighSmooth"></div>
+<div data-diagram="SphereGeometryLowSmooth"></div>
+<div data-diagram="SphereGeometryMediumSmooth"></div>
+<div data-diagram="SphereGeometryHighSmooth"></div>
 </div>
 
 5000 삼각형인 오른쪽 구체가 480 삼각형인 중간 구체보다 훨씬 좋다고
@@ -345,8 +318,8 @@ const material = new THREE.PointsMaterial({
 물론 선택이 쉬운 경우도 있습니다. 예를 들어 평면을 분할한다고 해보죠.
 
 <div class="spread">
-<div data-diagram="PlaneBufferGeometryLow"></div>
-<div data-diagram="PlaneBufferGeometryHigh"></div>
+<div data-diagram="PlaneGeometryLow"></div>
+<div data-diagram="PlaneGeometryHigh"></div>
 </div>
 
 왼쪽의 평면은 2 삼각형입니다. 오른쪽 평면은 200 삼각형이죠.
@@ -360,7 +333,7 @@ const material = new THREE.PointsMaterial({
 
 원시 모델 중 어떤 것도 실제 프로젝트에 적용하기가 어렵다면,
 [.obj 파일](threejs-load-obj.html) 또는 [.gltf 파일](threejs-load-gltf.html)을
-로드하여 사용할 수 있습니다. 또는 [커스텀 Geometry](threejs-custom-geometry.html)나
+로드하여 사용할 수 있습니다. 또는
 [커스텀 BufferGeometry](threejs-custom-buffergeometry.html)를 생성할 수도 있죠.
 
 다음 장에서는 [씬 그래프와 그 사용법](threejs-scenegraph.html)에 대해

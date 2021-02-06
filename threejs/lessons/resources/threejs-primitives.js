@@ -19,7 +19,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
   });
 
   const diagrams = {
-    BoxBufferGeometry: {
+    BoxGeometry: {
       ui: {
         width: { type: 'range', min: 1, max: 10, precision: 1, },
         height: { type: 'range', min: 1, max: 10, precision: 1, },
@@ -29,15 +29,15 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         depthSegments: { type: 'range', min: 1, max: 10, },
       },
       create(width = 8, height = 8, depth = 8) {
-        return new THREE.BoxBufferGeometry(width, height, depth);
+        return new THREE.BoxGeometry(width, height, depth);
       },
       create2(width = 8, height = 8, depth = 8, widthSegments = 4, heightSegments = 4, depthSegments = 4) {
-        return new THREE.BoxBufferGeometry(
+        return new THREE.BoxGeometry(
             width, height, depth,
             widthSegments, heightSegments, depthSegments);
       },
     },
-    CircleBufferGeometry: {
+    CircleGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
         segments: { type: 'range', min: 1, max: 50, },
@@ -45,14 +45,14 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         thetaLength: { type: 'range', min: 0, max: 2, mult: Math.PI },
       },
       create(radius = 7, segments = 24) {
-        return new THREE.CircleBufferGeometry(radius, segments);
+        return new THREE.CircleGeometry(radius, segments);
       },
       create2(radius = 7, segments = 24, thetaStart = Math.PI * 0.25, thetaLength = Math.PI * 1.5) {
-        return new THREE.CircleBufferGeometry(
+        return new THREE.CircleGeometry(
             radius, segments, thetaStart, thetaLength);
       },
     },
-    ConeBufferGeometry: {
+    ConeGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
         height: { type: 'range', min: 1, max: 10, precision: 1, },
@@ -63,17 +63,17 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         thetaLength: { type: 'range', min: 0, max: 2, mult: Math.PI },
       },
       create(radius = 6, height = 8, radialSegments = 16) {
-        return new THREE.ConeBufferGeometry(radius, height, radialSegments);
+        return new THREE.ConeGeometry(radius, height, radialSegments);
       },
       create2(radius = 6, height = 8, radialSegments = 16, heightSegments = 2, openEnded = true, thetaStart = Math.PI * 0.25, thetaLength = Math.PI * 1.5) {
-        return new THREE.ConeBufferGeometry(
+        return new THREE.ConeGeometry(
             radius, height,
             radialSegments, heightSegments,
             openEnded,
             thetaStart, thetaLength);
       },
     },
-    CylinderBufferGeometry: {
+    CylinderGeometry: {
       ui: {
         radiusTop: { type: 'range', min: 0, max: 10, precision: 1, },
         radiusBottom: { type: 'range', min: 0, max: 10, precision: 1, },
@@ -85,30 +85,30 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         thetaLength: { type: 'range', min: 0, max: 2, mult: Math.PI },
       },
       create(radiusTop = 4, radiusBottom = 4, height = 8, radialSegments = 12) {
-        return new THREE.CylinderBufferGeometry(
+        return new THREE.CylinderGeometry(
             radiusTop, radiusBottom, height, radialSegments);
       },
       create2(radiusTop = 4, radiusBottom = 4, height = 8, radialSegments = 12, heightSegments = 2, openEnded = false, thetaStart = Math.PI * 0.25, thetaLength = Math.PI * 1.5) {
-        return new THREE.CylinderBufferGeometry(
+        return new THREE.CylinderGeometry(
             radiusTop, radiusBottom, height,
             radialSegments, heightSegments,
             openEnded,
             thetaStart, thetaLength);
       },
     },
-    DodecahedronBufferGeometry: {
+    DodecahedronGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
         detail: { type: 'range', min: 0, max: 5, precision: 0, },
       },
       create(radius = 7) {
-        return new THREE.DodecahedronBufferGeometry(radius);
+        return new THREE.DodecahedronGeometry(radius);
       },
       create2(radius = 7, detail = 2) {
-        return new THREE.DodecahedronBufferGeometry(radius, detail);
+        return new THREE.DodecahedronGeometry(radius, detail);
       },
     },
-    ExtrudeBufferGeometry: {
+    ExtrudeGeometry: {
       ui: {
         steps: { type: 'range', min: 1, max: 100, },
         depth: { type: 'range', min: 1, max: 20, precision: 1, },
@@ -139,7 +139,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
           bevelSegments,
         };
 
-        const geometry = new THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
+        const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
         return geometry;
       },
       src: `
@@ -163,7 +163,7 @@ const extrudeSettings = {
   bevelSegments: 2,  // ui: bevelSegments
 };
 
-const geometry = THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
+const geometry = THREE.ExtrudeGeometry(shape, extrudeSettings);
 `,
       create2(steps = 100) {
     const outline = new THREE.Shape([
@@ -193,7 +193,7 @@ const geometry = THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
       extrudePath: shape,
     };
 
-    const geometry =  new THREE.ExtrudeBufferGeometry(outline, extrudeSettings);
+    const geometry =  new THREE.ExtrudeGeometry(outline, extrudeSettings);
     return geometry;
       },
       src2: `
@@ -224,23 +224,23 @@ const extrudeSettings = {
   extrudePath: shape,
 };
 
-const geometry =  new THREE.ExtrudeBufferGeometry(outline, extrudeSettings);
+const geometry =  new THREE.ExtrudeGeometry(outline, extrudeSettings);
 return geometry;
       `,
     },
-    IcosahedronBufferGeometry: {
+    IcosahedronGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
         detail: { type: 'range', min: 0, max: 5, precision: 0, },
       },
       create(radius = 7) {
-        return new THREE.IcosahedronBufferGeometry(radius);
+        return new THREE.IcosahedronGeometry(radius);
       },
       create2(radius = 7, detail = 2) {
-        return new THREE.IcosahedronBufferGeometry(radius, detail);
+        return new THREE.IcosahedronGeometry(radius, detail);
       },
     },
-    LatheBufferGeometry: {
+    LatheGeometry: {
       ui: {
         segments: { type: 'range', min: 1, max: 50, },
         phiStart: { type: 'range', min: 0, max: 2, mult: Math.PI },
@@ -251,30 +251,30 @@ return geometry;
         for (let i = 0; i < 10; ++i) {
           points.push(new THREE.Vector2(Math.sin(i * 0.2) * 3 + 3, (i - 5) * .8));
         }
-        return new THREE.LatheBufferGeometry(points);
+        return new THREE.LatheGeometry(points);
       },
       create2(segments = 12, phiStart = Math.PI * 0.25, phiLength = Math.PI * 1.5) {
         const points = [];
         for (let i = 0; i < 10; ++i) {
           points.push(new THREE.Vector2(Math.sin(i * 0.2) * 3 + 3, (i - 5) * .8));
         }
-        return new THREE.LatheBufferGeometry(
+        return new THREE.LatheGeometry(
             points, segments, phiStart, phiLength);
       },
     },
-    OctahedronBufferGeometry: {
+    OctahedronGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
         detail: { type: 'range', min: 0, max: 5, precision: 0, },
       },
       create(radius = 7) {
-        return new THREE.OctahedronBufferGeometry(radius);
+        return new THREE.OctahedronGeometry(radius);
       },
       create2(radius = 7, detail = 2) {
-        return new THREE.OctahedronBufferGeometry(radius, detail);
+        return new THREE.OctahedronGeometry(radius, detail);
       },
     },
-    ParametricBufferGeometry: {
+    ParametricGeometry: {
       ui: {
         stacks: { type: 'range', min: 1, max: 50, },
         slices: { type: 'range', min: 1, max: 50, },
@@ -328,11 +328,11 @@ return geometry;
           target.set(x, y, z).multiplyScalar(0.75);
         }
 
-        return new THREE.ParametricBufferGeometry(
+        return new THREE.ParametricGeometry(
             klein, slices, stacks);
       },
     },
-    PlaneBufferGeometry: {
+    PlaneGeometry: {
       ui: {
         width: { type: 'range', min: 1, max: 10, precision: 1, },
         height: { type: 'range', min: 1, max: 10, precision: 1, },
@@ -340,15 +340,15 @@ return geometry;
         heightSegments: { type: 'range', min: 1, max: 10, },
       },
       create(width = 9, height = 9) {
-        return new THREE.PlaneBufferGeometry(width, height);
+        return new THREE.PlaneGeometry(width, height);
       },
       create2(width = 9, height = 9, widthSegments = 2, heightSegments = 2) {
-        return new THREE.PlaneBufferGeometry(
+        return new THREE.PlaneGeometry(
             width, height,
             widthSegments, heightSegments);
       },
     },
-    PolyhedronBufferGeometry: {
+    PolyhedronGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
         detail: { type: 'range', min: 0, max: 5, precision: 0, },
@@ -366,11 +366,11 @@ return geometry;
             2, 3, 7,    7, 6, 2,
             4, 5, 6,    6, 7, 4,
         ];
-        return new THREE.PolyhedronBufferGeometry(
+        return new THREE.PolyhedronGeometry(
             verticesOfCube, indicesOfFaces, radius, detail);
       },
     },
-    RingBufferGeometry: {
+    RingGeometry: {
       ui: {
         innerRadius: { type: 'range', min: 1, max: 10, precision: 1, },
         outerRadius: { type: 'range', min: 1, max: 10, precision: 1, },
@@ -380,17 +380,17 @@ return geometry;
         thetaLength: { type: 'range', min: 0, max: 2, mult: Math.PI },
       },
       create(innerRadius = 2, outerRadius = 7, thetaSegments = 18) {
-        return new THREE.RingBufferGeometry(
+        return new THREE.RingGeometry(
             innerRadius, outerRadius, thetaSegments);
       },
       create2(innerRadius = 2, outerRadius = 7, thetaSegments = 18, phiSegments = 2, thetaStart = Math.PI * 0.25, thetaLength = Math.PI * 1.5) {
-        return new THREE.RingBufferGeometry(
+        return new THREE.RingGeometry(
             innerRadius, outerRadius,
             thetaSegments, phiSegments,
             thetaStart, thetaLength);
       },
     },
-    ShapeBufferGeometry: {
+    ShapeGeometry: {
       ui: {
         curveSegments: { type: 'range', min: 1, max: 30, },
       },
@@ -405,7 +405,7 @@ return geometry;
         shape.bezierCurveTo(x + 6, y + 7.7, x + 8, y + 4.5, x + 8, y + 3.5);
         shape.bezierCurveTo(x + 8, y + 3.5, x + 8, y, x + 5, y);
         shape.bezierCurveTo(x + 3.5, y, x + 2.5, y + 2.5, x + 2.5, y + 2.5);
-        return new THREE.ShapeBufferGeometry(shape);
+        return new THREE.ShapeGeometry(shape);
       },
       create2(curveSegments = 5) {
         const shape = new THREE.Shape();
@@ -418,10 +418,10 @@ return geometry;
         shape.bezierCurveTo(x + 6, y + 7.7, x + 8, y + 4.5, x + 8, y + 3.5);
         shape.bezierCurveTo(x + 8, y + 3.5, x + 8, y, x + 5, y);
         shape.bezierCurveTo(x + 3.5, y, x + 2.5, y + 2.5, x + 2.5, y + 2.5);
-        return new THREE.ShapeBufferGeometry(shape, curveSegments);
+        return new THREE.ShapeGeometry(shape, curveSegments);
       },
     },
-    SphereBufferGeometry: {
+    SphereGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
         widthSegments: { type: 'range', min: 1, max: 30, },
@@ -432,29 +432,29 @@ return geometry;
         thetaLength: { type: 'range', min: 0, max: 1, mult: Math.PI },
       },
       create(radius = 7, widthSegments = 12, heightSegments = 8) {
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return new THREE.SphereGeometry(radius, widthSegments, heightSegments);
       },
       create2(radius = 7, widthSegments = 12, heightSegments = 8, phiStart = Math.PI * 0.25, phiLength = Math.PI * 1.5, thetaStart = Math.PI * 0.25, thetaLength = Math.PI * 0.5) {
-        return new THREE.SphereBufferGeometry(
+        return new THREE.SphereGeometry(
             radius,
             widthSegments, heightSegments,
             phiStart, phiLength,
             thetaStart, thetaLength);
       },
     },
-    TetrahedronBufferGeometry: {
+    TetrahedronGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
         detail: { type: 'range', min: 0, max: 5, precision: 0, },
       },
       create(radius = 7) {
-        return new THREE.TetrahedronBufferGeometry(radius);
+        return new THREE.TetrahedronGeometry(radius);
       },
       create2(radius = 7, detail = 2) {
-        return new THREE.TetrahedronBufferGeometry(radius, detail);
+        return new THREE.TetrahedronGeometry(radius, detail);
       },
     },
-    TextBufferGeometry: {
+    TextGeometry: {
       ui: {
         text: { type: 'text', maxLength: 30, },
         size: { type: 'range', min: 1, max: 10, precision: 1, },
@@ -471,7 +471,7 @@ return geometry;
       create(text = 'three.js', size = 3, height = 0.2, curveSegments = 12, bevelEnabled = true, bevelThickness = 0.15, bevelSize = 0.3, bevelSegments = 5) {
         return new Promise((resolve) => {
           fontPromise.then((font) => {
-            resolve(new THREE.TextBufferGeometry(text, {
+            resolve(new THREE.TextGeometry(text, {
               font: font,
               size,
               height,
@@ -489,7 +489,7 @@ const loader = new THREE.FontLoader();
 
 loader.load('../resources/threejs/fonts/helvetiker_regular.typeface.json', (font) => {
   const text = 'three.js';  // ui: text
-  const geometry = new THREE.TextBufferGeometry(text, {
+  const geometry = new THREE.TextGeometry(text, {
     font: font,
     size: 3,  // ui: size
     height: 0.2,  // ui: height
@@ -503,7 +503,7 @@ loader.load('../resources/threejs/fonts/helvetiker_regular.typeface.json', (font
 });
       `,
     },
-    TorusBufferGeometry: {
+    TorusGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
         tubeRadius: { type: 'range', min: 1, max: 10, precision: 1, },
@@ -511,12 +511,12 @@ loader.load('../resources/threejs/fonts/helvetiker_regular.typeface.json', (font
         tubularSegments: { type: 'range', min: 1, max: 100, },
       },
       create(radius = 5, tubeRadius = 2, radialSegments = 8, tubularSegments = 24) {
-        return new THREE.TorusBufferGeometry(
+        return new THREE.TorusGeometry(
             radius, tubeRadius,
             radialSegments, tubularSegments);
       },
     },
-    TorusKnotBufferGeometry: {
+    TorusKnotGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
         tubeRadius: { type: 'range', min: 1, max: 10, precision: 1, },
@@ -526,11 +526,11 @@ loader.load('../resources/threejs/fonts/helvetiker_regular.typeface.json', (font
         q: { type: 'range', min: 1, max: 20, },
       },
       create(radius = 3.5, tubeRadius = 1.5, radialSegments = 8, tubularSegments = 64, p = 2, q = 3) {
-        return new THREE.TorusKnotBufferGeometry(
+        return new THREE.TorusKnotGeometry(
             radius, tubeRadius, tubularSegments, radialSegments, p, q);
       },
     },
-    TubeBufferGeometry: {
+    TubeGeometry: {
       ui: {
         tubularSegments: { type: 'range', min: 1, max: 100, },
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
@@ -552,7 +552,7 @@ loader.load('../resources/threejs/fonts/helvetiker_regular.typeface.json', (font
         }
 
         const path = new CustomSinCurve(4);
-        return new THREE.TubeBufferGeometry(
+        return new THREE.TubeGeometry(
             path, tubularSegments, radius, radialSegments, closed);
       },
     },
@@ -563,23 +563,22 @@ loader.load('../resources/threejs/fonts/helvetiker_regular.typeface.json', (font
       create() {
         return {
           lineGeometry: new THREE.EdgesGeometry(
-            new THREE.BoxBufferGeometry(8, 8, 8)),
+            new THREE.BoxGeometry(8, 8, 8)),
         };
       },
       create2(thresholdAngle = 1) {
         return {
           lineGeometry: new THREE.EdgesGeometry(
-            new THREE.SphereBufferGeometry(7, 6, 3), thresholdAngle),
+            new THREE.SphereGeometry(7, 6, 3), thresholdAngle),
         };
       },
-      nonBuffer: false,
       addConstCode: false,
       src: `
 const size = 8;
 const widthSegments = 2;
 const heightSegments = 2;
 const depthSegments = 2;
-const boxGeometry = new THREE.BoxBufferGeometry(
+const boxGeometry = new THREE.BoxGeometry(
     size, size, size,
     widthSegments, heightSegments, depthSegments);
 const geometry = new THREE.EdgesGeometry(boxGeometry);
@@ -588,7 +587,7 @@ const geometry = new THREE.EdgesGeometry(boxGeometry);
 const radius = 7;
 const widthSegments = 6;
 const heightSegments = 3;
-const sphereGeometry = new THREE.SphereBufferGeometry(
+const sphereGeometry = new THREE.SphereGeometry(
     radius, widthSegments, heightSegments);
 const thresholdAngle = 1;  // ui: thresholdAngle
 const geometry = new THREE.EdgesGeometry(sphereGeometry, thresholdAngle);
@@ -603,12 +602,11 @@ const geometry = new THREE.EdgesGeometry(sphereGeometry, thresholdAngle);
       create(widthSegments = 2, heightSegments = 2, depthSegments = 2) {
         const size = 8;
         return {
-          lineGeometry: new THREE.WireframeGeometry(new THREE.BoxBufferGeometry(
+          lineGeometry: new THREE.WireframeGeometry(new THREE.BoxGeometry(
             size, size, size,
             widthSegments, heightSegments, depthSegments)),
         };
       },
-      nonBuffer: false,
       addConstCode: false,
       src: `
 const size = 8;
@@ -616,7 +614,7 @@ const widthSegments = 2;  // ui: widthSegments
 const heightSegments = 2;  // ui: heightSegments
 const depthSegments = 2;  // ui: depthSegments
 const geometry = new THREE.WireframeGeometry(
-    new THREE.BoxBufferGeometry(
+    new THREE.BoxGeometry(
       size, size, size,
       widthSegments, heightSegments, depthSegments));
 `,
@@ -626,7 +624,7 @@ const geometry = new THREE.WireframeGeometry(
         const radius = 7;
         const widthSegments = 12;
         const heightSegments = 8;
-        const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
         const material = new THREE.PointsMaterial({
             color: 'red',
             size: 0.2,
@@ -643,7 +641,7 @@ const geometry = new THREE.WireframeGeometry(
         const radius = 7;
         const widthSegments = 12;
         const heightSegments = 8;
-        const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
         const material = new THREE.PointsMaterial({
             color: 'red',
             size: 3 * window.devicePixelRatio,
@@ -656,50 +654,50 @@ const geometry = new THREE.WireframeGeometry(
         };
       },
     },
-    SphereBufferGeometryLow: {
+    SphereGeometryLow: {
       create(radius = 7, widthSegments = 5, heightSegments = 3) {
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return new THREE.SphereGeometry(radius, widthSegments, heightSegments);
       },
     },
-    SphereBufferGeometryMedium: {
+    SphereGeometryMedium: {
       create(radius = 7, widthSegments = 24, heightSegments = 10) {
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return new THREE.SphereGeometry(radius, widthSegments, heightSegments);
       },
     },
-    SphereBufferGeometryHigh: {
+    SphereGeometryHigh: {
       create(radius = 7, widthSegments = 50, heightSegments = 50) {
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return new THREE.SphereGeometry(radius, widthSegments, heightSegments);
       },
     },
-    SphereBufferGeometryLowSmooth: {
+    SphereGeometryLowSmooth: {
       create(radius = 7, widthSegments = 5, heightSegments = 3) {
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return new THREE.SphereGeometry(radius, widthSegments, heightSegments);
       },
       showLines: false,
       flatShading: false,
     },
-    SphereBufferGeometryMediumSmooth: {
+    SphereGeometryMediumSmooth: {
       create(radius = 7, widthSegments = 24, heightSegments = 10) {
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return new THREE.SphereGeometry(radius, widthSegments, heightSegments);
       },
       showLines: false,
       flatShading: false,
     },
-    SphereBufferGeometryHighSmooth: {
+    SphereGeometryHighSmooth: {
       create(radius = 7, widthSegments = 50, heightSegments = 50) {
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return new THREE.SphereGeometry(radius, widthSegments, heightSegments);
       },
       showLines: false,
       flatShading: false,
     },
-    PlaneBufferGeometryLow: {
+    PlaneGeometryLow: {
       create(width = 9, height = 9, widthSegments = 1, heightSegments = 1) {
-        return new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+        return new THREE.PlaneGeometry(width, height, widthSegments, heightSegments);
       },
     },
-    PlaneBufferGeometryHigh: {
+    PlaneGeometryHigh: {
       create(width = 9, height = 9, widthSegments = 10, heightSegments = 10) {
-        return new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+        return new THREE.PlaneGeometry(width, height, widthSegments, heightSegments);
       },
     },
   };
@@ -753,10 +751,6 @@ const geometry = new THREE.WireframeGeometry(
     const right = addDiv(pair, 'desc');
     addDeepLink(right, '#', `#${base.id}`);
     addLink(right, name);
-    if (info.nonBuffer !== false) {
-      addElem(right, 'span', '', ', ');
-      addLink(right, name.replace('Buffer', ''));
-    }
     addDiv(right, '.note').innerHTML = text;
 
     // I get that this is super brittle. I think I'd have to

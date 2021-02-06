@@ -18,27 +18,27 @@ Three.js 有很多图元。图元就是一些 3D 的形状，在运行时根据�
 下面的很多图元都有默认的部分或者全部参数，所以可以根据你的需要选择使用。
 
 
-<div id="Diagram-BoxBufferGeometry" data-primitive="BoxBufferGeometry">盒子</div>
-<div id="Diagram-CircleBufferGeometry" data-primitive="CircleBufferGeometry">平面圆</div>
-<div id="Diagram-ConeBufferGeometry" data-primitive="ConeBufferGeometry">锥形</div>
-<div id="Diagram-CylinderBufferGeometry" data-primitive="CylinderBufferGeometry">圆柱</div>
-<div id="Diagram-DodecahedronBufferGeometry" data-primitive="DodecahedronBufferGeometry">十二面体</div>
-<div id="Diagram-ExtrudeBufferGeometry" data-primitive="ExtrudeBufferGeometry">受挤压的 2D 形状，及可选的斜切。
-这里我们挤压了一个心型。注意，这分别是 <code>TextBufferGeometry</code> 和 <code>TextGeometry</code> 的基础。<div>
-<div id="Diagram-IcosahedronBufferGeometry" data-primitive="IcosahedronBufferGeometry">二十面体</div>
-<div id="Diagram-LatheBufferGeometry" data-primitive="LatheBufferGeometry">绕着一条线旋转形成的形状。例如：灯泡、保龄球瓶、蜡烛、蜡烛台、酒瓶、玻璃杯等。你提供一系列点作为 2D 轮廓，并告诉 Three.js 沿着某条轴旋转时需要将侧面分成多少块。</div>
-<div id="Diagram-OctahedronBufferGeometry" data-primitive="OctahedronBufferGeometry">八面体</div>
-<div id="Diagram-ParametricBufferGeometry" data-primitive="ParametricBufferGeometry">通过提供一个函数（将网格中 2D 的点转成对应的 3D 点）生成的表面。</div>
-<div id="Diagram-PlaneBufferGeometry" data-primitive="PlaneBufferGeometry">2D 平面</div>
-<div id="Diagram-PolyhedronBufferGeometry" data-primitive="PolyhedronBufferGeometry">将一些环绕着中心点的三角形投影到球体上</div>
-<div id="Diagram-RingBufferGeometry" data-primitive="RingBufferGeometry">中间有洞的 2D 圆盘</div>
-<div id="Diagram-ShapeBufferGeometry" data-primitive="ShapeBufferGeometry">2D 的三角轮廓</div>
-<div id="Diagram-SphereBufferGeometry" data-primitive="SphereBufferGeometry">球体</div>
-<div id="Diagram-TetrahedronBufferGeometry" data-primitive="TetrahedronBufferGeometry">四面体</div>
-<div id="Diagram-TextBufferGeometry" data-primitive="TextBufferGeometry">根据 3D 字体和字符串生成的 3D 文字</div>
-<div id="Diagram-TorusBufferGeometry" data-primitive="TorusBufferGeometry">圆环体（甜甜圈）</div>
-<div id="Diagram-TorusKnotBufferGeometry" data-primitive="TorusKnotBufferGeometry">环形节</div>
-<div id="Diagram-TubeBufferGeometry" data-primitive="TubeBufferGeometry">圆环沿着路径</div>
+<div id="Diagram-BoxGeometry" data-primitive="BoxGeometry">盒子</div>
+<div id="Diagram-CircleGeometry" data-primitive="CircleGeometry">平面圆</div>
+<div id="Diagram-ConeGeometry" data-primitive="ConeGeometry">锥形</div>
+<div id="Diagram-CylinderGeometry" data-primitive="CylinderGeometry">圆柱</div>
+<div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">十二面体</div>
+<div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">受挤压的 2D 形状，及可选的斜切。
+这里我们挤压了一个心型。注意，这分别是 <code>TextGeometry</code> 和 <code>TextGeometry</code> 的基础。<div>
+<div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">二十面体</div>
+<div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">绕着一条线旋转形成的形状。例如：灯泡、保龄球瓶、蜡烛、蜡烛台、酒瓶、玻璃杯等。你提供一系列点作为 2D 轮廓，并告诉 Three.js 沿着某条轴旋转时需要将侧面分成多少块。</div>
+<div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">八面体</div>
+<div id="Diagram-ParametricGeometry" data-primitive="ParametricGeometry">通过提供一个函数（将网格中 2D 的点转成对应的 3D 点）生成的表面。</div>
+<div id="Diagram-PlaneGeometry" data-primitive="PlaneGeometry">2D 平面</div>
+<div id="Diagram-PolyhedronGeometry" data-primitive="PolyhedronGeometry">将一些环绕着中心点的三角形投影到球体上</div>
+<div id="Diagram-RingGeometry" data-primitive="RingGeometry">中间有洞的 2D 圆盘</div>
+<div id="Diagram-ShapeGeometry" data-primitive="ShapeGeometry">2D 的三角轮廓</div>
+<div id="Diagram-SphereGeometry" data-primitive="SphereGeometry">球体</div>
+<div id="Diagram-TetrahedronGeometry" data-primitive="TetrahedronGeometry">四面体</div>
+<div id="Diagram-TextGeometry" data-primitive="TextGeometry">根据 3D 字体和字符串生成的 3D 文字</div>
+<div id="Diagram-TorusGeometry" data-primitive="TorusGeometry">圆环体（甜甜圈）</div>
+<div id="Diagram-TorusKnotGeometry" data-primitive="TorusKnotGeometry">环形节</div>
+<div id="Diagram-TubeGeometry" data-primitive="TubeGeometry">圆环沿着路径</div>
 <div id="Diagram-EdgesGeometry" data-primitive="EdgesGeometry">一个工具对象，将一个几何体作为输入，生成面夹角大于某个阈值的那条边。例如，你从顶上看一个盒子，你会看到有一条线穿过这个面，因为每个组成这个盒子的三角形都显示出来了。而如果使用 <code>EdgesGeometry</code> 中间的线就会被移除。调整下面的 thresholdAngle，你就会看到夹角小于这个值的边消失了。</div>
 <div id="Diagram-WireframeGeometry" data-primitive="WireframeGeometry">对于给定的几何体，生成每个边包含一个线段（2 个点）的几何体。如果不这样，通常缺边或者多边，因为 WebGL 中每条边通常需要 2 个点。例如，如果你只有一个三角形，就只有 3 个点 。如果你用 <code>wireframe: true</code> 的材质来绘制它，你只能得到一条线。将这个三角形几何体传给 <code>WireframeGeometry</code> 就能生成一个新的几何体，这个几何体用 6 个点组成 3 条线段。</div>
 
@@ -60,7 +60,7 @@ Three.js 有很多图元。图元就是一些 3D 的形状，在运行时根据�
 使用顶点的数量在创建时就定好了，相应的创建存储，填充顶点数据。
 但用 `Geometry` 你就能随时添加顶点。
 
-我们会在 [另一篇文章](threejs-custom-geometry.html) 中来讲创建自定义几何体。
+我们会在 [另一篇文章](threejs-custom-buffergeometry.html) 中来讲创建自定义几何体。
 现在，我们来为创建每一个图元作为例子。
 我们从 [上一篇文章的例子](threejs-responsive.html) 开始。
 
@@ -127,7 +127,7 @@ function createMaterial() {
 
 同时，我们将 `side: THREE.DoubleSide` 传给材质。这告诉 Three.js 绘制组成形状的三角形的两个面。
 对于实心的形状，像球体或立方体，通常不需要绘制三角形的背面，因为它们全部朝向内部。
-对于我们的情况，我们会绘制一些像 `PlaneBufferGeometry` 和 `ShapeBufferGeometry` 这样的二维图形，没有内部,
+对于我们的情况，我们会绘制一些像 `PlaneGeometry` 和 `ShapeGeometry` 这样的二维图形，没有内部,
 如果不设置 `side: THREE.DoubleSide`，当从反面看时它们会消失。
 
 需要注意的是，如果 **不** 设置 `side: THREE.DoubleSide` 绘制会更快，所以最好只在需要的时候设置它。
@@ -151,7 +151,7 @@ function addSolidGeometry(x, y, geometry) {
   const width = 8;
   const height = 8;
   const depth = 8;
-  addSolidGeometry(-2, -2, new THREE.BoxBufferGeometry(width, height, depth));
+  addSolidGeometry(-2, -2, new THREE.BoxGeometry(width, height, depth));
 }
 ```
 
@@ -161,7 +161,7 @@ function addSolidGeometry(x, y, geometry) {
 
 {{{example url="../threejs-primitives.html" }}}
 
-上面的模式有一些值得注意的例外。最大的可能就是 `TextBufferGeometry`。在为文字生成网格前需要先加载 3D 字体数据。
+上面的模式有一些值得注意的例外。最大的可能就是 `TextGeometry`。在为文字生成网格前需要先加载 3D 字体数据。
 数据的加载是异步的，所以在尝试创建几何体前需要等待。通过将字体加载 Promise 化，我们可以让这个过程更简单。
 我们创建一个 `FontLoader`，然后 `loadFont` 函数返回一个 `promise`，`promise` 的 `resolve` 会给我们字体。
 接着我们创建一个 `async` 函数 `doit`，使用 `await` 加载字体。最后创建几何体，调用 `addOjbect` 将它添加到场景中。
@@ -178,7 +178,7 @@ function addSolidGeometry(x, y, geometry) {
 
   async function doit() {
     const font = await loadFont('resources/threejs/fonts/helvetiker_regular.typeface.json');  /* threejsfundamentals: url */
-    const geometry = new THREE.TextBufferGeometry('three.js', {
+    const geometry = new THREE.TextGeometry('three.js', {
       font: font,
       size: 3.0,
       height: .2,
@@ -243,7 +243,7 @@ function addLineGeometry(x, y, geometry) {
 const radius = 7;
 const widthSegments = 12;
 const heightSegments = 8;
-const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
 const material = new THREE.PointsMaterial({
     color: 'red',
     size: 0.2,     // in world units
@@ -276,9 +276,9 @@ const material = new THREE.PointsMaterial({
 一个很好的例子就是球形几何体。它可以这些参数：一圈组成的片数、从上到下的数量等。例如：
 
 <div class="spread">
-<div data-diagram="SphereBufferGeometryLow"></div>
-<div data-diagram="SphereBufferGeometryMedium"></div>
-<div data-diagram="SphereBufferGeometryHigh"></div>
+<div data-diagram="SphereGeometryLow"></div>
+<div data-diagram="SphereGeometryMedium"></div>
+<div data-diagram="SphereGeometryHigh"></div>
 </div>
 
 第一个球体一圈有 5 分片，高度为 3，一共 15 片，或者 30 个三角形。
@@ -288,9 +288,9 @@ const material = new THREE.PointsMaterial({
 由你决定需要细分成多少。看起来你可能需要较多数量的分片，但去除线，设置平面着色，我们就得到了：
 
 <div class="spread">
-<div data-diagram="SphereBufferGeometryLowSmooth"></div>
-<div data-diagram="SphereBufferGeometryMediumSmooth"></div>
-<div data-diagram="SphereBufferGeometryHighSmooth"></div>
+<div data-diagram="SphereGeometryLowSmooth"></div>
+<div data-diagram="SphereGeometryMediumSmooth"></div>
+<div data-diagram="SphereGeometryHighSmooth"></div>
 </div>
 
 现在并不明显是否右边有 5000 个三角形的比中间只有 480 个三角形的好更多。
@@ -301,8 +301,8 @@ const material = new THREE.PointsMaterial({
 有时候很容易选择。例如你可以选择将平面细分。
 
 <div class="spread">
-<div data-diagram="PlaneBufferGeometryLow"></div>
-<div data-diagram="PlaneBufferGeometryHigh"></div>
+<div data-diagram="PlaneGeometryLow"></div>
+<div data-diagram="PlaneGeometryHigh"></div>
 </div>
 
 左边的平面有 2 个三角形，右边的平面有 200 个三角形。不像球体，在多数平面的应用场景中，并没有什么折中的方法。
@@ -312,7 +312,7 @@ const material = new THREE.PointsMaterial({
 你需要根据你的具体情况选择合适的方案。
 
 如果上面的形状不符合你的使用需求，你可以从 [.obj 文件](threejs-load-obj.html) 或 [.gltf 文件](threejs-load-gltf.html) 加载几何体。
-你也可以创建 [自定义 Geometry](threejs-custom-geometry.html) 或 [自定义 BufferGeometry](threejs-custom-buffergeometry.html)。
+你也可以创建 [自定义 Geometry](threejs-custom-buffergeometry.html)。
 
 接下来是 [Three.js 的场景图是如何工作的及如何使用它](threejs-scenegraph.html)。
 
