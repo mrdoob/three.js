@@ -43,6 +43,8 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
 
 	this.encoding = encoding
 
+	this.tempColor = new Color()
+
 	this._selects = selects
   this.isSelective = Array.isArray(this._selects)
 	Object.defineProperty(this, 'selects', {
@@ -475,8 +477,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
   renderPass: function(renderer, passMaterial, renderTarget, clearColor, clearAlpha) {
 
     // save original state
-    this.originalClearColor.copy(renderer.getClearColor());
-    var originalClearAlpha = renderer.getClearAlpha();
+    this.originalClearColor.copy(renderer.getClearColor(this.tempColor));
+    var originalClearAlpha = renderer.getClearAlpha(this.tempColor);
     var originalAutoClear = renderer.autoClear;
 
     renderer.setRenderTarget(renderTarget);
@@ -503,8 +505,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
   renderOverride: function(renderer, overrideMaterial, renderTarget, clearColor, clearAlpha) {
 
-    this.originalClearColor.copy(renderer.getClearColor());
-    var originalClearAlpha = renderer.getClearAlpha();
+    this.originalClearColor.copy(renderer.getClearColor(this.tempColor));
+    var originalClearAlpha = renderer.getClearAlpha(this.tempColor);
     var originalAutoClear = renderer.autoClear;
 
     renderer.setRenderTarget(renderTarget);
@@ -535,8 +537,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
   renderMetalness: function(renderer, overrideMaterial, renderTarget, clearColor, clearAlpha) {
 
-    this.originalClearColor.copy(renderer.getClearColor());
-    var originalClearAlpha = renderer.getClearAlpha();
+    this.originalClearColor.copy(renderer.getClearColor(this.tempColor));
+    var originalClearAlpha = renderer.getClearAlpha(this.tempColor);
     var originalAutoClear = renderer.autoClear;
 
     renderer.setRenderTarget(renderTarget);
