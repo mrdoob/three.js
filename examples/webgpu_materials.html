@@ -20,7 +20,7 @@
 
 			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
-			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
+			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
 			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
 			import NormalNode from './jsm/renderers/nodes/accessors/NormalNode.js';
 			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
@@ -55,8 +55,8 @@
 
 				// Grid
 
-				const helper = new THREE.GridHelper( 1000, 40 );
-				helper.material.colorNode = new ColorNode( new THREE.Color( 0x303030 ) );
+				const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
+				helper.material.colorNode = new AttributeNode( 'color', 'vec3' );
 				helper.position.y = - 75;
 				scene.add( helper );
 
