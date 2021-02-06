@@ -2,6 +2,30 @@ Title: Three.js Custom BufferGeometry
 Description: How to make your own BufferGeometry.
 TOC: Custom BufferGeometry
 
+> **NOTE:** r125 removed `Geometry` from three.js. 
+> Only `BufferGeometry` now exists. Further, all geometry
+> with names like `XXXBufferGeometry` has been removed
+> and only `XXXGeometry` remains but `XXXGeometry` is
+> now an instance of `BufferGeometry`. 
+>
+> In other words before r125 there
+>
+> ```
+> BoxGeometry -> Geometry
+> BoxBufferGeometry -> BufferGeometry
+> ```
+>
+> As of r125 there is now only this
+>
+> ```
+> BoxGeometry -> BufferGeometry
+> ```
+>
+> This article still works but it references the previous
+> article which uses the deprecated `Geometry`. It will
+> take some work to re-write this so in the meantime
+> I added this note
+
 A [previous article](threejs-custom-geometry.html) covered
 how to use `Geometry`. This article is about `BufferGeometry`.
 `BufferGeometry` is *generally* faster to start and uses
