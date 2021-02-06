@@ -27146,117 +27146,138 @@
 		}
 	});
 
-	function EllipseCurve(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
-		Curve.call(this);
-		this.type = 'EllipseCurve';
-		this.aX = aX || 0;
-		this.aY = aY || 0;
-		this.xRadius = xRadius || 1;
-		this.yRadius = yRadius || 1;
-		this.aStartAngle = aStartAngle || 0;
-		this.aEndAngle = aEndAngle || 2 * Math.PI;
-		this.aClockwise = aClockwise || false;
-		this.aRotation = aRotation || 0;
-	}
+	var EllipseCurve = /*#__PURE__*/function (_Curve) {
+		_inheritsLoose(EllipseCurve, _Curve);
 
-	EllipseCurve.prototype = Object.create(Curve.prototype);
-	EllipseCurve.prototype.constructor = EllipseCurve;
-	EllipseCurve.prototype.isEllipseCurve = true;
+		function EllipseCurve(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
+			var _this;
 
-	EllipseCurve.prototype.getPoint = function (t, optionalTarget) {
-		var point = optionalTarget || new Vector2();
-		var twoPi = Math.PI * 2;
-		var deltaAngle = this.aEndAngle - this.aStartAngle;
-		var samePoints = Math.abs(deltaAngle) < Number.EPSILON; // ensures that deltaAngle is 0 .. 2 PI
-
-		while (deltaAngle < 0) {
-			deltaAngle += twoPi;
+			_this = _Curve.call(this) || this;
+			_this.type = 'EllipseCurve';
+			Object.defineProperty(_assertThisInitialized(_this), 'isEllipseCurve', {
+				value: true
+			});
+			_this.aX = aX || 0;
+			_this.aY = aY || 0;
+			_this.xRadius = xRadius || 1;
+			_this.yRadius = yRadius || 1;
+			_this.aStartAngle = aStartAngle || 0;
+			_this.aEndAngle = aEndAngle || 2 * Math.PI;
+			_this.aClockwise = aClockwise || false;
+			_this.aRotation = aRotation || 0;
+			return _this;
 		}
 
-		while (deltaAngle > twoPi) {
-			deltaAngle -= twoPi;
-		}
+		var _proto = EllipseCurve.prototype;
 
-		if (deltaAngle < Number.EPSILON) {
-			if (samePoints) {
-				deltaAngle = 0;
-			} else {
-				deltaAngle = twoPi;
+		_proto.getPoint = function getPoint(t, optionalTarget) {
+			var point = optionalTarget || new Vector2();
+			var twoPi = Math.PI * 2;
+			var deltaAngle = this.aEndAngle - this.aStartAngle;
+			var samePoints = Math.abs(deltaAngle) < Number.EPSILON; // ensures that deltaAngle is 0 .. 2 PI
+
+			while (deltaAngle < 0) {
+				deltaAngle += twoPi;
 			}
-		}
 
-		if (this.aClockwise === true && !samePoints) {
-			if (deltaAngle === twoPi) {
-				deltaAngle = -twoPi;
-			} else {
-				deltaAngle = deltaAngle - twoPi;
+			while (deltaAngle > twoPi) {
+				deltaAngle -= twoPi;
 			}
+
+			if (deltaAngle < Number.EPSILON) {
+				if (samePoints) {
+					deltaAngle = 0;
+				} else {
+					deltaAngle = twoPi;
+				}
+			}
+
+			if (this.aClockwise === true && !samePoints) {
+				if (deltaAngle === twoPi) {
+					deltaAngle = -twoPi;
+				} else {
+					deltaAngle = deltaAngle - twoPi;
+				}
+			}
+
+			var angle = this.aStartAngle + t * deltaAngle;
+			var x = this.aX + this.xRadius * Math.cos(angle);
+			var y = this.aY + this.yRadius * Math.sin(angle);
+
+			if (this.aRotation !== 0) {
+				var cos = Math.cos(this.aRotation);
+				var sin = Math.sin(this.aRotation);
+				var tx = x - this.aX;
+				var ty = y - this.aY; // Rotate the point about the center of the ellipse.
+
+				x = tx * cos - ty * sin + this.aX;
+				y = tx * sin + ty * cos + this.aY;
+			}
+
+			return point.set(x, y);
+		};
+
+		_proto.copy = function copy(source) {
+			_Curve.prototype.copy.call(this, source);
+
+			this.aX = source.aX;
+			this.aY = source.aY;
+			this.xRadius = source.xRadius;
+			this.yRadius = source.yRadius;
+			this.aStartAngle = source.aStartAngle;
+			this.aEndAngle = source.aEndAngle;
+			this.aClockwise = source.aClockwise;
+			this.aRotation = source.aRotation;
+			return this;
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = _Curve.prototype.toJSON.call(this);
+
+			data.aX = this.aX;
+			data.aY = this.aY;
+			data.xRadius = this.xRadius;
+			data.yRadius = this.yRadius;
+			data.aStartAngle = this.aStartAngle;
+			data.aEndAngle = this.aEndAngle;
+			data.aClockwise = this.aClockwise;
+			data.aRotation = this.aRotation;
+			return data;
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			_Curve.prototype.fromJSON.call(this, json);
+
+			this.aX = json.aX;
+			this.aY = json.aY;
+			this.xRadius = json.xRadius;
+			this.yRadius = json.yRadius;
+			this.aStartAngle = json.aStartAngle;
+			this.aEndAngle = json.aEndAngle;
+			this.aClockwise = json.aClockwise;
+			this.aRotation = json.aRotation;
+			return this;
+		};
+
+		return EllipseCurve;
+	}(Curve);
+
+	var ArcCurve = /*#__PURE__*/function (_EllipseCurve) {
+		_inheritsLoose(ArcCurve, _EllipseCurve);
+
+		function ArcCurve(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
+			var _this;
+
+			_this = _EllipseCurve.call(this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise) || this;
+			_this.type = 'ArcCurve';
+			Object.defineProperty(_assertThisInitialized(_this), 'isArcCurve', {
+				value: true
+			});
+			return _this;
 		}
 
-		var angle = this.aStartAngle + t * deltaAngle;
-		var x = this.aX + this.xRadius * Math.cos(angle);
-		var y = this.aY + this.yRadius * Math.sin(angle);
-
-		if (this.aRotation !== 0) {
-			var cos = Math.cos(this.aRotation);
-			var sin = Math.sin(this.aRotation);
-			var tx = x - this.aX;
-			var ty = y - this.aY; // Rotate the point about the center of the ellipse.
-
-			x = tx * cos - ty * sin + this.aX;
-			y = tx * sin + ty * cos + this.aY;
-		}
-
-		return point.set(x, y);
-	};
-
-	EllipseCurve.prototype.copy = function (source) {
-		Curve.prototype.copy.call(this, source);
-		this.aX = source.aX;
-		this.aY = source.aY;
-		this.xRadius = source.xRadius;
-		this.yRadius = source.yRadius;
-		this.aStartAngle = source.aStartAngle;
-		this.aEndAngle = source.aEndAngle;
-		this.aClockwise = source.aClockwise;
-		this.aRotation = source.aRotation;
-		return this;
-	};
-
-	EllipseCurve.prototype.toJSON = function () {
-		var data = Curve.prototype.toJSON.call(this);
-		data.aX = this.aX;
-		data.aY = this.aY;
-		data.xRadius = this.xRadius;
-		data.yRadius = this.yRadius;
-		data.aStartAngle = this.aStartAngle;
-		data.aEndAngle = this.aEndAngle;
-		data.aClockwise = this.aClockwise;
-		data.aRotation = this.aRotation;
-		return data;
-	};
-
-	EllipseCurve.prototype.fromJSON = function (json) {
-		Curve.prototype.fromJSON.call(this, json);
-		this.aX = json.aX;
-		this.aY = json.aY;
-		this.xRadius = json.xRadius;
-		this.yRadius = json.yRadius;
-		this.aStartAngle = json.aStartAngle;
-		this.aEndAngle = json.aEndAngle;
-		this.aClockwise = json.aClockwise;
-		this.aRotation = json.aRotation;
-		return this;
-	};
-
-	function ArcCurve(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
-		EllipseCurve.call(this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise);
-		this.type = 'ArcCurve';
-	}
-
-	ArcCurve.prototype = Object.create(EllipseCurve.prototype);
-	ArcCurve.prototype.constructor = ArcCurve;
-	ArcCurve.prototype.isArcCurve = true;
+		return ArcCurve;
+	}(EllipseCurve);
 
 	/**
 	 * Centripetal CatmullRom Curve - which is useful for avoiding
@@ -27325,142 +27346,155 @@
 			py = new CubicPoly(),
 			pz = new CubicPoly();
 
-	function CatmullRomCurve3(points, closed, curveType, tension) {
-		if (points === void 0) {
-			points = [];
+	var CatmullRomCurve3 = /*#__PURE__*/function (_Curve) {
+		_inheritsLoose(CatmullRomCurve3, _Curve);
+
+		function CatmullRomCurve3(points, closed, curveType, tension) {
+			var _this;
+
+			if (points === void 0) {
+				points = [];
+			}
+
+			if (closed === void 0) {
+				closed = false;
+			}
+
+			if (curveType === void 0) {
+				curveType = 'centripetal';
+			}
+
+			if (tension === void 0) {
+				tension = 0.5;
+			}
+
+			_this = _Curve.call(this) || this;
+			_this.type = 'CatmullRomCurve3';
+			Object.defineProperty(_assertThisInitialized(_this), 'isCatmullRomCurve3', {
+				value: true
+			});
+			_this.points = points;
+			_this.closed = closed;
+			_this.curveType = curveType;
+			_this.tension = tension;
+			return _this;
 		}
 
-		if (closed === void 0) {
-			closed = false;
-		}
+		var _proto = CatmullRomCurve3.prototype;
 
-		if (curveType === void 0) {
-			curveType = 'centripetal';
-		}
+		_proto.getPoint = function getPoint(t, optionalTarget) {
+			if (optionalTarget === void 0) {
+				optionalTarget = new Vector3();
+			}
 
-		if (tension === void 0) {
-			tension = 0.5;
-		}
+			var point = optionalTarget;
+			var points = this.points;
+			var l = points.length;
+			var p = (l - (this.closed ? 0 : 1)) * t;
+			var intPoint = Math.floor(p);
+			var weight = p - intPoint;
 
-		Curve.call(this);
-		this.type = 'CatmullRomCurve3';
-		this.points = points;
-		this.closed = closed;
-		this.curveType = curveType;
-		this.tension = tension;
-	}
+			if (this.closed) {
+				intPoint += intPoint > 0 ? 0 : (Math.floor(Math.abs(intPoint) / l) + 1) * l;
+			} else if (weight === 0 && intPoint === l - 1) {
+				intPoint = l - 2;
+				weight = 1;
+			}
 
-	CatmullRomCurve3.prototype = Object.create(Curve.prototype);
-	CatmullRomCurve3.prototype.constructor = CatmullRomCurve3;
-	CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
+			var p0, p3; // 4 points (p1 & p2 defined below)
 
-	CatmullRomCurve3.prototype.getPoint = function (t, optionalTarget) {
-		if (optionalTarget === void 0) {
-			optionalTarget = new Vector3();
-		}
+			if (this.closed || intPoint > 0) {
+				p0 = points[(intPoint - 1) % l];
+			} else {
+				// extrapolate first point
+				tmp.subVectors(points[0], points[1]).add(points[0]);
+				p0 = tmp;
+			}
 
-		var point = optionalTarget;
-		var points = this.points;
-		var l = points.length;
-		var p = (l - (this.closed ? 0 : 1)) * t;
-		var intPoint = Math.floor(p);
-		var weight = p - intPoint;
+			var p1 = points[intPoint % l];
+			var p2 = points[(intPoint + 1) % l];
 
-		if (this.closed) {
-			intPoint += intPoint > 0 ? 0 : (Math.floor(Math.abs(intPoint) / l) + 1) * l;
-		} else if (weight === 0 && intPoint === l - 1) {
-			intPoint = l - 2;
-			weight = 1;
-		}
+			if (this.closed || intPoint + 2 < l) {
+				p3 = points[(intPoint + 2) % l];
+			} else {
+				// extrapolate last point
+				tmp.subVectors(points[l - 1], points[l - 2]).add(points[l - 1]);
+				p3 = tmp;
+			}
 
-		var p0, p3; // 4 points (p1 & p2 defined below)
+			if (this.curveType === 'centripetal' || this.curveType === 'chordal') {
+				// init Centripetal / Chordal Catmull-Rom
+				var pow = this.curveType === 'chordal' ? 0.5 : 0.25;
+				var dt0 = Math.pow(p0.distanceToSquared(p1), pow);
+				var dt1 = Math.pow(p1.distanceToSquared(p2), pow);
+				var dt2 = Math.pow(p2.distanceToSquared(p3), pow); // safety check for repeated points
 
-		if (this.closed || intPoint > 0) {
-			p0 = points[(intPoint - 1) % l];
-		} else {
-			// extrapolate first point
-			tmp.subVectors(points[0], points[1]).add(points[0]);
-			p0 = tmp;
-		}
+				if (dt1 < 1e-4) dt1 = 1.0;
+				if (dt0 < 1e-4) dt0 = dt1;
+				if (dt2 < 1e-4) dt2 = dt1;
+				px.initNonuniformCatmullRom(p0.x, p1.x, p2.x, p3.x, dt0, dt1, dt2);
+				py.initNonuniformCatmullRom(p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2);
+				pz.initNonuniformCatmullRom(p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2);
+			} else if (this.curveType === 'catmullrom') {
+				px.initCatmullRom(p0.x, p1.x, p2.x, p3.x, this.tension);
+				py.initCatmullRom(p0.y, p1.y, p2.y, p3.y, this.tension);
+				pz.initCatmullRom(p0.z, p1.z, p2.z, p3.z, this.tension);
+			}
 
-		var p1 = points[intPoint % l];
-		var p2 = points[(intPoint + 1) % l];
+			point.set(px.calc(weight), py.calc(weight), pz.calc(weight));
+			return point;
+		};
 
-		if (this.closed || intPoint + 2 < l) {
-			p3 = points[(intPoint + 2) % l];
-		} else {
-			// extrapolate last point
-			tmp.subVectors(points[l - 1], points[l - 2]).add(points[l - 1]);
-			p3 = tmp;
-		}
+		_proto.copy = function copy(source) {
+			_Curve.prototype.copy.call(this, source);
 
-		if (this.curveType === 'centripetal' || this.curveType === 'chordal') {
-			// init Centripetal / Chordal Catmull-Rom
-			var pow = this.curveType === 'chordal' ? 0.5 : 0.25;
-			var dt0 = Math.pow(p0.distanceToSquared(p1), pow);
-			var dt1 = Math.pow(p1.distanceToSquared(p2), pow);
-			var dt2 = Math.pow(p2.distanceToSquared(p3), pow); // safety check for repeated points
+			this.points = [];
 
-			if (dt1 < 1e-4) dt1 = 1.0;
-			if (dt0 < 1e-4) dt0 = dt1;
-			if (dt2 < 1e-4) dt2 = dt1;
-			px.initNonuniformCatmullRom(p0.x, p1.x, p2.x, p3.x, dt0, dt1, dt2);
-			py.initNonuniformCatmullRom(p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2);
-			pz.initNonuniformCatmullRom(p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2);
-		} else if (this.curveType === 'catmullrom') {
-			px.initCatmullRom(p0.x, p1.x, p2.x, p3.x, this.tension);
-			py.initCatmullRom(p0.y, p1.y, p2.y, p3.y, this.tension);
-			pz.initCatmullRom(p0.z, p1.z, p2.z, p3.z, this.tension);
-		}
+			for (var i = 0, l = source.points.length; i < l; i++) {
+				var point = source.points[i];
+				this.points.push(point.clone());
+			}
 
-		point.set(px.calc(weight), py.calc(weight), pz.calc(weight));
-		return point;
-	};
+			this.closed = source.closed;
+			this.curveType = source.curveType;
+			this.tension = source.tension;
+			return this;
+		};
 
-	CatmullRomCurve3.prototype.copy = function (source) {
-		Curve.prototype.copy.call(this, source);
-		this.points = [];
+		_proto.toJSON = function toJSON() {
+			var data = _Curve.prototype.toJSON.call(this);
 
-		for (var i = 0, l = source.points.length; i < l; i++) {
-			var point = source.points[i];
-			this.points.push(point.clone());
-		}
+			data.points = [];
 
-		this.closed = source.closed;
-		this.curveType = source.curveType;
-		this.tension = source.tension;
-		return this;
-	};
+			for (var i = 0, l = this.points.length; i < l; i++) {
+				var point = this.points[i];
+				data.points.push(point.toArray());
+			}
 
-	CatmullRomCurve3.prototype.toJSON = function () {
-		var data = Curve.prototype.toJSON.call(this);
-		data.points = [];
+			data.closed = this.closed;
+			data.curveType = this.curveType;
+			data.tension = this.tension;
+			return data;
+		};
 
-		for (var i = 0, l = this.points.length; i < l; i++) {
-			var point = this.points[i];
-			data.points.push(point.toArray());
-		}
+		_proto.fromJSON = function fromJSON(json) {
+			_Curve.prototype.fromJSON.call(this, json);
 
-		data.closed = this.closed;
-		data.curveType = this.curveType;
-		data.tension = this.tension;
-		return data;
-	};
+			this.points = [];
 
-	CatmullRomCurve3.prototype.fromJSON = function (json) {
-		Curve.prototype.fromJSON.call(this, json);
-		this.points = [];
+			for (var i = 0, l = json.points.length; i < l; i++) {
+				var point = json.points[i];
+				this.points.push(new Vector3().fromArray(point));
+			}
 
-		for (var i = 0, l = json.points.length; i < l; i++) {
-			var point = json.points[i];
-			this.points.push(new Vector3().fromArray(point));
-		}
+			this.closed = json.closed;
+			this.curveType = json.curveType;
+			this.tension = json.tension;
+			return this;
+		};
 
-		this.closed = json.closed;
-		this.curveType = json.curveType;
-		this.tension = json.tension;
-		return this;
-	};
+		return CatmullRomCurve3;
+	}(Curve);
 
 	/**
 	 * Bezier Curves formulas obtained from
@@ -27515,465 +27549,553 @@
 		return CubicBezierP0(t, p0) + CubicBezierP1(t, p1) + CubicBezierP2(t, p2) + CubicBezierP3(t, p3);
 	}
 
-	function CubicBezierCurve(v0, v1, v2, v3) {
-		if (v0 === void 0) {
-			v0 = new Vector2();
+	var CubicBezierCurve = /*#__PURE__*/function (_Curve) {
+		_inheritsLoose(CubicBezierCurve, _Curve);
+
+		function CubicBezierCurve(v0, v1, v2, v3) {
+			var _this;
+
+			if (v0 === void 0) {
+				v0 = new Vector2();
+			}
+
+			if (v1 === void 0) {
+				v1 = new Vector2();
+			}
+
+			if (v2 === void 0) {
+				v2 = new Vector2();
+			}
+
+			if (v3 === void 0) {
+				v3 = new Vector2();
+			}
+
+			_this = _Curve.call(this) || this;
+			_this.type = 'CubicBezierCurve';
+			Object.defineProperty(_assertThisInitialized(_this), 'isCubicBezierCurve', {
+				value: true
+			});
+			_this.v0 = v0;
+			_this.v1 = v1;
+			_this.v2 = v2;
+			_this.v3 = v3;
+			return _this;
 		}
 
-		if (v1 === void 0) {
-			v1 = new Vector2();
+		var _proto = CubicBezierCurve.prototype;
+
+		_proto.getPoint = function getPoint(t, optionalTarget) {
+			if (optionalTarget === void 0) {
+				optionalTarget = new Vector2();
+			}
+
+			var point = optionalTarget;
+			var v0 = this.v0,
+					v1 = this.v1,
+					v2 = this.v2,
+					v3 = this.v3;
+			point.set(CubicBezier(t, v0.x, v1.x, v2.x, v3.x), CubicBezier(t, v0.y, v1.y, v2.y, v3.y));
+			return point;
+		};
+
+		_proto.copy = function copy(source) {
+			_Curve.prototype.copy.call(this, source);
+
+			this.v0.copy(source.v0);
+			this.v1.copy(source.v1);
+			this.v2.copy(source.v2);
+			this.v3.copy(source.v3);
+			return this;
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = _Curve.prototype.toJSON.call(this);
+
+			data.v0 = this.v0.toArray();
+			data.v1 = this.v1.toArray();
+			data.v2 = this.v2.toArray();
+			data.v3 = this.v3.toArray();
+			return data;
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			_Curve.prototype.fromJSON.call(this, json);
+
+			this.v0.fromArray(json.v0);
+			this.v1.fromArray(json.v1);
+			this.v2.fromArray(json.v2);
+			this.v3.fromArray(json.v3);
+			return this;
+		};
+
+		return CubicBezierCurve;
+	}(Curve);
+
+	var CubicBezierCurve3 = /*#__PURE__*/function (_Curve) {
+		_inheritsLoose(CubicBezierCurve3, _Curve);
+
+		function CubicBezierCurve3(v0, v1, v2, v3) {
+			var _this;
+
+			if (v0 === void 0) {
+				v0 = new Vector3();
+			}
+
+			if (v1 === void 0) {
+				v1 = new Vector3();
+			}
+
+			if (v2 === void 0) {
+				v2 = new Vector3();
+			}
+
+			if (v3 === void 0) {
+				v3 = new Vector3();
+			}
+
+			_this = _Curve.call(this) || this;
+			_this.type = 'CubicBezierCurve3';
+			Object.defineProperty(_assertThisInitialized(_this), 'isCubicBezierCurve3', {
+				value: true
+			});
+			_this.v0 = v0;
+			_this.v1 = v1;
+			_this.v2 = v2;
+			_this.v3 = v3;
+			return _this;
 		}
 
-		if (v2 === void 0) {
-			v2 = new Vector2();
+		var _proto = CubicBezierCurve3.prototype;
+
+		_proto.getPoint = function getPoint(t, optionalTarget) {
+			if (optionalTarget === void 0) {
+				optionalTarget = new Vector3();
+			}
+
+			var point = optionalTarget;
+			var v0 = this.v0,
+					v1 = this.v1,
+					v2 = this.v2,
+					v3 = this.v3;
+			point.set(CubicBezier(t, v0.x, v1.x, v2.x, v3.x), CubicBezier(t, v0.y, v1.y, v2.y, v3.y), CubicBezier(t, v0.z, v1.z, v2.z, v3.z));
+			return point;
+		};
+
+		_proto.copy = function copy(source) {
+			_Curve.prototype.copy.call(this, source);
+
+			this.v0.copy(source.v0);
+			this.v1.copy(source.v1);
+			this.v2.copy(source.v2);
+			this.v3.copy(source.v3);
+			return this;
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = _Curve.prototype.toJSON.call(this);
+
+			data.v0 = this.v0.toArray();
+			data.v1 = this.v1.toArray();
+			data.v2 = this.v2.toArray();
+			data.v3 = this.v3.toArray();
+			return data;
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			_Curve.prototype.fromJSON.call(this, json);
+
+			this.v0.fromArray(json.v0);
+			this.v1.fromArray(json.v1);
+			this.v2.fromArray(json.v2);
+			this.v3.fromArray(json.v3);
+			return this;
+		};
+
+		return CubicBezierCurve3;
+	}(Curve);
+
+	var LineCurve = /*#__PURE__*/function (_Curve) {
+		_inheritsLoose(LineCurve, _Curve);
+
+		function LineCurve(v1, v2) {
+			var _this;
+
+			if (v1 === void 0) {
+				v1 = new Vector2();
+			}
+
+			if (v2 === void 0) {
+				v2 = new Vector2();
+			}
+
+			_this = _Curve.call(this) || this;
+			_this.type = 'LineCurve';
+			Object.defineProperty(_assertThisInitialized(_this), 'isLineCurve', {
+				value: true
+			});
+			_this.v1 = v1;
+			_this.v2 = v2;
+			return _this;
 		}
 
-		if (v3 === void 0) {
-			v3 = new Vector2();
+		var _proto = LineCurve.prototype;
+
+		_proto.getPoint = function getPoint(t, optionalTarget) {
+			if (optionalTarget === void 0) {
+				optionalTarget = new Vector2();
+			}
+
+			var point = optionalTarget;
+
+			if (t === 1) {
+				point.copy(this.v2);
+			} else {
+				point.copy(this.v2).sub(this.v1);
+				point.multiplyScalar(t).add(this.v1);
+			}
+
+			return point;
+		} // Line curve is linear, so we can overwrite default getPointAt
+		;
+
+		_proto.getPointAt = function getPointAt(u, optionalTarget) {
+			return this.getPoint(u, optionalTarget);
+		};
+
+		_proto.getTangent = function getTangent(t, optionalTarget) {
+			var tangent = optionalTarget || new Vector2();
+			tangent.copy(this.v2).sub(this.v1).normalize();
+			return tangent;
+		};
+
+		_proto.copy = function copy(source) {
+			_Curve.prototype.copy.call(this, source);
+
+			this.v1.copy(source.v1);
+			this.v2.copy(source.v2);
+			return this;
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = _Curve.prototype.toJSON.call(this);
+
+			data.v1 = this.v1.toArray();
+			data.v2 = this.v2.toArray();
+			return data;
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			_Curve.prototype.fromJSON.call(this, json);
+
+			this.v1.fromArray(json.v1);
+			this.v2.fromArray(json.v2);
+			return this;
+		};
+
+		return LineCurve;
+	}(Curve);
+
+	var LineCurve3 = /*#__PURE__*/function (_Curve) {
+		_inheritsLoose(LineCurve3, _Curve);
+
+		function LineCurve3(v1, v2) {
+			var _this;
+
+			if (v1 === void 0) {
+				v1 = new Vector3();
+			}
+
+			if (v2 === void 0) {
+				v2 = new Vector3();
+			}
+
+			_this = _Curve.call(this) || this;
+			_this.type = 'LineCurve3';
+			Object.defineProperty(_assertThisInitialized(_this), 'isLineCurve3', {
+				value: true
+			});
+			_this.v1 = v1;
+			_this.v2 = v2;
+			return _this;
 		}
 
-		Curve.call(this);
-		this.type = 'CubicBezierCurve';
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
-		this.v3 = v3;
-	}
+		var _proto = LineCurve3.prototype;
 
-	CubicBezierCurve.prototype = Object.create(Curve.prototype);
-	CubicBezierCurve.prototype.constructor = CubicBezierCurve;
-	CubicBezierCurve.prototype.isCubicBezierCurve = true;
+		_proto.getPoint = function getPoint(t, optionalTarget) {
+			if (optionalTarget === void 0) {
+				optionalTarget = new Vector3();
+			}
 
-	CubicBezierCurve.prototype.getPoint = function (t, optionalTarget) {
-		if (optionalTarget === void 0) {
-			optionalTarget = new Vector2();
+			var point = optionalTarget;
+
+			if (t === 1) {
+				point.copy(this.v2);
+			} else {
+				point.copy(this.v2).sub(this.v1);
+				point.multiplyScalar(t).add(this.v1);
+			}
+
+			return point;
+		} // Line curve is linear, so we can overwrite default getPointAt
+		;
+
+		_proto.getPointAt = function getPointAt(u, optionalTarget) {
+			return this.getPoint(u, optionalTarget);
+		};
+
+		_proto.copy = function copy(source) {
+			_Curve.prototype.copy.call(this, source);
+
+			this.v1.copy(source.v1);
+			this.v2.copy(source.v2);
+			return this;
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = _Curve.prototype.toJSON.call(this);
+
+			data.v1 = this.v1.toArray();
+			data.v2 = this.v2.toArray();
+			return data;
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			_Curve.prototype.fromJSON.call(this, json);
+
+			this.v1.fromArray(json.v1);
+			this.v2.fromArray(json.v2);
+			return this;
+		};
+
+		return LineCurve3;
+	}(Curve);
+
+	var QuadraticBezierCurve = /*#__PURE__*/function (_Curve) {
+		_inheritsLoose(QuadraticBezierCurve, _Curve);
+
+		function QuadraticBezierCurve(v0, v1, v2) {
+			var _this;
+
+			if (v0 === void 0) {
+				v0 = new Vector2();
+			}
+
+			if (v1 === void 0) {
+				v1 = new Vector2();
+			}
+
+			if (v2 === void 0) {
+				v2 = new Vector2();
+			}
+
+			_this = _Curve.call(this) || this;
+			_this.type = 'QuadraticBezierCurve';
+			Object.defineProperty(_assertThisInitialized(_this), 'isQuadraticBezierCurve', {
+				value: true
+			});
+			_this.v0 = v0;
+			_this.v1 = v1;
+			_this.v2 = v2;
+			return _this;
 		}
 
-		var point = optionalTarget;
-		var v0 = this.v0,
-				v1 = this.v1,
-				v2 = this.v2,
-				v3 = this.v3;
-		point.set(CubicBezier(t, v0.x, v1.x, v2.x, v3.x), CubicBezier(t, v0.y, v1.y, v2.y, v3.y));
-		return point;
-	};
+		var _proto = QuadraticBezierCurve.prototype;
 
-	CubicBezierCurve.prototype.copy = function (source) {
-		Curve.prototype.copy.call(this, source);
-		this.v0.copy(source.v0);
-		this.v1.copy(source.v1);
-		this.v2.copy(source.v2);
-		this.v3.copy(source.v3);
-		return this;
-	};
+		_proto.getPoint = function getPoint(t, optionalTarget) {
+			if (optionalTarget === void 0) {
+				optionalTarget = new Vector2();
+			}
 
-	CubicBezierCurve.prototype.toJSON = function () {
-		var data = Curve.prototype.toJSON.call(this);
-		data.v0 = this.v0.toArray();
-		data.v1 = this.v1.toArray();
-		data.v2 = this.v2.toArray();
-		data.v3 = this.v3.toArray();
-		return data;
-	};
+			var point = optionalTarget;
+			var v0 = this.v0,
+					v1 = this.v1,
+					v2 = this.v2;
+			point.set(QuadraticBezier(t, v0.x, v1.x, v2.x), QuadraticBezier(t, v0.y, v1.y, v2.y));
+			return point;
+		};
 
-	CubicBezierCurve.prototype.fromJSON = function (json) {
-		Curve.prototype.fromJSON.call(this, json);
-		this.v0.fromArray(json.v0);
-		this.v1.fromArray(json.v1);
-		this.v2.fromArray(json.v2);
-		this.v3.fromArray(json.v3);
-		return this;
-	};
+		_proto.copy = function copy(source) {
+			_Curve.prototype.copy.call(this, source);
 
-	function CubicBezierCurve3(v0, v1, v2, v3) {
-		if (v0 === void 0) {
-			v0 = new Vector3();
+			this.v0.copy(source.v0);
+			this.v1.copy(source.v1);
+			this.v2.copy(source.v2);
+			return this;
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = _Curve.prototype.toJSON.call(this);
+
+			data.v0 = this.v0.toArray();
+			data.v1 = this.v1.toArray();
+			data.v2 = this.v2.toArray();
+			return data;
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			_Curve.prototype.fromJSON.call(this, json);
+
+			this.v0.fromArray(json.v0);
+			this.v1.fromArray(json.v1);
+			this.v2.fromArray(json.v2);
+			return this;
+		};
+
+		return QuadraticBezierCurve;
+	}(Curve);
+
+	var QuadraticBezierCurve3 = /*#__PURE__*/function (_Curve) {
+		_inheritsLoose(QuadraticBezierCurve3, _Curve);
+
+		function QuadraticBezierCurve3(v0, v1, v2) {
+			var _this;
+
+			if (v0 === void 0) {
+				v0 = new Vector3();
+			}
+
+			if (v1 === void 0) {
+				v1 = new Vector3();
+			}
+
+			if (v2 === void 0) {
+				v2 = new Vector3();
+			}
+
+			_this = _Curve.call(this) || this;
+			_this.type = 'QuadraticBezierCurve3';
+			Object.defineProperty(_assertThisInitialized(_this), 'isQuadraticBezierCurve3', {
+				value: true
+			});
+			_this.v0 = v0;
+			_this.v1 = v1;
+			_this.v2 = v2;
+			return _this;
 		}
 
-		if (v1 === void 0) {
-			v1 = new Vector3();
+		var _proto = QuadraticBezierCurve3.prototype;
+
+		_proto.getPoint = function getPoint(t, optionalTarget) {
+			if (optionalTarget === void 0) {
+				optionalTarget = new Vector3();
+			}
+
+			var point = optionalTarget;
+			var v0 = this.v0,
+					v1 = this.v1,
+					v2 = this.v2;
+			point.set(QuadraticBezier(t, v0.x, v1.x, v2.x), QuadraticBezier(t, v0.y, v1.y, v2.y), QuadraticBezier(t, v0.z, v1.z, v2.z));
+			return point;
+		};
+
+		_proto.copy = function copy(source) {
+			_Curve.prototype.copy.call(this, source);
+
+			this.v0.copy(source.v0);
+			this.v1.copy(source.v1);
+			this.v2.copy(source.v2);
+			return this;
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = _Curve.prototype.toJSON.call(this);
+
+			data.v0 = this.v0.toArray();
+			data.v1 = this.v1.toArray();
+			data.v2 = this.v2.toArray();
+			return data;
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			_Curve.prototype.fromJSON.call(this, json);
+
+			this.v0.fromArray(json.v0);
+			this.v1.fromArray(json.v1);
+			this.v2.fromArray(json.v2);
+			return this;
+		};
+
+		return QuadraticBezierCurve3;
+	}(Curve);
+
+	var SplineCurve = /*#__PURE__*/function (_Curve) {
+		_inheritsLoose(SplineCurve, _Curve);
+
+		function SplineCurve(points) {
+			var _this;
+
+			if (points === void 0) {
+				points = [];
+			}
+
+			_this = _Curve.call(this) || this;
+			_this.type = 'SplineCurve';
+			Object.defineProperty(_assertThisInitialized(_this), 'isSplineCurve', {
+				value: true
+			});
+			_this.points = points;
+			return _this;
 		}
 
-		if (v2 === void 0) {
-			v2 = new Vector3();
-		}
-
-		if (v3 === void 0) {
-			v3 = new Vector3();
-		}
-
-		Curve.call(this);
-		this.type = 'CubicBezierCurve3';
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
-		this.v3 = v3;
-	}
-
-	CubicBezierCurve3.prototype = Object.create(Curve.prototype);
-	CubicBezierCurve3.prototype.constructor = CubicBezierCurve3;
-	CubicBezierCurve3.prototype.isCubicBezierCurve3 = true;
-
-	CubicBezierCurve3.prototype.getPoint = function (t, optionalTarget) {
-		if (optionalTarget === void 0) {
-			optionalTarget = new Vector3();
-		}
-
-		var point = optionalTarget;
-		var v0 = this.v0,
-				v1 = this.v1,
-				v2 = this.v2,
-				v3 = this.v3;
-		point.set(CubicBezier(t, v0.x, v1.x, v2.x, v3.x), CubicBezier(t, v0.y, v1.y, v2.y, v3.y), CubicBezier(t, v0.z, v1.z, v2.z, v3.z));
-		return point;
-	};
-
-	CubicBezierCurve3.prototype.copy = function (source) {
-		Curve.prototype.copy.call(this, source);
-		this.v0.copy(source.v0);
-		this.v1.copy(source.v1);
-		this.v2.copy(source.v2);
-		this.v3.copy(source.v3);
-		return this;
-	};
-
-	CubicBezierCurve3.prototype.toJSON = function () {
-		var data = Curve.prototype.toJSON.call(this);
-		data.v0 = this.v0.toArray();
-		data.v1 = this.v1.toArray();
-		data.v2 = this.v2.toArray();
-		data.v3 = this.v3.toArray();
-		return data;
-	};
-
-	CubicBezierCurve3.prototype.fromJSON = function (json) {
-		Curve.prototype.fromJSON.call(this, json);
-		this.v0.fromArray(json.v0);
-		this.v1.fromArray(json.v1);
-		this.v2.fromArray(json.v2);
-		this.v3.fromArray(json.v3);
-		return this;
-	};
-
-	function LineCurve(v1, v2) {
-		if (v1 === void 0) {
-			v1 = new Vector2();
-		}
-
-		if (v2 === void 0) {
-			v2 = new Vector2();
-		}
-
-		Curve.call(this);
-		this.type = 'LineCurve';
-		this.v1 = v1;
-		this.v2 = v2;
-	}
-
-	LineCurve.prototype = Object.create(Curve.prototype);
-	LineCurve.prototype.constructor = LineCurve;
-	LineCurve.prototype.isLineCurve = true;
-
-	LineCurve.prototype.getPoint = function (t, optionalTarget) {
-		if (optionalTarget === void 0) {
-			optionalTarget = new Vector2();
-		}
-
-		var point = optionalTarget;
-
-		if (t === 1) {
-			point.copy(this.v2);
-		} else {
-			point.copy(this.v2).sub(this.v1);
-			point.multiplyScalar(t).add(this.v1);
-		}
-
-		return point;
-	}; // Line curve is linear, so we can overwrite default getPointAt
-
-
-	LineCurve.prototype.getPointAt = function (u, optionalTarget) {
-		return this.getPoint(u, optionalTarget);
-	};
-
-	LineCurve.prototype.getTangent = function (t, optionalTarget) {
-		var tangent = optionalTarget || new Vector2();
-		tangent.copy(this.v2).sub(this.v1).normalize();
-		return tangent;
-	};
-
-	LineCurve.prototype.copy = function (source) {
-		Curve.prototype.copy.call(this, source);
-		this.v1.copy(source.v1);
-		this.v2.copy(source.v2);
-		return this;
-	};
-
-	LineCurve.prototype.toJSON = function () {
-		var data = Curve.prototype.toJSON.call(this);
-		data.v1 = this.v1.toArray();
-		data.v2 = this.v2.toArray();
-		return data;
-	};
-
-	LineCurve.prototype.fromJSON = function (json) {
-		Curve.prototype.fromJSON.call(this, json);
-		this.v1.fromArray(json.v1);
-		this.v2.fromArray(json.v2);
-		return this;
-	};
-
-	function LineCurve3(v1, v2) {
-		if (v1 === void 0) {
-			v1 = new Vector3();
-		}
-
-		if (v2 === void 0) {
-			v2 = new Vector3();
-		}
-
-		Curve.call(this);
-		this.type = 'LineCurve3';
-		this.v1 = v1;
-		this.v2 = v2;
-	}
-
-	LineCurve3.prototype = Object.create(Curve.prototype);
-	LineCurve3.prototype.constructor = LineCurve3;
-	LineCurve3.prototype.isLineCurve3 = true;
-
-	LineCurve3.prototype.getPoint = function (t, optionalTarget) {
-		if (optionalTarget === void 0) {
-			optionalTarget = new Vector3();
-		}
-
-		var point = optionalTarget;
-
-		if (t === 1) {
-			point.copy(this.v2);
-		} else {
-			point.copy(this.v2).sub(this.v1);
-			point.multiplyScalar(t).add(this.v1);
-		}
-
-		return point;
-	}; // Line curve is linear, so we can overwrite default getPointAt
-
-
-	LineCurve3.prototype.getPointAt = function (u, optionalTarget) {
-		return this.getPoint(u, optionalTarget);
-	};
-
-	LineCurve3.prototype.copy = function (source) {
-		Curve.prototype.copy.call(this, source);
-		this.v1.copy(source.v1);
-		this.v2.copy(source.v2);
-		return this;
-	};
-
-	LineCurve3.prototype.toJSON = function () {
-		var data = Curve.prototype.toJSON.call(this);
-		data.v1 = this.v1.toArray();
-		data.v2 = this.v2.toArray();
-		return data;
-	};
-
-	LineCurve3.prototype.fromJSON = function (json) {
-		Curve.prototype.fromJSON.call(this, json);
-		this.v1.fromArray(json.v1);
-		this.v2.fromArray(json.v2);
-		return this;
-	};
-
-	function QuadraticBezierCurve(v0, v1, v2) {
-		if (v0 === void 0) {
-			v0 = new Vector2();
-		}
-
-		if (v1 === void 0) {
-			v1 = new Vector2();
-		}
-
-		if (v2 === void 0) {
-			v2 = new Vector2();
-		}
-
-		Curve.call(this);
-		this.type = 'QuadraticBezierCurve';
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
-	}
-
-	QuadraticBezierCurve.prototype = Object.create(Curve.prototype);
-	QuadraticBezierCurve.prototype.constructor = QuadraticBezierCurve;
-	QuadraticBezierCurve.prototype.isQuadraticBezierCurve = true;
-
-	QuadraticBezierCurve.prototype.getPoint = function (t, optionalTarget) {
-		if (optionalTarget === void 0) {
-			optionalTarget = new Vector2();
-		}
-
-		var point = optionalTarget;
-		var v0 = this.v0,
-				v1 = this.v1,
-				v2 = this.v2;
-		point.set(QuadraticBezier(t, v0.x, v1.x, v2.x), QuadraticBezier(t, v0.y, v1.y, v2.y));
-		return point;
-	};
-
-	QuadraticBezierCurve.prototype.copy = function (source) {
-		Curve.prototype.copy.call(this, source);
-		this.v0.copy(source.v0);
-		this.v1.copy(source.v1);
-		this.v2.copy(source.v2);
-		return this;
-	};
-
-	QuadraticBezierCurve.prototype.toJSON = function () {
-		var data = Curve.prototype.toJSON.call(this);
-		data.v0 = this.v0.toArray();
-		data.v1 = this.v1.toArray();
-		data.v2 = this.v2.toArray();
-		return data;
-	};
-
-	QuadraticBezierCurve.prototype.fromJSON = function (json) {
-		Curve.prototype.fromJSON.call(this, json);
-		this.v0.fromArray(json.v0);
-		this.v1.fromArray(json.v1);
-		this.v2.fromArray(json.v2);
-		return this;
-	};
-
-	function QuadraticBezierCurve3(v0, v1, v2) {
-		if (v0 === void 0) {
-			v0 = new Vector3();
-		}
-
-		if (v1 === void 0) {
-			v1 = new Vector3();
-		}
-
-		if (v2 === void 0) {
-			v2 = new Vector3();
-		}
-
-		Curve.call(this);
-		this.type = 'QuadraticBezierCurve3';
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
-	}
-
-	QuadraticBezierCurve3.prototype = Object.create(Curve.prototype);
-	QuadraticBezierCurve3.prototype.constructor = QuadraticBezierCurve3;
-	QuadraticBezierCurve3.prototype.isQuadraticBezierCurve3 = true;
-
-	QuadraticBezierCurve3.prototype.getPoint = function (t, optionalTarget) {
-		if (optionalTarget === void 0) {
-			optionalTarget = new Vector3();
-		}
-
-		var point = optionalTarget;
-		var v0 = this.v0,
-				v1 = this.v1,
-				v2 = this.v2;
-		point.set(QuadraticBezier(t, v0.x, v1.x, v2.x), QuadraticBezier(t, v0.y, v1.y, v2.y), QuadraticBezier(t, v0.z, v1.z, v2.z));
-		return point;
-	};
-
-	QuadraticBezierCurve3.prototype.copy = function (source) {
-		Curve.prototype.copy.call(this, source);
-		this.v0.copy(source.v0);
-		this.v1.copy(source.v1);
-		this.v2.copy(source.v2);
-		return this;
-	};
-
-	QuadraticBezierCurve3.prototype.toJSON = function () {
-		var data = Curve.prototype.toJSON.call(this);
-		data.v0 = this.v0.toArray();
-		data.v1 = this.v1.toArray();
-		data.v2 = this.v2.toArray();
-		return data;
-	};
-
-	QuadraticBezierCurve3.prototype.fromJSON = function (json) {
-		Curve.prototype.fromJSON.call(this, json);
-		this.v0.fromArray(json.v0);
-		this.v1.fromArray(json.v1);
-		this.v2.fromArray(json.v2);
-		return this;
-	};
-
-	function SplineCurve(points) {
-		if (points === void 0) {
-			points = [];
-		}
-
-		Curve.call(this);
-		this.type = 'SplineCurve';
-		this.points = points;
-	}
-
-	SplineCurve.prototype = Object.create(Curve.prototype);
-	SplineCurve.prototype.constructor = SplineCurve;
-	SplineCurve.prototype.isSplineCurve = true;
-
-	SplineCurve.prototype.getPoint = function (t, optionalTarget) {
-		if (optionalTarget === void 0) {
-			optionalTarget = new Vector2();
-		}
-
-		var point = optionalTarget;
-		var points = this.points;
-		var p = (points.length - 1) * t;
-		var intPoint = Math.floor(p);
-		var weight = p - intPoint;
-		var p0 = points[intPoint === 0 ? intPoint : intPoint - 1];
-		var p1 = points[intPoint];
-		var p2 = points[intPoint > points.length - 2 ? points.length - 1 : intPoint + 1];
-		var p3 = points[intPoint > points.length - 3 ? points.length - 1 : intPoint + 2];
-		point.set(CatmullRom(weight, p0.x, p1.x, p2.x, p3.x), CatmullRom(weight, p0.y, p1.y, p2.y, p3.y));
-		return point;
-	};
-
-	SplineCurve.prototype.copy = function (source) {
-		Curve.prototype.copy.call(this, source);
-		this.points = [];
-
-		for (var i = 0, l = source.points.length; i < l; i++) {
-			var point = source.points[i];
-			this.points.push(point.clone());
-		}
-
-		return this;
-	};
-
-	SplineCurve.prototype.toJSON = function () {
-		var data = Curve.prototype.toJSON.call(this);
-		data.points = [];
-
-		for (var i = 0, l = this.points.length; i < l; i++) {
-			var point = this.points[i];
-			data.points.push(point.toArray());
-		}
-
-		return data;
-	};
-
-	SplineCurve.prototype.fromJSON = function (json) {
-		Curve.prototype.fromJSON.call(this, json);
-		this.points = [];
-
-		for (var i = 0, l = json.points.length; i < l; i++) {
-			var point = json.points[i];
-			this.points.push(new Vector2().fromArray(point));
-		}
-
-		return this;
-	};
+		var _proto = SplineCurve.prototype;
+
+		_proto.getPoint = function getPoint(t, optionalTarget) {
+			if (optionalTarget === void 0) {
+				optionalTarget = new Vector2();
+			}
+
+			var point = optionalTarget;
+			var points = this.points;
+			var p = (points.length - 1) * t;
+			var intPoint = Math.floor(p);
+			var weight = p - intPoint;
+			var p0 = points[intPoint === 0 ? intPoint : intPoint - 1];
+			var p1 = points[intPoint];
+			var p2 = points[intPoint > points.length - 2 ? points.length - 1 : intPoint + 1];
+			var p3 = points[intPoint > points.length - 3 ? points.length - 1 : intPoint + 2];
+			point.set(CatmullRom(weight, p0.x, p1.x, p2.x, p3.x), CatmullRom(weight, p0.y, p1.y, p2.y, p3.y));
+			return point;
+		};
+
+		_proto.copy = function copy(source) {
+			Curve.prototype.copy.call(this, source);
+			this.points = [];
+
+			for (var i = 0, l = source.points.length; i < l; i++) {
+				var point = source.points[i];
+				this.points.push(point.clone());
+			}
+
+			return this;
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = Curve.prototype.toJSON.call(this);
+			data.points = [];
+
+			for (var i = 0, l = this.points.length; i < l; i++) {
+				var point = this.points[i];
+				data.points.push(point.toArray());
+			}
+
+			return data;
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			Curve.prototype.fromJSON.call(this, json);
+			this.points = [];
+
+			for (var i = 0, l = json.points.length; i < l; i++) {
+				var point = json.points[i];
+				this.points.push(new Vector2().fromArray(point));
+			}
+
+			return this;
+		};
+
+		return SplineCurve;
+	}(Curve);
 
 	var Curves = /*#__PURE__*/Object.freeze({
 		__proto__: null,
