@@ -112,7 +112,7 @@ const loader = new THREE.TextureLoader();
 
 그렇다면 텍스처의 좌표란 무엇일까요? 이는 `geometry`의 각 정점에 추가되는 데이터로, 특정
 정점에 텍스처의 어느 부분을 써야하는지를 나타냅니다. 자세한 사용법은 나중에
-[사용자 지정 geometry 만들기](threejs-custom-geometry.html)에서 살펴보겠습니다.
+[사용자 지정 geometry 만들기](threejs-custom-buffergeometry.html)에서 살펴보겠습니다.
 
 ## <a name="loading"></a> 텍스처 불러오기
 

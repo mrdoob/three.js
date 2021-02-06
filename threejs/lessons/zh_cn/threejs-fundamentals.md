@@ -37,7 +37,7 @@ ES6的语法。[点击这里查看你需要提前掌握的东西](threejs-prereq
 
 * [网格(`Mesh`)](Mesh)对象可以理解为用一种特定的[材质(`Material`)](Material)来绘制的一个特定的[几何体(`Geometry`)](Geometry)。[材质(`Material`)](Material)和[几何体(`Geometry`)](Geometry)可以被多个[网格(`Mesh`)](Mesh)对象使用。比如在不同的位置画两个蓝色立方体，我们会需要两个[网格(`Mesh`)](Mesh)对象来代表每一个立方体的位置和方向。但只需一个[几何体(`Geometry`)](Geometry)来存放立方体的顶点数据，和一种[材质(`Material`)](Material)来定义立方体的颜色为蓝色就可以了。两个[网格(`Mesh`)](Mesh)对象都引用了相同的[几何体(`Geometry`)](Geometry)和[材质(`Material`)](Material)。
 
-* [几何体(`Geometry`)](Geometry)对象顾名思义代表一些几何体，如球体、立方体、平面、狗、猫、人、树、建筑等物体的顶点信息。Three.js内置了许多[基本几何体](threejs-primitives.html) 。你也可以[创建自定义几何体](threejs-custom-geometry.html)或[从文件中加载几何体](threejs-load-obj.html)。
+* [几何体(`Geometry`)](Geometry)对象顾名思义代表一些几何体，如球体、立方体、平面、狗、猫、人、树、建筑等物体的顶点信息。Three.js内置了许多[基本几何体](threejs-primitives.html) 。你也可以[创建自定义几何体](threejs-custom-buffergeometry.html)或[从文件中加载几何体](threejs-load-obj.html)。
 
 * [材质(`Material`)](Material)对象代表[绘制几何体的表面属性](threejs-materials.html)，包括使用的颜色，和光亮程度。一个[材质(`Material`)](Material)可以引用一个或多个[纹理(`Texture`)](Texture)，这些纹理可以用来，打个比方，将图像包裹到几何体的表面。
 

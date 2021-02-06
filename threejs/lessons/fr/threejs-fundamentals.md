@@ -73,7 +73,7 @@ Voici ce qui est à remarquer dans le diagramme ci-dessus :
 * Les objets `Geometry` représentent les données associées aux sommets d'une géométrie telle qu'une
   sphère, un cube, un avion, un chien, un chat, un humain, un arbre, un bâtiment, etc...
   Three.js fournit plusieurs types intégrés de [primitives géométriques](threejs-primitives.html).
-  Vous pouvez aussi [créer vos propres géométries](threejs-custom-geometry.html) ou
+  Vous pouvez aussi [créer vos propres géométries](threejs-custom-buffergeometry.html) ou
   [charger des géométries à partir d'un fichier](threejs-load-obj.html).
 
 * Les objets `Material` représentent les

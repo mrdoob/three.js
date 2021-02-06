@@ -108,7 +108,7 @@ const loader = new THREE.TextureLoader();
 
 テクスチャの座標とはなんでしょうか？ジオメトリ頂点に与えられたデータのことで、
 テクスチャのどの部分がその頂点に対応するか指定するものです。
-[カスタムジオメトリの構築](threejs-custom-geometry.html)を始めるときに説明します。
+[カスタムジオメトリの構築](threejs-custom-buffergeometry.html)を始めるときに説明します。
 
 ## <a name="loading"></a> テクスチャの読み込み
 

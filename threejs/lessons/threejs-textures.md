@@ -111,7 +111,7 @@ each triangle in your geometry.
 
 What are texture coordinates? They are data added to each vertex of a piece of geometry
 that specify what part of the texture corresponds to that specific vertex.
-We'll go over them when we start [building custom geometry](threejs-custom-geometry.html).
+We'll go over them when we start [building custom geometry](threejs-custom-buffergeometry.html).
 
 ## <a name="loading"></a> Loading Textures
 

@@ -64,7 +64,7 @@ Three.js는 3차원 세계를 다루므로, 우리는 정육면체(cube)를 3차
 * `Geometry`는 기하학 객체의 정점 데이터입니다. 구(sphere), 정육면체(cube),
   면(plane), 개, 고양이, 사람, 나무, 건물 등 아주 다양한 것이 될 수 있죠. Three.js는
   기본적으로 몇 가지의 내장(built-in) [기하학 객체](threejs-primitives.html)를 제공합니다.
-  물론 [직접 기하학 객체를 만들](threejs-custom-geometry.html) 수도 있고,
+  물론 [직접 기하학 객체를 만들](threejs-custom-buffergeometry.html) 수도 있고,
   [파일에서 기하학 객체를 불러올](threejs-load-obj.html) 수도 있죠.
 
 * `Material`은 기하학 객체를 그리는 데 사용하는 [표면 속성](threejs-materials.html)입니다.

@@ -73,7 +73,7 @@ Things to notice about the diagram above.
    a sphere, cube, plane, dog, cat, human, tree, building, etc...
    Three.js provides many kinds of built in
    [geometry primitives](threejs-primitives.html). You can also
-   [create custom geometry](threejs-custom-geometry.html) as well as
+   [create custom geometry](threejs-custom-buffergeometry.html) as well as
    [load geometry from files](threejs-load-obj.html).
 
 * `Material` objects represent

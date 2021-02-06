@@ -89,7 +89,7 @@ const loader = new THREE.TextureLoader();
 
 在其他3D引擎中，如果你想在一个几何体上使用多个图像，使用 [纹理图集（Texture Atlas）](https://en.wikipedia.org/wiki/Texture_atlas) 更为常见，性能也更高。纹理图集是将多个图像放在一个单一的纹理中，然后使用几何体顶点上的纹理坐标来选择在几何体的每个三角形上使用纹理的哪些部分。
 
-什么是纹理坐标？它们是添加到一块几何体的每个顶点上的数据，用于指定该顶点对应的纹理的哪个部分。当我们开始[构建自定义几何体时（building custom geometry）](threejs-custom-geometry.html)，我们会介绍它们。
+什么是纹理坐标？它们是添加到一块几何体的每个顶点上的数据，用于指定该顶点对应的纹理的哪个部分。当我们开始[构建自定义几何体时（building custom geometry）](threejs-custom-buffergeometry.html)，我们会介绍它们。
 
 ## <a name="loading"></a> 加载纹理
 
