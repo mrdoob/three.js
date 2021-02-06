@@ -156,12 +156,9 @@ class CatmullRomCurve3 extends Curve {
 			let dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
 
 			// safety check for repeated points
-			if ( dt1 < 1e-4 )
-				dt1 = 1.0;
-			if ( dt0 < 1e-4 )
-				dt0 = dt1;
-			if ( dt2 < 1e-4 )
-				dt2 = dt1;
+			if ( dt1 < 1e-4 ) dt1 = 1.0;
+			if ( dt0 < 1e-4 ) dt0 = dt1;
+			if ( dt2 < 1e-4 ) dt2 = dt1;
 
 			px.initNonuniformCatmullRom( p0.x, p1.x, p2.x, p3.x, dt0, dt1, dt2 );
 			py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
