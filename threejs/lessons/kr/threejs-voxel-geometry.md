@@ -34,7 +34,7 @@ for (let y = 0; y < cellSize; ++y) {
 다음으로 모든 블럭을 돌면서 0이 아닐 경우 정육면체를 새로 만듭니다.
 
 ```js
-const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+const geometry = new THREE.BoxGeometry(1, 1, 1);
 const material = new THREE.MeshPhongMaterial({ color: 'green' });
 
 for (let y = 0; y < cellSize; ++y) {

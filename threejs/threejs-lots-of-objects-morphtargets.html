@@ -103,7 +103,7 @@ function main() {
   {
     const loader = new THREE.TextureLoader();
     const texture = loader.load('resources/images/world.jpg', render);
-    const geometry = new THREE.SphereBufferGeometry(1, 64, 32);
+    const geometry = new THREE.SphereGeometry(1, 64, 32);
     const material = new THREE.MeshBasicMaterial({map: texture});
     scene.add(new THREE.Mesh(geometry, material));
   }
@@ -186,7 +186,7 @@ function main() {
         const boxWidth = 1;
         const boxHeight = 1;
         const boxDepth = 1;
-        const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+        const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
         // adjust the helpers to point to the latitude and longitude
         lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;

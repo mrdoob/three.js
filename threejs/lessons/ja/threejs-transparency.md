@@ -191,7 +191,7 @@ function makeInstance(geometry, color, x, y, z) {
 ```js
 const planeWidth = 1;
 const planeHeight = 1;
-const geometry = new THREE.PlaneBufferGeometry(planeWidth, planeHeight);
+const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
 
 const loader = new THREE.TextureLoader();
 
@@ -258,7 +258,7 @@ function makeInstance(geometry, color, rotY, url) {
 
 どうやって達成するかはあなた次第です。
 [Blender](https://blender.org)のようなモデリングツールを使用していた場合は、テクスチャ座標を手動で調整すると思います。
-ここでは `PlaneBufferGeometry` を使用していますが、デフォルトではテクスチャを平面全体に引き伸ばします。
+ここでは `PlaneGeometry` を使用していますが、デフォルトではテクスチャを平面全体に引き伸ばします。
 [テクステャの記事で説明](threejs-textures.html)したように [`texture.repeat`](Texture.repeat) と [`texture.offset`](Texture.offset) を設定し、
 各平面上の表面のテクスチャから正しい半分が得られるようにテクスチャを拡大縮小したり移動させたりできます。
 

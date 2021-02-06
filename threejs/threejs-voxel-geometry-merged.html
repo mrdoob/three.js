@@ -60,7 +60,7 @@ function main() {
         const height = (Math.sin(x / cellSize * Math.PI * 4) + Math.sin(z / cellSize * Math.PI * 6)) * 20 + 60;
         //if (y < height) {
         if (height > y && height < y + 1) {
-          const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+          const geometry = new THREE.BoxGeometry(1, 1, 1);
           geometry.applyMatrix4((new THREE.Matrix4()).makeTranslation(x, y, z));
           geometries.push(geometry);
         }

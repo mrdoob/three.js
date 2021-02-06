@@ -75,7 +75,7 @@ function main() {
     scene.add(light);
   }
 
-  const groundGeometry = new THREE.PlaneBufferGeometry(50, 50);
+  const groundGeometry = new THREE.PlaneGeometry(50, 50);
   const groundMaterial = new THREE.MeshPhongMaterial({color: 0xCC8866});
   const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
   groundMesh.rotation.x = Math.PI * -.5;
@@ -89,7 +89,7 @@ function main() {
   const tank = new THREE.Object3D();
   scene.add(tank);
 
-  const bodyGeometry = new THREE.BoxBufferGeometry(carWidth, carHeight, carLength);
+  const bodyGeometry = new THREE.BoxGeometry(carWidth, carHeight, carLength);
   const bodyMaterial = new THREE.MeshPhongMaterial({color: 0x6688AA});
   const bodyMesh = new THREE.Mesh(bodyGeometry, bodyMaterial);
   bodyMesh.position.y = 1.4;
@@ -106,7 +106,7 @@ function main() {
   const wheelRadius = 1;
   const wheelThickness = .5;
   const wheelSegments = 6;
-  const wheelGeometry = new THREE.CylinderBufferGeometry(
+  const wheelGeometry = new THREE.CylinderGeometry(
       wheelRadius,     // top radius
       wheelRadius,     // bottom radius
       wheelThickness,  // height of cylinder
@@ -136,7 +136,7 @@ function main() {
   const domePhiEnd = Math.PI * 2;
   const domeThetaStart = 0;
   const domeThetaEnd = Math.PI * .5;
-  const domeGeometry = new THREE.SphereBufferGeometry(
+  const domeGeometry = new THREE.SphereGeometry(
     domeRadius, domeWidthSubdivisions, domeHeightSubdivisions,
     domePhiStart, domePhiEnd, domeThetaStart, domeThetaEnd);
   const domeMesh = new THREE.Mesh(domeGeometry, bodyMaterial);
@@ -147,7 +147,7 @@ function main() {
   const turretWidth = .1;
   const turretHeight = .1;
   const turretLength = carLength * .75 * .2;
-  const turretGeometry = new THREE.BoxBufferGeometry(
+  const turretGeometry = new THREE.BoxGeometry(
       turretWidth, turretHeight, turretLength);
   const turretMesh = new THREE.Mesh(turretGeometry, bodyMaterial);
   const turretPivot = new THREE.Object3D();
@@ -162,7 +162,7 @@ function main() {
   turretCamera.position.y = .75 * .2;
   turretMesh.add(turretCamera);
 
-  const targetGeometry = new THREE.SphereBufferGeometry(.5, 6, 3);
+  const targetGeometry = new THREE.SphereGeometry(.5, 6, 3);
   const targetMaterial = new THREE.MeshPhongMaterial({color: 0x00FF00, flatShading: true});
   const targetMesh = new THREE.Mesh(targetGeometry, targetMaterial);
   const targetOrbit = new THREE.Object3D();

@@ -16,7 +16,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
     const width = 4;
     const height = 3;
     const depth = 10;
-    const geometry = new THREE.BoxBufferGeometry(width, height, depth);
+    const geometry = new THREE.BoxGeometry(width, height, depth);
     const material = new THREE.MeshPhongMaterial({color: 'hsl(130,50%,50%)'});
     return {
       obj3D: new THREE.Mesh(geometry, material),
@@ -35,7 +35,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
       metalness: 0,
     };
     loader.load('/threejs/resources/models/simple_house_scene/scene.gltf', (gltf) => {
-      const hackGeometry = new THREE.CircleBufferGeometry(0.5, 32);
+      const hackGeometry = new THREE.CircleGeometry(0.5, 32);
       const box = new THREE.Box3();
       const size = new THREE.Vector3();
       const center = new THREE.Vector3();

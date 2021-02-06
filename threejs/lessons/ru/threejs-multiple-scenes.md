@@ -114,7 +114,7 @@ function makeScene(elem) {
 
 function setupScene1() {
   const sceneInfo = makeScene(document.querySelector('#box'));
-  const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
   const material = new THREE.MeshPhongMaterial({color: 'red'});
   const mesh = new THREE.Mesh(geometry, material);
   sceneInfo.scene.add(mesh);
@@ -127,7 +127,7 @@ function setupScene2() {
   const radius = .8;
   const widthSegments = 4;
   const heightSegments = 2;
-  const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+  const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
   const material = new THREE.MeshPhongMaterial({
     color: 'blue',
     flatShading: true,
@@ -339,7 +339,7 @@ function render(time) {
 {
   const elem = document.querySelector('#box');
   const {scene, camera} = makeScene();
-  const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
   const material = new THREE.MeshPhongMaterial({color: 'red'});
   const mesh = new THREE.Mesh(geometry, material);
   scene.add(mesh);
@@ -357,7 +357,7 @@ function render(time) {
   const radius = .8;
   const widthSegments = 4;
   const heightSegments = 2;
-  const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+  const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
   const material = new THREE.MeshPhongMaterial({
     color: 'blue',
     flatShading: true,
@@ -418,7 +418,7 @@ function render(time) {
 const sceneInitFunctionsByName = {
   'box': () => {
     const {scene, camera} = makeScene();
-    const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshPhongMaterial({color: 'red'});
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
@@ -433,7 +433,7 @@ const sceneInitFunctionsByName = {
     const radius = .8;
     const widthSegments = 4;
     const heightSegments = 2;
-    const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+    const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
     const material = new THREE.MeshPhongMaterial({
       color: 'blue',
       flatShading: true,
@@ -522,7 +522,7 @@ const sceneInitFunctionsByName = {
 -    const {scene, camera} = makeScene();
 + 'box': (elem) => {
 +    const {scene, camera, controls} = makeScene(elem);
-    const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshPhongMaterial({color: 'red'});
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
@@ -542,7 +542,7 @@ const sceneInitFunctionsByName = {
     const radius = .8;
     const widthSegments = 4;
     const heightSegments = 2;
-    const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+    const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
     const material = new THREE.MeshPhongMaterial({
       color: 'blue',
       flatShading: true,

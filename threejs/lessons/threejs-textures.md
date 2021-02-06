@@ -97,9 +97,9 @@ It works!
 {{{example url="../threejs-textured-cube-6-textures.html" }}}
 
 It should be noted though that not all geometry types supports multiple
-materials. `BoxGeometry` and `BoxBufferGeometry` can use 6 materials one for each face.
-`ConeGeometry` and `ConeBufferGeometry` can use 2 materials, one for the bottom and one for the cone.
-`CylinderGeometry` and `CylinderBufferGeometry` can use 3 materials, bottom, top, and side.
+materials. `BoxGeometry` and `BoxGeometry` can use 6 materials one for each face.
+`ConeGeometry` and `ConeGeometry` can use 2 materials, one for the bottom and one for the cone.
+`CylinderGeometry` and `CylinderGeometry` can use 3 materials, bottom, top, and side.
 For other cases you will need to build or load custom geometry and/or modify texture coordinates.
 
 It's far more common in other 3D engines and far more performant to use a

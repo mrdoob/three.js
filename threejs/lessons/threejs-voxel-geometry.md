@@ -38,7 +38,7 @@ I then walked through all the cells and if they were not
 0 I created a mesh with a cube.
 
 ```js
-const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+const geometry = new THREE.BoxGeometry(1, 1, 1);
 const material = new THREE.MeshPhongMaterial({color: 'green'});
 
 for (let y = 0; y < cellSize; ++y) {

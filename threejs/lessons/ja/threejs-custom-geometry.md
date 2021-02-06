@@ -17,7 +17,7 @@ TOC: カスタムジオメトリ
 
 ここまで簡単なカスタムジオメトリであれば大袈裟なモデリングツールを使わずにTHREE.jsのコードで作れます。
 
-まずは立方体を作ってみましょう。THREE.jsの`BoxGeometry`や`BoxBufferGeometry`を使えば一発で
+まずは立方体を作ってみましょう。THREE.jsの`BoxGeometry`や`BoxGeometry`を使えば一発で
 立方体を作れますが、簡単な例としてカスタムジオメトリで作ってみましょう。
 
 THREE.jsにはカスタムジオメトリを作る方法が２つあります。１つ目は`Geometry`クラスで２つ目が`BufferGeometry`です。

@@ -168,7 +168,7 @@ class ClearingLogger {
 아래는 화면을 클릭할 때마다 `Mesh`를 추가하는 코드입니다.
 
 ```js
-const geometry = new THREE.SphereBufferGeometry();
+const geometry = new THREE.SphereGeometry();
 const material = new THREE.MeshBasicMaterial({ color: 'red' });
 
 const things = [];

@@ -195,7 +195,7 @@ Three.js의 분류 기준은 고정적인 듯합니다. `side: THREE.BackSide` m
 ```js
 const planeWidth = 1;
 const planeHeight = 1;
-const geometry = new THREE.PlaneBufferGeometry(planeWidth, planeHeight);
+const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
 
 const loader = new THREE.TextureLoader();
 
@@ -263,7 +263,7 @@ function makeInstance(geometry, color, rotY, url) {
 
 저걸 어떻게 구현할지는 여러분의 선택입니다. [블렌더(Blender)](https://blender.org)
 같은 3D 에디터를 사용했다면 텍스처 좌표를 직접 수정했겠죠. 예제의 경우에는
-`PlaneBufferGeometry`를 썼습니다. [이전에 다뤘듯](threejs-textures.html)
+`PlaneGeometry`를 썼습니다. [이전에 다뤘듯](threejs-textures.html)
 이 geometry는 기본적으로 텍스처를 크기에 맞춰 늘립니다. [`texture.repeat`](Texture.repeat)
 속성과 [`texture.offset`](Texture.offset) 속성을 조정해 각 면에 적절한
 텍스처를 입혀줄 수 있죠.

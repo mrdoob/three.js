@@ -53,7 +53,7 @@ const objects = [];
 const radius = 1;
 const widthSegments = 6;
 const heightSegments = 6;
-const sphereGeometry = new THREE.SphereBufferGeometry(
+const sphereGeometry = new THREE.SphereGeometry(
     radius, widthSegments, heightSegments);
 
 const sunMaterial = new THREE.MeshPhongMaterial({emissive: 0xFFFF00});

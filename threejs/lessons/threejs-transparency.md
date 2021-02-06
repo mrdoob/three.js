@@ -203,7 +203,7 @@ We'll [add a texture](threejs-textures.html) to each plane.
 ```js
 const planeWidth = 1;
 const planeHeight = 1;
-const geometry = new THREE.PlaneBufferGeometry(planeWidth, planeHeight);
+const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
 
 const loader = new THREE.TextureLoader();
 
@@ -273,7 +273,7 @@ function makeInstance(geometry, color, rotY, url) {
 
 How you accomplish that is up to you. If I was using modeling package like
 [Blender](https://blender.org) I'd probably do this manually by adjusting
-texture coordinates. Here though we're using `PlaneBufferGeometry` which by
+texture coordinates. Here though we're using `PlaneGeometry` which by
 default stretches the texture across the plane. Like we [covered
 before](threejs-textures.html) By setting the [`texture.repeat`](Texture.repeat)
 and [`texture.offset`](Texture.offset) we can scale and move the texture to get

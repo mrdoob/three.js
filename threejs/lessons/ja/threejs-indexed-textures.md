@@ -66,7 +66,7 @@ pickingScene.background = new THREE.Color(0);
 ```js
 {
   const loader = new THREE.TextureLoader();
-  const geometry = new THREE.SphereBufferGeometry(1, 64, 32);
+  const geometry = new THREE.SphereGeometry(1, 64, 32);
 
 +  const indexTexture = loader.load('resources/data/world/country-index-texture.png', render);
 +  indexTexture.minFilter = THREE.NearestFilter;
@@ -346,7 +346,7 @@ void main() {
 ```js
 {
   const loader = new THREE.TextureLoader();
-  const geometry = new THREE.SphereBufferGeometry(1, 64, 32);
+  const geometry = new THREE.SphereGeometry(1, 64, 32);
 
   const indexTexture = loader.load('resources/data/world/country-index-texture.png', render);
   indexTexture.minFilter = THREE.NearestFilter;
@@ -439,7 +439,7 @@ paletteTexture.needsUpdate = true;
 これはマテリアルのユニフォームに設定する必要があります。
 
 ```js
-const geometry = new THREE.SphereBufferGeometry(1, 64, 32);
+const geometry = new THREE.SphereGeometry(1, 64, 32);
 const material = new THREE.MeshBasicMaterial({map: texture});
 material.onBeforeCompile = function(shader) {
   fragmentShaderReplacements.forEach((rep) => {

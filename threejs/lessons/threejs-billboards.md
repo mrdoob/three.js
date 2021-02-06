@@ -91,13 +91,13 @@ all the trees will share
 const trunkRadius = .2;
 const trunkHeight = 1;
 const trunkRadialSegments = 12;
-const trunkGeometry = new THREE.CylinderBufferGeometry(
+const trunkGeometry = new THREE.CylinderGeometry(
     trunkRadius, trunkRadius, trunkHeight, trunkRadialSegments);
 
 const topRadius = trunkRadius * 4;
 const topHeight = trunkHeight * 2;
 const topSegments = 12;
-const topGeometry = new THREE.ConeBufferGeometry(
+const topGeometry = new THREE.ConeGeometry(
     topRadius, topHeight, topSegments);
 
 const trunkMaterial = new THREE.MeshPhongMaterial({color: 'brown'});
@@ -141,7 +141,7 @@ Let's also add a ground plane while we're at it
 // add ground
 {
   const size = 400;
-  const geometry = new THREE.PlaneBufferGeometry(size, size);
+  const geometry = new THREE.PlaneGeometry(size, size);
   const material = new THREE.MeshPhongMaterial({color: 'gray'});
   const mesh = new THREE.Mesh(geometry, material);
   mesh.rotation.x = Math.PI * -0.5;

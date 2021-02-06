@@ -85,7 +85,7 @@ const loader = new THREE.TextureLoader();
 
 {{{example url="../threejs-textured-cube-6-textures.html" }}}
 
-但需要注意的是，并不是所有的几何体类型都支持多种材质。`BoxGeometry` 和 `BoxBufferGeometry` 可以使用6种材料，每个面一个。`ConeGeometry` 和 `ConeBufferGeometry` 可以使用2种材料，一种用于底部，一种用于侧面。 `CylinderGeometry` 和 `CylinderBufferGeometry` 可以使用3种材料，分别是底部、顶部和侧面。对于其他情况，你需要建立或加载自定义几何体和（或）修改纹理坐标。
+但需要注意的是，并不是所有的几何体类型都支持多种材质。`BoxGeometry` 和 `BoxGeometry` 可以使用6种材料，每个面一个。`ConeGeometry` 和 `ConeGeometry` 可以使用2种材料，一种用于底部，一种用于侧面。 `CylinderGeometry` 和 `CylinderGeometry` 可以使用3种材料，分别是底部、顶部和侧面。对于其他情况，你需要建立或加载自定义几何体和（或）修改纹理坐标。
 
 在其他3D引擎中，如果你想在一个几何体上使用多个图像，使用 [纹理图集（Texture Atlas）](https://en.wikipedia.org/wiki/Texture_atlas) 更为常见，性能也更高。纹理图集是将多个图像放在一个单一的纹理中，然后使用几何体顶点上的纹理坐标来选择在几何体的每个三角形上使用纹理的哪些部分。
 

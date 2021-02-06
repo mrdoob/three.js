@@ -147,14 +147,14 @@ const cursorColors = new Uint8Array([
 const cursorTexture = makeDataTexture(cursorColors, 2, 1);
 ```
 
-We'll then use that texture on a `TorusBufferGeometry`
+We'll then use that texture on a `TorusGeometry`
 
 ```js
 const ringRadius = 0.4;
 const tubeRadius = 0.1;
 const tubeSegments = 4;
 const ringSegments = 64;
-const cursorGeometry = new THREE.TorusBufferGeometry(
+const cursorGeometry = new THREE.TorusGeometry(
     ringRadius, tubeRadius, tubeSegments, ringSegments);
 
 const cursorMaterial = new THREE.MeshBasicMaterial({
@@ -250,19 +250,19 @@ A few things to notice **and try**.
   the inverse effect is best here as that way we can hopefully
   see the cursor regardless of the colors it is over.
 
-* We use a `TorusBufferGeometry` and not a `RingBufferGeometry`
+* We use a `TorusGeometry` and not a `RingGeometry`
 
-  For whatever reason the `RingBufferGeometry` uses a flat
-  UV mapping scheme. Because of this if we use a `RingBufferGeometry`
+  For whatever reason the `RingGeometry` uses a flat
+  UV mapping scheme. Because of this if we use a `RingGeometry`
   the texture slides horizontally across the ring instead of
   around it like it does above.
 
-  Try it out, change the `TorusBufferGeometry` to a `RingBufferGeometry`
+  Try it out, change the `TorusGeometry` to a `RingGeometry`
   (it's just commented out in the example above) and you'll see what I
   mean.
 
   The *proper* thing to do (for some definition of *proper*) would be
-  to either use the `RingBufferGeometry` but fix the texture coordinates
+  to either use the `RingGeometry` but fix the texture coordinates
   so they go around the ring. Or else, generate our own ring geometry.
   But, the torus works just fine. Placed directly in front of the camera
   with a `MeshBasicMaterial` it will look exactly like a ring and the
@@ -288,7 +288,7 @@ class PickHelper {
 +    const tubeRadius = 0.1;
 +    const tubeSegments = 4;
 +    const ringSegments = 64;
-+    const cursorGeometry = new THREE.TorusBufferGeometry(
++    const cursorGeometry = new THREE.TorusGeometry(
 +        ringRadius, tubeRadius, tubeSegments, ringSegments);
 +
 +    const cursorMaterial = new THREE.MeshBasicMaterial({
@@ -394,11 +394,11 @@ So first we'll make a sphere geometry
 const boxWidth = 1;
 const boxHeight = 1;
 const boxDepth = 1;
--const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
-+const boxGeometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+-const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
++const boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 +
 +const sphereRadius = 0.5;
-+const sphereGeometry = new THREE.SphereBufferGeometry(sphereRadius);
++const sphereGeometry = new THREE.SphereGeometry(sphereRadius);
 ```
 
 Then let's create 3 pairs of box and sphere meshes. We'll

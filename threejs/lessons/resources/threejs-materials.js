@@ -4,7 +4,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
 {
   function makeSphere(widthDivisions, heightDivisions) {
     const radius = 7;
-    return new THREE.SphereBufferGeometry(radius, widthDivisions, heightDivisions);
+    return new THREE.SphereGeometry(radius, widthDivisions, heightDivisions);
   }
 
   const highPolySphereGeometry = function() {
@@ -22,7 +22,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
   function smoothOrFlat(flatShading, radius = 7) {
     const widthDivisions = 12;
     const heightDivisions = 9;
-    const geometry = new THREE.SphereBufferGeometry(radius, widthDivisions, heightDivisions);
+    const geometry = new THREE.SphereGeometry(radius, widthDivisions, heightDivisions);
     const material = new THREE.MeshPhongMaterial({
       flatShading,
       color: 'hsl(300,50%,50%)',
@@ -45,7 +45,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
   function sideExample(side) {
     const base = new THREE.Object3D();
     const size = 6;
-    const geometry = new THREE.PlaneBufferGeometry(size, size);
+    const geometry = new THREE.PlaneGeometry(size, size);
     [
       { position: [ -1, 0, 0], up: [0,  1, 0], },
       { position: [  1, 0, 0], up: [0, -1, 0], },
@@ -303,7 +303,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         const tubularSegments = 64;
         const p = 2;
         const q = 3;
-        const geometry = new THREE.TorusKnotBufferGeometry(radius, tube, tubularSegments, radialSegments, p, q);
+        const geometry = new THREE.TorusKnotGeometry(radius, tube, tubularSegments, radialSegments, p, q);
         const material = new THREE.MeshDepthMaterial();
         camera.near = 7;
         camera.far = 20;
@@ -318,7 +318,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         const tubularSegments = 64;
         const p = 2;
         const q = 3;
-        const geometry = new THREE.TorusKnotBufferGeometry(radius, tube, tubularSegments, radialSegments, p, q);
+        const geometry = new THREE.TorusKnotGeometry(radius, tube, tubularSegments, radialSegments, p, q);
         const material = new THREE.MeshNormalMaterial();
         return new THREE.Mesh(geometry, material);
       },

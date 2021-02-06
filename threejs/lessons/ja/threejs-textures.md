@@ -95,9 +95,9 @@ const loader = new THREE.TextureLoader();
 {{{example url="../threejs-textured-cube-6-textures.html" }}}
 
 ただし、全ての種類のジオメトリが複数のマテリアルに対応しているわけではないことに注意してください。
-`BoxGeometry`と`BoxBufferGeometry`は、それぞれの面に6つのマテリアルを使えます。
-`ConeGeometry`と`ConeBufferGeometry`は2つのマテリアルを使うことができ、一つは底面、一つは円錐面に適用されます。
-`CylinderGeometry`と`CylinderBufferGeometry`は3つのマテリアルを使うことができ、一つは底面、一つは上面、一つは側面に適用されます。
+`BoxGeometry`と`BoxGeometry`は、それぞれの面に6つのマテリアルを使えます。
+`ConeGeometry`と`ConeGeometry`は2つのマテリアルを使うことができ、一つは底面、一つは円錐面に適用されます。
+`CylinderGeometry`と`CylinderGeometry`は3つのマテリアルを使うことができ、一つは底面、一つは上面、一つは側面に適用されます。
 その他のケースでは、カスタムジオメトリのビルドや読み込み、テクスチャの座標の修正が必要になります。
 
 

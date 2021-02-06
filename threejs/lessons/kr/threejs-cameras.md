@@ -303,7 +303,7 @@ const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
   const sphereRadius = 3;
   const sphereWidthDivisions = 32;
   const sphereHeightDivisions = 16;
-  const sphereGeo = new THREE.SphereBufferGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
+  const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
   const numSpheres = 20;
   for (let i = 0; i < numSpheres; ++i) {
     const sphereMat = new THREE.MeshPhongMaterial();
@@ -495,7 +495,7 @@ const textures = [
   loader.load('resources/images/flower-6.jpg'),
 ];
 const planeSize = 256;
-const planeGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
+const planeGeo = new THREE.PlaneGeometry(planeSize, planeSize);
 const planes = textures.map((texture) => {
   const planePivot = new THREE.Object3D();
   scene.add(planePivot);

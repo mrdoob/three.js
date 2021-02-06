@@ -82,7 +82,7 @@ function main() {
   const bgTexture = loader.load('resources/images/daikanyama.jpg');
   let bgMesh;
   {
-    const plane = new THREE.PlaneBufferGeometry(2, 2);
+    const plane = new THREE.PlaneGeometry(2, 2);
     const material = new THREE.MeshBasicMaterial({
       map: bgTexture,
       depthTest: false,

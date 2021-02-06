@@ -62,10 +62,10 @@ function main() {
   const boxWidth = 1;
   const boxHeight = 1;
   const boxDepth = 1;
-  const boxGeometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+  const boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
   const sphereRadius = 0.5;
-  const sphereGeometry = new THREE.SphereBufferGeometry(sphereRadius);
+  const sphereGeometry = new THREE.SphereGeometry(sphereRadius);
 
   function makeInstance(geometry, color, x) {
     const material = new THREE.MeshPhongMaterial({color});

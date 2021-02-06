@@ -13,7 +13,7 @@ Three.js에서는 [textures](threejs-textures.html), [geometries](threejs-primit
 가장 간단한 방법은 일일이 호출하는 겁니다. 초기화 시에 아래와 같이 지원을 메모리에 할당하고
 
 ```js
-const boxGeometry = new THREE.BoxBufferGeometry(...);
+const boxGeometry = new THREE.BoxGeometry(...);
 const boxTexture = textureLoader.load(...);
 const boxMaterial = new THREE.MeshPhongMaterial({ map: texture });
 ```

@@ -91,7 +91,7 @@ function main() {
   idTexture.minFilter = THREE.NearestFilter;
 
   {
-    const planeGeo = new THREE.PlaneBufferGeometry(2, 2);
+    const planeGeo = new THREE.PlaneGeometry(2, 2);
     const planeMat = new THREE.MeshBasicMaterial({
       map: idTexture,
       depthTest: false,

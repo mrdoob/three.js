@@ -175,7 +175,7 @@ class ClearingLogger {
 マウスをクリックするたびに新しい `Mesh` を追加するコードは以下の通りです。
 
 ```js
-const geometry = new THREE.SphereBufferGeometry();
+const geometry = new THREE.SphereGeometry();
 const material = new THREE.MeshBasicMaterial({color: 'red'});
 
 const things = [];

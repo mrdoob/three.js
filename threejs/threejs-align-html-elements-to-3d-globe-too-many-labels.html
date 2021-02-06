@@ -86,7 +86,7 @@ function main() {
   {
     const loader = new THREE.TextureLoader();
     const texture = loader.load('resources/data/world/country-outlines-4k.png', render);
-    const geometry = new THREE.SphereBufferGeometry(1, 64, 32);
+    const geometry = new THREE.SphereGeometry(1, 64, 32);
     const material = new THREE.MeshBasicMaterial({map: texture});
     scene.add(new THREE.Mesh(geometry, material));
   }

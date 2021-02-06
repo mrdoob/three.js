@@ -60,14 +60,14 @@ function main() {
   //const innerRadius = 0.4;
   //const outerRadius = 0.5;
   //const segments = 64;
-  //const cursorGeometry = new THREE.RingBufferGeometry(
+  //const cursorGeometry = new THREE.RingGeometry(
   //    innerRadius, outerRadius, segments);
 
   const ringRadius = 0.4;
   const tubeRadius = 0.1;
   const tubeSegments = 4;
   const ringSegments = 64;
-  const cursorGeometry = new THREE.TorusBufferGeometry(
+  const cursorGeometry = new THREE.TorusGeometry(
       ringRadius, tubeRadius, tubeSegments, ringSegments);
 
   const cursorColors = new Uint8Array([

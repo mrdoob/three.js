@@ -30,7 +30,7 @@ You could do this manually. At the start you might create
 some of these resources
 
 ```js
-const boxGeometry = new THREE.BoxBufferGeometry(...);
+const boxGeometry = new THREE.BoxGeometry(...);
 const boxTexture = textureLoader.load(...);
 const boxMaterial = new THREE.MeshPhongMaterial({map: texture});
 ```

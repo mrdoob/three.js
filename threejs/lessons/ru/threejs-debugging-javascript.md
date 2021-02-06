@@ -193,7 +193,7 @@ class ClearingLogger {
 Вот код, который добавляет новую сетку каждый раз, когда мы щелкаем мышью
 
 ```js
-const geometry = new THREE.SphereBufferGeometry();
+const geometry = new THREE.SphereGeometry();
 const material = new THREE.MeshBasicMaterial({color: 'red'});
 
 const things = [];

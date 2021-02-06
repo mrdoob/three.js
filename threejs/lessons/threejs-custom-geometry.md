@@ -22,7 +22,7 @@ Still, there are times when we might want to generate our own
 3D geometry in code instead of using a modeling package.
 
 First let's just make a cube. Even though three.js already
-provides us with `BoxGeometry` and `BoxBufferGeometry` a
+provides us with `BoxGeometry` and `BoxGeometry` a
 cube is easy to understand so let's start there.
 
 There are 2 ways to make custom geometry in THREE.js. One

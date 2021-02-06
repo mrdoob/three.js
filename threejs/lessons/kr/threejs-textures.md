@@ -100,9 +100,9 @@ const loader = new THREE.TextureLoader();
 {{{example url="../threejs-textured-cube-6-textures.html" }}}
 
 주의해야할 점은 모든 `geometry`가 재질을 배열로 받진 않는다는 점입니다.
-`BoxGeometry`나 `BoxBufferGeometry`는 최대 6개, `ConeGeometry`와
-`ConeBufferGeometry`는 밑면과 뿔 부분에 하나씩 최대 2개, `CylinderGeometry`와
-`CylinderBufferGeometry`는 아래, 위, 옆면 하나씩 최대 3개를 지정할 수 있죠.
+`BoxGeometry`나 `BoxGeometry`는 최대 6개, `ConeGeometry`와
+`ConeGeometry`는 밑면과 뿔 부분에 하나씩 최대 2개, `CylinderGeometry`와
+`CylinderGeometry`는 아래, 위, 옆면 하나씩 최대 3개를 지정할 수 있죠.
 다른 경우에는 `geometry`를 따로 만들거나, 텍스처의 좌표를 직접 수정해야 합니다.
 
 다른 3D 엔진에서나 Three.js에서나, 하나의 `geometry`에서 여러 텍스처를 쓰고 싶을 때는

@@ -20,7 +20,7 @@ import {GUI} from '../../../3rdparty/dat.gui.module.js';
     const root = new THREE.Object3D();
 
     const size = 3;
-    const geometry = new THREE.BoxBufferGeometry(size, size, size);
+    const geometry = new THREE.BoxGeometry(size, size, size);
     geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, zOffset * size));
     const material = new THREE.MeshBasicMaterial({
       color: 'red',
@@ -68,7 +68,7 @@ import {GUI} from '../../../3rdparty/dat.gui.module.js';
         const gridHelper = new THREE.GridHelper(size, divisions);
         scene.add(gridHelper);
 
-        const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
 
         const lonHelper = new THREE.Object3D();
         scene.add(lonHelper);
@@ -88,7 +88,7 @@ import {GUI} from '../../../3rdparty/dat.gui.module.js';
           latHelper.add(latMesh);
         }
         {
-          const geometry = new THREE.SphereBufferGeometry(0.1, 24, 12);
+          const geometry = new THREE.SphereGeometry(0.1, 24, 12);
           const posMesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: 'red'}));
           posMesh.position.z = 1;
           positionHelper.add(posMesh);

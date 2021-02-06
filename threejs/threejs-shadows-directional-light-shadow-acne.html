@@ -55,7 +55,7 @@ function main() {
     const repeats = planeSize / 2;
     texture.repeat.set(repeats, repeats);
 
-    const planeGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize, planeSize, planeSize);
+    const planeGeo = new THREE.PlaneGeometry(planeSize, planeSize, planeSize, planeSize);
     const positionAttribute = planeGeo.attributes.position;
     for (let i = 0; i < positionAttribute.count; ++i) {
       positionAttribute.setZ(i, Math.random() * .2);
@@ -81,7 +81,7 @@ function main() {
     const phiLength = Math.PI * 2;
     const thetaStart = Math.PI * .5;
     const thetaLength = Math.PI * .5;
-    const sphereGeo = new THREE.SphereBufferGeometry(
+    const sphereGeo = new THREE.SphereGeometry(
       sphereRadius,
       sphereWidthDivisions,
       sphereHeightDivisions,
@@ -105,7 +105,7 @@ function main() {
     const sphereRadius = 4;
     const sphereWidthDivisions = 32;
     const sphereHeightDivisions = 16;
-    const sphereGeo = new THREE.SphereBufferGeometry(
+    const sphereGeo = new THREE.SphereGeometry(
       sphereRadius,
       sphereWidthDivisions,
       sphereHeightDivisions,

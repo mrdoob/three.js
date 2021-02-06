@@ -76,7 +76,7 @@ picking scene.
 ```js
 {
   const loader = new THREE.TextureLoader();
-  const geometry = new THREE.SphereBufferGeometry(1, 64, 32);
+  const geometry = new THREE.SphereGeometry(1, 64, 32);
 
 +  const indexTexture = loader.load('resources/data/world/country-index-texture.png', render);
 +  indexTexture.minFilter = THREE.NearestFilter;
@@ -372,7 +372,7 @@ of search and replacement strings and apply them to the shader in
 ```js
 {
   const loader = new THREE.TextureLoader();
-  const geometry = new THREE.SphereBufferGeometry(1, 64, 32);
+  const geometry = new THREE.SphereGeometry(1, 64, 32);
 
   const indexTexture = loader.load('resources/data/world/country-index-texture.png', render);
   indexTexture.minFilter = THREE.NearestFilter;
@@ -472,7 +472,7 @@ to `true`.
 And then we still need to set the uniforms on the material.
 
 ```js
-const geometry = new THREE.SphereBufferGeometry(1, 64, 32);
+const geometry = new THREE.SphereGeometry(1, 64, 32);
 const material = new THREE.MeshBasicMaterial({map: texture});
 material.onBeforeCompile = function(shader) {
   fragmentShaderReplacements.forEach((rep) => {

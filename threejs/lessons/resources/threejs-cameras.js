@@ -13,7 +13,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         const width = 8;
         const height = 8;
         const depth = 8;
-        return addShape('hsl(150,100%,40%)', new THREE.BoxBufferGeometry(width, height, depth));
+        return addShape('hsl(150,100%,40%)', new THREE.BoxGeometry(width, height, depth));
       },
     },
     shapeCone: {
@@ -21,7 +21,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         const radius = 6;
         const height = 8;
         const segments = 24;
-        return addShape('hsl(160,100%,40%)', new THREE.ConeBufferGeometry(radius, height, segments));
+        return addShape('hsl(160,100%,40%)', new THREE.ConeGeometry(radius, height, segments));
       },
     },
     shapeCylinder: {
@@ -30,7 +30,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         const radiusBottom = 4;
         const height = 8;
         const radialSegments = 24;
-        return addShape('hsl(170,100%,40%)', new THREE.CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments));
+        return addShape('hsl(170,100%,40%)', new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radialSegments));
       },
     },
     shapeSphere: {
@@ -38,7 +38,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         const radius = 5;
         const widthSegments = 24;
         const heightSegments = 16;
-        return addShape('hsl(180,100%,40%)', new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments));
+        return addShape('hsl(180,100%,40%)', new THREE.SphereGeometry(radius, widthSegments, heightSegments));
       },
     },
     shapeFrustum: {
@@ -46,7 +46,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         const width = 8;
         const height = 8;
         const depth = 8;
-        const geometry = new THREE.BoxBufferGeometry(width, height, depth);
+        const geometry = new THREE.BoxGeometry(width, height, depth);
         const perspMat = new THREE.Matrix4();
         perspMat.makePerspective(-3, 3, -3, 3, 4, 12);
         const inMat = new THREE.Matrix4();

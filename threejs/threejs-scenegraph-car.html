@@ -54,7 +54,7 @@ function main() {
   const carHeight = 1;
   const carLength = 8;
 
-  const bodyGeometry = new THREE.BoxBufferGeometry(carWidth, carHeight, carLength);
+  const bodyGeometry = new THREE.BoxGeometry(carWidth, carHeight, carLength);
   const bodyMaterial = new THREE.MeshPhongMaterial({color: 0x6688AA});
   const bodyMesh = new THREE.Mesh(bodyGeometry, bodyMaterial);
   scene.add(bodyMesh);
@@ -62,7 +62,7 @@ function main() {
   const wheelRadius = 1;
   const wheelThickness = .5;
   const wheelSegments = 6;
-  const wheelGeometry = new THREE.CylinderBufferGeometry(
+  const wheelGeometry = new THREE.CylinderGeometry(
       wheelRadius,     // top radius
       wheelRadius,     // bottom radius
       wheelThickness,  // height of cylinder

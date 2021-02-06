@@ -19,7 +19,7 @@ TOC: 사용자 지정 Geometry
 만드는 게 유리할 수 있을 겁니다.
 
 먼저 정육면체를 하나 만들어보겠습니다. 이미 원시 모델에 `BoxGeometry`와
-`BoxBufferGeometry`가 있긴 하지만, 기본 개념을 이해하는 데는 간단한 게
+`BoxGeometry`가 있긴 하지만, 기본 개념을 이해하는 데는 간단한 게
 훨씬 효과적일 테니까요.
 
 Three.js에서 사용자 지정 geometry는 `Geometry` 또는 `BufferGeometry`,

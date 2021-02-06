@@ -163,16 +163,16 @@ const scene = new THREE.Scene();
 +const bodyRadiusBottom = .2;
 +const bodyHeight = 2;
 +const bodyRadialSegments = 6;
-+const bodyGeometry = new THREE.CylinderBufferGeometry(
++const bodyGeometry = new THREE.CylinderGeometry(
 +    bodyRadiusTop, bodyRadiusBottom, bodyHeight, bodyRadialSegments);
 +
 +const headRadius = bodyRadiusTop * 0.8;
 +const headLonSegments = 12;
 +const headLatSegments = 5;
-+const headGeometry = new THREE.SphereBufferGeometry(
++const headGeometry = new THREE.SphereGeometry(
 +    headRadius, headLonSegments, headLatSegments);
 +
-+const labelGeometry = new THREE.PlaneBufferGeometry(1, 1);
++const labelGeometry = new THREE.PlaneGeometry(1, 1);
 ```
 
 다음으로 이 geometry들을 이용해 사람을 만드는 함수를 만듭니다.
@@ -350,7 +350,7 @@ function makeLabelCanvas(baseWidth, size, name) {
 
 +const forceTextureInitialization = function() {
 +  const material = new THREE.MeshBasicMaterial();
-+  const geometry = new THREE.PlaneBufferGeometry();
++  const geometry = new THREE.PlaneGeometry();
 +  const scene = new THREE.Scene();
 +  scene.add(new THREE.Mesh(geometry, material));
 +  const camera = new THREE.Camera();

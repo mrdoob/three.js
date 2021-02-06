@@ -73,7 +73,7 @@ a `MeshBasicMaterial` as we don't need lighting for the ground.
   const repeats = planeSize / 2;
   texture.repeat.set(repeats, repeats);
 
-  const planeGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
+  const planeGeo = new THREE.PlaneGeometry(planeSize, planeSize);
   const planeMat = new THREE.MeshBasicMaterial({
     map: texture,
     side: THREE.DoubleSide,
@@ -108,14 +108,14 @@ Then we'll make a sphere geometry
 const sphereRadius = 1;
 const sphereWidthDivisions = 32;
 const sphereHeightDivisions = 16;
-const sphereGeo = new THREE.SphereBufferGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
+const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
 ```
 
 And a plane geometry for the fake shadow
 
 ```js
 const planeSize = 1;
-const shadowGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
+const shadowGeo = new THREE.PlaneGeometry(planeSize, planeSize);
 ```
 
 Now we'll make a bunch of spheres. For each sphere we'll create a `base`
@@ -464,7 +464,7 @@ of the box don't z-fight.
 ```js
 {
   const cubeSize = 30;
-  const cubeGeo = new THREE.BoxBufferGeometry(cubeSize, cubeSize, cubeSize);
+  const cubeGeo = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
   const cubeMat = new THREE.MeshPhongMaterial({
     color: '#CCC',
     side: THREE.BackSide,

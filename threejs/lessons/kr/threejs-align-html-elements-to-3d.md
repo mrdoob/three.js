@@ -9,7 +9,7 @@ TOC: HTML 요소를 3D로 정렬하기
 
 * 3D 텍스트를 쓴다.
 
-    [원시 모델에 관한 글](threejs-primitives.html)을 보면 `TextBufferGeometry`로 3D 텍스트를 만든 예제를 찾을 수 있을 겁니다. 로고에 애니메이션을 준다던가 하는 경우에는 유용하지만 상태, 정보, 이름 등을 붙이는 경우라면 오히려 불편하겠죠.
+    [원시 모델에 관한 글](threejs-primitives.html)을 보면 `TextGeometry`로 3D 텍스트를 만든 예제를 찾을 수 있을 겁니다. 로고에 애니메이션을 준다던가 하는 경우에는 유용하지만 상태, 정보, 이름 등을 붙이는 경우라면 오히려 불편하겠죠.
 
 * 2D 텍스트로 텍스처를 만들어 렌더링한다.
 
@@ -374,7 +374,7 @@ min, max, lat, lon은 나라의 위도(latitude)와 경도(longitude)를 나타�
 {
   const loader = new THREE.TextureLoader();
   const texture = loader.load('resources/data/world/country-outlines-4k.png', render);
-  const geometry = new THREE.SphereBufferGeometry(1, 64, 32);
+  const geometry = new THREE.SphereGeometry(1, 64, 32);
   const material = new THREE.MeshBasicMaterial({ map: texture });
   scene.add(new THREE.Mesh(geometry, material));
 }

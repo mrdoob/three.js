@@ -24,7 +24,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
   function filterCube(scale, texture) {
     const size = 8;
-    const geometry = new THREE.BoxBufferGeometry(size, size, size);
+    const geometry = new THREE.BoxGeometry(size, size, size);
     const material = new THREE.MeshBasicMaterial({
       map: texture || filterTexture,
     });
@@ -42,7 +42,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
     const planeScene = new THREE.Scene();
 
-    const plane = new THREE.PlaneBufferGeometry(1, 1);
+    const plane = new THREE.PlaneGeometry(1, 1);
     const planeMaterial = new THREE.MeshBasicMaterial({
       map: renderTarget.texture,
     });
@@ -150,7 +150,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         const texture = await filterTexturePromise;
         const root = new THREE.Object3D();
         const depth = 50;
-        const plane = new THREE.PlaneBufferGeometry(1, depth);
+        const plane = new THREE.PlaneGeometry(1, depth);
         const mipmap = [];
         const numMips = 7;
         for (let i = 0; i < numMips; ++i) {

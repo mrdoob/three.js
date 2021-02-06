@@ -25,7 +25,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         for (let y = 0; y < height; ++y) {
           for (let z = 0; z < depth; ++z) {
             for (let x = 0; x < width; ++x) {
-              const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+              const geometry = new THREE.BoxGeometry(1, 1, 1);
               geometry.applyMatrix4((new THREE.Matrix4()).makeTranslation(x, y, z));
               geometries.push(geometry);
             }
@@ -49,7 +49,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
     },
     culledCubes: {
       create() {
-        const geometry = new THREE.BoxBufferGeometry(3, 2, 2, 3, 2, 2);
+        const geometry = new THREE.BoxGeometry(3, 2, 2, 3, 2, 2);
         const material = new THREE.MeshBasicMaterial({
           color: colors.wire,
           wireframe: true,

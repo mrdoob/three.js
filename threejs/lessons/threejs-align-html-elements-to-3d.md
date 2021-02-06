@@ -11,7 +11,7 @@ each with pluses and minuses.
 
 * Use 3D text
 
-  If you look at the [primitives article](threejs-primitives.html) you'll see `TextBufferGeometry` which
+  If you look at the [primitives article](threejs-primitives.html) you'll see `TextGeometry` which
   makes 3D text. This might be useful for flying logos but probably not so useful for stats, info,
   or labelling lots of things.
 
@@ -417,7 +417,7 @@ The first thing is to make a sphere and use the outline texture.
 {
   const loader = new THREE.TextureLoader();
   const texture = loader.load('resources/data/world/country-outlines-4k.png', render);
-  const geometry = new THREE.SphereBufferGeometry(1, 64, 32);
+  const geometry = new THREE.SphereGeometry(1, 64, 32);
   const material = new THREE.MeshBasicMaterial({map: texture});
   scene.add(new THREE.Mesh(geometry, material));
 }

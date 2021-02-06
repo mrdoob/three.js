@@ -11,7 +11,7 @@ TOC: HTML要素を3Dに揃える
 
 * 3Dテキストを使用する
 
-  [プリミティブの記事](threejs-primitives.html)を見ると `TextBufferGeometry` があり、3Dテキストが作れます。
+  [プリミティブの記事](threejs-primitives.html)を見ると `TextGeometry` があり、3Dテキストが作れます。
   ロゴを飛ばすには便利ですが、統計や情報、ラベル付けなどにはあまり便利でないかもしれません。
 
 * テキストが描かれたテクスチャを使用する
@@ -406,7 +406,7 @@ min、max、lat、lon、これは全て緯度と経度です。
 {
   const loader = new THREE.TextureLoader();
   const texture = loader.load('resources/data/world/country-outlines-4k.png', render);
-  const geometry = new THREE.SphereBufferGeometry(1, 64, 32);
+  const geometry = new THREE.SphereGeometry(1, 64, 32);
   const material = new THREE.MeshBasicMaterial({map: texture});
   scene.add(new THREE.Mesh(geometry, material));
 }

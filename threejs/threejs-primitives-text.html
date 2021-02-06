@@ -92,7 +92,7 @@ function main() {
 
     async function doit() {
       const font = await loadFont('resources/threejs/fonts/helvetiker_regular.typeface.json');   /* threejsfundamentals: url */
-      const geometry = new THREE.TextBufferGeometry('three.js', {
+      const geometry = new THREE.TextGeometry('three.js', {
         font: font,
         size: 3.0,
         height: .2,

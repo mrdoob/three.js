@@ -203,7 +203,7 @@ examples from the article on [making things responsive](threejs-responsive.html)
 Here's the code that adds a new `Mesh` every time we click the mouse
 
 ```js
-const geometry = new THREE.SphereBufferGeometry();
+const geometry = new THREE.SphereGeometry();
 const material = new THREE.MeshBasicMaterial({color: 'red'});
 
 const things = [];
