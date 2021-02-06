@@ -1786,7 +1786,14 @@ function WebGLRenderer( parameters ) {
 
 		if ( renderTarget ) {
 
-			isRenderTarget3D = renderTarget.is3D();
+			const texture = renderTarget.texture;
+
+			if ( texture.isDataTexture3D || texture.isDataTexture2DArray ) {
+
+				isRenderTarget3D = true;
+
+			}
+
 			const __webglFramebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
 			if ( renderTarget.isWebGLCubeRenderTarget ) {
