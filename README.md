@@ -4,7 +4,6 @@ three.js
 [![NPM Package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
 [![NPM Downloads][npm-downloads]][npmtrends-url]
-[![Dev Dependencies][dev-dependencies]][dev-dependencies-url]
 [![Language Grade][lgtm]][lgtm-url]
 
 #### JavaScript 3D library ####
@@ -83,7 +82,5 @@ git clone --depth=1 https://github.com/mrdoob/three.js.git
 [build-size-url]: https://bundlephobia.com/result?p=three
 [npm-downloads]: https://img.shields.io/npm/dw/three
 [npmtrends-url]: https://www.npmtrends.com/three
-[dev-dependencies]: https://img.shields.io/david/dev/mrdoob/three.js
-[dev-dependencies-url]: https://david-dm.org/mrdoob/three.js#info=devDependencies
 [lgtm]: https://img.shields.io/lgtm/alerts/github/mrdoob/three.js
 [lgtm-url]: https://lgtm.com/projects/g/mrdoob/three.js/
