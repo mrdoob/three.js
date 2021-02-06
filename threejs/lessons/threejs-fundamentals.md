@@ -487,3 +487,6 @@ see what you need to change. It would be too much work to maintain both an es6 m
 version of this site so going forward this site will only show es6 module style. As stated elsewhere,
 to support legacy browsers look into a <a href="https://babeljs.io">transpiler</a>.</p>
 </div>
+
+<!-- needed for out of date translations -->
+<a href="threejs-geometry.html"></a>
