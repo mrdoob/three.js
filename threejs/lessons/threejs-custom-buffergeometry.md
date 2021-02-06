@@ -432,6 +432,10 @@ I hope these were useful examples of how to use `BufferGeometry` directly to
 make your own geometry and how to dynamically update the contents of a
 `BufferAttribute`.
 
+<!-- needed to prevent warning from outdated translation -->
+<a href="resources/threejs-geometry.svg"></a>
+<a href="threejs-custom-geometry.html"></a>
+
 <canvas id="c"></canvas>
 <script type="module" src="resources/threejs-custom-buffergeometry.js"></script>
 
