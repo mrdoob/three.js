@@ -26602,18 +26602,21 @@
 		}
 	});
 
-	function AnimationLoader(manager) {
-		Loader.call(this, manager);
-	}
+	var AnimationLoader = /*#__PURE__*/function (_Loader) {
+		_inheritsLoose(AnimationLoader, _Loader);
 
-	AnimationLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-		constructor: AnimationLoader,
-		load: function load(url, onLoad, onProgress, onError) {
+		function AnimationLoader(manager) {
+			return _Loader.call(this, manager) || this;
+		}
+
+		var _proto = AnimationLoader.prototype;
+
+		_proto.load = function load(url, onLoad, onProgress, onError) {
 			var scope = this;
-			var loader = new FileLoader(scope.manager);
-			loader.setPath(scope.path);
-			loader.setRequestHeader(scope.requestHeader);
-			loader.setWithCredentials(scope.withCredentials);
+			var loader = new FileLoader(this.manager);
+			loader.setPath(this.path);
+			loader.setRequestHeader(this.requestHeader);
+			loader.setWithCredentials(this.withCredentials);
 			loader.load(url, function (text) {
 				try {
 					onLoad(scope.parse(JSON.parse(text)));
@@ -26627,8 +26630,9 @@
 					scope.manager.itemError(url);
 				}
 			}, onProgress, onError);
-		},
-		parse: function parse(json) {
+		};
+
+		_proto.parse = function parse(json) {
 			var animations = [];
 
 			for (var i = 0; i < json.length; i++) {
@@ -26637,8 +26641,10 @@
 			}
 
 			return animations;
-		}
-	});
+		};
+
+		return AnimationLoader;
+	}(Loader);
 
 	/**
 	 * Abstract Base class to block based textures loader (dds, pvr, ...)
@@ -26730,13 +26736,16 @@
 		}
 	});
 
-	function ImageLoader(manager) {
-		Loader.call(this, manager);
-	}
+	var ImageLoader = /*#__PURE__*/function (_Loader) {
+		_inheritsLoose(ImageLoader, _Loader);
 
-	ImageLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-		constructor: ImageLoader,
-		load: function load(url, onLoad, onProgress, onError) {
+		function ImageLoader(manager) {
+			return _Loader.call(this, manager) || this;
+		}
+
+		var _proto = ImageLoader.prototype;
+
+		_proto.load = function load(url, onLoad, onProgress, onError) {
 			if (this.path !== undefined) url = this.path + url;
 			url = this.manager.resolveURL(url);
 			var scope = this;
@@ -26779,16 +26788,21 @@
 			scope.manager.itemStart(url);
 			image.src = url;
 			return image;
+		};
+
+		return ImageLoader;
+	}(Loader);
+
+	var CubeTextureLoader = /*#__PURE__*/function (_Loader) {
+		_inheritsLoose(CubeTextureLoader, _Loader);
+
+		function CubeTextureLoader(manager) {
+			return _Loader.call(this, manager) || this;
 		}
-	});
 
-	function CubeTextureLoader(manager) {
-		Loader.call(this, manager);
-	}
+		var _proto = CubeTextureLoader.prototype;
 
-	CubeTextureLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-		constructor: CubeTextureLoader,
-		load: function load(urls, onLoad, onProgress, onError) {
+		_proto.load = function load(urls, onLoad, onProgress, onError) {
 			var texture = new CubeTexture();
 			var loader = new ImageLoader(this.manager);
 			loader.setCrossOrigin(this.crossOrigin);
@@ -26812,8 +26826,10 @@
 			}
 
 			return texture;
-		}
-	});
+		};
+
+		return CubeTextureLoader;
+	}(Loader);
 
 	/**
 	 * Abstract Base class to load generic binary textures formats (rgbe, hdr, ...)
@@ -29246,14 +29262,20 @@
 		}
 	});
 
-	function MaterialLoader(manager) {
-		Loader.call(this, manager);
-		this.textures = {};
-	}
+	var MaterialLoader = /*#__PURE__*/function (_Loader) {
+		_inheritsLoose(MaterialLoader, _Loader);
 
-	MaterialLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-		constructor: MaterialLoader,
-		load: function load(url, onLoad, onProgress, onError) {
+		function MaterialLoader(manager) {
+			var _this;
+
+			_this = _Loader.call(this, manager) || this;
+			_this.textures = {};
+			return _this;
+		}
+
+		var _proto = MaterialLoader.prototype;
+
+		_proto.load = function load(url, onLoad, onProgress, onError) {
 			var scope = this;
 			var loader = new FileLoader(scope.manager);
 			loader.setPath(scope.path);
@@ -29272,8 +29294,9 @@
 					scope.manager.itemError(url);
 				}
 			}, onProgress, onError);
-		},
-		parse: function parse(json) {
+		};
+
+		_proto.parse = function parse(json) {
 			var textures = this.textures;
 
 			function getTexture(name) {
@@ -29445,12 +29468,15 @@
 			if (json.transmission !== undefined) material.transmission = json.transmission;
 			if (json.transmissionMap !== undefined) material.transmissionMap = getTexture(json.transmissionMap);
 			return material;
-		},
-		setTextures: function setTextures(value) {
+		};
+
+		_proto.setTextures = function setTextures(value) {
 			this.textures = value;
 			return this;
-		}
-	});
+		};
+
+		return MaterialLoader;
+	}(Loader);
 
 	var LoaderUtils = {
 		decodeText: function decodeText(array) {
@@ -29534,13 +29560,16 @@
 		}
 	});
 
-	function BufferGeometryLoader(manager) {
-		Loader.call(this, manager);
-	}
+	var BufferGeometryLoader = /*#__PURE__*/function (_Loader) {
+		_inheritsLoose(BufferGeometryLoader, _Loader);
 
-	BufferGeometryLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-		constructor: BufferGeometryLoader,
-		load: function load(url, onLoad, onProgress, onError) {
+		function BufferGeometryLoader(manager) {
+			return _Loader.call(this, manager) || this;
+		}
+
+		var _proto = BufferGeometryLoader.prototype;
+
+		_proto.load = function load(url, onLoad, onProgress, onError) {
 			var scope = this;
 			var loader = new FileLoader(scope.manager);
 			loader.setPath(scope.path);
@@ -29559,8 +29588,9 @@
 					scope.manager.itemError(url);
 				}
 			}, onProgress, onError);
-		},
-		parse: function parse(json) {
+		};
+
+		_proto.parse = function parse(json) {
 			var interleavedBufferMap = {};
 			var arrayBufferMap = {};
 
@@ -29673,8 +29703,10 @@
 			if (json.name) geometry.name = json.name;
 			if (json.userData) geometry.userData = json.userData;
 			return geometry;
-		}
-	});
+		};
+
+		return BufferGeometryLoader;
+	}(Loader);
 
 	var ObjectLoader = /*#__PURE__*/function (_Loader) {
 		_inheritsLoose(ObjectLoader, _Loader);
@@ -30772,13 +30804,16 @@
 		};
 	}
 
-	function FontLoader(manager) {
-		Loader.call(this, manager);
-	}
+	var FontLoader = /*#__PURE__*/function (_Loader) {
+		_inheritsLoose(FontLoader, _Loader);
 
-	FontLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-		constructor: FontLoader,
-		load: function load(url, onLoad, onProgress, onError) {
+		function FontLoader(manager) {
+			return _Loader.call(this, manager) || this;
+		}
+
+		var _proto = FontLoader.prototype;
+
+		_proto.load = function load(url, onLoad, onProgress, onError) {
 			var scope = this;
 			var loader = new FileLoader(this.manager);
 			loader.setPath(this.path);
@@ -30797,11 +30832,14 @@
 				var font = scope.parse(json);
 				if (onLoad) onLoad(font);
 			}, onProgress, onError);
-		},
-		parse: function parse(json) {
+		};
+
+		_proto.parse = function parse(json) {
 			return new Font(json);
-		}
-	});
+		};
+
+		return FontLoader;
+	}(Loader);
 
 	var _context;
 
@@ -30818,19 +30856,22 @@
 		}
 	};
 
-	function AudioLoader(manager) {
-		Loader.call(this, manager);
-	}
+	var AudioLoader = /*#__PURE__*/function (_Loader) {
+		_inheritsLoose(AudioLoader, _Loader);
 
-	AudioLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-		constructor: AudioLoader,
-		load: function load(url, onLoad, onProgress, onError) {
+		function AudioLoader(manager) {
+			return _Loader.call(this, manager) || this;
+		}
+
+		var _proto = AudioLoader.prototype;
+
+		_proto.load = function load(url, onLoad, onProgress, onError) {
 			var scope = this;
-			var loader = new FileLoader(scope.manager);
+			var loader = new FileLoader(this.manager);
 			loader.setResponseType('arraybuffer');
-			loader.setPath(scope.path);
-			loader.setRequestHeader(scope.requestHeader);
-			loader.setWithCredentials(scope.withCredentials);
+			loader.setPath(this.path);
+			loader.setRequestHeader(this.requestHeader);
+			loader.setWithCredentials(this.withCredentials);
 			loader.load(url, function (buffer) {
 				try {
 					// Create a copy of the buffer. The `decodeAudioData` method
@@ -30850,8 +30891,10 @@
 					scope.manager.itemError(url);
 				}
 			}, onProgress, onError);
-		}
-	});
+		};
+
+		return AudioLoader;
+	}(Loader);
 
 	function HemisphereLightProbe(skyColor, groundColor, intensity) {
 		LightProbe.call(this, undefined, intensity);

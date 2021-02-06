@@ -34509,24 +34509,22 @@ FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 } );
 
-function AnimationLoader( manager ) {
+class AnimationLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-AnimationLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: AnimationLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
 
-		const loader = new FileLoader( scope.manager );
-		loader.setPath( scope.path );
-		loader.setRequestHeader( scope.requestHeader );
-		loader.setWithCredentials( scope.withCredentials );
+		const loader = new FileLoader( this.manager );
+		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -34551,9 +34549,9 @@ AnimationLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( json ) {
+	parse( json ) {
 
 		const animations = [];
 
@@ -34569,7 +34567,7 @@ AnimationLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 /**
  * Abstract Base class to block based textures loader (dds, pvr, ...)
@@ -34700,17 +34698,15 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 
 } );
 
-function ImageLoader( manager ) {
+class ImageLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: ImageLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		if ( this.path !== undefined ) url = this.path + url;
 
@@ -34780,19 +34776,17 @@ ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
-
-function CubeTextureLoader( manager ) {
-
-	Loader.call( this, manager );
-
 }
 
-CubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+class CubeTextureLoader extends Loader {
 
-	constructor: CubeTextureLoader,
+	constructor( manager ) {
 
-	load: function ( urls, onLoad, onProgress, onError ) {
+		super( manager );
+
+	}
+
+	load( urls, onLoad, onProgress, onError ) {
 
 		const texture = new CubeTexture();
 
@@ -34832,7 +34826,7 @@ CubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 	}
 
-} );
+}
 
 /**
  * Abstract Base class to load generic binary textures formats (rgbe, hdr, ...)
@@ -37893,19 +37887,16 @@ LightProbe.prototype = Object.assign( Object.create( Light.prototype ), {
 
 } );
 
-function MaterialLoader( manager ) {
+class MaterialLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.textures = {};
+		super( manager );
+		this.textures = {};
 
-}
+	}
 
-MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
-
-	constructor: MaterialLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
 
@@ -37937,9 +37928,9 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( json ) {
+	parse( json ) {
 
 		const textures = this.textures;
 
@@ -38168,16 +38159,16 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return material;
 
-	},
+	}
 
-	setTextures: function ( value ) {
+	setTextures( value ) {
 
 		this.textures = value;
 		return this;
 
 	}
 
-} );
+}
 
 const LoaderUtils = {
 
@@ -38320,17 +38311,15 @@ InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribu
 
 } );
 
-function BufferGeometryLoader( manager ) {
+class BufferGeometryLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: BufferGeometryLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
 
@@ -38362,9 +38351,9 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( json ) {
+	parse( json ) {
 
 		const interleavedBufferMap = {};
 		const arrayBufferMap = {};
@@ -38522,7 +38511,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 	}
 
-} );
+}
 
 class ObjectLoader extends Loader {
 
@@ -40161,17 +40150,15 @@ function createPath( char, scale, offsetX, offsetY, data ) {
 
 }
 
-function FontLoader( manager ) {
+class FontLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-FontLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: FontLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
 
@@ -40200,15 +40187,15 @@ FontLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( json ) {
+	parse( json ) {
 
 		return new Font( json );
 
 	}
 
-} );
+}
 
 let _context;
 
@@ -40234,25 +40221,23 @@ const AudioContext = {
 
 };
 
-function AudioLoader( manager ) {
+class AudioLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-AudioLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: AudioLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
 
-		const loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
-		loader.setPath( scope.path );
-		loader.setRequestHeader( scope.requestHeader );
-		loader.setWithCredentials( scope.withCredentials );
+		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			try {
@@ -40288,7 +40273,7 @@ AudioLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 function HemisphereLightProbe( skyColor, groundColor, intensity ) {
 
