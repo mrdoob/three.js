@@ -41,12 +41,6 @@ class FloatUniform extends WebGPUUniform {
 
 	}
 
-	getValue() {
-
-		return this.nodeUniform.value;
-
-	}
-
 }
 
 class Vector2Uniform extends WebGPUUniform {

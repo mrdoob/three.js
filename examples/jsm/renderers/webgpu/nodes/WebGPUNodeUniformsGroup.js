@@ -13,16 +13,7 @@ class WebGPUNodeUniformsGroup extends WebGPUUniformsGroup {
 
 		this.setVisibility( shaderStageVisibility );
 
-		//this.setOnBeforeUpdate( this._onBeforeUpdate );
-
 	}
-	/*
-	_onBeforeUpdate( object, camera ) {
-
-		const material = object.material;
-
-	}
-	*/
 
 }
 

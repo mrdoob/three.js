@@ -206,7 +206,7 @@ class WebGPUTextures {
 					depth: 1
 				},
 				format: colorTextureFormat,
-				usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.SAMPLED
+				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.SAMPLED
 			} );
 
 			this.info.memory.textures ++;
@@ -234,7 +234,7 @@ class WebGPUTextures {
 						depth: 1
 					},
 					format: depthTextureFormat,
-					usage: GPUTextureUsage.OUTPUT_ATTACHMENT
+					usage: GPUTextureUsage.RENDER_ATTACHMENT
 				} );
 
 				this.info.memory.textures ++;
@@ -320,9 +320,9 @@ class WebGPUTextures {
 
 		if ( needsMipmaps === true ) {
 
-			// current mipmap generation requires OUTPUT_ATTACHMENT
+			// current mipmap generation requires RENDER_ATTACHMENT
 
-			usage |= GPUTextureUsage.OUTPUT_ATTACHMENT;
+			usage |= GPUTextureUsage.RENDER_ATTACHMENT;
 
 		}
 
@@ -390,7 +390,7 @@ class WebGPUTextures {
 		const bytesPerTexel = this._getBytesPerTexel( format );
 		const bytesPerRow = Math.ceil( image.width * bytesPerTexel / 256 ) * 256;
 
-		this.device.defaultQueue.writeTexture(
+		this.device.queue.writeTexture(
 			{
 				texture: textureGPU,
 				mipLevel: 0
@@ -426,7 +426,7 @@ class WebGPUTextures {
 
 	_copyImageBitmapToTexture( image, textureGPU, origin = { x: 0, y: 0, z: 0 } ) {
 
-		this.device.defaultQueue.copyImageBitmapToTexture(
+		this.device.queue.copyImageBitmapToTexture(
 			{
 				imageBitmap: image
 			}, {
@@ -457,7 +457,7 @@ class WebGPUTextures {
 
 			const bytesPerRow = Math.ceil( width / blockData.width ) * blockData.byteLength;
 
-			this.device.defaultQueue.writeTexture(
+			this.device.queue.writeTexture(
 				{
 					texture: textureGPU,
 					mipLevel: i

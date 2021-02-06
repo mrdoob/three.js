@@ -785,7 +785,7 @@
 		Function("r", "regeneratorRuntime = r")(runtime);
 	}
 
-	var REVISION = '125';
+	var REVISION = '126dev';
 	var MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -2923,6 +2923,22 @@
 					y1 = src1[srcOffset1 + 1],
 					z1 = src1[srcOffset1 + 2],
 					w1 = src1[srcOffset1 + 3];
+
+			if (t === 0) {
+				dst[dstOffset + 0] = x0;
+				dst[dstOffset + 1] = y0;
+				dst[dstOffset + 2] = z0;
+				dst[dstOffset + 3] = w0;
+				return;
+			}
+
+			if (t === 1) {
+				dst[dstOffset + 0] = x1;
+				dst[dstOffset + 1] = y1;
+				dst[dstOffset + 2] = z1;
+				dst[dstOffset + 3] = w1;
+				return;
+			}
 
 			if (w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1) {
 				var s = 1 - t;
@@ -7021,7 +7037,6 @@
 		this.fog = true;
 		this.blending = NormalBlending;
 		this.side = FrontSide;
-		this.flatShading = false;
 		this.vertexColors = false;
 		this.opacity = 1;
 		this.transparent = false;
@@ -7201,7 +7216,6 @@
 			if (this.size !== undefined) data.size = this.size;
 			if (this.sizeAttenuation !== undefined) data.sizeAttenuation = this.sizeAttenuation;
 			if (this.blending !== NormalBlending) data.blending = this.blending;
-			if (this.flatShading === true) data.flatShading = this.flatShading;
 			if (this.side !== FrontSide) data.side = this.side;
 			if (this.vertexColors) data.vertexColors = true;
 			if (this.opacity < 1) data.opacity = this.opacity;
@@ -7236,6 +7250,7 @@
 			if (this.morphTargets === true) data.morphTargets = true;
 			if (this.morphNormals === true) data.morphNormals = true;
 			if (this.skinning === true) data.skinning = true;
+			if (this.flatShading === true) data.flatShading = this.flatShading;
 			if (this.visible === false) data.visible = false;
 			if (this.toneMapped === false) data.toneMapped = false;
 			if (JSON.stringify(this.userData) !== '{}') data.userData = this.userData; // TODO: Copied from Object3D.toJSON
@@ -7269,7 +7284,6 @@
 			this.fog = source.fog;
 			this.blending = source.blending;
 			this.side = source.side;
-			this.flatShading = source.flatShading;
 			this.vertexColors = source.vertexColors;
 			this.opacity = source.opacity;
 			this.transparent = source.transparent;
@@ -10660,7 +10674,7 @@
 
 	var bsdfs = "vec2 integrateSpecularBRDF( const in float dotNV, const in float roughness ) {\n\tconst vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );\n\tconst vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );\n\tvec4 r = roughness * c0 + c1;\n\tfloat a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;\n\treturn vec2( -1.04, 1.04 ) * a004 + r.zw;\n}\nfloat punctualLightIntensityToIrradianceFactor( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {\n#if defined ( PHYSICALLY_CORRECT_LIGHTS )\n\tfloat distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );\n\tif( cutoffDistance > 0.0 ) {\n\t\tdistanceFalloff *= pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );\n\t}\n\treturn distanceFalloff;\n#else\n\tif( cutoffDistance > 0.0 && decayExponent > 0.0 ) {\n\t\treturn pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );\n\t}\n\treturn 1.0;\n#endif\n}\nvec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\n\treturn RECIPROCAL_PI * diffuseColor;\n}\nvec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\n\tfloat fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\n\treturn ( 1.0 - specularColor ) * fresnel + specularColor;\n}\nvec3 F_Schlick_RoughnessDependent( const in vec3 F0, const in float dotNV, const in float roughness ) {\n\tfloat fresnel = exp2( ( -5.55473 * dotNV - 6.98316 ) * dotNV );\n\tvec3 Fr = max( vec3( 1.0 - roughness ), F0 ) - F0;\n\treturn Fr * fresnel + F0;\n}\nfloat G_GGX_Smith( const in float alpha, const in float dotNL, const in float dotNV ) {\n\tfloat a2 = pow2( alpha );\n\tfloat gl = dotNL + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\tfloat gv = dotNV + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\treturn 1.0 / ( gl * gv );\n}\nfloat G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {\n\tfloat a2 = pow2( alpha );\n\tfloat gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\tfloat gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\treturn 0.5 / max( gv + gl, EPSILON );\n}\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n\tfloat a2 = pow2( alpha );\n\tfloat denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0;\n\treturn RECIPROCAL_PI * a2 / pow2( denom );\n}\nvec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 viewDir, const in vec3 normal, const in vec3 specularColor, const in float roughness ) {\n\tfloat alpha = pow2( roughness );\n\tvec3 halfDir = normalize( incidentLight.direction + viewDir );\n\tfloat dotNL = saturate( dot( normal, incidentLight.direction ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\tfloat dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n\tvec3 F = F_Schlick( specularColor, dotLH );\n\tfloat G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\tfloat D = D_GGX( alpha, dotNH );\n\treturn F * ( G * D );\n}\nvec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {\n\tconst float LUT_SIZE = 64.0;\n\tconst float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;\n\tconst float LUT_BIAS = 0.5 / LUT_SIZE;\n\tfloat dotNV = saturate( dot( N, V ) );\n\tvec2 uv = vec2( roughness, sqrt( 1.0 - dotNV ) );\n\tuv = uv * LUT_SCALE + LUT_BIAS;\n\treturn uv;\n}\nfloat LTC_ClippedSphereFormFactor( const in vec3 f ) {\n\tfloat l = length( f );\n\treturn max( ( l * l + f.z ) / ( l + 1.0 ), 0.0 );\n}\nvec3 LTC_EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {\n\tfloat x = dot( v1, v2 );\n\tfloat y = abs( x );\n\tfloat a = 0.8543985 + ( 0.4965155 + 0.0145206 * y ) * y;\n\tfloat b = 3.4175940 + ( 4.1616724 + y ) * y;\n\tfloat v = a / b;\n\tfloat theta_sintheta = ( x > 0.0 ) ? v : 0.5 * inversesqrt( max( 1.0 - x * x, 1e-7 ) ) - v;\n\treturn cross( v1, v2 ) * theta_sintheta;\n}\nvec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in mat3 mInv, const in vec3 rectCoords[ 4 ] ) {\n\tvec3 v1 = rectCoords[ 1 ] - rectCoords[ 0 ];\n\tvec3 v2 = rectCoords[ 3 ] - rectCoords[ 0 ];\n\tvec3 lightNormal = cross( v1, v2 );\n\tif( dot( lightNormal, P - rectCoords[ 0 ] ) < 0.0 ) return vec3( 0.0 );\n\tvec3 T1, T2;\n\tT1 = normalize( V - N * dot( V, N ) );\n\tT2 = - cross( N, T1 );\n\tmat3 mat = mInv * transposeMat3( mat3( T1, T2, N ) );\n\tvec3 coords[ 4 ];\n\tcoords[ 0 ] = mat * ( rectCoords[ 0 ] - P );\n\tcoords[ 1 ] = mat * ( rectCoords[ 1 ] - P );\n\tcoords[ 2 ] = mat * ( rectCoords[ 2 ] - P );\n\tcoords[ 3 ] = mat * ( rectCoords[ 3 ] - P );\n\tcoords[ 0 ] = normalize( coords[ 0 ] );\n\tcoords[ 1 ] = normalize( coords[ 1 ] );\n\tcoords[ 2 ] = normalize( coords[ 2 ] );\n\tcoords[ 3 ] = normalize( coords[ 3 ] );\n\tvec3 vectorFormFactor = vec3( 0.0 );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 0 ], coords[ 1 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 1 ], coords[ 2 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 2 ], coords[ 3 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 3 ], coords[ 0 ] );\n\tfloat result = LTC_ClippedSphereFormFactor( vectorFormFactor );\n\treturn vec3( result );\n}\nvec3 BRDF_Specular_GGX_Environment( const in vec3 viewDir, const in vec3 normal, const in vec3 specularColor, const in float roughness ) {\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tvec2 brdf = integrateSpecularBRDF( dotNV, roughness );\n\treturn specularColor * brdf.x + brdf.y;\n}\nvoid BRDF_Specular_Multiscattering_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {\n\tfloat dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n\tvec3 F = F_Schlick_RoughnessDependent( specularColor, dotNV, roughness );\n\tvec2 brdf = integrateSpecularBRDF( dotNV, roughness );\n\tvec3 FssEss = F * brdf.x + brdf.y;\n\tfloat Ess = brdf.x + brdf.y;\n\tfloat Ems = 1.0 - Ess;\n\tvec3 Favg = specularColor + ( 1.0 - specularColor ) * 0.047619;\tvec3 Fms = FssEss * Favg / ( 1.0 - Ems * Favg );\n\tsingleScatter += FssEss;\n\tmultiScatter += Fms * Ems;\n}\nfloat G_BlinnPhong_Implicit( ) {\n\treturn 0.25;\n}\nfloat D_BlinnPhong( const in float shininess, const in float dotNH ) {\n\treturn RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\n}\nvec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\n\tvec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n\tfloat dotNH = saturate( dot( geometry.normal, halfDir ) );\n\tfloat dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n\tvec3 F = F_Schlick( specularColor, dotLH );\n\tfloat G = G_BlinnPhong_Implicit( );\n\tfloat D = D_BlinnPhong( shininess, dotNH );\n\treturn F * ( G * D );\n}\nfloat GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {\n\treturn ( 2.0 / pow2( ggxRoughness + 0.0001 ) - 2.0 );\n}\nfloat BlinnExponentToGGXRoughness( const in float blinnExponent ) {\n\treturn sqrt( 2.0 / ( blinnExponent + 2.0 ) );\n}\n#if defined( USE_SHEEN )\nfloat D_Charlie(float roughness, float NoH) {\n\tfloat invAlpha = 1.0 / roughness;\n\tfloat cos2h = NoH * NoH;\n\tfloat sin2h = max(1.0 - cos2h, 0.0078125);\treturn (2.0 + invAlpha) * pow(sin2h, invAlpha * 0.5) / (2.0 * PI);\n}\nfloat V_Neubelt(float NoV, float NoL) {\n\treturn saturate(1.0 / (4.0 * (NoL + NoV - NoL * NoV)));\n}\nvec3 BRDF_Specular_Sheen( const in float roughness, const in vec3 L, const in GeometricContext geometry, vec3 specularColor ) {\n\tvec3 N = geometry.normal;\n\tvec3 V = geometry.viewDir;\n\tvec3 H = normalize( V + L );\n\tfloat dotNH = saturate( dot( N, H ) );\n\treturn specularColor * D_Charlie( roughness, dotNH ) * V_Neubelt( dot(N, V), dot(N, L) );\n}\n#endif";
 
-	var bumpmap_pars_fragment = "#ifdef USE_BUMPMAP\n\tuniform sampler2D bumpMap;\n\tuniform float bumpScale;\n\tvec2 dHdxy_fwd() {\n\t\tvec2 dSTdx = dFdx( vUv );\n\t\tvec2 dSTdy = dFdy( vUv );\n\t\tfloat Hll = bumpScale * texture2D( bumpMap, vUv ).x;\n\t\tfloat dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;\n\t\tfloat dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;\n\t\treturn vec2( dBx, dBy );\n\t}\n\tvec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {\n\t\tvec3 vSigmaX = vec3( dFdx( surf_pos.x ), dFdx( surf_pos.y ), dFdx( surf_pos.z ) );\n\t\tvec3 vSigmaY = vec3( dFdy( surf_pos.x ), dFdy( surf_pos.y ), dFdy( surf_pos.z ) );\n\t\tvec3 vN = surf_norm;\n\t\tvec3 R1 = cross( vSigmaY, vN );\n\t\tvec3 R2 = cross( vN, vSigmaX );\n\t\tfloat fDet = dot( vSigmaX, R1 );\n\t\tfDet *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t\tvec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );\n\t\treturn normalize( abs( fDet ) * surf_norm - vGrad );\n\t}\n#endif";
+	var bumpmap_pars_fragment = "#ifdef USE_BUMPMAP\n\tuniform sampler2D bumpMap;\n\tuniform float bumpScale;\n\tvec2 dHdxy_fwd() {\n\t\tvec2 dSTdx = dFdx( vUv );\n\t\tvec2 dSTdy = dFdy( vUv );\n\t\tfloat Hll = bumpScale * texture2D( bumpMap, vUv ).x;\n\t\tfloat dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;\n\t\tfloat dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;\n\t\treturn vec2( dBx, dBy );\n\t}\n\tvec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy, float faceDirection ) {\n\t\tvec3 vSigmaX = vec3( dFdx( surf_pos.x ), dFdx( surf_pos.y ), dFdx( surf_pos.z ) );\n\t\tvec3 vSigmaY = vec3( dFdy( surf_pos.x ), dFdy( surf_pos.y ), dFdy( surf_pos.z ) );\n\t\tvec3 vN = surf_norm;\n\t\tvec3 R1 = cross( vSigmaY, vN );\n\t\tvec3 R2 = cross( vN, vSigmaX );\n\t\tfloat fDet = dot( vSigmaX, R1 ) * faceDirection;\n\t\tvec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );\n\t\treturn normalize( abs( fDet ) * surf_norm - vGrad );\n\t}\n#endif";
 
 	var clipping_planes_fragment = "#if NUM_CLIPPING_PLANES > 0\n\tvec4 plane;\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < UNION_CLIPPING_PLANES; i ++ ) {\n\t\tplane = clippingPlanes[ i ];\n\t\tif ( dot( vClipPosition, plane.xyz ) > plane.w ) discard;\n\t}\n\t#pragma unroll_loop_end\n\t#if UNION_CLIPPING_PLANES < NUM_CLIPPING_PLANES\n\t\tbool clipped = true;\n\t\t#pragma unroll_loop_start\n\t\tfor ( int i = UNION_CLIPPING_PLANES; i < NUM_CLIPPING_PLANES; i ++ ) {\n\t\t\tplane = clippingPlanes[ i ];\n\t\t\tclipped = ( dot( vClipPosition, plane.xyz ) > plane.w ) && clipped;\n\t\t}\n\t\t#pragma unroll_loop_end\n\t\tif ( clipped ) discard;\n\t#endif\n#endif";
 
@@ -10770,15 +10784,15 @@
 
 	var morphtarget_vertex = "#ifdef USE_MORPHTARGETS\n\ttransformed *= morphTargetBaseInfluence;\n\ttransformed += morphTarget0 * morphTargetInfluences[ 0 ];\n\ttransformed += morphTarget1 * morphTargetInfluences[ 1 ];\n\ttransformed += morphTarget2 * morphTargetInfluences[ 2 ];\n\ttransformed += morphTarget3 * morphTargetInfluences[ 3 ];\n\t#ifndef USE_MORPHNORMALS\n\t\ttransformed += morphTarget4 * morphTargetInfluences[ 4 ];\n\t\ttransformed += morphTarget5 * morphTargetInfluences[ 5 ];\n\t\ttransformed += morphTarget6 * morphTargetInfluences[ 6 ];\n\t\ttransformed += morphTarget7 * morphTargetInfluences[ 7 ];\n\t#endif\n#endif";
 
-	var normal_fragment_begin = "#ifdef FLAT_SHADED\n\tvec3 fdx = vec3( dFdx( vViewPosition.x ), dFdx( vViewPosition.y ), dFdx( vViewPosition.z ) );\n\tvec3 fdy = vec3( dFdy( vViewPosition.x ), dFdy( vViewPosition.y ), dFdy( vViewPosition.z ) );\n\tvec3 normal = normalize( cross( fdx, fdy ) );\n#else\n\tvec3 normal = normalize( vNormal );\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t#endif\n\t#ifdef USE_TANGENT\n\t\tvec3 tangent = normalize( vTangent );\n\t\tvec3 bitangent = normalize( vBitangent );\n\t\t#ifdef DOUBLE_SIDED\n\t\t\ttangent = tangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t\t\tbitangent = bitangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t\t#endif\n\t\t#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP )\n\t\t\tmat3 vTBN = mat3( tangent, bitangent, normal );\n\t\t#endif\n\t#endif\n#endif\nvec3 geometryNormal = normal;";
+	var normal_fragment_begin = "float faceDirection = float( gl_FrontFacing ) * 2.0 - 1.0;\n#ifdef FLAT_SHADED\n\tvec3 fdx = vec3( dFdx( vViewPosition.x ), dFdx( vViewPosition.y ), dFdx( vViewPosition.z ) );\n\tvec3 fdy = vec3( dFdy( vViewPosition.x ), dFdy( vViewPosition.y ), dFdy( vViewPosition.z ) );\n\tvec3 normal = normalize( cross( fdx, fdy ) );\n#else\n\tvec3 normal = normalize( vNormal );\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * faceDirection;\n\t#endif\n\t#ifdef USE_TANGENT\n\t\tvec3 tangent = normalize( vTangent );\n\t\tvec3 bitangent = normalize( vBitangent );\n\t\t#ifdef DOUBLE_SIDED\n\t\t\ttangent = tangent * faceDirection;\n\t\t\tbitangent = bitangent * faceDirection;\n\t\t#endif\n\t\t#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP )\n\t\t\tmat3 vTBN = mat3( tangent, bitangent, normal );\n\t\t#endif\n\t#endif\n#endif\nvec3 geometryNormal = normal;";
 
-	var normal_fragment_maps = "#ifdef OBJECTSPACE_NORMALMAP\n\tnormal = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\t#ifdef FLIP_SIDED\n\t\tnormal = - normal;\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t#endif\n\tnormal = normalize( normalMatrix * normal );\n#elif defined( TANGENTSPACE_NORMALMAP )\n\tvec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\tmapN.xy *= normalScale;\n\t#ifdef USE_TANGENT\n\t\tnormal = normalize( vTBN * mapN );\n\t#else\n\t\tnormal = perturbNormal2Arb( -vViewPosition, normal, mapN );\n\t#endif\n#elif defined( USE_BUMPMAP )\n\tnormal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );\n#endif";
+	var normal_fragment_maps = "#ifdef OBJECTSPACE_NORMALMAP\n\tnormal = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\t#ifdef FLIP_SIDED\n\t\tnormal = - normal;\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * faceDirection;\n\t#endif\n\tnormal = normalize( normalMatrix * normal );\n#elif defined( TANGENTSPACE_NORMALMAP )\n\tvec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\tmapN.xy *= normalScale;\n\t#ifdef USE_TANGENT\n\t\tnormal = normalize( vTBN * mapN );\n\t#else\n\t\tnormal = perturbNormal2Arb( -vViewPosition, normal, mapN, faceDirection );\n\t#endif\n#elif defined( USE_BUMPMAP )\n\tnormal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd(), faceDirection );\n#endif";
 
-	var normalmap_pars_fragment = "#ifdef USE_NORMALMAP\n\tuniform sampler2D normalMap;\n\tuniform vec2 normalScale;\n#endif\n#ifdef OBJECTSPACE_NORMALMAP\n\tuniform mat3 normalMatrix;\n#endif\n#if ! defined ( USE_TANGENT ) && ( defined ( TANGENTSPACE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP ) )\n\tvec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 mapN ) {\n\t\tvec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );\n\t\tvec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );\n\t\tvec2 st0 = dFdx( vUv.st );\n\t\tvec2 st1 = dFdy( vUv.st );\n\t\tfloat scale = sign( st1.t * st0.s - st0.t * st1.s );\n\t\tvec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );\n\t\tvec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );\n\t\tvec3 N = normalize( surf_norm );\n\t\tmat3 tsn = mat3( S, T, N );\n\t\tmapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t\treturn normalize( tsn * mapN );\n\t}\n#endif";
+	var normalmap_pars_fragment = "#ifdef USE_NORMALMAP\n\tuniform sampler2D normalMap;\n\tuniform vec2 normalScale;\n#endif\n#ifdef OBJECTSPACE_NORMALMAP\n\tuniform mat3 normalMatrix;\n#endif\n#if ! defined ( USE_TANGENT ) && ( defined ( TANGENTSPACE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP ) )\n\tvec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 mapN, float faceDirection ) {\n\t\tvec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );\n\t\tvec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );\n\t\tvec2 st0 = dFdx( vUv.st );\n\t\tvec2 st1 = dFdy( vUv.st );\n\t\tfloat scale = sign( st1.t * st0.s - st0.t * st1.s );\n\t\tvec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );\n\t\tvec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );\n\t\tvec3 N = normalize( surf_norm );\n\t\tmat3 tsn = mat3( S, T, N );\n\t\tmapN.xy *= faceDirection;\n\t\treturn normalize( tsn * mapN );\n\t}\n#endif";
 
 	var clearcoat_normal_fragment_begin = "#ifdef CLEARCOAT\n\tvec3 clearcoatNormal = geometryNormal;\n#endif";
 
-	var clearcoat_normal_fragment_maps = "#ifdef USE_CLEARCOAT_NORMALMAP\n\tvec3 clearcoatMapN = texture2D( clearcoatNormalMap, vUv ).xyz * 2.0 - 1.0;\n\tclearcoatMapN.xy *= clearcoatNormalScale;\n\t#ifdef USE_TANGENT\n\t\tclearcoatNormal = normalize( vTBN * clearcoatMapN );\n\t#else\n\t\tclearcoatNormal = perturbNormal2Arb( - vViewPosition, clearcoatNormal, clearcoatMapN );\n\t#endif\n#endif";
+	var clearcoat_normal_fragment_maps = "#ifdef USE_CLEARCOAT_NORMALMAP\n\tvec3 clearcoatMapN = texture2D( clearcoatNormalMap, vUv ).xyz * 2.0 - 1.0;\n\tclearcoatMapN.xy *= clearcoatNormalScale;\n\t#ifdef USE_TANGENT\n\t\tclearcoatNormal = normalize( vTBN * clearcoatMapN );\n\t#else\n\t\tclearcoatNormal = perturbNormal2Arb( - vViewPosition, clearcoatNormal, clearcoatMapN, faceDirection );\n\t#endif\n#endif";
 
 	var clearcoat_pars_fragment = "#ifdef USE_CLEARCOATMAP\n\tuniform sampler2D clearcoatMap;\n#endif\n#ifdef USE_CLEARCOAT_ROUGHNESSMAP\n\tuniform sampler2D clearcoatRoughnessMap;\n#endif\n#ifdef USE_CLEARCOAT_NORMALMAP\n\tuniform sampler2D clearcoatNormalMap;\n\tuniform vec2 clearcoatNormalScale;\n#endif";
 
@@ -12112,9 +12126,9 @@
 
 		function getMaxAnisotropy() {
 			if (maxAnisotropy !== undefined) return maxAnisotropy;
-			var extension = extensions.get('EXT_texture_filter_anisotropic');
 
-			if (extension !== null) {
+			if (extensions.has('EXT_texture_filter_anisotropic') === true) {
+				var extension = extensions.get('EXT_texture_filter_anisotropic');
 				maxAnisotropy = gl.getParameter(extension.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
 			} else {
 				maxAnisotropy = 0;
@@ -12164,7 +12178,7 @@
 		var maxVaryings = gl.getParameter(36348);
 		var maxFragmentUniforms = gl.getParameter(36349);
 		var vertexTextures = maxVertexTextures > 0;
-		var floatFragmentTextures = isWebGL2 || !!extensions.get('OES_texture_float');
+		var floatFragmentTextures = isWebGL2 || extensions.has('OES_texture_float');
 		var floatVertexTextures = vertexTextures && floatFragmentTextures;
 		var maxSamples = isWebGL2 ? gl.getParameter(36183) : 0;
 		return {
@@ -14165,7 +14179,7 @@
 				fog: !!fog,
 				useFog: material.fog,
 				fogExp2: fog && fog.isFogExp2,
-				flatShading: material.flatShading,
+				flatShading: !!material.flatShading,
 				sizeAttenuation: material.sizeAttenuation,
 				logarithmicDepthBuffer: logarithmicDepthBuffer,
 				skinning: material.skinning && maxBones > 0,
@@ -16354,11 +16368,11 @@
 				}
 			}
 
-			var extension = extensions.get('EXT_texture_filter_anisotropic');
+			if (extensions.has('EXT_texture_filter_anisotropic') === true) {
+				var extension = extensions.get('EXT_texture_filter_anisotropic');
+				if (texture.type === FloatType && extensions.has('OES_texture_float_linear') === false) return; // verify extension for WebGL 1 and WebGL 2
 
-			if (extension) {
-				if (texture.type === FloatType && extensions.get('OES_texture_float_linear') === null) return;
-				if (texture.type === HalfFloatType && (isWebGL2 || extensions.get('OES_texture_half_float_linear')) === null) return;
+				if (isWebGL2 === false && texture.type === HalfFloatType && extensions.has('OES_texture_half_float_linear') === false) return; // verify extension for WebGL 1 only
 
 				if (texture.anisotropy > 1 || properties.get(texture).__currentAnisotropy) {
 					_gl.texParameterf(textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(texture.anisotropy, capabilities.getMaxAnisotropy()));
@@ -20143,10 +20157,6 @@
 	var _matrix$1 = new Matrix4();
 
 	function SkinnedMesh(geometry, material) {
-		if (geometry && geometry.isGeometry) {
-			console.error('THREE.SkinnedMesh no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
-		}
-
 		Mesh.call(this, geometry, material);
 		this.type = 'SkinnedMesh';
 		this.bindMode = 'attached';
@@ -24140,7 +24150,9 @@
 	 *
 	 *	skinning: <bool>,
 	 *	morphTargets: <bool>,
-	 *	morphNormals: <bool>
+	 *	morphNormals: <bool>,
+	 *
+	 *	flatShading: <bool>
 	 * }
 	 */
 
@@ -24183,6 +24195,7 @@
 		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
+		this.flatShading = false;
 		this.vertexTangents = false;
 		this.setValues(parameters);
 	}
@@ -24228,6 +24241,7 @@
 		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
+		this.flatShading = source.flatShading;
 		this.vertexTangents = source.vertexTangents;
 		return this;
 	};
@@ -24354,7 +24368,9 @@
 	 *
 	 *	skinning: <bool>,
 	 *	morphTargets: <bool>,
-	 *	morphNormals: <bool>
+	 *	morphNormals: <bool>,
+	 *
+	 *	flatShading: <bool>
 	 * }
 	 */
 
@@ -24394,6 +24410,7 @@
 		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
+		this.flatShading = false;
 		this.setValues(parameters);
 	}
 
@@ -24435,6 +24452,7 @@
 		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
+		this.flatShading = source.flatShading;
 		return this;
 	};
 
@@ -24567,7 +24585,9 @@
 	 *
 	 *	skinning: <bool>,
 	 *	morphTargets: <bool>,
-	 *	morphNormals: <bool>
+	 *	morphNormals: <bool>,
+	 *
+	 *	flatShading: <bool>
 	 * }
 	 */
 
@@ -24588,6 +24608,7 @@
 		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
+		this.flatShading = false;
 		this.setValues(parameters);
 	}
 
@@ -24610,6 +24631,7 @@
 		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
+		this.flatShading = source.flatShading;
 		return this;
 	};
 
@@ -24733,6 +24755,8 @@
 	 *	skinning: <bool>,
 	 *	morphTargets: <bool>,
 	 *	morphNormals: <bool>
+	 *
+	 *	flatShading: <bool>
 	 * }
 	 */
 
@@ -24758,6 +24782,7 @@
 		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
+		this.flatShading = false;
 		this.setValues(parameters);
 	}
 
@@ -24785,6 +24810,7 @@
 		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
+		this.flatShading = source.flatShading;
 		return this;
 	};
 
@@ -27968,19 +27994,27 @@
 	 *	curves, but retains the api of a curve
 	 **************************************************************/
 
-	function CurvePath() {
-		Curve.call(this);
-		this.type = 'CurvePath';
-		this.curves = [];
-		this.autoClose = false; // Automatically closes the path
-	}
+	var CurvePath = /*#__PURE__*/function (_Curve) {
+		_inheritsLoose(CurvePath, _Curve);
 
-	CurvePath.prototype = Object.assign(Object.create(Curve.prototype), {
-		constructor: CurvePath,
-		add: function add(curve) {
+		function CurvePath() {
+			var _this;
+
+			_this = _Curve.call(this) || this;
+			_this.type = 'CurvePath';
+			_this.curves = [];
+			_this.autoClose = false; // Automatically closes the path
+
+			return _this;
+		}
+
+		var _proto = CurvePath.prototype;
+
+		_proto.add = function add(curve) {
 			this.curves.push(curve);
-		},
-		closePath: function closePath() {
+		};
+
+		_proto.closePath = function closePath() {
 			// Add a line curve if start and end of lines are not connected
 			var startPoint = this.curves[0].getPoint(0);
 			var endPoint = this.curves[this.curves.length - 1].getPoint(1);
@@ -27988,15 +28022,16 @@
 			if (!startPoint.equals(endPoint)) {
 				this.curves.push(new LineCurve(endPoint, startPoint));
 			}
-		},
-		// To get accurate point with reference to
+		} // To get accurate point with reference to
 		// entire path distance at time t,
 		// following has to be done:
 		// 1. Length of each sub path have to be known
 		// 2. Locate and identify type of curve
 		// 3. Get t for the curve
 		// 4. Return curve.getPointAt(t')
-		getPoint: function getPoint(t) {
+		;
+
+		_proto.getPoint = function getPoint(t) {
 			var d = t * this.getLength();
 			var curveLengths = this.getCurveLengths();
 			var i = 0; // To think about boundaries points.
@@ -28014,23 +28049,26 @@
 			}
 
 			return null; // loop where sum != 0, sum > d , sum+1 <d
-		},
-		// We cannot use the default THREE.Curve getPoint() with getLength() because in
+		} // We cannot use the default THREE.Curve getPoint() with getLength() because in
 		// THREE.Curve, getLength() depends on getPoint() but in THREE.CurvePath
 		// getPoint() depends on getLength
-		getLength: function getLength() {
+		;
+
+		_proto.getLength = function getLength() {
 			var lens = this.getCurveLengths();
 			return lens[lens.length - 1];
-		},
-		// cacheLengths must be recalculated.
-		updateArcLengths: function updateArcLengths() {
+		} // cacheLengths must be recalculated.
+		;
+
+		_proto.updateArcLengths = function updateArcLengths() {
 			this.needsUpdate = true;
 			this.cacheLengths = null;
 			this.getCurveLengths();
-		},
-		// Compute lengths and cache them
+		} // Compute lengths and cache them
 		// We cannot overwrite getLengths() because UtoT mapping uses it.
-		getCurveLengths: function getCurveLengths() {
+		;
+
+		_proto.getCurveLengths = function getCurveLengths() {
 			// We use cache values if curves and cache array are same length
 			if (this.cacheLengths && this.cacheLengths.length === this.curves.length) {
 				return this.cacheLengths;
@@ -28048,8 +28086,9 @@
 
 			this.cacheLengths = lengths;
 			return lengths;
-		},
-		getSpacedPoints: function getSpacedPoints(divisions) {
+		};
+
+		_proto.getSpacedPoints = function getSpacedPoints(divisions) {
 			if (divisions === void 0) {
 				divisions = 40;
 			}
@@ -28065,8 +28104,9 @@
 			}
 
 			return points;
-		},
-		getPoints: function getPoints(divisions) {
+		};
+
+		_proto.getPoints = function getPoints(divisions) {
 			if (divisions === void 0) {
 				divisions = 12;
 			}
@@ -28093,9 +28133,11 @@
 			}
 
 			return points;
-		},
-		copy: function copy(source) {
-			Curve.prototype.copy.call(this, source);
+		};
+
+		_proto.copy = function copy(source) {
+			_Curve.prototype.copy.call(this, source);
+
 			this.curves = [];
 
 			for (var i = 0, l = source.curves.length; i < l; i++) {
@@ -28105,9 +28147,11 @@
 
 			this.autoClose = source.autoClose;
 			return this;
-		},
-		toJSON: function toJSON() {
-			var data = Curve.prototype.toJSON.call(this);
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = _Curve.prototype.toJSON.call(this);
+
 			data.autoClose = this.autoClose;
 			data.curves = [];
 
@@ -28117,9 +28161,11 @@
 			}
 
 			return data;
-		},
-		fromJSON: function fromJSON(json) {
-			Curve.prototype.fromJSON.call(this, json);
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			_Curve.prototype.fromJSON.call(this, json);
+
 			this.autoClose = json.autoClose;
 			this.curves = [];
 
@@ -28129,22 +28175,31 @@
 			}
 
 			return this;
+		};
+
+		return CurvePath;
+	}(Curve);
+
+	var Path = /*#__PURE__*/function (_CurvePath) {
+		_inheritsLoose(Path, _CurvePath);
+
+		function Path(points) {
+			var _this;
+
+			_this = _CurvePath.call(this) || this;
+			_this.type = 'Path';
+			_this.currentPoint = new Vector2();
+
+			if (points) {
+				_this.setFromPoints(points);
+			}
+
+			return _this;
 		}
-	});
 
-	function Path(points) {
-		CurvePath.call(this);
-		this.type = 'Path';
-		this.currentPoint = new Vector2();
+		var _proto = Path.prototype;
 
-		if (points) {
-			this.setFromPoints(points);
-		}
-	}
-
-	Path.prototype = Object.assign(Object.create(CurvePath.prototype), {
-		constructor: Path,
-		setFromPoints: function setFromPoints(points) {
+		_proto.setFromPoints = function setFromPoints(points) {
 			this.moveTo(points[0].x, points[0].y);
 
 			for (var i = 1, l = points.length; i < l; i++) {
@@ -28152,31 +28207,36 @@
 			}
 
 			return this;
-		},
-		moveTo: function moveTo(x, y) {
+		};
+
+		_proto.moveTo = function moveTo(x, y) {
 			this.currentPoint.set(x, y); // TODO consider referencing vectors instead of copying?
 
 			return this;
-		},
-		lineTo: function lineTo(x, y) {
+		};
+
+		_proto.lineTo = function lineTo(x, y) {
 			var curve = new LineCurve(this.currentPoint.clone(), new Vector2(x, y));
 			this.curves.push(curve);
 			this.currentPoint.set(x, y);
 			return this;
-		},
-		quadraticCurveTo: function quadraticCurveTo(aCPx, aCPy, aX, aY) {
+		};
+
+		_proto.quadraticCurveTo = function quadraticCurveTo(aCPx, aCPy, aX, aY) {
 			var curve = new QuadraticBezierCurve(this.currentPoint.clone(), new Vector2(aCPx, aCPy), new Vector2(aX, aY));
 			this.curves.push(curve);
 			this.currentPoint.set(aX, aY);
 			return this;
-		},
-		bezierCurveTo: function bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY) {
+		};
+
+		_proto.bezierCurveTo = function bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY) {
 			var curve = new CubicBezierCurve(this.currentPoint.clone(), new Vector2(aCP1x, aCP1y), new Vector2(aCP2x, aCP2y), new Vector2(aX, aY));
 			this.curves.push(curve);
 			this.currentPoint.set(aX, aY);
 			return this;
-		},
-		splineThru: function splineThru(pts
+		};
+
+		_proto.splineThru = function splineThru(pts
 		/*Array of Vector*/
 		) {
 			var npts = [this.currentPoint.clone()].concat(pts);
@@ -28184,24 +28244,28 @@
 			this.curves.push(curve);
 			this.currentPoint.copy(pts[pts.length - 1]);
 			return this;
-		},
-		arc: function arc(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
+		};
+
+		_proto.arc = function arc(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
 			var x0 = this.currentPoint.x;
 			var y0 = this.currentPoint.y;
 			this.absarc(aX + x0, aY + y0, aRadius, aStartAngle, aEndAngle, aClockwise);
 			return this;
-		},
-		absarc: function absarc(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
+		};
+
+		_proto.absarc = function absarc(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
 			this.absellipse(aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise);
 			return this;
-		},
-		ellipse: function ellipse(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
+		};
+
+		_proto.ellipse = function ellipse(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
 			var x0 = this.currentPoint.x;
 			var y0 = this.currentPoint.y;
 			this.absellipse(aX + x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation);
 			return this;
-		},
-		absellipse: function absellipse(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
+		};
+
+		_proto.absellipse = function absellipse(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
 			var curve = new EllipseCurve(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation);
 
 			if (this.curves.length > 0) {
@@ -28217,34 +28281,48 @@
 			var lastPoint = curve.getPoint(1);
 			this.currentPoint.copy(lastPoint);
 			return this;
-		},
-		copy: function copy(source) {
-			CurvePath.prototype.copy.call(this, source);
+		};
+
+		_proto.copy = function copy(source) {
+			_CurvePath.prototype.copy.call(this, source);
+
 			this.currentPoint.copy(source.currentPoint);
 			return this;
-		},
-		toJSON: function toJSON() {
-			var data = CurvePath.prototype.toJSON.call(this);
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = _CurvePath.prototype.toJSON.call(this);
+
 			data.currentPoint = this.currentPoint.toArray();
 			return data;
-		},
-		fromJSON: function fromJSON(json) {
-			CurvePath.prototype.fromJSON.call(this, json);
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			_CurvePath.prototype.fromJSON.call(this, json);
+
 			this.currentPoint.fromArray(json.currentPoint);
 			return this;
+		};
+
+		return Path;
+	}(CurvePath);
+
+	var Shape = /*#__PURE__*/function (_Path) {
+		_inheritsLoose(Shape, _Path);
+
+		function Shape(points) {
+			var _this;
+
+			_this = _Path.call(this, points) || this;
+			_this.uuid = MathUtils.generateUUID();
+			_this.type = 'Shape';
+			_this.holes = [];
+			return _this;
 		}
-	});
 
-	function Shape(points) {
-		Path.call(this, points);
-		this.uuid = MathUtils.generateUUID();
-		this.type = 'Shape';
-		this.holes = [];
-	}
+		var _proto = Shape.prototype;
 
-	Shape.prototype = Object.assign(Object.create(Path.prototype), {
-		constructor: Shape,
-		getPointsHoles: function getPointsHoles(divisions) {
+		_proto.getPointsHoles = function getPointsHoles(divisions) {
 			var holesPts = [];
 
 			for (var i = 0, l = this.holes.length; i < l; i++) {
@@ -28252,16 +28330,19 @@
 			}
 
 			return holesPts;
-		},
-		// get points of shape and holes (keypoints based on segments parameter)
-		extractPoints: function extractPoints(divisions) {
+		} // get points of shape and holes (keypoints based on segments parameter)
+		;
+
+		_proto.extractPoints = function extractPoints(divisions) {
 			return {
 				shape: this.getPoints(divisions),
 				holes: this.getPointsHoles(divisions)
 			};
-		},
-		copy: function copy(source) {
-			Path.prototype.copy.call(this, source);
+		};
+
+		_proto.copy = function copy(source) {
+			_Path.prototype.copy.call(this, source);
+
 			this.holes = [];
 
 			for (var i = 0, l = source.holes.length; i < l; i++) {
@@ -28270,9 +28351,11 @@
 			}
 
 			return this;
-		},
-		toJSON: function toJSON() {
-			var data = Path.prototype.toJSON.call(this);
+		};
+
+		_proto.toJSON = function toJSON() {
+			var data = _Path.prototype.toJSON.call(this);
+
 			data.uuid = this.uuid;
 			data.holes = [];
 
@@ -28282,9 +28365,11 @@
 			}
 
 			return data;
-		},
-		fromJSON: function fromJSON(json) {
-			Path.prototype.fromJSON.call(this, json);
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
+			_Path.prototype.fromJSON.call(this, json);
+
 			this.uuid = json.uuid;
 			this.holes = [];
 
@@ -28294,8 +28379,10 @@
 			}
 
 			return this;
-		}
-	});
+		};
+
+		return Shape;
+	}(Path);
 
 	function Light(color, intensity) {
 		if (intensity === void 0) {
@@ -30178,37 +30265,44 @@
 		}
 	});
 
-	function ShapePath() {
-		this.type = 'ShapePath';
-		this.color = new Color();
-		this.subPaths = [];
-		this.currentPath = null;
-	}
+	var ShapePath = /*#__PURE__*/function () {
+		function ShapePath() {
+			this.type = 'ShapePath';
+			this.color = new Color();
+			this.subPaths = [];
+			this.currentPath = null;
+		}
 
-	Object.assign(ShapePath.prototype, {
-		moveTo: function moveTo(x, y) {
+		var _proto = ShapePath.prototype;
+
+		_proto.moveTo = function moveTo(x, y) {
 			this.currentPath = new Path();
 			this.subPaths.push(this.currentPath);
 			this.currentPath.moveTo(x, y);
 			return this;
-		},
-		lineTo: function lineTo(x, y) {
+		};
+
+		_proto.lineTo = function lineTo(x, y) {
 			this.currentPath.lineTo(x, y);
 			return this;
-		},
-		quadraticCurveTo: function quadraticCurveTo(aCPx, aCPy, aX, aY) {
+		};
+
+		_proto.quadraticCurveTo = function quadraticCurveTo(aCPx, aCPy, aX, aY) {
 			this.currentPath.quadraticCurveTo(aCPx, aCPy, aX, aY);
 			return this;
-		},
-		bezierCurveTo: function bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY) {
+		};
+
+		_proto.bezierCurveTo = function bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY) {
 			this.currentPath.bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY);
 			return this;
-		},
-		splineThru: function splineThru(pts) {
+		};
+
+		_proto.splineThru = function splineThru(pts) {
 			this.currentPath.splineThru(pts);
 			return this;
-		},
-		toShapes: function toShapes(isCCW, noHoles) {
+		};
+
+		_proto.toShapes = function toShapes(isCCW, noHoles) {
 			function toShapesNoHoles(inSubpaths) {
 				var shapes = [];
 
@@ -30383,8 +30477,10 @@
 
 
 			return shapes;
-		}
-	});
+		};
+
+		return ShapePath;
+	}();
 
 	var Font = /*#__PURE__*/function () {
 		function Font(data) {
@@ -36751,27 +36847,8 @@
 	CubeCamera.prototype.clear = function (renderer, color, depth, stencil) {
 		console.warn('THREE.CubeCamera: .clear() is now .renderTarget.clear().');
 		return this.renderTarget.clear(renderer, color, depth, stencil);
-	}; //
-
-
-	var GeometryUtils = {
-		merge: function merge(geometry1, geometry2, materialIndexOffset) {
-			console.warn('THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.');
-			var matrix;
-
-			if (geometry2.isMesh) {
-				geometry2.matrixAutoUpdate && geometry2.updateMatrix();
-				matrix = geometry2.matrix;
-				geometry2 = geometry2.geometry;
-			}
-
-			geometry1.merge(geometry2, matrix, materialIndexOffset);
-		},
-		center: function center(geometry) {
-			console.warn('THREE.GeometryUtils: .center() has been moved to Geometry. Use geometry.center() instead.');
-			return geometry.center();
-		}
 	};
+
 	ImageUtils.crossOrigin = undefined;
 
 	ImageUtils.loadTexture = function (url, mapping, onLoad, onError) {
@@ -36984,7 +37061,6 @@
 	exports.GLSL1 = GLSL1;
 	exports.GLSL3 = GLSL3;
 	exports.GammaEncoding = GammaEncoding;
-	exports.GeometryUtils = GeometryUtils;
 	exports.GreaterDepth = GreaterDepth;
 	exports.GreaterEqualDepth = GreaterEqualDepth;
 	exports.GreaterEqualStencilFunc = GreaterEqualStencilFunc;
