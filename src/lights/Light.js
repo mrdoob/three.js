@@ -13,8 +13,6 @@ class Light extends Object3D {
 		this.color = new Color( color );
 		this.intensity = intensity;
 
-		this.receiveShadow = undefined;
-
 	}
 
 	copy( source ) {

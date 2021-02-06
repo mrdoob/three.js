@@ -9,8 +9,6 @@ class AmbientLight extends Light {
 		this.type = 'AmbientLight';
 		Object.defineProperty( this, 'isAmbientLight', { value: true } );
 
-		this.castShadow = undefined;
-
 	}
 
 }
