@@ -2801,6 +2801,7 @@
 			});
 			_this.width = width;
 			_this.height = height;
+			_this.depth = 1;
 			_this.scissor = new Vector4(0, 0, width, height);
 			_this.scissorTest = false;
 			_this.viewport = new Vector4(0, 0, width, height);
@@ -2809,6 +2810,7 @@
 			_this.texture.image = {};
 			_this.texture.image.width = width;
 			_this.texture.image.height = height;
+			_this.texture.image.depth = 1;
 			_this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
 			_this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 			_this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
@@ -2819,12 +2821,27 @@
 
 		var _proto = WebGLRenderTarget.prototype;
 
-		_proto.setSize = function setSize(width, height) {
-			if (this.width !== width || this.height !== height) {
+		_proto.setTexture = function setTexture(texture) {
+			texture.image = {
+				width: this.width,
+				height: this.height,
+				depth: this.depth
+			};
+			this.texture = texture;
+		};
+
+		_proto.setSize = function setSize(width, height, depth) {
+			if (depth === void 0) {
+				depth = 1;
+			}
+
+			if (this.width !== width || this.height !== height || this.depth !== depth) {
 				this.width = width;
 				this.height = height;
+				this.depth = depth;
 				this.texture.image.width = width;
 				this.texture.image.height = height;
+				this.texture.image.depth = depth;
 				this.dispose();
 			}
 
@@ -2839,6 +2856,7 @@
 		_proto.copy = function copy(source) {
 			this.width = source.width;
 			this.height = source.height;
+			this.depth = source.depth;
 			this.viewport.copy(source.viewport);
 			this.texture = source.texture.clone();
 			this.depthBuffer = source.depthBuffer;
@@ -16620,7 +16638,12 @@
 			var glFormat = utils.convert(renderTarget.texture.format);
 			var glType = utils.convert(renderTarget.texture.type);
 			var glInternalFormat = getInternalFormat(renderTarget.texture.internalFormat, glFormat, glType);
-			state.texImage2D(textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null);
+
+			if (textureTarget === 32879 || textureTarget === 35866) {
+				state.texImage3D(textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, renderTarget.depth, 0, glFormat, glType, null);
+			} else {
+				state.texImage2D(textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null);
+			}
 
 			_gl.bindFramebuffer(36160, framebuffer);
 
@@ -16745,17 +16768,19 @@
 
 
 		function setupRenderTarget(renderTarget) {
+			var texture = renderTarget.texture;
 			var renderTargetProperties = properties.get(renderTarget);
-			var textureProperties = properties.get(renderTarget.texture);
+			var textureProperties = properties.get(texture);
 			renderTarget.addEventListener('dispose', onRenderTargetDispose);
 			textureProperties.__webglTexture = _gl.createTexture();
 			info.memory.textures++;
 			var isCube = renderTarget.isWebGLCubeRenderTarget === true;
 			var isMultisample = renderTarget.isWebGLMultisampleRenderTarget === true;
+			var isRenderTarget3D = texture.isDataTexture3D || texture.isDataTexture2DArray;
 			var supportsMips = isPowerOfTwo(renderTarget) || isWebGL2; // Handles WebGL2 RGBFormat fallback - #18858
 
-			if (isWebGL2 && renderTarget.texture.format === RGBFormat && (renderTarget.texture.type === FloatType || renderTarget.texture.type === HalfFloatType)) {
-				renderTarget.texture.format = RGBAFormat;
+			if (isWebGL2 && texture.format === RGBFormat && (texture.type === FloatType || texture.type === HalfFloatType)) {
+				texture.format = RGBAFormat;
 				console.warn('THREE.WebGLRenderer: Rendering to textures with RGB format is not supported. Using RGBA format instead.');
 			} // Setup framebuffer
 
@@ -16776,9 +16801,9 @@
 
 						_gl.bindRenderbuffer(36161, renderTargetProperties.__webglColorRenderbuffer);
 
-						var glFormat = utils.convert(renderTarget.texture.format);
-						var glType = utils.convert(renderTarget.texture.type);
-						var glInternalFormat = getInternalFormat(renderTarget.texture.internalFormat, glFormat, glType);
+						var glFormat = utils.convert(texture.format);
+						var glType = utils.convert(texture.type);
+						var glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType);
 						var samples = getRenderTargetSamples(renderTarget);
 
 						_gl.renderbufferStorageMultisample(36161, samples, glInternalFormat, renderTarget.width, renderTarget.height);
@@ -16804,24 +16829,36 @@
 
 			if (isCube) {
 				state.bindTexture(34067, textureProperties.__webglTexture);
-				setTextureParameters(34067, renderTarget.texture, supportsMips);
+				setTextureParameters(34067, texture, supportsMips);
 
 				for (var _i5 = 0; _i5 < 6; _i5++) {
 					setupFrameBufferTexture(renderTargetProperties.__webglFramebuffer[_i5], renderTarget, 36064, 34069 + _i5);
 				}
 
-				if (textureNeedsGenerateMipmaps(renderTarget.texture, supportsMips)) {
-					generateMipmap(34067, renderTarget.texture, renderTarget.width, renderTarget.height);
+				if (textureNeedsGenerateMipmaps(texture, supportsMips)) {
+					generateMipmap(34067, texture, renderTarget.width, renderTarget.height);
 				}
 
 				state.bindTexture(34067, null);
 			} else {
-				state.bindTexture(3553, textureProperties.__webglTexture);
-				setTextureParameters(3553, renderTarget.texture, supportsMips);
-				setupFrameBufferTexture(renderTargetProperties.__webglFramebuffer, renderTarget, 36064, 3553);
+				var glTextureType = 3553;
 
-				if (textureNeedsGenerateMipmaps(renderTarget.texture, supportsMips)) {
-					generateMipmap(3553, renderTarget.texture, renderTarget.width, renderTarget.height);
+				if (isRenderTarget3D) {
+					// Render targets containing layers, i.e: Texture 3D and 2d arrays
+					if (isWebGL2) {
+						var isTexture3D = texture.isDataTexture3D;
+						glTextureType = isTexture3D ? 32879 : 35866;
+					} else {
+						console.warn('THREE.DataTexture3D and THREE.DataTexture2DArray only supported with WebGL2.');
+					}
+				}
+
+				state.bindTexture(glTextureType, textureProperties.__webglTexture);
+				setTextureParameters(glTextureType, texture, supportsMips);
+				setupFrameBufferTexture(renderTargetProperties.__webglFramebuffer, renderTarget, 36064, glTextureType);
+
+				if (textureNeedsGenerateMipmaps(texture, supportsMips)) {
+					generateMipmap(3553, texture, renderTarget.width, renderTarget.height);
 				}
 
 				state.bindTexture(3553, null);
@@ -19299,8 +19336,15 @@
 
 			var framebuffer = _framebuffer;
 			var isCube = false;
+			var isRenderTarget3D = false;
 
 			if (renderTarget) {
+				var texture = renderTarget.texture;
+
+				if (texture.isDataTexture3D || texture.isDataTexture2DArray) {
+					isRenderTarget3D = true;
+				}
+
 				var __webglFramebuffer = properties.get(renderTarget).__webglFramebuffer;
 
 				if (renderTarget.isWebGLCubeRenderTarget) {
@@ -19339,6 +19383,12 @@
 				var textureProperties = properties.get(renderTarget.texture);
 
 				_gl.framebufferTexture2D(36160, 36064, 34069 + activeCubeFace, textureProperties.__webglTexture, activeMipmapLevel);
+			} else if (isRenderTarget3D) {
+				var _textureProperties = properties.get(renderTarget.texture);
+
+				var layer = activeCubeFace || 0;
+
+				_gl.framebufferTextureLayer(36160, 36064, _textureProperties.__webglTexture, activeMipmapLevel || 0, layer);
 			}
 		};
 
