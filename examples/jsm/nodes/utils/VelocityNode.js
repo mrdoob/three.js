@@ -154,18 +154,12 @@ VelocityNode.prototype.copy = function ( source ) {
 
 VelocityNode.prototype.toJSON = function ( meta ) {
 
-	var data = this.getJSONNode( meta );
+	var data = Vector3Node.prototype.toJSON.call( this, meta );
 
-	if ( ! data ) {
+	if ( this.target ) data.target = this.target.uuid;
 
-		data = this.createJSONNode( meta );
-
-		if ( this.target ) data.target = this.target.uuid;
-
-		// clone params
-		data.params = JSON.parse( JSON.stringify( this.params ) );
-
-	}
+	// clone params
+	data.params = JSON.parse( JSON.stringify( this.params ) );
 
 	return data;
 
