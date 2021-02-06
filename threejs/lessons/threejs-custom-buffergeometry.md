@@ -2,47 +2,8 @@ Title: Three.js Custom BufferGeometry
 Description: How to make your own BufferGeometry.
 TOC: Custom BufferGeometry
 
-> **NOTE:** r125 removed `Geometry` from three.js. 
-> Only `BufferGeometry` now exists. Further, all geometry
-> with names like `XXXBufferGeometry` has been removed
-> and only `XXXGeometry` remains but `XXXGeometry` is
-> now an instance of `BufferGeometry`. 
->
-> In other words before r125 there
->
-> ```
-> BoxGeometry -> Geometry
-> BoxBufferGeometry -> BufferGeometry
-> ```
->
-> As of r125 there is now only this
->
-> ```
-> BoxGeometry -> BufferGeometry
-> ```
->
-> This article still works but it references the previous
-> article which uses the deprecated `Geometry`. It will
-> take some work to re-write this so in the meantime
-> I added this note
-
-A [previous article](threejs-custom-geometry.html) covered
-how to use `Geometry`. This article is about `BufferGeometry`.
-`BufferGeometry` is *generally* faster to start and uses
-less memory but can be harder to setup.
-
-In [the article on Geometry](threejs-custom-geometry.html) we went over that to use a `Geometry` you supply an
-array of `Vector3` vertices (positions). You then make `Face3` objects specifying
-by index the 3 vertices that make each triangle of the shape you're making. To
-each `Face3` you can specify either a face normal or normals for each individual
-vertex of the face. You can also specify a face color or individual vertex
-colors. Finally you can make a parallel array of arrays of texture coordinates
-(UVs), one array for each face containing an array of UVs, one for each vertex
-of the face.
-
-<div class="threejs_center"><img src="resources/threejs-geometry.svg" style="width: 700px"></div>
-
-`BufferGeometry` on the other hand uses *named* `BufferAttribute`s.
+`BufferGeometry` is three.js's way of representing all geometry. It's
+essentially a collection *named*  `BufferAttribute`s.
 Each `BufferAttribute` represents an array of one type of data: positions,
 normals, colors, and uv. Together, the added `BufferAttribute`s represent
 *parallel arrays* of all the data for each vertex.
@@ -59,17 +20,9 @@ This brings up a point, here's a diagram of a cube with one corner highlighted.
 <div class="threejs_center"><img src="resources/cube-faces-vertex.svg" style="width: 500px"></div>
 
 Thinking about it that single corner needs a different normal for each face of the
-cube. It needs different UVs for each face as well. This points out the biggest difference
-between `Geometry` and `BufferGeometry`. Nothing is shared with `BufferGeometry`.
+cube. It needs different UVs for each face as well. 
 A single *vertex* is the combination of all of its parts. If a vertex needs any
 part to be different then it must be a different vertex.
-
-The truth is when you use `Geometry` three.js transforms it into this format.
-That is where the extra memory and time comes from when using `Geometry`. Extra
-memory for all the `Vector3`s, `Vector2`s, `Face3`s and array objects and then
-extra time to translate all of that data into parallel arrays in the form of
-`BufferAttribute`s like above. Sometimes that makes using `Geometry` easier.
-With `BufferGeometry` it is up to us to supply the data already turned into this format.
 
 As a simple example let's make a cube using `BufferGeometry`. A cube is interesting
 because it appears to share vertices at the corners but really
@@ -77,8 +30,7 @@ does not. For our example we'll list out all the vertices with all their data
 and then convert that data into parallel arrays and finally use those to make
 `BufferAttribute`s and add them to a `BufferGeometry`.
 
-Starting with the texture coordinate example from [the previous article](threejs-custom-geometry.html) we've deleted all the code related to setting up
-a `Geometry`. Then we list all the data needed for the cube. Remember again
+We start with a list of all the data needed for the cube. Remember again
 that if a vertex has any unique parts it has to be a separate vertex. As such
 to make a cube requires 36 vertices. 2 triangles per face, 3 vertices per triangle,
 6 faces = 36 vertices.
@@ -271,7 +223,7 @@ geometry.setAttribute(
 
 `BufferGeometry` has a [`computeVertexNormals`](BufferGeometry.computeVertexNormals) method for computing normals if you
 are not supplying them. Unfortunately, 
-since positions can not be shared if any other part of a vertex is different
+since positions can not be shared if any other part of a vertex is different,
 the results of calling `computeVertexNormals` will generate seams if your
 geometry is supposed to connect to itself like a sphere or a cylinder.
 
@@ -285,7 +237,7 @@ For the cylinder above the normals were created using `computeVertexNormals`.
 If you look closely there is a seam on the cylinder. This is because there
 is no way to share the vertices at the start and end of the cylinder since they
 require different UVs so the function to compute them has no idea those are
-the same vertices and to smooth over them. Just a small thing to be aware of.
+the same vertices to smooth over them. Just a small thing to be aware of.
 The solution is to supply your own normals.
 
 We can also use [TypedArrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) from the start instead of native JavaScript arrays.
@@ -478,8 +430,7 @@ And we set `positionAttribute.needsUpdate` to tell THREE.js to use our changes.
 
 I hope these were useful examples of how to use `BufferGeometry` directly to
 make your own geometry and how to dynamically update the contents of a
-`BufferAttribute`. Which you use, `Geometry` or `BufferGeometry`, really
-depends on your needs.
+`BufferAttribute`.
 
 <canvas id="c"></canvas>
 <script type="module" src="resources/threejs-custom-buffergeometry.js"></script>
