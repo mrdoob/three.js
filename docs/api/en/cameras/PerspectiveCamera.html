@@ -37,12 +37,13 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:Number fov], [param:Number aspect], [param:Number near], [param:Number far] )</h3>
+		<h3>[name]( [param:Number fov], [param:Number aspect], [param:Number near], [param:Number far], [param:Boolean fitWidth] )</h3>
 		<p>
 		fov — Camera frustum vertical field of view.<br />
 		aspect — Camera frustum aspect ratio.<br />
 		near — Camera frustum near plane.<br />
-		far — Camera frustum far plane.<br /><br />
+		far — Camera frustum far plane.<br />
+		fitWidth — Whether to apply [page:.fov fov] to horizontal.<br /><br />
 
 			Together these define the camera's [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum].
 		</p>
@@ -79,6 +80,9 @@
 
 		<h3>[property:Float fov]</h3>
 		<p>Camera frustum vertical field of view, from bottom to top of view, in degrees. Default is *50*.</p>
+
+		<h3>[property:Boolean fitWidth]</h3>
+		<p>Whether to apply [page:.fov fov] to horizontal. Default is *false*.</p>
 
 
 		<h3>[property:Float near]</h3>

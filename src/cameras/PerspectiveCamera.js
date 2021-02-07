@@ -2,13 +2,14 @@ import { Camera } from './Camera.js';
 import { Object3D } from '../core/Object3D.js';
 import { MathUtils } from '../math/MathUtils.js';
 
-function PerspectiveCamera( fov = 50, aspect = 1, near = 0.1, far = 2000 ) {
+function PerspectiveCamera( fov = 50, aspect = 1, near = 0.1, far = 2000, fitWidth = false ) {
 
 	Camera.call( this );
 
 	this.type = 'PerspectiveCamera';
 
 	this.fov = fov;
+	this.fitWidth = fitWidth;
 	this.zoom = 1;
 
 	this.near = near;
@@ -36,6 +37,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		Camera.prototype.copy.call( this, source, recursive );
 
 		this.fov = source.fov;
+		this.fitWidth = source.fitWidth;
 		this.zoom = source.zoom;
 
 		this.near = source.near;
@@ -182,10 +184,24 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 	updateProjectionMatrix: function () {
 
 		const near = this.near;
-		let top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom;
-		let height = 2 * top;
-		let width = this.aspect * height;
-		let left = - 0.5 * width;
+		let top, height, width, left;
+
+		if ( this.fitWidth === true ) {
+
+			left = - near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom;
+			width = - 2 * left;
+			height = width / this.aspect;
+			top = 0.5 * height;
+
+		} else {
+
+			top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom;
+			height = 2 * top;
+			width = this.aspect * height;
+			left = - 0.5 * width;
+
+		}
+
 		const view = this.view;
 
 		if ( this.view !== null && this.view.enabled ) {
@@ -214,6 +230,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		const data = Object3D.prototype.toJSON.call( this, meta );
 
 		data.object.fov = this.fov;
+		data.object.fitWidth = this.fitWidth;
 		data.object.zoom = this.zoom;
 
 		data.object.near = this.near;
