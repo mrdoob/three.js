@@ -311,6 +311,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/undo': 'Undo',
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
+			'sidebar/settings/viewport': 'Viewport',
 			'sidebar/settings/viewport/grid': 'Grid',
 			'sidebar/settings/viewport/helpers': 'Helpers',
 
@@ -636,6 +637,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/undo': 'Annuler',
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
+			'sidebar/settings/viewport': 'Viewport',
 			'sidebar/settings/viewport/grid': 'Grille',
 			'sidebar/settings/viewport/helpers': 'Helpers',
 
@@ -945,6 +947,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/undo': '撤销',
 			'sidebar/settings/shortcuts/focus': '聚焦',
 
+			'sidebar/settings/viewport': 'Viewport',
 			'sidebar/settings/viewport/grid': '网格',
 			'sidebar/settings/viewport/helpers': '辅助',
 

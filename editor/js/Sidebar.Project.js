@@ -10,11 +10,10 @@ function SidebarProject( editor ) {
 
 	var container = new UISpan();
 
-	var projectsettings = new UIPanel();
-	projectsettings.setBorderTop( '0' );
-	projectsettings.setPaddingTop( '20px' );
-
-	container.add( projectsettings );
+	var settings = new UIPanel();
+	settings.setBorderTop( '0' );
+	settings.setPaddingTop( '20px' );
+	container.add( settings );
 
 	// Title
 
@@ -28,7 +27,7 @@ function SidebarProject( editor ) {
 	titleRow.add( new UIText( strings.getKey( 'sidebar/project/title' ) ).setWidth( '90px' ) );
 	titleRow.add( title );
 
-	projectsettings.add( titleRow );
+	settings.add( titleRow );
 
 	// Editable
 
@@ -42,7 +41,7 @@ function SidebarProject( editor ) {
 	editableRow.add( new UIText( strings.getKey( 'sidebar/project/editable' ) ).setWidth( '90px' ) );
 	editableRow.add( editable );
 
-	projectsettings.add( editableRow );
+	settings.add( editableRow );
 
 	// WebVR
 
@@ -56,7 +55,7 @@ function SidebarProject( editor ) {
 	vrRow.add( new UIText( strings.getKey( 'sidebar/project/vr' ) ).setWidth( '90px' ) );
 	vrRow.add( vr );
 
-	projectsettings.add( vrRow );
+	settings.add( vrRow );
 
 	//
 

@@ -6,8 +6,6 @@ import { SidebarScript } from './Sidebar.Script.js';
 import { SidebarAnimation } from './Sidebar.Animation.js';
 import { SidebarProject } from './Sidebar.Project.js';
 import { SidebarSettings } from './Sidebar.Settings.js';
-import { SidebarSettingsShortcuts } from './Sidebar.Settings.Shortcuts.js';
-import { SidebarSettingsHistory } from './Sidebar.Settings.History.js';
 
 function Sidebar( editor ) {
 
@@ -22,14 +20,8 @@ function Sidebar( editor ) {
 		new SidebarAnimation( editor ),
 		new SidebarScript( editor )
 	);
-
 	var project = new SidebarProject( editor );
-
-	var settings = new UISpan().add(
-		new SidebarSettings( editor ),
-		new SidebarSettingsShortcuts( editor ),
-		new SidebarSettingsHistory( editor )
-	);
+	var settings = new SidebarSettings( editor );
 
 	container.addTab( 'scene', strings.getKey( 'sidebar/scene' ), scene );
 	container.addTab( 'project', strings.getKey( 'sidebar/project' ), project );
