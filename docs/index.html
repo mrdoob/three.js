@@ -65,6 +65,14 @@
 
 			const list = await ( await fetch( 'list.json' ) ).json();
 
+			// *BufferGeometry to *Geometry
+
+			if ( /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
+
+				window.location.hash = window.location.hash.replace( 'BufferGeometry', 'Geometry' );
+
+			}
+
 			const hash = window.location.hash.substring( 1 );
 
 			// Localisation
