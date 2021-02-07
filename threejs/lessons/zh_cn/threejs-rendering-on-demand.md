@@ -24,8 +24,8 @@ First we'll add in the `OrbitControls` so there is something that could change
 that we can render in response to.
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
 ```
 
 然后
@@ -153,8 +153,8 @@ render();
 让我们加一个简单的GUI
 
 ```js
-import * as THREE from './resources/three/r122/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r125/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
 +import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 
