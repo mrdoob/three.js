@@ -54,7 +54,7 @@
 				const loader = new THREE.TextureLoader();
 				const texture = loader.load( './textures/uv_grid_opengl.jpg' );
 
-				const geometryBox = new THREE.BoxBufferGeometry();
+				const geometryBox = new THREE.BoxGeometry();
 				const materialBox = new THREE.MeshBasicMaterial();
 				materialBox.colorNode = new TextureNode( texture );
 
