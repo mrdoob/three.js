@@ -1,4 +1,4 @@
-Title: Three.js基础
+Title: Three.js 基础
 Description: 学习Three.js的第一篇文章
 TOC: 基础
 
