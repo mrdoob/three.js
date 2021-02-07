@@ -60,12 +60,18 @@
 			删除图层对象已有的所有对应关系，增加与参数指定的图层的对应关系。
 		</p>
 
-		<h3>[method:Boolean test]( [param:Layers_or_Integer layers] )</h3>
+		<h3>[method:Boolean test]( [param:Layers layers] )</h3>
 		<p>
-			layers - a Layers object or an integer from 0 to 31.<br /><br />
+			layers - 一个图层对象。<br /><br />
 
-			If *layers* is a Layers object, returns true if this and the passed *layers* object have at least one layer in common.
-			If *layers* is an integer, returns true if this is a member of *layers*.
+			如果传入图层对象与当前对象属于相同的一组图层，则返回 true，否则返回 false。
+		</p>
+
+		<h3>[method:Boolean testInteger]( [param:Integer layer] )</h3>
+		<p>
+			layer - 一个 0 - 31 的整数。<br /><br />
+
+			returns true if this is a member of *layer*.
 		</p>
 
 		<h3>[method:null toggle]( [param:Integer layer] )</h3>

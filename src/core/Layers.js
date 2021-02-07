@@ -44,9 +44,13 @@ class Layers {
 
 	test( layers ) {
 
-		const mask = ( typeof layers === 'number' ) ? ( 1 << layers | 0 ) : layers.mask;
+		return ( this.mask & layers.mask ) !== 0;
 
-		return ( this.mask & mask ) !== 0;
+	}
+
+	testInteger( channel ) {
+
+		return ( this.mask & ( 1 << channel | 0 ) ) !== 0;
 
 	}
 
