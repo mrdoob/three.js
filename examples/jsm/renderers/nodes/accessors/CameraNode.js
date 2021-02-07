@@ -75,9 +75,13 @@ class CameraNode extends Node {
 
 				}
 
-			} else if ( inputNode === null || inputNode.isVector3Node !== true ) {
+			} else if ( scope === CameraNode.POSITION ) {
 
-				inputNode = new Vector3Node();
+				if ( inputNode === null || inputNode.isVector3Node !== true ) {
+
+					inputNode = new Vector3Node();
+
+				}
 
 			}
 

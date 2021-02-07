@@ -43,7 +43,8 @@ class AttributeNode extends Node {
 
 			if ( nodeVary === undefined ) {
 
-				nodeVary = builder.getVaryFromNode( this, attribute.type, attributeName );
+				nodeVary = builder.getVaryFromNode( this, attribute.type );
+				nodeVary.snippet = attributeName;
 
 				nodeData.nodeVary = nodeVary;
 

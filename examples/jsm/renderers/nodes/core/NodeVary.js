@@ -1,10 +1,10 @@
 class NodeVary {
 
-	constructor( name, type, value ) {
+	constructor( name, type, snippet = '' ) {
 
 		this.name = name;
 		this.type = type;
-		this.value = value;
+		this.snippet = snippet;
 
 		Object.defineProperty( this, 'isNodeVary', { value: true } );
 

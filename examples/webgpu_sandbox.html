@@ -22,10 +22,12 @@
 			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
 			import FloatNode from './jsm/renderers/nodes/inputs/FloatNode.js';
 			import Vector2Node from './jsm/renderers/nodes/inputs/Vector2Node.js';
+			import Vector3Node from './jsm/renderers/nodes/inputs/Vector3Node.js';
 			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
 			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
 			import UVNode from './jsm/renderers/nodes/accessors/UVNode.js';
 			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
+			import NormalNode from './jsm/renderers/nodes/accessors/NormalNode.js';
 			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
 			import SwitchNode from './jsm/renderers/nodes/utils/SwitchNode.js';
 			import TimerNode from './jsm/renderers/nodes/utils/TimerNode.js';
@@ -95,10 +97,13 @@
 				const geometrySphere = new THREE.SphereGeometry( .5, 64, 64 );
 				const materialSphere = new THREE.MeshBasicMaterial();
 
-				const displaceScaled = new OperatorNode( '*', new TextureNode( textureDisplace ), new FloatNode( .2 ) );
+				const displaceAnimated = new SwitchNode( new TextureNode( textureDisplace ), 'x' );
+				const displaceY = new OperatorNode( '*', displaceAnimated, new FloatNode( .25 ).setConst( true ) );
 
-				materialSphere.colorNode = new TextureNode( textureDisplace );
-				materialSphere.positionNode = new OperatorNode( '+', new PositionNode(), displaceScaled );
+				const displace = new OperatorNode( '*', new NormalNode( NormalNode.LOCAL ), displaceY );
+
+				materialSphere.colorNode = displaceY;
+				materialSphere.positionNode = new OperatorNode( '+', new PositionNode( PositionNode.LOCAL ), displace );
 
 				const sphere = new THREE.Mesh( geometrySphere, materialSphere );
 				sphere.position.set( - 2, - 1, 0 );
