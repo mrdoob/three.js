@@ -20,96 +20,89 @@ function SidebarProjectRenderer( editor ) {
 	// Antialias
 
 	var antialiasRow = new UIRow();
-	var antialiasBoolean = new UIBoolean( config.getKey( 'project/renderer/antialias' ) ).onChange( function () {
-
-		createRenderer();
-
-	} );
-
-	antialiasRow.add( new UIText( strings.getKey( 'sidebar/project/antialias' ) ).setWidth( '90px' ) );
-	antialiasRow.add( antialiasBoolean );
-
 	container.add( antialiasRow );
 
-	// Shadows
+	antialiasRow.add( new UIText( strings.getKey( 'sidebar/project/antialias' ) ).setWidth( '90px' ) );
 
-	var shadowsRow = new UIRow();
-	var shadowsBoolean = new UIBoolean( config.getKey( 'project/renderer/shadows' ) ).onChange( function () {
-
-		currentRenderer.shadowMap.enabled = this.getValue();
-		signals.rendererUpdated.dispatch();
-
-	} );
-
-	shadowsRow.add( new UIText( strings.getKey( 'sidebar/project/shadows' ) ).setWidth( '90px' ) );
-	shadowsRow.add( shadowsBoolean );
-
-	var shadowTypeSelect = new UISelect().setOptions( {
-		0: 'Basic',
-		1: 'PCF',
-		2: 'PCF (Soft)',
-		//	3: 'VSM'
-	} ).setWidth( '125px' ).onChange( function () {
-
-		currentRenderer.shadowMap.type = parseFloat( this.getValue() );
-		signals.rendererUpdated.dispatch();
-
-	} );
-	shadowTypeSelect.setValue( config.getKey( 'project/renderer/shadowType' ) );
-
-	shadowsRow.add( shadowTypeSelect );
-
-	container.add( shadowsRow );
+	var antialiasBoolean = new UIBoolean( config.getKey( 'project/renderer/antialias' ) ).onChange( createRenderer );
+	antialiasRow.add( antialiasBoolean );
 
 	// Physically Correct lights
 
 	var physicallyCorrectLightsRow = new UIRow();
+	container.add( physicallyCorrectLightsRow );
+
+	physicallyCorrectLightsRow.add( new UIText( strings.getKey( 'sidebar/project/physicallyCorrectLights' ) ).setWidth( '90px' ) );
+
 	var physicallyCorrectLightsBoolean = new UIBoolean( config.getKey( 'project/renderer/physicallyCorrectLights' ) ).onChange( function () {
 
 		currentRenderer.physicallyCorrectLights = this.getValue();
 		signals.rendererUpdated.dispatch();
 
 	} );
-
-	physicallyCorrectLightsRow.add( new UIText( strings.getKey( 'sidebar/project/physicallyCorrectLights' ) ).setWidth( '90px' ) );
 	physicallyCorrectLightsRow.add( physicallyCorrectLightsBoolean );
 
-	container.add( physicallyCorrectLightsRow );
+	// Shadows
+
+	var shadowsRow = new UIRow();
+	container.add( shadowsRow );
+
+	shadowsRow.add( new UIText( strings.getKey( 'sidebar/project/shadows' ) ).setWidth( '90px' ) );
+
+	var shadowsBoolean = new UIBoolean( config.getKey( 'project/renderer/shadows' ) ).onChange( updateShadows );
+	shadowsRow.add( shadowsBoolean );
+
+	var shadowTypeSelect = new UISelect().setOptions( {
+		0: 'Basic',
+		1: 'PCF',
+		2: 'PCF Soft',
+		//	3: 'VSM'
+	} ).setWidth( '125px' ).onChange( updateShadows );
+	shadowTypeSelect.setValue( config.getKey( 'project/renderer/shadowType' ) );
+	shadowsRow.add( shadowTypeSelect );
+
+	function updateShadows() {
+
+		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
+		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );
+
+		signals.rendererUpdated.dispatch();
+
+	}
 
 	// Tonemapping
 
 	var toneMappingRow = new UIRow();
+	container.add( toneMappingRow );
+
+	toneMappingRow.add( new UIText( strings.getKey( 'sidebar/project/toneMapping' ) ).setWidth( '90px' ) );
+
 	var toneMappingSelect = new UISelect().setOptions( {
-		0: 'None',
+		0: 'No',
 		1: 'Linear',
 		2: 'Reinhard',
 		3: 'Cineon',
 		4: 'ACESFilmic'
-	} ).setWidth( '120px' ).onChange( function () {
-
-		currentRenderer.toneMapping = parseFloat( this.getValue() );
-		toneMappingExposure.setDisplay( currentRenderer.toneMapping === 0 ? 'none' : '' );
-		signals.rendererUpdated.dispatch();
-
-	} );
+	} ).setWidth( '120px' ).onChange( updateToneMapping );
 	toneMappingSelect.setValue( config.getKey( 'project/renderer/toneMapping' ) );
-
-	toneMappingRow.add( new UIText( strings.getKey( 'sidebar/project/toneMapping' ) ).setWidth( '90px' ) );
 	toneMappingRow.add( toneMappingSelect );
 
 	var toneMappingExposure = new UINumber( config.getKey( 'project/renderer/toneMappingExposure' ) );
 	toneMappingExposure.setDisplay( toneMappingSelect.getValue() === '0' ? 'none' : '' );
 	toneMappingExposure.setWidth( '30px' ).setMarginLeft( '10px' );
 	toneMappingExposure.setRange( 0, 10 );
-	toneMappingExposure.onChange( function () {
-
-		currentRenderer.toneMappingExposure = this.getValue();
-		signals.rendererUpdated.dispatch();
-
-	} );
+	toneMappingExposure.onChange( updateToneMapping );
 	toneMappingRow.add( toneMappingExposure );
 
-	container.add( toneMappingRow );
+	function updateToneMapping() {
+
+		toneMappingExposure.setDisplay( toneMappingSelect.getValue() === '0' ? 'none' : '' );
+
+		currentRenderer.toneMapping = parseFloat( toneMappingSelect.getValue() );
+		currentRenderer.toneMappingExposure = toneMappingExposure.getValue();
+		signals.rendererUpdated.dispatch();
+
+	}
 
 	//
 
@@ -129,23 +122,16 @@ function SidebarProjectRenderer( editor ) {
 
 	createRenderer();
 
-	// signals
+
+	// Signals
 
 	signals.editorCleared.add( function () {
 
 		currentRenderer.physicallyCorrectLights = false;
 		currentRenderer.shadowMap.enabled = true;
-		currentRenderer.shadowMap.type = 1;
-		currentRenderer.toneMapping = 0;
+		currentRenderer.shadowMap.type = THREE.PCFShadowMap;
+		currentRenderer.toneMapping = THREE.NoToneMapping;
 		currentRenderer.toneMappingExposure = 1;
-
-		refreshRendererUI();
-
-		signals.rendererUpdated.dispatch();
-
-	} );
-
-	function refreshRendererUI() {
 
 		physicallyCorrectLightsBoolean.setValue( currentRenderer.physicallyCorrectLights );
 		shadowsBoolean.setValue( currentRenderer.shadowMap.enabled );
@@ -154,7 +140,9 @@ function SidebarProjectRenderer( editor ) {
 		toneMappingExposure.setValue( currentRenderer.toneMappingExposure );
 		toneMappingExposure.setDisplay( currentRenderer.toneMapping === 0 ? 'none' : '' );
 
-	}
+		signals.rendererUpdated.dispatch();
+
+	} );
 
 	signals.rendererUpdated.add( function () {
 

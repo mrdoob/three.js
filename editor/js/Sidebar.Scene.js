@@ -452,7 +452,7 @@ function SidebarScene( editor ) {
 
 		if ( ignoreObjectSelectedSignal === true ) return;
 
-		if ( object !== null ) {
+		if ( object !== null && object.parent !== null ) {
 
 			let needsRefresh = false;
 			let parent = object.parent;
