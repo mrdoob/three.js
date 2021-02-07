@@ -509,6 +509,9 @@ Then let's load 6 textures and make 6 planes, one for each texture.
 We'll parent each plane to a `THREE.Object3D` to make it easy to offset
 the plane so its center appears to be at its top left corner.
 
+If you're running locally you'll also need to have [setup](threejs-setup.html).
+You might also want to read about [using textures](threejs-textures.html).
+
 ```js
 const loader = new THREE.TextureLoader();
 const textures = [

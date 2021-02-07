@@ -2,7 +2,7 @@ Title: Three.js 优化对象的同时保持动画效果
 Description: 使用morphtarget优化
 TOC: 优化对象的同时保持动画效果
 
-本文是关于 three.js 系列文章的一部分. 第一篇文章是 [three.js 基础](threejs-fundamentals.html). 如果你还没看过而且对three.js 还不熟悉，那应该从那里开始.
+本文是关于 three.js 系列文章的一部分. 第一篇文章是 [three.js 基础](threejs-optimize-lots-of-objects.html). 如果你还没看过而且对three.js 还不熟悉，那应该从那里开始.
 
 在上一章中, 我们合并了19000个对象到一个几何体中. 这带来的好处是优化掉19000次绘制操作但是缺点是没有办法再单独操作某一个了. 
 
