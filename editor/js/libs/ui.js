@@ -1069,6 +1069,31 @@ UIButton.prototype.setLabel = function ( value ) {
 };
 
 
+// UIProgress
+
+function UIProgress( value ) {
+
+	UIElement.call( this );
+
+	var dom = document.createElement( 'progress' );
+
+	this.dom = dom;
+	this.dom.value = value;
+
+	return this;
+
+}
+
+UIProgress.prototype = Object.create( UIElement.prototype );
+UIProgress.prototype.constructor = UIProgress;
+
+UIProgress.prototype.setValue = function ( value ) {
+
+	this.dom.value = value;
+
+};
+
+
 // UITabbedPanel
 
 function UITabbedPanel( ) {
@@ -1351,4 +1376,4 @@ UIListbox.ListboxItem = function ( parent ) {
 UIListbox.ListboxItem.prototype = Object.create( UIElement.prototype );
 UIListbox.ListboxItem.prototype.constructor = UIListbox.ListboxItem;
 
-export { UIElement, UISpan, UIDiv, UIRow, UIPanel, UIText, UIInput, UITextArea, UISelect, UICheckbox, UIColor, UINumber, UIInteger, UIBreak, UIHorizontalRule, UIButton, UITabbedPanel, UIListbox };
+export { UIElement, UISpan, UIDiv, UIRow, UIPanel, UIText, UIInput, UITextArea, UISelect, UICheckbox, UIColor, UINumber, UIInteger, UIBreak, UIHorizontalRule, UIButton, UIProgress, UITabbedPanel, UIListbox };

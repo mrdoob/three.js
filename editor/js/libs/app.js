@@ -1,16 +1,15 @@
-
 var APP = {
 
 	Player: function () {
 
 		var renderer = new THREE.WebGLRenderer( { antialias: true } );
-		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setPixelRatio( window.devicePixelRatio ); // TODO: Use player.setPixelRatio()
 		renderer.outputEncoding = THREE.sRGBEncoding;
 
 		var loader = new THREE.ObjectLoader();
 		var camera, scene;
 
-		var vrButton = VRButton.createButton( renderer );
+		var vrButton = VRButton.createButton( renderer ); // eslint-disable-line no-undef
 
 		var events = {};
 
@@ -116,6 +115,12 @@ var APP = {
 
 		};
 
+		this.setPixelRatio = function ( pixelRatio ) {
+
+			renderer.setPixelRatio( pixelRatio );
+
+		};
+
 		this.setSize = function ( width, height ) {
 
 			this.width = width;
@@ -199,6 +204,14 @@ var APP = {
 			dispatch( events.stop, arguments );
 
 			renderer.setAnimationLoop( null );
+
+		};
+
+		this.render = function ( time ) {
+
+			dispatch( events.update, { time: time * 1000, delta: 0 /* TODO */ } );
+
+			renderer.render( scene, camera );
 
 		};
 
