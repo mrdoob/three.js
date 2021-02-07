@@ -29,7 +29,6 @@ import { Uniform } from './core/Uniform.js';
 import { Raycaster } from './core/Raycaster.js';
 import { Curve } from './extras/core/Curve.js';
 import { Path } from './extras/core/Path.js';
-import { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 import { AxesHelper } from './helpers/AxesHelper.js';
 import { BoxHelper } from './helpers/BoxHelper.js';
 import { GridHelper } from './helpers/GridHelper.js';
@@ -257,66 +256,6 @@ Object.assign( Path.prototype, {
 
 		console.warn( 'THREE.Path: .fromPoints() has been renamed to .setFromPoints().' );
 		return this.setFromPoints( points );
-
-	}
-
-} );
-
-//
-
-export function ClosedSplineCurve3( points ) {
-
-	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
-
-	CatmullRomCurve3.call( this, points );
-	this.type = 'catmullrom';
-	this.closed = true;
-
-}
-
-ClosedSplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
-
-//
-
-export function SplineCurve3( points ) {
-
-	console.warn( 'THREE.SplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
-
-	CatmullRomCurve3.call( this, points );
-	this.type = 'catmullrom';
-
-}
-
-SplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
-
-//
-
-export function Spline( points ) {
-
-	console.warn( 'THREE.Spline has been removed. Use THREE.CatmullRomCurve3 instead.' );
-
-	CatmullRomCurve3.call( this, points );
-	this.type = 'catmullrom';
-
-}
-
-Spline.prototype = Object.create( CatmullRomCurve3.prototype );
-
-Object.assign( Spline.prototype, {
-
-	initFromArray: function ( /* a */ ) {
-
-		console.error( 'THREE.Spline: .initFromArray() has been removed.' );
-
-	},
-	getControlPointsArray: function ( /* optionalTarget */ ) {
-
-		console.error( 'THREE.Spline: .getControlPointsArray() has been removed.' );
-
-	},
-	reparametrizeByArcLength: function ( /* samplingCoef */ ) {
-
-		console.error( 'THREE.Spline: .reparametrizeByArcLength() has been removed.' );
 
 	}
 
