@@ -47,7 +47,7 @@ function UITexture( mapping ) {
 
 	function loadFile( file ) {
 
-		var extension = file.name.split( '.' ).pop().toLowerCase()
+		var extension = file.name.split( '.' ).pop().toLowerCase();
 		var reader = new FileReader();
 
 		if ( extension === 'hdr' ) {
@@ -112,6 +112,7 @@ function UITexture( mapping ) {
 			}, false );
 
 			reader.readAsDataURL( file );
+
 		}
 
 		form.reset();
@@ -899,7 +900,7 @@ function UIBoolean( boolean, text ) {
 
 	UISpan.call( this );
 
-	this.setMarginRight( '10px' );
+	this.setMarginRight( '4px' );
 
 	this.checkbox = new UICheckbox( boolean );
 	this.text = new UIText( text ).setMarginLeft( '3px' );
