@@ -2,7 +2,7 @@
 import { UIPanel, UIBreak, UIText } from './libs/ui.js';
 import { UIBoolean, UIOutliner } from './libs/ui.three.js';
 
-function SidebarHistory( editor ) {
+function SidebarSettingsHistory( editor ) {
 
 	var strings = editor.strings;
 
@@ -130,4 +130,4 @@ function SidebarHistory( editor ) {
 
 }
 
-export { SidebarHistory };
+export { SidebarSettingsHistory };

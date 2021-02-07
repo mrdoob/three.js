@@ -64,7 +64,6 @@ function SidebarSettings( editor ) {
 
 	//
 
-	container.add( new SidebarSettingsShortcuts( editor ) );
 	container.add( new SidebarSettingsViewport( editor ) );
 
 	return container;
