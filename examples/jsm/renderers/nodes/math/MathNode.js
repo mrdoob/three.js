@@ -1,5 +1,4 @@
 import Node from '../core/Node.js';
-import OperatorNode from './OperatorNode.js';
 
 class MathNode extends Node {
 
