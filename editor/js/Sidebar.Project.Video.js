@@ -19,12 +19,12 @@ function SidebarProjectVideo( editor ) {
 
 	resolutionRow.add( new UIText( 'Resolution' ).setWidth( '90px' ) );
 
-	var videoWidth = new UIInteger( 600 ).setWidth( '28px' );
+	var videoWidth = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
 	resolutionRow.add( videoWidth );
 
-	resolutionRow.add( new UIText( '×' ).setFontSize( '12px' ).setWidth( '14px' ) );
+	resolutionRow.add( new UIText( '×' ).setTextAlign( 'center' ).setFontSize( '12px' ).setWidth( '12px' ) );
 
-	var videoHeight = new UIInteger( 600 ).setWidth( '28px' );
+	var videoHeight = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
 	resolutionRow.add( videoHeight );
 
 	var videoFPS = new UIInteger( 30 ).setTextAlign( 'center' ).setWidth( '20px' );
