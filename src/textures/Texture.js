@@ -19,14 +19,15 @@ let textureId = 0;
 
 class Texture extends EventDispatcher {
 
+	static DEFAULT_IMAGE = undefined;
+	static DEFAULT_MAPPING = UVMapping;
+
 	constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1, encoding = LinearEncoding ) {
 
 		super();
 
 		Object.defineProperty( this, 'id', { value: textureId ++ } );
 		Object.defineProperty( this, 'isTexture', { value: true } );
-		Object.defineProperty( this, 'DEFAULT_IMAGE', { value: undefined } );
-		Object.defineProperty( this, 'DEFAULT_MAPPING', { value: UVMapping } );
 
 		this.uuid = MathUtils.generateUUID();
 
