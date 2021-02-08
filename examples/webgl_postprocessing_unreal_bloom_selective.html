@@ -81,7 +81,8 @@
 			camera.position.set( 0, 0, 20 );
 			camera.lookAt( 0, 0, 0 );
 
-			const controls = new OrbitControls( camera, renderer.domElement );
+			const controls = new OrbitControls( camera );
+			controls.listenToPointerEvents( renderer.domElement );
 			controls.maxPolarAngle = Math.PI * 0.5;
 			controls.minDistance = 1;
 			controls.maxDistance = 100;

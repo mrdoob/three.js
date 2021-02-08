@@ -84,7 +84,8 @@
 				camera.position.y = 2 * radius;
 				camera.position.z = 2 * radius;
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 
 				//
 

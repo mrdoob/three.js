@@ -55,7 +55,8 @@
 					cloud = new THREE.TextureLoader().load( 'textures/lava/cloud.png' );
 					cloud.wrapS = cloud.wrapT = THREE.RepeatWrapping;
 
-					controls = new OrbitControls( camera, renderer.domElement );
+					controls = new OrbitControls( camera );
+					controls.listenToPointerEvents( renderer.domElement );
 					controls.minDistance = 50;
 					controls.maxDistance = 200;
 

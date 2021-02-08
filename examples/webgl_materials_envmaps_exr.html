@@ -113,7 +113,8 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 300;
 

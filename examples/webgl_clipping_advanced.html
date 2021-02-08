@@ -288,7 +288,8 @@
 
 				// Controls
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.minDistance = 1;
 				controls.maxDistance = 8;
 				controls.target.set( 0, 1, 0 );

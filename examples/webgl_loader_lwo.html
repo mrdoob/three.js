@@ -91,7 +91,8 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.target.set( 1.33, 10, - 6.7 );
 				controls.update();
 

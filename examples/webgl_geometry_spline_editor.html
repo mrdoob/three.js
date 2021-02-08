@@ -128,7 +128,8 @@
 				gui.open();
 
 				// Controls
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.damping = 0.2;
 				controls.addEventListener( 'change', render );
 

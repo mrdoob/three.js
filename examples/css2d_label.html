@@ -104,7 +104,8 @@
 				labelRenderer.domElement.style.top = '0px';
 				document.body.appendChild( labelRenderer.domElement );
 
-				const controls = new OrbitControls( camera, labelRenderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( labelRenderer.domElement );
 				controls.minDistance = 5;
 				controls.maxDistance = 100;
 

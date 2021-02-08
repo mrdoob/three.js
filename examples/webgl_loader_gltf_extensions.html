@@ -237,7 +237,8 @@
 
 				// TODO: Reuse existing OrbitControls, GLTFLoaders, and so on
 
-				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls = new OrbitControls( camera );
+				orbitControls.listenToPointerEvents( renderer.domElement );
 
 				if ( sceneInfo.addGround ) {
 

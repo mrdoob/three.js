@@ -48,7 +48,8 @@
 				camera.position.set( 10, 15, 25 );
 				scene.add( camera );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 20;
 				controls.maxDistance = 50;

@@ -87,13 +87,15 @@
 
 				camera = cameraPerspective;
 
-				controlsPerspective = new OrbitControls( cameraPerspective, renderer.domElement );
+				controlsPerspective = new OrbitControls( cameraPerspective );
+				controlsPerspective.listenToPointerEvents( renderer.domElement );
 				controlsPerspective.minDistance = 1000;
 				controlsPerspective.maxDistance = 2400;
 				controlsPerspective.enablePan = false;
 				controlsPerspective.enableDamping = true;
 
-				controlsOrtho = new OrbitControls( cameraOrtho, renderer.domElement );
+				controlsOrtho = new OrbitControls( cameraOrtho );
+				controlsOrtho.listenToPointerEvents( renderer.domElement );
 				controlsOrtho.minZoom = 0.5;
 				controlsOrtho.maxZoom = 1.5;
 				controlsOrtho.enablePan = false;

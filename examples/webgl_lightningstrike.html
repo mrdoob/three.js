@@ -335,7 +335,8 @@
 
 				// Controls
 
-				const controls = new OrbitControls( scene.userData.camera, renderer.domElement );
+				const controls = new OrbitControls( scene.userData.camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.target.y = ( conesDistance + coneHeight ) * 0.5;
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.05;
@@ -558,7 +559,8 @@
 
 				// Controls
 
-				const controls = new OrbitControls( scene.userData.camera, renderer.domElement );
+				const controls = new OrbitControls( scene.userData.camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.target.copy( sphereMesh.position );
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.05;
@@ -748,7 +750,8 @@
 
 				// Controls
 
-				const controls = new OrbitControls( scene.userData.camera, renderer.domElement );
+				const controls = new OrbitControls( scene.userData.camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.target.y = GROUND_SIZE * 0.05;
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.05;

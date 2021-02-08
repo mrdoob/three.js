@@ -51,7 +51,8 @@
 
 				} );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.target.y = camera.position.y;
 				controls.update();

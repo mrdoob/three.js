@@ -99,7 +99,8 @@
 				container.appendChild( renderer.domElement );
 
 				//controls
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.enableZoom = false;
 				controls.enablePan = false;
 				controls.minPolarAngle = Math.PI / 4;

@@ -61,7 +61,8 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 10, 20000 );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.minDistance = 1000;
 				controls.maxDistance = 10000;
 				controls.maxPolarAngle = Math.PI / 2;

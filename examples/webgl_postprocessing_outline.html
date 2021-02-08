@@ -126,7 +126,8 @@
 				camera = new THREE.PerspectiveCamera( 45, width / height, 0.1, 100 );
 				camera.position.set( 0, 0, 8 );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.minDistance = 5;
 				controls.maxDistance = 20;
 				controls.enablePan = false;

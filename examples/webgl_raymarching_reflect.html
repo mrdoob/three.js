@@ -299,7 +299,8 @@
 				scene.add( mesh );
 
 				// Controls
-				const controls = new OrbitControls( camera, canvas );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( canvas );
 				controls.enableZoom = false;
 
 				// GUI

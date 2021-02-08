@@ -28,7 +28,8 @@
 
 		const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
-		const controls = new OrbitControls( camera, renderer.domElement );
+		const controls = new OrbitControls( camera );
+		controls.listenToPointerEvents( renderer.domElement );
 
 		//controls.update() must be called after any manual changes to the camera's transform
 		camera.position.set( 0, 20, 100 );
@@ -286,6 +287,11 @@ controls.touches = {
 		<h3>[method:void listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>
 		<p>
 			Adds key event listeners to the given DOM element. *window* is a recommended argument for using this method.
+		</p>
+
+		<h3>[method:void listenToPointerEvents] ( [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			Adds pointer event listeners to the given DOM element. *renderer.domElement* is a recommended argument for using this method.
 		</p>
 
 		<h3>[method:null reset] ()</h3>

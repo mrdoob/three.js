@@ -63,7 +63,8 @@
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, container );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( container );
 
 				window.addEventListener( 'resize', resize );
 

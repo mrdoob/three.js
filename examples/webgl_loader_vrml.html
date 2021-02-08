@@ -78,7 +78,8 @@
 
 				// controls
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.minDistance = 1;
 				controls.maxDistance = 200;
 				controls.enableDamping = true;

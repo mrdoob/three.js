@@ -50,8 +50,8 @@
 			camera.position.set( 15, 15, 15 );
 			camera.lookAt( scene.position );
 
-			controls = new OrbitControls( camera, renderer.domElement );
-			controls.enableRotate = true;
+			controls = new OrbitControls( camera );
+			controls.listenToPointerEvents( renderer.domElement );
 
 			// add sprites
 

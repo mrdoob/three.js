@@ -166,7 +166,8 @@
 				renderer.setClearColor( 0xCCCCCC, 1 );
 
 				// Mouse control
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 

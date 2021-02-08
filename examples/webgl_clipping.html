@@ -115,7 +115,8 @@
 
 				// Controls
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.target.set( 0, 1, 0 );
 				controls.update();
 

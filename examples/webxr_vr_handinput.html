@@ -43,7 +43,8 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 1.6, 3 );
 
-				controls = new OrbitControls( camera, container );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( container );
 				controls.target.set( 0, 1.6, 0 );
 				controls.update();
 

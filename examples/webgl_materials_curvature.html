@@ -130,7 +130,8 @@
 				renderer.autoClear = false;
 				document.body.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.minDistance = 20;
 				controls.maxDistance = 100;
 

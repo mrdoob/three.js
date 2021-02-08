@@ -114,7 +114,8 @@
 
 				// CONTROLS
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.maxPolarAngle = 0.9 * Math.PI / 2;
 				controls.enableZoom = false;
 

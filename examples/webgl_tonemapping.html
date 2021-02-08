@@ -77,7 +77,8 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( - 1.8, 0.6, 2.7 );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.enableZoom = false;
 				controls.enablePan = false;

@@ -154,7 +154,8 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100 );
 				camera.position.set( - 1, 2, 3 );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.enablePan = false;
 				controls.enableZoom = false;
 				controls.target.set( 0, 1, 0 );

@@ -50,7 +50,8 @@
 				cubeCamera = new THREE.CubeCamera( 1, 1000, cubeRenderTarget );
 
 				// controls
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 10;
 				controls.maxDistance = 50;

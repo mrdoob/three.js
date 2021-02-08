@@ -135,7 +135,8 @@
 				container.appendChild( renderer.domElement );
 
 				//controls
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.minPolarAngle = Math.PI / 4;
 				controls.maxPolarAngle = Math.PI / 1.5;
 

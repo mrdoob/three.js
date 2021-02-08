@@ -40,7 +40,8 @@
 				camera.position.set( 0, 0, 1 );
 				camera.lookAt( scene.position );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.addEventListener( 'change', render );
 
 				const geometry = flipY( new THREE.PlaneBufferGeometry() );

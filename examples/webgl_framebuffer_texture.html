@@ -121,7 +121,8 @@
 				//
 
 				const selection = document.getElementById( 'selection' );
-				const controls = new OrbitControls( camera, selection );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( selection );
 				controls.enablePan = false;
 
 				//

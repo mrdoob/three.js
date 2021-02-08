@@ -176,7 +176,8 @@
 				const copyPass = new ShaderPass( CopyShader );
 				composer.addPass( copyPass );
 
-				const controls = new OrbitControls( cameraP, renderer.domElement );
+				const controls = new OrbitControls( cameraP );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.enableZoom = false;
 
 				window.addEventListener( 'resize', onWindowResize );

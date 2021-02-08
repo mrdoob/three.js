@@ -112,7 +112,8 @@
 					camera.position.z = 2;
 					scene.userData.camera = camera;
 
-					const controls = new OrbitControls( scene.userData.camera, scene.userData.element );
+					const controls = new OrbitControls( scene.userData.camera );
+					controls.listenToPointerEvents( scene.userData.element );
 					controls.minDistance = 2;
 					controls.maxDistance = 5;
 					controls.enablePan = false;

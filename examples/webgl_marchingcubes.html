@@ -99,7 +99,8 @@
 
 			// CONTROLS
 
-			const controls = new OrbitControls( camera, renderer.domElement );
+			const controls = new OrbitControls( camera );
+			controls.listenToPointerEvents( renderer.domElement );
 			controls.minDistance = 500;
 			controls.maxDistance = 5000;
 

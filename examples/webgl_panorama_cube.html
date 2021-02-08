@@ -39,7 +39,8 @@
 				camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.z = 0.01;
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.enableZoom = false;
 				controls.enablePan = false;
 				controls.enableDamping = true;

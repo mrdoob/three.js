@@ -97,7 +97,8 @@
 				cameraBG = new THREE.OrthographicCamera( - windowHalfX, windowHalfX, windowHalfY, - windowHalfY, - 10000, 10000 );
 				cameraBG.position.z = 100;
 
-				orbitControls = new OrbitControls( camera, container );
+				orbitControls = new OrbitControls( camera );
+				orbitControls.listenToPointerEvents( container );
 				orbitControls.autoRotate = true;
 				orbitControls.autoRotateSpeed = 1;
 

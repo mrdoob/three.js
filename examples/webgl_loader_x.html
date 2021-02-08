@@ -80,7 +80,8 @@
 			camera.position.set( 2, 10, - 28 );
 			camera.up.set( 0, 1, 0 );
 
-			controls = new OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera );
+			controls.listenToPointerEvents( renderer.domElement );
 			controls.target.set( 0, 5, 0 );
 			controls.update();
 

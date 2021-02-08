@@ -129,7 +129,8 @@
 				camera.position.z = - 50;
 				camera.position.y = 30;
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 200;
 

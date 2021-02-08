@@ -52,7 +52,8 @@
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.25;

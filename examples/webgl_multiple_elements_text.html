@@ -174,7 +174,8 @@
 					camera.position.set( 0, 0, 1.2 * balls );
 					scene.userData.camera = camera;
 
-					const controls = new OrbitControls( camera, views[ n ] );
+					const controls = new OrbitControls( camera );
+					controls.listenToPointerEvents( views[ n ] );
 					scene.userData.controls = controls;
 
 					scenes.push( scene );

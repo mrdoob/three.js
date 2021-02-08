@@ -50,7 +50,8 @@
 
 				// controls
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement ); // mandatory
 				controls.listenToKeyEvents( window ); // optional
 
 				//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)

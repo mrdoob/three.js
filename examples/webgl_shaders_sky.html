@@ -101,7 +101,8 @@
 				renderer.toneMappingExposure = 0.5;
 				document.body.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.addEventListener( 'change', render );
 				//controls.maxPolarAngle = Math.PI / 2;
 				controls.enableZoom = false;

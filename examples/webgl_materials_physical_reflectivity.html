@@ -162,7 +162,8 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.minDistance = 20;
 				controls.maxDistance = 200;
 

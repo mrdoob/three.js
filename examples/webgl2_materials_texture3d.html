@@ -56,7 +56,8 @@
 			camera.up.set( 0, 0, 1 ); // In our data, z is up
 
 			// Create controls
-			controls = new OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera );
+			controls.listenToPointerEvents( renderer.domElement );
 			controls.addEventListener( 'change', render );
 			controls.target.set( 64, 64, 128 );
 			controls.minZoom = 0.5;

@@ -76,7 +76,8 @@
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.maxPolarAngle = Math.PI / 2;
 				camera.position.set( 60, 60, 0 );
 				controls.target = new THREE.Vector3( - 100, 10, 0 );

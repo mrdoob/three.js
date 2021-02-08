@@ -117,7 +117,8 @@
 				camera.position.z = 1500;
 				scene.add( camera );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.enableZoom = false;
 				controls.enableDamping = true;
 

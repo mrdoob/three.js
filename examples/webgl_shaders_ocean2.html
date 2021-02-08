@@ -45,7 +45,8 @@
 					this.ms_Camera.lookAt( 0, 0, 0 );
 
 					// Initialize Orbit control
-					this.ms_Controls = new OrbitControls( this.ms_Camera, this.ms_Renderer.domElement );
+					this.ms_Controls = new OrbitControls( this.ms_Camera );
+					this.ms_Controls.listenToPointerEvents( this.ms_Renderer.domElement );
 					this.ms_Controls.userPan = false;
 					this.ms_Controls.userPanSpeed = 0.0;
 					this.ms_Controls.minDistance = 0;

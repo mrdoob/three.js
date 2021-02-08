@@ -64,7 +64,8 @@
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.z = 6;
 
-				controls = new OrbitControls( camera, container );
+				controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( container );
 
 				const light = new THREE.HemisphereLight( 0xffffff, 0x444444, 1 );
 				light.position.set( - 2, 2, 2 );

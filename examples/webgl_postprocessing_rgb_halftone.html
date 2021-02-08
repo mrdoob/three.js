@@ -50,7 +50,8 @@
 				document.body.appendChild( stats.dom );
 
 				// camera controls
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.target.set( 0, 0, 0 );
 				controls.update();
 

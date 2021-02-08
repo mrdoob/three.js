@@ -118,7 +118,8 @@
 
 				//
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera );
+				controls.listenToPointerEvents( renderer.domElement );
 				controls.target.y = 0.5;
 				controls.update();
 

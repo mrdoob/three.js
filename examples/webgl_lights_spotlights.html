@@ -26,7 +26,8 @@
 
 			const camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 2000 );
 
-			const controls = new OrbitControls( camera, renderer.domElement );
+			const controls = new OrbitControls( camera );
+			controls.listenToPointerEvents( renderer.domElement );
 
 			const scene = new THREE.Scene();
 

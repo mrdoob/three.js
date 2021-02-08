@@ -7,11 +7,8 @@
 
 THREE.OrbitControls = function ( object, domElement ) {
 
-	if ( domElement === undefined ) console.warn( 'THREE.OrbitControls: The second parameter "domElement" is now mandatory.' );
-	if ( domElement === document ) console.error( 'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.' );
-
 	this.object = object;
-	this.domElement = domElement;
+	this.domElement = null;
 
 	// Set to false to disable this control
 	this.enabled = true;
@@ -99,6 +96,21 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		domElement.addEventListener( 'keydown', onKeyDown );
 		this._domElementKeyEvents = domElement;
+
+	};
+
+	this.listenToPointerEvents = function ( domElement ) {
+
+		if ( domElement === document ) console.error( 'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.' );
+
+		domElement.addEventListener( 'contextmenu', onContextMenu );
+		domElement.addEventListener( 'pointerdown', onPointerDown );
+		domElement.addEventListener( 'wheel', onMouseWheel );
+		domElement.addEventListener( 'touchstart', onTouchStart );
+		domElement.addEventListener( 'touchend', onTouchEnd );
+		domElement.addEventListener( 'touchmove', onTouchMove );
+
+		this.domElement = domElement;
 
 	};
 
@@ -1172,14 +1184,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	//
 
-	scope.domElement.addEventListener( 'contextmenu', onContextMenu );
+	if ( domElement !== undefined ) {
 
-	scope.domElement.addEventListener( 'pointerdown', onPointerDown );
-	scope.domElement.addEventListener( 'wheel', onMouseWheel );
+		console.warn( 'THREE.OrbitControls: The domElement constructor param has been deprecated. Use .listenToPointerEvents() instead.' );
+		this.listenToPointerEvents( domElement );
 
-	scope.domElement.addEventListener( 'touchstart', onTouchStart );
-	scope.domElement.addEventListener( 'touchend', onTouchEnd );
-	scope.domElement.addEventListener( 'touchmove', onTouchMove );
+	}
 
 	// force an update at start
 

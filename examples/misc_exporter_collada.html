@@ -80,7 +80,8 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 				// CONTROLS
-				cameraControls = new OrbitControls( camera, renderer.domElement );
+				cameraControls = new OrbitControls( camera );
+				cameraControls.listenToPointerEvents( renderer.domElement );
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP

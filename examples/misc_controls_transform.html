@@ -57,7 +57,8 @@
 				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
 				const material = new THREE.MeshLambertMaterial( { map: texture, transparent: true } );
 
-				orbit = new OrbitControls( currentCamera, renderer.domElement );
+				orbit = new OrbitControls( currentCamera );
+				orbit.listenToPointerEvents( renderer.domElement );
 				orbit.update();
 				orbit.addEventListener( 'change', render );
 
