@@ -78,7 +78,8 @@ function SidebarProjectVideo( editor ) {
 		const encoder = Encoder.create({
 			width: canvas.width,
 			height: canvas.height,
-			fps: fps
+			fps: fps,
+			// kbps: 60 // that's pretty ugly
 		});
 
 		let currentTime = 0;
