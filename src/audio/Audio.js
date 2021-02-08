@@ -37,6 +37,10 @@ class Audio extends Object3D {
 
 	}
 
+	clone( recursive ) {
+		return new this.constructor( this.listener.clone( recursive ) ).copy( this, recursive );
+	}
+
 	getOutput() {
 
 		return this.gain;
