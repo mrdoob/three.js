@@ -2,6 +2,8 @@ import { UIBreak, UIButton, UIInteger, UIPanel, UIProgress, UIRow, UIText } from
 
 import { APP } from './libs/app.js';
 
+import loadEncoder from "https://unpkg.com/mp4-h264";
+
 function SidebarProjectVideo( editor ) {
 
 	var container = new UIPanel();
@@ -54,6 +56,7 @@ function SidebarProjectVideo( editor ) {
 	const renderButton = new UIButton( 'RENDER' );
 	renderButton.setWidth( '170px' );
 	renderButton.onClick( async () => {
+		console.time('Video encoding mp4-h264');
 
 		renderButton.setDisplay( 'none' );
 		progress.setDisplay( '' );
@@ -66,55 +69,46 @@ function SidebarProjectVideo( editor ) {
 
 		const canvas = player.dom.firstElementChild;
 
-		//
-
-		const { createFFmpeg, fetchFile } = FFmpeg; // eslint-disable-line no-undef
-		const ffmpeg = createFFmpeg( { log: true } );
-
-		await ffmpeg.load();
-
-		ffmpeg.setProgress( ( { ratio } ) => {
-
-			progress.setValue( ratio );
-
-		} );
-
 		const fps = videoFPS.getValue();
 		const duration = videoDuration.getValue();
 		const frames = duration * fps;
 
-		let currentTime = 0;
+		const Encoder = await loadEncoder();
+		// Create a new encoder interface
+		const encoder = Encoder.create({
+			width: canvas.width,
+			height: canvas.height,
+			fps: fps
+		});
 
+		let currentTime = 0;
+		const canvasCopy = document.createElement('canvas');
+		canvasCopy.width = canvas.width;
+		canvasCopy.height = canvas.height;
+		const contextCopy = canvasCopy.getContext('2d');
 		for ( let i = 0; i < frames; i ++ ) {
 
 			player.render( currentTime );
+			contextCopy.drawImage(canvas, 0, 0);
+			const rgba = contextCopy.getImageData(0, 0, canvas.width, canvas.height).data;
+			encoder.encodeRGB(rgba);
 
-			const num = i.toString().padStart( 5, '0' );
-			ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
 			currentTime += 1 / fps;
 
 			progress.setValue( i / frames );
 
 		}
 
-		await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 6 ), 'out.mp4' );
+		const mp4 = encoder.end();
 
-		const data = ffmpeg.FS( 'readFile', 'out.mp4' );
-
-		for ( let i = 0; i < frames; i ++ ) {
-
-			const num = i.toString().padStart( 5, '0' );
-			ffmpeg.FS( 'unlink', `tmp.${num}.png` );
-
-		}
-
-		save( new Blob( [ data.buffer ], { type: 'video/mp4' } ), 'out.mp4' );
+		save( new Blob([mp4], { type: "video/mp4" }), 'out.mp4' );
 
 		player.dispose();
 
 		renderButton.setDisplay( '' );
 		progress.setDisplay( 'none' );
 
+		console.timeEnd('Video encoding mp4-h264');
 	} );
 	container.add( renderButton );
 
@@ -128,7 +122,7 @@ function SidebarProjectVideo( editor ) {
 		link.download = filename;
 		link.dispatchEvent( new MouseEvent( 'click' ) );
 
-		// URL.revokeObjectURL( url ); breaks Firefox...
+		URL.revokeObjectURL( link.href );
 
 	}
 
