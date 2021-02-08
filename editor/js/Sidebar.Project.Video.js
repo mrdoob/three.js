@@ -2,7 +2,19 @@ import { UIBreak, UIButton, UIInteger, UIPanel, UIProgress, UIRow, UIText } from
 
 import { APP } from './libs/app.js';
 
+import { simd } from "https://unpkg.com/wasm-feature-detect?module";
 import loadEncoder from "https://unpkg.com/mp4-h264";
+
+let lazyEncoderPromise;
+
+function lazyLoadEncoder () {
+	if (lazyEncoderPromise != null) return lazyEncoderPromise;
+	lazyEncoderPromise = simd().then(isSIMD => {
+		console.log("SIMD Video Encoder Supported?", isSIMD);
+		return loadEncoder({ simd: isSIMD });
+	});
+	return lazyEncoderPromise;
+}
 
 function SidebarProjectVideo( editor ) {
 
@@ -71,15 +83,37 @@ function SidebarProjectVideo( editor ) {
 
 		const fps = videoFPS.getValue();
 		const duration = videoDuration.getValue();
-		const frames = duration * fps;
+		const frames = Math.floor(duration * fps);
 
-		const Encoder = await loadEncoder();
+		const Encoder = await lazyLoadEncoder();
+
+		// Ideally the user could choose this sort of thing
+		const preset = "medium";
+		const presetOpts = {
+			medium: {
+				kbps: 1200,
+				speed: 5,
+				qpMax: 20,
+				temporalDenoise: true,
+			},
+			low: {
+				speed: 0,
+				kbps: 1200 / 2,
+				qpMax: 40,
+				temporalDenoise: true,
+			},
+			high: {
+				speed: 5,
+			},
+		}[preset];
+		console.log("Encoding with Compression Preset", preset);
+
 		// Create a new encoder interface
 		const encoder = Encoder.create({
+			...presetOpts,
 			width: canvas.width,
 			height: canvas.height,
 			fps: fps,
-			// kbps: 60 // that's pretty ugly
 		});
 
 		let currentTime = 0;
@@ -87,7 +121,8 @@ function SidebarProjectVideo( editor ) {
 		canvasCopy.width = canvas.width;
 		canvasCopy.height = canvas.height;
 		const contextCopy = canvasCopy.getContext('2d');
-		for ( let i = 0; i < frames; i ++ ) {
+		const frameArray = new Array(frames).fill(0).map((_, i) => i);
+		for (let i of frameArray) {
 
 			player.render( currentTime );
 			contextCopy.drawImage(canvas, 0, 0);
@@ -97,6 +132,7 @@ function SidebarProjectVideo( editor ) {
 			currentTime += 1 / fps;
 
 			progress.setValue( i / frames );
+			await new Promise((resolve) => setTimeout(resolve, 0));
 
 		}
 
