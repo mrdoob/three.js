@@ -19,9 +19,6 @@ let textureId = 0;
 
 class Texture extends EventDispatcher {
 
-	static DEFAULT_IMAGE = undefined;
-	static DEFAULT_MAPPING = UVMapping;
-
 	constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1, encoding = LinearEncoding ) {
 
 		super();
@@ -204,11 +201,11 @@ class Texture extends EventDispatcher {
 
 						if ( image[ i ].isDataTexture ) {
 
-							url.push( serializeImage( image[ i ].image ) );
+							url.push( this.serializeImage( image[ i ].image ) );
 
 						} else {
 
-							url.push( serializeImage( image[ i ] ) );
+							url.push( this.serializeImage( image[ i ] ) );
 
 						}
 
@@ -218,7 +215,7 @@ class Texture extends EventDispatcher {
 
 					// process single image
 
-					url = serializeImage( image );
+					url = this.serializeImage( image );
 
 				}
 
@@ -370,5 +367,8 @@ class Texture extends EventDispatcher {
 	}
 
 }
+
+Texture.DEFAULT_IMAGE = undefined;
+Texture.DEFAULT_MAPPING = UVMapping;
 
 export { Texture };
