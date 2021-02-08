@@ -2,10 +2,10 @@ Title: Three.js Custom BufferGeometry
 Description: How to make your own BufferGeometry.
 TOC: Custom BufferGeometry
 
-`BufferGeometry` is three.js's way of representing all geometry. It's
-essentially a collection *named*  `BufferAttribute`s.
+`BufferGeometry` is three.js's way of representing all geometry. A `BufferGeometry`
+essentially a collection *named* of `BufferAttribute`s.
 Each `BufferAttribute` represents an array of one type of data: positions,
-normals, colors, and uv. Together, the added `BufferAttribute`s represent
+normals, colors, uv, etc... Together, the named `BufferAttribute`s represent
 *parallel arrays* of all the data for each vertex.
 
 <div class="threejs_center"><img src="resources/threejs-attributes.svg" style="width: 700px"></div>
@@ -20,7 +20,17 @@ This brings up a point, here's a diagram of a cube with one corner highlighted.
 <div class="threejs_center"><img src="resources/cube-faces-vertex.svg" style="width: 500px"></div>
 
 Thinking about it that single corner needs a different normal for each face of the
-cube. It needs different UVs for each face as well. 
+cube. A normal is info about which direction something faces. In the diagram
+the normals are presented by the arrows around the corner vertex showing that each
+face that shares that vertex position needs a normal that points in a different direction.
+
+That corner needs different UVs for each face as well. UVs are texture coordinates
+that specify which part of a texture being drawn on a triangle corresponds to that
+vertex position. You can see the green face needs that vertex to have a UV that corresponds
+to the top right corner of the F texture, the blue face needs a UV that corresponds to the
+top left corner of the F texture, and the red face needs a UV that corresponds to the bottom
+left corner of the F texture.
+
 A single *vertex* is the combination of all of its parts. If a vertex needs any
 part to be different then it must be a different vertex.
 
@@ -432,7 +442,7 @@ I hope these were useful examples of how to use `BufferGeometry` directly to
 make your own geometry and how to dynamically update the contents of a
 `BufferAttribute`.
 
-<!-- needed to prevent warning from outdated translation -->
+<!-- needed to prevent warning from outdated translations -->
 <a href="resources/threejs-geometry.svg"></a>
 <a href="threejs-custom-geometry.html"></a>
 
