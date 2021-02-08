@@ -21,8 +21,8 @@ THREE.OrientationHelper = function ( camera, controls, options, labels ) {
 		cameraDistance: 150,
 		boxBackground: '#ddd',
 		boxColor: '#222',
-		boxCanvasSide: 128,
-		boxFontSize: 28,
+		boxCanvasSide: 64,
+		boxFontSize: 14,
 		boxFontFamily: 'Arial',
 		model3D: null,
 		addRing: true,
@@ -109,7 +109,7 @@ THREE.OrientationHelper = function ( camera, controls, options, labels ) {
 	} );
 
 	var cameraPosition = camera.position;
-	var controlsTarget = controls && controls.target || new THREE.Vector3();
+	var controlsTarget = ( controls && controls.target ) || new THREE.Vector3();
 
 	var _vector3Helper = new THREE.Vector3(),
 		_mouseVectorWebGL = new THREE.Vector2(),
@@ -228,7 +228,7 @@ THREE.OrientationHelper = function ( camera, controls, options, labels ) {
 			}
 
 			_mouseVectorWebGL.x = ( ( ev.clientX - _viewportClientRect.left ) / _viewportClientRect.width ) * 2 - 1;
-			_mouseVectorWebGL.y = ( ( ev.clientY - _viewportClientRect.top ) / _viewportClientRect.height ) * 2 - 1;
+			_mouseVectorWebGL.y = - ( ( ev.clientY - _viewportClientRect.top ) / _viewportClientRect.height ) * 2 + 1;
 
 			scope._raycaster.setFromCamera( _mouseVectorWebGL, scope._camera );
 
