@@ -36,13 +36,12 @@
 
 		<h2>생성자</h2>
 
-		<h3>[name]( [param:Number fov], [param:Number aspect], [param:Number near], [param:Number far], [param:Boolean fitWidth] )</h3>
+		<h3>[name]( [param:Number fov], [param:Number aspect], [param:Number near], [param:Number far] )</h3>
 		<p>
 		fov — 카메라 절두체 수직 시야.<br />
 		aspect — 카메라 절두체 종횡비.<br />
 		near — 카메라 절두체 근평면.<br />
-		far — 카메라 절두체 원평면.<br />
-		fitWidth — Whether to apply [page:.fov fov] to horizontal.<br /><br />
+		far — 카메라 절두체 원평면.<br /><br />
 
 			카메라의 [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum]을 정의합니다.
 		</p>
@@ -80,9 +79,6 @@
 
 		<h3>[property:Float fov]</h3>
 		<p>카메라 아래부터 위까지, 도 단위로 표시되는 수직 시야입니다. 기본값은 *50*입니다.</p>
-
-		<h3>[property:Boolean fitWidth]</h3>
-		<p>Whether to apply [page:.fov fov] to horizontal. Default is *false*.</p>
 
 
 		<h3>[property:Float near]</h3>
@@ -132,6 +128,30 @@
 		현재 [page:PerspectiveCamera.filmGauge .filmGauge]에 대해 초점 길이로 FOV를 설정합니다.<br /><br />
 
 		기본적으로 초점 길이는 35mm(전체 프레임) 카메라로 지정됩니다.
+		</p>
+
+		<h3>[method:Float getHorizontalFOV]()</h3>
+		<p>Returns the current horizontal field of view angle in degrees, calculated from [page:.fov .fov] and [page:.aspect .aspect].</p>
+
+		<h3>[method:null setHorizontalFOV]( [param:Float horizontalFOV] )</h3>
+		<p>Sets the [page:.fov .fov] by horizontal field of view in degrees and [page:.aspect .aspect].</p>
+
+		<p>
+			To maintain a constant horizontal fov, you would call it like this:<br />
+
+			<code>function onWindowResize( event ) {
+
+	renderer.setSize( window.innerWidth, window.innerHeight );
+
+	// maintain a constant horizontal fov
+	const hfov = camera.getHorizontalFOV();
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.setHorizontalFOV( hfov );
+
+	render(); // if there is no animation loop
+
+}
+</code>
 		</p>
 
 		<h3>[method:null setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>

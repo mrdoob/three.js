@@ -37,13 +37,12 @@
 
 		<h2>构造器</h2>
 
-		<h3>[name]( [param:Number fov], [param:Number aspect], [param:Number near], [param:Number far], [param:Boolean fitWidth] )</h3>
+		<h3>[name]( [param:Number fov], [param:Number aspect], [param:Number near], [param:Number far] )</h3>
 		<p>
 		fov — 摄像机视锥体垂直视野角度<br />
 		aspect — 摄像机视锥体长宽比<br />
 		near — 摄像机视锥体近端面<br />
-		far — 摄像机视锥体远端面<br />
-		fitWidth — 是否将视野角度([page:.fov fov])应用到水平宽度上<br /><br />
+		far — 摄像机视锥体远端面<br /><br />
 
 		这些参数一起定义了摄像机的[link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum]（视锥体）。
 		</p>
@@ -80,9 +79,6 @@
 
 		<h3>[property:Float fov]</h3>
 		<p>摄像机视锥体垂直视野角度，从视图的底部到顶部，以角度来表示。默认值是*50*。</p>
-
-		<h3>[property:Boolean fitWidth]</h3>
-		<p>是否将视野角度([page:.fov fov])应用到水平宽度上。默认值是*false*。</p>
 
 
 		<h3>[property:Float near]</h3>
@@ -130,6 +126,30 @@
 			通过相对于当前[page:PerspectiveCamera.filmGauge .filmGauge]的焦距，设置FOV。
 		<br /><br />
 			默认情况下，焦距是为35mm（全画幅）摄像机而指定的。</p>
+
+			<h3>[method:Float getHorizontalFOV]()</h3>
+			<p>返回从[page:.fov .fov]和[page:.aspect .aspect]计算得出的当前水平视野度数。</p>
+	
+			<h3>[method:null setHorizontalFOV]( [param:Float horizontalFOV] )</h3>
+			<p>通过水平视野度数和[page:.aspect .aspect]设置[page:.fov .fov]。</p>
+	
+			<p>
+				为了保持固定的水平视野，你可以这样来设置、调用：<br />
+				
+				<code>function onWindowResize( event ) {
+	
+		renderer.setSize( window.innerWidth, window.innerHeight );
+	
+		// maintain a constant horizontal fov
+		const hfov = camera.getHorizontalFOV();
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.setHorizontalFOV( hfov );
+	
+		render(); // if there is no animation loop
+	
+	}
+	</code>
+			</p>
 
 		<h3>[method:null setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
 		<p>
