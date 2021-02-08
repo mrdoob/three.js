@@ -2,13 +2,13 @@ import { UIBreak, UIButton, UIInteger, UIPanel, UIProgress, UIRow, UIText, UISel
 
 import { APP } from './libs/app.js';
 
-import { simd } from "https://unpkg.com/wasm-feature-detect?module";
-import loadEncoder from "https://unpkg.com/mp4-h264";
+import { simd } from "./libs/wasm-feature-detect/index.js";
+import loadEncoder from "./libs/mp4-h264/mp4-encoder.js";
 
 const qualityPresets = {
 	low: {
 		groupOfPictures: 24,
-		speed: 4,
+		speed: 3,
 		kbps: 600,
 		qpMin: 24,
 		qpMax: 36,
@@ -16,10 +16,10 @@ const qualityPresets = {
 	},
 	medium: {
 		groupOfPictures: 20,
-		speed: 5,
+		speed: 3,
 		kbps: 1200,
-		qpMin: 18,
-		qpMax: 24,
+		qpMin: 14,
+		qpMax: 22,
 		temporalDenoise: true
 	},
 	high: {
@@ -113,8 +113,6 @@ function SidebarProjectVideo( editor ) {
 	const renderButton = new UIButton( 'RENDER' );
 	renderButton.setWidth( '170px' );
 	renderButton.onClick( async () => {
-		console.time( 'Video encoding mp4-h264' );
-
 		renderButton.setDisplay( 'none' );
 		progress.setDisplay( '' );
 		progress.setValue( 0 );
@@ -136,7 +134,6 @@ function SidebarProjectVideo( editor ) {
 		const Encoder = await lazyLoadEncoder();
 
 		const presetOpts = qualityPresets[quality];
-		console.log( "Encoding with Compression Preset", quality, presetOpts );
 
 		// Create a new encoder interface
 		const encoder = Encoder.create({
@@ -171,8 +168,6 @@ function SidebarProjectVideo( editor ) {
 
 		renderButton.setDisplay( '' );
 		progress.setDisplay( 'none' );
-
-		console.timeEnd( 'Video encoding mp4-h264' );
 	} );
 	container.add( renderButton );
 
