@@ -6278,8 +6278,8 @@
 			}
 
 			object.applyMatrix4(_m1$1);
-			object.updateWorldMatrix(false, false);
 			this.add(object);
+			object.updateWorldMatrix(false, true);
 			return this;
 		},
 		getObjectById: function getObjectById(id) {
@@ -9495,7 +9495,7 @@
 			_vC.add(_morphC);
 		}
 
-		if (object.isSkinnedMesh) {
+		if (object.isSkinnedMesh && material.skinning) {
 			object.boneTransform(a, _vA);
 			object.boneTransform(b, _vB);
 			object.boneTransform(c, _vC);
@@ -29004,15 +29004,22 @@
 		}
 	});
 
-	function AmbientLight(color, intensity) {
-		Light.call(this, color, intensity);
-		this.type = 'AmbientLight';
-	}
+	var AmbientLight = /*#__PURE__*/function (_Light) {
+		_inheritsLoose(AmbientLight, _Light);
 
-	AmbientLight.prototype = Object.assign(Object.create(Light.prototype), {
-		constructor: AmbientLight,
-		isAmbientLight: true
-	});
+		function AmbientLight(color, intensity) {
+			var _this;
+
+			_this = _Light.call(this, color, intensity) || this;
+			_this.type = 'AmbientLight';
+			Object.defineProperty(_assertThisInitialized(_this), 'isAmbientLight', {
+				value: true
+			});
+			return _this;
+		}
+
+		return AmbientLight;
+	}(Light);
 
 	function RectAreaLight(color, intensity, width, height) {
 		Light.call(this, color, intensity);
@@ -35893,45 +35900,6 @@
 		}
 	}); //
 
-	function ClosedSplineCurve3(points) {
-		console.warn('THREE.ClosedSplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.');
-		CatmullRomCurve3.call(this, points);
-		this.type = 'catmullrom';
-		this.closed = true;
-	}
-	ClosedSplineCurve3.prototype = Object.create(CatmullRomCurve3.prototype); //
-
-	function SplineCurve3(points) {
-		console.warn('THREE.SplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.');
-		CatmullRomCurve3.call(this, points);
-		this.type = 'catmullrom';
-	}
-	SplineCurve3.prototype = Object.create(CatmullRomCurve3.prototype); //
-
-	function Spline(points) {
-		console.warn('THREE.Spline has been removed. Use THREE.CatmullRomCurve3 instead.');
-		CatmullRomCurve3.call(this, points);
-		this.type = 'catmullrom';
-	}
-	Spline.prototype = Object.create(CatmullRomCurve3.prototype);
-	Object.assign(Spline.prototype, {
-		initFromArray: function initFromArray()
-		/* a */
-		{
-			console.error('THREE.Spline: .initFromArray() has been removed.');
-		},
-		getControlPointsArray: function getControlPointsArray()
-		/* optionalTarget */
-		{
-			console.error('THREE.Spline: .getControlPointsArray() has been removed.');
-		},
-		reparametrizeByArcLength: function reparametrizeByArcLength()
-		/* samplingCoef */
-		{
-			console.error('THREE.Spline: .reparametrizeByArcLength() has been removed.');
-		}
-	}); //
-
 	function AxisHelper(size) {
 		console.warn('THREE.AxisHelper has been renamed to THREE.AxesHelper.');
 		return new AxesHelper(size);
@@ -37198,7 +37166,6 @@
 	exports.CircleGeometry = CircleGeometry;
 	exports.ClampToEdgeWrapping = ClampToEdgeWrapping;
 	exports.Clock = Clock;
-	exports.ClosedSplineCurve3 = ClosedSplineCurve3;
 	exports.Color = Color;
 	exports.ColorKeyframeTrack = ColorKeyframeTrack;
 	exports.CompressedTexture = CompressedTexture;
@@ -37526,9 +37493,7 @@
 	exports.SphereGeometry = SphereGeometry;
 	exports.Spherical = Spherical;
 	exports.SphericalHarmonics3 = SphericalHarmonics3;
-	exports.Spline = Spline;
 	exports.SplineCurve = SplineCurve;
-	exports.SplineCurve3 = SplineCurve3;
 	exports.SpotLight = SpotLight;
 	exports.SpotLightHelper = SpotLightHelper;
 	exports.Sprite = Sprite;
