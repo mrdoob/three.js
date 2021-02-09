@@ -1,60 +1,60 @@
-
 import { Command } from '../Command.js';
 
-import * as THREE from '../../../build/three.module.js';
+import { ObjectLoader } from '../../../build/three.module.js';
 
 /**
  * @param editor Editor
  * @param object THREE.Object3D
  * @constructor
  */
-function RemoveObjectCommand( editor, object ) {
+class RemoveObjectCommand extends Command {
 
-	Command.call( this, editor );
+	constructor( editor, object ) {
 
-	this.type = 'RemoveObjectCommand';
-	this.name = 'Remove Object';
+		super( editor );
 
-	this.object = object;
-	this.parent = ( object !== undefined ) ? object.parent : undefined;
-	if ( this.parent !== undefined ) {
+		this.type = 'RemoveObjectCommand';
+		this.name = 'Remove Object';
 
-		this.index = this.parent.children.indexOf( this.object );
+		this.object = object;
+		this.parent = ( object !== undefined ) ? object.parent : undefined;
+		if ( this.parent !== undefined ) {
+
+			this.index = this.parent.children.indexOf( this.object );
+
+		}
 
 	}
 
-}
-
-RemoveObjectCommand.prototype = {
-
-	execute: function () {
+	execute() {
 
 		this.editor.removeObject( this.object );
 		this.editor.deselect();
 
-	},
+	}
 
-	undo: function () {
+	undo() {
 
 		this.editor.addObject( this.object, this.parent, this.index );
 		this.editor.select( this.object );
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var output = Command.prototype.toJSON.call( this );
+		const output = super.toJSON( this );
+
 		output.object = this.object.toJSON();
 		output.index = this.index;
 		output.parentUuid = this.parent.uuid;
 
 		return output;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Command.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.parent = this.editor.objectByUuid( json.parentUuid );
 		if ( this.parent === undefined ) {
@@ -66,15 +66,16 @@ RemoveObjectCommand.prototype = {
 		this.index = json.index;
 
 		this.object = this.editor.objectByUuid( json.object.object.uuid );
+
 		if ( this.object === undefined ) {
 
-			var loader = new THREE.ObjectLoader();
+			const loader = new ObjectLoader();
 			this.object = loader.parse( json.object );
 
 		}
 
 	}
 
-};
+}
 
 export { RemoveObjectCommand };
