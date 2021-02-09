@@ -5,13 +5,14 @@ class Light extends Object3D {
 
 	constructor( color, intensity = 1 ) {
 
-		super( );
+		super();
+
+		Object.defineProperty( this, 'isLight', { value: true } );
 
 		this.type = 'Light';
 
 		this.color = new Color( color );
 		this.intensity = intensity;
-		Object.defineProperty( this, 'isLight', { value: true } );
 
 	}
 
@@ -47,6 +48,5 @@ class Light extends Object3D {
 	}
 
 }
-
 
 export { Light };
