@@ -46,7 +46,7 @@ function buildHeader() {
 
 function buildXform( object, define ) {
 
-	const name = 'Object' + object.id;
+	const name = 'Object_' + object.id;
 	const transform = buildMatrix( object.matrixWorld );
 
 	return `def Xform "${ name }"
@@ -79,7 +79,7 @@ function buildMatrixRow( array, offset ) {
 
 function buildMesh( geometry, material ) {
 
-	const name = 'Geometry' + geometry.id;
+	const name = 'Geometry_' + geometry.id;
 	const attributes = geometry.attributes;
 	const count = attributes.position.count;
 
@@ -87,14 +87,16 @@ function buildMesh( geometry, material ) {
     {
         int[] faceVertexCounts = [${ buildMeshVertexCount( geometry ) }]
         int[] faceVertexIndices = [${ buildMeshVertexIndices( geometry ) }]
-        rel material:binding = </_materials/Material_${ material.id }>
+        rel material:binding = </Materials/Material_${ material.id }>
         normal3f[] normals = [${ buildVector3Array( attributes.normal, count )}] (
             interpolation = "vertex"
         )
         point3f[] points = [${ buildVector3Array( attributes.position, count )}]
-        texCoord2f[] primvars:UVMap = [${ buildVector2Array( attributes.uv, count )}] (
-            interpolation = "faceVarying"
+        float2[] primvars:st = [${ buildVector2Array( attributes.uv, count )}] (
+            elementSize = 1
+            interpolation = "vertex"
         )
+        int[] primvars:st:indices
         uniform token subdivisionScheme = "none"
     }
 `;
@@ -188,7 +190,7 @@ function buildMaterials( materials ) {
 
 	}
 
-	return `def "_materials"
+	return `def "Materials"
 {
 ${ array.join( '' ) }
 }
@@ -202,9 +204,9 @@ function buildMaterial( material ) {
 	return `
     def Material "Material_${ material.id }"
     {
-        token outputs:surface.connect = </_materials/Material_${ material.id }/previewShader.outputs:surface>
+        token outputs:surface.connect = </Materials/Material_${ material.id }/PreviewSurface.outputs:surface>
 
-        def Shader "previewShader"
+        def Shader "PreviewSurface"
         {
             uniform token info:id = "UsdPreviewSurface"
             color3f inputs:diffuseColor = ${ buildColor( material.color ) }
