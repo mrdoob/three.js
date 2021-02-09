@@ -1987,9 +1987,9 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.copyTextureToTexture3D = function ( box, srcTexture, dstTexture, level = 0 ) {
+	this.copyTextureToTexture3D = function ( sourceBox, position, srcTexture, dstTexture, level = 0 ) {
 
-		if ( ! _this.isWebGL1Renderer ) {
+		if ( _this.isWebGL1Renderer ) {
 
 			console.warn( 'THREE.WebGLRenderer.copyTextureToTexture3D: can only be used with WebGL2.' );
 			return;
@@ -2021,25 +2021,37 @@ function WebGLRenderer( parameters ) {
 		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, dstTexture.flipY );
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
 		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
+
+		// @todo: we can move those parameters to the 3D texture
+		// classes just like `UNPACK_ALIGNMENT`, and then we can use them when
+		// uploading texture. If we decide to keep this function this way with the
+		// `sourceBox` parameter, then we need to reset those parameters to the
+		// default values either after the `texSubImage3D` call, or when uploading
+		// a texture.
 		_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, width );
 		_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, height );
-		_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, box.x );
-		_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, box.y );
-		_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, box.z );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, sourceBox.min.x );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, sourceBox.min.y );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, sourceBox.min.z );
 
 		_gl.texSubImage3D(
 			glTarget,
 			level,
-			box.x,
-			box.y,
-			box.z,
-			box.max.x - box.min.x + 1,
-			box.max.y - box.min.y + 1,
-			box.max.z - box.min.z + 1,
+			position.x,
+			position.y,
+			position.z,
+			sourceBox.max.x - sourceBox.min.x + 1,
+			sourceBox.max.y - sourceBox.min.y + 1,
+			sourceBox.max.z - sourceBox.min.z + 1,
 			glFormat,
 			glType,
 			data
 		);
+
+		// Generate mipmaps only when copying level 0
+		if ( level === 0 && dstTexture.generateMipmaps ) _gl.generateMipmap( glTarget );
+
+		state.unbindTexture();
 
 	};
 
