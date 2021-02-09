@@ -449,7 +449,20 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		return undefined;
 
 	},
+	getObjectByDeepProperty: function (name, value) {
+  		if (name.reduce((prev, current) => prev[current], this) === value) return this;
 
+  		for (let i = 0, l = this.children.length; i < l; i += 1) {
+   			const child = this.children[i];
+    			const object = child.getObjectByDeepProperty(name, value);
+
+    			if (object !== undefined) {
+     			return object;
+    			}
+  		}
+
+  		return undefined;
+	};
 	getWorldPosition: function ( target ) {
 
 		if ( target === undefined ) {
