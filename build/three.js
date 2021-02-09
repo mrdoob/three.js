@@ -28575,28 +28575,39 @@
 		return Shape;
 	}(Path);
 
-	function Light(color, intensity) {
-		if (intensity === void 0) {
-			intensity = 1;
+	var Light = /*#__PURE__*/function (_Object3D) {
+		_inheritsLoose(Light, _Object3D);
+
+		function Light(color, intensity) {
+			var _this;
+
+			if (intensity === void 0) {
+				intensity = 1;
+			}
+
+			_this = _Object3D.call(this) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isLight', {
+				value: true
+			});
+			_this.type = 'Light';
+			_this.color = new Color(color);
+			_this.intensity = intensity;
+			return _this;
 		}
 
-		Object3D.call(this);
-		this.type = 'Light';
-		this.color = new Color(color);
-		this.intensity = intensity;
-	}
+		var _proto = Light.prototype;
 
-	Light.prototype = Object.assign(Object.create(Object3D.prototype), {
-		constructor: Light,
-		isLight: true,
-		copy: function copy(source) {
-			Object3D.prototype.copy.call(this, source);
+		_proto.copy = function copy(source) {
+			_Object3D.prototype.copy.call(this, source);
+
 			this.color.copy(source.color);
 			this.intensity = source.intensity;
 			return this;
-		},
-		toJSON: function toJSON(meta) {
-			var data = Object3D.prototype.toJSON.call(this, meta);
+		};
+
+		_proto.toJSON = function toJSON(meta) {
+			var data = _Object3D.prototype.toJSON.call(this, meta);
+
 			data.object.color = this.color.getHex();
 			data.object.intensity = this.intensity;
 			if (this.groundColor !== undefined) data.object.groundColor = this.groundColor.getHex();
@@ -28606,90 +28617,119 @@
 			if (this.penumbra !== undefined) data.object.penumbra = this.penumbra;
 			if (this.shadow !== undefined) data.object.shadow = this.shadow.toJSON();
 			return data;
+		};
+
+		return Light;
+	}(Object3D);
+
+	var HemisphereLight = /*#__PURE__*/function (_Light) {
+		_inheritsLoose(HemisphereLight, _Light);
+
+		function HemisphereLight(skyColor, groundColor, intensity) {
+			var _this;
+
+			_this = _Light.call(this, skyColor, intensity) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isHemisphereLight', {
+				value: true
+			});
+			_this.type = 'HemisphereLight';
+
+			_this.position.copy(Object3D.DefaultUp);
+
+			_this.updateMatrix();
+
+			_this.groundColor = new Color(groundColor);
+			return _this;
 		}
-	});
 
-	function HemisphereLight(skyColor, groundColor, intensity) {
-		Light.call(this, skyColor, intensity);
-		this.type = 'HemisphereLight';
-		this.position.copy(Object3D.DefaultUp);
-		this.updateMatrix();
-		this.groundColor = new Color(groundColor);
-	}
+		var _proto = HemisphereLight.prototype;
 
-	HemisphereLight.prototype = Object.assign(Object.create(Light.prototype), {
-		constructor: HemisphereLight,
-		isHemisphereLight: true,
-		copy: function copy(source) {
+		_proto.copy = function copy(source) {
 			Light.prototype.copy.call(this, source);
 			this.groundColor.copy(source.groundColor);
 			return this;
+		};
+
+		return HemisphereLight;
+	}(Light);
+
+	var _projScreenMatrix = /*@__PURE__*/new Matrix4();
+
+	var _lightPositionWorld = /*@__PURE__*/new Vector3();
+
+	var _lookTarget = /*@__PURE__*/new Vector3();
+
+	var LightShadow = /*#__PURE__*/function () {
+		function LightShadow(camera) {
+			this.camera = camera;
+			this.bias = 0;
+			this.normalBias = 0;
+			this.radius = 1;
+			this.mapSize = new Vector2(512, 512);
+			this.map = null;
+			this.mapPass = null;
+			this.matrix = new Matrix4();
+			this.autoUpdate = true;
+			this.needsUpdate = false;
+			this._frustum = new Frustum();
+			this._frameExtents = new Vector2(1, 1);
+			this._viewportCount = 1;
+			this._viewports = [new Vector4(0, 0, 1, 1)];
 		}
-	});
 
-	function LightShadow(camera) {
-		this.camera = camera;
-		this.bias = 0;
-		this.normalBias = 0;
-		this.radius = 1;
-		this.mapSize = new Vector2(512, 512);
-		this.map = null;
-		this.mapPass = null;
-		this.matrix = new Matrix4();
-		this.autoUpdate = true;
-		this.needsUpdate = false;
-		this._frustum = new Frustum();
-		this._frameExtents = new Vector2(1, 1);
-		this._viewportCount = 1;
-		this._viewports = [new Vector4(0, 0, 1, 1)];
-	}
+		var _proto = LightShadow.prototype;
 
-	Object.assign(LightShadow.prototype, {
-		_projScreenMatrix: new Matrix4(),
-		_lightPositionWorld: new Vector3(),
-		_lookTarget: new Vector3(),
-		getViewportCount: function getViewportCount() {
+		_proto.getViewportCount = function getViewportCount() {
 			return this._viewportCount;
-		},
-		getFrustum: function getFrustum() {
-			return this._frustum;
-		},
-		updateMatrices: function updateMatrices(light) {
-			var shadowCamera = this.camera,
-					shadowMatrix = this.matrix,
-					projScreenMatrix = this._projScreenMatrix,
-					lookTarget = this._lookTarget,
-					lightPositionWorld = this._lightPositionWorld;
-			lightPositionWorld.setFromMatrixPosition(light.matrixWorld);
-			shadowCamera.position.copy(lightPositionWorld);
-			lookTarget.setFromMatrixPosition(light.target.matrixWorld);
-			shadowCamera.lookAt(lookTarget);
-			shadowCamera.updateMatrixWorld();
-			projScreenMatrix.multiplyMatrices(shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse);
+		};
 
-			this._frustum.setFromProjectionMatrix(projScreenMatrix);
+		_proto.getFrustum = function getFrustum() {
+			return this._frustum;
+		};
+
+		_proto.updateMatrices = function updateMatrices(light) {
+			var shadowCamera = this.camera;
+			var shadowMatrix = this.matrix;
+
+			_lightPositionWorld.setFromMatrixPosition(light.matrixWorld);
+
+			shadowCamera.position.copy(_lightPositionWorld);
+
+			_lookTarget.setFromMatrixPosition(light.target.matrixWorld);
+
+			shadowCamera.lookAt(_lookTarget);
+			shadowCamera.updateMatrixWorld();
+
+			_projScreenMatrix.multiplyMatrices(shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse);
+
+			this._frustum.setFromProjectionMatrix(_projScreenMatrix);
 
 			shadowMatrix.set(0.5, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0);
 			shadowMatrix.multiply(shadowCamera.projectionMatrix);
 			shadowMatrix.multiply(shadowCamera.matrixWorldInverse);
-		},
-		getViewport: function getViewport(viewportIndex) {
+		};
+
+		_proto.getViewport = function getViewport(viewportIndex) {
 			return this._viewports[viewportIndex];
-		},
-		getFrameExtents: function getFrameExtents() {
+		};
+
+		_proto.getFrameExtents = function getFrameExtents() {
 			return this._frameExtents;
-		},
-		copy: function copy(source) {
+		};
+
+		_proto.copy = function copy(source) {
 			this.camera = source.camera.clone();
 			this.bias = source.bias;
 			this.radius = source.radius;
 			this.mapSize.copy(source.mapSize);
 			return this;
-		},
-		clone: function clone() {
+		};
+
+		_proto.clone = function clone() {
 			return new this.constructor().copy(this);
-		},
-		toJSON: function toJSON() {
+		};
+
+		_proto.toJSON = function toJSON() {
 			var object = {};
 			if (this.bias !== 0) object.bias = this.bias;
 			if (this.normalBias !== 0) object.normalBias = this.normalBias;
@@ -28698,18 +28738,28 @@
 			object.camera = this.camera.toJSON(false).object;
 			delete object.camera.matrix;
 			return object;
+		};
+
+		return LightShadow;
+	}();
+
+	var SpotLightShadow = /*#__PURE__*/function (_LightShadow) {
+		_inheritsLoose(SpotLightShadow, _LightShadow);
+
+		function SpotLightShadow() {
+			var _this;
+
+			_this = _LightShadow.call(this, new PerspectiveCamera(50, 1, 0.5, 500)) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isSpotLightShadow', {
+				value: true
+			});
+			_this.focus = 1;
+			return _this;
 		}
-	});
 
-	function SpotLightShadow() {
-		LightShadow.call(this, new PerspectiveCamera(50, 1, 0.5, 500));
-		this.focus = 1;
-	}
+		var _proto = SpotLightShadow.prototype;
 
-	SpotLightShadow.prototype = Object.assign(Object.create(LightShadow.prototype), {
-		constructor: SpotLightShadow,
-		isSpotLightShadow: true,
-		updateMatrices: function updateMatrices(light) {
+		_proto.updateMatrices = function updateMatrices(light) {
 			var camera = this.camera;
 			var fov = MathUtils.RAD2DEG * 2 * light.angle * this.focus;
 			var aspect = this.mapSize.width / this.mapSize.height;
@@ -28722,17 +28772,70 @@
 				camera.updateProjectionMatrix();
 			}
 
-			LightShadow.prototype.updateMatrices.call(this, light);
-		}
-	});
+			_LightShadow.prototype.updateMatrices.call(this, light);
+		};
 
-	function SpotLight(color, intensity, distance, angle, penumbra, decay) {
-		Light.call(this, color, intensity);
-		this.type = 'SpotLight';
-		this.position.copy(Object3D.DefaultUp);
-		this.updateMatrix();
-		this.target = new Object3D();
-		Object.defineProperty(this, 'power', {
+		return SpotLightShadow;
+	}(LightShadow);
+
+	var SpotLight = /*#__PURE__*/function (_Light) {
+		_inheritsLoose(SpotLight, _Light);
+
+		function SpotLight(color, intensity, distance, angle, penumbra, decay) {
+			var _this;
+
+			if (distance === void 0) {
+				distance = 0;
+			}
+
+			if (angle === void 0) {
+				angle = Math.PI / 3;
+			}
+
+			if (penumbra === void 0) {
+				penumbra = 0;
+			}
+
+			if (decay === void 0) {
+				decay = 1;
+			}
+
+			_this = _Light.call(this, color, intensity) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isSpotLight', {
+				value: true
+			});
+			_this.type = 'SpotLight';
+
+			_this.position.copy(Object3D.DefaultUp);
+
+			_this.updateMatrix();
+
+			_this.target = new Object3D();
+			_this.distance = distance;
+			_this.angle = angle;
+			_this.penumbra = penumbra;
+			_this.decay = decay; // for physically correct lights, should be 2.
+
+			_this.shadow = new SpotLightShadow();
+			return _this;
+		}
+
+		var _proto = SpotLight.prototype;
+
+		_proto.copy = function copy(source) {
+			_Light.prototype.copy.call(this, source);
+
+			this.distance = source.distance;
+			this.angle = source.angle;
+			this.penumbra = source.penumbra;
+			this.decay = source.decay;
+			this.target = source.target.clone();
+			this.shadow = source.shadow.clone();
+			return this;
+		};
+
+		_createClass(SpotLight, [{
+			key: "power",
 			get: function get() {
 				// intensity = power per solid angle.
 				// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
@@ -28743,88 +28846,123 @@
 				// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 				this.intensity = power / Math.PI;
 			}
-		});
-		this.distance = distance !== undefined ? distance : 0;
-		this.angle = angle !== undefined ? angle : Math.PI / 3;
-		this.penumbra = penumbra !== undefined ? penumbra : 0;
-		this.decay = decay !== undefined ? decay : 1; // for physically correct lights, should be 2.
+		}]);
 
-		this.shadow = new SpotLightShadow();
-	}
+		return SpotLight;
+	}(Light);
 
-	SpotLight.prototype = Object.assign(Object.create(Light.prototype), {
-		constructor: SpotLight,
-		isSpotLight: true,
-		copy: function copy(source) {
-			Light.prototype.copy.call(this, source);
-			this.distance = source.distance;
-			this.angle = source.angle;
-			this.penumbra = source.penumbra;
-			this.decay = source.decay;
-			this.target = source.target.clone();
-			this.shadow = source.shadow.clone();
-			return this;
+	var _projScreenMatrix$1 = /*@__PURE__*/new Matrix4();
+
+	var _lightPositionWorld$1 = /*@__PURE__*/new Vector3();
+
+	var _lookTarget$1 = /*@__PURE__*/new Vector3();
+
+	var PointLightShadow = /*#__PURE__*/function (_LightShadow) {
+		_inheritsLoose(PointLightShadow, _LightShadow);
+
+		function PointLightShadow() {
+			var _this;
+
+			_this = _LightShadow.call(this, new PerspectiveCamera(90, 1, 0.5, 500)) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isPointLightShadow', {
+				value: true
+			});
+			_this._frameExtents = new Vector2(4, 2);
+			_this._viewportCount = 6;
+			_this._viewports = [// These viewports map a cube-map onto a 2D texture with the
+			// following orientation:
+			//
+			//	xzXZ
+			//	 y Y
+			//
+			// X - Positive x direction
+			// x - Negative x direction
+			// Y - Positive y direction
+			// y - Negative y direction
+			// Z - Positive z direction
+			// z - Negative z direction
+			// positive X
+			new Vector4(2, 1, 1, 1), // negative X
+			new Vector4(0, 1, 1, 1), // positive Z
+			new Vector4(3, 1, 1, 1), // negative Z
+			new Vector4(1, 1, 1, 1), // positive Y
+			new Vector4(3, 0, 1, 1), // negative Y
+			new Vector4(1, 0, 1, 1)];
+			_this._cubeDirections = [new Vector3(1, 0, 0), new Vector3(-1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 0, -1), new Vector3(0, 1, 0), new Vector3(0, -1, 0)];
+			_this._cubeUps = [new Vector3(0, 1, 0), new Vector3(0, 1, 0), new Vector3(0, 1, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1), new Vector3(0, 0, -1)];
+			return _this;
 		}
-	});
 
-	function PointLightShadow() {
-		LightShadow.call(this, new PerspectiveCamera(90, 1, 0.5, 500));
-		this._frameExtents = new Vector2(4, 2);
-		this._viewportCount = 6;
-		this._viewports = [// These viewports map a cube-map onto a 2D texture with the
-		// following orientation:
-		//
-		//	xzXZ
-		//	 y Y
-		//
-		// X - Positive x direction
-		// x - Negative x direction
-		// Y - Positive y direction
-		// y - Negative y direction
-		// Z - Positive z direction
-		// z - Negative z direction
-		// positive X
-		new Vector4(2, 1, 1, 1), // negative X
-		new Vector4(0, 1, 1, 1), // positive Z
-		new Vector4(3, 1, 1, 1), // negative Z
-		new Vector4(1, 1, 1, 1), // positive Y
-		new Vector4(3, 0, 1, 1), // negative Y
-		new Vector4(1, 0, 1, 1)];
-		this._cubeDirections = [new Vector3(1, 0, 0), new Vector3(-1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 0, -1), new Vector3(0, 1, 0), new Vector3(0, -1, 0)];
-		this._cubeUps = [new Vector3(0, 1, 0), new Vector3(0, 1, 0), new Vector3(0, 1, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1), new Vector3(0, 0, -1)];
-	}
+		var _proto = PointLightShadow.prototype;
 
-	PointLightShadow.prototype = Object.assign(Object.create(LightShadow.prototype), {
-		constructor: PointLightShadow,
-		isPointLightShadow: true,
-		updateMatrices: function updateMatrices(light, viewportIndex) {
+		_proto.updateMatrices = function updateMatrices(light, viewportIndex) {
 			if (viewportIndex === void 0) {
 				viewportIndex = 0;
 			}
 
-			var camera = this.camera,
-					shadowMatrix = this.matrix,
-					lightPositionWorld = this._lightPositionWorld,
-					lookTarget = this._lookTarget,
-					projScreenMatrix = this._projScreenMatrix;
-			lightPositionWorld.setFromMatrixPosition(light.matrixWorld);
-			camera.position.copy(lightPositionWorld);
-			lookTarget.copy(camera.position);
-			lookTarget.add(this._cubeDirections[viewportIndex]);
+			var camera = this.camera;
+			var shadowMatrix = this.matrix;
+
+			_lightPositionWorld$1.setFromMatrixPosition(light.matrixWorld);
+
+			camera.position.copy(_lightPositionWorld$1);
+
+			_lookTarget$1.copy(camera.position);
+
+			_lookTarget$1.add(this._cubeDirections[viewportIndex]);
+
 			camera.up.copy(this._cubeUps[viewportIndex]);
-			camera.lookAt(lookTarget);
+			camera.lookAt(_lookTarget$1);
 			camera.updateMatrixWorld();
-			shadowMatrix.makeTranslation(-lightPositionWorld.x, -lightPositionWorld.y, -lightPositionWorld.z);
-			projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+			shadowMatrix.makeTranslation(-_lightPositionWorld$1.x, -_lightPositionWorld$1.y, -_lightPositionWorld$1.z);
 
-			this._frustum.setFromProjectionMatrix(projScreenMatrix);
+			_projScreenMatrix$1.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+
+			this._frustum.setFromProjectionMatrix(_projScreenMatrix$1);
+		};
+
+		return PointLightShadow;
+	}(LightShadow);
+
+	var PointLight = /*#__PURE__*/function (_Light) {
+		_inheritsLoose(PointLight, _Light);
+
+		function PointLight(color, intensity, distance, decay) {
+			var _this;
+
+			if (distance === void 0) {
+				distance = 0;
+			}
+
+			if (decay === void 0) {
+				decay = 1;
+			}
+
+			_this = _Light.call(this, color, intensity) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isPointLight', {
+				value: true
+			});
+			_this.type = 'PointLight';
+			_this.distance = distance;
+			_this.decay = decay; // for physically correct lights, should be 2.
+
+			_this.shadow = new PointLightShadow();
+			return _this;
 		}
-	});
 
-	function PointLight(color, intensity, distance, decay) {
-		Light.call(this, color, intensity);
-		this.type = 'PointLight';
-		Object.defineProperty(this, 'power', {
+		var _proto = PointLight.prototype;
+
+		_proto.copy = function copy(source) {
+			_Light.prototype.copy.call(this, source);
+
+			this.distance = source.distance;
+			this.decay = source.decay;
+			this.shadow = source.shadow.clone();
+			return this;
+		};
+
+		_createClass(PointLight, [{
+			key: "power",
 			get: function get() {
 				// intensity = power per solid angle.
 				// ref: equation (15) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
@@ -28835,24 +28973,10 @@
 				// ref: equation (15) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 				this.intensity = power / (4 * Math.PI);
 			}
-		});
-		this.distance = distance !== undefined ? distance : 0;
-		this.decay = decay !== undefined ? decay : 1; // for physically correct lights, should be 2.
+		}]);
 
-		this.shadow = new PointLightShadow();
-	}
-
-	PointLight.prototype = Object.assign(Object.create(Light.prototype), {
-		constructor: PointLight,
-		isPointLight: true,
-		copy: function copy(source) {
-			Light.prototype.copy.call(this, source);
-			this.distance = source.distance;
-			this.decay = source.decay;
-			this.shadow = source.shadow.clone();
-			return this;
-		}
-	});
+		return PointLight;
+	}(Light);
 
 	function OrthographicCamera(left, right, top, bottom, near, far) {
 		if (left === void 0) {
@@ -28972,37 +29096,55 @@
 		}
 	});
 
-	function DirectionalLightShadow() {
-		LightShadow.call(this, new OrthographicCamera(-5, 5, 5, -5, 0.5, 500));
-	}
+	var DirectionalLightShadow = /*#__PURE__*/function (_LightShadow) {
+		_inheritsLoose(DirectionalLightShadow, _LightShadow);
 
-	DirectionalLightShadow.prototype = Object.assign(Object.create(LightShadow.prototype), {
-		constructor: DirectionalLightShadow,
-		isDirectionalLightShadow: true,
-		updateMatrices: function updateMatrices(light) {
-			LightShadow.prototype.updateMatrices.call(this, light);
+		function DirectionalLightShadow() {
+			var _this;
+
+			_this = _LightShadow.call(this, new OrthographicCamera(-5, 5, 5, -5, 0.5, 500)) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isDirectionalLightShadow', {
+				value: true
+			});
+			return _this;
 		}
-	});
 
-	function DirectionalLight(color, intensity) {
-		Light.call(this, color, intensity);
-		this.type = 'DirectionalLight';
-		this.position.copy(Object3D.DefaultUp);
-		this.updateMatrix();
-		this.target = new Object3D();
-		this.shadow = new DirectionalLightShadow();
-	}
+		return DirectionalLightShadow;
+	}(LightShadow);
 
-	DirectionalLight.prototype = Object.assign(Object.create(Light.prototype), {
-		constructor: DirectionalLight,
-		isDirectionalLight: true,
-		copy: function copy(source) {
-			Light.prototype.copy.call(this, source);
+	var DirectionalLight = /*#__PURE__*/function (_Light) {
+		_inheritsLoose(DirectionalLight, _Light);
+
+		function DirectionalLight(color, intensity) {
+			var _this;
+
+			_this = _Light.call(this, color, intensity) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isDirectionalLight', {
+				value: true
+			});
+			_this.type = 'DirectionalLight';
+
+			_this.position.copy(Object3D.DefaultUp);
+
+			_this.updateMatrix();
+
+			_this.target = new Object3D();
+			_this.shadow = new DirectionalLightShadow();
+			return _this;
+		}
+
+		var _proto = DirectionalLight.prototype;
+
+		_proto.copy = function copy(source) {
+			_Light.prototype.copy.call(this, source);
+
 			this.target = source.target.clone();
 			this.shadow = source.shadow.clone();
 			return this;
-		}
-	});
+		};
+
+		return DirectionalLight;
+	}(Light);
 
 	var AmbientLight = /*#__PURE__*/function (_Light) {
 		_inheritsLoose(AmbientLight, _Light);
@@ -29021,29 +29163,50 @@
 		return AmbientLight;
 	}(Light);
 
-	function RectAreaLight(color, intensity, width, height) {
-		Light.call(this, color, intensity);
-		this.type = 'RectAreaLight';
-		this.width = width !== undefined ? width : 10;
-		this.height = height !== undefined ? height : 10;
-	}
+	var RectAreaLight = /*#__PURE__*/function (_Light) {
+		_inheritsLoose(RectAreaLight, _Light);
 
-	RectAreaLight.prototype = Object.assign(Object.create(Light.prototype), {
-		constructor: RectAreaLight,
-		isRectAreaLight: true,
-		copy: function copy(source) {
-			Light.prototype.copy.call(this, source);
+		function RectAreaLight(color, intensity, width, height) {
+			var _this;
+
+			if (width === void 0) {
+				width = 10;
+			}
+
+			if (height === void 0) {
+				height = 10;
+			}
+
+			_this = _Light.call(this, color, intensity) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isRectAreaLight', {
+				value: true
+			});
+			_this.type = 'RectAreaLight';
+			_this.width = width;
+			_this.height = height;
+			return _this;
+		}
+
+		var _proto = RectAreaLight.prototype;
+
+		_proto.copy = function copy(source) {
+			_Light.prototype.copy.call(this, source);
+
 			this.width = source.width;
 			this.height = source.height;
 			return this;
-		},
-		toJSON: function toJSON(meta) {
-			var data = Light.prototype.toJSON.call(this, meta);
+		};
+
+		_proto.toJSON = function toJSON(meta) {
+			var data = _Light.prototype.toJSON.call(this, meta);
+
 			data.object.width = this.width;
 			data.object.height = this.height;
 			return data;
-		}
-	});
+		};
+
+		return RectAreaLight;
+	}(Light);
 
 	/**
 	 * Primary reference:
@@ -29242,32 +29405,53 @@
 		return SphericalHarmonics3;
 	}();
 
-	function LightProbe(sh, intensity) {
-		Light.call(this, undefined, intensity);
-		this.type = 'LightProbe';
-		this.sh = sh !== undefined ? sh : new SphericalHarmonics3();
-	}
+	var LightProbe = /*#__PURE__*/function (_Light) {
+		_inheritsLoose(LightProbe, _Light);
 
-	LightProbe.prototype = Object.assign(Object.create(Light.prototype), {
-		constructor: LightProbe,
-		isLightProbe: true,
-		copy: function copy(source) {
-			Light.prototype.copy.call(this, source);
+		function LightProbe(sh, intensity) {
+			var _this;
+
+			if (sh === void 0) {
+				sh = new SphericalHarmonics3();
+			}
+
+			if (intensity === void 0) {
+				intensity = 1;
+			}
+
+			_this = _Light.call(this, undefined, intensity) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isLightProbe', {
+				value: true
+			});
+			_this.sh = sh;
+			return _this;
+		}
+
+		var _proto = LightProbe.prototype;
+
+		_proto.copy = function copy(source) {
+			_Light.prototype.copy.call(this, source);
+
 			this.sh.copy(source.sh);
 			return this;
-		},
-		fromJSON: function fromJSON(json) {
+		};
+
+		_proto.fromJSON = function fromJSON(json) {
 			this.intensity = json.intensity; // TODO: Move this bit to Light.fromJSON();
 
 			this.sh.fromArray(json.sh);
 			return this;
-		},
-		toJSON: function toJSON(meta) {
-			var data = Light.prototype.toJSON.call(this, meta);
+		};
+
+		_proto.toJSON = function toJSON(meta) {
+			var data = _Light.prototype.toJSON.call(this, meta);
+
 			data.object.sh = this.sh.toArray();
 			return data;
-		}
-	});
+		};
+
+		return LightProbe;
+	}(Light);
 
 	var MaterialLoader = /*#__PURE__*/function (_Loader) {
 		_inheritsLoose(MaterialLoader, _Loader);
@@ -30903,55 +31087,61 @@
 		return AudioLoader;
 	}(Loader);
 
-	function HemisphereLightProbe(skyColor, groundColor, intensity) {
-		LightProbe.call(this, undefined, intensity);
-		var color1 = new Color().set(skyColor);
-		var color2 = new Color().set(groundColor);
-		var sky = new Vector3(color1.r, color1.g, color1.b);
-		var ground = new Vector3(color2.r, color2.g, color2.b); // without extra factor of PI in the shader, should = 1 / Math.sqrt( Math.PI );
+	var HemisphereLightProbe = /*#__PURE__*/function (_LightProbe) {
+		_inheritsLoose(HemisphereLightProbe, _LightProbe);
 
-		var c0 = Math.sqrt(Math.PI);
-		var c1 = c0 * Math.sqrt(0.75);
-		this.sh.coefficients[0].copy(sky).add(ground).multiplyScalar(c0);
-		this.sh.coefficients[1].copy(sky).sub(ground).multiplyScalar(c1);
-	}
+		function HemisphereLightProbe(skyColor, groundColor, intensity) {
+			var _this;
 
-	HemisphereLightProbe.prototype = Object.assign(Object.create(LightProbe.prototype), {
-		constructor: HemisphereLightProbe,
-		isHemisphereLightProbe: true,
-		copy: function copy(source) {
-			// modifying colors not currently supported
-			LightProbe.prototype.copy.call(this, source);
-			return this;
-		},
-		toJSON: function toJSON(meta) {
-			var data = LightProbe.prototype.toJSON.call(this, meta); // data.sh = this.sh.toArray(); // todo
+			if (intensity === void 0) {
+				intensity = 1;
+			}
 
-			return data;
+			_this = _LightProbe.call(this, undefined, intensity) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isHemisphereLightProbe', {
+				value: true
+			});
+			var color1 = new Color().set(skyColor);
+			var color2 = new Color().set(groundColor);
+			var sky = new Vector3(color1.r, color1.g, color1.b);
+			var ground = new Vector3(color2.r, color2.g, color2.b); // without extra factor of PI in the shader, should = 1 / Math.sqrt( Math.PI );
+
+			var c0 = Math.sqrt(Math.PI);
+			var c1 = c0 * Math.sqrt(0.75);
+
+			_this.sh.coefficients[0].copy(sky).add(ground).multiplyScalar(c0);
+
+			_this.sh.coefficients[1].copy(sky).sub(ground).multiplyScalar(c1);
+
+			return _this;
 		}
-	});
 
-	function AmbientLightProbe(color, intensity) {
-		LightProbe.call(this, undefined, intensity);
-		var color1 = new Color().set(color); // without extra factor of PI in the shader, would be 2 / Math.sqrt( Math.PI );
+		return HemisphereLightProbe;
+	}(LightProbe);
 
-		this.sh.coefficients[0].set(color1.r, color1.g, color1.b).multiplyScalar(2 * Math.sqrt(Math.PI));
-	}
+	var AmbientLightProbe = /*#__PURE__*/function (_LightProbe) {
+		_inheritsLoose(AmbientLightProbe, _LightProbe);
 
-	AmbientLightProbe.prototype = Object.assign(Object.create(LightProbe.prototype), {
-		constructor: AmbientLightProbe,
-		isAmbientLightProbe: true,
-		copy: function copy(source) {
-			// modifying color not currently supported
-			LightProbe.prototype.copy.call(this, source);
-			return this;
-		},
-		toJSON: function toJSON(meta) {
-			var data = LightProbe.prototype.toJSON.call(this, meta); // data.sh = this.sh.toArray(); // todo
+		function AmbientLightProbe(color, intensity) {
+			var _this;
 
-			return data;
+			if (intensity === void 0) {
+				intensity = 1;
+			}
+
+			_this = _LightProbe.call(this, undefined, intensity) || this;
+			Object.defineProperty(_assertThisInitialized(_this), 'isAmbientLightProbe', {
+				value: true
+			});
+			var color1 = new Color().set(color); // without extra factor of PI in the shader, would be 2 / Math.sqrt( Math.PI );
+
+			_this.sh.coefficients[0].set(color1.r, color1.g, color1.b).multiplyScalar(2 * Math.sqrt(Math.PI));
+
+			return _this;
 		}
-	});
+
+		return AmbientLightProbe;
+	}(LightProbe);
 
 	var _eyeRight = new Matrix4();
 
