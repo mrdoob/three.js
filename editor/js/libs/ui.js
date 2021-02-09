@@ -976,14 +976,6 @@ class UIButton extends UIElement {
 
 	}
 
-	setLabel( value ) {
-
-		this.dom.textContent = value;
-
-		return this;
-
-	}
-
 }
 
 class UIProgress extends UIElement {

@@ -22,7 +22,7 @@ function SidebarProjectMaterials( editor ) {
 	var buttonsRow = new UIRow();
 	container.add( buttonsRow );
 
-	var assignMaterial = new UIButton().setLabel( strings.getKey( 'sidebar/project/Assign' ) );
+	var assignMaterial = new UIButton( strings.getKey( 'sidebar/project/Assign' ) );
 	assignMaterial.onClick( function () {
 
 		var selectedObject = editor.selected;
