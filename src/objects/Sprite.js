@@ -32,7 +32,7 @@ class Sprite extends Object3D {
 
 		super();
 
-		Object.defineProperty( this, "isSprite", { value: true } );
+		Object.defineProperty( this, 'isSprite', { value: true } );
 		this.type = 'Sprite';
 
 		if ( _geometry === undefined ) {
