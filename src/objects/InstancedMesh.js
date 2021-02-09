@@ -9,33 +9,37 @@ const _instanceIntersects = [];
 
 const _mesh = new Mesh();
 
-class InstancedMesh extends Mesh {
+function InstancedMesh( geometry, material, count ) {
 
-	constructor( geometry, material, count ) {
+	Mesh.call( this, geometry, material );
 
-		super( geometry, material );
-		Object.defineProperty( this, "isInstancedMesh", { value: true } );
-		this.instanceMatrix = new BufferAttribute( new Float32Array( count * 16 ), 16 );
-		this.instanceColor = null;
+	this.instanceMatrix = new BufferAttribute( new Float32Array( count * 16 ), 16 );
+	this.instanceColor = null;
 
-		this.count = count;
+	this.count = count;
 
-		this.frustumCulled = false;
+	this.frustumCulled = false;
 
-	}
+}
 
-	copy( source ) {
+InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
-		super.copy( source );
+	constructor: InstancedMesh,
+
+	isInstancedMesh: true,
+
+	copy: function ( source ) {
+
+		Mesh.prototype.copy.call( this, source );
 
 		this.instanceMatrix.copy( source.instanceMatrix );
 		this.count = source.count;
 
 		return this;
 
-	}
+	},
 
-	setColorAt( index, color ) {
+	setColorAt: function ( index, color ) {
 
 		if ( this.instanceColor === null ) {
 
@@ -45,15 +49,15 @@ class InstancedMesh extends Mesh {
 
 		color.toArray( this.instanceColor.array, index * 3 );
 
-	}
+	},
 
-	getMatrixAt( index, matrix ) {
+	getMatrixAt: function ( index, matrix ) {
 
 		matrix.fromArray( this.instanceMatrix.array, index * 16 );
 
-	}
+	},
 
-	raycast( raycaster, intersects ) {
+	raycast: function ( raycaster, intersects ) {
 
 		const matrixWorld = this.matrixWorld;
 		const raycastTimes = this.count;
@@ -92,19 +96,18 @@ class InstancedMesh extends Mesh {
 
 		}
 
-	}
+	},
 
-	setMatrixAt( index, matrix ) {
+	setMatrixAt: function ( index, matrix ) {
 
 		matrix.toArray( this.instanceMatrix.array, index * 16 );
 
+	},
+
+	updateMorphTargets: function () {
+
 	}
 
-	updateMorphTargets() {
-
-	}
-
-}
-
+} );
 
 export { InstancedMesh };
