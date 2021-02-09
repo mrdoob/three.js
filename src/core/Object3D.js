@@ -449,6 +449,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		return undefined;
 
 	},
+	
 	getObjectByDeepProperty: function (name, value) {
   		if (name.reduce((prev, current) => prev[current], this) === value) return this;
 
@@ -462,7 +463,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
   		}
 
   		return undefined;
-	};
+	},
+	
 	getWorldPosition: function ( target ) {
 
 		if ( target === undefined ) {
