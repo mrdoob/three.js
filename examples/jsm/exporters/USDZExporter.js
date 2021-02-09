@@ -89,7 +89,7 @@ function buildMesh( geometry, material ) {
         int[] faceVertexIndices = [${ buildMeshVertexIndices( geometry ) }]
         rel material:binding = </_materials/Material_${ material.id }>
         normal3f[] normals = [${ buildVector3Array( attributes.normal, count )}] (
-            interpolation = "faceVarying"
+            interpolation = "vertex"
         )
         point3f[] points = [${ buildVector3Array( attributes.position, count )}]
         texCoord2f[] primvars:UVMap = [${ buildVector2Array( attributes.uv, count )}] (
