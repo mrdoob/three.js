@@ -1987,6 +1987,62 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.copyTextureToTexture3D = function ( box, srcTexture, dstTexture, level = 0 ) {
+
+		if ( ! _this.isWebGL1Renderer ) {
+
+			console.warn( 'THREE.WebGLRenderer.copyTextureToTexture3D: can only be used with WebGL2.' );
+			return;
+
+		}
+
+		const { width, height, data } = srcTexture.image;
+		const glFormat = utils.convert( dstTexture.format );
+		const glType = utils.convert( dstTexture.type );
+		let glTarget;
+
+		if ( dstTexture.isDataTexture3D ) {
+
+			textures.setTexture3D( dstTexture, 0 );
+			glTarget = _gl.TEXTURE_3D;
+
+		} else if ( dstTexture.isDataTexture2DArray ) {
+
+			textures.setTexture2DArray( dstTexture, 0 );
+			glTarget = _gl.TEXTURE_2D_ARRAY;
+
+		} else {
+
+			console.warn( 'THREE.WebGLRenderer.copyTextureToTexture3D: only supports THREE.DataTexture3D and THREE.DataTexture2DArray.' );
+			return;
+
+		}
+
+		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, dstTexture.flipY );
+		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
+		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
+		_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, width );
+		_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, height );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, box.x );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, box.y );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, box.z );
+
+		_gl.texSubImage3D(
+			glTarget,
+			level,
+			box.x,
+			box.y,
+			box.z,
+			box.max.x - box.min.x + 1,
+			box.max.y - box.min.y + 1,
+			box.max.z - box.min.z + 1,
+			glFormat,
+			glType,
+			data
+		);
+
+	};
+
 	this.initTexture = function ( texture ) {
 
 		textures.setTexture2D( texture, 0 );
