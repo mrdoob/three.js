@@ -46,7 +46,7 @@ function buildHeader() {
 
 function buildXform( object, define ) {
 
-	const name = object.name || 'Xform1';
+	const name = 'Object' + object.id;
 	const transform = buildMatrix( object.matrixWorld );
 
 	return `def Xform "${ name }"
@@ -79,7 +79,7 @@ function buildMatrixRow( array, offset ) {
 
 function buildMesh( geometry, material ) {
 
-	const name = geometry.name || 'Mesh1';
+	const name = 'Geometry' + geometry.id;
 	const attributes = geometry.attributes;
 	const count = attributes.position.count;
 
