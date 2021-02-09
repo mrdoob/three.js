@@ -38,7 +38,7 @@
 
 	void main()
 	{
-		float voxel = texture( uTexture, vec3( vUv, uDepth ) ).r;
+		float voxel = texture(uTexture, vec3( vUv, uDepth )).r;
 		gl_FragColor.r = (voxel - uSampleLeft) / uSampleWidth;
 	}
 
@@ -75,7 +75,6 @@
 
 		// lighten a bit
 		gl_FragColor = vec4( color.rrr * 1.5, 1.0 );
-
 	}
 	</script>
 	<body>
@@ -103,7 +102,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
-			import { JSZip } from './jsm/libs/jszip.module.min.js';
+			import { unzipSync } from './jsm/libs/fflate.module.min.js';
 
 			import { WEBGL } from './jsm/WebGL.js';
 
@@ -126,7 +125,7 @@
 			/** Post-processing objects */
 
 			const postProcessScene = new THREE.Scene();
-			const postProcessCamera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+			const postProcessCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
 			const renderTargetTexture = new THREE.DataTexture2DArray();
 			renderTargetTexture.format = THREE.RedFormat;
@@ -192,8 +191,8 @@
 					.setResponseType( 'arraybuffer' )
 					.load( 'textures/3d/head256x256x109.zip', function ( data ) {
 
-						var zip = new JSZip( data );
-						var array = zip.files[ 'head256x256x109' ].asUint8Array();
+						var zip = unzipSync( new Uint8Array( data ) );
+						const array = new Uint8Array( zip[ 'head256x256x109' ].buffer );
 
 						const texture = new THREE.DataTexture2DArray( array, DIMENSIONS.width, DIMENSIONS.height, DIMENSIONS.depth );
 						texture.format = THREE.RedFormat;
@@ -248,7 +247,7 @@
 				postProcessMaterial.uniforms.uSampleLeft.value += deltaX;
 				postProcessMaterial.uniforms.uSampleWidth.value += deltaY;
 
-				App.mousePrevious.set(x, y);
+				App.mousePrevious.set( x, y );
 
 			}
 
@@ -265,7 +264,7 @@
 
 				requestAnimationFrame( animate );
 
-				var value = mesh.material.uniforms[ "depth" ].value;
+				var value = mesh.material.uniforms[ 'depth' ].value;
 
 				value += depthStep;
 
@@ -278,15 +277,18 @@
 
 				}
 
-				mesh.material.uniforms[ "depth" ].value = value;
+				mesh.material.uniforms[ 'depth' ].value = value;
 
 				render();
 
 			}
 
+			/**
+			 * Renders the 2D array into the render target `renderTarget`.
+			 */
 			function renderTo2DArray() {
 
-				const layer = Math.floor( mesh.material.uniforms[ "depth" ].value );
+				const layer = Math.floor( mesh.material.uniforms[ 'depth' ].value );
 				postProcessMaterial.uniforms.uDepth.value = layer;
 				renderer.setRenderTarget( renderTarget, layer );
 				renderer.render( postProcessScene, postProcessCamera );
@@ -296,7 +298,12 @@
 
 			function render() {
 
+				// Step 1 - Render the input DataTexture2DArray into a
+				// DataTexture2DArray render target.
 				renderTo2DArray();
+
+				// Step 2 - Renders the scene containing the plane with a material
+				// sampling the render target texture.
 				renderer.render( scene, camera );
 
 			}
