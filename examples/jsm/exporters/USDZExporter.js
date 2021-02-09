@@ -208,6 +208,7 @@ function buildMaterial( material ) {
         {
             uniform token info:id = "UsdPreviewSurface"
             color3f inputs:diffuseColor = ${ buildColor( material.color ) }
+            color3f inputs:emissiveColor = ${ buildColor( material.emissive ) }
             float inputs:metallic = ${ material.metalness }
             float inputs:roughness = ${ material.roughness }
             token outputs:surface
