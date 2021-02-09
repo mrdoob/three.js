@@ -3,30 +3,33 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 
-class SkinnedMesh extends Mesh {
+function SkinnedMesh( geometry, material ) {
 
-	constructor( geometry, material ) {
+	if ( geometry && geometry.isGeometry ) {
 
-		if ( geometry && geometry.isGeometry ) {
-
-			console.error( 'THREE.SkinnedMesh no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
-
-		}
-
-		super( geometry, material );
-
-		Object.defineProperty( this, "isSkinnedMesh", { value: true } );
-		this.type = 'SkinnedMesh';
-
-		this.bindMode = 'attached';
-		this.bindMatrix = new Matrix4();
-		this.bindMatrixInverse = new Matrix4();
+		console.error( 'THREE.SkinnedMesh no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 	}
 
-	copy( source ) {
+	Mesh.call( this, geometry, material );
 
-		super.copy( source );
+	this.type = 'SkinnedMesh';
+
+	this.bindMode = 'attached';
+	this.bindMatrix = new Matrix4();
+	this.bindMatrixInverse = new Matrix4();
+
+}
+
+SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
+
+	constructor: SkinnedMesh,
+
+	isSkinnedMesh: true,
+
+	copy: function ( source ) {
+
+		Mesh.prototype.copy.call( this, source );
 
 		this.bindMode = source.bindMode;
 		this.bindMatrix.copy( source.bindMatrix );
@@ -36,9 +39,9 @@ class SkinnedMesh extends Mesh {
 
 		return this;
 
-	}
+	},
 
-	bind( skeleton, bindMatrix ) {
+	bind: function ( skeleton, bindMatrix ) {
 
 		this.skeleton = skeleton;
 
@@ -55,15 +58,15 @@ class SkinnedMesh extends Mesh {
 		this.bindMatrix.copy( bindMatrix );
 		this.bindMatrixInverse.copy( bindMatrix ).invert();
 
-	}
+	},
 
-	pose() {
+	pose: function () {
 
 		this.skeleton.pose();
 
-	}
+	},
 
-	normalizeSkinWeights() {
+	normalizeSkinWeights: function () {
 
 		const vector = new Vector4();
 
@@ -92,11 +95,11 @@ class SkinnedMesh extends Mesh {
 
 		}
 
-	}
+	},
 
-	updateMatrixWorld( force ) {
+	updateMatrixWorld: function ( force ) {
 
-		super.updateMatrixWorld( force );
+		Mesh.prototype.updateMatrixWorld.call( this, force );
 
 		if ( this.bindMode === 'attached' ) {
 
@@ -112,9 +115,9 @@ class SkinnedMesh extends Mesh {
 
 		}
 
-	}
+	},
 
-	boneTransform() {
+	boneTransform: ( function () {
 
 		const basePosition = new Vector3();
 
@@ -154,11 +157,11 @@ class SkinnedMesh extends Mesh {
 
 			return target.applyMatrix4( this.bindMatrixInverse );
 
-		}();
+		};
 
-	}
+	}() )
 
-}
+} );
 
 
 export { SkinnedMesh };
