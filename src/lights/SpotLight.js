@@ -2,52 +2,49 @@ import { Light } from './Light.js';
 import { SpotLightShadow } from './SpotLightShadow.js';
 import { Object3D } from '../core/Object3D.js';
 
-function SpotLight( color, intensity, distance, angle, penumbra, decay ) {
+class SpotLight extends Light {
 
-	Light.call( this, color, intensity );
+	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1 ) {
 
-	this.type = 'SpotLight';
+		super( color, intensity );
 
-	this.position.copy( Object3D.DefaultUp );
-	this.updateMatrix();
+		Object.defineProperty( this, 'isSpotLight', { value: true } );
 
-	this.target = new Object3D();
+		this.type = 'SpotLight';
 
-	Object.defineProperty( this, 'power', {
-		get: function () {
+		this.position.copy( Object3D.DefaultUp );
+		this.updateMatrix();
 
-			// intensity = power per solid angle.
-			// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-			return this.intensity * Math.PI;
+		this.target = new Object3D();
 
-		},
-		set: function ( power ) {
+		this.distance = distance;
+		this.angle = angle;
+		this.penumbra = penumbra;
+		this.decay = decay; // for physically correct lights, should be 2.
 
-			// intensity = power per solid angle.
-			// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-			this.intensity = power / Math.PI;
+		this.shadow = new SpotLightShadow();
 
-		}
-	} );
+	}
 
-	this.distance = ( distance !== undefined ) ? distance : 0;
-	this.angle = ( angle !== undefined ) ? angle : Math.PI / 3;
-	this.penumbra = ( penumbra !== undefined ) ? penumbra : 0;
-	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
+	get power() {
 
-	this.shadow = new SpotLightShadow();
+		// intensity = power per solid angle.
+		// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
+		return this.intensity * Math.PI;
 
-}
+	}
 
-SpotLight.prototype = Object.assign( Object.create( Light.prototype ), {
+	set power( power ) {
 
-	constructor: SpotLight,
+		// intensity = power per solid angle.
+		// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
+		this.intensity = power / Math.PI;
 
-	isSpotLight: true,
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
-		Light.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.distance = source.distance;
 		this.angle = source.angle;
@@ -62,7 +59,6 @@ SpotLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 	}
 
-} );
-
+}
 
 export { SpotLight };
