@@ -13,6 +13,12 @@ THREE.GLTFLoader = ( function () {
 
 		this.register( function ( parser ) {
 
+			return new GLTFMaterialsUnlitExtension( parser );
+
+		} );
+
+		this.register( function ( parser ) {
+
 			return new GLTFMaterialsClearcoatExtension( parser );
 
 		} );
@@ -255,10 +261,6 @@ THREE.GLTFLoader = ( function () {
 					var extensionsRequired = json.extensionsRequired || [];
 
 					switch ( extensionName ) {
-
-						case EXTENSIONS.KHR_MATERIALS_UNLIT:
-							extensions[ extensionName ] = new GLTFMaterialsUnlitExtension();
-							break;
 
 						case EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS:
 							extensions[ extensionName ] = new GLTFMaterialsPbrSpecularGlossinessExtension();
@@ -506,47 +508,36 @@ THREE.GLTFLoader = ( function () {
 	 *
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_unlit
 	 */
-	function GLTFMaterialsUnlitExtension() {
+	function GLTFMaterialsUnlitExtension( parser ) {
 
+		this.parser = parser;
 		this.name = EXTENSIONS.KHR_MATERIALS_UNLIT;
 
 	}
 
-	GLTFMaterialsUnlitExtension.prototype.getMaterialType = function () {
+	GLTFMaterialsUnlitExtension.prototype.getMaterialType = function ( materialIndex ) {
+
+		var parser = this.parser;
+		var materialDef = parser.json.materials[ materialIndex ];
+
+		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) return null;
 
 		return THREE.MeshBasicMaterial;
 
 	};
 
-	GLTFMaterialsUnlitExtension.prototype.extendParams = function ( materialParams, materialDef, parser ) {
+	GLTFMaterialsUnlitExtension.prototype.extendMaterialParams = function ( materialIndex, materialParams ) {
 
-		var pending = [];
+		var parser = this.parser;
+		var materialDef = parser.json.materials[ materialIndex ];
 
-		materialParams.color = new THREE.Color( 1.0, 1.0, 1.0 );
-		materialParams.opacity = 1.0;
+		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) return null;
 
-		var metallicRoughness = materialDef.pbrMetallicRoughness;
+		// Removing material params that is not required to supress warnings.
+		delete materialParams.metalness;
+		delete materialParams.roughness;
 
-		if ( metallicRoughness ) {
-
-			if ( Array.isArray( metallicRoughness.baseColorFactor ) ) {
-
-				var array = metallicRoughness.baseColorFactor;
-
-				materialParams.color.fromArray( array );
-				materialParams.opacity = array[ 3 ];
-
-			}
-
-			if ( metallicRoughness.baseColorTexture !== undefined ) {
-
-				pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture ) );
-
-			}
-
-		}
-
-		return Promise.all( pending );
+		return Promise.resolve();
 
 	};
 
@@ -2708,12 +2699,6 @@ THREE.GLTFLoader = ( function () {
 			var sgExtension = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ];
 			materialType = sgExtension.getMaterialType();
 			pending.push( sgExtension.extendParams( materialParams, materialDef, parser ) );
-
-		} else if ( materialExtensions[ EXTENSIONS.KHR_MATERIALS_UNLIT ] ) {
-
-			var kmuExtension = extensions[ EXTENSIONS.KHR_MATERIALS_UNLIT ];
-			materialType = kmuExtension.getMaterialType();
-			pending.push( kmuExtension.extendParams( materialParams, materialDef, parser ) );
 
 		} else {
 
