@@ -296,6 +296,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		object.userData[ 'groups' ] = data.groups;
 		object.userData[ 'settings' ] = data.settings;
 		object.userData[ 'objectType' ] = 'File3dm';
+		object.userData[ 'materials' ] = null;
 		object.name = this.url;
 
 		var objects = data.objects;
@@ -322,9 +323,10 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				default:
 
-					if ( attributes.hasOwnProperty( 'materialUUID' ) ) {
+					if ( attributes.materialIndex >= 0 ) {
 
-						var rMaterial = materials.find( m => m.id === attributes.materialUUID );
+						// var rMaterial = materials.find( m => m.id === attributes.materialUUID );
+						var rMaterial = materials[ attributes.materialIndex ];
 						var material = this._createMaterial( rMaterial );
 						material = this._compareMaterials( material );
 						var _object = this._createObject( obj, material );
@@ -416,8 +418,8 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		this.materials = [];
-
+		object.userData[ 'materials' ] = this.materials;
+		// this.materials = [];
 		return object;
 
 	},
@@ -845,12 +847,14 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			if ( object !== undefined ) {
 
+				/*
 				if ( object.attributes.materialIndex >= 0 ) {
 
 					var mId = doc.materials().findIndex( object.attributes.materialIndex ).id;
 					object.attributes.materialUUID = mId;
 
 				}
+				*/
 
 				objects.push( object );
 
