@@ -2,9 +2,8 @@
  * @author Kai Salmen / www.kaisalmen.de
  */
 
-import { MeshMessageStructure } from "../utils/TransferableUtils.js";
-import { WorkerTaskManagerDefaultRouting } from "./tmDefaultComRouting.js";
-
+import { GeometryTransport } from "../workerTaskManager/utils/TransferableUtils.js";
+import { WorkerTaskManagerDefaultRouting } from "../workerTaskManager/comm/worker/defaultRouting.js";
 
 function init ( context, id, config ) {
 
@@ -18,25 +17,28 @@ function init ( context, id, config ) {
 
 function execute ( context, id, config ) {
 
-	let payload = MeshMessageStructure.cloneMessageStructure( context.config );
-	let vertexArray = payload.main.buffers.vertices.buffer;
+	const geometry = new GeometryTransport().loadData( context.config ).reconstruct( true ).getBufferGeometry();
+	geometry.name = 'tmProto' + config.id;
+	let vertexArray = geometry.getAttribute( 'position' ).array;
 	for ( let i = 0; i < vertexArray.length; i++ ) {
 
 		vertexArray[ i ] = vertexArray[ i ] + 10 * ( Math.random() - 0.5 );
 
 	}
-	payload.main.meshName = 'tmProto' + config.id;
-	payload.main.id = config.id;
-	payload.main.params.geometryType = 1;
-	payload.main.materials.materialNames = [ 'defaultLineMaterial' ];
+
+	const sender = new GeometryTransport( 'execComplete', config.id )
+		.setGeometry( geometry, 1 )
+		.package( false );
+
 	let randArray = new Uint8Array( 3 );
 	context.crypto.getRandomValues( randArray );
-	payload.main.params.color = {
+	sender.main.params.color = {
 		r: randArray[ 0 ] / 255,
 		g: randArray[ 1 ] / 255,
 		b: randArray[ 2 ] / 255
 	};
-	payload.postMessage( context );
+
+	sender.postMessage( context );
 
 }
 

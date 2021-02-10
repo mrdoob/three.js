@@ -24,23 +24,24 @@
 
 			import { TrackballControls } from "./jsm/controls/TrackballControls.js";
 			import { WorkerTaskManager } from "./jsm/loaders/workerTaskManager/WorkerTaskManager.js";
-			import { MeshReceiver } from "./jsm/loaders/workerTaskManager/shared/MeshReceiver.js";
 			import {
-				MeshMessageStructure,
-				ObjectManipulator
+				TransportBase,
+				GeometryTransport,
+				MeshTransport,
+				MaterialsTransport,
+				MaterialStore,
+				CodeUtils
 			} from "./jsm/loaders/workerTaskManager/utils/TransferableUtils.js"
-			import { MaterialHandler } from "./jsm/loaders/workerTaskManager/shared/MaterialHandler.js";
-			import { TransferableUtils } from "./jsm/loaders/workerTaskManager/utils/TransferableUtils.js";
 			import { FileLoader } from "../src/loaders/FileLoader.js";
 			import { MTLLoader } from "./jsm/loaders/MTLLoader.js";
-			import { OBJLoaderWorker } from "./jsm/loaders/workerTaskManager/worker/tmOBJLoader.js";
+			import { OBJLoaderWorker } from "./jsm/loaders/worker/tmOBJLoader.js";
 
 			/**
 			 * The aim of this example is to show all possible ways how to use the {@link WorkerTaskManager}:
 			 * - Standard Workers with dependency loading
 			 * - Module Workers with and without additional dependencies
 			 * - Main Fallback without dependencies
-			 * - It also allows to use OBJLoader2Parser with and without modules.
+			 * - It also allows to use OBJLoader with and without modules.
 			 *
 			 * Via dat.gui it is possible to control various parameters of the example:
 			 * - The quantity of workers created for each task (default: 4)
@@ -51,7 +52,6 @@
 			 * The tasks perform the same loading operation over and over again. This shall demonstrate:
 			 * - A good CPU utilization can be achieved permanently if the selected amount of workers match the logical CPUs available
 			 * - No memory is leaked
-			 * - The exmaple is able
 			 */
 			class TaskManagerPrototypeExample {
 
@@ -73,8 +73,6 @@
 					this.controls = null;
 
 					this.workerTaskManager = null;
-					this.materialHandler = null;
-					this.meshReceiver = null;
 
 					this.taskDescriptions = new Map ();
 					this.tasksToUse = [];
@@ -100,36 +98,39 @@
 					this.baseVectorZ = new THREE.Vector3( 0, 0, 1 );
 				}
 
+				_recalcExecutionNumbers () {
+					this.loopCount = this.overallExecutionCount / this.maxPerLoop;
+				}
+
 				resetAppContext () {
 					this.workerTaskManager = new WorkerTaskManager();
 					this.workerTaskManager.setVerbose( true );
 
-					this.materialHandler = new MaterialHandler();
-					this.materialHandler.createDefaultMaterials( true );
-					let meshNormalMaterial = new THREE.MeshNormalMaterial();
-					meshNormalMaterial.name = 'meshNormalMaterial';
-					this.materialHandler.addMaterials( { meshNormalMaterial: meshNormalMaterial }, true )
-					this.meshReceiver = new MeshReceiver( this.materialHandler );
-
 					this.taskDescriptions.clear();
 					this.taskDescriptions.set( 'tmProtoExample', {
 						name: 'tmProtoExample',
-						use: false,
+						use: true,
 						fallback: false,
 						funcInit: WorkerFunctions.workerStandardInit,
-						funcExec: WorkerFunctions.workerStandardExec
+						funcExec: WorkerFunctions.workerStandardExec,
+						dependencies: [
+							{ url: "../build/three.js" },
+							{ code: CodeUtils.serializeClass( THREE.BufferGeometry ) },
+							{ code: CodeUtils.serializeClass( TransportBase ) },
+							{ code: CodeUtils.serializeClass( GeometryTransport ) }
+						]
 					} );
 					this.taskDescriptions.set( 'tmProtoExampleModule', {
 						name: 'tmProtoExampleModule',
-						use: false,
+						use: true,
 						fallback: false,
-						module: './jsm/loaders/workerTaskManager/worker/tmModuleExample.js'
+						module: './jsm/loaders/worker/tmModuleExample.js'
 					} );
 					this.taskDescriptions.set( 'tmProtoExampleModuleNoThree', {
 						name: 'tmProtoExampleModuleNoThree',
-						use: false,
+						use: true,
 						fallback: false,
-						module: './jsm/loaders/workerTaskManager/worker/tmModuleExampleNoThree.js'
+						module: './jsm/loaders/worker/tmModuleExampleNoThree.js'
 					} );
 					this.taskDescriptions.set( 'tmProtoExampleMain', {
 						name: 'tmProtoExampleMain',
@@ -142,10 +143,10 @@
 						name: 'tmOBJLoaderModule',
 						use: true,
 						fallback: false,
-						module: './jsm/loaders/workerTaskManager/worker/tmOBJLoader.js',
+						module: './jsm/loaders/worker/tmOBJLoader.js',
 						filenameMtl: './models/obj/female02/female02.mtl',
 						filenameObj: './models/obj/female02/female02.obj',
-						materials: {}
+						materialStore: new MaterialStore( true ),
 					} );
 					this.taskDescriptions.set( 'tmOBJLoaderStandard', {
 						name: 'tmOBJLoaderStandard',
@@ -155,7 +156,8 @@
 						funcExec: OBJLoaderWorker.execute,
 						filenameMtl: './models/obj/male02/male02.mtl',
 						filenameObj: './models/obj/male02/male02.obj',
-						materials: {}
+						materialStore: new MaterialStore( true ),
+						dependencies: OBJLoaderWorker.buildStandardWorkerDependencies( '../build/three.js', '../examples/js/loaders/OBJLoader.js' )
 					} );
 
 					this.tasksToUse = [];
@@ -227,11 +229,12 @@
 				async initContent () {
 					let awaiting = [];
 					this.tasksToUse = [];
+
 					let taskDescr = this.taskDescriptions.get( 'tmProtoExample' );
 					if ( taskDescr.use ) {
 
 						this.tasksToUse.push( taskDescr );
-						this.workerTaskManager.registerTaskType( taskDescr.name, taskDescr.funcInit, taskDescr.funcExec, null, false, [ { url: "../build/three.js" } ] );
+						this.workerTaskManager.registerTaskType( taskDescr.name, taskDescr.funcInit, taskDescr.funcExec, null, false, taskDescr.dependencies );
 						awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, { param1: 'param1value' } ).catch( e => console.error( e ) ) );
 
 					}
@@ -247,10 +250,12 @@
 					if ( taskDescr.use ) {
 
 						let torus = new THREE.TorusBufferGeometry( 25, 8, 16, 100 );
-						let torusPayload = TransferableUtils.packageBufferGeometry( torus, '0', 'torus', 0 );
+						torus.name = 'torus';
+
+						const sender = new GeometryTransport().setGeometry( torus, 0 ).package( false );
 						this.tasksToUse.push( taskDescr );
 						this.workerTaskManager.registerTaskTypeModule( taskDescr.name, taskDescr.module );
-						awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, torusPayload, torusPayload.transferables ).catch( e => console.error( e ) ) );
+						awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, sender.getMain(), sender.getTransferables() ).catch( e => console.error( e ) ) );
 
 					}
 					taskDescr = this.taskDescriptions.get( 'tmProtoExampleMain' );
@@ -267,32 +272,29 @@
 						this.tasksToUse.push( taskDescr );
 						this.workerTaskManager.registerTaskTypeModule( taskDescr.name, taskDescr.module );
 						await this.loadObjMtl( taskDescr )
-						.then( buffer => {
-							let config = { buffer: buffer }
-							awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, config, { buffer: buffer } ).catch( e => console.error( e ) ) );
-						} );
+							.then( buffer => {
+								const mt = new MaterialsTransport()
+									.addBuffer( "data", buffer )
+									.setMaterials( taskDescr.materialStore.getMaterials() )
+									.cleanMaterials()
+									.package( false );
+								awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, mt.getMain(), mt.getTransferables() ).catch( e => console.error( e ) ) );
+							} );
 
 					}
 					taskDescr = this.taskDescriptions.get( 'tmOBJLoaderStandard' );
 					if ( taskDescr.use ) {
 
 						this.tasksToUse.push( taskDescr );
-						let transferableUtils = TransferableUtils.toString() + ';\n\n';
-						let meshMessageStructure = MeshMessageStructure.toString() + ';\n\n';
-
-						this.workerTaskManager.registerTaskType( taskDescr.name, taskDescr.funcInit, taskDescr.funcExec, null, false,
-								[
-									{ url: '../build/three.js' },
-									{ code: '\n\nconst MaterialLoader = THREE.MaterialLoader;\n\n' },
-									{ url: '../examples/js/loaders/OBJLoader.js' },
-									{ code: '\n\nconst OBJLoader = THREE.OBJLoader;\n\n' },
-									{ code: transferableUtils },
-									{ code: meshMessageStructure }
-								] );
+						this.workerTaskManager.registerTaskType( taskDescr.name, taskDescr.funcInit, taskDescr.funcExec, null, false, taskDescr.dependencies );
 						await this.loadObjMtl( taskDescr )
 							.then( buffer => {
-								let config = { buffer: buffer }
-								awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, config, { buffer: buffer } ).catch( e => console.error( e ) ) );
+								const mt = new MaterialsTransport()
+									.addBuffer( "data", buffer )
+									.setMaterials( taskDescr.materialStore.getMaterials() )
+									.cleanMaterials()
+									.package( false );
+								awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, mt.getMain(), mt.getTransferables() ).catch( e => console.error( e ) ) );
 							} );
 
 					}
@@ -322,8 +324,7 @@
 					await loadMtl.then( materialCreator => {
 
 						materialCreator.preload();
-						this.materialHandler.addMaterials( materialCreator.materials, false );
-						taskDescr.materials = this.materialHandler.getMaterialsJSON()
+						taskDescr.materialStore.addMaterials( materialCreator.materials, false );
 
 					} ) ;
 					return await fileLoader.loadAsync( taskDescr.filenameObj );
@@ -349,14 +350,11 @@
 						for ( let i = 0; i < this.maxPerLoop; i ++ ) {
 
 							let taskDescr = this.tasksToUse[ taskToUseIndex ];
-							let promise = this.workerTaskManager.enqueueForExecution( taskDescr.name, {
-									id: globalCount,
-									params: {
-										materials: taskDescr.materials
-									}
-								},
-								data => this._processMessage( data ) )
-									.then( data => this._processMessage( data ) )
+
+							const tb = new TransportBase( 'execute', globalCount ).setParams( { modelName: taskDescr.name } );
+							let promise = this.workerTaskManager.enqueueForExecution( taskDescr.name, tb.getMain(),
+								data => this._processMessage( taskDescr, data ) )
+									.then( data => this._processMessage( taskDescr, data ) )
 									.catch( e => console.error( e ) )
 							this.executions.push( promise );
 
@@ -383,7 +381,8 @@
 
 				}
 
-				_processMessage ( payload ) {
+				_processMessage ( taskDescr, payload ) {
+					let mesh, material;
 					switch ( payload.cmd ) {
 						case 'init':
 							console.log( 'Init Completed: ' + payload.id );
@@ -393,16 +392,33 @@
 						case 'assetAvailable':
 							switch ( payload.type ) {
 
-								case 'mesh':
-									let meshes = this.meshReceiver.buildMeshes( payload );
-									this._addMesh( meshes[ 0 ], payload.id, payload.params );
+								case 'GeometryTransport':
+									const geometryTransport = new GeometryTransport().loadData( payload ).reconstruct( payload.geometry );
+
+									let randArray = new Uint8Array( 3 );
+									window.crypto.getRandomValues( randArray );
+									const color = new THREE.Color();
+									color.r = randArray[ 0 ] / 255;
+									color.g = randArray[ 1 ] / 255;
+									color.b = randArray[ 2 ] / 255;
+									material = new THREE.MeshPhongMaterial( { color: color } );
+
+									mesh = new THREE.Mesh( geometryTransport.getBufferGeometry(), material );
+									this._addMesh( mesh, geometryTransport.main.id );
 									break;
 
-								case 'material':
-									this.materialHandler.addPayloadMaterials( payload );
+								case 'MeshTransport' :
+									const meshTransport = new MeshTransport().loadData( payload ).reconstruct( false );
+
+									const materialsTransport = meshTransport.getMaterialsTransport();
+									material = materialsTransport.processMaterialTransport( taskDescr.materialStore ? taskDescr.materialStore.getMaterials() : {}, true );
+
+									mesh = new THREE.Mesh( meshTransport.getBufferGeometry(), material );
+									this._addMesh( mesh, meshTransport.main.id );
 									break;
 
-								case 'void':
+								case 'TransportBase':
+									if ( payload.cmd !== 'execComplete' ) console.log( 'TransportBase' );
 									break;
 
 								default:
@@ -419,13 +435,14 @@
 					}
 				}
 
-				_addMesh( mesh, id, params ) {
+				_addMesh( mesh, id ) {
 
 					let storedPos = this.objectsUsed.get( id );
 					let pos;
 					if ( storedPos ) {
 
 						pos = storedPos.pos;
+
 					}
 					else {
 
@@ -438,12 +455,6 @@
 					}
 					mesh.position.set( pos.x, pos.y, pos.z );
 					mesh.name = id + '' + mesh.name;
-					if ( params.color !== undefined ) {
-
-						mesh.material.color = new THREE.Color( params.color.r, params.color.g, params.color.b );
-
-					}
-
 					this.scene.add( mesh );
 					this.meshesAdded.push( mesh.name );
 					this.meshCount ++;
@@ -544,50 +555,17 @@
 				workerStandardExec: function ( context, id, config ) {
 
 					let bufferGeometry = new THREE.SphereBufferGeometry( 40, 64, 64 );
-
-					let vertexBA = bufferGeometry.getAttribute( 'position' );
-					let indexBA = bufferGeometry.getIndex();
-					let colorBA = bufferGeometry.getAttribute( 'color' );
-					let normalBA = bufferGeometry.getAttribute( 'normal' );
-					let uvBA = bufferGeometry.getAttribute( 'uv' );
-
-					let vertexArray = vertexBA.array;
+					bufferGeometry.name = 'tmProto' + config.id;
+					let vertexArray = bufferGeometry.getAttribute( 'position' ).array;
 					for ( let i = 0; i < vertexArray.length; i ++ ) {
 
 						vertexArray[ i ] = vertexArray[ i ] * Math.random() * 0.48;
 
 					}
-					let vertexFA = vertexArray;
-					let indexUA = (indexBA !== null && indexBA !== undefined) ? indexBA.array : null;
-					let colorFA = (colorBA !== null && colorBA !== undefined) ? colorBA.array : null;
-					let normalFA = (normalBA !== null && normalBA !== undefined) ? normalBA.array : null;
-					let uvFA = (uvBA !== null && uvBA !== undefined) ? uvBA.array : null;
-
-					context.postMessage( {
-								cmd: 'execComplete',
-								type: 'mesh',
-								meshName: 'tmProto' + config.id,
-								id: config.id,
-								params: {
-									geometryType: 0
-								},
-								buffers: {
-									vertices: vertexFA,
-									indices: indexUA,
-									colors: colorFA,
-									normals: normalFA,
-									uvs: uvFA,
-								},
-								materials: {
-									materialNames: ['meshNormalMaterial']
-								}
-							},
-							[vertexFA.buffer],
-							indexUA !== null ? [indexUA.buffer] : null,
-							colorFA !== null ? [colorFA.buffer] : null,
-							normalFA !== null ? [normalFA.buffer] : null,
-							uvFA !== null ? [uvFA.buffer] : null
-					);
+					new GeometryTransport( 'execComplete', config.id )
+						.setGeometry( bufferGeometry, 0 )
+						.package( false )
+						.postMessage( context );
 
 				}
 
@@ -734,11 +712,11 @@
 
 			index++;
 			tmControls.controls[ index ] = gui.add( tmControls, 'overallExecutionCount', 0, 10000000 ).step( 1000 ).name( 'Overall Execution Count' );
-			tmControls.controls[ index ].onChange( value => { app.overallExecutionCount = value } );
+			tmControls.controls[ index ].onChange( value => { app.overallExecutionCount = value; app._recalcExecutionNumbers() } );
 
 			index++;
 			tmControls.controls[ index ] = gui.add( tmControls, 'maxPerLoop', 0, 10000 ).step( 100 ).name( 'Loop executions' );
-			tmControls.controls[ index ].onChange( value => { app.maxPerLoop = value } );
+			tmControls.controls[ index ].onChange( value => { app.maxPerLoop = value; app._recalcExecutionNumbers() } );
 
 			index++;
 			tmControls.controls[ index ] = gui.add( tmControls, 'numberOfMeshesToKeep', 100, 10000 ).step( 25 ).name( 'Keep N Meshes' );
