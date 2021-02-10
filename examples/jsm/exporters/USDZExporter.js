@@ -61,8 +61,6 @@ async function imgToU8( image ) {
 		canvas.height = image.height;
 
 		const context = canvas.getContext( '2d' );
-		context.translate( 0, canvas.height );
-		context.scale( 1, - 1 );
 		context.drawImage( image, 0, 0, canvas.width, canvas.height );
 
 		const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/jpeg' ) );
@@ -213,7 +211,7 @@ function buildVector2Array( attribute, count ) {
 
 	for ( let i = 0; i < data.length; i += 2 ) {
 
-		array.push( `(${ data[ i + 0 ] }, ${ data[ i + 1 ] })` );
+		array.push( `(${ data[ i + 0 ] }, ${ 1 - data[ i + 1 ] })` );
 
 	}
 
