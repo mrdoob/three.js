@@ -12,33 +12,39 @@ function CharsetEncoder() {
  */
 CharsetEncoder.prototype.s2u = function ( uint8Array ) {
 
-	var t = this.s2uTable;
-	var str = '';
-	var p = 0;
+	return new TextDecoder('shift-jis').decode(uint8Array);
 
-	while ( p < uint8Array.length ) {
+	//======================= doesn't work well ============================
 
-		var key = uint8Array[ p ++ ];
+	// var t = this.s2uTable;
+	// var str = '';
+	// var p = 0;
 
-		if ( ! ( ( key >= 0x00 && key <= 0x7e ) ||
-          ( key >= 0xa1 && key <= 0xdf ) ) &&
-       p < uint8Array.length ) {
+	// while ( p < uint8Array.length ) {
 
-			key = ( key << 8 ) | uint8Array[ p ++ ];
+	// 	var key = uint8Array[ p ++ ];
 
-		}
+	// 	if ( ! ( ( key >= 0x00 && key <= 0x7e ) ||
+    //       ( key >= 0xa1 && key <= 0xdf ) ) &&
+    //    p < uint8Array.length ) {
 
-		if ( t[ key ] === undefined ) {
+	// 		key = ( key << 8 ) | uint8Array[ p ++ ];
 
-			throw 'unknown char code ' + key + '.';
+	// 	}
 
-		}
+	// 	if ( t[ key ] === undefined ) {
 
-		str += String.fromCharCode( t[ key ] );
+	// 		throw 'unknown char code ' + key + '.';
 
-	}
+	// 	}
 
-	return str;
+	// 	str += String.fromCharCode( t[ key ] );
+
+	// }
+
+	// return str;
+
+	// ===============================================================
 
 };
 
