@@ -162,7 +162,9 @@ THREE.GLTFLoader = ( function () {
 
 			if ( this.pluginCallbacks.indexOf( callback ) === - 1 ) {
 
-				this.pluginCallbacks.push( callback );
+				// Insert to the top of the list, prioritizing user defined plugins
+				// See: https://github.com/mrdoob/three.js/issues/20709
+				this.pluginCallbacks.unshift( callback );
 
 			}
 
