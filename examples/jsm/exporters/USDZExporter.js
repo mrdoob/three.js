@@ -63,7 +63,7 @@ async function imgToU8( image ) {
 		const context = canvas.getContext( '2d' );
 		context.drawImage( image, 0, 0, canvas.width, canvas.height );
 
-		const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/jpeg' ) );
+		const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/jpeg', 1 ) );
 		return new Uint8Array( await blob.arrayBuffer() );
 
 	}
@@ -244,6 +244,8 @@ ${ array.join( '' ) }
 
 function buildMaterial( material ) {
 
+	// https://graphics.pixar.com/usd/docs/UsdPreviewSurface-Proposal.html
+
 	const pad = '            ';
 	const parameters = [];
 
@@ -257,6 +259,16 @@ function buildMaterial( material ) {
 
 	}
 
+	if ( material.emissiveMap !== null ) {
+
+		parameters.push( `${ pad }float3 inputs:emissiveColor.connect = </Textures/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
+
+	} else {
+
+		parameters.push( `${ pad }float3 inputs:emissiveColor = ${ buildColor( material.emissive ) }` );
+
+	}
+
 	if ( material.normalMap !== null ) {
 
 		parameters.push( `${ pad }float3 inputs:normal.connect = </Textures/Texture_${ material.normalMap.id }.outputs:rgb>` );
@@ -265,13 +277,13 @@ function buildMaterial( material ) {
 
 	if ( material.aoMap !== null ) {
 
-		parameters.push( `${ pad }float inputs:occlusion.connect = </Textures/Texture_${ material.aoMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }float inputs:occlusion.connect = </Textures/Texture_${ material.aoMap.id }.outputs:r>` );
 
 	}
 
 	if ( material.roughnessMap !== null ) {
 
-		parameters.push( `${ pad }float inputs:roughness.connect = </Textures/Texture_${ material.roughnessMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }float inputs:roughness.connect = </Textures/Texture_${ material.roughnessMap.id }.outputs:g>` );
 
 	} else {
 
@@ -281,20 +293,13 @@ function buildMaterial( material ) {
 
 	if ( material.metalnessMap !== null ) {
 
-		parameters.push( `${ pad }float inputs:metalness.connect = </Textures/Texture_${ material.metalnessMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }float inputs:metallic.connect = </Textures/Texture_${ material.metalnessMap.id }.outputs:b>` );
 
 	} else {
 
 		parameters.push( `${ pad }float inputs:metallic = ${ material.metalness }` );
 
 	}
-
-	if ( material.emissiveMap !== null ) {
-
-		parameters.push( `${ pad }float3 inputs:emissive.connect = </Textures/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
-
-	}
-
 
 	return `
     def Material "Material_${ material.id }"
@@ -344,6 +349,9 @@ function buildTexture( texture ) {
         token inputs:isSRGB = "auto"
         token inputs:wrapS = "repeat"
         token inputs:wrapT = "repeat"
+        float outputs:r
+        float outputs:g
+        float outputs:b
         float3 outputs:rgb
     }
 `;
