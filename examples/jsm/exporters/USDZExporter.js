@@ -246,41 +246,54 @@ ${ array.join( '' ) }
 
 function buildMaterial( material ) {
 
-	const textures = [];
+	const pad = '            ';
+	const parameters = [];
 
 	if ( material.map !== null ) {
 
-		textures.push( `            float3 inputs:diffuseColor.connect = </Textures/Texture_${ material.map.id }.outputs:rgb>` );
+		parameters.push( `${ pad }float3 inputs:diffuseColor.connect = </Textures/Texture_${ material.map.id }.outputs:rgb>` );
+
+	} else {
+
+		parameters.push( `${ pad }float3 inputs:diffuseColor = ${ buildColor( material.color ) }` );
 
 	}
 
 	if ( material.normalMap !== null ) {
 
-		textures.push( `            float3 inputs:normal.connect = </Textures/Texture_${ material.normalMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }float3 inputs:normal.connect = </Textures/Texture_${ material.normalMap.id }.outputs:rgb>` );
 
 	}
 
 	if ( material.aoMap !== null ) {
 
-		textures.push( `            float inputs:occlusion.connect = </Textures/Texture_${ material.aoMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }float inputs:occlusion.connect = </Textures/Texture_${ material.aoMap.id }.outputs:rgb>` );
 
 	}
 
 	if ( material.roughnessMap !== null ) {
 
-		textures.push( `            float inputs:roughness.connect = </Textures/Texture_${ material.roughnessMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }float inputs:roughness.connect = </Textures/Texture_${ material.roughnessMap.id }.outputs:rgb>` );
+
+	} else {
+
+		parameters.push( `${ pad }float inputs:roughness = ${ material.roughness }` );
 
 	}
 
 	if ( material.metalnessMap !== null ) {
 
-		textures.push( `            float inputs:metalness.connect = </Textures/Texture_${ material.metalnessMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }float inputs:metalness.connect = </Textures/Texture_${ material.metalnessMap.id }.outputs:rgb>` );
+
+	} else {
+
+		parameters.push( `${ pad }float inputs:metallic = ${ material.metalness }` );
 
 	}
 
 	if ( material.emissiveMap !== null ) {
 
-		textures.push( `            float3 inputs:emissive.connect = </Textures/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }float3 inputs:emissive.connect = </Textures/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
 
 	}
 
@@ -293,10 +306,7 @@ function buildMaterial( material ) {
         def Shader "PreviewSurface"
         {
             uniform token info:id = "UsdPreviewSurface"
-            float3 inputs:diffuseColor = ${ buildColor( material.color ) }
-            float inputs:metallic = ${ material.metalness }
-            float inputs:roughness = ${ material.roughness }
-${ textures.join( '\n' ) }
+${ parameters.join( '\n' ) }
             int inputs:useSpecularWorkflow = 0
             token outputs:surface
         }
