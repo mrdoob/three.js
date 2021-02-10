@@ -469,6 +469,8 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'SubD':
 			case 'Brep':
 
+			if ( obj.geometry === null ) return;
+
 				var geometry = loader.parse( obj.geometry );
 
 				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
@@ -1168,9 +1170,14 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 				}
 
-				mesh.compact();
-				geometry = mesh.toThreejsJSON();
-				faces.delete();
+				if ( mesh.faces().count > 0) {
+
+					mesh.compact();
+					geometry = mesh.toThreejsJSON();
+					faces.delete();
+
+				}
+
 				mesh.delete();
 
 				break;
@@ -1234,7 +1241,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		}
 
-		if ( Array.isArray( geometry ) === false || geometry.length > 0 ) {
+		if ( geometry ) {
 
 			var attributes = extractProperties( _attributes );
 			attributes.geometry = extractProperties( _geometry );
@@ -1261,7 +1268,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		} else {
 
-			console.warn( 'THREE.3DMLoader: Object has no associated mesh geometry.' );
+			console.warn( `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.` );
 
 		}
 

@@ -1,7 +1,7 @@
 
 var rhino3dm = (function() {
-  var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
-  if (typeof __filename !== 'undefined') _scriptDir = _scriptDir || __filename;
+  var _scriptDir = import.meta.url;
+  
   return (
 function(rhino3dm) {
   rhino3dm = rhino3dm || {};
@@ -13,9 +13,4 @@ var Module=typeof rhino3dm!=="undefined"?rhino3dm:{};var readyPromiseResolve,rea
 }
 );
 })();
-if (typeof exports === 'object' && typeof module === 'object')
-  module.exports = rhino3dm;
-else if (typeof define === 'function' && define['amd'])
-  define([], function() { return rhino3dm; });
-else if (typeof exports === 'object')
-  exports["rhino3dm"] = rhino3dm;
+export default rhino3dm;
