@@ -2,26 +2,71 @@ import { zipSync, strToU8 } from '../libs/fflate.module.min.js';
 
 class USDZExporter {
 
-	parse( scene ) {
+	async parse( scene ) {
 
 		let output = buildHeader();
 
 		const materials = {};
+		const textures = {};
 
 		scene.traverse( ( object ) => {
 
 			if ( object.isMesh ) {
 
-				materials[ object.material.uuid ] = object.material;
-				output += buildXform( object, buildMesh( object.geometry, object.material ) );
+				const geometry = object.geometry;
+				const material = object.material;
+
+				materials[ material.uuid ] = material;
+
+				if ( material.map !== null ) textures[ material.map.uuid ] = material.map;
+				if ( material.normalMap !== null ) textures[ material.normalMap.uuid ] = material.normalMap;
+				if ( material.aoMap !== null ) textures[ material.aoMap.uuid ] = material.aoMap;
+				if ( material.roughnessMap !== null ) textures[ material.roughnessMap.uuid ] = material.roughnessMap;
+				if ( material.metalnessMap !== null ) textures[ material.metalnessMap.uuid ] = material.metalnessMap;
+				if ( material.emissiveMap !== null ) textures[ material.emissiveMap.uuid ] = material.emissiveMap;
+
+				output += buildXform( object, buildMesh( geometry, material ) );
 
 			}
 
 		} );
 
 		output += buildMaterials( materials );
+		output += buildTextures( textures );
 
-		return zipSync( { 'model.usda': strToU8( output ) }, { level: 0 } );
+		const files = {};
+
+		for ( const uuid in textures ) {
+
+			const texture = textures[ uuid ];
+			files[ 'Texture_' + texture.id + '.jpg' ] = await img2U8( texture.image );
+
+		}
+
+		return zipSync( { 'model.usda': strToU8( output ), 'textures': files }, { level: 0 } );
+
+	}
+
+}
+
+async function img2U8( image ) {
+
+	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+		( typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas ) ||
+		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
+
+		const canvas = document.createElement( 'canvas' );
+		canvas.width = image.width;
+		canvas.height = image.height;
+
+		const context = canvas.getContext( '2d' );
+		context.translate( 0, canvas.height );
+		context.scale( 1, - 1 );
+		context.drawImage( image, 0, 0, canvas.width, canvas.height );
+
+		const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/jpeg' ) );
+		return new Uint8Array( await blob.arrayBuffer() );
 
 	}
 
@@ -201,6 +246,45 @@ ${ array.join( '' ) }
 
 function buildMaterial( material ) {
 
+	const textures = [];
+
+	if ( material.map !== null ) {
+
+		textures.push( `            float3 inputs:diffuseColor.connect = </Textures/Texture_${ material.map.id }.outputs:rgb>` );
+
+	}
+
+	if ( material.normalMap !== null ) {
+
+		textures.push( `            float3 inputs:normal.connect = </Textures/Texture_${ material.normalMap.id }.outputs:rgb>` );
+
+	}
+
+	if ( material.aoMap !== null ) {
+
+		textures.push( `            float inputs:occlusion.connect = </Textures/Texture_${ material.aoMap.id }.outputs:rgb>` );
+
+	}
+
+	if ( material.roughnessMap !== null ) {
+
+		textures.push( `            float inputs:roughness.connect = </Textures/Texture_${ material.roughnessMap.id }.outputs:rgb>` );
+
+	}
+
+	if ( material.metalnessMap !== null ) {
+
+		textures.push( `            float inputs:metalness.connect = </Textures/Texture_${ material.metalnessMap.id }.outputs:rgb>` );
+
+	}
+
+	if ( material.emissiveMap !== null ) {
+
+		textures.push( `            float3 inputs:emissive.connect = </Textures/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
+
+	}
+
+
 	return `
     def Material "Material_${ material.id }"
     {
@@ -209,12 +293,50 @@ function buildMaterial( material ) {
         def Shader "PreviewSurface"
         {
             uniform token info:id = "UsdPreviewSurface"
-            color3f inputs:diffuseColor = ${ buildColor( material.color ) }
-            color3f inputs:emissiveColor = ${ buildColor( material.emissive ) }
+            float3 inputs:diffuseColor = ${ buildColor( material.color ) }
             float inputs:metallic = ${ material.metalness }
             float inputs:roughness = ${ material.roughness }
+${ textures.join( '\n' ) }
+            int inputs:useSpecularWorkflow = 0
             token outputs:surface
         }
+    }
+`;
+
+}
+
+function buildTextures( textures ) {
+
+	const array = [];
+
+	for ( const uuid in textures ) {
+
+		const texture = textures[ uuid ];
+
+		array.push( buildTexture( texture ) );
+
+	}
+
+	return `def "Textures"
+{
+${ array.join( '' ) }
+}
+
+`;
+
+}
+
+function buildTexture( texture ) {
+
+	return `
+    def Shader "Texture_${ texture.id }"
+    {
+        uniform token info:id = "UsdUVTexture"
+        asset inputs:file = @textures/Texture_${ texture.id }.jpg@
+        token inputs:isSRGB = "auto"
+        token inputs:wrapS = "repeat"
+        token inputs:wrapT = "repeat"
+        float3 outputs:rgb
     }
 `;
 

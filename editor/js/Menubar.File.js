@@ -390,7 +390,7 @@ function MenubarFile( editor ) {
 
 		var exporter = new USDZExporter();
 
-		saveArrayBuffer( exporter.parse( editor.scene, { binary: true } ), 'model.usdz' );
+		saveArrayBuffer( await exporter.parse( editor.scene, { binary: true } ), 'model.usdz' );
 
 	} );
 	options.add( option );
