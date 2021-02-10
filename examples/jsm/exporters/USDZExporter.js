@@ -39,7 +39,7 @@ class USDZExporter {
 		for ( const uuid in textures ) {
 
 			const texture = textures[ uuid ];
-			files[ 'Texture_' + texture.id + '.jpg' ] = await img2U8( texture.image );
+			files[ 'Texture_' + texture.id + '.jpg' ] = await imgToU8( texture.image );
 
 		}
 
@@ -49,7 +49,7 @@ class USDZExporter {
 
 }
 
-async function img2U8( image ) {
+async function imgToU8( image ) {
 
 	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
