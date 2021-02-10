@@ -845,16 +845,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			_object.delete();
 
-			if ( object !== undefined ) {
-
-				/*
-				if ( object.attributes.materialIndex >= 0 ) {
-
-					var mId = doc.materials().findIndex( object.attributes.materialIndex ).id;
-					object.attributes.materialUUID = mId;
-
-				}
-				*/
+			if ( object ) {
 
 				objects.push( object );
 
