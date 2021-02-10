@@ -33,6 +33,8 @@ var Rhino3dmLoader = function ( manager ) {
 	this.libraryBinary = null;
 	this.libraryConfig = {};
 
+	this.url = '';
+
 	this.workerLimit = 4;
 	this.workerPool = [];
 	this.workerNextTaskID = 1;
@@ -72,6 +74,8 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
+
+		this.url = url;
 
 		loader.load( url, ( buffer ) => {
 
@@ -291,6 +295,9 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		object.userData[ 'layers' ] = data.layers;
 		object.userData[ 'groups' ] = data.groups;
 		object.userData[ 'settings' ] = data.settings;
+		object.userData[ 'objectType' ] = 'File3dm';
+		object.userData[ 'materials' ] = null;
+		object.name = this.url;
 
 		var objects = data.objects;
 		var materials = data.materials;
@@ -316,9 +323,9 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				default:
 
-					if ( attributes.hasOwnProperty( 'materialUUID' ) ) {
+					if ( attributes.materialIndex >= 0 ) {
 
-						var rMaterial = materials.find( m => m.id === attributes.materialUUID );
+						var rMaterial = materials[ attributes.materialIndex ];
 						var material = this._createMaterial( rMaterial );
 						material = this._compareMaterials( material );
 						var _object = this._createObject( obj, material );
@@ -410,8 +417,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		this.materials = [];
-
+		object.userData[ 'materials' ] = this.materials;
 		return object;
 
 	},
@@ -459,6 +465,9 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'Mesh':
 			case 'Extrusion':
 			case 'SubD':
+			case 'Brep':
+
+				if ( obj.geometry === null ) return;
 
 				var geometry = loader.parse( obj.geometry );
 
@@ -488,32 +497,6 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				}
 
 				return mesh;
-
-			case 'Brep':
-
-				var brepObject = new Object3D();
-
-				for ( var j = 0; j < obj.geometry.length; j ++ ) {
-
-					geometry = loader.parse( obj.geometry[ j ] );
-					var mesh = new Mesh( geometry, mat );
-					mesh.castShadow = attributes.castsShadows;
-					mesh.receiveShadow = attributes.receivesShadows;
-
-					brepObject.add( mesh );
-
-				}
-
-				brepObject.userData[ 'attributes' ] = attributes;
-				brepObject.userData[ 'objectType' ] = obj.objectType;
-
-				if ( attributes.name ) {
-
-					brepObject.name = attributes.name;
-
-				}
-
-				return brepObject;
 
 			case 'Curve':
 
@@ -862,14 +845,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			_object.delete();
 
-			if ( object !== undefined ) {
-
-				if ( object.attributes.materialIndex >= 0 ) {
-
-					var mId = doc.materials().findIndex( object.attributes.materialIndex ).id;
-					object.attributes.materialUUID = mId;
-
-				}
+			if ( object ) {
 
 				objects.push( object );
 
@@ -1165,17 +1141,17 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			case rhino.ObjectType.Brep:
 
 				var faces = _geometry.faces();
-				geometry = [];
+				var mesh = new rhino.Mesh();
 
 				for ( var faceIndex = 0; faceIndex < faces.count; faceIndex ++ ) {
 
 					var face = faces.get( faceIndex );
-					var mesh = face.getMesh( rhino.MeshType.Any );
+					var _mesh = face.getMesh( rhino.MeshType.Any );
 
-					if ( mesh ) {
+					if ( _mesh ) {
 
-						geometry.push( mesh.toThreejsJSON() );
-						mesh.delete();
+						mesh.append( _mesh );
+						_mesh.delete();
 
 					}
 
@@ -1183,7 +1159,15 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 				}
 
-				faces.delete();
+				if ( mesh.faces().count > 0 ) {
+
+					mesh.compact();
+					geometry = mesh.toThreejsJSON();
+					faces.delete();
+
+				}
+
+				mesh.delete();
 
 				break;
 
@@ -1246,7 +1230,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		}
 
-		if ( Array.isArray( geometry ) === false || geometry.length > 0 ) {
+		if ( geometry ) {
 
 			var attributes = extractProperties( _attributes );
 			attributes.geometry = extractProperties( _geometry );
@@ -1273,7 +1257,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		} else {
 
-			console.warn( 'THREE.3DMLoader: Object has no mesh geometry. Consider opening this in Rhino, using a shaded display mode, and exporting again.' );
+			console.warn( `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.` );
 
 		}
 
