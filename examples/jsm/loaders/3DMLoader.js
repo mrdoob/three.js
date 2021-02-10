@@ -325,7 +325,6 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					if ( attributes.materialIndex >= 0 ) {
 
-						// var rMaterial = materials.find( m => m.id === attributes.materialUUID );
 						var rMaterial = materials[ attributes.materialIndex ];
 						var material = this._createMaterial( rMaterial );
 						material = this._compareMaterials( material );
@@ -419,7 +418,6 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		}
 
 		object.userData[ 'materials' ] = this.materials;
-		// this.materials = [];
 		return object;
 
 	},
@@ -469,7 +467,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'SubD':
 			case 'Brep':
 
-			if ( obj.geometry === null ) return;
+				if ( obj.geometry === null ) return;
 
 				var geometry = loader.parse( obj.geometry );
 
@@ -1170,7 +1168,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 				}
 
-				if ( mesh.faces().count > 0) {
+				if ( mesh.faces().count > 0 ) {
 
 					mesh.compact();
 					geometry = mesh.toThreejsJSON();
