@@ -76,7 +76,9 @@ function buildHeader() {
 
 	return `#usda 1.0
 (
-    doc = "Three.js"
+    customLayerData = {
+        string creator = "Three.js USDZExporter"
+    }
     metersPerUnit = 1
     upAxis = "Y"
 )
@@ -346,7 +348,6 @@ function buildTexture( texture ) {
     {
         uniform token info:id = "UsdUVTexture"
         asset inputs:file = @textures/Texture_${ texture.id }.jpg@
-        token inputs:isSRGB = "auto"
         token inputs:wrapS = "repeat"
         token inputs:wrapT = "repeat"
         float outputs:r
