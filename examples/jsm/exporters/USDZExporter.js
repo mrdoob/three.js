@@ -251,27 +251,27 @@ function buildMaterial( material ) {
 
 	if ( material.map !== null ) {
 
-		parameters.push( `${ pad }float3 inputs:diffuseColor.connect = </Textures/Texture_${ material.map.id }.outputs:rgb>` );
+		parameters.push( `${ pad }color3f inputs:diffuseColor.connect = </Textures/Texture_${ material.map.id }.outputs:rgb>` );
 
 	} else {
 
-		parameters.push( `${ pad }float3 inputs:diffuseColor = ${ buildColor( material.color ) }` );
+		parameters.push( `${ pad }color3f inputs:diffuseColor = ${ buildColor( material.color ) }` );
 
 	}
 
 	if ( material.emissiveMap !== null ) {
 
-		parameters.push( `${ pad }float3 inputs:emissiveColor.connect = </Textures/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }color3f inputs:emissiveColor.connect = </Textures/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
 
 	} else {
 
-		parameters.push( `${ pad }float3 inputs:emissiveColor = ${ buildColor( material.emissive ) }` );
+		parameters.push( `${ pad }color3f inputs:emissiveColor = ${ buildColor( material.emissive ) }` );
 
 	}
 
 	if ( material.normalMap !== null ) {
 
-		parameters.push( `${ pad }float3 inputs:normal.connect = </Textures/Texture_${ material.normalMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }normal3f inputs:normal.connect = </Textures/Texture_${ material.normalMap.id }.outputs:rgb>` );
 
 	}
 
