@@ -265,7 +265,7 @@ function buildMaterial( material ) {
 
 		parameters.push( `${ pad }color3f inputs:emissiveColor.connect = </Textures/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
 
-	} else {
+	} else if ( material.emissive.getHex() > 0 ) {
 
 		parameters.push( `${ pad }color3f inputs:emissiveColor = ${ buildColor( material.emissive ) }` );
 
