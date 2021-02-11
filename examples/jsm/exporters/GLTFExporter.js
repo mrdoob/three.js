@@ -922,7 +922,7 @@ var GLTFExporter = ( function () {
 
 			};
 
-			if ( attribute.normalized === true ) gltfAccessor.normalized = true;
+			if ( attribute.normalized === true ) accessorDef.normalized = true;
 			if ( ! json.accessors ) json.accessors = [];
 
 			return json.accessors.push( accessorDef ) - 1;
