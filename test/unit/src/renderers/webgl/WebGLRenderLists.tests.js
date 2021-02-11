@@ -2,6 +2,7 @@
 
 import { WebGLRenderLists, WebGLRenderList } from '../../../../../src/renderers/webgl/WebGLRenderLists';
 import { WebGLProperties } from '../../../../../src/renderers/webgl/WebGLProperties';
+import { Camera } from '../../../../../src/cameras/Camera';
 import { Scene } from '../../../../../src/scenes/Scene';
 
 export default QUnit.module( 'Renderers', () => {
@@ -18,14 +19,18 @@ export default QUnit.module( 'Renderers', () => {
 				var renderLists = new WebGLRenderLists( properties );
 				var sceneA = new Scene();
 				var sceneB = new Scene();
+				var cameraA = new Camera();
+				var cameraB = new Camera();
 
-				var listA = renderLists.get( sceneA );
-				var listB = renderLists.get( sceneB );
+				var listAA = renderLists.get( sceneA, cameraA );
+				var listAB = renderLists.get( sceneA, cameraB );
+				var listBA = renderLists.get( sceneB, cameraA );
 
-				assert.propEqual( listA, new WebGLRenderList( properties ), "listA is type of WebGLRenderList." );
-				assert.propEqual( listB, new WebGLRenderList( properties ), "listB is type of WebGLRenderList." );
-				assert.ok( listA !== listB, "Render lists are different." );
-
+				assert.propEqual( listAA, new WebGLRenderList( properties ), "listAA is type of WebGLRenderList." );
+				assert.propEqual( listAB, new WebGLRenderList( properties ), "listAB is type of WebGLRenderList." );
+				assert.ok( listAA !== listAB, "Render lists for camera A and B with same scene are different." );
+				assert.ok( listAA !== listBA, "Render lists for scene A and B with same camera are different." );
+				assert.ok( listAA === renderLists.get( sceneA, cameraA ), "The same list is returned when called with the same scene, camera." );
 
 			} );
 

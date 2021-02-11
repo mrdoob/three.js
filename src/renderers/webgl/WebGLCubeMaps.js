@@ -40,6 +40,7 @@ function WebGLCubeMaps( renderer ) {
 
 					if ( image && image.height > 0 ) {
 
+						const currentRenderList = renderer.getRenderList();
 						const currentRenderTarget = renderer.getRenderTarget();
 
 						const renderTarget = new WebGLCubeRenderTarget( image.height / 2 );
@@ -47,6 +48,7 @@ function WebGLCubeMaps( renderer ) {
 						cubemaps.set( texture, renderTarget );
 
 						renderer.setRenderTarget( currentRenderTarget );
+						renderer.setRenderList( currentRenderList );
 
 						texture.addEventListener( 'dispose', onTextureDispose );
 

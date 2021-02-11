@@ -68,9 +68,8 @@ function WebGLRenderer( parameters ) {
 	let currentRenderState = null;
 
 	// render() can be called from within a callback triggered by another render.
-	// We track this so that the nested render call gets its list and state isolated from the parent render call.
+	// We track this so that the nested render call gets its state isolated from the parent render call.
 
-	const renderListStack = [];
 	const renderStateStack = [];
 
 	// public properties
@@ -1024,10 +1023,8 @@ function WebGLRenderer( parameters ) {
 		_localClippingEnabled = this.localClippingEnabled;
 		_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
 
-		currentRenderList = renderLists.get( scene, renderListStack.length );
+		currentRenderList = renderLists.get( scene, camera );
 		currentRenderList.init();
-
-		renderListStack.push( currentRenderList );
 
 		projectObject( scene, camera, 0, _this.sortObjects );
 
@@ -1103,7 +1100,6 @@ function WebGLRenderer( parameters ) {
 		// _gl.finish();
 
 		renderStateStack.pop();
-
 		if ( renderStateStack.length > 0 ) {
 
 			currentRenderState = renderStateStack[ renderStateStack.length - 1 ];
@@ -1114,17 +1110,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		renderListStack.pop();
-
-		if ( renderListStack.length > 0 ) {
-
-			currentRenderList = renderListStack[ renderListStack.length - 1 ];
-
-		} else {
-
-			currentRenderList = null;
-
-		}
+		currentRenderList = null;
 
 	};
 
@@ -1761,6 +1747,18 @@ function WebGLRenderer( parameters ) {
 	this.getActiveMipmapLevel = function () {
 
 		return _currentActiveMipmapLevel;
+
+	};
+
+	this.getRenderList = function () {
+
+		return currentRenderList;
+
+	};
+
+	this.setRenderList = function ( renderList ) {
+
+		currentRenderList = renderList;
 
 	};
 
