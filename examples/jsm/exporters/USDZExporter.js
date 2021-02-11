@@ -57,8 +57,8 @@ async function imgToU8( image ) {
 		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
 		const canvas = document.createElement( 'canvas' );
-		canvas.width = image.width;
-		canvas.height = image.height;
+		canvas.width = Math.min( 1024, image.width );
+		canvas.height = Math.min( 1024, image.height );
 
 		const context = canvas.getContext( '2d' );
 		context.drawImage( image, 0, 0, canvas.width, canvas.height );
