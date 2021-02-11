@@ -3,8 +3,6 @@ console.warn( "THREE.SSAARenderPass: As part of the transition to ES6 Modules, t
 *
 * Supersample Anti-Aliasing Render Pass
 *
-* @author bhouston / http://clara.io/
-*
 * This manual approach to SSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
 *
 * References: https://en.wikipedia.org/wiki/Supersampling

@@ -1,11 +1,3 @@
-/**
- * @author Mike Piecuch / https://github.com/mikepiecuch
- *
- * Based on research paper "Real-Time Fluid Dynamics for Games" by Jos Stam
- * http://www.dgp.toronto.edu/people/stam/reality/Research/pdf/GDC03.pdf
- *
- */
-
 import {
 	Clock,
 	Color,
@@ -23,6 +15,11 @@ import {
 	Vector2,
 	WebGLRenderTarget
 } from "../../../build/three.module.js";
+/**
+ * Based on research paper "Real-Time Fluid Dynamics for Games" by Jos Stam
+ * http://www.dgp.toronto.edu/people/stam/reality/Research/pdf/GDC03.pdf
+ *
+ */
 
 var Fire = function ( geometry, options ) {
 
@@ -148,8 +145,7 @@ var Fire = function ( geometry, options ) {
 	var parameters = {
 		minFilter: NearestFilter,
 		magFilter: NearestFilter,
-		depthBuffer: false,
-		stencilBuffer: false
+		depthBuffer: false
 	};
 
 

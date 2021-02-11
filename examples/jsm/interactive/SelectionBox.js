@@ -1,12 +1,10 @@
-/**
- * @author HypnosNova / https://www.threejs.org.cn/gallery
- * This is a class to check whether objects are in a selection area in 3D space
- */
-
 import {
 	Frustum,
 	Vector3
 } from "../../../build/three.module.js";
+/**
+ * This is a class to check whether objects are in a selection area in 3D space
+ */
 
 var SelectionBox = ( function () {
 

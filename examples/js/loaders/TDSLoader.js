@@ -4,8 +4,6 @@ console.warn( "THREE.TDSLoader: As part of the transition to ES6 Modules, the fi
  *
  * Loads geometry with uv and materials basic properties with texture support.
  *
- * @author @tentone
- * @author @timknip
  * @class TDSLoader
  * @constructor
  */
@@ -46,6 +44,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
 
 		loader.load( url, function ( data ) {
 

@@ -202,7 +202,7 @@
 				this.mesh = new THREE.Mesh( generateGeometry( type, numObjects ), defaultMaterial );
 				this.scene.add( this.mesh );
 
-				var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+				var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 				this.fbo = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
 
 				this.render = function ( delta, rtt ) {

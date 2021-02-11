@@ -1,19 +1,15 @@
-/**
- * @author munrocket / https://github.com/munrocket
- */
-
 const fs = require( 'fs' );
 
 // examples
 const E = fs.readdirSync( './examples' )
-		.filter( s => s.slice( - 5 ) === '.html' )
-		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => f !== 'index' );
+	.filter( s => s.slice( - 5 ) === '.html' )
+	.map( s => s.slice( 0, s.length - 5 ) )
+	.filter( f => f !== 'index' );
 
 // screenshots
 const S = fs.readdirSync( './examples/screenshots' )
-		.filter( s => s.slice( - 4 ) === '.jpg' )
-		.map( s => s.slice( 0, s.length - 4 ) )
+	.filter( s => s.slice( - 4 ) === '.jpg' )
+	.map( s => s.slice( 0, s.length - 4 ) );
 
 // files.js
 const F = [];
@@ -43,10 +39,10 @@ if ( subES.length + subSE.length + subEF.length + subFE.length === 0 ) {
 
 } else {
 
-	if ( subES.length > 0 ) console.red( 'Make screenshot for example(s): ' + subES.join(' ') );
-	if ( subSE.length > 0 ) console.red( 'Remove unnecessary screenshot(s): ' + subSE.join(' ') );
-	if ( subEF.length > 0 ) console.red( 'Add description in file.js for example(s): ' + subEF.join(' ') );
-	if ( subFE.length > 0 ) console.red( 'Remove description in file.js for example(s): ' + subFE.join(' ') );
+	if ( subES.length > 0 ) console.red( 'Make screenshot for example(s): ' + subES.join( ' ' ) );
+	if ( subSE.length > 0 ) console.red( 'Remove unnecessary screenshot(s): ' + subSE.join( ' ' ) );
+	if ( subEF.length > 0 ) console.red( 'Add description in file.js for example(s): ' + subEF.join( ' ' ) );
+	if ( subFE.length > 0 ) console.red( 'Remove description in file.js for example(s): ' + subFE.join( ' ' ) );
 
 	console.red( 'TEST FAILED!' );
 

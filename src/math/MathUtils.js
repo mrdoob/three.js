@@ -1,10 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author thezwap
- */
-
 const _lut = [];
 
 for ( let i = 0; i < 256; i ++ ) {
@@ -12,6 +5,8 @@ for ( let i = 0; i < 256; i ++ ) {
 	_lut[ i ] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 );
 
 }
+
+let _seed = 1234567;
 
 const MathUtils = {
 
@@ -117,23 +112,17 @@ const MathUtils = {
 
 	// Deterministic pseudo-random float in the interval [ 0, 1 ]
 
-	seededRandom: function () {
+	seededRandom: function ( s ) {
 
-		var seed = 1234567;
+		if ( s !== undefined ) _seed = s % 2147483647;
 
-		return function seededRandom( s ) {
+		// Park-Miller algorithm
 
-			if ( s !== undefined ) seed = s % 2147483647;
+		_seed = _seed * 16807 % 2147483647;
 
-			// Park-Miller algorithm
+		return ( _seed - 1 ) / 2147483646;
 
-			seed = seed * 16807 % 2147483647;
-
-			return ( seed - 1 ) / 2147483646;
-
-		};
-
-	}(),
+	},
 
 	degToRad: function ( degrees ) {
 

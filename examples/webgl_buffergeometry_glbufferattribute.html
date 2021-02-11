@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - buffergeometry - custom VBOs</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - custom VBOs</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var points;
+
+			var particles = 300000;
+			var drawCount = 10000;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 5, 3500 );
+				camera.position.z = 2750;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
+				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+
+				//
+
+				var geometry = new THREE.BufferGeometry();
+
+				var positions = [];
+				var positions2 = [];
+				var colors = [];
+
+				var color = new THREE.Color();
+
+				var n = 1000, n2 = n / 2; // particles spread in the cube
+
+				for ( var i = 0; i < particles; i ++ ) {
+
+					// positions
+
+					var x = Math.random() * n - n2;
+					var y = Math.random() * n - n2;
+					var z = Math.random() * n - n2;
+
+					positions.push( x, y, z );
+					positions2.push( z * 0.3, x * 0.3, y * 0.3 );
+
+					// colors
+
+					var vx = ( x / n ) + 0.5;
+					var vy = ( y / n ) + 0.5;
+					var vz = ( z / n ) + 0.5;
+
+					color.setRGB( vx, vy, vz );
+
+					colors.push( color.r, color.g, color.b );
+
+				}
+
+				var gl = renderer.getContext();
+
+				var pos = gl.createBuffer();
+				gl.bindBuffer( gl.ARRAY_BUFFER, pos );
+				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( positions ), gl.STATIC_DRAW );
+
+				var pos2 = gl.createBuffer();
+				gl.bindBuffer( gl.ARRAY_BUFFER, pos2 );
+				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( positions2 ), gl.STATIC_DRAW );
+
+				var rgb = gl.createBuffer();
+				gl.bindBuffer( gl.ARRAY_BUFFER, rgb );
+				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( colors ), gl.STATIC_DRAW );
+
+				var posAttr1 = new THREE.GLBufferAttribute( pos, gl.FLOAT, 3, 4, particles );
+				var posAttr2 = new THREE.GLBufferAttribute( pos2, gl.FLOAT, 3, 4, particles );
+				geometry.setAttribute( 'position', posAttr1 );
+
+				setInterval( function () {
+
+					var attr = geometry.getAttribute( 'position' );
+
+					geometry.setAttribute( 'position', ( attr === posAttr1 ) ? posAttr2 : posAttr1 );
+
+				}, 2000 );
+
+				geometry.setAttribute( 'color', new THREE.GLBufferAttribute( rgb, gl.FLOAT, 3, 4, particles ) );
+
+				//
+
+				var material = new THREE.PointsMaterial( { size: 15, vertexColors: THREE.VertexColors } );
+
+				points = new THREE.Points( geometry, material );
+
+				// Choose one:
+				// geometry.boundingSphere = ( new THREE.Sphere() ).set( new THREE.Vector3(), Infinity );
+				points.frustumCulled = false;
+
+				scene.add( points );
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				drawCount = ( Math.max( 5000, drawCount ) + Math.floor( 500 * Math.random() ) ) % particles;
+				points.geometry.setDrawRange( 0, drawCount );
+
+				var time = Date.now() * 0.001;
+
+				points.rotation.x = time * 0.1;
+				points.rotation.y = time * 0.2;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

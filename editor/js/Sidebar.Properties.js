@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UITabbedPanel } from './libs/ui.js';
 
 import { SidebarObject } from './Sidebar.Object.js';

@@ -1,16 +1,13 @@
+import {
+	Matrix4,
+	Vector2
+} from "../../../build/three.module.js";
 /**
- * @author Mugen87 / https://github.com/Mugen87
- *
  * References:
  * http://john-chapman-graphics.blogspot.com/2013/01/ssao-tutorial.html
  * https://learnopengl.com/Advanced-Lighting/SSAO
  * https://github.com/McNopper/OpenGL/blob/master/Example28/shader/ssao.frag.glsl
  */
-
-import {
-	Matrix4,
-	Vector2
-} from "../../../build/three.module.js";
 
 var SSAOShader = {
 

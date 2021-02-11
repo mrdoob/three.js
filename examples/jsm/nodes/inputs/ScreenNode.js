@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { InputNode } from '../core/InputNode.js';
 import { TextureNode } from './TextureNode.js';
 

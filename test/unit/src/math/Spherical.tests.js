@@ -1,7 +1,3 @@
-/**
- * @author moraxy / https://github.com/moraxy
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Spherical } from '../../../../src/math/Spherical';

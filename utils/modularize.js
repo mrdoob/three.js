@@ -1,8 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 var fs = require( 'fs' );
 THREE = require( '../build/three.js' );
 
@@ -252,15 +247,7 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	// remove examples/js deprecation warning
 
-	contents = contents.replace( /^console\.warn.*\n/, '' );
-
-	// imports
-
-	contents = contents.replace( /^\/\*+[^*]*\*+(?:[^/*][^*]*\*+)*\//, function ( match ) {
-
-		return `${match}\n\n_IMPORTS_`;
-
-	} );
+	contents = contents.replace( /^console\.warn.*(\r\n|\r|\n)/, '' );
 
 	// class name
 
@@ -342,7 +329,7 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	var exports = `export { ${classNames.join( ", " )} };\n`;
 
-	var output = contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
+	var output = imports + '\n' + contents + '\n' + exports;
 
 	// console.log( output );
 

@@ -54,14 +54,19 @@ export class Geometry extends EventDispatcher {
 
 	/**
 	 * Name for this geometry. Default is an empty string.
+	 * @default ''
 	 */
 	name: string;
 
+	/**
+	 * @default 'Geometry'
+	 */
 	type: string;
 
 	/**
 	 * The array of vertices hold every position of points of the model.
 	 * To signal an update in this array, Geometry.verticesNeedUpdate needs to be set to true.
+	 * @default []
 	 */
 	vertices: Vector3[];
 
@@ -70,6 +75,7 @@ export class Geometry extends EventDispatcher {
 	 * Used in ParticleSystem, Line and Ribbon.
 	 * Meshes use per-face-use-of-vertex colors embedded directly in faces.
 	 * To signal an update in this array, Geometry.colorsNeedUpdate needs to be set to true.
+	 * @default []
 	 */
 	colors: Color[];
 
@@ -77,6 +83,7 @@ export class Geometry extends EventDispatcher {
 	 * Array of triangles or/and quads.
 	 * The array of faces describe how each vertex in the model is connected with each other.
 	 * To signal an update in this array, Geometry.elementsNeedUpdate needs to be set to true.
+	 * @default []
 	 */
 	faces: Face3[];
 
@@ -84,6 +91,7 @@ export class Geometry extends EventDispatcher {
 	 * Array of face UV layers.
 	 * Each UV layer is an array of UV matching order and number of vertices in faces.
 	 * To signal an update in this array, Geometry.uvsNeedUpdate needs to be set to true.
+	 * @default [[]]
 	 */
 	faceVertexUvs: Vector2[][][];
 
@@ -93,6 +101,7 @@ export class Geometry extends EventDispatcher {
 	 *		 { name: "targetName", vertices: [ new THREE.Vector3(), ... ] }
 	 *
 	 * Morph vertices match number and order of primary vertices.
+	 * @default []
 	 */
 	morphTargets: MorphTarget[];
 
@@ -100,66 +109,78 @@ export class Geometry extends EventDispatcher {
 	 * Array of morph normals. Morph normals have similar structure as morph targets, each normal set is a Javascript object:
 	 *
 	 *		 morphNormal = { name: "NormalName", normals: [ new THREE.Vector3(), ... ] }
+	 * @default []
 	 */
 	morphNormals: MorphNormals[];
 
 	/**
 	 * Array of skinning weights, matching number and order of vertices.
+	 * @default []
 	 */
 	skinWeights: Vector4[];
 
 	/**
 	 * Array of skinning indices, matching number and order of vertices.
+	 * @default []
 	 */
 	skinIndices: Vector4[];
 
 	/**
-	 *
+	 * @default []
 	 */
 	lineDistances: number[];
 
 	/**
 	 * Bounding box.
+	 * @default null
 	 */
 	boundingBox: Box3 | null;
 
 	/**
 	 * Bounding sphere.
+	 * @default null
 	 */
 	boundingSphere: Sphere | null;
 
 	/**
 	 * Set to true if the vertices array has been updated.
+	 * @default false
 	 */
 	verticesNeedUpdate: boolean;
 
 	/**
 	 * Set to true if the faces array has been updated.
+	 * @default false
 	 */
 	elementsNeedUpdate: boolean;
 
 	/**
 	 * Set to true if the uvs array has been updated.
+	 * @default false
 	 */
 	uvsNeedUpdate: boolean;
 
 	/**
 	 * Set to true if the normals array has been updated.
+	 * @default false
 	 */
 	normalsNeedUpdate: boolean;
 
 	/**
 	 * Set to true if the colors array has been updated.
+	 * @default false
 	 */
 	colorsNeedUpdate: boolean;
 
 	/**
 	 * Set to true if the linedistances array has been updated.
+	 * @default false
 	 */
 	lineDistancesNeedUpdate: boolean;
 
 	/**
 	 *
+	 * @default false
 	 */
 	groupsNeedUpdate: boolean;
 

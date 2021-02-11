@@ -31,7 +31,9 @@
 					<div id="exitSearchButton"></div>
 				</div>
 
-				<div id="content"></div>
+				<div id="content">
+					<img id="previewsToggler" src="./files/thumbnails.svg" width="20" height="20" />
+				</div>
 			</div>
 
 		</div>
@@ -52,6 +54,8 @@
 		var expandButton = document.getElementById( 'expandButton' );
 		var viewSrcButton = document.getElementById( 'button' );
 		var panelScrim = document.getElementById( 'panelScrim' );
+
+		var previewsToggler = document.getElementById( 'previewsToggler' );
 
 		var links = {};
 		var selected = null;
@@ -150,6 +154,13 @@
 
 			};
 
+			previewsToggler.onclick = function ( event ) {
+
+				event.preventDefault();
+				content.classList.toggle( 'minimal' );
+
+			};
+
 			// iOS iframe auto-resize workaround
 
 			if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
@@ -219,7 +230,8 @@
 
 		function updateFilter() {
 
-			var v = filterInput.value;
+			var v = filterInput.value.trim();
+			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
 
 			if ( v !== '' ) {
 
@@ -253,7 +265,7 @@
 
 			var link = links[ file ];
 			var name = getName( file );
-			if ( file in tags ) file += tags[ file ].join( ' ' );
+			if ( file in tags ) file += ' ' + tags[ file ].join( ' ' );
 			var res = file.match( exp );
 			var text;
 
@@ -329,7 +341,7 @@
 
 			if ( p !== - 1 ) {
 
-				return window.location.search.substr( 3 );
+				return decodeURI( window.location.search.substr( 3 ) );
 
 			}
 

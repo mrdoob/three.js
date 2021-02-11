@@ -12,8 +12,8 @@ export class PositionalAudio extends Audio<PannerNode> {
 	getRefDistance(): number;
 	setRolloffFactor( value: number ): this;
 	getRolloffFactor(): number;
-	setDistanceModel( value: DistanceModelType ): this;
-	getDistanceModel(): DistanceModelType;
+	setDistanceModel( value: string ): this;
+	getDistanceModel(): string;
 	setMaxDistance( value: number ): this;
 	getMaxDistance(): number;
 	setDirectionalCone(

@@ -6,8 +6,6 @@ console.warn( "THREE.GCodeLoader: As part of the transition to ES6 Modules, the 
  *
  * @class THREE.GCodeLoader
  * @param {Manager} manager Loading manager.
- * @author tentone
- * @author joewalnes
  */
 
 THREE.GCodeLoader = function ( manager ) {
@@ -28,6 +26,7 @@ THREE.GCodeLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( text ) {
 
 			try {

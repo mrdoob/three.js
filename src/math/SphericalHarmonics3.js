@@ -1,9 +1,6 @@
 import { Vector3 } from './Vector3.js';
 
 /**
- * @author bhouston / http://clara.io
- * @author WestLangley / http://github.com/WestLangley
- *
  * Primary reference:
  *   https://graphics.stanford.edu/papers/envmap/envmap.pdf
  *
@@ -13,23 +10,23 @@ import { Vector3 } from './Vector3.js';
 
 // 3-band SH defined by 9 coefficients
 
-function SphericalHarmonics3() {
+class SphericalHarmonics3 {
 
-	this.coefficients = [];
+	constructor() {
 
-	for ( let i = 0; i < 9; i ++ ) {
+		Object.defineProperty( this, 'isSphericalHarmonics3', { value: true } );
 
-		this.coefficients.push( new Vector3() );
+		this.coefficients = [];
+
+		for ( let i = 0; i < 9; i ++ ) {
+
+			this.coefficients.push( new Vector3() );
+
+		}
 
 	}
 
-}
-
-Object.assign( SphericalHarmonics3.prototype, {
-
-	isSphericalHarmonics3: true,
-
-	set: function ( coefficients ) {
+	set( coefficients ) {
 
 		for ( let i = 0; i < 9; i ++ ) {
 
@@ -39,9 +36,9 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	zero: function () {
+	zero() {
 
 		for ( let i = 0; i < 9; i ++ ) {
 
@@ -51,11 +48,11 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 		return this;
 
-	},
+	}
 
 	// get the radiance in the direction of the normal
 	// target is a Vector3
-	getAt: function ( normal, target ) {
+	getAt( normal, target ) {
 
 		// normal is assumed to be unit length
 
@@ -80,12 +77,12 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 		return target;
 
-	},
+	}
 
 	// get the irradiance (radiance convolved with cosine lobe) in the direction of the normal
 	// target is a Vector3
 	// https://graphics.stanford.edu/papers/envmap/envmap.pdf
-	getIrradianceAt: function ( normal, target ) {
+	getIrradianceAt( normal, target ) {
 
 		// normal is assumed to be unit length
 
@@ -110,9 +107,9 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 		return target;
 
-	},
+	}
 
-	add: function ( sh ) {
+	add( sh ) {
 
 		for ( let i = 0; i < 9; i ++ ) {
 
@@ -122,9 +119,9 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	addScaledSH: function ( sh, s ) {
+	addScaledSH( sh, s ) {
 
 		for ( let i = 0; i < 9; i ++ ) {
 
@@ -134,9 +131,9 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	scale: function ( s ) {
+	scale( s ) {
 
 		for ( let i = 0; i < 9; i ++ ) {
 
@@ -146,9 +143,9 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	lerp: function ( sh, alpha ) {
+	lerp( sh, alpha ) {
 
 		for ( let i = 0; i < 9; i ++ ) {
 
@@ -158,9 +155,9 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	equals: function ( sh ) {
+	equals( sh ) {
 
 		for ( let i = 0; i < 9; i ++ ) {
 
@@ -174,21 +171,21 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 		return true;
 
-	},
+	}
 
-	copy: function ( sh ) {
+	copy( sh ) {
 
 		return this.set( sh.coefficients );
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	fromArray: function ( array, offset ) {
+	fromArray( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
 
@@ -202,9 +199,9 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toArray: function ( array, offset ) {
+	toArray( array, offset ) {
 
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
@@ -221,13 +218,9 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 	}
 
-} );
-
-Object.assign( SphericalHarmonics3, {
-
 	// evaluate the basis functions
 	// shBasis is an Array[ 9 ]
-	getBasisAt: function ( normal, shBasis ) {
+	static getBasisAt( normal, shBasis ) {
 
 		// normal is assumed to be unit length
 
@@ -250,6 +243,7 @@ Object.assign( SphericalHarmonics3, {
 
 	}
 
-} );
+}
+
 
 export { SphericalHarmonics3 };

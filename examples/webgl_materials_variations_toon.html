@@ -129,13 +129,9 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x111111 ) );
+				scene.add( new THREE.AmbientLight( 0x888888 ) );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.set( 1, 1, 1 ).normalize();
-				scene.add( directionalLight );
-
-				var pointLight = new THREE.PointLight( 0xffffff, 1.75, 800 );
+				var pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
 				particleLight.add( pointLight );
 
 				//

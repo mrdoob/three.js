@@ -1,7 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
-
 // TODO (Itee) Editor is not es6 module so care to include order !!!
 // TODO: all views could not be testable, waiting modular code before implement units tests on them
 

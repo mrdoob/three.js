@@ -43,9 +43,6 @@
 					<li>
 						循环变量必须是*i*。
 					</li>
-					<li>
-						循环必须使用某种空格格式。
-					</li>
 				</ul>
 				<code>
 		#pragma unroll_loop_start
@@ -310,6 +307,12 @@ this.extensions = {
 			它也可以作为一个字符串直接传递或者通过AJAX加载。
 		</p>
 
+		<h3>[property:String glslVersion]</h3>
+		<p>
+		Defines the GLSL version of custom shader code. Only relevant for WebGL 2 in order to define whether to specify
+		GLSL 3.0 or not. Valid values are *THREE.GLSL1* or *THREE.GLSL3*. Default is *null*.
+		</p>
+
 		<h3>[property:String index0AttributeName]</h3>
 		<p> 如果设置，则调用[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation gl.bindAttribLocation]
 			将通用顶点索引绑定到属性变量。默认值未定义。
@@ -331,10 +334,6 @@ this.extensions = {
 
 		<h3>[property:boolean morphNormals]</h3>
 		<p> When set to true, morph normal attributes are available in the vertex shader. Default is *false*.
-		</p>
-
-		<h3>[property:WebGLProgram program]</h3>
-		<p> 与此材质相关联的编译后的shader程序，由[page:WebGLRenderer]生成。您应该不需要访问此属性。
 		</p>
 
 		<h3>[property:Boolean flatShading]</h3>

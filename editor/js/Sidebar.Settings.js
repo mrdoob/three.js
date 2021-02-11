@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIRow, UISelect, UIText, UIInteger } from './libs/ui.js';
 
 import { SidebarSettingsViewport } from './Sidebar.Settings.Viewport.js';

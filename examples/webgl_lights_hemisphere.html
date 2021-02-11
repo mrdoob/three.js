@@ -66,7 +66,7 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 
-			var camera, scene, renderer, dirLight, dirLightHeper, hemiLight, hemiLightHelper;
+			var camera, scene, renderer, dirLight, dirLightHelper, hemiLight, hemiLightHelper;
 			var mixers = [];
 			var stats;
 
@@ -120,8 +120,8 @@
 				dirLight.shadow.camera.far = 3500;
 				dirLight.shadow.bias = - 0.0001;
 
-				dirLightHeper = new THREE.DirectionalLightHelper( dirLight, 10 );
-				scene.add( dirLightHeper );
+				dirLightHelper = new THREE.DirectionalLightHelper( dirLight, 10 );
+				scene.add( dirLightHelper );
 
 				// GROUND
 
@@ -214,7 +214,7 @@
 				directionalButton.addEventListener( 'click', function () {
 
 					dirLight.visible = ! dirLight.visible;
-					dirLightHeper.visible = ! dirLightHeper.visible;
+					dirLightHelper.visible = ! dirLightHelper.visible;
 
 				} );
 

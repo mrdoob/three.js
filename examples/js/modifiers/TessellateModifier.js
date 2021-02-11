@@ -2,8 +2,6 @@ console.warn( "THREE.TessellateModifier: As part of the transition to ES6 Module
 /**
  * Break faces with edges longer than maxEdgeLength
  * - not recursive
- *
- * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.TessellateModifier = function ( maxEdgeLength ) {

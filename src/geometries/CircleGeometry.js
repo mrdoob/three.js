@@ -1,9 +1,3 @@
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- * @author Mugen87 / https://github.com/Mugen87
- * @author hughes
- */
-
 import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
@@ -12,109 +6,110 @@ import { Vector2 } from '../math/Vector2.js';
 
 // CircleGeometry
 
-function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
+class CircleGeometry extends Geometry {
 
-	Geometry.call( this );
+	constructor( radius, segments, thetaStart, thetaLength ) {
 
-	this.type = 'CircleGeometry';
+		super();
+		this.type = 'CircleGeometry';
 
-	this.parameters = {
-		radius: radius,
-		segments: segments,
-		thetaStart: thetaStart,
-		thetaLength: thetaLength
-	};
+		this.parameters = {
+			radius: radius,
+			segments: segments,
+			thetaStart: thetaStart,
+			thetaLength: thetaLength
+		};
 
-	this.fromBufferGeometry( new CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
-	this.mergeVertices();
+		this.fromBufferGeometry( new CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
+		this.mergeVertices();
+
+	}
 
 }
-
-CircleGeometry.prototype = Object.create( Geometry.prototype );
-CircleGeometry.prototype.constructor = CircleGeometry;
 
 // CircleBufferGeometry
 
-function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
+class CircleBufferGeometry extends BufferGeometry {
 
-	BufferGeometry.call( this );
+	constructor( radius, segments, thetaStart, thetaLength ) {
 
-	this.type = 'CircleBufferGeometry';
+		super();
 
-	this.parameters = {
-		radius: radius,
-		segments: segments,
-		thetaStart: thetaStart,
-		thetaLength: thetaLength
-	};
+		this.type = 'CircleBufferGeometry';
 
-	radius = radius || 1;
-	segments = segments !== undefined ? Math.max( 3, segments ) : 8;
+		this.parameters = {
+			radius: radius,
+			segments: segments,
+			thetaStart: thetaStart,
+			thetaLength: thetaLength
+		};
 
-	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+		radius = radius || 1;
+		segments = segments !== undefined ? Math.max( 3, segments ) : 8;
 
-	// buffers
+		thetaStart = thetaStart !== undefined ? thetaStart : 0;
+		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
 
-	const indices = [];
-	const vertices = [];
-	const normals = [];
-	const uvs = [];
+		// buffers
 
-	// helper variables
+		const indices = [];
+		const vertices = [];
+		const normals = [];
+		const uvs = [];
 
-	const vertex = new Vector3();
-	const uv = new Vector2();
+		// helper variables
 
-	// center point
+		const vertex = new Vector3();
+		const uv = new Vector2();
 
-	vertices.push( 0, 0, 0 );
-	normals.push( 0, 0, 1 );
-	uvs.push( 0.5, 0.5 );
+		// center point
 
-	for ( let s = 0, i = 3; s <= segments; s ++, i += 3 ) {
-
-		const segment = thetaStart + s / segments * thetaLength;
-
-		// vertex
-
-		vertex.x = radius * Math.cos( segment );
-		vertex.y = radius * Math.sin( segment );
-
-		vertices.push( vertex.x, vertex.y, vertex.z );
-
-		// normal
-
+		vertices.push( 0, 0, 0 );
 		normals.push( 0, 0, 1 );
+		uvs.push( 0.5, 0.5 );
 
-		// uvs
+		for ( let s = 0, i = 3; s <= segments; s ++, i += 3 ) {
 
-		uv.x = ( vertices[ i ] / radius + 1 ) / 2;
-		uv.y = ( vertices[ i + 1 ] / radius + 1 ) / 2;
+			const segment = thetaStart + s / segments * thetaLength;
 
-		uvs.push( uv.x, uv.y );
+			// vertex
+
+			vertex.x = radius * Math.cos( segment );
+			vertex.y = radius * Math.sin( segment );
+
+			vertices.push( vertex.x, vertex.y, vertex.z );
+
+			// normal
+
+			normals.push( 0, 0, 1 );
+
+			// uvs
+
+			uv.x = ( vertices[ i ] / radius + 1 ) / 2;
+			uv.y = ( vertices[ i + 1 ] / radius + 1 ) / 2;
+
+			uvs.push( uv.x, uv.y );
+
+		}
+
+		// indices
+
+		for ( let i = 1; i <= segments; i ++ ) {
+
+			indices.push( i, i + 1, 0 );
+
+		}
+
+		// build geometry
+
+		this.setIndex( indices );
+		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	}
-
-	// indices
-
-	for ( let i = 1; i <= segments; i ++ ) {
-
-		indices.push( i, i + 1, 0 );
-
-	}
-
-	// build geometry
-
-	this.setIndex( indices );
-	this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-	this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 }
-
-CircleBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
 
 
 export { CircleGeometry, CircleBufferGeometry };

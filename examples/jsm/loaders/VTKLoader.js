@@ -1,14 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Alex Pletzer
- *
- * Updated on 22.03.2017
- * VTK header is now parsed and used to extract all the compressed data
- * @author Andrii Iudin https://github.com/andreyyudin
- * @author Paul Kibet Korir https://github.com/polarise
- * @author Sriram Somasundharam https://github.com/raamssundar
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,
@@ -36,6 +25,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( text ) {
 
 			try {
