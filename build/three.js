@@ -14483,8 +14483,7 @@
 
 			if (lists.has(scene) === false) {
 				list = new WebGLRenderList(properties);
-				lists.set(scene, []);
-				lists.get(scene).push(list);
+				lists.set(scene, [list]);
 			} else {
 				if (renderCallDepth >= lists.get(scene).length) {
 					list = new WebGLRenderList(properties);
@@ -14991,8 +14990,7 @@
 
 			if (renderStates.has(scene) === false) {
 				renderState = new WebGLRenderState(extensions, capabilities);
-				renderStates.set(scene, []);
-				renderStates.get(scene).push(renderState);
+				renderStates.set(scene, [renderState]);
 			} else {
 				if (renderCallDepth >= renderStates.get(scene).length) {
 					renderState = new WebGLRenderState(extensions, capabilities);
