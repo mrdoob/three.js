@@ -181,8 +181,7 @@ function WebGLRenderLists( properties ) {
 		if ( lists.has( scene ) === false ) {
 
 			list = new WebGLRenderList( properties );
-			lists.set( scene, [] );
-			lists.get( scene ).push( list );
+			lists.set( scene, [ list ] );
 
 		} else {
 
