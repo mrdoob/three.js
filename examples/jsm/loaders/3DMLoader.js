@@ -1251,7 +1251,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			objectType = objectType.constructor.name;
 			objectType = objectType.substring( 11, objectType.length );
-			attributes.geometry.objectType = objectType;
 
 			return { geometry, attributes, objectType };
 
@@ -1269,13 +1268,24 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		for ( var property in object ) {
 
-			if ( typeof object[ property ] !== 'function' ) {
+			var value = object[ property ];
 
-				result[ property ] = object[ property ];
+			if ( typeof value !== 'function' ) {
+
+				if ( typeof value === 'object' && value !== null && value.hasOwnProperty( 'constructor' ) ) {
+
+					result[ property ] = { name: value.constructor.name, value: value.value };
+
+				} else {
+
+					result[ property ] = value;
+
+				}
 
 			} else {
 
-				// console.log( `${property}: ${object[ property ]}` );
+				// these are functions that could be called to extract more data.
+				//console.log( `${property}: ${object[ property ].constructor.name}` );
 
 			}
 
@@ -1368,7 +1378,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			var tan = curve.tangentAt( t );
 			var prevTan = curve.tangentAt( ts.slice( - 1 )[ 0 ] );
 
-			// Duplicaated from THREE.Vector3
+			// Duplicated from THREE.Vector3
 			// How to pass imports to worker?
 
 			var tS = tan[ 0 ] * tan[ 0 ] + tan[ 1 ] * tan[ 1 ] + tan[ 2 ] * tan[ 2 ];
