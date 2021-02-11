@@ -12356,13 +12356,11 @@
 						var image = texture.image;
 
 						if (image && image.height > 0) {
-							var currentRenderList = renderer.getRenderList();
 							var currentRenderTarget = renderer.getRenderTarget();
 							var renderTarget = new WebGLCubeRenderTarget(image.height / 2);
 							renderTarget.fromEquirectangularTexture(renderer, texture);
 							cubemaps.set(texture, renderTarget);
 							renderer.setRenderTarget(currentRenderTarget);
-							renderer.setRenderList(currentRenderList);
 							texture.addEventListener('dispose', onTextureDispose);
 							return mapTextureMapping(renderTarget.texture, texture.mapping);
 						} else {
@@ -14480,20 +14478,19 @@
 	function WebGLRenderLists(properties) {
 		var lists = new WeakMap();
 
-		function get(scene, camera) {
-			var cameras = lists.get(scene);
+		function get(scene, renderCallDepth) {
 			var list;
 
-			if (cameras === undefined) {
+			if (lists.has(scene) === false) {
 				list = new WebGLRenderList(properties);
-				lists.set(scene, new WeakMap());
-				lists.get(scene).set(camera, list);
+				lists.set(scene, []);
+				lists.get(scene).push(list);
 			} else {
-				list = cameras.get(camera);
-
-				if (list === undefined) {
+				if (renderCallDepth >= lists.get(scene).length) {
 					list = new WebGLRenderList(properties);
-					cameras.set(camera, list);
+					lists.get(scene).push(list);
+				} else {
+					list = lists.get(scene)[renderCallDepth];
 				}
 			}
 
@@ -18168,8 +18165,9 @@
 
 		var currentRenderList = null;
 		var currentRenderState = null; // render() can be called from within a callback triggered by another render.
-		// We track this so that the nested render call gets its state isolated from the parent render call.
+		// We track this so that the nested render call gets its list and state isolated from the parent render call.
 
+		var renderListStack = [];
 		var renderStateStack = []; // public properties
 
 		this.domElement = _canvas; // Debug configuration container
@@ -18838,8 +18836,9 @@
 
 			_localClippingEnabled = this.localClippingEnabled;
 			_clippingEnabled = clipping.init(this.clippingPlanes, _localClippingEnabled, camera);
-			currentRenderList = renderLists.get(scene, camera);
+			currentRenderList = renderLists.get(scene, renderListStack.length);
 			currentRenderList.init();
+			renderListStack.push(currentRenderList);
 			projectObject(scene, camera, 0, _this.sortObjects);
 			currentRenderList.finish();
 
@@ -18892,7 +18891,13 @@
 				currentRenderState = null;
 			}
 
-			currentRenderList = null;
+			renderListStack.pop();
+
+			if (renderListStack.length > 0) {
+				currentRenderList = renderListStack[renderListStack.length - 1];
+			} else {
+				currentRenderList = null;
+			}
 		};
 
 		function projectObject(object, camera, groupOrder, sortObjects) {
@@ -19306,14 +19311,6 @@
 
 		this.getActiveMipmapLevel = function () {
 			return _currentActiveMipmapLevel;
-		};
-
-		this.getRenderList = function () {
-			return currentRenderList;
-		};
-
-		this.setRenderList = function (renderList) {
-			currentRenderList = renderList;
 		};
 
 		this.getRenderTarget = function () {
