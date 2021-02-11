@@ -4,7 +4,7 @@ import ModelNode from '../accessors/ModelNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 
-class ModelViewProjectionMatrixNode extends Node {
+class ModelViewProjectionNode extends Node {
 
 	constructor( position = new PositionNode() ) {
 
@@ -29,4 +29,4 @@ class ModelViewProjectionMatrixNode extends Node {
 
 }
 
-export default ModelViewProjectionMatrixNode;
+export default ModelViewProjectionNode;
