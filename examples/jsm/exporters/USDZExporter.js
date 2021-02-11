@@ -34,16 +34,43 @@ class USDZExporter {
 		output += buildMaterials( materials );
 		output += buildTextures( textures );
 
-		const files = {};
+		const files = { 'model.usda': strToU8( output ) };
 
 		for ( const uuid in textures ) {
 
 			const texture = textures[ uuid ];
-			files[ 'Texture_' + texture.id + '.jpg' ] = await imgToU8( texture.image );
+			files[ 'textures/Texture_' + texture.id + '.jpg' ] = await imgToU8( texture.image );
 
 		}
 
-		return zipSync( { 'model.usda': strToU8( output ), 'textures': files }, { level: 0 } );
+		// 64 byte alignment
+		// https://github.com/101arrowz/fflate/issues/39#issuecomment-777263109
+
+		let offset = 0;
+
+		for ( const filename in files ) {
+
+			const file = files[ filename ];
+			const headerSize = 34 + filename.length;
+
+			offset += headerSize;
+
+			const offsetMod64 = offset & 63;
+
+			if ( offsetMod64 !== 4 ) {
+
+				const padLength = 64 - offsetMod64;
+				const padding = new Uint8Array( padLength );
+
+				files[ filename ] = [ file, { extra: { 12345: padding } } ];
+
+			}
+
+			offset = file.length;
+
+		}
+
+		return zipSync( files, { level: 0 } );
 
 	}
 
