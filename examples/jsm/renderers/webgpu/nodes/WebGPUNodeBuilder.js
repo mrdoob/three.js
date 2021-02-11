@@ -8,7 +8,7 @@ import { WebGPUSampledTexture } from '../WebGPUSampledTexture.js';
 
 import NodeSlot from '../../nodes/core/NodeSlot.js';
 import NodeBuilder from '../../nodes/core/NodeBuilder.js';
-import ModelViewProjectionMatrixNode from '../../nodes/accessors/ModelViewProjectionMatrixNode.js';
+import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode.js';
 
 import ShaderLib from './ShaderLib.js';
 
@@ -41,7 +41,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		if ( material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
 
-			const mvpNode = new ModelViewProjectionMatrixNode();
+			const mvpNode = new ModelViewProjectionNode();
 
 			if ( material.positionNode !== undefined ) {
 
