@@ -1,46 +1,42 @@
 import { MathUtils } from '../math/MathUtils.js';
 import { StaticDrawUsage } from '../constants.js';
 
-function InterleavedBuffer( array, stride ) {
+class InterleavedBuffer {
 
-	this.array = array;
-	this.stride = stride;
-	this.count = array !== undefined ? array.length / stride : 0;
+	constructor( array, stride ) {
 
-	this.usage = StaticDrawUsage;
-	this.updateRange = { offset: 0, count: - 1 };
+		this.array = array;
+		this.stride = stride;
+		this.count = array !== undefined ? array.length / stride : 0;
 
-	this.version = 0;
+		this.isInterleavedBuffer = true;
 
-	this.uuid = MathUtils.generateUUID();
+		this.usage = StaticDrawUsage;
+		this.updateRange = { offset: 0, count: - 1 };
 
-}
+		this.version = 0;
 
-Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
+		this.uuid = MathUtils.generateUUID();
 
-	set: function ( value ) {
+	}
+
+	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
 
 	}
 
-} );
+	onUploadCallback() {}
 
-Object.assign( InterleavedBuffer.prototype, {
-
-	isInterleavedBuffer: true,
-
-	onUploadCallback: function () {},
-
-	setUsage: function ( value ) {
+	setUsage( value ) {
 
 		this.usage = value;
 
 		return this;
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		this.array = new source.array.constructor( source.array );
 		this.count = source.count;
@@ -49,9 +45,9 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyAt: function ( index1, attribute, index2 ) {
+	copyAt( index1, attribute, index2 ) {
 
 		index1 *= this.stride;
 		index2 *= attribute.stride;
@@ -64,17 +60,17 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		return this;
 
-	},
+	}
 
-	set: function ( value, offset = 0 ) {
+	set( value, offset = 0 ) {
 
 		this.array.set( value, offset );
 
 		return this;
 
-	},
+	}
 
-	clone: function ( data ) {
+	clone( data ) {
 
 		if ( data.arrayBuffers === undefined ) {
 
@@ -101,17 +97,17 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		return ib;
 
-	},
+	}
 
-	onUpload: function ( callback ) {
+	onUpload( callback ) {
 
 		this.onUploadCallback = callback;
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( data ) {
+	toJSON( data ) {
 
 		if ( data.arrayBuffers === undefined ) {
 
@@ -144,6 +140,6 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	}
 
-} );
+}
 
 export { InterleavedBuffer };
