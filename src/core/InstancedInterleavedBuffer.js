@@ -2,13 +2,13 @@ import { InterleavedBuffer } from './InterleavedBuffer.js';
 
 class InstancedInterleavedBuffer extends InterleavedBuffer {
 
-	constructor( array, stride, meshPerAttribute ) {
+	constructor( array, stride, meshPerAttribute = 1 ) {
 
 		super( array, stride );
 
 		Object.defineProperty( this, 'isInstancedInterleavedBuffer', { value: true } );
 
-		this.meshPerAttribute = meshPerAttribute || 1;
+		this.meshPerAttribute = meshPerAttribute;
 
 	}
 

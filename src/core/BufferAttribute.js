@@ -276,8 +276,6 @@ class BufferAttribute {
 
 	set( value, offset = 0 ) {
 
-		if ( offset === undefined ) offset = 0;
-
 		this.array.set( value, offset );
 
 		return this;
