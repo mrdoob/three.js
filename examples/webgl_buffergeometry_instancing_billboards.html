@@ -75,16 +75,16 @@
 
 		import Stats from './jsm/libs/stats.module.js';
 
-		var container, stats;
+		let container, stats;
 
-		var camera, scene, renderer;
-		var geometry, material, mesh;
+		let camera, scene, renderer;
+		let geometry, material, mesh;
 
 		function init() {
 
 			renderer = new THREE.WebGLRenderer();
 
-			if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
+			if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'ANGLE_instanced_arrays' ) === false ) {
 
 				document.getElementById( 'notSupported' ).style.display = '';
 				return false;
@@ -99,17 +99,17 @@
 
 			scene = new THREE.Scene();
 
-			var circleGeometry = new THREE.CircleBufferGeometry( 1, 6 );
+			const circleGeometry = new THREE.CircleGeometry( 1, 6 );
 
 			geometry = new THREE.InstancedBufferGeometry();
 			geometry.index = circleGeometry.index;
 			geometry.attributes = circleGeometry.attributes;
 
-			var particleCount = 75000;
+			const particleCount = 75000;
 
-			var translateArray = new Float32Array( particleCount * 3 );
+			const translateArray = new Float32Array( particleCount * 3 );
 
-			for ( var i = 0, i3 = 0, l = particleCount; i < l; i ++, i3 += 3 ) {
+			for ( let i = 0, i3 = 0, l = particleCount; i < l; i ++, i3 += 3 ) {
 
 				translateArray[ i3 + 0 ] = Math.random() * 2 - 1;
 				translateArray[ i3 + 1 ] = Math.random() * 2 - 1;
@@ -141,7 +141,7 @@
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 			return true;
 
@@ -167,7 +167,7 @@
 
 		function render() {
 
-			var time = performance.now() * 0.0005;
+			const time = performance.now() * 0.0005;
 
 			material.uniforms[ "time" ].value = time;
 

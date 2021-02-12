@@ -1,5 +1,3 @@
-console.warn( "THREE.PointerLockControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.PointerLockControls = function ( camera, domElement ) {
 
 	if ( domElement === undefined ) {
@@ -79,17 +77,17 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	this.connect = function () {
 
-		scope.domElement.ownerDocument.addEventListener( 'mousemove', onMouseMove, false );
-		scope.domElement.ownerDocument.addEventListener( 'pointerlockchange', onPointerlockChange, false );
-		scope.domElement.ownerDocument.addEventListener( 'pointerlockerror', onPointerlockError, false );
+		scope.domElement.ownerDocument.addEventListener( 'mousemove', onMouseMove );
+		scope.domElement.ownerDocument.addEventListener( 'pointerlockchange', onPointerlockChange );
+		scope.domElement.ownerDocument.addEventListener( 'pointerlockerror', onPointerlockError );
 
 	};
 
 	this.disconnect = function () {
 
-		scope.domElement.ownerDocument.removeEventListener( 'mousemove', onMouseMove, false );
-		scope.domElement.ownerDocument.removeEventListener( 'pointerlockchange', onPointerlockChange, false );
-		scope.domElement.ownerDocument.removeEventListener( 'pointerlockerror', onPointerlockError, false );
+		scope.domElement.ownerDocument.removeEventListener( 'mousemove', onMouseMove );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerlockchange', onPointerlockChange );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerlockerror', onPointerlockError );
 
 	};
 

@@ -21,7 +21,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Water } from './jsm/objects/Water2.js';
 
-			var scene, camera, renderer, water;
+			let scene, camera, renderer, water;
 
 			init();
 			animate();
@@ -40,13 +40,13 @@
 
 				// ground
 
-				var groundGeometry = new THREE.PlaneBufferGeometry( 20, 20, 10, 10 );
-				var groundMaterial = new THREE.MeshBasicMaterial( { color: 0xcccccc } );
-				var ground = new THREE.Mesh( groundGeometry, groundMaterial );
+				const groundGeometry = new THREE.PlaneGeometry( 20, 20, 10, 10 );
+				const groundMaterial = new THREE.MeshBasicMaterial( { color: 0xcccccc } );
+				const ground = new THREE.Mesh( groundGeometry, groundMaterial );
 				ground.rotation.x = Math.PI * - 0.5;
 				scene.add( ground );
 
-				var textureLoader = new THREE.TextureLoader();
+				const textureLoader = new THREE.TextureLoader();
 				textureLoader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg', function ( map ) {
 
 					map.wrapS = THREE.RepeatWrapping;
@@ -60,8 +60,8 @@
 
 				// water
 
-				var waterGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
-				var flowMap = textureLoader.load( 'textures/water/Water_1_M_Flow.jpg' );
+				const waterGeometry = new THREE.PlaneGeometry( 20, 20 );
+				const flowMap = textureLoader.load( 'textures/water/Water_1_M_Flow.jpg' );
 
 				water = new Water( waterGeometry, {
 					scale: 2,
@@ -76,9 +76,9 @@
 
 				// flow map helper
 
-				var helperGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
-				var helperMaterial = new THREE.MeshBasicMaterial( { map: flowMap } );
-				var helper = new THREE.Mesh( helperGeometry, helperMaterial );
+				const helperGeometry = new THREE.PlaneGeometry( 20, 20 );
+				const helperMaterial = new THREE.MeshBasicMaterial( { map: flowMap } );
+				const helper = new THREE.Mesh( helperGeometry, helperMaterial );
 				helper.position.y = 1.01;
 				helper.rotation.x = Math.PI * - 0.5;
 				helper.visible = false;
@@ -93,23 +93,23 @@
 
 				//
 
-				var gui = new GUI();
+				const gui = new GUI();
 				gui.add( helper, 'visible' ).name( 'Show Flow Map' );
 				gui.open();
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 5;
 				controls.maxDistance = 50;
 
 				//
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

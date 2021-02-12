@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -18,10 +17,10 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var quaternion = new THREE.Quaternion();
+		const quaternion = new THREE.Quaternion();
 		quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
 
-		var vector = new THREE.Vector3( 1, 0, 0 );
+		const vector = new THREE.Vector3( 1, 0, 0 );
 		vector.applyQuaternion( quaternion );
 		</code>
 
@@ -103,7 +102,7 @@
 			Sets this quaternion to the identity quaternion; that is, to the quaternion that represents "no rotation".
 		</p>
 
-		<h3>[method:Quaternion inverse]()</h3>
+		<h3>[method:Quaternion invert]()</h3>
 		<p>
 			Inverts this quaternion - calculates the [page:.conjugate conjugate]. The quaternion is assumed to have unit length.
 		</p>
@@ -142,20 +141,20 @@
 		<h3>[method:Quaternion rotateTowards]( [param:Quaternion q], [param:Float step] )</h3>
 		<p>
 			[page:Quaternion q] - The target quaternion.<br />
-			[page:float step] - The angular step in radians.<br /><br />
+			[page:Float step] - The angular step in radians.<br /><br />
 
 			Rotates this quaternion by a given angular step to the defined quaternion *q*.
 			The method ensures that the final quaternion will not overshoot *q*.
 		</p>
 
-		<h3>[method:Quaternion slerp]( [param:Quaternion qb], [param:float t] )</h3>
+		<h3>[method:Quaternion slerp]( [param:Quaternion qb], [param:Float t] )</h3>
 		<p>
 			[page:Quaternion qb] - The other quaternion rotation<br />
-			[page:float t] - interpolation factor in the closed interval [0, 1].<br /><br />
+			[page:Float t] - interpolation factor in the closed interval [0, 1].<br /><br />
 
-			Handles the spherical linear interpolation between quaternions. [page:float t] represents the
-			amount of rotation between this quaternion (where [page:float t] is 0) and [page:Quaternion qb] (where
-			[page:float t] is 1). This quaternion is set to the result. Also see the static version of the
+			Handles the spherical linear interpolation between quaternions. [page:Float t] represents the
+			amount of rotation between this quaternion (where [page:Float t] is 0) and [page:Quaternion qb] (where
+			[page:Float t] is 1). This quaternion is set to the result. Also see the static version of the
 			*slerp* below.
 
 			<code>
@@ -179,6 +178,8 @@
 
 		<h3>[method:Quaternion setFromRotationMatrix]( [param:Matrix4 m] )</h3>
 		<p>
+		[page:Matrix4 m] - a [page:Matrix4] of which the upper 3x3 of matrix is a pure
+		[link:https://en.wikipedia.org/wiki/Rotation_matrix rotation matrix] (i.e. unscaled).<br />
 		Sets this quaternion from rotation component of [page:Matrix4 m].<br />
 		Adapted from the method [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm here].
 		</p>
@@ -219,7 +220,7 @@ THREE.Quaternion.slerp( qStart, qEnd, qTarget, t );
 			By contrast, to call the 'normal' or instanced slerp method, you would do the following:
 			<code>
 //instantiate a quaternion with default values
-var q = new THREE.Quaternion();
+const q = new THREE.Quaternion();
 
 //call the instanced slerp method
 q.slerp( qb, t )
@@ -232,14 +233,14 @@ q.slerp( qb, t )
 			[page:Quaternion qStart] - The starting quaternion (where [page:Float t] is 0)<br />
 			[page:Quaternion qEnd] - The ending quaternion (where [page:Float t] is 1)<br />
 			[page:Quaternion qTarget] - The target quaternion that gets set with the result<br />
-			[page:float t] - interpolation factor in the closed interval [0, 1].<br /><br />
+			[page:Float t] - interpolation factor in the closed interval [0, 1].<br /><br />
 
 			Unlike the normal method, the static version of slerp sets a target quaternion to the result of the slerp operation.
 			<code>
 			// Code setup
-			var startQuaternion = new THREE.Quaternion().set( 0, 0, 0, 1 ).normalize();
-			var endQuaternion = new THREE.Quaternion().set( 1, 1, 1, 1 ).normalize();
-			var t = 0;
+			const startQuaternion = new THREE.Quaternion().set( 0, 0, 0, 1 ).normalize();
+			const endQuaternion = new THREE.Quaternion().set( 1, 1, 1, 1 ).normalize();
+			let t = 0;
 
 			// Update a mesh's rotation in the loop
 			t = ( t + 0.01 ) % 1; // constant angular momentum
@@ -256,7 +257,7 @@ q.slerp( qb, t )
 		[page:Integer srcOffset0] - An offset into the array *src0*.<br />
 		[page:Array src1] - The source array of the target quatnerion.<br />
 		[page:Integer srcOffset1] - An offset into the array *src1*.<br />
-		[page:float t] - Normalized interpolation factor (between 0 and 1).<br /><br />
+		[page:Float t] - Normalized interpolation factor (between 0 and 1).<br /><br />
 		</p>
 		<p>
 		Like the static *slerp* method above, but operates directly on flat arrays of numbers.

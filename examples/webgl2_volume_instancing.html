@@ -50,8 +50,7 @@
 
 				// Material
 
-				const vertexShader = `#version 300 es
-
+				const vertexShader = /* glsl */`
 					in vec3 position;
 					in mat4 instanceMatrix;
 
@@ -73,7 +72,7 @@
 					}
 				`;
 
-				const fragmentShader = `#version 300 es
+				const fragmentShader = /* glsl */`
 					precision highp float;
 					precision highp sampler3D;
 
@@ -171,8 +170,6 @@
 
 						const array = new Uint8Array( size.x * size.y * size.z );
 
-						console.log( size.x, size.y, size.z );
-
 						for ( var j = 0, k = 0; j < data.length; j += 4, k ++ ) {
 
 							const x = data[ j + 0 ];
@@ -191,8 +188,9 @@
 						texture.magFilter = THREE.LinearFilter;
 						texture.unpackAlignment = 1;
 
-						const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+						const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 						const material = new THREE.RawShaderMaterial( {
+							glslVersion: THREE.GLSL3,
 							uniforms: {
 								map: { value: texture },
 								cameraPos: { value: new THREE.Vector3() }
@@ -229,7 +227,7 @@
 
 				} );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

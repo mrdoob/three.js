@@ -1,6 +1,3 @@
-import { Geometry } from '../core/Geometry.js';
-import { ExtrudeBufferGeometry } from './ExtrudeGeometry.js';
-
 /**
  * Text = 3D Text
  *
@@ -18,42 +15,19 @@ import { ExtrudeBufferGeometry } from './ExtrudeGeometry.js';
  * }
  */
 
-// TextGeometry
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { ExtrudeGeometry } from './ExtrudeGeometry.js';
 
-class TextGeometry extends Geometry {
+class TextGeometry extends ExtrudeGeometry {
 
-	constructor( text, parameters ) {
-
-		super();
-		this.type = 'TextGeometry';
-
-		this.parameters = {
-			text: text,
-			parameters: parameters
-		};
-
-		this.fromBufferGeometry( new TextBufferGeometry( text, parameters ) );
-		this.mergeVertices();
-
-	}
-
-}
-
-
-// TextBufferGeometry
-
-class TextBufferGeometry extends ExtrudeBufferGeometry {
-
-	constructor( text, parameters ) {
-
-		parameters = parameters || {};
+	constructor( text, parameters = {} ) {
 
 		const font = parameters.font;
 
 		if ( ! ( font && font.isFont ) ) {
 
 			console.error( 'THREE.TextGeometry: font parameter is not an instance of THREE.Font.' );
-			return new Geometry();
+			return new BufferGeometry();
 
 		}
 
@@ -71,11 +45,11 @@ class TextBufferGeometry extends ExtrudeBufferGeometry {
 
 		super( shapes, parameters );
 
-		this.type = 'TextBufferGeometry';
+		this.type = 'TextGeometry';
 
 	}
 
 }
 
 
-export { TextGeometry, TextBufferGeometry };
+export { TextGeometry, TextGeometry as TextBufferGeometry };

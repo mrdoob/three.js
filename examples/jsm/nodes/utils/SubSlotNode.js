@@ -10,7 +10,7 @@ function SubSlotNode( slots ) {
 
 SubSlotNode.prototype = Object.create( TempNode.prototype );
 SubSlotNode.prototype.constructor = SubSlotNode;
-SubSlotNode.prototype.nodeType = "SubSlot";
+SubSlotNode.prototype.nodeType = 'SubSlot';
 
 SubSlotNode.prototype.getType = function ( builder, output ) {
 

@@ -62,23 +62,23 @@
 
 			import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
 
-			var camera, scene, renderer, controls;
+			let camera, scene, renderer, controls;
 
-			var objects = [];
+			const objects = [];
 
-			var raycaster;
+			let raycaster;
 
-			var moveForward = false;
-			var moveBackward = false;
-			var moveLeft = false;
-			var moveRight = false;
-			var canJump = false;
+			let moveForward = false;
+			let moveBackward = false;
+			let moveLeft = false;
+			let moveRight = false;
+			let canJump = false;
 
-			var prevTime = performance.now();
-			var velocity = new THREE.Vector3();
-			var direction = new THREE.Vector3();
-			var vertex = new THREE.Vector3();
-			var color = new THREE.Color();
+			let prevTime = performance.now();
+			const velocity = new THREE.Vector3();
+			const direction = new THREE.Vector3();
+			const vertex = new THREE.Vector3();
+			const color = new THREE.Color();
 
 			init();
 			animate();
@@ -92,20 +92,20 @@
 				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
 
-				var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
+				const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
 				light.position.set( 0.5, 1, 0.75 );
 				scene.add( light );
 
 				controls = new PointerLockControls( camera, document.body );
 
-				var blocker = document.getElementById( 'blocker' );
-				var instructions = document.getElementById( 'instructions' );
+				const blocker = document.getElementById( 'blocker' );
+				const instructions = document.getElementById( 'instructions' );
 
 				instructions.addEventListener( 'click', function () {
 
 					controls.lock();
 
-				}, false );
+				} );
 
 				controls.addEventListener( 'lock', function () {
 
@@ -123,31 +123,31 @@
 
 				scene.add( controls.getObject() );
 
-				var onKeyDown = function ( event ) {
+				const onKeyDown = function ( event ) {
 
-					switch ( event.keyCode ) {
+					switch ( event.code ) {
 
-						case 38: // up
-						case 87: // w
+						case 'ArrowUp':
+						case 'KeyW':
 							moveForward = true;
 							break;
 
-						case 37: // left
-						case 65: // a
+						case 'ArrowLeft':
+						case 'KeyA':
 							moveLeft = true;
 							break;
 
-						case 40: // down
-						case 83: // s
+						case 'ArrowDown':
+						case 'KeyS':
 							moveBackward = true;
 							break;
 
-						case 39: // right
-						case 68: // d
+						case 'ArrowRight':
+						case 'KeyD':
 							moveRight = true;
 							break;
 
-						case 32: // space
+						case 'Space':
 							if ( canJump === true ) velocity.y += 350;
 							canJump = false;
 							break;
@@ -156,27 +156,27 @@
 
 				};
 
-				var onKeyUp = function ( event ) {
+				const onKeyUp = function ( event ) {
 
-					switch ( event.keyCode ) {
+					switch ( event.code ) {
 
-						case 38: // up
-						case 87: // w
+						case 'ArrowUp':
+						case 'KeyW':
 							moveForward = false;
 							break;
 
-						case 37: // left
-						case 65: // a
+						case 'ArrowLeft':
+						case 'KeyA':
 							moveLeft = false;
 							break;
 
-						case 40: // down
-						case 83: // s
+						case 'ArrowDown':
+						case 'KeyS':
 							moveBackward = false;
 							break;
 
-						case 39: // right
-						case 68: // d
+						case 'ArrowRight':
+						case 'KeyD':
 							moveRight = false;
 							break;
 
@@ -184,21 +184,21 @@
 
 				};
 
-				document.addEventListener( 'keydown', onKeyDown, false );
-				document.addEventListener( 'keyup', onKeyUp, false );
+				document.addEventListener( 'keydown', onKeyDown );
+				document.addEventListener( 'keyup', onKeyUp );
 
 				raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
 
 				// floor
 
-				var floorGeometry = new THREE.PlaneBufferGeometry( 2000, 2000, 100, 100 );
+				let floorGeometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
 				floorGeometry.rotateX( - Math.PI / 2 );
 
 				// vertex displacement
 
-				var position = floorGeometry.attributes.position;
+				let position = floorGeometry.attributes.position;
 
-				for ( var i = 0, l = position.count; i < l; i ++ ) {
+				for ( let i = 0, l = position.count; i < l; i ++ ) {
 
 					vertex.fromBufferAttribute( position, i );
 
@@ -213,45 +213,44 @@
 				floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
 
 				position = floorGeometry.attributes.position;
-				var colors = [];
+				const colorsFloor = [];
 
-				for ( var i = 0, l = position.count; i < l; i ++ ) {
+				for ( let i = 0, l = position.count; i < l; i ++ ) {
 
 					color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-					colors.push( color.r, color.g, color.b );
+					colorsFloor.push( color.r, color.g, color.b );
 
 				}
 
-				floorGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				floorGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colorsFloor, 3 ) );
 
-				var floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
+				const floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
 
-				var floor = new THREE.Mesh( floorGeometry, floorMaterial );
+				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				scene.add( floor );
 
 				// objects
 
-				var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
-				boxGeometry = boxGeometry.toNonIndexed(); // ensure each face has unique vertices
+				const boxGeometry = new THREE.BoxGeometry( 20, 20, 20 ).toNonIndexed();
 
 				position = boxGeometry.attributes.position;
-				colors = [];
+				const colorsBox = [];
 
-				for ( var i = 0, l = position.count; i < l; i ++ ) {
+				for ( let i = 0, l = position.count; i < l; i ++ ) {
 
 					color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-					colors.push( color.r, color.g, color.b );
+					colorsBox.push( color.r, color.g, color.b );
 
 				}
 
-				boxGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				boxGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colorsBox, 3 ) );
 
-				for ( var i = 0; i < 500; i ++ ) {
+				for ( let i = 0; i < 500; i ++ ) {
 
-					var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: true } );
+					const boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: true } );
 					boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
 
-					var box = new THREE.Mesh( boxGeometry, boxMaterial );
+					const box = new THREE.Mesh( boxGeometry, boxMaterial );
 					box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
 					box.position.y = Math.floor( Math.random() * 20 ) * 20 + 10;
 					box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
@@ -270,7 +269,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -287,17 +286,18 @@
 
 				requestAnimationFrame( animate );
 
+				const time = performance.now();
+
 				if ( controls.isLocked === true ) {
 
 					raycaster.ray.origin.copy( controls.getObject().position );
 					raycaster.ray.origin.y -= 10;
 
-					var intersections = raycaster.intersectObjects( objects );
+					const intersections = raycaster.intersectObjects( objects );
 
-					var onObject = intersections.length > 0;
+					const onObject = intersections.length > 0;
 
-					var time = performance.now();
-					var delta = ( time - prevTime ) / 1000;
+					const delta = ( time - prevTime ) / 1000;
 
 					velocity.x -= velocity.x * 10.0 * delta;
 					velocity.z -= velocity.z * 10.0 * delta;
@@ -332,9 +332,9 @@
 
 					}
 
-					prevTime = time;
-
 				}
+
+				prevTime = time;
 
 				renderer.render( scene, camera );
 

@@ -1,9 +1,10 @@
 import {
+	BufferGeometry,
 	Curve,
-	Geometry,
 	ParametricGeometry,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
+
 /**
  * Experimenting of primitive geometry creation using Surface Parametric equations
  */
@@ -149,7 +150,7 @@ ParametricGeometries.TubeGeometry = function ( path, segments, radius, segmentsR
 
 };
 
-ParametricGeometries.TubeGeometry.prototype = Object.create( Geometry.prototype );
+ParametricGeometries.TubeGeometry.prototype = Object.create( BufferGeometry.prototype );
 ParametricGeometries.TubeGeometry.prototype.constructor = ParametricGeometries.TubeGeometry;
 
 
@@ -200,7 +201,7 @@ ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segmentsT, seg
 
 };
 
-ParametricGeometries.TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
+ParametricGeometries.TorusKnotGeometry.prototype = Object.create( BufferGeometry.prototype );
 ParametricGeometries.TorusKnotGeometry.prototype.constructor = ParametricGeometries.TorusKnotGeometry;
 
 
@@ -228,7 +229,7 @@ ParametricGeometries.SphereGeometry = function ( size, u, v ) {
 
 };
 
-ParametricGeometries.SphereGeometry.prototype = Object.create( Geometry.prototype );
+ParametricGeometries.SphereGeometry.prototype = Object.create( BufferGeometry.prototype );
 ParametricGeometries.SphereGeometry.prototype.constructor = ParametricGeometries.SphereGeometry;
 
 
@@ -254,7 +255,7 @@ ParametricGeometries.PlaneGeometry = function ( width, depth, segmentsWidth, seg
 
 };
 
-ParametricGeometries.PlaneGeometry.prototype = Object.create( Geometry.prototype );
+ParametricGeometries.PlaneGeometry.prototype = Object.create( BufferGeometry.prototype );
 ParametricGeometries.PlaneGeometry.prototype.constructor = ParametricGeometries.PlaneGeometry;
 
 export { ParametricGeometries };

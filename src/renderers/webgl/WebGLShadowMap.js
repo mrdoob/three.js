@@ -48,12 +48,12 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	} );
 
-	const shadowMaterialHorizonal = shadowMaterialVertical.clone();
-	shadowMaterialHorizonal.defines.HORIZONAL_PASS = 1;
+	const shadowMaterialHorizontal = shadowMaterialVertical.clone();
+	shadowMaterialHorizontal.defines.HORIZONTAL_PASS = 1;
 
 	const fullScreenTri = new BufferGeometry();
 	fullScreenTri.setAttribute(
-		"position",
+		'position',
 		new BufferAttribute(
 			new Float32Array( [ - 1, - 1, 0.5, 3, - 1, 0.5, - 1, 3, 0.5 ] ),
 			3
@@ -97,14 +97,14 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 			const light = lights[ i ];
 			const shadow = light.shadow;
 
-			if ( shadow.autoUpdate === false && shadow.needsUpdate === false ) continue;
-
 			if ( shadow === undefined ) {
 
 				console.warn( 'THREE.WebGLShadowMap:', light, 'has no shadow.' );
 				continue;
 
 			}
+
+			if ( shadow.autoUpdate === false && shadow.needsUpdate === false ) continue;
 
 			_shadowMapSize.copy( shadow.mapSize );
 
@@ -136,10 +136,10 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			if ( shadow.map === null && ! shadow.isPointLightShadow && this.type === VSMShadowMap ) {
 
-				const pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat, stencilBuffer: false };
+				const pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat };
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
-				shadow.map.texture.name = light.name + ".shadowMap";
+				shadow.map.texture.name = light.name + '.shadowMap';
 
 				shadow.mapPass = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 
@@ -149,10 +149,10 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			if ( shadow.map === null ) {
 
-				const pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat, stencilBuffer: false };
+				const pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
-				shadow.map.texture.name = light.name + ".shadowMap";
+				shadow.map.texture.name = light.name + '.shadowMap';
 
 				shadow.camera.updateProjectionMatrix();
 
@@ -215,14 +215,14 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		_renderer.clear();
 		_renderer.renderBufferDirect( camera, null, geometry, shadowMaterialVertical, fullScreenMesh, null );
 
-		// horizonal pass
+		// horizontal pass
 
-		shadowMaterialHorizonal.uniforms.shadow_pass.value = shadow.mapPass.texture;
-		shadowMaterialHorizonal.uniforms.resolution.value = shadow.mapSize;
-		shadowMaterialHorizonal.uniforms.radius.value = shadow.radius;
+		shadowMaterialHorizontal.uniforms.shadow_pass.value = shadow.mapPass.texture;
+		shadowMaterialHorizontal.uniforms.resolution.value = shadow.mapSize;
+		shadowMaterialHorizontal.uniforms.radius.value = shadow.radius;
 		_renderer.setRenderTarget( shadow.map );
 		_renderer.clear();
-		_renderer.renderBufferDirect( camera, null, geometry, shadowMaterialHorizonal, fullScreenMesh, null );
+		_renderer.renderBufferDirect( camera, null, geometry, shadowMaterialHorizontal, fullScreenMesh, null );
 
 	}
 

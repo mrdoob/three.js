@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,24 +18,24 @@
 		颜色可以用以下任意一种方式初始化。
 		<code>
 		//empty constructor - will default white
-		var color = new THREE.Color();
+		const color1 = new THREE.Color();
 
 		//Hexadecimal color (recommended)
-		var color = new THREE.Color( 0xff0000 );
+		const color2 = new THREE.Color( 0xff0000 );
 
 		//RGB string
-		var color = new THREE.Color("rgb(255, 0, 0)");
-		var color = new THREE.Color("rgb(100%, 0%, 0%)");
+		const color3 = new THREE.Color("rgb(255, 0, 0)");
+		const color4 = new THREE.Color("rgb(100%, 0%, 0%)");
 
 		//X11 color name - all 140 color names are supported.
 		//Note the lack of CamelCase in the name
-		var color = new THREE.Color( 'skyblue' );
+		const color5 = new THREE.Color( 'skyblue' );
 
 		//HSL string
-		var color = new THREE.Color("hsl(0, 100%, 50%)");
+		const color6 = new THREE.Color("hsl(0, 100%, 50%)");
 
 		//Separate RGB values between 0 and 1
-		var color = new THREE.Color( 1, 0, 0 );
+		const color7 = new THREE.Color( 1, 0, 0 );
 		</code>
 
 
@@ -212,6 +211,16 @@
 		[page:Float alpha] - 介于0到1的数字。<br /><br />
 
 		将该颜色的RGB值线性插值到传入参数的RGB值。alpha参数可以被认为是两种颜色之间的比例值，其中0是当前颜色和1.0是第一个参数的颜色。
+		</p>
+
+		<h3>[method:this lerpColors]( [param:Color color1], [param:Color color2], [param:Float alpha] )</h3>
+		<p>
+		[page:Color color1] - 开始的颜色。<br />
+		[page:Color color2] - 结束收敛的颜色。<br />
+		[page:Float alpha] - 介于0到1的数字。<br /><br />
+
+		将该颜色设置为线性插值颜色 [page:Color color1] 和 [page:Color color2] - 在此 alpha 是连接两种颜色的直线百分比距离
+		alpha = 0 时为 [page:Color color1]， alpha = 1 时为 [page:Color color2]。
 		</p>
 
 		<h3>[method:Color lerpHSL]( [param:Color color], [param:Float alpha] ) </h3>

@@ -1,13 +1,15 @@
 import { Matrix3 } from './Matrix3.js';
 import { Vector3 } from './Vector3.js';
 
-const _vector1 = new Vector3();
-const _vector2 = new Vector3();
-const _normalMatrix = new Matrix3();
+const _vector1 = /*@__PURE__*/ new Vector3();
+const _vector2 = /*@__PURE__*/ new Vector3();
+const _normalMatrix = /*@__PURE__*/ new Matrix3();
 
 class Plane {
 
 	constructor( normal, constant ) {
+
+		Object.defineProperty( this, 'isPlane', { value: true } );
 
 		// normal is assumed to be normalized
 
@@ -220,8 +222,6 @@ class Plane {
 	}
 
 }
-
-Plane.prototype.isPlane = true;
 
 
 export { Plane };

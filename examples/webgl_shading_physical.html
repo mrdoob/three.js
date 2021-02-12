@@ -22,23 +22,25 @@
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var container, stats;
+			let stats;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var mesh;
+			let mesh;
 
-			var controls;
+			let controls;
 
-			var cubeCamera;
+			let cubeCamera;
 
-			var sunLight, pointLight, ambientLight;
+			let sunLight, pointLight, ambientLight;
 
-			var mixer;
+			let mixer;
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
-			var gui, shadowCameraHelper, shadowConfig = {
+			let gui, shadowCameraHelper;
+
+			const shadowConfig = {
 
 				shadowCameraVisible: false,
 				shadowCameraNear: 750,
@@ -52,7 +54,7 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				// CAMERA
@@ -67,7 +69,7 @@
 
 				// CUBE CAMERA
 
-				var cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, {
+				const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, {
 					format: THREE.RGBFormat,
 					generateMipmaps: true,
 					minFilter: THREE.LinearMipmapLinearFilter,
@@ -76,36 +78,36 @@
 				cubeCamera = new THREE.CubeCamera( 1, 10000, cubeRenderTarget );
 
 				// TEXTURES
-				var textureLoader = new THREE.TextureLoader();
+				const textureLoader = new THREE.TextureLoader();
 
-				var textureSquares = textureLoader.load( "textures/patterns/bright_squares256.png" );
+				const textureSquares = textureLoader.load( "textures/patterns/bright_squares256.png" );
 				textureSquares.repeat.set( 50, 50 );
 				textureSquares.wrapS = textureSquares.wrapT = THREE.RepeatWrapping;
 				textureSquares.magFilter = THREE.NearestFilter;
 				textureSquares.encoding = THREE.sRGBEncoding;
 
-				var textureNoiseColor = textureLoader.load( "textures/disturb.jpg" );
+				const textureNoiseColor = textureLoader.load( "textures/disturb.jpg" );
 				textureNoiseColor.repeat.set( 1, 1 );
 				textureNoiseColor.wrapS = textureNoiseColor.wrapT = THREE.RepeatWrapping;
 				textureNoiseColor.encoding = THREE.sRGBEncoding;
 
-				var textureLava = textureLoader.load( "textures/lava/lavatile.jpg" );
+				const textureLava = textureLoader.load( "textures/lava/lavatile.jpg" );
 				textureLava.repeat.set( 6, 2 );
 				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
 				textureLava.encoding = THREE.sRGBEncoding;
 
 				// GROUND
 
-				var groundMaterial = new THREE.MeshPhongMaterial( {
+				const groundMaterial = new THREE.MeshPhongMaterial( {
 					shininess: 80,
 					color: 0xffffff,
 					specular: 0xffffff,
 					map: textureSquares
 				} );
 
-				var planeGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const planeGeometry = new THREE.PlaneGeometry( 100, 100 );
 
-				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
+				const ground = new THREE.Mesh( planeGeometry, groundMaterial );
 				ground.position.set( 0, 0, 0 );
 				ground.rotation.x = - Math.PI / 2;
 				ground.scale.set( 1000, 1000, 1000 );
@@ -114,15 +116,15 @@
 
 				// MATERIALS
 
-				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
-				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeRenderTarget.texture } );
+				const materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
+				const materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
+				const materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeRenderTarget.texture } );
 
 				// OBJECTS
 
-				var sphereGeometry = new THREE.SphereBufferGeometry( 100, 64, 32 );
-				var torusGeometry = new THREE.TorusBufferGeometry( 240, 60, 32, 64 );
-				var cubeGeometry = new THREE.BoxBufferGeometry( 150, 150, 150 );
+				const sphereGeometry = new THREE.SphereGeometry( 100, 64, 32 );
+				const torusGeometry = new THREE.TorusGeometry( 240, 60, 32, 64 );
+				const cubeGeometry = new THREE.BoxGeometry( 150, 150, 150 );
 
 				addObject( torusGeometry, materialPhong, 0, 100, 0, 0 );
 				addObject( cubeGeometry, materialLambert, 350, 75, 300, 0 );
@@ -132,7 +134,7 @@
 
 				function addObjectColor( geometry, color, x, y, z, ry ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+					const material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
 
 					return addObject( geometry, material, x, y, z, ry );
 
@@ -140,7 +142,7 @@
 
 				function addObject( geometry, material, x, y, z, ry ) {
 
-					var tmpMesh = new THREE.Mesh( geometry, material );
+					const tmpMesh = new THREE.Mesh( geometry, material );
 
 					tmpMesh.material.color.offsetHSL( 0.1, - 0.1, 0 );
 
@@ -157,9 +159,9 @@
 
 				}
 
-				var bigCube = new THREE.BoxBufferGeometry( 50, 500, 50 );
-				var midCube = new THREE.BoxBufferGeometry( 50, 200, 50 );
-				var smallCube = new THREE.BoxBufferGeometry( 100, 100, 100 );
+				const bigCube = new THREE.BoxGeometry( 50, 500, 50 );
+				const midCube = new THREE.BoxGeometry( 50, 200, 50 );
+				const smallCube = new THREE.BoxGeometry( 100, 100, 100 );
 
 				addObjectColor( bigCube, 0xff0000, - 500, 250, 0, 0 );
 				addObjectColor( smallCube, 0xff0000, - 500, 50, - 150, 0 );
@@ -173,24 +175,24 @@
 				addObjectColor( midCube, 0xff00ff, 0, 100, 500, 0 );
 				addObjectColor( smallCube, 0xff00ff, - 150, 50, 500, 0 );
 
-				addObjectColor( new THREE.BoxBufferGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI / 4 );
-				addObjectColor( new THREE.BoxBufferGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
+				addObjectColor( new THREE.BoxGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI / 4 );
+				addObjectColor( new THREE.BoxGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
 
-				addObjectColor( new THREE.SphereBufferGeometry( 100, 32, 26 ), 0xffffff, - 300, 100, 300, 0 );
+				addObjectColor( new THREE.SphereGeometry( 100, 32, 26 ), 0xffffff, - 300, 100, 300, 0 );
 
 				// MORPHS
 
-				var loader = new GLTFLoader();
+				const loader = new GLTFLoader();
 
 				loader.load( "models/gltf/SittingBox.glb", function ( gltf ) {
 
-					var mesh = gltf.scene.children[ 0 ];
+					const mesh = gltf.scene.children[ 0 ];
 
 					mixer = new THREE.AnimationMixer( mesh );
 
 					mixer.clipAction( gltf.animations[ 0 ] ).setDuration( 10 ).play();
 
-					var s = 200;
+					const s = 200;
 					mesh.scale.set( s, s, s );
 
 					mesh.castShadow = true;
@@ -262,7 +264,7 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// GUI
 
@@ -270,7 +272,7 @@
 
 				// SHADOW
 
-				var shadowGUI = gui.addFolder( "Shadow" );
+				const shadowGUI = gui.addFolder( "Shadow" );
 
     		shadowGUI.add( shadowConfig, 'shadowCameraVisible' ).onChange( function () {
 
@@ -333,7 +335,7 @@
 
 				// update
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				controls.update();
 

@@ -18,9 +18,9 @@
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			var camera, scene, renderer, stats;
+			let camera, scene, renderer, stats;
 
-			var mesh;
+			let mesh;
 
 			init();
 			animate();
@@ -37,40 +37,40 @@
 
 				//
 
-				var light = new THREE.HemisphereLight();
+				const light = new THREE.HemisphereLight();
 				scene.add( light );
 
 				//
 
-				var geometry = new THREE.BufferGeometry();
+				const geometry = new THREE.BufferGeometry();
 
-				var indices = [];
+				const indices = [];
 
-				var vertices = [];
-				var normals = [];
-				var colors = [];
+				const vertices = [];
+				const normals = [];
+				const colors = [];
 
-				var size = 20;
-				var segments = 10;
+				const size = 20;
+				const segments = 10;
 
-				var halfSize = size / 2;
-				var segmentSize = size / segments;
+				const halfSize = size / 2;
+				const segmentSize = size / segments;
 
 				// generate vertices, normals and color data for a simple grid geometry
 
-				for ( var i = 0; i <= segments; i ++ ) {
+				for ( let i = 0; i <= segments; i ++ ) {
 
-					var y = ( i * segmentSize ) - halfSize;
+					const y = ( i * segmentSize ) - halfSize;
 
-					for ( var j = 0; j <= segments; j ++ ) {
+					for ( let j = 0; j <= segments; j ++ ) {
 
-						var x = ( j * segmentSize ) - halfSize;
+						const x = ( j * segmentSize ) - halfSize;
 
 						vertices.push( x, - y, 0 );
 						normals.push( 0, 0, 1 );
 
-						var r = ( x / size ) + 0.5;
-						var g = ( y / size ) + 0.5;
+						const r = ( x / size ) + 0.5;
+						const g = ( y / size ) + 0.5;
 
 						colors.push( r, g, 1 );
 
@@ -80,14 +80,14 @@
 
 				// generate indices (data for element array buffer)
 
-				for ( var i = 0; i < segments; i ++ ) {
+				for ( let i = 0; i < segments; i ++ ) {
 
-					for ( var j = 0; j < segments; j ++ ) {
+					for ( let j = 0; j < segments; j ++ ) {
 
-						var a = i * ( segments + 1 ) + ( j + 1 );
-						var b = i * ( segments + 1 ) + j;
-						var c = ( i + 1 ) * ( segments + 1 ) + j;
-						var d = ( i + 1 ) * ( segments + 1 ) + ( j + 1 );
+						const a = i * ( segments + 1 ) + ( j + 1 );
+						const b = i * ( segments + 1 ) + j;
+						const c = ( i + 1 ) * ( segments + 1 ) + j;
+						const d = ( i + 1 ) * ( segments + 1 ) + ( j + 1 );
 
 						// generate two faces (triangles) per iteration
 
@@ -105,7 +105,7 @@
 				geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.MeshPhongMaterial( {
+				const material = new THREE.MeshPhongMaterial( {
 					side: THREE.DoubleSide,
 					vertexColors: true
 				} );
@@ -127,12 +127,12 @@
 
 				//
 
-				var gui = new GUI();
+				const gui = new GUI();
 				gui.add( material, 'wireframe' );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -158,7 +158,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
 				mesh.rotation.x = time * 0.25;
 				mesh.rotation.y = time * 0.5;

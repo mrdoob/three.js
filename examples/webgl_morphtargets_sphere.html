@@ -20,21 +20,19 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var container;
+			let camera, scene, renderer, clock;
 
-			var camera, scene, renderer, clock;
+			let mesh;
 
-			var mesh;
-
-			var sign = 1;
-			var speed = 0.5;
+			let sign = 1;
+			const speed = 0.5;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.2, 100 );
 				camera.position.set( 0, 5, 5 );
@@ -43,18 +41,17 @@
 
 				clock = new THREE.Clock();
 
-				var light = new THREE.PointLight( 0xff2200, 0.7 );
-				light.position.set( 100, 100, 100 );
-				scene.add( light );
+				const light1 = new THREE.PointLight( 0xff2200, 0.7 );
+				light1.position.set( 100, 100, 100 );
+				scene.add( light1 );
 
-				light = new THREE.PointLight( 0x22ff00, 0.7 );
-				light.position.set( - 100, - 100, - 100 );
-				scene.add( light );
+				const light2 = new THREE.PointLight( 0x22ff00, 0.7 );
+				light2.position.set( - 100, - 100, - 100 );
+				scene.add( light2 );
 
-				light = new THREE.AmbientLight( 0x111111 );
-				scene.add( light );
+				scene.add( new THREE.AmbientLight( 0x111111 ) );
 
-				var loader = new GLTFLoader();
+				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/AnimatedMorphSphere/glTF/AnimatedMorphSphere.gltf', function ( gltf ) {
 
 					gltf.scene.traverse( function ( node ) {
@@ -73,7 +70,7 @@
 
 					//
 
-					var pointsMaterial = new THREE.PointsMaterial( {
+					const pointsMaterial = new THREE.PointsMaterial( {
 
 						size: 10,
 						sizeAttenuation: false,
@@ -83,7 +80,7 @@
 
 					} );
 
-					var points = new THREE.Points( mesh.geometry, pointsMaterial );
+					const points = new THREE.Points( mesh.geometry, pointsMaterial );
 
 					points.morphTargetInfluences = mesh.morphTargetInfluences;
 					points.morphTargetDictionary = mesh.morphTargetDictionary;
@@ -101,13 +98,13 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
 				controls.maxDistance = 20;
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				document.addEventListener( 'visibilitychange', onVisibilityChange );
 
@@ -145,11 +142,11 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( mesh !== undefined ) {
 
-					var step = delta * speed;
+					const step = delta * speed;
 
 					mesh.rotation.y += step;
 

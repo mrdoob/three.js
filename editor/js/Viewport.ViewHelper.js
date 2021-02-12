@@ -47,7 +47,7 @@ function ViewHelper( editorCamera, container ) {
 	var camera = new THREE.OrthographicCamera( - 2, 2, 2, - 2, 0, 4 );
 	camera.position.set( 0, 0, 2 );
 
-	var geometry = new THREE.BoxBufferGeometry( 0.8, 0.05, 0.05 ).translate( 0.4, 0, 0 );
+	var geometry = new THREE.BoxGeometry( 0.8, 0.05, 0.05 ).translate( 0.4, 0, 0 );
 
 	var xAxis = new THREE.Mesh( geometry, getAxisMaterial( color1 ) );
 	var yAxis = new THREE.Mesh( geometry, getAxisMaterial( color2 ) );
@@ -103,7 +103,7 @@ function ViewHelper( editorCamera, container ) {
 
 	this.render = function ( renderer ) {
 
-		this.quaternion.copy( editorCamera.quaternion ).inverse();
+		this.quaternion.copy( editorCamera.quaternion ).invert();
 		this.updateMatrixWorld();
 
 		point.set( 0, 0, 1 );
@@ -198,11 +198,12 @@ function ViewHelper( editorCamera, container ) {
 	this.update = function ( delta ) {
 
 		var step = delta * turnRate;
+		var focusPoint = this.controls.center;
 
 		// animate position by doing a slerp and then scaling the position on the unit sphere
 
 		q1.rotateTowards( q2, step );
-		editorCamera.position.set( 0, 0, 1 ).applyQuaternion( q1 ).multiplyScalar( radius );
+		editorCamera.position.set( 0, 0, 1 ).applyQuaternion( q1 ).multiplyScalar( radius ).add( focusPoint );
 
 		// animate orientation
 
@@ -258,7 +259,7 @@ function ViewHelper( editorCamera, container ) {
 		//
 
 		radius = editorCamera.position.distanceTo( focusPoint );
-		targetPosition.multiplyScalar( radius );
+		targetPosition.multiplyScalar( radius ).add( focusPoint );
 
 		dummy.position.copy( focusPoint );
 

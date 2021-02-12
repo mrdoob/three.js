@@ -74,21 +74,19 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			var container;
-
-			var scene, camera, renderer;
-			var geometry, mesh, material;
-			var mouse, center;
+			let scene, camera, renderer;
+			let geometry, mesh, material;
+			let mouse, center;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var info = document.createElement( 'div' );
+				const info = document.createElement( 'div' );
 				info.id = 'info';
 				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - kinect';
 				document.body.appendChild( info );
@@ -100,19 +98,19 @@
 				center = new THREE.Vector3();
 				center.z = - 1000;
 
-				var video = document.getElementById( 'video' );
+				const video = document.getElementById( 'video' );
 
-				var texture = new THREE.VideoTexture( video );
+				const texture = new THREE.VideoTexture( video );
 				texture.minFilter = THREE.NearestFilter;
 
-				var width = 640, height = 480;
-				var nearClipping = 850, farClipping = 4000;
+				const width = 640, height = 480;
+				const nearClipping = 850, farClipping = 4000;
 
 				geometry = new THREE.BufferGeometry();
 
-				var vertices = new Float32Array( width * height * 3 );
+				const vertices = new Float32Array( width * height * 3 );
 
-				for ( var i = 0, j = 0, l = vertices.length; i < l; i += 3, j ++ ) {
+				for ( let i = 0, j = 0, l = vertices.length; i < l; i += 3, j ++ ) {
 
 					vertices[ i ] = j % width;
 					vertices[ i + 1 ] = Math.floor( j / width );
@@ -146,7 +144,7 @@
 				mesh = new THREE.Points( geometry, material );
 				scene.add( mesh );
 
-				var gui = new GUI();
+				const gui = new GUI();
 				gui.add( material.uniforms.nearClipping, 'value', 1, 10000, 1.0 ).name( 'nearClipping' );
 				gui.add( material.uniforms.farClipping, 'value', 1, 10000, 1.0 ).name( 'farClipping' );
 				gui.add( material.uniforms.pointSize, 'value', 1, 10, 1.0 ).name( 'pointSize' );
@@ -163,11 +161,11 @@
 
 				mouse = new THREE.Vector3( 0, 0, 1 );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

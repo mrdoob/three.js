@@ -1,6 +1,6 @@
 import {
 	Vector2
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var SelectionHelper = ( function () {
 
@@ -18,14 +18,14 @@ var SelectionHelper = ( function () {
 
 		this.isDown = false;
 
-		this.renderer.domElement.addEventListener( 'mousedown', function ( event ) {
+		this.renderer.domElement.addEventListener( 'pointerdown', function ( event ) {
 
 			this.isDown = true;
 			this.onSelectStart( event );
 
-		}.bind( this ), false );
+		}.bind( this ) );
 
-		this.renderer.domElement.addEventListener( 'mousemove', function ( event ) {
+		this.renderer.domElement.addEventListener( 'pointermove', function ( event ) {
 
 			if ( this.isDown ) {
 
@@ -33,14 +33,14 @@ var SelectionHelper = ( function () {
 
 			}
 
-		}.bind( this ), false );
+		}.bind( this ) );
 
-		this.renderer.domElement.addEventListener( 'mouseup', function ( event ) {
+		this.renderer.domElement.addEventListener( 'pointerup', function ( event ) {
 
 			this.isDown = false;
 			this.onSelectOver( event );
 
-		}.bind( this ), false );
+		}.bind( this ) );
 
 	}
 

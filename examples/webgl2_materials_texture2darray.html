@@ -31,12 +31,14 @@
 	in vec2 vUv;
 	uniform int depth;
 
+	out vec4 outColor;
+
 	void main() {
 
 		vec4 color = texture( diffuse, vec3( vUv, depth ) );
 
 		// lighten a bit
-		gl_FragColor = vec4( color.rrr * 1.5, 1.0 );
+		outColor = vec4( color.rrr * 1.5, 1.0 );
 
 	}
 	</script>
@@ -54,7 +56,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
-			import { JSZip } from './jsm/libs/jszip.module.min.js';
+			import { unzipSync } from './jsm/libs/fflate.module.min.js';
 
 			import { WEBGL } from './jsm/WebGL.js';
 
@@ -64,19 +66,19 @@
 
 			}
 
-			var camera, scene, mesh, renderer, stats;
+			let camera, scene, mesh, renderer, stats;
 
-			var planeWidth = 50;
-			var planeHeight = 50;
+			const planeWidth = 50;
+			const planeHeight = 50;
 
-			var depthStep = 0.4;
+			let depthStep = 0.4;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
@@ -90,24 +92,25 @@
 					.setResponseType( 'arraybuffer' )
 					.load( 'textures/3d/head256x256x109.zip', function ( data ) {
 
-						var zip = new JSZip( data );
-						var array = zip.files[ 'head256x256x109' ].asUint8Array();
+						const zip = unzipSync( new Uint8Array( data ) );
+						const array = new Uint8Array( zip[ 'head256x256x109' ].buffer );
 
-						var texture = new THREE.DataTexture2DArray( array, 256, 256, 109 );
+						const texture = new THREE.DataTexture2DArray( array, 256, 256, 109 );
 						texture.format = THREE.RedFormat;
 						texture.type = THREE.UnsignedByteType;
 
-						var material = new THREE.ShaderMaterial( {
+						const material = new THREE.ShaderMaterial( {
 							uniforms: {
 								diffuse: { value: texture },
 								depth: { value: 55 },
 								size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
 							},
 							vertexShader: document.getElementById( 'vs' ).textContent.trim(),
-							fragmentShader: document.getElementById( 'fs' ).textContent.trim()
+							fragmentShader: document.getElementById( 'fs' ).textContent.trim(),
+							glslVersion: THREE.GLSL3
 						} );
 
-						var geometry = new THREE.PlaneBufferGeometry( planeWidth, planeHeight );
+						const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 
 						mesh = new THREE.Mesh( geometry, material );
 
@@ -125,7 +128,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -144,7 +147,7 @@
 
 				if ( mesh ) {
 
-					var value = mesh.material.uniforms[ "depth" ].value;
+					let value = mesh.material.uniforms[ "depth" ].value;
 
 					value += depthStep;
 

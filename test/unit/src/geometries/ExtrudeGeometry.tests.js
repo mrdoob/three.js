@@ -1,10 +1,10 @@
 /* global QUnit */
 
-import { ExtrudeBufferGeometry } from '../../../../src/geometries/ExtrudeGeometry';
+import { ExtrudeGeometry, ExtrudeBufferGeometry } from '../../../../src/geometries/ExtrudeGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'ExtrudeBufferGeometry', () => {
+	QUnit.module( 'ExtrudeGeometry', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

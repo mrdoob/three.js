@@ -14,6 +14,8 @@ class SphericalHarmonics3 {
 
 	constructor() {
 
+		Object.defineProperty( this, 'isSphericalHarmonics3', { value: true } );
+
 		this.coefficients = [];
 
 		for ( let i = 0; i < 9; i ++ ) {
@@ -183,9 +185,7 @@ class SphericalHarmonics3 {
 
 	}
 
-	fromArray( array, offset ) {
-
-		if ( offset === undefined ) offset = 0;
+	fromArray( array, offset = 0 ) {
 
 		const coefficients = this.coefficients;
 
@@ -199,10 +199,7 @@ class SphericalHarmonics3 {
 
 	}
 
-	toArray( array, offset ) {
-
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+	toArray( array = [], offset = 0 ) {
 
 		const coefficients = this.coefficients;
 
@@ -242,8 +239,6 @@ class SphericalHarmonics3 {
 	}
 
 }
-
-SphericalHarmonics3.prototype.isSphericalHarmonics3 = true;
 
 
 export { SphericalHarmonics3 };

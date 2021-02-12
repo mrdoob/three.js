@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,13 +20,9 @@
 		<h2>代码示例</h2>
 
 		<code>
-//assuming you have created a HTML video element with id="video"
-var video = document.getElementById( 'video' );
-
-var texture = new THREE.VideoTexture( video );
-texture.minFilter = THREE.LinearFilter;
-texture.magFilter = THREE.LinearFilter;
-texture.format = THREE.RGBFormat;
+// assuming you have created a HTML video element with id="video"
+const video = document.getElementById( 'video' );
+const texture = new THREE.VideoTexture( video );
 		</code>
 
 		<h2>例子</h2>
@@ -72,7 +67,7 @@ texture.format = THREE.RGBFormat;
 		共有属性请参见其基类[page:Texture Texture]。
 	</p>
 
-		<h3>[property:boolean needsUpdate]</h3>
+		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
 		在这里，你不必手动设置这个值，因为它是由[page:VideoTexture.update update]方法来进行控制的。
 		</p>
@@ -86,7 +81,7 @@ texture.format = THREE.RGBFormat;
 	<h3>[method:null update]()</h3>
 		<p>
 		在每一次新的一帧可用时，这个方法将被自动调用，
-		并将[property:boolean needsUpdate]设置为*true*。
+		并将[property:Boolean needsUpdate]设置为*true*。
 		</p>
 
 

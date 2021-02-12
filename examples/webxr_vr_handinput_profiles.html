@@ -21,23 +21,23 @@
 			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 			import { XRHandModelFactory } from './jsm/webxr/XRHandModelFactory.js';
 
-			var container;
-			var camera, scene, renderer;
-			var hand1, hand2;
-			var controller1, controller2;
-			var controllerGrip1, controllerGrip2;
+			let container;
+			let camera, scene, renderer;
+			let hand1, hand2;
+			let controller1, controller2;
+			let controllerGrip1, controllerGrip2;
 
-			var currentHandModel = {
+			const currentHandModel = {
 				left: 0,
 				right: 0
 			};
 
-			var handModels = {
+			const handModels = {
 				left: null,
 				right: null
 			};
 
-			var controls;
+			let controls;
 
 			init();
 			animate();
@@ -59,16 +59,16 @@
 				controls.target.set( 0, 1.6, 0 );
 				controls.update();
 
-				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
-				var material = new THREE.MeshStandardMaterial( { color: 0x222222 } );
-				var floor = new THREE.Mesh( geometry, material );
+				const floorGeometry = new THREE.PlaneGeometry( 4, 4 );
+				const floorMaterial = new THREE.MeshStandardMaterial( { color: 0x222222 } );
+				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
 				scene.add( floor );
 
 				scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				const light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
@@ -99,8 +99,8 @@
 				controller2 = renderer.xr.getController( 1 );
 				scene.add( controller2 );
 
-				var controllerModelFactory = new XRControllerModelFactory();
-				var handModelFactory = new XRHandModelFactory().setPath( "./models/fbx/" );
+				const controllerModelFactory = new XRControllerModelFactory();
+				const handModelFactory = new XRHandModelFactory().setPath( "./models/fbx/" );
 
 				// Hand 1
 
@@ -176,9 +176,9 @@
 				//
 				window.hands = [ hand1, hand2 ];
 
-				var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+				const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 
-				var line = new THREE.Line( geometry );
+				const line = new THREE.Line( geometry );
 				line.name = 'line';
 				line.scale.z = 5;
 
@@ -187,7 +187,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

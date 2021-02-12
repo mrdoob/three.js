@@ -25,13 +25,13 @@
 			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
-			var orbitControls;
-			var camera, scene, renderer, loader;
-			var gltf, background, envMap, mixer, gui, extensionControls;
+			let orbitControls;
+			let camera, scene, renderer, loader;
+			let gltf, background, envMap, mixer, gui, extensionControls;
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
-			var scenes = {
+			const scenes = {
 				Boombox: {
 					name: 'BoomBox (PBR)',
 					url: './models/gltf/BoomBox/%s/BoomBox.gltf',
@@ -137,7 +137,7 @@
 				},
 			};
 
-			var state = {
+			const state = {
 				scene: Object.keys( scenes )[ 0 ],
 				extension: scenes[ Object.keys( scenes )[ 0 ] ].extensions[ 0 ],
 				playAnimation: true
@@ -154,7 +154,7 @@
 				renderer.physicallyCorrectLights = true;
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// Load background and generate envMap
 
@@ -176,14 +176,14 @@
 
 					} );
 
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
 			}
 
 			function initScene( sceneInfo ) {
 
-				var descriptionEl = document.getElementById( 'description' );
+				const descriptionEl = document.getElementById( 'description' );
 
 				if ( sceneInfo.author && sceneInfo.authorURL ) {
 
@@ -197,14 +197,14 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.001, 1000 );
 				scene.add( camera );
 
-				var spot1;
+				let spot1;
 
 				if ( sceneInfo.addLights ) {
 
-					var ambient = new THREE.AmbientLight( 0x222222 );
+					const ambient = new THREE.AmbientLight( 0x222222 );
 					scene.add( ambient );
 
-					var directionalLight = new THREE.DirectionalLight( 0xdddddd, 4 );
+					const directionalLight = new THREE.DirectionalLight( 0xdddddd, 4 );
 					directionalLight.position.set( 0, 0, 1 ).normalize();
 					scene.add( directionalLight );
 
@@ -241,8 +241,8 @@
 
 				if ( sceneInfo.addGround ) {
 
-					var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xFFFFFF } );
-					var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 512, 512 ), groundMaterial );
+					const groundMaterial = new THREE.MeshPhongMaterial( { color: 0xFFFFFF } );
+					const ground = new THREE.Mesh( new THREE.PlaneGeometry( 512, 512 ), groundMaterial );
 					ground.receiveShadow = !! sceneInfo.shadows;
 
 					if ( sceneInfo.groundPos ) {
@@ -263,13 +263,13 @@
 
 				loader = new GLTFLoader();
 
-				var dracoLoader = new DRACOLoader();
+				const dracoLoader = new DRACOLoader();
 				dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 				loader.setDRACOLoader( dracoLoader );
 
 				loader.setDDSLoader( new DDSLoader() );
 
-				var url = sceneInfo.url.replace( /%s/g, state.extension );
+				let url = sceneInfo.url.replace( /%s/g, state.extension );
 
 				if ( state.extension === 'glTF-Binary' ) {
 
@@ -277,13 +277,13 @@
 
 				}
 
-				var loadStartTime = performance.now();
+				const loadStartTime = performance.now();
 
 				loader.load( url, function ( data ) {
 
 					gltf = data;
 
-					var object = gltf.scene;
+					const object = gltf.scene;
 
 					console.info( 'Load time: ' + ( performance.now() - loadStartTime ).toFixed( 2 ) + ' ms.' );
 
@@ -347,15 +347,15 @@
 
 					} );
 
-					var animations = gltf.animations;
+					const animations = gltf.animations;
 
 					if ( animations && animations.length ) {
 
 						mixer = new THREE.AnimationMixer( object );
 
-						for ( var i = 0; i < animations.length; i ++ ) {
+						for ( let i = 0; i < animations.length; i ++ ) {
 
-							var animation = animations[ i ];
+							const animation = animations[ i ];
 
 							// There's .3333 seconds junk at the tail of the Monster animation that
 							// keeps it from looping cleanly. Clip it at 3 seconds
@@ -365,7 +365,7 @@
 
 							}
 
-							var action = mixer.clipAction( animation );
+							const action = mixer.clipAction( animation );
 
 							if ( state.playAnimation ) action.play();
 
@@ -416,10 +416,10 @@
 				gui = new GUI( { width: 330 } );
 				gui.domElement.parentElement.style.zIndex = 101;
 
-				var sceneCtrl = gui.add( state, 'scene', Object.keys( scenes ) );
+				const sceneCtrl = gui.add( state, 'scene', Object.keys( scenes ) );
 				sceneCtrl.onChange( reload );
 
-				var animCtrl = gui.add( state, 'playAnimation' );
+				const animCtrl = gui.add( state, 'playAnimation' );
 				animCtrl.onChange( toggleAnimations );
 
 				updateGUI();
@@ -430,7 +430,7 @@
 
 				if ( extensionControls ) extensionControls.remove();
 
-				var sceneInfo = scenes[ state.scene ];
+				const sceneInfo = scenes[ state.scene ];
 
 				if ( sceneInfo.extensions.indexOf( state.extension ) === - 1 ) {
 
@@ -445,10 +445,10 @@
 
 			function toggleAnimations() {
 
-				for ( var i = 0; i < gltf.animations.length; i ++ ) {
+				for ( let i = 0; i < gltf.animations.length; i ++ ) {
 
-					var clip = gltf.animations[ i ];
-					var action = mixer.existingAction( clip );
+					const clip = gltf.animations[ i ];
+					const action = mixer.existingAction( clip );
 
 					state.playAnimation ? action.play() : action.stop();
 

@@ -24,9 +24,9 @@
 		import { SubsurfaceScatteringShader } from './jsm/shaders/SubsurfaceScatteringShader.js';
 		import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
-		var container, stats;
-		var camera, scene, renderer;
-		var model;
+		let container, stats;
+		let camera, scene, renderer;
+		let model;
 
 		init();
 		animate();
@@ -45,18 +45,18 @@
 
 			scene.add( new THREE.AmbientLight( 0x888888 ) );
 
-			var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.03 );
+			const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.03 );
 			directionalLight.position.set( 0.0, 0.5, 0.5 ).normalize();
 			scene.add( directionalLight );
 
-			var pointLight1 = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888888 } ) );
+			const pointLight1 = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888888 } ) );
 			pointLight1.add( new THREE.PointLight( 0x888888, 7.0, 300 ) );
 			scene.add( pointLight1 );
 			pointLight1.position.x = 0;
 			pointLight1.position.y = - 50;
 			pointLight1.position.z = 350;
 
-			var pointLight2 = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888800 } ) );
+			const pointLight2 = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888800 } ) );
 			pointLight2.add( new THREE.PointLight( 0x888800, 1.0, 500 ) );
 			scene.add( pointLight2 );
 			pointLight2.position.x = - 100;
@@ -74,11 +74,11 @@
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			var controls = new OrbitControls( camera, container );
+			const controls = new OrbitControls( camera, container );
 			controls.minDistance = 500;
 			controls.maxDistance = 3000;
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 			initMaterial();
 
@@ -86,13 +86,13 @@
 
 		function initMaterial() {
 
-			var loader = new THREE.TextureLoader();
-			var imgTexture = loader.load( 'models/fbx/white.jpg' );
-			var thicknessTexture = loader.load( 'models/fbx/bunny_thickness.jpg' );
+			const loader = new THREE.TextureLoader();
+			const imgTexture = loader.load( 'models/fbx/white.jpg' );
+			const thicknessTexture = loader.load( 'models/fbx/bunny_thickness.jpg' );
 			imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 
-			var shader = SubsurfaceScatteringShader;
-			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+			const shader = SubsurfaceScatteringShader;
+			const uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 			uniforms[ 'map' ].value = imgTexture;
 
@@ -107,7 +107,7 @@
 			uniforms[ 'thicknessPower' ].value = 2.0;
 			uniforms[ 'thicknessScale' ].value = 16.0;
 
-			var material = new THREE.ShaderMaterial( {
+			const material = new THREE.ShaderMaterial( {
 				uniforms: uniforms,
 				vertexShader: shader.vertexShader,
 				fragmentShader: shader.fragmentShader,
@@ -117,8 +117,8 @@
 
 			// LOADER
 
-			var loader = new FBXLoader();
-			loader.load( 'models/fbx/stanford-bunny.fbx', function ( object ) {
+			const loaderFBX = new FBXLoader();
+			loaderFBX.load( 'models/fbx/stanford-bunny.fbx', function ( object ) {
 
 				model = object.children[ 0 ];
 				model.position.set( 0, 0, 10 );
@@ -134,9 +134,9 @@
 
 		function initGUI( uniforms ) {
 
-			var gui = new GUI();
+			const gui = new GUI();
 
-			var ThicknessControls = function () {
+			const ThicknessControls = function () {
 
 				this.distortion = uniforms[ 'thicknessDistortion' ].value;
 				this.ambient = uniforms[ 'thicknessAmbient' ].value;
@@ -146,8 +146,8 @@
 
 			};
 
-			var thicknessControls = new ThicknessControls();
-			var thicknessFolder = gui.addFolder( 'Thickness Control' );
+			const thicknessControls = new ThicknessControls();
+			const thicknessFolder = gui.addFolder( 'Thickness Control' );
 
 			thicknessFolder.add( thicknessControls, 'distortion' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( function () {
 

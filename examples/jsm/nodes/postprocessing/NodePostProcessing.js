@@ -2,7 +2,7 @@ import {
 	LinearFilter,
 	Mesh,
 	OrthographicCamera,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	RGBAFormat,
 	Scene,
 	Vector2,
@@ -19,8 +19,7 @@ function NodePostProcessing( renderer, renderTarget ) {
 		var parameters = {
 			minFilter: LinearFilter,
 			magFilter: LinearFilter,
-			format: RGBAFormat,
-			stencilBuffer: false
+			format: RGBAFormat
 		};
 
 		var size = renderer.getDrawingBufferSize( new Vector2() );
@@ -37,7 +36,7 @@ function NodePostProcessing( renderer, renderTarget ) {
 	this.camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene = new Scene();
 
-	this.quad = new Mesh( new PlaneBufferGeometry( 2, 2 ), this.material );
+	this.quad = new Mesh( new PlaneGeometry( 2, 2 ), this.material );
 	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
@@ -128,11 +127,11 @@ NodePostProcessing.prototype = {
 			var data = {};
 
 			data.uuid = this.uuid;
-			data.type = "NodePostProcessing";
+			data.type = 'NodePostProcessing';
 
 			meta.post[ this.uuid ] = data;
 
-			if ( this.name !== "" ) data.name = this.name;
+			if ( this.name !== '' ) data.name = this.name;
 
 			if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 

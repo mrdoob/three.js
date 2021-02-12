@@ -169,14 +169,12 @@
 		const cachedAttributes = currentState.attributes;
 		const geometryAttributes = geometry.attributes;
 
-		if ( Object.keys( cachedAttributes ).length !== Object.keys( geometryAttributes ).length ) return true;
+		let attributesNum = 0;
 
 		for ( const key in geometryAttributes ) {
 
 			const cachedAttribute = cachedAttributes[ key ];
 			const geometryAttribute = geometryAttributes[ key ];
-
-			if ( geometryAttribute.isGLBufferAttribute ) return true;
 
 			if ( cachedAttribute === undefined ) return true;
 
@@ -184,7 +182,11 @@
 
 			if ( cachedAttribute.data !== geometryAttribute.data ) return true;
 
+			attributesNum ++;
+
 		}
+
+		if ( currentState.attributesNum !== attributesNum ) return true;
 
 		if ( currentState.index !== index ) return true;
 
@@ -196,6 +198,7 @@
 
 		const cache = {};
 		const attributes = geometry.attributes;
+		let attributesNum = 0;
 
 		for ( const key in attributes ) {
 
@@ -212,9 +215,12 @@
 
 			cache[ key ] = data;
 
+			attributesNum ++;
+
 		}
 
 		currentState.attributes = cache;
+		currentState.attributesNum = attributesNum;
 
 		currentState.index = index;
 

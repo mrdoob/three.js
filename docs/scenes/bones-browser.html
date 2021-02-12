@@ -29,7 +29,7 @@
 			import {
 				Bone,
 				Color,
-				CylinderBufferGeometry,
+				CylinderGeometry,
 				DoubleSide,
 				Float32BufferAttribute,
 				MeshPhongMaterial,
@@ -47,9 +47,9 @@
 			import { GUI } from '../../examples/jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from '../../examples/jsm/controls/OrbitControls.js';
 
-			var gui, scene, camera, renderer, orbit, lights, mesh, bones, skeletonHelper;
+			let gui, scene, camera, renderer, orbit, lights, mesh, bones, skeletonHelper;
 
-			var state = {
+			const state = {
 				animateBones: false
 			};
 
@@ -101,7 +101,7 @@
 
 			function createGeometry( sizing ) {
 
-				var geometry = new CylinderBufferGeometry(
+				const geometry = new CylinderGeometry(
 					5, // radiusTop
 					5, // radiusBottom
 					sizing.height, // height
@@ -110,21 +110,21 @@
 					true // openEnded
 				);
 
-				var position = geometry.attributes.position;
+				const position = geometry.attributes.position;
 
-				var vertex = new Vector3();
+				const vertex = new Vector3();
 
-				var skinIndices = [];
-				var skinWeights = [];
+				const skinIndices = [];
+				const skinWeights = [];
 
-				for ( var i = 0; i < position.count; i ++ ) {
+				for ( let i = 0; i < position.count; i ++ ) {
 
 					vertex.fromBufferAttribute( position, i );
 
-					var y = ( vertex.y + sizing.halfHeight );
+					const y = ( vertex.y + sizing.halfHeight );
 
-					var skinIndex = Math.floor( y / sizing.segmentHeight );
-					var skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
+					const skinIndex = Math.floor( y / sizing.segmentHeight );
+					const skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
 
 					skinIndices.push( skinIndex, skinIndex + 1, 0, 0 );
 					skinWeights.push( 1 - skinWeight, skinWeight, 0, 0 );
@@ -142,13 +142,13 @@
 
 				bones = [];
 
-				var prevBone = new Bone();
+				let prevBone = new Bone();
 				bones.push( prevBone );
 				prevBone.position.y = - sizing.halfHeight;
 
-				for ( var i = 0; i < sizing.segmentCount; i ++ ) {
+				for ( let i = 0; i < sizing.segmentCount; i ++ ) {
 
-					var bone = new Bone();
+					const bone = new Bone();
 					bone.position.y = sizing.segmentHeight;
 					bones.push( bone );
 					prevBone.add( bone );
@@ -162,7 +162,7 @@
 
 			function createMesh( geometry, bones ) {
 
-				var material = new MeshPhongMaterial( {
+				const material = new MeshPhongMaterial( {
 					skinning: true,
 					color: 0x156289,
 					emissive: 0x072534,
@@ -170,8 +170,8 @@
 					flatShading: true
 				} );
 
-				var mesh = new SkinnedMesh( geometry,	material );
-				var skeleton = new Skeleton( bones );
+				const mesh = new SkinnedMesh( geometry,	material );
+				const skeleton = new Skeleton( bones );
 
 				mesh.add( bones[ 0 ] );
 
@@ -187,7 +187,7 @@
 
 			function setupDatGui() {
 
-				var folder = gui.addFolder( "General Options" );
+				let folder = gui.addFolder( "General Options" );
 
 				folder.add( state, "animateBones" );
 				folder.__controllers[ 0 ].name( "Animate Bones" );
@@ -195,11 +195,11 @@
 				folder.add( mesh, "pose" );
 				folder.__controllers[ 1 ].name( ".pose()" );
 
-				var bones = mesh.skeleton.bones;
+				const bones = mesh.skeleton.bones;
 
-				for ( var i = 0; i < bones.length; i ++ ) {
+				for ( let i = 0; i < bones.length; i ++ ) {
 
-					var bone = bones[ i ];
+					const bone = bones[ i ];
 
 					folder = gui.addFolder( "Bone " + i );
 
@@ -233,20 +233,20 @@
 
 			function initBones() {
 
-				var segmentHeight = 8;
-				var segmentCount = 4;
-				var height = segmentHeight * segmentCount;
-				var halfHeight = height * 0.5;
+				const segmentHeight = 8;
+				const segmentCount = 4;
+				const height = segmentHeight * segmentCount;
+				const halfHeight = height * 0.5;
 
-				var sizing = {
+				const sizing = {
 					segmentHeight: segmentHeight,
 					segmentCount: segmentCount,
 					height: height,
 					halfHeight: halfHeight
 				};
 
-				var geometry = createGeometry( sizing );
-				var bones = createBones( sizing );
+				const geometry = createGeometry( sizing );
+				const bones = createBones( sizing );
 				mesh = createMesh( geometry, bones );
 
 				mesh.scale.multiplyScalar( 1 );
@@ -258,12 +258,12 @@
 
 				requestAnimationFrame( render );
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
 				//Wiggle the bones
 				if ( state.animateBones ) {
 
-					for ( var i = 0; i < mesh.skeleton.bones.length; i ++ ) {
+					for ( let i = 0; i < mesh.skeleton.bones.length; i ++ ) {
 
 						mesh.skeleton.bones[ i ].rotation.z = Math.sin( time ) * 2 / mesh.skeleton.bones.length;
 

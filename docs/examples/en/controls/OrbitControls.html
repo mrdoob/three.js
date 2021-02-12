@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,22 +13,22 @@
 		Orbit controls allow the camera to orbit around a target.<br>
 
 		To use this, as with all files in the /examples directory, you will have to
-		include the file seperately in your HTML.
+		include the file separately in your HTML.
 
 		</p>
 
 		<h2>Code Example</h2>
 
 		<code>
-		var renderer = new THREE.WebGLRenderer();
+		const renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
 
-		var scene = new THREE.Scene();
+		const scene = new THREE.Scene();
 
-		var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+		const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
-		var controls = new OrbitControls( camera, renderer.domElement );
+		const controls = new OrbitControls( camera, renderer.domElement );
 
 		//controls.update() must be called after any manual changes to the camera's transform
 		camera.position.set( 0, 20, 100 );
@@ -87,15 +86,15 @@
 
 		<h3>[property:Float autoRotateSpeed]</h3>
 		<p>
-			How fast to rotate around the target if [property:Boolean autoRotate] is true. Default is 2.0, which equates to 30 seconds
-			per rotation at 60fps.<br> Note that if [property:Boolean autoRotate] is enabled, you must call [page:.update]
+			How fast to rotate around the target if [page:.autoRotate] is true. Default is 2.0, which equates to 30 seconds
+			per orbit at 60fps.<br> Note that if [page:.autoRotate] is enabled, you must call [page:.update]
 			() in your animation loop.
 		</p>
 
 		<h3>
 			[property:Float dampingFactor]</h3>
 		<p>
-			The damping inertia used if [property:Boolean enableDamping] is set to true.<br> Note that for this to work, you must
+			The damping inertia used if [page:.enableDamping] is set to true.<br> Note that for this to work, you must
 			call [page:.update] () in your animation loop.
 		</p>
 
@@ -114,11 +113,6 @@
 		<p>
 			Set to true to enable damping (inertia), which can be used to give a sense of weight to the controls. Default is false.<br>
 			Note that if this is enabled, you must call [page:.update] () in your animation loop.
-		</p>
-
-		<h3>[property:Boolean enableKeys]</h3>
-		<p>
-			Enable or disable the use of keyboard controls.
 		</p>
 
 		<h3>[property:Boolean enablePan]</h3>
@@ -287,6 +281,11 @@ controls.touches = {
 		<h3>[method:radians getPolarAngle] ()</h3>
 		<p>
 			Get the current vertical rotation, in radians.
+		</p>
+
+		<h3>[method:void listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			Adds key event listeners to the given DOM element. *window* is a recommended argument for using this method.
 		</p>
 
 		<h3>[method:null reset] ()</h3>

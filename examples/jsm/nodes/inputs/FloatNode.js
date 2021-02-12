@@ -10,7 +10,7 @@ function FloatNode( value ) {
 
 FloatNode.prototype = Object.create( InputNode.prototype );
 FloatNode.prototype.constructor = FloatNode;
-FloatNode.prototype.nodeType = "Float";
+FloatNode.prototype.nodeType = 'Float';
 
 FloatNode.prototype.generateReadonly = function ( builder, output, uuid, type/*, ns, needsUpdate */ ) {
 

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -64,8 +63,7 @@
 
 		<h3>[property:Texture aoMap]</h3>
 		<p>The red channel of this texture is used as the ambient occlusion map. Default is null.
-		The aoMap requires a second set of UVs, and consequently will ignore the [page:Texture repeat]
-		and [page:Texture offset] Texture properties.</p>
+		The aoMap requires a second set of UVs.</p>
 
 		<h3>[property:Float aoMapIntensity]</h3>
 		<p>Intensity of the ambient occlusion effect. Default is 1. Zero is no occlusion effect.</p>
@@ -127,9 +125,7 @@
 			[page:Textures THREE.NearestFilter] when using this type of texture. Default is *null*.</p>
 
 		<h3>[property:Texture lightMap]</h3>
-		<p>The light map. Default is null. The lightMap requires a second set of UVs,
-		and consequently will ignore the [page:Texture repeat] and [page:Texture offset]
-		Texture properties.</p>
+		<p>The light map. Default is null. The lightMap requires a second set of UVs.</p>
 
 		<h3>[property:Float lightMapIntensity]</h3>
 		<p>Intensity of the baked light. Default is 1.</p>
@@ -137,10 +133,10 @@
 		<h3>[property:Texture map]</h3>
 		<p>The color map. Default is null. The texture map color is modulated by the diffuse [page:.color].</p>
 
-		<h3>[property:boolean morphNormals]</h3>
+		<h3>[property:Boolean morphNormals]</h3>
 		<p>
 			Defines whether the material uses morphNormals. Set as true to pass morphNormal
-			attributes from the [page:Geometry]	to the shader. Default is *false*.
+			attributes from the geometry to the shader. Default is *false*.
 		</p>
 
 		<h3>[property:Boolean morphTargets]</h3>
@@ -150,6 +146,8 @@
 		<p>
 			The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change
 			the way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting.
+			In case the material has a normal map authored using the left handed convention, the y component of normalScale
+			should be negated to compensate for the different handedness.
 		</p>
 
 		<h3>[property:Integer normalMapType]</h3>

@@ -112,24 +112,6 @@ class CubeCamera extends Object3D {
 
 	}
 
-	clear( renderer, color, depth, stencil ) {
-
-		const currentRenderTarget = renderer.getRenderTarget();
-
-		const renderTarget = this.renderTarget;
-
-		for ( let i = 0; i < 6; i ++ ) {
-
-			renderer.setRenderTarget( renderTarget, i );
-
-			renderer.clear( color, depth, stencil );
-
-		}
-
-		renderer.setRenderTarget( currentRenderTarget );
-
-	}
-
 }
 
 export { CubeCamera };

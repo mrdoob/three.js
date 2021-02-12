@@ -1,4 +1,3 @@
-console.warn( "THREE.ShadowMapViewer: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * This is a helper for visualising a given light's shadow map.
  * It works for shadow casting lights: DirectionalLight and SpotLight.
@@ -54,7 +53,7 @@ THREE.ShadowMapViewer = function ( light ) {
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader
 	} );
-	var plane = new THREE.PlaneBufferGeometry( frame.width, frame.height );
+	var plane = new THREE.PlaneGeometry( frame.width, frame.height );
 	var mesh = new THREE.Mesh( plane, material );
 
 	scene.add( mesh );
@@ -86,7 +85,7 @@ THREE.ShadowMapViewer = function ( light ) {
 		var labelMaterial = new THREE.MeshBasicMaterial( { map: labelTexture, side: THREE.DoubleSide } );
 		labelMaterial.transparent = true;
 
-		var labelPlane = new THREE.PlaneBufferGeometry( labelCanvas.width, labelCanvas.height );
+		var labelPlane = new THREE.PlaneGeometry( labelCanvas.width, labelCanvas.height );
 		labelMesh = new THREE.Mesh( labelPlane, labelMaterial );
 
 		scene.add( labelMesh );

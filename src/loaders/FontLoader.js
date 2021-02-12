@@ -2,23 +2,22 @@ import { Font } from '../extras/core/Font.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 
-function FontLoader( manager ) {
+class FontLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-FontLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: FontLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
 
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			let json;
@@ -40,15 +39,15 @@ FontLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( json ) {
+	parse( json ) {
 
 		return new Font( json );
 
 	}
 
-} );
+}
 
 
 export { FontLoader };

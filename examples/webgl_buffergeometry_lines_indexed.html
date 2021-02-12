@@ -18,11 +18,11 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var parent_node;
+			let parent_node;
 
 			init();
 			animate();
@@ -36,19 +36,19 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.BufferGeometry();
-				var material = new THREE.LineBasicMaterial( { vertexColors: true } );
+				const geometry = new THREE.BufferGeometry();
+				const material = new THREE.LineBasicMaterial( { vertexColors: true } );
 
-				var indices = [];
-				var positions = [];
-				var colors = [];
+				const indices = [];
+				const positions = [];
+				const colors = [];
 
-				var next_positions_index = 0;
+				let next_positions_index = 0;
 
 				//
 
-				var iteration_count = 4;
-				var rangle = 60 * Math.PI / 180.0;
+				const iteration_count = 4;
+				const rangle = 60 * Math.PI / 180.0;
 
 				function add_vertex( v ) {
 
@@ -67,7 +67,7 @@
 
 					if ( -- depth < 0 ) {
 
-						var i = next_positions_index - 1; // p0 already there
+						const i = next_positions_index - 1; // p0 already there
 						add_vertex( p4 );
 						indices.push( i, i + 1 );
 
@@ -75,17 +75,17 @@
 
 					}
 
-					var v = p4.clone().sub( p0 );
-					var v_tier = v.clone().multiplyScalar( 1 / 3 );
-					var p1 = p0.clone().add( v_tier );
+					const v = p4.clone().sub( p0 );
+					const v_tier = v.clone().multiplyScalar( 1 / 3 );
+					const p1 = p0.clone().add( v_tier );
 
-					var angle = Math.atan2( v.y, v.x ) + rangle;
-					var length = v_tier.length();
-					var p2 = p1.clone();
+					const angle = Math.atan2( v.y, v.x ) + rangle;
+					const length = v_tier.length();
+					const p2 = p1.clone();
 					p2.x += Math.cos( angle ) * length;
 					p2.y += Math.sin( angle ) * length;
 
-					var p3 = p0.clone().add( v_tier ).add( v_tier );
+					const p3 = p0.clone().add( v_tier ).add( v_tier );
 
 					snowflake_iteration( p0, p1, depth );
 					snowflake_iteration( p1, p2, depth );
@@ -96,11 +96,11 @@
 
 				function snowflake( points, loop, x_offset ) {
 
-					for ( var iteration = 0; iteration != iteration_count; iteration ++ ) {
+					for ( let iteration = 0; iteration != iteration_count; iteration ++ ) {
 
 						add_vertex( points[ 0 ] );
 
-						for ( var p_index = 0, p_count = points.length - 1; p_index != p_count; p_index ++ ) {
+						for ( let p_index = 0, p_count = points.length - 1; p_index != p_count; p_index ++ ) {
 
 							snowflake_iteration( points[ p_index ], points[ p_index + 1 ], iteration );
 
@@ -110,7 +110,7 @@
 
 						// translate input curve for next iteration
 
-						for ( var p_index = 0, p_count = points.length; p_index != p_count; p_index ++ ) {
+						for ( let p_index = 0, p_count = points.length; p_index != p_count; p_index ++ ) {
 
 							points[ p_index ].x += x_offset;
 
@@ -120,7 +120,8 @@
 
 				}
 
-				var y = 0;
+				let y = 0;
+
 				snowflake(
 					[
 						new THREE.Vector3( 0, y, 0 ),
@@ -173,7 +174,7 @@
 				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 				geometry.computeBoundingSphere();
 
-				var lineSegments = new THREE.LineSegments( geometry, material );
+				const lineSegments = new THREE.LineSegments( geometry, material );
 				lineSegments.position.x -= 1200;
 				lineSegments.position.y -= 1200;
 
@@ -196,7 +197,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -222,7 +223,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
 				parent_node.rotation.z = time * 0.5;
 

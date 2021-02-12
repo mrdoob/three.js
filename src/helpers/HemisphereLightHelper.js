@@ -3,12 +3,12 @@ import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
 import { Mesh } from '../objects/Mesh.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
-import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry.js';
+import { OctahedronGeometry } from '../geometries/OctahedronGeometry.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 
-const _vector = new Vector3();
-const _color1 = new Color();
-const _color2 = new Color();
+const _vector = /*@__PURE__*/ new Vector3();
+const _color1 = /*@__PURE__*/ new Color();
+const _color2 = /*@__PURE__*/ new Color();
 
 class HemisphereLightHelper extends Object3D {
 
@@ -23,7 +23,7 @@ class HemisphereLightHelper extends Object3D {
 
 		this.color = color;
 
-		const geometry = new OctahedronBufferGeometry( size );
+		const geometry = new OctahedronGeometry( size );
 		geometry.rotateY( Math.PI * 0.5 );
 
 		this.material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );

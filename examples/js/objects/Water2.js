@@ -1,4 +1,3 @@
-console.warn( "THREE.Water2: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * References:
  *	http://www.valvesoftware.com/publications/2010/siggraph2010_vlachos_waterflow.pdf
@@ -87,14 +86,14 @@ THREE.Water = function ( geometry, options ) {
 	if ( flowMap !== undefined ) {
 
 		this.material.defines.USE_FLOWMAP = '';
-		this.material.uniforms[ "tFlowMap" ] = {
+		this.material.uniforms[ 'tFlowMap' ] = {
 			type: 't',
 			value: flowMap
 		};
 
 	} else {
 
-		this.material.uniforms[ "flowDirection" ] = {
+		this.material.uniforms[ 'flowDirection' ] = {
 			type: 'v2',
 			value: flowDirection
 		};
@@ -106,23 +105,23 @@ THREE.Water = function ( geometry, options ) {
 	normalMap0.wrapS = normalMap0.wrapT = THREE.RepeatWrapping;
 	normalMap1.wrapS = normalMap1.wrapT = THREE.RepeatWrapping;
 
-	this.material.uniforms[ "tReflectionMap" ].value = reflector.getRenderTarget().texture;
-	this.material.uniforms[ "tRefractionMap" ].value = refractor.getRenderTarget().texture;
-	this.material.uniforms[ "tNormalMap0" ].value = normalMap0;
-	this.material.uniforms[ "tNormalMap1" ].value = normalMap1;
+	this.material.uniforms[ 'tReflectionMap' ].value = reflector.getRenderTarget().texture;
+	this.material.uniforms[ 'tRefractionMap' ].value = refractor.getRenderTarget().texture;
+	this.material.uniforms[ 'tNormalMap0' ].value = normalMap0;
+	this.material.uniforms[ 'tNormalMap1' ].value = normalMap1;
 
 	// water
 
-	this.material.uniforms[ "color" ].value = color;
-	this.material.uniforms[ "reflectivity" ].value = reflectivity;
-	this.material.uniforms[ "textureMatrix" ].value = textureMatrix;
+	this.material.uniforms[ 'color' ].value = color;
+	this.material.uniforms[ 'reflectivity' ].value = reflectivity;
+	this.material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 
 	// inital values
 
-	this.material.uniforms[ "config" ].value.x = 0; // flowMapOffset0
-	this.material.uniforms[ "config" ].value.y = halfCycle; // flowMapOffset1
-	this.material.uniforms[ "config" ].value.z = halfCycle; // halfCycle
-	this.material.uniforms[ "config" ].value.w = scale; // scale
+	this.material.uniforms[ 'config' ].value.x = 0; // flowMapOffset0
+	this.material.uniforms[ 'config' ].value.y = halfCycle; // flowMapOffset1
+	this.material.uniforms[ 'config' ].value.z = halfCycle; // halfCycle
+	this.material.uniforms[ 'config' ].value.w = scale; // scale
 
 	// functions
 
@@ -144,7 +143,7 @@ THREE.Water = function ( geometry, options ) {
 	function updateFlow() {
 
 		var delta = clock.getDelta();
-		var config = scope.material.uniforms[ "config" ];
+		var config = scope.material.uniforms[ 'config' ];
 
 		config.value.x += flowSpeed * delta; // flowMapOffset0
 		config.value.y = config.value.x + halfCycle; // flowMapOffset1

@@ -26,11 +26,11 @@
 
 			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 
-			var camera, controls, scene, renderer, stats;
+			let camera, controls, scene, renderer, stats;
 
-			var mesh, geometry, material, clock;
+			let mesh, geometry, material, clock;
 
-			var worldWidth = 128, worldDepth = 128;
+			const worldWidth = 128, worldDepth = 128;
 
 			init();
 			animate();
@@ -46,20 +46,20 @@
 				scene.background = new THREE.Color( 0xaaccff );
 				scene.fog = new THREE.FogExp2( 0xaaccff, 0.0007 );
 
-				geometry = new THREE.PlaneBufferGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
+				geometry = new THREE.PlaneGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
-				var position = geometry.attributes.position;
+				const position = geometry.attributes.position;
 				position.usage = THREE.DynamicDrawUsage;
 
-				for ( var i = 0; i < position.count; i ++ ) {
+				for ( let i = 0; i < position.count; i ++ ) {
 
-					var y = 35 * Math.sin( i / 2 );
+					const y = 35 * Math.sin( i / 2 );
 					position.setY( i, y );
 
 				}
 
-				var texture = new THREE.TextureLoader().load( 'textures/water.jpg' );
+				const texture = new THREE.TextureLoader().load( 'textures/water.jpg' );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 5, 5 );
 
@@ -83,7 +83,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -111,14 +111,14 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
-				var time = clock.getElapsedTime() * 10;
+				const delta = clock.getDelta();
+				const time = clock.getElapsedTime() * 10;
 
-				var position = geometry.attributes.position;
+				const position = geometry.attributes.position;
 
-				for ( var i = 0; i < position.count; i ++ ) {
+				for ( let i = 0; i < position.count; i ++ ) {
 
-					var y = 35 * Math.sin( i / 5 + ( time + i ) / 7 );
+					const y = 35 * Math.sin( i / 5 + ( time + i ) / 7 );
 					position.setY( i, y );
 
 				}

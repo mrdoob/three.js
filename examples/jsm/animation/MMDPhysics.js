@@ -1,17 +1,18 @@
 import {
 	Bone,
-	BoxBufferGeometry,
+	BoxGeometry,
 	Color,
-	CylinderBufferGeometry,
+	CylinderGeometry,
 	Euler,
 	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
 	Object3D,
 	Quaternion,
-	SphereBufferGeometry,
+	SphereGeometry,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
+
 /**
  * Dependencies
  *  - Ammo.js https://github.com/kripken/ammo.js
@@ -1324,7 +1325,7 @@ var MMDPhysics = ( function () {
 						.copy( mesh.matrixWorld )
 						.decompose( position, quaternion, scale )
 						.compose( position, quaternion, scale.set( 1, 1, 1 ) )
-						.getInverse( matrixWorldInv );
+						.invert();
 
 					for ( var i = 0, il = bodies.length; i < il; i ++ ) {
 
@@ -1372,10 +1373,10 @@ var MMDPhysics = ( function () {
 				switch ( param.shapeType ) {
 
 					case 0:
-						return new SphereBufferGeometry( param.width, 16, 8 );
+						return new SphereGeometry( param.width, 16, 8 );
 
 					case 1:
-						return new BoxBufferGeometry( param.width * 2, param.height * 2, param.depth * 2, 8, 8, 8 );
+						return new BoxGeometry( param.width * 2, param.height * 2, param.depth * 2, 8, 8, 8 );
 
 					case 2:
 						return new createCapsuleGeometry( param.width, param.height, 16, 8 );
@@ -1390,9 +1391,9 @@ var MMDPhysics = ( function () {
 			// copy from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mytest37.js?ver=20160815
 			function createCapsuleGeometry( radius, cylinderHeight, segmentsRadius, segmentsHeight ) {
 
-				var geometry = new CylinderBufferGeometry( radius, radius, cylinderHeight, segmentsRadius, segmentsHeight, true );
-				var upperSphere = new Mesh( new SphereBufferGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, 0, Math.PI / 2 ) );
-				var lowerSphere = new Mesh( new SphereBufferGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2 ) );
+				var geometry = new CylinderGeometry( radius, radius, cylinderHeight, segmentsRadius, segmentsHeight, true );
+				var upperSphere = new Mesh( new SphereGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, 0, Math.PI / 2 ) );
+				var lowerSphere = new Mesh( new SphereGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2 ) );
 
 				upperSphere.position.set( 0, cylinderHeight / 2, 0 );
 				lowerSphere.position.set( 0, - cylinderHeight / 2, 0 );

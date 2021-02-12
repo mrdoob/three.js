@@ -19,8 +19,6 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - draco<br/><br/>
-			<button id="createGeometry">Geometry</button>
-			<button id="createBufferGeometry">BufferGeometry</button> |
 			<button id="exportFile">Export DRC</button>
 		</div>
 
@@ -33,36 +31,10 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { DRACOExporter } from './jsm/exporters/DRACOExporter.js';
 
-			var scene, camera, renderer, exporter, mesh;
+			let scene, camera, renderer, exporter, mesh;
 
 			init();
 			animate();
-
-			function createBufferGeometry() {
-
-				scene.remove( mesh );
-
-				var geometry = new THREE.TorusKnotBufferGeometry( 50, 15, 200, 30 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.castShadow = true;
-				mesh.position.y = 25;
-				scene.add( mesh );
-
-			}
-
-			function createGeometry() {
-
-				scene.remove( mesh );
-
-				var geometry = new THREE.TorusKnotGeometry( 50, 15, 200, 30 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.castShadow = true;
-				mesh.position.y = 25;
-				scene.add( mesh );
-
-			}
 
 			function init() {
 
@@ -77,11 +49,11 @@
 
 				//
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 200, 0 );
 				scene.add( hemiLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				directionalLight.position.set( 0, 200, 100 );
 				directionalLight.castShadow = true;
 				directionalLight.shadow.camera.top = 180;
@@ -92,8 +64,8 @@
 
 				// ground
 
-				var ground = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 2000, 2000 ),
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( 2000, 2000 ),
 					new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } )
 				);
 				ground.rotation.x = - Math.PI / 2;
@@ -101,7 +73,7 @@
 				ground.receiveShadow = true;
 				scene.add( ground );
 
-				var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
+				const grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
 				grid.position.y = - 75;
@@ -109,8 +81,8 @@
 
 				// export mesh
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 50, 15, 200, 30 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+				const geometry = new THREE.TorusKnotGeometry( 50, 15, 200, 30 );
+				const material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
 				mesh.position.y = 25;
@@ -126,21 +98,15 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 25, 0 );
 				controls.update();
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				var createGeometryButton = document.getElementById( 'createGeometry' );
-				createGeometryButton.addEventListener( 'click', createGeometry );
-
-				var createBufferGeometryButton = document.getElementById( 'createBufferGeometry' );
-				createBufferGeometryButton.addEventListener( 'click', createBufferGeometry );
-
-				var exportButton = document.getElementById( 'exportFile' );
+				const exportButton = document.getElementById( 'exportFile' );
 				exportButton.addEventListener( 'click', exportFile );
 
 			}
@@ -163,12 +129,12 @@
 
 			function exportFile() {
 
-				var result = exporter.parse( mesh.geometry );
+				const result = exporter.parse( mesh );
 				saveArrayBuffer( result, 'file.drc' );
 
 			}
 
-			var link = document.createElement( 'a' );
+			const link = document.createElement( 'a' );
 			link.style.display = 'none';
 			document.body.appendChild( link );
 

@@ -21,8 +21,10 @@
 			import { AmmoPhysics } from './jsm/physics/AmmoPhysics.js';
 			import Stats from './jsm/libs/stats.module.js';
 
-			var camera, scene, renderer, stats;
-			var physics, position;
+			let camera, scene, renderer, stats;
+			let physics, position;
+
+			let boxes, spheres;
 
 			init();
 
@@ -40,44 +42,67 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x666666 );
 
-				var light = new THREE.HemisphereLight();
-				light.intensity = 0.35;
-				scene.add( light );
+				const hemiLight = new THREE.HemisphereLight();
+				hemiLight.intensity = 0.35;
+				scene.add( hemiLight );
 
-				var light = new THREE.DirectionalLight();
-				light.position.set( 5, 5, 5 );
-				light.castShadow = true;
-				light.shadow.camera.zoom = 2;
-				scene.add( light );
+				const dirLight = new THREE.DirectionalLight();
+				dirLight.position.set( 5, 5, 5 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.zoom = 2;
+				scene.add( dirLight );
 
-				var plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 5, 5 ),
+				const floor = new THREE.Mesh(
+					new THREE.BoxGeometry( 10, 5, 10 ),
 					new THREE.ShadowMaterial( { color: 0x111111 } )
 				);
-				plane.rotation.x = - Math.PI / 2;
-				plane.receiveShadow = true;
-				scene.add( plane );
-				physics.addMesh( plane );
+				floor.position.y = - 2.5;
+				floor.receiveShadow = true;
+				scene.add( floor );
+				physics.addMesh( floor );
 
-				var geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1 );
-				var material = new THREE.MeshLambertMaterial();
-				var mesh = new THREE.InstancedMesh( geometry, material, 200 );
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
-				scene.add( mesh );
+				//
 
-				var matrix = new THREE.Matrix4();
-				var color = new THREE.Color();
+				const material = new THREE.MeshLambertMaterial();
 
-				for ( var i = 0; i < mesh.count; i ++ ) {
+				const matrix = new THREE.Matrix4();
+				const color = new THREE.Color();
+
+				// Boxes
+
+				const geometryBox = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
+				boxes = new THREE.InstancedMesh( geometryBox, material, 100 );
+				boxes.castShadow = true;
+				boxes.receiveShadow = true;
+				scene.add( boxes );
+
+				for ( let i = 0; i < boxes.count; i ++ ) {
 
 					matrix.setPosition( Math.random() - 0.5, Math.random() * 2, Math.random() - 0.5 );
-					mesh.setMatrixAt( i, matrix );
-					mesh.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
+					boxes.setMatrixAt( i, matrix );
+					boxes.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
 
 				}
 
-				physics.addMesh( mesh, 1 );
+				physics.addMesh( boxes, 1 );
+
+				// Spheres
+
+				const geometrySphere = new THREE.IcosahedronGeometry( 0.075, 3 );
+				spheres = new THREE.InstancedMesh( geometrySphere, material, 100 );
+				spheres.castShadow = true;
+				spheres.receiveShadow = true;
+				scene.add( spheres );
+
+				for ( let i = 0; i < spheres.count; i ++ ) {
+
+					matrix.setPosition( Math.random() - 0.5, Math.random() * 2, Math.random() - 0.5 );
+					spheres.setMatrixAt( i, matrix );
+					spheres.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
+
+				}
+
+				physics.addMesh( spheres, 1 );
 
 				//
 
@@ -93,7 +118,7 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.y = 0.5;
 				controls.update();
 
@@ -105,11 +130,19 @@
 
 				requestAnimationFrame( animate );
 
-				var mesh = scene.children[ 3 ];
-				var index = Math.floor( Math.random() * mesh.count );
+				//
 
-				position.set( 0, Math.random() * 2, 0 );
-				physics.setMeshPosition( mesh, position, index );
+				let index = Math.floor( Math.random() * boxes.count );
+
+				position.set( 0, Math.random() + 1, 0 );
+				physics.setMeshPosition( boxes, position, index );
+
+				//
+
+				index = Math.floor( Math.random() * spheres.count );
+
+				position.set( 0, Math.random() + 1, 0 );
+				physics.setMeshPosition( spheres, position, index );
 
 				renderer.render( scene, camera );
 

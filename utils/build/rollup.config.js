@@ -1,4 +1,16 @@
-import buble from 'rollup-plugin-buble';
+import babel from '@rollup/plugin-babel';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import { terser } from 'rollup-plugin-terser';
+
+if ( String.prototype.replaceAll === undefined ) {
+
+	String.prototype.replaceAll = function ( find, replace ) {
+
+		return this.split( find ).join( replace );
+
+	};
+
+}
 
 function glconstants() {
 
@@ -169,6 +181,27 @@ function glconstants() {
 
 }
 
+function addons() {
+
+	return {
+
+		transform( code, id ) {
+
+			if ( /\/examples\/jsm\//.test( id ) === false ) return;
+
+			code = code.replace( 'build/three.module.js', 'src/Three.js' );
+
+			return {
+				code: code,
+				map: null
+			};
+
+		}
+
+	};
+
+}
+
 function glsl() {
 
 	return {
@@ -177,7 +210,7 @@ function glsl() {
 
 			if ( /\.glsl.js$/.test( id ) === false ) return;
 
-			code = code.replace( /\/\* glsl \*\/\`((.|\n)*)\`/, function ( match, p1 ) {
+			code = code.replace( /\/\* glsl \*\/\`((.|\r|\n)*)\`/, function ( match, p1 ) {
 
 				return JSON.stringify(
 					p1
@@ -201,33 +234,15 @@ function glsl() {
 
 }
 
-function bubleCleanup() {
+function babelCleanup() {
 
-	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
-	const wrappedClass = /(var (\w+) = \/\*@__PURE__*\*\/\(function \((\w+)\) {\n).*(return \2;\s+}\(\3\)\);\n)/s;
-	const unwrap = function ( match, wrapperStart, klass, parentClass, wrapperEnd ) {
-
-		return match
-			.replace( wrapperStart, '' )
-			.replace( `if ( ${parentClass} ) ${klass}.__proto__ = ${parentClass};`, '' )
-			.replace(
-				`${klass}.prototype = Object.create( ${parentClass} && ${parentClass}.prototype );`,
-				`${klass}.prototype = Object.create( ${parentClass}.prototype );`
-			)
-			.replace( wrapperEnd, '' )
-			.replace( danglingTabs, '' );
-
-	};
+	const doubleSpaces = / {2}/g;
 
 	return {
 
 		transform( code ) {
 
-			while ( wrappedClass.test( code ) ) {
-
-				code = code.replace( wrappedClass, unwrap );
-
-			}
+			code = code.replace( doubleSpaces, '\t' );
 
 			return {
 				code: code,
@@ -240,19 +255,86 @@ function bubleCleanup() {
 
 }
 
+function header() {
+
+	return {
+
+		renderChunk( code ) {
+
+			return '// threejs.org/license\n' + code;
+
+		}
+
+	};
+
+}
+
+function polyfills() {
+
+	return {
+
+		transform( code, filePath ) {
+
+			if ( filePath.endsWith( 'src/Three.js' ) || filePath.endsWith( 'src\\Three.js' ) ) {
+
+				code = 'import \'regenerator-runtime\';\n' + code;
+				code = 'import \'./polyfills\';\n' + code;
+
+			}
+
+
+			return {
+				code: code,
+				map: null
+			};
+
+		}
+
+	};
+
+}
+
+const babelrc = {
+	presets: [
+		[
+			'@babel/preset-env',
+			{
+				modules: false,
+				// the supported browsers of the three.js browser bundle
+				// https://browsersl.ist/?q=%3E0.3%25%2C+not+dead
+				targets: '>0.3%, not dead',
+				loose: true,
+				bugfixes: true,
+			},
+		],
+	],
+	plugins: [
+		[
+			'@babel/plugin-proposal-class-properties',
+			{
+				loose: true
+			}
+		]
+	]
+};
+
 export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
+			polyfills(),
+			nodeResolve(),
+			addons(),
 			glconstants(),
 			glsl(),
-			buble( {
-				transforms: {
-					arrow: false,
-					classes: true
-				}
+			babel( {
+				babelHelpers: 'bundled',
+				compact: false,
+				babelrc: false,
+				...babelrc
 			} ),
-			bubleCleanup()
+			babelCleanup(),
+			header()
 		],
 		output: [
 			{
@@ -266,14 +348,40 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
+			polyfills(),
+			nodeResolve(),
+			addons(),
 			glconstants(),
-			glsl()
+			glsl(),
+			babel( {
+				babelHelpers: 'bundled',
+				babelrc: false,
+				...babelrc
+			} ),
+			babelCleanup(),
+			terser(),
+			header()
+		],
+		output: [
+			{
+				format: 'umd',
+				name: 'THREE',
+				file: 'build/three.min.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			addons(),
+			glconstants(),
+			glsl(),
+			header()
 		],
 		output: [
 			{
 				format: 'esm',
-				file: 'build/three.module.js',
-				indent: '\t'
+				file: 'build/three.module.js'
 			}
 		]
 	}

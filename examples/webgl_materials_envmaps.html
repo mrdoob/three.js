@@ -21,9 +21,9 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var controls, camera, scene, renderer;
-			var textureEquirec, textureCube;
-			var sphereMesh, sphereMaterial;
+			let controls, camera, scene, renderer;
+			let textureEquirec, textureCube;
+			let sphereMesh, sphereMaterial;
 
 			init();
 			animate();
@@ -41,18 +41,18 @@
 
 				// Lights
 
-				var ambient = new THREE.AmbientLight( 0xffffff );
+				const ambient = new THREE.AmbientLight( 0xffffff );
 				scene.add( ambient );
 
 				// Textures
 
-				var loader = new THREE.CubeTextureLoader();
+				const loader = new THREE.CubeTextureLoader();
 				loader.setPath( 'textures/cube/Bridge2/' );
 
 				textureCube = loader.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
 				textureCube.encoding = THREE.sRGBEncoding;
 
-				var textureLoader = new THREE.TextureLoader();
+				const textureLoader = new THREE.TextureLoader();
 
 				textureEquirec = textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg' );
 				textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
@@ -62,7 +62,7 @@
 
 				//
 
-				var geometry = new THREE.IcosahedronBufferGeometry( 400, 4 );
+				const geometry = new THREE.IcosahedronGeometry( 400, 15 );
 				sphereMaterial = new THREE.MeshLambertMaterial( { envMap: textureCube } );
 				sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
 				scene.add( sphereMesh );
@@ -83,7 +83,7 @@
 
 				//
 
-				var params = {
+				const params = {
 					Cube: function () {
 
 						scene.background = textureCube;
@@ -103,7 +103,7 @@
 					Refraction: false
 				};
 
-				var gui = new GUI();
+				const gui = new GUI();
 				gui.add( params, 'Cube' );
 				gui.add( params, 'Equirectangular' );
 				gui.add( params, 'Refraction' ).onChange( function ( value ) {
@@ -125,7 +125,7 @@
 				} );
 				gui.open();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

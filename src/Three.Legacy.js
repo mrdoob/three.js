@@ -24,23 +24,17 @@ import {
 import { BufferGeometry } from './core/BufferGeometry.js';
 import { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 import { InterleavedBuffer } from './core/InterleavedBuffer.js';
-import { Face3 } from './core/Face3.js';
-import { Geometry } from './core/Geometry.js';
 import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform.js';
 import { Raycaster } from './core/Raycaster.js';
 import { Curve } from './extras/core/Curve.js';
-import { CurvePath } from './extras/core/CurvePath.js';
 import { Path } from './extras/core/Path.js';
-import { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 import { AxesHelper } from './helpers/AxesHelper.js';
 import { BoxHelper } from './helpers/BoxHelper.js';
 import { GridHelper } from './helpers/GridHelper.js';
 import { SkeletonHelper } from './helpers/SkeletonHelper.js';
-import { BoxGeometry } from './geometries/BoxGeometry.js';
 import { EdgesGeometry } from './geometries/EdgesGeometry.js';
 import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
-import { ExtrudeBufferGeometry } from './geometries/ExtrudeGeometry.js';
 import { ShapeGeometry } from './geometries/ShapeGeometry.js';
 import { WireframeGeometry } from './geometries/WireframeGeometry.js';
 import { Light } from './lights/Light.js';
@@ -50,7 +44,6 @@ import { FileLoader } from './loaders/FileLoader.js';
 import { AudioLoader } from './loaders/AudioLoader.js';
 import { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
 import { DataTextureLoader } from './loaders/DataTextureLoader.js';
-import { ObjectLoader } from './loaders/ObjectLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
 import { LineBasicMaterial } from './materials/LineBasicMaterial.js';
@@ -90,15 +83,7 @@ import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
 import { Scene } from './scenes/Scene.js';
 
-export { BoxGeometry as CubeGeometry };
 export { MathUtils as Math };
-
-export function Face4( a, b, c, d, normal, color, materialIndex ) {
-
-	console.warn( 'THREE.Face4 has been removed. A THREE.Face3 will be created instead.' );
-	return new Face3( a, b, c, normal, color, materialIndex );
-
-}
 
 export const LineStrip = 0;
 export const LinePieces = 1;
@@ -113,9 +98,7 @@ export function MeshFaceMaterial( materials ) {
 
 }
 
-export function MultiMaterial( materials ) {
-
-	if ( materials === undefined ) materials = [];
+export function MultiMaterial( materials = [] ) {
 
 	console.warn( 'THREE.MultiMaterial has been removed. Use an Array instead.' );
 	materials.isMultiMaterial = true;
@@ -267,117 +250,12 @@ Curve.create = function ( construct, getPoint ) {
 
 //
 
-Object.assign( CurvePath.prototype, {
-
-	createPointsGeometry: function ( divisions ) {
-
-		console.warn( 'THREE.CurvePath: .createPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
-
-		// generate geometry from path points (for Line or Points objects)
-
-		const pts = this.getPoints( divisions );
-		return this.createGeometry( pts );
-
-	},
-
-	createSpacedPointsGeometry: function ( divisions ) {
-
-		console.warn( 'THREE.CurvePath: .createSpacedPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
-
-		// generate geometry from equidistant sampling along the path
-
-		const pts = this.getSpacedPoints( divisions );
-		return this.createGeometry( pts );
-
-	},
-
-	createGeometry: function ( points ) {
-
-		console.warn( 'THREE.CurvePath: .createGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
-
-		const geometry = new Geometry();
-
-		for ( let i = 0, l = points.length; i < l; i ++ ) {
-
-			const point = points[ i ];
-			geometry.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
-
-		}
-
-		return geometry;
-
-	}
-
-} );
-
-//
-
 Object.assign( Path.prototype, {
 
 	fromPoints: function ( points ) {
 
 		console.warn( 'THREE.Path: .fromPoints() has been renamed to .setFromPoints().' );
 		return this.setFromPoints( points );
-
-	}
-
-} );
-
-//
-
-export function ClosedSplineCurve3( points ) {
-
-	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
-
-	CatmullRomCurve3.call( this, points );
-	this.type = 'catmullrom';
-	this.closed = true;
-
-}
-
-ClosedSplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
-
-//
-
-export function SplineCurve3( points ) {
-
-	console.warn( 'THREE.SplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
-
-	CatmullRomCurve3.call( this, points );
-	this.type = 'catmullrom';
-
-}
-
-SplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
-
-//
-
-export function Spline( points ) {
-
-	console.warn( 'THREE.Spline has been removed. Use THREE.CatmullRomCurve3 instead.' );
-
-	CatmullRomCurve3.call( this, points );
-	this.type = 'catmullrom';
-
-}
-
-Spline.prototype = Object.create( CatmullRomCurve3.prototype );
-
-Object.assign( Spline.prototype, {
-
-	initFromArray: function ( /* a */ ) {
-
-		console.error( 'THREE.Spline: .initFromArray() has been removed.' );
-
-	},
-	getControlPointsArray: function ( /* optionalTarget */ ) {
-
-		console.error( 'THREE.Spline: .getControlPointsArray() has been removed.' );
-
-	},
-	reparametrizeByArcLength: function ( /* samplingCoef */ ) {
-
-		console.error( 'THREE.Spline: .reparametrizeByArcLength() has been removed.' );
 
 	}
 
@@ -467,17 +345,6 @@ export function BinaryTextureLoader( manager ) {
 	return new DataTextureLoader( manager );
 
 }
-
-Object.assign( ObjectLoader.prototype, {
-
-	setTexturePath: function ( value ) {
-
-		console.warn( 'THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().' );
-		return this.setResourcePath( value );
-
-	}
-
-} );
 
 //
 
@@ -597,7 +464,7 @@ Object.assign( Matrix3.prototype, {
 
 	flattenToArrayOffset: function ( array, offset ) {
 
-		console.warn( "THREE.Matrix3: .flattenToArrayOffset() has been deprecated. Use .toArray() instead." );
+		console.warn( 'THREE.Matrix3: .flattenToArrayOffset() has been deprecated. Use .toArray() instead.' );
 		return this.toArray( array, offset );
 
 	},
@@ -622,6 +489,12 @@ Object.assign( Matrix3.prototype, {
 
 		console.error( 'THREE.Matrix3: .applyToVector3Array() has been removed.' );
 
+	},
+	getInverse: function ( matrix ) {
+
+		console.warn( 'THREE.Matrix3: .getInverse() has been removed. Use matrixInv.copy( matrix ).invert(); instead.' );
+		return this.copy( matrix ).invert();
+
 	}
 
 } );
@@ -636,7 +509,7 @@ Object.assign( Matrix4.prototype, {
 	},
 	flattenToArrayOffset: function ( array, offset ) {
 
-		console.warn( "THREE.Matrix4: .flattenToArrayOffset() has been deprecated. Use .toArray() instead." );
+		console.warn( 'THREE.Matrix4: .flattenToArrayOffset() has been deprecated. Use .toArray() instead.' );
 		return this.toArray( array, offset );
 
 	},
@@ -727,6 +600,12 @@ Object.assign( Matrix4.prototype, {
 		console.warn( 'THREE.Matrix4: .makeFrustum() has been removed. Use .makePerspective( left, right, top, bottom, near, far ) instead.' );
 		return this.makePerspective( left, right, top, bottom, near, far );
 
+	},
+	getInverse: function ( matrix ) {
+
+		console.warn( 'THREE.Matrix4: .getInverse() has been removed. Use matrixInv.copy( matrix ).invert(); instead.' );
+		return this.copy( matrix ).invert();
+
 	}
 
 } );
@@ -738,12 +617,22 @@ Plane.prototype.isIntersectionLine = function ( line ) {
 
 };
 
-Quaternion.prototype.multiplyVector3 = function ( vector ) {
+Object.assign( Quaternion.prototype, {
 
-	console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
-	return vector.applyQuaternion( this );
+	multiplyVector3: function ( vector ) {
 
-};
+		console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
+		return vector.applyQuaternion( this );
+
+	},
+	inverse: function ( ) {
+
+		console.warn( 'THREE.Quaternion: .inverse() has been renamed to invert().' );
+		return this.invert();
+
+	}
+
+} );
 
 Object.assign( Ray.prototype, {
 
@@ -942,27 +831,6 @@ Object.assign( Vector4.prototype, {
 
 //
 
-Object.assign( Geometry.prototype, {
-
-	computeTangents: function () {
-
-		console.error( 'THREE.Geometry: .computeTangents() has been removed.' );
-
-	},
-	computeLineDistances: function () {
-
-		console.error( 'THREE.Geometry: .computeLineDistances() has been removed. Use THREE.Line.computeLineDistances() instead.' );
-
-	},
-	applyMatrix: function ( matrix ) {
-
-		console.warn( 'THREE.Geometry: .applyMatrix() has been renamed to .applyMatrix4().' );
-		return this.applyMatrix4( matrix );
-
-	}
-
-} );
-
 Object.assign( Object3D.prototype, {
 
 	getChildByName: function ( name ) {
@@ -1110,8 +978,8 @@ Object.defineProperty( Curve.prototype, '__arcLengthDivisions', {
 
 PerspectiveCamera.prototype.setLens = function ( focalLength, filmGauge ) {
 
-	console.warn( "THREE.PerspectiveCamera.setLens is deprecated. " +
-			"Use .setFocalLength and .filmGauge for a photographic setup." );
+	console.warn( 'THREE.PerspectiveCamera.setLens is deprecated. ' +
+			'Use .setFocalLength and .filmGauge for a photographic setup.' );
 
 	if ( filmGauge !== undefined ) this.filmGauge = filmGauge;
 	this.setFocalLength( focalLength );
@@ -1323,11 +1191,6 @@ Object.assign( BufferGeometry.prototype, {
 		this.clearGroups();
 
 	},
-	computeTangents: function () {
-
-		console.warn( 'THREE.BufferGeometry: .computeTangents() has been removed.' );
-
-	},
 	computeOffsets: function () {
 
 		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.' );
@@ -1444,23 +1307,23 @@ Object.assign( InterleavedBuffer.prototype, {
 
 //
 
-Object.assign( ExtrudeBufferGeometry.prototype, {
+Object.assign( ExtrudeGeometry.prototype, {
 
 	getArrays: function () {
 
-		console.error( 'THREE.ExtrudeBufferGeometry: .getArrays() has been removed.' );
+		console.error( 'THREE.ExtrudeGeometry: .getArrays() has been removed.' );
 
 	},
 
 	addShapeList: function () {
 
-		console.error( 'THREE.ExtrudeBufferGeometry: .addShapeList() has been removed.' );
+		console.error( 'THREE.ExtrudeGeometry: .addShapeList() has been removed.' );
 
 	},
 
 	addShape: function () {
 
-		console.error( 'THREE.ExtrudeBufferGeometry: .addShape() has been removed.' );
+		console.error( 'THREE.ExtrudeGeometry: .addShape() has been removed.' );
 
 	}
 
@@ -2118,34 +1981,10 @@ CubeCamera.prototype.updateCubeMap = function ( renderer, scene ) {
 
 };
 
-//
+CubeCamera.prototype.clear = function ( renderer, color, depth, stencil ) {
 
-export const GeometryUtils = {
-
-	merge: function ( geometry1, geometry2, materialIndexOffset ) {
-
-		console.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
-		let matrix;
-
-		if ( geometry2.isMesh ) {
-
-			geometry2.matrixAutoUpdate && geometry2.updateMatrix();
-
-			matrix = geometry2.matrix;
-			geometry2 = geometry2.geometry;
-
-		}
-
-		geometry1.merge( geometry2, matrix, materialIndexOffset );
-
-	},
-
-	center: function ( geometry ) {
-
-		console.warn( 'THREE.GeometryUtils: .center() has been moved to Geometry. Use geometry.center() instead.' );
-		return geometry.center();
-
-	}
+	console.warn( 'THREE.CubeCamera: .clear() is now .renderTarget.clear().' );
+	return this.renderTarget.clear( renderer, color, depth, stencil );
 
 };
 

@@ -3,7 +3,7 @@ import { Object3D } from '../core/Object3D.js';
 
 class OrthographicCamera extends Camera {
 
-	constructor( left, right, top, bottom, near, far ) {
+	constructor( left = - 1, right = 1, top = 1, bottom = - 1, near = 0.1, far = 2000 ) {
 
 		super();
 
@@ -12,7 +12,14 @@ class OrthographicCamera extends Camera {
 		this.type = 'OrthographicCamera';
 
 		this.zoom = 1;
-		this.view = null;
+		this.view = null
+    this.left = left;
+    this.right = right;
+    this.top = top;
+    this.bottom = bottom;
+
+    this.near = near;
+    this.far = far;
 
 		this.left = ( left !== undefined ) ? left : - 1;
 		this.right = ( right !== undefined ) ? right : 1;
@@ -110,7 +117,7 @@ class OrthographicCamera extends Camera {
 
 		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far );
 
-		this.projectionMatrixInverse.getInverse( this.projectionMatrix );
+		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 
 	}
 

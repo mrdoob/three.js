@@ -19,9 +19,9 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Sky } from './jsm/objects/Sky.js';
 
-			var camera, controls, scene, renderer;
+			let camera, scene, renderer;
 
-			var sky, sun;
+			let sky, sun;
 
 			init();
 			render();
@@ -37,7 +37,7 @@
 
 				/// GUI
 
-				var effectController = {
+				const effectController = {
 					turbidity: 10,
 					rayleigh: 3,
 					mieCoefficient: 0.005,
@@ -49,14 +49,14 @@
 
 				function guiChanged() {
 
-					var uniforms = sky.material.uniforms;
+					const uniforms = sky.material.uniforms;
 					uniforms[ "turbidity" ].value = effectController.turbidity;
 					uniforms[ "rayleigh" ].value = effectController.rayleigh;
 					uniforms[ "mieCoefficient" ].value = effectController.mieCoefficient;
 					uniforms[ "mieDirectionalG" ].value = effectController.mieDirectionalG;
 
-					var theta = Math.PI * ( effectController.inclination - 0.5 );
-					var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
+					const theta = Math.PI * ( effectController.inclination - 0.5 );
+					const phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
 
 					sun.x = Math.cos( phi );
 					sun.y = Math.sin( phi ) * Math.sin( theta );
@@ -69,7 +69,7 @@
 
 				}
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( effectController, "turbidity", 0.0, 20.0, 0.1 ).onChange( guiChanged );
 				gui.add( effectController, "rayleigh", 0.0, 4, 0.001 ).onChange( guiChanged );
@@ -90,7 +90,7 @@
 
 				scene = new THREE.Scene();
 
-				var helper = new THREE.GridHelper( 10000, 2, 0xffffff, 0xffffff );
+				const helper = new THREE.GridHelper( 10000, 2, 0xffffff, 0xffffff );
 				scene.add( helper );
 
 				renderer = new THREE.WebGLRenderer();
@@ -101,7 +101,7 @@
 				renderer.toneMappingExposure = 0.5;
 				document.body.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				//controls.maxPolarAngle = Math.PI / 2;
 				controls.enableZoom = false;
@@ -109,7 +109,7 @@
 
 				initSky();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -28,6 +28,8 @@ import { Color } from '../math/Color.js';
  *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
+ *
+ *  flatShading: <bool>
  * }
  */
 
@@ -61,6 +63,8 @@ function MeshMatcapMaterial( parameters ) {
 	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
+
+	this.flatShading = false;
 
 	this.setValues( parameters );
 
@@ -99,6 +103,8 @@ MeshMatcapMaterial.prototype.copy = function ( source ) {
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
+
+	this.flatShading = source.flatShading;
 
 	return this;
 

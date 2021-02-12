@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -38,12 +37,12 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var a = new THREE.Vector4( 0, 1, 0, 0 );
+		const a = new THREE.Vector4( 0, 1, 0, 0 );
 
 		//no arguments; will be initialised to (0, 0, 0, 1)
-		var b = new THREE.Vector4( );
+		const b = new THREE.Vector4( );
 
-		var d = a.dot( b );
+		const d = a.dot( b );
 		</code>
 
 
@@ -240,6 +239,9 @@
 		如果该向量的x值、y值、z值或w值大于所传入[page:Vector4 v]的x值、y值、z值或w值，
 		则将该值替换为对应的最小值。
 		</p>
+
+		<h3>[method:this multiply]( [param:Vector4 v] )</h3>
+		<p>将该向量与所传入的向量[page:Vector4 v]进行相乘。</p>
 
 		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
 		<p>将该向量与所传入的标量[page:Float s]进行相乘。</p>

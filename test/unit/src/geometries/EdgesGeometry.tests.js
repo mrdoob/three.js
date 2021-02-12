@@ -1,7 +1,6 @@
 /* global QUnit */
 
 import { EdgesGeometry } from '../../../../src/geometries/EdgesGeometry';
-import { Geometry } from '../../../../src/core/Geometry';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { Vector3 } from '../../../../src/math/Vector3';
@@ -41,10 +40,8 @@ function testEdges( vertList, idxList, numAfter, assert ) {
 function createGeometries( vertList, idxList ) {
 
 	var geomIB = createIndexedBufferGeometry( vertList, idxList );
-	var geom = new Geometry().fromBufferGeometry( geomIB );
-	var geomB = new BufferGeometry().fromGeometry( geom );
 	var geomDC = addDrawCalls( geomIB.clone() );
-	return [ geom, geomB, geomIB, geomDC ];
+	return [ geomIB, geomDC ];
 
 }
 
@@ -285,7 +282,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( "three triangles, coplanar first", ( assert ) => {
 
-			testEdges( vertList, [ 0, 1, 2, 0, 2, 3, 0, 4, 2 ], 7, assert );
+			testEdges( vertList, [ 0, 2, 3, 0, 1, 2, 0, 4, 2 ], 7, assert );
 
 		} );
 

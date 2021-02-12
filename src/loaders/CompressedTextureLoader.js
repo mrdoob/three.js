@@ -26,12 +26,12 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 		const images = [];
 
 		const texture = new CompressedTexture();
-		texture.image = images;
 
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 
 		let loaded = 0;
 
@@ -52,9 +52,9 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 
 				if ( loaded === 6 ) {
 
-					if ( texDatas.mipmapCount === 1 )
-						texture.minFilter = LinearFilter;
+					if ( texDatas.mipmapCount === 1 ) texture.minFilter = LinearFilter;
 
+					texture.image = images;
 					texture.format = texDatas.format;
 					texture.needsUpdate = true;
 
@@ -100,6 +100,8 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 						}
 
 					}
+
+					texture.image = images;
 
 				} else {
 

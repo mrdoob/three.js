@@ -57,21 +57,23 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var renderer, scene, camera, stats;
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
-			var particles;
+			let renderer, scene, camera, stats;
 
-			var PARTICLE_SIZE = 20;
+			let particles;
 
-			var raycaster, intersects;
-			var mouse, INTERSECTED;
+			const PARTICLE_SIZE = 20;
+
+			let raycaster, intersects;
+			let mouse, INTERSECTED;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				scene = new THREE.Scene();
 
@@ -80,19 +82,25 @@
 
 				//
 
-				var vertices = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 ).vertices;
+				let boxGeometry = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 );
 
-				var positions = new Float32Array( vertices.length * 3 );
-				var colors = new Float32Array( vertices.length * 3 );
-				var sizes = new Float32Array( vertices.length );
+				// if normal and uv attributes are not removed, mergeVertices() can't consolidate indentical vertices with different normal/uv data
 
-				var vertex;
-				var color = new THREE.Color();
+				boxGeometry.deleteAttribute( 'normal' );
+				boxGeometry.deleteAttribute( 'uv' );
 
-				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+				boxGeometry = BufferGeometryUtils.mergeVertices( boxGeometry );
 
-					vertex = vertices[ i ];
-					vertex.toArray( positions, i * 3 );
+				//
+
+				const positionAttribute = boxGeometry.getAttribute( 'position' );
+
+				const colors = [];
+				const sizes = [];
+
+				const color = new THREE.Color();
+
+				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
 
 					color.setHSL( 0.01 + 0.1 * ( i / l ), 1.0, 0.5 );
 					color.toArray( colors, i * 3 );
@@ -101,18 +109,18 @@
 
 				}
 
-				var geometry = new THREE.BufferGeometry();
-				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.setAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
-				geometry.setAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'customColor', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ) );
 
 				//
 
-				var material = new THREE.ShaderMaterial( {
+				const material = new THREE.ShaderMaterial( {
 
 					uniforms: {
 						color: { value: new THREE.Color( 0xffffff ) },
-						pointTexture: { value: new THREE.TextureLoader().load( "textures/sprites/disc.png" ) }
+						pointTexture: { value: new THREE.TextureLoader().load( 'textures/sprites/disc.png' ) }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
@@ -145,8 +153,8 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			}
 
@@ -182,8 +190,8 @@
 				particles.rotation.x += 0.0005;
 				particles.rotation.y += 0.001;
 
-				var geometry = particles.geometry;
-				var attributes = geometry.attributes;
+				const geometry = particles.geometry;
+				const attributes = geometry.attributes;
 
 				raycaster.setFromCamera( mouse, camera );
 

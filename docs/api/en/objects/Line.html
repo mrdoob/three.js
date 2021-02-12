@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -25,28 +24,28 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var material = new THREE.LineBasicMaterial({
+		const material = new THREE.LineBasicMaterial({
 			color: 0x0000ff
 		});
 
-		var points = [];
+		const points = [];
 		points.push( new THREE.Vector3( - 10, 0, 0 ) );
 		points.push( new THREE.Vector3( 0, 10, 0 ) );
 		points.push( new THREE.Vector3( 10, 0, 0 ) );
 
-		var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-		var line = new THREE.Line( geometry, material );
+		const line = new THREE.Line( geometry, material );
 		scene.add( line );
 		</code>
 
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
 
 		<p>
-		[page:Geometry geometry] — vertices representing the line segment(s). Default is a new [page:BufferGeometry].<br />
+		[page:BufferGeometry geometry] — vertices representing the line segment(s). Default is a new [page:BufferGeometry].<br />
 		[page:Material material] — material for the line. Default is a new [page:LineBasicMaterial].<br />
 		</p>
 
@@ -54,7 +53,7 @@
 		<p>See the base [page:Object3D] class for common properties.</p>
 
 
-		<h3>[property:Geometry geometry]</h3>
+		<h3>[property:BufferGeometry geometry]</h3>
 		<p>Vertices representing the line segment(s).</p>
 
 		<h3>[property:Material material]</h3>

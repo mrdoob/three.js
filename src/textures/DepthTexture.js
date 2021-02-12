@@ -22,7 +22,7 @@ function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, mi
 	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
 
 	this.flipY = false;
-	this.generateMipmaps	= false;
+	this.generateMipmaps = false;
 
 }
 

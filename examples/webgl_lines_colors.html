@@ -19,12 +19,12 @@
 
 			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
-			var mouseX = 0, mouseY = 0;
+			let mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
 			animate();
@@ -43,27 +43,27 @@
 
 				//
 
-				var hilbertPoints = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				const hilbertPoints = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
-				var geometry1 = new THREE.BufferGeometry();
-				var geometry2 = new THREE.BufferGeometry();
-				var geometry3 = new THREE.BufferGeometry();
+				const geometry1 = new THREE.BufferGeometry();
+				const geometry2 = new THREE.BufferGeometry();
+				const geometry3 = new THREE.BufferGeometry();
 
-				var subdivisions = 6;
+				const subdivisions = 6;
 
-				var vertices = [];
-				var colors1 = [];
-				var colors2 = [];
-				var colors3 = [];
+				let vertices = [];
+				let colors1 = [];
+				let colors2 = [];
+				let colors3 = [];
 
-				var point = new THREE.Vector3();
-				var color = new THREE.Color();
+				const point = new THREE.Vector3();
+				const color = new THREE.Color();
 
-				var spline = new THREE.CatmullRomCurve3( hilbertPoints );
+				const spline = new THREE.CatmullRomCurve3( hilbertPoints );
 
-				for ( var i = 0; i < hilbertPoints.length * subdivisions; i ++ ) {
+				for ( let i = 0; i < hilbertPoints.length * subdivisions; i ++ ) {
 
-					var t = i / ( hilbertPoints.length * subdivisions );
+					const t = i / ( hilbertPoints.length * subdivisions );
 					spline.getPoint( t, point );
 
 					vertices.push( point.x, point.y, point.z );
@@ -89,18 +89,18 @@
 
 				//
 
-				var geometry4 = new THREE.BufferGeometry();
-				var geometry5 = new THREE.BufferGeometry();
-				var geometry6 = new THREE.BufferGeometry();
+				const geometry4 = new THREE.BufferGeometry();
+				const geometry5 = new THREE.BufferGeometry();
+				const geometry6 = new THREE.BufferGeometry();
 
 				vertices = [];
 				colors1 = [];
 				colors2 = [];
 				colors3 = [];
 
-				for ( var i = 0; i < hilbertPoints.length; i ++ ) {
+				for ( let i = 0; i < hilbertPoints.length; i ++ ) {
 
-					var point = hilbertPoints[ i ];
+					const point = hilbertPoints[ i ];
 
 					vertices.push( point.x, point.y, point.z );
 
@@ -127,9 +127,10 @@
 
 				var	material = new THREE.LineBasicMaterial( { color: 0xffffff, vertexColors: true } );
 
-				var line, p, scale = 0.3, d = 225;
+				let line, p;
+				const scale = 0.3, d = 225;
 
-				var parameters = [
+				const parameters = [
 					[ material, scale * 1.5, [ - d, - d / 2, 0 ], geometry1 ],
 					[ material, scale * 1.5, [ 0, - d / 2, 0 ], geometry2 ],
 					[ material, scale * 1.5, [ d, - d / 2, 0 ], geometry3 ],
@@ -139,7 +140,7 @@
 					[ material, scale * 1.5, [ d, d / 2, 0 ], geometry6 ],
 				];
 
-				for ( var i = 0; i < parameters.length; i ++ ) {
+				for ( let i = 0; i < parameters.length; i ++ ) {
 
 					p = parameters[ i ];
 					line = new THREE.Line( p[ 3 ], p[ 0 ] );
@@ -153,13 +154,12 @@
 
 				//
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				document.body.style.touchAction = 'none';
+				document.body.addEventListener( 'pointermove', onPointerMove );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -177,36 +177,12 @@
 
 			//
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
+
+				if ( event.isPrimary === false ) return;
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
-
-			}
-
-			function onDocumentTouchStart( event ) {
-
-				if ( event.touches.length > 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length == 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
 
 			}
 
@@ -226,11 +202,11 @@
 
 				camera.lookAt( scene.position );
 
-				var time = Date.now() * 0.0005;
+				const time = Date.now() * 0.0005;
 
-				for ( var i = 0; i < scene.children.length; i ++ ) {
+				for ( let i = 0; i < scene.children.length; i ++ ) {
 
-					var object = scene.children[ i ];
+					const object = scene.children[ i ];
 
 					if ( object.isLine ) {
 

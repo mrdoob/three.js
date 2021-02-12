@@ -29,25 +29,25 @@
 			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			// Graphics variables
-			var container, stats;
-			var camera, controls, scene, renderer;
-			var textureLoader;
-			var clock = new THREE.Clock();
-			var clickRequest = false;
-			var mouseCoords = new THREE.Vector2();
-			var raycaster = new THREE.Raycaster();
-			var ballMaterial = new THREE.MeshPhongMaterial( { color: 0x202020 } );
-			var pos = new THREE.Vector3();
-			var quat = new THREE.Quaternion();
+			let container, stats;
+			let camera, controls, scene, renderer;
+			let textureLoader;
+			const clock = new THREE.Clock();
+			let clickRequest = false;
+			const mouseCoords = new THREE.Vector2();
+			const raycaster = new THREE.Raycaster();
+			const ballMaterial = new THREE.MeshPhongMaterial( { color: 0x202020 } );
+			const pos = new THREE.Vector3();
+			const quat = new THREE.Quaternion();
 
 			// Physics variables
-			var gravityConstant = - 9.8;
-			var physicsWorld;
-			var rigidBodies = [];
-			var softBodies = [];
-			var margin = 0.05;
-			var transformAux1;
-			var softBodyHelpers;
+			const gravityConstant = - 9.8;
+			let physicsWorld;
+			const rigidBodies = [];
+			const softBodies = [];
+			const margin = 0.05;
+			let transformAux1;
+			let softBodyHelpers;
 
 			Ammo().then( function ( AmmoLib ) {
 
@@ -93,13 +93,13 @@
 
 				textureLoader = new THREE.TextureLoader();
 
-				var ambientLight = new THREE.AmbientLight( 0x404040 );
+				const ambientLight = new THREE.AmbientLight( 0x404040 );
 				scene.add( ambientLight );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				const light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( - 10, 10, 5 );
 				light.castShadow = true;
-				var d = 20;
+				const d = 20;
 				light.shadow.camera.left = - d;
 				light.shadow.camera.right = d;
 				light.shadow.camera.top = d;
@@ -119,7 +119,7 @@
 				container.appendChild( stats.domElement );
 
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -127,11 +127,11 @@
 
 				// Physics configuration
 
-				var collisionConfiguration = new Ammo.btSoftBodyRigidBodyCollisionConfiguration();
-				var dispatcher = new Ammo.btCollisionDispatcher( collisionConfiguration );
-				var broadphase = new Ammo.btDbvtBroadphase();
-				var solver = new Ammo.btSequentialImpulseConstraintSolver();
-				var softBodySolver = new Ammo.btDefaultSoftBodySolver();
+				const collisionConfiguration = new Ammo.btSoftBodyRigidBodyCollisionConfiguration();
+				const dispatcher = new Ammo.btCollisionDispatcher( collisionConfiguration );
+				const broadphase = new Ammo.btDbvtBroadphase();
+				const solver = new Ammo.btSequentialImpulseConstraintSolver();
+				const softBodySolver = new Ammo.btDefaultSoftBodySolver();
 				physicsWorld = new Ammo.btSoftRigidDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration, softBodySolver );
 				physicsWorld.setGravity( new Ammo.btVector3( 0, gravityConstant, 0 ) );
 				physicsWorld.getWorldInfo().set_m_gravity( new Ammo.btVector3( 0, gravityConstant, 0 ) );
@@ -146,7 +146,7 @@
 				// Ground
 				pos.set( 0, - 0.5, 0 );
 				quat.set( 0, 0, 0, 1 );
-				var ground = createParalellepiped( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
+				const ground = createParalellepiped( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
 				ground.castShadow = true;
 				ground.receiveShadow = true;
 				textureLoader.load( "textures/grid.png", function ( texture ) {
@@ -160,20 +160,20 @@
 				} );
 
 				// Create soft volumes
-				var volumeMass = 15;
+				const volumeMass = 15;
 
-				var sphereGeometry = new THREE.SphereBufferGeometry( 1.5, 40, 25 );
+				const sphereGeometry = new THREE.SphereGeometry( 1.5, 40, 25 );
 				sphereGeometry.translate( 5, 5, 0 );
 				createSoftVolume( sphereGeometry, volumeMass, 250 );
 
-				var boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 5, 4, 4, 20 );
+				const boxGeometry = new THREE.BoxGeometry( 1, 1, 5, 4, 4, 20 );
 				boxGeometry.translate( - 2, 5, 0 );
 				createSoftVolume( boxGeometry, volumeMass, 120 );
 
 				// Ramp
 				pos.set( 3, 1, 0 );
 				quat.setFromAxisAngle( new THREE.Vector3( 0, 0, 1 ), 30 * Math.PI / 180 );
-				var obstacle = createParalellepiped( 10, 1, 4, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0x606060 } ) );
+				const obstacle = createParalellepiped( 10, 1, 4, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0x606060 } ) );
 				obstacle.castShadow = true;
 				obstacle.receiveShadow = true;
 
@@ -182,12 +182,12 @@
 			function processGeometry( bufGeometry ) {
 
 				// Ony consider the position values when merging the vertices
-				var posOnlyBufGeometry = new THREE.BufferGeometry();
+				const posOnlyBufGeometry = new THREE.BufferGeometry();
 				posOnlyBufGeometry.setAttribute( 'position', bufGeometry.getAttribute( 'position' ) );
 				posOnlyBufGeometry.setIndex( bufGeometry.getIndex() );
 
 				// Merge the vertices so the triangle soup is converted to indexed triangles
-				var indexedBufferGeom = BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
+				const indexedBufferGeom = BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
 
 				// Create index arrays mapping the indexed vertices to bufGeometry vertices
 				mapIndices( bufGeometry, indexedBufferGeom );
@@ -196,7 +196,7 @@
 
 			function isEqual( x1, y1, z1, x2, y2, z2 ) {
 
-				var delta = 0.000001;
+				const delta = 0.000001;
 				return Math.abs( x2 - x1 ) < delta &&
 						Math.abs( y2 - y1 ) < delta &&
 						Math.abs( z2 - z1 ) < delta;
@@ -207,27 +207,27 @@
 
 				// Creates ammoVertices, ammoIndices and ammoIndexAssociation in bufGeometry
 
-				var vertices = bufGeometry.attributes.position.array;
-				var idxVertices = indexedBufferGeom.attributes.position.array;
-				var indices = indexedBufferGeom.index.array;
+				const vertices = bufGeometry.attributes.position.array;
+				const idxVertices = indexedBufferGeom.attributes.position.array;
+				const indices = indexedBufferGeom.index.array;
 
-				var numIdxVertices = idxVertices.length / 3;
-				var numVertices = vertices.length / 3;
+				const numIdxVertices = idxVertices.length / 3;
+				const numVertices = vertices.length / 3;
 
 				bufGeometry.ammoVertices = idxVertices;
 				bufGeometry.ammoIndices = indices;
 				bufGeometry.ammoIndexAssociation = [];
 
-				for ( var i = 0; i < numIdxVertices; i ++ ) {
+				for ( let i = 0; i < numIdxVertices; i ++ ) {
 
-					var association = [];
+					const association = [];
 					bufGeometry.ammoIndexAssociation.push( association );
 
-					var i3 = i * 3;
+					const i3 = i * 3;
 
-					for ( var j = 0; j < numVertices; j ++ ) {
+					for ( let j = 0; j < numVertices; j ++ ) {
 
-						var j3 = j * 3;
+						const j3 = j * 3;
 						if ( isEqual( idxVertices[ i3 ], idxVertices[ i3 + 1 ], idxVertices[ i3 + 2 ],
 							vertices[ j3 ], vertices[ j3 + 1 ], vertices[ j3 + 2 ] ) ) {
 
@@ -245,7 +245,7 @@
 
 				processGeometry( bufferGeom );
 
-				var volume = new THREE.Mesh( bufferGeom, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
+				const volume = new THREE.Mesh( bufferGeom, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
 				volume.castShadow = true;
 				volume.receiveShadow = true;
 				volume.frustumCulled = false;
@@ -260,14 +260,14 @@
 
 				// Volume physic object
 
-				var volumeSoftBody = softBodyHelpers.CreateFromTriMesh(
+				const volumeSoftBody = softBodyHelpers.CreateFromTriMesh(
 					physicsWorld.getWorldInfo(),
 					bufferGeom.ammoVertices,
 					bufferGeom.ammoIndices,
 					bufferGeom.ammoIndices.length / 3,
 					true );
 
-				var sbConfig = volumeSoftBody.get_m_cfg();
+				const sbConfig = volumeSoftBody.get_m_cfg();
 				sbConfig.set_viterations( 40 );
 				sbConfig.set_piterations( 40 );
 
@@ -297,8 +297,8 @@
 
 			function createParalellepiped( sx, sy, sz, mass, pos, quat, material ) {
 
-				var threeObject = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
-				var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
+				const threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
+				const shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 				shape.setMargin( margin );
 
 				createRigidBody( threeObject, shape, mass, pos, quat );
@@ -312,17 +312,17 @@
 				threeObject.position.copy( pos );
 				threeObject.quaternion.copy( quat );
 
-				var transform = new Ammo.btTransform();
+				const transform = new Ammo.btTransform();
 				transform.setIdentity();
 				transform.setOrigin( new Ammo.btVector3( pos.x, pos.y, pos.z ) );
 				transform.setRotation( new Ammo.btQuaternion( quat.x, quat.y, quat.z, quat.w ) );
-				var motionState = new Ammo.btDefaultMotionState( transform );
+				const motionState = new Ammo.btDefaultMotionState( transform );
 
-				var localInertia = new Ammo.btVector3( 0, 0, 0 );
+				const localInertia = new Ammo.btVector3( 0, 0, 0 );
 				physicsShape.calculateLocalInertia( mass, localInertia );
 
-				var rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, physicsShape, localInertia );
-				var body = new Ammo.btRigidBody( rbInfo );
+				const rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, physicsShape, localInertia );
+				const body = new Ammo.btRigidBody( rbInfo );
 
 				threeObject.userData.physicsBody = body;
 
@@ -345,7 +345,7 @@
 
 			function initInput() {
 
-				window.addEventListener( 'mousedown', function ( event ) {
+				window.addEventListener( 'pointerdown', function ( event ) {
 
 					if ( ! clickRequest ) {
 
@@ -358,7 +358,7 @@
 
 					}
 
-				}, false );
+				} );
 
 			}
 
@@ -369,18 +369,18 @@
 					raycaster.setFromCamera( mouseCoords, camera );
 
 					// Creates a ball
-					var ballMass = 3;
-					var ballRadius = 0.4;
+					const ballMass = 3;
+					const ballRadius = 0.4;
 
-					var ball = new THREE.Mesh( new THREE.SphereBufferGeometry( ballRadius, 18, 16 ), ballMaterial );
+					const ball = new THREE.Mesh( new THREE.SphereGeometry( ballRadius, 18, 16 ), ballMaterial );
 					ball.castShadow = true;
 					ball.receiveShadow = true;
-					var ballShape = new Ammo.btSphereShape( ballRadius );
+					const ballShape = new Ammo.btSphereShape( ballRadius );
 					ballShape.setMargin( margin );
 					pos.copy( raycaster.ray.direction );
 					pos.add( raycaster.ray.origin );
 					quat.set( 0, 0, 0, 1 );
-					var ballBody = createRigidBody( ball, ballShape, ballMass, pos, quat );
+					const ballBody = createRigidBody( ball, ballShape, ballMass, pos, quat );
 					ballBody.setFriction( 0.5 );
 
 					pos.copy( raycaster.ray.direction );
@@ -413,7 +413,7 @@
 
 			function render() {
 
-				var deltaTime = clock.getDelta();
+				const deltaTime = clock.getDelta();
 
 				updatePhysics( deltaTime );
 
@@ -429,33 +429,33 @@
 				physicsWorld.stepSimulation( deltaTime, 10 );
 
 				// Update soft volumes
-				for ( var i = 0, il = softBodies.length; i < il; i ++ ) {
+				for ( let i = 0, il = softBodies.length; i < il; i ++ ) {
 
-					var volume = softBodies[ i ];
-					var geometry = volume.geometry;
-					var softBody = volume.userData.physicsBody;
-					var volumePositions = geometry.attributes.position.array;
-					var volumeNormals = geometry.attributes.normal.array;
-					var association = geometry.ammoIndexAssociation;
-					var numVerts = association.length;
-					var nodes = softBody.get_m_nodes();
-					for ( var j = 0; j < numVerts; j ++ ) {
+					const volume = softBodies[ i ];
+					const geometry = volume.geometry;
+					const softBody = volume.userData.physicsBody;
+					const volumePositions = geometry.attributes.position.array;
+					const volumeNormals = geometry.attributes.normal.array;
+					const association = geometry.ammoIndexAssociation;
+					const numVerts = association.length;
+					const nodes = softBody.get_m_nodes();
+					for ( let j = 0; j < numVerts; j ++ ) {
 
-						var node = nodes.at( j );
-						var nodePos = node.get_m_x();
-						var x = nodePos.x();
-						var y = nodePos.y();
-						var z = nodePos.z();
-						var nodeNormal = node.get_m_n();
-						var nx = nodeNormal.x();
-						var ny = nodeNormal.y();
-						var nz = nodeNormal.z();
+						const node = nodes.at( j );
+						const nodePos = node.get_m_x();
+						const x = nodePos.x();
+						const y = nodePos.y();
+						const z = nodePos.z();
+						const nodeNormal = node.get_m_n();
+						const nx = nodeNormal.x();
+						const ny = nodeNormal.y();
+						const nz = nodeNormal.z();
 
-						var assocVertex = association[ j ];
+						const assocVertex = association[ j ];
 
-						for ( var k = 0, kl = assocVertex.length; k < kl; k ++ ) {
+						for ( let k = 0, kl = assocVertex.length; k < kl; k ++ ) {
 
-							var indexVertex = assocVertex[ k ];
+							let indexVertex = assocVertex[ k ];
 							volumePositions[ indexVertex ] = x;
 							volumeNormals[ indexVertex ] = nx;
 							indexVertex ++;
@@ -475,16 +475,16 @@
 				}
 
 				// Update rigid bodies
-				for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {
+				for ( let i = 0, il = rigidBodies.length; i < il; i ++ ) {
 
-					var objThree = rigidBodies[ i ];
-					var objPhys = objThree.userData.physicsBody;
-					var ms = objPhys.getMotionState();
+					const objThree = rigidBodies[ i ];
+					const objPhys = objThree.userData.physicsBody;
+					const ms = objPhys.getMotionState();
 					if ( ms ) {
 
 						ms.getWorldTransform( transformAux1 );
-						var p = transformAux1.getOrigin();
-						var q = transformAux1.getRotation();
+						const p = transformAux1.getOrigin();
+						const q = transformAux1.getRotation();
 						objThree.position.set( p.x(), p.y(), p.z() );
 						objThree.quaternion.set( q.x(), q.y(), q.z(), q.w() );
 

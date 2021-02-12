@@ -21,19 +21,20 @@
 				import { GUI } from './jsm/libs/dat.gui.module.js';
 				import { OrbitControls } from './jsm/controls/OrbitControls.js';
 				import { NodeMaterialLoader } from './jsm/loaders/NodeMaterialLoader.js';
-				import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
+				import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 				import { NodeFrame } from './jsm/nodes/core/NodeFrame.js';
 				import { NodeMaterial } from './jsm/nodes/materials/NodeMaterial.js';
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
-				var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
-				var frame = new NodeFrame();
-				var teapot, mesh, cloud;
-				var controls;
-				var gui;
+				let renderer, scene, camera;
+				const clock = new THREE.Clock(), fov = 50;
+				const frame = new NodeFrame();
+				let teapot, mesh, cloud;
+				let controls;
+				let gui;
 
-				var param = { load: 'caustic' };
+				const param = { load: 'caustic' };
 
 				window.addEventListener( 'load', init );
 
@@ -50,7 +51,6 @@
 					camera.position.x = 50;
 					camera.position.z = - 50;
 					camera.position.y = 30;
-					camera.target = new THREE.Vector3();
 
 					cloud = new THREE.TextureLoader().load( 'textures/lava/cloud.png' );
 					cloud.wrapS = cloud.wrapT = THREE.RepeatWrapping;
@@ -61,20 +61,20 @@
 
 					scene.add( new THREE.AmbientLight( 0x464646 ) );
 
-					var light = new THREE.DirectionalLight( 0xffddcc, 1 );
-					light.position.set( 1, 0.75, 0.5 );
-					scene.add( light );
+					const light1 = new THREE.DirectionalLight( 0xffddcc, 1 );
+					light1.position.set( 1, 0.75, 0.5 );
+					scene.add( light1 );
 
-					var light = new THREE.DirectionalLight( 0xccccff, 1 );
-					light.position.set( - 1, 0.75, - 0.5 );
-					scene.add( light );
+					const light2 = new THREE.DirectionalLight( 0xccccff, 1 );
+					light2.position.set( - 1, 0.75, - 0.5 );
+					scene.add( light2 );
 
-					teapot = new TeapotBufferGeometry( 15, 18 );
+					teapot = new TeapotGeometry( 15, 18 );
 
 					mesh = new THREE.Mesh( teapot );
 					scene.add( mesh );
 
-					window.addEventListener( 'resize', onWindowResize, false );
+					window.addEventListener( 'resize', onWindowResize );
 
 					updateMaterial();
 
@@ -106,7 +106,7 @@
 
 				function addGui( name, value, callback, isColor, min, max ) {
 
-					var node;
+					let node;
 
 					param[ name ] = value;
 
@@ -147,15 +147,15 @@
 
 					clearGui();
 
-					var url = "nodes/" + param.load + ".json";
+					const url = "nodes/" + param.load + ".json";
 
-					var library = {
+					const library = {
 						"cloud": cloud
 					};
 
-					var loader = new NodeMaterialLoader( undefined, library ).load( url, function () {
+					const loader = new NodeMaterialLoader( undefined, library ).load( url, function () {
 
-						var time = loader.getObjectByName( "time" );
+						const time = loader.getObjectByName( "time" );
 
 						if ( time ) {
 
@@ -182,7 +182,7 @@
 
 				function onWindowResize() {
 
-					var width = window.innerWidth, height = window.innerHeight;
+					const width = window.innerWidth, height = window.innerHeight;
 
 					camera.aspect = width / height;
 					camera.updateProjectionMatrix();
@@ -193,7 +193,7 @@
 
 				function animate() {
 
-					var delta = clock.getDelta();
+					const delta = clock.getDelta();
 
 					// update material animation and/or gpu calcs (pre-renderer)
 					if ( mesh.material instanceof NodeMaterial ) frame.update( delta ).updateNode( mesh.material );

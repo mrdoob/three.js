@@ -24,49 +24,51 @@
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { ConvexObjectBreaker } from './jsm/misc/ConvexObjectBreaker.js';
-		import { ConvexBufferGeometry } from './jsm/geometries/ConvexGeometry.js';
+		import { ConvexGeometry } from './jsm/geometries/ConvexGeometry.js';
 
 		// - Global variables -
 
 		// Graphics variables
-		var container, stats;
-		var camera, controls, scene, renderer;
-		var textureLoader;
-		var clock = new THREE.Clock();
+		let container, stats;
+		let camera, controls, scene, renderer;
+		let textureLoader;
+		const clock = new THREE.Clock();
 
-		var mouseCoords = new THREE.Vector2();
-		var raycaster = new THREE.Raycaster();
-		var ballMaterial = new THREE.MeshPhongMaterial( { color: 0x202020 } );
+		const mouseCoords = new THREE.Vector2();
+		const raycaster = new THREE.Raycaster();
+		const ballMaterial = new THREE.MeshPhongMaterial( { color: 0x202020 } );
 
 		// Physics variables
-		var gravityConstant = 7.8;
-		var collisionConfiguration;
-		var dispatcher;
-		var broadphase;
-		var solver;
-		var physicsWorld;
-		var margin = 0.05;
+		const gravityConstant = 7.8;
+		let collisionConfiguration;
+		let dispatcher;
+		let broadphase;
+		let solver;
+		let physicsWorld;
+		const margin = 0.05;
 
-		var convexBreaker = new ConvexObjectBreaker();
+		const convexBreaker = new ConvexObjectBreaker();
 
 		// Rigid bodies include all movable objects
-		var rigidBodies = [];
+		const rigidBodies = [];
 
-		var pos = new THREE.Vector3();
-		var quat = new THREE.Quaternion();
-		var transformAux1;
-		var tempBtVec3_1;
+		const pos = new THREE.Vector3();
+		const quat = new THREE.Quaternion();
+		let transformAux1;
+		let tempBtVec3_1;
 
-		var objectsToRemove = [];
-		for ( var i = 0; i < 500; i ++ ) {
+		const objectsToRemove = [];
+
+		for ( let i = 0; i < 500; i ++ ) {
 
 			objectsToRemove[ i ] = null;
 
 		}
-		var numObjectsToRemove = 0;
 
-		var impactPoint = new THREE.Vector3();
-		var impactNormal = new THREE.Vector3();
+		let numObjectsToRemove = 0;
+
+		const impactPoint = new THREE.Vector3();
+		const impactNormal = new THREE.Vector3();
 
 		// - Main code -
 
@@ -117,13 +119,13 @@
 
 			textureLoader = new THREE.TextureLoader();
 
-			var ambientLight = new THREE.AmbientLight( 0x707070 );
+			const ambientLight = new THREE.AmbientLight( 0x707070 );
 			scene.add( ambientLight );
 
-			var light = new THREE.DirectionalLight( 0xffffff, 1 );
+			const light = new THREE.DirectionalLight( 0xffffff, 1 );
 			light.position.set( - 10, 18, 5 );
 			light.castShadow = true;
-			var d = 14;
+			const d = 14;
 			light.shadow.camera.left = - d;
 			light.shadow.camera.right = d;
 			light.shadow.camera.top = d;
@@ -144,7 +146,7 @@
 
 			//
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 		}
 
@@ -166,7 +168,7 @@
 
 		function createObject( mass, halfExtents, pos, quat, material ) {
 
-			var object = new THREE.Mesh( new THREE.BoxBufferGeometry( halfExtents.x * 2, halfExtents.y * 2, halfExtents.z * 2 ), material );
+			const object = new THREE.Mesh( new THREE.BoxGeometry( halfExtents.x * 2, halfExtents.y * 2, halfExtents.z * 2 ), material );
 			object.position.copy( pos );
 			object.quaternion.copy( quat );
 			convexBreaker.prepareBreakableObject( object, mass, new THREE.Vector3(), new THREE.Vector3(), true );
@@ -179,7 +181,7 @@
 			// Ground
 			pos.set( 0, - 0.5, 0 );
 			quat.set( 0, 0, 0, 1 );
-			var ground = createParalellepipedWithPhysics( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
+			const ground = createParalellepipedWithPhysics( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
 			ground.receiveShadow = true;
 			textureLoader.load( "textures/grid.png", function ( texture ) {
 
@@ -192,8 +194,8 @@
 			} );
 
 			// Tower 1
-			var towerMass = 1000;
-			var towerHalfExtents = new THREE.Vector3( 2, 5, 2 );
+			const towerMass = 1000;
+			const towerHalfExtents = new THREE.Vector3( 2, 5, 2 );
 			pos.set( - 8, 5, 0 );
 			quat.set( 0, 0, 0, 1 );
 			createObject( towerMass, towerHalfExtents, pos, quat, createMaterial( 0xB03014 ) );
@@ -204,18 +206,18 @@
 			createObject( towerMass, towerHalfExtents, pos, quat, createMaterial( 0xB03214 ) );
 
 			//Bridge
-			var bridgeMass = 100;
-			var bridgeHalfExtents = new THREE.Vector3( 7, 0.2, 1.5 );
+			const bridgeMass = 100;
+			const bridgeHalfExtents = new THREE.Vector3( 7, 0.2, 1.5 );
 			pos.set( 0, 10.2, 0 );
 			quat.set( 0, 0, 0, 1 );
 			createObject( bridgeMass, bridgeHalfExtents, pos, quat, createMaterial( 0xB3B865 ) );
 
 			// Stones
-			var stoneMass = 120;
-			var stoneHalfExtents = new THREE.Vector3( 1, 2, 0.15 );
-			var numStones = 8;
+			const stoneMass = 120;
+			const stoneHalfExtents = new THREE.Vector3( 1, 2, 0.15 );
+			const numStones = 8;
 			quat.set( 0, 0, 0, 1 );
-			for ( var i = 0; i < numStones; i ++ ) {
+			for ( let i = 0; i < numStones; i ++ ) {
 
 				pos.set( 0, 2, 15 * ( 0.5 - i / ( numStones + 1 ) ) );
 
@@ -224,17 +226,17 @@
 			}
 
 			// Mountain
-			var mountainMass = 860;
-			var mountainHalfExtents = new THREE.Vector3( 4, 5, 4 );
+			const mountainMass = 860;
+			const mountainHalfExtents = new THREE.Vector3( 4, 5, 4 );
 			pos.set( 5, mountainHalfExtents.y * 0.5, - 7 );
 			quat.set( 0, 0, 0, 1 );
-			var mountainPoints = [];
+			const mountainPoints = [];
 			mountainPoints.push( new THREE.Vector3( mountainHalfExtents.x, - mountainHalfExtents.y, mountainHalfExtents.z ) );
 			mountainPoints.push( new THREE.Vector3( - mountainHalfExtents.x, - mountainHalfExtents.y, mountainHalfExtents.z ) );
 			mountainPoints.push( new THREE.Vector3( mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
 			mountainPoints.push( new THREE.Vector3( - mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
 			mountainPoints.push( new THREE.Vector3( 0, mountainHalfExtents.y, 0 ) );
-			var mountain = new THREE.Mesh( new ConvexBufferGeometry( mountainPoints ), createMaterial( 0xB03814 ) );
+			const mountain = new THREE.Mesh( new ConvexGeometry( mountainPoints ), createMaterial( 0xB03814 ) );
 			mountain.position.copy( pos );
 			mountain.quaternion.copy( quat );
 			convexBreaker.prepareBreakableObject( mountain, mountainMass, new THREE.Vector3(), new THREE.Vector3(), true );
@@ -244,8 +246,8 @@
 
 		function createParalellepipedWithPhysics( sx, sy, sz, mass, pos, quat, material ) {
 
-			var object = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
-			var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
+			const object = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
+			const shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 			shape.setMargin( margin );
 
 			createRigidBody( object, shape, mass, pos, quat );
@@ -259,13 +261,13 @@
 			object.castShadow = true;
 			object.receiveShadow = true;
 
-			var shape = createConvexHullPhysicsShape( object.geometry.attributes.position.array );
+			const shape = createConvexHullPhysicsShape( object.geometry.attributes.position.array );
 			shape.setMargin( margin );
 
-			var body = createRigidBody( object, shape, object.userData.mass, null, null, object.userData.velocity, object.userData.angularVelocity );
+			const body = createRigidBody( object, shape, object.userData.mass, null, null, object.userData.velocity, object.userData.angularVelocity );
 
 			// Set pointer back to the three object only in the debris objects
-			var btVecUserData = new Ammo.btVector3( 0, 0, 0 );
+			const btVecUserData = new Ammo.btVector3( 0, 0, 0 );
 			btVecUserData.threeObject = object;
 			body.setUserPointer( btVecUserData );
 
@@ -281,12 +283,12 @@
 
 		function createConvexHullPhysicsShape( coords ) {
 
-			var shape = new Ammo.btConvexHullShape();
+			const shape = new Ammo.btConvexHullShape();
 
-			for ( var i = 0, il = coords.length; i < il; i += 3 ) {
+			for ( let i = 0, il = coords.length; i < il; i += 3 ) {
 
 				tempBtVec3_1.setValue( coords[ i ], coords[ i + 1 ], coords[ i + 2 ] );
-				var lastOne = ( i >= ( il - 3 ) );
+				const lastOne = ( i >= ( il - 3 ) );
 				shape.addPoint( tempBtVec3_1, lastOne );
 
 			}
@@ -306,6 +308,7 @@
 				pos = object.position;
 
 			}
+
 			if ( quat ) {
 
 				object.quaternion.copy( quat );
@@ -316,17 +319,17 @@
 
 			}
 
-			var transform = new Ammo.btTransform();
+			const transform = new Ammo.btTransform();
 			transform.setIdentity();
 			transform.setOrigin( new Ammo.btVector3( pos.x, pos.y, pos.z ) );
 			transform.setRotation( new Ammo.btQuaternion( quat.x, quat.y, quat.z, quat.w ) );
-			var motionState = new Ammo.btDefaultMotionState( transform );
+			const motionState = new Ammo.btDefaultMotionState( transform );
 
-			var localInertia = new Ammo.btVector3( 0, 0, 0 );
+			const localInertia = new Ammo.btVector3( 0, 0, 0 );
 			physicsShape.calculateLocalInertia( mass, localInertia );
 
-			var rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, physicsShape, localInertia );
-			var body = new Ammo.btRigidBody( rbInfo );
+			const rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, physicsShape, localInertia );
+			const body = new Ammo.btRigidBody( rbInfo );
 
 			body.setFriction( 0.5 );
 
@@ -335,6 +338,7 @@
 				body.setLinearVelocity( new Ammo.btVector3( vel.x, vel.y, vel.z ) );
 
 			}
+
 			if ( angVel ) {
 
 				body.setAngularVelocity( new Ammo.btVector3( angVel.x, angVel.y, angVel.z ) );
@@ -376,7 +380,7 @@
 
 		function initInput() {
 
-			window.addEventListener( 'mousedown', function ( event ) {
+			window.addEventListener( 'pointerdown', function ( event ) {
 
 				mouseCoords.set(
 					( event.clientX / window.innerWidth ) * 2 - 1,
@@ -386,24 +390,24 @@
 				raycaster.setFromCamera( mouseCoords, camera );
 
 				// Creates a ball and throws it
-				var ballMass = 35;
-				var ballRadius = 0.4;
+				const ballMass = 35;
+				const ballRadius = 0.4;
 
-				var ball = new THREE.Mesh( new THREE.SphereBufferGeometry( ballRadius, 14, 10 ), ballMaterial );
+				const ball = new THREE.Mesh( new THREE.SphereGeometry( ballRadius, 14, 10 ), ballMaterial );
 				ball.castShadow = true;
 				ball.receiveShadow = true;
-				var ballShape = new Ammo.btSphereShape( ballRadius );
+				const ballShape = new Ammo.btSphereShape( ballRadius );
 				ballShape.setMargin( margin );
 				pos.copy( raycaster.ray.direction );
 				pos.add( raycaster.ray.origin );
 				quat.set( 0, 0, 0, 1 );
-				var ballBody = createRigidBody( ball, ballShape, ballMass, pos, quat );
+				const ballBody = createRigidBody( ball, ballShape, ballMass, pos, quat );
 
 				pos.copy( raycaster.ray.direction );
 				pos.multiplyScalar( 24 );
 				ballBody.setLinearVelocity( new Ammo.btVector3( pos.x, pos.y, pos.z ) );
 
-			}, false );
+			} );
 
 		}
 
@@ -427,7 +431,7 @@
 
 		function render() {
 
-			var deltaTime = clock.getDelta();
+			const deltaTime = clock.getDelta();
 
 			updatePhysics( deltaTime );
 
@@ -441,17 +445,17 @@
 			physicsWorld.stepSimulation( deltaTime, 10 );
 
 			// Update rigid bodies
-			for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {
+			for ( let i = 0, il = rigidBodies.length; i < il; i ++ ) {
 
-				var objThree = rigidBodies[ i ];
-				var objPhys = objThree.userData.physicsBody;
-				var ms = objPhys.getMotionState();
+				const objThree = rigidBodies[ i ];
+				const objPhys = objThree.userData.physicsBody;
+				const ms = objPhys.getMotionState();
 
 				if ( ms ) {
 
 					ms.getWorldTransform( transformAux1 );
-					var p = transformAux1.getOrigin();
-					var q = transformAux1.getRotation();
+					const p = transformAux1.getOrigin();
+					const q = transformAux1.getRotation();
 					objThree.position.set( p.x(), p.y(), p.z() );
 					objThree.quaternion.set( q.x(), q.y(), q.z(), q.w() );
 
@@ -461,14 +465,14 @@
 
 			}
 
-			for ( var i = 0, il = dispatcher.getNumManifolds(); i < il; i ++ ) {
+			for ( let i = 0, il = dispatcher.getNumManifolds(); i < il; i ++ ) {
 
-				var contactManifold = dispatcher.getManifoldByIndexInternal( i );
-				var rb0 = Ammo.castObject( contactManifold.getBody0(), Ammo.btRigidBody );
-				var rb1 = Ammo.castObject( contactManifold.getBody1(), Ammo.btRigidBody );
+				const contactManifold = dispatcher.getManifoldByIndexInternal( i );
+				const rb0 = Ammo.castObject( contactManifold.getBody0(), Ammo.btRigidBody );
+				const rb1 = Ammo.castObject( contactManifold.getBody1(), Ammo.btRigidBody );
 
-				var threeObject0 = Ammo.castObject( rb0.getUserPointer(), Ammo.btVector3 ).threeObject;
-				var threeObject1 = Ammo.castObject( rb1.getUserPointer(), Ammo.btVector3 ).threeObject;
+				const threeObject0 = Ammo.castObject( rb0.getUserPointer(), Ammo.btVector3 ).threeObject;
+				const threeObject1 = Ammo.castObject( rb1.getUserPointer(), Ammo.btVector3 ).threeObject;
 
 				if ( ! threeObject0 && ! threeObject1 ) {
 
@@ -476,14 +480,14 @@
 
 				}
 
-				var userData0 = threeObject0 ? threeObject0.userData : null;
-				var userData1 = threeObject1 ? threeObject1.userData : null;
+				const userData0 = threeObject0 ? threeObject0.userData : null;
+				const userData1 = threeObject1 ? threeObject1.userData : null;
 
-				var breakable0 = userData0 ? userData0.breakable : false;
-				var breakable1 = userData1 ? userData1.breakable : false;
+				const breakable0 = userData0 ? userData0.breakable : false;
+				const breakable1 = userData1 ? userData1.breakable : false;
 
-				var collided0 = userData0 ? userData0.collided : false;
-				var collided1 = userData1 ? userData1.collided : false;
+				const collided0 = userData0 ? userData0.collided : false;
+				const collided1 = userData1 ? userData1.collided : false;
 
 				if ( ( ! breakable0 && ! breakable1 ) || ( collided0 && collided1 ) ) {
 
@@ -491,22 +495,22 @@
 
 				}
 
-				var contact = false;
-				var maxImpulse = 0;
-				for ( var j = 0, jl = contactManifold.getNumContacts(); j < jl; j ++ ) {
+				let contact = false;
+				let maxImpulse = 0;
+				for ( let j = 0, jl = contactManifold.getNumContacts(); j < jl; j ++ ) {
 
-					var contactPoint = contactManifold.getContactPoint( j );
+					const contactPoint = contactManifold.getContactPoint( j );
 
 					if ( contactPoint.getDistance() < 0 ) {
 
 						contact = true;
-						var impulse = contactPoint.getAppliedImpulse();
+						const impulse = contactPoint.getAppliedImpulse();
 
 						if ( impulse > maxImpulse ) {
 
 							maxImpulse = impulse;
-							var pos = contactPoint.get_m_positionWorldOnB();
-							var normal = contactPoint.get_m_normalWorldOnB();
+							const pos = contactPoint.get_m_positionWorldOnB();
+							const normal = contactPoint.get_m_normalWorldOnB();
 							impactPoint.set( pos.x(), pos.y(), pos.z() );
 							impactNormal.set( normal.x(), normal.y(), normal.z() );
 
@@ -523,18 +527,18 @@
 
 				// Subdivision
 
-				var fractureImpulse = 250;
+				const fractureImpulse = 250;
 
 				if ( breakable0 && ! collided0 && maxImpulse > fractureImpulse ) {
 
-					var debris = convexBreaker.subdivideByImpact( threeObject0, impactPoint, impactNormal, 1, 2, 1.5 );
+					const debris = convexBreaker.subdivideByImpact( threeObject0, impactPoint, impactNormal, 1, 2, 1.5 );
 
-					var numObjects = debris.length;
-					for ( var j = 0; j < numObjects; j ++ ) {
+					const numObjects = debris.length;
+					for ( let j = 0; j < numObjects; j ++ ) {
 
-						var vel = rb0.getLinearVelocity();
-						var angVel = rb0.getAngularVelocity();
-						var fragment = debris[ j ];
+						const vel = rb0.getLinearVelocity();
+						const angVel = rb0.getAngularVelocity();
+						const fragment = debris[ j ];
 						fragment.userData.velocity.set( vel.x(), vel.y(), vel.z() );
 						fragment.userData.angularVelocity.set( angVel.x(), angVel.y(), angVel.z() );
 
@@ -549,14 +553,14 @@
 
 				if ( breakable1 && ! collided1 && maxImpulse > fractureImpulse ) {
 
-					var debris = convexBreaker.subdivideByImpact( threeObject1, impactPoint, impactNormal, 1, 2, 1.5 );
+					const debris = convexBreaker.subdivideByImpact( threeObject1, impactPoint, impactNormal, 1, 2, 1.5 );
 
-					var numObjects = debris.length;
-					for ( var j = 0; j < numObjects; j ++ ) {
+					const numObjects = debris.length;
+					for ( let j = 0; j < numObjects; j ++ ) {
 
-						var vel = rb1.getLinearVelocity();
-						var angVel = rb1.getAngularVelocity();
-						var fragment = debris[ j ];
+						const vel = rb1.getLinearVelocity();
+						const angVel = rb1.getAngularVelocity();
+						const fragment = debris[ j ];
 						fragment.userData.velocity.set( vel.x(), vel.y(), vel.z() );
 						fragment.userData.angularVelocity.set( angVel.x(), angVel.y(), angVel.z() );
 
@@ -571,11 +575,12 @@
 
 			}
 
-			for ( var i = 0; i < numObjectsToRemove; i ++ ) {
+			for ( let i = 0; i < numObjectsToRemove; i ++ ) {
 
 				removeDebris( objectsToRemove[ i ] );
 
 			}
+
 			numObjectsToRemove = 0;
 
 		}

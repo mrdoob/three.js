@@ -21,24 +21,25 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
+			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
 			import { NodeMaterialLoader, NodeMaterialLoaderUtils } from './jsm/loaders/NodeMaterialLoader.js';
 
 			import * as Nodes from './jsm/nodes/Nodes.js';
 
-			var container = document.getElementById( 'container' );
+			const container = document.getElementById( 'container' );
 
-			var renderer, scene, lightGroup, camera, clock = new THREE.Clock(), fov = 50;
-			var frame = new Nodes.NodeFrame();
-			var teapot, mesh;
-			var controls;
-			var move = false;
-			var rtTexture, rtMaterial;
-			var gui;
-			var library = {};
-			var serialized = false;
-			var textures = {
+			let renderer, scene, lightGroup, camera;
+			const clock = new THREE.Clock(), fov = 50;
+			const frame = new Nodes.NodeFrame();
+			let teapot, mesh;
+			let controls;
+			let move = false;
+			let rtTexture, rtMaterial;
+			let gui;
+			const library = {};
+			let serialized = false;
+			const textures = {
 				brick: { url: 'textures/brick_diffuse.jpg' },
 				grass: { url: 'textures/terrain/grasslight-big.jpg' },
 				grassNormal: { url: 'textures/terrain/grasslight-big-nm.jpg' },
@@ -48,11 +49,11 @@
 				spherical: { url: 'textures/envmap.png' }
 			};
 
-			var param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'mesh-standard' };
+			const param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'mesh-standard' };
 
 			function getTexture( name ) {
 
-				var texture = textures[ name ].texture;
+				let texture = textures[ name ].texture;
 
 				if ( ! texture ) {
 
@@ -67,7 +68,7 @@
 
 			}
 
-			var premTexture, pmremCube;
+			let premTexture, pmremCube;
 
 			function updatePREM( textureCube ) {
 
@@ -75,11 +76,11 @@
 
 				if ( ! pmremCube || ! renderer ) return;
 
-				var minFilter = pmremCube.minFilter;
-				var magFilter = pmremCube.magFilter;
-				var generateMipmaps = pmremCube.generateMipmaps;
+				const minFilter = pmremCube.minFilter;
+				const magFilter = pmremCube.magFilter;
+				const generateMipmaps = pmremCube.generateMipmaps;
 
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				premTexture = pmremGenerator.fromCubemap( pmremCube ).texture;
 				pmremGenerator.dispose();
 
@@ -92,17 +93,17 @@
 
 			}
 
-			var cubemap = function () {
+			const cubemap = function () {
 
-				var path = "textures/cube/Park2/";
-				var format = '.jpg';
-				var urls = [
+				const path = "textures/cube/Park2/";
+				const format = '.jpg';
+				const urls = [
 					path + 'posx' + format, path + 'negx' + format,
 					path + 'posy' + format, path + 'negy' + format,
 					path + 'posz' + format, path + 'negz' + format
 				];
 
-				var textureCube = new THREE.CubeTextureLoader().load( urls, updatePREM );
+				const textureCube = new THREE.CubeTextureLoader().load( urls, updatePREM );
 
 				library[ textureCube.uuid ] = textureCube;
 
@@ -127,8 +128,6 @@
 				camera.position.x = 50;
 				camera.position.z = - 50;
 				camera.position.y = 30;
-				camera.target = new THREE.Vector3();
-
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
@@ -137,7 +136,7 @@
 				lightGroup = new THREE.Group();
 				scene.add( lightGroup );
 
-				var light;
+				let light;
 
 				lightGroup.add( new THREE.AmbientLight( 0x464646 ) );
 
@@ -149,7 +148,7 @@
 				light.position.set( - 1, 0.75, - 0.5 );
 				lightGroup.add( light );
 
-				teapot = new TeapotBufferGeometry( 15, 18 );
+				teapot = new TeapotGeometry( 15, 18 );
 
 				mesh = new THREE.Mesh( teapot );
 				scene.add( mesh );
@@ -160,7 +159,7 @@
 
 				updatePREM();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				updateMaterial();
 
@@ -236,7 +235,7 @@
 
 			function addGui( name, value, callback, isColor, min, max ) {
 
-				var node;
+				let node;
 
 				param[ name ] = value;
 
@@ -2501,7 +2500,7 @@
 
 								case 'prem':
 
-									mtl.color = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ), undefined, undefined, bias );
+									mtl.color = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ), undefined, bias );
 
 									break;
 
@@ -2948,7 +2947,7 @@
 
 						var blurtexture = new Nodes.FunctionNode( [
 							// Reference: TriangleBlurShader.js
-							"vec4 blurtexture(sampler2D texture, vec2 uv, vec2 delta) {",
+							"vec4 blurtexture(sampler2D map, vec2 uv, vec2 delta) {",
 							"	vec4 color = vec4( 0.0 );",
 							"	float total = 0.0;",
 							// randomize the lookup values to hide the fixed number of samples
@@ -2956,7 +2955,7 @@
 							"	for ( float t = -BLUR_ITERATIONS; t <= BLUR_ITERATIONS; t ++ ) {",
 							"		float percent = ( t + offset - 0.5 ) / BLUR_ITERATIONS;",
 							"		float weight = 1.0 - abs( percent );",
-							"		color += texture2D( texture, uv + delta * percent ) * weight;",
+							"		color += texture2D( map, uv + delta * percent ) * weight;",
 							"		total += weight;",
 							"	}",
 							"	return color / total;",
@@ -2964,7 +2963,7 @@
 						].join( "\n" ), [ new Nodes.ConstNode( "float BLUR_ITERATIONS 10.0" ) ] );
 
 						var blurredTexture = new Nodes.FunctionCallNode( blurtexture, {
-							texture: new Nodes.TextureNode( getTexture( "brick" ) ),
+							map: new Nodes.TextureNode( getTexture( "brick" ) ),
 							delta: delta,
 							uv: new Nodes.UVNode()
 						} );
@@ -3010,7 +3009,7 @@
 
 						var triplanarMapping = new Nodes.FunctionNode( [
 							// Reference: https://github.com/keijiro/StandardTriplanar
-							"vec4 triplanar_mapping( sampler2D texture, vec3 normal, vec3 position, float scale ) {",
+							"vec4 triplanar_mapping( sampler2D map, vec3 normal, vec3 position, float scale ) {",
 
 							// Blending factor of triplanar mapping
 							"	vec3 bf = normalize( abs( normal ) );",
@@ -3022,9 +3021,9 @@
 							"	vec2 tz = position.xy * scale;",
 
 							// Base color
-							"	vec4 cx = texture2D(texture, tx) * bf.x;",
-							"	vec4 cy = texture2D(texture, ty) * bf.y;",
-							"	vec4 cz = texture2D(texture, tz) * bf.z;",
+							"	vec4 cx = texture2D(map, tx) * bf.x;",
+							"	vec4 cy = texture2D(map, ty) * bf.y;",
+							"	vec4 cz = texture2D(map, tz) * bf.z;",
 
 							"	return cx + cy + cz;",
 
@@ -3032,7 +3031,7 @@
 						].join( "\n" ) );
 
 						var triplanarMappingTexture = new Nodes.FunctionCallNode( triplanarMapping, {
-							texture: new Nodes.TextureNode( getTexture( "brick" ) ),
+							map: new Nodes.TextureNode( getTexture( "brick" ) ),
 							normal: new Nodes.NormalNode( Nodes.NormalNode.WORLD ),
 							position: new Nodes.PositionNode( Nodes.PositionNode.WORLD ),
 							scale: scale,
@@ -3260,7 +3259,7 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth, height = window.innerHeight;
+				const width = window.innerWidth, height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -3286,18 +3285,18 @@
 
 				// gui
 
-				var div = document.getElementById( 'serialize' );
+				const div = document.getElementById( 'serialize' );
 				div.textContent = "Serialize and apply";
 
 			}
 
 			function serialize() {
 
-				var json = mesh.material.toJSON();
+				const json = mesh.material.toJSON();
 
 				// replace uuid to url (facilitates the load of textures using url otherside uuid) e.g:
 
-				var cloud = getTexture( "cloud" );
+				const cloud = getTexture( "cloud" );
 
 				NodeMaterialLoaderUtils.replaceUUID( json, cloud, "cloud" );
 
@@ -3305,7 +3304,7 @@
 
 				// --
 
-				var jsonStr = JSON.stringify( json );
+				const jsonStr = JSON.stringify( json );
 
 				console.log( jsonStr );
 
@@ -3318,7 +3317,7 @@
 
 				// gui
 
-				var div = document.getElementById( 'serialize' );
+				const div = document.getElementById( 'serialize' );
 				div.textContent = "Click to reset - JSON Generate: " + ( jsonStr.length / 1024 ).toFixed( 3 ) + "kB";
 
 				if ( gui ) gui.destroy();
@@ -3329,7 +3328,7 @@
 
 			function animate() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( move ) {
 

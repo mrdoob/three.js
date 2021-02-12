@@ -1,6 +1,6 @@
 import { BackSide, FrontSide, CubeUVReflectionMapping } from '../../constants.js';
-import { BoxBufferGeometry } from '../../geometries/BoxGeometry.js';
-import { PlaneBufferGeometry } from '../../geometries/PlaneGeometry.js';
+import { BoxGeometry } from '../../geometries/BoxGeometry.js';
+import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { Color } from '../../math/Color.js';
 import { Mesh } from '../../objects/Mesh.js';
@@ -58,12 +58,12 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 		}
 
-		if ( background && ( background.isCubeTexture || background.isWebGLCubeRenderTarget || background.isWebGLCubeRenderTargetTexture || background.mapping === CubeUVReflectionMapping ) ) {
+		if ( background && ( background.isCubeTexture || background.isWebGLCubeRenderTarget || background.mapping === CubeUVReflectionMapping ) ) {
 
 			if ( boxMesh === undefined ) {
 
 				boxMesh = new Mesh(
-					new BoxBufferGeometry( 1, 1, 1 ),
+					new BoxGeometry( 1, 1, 1 ),
 					new ShaderMaterial( {
 						name: 'BackgroundCubeMaterial',
 						uniforms: cloneUniforms( ShaderLib.cube.uniforms ),
@@ -109,7 +109,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 			}
 
 			boxMesh.material.uniforms.envMap.value = background;
-			boxMesh.material.uniforms.flipEnvMap.value = background.isCubeTexture ? - 1 : 1;
+			boxMesh.material.uniforms.flipEnvMap.value = ( background.isCubeTexture && background._needsFlipEnvMap ) ? - 1 : 1;
 
 			if ( currentBackground !== background ||
 				currentBackgroundVersion !== background.version ||
@@ -131,7 +131,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 			if ( planeMesh === undefined ) {
 
 				planeMesh = new Mesh(
-					new PlaneBufferGeometry( 2, 2 ),
+					new PlaneGeometry( 2, 2 ),
 					new ShaderMaterial( {
 						name: 'BackgroundMaterial',
 						uniforms: cloneUniforms( ShaderLib.background.uniforms ),
@@ -204,10 +204,10 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 			return clearColor;
 
 		},
-		setClearColor: function ( color, alpha ) {
+		setClearColor: function ( color, alpha = 1 ) {
 
 			clearColor.set( color );
-			clearAlpha = alpha !== undefined ? alpha : 1;
+			clearAlpha = alpha;
 			setClear( clearColor, clearAlpha );
 
 		},

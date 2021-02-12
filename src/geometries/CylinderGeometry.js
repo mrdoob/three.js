@@ -1,14 +1,11 @@
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 
-// CylinderGeometry
+class CylinderGeometry extends BufferGeometry {
 
-class CylinderGeometry extends Geometry {
-
-	constructor( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 		this.type = 'CylinderGeometry';
@@ -24,45 +21,10 @@ class CylinderGeometry extends Geometry {
 			thetaLength: thetaLength
 		};
 
-		this.fromBufferGeometry( new CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) );
-		this.mergeVertices();
-
-	}
-
-}
-
-// CylinderBufferGeometry
-
-class CylinderBufferGeometry extends BufferGeometry {
-
-	constructor( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
-
-		super();
-		this.type = 'CylinderBufferGeometry';
-
-		this.parameters = {
-			radiusTop: radiusTop,
-			radiusBottom: radiusBottom,
-			height: height,
-			radialSegments: radialSegments,
-			heightSegments: heightSegments,
-			openEnded: openEnded,
-			thetaStart: thetaStart,
-			thetaLength: thetaLength
-		};
-
 		const scope = this;
 
-		radiusTop = radiusTop !== undefined ? radiusTop : 1;
-		radiusBottom = radiusBottom !== undefined ? radiusBottom : 1;
-		height = height || 1;
-
-		radialSegments = Math.floor( radialSegments ) || 8;
-		heightSegments = Math.floor( heightSegments ) || 1;
-
-		openEnded = openEnded !== undefined ? openEnded : false;
-		thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
-		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+		radialSegments = Math.floor( radialSegments );
+		heightSegments = Math.floor( heightSegments );
 
 		// buffers
 
@@ -304,4 +266,4 @@ class CylinderBufferGeometry extends BufferGeometry {
 }
 
 
-export { CylinderGeometry, CylinderBufferGeometry };
+export { CylinderGeometry, CylinderGeometry as CylinderBufferGeometry };

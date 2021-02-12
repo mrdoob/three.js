@@ -3,14 +3,13 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
-		<h1>车削几何体（[name]）</h1>
+		<h1>车削缓冲几何体（[name]）</h1>
 
 		<p class="desc">创建具有轴对称性的网格，比如花瓶。车削绕着Y轴来进行旋转。</p>
 
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -35,13 +34,13 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var points = [];
-		for ( var i = 0; i < 10; i ++ ) {
+		const points = [];
+		for ( let i = 0; i < 10; i ++ ) {
 			points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 10 + 5, ( i - 5 ) * 2 ) );
 		}
-		var geometry = new THREE.LatheGeometry( points );
-		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-		var lathe = new THREE.Mesh( geometry, material );
+		const geometry = new THREE.LatheGeometry( points );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const lathe = new THREE.Mesh( geometry, material );
 		scene.add( lathe );
 		</code>
 
@@ -52,22 +51,22 @@
 		points — 一个Vector2对象数组。每个点的X坐标必须大于0。<br />
 		segments — 要生成的车削几何体圆周分段的数量，默认值是12。<br />
 		phiStart — 以弧度表示的起始角度，默认值为0。<br />
-		phiLength — 车削部分的弧度（0-2PI）范围，2PI将是一个完全闭合的、完整的车削几何体，小于2PI是部分车削。默认值是2PI。
+		phiLength — 车削部分的弧度（0-2PI）范围，2PI将是一个完全闭合的、完整的车削几何体，小于2PI是部分的车削。默认值是2PI。
 		</p>
 		<p>
-		基于参数创建一个LatheGeometry。
-		</p>
+				基于参数创建一个LatheGeometry。
+			</p>
 
 		<h2>属性</h2>
-		<p>共有属性请参见其基类[page:Geometry]。</p>
+		<p>共有属性请参见其基类[page:BufferGeometry]。</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
+				一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
 		</p>
 
 		<h2>方法(Methods)</h2>
-		<p>共有方法请参见其基类[page:Geometry]。</p>
+		<p>共有方法请参见其基类[page:BufferGeometry]。</p>
 
 		<h2>源代码</h2>
 

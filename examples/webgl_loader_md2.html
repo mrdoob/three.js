@@ -24,25 +24,27 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { MD2Character } from './jsm/misc/MD2Character.js';
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
+			let SCREEN_WIDTH = window.innerWidth;
+			let SCREEN_HEIGHT = window.innerHeight;
 
-			var container, camera, scene, renderer;
+			let container, camera, scene, renderer;
 
-			var character;
+			let character;
 
-			var gui, playbackConfig = {
+			let gui;
+
+			const playbackConfig = {
 
 				speed: 1.0,
 				wireframe: false
 
 			};
 
-			var controls;
+			let controls;
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
-			var stats;
+			let stats;
 
 			init();
 			animate();
@@ -67,37 +69,37 @@
 
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
-				light.position.set( 200, 250, 500 );
-				light.angle = 0.5;
-				light.penumbra = 0.5;
+				const light1 = new THREE.SpotLight( 0xffffff, 5, 1000 );
+				light1.position.set( 200, 250, 500 );
+				light1.angle = 0.5;
+				light1.penumbra = 0.5;
 
-				light.castShadow = true;
-				light.shadow.mapSize.width = 1024;
-				light.shadow.mapSize.height = 1024;
+				light1.castShadow = true;
+				light1.shadow.mapSize.width = 1024;
+				light1.shadow.mapSize.height = 1024;
 
-				// scene.add( new CameraHelper( light.shadow.camera ) );
-				scene.add( light );
+				// scene.add( new THREE.CameraHelper( light1.shadow.camera ) );
+				scene.add( light1 );
 
-				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
-				light.position.set( - 100, 350, 350 );
-				light.angle = 0.5;
-				light.penumbra = 0.5;
+				const light2 = new THREE.SpotLight( 0xffffff, 5, 1000 );
+				light2.position.set( - 100, 350, 350 );
+				light2.angle = 0.5;
+				light2.penumbra = 0.5;
 
-				light.castShadow = true;
-				light.shadow.mapSize.width = 1024;
-				light.shadow.mapSize.height = 1024;
+				light2.castShadow = true;
+				light2.shadow.mapSize.width = 1024;
+				light2.shadow.mapSize.height = 1024;
 
-				// scene.add( new CameraHelper( light.shadow.camera ) );
-				scene.add( light );
+				// scene.add( new THREE.CameraHelper( light2.shadow.camera ) );
+				scene.add( light2 );
 
 				//  GROUND
 
-				var gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
-				var gg = new THREE.PlaneBufferGeometry( 2000, 2000 );
-				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
+				const gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
+				const gg = new THREE.PlaneGeometry( 2000, 2000 );
+				const gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
-				var ground = new THREE.Mesh( gg, gm );
+				const ground = new THREE.Mesh( gg, gm );
 				ground.rotation.x = - Math.PI / 2;
 				ground.material.map.repeat.set( 8, 8 );
 				ground.material.map.wrapS = ground.material.map.wrapT = THREE.RepeatWrapping;
@@ -125,7 +127,7 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// CONTROLS
 
@@ -151,7 +153,7 @@
 
 				// CHARACTER
 
-				var config = {
+				const config = {
 
 					baseUrl: "models/md2/ratamahatta/",
 
@@ -209,7 +211,7 @@
 
 			function labelize( text ) {
 
-				var parts = text.split( "." );
+				const parts = text.split( "." );
 
 				if ( parts.length > 1 ) {
 
@@ -226,9 +228,9 @@
 
 			function setupWeaponsGUI( character ) {
 
-				var folder = gui.addFolder( "Weapons" );
+				const folder = gui.addFolder( "Weapons" );
 
-				var generateCallback = function ( index ) {
+				const generateCallback = function ( index ) {
 
 					return function () {
 
@@ -238,11 +240,11 @@
 
 				};
 
-				var guiItems = [];
+				const guiItems = [];
 
-				for ( var i = 0; i < character.weapons.length; i ++ ) {
+				for ( let i = 0; i < character.weapons.length; i ++ ) {
 
-					var name = character.weapons[ i ].name;
+					const name = character.weapons[ i ].name;
 
 					playbackConfig[ name ] = generateCallback( i );
 					guiItems[ i ] = folder.add( playbackConfig, name ).name( labelize( name ) );
@@ -255,9 +257,9 @@
 
 			function setupSkinsGUI( character ) {
 
-				var folder = gui.addFolder( "Skins" );
+				const folder = gui.addFolder( "Skins" );
 
-				var generateCallback = function ( index ) {
+				const generateCallback = function ( index ) {
 
 					return function () {
 
@@ -267,11 +269,11 @@
 
 				};
 
-				var guiItems = [];
+				const guiItems = [];
 
-				for ( var i = 0; i < character.skinsBody.length; i ++ ) {
+				for ( let i = 0; i < character.skinsBody.length; i ++ ) {
 
-					var name = character.skinsBody[ i ].name;
+					const name = character.skinsBody[ i ].name;
 
 					playbackConfig[ name ] = generateCallback( i );
 					guiItems[ i ] = folder.add( playbackConfig, name ).name( labelize( name ) );
@@ -284,9 +286,9 @@
 
 			function setupGUIAnimations( character ) {
 
-				var folder = gui.addFolder( "Animations" );
+				const folder = gui.addFolder( "Animations" );
 
-				var generateCallback = function ( animationClip ) {
+				const generateCallback = function ( animationClip ) {
 
 					return function () {
 
@@ -296,12 +298,12 @@
 
 				};
 
-				var i = 0, guiItems = [];
-				var animations = character.meshBody.geometry.animations;
+				const guiItems = [];
+				const animations = character.meshBody.geometry.animations;
 
-				for ( var i = 0; i < animations.length; i ++ ) {
+				for ( let i = 0; i < animations.length; i ++ ) {
 
-					var clip = animations[ i ];
+					const clip = animations[ i ];
 
 					playbackConfig[ clip.name ] = generateCallback( clip );
 					guiItems[ i ] = folder.add( playbackConfig, clip.name, clip.name );
@@ -325,7 +327,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				character.update( delta );
 

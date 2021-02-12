@@ -1,13 +1,11 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import {
-	IcosahedronBufferGeometry
-} from '../../../../src/geometries/IcosahedronGeometry';
+import { IcosahedronGeometry, IcosahedronBufferGeometry } from '../../../../src/geometries/IcosahedronGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'IcosahedronBufferGeometry', ( hooks ) => {
+	QUnit.module( 'IcosahedronGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -18,9 +16,10 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				new IcosahedronBufferGeometry(),
-				new IcosahedronBufferGeometry( parameters.radius ),
-				new IcosahedronBufferGeometry( parameters.radius, parameters.detail ),
+				new IcosahedronGeometry(),
+				new IcosahedronGeometry( parameters.radius ),
+				new IcosahedronGeometry( parameters.radius, parameters.detail ),
+				new IcosahedronBufferGeometry()
 			];
 
 		} );

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,16 +16,13 @@
 		<p>
 			读取或编辑 BufferGeometry 中的数据，见 [page:BufferAttribute] 文档。
 		</p>
-		<p>
-			几何体的更多使用示例，详见 [page:Geometry]。
-		</p>
 
 		<h2>代码示例</h2>
 		<code>
-		var geometry = new THREE.BufferGeometry();
+		const geometry = new THREE.BufferGeometry();
 		// 创建一个简单的矩形. 在这里我们左上和右下顶点被复制了两次。
 		// 因为在两个三角面片里，这两个顶点都需要被用到。
-		var vertices = new Float32Array( [
+		const vertices = new Float32Array( [
 			-1.0, -1.0,  1.0,
 			 1.0, -1.0,  1.0,
 			 1.0,  1.0,  1.0,
@@ -38,8 +34,8 @@
 
 		// itemSize = 3 因为每个顶点都是一个三元组。
 		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-		var mesh = new THREE.Mesh( geometry, material );
+		const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		const mesh = new THREE.Mesh( geometry, material );
 		</code>
 
 		<h2>例子</h2>
@@ -119,7 +115,7 @@
 
 		<h3>[property:BufferAttribute index]</h3>
 		<p>
-			允许顶点在多个三角面片间可以重用。这样的顶点被称为"已索引的三角面片（indexed triangles）"并且使用时和[page:Geometry]中一致：
+			允许顶点在多个三角面片间可以重用。这样的顶点被称为"已索引的三角面片（indexed triangles)。
 			每个三角面片都和三个顶点的索引相关。该 attribute 因此所存储的是每个三角面片的三个顶点的索引。
 
 			如果该 attribute 没有设置过，则 [page:WebGLRenderer renderer] 假设每三个连续的位置代表一个三角面片。
@@ -129,7 +125,14 @@
 
 		<h3>[property:Object morphAttributes]</h3>
 		<p>
-			存储 [page:BufferAttribute] 的 Hashmap，存储了几何体 [page:Geometry.morphTargets morphTargets] 的细节信息。
+			存储 [page:BufferAttribute] 的 Hashmap，存储了几何体 morph targets 的细节信息。
+		</p>
+
+		<h3>[property:Boolean morphTargetsRelative]</h3>
+		<p>
+			Used to control the morph target behavior; when set to true, the morph target data is treated as relative offsets, rather than as absolute positions/normals.
+
+			Default is *false*.
 		</p>
 
 		<h3>[property:String name]</h3>
@@ -191,6 +194,12 @@
 			边界球形不会默认计算，需要调用该接口指定计算边界球形，否则保持默认值 *null*。
 		</p>
 
+		<h3>[method:null computeTangents]()</h3>
+		<p>
+		Calculates and adds a tangent attribute to this geometry.<br />
+		The computation is only supported for indexed geometries and if position, normal, and uv attributes are defined.
+		</p>
+
 		<h3>[method:null computeVertexNormals]()</h3>
 		<p>通过面片法向量的平均值计算每个顶点的法向量。</p>
 
@@ -200,21 +209,14 @@
 			如果在运行是需要从内存中删除 BufferGeometry，则需要调用该函数。
 		</p>
 
-		<h3>[method:BufferGeometry fromDirectGeometry]( [param:Geometry] )</h3>
-		<p>
-			通过 [page:DirectGeometry] 所包含的面数据生成一个 BufferGeometry 对象。对于线型几何体未实现该方法。<br /><br />
-
-			注意: [page:DirectGeometry] 主要用于内部 [page:Geometry] 和 BufferGeometry 的类型转换。
-		</p>
-
-		<h3>[method:BufferGeometry fromGeometry]( [param:Geometry] )</h3>
-		<p>通过 [page:Geometry] 所包含的面信息生成一个 BufferGeometry 对象。对于线型几何体未实现该方法。</p>
-
 		<h3>[method:BufferAttribute getAttribute]( [param:String name] )</h3>
 		<p>返回指定名称的 [page:BufferAttribute attribute]。</p>
 
 		<h3>[method:BufferAttribute getIndex] ()</h3>
 		<p>返回缓存相关的 [page:.index]。</p>
+
+		<h3>[method:Boolean hasAttribute]( [param:String name] )</h3>
+		<p>Returns *true* if the attribute with the specified name exists.</p>
 
 		<h3>[method:BufferGeometry lookAt] ( [param:Vector3 vector] )</h3>
 		<p>
@@ -254,14 +256,11 @@
 			缩放几何体。该操作一般在一次处理中完成，不会循环处理。典型的用法是通过调用 [page:Object3D.scale] 实时旋转几何体。
 		</p>
 
-		<h3>[method:null setIndex] ( [param:BufferAttribute index] )</h3>
+		<h3>[method:BufferGeometry setIndex] ( [param:BufferAttribute index] )</h3>
 		<p>设置缓存的 [page:.index]。</p>
 
 		<h3>[method:null setDrawRange] ( [param:Integer start], [param:Integer count] )</h3>
 		<p>设置缓存的 [page:.drawRange]。详见相关属性说明。</p>
-
-		<h3>[method:BufferGeometry setFromObject] ( [param:Object3D object] )</h3>
-		<p>通过 [page:Object3D] 设置该 BufferGeometry 的 attribute。</p>
 
 		<h3>[method:BufferGeometry setFromPoints] ( [param:Array points] )</h3>
 		<p>通过点队列设置该 BufferGeometry 的 attribute。</p>
@@ -276,9 +275,6 @@
 		<p>
 			移动几何体。该操作一般在一次处理中完成，不会循环处理。典型的用法是通过调用 [page:Object3D.rotation] 实时旋转几何体。
 		</p>
-
-		<h3>[method:BufferGeometry updateFromObject] ( [param:Object3D object] )</h3>
-		<div>通过 [page:Object3D] 更新 BufferGeometry 的 attribute。</div>
 
 		<h2>Source</h2>
 

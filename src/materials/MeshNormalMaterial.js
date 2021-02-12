@@ -22,7 +22,9 @@ import { Vector2 } from '../math/Vector2.js';
  *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
- *  morphNormals: <bool>
+ *  morphNormals: <bool>,
+ *
+ *  flatShading: <bool>
  * }
  */
 
@@ -51,6 +53,8 @@ function MeshNormalMaterial( parameters ) {
 	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
+
+	this.flatShading = false;
 
 	this.setValues( parameters );
 
@@ -82,6 +86,8 @@ MeshNormalMaterial.prototype.copy = function ( source ) {
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
+
+	this.flatShading = source.flatShading;
 
 	return this;
 

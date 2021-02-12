@@ -13,16 +13,16 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var container, stats;
+			let stats;
 
-			var camera, scene, renderer, clock;
+			let camera, scene, renderer, clock;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10 );
@@ -32,27 +32,27 @@
 
 				scene = new THREE.Scene();
 
-				var colorArray = [ new THREE.Color( 0xff0080 ), new THREE.Color( 0xffffff ), new THREE.Color( 0x8000ff ) ];
-				var positions = [];
-				var colors = [];
+				const colorArray = [ new THREE.Color( 0xff0080 ), new THREE.Color( 0xffffff ), new THREE.Color( 0x8000ff ) ];
+				const positions = [];
+				const colors = [];
 
-				for ( var i = 0; i < 100; i ++ ) {
+				for ( let i = 0; i < 100; i ++ ) {
 
 					positions.push( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
 
-					var clr = colorArray[ Math.floor( Math.random() * colorArray.length ) ];
+					const clr = colorArray[ Math.floor( Math.random() * colorArray.length ) ];
 
 					colors.push( clr.r, clr.g, clr.b );
 
 				}
 
-				var geometry = new THREE.BufferGeometry();
+				const geometry = new THREE.BufferGeometry();
 				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.PointsMaterial( { size: 4, vertexColors: true, depthTest: false, sizeAttenuation: false } );
+				const material = new THREE.PointsMaterial( { size: 4, vertexColors: true, depthTest: false, sizeAttenuation: false } );
 
-				var mesh = new THREE.Points( geometry, material );
+				const mesh = new THREE.Points( geometry, material );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
@@ -66,7 +66,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -92,7 +92,7 @@
 
 			function render() {
 
-				var elapsedTime = clock.getElapsedTime();
+				const elapsedTime = clock.getElapsedTime();
 
 				scene.rotation.y = elapsedTime * 0.5;
 
