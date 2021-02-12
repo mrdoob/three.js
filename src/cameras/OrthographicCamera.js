@@ -12,14 +12,14 @@ class OrthographicCamera extends Camera {
 		this.type = 'OrthographicCamera';
 
 		this.zoom = 1;
-		this.view = null
-    this.left = left;
-    this.right = right;
-    this.top = top;
-    this.bottom = bottom;
+		this.view = null;
+		this.left = left;
+		this.right = right;
+		this.top = top;
+		this.bottom = bottom;
 
-    this.near = near;
-    this.far = far;
+		this.near = near;
+		this.far = far;
 
 		this.left = ( left !== undefined ) ? left : - 1;
 		this.right = ( right !== undefined ) ? right : 1;
