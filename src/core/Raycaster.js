@@ -62,6 +62,14 @@ class Raycaster {
 
 	}
 
+	set( origin, direction ) {
+
+		// direction is assumed to be normalized (for accurate distance calculations)
+
+		this.ray.set( origin, direction );
+
+	}
+
 	setFromCamera( coords, camera ) {
 
 		if ( camera && camera.isPerspectiveCamera ) {
@@ -120,17 +128,5 @@ class Raycaster {
 	}
 
 }
-
-Object.assign( Raycaster.prototype, {
-
-	set: function ( origin, direction ) {
-
-		// direction is assumed to be normalized (for accurate distance calculations)
-
-		this.ray.set( origin, direction );
-
-	}
-
-} );
 
 export { Raycaster };
