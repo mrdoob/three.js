@@ -25,7 +25,7 @@
 			import { TrackballControls } from "./jsm/controls/TrackballControls.js";
 			import { WorkerTaskManager } from "./jsm/loaders/workerTaskManager/WorkerTaskManager.js";
 			import {
-				TransportBase,
+				DataTransport,
 				GeometryTransport,
 				MeshTransport,
 				MaterialsTransport,
@@ -116,7 +116,7 @@
 						dependencies: [
 							{ url: "../build/three.js" },
 							{ code: CodeUtils.serializeClass( THREE.BufferGeometry ) },
-							{ code: CodeUtils.serializeClass( TransportBase ) },
+							{ code: CodeUtils.serializeClass( DataTransport ) },
 							{ code: CodeUtils.serializeClass( GeometryTransport ) }
 						]
 					} );
@@ -274,7 +274,7 @@
 						await this.loadObjMtl( taskDescr )
 							.then( buffer => {
 								const mt = new MaterialsTransport()
-									.addBuffer( "data", buffer )
+									.addBuffer( 'modelData', buffer )
 									.setMaterials( taskDescr.materialStore.getMaterials() )
 									.cleanMaterials()
 									.package( false );
@@ -290,7 +290,7 @@
 						await this.loadObjMtl( taskDescr )
 							.then( buffer => {
 								const mt = new MaterialsTransport()
-									.addBuffer( "data", buffer )
+									.addBuffer( 'modelData', buffer )
 									.setMaterials( taskDescr.materialStore.getMaterials() )
 									.cleanMaterials()
 									.package( false );
@@ -351,7 +351,7 @@
 
 							let taskDescr = this.tasksToUse[ taskToUseIndex ];
 
-							const tb = new TransportBase( 'execute', globalCount ).setParams( { modelName: taskDescr.name } );
+							const tb = new DataTransport( 'execute', globalCount ).setParams( { modelName: taskDescr.name } );
 							let promise = this.workerTaskManager.enqueueForExecution( taskDescr.name, tb.getMain(),
 								data => this._processMessage( taskDescr, data ) )
 									.then( data => this._processMessage( taskDescr, data ) )
@@ -404,7 +404,7 @@
 									material = new THREE.MeshPhongMaterial( { color: color } );
 
 									mesh = new THREE.Mesh( geometryTransport.getBufferGeometry(), material );
-									this._addMesh( mesh, geometryTransport.main.id );
+									this._addMesh( mesh, geometryTransport.getId() );
 									break;
 
 								case 'MeshTransport' :
@@ -414,11 +414,11 @@
 									material = materialsTransport.processMaterialTransport( taskDescr.materialStore ? taskDescr.materialStore.getMaterials() : {}, true );
 
 									mesh = new THREE.Mesh( meshTransport.getBufferGeometry(), material );
-									this._addMesh( mesh, meshTransport.main.id );
+									this._addMesh( mesh, meshTransport.getId() );
 									break;
 
-								case 'TransportBase':
-									if ( payload.cmd !== 'execComplete' ) console.log( 'TransportBase' );
+								case 'DataTransport':
+									if ( payload.cmd !== 'execComplete' ) console.log( 'DataTransport' );
 									break;
 
 								default:

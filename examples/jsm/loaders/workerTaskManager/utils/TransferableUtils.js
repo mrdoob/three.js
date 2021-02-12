@@ -20,10 +20,10 @@ import {
 /**
  * Define a base structure that is used to ship data in between main and workers.
  */
-class TransportBase {
+class DataTransport {
 
 	/**
-	 * Creates a new {@link TransportBase}.
+	 * Creates a new {@link DataTransport}.
 	 *
 	 * @param {string} [cmd]
 	 * @param {string} [id]
@@ -33,35 +33,57 @@ class TransportBase {
 		this.main = {
 			cmd: ( cmd !== undefined ) ? cmd : 'unknown',
 			id: ( id !== undefined ) ? id : 0,
-			type: 'TransportBase',
+			type: 'DataTransport',
 			/** @type {number} */
 			progress: 0,
+			buffers: {},
 			params: {
 			}
 		};
 		this.transferables = [];
-
 	}
 
 	/**
 	 *
 	 * @param {object} transportObject
 	 *
-	 * @return {TransportBase}
+	 * @return {DataTransport}
 	 */
 	loadData( transportObject ) {
 		this.main.cmd = transportObject.cmd;
 		this.main.id = transportObject.id;
-		this.main.type = 'TransportBase';
+		this.main.type = 'DataTransport';
 		this.setProgress( transportObject.progress );
 		this.setParams( transportObject.params );
+
+		if ( transportObject.buffers ) {
+			Object.entries( transportObject.buffers ).forEach( ( [name, buffer] ) => {
+				this.main.buffers[ name ] = buffer;
+			} );
+		}
 		return this;
 	}
 
 	/**
 	 *
+	 * @return {string}
+	 */
+	getCmd () {
+		return this.main.cmd;
+	}
+
+	/**
+	 *
+	 * @return {number|string}
+	 */
+	getId() {
+		return this.main.id;
+	}
+
+	/**
+	 *
 	 * @param {object.<string, *>} params
-	 * @return {TransportBase}
+	 * @return {DataTransport}
 	 */
 	setParams( params ) {
 
@@ -78,81 +100,15 @@ class TransportBase {
 
 	/**
 	 *
-	 * @return {*|{cmd: string, type: string, progress: {numericalValue: number}, params: {}}|{progress: number, cmd: (string|string), id: (string|number), type: string, params: {}}}
-	 */
-	getMain() {
-
-		return this.main;
-
-	}
-
-	/**
-	 *
-	 * @return {[]|any[]|*}
-	 */
-	getTransferables() {
-
-		return this.transferables;
-
-	}
-
-	/**
-	 *
 	 * @param {number} numericalValue
 	 *
-	 * @return {TransportBase}
+	 * @return {DataTransport}
 	 */
 	setProgress( numericalValue ) {
 
 		this.main.progress = numericalValue;
 		return this;
 
-	}
-
-	/**
-	 * Posts a message by invoking the method on the provided object.
-	 *
-	 * @param {object} postMessageImpl
-	 *
-	 * @return {TransportBase}
-	 */
-	postMessage( postMessageImpl ) {
-
-		postMessageImpl.postMessage( this.main, this.transferables );
-		return this;
-
-	}
-}
-
-class DataTransport extends TransportBase {
-
-	/**
-	 * Creates a new {@link DataTransport}.
-	 *
-	 * @param {string} [cmd]
-	 * @param {string} [id]
-	 */
-	constructor( cmd, id ) {
-		super( cmd, id );
-		this.main.type = 'DataTransport';
-		this.main.buffers = {};
-	}
-
-	/**
-	 *
-	 * @param {object} transportObject
-	 *
-	 * @return {TransportBase}
-	 */
-	loadData( transportObject ) {
-		super.loadData( transportObject );
-
-		if ( transportObject.buffers ) {
-			Object.entries( transportObject.buffers ).forEach( ( [name, buffer] ) => {
-				this.main.buffers[ name ] = buffer;
-			} );
-		}
-		return this;
 	}
 
 	/**
@@ -166,13 +122,13 @@ class DataTransport extends TransportBase {
 		return this;
 	}
 
+	/**
+	 *
+	 * @param name
+	 * @return {ArrayBuffer}
+	 */
 	getBuffer( name ) {
-		return this.main.buffers[ name];
-	}
-
-	setParams( params ) {
-		super.setParams( params );
-		return this;
+		return this.main.buffers[ name ];
 	}
 
 	/**
@@ -184,26 +140,50 @@ class DataTransport extends TransportBase {
 	 */
 	package( cloneBuffers ) {
 		for ( let buffer of Object.values( this.main.buffers ) ) {
-			this.addArrayBufferToTransferable( buffer, cloneBuffers );
+
+			if ( buffer !== null && buffer !== undefined ) {
+
+				const potentialClone = cloneBuffers ? buffer.slice( 0 ) : buffer;
+				this.transferables.push( potentialClone );
+
+			}
+
 		}
 		return this;
 	}
 
 	/**
+	 * Return main data object
+	 * @return {object}
+	 */
+	getMain() {
+
+		return this.main;
+
+	}
+
+	/**
+	 * Return all transferable in one array.
+	 * @return {[]|any[]|*}
+	 */
+	getTransferables() {
+
+		return this.transferables;
+
+	}
+
+	/**
+	 * Posts a message by invoking the method on the provided object.
 	 *
-	 * @param buffer
-	 * @param cloneBuffer
+	 * @param {object} postMessageImpl
 	 *
 	 * @return {DataTransport}
 	 */
-	addArrayBufferToTransferable( buffer, cloneBuffer ) {
-		if ( buffer !== null && buffer !== undefined ) {
+	postMessage( postMessageImpl ) {
 
-			const potentialClone = cloneBuffer ? buffer.slice( 0 ) : buffer;
-			this.transferables.push( potentialClone );
-
-		}
+		postMessageImpl.postMessage( this.main, this.transferables );
 		return this;
+
 	}
 }
 
@@ -391,7 +371,7 @@ class MaterialsTransport extends DataTransport {
 /**
  * Define a structure that is used to send geometry data between main and workers.
  */
-class GeometryTransport extends TransportBase {
+class GeometryTransport extends DataTransport {
 
 	/**
 	 * Creates a new {@link GeometrySender}.
@@ -440,7 +420,7 @@ class GeometryTransport extends TransportBase {
 	 */
 	setGeometry( geometry, geometryType ) {
 		this.main.geometry = geometry;
-		this.main.params.geometryType = geometryType;
+		this.main.geometryType = geometryType;
 		if ( geometry instanceof BufferGeometry ) this.main.bufferGeometry = geometry;
 
 		return this;
@@ -454,6 +434,7 @@ class GeometryTransport extends TransportBase {
 	 * @return {GeometryTransport}
 	 */
 	package( cloneBuffers ) {
+		super.package( cloneBuffers );
 		const vertexBA = this.main.geometry.getAttribute( 'position' );
 		const normalBA = this.main.geometry.getAttribute( 'normal' );
 		const uvBA = this.main.geometry.getAttribute( 'uv' );
@@ -741,6 +722,9 @@ class MaterialUtils {
 
 }
 
+/**
+ * Store materials in an object and create and store default materials optionally.
+ */
 class MaterialStore {
 
 	constructor( createDefaultMaterials ) {
@@ -909,7 +893,6 @@ class ObjectManipulator {
 }
 
 export {
-	TransportBase,
 	DataTransport,
 	GeometryTransport,
 	MeshTransport,

@@ -3,7 +3,6 @@
  */
 
 import {
-	TransportBase,
 	DataTransport,
 	MaterialsTransport,
 	MaterialUtils,
@@ -28,7 +27,6 @@ const OBJLoaderWorker = {
 			{ url: objLoaderLocation },
 			{ code: '\n\nconst OBJLoader = THREE.OBJLoader;\n\n' },
 			{ code: '\n\n' },
-			{ code: CodeUtils.serializeClass( TransportBase ) },
 			{ code: CodeUtils.serializeClass( DataTransport ) },
 			{ code: CodeUtils.serializeClass( MaterialsTransport ) },
 			{ code: CodeUtils.serializeClass( MaterialUtils ) },
@@ -46,7 +44,7 @@ const OBJLoaderWorker = {
 			materials: materialsTransport.getMaterials()
 		}
 
-		const buffer = materialsTransport.getBuffer( 'data' )
+		const buffer = materialsTransport.getBuffer( 'modelData' )
 		if ( buffer !== undefined && buffer !== null ) context.objLoader.buffer = buffer;
 
 		context.postMessage( {
@@ -58,7 +56,9 @@ const OBJLoaderWorker = {
 	execute: function ( context, id, config ) {
 
 		context.objLoader.loader = new OBJLoader();
-		context.objLoader.loader.objectId = config.id;
+		const dataTransport = new DataTransport().loadData( config );
+
+		context.objLoader.loader.objectId = dataTransport.getId();
 		context.objLoader.loader.setMaterials( context.objLoader.materials );
 
 		const enc = new TextDecoder("utf-8");
@@ -66,12 +66,12 @@ const OBJLoaderWorker = {
 		for ( let mesh, i = 0; i < meshes.children.length; i ++ ) {
 
 			mesh = meshes.children[ i ];
-			mesh.name = mesh.name + config.id;
+			mesh.name = mesh.name + dataTransport.getId();
 
 			const materialsTransport = new MaterialsTransport();
 			const material = mesh.material;
 			MaterialUtils.addMaterial( materialsTransport.main.materials, material, material.name, false, false );
-			new MeshTransport( 'assetAvailable', config.id )
+			new MeshTransport( 'assetAvailable', dataTransport.getId() )
 				.setMesh( mesh, 0 )
 				.setMaterialsTransport( materialsTransport )
 				.package( false )
@@ -80,7 +80,7 @@ const OBJLoaderWorker = {
 		}
 
 		// signal complete
-		new TransportBase( 'execComplete' ).postMessage( context );
+		new DataTransport( 'execComplete' ).postMessage( context );
 
 	}
 
