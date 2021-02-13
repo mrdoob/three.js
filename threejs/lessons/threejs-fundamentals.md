@@ -488,6 +488,6 @@ version of this site so going forward this site will only show es6 module style.
 to support legacy browsers look into a <a href="https://babeljs.io">transpiler</a>.</p>
 </div>
 
-<!-- needed for out of date translations -->
+<!-- needed in English only to prevent warning from outdated translations -->
 <a href="threejs-geometry.html"></a>
 <a href="Geometry"></a>

@@ -381,10 +381,6 @@ positionAttribute.needsUpdate = true;
 
 `BufferGeometry`を作って`BufferAttribute`をアップデートする方法を紹介しました。
 
-<!-- needed to prevent warning from outdated translations -->
-<a href="resources/threejs-geometry.svg"></a>
-<a href="threejs-custom-geometry.html"></a>
-
 <canvas id="c"></canvas>
 <script type="module" src="resources/threejs-custom-buffergeometry.js"></script>
 

@@ -442,7 +442,7 @@ I hope these were useful examples of how to use `BufferGeometry` directly to
 make your own geometry and how to dynamically update the contents of a
 `BufferAttribute`.
 
-<!-- needed to prevent warning from outdated translations -->
+<!-- needed in English only to prevent warning from outdated translations -->
 <a href="resources/threejs-geometry.svg"></a>
 <a href="threejs-custom-geometry.html"></a>
 
