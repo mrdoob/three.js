@@ -2,15 +2,8 @@ Title: Three.jsのカスタムバッファジオメトリ
 Description: カスタムバッファジオメトリを作る
 TOC: カスタムバッファジオメトリ
 
-{{{warning msgId="updateNeeded" link="https://github.com/gfxfundamentals/threejsfundamentals/issues/185"}}}
-
-[前回の記事](threejs-custom-geometry.html)では`Geometry`を紹介しました。この記事では`BufferGeometry`を紹介します。`BufferGeometry`とは*一般的に*高速で動きメモリ消費も低く抑えられます。が、設定は少し難しいです。
-
-[ジオメトリの記事](threejs-custom-geometry.html) のおさらいをしましょう。`Geometry`には`Vector3`を設定する必要がありました。これは頂点を表す三次元上の点です。次に`Face3`を設定することで面を定義しました。これはvertexの配列のインデックス情報を使って３つの点を指定することで面を定義しています。光の反射方向などの設定するためにfaceにはnormal（法線）が必要でした。faceに対して１つのnormalを設定することもできますし、vertexに指定して滑らかな面を擬似的に作ることもできました。colorもnormalと同じようにfaceに指定したりvertexに指定したりできました。記事の最後では配列の配列を使ってテクスチャ座標（UV）を設定しました。配列の中の配列の１つが１つのfaceに対応しておりその配列の１つの要素がvertex１つに対応しています。
-
-<div class="threejs_center"><img src="resources/threejs-geometry.svg" style="width: 700px"></div>
-
-`BufferGeometry`は`BufferAttribute`を使います。１つの`BufferAttribute`はジオメトリを作るための１種類のデータに対応しています。vertexの位置情報を格納するための`BufferAttribute`、color情報を格納するための`BufferAttribute`、normal情報を格納するための`BufferAttribute`がそれぞれあります。
+`BufferGeometry`は全てのジオメトリを表現する方法です。
+BufferGeometryは`BufferAttribute`を使います。１つの`BufferAttribute`はジオメトリを作るための１種類のデータに対応しています。vertexの位置情報を格納するための`BufferAttribute`、color情報を格納するための`BufferAttribute`、normal情報を格納するための`BufferAttribute`がそれぞれあります。
 
 <div class="threejs_center"><img src="resources/threejs-attributes.svg" style="width: 700px"></div>
 
@@ -18,13 +11,19 @@ TOC: カスタムバッファジオメトリ
 
 <div class="threejs_center"><img src="resources/cube-faces-vertex.svg" style="width: 500px"></div>
 
-上の図のハイライトされたvertexにはこのvertexに接する全ての面のnormalが指定されています。UVを指定するときもすべてのfaceに対して指定する必要があります。これが`Geometry`と`BufferGeometry`の大きな違いです。`BufferGeometry`では情報が共有されることはありません。単一のvertexはこれらの情報の合成として表現されます。
+上の図のハイライトされたvertexには、このvertexに接する全ての面に異なるnormalが必要です。normalとはどの方向を向いているかの情報です。
+この図ではnormalは角の頂点の周りの矢印で示されており、その頂点に接する全ての面には異なる方向を指すnormalが必要です。
 
-実は`Geometry`を使うときはthree.jsが自動的にこのフォーマットに変換しています。`Geometry`が`BufferGeometry`よりメモリを使うのはこの変換のためです。すべての`Vector3`, `Vector2`, `Face3`を`BufferAttribute`配列に変換する際にメモリを使います。`Geometry`は簡単に書けるため便利ですが`BufferGeometry`を使う時にはこれら全ての変換を自分でする必要があります。
+同様に面ごとに違うUVも必要です。
+UVはテクスチャのどの部分に頂点位置が対応しているか指定するテクスチャ座標です。
+緑の面はFテクスチャの右上に対応するUV、青い面は左上に対応するUV、赤の面は左下に対応したUVが必要な事が分かります。
+
+単一のvertexはこれらの情報の合成として表現されます。
+頂点が異なる部分を必要とする場合、それは異なる頂点でなければなりません。
 
 簡単な例として`BufferGeometry`を使って立方体を作ってみましょう。立方体を例にするのはvertexがfaceによって共有されているように見えて実は共有されていないからです。この例ではまずすべてのvertexの情報をリストアップして並列の配列に変換して`BufferAttribute`を作り、最後に`BufferGeometry`を作ります。
 
-[以前の記事](threejs-custom-geometry.html)のサンプルコードを使います。`Geometry`を作っていた部分は全て消します。次に立方体に必要な情報をすべてリストアップします。`Geometry`では１つのvertexを複数のfaceで共有できましたが今回は共有できないことに注意してください。つまり１つの立方体を作るために３６個のvertexが必要になります。１つの面につき２つの三角形、１つの三角形につき３つのvertex、これが６面あるので３６個のvertexが必要になる計算です。
+立方体に必要な情報をすべてリストアップします。`Geometry`では１つのvertexを複数のfaceで共有できましたが今回は共有できないことに注意してください。つまり１つの立方体を作るために３６個のvertexが必要になります。１つの面につき２つの三角形、１つの三角形につき３つのvertex、これが６面あるので３６個のvertexが必要になる計算です。
 
 ```js
 const vertices = [
@@ -117,7 +116,6 @@ for (const vertex of vertices) {
 
 {{{example url="../threejs-custom-buffergeometry-cube.html"}}}
 
-
 かなり大量のデータです。この配列からvertexを選ぶときにはインデックスを使います。１つの三角形は３つのvertexで構成されていて２つの三角形が１つのfaceを作っています。これが６枚で１つの立方体を構成しています。１つのfaceを構成する２つの三角形を作っているvertexは２つが同じデータを持っています。position, normal, UVすべて同じです。そこで重複しているデータを１つ消して１つにして、そのデータを別のインデックスで指定します。
 
 ではまず重複したデータを１つにします。
@@ -200,17 +198,11 @@ geometry.setAttribute(
 
 {{{example url="../threejs-custom-buffergeometry-cube-indexed.html"}}}
 
-
 `Geometry`と同じように`BufferGeometry`も[`computeVertexNormals`](BufferGeometry.computeVertexNormals)メソッドを持っています。これは特に指定がない場合に自動的にnormalを計算するメソッドです。ただし`Geometry`の場合と違いvertexがfaceによって共有されていないために`computeVertexNormals`の結果も少し違います。
 
 <div class="spread">
   <div>
     <div data-diagram="bufferGeometryCylinder"></div>
-    <div class="code">BufferGeometry</div>
-  </div>
-  <div>
-    <div data-diagram="geometryCylinder"></div>
-    <div class="code">Geometry</div>
   </div>
 </div>
 
@@ -338,6 +330,7 @@ const segmentsAround = 24;
 const segmentsDown = 16;
 const {positions, indices} = makeSpherePositions(segmentsAround, segmentsDown);
 ```
+
 returnされているpositionは単位球（半径が１の球体）なのでそのままこのデータをnormalに使えます。
 
 ```js
@@ -386,7 +379,11 @@ positionAttribute.needsUpdate = true;
 
 {{{example url="../threejs-custom-buffergeometry-dynamic.html"}}}
 
-`BufferGeometry`を作って`BufferAttribute`をアップデートする方法を紹介しました。`BufferAttribute`を使うか`Geometry`はケースバイケースです。
+`BufferGeometry`を作って`BufferAttribute`をアップデートする方法を紹介しました。
+
+<!-- needed to prevent warning from outdated translations -->
+<a href="resources/threejs-geometry.svg"></a>
+<a href="threejs-custom-geometry.html"></a>
 
 <canvas id="c"></canvas>
 <script type="module" src="resources/threejs-custom-buffergeometry.js"></script>
