@@ -30,6 +30,8 @@ var TrackballControls = function ( object, domElement ) {
 	this.noRotate = false;
 	this.noZoom = false;
 	this.noPan = false;
+	this.noPanX = false;
+	this.noPanY = false;
 
 	this.staticMoving = false;
 	this.dynamicDampingFactor = 0.2;
@@ -258,6 +260,18 @@ var TrackballControls = function ( object, domElement ) {
 		return function panCamera() {
 
 			mouseChange.copy( _panEnd ).sub( _panStart );
+
+			if (this.noPanX) {
+
+				mouseChange.x = 0
+
+			}
+
+			if (this.noPanY) {
+
+				mouseChange.y = 0
+
+			}
 
 			if ( mouseChange.lengthSq() ) {
 
@@ -671,6 +685,19 @@ var TrackballControls = function ( object, domElement ) {
 				var x = ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX ) / 2;
 				var y = ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY ) / 2;
 				_panEnd.copy( getMouseOnScreen( x, y ) );
+
+				if (scope.noPanX) {
+		
+					_panEnd.x = _panStart.x
+		
+				}
+		
+				if (scope.noPanY) {
+		
+					_panEnd.y = _panStart.y
+		
+				}
+				
 				break;
 
 		}

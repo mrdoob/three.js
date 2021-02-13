@@ -34,7 +34,9 @@
 			let perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
 
 			const params = {
-				orthographicCamera: false
+				orthographicCamera: false, 
+				noPanX: false, 
+				noPanY: false
 			};
 
 			const frustumSize = 400;
@@ -106,6 +108,10 @@
 					createControls( value ? orthographicCamera : perspectiveCamera );
 
 				} );
+
+				gui.add( params, 'noPanX' ).name( 'disable pan: X axis' ).onChange( function ( value ) { controls.noPanX = value; } );
+				gui.add( params, 'noPanY' ).name( 'disable pan: Y axis' ).onChange( function ( value ) { controls.noPanY = value; } );
+
 
 				//
 
