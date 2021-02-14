@@ -38,6 +38,14 @@
 			<li>EXT_meshopt_compression</li>
 		</ul>
 
+		<p>
+			The following glTF 2.0 extension is supported by an external user plugin
+		</p>
+
+		<ul>
+			<li>[link:https://github.com/takahirox/three-gltf-plugins KHR_materials_variants]<sup>3</sup></li>
+		</ul>
+
 		<p><i>
 			<sup>1</sup>需要[link:https://threejs.org/docs/#api/en/renderers/WebGLRenderer.physicallyCorrectLights physicallyCorrectLights]被启用。
 		</i></p>
@@ -50,6 +58,10 @@
 			每次对使用具有唯一变换的纹理都会导致一次额外的GPU纹理上传。
 			请参阅#[link:https://github.com/mrdoob/three.js/pull/13831 13831] 和
 			#[link:https://github.com/mrdoob/three.js/issues/12788 12788]。
+		</i></p>
+
+		<p><i>
+			<sup>3</sup>You can also manually process the extension after loading in your application. See [link:https://threejs.org/examples/#webgl_loader_gltf_variants Three.js glTF materials variants example].
 		</i></p>
 
 		<h2>代码示例</h2>
