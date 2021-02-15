@@ -4,7 +4,7 @@ class FogExp2 {
 
 	constructor( color, density ) {
 
-		Object.defineProperty( this, 'isFogExp2', { value: true } );
+		this.isFogExp2 = true;
 
 		this.name = '';
 

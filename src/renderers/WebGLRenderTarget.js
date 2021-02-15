@@ -14,7 +14,7 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		super();
 
-		Object.defineProperty( this, 'isWebGLRenderTarget', { value: true } );
+		this.isWebGLRenderTarget = true;
 
 		this.width = width;
 		this.height = height;

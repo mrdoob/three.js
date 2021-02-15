@@ -8,7 +8,7 @@ class LineCurve extends Curve {
 		super();
 
 		this.type = 'LineCurve';
-		Object.defineProperty( this, 'isLineCurve', { value: true } );
+		this.isLineCurve = true;
 
 		this.v1 = v1;
 		this.v2 = v2;

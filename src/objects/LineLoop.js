@@ -6,7 +6,7 @@ class LineLoop extends Line {
 
 		super( geometry, material );
 		this.type = 'LineLoop';
-		Object.defineProperty( this, 'isLineLoop', { value: true } );
+		this.isLineLoop = true;
 
 	}
 

@@ -55,7 +55,7 @@ class Color {
 
 	constructor( r, g, b ) {
 
-		Object.defineProperty( this, 'isColor', { value: true } );
+		this.isColor = true;
 
 		if ( g === undefined && b === undefined ) {
 

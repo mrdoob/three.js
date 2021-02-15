@@ -15,7 +15,7 @@ class PointLightShadow extends LightShadow {
 
 		super( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
-		Object.defineProperty( this, 'isPointLightShadow', { value: true } );
+		this.isPointLightShadow = true;
 
 		this._frameExtents = new Vector2( 4, 2 );
 
