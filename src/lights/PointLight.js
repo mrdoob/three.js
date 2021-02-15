@@ -7,7 +7,7 @@ class PointLight extends Light {
 
 		super( color, intensity );
 
-		Object.defineProperty( this, 'isPointLight', { value: true } );
+		this.isPointLight = true;
 
 		this.type = 'PointLight';
 

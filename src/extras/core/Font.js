@@ -4,7 +4,7 @@ class Font {
 
 	constructor( data ) {
 
-		Object.defineProperty( this, 'isFont', { value: true } );
+		this.isFont = true;
 
 		this.type = 'Font';
 

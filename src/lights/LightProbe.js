@@ -7,7 +7,7 @@ class LightProbe extends Light {
 
 		super( undefined, intensity );
 
-		Object.defineProperty( this, 'isLightProbe', { value: true } );
+		this.isLightProbe = true;
 
 		this.sh = sh;
 

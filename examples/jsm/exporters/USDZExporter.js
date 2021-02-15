@@ -83,9 +83,11 @@ async function imgToU8( image ) {
 		( typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas ) ||
 		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
+		const scale = 1024 / Math.max( image.width, image.height );
+
 		const canvas = document.createElement( 'canvas' );
-		canvas.width = Math.min( 1024, image.width );
-		canvas.height = Math.min( 1024, image.height );
+		canvas.width = image.width * Math.min( 1, scale );
+		canvas.height = image.height * Math.min( 1, scale );
 
 		const context = canvas.getContext( '2d' );
 		context.drawImage( image, 0, 0, canvas.width, canvas.height );

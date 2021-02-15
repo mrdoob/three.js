@@ -88,7 +88,7 @@ class CatmullRomCurve3 extends Curve {
 		super();
 
 		this.type = 'CatmullRomCurve3';
-		Object.defineProperty( this, 'isCatmullRomCurve3', { value: true } );
+		this.isCatmullRomCurve3 = true;
 		this.points = points;
 		this.closed = closed;
 		this.curveType = curveType;

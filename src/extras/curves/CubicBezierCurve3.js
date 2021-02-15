@@ -9,7 +9,7 @@ class CubicBezierCurve3 extends Curve {
 		super();
 
 		this.type = 'CubicBezierCurve3';
-		Object.defineProperty( this, 'isCubicBezierCurve3', { value: true } );
+		this.isCubicBezierCurve3 = true;
 
 		this.v0 = v0;
 		this.v1 = v1;

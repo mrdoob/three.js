@@ -21,7 +21,7 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		super( size, size, options );
 
-		Object.defineProperty( this, 'isWebGLCubeRenderTarget', { value: true } );
+		this.isWebGLCubeRenderTarget = true;
 
 		options = options || {};
 

@@ -4,7 +4,7 @@ class Quaternion {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
-		Object.defineProperty( this, 'isQuaternion', { value: true } );
+		this.isQuaternion = true;
 
 		this._x = x;
 		this._y = y;

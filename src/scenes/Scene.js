@@ -6,7 +6,7 @@ class Scene extends Object3D {
 
 		super();
 
-		Object.defineProperty( this, 'isScene', { value: true } );
+		this.isScene = true;
 
 		this.type = 'Scene';
 
