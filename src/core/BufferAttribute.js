@@ -394,12 +394,18 @@ Object.assign( BufferAttribute.prototype, {
 
 	toJSON: function () {
 
-		return {
+		const data = {
 			itemSize: this.itemSize,
 			type: this.array.constructor.name,
 			array: Array.prototype.slice.call( this.array ),
 			normalized: this.normalized
 		};
+
+		if ( this.name !== '' ) data.name = this.name;
+		if ( this.usage !== StaticDrawUsage ) data.usage = this.usage;
+		if ( this.updateRange.offset !== 0 || this.updateRange.count !== - 1 ) data.updateRange = this.updateRange;
+
+		return data;
 
 	}
 
