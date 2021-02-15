@@ -34,16 +34,43 @@ class USDZExporter {
 		output += buildMaterials( materials );
 		output += buildTextures( textures );
 
-		const files = {};
+		const files = { 'model.usda': strToU8( output ) };
 
 		for ( const uuid in textures ) {
 
 			const texture = textures[ uuid ];
-			files[ 'Texture_' + texture.id + '.jpg' ] = await imgToU8( texture.image );
+			files[ 'textures/Texture_' + texture.id + '.jpg' ] = await imgToU8( texture.image );
 
 		}
 
-		return zipSync( { 'model.usda': strToU8( output ), 'textures': files }, { level: 0 } );
+		// 64 byte alignment
+		// https://github.com/101arrowz/fflate/issues/39#issuecomment-777263109
+
+		let offset = 0;
+
+		for ( const filename in files ) {
+
+			const file = files[ filename ];
+			const headerSize = 34 + filename.length;
+
+			offset += headerSize;
+
+			const offsetMod64 = offset & 63;
+
+			if ( offsetMod64 !== 4 ) {
+
+				const padLength = 64 - offsetMod64;
+				const padding = new Uint8Array( padLength );
+
+				files[ filename ] = [ file, { extra: { 12345: padding } } ];
+
+			}
+
+			offset = file.length;
+
+		}
+
+		return zipSync( files, { level: 0 } );
 
 	}
 
@@ -57,8 +84,8 @@ async function imgToU8( image ) {
 		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
 		const canvas = document.createElement( 'canvas' );
-		canvas.width = image.width;
-		canvas.height = image.height;
+		canvas.width = Math.min( 1024, image.width );
+		canvas.height = Math.min( 1024, image.height );
 
 		const context = canvas.getContext( '2d' );
 		context.drawImage( image, 0, 0, canvas.width, canvas.height );
@@ -76,7 +103,9 @@ function buildHeader() {
 
 	return `#usda 1.0
 (
-    doc = "Three.js"
+    customLayerData = {
+        string creator = "Three.js USDZExporter"
+    }
     metersPerUnit = 1
     upAxis = "Y"
 )
@@ -251,27 +280,27 @@ function buildMaterial( material ) {
 
 	if ( material.map !== null ) {
 
-		parameters.push( `${ pad }float3 inputs:diffuseColor.connect = </Textures/Texture_${ material.map.id }.outputs:rgb>` );
+		parameters.push( `${ pad }color3f inputs:diffuseColor.connect = </Textures/Texture_${ material.map.id }.outputs:rgb>` );
 
 	} else {
 
-		parameters.push( `${ pad }float3 inputs:diffuseColor = ${ buildColor( material.color ) }` );
+		parameters.push( `${ pad }color3f inputs:diffuseColor = ${ buildColor( material.color ) }` );
 
 	}
 
 	if ( material.emissiveMap !== null ) {
 
-		parameters.push( `${ pad }float3 inputs:emissiveColor.connect = </Textures/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }color3f inputs:emissiveColor.connect = </Textures/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
 
-	} else {
+	} else if ( material.emissive.getHex() > 0 ) {
 
-		parameters.push( `${ pad }float3 inputs:emissiveColor = ${ buildColor( material.emissive ) }` );
+		parameters.push( `${ pad }color3f inputs:emissiveColor = ${ buildColor( material.emissive ) }` );
 
 	}
 
 	if ( material.normalMap !== null ) {
 
-		parameters.push( `${ pad }float3 inputs:normal.connect = </Textures/Texture_${ material.normalMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }normal3f inputs:normal.connect = </Textures/Texture_${ material.normalMap.id }.outputs:rgb>` );
 
 	}
 
@@ -346,7 +375,6 @@ function buildTexture( texture ) {
     {
         uniform token info:id = "UsdUVTexture"
         asset inputs:file = @textures/Texture_${ texture.id }.jpg@
-        token inputs:isSRGB = "auto"
         token inputs:wrapS = "repeat"
         token inputs:wrapT = "repeat"
         float outputs:r
