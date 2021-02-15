@@ -763,7 +763,19 @@ THREE.GLTFLoader = ( function () {
 
 		var extension = textureDef.extensions[ name ];
 		var source = json.images[ extension.source ];
-		var loader = source.uri ? parser.options.manager.getHandler( source.uri ) : parser.textureLoader;
+
+		var loader;
+		if ( source.uri ) {
+
+			loader = parser.options.getHandler( source.uri );
+
+		}
+
+		if ( ! loader ) {
+
+			loader = parser.textureLoader;
+
+		}
 
 		return this.detectSupport().then( function ( isSupported ) {
 
