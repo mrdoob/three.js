@@ -63,6 +63,32 @@ Object.assign( Loader.prototype, {
 		this.requestHeader = requestHeader;
 		return this;
 
+	},
+
+	setFromFetchOptions: function ( fetchOptions ) {
+
+		this.setWithCredentials( fetchOptions.credentials === 'include' );
+
+		if ( fetchOptions.credentials === 'include' && fetchOptions.mode === 'cors' ) {
+
+			this.setCrossOrigin( 'use-credentials' );
+
+		} else {
+
+			this.setCrossOrigin( 'anonymous' );
+
+		}
+
+		if ( fetchOptions.headers ) {
+
+			this.setRequestHeader( fetchOptions.headers );
+
+		} else {
+
+			this.setRequestHeader( {} );
+
+		}
+
 	}
 
 } );
