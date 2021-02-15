@@ -5,7 +5,7 @@ class Vector3 {
 
 	constructor( x = 0, y = 0, z = 0 ) {
 
-		Object.defineProperty( this, 'isVector3', { value: true } );
+		this.isVector3 = true;
 
 		this.x = x;
 		this.y = y;

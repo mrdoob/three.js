@@ -8,7 +8,7 @@ class SpotLight extends Light {
 
 		super( color, intensity );
 
-		Object.defineProperty( this, 'isSpotLight', { value: true } );
+		this.isSpotLight = true;
 
 		this.type = 'SpotLight';
 

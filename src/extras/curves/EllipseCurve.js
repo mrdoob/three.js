@@ -8,7 +8,7 @@ class EllipseCurve extends Curve {
 		super();
 
 		this.type = 'EllipseCurve';
-		Object.defineProperty( this, 'isEllipseCurve', { value: true } );
+		this.isEllipseCurve = true;
 
 		this.aX = aX || 0;
 		this.aY = aY || 0;

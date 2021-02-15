@@ -6,7 +6,7 @@ class Group extends Object3D {
 
 		super();
 		this.type = 'Group';
-		Object.defineProperty( this, 'isGroup', { value: true } );
+		this.isGroup = true;
 
 	}
 

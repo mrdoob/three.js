@@ -57,7 +57,7 @@ class Sprite extends Object3D {
 
 		this.center = new Vector2( 0.5, 0.5 );
 
-		Object.defineProperty( this, 'isSprite', { value: true } );
+		this.isSprite = true;
 
 	}
 
