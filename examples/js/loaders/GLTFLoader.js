@@ -228,6 +228,7 @@ THREE.GLTFLoader = ( function () {
 
 				path: path || this.resourcePath || '',
 				crossOrigin: this.crossOrigin,
+				requestHeader: this.requestHeader,
 				manager: this.manager,
 				ktx2Loader: this.ktx2Loader,
 				meshoptDecoder: this.meshoptDecoder
@@ -1836,6 +1837,7 @@ THREE.GLTFLoader = ( function () {
 		}
 
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
+		this.textureLoader.setRequestHeader( this.options.requestHeader );
 
 		this.fileLoader = new THREE.FileLoader( this.options.manager );
 		this.fileLoader.setResponseType( 'arraybuffer' );
