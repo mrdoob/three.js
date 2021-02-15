@@ -1305,9 +1305,7 @@
 				y = 0;
 			}
 
-			Object.defineProperty(this, 'isVector2', {
-				value: true
-			});
+			this.isVector2 = true;
 			this.x = x;
 			this.y = y;
 		}
@@ -1656,9 +1654,7 @@
 
 	var Matrix3 = /*#__PURE__*/function () {
 		function Matrix3() {
-			Object.defineProperty(this, 'isMatrix3', {
-				value: true
-			});
+			this.isMatrix3 = true;
 			this.elements = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 
 			if (arguments.length > 0) {
@@ -2280,9 +2276,7 @@
 				w = 1;
 			}
 
-			Object.defineProperty(this, 'isVector4', {
-				value: true
-			});
+			this.isVector4 = true;
 			this.x = x;
 			this.y = y;
 			this.z = z;
@@ -2796,9 +2790,7 @@
 			var _this;
 
 			_this = _EventDispatcher.call(this) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isWebGLRenderTarget', {
-				value: true
-			});
+			_this.isWebGLRenderTarget = true;
 			_this.width = width;
 			_this.height = height;
 			_this.depth = 1;
@@ -2881,9 +2873,7 @@
 			var _this;
 
 			_this = _WebGLRenderTarget.call(this, width, height, options) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isWebGLMultisampleRenderTarget', {
-				value: true
-			});
+			_this.isWebGLMultisampleRenderTarget = true;
 			_this.samples = 4;
 			return _this;
 		}
@@ -2918,9 +2908,7 @@
 				w = 1;
 			}
 
-			Object.defineProperty(this, 'isQuaternion', {
-				value: true
-			});
+			this.isQuaternion = true;
 			this._x = x;
 			this._y = y;
 			this._z = z;
@@ -3465,9 +3453,7 @@
 				z = 0;
 			}
 
-			Object.defineProperty(this, 'isVector3', {
-				value: true
-			});
+			this.isVector3 = true;
 			this.x = x;
 			this.y = y;
 			this.z = z;
@@ -4008,9 +3994,7 @@
 
 	var Box3 = /*#__PURE__*/function () {
 		function Box3(min, max) {
-			Object.defineProperty(this, 'isBox3', {
-				value: true
-			});
+			this.isBox3 = true;
 			this.min = min !== undefined ? min : new Vector3(+Infinity, +Infinity, +Infinity);
 			this.max = max !== undefined ? max : new Vector3(-Infinity, -Infinity, -Infinity);
 		}
@@ -4926,9 +4910,7 @@
 
 	var Matrix4 = /*#__PURE__*/function () {
 		function Matrix4() {
-			Object.defineProperty(this, 'isMatrix4', {
-				value: true
-			});
+			this.isMatrix4 = true;
 			this.elements = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 			if (arguments.length > 0) {
@@ -5708,9 +5690,7 @@
 				order = Euler.DefaultOrder;
 			}
 
-			Object.defineProperty(this, 'isEuler', {
-				value: true
-			});
+			this.isEuler = true;
 			this._x = x;
 			this._y = y;
 			this._z = z;
@@ -6613,9 +6593,7 @@
 
 	var Plane = /*#__PURE__*/function () {
 		function Plane(normal, constant) {
-			Object.defineProperty(this, 'isPlane', {
-				value: true
-			}); // normal is assumed to be normalized
+			this.isPlane = true; // normal is assumed to be normalized
 
 			this.normal = normal !== undefined ? normal : new Vector3(1, 0, 0);
 			this.constant = constant !== undefined ? constant : 0;
@@ -7543,9 +7521,7 @@
 
 	var Color = /*#__PURE__*/function () {
 		function Color(r, g, b) {
-			Object.defineProperty(this, 'isColor', {
-				value: true
-			});
+			this.isColor = true;
 
 			if (g === undefined && b === undefined) {
 				// r is THREE.Color, hex or string
@@ -10229,9 +10205,7 @@
 			}
 
 			_this = _WebGLRenderTarget.call(this, size, size, options) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isWebGLCubeRenderTarget', {
-				value: true
-			});
+			_this.isWebGLCubeRenderTarget = true;
 			options = options || {};
 			_this.texture = new CubeTexture(undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding);
 			_this.texture._needsFlipEnvMap = false;
@@ -17137,9 +17111,7 @@
 
 			_this = _Object3D.call(this) || this;
 			_this.type = 'Group';
-			Object.defineProperty(_assertThisInitialized(_this), 'isGroup', {
-				value: true
-			});
+			_this.isGroup = true;
 			return _this;
 		}
 
@@ -19554,9 +19526,7 @@
 
 	var FogExp2 = /*#__PURE__*/function () {
 		function FogExp2(color, density) {
-			Object.defineProperty(this, 'isFogExp2', {
-				value: true
-			});
+			this.isFogExp2 = true;
 			this.name = '';
 			this.color = new Color(color);
 			this.density = density !== undefined ? density : 0.00025;
@@ -19583,9 +19553,7 @@
 
 	var Fog = /*#__PURE__*/function () {
 		function Fog(color, near, far) {
-			Object.defineProperty(this, 'isFog', {
-				value: true
-			});
+			this.isFog = true;
 			this.name = '';
 			this.color = new Color(color);
 			this.near = near !== undefined ? near : 1;
@@ -19619,9 +19587,7 @@
 			var _this;
 
 			_this = _Object3D.call(this) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isScene', {
-				value: true
-			});
+			_this.isScene = true;
 			_this.type = 'Scene';
 			_this.background = null;
 			_this.environment = null;
@@ -20005,9 +19971,7 @@
 			_this.geometry = _geometry;
 			_this.material = material !== undefined ? material : new SpriteMaterial();
 			_this.center = new Vector2(0.5, 0.5);
-			Object.defineProperty(_assertThisInitialized(_this), 'isSprite', {
-				value: true
-			});
+			_this.isSprite = true;
 			return _this;
 		}
 
@@ -20890,9 +20854,7 @@
 
 			_this = _Line.call(this, geometry, material) || this;
 			_this.type = 'LineLoop';
-			Object.defineProperty(_assertThisInitialized(_this), 'isLineLoop', {
-				value: true
-			});
+			_this.isLineLoop = true;
 			return _this;
 		}
 
@@ -27296,9 +27258,7 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'EllipseCurve';
-			Object.defineProperty(_assertThisInitialized(_this), 'isEllipseCurve', {
-				value: true
-			});
+			_this.isEllipseCurve = true;
 			_this.aX = aX || 0;
 			_this.aY = aY || 0;
 			_this.xRadius = xRadius || 1;
@@ -27412,9 +27372,7 @@
 
 			_this = _EllipseCurve.call(this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise) || this;
 			_this.type = 'ArcCurve';
-			Object.defineProperty(_assertThisInitialized(_this), 'isArcCurve', {
-				value: true
-			});
+			_this.isArcCurve = true;
 			return _this;
 		}
 
@@ -27512,9 +27470,7 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'CatmullRomCurve3';
-			Object.defineProperty(_assertThisInitialized(_this), 'isCatmullRomCurve3', {
-				value: true
-			});
+			_this.isCatmullRomCurve3 = true;
 			_this.points = points;
 			_this.closed = closed;
 			_this.curveType = curveType;
@@ -27715,9 +27671,7 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'CubicBezierCurve';
-			Object.defineProperty(_assertThisInitialized(_this), 'isCubicBezierCurve', {
-				value: true
-			});
+			_this.isCubicBezierCurve = true;
 			_this.v0 = v0;
 			_this.v1 = v1;
 			_this.v2 = v2;
@@ -27798,9 +27752,7 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'CubicBezierCurve3';
-			Object.defineProperty(_assertThisInitialized(_this), 'isCubicBezierCurve3', {
-				value: true
-			});
+			_this.isCubicBezierCurve3 = true;
 			_this.v0 = v0;
 			_this.v1 = v1;
 			_this.v2 = v2;
@@ -27873,9 +27825,7 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'LineCurve';
-			Object.defineProperty(_assertThisInitialized(_this), 'isLineCurve', {
-				value: true
-			});
+			_this.isLineCurve = true;
 			_this.v1 = v1;
 			_this.v2 = v2;
 			return _this;
@@ -27954,9 +27904,7 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'LineCurve3';
-			Object.defineProperty(_assertThisInitialized(_this), 'isLineCurve3', {
-				value: true
-			});
+			_this.isLineCurve3 = true;
 			_this.v1 = v1;
 			_this.v2 = v2;
 			return _this;
@@ -28033,9 +27981,7 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'QuadraticBezierCurve';
-			Object.defineProperty(_assertThisInitialized(_this), 'isQuadraticBezierCurve', {
-				value: true
-			});
+			_this.isQuadraticBezierCurve = true;
 			_this.v0 = v0;
 			_this.v1 = v1;
 			_this.v2 = v2;
@@ -28107,9 +28053,7 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'QuadraticBezierCurve3';
-			Object.defineProperty(_assertThisInitialized(_this), 'isQuadraticBezierCurve3', {
-				value: true
-			});
+			_this.isQuadraticBezierCurve3 = true;
 			_this.v0 = v0;
 			_this.v1 = v1;
 			_this.v2 = v2;
@@ -28173,9 +28117,7 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'SplineCurve';
-			Object.defineProperty(_assertThisInitialized(_this), 'isSplineCurve', {
-				value: true
-			});
+			_this.isSplineCurve = true;
 			_this.points = points;
 			return _this;
 		}
@@ -28659,9 +28601,7 @@
 			}
 
 			_this = _Object3D.call(this) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isLight', {
-				value: true
-			});
+			_this.isLight = true;
 			_this.type = 'Light';
 			_this.color = new Color(color);
 			_this.intensity = intensity;
@@ -28702,9 +28642,7 @@
 			var _this;
 
 			_this = _Light.call(this, skyColor, intensity) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isHemisphereLight', {
-				value: true
-			});
+			_this.isHemisphereLight = true;
 			_this.type = 'HemisphereLight';
 
 			_this.position.copy(Object3D.DefaultUp);
@@ -28823,9 +28761,7 @@
 			var _this;
 
 			_this = _LightShadow.call(this, new PerspectiveCamera(50, 1, 0.5, 500)) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isSpotLightShadow', {
-				value: true
-			});
+			_this.isSpotLightShadow = true;
 			_this.focus = 1;
 			return _this;
 		}
@@ -28874,9 +28810,7 @@
 			}
 
 			_this = _Light.call(this, color, intensity) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isSpotLight', {
-				value: true
-			});
+			_this.isSpotLight = true;
 			_this.type = 'SpotLight';
 
 			_this.position.copy(Object3D.DefaultUp);
@@ -28937,9 +28871,7 @@
 			var _this;
 
 			_this = _LightShadow.call(this, new PerspectiveCamera(90, 1, 0.5, 500)) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isPointLightShadow', {
-				value: true
-			});
+			_this.isPointLightShadow = true;
 			_this._frameExtents = new Vector2(4, 2);
 			_this._viewportCount = 6;
 			_this._viewports = [// These viewports map a cube-map onto a 2D texture with the
@@ -29012,9 +28944,7 @@
 			}
 
 			_this = _Light.call(this, color, intensity) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isPointLight', {
-				value: true
-			});
+			_this.isPointLight = true;
 			_this.type = 'PointLight';
 			_this.distance = distance;
 			_this.decay = decay; // for physically correct lights, should be 2.
@@ -29176,9 +29106,7 @@
 			var _this;
 
 			_this = _LightShadow.call(this, new OrthographicCamera(-5, 5, 5, -5, 0.5, 500)) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isDirectionalLightShadow', {
-				value: true
-			});
+			_this.isDirectionalLightShadow = true;
 			return _this;
 		}
 
@@ -29192,9 +29120,7 @@
 			var _this;
 
 			_this = _Light.call(this, color, intensity) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isDirectionalLight', {
-				value: true
-			});
+			_this.isDirectionalLight = true;
 			_this.type = 'DirectionalLight';
 
 			_this.position.copy(Object3D.DefaultUp);
@@ -29227,9 +29153,7 @@
 
 			_this = _Light.call(this, color, intensity) || this;
 			_this.type = 'AmbientLight';
-			Object.defineProperty(_assertThisInitialized(_this), 'isAmbientLight', {
-				value: true
-			});
+			_this.isAmbientLight = true;
 			return _this;
 		}
 
@@ -29251,9 +29175,7 @@
 			}
 
 			_this = _Light.call(this, color, intensity) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isRectAreaLight', {
-				value: true
-			});
+			_this.isRectAreaLight = true;
 			_this.type = 'RectAreaLight';
 			_this.width = width;
 			_this.height = height;
@@ -29292,9 +29214,7 @@
 
 	var SphericalHarmonics3 = /*#__PURE__*/function () {
 		function SphericalHarmonics3() {
-			Object.defineProperty(this, 'isSphericalHarmonics3', {
-				value: true
-			});
+			this.isSphericalHarmonics3 = true;
 			this.coefficients = [];
 
 			for (var i = 0; i < 9; i++) {
@@ -29493,9 +29413,7 @@
 			}
 
 			_this = _Light.call(this, undefined, intensity) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isLightProbe', {
-				value: true
-			});
+			_this.isLightProbe = true;
 			_this.sh = sh;
 			return _this;
 		}
@@ -30719,6 +30637,7 @@
 
 			var fetchOptions = {};
 			fetchOptions.credentials = this.crossOrigin === 'anonymous' ? 'same-origin' : 'include';
+			fetchOptions.headers = this.requestHeader;
 			fetch(url, fetchOptions).then(function (res) {
 				return res.blob();
 			}).then(function (blob) {
@@ -30955,9 +30874,7 @@
 
 	var Font = /*#__PURE__*/function () {
 		function Font(data) {
-			Object.defineProperty(this, 'isFont', {
-				value: true
-			});
+			this.isFont = true;
 			this.type = 'Font';
 			this.data = data;
 		}
@@ -31171,9 +31088,7 @@
 			}
 
 			_this = _LightProbe.call(this, undefined, intensity) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isHemisphereLightProbe', {
-				value: true
-			});
+			_this.isHemisphereLightProbe = true;
 			var color1 = new Color().set(skyColor);
 			var color2 = new Color().set(groundColor);
 			var sky = new Vector3(color1.r, color1.g, color1.b);
@@ -31203,9 +31118,7 @@
 			}
 
 			_this = _LightProbe.call(this, undefined, intensity) || this;
-			Object.defineProperty(_assertThisInitialized(_this), 'isAmbientLightProbe', {
-				value: true
-			});
+			_this.isAmbientLightProbe = true;
 			var color1 = new Color().set(color); // without extra factor of PI in the shader, would be 2 / Math.sqrt( Math.PI );
 
 			_this.sh.coefficients[0].set(color1.r, color1.g, color1.b).multiplyScalar(2 * Math.sqrt(Math.PI));
@@ -34092,9 +34005,7 @@
 
 	var Box2 = /*#__PURE__*/function () {
 		function Box2(min, max) {
-			Object.defineProperty(this, 'isBox2', {
-				value: true
-			});
+			this.isBox2 = true;
 			this.min = min !== undefined ? min : new Vector2(+Infinity, +Infinity);
 			this.max = max !== undefined ? max : new Vector2(-Infinity, -Infinity);
 		}

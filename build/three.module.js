@@ -519,7 +519,7 @@ class Vector2 {
 
 	constructor( x = 0, y = 0 ) {
 
-		Object.defineProperty( this, 'isVector2', { value: true } );
+		this.isVector2 = true;
 
 		this.x = x;
 		this.y = y;
@@ -995,7 +995,7 @@ class Matrix3 {
 
 	constructor() {
 
-		Object.defineProperty( this, 'isMatrix3', { value: true } );
+		this.isMatrix3 = true;
 
 		this.elements = [
 
@@ -1749,7 +1749,7 @@ class Vector4 {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
-		Object.defineProperty( this, 'isVector4', { value: true } );
+		this.isVector4 = true;
 
 		this.x = x;
 		this.y = y;
@@ -2410,7 +2410,7 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		super();
 
-		Object.defineProperty( this, 'isWebGLRenderTarget', { value: true } );
+		this.isWebGLRenderTarget = true;
 
 		this.width = width;
 		this.height = height;
@@ -2510,7 +2510,7 @@ class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 
 		super( width, height, options );
 
-		Object.defineProperty( this, 'isWebGLMultisampleRenderTarget', { value: true } );
+		this.isWebGLMultisampleRenderTarget = true;
 
 		this.samples = 4;
 
@@ -2532,7 +2532,7 @@ class Quaternion {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
-		Object.defineProperty( this, 'isQuaternion', { value: true } );
+		this.isQuaternion = true;
 
 		this._x = x;
 		this._y = y;
@@ -3188,7 +3188,7 @@ class Vector3 {
 
 	constructor( x = 0, y = 0, z = 0 ) {
 
-		Object.defineProperty( this, 'isVector3', { value: true } );
+		this.isVector3 = true;
 
 		this.x = x;
 		this.y = y;
@@ -3905,7 +3905,7 @@ class Box3 {
 
 	constructor( min, max ) {
 
-		Object.defineProperty( this, 'isBox3', { value: true } );
+		this.isBox3 = true;
 
 		this.min = ( min !== undefined ) ? min : new Vector3( + Infinity, + Infinity, + Infinity );
 		this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );
@@ -5145,7 +5145,7 @@ class Matrix4 {
 
 	constructor() {
 
-		Object.defineProperty( this, 'isMatrix4', { value: true } );
+		this.isMatrix4 = true;
 
 		this.elements = [
 
@@ -6027,7 +6027,7 @@ class Euler {
 
 	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
 
-		Object.defineProperty( this, 'isEuler', { value: true } );
+		this.isEuler = true;
 
 		this._x = x;
 		this._y = y;
@@ -7305,7 +7305,7 @@ class Plane {
 
 	constructor( normal, constant ) {
 
-		Object.defineProperty( this, 'isPlane', { value: true } );
+		this.isPlane = true;
 
 		// normal is assumed to be normalized
 
@@ -8344,7 +8344,7 @@ class Color {
 
 	constructor( r, g, b ) {
 
-		Object.defineProperty( this, 'isColor', { value: true } );
+		this.isColor = true;
 
 		if ( g === undefined && b === undefined ) {
 
@@ -11975,7 +11975,7 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		super( size, size, options );
 
-		Object.defineProperty( this, 'isWebGLCubeRenderTarget', { value: true } );
+		this.isWebGLCubeRenderTarget = true;
 
 		options = options || {};
 
@@ -21571,7 +21571,7 @@ class Group extends Object3D {
 
 		super();
 		this.type = 'Group';
-		Object.defineProperty( this, 'isGroup', { value: true } );
+		this.isGroup = true;
 
 	}
 
@@ -24979,7 +24979,7 @@ class FogExp2 {
 
 	constructor( color, density ) {
 
-		Object.defineProperty( this, 'isFogExp2', { value: true } );
+		this.isFogExp2 = true;
 
 		this.name = '';
 
@@ -25010,7 +25010,7 @@ class Fog {
 
 	constructor( color, near, far ) {
 
-		Object.defineProperty( this, 'isFog', { value: true } );
+		this.isFog = true;
 
 		this.name = '';
 
@@ -25046,7 +25046,7 @@ class Scene extends Object3D {
 
 		super();
 
-		Object.defineProperty( this, 'isScene', { value: true } );
+		this.isScene = true;
 
 		this.type = 'Scene';
 
@@ -25608,7 +25608,7 @@ class Sprite extends Object3D {
 
 		this.center = new Vector2( 0.5, 0.5 );
 
-		Object.defineProperty( this, 'isSprite', { value: true } );
+		this.isSprite = true;
 
 	}
 
@@ -26806,7 +26806,7 @@ class LineLoop extends Line {
 
 		super( geometry, material );
 		this.type = 'LineLoop';
-		Object.defineProperty( this, 'isLineLoop', { value: true } );
+		this.isLineLoop = true;
 
 	}
 
@@ -35414,7 +35414,7 @@ class EllipseCurve extends Curve {
 		super();
 
 		this.type = 'EllipseCurve';
-		Object.defineProperty( this, 'isEllipseCurve', { value: true } );
+		this.isEllipseCurve = true;
 
 		this.aX = aX || 0;
 		this.aY = aY || 0;
@@ -35561,7 +35561,7 @@ class ArcCurve extends EllipseCurve {
 		super( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 
 		this.type = 'ArcCurve';
-		Object.defineProperty( this, 'isArcCurve', { value: true } );
+		this.isArcCurve = true;
 
 	}
 
@@ -35654,7 +35654,7 @@ class CatmullRomCurve3 extends Curve {
 		super();
 
 		this.type = 'CatmullRomCurve3';
-		Object.defineProperty( this, 'isCatmullRomCurve3', { value: true } );
+		this.isCatmullRomCurve3 = true;
 		this.points = points;
 		this.closed = closed;
 		this.curveType = curveType;
@@ -35896,7 +35896,7 @@ class CubicBezierCurve extends Curve {
 		super();
 
 		this.type = 'CubicBezierCurve';
-		Object.defineProperty( this, 'isCubicBezierCurve', { value: true } );
+		this.isCubicBezierCurve = true;
 
 		this.v0 = v0;
 		this.v1 = v1;
@@ -35965,7 +35965,7 @@ class CubicBezierCurve3 extends Curve {
 		super();
 
 		this.type = 'CubicBezierCurve3';
-		Object.defineProperty( this, 'isCubicBezierCurve3', { value: true } );
+		this.isCubicBezierCurve3 = true;
 
 		this.v0 = v0;
 		this.v1 = v1;
@@ -36034,7 +36034,7 @@ class LineCurve extends Curve {
 		super();
 
 		this.type = 'LineCurve';
-		Object.defineProperty( this, 'isLineCurve', { value: true } );
+		this.isLineCurve = true;
 
 		this.v1 = v1;
 		this.v2 = v2;
@@ -36113,7 +36113,7 @@ class LineCurve3 extends Curve {
 		super();
 
 		this.type = 'LineCurve3';
-		Object.defineProperty( this, 'isLineCurve3', { value: true } );
+		this.isLineCurve3 = true;
 
 		this.v1 = v1;
 		this.v2 = v2;
@@ -36183,7 +36183,7 @@ class QuadraticBezierCurve extends Curve {
 		super();
 
 		this.type = 'QuadraticBezierCurve';
-		Object.defineProperty( this, 'isQuadraticBezierCurve', { value: true } );
+		this.isQuadraticBezierCurve = true;
 
 		this.v0 = v0;
 		this.v1 = v1;
@@ -36247,7 +36247,7 @@ class QuadraticBezierCurve3 extends Curve {
 		super();
 
 		this.type = 'QuadraticBezierCurve3';
-		Object.defineProperty( this, 'isQuadraticBezierCurve3', { value: true } );
+		this.isQuadraticBezierCurve3 = true;
 
 		this.v0 = v0;
 		this.v1 = v1;
@@ -36312,7 +36312,7 @@ class SplineCurve extends Curve {
 		super();
 
 		this.type = 'SplineCurve';
-		Object.defineProperty( this, 'isSplineCurve', { value: true } );
+		this.isSplineCurve = true;
 
 		this.points = points;
 
@@ -36941,7 +36941,7 @@ class Light extends Object3D {
 
 		super();
 
-		Object.defineProperty( this, 'isLight', { value: true } );
+		this.isLight = true;
 
 		this.type = 'Light';
 
@@ -36989,7 +36989,7 @@ class HemisphereLight extends Light {
 
 		super( skyColor, intensity );
 
-		Object.defineProperty( this, 'isHemisphereLight', { value: true } );
+		this.isHemisphereLight = true;
 
 		this.type = 'HemisphereLight';
 
@@ -37142,7 +37142,7 @@ class SpotLightShadow extends LightShadow {
 
 		super( new PerspectiveCamera( 50, 1, 0.5, 500 ) );
 
-		Object.defineProperty( this, 'isSpotLightShadow', { value: true } );
+		this.isSpotLightShadow = true;
 
 		this.focus = 1;
 
@@ -37177,7 +37177,7 @@ class SpotLight extends Light {
 
 		super( color, intensity );
 
-		Object.defineProperty( this, 'isSpotLight', { value: true } );
+		this.isSpotLight = true;
 
 		this.type = 'SpotLight';
 
@@ -37240,7 +37240,7 @@ class PointLightShadow extends LightShadow {
 
 		super( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
-		Object.defineProperty( this, 'isPointLightShadow', { value: true } );
+		this.isPointLightShadow = true;
 
 		this._frameExtents = new Vector2( 4, 2 );
 
@@ -37315,7 +37315,7 @@ class PointLight extends Light {
 
 		super( color, intensity );
 
-		Object.defineProperty( this, 'isPointLight', { value: true } );
+		this.isPointLight = true;
 
 		this.type = 'PointLight';
 
@@ -37498,7 +37498,7 @@ class DirectionalLightShadow extends LightShadow {
 
 		super( new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 
-		Object.defineProperty( this, 'isDirectionalLightShadow', { value: true } );
+		this.isDirectionalLightShadow = true;
 
 	}
 
@@ -37510,7 +37510,7 @@ class DirectionalLight extends Light {
 
 		super( color, intensity );
 
-		Object.defineProperty( this, 'isDirectionalLight', { value: true } );
+		this.isDirectionalLight = true;
 
 		this.type = 'DirectionalLight';
 
@@ -37543,7 +37543,7 @@ class AmbientLight extends Light {
 		super( color, intensity );
 
 		this.type = 'AmbientLight';
-		Object.defineProperty( this, 'isAmbientLight', { value: true } );
+		this.isAmbientLight = true;
 
 	}
 
@@ -37555,7 +37555,7 @@ class RectAreaLight extends Light {
 
 		super( color, intensity );
 
-		Object.defineProperty( this, 'isRectAreaLight', { value: true } );
+		this.isRectAreaLight = true;
 
 		this.type = 'RectAreaLight';
 
@@ -37602,7 +37602,7 @@ class SphericalHarmonics3 {
 
 	constructor() {
 
-		Object.defineProperty( this, 'isSphericalHarmonics3', { value: true } );
+		this.isSphericalHarmonics3 = true;
 
 		this.coefficients = [];
 
@@ -37834,7 +37834,7 @@ class LightProbe extends Light {
 
 		super( undefined, intensity );
 
-		Object.defineProperty( this, 'isLightProbe', { value: true } );
+		this.isLightProbe = true;
 
 		this.sh = sh;
 
@@ -39674,6 +39674,7 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		const fetchOptions = {};
 		fetchOptions.credentials = ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include';
+		fetchOptions.headers = this.requestHeader;
 
 		fetch( url, fetchOptions ).then( function ( res ) {
 
@@ -39998,7 +39999,7 @@ class Font {
 
 	constructor( data ) {
 
-		Object.defineProperty( this, 'isFont', { value: true } );
+		this.isFont = true;
 
 		this.type = 'Font';
 
@@ -40265,7 +40266,7 @@ class HemisphereLightProbe extends LightProbe {
 
 		super( undefined, intensity );
 
-		Object.defineProperty( this, 'isHemisphereLightProbe', { value: true } );
+		this.isHemisphereLightProbe = true;
 
 		const color1 = new Color().set( skyColor );
 		const color2 = new Color().set( groundColor );
@@ -40290,7 +40291,7 @@ class AmbientLightProbe extends LightProbe {
 
 		super( undefined, intensity );
 
-		Object.defineProperty( this, 'isAmbientLightProbe', { value: true } );
+		this.isAmbientLightProbe = true;
 
 		const color1 = new Color().set( color );
 
@@ -44392,7 +44393,7 @@ class Box2 {
 
 	constructor( min, max ) {
 
-		Object.defineProperty( this, 'isBox2', { value: true } );
+		this.isBox2 = true;
 
 		this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
 		this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );
