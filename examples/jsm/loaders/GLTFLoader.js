@@ -2429,21 +2429,12 @@ var GLTFLoader = ( function () {
 	 */
 	GLTFParser.prototype.loadTexture = function ( textureIndex ) {
 
-		var parser = this;
 		var json = this.json;
 		var options = this.options;
-
 		var textureDef = json.textures[ textureIndex ];
+		var source = json.images[ textureDef.source ];
 
-		var textureExtensions = textureDef.extensions || {};
-
-		var source;
-
-		source = json.images[ textureDef.source ];
-
-		var loader = textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ]
-			? parser.extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ].ddsLoader
-			: this.textureLoader;
+		var loader = this.textureLoader;
 
 		if ( source.uri ) {
 
