@@ -764,16 +764,11 @@ THREE.GLTFLoader = ( function () {
 		var extension = textureDef.extensions[ name ];
 		var source = json.images[ extension.source ];
 
-		var loader;
+		var loader = parser.textureLoader;
 		if ( source.uri ) {
 
-			loader = parser.options.manager.getHandler( source.uri );
-
-		}
-
-		if ( ! loader ) {
-
-			loader = parser.textureLoader;
+			var handler = parser.options.manager.getHandler( source.uri );
+			if ( handler !== null ) loader = handler;
 
 		}
 
@@ -2409,19 +2404,14 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		var loader;
+		var loader = textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ]
+			? parser.extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ].ddsLoader
+			: this.textureLoader;
 
 		if ( source.uri ) {
 
-			loader = options.manager.getHandler( source.uri );
-
-		}
-
-		if ( ! loader ) {
-
-			loader = textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ]
-				? parser.extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ].ddsLoader
-				: this.textureLoader;
+			var handler = options.manager.getHandler( source.uri );
+			if ( handler !== null ) loader = handler;
 
 		}
 
