@@ -36,7 +36,15 @@
 			<li>KHR_texture_transform<sup>2</sup></li>
 			<li>EXT_texture_webp</li>
 			<li>EXT_meshopt_compression</li>
-			<li>MSFT_texture_dds</li>
+		</ul>
+
+		<p>
+			The following glTF 2.0 extension is supported by an external user plugin
+		</p>
+
+		<ul>
+			<li>[link:https://github.com/takahirox/three-gltf-extensions KHR_materials_variants]<sup>3</sup></li>
+			<li>[link:https://github.com/takahirox/three-gltf-extensions MSFT_texture_dds]</li>
 		</ul>
 
 		<p><i>
@@ -51,6 +59,10 @@
 			每次对使用具有唯一变换的纹理都会导致一次额外的GPU纹理上传。
 			请参阅#[link:https://github.com/mrdoob/three.js/pull/13831 13831] 和
 			#[link:https://github.com/mrdoob/three.js/issues/12788 12788]。
+		</i></p>
+
+		<p><i>
+			<sup>3</sup>You can also manually process the extension after loading in your application. See [link:https://threejs.org/examples/#webgl_loader_gltf_variants Three.js glTF materials variants example].
 		</i></p>
 
 		<h2>代码示例</h2>
@@ -186,11 +198,6 @@
 		</p>
 		<p>
 		请参阅[link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme]来了解Draco及其解码器的详细信息。
-		</p>
-
-		<h3>[method:null setDDSLoader]( [param:DDSLoader ddsLoader] )</h3>
-		<p>
-		[page:DDSLoader ddsLoader] — THREE.DDSLoader的实例，用于加载使用MSFT_TEXTURE_DDS扩展压缩过的纹理。
 		</p>
 
 		<h3>[method:null parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>

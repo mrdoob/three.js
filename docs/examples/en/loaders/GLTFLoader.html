@@ -38,7 +38,15 @@
 			<li>KHR_texture_transform<sup>2</sup></li>
 			<li>EXT_texture_webp</li>
 			<li>EXT_meshopt_compression</li>
-			<li>MSFT_texture_dds</li>
+		</ul>
+
+		<p>
+			The following glTF 2.0 extension is supported by an external user plugin
+		</p>
+
+		<ul>
+			<li>[link:https://github.com/takahirox/three-gltf-extensions KHR_materials_variants]<sup>3</sup></li>
+			<li>[link:https://github.com/takahirox/three-gltf-extensions MSFT_texture_dds]</li>
 		</ul>
 
 		<p><i>
@@ -52,6 +60,10 @@
 			transform will result in an additional GPU texture upload. See
 			#[link:https://github.com/mrdoob/three.js/pull/13831 13831] and
 			#[link:https://github.com/mrdoob/three.js/issues/12788 12788].
+		</i></p>
+
+		<p><i>
+			<sup>3</sup>You can also manually process the extension after loading in your application. See [link:https://threejs.org/examples/#webgl_loader_gltf_variants Three.js glTF materials variants example].
 		</i></p>
 
 		<h2>Code Example</h2>
@@ -191,12 +203,6 @@
 		</p>
 		<p>
 		Refer to this [link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme] for the details of Draco and its decoder.
-		</p>
-
-
-		<h3>[method:null setDDSLoader]( [param:DDSLoader ddsLoader] )</h3>
-		<p>
-		[page:DDSLoader ddsLoader] — Instance of THREE.DDSLoader, to be used for loading compressed textures with the MSFT_TEXTURE_DDS extension.
 		</p>
 
 		<h3>[method:null setKTX2Loader]( [param:KTX2Loader ktx2Loader] )</h3>

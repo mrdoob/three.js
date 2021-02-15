@@ -9696,7 +9696,7 @@
 			for (var p in src[u]) {
 				var property = src[u][p];
 
-				if (property && (property.isColor || property.isMatrix3 || property.isMatrix4 || property.isVector2 || property.isVector3 || property.isVector4 || property.isTexture)) {
+				if (property && (property.isColor || property.isMatrix3 || property.isMatrix4 || property.isVector2 || property.isVector3 || property.isVector4 || property.isTexture || property.isQuaternion)) {
 					dst[u][p] = property.clone();
 				} else if (Array.isArray(property)) {
 					dst[u][p] = property.slice();
@@ -15655,7 +15655,7 @@
 		var stencilBuffer = new StencilBuffer();
 		var enabledCapabilities = {};
 		var currentProgram = null;
-		var currentBlendingEnabled = null;
+		var currentBlendingEnabled = false;
 		var currentBlending = null;
 		var currentBlendEquation = null;
 		var currentBlendSrc = null;
@@ -15758,7 +15758,7 @@
 
 		function setBlending(blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha) {
 			if (blending === NoBlending) {
-				if (currentBlendingEnabled) {
+				if (currentBlendingEnabled === true) {
 					disable(3042);
 					currentBlendingEnabled = false;
 				}
@@ -15766,7 +15766,7 @@
 				return;
 			}
 
-			if (!currentBlendingEnabled) {
+			if (currentBlendingEnabled === false) {
 				enable(3042);
 				currentBlendingEnabled = true;
 			}
@@ -16026,11 +16026,34 @@
 
 
 		function reset() {
+			// reset state
+			gl.disable(3042);
+			gl.disable(2884);
+			gl.disable(2929);
+			gl.disable(32823);
+			gl.disable(3089);
+			gl.disable(2960);
+			gl.blendEquation(32774);
+			gl.blendFunc(1, 0);
+			gl.blendFuncSeparate(1, 0, 1, 0);
+			gl.colorMask(true, true, true, true);
+			gl.clearColor(0, 0, 0, 0);
+			gl.depthMask(true);
+			gl.depthFunc(513);
+			gl.clearDepth(1);
+			gl.stencilMask(0xffffffff);
+			gl.stencilFunc(519, 0, 1);
+			gl.stencilOp(7680, 7680, 7680);
+			gl.clearStencil(0);
+			gl.cullFace(1029);
+			gl.frontFace(2305);
+			gl.polygonOffset(0, 0); // reset internals
+
 			enabledCapabilities = {};
 			currentTextureSlot = null;
 			currentBoundTextures = {};
 			currentProgram = null;
-			currentBlendingEnabled = null;
+			currentBlendingEnabled = false;
 			currentBlending = null;
 			currentBlendEquation = null;
 			currentBlendSrc = null;
@@ -17106,15 +17129,22 @@
 		isArrayCamera: true
 	});
 
-	function Group() {
-		Object3D.call(this);
-		this.type = 'Group';
-	}
+	var Group = /*#__PURE__*/function (_Object3D) {
+		_inheritsLoose(Group, _Object3D);
 
-	Group.prototype = Object.assign(Object.create(Object3D.prototype), {
-		constructor: Group,
-		isGroup: true
-	});
+		function Group() {
+			var _this;
+
+			_this = _Object3D.call(this) || this;
+			_this.type = 'Group';
+			Object.defineProperty(_assertThisInitialized(_this), 'isGroup', {
+				value: true
+			});
+			return _this;
+		}
+
+		return Group;
+	}(Object3D);
 
 	function WebXRController() {
 		this._targetRay = null;
@@ -19927,55 +19957,63 @@
 
 	var _geometry;
 
-	var _intersectPoint = new Vector3();
+	var _intersectPoint = /*@__PURE__*/new Vector3();
 
-	var _worldScale = new Vector3();
+	var _worldScale = /*@__PURE__*/new Vector3();
 
-	var _mvPosition = new Vector3();
+	var _mvPosition = /*@__PURE__*/new Vector3();
 
-	var _alignedPosition = new Vector2();
+	var _alignedPosition = /*@__PURE__*/new Vector2();
 
-	var _rotatedPosition = new Vector2();
+	var _rotatedPosition = /*@__PURE__*/new Vector2();
 
-	var _viewWorldMatrix = new Matrix4();
+	var _viewWorldMatrix = /*@__PURE__*/new Matrix4();
 
-	var _vA$1 = new Vector3();
+	var _vA$1 = /*@__PURE__*/new Vector3();
 
-	var _vB$1 = new Vector3();
+	var _vB$1 = /*@__PURE__*/new Vector3();
 
-	var _vC$1 = new Vector3();
+	var _vC$1 = /*@__PURE__*/new Vector3();
 
-	var _uvA$1 = new Vector2();
+	var _uvA$1 = /*@__PURE__*/new Vector2();
 
-	var _uvB$1 = new Vector2();
+	var _uvB$1 = /*@__PURE__*/new Vector2();
 
-	var _uvC$1 = new Vector2();
+	var _uvC$1 = /*@__PURE__*/new Vector2();
 
-	function Sprite(material) {
-		Object3D.call(this);
-		this.type = 'Sprite';
+	var Sprite = /*#__PURE__*/function (_Object3D) {
+		_inheritsLoose(Sprite, _Object3D);
 
-		if (_geometry === undefined) {
-			_geometry = new BufferGeometry();
-			var float32Array = new Float32Array([-0.5, -0.5, 0, 0, 0, 0.5, -0.5, 0, 1, 0, 0.5, 0.5, 0, 1, 1, -0.5, 0.5, 0, 0, 1]);
-			var interleavedBuffer = new InterleavedBuffer(float32Array, 5);
+		function Sprite(material) {
+			var _this;
 
-			_geometry.setIndex([0, 1, 2, 0, 2, 3]);
+			_this = _Object3D.call(this) || this;
+			_this.type = 'Sprite';
 
-			_geometry.setAttribute('position', new InterleavedBufferAttribute(interleavedBuffer, 3, 0, false));
+			if (_geometry === undefined) {
+				_geometry = new BufferGeometry();
+				var float32Array = new Float32Array([-0.5, -0.5, 0, 0, 0, 0.5, -0.5, 0, 1, 0, 0.5, 0.5, 0, 1, 1, -0.5, 0.5, 0, 0, 1]);
+				var interleavedBuffer = new InterleavedBuffer(float32Array, 5);
 
-			_geometry.setAttribute('uv', new InterleavedBufferAttribute(interleavedBuffer, 2, 3, false));
+				_geometry.setIndex([0, 1, 2, 0, 2, 3]);
+
+				_geometry.setAttribute('position', new InterleavedBufferAttribute(interleavedBuffer, 3, 0, false));
+
+				_geometry.setAttribute('uv', new InterleavedBufferAttribute(interleavedBuffer, 2, 3, false));
+			}
+
+			_this.geometry = _geometry;
+			_this.material = material !== undefined ? material : new SpriteMaterial();
+			_this.center = new Vector2(0.5, 0.5);
+			Object.defineProperty(_assertThisInitialized(_this), 'isSprite', {
+				value: true
+			});
+			return _this;
 		}
 
-		this.geometry = _geometry;
-		this.material = material !== undefined ? material : new SpriteMaterial();
-		this.center = new Vector2(0.5, 0.5);
-	}
+		var _proto = Sprite.prototype;
 
-	Sprite.prototype = Object.assign(Object.create(Object3D.prototype), {
-		constructor: Sprite,
-		isSprite: true,
-		raycast: function raycast(raycaster, intersects) {
+		_proto.raycast = function raycast(raycaster, intersects) {
 			if (raycaster.camera === null) {
 				console.error('THREE.Sprite: "Raycaster.camera" needs to be set in order to raycast against sprites.');
 			}
@@ -20036,14 +20074,17 @@
 				face: null,
 				object: this
 			});
-		},
-		copy: function copy(source) {
+		};
+
+		_proto.copy = function copy(source) {
 			Object3D.prototype.copy.call(this, source);
 			if (source.center !== undefined) this.center.copy(source.center);
 			this.material = source.material;
 			return this;
-		}
-	});
+		};
+
+		return Sprite;
+	}(Object3D);
 
 	function transformVertex(vertexPosition, mvPosition, center, scale, sin, cos) {
 		// compute position in camera space
@@ -20064,28 +20105,37 @@
 		vertexPosition.applyMatrix4(_viewWorldMatrix);
 	}
 
-	var _v1$4 = new Vector3();
+	var _v1$4 = /*@__PURE__*/new Vector3();
 
-	var _v2$2 = new Vector3();
+	var _v2$2 = /*@__PURE__*/new Vector3();
 
-	function LOD() {
-		Object3D.call(this);
-		this._currentLevel = 0;
-		this.type = 'LOD';
-		Object.defineProperties(this, {
-			levels: {
-				enumerable: true,
-				value: []
-			}
-		});
-		this.autoUpdate = true;
-	}
+	var LOD = /*#__PURE__*/function (_Object3D) {
+		_inheritsLoose(LOD, _Object3D);
 
-	LOD.prototype = Object.assign(Object.create(Object3D.prototype), {
-		constructor: LOD,
-		isLOD: true,
-		copy: function copy(source) {
-			Object3D.prototype.copy.call(this, source, false);
+		function LOD() {
+			var _this;
+
+			_this = _Object3D.call(this) || this;
+			_this._currentLevel = 0;
+			_this.type = 'LOD';
+			Object.defineProperties(_assertThisInitialized(_this), {
+				levels: {
+					enumerable: true,
+					value: []
+				},
+				isLOD: {
+					value: true
+				}
+			});
+			_this.autoUpdate = true;
+			return _this;
+		}
+
+		var _proto = LOD.prototype;
+
+		_proto.copy = function copy(source) {
+			_Object3D.prototype.copy.call(this, source, false);
+
 			var levels = source.levels;
 
 			for (var i = 0, l = levels.length; i < l; i++) {
@@ -20095,8 +20145,9 @@
 
 			this.autoUpdate = source.autoUpdate;
 			return this;
-		},
-		addLevel: function addLevel(object, distance) {
+		};
+
+		_proto.addLevel = function addLevel(object, distance) {
 			if (distance === void 0) {
 				distance = 0;
 			}
@@ -20117,11 +20168,13 @@
 			});
 			this.add(object);
 			return this;
-		},
-		getCurrentLevel: function getCurrentLevel() {
+		};
+
+		_proto.getCurrentLevel = function getCurrentLevel() {
 			return this._currentLevel;
-		},
-		getObjectForDistance: function getObjectForDistance(distance) {
+		};
+
+		_proto.getObjectForDistance = function getObjectForDistance(distance) {
 			var levels = this.levels;
 
 			if (levels.length > 0) {
@@ -20137,8 +20190,9 @@
 			}
 
 			return null;
-		},
-		raycast: function raycast(raycaster, intersects) {
+		};
+
+		_proto.raycast = function raycast(raycaster, intersects) {
 			var levels = this.levels;
 
 			if (levels.length > 0) {
@@ -20147,8 +20201,9 @@
 				var distance = raycaster.ray.origin.distanceTo(_v1$4);
 				this.getObjectForDistance(distance).raycast(raycaster, intersects);
 			}
-		},
-		update: function update(camera) {
+		};
+
+		_proto.update = function update(camera) {
 			var levels = this.levels;
 
 			if (levels.length > 1) {
@@ -20175,9 +20230,11 @@
 					levels[i].object.visible = false;
 				}
 			}
-		},
-		toJSON: function toJSON(meta) {
-			var data = Object3D.prototype.toJSON.call(this, meta);
+		};
+
+		_proto.toJSON = function toJSON(meta) {
+			var data = _Object3D.prototype.toJSON.call(this, meta);
+
 			if (this.autoUpdate === false) data.object.autoUpdate = false;
 			data.object.levels = [];
 			var levels = this.levels;
@@ -20191,8 +20248,10 @@
 			}
 
 			return data;
-		}
-	});
+		};
+
+		return LOD;
+	}(Object3D);
 
 	var _basePosition = new Vector3();
 
@@ -20307,31 +20366,33 @@
 		isBone: true
 	});
 
-	var _offsetMatrix = new Matrix4();
+	var _offsetMatrix = /*@__PURE__*/new Matrix4();
 
-	var _identityMatrix = new Matrix4();
+	var _identityMatrix = /*@__PURE__*/new Matrix4();
 
-	function Skeleton(bones, boneInverses) {
-		if (bones === void 0) {
-			bones = [];
+	var Skeleton = /*#__PURE__*/function () {
+		function Skeleton(bones, boneInverses) {
+			if (bones === void 0) {
+				bones = [];
+			}
+
+			if (boneInverses === void 0) {
+				boneInverses = [];
+			}
+
+			this.uuid = MathUtils.generateUUID();
+			this.bones = bones.slice(0);
+			this.boneInverses = boneInverses;
+			this.boneMatrices = null;
+			this.boneTexture = null;
+			this.boneTextureSize = 0;
+			this.frame = -1;
+			this.init();
 		}
 
-		if (boneInverses === void 0) {
-			boneInverses = [];
-		}
+		var _proto = Skeleton.prototype;
 
-		this.uuid = MathUtils.generateUUID();
-		this.bones = bones.slice(0);
-		this.boneInverses = boneInverses;
-		this.boneMatrices = null;
-		this.boneTexture = null;
-		this.boneTextureSize = 0;
-		this.frame = -1;
-		this.init();
-	}
-
-	Object.assign(Skeleton.prototype, {
-		init: function init() {
+		_proto.init = function init() {
 			var bones = this.bones;
 			var boneInverses = this.boneInverses;
 			this.boneMatrices = new Float32Array(bones.length * 16); // calculate inverse bone matrices if necessary
@@ -20349,8 +20410,9 @@
 					}
 				}
 			}
-		},
-		calculateInverses: function calculateInverses() {
+		};
+
+		_proto.calculateInverses = function calculateInverses() {
 			this.boneInverses.length = 0;
 
 			for (var i = 0, il = this.bones.length; i < il; i++) {
@@ -20362,8 +20424,9 @@
 
 				this.boneInverses.push(inverse);
 			}
-		},
-		pose: function pose() {
+		};
+
+		_proto.pose = function pose() {
 			// recover the bind-time world matrices
 			for (var i = 0, il = this.bones.length; i < il; i++) {
 				var bone = this.bones[i];
@@ -20389,8 +20452,9 @@
 					_bone.matrix.decompose(_bone.position, _bone.quaternion, _bone.scale);
 				}
 			}
-		},
-		update: function update() {
+		};
+
+		_proto.update = function update() {
 			var bones = this.bones;
 			var boneInverses = this.boneInverses;
 			var boneMatrices = this.boneMatrices;
@@ -20408,11 +20472,13 @@
 			if (boneTexture !== null) {
 				boneTexture.needsUpdate = true;
 			}
-		},
-		clone: function clone() {
+		};
+
+		_proto.clone = function clone() {
 			return new Skeleton(this.bones, this.boneInverses);
-		},
-		getBoneByName: function getBoneByName(name) {
+		};
+
+		_proto.getBoneByName = function getBoneByName(name) {
 			for (var i = 0, il = this.bones.length; i < il; i++) {
 				var bone = this.bones[i];
 
@@ -20422,14 +20488,16 @@
 			}
 
 			return undefined;
-		},
-		dispose: function dispose() {
+		};
+
+		_proto.dispose = function dispose() {
 			if (this.boneTexture !== null) {
 				this.boneTexture.dispose();
 				this.boneTexture = null;
 			}
-		},
-		fromJSON: function fromJSON(json, bones) {
+		};
+
+		_proto.fromJSON = function fromJSON(json, bones) {
 			this.uuid = json.uuid;
 
 			for (var i = 0, l = json.bones.length; i < l; i++) {
@@ -20447,8 +20515,9 @@
 
 			this.init();
 			return this;
-		},
-		toJSON: function toJSON() {
+		};
+
+		_proto.toJSON = function toJSON() {
 			var data = {
 				metadata: {
 					version: 4.5,
@@ -20470,8 +20539,10 @@
 			}
 
 			return data;
-		}
-	});
+		};
+
+		return Skeleton;
+	}();
 
 	var _instanceLocalMatrix = new Matrix4();
 
@@ -20811,15 +20882,22 @@
 		}
 	});
 
-	function LineLoop(geometry, material) {
-		Line.call(this, geometry, material);
-		this.type = 'LineLoop';
-	}
+	var LineLoop = /*#__PURE__*/function (_Line) {
+		_inheritsLoose(LineLoop, _Line);
 
-	LineLoop.prototype = Object.assign(Object.create(Line.prototype), {
-		constructor: LineLoop,
-		isLineLoop: true
-	});
+		function LineLoop(geometry, material) {
+			var _this;
+
+			_this = _Line.call(this, geometry, material) || this;
+			_this.type = 'LineLoop';
+			Object.defineProperty(_assertThisInitialized(_this), 'isLineLoop', {
+				value: true
+			});
+			return _this;
+		}
+
+		return LineLoop;
+	}(Line);
 
 	/**
 	 * parameters = {

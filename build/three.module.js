@@ -11260,7 +11260,7 @@ function cloneUniforms( src ) {
 			if ( property && ( property.isColor ||
 				property.isMatrix3 || property.isMatrix4 ||
 				property.isVector2 || property.isVector3 || property.isVector4 ||
-				property.isTexture ) ) {
+				property.isTexture || property.isQuaternion ) ) {
 
 				dst[ u ][ p ] = property.clone();
 
@@ -19386,7 +19386,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	let currentProgram = null;
 
-	let currentBlendingEnabled = null;
+	let currentBlendingEnabled = false;
 	let currentBlending = null;
 	let currentBlendEquation = null;
 	let currentBlendSrc = null;
@@ -19548,7 +19548,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		if ( blending === NoBlending ) {
 
-			if ( currentBlendingEnabled ) {
+			if ( currentBlendingEnabled === true ) {
 
 				disable( 3042 );
 				currentBlendingEnabled = false;
@@ -19559,7 +19559,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		}
 
-		if ( ! currentBlendingEnabled ) {
+		if ( currentBlendingEnabled === false ) {
 
 			enable( 3042 );
 			currentBlendingEnabled = true;
@@ -19945,6 +19945,38 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	function reset() {
 
+		// reset state
+
+		gl.disable( 3042 );
+		gl.disable( 2884 );
+		gl.disable( 2929 );
+		gl.disable( 32823 );
+		gl.disable( 3089 );
+		gl.disable( 2960 );
+
+		gl.blendEquation( 32774 );
+		gl.blendFunc( 1, 0 );
+		gl.blendFuncSeparate( 1, 0, 1, 0 );
+
+		gl.colorMask( true, true, true, true );
+		gl.clearColor( 0, 0, 0, 0 );
+
+		gl.depthMask( true );
+		gl.depthFunc( 513 );
+		gl.clearDepth( 1 );
+
+		gl.stencilMask( 0xffffffff );
+		gl.stencilFunc( 519, 0, 1 );
+		gl.stencilOp( 7680, 7680, 7680 );
+		gl.clearStencil( 0 );
+
+		gl.cullFace( 1029 );
+		gl.frontFace( 2305 );
+
+		gl.polygonOffset( 0, 0 );
+
+		// reset internals
+
 		enabledCapabilities = {};
 
 		currentTextureSlot = null;
@@ -19952,7 +19984,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		currentProgram = null;
 
-		currentBlendingEnabled = null;
+		currentBlendingEnabled = false;
 		currentBlending = null;
 		currentBlendEquation = null;
 		currentBlendSrc = null;
@@ -21533,21 +21565,17 @@ ArrayCamera.prototype = Object.assign( Object.create( PerspectiveCamera.prototyp
 
 } );
 
-function Group() {
+class Group extends Object3D {
 
-	Object3D.call( this );
+	constructor() {
 
-	this.type = 'Group';
+		super();
+		this.type = 'Group';
+		Object.defineProperty( this, 'isGroup', { value: true } );
+
+	}
 
 }
-
-Group.prototype = Object.assign( Object.create( Object3D.prototype ), {
-
-	constructor: Group,
-
-	isGroup: true
-
-} );
 
 function WebXRController() {
 
@@ -25533,61 +25561,58 @@ SpriteMaterial.prototype.copy = function ( source ) {
 
 let _geometry;
 
-const _intersectPoint = new Vector3();
-const _worldScale = new Vector3();
-const _mvPosition = new Vector3();
+const _intersectPoint = /*@__PURE__*/ new Vector3();
+const _worldScale = /*@__PURE__*/ new Vector3();
+const _mvPosition = /*@__PURE__*/ new Vector3();
 
-const _alignedPosition = new Vector2();
-const _rotatedPosition = new Vector2();
-const _viewWorldMatrix = new Matrix4();
+const _alignedPosition = /*@__PURE__*/ new Vector2();
+const _rotatedPosition = /*@__PURE__*/ new Vector2();
+const _viewWorldMatrix = /*@__PURE__*/ new Matrix4();
 
-const _vA$1 = new Vector3();
-const _vB$1 = new Vector3();
-const _vC$1 = new Vector3();
+const _vA$1 = /*@__PURE__*/ new Vector3();
+const _vB$1 = /*@__PURE__*/ new Vector3();
+const _vC$1 = /*@__PURE__*/ new Vector3();
 
-const _uvA$1 = new Vector2();
-const _uvB$1 = new Vector2();
-const _uvC$1 = new Vector2();
+const _uvA$1 = /*@__PURE__*/ new Vector2();
+const _uvB$1 = /*@__PURE__*/ new Vector2();
+const _uvC$1 = /*@__PURE__*/ new Vector2();
 
-function Sprite( material ) {
+class Sprite extends Object3D {
 
-	Object3D.call( this );
+	constructor( material ) {
 
-	this.type = 'Sprite';
+		super();
+		this.type = 'Sprite';
 
-	if ( _geometry === undefined ) {
+		if ( _geometry === undefined ) {
 
-		_geometry = new BufferGeometry();
+			_geometry = new BufferGeometry();
 
-		const float32Array = new Float32Array( [
-			- 0.5, - 0.5, 0, 0, 0,
-			0.5, - 0.5, 0, 1, 0,
-			0.5, 0.5, 0, 1, 1,
-			- 0.5, 0.5, 0, 0, 1
-		] );
+			const float32Array = new Float32Array( [
+				- 0.5, - 0.5, 0, 0, 0,
+				0.5, - 0.5, 0, 1, 0,
+				0.5, 0.5, 0, 1, 1,
+				- 0.5, 0.5, 0, 0, 1
+			] );
 
-		const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
+			const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
 
-		_geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-		_geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-		_geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+			_geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
+			_geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+			_geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+
+		}
+
+		this.geometry = _geometry;
+		this.material = ( material !== undefined ) ? material : new SpriteMaterial();
+
+		this.center = new Vector2( 0.5, 0.5 );
+
+		Object.defineProperty( this, 'isSprite', { value: true } );
 
 	}
 
-	this.geometry = _geometry;
-	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
-
-	this.center = new Vector2( 0.5, 0.5 );
-
-}
-
-Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
-
-	constructor: Sprite,
-
-	isSprite: true,
-
-	raycast: function ( raycaster, intersects ) {
+	raycast( raycaster, intersects ) {
 
 		if ( raycaster.camera === null ) {
 
@@ -25660,9 +25685,9 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		} );
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		Object3D.prototype.copy.call( this, source );
 
@@ -25674,7 +25699,7 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
 
 function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) {
 
@@ -25703,37 +25728,36 @@ function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) 
 
 }
 
-const _v1$4 = new Vector3();
-const _v2$2 = new Vector3();
+const _v1$4 = /*@__PURE__*/ new Vector3();
+const _v2$2 = /*@__PURE__*/ new Vector3();
 
-function LOD() {
+class LOD extends Object3D {
 
-	Object3D.call( this );
+	constructor() {
 
-	this._currentLevel = 0;
+		super();
 
-	this.type = 'LOD';
+		this._currentLevel = 0;
 
-	Object.defineProperties( this, {
-		levels: {
-			enumerable: true,
-			value: []
-		}
-	} );
+		this.type = 'LOD';
 
-	this.autoUpdate = true;
+		Object.defineProperties( this, {
+			levels: {
+				enumerable: true,
+				value: []
+			},
+			isLOD: {
+				value: true,
+			}
+		} );
 
-}
+		this.autoUpdate = true;
 
-LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
+	}
 
-	constructor: LOD,
+	copy( source ) {
 
-	isLOD: true,
-
-	copy: function ( source ) {
-
-		Object3D.prototype.copy.call( this, source, false );
+		super.copy( source, false );
 
 		const levels = source.levels;
 
@@ -25749,9 +25773,9 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	addLevel: function ( object, distance = 0 ) {
+	addLevel( object, distance = 0 ) {
 
 		distance = Math.abs( distance );
 
@@ -25775,15 +25799,15 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	getCurrentLevel: function () {
+	getCurrentLevel() {
 
 		return this._currentLevel;
 
-	},
+	}
 
-	getObjectForDistance: function ( distance ) {
+	getObjectForDistance( distance ) {
 
 		const levels = this.levels;
 
@@ -25807,9 +25831,9 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return null;
 
-	},
+	}
 
-	raycast: function ( raycaster, intersects ) {
+	raycast( raycaster, intersects ) {
 
 		const levels = this.levels;
 
@@ -25823,9 +25847,9 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-	},
+	}
 
-	update: function ( camera ) {
+	update( camera ) {
 
 		const levels = this.levels;
 
@@ -25865,11 +25889,11 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
-		const data = Object3D.prototype.toJSON.call( this, meta );
+		const data = super.toJSON( meta );
 
 		if ( this.autoUpdate === false ) data.object.autoUpdate = false;
 
@@ -25892,7 +25916,7 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
 
 const _basePosition = new Vector3();
 
@@ -26060,29 +26084,29 @@ Bone.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 } );
 
-const _offsetMatrix = new Matrix4();
-const _identityMatrix = new Matrix4();
+const _offsetMatrix = /*@__PURE__*/ new Matrix4();
+const _identityMatrix = /*@__PURE__*/ new Matrix4();
 
-function Skeleton( bones = [], boneInverses = [] ) {
+class Skeleton {
 
-	this.uuid = MathUtils.generateUUID();
+	constructor( bones = [], boneInverses = [] ) {
 
-	this.bones = bones.slice( 0 );
-	this.boneInverses = boneInverses;
-	this.boneMatrices = null;
+		this.uuid = MathUtils.generateUUID();
 
-	this.boneTexture = null;
-	this.boneTextureSize = 0;
+		this.bones = bones.slice( 0 );
+		this.boneInverses = boneInverses;
+		this.boneMatrices = null;
 
-	this.frame = - 1;
+		this.boneTexture = null;
+		this.boneTextureSize = 0;
 
-	this.init();
+		this.frame = - 1;
 
-}
+		this.init();
 
-Object.assign( Skeleton.prototype, {
+	}
 
-	init: function () {
+	init() {
 
 		const bones = this.bones;
 		const boneInverses = this.boneInverses;
@@ -26115,9 +26139,9 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	calculateInverses: function () {
+	calculateInverses() {
 
 		this.boneInverses.length = 0;
 
@@ -26135,9 +26159,9 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	pose: function () {
+	pose() {
 
 		// recover the bind-time world matrices
 
@@ -26178,9 +26202,9 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	update: function () {
+	update() {
 
 		const bones = this.bones;
 		const boneInverses = this.boneInverses;
@@ -26206,15 +26230,15 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new Skeleton( this.bones, this.boneInverses );
 
-	},
+	}
 
-	getBoneByName: function ( name ) {
+	getBoneByName( name ) {
 
 		for ( let i = 0, il = this.bones.length; i < il; i ++ ) {
 
@@ -26230,9 +26254,9 @@ Object.assign( Skeleton.prototype, {
 
 		return undefined;
 
-	},
+	}
 
-	dispose: function ( ) {
+	dispose( ) {
 
 		if ( this.boneTexture !== null ) {
 
@@ -26242,9 +26266,9 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	fromJSON: function ( json, bones ) {
+	fromJSON( json, bones ) {
 
 		this.uuid = json.uuid;
 
@@ -26269,9 +26293,9 @@ Object.assign( Skeleton.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		const data = {
 			metadata: {
@@ -26302,7 +26326,7 @@ Object.assign( Skeleton.prototype, {
 
 	}
 
-} );
+}
 
 const _instanceLocalMatrix = new Matrix4();
 const _instanceWorldMatrix = new Matrix4();
@@ -26776,21 +26800,19 @@ LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 
 } );
 
-function LineLoop( geometry, material ) {
+class LineLoop extends Line {
 
-	Line.call( this, geometry, material );
+	constructor( geometry, material ) {
 
-	this.type = 'LineLoop';
+		super( geometry, material );
+		this.type = 'LineLoop';
+		Object.defineProperty( this, 'isLineLoop', { value: true } );
+
+	}
+
+
 
 }
-
-LineLoop.prototype = Object.assign( Object.create( Line.prototype ), {
-
-	constructor: LineLoop,
-
-	isLineLoop: true,
-
-} );
 
 /**
  * parameters = {
