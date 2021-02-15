@@ -7,7 +7,7 @@ class ArcCurve extends EllipseCurve {
 		super( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 
 		this.type = 'ArcCurve';
-		Object.defineProperty( this, 'isArcCurve', { value: true } );
+		this.isArcCurve = true;
 
 	}
 

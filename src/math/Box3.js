@@ -4,7 +4,7 @@ class Box3 {
 
 	constructor( min, max ) {
 
-		Object.defineProperty( this, 'isBox3', { value: true } );
+		this.isBox3 = true;
 
 		this.min = ( min !== undefined ) ? min : new Vector3( + Infinity, + Infinity, + Infinity );
 		this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );

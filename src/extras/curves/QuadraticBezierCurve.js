@@ -9,7 +9,7 @@ class QuadraticBezierCurve extends Curve {
 		super();
 
 		this.type = 'QuadraticBezierCurve';
-		Object.defineProperty( this, 'isQuadraticBezierCurve', { value: true } );
+		this.isQuadraticBezierCurve = true;
 
 		this.v0 = v0;
 		this.v1 = v1;

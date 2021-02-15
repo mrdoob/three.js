@@ -2,7 +2,7 @@ class Vector2 {
 
 	constructor( x = 0, y = 0 ) {
 
-		Object.defineProperty( this, 'isVector2', { value: true } );
+		this.isVector2 = true;
 
 		this.x = x;
 		this.y = y;

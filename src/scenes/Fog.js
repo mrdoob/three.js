@@ -4,7 +4,7 @@ class Fog {
 
 	constructor( color, near, far ) {
 
-		Object.defineProperty( this, 'isFog', { value: true } );
+		this.isFog = true;
 
 		this.name = '';
 

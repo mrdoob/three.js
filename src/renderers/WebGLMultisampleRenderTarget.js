@@ -6,7 +6,7 @@ class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 
 		super( width, height, options );
 
-		Object.defineProperty( this, 'isWebGLMultisampleRenderTarget', { value: true } );
+		this.isWebGLMultisampleRenderTarget = true;
 
 		this.samples = 4;
 

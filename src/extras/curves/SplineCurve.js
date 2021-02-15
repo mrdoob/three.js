@@ -9,7 +9,7 @@ class SplineCurve extends Curve {
 		super();
 
 		this.type = 'SplineCurve';
-		Object.defineProperty( this, 'isSplineCurve', { value: true } );
+		this.isSplineCurve = true;
 
 		this.points = points;
 
