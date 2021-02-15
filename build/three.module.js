@@ -19386,7 +19386,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	let currentProgram = null;
 
-	let currentBlendingEnabled = null;
+	let currentBlendingEnabled = false;
 	let currentBlending = null;
 	let currentBlendEquation = null;
 	let currentBlendSrc = null;
@@ -19548,7 +19548,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		if ( blending === NoBlending ) {
 
-			if ( currentBlendingEnabled ) {
+			if ( currentBlendingEnabled === true ) {
 
 				disable( 3042 );
 				currentBlendingEnabled = false;
@@ -19559,7 +19559,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		}
 
-		if ( ! currentBlendingEnabled ) {
+		if ( currentBlendingEnabled === false ) {
 
 			enable( 3042 );
 			currentBlendingEnabled = true;
@@ -19945,6 +19945,38 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	function reset() {
 
+		// reset state
+
+		gl.disable( 3042 );
+		gl.disable( 2884 );
+		gl.disable( 2929 );
+		gl.disable( 32823 );
+		gl.disable( 3089 );
+		gl.disable( 2960 );
+
+		gl.blendEquation( 32774 );
+		gl.blendFunc( 1, 0 );
+		gl.blendFuncSeparate( 1, 0, 1, 0 );
+
+		gl.colorMask( true, true, true, true );
+		gl.clearColor( 0, 0, 0, 0 );
+
+		gl.depthMask( true );
+		gl.depthFunc( 513 );
+		gl.clearDepth( 1 );
+
+		gl.stencilMask( 0xffffffff );
+		gl.stencilFunc( 519, 0, 1 );
+		gl.stencilOp( 7680, 7680, 7680 );
+		gl.clearStencil( 0 );
+
+		gl.cullFace( 1029 );
+		gl.frontFace( 2305 );
+
+		gl.polygonOffset( 0, 0 );
+
+		// reset internals
+
 		enabledCapabilities = {};
 
 		currentTextureSlot = null;
@@ -19952,7 +19984,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		currentProgram = null;
 
-		currentBlendingEnabled = null;
+		currentBlendingEnabled = false;
 		currentBlending = null;
 		currentBlendEquation = null;
 		currentBlendSrc = null;
