@@ -767,7 +767,7 @@ THREE.GLTFLoader = ( function () {
 		var loader;
 		if ( source.uri ) {
 
-			loader = parser.options.getHandler( source.uri );
+			loader = parser.options.manager.getHandler( source.uri );
 
 		}
 
