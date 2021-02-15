@@ -1247,6 +1247,12 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			}
 
+			if ( _geometry.userStringCount > 0 ) {
+
+				attributes.geometry.userStrings = _geometry.getUserStrings();
+
+			}
+
 			attributes.drawColor = _attributes.drawColor( doc );
 
 			objectType = objectType.constructor.name;
