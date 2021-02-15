@@ -5,11 +5,13 @@
 import {
 	DataTransport,
 	MaterialsTransport,
-	MaterialUtils,
 	GeometryTransport,
 	MeshTransport,
-	CodeUtils,
-} from "../workerTaskManager/utils/TransferableUtils.js";
+	ObjectUtils,
+} from "../workerTaskManager/utils/TransportUtils.js";
+import {
+	MaterialUtils
+} from '../workerTaskManager/utils/MaterialUtils.js';
 import { OBJLoader } from "../OBJLoader.js";
 import { WorkerTaskManagerDefaultRouting } from "../workerTaskManager/comm/worker/defaultRouting.js";
 
@@ -27,11 +29,11 @@ const OBJLoaderWorker = {
 			{ url: objLoaderLocation },
 			{ code: '\n\nconst OBJLoader = THREE.OBJLoader;\n\n' },
 			{ code: '\n\n' },
-			{ code: CodeUtils.serializeClass( DataTransport ) },
-			{ code: CodeUtils.serializeClass( MaterialsTransport ) },
-			{ code: CodeUtils.serializeClass( MaterialUtils ) },
-			{ code: CodeUtils.serializeClass( GeometryTransport ) },
-			{ code: CodeUtils.serializeClass( MeshTransport ) }
+			{ code: ObjectUtils.serializeClass( DataTransport ) },
+			{ code: ObjectUtils.serializeClass( MaterialsTransport ) },
+			{ code: ObjectUtils.serializeClass( MaterialUtils ) },
+			{ code: ObjectUtils.serializeClass( GeometryTransport ) },
+			{ code: ObjectUtils.serializeClass( MeshTransport ) }
 		]
 	},
 

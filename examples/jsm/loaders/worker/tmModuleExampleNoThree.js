@@ -2,7 +2,7 @@
  * @author Kai Salmen / www.kaisalmen.de
  */
 
-import { GeometryTransport } from "../workerTaskManager/utils/TransferableUtils.js";
+import { GeometryTransport } from "../workerTaskManager/utils/TransportUtils.js";
 import { WorkerTaskManagerDefaultRouting } from "../workerTaskManager/comm/worker/defaultRouting.js";
 
 function init ( context, id, config ) {

@@ -9,9 +9,11 @@ import {
 } from "../../../../build/three.module.js";
 import {
 	MeshTransport,
-	MaterialsTransport,
+	MaterialsTransport
+} from "../workerTaskManager/utils/TransportUtils.js";
+import {
 	MaterialUtils
-} from "../workerTaskManager/utils/TransferableUtils.js";
+} from '../workerTaskManager/utils/MaterialUtils.js';
 import { WorkerTaskManagerDefaultRouting } from "../workerTaskManager/comm/worker/defaultRouting.js";
 
 

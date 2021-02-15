@@ -29,9 +29,9 @@
 				GeometryTransport,
 				MeshTransport,
 				MaterialsTransport,
-				MaterialStore,
-				CodeUtils
-			} from "./jsm/loaders/workerTaskManager/utils/TransferableUtils.js"
+				ObjectUtils
+			} from "./jsm/loaders/workerTaskManager/utils/TransportUtils.js"
+			import { MaterialStore } from "./jsm/loaders/workerTaskManager/utils/MaterialStore.js"
 			import { FileLoader } from "../src/loaders/FileLoader.js";
 			import { MTLLoader } from "./jsm/loaders/MTLLoader.js";
 			import { OBJLoaderWorker } from "./jsm/loaders/worker/tmOBJLoader.js";
@@ -115,9 +115,9 @@
 						funcExec: WorkerFunctions.workerStandardExec,
 						dependencies: [
 							{ url: "../build/three.js" },
-							{ code: CodeUtils.serializeClass( THREE.BufferGeometry ) },
-							{ code: CodeUtils.serializeClass( DataTransport ) },
-							{ code: CodeUtils.serializeClass( GeometryTransport ) }
+							{ code: ObjectUtils.serializeClass( THREE.BufferGeometry ) },
+							{ code: ObjectUtils.serializeClass( DataTransport ) },
+							{ code: ObjectUtils.serializeClass( GeometryTransport ) }
 						]
 					} );
 					this.taskDescriptions.set( 'tmProtoExampleModule', {
