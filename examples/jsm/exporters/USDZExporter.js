@@ -167,10 +167,8 @@ function buildMesh( geometry, material ) {
         )
         point3f[] points = [${ buildVector3Array( attributes.position, count )}]
         float2[] primvars:st = [${ buildVector2Array( attributes.uv, count )}] (
-            elementSize = 1
             interpolation = "vertex"
         )
-        int[] primvars:st:indices
         uniform token subdivisionScheme = "none"
     }
 `;
