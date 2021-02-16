@@ -15,8 +15,6 @@ class PointLightShadow extends LightShadow {
 
 		super( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
-		this.isPointLightShadow = true;
-
 		this._frameExtents = new Vector2( 4, 2 );
 
 		this._viewportCount = 6;
@@ -83,5 +81,7 @@ class PointLightShadow extends LightShadow {
 	}
 
 }
+
+PointLightShadow.prototype.isPointLightShadow = true;
 
 export { PointLightShadow };

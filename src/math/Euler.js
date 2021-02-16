@@ -10,8 +10,6 @@ class Euler {
 
 	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
 
-		this.isEuler = true;
-		
 		this._x = x;
 		this._y = y;
 		this._z = z;
@@ -319,6 +317,8 @@ class Euler {
 	_onChangeCallback() {}
 
 }
+
+Euler.prototype.isEuler = true;
 
 Euler.DefaultOrder = 'XYZ';
 Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];

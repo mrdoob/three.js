@@ -4,8 +4,6 @@ class FogExp2 {
 
 	constructor( color, density ) {
 
-		this.isFogExp2 = true;
-
 		this.name = '';
 
 		this.color = new Color( color );
@@ -31,5 +29,6 @@ class FogExp2 {
 
 }
 
+FogExp2.prototype.isFogExp2 = true;
 
 export { FogExp2 };

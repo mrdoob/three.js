@@ -8,7 +8,6 @@ class LineCurve extends Curve {
 		super();
 
 		this.type = 'LineCurve';
-		this.isLineCurve = true;
 
 		this.v1 = v1;
 		this.v2 = v2;
@@ -85,5 +84,7 @@ class LineCurve extends Curve {
 	}
 
 }
+
+LineCurve.prototype.isLineCurve = true;
 
 export { LineCurve };

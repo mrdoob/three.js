@@ -7,11 +7,11 @@ class AmbientLight extends Light {
 		super( color, intensity );
 
 		this.type = 'AmbientLight';
-		this.isAmbientLight = true;
 
 	}
 
 }
 
+AmbientLight.prototype.isAmbientLight = true;
 
 export { AmbientLight };
