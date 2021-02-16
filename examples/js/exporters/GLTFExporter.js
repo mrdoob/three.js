@@ -1105,7 +1105,7 @@ THREE.GLTFExporter = ( function () {
 			// @QUESTION Should we avoid including any attribute that has the default value?
 			var materialDef = {	pbrMetallicRoughness: {} };
 
-			if ( ! material.isMeshStandardMaterial || ! material.isMeshBasicMaterial ) {
+			if ( material.isMeshStandardMaterial !== true && material.isMeshBasicMaterial !== true ) {
 
 				console.warn( 'GLTFExporter: Use MeshStandardMaterial or MeshBasicMaterial for best results.' );
 
