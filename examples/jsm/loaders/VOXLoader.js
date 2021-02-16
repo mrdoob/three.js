@@ -251,9 +251,14 @@ class VOXMesh extends Mesh {
 		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		geometry.computeVertexNormals();
 
-		if ( hasColors ) geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+		const material = new MeshStandardMaterial();
 
-		const material = new MeshStandardMaterial( { vertexColors: hasColors } );
+		if ( hasColors ) {
+
+			geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+			material.vertexColors = true;
+
+		}
 
 		super( geometry, material );
 
