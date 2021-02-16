@@ -157,6 +157,12 @@ function buildMesh( geometry, material ) {
 	const attributes = geometry.attributes;
 	const count = attributes.position.count;
 
+	if ( 'uv2' in attributes ) {
+
+		console.warn( 'THREE.USDZExporter: uv2 not supported yet.' );
+
+	}
+
 	return `def Mesh "${ name }"
     {
         int[] faceVertexCounts = [${ buildMeshVertexCount( geometry ) }]
