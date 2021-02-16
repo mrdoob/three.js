@@ -101,6 +101,8 @@ async function imgToU8( image ) {
 
 //
 
+const PRECISION = 7;
+
 function buildHeader() {
 
 	return `#usda 1.0
@@ -224,7 +226,7 @@ function buildVector3Array( attribute, count ) {
 
 	for ( let i = 0; i < data.length; i += 3 ) {
 
-		array.push( `(${ data[ i + 0 ] }, ${ data[ i + 1 ] }, ${ data[ i + 2 ] })` );
+		array.push( `(${ data[ i + 0 ].toPrecision( PRECISION ) }, ${ data[ i + 1 ].toPrecision( PRECISION ) }, ${ data[ i + 2 ].toPrecision( PRECISION ) })` );
 
 	}
 
@@ -246,7 +248,7 @@ function buildVector2Array( attribute, count ) {
 
 	for ( let i = 0; i < data.length; i += 2 ) {
 
-		array.push( `(${ data[ i + 0 ] }, ${ 1 - data[ i + 1 ] })` );
+		array.push( `(${ data[ i + 0 ].toPrecision( PRECISION ) }, ${ 1 - data[ i + 1 ].toPrecision( PRECISION ) })` );
 
 	}
 
