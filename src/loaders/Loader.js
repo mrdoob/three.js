@@ -67,25 +67,23 @@ Object.assign( Loader.prototype, {
 
 	setFromFetchOptions: function ( fetchOptions ) {
 
-		this.setWithCredentials( fetchOptions.credentials === 'include' );
+		const defaultedOptions = Object.assign( {
+			credentials: 'same-origin',
+			mode: 'cors',
+			headers: {},
 
-		if ( fetchOptions.credentials === 'include' && fetchOptions.mode === 'cors' ) {
+		}, fetchOptions );
+
+		this.setWithCredentials( defaultedOptions.credentials === 'include' );
+		this.setRequestHeader( defaultedOptions.headers );
+
+		if ( defaultedOptions.credentials === 'include' && defaultedOptions.mode === 'cors' ) {
 
 			this.setCrossOrigin( 'use-credentials' );
 
 		} else {
 
 			this.setCrossOrigin( 'anonymous' );
-
-		}
-
-		if ( fetchOptions.headers ) {
-
-			this.setRequestHeader( fetchOptions.headers );
-
-		} else {
-
-			this.setRequestHeader( {} );
 
 		}
 
