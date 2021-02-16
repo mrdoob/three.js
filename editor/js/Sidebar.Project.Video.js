@@ -124,11 +124,15 @@ function SidebarProjectVideo( editor ) {
 
 	function save( blob, filename ) {
 
+		if ( link.href ) {
+
+			URL.revokeObjectURL( link.href );
+
+		}
+
 		link.href = URL.createObjectURL( blob );
 		link.download = filename;
 		link.dispatchEvent( new MouseEvent( 'click' ) );
-
-		// URL.revokeObjectURL( url ); breaks Firefox...
 
 	}
 
