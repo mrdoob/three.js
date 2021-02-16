@@ -9,7 +9,6 @@ class QuadraticBezierCurve3 extends Curve {
 		super();
 
 		this.type = 'QuadraticBezierCurve3';
-		this.isQuadraticBezierCurve3 = true;
 
 		this.v0 = v0;
 		this.v1 = v1;
@@ -70,5 +69,7 @@ class QuadraticBezierCurve3 extends Curve {
 	}
 
 }
+
+QuadraticBezierCurve3.prototype.isQuadraticBezierCurve3 = true;
 
 export { QuadraticBezierCurve3 };

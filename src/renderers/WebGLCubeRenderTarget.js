@@ -21,8 +21,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		super( size, size, options );
 
-		this.isWebGLCubeRenderTarget = true;
-
 		options = options || {};
 
 		this.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
@@ -140,5 +138,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 }
 
+WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
 
 export { WebGLCubeRenderTarget };

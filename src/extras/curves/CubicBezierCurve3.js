@@ -9,7 +9,6 @@ class CubicBezierCurve3 extends Curve {
 		super();
 
 		this.type = 'CubicBezierCurve3';
-		this.isCubicBezierCurve3 = true;
 
 		this.v0 = v0;
 		this.v1 = v1;
@@ -74,5 +73,7 @@ class CubicBezierCurve3 extends Curve {
 	}
 
 }
+
+CubicBezierCurve3.prototype.isCubicBezierCurve3 = true;
 
 export { CubicBezierCurve3 };

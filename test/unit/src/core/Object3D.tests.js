@@ -297,9 +297,11 @@ export default QUnit.module( 'Core', () => {
 			obj.translateOnAxis( new Vector3( 0, 1, 0 ), 1.23 );
 			obj.translateOnAxis( new Vector3( 0, 0, 1 ), - 4.56 );
 
-			assert.numEqual( obj.position.x, 1, 'x is equal' );
-			assert.numEqual( obj.position.y, 1.23, 'y is equal' );
-			assert.numEqual( obj.position.z, - 4.56, 'z is equal' );
+			assert.propEqual( obj.position, {
+				x: 1,
+				y: 1.23,
+				z: - 4.56
+			} );
 
 		} );
 

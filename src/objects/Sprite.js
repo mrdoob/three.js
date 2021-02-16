@@ -85,8 +85,6 @@ class Sprite extends Object3D {
 
 		this.center = new Vector2( 0.5, 0.5 );
 
-		this.isSprite = true;
-
 	}
 
 	raycast( raycaster, intersects ) {
@@ -177,5 +175,7 @@ class Sprite extends Object3D {
 	}
 
 }
+
+Sprite.prototype.isSprite = true;
 
 export { Sprite };

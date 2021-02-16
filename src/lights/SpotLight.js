@@ -8,8 +8,6 @@ class SpotLight extends Light {
 
 		super( color, intensity );
 
-		this.isSpotLight = true;
-
 		this.type = 'SpotLight';
 
 		this.position.copy( Object3D.DefaultUp );
@@ -60,5 +58,7 @@ class SpotLight extends Light {
 	}
 
 }
+
+SpotLight.prototype.isSpotLight = true;
 
 export { SpotLight };

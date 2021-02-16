@@ -12,8 +12,6 @@ class Matrix4 {
 
 	constructor() {
 
-		this.isMatrix4 = true;
-
 		this.elements = [
 
 			1, 0, 0, 0,
@@ -881,5 +879,7 @@ class Matrix4 {
 	}
 
 }
+
+Matrix4.prototype.isMatrix4 = true;
 
 export { Matrix4 };

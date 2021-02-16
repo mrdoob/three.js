@@ -6,8 +6,6 @@ class RectAreaLight extends Light {
 
 		super( color, intensity );
 
-		this.isRectAreaLight = true;
-
 		this.type = 'RectAreaLight';
 
 		this.width = width;
@@ -38,5 +36,7 @@ class RectAreaLight extends Light {
 	}
 
 }
+
+RectAreaLight.prototype.isRectAreaLight = true;
 
 export { RectAreaLight };
