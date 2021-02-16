@@ -519,8 +519,6 @@ class Vector2 {
 
 	constructor( x = 0, y = 0 ) {
 
-		this.isVector2 = true;
-
 		this.x = x;
 		this.y = y;
 
@@ -991,11 +989,11 @@ class Vector2 {
 
 }
 
+Vector2.prototype.isVector2 = true;
+
 class Matrix3 {
 
 	constructor() {
-
-		this.isMatrix3 = true;
 
 		this.elements = [
 
@@ -1036,12 +1034,6 @@ class Matrix3 {
 		);
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().fromArray( this.elements );
 
 	}
 
@@ -1327,7 +1319,15 @@ class Matrix3 {
 
 	}
 
+	clone() {
+
+		return new this.constructor().fromArray( this.elements );
+
+	}
+
 }
+
+Matrix3.prototype.isMatrix3 = true;
 
 let _canvas;
 
@@ -1748,8 +1748,6 @@ function serializeImage( image ) {
 class Vector4 {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
-
-		this.isVector4 = true;
 
 		this.x = x;
 		this.y = y;
@@ -2399,6 +2397,8 @@ class Vector4 {
 
 }
 
+Vector4.prototype.isVector4 = true;
+
 /*
  In options, we can specify:
  * Texture parameters for an auto-generated target texture
@@ -2409,8 +2409,6 @@ class WebGLRenderTarget extends EventDispatcher {
 	constructor( width, height, options ) {
 
 		super();
-
-		this.isWebGLRenderTarget = true;
 
 		this.width = width;
 		this.height = height;
@@ -2504,13 +2502,13 @@ class WebGLRenderTarget extends EventDispatcher {
 
 }
 
+WebGLRenderTarget.prototype.isWebGLRenderTarget = true;
+
 class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 
 	constructor( width, height, options ) {
 
 		super( width, height, options );
-
-		this.isWebGLMultisampleRenderTarget = true;
 
 		this.samples = 4;
 
@@ -2528,11 +2526,11 @@ class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 
 }
 
+WebGLMultisampleRenderTarget.prototype.isWebGLMultisampleRenderTarget = true;
+
 class Quaternion {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
-
-		this.isQuaternion = true;
 
 		this._x = x;
 		this._y = y;
@@ -3184,11 +3182,11 @@ class Quaternion {
 
 }
 
+Quaternion.prototype.isQuaternion = true;
+
 class Vector3 {
 
 	constructor( x = 0, y = 0, z = 0 ) {
-
-		this.isVector3 = true;
 
 		this.x = x;
 		this.y = y;
@@ -3898,17 +3896,17 @@ class Vector3 {
 
 }
 
+Vector3.prototype.isVector3 = true;
+
 const _vector = /*@__PURE__*/ new Vector3();
 const _quaternion = /*@__PURE__*/ new Quaternion();
 
 class Box3 {
 
-	constructor( min, max ) {
+	constructor( min = new Vector3( + Infinity, + Infinity, + Infinity ), max = new Vector3( - Infinity, - Infinity, - Infinity ) ) {
 
-		this.isBox3 = true;
-
-		this.min = ( min !== undefined ) ? min : new Vector3( + Infinity, + Infinity, + Infinity );
-		this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );
+		this.min = min;
+		this.max = max;
 
 	}
 
@@ -4393,31 +4391,7 @@ class Box3 {
 
 }
 
-function satForAxes( axes, v0, v1, v2, extents ) {
-
-	for ( let i = 0, j = axes.length - 3; i <= j; i += 3 ) {
-
-		_testAxis.fromArray( axes, i );
-		// project the aabb onto the seperating axis
-		const r = extents.x * Math.abs( _testAxis.x ) + extents.y * Math.abs( _testAxis.y ) + extents.z * Math.abs( _testAxis.z );
-		// project all 3 vertices of the triangle onto the seperating axis
-		const p0 = v0.dot( _testAxis );
-		const p1 = v1.dot( _testAxis );
-		const p2 = v2.dot( _testAxis );
-		// actual test, basically see if either of the most extreme of the triangle points intersects r
-		if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
-
-			// points of the projected triangle are outside the projected half-length of the aabb
-			// the axis is seperating and we can exit
-			return false;
-
-		}
-
-	}
-
-	return true;
-
-}
+Box3.prototype.isBox3 = true;
 
 const _points = [
 	/*@__PURE__*/ new Vector3(),
@@ -4451,14 +4425,40 @@ const _extents = /*@__PURE__*/ new Vector3();
 const _triangleNormal = /*@__PURE__*/ new Vector3();
 const _testAxis = /*@__PURE__*/ new Vector3();
 
+function satForAxes( axes, v0, v1, v2, extents ) {
+
+	for ( let i = 0, j = axes.length - 3; i <= j; i += 3 ) {
+
+		_testAxis.fromArray( axes, i );
+		// project the aabb onto the seperating axis
+		const r = extents.x * Math.abs( _testAxis.x ) + extents.y * Math.abs( _testAxis.y ) + extents.z * Math.abs( _testAxis.z );
+		// project all 3 vertices of the triangle onto the seperating axis
+		const p0 = v0.dot( _testAxis );
+		const p1 = v1.dot( _testAxis );
+		const p2 = v2.dot( _testAxis );
+		// actual test, basically see if either of the most extreme of the triangle points intersects r
+		if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
+
+			// points of the projected triangle are outside the projected half-length of the aabb
+			// the axis is seperating and we can exit
+			return false;
+
+		}
+
+	}
+
+	return true;
+
+}
+
 const _box$1 = /*@__PURE__*/ new Box3();
 
 class Sphere {
 
-	constructor( center, radius ) {
+	constructor( center = new Vector3(), radius = - 1 ) {
 
-		this.center = ( center !== undefined ) ? center : new Vector3();
-		this.radius = ( radius !== undefined ) ? radius : - 1;
+		this.center = center;
+		this.radius = radius;
 
 	}
 
@@ -4496,12 +4496,6 @@ class Sphere {
 		this.radius = Math.sqrt( maxRadiusSq );
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -4632,6 +4626,12 @@ class Sphere {
 
 	}
 
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
 }
 
 const _vector$2 = /*@__PURE__*/ new Vector3();
@@ -4645,10 +4645,10 @@ const _normal = /*@__PURE__*/ new Vector3();
 
 class Ray {
 
-	constructor( origin, direction ) {
+	constructor( origin = new Vector3(), direction = new Vector3( 0, 0, - 1 ) ) {
 
-		this.origin = ( origin !== undefined ) ? origin : new Vector3();
-		this.direction = ( direction !== undefined ) ? direction : new Vector3( 0, 0, - 1 );
+		this.origin = origin;
+		this.direction = direction;
 
 	}
 
@@ -4658,12 +4658,6 @@ class Ray {
 		this.direction.copy( direction );
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -5139,13 +5133,17 @@ class Ray {
 
 	}
 
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
 }
 
 class Matrix4 {
 
 	constructor() {
-
-		this.isMatrix4 = true;
 
 		this.elements = [
 
@@ -6015,6 +6013,8 @@ class Matrix4 {
 
 }
 
+Matrix4.prototype.isMatrix4 = true;
+
 const _v1$1 = /*@__PURE__*/ new Vector3();
 const _m1 = /*@__PURE__*/ new Matrix4();
 const _zero = /*@__PURE__*/ new Vector3( 0, 0, 0 );
@@ -6023,11 +6023,12 @@ const _x = /*@__PURE__*/ new Vector3();
 const _y = /*@__PURE__*/ new Vector3();
 const _z = /*@__PURE__*/ new Vector3();
 
+const _matrix = /*@__PURE__*/ new Matrix4();
+const _quaternion$1 = /*@__PURE__*/ new Quaternion();
+
 class Euler {
 
 	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
-
-		this.isEuler = true;
 
 		this._x = x;
 		this._y = y;
@@ -6337,11 +6338,10 @@ class Euler {
 
 }
 
+Euler.prototype.isEuler = true;
+
 Euler.DefaultOrder = 'XYZ';
 Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
-
-const _matrix = /*@__PURE__*/ new Matrix4();
-const _quaternion$1 = /*@__PURE__*/ new Quaternion();
 
 class Layers {
 
@@ -7303,14 +7303,12 @@ const _normalMatrix = /*@__PURE__*/ new Matrix3();
 
 class Plane {
 
-	constructor( normal, constant ) {
-
-		this.isPlane = true;
+	constructor( normal = new Vector3( 1, 0, 0 ), constant = 0 ) {
 
 		// normal is assumed to be normalized
 
-		this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
-		this.constant = ( constant !== undefined ) ? constant : 0;
+		this.normal = normal;
+		this.constant = constant;
 
 	}
 
@@ -7350,12 +7348,6 @@ class Plane {
 		this.setFromNormalAndCoplanarPoint( normal, a );
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -7517,7 +7509,15 @@ class Plane {
 
 	}
 
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
 }
+
+Plane.prototype.isPlane = true;
 
 const _v0$1 = /*@__PURE__*/ new Vector3();
 const _v1$3 = /*@__PURE__*/ new Vector3();
@@ -7533,11 +7533,11 @@ const _vcp = /*@__PURE__*/ new Vector3();
 
 class Triangle {
 
-	constructor( a, b, c ) {
+	constructor( a = new Vector3(), b = new Vector3(), c = new Vector3() ) {
 
-		this.a = ( a !== undefined ) ? a : new Vector3();
-		this.b = ( b !== undefined ) ? b : new Vector3();
-		this.c = ( c !== undefined ) ? c : new Vector3();
+		this.a = a;
+		this.b = b;
+		this.c = c;
 
 	}
 
@@ -8344,8 +8344,6 @@ class Color {
 
 	constructor( r, g, b ) {
 
-		this.isColor = true;
-
 		if ( g === undefined && b === undefined ) {
 
 			// r is THREE.Color, hex or string
@@ -8893,6 +8891,8 @@ class Color {
 }
 
 Color.NAMES = _colorKeywords;
+
+Color.prototype.isColor = true;
 Color.prototype.r = 1;
 Color.prototype.g = 1;
 Color.prototype.b = 1;
@@ -11975,8 +11975,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		super( size, size, options );
 
-		this.isWebGLCubeRenderTarget = true;
-
 		options = options || {};
 
 		this.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
@@ -12094,6 +12092,8 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 }
 
+WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
+
 function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
 	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
@@ -12121,18 +12121,9 @@ const _vector$5 = /*@__PURE__*/ new Vector3();
 
 class Frustum {
 
-	constructor( p0, p1, p2, p3, p4, p5 ) {
+	constructor( p0 = new Plane(), p1 = new Plane(), p2 = new Plane(), p3 = new Plane(), p4 = new Plane(), p5 = new Plane() ) {
 
-		this.planes = [
-
-			( p0 !== undefined ) ? p0 : new Plane(),
-			( p1 !== undefined ) ? p1 : new Plane(),
-			( p2 !== undefined ) ? p2 : new Plane(),
-			( p3 !== undefined ) ? p3 : new Plane(),
-			( p4 !== undefined ) ? p4 : new Plane(),
-			( p5 !== undefined ) ? p5 : new Plane()
-
-		];
+		this.planes = [ p0, p1, p2, p3, p4, p5 ];
 
 	}
 
@@ -12148,12 +12139,6 @@ class Frustum {
 		planes[ 5 ].copy( p5 );
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -12276,6 +12261,12 @@ class Frustum {
 		}
 
 		return true;
+
+	}
+
+	clone() {
+
+		return new this.constructor().copy( this );
 
 	}
 
@@ -21570,12 +21561,14 @@ class Group extends Object3D {
 	constructor() {
 
 		super();
+
 		this.type = 'Group';
-		this.isGroup = true;
 
 	}
 
 }
+
+Group.prototype.isGroup = true;
 
 function WebXRController() {
 
@@ -24979,8 +24972,6 @@ class FogExp2 {
 
 	constructor( color, density ) {
 
-		this.isFogExp2 = true;
-
 		this.name = '';
 
 		this.color = new Color( color );
@@ -25006,11 +24997,11 @@ class FogExp2 {
 
 }
 
+FogExp2.prototype.isFogExp2 = true;
+
 class Fog {
 
 	constructor( color, near, far ) {
-
-		this.isFog = true;
 
 		this.name = '';
 
@@ -25040,13 +25031,13 @@ class Fog {
 
 }
 
+Fog.prototype.isFog = true;
+
 class Scene extends Object3D {
 
 	constructor() {
 
 		super();
-
-		this.isScene = true;
 
 		this.type = 'Scene';
 
@@ -25096,6 +25087,8 @@ class Scene extends Object3D {
 	}
 
 }
+
+Scene.prototype.isScene = true;
 
 function InterleavedBuffer( array, stride ) {
 
@@ -25582,6 +25575,7 @@ class Sprite extends Object3D {
 	constructor( material ) {
 
 		super();
+
 		this.type = 'Sprite';
 
 		if ( _geometry === undefined ) {
@@ -25607,8 +25601,6 @@ class Sprite extends Object3D {
 		this.material = ( material !== undefined ) ? material : new SpriteMaterial();
 
 		this.center = new Vector2( 0.5, 0.5 );
-
-		this.isSprite = true;
 
 	}
 
@@ -25689,7 +25681,7 @@ class Sprite extends Object3D {
 
 	copy( source ) {
 
-		Object3D.prototype.copy.call( this, source );
+		super.copy( source );
 
 		if ( source.center !== undefined ) this.center.copy( source.center );
 
@@ -25700,6 +25692,8 @@ class Sprite extends Object3D {
 	}
 
 }
+
+Sprite.prototype.isSprite = true;
 
 function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) {
 
@@ -26805,14 +26799,14 @@ class LineLoop extends Line {
 	constructor( geometry, material ) {
 
 		super( geometry, material );
+
 		this.type = 'LineLoop';
-		this.isLineLoop = true;
 
 	}
 
-
-
 }
+
+LineLoop.prototype.isLineLoop = true;
 
 /**
  * parameters = {
@@ -35409,27 +35403,27 @@ Object.assign( Curve.prototype, {
 
 class EllipseCurve extends Curve {
 
-	constructor( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
+	constructor( aX = 0, aY = 0, xRadius = 1, yRadius = 1, aStartAngle = 0, aEndAngle = Math.PI * 2, aClockwise = false, aRotation = 0 ) {
 
 		super();
 
 		this.type = 'EllipseCurve';
-		this.isEllipseCurve = true;
 
-		this.aX = aX || 0;
-		this.aY = aY || 0;
+		this.aX = aX;
+		this.aY = aY;
 
-		this.xRadius = xRadius || 1;
-		this.yRadius = yRadius || 1;
+		this.xRadius = xRadius;
+		this.yRadius = yRadius;
 
-		this.aStartAngle = aStartAngle || 0;
-		this.aEndAngle = aEndAngle || 2 * Math.PI;
+		this.aStartAngle = aStartAngle;
+		this.aEndAngle = aEndAngle;
 
-		this.aClockwise = aClockwise || false;
+		this.aClockwise = aClockwise;
 
-		this.aRotation = aRotation || 0;
+		this.aRotation = aRotation;
 
 	}
+
 	getPoint( t, optionalTarget ) {
 
 		const point = optionalTarget || new Vector2();
@@ -35491,6 +35485,7 @@ class EllipseCurve extends Curve {
 		return point.set( x, y );
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -35511,6 +35506,7 @@ class EllipseCurve extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -35531,6 +35527,7 @@ class EllipseCurve extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );
@@ -35554,6 +35551,8 @@ class EllipseCurve extends Curve {
 
 }
 
+EllipseCurve.prototype.isEllipseCurve = true;
+
 class ArcCurve extends EllipseCurve {
 
 	constructor( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
@@ -35561,11 +35560,12 @@ class ArcCurve extends EllipseCurve {
 		super( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 
 		this.type = 'ArcCurve';
-		this.isArcCurve = true;
 
 	}
 
 }
+
+ArcCurve.prototype.isArcCurve = true;
 
 /**
  * Centripetal CatmullRom Curve - which is useful for avoiding
@@ -35654,7 +35654,7 @@ class CatmullRomCurve3 extends Curve {
 		super();
 
 		this.type = 'CatmullRomCurve3';
-		this.isCatmullRomCurve3 = true;
+
 		this.points = points;
 		this.closed = closed;
 		this.curveType = curveType;
@@ -35747,6 +35747,7 @@ class CatmullRomCurve3 extends Curve {
 		return point;
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -35768,6 +35769,7 @@ class CatmullRomCurve3 extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -35788,6 +35790,7 @@ class CatmullRomCurve3 extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );
@@ -35810,6 +35813,8 @@ class CatmullRomCurve3 extends Curve {
 	}
 
 }
+
+CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
 
 /**
  * Bezier Curves formulas obtained from
@@ -35896,7 +35901,6 @@ class CubicBezierCurve extends Curve {
 		super();
 
 		this.type = 'CubicBezierCurve';
-		this.isCubicBezierCurve = true;
 
 		this.v0 = v0;
 		this.v1 = v1;
@@ -35919,6 +35923,7 @@ class CubicBezierCurve extends Curve {
 		return point;
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -35931,6 +35936,7 @@ class CubicBezierCurve extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -35943,6 +35949,7 @@ class CubicBezierCurve extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );
@@ -35958,6 +35965,8 @@ class CubicBezierCurve extends Curve {
 
 }
 
+CubicBezierCurve.prototype.isCubicBezierCurve = true;
+
 class CubicBezierCurve3 extends Curve {
 
 	constructor( v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3(), v3 = new Vector3() ) {
@@ -35965,7 +35974,6 @@ class CubicBezierCurve3 extends Curve {
 		super();
 
 		this.type = 'CubicBezierCurve3';
-		this.isCubicBezierCurve3 = true;
 
 		this.v0 = v0;
 		this.v1 = v1;
@@ -35973,6 +35981,7 @@ class CubicBezierCurve3 extends Curve {
 		this.v3 = v3;
 
 	}
+
 	getPoint( t, optionalTarget = new Vector3() ) {
 
 		const point = optionalTarget;
@@ -35988,6 +35997,7 @@ class CubicBezierCurve3 extends Curve {
 		return point;
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -36000,6 +36010,7 @@ class CubicBezierCurve3 extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -36012,6 +36023,7 @@ class CubicBezierCurve3 extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );
@@ -36027,6 +36039,8 @@ class CubicBezierCurve3 extends Curve {
 
 }
 
+CubicBezierCurve3.prototype.isCubicBezierCurve3 = true;
+
 class LineCurve extends Curve {
 
 	constructor( v1 = new Vector2(), v2 = new Vector2() ) {
@@ -36034,12 +36048,12 @@ class LineCurve extends Curve {
 		super();
 
 		this.type = 'LineCurve';
-		this.isLineCurve = true;
 
 		this.v1 = v1;
 		this.v2 = v2;
 
 	}
+
 	getPoint( t, optionalTarget = new Vector2() ) {
 
 		const point = optionalTarget;
@@ -36058,12 +36072,14 @@ class LineCurve extends Curve {
 		return point;
 
 	}
+
 	// Line curve is linear, so we can overwrite default getPointAt
 	getPointAt( u, optionalTarget ) {
 
 		return this.getPoint( u, optionalTarget );
 
 	}
+
 	getTangent( t, optionalTarget ) {
 
 		const tangent = optionalTarget || new Vector2();
@@ -36073,6 +36089,7 @@ class LineCurve extends Curve {
 		return tangent;
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -36083,6 +36100,7 @@ class LineCurve extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -36093,6 +36111,7 @@ class LineCurve extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );
@@ -36105,6 +36124,8 @@ class LineCurve extends Curve {
 	}
 
 }
+
+LineCurve.prototype.isLineCurve = true;
 
 class LineCurve3 extends Curve {
 
@@ -36183,13 +36204,13 @@ class QuadraticBezierCurve extends Curve {
 		super();
 
 		this.type = 'QuadraticBezierCurve';
-		this.isQuadraticBezierCurve = true;
 
 		this.v0 = v0;
 		this.v1 = v1;
 		this.v2 = v2;
 
 	}
+
 	getPoint( t, optionalTarget = new Vector2() ) {
 
 		const point = optionalTarget;
@@ -36204,6 +36225,7 @@ class QuadraticBezierCurve extends Curve {
 		return point;
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -36215,6 +36237,7 @@ class QuadraticBezierCurve extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -36226,6 +36249,7 @@ class QuadraticBezierCurve extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );
@@ -36240,6 +36264,8 @@ class QuadraticBezierCurve extends Curve {
 
 }
 
+QuadraticBezierCurve.prototype.isQuadraticBezierCurve = true;
+
 class QuadraticBezierCurve3 extends Curve {
 
 	constructor( v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3() ) {
@@ -36247,13 +36273,13 @@ class QuadraticBezierCurve3 extends Curve {
 		super();
 
 		this.type = 'QuadraticBezierCurve3';
-		this.isQuadraticBezierCurve3 = true;
 
 		this.v0 = v0;
 		this.v1 = v1;
 		this.v2 = v2;
 
 	}
+
 	getPoint( t, optionalTarget = new Vector3() ) {
 
 		const point = optionalTarget;
@@ -36269,6 +36295,7 @@ class QuadraticBezierCurve3 extends Curve {
 		return point;
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -36280,6 +36307,7 @@ class QuadraticBezierCurve3 extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -36291,6 +36319,7 @@ class QuadraticBezierCurve3 extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );
@@ -36305,6 +36334,8 @@ class QuadraticBezierCurve3 extends Curve {
 
 }
 
+QuadraticBezierCurve3.prototype.isQuadraticBezierCurve3 = true;
+
 class SplineCurve extends Curve {
 
 	constructor( points = [] ) {
@@ -36312,11 +36343,11 @@ class SplineCurve extends Curve {
 		super();
 
 		this.type = 'SplineCurve';
-		this.isSplineCurve = true;
 
 		this.points = points;
 
 	}
+
 	getPoint( t, optionalTarget = new Vector2() ) {
 
 		const point = optionalTarget;
@@ -36340,9 +36371,10 @@ class SplineCurve extends Curve {
 		return point;
 
 	}
+
 	copy( source ) {
 
-		Curve.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.points = [];
 
@@ -36357,9 +36389,10 @@ class SplineCurve extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
-		const data = Curve.prototype.toJSON.call( this );
+		const data = super.toJSON();
 
 		data.points = [];
 
@@ -36373,9 +36406,10 @@ class SplineCurve extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
-		Curve.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.points = [];
 
@@ -36391,6 +36425,8 @@ class SplineCurve extends Curve {
 	}
 
 }
+
+SplineCurve.prototype.isSplineCurve = true;
 
 var Curves = /*#__PURE__*/Object.freeze({
 	__proto__: null,
@@ -36941,8 +36977,6 @@ class Light extends Object3D {
 
 		super();
 
-		this.isLight = true;
-
 		this.type = 'Light';
 
 		this.color = new Color( color );
@@ -36983,13 +37017,13 @@ class Light extends Object3D {
 
 }
 
+Light.prototype.isLight = true;
+
 class HemisphereLight extends Light {
 
 	constructor( skyColor, groundColor, intensity ) {
 
 		super( skyColor, intensity );
-
-		this.isHemisphereLight = true;
 
 		this.type = 'HemisphereLight';
 
@@ -37011,6 +37045,8 @@ class HemisphereLight extends Light {
 	}
 
 }
+
+HemisphereLight.prototype.isHemisphereLight = true;
 
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
@@ -37142,8 +37178,6 @@ class SpotLightShadow extends LightShadow {
 
 		super( new PerspectiveCamera( 50, 1, 0.5, 500 ) );
 
-		this.isSpotLightShadow = true;
-
 		this.focus = 1;
 
 	}
@@ -37171,13 +37205,13 @@ class SpotLightShadow extends LightShadow {
 
 }
 
+SpotLightShadow.prototype.isSpotLightShadow = true;
+
 class SpotLight extends Light {
 
 	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1 ) {
 
 		super( color, intensity );
-
-		this.isSpotLight = true;
 
 		this.type = 'SpotLight';
 
@@ -37230,6 +37264,8 @@ class SpotLight extends Light {
 
 }
 
+SpotLight.prototype.isSpotLight = true;
+
 const _projScreenMatrix$1 = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld$1 = /*@__PURE__*/ new Vector3();
 const _lookTarget$1 = /*@__PURE__*/ new Vector3();
@@ -37239,8 +37275,6 @@ class PointLightShadow extends LightShadow {
 	constructor() {
 
 		super( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
-
-		this.isPointLightShadow = true;
 
 		this._frameExtents = new Vector2( 4, 2 );
 
@@ -37309,13 +37343,13 @@ class PointLightShadow extends LightShadow {
 
 }
 
+PointLightShadow.prototype.isPointLightShadow = true;
+
 class PointLight extends Light {
 
 	constructor( color, intensity, distance = 0, decay = 1 ) {
 
 		super( color, intensity );
-
-		this.isPointLight = true;
 
 		this.type = 'PointLight';
 
@@ -37356,6 +37390,8 @@ class PointLight extends Light {
 	}
 
 }
+
+PointLight.prototype.isPointLight = true;
 
 function OrthographicCamera( left = - 1, right = 1, top = 1, bottom = - 1, near = 0.1, far = 2000 ) {
 
@@ -37498,19 +37534,17 @@ class DirectionalLightShadow extends LightShadow {
 
 		super( new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 
-		this.isDirectionalLightShadow = true;
-
 	}
 
 }
+
+DirectionalLightShadow.prototype.isDirectionalLightShadow = true;
 
 class DirectionalLight extends Light {
 
 	constructor( color, intensity ) {
 
 		super( color, intensity );
-
-		this.isDirectionalLight = true;
 
 		this.type = 'DirectionalLight';
 
@@ -37536,6 +37570,8 @@ class DirectionalLight extends Light {
 
 }
 
+DirectionalLight.prototype.isDirectionalLight = true;
+
 class AmbientLight extends Light {
 
 	constructor( color, intensity ) {
@@ -37543,19 +37579,18 @@ class AmbientLight extends Light {
 		super( color, intensity );
 
 		this.type = 'AmbientLight';
-		this.isAmbientLight = true;
 
 	}
 
 }
+
+AmbientLight.prototype.isAmbientLight = true;
 
 class RectAreaLight extends Light {
 
 	constructor( color, intensity, width = 10, height = 10 ) {
 
 		super( color, intensity );
-
-		this.isRectAreaLight = true;
 
 		this.type = 'RectAreaLight';
 
@@ -37588,6 +37623,8 @@ class RectAreaLight extends Light {
 
 }
 
+RectAreaLight.prototype.isRectAreaLight = true;
+
 /**
  * Primary reference:
  *   https://graphics.stanford.edu/papers/envmap/envmap.pdf
@@ -37601,8 +37638,6 @@ class RectAreaLight extends Light {
 class SphericalHarmonics3 {
 
 	constructor() {
-
-		this.isSphericalHarmonics3 = true;
 
 		this.coefficients = [];
 
@@ -37828,13 +37863,13 @@ class SphericalHarmonics3 {
 
 }
 
+SphericalHarmonics3.prototype.isSphericalHarmonics3 = true;
+
 class LightProbe extends Light {
 
 	constructor( sh = new SphericalHarmonics3(), intensity = 1 ) {
 
 		super( undefined, intensity );
-
-		this.isLightProbe = true;
 
 		this.sh = sh;
 
@@ -37870,6 +37905,8 @@ class LightProbe extends Light {
 	}
 
 }
+
+LightProbe.prototype.isLightProbe = true;
 
 class MaterialLoader extends Loader {
 
@@ -39999,8 +40036,6 @@ class Font {
 
 	constructor( data ) {
 
-		this.isFont = true;
-
 		this.type = 'Font';
 
 		this.data = data;
@@ -40135,6 +40170,8 @@ function createPath( char, scale, offsetX, offsetY, data ) {
 
 }
 
+Font.prototype.isFont = true;
+
 class FontLoader extends Loader {
 
 	constructor( manager ) {
@@ -40266,8 +40303,6 @@ class HemisphereLightProbe extends LightProbe {
 
 		super( undefined, intensity );
 
-		this.isHemisphereLightProbe = true;
-
 		const color1 = new Color().set( skyColor );
 		const color2 = new Color().set( groundColor );
 
@@ -40285,13 +40320,13 @@ class HemisphereLightProbe extends LightProbe {
 
 }
 
+HemisphereLightProbe.prototype.isHemisphereLightProbe = true;
+
 class AmbientLightProbe extends LightProbe {
 
 	constructor( color, intensity = 1 ) {
 
 		super( undefined, intensity );
-
-		this.isAmbientLightProbe = true;
 
 		const color1 = new Color().set( color );
 
@@ -40301,6 +40336,8 @@ class AmbientLightProbe extends LightProbe {
 	}
 
 }
+
+AmbientLightProbe.prototype.isAmbientLightProbe = true;
 
 const _eyeRight = new Matrix4();
 const _eyeLeft = new Matrix4();
@@ -44273,12 +44310,6 @@ class Spherical {
 
 	}
 
-	clone() {
-
-		return new this.constructor().copy( this );
-
-	}
-
 	copy( other ) {
 
 		this.radius = other.radius;
@@ -44325,6 +44356,12 @@ class Spherical {
 
 	}
 
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
 }
 
 /**
@@ -44333,11 +44370,11 @@ class Spherical {
 
 class Cylindrical {
 
-	constructor( radius, theta, y ) {
+	constructor( radius = 1, theta = 0, y = 0 ) {
 
-		this.radius = ( radius !== undefined ) ? radius : 1.0; // distance from the origin to a point in the x-z plane
-		this.theta = ( theta !== undefined ) ? theta : 0; // counterclockwise angle in the x-z plane measured in radians from the positive z-axis
-		this.y = ( y !== undefined ) ? y : 0; // height above the x-z plane
+		this.radius = radius; // distance from the origin to a point in the x-z plane
+		this.theta = theta; // counterclockwise angle in the x-z plane measured in radians from the positive z-axis
+		this.y = y; // height above the x-z plane
 
 		return this;
 
@@ -44350,12 +44387,6 @@ class Cylindrical {
 		this.y = y;
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -44385,18 +44416,22 @@ class Cylindrical {
 
 	}
 
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
 }
 
 const _vector$8 = /*@__PURE__*/ new Vector2();
 
 class Box2 {
 
-	constructor( min, max ) {
+	constructor( min = new Vector2( + Infinity, + Infinity ), max = new Vector2( - Infinity, - Infinity ) ) {
 
-		this.isBox2 = true;
-
-		this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
-		this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );
+		this.min = min;
+		this.max = max;
 
 	}
 
@@ -44615,15 +44650,17 @@ class Box2 {
 
 }
 
+Box2.prototype.isBox2 = true;
+
 const _startP = /*@__PURE__*/ new Vector3();
 const _startEnd = /*@__PURE__*/ new Vector3();
 
 class Line3 {
 
-	constructor( start, end ) {
+	constructor( start = new Vector3(), end = new Vector3() ) {
 
-		this.start = ( start !== undefined ) ? start : new Vector3();
-		this.end = ( end !== undefined ) ? end : new Vector3();
+		this.start = start;
+		this.end = end;
 
 	}
 
@@ -44633,12 +44670,6 @@ class Line3 {
 		this.end.copy( end );
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -44749,6 +44780,12 @@ class Line3 {
 	equals( line ) {
 
 		return line.start.equals( this.start ) && line.end.equals( this.end );
+
+	}
+
+	clone() {
+
+		return new this.constructor().copy( this );
 
 	}
 

@@ -1047,7 +1047,17 @@
 	function _inheritsLoose(subClass, superClass) {
 		subClass.prototype = Object.create(superClass.prototype);
 		subClass.prototype.constructor = subClass;
-		subClass.__proto__ = superClass;
+
+		_setPrototypeOf(subClass, superClass);
+	}
+
+	function _setPrototypeOf(o, p) {
+		_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+			o.__proto__ = p;
+			return o;
+		};
+
+		return _setPrototypeOf(o, p);
 	}
 
 	function _assertThisInitialized(self) {
@@ -1305,7 +1315,6 @@
 				y = 0;
 			}
 
-			this.isVector2 = true;
 			this.x = x;
 			this.y = y;
 		}
@@ -1652,9 +1661,10 @@
 		return Vector2;
 	}();
 
+	Vector2.prototype.isVector2 = true;
+
 	var Matrix3 = /*#__PURE__*/function () {
 		function Matrix3() {
-			this.isMatrix3 = true;
 			this.elements = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 
 			if (arguments.length > 0) {
@@ -1681,10 +1691,6 @@
 		_proto.identity = function identity() {
 			this.set(1, 0, 0, 0, 1, 0, 0, 0, 1);
 			return this;
-		};
-
-		_proto.clone = function clone() {
-			return new this.constructor().fromArray(this.elements);
 		};
 
 		_proto.copy = function copy(m) {
@@ -1940,8 +1946,14 @@
 			return array;
 		};
 
+		_proto.clone = function clone() {
+			return new this.constructor().fromArray(this.elements);
+		};
+
 		return Matrix3;
 	}();
+
+	Matrix3.prototype.isMatrix3 = true;
 
 	var _canvas;
 
@@ -2276,7 +2288,6 @@
 				w = 1;
 			}
 
-			this.isVector4 = true;
 			this.x = x;
 			this.y = y;
 			this.z = z;
@@ -2777,6 +2788,8 @@
 		return Vector4;
 	}();
 
+	Vector4.prototype.isVector4 = true;
+
 	/*
 	 In options, we can specify:
 	 * Texture parameters for an auto-generated target texture
@@ -2790,7 +2803,6 @@
 			var _this;
 
 			_this = _EventDispatcher.call(this) || this;
-			_this.isWebGLRenderTarget = true;
 			_this.width = width;
 			_this.height = height;
 			_this.depth = 1;
@@ -2866,6 +2878,8 @@
 		return WebGLRenderTarget;
 	}(EventDispatcher);
 
+	WebGLRenderTarget.prototype.isWebGLRenderTarget = true;
+
 	var WebGLMultisampleRenderTarget = /*#__PURE__*/function (_WebGLRenderTarget) {
 		_inheritsLoose(WebGLMultisampleRenderTarget, _WebGLRenderTarget);
 
@@ -2873,7 +2887,6 @@
 			var _this;
 
 			_this = _WebGLRenderTarget.call(this, width, height, options) || this;
-			_this.isWebGLMultisampleRenderTarget = true;
 			_this.samples = 4;
 			return _this;
 		}
@@ -2889,6 +2902,8 @@
 
 		return WebGLMultisampleRenderTarget;
 	}(WebGLRenderTarget);
+
+	WebGLMultisampleRenderTarget.prototype.isWebGLMultisampleRenderTarget = true;
 
 	var Quaternion = /*#__PURE__*/function () {
 		function Quaternion(x, y, z, w) {
@@ -2908,7 +2923,6 @@
 				w = 1;
 			}
 
-			this.isQuaternion = true;
 			this._x = x;
 			this._y = y;
 			this._z = z;
@@ -3439,6 +3453,8 @@
 		return Quaternion;
 	}();
 
+	Quaternion.prototype.isQuaternion = true;
+
 	var Vector3 = /*#__PURE__*/function () {
 		function Vector3(x, y, z) {
 			if (x === void 0) {
@@ -3453,7 +3469,6 @@
 				z = 0;
 			}
 
-			this.isVector3 = true;
 			this.x = x;
 			this.y = y;
 			this.z = z;
@@ -3988,15 +4003,24 @@
 		return Vector3;
 	}();
 
+	Vector3.prototype.isVector3 = true;
+
 	var _vector = /*@__PURE__*/new Vector3();
 
 	var _quaternion = /*@__PURE__*/new Quaternion();
 
 	var Box3 = /*#__PURE__*/function () {
 		function Box3(min, max) {
-			this.isBox3 = true;
-			this.min = min !== undefined ? min : new Vector3(+Infinity, +Infinity, +Infinity);
-			this.max = max !== undefined ? max : new Vector3(-Infinity, -Infinity, -Infinity);
+			if (min === void 0) {
+				min = new Vector3(+Infinity, +Infinity, +Infinity);
+			}
+
+			if (max === void 0) {
+				max = new Vector3(-Infinity, -Infinity, -Infinity);
+			}
+
+			this.min = min;
+			this.max = max;
 		}
 
 		var _proto = Box3.prototype;
@@ -4359,27 +4383,7 @@
 		return Box3;
 	}();
 
-	function satForAxes(axes, v0, v1, v2, extents) {
-		for (var i = 0, j = axes.length - 3; i <= j; i += 3) {
-			_testAxis.fromArray(axes, i); // project the aabb onto the seperating axis
-
-
-			var r = extents.x * Math.abs(_testAxis.x) + extents.y * Math.abs(_testAxis.y) + extents.z * Math.abs(_testAxis.z); // project all 3 vertices of the triangle onto the seperating axis
-
-			var p0 = v0.dot(_testAxis);
-			var p1 = v1.dot(_testAxis);
-			var p2 = v2.dot(_testAxis); // actual test, basically see if either of the most extreme of the triangle points intersects r
-
-			if (Math.max(-Math.max(p0, p1, p2), Math.min(p0, p1, p2)) > r) {
-				// points of the projected triangle are outside the projected half-length of the aabb
-				// the axis is seperating and we can exit
-				return false;
-			}
-		}
-
-		return true;
-	}
-
+	Box3.prototype.isBox3 = true;
 	var _points = [/*@__PURE__*/new Vector3(), /*@__PURE__*/new Vector3(), /*@__PURE__*/new Vector3(), /*@__PURE__*/new Vector3(), /*@__PURE__*/new Vector3(), /*@__PURE__*/new Vector3(), /*@__PURE__*/new Vector3(), /*@__PURE__*/new Vector3()];
 
 	var _vector$1 = /*@__PURE__*/new Vector3();
@@ -4408,12 +4412,41 @@
 
 	var _testAxis = /*@__PURE__*/new Vector3();
 
+	function satForAxes(axes, v0, v1, v2, extents) {
+		for (var i = 0, j = axes.length - 3; i <= j; i += 3) {
+			_testAxis.fromArray(axes, i); // project the aabb onto the seperating axis
+
+
+			var r = extents.x * Math.abs(_testAxis.x) + extents.y * Math.abs(_testAxis.y) + extents.z * Math.abs(_testAxis.z); // project all 3 vertices of the triangle onto the seperating axis
+
+			var p0 = v0.dot(_testAxis);
+			var p1 = v1.dot(_testAxis);
+			var p2 = v2.dot(_testAxis); // actual test, basically see if either of the most extreme of the triangle points intersects r
+
+			if (Math.max(-Math.max(p0, p1, p2), Math.min(p0, p1, p2)) > r) {
+				// points of the projected triangle are outside the projected half-length of the aabb
+				// the axis is seperating and we can exit
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	var _box$1 = /*@__PURE__*/new Box3();
 
 	var Sphere = /*#__PURE__*/function () {
 		function Sphere(center, radius) {
-			this.center = center !== undefined ? center : new Vector3();
-			this.radius = radius !== undefined ? radius : -1;
+			if (center === void 0) {
+				center = new Vector3();
+			}
+
+			if (radius === void 0) {
+				radius = -1;
+			}
+
+			this.center = center;
+			this.radius = radius;
 		}
 
 		var _proto = Sphere.prototype;
@@ -4441,10 +4474,6 @@
 
 			this.radius = Math.sqrt(maxRadiusSq);
 			return this;
-		};
-
-		_proto.clone = function clone() {
-			return new this.constructor().copy(this);
 		};
 
 		_proto.copy = function copy(sphere) {
@@ -4534,6 +4563,10 @@
 			return sphere.center.equals(this.center) && sphere.radius === this.radius;
 		};
 
+		_proto.clone = function clone() {
+			return new this.constructor().copy(this);
+		};
+
 		return Sphere;
 	}();
 
@@ -4553,8 +4586,16 @@
 
 	var Ray = /*#__PURE__*/function () {
 		function Ray(origin, direction) {
-			this.origin = origin !== undefined ? origin : new Vector3();
-			this.direction = direction !== undefined ? direction : new Vector3(0, 0, -1);
+			if (origin === void 0) {
+				origin = new Vector3();
+			}
+
+			if (direction === void 0) {
+				direction = new Vector3(0, 0, -1);
+			}
+
+			this.origin = origin;
+			this.direction = direction;
 		}
 
 		var _proto = Ray.prototype;
@@ -4563,10 +4604,6 @@
 			this.origin.copy(origin);
 			this.direction.copy(direction);
 			return this;
-		};
-
-		_proto.clone = function clone() {
-			return new this.constructor().copy(this);
 		};
 
 		_proto.copy = function copy(ray) {
@@ -4905,12 +4942,15 @@
 			return ray.origin.equals(this.origin) && ray.direction.equals(this.direction);
 		};
 
+		_proto.clone = function clone() {
+			return new this.constructor().copy(this);
+		};
+
 		return Ray;
 	}();
 
 	var Matrix4 = /*#__PURE__*/function () {
 		function Matrix4() {
-			this.isMatrix4 = true;
 			this.elements = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 			if (arguments.length > 0) {
@@ -5658,6 +5698,8 @@
 		return Matrix4;
 	}();
 
+	Matrix4.prototype.isMatrix4 = true;
+
 	var _v1$1 = /*@__PURE__*/new Vector3();
 
 	var _m1 = /*@__PURE__*/new Matrix4();
@@ -5671,6 +5713,10 @@
 	var _y = /*@__PURE__*/new Vector3();
 
 	var _z = /*@__PURE__*/new Vector3();
+
+	var _matrix = /*@__PURE__*/new Matrix4();
+
+	var _quaternion$1 = /*@__PURE__*/new Quaternion();
 
 	var Euler = /*#__PURE__*/function () {
 		function Euler(x, y, z, order) {
@@ -5690,7 +5736,6 @@
 				order = Euler.DefaultOrder;
 			}
 
-			this.isEuler = true;
 			this._x = x;
 			this._y = y;
 			this._z = z;
@@ -5936,12 +5981,9 @@
 		return Euler;
 	}();
 
+	Euler.prototype.isEuler = true;
 	Euler.DefaultOrder = 'XYZ';
 	Euler.RotationOrders = ['XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX'];
-
-	var _matrix = /*@__PURE__*/new Matrix4();
-
-	var _quaternion$1 = /*@__PURE__*/new Quaternion();
 
 	var Layers = /*#__PURE__*/function () {
 		function Layers() {
@@ -6593,10 +6635,17 @@
 
 	var Plane = /*#__PURE__*/function () {
 		function Plane(normal, constant) {
-			this.isPlane = true; // normal is assumed to be normalized
+			if (normal === void 0) {
+				normal = new Vector3(1, 0, 0);
+			}
 
-			this.normal = normal !== undefined ? normal : new Vector3(1, 0, 0);
-			this.constant = constant !== undefined ? constant : 0;
+			if (constant === void 0) {
+				constant = 0;
+			}
+
+			// normal is assumed to be normalized
+			this.normal = normal;
+			this.constant = constant;
 		}
 
 		var _proto = Plane.prototype;
@@ -6625,10 +6674,6 @@
 
 			this.setFromNormalAndCoplanarPoint(normal, a);
 			return this;
-		};
-
-		_proto.clone = function clone() {
-			return new this.constructor().copy(this);
 		};
 
 		_proto.copy = function copy(plane) {
@@ -6738,8 +6783,14 @@
 			return plane.normal.equals(this.normal) && plane.constant === this.constant;
 		};
 
+		_proto.clone = function clone() {
+			return new this.constructor().copy(this);
+		};
+
 		return Plane;
 	}();
+
+	Plane.prototype.isPlane = true;
 
 	var _v0$1 = /*@__PURE__*/new Vector3();
 
@@ -6763,9 +6814,21 @@
 
 	var Triangle = /*#__PURE__*/function () {
 		function Triangle(a, b, c) {
-			this.a = a !== undefined ? a : new Vector3();
-			this.b = b !== undefined ? b : new Vector3();
-			this.c = c !== undefined ? c : new Vector3();
+			if (a === void 0) {
+				a = new Vector3();
+			}
+
+			if (b === void 0) {
+				b = new Vector3();
+			}
+
+			if (c === void 0) {
+				c = new Vector3();
+			}
+
+			this.a = a;
+			this.b = b;
+			this.c = c;
 		}
 
 		Triangle.getNormal = function getNormal(a, b, c, target) {
@@ -7521,8 +7584,6 @@
 
 	var Color = /*#__PURE__*/function () {
 		function Color(r, g, b) {
-			this.isColor = true;
-
 			if (g === undefined && b === undefined) {
 				// r is THREE.Color, hex or string
 				return this.set(r);
@@ -7938,6 +7999,7 @@
 	}();
 
 	Color.NAMES = _colorKeywords;
+	Color.prototype.isColor = true;
 	Color.prototype.r = 1;
 	Color.prototype.g = 1;
 	Color.prototype.b = 1;
@@ -10205,7 +10267,6 @@
 			}
 
 			_this = _WebGLRenderTarget.call(this, size, size, options) || this;
-			_this.isWebGLCubeRenderTarget = true;
 			options = options || {};
 			_this.texture = new CubeTexture(undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding);
 			_this.texture._needsFlipEnvMap = false;
@@ -10271,6 +10332,8 @@
 		return WebGLCubeRenderTarget;
 	}(WebGLRenderTarget);
 
+	WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
+
 	function DataTexture(data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding) {
 		Texture.call(this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding);
 		this.image = {
@@ -10296,7 +10359,31 @@
 
 	var Frustum = /*#__PURE__*/function () {
 		function Frustum(p0, p1, p2, p3, p4, p5) {
-			this.planes = [p0 !== undefined ? p0 : new Plane(), p1 !== undefined ? p1 : new Plane(), p2 !== undefined ? p2 : new Plane(), p3 !== undefined ? p3 : new Plane(), p4 !== undefined ? p4 : new Plane(), p5 !== undefined ? p5 : new Plane()];
+			if (p0 === void 0) {
+				p0 = new Plane();
+			}
+
+			if (p1 === void 0) {
+				p1 = new Plane();
+			}
+
+			if (p2 === void 0) {
+				p2 = new Plane();
+			}
+
+			if (p3 === void 0) {
+				p3 = new Plane();
+			}
+
+			if (p4 === void 0) {
+				p4 = new Plane();
+			}
+
+			if (p5 === void 0) {
+				p5 = new Plane();
+			}
+
+			this.planes = [p0, p1, p2, p3, p4, p5];
 		}
 
 		var _proto = Frustum.prototype;
@@ -10310,10 +10397,6 @@
 			planes[4].copy(p4);
 			planes[5].copy(p5);
 			return this;
-		};
-
-		_proto.clone = function clone() {
-			return new this.constructor().copy(this);
 		};
 
 		_proto.copy = function copy(frustum) {
@@ -10417,6 +10500,10 @@
 			}
 
 			return true;
+		};
+
+		_proto.clone = function clone() {
+			return new this.constructor().copy(this);
 		};
 
 		return Frustum;
@@ -17111,12 +17198,13 @@
 
 			_this = _Object3D.call(this) || this;
 			_this.type = 'Group';
-			_this.isGroup = true;
 			return _this;
 		}
 
 		return Group;
 	}(Object3D);
+
+	Group.prototype.isGroup = true;
 
 	function WebXRController() {
 		this._targetRay = null;
@@ -19526,7 +19614,6 @@
 
 	var FogExp2 = /*#__PURE__*/function () {
 		function FogExp2(color, density) {
-			this.isFogExp2 = true;
 			this.name = '';
 			this.color = new Color(color);
 			this.density = density !== undefined ? density : 0.00025;
@@ -19551,9 +19638,10 @@
 		return FogExp2;
 	}();
 
+	FogExp2.prototype.isFogExp2 = true;
+
 	var Fog = /*#__PURE__*/function () {
 		function Fog(color, near, far) {
-			this.isFog = true;
 			this.name = '';
 			this.color = new Color(color);
 			this.near = near !== undefined ? near : 1;
@@ -19580,6 +19668,8 @@
 		return Fog;
 	}();
 
+	Fog.prototype.isFog = true;
+
 	var Scene = /*#__PURE__*/function (_Object3D) {
 		_inheritsLoose(Scene, _Object3D);
 
@@ -19587,7 +19677,6 @@
 			var _this;
 
 			_this = _Object3D.call(this) || this;
-			_this.isScene = true;
 			_this.type = 'Scene';
 			_this.background = null;
 			_this.environment = null;
@@ -19630,6 +19719,8 @@
 
 		return Scene;
 	}(Object3D);
+
+	Scene.prototype.isScene = true;
 
 	function InterleavedBuffer(array, stride) {
 		this.array = array;
@@ -19971,7 +20062,6 @@
 			_this.geometry = _geometry;
 			_this.material = material !== undefined ? material : new SpriteMaterial();
 			_this.center = new Vector2(0.5, 0.5);
-			_this.isSprite = true;
 			return _this;
 		}
 
@@ -20041,7 +20131,8 @@
 		};
 
 		_proto.copy = function copy(source) {
-			Object3D.prototype.copy.call(this, source);
+			_Object3D.prototype.copy.call(this, source);
+
 			if (source.center !== undefined) this.center.copy(source.center);
 			this.material = source.material;
 			return this;
@@ -20049,6 +20140,8 @@
 
 		return Sprite;
 	}(Object3D);
+
+	Sprite.prototype.isSprite = true;
 
 	function transformVertex(vertexPosition, mvPosition, center, scale, sin, cos) {
 		// compute position in camera space
@@ -20854,12 +20947,13 @@
 
 			_this = _Line.call(this, geometry, material) || this;
 			_this.type = 'LineLoop';
-			_this.isLineLoop = true;
 			return _this;
 		}
 
 		return LineLoop;
 	}(Line);
+
+	LineLoop.prototype.isLineLoop = true;
 
 	/**
 	 * parameters = {
@@ -27256,17 +27350,48 @@
 		function EllipseCurve(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
 			var _this;
 
+			if (aX === void 0) {
+				aX = 0;
+			}
+
+			if (aY === void 0) {
+				aY = 0;
+			}
+
+			if (xRadius === void 0) {
+				xRadius = 1;
+			}
+
+			if (yRadius === void 0) {
+				yRadius = 1;
+			}
+
+			if (aStartAngle === void 0) {
+				aStartAngle = 0;
+			}
+
+			if (aEndAngle === void 0) {
+				aEndAngle = Math.PI * 2;
+			}
+
+			if (aClockwise === void 0) {
+				aClockwise = false;
+			}
+
+			if (aRotation === void 0) {
+				aRotation = 0;
+			}
+
 			_this = _Curve.call(this) || this;
 			_this.type = 'EllipseCurve';
-			_this.isEllipseCurve = true;
-			_this.aX = aX || 0;
-			_this.aY = aY || 0;
-			_this.xRadius = xRadius || 1;
-			_this.yRadius = yRadius || 1;
-			_this.aStartAngle = aStartAngle || 0;
-			_this.aEndAngle = aEndAngle || 2 * Math.PI;
-			_this.aClockwise = aClockwise || false;
-			_this.aRotation = aRotation || 0;
+			_this.aX = aX;
+			_this.aY = aY;
+			_this.xRadius = xRadius;
+			_this.yRadius = yRadius;
+			_this.aStartAngle = aStartAngle;
+			_this.aEndAngle = aEndAngle;
+			_this.aClockwise = aClockwise;
+			_this.aRotation = aRotation;
 			return _this;
 		}
 
@@ -27364,6 +27489,8 @@
 		return EllipseCurve;
 	}(Curve);
 
+	EllipseCurve.prototype.isEllipseCurve = true;
+
 	var ArcCurve = /*#__PURE__*/function (_EllipseCurve) {
 		_inheritsLoose(ArcCurve, _EllipseCurve);
 
@@ -27372,12 +27499,13 @@
 
 			_this = _EllipseCurve.call(this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise) || this;
 			_this.type = 'ArcCurve';
-			_this.isArcCurve = true;
 			return _this;
 		}
 
 		return ArcCurve;
 	}(EllipseCurve);
+
+	ArcCurve.prototype.isArcCurve = true;
 
 	/**
 	 * Centripetal CatmullRom Curve - which is useful for avoiding
@@ -27470,7 +27598,6 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'CatmullRomCurve3';
-			_this.isCatmullRomCurve3 = true;
 			_this.points = points;
 			_this.closed = closed;
 			_this.curveType = curveType;
@@ -27594,6 +27721,8 @@
 		return CatmullRomCurve3;
 	}(Curve);
 
+	CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
+
 	/**
 	 * Bezier Curves formulas obtained from
 	 * http://en.wikipedia.org/wiki/Bézier_curve
@@ -27671,7 +27800,6 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'CubicBezierCurve';
-			_this.isCubicBezierCurve = true;
 			_this.v0 = v0;
 			_this.v1 = v1;
 			_this.v2 = v2;
@@ -27728,6 +27856,8 @@
 		return CubicBezierCurve;
 	}(Curve);
 
+	CubicBezierCurve.prototype.isCubicBezierCurve = true;
+
 	var CubicBezierCurve3 = /*#__PURE__*/function (_Curve) {
 		_inheritsLoose(CubicBezierCurve3, _Curve);
 
@@ -27752,7 +27882,6 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'CubicBezierCurve3';
-			_this.isCubicBezierCurve3 = true;
 			_this.v0 = v0;
 			_this.v1 = v1;
 			_this.v2 = v2;
@@ -27809,6 +27938,8 @@
 		return CubicBezierCurve3;
 	}(Curve);
 
+	CubicBezierCurve3.prototype.isCubicBezierCurve3 = true;
+
 	var LineCurve = /*#__PURE__*/function (_Curve) {
 		_inheritsLoose(LineCurve, _Curve);
 
@@ -27825,7 +27956,6 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'LineCurve';
-			_this.isLineCurve = true;
 			_this.v1 = v1;
 			_this.v2 = v2;
 			return _this;
@@ -27887,6 +28017,8 @@
 
 		return LineCurve;
 	}(Curve);
+
+	LineCurve.prototype.isLineCurve = true;
 
 	var LineCurve3 = /*#__PURE__*/function (_Curve) {
 		_inheritsLoose(LineCurve3, _Curve);
@@ -27981,7 +28113,6 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'QuadraticBezierCurve';
-			_this.isQuadraticBezierCurve = true;
 			_this.v0 = v0;
 			_this.v1 = v1;
 			_this.v2 = v2;
@@ -28033,6 +28164,8 @@
 		return QuadraticBezierCurve;
 	}(Curve);
 
+	QuadraticBezierCurve.prototype.isQuadraticBezierCurve = true;
+
 	var QuadraticBezierCurve3 = /*#__PURE__*/function (_Curve) {
 		_inheritsLoose(QuadraticBezierCurve3, _Curve);
 
@@ -28053,7 +28186,6 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'QuadraticBezierCurve3';
-			_this.isQuadraticBezierCurve3 = true;
 			_this.v0 = v0;
 			_this.v1 = v1;
 			_this.v2 = v2;
@@ -28105,6 +28237,8 @@
 		return QuadraticBezierCurve3;
 	}(Curve);
 
+	QuadraticBezierCurve3.prototype.isQuadraticBezierCurve3 = true;
+
 	var SplineCurve = /*#__PURE__*/function (_Curve) {
 		_inheritsLoose(SplineCurve, _Curve);
 
@@ -28117,7 +28251,6 @@
 
 			_this = _Curve.call(this) || this;
 			_this.type = 'SplineCurve';
-			_this.isSplineCurve = true;
 			_this.points = points;
 			return _this;
 		}
@@ -28143,7 +28276,8 @@
 		};
 
 		_proto.copy = function copy(source) {
-			Curve.prototype.copy.call(this, source);
+			_Curve.prototype.copy.call(this, source);
+
 			this.points = [];
 
 			for (var i = 0, l = source.points.length; i < l; i++) {
@@ -28155,7 +28289,8 @@
 		};
 
 		_proto.toJSON = function toJSON() {
-			var data = Curve.prototype.toJSON.call(this);
+			var data = _Curve.prototype.toJSON.call(this);
+
 			data.points = [];
 
 			for (var i = 0, l = this.points.length; i < l; i++) {
@@ -28167,7 +28302,8 @@
 		};
 
 		_proto.fromJSON = function fromJSON(json) {
-			Curve.prototype.fromJSON.call(this, json);
+			_Curve.prototype.fromJSON.call(this, json);
+
 			this.points = [];
 
 			for (var i = 0, l = json.points.length; i < l; i++) {
@@ -28180,6 +28316,8 @@
 
 		return SplineCurve;
 	}(Curve);
+
+	SplineCurve.prototype.isSplineCurve = true;
 
 	var Curves = /*#__PURE__*/Object.freeze({
 		__proto__: null,
@@ -28601,7 +28739,6 @@
 			}
 
 			_this = _Object3D.call(this) || this;
-			_this.isLight = true;
 			_this.type = 'Light';
 			_this.color = new Color(color);
 			_this.intensity = intensity;
@@ -28635,6 +28772,8 @@
 		return Light;
 	}(Object3D);
 
+	Light.prototype.isLight = true;
+
 	var HemisphereLight = /*#__PURE__*/function (_Light) {
 		_inheritsLoose(HemisphereLight, _Light);
 
@@ -28642,7 +28781,6 @@
 			var _this;
 
 			_this = _Light.call(this, skyColor, intensity) || this;
-			_this.isHemisphereLight = true;
 			_this.type = 'HemisphereLight';
 
 			_this.position.copy(Object3D.DefaultUp);
@@ -28663,6 +28801,8 @@
 
 		return HemisphereLight;
 	}(Light);
+
+	HemisphereLight.prototype.isHemisphereLight = true;
 
 	var _projScreenMatrix = /*@__PURE__*/new Matrix4();
 
@@ -28761,7 +28901,6 @@
 			var _this;
 
 			_this = _LightShadow.call(this, new PerspectiveCamera(50, 1, 0.5, 500)) || this;
-			_this.isSpotLightShadow = true;
 			_this.focus = 1;
 			return _this;
 		}
@@ -28787,6 +28926,8 @@
 		return SpotLightShadow;
 	}(LightShadow);
 
+	SpotLightShadow.prototype.isSpotLightShadow = true;
+
 	var SpotLight = /*#__PURE__*/function (_Light) {
 		_inheritsLoose(SpotLight, _Light);
 
@@ -28810,7 +28951,6 @@
 			}
 
 			_this = _Light.call(this, color, intensity) || this;
-			_this.isSpotLight = true;
 			_this.type = 'SpotLight';
 
 			_this.position.copy(Object3D.DefaultUp);
@@ -28858,6 +28998,8 @@
 		return SpotLight;
 	}(Light);
 
+	SpotLight.prototype.isSpotLight = true;
+
 	var _projScreenMatrix$1 = /*@__PURE__*/new Matrix4();
 
 	var _lightPositionWorld$1 = /*@__PURE__*/new Vector3();
@@ -28871,7 +29013,6 @@
 			var _this;
 
 			_this = _LightShadow.call(this, new PerspectiveCamera(90, 1, 0.5, 500)) || this;
-			_this.isPointLightShadow = true;
 			_this._frameExtents = new Vector2(4, 2);
 			_this._viewportCount = 6;
 			_this._viewports = [// These viewports map a cube-map onto a 2D texture with the
@@ -28929,6 +29070,8 @@
 		return PointLightShadow;
 	}(LightShadow);
 
+	PointLightShadow.prototype.isPointLightShadow = true;
+
 	var PointLight = /*#__PURE__*/function (_Light) {
 		_inheritsLoose(PointLight, _Light);
 
@@ -28944,7 +29087,6 @@
 			}
 
 			_this = _Light.call(this, color, intensity) || this;
-			_this.isPointLight = true;
 			_this.type = 'PointLight';
 			_this.distance = distance;
 			_this.decay = decay; // for physically correct lights, should be 2.
@@ -28980,6 +29122,8 @@
 
 		return PointLight;
 	}(Light);
+
+	PointLight.prototype.isPointLight = true;
 
 	function OrthographicCamera(left, right, top, bottom, near, far) {
 		if (left === void 0) {
@@ -29103,15 +29247,13 @@
 		_inheritsLoose(DirectionalLightShadow, _LightShadow);
 
 		function DirectionalLightShadow() {
-			var _this;
-
-			_this = _LightShadow.call(this, new OrthographicCamera(-5, 5, 5, -5, 0.5, 500)) || this;
-			_this.isDirectionalLightShadow = true;
-			return _this;
+			return _LightShadow.call(this, new OrthographicCamera(-5, 5, 5, -5, 0.5, 500)) || this;
 		}
 
 		return DirectionalLightShadow;
 	}(LightShadow);
+
+	DirectionalLightShadow.prototype.isDirectionalLightShadow = true;
 
 	var DirectionalLight = /*#__PURE__*/function (_Light) {
 		_inheritsLoose(DirectionalLight, _Light);
@@ -29120,7 +29262,6 @@
 			var _this;
 
 			_this = _Light.call(this, color, intensity) || this;
-			_this.isDirectionalLight = true;
 			_this.type = 'DirectionalLight';
 
 			_this.position.copy(Object3D.DefaultUp);
@@ -29145,6 +29286,8 @@
 		return DirectionalLight;
 	}(Light);
 
+	DirectionalLight.prototype.isDirectionalLight = true;
+
 	var AmbientLight = /*#__PURE__*/function (_Light) {
 		_inheritsLoose(AmbientLight, _Light);
 
@@ -29153,12 +29296,13 @@
 
 			_this = _Light.call(this, color, intensity) || this;
 			_this.type = 'AmbientLight';
-			_this.isAmbientLight = true;
 			return _this;
 		}
 
 		return AmbientLight;
 	}(Light);
+
+	AmbientLight.prototype.isAmbientLight = true;
 
 	var RectAreaLight = /*#__PURE__*/function (_Light) {
 		_inheritsLoose(RectAreaLight, _Light);
@@ -29175,7 +29319,6 @@
 			}
 
 			_this = _Light.call(this, color, intensity) || this;
-			_this.isRectAreaLight = true;
 			_this.type = 'RectAreaLight';
 			_this.width = width;
 			_this.height = height;
@@ -29203,6 +29346,8 @@
 		return RectAreaLight;
 	}(Light);
 
+	RectAreaLight.prototype.isRectAreaLight = true;
+
 	/**
 	 * Primary reference:
 	 *	 https://graphics.stanford.edu/papers/envmap/envmap.pdf
@@ -29214,7 +29359,6 @@
 
 	var SphericalHarmonics3 = /*#__PURE__*/function () {
 		function SphericalHarmonics3() {
-			this.isSphericalHarmonics3 = true;
 			this.coefficients = [];
 
 			for (var i = 0; i < 9; i++) {
@@ -29398,6 +29542,8 @@
 		return SphericalHarmonics3;
 	}();
 
+	SphericalHarmonics3.prototype.isSphericalHarmonics3 = true;
+
 	var LightProbe = /*#__PURE__*/function (_Light) {
 		_inheritsLoose(LightProbe, _Light);
 
@@ -29413,7 +29559,6 @@
 			}
 
 			_this = _Light.call(this, undefined, intensity) || this;
-			_this.isLightProbe = true;
 			_this.sh = sh;
 			return _this;
 		}
@@ -29443,6 +29588,8 @@
 
 		return LightProbe;
 	}(Light);
+
+	LightProbe.prototype.isLightProbe = true;
 
 	var MaterialLoader = /*#__PURE__*/function (_Loader) {
 		_inheritsLoose(MaterialLoader, _Loader);
@@ -30874,7 +31021,6 @@
 
 	var Font = /*#__PURE__*/function () {
 		function Font(data) {
-			this.isFont = true;
 			this.type = 'Font';
 			this.data = data;
 		}
@@ -30985,6 +31131,8 @@
 		};
 	}
 
+	Font.prototype.isFont = true;
+
 	var FontLoader = /*#__PURE__*/function (_Loader) {
 		_inheritsLoose(FontLoader, _Loader);
 
@@ -31088,7 +31236,6 @@
 			}
 
 			_this = _LightProbe.call(this, undefined, intensity) || this;
-			_this.isHemisphereLightProbe = true;
 			var color1 = new Color().set(skyColor);
 			var color2 = new Color().set(groundColor);
 			var sky = new Vector3(color1.r, color1.g, color1.b);
@@ -31107,6 +31254,8 @@
 		return HemisphereLightProbe;
 	}(LightProbe);
 
+	HemisphereLightProbe.prototype.isHemisphereLightProbe = true;
+
 	var AmbientLightProbe = /*#__PURE__*/function (_LightProbe) {
 		_inheritsLoose(AmbientLightProbe, _LightProbe);
 
@@ -31118,7 +31267,6 @@
 			}
 
 			_this = _LightProbe.call(this, undefined, intensity) || this;
-			_this.isAmbientLightProbe = true;
 			var color1 = new Color().set(color); // without extra factor of PI in the shader, would be 2 / Math.sqrt( Math.PI );
 
 			_this.sh.coefficients[0].set(color1.r, color1.g, color1.b).multiplyScalar(2 * Math.sqrt(Math.PI));
@@ -31128,6 +31276,8 @@
 
 		return AmbientLightProbe;
 	}(LightProbe);
+
+	AmbientLightProbe.prototype.isAmbientLightProbe = true;
 
 	var _eyeRight = new Matrix4();
 
@@ -33914,10 +34064,6 @@
 			return this;
 		};
 
-		_proto.clone = function clone() {
-			return new this.constructor().copy(this);
-		};
-
 		_proto.copy = function copy(other) {
 			this.radius = other.radius;
 			this.phi = other.phi;
@@ -33950,6 +34096,10 @@
 			return this;
 		};
 
+		_proto.clone = function clone() {
+			return new this.constructor().copy(this);
+		};
+
 		return Spherical;
 	}();
 
@@ -33958,11 +34108,23 @@
 	 */
 	var Cylindrical = /*#__PURE__*/function () {
 		function Cylindrical(radius, theta, y) {
-			this.radius = radius !== undefined ? radius : 1.0; // distance from the origin to a point in the x-z plane
+			if (radius === void 0) {
+				radius = 1;
+			}
 
-			this.theta = theta !== undefined ? theta : 0; // counterclockwise angle in the x-z plane measured in radians from the positive z-axis
+			if (theta === void 0) {
+				theta = 0;
+			}
 
-			this.y = y !== undefined ? y : 0; // height above the x-z plane
+			if (y === void 0) {
+				y = 0;
+			}
+
+			this.radius = radius; // distance from the origin to a point in the x-z plane
+
+			this.theta = theta; // counterclockwise angle in the x-z plane measured in radians from the positive z-axis
+
+			this.y = y; // height above the x-z plane
 
 			return this;
 		}
@@ -33974,10 +34136,6 @@
 			this.theta = theta;
 			this.y = y;
 			return this;
-		};
-
-		_proto.clone = function clone() {
-			return new this.constructor().copy(this);
 		};
 
 		_proto.copy = function copy(other) {
@@ -33998,6 +34156,10 @@
 			return this;
 		};
 
+		_proto.clone = function clone() {
+			return new this.constructor().copy(this);
+		};
+
 		return Cylindrical;
 	}();
 
@@ -34005,9 +34167,16 @@
 
 	var Box2 = /*#__PURE__*/function () {
 		function Box2(min, max) {
-			this.isBox2 = true;
-			this.min = min !== undefined ? min : new Vector2(+Infinity, +Infinity);
-			this.max = max !== undefined ? max : new Vector2(-Infinity, -Infinity);
+			if (min === void 0) {
+				min = new Vector2(+Infinity, +Infinity);
+			}
+
+			if (max === void 0) {
+				max = new Vector2(-Infinity, -Infinity);
+			}
+
+			this.min = min;
+			this.max = max;
 		}
 
 		var _proto = Box2.prototype;
@@ -34157,14 +34326,24 @@
 		return Box2;
 	}();
 
+	Box2.prototype.isBox2 = true;
+
 	var _startP = /*@__PURE__*/new Vector3();
 
 	var _startEnd = /*@__PURE__*/new Vector3();
 
 	var Line3 = /*#__PURE__*/function () {
 		function Line3(start, end) {
-			this.start = start !== undefined ? start : new Vector3();
-			this.end = end !== undefined ? end : new Vector3();
+			if (start === void 0) {
+				start = new Vector3();
+			}
+
+			if (end === void 0) {
+				end = new Vector3();
+			}
+
+			this.start = start;
+			this.end = end;
 		}
 
 		var _proto = Line3.prototype;
@@ -34173,10 +34352,6 @@
 			this.start.copy(start);
 			this.end.copy(end);
 			return this;
-		};
-
-		_proto.clone = function clone() {
-			return new this.constructor().copy(this);
 		};
 
 		_proto.copy = function copy(line) {
@@ -34257,6 +34432,10 @@
 
 		_proto.equals = function equals(line) {
 			return line.start.equals(this.start) && line.end.equals(this.end);
+		};
+
+		_proto.clone = function clone() {
+			return new this.constructor().copy(this);
 		};
 
 		return Line3;
