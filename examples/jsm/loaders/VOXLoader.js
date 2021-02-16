@@ -1,10 +1,14 @@
 import {
 	BufferGeometry,
+	DataTexture3D,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
+	LinearFilter,
 	Mesh,
-	MeshStandardMaterial
+	MeshStandardMaterial,
+	NearestFilter,
+	RedFormat
 } from '../../../build/three.module.js';
 
 class VOXLoader extends Loader {
@@ -257,4 +261,39 @@ class VOXMesh extends Mesh {
 
 }
 
-export { VOXLoader, VOXMesh };
+class VOXDataTexture3D extends DataTexture3D {
+
+	constructor( chunk ) {
+
+		const data = chunk.data;
+		const size = chunk.size;
+
+		const offsety = size.x;
+		const offsetz = size.x * size.y;
+
+		const array = new Uint8Array( size.x * size.y * size.z );
+
+		for ( let j = 0, k = 0; j < data.length; j += 4, k ++ ) {
+
+			const x = data[ j + 0 ];
+			const y = data[ j + 1 ];
+			const z = data[ j + 2 ];
+
+			const index = x + ( y * offsety ) + ( z * offsetz );
+
+			array[ index ] = 255.0;
+
+		}
+
+		super( array, size.x, size.y, size.z );
+
+		this.format = RedFormat;
+		this.minFilter = NearestFilter;
+		this.magFilter = LinearFilter;
+		this.unpackAlignment = 1;
+
+	}
+
+}
+
+export { VOXLoader, VOXMesh, VOXDataTexture3D };
