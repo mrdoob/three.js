@@ -3,27 +3,28 @@ import { Vector2 } from '../../math/Vector2.js';
 
 class EllipseCurve extends Curve {
 
-	constructor( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
+	constructor( aX = 0, aY = 0, xRadius = 1, yRadius = 1, aStartAngle = 0, aEndAngle = Math.PI * 2, aClockwise = false, aRotation = 0 ) {
 
 		super();
 
 		this.type = 'EllipseCurve';
 		this.isEllipseCurve = true;
 
-		this.aX = aX || 0;
-		this.aY = aY || 0;
+		this.aX = aX;
+		this.aY = aY;
 
-		this.xRadius = xRadius || 1;
-		this.yRadius = yRadius || 1;
+		this.xRadius = xRadius;
+		this.yRadius = yRadius;
 
-		this.aStartAngle = aStartAngle || 0;
-		this.aEndAngle = aEndAngle || 2 * Math.PI;
+		this.aStartAngle = aStartAngle;
+		this.aEndAngle = aEndAngle;
 
-		this.aClockwise = aClockwise || false;
+		this.aClockwise = aClockwise;
 
-		this.aRotation = aRotation || 0;
+		this.aRotation = aRotation;
 
 	}
+
 	getPoint( t, optionalTarget ) {
 
 		const point = optionalTarget || new Vector2();
@@ -85,6 +86,7 @@ class EllipseCurve extends Curve {
 		return point.set( x, y );
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -105,6 +107,7 @@ class EllipseCurve extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -125,6 +128,7 @@ class EllipseCurve extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );

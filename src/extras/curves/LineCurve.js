@@ -14,6 +14,7 @@ class LineCurve extends Curve {
 		this.v2 = v2;
 
 	}
+
 	getPoint( t, optionalTarget = new Vector2() ) {
 
 		const point = optionalTarget;
@@ -32,12 +33,14 @@ class LineCurve extends Curve {
 		return point;
 
 	}
+
 	// Line curve is linear, so we can overwrite default getPointAt
 	getPointAt( u, optionalTarget ) {
 
 		return this.getPoint( u, optionalTarget );
 
 	}
+
 	getTangent( t, optionalTarget ) {
 
 		const tangent = optionalTarget || new Vector2();
@@ -47,6 +50,7 @@ class LineCurve extends Curve {
 		return tangent;
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -57,6 +61,7 @@ class LineCurve extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -67,6 +72,7 @@ class LineCurve extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );

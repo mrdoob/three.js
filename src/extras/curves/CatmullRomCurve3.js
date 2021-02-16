@@ -181,6 +181,7 @@ class CatmullRomCurve3 extends Curve {
 		return point;
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -202,6 +203,7 @@ class CatmullRomCurve3 extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -222,6 +224,7 @@ class CatmullRomCurve3 extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );

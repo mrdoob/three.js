@@ -32,6 +32,7 @@ class CubicBezierCurve extends Curve {
 		return point;
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -44,6 +45,7 @@ class CubicBezierCurve extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -56,6 +58,7 @@ class CubicBezierCurve extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );

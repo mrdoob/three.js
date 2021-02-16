@@ -14,6 +14,7 @@ class SplineCurve extends Curve {
 		this.points = points;
 
 	}
+
 	getPoint( t, optionalTarget = new Vector2() ) {
 
 		const point = optionalTarget;
@@ -37,9 +38,10 @@ class SplineCurve extends Curve {
 		return point;
 
 	}
+
 	copy( source ) {
 
-		Curve.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.points = [];
 
@@ -54,9 +56,10 @@ class SplineCurve extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
-		const data = Curve.prototype.toJSON.call( this );
+		const data = super.toJSON();
 
 		data.points = [];
 
@@ -70,9 +73,10 @@ class SplineCurve extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
-		Curve.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.points = [];
 

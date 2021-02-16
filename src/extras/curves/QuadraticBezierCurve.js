@@ -16,6 +16,7 @@ class QuadraticBezierCurve extends Curve {
 		this.v2 = v2;
 
 	}
+
 	getPoint( t, optionalTarget = new Vector2() ) {
 
 		const point = optionalTarget;
@@ -30,6 +31,7 @@ class QuadraticBezierCurve extends Curve {
 		return point;
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -41,6 +43,7 @@ class QuadraticBezierCurve extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -52,6 +55,7 @@ class QuadraticBezierCurve extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );
