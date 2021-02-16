@@ -7,8 +7,6 @@
   link: 'http://threejsfundamentals.org/',
   commentSectionHeader: `
     <div>
-      <a href="http://stackoverflow.com/questions/tagged/three.js">Stackoverflow</a>
-      /
       <a href="http://github.com/greggman/threefundamentals/issues">Github</a>
     </div>
   `,

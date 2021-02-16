@@ -5,7 +5,9 @@
   title: 'Three.js 基础',
   description: 'Three.js 基础学习',
   link: 'http://threejsfundamentals.org/',
-  commentSectionHeader: '<div>有问题？ <a href="http://stackoverflow.com/questions/tagged/three.js">在 Stackoverflow 上提问</a>.</div>\n        <div><a href="https://github.com/gfxfundamentals/threejsfundamentals/issues/new?assignees=&labels=suggested+topic&template=suggest-topic.md&title=%5BSUGGESTION%5D">Suggestion</a>? <a href="https://github.com/gfxfundamentals/threejsfundamentals/issues/new?assignees=&labels=&template=request.md&title=">Request</a>? <a href="https://github.com/gfxfundamentals/threejsfundamentals/issues/new?assignees=&labels=bug+%2F+issue&template=bug-issue-report.md&title=">Issue</a>? <a href="https://github.com/gfxfundamentals/threejsfundamentals/issues/new?assignees=&labels=bug+%2F+issue&template=bug-issue-report.md&title=">Bug</a>?</div>',
+  commentSectionHeader: `
+    <div><a href="https://github.com/gfxfundamentals/threejsfundamentals/issues/new?assignees=&labels=suggested+topic&template=suggest-topic.md&title=%5BSUGGESTION%5D">Suggestion</a>? <a href="https://github.com/gfxfundamentals/threejsfundamentals/issues/new?assignees=&labels=&template=request.md&title=">Request</a>? <a href="https://github.com/gfxfundamentals/threejsfundamentals/issues/new?assignees=&labels=bug+%2F+issue&template=bug-issue-report.md&title=">Issue</a>? <a href="https://github.com/gfxfundamentals/threejsfundamentals/issues/new?assignees=&labels=bug+%2F+issue&template=bug-issue-report.md&title=">Bug</a>?</div>
+  `,
   missing: "抱歉，还没有中文翻译哦。 [欢迎加入翻译](https://github.com/gfxfundamentals/threejsfundamentals)! 😄\n\n[英文原文链接]({{{origLink}}}).",
   toc: '目录',
   categoryMapping: {

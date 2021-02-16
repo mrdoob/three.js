@@ -5,7 +5,9 @@
   title: 'Three.js, notions de base',
   description: 'Apprendre à utiliser Three.js.',
   link: 'http://threejsfundamentals.org/',
-  commentSectionHeader: '<div>Questions ? <a href="http://stackoverflow.com/questions/tagged/three.js">Les poser sur stackoverflow</a>.</div>\n        <div>Problèmes / bug ? <a href="http://github.com/gfxfundamentals/threejsfundamentals/issues">Les reporter sur github</a>.</div>',
+  commentSectionHeader: `
+    <div>Problèmes / bug ? <a href="http://github.com/gfxfundamentals/threejsfundamentals/issues">Les reporter sur github</a>.</div>
+  `,
   missing: "Désolé, cet article n'a pas encore été traduit. [Les traductions sont le bienvenue](https://github.com/gfxfundamentals/threejsfundamentals)! 😄\n\n[Voici l'article anglais originel pour le moment]({{{origLink}}}).",
   toc: 'Table des matières',
   categoryMapping: {
