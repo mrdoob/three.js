@@ -9,6 +9,7 @@ export interface MeshDepthMaterialParameters extends MaterialParameters {
 	displacementMap?: Texture | null;
 	displacementScale?: number;
 	displacementBias?: number;
+	morphTargets?: boolean;
 	wireframe?: boolean;
 	wireframeLinewidth?: number;
 }
