@@ -46,12 +46,6 @@ class Matrix3 {
 
 	}
 
-	clone() {
-
-		return new this.constructor().fromArray( this.elements );
-
-	}
-
 	copy( m ) {
 
 		const te = this.elements;
@@ -331,6 +325,12 @@ class Matrix3 {
 		array[ offset + 8 ] = te[ 8 ];
 
 		return array;
+
+	}
+
+	clone() {
+
+		return new this.constructor().fromArray( this.elements );
 
 	}
 

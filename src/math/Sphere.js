@@ -5,10 +5,10 @@ const _box = /*@__PURE__*/ new Box3();
 
 class Sphere {
 
-	constructor( center, radius ) {
+	constructor( center = new Vector3(), radius = - 1 ) {
 
-		this.center = ( center !== undefined ) ? center : new Vector3();
-		this.radius = ( radius !== undefined ) ? radius : - 1;
+		this.center = center;
+		this.radius = radius;
 
 	}
 
@@ -46,12 +46,6 @@ class Sphere {
 		this.radius = Math.sqrt( maxRadiusSq );
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -182,7 +176,12 @@ class Sphere {
 
 	}
 
-}
+	clone() {
 
+		return new this.constructor().copy( this );
+
+	}
+
+}
 
 export { Sphere };
