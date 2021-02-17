@@ -24943,6 +24943,80 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.copyTextureToTexture3D = function ( sourceBox, position, srcTexture, dstTexture, level = 0 ) {
+
+		if ( _this.isWebGL1Renderer ) {
+
+			console.warn( 'THREE.WebGLRenderer.copyTextureToTexture3D: can only be used with WebGL2.' );
+			return;
+
+		}
+
+		const { width, height, data } = srcTexture.image;
+		const glFormat = utils.convert( dstTexture.format );
+		const glType = utils.convert( dstTexture.type );
+		let glTarget;
+
+		if ( dstTexture.isDataTexture3D ) {
+
+			textures.setTexture3D( dstTexture, 0 );
+			glTarget = 32879;
+
+		} else if ( dstTexture.isDataTexture2DArray ) {
+
+			textures.setTexture2DArray( dstTexture, 0 );
+			glTarget = 35866;
+
+		} else {
+
+			console.warn( 'THREE.WebGLRenderer.copyTextureToTexture3D: only supports THREE.DataTexture3D and THREE.DataTexture2DArray.' );
+			return;
+
+		}
+
+		_gl.pixelStorei( 37440, dstTexture.flipY );
+		_gl.pixelStorei( 37441, dstTexture.premultiplyAlpha );
+		_gl.pixelStorei( 3317, dstTexture.unpackAlignment );
+
+		const unpackRowLen = _gl.getParameter( 3314 );
+		const unpackImageHeight = _gl.getParameter( 32878 );
+		const unpackSkipPixels = _gl.getParameter( 3316 );
+		const unpackSkipRows = _gl.getParameter( 3315 );
+		const unpackSkipImages = _gl.getParameter( 32877 );
+
+		_gl.pixelStorei( 3314, width );
+		_gl.pixelStorei( 32878, height );
+		_gl.pixelStorei( 3316, sourceBox.min.x );
+		_gl.pixelStorei( 3315, sourceBox.min.y );
+		_gl.pixelStorei( 32877, sourceBox.min.z );
+
+		_gl.texSubImage3D(
+			glTarget,
+			level,
+			position.x,
+			position.y,
+			position.z,
+			sourceBox.max.x - sourceBox.min.x + 1,
+			sourceBox.max.y - sourceBox.min.y + 1,
+			sourceBox.max.z - sourceBox.min.z + 1,
+			glFormat,
+			glType,
+			data
+		);
+
+		_gl.pixelStorei( 3314, unpackRowLen );
+		_gl.pixelStorei( 32878, unpackImageHeight );
+		_gl.pixelStorei( 3316, unpackSkipPixels );
+		_gl.pixelStorei( 3315, unpackSkipRows );
+		_gl.pixelStorei( 32877, unpackSkipImages );
+
+		// Generate mipmaps only when copying level 0
+		if ( level === 0 && dstTexture.generateMipmaps ) _gl.generateMipmap( glTarget );
+
+		state.unbindTexture();
+
+	};
+
 	this.initTexture = function ( texture ) {
 
 		textures.setTexture2D( texture, 0 );
