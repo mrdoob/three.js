@@ -2022,12 +2022,12 @@ function WebGLRenderer( parameters ) {
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
 		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
 
-		// @todo: we can move those parameters to the 3D texture
-		// classes just like `UNPACK_ALIGNMENT`, and then we can use them when
-		// uploading texture. If we decide to keep this function this way with the
-		// `sourceBox` parameter, then we need to reset those parameters to the
-		// default values either after the `texSubImage3D` call, or when uploading
-		// a texture.
+		const unpackRowLen = _gl.getParameter( _gl.UNPACK_ROW_LENGTH );
+		const unpackImageHeight = _gl.getParameter( _gl.UNPACK_IMAGE_HEIGHT );
+		const unpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
+		const unpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
+		const unpackSkipImages = _gl.getParameter( _gl.UNPACK_SKIP_IMAGES );
+
 		_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, width );
 		_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, height );
 		_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, sourceBox.min.x );
@@ -2047,6 +2047,12 @@ function WebGLRenderer( parameters ) {
 			glType,
 			data
 		);
+
+		_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, unpackRowLen );
+		_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, unpackImageHeight );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, unpackSkipPixels );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, unpackSkipRows );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, unpackSkipImages );
 
 		// Generate mipmaps only when copying level 0
 		if ( level === 0 && dstTexture.generateMipmaps ) _gl.generateMipmap( glTarget );
