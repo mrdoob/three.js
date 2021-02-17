@@ -600,7 +600,7 @@ THREE.GLTFLoader = ( function () {
 				var scale = extension.clearcoatNormalTexture.scale;
 
 				// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-				materialParams.clearcoatNormalScale = new THREE.Vector2( scale, -scale );
+				materialParams.clearcoatNormalScale = new THREE.Vector2( scale, - scale );
 
 			}
 
@@ -2617,8 +2617,8 @@ THREE.GLTFLoader = ( function () {
 					cachedMaterial.vertexTangents = true;
 
 					// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-					if ( cachedMaterial.normalScale ) cachedMaterial.normalScale.y *= -1;
-					if ( cachedMaterial.clearcoatNormalScale ) cachedMaterial.clearcoatNormalScale.y *= -1;
+					if ( cachedMaterial.normalScale ) cachedMaterial.normalScale.y *= - 1;
+					if ( cachedMaterial.clearcoatNormalScale ) cachedMaterial.clearcoatNormalScale.y *= - 1;
 
 				}
 
@@ -2761,11 +2761,11 @@ THREE.GLTFLoader = ( function () {
 			pending.push( parser.assignTexture( materialParams, 'normalMap', materialDef.normalTexture ) );
 
 			// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-			materialParams.normalScale = new THREE.Vector2( 1, -1 );
+			materialParams.normalScale = new THREE.Vector2( 1, - 1 );
 
 			if ( materialDef.normalTexture.scale !== undefined ) {
 
-				materialParams.normalScale.set( materialDef.normalTexture.scale, -materialDef.normalTexture.scale );
+				materialParams.normalScale.set( materialDef.normalTexture.scale, - materialDef.normalTexture.scale );
 
 			}
 

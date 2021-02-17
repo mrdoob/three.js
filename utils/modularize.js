@@ -193,7 +193,6 @@ var files = [
 	{ path: 'shaders/LuminosityShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/MirrorShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/NormalMapShader.js', dependencies: [], ignoreList: [] },
-	{ path: 'shaders/OceanShaders.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/ParallaxShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/PixelShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/RGBShiftShader.js', dependencies: [], ignoreList: [] },
