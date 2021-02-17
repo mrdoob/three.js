@@ -2,7 +2,7 @@ import { BufferAttribute } from './BufferAttribute.js';
 
 class InstancedBufferAttribute extends BufferAttribute {
 
-	constructor( array, itemSize, normalized, meshPerAttribute ) {
+	constructor( array, itemSize, normalized, meshPerAttribute = 1 ) {
 
 		super( array, itemSize, normalized );
 
@@ -18,7 +18,7 @@ class InstancedBufferAttribute extends BufferAttribute {
 
 		}
 
-		this.meshPerAttribute = meshPerAttribute || 1;
+		this.meshPerAttribute = meshPerAttribute;
 
 	}
 
