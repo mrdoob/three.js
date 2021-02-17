@@ -61,7 +61,6 @@
 	"webgl_refraction": [ "water" ],
 	"webgl_rtt": [ "renderTarget", "texture" ],
 	"webgl_shaders_ocean": [ "water" ],
-	"webgl_shaders_ocean2": [ "water" ],
 	"webgl_shaders_sky": [ "sun" ],
 	"webgl_shaders_tonemapping": [ "hrd" ],
 	"webgl_shading_physical": [ "pbr" ],
