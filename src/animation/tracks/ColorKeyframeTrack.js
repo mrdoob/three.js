@@ -3,16 +3,9 @@ import { KeyframeTrack } from '../KeyframeTrack.js';
 /**
  * A Track of keyframe values that represent color.
  */
+class ColorKeyframeTrack extends KeyframeTrack {}
 
-function ColorKeyframeTrack( name, times, values, interpolation ) {
-
-	KeyframeTrack.call( this, name, times, values, interpolation );
-
-}
-
-ColorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: ColorKeyframeTrack,
+Object.assign( ColorKeyframeTrack.prototype, {
 
 	ValueTypeName: 'color'
 

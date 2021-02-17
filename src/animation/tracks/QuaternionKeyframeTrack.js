@@ -5,28 +5,23 @@ import { QuaternionLinearInterpolant } from '../../math/interpolants/QuaternionL
 /**
  * A Track of quaternion keyframe values.
  */
+class QuaternionKeyframeTrack extends KeyframeTrack {
 
-function QuaternionKeyframeTrack( name, times, values, interpolation ) {
+	InterpolantFactoryMethodLinear( result ) {
 
-	KeyframeTrack.call( this, name, times, values, interpolation );
+		return new QuaternionLinearInterpolant( this.times, this.values, this.getValueSize(), result );
+
+	}
 
 }
 
-QuaternionKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: QuaternionKeyframeTrack,
+Object.assign( QuaternionKeyframeTrack.prototype, {
 
 	ValueTypeName: 'quaternion',
 
 	// ValueBufferType is inherited
 
 	DefaultInterpolation: InterpolateLinear,
-
-	InterpolantFactoryMethodLinear: function ( result ) {
-
-		return new QuaternionLinearInterpolant( this.times, this.values, this.getValueSize(), result );
-
-	},
 
 	InterpolantFactoryMethodSmooth: undefined // not yet implemented
 
