@@ -25651,20 +25651,19 @@
 		}
 	});
 
-	function KeyframeTrack(name, times, values, interpolation) {
-		if (name === undefined) throw new Error('THREE.KeyframeTrack: track name is undefined');
-		if (times === undefined || times.length === 0) throw new Error('THREE.KeyframeTrack: no keyframes in track named ' + name);
-		this.name = name;
-		this.times = AnimationUtils.convertArray(times, this.TimeBufferType);
-		this.values = AnimationUtils.convertArray(values, this.ValueBufferType);
-		this.setInterpolation(interpolation || this.DefaultInterpolation);
-	} // Static methods
-
-
-	Object.assign(KeyframeTrack, {
-		// Serialization (in static context, because of constructor invocation
+	var KeyframeTrack = /*#__PURE__*/function () {
+		function KeyframeTrack(name, times, values, interpolation) {
+			if (name === undefined) throw new Error('THREE.KeyframeTrack: track name is undefined');
+			if (times === undefined || times.length === 0) throw new Error('THREE.KeyframeTrack: no keyframes in track named ' + name);
+			this.name = name;
+			this.times = AnimationUtils.convertArray(times, this.TimeBufferType);
+			this.values = AnimationUtils.convertArray(values, this.ValueBufferType);
+			this.setInterpolation(interpolation || this.DefaultInterpolation);
+		} // Serialization (in static context, because of constructor invocation
 		// and automatic invocation of .toJSON):
-		toJSON: function toJSON(track) {
+
+
+		KeyframeTrack.toJSON = function toJSON(track) {
 			var trackType = track.constructor;
 			var json; // derived classes can define a static toJSON method
 
@@ -25687,23 +25686,23 @@
 			json.type = track.ValueTypeName; // mandatory
 
 			return json;
-		}
-	});
-	Object.assign(KeyframeTrack.prototype, {
-		constructor: KeyframeTrack,
-		TimeBufferType: Float32Array,
-		ValueBufferType: Float32Array,
-		DefaultInterpolation: InterpolateLinear,
-		InterpolantFactoryMethodDiscrete: function InterpolantFactoryMethodDiscrete(result) {
+		};
+
+		var _proto = KeyframeTrack.prototype;
+
+		_proto.InterpolantFactoryMethodDiscrete = function InterpolantFactoryMethodDiscrete(result) {
 			return new DiscreteInterpolant(this.times, this.values, this.getValueSize(), result);
-		},
-		InterpolantFactoryMethodLinear: function InterpolantFactoryMethodLinear(result) {
+		};
+
+		_proto.InterpolantFactoryMethodLinear = function InterpolantFactoryMethodLinear(result) {
 			return new LinearInterpolant(this.times, this.values, this.getValueSize(), result);
-		},
-		InterpolantFactoryMethodSmooth: function InterpolantFactoryMethodSmooth(result) {
+		};
+
+		_proto.InterpolantFactoryMethodSmooth = function InterpolantFactoryMethodSmooth(result) {
 			return new CubicInterpolant(this.times, this.values, this.getValueSize(), result);
-		},
-		setInterpolation: function setInterpolation(interpolation) {
+		};
+
+		_proto.setInterpolation = function setInterpolation(interpolation) {
 			var factoryMethod;
 
 			switch (interpolation) {
@@ -25738,8 +25737,9 @@
 
 			this.createInterpolant = factoryMethod;
 			return this;
-		},
-		getInterpolation: function getInterpolation() {
+		};
+
+		_proto.getInterpolation = function getInterpolation() {
 			switch (this.createInterpolant) {
 				case this.InterpolantFactoryMethodDiscrete:
 					return InterpolateDiscrete;
@@ -25750,12 +25750,14 @@
 				case this.InterpolantFactoryMethodSmooth:
 					return InterpolateSmooth;
 			}
-		},
-		getValueSize: function getValueSize() {
+		};
+
+		_proto.getValueSize = function getValueSize() {
 			return this.values.length / this.times.length;
-		},
-		// move all keyframes either forwards or backwards in time
-		shift: function shift(timeOffset) {
+		} // move all keyframes either forwards or backwards in time
+		;
+
+		_proto.shift = function shift(timeOffset) {
 			if (timeOffset !== 0.0) {
 				var times = this.times;
 
@@ -25765,9 +25767,10 @@
 			}
 
 			return this;
-		},
-		// scale all keyframe times by a factor (useful for frame <-> seconds conversions)
-		scale: function scale(timeScale) {
+		} // scale all keyframe times by a factor (useful for frame <-> seconds conversions)
+		;
+
+		_proto.scale = function scale(timeScale) {
 			if (timeScale !== 1.0) {
 				var times = this.times;
 
@@ -25777,10 +25780,11 @@
 			}
 
 			return this;
-		},
-		// removes keyframes before and after animation without changing any values within the range [startTime, endTime].
+		} // removes keyframes before and after animation without changing any values within the range [startTime, endTime].
 		// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
-		trim: function trim(startTime, endTime) {
+		;
+
+		_proto.trim = function trim(startTime, endTime) {
 			var times = this.times,
 					nKeys = times.length;
 			var from = 0,
@@ -25809,9 +25813,10 @@
 			}
 
 			return this;
-		},
-		// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
-		validate: function validate() {
+		} // ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
+		;
+
+		_proto.validate = function validate() {
 			var valid = true;
 			var valueSize = this.getValueSize();
 
@@ -25864,10 +25869,11 @@
 			}
 
 			return valid;
-		},
-		// removes equivalent sequential keys as common in morph target sequences
+		} // removes equivalent sequential keys as common in morph target sequences
 		// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
-		optimize: function optimize() {
+		;
+
+		_proto.optimize = function optimize() {
 			// times or values may be shared with other tracks, so overwriting is unsafe
 			var times = AnimationUtils.arraySlice(this.times),
 					values = AnimationUtils.arraySlice(this.values),
@@ -25937,8 +25943,9 @@
 			}
 
 			return this;
-		},
-		clone: function clone() {
+		};
+
+		_proto.clone = function clone() {
 			var times = AnimationUtils.arraySlice(this.times, 0);
 			var values = AnimationUtils.arraySlice(this.values, 0);
 			var TypedKeyframeTrack = this.constructor;
@@ -25946,60 +25953,66 @@
 
 			track.createInterpolant = this.createInterpolant;
 			return track;
-		}
-	});
+		};
+
+		return KeyframeTrack;
+	}();
+
+	KeyframeTrack.prototype.TimeBufferType = Float32Array;
+	KeyframeTrack.prototype.ValueBufferType = Float32Array;
+	KeyframeTrack.prototype.DefaultInterpolation = InterpolateLinear;
 
 	/**
 	 * A Track of Boolean keyframe values.
 	 */
 
-	function BooleanKeyframeTrack(name, times, values) {
-		KeyframeTrack.call(this, name, times, values);
-	}
+	var BooleanKeyframeTrack = /*#__PURE__*/function (_KeyframeTrack) {
+		_inheritsLoose(BooleanKeyframeTrack, _KeyframeTrack);
 
-	BooleanKeyframeTrack.prototype = Object.assign(Object.create(KeyframeTrack.prototype), {
-		constructor: BooleanKeyframeTrack,
-		ValueTypeName: 'bool',
-		ValueBufferType: Array,
-		DefaultInterpolation: InterpolateDiscrete,
-		InterpolantFactoryMethodLinear: undefined,
-		InterpolantFactoryMethodSmooth: undefined // Note: Actually this track could have a optimized / compressed
-		// representation of a single value and a custom interpolant that
-		// computes "firstValue ^ isOdd( index )".
+		function BooleanKeyframeTrack() {
+			return _KeyframeTrack.apply(this, arguments) || this;
+		}
 
-	});
+		return BooleanKeyframeTrack;
+	}(KeyframeTrack);
+
+	BooleanKeyframeTrack.prototype.ValueTypeName = 'bool';
+	BooleanKeyframeTrack.prototype.ValueBufferType = Array;
+	BooleanKeyframeTrack.prototype.DefaultInterpolation = InterpolateDiscrete;
+	BooleanKeyframeTrack.prototype.InterpolantFactoryMethodLinear = undefined;
+	BooleanKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined; // Note: Actually this track could have a optimized / compressed
 
 	/**
 	 * A Track of keyframe values that represent color.
 	 */
 
-	function ColorKeyframeTrack(name, times, values, interpolation) {
-		KeyframeTrack.call(this, name, times, values, interpolation);
-	}
+	var ColorKeyframeTrack = /*#__PURE__*/function (_KeyframeTrack) {
+		_inheritsLoose(ColorKeyframeTrack, _KeyframeTrack);
 
-	ColorKeyframeTrack.prototype = Object.assign(Object.create(KeyframeTrack.prototype), {
-		constructor: ColorKeyframeTrack,
-		ValueTypeName: 'color' // ValueBufferType is inherited
-		// DefaultInterpolation is inherited
-		// Note: Very basic implementation and nothing special yet.
-		// However, this is the place for color space parameterization.
+		function ColorKeyframeTrack() {
+			return _KeyframeTrack.apply(this, arguments) || this;
+		}
 
-	});
+		return ColorKeyframeTrack;
+	}(KeyframeTrack);
+
+	ColorKeyframeTrack.prototype.ValueTypeName = 'color'; // ValueBufferType is inherited
 
 	/**
 	 * A Track of numeric keyframe values.
 	 */
 
-	function NumberKeyframeTrack(name, times, values, interpolation) {
-		KeyframeTrack.call(this, name, times, values, interpolation);
-	}
+	var NumberKeyframeTrack = /*#__PURE__*/function (_KeyframeTrack) {
+		_inheritsLoose(NumberKeyframeTrack, _KeyframeTrack);
 
-	NumberKeyframeTrack.prototype = Object.assign(Object.create(KeyframeTrack.prototype), {
-		constructor: NumberKeyframeTrack,
-		ValueTypeName: 'number' // ValueBufferType is inherited
-		// DefaultInterpolation is inherited
+		function NumberKeyframeTrack() {
+			return _KeyframeTrack.apply(this, arguments) || this;
+		}
 
-	});
+		return NumberKeyframeTrack;
+	}(KeyframeTrack);
+
+	NumberKeyframeTrack.prototype.ValueTypeName = 'number'; // ValueBufferType is inherited
 
 	/**
 	 * Spherical linear unit quaternion interpolant.
@@ -26030,53 +26043,62 @@
 	 * A Track of quaternion keyframe values.
 	 */
 
-	function QuaternionKeyframeTrack(name, times, values, interpolation) {
-		KeyframeTrack.call(this, name, times, values, interpolation);
-	}
+	var QuaternionKeyframeTrack = /*#__PURE__*/function (_KeyframeTrack) {
+		_inheritsLoose(QuaternionKeyframeTrack, _KeyframeTrack);
 
-	QuaternionKeyframeTrack.prototype = Object.assign(Object.create(KeyframeTrack.prototype), {
-		constructor: QuaternionKeyframeTrack,
-		ValueTypeName: 'quaternion',
-		// ValueBufferType is inherited
-		DefaultInterpolation: InterpolateLinear,
-		InterpolantFactoryMethodLinear: function InterpolantFactoryMethodLinear(result) {
+		function QuaternionKeyframeTrack() {
+			return _KeyframeTrack.apply(this, arguments) || this;
+		}
+
+		var _proto = QuaternionKeyframeTrack.prototype;
+
+		_proto.InterpolantFactoryMethodLinear = function InterpolantFactoryMethodLinear(result) {
 			return new QuaternionLinearInterpolant(this.times, this.values, this.getValueSize(), result);
-		},
-		InterpolantFactoryMethodSmooth: undefined // not yet implemented
+		};
 
-	});
+		return QuaternionKeyframeTrack;
+	}(KeyframeTrack);
+
+	QuaternionKeyframeTrack.prototype.ValueTypeName = 'quaternion'; // ValueBufferType is inherited
+
+	QuaternionKeyframeTrack.prototype.DefaultInterpolation = InterpolateLinear;
+	QuaternionKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined;
 
 	/**
 	 * A Track that interpolates Strings
 	 */
 
-	function StringKeyframeTrack(name, times, values, interpolation) {
-		KeyframeTrack.call(this, name, times, values, interpolation);
-	}
+	var StringKeyframeTrack = /*#__PURE__*/function (_KeyframeTrack) {
+		_inheritsLoose(StringKeyframeTrack, _KeyframeTrack);
 
-	StringKeyframeTrack.prototype = Object.assign(Object.create(KeyframeTrack.prototype), {
-		constructor: StringKeyframeTrack,
-		ValueTypeName: 'string',
-		ValueBufferType: Array,
-		DefaultInterpolation: InterpolateDiscrete,
-		InterpolantFactoryMethodLinear: undefined,
-		InterpolantFactoryMethodSmooth: undefined
-	});
+		function StringKeyframeTrack() {
+			return _KeyframeTrack.apply(this, arguments) || this;
+		}
+
+		return StringKeyframeTrack;
+	}(KeyframeTrack);
+
+	StringKeyframeTrack.prototype.ValueTypeName = 'string';
+	StringKeyframeTrack.prototype.ValueBufferType = Array;
+	StringKeyframeTrack.prototype.DefaultInterpolation = InterpolateDiscrete;
+	StringKeyframeTrack.prototype.InterpolantFactoryMethodLinear = undefined;
+	StringKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined;
 
 	/**
 	 * A Track of vectored keyframe values.
 	 */
 
-	function VectorKeyframeTrack(name, times, values, interpolation) {
-		KeyframeTrack.call(this, name, times, values, interpolation);
-	}
+	var VectorKeyframeTrack = /*#__PURE__*/function (_KeyframeTrack) {
+		_inheritsLoose(VectorKeyframeTrack, _KeyframeTrack);
 
-	VectorKeyframeTrack.prototype = Object.assign(Object.create(KeyframeTrack.prototype), {
-		constructor: VectorKeyframeTrack,
-		ValueTypeName: 'vector' // ValueBufferType is inherited
-		// DefaultInterpolation is inherited
+		function VectorKeyframeTrack() {
+			return _KeyframeTrack.apply(this, arguments) || this;
+		}
 
-	});
+		return VectorKeyframeTrack;
+	}(KeyframeTrack);
+
+	VectorKeyframeTrack.prototype.ValueTypeName = 'vector'; // ValueBufferType is inherited
 
 	function AnimationClip(name, duration, tracks, blendMode) {
 		if (duration === void 0) {
@@ -35361,18 +35383,36 @@
 	var ArrowHelper = /*#__PURE__*/function (_Object3D) {
 		_inheritsLoose(ArrowHelper, _Object3D);
 
+		// dir is assumed to be normalized
 		function ArrowHelper(dir, origin, length, color, headLength, headWidth) {
 			var _this;
 
-			_this = _Object3D.call(this) || this; // dir is assumed to be normalized
+			if (dir === void 0) {
+				dir = new Vector3(0, 0, 1);
+			}
 
+			if (origin === void 0) {
+				origin = new Vector3(0, 0, 0);
+			}
+
+			if (length === void 0) {
+				length = 1;
+			}
+
+			if (color === void 0) {
+				color = 0xffff00;
+			}
+
+			if (headLength === void 0) {
+				headLength = length * 0.2;
+			}
+
+			if (headWidth === void 0) {
+				headWidth = headLength * 0.2;
+			}
+
+			_this = _Object3D.call(this) || this;
 			_this.type = 'ArrowHelper';
-			if (dir === undefined) dir = new Vector3(0, 0, 1);
-			if (origin === undefined) origin = new Vector3(0, 0, 0);
-			if (length === undefined) length = 1;
-			if (color === undefined) color = 0xffff00;
-			if (headLength === undefined) headLength = 0.2 * length;
-			if (headWidth === undefined) headWidth = 0.2 * headLength;
 
 			if (_lineGeometry === undefined) {
 				_lineGeometry = new BufferGeometry();
@@ -35426,8 +35466,14 @@
 		};
 
 		_proto.setLength = function setLength(length, headLength, headWidth) {
-			if (headLength === undefined) headLength = 0.2 * length;
-			if (headWidth === undefined) headWidth = 0.2 * headLength;
+			if (headLength === void 0) {
+				headLength = length * 0.2;
+			}
+
+			if (headWidth === void 0) {
+				headWidth = headLength * 0.2;
+			}
+
 			this.line.scale.set(1, Math.max(0.0001, length - headLength), 1); // see #17458
 
 			this.line.updateMatrix();

@@ -32883,28 +32883,26 @@ DiscreteInterpolant.prototype = Object.assign( Object.create( Interpolant.protot
 
 } );
 
-function KeyframeTrack( name, times, values, interpolation ) {
+class KeyframeTrack {
 
-	if ( name === undefined ) throw new Error( 'THREE.KeyframeTrack: track name is undefined' );
-	if ( times === undefined || times.length === 0 ) throw new Error( 'THREE.KeyframeTrack: no keyframes in track named ' + name );
+	constructor( name, times, values, interpolation ) {
 
-	this.name = name;
+		if ( name === undefined ) throw new Error( 'THREE.KeyframeTrack: track name is undefined' );
+		if ( times === undefined || times.length === 0 ) throw new Error( 'THREE.KeyframeTrack: no keyframes in track named ' + name );
 
-	this.times = AnimationUtils.convertArray( times, this.TimeBufferType );
-	this.values = AnimationUtils.convertArray( values, this.ValueBufferType );
+		this.name = name;
 
-	this.setInterpolation( interpolation || this.DefaultInterpolation );
+		this.times = AnimationUtils.convertArray( times, this.TimeBufferType );
+		this.values = AnimationUtils.convertArray( values, this.ValueBufferType );
 
-}
+		this.setInterpolation( interpolation || this.DefaultInterpolation );
 
-// Static methods
-
-Object.assign( KeyframeTrack, {
+	}
 
 	// Serialization (in static context, because of constructor invocation
 	// and automatic invocation of .toJSON):
 
-	toJSON: function ( track ) {
+	static toJSON( track ) {
 
 		const trackType = track.constructor;
 
@@ -32942,37 +32940,25 @@ Object.assign( KeyframeTrack, {
 
 	}
 
-} );
-
-Object.assign( KeyframeTrack.prototype, {
-
-	constructor: KeyframeTrack,
-
-	TimeBufferType: Float32Array,
-
-	ValueBufferType: Float32Array,
-
-	DefaultInterpolation: InterpolateLinear,
-
-	InterpolantFactoryMethodDiscrete: function ( result ) {
+	InterpolantFactoryMethodDiscrete( result ) {
 
 		return new DiscreteInterpolant( this.times, this.values, this.getValueSize(), result );
 
-	},
+	}
 
-	InterpolantFactoryMethodLinear: function ( result ) {
+	InterpolantFactoryMethodLinear( result ) {
 
 		return new LinearInterpolant( this.times, this.values, this.getValueSize(), result );
 
-	},
+	}
 
-	InterpolantFactoryMethodSmooth: function ( result ) {
+	InterpolantFactoryMethodSmooth( result ) {
 
 		return new CubicInterpolant( this.times, this.values, this.getValueSize(), result );
 
-	},
+	}
 
-	setInterpolation: function ( interpolation ) {
+	setInterpolation( interpolation ) {
 
 		let factoryMethod;
 
@@ -33027,9 +33013,9 @@ Object.assign( KeyframeTrack.prototype, {
 
 		return this;
 
-	},
+	}
 
-	getInterpolation: function () {
+	getInterpolation() {
 
 		switch ( this.createInterpolant ) {
 
@@ -33047,16 +33033,16 @@ Object.assign( KeyframeTrack.prototype, {
 
 		}
 
-	},
+	}
 
-	getValueSize: function () {
+	getValueSize() {
 
 		return this.values.length / this.times.length;
 
-	},
+	}
 
 	// move all keyframes either forwards or backwards in time
-	shift: function ( timeOffset ) {
+	shift( timeOffset ) {
 
 		if ( timeOffset !== 0.0 ) {
 
@@ -33072,10 +33058,10 @@ Object.assign( KeyframeTrack.prototype, {
 
 		return this;
 
-	},
+	}
 
 	// scale all keyframe times by a factor (useful for frame <-> seconds conversions)
-	scale: function ( timeScale ) {
+	scale( timeScale ) {
 
 		if ( timeScale !== 1.0 ) {
 
@@ -33091,11 +33077,11 @@ Object.assign( KeyframeTrack.prototype, {
 
 		return this;
 
-	},
+	}
 
 	// removes keyframes before and after animation without changing any values within the range [startTime, endTime].
 	// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
-	trim: function ( startTime, endTime ) {
+	trim( startTime, endTime ) {
 
 		const times = this.times,
 			nKeys = times.length;
@@ -33135,10 +33121,10 @@ Object.assign( KeyframeTrack.prototype, {
 
 		return this;
 
-	},
+	}
 
 	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
-	validate: function () {
+	validate() {
 
 		let valid = true;
 
@@ -33212,11 +33198,11 @@ Object.assign( KeyframeTrack.prototype, {
 
 		return valid;
 
-	},
+	}
 
 	// removes equivalent sequential keys as common in morph target sequences
 	// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
-	optimize: function () {
+	optimize() {
 
 		// times or values may be shared with other tracks, so overwriting is unsafe
 		const times = AnimationUtils.arraySlice( this.times ),
@@ -33325,9 +33311,9 @@ Object.assign( KeyframeTrack.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		const times = AnimationUtils.arraySlice( this.times, 0 );
 		const values = AnimationUtils.arraySlice( this.values, 0 );
@@ -33342,82 +33328,36 @@ Object.assign( KeyframeTrack.prototype, {
 
 	}
 
-} );
+}
+
+KeyframeTrack.prototype.TimeBufferType = Float32Array;
+KeyframeTrack.prototype.ValueBufferType = Float32Array;
+KeyframeTrack.prototype.DefaultInterpolation = InterpolateLinear;
 
 /**
  * A Track of Boolean keyframe values.
  */
+class BooleanKeyframeTrack extends KeyframeTrack {}
 
-function BooleanKeyframeTrack( name, times, values ) {
-
-	KeyframeTrack.call( this, name, times, values );
-
-}
-
-BooleanKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: BooleanKeyframeTrack,
-
-	ValueTypeName: 'bool',
-	ValueBufferType: Array,
-
-	DefaultInterpolation: InterpolateDiscrete,
-
-	InterpolantFactoryMethodLinear: undefined,
-	InterpolantFactoryMethodSmooth: undefined
-
-	// Note: Actually this track could have a optimized / compressed
-	// representation of a single value and a custom interpolant that
-	// computes "firstValue ^ isOdd( index )".
-
-} );
+BooleanKeyframeTrack.prototype.ValueTypeName = 'bool';
+BooleanKeyframeTrack.prototype.ValueBufferType = Array;
+BooleanKeyframeTrack.prototype.DefaultInterpolation = InterpolateDiscrete;
+BooleanKeyframeTrack.prototype.InterpolantFactoryMethodLinear = undefined;
+BooleanKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined;
 
 /**
  * A Track of keyframe values that represent color.
  */
+class ColorKeyframeTrack extends KeyframeTrack {}
 
-function ColorKeyframeTrack( name, times, values, interpolation ) {
-
-	KeyframeTrack.call( this, name, times, values, interpolation );
-
-}
-
-ColorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: ColorKeyframeTrack,
-
-	ValueTypeName: 'color'
-
-	// ValueBufferType is inherited
-
-	// DefaultInterpolation is inherited
-
-	// Note: Very basic implementation and nothing special yet.
-	// However, this is the place for color space parameterization.
-
-} );
+ColorKeyframeTrack.prototype.ValueTypeName = 'color';
 
 /**
  * A Track of numeric keyframe values.
  */
+class NumberKeyframeTrack extends KeyframeTrack {}
 
-function NumberKeyframeTrack( name, times, values, interpolation ) {
-
-	KeyframeTrack.call( this, name, times, values, interpolation );
-
-}
-
-NumberKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: NumberKeyframeTrack,
-
-	ValueTypeName: 'number'
-
-	// ValueBufferType is inherited
-
-	// DefaultInterpolation is inherited
-
-} );
+NumberKeyframeTrack.prototype.ValueTypeName = 'number';
 
 /**
  * Spherical linear unit quaternion interpolant.
@@ -33458,79 +33398,38 @@ QuaternionLinearInterpolant.prototype = Object.assign( Object.create( Interpolan
 /**
  * A Track of quaternion keyframe values.
  */
+class QuaternionKeyframeTrack extends KeyframeTrack {
 
-function QuaternionKeyframeTrack( name, times, values, interpolation ) {
-
-	KeyframeTrack.call( this, name, times, values, interpolation );
-
-}
-
-QuaternionKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: QuaternionKeyframeTrack,
-
-	ValueTypeName: 'quaternion',
-
-	// ValueBufferType is inherited
-
-	DefaultInterpolation: InterpolateLinear,
-
-	InterpolantFactoryMethodLinear: function ( result ) {
+	InterpolantFactoryMethodLinear( result ) {
 
 		return new QuaternionLinearInterpolant( this.times, this.values, this.getValueSize(), result );
 
-	},
+	}
 
-	InterpolantFactoryMethodSmooth: undefined // not yet implemented
+}
 
-} );
+QuaternionKeyframeTrack.prototype.ValueTypeName = 'quaternion';
+// ValueBufferType is inherited
+QuaternionKeyframeTrack.prototype.DefaultInterpolation = InterpolateLinear;
+QuaternionKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined;
 
 /**
  * A Track that interpolates Strings
  */
+class StringKeyframeTrack extends KeyframeTrack {}
 
-function StringKeyframeTrack( name, times, values, interpolation ) {
-
-	KeyframeTrack.call( this, name, times, values, interpolation );
-
-}
-
-StringKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: StringKeyframeTrack,
-
-	ValueTypeName: 'string',
-	ValueBufferType: Array,
-
-	DefaultInterpolation: InterpolateDiscrete,
-
-	InterpolantFactoryMethodLinear: undefined,
-
-	InterpolantFactoryMethodSmooth: undefined
-
-} );
+StringKeyframeTrack.prototype.ValueTypeName = 'string';
+StringKeyframeTrack.prototype.ValueBufferType = Array;
+StringKeyframeTrack.prototype.DefaultInterpolation = InterpolateDiscrete;
+StringKeyframeTrack.prototype.InterpolantFactoryMethodLinear = undefined;
+StringKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined;
 
 /**
  * A Track of vectored keyframe values.
  */
+class VectorKeyframeTrack extends KeyframeTrack {}
 
-function VectorKeyframeTrack( name, times, values, interpolation ) {
-
-	KeyframeTrack.call( this, name, times, values, interpolation );
-
-}
-
-VectorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: VectorKeyframeTrack,
-
-	ValueTypeName: 'vector'
-
-	// ValueBufferType is inherited
-
-	// DefaultInterpolation is inherited
-
-} );
+VectorKeyframeTrack.prototype.ValueTypeName = 'vector';
 
 function AnimationClip( name, duration = - 1, tracks, blendMode = NormalAnimationBlendMode ) {
 
@@ -45762,19 +45661,13 @@ let _lineGeometry, _coneGeometry;
 
 class ArrowHelper extends Object3D {
 
-	constructor( dir, origin, length, color, headLength, headWidth ) {
+	// dir is assumed to be normalized
+
+	constructor( dir = new Vector3( 0, 0, 1 ), origin = new Vector3( 0, 0, 0 ), length = 1, color = 0xffff00, headLength = length * 0.2, headWidth = headLength * 0.2 ) {
 
 		super();
-		// dir is assumed to be normalized
 
 		this.type = 'ArrowHelper';
-
-		if ( dir === undefined ) dir = new Vector3( 0, 0, 1 );
-		if ( origin === undefined ) origin = new Vector3( 0, 0, 0 );
-		if ( length === undefined ) length = 1;
-		if ( color === undefined ) color = 0xffff00;
-		if ( headLength === undefined ) headLength = 0.2 * length;
-		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
 		if ( _lineGeometry === undefined ) {
 
@@ -45825,10 +45718,7 @@ class ArrowHelper extends Object3D {
 
 	}
 
-	setLength( length, headLength, headWidth ) {
-
-		if ( headLength === undefined ) headLength = 0.2 * length;
-		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
+	setLength( length, headLength = length * 0.2, headWidth = headLength * 0.2 ) {
 
 		this.line.scale.set( 1, Math.max( 0.0001, length - headLength ), 1 ); // see #17458
 		this.line.updateMatrix();
