@@ -4,94 +4,88 @@ import { MathUtils } from '../math/MathUtils.js';
 
 let materialId = 0;
 
-class Material extends EventDispatcher {
+function Material() {
 
-	constructor() {
+	Object.defineProperty( this, 'id', { value: materialId ++ } );
 
-		super();
+	this.uuid = MathUtils.generateUUID();
 
-		Object.defineProperty( this, 'id', { value: materialId ++ } );
-		Object.defineProperty( this, 'isMaterial', { value: true } );
+	this.name = '';
+	this.type = 'Material';
 
-		this.uuid = MathUtils.generateUUID();
+	this.fog = true;
 
-		this.name = '';
-		this.type = 'Material';
+	this.blending = NormalBlending;
+	this.side = FrontSide;
+	this.vertexColors = false;
 
-		this.fog = true;
+	this.opacity = 1;
+	this.transparent = false;
 
-		this.blending = NormalBlending;
-		this.side = FrontSide;
-		this.flatShading = false;
-		this.vertexColors = false;
+	this.blendSrc = SrcAlphaFactor;
+	this.blendDst = OneMinusSrcAlphaFactor;
+	this.blendEquation = AddEquation;
+	this.blendSrcAlpha = null;
+	this.blendDstAlpha = null;
+	this.blendEquationAlpha = null;
 
-		this.opacity = 1;
-		this.transparent = false;
+	this.depthFunc = LessEqualDepth;
+	this.depthTest = true;
+	this.depthWrite = true;
 
-		this.blendSrc = SrcAlphaFactor;
-		this.blendDst = OneMinusSrcAlphaFactor;
-		this.blendEquation = AddEquation;
-		this.blendSrcAlpha = null;
-		this.blendDstAlpha = null;
-		this.blendEquationAlpha = null;
+	this.stencilWriteMask = 0xff;
+	this.stencilFunc = AlwaysStencilFunc;
+	this.stencilRef = 0;
+	this.stencilFuncMask = 0xff;
+	this.stencilFail = KeepStencilOp;
+	this.stencilZFail = KeepStencilOp;
+	this.stencilZPass = KeepStencilOp;
+	this.stencilWrite = false;
 
-		this.depthFunc = LessEqualDepth;
-		this.depthTest = true;
-		this.depthWrite = true;
+	this.clippingPlanes = null;
+	this.clipIntersection = false;
+	this.clipShadows = false;
 
-		this.stencilWriteMask = 0xff;
-		this.stencilFunc = AlwaysStencilFunc;
-		this.stencilRef = 0;
-		this.stencilFuncMask = 0xff;
-		this.stencilFail = KeepStencilOp;
-		this.stencilZFail = KeepStencilOp;
-		this.stencilZPass = KeepStencilOp;
-		this.stencilWrite = false;
+	this.shadowSide = null;
 
-		this.clippingPlanes = null;
-		this.clipIntersection = false;
-		this.clipShadows = false;
+	this.colorWrite = true;
 
-		this.shadowSide = null;
+	this.precision = null; // override the renderer's default precision for this material
 
-		this.colorWrite = true;
+	this.polygonOffset = false;
+	this.polygonOffsetFactor = 0;
+	this.polygonOffsetUnits = 0;
 
-		this.precision = null; // override the renderer's default precision for this material
+	this.dithering = false;
 
-		this.polygonOffset = false;
-		this.polygonOffsetFactor = 0;
-		this.polygonOffsetUnits = 0;
+	this.alphaTest = 0;
+	this.premultipliedAlpha = false;
 
-		this.dithering = false;
+	this.visible = true;
 
-		this.alphaTest = 0;
-		this.premultipliedAlpha = false;
+	this.toneMapped = true;
 
-		this.visible = true;
+	this.userData = {};
 
-		this.toneMapped = true;
+	this.version = 0;
 
-		this.userData = {};
+}
 
-		this.version = 0;
+Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
-	}
+	constructor: Material,
 
-	set needsUpdate( value ) {
+	isMaterial: true,
 
-		if ( value === true ) this.version ++;
+	onBeforeCompile: function ( /* shaderobject, renderer */ ) {},
 
-	}
-
-	onBeforeCompile( /* shaderobject, renderer */ ) {}
-
-	customProgramCacheKey() {
+	customProgramCacheKey: function () {
 
 		return this.onBeforeCompile.toString();
 
-	}
+	},
 
-	setValues( values ) {
+	setValues: function ( values ) {
 
 		if ( values === undefined ) return;
 
@@ -140,9 +134,9 @@ class Material extends EventDispatcher {
 
 		}
 
-	}
+	},
 
-	toJSON( meta ) {
+	toJSON: function ( meta ) {
 
 		const isRoot = ( meta === undefined || typeof meta === 'string' );
 
@@ -353,15 +347,15 @@ class Material extends EventDispatcher {
 
 		return data;
 
-	}
+	},
 
-	clone() {
+	clone: function () {
 
 		return new this.constructor().copy( this );
 
-	}
+	},
 
-	copy( source ) {
+	copy: function ( source ) {
 
 		this.name = source.name;
 
@@ -437,14 +431,24 @@ class Material extends EventDispatcher {
 
 		return this;
 
-	}
+	},
 
-	dispose() {
+	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
-}
+} );
+
+Object.defineProperty( Material.prototype, 'needsUpdate', {
+
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
+
+	}
+
+} );
 
 export { Material };
