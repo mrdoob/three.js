@@ -59,8 +59,6 @@ class MeshPhongMaterial extends Material {
 
 		super();
 
-		Object.defineProperty( this, 'isMeshPhongMaterial', { value: true } );
-
 		this.type = 'MeshPhongMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
@@ -170,5 +168,7 @@ class MeshPhongMaterial extends Material {
 	}
 
 }
+
+MeshPhongMaterial.prototype.isMeshPhongMaterial = true;
 
 export { MeshPhongMaterial };

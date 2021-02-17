@@ -43,8 +43,6 @@ class MeshLambertMaterial extends Material {
 
 		super();
 
-		Object.defineProperty( this, 'isMeshLambertMaterial', { value: true } );
-
 		this.type = 'MeshLambertMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
@@ -124,5 +122,7 @@ class MeshLambertMaterial extends Material {
 	}
 
 }
+
+MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
 
 export { MeshLambertMaterial };

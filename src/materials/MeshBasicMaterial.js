@@ -40,8 +40,6 @@ class MeshBasicMaterial extends Material {
 
 		super();
 
-		Object.defineProperty( this, 'isMeshBasicMaterial', { value: true } );
-
 		this.type = 'MeshBasicMaterial';
 
 		this.color = new Color( 0xffffff ); // emissive
@@ -111,5 +109,7 @@ class MeshBasicMaterial extends Material {
 	}
 
 }
+
+MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
 
 export { MeshBasicMaterial };

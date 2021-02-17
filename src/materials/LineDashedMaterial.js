@@ -19,8 +19,6 @@ class LineDashedMaterial extends LineBasicMaterial {
 
 		super();
 
-		Object.defineProperty( this, 'isLineDashedMaterial', { value: true } );
-
 		this.type = 'LineDashedMaterial';
 
 		this.scale = 1;
@@ -44,5 +42,7 @@ class LineDashedMaterial extends LineBasicMaterial {
 	}
 
 }
+
+LineDashedMaterial.prototype.isLineDashedMaterial = true;
 
 export { LineDashedMaterial };

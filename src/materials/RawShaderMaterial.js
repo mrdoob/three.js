@@ -6,12 +6,12 @@ class RawShaderMaterial extends ShaderMaterial {
 
 		super( parameters );
 
-		Object.defineProperty( this, 'isRawShaderMaterial', { value: true } );
-
 		this.type = 'RawShaderMaterial';
 
 	}
 
 }
+
+RawShaderMaterial.prototype.isRawShaderMaterial = true;
 
 export { RawShaderMaterial };

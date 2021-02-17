@@ -39,8 +39,6 @@ class MeshMatcapMaterial extends Material {
 
 		super();
 
-		Object.defineProperty( this, 'isMeshMatcapMaterial', { value: true } );
-
 		this.defines = { 'MATCAP': '' };
 
 		this.type = 'MeshMatcapMaterial';
@@ -111,5 +109,7 @@ class MeshMatcapMaterial extends Material {
 	}
 
 }
+
+MeshMatcapMaterial.prototype.isMeshMatcapMaterial = true;
 
 export { MeshMatcapMaterial };

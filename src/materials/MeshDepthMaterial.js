@@ -25,8 +25,6 @@ class MeshDepthMaterial extends Material {
 
 		super();
 
-		Object.defineProperty( this, 'isMeshDepthMaterial', { value: true } );
-
 		this.type = 'MeshDepthMaterial';
 
 		this.depthPacking = BasicDepthPacking;
@@ -76,5 +74,7 @@ class MeshDepthMaterial extends Material {
 	}
 
 }
+
+MeshDepthMaterial.prototype.isMeshDepthMaterial = true;
 
 export { MeshDepthMaterial };

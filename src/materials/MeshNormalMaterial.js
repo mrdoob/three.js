@@ -34,8 +34,6 @@ class MeshNormalMaterial extends Material {
 
 		super();
 
-		Object.defineProperty( this, 'isMeshNormalMaterial', { value: true } );
-
 		this.type = 'MeshNormalMaterial';
 
 		this.bumpMap = null;
@@ -93,5 +91,7 @@ class MeshNormalMaterial extends Material {
 	}
 
 }
+
+MeshNormalMaterial.prototype.isMeshNormalMaterial = true;
 
 export { MeshNormalMaterial };

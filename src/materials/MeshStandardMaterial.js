@@ -61,8 +61,6 @@ class MeshStandardMaterial extends Material {
 
 		super();
 
-		Object.defineProperty( this, 'isMeshStandardMaterial', { value: true } );
-
 		this.defines = { 'STANDARD': '' };
 
 		this.type = 'MeshStandardMaterial';
@@ -184,5 +182,7 @@ class MeshStandardMaterial extends Material {
 	}
 
 }
+
+MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
 
 export { MeshStandardMaterial };

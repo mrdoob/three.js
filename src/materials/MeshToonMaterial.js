@@ -48,8 +48,6 @@ class MeshToonMaterial extends Material {
 
 		super();
 
-		Object.defineProperty( this, 'isMeshToonMaterial', { value: true } );
-
 		this.defines = { 'TOON': '' };
 
 		this.type = 'MeshToonMaterial';
@@ -141,5 +139,7 @@ class MeshToonMaterial extends Material {
 	}
 
 }
+
+MeshToonMaterial.prototype.isMeshToonMaterial = true;
 
 export { MeshToonMaterial };
