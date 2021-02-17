@@ -19957,7 +19957,7 @@ function WebGLState( gl, extensions, capabilities ) {
 		gl.clearDepth( 1 );
 
 		gl.stencilMask( 0xffffffff );
-		gl.stencilFunc( 519, 0, 1 );
+		gl.stencilFunc( 519, 0, 0xffffffff );
 		gl.stencilOp( 7680, 7680, 7680 );
 		gl.clearStencil( 0 );
 
@@ -19965,6 +19965,15 @@ function WebGLState( gl, extensions, capabilities ) {
 		gl.frontFace( 2305 );
 
 		gl.polygonOffset( 0, 0 );
+
+		gl.activeTexture( 33984 );
+
+		gl.useProgram( null );
+
+		gl.lineWidth( 1 );
+
+		gl.scissor( 0, 0, gl.canvas.width, gl.canvas.height );
+		gl.viewport( 0, 0, gl.canvas.width, gl.canvas.height );
 
 		// reset internals
 
