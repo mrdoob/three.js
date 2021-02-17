@@ -25,42 +25,36 @@ class CubeCamera extends Object3D {
 		cameraPX.layers = this.layers;
 		cameraPX.up.set( 0, - 1, 0 );
 		cameraPX.lookAt( new Vector3( 1, 0, 0 ) );
-		this.cameraPX = cameraPX;
 		this.add( cameraPX );
 
 		const cameraNX = new PerspectiveCamera( fov, aspect, near, far );
 		cameraNX.layers = this.layers;
 		cameraNX.up.set( 0, - 1, 0 );
 		cameraNX.lookAt( new Vector3( - 1, 0, 0 ) );
-		this.cameraNX = cameraNX;
 		this.add( cameraNX );
 
 		const cameraPY = new PerspectiveCamera( fov, aspect, near, far );
 		cameraPY.layers = this.layers;
 		cameraPY.up.set( 0, 0, 1 );
 		cameraPY.lookAt( new Vector3( 0, 1, 0 ) );
-		this.cameraPY = cameraPY;
 		this.add( cameraPY );
 
 		const cameraNY = new PerspectiveCamera( fov, aspect, near, far );
 		cameraNY.layers = this.layers;
 		cameraNY.up.set( 0, 0, - 1 );
 		cameraNY.lookAt( new Vector3( 0, - 1, 0 ) );
-		this.cameraNY = cameraNY;
 		this.add( cameraNY );
 
 		const cameraPZ = new PerspectiveCamera( fov, aspect, near, far );
 		cameraPZ.layers = this.layers;
 		cameraPZ.up.set( 0, - 1, 0 );
 		cameraPZ.lookAt( new Vector3( 0, 0, 1 ) );
-		this.cameraPZ = cameraPZ;
 		this.add( cameraPZ );
 
 		const cameraNZ = new PerspectiveCamera( fov, aspect, near, far );
 		cameraNZ.layers = this.layers;
 		cameraNZ.up.set( 0, - 1, 0 );
 		cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
-		this.cameraNZ = cameraNZ;
 		this.add( cameraNZ );
 
 	}
@@ -69,41 +63,42 @@ class CubeCamera extends Object3D {
 
 		if ( this.parent === null ) this.updateMatrixWorld();
 
+		const renderTarget = this.renderTarget;
+
+		const cameraPX = this.children[ 0 ];
+		const cameraNX = this.children[ 1 ];
+		const cameraPY = this.children[ 2 ];
+		const cameraNY = this.children[ 3 ];
+		const cameraPZ = this.children[ 4 ];
+		const cameraNZ = this.children[ 5 ];
+
 		const currentXrEnabled = renderer.xr.enabled;
 		const currentRenderTarget = renderer.getRenderTarget();
 
 		renderer.xr.enabled = false;
-
-		const renderTarget = this.renderTarget;
 
 		const generateMipmaps = renderTarget.texture.generateMipmaps;
 
 		renderTarget.texture.generateMipmaps = false;
 
 		renderer.setRenderTarget( renderTarget, 0 );
-		const cameraPX = this.cameraPX;
 		renderer.render( scene, cameraPX );
 
 		renderer.setRenderTarget( renderTarget, 1 );
-		const cameraNX = this.cameraNX;
 		renderer.render( scene, cameraNX );
 
 		renderer.setRenderTarget( renderTarget, 2 );
-		const cameraPY = this.cameraPY;
 		renderer.render( scene, cameraPY );
 
 		renderer.setRenderTarget( renderTarget, 3 );
-		const cameraNY = this.cameraNY;
 		renderer.render( scene, cameraNY );
 
 		renderer.setRenderTarget( renderTarget, 4 );
-		const cameraPZ = this.cameraPZ;
 		renderer.render( scene, cameraPZ );
 
 		renderTarget.texture.generateMipmaps = generateMipmaps;
 
 		renderer.setRenderTarget( renderTarget, 5 );
-		const cameraNZ = this.cameraNZ;
 		renderer.render( scene, cameraNZ );
 
 		renderer.setRenderTarget( currentRenderTarget );
