@@ -455,14 +455,8 @@ class KeyframeTrack {
 
 }
 
-Object.assign( KeyframeTrack.prototype, {
-
-	TimeBufferType: Float32Array,
-
-	ValueBufferType: Float32Array,
-
-	DefaultInterpolation: InterpolateLinear,
-
-} );
+KeyframeTrack.prototype.TimeBufferType = Float32Array;
+KeyframeTrack.prototype.ValueBufferType = Float32Array;
+KeyframeTrack.prototype.DefaultInterpolation = InterpolateLinear;
 
 export { KeyframeTrack };

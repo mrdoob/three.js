@@ -5,14 +5,8 @@ import { KeyframeTrack } from '../KeyframeTrack.js';
  */
 class VectorKeyframeTrack extends KeyframeTrack {}
 
-Object.assign( VectorKeyframeTrack.prototype, {
-
-	ValueTypeName: 'vector'
-
-	// ValueBufferType is inherited
-
-	// DefaultInterpolation is inherited
-
-} );
+VectorKeyframeTrack.prototype.ValueTypeName = 'vector';
+// ValueBufferType is inherited
+// DefaultInterpolation is inherited
 
 export { VectorKeyframeTrack };

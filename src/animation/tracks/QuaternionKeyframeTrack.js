@@ -15,16 +15,9 @@ class QuaternionKeyframeTrack extends KeyframeTrack {
 
 }
 
-Object.assign( QuaternionKeyframeTrack.prototype, {
-
-	ValueTypeName: 'quaternion',
-
-	// ValueBufferType is inherited
-
-	DefaultInterpolation: InterpolateLinear,
-
-	InterpolantFactoryMethodSmooth: undefined // not yet implemented
-
-} );
+QuaternionKeyframeTrack.prototype.ValueTypeName = 'quaternion';
+// ValueBufferType is inherited
+QuaternionKeyframeTrack.prototype.DefaultInterpolation = InterpolateLinear;
+QuaternionKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined;
 
 export { QuaternionKeyframeTrack };

@@ -5,14 +5,8 @@ import { KeyframeTrack } from '../KeyframeTrack.js';
  */
 class NumberKeyframeTrack extends KeyframeTrack {}
 
-Object.assign( NumberKeyframeTrack.prototype, {
-
-	ValueTypeName: 'number'
-
-	// ValueBufferType is inherited
-
-	// DefaultInterpolation is inherited
-
-} );
+NumberKeyframeTrack.prototype.ValueTypeName = 'number';
+// ValueBufferType is inherited
+// DefaultInterpolation is inherited
 
 export { NumberKeyframeTrack };
