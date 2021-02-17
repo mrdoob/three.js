@@ -55,7 +55,7 @@ class MeshDistanceMaterial extends Material {
 
 	copy( source ) {
 
-		super.clone( source );
+		super.copy( source );
 
 		this.referencePosition.copy( source.referencePosition );
 		this.nearDistance = source.nearDistance;

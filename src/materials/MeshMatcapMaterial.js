@@ -77,7 +77,7 @@ class MeshMatcapMaterial extends Material {
 
 	copy( source ) {
 
-		super.clone( source );
+		super.copy( source );
 
 		this.defines = { 'MATCAP': '' };
 

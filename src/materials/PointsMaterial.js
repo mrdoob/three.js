@@ -42,7 +42,7 @@ class PointsMaterial extends Material {
 
 	copy( source ) {
 
-		super.clone( source );
+		super.copy( source );
 
 		this.color.copy( source.color );
 

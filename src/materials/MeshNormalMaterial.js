@@ -66,7 +66,7 @@ class MeshNormalMaterial extends Material {
 
 	copy( source ) {
 
-		super.clone( source );
+		super.copy( source );
 
 		this.bumpMap = source.bumpMap;
 		this.bumpScale = source.bumpScale;
