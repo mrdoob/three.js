@@ -807,7 +807,14 @@ var GLTFLoader = ( function () {
 
 		var extension = textureDef.extensions[ name ];
 		var source = json.images[ extension.source ];
-		var loader = source.uri ? parser.options.manager.getHandler( source.uri ) : parser.textureLoader;
+
+		var loader = parser.textureLoader;
+		if ( source.uri ) {
+
+			var handler = parser.options.manager.getHandler( source.uri );
+			if ( handler !== null ) loader = handler;
+
+		}
 
 		return this.detectSupport().then( function ( isSupported ) {
 
@@ -2422,29 +2429,17 @@ var GLTFLoader = ( function () {
 	 */
 	GLTFParser.prototype.loadTexture = function ( textureIndex ) {
 
-		var parser = this;
 		var json = this.json;
 		var options = this.options;
-
 		var textureDef = json.textures[ textureIndex ];
+		var source = json.images[ textureDef.source ];
 
-		var textureExtensions = textureDef.extensions || {};
-
-		var source;
-
-		source = json.images[ textureDef.source ];
-
-		var loader;
+		var loader = this.textureLoader;
 
 		if ( source.uri ) {
 
-			loader = options.manager.getHandler( source.uri );
-
-		}
-
-		if ( ! loader ) {
-
-			loader = this.textureLoader;
+			var handler = options.manager.getHandler( source.uri );
+			if ( handler !== null ) loader = handler;
 
 		}
 
