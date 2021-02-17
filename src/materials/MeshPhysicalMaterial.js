@@ -73,7 +73,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	copy( source ) {
 
-		MeshStandardMaterial.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.defines = {
 

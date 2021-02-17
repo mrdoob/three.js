@@ -92,7 +92,7 @@ class ShaderMaterial extends Material {
 
 	copy( source ) {
 
-		Material.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.fragmentShader = source.fragmentShader;
 		this.vertexShader = source.vertexShader;

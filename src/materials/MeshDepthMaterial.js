@@ -53,7 +53,7 @@ class MeshDepthMaterial extends Material {
 
 	copy( source ) {
 
-		Material.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.depthPacking = source.depthPacking;
 

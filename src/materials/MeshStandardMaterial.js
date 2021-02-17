@@ -124,7 +124,7 @@ class MeshStandardMaterial extends Material {
 
 	copy( source ) {
 
-		Material.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.defines = { 'STANDARD': '' };
 

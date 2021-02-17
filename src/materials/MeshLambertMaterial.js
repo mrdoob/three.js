@@ -85,7 +85,7 @@ class MeshLambertMaterial extends Material {
 
 	copy( source ) {
 
-		Material.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.color.copy( source.color );
 
