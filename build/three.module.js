@@ -11822,60 +11822,73 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 const fov = 90, aspect = 1;
 
-function CubeCamera( near, far, renderTarget ) {
+class CubeCamera extends Object3D {
 
-	Object3D.call( this );
+	constructor( near, far, renderTarget ) {
 
-	this.type = 'CubeCamera';
+		super();
 
-	if ( renderTarget.isWebGLCubeRenderTarget !== true ) {
+		this.type = 'CubeCamera';
 
-		console.error( 'THREE.CubeCamera: The constructor now expects an instance of WebGLCubeRenderTarget as third parameter.' );
-		return;
+		if ( renderTarget.isWebGLCubeRenderTarget !== true ) {
+
+			console.error( 'THREE.CubeCamera: The constructor now expects an instance of WebGLCubeRenderTarget as third parameter.' );
+			return;
+
+		}
+
+		this.renderTarget = renderTarget;
+
+		const cameraPX = new PerspectiveCamera( fov, aspect, near, far );
+		cameraPX.layers = this.layers;
+		cameraPX.up.set( 0, - 1, 0 );
+		cameraPX.lookAt( new Vector3( 1, 0, 0 ) );
+		this.add( cameraPX );
+
+		const cameraNX = new PerspectiveCamera( fov, aspect, near, far );
+		cameraNX.layers = this.layers;
+		cameraNX.up.set( 0, - 1, 0 );
+		cameraNX.lookAt( new Vector3( - 1, 0, 0 ) );
+		this.add( cameraNX );
+
+		const cameraPY = new PerspectiveCamera( fov, aspect, near, far );
+		cameraPY.layers = this.layers;
+		cameraPY.up.set( 0, 0, 1 );
+		cameraPY.lookAt( new Vector3( 0, 1, 0 ) );
+		this.add( cameraPY );
+
+		const cameraNY = new PerspectiveCamera( fov, aspect, near, far );
+		cameraNY.layers = this.layers;
+		cameraNY.up.set( 0, 0, - 1 );
+		cameraNY.lookAt( new Vector3( 0, - 1, 0 ) );
+		this.add( cameraNY );
+
+		const cameraPZ = new PerspectiveCamera( fov, aspect, near, far );
+		cameraPZ.layers = this.layers;
+		cameraPZ.up.set( 0, - 1, 0 );
+		cameraPZ.lookAt( new Vector3( 0, 0, 1 ) );
+		this.add( cameraPZ );
+
+		const cameraNZ = new PerspectiveCamera( fov, aspect, near, far );
+		cameraNZ.layers = this.layers;
+		cameraNZ.up.set( 0, - 1, 0 );
+		cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
+		this.add( cameraNZ );
 
 	}
 
-	this.renderTarget = renderTarget;
-
-	const cameraPX = new PerspectiveCamera( fov, aspect, near, far );
-	cameraPX.layers = this.layers;
-	cameraPX.up.set( 0, - 1, 0 );
-	cameraPX.lookAt( new Vector3( 1, 0, 0 ) );
-	this.add( cameraPX );
-
-	const cameraNX = new PerspectiveCamera( fov, aspect, near, far );
-	cameraNX.layers = this.layers;
-	cameraNX.up.set( 0, - 1, 0 );
-	cameraNX.lookAt( new Vector3( - 1, 0, 0 ) );
-	this.add( cameraNX );
-
-	const cameraPY = new PerspectiveCamera( fov, aspect, near, far );
-	cameraPY.layers = this.layers;
-	cameraPY.up.set( 0, 0, 1 );
-	cameraPY.lookAt( new Vector3( 0, 1, 0 ) );
-	this.add( cameraPY );
-
-	const cameraNY = new PerspectiveCamera( fov, aspect, near, far );
-	cameraNY.layers = this.layers;
-	cameraNY.up.set( 0, 0, - 1 );
-	cameraNY.lookAt( new Vector3( 0, - 1, 0 ) );
-	this.add( cameraNY );
-
-	const cameraPZ = new PerspectiveCamera( fov, aspect, near, far );
-	cameraPZ.layers = this.layers;
-	cameraPZ.up.set( 0, - 1, 0 );
-	cameraPZ.lookAt( new Vector3( 0, 0, 1 ) );
-	this.add( cameraPZ );
-
-	const cameraNZ = new PerspectiveCamera( fov, aspect, near, far );
-	cameraNZ.layers = this.layers;
-	cameraNZ.up.set( 0, - 1, 0 );
-	cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
-	this.add( cameraNZ );
-
-	this.update = function ( renderer, scene ) {
+	update( renderer, scene ) {
 
 		if ( this.parent === null ) this.updateMatrixWorld();
+
+		const renderTarget = this.renderTarget;
+
+		const cameraPX = this.children[ 0 ];
+		const cameraNX = this.children[ 1 ];
+		const cameraPY = this.children[ 2 ];
+		const cameraNY = this.children[ 3 ];
+		const cameraPZ = this.children[ 4 ];
+		const cameraNZ = this.children[ 5 ];
 
 		const currentXrEnabled = renderer.xr.enabled;
 		const currentRenderTarget = renderer.getRenderTarget();
@@ -11910,12 +11923,9 @@ function CubeCamera( near, far, renderTarget ) {
 
 		renderer.xr.enabled = currentXrEnabled;
 
-	};
+	}
 
 }
-
-CubeCamera.prototype = Object.create( Object3D.prototype );
-CubeCamera.prototype.constructor = CubeCamera;
 
 function CubeTexture( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
@@ -37385,36 +37395,32 @@ class PointLight extends Light {
 
 PointLight.prototype.isPointLight = true;
 
-function OrthographicCamera( left = - 1, right = 1, top = 1, bottom = - 1, near = 0.1, far = 2000 ) {
+class OrthographicCamera extends Camera {
 
-	Camera.call( this );
+	constructor( left = - 1, right = 1, top = 1, bottom = - 1, near = 0.1, far = 2000 ) {
 
-	this.type = 'OrthographicCamera';
+		super();
 
-	this.zoom = 1;
-	this.view = null;
+		this.type = 'OrthographicCamera';
 
-	this.left = left;
-	this.right = right;
-	this.top = top;
-	this.bottom = bottom;
+		this.zoom = 1;
+		this.view = null;
 
-	this.near = near;
-	this.far = far;
+		this.left = left;
+		this.right = right;
+		this.top = top;
+		this.bottom = bottom;
 
-	this.updateProjectionMatrix();
+		this.near = near;
+		this.far = far;
 
-}
+		this.updateProjectionMatrix();
 
-OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ), {
+	}
 
-	constructor: OrthographicCamera,
+	copy( source, recursive ) {
 
-	isOrthographicCamera: true,
-
-	copy: function ( source, recursive ) {
-
-		Camera.prototype.copy.call( this, source, recursive );
+		super.copy( source, recursive );
 
 		this.left = source.left;
 		this.right = source.right;
@@ -37428,9 +37434,9 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 		return this;
 
-	},
+	}
 
-	setViewOffset: function ( fullWidth, fullHeight, x, y, width, height ) {
+	setViewOffset( fullWidth, fullHeight, x, y, width, height ) {
 
 		if ( this.view === null ) {
 
@@ -37456,9 +37462,9 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 		this.updateProjectionMatrix();
 
-	},
+	}
 
-	clearViewOffset: function () {
+	clearViewOffset() {
 
 		if ( this.view !== null ) {
 
@@ -37468,9 +37474,9 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 		this.updateProjectionMatrix();
 
-	},
+	}
 
-	updateProjectionMatrix: function () {
+	updateProjectionMatrix() {
 
 		const dx = ( this.right - this.left ) / ( 2 * this.zoom );
 		const dy = ( this.top - this.bottom ) / ( 2 * this.zoom );
@@ -37498,9 +37504,9 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
 		const data = Object3D.prototype.toJSON.call( this, meta );
 
@@ -37518,7 +37524,9 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 	}
 
-} );
+}
+
+OrthographicCamera.prototype.isOrthographicCamera = true;
 
 class DirectionalLightShadow extends LightShadow {
 
@@ -40334,37 +40342,37 @@ AmbientLightProbe.prototype.isAmbientLightProbe = true;
 const _eyeRight = new Matrix4();
 const _eyeLeft = new Matrix4();
 
-function StereoCamera() {
+class StereoCamera {
 
-	this.type = 'StereoCamera';
+	constructor() {
 
-	this.aspect = 1;
+		this.type = 'StereoCamera';
 
-	this.eyeSep = 0.064;
+		this.aspect = 1;
 
-	this.cameraL = new PerspectiveCamera();
-	this.cameraL.layers.enable( 1 );
-	this.cameraL.matrixAutoUpdate = false;
+		this.eyeSep = 0.064;
 
-	this.cameraR = new PerspectiveCamera();
-	this.cameraR.layers.enable( 2 );
-	this.cameraR.matrixAutoUpdate = false;
+		this.cameraL = new PerspectiveCamera();
+		this.cameraL.layers.enable( 1 );
+		this.cameraL.matrixAutoUpdate = false;
 
-	this._cache = {
-		focus: null,
-		fov: null,
-		aspect: null,
-		near: null,
-		far: null,
-		zoom: null,
-		eyeSep: null
-	};
+		this.cameraR = new PerspectiveCamera();
+		this.cameraR.layers.enable( 2 );
+		this.cameraR.matrixAutoUpdate = false;
 
-}
+		this._cache = {
+			focus: null,
+			fov: null,
+			aspect: null,
+			near: null,
+			far: null,
+			zoom: null,
+			eyeSep: null
+		};
 
-Object.assign( StereoCamera.prototype, {
+	}
 
-	update: function ( camera ) {
+	update( camera ) {
 
 		const cache = this._cache;
 
@@ -40423,7 +40431,7 @@ Object.assign( StereoCamera.prototype, {
 
 	}
 
-} );
+}
 
 class Clock {
 
