@@ -28,70 +28,70 @@ import { Vector2 } from '../math/Vector2.js';
  * }
  */
 
-function MeshNormalMaterial( parameters ) {
+class MeshNormalMaterial extends Material {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.type = 'MeshNormalMaterial';
+		super();
 
-	this.bumpMap = null;
-	this.bumpScale = 1;
+		Object.defineProperty( this, 'isMeshNormalMaterial', { value: true } );
 
-	this.normalMap = null;
-	this.normalMapType = TangentSpaceNormalMap;
-	this.normalScale = new Vector2( 1, 1 );
+		this.type = 'MeshNormalMaterial';
 
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
+		this.bumpMap = null;
+		this.bumpScale = 1;
 
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
+		this.normalMap = null;
+		this.normalMapType = TangentSpaceNormalMap;
+		this.normalScale = new Vector2( 1, 1 );
 
-	this.fog = false;
+		this.displacementMap = null;
+		this.displacementScale = 1;
+		this.displacementBias = 0;
 
-	this.skinning = false;
-	this.morphTargets = false;
-	this.morphNormals = false;
+		this.wireframe = false;
+		this.wireframeLinewidth = 1;
 
-	this.flatShading = false;
+		this.fog = false;
 
-	this.setValues( parameters );
+		this.skinning = false;
+		this.morphTargets = false;
+		this.morphNormals = false;
+
+		this.flatShading = false;
+
+		this.setValues( parameters );
+
+	}
+
+	copy( source ) {
+
+		super.clone( source );
+
+		this.bumpMap = source.bumpMap;
+		this.bumpScale = source.bumpScale;
+
+		this.normalMap = source.normalMap;
+		this.normalMapType = source.normalMapType;
+		this.normalScale.copy( source.normalScale );
+
+		this.displacementMap = source.displacementMap;
+		this.displacementScale = source.displacementScale;
+		this.displacementBias = source.displacementBias;
+
+		this.wireframe = source.wireframe;
+		this.wireframeLinewidth = source.wireframeLinewidth;
+
+		this.skinning = source.skinning;
+		this.morphTargets = source.morphTargets;
+		this.morphNormals = source.morphNormals;
+
+		this.flatShading = source.flatShading;
+
+		return this;
+
+	}
 
 }
-
-MeshNormalMaterial.prototype = Object.create( Material.prototype );
-MeshNormalMaterial.prototype.constructor = MeshNormalMaterial;
-
-MeshNormalMaterial.prototype.isMeshNormalMaterial = true;
-
-MeshNormalMaterial.prototype.copy = function ( source ) {
-
-	Material.prototype.copy.call( this, source );
-
-	this.bumpMap = source.bumpMap;
-	this.bumpScale = source.bumpScale;
-
-	this.normalMap = source.normalMap;
-	this.normalMapType = source.normalMapType;
-	this.normalScale.copy( source.normalScale );
-
-	this.displacementMap = source.displacementMap;
-	this.displacementScale = source.displacementScale;
-	this.displacementBias = source.displacementBias;
-
-	this.wireframe = source.wireframe;
-	this.wireframeLinewidth = source.wireframeLinewidth;
-
-	this.skinning = source.skinning;
-	this.morphTargets = source.morphTargets;
-	this.morphNormals = source.morphNormals;
-
-	this.flatShading = source.flatShading;
-
-	return this;
-
-};
-
 
 export { MeshNormalMaterial };
