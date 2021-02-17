@@ -26,14 +26,11 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Reflector } from './jsm/objects/Reflector.js';
-
-			// scene size
-			const WIDTH = window.innerWidth;
-			const HEIGHT = window.innerHeight;
+			import Stats from "./jsm/libs/stats.module.js";
 
 			// camera
 			const VIEW_ANGLE = 45;
-			const ASPECT = WIDTH / HEIGHT;
+			let aspect = window.innerWidth / window.innerHeight;
 			const NEAR = 1;
 			const FAR = 500;
 
@@ -42,6 +39,9 @@
 			let cameraControls;
 
 			let sphereGroup, smallSphere;
+
+			let groundMirrorRenderTarget, verticalMirrorRenderTarget;
+			let stats;
 
 			init();
 			animate();
@@ -53,14 +53,14 @@
 				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( WIDTH, HEIGHT );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				// scene
 				scene = new THREE.Scene();
 
 				// camera
-				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
+				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, aspect, NEAR, FAR );
 				camera.position.set( 0, 75, 160 );
 
 				cameraControls = new OrbitControls( camera, renderer.domElement );
@@ -80,10 +80,11 @@
 				geometry = new THREE.CircleGeometry( 40, 64 );
 				const groundMirror = new Reflector( geometry, {
 					clipBias: 0.003,
-					textureWidth: WIDTH * window.devicePixelRatio,
-					textureHeight: HEIGHT * window.devicePixelRatio,
+					textureWidth: window.innerWidth * window.devicePixelRatio,
+					textureHeight: window.innerHeight * window.devicePixelRatio,
 					color: 0x777777
 				} );
+				groundMirrorRenderTarget = groundMirror.getRenderTarget()
 				groundMirror.position.y = 0.5;
 				groundMirror.rotateX( - Math.PI / 2 );
 				scene.add( groundMirror );
@@ -91,10 +92,11 @@
 				geometry = new THREE.PlaneGeometry( 100, 100 );
 				const verticalMirror = new Reflector( geometry, {
 					clipBias: 0.003,
-					textureWidth: WIDTH * window.devicePixelRatio,
-					textureHeight: HEIGHT * window.devicePixelRatio,
+					textureWidth: window.innerWidth * window.devicePixelRatio,
+					textureHeight: window.innerHeight * window.devicePixelRatio,
 					color: 0x889999
 				} );
+				verticalMirrorRenderTarget = verticalMirror.getRenderTarget()
 				verticalMirror.position.y = 50;
 				verticalMirror.position.z = - 50;
 				scene.add( verticalMirror );
@@ -168,6 +170,22 @@
 				blueLight.position.set( 0, 50, 550 );
 				scene.add( blueLight );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				window.addEventListener( "resize", onWindowResize, false );
+			}
+
+			function onWindowResize() {
+
+				aspect = window.innerWidth / window.innerHeight;
+				camera.aspect = aspect;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				groundMirrorRenderTarget.setSize(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio);
+				verticalMirrorRenderTarget.setSize(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio);
+
 			}
 
 			function animate() {
@@ -187,6 +205,8 @@
 				smallSphere.rotation.z = timer * 0.8;
 
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 
