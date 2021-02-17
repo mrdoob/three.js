@@ -10,7 +10,6 @@ import {
 	Sphere,
 	Texture,
 	Material,
-	MeshStandardMaterial,
 	MaterialLoader
 } from "../../../../../build/three.module.js";
 import {
@@ -24,7 +23,6 @@ class DataTransport {
 
 	/**
 	 * Creates a new {@link DataTransport}.
-	 *
 	 * @param {string} [cmd]
 	 * @param {string} [id]
 	 */
@@ -40,16 +38,18 @@ class DataTransport {
 			params: {
 			}
 		};
+		/** @type {ArrayBuffer[]} */
 		this.transferables = [];
+
 	}
 
 	/**
-	 *
+	 * Populate this object with previously serialized data.
 	 * @param {object} transportObject
-	 *
 	 * @return {DataTransport}
 	 */
 	loadData( transportObject ) {
+
 		this.main.cmd = transportObject.cmd;
 		this.main.id = transportObject.id;
 		this.main.type = 'DataTransport';
@@ -57,31 +57,40 @@ class DataTransport {
 		this.setParams( transportObject.params );
 
 		if ( transportObject.buffers ) {
+
 			Object.entries( transportObject.buffers ).forEach( ( [name, buffer] ) => {
+
 				this.main.buffers[ name ] = buffer;
+
 			} );
+
 		}
 		return this;
+
 	}
 
 	/**
-	 *
+	 * Returns the value of the command.
 	 * @return {string}
 	 */
 	getCmd () {
+
 		return this.main.cmd;
+
 	}
 
 	/**
-	 *
-	 * @return {number|string}
+	 * Returns the id.
+	 * @return {string}
 	 */
 	getId() {
+
 		return this.main.id;
+
 	}
 
 	/**
-	 *
+	 * Set a parameter object which is a map with string keys and strings or objects as values.
 	 * @param {object.<string, *>} params
 	 * @return {DataTransport}
 	 */
@@ -94,14 +103,19 @@ class DataTransport {
 
 	}
 
+	/**
+	 * Return the parameter object
+	 * @return {object.<string, *>}
+	 */
 	getParams() {
+
 		return this.main.params;
+
 	}
 
 	/**
-	 *
+	 * Set the current progress (e.g. percentage of progress)
 	 * @param {number} numericalValue
-	 *
 	 * @return {DataTransport}
 	 */
 	setProgress( numericalValue ) {
@@ -112,33 +126,36 @@ class DataTransport {
 	}
 
 	/**
-	 *
-	 * @param name
-	 * @param buffer
+	 * Add a named {@link ArrayBuffer}
+	 * @param {string} name
+	 * @param {ArrayBuffer} buffer
 	 * @return {DataTransport}
 	 */
 	addBuffer ( name, buffer ) {
+
 		this.main.buffers[ name ] = buffer;
 		return this;
+
 	}
 
 	/**
-	 *
-	 * @param name
+	 * Retrieve an {@link ArrayBuffer} by name
+	 * @param {string} name
 	 * @return {ArrayBuffer}
 	 */
 	getBuffer( name ) {
+
 		return this.main.buffers[ name ];
+
 	}
 
 	/**
-	 * Package all data buffers
-	 *
+	 * Package all data buffers into the transferable array. Clone if data needs to stay in current context.
 	 * @param {boolean} cloneBuffers
-	 *
 	 * @return {DataTransport}
 	 */
 	package( cloneBuffers ) {
+
 		for ( let buffer of Object.values( this.main.buffers ) ) {
 
 			if ( buffer !== null && buffer !== undefined ) {
@@ -150,6 +167,7 @@ class DataTransport {
 
 		}
 		return this;
+
 	}
 
 	/**
@@ -164,7 +182,7 @@ class DataTransport {
 
 	/**
 	 * Return all transferable in one array.
-	 * @return {[]|any[]|*}
+	 * @return {[]|ArrayBuffer[]}
 	 */
 	getTransferables() {
 
@@ -174,9 +192,7 @@ class DataTransport {
 
 	/**
 	 * Posts a message by invoking the method on the provided object.
-	 *
 	 * @param {object} postMessageImpl
-	 *
 	 * @return {DataTransport}
 	 */
 	postMessage( postMessageImpl ) {
@@ -194,25 +210,28 @@ class MaterialsTransport extends DataTransport {
 
 	/**
 	 * Creates a new {@link MeshMessageStructure}.
-	 *
 	 * @param {string} [cmd]
 	 * @param {string} [id]
 	 */
 	constructor( cmd, id ) {
+
 		super( cmd, id );
 		this.main.type = 'MaterialsTransport';
+		/** {object.<string, Material>} */
 		this.main.materials = {};
+		/** {object.<number, string>} */
 		this.main.multiMaterialNames = {};
 		this.main.cloneInstructions = [];
+
 	}
 
 	/**
-	 *
+	 * See {@link DataTransport#loadData}
 	 * @param {object} transportObject
-	 *
 	 * @return {MaterialsTransport}
 	 */
 	loadData( transportObject ) {
+
 		super.loadData( transportObject );
 		this.main.type = 'MaterialsTransport';
 		Object.assign( this.main, transportObject );
@@ -224,49 +243,74 @@ class MaterialsTransport extends DataTransport {
 
 		} );
 		return this;
+
 	}
 
 	_cleanMaterial ( material ) {
+
 		Object.entries( material ).forEach( ( [key, value] ) => {
+
 			if ( value instanceof Texture || value === null ) {
 				material[ key ] = undefined;
+
 			}
+
 		} );
 		return material;
+
 	}
 
 	/**
-	 *
-	 * @param name
-	 * @param buffer
-	 * @return {DataTransport}
+	 * See {@link DataTransport#loadData}
+	 * @param {string} name
+	 * @param {ArrayBuffer} buffer
+	 * @return {MaterialsTransport}
 	 */
 	addBuffer( name, buffer ) {
-		return super.addBuffer( name, buffer );
-	}
 
-	setParams( params ) {
-		super.setParams( params );
+		super.addBuffer( name, buffer );
 		return this;
+
 	}
 
 	/**
-	 *
-	 * @param materials
+	 * See {@link DataTransport#setParams}
+	 * @param {object.<string, *>} params
+	 * @return {MaterialsTransport}
 	 */
-	setMaterials ( materials ) {
-		if ( materials !== undefined && materials !== null && Object.keys( materials ).length > 0 ) this.main.materials = materials;
+	setParams( params ) {
+
+		super.setParams( params );
 		return this;
+
 	}
 
+	/**
+	 * Set an object containing named materials.
+	 * @param {object.<string, Material>} materials
+	 */
+	setMaterials ( materials ) {
+
+		if ( materials !== undefined && materials !== null && Object.keys( materials ).length > 0 ) this.main.materials = materials;
+		return this;
+
+	}
+
+	/**
+	 * Returns all maerials
+	 * @return {object.<string, Material>}
+	 */
 	getMaterials () {
+
 		return this.main.materials;
+
 	}
 
 	/**
 	 * Removes all textures and null values from all materials
 	 */
 	cleanMaterials () {
+
 		let clonedMaterials = {};
 		let clonedMaterial;
 		for ( let material of Object.values( this.main.materials ) ) {
@@ -281,30 +325,46 @@ class MaterialsTransport extends DataTransport {
 		}
 		this.setMaterials( clonedMaterials );
 		return this;
+
 	}
 
+	/**
+	 * See {@link DataTransport#package}
+	 * @param {boolean} cloneBuffers
+	 * @return {DataTransport}
+	 */
 	package ( cloneBuffers) {
 
 		super.package( cloneBuffers );
-
 		this.main.materials = MaterialUtils.getMaterialsJSON( this.main.materials );
 		return this;
 
 	}
 
+	/**
+	 * Tell whether a multi-material was defined
+	 * @return {boolean}
+	 */
 	hasMultiMaterial () {
 
 		return ( Object.keys( this.main.multiMaterialNames ).length > 0 );
 
 	}
 
+	/**
+	 * Returns a single material if it is defined or null.
+	 * @return {Material|null}
+	 */
 	getSingleMaterial () {
 
 		if ( Object.keys( this.main.materials ).length > 0 ) {
+
 			return Object.entries( this.main.materials )[ 0 ][ 1 ];
-		}
-		else {
-			return new MeshStandardMaterial( { color: 0xFF0000 } );
+
+		} else {
+
+			return null;
+
 		}
 
 	}
@@ -363,6 +423,7 @@ class GeometryTransport extends DataTransport {
 	 * @param {string} [id]
 	 */
 	constructor( cmd, id ) {
+
 		super( cmd, id );
 		this.main.type = 'GeometryTransport';
 		/**
@@ -374,6 +435,7 @@ class GeometryTransport extends DataTransport {
 		this.main.geometry = {};
 		/** @type {BufferGeometry} */
 		this.main.bufferGeometry = null;
+
 	}
 
 	/**
@@ -383,14 +445,28 @@ class GeometryTransport extends DataTransport {
 	 * @return {GeometryTransport}
 	 */
 	loadData( transportObject ) {
+
 		super.loadData( transportObject );
 		this.main.type = 'GeometryTransport';
 		return this.setGeometry( transportObject.geometry, transportObject.geometryType );
+
+	}
+
+	/**
+	 * Returns
+	 * @return {number}
+	 */
+	getGeometryType() {
+
+		return this.main.geometryType;
+
 	}
 
 	setParams( params ) {
+
 		super.setParams( params );
 		return this;
+
 	}
 
 	/**

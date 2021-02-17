@@ -6,15 +6,15 @@ import {
 	TorusKnotBufferGeometry,
 	Color,
 	MeshPhongMaterial
-} from "../../../../build/three.module.js";
+} from "../../../../../build/three.module.js";
 import {
 	MeshTransport,
 	MaterialsTransport
-} from "../workerTaskManager/utils/TransportUtils.js";
+} from "../utils/TransportUtils.js";
 import {
 	MaterialUtils
-} from '../workerTaskManager/utils/MaterialUtils.js';
-import { WorkerTaskManagerDefaultRouting } from "../workerTaskManager/comm/worker/defaultRouting.js";
+} from '../utils/MaterialUtils.js';
+import { WorkerTaskManagerDefaultRouting } from "./defaultRouting.js";
 
 
 function init ( context, id, config ) {

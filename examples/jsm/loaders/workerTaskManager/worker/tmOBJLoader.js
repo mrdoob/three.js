@@ -8,12 +8,12 @@ import {
 	GeometryTransport,
 	MeshTransport,
 	ObjectUtils,
-} from "../workerTaskManager/utils/TransportUtils.js";
+} from "../utils/TransportUtils.js";
 import {
 	MaterialUtils
-} from '../workerTaskManager/utils/MaterialUtils.js';
-import { OBJLoader } from "../OBJLoader.js";
-import { WorkerTaskManagerDefaultRouting } from "../workerTaskManager/comm/worker/defaultRouting.js";
+} from '../utils/MaterialUtils.js';
+import { OBJLoader } from "../../OBJLoader.js";
+import { WorkerTaskManagerDefaultRouting } from "./defaultRouting.js";
 
 const OBJLoaderWorker = {
 

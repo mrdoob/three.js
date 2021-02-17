@@ -34,7 +34,7 @@
 			import { MaterialStore } from "./jsm/loaders/workerTaskManager/utils/MaterialStore.js"
 			import { FileLoader } from "../src/loaders/FileLoader.js";
 			import { MTLLoader } from "./jsm/loaders/MTLLoader.js";
-			import { OBJLoaderWorker } from "./jsm/loaders/worker/tmOBJLoader.js";
+			import { OBJLoaderWorker } from "./jsm/loaders/workerTaskManager/worker/tmOBJLoader.js";
 
 			/**
 			 * The aim of this example is to show all possible ways how to use the {@link WorkerTaskManager}:
@@ -114,7 +114,7 @@
 						funcInit: WorkerFunctions.workerStandardInit,
 						funcExec: WorkerFunctions.workerStandardExec,
 						dependencies: [
-							{ url: "../build/three.js" },
+							{ url: "../build/three.min.js" },
 							{ code: ObjectUtils.serializeClass( THREE.BufferGeometry ) },
 							{ code: ObjectUtils.serializeClass( DataTransport ) },
 							{ code: ObjectUtils.serializeClass( GeometryTransport ) }
@@ -124,13 +124,13 @@
 						name: 'tmProtoExampleModule',
 						use: true,
 						fallback: false,
-						module: './jsm/loaders/worker/tmModuleExample.js'
+						module: './jsm/loaders/workerTaskManager/worker/tmModuleExample.js'
 					} );
 					this.taskDescriptions.set( 'tmProtoExampleModuleNoThree', {
 						name: 'tmProtoExampleModuleNoThree',
 						use: true,
 						fallback: false,
-						module: './jsm/loaders/worker/tmModuleExampleNoThree.js'
+						module: './jsm/loaders/workerTaskManager/worker/tmModuleExampleNoThree.js'
 					} );
 					this.taskDescriptions.set( 'tmProtoExampleMain', {
 						name: 'tmProtoExampleMain',
@@ -143,7 +143,7 @@
 						name: 'tmOBJLoaderModule',
 						use: true,
 						fallback: false,
-						module: './jsm/loaders/worker/tmOBJLoader.js',
+						module: './jsm/loaders/workerTaskManager/worker/tmOBJLoader.js',
 						filenameMtl: './models/obj/female02/female02.mtl',
 						filenameObj: './models/obj/female02/female02.obj',
 						materialStore: new MaterialStore( true ),
@@ -157,7 +157,7 @@
 						filenameMtl: './models/obj/male02/male02.mtl',
 						filenameObj: './models/obj/male02/male02.obj',
 						materialStore: new MaterialStore( true ),
-						dependencies: OBJLoaderWorker.buildStandardWorkerDependencies( '../build/three.js', '../examples/js/loaders/OBJLoader.js' )
+						dependencies: OBJLoaderWorker.buildStandardWorkerDependencies( '../build/three.min.js', '../examples/js/loaders/OBJLoader.js' )
 					} );
 
 					this.tasksToUse = [];
@@ -412,6 +412,7 @@
 
 									const materialsTransport = meshTransport.getMaterialsTransport();
 									material = materialsTransport.processMaterialTransport( taskDescr.materialStore ? taskDescr.materialStore.getMaterials() : {}, true );
+									if ( material === null ) material = new THREE.MeshStandardMaterial( { color: 0xFF0000 } );
 
 									mesh = new THREE.Mesh( meshTransport.getBufferGeometry(), material );
 									this._addMesh( mesh, meshTransport.getId() );
