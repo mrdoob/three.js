@@ -6,21 +6,24 @@ import { PropertyMixer } from './PropertyMixer.js';
 import { AnimationClip } from './AnimationClip.js';
 import { NormalAnimationBlendMode } from '../constants.js';
 
-function AnimationMixer( root ) {
+class AnimationMixer extends EventDispatcher {
 
-	this._root = root;
-	this._initMemoryManager();
-	this._accuIndex = 0;
+	constructor( root ) {
 
-	this.time = 0;
+		super();
+		this._root = root;
+		this._initMemoryManager();
+		this._accuIndex = 0;
 
-	this.timeScale = 1.0;
+		this.time = 0;
+
+		this.timeScale = 1.0;
+
+	}
 
 }
 
-AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-
-	constructor: AnimationMixer,
+Object.assign( AnimationMixer.prototype, {
 
 	_bindAction: function ( action, prototypeAction ) {
 
