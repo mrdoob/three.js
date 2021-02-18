@@ -15,10 +15,7 @@ class AnimationMixer extends EventDispatcher {
 		this._root = root;
 		this._initMemoryManager();
 		this._accuIndex = 0;
-		this._controlInterpolantsResultBuffer = new Float32Array( 1 );
-
 		this.time = 0;
-
 		this.timeScale = 1.0;
 
 	}
@@ -765,5 +762,6 @@ class AnimationMixer extends EventDispatcher {
 
 }
 
+AnimationMixer.prototype._controlInterpolantsResultBuffer = new Float32Array( 1 );
 
 export { AnimationMixer };
