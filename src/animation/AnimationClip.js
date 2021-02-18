@@ -387,7 +387,7 @@ class AnimationClip {
 
 	toJSON() {
 
-		return AnimationClip.toJSON( this );
+		return this.constructor.toJSON( this );
 
 	}
 
