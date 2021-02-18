@@ -34,10 +34,10 @@ export default /* glsl */`
 		vec3 T = q1perp * st0.x + q0perp * st1.x;
 		vec3 B = q1perp * st0.y + q0perp * st1.y;
 
-		float det = max( dot(T,T), dot(B,B) );
-		float scale = (det == 0.0) ? 0.0 : faceDirection * inversesqrt( det );
+		float det = max( dot( T, T ), dot( B, B ) );
+		float scale = ( det == 0.0 ) ? 0.0 : faceDirection * inversesqrt( det );
 
-		return normalize( T * (mapN.x * scale) + B * ( mapN.y * scale ) + N * mapN.z );
+		return normalize( T * ( mapN.x * scale ) + B * ( mapN.y * scale ) + N * mapN.z );
 
 	}
 
