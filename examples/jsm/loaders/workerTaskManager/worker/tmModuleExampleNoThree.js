@@ -1,5 +1,5 @@
 /**
- * @author Kai Salmen / www.kaisalmen.de
+ * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
 import { GeometryTransport } from "../utils/TransportUtils.js";

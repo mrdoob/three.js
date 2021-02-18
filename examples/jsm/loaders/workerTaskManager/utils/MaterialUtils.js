@@ -1,18 +1,23 @@
 /**
- * @author Kai Salmen / www.kaisalmen.de
+ * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
 import { Material } from "../../../../../build/three.module.js";
 
+/**
+ * Static functions useful in the context of handling materials.
+ */
 class MaterialUtils {
 
 	/**
+	 * Adds the provided material to the provided materials object if the material does not exists.
+	 * Use force override existing material.
 	 *
-	 * @param {object} materialsObject
-	 * @param {Material|MaterialCloneInstruction} material
+	 * @param {object.<string, Material>} materialsObject
+	 * @param {Material} material
 	 * @param {string} materialName
 	 * @param {boolean} force
-	 * @param {boolena} [log]
+	 * @param {boolean} [log] Log messages to the console
 	 */
 	static addMaterial( materialsObject, material, materialName, force, log ) {
 		let existingMaterial;
@@ -45,9 +50,9 @@ class MaterialUtils {
 	}
 
 	/**
-	 * Returns the mapping object of material name and corresponding jsonified material.
+	 * Transforms the named materials object to an object with named jsonified materials.
 	 *
-	 * @param {object.<string,Material>}
+	 * @param {object.<string, Material>}
 	 * @returns {Object} Map of Materials in JSON representation
 	 */
 	static getMaterialsJSON ( materialsObject ) {
@@ -65,9 +70,10 @@ class MaterialUtils {
 	}
 
 	/**
+	 * Clones a material according the provided instructions.
 	 *
 	 * @param {object.<String, Material>} materials
-	 * @param {MaterialCloneInstruction} materialCloneInstruction
+	 * @param {object} materialCloneInstruction
 	 * @param {boolean} [log]
 	 */
 	static cloneMaterial ( materials, materialCloneInstruction, log ) {
@@ -95,29 +101,7 @@ class MaterialUtils {
 		return material;
 
 	}
-}
-
-class MaterialCloneInstruction {
-
-	/**
-	 *
-	 * @param {string} materialNameOrg
-	 * @param {string} materialNameNew
-	 * @param {boolean} haveVertexColors
-	 * @param {boolean} flatShading
-	 */
-	constructor ( materialNameOrg, materialNameNew, haveVertexColors, flatShading ) {
-		this.materialNameOrg = materialNameOrg;
-		this.materialProperties = {
-			name: materialNameNew,
-			vertexColors: haveVertexColors ? 2 : 0,
-			flatShading: flatShading
-		};
-	}
 
 }
 
-export {
-	MaterialUtils,
-	MaterialCloneInstruction
-}
+export { MaterialUtils }

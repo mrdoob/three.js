@@ -252,7 +252,7 @@
 						let torus = new THREE.TorusBufferGeometry( 25, 8, 16, 100 );
 						torus.name = 'torus';
 
-						const sender = new GeometryTransport().setGeometry( torus, 0 ).package( false );
+						const sender = new GeometryTransport().setGeometry( torus, 0 ).package( true );
 						this.tasksToUse.push( taskDescr );
 						this.workerTaskManager.registerTaskTypeModule( taskDescr.name, taskDescr.module );
 						awaiting.push( this.workerTaskManager.initTaskType( taskDescr.name, sender.getMain(), sender.getTransferables() ).catch( e => console.error( e ) ) );

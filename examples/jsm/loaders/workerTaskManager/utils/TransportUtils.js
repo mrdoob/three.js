@@ -1,5 +1,4 @@
 /**
- * @author Kai Salmen / https://kaisalmen.de
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
@@ -370,7 +369,7 @@ class MaterialsTransport extends DataTransport {
 	}
 
 	/**
-	 * Updates the materials with contained material objects (sync) or from alteration instructions (async).
+	 * Adds contained material or multi-material the provided materials object or it clones and adds new materials according clone instructions.
 	 *
 	 * @param {Object.<string, Material>} materials
 	 * @param {boolean} log
@@ -417,8 +416,7 @@ class MaterialsTransport extends DataTransport {
 class GeometryTransport extends DataTransport {
 
 	/**
-	 * Creates a new {@link GeometrySender}.
-	 *
+	 * Creates a new {@link GeometryTransport}.
 	 * @param {string} [cmd]
 	 * @param {string} [id]
 	 */
@@ -439,9 +437,8 @@ class GeometryTransport extends DataTransport {
 	}
 
 	/**
-	 *
+	 * See {@link DataTransport#loadData}
 	 * @param {object} transportObject
-	 *
 	 * @return {GeometryTransport}
 	 */
 	loadData( transportObject ) {
@@ -453,7 +450,7 @@ class GeometryTransport extends DataTransport {
 	}
 
 	/**
-	 * Returns
+	 * Returns the geometry type [0=Mesh|1=LineSegments|2=Points]
 	 * @return {number}
 	 */
 	getGeometryType() {
@@ -462,6 +459,11 @@ class GeometryTransport extends DataTransport {
 
 	}
 
+	/**
+	 * See {@link DataTransport#setParams}
+	 * @param {object} params
+	 * @return {GeometryTransport}
+	 */
 	setParams( params ) {
 
 		super.setParams( params );
@@ -470,11 +472,10 @@ class GeometryTransport extends DataTransport {
 	}
 
 	/**
-	 * Only add the {@link BufferGeometry}
+	 * Set the {@link BufferGeometry} and geometry type that can be used when a mesh is created.
 	 *
 	 * @param {BufferGeometry} geometry
-	 * @param {number} geometryType
-	 *
+	 * @param {number} geometryType [0=Mesh|1=LineSegments|2=Points]
 	 * @return {GeometryTransport}
 	 */
 	setGeometry( geometry, geometryType ) {
@@ -486,13 +487,13 @@ class GeometryTransport extends DataTransport {
 	}
 
 	/**
-	 * Package {@link BufferGeometry}
+	 * Package {@link BufferGeometry} and prepare it for transport.
 	 *
-	 * @param {boolean} cloneBuffers
-	 *
+	 * @param {boolean} cloneBuffers Clone buffers if their content shall stay in the current context.
 	 * @return {GeometryTransport}
 	 */
 	package( cloneBuffers ) {
+
 		super.package( cloneBuffers );
 		const vertexBA = this.main.geometry.getAttribute( 'position' );
 		const normalBA = this.main.geometry.getAttribute( 'normal' );
@@ -502,34 +503,33 @@ class GeometryTransport extends DataTransport {
 		const skinWeightBA = this.main.geometry.getAttribute( 'skinWeight' );
 		const indexBA = this.main.geometry.getIndex();
 
-		this.addBufferAttributeToTransferable( vertexBA, cloneBuffers );
-		this.addBufferAttributeToTransferable( normalBA, cloneBuffers );
-		this.addBufferAttributeToTransferable( uvBA, cloneBuffers );
-		this.addBufferAttributeToTransferable( colorBA, cloneBuffers );
-		this.addBufferAttributeToTransferable( skinIndexBA, cloneBuffers );
-		this.addBufferAttributeToTransferable( skinWeightBA, cloneBuffers );
-
-		this.addBufferAttributeToTransferable( indexBA, cloneBuffers );
-
+		this._addBufferAttributeToTransferable( vertexBA, cloneBuffers );
+		this._addBufferAttributeToTransferable( normalBA, cloneBuffers );
+		this._addBufferAttributeToTransferable( uvBA, cloneBuffers );
+		this._addBufferAttributeToTransferable( colorBA, cloneBuffers );
+		this._addBufferAttributeToTransferable( skinIndexBA, cloneBuffers );
+		this._addBufferAttributeToTransferable( skinWeightBA, cloneBuffers );
+		this._addBufferAttributeToTransferable( indexBA, cloneBuffers );
 		return this;
 	}
 
 	/**
+	 * Reconstructs the {@link BufferGeometry} from the raw buffers.
 	 * @param {boolean} cloneBuffers
-	 *
 	 * @return {GeometryTransport}
 	 */
 	reconstruct( cloneBuffers ) {
+
 		if ( this.main.bufferGeometry instanceof BufferGeometry ) return this;
 		this.main.bufferGeometry = new BufferGeometry();
 
 		const transferredGeometry = this.main.geometry;
-		this.assignAttribute( transferredGeometry.attributes.position, 'position', cloneBuffers );
-		this.assignAttribute( transferredGeometry.attributes.normal, 'normal', cloneBuffers );
-		this.assignAttribute( transferredGeometry.attributes.uv, 'uv', cloneBuffers );
-		this.assignAttribute( transferredGeometry.attributes.color, 'color', cloneBuffers );
-		this.assignAttribute( transferredGeometry.attributes.skinIndex, 'skinIndex', cloneBuffers );
-		this.assignAttribute( transferredGeometry.attributes.skinWeight, 'skinWeight', cloneBuffers );
+		this._assignAttribute( transferredGeometry.attributes.position, 'position', cloneBuffers );
+		this._assignAttribute( transferredGeometry.attributes.normal, 'normal', cloneBuffers );
+		this._assignAttribute( transferredGeometry.attributes.uv, 'uv', cloneBuffers );
+		this._assignAttribute( transferredGeometry.attributes.color, 'color', cloneBuffers );
+		this._assignAttribute( transferredGeometry.attributes.skinIndex, 'skinIndex', cloneBuffers );
+		this._assignAttribute( transferredGeometry.attributes.skinWeight, 'skinWeight', cloneBuffers );
 
 		const index = transferredGeometry.index;
 		if ( index !== null && index !== undefined ) {
@@ -550,26 +550,22 @@ class GeometryTransport extends DataTransport {
 		this.main.bufferGeometry.groups = transferredGeometry.groups;
 		this.main.bufferGeometry.drawRange = transferredGeometry.drawRange;
 		this.main.bufferGeometry.userData = transferredGeometry.userData;
-
 		return this;
+
 	}
 
 	/**
-	 *
+	 * Returns the {@link BufferGeometry}.
 	 * @return {BufferGeometry|null}
 	 */
 	getBufferGeometry() {
+
 		return this.main.bufferGeometry
+
 	}
 
-	/**
-	 *
-	 * @param input
-	 * @param cloneBuffer
-	 *
-	 * @return {GeometryTransport}
-	 */
-	addBufferAttributeToTransferable( input, cloneBuffer ) {
+	_addBufferAttributeToTransferable( input, cloneBuffer ) {
+
 		if ( input !== null && input !== undefined ) {
 
 			const arrayBuffer = cloneBuffer ? input.array.slice( 0 ) : input.array;
@@ -577,67 +573,73 @@ class GeometryTransport extends DataTransport {
 
 		}
 		return this;
+
 	}
 
-	/**
-	 *
-	 * @param attr
-	 * @param attrName
-	 * @param cloneBuffer
-	 *
-	 * @return {GeometryTransport}
-	 */
-	assignAttribute( attr, attrName, cloneBuffer ) {
+	_assignAttribute( attr, attrName, cloneBuffer ) {
+
 		if ( attr ) {
+
 			const arrayBuffer = cloneBuffer ? attr.array.slice( 0 ) : attr.array;
 			this.main.bufferGeometry.setAttribute( attrName, new BufferAttribute( arrayBuffer, attr.itemSize, attr.normalized ) );
+
 		}
 		return this;
+
 	}
 
 }
 
+
+/**
+ * Define a structure that is used to send mesh data between main and workers.
+ */
 class MeshTransport extends GeometryTransport {
 
 	/**
 	 * Creates a new {@link MeshTransport}.
-	 *
 	 * @param {string} [cmd]
 	 * @param {string} [id]
 	 */
 	constructor( cmd, id ) {
-		super( cmd, id );
 
+		super( cmd, id );
 		this.main.type = 'MeshTransport';
 		// needs to be added as we cannot inherit from both materials and geometry
 		this.main.materialsTransport = new MaterialsTransport();
+
 	}
 
 	/**
-	 *
+	 * See {@link GeometryTransport#loadData}
 	 * @param {object} transportObject
-	 *
 	 * @return {MeshTransport}
 	 */
 	loadData( transportObject ) {
+
 		super.loadData( transportObject );
 		this.main.type = 'MeshTransport';
 		this.main.meshName = transportObject.meshName;
 		this.main.materialsTransport = new MaterialsTransport().loadData( transportObject.materialsTransport.main );
-
 		return this;
-	}
 
-	setParams( params ) {
-		super.setParams( params );
-		return this;
 	}
 
 	/**
-	 * Only set the material.
-	 *
+	 * See {@link GeometryTransport#loadData}
+	 * @param {object} params
+	 * @return {MeshTransport}
+	 */
+	setParams( params ) {
+
+		super.setParams( params );
+		return this;
+
+	}
+
+	/**
+	 * The {@link MaterialsTransport} wraps all info regarding the material for the mesh.
 	 * @param {MaterialsTransport} materialsTransport
-	 *
 	 * @return {MeshTransport}
 	 */
 	setMaterialsTransport( materialsTransport ) {
@@ -657,51 +659,60 @@ class MeshTransport extends GeometryTransport {
 	}
 
 	/**
-	 *
+	 * Sets the mesh and the geometry type [0=Mesh|1=LineSegments|2=Points]
 	 * @param {Mesh} mesh
 	 * @param {number} geometryType
-	 *
 	 * @return {MeshTransport}
 	 */
 	setMesh( mesh, geometryType ) {
+
 		this.main.meshName = mesh.name;
 		super.setGeometry( mesh.geometry, geometryType );
-
 		return this;
+
 	}
 
 	/**
-	 * Package {@link Mesh}
-	 *
+	 * See {@link GeometryTransport#package}
 	 * @param {boolean} cloneBuffers
-	 *
 	 * @return {MeshTransport}
 	 */
 	package( cloneBuffers ) {
-		super.package( cloneBuffers );
-		if ( this.main.materialsTransport !== null ) this.main.materialsTransport.package();
 
+		super.package( cloneBuffers );
+		if ( this.main.materialsTransport !== null ) this.main.materialsTransport.package( cloneBuffers );
 		return this;
 	}
 
 	/**
+	 * See {@link GeometryTransport#reconstruct}
 	 * @param {boolean} cloneBuffers
-	 *
 	 * @return {MeshTransport}
 	 */
 	reconstruct( cloneBuffers ) {
+
 		super.reconstruct( cloneBuffers );
-
 		// so far nothing needs to be done for material
-
 		return this;
+
 	}
 
 }
 
 
+/**
+ * Utility for serializing object in memory
+ */
 class ObjectUtils {
 
+	/**
+	 * Serializes a class with an optional prototype
+	 * @param targetClass
+	 * @param targetPrototype
+	 * @param fullObjectName
+	 * @param processPrototype
+	 * @return {string}
+	 */
 	static serializePrototype( targetClass, targetPrototype, fullObjectName, processPrototype ) {
 
 		let prototypeFunctions = [];
@@ -738,6 +749,11 @@ class ObjectUtils {
 
 	}
 
+	/**
+	 * Serializes a class.
+	 * @param {object} targetClass An ES6+ class
+	 * @return {string}
+	 */
 	static serializeClass( targetClass ) {
 
 		return targetClass.toString() + "\n\n";
@@ -746,6 +762,10 @@ class ObjectUtils {
 
 }
 
+
+/**
+ * Object manipulation utilities.
+ */
 class ObjectManipulator {
 
 	/**

@@ -1,5 +1,5 @@
 /**
- * @author Kai Salmen / www.kaisalmen.de
+ * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
 import {
@@ -12,10 +12,15 @@ import {
 import { MaterialUtils } from "./MaterialUtils.js";
 
 /**
- * Store materials in an object and create and store default materials optionally.
+ * Helper class around an object storing materials by name.
+ * Optionally, create and store default materials.
  */
 class MaterialStore {
 
+	/**
+	 * Creates a new {@link MaterialStore}.
+	 * @param {boolean} createDefaultMaterials
+	 */
 	constructor( createDefaultMaterials ) {
 
 		this.materials = {};
@@ -46,8 +51,8 @@ class MaterialStore {
 	/**
 	 * Set materials loaded by any supplier of an Array of {@link Material}.
 	 *
-	 * @param newMaterials Object with named {@link Material}
-	 * @param forceOverrideExisting boolean Override existing material
+	 * @param {object<string, Material>} newMaterials Object with named {@link Material}
+	 * @param {boolean} forceOverrideExisting boolean Override existing material
 	 */
 	addMaterials ( newMaterials, forceOverrideExisting ) {
 

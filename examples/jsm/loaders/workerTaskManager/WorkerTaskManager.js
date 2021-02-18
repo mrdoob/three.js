@@ -1,6 +1,6 @@
 /**
- * @author Don McCurdy / https://www.donmccurdy.com
- * @author Kai Salmen / https://kaisalmen.de
+ * Development repository: https://github.com/kaisalmen/WWOBJLoader
+ * Proposed by Don McCurdy / https://www.donmccurdy.com
  */
 
 import { FileLoader } from "../../../../build/three.module.js";
