@@ -26,7 +26,6 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { ReflectorRTT } from './jsm/objects/ReflectorRTT.js';
-			import Stats from "./jsm/libs/stats.module.js";
 
 			import {
 				NodeFrame,
@@ -65,8 +64,7 @@
 
 			const frame = new NodeFrame();
 
-			let groundMirrorRenderTarget;
-			let stats;
+			let groundMirror;
 			let blurMirror;
 
 			function init() {
@@ -92,10 +90,8 @@
 				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
 				window.addEventListener( "resize", onWindowResize, false );
+				
 			}
 
 			function onWindowResize() {
@@ -105,8 +101,16 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				groundMirrorRenderTarget.setSize(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio);
-				blurMirror.size = new THREE.Vector2( window.innerWidth, window.innerHeight );
+
+				groundMirror.getRenderTarget().setSize(
+					window.innerWidth * window.devicePixelRatio,
+					window.innerHeight * window.devicePixelRatio
+				);
+
+				blurMirror.size.set(
+					window.innerWidth * window.devicePixelRatio,
+					window.innerHeight * window.devicePixelRatio
+				);
 				blurMirror.updateFrame()
 				
 			}
@@ -119,12 +123,11 @@
 
 				// reflector/mirror plane
 				geometry = new THREE.PlaneGeometry( 100, 100 );
-				const groundMirror = new ReflectorRTT( geometry, { 
+				groundMirror = new ReflectorRTT( geometry, {
 					clipBias: 0.003,
 					textureWidth: window.innerWidth * window.devicePixelRatio,
 					textureHeight: window.innerHeight * window.devicePixelRatio
 				} );
-				groundMirrorRenderTarget = groundMirror.getRenderTarget()
 
 				const mask = new SwitchNode( new TextureNode( decalDiffuse ), 'w' );
 
@@ -150,7 +153,10 @@
 				);
 
 				blurMirror = new BlurNode( mirror );
-				blurMirror.size = new THREE.Vector2( window.innerWidth, window.innerHeight );
+				blurMirror.size = new THREE.Vector2(
+					window.innerWidth * window.devicePixelRatio,
+					window.innerHeight * window.devicePixelRatio
+				);
 				blurMirror.uv = new ExpressionNode( "projCoord.xyz / projCoord.q", "vec3" );
 				blurMirror.uv.keywords[ "projCoord" ] = new OperatorNode( mirror.offset, mirror.uv, OperatorNode.ADD );
 				blurMirror.radius.x = blurMirror.radius.y = 0;
@@ -286,7 +292,6 @@
 
 				render();
 
-				stats.update();
 			}
 
 			init();
