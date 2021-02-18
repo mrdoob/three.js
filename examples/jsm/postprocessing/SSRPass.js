@@ -348,7 +348,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     if (this.encoding) this.beautyRenderTarget.texture.encoding = this.encoding
     renderer.setRenderTarget(this.beautyRenderTarget);
-    renderer.clear();
+		renderer.clear();
+		window.needReflector=true
     renderer.render(this.scene, this.camera);
 
     // render normals

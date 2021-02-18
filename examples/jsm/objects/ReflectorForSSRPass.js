@@ -91,6 +91,9 @@ var Reflector = function ( geometry, options ) {
 	this.material = material;
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
+		if (!window.needReflector) return;
+		window.needReflector=false
+		// console.log('onBeforeRender')
 
 		reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
