@@ -2,6 +2,7 @@ export * from './BoxGeometry.js';
 export * from './CircleGeometry.js';
 export * from './ConeGeometry.js';
 export * from './CylinderGeometry.js';
+export * from './CapsuleGeometry.js';
 export * from './DodecahedronGeometry.js';
 export * from './EdgesGeometry.js';
 export * from './ExtrudeGeometry.js';

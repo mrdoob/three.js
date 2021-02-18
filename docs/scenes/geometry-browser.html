@@ -34,6 +34,7 @@
 				ConeGeometry,
 				Curve,
 				CylinderGeometry,
+				CapsuleGeometry,
 				DodecahedronGeometry,
 				DoubleSide,
 				ExtrudeGeometry,
@@ -195,6 +196,49 @@
 					folder.add( data, 'radialSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
 					folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
 					folder.add( data, 'openEnded' ).onChange( generateGeometry );
+					folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
+					folder.add( data, 'thetaLength', 0, twoPi ).onChange( generateGeometry );
+
+
+					generateGeometry();
+
+				},
+				
+				CapsuleGeometry: function ( mesh ) {
+
+					const data = {
+						radius: 5,
+						height: 15,
+						radialSegments: 8,
+						heightSegments: 1,
+						capSegments: 4,
+						thetaStart: 0,
+						thetaLength: twoPi
+					};
+
+					function generateGeometry() {
+
+						updateGroupGeometry( mesh,
+							new CapsuleGeometry(
+								data.radius,
+								data.height,
+								data.radialSegments,
+								data.heightSegments,
+								data.capSegments,
+								data.thetaStart,
+								data.thetaLength
+							)
+						);
+
+					}
+
+					const folder = gui.addFolder( 'THREE.CapsuleGeometry' );
+
+					folder.add( data, 'radius', 0, 30 ).onChange( generateGeometry );
+					folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
+					folder.add( data, 'radialSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
+					folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
+					folder.add( data, 'capSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
 					folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
 					folder.add( data, 'thetaLength', 0, twoPi ).onChange( generateGeometry );
 
