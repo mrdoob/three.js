@@ -203,11 +203,11 @@ class Texture extends EventDispatcher {
 
 						if ( image[ i ].isDataTexture ) {
 
-							url.push( this.serializeImage( image[ i ].image ) );
+							url.push( serializeImage( image[ i ].image ) );
 
 						} else {
 
-							url.push( this.serializeImage( image[ i ] ) );
+							url.push( serializeImage( image[ i ] ) );
 
 						}
 
@@ -217,7 +217,7 @@ class Texture extends EventDispatcher {
 
 					// process single image
 
-					url = this.serializeImage( image );
+					url = serializeImage( image );
 
 				}
 
@@ -334,42 +334,42 @@ class Texture extends EventDispatcher {
 
 	}
 
-	serializeImage( image ) {
+}
 
-		if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
-      ( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
-      ( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
+Texture.prototype.isTexture = true;
 
-			// default images
+function serializeImage( image ) {
 
-			return ImageUtils.getDataURL( image );
+	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
+
+		// default images
+
+		return ImageUtils.getDataURL( image );
+
+	} else {
+
+		if ( image.data ) {
+
+			// images of DataTexture
+
+			return {
+				data: Array.prototype.slice.call( image.data ),
+				width: image.width,
+				height: image.height,
+				type: image.data.constructor.name
+			};
 
 		} else {
 
-			if ( image.data ) {
-
-				// images of DataTexture
-
-				return {
-					data: Array.prototype.slice.call( image.data ),
-					width: image.width,
-					height: image.height,
-					type: image.data.constructor.name
-				};
-
-			} else {
-
-				console.warn( 'THREE.Texture: Unable to serialize Texture.' );
-				return {};
-
-			}
+			console.warn( 'THREE.Texture: Unable to serialize Texture.' );
+			return {};
 
 		}
 
 	}
 
 }
-
-Texture.prototype.isTexture = true;
 
 export { Texture };
