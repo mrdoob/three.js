@@ -383,9 +383,9 @@ class AnimationClip {
 
 		return new this.constructor( this.name, this.duration, tracks, this.blendMode );
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		return AnimationClip.toJSON( this );
 
