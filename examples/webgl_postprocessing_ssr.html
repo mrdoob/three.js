@@ -35,7 +35,7 @@
 			enableSSR: true,
 			autoRotate: true,
 			isOtherMeshes: true,
-			isReflector: false,
+			isGroundReflector: true,
 		}
 		let composer
 		let ssrPass
@@ -46,8 +46,7 @@
 		let controls;
 		let camera, scene, renderer;
 		let otherMeshes = []
-		let reflector
-		let reflectorRenderTarget
+		let groundReflector
 		let selects=[]
 
 		const container = document.querySelector('#container');
@@ -135,18 +134,17 @@
 			}
 			{
 				const geometry = new THREE.PlaneBufferGeometry(8, 8);
-				reflector = new Reflector(geometry, {
+				groundReflector = new Reflector(geometry, {
 					clipBias: 0.003,
 					textureWidth: window.innerWidth,
 					textureHeight: window.innerHeight,
 					color: 0x888888,
 					useDepthTexture: true,
 				});
-				reflectorRenderTarget = reflector.getRenderTarget()
-				reflector.position.y = plane.position.y + .0001;
-				reflector.rotation.x = -Math.PI / 2
-				reflector.visible = params.isReflector
-				scene.add(reflector);
+				groundReflector.position.y = plane.position.y + .0001;
+				groundReflector.rotation.x = -Math.PI / 2
+				groundReflector.visible = params.isGroundReflector
+				scene.add(groundReflector);
 			}
 
 			// renderer
@@ -182,7 +180,7 @@
 				height: innerHeight,
 				encoding: THREE.sRGBEncoding,
 				isPerspectiveCamera: isPerspectiveCamera,
-				selects: params.isReflector ? selects : null,
+				selects: params.isGroundReflector ? selects : null,
 				// morphTargets: true,
 			});
 			// window.ssrPass = ssrPass
@@ -198,12 +196,12 @@
 			gui.add(ssrPass, 'isDistanceAttenuation');
 			ssrPass.maxDistance = .1
 			gui.add(ssrPass, 'maxDistance').min(0).max(1).step(.01);
-			gui.add(params, 'isReflector').onChange(() => {
-				if (params.isReflector) {
-					reflector.visible = true
+			gui.add(params, 'isGroundReflector').onChange(() => {
+				if (params.isGroundReflector) {
+					groundReflector.visible = true
 					ssrPass.selects = selects
 				} else {
-					reflector.visible = false
+					groundReflector.visible = false
 					ssrPass.selects = null
 				}
 			})
@@ -251,7 +249,7 @@
 
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			composer.setSize(window.innerWidth, window.innerHeight);
-			reflectorRenderTarget.setSize(window.innerWidth, window.innerHeight);
+			groundReflector.getRenderTarget().setSize(window.innerWidth, window.innerHeight);
 
 		}
 
@@ -279,8 +277,10 @@
 			}
 
 			if (params.enableSSR) {
+				groundReflector.needsUpdate = true;  // Just SSRPass's beautyRenderTarget (which rendered fisrt internally) need Reflector.
 				composer.render();
 			} else {
+				groundReflector.needsUpdate = true;
 				renderer.render(scene, camera)
 			}
 

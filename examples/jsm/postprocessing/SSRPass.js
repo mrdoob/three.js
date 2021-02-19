@@ -39,7 +39,7 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   this.output = 0;
 
   this.maxDistance = SSRShader.uniforms.maxDistance.value;
-  this.surfDist = SSRShader.uniforms.maxDistance.value;
+  this.surfDist = SSRShader.uniforms.surfDist.value;
 
 	this.encoding = encoding
 
@@ -349,7 +349,6 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     if (this.encoding) this.beautyRenderTarget.texture.encoding = this.encoding
     renderer.setRenderTarget(this.beautyRenderTarget);
 		renderer.clear();
-		window.needReflector=true
     renderer.render(this.scene, this.camera);
 
     // render normals

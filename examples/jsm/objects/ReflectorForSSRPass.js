@@ -36,6 +36,8 @@ var Reflector = function ( geometry, options ) {
 
 	//
 
+	scope.needsUpdate = false;
+
 	var reflectorPlane = new Plane();
 	var normal = new Vector3();
 	var reflectorWorldPosition = new Vector3();
@@ -91,8 +93,8 @@ var Reflector = function ( geometry, options ) {
 	this.material = material;
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
-		if (!window.needReflector) return;
-		window.needReflector=false
+		if ( !scope.needsUpdate ) return;
+		scope.needsUpdate = false;
 		// console.log('onBeforeRender')
 
 		reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
