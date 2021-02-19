@@ -1,11 +1,6 @@
-/**
- * @author bhouston / http://exocortex.com/
- * @author zz85 / http://github.com/zz85
- */
-
 import {
 	MathUtils
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var ColorConverter = {
 

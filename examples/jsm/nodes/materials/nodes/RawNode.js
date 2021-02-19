@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { Node } from '../../core/Node.js';
 
 function RawNode( value ) {
@@ -14,7 +10,7 @@ function RawNode( value ) {
 
 RawNode.prototype = Object.create( Node.prototype );
 RawNode.prototype.constructor = RawNode;
-RawNode.prototype.nodeType = "Raw";
+RawNode.prototype.nodeType = 'Raw';
 
 RawNode.prototype.generate = function ( builder ) {
 

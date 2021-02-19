@@ -1,6 +1,14 @@
+import {
+	BufferGeometry,
+	DynamicDrawUsage,
+	Float32BufferAttribute,
+	MathUtils,
+	Uint32BufferAttribute,
+	Vector3
+} from '../../../build/three.module.js';
+import { SimplexNoise } from '../math/SimplexNoise.js';
+
 /**
- * @author yomboprime https://github.com/yomboprime
- *
  * @fileoverview LightningStrike object for creating lightning strikes and voltaic arcs.
  *
  *
@@ -100,16 +108,6 @@
  *
  *
 */
-
-import {
-	BufferGeometry,
-	DynamicDrawUsage,
-	Float32BufferAttribute,
-	MathUtils,
-	Uint32BufferAttribute,
-	Vector3
-} from "../../../build/three.module.js";
-import { SimplexNoise } from "../math/SimplexNoise.js";
 
 var LightningStrike = function ( rayParameters ) {
 

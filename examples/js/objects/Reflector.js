@@ -1,8 +1,3 @@
-console.warn( "THREE.Reflector: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
-/**
- * @author Slayvin / http://slayvin.net
- */
-
 THREE.Reflector = function ( geometry, options ) {
 
 	THREE.Mesh.call( this, geometry );
@@ -18,7 +13,6 @@ THREE.Reflector = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || THREE.Reflector.ReflectorShader;
-	var encoding = options.encoding !== undefined ? options.encoding : THREE.LinearEncoding;
 
 	//
 
@@ -40,9 +34,7 @@ THREE.Reflector = function ( geometry, options ) {
 	var parameters = {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
-		format: THREE.RGBFormat,
-		stencilBuffer: false,
-		encoding: encoding
+		format: THREE.RGBFormat
 	};
 
 	var renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
@@ -59,9 +51,9 @@ THREE.Reflector = function ( geometry, options ) {
 		vertexShader: shader.vertexShader
 	} );
 
-	material.uniforms[ "tDiffuse" ].value = renderTarget.texture;
-	material.uniforms[ "color" ].value = color;
-	material.uniforms[ "textureMatrix" ].value = textureMatrix;
+	material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
+	material.uniforms[ 'color' ].value = color;
+	material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 
 	this.material = material;
 
@@ -140,6 +132,8 @@ THREE.Reflector = function ( geometry, options ) {
 		projectionMatrix.elements[ 14 ] = clipPlane.w;
 
 		// Render
+
+		renderTarget.texture.encoding = renderer.outputEncoding;
 
 		scope.visible = false;
 

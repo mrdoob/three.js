@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { NodeLib } from '../core/NodeLib.js';
 
@@ -19,7 +15,7 @@ NormalNode.VIEW = 'view';
 
 NormalNode.prototype = Object.create( TempNode.prototype );
 NormalNode.prototype.constructor = NormalNode;
-NormalNode.prototype.nodeType = "Normal";
+NormalNode.prototype.nodeType = 'Normal';
 
 NormalNode.prototype.getShared = function () {
 

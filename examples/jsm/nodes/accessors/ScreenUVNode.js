@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { ResolutionNode } from './ResolutionNode.js';
 
@@ -15,7 +11,7 @@ function ScreenUVNode( resolution ) {
 
 ScreenUVNode.prototype = Object.create( TempNode.prototype );
 ScreenUVNode.prototype.constructor = ScreenUVNode;
-ScreenUVNode.prototype.nodeType = "ScreenUV";
+ScreenUVNode.prototype.nodeType = 'ScreenUV';
 
 ScreenUVNode.prototype.generate = function ( builder, output ) {
 
@@ -27,7 +23,7 @@ ScreenUVNode.prototype.generate = function ( builder, output ) {
 
 	} else {
 
-		console.warn( "THREE.ScreenUVNode is not compatible with " + builder.shader + " shader." );
+		console.warn( 'THREE.ScreenUVNode is not compatible with ' + builder.shader + ' shader.' );
 
 		result = 'vec2( 0.0 )';
 
@@ -64,4 +60,3 @@ ScreenUVNode.prototype.toJSON = function ( meta ) {
 };
 
 export { ScreenUVNode };
-

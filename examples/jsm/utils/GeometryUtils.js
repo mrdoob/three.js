@@ -1,21 +1,13 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- */
-
 import {
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var GeometryUtils = {
 
 	/**
 	 * Generates 2D-Coordinates in a very fast way.
 	 *
-	 * @author Dylan Grafmyre
-	 *
 	 * Based on work by:
-	 * @author Thomas Diewald
 	 * @link http://www.openprocessing.org/sketch/15493
 	 *
 	 * @param center     Center of Hilbert curve.
@@ -76,10 +68,7 @@ var GeometryUtils = {
 	/**
 	 * Generates 3D-Coordinates in a very fast way.
 	 *
-	 * @author Dylan Grafmyre
-	 *
 	 * Based on work by:
-	 * @author Thomas Diewald
 	 * @link http://www.openprocessing.org/visuals/?visualID=15599
 	 *
 	 * @param center     Center of Hilbert curve.
@@ -154,6 +143,104 @@ var GeometryUtils = {
 
 		// Return complete Hilbert Curve.
 		return vec;
+
+	},
+
+	/**
+	 * Generates a Gosper curve (lying in the XY plane)
+	 *
+	 * https://gist.github.com/nitaku/6521802
+	 *
+	 * @param size The size of a single gosper island.
+	 */
+	gosper: function ( size ) {
+
+		size = ( size !== undefined ) ? size : 1;
+
+		function fractalize( config ) {
+
+			var output;
+			var input = config.axiom;
+
+			for ( var i = 0, il = config.steps; 0 <= il ? i < il : i > il; 0 <= il ? i ++ : i -- ) {
+
+				output = '';
+
+				for ( var j = 0, jl = input.length; j < jl; j ++ ) {
+
+					var char = input[ j ];
+
+					if ( char in config.rules ) {
+
+						output += config.rules[ char ];
+
+					} else {
+
+						output += char;
+
+					}
+
+				}
+
+				input = output;
+
+			}
+
+			return output;
+
+		}
+
+		function toPoints( config ) {
+
+			var currX = 0, currY = 0;
+			var angle = 0;
+			var path = [ 0, 0, 0 ];
+			var fractal = config.fractal;
+
+			for ( var i = 0, l = fractal.length; i < l; i ++ ) {
+
+				var char = fractal[ i ];
+
+				if ( char === '+' ) {
+
+					angle += config.angle;
+
+				} else if ( char === '-' ) {
+
+					angle -= config.angle;
+
+				} else if ( char === 'F' ) {
+
+					currX += config.size * Math.cos( angle );
+					currY += - config.size * Math.sin( angle );
+					path.push( currX, currY, 0 );
+
+				}
+
+			}
+
+			return path;
+
+		}
+
+		//
+
+		var gosper = fractalize( {
+			axiom: 'A',
+			steps: 4,
+			rules: {
+				A: 'A+BF++BF-FA--FAFA-BF+',
+				B: '-FA+BFBF++BF+FA--FA-B'
+			}
+		} );
+
+		var points = toPoints( {
+			fractal: gosper,
+			size: size,
+			angle: Math.PI / 3 // 60 degrees
+		} );
+
+		return points;
 
 	}
 

@@ -1,13 +1,9 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import {
 	DefaultLoadingManager,
 	FileLoader
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
-import * as Nodes from "../nodes/Nodes.js";
+import * as Nodes from '../nodes/Nodes.js';
 
 var NodeMaterialLoader = function ( manager, library ) {
 
@@ -27,9 +23,9 @@ var NodeMaterialLoaderUtils = {
 
 		recursive = recursive !== undefined ? recursive : true;
 
-		if ( typeof uuid === "object" ) uuid = uuid.uuid;
+		if ( typeof uuid === 'object' ) uuid = uuid.uuid;
 
-		if ( typeof object === "object" ) {
+		if ( typeof object === 'object' ) {
 
 			var keys = Object.keys( object );
 
@@ -120,7 +116,7 @@ Object.assign( NodeMaterialLoader.prototype, {
 
 		if ( ! object ) {
 
-			console.warn( "Node \"" + uuid + "\" not found." );
+			console.warn( 'Node "' + uuid + '" not found.' );
 
 		}
 
@@ -132,12 +128,12 @@ Object.assign( NodeMaterialLoader.prototype, {
 
 		switch ( typeof json ) {
 
-			case "boolean":
-			case "number":
+			case 'boolean':
+			case 'number':
 
 				return json;
 
-			case "string":
+			case 'string':
 
 				if ( /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/i.test( json ) || this.library[ json ] ) {
 
@@ -161,7 +157,7 @@ Object.assign( NodeMaterialLoader.prototype, {
 
 					for ( var prop in json ) {
 
-						if ( prop === "uuid" ) continue;
+						if ( prop === 'uuid' ) continue;
 
 						json[ prop ] = this.resolve( json[ prop ] );
 
@@ -183,7 +179,7 @@ Object.assign( NodeMaterialLoader.prototype, {
 
 			node = json.nodes[ uuid ];
 
-			object = new Nodes[ node.nodeType + "Node" ]();
+			object = new Nodes[ node.nodeType + 'Node' ]();
 
 			if ( node.name ) {
 

@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { Node } from './Node.js';
 
 function VarNode( type, value ) {
@@ -14,7 +10,7 @@ function VarNode( type, value ) {
 
 VarNode.prototype = Object.create( Node.prototype );
 VarNode.prototype.constructor = VarNode;
-VarNode.prototype.nodeType = "Var";
+VarNode.prototype.nodeType = 'Var';
 
 VarNode.prototype.getType = function ( builder ) {
 

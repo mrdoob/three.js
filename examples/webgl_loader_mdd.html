@@ -18,7 +18,7 @@
 
 			import { MDDLoader } from './jsm/loaders/MDDLoader.js';
 
-			var camera, scene, renderer, mixer, clock;
+			let camera, scene, renderer, mixer, clock;
 
 			init();
 
@@ -34,19 +34,19 @@
 
 				//
 
-				var loader = new MDDLoader();
+				const loader = new MDDLoader();
 				loader.load( 'models/mdd/cube.mdd', function ( result ) {
 
 					const morphTargets = result.morphTargets;
 					const clip = result.clip;
 					// clip.optimize(); // optional
 
-					var geometry = new THREE.BoxBufferGeometry();
+					const geometry = new THREE.BoxGeometry();
 					geometry.morphAttributes.position = morphTargets; // apply morph targets
 
-					var material = new THREE.MeshNormalMaterial( { morphTargets: true } );
+					const material = new THREE.MeshNormalMaterial( { morphTargets: true } );
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 					scene.add( mesh );
 
 					mixer = new THREE.AnimationMixer( mesh );
@@ -63,7 +63,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -80,7 +80,7 @@
 
 				requestAnimationFrame( animate );
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 

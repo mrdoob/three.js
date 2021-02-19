@@ -1,6 +1,18 @@
+import {
+	DoubleSide,
+	LinearFilter,
+	Mesh,
+	MeshBasicMaterial,
+	OrthographicCamera,
+	PlaneGeometry,
+	Scene,
+	ShaderMaterial,
+	Texture,
+	UniformsUtils
+} from '../../../build/three.module.js';
+import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader.js';
+
 /**
- * @author arya-s / https://github.com/arya-s
- *
  * This is a helper for visualising a given light's shadow map.
  * It works for shadow casting lights: DirectionalLight and SpotLight.
  * It renders out the shadow map and displays it on a HUD.
@@ -26,20 +38,6 @@
  *
  *	6) If you set the position or size members directly, you need to call shadowMapViewer.update();
  */
-
-import {
-	DoubleSide,
-	LinearFilter,
-	Mesh,
-	MeshBasicMaterial,
-	OrthographicCamera,
-	PlaneBufferGeometry,
-	Scene,
-	ShaderMaterial,
-	Texture,
-	UniformsUtils
-} from "../../../build/three.module.js";
-import { UnpackDepthRGBAShader } from "../shaders/UnpackDepthRGBAShader.js";
 
 var ShadowMapViewer = function ( light ) {
 
@@ -69,7 +67,7 @@ var ShadowMapViewer = function ( light ) {
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader
 	} );
-	var plane = new PlaneBufferGeometry( frame.width, frame.height );
+	var plane = new PlaneGeometry( frame.width, frame.height );
 	var mesh = new Mesh( plane, material );
 
 	scene.add( mesh );
@@ -101,7 +99,7 @@ var ShadowMapViewer = function ( light ) {
 		var labelMaterial = new MeshBasicMaterial( { map: labelTexture, side: DoubleSide } );
 		labelMaterial.transparent = true;
 
-		var labelPlane = new PlaneBufferGeometry( labelCanvas.width, labelCanvas.height );
+		var labelPlane = new PlaneGeometry( labelCanvas.width, labelCanvas.height );
 		labelMesh = new Mesh( labelPlane, labelMaterial );
 
 		scene.add( labelMesh );

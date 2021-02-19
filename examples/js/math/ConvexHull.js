@@ -1,9 +1,5 @@
-console.warn( "THREE.ConvexHull: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
- * @author Mugen87 / https://github.com/Mugen87
- *
  * Ported from: https://github.com/maurizzzio/quickhull3d/ by Mauricio Poppe (https://github.com/maurizzzio)
- *
  */
 
 THREE.ConvexHull = ( function () {
@@ -83,16 +79,8 @@ THREE.ConvexHull = ( function () {
 
 					if ( geometry.isGeometry ) {
 
-						var vertices = geometry.vertices;
-
-						for ( i = 0, l = vertices.length; i < l; i ++ ) {
-
-							point = vertices[ i ].clone();
-							point.applyMatrix4( node.matrixWorld );
-
-							points.push( point );
-
-						}
+						console.error( 'THREE.ConvexHull no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
+						return;
 
 					} else if ( geometry.isBufferGeometry ) {
 

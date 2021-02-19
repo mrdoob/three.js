@@ -21,11 +21,11 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Water } from './jsm/objects/Water2.js';
 
-			var scene, camera, clock, renderer, water;
+			let scene, camera, clock, renderer, water;
 
-			var torusKnot;
+			let torusKnot;
 
-			var params = {
+			const params = {
 				color: '#ffffff',
 				scale: 4,
 				flowX: 1,
@@ -53,8 +53,8 @@
 
 				// mesh
 
-				var torusKnotGeometry = new THREE.TorusKnotBufferGeometry( 3, 1, 256, 32 );
-				var torusKnotMaterial = new THREE.MeshNormalMaterial();
+				const torusKnotGeometry = new THREE.TorusKnotGeometry( 3, 1, 256, 32 );
+				const torusKnotMaterial = new THREE.MeshNormalMaterial();
 
 				torusKnot = new THREE.Mesh( torusKnotGeometry, torusKnotMaterial );
 				torusKnot.position.y = 4;
@@ -63,13 +63,13 @@
 
 				// ground
 
-				var groundGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
-				var groundMaterial = new THREE.MeshStandardMaterial( { roughness: 0.8, metalness: 0.4 } );
-				var ground = new THREE.Mesh( groundGeometry, groundMaterial );
+				const groundGeometry = new THREE.PlaneGeometry( 20, 20 );
+				const groundMaterial = new THREE.MeshStandardMaterial( { roughness: 0.8, metalness: 0.4 } );
+				const ground = new THREE.Mesh( groundGeometry, groundMaterial );
 				ground.rotation.x = Math.PI * - 0.5;
 				scene.add( ground );
 
-				var textureLoader = new THREE.TextureLoader();
+				const textureLoader = new THREE.TextureLoader();
 				textureLoader.load( 'textures/hardwood2_diffuse.jpg', function ( map ) {
 
 					map.wrapS = THREE.RepeatWrapping;
@@ -83,7 +83,7 @@
 
 				// water
 
-				var waterGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+				const waterGeometry = new THREE.PlaneGeometry( 20, 20 );
 
 				water = new Water( waterGeometry, {
 					color: params.color,
@@ -99,10 +99,10 @@
 
 				// skybox
 
-				var cubeTextureLoader = new THREE.CubeTextureLoader();
+				const cubeTextureLoader = new THREE.CubeTextureLoader();
 				cubeTextureLoader.setPath( 'textures/cube/Park2/' );
 
-				var cubeTexture = cubeTextureLoader.load( [
+				const cubeTexture = cubeTextureLoader.load( [
 					"posx.jpg", "negx.jpg",
 					"posy.jpg", "negy.jpg",
 					"posz.jpg", "negz.jpg"
@@ -112,10 +112,10 @@
 
 				// light
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
 				directionalLight.position.set( - 1, 1, 1 );
 				scene.add( directionalLight );
 
@@ -128,7 +128,7 @@
 
 				// dat.gui
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.addColor( params, 'color' ).onChange( function ( value ) {
 
@@ -157,17 +157,17 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 5;
 				controls.maxDistance = 50;
 
 				//
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -185,7 +185,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				torusKnot.rotation.x += delta;
 				torusKnot.rotation.y += delta * 0.5;

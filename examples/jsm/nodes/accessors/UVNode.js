@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { NodeLib } from '../core/NodeLib.js';
 
@@ -15,7 +11,7 @@ function UVNode( index ) {
 
 UVNode.prototype = Object.create( TempNode.prototype );
 UVNode.prototype.constructor = UVNode;
-UVNode.prototype.nodeType = "UV";
+UVNode.prototype.nodeType = 'UV';
 
 UVNode.prototype.generate = function ( builder, output ) {
 

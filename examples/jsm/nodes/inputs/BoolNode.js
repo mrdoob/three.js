@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { InputNode } from '../core/InputNode.js';
 
 function BoolNode( value ) {
@@ -14,7 +10,7 @@ function BoolNode( value ) {
 
 BoolNode.prototype = Object.create( InputNode.prototype );
 BoolNode.prototype.constructor = BoolNode;
-BoolNode.prototype.nodeType = "Bool";
+BoolNode.prototype.nodeType = 'Bool';
 
 BoolNode.prototype.generateReadonly = function ( builder, output, uuid, type/*, ns, needsUpdate */ ) {
 

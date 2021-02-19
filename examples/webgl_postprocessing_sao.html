@@ -23,10 +23,10 @@
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 			import { SAOPass } from './jsm/postprocessing/SAOPass.js';
 
-			var container, stats;
-			var camera, scene, renderer;
-			var composer, renderPass, saoPass;
-			var group;
+			let container, stats;
+			let camera, scene, renderer;
+			let composer, renderPass, saoPass;
+			let group;
 
 			init();
 			animate();
@@ -36,9 +36,9 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var width = window.innerWidth || 1;
-				var height = window.innerHeight || 1;
-				var devicePixelRatio = window.devicePixelRatio || 1;
+				const width = window.innerWidth || 1;
+				const height = window.innerHeight || 1;
+				const devicePixelRatio = window.devicePixelRatio || 1;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0x000000 );
@@ -54,37 +54,37 @@
 				group = new THREE.Object3D();
 				scene.add( group );
 
-				var light = new THREE.PointLight( 0xddffdd, 0.8 );
+				const light = new THREE.PointLight( 0xddffdd, 0.8 );
 				light.position.z = 70;
 				light.position.y = - 70;
 				light.position.x = - 70;
 				scene.add( light );
 
-				var light2 = new THREE.PointLight( 0xffdddd, 0.8 );
+				const light2 = new THREE.PointLight( 0xffdddd, 0.8 );
 				light2.position.z = 70;
 				light2.position.x = - 70;
 				light2.position.y = 70;
 				scene.add( light2 );
 
-				var light3 = new THREE.PointLight( 0xddddff, 0.8 );
+				const light3 = new THREE.PointLight( 0xddddff, 0.8 );
 				light3.position.z = 70;
 				light3.position.x = 70;
 				light3.position.y = - 70;
 				scene.add( light3 );
 
-				var light3 = new THREE.AmbientLight( 0xffffff, 0.05 );
-				scene.add( light3 );
+				const light4 = new THREE.AmbientLight( 0xffffff, 0.05 );
+				scene.add( light4 );
 
-				var geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
+				const geometry = new THREE.SphereGeometry( 3, 48, 24 );
 
-				for ( var i = 0; i < 120; i ++ ) {
+				for ( let i = 0; i < 120; i ++ ) {
 
-					var material = new THREE.MeshStandardMaterial();
+					const material = new THREE.MeshStandardMaterial();
 					material.roughness = 0.5 * Math.random() + 0.25;
 					material.metalness = 0;
 					material.color.setHSL( Math.random(), 1.0, 0.3 );
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 4 - 2;
 					mesh.position.y = Math.random() * 4 - 2;
 					mesh.position.z = Math.random() * 4 - 2;
@@ -107,7 +107,7 @@
 				composer.addPass( saoPass );
 
 				// Init gui
-				var gui = new GUI();
+				const gui = new GUI();
 				gui.add( saoPass.params, 'output', {
 					'Beauty': SAOPass.OUTPUT.Beauty,
 					'Beauty+SAO': SAOPass.OUTPUT.Default,
@@ -129,14 +129,14 @@
 				gui.add( saoPass.params, 'saoBlurStdDev', 0.5, 150 );
 				gui.add( saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1 );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function onWindowResize() {
 
-				var width = window.innerWidth || 1;
-				var height = window.innerHeight || 1;
+				const width = window.innerWidth || 1;
+				const height = window.innerHeight || 1;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -159,7 +159,7 @@
 
 			function render() {
 
-				var timer = performance.now();
+				const timer = performance.now();
 				group.rotation.x = timer * 0.0002;
 				group.rotation.y = timer * 0.0001;
 

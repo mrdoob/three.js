@@ -1,15 +1,13 @@
+import {
+	CompressedTextureLoader
+} from '../../../build/three.module.js';
+
 /**
- * @author amakaseev / https://github.com/amakaseev
- *
  * for description see https://www.khronos.org/opengles/sdk/tools/KTX/
  * for file layout see https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/
  *
  * ported from https://github.com/BabylonJS/Babylon.js/blob/master/src/Tools/babylon.khronosTextureContainer.ts
  */
-
-import {
-	CompressedTextureLoader
-} from "../../../build/three.module.js";
 
 
 var KTXLoader = function ( manager ) {
@@ -152,7 +150,7 @@ var KhronosTextureContainer = ( function () {
 
 				var byteArray = new Uint8Array( this.arrayBuffer, dataOffset, imageSize );
 
-				mipmaps.push( { "data": byteArray, "width": width, "height": height } );
+				mipmaps.push( { 'data': byteArray, 'width': width, 'height': height } );
 
 				dataOffset += imageSize;
 				dataOffset += 3 - ( ( imageSize + 3 ) % 4 ); // add padding for odd sized image

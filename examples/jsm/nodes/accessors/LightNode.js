@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 
 function LightNode( scope ) {
@@ -16,7 +12,7 @@ LightNode.TOTAL = 'total';
 
 LightNode.prototype = Object.create( TempNode.prototype );
 LightNode.prototype.constructor = LightNode;
-LightNode.prototype.nodeType = "Light";
+LightNode.prototype.nodeType = 'Light';
 
 LightNode.prototype.generate = function ( builder, output ) {
 
@@ -26,7 +22,7 @@ LightNode.prototype.generate = function ( builder, output ) {
 
 	} else {
 
-		console.warn( "THREE.LightNode is only compatible in \"light\" channel." );
+		console.warn( 'THREE.LightNode is only compatible in "light" channel.' );
 
 		return builder.format( 'vec3( 0.0 )', this.type, output );
 

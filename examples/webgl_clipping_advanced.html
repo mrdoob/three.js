@@ -22,12 +22,12 @@
 				// creates a clipping volume from a convex triangular mesh
 				// specified by the arrays 'vertices' and 'indices'
 
-				var n = indices.length / 3,
+				const n = indices.length / 3,
 					result = new Array( n );
 
-				for ( var i = 0, j = 0; i < n; ++ i, j += 3 ) {
+				for ( let i = 0, j = 0; i < n; ++ i, j += 3 ) {
 
-					var a = vertices[ indices[ j ] ],
+					const a = vertices[ indices[ j ] ],
 						b = vertices[ indices[ j + 1 ] ],
 						c = vertices[ indices[ j + 2 ] ];
 
@@ -44,9 +44,9 @@
 
 				// creates an array of n uninitialized plane objects
 
-				var result = new Array( n );
+				const result = new Array( n );
 
-				for ( var i = 0; i !== n; ++ i )
+				for ( let i = 0; i !== n; ++ i )
 					result[ i ] = new THREE.Plane();
 
 				return result;
@@ -57,18 +57,18 @@
 
 				// sets an array of existing planes to transformed 'planesIn'
 
-				for ( var i = 0, n = planesIn.length; i !== n; ++ i )
+				for ( let i = 0, n = planesIn.length; i !== n; ++ i )
 					planesOut[ i ].copy( planesIn[ i ] ).applyMatrix4( matrix );
 
 			}
 
 			function cylindricalPlanes( n, innerRadius ) {
 
-				var result = createPlanes( n );
+				const result = createPlanes( n );
 
-				for ( var i = 0; i !== n; ++ i ) {
+				for ( let i = 0; i !== n; ++ i ) {
 
-					var plane = result[ i ],
+					const plane = result[ i ],
 						angle = i * Math.PI * 2 / n;
 
 					plane.normal.set(
@@ -82,18 +82,18 @@
 
 			}
 
-			var planeToMatrix = ( function () {
+			const planeToMatrix = ( function () {
 
 				// creates a matrix that aligns X/Y to a given plane
 
 				// temporaries:
-				var xAxis = new THREE.Vector3(),
+				const xAxis = new THREE.Vector3(),
 					yAxis = new THREE.Vector3(),
 					trans = new THREE.Vector3();
 
 				return function planeToMatrix( plane ) {
 
-					var zAxis = plane.normal,
+					const zAxis = plane.normal,
 						matrix = new THREE.Matrix4();
 
 					// Hughes & Moeller '99
@@ -125,7 +125,7 @@
 
 			// A regular tetrahedron for the clipping volume:
 
-			var Vertices = [
+			const Vertices = [
 					new THREE.Vector3( + 1, 0, + Math.SQRT1_2 ),
 					new THREE.Vector3( - 1, 0, + Math.SQRT1_2 ),
 					new THREE.Vector3( 0, + 1, - Math.SQRT1_2 ),
@@ -144,7 +144,7 @@
 				Empty = Object.freeze( [] );
 
 
-			var camera, scene, renderer, startTime, stats,
+			let camera, scene, renderer, startTime, stats,
 
 				object, clipMaterial,
 				volumeVisualization,
@@ -163,7 +163,7 @@
 
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.3 ) );
 
-				var spotLight = new THREE.SpotLight( 0xffffff, 0.5 );
+				const spotLight = new THREE.SpotLight( 0xffffff, 0.5 );
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.2;
 				spotLight.position.set( 2, 3, 3 );
@@ -174,7 +174,7 @@
 				spotLight.shadow.mapSize.height = 1024;
 				scene.add( spotLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				dirLight.position.set( 0, 2, 0 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 1;
@@ -202,13 +202,13 @@
 
 				object = new THREE.Group();
 
-				var geometry = new THREE.BoxBufferGeometry( 0.18, 0.18, 0.18 );
+				const geometry = new THREE.BoxGeometry( 0.18, 0.18, 0.18 );
 
-				for ( var z = - 2; z <= 2; ++ z )
-					for ( var y = - 2; y <= 2; ++ y )
-						for ( var x = - 2; x <= 2; ++ x ) {
+				for ( let z = - 2; z <= 2; ++ z )
+					for ( let y = - 2; y <= 2; ++ y )
+						for ( let x = - 2; x <= 2; ++ x ) {
 
-							var mesh = new THREE.Mesh( geometry, clipMaterial );
+							const mesh = new THREE.Mesh( geometry, clipMaterial );
 							mesh.position.set( x / 5, y / 5, z / 5 );
 							mesh.castShadow = true;
 							object.add( mesh );
@@ -218,17 +218,16 @@
 				scene.add( object );
 
 
-				var planeGeometry =
-						new THREE.PlaneBufferGeometry( 3, 3, 1, 1 ),
+				const planeGeometry = new THREE.PlaneGeometry( 3, 3, 1, 1 ),
 
 					color = new THREE.Color();
 
 				volumeVisualization = new THREE.Group();
 				volumeVisualization.visible = false;
 
-				for ( var i = 0, n = Planes.length; i !== n; ++ i ) {
+				for ( let i = 0, n = Planes.length; i !== n; ++ i ) {
 
-					var material = new THREE.MeshBasicMaterial( {
+					const material = new THREE.MeshBasicMaterial( {
 						color: color.setHSL( i / n, 0.5, 0.5 ).getHex(),
 						side: THREE.DoubleSide,
 
@@ -249,7 +248,7 @@
 
 					} );
 
-					var mesh = new THREE.Mesh( planeGeometry, material );
+					const mesh = new THREE.Mesh( planeGeometry, material );
 					mesh.matrixAutoUpdate = false;
 
 					volumeVisualization.add( mesh );
@@ -259,7 +258,7 @@
 				scene.add( volumeVisualization );
 
 
-				var ground = new THREE.Mesh( planeGeometry,
+				const ground = new THREE.Mesh( planeGeometry,
 					new THREE.MeshPhongMaterial( {
 						color: 0xa0adaf, shininess: 10 } ) );
 				ground.rotation.x = - Math.PI / 2;
@@ -269,13 +268,13 @@
 
 				// Renderer
 
-				var container = document.body;
+				const container = document.body;
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 				container.appendChild( renderer.domElement );
 				// Clipping setup:
 				globalClippingPlanes = createPlanes( GlobalClippingPlanes.length );
@@ -289,7 +288,7 @@
 
 				// Controls
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
 				controls.maxDistance = 8;
 				controls.target.set( 0, 1, 0 );
@@ -297,7 +296,7 @@
 
 				// GUI
 
-				var gui = new GUI(),
+				const gui = new GUI(),
 					folder = gui.addFolder( "Local Clipping" ),
 					props = {
 						get 'Enabled'() {
@@ -375,19 +374,19 @@
 
 				// set the orientation of an object based on a world matrix
 
-				var parent = object.parent;
+				const parent = object.parent;
 				scene.updateMatrixWorld();
-				object.matrix.getInverse( parent.matrixWorld );
+				object.matrix.copy( parent.matrixWorld ).invert();
 				object.applyMatrix4( matrix );
 
 			}
 
-			var transform = new THREE.Matrix4(),
+			const transform = new THREE.Matrix4(),
 				tmpMatrix = new THREE.Matrix4();
 
 			function animate() {
 
-				var currentTime = Date.now(),
+				const currentTime = Date.now(),
 					time = ( currentTime - startTime ) / 1000;
 
 				requestAnimationFrame( animate );
@@ -399,16 +398,16 @@
 				object.updateMatrix();
 				transform.copy( object.matrix );
 
-				var bouncy = Math.cos( time * .5 ) * 0.5 + 0.7;
+				const bouncy = Math.cos( time * .5 ) * 0.5 + 0.7;
 				transform.multiply(
 					tmpMatrix.makeScale( bouncy, bouncy, bouncy ) );
 
 				assignTransformedPlanes(
 					clipMaterial.clippingPlanes, Planes, transform );
 
-				var planeMeshes = volumeVisualization.children;
+				const planeMeshes = volumeVisualization.children;
 
-				for ( var i = 0, n = planeMeshes.length; i !== n; ++ i ) {
+				for ( let i = 0, n = planeMeshes.length; i !== n; ++ i ) {
 
 					tmpMatrix.multiplyMatrices( transform, PlaneMatrices[ i ] );
 					setObjectWorldMatrix( planeMeshes[ i ], tmpMatrix );
@@ -417,8 +416,7 @@
 
 				transform.makeRotationY( time * 0.1 );
 
-				assignTransformedPlanes(
-					globalClippingPlanes, GlobalClippingPlanes, transform );
+				assignTransformedPlanes( globalClippingPlanes, GlobalClippingPlanes, transform );
 
 				stats.begin();
 				renderer.render( scene, camera );

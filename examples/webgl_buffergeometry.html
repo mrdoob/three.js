@@ -17,11 +17,11 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var mesh;
+			let mesh;
 
 			init();
 			animate();
@@ -43,55 +43,55 @@
 
 				scene.add( new THREE.AmbientLight( 0x444444 ) );
 
-				var light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				const light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				light1.position.set( 1, 1, 1 );
 				scene.add( light1 );
 
-				var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				const light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light2.position.set( 0, - 1, 0 );
 				scene.add( light2 );
 
 				//
 
-				var triangles = 160000;
+				const triangles = 160000;
 
-				var geometry = new THREE.BufferGeometry();
+				const geometry = new THREE.BufferGeometry();
 
-				var positions = [];
-				var normals = [];
-				var colors = [];
+				const positions = [];
+				const normals = [];
+				const colors = [];
 
-				var color = new THREE.Color();
+				const color = new THREE.Color();
 
-				var n = 800, n2 = n / 2;	// triangles spread in the cube
-				var d = 12, d2 = d / 2;	// individual triangle size
+				const n = 800, n2 = n / 2;	// triangles spread in the cube
+				const d = 12, d2 = d / 2;	// individual triangle size
 
-				var pA = new THREE.Vector3();
-				var pB = new THREE.Vector3();
-				var pC = new THREE.Vector3();
+				const pA = new THREE.Vector3();
+				const pB = new THREE.Vector3();
+				const pC = new THREE.Vector3();
 
-				var cb = new THREE.Vector3();
-				var ab = new THREE.Vector3();
+				const cb = new THREE.Vector3();
+				const ab = new THREE.Vector3();
 
-				for ( var i = 0; i < triangles; i ++ ) {
+				for ( let i = 0; i < triangles; i ++ ) {
 
 					// positions
 
-					var x = Math.random() * n - n2;
-					var y = Math.random() * n - n2;
-					var z = Math.random() * n - n2;
+					const x = Math.random() * n - n2;
+					const y = Math.random() * n - n2;
+					const z = Math.random() * n - n2;
 
-					var ax = x + Math.random() * d - d2;
-					var ay = y + Math.random() * d - d2;
-					var az = z + Math.random() * d - d2;
+					const ax = x + Math.random() * d - d2;
+					const ay = y + Math.random() * d - d2;
+					const az = z + Math.random() * d - d2;
 
-					var bx = x + Math.random() * d - d2;
-					var by = y + Math.random() * d - d2;
-					var bz = z + Math.random() * d - d2;
+					const bx = x + Math.random() * d - d2;
+					const by = y + Math.random() * d - d2;
+					const bz = z + Math.random() * d - d2;
 
-					var cx = x + Math.random() * d - d2;
-					var cy = y + Math.random() * d - d2;
-					var cz = z + Math.random() * d - d2;
+					const cx = x + Math.random() * d - d2;
+					const cy = y + Math.random() * d - d2;
+					const cz = z + Math.random() * d - d2;
 
 					positions.push( ax, ay, az );
 					positions.push( bx, by, bz );
@@ -109,9 +109,9 @@
 
 					cb.normalize();
 
-					var nx = cb.x;
-					var ny = cb.y;
-					var nz = cb.z;
+					const nx = cb.x;
+					const ny = cb.y;
+					const nz = cb.z;
 
 					normals.push( nx, ny, nz );
 					normals.push( nx, ny, nz );
@@ -119,9 +119,9 @@
 
 					// colors
 
-					var vx = ( x / n ) + 0.5;
-					var vy = ( y / n ) + 0.5;
-					var vz = ( z / n ) + 0.5;
+					const vx = ( x / n ) + 0.5;
+					const vy = ( y / n ) + 0.5;
+					const vz = ( z / n ) + 0.5;
 
 					color.setRGB( vx, vy, vz );
 
@@ -143,7 +143,7 @@
 
 				geometry.computeBoundingSphere();
 
-				var material = new THREE.MeshPhongMaterial( {
+				const material = new THREE.MeshPhongMaterial( {
 					color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
 					side: THREE.DoubleSide, vertexColors: true
 				} );
@@ -167,7 +167,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -193,7 +193,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
 				mesh.rotation.x = time * 0.25;
 				mesh.rotation.y = time * 0.5;

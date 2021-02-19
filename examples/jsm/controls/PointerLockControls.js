@@ -1,13 +1,8 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import {
 	Euler,
 	EventDispatcher,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var PointerLockControls = function ( camera, domElement ) {
 
@@ -20,6 +15,11 @@ var PointerLockControls = function ( camera, domElement ) {
 
 	this.domElement = domElement;
 	this.isLocked = false;
+
+	// Set to constrain the pitch of the camera
+	// Range is 0 to Math.PI radians
+	this.minPolarAngle = 0; // radians
+	this.maxPolarAngle = Math.PI; // radians
 
 	//
 	// internals
@@ -49,7 +49,7 @@ var PointerLockControls = function ( camera, domElement ) {
 		euler.y -= movementX * 0.002;
 		euler.x -= movementY * 0.002;
 
-		euler.x = Math.max( - PI_2, Math.min( PI_2, euler.x ) );
+		euler.x = Math.max( PI_2 - scope.maxPolarAngle, Math.min( PI_2 - scope.minPolarAngle, euler.x ) );
 
 		camera.quaternion.setFromEuler( euler );
 
@@ -59,7 +59,7 @@ var PointerLockControls = function ( camera, domElement ) {
 
 	function onPointerlockChange() {
 
-		if ( document.pointerLockElement === scope.domElement ) {
+		if ( scope.domElement.ownerDocument.pointerLockElement === scope.domElement ) {
 
 			scope.dispatchEvent( lockEvent );
 
@@ -83,17 +83,17 @@ var PointerLockControls = function ( camera, domElement ) {
 
 	this.connect = function () {
 
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'pointerlockchange', onPointerlockChange, false );
-		document.addEventListener( 'pointerlockerror', onPointerlockError, false );
+		scope.domElement.ownerDocument.addEventListener( 'mousemove', onMouseMove );
+		scope.domElement.ownerDocument.addEventListener( 'pointerlockchange', onPointerlockChange );
+		scope.domElement.ownerDocument.addEventListener( 'pointerlockerror', onPointerlockError );
 
 	};
 
 	this.disconnect = function () {
 
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'pointerlockchange', onPointerlockChange, false );
-		document.removeEventListener( 'pointerlockerror', onPointerlockError, false );
+		scope.domElement.ownerDocument.removeEventListener( 'mousemove', onMouseMove );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerlockchange', onPointerlockChange );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerlockerror', onPointerlockError );
 
 	};
 
@@ -150,7 +150,7 @@ var PointerLockControls = function ( camera, domElement ) {
 
 	this.unlock = function () {
 
-		document.exitPointerLock();
+		scope.domElement.ownerDocument.exitPointerLock();
 
 	};
 

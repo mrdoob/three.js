@@ -1,11 +1,7 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 import {
 	MathUtils,
 	Mesh
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var MorphBlendMesh = function ( geometry, material ) {
 
@@ -227,7 +223,7 @@ MorphBlendMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		} else {
 
-			console.warn( "MorphBlendMesh: animation[" + name + "] undefined in .playAnimation()" );
+			console.warn( 'THREE.MorphBlendMesh: animation[' + name + '] undefined in .playAnimation()' );
 
 		}
 

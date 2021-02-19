@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from './TempNode.js';
 
 function InputNode( type, params ) {
@@ -21,6 +17,8 @@ InputNode.prototype.constructor = InputNode;
 InputNode.prototype.setReadonly = function ( value ) {
 
 	this.readonly = value;
+
+	this.hashProperties = this.readonly ? [ 'value' ] : undefined;
 
 	return this;
 

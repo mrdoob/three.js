@@ -24,8 +24,8 @@
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { PCDLoader } from './jsm/loaders/PCDLoader.js';
 
-			var container, stats;
-			var camera, controls, scene, renderer;
+			let container, stats;
+			let camera, controls, scene, renderer;
 
 			init();
 			animate();
@@ -46,11 +46,11 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var loader = new PCDLoader();
+				const loader = new PCDLoader();
 				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( points ) {
 
 					scene.add( points );
-					var center = points.geometry.boundingSphere.center;
+					const center = points.geometry.boundingSphere.center;
 					controls.target.set( center.x, center.y, center.z );
 					controls.update();
 
@@ -74,7 +74,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				window.addEventListener( 'keypress', keyboard );
 
@@ -91,7 +91,7 @@
 
 			function keyboard( ev ) {
 
-				var points = scene.getObjectByName( 'Zaghetto.pcd' );
+				const points = scene.getObjectByName( 'Zaghetto.pcd' );
 
 				switch ( ev.key || String.fromCharCode( ev.keyCode || ev.charCode ) ) {
 

@@ -1,7 +1,3 @@
-/**
- * @author vHawk / https://github.com/vHawk/
- */
-
 import {
 	Vector2,
 	Vector3,
@@ -325,8 +321,8 @@ export class CSM {
 
 		for ( let i = 0; i < this.cascades; i ++ ) {
 
-			let amount = this.breaks[ i ];
-			let prev = this.breaks[ i - 1 ] || 0;
+			const amount = this.breaks[ i ];
+			const prev = this.breaks[ i - 1 ] || 0;
 			target[ i ].x = prev;
 			target[ i ].y = amount;
 

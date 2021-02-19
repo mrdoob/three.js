@@ -1,14 +1,10 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { MathUtils } from '../../../../build/three.module.js';
 
 function Node( type ) {
 
 	this.uuid = MathUtils.generateUUID();
 
-	this.name = "";
+	this.name = '';
 
 	this.type = type;
 
@@ -21,6 +17,8 @@ Node.prototype = {
 	constructor: Node,
 
 	isNode: true,
+
+	hashProperties: undefined,
 
 	analyze: function ( builder, settings ) {
 
@@ -100,6 +98,42 @@ Node.prototype = {
 
 	},
 
+	getHash: function () {
+
+		var hash = '{';
+		var prop, obj;
+
+		for ( prop in this ) {
+
+			obj = this[ prop ];
+
+			if ( obj instanceof Node ) {
+
+				hash += '"' + prop + '":' + obj.getHash() + ',';
+
+			}
+
+		}
+
+		if ( this.hashProperties ) {
+
+			for ( var i = 0; i < this.hashProperties.length; i ++ ) {
+
+				prop = this.hashProperties[ i ];
+				obj = this[ prop ];
+
+				hash += '"' + prop + '":"' + String( obj ) + '",';
+
+			}
+
+		}
+
+		hash += '"id":"' + this.uuid + '"}';
+
+		return hash;
+
+	},
+
 	appendDepsNode: function ( builder, data, output ) {
 
 		data.deps = ( data.deps || 0 ) + 1;
@@ -163,12 +197,12 @@ Node.prototype = {
 
 		var data = {};
 
-		if ( typeof this.nodeType !== "string" ) throw new Error( "Node does not allow serialization." );
+		if ( typeof this.nodeType !== 'string' ) throw new Error( 'Node does not allow serialization.' );
 
 		data.uuid = this.uuid;
 		data.nodeType = this.nodeType;
 
-		if ( this.name !== "" ) data.name = this.name;
+		if ( this.name !== '' ) data.name = this.name;
 
 		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 

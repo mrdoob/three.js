@@ -34,18 +34,18 @@
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
-		var container, stats, gui, guiStatsEl;
-		var camera, controls, scene, renderer, material;
+		let container, stats, gui, guiStatsEl;
+		let camera, controls, scene, renderer, material;
 
 		// gui
 
-		var Method = {
+		const Method = {
 			INSTANCED: 'INSTANCED',
 			MERGED: 'MERGED',
 			NAIVE: 'NAIVE'
 		};
 
-		var api = {
+		const api = {
 			method: Method.INSTANCED,
 			count: 1000
 		};
@@ -60,7 +60,7 @@
 
 		function clean() {
 
-			var meshes = [];
+			const meshes = [];
 
 			scene.traverse( function ( object ) {
 
@@ -68,9 +68,9 @@
 
 			} );
 
-			for ( var i = 0; i < meshes.length; i ++ ) {
+			for ( let i = 0; i < meshes.length; i ++ ) {
 
-				var mesh = meshes[ i ];
+				const mesh = meshes[ i ];
 				mesh.material.dispose();
 				mesh.geometry.dispose();
 
@@ -80,12 +80,12 @@
 
 		}
 
-		var randomizeMatrix = function () {
+		const randomizeMatrix = function () {
 
-			var position = new THREE.Vector3();
-			var rotation = new THREE.Euler();
-			var quaternion = new THREE.Quaternion();
-			var scale = new THREE.Vector3();
+			const position = new THREE.Vector3();
+			const rotation = new THREE.Euler();
+			const quaternion = new THREE.Quaternion();
+			const scale = new THREE.Vector3();
 
 			return function ( matrix ) {
 
@@ -120,7 +120,7 @@
 
 					geometry.computeVertexNormals();
 
-					console.time( api.method + ' (build)'  );
+					console.time( api.method + ' (build)' );
 
 					switch ( api.method ) {
 
@@ -140,16 +140,16 @@
 
 					console.timeEnd( api.method + ' (build)' );
 
-			} );
+				} );
 
 		}
 
 		function makeInstanced( geometry ) {
 
-			var matrix = new THREE.Matrix4();
-			var mesh = new THREE.InstancedMesh( geometry, material, api.count );
+			const matrix = new THREE.Matrix4();
+			const mesh = new THREE.InstancedMesh( geometry, material, api.count );
 
-			for ( var i = 0; i < api.count; i ++ ) {
+			for ( let i = 0; i < api.count; i ++ ) {
 
 				randomizeMatrix( matrix );
 				mesh.setMatrixAt( i, matrix );
@@ -160,7 +160,7 @@
 
 			//
 
-			var geometryByteLength = getGeometryByteLength( geometry );
+			const geometryByteLength = getGeometryByteLength( geometry );
 
 			guiStatsEl.innerHTML = [
 
@@ -173,22 +173,21 @@
 
 		function makeMerged( geometry ) {
 
-			var instanceGeometry;
-			var geometries = [];
-			var matrix = new THREE.Matrix4();
+			const geometries = [];
+			const matrix = new THREE.Matrix4();
 
-			for ( var i = 0; i < api.count; i ++ ) {
+			for ( let i = 0; i < api.count; i ++ ) {
 
 				randomizeMatrix( matrix );
 
-				var instanceGeometry = geometry.clone();
+				const instanceGeometry = geometry.clone();
 				instanceGeometry.applyMatrix4( matrix );
 
 				geometries.push( instanceGeometry );
 
 			}
 
-			var mergedGeometry = BufferGeometryUtils.mergeBufferGeometries( geometries );
+			const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries( geometries );
 
 			scene.add( new THREE.Mesh( mergedGeometry, material ) );
 
@@ -205,13 +204,13 @@
 
 		function makeNaive( geometry ) {
 
-			var matrix = new THREE.Matrix4();
+			const matrix = new THREE.Matrix4();
 
-			for ( var i = 0; i < api.count; i ++ ) {
+			for ( let i = 0; i < api.count; i ++ ) {
 
 				randomizeMatrix( matrix );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh = new THREE.Mesh( geometry, material );
 				mesh.applyMatrix4( matrix );
 
 				scene.add( mesh );
@@ -220,7 +219,7 @@
 
 			//
 
-			var geometryByteLength = getGeometryByteLength( geometry );
+			const geometryByteLength = getGeometryByteLength( geometry );
 
 			guiStatsEl.innerHTML = [
 
@@ -233,8 +232,8 @@
 
 		function init() {
 
-			var width = window.innerWidth;
-			var height = window.innerHeight;
+			const width = window.innerWidth;
+			const height = window.innerHeight;
 
 			// camera
 
@@ -272,7 +271,7 @@
 			gui.add( api, 'method', Method ).onChange( initMesh );
 			gui.add( api, 'count', 1, 10000 ).step( 1 ).onChange( initMesh );
 
-			var perfFolder = gui.addFolder( 'Performance' );
+			const perfFolder = gui.addFolder( 'Performance' );
 
 			guiStatsEl = document.createElement( 'li' );
 			guiStatsEl.classList.add( 'gui-stats' );
@@ -282,9 +281,9 @@
 
 			// listeners
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
-			Object.assign(window, {scene});
+			Object.assign( window, { scene } );
 
 		}
 
@@ -292,8 +291,8 @@
 
 		function onWindowResize() {
 
-			var width = window.innerWidth;
-			var height = window.innerHeight;
+			const width = window.innerWidth;
+			const height = window.innerHeight;
 
 			camera.aspect = width / height;
 			camera.updateProjectionMatrix();
@@ -323,11 +322,11 @@
 
 		function getGeometryByteLength( geometry ) {
 
-			var total = 0;
+			let total = 0;
 
 			if ( geometry.index ) total += geometry.index.array.byteLength;
 
-			for ( var name in geometry.attributes ) {
+			for ( const name in geometry.attributes ) {
 
 				total += geometry.attributes[ name ].array.byteLength;
 
@@ -342,11 +341,11 @@
 
 			if ( bytes === 0 ) return '0 bytes';
 
-			var k = 1024;
-			var dm = decimals < 0 ? 0 : decimals;
-			var sizes = [ 'bytes', 'KB', 'MB' ];
+			const k = 1024;
+			const dm = decimals < 0 ? 0 : decimals;
+			const sizes = [ 'bytes', 'KB', 'MB' ];
 
-			var i = Math.floor( Math.log( bytes ) / Math.log( k ) );
+			const i = Math.floor( Math.log( bytes ) / Math.log( k ) );
 
 			return parseFloat( ( bytes / Math.pow( k, i ) ).toFixed( dm ) ) + ' ' + sizes[ i ];
 

@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from './TempNode.js';
 
 var declarationRegexp = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
@@ -23,7 +19,7 @@ ConstNode.EPSILON = 'EPSILON';
 
 ConstNode.prototype = Object.create( TempNode.prototype );
 ConstNode.prototype.constructor = ConstNode;
-ConstNode.prototype.nodeType = "Const";
+ConstNode.prototype.nodeType = 'Const';
 
 ConstNode.prototype.getType = function ( builder ) {
 
@@ -35,7 +31,7 @@ ConstNode.prototype.parse = function ( src, useDefine ) {
 
 	this.src = src || '';
 
-	var name, type, value = "";
+	var name, type, value = '';
 
 	var match = this.src.match( declarationRegexp );
 

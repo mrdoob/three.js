@@ -1,14 +1,10 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { ExpressionNode } from '../core/ExpressionNode.js';
 import { Matrix3Node } from '../inputs/Matrix3Node.js';
 import { UVNode } from '../accessors/UVNode.js';
 
 function UVTransformNode( uv, position ) {
 
-	ExpressionNode.call( this, "( uvTransform * vec3( uvNode, 1 ) ).xy", "vec2" );
+	ExpressionNode.call( this, '( uvTransform * vec3( uvNode, 1 ) ).xy', 'vec2' );
 
 	this.uv = uv || new UVNode();
 	this.position = position || new Matrix3Node();
@@ -17,12 +13,12 @@ function UVTransformNode( uv, position ) {
 
 UVTransformNode.prototype = Object.create( ExpressionNode.prototype );
 UVTransformNode.prototype.constructor = UVTransformNode;
-UVTransformNode.prototype.nodeType = "UVTransform";
+UVTransformNode.prototype.nodeType = 'UVTransform';
 
 UVTransformNode.prototype.generate = function ( builder, output ) {
 
-	this.keywords[ "uvNode" ] = this.uv;
-	this.keywords[ "uvTransform" ] = this.position;
+	this.keywords[ 'uvNode' ] = this.uv;
+	this.keywords[ 'uvTransform' ] = this.position;
 
 	return ExpressionNode.prototype.generate.call( this, builder, output );
 

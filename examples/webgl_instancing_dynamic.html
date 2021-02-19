@@ -15,12 +15,12 @@
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			var camera, scene, renderer, stats;
+			let camera, scene, renderer, stats;
 
-			var mesh;
-			var amount = parseInt( window.location.search.substr( 1 ) ) || 10;
-			var count = Math.pow( amount, 3 );
-			var dummy = new THREE.Object3D();
+			let mesh;
+			const amount = parseInt( window.location.search.substr( 1 ) ) || 10;
+			const count = Math.pow( amount, 3 );
+			const dummy = new THREE.Object3D();
 
 			init();
 			animate();
@@ -33,15 +33,15 @@
 
 				scene = new THREE.Scene();
 
-				var loader = new THREE.BufferGeometryLoader();
+				const loader = new THREE.BufferGeometryLoader();
 				loader.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 					geometry.scale( 0.5, 0.5, 0.5 );
 
-					var material = new THREE.MeshNormalMaterial();
+					const material = new THREE.MeshNormalMaterial();
 					// check overdraw
-					// var material = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.1, transparent: true } );
+					// let material = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.1, transparent: true } );
 
 					mesh = new THREE.InstancedMesh( geometry, material, count );
 					mesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
@@ -49,7 +49,7 @@
 
 					//
 
-					var gui = new GUI();
+					const gui = new GUI();
 					gui.add( mesh, 'count', 0, count );
 
 				} );
@@ -68,7 +68,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -97,19 +97,19 @@
 
 				if ( mesh ) {
 
-					var time = Date.now() * 0.001;
+					const time = Date.now() * 0.001;
 
 					mesh.rotation.x = Math.sin( time / 4 );
 					mesh.rotation.y = Math.sin( time / 2 );
 
-					var i = 0;
-					var offset = ( amount - 1 ) / 2;
+					let i = 0;
+					const offset = ( amount - 1 ) / 2;
 
-					for ( var x = 0; x < amount; x ++ ) {
+					for ( let x = 0; x < amount; x ++ ) {
 
-						for ( var y = 0; y < amount; y ++ ) {
+						for ( let y = 0; y < amount; y ++ ) {
 
-							for ( var z = 0; z < amount; z ++ ) {
+							for ( let z = 0; z < amount; z ++ ) {
 
 								dummy.position.set( offset - x, offset - y, offset - z );
 								dummy.rotation.y = ( Math.sin( x / 4 + time ) + Math.sin( y / 4 + time ) + Math.sin( z / 4 + time ) );

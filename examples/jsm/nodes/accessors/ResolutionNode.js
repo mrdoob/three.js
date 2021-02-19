@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { Vector2 } from '../../../../build/three.module.js';
 
 import { Vector2Node } from '../inputs/Vector2Node.js';
@@ -16,7 +12,7 @@ function ResolutionNode() {
 
 ResolutionNode.prototype = Object.create( Vector2Node.prototype );
 ResolutionNode.prototype.constructor = ResolutionNode;
-ResolutionNode.prototype.nodeType = "Resolution";
+ResolutionNode.prototype.nodeType = 'Resolution';
 
 ResolutionNode.prototype.updateFrame = function ( frame ) {
 
@@ -31,7 +27,7 @@ ResolutionNode.prototype.updateFrame = function ( frame ) {
 
 	} else {
 
-		console.warn( "ResolutionNode need a renderer in NodeFrame" );
+		console.warn( 'ResolutionNode need a renderer in NodeFrame' );
 
 	}
 

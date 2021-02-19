@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { Vector2 } from '../../../../build/three.module.js';
 
 import { InputNode } from '../core/InputNode.js';
@@ -17,13 +13,13 @@ function Vector2Node( x, y ) {
 
 Vector2Node.prototype = Object.create( InputNode.prototype );
 Vector2Node.prototype.constructor = Vector2Node;
-Vector2Node.prototype.nodeType = "Vector2";
+Vector2Node.prototype.nodeType = 'Vector2';
 
 NodeUtils.addShortcuts( Vector2Node.prototype, 'value', [ 'x', 'y' ] );
 
 Vector2Node.prototype.generateReadonly = function ( builder, output, uuid, type/*, ns, needsUpdate*/ ) {
 
-	return builder.format( "vec2( " + this.x + ", " + this.y + " )", type, output );
+	return builder.format( 'vec2( ' + this.x + ', ' + this.y + ' )', type, output );
 
 };
 

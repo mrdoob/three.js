@@ -1,7 +1,3 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import {
 	Box3,
 	MathUtils,
@@ -9,7 +5,7 @@ import {
 	Matrix3,
 	Ray,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 // module scope helper variables
 
@@ -329,7 +325,8 @@ Object.assign( OBB.prototype, {
 
 		// transform ray to the local space of the OBB
 
-		localRay.copy( ray ).applyMatrix4( inverse.getInverse( matrix ) );
+		inverse.copy( matrix ).invert();
+		localRay.copy( ray ).applyMatrix4( inverse );
 
 		// perform ray <-> AABB intersection test
 

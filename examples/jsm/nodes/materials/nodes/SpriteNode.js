@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import {
 	UniformsLib,
 	UniformsUtils
@@ -21,7 +17,7 @@ function SpriteNode() {
 
 SpriteNode.prototype = Object.create( Node.prototype );
 SpriteNode.prototype.constructor = SpriteNode;
-SpriteNode.prototype.nodeType = "Sprite";
+SpriteNode.prototype.nodeType = 'Sprite';
 
 SpriteNode.prototype.build = function ( builder ) {
 
@@ -41,28 +37,28 @@ SpriteNode.prototype.build = function ( builder ) {
 		] ) );
 
 		builder.addParsCode( [
-			"#include <fog_pars_vertex>",
-			"#include <logdepthbuf_pars_vertex>",
-			"#include <clipping_planes_pars_vertex>"
-		].join( "\n" ) );
+			'#include <fog_pars_vertex>',
+			'#include <logdepthbuf_pars_vertex>',
+			'#include <clipping_planes_pars_vertex>'
+		].join( '\n' ) );
 
 		output = [
-			"#include <clipping_planes_fragment>",
-			"#include <begin_vertex>"
+			'#include <clipping_planes_fragment>',
+			'#include <begin_vertex>'
 		];
 
 		if ( position ) {
 
 			output.push(
 				position.code,
-				position.result ? "transformed = " + position.result + ";" : ''
+				position.result ? 'transformed = ' + position.result + ';' : ''
 			);
 
 		}
 
 		output.push(
-			"#include <project_vertex>",
-			"#include <fog_vertex>",
+			'#include <project_vertex>',
+			'#include <fog_vertex>',
 
 			'mat4 modelViewMtx = modelViewMatrix;',
 			'mat4 modelMtx = modelMatrix;',
@@ -106,25 +102,25 @@ SpriteNode.prototype.build = function ( builder ) {
 			'modelViewMtx[2][1] = 0.0;',
 			'modelViewMtx[2][2] = 1.0;',
 
-			"gl_Position = projectionMatrix * modelViewMtx * modelMtx * vec4( transformed, 1.0 );",
+			'gl_Position = projectionMatrix * modelViewMtx * modelMtx * vec4( transformed, 1.0 );',
 
-			"#include <logdepthbuf_vertex>",
-			"#include <clipping_planes_vertex>",
-			"#include <fog_vertex>"
+			'#include <logdepthbuf_vertex>',
+			'#include <clipping_planes_vertex>',
+			'#include <fog_vertex>'
 		);
 
 	} else {
 
 		builder.addParsCode( [
-			"#include <fog_pars_fragment>",
-			"#include <logdepthbuf_pars_fragment>",
-			"#include <clipping_planes_pars_fragment>"
-		].join( "\n" ) );
+			'#include <fog_pars_fragment>',
+			'#include <logdepthbuf_pars_fragment>',
+			'#include <clipping_planes_pars_fragment>'
+		].join( '\n' ) );
 
 		builder.addCode( [
-			"#include <clipping_planes_fragment>",
-			"#include <logdepthbuf_fragment>"
-		].join( "\n" ) );
+			'#include <clipping_planes_fragment>',
+			'#include <logdepthbuf_fragment>'
+		].join( '\n' ) );
 
 		// analyze all nodes to reuse generate codes
 
@@ -160,27 +156,27 @@ SpriteNode.prototype.build = function ( builder ) {
 
 				'#endif',
 				color.code,
-				"gl_FragColor = vec4( " + color.result + ", " + alpha.result + " );"
+				'gl_FragColor = vec4( ' + color.result + ', ' + alpha.result + ' );'
 			);
 
 		} else {
 
 			output.push(
 				color.code,
-				"gl_FragColor = vec4( " + color.result + ", 1.0 );"
+				'gl_FragColor = vec4( ' + color.result + ', 1.0 );'
 			);
 
 		}
 
 		output.push(
-			"#include <tonemapping_fragment>",
-			"#include <encodings_fragment>",
-			"#include <fog_fragment>"
+			'#include <tonemapping_fragment>',
+			'#include <encodings_fragment>',
+			'#include <fog_fragment>'
 		);
 
 	}
 
-	return output.join( "\n" );
+	return output.join( '\n' );
 
 };
 

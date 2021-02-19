@@ -1,7 +1,3 @@
-/**
- * @author vHawk / https://github.com/vHawk/
- */
-
 import { Vector3, Matrix4 } from '../../../build/three.module.js';
 
 const inverseProjectionMatrix = new Matrix4();
@@ -39,7 +35,7 @@ export default class Frustum {
 
 		const isOrthographic = projectionMatrix.elements[ 2 * 4 + 3 ] === 0;
 
-		inverseProjectionMatrix.getInverse( projectionMatrix );
+		inverseProjectionMatrix.copy( projectionMatrix ).invert();
 
 		// 3 --- 0  vertices.near/far order
 		// |     |

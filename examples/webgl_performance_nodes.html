@@ -43,19 +43,20 @@
 				MeshStandardNodeMaterial
 			} from './jsm/nodes/Nodes.js';
 
-			var container, stats;
+			let stats;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var geometry;
-			var meshes = [];
+			let geometry;
 
-			var mouseX = 0, mouseY = 0;
+			let mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			const meshes = [];
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			init();
 			animate();
@@ -64,7 +65,7 @@
 
 				count = count !== undefined ? count : 70;
 
-				var i = 0;
+				let i = 0;
 
 				for ( i = 0; i < meshes.length; i ++ ) {
 
@@ -74,11 +75,11 @@
 
 				}
 
-				meshes = [];
+				meshes.length = 0;
 
 				for ( i = 0; i < count; i ++ ) {
 
-					var material = new MaterialClass(),
+					const material = new MaterialClass(),
 						color = 0xFFFFFF * Math.random();
 
 					if ( material.color.isNode ) material.color.value.setHex( color );
@@ -87,7 +88,7 @@
 					// prevent share code
 					material.defines.UUID = material.uuid;
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 1000 - 500;
 					mesh.position.y = Math.random() * 1000 - 500;
@@ -108,7 +109,7 @@
 
 			function benchmark() {
 
-				var time, benchmarkTime;
+				let time, benchmarkTime;
 
 				// Stabilizes CPU
 
@@ -166,7 +167,7 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -176,7 +177,7 @@
 				scene.add( new THREE.PointLight( 0xFFFFFF ) );
 				//scene.background = new THREE.Color( 0xffffff );
 
-				var loader = new THREE.BufferGeometryLoader();
+				const loader = new THREE.BufferGeometryLoader();
 				loader.load( 'models/json/suzanne_buffergeometry.json', function ( geo ) {
 
 					geo.computeVertexNormals();
@@ -188,7 +189,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				//renderer.sortObjects = false;
 
 				container.appendChild( renderer.domElement );
 
@@ -197,7 +197,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
