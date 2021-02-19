@@ -41,13 +41,9 @@
 				NormalMapNode,
 			} from './jsm/nodes/Nodes.js';
 
-			// scene size
-			const WIDTH = window.innerWidth;
-			const HEIGHT = window.innerHeight;
-
 			// camera
 			const VIEW_ANGLE = 45;
-			const ASPECT = WIDTH / HEIGHT;
+			let aspect = window.innerWidth / window.innerHeight;
 			const NEAR = 1;
 			const FAR = 500;
 
@@ -68,18 +64,21 @@
 
 			const frame = new NodeFrame();
 
+			let groundMirror;
+			let blurMirror;
+
 			function init() {
 
 				// renderer
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( WIDTH, HEIGHT );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				// scene
 				scene = new THREE.Scene();
 
 				// camera
-				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
+				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, aspect, NEAR, FAR );
 				camera.position.set( 0, 75, 160 );
 
 				cameraControls = new OrbitControls( camera, renderer.domElement );
@@ -91,6 +90,29 @@
 				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
+				window.addEventListener( "resize", onWindowResize, false );
+				
+			}
+
+			function onWindowResize() {
+
+				aspect = window.innerWidth / window.innerHeight;
+				camera.aspect = aspect;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				groundMirror.getRenderTarget().setSize(
+					window.innerWidth * window.devicePixelRatio,
+					window.innerHeight * window.devicePixelRatio
+				);
+
+				blurMirror.size.set(
+					window.innerWidth * window.devicePixelRatio,
+					window.innerHeight * window.devicePixelRatio
+				);
+				blurMirror.updateFrame()
+				
 			}
 
 			function fillScene() {
@@ -101,7 +123,11 @@
 
 				// reflector/mirror plane
 				geometry = new THREE.PlaneGeometry( 100, 100 );
-				const groundMirror = new ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
+				groundMirror = new ReflectorRTT( geometry, {
+					clipBias: 0.003,
+					textureWidth: window.innerWidth * window.devicePixelRatio,
+					textureHeight: window.innerHeight * window.devicePixelRatio
+				} );
 
 				const mask = new SwitchNode( new TextureNode( decalDiffuse ), 'w' );
 
@@ -126,8 +152,11 @@
 					OperatorNode.MUL
 				);
 
-				const blurMirror = new BlurNode( mirror );
-				blurMirror.size = new THREE.Vector2( WIDTH, HEIGHT );
+				blurMirror = new BlurNode( mirror );
+				blurMirror.size = new THREE.Vector2(
+					window.innerWidth * window.devicePixelRatio,
+					window.innerHeight * window.devicePixelRatio
+				);
 				blurMirror.uv = new ExpressionNode( "projCoord.xyz / projCoord.q", "vec3" );
 				blurMirror.uv.keywords[ "projCoord" ] = new OperatorNode( mirror.offset, mirror.uv, OperatorNode.ADD );
 				blurMirror.radius.x = blurMirror.radius.y = 0;
