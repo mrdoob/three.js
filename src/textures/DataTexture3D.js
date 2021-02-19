@@ -1,23 +1,19 @@
-/**
- * @author Artur Trzesiok
- */
-
 import { Texture } from './Texture.js';
 import { ClampToEdgeWrapping, NearestFilter } from '../constants.js';
 
-function DataTexture3D( data, width, height, depth ) {
+function DataTexture3D( data = null, width = 1, height = 1, depth = 1 ) {
 
 	// We're going to add .setXXX() methods for setting properties later.
 	// Users can still set in DataTexture3D directly.
 	//
-	//	var texture = new THREE.DataTexture3D( data, width, height, depth );
+	//	const texture = new THREE.DataTexture3D( data, width, height, depth );
 	// 	texture.anisotropy = 16;
 	//
 	// See #14839
 
 	Texture.call( this, null );
 
-	this.image = { data: data || null, width: width || 1, height: height || 1, depth: depth || 1 };
+	this.image = { data, width, height, depth };
 
 	this.magFilter = NearestFilter;
 	this.minFilter = NearestFilter;

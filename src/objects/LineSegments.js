@@ -2,10 +2,6 @@ import { Line } from './Line.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 const _start = new Vector3();
 const _end = new Vector3();
 
@@ -56,18 +52,7 @@ LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 
 		} else if ( geometry.isGeometry ) {
 
-			const vertices = geometry.vertices;
-			const lineDistances = geometry.lineDistances;
-
-			for ( let i = 0, l = vertices.length; i < l; i += 2 ) {
-
-				_start.copy( vertices[ i ] );
-				_end.copy( vertices[ i + 1 ] );
-
-				lineDistances[ i ] = ( i === 0 ) ? 0 : lineDistances[ i - 1 ];
-				lineDistances[ i + 1 ] = lineDistances[ i ] + _start.distanceTo( _end );
-
-			}
+			console.error( 'THREE.LineSegments.computeLineDistances() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 		}
 

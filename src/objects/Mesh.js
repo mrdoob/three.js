@@ -5,17 +5,9 @@ import { Ray } from '../math/Ray.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
 import { Triangle } from '../math/Triangle.js';
-import { Face3 } from '../core/Face3.js';
 import { DoubleSide, BackSide } from '../constants.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
-
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author mikael emtinger / http://gomo.se/
- * @author jonobr1 / http://jonobr1.com/
- */
 
 const _inverseMatrix = new Matrix4();
 const _ray = new Ray();
@@ -40,14 +32,14 @@ const _uvC = new Vector2();
 const _intersectionPoint = new Vector3();
 const _intersectionPointWorld = new Vector3();
 
-function Mesh( geometry, material ) {
+function Mesh( geometry = new BufferGeometry(), material = new MeshBasicMaterial() ) {
 
 	Object3D.call( this );
 
 	this.type = 'Mesh';
 
-	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new MeshBasicMaterial();
+	this.geometry = geometry;
+	this.material = material;
 
 	this.updateMorphTargets();
 
@@ -74,6 +66,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			this.morphTargetDictionary = Object.assign( {}, source.morphTargetDictionary );
 
 		}
+
+		this.material = source.material;
+		this.geometry = source.geometry;
 
 		return this;
 
@@ -143,7 +138,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		//
 
-		_inverseMatrix.getInverse( matrixWorld );
+		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
 		// Check boundingBox before continuing
@@ -287,56 +282,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		} else if ( geometry.isGeometry ) {
 
-			const isMultiMaterial = Array.isArray( material );
-
-			const vertices = geometry.vertices;
-			const faces = geometry.faces;
-			let uvs;
-
-			const faceVertexUvs = geometry.faceVertexUvs[ 0 ];
-			if ( faceVertexUvs.length > 0 ) uvs = faceVertexUvs;
-
-			for ( let f = 0, fl = faces.length; f < fl; f ++ ) {
-
-				const face = faces[ f ];
-				const faceMaterial = isMultiMaterial ? material[ face.materialIndex ] : material;
-
-				if ( faceMaterial === undefined ) continue;
-
-				const fvA = vertices[ face.a ];
-				const fvB = vertices[ face.b ];
-				const fvC = vertices[ face.c ];
-
-				intersection = checkIntersection( this, faceMaterial, raycaster, _ray, fvA, fvB, fvC, _intersectionPoint );
-
-				if ( intersection ) {
-
-					if ( uvs && uvs[ f ] ) {
-
-						const uvs_f = uvs[ f ];
-						_uvA.copy( uvs_f[ 0 ] );
-						_uvB.copy( uvs_f[ 1 ] );
-						_uvC.copy( uvs_f[ 2 ] );
-
-						intersection.uv = Triangle.getUV( _intersectionPoint, fvA, fvB, fvC, _uvA, _uvB, _uvC, new Vector2() );
-
-					}
-
-					intersection.face = face;
-					intersection.faceIndex = f;
-					intersects.push( intersection );
-
-				}
-
-			}
+			console.error( 'THREE.Mesh.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 		}
-
-	},
-
-	clone: function () {
-
-		return new this.constructor( this.geometry, this.material ).copy( this );
 
 	}
 
@@ -420,7 +368,7 @@ function checkBufferGeometryIntersection( object, material, raycaster, ray, posi
 
 	}
 
-	if ( object.isSkinnedMesh ) {
+	if ( object.isSkinnedMesh && material.skinning ) {
 
 		object.boneTransform( a, _vA );
 		object.boneTransform( b, _vB );
@@ -452,7 +400,14 @@ function checkBufferGeometryIntersection( object, material, raycaster, ray, posi
 
 		}
 
-		const face = new Face3( a, b, c );
+		const face = {
+			a: a,
+			b: a,
+			c: c,
+			normal: new Vector3(),
+			materialIndex: 0
+		};
+
 		Triangle.getNormal( _vA, _vB, _vC, face.normal );
 
 		intersection.face = face;

@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function painterSortStable( a, b ) {
 
 	if ( a.groupOrder !== b.groupOrder ) {
@@ -55,15 +51,15 @@ function reversePainterSortStable( a, b ) {
 }
 
 
-function WebGLRenderList() {
+function WebGLRenderList( properties ) {
 
-	var renderItems = [];
-	var renderItemsIndex = 0;
+	const renderItems = [];
+	let renderItemsIndex = 0;
 
-	var opaque = [];
-	var transparent = [];
+	const opaque = [];
+	const transparent = [];
 
-	var defaultProgram = { id: - 1 };
+	const defaultProgram = { id: - 1 };
 
 	function init() {
 
@@ -76,7 +72,8 @@ function WebGLRenderList() {
 
 	function getNextRenderItem( object, geometry, material, groupOrder, z, group ) {
 
-		var renderItem = renderItems[ renderItemsIndex ];
+		let renderItem = renderItems[ renderItemsIndex ];
+		const materialProperties = properties.get( material );
 
 		if ( renderItem === undefined ) {
 
@@ -85,7 +82,7 @@ function WebGLRenderList() {
 				object: object,
 				geometry: geometry,
 				material: material,
-				program: material.program || defaultProgram,
+				program: materialProperties.program || defaultProgram,
 				groupOrder: groupOrder,
 				renderOrder: object.renderOrder,
 				z: z,
@@ -100,7 +97,7 @@ function WebGLRenderList() {
 			renderItem.object = object;
 			renderItem.geometry = geometry;
 			renderItem.material = material;
-			renderItem.program = material.program || defaultProgram;
+			renderItem.program = materialProperties.program || defaultProgram;
 			renderItem.groupOrder = groupOrder;
 			renderItem.renderOrder = object.renderOrder;
 			renderItem.z = z;
@@ -116,7 +113,7 @@ function WebGLRenderList() {
 
 	function push( object, geometry, material, groupOrder, z, group ) {
 
-		var renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
+		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
 
 		( material.transparent === true ? transparent : opaque ).push( renderItem );
 
@@ -124,7 +121,7 @@ function WebGLRenderList() {
 
 	function unshift( object, geometry, material, groupOrder, z, group ) {
 
-		var renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
+		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
 
 		( material.transparent === true ? transparent : opaque ).unshift( renderItem );
 
@@ -141,9 +138,9 @@ function WebGLRenderList() {
 
 		// Clear references from inactive renderItems in the list
 
-		for ( var i = renderItemsIndex, il = renderItems.length; i < il; i ++ ) {
+		for ( let i = renderItemsIndex, il = renderItems.length; i < il; i ++ ) {
 
-			var renderItem = renderItems[ i ];
+			const renderItem = renderItems[ i ];
 
 			if ( renderItem.id === null ) break;
 
@@ -159,6 +156,7 @@ function WebGLRenderList() {
 	}
 
 	return {
+
 		opaque: opaque,
 		transparent: transparent,
 
@@ -172,39 +170,29 @@ function WebGLRenderList() {
 
 }
 
-function WebGLRenderLists() {
+function WebGLRenderLists( properties ) {
 
-	var lists = new WeakMap();
+	let lists = new WeakMap();
 
-	function onSceneDispose( event ) {
+	function get( scene, renderCallDepth ) {
 
-		var scene = event.target;
+		let list;
 
-		scene.removeEventListener( 'dispose', onSceneDispose );
+		if ( lists.has( scene ) === false ) {
 
-		lists.delete( scene );
-
-	}
-
-	function get( scene, camera ) {
-
-		var cameras = lists.get( scene );
-		var list;
-		if ( cameras === undefined ) {
-
-			list = new WebGLRenderList();
-			lists.set( scene, new WeakMap() );
-			lists.get( scene ).set( camera, list );
-
-			scene.addEventListener( 'dispose', onSceneDispose );
+			list = new WebGLRenderList( properties );
+			lists.set( scene, [ list ] );
 
 		} else {
 
-			list = cameras.get( camera );
-			if ( list === undefined ) {
+			if ( renderCallDepth >= lists.get( scene ).length ) {
 
-				list = new WebGLRenderList();
-				cameras.set( camera, list );
+				list = new WebGLRenderList( properties );
+				lists.get( scene ).push( list );
+
+			} else {
+
+				list = lists.get( scene )[ renderCallDepth ];
 
 			}
 
@@ -228,4 +216,4 @@ function WebGLRenderLists() {
 }
 
 
-export { WebGLRenderLists };
+export { WebGLRenderLists, WebGLRenderList };

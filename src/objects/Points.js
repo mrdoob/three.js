@@ -6,23 +6,19 @@ import { Vector3 } from '../math/Vector3.js';
 import { PointsMaterial } from '../materials/PointsMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 const _inverseMatrix = new Matrix4();
 const _ray = new Ray();
 const _sphere = new Sphere();
 const _position = new Vector3();
 
-function Points( geometry, material ) {
+function Points( geometry = new BufferGeometry(), material = new PointsMaterial() ) {
 
 	Object3D.call( this );
 
 	this.type = 'Points';
 
-	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new PointsMaterial();
+	this.geometry = geometry;
+	this.material = material;
 
 	this.updateMorphTargets();
 
@@ -33,6 +29,17 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	constructor: Points,
 
 	isPoints: true,
+
+	copy: function ( source ) {
+
+		Object3D.prototype.copy.call( this, source );
+
+		this.material = source.material;
+		this.geometry = source.geometry;
+
+		return this;
+
+	},
 
 	raycast: function ( raycaster, intersects ) {
 
@@ -52,7 +59,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		//
 
-		_inverseMatrix.getInverse( matrixWorld );
+		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
 		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
@@ -62,7 +69,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			const index = geometry.index;
 			const attributes = geometry.attributes;
-			const positions = attributes.position.array;
+			const positionAttribute = attributes.position;
 
 			if ( index !== null ) {
 
@@ -72,7 +79,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					const a = indices[ i ];
 
-					_position.fromArray( positions, a * 3 );
+					_position.fromBufferAttribute( positionAttribute, a );
 
 					testPoint( _position, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
@@ -80,9 +87,9 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			} else {
 
-				for ( let i = 0, l = positions.length / 3; i < l; i ++ ) {
+				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
 
-					_position.fromArray( positions, i * 3 );
+					_position.fromBufferAttribute( positionAttribute, i );
 
 					testPoint( _position, i, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
@@ -92,13 +99,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		} else {
 
-			const vertices = geometry.vertices;
-
-			for ( let i = 0, l = vertices.length; i < l; i ++ ) {
-
-				testPoint( vertices[ i ], i, localThresholdSq, matrixWorld, raycaster, intersects, this );
-
-			}
+			console.error( 'THREE.Points.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 		}
 
@@ -146,12 +147,6 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			}
 
 		}
-
-	},
-
-	clone: function () {
-
-		return new this.constructor( this.geometry, this.material ).copy( this );
 
 	}
 

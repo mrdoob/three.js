@@ -1,8 +1,4 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-import { BackSide } from "../../constants.js";
+import { BackSide } from '../../constants.js';
 
 function WebGLMaterials( properties ) {
 
@@ -23,7 +19,7 @@ function WebGLMaterials( properties ) {
 
 	}
 
-	function refreshMaterialUniforms( uniforms, material, environment, pixelRatio, height ) {
+	function refreshMaterialUniforms( uniforms, material, pixelRatio, height ) {
 
 		if ( material.isMeshBasicMaterial ) {
 
@@ -46,15 +42,15 @@ function WebGLMaterials( properties ) {
 
 		} else if ( material.isMeshStandardMaterial ) {
 
-			refreshUniformsCommon( uniforms, material, environment );
+			refreshUniformsCommon( uniforms, material );
 
 			if ( material.isMeshPhysicalMaterial ) {
 
-				refreshUniformsPhysical( uniforms, material, environment );
+				refreshUniformsPhysical( uniforms, material );
 
 			} else {
 
-				refreshUniformsStandard( uniforms, material, environment );
+				refreshUniformsStandard( uniforms, material );
 
 			}
 
@@ -109,7 +105,7 @@ function WebGLMaterials( properties ) {
 
 	}
 
-	function refreshUniformsCommon( uniforms, material, environment ) {
+	function refreshUniformsCommon( uniforms, material ) {
 
 		uniforms.opacity.value = material.opacity;
 
@@ -143,18 +139,24 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		var envMap = material.envMap || environment;
+		const envMap = properties.get( material ).envMap;
 
 		if ( envMap ) {
 
 			uniforms.envMap.value = envMap;
 
-			uniforms.flipEnvMap.value = envMap.isCubeTexture ? - 1 : 1;
+			uniforms.flipEnvMap.value = ( envMap.isCubeTexture && envMap._needsFlipEnvMap ) ? - 1 : 1;
 
 			uniforms.reflectivity.value = material.reflectivity;
 			uniforms.refractionRatio.value = material.refractionRatio;
 
-			uniforms.maxMipLevel.value = properties.get( envMap ).__maxMipLevel;
+			const maxMipLevel = properties.get( envMap ).__maxMipLevel;
+
+			if ( maxMipLevel !== undefined ) {
+
+				uniforms.maxMipLevel.value = maxMipLevel;
+
+			}
 
 		}
 
@@ -175,12 +177,18 @@ function WebGLMaterials( properties ) {
 		// uv repeat and offset setting priorities
 		// 1. color map
 		// 2. specular map
-		// 3. normal map
-		// 4. bump map
-		// 5. alpha map
-		// 6. emissive map
+		// 3. displacementMap map
+		// 4. normal map
+		// 5. bump map
+		// 6. roughnessMap map
+		// 7. metalnessMap map
+		// 8. alphaMap map
+		// 9. emissiveMap map
+		// 10. clearcoat map
+		// 11. clearcoat normal map
+		// 12. clearcoat roughnessMap map
 
-		var uvScaleMap;
+		let uvScaleMap;
 
 		if ( material.map ) {
 
@@ -218,6 +226,18 @@ function WebGLMaterials( properties ) {
 
 			uvScaleMap = material.emissiveMap;
 
+		} else if ( material.clearcoatMap ) {
+
+			uvScaleMap = material.clearcoatMap;
+
+		} else if ( material.clearcoatNormalMap ) {
+
+			uvScaleMap = material.clearcoatNormalMap;
+
+		} else if ( material.clearcoatRoughnessMap ) {
+
+			uvScaleMap = material.clearcoatRoughnessMap;
+
 		}
 
 		if ( uvScaleMap !== undefined ) {
@@ -243,7 +263,7 @@ function WebGLMaterials( properties ) {
 		// 1. ao map
 		// 2. light map
 
-		var uv2ScaleMap;
+		let uv2ScaleMap;
 
 		if ( material.aoMap ) {
 
@@ -314,7 +334,7 @@ function WebGLMaterials( properties ) {
 		// 1. color map
 		// 2. alpha map
 
-		var uvScaleMap;
+		let uvScaleMap;
 
 		if ( material.map ) {
 
@@ -362,7 +382,7 @@ function WebGLMaterials( properties ) {
 		// 1. color map
 		// 2. alpha map
 
-		var uvScaleMap;
+		let uvScaleMap;
 
 		if ( material.map ) {
 
@@ -437,9 +457,6 @@ function WebGLMaterials( properties ) {
 
 	function refreshUniformsToon( uniforms, material ) {
 
-		uniforms.specular.value.copy( material.specular );
-		uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
-
 		if ( material.gradientMap ) {
 
 			uniforms.gradientMap.value = material.gradientMap;
@@ -478,7 +495,7 @@ function WebGLMaterials( properties ) {
 
 	}
 
-	function refreshUniformsStandard( uniforms, material, environment ) {
+	function refreshUniformsStandard( uniforms, material ) {
 
 		uniforms.roughness.value = material.roughness;
 		uniforms.metalness.value = material.metalness;
@@ -525,7 +542,9 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		if ( material.envMap || environment ) {
+		const envMap = properties.get( material ).envMap;
+
+		if ( envMap ) {
 
 			//uniforms.envMap.value = material.envMap; // part of uniforms common
 			uniforms.envMapIntensity.value = material.envMapIntensity;
@@ -534,9 +553,9 @@ function WebGLMaterials( properties ) {
 
 	}
 
-	function refreshUniformsPhysical( uniforms, material, environment ) {
+	function refreshUniformsPhysical( uniforms, material ) {
 
-		refreshUniformsStandard( uniforms, material, environment );
+		refreshUniformsStandard( uniforms, material );
 
 		uniforms.reflectivity.value = material.reflectivity; // also part of uniforms common
 
@@ -569,7 +588,13 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		uniforms.transparency.value = material.transparency;
+		uniforms.transmission.value = material.transmission;
+
+		if ( material.transmissionMap ) {
+
+			uniforms.transmissionMap.value = material.transmissionMap;
+
+		}
 
 	}
 

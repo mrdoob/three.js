@@ -1,19 +1,33 @@
 import { Group } from '../../objects/Group.js';
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 function WebXRController() {
 
 	this._targetRay = null;
 	this._grip = null;
+	this._hand = null;
 
 }
 
 Object.assign( WebXRController.prototype, {
 
 	constructor: WebXRController,
+
+	getHandSpace: function () {
+
+		if ( this._hand === null ) {
+
+			this._hand = new Group();
+			this._hand.matrixAutoUpdate = false;
+			this._hand.visible = false;
+
+			this._hand.joints = {};
+			this._hand.inputState = { pinching: false };
+
+		}
+
+		return this._hand;
+
+	},
 
 	getTargetRaySpace: function () {
 
@@ -57,6 +71,12 @@ Object.assign( WebXRController.prototype, {
 
 		}
 
+		if ( this._hand !== null ) {
+
+			this._hand.dispatchEvent( event );
+
+		}
+
 		return this;
 
 	},
@@ -77,41 +97,118 @@ Object.assign( WebXRController.prototype, {
 
 		}
 
+		if ( this._hand !== null ) {
+
+			this._hand.visible = false;
+
+		}
+
 		return this;
 
 	},
 
 	update: function ( inputSource, frame, referenceSpace ) {
 
-		var inputPose = null;
-		var gripPose = null;
+		let inputPose = null;
+		let gripPose = null;
+		let handPose = null;
 
-		var targetRay = this._targetRay;
-		var grip = this._grip;
+		const targetRay = this._targetRay;
+		const grip = this._grip;
+		const hand = this._hand;
 
-		if ( inputSource ) {
+		if ( inputSource && frame.session.visibilityState !== 'visible-blurred' ) {
 
-			if ( targetRay !== null ) {
+			if ( hand && inputSource.hand ) {
 
-				inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
+				handPose = true;
 
-				if ( inputPose !== null ) {
+				for ( const inputjoint of inputSource.hand.values() ) {
 
-					targetRay.matrix.fromArray( inputPose.transform.matrix );
-					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+					// Update the joints groups with the XRJoint poses
+					const jointPose = frame.getJointPose( inputjoint, referenceSpace );
+
+					if ( hand.joints[ inputjoint.jointName ] === undefined ) {
+
+						// The transform of this joint will be updated with the joint pose on each frame
+						const joint = new Group();
+						joint.matrixAutoUpdate = false;
+						joint.visible = false;
+						hand.joints[ inputjoint.jointName ] = joint;
+						// ??
+						hand.add( joint );
+
+					}
+
+					const joint = hand.joints[ inputjoint.jointName ];
+
+					if ( jointPose !== null ) {
+
+						joint.matrix.fromArray( jointPose.transform.matrix );
+						joint.matrix.decompose( joint.position, joint.rotation, joint.scale );
+						joint.jointRadius = jointPose.radius;
+
+					}
+
+					joint.visible = jointPose !== null;
 
 				}
 
-			}
+				// Custom events
 
-			if ( grip !== null && inputSource.gripSpace ) {
+				// Check pinchz
+				const indexTip = hand.joints[ 'index-finger-tip' ];
+				const thumbTip = hand.joints[ 'thumb-tip' ];
+				const distance = indexTip.position.distanceTo( thumbTip.position );
 
-				gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
+				const distanceToPinch = 0.02;
+				const threshold = 0.005;
 
-				if ( gripPose !== null ) {
+				if ( hand.inputState.pinching && distance > distanceToPinch + threshold ) {
 
-					grip.matrix.fromArray( gripPose.transform.matrix );
-					grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
+					hand.inputState.pinching = false;
+					this.dispatchEvent( {
+						type: 'pinchend',
+						handedness: inputSource.handedness,
+						target: this
+					} );
+
+				} else if ( ! hand.inputState.pinching && distance <= distanceToPinch - threshold ) {
+
+					hand.inputState.pinching = true;
+					this.dispatchEvent( {
+						type: 'pinchstart',
+						handedness: inputSource.handedness,
+						target: this
+					} );
+
+				}
+
+			} else {
+
+				if ( targetRay !== null ) {
+
+					inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
+
+					if ( inputPose !== null ) {
+
+						targetRay.matrix.fromArray( inputPose.transform.matrix );
+						targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+
+					}
+
+				}
+
+				if ( grip !== null && inputSource.gripSpace ) {
+
+					gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
+
+					if ( gripPose !== null ) {
+
+						grip.matrix.fromArray( gripPose.transform.matrix );
+						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
+
+					}
 
 				}
 
@@ -128,6 +225,12 @@ Object.assign( WebXRController.prototype, {
 		if ( grip !== null ) {
 
 			grip.visible = ( gripPose !== null );
+
+		}
+
+		if ( hand !== null ) {
+
+			hand.visible = ( handPose !== null );
 
 		}
 

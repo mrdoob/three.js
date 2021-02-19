@@ -1,9 +1,5 @@
 import { BufferGeometry } from './BufferGeometry.js';
 
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- */
-
 function InstancedBufferGeometry() {
 
 	BufferGeometry.call( this );
@@ -37,7 +33,7 @@ InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry
 
 	toJSON: function () {
 
-		var data = BufferGeometry.prototype.toJSON.call( this );
+		const data = BufferGeometry.prototype.toJSON.call( this );
 
 		data.instanceCount = this.instanceCount;
 

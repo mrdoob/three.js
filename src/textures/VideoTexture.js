@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { RGBFormat, LinearFilter } from '../constants.js';
 import { Texture } from './Texture.js';
 
@@ -16,19 +12,41 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 	this.generateMipmaps = false;
 
+	const scope = this;
+
+	function updateVideo() {
+
+		scope.needsUpdate = true;
+		video.requestVideoFrameCallback( updateVideo );
+
+	}
+
+	if ( 'requestVideoFrameCallback' in video ) {
+
+		video.requestVideoFrameCallback( updateVideo );
+
+	}
+
 }
 
 VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
 
 	constructor: VideoTexture,
 
+	clone: function () {
+
+		return new this.constructor( this.image ).copy( this );
+
+	},
+
 	isVideoTexture: true,
 
 	update: function () {
 
-		var video = this.image;
+		const video = this.image;
+		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
 
-		if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+		if ( hasVideoFrameCallback === false && video.readyState >= video.HAVE_CURRENT_DATA ) {
 
 			this.needsUpdate = true;
 

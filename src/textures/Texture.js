@@ -1,9 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author szimek / https://github.com/szimek/
- */
-
 import { EventDispatcher } from '../core/EventDispatcher.js';
 import {
 	MirroredRepeatWrapping,
@@ -21,9 +15,9 @@ import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { ImageUtils } from '../extras/ImageUtils.js';
 
-var textureId = 0;
+let textureId = 0;
 
-function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+function Texture( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1, encoding = LinearEncoding ) {
 
 	Object.defineProperty( this, 'id', { value: textureId ++ } );
 
@@ -31,22 +25,22 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.name = '';
 
-	this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
+	this.image = image;
 	this.mipmaps = [];
 
-	this.mapping = mapping !== undefined ? mapping : Texture.DEFAULT_MAPPING;
+	this.mapping = mapping;
 
-	this.wrapS = wrapS !== undefined ? wrapS : ClampToEdgeWrapping;
-	this.wrapT = wrapT !== undefined ? wrapT : ClampToEdgeWrapping;
+	this.wrapS = wrapS;
+	this.wrapT = wrapT;
 
-	this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
-	this.minFilter = minFilter !== undefined ? minFilter : LinearMipmapLinearFilter;
+	this.magFilter = magFilter;
+	this.minFilter = minFilter;
 
-	this.anisotropy = anisotropy !== undefined ? anisotropy : 1;
+	this.anisotropy = anisotropy;
 
-	this.format = format !== undefined ? format : RGBAFormat;
+	this.format = format;
 	this.internalFormat = null;
-	this.type = type !== undefined ? type : UnsignedByteType;
+	this.type = type;
 
 	this.offset = new Vector2( 0, 0 );
 	this.repeat = new Vector2( 1, 1 );
@@ -65,7 +59,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	//
 	// Also changing the encoding after already used by a Material will not automatically make the Material
 	// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
-	this.encoding = encoding !== undefined ? encoding : LinearEncoding;
+	this.encoding = encoding;
 
 	this.version = 0;
 	this.onUpdate = null;
@@ -134,7 +128,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	toJSON: function ( meta ) {
 
-		var isRootObject = ( meta === undefined || typeof meta === 'string' );
+		const isRootObject = ( meta === undefined || typeof meta === 'string' );
 
 		if ( ! isRootObject && meta.textures[ this.uuid ] !== undefined ) {
 
@@ -142,7 +136,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		}
 
-		var output = {
+		const output = {
 
 			metadata: {
 				version: 4.5,
@@ -181,7 +175,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 			// TODO: Move to THREE.Image
 
-			var image = this.image;
+			const image = this.image;
 
 			if ( image.uuid === undefined ) {
 
@@ -191,7 +185,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
 
-				var url;
+				let url;
 
 				if ( Array.isArray( image ) ) {
 
@@ -199,9 +193,19 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 					url = [];
 
-					for ( var i = 0, l = image.length; i < l; i ++ ) {
+					for ( let i = 0, l = image.length; i < l; i ++ ) {
 
-						url.push( ImageUtils.getDataURL( image[ i ] ) );
+						// check cube texture with data textures
+
+						if ( image[ i ].isDataTexture ) {
+
+							url.push( serializeImage( image[ i ].image ) );
+
+						} else {
+
+							url.push( serializeImage( image[ i ] ) );
+
+						}
 
 					}
 
@@ -209,7 +213,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 					// process single image
 
-					url = ImageUtils.getDataURL( image );
+					url = serializeImage( image );
 
 				}
 
@@ -322,7 +326,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 } );
 
-Object.defineProperty( Texture.prototype, "needsUpdate", {
+Object.defineProperty( Texture.prototype, 'needsUpdate', {
 
 	set: function ( value ) {
 
@@ -332,5 +336,38 @@ Object.defineProperty( Texture.prototype, "needsUpdate", {
 
 } );
 
+function serializeImage( image ) {
+
+	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
+
+		// default images
+
+		return ImageUtils.getDataURL( image );
+
+	} else {
+
+		if ( image.data ) {
+
+			// images of DataTexture
+
+			return {
+				data: Array.prototype.slice.call( image.data ),
+				width: image.width,
+				height: image.height,
+				type: image.data.constructor.name
+			};
+
+		} else {
+
+			console.warn( 'THREE.Texture: Unable to serialize Texture.' );
+			return {};
+
+		}
+
+	}
+
+}
 
 export { Texture };

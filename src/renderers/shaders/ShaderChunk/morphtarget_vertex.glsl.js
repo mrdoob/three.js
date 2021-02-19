@@ -12,10 +12,10 @@ export default /* glsl */`
 
 	#ifndef USE_MORPHNORMALS
 
-	transformed += morphTarget4 * morphTargetInfluences[ 4 ];
-	transformed += morphTarget5 * morphTargetInfluences[ 5 ];
-	transformed += morphTarget6 * morphTargetInfluences[ 6 ];
-	transformed += morphTarget7 * morphTargetInfluences[ 7 ];
+		transformed += morphTarget4 * morphTargetInfluences[ 4 ];
+		transformed += morphTarget5 * morphTargetInfluences[ 5 ];
+		transformed += morphTarget6 * morphTargetInfluences[ 6 ];
+		transformed += morphTarget7 * morphTargetInfluences[ 7 ];
 
 	#endif
 
