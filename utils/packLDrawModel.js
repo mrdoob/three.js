@@ -1,6 +1,4 @@
 /**
- * @author yomboprime / https://github.com/yomboprime/
- *
  * LDraw object packer
  *
  * Usage:
@@ -174,7 +172,7 @@ function parseObject( fileName, isRoot ) {
 
 	}
 
-	var objectPath = path.join( prefix, fileName );
+	var objectPath = path.join( prefix, fileName ).trim().replace( /\\/g, '/' );
 
 	if ( ! objectContent ) {
 
