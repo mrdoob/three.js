@@ -1836,7 +1836,7 @@
 		};
 
 		_proto.getNormalMatrix = function getNormalMatrix(matrix4) {
-			return this.setFromMatrix4(matrix4).copy(this).invert().transpose();
+			return this.setFromMatrix4(matrix4).invert().transpose();
 		};
 
 		_proto.transposeIntoArray = function transposeIntoArray(r) {
