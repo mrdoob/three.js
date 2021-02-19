@@ -11990,6 +11990,9 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		this.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
+		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
+		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
+
 		this.texture._needsFlipEnvMap = false;
 
 	}
@@ -33525,104 +33528,28 @@ class VectorKeyframeTrack extends KeyframeTrack {}
 
 VectorKeyframeTrack.prototype.ValueTypeName = 'vector';
 
-function AnimationClip( name, duration = - 1, tracks, blendMode = NormalAnimationBlendMode ) {
+class AnimationClip {
 
-	this.name = name;
-	this.tracks = tracks;
-	this.duration = duration;
-	this.blendMode = blendMode;
+	constructor( name, duration = - 1, tracks, blendMode = NormalAnimationBlendMode ) {
 
-	this.uuid = MathUtils.generateUUID();
+		this.name = name;
+		this.tracks = tracks;
+		this.duration = duration;
+		this.blendMode = blendMode;
 
-	// this means it should figure out its duration by scanning the tracks
-	if ( this.duration < 0 ) {
+		this.uuid = MathUtils.generateUUID();
 
-		this.resetDuration();
+		// this means it should figure out its duration by scanning the tracks
+		if ( this.duration < 0 ) {
 
-	}
+			this.resetDuration();
 
-}
-
-function getTrackTypeForValueTypeName( typeName ) {
-
-	switch ( typeName.toLowerCase() ) {
-
-		case 'scalar':
-		case 'double':
-		case 'float':
-		case 'number':
-		case 'integer':
-
-			return NumberKeyframeTrack;
-
-		case 'vector':
-		case 'vector2':
-		case 'vector3':
-		case 'vector4':
-
-			return VectorKeyframeTrack;
-
-		case 'color':
-
-			return ColorKeyframeTrack;
-
-		case 'quaternion':
-
-			return QuaternionKeyframeTrack;
-
-		case 'bool':
-		case 'boolean':
-
-			return BooleanKeyframeTrack;
-
-		case 'string':
-
-			return StringKeyframeTrack;
+		}
 
 	}
 
-	throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
 
-}
-
-function parseKeyframeTrack( json ) {
-
-	if ( json.type === undefined ) {
-
-		throw new Error( 'THREE.KeyframeTrack: track type undefined, can not parse' );
-
-	}
-
-	const trackType = getTrackTypeForValueTypeName( json.type );
-
-	if ( json.times === undefined ) {
-
-		const times = [], values = [];
-
-		AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
-
-		json.times = times;
-		json.values = values;
-
-	}
-
-	// derived classes can define a static parse method
-	if ( trackType.parse !== undefined ) {
-
-		return trackType.parse( json );
-
-	} else {
-
-		// by default, we assume a constructor compatible with the base
-		return new trackType( json.name, json.times, json.values, json.interpolation );
-
-	}
-
-}
-
-Object.assign( AnimationClip, {
-
-	parse: function ( json ) {
+	static parse( json ) {
 
 		const tracks = [],
 			jsonTracks = json.tracks,
@@ -33634,14 +33561,14 @@ Object.assign( AnimationClip, {
 
 		}
 
-		const clip = new AnimationClip( json.name, json.duration, tracks, json.blendMode );
+		const clip = new this( json.name, json.duration, tracks, json.blendMode );
 		clip.uuid = json.uuid;
 
 		return clip;
 
-	},
+	}
 
-	toJSON: function ( clip ) {
+	static toJSON( clip ) {
 
 		const tracks = [],
 			clipTracks = clip.tracks;
@@ -33664,9 +33591,9 @@ Object.assign( AnimationClip, {
 
 		return json;
 
-	},
+	}
 
-	CreateFromMorphTargetSequence: function ( name, morphTargetSequence, fps, noLoop ) {
+	static CreateFromMorphTargetSequence( name, morphTargetSequence, fps, noLoop ) {
 
 		const numMorphTargets = morphTargetSequence.length;
 		const tracks = [];
@@ -33704,11 +33631,11 @@ Object.assign( AnimationClip, {
 
 		}
 
-		return new AnimationClip( name, - 1, tracks );
+		return new this( name, - 1, tracks );
 
-	},
+	}
 
-	findByName: function ( objectOrClipArray, name ) {
+	static findByName( objectOrClipArray, name ) {
 
 		let clipArray = objectOrClipArray;
 
@@ -33731,9 +33658,9 @@ Object.assign( AnimationClip, {
 
 		return null;
 
-	},
+	}
 
-	CreateClipsFromMorphTargetSequences: function ( morphTargets, fps, noLoop ) {
+	static CreateClipsFromMorphTargetSequences( morphTargets, fps, noLoop ) {
 
 		const animationToMorphTargets = {};
 
@@ -33770,16 +33697,16 @@ Object.assign( AnimationClip, {
 
 		for ( const name in animationToMorphTargets ) {
 
-			clips.push( AnimationClip.CreateFromMorphTargetSequence( name, animationToMorphTargets[ name ], fps, noLoop ) );
+			clips.push( this.CreateFromMorphTargetSequence( name, animationToMorphTargets[ name ], fps, noLoop ) );
 
 		}
 
 		return clips;
 
-	},
+	}
 
 	// parse the animation.hierarchy format
-	parseAnimation: function ( animation, bones ) {
+	static parseAnimation( animation, bones ) {
 
 		if ( ! animation ) {
 
@@ -33900,17 +33827,13 @@ Object.assign( AnimationClip, {
 
 		}
 
-		const clip = new AnimationClip( clipName, duration, tracks, blendMode );
+		const clip = new this( clipName, duration, tracks, blendMode );
 
 		return clip;
 
 	}
 
-} );
-
-Object.assign( AnimationClip.prototype, {
-
-	resetDuration: function () {
+	resetDuration() {
 
 		const tracks = this.tracks;
 		let duration = 0;
@@ -33927,9 +33850,9 @@ Object.assign( AnimationClip.prototype, {
 
 		return this;
 
-	},
+	}
 
-	trim: function () {
+	trim() {
 
 		for ( let i = 0; i < this.tracks.length; i ++ ) {
 
@@ -33939,9 +33862,9 @@ Object.assign( AnimationClip.prototype, {
 
 		return this;
 
-	},
+	}
 
-	validate: function () {
+	validate() {
 
 		let valid = true;
 
@@ -33953,9 +33876,9 @@ Object.assign( AnimationClip.prototype, {
 
 		return valid;
 
-	},
+	}
 
-	optimize: function () {
+	optimize() {
 
 		for ( let i = 0; i < this.tracks.length; i ++ ) {
 
@@ -33965,9 +33888,9 @@ Object.assign( AnimationClip.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		const tracks = [];
 
@@ -33977,17 +33900,94 @@ Object.assign( AnimationClip.prototype, {
 
 		}
 
-		return new AnimationClip( this.name, this.duration, tracks, this.blendMode );
-
-	},
-
-	toJSON: function () {
-
-		return AnimationClip.toJSON( this );
+		return new this.constructor( this.name, this.duration, tracks, this.blendMode );
 
 	}
 
-} );
+	toJSON() {
+
+		return this.constructor.toJSON( this );
+
+	}
+
+}
+
+function getTrackTypeForValueTypeName( typeName ) {
+
+	switch ( typeName.toLowerCase() ) {
+
+		case 'scalar':
+		case 'double':
+		case 'float':
+		case 'number':
+		case 'integer':
+
+			return NumberKeyframeTrack;
+
+		case 'vector':
+		case 'vector2':
+		case 'vector3':
+		case 'vector4':
+
+			return VectorKeyframeTrack;
+
+		case 'color':
+
+			return ColorKeyframeTrack;
+
+		case 'quaternion':
+
+			return QuaternionKeyframeTrack;
+
+		case 'bool':
+		case 'boolean':
+
+			return BooleanKeyframeTrack;
+
+		case 'string':
+
+			return StringKeyframeTrack;
+
+	}
+
+	throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
+
+}
+
+function parseKeyframeTrack( json ) {
+
+	if ( json.type === undefined ) {
+
+		throw new Error( 'THREE.KeyframeTrack: track type undefined, can not parse' );
+
+	}
+
+	const trackType = getTrackTypeForValueTypeName( json.type );
+
+	if ( json.times === undefined ) {
+
+		const times = [], values = [];
+
+		AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
+
+		json.times = times;
+		json.values = values;
+
+	}
+
+	// derived classes can define a static parse method
+	if ( trackType.parse !== undefined ) {
+
+		return trackType.parse( json );
+
+	} else {
+
+		// by default, we assume a constructor compatible with the base
+		return new trackType( json.name, json.times, json.values, json.interpolation );
+
+	}
+
+}
 
 const Cache = {
 
@@ -41188,82 +41188,82 @@ class AudioAnalyser {
 
 }
 
-function PropertyMixer( binding, typeName, valueSize ) {
+class PropertyMixer {
 
-	this.binding = binding;
-	this.valueSize = valueSize;
+	constructor( binding, typeName, valueSize ) {
 
-	let mixFunction,
-		mixFunctionAdditive,
-		setIdentity;
+		this.binding = binding;
+		this.valueSize = valueSize;
 
-	// buffer layout: [ incoming | accu0 | accu1 | orig | addAccu | (optional work) ]
-	//
-	// interpolators can use .buffer as their .result
-	// the data then goes to 'incoming'
-	//
-	// 'accu0' and 'accu1' are used frame-interleaved for
-	// the cumulative result and are compared to detect
-	// changes
-	//
-	// 'orig' stores the original state of the property
-	//
-	// 'add' is used for additive cumulative results
-	//
-	// 'work' is optional and is only present for quaternion types. It is used
-	// to store intermediate quaternion multiplication results
+		let mixFunction,
+			mixFunctionAdditive,
+			setIdentity;
 
-	switch ( typeName ) {
+		// buffer layout: [ incoming | accu0 | accu1 | orig | addAccu | (optional work) ]
+		//
+		// interpolators can use .buffer as their .result
+		// the data then goes to 'incoming'
+		//
+		// 'accu0' and 'accu1' are used frame-interleaved for
+		// the cumulative result and are compared to detect
+		// changes
+		//
+		// 'orig' stores the original state of the property
+		//
+		// 'add' is used for additive cumulative results
+		//
+		// 'work' is optional and is only present for quaternion types. It is used
+		// to store intermediate quaternion multiplication results
 
-		case 'quaternion':
-			mixFunction = this._slerp;
-			mixFunctionAdditive = this._slerpAdditive;
-			setIdentity = this._setAdditiveIdentityQuaternion;
+		switch ( typeName ) {
 
-			this.buffer = new Float64Array( valueSize * 6 );
-			this._workIndex = 5;
-			break;
+			case 'quaternion':
+				mixFunction = this._slerp;
+				mixFunctionAdditive = this._slerpAdditive;
+				setIdentity = this._setAdditiveIdentityQuaternion;
 
-		case 'string':
-		case 'bool':
-			mixFunction = this._select;
+				this.buffer = new Float64Array( valueSize * 6 );
+				this._workIndex = 5;
+				break;
 
-			// Use the regular mix function and for additive on these types,
-			// additive is not relevant for non-numeric types
-			mixFunctionAdditive = this._select;
+			case 'string':
+			case 'bool':
+				mixFunction = this._select;
 
-			setIdentity = this._setAdditiveIdentityOther;
+				// Use the regular mix function and for additive on these types,
+				// additive is not relevant for non-numeric types
+				mixFunctionAdditive = this._select;
 
-			this.buffer = new Array( valueSize * 5 );
-			break;
+				setIdentity = this._setAdditiveIdentityOther;
 
-		default:
-			mixFunction = this._lerp;
-			mixFunctionAdditive = this._lerpAdditive;
-			setIdentity = this._setAdditiveIdentityNumeric;
+				this.buffer = new Array( valueSize * 5 );
+				break;
 
-			this.buffer = new Float64Array( valueSize * 5 );
+			default:
+				mixFunction = this._lerp;
+				mixFunctionAdditive = this._lerpAdditive;
+				setIdentity = this._setAdditiveIdentityNumeric;
+
+				this.buffer = new Float64Array( valueSize * 5 );
+
+		}
+
+		this._mixBufferRegion = mixFunction;
+		this._mixBufferRegionAdditive = mixFunctionAdditive;
+		this._setIdentity = setIdentity;
+		this._origIndex = 3;
+		this._addIndex = 4;
+
+		this.cumulativeWeight = 0;
+		this.cumulativeWeightAdditive = 0;
+
+		this.useCount = 0;
+		this.referenceCount = 0;
 
 	}
 
-	this._mixBufferRegion = mixFunction;
-	this._mixBufferRegionAdditive = mixFunctionAdditive;
-	this._setIdentity = setIdentity;
-	this._origIndex = 3;
-	this._addIndex = 4;
-
-	this.cumulativeWeight = 0;
-	this.cumulativeWeightAdditive = 0;
-
-	this.useCount = 0;
-	this.referenceCount = 0;
-
-}
-
-Object.assign( PropertyMixer.prototype, {
-
 	// accumulate data in the 'incoming' region into 'accu<i>'
-	accumulate: function ( accuIndex, weight ) {
+	accumulate( accuIndex, weight ) {
 
 		// note: happily accumulating nothing when weight = 0, the caller knows
 		// the weight and shouldn't have made the call in the first place
@@ -41298,10 +41298,10 @@ Object.assign( PropertyMixer.prototype, {
 
 		this.cumulativeWeight = currentWeight;
 
-	},
+	}
 
 	// accumulate data in the 'incoming' region into 'add'
-	accumulateAdditive: function ( weight ) {
+	accumulateAdditive( weight ) {
 
 		const buffer = this.buffer,
 			stride = this.valueSize,
@@ -41320,10 +41320,10 @@ Object.assign( PropertyMixer.prototype, {
 		this._mixBufferRegionAdditive( buffer, offset, 0, weight, stride );
 		this.cumulativeWeightAdditive += weight;
 
-	},
+	}
 
 	// apply the state of 'accu<i>' to the binding when accus differ
-	apply: function ( accuIndex ) {
+	apply( accuIndex ) {
 
 		const stride = this.valueSize,
 			buffer = this.buffer,
@@ -41369,10 +41369,10 @@ Object.assign( PropertyMixer.prototype, {
 
 		}
 
-	},
+	}
 
 	// remember the state of the bound property and copy it to both accus
-	saveOriginalState: function () {
+	saveOriginalState() {
 
 		const binding = this.binding;
 
@@ -41396,17 +41396,17 @@ Object.assign( PropertyMixer.prototype, {
 		this.cumulativeWeight = 0;
 		this.cumulativeWeightAdditive = 0;
 
-	},
+	}
 
 	// apply the state previously taken via 'saveOriginalState' to the binding
-	restoreOriginalState: function () {
+	restoreOriginalState() {
 
 		const originalValueOffset = this.valueSize * 3;
 		this.binding.setValue( this.buffer, originalValueOffset );
 
-	},
+	}
 
-	_setAdditiveIdentityNumeric: function () {
+	_setAdditiveIdentityNumeric() {
 
 		const startIndex = this._addIndex * this.valueSize;
 		const endIndex = startIndex + this.valueSize;
@@ -41417,16 +41417,16 @@ Object.assign( PropertyMixer.prototype, {
 
 		}
 
-	},
+	}
 
-	_setAdditiveIdentityQuaternion: function () {
+	_setAdditiveIdentityQuaternion() {
 
 		this._setAdditiveIdentityNumeric();
 		this.buffer[ this._addIndex * this.valueSize + 3 ] = 1;
 
-	},
+	}
 
-	_setAdditiveIdentityOther: function () {
+	_setAdditiveIdentityOther() {
 
 		const startIndex = this._origIndex * this.valueSize;
 		const targetIndex = this._addIndex * this.valueSize;
@@ -41437,12 +41437,12 @@ Object.assign( PropertyMixer.prototype, {
 
 		}
 
-	},
+	}
 
 
 	// mix functions
 
-	_select: function ( buffer, dstOffset, srcOffset, t, stride ) {
+	_select( buffer, dstOffset, srcOffset, t, stride ) {
 
 		if ( t >= 0.5 ) {
 
@@ -41454,15 +41454,15 @@ Object.assign( PropertyMixer.prototype, {
 
 		}
 
-	},
+	}
 
-	_slerp: function ( buffer, dstOffset, srcOffset, t ) {
+	_slerp( buffer, dstOffset, srcOffset, t ) {
 
 		Quaternion.slerpFlat( buffer, dstOffset, buffer, dstOffset, buffer, srcOffset, t );
 
-	},
+	}
 
-	_slerpAdditive: function ( buffer, dstOffset, srcOffset, t, stride ) {
+	_slerpAdditive( buffer, dstOffset, srcOffset, t, stride ) {
 
 		const workOffset = this._workIndex * stride;
 
@@ -41472,9 +41472,9 @@ Object.assign( PropertyMixer.prototype, {
 		// Slerp to the intermediate result
 		Quaternion.slerpFlat( buffer, dstOffset, buffer, dstOffset, buffer, workOffset, t );
 
-	},
+	}
 
-	_lerp: function ( buffer, dstOffset, srcOffset, t, stride ) {
+	_lerp( buffer, dstOffset, srcOffset, t, stride ) {
 
 		const s = 1 - t;
 
@@ -41486,9 +41486,9 @@ Object.assign( PropertyMixer.prototype, {
 
 		}
 
-	},
+	}
 
-	_lerpAdditive: function ( buffer, dstOffset, srcOffset, t, stride ) {
+	_lerpAdditive( buffer, dstOffset, srcOffset, t, stride ) {
 
 		for ( let i = 0; i !== stride; ++ i ) {
 
@@ -41500,7 +41500,7 @@ Object.assign( PropertyMixer.prototype, {
 
 	}
 
-} );
+}
 
 // Characters [].:/ are reserved for track binding syntax.
 const _RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
@@ -42214,61 +42214,59 @@ Object.assign( PropertyBinding.prototype, {
  *    target group or directly, but not both.
  */
 
-function AnimationObjectGroup() {
+class AnimationObjectGroup {
 
-	this.uuid = MathUtils.generateUUID();
+	constructor() {
 
-	// cached objects followed by the active ones
-	this._objects = Array.prototype.slice.call( arguments );
+		this.uuid = MathUtils.generateUUID();
 
-	this.nCachedObjects_ = 0; // threshold
-	// note: read by PropertyBinding.Composite
+		// cached objects followed by the active ones
+		this._objects = Array.prototype.slice.call( arguments );
 
-	const indices = {};
-	this._indicesByUUID = indices; // for bookkeeping
+		this.nCachedObjects_ = 0; // threshold
+		// note: read by PropertyBinding.Composite
 
-	for ( let i = 0, n = arguments.length; i !== n; ++ i ) {
+		const indices = {};
+		this._indicesByUUID = indices; // for bookkeeping
 
-		indices[ arguments[ i ].uuid ] = i;
+		for ( let i = 0, n = arguments.length; i !== n; ++ i ) {
 
-	}
-
-	this._paths = []; // inside: string
-	this._parsedPaths = []; // inside: { we don't care, here }
-	this._bindings = []; // inside: Array< PropertyBinding >
-	this._bindingsIndicesByPath = {}; // inside: indices in these arrays
-
-	const scope = this;
-
-	this.stats = {
-
-		objects: {
-			get total() {
-
-				return scope._objects.length;
-
-			},
-			get inUse() {
-
-				return this.total - scope.nCachedObjects_;
-
-			}
-		},
-		get bindingsPerObject() {
-
-			return scope._bindings.length;
+			indices[ arguments[ i ].uuid ] = i;
 
 		}
 
-	};
+		this._paths = []; // inside: string
+		this._parsedPaths = []; // inside: { we don't care, here }
+		this._bindings = []; // inside: Array< PropertyBinding >
+		this._bindingsIndicesByPath = {}; // inside: indices in these arrays
 
-}
+		const scope = this;
 
-Object.assign( AnimationObjectGroup.prototype, {
+		this.stats = {
 
-	isAnimationObjectGroup: true,
+			objects: {
+				get total() {
 
-	add: function () {
+					return scope._objects.length;
+
+				},
+				get inUse() {
+
+					return this.total - scope.nCachedObjects_;
+
+				}
+			},
+			get bindingsPerObject() {
+
+				return scope._bindings.length;
+
+			}
+
+		};
+
+	}
+
+	add() {
 
 		const objects = this._objects,
 			indicesByUUID = this._indicesByUUID,
@@ -42354,9 +42352,9 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 		this.nCachedObjects_ = nCachedObjects;
 
-	},
+	}
 
-	remove: function () {
+	remove() {
 
 		const objects = this._objects,
 			indicesByUUID = this._indicesByUUID,
@@ -42403,10 +42401,10 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 		this.nCachedObjects_ = nCachedObjects;
 
-	},
+	}
 
 	// remove & forget
-	uncache: function () {
+	uncache() {
 
 		const objects = this._objects,
 			indicesByUUID = this._indicesByUUID,
@@ -42493,11 +42491,11 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 		this.nCachedObjects_ = nCachedObjects;
 
-	},
+	}
 
 	// Internal interface used by befriended PropertyBinding.Composite:
 
-	subscribe_: function ( path, parsedPath ) {
+	subscribe_( path, parsedPath ) {
 
 		// returns an array of bindings for the given path that is changed
 		// according to the contained objects in the group
@@ -42532,9 +42530,9 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 		return bindingsForPath;
 
-	},
+	}
 
-	unsubscribe_: function ( path ) {
+	unsubscribe_( path ) {
 
 		// tells the group to forget about a property path and no longer
 		// update the array previously obtained with 'subscribe_'
@@ -42566,7 +42564,9 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 	}
 
-} );
+}
+
+AnimationObjectGroup.prototype.isAnimationObjectGroup = true;
 
 class AnimationAction {
 
@@ -43262,23 +43262,21 @@ class AnimationAction {
 
 }
 
-function AnimationMixer( root ) {
+class AnimationMixer extends EventDispatcher {
 
-	this._root = root;
-	this._initMemoryManager();
-	this._accuIndex = 0;
+	constructor( root ) {
 
-	this.time = 0;
+		super();
 
-	this.timeScale = 1.0;
+		this._root = root;
+		this._initMemoryManager();
+		this._accuIndex = 0;
+		this.time = 0;
+		this.timeScale = 1.0;
 
-}
+	}
 
-AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-
-	constructor: AnimationMixer,
-
-	_bindAction: function ( action, prototypeAction ) {
+	_bindAction( action, prototypeAction ) {
 
 		const root = action._localRoot || this._root,
 			tracks = action._clip.tracks,
@@ -43345,9 +43343,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	_activateAction: function ( action ) {
+	_activateAction( action ) {
 
 		if ( ! this._isActiveAction( action ) ) {
 
@@ -43387,9 +43385,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	_deactivateAction: function ( action ) {
+	_deactivateAction( action ) {
 
 		if ( this._isActiveAction( action ) ) {
 
@@ -43413,11 +43411,11 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
 	// Memory manager
 
-	_initMemoryManager: function () {
+	_initMemoryManager() {
 
 		this._actions = []; // 'nActiveActions' followed by inactive ones
 		this._nActiveActions = 0;
@@ -43482,18 +43480,18 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		};
 
-	},
+	}
 
 	// Memory management for AnimationAction objects
 
-	_isActiveAction: function ( action ) {
+	_isActiveAction( action ) {
 
 		const index = action._cacheIndex;
 		return index !== null && index < this._nActiveActions;
 
-	},
+	}
 
-	_addInactiveAction: function ( action, clipUuid, rootUuid ) {
+	_addInactiveAction( action, clipUuid, rootUuid ) {
 
 		const actions = this._actions,
 			actionsByClip = this._actionsByClip;
@@ -43527,9 +43525,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		actionsForClip.actionByRoot[ rootUuid ] = action;
 
-	},
+	}
 
-	_removeInactiveAction: function ( action ) {
+	_removeInactiveAction( action ) {
 
 		const actions = this._actions,
 			lastInactiveAction = actions[ actions.length - 1 ],
@@ -43572,9 +43570,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		this._removeInactiveBindingsForAction( action );
 
-	},
+	}
 
-	_removeInactiveBindingsForAction: function ( action ) {
+	_removeInactiveBindingsForAction( action ) {
 
 		const bindings = action._propertyBindings;
 
@@ -43590,9 +43588,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	_lendAction: function ( action ) {
+	_lendAction( action ) {
 
 		// [ active actions |  inactive actions  ]
 		// [  active actions >| inactive actions ]
@@ -43613,9 +43611,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		firstInactiveAction._cacheIndex = prevIndex;
 		actions[ prevIndex ] = firstInactiveAction;
 
-	},
+	}
 
-	_takeBackAction: function ( action ) {
+	_takeBackAction( action ) {
 
 		// [  active actions  | inactive actions ]
 		// [ active actions |< inactive actions  ]
@@ -43636,11 +43634,11 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		lastActiveAction._cacheIndex = prevIndex;
 		actions[ prevIndex ] = lastActiveAction;
 
-	},
+	}
 
 	// Memory management for PropertyMixer objects
 
-	_addInactiveBinding: function ( binding, rootUuid, trackName ) {
+	_addInactiveBinding( binding, rootUuid, trackName ) {
 
 		const bindingsByRoot = this._bindingsByRootAndName,
 			bindings = this._bindings;
@@ -43659,9 +43657,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		binding._cacheIndex = bindings.length;
 		bindings.push( binding );
 
-	},
+	}
 
-	_removeInactiveBinding: function ( binding ) {
+	_removeInactiveBinding( binding ) {
 
 		const bindings = this._bindings,
 			propBinding = binding.binding,
@@ -43685,9 +43683,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	_lendBinding: function ( binding ) {
+	_lendBinding( binding ) {
 
 		const bindings = this._bindings,
 			prevIndex = binding._cacheIndex,
@@ -43702,9 +43700,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		firstInactiveBinding._cacheIndex = prevIndex;
 		bindings[ prevIndex ] = firstInactiveBinding;
 
-	},
+	}
 
-	_takeBackBinding: function ( binding ) {
+	_takeBackBinding( binding ) {
 
 		const bindings = this._bindings,
 			prevIndex = binding._cacheIndex,
@@ -43719,12 +43717,12 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		lastActiveBinding._cacheIndex = prevIndex;
 		bindings[ prevIndex ] = lastActiveBinding;
 
-	},
+	}
 
 
 	// Memory management of Interpolants for weight and time scale
 
-	_lendControlInterpolant: function () {
+	_lendControlInterpolant() {
 
 		const interpolants = this._controlInterpolants,
 			lastActiveIndex = this._nActiveControlInterpolants ++;
@@ -43744,9 +43742,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return interpolant;
 
-	},
+	}
 
-	_takeBackControlInterpolant: function ( interpolant ) {
+	_takeBackControlInterpolant( interpolant ) {
 
 		const interpolants = this._controlInterpolants,
 			prevIndex = interpolant.__cacheIndex,
@@ -43761,14 +43759,12 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		lastActiveInterpolant.__cacheIndex = prevIndex;
 		interpolants[ prevIndex ] = lastActiveInterpolant;
 
-	},
-
-	_controlInterpolantsResultBuffer: new Float32Array( 1 ),
+	}
 
 	// return an action for a clip optionally using a custom root target
 	// object (this method allocates a lot of dynamic memory in case a
 	// previously unknown clip/root combination is specified)
-	clipAction: function ( clip, optionalRoot, blendMode ) {
+	clipAction( clip, optionalRoot, blendMode ) {
 
 		const root = optionalRoot || this._root,
 			rootUuid = root.uuid;
@@ -43827,10 +43823,10 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return newAction;
 
-	},
+	}
 
 	// get an existing action
-	existingAction: function ( clip, optionalRoot ) {
+	existingAction( clip, optionalRoot ) {
 
 		const root = optionalRoot || this._root,
 			rootUuid = root.uuid,
@@ -43850,10 +43846,10 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return null;
 
-	},
+	}
 
 	// deactivates all previously scheduled actions
-	stopAllAction: function () {
+	stopAllAction() {
 
 		const actions = this._actions,
 			nActions = this._nActiveActions;
@@ -43866,10 +43862,10 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
 	// advance the time and update apply the animation
-	update: function ( deltaTime ) {
+	update( deltaTime ) {
 
 		deltaTime *= this.timeScale;
 
@@ -43904,10 +43900,10 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
 	// Allows you to seek to a specific time in an animation.
-	setTime: function ( timeInSeconds ) {
+	setTime( timeInSeconds ) {
 
 		this.time = 0; // Zero out time attribute for AnimationMixer object;
 		for ( let i = 0; i < this._actions.length; i ++ ) {
@@ -43918,17 +43914,17 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this.update( timeInSeconds ); // Update used to set exact time. Returns "this" AnimationMixer object.
 
-	},
+	}
 
 	// return this mixer's root target object
-	getRoot: function () {
+	getRoot() {
 
 		return this._root;
 
-	},
+	}
 
 	// free all resources specific to a particular clip
-	uncacheClip: function ( clip ) {
+	uncacheClip( clip ) {
 
 		const actions = this._actions,
 			clipUuid = clip.uuid,
@@ -43967,10 +43963,10 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
 	// free all resources specific to a particular root target object
-	uncacheRoot: function ( root ) {
+	uncacheRoot( root ) {
 
 		const rootUuid = root.uuid,
 			actionsByClip = this._actionsByClip;
@@ -44004,10 +44000,10 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
 	// remove a targeted clip from the cache
-	uncacheAction: function ( clip, optionalRoot ) {
+	uncacheAction( clip, optionalRoot ) {
 
 		const action = this.existingAction( clip, optionalRoot );
 
@@ -44020,7 +44016,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	}
 
-} );
+}
+
+AnimationMixer.prototype._controlInterpolantsResultBuffer = new Float32Array( 1 );
 
 class Uniform {
 

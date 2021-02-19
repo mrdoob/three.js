@@ -10308,6 +10308,8 @@
 			_this = _WebGLRenderTarget.call(this, size, size, options) || this;
 			options = options || {};
 			_this.texture = new CubeTexture(undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding);
+			_this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
+			_this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 			_this.texture._needsFlipEnvMap = false;
 			return _this;
 		}
@@ -26389,84 +26391,28 @@
 
 	VectorKeyframeTrack.prototype.ValueTypeName = 'vector'; // ValueBufferType is inherited
 
-	function AnimationClip(name, duration, tracks, blendMode) {
-		if (duration === void 0) {
-			duration = -1;
+	var AnimationClip = /*#__PURE__*/function () {
+		function AnimationClip(name, duration, tracks, blendMode) {
+			if (duration === void 0) {
+				duration = -1;
+			}
+
+			if (blendMode === void 0) {
+				blendMode = NormalAnimationBlendMode;
+			}
+
+			this.name = name;
+			this.tracks = tracks;
+			this.duration = duration;
+			this.blendMode = blendMode;
+			this.uuid = MathUtils.generateUUID(); // this means it should figure out its duration by scanning the tracks
+
+			if (this.duration < 0) {
+				this.resetDuration();
+			}
 		}
 
-		if (blendMode === void 0) {
-			blendMode = NormalAnimationBlendMode;
-		}
-
-		this.name = name;
-		this.tracks = tracks;
-		this.duration = duration;
-		this.blendMode = blendMode;
-		this.uuid = MathUtils.generateUUID(); // this means it should figure out its duration by scanning the tracks
-
-		if (this.duration < 0) {
-			this.resetDuration();
-		}
-	}
-
-	function getTrackTypeForValueTypeName(typeName) {
-		switch (typeName.toLowerCase()) {
-			case 'scalar':
-			case 'double':
-			case 'float':
-			case 'number':
-			case 'integer':
-				return NumberKeyframeTrack;
-
-			case 'vector':
-			case 'vector2':
-			case 'vector3':
-			case 'vector4':
-				return VectorKeyframeTrack;
-
-			case 'color':
-				return ColorKeyframeTrack;
-
-			case 'quaternion':
-				return QuaternionKeyframeTrack;
-
-			case 'bool':
-			case 'boolean':
-				return BooleanKeyframeTrack;
-
-			case 'string':
-				return StringKeyframeTrack;
-		}
-
-		throw new Error('THREE.KeyframeTrack: Unsupported typeName: ' + typeName);
-	}
-
-	function parseKeyframeTrack(json) {
-		if (json.type === undefined) {
-			throw new Error('THREE.KeyframeTrack: track type undefined, can not parse');
-		}
-
-		var trackType = getTrackTypeForValueTypeName(json.type);
-
-		if (json.times === undefined) {
-			var times = [],
-					values = [];
-			AnimationUtils.flattenJSON(json.keys, times, values, 'value');
-			json.times = times;
-			json.values = values;
-		} // derived classes can define a static parse method
-
-
-		if (trackType.parse !== undefined) {
-			return trackType.parse(json);
-		} else {
-			// by default, we assume a constructor compatible with the base
-			return new trackType(json.name, json.times, json.values, json.interpolation);
-		}
-	}
-
-	Object.assign(AnimationClip, {
-		parse: function parse(json) {
+		AnimationClip.parse = function parse(json) {
 			var tracks = [],
 					jsonTracks = json.tracks,
 					frameTime = 1.0 / (json.fps || 1.0);
@@ -26475,11 +26421,12 @@
 				tracks.push(parseKeyframeTrack(jsonTracks[i]).scale(frameTime));
 			}
 
-			var clip = new AnimationClip(json.name, json.duration, tracks, json.blendMode);
+			var clip = new this(json.name, json.duration, tracks, json.blendMode);
 			clip.uuid = json.uuid;
 			return clip;
-		},
-		toJSON: function toJSON(clip) {
+		};
+
+		AnimationClip.toJSON = function toJSON(clip) {
 			var tracks = [],
 					clipTracks = clip.tracks;
 			var json = {
@@ -26495,8 +26442,9 @@
 			}
 
 			return json;
-		},
-		CreateFromMorphTargetSequence: function CreateFromMorphTargetSequence(name, morphTargetSequence, fps, noLoop) {
+		};
+
+		AnimationClip.CreateFromMorphTargetSequence = function CreateFromMorphTargetSequence(name, morphTargetSequence, fps, noLoop) {
 			var numMorphTargets = morphTargetSequence.length;
 			var tracks = [];
 
@@ -26518,9 +26466,10 @@
 				tracks.push(new NumberKeyframeTrack('.morphTargetInfluences[' + morphTargetSequence[i].name + ']', times, values).scale(1.0 / fps));
 			}
 
-			return new AnimationClip(name, -1, tracks);
-		},
-		findByName: function findByName(objectOrClipArray, name) {
+			return new this(name, -1, tracks);
+		};
+
+		AnimationClip.findByName = function findByName(objectOrClipArray, name) {
 			var clipArray = objectOrClipArray;
 
 			if (!Array.isArray(objectOrClipArray)) {
@@ -26535,8 +26484,9 @@
 			}
 
 			return null;
-		},
-		CreateClipsFromMorphTargetSequences: function CreateClipsFromMorphTargetSequences(morphTargets, fps, noLoop) {
+		};
+
+		AnimationClip.CreateClipsFromMorphTargetSequences = function CreateClipsFromMorphTargetSequences(morphTargets, fps, noLoop) {
 			var animationToMorphTargets = {}; // tested with https://regex101.com/ on trick sequences
 			// such flamingo_flyA_003, flamingo_run1_003, crdeath0059
 
@@ -26562,13 +26512,14 @@
 			var clips = [];
 
 			for (var _name in animationToMorphTargets) {
-				clips.push(AnimationClip.CreateFromMorphTargetSequence(_name, animationToMorphTargets[_name], fps, noLoop));
+				clips.push(this.CreateFromMorphTargetSequence(_name, animationToMorphTargets[_name], fps, noLoop));
 			}
 
 			return clips;
-		},
-		// parse the animation.hierarchy format
-		parseAnimation: function parseAnimation(animation, bones) {
+		} // parse the animation.hierarchy format
+		;
+
+		AnimationClip.parseAnimation = function parseAnimation(animation, bones) {
 			if (!animation) {
 				console.error('THREE.AnimationClip: No animation in JSONLoader data.');
 				return null;
@@ -26643,12 +26594,13 @@
 				return null;
 			}
 
-			var clip = new AnimationClip(clipName, duration, tracks, blendMode);
+			var clip = new this(clipName, duration, tracks, blendMode);
 			return clip;
-		}
-	});
-	Object.assign(AnimationClip.prototype, {
-		resetDuration: function resetDuration() {
+		};
+
+		var _proto = AnimationClip.prototype;
+
+		_proto.resetDuration = function resetDuration() {
 			var tracks = this.tracks;
 			var duration = 0;
 
@@ -26659,15 +26611,17 @@
 
 			this.duration = duration;
 			return this;
-		},
-		trim: function trim() {
+		};
+
+		_proto.trim = function trim() {
 			for (var i = 0; i < this.tracks.length; i++) {
 				this.tracks[i].trim(0, this.duration);
 			}
 
 			return this;
-		},
-		validate: function validate() {
+		};
+
+		_proto.validate = function validate() {
 			var valid = true;
 
 			for (var i = 0; i < this.tracks.length; i++) {
@@ -26675,27 +26629,88 @@
 			}
 
 			return valid;
-		},
-		optimize: function optimize() {
+		};
+
+		_proto.optimize = function optimize() {
 			for (var i = 0; i < this.tracks.length; i++) {
 				this.tracks[i].optimize();
 			}
 
 			return this;
-		},
-		clone: function clone() {
+		};
+
+		_proto.clone = function clone() {
 			var tracks = [];
 
 			for (var i = 0; i < this.tracks.length; i++) {
 				tracks.push(this.tracks[i].clone());
 			}
 
-			return new AnimationClip(this.name, this.duration, tracks, this.blendMode);
-		},
-		toJSON: function toJSON() {
-			return AnimationClip.toJSON(this);
+			return new this.constructor(this.name, this.duration, tracks, this.blendMode);
+		};
+
+		_proto.toJSON = function toJSON() {
+			return this.constructor.toJSON(this);
+		};
+
+		return AnimationClip;
+	}();
+
+	function getTrackTypeForValueTypeName(typeName) {
+		switch (typeName.toLowerCase()) {
+			case 'scalar':
+			case 'double':
+			case 'float':
+			case 'number':
+			case 'integer':
+				return NumberKeyframeTrack;
+
+			case 'vector':
+			case 'vector2':
+			case 'vector3':
+			case 'vector4':
+				return VectorKeyframeTrack;
+
+			case 'color':
+				return ColorKeyframeTrack;
+
+			case 'quaternion':
+				return QuaternionKeyframeTrack;
+
+			case 'bool':
+			case 'boolean':
+				return BooleanKeyframeTrack;
+
+			case 'string':
+				return StringKeyframeTrack;
 		}
-	});
+
+		throw new Error('THREE.KeyframeTrack: Unsupported typeName: ' + typeName);
+	}
+
+	function parseKeyframeTrack(json) {
+		if (json.type === undefined) {
+			throw new Error('THREE.KeyframeTrack: track type undefined, can not parse');
+		}
+
+		var trackType = getTrackTypeForValueTypeName(json.type);
+
+		if (json.times === undefined) {
+			var times = [],
+					values = [];
+			AnimationUtils.flattenJSON(json.keys, times, values, 'value');
+			json.times = times;
+			json.values = values;
+		} // derived classes can define a static parse method
+
+
+		if (trackType.parse !== undefined) {
+			return trackType.parse(json);
+		} else {
+			// by default, we assume a constructor compatible with the base
+			return new trackType(json.name, json.times, json.values, json.interpolation);
+		}
+	}
 
 	var Cache = {
 		enabled: false,
@@ -32253,65 +32268,67 @@
 		return AudioAnalyser;
 	}();
 
-	function PropertyMixer(binding, typeName, valueSize) {
-		this.binding = binding;
-		this.valueSize = valueSize;
-		var mixFunction, mixFunctionAdditive, setIdentity; // buffer layout: [ incoming | accu0 | accu1 | orig | addAccu | (optional work) ]
-		//
-		// interpolators can use .buffer as their .result
-		// the data then goes to 'incoming'
-		//
-		// 'accu0' and 'accu1' are used frame-interleaved for
-		// the cumulative result and are compared to detect
-		// changes
-		//
-		// 'orig' stores the original state of the property
-		//
-		// 'add' is used for additive cumulative results
-		//
-		// 'work' is optional and is only present for quaternion types. It is used
-		// to store intermediate quaternion multiplication results
+	var PropertyMixer = /*#__PURE__*/function () {
+		function PropertyMixer(binding, typeName, valueSize) {
+			this.binding = binding;
+			this.valueSize = valueSize;
+			var mixFunction, mixFunctionAdditive, setIdentity; // buffer layout: [ incoming | accu0 | accu1 | orig | addAccu | (optional work) ]
+			//
+			// interpolators can use .buffer as their .result
+			// the data then goes to 'incoming'
+			//
+			// 'accu0' and 'accu1' are used frame-interleaved for
+			// the cumulative result and are compared to detect
+			// changes
+			//
+			// 'orig' stores the original state of the property
+			//
+			// 'add' is used for additive cumulative results
+			//
+			// 'work' is optional and is only present for quaternion types. It is used
+			// to store intermediate quaternion multiplication results
 
-		switch (typeName) {
-			case 'quaternion':
-				mixFunction = this._slerp;
-				mixFunctionAdditive = this._slerpAdditive;
-				setIdentity = this._setAdditiveIdentityQuaternion;
-				this.buffer = new Float64Array(valueSize * 6);
-				this._workIndex = 5;
-				break;
+			switch (typeName) {
+				case 'quaternion':
+					mixFunction = this._slerp;
+					mixFunctionAdditive = this._slerpAdditive;
+					setIdentity = this._setAdditiveIdentityQuaternion;
+					this.buffer = new Float64Array(valueSize * 6);
+					this._workIndex = 5;
+					break;
 
-			case 'string':
-			case 'bool':
-				mixFunction = this._select; // Use the regular mix function and for additive on these types,
-				// additive is not relevant for non-numeric types
+				case 'string':
+				case 'bool':
+					mixFunction = this._select; // Use the regular mix function and for additive on these types,
+					// additive is not relevant for non-numeric types
 
-				mixFunctionAdditive = this._select;
-				setIdentity = this._setAdditiveIdentityOther;
-				this.buffer = new Array(valueSize * 5);
-				break;
+					mixFunctionAdditive = this._select;
+					setIdentity = this._setAdditiveIdentityOther;
+					this.buffer = new Array(valueSize * 5);
+					break;
 
-			default:
-				mixFunction = this._lerp;
-				mixFunctionAdditive = this._lerpAdditive;
-				setIdentity = this._setAdditiveIdentityNumeric;
-				this.buffer = new Float64Array(valueSize * 5);
-		}
+				default:
+					mixFunction = this._lerp;
+					mixFunctionAdditive = this._lerpAdditive;
+					setIdentity = this._setAdditiveIdentityNumeric;
+					this.buffer = new Float64Array(valueSize * 5);
+			}
 
-		this._mixBufferRegion = mixFunction;
-		this._mixBufferRegionAdditive = mixFunctionAdditive;
-		this._setIdentity = setIdentity;
-		this._origIndex = 3;
-		this._addIndex = 4;
-		this.cumulativeWeight = 0;
-		this.cumulativeWeightAdditive = 0;
-		this.useCount = 0;
-		this.referenceCount = 0;
-	}
+			this._mixBufferRegion = mixFunction;
+			this._mixBufferRegionAdditive = mixFunctionAdditive;
+			this._setIdentity = setIdentity;
+			this._origIndex = 3;
+			this._addIndex = 4;
+			this.cumulativeWeight = 0;
+			this.cumulativeWeightAdditive = 0;
+			this.useCount = 0;
+			this.referenceCount = 0;
+		} // accumulate data in the 'incoming' region into 'accu<i>'
 
-	Object.assign(PropertyMixer.prototype, {
-		// accumulate data in the 'incoming' region into 'accu<i>'
-		accumulate: function accumulate(accuIndex, weight) {
+
+		var _proto = PropertyMixer.prototype;
+
+		_proto.accumulate = function accumulate(accuIndex, weight) {
 			// note: happily accumulating nothing when weight = 0, the caller knows
 			// the weight and shouldn't have made the call in the first place
 			var buffer = this.buffer,
@@ -32335,9 +32352,10 @@
 			}
 
 			this.cumulativeWeight = currentWeight;
-		},
-		// accumulate data in the 'incoming' region into 'add'
-		accumulateAdditive: function accumulateAdditive(weight) {
+		} // accumulate data in the 'incoming' region into 'add'
+		;
+
+		_proto.accumulateAdditive = function accumulateAdditive(weight) {
 			var buffer = this.buffer,
 					stride = this.valueSize,
 					offset = stride * this._addIndex;
@@ -32351,9 +32369,10 @@
 			this._mixBufferRegionAdditive(buffer, offset, 0, weight, stride);
 
 			this.cumulativeWeightAdditive += weight;
-		},
-		// apply the state of 'accu<i>' to the binding when accus differ
-		apply: function apply(accuIndex) {
+		} // apply the state of 'accu<i>' to the binding when accus differ
+		;
+
+		_proto.apply = function apply(accuIndex) {
 			var stride = this.valueSize,
 					buffer = this.buffer,
 					offset = accuIndex * stride + stride,
@@ -32382,9 +32401,10 @@
 					break;
 				}
 			}
-		},
-		// remember the state of the bound property and copy it to both accus
-		saveOriginalState: function saveOriginalState() {
+		} // remember the state of the bound property and copy it to both accus
+		;
+
+		_proto.saveOriginalState = function saveOriginalState() {
 			var binding = this.binding;
 			var buffer = this.buffer,
 					stride = this.valueSize,
@@ -32400,66 +32420,77 @@
 
 			this.cumulativeWeight = 0;
 			this.cumulativeWeightAdditive = 0;
-		},
-		// apply the state previously taken via 'saveOriginalState' to the binding
-		restoreOriginalState: function restoreOriginalState() {
+		} // apply the state previously taken via 'saveOriginalState' to the binding
+		;
+
+		_proto.restoreOriginalState = function restoreOriginalState() {
 			var originalValueOffset = this.valueSize * 3;
 			this.binding.setValue(this.buffer, originalValueOffset);
-		},
-		_setAdditiveIdentityNumeric: function _setAdditiveIdentityNumeric() {
+		};
+
+		_proto._setAdditiveIdentityNumeric = function _setAdditiveIdentityNumeric() {
 			var startIndex = this._addIndex * this.valueSize;
 			var endIndex = startIndex + this.valueSize;
 
 			for (var i = startIndex; i < endIndex; i++) {
 				this.buffer[i] = 0;
 			}
-		},
-		_setAdditiveIdentityQuaternion: function _setAdditiveIdentityQuaternion() {
+		};
+
+		_proto._setAdditiveIdentityQuaternion = function _setAdditiveIdentityQuaternion() {
 			this._setAdditiveIdentityNumeric();
 
 			this.buffer[this._addIndex * this.valueSize + 3] = 1;
-		},
-		_setAdditiveIdentityOther: function _setAdditiveIdentityOther() {
+		};
+
+		_proto._setAdditiveIdentityOther = function _setAdditiveIdentityOther() {
 			var startIndex = this._origIndex * this.valueSize;
 			var targetIndex = this._addIndex * this.valueSize;
 
 			for (var i = 0; i < this.valueSize; i++) {
 				this.buffer[targetIndex + i] = this.buffer[startIndex + i];
 			}
-		},
-		// mix functions
-		_select: function _select(buffer, dstOffset, srcOffset, t, stride) {
+		} // mix functions
+		;
+
+		_proto._select = function _select(buffer, dstOffset, srcOffset, t, stride) {
 			if (t >= 0.5) {
 				for (var i = 0; i !== stride; ++i) {
 					buffer[dstOffset + i] = buffer[srcOffset + i];
 				}
 			}
-		},
-		_slerp: function _slerp(buffer, dstOffset, srcOffset, t) {
+		};
+
+		_proto._slerp = function _slerp(buffer, dstOffset, srcOffset, t) {
 			Quaternion.slerpFlat(buffer, dstOffset, buffer, dstOffset, buffer, srcOffset, t);
-		},
-		_slerpAdditive: function _slerpAdditive(buffer, dstOffset, srcOffset, t, stride) {
+		};
+
+		_proto._slerpAdditive = function _slerpAdditive(buffer, dstOffset, srcOffset, t, stride) {
 			var workOffset = this._workIndex * stride; // Store result in intermediate buffer offset
 
 			Quaternion.multiplyQuaternionsFlat(buffer, workOffset, buffer, dstOffset, buffer, srcOffset); // Slerp to the intermediate result
 
 			Quaternion.slerpFlat(buffer, dstOffset, buffer, dstOffset, buffer, workOffset, t);
-		},
-		_lerp: function _lerp(buffer, dstOffset, srcOffset, t, stride) {
+		};
+
+		_proto._lerp = function _lerp(buffer, dstOffset, srcOffset, t, stride) {
 			var s = 1 - t;
 
 			for (var i = 0; i !== stride; ++i) {
 				var j = dstOffset + i;
 				buffer[j] = buffer[j] * s + buffer[srcOffset + i] * t;
 			}
-		},
-		_lerpAdditive: function _lerpAdditive(buffer, dstOffset, srcOffset, t, stride) {
+		};
+
+		_proto._lerpAdditive = function _lerpAdditive(buffer, dstOffset, srcOffset, t, stride) {
 			for (var i = 0; i !== stride; ++i) {
 				var j = dstOffset + i;
 				buffer[j] = buffer[j] + buffer[srcOffset + i] * t;
 			}
-		}
-	});
+		};
+
+		return PropertyMixer;
+	}();
 
 	// Characters [].:/ are reserved for track binding syntax.
 	var _RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
@@ -32915,51 +32946,52 @@
 	 *		target group or directly, but not both.
 	 */
 
-	function AnimationObjectGroup() {
-		this.uuid = MathUtils.generateUUID(); // cached objects followed by the active ones
+	var AnimationObjectGroup = /*#__PURE__*/function () {
+		function AnimationObjectGroup() {
+			this.uuid = MathUtils.generateUUID(); // cached objects followed by the active ones
 
-		this._objects = Array.prototype.slice.call(arguments);
-		this.nCachedObjects_ = 0; // threshold
-		// note: read by PropertyBinding.Composite
+			this._objects = Array.prototype.slice.call(arguments);
+			this.nCachedObjects_ = 0; // threshold
+			// note: read by PropertyBinding.Composite
 
-		var indices = {};
-		this._indicesByUUID = indices; // for bookkeeping
+			var indices = {};
+			this._indicesByUUID = indices; // for bookkeeping
 
-		for (var i = 0, n = arguments.length; i !== n; ++i) {
-			indices[arguments[i].uuid] = i;
-		}
-
-		this._paths = []; // inside: string
-
-		this._parsedPaths = []; // inside: { we don't care, here }
-
-		this._bindings = []; // inside: Array< PropertyBinding >
-
-		this._bindingsIndicesByPath = {}; // inside: indices in these arrays
-
-		var scope = this;
-		this.stats = {
-			objects: {
-				get total() {
-					return scope._objects.length;
-				},
-
-				get inUse() {
-					return this.total - scope.nCachedObjects_;
-				}
-
-			},
-
-			get bindingsPerObject() {
-				return scope._bindings.length;
+			for (var i = 0, n = arguments.length; i !== n; ++i) {
+				indices[arguments[i].uuid] = i;
 			}
 
-		};
-	}
+			this._paths = []; // inside: string
 
-	Object.assign(AnimationObjectGroup.prototype, {
-		isAnimationObjectGroup: true,
-		add: function add() {
+			this._parsedPaths = []; // inside: { we don't care, here }
+
+			this._bindings = []; // inside: Array< PropertyBinding >
+
+			this._bindingsIndicesByPath = {}; // inside: indices in these arrays
+
+			var scope = this;
+			this.stats = {
+				objects: {
+					get total() {
+						return scope._objects.length;
+					},
+
+					get inUse() {
+						return this.total - scope.nCachedObjects_;
+					}
+
+				},
+
+				get bindingsPerObject() {
+					return scope._bindings.length;
+				}
+
+			};
+		}
+
+		var _proto = AnimationObjectGroup.prototype;
+
+		_proto.add = function add() {
 			var objects = this._objects,
 					indicesByUUID = this._indicesByUUID,
 					paths = this._paths,
@@ -33017,8 +33049,9 @@
 
 
 			this.nCachedObjects_ = nCachedObjects;
-		},
-		remove: function remove() {
+		};
+
+		_proto.remove = function remove() {
 			var objects = this._objects,
 					indicesByUUID = this._indicesByUUID,
 					bindings = this._bindings,
@@ -33051,9 +33084,10 @@
 
 
 			this.nCachedObjects_ = nCachedObjects;
-		},
-		// remove & forget
-		uncache: function uncache() {
+		} // remove & forget
+		;
+
+		_proto.uncache = function uncache() {
 			var objects = this._objects,
 					indicesByUUID = this._indicesByUUID,
 					bindings = this._bindings,
@@ -33117,9 +33151,10 @@
 
 
 			this.nCachedObjects_ = nCachedObjects;
-		},
-		// Internal interface used by befriended PropertyBinding.Composite:
-		subscribe_: function subscribe_(path, parsedPath) {
+		} // Internal interface used by befriended PropertyBinding.Composite:
+		;
+
+		_proto.subscribe_ = function subscribe_(path, parsedPath) {
 			// returns an array of bindings for the given path that is changed
 			// according to the contained objects in the group
 			var indicesByPath = this._bindingsIndicesByPath;
@@ -33144,8 +33179,9 @@
 			}
 
 			return bindingsForPath;
-		},
-		unsubscribe_: function unsubscribe_(path) {
+		};
+
+		_proto.unsubscribe_ = function unsubscribe_(path) {
 			// tells the group to forget about a property path and no longer
 			// update the array previously obtained with 'subscribe_'
 			var indicesByPath = this._bindingsIndicesByPath,
@@ -33166,8 +33202,12 @@
 				paths[index] = paths[lastBindingsIndex];
 				paths.pop();
 			}
-		}
-	});
+		};
+
+		return AnimationObjectGroup;
+	}();
+
+	AnimationObjectGroup.prototype.isAnimationObjectGroup = true;
 
 	var AnimationAction = /*#__PURE__*/function () {
 		function AnimationAction(mixer, clip, localRoot, blendMode) {
@@ -33678,19 +33718,26 @@
 		return AnimationAction;
 	}();
 
-	function AnimationMixer(root) {
-		this._root = root;
+	var AnimationMixer = /*#__PURE__*/function (_EventDispatcher) {
+		_inheritsLoose(AnimationMixer, _EventDispatcher);
 
-		this._initMemoryManager();
+		function AnimationMixer(root) {
+			var _this;
 
-		this._accuIndex = 0;
-		this.time = 0;
-		this.timeScale = 1.0;
-	}
+			_this = _EventDispatcher.call(this) || this;
+			_this._root = root;
 
-	AnimationMixer.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
-		constructor: AnimationMixer,
-		_bindAction: function _bindAction(action, prototypeAction) {
+			_this._initMemoryManager();
+
+			_this._accuIndex = 0;
+			_this.time = 0;
+			_this.timeScale = 1.0;
+			return _this;
+		}
+
+		var _proto = AnimationMixer.prototype;
+
+		_proto._bindAction = function _bindAction(action, prototypeAction) {
 			var root = action._localRoot || this._root,
 					tracks = action._clip.tracks,
 					nTracks = tracks.length,
@@ -33737,8 +33784,9 @@
 
 				interpolants[i].resultBuffer = binding.buffer;
 			}
-		},
-		_activateAction: function _activateAction(action) {
+		};
+
+		_proto._activateAction = function _activateAction(action) {
 			if (!this._isActiveAction(action)) {
 				if (action._cacheIndex === null) {
 					// this action has been forgotten by the cache, but the user
@@ -33766,8 +33814,9 @@
 
 				this._lendAction(action);
 			}
-		},
-		_deactivateAction: function _deactivateAction(action) {
+		};
+
+		_proto._deactivateAction = function _deactivateAction(action) {
 			if (this._isActiveAction(action)) {
 				var bindings = action._propertyBindings; // decrement reference counts / sort out state
 
@@ -33783,9 +33832,10 @@
 
 				this._takeBackAction(action);
 			}
-		},
-		// Memory manager
-		_initMemoryManager: function _initMemoryManager() {
+		} // Memory manager
+		;
+
+		_proto._initMemoryManager = function _initMemoryManager() {
 			this._actions = []; // 'nActiveActions' followed by inactive ones
 
 			this._nActiveActions = 0;
@@ -33836,13 +33886,15 @@
 
 				}
 			};
-		},
-		// Memory management for AnimationAction objects
-		_isActiveAction: function _isActiveAction(action) {
+		} // Memory management for AnimationAction objects
+		;
+
+		_proto._isActiveAction = function _isActiveAction(action) {
 			var index = action._cacheIndex;
 			return index !== null && index < this._nActiveActions;
-		},
-		_addInactiveAction: function _addInactiveAction(action, clipUuid, rootUuid) {
+		};
+
+		_proto._addInactiveAction = function _addInactiveAction(action, clipUuid, rootUuid) {
 			var actions = this._actions,
 					actionsByClip = this._actionsByClip;
 			var actionsForClip = actionsByClip[clipUuid];
@@ -33863,8 +33915,9 @@
 			action._cacheIndex = actions.length;
 			actions.push(action);
 			actionsForClip.actionByRoot[rootUuid] = action;
-		},
-		_removeInactiveAction: function _removeInactiveAction(action) {
+		};
+
+		_proto._removeInactiveAction = function _removeInactiveAction(action) {
 			var actions = this._actions,
 					lastInactiveAction = actions[actions.length - 1],
 					cacheIndex = action._cacheIndex;
@@ -33891,8 +33944,9 @@
 			}
 
 			this._removeInactiveBindingsForAction(action);
-		},
-		_removeInactiveBindingsForAction: function _removeInactiveBindingsForAction(action) {
+		};
+
+		_proto._removeInactiveBindingsForAction = function _removeInactiveBindingsForAction(action) {
 			var bindings = action._propertyBindings;
 
 			for (var i = 0, n = bindings.length; i !== n; ++i) {
@@ -33902,8 +33956,9 @@
 					this._removeInactiveBinding(binding);
 				}
 			}
-		},
-		_lendAction: function _lendAction(action) {
+		};
+
+		_proto._lendAction = function _lendAction(action) {
 			// [ active actions |	inactive actions	]
 			// [	active actions >| inactive actions ]
 			//								 s				a
@@ -33917,8 +33972,9 @@
 			actions[lastActiveIndex] = action;
 			firstInactiveAction._cacheIndex = prevIndex;
 			actions[prevIndex] = firstInactiveAction;
-		},
-		_takeBackAction: function _takeBackAction(action) {
+		};
+
+		_proto._takeBackAction = function _takeBackAction(action) {
 			// [	active actions	| inactive actions ]
 			// [ active actions |< inactive actions	]
 			//				a				s
@@ -33932,9 +33988,10 @@
 			actions[firstInactiveIndex] = action;
 			lastActiveAction._cacheIndex = prevIndex;
 			actions[prevIndex] = lastActiveAction;
-		},
-		// Memory management for PropertyMixer objects
-		_addInactiveBinding: function _addInactiveBinding(binding, rootUuid, trackName) {
+		} // Memory management for PropertyMixer objects
+		;
+
+		_proto._addInactiveBinding = function _addInactiveBinding(binding, rootUuid, trackName) {
 			var bindingsByRoot = this._bindingsByRootAndName,
 					bindings = this._bindings;
 			var bindingByName = bindingsByRoot[rootUuid];
@@ -33947,8 +34004,9 @@
 			bindingByName[trackName] = binding;
 			binding._cacheIndex = bindings.length;
 			bindings.push(binding);
-		},
-		_removeInactiveBinding: function _removeInactiveBinding(binding) {
+		};
+
+		_proto._removeInactiveBinding = function _removeInactiveBinding(binding) {
 			var bindings = this._bindings,
 					propBinding = binding.binding,
 					rootUuid = propBinding.rootNode.uuid,
@@ -33965,8 +34023,9 @@
 			if (Object.keys(bindingByName).length === 0) {
 				delete bindingsByRoot[rootUuid];
 			}
-		},
-		_lendBinding: function _lendBinding(binding) {
+		};
+
+		_proto._lendBinding = function _lendBinding(binding) {
 			var bindings = this._bindings,
 					prevIndex = binding._cacheIndex,
 					lastActiveIndex = this._nActiveBindings++,
@@ -33975,8 +34034,9 @@
 			bindings[lastActiveIndex] = binding;
 			firstInactiveBinding._cacheIndex = prevIndex;
 			bindings[prevIndex] = firstInactiveBinding;
-		},
-		_takeBackBinding: function _takeBackBinding(binding) {
+		};
+
+		_proto._takeBackBinding = function _takeBackBinding(binding) {
 			var bindings = this._bindings,
 					prevIndex = binding._cacheIndex,
 					firstInactiveIndex = --this._nActiveBindings,
@@ -33985,9 +34045,10 @@
 			bindings[firstInactiveIndex] = binding;
 			lastActiveBinding._cacheIndex = prevIndex;
 			bindings[prevIndex] = lastActiveBinding;
-		},
-		// Memory management of Interpolants for weight and time scale
-		_lendControlInterpolant: function _lendControlInterpolant() {
+		} // Memory management of Interpolants for weight and time scale
+		;
+
+		_proto._lendControlInterpolant = function _lendControlInterpolant() {
 			var interpolants = this._controlInterpolants,
 					lastActiveIndex = this._nActiveControlInterpolants++;
 			var interpolant = interpolants[lastActiveIndex];
@@ -33999,8 +34060,9 @@
 			}
 
 			return interpolant;
-		},
-		_takeBackControlInterpolant: function _takeBackControlInterpolant(interpolant) {
+		};
+
+		_proto._takeBackControlInterpolant = function _takeBackControlInterpolant(interpolant) {
 			var interpolants = this._controlInterpolants,
 					prevIndex = interpolant.__cacheIndex,
 					firstInactiveIndex = --this._nActiveControlInterpolants,
@@ -34009,12 +34071,12 @@
 			interpolants[firstInactiveIndex] = interpolant;
 			lastActiveInterpolant.__cacheIndex = prevIndex;
 			interpolants[prevIndex] = lastActiveInterpolant;
-		},
-		_controlInterpolantsResultBuffer: new Float32Array(1),
-		// return an action for a clip optionally using a custom root target
+		} // return an action for a clip optionally using a custom root target
 		// object (this method allocates a lot of dynamic memory in case a
 		// previously unknown clip/root combination is specified)
-		clipAction: function clipAction(clip, optionalRoot, blendMode) {
+		;
+
+		_proto.clipAction = function clipAction(clip, optionalRoot, blendMode) {
 			var root = optionalRoot || this._root,
 					rootUuid = root.uuid;
 			var clipObject = typeof clip === 'string' ? AnimationClip.findByName(root, clip) : clip;
@@ -34055,9 +34117,10 @@
 			this._addInactiveAction(newAction, clipUuid, rootUuid);
 
 			return newAction;
-		},
-		// get an existing action
-		existingAction: function existingAction(clip, optionalRoot) {
+		} // get an existing action
+		;
+
+		_proto.existingAction = function existingAction(clip, optionalRoot) {
 			var root = optionalRoot || this._root,
 					rootUuid = root.uuid,
 					clipObject = typeof clip === 'string' ? AnimationClip.findByName(root, clip) : clip,
@@ -34069,9 +34132,10 @@
 			}
 
 			return null;
-		},
-		// deactivates all previously scheduled actions
-		stopAllAction: function stopAllAction() {
+		} // deactivates all previously scheduled actions
+		;
+
+		_proto.stopAllAction = function stopAllAction() {
 			var actions = this._actions,
 					nActions = this._nActiveActions;
 
@@ -34080,9 +34144,10 @@
 			}
 
 			return this;
-		},
-		// advance the time and update apply the animation
-		update: function update(deltaTime) {
+		} // advance the time and update apply the animation
+		;
+
+		_proto.update = function update(deltaTime) {
 			deltaTime *= this.timeScale;
 			var actions = this._actions,
 					nActions = this._nActiveActions,
@@ -34105,9 +34170,10 @@
 			}
 
 			return this;
-		},
-		// Allows you to seek to a specific time in an animation.
-		setTime: function setTime(timeInSeconds) {
+		} // Allows you to seek to a specific time in an animation.
+		;
+
+		_proto.setTime = function setTime(timeInSeconds) {
 			this.time = 0; // Zero out time attribute for AnimationMixer object;
 
 			for (var i = 0; i < this._actions.length; i++) {
@@ -34115,13 +34181,15 @@
 			}
 
 			return this.update(timeInSeconds); // Update used to set exact time. Returns "this" AnimationMixer object.
-		},
-		// return this mixer's root target object
-		getRoot: function getRoot() {
+		} // return this mixer's root target object
+		;
+
+		_proto.getRoot = function getRoot() {
 			return this._root;
-		},
-		// free all resources specific to a particular clip
-		uncacheClip: function uncacheClip(clip) {
+		} // free all resources specific to a particular clip
+		;
+
+		_proto.uncacheClip = function uncacheClip(clip) {
 			var actions = this._actions,
 					clipUuid = clip.uuid,
 					actionsByClip = this._actionsByClip,
@@ -34151,9 +34219,10 @@
 
 				delete actionsByClip[clipUuid];
 			}
-		},
-		// free all resources specific to a particular root target object
-		uncacheRoot: function uncacheRoot(root) {
+		} // free all resources specific to a particular root target object
+		;
+
+		_proto.uncacheRoot = function uncacheRoot(root) {
 			var rootUuid = root.uuid,
 					actionsByClip = this._actionsByClip;
 
@@ -34179,9 +34248,10 @@
 					this._removeInactiveBinding(binding);
 				}
 			}
-		},
-		// remove a targeted clip from the cache
-		uncacheAction: function uncacheAction(clip, optionalRoot) {
+		} // remove a targeted clip from the cache
+		;
+
+		_proto.uncacheAction = function uncacheAction(clip, optionalRoot) {
 			var action = this.existingAction(clip, optionalRoot);
 
 			if (action !== null) {
@@ -34189,8 +34259,12 @@
 
 				this._removeInactiveAction(action);
 			}
-		}
-	});
+		};
+
+		return AnimationMixer;
+	}(EventDispatcher);
+
+	AnimationMixer.prototype._controlInterpolantsResultBuffer = new Float32Array(1);
 
 	var Uniform = /*#__PURE__*/function () {
 		function Uniform(value) {
