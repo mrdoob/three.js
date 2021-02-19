@@ -7,8 +7,6 @@ class DataTexture2DArray extends Texture {
 
 		super( null );
 
-		Object.defineProperty( this, 'isDataTexture2DArray', { value: true } );
-
 		this.image = { data, width, height, depth };
 
 		this.magFilter = NearestFilter;
@@ -24,5 +22,7 @@ class DataTexture2DArray extends Texture {
 	}
 
 }
+
+DataTexture2DArray.prototype.isDataTexture2DArray = true;
 
 export { DataTexture2DArray };

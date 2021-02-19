@@ -11,8 +11,6 @@ class CubeTexture extends Texture {
 
 		super( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
-		Object.defineProperty( this, 'isCubeTexture', { value: true } );
-
 		// Why CubeTexture._needsFlipEnvMap is necessary:
 		//
 		// By convention -- likely based on the RenderMan spec from the 1990's -- cube maps are specified by WebGL (and three.js)
@@ -42,5 +40,7 @@ class CubeTexture extends Texture {
 	}
 
 }
+
+CubeTexture.prototype.isCubeTexture = true;
 
 export { CubeTexture };

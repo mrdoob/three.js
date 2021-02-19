@@ -18,8 +18,6 @@ class DepthTexture extends Texture {
 
 		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
-		Object.defineProperty( this, 'isDepthTexture', { value: true } );
-
 		this.image = { width: width, height: height };
 
 		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
@@ -32,5 +30,7 @@ class DepthTexture extends Texture {
 
 
 }
+
+DepthTexture.prototype.isDepthTexture = true;
 
 export { DepthTexture };

@@ -6,8 +6,6 @@ class CompressedTexture extends Texture {
 
 		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
-		Object.defineProperty( this, 'isCompressedTexture', { value: true } );
-
 		this.image = { width: width, height: height };
 		this.mipmaps = mipmaps;
 
@@ -24,5 +22,7 @@ class CompressedTexture extends Texture {
 	}
 
 }
+
+CompressedTexture.prototype.isCompressedTexture = true;
 
 export { CompressedTexture };
