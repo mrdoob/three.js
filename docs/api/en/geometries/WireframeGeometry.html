@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -12,16 +11,16 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">This can be used as a helper object to view a [page:Geometry Geometry] object as a wireframe.</p>
+		<p class="desc">This can be used as a helper object to view a [page:BufferGeometry geometry] as a wireframe.</p>
 
 		<h2>Code Example</h2>
 
 		<code>
-		var geometry = new THREE.SphereBufferGeometry( 100, 100, 100 );
+		const geometry = new THREE.SphereGeometry( 100, 100, 100 );
 
-		var wireframe = new THREE.WireframeGeometry( geometry );
+		const wireframe = new THREE.WireframeGeometry( geometry );
 
-		var line = new THREE.LineSegments( wireframe );
+		const line = new THREE.LineSegments( wireframe );
 		line.material.depthTest = false;
 		line.material.opacity = 0.25;
 		line.material.transparent = true;
@@ -37,7 +36,7 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:Geometry geometry] )</h3>
+		<h3>[name]( [param:BufferGeometry geometry] )</h3>
 		<p>
 		geometry — any geometry object.
 		</p>

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -75,6 +74,11 @@
 			将剪辑的持续时间（[page:.duration duration]）设为最长的关键帧轨道([page:KeyframeTrack])的持续时间。
 		</p>
 
+		<h3>[method:Object toJSON]()</h3>
+		<p>
+			Returns a JSON object representing the serialized animation clip.
+		</p>
+
 		<h3>[method:this trim]()</h3>
 		<p>
 			修剪所有的轨道到该剪辑的持续时间。
@@ -91,13 +95,13 @@
 
 		<h3>[method:Array CreateClipsFromMorphTargetSequences]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
 		<p>
-			返回从几何体的变形目标序列([page:Geometry.morphTargets morph
-			target sequences])创建的新动画剪辑(AnimationClip)数组，并尝试将变形目标名称分类为基于动画组的模式，如“Walk_001、Walk_002、Run_001、Run_002……”。
+			返回从几何体的变形目标序列(morph
+			target sequences)创建的新动画剪辑(AnimationClip)数组，并尝试将变形目标名称分类为基于动画组的模式，如“Walk_001、Walk_002、Run_001、Run_002……”。
 		</p>
 
 		<h3>[method:AnimationClip CreateFromMorphTargetSequence]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
 		<p>
-			返回一个由几何体变形目标数组([page:Geometry.morphTargets morph targets array])得到的新动画剪辑，接收名称和帧率参数。<br /><br />
+			返回一个由几何体变形目标数组(morph targets array)得到的新动画剪辑，接收名称和帧率参数。<br /><br />
 
 			说明: 帧率是必须参数, 但是动画速度可能会在*AnimationAction*中被[page:AnimationAction.setDuration animationAction.setDuration]方法重写。
 

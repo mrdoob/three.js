@@ -3,13 +3,11 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
-
+		[page:BufferGeometry] &rarr; [page:PolyhedronGeometry] &rarr;
 		<h1>[name]</h1>
 
 		<p class="desc">A class for generating an icosahedron geometry.</p>
@@ -22,7 +20,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -41,7 +39,7 @@
 		</p>
 
 		<h2>Properties</h2>
-		<p>See the base [page:Geometry] class for common properties.</p>
+		<p>See the base [page:PolyhedronGeometry] class for common properties.</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
@@ -49,7 +47,7 @@
 		</p>
 
 		<h2>Methods</h2>
-		<p>See the base [page:Geometry] class for common methods.</p>
+		<p>See the base [page:PolyhedronGeometry] class for common methods.</p>
 
 		<h2>Source</h2>
 

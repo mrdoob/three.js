@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,14 +21,14 @@
 
 		<code>
 		// create an AudioListener and add it to the camera
-		var listener = new THREE.AudioListener();
+		const listener = new THREE.AudioListener();
 		camera.add( listener );
 
 		// create the PositionalAudio object (passing in the listener)
-		var sound = new THREE.PositionalAudio( listener );
+		const sound = new THREE.PositionalAudio( listener );
 
 		// load a sound and set it as the PositionalAudio object's buffer
-		var audioLoader = new THREE.AudioLoader();
+		const audioLoader = new THREE.AudioLoader();
 		audioLoader.load( 'sounds/song.ogg', function( buffer ) {
 			sound.setBuffer( buffer );
 			sound.setRefDistance( 20 );
@@ -37,9 +36,9 @@
 		});
 
 		// create an object for the sound to play from
-		var sphere = new THREE.SphereBufferGeometry( 20, 32, 16 );
-		var material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
-		var mesh = new THREE.Mesh( sphere, material );
+		const sphere = new THREE.SphereGeometry( 20, 32, 16 );
+		const material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
+		const mesh = new THREE.Mesh( sphere, material );
 		scene.add( mesh );
 
 		// finally add the sound to the mesh

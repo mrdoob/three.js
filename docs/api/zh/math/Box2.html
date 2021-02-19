@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -11,7 +10,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			表示二维空间中的一个包围盒。
+			表示二维空间中的一个轴对齐包围盒（axis-aligned bounding box，AABB）。
 		</p>
 
 
@@ -93,9 +92,9 @@
 		扩展盒子的边界来包含该点。
 		</p>
 
-		<h3>[method:Box2 expandByScalar]( [param:float scalar] )</h3>
+		<h3>[method:Box2 expandByScalar]( [param:Float scalar] )</h3>
 		<p>
-		[page:float scalar] - 盒子扩展的距离。<br /><br />
+		[page:Float scalar] - 盒子扩展的距离。<br /><br />
 		在每个维度上扩展参数scalar所指定的距离，如果为负数，则盒子空间将收缩。
 		</p>
 
@@ -151,10 +150,11 @@
 
 		<h3>[method:Box2 set]( [param:Vector2 min], [param:Vector2 max] )</h3>
 		<p>
-			[page:Vector2 min] - (必须 ) 表示该盒子的下边界(x, y)。 <br>
+			[page:Vector2 min] - (必须) 表示该盒子的下边界(x, y)。 <br>
 			[page:Vector2 max]  - (必须) 表示该盒子的上边界(x, y)。 <br /><br />
 
-			设置这个盒子的上下(x, y)的界限。
+			设置这个盒子的上下(x, y)的界限。<br>
+			Please note that this method only copies the values from the given objects.
 		</p>
 
 		<h3>[method:Box2 setFromCenterAndSize]( [param:Vector2 center], [param:Vector2 size] )</h3>

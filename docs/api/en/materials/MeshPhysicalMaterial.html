@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -24,7 +23,7 @@
 			</li>
 			<li>
 				<b>Physically-based transparency:</b> One limitation of [page:Material.opacity .opacity] is
-				that highly transparent materials are less reflective. Physically-based [page:.transparency]
+				that highly transparent materials are less reflective. Physically-based [page:.transmission]
 				provides a more realistic option for thin, transparent surfaces like glass.
 			</li>
 			<li>
@@ -47,7 +46,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -62,7 +61,8 @@
 			[example:webgl_materials_variations_physical materials / variations / physical]<br />
 			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
 			[example:webgl_materials_physical_reflectivity materials / physical / reflectivity]<br />
-			[example:webgl_materials_physical_transparency materials / physical / transparency]
+			[example:webgl_materials_physical_sheen materials / physical / sheen]<br />
+			[example:webgl_materials_physical_transmission materials / physical / transmission]
 		</p>
 
 		<h2>Constructor</h2>
@@ -121,22 +121,39 @@
 			This is used by the [page:WebGLRenderer] for selecting shaders.
 		</p>
 
-		<h3>[property:Float reflectivity]</h3>
+		<h3>[property:Float ior]</h3>
 		<p>
-		Degree of reflectivity, from *0.0* to *1.0*. Default is *0.5*.<br />
-
-		This models the reflectivity of non-metallic materials. It has no effect when [page:MeshStandardMaterial.metalness metalness] is *1.0*
+			Index-of-refraction for non-metallic materials, from *1.0* to *2.333*. Default is *1.5*.<br />
 		</p>
 
-		<h3>[property:Float transparency]</h3>
+		<h3>[property:Float reflectivity]</h3>
 		<p>
-		Degree of transparency, from *0.0* to *1.0*. Default is *0.0*.<br />
+			Degree of reflectivity, from *0.0* to *1.0*. Default is *0.5*, which corresponds to an index-of-refraction of 1.5.<br />
 
-		Thin, transparent or semitransparent, plastic or glass materials remain largely reflective even if they are mostly transparent.
+			This models the reflectivity of non-metallic materials. It has no effect when [page:MeshStandardMaterial.metalness metalness] is *1.0*
+		</p>
 
-		The transparency property can be used to model these materials.<br />
+		<h3>[property:Color sheen]</h3>
+		<p>
+			If a color is assigned to this property, the material will use a special sheen BRDF intended for rendering cloth materials such as velvet.
+			The sheen color provides the ability to create two-tone specular materials. *null* by default.
+		</p>
 
-		When transparency is non-zero, [page:Material.opacity opacity] should be set to *1*.
+		<h3>[property:Float transmission]</h3>
+		<p>
+		Degree of transmission (or optical transparency), from *0.0* to *1.0*. Default is *0.0*.<br />
+
+		Thin, transparent or semitransparent, plastic or glass materials remain largely reflective even if they are fully transmissive.
+
+		The transmission property can be used to model these materials.<br />
+
+		When transmission is non-zero, [page:Material.opacity opacity] should be set to *1*.
+		</p>
+
+		<h3>[property:Texture transmissionMap]</h3>
+		<p>
+			The red channel of this texture is multiplied against [page:.transmission], for per-pixel control
+			over optical transparency. Default is *null*.
 		</p>
 
 		<h2>Methods</h2>

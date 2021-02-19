@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -23,11 +22,11 @@
 
 		<code>
 		// Instantiate an exporter
-		var exporter = new PLYExporter();
+		const exporter = new PLYExporter();
 
 		// Parse the input and generate the ply output
-		var data = exporter.parse( scene, options );
-		downloadFile(data);
+		const data = exporter.parse( scene, options );
+		downloadFile( data );
 		</code>
 
 		<h2>Constructor</h2>

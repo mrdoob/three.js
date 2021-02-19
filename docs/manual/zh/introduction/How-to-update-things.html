@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -12,13 +11,13 @@
 		<div>
 			<p>默认情况下，所有对象都会自动更新它们的矩阵（如果它们已添加到场景中）</p>
 			<code>
-var object = new THREE.Object3D();
+const object = new THREE.Object3D();
 scene.add( object );
 			</code>
 			或者它们是已添加到场景中的另一个对象的子节点:
 			<code>
-var object1 = new THREE.Object3D();
-var object2 = new THREE.Object3D();
+const object1 = new THREE.Object3D();
+const object2 = new THREE.Object3D();
 
 object1.add( object2 );
 scene.add( object1 ); //object1 和 object2 会自动更新它们的矩阵
@@ -53,36 +52,36 @@ object.updateMatrix();
 				在500个顶点的缓冲区中，但首先只使用 [page:BufferGeometry.drawRange]。
 			</p>
 			<code>
-var MAX_POINTS = 500;
+const MAX_POINTS = 500;
 
 // geometry
-var geometry = new THREE.BufferGeometry();
+const geometry = new THREE.BufferGeometry();
 
 // attributes
-var positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+const positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
 geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 // draw range
-var drawCount = 2; // draw the first 2 points, only
+const drawCount = 2; // draw the first 2 points, only
 geometry.setDrawRange( 0, drawCount );
 
 // material
-var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 // line
-var line = new THREE.Line( geometry,  material );
+const line = new THREE.Line( geometry,  material );
 scene.add( line );
 			</code>
 		 	<p>
 				然后我们随机增加顶点到line中，以这样的一种方式：
 			</p>
 			<code>
-var positions = line.geometry.attributes.position.array;
+const positions = line.geometry.attributes.position.array;
 
-var x, y, z, index;
+let x, y, z, index;
 x = y = z = index = 0;
 
-for ( var i = 0, l = MAX_POINTS; i < l; i ++ ) {
+for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
 
     positions[ index ++ ] = x;
     positions[ index ++ ] = y;
@@ -108,7 +107,7 @@ line.geometry.attributes.position.needsUpdate = true; // 需要加在第一次�
 			</code>
 
 			<p>
-				<a href="http://jsfiddle.net/w67tzfhx/">这个fiddle</a>展示了一个你可以参考的运动的line。
+				<a href="https://jsfiddle.net/xvnctbL0/2/">这个fiddle</a>展示了一个你可以参考的运动的line。
 			</p>
 
 			<h3>例子</h3>
@@ -117,35 +116,6 @@ line.geometry.attributes.position.needsUpdate = true; // 需要加在第一次�
 				[example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
 			</p>
 
-		</div>
-
-		<h2>Geometry</h2>
-		<div>
-			<p>
-				以下标志控制各种geometry属性的更新。仅对于需要更新的属性设置标志，因为更新成本很高。
-				一旦buffers改变，这些标志位会自动重置为false。如果你想要持续更新buffers，你需要保持这些设置为true。
-				请注意这仅适用于[page:Geometry]而不是[page:BufferGeometry]。
-			</p>
-			<code>
-var geometry = new THREE.Geometry();
-geometry.verticesNeedUpdate = true;
-geometry.elementsNeedUpdate = true;
-geometry.morphTargetsNeedUpdate = true;
-geometry.uvsNeedUpdate = true;
-geometry.normalsNeedUpdate = true;
-geometry.colorsNeedUpdate = true;
-geometry.tangentsNeedUpdate = true;
-			</code>
-
-			<p>
-				在早于[link:https://github.com/mrdoob/three.js/releases/tag/r66 r66]的版本中，meshes
-				需要额外设定 <em>dynamic</em> 标志为true （为了维持内部的 typed arrays）：
-			</p>
-
-			<code>
-	//removed after r66
-	geometry.dynamic = true;
-			</code>
 		</div>
 
 		<h2>材质（Materials）</h2>

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -25,7 +24,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -38,27 +37,27 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var geometry = new THREE.CylinderBufferGeometry( 5, 5, 5, 5, 15, 5, 30 );
+		const geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
 
 		// create the skin indices and skin weights
 
-		var position = geometry.attributes.position;
+		const position = geometry.attributes.position;
 
-		var vertex = new THREE.Vector3();
+		const vertex = new THREE.Vector3();
 
-		var skinIndices = [];
-		var skinWeights = [];
+		const skinIndices = [];
+		const skinWeights = [];
 
-		for ( var i = 0; i < position.count; i ++ ) {
+		for ( let i = 0; i < position.count; i ++ ) {
 
 			vertex.fromBufferAttribute( position, i );
 
 			// compute skinIndex and skinWeight based on some configuration data
 
-			var y = ( vertex.y + sizing.halfHeight );
+			const y = ( vertex.y + sizing.halfHeight );
 
-			var skinIndex = Math.floor( y / sizing.segmentHeight );
-			var skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
+			const skinIndex = Math.floor( y / sizing.segmentHeight );
+			const skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
 
 			skinIndices.push( skinIndex, skinIndex + 1, 0, 0 );
 			skinWeights.push( 1 - skinWeight, skinWeight, 0, 0 );
@@ -70,12 +69,12 @@
 
 		// create skinned mesh and skeleton
 
-		var mesh = new THREE.SkinnedMesh( geometry, material );
-		var skeleton = new THREE.Skeleton( bones );
+		const mesh = new THREE.SkinnedMesh( geometry, material );
+		const skeleton = new THREE.Skeleton( bones );
 
 		// see example from THREE.Skeleton
 
-		var rootBone = skeleton.bones[ 0 ];
+		const rootBone = skeleton.bones[ 0 ];
 		mesh.add( rootBone );
 
 		// bind the skeleton to the mesh
@@ -91,18 +90,14 @@
 		<h2>Constructor</h2>
 		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
 		<p>
-		[page:Geometry geometry] - an instance of [page:BufferGeometry].<br />
+		[page:BufferGeometry geometry] - an instance of [page:BufferGeometry].<br />
 		[page:Material material] - (optional) an instance of [page:Material]. Default is a new [page:MeshBasicMaterial].
 		</p>
-
-
-
-
 
 		<h2>Properties</h2>
 		<p>See the base [page:Mesh] class for common properties.</p>
 
-		<h3>[property:string bindMode]</h3>
+		<h3>[property:String bindMode]</h3>
 		<p>
 		Either "attached" or "detached". "attached" uses the [page:SkinnedMesh.matrixWorld]
 		property for the base transform	matrix of the bones. "detached" uses the

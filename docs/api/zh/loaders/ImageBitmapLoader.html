@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -13,14 +12,14 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			一个把[page:Image]加载为[link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap]的加载器。
+			一个把[page:Image]加载为[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap]的加载器。
 			ImageBitmap提供了一种异步且有效的资源的途径，用于在WebGL中渲染的纹理。<br/>
 			不像[page:FileLoader], [name]无需避免对同一的URL进行多次请求。
 		</p>
 
 		<p>
-			Note that [page:Texture.flipY] and [page:Texture.premultiplyAlpha] with [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap] are ignored.
-			[link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap] needs these configuration on bitmap creation
+			Note that [page:Texture.flipY] and [page:Texture.premultiplyAlpha] with [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap] are ignored.
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap] needs these configuration on bitmap creation
 			unlike regular images need them on uploading to GPU. You need to set the equivalent options via [page:ImageBitmapLoader.setOptions]
 			instead. Refer to [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#6.10 WebGL specification] for the detail.
 		</p>
@@ -29,7 +28,7 @@
 
 		<code>
 		// 初始化一个加载器
-		var loader = new THREE.ImageBitmapLoader();
+		const loader = new THREE.ImageBitmapLoader();
 
 		// set options if needed
 		loader.setOptions( { imageOrientation: 'flipY' } );
@@ -41,8 +40,8 @@
 
 			// onLoad回调
 			function ( imageBitmap ) {
-				var texture = new THREE.CanvasTexture( imageBitmap );
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				const texture = new THREE.CanvasTexture( imageBitmap );
+				const material = new THREE.MeshBasicMaterial( { map: texture } );
 			},
 
 			// 目前暂不支持onProgress的回调
