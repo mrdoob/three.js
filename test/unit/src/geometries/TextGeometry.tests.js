@@ -1,15 +1,10 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import {
-	TextBufferGeometry
-} from '../../../../src/geometries/TextGeometry';
+import { TextGeometry, TextBufferGeometry } from '../../../../src/geometries/TextGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'TextBufferGeometry', () => {
+	QUnit.module( 'TextGeometry', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

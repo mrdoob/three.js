@@ -1,8 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author tschw
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
@@ -528,7 +523,21 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "inverse/conjugate", ( assert ) => {
+		QUnit.test( "identity", ( assert ) => {
+
+			var a = new Quaternion();
+
+			a.set( x, y, z, w );
+			a.identity();
+
+			assert.ok( a.x == 0, "Passed!" );
+			assert.ok( a.y == 0, "Passed!" );
+			assert.ok( a.z === 0, "Passed!" );
+			assert.ok( a.w === 1, "Passed!" );
+
+		} );
+
+		QUnit.test( "invert/conjugate", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
 

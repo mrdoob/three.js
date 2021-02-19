@@ -1,6 +1,3 @@
-/**
- * @author Don McCurdy / https://www.donmccurdy.com
- */
 /* global QUnit */
 
 import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter';
@@ -24,6 +21,10 @@ export default QUnit.module( 'Loaders', () => {
 			assert.ok( new GLTFLoader(), 'Can instantiate a loader.' );
 
 		} );
+
+	} );
+
+	QUnit.module( 'GLTFLoader-webonly', () => {
 
 		QUnit.test( 'parse - basic', ( assert ) => {
 

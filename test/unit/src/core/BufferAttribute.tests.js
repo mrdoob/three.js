@@ -1,6 +1,3 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- */
 /* global QUnit */
 
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
@@ -243,6 +240,18 @@ export default QUnit.module( 'Core', () => {
 				assert.ok( attr.array[ i ] === attrCopy.array[ i ], 'array item is equal' );
 
 			}
+
+		} );
+
+		QUnit.test( "toJSON", ( assert ) => {
+
+			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3, true );
+			assert.deepEqual( attr.toJSON(), {
+				itemSize: 3,
+				type: 'Float32Array',
+				array: [ 1, 2, 3, 4, 5, 6 ],
+				normalized: true
+			}, 'Serialized to JSON as expected' );
 
 		} );
 

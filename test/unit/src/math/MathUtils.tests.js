@@ -1,7 +1,3 @@
-/**
- * @author humbletim / https://github.com/humbletim
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { MathUtils } from '../../../../src/math/MathUtils';
@@ -56,6 +52,13 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( MathUtils.lerp( 1, 2, 1 ), 2, "Value equal to upper boundary" );
 			assert.strictEqual( MathUtils.lerp( 1, 2, 0.4 ), 1.4, "Value within range" );
 
+
+		} );
+
+		QUnit.test( "damp", ( assert ) => {
+
+			assert.strictEqual( MathUtils.damp( 1, 2, 0, 0.016 ), 1, "Value equal to lower boundary" );
+			assert.strictEqual( MathUtils.damp( 1, 2, 10, 0.016 ), 1.1478562110337887, "Value within range" );
 
 		} );
 
@@ -153,6 +156,15 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 1 ), 1, "Closest lower PoT to 1 is 1" );
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 3 ), 2, "Closest lower PoT to 3 is 2" );
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 4 ), 4, "Closest lower PoT to 4 is 4" );
+
+		} );
+
+
+		QUnit.test( "pingpong", ( assert ) => {
+
+			assert.strictEqual( MathUtils.pingpong( 2.5 ), 0.5, "Value at 2.5 is 0.5" );
+			assert.strictEqual( MathUtils.pingpong( 2.5, 2 ), 1.5, "Value at 2.5 with length of 2 is 1.5" );
+			assert.strictEqual( MathUtils.pingpong( - 1.5 ), 0.5, "Value at -1.5 is 0.5" );
 
 		} );
 

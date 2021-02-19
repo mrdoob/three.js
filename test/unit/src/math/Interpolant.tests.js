@@ -1,7 +1,3 @@
-/**
- * @author tschw
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Interpolant } from '../../../../src/math/Interpolant';

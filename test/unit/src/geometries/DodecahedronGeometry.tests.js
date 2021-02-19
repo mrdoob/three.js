@@ -1,13 +1,7 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import {
-	DodecahedronBufferGeometry
-} from '../../../../src/geometries/DodecahedronGeometry';
+import { DodecahedronGeometry, DodecahedronBufferGeometry } from '../../../../src/geometries/DodecahedronGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -22,9 +16,10 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				new DodecahedronBufferGeometry(),
-				new DodecahedronBufferGeometry( parameters.radius ),
-				new DodecahedronBufferGeometry( parameters.radius, parameters.detail ),
+				new DodecahedronGeometry(),
+				new DodecahedronGeometry( parameters.radius ),
+				new DodecahedronGeometry( parameters.radius, parameters.detail ),
+				new DodecahedronBufferGeometry()
 			];
 
 		} );
