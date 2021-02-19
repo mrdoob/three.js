@@ -1,7 +1,8 @@
-import babel from '@rollup/plugin-babel';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import { terser } from 'rollup-plugin-terser';
-import babelrc from '../../.babelrc.json';
+//for build/three.module.min.js
+import fs from 'fs';
+import path from 'path';
+
+import buble from 'rollup-plugin-buble';
 
 function glconstants() {
 
@@ -61,7 +62,6 @@ function glconstants() {
 		RGBA: 6408,
 		LUMINANCE: 6409,
 		LUMINANCE_ALPHA: 6410,
-		KEEP: 7680,
 		RED_INTEGER: 36244,
 		RG: 33319,
 		RG_INTEGER: 33320,
@@ -145,11 +145,6 @@ function glconstants() {
 		MAX_FRAGMENT_UNIFORM_VECTORS: 36349,
 		UNPACK_FLIP_Y_WEBGL: 37440,
 		UNPACK_PREMULTIPLY_ALPHA_WEBGL: 37441,
-		UNPACK_ROW_LENGTH: 3314,
-		UNPACK_IMAGE_HEIGHT: 32878,
-		UNPACK_SKIP_PIXELS: 3316,
-		UNPACK_SKIP_ROWS: 3315,
-		UNPACK_SKIP_IMAGES: 32877,
 		MAX_SAMPLES: 36183,
 		READ_FRAMEBUFFER: 36008,
 		DRAW_FRAMEBUFFER: 36009
@@ -169,28 +164,7 @@ function glconstants() {
 
 			return {
 				code: code,
-				map: null
-			};
-
-		}
-
-	};
-
-}
-
-function addons() {
-
-	return {
-
-		transform( code, id ) {
-
-			if ( /\/examples\/jsm\//.test( id ) === false ) return;
-
-			code = code.replace( 'build/three.module.js', 'src/Three.js' );
-
-			return {
-				code: code,
-				map: null
+				map: { mappings: '' }
 			};
 
 		}
@@ -207,7 +181,7 @@ function glsl() {
 
 			if ( /\.glsl.js$/.test( id ) === false ) return;
 
-			code = code.replace( /\/\* glsl \*\/\`((.|\r|\n)*)\`/, function ( match, p1 ) {
+			code = code.replace( /\/\* glsl \*\/\`((.*|\n|\r\n)*)\`/, function ( match, p1 ) {
 
 				return JSON.stringify(
 					p1
@@ -222,7 +196,7 @@ function glsl() {
 
 			return {
 				code: code,
-				map: null
+				map: { mappings: '' }
 			};
 
 		}
@@ -231,83 +205,27 @@ function glsl() {
 
 }
 
-function babelCleanup() {
-
-	const doubleSpaces = / {2}/g;
-
-	return {
-
-		transform( code ) {
-
-			code = code.replace( doubleSpaces, '\t' );
-
-			return {
-				code: code,
-				map: null
-			};
-
-		}
-
-	};
-
-}
-
-function header() {
-
-	return {
-
-		renderChunk( code ) {
-
-			return '// threejs.org/license\n' + code;
-
-		}
-
-	};
-
-}
-
-function polyfills() {
-
-	return {
-
-		transform( code, filePath ) {
-
-			if ( filePath.endsWith( 'src/Three.js' ) || filePath.endsWith( 'src\\Three.js' ) ) {
-
-				code = 'import \'regenerator-runtime\';\n' + code;
-				code = 'import \'./polyfills\';\n' + code;
-
-			}
-
-
-			return {
-				code: code,
-				map: null
-			};
-
-		}
-
-	};
-
-}
+//Build build/three.module.min.js
+//https://www.npmjs.com/package/uglify-es
+const UglifyJS = require( "uglify-es" ),
+	code = fs.readFileSync( path.join( __dirname, '../../build/three.module.js' ), "utf8" ),
+	result = UglifyJS.minify( code );
+if ( result.error !== undefined )
+	console.log( result.error ); // runtime error, or `undefined` if no error
+else fs.writeFileSync( "build/three.module.min.js", result.code, "utf8" );
 
 export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			polyfills(),
-			nodeResolve(),
-			addons(),
 			glconstants(),
 			glsl(),
-			babel( {
-				babelHelpers: 'bundled',
-				compact: false,
-				babelrc: false,
-				...babelrc
-			} ),
-			babelCleanup(),
-			header()
+			buble( {
+				transforms: {
+					arrow: false,
+					classes: true
+				}
+			} )
 		],
 		output: [
 			{
@@ -321,40 +239,14 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			polyfills(),
-			nodeResolve(),
-			addons(),
 			glconstants(),
-			glsl(),
-			babel( {
-				babelHelpers: 'bundled',
-				babelrc: false,
-				...babelrc
-			} ),
-			babelCleanup(),
-			terser(),
-			header()
-		],
-		output: [
-			{
-				format: 'umd',
-				name: 'THREE',
-				file: 'build/three.min.js'
-			}
-		]
-	},
-	{
-		input: 'src/Three.js',
-		plugins: [
-			addons(),
-			glconstants(),
-			glsl(),
-			header()
+			glsl()
 		],
 		output: [
 			{
 				format: 'esm',
-				file: 'build/three.module.js'
+				file: 'build/three.module.js',
+				indent: '\t'
 			}
 		]
 	}
