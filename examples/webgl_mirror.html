@@ -27,12 +27,6 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Reflector } from './jsm/objects/Reflector.js';
 
-			// camera
-			const VIEW_ANGLE = 45;
-			let aspect = window.innerWidth / window.innerHeight;
-			const NEAR = 1;
-			const FAR = 500;
-
 			let camera, scene, renderer;
 
 			let cameraControls;
@@ -58,7 +52,7 @@
 				scene = new THREE.Scene();
 
 				// camera
-				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, aspect, NEAR, FAR );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
 				camera.position.set( 0, 75, 160 );
 
 				cameraControls = new OrbitControls( camera, renderer.domElement );
@@ -166,14 +160,13 @@
 				blueLight.position.set( 0, 50, 550 );
 				scene.add( blueLight );
 
-				window.addEventListener( "resize", onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
 			function onWindowResize() {
 
-				aspect = window.innerWidth / window.innerHeight;
-				camera.aspect = aspect;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );

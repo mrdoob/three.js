@@ -41,12 +41,6 @@
 				NormalMapNode,
 			} from './jsm/nodes/Nodes.js';
 
-			// camera
-			const VIEW_ANGLE = 45;
-			let aspect = window.innerWidth / window.innerHeight;
-			const NEAR = 1;
-			const FAR = 500;
-
 			const decalNormal = new THREE.TextureLoader().load( 'textures/decal/decal-normal.jpg' );
 
 			const decalDiffuse = new THREE.TextureLoader().load( 'textures/decal/decal-diffuse.png' );
@@ -78,7 +72,7 @@
 				scene = new THREE.Scene();
 
 				// camera
-				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, aspect, NEAR, FAR );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
 				camera.position.set( 0, 75, 160 );
 
 				cameraControls = new OrbitControls( camera, renderer.domElement );
@@ -90,14 +84,13 @@
 				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				window.addEventListener( "resize", onWindowResize, false );
-				
+				window.addEventListener( 'resize', onWindowResize, false );
+
 			}
 
 			function onWindowResize() {
 
-				aspect = window.innerWidth / window.innerHeight;
-				camera.aspect = aspect;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -111,8 +104,8 @@
 					window.innerWidth * window.devicePixelRatio,
 					window.innerHeight * window.devicePixelRatio
 				);
-				blurMirror.updateFrame()
-				
+				blurMirror.updateFrame();
+
 			}
 
 			function fillScene() {
@@ -157,11 +150,11 @@
 					window.innerWidth * window.devicePixelRatio,
 					window.innerHeight * window.devicePixelRatio
 				);
-				blurMirror.uv = new ExpressionNode( "projCoord.xyz / projCoord.q", "vec3" );
-				blurMirror.uv.keywords[ "projCoord" ] = new OperatorNode( mirror.offset, mirror.uv, OperatorNode.ADD );
+				blurMirror.uv = new ExpressionNode( 'projCoord.xyz / projCoord.q', 'vec3' );
+				blurMirror.uv.keywords[ 'projCoord' ] = new OperatorNode( mirror.offset, mirror.uv, OperatorNode.ADD );
 				blurMirror.radius.x = blurMirror.radius.y = 0;
 
-				gui.add( { blur: blurMirror.radius.x }, "blur", 0, 25 ).onChange( function ( v ) {
+				gui.add( { blur: blurMirror.radius.x }, 'blur', 0, 25 ).onChange( function ( v ) {
 
 					blurMirror.radius.x = blurMirror.radius.y = v;
 
