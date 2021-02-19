@@ -41,17 +41,20 @@
 			 * - Standard Workers with dependency loading
 			 * - Module Workers with and without additional dependencies
 			 * - Main Fallback without dependencies
-			 * - It also allows to use OBJLoader with and without modules.
+			 * - It also allows to use OBJLoader in wrapper (tmOBJLoader.js with and without modules.
 			 *
 			 * Via dat.gui it is possible to control various parameters of the example:
-			 * - The quantity of workers created for each task (default: 4)
-			 * - The absolute overall count of task executions (default: 1000000)
-			 * - The maximum amount of task executions per loop (=number of promises returned, default: 1000)
-			 * - How many meshes shall be kept as otherwise the continuous loading will (default: 750)
+			 * - The quantity of workers created for each task (1-32, default: 4)
+			 * - The absolute overall count of task executions (10^3-10^7, default: 10^6)
+			 * - The maximum amount of task executions per loop (=number of promises returned, 1-10000, default: 1000)
+			 * - How many meshes shall be kept as otherwise the continuous loading will (100-10000, default: 750)
 			 *
-			 * The tasks perform the same loading operation over and over again. This shall demonstrate:
+			 * The tasks perform the same loading operation over and over again.
+			 * This is not what you want to do in a real-world loading scenario,
+			 * but it is very helpful to demonstrate:
 			 * - A good CPU utilization can be achieved permanently if the selected amount of workers match the logical CPUs available
-			 * - No memory is leaked
+			 * - No memory is leaked, by the workers
+			 * - It can be extended or altered to test new worker implementations
 			 */
 			class TaskManagerPrototypeExample {
 
@@ -106,6 +109,7 @@
 					this.workerTaskManager = new WorkerTaskManager();
 					this.workerTaskManager.setVerbose( true );
 
+					// configure all task that shall be usable on register to the WorkerTaskManager
 					this.taskDescriptions.clear();
 					this.taskDescriptions.set( 'tmProtoExample', {
 						name: 'tmProtoExample',
@@ -223,10 +227,13 @@
 
 				/**
 				 * Registers any selected task at the {@link WorkerTaskManager} and initializes them.
+				 * The initialization varies. Some need task only pass dummy params others need
+				 * to init and send buffers to the workers
 				 *
 				 * @return {Promise<any>}
 				 */
 				async initContent () {
+
 					let awaiting = [];
 					this.tasksToUse = [];
 
@@ -302,14 +309,15 @@
 
 						return await Promise.all( awaiting );
 
-					}
-					else {
+					} else {
 
 						return new Promise( ( resolve, reject ) => { reject ( 'No task type has been configured' ) } )
 
 					}
+
 				}
 
+				/** Only once needed for OBJ/MTL initialization */
 				async loadObjMtl ( taskDescr ) {
 
 					let fileLoader = new FileLoader();
@@ -326,7 +334,7 @@
 						materialCreator.preload();
 						taskDescr.materialStore.addMaterials( materialCreator.materials, false );
 
-					} ) ;
+					} );
 					return await fileLoader.loadAsync( taskDescr.filenameObj );
 
 				}
@@ -334,7 +342,6 @@
 				/**
 				 * Once all tasks are initialized a number of tasks (maxPerLoop) are enqueued.
 				 * This is repeated a configured number of times (loopCount) or the abort flag is set.
-				 *
 				 * @return {Promise<void>}
 				 */
 				async executeWorkers () {
@@ -373,14 +380,16 @@
 					this.workerTaskManager.dispose();
 					console.timeEnd( 'start' );
 
-					if ( this.reset ) {
-
-						this.resetAppContext();
-
-					}
+					if ( this.reset ) this.resetAppContext();
 
 				}
 
+				/**
+				 * This method is invoked when {@link WorkerTaskManager} received a message from a worker.
+				 * @param {object} taskDescr
+				 * @param {object} payload Message received from worker
+				 * @private
+				 */
 				_processMessage ( taskDescr, payload ) {
 					let mesh, material;
 					switch ( payload.cmd ) {
@@ -436,6 +445,9 @@
 					}
 				}
 
+				/**
+				 * Add mesh at random position, but keep sub-meshes of an object together
+				 */
 				_addMesh( mesh, id ) {
 
 					let storedPos = this.objectsUsed.get( id );
@@ -462,6 +474,10 @@
 
 				}
 
+				/**
+				 * Ensures that only the configured amount of meshes stay in the scene
+				 * @private
+				 */
 				_cleanMeshes() {
 
 					if ( this.meshesAdded.length >= this.numberOfMeshesToKeep ) {
@@ -472,6 +488,11 @@
 
 				}
 
+				/**
+				 * Perform the actual deletion of meshes from the scene.
+				 * @param {number} deleteRange
+				 * @private
+				 */
 				_deleteMeshRange( deleteRange )  {
 
 					let toBeRemoved;
@@ -539,6 +560,9 @@
 
 			}
 
+			/**
+			 * Simplest way to define a worker for {@link WorkerTaskManager}
+			 */
 			const WorkerFunctions = {
 
 				workerStandardInit: function ( context, id, config ) {
@@ -575,6 +599,9 @@
 			let app = new TaskManagerPrototypeExample( document.getElementById( 'example' ) );
 			app.resetAppContext();
 
+			/**
+			 * DAT UI configuration and behaviour.
+			 */
 			let tmControls = {
 				controls: [],
 				controlStop: null,
@@ -712,11 +739,11 @@
 			tmControls.controls[ index ].onChange( value => { app.workerTaskManager.setMaxParallelExecutions( value ) } );
 
 			index++;
-			tmControls.controls[ index ] = gui.add( tmControls, 'overallExecutionCount', 0, 10000000 ).step( 1000 ).name( 'Overall Execution Count' );
+			tmControls.controls[ index ] = gui.add( tmControls, 'overallExecutionCount', 1000, 10000000 ).step( 1000 ).name( 'Overall Execution Count' );
 			tmControls.controls[ index ].onChange( value => { app.overallExecutionCount = value; app._recalcExecutionNumbers() } );
 
 			index++;
-			tmControls.controls[ index ] = gui.add( tmControls, 'maxPerLoop', 0, 10000 ).step( 100 ).name( 'Loop executions' );
+			tmControls.controls[ index ] = gui.add( tmControls, 'maxPerLoop', 1, 10000 ).step( 100 ).name( 'Loop executions' );
 			tmControls.controls[ index ].onChange( value => { app.maxPerLoop = value; app._recalcExecutionNumbers() } );
 
 			index++;
