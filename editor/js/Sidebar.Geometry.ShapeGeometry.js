@@ -1,14 +1,10 @@
-/**
- * @author Temdog007 / http://github.com/Temdog007
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UIButton } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryShapeGeometry = function ( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -35,7 +31,7 @@ var SidebarGeometryShapeGeometry = function ( editor, object ) {
 
 	function changeShape() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.ShapeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ShapeGeometry(
 			parameters.shapes,
 			curveSegments.getValue()
 		) ) );
@@ -44,7 +40,7 @@ var SidebarGeometryShapeGeometry = function ( editor, object ) {
 
 	function toExtrude() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.ExtrudeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ExtrudeGeometry(
 			parameters.shapes, {
 				curveSegments: curveSegments.getValue()
 			}
@@ -54,6 +50,6 @@ var SidebarGeometryShapeGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
-export { SidebarGeometryShapeGeometry };
+export { GeometryParametersPanel };

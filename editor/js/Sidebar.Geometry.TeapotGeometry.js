@@ -1,12 +1,8 @@
-/**
- * @author tschw
- */
-
 import { UIRow, UIText, UIInteger, UICheckbox, UINumber } from './libs/ui.js';
 
-import { TeapotBufferGeometry } from '../../examples/jsm/geometries/TeapotBufferGeometry.js';
+import { TeapotGeometry } from '../../examples/jsm/geometries/TeapotGeometry.js';
 
-var SidebarGeometryTeapotBufferGeometry = function ( signals, object ) {
+function GeometryParametersPanel( signals, object ) {
 
 	var container = new UIRow();
 
@@ -86,7 +82,7 @@ var SidebarGeometryTeapotBufferGeometry = function ( signals, object ) {
 
 		object.geometry.dispose();
 
-		object.geometry = new TeapotBufferGeometry(
+		object.geometry = new TeapotGeometry(
 			size.getValue(),
 			segments.getValue(),
 			bottom.getValue(),
@@ -104,6 +100,6 @@ var SidebarGeometryTeapotBufferGeometry = function ( signals, object ) {
 
 	return container;
 
-};
+}
 
-export { SidebarGeometryTeapotBufferGeometry };
+export { GeometryParametersPanel };

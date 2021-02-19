@@ -1,14 +1,10 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryPlaneGeometry = function ( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -62,7 +58,7 @@ var SidebarGeometryPlaneGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.PlaneBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.PlaneGeometry(
 			width.getValue(),
 			height.getValue(),
 			widthSegments.getValue(),
@@ -73,6 +69,6 @@ var SidebarGeometryPlaneGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
-export { SidebarGeometryPlaneGeometry };
+export { GeometryParametersPanel };

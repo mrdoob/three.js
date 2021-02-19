@@ -1,14 +1,10 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometrySphereGeometry = function ( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -92,7 +88,7 @@ var SidebarGeometrySphereGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.SphereBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.SphereGeometry(
 			radius.getValue(),
 			widthSegments.getValue(),
 			heightSegments.getValue(),
@@ -106,6 +102,6 @@ var SidebarGeometrySphereGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
-export { SidebarGeometrySphereGeometry };
+export { GeometryParametersPanel };

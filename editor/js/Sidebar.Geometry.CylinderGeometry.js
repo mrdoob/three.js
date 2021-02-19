@@ -1,14 +1,10 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UICheckbox, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryCylinderGeometry = function ( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -81,7 +77,7 @@ var SidebarGeometryCylinderGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.CylinderBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.CylinderGeometry(
 			radiusTop.getValue(),
 			radiusBottom.getValue(),
 			height.getValue(),
@@ -94,6 +90,6 @@ var SidebarGeometryCylinderGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
-export { SidebarGeometryCylinderGeometry };
+export { GeometryParametersPanel };

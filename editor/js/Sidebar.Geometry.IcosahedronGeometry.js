@@ -1,14 +1,10 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryIcosahedronGeometry = function ( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -43,7 +39,7 @@ var SidebarGeometryIcosahedronGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.IcosahedronBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.IcosahedronGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );
@@ -54,6 +50,6 @@ var SidebarGeometryIcosahedronGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
-export { SidebarGeometryIcosahedronGeometry };
+export { GeometryParametersPanel };

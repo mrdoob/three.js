@@ -1,10 +1,6 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIRow, UIButton } from './libs/ui.js';
 
-var SidebarGeometryModifiers = function ( editor, object ) {
+function SidebarGeometryModifiers( editor, object ) {
 
 	var signals = editor.signals;
 
@@ -19,15 +15,7 @@ var SidebarGeometryModifiers = function ( editor, object ) {
 
 		geometry.computeVertexNormals();
 
-		if ( geometry.isBufferGeometry ) {
-
-			geometry.attributes.normal.needsUpdate = true;
-
-		} else {
-
-			geometry.normalsNeedUpdate = true;
-
-		}
+		geometry.attributes.normal.needsUpdate = true;
 
 		signals.geometryChanged.dispatch( object );
 
@@ -39,6 +27,6 @@ var SidebarGeometryModifiers = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometryModifiers };
