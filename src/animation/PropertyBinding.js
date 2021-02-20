@@ -641,24 +641,22 @@ class PropertyBinding {
 
 }
 
-Object.assign( PropertyBinding, {
-	Composite
-} );
+PropertyBinding.Composite = Composite;
 
-const BindingType = {
+PropertyBinding.prototype.BindingType = {
 	Direct: 0,
 	EntireArray: 1,
 	ArrayElement: 2,
 	HasFromToArray: 3
 };
 
-const Versioning = {
+PropertyBinding.prototype.Versioning = {
 	None: 0,
 	NeedsUpdate: 1,
 	MatrixWorldNeedsUpdate: 2
 };
 
-const	GetterByBindingType = [
+PropertyBinding.prototype.GetterByBindingType = [
 
 	PropertyBinding.prototype._getValue_direct,
 	PropertyBinding.prototype._getValue_array,
@@ -667,7 +665,7 @@ const	GetterByBindingType = [
 
 ];
 
-const	SetterByBindingTypeAndVersioning = [
+PropertyBinding.prototype.SetterByBindingTypeAndVersioning = [
 
 	[
 		// Direct
@@ -701,13 +699,5 @@ const	SetterByBindingTypeAndVersioning = [
 
 ];
 
-Object.assign( PropertyBinding.prototype, {
-
-	BindingType,
-	Versioning,
-	GetterByBindingType,
-	SetterByBindingTypeAndVersioning,
-
-} );
 
 export { PropertyBinding };
