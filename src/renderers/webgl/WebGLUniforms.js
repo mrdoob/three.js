@@ -414,7 +414,7 @@ function setValueT6( gl, v, textures ) {
 
 }
 
-// Integer / Boolean vectors or arrays thereof (always flat arrays)
+// Integer / Boolean
 
 function setValueV1i( gl, v ) {
 
@@ -427,6 +427,8 @@ function setValueV1i( gl, v ) {
 	cache[ 0 ] = v;
 
 }
+
+// Integer / Boolean vectors
 
 function setValueV2i( gl, v ) {
 
@@ -464,7 +466,7 @@ function setValueV4i( gl, v ) {
 
 }
 
-// uint
+// Unsigned integer
 
 function setValueV1ui( gl, v ) {
 
@@ -475,6 +477,44 @@ function setValueV1ui( gl, v ) {
 	gl.uniform1ui( this.addr, v );
 
 	cache[ 0 ] = v;
+
+}
+
+// Unsigned integer vectors
+
+function setValueV2ui( gl, v ) {
+
+	const cache = this.cache;
+
+	if ( arraysEqual( cache, v ) ) return;
+
+	gl.uniform2uiv( this.addr, v );
+
+	copyArray( cache, v );
+
+}
+
+function setValueV3ui( gl, v ) {
+
+	const cache = this.cache;
+
+	if ( arraysEqual( cache, v ) ) return;
+
+	gl.uniform3uiv( this.addr, v );
+
+	copyArray( cache, v );
+
+}
+
+function setValueV4ui( gl, v ) {
+
+	const cache = this.cache;
+
+	if ( arraysEqual( cache, v ) ) return;
+
+	gl.uniform4uiv( this.addr, v );
+
+	copyArray( cache, v );
 
 }
 
@@ -499,6 +539,9 @@ function getSingularSetter( type ) {
 		case 0x8b55: case 0x8b59: return setValueV4i; // _VEC4
 
 		case 0x1405: return setValueV1ui; // UINT
+		case 0x8dc6: return setValueV2ui; // _VEC2
+		case 0x8dc7: return setValueV3ui; // _VEC3
+		case 0x8dc8: return setValueV4ui; // _VEC4
 
 		case 0x8b5e: // SAMPLER_2D
 		case 0x8d66: // SAMPLER_EXTERNAL_OES
@@ -557,6 +600,32 @@ function setValueV3iArray( gl, v ) {
 function setValueV4iArray( gl, v ) {
 
 	gl.uniform4iv( this.addr, v );
+
+}
+
+
+// Unsigned integer vectors or arrays thereof (always flat arrays)
+function setValueV1uiArray( gl, v ) {
+
+	gl.uniform1uiv( this.addr, v );
+
+}
+
+function setValueV2uiArray( gl, v ) {
+
+	gl.uniform2uiv( this.addr, v );
+
+}
+
+function setValueV3uiArray( gl, v ) {
+
+	gl.uniform3uiv( this.addr, v );
+
+}
+
+function setValueV4uiArray( gl, v ) {
+
+	gl.uniform4uiv( this.addr, v );
 
 }
 
@@ -666,6 +735,11 @@ function getPureArraySetter( type ) {
 		case 0x8b53: case 0x8b57: return setValueV2iArray; // _VEC2
 		case 0x8b54: case 0x8b58: return setValueV3iArray; // _VEC3
 		case 0x8b55: case 0x8b59: return setValueV4iArray; // _VEC4
+
+		case 0x1405: return setValueV1uiArray; // UINT
+		case 0x8dc6: return setValueV2uiArray; // _VEC2
+		case 0x8dc7: return setValueV3uiArray; // _VEC3
+		case 0x8dc8: return setValueV4uiArray; // _VEC4
 
 		case 0x8b5e: // SAMPLER_2D
 		case 0x8d66: // SAMPLER_EXTERNAL_OES
