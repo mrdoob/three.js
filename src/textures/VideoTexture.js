@@ -1,47 +1,43 @@
 import { RGBFormat, LinearFilter } from '../constants.js';
 import { Texture } from './Texture.js';
 
-function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+class VideoTexture extends Texture {
 
-	Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+	constructor( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.format = format !== undefined ? format : RGBFormat;
+		super( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
-	this.minFilter = minFilter !== undefined ? minFilter : LinearFilter;
-	this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
+		this.format = format !== undefined ? format : RGBFormat;
 
-	this.generateMipmaps = false;
+		this.minFilter = minFilter !== undefined ? minFilter : LinearFilter;
+		this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
 
-	const scope = this;
+		this.generateMipmaps = false;
 
-	function updateVideo() {
+		const scope = this;
 
-		scope.needsUpdate = true;
-		video.requestVideoFrameCallback( updateVideo );
+		function updateVideo() {
+
+			scope.needsUpdate = true;
+			video.requestVideoFrameCallback( updateVideo );
+
+		}
+
+		if ( 'requestVideoFrameCallback' in video ) {
+
+			video.requestVideoFrameCallback( updateVideo );
+
+		}
 
 	}
 
-	if ( 'requestVideoFrameCallback' in video ) {
-
-		video.requestVideoFrameCallback( updateVideo );
-
-	}
-
-}
-
-VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
-
-	constructor: VideoTexture,
-
-	clone: function () {
+	clone() {
 
 		return new this.constructor( this.image ).copy( this );
 
-	},
+	}
 
-	isVideoTexture: true,
-
-	update: function () {
+	update() {
 
 		const video = this.image;
 		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
@@ -54,7 +50,8 @@ VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
 
 	}
 
-} );
+}
 
+VideoTexture.prototype.isVideoTexture = true;
 
 export { VideoTexture };

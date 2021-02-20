@@ -17,77 +17,81 @@ import { ImageUtils } from '../extras/ImageUtils.js';
 
 let textureId = 0;
 
-function Texture( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1, encoding = LinearEncoding ) {
+class Texture extends EventDispatcher {
 
-	Object.defineProperty( this, 'id', { value: textureId ++ } );
+	static DEFAULT_IMAGE = undefined;
+	static DEFAULT_MAPPING = UVMapping;
 
-	this.uuid = MathUtils.generateUUID();
+	constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1, encoding = LinearEncoding ) {
 
-	this.name = '';
+		super();
 
-	this.image = image;
-	this.mipmaps = [];
+		Object.defineProperty( this, 'id', { value: textureId ++ } );
 
-	this.mapping = mapping;
+		this.uuid = MathUtils.generateUUID();
 
-	this.wrapS = wrapS;
-	this.wrapT = wrapT;
+		this.name = '';
 
-	this.magFilter = magFilter;
-	this.minFilter = minFilter;
+		this.image = image;
+		this.mipmaps = [];
 
-	this.anisotropy = anisotropy;
+		this.mapping = mapping;
 
-	this.format = format;
-	this.internalFormat = null;
-	this.type = type;
+		this.wrapS = wrapS;
+		this.wrapT = wrapT;
 
-	this.offset = new Vector2( 0, 0 );
-	this.repeat = new Vector2( 1, 1 );
-	this.center = new Vector2( 0, 0 );
-	this.rotation = 0;
+		this.magFilter = magFilter;
+		this.minFilter = minFilter;
 
-	this.matrixAutoUpdate = true;
-	this.matrix = new Matrix3();
+		this.anisotropy = anisotropy;
 
-	this.generateMipmaps = true;
-	this.premultiplyAlpha = false;
-	this.flipY = true;
-	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
+		this.format = format;
+		this.internalFormat = null;
+		this.type = type;
 
-	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
-	//
-	// Also changing the encoding after already used by a Material will not automatically make the Material
-	// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
-	this.encoding = encoding;
+		this.offset = new Vector2( 0, 0 );
+		this.repeat = new Vector2( 1, 1 );
+		this.center = new Vector2( 0, 0 );
+		this.rotation = 0;
 
-	this.version = 0;
-	this.onUpdate = null;
+		this.matrixAutoUpdate = true;
+		this.matrix = new Matrix3();
 
-}
+		// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
+		//
+		// Also changing the encoding after already used by a Material will not automatically make the Material
+		// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
+		this.encoding = encoding;
 
-Texture.DEFAULT_IMAGE = undefined;
-Texture.DEFAULT_MAPPING = UVMapping;
+		this.generateMipmaps = true;
+		this.premultiplyAlpha = false;
+		this.flipY = true;
+		this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+		// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
+		//
+		// Also changing the encoding after already used by a Material will not automatically make the Material
+		// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
+		this.encoding = encoding !== undefined ? encoding : LinearEncoding;
 
-	constructor: Texture,
+		this.version = 0;
+		this.onUpdate = null;
 
-	isTexture: true,
+	}
 
-	updateMatrix: function () {
+	updateMatrix() {
 
 		this.matrix.setUvTransform( this.offset.x, this.offset.y, this.repeat.x, this.repeat.y, this.rotation, this.center.x, this.center.y );
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		this.name = source.name;
 
@@ -124,9 +128,9 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
 		const isRootObject = ( meta === undefined || typeof meta === 'string' );
 
@@ -236,15 +240,15 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		return output;
 
-	},
+	}
 
-	dispose: function () {
+	dispose() {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
-	},
+	}
 
-	transformUv: function ( uv ) {
+	transformUv( uv ) {
 
 		if ( this.mapping !== UVMapping ) return uv;
 
@@ -324,17 +328,15 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	}
 
-} );
-
-Object.defineProperty( Texture.prototype, 'needsUpdate', {
-
-	set: function ( value ) {
+	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
 
 	}
 
-} );
+}
+
+Texture.prototype.isTexture = true;
 
 function serializeImage( image ) {
 
