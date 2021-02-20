@@ -224,7 +224,7 @@ class Vector4 {
 		return this;
 
 	}
-
+	eee() {}
 	multiply( v ) {
 
 		this.x *= v.x;
