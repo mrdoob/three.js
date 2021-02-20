@@ -22,92 +22,90 @@ import { MathUtils } from '../math/MathUtils.js';
  * }
  */
 
-class MeshPhysicalMaterial extends MeshStandardMaterial {
+function MeshPhysicalMaterial( parameters ) {
 
-	constructor( parameters ) {
+	MeshStandardMaterial.call( this );
 
-		super();
+	this.defines = {
 
-		this.defines = {
+		'STANDARD': '',
+		'PHYSICAL': ''
 
-			'STANDARD': '',
-			'PHYSICAL': ''
+	};
 
-		};
+	this.type = 'MeshPhysicalMaterial';
 
-		this.type = 'MeshPhysicalMaterial';
+	this.clearcoat = 0.0;
+	this.clearcoatMap = null;
+	this.clearcoatRoughness = 0.0;
+	this.clearcoatRoughnessMap = null;
+	this.clearcoatNormalScale = new Vector2( 1, 1 );
+	this.clearcoatNormalMap = null;
 
-		this.clearcoat = 0.0;
-		this.clearcoatMap = null;
-		this.clearcoatRoughness = 0.0;
-		this.clearcoatRoughnessMap = null;
-		this.clearcoatNormalScale = new Vector2( 1, 1 );
-		this.clearcoatNormalMap = null;
+	this.reflectivity = 0.5; // maps to F0 = 0.04
 
-		this.reflectivity = 0.5; // maps to F0 = 0.04
+	Object.defineProperty( this, 'ior', {
+		get: function () {
 
-		Object.defineProperty( this, 'ior', {
-			get: function () {
+			return ( 1 + 0.4 * this.reflectivity ) / ( 1 - 0.4 * this.reflectivity );
 
-				return ( 1 + 0.4 * this.reflectivity ) / ( 1 - 0.4 * this.reflectivity );
+		},
+		set: function ( ior ) {
 
-			},
-			set: function ( ior ) {
-
-				this.reflectivity = MathUtils.clamp( 2.5 * ( ior - 1 ) / ( ior + 1 ), 0, 1 );
-
-			}
-		} );
-
-
-		this.sheen = null; // null will disable sheen bsdf
-
-		this.transmission = 0.0;
-		this.transmissionMap = null;
-
-		this.setValues( parameters );
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.defines = {
-
-			'STANDARD': '',
-			'PHYSICAL': ''
-
-		};
-
-		this.clearcoat = source.clearcoat;
-		this.clearcoatMap = source.clearcoatMap;
-		this.clearcoatRoughness = source.clearcoatRoughness;
-		this.clearcoatRoughnessMap = source.clearcoatRoughnessMap;
-		this.clearcoatNormalMap = source.clearcoatNormalMap;
-		this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
-
-		this.reflectivity = source.reflectivity;
-
-		if ( source.sheen ) {
-
-			this.sheen = ( this.sheen || new Color() ).copy( source.sheen );
-
-		} else {
-
-			this.sheen = null;
+			this.reflectivity = MathUtils.clamp( 2.5 * ( ior - 1 ) / ( ior + 1 ), 0, 1 );
 
 		}
+	} );
 
-		this.transmission = source.transmission;
-		this.transmissionMap = source.transmissionMap;
+	this.sheen = null; // null will disable sheen bsdf
 
-		return this;
+	this.transmission = 0.0;
+	this.transmissionMap = null;
 
-	}
+	this.setValues( parameters );
 
 }
 
+MeshPhysicalMaterial.prototype = Object.create( MeshStandardMaterial.prototype );
+MeshPhysicalMaterial.prototype.constructor = MeshPhysicalMaterial;
+
 MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
+
+MeshPhysicalMaterial.prototype.copy = function ( source ) {
+
+	MeshStandardMaterial.prototype.copy.call( this, source );
+
+	this.defines = {
+
+		'STANDARD': '',
+		'PHYSICAL': ''
+
+	};
+
+	this.clearcoat = source.clearcoat;
+	this.clearcoatMap = source.clearcoatMap;
+	this.clearcoatRoughness = source.clearcoatRoughness;
+	this.clearcoatRoughnessMap = source.clearcoatRoughnessMap;
+	this.clearcoatNormalMap = source.clearcoatNormalMap;
+	this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
+
+	this.reflectivity = source.reflectivity;
+
+	if ( source.sheen ) {
+
+		this.sheen = ( this.sheen || new Color() ).copy( source.sheen );
+
+	} else {
+
+		this.sheen = null;
+
+	}
+
+	this.transmission = source.transmission;
+	this.transmissionMap = source.transmissionMap;
+
+	return this;
+
+};
 
 export { MeshPhysicalMaterial };
