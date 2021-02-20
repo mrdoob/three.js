@@ -1392,77 +1392,75 @@ const ImageUtils = {
 
 let textureId = 0;
 
-function Texture( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1, encoding = LinearEncoding ) {
+class Texture extends EventDispatcher {
 
-	Object.defineProperty( this, 'id', { value: textureId ++ } );
+	static DEFAULT_IMAGE = undefined;
+	static DEFAULT_MAPPING = UVMapping;
 
-	this.uuid = MathUtils.generateUUID();
+	constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1, encoding = LinearEncoding ) {
 
-	this.name = '';
+		super();
 
-	this.image = image;
-	this.mipmaps = [];
+		Object.defineProperty( this, 'id', { value: textureId ++ } );
 
-	this.mapping = mapping;
+		this.uuid = MathUtils.generateUUID();
 
-	this.wrapS = wrapS;
-	this.wrapT = wrapT;
+		this.name = '';
 
-	this.magFilter = magFilter;
-	this.minFilter = minFilter;
+		this.image = image;
+		this.mipmaps = [];
 
-	this.anisotropy = anisotropy;
+		this.mapping = mapping;
 
-	this.format = format;
-	this.internalFormat = null;
-	this.type = type;
+		this.wrapS = wrapS;
+		this.wrapT = wrapT;
 
-	this.offset = new Vector2( 0, 0 );
-	this.repeat = new Vector2( 1, 1 );
-	this.center = new Vector2( 0, 0 );
-	this.rotation = 0;
+		this.magFilter = magFilter;
+		this.minFilter = minFilter;
 
-	this.matrixAutoUpdate = true;
-	this.matrix = new Matrix3();
+		this.anisotropy = anisotropy;
 
-	this.generateMipmaps = true;
-	this.premultiplyAlpha = false;
-	this.flipY = true;
-	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
+		this.format = format;
+		this.internalFormat = null;
+		this.type = type;
 
-	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
-	//
-	// Also changing the encoding after already used by a Material will not automatically make the Material
-	// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
-	this.encoding = encoding;
+		this.offset = new Vector2( 0, 0 );
+		this.repeat = new Vector2( 1, 1 );
+		this.center = new Vector2( 0, 0 );
+		this.rotation = 0;
 
-	this.version = 0;
-	this.onUpdate = null;
+		this.matrixAutoUpdate = true;
+		this.matrix = new Matrix3();
 
-}
+		this.generateMipmaps = true;
+		this.premultiplyAlpha = false;
+		this.flipY = true;
+		this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-Texture.DEFAULT_IMAGE = undefined;
-Texture.DEFAULT_MAPPING = UVMapping;
+		// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
+		//
+		// Also changing the encoding after already used by a Material will not automatically make the Material
+		// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
+		this.encoding = encoding;
 
-Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+		this.version = 0;
+		this.onUpdate = null;
 
-	constructor: Texture,
+	}
 
-	isTexture: true,
-
-	updateMatrix: function () {
+	updateMatrix() {
 
 		this.matrix.setUvTransform( this.offset.x, this.offset.y, this.repeat.x, this.repeat.y, this.rotation, this.center.x, this.center.y );
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		this.name = source.name;
 
@@ -1499,9 +1497,9 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
 		const isRootObject = ( meta === undefined || typeof meta === 'string' );
 
@@ -1611,15 +1609,15 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		return output;
 
-	},
+	}
 
-	dispose: function () {
+	dispose() {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
-	},
+	}
 
-	transformUv: function ( uv ) {
+	transformUv( uv ) {
 
 		if ( this.mapping !== UVMapping ) return uv;
 
@@ -1699,17 +1697,15 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	}
 
-} );
-
-Object.defineProperty( Texture.prototype, 'needsUpdate', {
-
-	set: function ( value ) {
+	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
 
 	}
 
-} );
+}
+
+Texture.prototype.isTexture = true;
 
 function serializeImage( image ) {
 
@@ -11927,50 +11923,47 @@ class CubeCamera extends Object3D {
 
 }
 
-function CubeTexture( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+class CubeTexture extends Texture {
 
-	images = images !== undefined ? images : [];
-	mapping = mapping !== undefined ? mapping : CubeReflectionMapping;
-	format = format !== undefined ? format : RGBFormat;
+	constructor( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
-	Texture.call( this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+		images = images !== undefined ? images : [];
+		mapping = mapping !== undefined ? mapping : CubeReflectionMapping;
+		format = format !== undefined ? format : RGBFormat;
 
-	this.flipY = false;
+		super( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
-	// Why CubeTexture._needsFlipEnvMap is necessary:
-	//
-	// By convention -- likely based on the RenderMan spec from the 1990's -- cube maps are specified by WebGL (and three.js)
-	// in a coordinate system in which positive-x is to the right when looking up the positive-z axis -- in other words,
-	// in a left-handed coordinate system. By continuing this convention, preexisting cube maps continued to render correctly.
+		// Why CubeTexture._needsFlipEnvMap is necessary:
+		//
+		// By convention -- likely based on the RenderMan spec from the 1990's -- cube maps are specified by WebGL (and three.js)
+		// in a coordinate system in which positive-x is to the right when looking up the positive-z axis -- in other words,
+		// in a left-handed coordinate system. By continuing this convention, preexisting cube maps continued to render correctly.
 
-	// three.js uses a right-handed coordinate system. So environment maps used in three.js appear to have px and nx swapped
-	// and the flag _needsFlipEnvMap controls this conversion. The flip is not required (and thus _needsFlipEnvMap is set to false)
-	// when using WebGLCubeRenderTarget.texture as a cube texture.
+		// three.js uses a right-handed coordinate system. So environment maps used in three.js appear to have px and nx swapped
+		// and the flag _needsFlipEnvMap controls this conversion. The flip is not required (and thus _needsFlipEnvMap is set to false)
+		// when using WebGLCubeRenderTarget.texture as a cube texture.
 
-	this._needsFlipEnvMap = true;
+		this._needsFlipEnvMap = true;
 
-}
+		this.flipY = false;
 
-CubeTexture.prototype = Object.create( Texture.prototype );
-CubeTexture.prototype.constructor = CubeTexture;
+	}
 
-CubeTexture.prototype.isCubeTexture = true;
-
-Object.defineProperty( CubeTexture.prototype, 'images', {
-
-	get: function () {
+	get images() {
 
 		return this.image;
 
-	},
+	}
 
-	set: function ( value ) {
+	set images( value ) {
 
 		this.image = value;
 
 	}
 
-} );
+}
+
+CubeTexture.prototype.isCubeTexture = true;
 
 class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
@@ -12108,25 +12101,26 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
 
-function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+class DataTexture extends Texture {
 
-	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+	constructor( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
-	this.image = { data: data || null, width: width || 1, height: height || 1 };
+		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
-	this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+		this.image = { data: data || null, width: width || 1, height: height || 1 };
 
-	this.generateMipmaps = false;
-	this.flipY = false;
-	this.unpackAlignment = 1;
+		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
+		this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
 
-	this.needsUpdate = true;
+		this.generateMipmaps = false;
+		this.flipY = false;
+		this.unpackAlignment = 1;
+
+		this.needsUpdate = true;
+
+	}
 
 }
-
-DataTexture.prototype = Object.create( Texture.prototype );
-DataTexture.prototype.constructor = DataTexture;
 
 DataTexture.prototype.isDataTexture = true;
 
@@ -15388,57 +15382,60 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 }
 
-function DataTexture2DArray( data = null, width = 1, height = 1, depth = 1 ) {
+class DataTexture2DArray extends Texture {
 
-	Texture.call( this, null );
+	constructor( data = null, width = 1, height = 1, depth = 1 ) {
 
-	this.image = { data, width, height, depth };
+		super( null );
 
-	this.magFilter = NearestFilter;
-	this.minFilter = NearestFilter;
+		this.image = { data, width, height, depth };
 
-	this.wrapR = ClampToEdgeWrapping;
+		this.magFilter = NearestFilter;
+		this.minFilter = NearestFilter;
 
-	this.generateMipmaps = false;
-	this.flipY = false;
+		this.wrapR = ClampToEdgeWrapping;
 
-	this.needsUpdate = true;
+		this.generateMipmaps = false;
+		this.flipY = false;
+
+		this.needsUpdate = true;
+
+	}
 
 }
 
-DataTexture2DArray.prototype = Object.create( Texture.prototype );
-DataTexture2DArray.prototype.constructor = DataTexture2DArray;
 DataTexture2DArray.prototype.isDataTexture2DArray = true;
 
-function DataTexture3D( data = null, width = 1, height = 1, depth = 1 ) {
+class DataTexture3D extends Texture {
 
-	// We're going to add .setXXX() methods for setting properties later.
-	// Users can still set in DataTexture3D directly.
-	//
-	//	const texture = new THREE.DataTexture3D( data, width, height, depth );
-	// 	texture.anisotropy = 16;
-	//
-	// See #14839
+	constructor( data = null, width = 1, height = 1, depth = 1 ) {
 
-	Texture.call( this, null );
+		// We're going to add .setXXX() methods for setting properties later.
+		// Users can still set in DataTexture3D directly.
+		//
+		//	const texture = new THREE.DataTexture3D( data, width, height, depth );
+		// 	texture.anisotropy = 16;
+		//
+		// See #14839
 
-	this.image = { data, width, height, depth };
+		super( null );
 
-	this.magFilter = NearestFilter;
-	this.minFilter = NearestFilter;
+		this.image = { data, width, height, depth };
 
-	this.wrapR = ClampToEdgeWrapping;
+		this.magFilter = NearestFilter;
+		this.minFilter = NearestFilter;
 
-	this.generateMipmaps = false;
-	this.flipY = false;
+		this.wrapR = ClampToEdgeWrapping;
 
-	this.needsUpdate = true;
+		this.generateMipmaps = false;
+		this.flipY = false;
 
+		this.needsUpdate = true;
+
+	}
 
 }
 
-DataTexture3D.prototype = Object.create( Texture.prototype );
-DataTexture3D.prototype.constructor = DataTexture3D;
 DataTexture3D.prototype.isDataTexture3D = true;
 
 /**
@@ -27137,47 +27134,43 @@ function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, inte
 
 }
 
-function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+class VideoTexture extends Texture {
 
-	Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+	constructor( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.format = format !== undefined ? format : RGBFormat;
+		super( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
-	this.minFilter = minFilter !== undefined ? minFilter : LinearFilter;
-	this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
+		this.format = format !== undefined ? format : RGBFormat;
 
-	this.generateMipmaps = false;
+		this.minFilter = minFilter !== undefined ? minFilter : LinearFilter;
+		this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
 
-	const scope = this;
+		this.generateMipmaps = false;
 
-	function updateVideo() {
+		const scope = this;
 
-		scope.needsUpdate = true;
-		video.requestVideoFrameCallback( updateVideo );
+		function updateVideo() {
+
+			scope.needsUpdate = true;
+			video.requestVideoFrameCallback( updateVideo );
+
+		}
+
+		if ( 'requestVideoFrameCallback' in video ) {
+
+			video.requestVideoFrameCallback( updateVideo );
+
+		}
 
 	}
 
-	if ( 'requestVideoFrameCallback' in video ) {
-
-		video.requestVideoFrameCallback( updateVideo );
-
-	}
-
-}
-
-VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
-
-	constructor: VideoTexture,
-
-	clone: function () {
+	clone() {
 
 		return new this.constructor( this.image ).copy( this );
 
-	},
+	}
 
-	isVideoTexture: true,
-
-	update: function () {
+	update() {
 
 		const video = this.image;
 		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
@@ -27190,71 +27183,79 @@ VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
 
 	}
 
-} );
-
-function CompressedTexture( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
-
-	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
-
-	this.image = { width: width, height: height };
-	this.mipmaps = mipmaps;
-
-	// no flipping for cube textures
-	// (also flipping doesn't work for compressed textures )
-
-	this.flipY = false;
-
-	// can't generate mipmaps for compressed textures
-	// mips must be embedded in DDS files
-
-	this.generateMipmaps = false;
-
 }
 
-CompressedTexture.prototype = Object.create( Texture.prototype );
-CompressedTexture.prototype.constructor = CompressedTexture;
+VideoTexture.prototype.isVideoTexture = true;
 
-CompressedTexture.prototype.isCompressedTexture = true;
+class CompressedTexture extends Texture {
 
-function CanvasTexture( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+	constructor( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
-	Texture.call( this, canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
-	this.needsUpdate = true;
+		this.image = { width: width, height: height };
+		this.mipmaps = mipmaps;
 
-}
+		// no flipping for cube textures
+		// (also flipping doesn't work for compressed textures )
 
-CanvasTexture.prototype = Object.create( Texture.prototype );
-CanvasTexture.prototype.constructor = CanvasTexture;
-CanvasTexture.prototype.isCanvasTexture = true;
+		this.flipY = false;
 
-function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
+		// can't generate mipmaps for compressed textures
+		// mips must be embedded in DDS files
 
-	format = format !== undefined ? format : DepthFormat;
-
-	if ( format !== DepthFormat && format !== DepthStencilFormat ) {
-
-		throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' );
+		this.generateMipmaps = false;
 
 	}
 
-	if ( type === undefined && format === DepthFormat ) type = UnsignedShortType;
-	if ( type === undefined && format === DepthStencilFormat ) type = UnsignedInt248Type;
+}
 
-	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+CompressedTexture.prototype.isCompressedTexture = true;
 
-	this.image = { width: width, height: height };
+class CanvasTexture extends Texture {
 
-	this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+	constructor( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.flipY = false;
-	this.generateMipmaps = false;
+		super( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+		this.needsUpdate = true;
+
+	}
 
 }
 
-DepthTexture.prototype = Object.create( Texture.prototype );
-DepthTexture.prototype.constructor = DepthTexture;
+CanvasTexture.prototype.isCanvasTexture = true;
+
+class DepthTexture extends Texture {
+
+	constructor( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
+
+		format = format !== undefined ? format : DepthFormat;
+
+		if ( format !== DepthFormat && format !== DepthStencilFormat ) {
+
+			throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' );
+
+		}
+
+		if ( type === undefined && format === DepthFormat ) type = UnsignedShortType;
+		if ( type === undefined && format === DepthStencilFormat ) type = UnsignedInt248Type;
+
+		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+		this.image = { width: width, height: height };
+
+		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
+		this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+
+		this.flipY = false;
+		this.generateMipmaps	= false;
+
+	}
+
+
+}
+
 DepthTexture.prototype.isDepthTexture = true;
 
 class CircleGeometry extends BufferGeometry {
