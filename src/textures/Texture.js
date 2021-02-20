@@ -57,12 +57,6 @@ class Texture extends EventDispatcher {
 		this.matrixAutoUpdate = true;
 		this.matrix = new Matrix3();
 
-		// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
-		//
-		// Also changing the encoding after already used by a Material will not automatically make the Material
-		// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
-		this.encoding = encoding;
-
 		this.generateMipmaps = true;
 		this.premultiplyAlpha = false;
 		this.flipY = true;
@@ -72,7 +66,7 @@ class Texture extends EventDispatcher {
 		//
 		// Also changing the encoding after already used by a Material will not automatically make the Material
 		// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
-		this.encoding = encoding !== undefined ? encoding : LinearEncoding;
+		this.encoding = encoding;
 
 		this.version = 0;
 		this.onUpdate = null;
