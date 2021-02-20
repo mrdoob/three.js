@@ -1023,8 +1023,7 @@ var MMDAnimationHelper = ( function () {
 
 						if ( grant.affectRotation ) {
 							
-							this.mesh.updateMatrixWorld( true );
-							new CCDIKSolver(this.mesh, this.mesh.geometry.userData.MMD.iks).update();
+							if(grant.ratio <= 0) continue;
 
 							quaternion.set( 0, 0, 0, 1 );
 							quaternion.slerp( parentBone.quaternion, grant.ratio );
