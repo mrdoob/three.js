@@ -1,5 +1,5 @@
 export default /* glsl */`
-float faceDirection = float( gl_FrontFacing ) * 2.0 - 1.0;
+float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 #ifdef FLAT_SHADED
 

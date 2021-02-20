@@ -25,6 +25,9 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		this.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
+		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
+		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
+
 		this.texture._needsFlipEnvMap = false;
 
 	}
