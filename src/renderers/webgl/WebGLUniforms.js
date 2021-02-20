@@ -265,7 +265,7 @@ function setValueV4f( gl, v ) {
 
 }
 
-// Single matrix (from flat array or MatrixN)
+// Single matrix (from flat array or THREE.MatrixN)
 
 function setValueM2( gl, v ) {
 
@@ -348,73 +348,7 @@ function setValueM4( gl, v ) {
 
 }
 
-// Single texture (2D / Cube)
-
-function setValueT1( gl, v, textures ) {
-
-	const cache = this.cache;
-	const unit = textures.allocateTextureUnit();
-
-	if ( cache[ 0 ] !== unit ) {
-
-		gl.uniform1i( this.addr, unit );
-		cache[ 0 ] = unit;
-
-	}
-
-	textures.safeSetTexture2D( v || emptyTexture, unit );
-
-}
-
-function setValueT2DArray1( gl, v, textures ) {
-
-	const cache = this.cache;
-	const unit = textures.allocateTextureUnit();
-
-	if ( cache[ 0 ] !== unit ) {
-
-		gl.uniform1i( this.addr, unit );
-		cache[ 0 ] = unit;
-
-	}
-
-	textures.setTexture2DArray( v || emptyTexture2dArray, unit );
-
-}
-
-function setValueT3D1( gl, v, textures ) {
-
-	const cache = this.cache;
-	const unit = textures.allocateTextureUnit();
-
-	if ( cache[ 0 ] !== unit ) {
-
-		gl.uniform1i( this.addr, unit );
-		cache[ 0 ] = unit;
-
-	}
-
-	textures.setTexture3D( v || emptyTexture3d, unit );
-
-}
-
-function setValueT6( gl, v, textures ) {
-
-	const cache = this.cache;
-	const unit = textures.allocateTextureUnit();
-
-	if ( cache[ 0 ] !== unit ) {
-
-		gl.uniform1i( this.addr, unit );
-		cache[ 0 ] = unit;
-
-	}
-
-	textures.safeSetTextureCube( v || emptyCubeTexture, unit );
-
-}
-
-// Integer / Boolean
+// Single integer / boolean
 
 function setValueV1i( gl, v ) {
 
@@ -428,7 +362,7 @@ function setValueV1i( gl, v ) {
 
 }
 
-// Integer / Boolean vectors
+// Single integer / boolean vector (from flat array)
 
 function setValueV2i( gl, v ) {
 
@@ -466,7 +400,7 @@ function setValueV4i( gl, v ) {
 
 }
 
-// Unsigned integer
+// Single unsigned integer
 
 function setValueV1ui( gl, v ) {
 
@@ -480,7 +414,7 @@ function setValueV1ui( gl, v ) {
 
 }
 
-// Unsigned integer vectors
+// Single unsigned integer vector (from flat array)
 
 function setValueV2ui( gl, v ) {
 
@@ -515,6 +449,73 @@ function setValueV4ui( gl, v ) {
 	gl.uniform4uiv( this.addr, v );
 
 	copyArray( cache, v );
+
+}
+
+
+// Single texture (2D / Cube)
+
+function setValueT1( gl, v, textures ) {
+
+	const cache = this.cache;
+	const unit = textures.allocateTextureUnit();
+
+	if ( cache[ 0 ] !== unit ) {
+
+		gl.uniform1i( this.addr, unit );
+		cache[ 0 ] = unit;
+
+	}
+
+	textures.safeSetTexture2D( v || emptyTexture, unit );
+
+}
+
+function setValueT3D1( gl, v, textures ) {
+
+	const cache = this.cache;
+	const unit = textures.allocateTextureUnit();
+
+	if ( cache[ 0 ] !== unit ) {
+
+		gl.uniform1i( this.addr, unit );
+		cache[ 0 ] = unit;
+
+	}
+
+	textures.setTexture3D( v || emptyTexture3d, unit );
+
+}
+
+function setValueT6( gl, v, textures ) {
+
+	const cache = this.cache;
+	const unit = textures.allocateTextureUnit();
+
+	if ( cache[ 0 ] !== unit ) {
+
+		gl.uniform1i( this.addr, unit );
+		cache[ 0 ] = unit;
+
+	}
+
+	textures.safeSetTextureCube( v || emptyCubeTexture, unit );
+
+}
+
+function setValueT2DArray1( gl, v, textures ) {
+
+	const cache = this.cache;
+	const unit = textures.allocateTextureUnit();
+
+	if ( cache[ 0 ] !== unit ) {
+
+		gl.uniform1i( this.addr, unit );
+		cache[ 0 ] = unit;
+
+	}
+
+	textures.setTexture2DArray( v || emptyTexture2dArray, unit );
 
 }
 
@@ -571,66 +572,16 @@ function getSingularSetter( type ) {
 
 }
 
+
 // Array of scalars
+
 function setValueV1fArray( gl, v ) {
 
 	gl.uniform1fv( this.addr, v );
 
 }
 
-// Integer / Boolean vectors or arrays thereof (always flat arrays)
-function setValueV1iArray( gl, v ) {
-
-	gl.uniform1iv( this.addr, v );
-
-}
-
-function setValueV2iArray( gl, v ) {
-
-	gl.uniform2iv( this.addr, v );
-
-}
-
-function setValueV3iArray( gl, v ) {
-
-	gl.uniform3iv( this.addr, v );
-
-}
-
-function setValueV4iArray( gl, v ) {
-
-	gl.uniform4iv( this.addr, v );
-
-}
-
-
-// Unsigned integer vectors or arrays thereof (always flat arrays)
-function setValueV1uiArray( gl, v ) {
-
-	gl.uniform1uiv( this.addr, v );
-
-}
-
-function setValueV2uiArray( gl, v ) {
-
-	gl.uniform2uiv( this.addr, v );
-
-}
-
-function setValueV3uiArray( gl, v ) {
-
-	gl.uniform3uiv( this.addr, v );
-
-}
-
-function setValueV4uiArray( gl, v ) {
-
-	gl.uniform4uiv( this.addr, v );
-
-}
-
-
-// Array of vectors (flat or from THREE classes)
+// Array of vectors (from flat array or array of THREE.VectorN)
 
 function setValueV2fArray( gl, v ) {
 
@@ -656,7 +607,7 @@ function setValueV4fArray( gl, v ) {
 
 }
 
-// Array of matrices (flat or from THREE clases)
+// Array of matrices (from flat array or array of THREE.MatrixN)
 
 function setValueM2Array( gl, v ) {
 
@@ -681,6 +632,63 @@ function setValueM4Array( gl, v ) {
 	gl.uniformMatrix4fv( this.addr, false, data );
 
 }
+
+// Array of integer / boolean
+
+function setValueV1iArray( gl, v ) {
+
+	gl.uniform1iv( this.addr, v );
+
+}
+
+// Array of integer / boolean vectors (from flat array)
+
+function setValueV2iArray( gl, v ) {
+
+	gl.uniform2iv( this.addr, v );
+
+}
+
+function setValueV3iArray( gl, v ) {
+
+	gl.uniform3iv( this.addr, v );
+
+}
+
+function setValueV4iArray( gl, v ) {
+
+	gl.uniform4iv( this.addr, v );
+
+}
+
+// Array of unsigned integer
+
+function setValueV1uiArray( gl, v ) {
+
+	gl.uniform1uiv( this.addr, v );
+
+}
+
+// Array of unsigned integer vectors (from flat array)
+
+function setValueV2uiArray( gl, v ) {
+
+	gl.uniform2uiv( this.addr, v );
+
+}
+
+function setValueV3uiArray( gl, v ) {
+
+	gl.uniform3uiv( this.addr, v );
+
+}
+
+function setValueV4uiArray( gl, v ) {
+
+	gl.uniform4uiv( this.addr, v );
+
+}
+
 
 // Array of textures (2D / Cube)
 
