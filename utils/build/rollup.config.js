@@ -275,10 +275,8 @@ function polyfills() {
 			if ( filePath.endsWith( 'src/Three.js' ) || filePath.endsWith( 'src\\Three.js' ) ) {
 
 				code = 'import \'regenerator-runtime\';\n' + code;
-				code = 'import \'./polyfills\';\n' + code;
 
 			}
-
 
 			return {
 				code: code,
