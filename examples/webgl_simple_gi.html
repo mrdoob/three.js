@@ -18,15 +18,19 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			// HACK:
+			class GIMesh extends THREE.Mesh {
 
-			THREE.Mesh.prototype.clone = function () {
+				copy( source ) {
 
-				const newMaterial = ( this.material.isMaterial ) ? this.material.clone() : this.material.slice();
+					super.copy( source );
 
-				return new this.constructor( this.geometry.clone(), newMaterial ).copy( this );
+					this.geometry = source.geometry.clone();
 
-			};
+					return this;
+
+				}
+
+			}
 
 			//
 
@@ -41,11 +45,7 @@
 				let clone = scene.clone();
 				clone.autoUpdate = false;
 
-				const rt = new THREE.WebGLRenderTarget( SIZE, SIZE, {
-					wrapS: THREE.ClampToEdgeWrapping,
-					wrapT: THREE.ClampToEdgeWrapping,
-					depthBuffer: true
-				} );
+				const rt = new THREE.WebGLRenderTarget( SIZE, SIZE );
 
 				const normalMatrix = new THREE.Matrix3();
 
@@ -62,7 +62,7 @@
 
 					if ( bounces === 3 ) return;
 
-					const object = scene.children[ 0 ];
+					const object = scene.children[ 0 ]; // torusKnot
 					const geometry = object.geometry;
 
 					const attributes = geometry.attributes;
@@ -157,10 +157,10 @@
 
 				// torus knot
 
-				const torusGeometry = new THREE.TorusKnotBufferGeometry( 0.75, 0.3, 128, 32, 1 );
+				const torusGeometry = new THREE.TorusKnotGeometry( 0.75, 0.3, 128, 32, 1 );
 				const material = new THREE.MeshBasicMaterial( { vertexColors: true } );
 
-				const torusKnot = new THREE.Mesh( torusGeometry, material );
+				const torusKnot = new GIMesh( torusGeometry, material );
 				scene.add( torusKnot );
 
 				// room
@@ -173,7 +173,7 @@
 
 				}
 
-				const boxGeometry = new THREE.BoxBufferGeometry( 3, 3, 3 );
+				const boxGeometry = new THREE.BoxGeometry( 3, 3, 3 );
 
 				const box = new THREE.Mesh( boxGeometry, materials );
 				scene.add( box );
@@ -191,7 +191,7 @@
 				controls.minDistance = 1;
 				controls.maxDistance = 10;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -1,6 +1,6 @@
 import * as THREE from '../../build/three.module.js';
 
-import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
+import { zipSync, strToU8 } from '../../examples/jsm/libs/fflate.module.min.js';
 
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
@@ -379,6 +379,22 @@ function MenubarFile( editor ) {
 	} );
 	options.add( option );
 
+	// Export USDZ
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/usdz' ) );
+	option.onClick( async function () {
+
+		var { USDZExporter } = await import( '../../examples/jsm/exporters/USDZExporter.js' );
+
+		var exporter = new USDZExporter();
+
+		saveArrayBuffer( await exporter.parse( editor.scene, { binary: true } ), 'model.usdz' );
+
+	} );
+	options.add( option );
+
 	//
 
 	options.add( new UIHorizontalRule() );
@@ -390,7 +406,7 @@ function MenubarFile( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/file/publish' ) );
 	option.onClick( function () {
 
-		var zip = new JSZip();
+		var toZip = {};
 
 		//
 
@@ -401,7 +417,7 @@ function MenubarFile( editor ) {
 		output = JSON.stringify( output, parseNumber, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		zip.file( 'app.json', output );
+		toZip[ 'app.json' ] = strToU8( output );
 
 		//
 
@@ -409,7 +425,11 @@ function MenubarFile( editor ) {
 
 		var manager = new THREE.LoadingManager( function () {
 
-			save( zip.generate( { type: 'blob' } ), ( title !== '' ? title : 'untitled' ) + '.zip' );
+			var zipped = zipSync( toZip, { level: 9 } );
+
+			var blob = new Blob( [ zipped.buffer ], { type: 'application/zip' } );
+
+			save( blob, ( title !== '' ? title : 'untitled' ) + '.zip' );
 
 		} );
 
@@ -441,22 +461,22 @@ function MenubarFile( editor ) {
 
 			content = content.replace( '\n\t\t\t/* edit button */\n', editButton );
 
-			zip.file( 'index.html', content );
+			toZip[ 'index.html' ] = strToU8( content );
 
 		} );
 		loader.load( 'js/libs/app.js', function ( content ) {
 
-			zip.file( 'js/app.js', content );
+			toZip[ 'js/app.js' ] = strToU8( content );
 
 		} );
 		loader.load( '../build/three.module.js', function ( content ) {
 
-			zip.file( 'js/three.module.js', content );
+			toZip[ 'js/three.module.js' ] = strToU8( content );
 
 		} );
 		loader.load( '../examples/jsm/webxr/VRButton.js', function ( content ) {
 
-			zip.file( 'js/VRButton.js', content );
+			toZip[ 'js/VRButton.js' ] = strToU8( content );
 
 		} );
 
@@ -468,11 +488,15 @@ function MenubarFile( editor ) {
 	var link = document.createElement( 'a' );
 	function save( blob, filename ) {
 
+		if ( link.href ) {
+
+			URL.revokeObjectURL( link.href );
+
+		}
+
 		link.href = URL.createObjectURL( blob );
 		link.download = filename || 'data.json';
 		link.dispatchEvent( new MouseEvent( 'click' ) );
-
-		// URL.revokeObjectURL( url ); breaks Firefox...
 
 	}
 

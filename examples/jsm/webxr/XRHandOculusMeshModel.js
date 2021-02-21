@@ -55,11 +55,49 @@ class XRHandOculusMeshModel {
 				'b_%_pinky3', // XRHand.LITTLE_PHALANX_DISTAL,
 				'b_%_pinkynull', // XRHand.LITTLE_PHALANX_TIP
 			];
+
+			const joints = [
+				'wrist',
+				'thumb-metacarpal',
+				'thumb-phalanx-proximal',
+				'thumb-phalanx-distal',
+				'thumb-tip',
+				'index-finger-metacarpal',
+				'index-finger-phalanx-proximal',
+				'index-finger-phalanx-intermediate',
+				'index-finger-phalanx-distal',
+				'index-finger-tip',
+				'middle-finger-metacarpal',
+				'middle-finger-phalanx-proximal',
+				'middle-finger-phalanx-intermediate',
+				'middle-finger-phalanx-distal',
+				'middle-finger-tip',
+				'ring-finger-metacarpal',
+				'ring-finger-phalanx-proximal',
+				'ring-finger-phalanx-intermediate',
+				'ring-finger-phalanx-distal',
+				'ring-finger-tip',
+				'pinky-finger-metacarpal',
+				'pinky-finger-phalanx-proximal',
+				'pinky-finger-phalanx-intermediate',
+				'pinky-finger-phalanx-distal',
+				'pinky-finger-tip',
+			];
+
+			let i = 0;
+
 			bonesMapping.forEach( boneName => {
 
 				if ( boneName ) {
 
 					const bone = object.getObjectByName( boneName.replace( /%/g, handedness === 'right' ? 'r' : 'l' ) );
+
+					if ( bone !== undefined) {
+
+						bone.jointName = joints [ i ];
+
+					}
+
 					this.bones.push( bone );
 
 				} else {
@@ -67,6 +105,8 @@ class XRHandOculusMeshModel {
 					this.bones.push( null );
 
 				}
+
+				i ++;
 
 			} );
 
@@ -81,9 +121,10 @@ class XRHandOculusMeshModel {
 		for ( let i = 0; i < this.bones.length; i ++ ) {
 
 			const bone = this.bones[ i ];
-			const XRJoint = XRJoints[ i ];
 
-			if ( XRJoint ) {
+			if ( bone ) {
+
+				const XRJoint = XRJoints[ bone.jointName ];
 
 				if ( XRJoint.visible ) {
 

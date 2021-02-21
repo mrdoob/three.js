@@ -29,7 +29,7 @@
 			import {
 				Bone,
 				Color,
-				CylinderBufferGeometry,
+				CylinderGeometry,
 				DoubleSide,
 				Float32BufferAttribute,
 				MeshPhongMaterial,
@@ -101,7 +101,7 @@
 
 			function createGeometry( sizing ) {
 
-				const geometry = new CylinderBufferGeometry(
+				const geometry = new CylinderGeometry(
 					5, // radiusTop
 					5, // radiusBottom
 					sizing.height, // height

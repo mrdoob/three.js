@@ -13,12 +13,6 @@ const _matrix = new Matrix4();
 
 function SkinnedMesh( geometry, material ) {
 
-	if ( geometry && geometry.isGeometry ) {
-
-		console.error( 'THREE.SkinnedMesh no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
-
-	}
-
 	Mesh.call( this, geometry, material );
 
 	this.type = 'SkinnedMesh';

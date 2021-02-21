@@ -1,12 +1,12 @@
 /* global QUnit */
 
-import { ShapeBufferGeometry } from '../../../../src/geometries/ShapeBufferGeometry';
+import { ShapeGeometry, ShapeBufferGeometry } from '../../../../src/geometries/ShapeGeometry';
 
 import { Shape } from '../../../../src/extras/core/Shape';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'ShapeBufferGeometry', ( hooks ) => {
+	QUnit.module( 'ShapeGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -17,6 +17,7 @@ export default QUnit.module( 'Geometries', () => {
 			triangleShape.lineTo( - 1, 1 );
 
 			geometries = [
+				new ShapeGeometry( triangleShape ),
 				new ShapeBufferGeometry( triangleShape )
 			];
 

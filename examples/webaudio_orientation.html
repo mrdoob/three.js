@@ -75,7 +75,7 @@
 
 			//
 
-			const mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 50, 50 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+			const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 50, 50 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 			mesh.rotation.x = - Math.PI / 2;
 			mesh.receiveShadow = true;
 			scene.add( mesh );
@@ -128,7 +128,7 @@
 
 			// sound is damped behind this wall
 
-			const wallGeometry = new THREE.BoxBufferGeometry( 2, 1, 0.1 );
+			const wallGeometry = new THREE.BoxGeometry( 2, 1, 0.1 );
 			const wallMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, transparent: true, opacity: 0.5 } );
 
 			const wall = new THREE.Mesh( wallGeometry, wallMaterial );
@@ -156,7 +156,7 @@
 
 			//
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 		}
 

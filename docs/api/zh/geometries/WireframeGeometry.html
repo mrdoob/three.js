@@ -11,12 +11,12 @@
 
 		<h1>网格几何体（[name]）</h1>
 
-		<p class="desc">这个类可以被用作一个辅助物体，来对一个[page:Geometry Geometry]以线框的形式进行查看。</p>
+		<p class="desc">这个类可以被用作一个辅助物体，来对一个[page:BufferGeometry geometry]以线框的形式进行查看。</p>
 
 		<h2>代码示例</h2>
 
 		<code>
-		const geometry = new THREE.SphereBufferGeometry( 100, 100, 100 );
+		const geometry = new THREE.SphereGeometry( 100, 100, 100 );
 
 		const wireframe = new THREE.WireframeGeometry( geometry );
 
@@ -35,7 +35,7 @@
 
 		<h2>构造器</h2>
 
-		<h3>[name]( [param:Geometry geometry] )</h3>
+		<h3>[name]( [param:BufferGeometry geometry] )</h3>
 		<p>
 		geometry — 任意几何体对象。
 		</p>

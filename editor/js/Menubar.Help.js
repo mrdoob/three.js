@@ -28,6 +28,7 @@ function MenubarHelp( editor ) {
 	} );
 	options.add( option );
 
+	/*
 	// Icon
 
 	var option = new UIRow();
@@ -39,6 +40,7 @@ function MenubarHelp( editor ) {
 
 	} );
 	options.add( option );
+	*/
 
 	// About
 
@@ -47,7 +49,7 @@ function MenubarHelp( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/help/about' ) );
 	option.onClick( function () {
 
-		window.open( 'http://threejs.org', '_blank' );
+		window.open( 'https://threejs.org', '_blank' );
 
 	} );
 	options.add( option );

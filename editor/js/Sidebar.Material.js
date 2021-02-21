@@ -1360,7 +1360,7 @@ function SidebarMaterial( editor ) {
 
 		} else if ( currentObject.isLine ) {
 
-			lineMaterialOptions.setOptions( lineMaterialOptions );
+			materialClass.setOptions( lineMaterialOptions );
 
 		}
 

@@ -65,7 +65,7 @@ When you’ve decided to make changes, start with the following:
 
 * Don't include any build files to your commit.
 * Not all new features will need a new example. Simpler features could be incorporated into an existing example. Bigger features may be asked to add an example demonstrating the feature.
-* Making changes may require changes to the documentation. If so, please make a new PR for the appropriate doc changes. To update the Chinese docs, simply copy the English to begin with.
+* Making changes may require changes to the documentation. To update the docs in other languages, simply copy the English to begin with.
 * it's good to also add an example and screenshot for it, for showing how it's used and for end-to-end testing.
 * If you modify existing code, run relevant examples to check they didn't break and there wasn't performance regress.
 * If you add some assets for the examples (models, textures, sounds, etc), make sure they have a proper license allowing for their use here, less restrictive the better. It is unlikely for large assets to be accepted.
@@ -77,6 +77,6 @@ When you’ve decided to make changes, start with the following:
 
 * Once done with a patch / feature do not add more commits to a feature branch
 * Create separate branches per patch or feature.
-* If you make a PR but it is not actually ready to be pulled into the dev branch, add `[Draft]` into the PR title and/or convert it to a draft PR
+* If you make a PR but it is not actually ready to be pulled into the dev branch then please [convert it to a draft PR](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/changing-the-stage-of-a-pull-request#converting-a-pull-request-to-a-draft).
 
 This project is currently contributed to mostly via everyone's spare time. Please keep that in mind as it may take some time for the appropriate feedback to get to you. If you are unsure about adding a new feature, it might be better to ask first to see whether other people think it's a good idea.

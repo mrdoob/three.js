@@ -75,7 +75,7 @@
 				camera.position.x = 2000;
 				controls.update();
 
-				const geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				const geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
 				const vertices = geometry.attributes.position.array;
@@ -97,20 +97,20 @@
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
 
-				const geometryHelper = new THREE.ConeBufferGeometry( 20, 100, 3 );
+				const geometryHelper = new THREE.ConeGeometry( 20, 100, 3 );
 				geometryHelper.translate( 0, 50, 0 );
 				geometryHelper.rotateX( Math.PI / 2 );
 				helper = new THREE.Mesh( geometryHelper, new THREE.MeshNormalMaterial() );
 				scene.add( helper );
 
-				container.addEventListener( 'mousemove', onMouseMove, false );
+				container.addEventListener( 'mousemove', onMouseMove );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

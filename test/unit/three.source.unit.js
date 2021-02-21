@@ -3,7 +3,6 @@ import './utils/qunit-utils.js';
 
 //src
 import './src/constants.tests';
-import './src/polyfills.tests';
 import './src/utils.tests';
 
 
@@ -47,10 +46,7 @@ import './src/cameras/StereoCamera.tests';
 import './src/core/BufferAttribute.tests';
 import './src/core/BufferGeometry.tests';
 import './src/core/Clock.tests';
-import './src/core/DirectGeometry.tests';
 import './src/core/EventDispatcher.tests';
-import './src/core/Face3.tests';
-import './src/core/Geometry.tests';
 import './src/core/InstancedBufferAttribute.tests';
 import './src/core/InstancedBufferGeometry.tests';
 import './src/core/InstancedInterleavedBuffer.tests';

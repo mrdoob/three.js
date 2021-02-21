@@ -257,7 +257,7 @@ THREE.CCDIKSolver = ( function () {
 		this.matrix.copy( mesh.matrixWorld );
 		this.matrixAutoUpdate = false;
 
-		this.sphereGeometry = new THREE.SphereBufferGeometry( 0.25, 16, 8 );
+		this.sphereGeometry = new THREE.SphereGeometry( 0.25, 16, 8 );
 
 		this.targetSphereMaterial = new THREE.MeshBasicMaterial( {
 			color: new THREE.Color( 0xff8888 ),

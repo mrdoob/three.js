@@ -261,7 +261,7 @@ Object.assign( THREE.Pass.prototype, {
 THREE.Pass.FullScreenQuad = ( function () {
 
 	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+	var geometry = new THREE.PlaneGeometry( 2, 2 );
 
 	var FullScreenQuad = function ( material ) {
 

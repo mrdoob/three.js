@@ -10,27 +10,23 @@ a wide variety of GPU texture compression formats.
 ## Transcoders
 
 Basis Universal texture data may be used in two different file formats:
-`.basis` and `.ktx2`. Texture data is identical in both cases, but different
-transcoders are required to read the two file types. Both transcoders are
-available in this folder now, but they may be merged in the future.
+`.basis` and `.ktx2`, where `ktx2` is a standardized wrapper around basis texture data.
 
 For further documentation about the Basis compressor and transcoder, refer to
 the [Basis GitHub repository](https://github.com/BinomialLLC/basis_universal).
 
-### .basis
-
-The folder contains two files required for transcoding `.basis` textures:
+The folder contains two files required for transcoding `.basis` or `.ktx2` textures:
 
 * `basis_transcoder.js` — JavaScript wrapper for the WebAssembly transcoder.
 * `basis_transcoder.wasm` — WebAssembly transcoder.
 
-Both are dependencies of `THREE.BasisTextureLoader`:
+Both are dependencies of `THREE.KTX2Loader` and `THREE.BasisTextureLoader`:
 
 ```js
-var basisLoader = new THREE.BasisTextureLoader();
-basisLoader.setTranscoderPath( 'examples/js/libs/basis/' );
-basisLoader.detectSupport( renderer );
-basisLoader.load( 'diffuse.basis', function ( texture ) {
+var ktx2Loader = new THREE.KTX2Loader();
+ktx2Loader.setTranscoderPath( 'examples/js/libs/basis/' );
+ktx2Loader.detectSupport( renderer );
+ktx2Loader.load( 'diffuse.ktx2', function ( texture ) {
 
 	var material = new THREE.MeshStandardMaterial( { map: texture } );
 
@@ -44,18 +40,6 @@ basisLoader.load( 'diffuse.basis', function ( texture ) {
 
 } );
 ```
-
-### .ktx2
-
-The folder contains two files required for transcoding `.ktx2` textures:
-
-* `msc_basis_transcoder.js` — JavaScript wrapper for the WebAssembly transcoder.
-* `msc_basis_transcoder.wasm` — WebAssembly transcoder.
-
-Currently, the `msc_basis_transcoder.js` file must be added to the page as a
-global script. The WASM transcoder will be downloaded from the same directory
-automatically. These will likely be replaced with ES modules, and merged with
-the `.basis` transcoder, in the future. See `KTX2Loader` for usage.
 
 ## License
 

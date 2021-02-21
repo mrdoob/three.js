@@ -21,7 +21,6 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
 			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
@@ -39,7 +38,7 @@
 					authorURL: 'https://www.microsoft.com/',
 					cameraPos: new THREE.Vector3( 0.02, 0.01, 0.03 ),
 					objectRotation: new THREE.Euler( 0, Math.PI, 0 ),
-					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-dds' ],
+					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary' ],
 					addEnvMap: true
 				},
 				'Bot Skinned': {
@@ -154,7 +153,7 @@
 				renderer.physicallyCorrectLights = true;
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// Load background and generate envMap
 
@@ -242,7 +241,7 @@
 				if ( sceneInfo.addGround ) {
 
 					const groundMaterial = new THREE.MeshPhongMaterial( { color: 0xFFFFFF } );
-					const ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 512, 512 ), groundMaterial );
+					const ground = new THREE.Mesh( new THREE.PlaneGeometry( 512, 512 ), groundMaterial );
 					ground.receiveShadow = !! sceneInfo.shadows;
 
 					if ( sceneInfo.groundPos ) {
@@ -266,8 +265,6 @@
 				const dracoLoader = new DRACOLoader();
 				dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 				loader.setDRACOLoader( dracoLoader );
-
-				loader.setDDSLoader( new DDSLoader() );
 
 				let url = sceneInfo.url.replace( /%s/g, state.extension );
 

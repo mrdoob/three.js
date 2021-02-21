@@ -53,7 +53,7 @@
 				scene.add( dirLight );
 
 				const floor = new THREE.Mesh(
-					new THREE.BoxBufferGeometry( 10, 5, 10 ),
+					new THREE.BoxGeometry( 10, 5, 10 ),
 					new THREE.ShadowMaterial( { color: 0x111111 } )
 				);
 				floor.position.y = - 2.5;
@@ -70,7 +70,7 @@
 
 				// Boxes
 
-				const geometryBox = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1 );
+				const geometryBox = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
 				boxes = new THREE.InstancedMesh( geometryBox, material, 100 );
 				boxes.castShadow = true;
 				boxes.receiveShadow = true;
@@ -88,7 +88,7 @@
 
 				// Spheres
 
-				const geometrySphere = new THREE.IcosahedronBufferGeometry( 0.075, 3 );
+				const geometrySphere = new THREE.IcosahedronGeometry( 0.075, 3 );
 				spheres = new THREE.InstancedMesh( geometrySphere, material, 100 );
 				spheres.castShadow = true;
 				spheres.receiveShadow = true;

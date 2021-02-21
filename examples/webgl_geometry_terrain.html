@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - geometry - terrain</title>
+		<title>three.js webgl - geometry - terrain + fog</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #bfd1e5;
+				background-color: #efd1b5;
 				color: #61443e;
 			}
 			a {
@@ -18,7 +18,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain demo<br />(left click: forward, right click: backward)</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain + fog demo <br />(left click: forward, right click: backward)</div>
 
 		<script type="module">
 
@@ -30,14 +30,10 @@
 			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
 
 			let container, stats;
-
 			let camera, controls, scene, renderer;
-
 			let mesh, texture;
 
-			const worldWidth = 256, worldDepth = 256,
-				worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
-
+			const worldWidth = 256, worldDepth = 256;
 			const clock = new THREE.Clock();
 
 			init();
@@ -47,16 +43,18 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xbfd1e5 );
+				scene.background = new THREE.Color( 0xefd1b5 );
+				scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
 
 				const data = generateHeight( worldWidth, worldDepth );
 
-				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
+				camera.position.set( 100, 800, - 800 );
+				camera.lookAt( - 100, 810, - 800 );
 
-				const geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				const geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
 				const vertices = geometry.attributes.position.array;
@@ -80,15 +78,16 @@
 				container.appendChild( renderer.domElement );
 
 				controls = new FirstPersonControls( camera, renderer.domElement );
-				controls.movementSpeed = 1000;
+				controls.movementSpeed = 150;
 				controls.lookSpeed = 0.1;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
+
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -105,8 +104,16 @@
 
 			function generateHeight( width, height ) {
 
-				const size = width * height, data = new Uint8Array( size ),
-					perlin = new ImprovedNoise(), z = Math.random() * 100;
+				let seed = Math.PI / 4;
+				window.Math.random = function () {
+
+					const x = Math.sin( seed ++ ) * 10000;
+					return x - Math.floor( x );
+
+				};
+
+				const size = width * height, data = new Uint8Array( size );
+				const perlin = new ImprovedNoise(), z = Math.random() * 100;
 
 				let quality = 1;
 
@@ -203,6 +210,7 @@
 				stats.update();
 
 			}
+
 
 			function render() {
 

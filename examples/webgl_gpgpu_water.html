@@ -317,7 +317,7 @@
 				container.appendChild( stats.dom );
 
 				container.style.touchAction = 'none';
-				container.addEventListener( 'pointermove', onPointerMove, false );
+				container.addEventListener( 'pointermove', onPointerMove );
 
 				document.addEventListener( 'keydown', function ( event ) {
 
@@ -329,9 +329,9 @@
 
 					}
 
-				}, false );
+				} );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 
 				const gui = new GUI();
@@ -385,7 +385,7 @@
 
 				const materialColor = 0x0040C0;
 
-				const geometry = new THREE.PlaneBufferGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
+				const geometry = new THREE.PlaneGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
 
 				// material: make a THREE.ShaderMaterial clone of THREE.MeshPhongMaterial, with customized vertex shader
 				const material = new THREE.ShaderMaterial( {
@@ -427,7 +427,7 @@
 				scene.add( waterMesh );
 
 				// THREE.Mesh just for mouse raycasting
-				const geometryRay = new THREE.PlaneBufferGeometry( BOUNDS, BOUNDS, 1, 1 );
+				const geometryRay = new THREE.PlaneGeometry( BOUNDS, BOUNDS, 1, 1 );
 				meshRay = new THREE.Mesh( geometryRay, new THREE.MeshBasicMaterial( { color: 0xFFFFFF, visible: false } ) );
 				meshRay.rotation.x = - Math.PI / 2;
 				meshRay.matrixAutoUpdate = false;
@@ -561,7 +561,7 @@
 
 			function createSpheres() {
 
-				const sphereTemplate = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 24, 12 ), new THREE.MeshPhongMaterial( { color: 0xFFFF00 } ) );
+				const sphereTemplate = new THREE.Mesh( new THREE.SphereGeometry( 4, 24, 12 ), new THREE.MeshPhongMaterial( { color: 0xFFFF00 } ) );
 
 				for ( let i = 0; i < NUM_SPHERES; i ++ ) {
 

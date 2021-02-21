@@ -4,7 +4,7 @@ import {
 	Matrix4,
 	Vector3
 } from '../../../build/three.module.js';
-import { Zlib } from '../libs/gunzip.module.min.js';
+import * as fflate from '../libs/fflate.module.min.js';
 import { Volume } from '../misc/Volume.js';
 
 var NRRDLoader = function ( manager ) {
@@ -318,12 +318,11 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		parseHeader( _header );
 
 		var _data = _bytes.subarray( _data_start ); // the data without header
-		if ( headerObject.encoding === 'gzip' || headerObject.encoding === 'gz' ) {
+		if ( headerObject.encoding.substring( 0, 2 ) === 'gz' ) {
 
 			// we need to decompress the datastream
 			// here we start the unzipping and get a typed Uint8Array back
-			var inflate = new Zlib.Gunzip( new Uint8Array( _data ) ); // eslint-disable-line no-undef
-			_data = inflate.decompress();
+			_data = fflate.gunzipSync( new Uint8Array( _data ) );// eslint-disable-line no-undef
 
 		} else if ( headerObject.encoding === 'ascii' || headerObject.encoding === 'text' || headerObject.encoding === 'txt' || headerObject.encoding === 'hex' ) {
 

@@ -53,6 +53,17 @@
 		and [page:Float t] = 1 will return [page:Float y].
 		</p>
 
+		<h3>[method:Float damp]( [param:Float x], [param:Float y], [param:Float lambda], [param:Float dt] )</h3>
+		<p>
+		[page:Float x] - Current point. <br />
+		[page:Float y] - Target point. <br />
+		[page:Float lambda] - A higher lambda value will make the movement more sudden, and a lower value will make the movement more gradual. <br />
+		[page:Float dt] - Delta time in seconds.<br><br />
+
+		Smoothly interpolate a number from [page:Float x] toward [page:Float y] in a spring-like manner using the [page:Float dt] to maintain frame rate independent movement.
+		For details, see [link:http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/ Frame rate independent damping using lerp].
+		</p>
+
 		<h3>[method:Float mapLinear]( [param:Float x], [param:Float a1], [param:Float a2], [param:Float b1], [param:Float b2] )</h3>
 		<p>
 		[page:Float x] — Value to be mapped.<br />
@@ -63,6 +74,13 @@
 
 		Linear mapping of [page:Float x] from range [[page:Float a1], [page:Float a2]] to range [[page:Float b1], [page:Float b2]].
 		</p>
+
+		<h3>[method:Float pingpong]( [param:Float x], [param:Float length] )</h3>
+		<p>
+		[page:Float x] — The value to pingpong.<br />
+		[page:Float length] — The positive value the function will pingpong to. Default is 1.<br /><br />
+
+		Returns a value that alternates between 0 and [param:Float length].</p>
 
 		<h3>[method:Integer ceilPowerOfTwo]( [param:Number n] )</h3>
 		<p>Returns the smallest power of 2 that is greater than or equal to [page:Number n].</p>

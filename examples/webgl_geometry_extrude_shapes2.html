@@ -357,7 +357,7 @@
 					for ( let j = 0; j < simpleShapes.length; j ++ ) {
 
 						const simpleShape = simpleShapes[ j ];
-						const shape3d = new THREE.ExtrudeBufferGeometry( simpleShape, {
+						const shape3d = new THREE.ExtrudeGeometry( simpleShape, {
 							depth: depth,
 							bevelEnabled: false
 						} );
@@ -442,7 +442,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

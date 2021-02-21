@@ -4,7 +4,7 @@ import {
 	LinearFilter,
 	Mesh,
 	MeshBasicMaterial,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	Texture
 } from '../../../build/three.module.js';
 
@@ -209,7 +209,7 @@ VolumeSlice.prototype = {
 
 		if ( this.geometry ) this.geometry.dispose(); // dispose existing geometry
 
-		this.geometry = new PlaneBufferGeometry( extracted.planeWidth, extracted.planeHeight );
+		this.geometry = new PlaneGeometry( extracted.planeWidth, extracted.planeHeight );
 
 		if ( this.mesh ) {
 

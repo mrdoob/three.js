@@ -50,7 +50,7 @@
 
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// scene
 
@@ -137,7 +137,7 @@
 
 						scene.background = radianceMap;
 
-						const geometry = new THREE.SphereBufferGeometry( 0.4, 32, 32 );
+						const geometry = new THREE.SphereGeometry( 0.4, 32, 32 );
 
 						for ( let x = 0; x <= 10; x ++ ) {
 
@@ -169,7 +169,7 @@
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				const width = window.innerWidth;
 				const height = window.innerHeight;
