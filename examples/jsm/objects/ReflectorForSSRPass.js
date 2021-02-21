@@ -33,10 +33,41 @@ var Reflector = function ( geometry, options ) {
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || Reflector.ReflectorShader;
 	var useDepthTexture = options.useDepthTexture
+	var yAxis = new Vector3(0, 1, 0);
+	var vecTemp0 = new Vector3();
+	var vecTemp1 = new Vector3();
 
 	//
 
 	scope.needsUpdate = false;
+	scope.maxDistance = Reflector.ReflectorShader.uniforms.maxDistance.value
+	scope.opacity = Reflector.ReflectorShader.uniforms.opacity.value
+
+  scope._isDistanceAttenuation = Reflector.ReflectorShader.defines.isDistanceAttenuation
+  Object.defineProperty(scope, 'isDistanceAttenuation', {
+    get() {
+      return scope._isDistanceAttenuation
+    },
+    set(val) {
+      if (scope._isDistanceAttenuation === val) return
+      scope._isDistanceAttenuation = val
+      scope.material.defines.isDistanceAttenuation = val
+      scope.material.needsUpdate = true
+    }
+	})
+
+  scope._isFresnel = Reflector.ReflectorShader.defines.isFresnel
+  Object.defineProperty(scope, 'isFresnel', {
+    get() {
+      return scope._isFresnel
+    },
+    set(val) {
+      if (scope._isFresnel === val) return
+      scope._isFresnel = val
+      scope.material.defines.isFresnel = val
+      scope.material.needsUpdate = true
+    }
+	})
 
 	var reflectorPlane = new Plane();
 	var normal = new Vector3();
@@ -77,7 +108,9 @@ var Reflector = function ( geometry, options ) {
 
 	var material = new ShaderMaterial( {
 		transparent: useDepthTexture,
-		defines: { useDepthTexture: useDepthTexture },
+    defines: Object.assign({
+      useDepthTexture: useDepthTexture
+    }, Reflector.ReflectorShader.defines),
 		uniforms: UniformsUtils.clone( shader.uniforms ),
 		fragmentShader: shader.fragmentShader,
 		vertexShader: shader.vertexShader
@@ -96,6 +129,18 @@ var Reflector = function ( geometry, options ) {
 		if ( !scope.needsUpdate ) return;
 		scope.needsUpdate = false;
 		// console.log('onBeforeRender')
+
+		material.uniforms['maxDistance'].value = scope.maxDistance * (camera.position.length() / camera.position.y);
+		///todo: Temporary hack,
+		// need precise calculation like this https://github.com/mrdoob/three.js/pull/20156/commits/8181946068e386d14a283cbd4f8877bc7ae066d3 ,
+		// after fully understand http://www.terathon.com/lengyel/Lengyel-Oblique.pdf .
+
+		material.uniforms['opacity'].value = scope.opacity;
+
+		vecTemp0.copy(camera.position).normalize();
+		vecTemp1.copy(vecTemp0).reflect(yAxis);
+		material.uniforms['fresnel'].value = (vecTemp0.dot( vecTemp1 ) + 1.) / 2.; ///todo: Also need to use glsl viewPosition and viewNormal per pixel.
+		// console.log(material.uniforms['fresnel'].value)
 
 		reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
@@ -220,25 +265,22 @@ var Reflector = function ( geometry, options ) {
 Reflector.prototype = Object.create( Mesh.prototype );
 Reflector.prototype.constructor = Reflector;
 
-Reflector.ReflectorShader = {
+Reflector.ReflectorShader = { ///todo: Will conflict with Reflector.js?
+
+  defines: {
+    isDistanceAttenuation: true,
+    isFresnel: true,
+  },
 
 	uniforms: {
 
-		'color': {
-			value: null
-		},
-
-		'tDiffuse': {
-			value: null
-		},
-
-		'tDepth': {
-			value: null
-		},
-
-		'textureMatrix': {
-			value: null
-		}
+		color: { value: null },
+		tDiffuse: { value: null },
+		tDepth: { value: null },
+		textureMatrix: { value: null },
+    maxDistance: { value: 180 },
+    opacity: { value: .5 },
+    fresnel: { value: null },
 
 	},
 
@@ -255,36 +297,40 @@ Reflector.ReflectorShader = {
 		'}'
 	].join( '\n' ),
 
-	fragmentShader: [
-		'uniform vec3 color;',
-		'uniform sampler2D tDiffuse;',
-		'uniform sampler2D tDepth;',
-		'varying vec4 vUv;',
-
-		'float blendOverlay( float base, float blend ) {',
-
-		'	return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );',
-
-		'}',
-
-		'vec3 blendOverlay( vec3 base, vec3 blend ) {',
-
-		'	return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );',
-
-		'}',
-
-		'void main() {',
-
-		'	vec4 base = texture2DProj( tDiffuse, vUv );',
-		'	#ifdef useDepthTexture',
-		'		vec4 depth = texture2DProj( tDepth, vUv );',
-		'		gl_FragColor = vec4( blendOverlay( base.rgb, color ), pow(1.-depth.r,10./*temp*/) );',
-		'	#else',
-		'		gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );',
-		'	#endif',
-
-		'}'
-	].join( '\n' )
+	fragmentShader: `
+		uniform vec3 color;
+		uniform sampler2D tDiffuse;
+		uniform sampler2D tDepth;
+		uniform float maxDistance;
+		uniform float opacity;
+		uniform float fresnel;
+		varying vec4 vUv;
+		float blendOverlay( float base, float blend ) {
+			return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
+		}
+		vec3 blendOverlay( vec3 base, vec3 blend ) {
+			return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );
+		}
+		void main() {
+			vec4 base = texture2DProj( tDiffuse, vUv );
+			#ifdef useDepthTexture
+				float op=opacity;
+				float depth = texture2DProj( tDepth, vUv ).r;
+				if(depth>maxDistance) discard;
+				#ifdef isDistanceAttenuation
+					float ratio=1.-(depth/maxDistance);
+					float attenuation=ratio*ratio;
+					op=opacity*attenuation;
+				#endif
+				#ifdef isFresnel
+					op*=fresnel;
+				#endif
+				gl_FragColor = vec4( blendOverlay( base.rgb, color ), op );
+			#else
+				gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+			#endif
+		}
+	`,
 };
 
 export { Reflector };
