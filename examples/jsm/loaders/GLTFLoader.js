@@ -1901,6 +1901,9 @@ var GLTFLoader = ( function () {
 		if ( typeof createImageBitmap !== 'undefined' && /Firefox/.test( navigator.userAgent ) === false ) {
 
 			this.textureLoader = new ImageBitmapLoader( this.options.manager );
+			// in glTF any colorspace information (such as ICC profiles, intents, etc)
+			// from PNG or JPEG containers must be ignored.
+			this.textureLoader.setOptions( { colorSpaceConversion: 'none' } );
 
 		} else {
 
