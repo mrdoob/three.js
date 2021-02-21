@@ -38,6 +38,7 @@ import {
 	NearestFilter,
 	NearestMipmapLinearFilter,
 	NearestMipmapNearestFilter,
+	NoColorSpaceConversion,
 	NumberKeyframeTrack,
 	Object3D,
 	OrthographicCamera,
@@ -2526,6 +2527,7 @@ var GLTFLoader = ( function () {
 			}
 
 			texture.flipY = false;
+			texture.colorSpaceConversion = NoColorSpaceConversion;
 
 			if ( textureDef.name ) texture.name = textureDef.name;
 

@@ -2461,6 +2461,7 @@ THREE.GLTFLoader = ( function () {
 			}
 
 			texture.flipY = false;
+			texture.colorSpaceConversion = THREE.NoColorSpaceConversion;
 
 			if ( textureDef.name ) texture.name = textureDef.name;
 
