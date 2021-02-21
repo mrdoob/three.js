@@ -567,6 +567,19 @@
 		除此之外的其他值仅在材质的贴图、envMap和emissiveMap中有效。
 	</p>
 
+	<h2>Color space conversion</h2>
+	<code>
+	THREE.DefaultColorSpaceConversion
+	THREE.NoColorSpaceConversion
+	</code>
+
+	<p>
+	For use with a Texture's [page:Texture.colorSpaceConversion colorSpaceConversion] property.<br /><br />
+
+	[page:constant DefaultColorSpaceConversion] is the default and the browser's default colorspace conversion is applied at texture image uploading.
+	If [page:constant NoColorSpaceConversion] is set, no colorspace conversion is applied.
+	</p>
+
 	<h2>源代码</h2>
 	<p>
 		[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
