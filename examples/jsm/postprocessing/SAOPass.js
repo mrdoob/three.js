@@ -82,7 +82,7 @@ var SAOPass = function ( scene, camera, depthTexture, useNormals, resolution ) {
 		var depthTexture = new DepthTexture();
 		depthTexture.type = UnsignedShortType;
 		depthTexture.minFilter = NearestFilter;
-		depthTexture.maxFilter = NearestFilter;
+		depthTexture.magFilter = NearestFilter;
 
 		this.beautyRenderTarget.depthTexture = depthTexture;
 		this.beautyRenderTarget.depthBuffer = true;
