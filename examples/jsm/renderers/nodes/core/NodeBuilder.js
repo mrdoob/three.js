@@ -1,6 +1,7 @@
 import NodeUniform from './NodeUniform.js';
 import NodeAttribute from './NodeAttribute.js';
 import NodeVary from './NodeVary.js';
+import NodeCode from './NodeCode.js';
 import { NodeUpdateType } from './constants.js';
 
 class NodeBuilder {
@@ -19,6 +20,7 @@ class NodeBuilder {
 		this.slots = { vertex: [], fragment: [] };
 		this.defines = { vertex: {}, fragment: {} };
 		this.uniforms = { vertex: [], fragment: [] };
+		this.nodeCodes = { vertex: [], fragment: [] };
 		this.attributes = [];
 		this.varys = [];
 
@@ -72,7 +74,7 @@ class NodeBuilder {
 		if ( type === 'vec4' ) return `vec4( ${value.x}, ${value.y}, ${value.z}, ${value.w} )`;
 		if ( type === 'color' ) return `vec3( ${value.r}, ${value.g}, ${value.b} )`;
 
-		throw new Error( `Type '${type}' not found in generate constant attempt.` );
+		throw new Error( `NodeBuilder: Type '${type}' not found in generate constant attempt.` );
 
 	}
 
@@ -221,6 +223,29 @@ class NodeBuilder {
 
 	}
 
+	getCodeFromNode( node, type, shaderStage = this.shaderStage ) {
+
+		const nodeData = this.getDataFromNode( node );
+
+		let nodeCode = nodeData.code;
+
+		if ( nodeCode === undefined ) {
+
+			const nodeCodes = this.nodeCodes[ shaderStage ];
+			const index = nodeCodes.length;
+
+			nodeCode = new NodeCode( 'nodeC' + index, type );
+
+			nodeCodes.push( nodeCode );
+
+			nodeData.code = nodeCode;
+
+		}
+
+		return nodeCode;
+	
+	}
+
 	/*
 	analyzeNode( node ) {
 
@@ -282,6 +307,22 @@ class NodeBuilder {
 		console.warn( 'Abstract function.' );
 
 	}
+	
+	getUniformsHeaderCodes( shaderStage ) {
+
+		const nodeCodes = this.nodeCodes[ shaderStage ];
+
+		let code = '';
+
+		for ( const nodeCode of nodeCodes ) {
+
+			code += nodeCode.code + '\n';
+
+		}
+		
+		return code;
+
+	}
 
 	getHash() {
 
@@ -320,7 +361,9 @@ class NodeBuilder {
 
 			this.define( shaderStage, 'NODE_BODY_VARYS', this.getVarysBodySnippet( shaderStage ) );
 
-			shaderData[ shaderStage ] = this._buildDefines( shaderStage );
+			const shaderCode = this.getUniformsHeaderCodes( shaderStage );
+
+			shaderData[ shaderStage ] = this._buildDefines( shaderStage ) + '\n' + shaderCode;
 
 		}
 

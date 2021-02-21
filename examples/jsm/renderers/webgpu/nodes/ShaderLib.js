@@ -7,10 +7,16 @@ NODE_HEADER_UNIFORMS
 NODE_HEADER_VARYS
 
 void main(){
+	
 	NODE_BODY_VARYS
+	
 	gl_Position = NODE_MVP;
+	
 }`,
 		fragmentShader: `#version 450
+
+// Variadic Macros
+#define texture2D( a, b ) texture( sampler2D( a, a##_sampler ), b )
 
 NODE_HEADER_ATTRIBUTES
 NODE_HEADER_UNIFORMS
