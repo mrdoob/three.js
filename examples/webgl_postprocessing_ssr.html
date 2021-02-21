@@ -205,26 +205,28 @@
 			gui.add(params, 'autoRotate').onChange(() => {
 				controls.enabled = !params.autoRotate
 			})
-			gui.add(ssrPass, 'isFresnel').onChange(()=>{
+
+			let folder = gui.addFolder( 'more settings' )
+			folder.add(ssrPass, 'isFresnel').onChange(()=>{
 				groundReflector.isFresnel=ssrPass.isFresnel
 			});
-			gui.add(ssrPass, 'isDistanceAttenuation').onChange(()=>{
+			folder.add(ssrPass, 'isDistanceAttenuation').onChange(()=>{
 				groundReflector.isDistanceAttenuation=ssrPass.isDistanceAttenuation
 			});
 			ssrPass.maxDistance = .1
 			groundReflector.maxDistance = ssrPass.maxDistance
-			gui.add(ssrPass, 'maxDistance').min(0).max(.5).step(.001).onChange(()=>{
+			folder.add(ssrPass, 'maxDistance').min(0).max(.5).step(.001).onChange(()=>{
 				groundReflector.maxDistance=ssrPass.maxDistance
 			});
-			gui.add(params, 'isOtherMeshes').onChange(() => {
+			folder.add(params, 'isOtherMeshes').onChange(() => {
 				if (params.isOtherMeshes) {
 					otherMeshes.forEach(mesh => mesh.visible = true)
 				} else {
 					otherMeshes.forEach(mesh => mesh.visible = false)
 				}
 			})
-			gui.add(ssrPass, 'isBouncing')
-			gui.add(ssrPass, 'output', {
+			folder.add(ssrPass, 'isBouncing')
+			folder.add(ssrPass, 'output', {
 				'Default': SSRPass.OUTPUT.Default,
 				'SSR Only': SSRPass.OUTPUT.SSR,
 				'Beauty': SSRPass.OUTPUT.Beauty,
@@ -238,20 +240,20 @@
 			});
 			ssrPass.opacity = 1
 			groundReflector.opacity=ssrPass.opacity
-			gui.add(ssrPass, 'opacity').min(0).max(1).onChange(()=>{
+			folder.add(ssrPass, 'opacity').min(0).max(1).onChange(()=>{
 				groundReflector.opacity=ssrPass.opacity
 			});
 			if (isPerspectiveCamera) {
 				ssrPass.surfDist = 0.0015
-				gui.add(ssrPass, 'surfDist').min(0).max(.005).step(.0001);
+				folder.add(ssrPass, 'surfDist').min(0).max(.005).step(.0001);
 			} else {
 				ssrPass.surfDist = 2
-				gui.add(ssrPass, 'surfDist').min(0).max(7).step(.01);
+				folder.add(ssrPass, 'surfDist').min(0).max(7).step(.01);
 			}
-			gui.add(ssrPass, 'isInfiniteThick');
-			gui.add(ssrPass, 'thickTolerance').min(0).max(.05).step(.0001);
-			gui.add(ssrPass, 'isBlur');
-			gui.close()
+			folder.add(ssrPass, 'isInfiniteThick');
+			folder.add(ssrPass, 'thickTolerance').min(0).max(.05).step(.0001);
+			folder.add(ssrPass, 'isBlur');
+			// gui.close()
 
 		}
 
