@@ -8,7 +8,8 @@ import {
 	RGBAFormat,
 	LinearMipmapLinearFilter,
 	LinearFilter,
-	UVMapping
+	UVMapping,
+	DefaultColorSpaceConversion
 } from '../constants.js';
 import { MathUtils } from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
@@ -21,6 +22,7 @@ class Texture extends EventDispatcher {
 
 	static DEFAULT_IMAGE = undefined;
 	static DEFAULT_MAPPING = UVMapping;
+	static DEFAULT_COLOR_SPACE_CONVERSION = DefaultColorSpaceConversion;
 
 	constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1, encoding = LinearEncoding ) {
 
@@ -61,6 +63,7 @@ class Texture extends EventDispatcher {
 		this.premultiplyAlpha = false;
 		this.flipY = true;
 		this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
+		this.colorSpaceConversion = Texture.DEFAULT_COLOR_SPACE_CONVERSION;
 
 		// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
 		//
@@ -117,6 +120,7 @@ class Texture extends EventDispatcher {
 		this.generateMipmaps = source.generateMipmaps;
 		this.premultiplyAlpha = source.premultiplyAlpha;
 		this.flipY = source.flipY;
+		this.colorSpaceConversion = source.colorSpaceConversion;
 		this.unpackAlignment = source.unpackAlignment;
 		this.encoding = source.encoding;
 
@@ -165,7 +169,8 @@ class Texture extends EventDispatcher {
 			flipY: this.flipY,
 
 			premultiplyAlpha: this.premultiplyAlpha,
-			unpackAlignment: this.unpackAlignment
+			unpackAlignment: this.unpackAlignment,
+			colorSpaceConversion: this.colorSpaceConversion
 
 		};
 

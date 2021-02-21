@@ -167,6 +167,8 @@ export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;
 export const TangentSpaceNormalMap = 0;
 export const ObjectSpaceNormalMap = 1;
+export const NoColorSpaceConversion = 0;
+export const DefaultColorSpaceConversion = 37444;
 
 export const ZeroStencilOp = 0;
 export const KeepStencilOp = 7680;

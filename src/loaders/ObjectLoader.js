@@ -773,6 +773,7 @@ class ObjectLoader extends Loader {
 
 				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
+				if ( data.colorSpaceConversion !== undefined ) texture.colorSpaceConversion = data.colorSpaceConversion;
 
 				textures[ data.uuid ] = texture;
 
