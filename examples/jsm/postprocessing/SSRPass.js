@@ -23,7 +23,7 @@ import { SSRBlurShader } from "../shaders/SSRShader.js";
 import { SSRDepthShader } from "../shaders/SSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
-var SSRPass = function({ scene, camera, width, height, selects, encoding, isPerspectiveCamera = true, isBouncing = false, morphTargets = false }) {
+var SSRPass = function({ renderer, scene, camera, width, height, selects, encoding, isPerspectiveCamera = true, isBouncing = false, morphTargets = false, groundReflector }) {
 
   Pass.call(this);
 
@@ -32,8 +32,10 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
 
   this.clear = true;
 
+	this.renderer = renderer;
+	this.scene = scene;
   this.camera = camera;
-  this.scene = scene;
+	this.groundReflector = groundReflector;
 
   this.opacity = SSRShader.uniforms.opacity.value;;
   this.output = 0;
@@ -349,7 +351,12 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     if (this.encoding) this.beautyRenderTarget.texture.encoding = this.encoding
     renderer.setRenderTarget(this.beautyRenderTarget);
 		renderer.clear();
+		if (this.groundReflector) {
+			this.groundReflector.doRender(this.renderer, this.scene, this.camera);
+			this.groundReflector.visible = true
+		}
     renderer.render(this.scene, this.camera);
+		if(this.groundReflector) this.groundReflector.visible=false
 
     // render normals
 

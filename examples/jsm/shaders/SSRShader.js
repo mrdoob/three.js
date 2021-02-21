@@ -276,7 +276,9 @@ var SSRDepthShader = {
     void main() {
 
     	float depth = getLinearDepth( vUv );
-    	gl_FragColor = vec4( vec3( 1.0 - depth ), 1.0 );
+			float d = 1.0 - depth;
+			// d=(d-.999)*1000.;
+    	gl_FragColor = vec4( vec3( d ), 1.0 );
 
     }
 

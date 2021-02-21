@@ -141,9 +141,10 @@
 					color: 0x888888,
 					useDepthTexture: true,
 				});
+				groundReflector.material.depthWrite = false;
 				groundReflector.position.y = plane.position.y + .0001;
 				groundReflector.rotation.x = -Math.PI / 2
-				groundReflector.visible = params.isGroundReflector
+				groundReflector.visible = false
 				scene.add(groundReflector);
 			}
 
@@ -174,12 +175,14 @@
 
 			composer = new EffectComposer(renderer);
 			ssrPass = new SSRPass({
+				renderer,
 				scene,
 				camera,
 				width: innerWidth,
 				height: innerHeight,
 				encoding: THREE.sRGBEncoding,
 				isPerspectiveCamera: isPerspectiveCamera,
+				groundReflector: params.isGroundReflector ? groundReflector : null,
 				selects: params.isGroundReflector ? selects : null,
 				// morphTargets: true,
 			});
@@ -192,10 +195,10 @@
 			gui.add(params, 'enableSSR').name('Enable SSR');
 			gui.add(params, 'isGroundReflector').onChange(() => {
 				if (params.isGroundReflector) {
-					groundReflector.visible = true
+					ssrPass.groundReflector = groundReflector,
 					ssrPass.selects = selects
 				} else {
-					groundReflector.visible = false
+					ssrPass.groundReflector = null,
 					ssrPass.selects = null
 				}
 			})
@@ -288,12 +291,10 @@
 			}
 
 			if (params.enableSSR) {
-				groundReflector.needsUpdate = true;  // Just SSRPass's beautyRenderTarget (which rendered fisrt internally) need Reflector.
 				///todo: groundReflector has full ground info, need use it to solve reflection gaps problem on objects when camera near ground.
 				///todo: the normal info where groundReflector reflected need to be changed.
 				composer.render();
 			} else {
-				groundReflector.needsUpdate = true;
 				renderer.render(scene, camera)
 			}
 

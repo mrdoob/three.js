@@ -125,10 +125,7 @@ var Reflector = function ( geometry, options ) {
 
 	this.material = material;
 
-	this.onBeforeRender = function ( renderer, scene, camera ) {
-		if ( !scope.needsUpdate ) return;
-		scope.needsUpdate = false;
-		// console.log('onBeforeRender')
+	this.doRender = function ( renderer, scene, camera ) {
 
 		material.uniforms['maxDistance'].value = scope.maxDistance * (camera.position.length() / camera.position.y);
 		///todo: Temporary hack,
@@ -218,7 +215,7 @@ var Reflector = function ( geometry, options ) {
 
 		renderTarget.texture.encoding = renderer.outputEncoding;
 
-		scope.visible = false;
+		// scope.visible = false;
 
 		var currentRenderTarget = renderer.getRenderTarget();
 
@@ -250,7 +247,7 @@ var Reflector = function ( geometry, options ) {
 
 		}
 
-		scope.visible = true;
+		// scope.visible = true;
 
 	};
 
