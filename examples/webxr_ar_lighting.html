@@ -62,7 +62,11 @@
 					scene.remove(defaultLight);
 
 					// The estimated lighting also provides an environment cubemap, which we can apply here.
-					scene.environment = xrLight.environment;
+					if ( xrLight.environment ) {
+
+						scene.environment = xrLight.environment;
+
+					}
 
 				});
 

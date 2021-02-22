@@ -7,7 +7,7 @@ import {
 
 class SessionLightProbe {
 
-	constructor( xrLight, renderer, lightProbe, estimationStartCallback ) {
+	constructor( xrLight, renderer, lightProbe, environmentEstimation, estimationStartCallback ) {
 
 		this.xrLight = xrLight;
 		this.renderer = renderer;
@@ -20,7 +20,11 @@ class SessionLightProbe {
 
 		// If the XRWebGLBinding class is available then we can also query an
 		// estimated reflection cube map.
-		if ( 'XRWebGLBinding' in window ) {
+		if ( environmentEstimation && 'XRWebGLBinding' in window ) {
+
+			// This is the simplest way I know of to initialize a WebGL cubemap in Three.
+			const cubeRenderTarget = new WebGLCubeRenderTarget( 16 );
+			xrLight.environment = cubeRenderTarget.texture;
 
 			const gl = renderer.getContext();
 
@@ -39,19 +43,11 @@ class SessionLightProbe {
 
 			this.xrWebGLBinding = new XRWebGLBinding( session, gl );
 
-			// TODO: This should actually use the 'reflectionchange' event instead
-			// but there is a known issue in Chrome with that at the moment.
-			/*this.lightProbe.addEventListener('reflectionchange', () => {
-				this.updateReflection();
-			});*/
-
-			// Until the above is fixed, update the reflection once a second. (Which is
-			// approximately how frequently the event would fire anyway).
-			setInterval( () => {
+			this.lightProbe.addEventListener('reflectionchange', () => {
 
 				this.updateReflection();
 
-			}, 1000 );
+			});
 
 		}
 
@@ -137,7 +133,7 @@ class SessionLightProbe {
 
 export class XREstimatedLight extends Group {
 
-	constructor( renderer ) {
+	constructor( renderer, environmentEstimation = true ) {
 
 		super();
 
@@ -149,9 +145,9 @@ export class XREstimatedLight extends Group {
 		this.directionalLight.intensity = 0;
 		this.add( this.directionalLight );
 
-		// This is the simplest way I know of to initialize a WebGL cubemap in Three.
-		const cubeRenderTarget = new WebGLCubeRenderTarget( 16 );
-		this.environment = cubeRenderTarget.texture;
+		// Will be set to a cube map in the SessionLightProbe is environment estimation is
+		// available and requested.
+		this.environment = null;
 
 		let sessionLightProbe = null;
 		let estimationStarted = false;
@@ -167,7 +163,7 @@ export class XREstimatedLight extends Group {
 
 				} ).then( ( probe ) => {
 
-					sessionLightProbe = new SessionLightProbe( this, renderer, probe, () => {
+					sessionLightProbe = new SessionLightProbe( this, renderer, probe, environmentEstimation, () => {
 
 						estimationStarted = true;
 
