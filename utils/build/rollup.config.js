@@ -6,7 +6,7 @@ import babelrc from '../../.babelrc.json';
 function glconstants() {
 
 	var constants = {
-		POINTS: 0, ZERO: 0,
+		POINTS: 0, ZERO: 0, NONE: 0,
 		LINES: 1, ONE: 1,
 		LINE_LOOP: 2,
 		LINE_STRIP: 3,
@@ -145,6 +145,7 @@ function glconstants() {
 		MAX_FRAGMENT_UNIFORM_VECTORS: 36349,
 		UNPACK_FLIP_Y_WEBGL: 37440,
 		UNPACK_PREMULTIPLY_ALPHA_WEBGL: 37441,
+		UNPACK_COLORSPACE_CONVERSION_WEBGL: 37443,
 		UNPACK_ROW_LENGTH: 3314,
 		UNPACK_IMAGE_HEIGHT: 32878,
 		UNPACK_SKIP_PIXELS: 3316,
