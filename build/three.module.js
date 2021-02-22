@@ -11879,12 +11879,7 @@ class CubeCamera extends Object3D {
 
 		const renderTarget = this.renderTarget;
 
-		const cameraPX = this.children[ 0 ];
-		const cameraNX = this.children[ 1 ];
-		const cameraPY = this.children[ 2 ];
-		const cameraNY = this.children[ 3 ];
-		const cameraPZ = this.children[ 4 ];
-		const cameraNZ = this.children[ 5 ];
+		const [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ] = this.children;
 
 		const currentXrEnabled = renderer.xr.enabled;
 		const currentRenderTarget = renderer.getRenderTarget();
@@ -20564,6 +20559,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.pixelStorei( 37440, texture.flipY );
 		_gl.pixelStorei( 37441, texture.premultiplyAlpha );
 		_gl.pixelStorei( 3317, texture.unpackAlignment );
+		_gl.pixelStorei( 37443, 0 );
 
 		const needsPowerOfTwo = textureNeedsPowerOfTwo( texture ) && isPowerOfTwo( texture.image ) === false;
 		const image = resizeImage( texture.image, needsPowerOfTwo, false, maxTextureSize );
@@ -20773,6 +20769,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.pixelStorei( 37440, texture.flipY );
 		_gl.pixelStorei( 37441, texture.premultiplyAlpha );
 		_gl.pixelStorei( 3317, texture.unpackAlignment );
+		_gl.pixelStorei( 37443, 0 );
 
 		const isCompressed = ( texture && ( texture.isCompressedTexture || texture.image[ 0 ].isCompressedTexture ) );
 		const isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
@@ -31231,135 +31228,134 @@ RawShaderMaterial.prototype.isRawShaderMaterial = true;
  * }
  */
 
-class MeshStandardMaterial extends Material {
+function MeshStandardMaterial( parameters ) {
 
-	constructor( parameters ) {
+	Material.call( this );
 
-		super();
+	this.defines = { 'STANDARD': '' };
 
-		this.defines = { 'STANDARD': '' };
+	this.type = 'MeshStandardMaterial';
 
-		this.type = 'MeshStandardMaterial';
+	this.color = new Color( 0xffffff ); // diffuse
+	this.roughness = 1.0;
+	this.metalness = 0.0;
 
-		this.color = new Color( 0xffffff ); // diffuse
-		this.roughness = 1.0;
-		this.metalness = 0.0;
+	this.map = null;
 
-		this.map = null;
+	this.lightMap = null;
+	this.lightMapIntensity = 1.0;
 
-		this.lightMap = null;
-		this.lightMapIntensity = 1.0;
+	this.aoMap = null;
+	this.aoMapIntensity = 1.0;
 
-		this.aoMap = null;
-		this.aoMapIntensity = 1.0;
+	this.emissive = new Color( 0x000000 );
+	this.emissiveIntensity = 1.0;
+	this.emissiveMap = null;
 
-		this.emissive = new Color( 0x000000 );
-		this.emissiveIntensity = 1.0;
-		this.emissiveMap = null;
+	this.bumpMap = null;
+	this.bumpScale = 1;
 
-		this.bumpMap = null;
-		this.bumpScale = 1;
+	this.normalMap = null;
+	this.normalMapType = TangentSpaceNormalMap;
+	this.normalScale = new Vector2( 1, 1 );
 
-		this.normalMap = null;
-		this.normalMapType = TangentSpaceNormalMap;
-		this.normalScale = new Vector2( 1, 1 );
+	this.displacementMap = null;
+	this.displacementScale = 1;
+	this.displacementBias = 0;
 
-		this.displacementMap = null;
-		this.displacementScale = 1;
-		this.displacementBias = 0;
+	this.roughnessMap = null;
 
-		this.roughnessMap = null;
+	this.metalnessMap = null;
 
-		this.metalnessMap = null;
+	this.alphaMap = null;
 
-		this.alphaMap = null;
+	this.envMap = null;
+	this.envMapIntensity = 1.0;
 
-		this.envMap = null;
-		this.envMapIntensity = 1.0;
+	this.refractionRatio = 0.98;
 
-		this.refractionRatio = 0.98;
+	this.wireframe = false;
+	this.wireframeLinewidth = 1;
+	this.wireframeLinecap = 'round';
+	this.wireframeLinejoin = 'round';
 
-		this.wireframe = false;
-		this.wireframeLinewidth = 1;
-		this.wireframeLinecap = 'round';
-		this.wireframeLinejoin = 'round';
+	this.skinning = false;
+	this.morphTargets = false;
+	this.morphNormals = false;
 
-		this.skinning = false;
-		this.morphTargets = false;
-		this.morphNormals = false;
+	this.flatShading = false;
 
-		this.flatShading = false;
+	this.vertexTangents = false;
 
-		this.vertexTangents = false;
-
-		this.setValues( parameters );
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.defines = { 'STANDARD': '' };
-
-		this.color.copy( source.color );
-		this.roughness = source.roughness;
-		this.metalness = source.metalness;
-
-		this.map = source.map;
-
-		this.lightMap = source.lightMap;
-		this.lightMapIntensity = source.lightMapIntensity;
-
-		this.aoMap = source.aoMap;
-		this.aoMapIntensity = source.aoMapIntensity;
-
-		this.emissive.copy( source.emissive );
-		this.emissiveMap = source.emissiveMap;
-		this.emissiveIntensity = source.emissiveIntensity;
-
-		this.bumpMap = source.bumpMap;
-		this.bumpScale = source.bumpScale;
-
-		this.normalMap = source.normalMap;
-		this.normalMapType = source.normalMapType;
-		this.normalScale.copy( source.normalScale );
-
-		this.displacementMap = source.displacementMap;
-		this.displacementScale = source.displacementScale;
-		this.displacementBias = source.displacementBias;
-
-		this.roughnessMap = source.roughnessMap;
-
-		this.metalnessMap = source.metalnessMap;
-
-		this.alphaMap = source.alphaMap;
-
-		this.envMap = source.envMap;
-		this.envMapIntensity = source.envMapIntensity;
-
-		this.refractionRatio = source.refractionRatio;
-
-		this.wireframe = source.wireframe;
-		this.wireframeLinewidth = source.wireframeLinewidth;
-		this.wireframeLinecap = source.wireframeLinecap;
-		this.wireframeLinejoin = source.wireframeLinejoin;
-
-		this.skinning = source.skinning;
-		this.morphTargets = source.morphTargets;
-		this.morphNormals = source.morphNormals;
-
-		this.flatShading = source.flatShading;
-
-		this.vertexTangents = source.vertexTangents;
-
-		return this;
-
-	}
+	this.setValues( parameters );
 
 }
 
+MeshStandardMaterial.prototype = Object.create( Material.prototype );
+MeshStandardMaterial.prototype.constructor = MeshStandardMaterial;
+
 MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
+
+MeshStandardMaterial.prototype.copy = function ( source ) {
+
+	Material.prototype.copy.call( this, source );
+
+	this.defines = { 'STANDARD': '' };
+
+	this.color.copy( source.color );
+	this.roughness = source.roughness;
+	this.metalness = source.metalness;
+
+	this.map = source.map;
+
+	this.lightMap = source.lightMap;
+	this.lightMapIntensity = source.lightMapIntensity;
+
+	this.aoMap = source.aoMap;
+	this.aoMapIntensity = source.aoMapIntensity;
+
+	this.emissive.copy( source.emissive );
+	this.emissiveMap = source.emissiveMap;
+	this.emissiveIntensity = source.emissiveIntensity;
+
+	this.bumpMap = source.bumpMap;
+	this.bumpScale = source.bumpScale;
+
+	this.normalMap = source.normalMap;
+	this.normalMapType = source.normalMapType;
+	this.normalScale.copy( source.normalScale );
+
+	this.displacementMap = source.displacementMap;
+	this.displacementScale = source.displacementScale;
+	this.displacementBias = source.displacementBias;
+
+	this.roughnessMap = source.roughnessMap;
+
+	this.metalnessMap = source.metalnessMap;
+
+	this.alphaMap = source.alphaMap;
+
+	this.envMap = source.envMap;
+	this.envMapIntensity = source.envMapIntensity;
+
+	this.refractionRatio = source.refractionRatio;
+
+	this.wireframe = source.wireframe;
+	this.wireframeLinewidth = source.wireframeLinewidth;
+	this.wireframeLinecap = source.wireframeLinecap;
+	this.wireframeLinejoin = source.wireframeLinejoin;
+
+	this.skinning = source.skinning;
+	this.morphTargets = source.morphTargets;
+	this.morphNormals = source.morphNormals;
+
+	this.flatShading = source.flatShading;
+
+	this.vertexTangents = source.vertexTangents;
+
+	return this;
+
+};
 
 /**
  * parameters = {
@@ -31380,93 +31376,91 @@ MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
  * }
  */
 
-class MeshPhysicalMaterial extends MeshStandardMaterial {
+function MeshPhysicalMaterial( parameters ) {
 
-	constructor( parameters ) {
+	MeshStandardMaterial.call( this );
 
-		super();
+	this.defines = {
 
-		this.defines = {
+		'STANDARD': '',
+		'PHYSICAL': ''
 
-			'STANDARD': '',
-			'PHYSICAL': ''
+	};
 
-		};
+	this.type = 'MeshPhysicalMaterial';
 
-		this.type = 'MeshPhysicalMaterial';
+	this.clearcoat = 0.0;
+	this.clearcoatMap = null;
+	this.clearcoatRoughness = 0.0;
+	this.clearcoatRoughnessMap = null;
+	this.clearcoatNormalScale = new Vector2( 1, 1 );
+	this.clearcoatNormalMap = null;
 
-		this.clearcoat = 0.0;
-		this.clearcoatMap = null;
-		this.clearcoatRoughness = 0.0;
-		this.clearcoatRoughnessMap = null;
-		this.clearcoatNormalScale = new Vector2( 1, 1 );
-		this.clearcoatNormalMap = null;
+	this.reflectivity = 0.5; // maps to F0 = 0.04
 
-		this.reflectivity = 0.5; // maps to F0 = 0.04
+	Object.defineProperty( this, 'ior', {
+		get: function () {
 
-		Object.defineProperty( this, 'ior', {
-			get: function () {
+			return ( 1 + 0.4 * this.reflectivity ) / ( 1 - 0.4 * this.reflectivity );
 
-				return ( 1 + 0.4 * this.reflectivity ) / ( 1 - 0.4 * this.reflectivity );
+		},
+		set: function ( ior ) {
 
-			},
-			set: function ( ior ) {
-
-				this.reflectivity = MathUtils.clamp( 2.5 * ( ior - 1 ) / ( ior + 1 ), 0, 1 );
-
-			}
-		} );
-
-
-		this.sheen = null; // null will disable sheen bsdf
-
-		this.transmission = 0.0;
-		this.transmissionMap = null;
-
-		this.setValues( parameters );
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.defines = {
-
-			'STANDARD': '',
-			'PHYSICAL': ''
-
-		};
-
-		this.clearcoat = source.clearcoat;
-		this.clearcoatMap = source.clearcoatMap;
-		this.clearcoatRoughness = source.clearcoatRoughness;
-		this.clearcoatRoughnessMap = source.clearcoatRoughnessMap;
-		this.clearcoatNormalMap = source.clearcoatNormalMap;
-		this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
-
-		this.reflectivity = source.reflectivity;
-
-		if ( source.sheen ) {
-
-			this.sheen = ( this.sheen || new Color() ).copy( source.sheen );
-
-		} else {
-
-			this.sheen = null;
+			this.reflectivity = MathUtils.clamp( 2.5 * ( ior - 1 ) / ( ior + 1 ), 0, 1 );
 
 		}
+	} );
 
-		this.transmission = source.transmission;
-		this.transmissionMap = source.transmissionMap;
+	this.sheen = null; // null will disable sheen bsdf
 
-		return this;
+	this.transmission = 0.0;
+	this.transmissionMap = null;
 
-	}
+	this.setValues( parameters );
 
 }
 
+MeshPhysicalMaterial.prototype = Object.create( MeshStandardMaterial.prototype );
+MeshPhysicalMaterial.prototype.constructor = MeshPhysicalMaterial;
+
 MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
+
+MeshPhysicalMaterial.prototype.copy = function ( source ) {
+
+	MeshStandardMaterial.prototype.copy.call( this, source );
+
+	this.defines = {
+
+		'STANDARD': '',
+		'PHYSICAL': ''
+
+	};
+
+	this.clearcoat = source.clearcoat;
+	this.clearcoatMap = source.clearcoatMap;
+	this.clearcoatRoughness = source.clearcoatRoughness;
+	this.clearcoatRoughnessMap = source.clearcoatRoughnessMap;
+	this.clearcoatNormalMap = source.clearcoatNormalMap;
+	this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
+
+	this.reflectivity = source.reflectivity;
+
+	if ( source.sheen ) {
+
+		this.sheen = ( this.sheen || new Color() ).copy( source.sheen );
+
+	} else {
+
+		this.sheen = null;
+
+	}
+
+	this.transmission = source.transmission;
+	this.transmissionMap = source.transmissionMap;
+
+	return this;
+
+};
 
 /**
  * parameters = {
@@ -39720,7 +39714,7 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		} ).then( function ( blob ) {
 
-			return createImageBitmap( blob, scope.options );
+			return createImageBitmap( blob, Object.assign( scope.options, { colorSpaceConversion: 'none' } ) );
 
 		} ).then( function ( imageBitmap ) {
 
