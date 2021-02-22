@@ -1475,73 +1475,7 @@ THREE.SVGLoader.pointsToStroke = function ( points, style, arcDivisions, minDist
 	}
 
 	// Extrude strokes
-
-	var options = { depth: 16, steps: 2 };
-	if ( extrudeOptions ) Object.assign( options, extrudeOptions );
-
-	var indices = [];
-	var steps = options.steps;
-	var vlen = vertices.length;
-	var flen = vlen / 3;
-	var i = 0;
-	var s;
-
-	// Add stepped vertices...
-	// Including front facing vertices
-	for ( s = 1; s <= steps; s ++ ) {
-
-		for ( i = 0; i < vlen; i += 3 ) {
-
-			vertices.push( vertices[ i ], vertices[ i + 1 ], options.depth / steps * s );
-
-		}
-
-	}
-
-	// Bottom faces
-	for ( i = 0; i < flen; i += 3 ) {
-
-		indices.push( i + 2, i + 1, i );
-
-	}
-
-	// Front faces
-	for ( i = 0; i < flen; i += 3 ) {
-
-		indices.push( i + flen * steps, i + 1 + flen * steps, i + 2 + flen * steps );
-
-	}
-
-	// Side wall faces
-	i = flen;
-
-	while ( -- i > 0 ) {
-
-		var j = i;
-		var k = i - 1;
-
-		for ( s = 0; s < steps; s ++ ) {
-
-			var s1 = flen * s;
-			var s2 = flen * ( s + 1 );
-
-			var a = j + s1,
-				b = k + s1,
-				c = k + s2,
-				d = j + s2;
-
-			indices.push( a, b, d );
-			indices.push( b, c, d );
-
-		}
-
-	}
-
-	geometry = new THREE.BufferGeometry();
-	geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-	geometry.setIndex( indices );
-
-	return geometry;
+	return THREE.SVGLoader.extrudeVertices( extrudeOptions, vertices );
 
 };
 
@@ -2300,3 +2234,77 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 	};
 
 }();
+
+THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices ) {
+
+	// Extrudes planar vertices and returns a BufferGeometry.
+
+	var options = { depth: 16, steps: 2 };
+	if ( extrudeOptions ) Object.assign( options, extrudeOptions );
+
+	var indices = [];
+	var steps = options.steps;
+	var vlen = vertices.length;
+	var flen = vlen / 3;
+	var i = 0;
+	var s;
+
+	// Add stepped vertices...
+	// Including front facing vertices
+	for ( s = 1; s <= steps; s ++ ) {
+
+		for ( i = 0; i < vlen; i += 3 ) {
+
+			vertices.push( vertices[ i ], vertices[ i + 1 ], options.depth / steps * s );
+
+		}
+
+	}
+
+	// Bottom faces
+	for ( i = 0; i < flen; i += 3 ) {
+
+		indices.push( i + 2, i + 1, i );
+
+	}
+
+	// Front faces
+	for ( i = 0; i < flen; i += 3 ) {
+
+		indices.push( i + flen * steps, i + 1 + flen * steps, i + 2 + flen * steps );
+
+	}
+
+	// Side wall faces
+	i = flen;
+
+	while ( -- i > 0 ) {
+
+		var j = i;
+		var k = i - 1;
+
+		for ( s = 0; s < steps; s ++ ) {
+
+			var s1 = flen * s;
+			var s2 = flen * ( s + 1 );
+
+			var a = j + s1,
+				b = k + s1,
+				c = k + s2,
+				d = j + s2;
+
+			indices.push( a, b, d );
+			indices.push( b, c, d );
+
+		}
+
+	}
+
+	var geometry = new THREE.BufferGeometry();
+	geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+	geometry.computeVertexNormals();
+	geometry.setIndex( indices );
+
+	return geometry;
+
+};
