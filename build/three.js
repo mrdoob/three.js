@@ -2454,6 +2454,8 @@
 			return this;
 		};
 
+		_proto.eee = function eee() {};
+
 		_proto.multiply = function multiply(v) {
 			this.x *= v.x;
 			this.y *= v.y;
