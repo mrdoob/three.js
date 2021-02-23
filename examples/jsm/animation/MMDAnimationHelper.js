@@ -978,6 +978,37 @@ var MMDAnimationHelper = ( function () {
 		this.mesh = mesh;
 		this.grants = grants || [];
 
+		this.CCDIKSolver = new CCDIKSolver(this.mesh, this.mesh.geometry.userData.MMD.iks);
+
+		var bones = this.mesh.skeleton.bones;
+		// add hasIK userData to IK, IK's parent.
+		for( var i = 0; i < mesh.geometry.userData.MMD.iks.length; i++ ) {
+
+			var ik = mesh.geometry.userData.MMD.iks[i];
+			var bone = bones[ik.target];
+			// add hasIK in links
+			
+			for( var j = 0; j < ik.links.length; j++ ) {
+
+				var link = ik.links[j]
+				
+				if( link && !( link.index && link.enabled )) continue;
+				
+				var linkBone = bones[link.index];
+				linkBone.userData.hasIK = true;
+				// add hasIK to link ~ root
+				while( linkBone.parent ) {
+					linkBone.parent.userData.hasIK = true;
+					linkBone = linkBone.parent;
+				}
+			}
+			// add hasIK to bone ~ root
+			while ( bone.parent ) {
+				bone.parent.userData.hasIK = true;
+				bone = bone.parent;
+			}
+		}
+
 	}
 
 	GrantSolver.prototype = {
@@ -1022,12 +1053,15 @@ var MMDAnimationHelper = ( function () {
 						}
 
 						if ( grant.affectRotation ) {
-							
-							if(grant.ratio <= 0) continue;
 
 							quaternion.set( 0, 0, 0, 1 );
 							quaternion.slerp( parentBone.quaternion, grant.ratio );
 							bone.quaternion.multiply( quaternion );
+
+							if(bone.userData.hasIK) {
+								this.mesh.updateMatrixWorld( true );
+								this.CCDIKSolver.update();
+							}
 
 						}
 
