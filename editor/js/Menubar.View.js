@@ -14,14 +14,34 @@ function MenubarView( editor ) {
 	options.setClass( 'options' );
 	container.add( options );
 
-	// VR mode
+	// Fullscreen
 
 	var option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( 'VR mode' );
+	option.setTextContent( 'Fullscreen' );
 	option.onClick( function () {
 
-		editor.signals.enterVR.dispatch();
+		if ( document.fullscreenElement === null ) {
+
+			document.documentElement.requestFullscreen();
+
+		} else if ( document.exitFullscreen ) {
+
+			document.exitFullscreen();
+
+		}
+
+		// Safari
+
+		if ( document.webkitFullscreenElement === null ) {
+
+			document.documentElement.webkitRequestFullscreen();
+
+		} else if ( document.webkitExitFullscreen ) {
+
+			document.webkitExitFullscreen();
+
+		}
 
 	} );
 	options.add( option );
