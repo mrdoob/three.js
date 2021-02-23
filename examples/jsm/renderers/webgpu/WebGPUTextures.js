@@ -203,7 +203,7 @@ class WebGPUTextures {
 				size: {
 					width: width,
 					height: height,
-					depth: 1
+					depthOrArrayLayers: 1
 				},
 				format: colorTextureFormat,
 				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.SAMPLED
@@ -231,7 +231,7 @@ class WebGPUTextures {
 					size: {
 						width: width,
 						height: height,
-						depth: 1
+						depthOrArrayLayers: 1
 					},
 					format: depthTextureFormat,
 					usage: GPUTextureUsage.RENDER_ATTACHMENT
@@ -332,7 +332,7 @@ class WebGPUTextures {
 			size: {
 				width: width,
 				height: height,
-				depth: depth,
+				depthOrArrayLayers: depth,
 			},
 			mipLevelCount: mipLevelCount,
 			sampleCount: 1,
@@ -403,7 +403,7 @@ class WebGPUTextures {
 			{
 				width: image.width,
 				height: image.height,
-				depth: ( image.depth !== undefined ) ? image.depth : 1
+				depthOrArrayLayers: ( image.depth !== undefined ) ? image.depth : 1
 			} );
 
 	}
@@ -436,7 +436,7 @@ class WebGPUTextures {
 			}, {
 				width: image.width,
 				height: image.height,
-				depth: 1
+				depthOrArrayLayers: 1
 			}
 		);
 
@@ -470,7 +470,7 @@ class WebGPUTextures {
 				{
 					width: Math.ceil( width / blockData.width ) * blockData.width,
 					height: Math.ceil( height / blockData.width ) * blockData.width,
-					depth: 1,
+					depthOrArrayLayers: 1,
 				} );
 
 		}
