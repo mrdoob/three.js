@@ -314,10 +314,10 @@
 		"webgl2_volume_perlin"
 	],
 	"webgpu": [
-		"webgpu_sandbox",
-		"webgpu_rtt",
 		"webgpu_compute",
-		"webgpu_materials"
+		"webgpu_materials",
+		"webgpu_rtt",
+		"webgpu_sandbox"
 	],
 	"webaudio": [
 		"webaudio_orientation",
