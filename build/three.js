@@ -34352,10 +34352,18 @@
 	});
 
 	function Raycaster(origin, direction, near, far) {
+		if (near === void 0) {
+			near = 0;
+		}
+
+		if (far === void 0) {
+			far = Infinity;
+		}
+
 		this.ray = new Ray(origin, direction); // direction is assumed to be normalized (for accurate distance calculations)
 
-		this.near = near || 0;
-		this.far = far || Infinity;
+		this.near = near;
+		this.far = far;
 		this.camera = null;
 		this.layers = new Layers();
 		this.params = {
@@ -34416,20 +34424,27 @@
 				console.error('THREE.Raycaster: Unsupported camera type: ' + camera.type);
 			}
 		},
-		intersectObject: function intersectObject(object, recursive, optionalTarget) {
-			var intersects = optionalTarget || [];
+		intersectObject: function intersectObject(object, recursive, intersects) {
+			if (recursive === void 0) {
+				recursive = false;
+			}
+
+			if (intersects === void 0) {
+				intersects = [];
+			}
 
 			_intersectObject(object, this, intersects, recursive);
 
 			intersects.sort(ascSort);
 			return intersects;
 		},
-		intersectObjects: function intersectObjects(objects, recursive, optionalTarget) {
-			var intersects = optionalTarget || [];
+		intersectObjects: function intersectObjects(objects, recursive, intersects) {
+			if (recursive === void 0) {
+				recursive = false;
+			}
 
-			if (Array.isArray(objects) === false) {
-				console.warn('THREE.Raycaster.intersectObjects: objects is not an Array.');
-				return intersects;
+			if (intersects === void 0) {
+				intersects = [];
 			}
 
 			for (var i = 0, l = objects.length; i < l; i++) {

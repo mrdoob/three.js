@@ -44146,13 +44146,13 @@ Object.assign( GLBufferAttribute.prototype, {
 
 } );
 
-function Raycaster( origin, direction, near, far ) {
+function Raycaster( origin, direction, near = 0, far = Infinity ) {
 
 	this.ray = new Ray( origin, direction );
 	// direction is assumed to be normalized (for accurate distance calculations)
 
-	this.near = near || 0;
-	this.far = far || Infinity;
+	this.near = near;
+	this.far = far;
 	this.camera = null;
 	this.layers = new Layers();
 
@@ -44237,9 +44237,7 @@ Object.assign( Raycaster.prototype, {
 
 	},
 
-	intersectObject: function ( object, recursive, optionalTarget ) {
-
-		const intersects = optionalTarget || [];
+	intersectObject: function ( object, recursive = false, intersects = [] ) {
 
 		intersectObject( object, this, intersects, recursive );
 
@@ -44249,16 +44247,7 @@ Object.assign( Raycaster.prototype, {
 
 	},
 
-	intersectObjects: function ( objects, recursive, optionalTarget ) {
-
-		const intersects = optionalTarget || [];
-
-		if ( Array.isArray( objects ) === false ) {
-
-			console.warn( 'THREE.Raycaster.intersectObjects: objects is not an Array.' );
-			return intersects;
-
-		}
+	intersectObjects: function ( objects, recursive = false, intersects = [] ) {
 
 		for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
