@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js ar - cones</title>
+		<title>three.js ar - lighting estimation</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,8 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - Lighting Estimation<br/>(Chrome Android 88+)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - Lighting Estimation<br/>
+			(Chrome Android 90+)
 		</div>
 
 		<script type="module">
@@ -22,7 +23,6 @@
 			let camera, scene, renderer;
 			let controller;
 			let defaultEnvironment;
-			let ballGroup;
 
 			init();
 			animate();
@@ -58,8 +58,8 @@
 				xrLight.addEventListener( 'estimationstart', () => {
 
 					// Swap the default light out for the estimated one one we start getting some estimated values.
-					scene.add(xrLight);
-					scene.remove(defaultLight);
+					scene.add( xrLight );
+					scene.remove( defaultLight );
 
 					// The estimated lighting also provides an environment cubemap, which we can apply here.
 					if ( xrLight.environment ) {
@@ -68,18 +68,18 @@
 
 					}
 
-				});
+				} );
 
 				xrLight.addEventListener( 'estimationend', () => {
 
 					// Swap the lights back when we stop receiving estimated values.
-					scene.add(defaultLight);
-					scene.remove(xrLight);
+					scene.add( defaultLight );
+					scene.remove( xrLight );
 
 					// Revert back to the default environment.
 					scene.environment = defaultEnvironment;
 
-				});
+				} );
 
 				//
 
@@ -107,24 +107,24 @@
 
 				//
 
-				let ballGeometry = new THREE.SphereBufferGeometry(0.175, 32, 32);
-				let ballGroup = new THREE.Group();
-				ballGroup.position.z = -2;
+				const ballGeometry = new THREE.SphereBufferGeometry( 0.175, 32, 32 );
+				const ballGroup = new THREE.Group();
+				ballGroup.position.z = - 2;
 
 				const rows = 3;
 				const cols = 3;
 
-				for ( let i = 0; i < rows; ++i ) {
+				for ( let i = 0; i < rows; i ++ ) {
 
-					for ( let j = 0; j < cols; ++j ) {
+					for ( let j = 0; j < cols; j ++ ) {
 
-						const ballMaterial = new THREE.MeshStandardMaterial({
+						const ballMaterial = new THREE.MeshStandardMaterial( {
 							color: 0xdddddd,
 							roughness: i / rows,
 							metalness: j / cols
-						});
+						} );
 						const ballMesh = new THREE.Mesh( ballGeometry, ballMaterial );
-						ballMesh.position.set( (i + 0.5 - rows * 0.5) * 0.4, (j + 0.5 - cols * 0.5) * 0.4, 0 );
+						ballMesh.position.set( ( i + 0.5 - rows * 0.5 ) * 0.4, ( j + 0.5 - cols * 0.5 ) * 0.4, 0 );
 						ballGroup.add( ballMesh );
 
 					}
@@ -137,7 +137,7 @@
 
 				function onSelect() {
 
-					ballGroup.position.set( 0, 0, -2 ).applyMatrix4( controller.matrixWorld );
+					ballGroup.position.set( 0, 0, - 2 ).applyMatrix4( controller.matrixWorld );
 					ballGroup.quaternion.setFromRotationMatrix( controller.matrixWorld );
 
 				}
