@@ -2276,12 +2276,15 @@ THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices ) {
 	}
 
 	// Side wall faces
-	i = flen;
+	for ( i = 0; i < flen; i += 3 ) {
 
-	while ( -- i > 0 ) {
+		addWall( i, i + 1 );
+		addWall( i + 1, i + 2 );
+		addWall( i + 2, i );
 
-		var j = i;
-		var k = i - 1;
+	}
+
+	function addWall( j, k ) {
 
 		for ( s = 0; s < steps; s ++ ) {
 
