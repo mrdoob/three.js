@@ -25959,7 +25959,7 @@
 			var trackType = track.constructor;
 			var json; // derived classes can define a static toJSON method
 
-			if (trackType.toJSON !== undefined) {
+			if (trackType.toJSON !== this.toJSON) {
 				json = trackType.toJSON(track);
 			} else {
 				// by default, we assume the data can be serialized as-is
