@@ -97,10 +97,14 @@ class WebGPURenderPipelines {
 
 			const materialProperties = properties.get( material );
 
-			const disposeCallback = onMaterialDispose.bind( this );
-			materialProperties.disposeCallback = disposeCallback;
+			if ( materialProperties.disposeCallback === undefined ) {
 
-			material.addEventListener( 'dispose', disposeCallback );
+				const disposeCallback = onMaterialDispose.bind( this );
+				materialProperties.disposeCallback = disposeCallback;
+
+				material.addEventListener( 'dispose', disposeCallback );
+
+			}
 
 			// determine shader attributes
 
