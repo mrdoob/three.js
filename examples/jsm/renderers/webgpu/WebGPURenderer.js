@@ -852,7 +852,7 @@ class WebGPURenderer {
 				size: {
 					width: this._width * this._pixelRatio,
 					height: this._height * this._pixelRatio,
-					depth: 1
+					depthOrArrayLayers: 1
 				},
 				sampleCount: this._parameters.sampleCount,
 				format: GPUTextureFormat.BRGA8Unorm,
@@ -875,7 +875,7 @@ class WebGPURenderer {
 				size: {
 					width: this._width * this._pixelRatio,
 					height: this._height * this._pixelRatio,
-					depth: 1
+					depthOrArrayLayers: 1
 				},
 				sampleCount: this._parameters.sampleCount,
 				format: GPUTextureFormat.Depth24PlusStencil8,
