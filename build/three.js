@@ -19575,7 +19575,7 @@
 
 					var halfFloatSupportedByExt = textureType === HalfFloatType && (extensions.has('EXT_color_buffer_half_float') || capabilities.isWebGL2 && extensions.has('EXT_color_buffer_float'));
 
-					if (textureType !== UnsignedByteType && utils.convert(textureType) !== _gl.getParameter(35738) && // IE11, Edge and Chrome Mac < 52 (#9513)
+					if (textureType !== UnsignedByteType && utils.convert(textureType) !== _gl.getParameter(35738) && // Edge and Chrome Mac < 52 (#9513)
 					!(textureType === FloatType && (capabilities.isWebGL2 || extensions.has('OES_texture_float') || extensions.has('WEBGL_color_buffer_float'))) && // Chrome Mac >= 52 and Firefox
 					!halfFloatSupportedByExt) {
 						console.error('THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.');
@@ -31396,8 +31396,7 @@
 	}();
 
 	function createPaths(text, size, data) {
-		var chars = Array.from ? Array.from(text) : String(text).split(''); // workaround for IE11, see #13988
-
+		var chars = Array.from(text);
 		var scale = size / data.resolution;
 		var line_height = (data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness) * scale;
 		var paths = [];
