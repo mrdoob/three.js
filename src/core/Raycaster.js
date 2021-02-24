@@ -94,7 +94,17 @@ Object.assign( Raycaster.prototype, {
 
 	intersectObject: function ( object, recursive = false, intersects = [] ) {
 
-		intersectObject( object, this, intersects, recursive );
+		const objectIntersects = [];
+
+		intersectObject( object, this, objectIntersects, recursive );
+
+		for ( let i = 0, l = objectIntersects.length; i < l; i ++ ) {
+
+			objectIntersects[ i ].linkedParent = object;
+
+		}
+
+		intersects = intersects.concat( objectIntersects );
 
 		intersects.sort( ascSort );
 
@@ -106,7 +116,17 @@ Object.assign( Raycaster.prototype, {
 
 		for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
-			intersectObject( objects[ i ], this, intersects, recursive );
+			const objectIntersects = [];
+
+			intersectObject( objects[ i ], this, objectIntersects, recursive );
+
+			for ( let j = 0, l2 = objectIntersects.length; j < l2; j ++ ) {
+
+				objectIntersects[ j ].linkedParent = objects[ i ];
+
+			}
+
+			intersects = intersects.concat( objectIntersects );
 
 		}
 
