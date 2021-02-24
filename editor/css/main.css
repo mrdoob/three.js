@@ -78,7 +78,6 @@ textarea, input { outline: none; } /* osx */
 
 .TabbedPanel .Tabs .Tab {
 	padding: 10px;
-	vertical-align: middle;
 	text-transform: uppercase;
 }
 
@@ -240,7 +239,7 @@ textarea, input { outline: none; } /* osx */
 /* */
 
 #outliner .Script:after {
-	content: '{...}' /* ❮/❯ */
+	content: '◎'
 }
 
 /*  */

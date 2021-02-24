@@ -1,6 +1,5 @@
 import { Command } from '../Command.js';
-
-import * as THREE from '../../../build/three.module.js';
+import { Euler } from '../../../build/three.module.js';
 
 /**
  * @param editor Editor
@@ -9,58 +8,58 @@ import * as THREE from '../../../build/three.module.js';
  * @param optionalOldRotation THREE.Euler
  * @constructor
  */
-function SetRotationCommand( editor, object, newRotation, optionalOldRotation ) {
+class SetRotationCommand extends Command {
 
-	Command.call( this, editor );
+	constructor( editor, object, newRotation, optionalOldRotation ) {
 
-	this.type = 'SetRotationCommand';
-	this.name = 'Set Rotation';
-	this.updatable = true;
+		super( editor );
 
-	this.object = object;
+		this.type = 'SetRotationCommand';
+		this.name = 'Set Rotation';
+		this.updatable = true;
 
-	if ( object !== undefined && newRotation !== undefined ) {
+		this.object = object;
 
-		this.oldRotation = object.rotation.clone();
-		this.newRotation = newRotation.clone();
+		if ( object !== undefined && newRotation !== undefined ) {
+
+			this.oldRotation = object.rotation.clone();
+			this.newRotation = newRotation.clone();
+
+		}
+
+		if ( optionalOldRotation !== undefined ) {
+
+			this.oldRotation = optionalOldRotation.clone();
+
+		}
 
 	}
 
-	if ( optionalOldRotation !== undefined ) {
-
-		this.oldRotation = optionalOldRotation.clone();
-
-	}
-
-}
-
-SetRotationCommand.prototype = {
-
-	execute: function () {
+	execute() {
 
 		this.object.rotation.copy( this.newRotation );
 		this.object.updateMatrixWorld( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
-	},
+	}
 
-	undo: function () {
+	undo() {
 
 		this.object.rotation.copy( this.oldRotation );
 		this.object.updateMatrixWorld( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
-	},
+	}
 
-	update: function ( command ) {
+	update( command ) {
 
 		this.newRotation.copy( command.newRotation );
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var output = Command.prototype.toJSON.call( this );
+		const output = super.toJSON( this );
 
 		output.objectUuid = this.object.uuid;
 		output.oldRotation = this.oldRotation.toArray();
@@ -68,18 +67,18 @@ SetRotationCommand.prototype = {
 
 		return output;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Command.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.oldRotation = new THREE.Euler().fromArray( json.oldRotation );
-		this.newRotation = new THREE.Euler().fromArray( json.newRotation );
+		this.oldRotation = new Euler().fromArray( json.oldRotation );
+		this.newRotation = new Euler().fromArray( json.newRotation );
 
 	}
 
-};
+}
 
 export { SetRotationCommand };

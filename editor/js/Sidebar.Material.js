@@ -628,7 +628,7 @@ function SidebarMaterial( editor ) {
 
 				material = new materialClasses[ materialClass.getValue() ]();
 
-				if ( material.type === "RawShaderMaterial" ) {
+				if ( material.type === 'RawShaderMaterial' ) {
 
 					material.vertexShader = vertexShaderVariables + material.vertexShader;
 
@@ -1209,7 +1209,7 @@ function SidebarMaterial( editor ) {
 
 		if ( textureWarning ) {
 
-			console.warn( "Can't set texture, model doesn't have texture coordinates" );
+			console.warn( 'Can\'t set texture, model doesn\'t have texture coordinates' );
 
 		}
 

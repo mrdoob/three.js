@@ -30,8 +30,6 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 
 	var depthTexture = new THREE.DepthTexture();
 	depthTexture.type = THREE.UnsignedShortType;
-	depthTexture.minFilter = THREE.NearestFilter;
-	depthTexture.maxFilter = THREE.NearestFilter;
 
 	this.beautyRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
 		minFilter: THREE.LinearFilter,

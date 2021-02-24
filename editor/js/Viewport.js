@@ -9,6 +9,7 @@ import { EditorControls } from './EditorControls.js';
 import { ViewportCamera } from './Viewport.Camera.js';
 import { ViewportInfo } from './Viewport.Info.js';
 import { ViewHelper } from './Viewport.ViewHelper.js';
+import { VR } from './Viewport.VR.js';
 
 import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
@@ -42,6 +43,7 @@ function Viewport( editor ) {
 
 	var grid = new THREE.GridHelper( 30, 30, 0x444444, 0x888888 );
 	var viewHelper = new ViewHelper( camera, container );
+	var vr = new VR( editor );
 
 	//
 
@@ -335,6 +337,7 @@ function Viewport( editor ) {
 
 		if ( renderer !== null ) {
 
+			renderer.setAnimationLoop( null );
 			renderer.dispose();
 			pmremGenerator.dispose();
 			pmremTexture = null;
@@ -345,6 +348,7 @@ function Viewport( editor ) {
 
 		renderer = newRenderer;
 
+		renderer.setAnimationLoop( animate );
 		renderer.setClearColor( 0xaaaaaa );
 
 		if ( window.matchMedia ) {
@@ -659,6 +663,8 @@ function Viewport( editor ) {
 
 	} );
 
+	signals.exitedVR.add( render );
+
 	//
 
 	signals.windowResize.add( function () {
@@ -695,8 +701,6 @@ function Viewport( editor ) {
 
 	function animate() {
 
-		requestAnimationFrame( animate );
-
 		var mixer = editor.mixer;
 		var delta = clock.getDelta();
 
@@ -716,11 +720,15 @@ function Viewport( editor ) {
 
 		}
 
+		if ( vr.currentSession !== null ) {
+
+			needsUpdate = true;
+
+		}
+
 		if ( needsUpdate === true ) render();
 
 	}
-
-	requestAnimationFrame( animate );
 
 	//
 
@@ -743,7 +751,7 @@ function Viewport( editor ) {
 
 			renderer.autoClear = false;
 			if ( showSceneHelpers === true ) renderer.render( sceneHelpers, camera );
-			viewHelper.render( renderer );
+			if ( vr.currentSession === null ) viewHelper.render( renderer );
 			renderer.autoClear = true;
 
 		}

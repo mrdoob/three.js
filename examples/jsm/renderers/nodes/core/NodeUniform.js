@@ -7,6 +7,8 @@ class NodeUniform {
 		this.node = node;
 		this.needsUpdate = needsUpdate;
 
+		Object.defineProperty( this, 'isNodeUniform', { value: true } );
+
 	}
 
 	get value() {
