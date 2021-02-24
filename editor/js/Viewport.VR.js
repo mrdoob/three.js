@@ -11,6 +11,8 @@ class VR {
 		const signals = editor.signals;
 
 		let group = null;
+
+		let camera = null;
 		let renderer = null;
 
 		this.currentSession = null;
@@ -41,6 +43,8 @@ class VR {
 
 			}
 
+			camera = editor.camera.clone();
+
 			group.visible = true;
 
 			this.currentSession = session;
@@ -48,9 +52,11 @@ class VR {
 
 			await renderer.xr.setSession( this.currentSession );
 
-		}
+		};
 
-		 const onSessionEnded = async () => {
+		const onSessionEnded = async () => {
+
+			editor.camera.copy( camera );
 
 			group.visible = false;
 
