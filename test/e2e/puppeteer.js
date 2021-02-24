@@ -51,6 +51,7 @@ const exceptionList = [
 	'webxr_ar_lighting',
 	// webgpu
 	'webgpu_compute',
+	'webgpu_instance_uniform',
 	'webgpu_materials',
 	'webgpu_rtt',
 	'webgpu_sandbox'
