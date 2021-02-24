@@ -34,15 +34,15 @@
 					super( 'vec3' );
 
 					this.updateType = NodeUpdateType.Object;
-					
+
 					this.inputNode = new ColorNode( new THREE.Color() );
-					
+
 				}
 
 				update( frame ) {
 
 					const mesh = frame.object;
-					
+
 					this.inputNode.value.copy( mesh.color );
 
 				}
@@ -99,14 +99,9 @@
 
 				const geometry = new TeapotGeometry( 50, 18 );
 
-				for ( let i = 0, l = 10; i < l; i ++ ) {
+				for ( let i = 0, l = 12; i < l; i ++ ) {
 
-					// use material after fix material instance in WebGPU
-					const materialTemp = new THREE.MeshBasicMaterial();
-					materialTemp.colorNode = instanceUniform;
-					// --
-					
-					addMesh( geometry, materialTemp );
+					addMesh( geometry, material );
 
 				}
 
