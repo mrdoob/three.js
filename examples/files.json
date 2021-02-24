@@ -317,6 +317,7 @@
 		"webgpu_sandbox",
 		"webgpu_rtt",
 		"webgpu_compute",
+		"webgpu_instance_uniform",
 		"webgpu_materials"
 	],
 	"webaudio": [
