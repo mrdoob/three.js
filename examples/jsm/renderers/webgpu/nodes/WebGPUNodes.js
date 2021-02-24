@@ -13,15 +13,15 @@ class WebGPUNodes {
 
 	}
 
-	get( material ) {
+	get( object ) {
 
-		let nodeBuilder = this.builders.get( material );
+		let nodeBuilder = this.builders.get( object );
 
 		if ( nodeBuilder === undefined ) {
 
-			nodeBuilder = new WebGPUNodeBuilder( material, this.renderer ).build();
+			nodeBuilder = new WebGPUNodeBuilder( object.material, this.renderer ).build();
 
-			this.builders.set( material, nodeBuilder );
+			this.builders.set( object, nodeBuilder );
 
 		}
 
@@ -29,9 +29,9 @@ class WebGPUNodes {
 
 	}
 
-	remove( material ) {
+	remove( object ) {
 
-		this.builders.delete( material );
+		this.builders.delete( object );
 
 	}
 
@@ -45,7 +45,7 @@ class WebGPUNodes {
 
 		const material = object.material;
 
-		const nodeBuilder = this.get( material );
+		const nodeBuilder = this.get( object );
 		const nodeFrame = this.nodeFrame;
 
 		nodeFrame.material = material;
