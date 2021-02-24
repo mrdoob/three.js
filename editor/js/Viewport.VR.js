@@ -21,12 +21,18 @@ class VR {
 
 		const onSessionStarted = async ( session ) => {
 
+			const sidebar = document.getElementById( 'sidebar' );
+			sidebar.style.width = '300px';
+			sidebar.style.height = '700px';
+
+			//
+
 			if ( group === null ) {
 
 				group = new THREE.Group();
 				editor.sceneHelpers.add( group );
 
-				const mesh = new HTMLMesh( document.getElementById( 'sidebar' ), 300, 700 );
+				const mesh = new HTMLMesh( sidebar );
 				mesh.position.set( 1, 1.5, - 0.5 );
 				mesh.rotation.y = - 0.5;
 				group.add( mesh );
@@ -75,6 +81,12 @@ class VR {
 		};
 
 		const onSessionEnded = async () => {
+
+			const sidebar = document.getElementById( 'sidebar' );
+			sidebar.style.width = '';
+			sidebar.style.height = '';
+
+			//
 
 			editor.camera.copy( camera );
 
