@@ -2,15 +2,9 @@ import * as THREE from '../../../build/three.module.js';
 
 class HTMLMesh extends THREE.Mesh {
 
-	constructor( dom, width, height ) {
-
-		dom.style.width = width + 'px';
-		dom.style.height = height + 'px';
+	constructor( dom ) {
 
 		const texture = new HTMLTexture( dom );
-
-		dom.style.width = '';
-		dom.style.height = '';
 
 		const geometry = new THREE.PlaneGeometry( texture.image.width * 0.002, texture.image.height * 0.002 );
 		const material = new THREE.MeshBasicMaterial( { map: texture, toneMapped: false } );
