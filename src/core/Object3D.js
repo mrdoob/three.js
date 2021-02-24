@@ -662,7 +662,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 				images: {},
 				shapes: {},
 				skeletons: {},
-				animations: {}
+				animations: {},
+				nodes: {}
 			};
 
 			output.metadata = {
