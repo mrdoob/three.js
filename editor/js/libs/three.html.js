@@ -33,6 +33,14 @@ class HTMLTexture extends CanvasTexture {
 
 	}
 
+	click( x, y ) {
+
+		htmlclick( this.dom, x, y );
+
+		this.update();
+
+	}
+
 	update() {
 
 		this.image = html2canvas( this.dom );
@@ -231,6 +239,48 @@ function html2canvas( element ) {
 	console.timeEnd( 'drawElement' );
 
 	return canvas;
+
+}
+
+function htmlclick( element, x, y ) {
+
+	/*
+	const mouseEventInit = {
+		clientX: ( x * element.offsetWidth ) + element.offsetLeft,
+		clientY: ( y * element.offsetHeight ) + element.offsetTop,
+		view: element.ownerDocument.defaultView
+	};
+	element.dispatchEvent( new MouseEvent( 'click', mouseEventInit ) );
+	*/
+
+	const rect = element.getBoundingClientRect();
+
+	x = x * rect.width + rect.left;
+	y = y * rect.height + rect.top;
+
+	function traverse( element ) {
+
+		if ( element.nodeType !== 3 ) {
+
+			const rect = element.getBoundingClientRect();
+
+			if ( x > rect.left && x < rect.right && y > rect.top && y < rect.bottom ) {
+
+				element.click();
+
+			}
+
+			for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+				traverse( element.childNodes[ i ] );
+
+			}
+
+		}
+
+	}
+
+	traverse( element );
 
 }
 

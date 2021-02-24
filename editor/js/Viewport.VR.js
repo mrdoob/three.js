@@ -15,6 +15,8 @@ class VR {
 		let camera = null;
 		let renderer = null;
 
+		const intersectables = [];
+
 		this.currentSession = null;
 
 		const onSessionStarted = async ( session ) => {
@@ -28,6 +30,24 @@ class VR {
 				mesh.position.set( 1, 1.5, 0 );
 				mesh.rotation.y = - 0.5;
 				group.add( mesh );
+
+				intersectables.push( mesh );
+
+				// controllers
+
+				const controller1 = renderer.xr.getController( 0 );
+				controller1.addEventListener( 'select', onSelect );
+				group.add( controller1 );
+
+				const controller2 = renderer.xr.getController( 1 );
+				controller2.addEventListener( 'selectstart', onSelect );
+				group.add( controller2 );
+
+				const geometry = new THREE.BufferGeometry();
+				geometry.setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 5 ) ] );
+
+				controller1.add( new THREE.Line( geometry ) );
+				controller2.add( new THREE.Line( geometry ) );
 
 				//
 
@@ -68,6 +88,43 @@ class VR {
 			signals.exitedVR.dispatch();
 
 		};
+
+		//
+
+		function onSelect( event ) {
+
+			const controller = event.target;
+
+			const intersections = getIntersections( controller );
+
+			if ( intersections.length > 0 ) {
+
+				const intersection = intersections[ 0 ];
+
+				const object = intersection.object;
+				const uv = intersection.uv;
+
+				object.material.map.click( uv.x, 1 - uv.y );
+
+			}
+
+		}
+
+		const raycaster = new THREE.Raycaster();
+		const tempMatrix = new THREE.Matrix4();
+
+		function getIntersections( controller ) {
+
+			tempMatrix.identity().extractRotation( controller.matrixWorld );
+
+			raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+			raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+
+			return raycaster.intersectObjects( intersectables );
+
+		}
+
+		// signals
 
 		signals.toggleVR.add( () => {
 
