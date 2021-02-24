@@ -483,7 +483,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 	function onMouseDown( event ) {
 
 		event.preventDefault();
-		event.stopPropagation();
 
 		if ( _state === STATE.NONE ) {
 
@@ -539,7 +538,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
-		event.stopPropagation();
 
 		var state = ( _keyState !== STATE.NONE ) ? _keyState : _state;
 
@@ -565,7 +563,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
-		event.stopPropagation();
 
 		_state = STATE.NONE;
 
@@ -583,7 +580,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 		if ( scope.noZoom === true ) return;
 
 		event.preventDefault();
-		event.stopPropagation();
 
 		switch ( event.deltaMode ) {
 
@@ -646,7 +642,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
-		event.stopPropagation();
 
 		switch ( event.touches.length ) {
 
