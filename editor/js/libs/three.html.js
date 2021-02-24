@@ -1,19 +1,19 @@
-import {
-	CanvasTexture,
-	Mesh,
-	MeshBasicMaterial,
-	PlaneGeometry,
-	sRGBEncoding
-} from '../../../build/three.module.js';
+import * as THREE from '../../../build/three.module.js';
 
-class HTMLMesh extends Mesh {
+class HTMLMesh extends THREE.Mesh {
 
-	constructor( dom ) {
+	constructor( dom, width, height ) {
+
+		dom.style.width = width + 'px';
+		dom.style.height = height + 'px';
 
 		const texture = new HTMLTexture( dom );
 
-		const geometry = new PlaneGeometry( texture.image.width * 0.001, texture.image.height * 0.001 );
-		const material = new MeshBasicMaterial( { map: texture, toneMapped: false } );
+		dom.style.width = '';
+		dom.style.height = '';
+
+		const geometry = new THREE.PlaneGeometry( texture.image.width * 0.002, texture.image.height * 0.002 );
+		const material = new THREE.MeshBasicMaterial( { map: texture, toneMapped: false } );
 
 		super( geometry, material );
 
@@ -21,15 +21,18 @@ class HTMLMesh extends Mesh {
 
 }
 
-class HTMLTexture extends CanvasTexture {
+class HTMLTexture extends THREE.CanvasTexture {
 
 	constructor( dom ) {
 
 		super( html2canvas( dom ) );
 
 		this.dom = dom;
-		this.encoding = sRGBEncoding;
+
 		this.anisotropy = 16;
+		this.encoding = THREE.sRGBEncoding;
+		this.minFilter = THREE.LinearFilter;
+		this.magFilter = THREE.LinearFilter;
 
 	}
 
@@ -116,6 +119,12 @@ function html2canvas( element ) {
 	function drawText( style, x, y, string ) {
 
 		if ( string !== '' ) {
+
+			if ( style.textTransform === 'uppercase' ) {
+
+				string = string.toUpperCase();
+
+			}
 
 			context.font = style.fontSize + ' ' + style.fontFamily;
 			context.textBaseline = 'top';

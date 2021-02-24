@@ -100,6 +100,7 @@ const assets = [
 	'./js/libs/tern-threejs/threejs.js',
 
 	'./js/libs/signals.min.js',
+	'./js/libs/three.html.js',
 	'./js/libs/ui.js',
 	'./js/libs/ui.three.js',
 
@@ -126,6 +127,7 @@ const assets = [
 	'./js/Menubar.Play.js',
 	'./js/Menubar.Examples.js',
 	'./js/Menubar.Help.js',
+	'./js/Menubar.View.js',
 	'./js/Menubar.Status.js',
 	'./js/Resizer.js',
 	'./js/Sidebar.js',
@@ -169,6 +171,7 @@ const assets = [
 	'./js/Viewport.Camera.js',
 	'./js/Viewport.Info.js',
 	'./js/Viewport.ViewHelper.js',
+	'./js/Viewport.VR.js',
 
 	'./js/Command.js',
 	'./js/commands/AddObjectCommand.js',
@@ -212,7 +215,7 @@ self.addEventListener( 'install', async function () {
 
 		cache.add( asset ).catch( function () {
 
-			console.error( '[SW] Cound\'t cache:', asset );
+			console.warn( '[SW] Cound\'t cache:', asset );
 
 		} );
 
@@ -233,7 +236,7 @@ async function cacheFirst( request ) {
 
 	if ( cachedResponse === undefined ) {
 
-		console.error( '[SW] Not cached:', request.url );
+		console.warn( '[SW] Not cached:', request.url );
 		return fetch( request );
 
 	}

@@ -26,8 +26,8 @@ class VR {
 				group = new THREE.Group();
 				editor.sceneHelpers.add( group );
 
-				const mesh = new HTMLMesh( document.getElementById( 'sidebar' ) );
-				mesh.position.set( 1, 1.5, 0 );
+				const mesh = new HTMLMesh( document.getElementById( 'sidebar' ), 300, 700 );
+				mesh.position.set( 1, 1.5, - 0.5 );
 				mesh.rotation.y = - 0.5;
 				group.add( mesh );
 
