@@ -314,11 +314,11 @@
 		"webgl2_volume_perlin"
 	],
 	"webgpu": [
-		"webgpu_sandbox",
-		"webgpu_rtt",
 		"webgpu_compute",
 		"webgpu_instance_uniform",
-		"webgpu_materials"
+		"webgpu_materials",
+		"webgpu_rtt",
+		"webgpu_sandbox"
 	],
 	"webaudio": [
 		"webaudio_orientation",
@@ -329,6 +329,7 @@
 	"webxr": [
 		"webxr_ar_cones",
 		"webxr_ar_hittest",
+		"webxr_ar_lighting",
 		"webxr_ar_paint",
 		"webxr_vr_ballshooter",
 		"webxr_vr_cubes",

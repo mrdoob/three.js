@@ -47,7 +47,13 @@ const exceptionList = [
 	'webgl_tiled_forward', // exception for Github Actions
 	'webgl_video_kinect', // video tag not deterministic enough
 	'webgl_worker_offscreencanvas', // in a worker, not robust
-
+	// webxr
+	'webxr_ar_lighting',
+	// webgpu
+	'webgpu_compute',
+	'webgpu_materials',
+	'webgpu_rtt',
+	'webgpu_sandbox'
 ].concat( ( process.platform === 'win32' ) ? [
 
 	'webgl_effects_ascii' // windows fonts not supported
