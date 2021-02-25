@@ -2461,32 +2461,6 @@ SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 	var i = 0;
 	var s;
 
-	// Add stepped vertices...
-	// Including front facing vertices
-	for ( s = 1; s <= steps; s ++ ) {
-
-		for ( i = 0; i < vlen; i += 3 ) {
-
-			vertices.push( vertices[ i ], vertices[ i + 1 ], options.depth / steps * s );
-
-		}
-
-	}
-
-	if ( uvs ) {
-
-		var uvlen = uvs.length;
-		for ( s = 1; s <= steps; s ++ ) {
-
-			for ( i = 0; i < uvlen; i += 2 ) {
-
-				uvs.push( uvs[ i ], uvs[ i + 1 ] );
-
-			}
-
-		}
-
-	}
 
 	// Bottom faces
 	for ( i = 0; i < flen; i += 3 ) {
@@ -2495,10 +2469,14 @@ SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 
 	}
 
-	// Front faces
-	for ( i = 0; i < flen; i += 3 ) {
+	// Add stepped vertices...
+	for ( s = 1; s <= ( steps + 1 ); s ++ ) {
 
-		indices.push( i + flen * steps, i + 1 + flen * steps, i + 2 + flen * steps );
+		for ( i = 0; i < vlen; i += 3 ) {
+
+			vertices.push( vertices[ i ], vertices[ i + 1 ], options.depth / steps * ( s - 1 ) );
+
+		}
 
 	}
 
@@ -2511,17 +2489,31 @@ SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 
 	}
 
+	// Front faces
+	for ( i = 0; i < vlen; i += 3 ) {
+
+		vertices.push( vertices[ i ], vertices[ i + 1 ], options.depth );
+
+	}
+
+	for ( i = 0; i < flen; i += 3 ) {
+
+		indices.push( i + flen * ( steps + 2 ), i + 1 + flen * ( steps + 2 ), i + 2 + flen * ( steps + 2 ) );
+
+	}
+
 	var geometry = new BufferGeometry();
 	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 	if ( uvs ) {
 
-		var uvlen = uvs.length;
-		for ( s = 1; s <= steps; s ++ ) {
+		var uvlen = uvs.length, v = 0;
+		for ( s = 0; s <= ( steps + 1 ); s ++ ) {
 
 			for ( i = 0; i < uvlen; i += 2 ) {
 
-				uvs.push( uvs[ i ], uvs[ i + 1 ] );
+				v = s === steps + 1 ? 1. - uvs[ i + 1 ] : Math.abs( uvs[ i + 1 ] - s / steps );
+				uvs.push( uvs[ i ], v );
 
 			}
 
@@ -2551,7 +2543,7 @@ SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 
 		}
 
-		for ( s = 0; s < steps; s ++ ) {
+		for ( s = 0; s <= steps; s ++ ) {
 
 			var s1 = flen * s;
 			var s2 = flen * ( s + 1 );
