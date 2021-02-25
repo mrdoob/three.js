@@ -1455,7 +1455,7 @@ THREE.SVGLoader.pointsToStroke = function ( points, style, arcDivisions, minDist
 
 	var vertices = [];
 	var normals = extrude ? undefined : [];
-	var uvs = extrude ? undefined : [];
+	var uvs = [];
 
 	if ( THREE.SVGLoader.pointsToStrokeWithBuffers( points, style, arcDivisions, minDistance, vertices, normals, uvs ) === 0 ) {
 
@@ -1467,15 +1467,15 @@ THREE.SVGLoader.pointsToStroke = function ( points, style, arcDivisions, minDist
 
 		var geometry = new THREE.BufferGeometry();
 		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-		geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-		geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+		if ( normals ) geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+		if ( uvs ) geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
 		return geometry;
 
 	}
 
 	// Extrude strokes
-	return THREE.SVGLoader.extrudeVertices( extrudeOptions, vertices );
+	return THREE.SVGLoader.extrudeVertices( extrudeOptions, vertices, uvs );
 
 };
 
@@ -1991,8 +1991,8 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 			addVertex( currentPointL, u1, 0 );
 
 			addVertex( lastPointR, u0, 1 );
-			addVertex( currentPointL, u1, 1 );
-			addVertex( currentPointR, u1, 0 );
+			addVertex( currentPointL, u1, 0 );
+			addVertex( currentPointR, u1, 1 );
 
 		}
 
@@ -2018,7 +2018,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 
 					addVertex( currentPointL, u, 0 );
 					addVertex( nextPointL, u, 0 );
-					addVertex( innerPoint, u, 0.5 );
+					addVertex( innerPoint, u, 1 );
 
 				} else {
 
@@ -2035,8 +2035,8 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 					// Bevel join triangle
 
 					addVertex( currentPointR, u, 1 );
-					addVertex( nextPointR, u, 0 );
-					addVertex( innerPoint, u, 0.5 );
+					addVertex( innerPoint, u, 0 );
+					addVertex( nextPointR, u, 1 );
 
 				}
 
@@ -2053,8 +2053,8 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 				} else {
 
 					addVertex( currentPointR, u, 1 );
-					addVertex( nextPointR, u, 0 );
 					addVertex( currentPoint, u, 0.5 );
+					addVertex( nextPointR, u, 1 );
 
 				}
 
@@ -2173,8 +2173,8 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 
 						} else {
 
-							tempV2_3.toArray( vertices, vl - 2 * 3 );
-							tempV2_4.toArray( vertices, vl - 1 * 3 );
+							tempV2_3.toArray( vertices, vl - 1 * 3 );
+							tempV2_4.toArray( vertices, vl - 2 * 3 );
 							tempV2_4.toArray( vertices, vl - 4 * 3 );
 
 						}
@@ -2235,7 +2235,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 
 }();
 
-THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices ) {
+THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 
 	// Extrudes planar vertices and returns a BufferGeometry.
 
@@ -2285,6 +2285,18 @@ THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices ) {
 	}
 
 	function addWall( j, k ) {
+
+		if ( uvs ) {
+
+			var v1 = uvs[ j * 2 + 1 ];
+			var v2 = uvs[ k * 2 + 1 ];
+			if ( Math.abs( v1 - v2 ) > 0.01 || ( v1 > 0.01 && v1 < 0.99 ) ) {
+
+				return;
+
+			}
+
+		}
 
 		for ( s = 0; s < steps; s ++ ) {
 
