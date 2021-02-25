@@ -55,7 +55,7 @@
 				light.position.set( 0, 0.5, 1 ).normalize();
 				scene.add( light );
 
-				const sphere = new THREE.SphereBufferGeometry( 20, 32, 16 );
+				const sphere = new THREE.SphereGeometry( 20, 32, 16 );
 
 				material1 = new THREE.MeshPhongMaterial( { color: 0xffaa00, flatShading: true, shininess: 0 } );
 				material2 = new THREE.MeshPhongMaterial( { color: 0xff2200, flatShading: true, shininess: 0 } );
@@ -218,7 +218,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				animate();
 

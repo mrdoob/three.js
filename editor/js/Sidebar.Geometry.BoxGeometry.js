@@ -4,7 +4,7 @@ import { UIRow, UIText, UINumber, UIInteger } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-function SidebarGeometryBoxGeometry( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -77,7 +77,7 @@ function SidebarGeometryBoxGeometry( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.BoxBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.BoxGeometry(
 			width.getValue(),
 			height.getValue(),
 			depth.getValue(),
@@ -92,4 +92,4 @@ function SidebarGeometryBoxGeometry( editor, object ) {
 
 }
 
-export { SidebarGeometryBoxGeometry };
+export { GeometryParametersPanel };

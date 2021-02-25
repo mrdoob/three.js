@@ -4,8 +4,6 @@ class Matrix4 {
 
 	constructor() {
 
-		Object.defineProperty( this, 'isMatrix4', { value: true } );
-
 		this.elements = [
 
 			1, 0, 0, 0,
@@ -78,6 +76,23 @@ class Matrix4 {
 		te[ 12 ] = me[ 12 ];
 		te[ 13 ] = me[ 13 ];
 		te[ 14 ] = me[ 14 ];
+
+		return this;
+
+	}
+
+	setFromMatrix3( m ) {
+
+		const me = m.elements;
+
+		this.set(
+
+			me[ 0 ], me[ 3 ], me[ 6 ], 0,
+			me[ 1 ], me[ 4 ], me[ 7 ], 0,
+			me[ 2 ], me[ 5 ], me[ 8 ], 0,
+			0, 0, 0, 1
+
+		);
 
 		return this;
 
@@ -856,6 +871,8 @@ class Matrix4 {
 	}
 
 }
+
+Matrix4.prototype.isMatrix4 = true;
 
 const _v1 = /*@__PURE__*/ new Vector3();
 const _m1 = /*@__PURE__*/ new Matrix4();

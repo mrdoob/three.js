@@ -56,7 +56,7 @@
 				RGBFormat,
 				Scene,
 				TextureLoader,
-				TorusKnotBufferGeometry,
+				TorusKnotGeometry,
 				WebGLRenderer
 			} from "../../build/three.module.js";
 
@@ -490,6 +490,8 @@
 				const folder = gui.addFolder( 'THREE.MeshMatcapMaterial' );
 
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
+
+				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( data, 'matcap', matcapKeys ).onChange( updateTexture( material, 'matcap', matcaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
 
@@ -539,7 +541,6 @@
 				const folder = gui.addFolder( 'THREE.MeshToonMaterial' );
 
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
-
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
 				folder.add( data, 'gradientMap', gradientMapKeys ).onChange( updateTexture( material, 'gradientMap', gradientMaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
@@ -764,7 +765,7 @@
 
 			guiScene( gui, scene, camera );
 
-			let geometry = new TorusKnotBufferGeometry( 10, 3, 100, 16 );
+			let geometry = new TorusKnotGeometry( 10, 3, 100, 16 );
 			geometry = geometry.toNonIndexed();
 
 			generateVertexColors( geometry );

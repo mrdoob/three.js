@@ -17,7 +17,6 @@ function Material() {
 
 	this.blending = NormalBlending;
 	this.side = FrontSide;
-	this.flatShading = false;
 	this.vertexColors = false;
 
 	this.opacity = 1;
@@ -96,7 +95,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			if ( newValue === undefined ) {
 
-				console.warn( "THREE.Material: '" + key + "' parameter is undefined." );
+				console.warn( 'THREE.Material: \'' + key + '\' parameter is undefined.' );
 				continue;
 
 			}
@@ -114,7 +113,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			if ( currentValue === undefined ) {
 
-				console.warn( "THREE." + this.type + ": '" + key + "' is not a property of this material." );
+				console.warn( 'THREE.' + this.type + ': \'' + key + '\' is not a property of this material.' );
 				continue;
 
 			}
@@ -200,7 +199,13 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.map && this.map.isTexture ) data.map = this.map.toJSON( meta ).uuid;
 		if ( this.matcap && this.matcap.isTexture ) data.matcap = this.matcap.toJSON( meta ).uuid;
 		if ( this.alphaMap && this.alphaMap.isTexture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
-		if ( this.lightMap && this.lightMap.isTexture ) data.lightMap = this.lightMap.toJSON( meta ).uuid;
+
+		if ( this.lightMap && this.lightMap.isTexture ) {
+
+			data.lightMap = this.lightMap.toJSON( meta ).uuid;
+			data.lightMapIntensity = this.lightMapIntensity;
+
+		}
 
 		if ( this.aoMap && this.aoMap.isTexture ) {
 
@@ -259,7 +264,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
 
 		if ( this.blending !== NormalBlending ) data.blending = this.blending;
-		if ( this.flatShading === true ) data.flatShading = this.flatShading;
 		if ( this.side !== FrontSide ) data.side = this.side;
 		if ( this.vertexColors ) data.vertexColors = true;
 
@@ -304,6 +308,8 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.morphTargets === true ) data.morphTargets = true;
 		if ( this.morphNormals === true ) data.morphNormals = true;
 		if ( this.skinning === true ) data.skinning = true;
+
+		if ( this.flatShading === true ) data.flatShading = this.flatShading;
 
 		if ( this.visible === false ) data.visible = false;
 
@@ -357,7 +363,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.blending = source.blending;
 		this.side = source.side;
-		this.flatShading = source.flatShading;
 		this.vertexColors = source.vertexColors;
 
 		this.opacity = source.opacity;

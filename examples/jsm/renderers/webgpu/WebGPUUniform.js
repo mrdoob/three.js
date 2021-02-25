@@ -20,6 +20,12 @@ class WebGPUUniform {
 
 	}
 
+	getValue() {
+
+		return this.value;
+
+	}
+
 }
 
 class FloatUniform extends WebGPUUniform {

@@ -175,7 +175,7 @@
 
 				materialBg = new THREE.MeshBasicMaterial( { map: mapBg1 } );
 
-				const meshBg = new THREE.Mesh( new THREE.PlaneBufferGeometry( 4000, 2000 ), materialBg );
+				const meshBg = new THREE.Mesh( new THREE.PlaneGeometry( 4000, 2000 ), materialBg );
 				meshBg.position.set( 0, 0, - 1 );
 				scene.add( meshBg );
 
@@ -229,8 +229,8 @@
 					{ name: 'OneMinusDstColor', constant: THREE.OneMinusDstColorFactor }
 				];
 
-				const geo1 = new THREE.PlaneBufferGeometry( 100, 100 );
-				const geo2 = new THREE.PlaneBufferGeometry( 100, 25 );
+				const geo1 = new THREE.PlaneGeometry( 100, 100 );
+				const geo2 = new THREE.PlaneGeometry( 100, 25 );
 
 				for ( let i = 0; i < dst.length; i ++ ) {
 
@@ -309,7 +309,7 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				addImgHandler( 'img_0', 0 );
 				addImgHandler( 'img_1', 1 );

@@ -26,6 +26,11 @@ function Editor() {
 		startPlayer: new Signal(),
 		stopPlayer: new Signal(),
 
+		// vr
+
+		toggleVR: new Signal(),
+		exitedVR: new Signal(),
+
 		// notifications
 
 		editorCleared: new Signal(),
@@ -388,7 +393,7 @@ Editor.prototype = {
 
 	addHelper: function () {
 
-		var geometry = new THREE.SphereBufferGeometry( 2, 4, 2 );
+		var geometry = new THREE.SphereGeometry( 2, 4, 2 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: false } );
 
 		return function ( object, helper ) {
@@ -554,7 +559,7 @@ Editor.prototype = {
 
 		}
 
-		this.select( this.scene.getObjectById( id, true ) );
+		this.select( this.scene.getObjectById( id ) );
 
 	},
 
@@ -592,7 +597,7 @@ Editor.prototype = {
 
 	focusById: function ( id ) {
 
-		this.focus( this.scene.getObjectById( id, true ) );
+		this.focus( this.scene.getObjectById( id ) );
 
 	},
 
@@ -604,7 +609,7 @@ Editor.prototype = {
 		this.camera.copy( _DEFAULT_CAMERA );
 		this.signals.cameraResetted.dispatch();
 
-		this.scene.name = "Scene";
+		this.scene.name = 'Scene';
 		this.scene.userData = {};
 		this.scene.background = null;
 		this.scene.environment = null;

@@ -897,7 +897,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 	this.generateGeometry = function () {
 
 		console.warn(
-			"THREE.MarchingCubes: generateGeometry() now returns THREE.BufferGeometry"
+			'THREE.MarchingCubes: generateGeometry() now returns THREE.BufferGeometry'
 		);
 		return this.generateBufferGeometry();
 
@@ -951,13 +951,13 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		this.render( geo_callback );
 
 		if ( this.hasPositions )
-			geo.setAttribute( "position", new THREE.BufferAttribute( posArray, 3 ) );
+			geo.setAttribute( 'position', new THREE.BufferAttribute( posArray, 3 ) );
 		if ( this.hasNormals )
-			geo.setAttribute( "normal", new THREE.BufferAttribute( normArray, 3 ) );
+			geo.setAttribute( 'normal', new THREE.BufferAttribute( normArray, 3 ) );
 		if ( this.hasColors )
-			geo.setAttribute( "color", new THREE.BufferAttribute( colorArray, 3 ) );
+			geo.setAttribute( 'color', new THREE.BufferAttribute( colorArray, 3 ) );
 		if ( this.hasUvs )
-			geo.setAttribute( "uv", new THREE.BufferAttribute( uvArray, 2 ) );
+			geo.setAttribute( 'uv', new THREE.BufferAttribute( uvArray, 2 ) );
 
 		return geo;
 

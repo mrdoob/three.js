@@ -34,7 +34,7 @@
 			let windowHalfX = window.innerWidth / 2;
 			let windowHalfY = window.innerHeight / 2;
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			init();
 			animate();
@@ -48,10 +48,10 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
-				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 100, 20, 20 ), new THREE.MeshNormalMaterial() );
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( 100, 20, 20 ), new THREE.MeshNormalMaterial() );
 				scene.add( sphere );
 
-				const geometry = new THREE.CylinderBufferGeometry( 0, 10, 100, 12 );
+				const geometry = new THREE.CylinderGeometry( 0, 10, 100, 12 );
 				geometry.rotateX( Math.PI / 2 );
 
 				const material = new THREE.MeshNormalMaterial();
@@ -77,7 +77,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

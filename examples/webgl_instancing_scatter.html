@@ -43,8 +43,8 @@
 			const _normal = new THREE.Vector3();
 			const _scale = new THREE.Vector3();
 
-			// let surfaceGeometry = new THREE.BoxBufferGeometry( 10, 10, 10 ).toNonIndexed();
-			const surfaceGeometry = new THREE.TorusKnotBufferGeometry( 10, 3, 100, 16 ).toNonIndexed();
+			// let surfaceGeometry = new THREE.BoxGeometry( 10, 10, 10 ).toNonIndexed();
+			const surfaceGeometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 ).toNonIndexed();
 			const surfaceMaterial = new THREE.MeshLambertMaterial( { color: api.surfaceColor, wireframe: false } );
 			const surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
 
@@ -70,11 +70,8 @@
 				const _stemMesh = gltf.scene.getObjectByName( 'Stem' );
 				const _blossomMesh = gltf.scene.getObjectByName( 'Blossom' );
 
-				stemGeometry = new THREE.InstancedBufferGeometry();
-				blossomGeometry = new THREE.InstancedBufferGeometry();
-
-				THREE.BufferGeometry.prototype.copy.call( stemGeometry, _stemMesh.geometry );
-				THREE.BufferGeometry.prototype.copy.call( blossomGeometry, _blossomMesh.geometry );
+				stemGeometry = _stemMesh.geometry.clone();
+				blossomGeometry = _blossomMesh.geometry.clone();
 
 				const defaultTransform = new THREE.Matrix4()
 					.makeRotationX( Math.PI )
@@ -86,23 +83,19 @@
 				stemMaterial = _stemMesh.material;
 				blossomMaterial = _blossomMesh.material;
 
+				stemMesh = new THREE.InstancedMesh( stemGeometry, stemMaterial, count );
+				blossomMesh = new THREE.InstancedMesh( blossomGeometry, blossomMaterial, count );
+
 				// Assign random colors to the blossoms.
-				const _color = new THREE.Color();
-				const color = new Float32Array( count * 3 );
+				const color = new THREE.Color();
 				const blossomPalette = [ 0xF20587, 0xF2D479, 0xF2C879, 0xF2B077, 0xF24405 ];
 
 				for ( let i = 0; i < count; i ++ ) {
 
-					_color.setHex( blossomPalette[ Math.floor( Math.random() * blossomPalette.length ) ] );
-					_color.toArray( color, i * 3 );
+					color.setHex( blossomPalette[ Math.floor( Math.random() * blossomPalette.length ) ] );
+					blossomMesh.setColorAt( i, color );
 
 				}
-
-				blossomGeometry.setAttribute( 'color', new THREE.InstancedBufferAttribute( color, 3 ) );
-				blossomMaterial.vertexColors = true;
-
-				stemMesh = new THREE.InstancedMesh( stemGeometry, stemMaterial, count );
-				blossomMesh = new THREE.InstancedMesh( blossomGeometry, blossomMaterial, count );
 
 				// Instance matrices will be updated every frame.
 				stemMesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
@@ -178,7 +171,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

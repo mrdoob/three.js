@@ -63,7 +63,7 @@
 
 			}
 
-			const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+			const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 
 			function addCube( material ) {
 
@@ -117,7 +117,7 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

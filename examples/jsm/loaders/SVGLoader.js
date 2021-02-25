@@ -8,7 +8,7 @@ import {
 	ShapePath,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var SVGLoader = function ( manager ) {
 
@@ -18,7 +18,7 @@ var SVGLoader = function ( manager ) {
 	this.defaultDPI = 90;
 
 	// Accepted units: 'mm', 'cm', 'in', 'pt', 'pc', 'px'
-	this.defaultUnit = "px";
+	this.defaultUnit = 'px';
 
 };
 
@@ -136,7 +136,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					} else {
 
-						console.warn( "SVGLoader: 'use node' references non-existent node id: " + usedNodeId );
+						console.warn( 'SVGLoader: \'use node\' references non-existent node id: ' + usedNodeId );
 
 					}
 
@@ -938,7 +938,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				if ( adjustFunction === undefined ) adjustFunction = function copy( v ) {
 
-					if ( v.startsWith( 'url' ) ) console.warn( "SVGLoader: url access in attributes is not implemented." );
+					if ( v.startsWith( 'url' ) ) console.warn( 'SVGLoader: url access in attributes is not implemented.' );
 
 					return v;
 
@@ -985,35 +985,235 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function parseFloats( string ) {
+		// from https://github.com/ppvg/svg-numbers (MIT License)
 
-			var array = string.split( /[\s,]+|(?=\s?[+\-])/ );
+		function parseFloats( input ) {
 
-			for ( var i = 0; i < array.length; i ++ ) {
+			if ( typeof input !== 'string' ) {
 
-				var number = array[ i ];
+				throw new TypeError( 'Invalid input: ' + typeof input );
 
-				// Handle values like 48.6037.7.8
-				// TODO Find a regex for this
+			}
 
-				if ( number.indexOf( '.' ) !== number.lastIndexOf( '.' ) ) {
+			// Character groups
+			var RE = {
+				SEPARATOR: /[ \t\r\n\,.\-+]/,
+				WHITESPACE: /[ \t\r\n]/,
+				DIGIT: /[\d]/,
+				SIGN: /[-+]/,
+				POINT: /\./,
+				COMMA: /,/,
+				EXP: /e/i
+			};
 
-					var split = number.split( '.' );
+			// States
+			var SEP = 0;
+			var INT = 1;
+			var FLOAT = 2;
+			var EXP = 3;
 
-					for ( var s = 2; s < split.length; s ++ ) {
+			var state = SEP;
+			var seenComma = true;
+			var result = [], number = '', exponent = '';
 
-						array.splice( i + s - 1, 0, '0.' + split[ s ] );
+			function throwSyntaxError( current, i, partial ) {
+
+				var error = new SyntaxError( 'Unexpected character "' + current + '" at index ' + i + '.' );
+				error.partial = partial;
+				throw error;
+
+			}
+
+			function newNumber() {
+
+				if ( number !== '' ) {
+
+					if ( exponent === '' ) result.push( Number( number ) );
+					else result.push( Number( number ) * Math.pow( 10, Number( exponent ) ) );
+
+				}
+
+				number = '';
+				exponent = '';
+
+			}
+
+			var current, i = 0, length = input.length;
+			for ( i = 0; i < length; i ++ ) {
+
+				current = input[ i ];
+
+				// parse until next number
+				if ( state === SEP ) {
+
+					// eat whitespace
+					if ( RE.WHITESPACE.test( current ) ) {
+
+						continue;
+
+					}
+
+					// start new number
+					if ( RE.DIGIT.test( current ) || RE.SIGN.test( current ) ) {
+
+						state = INT;
+						number = current;
+						continue;
+
+					}
+
+					if ( RE.POINT.test( current ) ) {
+
+						state = FLOAT;
+						number = current;
+						continue;
+
+					}
+
+					// throw on double commas (e.g. "1, , 2")
+					if ( RE.COMMA.test( current ) ) {
+
+						if ( seenComma ) {
+
+							throwSyntaxError( current, i, result );
+
+						}
+
+						seenComma = true;
 
 					}
 
 				}
 
-				array[ i ] = parseFloatWithUnits( number );
+				// parse integer part
+				if ( state === INT ) {
+
+					if ( RE.DIGIT.test( current ) ) {
+
+						number += current;
+						continue;
+
+					}
+
+					if ( RE.POINT.test( current ) ) {
+
+						number += current;
+						state = FLOAT;
+						continue;
+
+					}
+
+					if ( RE.EXP.test( current ) ) {
+
+						state = EXP;
+						continue;
+
+					}
+
+					// throw on double signs ("-+1"), but not on sign as separator ("-1-2")
+					if ( RE.SIGN.test( current )
+							&& number.length === 1
+							&& RE.SIGN.test( number[ 0 ] ) ) {
+
+						throwSyntaxError( current, i, result );
+
+					}
+
+				}
+
+				// parse decimal part
+				if ( state === FLOAT ) {
+
+					if ( RE.DIGIT.test( current ) ) {
+
+						number += current;
+						continue;
+
+					}
+
+					if ( RE.EXP.test( current ) ) {
+
+						state = EXP;
+						continue;
+
+					}
+
+					// throw on double decimal points (e.g. "1..2")
+					if ( RE.POINT.test( current ) && number[ number.length - 1 ] === '.' ) {
+
+						throwSyntaxError( current, i, result );
+
+					}
+
+				}
+
+				// parse exponent part
+				if ( state == EXP ) {
+
+					if ( RE.DIGIT.test( current ) ) {
+
+						exponent += current;
+						continue;
+
+					}
+
+					if ( RE.SIGN.test( current ) ) {
+
+						if ( exponent === '' ) {
+
+							exponent += current;
+							continue;
+
+						}
+
+						if ( exponent.length === 1 && RE.SIGN.test( exponent ) ) {
+
+							throwSyntaxError( current, i, result );
+
+						}
+
+					}
+
+				}
+
+
+				// end of number
+				if ( RE.WHITESPACE.test( current ) ) {
+
+					newNumber();
+					state = SEP;
+					seenComma = false;
+
+				} else if ( RE.COMMA.test( current ) ) {
+
+					newNumber();
+					state = SEP;
+					seenComma = true;
+
+				} else if ( RE.SIGN.test( current ) ) {
+
+					newNumber();
+					state = INT;
+					number = current;
+
+				} else if ( RE.POINT.test( current ) ) {
+
+					newNumber();
+					state = FLOAT;
+					number = current;
+
+				} else {
+
+					throwSyntaxError( current, i, result );
+
+				}
 
 			}
 
-			return array;
+			// add the last number found (if any)
+			newNumber();
 
+			return result;
 
 		}
 
@@ -1024,55 +1224,55 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		// Conversion: [ fromUnit ][ toUnit ] (-1 means dpi dependent)
 		var unitConversion = {
 
-			"mm": {
-				"mm": 1,
-				"cm": 0.1,
-				"in": 1 / 25.4,
-				"pt": 72 / 25.4,
-				"pc": 6 / 25.4,
-				"px": - 1
+			'mm': {
+				'mm': 1,
+				'cm': 0.1,
+				'in': 1 / 25.4,
+				'pt': 72 / 25.4,
+				'pc': 6 / 25.4,
+				'px': - 1
 			},
-			"cm": {
-				"mm": 10,
-				"cm": 1,
-				"in": 1 / 2.54,
-				"pt": 72 / 2.54,
-				"pc": 6 / 2.54,
-				"px": - 1
+			'cm': {
+				'mm': 10,
+				'cm': 1,
+				'in': 1 / 2.54,
+				'pt': 72 / 2.54,
+				'pc': 6 / 2.54,
+				'px': - 1
 			},
-			"in": {
-				"mm": 25.4,
-				"cm": 2.54,
-				"in": 1,
-				"pt": 72,
-				"pc": 6,
-				"px": - 1
+			'in': {
+				'mm': 25.4,
+				'cm': 2.54,
+				'in': 1,
+				'pt': 72,
+				'pc': 6,
+				'px': - 1
 			},
-			"pt": {
-				"mm": 25.4 / 72,
-				"cm": 2.54 / 72,
-				"in": 1 / 72,
-				"pt": 1,
-				"pc": 6 / 72,
-				"px": - 1
+			'pt': {
+				'mm': 25.4 / 72,
+				'cm': 2.54 / 72,
+				'in': 1 / 72,
+				'pt': 1,
+				'pc': 6 / 72,
+				'px': - 1
 			},
-			"pc": {
-				"mm": 25.4 / 6,
-				"cm": 2.54 / 6,
-				"in": 1 / 6,
-				"pt": 72 / 6,
-				"pc": 1,
-				"px": - 1
+			'pc': {
+				'mm': 25.4 / 6,
+				'cm': 2.54 / 6,
+				'in': 1 / 6,
+				'pt': 72 / 6,
+				'pc': 1,
+				'px': - 1
 			},
-			"px": {
-				"px": 1
+			'px': {
+				'px': 1
 			}
 
 		};
 
 		function parseFloatWithUnits( string ) {
 
-			var theUnit = "px";
+			var theUnit = 'px';
 
 			if ( typeof string === 'string' || string instanceof String ) {
 
@@ -1094,11 +1294,11 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var scale = undefined;
 
-			if ( theUnit === "px" && scope.defaultUnit !== "px" ) {
+			if ( theUnit === 'px' && scope.defaultUnit !== 'px' ) {
 
 				// Conversion scale from  pixels to inches, then to default units
 
-				scale = unitConversion[ "in" ][ scope.defaultUnit ] / scope.defaultDPI;
+				scale = unitConversion[ 'in' ][ scope.defaultUnit ] / scope.defaultDPI;
 
 			} else {
 
@@ -1108,7 +1308,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					// Conversion scale to pixels
 
-					scale = unitConversion[ theUnit ][ "in" ] * scope.defaultDPI;
+					scale = unitConversion[ theUnit ][ 'in' ] * scope.defaultDPI;
 
 				}
 
@@ -1180,7 +1380,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 						switch ( transformType ) {
 
-							case "translate":
+							case 'translate':
 
 								if ( array.length >= 1 ) {
 
@@ -1199,7 +1399,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 								break;
 
-							case "rotate":
+							case 'rotate':
 
 								if ( array.length >= 1 ) {
 
@@ -1229,7 +1429,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 								break;
 
-							case "scale":
+							case 'scale':
 
 								if ( array.length >= 1 ) {
 
@@ -1248,7 +1448,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 								break;
 
-							case "skewX":
+							case 'skewX':
 
 								if ( array.length === 1 ) {
 
@@ -1262,7 +1462,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 								break;
 
-							case "skewY":
+							case 'skewY':
 
 								if ( array.length === 1 ) {
 
@@ -1276,7 +1476,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 								break;
 
-							case "matrix":
+							case 'matrix':
 
 								if ( array.length === 6 ) {
 
@@ -1349,7 +1549,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 						if ( isRotated ) {
 
-							console.warn( "SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented." );
+							console.warn( 'SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented.' );
 
 						}
 
@@ -1467,7 +1667,7 @@ SVGLoader.pointsToStroke = function ( points, style, arcDivisions, minDistance, 
 
 	var vertices = [];
 	var normals = extrude ? undefined : [];
-	var uvs = extrude ? undefined : [];
+	var uvs = [];
 
 	if ( SVGLoader.pointsToStrokeWithBuffers( points, style, arcDivisions, minDistance, vertices, normals, uvs ) === 0 ) {
 
@@ -1479,81 +1679,15 @@ SVGLoader.pointsToStroke = function ( points, style, arcDivisions, minDistance, 
 
 		var geometry = new BufferGeometry();
 		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-		geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-		geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+		if ( normals ) geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		if ( uvs ) geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 		return geometry;
 
 	}
 
 	// Extrude strokes
-
-	var options = { depth: 16, steps: 2 };
-	if ( extrudeOptions ) Object.assign( options, extrudeOptions );
-
-	var indices = [];
-	var steps = options.steps;
-	var vlen = vertices.length;
-	var flen = vlen / 3;
-	var i = 0;
-	var s;
-
-	// Add stepped vertices...
-	// Including front facing vertices
-	for ( s = 1; s <= steps; s ++ ) {
-
-		for ( i = 0; i < vlen; i += 3 ) {
-
-			vertices.push( vertices[ i ], vertices[ i + 1 ], options.depth / steps * s );
-
-		}
-
-	}
-
-	// Bottom faces
-	for ( i = 0; i < flen; i += 3 ) {
-
-		indices.push( i + 2, i + 1, i );
-
-	}
-
-	// Front faces
-	for ( i = 0; i < flen; i += 3 ) {
-
-		indices.push( i + flen * steps, i + 1 + flen * steps, i + 2 + flen * steps );
-
-	}
-
-	// Side wall faces
-	i = flen;
-
-	while ( -- i > 0 ) {
-
-		var j = i;
-		var k = i - 1;
-
-		for ( s = 0; s < steps; s ++ ) {
-
-			var s1 = flen * s;
-			var s2 = flen * ( s + 1 );
-
-			var a = j + s1,
-				b = k + s1,
-				c = k + s2,
-				d = j + s2;
-
-			indices.push( a, b, d );
-			indices.push( b, c, d );
-
-		}
-
-	}
-
-	geometry = new BufferGeometry();
-	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	geometry.setIndex( indices );
-
-	return geometry;
+	return SVGLoader.extrudeVertices( extrudeOptions, vertices, uvs );
 
 };
 
@@ -2069,8 +2203,8 @@ SVGLoader.pointsToStrokeWithBuffers = function () {
 			addVertex( currentPointL, u1, 0 );
 
 			addVertex( lastPointR, u0, 1 );
-			addVertex( currentPointL, u1, 1 );
-			addVertex( currentPointR, u1, 0 );
+			addVertex( currentPointL, u1, 0 );
+			addVertex( currentPointR, u1, 1 );
 
 		}
 
@@ -2096,7 +2230,7 @@ SVGLoader.pointsToStrokeWithBuffers = function () {
 
 					addVertex( currentPointL, u, 0 );
 					addVertex( nextPointL, u, 0 );
-					addVertex( innerPoint, u, 0.5 );
+					addVertex( innerPoint, u, 1 );
 
 				} else {
 
@@ -2113,8 +2247,8 @@ SVGLoader.pointsToStrokeWithBuffers = function () {
 					// Bevel join triangle
 
 					addVertex( currentPointR, u, 1 );
-					addVertex( nextPointR, u, 0 );
-					addVertex( innerPoint, u, 0.5 );
+					addVertex( innerPoint, u, 0 );
+					addVertex( nextPointR, u, 1 );
 
 				}
 
@@ -2131,8 +2265,8 @@ SVGLoader.pointsToStrokeWithBuffers = function () {
 				} else {
 
 					addVertex( currentPointR, u, 1 );
-					addVertex( nextPointR, u, 0 );
 					addVertex( currentPoint, u, 0.5 );
+					addVertex( nextPointR, u, 1 );
 
 				}
 
@@ -2251,8 +2385,8 @@ SVGLoader.pointsToStrokeWithBuffers = function () {
 
 						} else {
 
-							tempV2_3.toArray( vertices, vl - 2 * 3 );
-							tempV2_4.toArray( vertices, vl - 1 * 3 );
+							tempV2_3.toArray( vertices, vl - 1 * 3 );
+							tempV2_4.toArray( vertices, vl - 2 * 3 );
 							tempV2_4.toArray( vertices, vl - 4 * 3 );
 
 						}
@@ -2312,5 +2446,128 @@ SVGLoader.pointsToStrokeWithBuffers = function () {
 	};
 
 }();
+
+SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
+
+	// Extrudes planar vertices and returns a BufferGeometry.
+
+	var options = { depth: 16, steps: 2 };
+	if ( extrudeOptions ) Object.assign( options, extrudeOptions );
+
+	var indices = [];
+	var steps = options.steps;
+	var vlen = vertices.length;
+	var flen = vlen / 3;
+	var i = 0;
+	var s;
+
+	// Add stepped vertices...
+	// Including front facing vertices
+	for ( s = 1; s <= steps; s ++ ) {
+
+		for ( i = 0; i < vlen; i += 3 ) {
+
+			vertices.push( vertices[ i ], vertices[ i + 1 ], options.depth / steps * s );
+
+		}
+
+	}
+
+	if ( uvs ) {
+
+		var uvlen = uvs.length;
+		for ( s = 1; s <= steps; s ++ ) {
+
+			for ( i = 0; i < uvlen; i += 2 ) {
+
+				uvs.push( uvs[ i ], uvs[ i + 1 ] );
+
+			}
+
+		}
+
+	}
+
+	// Bottom faces
+	for ( i = 0; i < flen; i += 3 ) {
+
+		indices.push( i + 2, i + 1, i );
+
+	}
+
+	// Front faces
+	for ( i = 0; i < flen; i += 3 ) {
+
+		indices.push( i + flen * steps, i + 1 + flen * steps, i + 2 + flen * steps );
+
+	}
+
+	// Side wall faces
+	for ( i = 0; i < flen; i += 3 ) {
+
+		addWall( i, i + 1 );
+		addWall( i + 1, i + 2 );
+		addWall( i + 2, i );
+
+	}
+
+	var geometry = new BufferGeometry();
+	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+
+	if ( uvs ) {
+
+		var uvlen = uvs.length;
+		for ( s = 1; s <= steps; s ++ ) {
+
+			for ( i = 0; i < uvlen; i += 2 ) {
+
+				uvs.push( uvs[ i ], uvs[ i + 1 ] );
+
+			}
+
+		}
+
+		geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+
+	}
+
+	geometry.computeVertexNormals();
+	geometry.setIndex( indices );
+
+	return geometry;
+
+
+	function addWall( j, k ) {
+
+		if ( uvs ) {
+
+			var v1 = uvs[ j * 2 + 1 ];
+			var v2 = uvs[ k * 2 + 1 ];
+			if ( Math.abs( v1 - v2 ) > 0.01 || ( v1 > 0.01 && v1 < 0.99 ) ) {
+
+				return;
+
+			}
+
+		}
+
+		for ( s = 0; s < steps; s ++ ) {
+
+			var s1 = flen * s;
+			var s2 = flen * ( s + 1 );
+
+			var a = j + s1,
+				b = k + s1,
+				c = k + s2,
+				d = j + s2;
+
+			indices.push( a, b, d );
+			indices.push( b, c, d );
+
+		}
+
+	}
+
+};
 
 export { SVGLoader };

@@ -79,7 +79,7 @@
 
 				group = new THREE.Group();
 
-				const geometry = new THREE.SphereBufferGeometry( 10, 64, 40 );
+				const geometry = new THREE.SphereGeometry( 10, 64, 40 );
 				const material = new THREE.MeshLambertMaterial( { color: 0xee0808 } );
 				const material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
@@ -138,7 +138,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

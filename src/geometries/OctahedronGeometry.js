@@ -1,11 +1,21 @@
-import { Geometry } from '../core/Geometry.js';
-import { OctahedronBufferGeometry } from './OctahedronBufferGeometry.js';
+import { PolyhedronGeometry } from './PolyhedronGeometry.js';
 
-class OctahedronGeometry extends Geometry {
+class OctahedronGeometry extends PolyhedronGeometry {
 
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
-		super();
+		const vertices = [
+			1, 0, 0, 	- 1, 0, 0,	0, 1, 0,
+			0, - 1, 0, 	0, 0, 1,	0, 0, - 1
+		];
+
+		const indices = [
+			0, 2, 4,	0, 4, 3,	0, 3, 5,
+			0, 5, 2,	1, 2, 5,	1, 5, 3,
+			1, 3, 4,	1, 4, 2
+		];
+
+		super( vertices, indices, radius, detail );
 
 		this.type = 'OctahedronGeometry';
 
@@ -14,11 +24,8 @@ class OctahedronGeometry extends Geometry {
 			detail: detail
 		};
 
-		this.fromBufferGeometry( new OctahedronBufferGeometry( radius, detail ) );
-		this.mergeVertices();
-
 	}
 
 }
 
-export { OctahedronGeometry };
+export { OctahedronGeometry, OctahedronGeometry as OctahedronBufferGeometry };

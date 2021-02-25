@@ -74,13 +74,10 @@ THREE.CSS3DRenderer = function () {
 
 	var cameraElement = document.createElement( 'div' );
 
-	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	cameraElement.style.transformStyle = 'preserve-3d';
 	cameraElement.style.pointerEvents = 'none';
 
 	domElement.appendChild( cameraElement );
-
-	var isIE = /Trident/i.test( navigator.userAgent );
 
 	this.getSize = function () {
 
@@ -137,7 +134,7 @@ THREE.CSS3DRenderer = function () {
 
 	}
 
-	function getObjectCSSMatrix( matrix, cameraCSSMatrix ) {
+	function getObjectCSSMatrix( matrix ) {
 
 		var elements = matrix.elements;
 		var matrix3d = 'matrix3d(' +
@@ -158,15 +155,6 @@ THREE.CSS3DRenderer = function () {
 			epsilon( elements[ 14 ] ) + ',' +
 			epsilon( elements[ 15 ] ) +
 		')';
-
-		if ( isIE ) {
-
-			return 'translate(-50%,-50%)' +
-				'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)' +
-				cameraCSSMatrix +
-				matrix3d;
-
-		}
 
 		return 'translate(-50%,-50%)' + matrix3d;
 
@@ -194,11 +182,11 @@ THREE.CSS3DRenderer = function () {
 				matrix.elements[ 11 ] = 0;
 				matrix.elements[ 15 ] = 1;
 
-				style = getObjectCSSMatrix( matrix, cameraCSSMatrix );
+				style = getObjectCSSMatrix( matrix );
 
 			} else {
 
-				style = getObjectCSSMatrix( object.matrixWorld, cameraCSSMatrix );
+				style = getObjectCSSMatrix( object.matrixWorld );
 
 			}
 
@@ -207,17 +195,9 @@ THREE.CSS3DRenderer = function () {
 
 			if ( cachedObject === undefined || cachedObject.style !== style ) {
 
-				element.style.WebkitTransform = style;
 				element.style.transform = style;
 
 				var objectData = { style: style };
-
-				if ( isIE ) {
-
-					objectData.distanceToCameraSquared = getDistanceToSquared( camera, object );
-
-				}
-
 				cache.objects.set( object, objectData );
 
 			}
@@ -242,75 +222,13 @@ THREE.CSS3DRenderer = function () {
 
 	}
 
-	var getDistanceToSquared = function () {
-
-		var a = new THREE.Vector3();
-		var b = new THREE.Vector3();
-
-		return function ( object1, object2 ) {
-
-			a.setFromMatrixPosition( object1.matrixWorld );
-			b.setFromMatrixPosition( object2.matrixWorld );
-
-			return a.distanceToSquared( b );
-
-		};
-
-	}();
-
-	function filterAndFlatten( scene ) {
-
-		var result = [];
-
-		scene.traverse( function ( object ) {
-
-			if ( object instanceof THREE.CSS3DObject ) result.push( object );
-
-		} );
-
-		return result;
-
-	}
-
-	function zOrder( scene ) {
-
-		var sorted = filterAndFlatten( scene ).sort( function ( a, b ) {
-
-			var distanceA = cache.objects.get( a ).distanceToCameraSquared;
-			var distanceB = cache.objects.get( b ).distanceToCameraSquared;
-
-			return distanceA - distanceB;
-
-		} );
-
-		var zMax = sorted.length;
-
-		for ( var i = 0, l = sorted.length; i < l; i ++ ) {
-
-			sorted[ i ].element.style.zIndex = zMax - i;
-
-		}
-
-	}
-
 	this.render = function ( scene, camera ) {
 
 		var fov = camera.projectionMatrix.elements[ 5 ] * _heightHalf;
 
 		if ( cache.camera.fov !== fov ) {
 
-			if ( camera.isPerspectiveCamera ) {
-
-				domElement.style.WebkitPerspective = fov + 'px';
-				domElement.style.perspective = fov + 'px';
-
-			} else {
-
-				domElement.style.WebkitPerspective = '';
-				domElement.style.perspective = '';
-
-			}
-
+			domElement.style.perspective = camera.isPerspectiveCamera ? fov + 'px' : '';
 			cache.camera.fov = fov;
 
 		}
@@ -332,9 +250,8 @@ THREE.CSS3DRenderer = function () {
 		var style = cameraCSSMatrix +
 			'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)';
 
-		if ( cache.camera.style !== style && ! isIE ) {
+		if ( cache.camera.style !== style ) {
 
-			cameraElement.style.WebkitTransform = style;
 			cameraElement.style.transform = style;
 
 			cache.camera.style = style;
@@ -342,16 +259,6 @@ THREE.CSS3DRenderer = function () {
 		}
 
 		renderObject( scene, scene, camera, cameraCSSMatrix );
-
-		if ( isIE ) {
-
-			// IE10 and 11 does not support 'preserve-3d'.
-			// Thus, z-order in 3D will not work.
-			// We have to calc z-order manually and set CSS z-index for IE.
-			// FYI: z-index can't handle object intersection
-			zOrder( scene );
-
-		}
 
 	};
 

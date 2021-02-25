@@ -13,8 +13,10 @@ import {
 	MeshPhongMaterial,
 	MeshStandardMaterial,
 	ShaderMaterial,
+	UniformsLib,
+	UniformsUtils,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var LDrawLoader = ( function () {
 
@@ -370,7 +372,7 @@ var LDrawLoader = ( function () {
 
 		getLineNumberString: function () {
 
-			return this.lineNumber >= 0 ? " at line " + this.lineNumber : "";
+			return this.lineNumber >= 0 ? ' at line ' + this.lineNumber : '';
 
 		}
 
@@ -552,8 +554,8 @@ var LDrawLoader = ( function () {
 
 		// Add default main triangle and line edge materials (used in piecess that can be coloured with a main color)
 		this.setMaterials( [
-			this.parseColourMetaDirective( new LineParser( "Main_Colour CODE 16 VALUE #FF8080 EDGE #333333" ) ),
-			this.parseColourMetaDirective( new LineParser( "Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333" ) )
+			this.parseColourMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ),
+			this.parseColourMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) )
 		] );
 
 		// If this flag is set to true, each subobject will be a Object.
@@ -727,13 +729,13 @@ var LDrawLoader = ( function () {
 
 			// Given a colour code search its material in the parse scopes stack
 
-			if ( colourCode.startsWith( "0x2" ) ) {
+			if ( colourCode.startsWith( '0x2' ) ) {
 
 				// Special 'direct' material value (RGB colour)
 
 				var colour = colourCode.substring( 3 );
 
-				return this.parseColourMetaDirective( new LineParser( "Direct_Color_" + colour + " CODE -1 VALUE #" + colour + " EDGE #" + colour + "" ) );
+				return this.parseColourMetaDirective( new LineParser( 'Direct_Color_' + colour + ' CODE -1 VALUE #' + colour + ' EDGE #' + colour + '' ) );
 
 			}
 
@@ -802,7 +804,7 @@ var LDrawLoader = ( function () {
 			var name = lineParser.getToken();
 			if ( ! name ) {
 
-				throw 'LDrawLoader: Material name was expected after "!COLOUR tag' + lineParser.getLineNumberString() + ".";
+				throw 'LDrawLoader: Material name was expected after "!COLOUR tag' + lineParser.getLineNumberString() + '.';
 
 			}
 
@@ -820,12 +822,12 @@ var LDrawLoader = ( function () {
 
 				switch ( token.toUpperCase() ) {
 
-					case "CODE":
+					case 'CODE':
 
 						code = lineParser.getToken();
 						break;
 
-					case "VALUE":
+					case 'VALUE':
 
 						colour = lineParser.getToken();
 						if ( colour.startsWith( '0x' ) ) {
@@ -834,13 +836,13 @@ var LDrawLoader = ( function () {
 
 						} else if ( ! colour.startsWith( '#' ) ) {
 
-							throw 'LDrawLoader: Invalid colour while parsing material' + lineParser.getLineNumberString() + ".";
+							throw 'LDrawLoader: Invalid colour while parsing material' + lineParser.getLineNumberString() + '.';
 
 						}
 
 						break;
 
-					case "EDGE":
+					case 'EDGE':
 
 						edgeColour = lineParser.getToken();
 						if ( edgeColour.startsWith( '0x' ) ) {
@@ -853,7 +855,7 @@ var LDrawLoader = ( function () {
 							edgeMaterial = this.getMaterial( edgeColour );
 							if ( ! edgeMaterial ) {
 
-								throw 'LDrawLoader: Invalid edge colour while parsing material' + lineParser.getLineNumberString() + ".";
+								throw 'LDrawLoader: Invalid edge colour while parsing material' + lineParser.getLineNumberString() + '.';
 
 							}
 
@@ -870,7 +872,7 @@ var LDrawLoader = ( function () {
 
 						if ( isNaN( alpha ) ) {
 
-							throw 'LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + ".";
+							throw 'LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + '.';
 
 						}
 
@@ -890,7 +892,7 @@ var LDrawLoader = ( function () {
 
 						if ( isNaN( luminance ) ) {
 
-							throw 'LDrawLoader: Invalid luminance value in material definition' + LineParser.getLineNumberString() + ".";
+							throw 'LDrawLoader: Invalid luminance value in material definition' + LineParser.getLineNumberString() + '.';
 
 						}
 
@@ -924,7 +926,7 @@ var LDrawLoader = ( function () {
 						break;
 
 					default:
-						throw 'LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + ".";
+						throw 'LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + '.';
 						break;
 
 				}
@@ -1009,21 +1011,25 @@ var LDrawLoader = ( function () {
 					depthWrite: ! isTransparent
 				} );
 				edgeMaterial.userData.code = code;
-				edgeMaterial.name = name + " - Edge";
+				edgeMaterial.name = name + ' - Edge';
 				edgeMaterial.userData.canHaveEnvMap = false;
 
 				// This is the material used for conditional edges
 				edgeMaterial.userData.conditionalEdgeMaterial = new ShaderMaterial( {
 					vertexShader: conditionalLineVertShader,
 					fragmentShader: conditionalLineFragShader,
-					uniforms: {
-						diffuse: {
-							value: new Color( edgeColour )
-						},
-						opacity: {
-							value: alpha
+					uniforms: UniformsUtils.merge( [
+						UniformsLib.fog,
+						{
+							diffuse: {
+								value: new Color( edgeColour )
+							},
+							opacity: {
+								value: alpha
+							}
 						}
-					},
+					] ),
+					fog: true,
 					transparent: isTransparent,
 					depthWrite: ! isTransparent
 				} );
@@ -1369,7 +1375,7 @@ var LDrawLoader = ( function () {
 							0, 0, 0, 1
 						);
 
-						var fileName = lp.getRemainingString().trim().replace( /\\/g, "/" );
+						var fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
 
 						if ( scope.fileMap[ fileName ] ) {
 
@@ -1875,7 +1881,7 @@ var LDrawLoader = ( function () {
 						break;
 
 					case LDrawLoader.FILE_LOCATION_TRY_RELATIVE:
-						subobjectURL = url.substring( 0, url.lastIndexOf( "/" ) + 1 ) + subobjectURL;
+						subobjectURL = url.substring( 0, url.lastIndexOf( '/' ) + 1 ) + subobjectURL;
 						newLocationState = subobject.locationState + 1;
 						break;
 

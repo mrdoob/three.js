@@ -13,7 +13,7 @@
 		<div id="panel">
 
 			<div id="header">
-				<h1><a href="http://threejs.org">three.js</a></h1>
+				<h1><a href="https://threejs.org">three.js</a></h1>
 
 				<div id="sections">
 					<span class="selected">docs</span>
@@ -32,6 +32,7 @@
 					<select id="language">
 						<option value="en">en</option>
 						<option value="ar">ar</option>
+						<option value="ko">한국어</option>
 						<option value="zh">中文</option>
 					</select>
 				</div>
@@ -64,6 +65,14 @@
 
 			const list = await ( await fetch( 'list.json' ) ).json();
 
+			// *BufferGeometry to *Geometry
+
+			if ( /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
+
+				window.location.hash = window.location.hash.replace( 'BufferGeometry', 'Geometry' );
+
+			}
+
 			const hash = window.location.hash.substring( 1 );
 
 			// Localisation
@@ -72,7 +81,7 @@
 
 			if ( /^(api|manual|examples)/.test( hash ) ) {
 
-				const hashLanguage = /^(api|manual|examples)\/(en|ar|zh)\//.exec( hash );
+				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh)\//.exec( hash );
 
 				if ( hashLanguage === null ) {
 

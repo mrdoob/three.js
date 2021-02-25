@@ -16,7 +16,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 	this.supportsNormalTexture = ( useNormals !== undefined ) ? useNormals : false;
 
 	this.originalClearColor = new THREE.Color();
-	this.oldClearColor = new THREE.Color();
+	this._oldClearColor = new THREE.Color();
 	this.oldClearAlpha = 1;
 
 	this.params = {
@@ -53,8 +53,6 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 
 		var depthTexture = new THREE.DepthTexture();
 		depthTexture.type = THREE.UnsignedShortType;
-		depthTexture.minFilter = THREE.NearestFilter;
-		depthTexture.maxFilter = THREE.NearestFilter;
 
 		this.beautyRenderTarget.depthTexture = depthTexture;
 		this.beautyRenderTarget.depthBuffer = true;
@@ -192,7 +190,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 
 		}
 
-		this.oldClearColor.copy( renderer.getClearColor() );
+		renderer.getClearColor( this._oldClearColor );
 		this.oldClearAlpha = renderer.getClearAlpha();
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
@@ -303,7 +301,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		// Rendering SAOPass result on top of previous pass
 		this.renderPass( renderer, outputMaterial, this.renderToScreen ? null : readBuffer );
 
-		renderer.setClearColor( this.oldClearColor, this.oldClearAlpha );
+		renderer.setClearColor( this._oldClearColor, this.oldClearAlpha );
 		renderer.autoClear = oldAutoClear;
 
 	},
@@ -311,7 +309,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 	renderPass: function ( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
-		this.originalClearColor.copy( renderer.getClearColor() );
+		renderer.getClearColor( this.originalClearColor );
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
@@ -339,7 +337,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 
 	renderOverride: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
-		this.originalClearColor.copy( renderer.getClearColor() );
+		renderer.getClearColor( this.originalClearColor );
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
