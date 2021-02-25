@@ -2261,6 +2261,21 @@ THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 
 	}
 
+	if ( uvs ) {
+
+		var uvlen = uvs.length;
+		for ( s = 1; s <= steps; s ++ ) {
+
+			for ( i = 0; i < uvlen; i += 2 ) {
+
+				uvs.push( uvs[ i ], uvs[ i + 1 ] );
+
+			}
+
+		}
+
+	}
+
 	// Bottom faces
 	for ( i = 0; i < flen; i += 3 ) {
 
@@ -2283,6 +2298,32 @@ THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 		addWall( i + 2, i );
 
 	}
+
+	var geometry = new THREE.BufferGeometry();
+	geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+	if ( uvs ) {
+
+		var uvlen = uvs.length;
+		for ( s = 1; s <= steps; s ++ ) {
+
+			for ( i = 0; i < uvlen; i += 2 ) {
+
+				uvs.push( uvs[ i ], uvs[ i + 1 ] );
+
+			}
+
+		}
+
+		geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+
+	}
+
+	geometry.computeVertexNormals();
+	geometry.setIndex( indices );
+
+	return geometry;
+
 
 	function addWall( j, k ) {
 
@@ -2314,12 +2355,5 @@ THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 		}
 
 	}
-
-	var geometry = new THREE.BufferGeometry();
-	geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-	geometry.computeVertexNormals();
-	geometry.setIndex( indices );
-
-	return geometry;
 
 };
