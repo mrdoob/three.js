@@ -1021,6 +1021,8 @@ var MMDAnimationHelper = ( function () {
 		 */
 		update: function () {
 
+			var quaternion = new Quaternion();
+
 			return function (isRecursion = false) {
 
 				var bones = this.mesh.skeleton.bones;
@@ -1053,9 +1055,17 @@ var MMDAnimationHelper = ( function () {
 
 						if ( grant.affectRotation ) {
 
-							if(isRecursion && bone.userData.hasIK) continue;
+							if( isRecursion && bone.userData.hasIK ) continue;
 
-							bone.quaternion.slerp( parentBone.quaternion, grant.ratio );
+							if( isRecursion || bone.userData.hasIK ) {
+
+								quaternion.set( 0, 0, 0, 1 );
+								quaternion.slerp( parentBone.quaternion, grant.ratio );
+								quaternion.multiply(bone.quaternion);
+
+								bone.quaternion.copy(quaternion);
+
+							}
 
 						}
 
