@@ -1016,13 +1016,12 @@ var MMDAnimationHelper = ( function () {
 		constructor: GrantSolver,
 
 		/**
+		 * @param {boolean} isRecursion
 		 * @return {GrantSolver}
 		 */
 		update: function () {
 
-			var quaternion = new Quaternion();
-
-			return function () {
+			return function (isRecursion = false) {
 
 				var bones = this.mesh.skeleton.bones;
 				var grants = this.grants;
@@ -1054,18 +1053,22 @@ var MMDAnimationHelper = ( function () {
 
 						if ( grant.affectRotation ) {
 
-							quaternion.set( 0, 0, 0, 1 );
-							quaternion.slerp( parentBone.quaternion, grant.ratio );
-							bone.quaternion.multiply( quaternion );
+							if(isRecursion && bone.userData.hasIK) continue;
 
-							if(bone.userData.hasIK) {
-								this.mesh.updateMatrixWorld( true );
-								this.CCDIKSolver.update();
-							}
+							bone.quaternion.slerp( parentBone.quaternion, grant.ratio );
 
 						}
 
 					}
+
+				}
+
+				if( !isRecursion ) {
+
+					this.mesh.updateMatrixWorld( true );
+					this.CCDIKSolver.update();
+
+					this.update(true);
 
 				}
 
