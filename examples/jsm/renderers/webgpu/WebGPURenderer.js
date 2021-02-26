@@ -136,8 +136,8 @@ class WebGPURenderer {
 
 		}
 
-		this._parameters.extensions = ( parameters.extensions === undefined ) ? [] : parameters.extensions;
-		this._parameters.limits = ( parameters.limits === undefined ) ? {} : parameters.limits;
+		this._parameters.nonGuaranteedFeatures = ( parameters.nonGuaranteedFeatures === undefined ) ? [] : parameters.nonGuaranteedFeatures;
+		this._parameters.nonGuaranteedLimits = ( parameters.nonGuaranteedLimits === undefined ) ? {} : parameters.nonGuaranteedLimits;
 
 	}
 
