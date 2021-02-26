@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,9 +16,9 @@
 			It can also be used directly to load any file type that does not have a loader.
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 		<code>
-		var loader = new THREE.FileLoader();
+		const loader = new THREE.FileLoader();
 
 		//load a text file and output the result to the console
 		loader.load(
@@ -69,17 +68,8 @@
 			See [page:.setMimeType]. Default is *undefined*.
 		</p>
 
-		<h3>[property:Object requestHeader]</h3>
-		<p>The [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request. See [page:.setRequestHeader]. Default is *undefined*.</p>
-
 		<h3>[property:String responseType]</h3>
 		<p>The expected response type. See [page:.setResponseType]. Default is *undefined*.</p>
-
-		<h3>[property:String withCredentials]</h3>
-		<p>
-			Whether the XMLHttpRequest uses credentials. See [page:.setWithCredentials].
-			Default is *undefined*.
-		</p>
 
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
@@ -102,13 +92,6 @@
 			of the file being loaded. Note that in many cases this will be determined automatically, so by default it is *undefined*.
 		</p>
 
-		<h3>[method:FileLoader setRequestHeader]( [param:Object requestHeader] )</h3>
-		<p>
-			[page:object requestHeader] - key: The name of the header whose value is to be set. value: The value to set as the body of the header.<br /><br />
-
-			Set the [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request.
-		</p>
-
 		<h3>[method:FileLoader setResponseType]( [param:String responseType] )</h3>
 		<p>
 			Change the response type. Valid values are:<br />
@@ -117,13 +100,6 @@
 			[page:String blob] - returns the data as a [link:https://developer.mozilla.org/en/docs/Web/API/Blob Blob].<br />
 			[page:String document] - parses the file using the [link:https://developer.mozilla.org/en-US/docs/Web/API/DOMParser DOMParser].<br />
 			[page:String json] - parses the file using [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse JSON.parse].<br />
-		</p>
-
-		<h3>[method:FileLoader setWithCredentials]( [param:Boolean value] )</h3>
-		<p>
-			Whether the XMLHttpRequest uses credentials such as cookies, authorization headers or
-			TLS client certificates. See [link:https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials XMLHttpRequest.withCredentials].<br />
-			Note that this has no effect if you are loading files locally or from the same domain.
 		</p>
 
 

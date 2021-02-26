@@ -1,21 +1,17 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 import {
 	Clock,
 	LinearFilter,
 	Mesh,
 	OrthographicCamera,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	RGBAFormat,
 	Vector2,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
-import { CopyShader } from "../shaders/CopyShader.js";
-import { ShaderPass } from "../postprocessing/ShaderPass.js";
-import { MaskPass } from "../postprocessing/MaskPass.js";
-import { ClearMaskPass } from "../postprocessing/MaskPass.js";
+} from '../../../build/three.module.js';
+import { CopyShader } from '../shaders/CopyShader.js';
+import { ShaderPass } from '../postprocessing/ShaderPass.js';
+import { MaskPass } from '../postprocessing/MaskPass.js';
+import { ClearMaskPass } from '../postprocessing/MaskPass.js';
 
 var EffectComposer = function ( renderer, renderTarget ) {
 
@@ -26,8 +22,7 @@ var EffectComposer = function ( renderer, renderTarget ) {
 		var parameters = {
 			minFilter: LinearFilter,
 			magFilter: LinearFilter,
-			format: RGBAFormat,
-			stencilBuffer: false
+			format: RGBAFormat
 		};
 
 		var size = renderer.getSize( new Vector2() );
@@ -97,6 +92,19 @@ Object.assign( EffectComposer.prototype, {
 	insertPass: function ( pass, index ) {
 
 		this.passes.splice( index, 0, pass );
+		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
+
+	},
+
+	removePass: function ( pass ) {
+
+		const index = this.passes.indexOf( pass );
+
+		if ( index !== - 1 ) {
+
+			this.passes.splice( index, 1 );
+
+		}
 
 	},
 
@@ -268,7 +276,7 @@ Object.assign( Pass.prototype, {
 Pass.FullScreenQuad = ( function () {
 
 	var camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	var geometry = new PlaneBufferGeometry( 2, 2 );
+	var geometry = new PlaneGeometry( 2, 2 );
 
 	var FullScreenQuad = function ( material ) {
 
@@ -293,6 +301,12 @@ Pass.FullScreenQuad = ( function () {
 	} );
 
 	Object.assign( FullScreenQuad.prototype, {
+
+		dispose: function () {
+
+			this._mesh.geometry.dispose();
+
+		},
 
 		render: function ( renderer ) {
 

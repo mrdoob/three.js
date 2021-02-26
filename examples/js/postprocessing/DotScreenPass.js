@@ -1,21 +1,17 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 THREE.DotScreenPass = function ( center, angle, scale ) {
 
 	THREE.Pass.call( this );
 
 	if ( THREE.DotScreenShader === undefined )
-		console.error( "THREE.DotScreenPass relies on THREE.DotScreenShader" );
+		console.error( 'THREE.DotScreenPass relies on THREE.DotScreenShader' );
 
 	var shader = THREE.DotScreenShader;
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-	if ( center !== undefined ) this.uniforms[ "center" ].value.copy( center );
-	if ( angle !== undefined ) this.uniforms[ "angle" ].value = angle;
-	if ( scale !== undefined ) this.uniforms[ "scale" ].value = scale;
+	if ( center !== undefined ) this.uniforms[ 'center' ].value.copy( center );
+	if ( angle !== undefined ) this.uniforms[ 'angle' ].value = angle;
+	if ( scale !== undefined ) this.uniforms[ 'scale' ].value = scale;
 
 	this.material = new THREE.ShaderMaterial( {
 
@@ -35,8 +31,8 @@ THREE.DotScreenPass.prototype = Object.assign( Object.create( THREE.Pass.prototy
 
 	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
-		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
-		this.uniforms[ "tSize" ].value.set( readBuffer.width, readBuffer.height );
+		this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
+		this.uniforms[ 'tSize' ].value.set( readBuffer.width, readBuffer.height );
 
 		if ( this.renderToScreen ) {
 

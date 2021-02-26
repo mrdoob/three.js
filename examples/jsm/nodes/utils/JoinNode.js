@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
@@ -20,7 +16,7 @@ function JoinNode( x, y, z, w ) {
 
 JoinNode.prototype = Object.create( TempNode.prototype );
 JoinNode.prototype.constructor = JoinNode;
-JoinNode.prototype.nodeType = "Join";
+JoinNode.prototype.nodeType = 'Join';
 
 JoinNode.prototype.getNumElements = function () {
 

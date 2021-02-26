@@ -3,16 +3,15 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
 		<h1>[name]</h1>
 
-		<p class="desc">Creates a torus knot, the particular shape of which is defined by a pair of coprime integers, p and q.  If p and q are not coprime, the result will be a torus link.</p>
+		<p class="desc">Creates a torus knot, the particular shape of which is defined by a pair of coprime integers, p and q. If p and q are not coprime, the result will be a torus link.</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#TorusKnotGeometry"></iframe>
 
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -32,11 +31,11 @@
 
 		</script>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
-		<code>var geometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
-		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-		var torusKnot = new THREE.Mesh( geometry, material );
+		<code>const geometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const torusKnot = new THREE.Mesh( geometry, material );
 		scene.add( torusKnot );
 		</code>
 
@@ -55,16 +54,15 @@
 		</p>
 
 		<h2>Properties</h2>
-		<p>See the base [page:Geometry] class for common properties.</p>
+		<p>See the base [page:BufferGeometry] class for common properties.</p>
 
-		<h3>.parameters</h3>
+		<h3>[property:Object parameters]</h3>
 		<p>
 		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
 		</p>
 
 		<h2>Methods</h2>
-		<p>See the base [page:Geometry] class for common methods.</p>
-
+		<p>See the base [page:BufferGeometry] class for common methods.</p>
 
 		<h2>Source</h2>
 

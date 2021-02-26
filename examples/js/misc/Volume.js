@@ -4,7 +4,6 @@
  * For now it only handles 3 dimensional data.
  * See the webgl_loader_nrrd.html example and the loaderNRRD.js file to see how to use this class.
  * @class
- * @author Valentin Demeusy / https://github.com/stity
  * @param   {number}        xLength         Width of the volume
  * @param   {number}        yLength         Length of the volume
  * @param   {number}        zLength         Depth of the volume
@@ -357,15 +356,24 @@ THREE.Volume.prototype = {
 			return Math.abs( x.dot( base[ 2 ] ) ) > 0.9;
 
 		} );
-		var argumentsWithInversion = [ 'volume.xLength-1-', 'volume.yLength-1-', 'volume.zLength-1-' ];
-		var argArray = [ iDirection, jDirection, kDirection ].map( function ( direction, n ) {
 
-			return ( direction.dot( base[ n ] ) > 0 ? '' : argumentsWithInversion[ n ] ) + ( direction === axisInIJK ? 'IJKIndex' : direction.argVar );
+		sliceAccess = function ( i, j ) {
 
-		} );
-		var argString = argArray.join( ',' );
-		sliceAccess = eval( '(function sliceAccess (i,j) {return volume.access( ' + argString + ');})' );
+			var accessI, accessJ, accessK;
 
+			var si = ( iDirection === axisInIJK ) ? IJKIndex : ( iDirection.argVar === 'i' ? i : j );
+			var sj = ( jDirection === axisInIJK ) ? IJKIndex : ( jDirection.argVar === 'i' ? i : j );
+			var sk = ( kDirection === axisInIJK ) ? IJKIndex : ( kDirection.argVar === 'i' ? i : j );
+
+			// invert indices if necessary
+
+			var accessI = ( iDirection.dot( base[ 0 ] ) > 0 ) ? si : ( volume.xLength - 1 ) - si;
+			var accessJ = ( jDirection.dot( base[ 1 ] ) > 0 ) ? sj : ( volume.yLength - 1 ) - sj;
+			var accessK = ( kDirection.dot( base[ 2 ] ) > 0 ) ? sk : ( volume.zLength - 1 ) - sk;
+
+			return volume.access( accessI, accessJ, accessK );
+
+		};
 
 		return {
 			iLength: iLength,
@@ -426,6 +434,7 @@ THREE.Volume.prototype = {
 		var datasize = this.data.length;
 
 		var i = 0;
+
 		for ( i = 0; i < datasize; i ++ ) {
 
 			if ( ! isNaN( this.data[ i ] ) ) {
@@ -437,6 +446,7 @@ THREE.Volume.prototype = {
 			}
 
 		}
+
 		this.min = min;
 		this.max = max;
 

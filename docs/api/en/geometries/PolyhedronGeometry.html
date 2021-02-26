@@ -3,28 +3,29 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
 		<h1>[name]</h1>
 
 		<p class="desc">
 			A polyhedron is a solid in three dimensions with flat faces. This class will take an array of vertices,
-			project them onto a sphere, and then divide them up to the desired level of detail.
+			project them onto a sphere, and then divide them up to the desired level of detail. This class is used
+			by [page:DodecahedronGeometry], [page:IcosahedronGeometry], [page:OctahedronGeometry],
+			and [page:TetrahedronGeometry] to generate their respective geometries.
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 <code>
-var verticesOfCube = [
+const verticesOfCube = [
     -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
     -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
 ];
 
-var indicesOfFaces = [
+const indicesOfFaces = [
     2,1,0,    0,3,2,
     0,4,7,    7,3,0,
     0,1,5,    5,4,0,
@@ -33,7 +34,7 @@ var indicesOfFaces = [
     4,5,6,    6,7,4
 ];
 
-var geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
+const geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
 </code>
 
 		<h2>Constructor</h2>
@@ -48,7 +49,7 @@ var geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 
 		</p>
 
 		<h2>Properties</h2>
-		<p>See the base [page:Geometry] class for common properties.</p>
+		<p>See the base [page:BufferGeometry] class for common properties.</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
@@ -56,7 +57,7 @@ var geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 
 		</p>
 
 		<h2>Methods</h2>
-		<p>See the base [page:Geometry] class for common methods.</p>
+		<p>See the base [page:BufferGeometry] class for common methods.</p>
 
 		<h2>Source</h2>
 

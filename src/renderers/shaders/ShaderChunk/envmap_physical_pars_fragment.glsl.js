@@ -31,8 +31,7 @@ export default /* glsl */`
 
 		#elif defined( ENVMAP_TYPE_CUBE_UV )
 
-			vec3 queryVec = vec3( flipEnvMap * worldNormal.x, worldNormal.yz );
-			vec4 envMapColor = textureCubeUV( envMap, queryVec, 1.0 );
+			vec4 envMapColor = textureCubeUV( envMap, worldNormal, 1.0 );
 
 		#else
 
@@ -61,14 +60,14 @@ export default /* glsl */`
 
 		#ifdef ENVMAP_MODE_REFLECTION
 
-		  vec3 reflectVec = reflect( -viewDir, normal );
+			vec3 reflectVec = reflect( -viewDir, normal );
 
-		  // Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
-		  reflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );
+			// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
+			reflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );
 
 		#else
 
-		  vec3 reflectVec = refract( -viewDir, normal, refractionRatio );
+			vec3 reflectVec = refract( -viewDir, normal, refractionRatio );
 
 		#endif
 
@@ -94,42 +93,7 @@ export default /* glsl */`
 
 		#elif defined( ENVMAP_TYPE_CUBE_UV )
 
-			vec3 queryReflectVec = vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
-			vec4 envMapColor = textureCubeUV( envMap, queryReflectVec, roughness );
-
-		#elif defined( ENVMAP_TYPE_EQUIREC )
-
-			vec2 sampleUV;
-			sampleUV.y = asin( clamp( reflectVec.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;
-			sampleUV.x = atan( reflectVec.z, reflectVec.x ) * RECIPROCAL_PI2 + 0.5;
-
-			#ifdef TEXTURE_LOD_EXT
-
-				vec4 envMapColor = texture2DLodEXT( envMap, sampleUV, specularMIPLevel );
-
-			#else
-
-				vec4 envMapColor = texture2D( envMap, sampleUV, specularMIPLevel );
-
-			#endif
-
-			envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
-
-		#elif defined( ENVMAP_TYPE_SPHERE )
-
-			vec3 reflectView = normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0,0.0,1.0 ) );
-
-			#ifdef TEXTURE_LOD_EXT
-
-				vec4 envMapColor = texture2DLodEXT( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );
-
-			#else
-
-				vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );
-
-			#endif
-
-			envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
+			vec4 envMapColor = textureCubeUV( envMap, reflectVec, roughness );
 
 		#endif
 

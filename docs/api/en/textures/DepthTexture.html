@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -13,13 +12,15 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		Creates a texture for use as a Depth Texture. Require support for the
-	[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/ WEBGL_depth_texture] extension.
+		This class can be used to automatically save the depth information of a rendering into a texture.
+		When using a WebGL 1 rendering context, [name] requires support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/ WEBGL_depth_texture] extension.
 		</p>
 
-		<h2>Example</h2>
+		<h2>Examples</h2>
 
-		[example:webgl_depth_texture depth / texture]
+		<p>
+			[example:webgl_depth_texture depth / texture]
+		</p>
 
 		<h2>Constructor</h2>
 		<h3>[name]( [param:Number width], [param:Number height], [param:Constant type], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Number anisotropy], [param:Constant format] )</h3>
@@ -29,11 +30,11 @@
 
 		[page:Number height] -- height of the texture.<br />
 
-		[page:Constant type] -- Default is [page:Textures THREE.UnsignedShortType].
+		[page:Constant type] -- Default is [page:Textures THREE.UnsignedShortType] when unsing [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using  [page:Textures DepthStencilFormat].
 		See [page:Textures type constants] for other choices.<br />
 
 		[page:Constant mapping] --
-		See [page:Textures type constants] for details.<br />
+		See [page:Textures mapping mode constants] for details.<br />
 
 		[page:Constant wrapS] -- The default is [page:Textures THREE.ClampToEdgeWrapping].
 		See [page:Textures wrap mode constants] for other choices.<br />
@@ -71,7 +72,7 @@
 
 		<h3>[page:Texture.type .type]</h3>
 		<p>
-		Default is [page:Textures THREE.UnsignedShortType].
+		Default is [page:Textures THREE.UnsignedShortType] when unsing [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using [page:Textures DepthStencilFormat].
 		See [page:Textures format constants] for details.<br />
 		</p>
 

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -45,9 +44,14 @@
 			How many values make up each item.
 		</p>
 
-		<h3>[property:Integer offset]</h3>
+		<h3>[property:String name]</h3>
 		<p>
-			The offset in the underlying array buffer where an item starts.
+		Optional name for this attribute instance. Default is an empty string.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+			Default is *false*. Setting this to *true* will send the entire interleaved buffer (not just the specific attribute data) to the GPU again.
 		</p>
 
 		<h3>[property:Boolean normalized]</h3>
@@ -55,12 +59,15 @@
 			Default is *false*.
 		</p>
 
-		<h3>[property:Boolean isInterleavedBufferAttribute]</h3>
+		<h3>[property:Integer offset]</h3>
 		<p>
-			Default is *true*.
+			The offset in the underlying array buffer where an item starts.
 		</p>
 
 		<h2>Methods</h2>
+
+		<h3>[method:this applyMatrix4]( [param:Matrix4 m] )</h3>
+		<p>Applies matrix [page:Matrix4 m] to every Vector3 element of this InterleavedBufferAttribute.</p>
 
 		<h3>[method:Number getX]( [param:Integer index] ) </h3>
 		<p>Returns the x component of the item at the given index.</p>

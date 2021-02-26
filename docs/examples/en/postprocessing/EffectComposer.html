@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -56,7 +55,7 @@
 
 		<h2>Properties</h2>
 
-		<h3>[property:Boolean passes]</h3>
+		<h3>[property:Array passes]</h3>
 		<p>
 			An array representing the (ordered) chain of post-processing passes.
 		</p>
@@ -100,13 +99,21 @@
 			Inserts the given pass into the pass chain at the given index.
 		</p>
 
-		<h3>[method:boolean isLastEnabledPass]( [param:Integer passIndex] )</h3>
+		<h3>[method:Boolean isLastEnabledPass]( [param:Integer passIndex] )</h3>
 
 		<p>
 			passIndex -- The pass to check.<br /><br />
 
 			Returns true if the pass for the given index is the last enabled pass in the pass chain.
 			Used by [name] to determine when a pass should be rendered to screen.
+		</p>
+
+		<h3>[method:void removePass]( [param:Pass pass] )</h3>
+
+		<p>
+			pass -- The pass to remove from the pass chain.<br /><br />
+
+			Removes the given pass from the pass chain.
 		</p>
 
 		<h3>[method:void render]( [param:Float deltaTime] )</h3>
@@ -130,7 +137,7 @@
 		<p>
 			pixelRatio -- The device pixel ratio.<br /><br />
 
-			Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output.
+			Sets device pixel ratio. This is usually used for HiDPI device to prevent blurring output.
 				Thus, the semantic of the method is similar to [page:WebGLRenderer.setPixelRatio]().
 		</p>
 
@@ -151,7 +158,7 @@
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/postprocessing/EffectComposer.js examples/js/postprocessing/EffectComposer.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/EffectComposer.js examples/jsm/postprocessing/EffectComposer.js]
 		</p>
 	</body>
 </html>

@@ -1,7 +1,9 @@
 export default /* glsl */`
+float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
+
 #ifdef FLAT_SHADED
 
-	// Workaround for Adreno/Nexus5 not able able to do dFdx( vViewPosition ) ...
+	// Workaround for Adreno GPUs not able to do dFdx( vViewPosition )
 
 	vec3 fdx = vec3( dFdx( vViewPosition.x ), dFdx( vViewPosition.y ), dFdx( vViewPosition.z ) );
 	vec3 fdy = vec3( dFdy( vViewPosition.x ), dFdy( vViewPosition.y ), dFdy( vViewPosition.z ) );
@@ -13,7 +15,7 @@ export default /* glsl */`
 
 	#ifdef DOUBLE_SIDED
 
-		normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+		normal = normal * faceDirection;
 
 	#endif
 
@@ -24,8 +26,14 @@ export default /* glsl */`
 
 		#ifdef DOUBLE_SIDED
 
-			tangent = tangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-			bitangent = bitangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+			tangent = tangent * faceDirection;
+			bitangent = bitangent * faceDirection;
+
+		#endif
+
+		#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP )
+
+			mat3 vTBN = mat3( tangent, bitangent, normal );
 
 		#endif
 

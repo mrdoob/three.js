@@ -1,58 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
-		<h1>[name]</h1>
+		<h1>凸包几何体（[name]）</h1>
 
-		<p class="desc">[name] can be used to generate a convex hull for a given array of 3D points.
-			The average time complexity for this task is considered to be O(nlog(n)).</p>
+		<p class="desc">[name] 可被用于为传入的一组点生成凸包。
+			该任务的平均时间复杂度被认为是O(nlog(n))。</p>
 
-		<script>
+		<h2>代码示例</h2>
 
-		// iOS iframe auto-resize workaround
-
-		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
-
-			var scene = document.getElementById( 'scene' );
-
-			scene.style.width = getComputedStyle( scene ).width;
-			scene.style.height = getComputedStyle( scene ).height;
-			scene.setAttribute( 'scrolling', 'no' );
-
-		}
-
-		</script>
-
-		<h2>Example</h2>
-
-		<p>[example:webgl_geometry_convex geometry / convex ]</p>
-
-		<code>var geometry = new THREE.ConvexGeometry( points );
-		var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-		var mesh = new THREE.Mesh( geometry, material );
+		<code>const geometry = new ConvexGeometry( points );
+		const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+		const mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:webgl_geometry_convex geometry / convex ]</p>
 
 		<h2>Constructor</h2>
 
 		<h3>[name]( [param:Array points] )</h3>
 		<p>
-		points — Array of [page:Vector3 Vector3s] that the resulting convex hull will contain.
+		points — 所得凸包中将包含的一组[page:Vector3 Vector3]。
 		</p>
 
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/geometries/ConvexGeometry.js examples/js/geometries/ConvexGeometry.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/geometries/ConvexGeometry.js examples/jsm/geometries/ConvexGeometry.js]
 		</p>
 	</body>
 </html>

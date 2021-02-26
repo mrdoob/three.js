@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from './TempNode.js';
 
 var declarationRegexp = /^struct\s*([a-z_0-9]+)\s*{\s*((.|\n)*?)}/img,
@@ -17,7 +13,7 @@ function StructNode( src ) {
 
 StructNode.prototype = Object.create( TempNode.prototype );
 StructNode.prototype.constructor = StructNode;
-StructNode.prototype.nodeType = "Struct";
+StructNode.prototype.nodeType = 'Struct';
 
 StructNode.prototype.getType = function ( builder ) {
 

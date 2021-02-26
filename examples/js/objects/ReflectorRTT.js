@@ -1,7 +1,3 @@
-/**
- * RTT version
- */
-
 THREE.ReflectorRTT = function ( geometry, options ) {
 
 	THREE.Reflector.call( this, geometry, options );

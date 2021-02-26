@@ -1,6 +1,4 @@
 /**
- * @author yomboprime / https://github.com/yomboprime/
- *
  * LDraw object packer
  *
  * Usage:
@@ -174,7 +172,7 @@ function parseObject( fileName, isRoot ) {
 
 	}
 
-	var objectPath = path.join( prefix, fileName );
+	var objectPath = path.join( prefix, fileName ).trim().replace( /\\/g, '/' );
 
 	if ( ! objectContent ) {
 
@@ -222,7 +220,7 @@ function parseObject( fileName, isRoot ) {
 
 			// Embedded object was found, add to path map
 
-			var subobjectFileName = line.substring( charIndex ).trim().replace( "\\", "/" );
+			var subobjectFileName = line.substring( charIndex ).trim().replace( /\\/g, '/' );
 
 			if ( subobjectFileName ) {
 
@@ -263,7 +261,7 @@ function parseObject( fileName, isRoot ) {
 
 			}
 
-			var subobjectFileName = line.substring( charIndex ).trim().replace( "\\", "/" );
+			var subobjectFileName = line.substring( charIndex ).trim().replace( /\\/g, '/' );
 
 			if ( subobjectFileName ) {
 

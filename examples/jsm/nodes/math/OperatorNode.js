@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 
 function OperatorNode( a, b, op ) {
@@ -21,7 +17,7 @@ OperatorNode.DIV = '/';
 
 OperatorNode.prototype = Object.create( TempNode.prototype );
 OperatorNode.prototype.constructor = OperatorNode;
-OperatorNode.prototype.nodeType = "Operator";
+OperatorNode.prototype.nodeType = 'Operator';
 
 OperatorNode.prototype.getType = function ( builder ) {
 

@@ -1,15 +1,11 @@
-/*
- *  three.js NRRD file loader
- */
-
 import {
 	FileLoader,
 	Loader,
 	Matrix4,
 	Vector3
-} from "../../../build/three.module.js";
-import { Zlib } from "../libs/gunzip.module.min.js";
-import { Volume } from "../misc/Volume.js";
+} from '../../../build/three.module.js';
+import * as fflate from '../libs/fflate.module.min.js';
+import { Volume } from '../misc/Volume.js';
 
 var NRRDLoader = function ( manager ) {
 
@@ -28,9 +24,29 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( data ) {
 
-			onLoad( scope.parse( data ) );
+			try {
+
+				onLoad( scope.parse( data ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -178,16 +194,19 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				}
 
 			}
+
 			if ( ! headerObject.isNrrd ) {
 
 				throw new Error( 'Not an NRRD file' );
 
 			}
+
 			if ( headerObject.encoding === 'bz2' || headerObject.encoding === 'bzip2' ) {
 
 				throw new Error( 'Bzip is not supported' );
 
 			}
+
 			if ( ! headerObject.vectors ) {
 
 				//if no space direction is set, let's use the identity
@@ -240,6 +259,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				parsingFunction = parseFloat;
 
 			}
+
 			for ( var i = start; i < end; i ++ ) {
 
 				value = data[ i ];
@@ -256,17 +276,20 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						resultIndex ++;
 
 					}
+
 					number = '';
 
 				}
 
 			}
+
 			if ( number !== '' ) {
 
 				result[ resultIndex ] = parsingFunction( number, base );
 				resultIndex ++;
 
 			}
+
 			return result;
 
 		}
@@ -290,16 +313,16 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
 
 		}
+
 		// parse the header
 		parseHeader( _header );
 
 		var _data = _bytes.subarray( _data_start ); // the data without header
-		if ( headerObject.encoding === 'gzip' || headerObject.encoding === 'gz' ) {
+		if ( headerObject.encoding.substring( 0, 2 ) === 'gz' ) {
 
 			// we need to decompress the datastream
 			// here we start the unzipping and get a typed Uint8Array back
-			var inflate = new Zlib.Gunzip( new Uint8Array( _data ) ); // eslint-disable-line no-undef
-			_data = inflate.decompress();
+			_data = fflate.gunzipSync( new Uint8Array( _data ) );// eslint-disable-line no-undef
 
 		} else if ( headerObject.encoding === 'ascii' || headerObject.encoding === 'text' || headerObject.encoding === 'txt' || headerObject.encoding === 'hex' ) {
 
@@ -319,6 +342,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			_data = _copy;
 
 		}
+
 		// .. let's use the underlying array buffer
 		_data = _data.buffer;
 
@@ -358,7 +382,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var _spaceY = 1;
 		var _spaceZ = 1;
 
-		if ( headerObject.space == "left-posterior-superior" ) {
+		if ( headerObject.space == 'left-posterior-superior' ) {
 
 			_spaceX = - 1;
 			_spaceY = - 1;
@@ -391,7 +415,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		}
 
 		volume.inverseMatrix = new Matrix4();
-		volume.inverseMatrix.getInverse( volume.matrix );
+		volume.inverseMatrix.copy( volume.matrix ).invert();
 		volume.RASDimensions = ( new Vector3( volume.xLength, volume.yLength, volume.zLength ) ).applyMatrix4( volume.matrix ).round().toArray().map( Math.abs );
 
 		// .. and set the default threshold
@@ -401,6 +425,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			volume.lowerThreshold = min;
 
 		}
+
 		if ( volume.upperThreshold === Infinity ) {
 
 			volume.upperThreshold = max;
@@ -419,6 +444,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			start = 0;
 
 		}
+
 		if ( end === undefined ) {
 
 			end = array.length;
@@ -523,12 +549,14 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var _i, _len, _ref, _results;
 				_ref = data.split( /\s+/ );
 				_results = [];
+
 				for ( _i = 0, _len = _ref.length; _i < _len; _i ++ ) {
 
 					i = _ref[ _i ];
 					_results.push( parseInt( i, 10 ) );
 
 				}
+
 				return _results;
 
 			} )();
@@ -543,7 +571,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		'space origin': function ( data ) {
 
-			return this.space_origin = data.split( "(" )[ 1 ].split( ")" )[ 0 ].split( "," );
+			return this.space_origin = data.split( '(' )[ 1 ].split( ')' )[ 0 ].split( ',' );
 
 		},
 
@@ -555,6 +583,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var _i, _len, _results;
 				_results = [];
+
 				for ( _i = 0, _len = parts.length; _i < _len; _i ++ ) {
 
 					v = parts[ _i ];
@@ -563,17 +592,20 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						var _j, _len2, _ref, _results2;
 						_ref = v.slice( 1, - 1 ).split( /,/ );
 						_results2 = [];
+
 						for ( _j = 0, _len2 = _ref.length; _j < _len2; _j ++ ) {
 
 							f = _ref[ _j ];
 							_results2.push( parseFloat( f ) );
 
 						}
+
 						return _results2;
 
 					} )() );
 
 				}
+
 				return _results;
 
 			} )();
@@ -594,6 +626,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					_results.push( parseFloat( f ) );
 
 				}
+
 				return _results;
 
 			} )();

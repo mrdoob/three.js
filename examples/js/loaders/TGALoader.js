@@ -1,9 +1,3 @@
-/**
- * @author Daosheng Mu / https://github.com/DaoshengMu/
- * @author mrdoob / http://mrdoob.com/
- * @author takahirox / https://github.com/takahirox/
- */
-
 THREE.TGALoader = function ( manager ) {
 
 	THREE.Loader.call( this, manager );
@@ -23,6 +17,7 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setPath( this.path );
+		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, function ( buffer ) {
 
@@ -58,6 +53,7 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						console.error( 'THREE.TGALoader: Invalid type colormap data for indexed type.' );
 
 					}
+
 					break;
 
 					// check colormap type
@@ -71,6 +67,7 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						console.error( 'THREE.TGALoader: Invalid type colormap data for colormap type.' );
 
 					}
+
 					break;
 
 					// What the need of a file without data ?
@@ -166,11 +163,13 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						// raw pixels
 
 						count *= pixel_size;
+
 						for ( i = 0; i < count; ++ i ) {
 
 							pixel_data[ shift + i ] = data[ offset ++ ];
 
 						}
+
 						shift += count;
 
 					}
@@ -532,11 +531,11 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		var imageData = context.createImageData( header.width, header.height );
 
 		var result = tgaParse( use_rle, use_pal, header, offset, content );
-		var rgbaData = getTgaRGBA( imageData.data, header.width, header.height, result.pixel_data, result.palettes );
+		getTgaRGBA( imageData.data, header.width, header.height, result.pixel_data, result.palettes );
 
 		context.putImageData( imageData, 0, 0 );
 
-		return useOffscreen ? canvas.transferToImageBitmap() : canvas;
+		return canvas;
 
 	}
 

@@ -1,17 +1,14 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 import {
 	Box3,
-	Math as _Math,
+	MathUtils,
 	MeshLambertMaterial,
 	Object3D,
 	TextureLoader,
-	UVMapping
-} from "../../../build/three.module.js";
-import { MD2Loader } from "../loaders/MD2Loader.js";
-import { MorphBlendMesh } from "../misc/MorphBlendMesh.js";
+	UVMapping,
+	sRGBEncoding
+} from '../../../build/three.module.js';
+import { MD2Loader } from '../loaders/MD2Loader.js';
+import { MorphBlendMesh } from '../misc/MorphBlendMesh.js';
 
 var MD2CharacterComplex = function () {
 
@@ -158,8 +155,8 @@ var MD2CharacterComplex = function () {
 
 		// SKINS
 
-		this.skinsBody = loadTextures( config.baseUrl + "skins/", config.skins );
-		this.skinsWeapon = loadTextures( config.baseUrl + "skins/", weaponsTextures );
+		this.skinsBody = loadTextures( config.baseUrl + 'skins/', config.skins );
+		this.skinsWeapon = loadTextures( config.baseUrl + 'skins/', weaponsTextures );
 
 		// BODY
 
@@ -353,13 +350,13 @@ var MD2CharacterComplex = function () {
 
 		if ( controls.crouch ) {
 
-			moveAnimation = animations[ "crouchMove" ];
-			idleAnimation = animations[ "crouchIdle" ];
+			moveAnimation = animations[ 'crouchMove' ];
+			idleAnimation = animations[ 'crouchIdle' ];
 
 		} else {
 
-			moveAnimation = animations[ "move" ];
-			idleAnimation = animations[ "idle" ];
+			moveAnimation = animations[ 'move' ];
+			idleAnimation = animations[ 'idle' ];
 
 		}
 
@@ -367,8 +364,8 @@ var MD2CharacterComplex = function () {
 
 		if ( controls.jump ) {
 
-			moveAnimation = animations[ "jump" ];
-			idleAnimation = animations[ "jump" ];
+			moveAnimation = animations[ 'jump' ];
+			idleAnimation = animations[ 'jump' ];
 
 		}
 
@@ -376,13 +373,13 @@ var MD2CharacterComplex = function () {
 
 			if ( controls.crouch ) {
 
-				moveAnimation = animations[ "crouchAttack" ];
-				idleAnimation = animations[ "crouchAttack" ];
+				moveAnimation = animations[ 'crouchAttack' ];
+				idleAnimation = animations[ 'crouchAttack' ];
 
 			} else {
 
-				moveAnimation = animations[ "attack" ];
-				idleAnimation = animations[ "attack" ];
+				moveAnimation = animations[ 'attack' ];
+				idleAnimation = animations[ 'attack' ];
 
 			}
 
@@ -462,8 +459,8 @@ var MD2CharacterComplex = function () {
 
 		this.maxReverseSpeed = - this.maxSpeed;
 
-		if ( controls.moveForward ) this.speed = _Math.clamp( this.speed + delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
-		if ( controls.moveBackward ) this.speed = _Math.clamp( this.speed - delta * this.backAcceleration, this.maxReverseSpeed, this.maxSpeed );
+		if ( controls.moveForward ) this.speed = MathUtils.clamp( this.speed + delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
+		if ( controls.moveBackward ) this.speed = MathUtils.clamp( this.speed - delta * this.backAcceleration, this.maxReverseSpeed, this.maxSpeed );
 
 		// orientation based on controls
 		// (don't just stand while turning)
@@ -473,14 +470,14 @@ var MD2CharacterComplex = function () {
 		if ( controls.moveLeft ) {
 
 			this.bodyOrientation += delta * this.angularSpeed;
-			this.speed = _Math.clamp( this.speed + dir * delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
+			this.speed = MathUtils.clamp( this.speed + dir * delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
 
 		}
 
 		if ( controls.moveRight ) {
 
 			this.bodyOrientation -= delta * this.angularSpeed;
-			this.speed = _Math.clamp( this.speed + dir * delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
+			this.speed = MathUtils.clamp( this.speed + dir * delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
 
 		}
 
@@ -491,12 +488,12 @@ var MD2CharacterComplex = function () {
 			if ( this.speed > 0 ) {
 
 				var k = exponentialEaseOut( this.speed / this.maxSpeed );
-				this.speed = _Math.clamp( this.speed - k * delta * this.frontDecceleration, 0, this.maxSpeed );
+				this.speed = MathUtils.clamp( this.speed - k * delta * this.frontDecceleration, 0, this.maxSpeed );
 
 			} else {
 
 				var k = exponentialEaseOut( this.speed / this.maxReverseSpeed );
-				this.speed = _Math.clamp( this.speed + k * delta * this.backAcceleration, this.maxReverseSpeed, 0 );
+				this.speed = MathUtils.clamp( this.speed + k * delta * this.backAcceleration, this.maxReverseSpeed, 0 );
 
 			}
 
@@ -527,6 +524,7 @@ var MD2CharacterComplex = function () {
 			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
 			textures[ i ].mapping = UVMapping;
 			textures[ i ].name = textureUrls[ i ];
+			textures[ i ].encoding = sRGBEncoding;
 
 		}
 

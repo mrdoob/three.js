@@ -1,6 +1,4 @@
 /**
- * @author technohippy / https://github.com/technohippy
- * @author Mugen87 / https://github.com/Mugen87
  *
  * 3D Manufacturing Format (3MF) specification: https://3mf.io/specification/
  *
@@ -14,6 +12,8 @@
  *
  * - Texture 2D
  * - Texture 2D Groups
+ * - Color Groups (Vertex Colors)
+ * - Metallic Display Properties (PBR)
  */
 
 THREE.ThreeMFLoader = function ( manager ) {
@@ -34,9 +34,29 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
-			onLoad( scope.parse( buffer ) );
+			try {
+
+				onLoad( scope.parse( buffer ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -68,20 +88,20 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			try {
 
-				zip = new JSZip( data ); // eslint-disable-line no-undef
+				zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
 
 			} catch ( e ) {
 
 				if ( e instanceof ReferenceError ) {
 
-					console.error( 'THREE.3MFLoader: jszip missing and file is compressed.' );
+					console.error( 'THREE.3MFLoader: fflate missing and file is compressed.' );
 					return null;
 
 				}
 
 			}
 
-			for ( file in zip.files ) {
+			for ( file in zip ) {
 
 				if ( file.match( /\_rels\/.rels$/ ) ) {
 
@@ -113,7 +133,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			//
 
-			var relsView = new Uint8Array( zip.file( relsName ).asArrayBuffer() );
+			var relsView = zip[ relsName ];
 			var relsFileText = THREE.LoaderUtils.decodeText( relsView );
 			rels = parseRelsXml( relsFileText );
 
@@ -121,7 +141,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			if ( modelRelsName ) {
 
-				var relsView = new Uint8Array( zip.file( modelRelsName ).asArrayBuffer() );
+				var relsView = zip[ modelRelsName ];
 				var relsFileText = THREE.LoaderUtils.decodeText( relsView );
 				modelRels = parseRelsXml( relsFileText );
 
@@ -132,7 +152,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 			for ( var i = 0; i < modelPartNames.length; i ++ ) {
 
 				var modelPart = modelPartNames[ i ];
-				var view = new Uint8Array( zip.file( modelPart ).asArrayBuffer() );
+				var view = zip[ modelPart ];
 
 				var fileText = THREE.LoaderUtils.decodeText( view );
 				var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
@@ -175,7 +195,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 			for ( var i = 0; i < texturesPartNames.length; i ++ ) {
 
 				var texturesPartName = texturesPartNames[ i ];
-				texturesParts[ texturesPartName ] = zip.file( texturesPartName ).asArrayBuffer();
+				texturesParts[ texturesPartName ] = zip[ texturesPartName ].buffer;
 
 			}
 
@@ -260,6 +280,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 				var basematerialNode = basematerialNodes[ i ];
 				var basematerialData = parseBasematerialNode( basematerialNode );
+				basematerialData.index = i; // the order and count of the material nodes form an implicit 0-based index
 				basematerialsData.basematerials.push( basematerialData );
 
 			}
@@ -283,7 +304,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		}
 
-		function parseTextures2DGroupNodes( texture2DGroupNode ) {
+		function parseTextures2DGroupNode( texture2DGroupNode ) {
 
 			var texture2DGroupData = {
 				id: texture2DGroupNode.getAttribute( 'id' ), // required
@@ -311,12 +332,71 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		}
 
+		function parseColorGroupNode( colorGroupNode ) {
+
+			var colorGroupData = {
+				id: colorGroupNode.getAttribute( 'id' ), // required
+				displaypropertiesid: colorGroupNode.getAttribute( 'displaypropertiesid' )
+			};
+
+			var colorNodes = colorGroupNode.querySelectorAll( 'color' );
+
+			var colors = [];
+			var colorObject = new THREE.Color();
+
+			for ( var i = 0; i < colorNodes.length; i ++ ) {
+
+				var colorNode = colorNodes[ i ];
+				var color = colorNode.getAttribute( 'color' );
+
+				colorObject.setStyle( color.substring( 0, 7 ) );
+				colorObject.convertSRGBToLinear(); // color is in sRGB
+
+				colors.push( colorObject.r, colorObject.g, colorObject.b );
+
+			}
+
+			colorGroupData[ 'colors' ] = new Float32Array( colors );
+
+			return colorGroupData;
+
+		}
+
+		function parseMetallicDisplaypropertiesNode( metallicDisplaypropetiesNode ) {
+
+			var metallicDisplaypropertiesData = {
+				id: metallicDisplaypropetiesNode.getAttribute( 'id' ) // required
+			};
+
+			var metallicNodes = metallicDisplaypropetiesNode.querySelectorAll( 'pbmetallic' );
+
+			var metallicData = [];
+
+			for ( var i = 0; i < metallicNodes.length; i ++ ) {
+
+				var metallicNode = metallicNodes[ i ];
+
+				metallicData.push( {
+					name: metallicNode.getAttribute( 'name' ), // required
+					metallicness: parseFloat( metallicNode.getAttribute( 'metallicness' ) ), // required
+					roughness: parseFloat( metallicNode.getAttribute( 'roughness' ) ) // required
+				} );
+
+			}
+
+			metallicDisplaypropertiesData.data = metallicData;
+
+			return metallicDisplaypropertiesData;
+
+		}
+
 		function parseBasematerialNode( basematerialNode ) {
 
 			var basematerialData = {};
 
 			basematerialData[ 'name' ] = basematerialNode.getAttribute( 'name' ); // required
 			basematerialData[ 'displaycolor' ] = basematerialNode.getAttribute( 'displaycolor' ); // required
+			basematerialData[ 'displaypropertiesid' ] = basematerialNode.getAttribute( 'displaypropertiesid' );
 
 			return basematerialData;
 
@@ -567,13 +647,39 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			//
 
+			resourcesData[ 'colorgroup' ] = {};
+			var colorGroupNodes = resourcesNode.querySelectorAll( 'colorgroup' );
+
+			for ( var i = 0; i < colorGroupNodes.length; i ++ ) {
+
+				var colorGroupNode = colorGroupNodes[ i ];
+				var colorGroupData = parseColorGroupNode( colorGroupNode );
+				resourcesData[ 'colorgroup' ][ colorGroupData[ 'id' ] ] = colorGroupData;
+
+			}
+
+			//
+
+			resourcesData[ 'pbmetallicdisplayproperties' ] = {};
+			var pbmetallicdisplaypropertiesNodes = resourcesNode.querySelectorAll( 'pbmetallicdisplayproperties' );
+
+			for ( var i = 0; i < pbmetallicdisplaypropertiesNodes.length; i ++ ) {
+
+				var pbmetallicdisplaypropertiesNode = pbmetallicdisplaypropertiesNodes[ i ];
+				var pbmetallicdisplaypropertiesData = parseMetallicDisplaypropertiesNode( pbmetallicdisplaypropertiesNode );
+				resourcesData[ 'pbmetallicdisplayproperties' ][ pbmetallicdisplaypropertiesData[ 'id' ] ] = pbmetallicdisplaypropertiesData;
+
+			}
+
+			//
+
 			resourcesData[ 'texture2dgroup' ] = {};
 			var textures2DGroupNodes = resourcesNode.querySelectorAll( 'texture2dgroup' );
 
 			for ( var i = 0; i < textures2DGroupNodes.length; i ++ ) {
 
 				var textures2DGroupNode = textures2DGroupNodes[ i ];
-				var textures2DGroupData = parseTextures2DGroupNodes( textures2DGroupNode );
+				var textures2DGroupData = parseTextures2DGroupNode( textures2DGroupNode );
 				resourcesData[ 'texture2dgroup' ][ textures2DGroupData[ 'id' ] ] = textures2DGroupData;
 
 			}
@@ -877,6 +983,73 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		}
 
+		function buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData, objectData ) {
+
+			// geometry
+
+			var geometry = new THREE.BufferGeometry();
+
+			var positionData = [];
+			var colorData = [];
+
+			var vertices = meshData.vertices;
+			var colors = colorgroup.colors;
+
+			for ( var i = 0, l = triangleProperties.length; i < l; i ++ ) {
+
+				var triangleProperty = triangleProperties[ i ];
+
+				var v1 = triangleProperty.v1;
+				var v2 = triangleProperty.v2;
+				var v3 = triangleProperty.v3;
+
+				positionData.push( vertices[ ( v1 * 3 ) + 0 ] );
+				positionData.push( vertices[ ( v1 * 3 ) + 1 ] );
+				positionData.push( vertices[ ( v1 * 3 ) + 2 ] );
+
+				positionData.push( vertices[ ( v2 * 3 ) + 0 ] );
+				positionData.push( vertices[ ( v2 * 3 ) + 1 ] );
+				positionData.push( vertices[ ( v2 * 3 ) + 2 ] );
+
+				positionData.push( vertices[ ( v3 * 3 ) + 0 ] );
+				positionData.push( vertices[ ( v3 * 3 ) + 1 ] );
+				positionData.push( vertices[ ( v3 * 3 ) + 2 ] );
+
+				//
+
+				var p1 = ( triangleProperty.p1 !== undefined ) ? triangleProperty.p1 : objectData.pindex;
+				var p2 = ( triangleProperty.p2 !== undefined ) ? triangleProperty.p2 : p1;
+				var p3 = ( triangleProperty.p3 !== undefined ) ? triangleProperty.p3 : p1;
+
+				colorData.push( colors[ ( p1 * 3 ) + 0 ] );
+				colorData.push( colors[ ( p1 * 3 ) + 1 ] );
+				colorData.push( colors[ ( p1 * 3 ) + 2 ] );
+
+				colorData.push( colors[ ( p2 * 3 ) + 0 ] );
+				colorData.push( colors[ ( p2 * 3 ) + 1 ] );
+				colorData.push( colors[ ( p2 * 3 ) + 2 ] );
+
+				colorData.push( colors[ ( p3 * 3 ) + 0 ] );
+				colorData.push( colors[ ( p3 * 3 ) + 1 ] );
+				colorData.push( colors[ ( p3 * 3 ) + 2 ] );
+
+			}
+
+			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positionData, 3 ) );
+			geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colorData, 3 ) );
+
+			// material
+
+			var material = new THREE.MeshPhongMaterial( { vertexColors: true, flatShading: true } );
+
+			// mesh
+
+			var mesh = new THREE.Mesh( geometry, material );
+
+			return mesh;
+
+		}
+
 		function buildDefaultMesh( meshData ) {
 
 			var geometry = new THREE.BufferGeometry();
@@ -896,7 +1069,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 			var keys = Object.keys( resourceMap );
 			var meshes = [];
 
-			for ( var i = 0; i < keys.length; i ++ ) {
+			for ( var i = 0, il = keys.length; i < il; i ++ ) {
 
 				var resourceId = keys[ i ];
 				var triangleProperties = resourceMap[ resourceId ];
@@ -908,16 +1081,22 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 						var basematerials = modelData.resources.basematerials[ resourceId ];
 						var newMeshes = buildBasematerialsMeshes( basematerials, triangleProperties, modelData, meshData, textureData, objectData );
 
-						for ( var i = 0, l = newMeshes.length; i < l; i ++ ) {
+						for ( var j = 0, jl = newMeshes.length; j < jl; j ++ ) {
 
-							meshes.push( newMeshes[ i ] );
+							meshes.push( newMeshes[ j ] );
 
 						}
+
 						break;
 
 					case 'texture':
 						var texture2dgroup = modelData.resources.texture2dgroup[ resourceId ];
-						meshes.push( buildTexturedMesh( texture2dgroup, triangleProperties, modelData, meshData, textureData ) );
+						meshes.push( buildTexturedMesh( texture2dgroup, triangleProperties, modelData, meshData, textureData, objectData ) );
+						break;
+
+					case 'vertexColors':
+						var colorgroup = modelData.resources.colorgroup[ resourceId ];
+						meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData, objectData ) );
 						break;
 
 					case 'default':
@@ -944,6 +1123,10 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 			} else if ( modelData.resources.basematerials[ pid ] !== undefined ) {
 
 				return 'material';
+
+			} else if ( modelData.resources.colorgroup[ pid ] !== undefined ) {
+
+				return 'vertexColors';
 
 			} else if ( pid === 'default' ) {
 
@@ -1047,9 +1230,29 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		}
 
-		function buildBasematerial( materialData ) {
+		function buildBasematerial( materialData, objects, modelData ) {
 
-			var material = new THREE.MeshPhongMaterial( { flatShading: true } );
+			var material;
+
+			var displaypropertiesid = materialData.displaypropertiesid;
+			var pbmetallicdisplayproperties = modelData.resources.pbmetallicdisplayproperties;
+
+			if ( displaypropertiesid !== null && pbmetallicdisplayproperties[ displaypropertiesid ] !== undefined ) {
+
+				// metallic display property, use StandardMaterial
+
+				var pbmetallicdisplayproperty = pbmetallicdisplayproperties[ displaypropertiesid ];
+				var metallicData = pbmetallicdisplayproperty.data[ materialData.index ];
+
+				material = new THREE.MeshStandardMaterial( { flatShading: true, roughness: metallicData.roughness, metalness: metallicData.metallicness } );
+
+			} else {
+
+				// otherwise use PhongMaterial
+
+				material = new THREE.MeshPhongMaterial( { flatShading: true } );
+
+			}
 
 			material.name = materialData.name;
 
@@ -1091,13 +1294,13 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 				var object3D = build.clone();
 
-				// apply component transfrom
+				// apply component transform
 
 				var transform = component.transform;
 
 				if ( transform ) {
 
-					object3D.applyMatrix( transform );
+					object3D.applyMatrix4( transform );
 
 				}
 
@@ -1184,11 +1387,24 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		}
 
+		function fetch3DModelPart( rels ) {
+
+			for ( var i = 0; i < rels.length; i ++ ) {
+
+				var rel = rels[ i ];
+				var extension = rel.target.split( '.' ).pop();
+
+				if ( extension.toLowerCase() === 'model' ) return rel;
+
+			}
+
+		}
+
 		function build( objects, data3mf ) {
 
 			var group = new THREE.Group();
 
-			var relationship = data3mf[ 'rels' ][ 0 ];
+			var relationship = fetch3DModelPart( data3mf[ 'rels' ] );
 			var buildData = data3mf.model[ relationship[ 'target' ].substring( 1 ) ][ 'build' ];
 
 			for ( var i = 0; i < buildData.length; i ++ ) {
@@ -1202,7 +1418,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 				if ( transform ) {
 
-					object3D.applyMatrix( transform );
+					object3D.applyMatrix4( transform );
 
 				}
 

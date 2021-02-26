@@ -1,12 +1,8 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 import {
 	AnimationClip,
 	AnimationMixer,
 	Mesh
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var MorphAnimMesh = function ( geometry, material ) {
 

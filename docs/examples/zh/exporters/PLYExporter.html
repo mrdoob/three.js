@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,15 +18,15 @@
 		uv coordinates. No textures or texture references are saved.
 		</p>
 
-		<h2>Example</h2>
+		<h2>代码示例</h2>
 
 		<code>
 		// Instantiate an exporter
-		var exporter = new THREE.PLYExporter();
+		const exporter = new PLYExporter();
 
 		// Parse the input and generate the ply output
-		var data = exporter.parse( scene, options );
-		downloadFile(data);
+		const data = exporter.parse( scene, options );
+		downloadFile( data );
 		</code>
 
 		<h2>Constructor</h2>
@@ -60,7 +59,7 @@
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/exporters/PLYExporter.js examples/js/exporters/PLYExporter.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/PLYExporter.js examples/jsm/exporters/PLYExporter.js]
 		</p>
 	</body>
 </html>

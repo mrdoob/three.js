@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -27,14 +26,17 @@
 			using Draco with glTF, an instance of DRACOLoader will be used internally by [page:GLTFLoader].
 		</p>
 
-		<h2>Example</h2>
+		<h2>代码示例</h2>
 
 		<code>
 		// Instantiate a loader
-		var loader = new THREE.DRACOLoader();
+		const loader = new DRACOLoader();
 
 		// Specify path to a folder containing WASM/JS decoding libraries.
-		loader.setDecoderPath( '/examples/js/libs/draco' );
+		loader.setDecoderPath( '/examples/js/libs/draco/' );
+
+		// Optional: Pre-fetch Draco WASM/JS module.
+		loader.preload();
 
 		// Load a Draco geometry
 		loader.load(
@@ -43,8 +45,8 @@
 			// called when the resource is loaded
 			function ( geometry ) {
 
-				var material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
-				var mesh = new THREE.Mesh( geometry, material );
+				const material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 			},
@@ -63,7 +65,11 @@
 		);
 		</code>
 
-		[example:webgl_loader_draco]
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_loader_draco]
+		</p>
 
 		<h2>Browser compatibility</h2>
 
@@ -128,6 +134,11 @@
 		in the application.
 		</p>
 
+		<h3>[method:this preload]()</h3>
+		<p>
+		Requests the decoder libraries, if not already loaded.
+		</p>
+
 		<h3>[method:this dispose]()</h3>
 		<p>
 		Disposes of the decoder resources and deallocates memory. The decoder
@@ -137,7 +148,7 @@
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/DRACOLoader.js examples/js/loaders/DRACOLoader.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/DRACOLoader.js examples/jsm/loaders/DRACOLoader.js]
 		</p>
 	</body>
 </html>

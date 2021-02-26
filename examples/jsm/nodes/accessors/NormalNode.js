@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { NodeLib } from '../core/NodeLib.js';
 
@@ -19,13 +15,27 @@ NormalNode.VIEW = 'view';
 
 NormalNode.prototype = Object.create( TempNode.prototype );
 NormalNode.prototype.constructor = NormalNode;
-NormalNode.prototype.nodeType = "Normal";
+NormalNode.prototype.nodeType = 'Normal';
 
 NormalNode.prototype.getShared = function () {
 
 	// if shared is false, TempNode will not create temp variable (for optimization)
 
 	return this.scope === NormalNode.WORLD;
+
+};
+
+NormalNode.prototype.build = function ( builder, output, uuid, ns ) {
+
+	var contextNormal = builder.context[ this.scope + 'Normal' ];
+
+	if ( contextNormal ) {
+
+		return contextNormal.build( builder, output, uuid, ns );
+
+	}
+
+	return TempNode.prototype.build.call( this, builder, output, uuid );
 
 };
 

@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { InputNode } from '../core/InputNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
@@ -19,7 +15,7 @@ function ReflectorNode( mirror ) {
 
 ReflectorNode.prototype = Object.create( TempNode.prototype );
 ReflectorNode.prototype.constructor = ReflectorNode;
-ReflectorNode.prototype.nodeType = "Reflector";
+ReflectorNode.prototype.nodeType = 'Reflector';
 
 ReflectorNode.prototype.setMirror = function ( mirror ) {
 
@@ -53,7 +49,7 @@ ReflectorNode.prototype.generate = function ( builder, output ) {
 
 	} else {
 
-		console.warn( "THREE.ReflectorNode is not compatible with " + builder.shader + " shader." );
+		console.warn( 'THREE.ReflectorNode is not compatible with ' + builder.shader + ' shader.' );
 
 		return builder.format( 'vec4( 0.0 )', this.type, output );
 

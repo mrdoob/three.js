@@ -1,8 +1,4 @@
 /**
- * @author gero3 / https://github.com/gero3
- * @author tentone / https://github.com/tentone
- * @author troy351 / https://github.com/troy351
- *
  * Requires opentype.js to be included in the project.
  * Loads TTF files and converts them into typeface JSON that can be used directly
  * to create THREE.Font objects.
@@ -28,9 +24,29 @@ THREE.TTFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( buffer ) {
 
-			onLoad( scope.parse( buffer ) );
+			try {
+
+				onLoad( scope.parse( buffer ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -193,7 +209,7 @@ THREE.TTFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}
 
-		return convert( opentype.parse( arraybuffer ), this.reversed );
+		return convert( opentype.parse( arraybuffer ), this.reversed ); // eslint-disable-line no-undef
 
 	}
 

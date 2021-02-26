@@ -1,8 +1,5 @@
 /**
- * @author zz85
- *
  * Experimenting of primitive geometry creation using Surface Parametric equations
- *
  */
 
 THREE.ParametricGeometries = {
@@ -96,14 +93,13 @@ THREE.ParametricGeometries = {
  *
  *********************************************/
 
-THREE.ParametricGeometries.TubeGeometry = function ( path, segments, radius, segmentsRadius, closed, debug ) {
+THREE.ParametricGeometries.TubeGeometry = function ( path, segments, radius, segmentsRadius, closed ) {
 
 	this.path = path;
 	this.segments = segments || 64;
 	this.radius = radius || 1;
 	this.segmentsRadius = segmentsRadius || 8;
 	this.closed = closed || false;
-	if ( debug ) this.debug = new THREE.Object3D();
 
 	var scope = this, numpoints = this.segments + 1;
 
@@ -118,6 +114,8 @@ THREE.ParametricGeometries.TubeGeometry = function ( path, segments, radius, seg
 	this.normals = normals;
 	this.binormals = binormals;
 
+	var position = new THREE.Vector3();
+
 	var ParametricTube = function ( u, v, target ) {
 
 		v *= 2 * Math.PI;
@@ -125,28 +123,19 @@ THREE.ParametricGeometries.TubeGeometry = function ( path, segments, radius, seg
 		var i = u * ( numpoints - 1 );
 		i = Math.floor( i );
 
-		var pos = path.getPointAt( u );
+		path.getPointAt( u, position );
 
-		var tangent = tangents[ i ];
 		var normal = normals[ i ];
 		var binormal = binormals[ i ];
-
-		if ( scope.debug ) {
-
-			scope.debug.add( new THREE.ArrowHelper( tangent, pos, radius, 0x0000ff ) );
-			scope.debug.add( new THREE.ArrowHelper( normal, pos, radius, 0xff0000 ) );
-			scope.debug.add( new THREE.ArrowHelper( binormal, pos, radius, 0x00ff00 ) );
-
-		}
 
 		var cx = - scope.radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
 		var cy = scope.radius * Math.sin( v );
 
-		pos.x += cx * normal.x + cy * binormal.x;
-		pos.y += cx * normal.y + cy * binormal.y;
-		pos.z += cx * normal.z + cy * binormal.z;
+		position.x += cx * normal.x + cy * binormal.x;
+		position.y += cx * normal.y + cy * binormal.y;
+		position.z += cx * normal.z + cy * binormal.z;
 
-		target.copy( pos );
+		target.copy( position );
 
 	};
 
@@ -154,7 +143,7 @@ THREE.ParametricGeometries.TubeGeometry = function ( path, segments, radius, seg
 
 };
 
-THREE.ParametricGeometries.TubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.ParametricGeometries.TubeGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.ParametricGeometries.TubeGeometry.prototype.constructor = THREE.ParametricGeometries.TubeGeometry;
 
 
@@ -205,7 +194,7 @@ THREE.ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segments
 
 };
 
-THREE.ParametricGeometries.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.ParametricGeometries.TorusKnotGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.ParametricGeometries.TorusKnotGeometry.prototype.constructor = THREE.ParametricGeometries.TorusKnotGeometry;
 
 
@@ -233,7 +222,7 @@ THREE.ParametricGeometries.SphereGeometry = function ( size, u, v ) {
 
 };
 
-THREE.ParametricGeometries.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.ParametricGeometries.SphereGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.ParametricGeometries.SphereGeometry.prototype.constructor = THREE.ParametricGeometries.SphereGeometry;
 
 
@@ -259,5 +248,5 @@ THREE.ParametricGeometries.PlaneGeometry = function ( width, depth, segmentsWidt
 
 };
 
-THREE.ParametricGeometries.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.ParametricGeometries.PlaneGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.ParametricGeometries.PlaneGeometry.prototype.constructor = THREE.ParametricGeometries.PlaneGeometry;

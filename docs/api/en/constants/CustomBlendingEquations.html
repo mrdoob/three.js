@@ -3,29 +3,28 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>Custom Blending Equation Constants</h1>
 
-
-		<h2>Example</h2>
-		<p>[example:webgl_materials_blending_custom materials / blending / custom ]</p>
-
-		<h2>Usage</h2>
 		<p>
 			These work with all material types. First set the material's blending mode to THREE.CustomBlending, then set the desired Blending Equation, Source Factor and Destination Factor.
 		</p>
 
+		<h2>Code Example</h2>
+
 		<code>
-		var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+		const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
 		material.blending = THREE.CustomBlending;
 		material.blendEquation = THREE.AddEquation; //default
 		material.blendSrc = THREE.SrcAlphaFactor; //default
 		material.blendDst = THREE.OneMinusSrcAlphaFactor; //default
 		</code>
+
+		<h2>Examples</h2>
+		<p>[example:webgl_materials_blending_custom materials / blending / custom ]</p>
 
 		<h2>Blending Equations</h2>
 		<code>

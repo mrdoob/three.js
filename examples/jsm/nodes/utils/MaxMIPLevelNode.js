@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { FloatNode } from '../inputs/FloatNode.js';
 
 function MaxMIPLevelNode( texture ) {
@@ -16,7 +12,7 @@ function MaxMIPLevelNode( texture ) {
 
 MaxMIPLevelNode.prototype = Object.create( FloatNode.prototype );
 MaxMIPLevelNode.prototype.constructor = MaxMIPLevelNode;
-MaxMIPLevelNode.prototype.nodeType = "MaxMIPLevel";
+MaxMIPLevelNode.prototype.nodeType = 'MaxMIPLevel';
 
 Object.defineProperties( MaxMIPLevelNode.prototype, {
 

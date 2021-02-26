@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { ConstNode } from '../core/ConstNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
@@ -16,16 +12,16 @@ function LuminanceNode( rgb ) {
 
 LuminanceNode.Nodes = ( function () {
 
-	var LUMA = new ConstNode( "vec3 LUMA vec3( 0.2125, 0.7154, 0.0721 )" );
+	var LUMA = new ConstNode( 'vec3 LUMA vec3( 0.2125, 0.7154, 0.0721 )' );
 
 	var luminance = new FunctionNode( [
 		// Algorithm from Chapter 10 of Graphics Shaders
-		"float luminance( vec3 rgb ) {",
+		'float luminance( vec3 rgb ) {',
 
-		"	return dot( rgb, LUMA );",
+		'	return dot( rgb, LUMA );',
 
-		"}"
-	].join( "\n" ), [ LUMA ] );
+		'}'
+	].join( '\n' ), [ LUMA ] );
 
 	return {
 		LUMA: LUMA,
@@ -36,7 +32,7 @@ LuminanceNode.Nodes = ( function () {
 
 LuminanceNode.prototype = Object.create( TempNode.prototype );
 LuminanceNode.prototype.constructor = LuminanceNode;
-LuminanceNode.prototype.nodeType = "Luminance";
+LuminanceNode.prototype.nodeType = 'Luminance';
 
 LuminanceNode.prototype.generate = function ( builder, output ) {
 

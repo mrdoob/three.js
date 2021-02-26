@@ -1,8 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mr.doob / http://mrdoob.com/
- */
-
 THREE.WEBGL = {
 
 	isWebGLAvailable: function () {

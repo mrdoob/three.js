@@ -1,17 +1,14 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com
- * @author chaht01 / http://hyuntak.com
- * Port of http://webglsamples.org/blob/blob.html
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,
 	Color,
 	ImmediateRenderObject,
 	NoColors
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
+
+/**
+ * Port of http://webglsamples.org/blob/blob.html
+ */
 
 var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 
@@ -908,7 +905,7 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 	this.generateGeometry = function () {
 
 		console.warn(
-			"MarchingCubes: generateGeometry() now returns BufferGeometry"
+			'THREE.MarchingCubes: generateGeometry() now returns BufferGeometry'
 		);
 		return this.generateBufferGeometry();
 
@@ -962,13 +959,13 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 		this.render( geo_callback );
 
 		if ( this.hasPositions )
-			geo.setAttribute( "position", new BufferAttribute( posArray, 3 ) );
+			geo.setAttribute( 'position', new BufferAttribute( posArray, 3 ) );
 		if ( this.hasNormals )
-			geo.setAttribute( "normal", new BufferAttribute( normArray, 3 ) );
+			geo.setAttribute( 'normal', new BufferAttribute( normArray, 3 ) );
 		if ( this.hasColors )
-			geo.setAttribute( "color", new BufferAttribute( colorArray, 3 ) );
+			geo.setAttribute( 'color', new BufferAttribute( colorArray, 3 ) );
 		if ( this.hasUvs )
-			geo.setAttribute( "uv", new BufferAttribute( uvArray, 2 ) );
+			geo.setAttribute( 'uv', new BufferAttribute( uvArray, 2 ) );
 
 		return geo;
 

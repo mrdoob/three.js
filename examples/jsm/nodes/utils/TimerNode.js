@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { FloatNode } from '../inputs/FloatNode.js';
 import { NodeLib } from '../core/NodeLib.js';
 
@@ -22,7 +18,7 @@ TimerNode.DELTA = 'delta';
 
 TimerNode.prototype = Object.create( FloatNode.prototype );
 TimerNode.prototype.constructor = TimerNode;
-TimerNode.prototype.nodeType = "Timer";
+TimerNode.prototype.nodeType = 'Timer';
 
 TimerNode.prototype.getReadonly = function () {
 
@@ -81,18 +77,12 @@ TimerNode.prototype.copy = function ( source ) {
 
 TimerNode.prototype.toJSON = function ( meta ) {
 
-	var data = this.getJSONNode( meta );
+	var data = FloatNode.prototype.toJSON.call( this, meta );
 
-	if ( ! data ) {
+	data.scope = this.scope;
+	data.scale = this.scale;
 
-		data = this.createJSONNode( meta );
-
-		data.scope = this.scope;
-		data.scale = this.scale;
-
-		data.timeScale = this.timeScale;
-
-	}
+	data.timeScale = this.timeScale;
 
 	return data;
 

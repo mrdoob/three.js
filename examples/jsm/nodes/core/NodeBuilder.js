@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import {
 	CubeReflectionMapping,
 	CubeRefractionMapping,
@@ -64,7 +60,9 @@ function NodeBuilder() {
 		uv: [],
 		color: [],
 		lights: false,
-		fog: false
+		fog: false,
+		transparent: false,
+		irradiance: false
 	};
 
 	this.includes = {
@@ -76,28 +74,28 @@ function NodeBuilder() {
 	this.attributes = {};
 
 	this.prefixCode = [
-		"#ifdef TEXTURE_LOD_EXT",
+		'#ifdef TEXTURE_LOD_EXT',
 
-		"	#define texCube(a, b) textureCube(a, b)",
-		"	#define texCubeBias(a, b, c) textureCubeLodEXT(a, b, c)",
+		'	#define texCube(a, b) textureCube(a, b)',
+		'	#define texCubeBias(a, b, c) textureCubeLodEXT(a, b, c)',
 
-		"	#define tex2D(a, b) texture2D(a, b)",
-		"	#define tex2DBias(a, b, c) texture2DLodEXT(a, b, c)",
+		'	#define tex2D(a, b) texture2D(a, b)',
+		'	#define tex2DBias(a, b, c) texture2DLodEXT(a, b, c)',
 
-		"#else",
+		'#else',
 
-		"	#define texCube(a, b) textureCube(a, b)",
-		"	#define texCubeBias(a, b, c) textureCube(a, b, c)",
+		'	#define texCube(a, b) textureCube(a, b)',
+		'	#define texCubeBias(a, b, c) textureCube(a, b, c)',
 
-		"	#define tex2D(a, b) texture2D(a, b)",
-		"	#define tex2DBias(a, b, c) texture2D(a, b, c)",
+		'	#define tex2D(a, b) texture2D(a, b)',
+		'	#define tex2DBias(a, b, c) texture2D(a, b, c)',
 
-		"#endif",
+		'#endif',
 
-		"#include <packing>",
-		"#include <common>"
+		'#include <packing>',
+		'#include <common>'
 
-	].join( "\n" );
+	].join( '\n' );
 
 	this.parsCode = {
 		vertex: '',
@@ -164,20 +162,23 @@ NodeBuilder.prototype = {
 		this.buildShader( 'vertex', vertex );
 		this.buildShader( 'fragment', fragment );
 
-		if ( this.requires.uv[ 0 ] ) {
+		for ( var i = 0; i < this.requires.uv.length; i ++ ) {
 
-			this.addVaryCode( 'varying vec2 vUv;' );
+			if ( this.requires.uv[ i ] ) {
 
-			this.addVertexFinalCode( 'vUv = uv;' );
+				var uvIndex = i > 0 ? i + 1 : '';
 
-		}
+				this.addVaryCode( 'varying vec2 vUv' + uvIndex + ';' );
 
-		if ( this.requires.uv[ 1 ] ) {
+				if ( i > 0 ) {
 
-			this.addVaryCode( 'varying vec2 vUv2;' );
-			this.addVertexParsCode( 'attribute vec2 uv2;' );
+					this.addVertexParsCode( 'attribute vec2 uv' + uvIndex + ';' );
 
-			this.addVertexFinalCode( 'vUv2 = uv2;' );
+				}
+
+				this.addVertexFinalCode( 'vUv' + uvIndex + ' = uv' + uvIndex + ';' );
+
+			}
 
 		}
 
@@ -521,7 +522,7 @@ NodeBuilder.prototype = {
 			this.resultCode[ shader ],
 			this.finalCode[ shader ],
 			'}'
-		].join( "\n" );
+		].join( '\n' );
 
 	},
 
@@ -541,7 +542,7 @@ NodeBuilder.prototype = {
 
 			if ( formatType === undefined ) {
 
-				throw new Error( "Node pars " + formatType + " not found." );
+				throw new Error( 'Node pars ' + formatType + ' not found.' );
 
 			}
 
@@ -676,7 +677,7 @@ NodeBuilder.prototype = {
 
 		} else {
 
-			throw new Error( "Include not found." );
+			throw new Error( 'Include not found.' );
 
 		}
 
@@ -949,9 +950,7 @@ NodeBuilder.prototype = {
 
 	},
 
-	getTextureEncodingFromMap: function ( map, gammaOverrideLinear ) {
-
-		gammaOverrideLinear = gammaOverrideLinear !== undefined ? gammaOverrideLinear : this.context.gamma && ( this.renderer ? this.renderer.gammaInput : false );
+	getTextureEncodingFromMap: function ( map ) {
 
 		var encoding;
 
@@ -965,13 +964,12 @@ NodeBuilder.prototype = {
 
 		} else if ( map.isWebGLRenderTarget ) {
 
-			console.warn( "THREE.WebGLPrograms.getTextureEncodingFromMap: don't use render targets as textures. Use their .texture property instead." );
+			console.warn( 'THREE.WebGLPrograms.getTextureEncodingFromMap: don\'t use render targets as textures. Use their .texture property instead.' );
 			encoding = map.texture.encoding;
 
 		}
 
-		// add backwards compatibility for WebGLRenderer.gammaInput/gammaOutput parameter, should probably be removed at some point.
-		if ( encoding === LinearEncoding && gammaOverrideLinear ) {
+		if ( encoding === LinearEncoding && this.context.gamma ) {
 
 			encoding = GammaEncoding;
 

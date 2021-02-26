@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { InputNode } from '../core/InputNode.js';
 
 function FloatNode( value ) {
@@ -14,7 +10,7 @@ function FloatNode( value ) {
 
 FloatNode.prototype = Object.create( InputNode.prototype );
 FloatNode.prototype.constructor = FloatNode;
-FloatNode.prototype.nodeType = "Float";
+FloatNode.prototype.nodeType = 'Float';
 
 FloatNode.prototype.generateReadonly = function ( builder, output, uuid, type/*, ns, needsUpdate */ ) {
 

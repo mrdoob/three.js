@@ -1,7 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 THREE.MD2CharacterComplex = function () {
 
 	var scope = this;
@@ -147,8 +143,8 @@ THREE.MD2CharacterComplex = function () {
 
 		// SKINS
 
-		this.skinsBody = loadTextures( config.baseUrl + "skins/", config.skins );
-		this.skinsWeapon = loadTextures( config.baseUrl + "skins/", weaponsTextures );
+		this.skinsBody = loadTextures( config.baseUrl + 'skins/', config.skins );
+		this.skinsWeapon = loadTextures( config.baseUrl + 'skins/', weaponsTextures );
 
 		// BODY
 
@@ -342,13 +338,13 @@ THREE.MD2CharacterComplex = function () {
 
 		if ( controls.crouch ) {
 
-			moveAnimation = animations[ "crouchMove" ];
-			idleAnimation = animations[ "crouchIdle" ];
+			moveAnimation = animations[ 'crouchMove' ];
+			idleAnimation = animations[ 'crouchIdle' ];
 
 		} else {
 
-			moveAnimation = animations[ "move" ];
-			idleAnimation = animations[ "idle" ];
+			moveAnimation = animations[ 'move' ];
+			idleAnimation = animations[ 'idle' ];
 
 		}
 
@@ -356,8 +352,8 @@ THREE.MD2CharacterComplex = function () {
 
 		if ( controls.jump ) {
 
-			moveAnimation = animations[ "jump" ];
-			idleAnimation = animations[ "jump" ];
+			moveAnimation = animations[ 'jump' ];
+			idleAnimation = animations[ 'jump' ];
 
 		}
 
@@ -365,13 +361,13 @@ THREE.MD2CharacterComplex = function () {
 
 			if ( controls.crouch ) {
 
-				moveAnimation = animations[ "crouchAttack" ];
-				idleAnimation = animations[ "crouchAttack" ];
+				moveAnimation = animations[ 'crouchAttack' ];
+				idleAnimation = animations[ 'crouchAttack' ];
 
 			} else {
 
-				moveAnimation = animations[ "attack" ];
-				idleAnimation = animations[ "attack" ];
+				moveAnimation = animations[ 'attack' ];
+				idleAnimation = animations[ 'attack' ];
 
 			}
 
@@ -451,8 +447,8 @@ THREE.MD2CharacterComplex = function () {
 
 		this.maxReverseSpeed = - this.maxSpeed;
 
-		if ( controls.moveForward ) this.speed = THREE.Math.clamp( this.speed + delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
-		if ( controls.moveBackward ) this.speed = THREE.Math.clamp( this.speed - delta * this.backAcceleration, this.maxReverseSpeed, this.maxSpeed );
+		if ( controls.moveForward ) this.speed = THREE.MathUtils.clamp( this.speed + delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
+		if ( controls.moveBackward ) this.speed = THREE.MathUtils.clamp( this.speed - delta * this.backAcceleration, this.maxReverseSpeed, this.maxSpeed );
 
 		// orientation based on controls
 		// (don't just stand while turning)
@@ -462,14 +458,14 @@ THREE.MD2CharacterComplex = function () {
 		if ( controls.moveLeft ) {
 
 			this.bodyOrientation += delta * this.angularSpeed;
-			this.speed = THREE.Math.clamp( this.speed + dir * delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
+			this.speed = THREE.MathUtils.clamp( this.speed + dir * delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
 
 		}
 
 		if ( controls.moveRight ) {
 
 			this.bodyOrientation -= delta * this.angularSpeed;
-			this.speed = THREE.Math.clamp( this.speed + dir * delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
+			this.speed = THREE.MathUtils.clamp( this.speed + dir * delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
 
 		}
 
@@ -480,12 +476,12 @@ THREE.MD2CharacterComplex = function () {
 			if ( this.speed > 0 ) {
 
 				var k = exponentialEaseOut( this.speed / this.maxSpeed );
-				this.speed = THREE.Math.clamp( this.speed - k * delta * this.frontDecceleration, 0, this.maxSpeed );
+				this.speed = THREE.MathUtils.clamp( this.speed - k * delta * this.frontDecceleration, 0, this.maxSpeed );
 
 			} else {
 
 				var k = exponentialEaseOut( this.speed / this.maxReverseSpeed );
-				this.speed = THREE.Math.clamp( this.speed + k * delta * this.backAcceleration, this.maxReverseSpeed, 0 );
+				this.speed = THREE.MathUtils.clamp( this.speed + k * delta * this.backAcceleration, this.maxReverseSpeed, 0 );
 
 			}
 
@@ -516,6 +512,7 @@ THREE.MD2CharacterComplex = function () {
 			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
 			textures[ i ].mapping = THREE.UVMapping;
 			textures[ i ].name = textureUrls[ i ];
+			textures[ i ].encoding = THREE.sRGBEncoding;
 
 		}
 

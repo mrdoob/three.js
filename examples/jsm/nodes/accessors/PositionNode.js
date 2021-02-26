@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { NodeLib } from '../core/NodeLib.js';
 
@@ -20,7 +16,7 @@ PositionNode.PROJECTION = 'projection';
 
 PositionNode.prototype = Object.create( TempNode.prototype );
 PositionNode.prototype.constructor = PositionNode;
-PositionNode.prototype.nodeType = "Position";
+PositionNode.prototype.nodeType = 'Position';
 
 PositionNode.prototype.getType = function ( ) {
 

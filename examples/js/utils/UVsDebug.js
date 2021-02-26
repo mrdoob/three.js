@@ -1,12 +1,8 @@
 /**
- * @author zz85 / http://github.com/zz85
- * @author WestLangley / http://github.com/WestLangley
- * @author Mugen87 / https://github.com/Mugen87
- *
  * tool for "unwrapping" and debugging three.js geometries UV mapping
  *
  * Sample usage:
- *	document.body.appendChild( THREE.UVsDebug( new THREE.SphereBufferGeometry( 10, 10, 10, 10 ) );
+ *	document.body.appendChild( THREE.UVsDebug( new THREE.SphereGeometry( 10, 10, 10, 10 ) );
  *
  */
 
@@ -33,36 +29,19 @@ THREE.UVsDebug = function ( geometry, size ) {
 	canvas.height = height;
 
 	var ctx = canvas.getContext( '2d' );
-	ctx.lineWidth = 2;
-	ctx.strokeStyle = 'rgba( 0, 0, 0, 1.0 )';
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = 'rgb( 63, 63, 63 )';
 	ctx.textAlign = 'center';
 
 	// paint background white
 
-	ctx.fillStyle = 'rgba( 255, 255, 255, 1.0 )';
+	ctx.fillStyle = 'rgb( 255, 255, 255 )';
 	ctx.fillRect( 0, 0, width, height );
 
 	if ( geometry.isGeometry ) {
 
-		var faces = geometry.faces;
-		var uvSet = geometry.faceVertexUvs[ 0 ];
-
-		for ( var i = 0, il = uvSet.length; i < il; i ++ ) {
-
-			var face = faces[ i ];
-			var uv = uvSet[ i ];
-
-			face[ 0 ] = face.a;
-			face[ 1 ] = face.b;
-			face[ 2 ] = face.c;
-
-			uvs[ 0 ].copy( uv[ 0 ] );
-			uvs[ 1 ].copy( uv[ 1 ] );
-			uvs[ 2 ].copy( uv[ 2 ] );
-
-			processFace( face, uvs, i );
-
-		}
+		console.error( 'THREE.UVsDebug no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
+		return;
 
 	} else {
 
@@ -128,11 +107,11 @@ THREE.UVsDebug = function ( geometry, size ) {
 
 			if ( j === 0 ) {
 
-				ctx.moveTo( uv.x * width, ( 1 - uv.y ) * height );
+				ctx.moveTo( uv.x * ( width - 2 ) + 0.5, ( 1 - uv.y ) * ( height - 2 ) + 0.5 );
 
 			} else {
 
-				ctx.lineTo( uv.x * width, ( 1 - uv.y ) * height );
+				ctx.lineTo( uv.x * ( width - 2 ) + 0.5, ( 1 - uv.y ) * ( height - 2 ) + 0.5 );
 
 			}
 
@@ -147,8 +126,8 @@ THREE.UVsDebug = function ( geometry, size ) {
 
 		// label the face number
 
-		ctx.font = '12pt Arial bold';
-		ctx.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
+		ctx.font = '18px Arial';
+		ctx.fillStyle = 'rgb( 63, 63, 63 )';
 		ctx.fillText( index, a.x * width, ( 1 - a.y ) * height );
 
 		if ( a.x > 0.95 ) {
@@ -161,8 +140,8 @@ THREE.UVsDebug = function ( geometry, size ) {
 
 		//
 
-		ctx.font = '8pt Arial bold';
-		ctx.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
+		ctx.font = '12px Arial';
+		ctx.fillStyle = 'rgb( 191, 191, 191 )';
 
 		// label uv edge orders
 

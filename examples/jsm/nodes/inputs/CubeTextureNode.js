@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { InputNode } from '../core/InputNode.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
@@ -19,7 +15,7 @@ function CubeTextureNode( value, uv, bias ) {
 
 CubeTextureNode.prototype = Object.create( InputNode.prototype );
 CubeTextureNode.prototype.constructor = CubeTextureNode;
-CubeTextureNode.prototype.nodeType = "CubeTexture";
+CubeTextureNode.prototype.nodeType = 'CubeTexture';
 
 CubeTextureNode.prototype.getTexture = function ( builder, output ) {
 

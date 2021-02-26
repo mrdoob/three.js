@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from './TempNode.js';
 
 function FunctionCallNode( func, inputs ) {
@@ -14,7 +10,7 @@ function FunctionCallNode( func, inputs ) {
 
 FunctionCallNode.prototype = Object.create( TempNode.prototype );
 FunctionCallNode.prototype.constructor = FunctionCallNode;
-FunctionCallNode.prototype.nodeType = "FunctionCall";
+FunctionCallNode.prototype.nodeType = 'FunctionCall';
 
 FunctionCallNode.prototype.setFunction = function ( func, inputs ) {
 

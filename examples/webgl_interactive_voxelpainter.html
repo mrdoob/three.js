@@ -26,14 +26,14 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer;
-			var plane;
-			var mouse, raycaster, isShiftDown = false;
+			let camera, scene, renderer;
+			let plane;
+			let mouse, raycaster, isShiftDown = false;
 
-			var rollOverMesh, rollOverMaterial;
-			var cubeGeo, cubeMaterial;
+			let rollOverMesh, rollOverMaterial;
+			let cubeGeo, cubeMaterial;
 
-			var objects = [];
+			const objects = [];
 
 			init();
 			render();
@@ -49,19 +49,19 @@
 
 				// roll-over helpers
 
-				var rollOverGeo = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				const rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
 				rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
 				rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
 				scene.add( rollOverMesh );
 
 				// cubes
 
-				cubeGeo = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
 				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( 'textures/square-outline-textured.png' ) } );
 
 				// grid
 
-				var gridHelper = new THREE.GridHelper( 1000, 20 );
+				const gridHelper = new THREE.GridHelper( 1000, 20 );
 				scene.add( gridHelper );
 
 				//
@@ -69,7 +69,7 @@
 				raycaster = new THREE.Raycaster();
 				mouse = new THREE.Vector2();
 
-				var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
+				const geometry = new THREE.PlaneGeometry( 1000, 1000 );
 				geometry.rotateX( - Math.PI / 2 );
 
 				plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
@@ -79,10 +79,10 @@
 
 				// lights
 
-				var ambientLight = new THREE.AmbientLight( 0x606060 );
+				const ambientLight = new THREE.AmbientLight( 0x606060 );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
 				scene.add( directionalLight );
 
@@ -91,14 +91,14 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'keydown', onDocumentKeyDown, false );
-				document.addEventListener( 'keyup', onDocumentKeyUp, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
+				document.addEventListener( 'mousedown', onDocumentMouseDown );
+				document.addEventListener( 'keydown', onDocumentKeyDown );
+				document.addEventListener( 'keyup', onDocumentKeyUp );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -119,11 +119,11 @@
 
 				raycaster.setFromCamera( mouse, camera );
 
-				var intersects = raycaster.intersectObjects( objects );
+				const intersects = raycaster.intersectObjects( objects );
 
 				if ( intersects.length > 0 ) {
 
-					var intersect = intersects[ 0 ];
+					const intersect = intersects[ 0 ];
 
 					rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
 					rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
@@ -142,11 +142,11 @@
 
 				raycaster.setFromCamera( mouse, camera );
 
-				var intersects = raycaster.intersectObjects( objects );
+				const intersects = raycaster.intersectObjects( objects );
 
 				if ( intersects.length > 0 ) {
 
-					var intersect = intersects[ 0 ];
+					const intersect = intersects[ 0 ];
 
 					// delete cube
 
@@ -164,7 +164,7 @@
 
 					} else {
 
-						var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+						const voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
 						voxel.position.copy( intersect.point ).add( intersect.face.normal );
 						voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
 						scene.add( voxel );

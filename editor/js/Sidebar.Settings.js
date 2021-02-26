@@ -1,27 +1,31 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UIPanel, UIRow, UISelect, UISpan, UIText, UIInteger } from './libs/ui.js';
 
-Sidebar.Settings = function ( editor ) {
+import { SidebarSettingsViewport } from './Sidebar.Settings.Viewport.js';
+import { SidebarSettingsShortcuts } from './Sidebar.Settings.Shortcuts.js';
+import { SidebarSettingsHistory } from './Sidebar.Settings.History.js';
+
+function SidebarSettings( editor ) {
 
 	var config = editor.config;
-	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var container = new UI.Panel();
-	container.setBorderTop( '0' );
-	container.setPaddingTop( '20px' );
-	container.setPaddingBottom( '20px' );
+	var container = new UISpan();
+
+	var settings = new UIPanel();
+	settings.setBorderTop( '0' );
+	settings.setPaddingTop( '20px' );
+	container.add( settings );
 
 	// language
 
 	var options = {
 		en: 'English',
+		fr: 'Français',
 		zh: '中文'
 	};
 
-	var languageRow = new UI.Row();
-	var language = new UI.Select().setWidth( '150px' );
+	var languageRow = new UIRow();
+	var language = new UISelect().setWidth( '150px' );
 	language.setOptions( options );
 
 	if ( config.getKey( 'language' ) !== undefined ) {
@@ -38,14 +42,37 @@ Sidebar.Settings = function ( editor ) {
 
 	} );
 
-	languageRow.add( new UI.Text( strings.getKey( 'sidebar/settings/language' ) ).setWidth( '90px' ) );
+	languageRow.add( new UIText( strings.getKey( 'sidebar/settings/language' ) ).setWidth( '90px' ) );
 	languageRow.add( language );
 
-	container.add( languageRow );
+	settings.add( languageRow );
 
-	container.add( new Sidebar.Settings.Shortcuts( editor ) );
-	container.add( new Sidebar.Settings.Viewport( editor ) );
+	// export precision
+
+	var exportPrecisionRow = new UIRow();
+	var exportPrecision = new UIInteger( config.getKey( 'exportPrecision' ) ).setRange( 2, Infinity );
+
+	exportPrecision.onChange( function () {
+
+		var value = this.getValue();
+
+		editor.config.setKey( 'exportPrecision', value );
+
+	} );
+
+	exportPrecisionRow.add( new UIText( strings.getKey( 'sidebar/settings/exportPrecision' ) ).setWidth( '90px' ) );
+	exportPrecisionRow.add( exportPrecision );
+
+	settings.add( exportPrecisionRow );
+
+	//
+
+	container.add( new SidebarSettingsViewport( editor ) );
+	container.add( new SidebarSettingsShortcuts( editor ) );
+	container.add( new SidebarSettingsHistory( editor ) );
 
 	return container;
 
-};
+}
+
+export { SidebarSettings };

@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { LuminanceNode } from './LuminanceNode.js';
@@ -20,45 +16,45 @@ function ColorAdjustmentNode( rgb, adjustment, method ) {
 ColorAdjustmentNode.Nodes = ( function () {
 
 	var hue = new FunctionNode( [
-		"vec3 hue(vec3 rgb, float adjustment) {",
+		'vec3 hue(vec3 rgb, float adjustment) {',
 
-		"	const mat3 RGBtoYIQ = mat3(0.299, 0.587, 0.114, 0.595716, -0.274453, -0.321263, 0.211456, -0.522591, 0.311135);",
-		"	const mat3 YIQtoRGB = mat3(1.0, 0.9563, 0.6210, 1.0, -0.2721, -0.6474, 1.0, -1.107, 1.7046);",
+		'	const mat3 RGBtoYIQ = mat3(0.299, 0.587, 0.114, 0.595716, -0.274453, -0.321263, 0.211456, -0.522591, 0.311135);',
+		'	const mat3 YIQtoRGB = mat3(1.0, 0.9563, 0.6210, 1.0, -0.2721, -0.6474, 1.0, -1.107, 1.7046);',
 
-		"	vec3 yiq = RGBtoYIQ * rgb;",
+		'	vec3 yiq = RGBtoYIQ * rgb;',
 
-		"	float hue = atan(yiq.z, yiq.y) + adjustment;",
-		"	float chroma = sqrt(yiq.z * yiq.z + yiq.y * yiq.y);",
+		'	float hue = atan(yiq.z, yiq.y) + adjustment;',
+		'	float chroma = sqrt(yiq.z * yiq.z + yiq.y * yiq.y);',
 
-		"	return YIQtoRGB * vec3(yiq.x, chroma * cos(hue), chroma * sin(hue));",
+		'	return YIQtoRGB * vec3(yiq.x, chroma * cos(hue), chroma * sin(hue));',
 
-		"}"
-	].join( "\n" ) );
+		'}'
+	].join( '\n' ) );
 
 	var saturation = new FunctionNode( [
 		// Algorithm from Chapter 16 of OpenGL Shading Language
-		"vec3 saturation(vec3 rgb, float adjustment) {",
+		'vec3 saturation(vec3 rgb, float adjustment) {',
 
-		"	vec3 intensity = vec3( luminance( rgb ) );",
+		'	vec3 intensity = vec3( luminance( rgb ) );',
 
-		"	return mix( intensity, rgb, adjustment );",
+		'	return mix( intensity, rgb, adjustment );',
 
-		"}"
-	].join( "\n" ), [ LuminanceNode.Nodes.luminance ] ); // include LuminanceNode function
+		'}'
+	].join( '\n' ), [ LuminanceNode.Nodes.luminance ] ); // include LuminanceNode function
 
 	var vibrance = new FunctionNode( [
 		// Shader by Evan Wallace adapted by @lo-th
-		"vec3 vibrance(vec3 rgb, float adjustment) {",
+		'vec3 vibrance(vec3 rgb, float adjustment) {',
 
-		"	float average = (rgb.r + rgb.g + rgb.b) / 3.0;",
+		'	float average = (rgb.r + rgb.g + rgb.b) / 3.0;',
 
-		"	float mx = max(rgb.r, max(rgb.g, rgb.b));",
-		"	float amt = (mx - average) * (-3.0 * adjustment);",
+		'	float mx = max(rgb.r, max(rgb.g, rgb.b));',
+		'	float amt = (mx - average) * (-3.0 * adjustment);',
 
-		"	return mix(rgb.rgb, vec3(mx), amt);",
+		'	return mix(rgb.rgb, vec3(mx), amt);',
 
-		"}"
-	].join( "\n" ) );
+		'}'
+	].join( '\n' ) );
 
 	return {
 		hue: hue,
@@ -76,7 +72,8 @@ ColorAdjustmentNode.CONTRAST = 'contrast';
 
 ColorAdjustmentNode.prototype = Object.create( TempNode.prototype );
 ColorAdjustmentNode.prototype.constructor = ColorAdjustmentNode;
-ColorAdjustmentNode.prototype.nodeType = "ColorAdjustment";
+ColorAdjustmentNode.prototype.nodeType = 'ColorAdjustment';
+ColorAdjustmentNode.prototype.hashProperties = [ 'method' ];
 
 ColorAdjustmentNode.prototype.generate = function ( builder, output ) {
 

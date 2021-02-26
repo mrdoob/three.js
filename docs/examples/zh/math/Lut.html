@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>查找表（[name]）</h1>
+
+		<p class="desc">
+		表示颜色表的查找表，用于从一个数据值的范围中确定颜色值。
+		</p>
+
+
+		<h2>代码示例</h2>
+		<code>
+		const lut = new Lut( 'rainbow', 512 );
+		const color = lut.getColor( 0.5 );
+		</code>
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( colormap, numberOfColors )</h3>
+		<p>
+		colormap - （可选）从预定义的颜色表中设置一个颜色表。可选值有："rainbow"、 "cooltowarm"、 "blackbody"。
+		numberOfColors - （可选）设置用于表示数据数组的颜色数量。
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:Float minV]</h3>
+		<p>
+		查找表所表示的最小值，默认为0。
+		</p>
+
+		<h3>[property:Float maxV]</h3>
+		<p>
+		查找表所表示的最小值，默认为1。
+		</p>
+
+		<h3>.[legend]</h3>
+		<p>
+		查找表的图例。
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:null copy]( [param:Lut lut] ) [param:Lut this]</h3>
+		<p>
+		color — 要拷贝的 Lut。
+		</p>
+		<p>
+		拷贝给定的 Lut。
+		</p>
+
+		<h3>.setLegendOn [parameters]</h3>
+		<p>
+		parameters - { layout: value, position: { x: value, y: value, z: value }, dimensions: { width: value, height: value } }
+		layout — Horizontal or vertical layout. Default is vertical.<br />
+		position — The position x,y,z of the legend.<br />
+		dimensions — The dimensions (width and height) of the legend.<br />
+		</p>
+		<p>
+		Sets this Lut with the legend on.
+		</p>
+
+		<h3>.setLegendOff</h3>
+		<p>
+		</p>
+		<p>
+		Sets this Lut with the legend off.
+		</p>
+
+    <h3>.setLegendLabels [parameters, callback]</h3>
+		<p>
+		parameters - { fontsize: value, fontface: value, title: value, um: value, ticks: value, decimal: value, notation: value }
+		fontsize — Font size to be used for labels.<br />
+		fontface — Font type to be used for labels.<br />
+		title — The title of the legend.<br />
+		um — The unit of measurements of the legend.<br />
+		ticks — The number of ticks to be displayed.<br />
+		decimal — The number of decimals to be used for legend values.<br />
+		notation — Legend notation: standard (default) or scientific.<br />
+		callback — An optional callback to be used to format the legend labels.<br />
+		</p>
+		<p>
+		Sets the labels of the legend of this Lut.
+		</p>
+
+		<h3>[method:Lut setMin]( [param:Float minV] )</h3>
+		<p>
+		minV — 查找表所表示的最小值。<br />
+		</p>
+		<p>
+		将查找表要表示的最小值设为该值。
+		</p>
+
+		<h3>[method:Lut setMax]( [param:Float maxV] )</h3>
+		<p>
+		maxV — 查找表所表示的最小值。<br />
+		</p>
+		<p>
+		将查找表要表示的最大值设为该值。
+		</p>
+
+		<h3>[method:Lut changeNumberOfColors]( [param:Float numberOfColors] )</h3>
+		<p>
+		numberOfColors — 用于表示数据数组的颜色数量。<br />
+		</p>
+		<p>
+		设置查找表中要使用的颜色的数量。
+		</p>
+
+		<h3>[method:Lut changeColorMap]( [param:Float colorMap] )</h3>
+		<p>
+		colorMap — 用于表示数据数组的颜色表名称。<br />
+		</p>
+		<p>
+		设置查找表的颜色表为传入的颜色表。
+		</p>
+
+		<h3>[method:Lut addColorMap]( colorMapName, arrayOfColors )</h3>
+		<p>
+		插入一个新的颜色表到可用颜色表中。
+		</p>
+
+		<h3>[method:Lut getColor]( value ) [param:Lut this]</h3>
+		<p>
+		value -- 作为颜色展示的数据值。
+		</p>
+		<p>
+		返回一个[page:Color]。
+		</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/Lut.js examples/jsm/math/Lut.js]
+		</p>
+	</body>
+</html>

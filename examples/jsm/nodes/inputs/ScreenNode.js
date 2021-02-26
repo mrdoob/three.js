@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { InputNode } from '../core/InputNode.js';
 import { TextureNode } from './TextureNode.js';
 
@@ -13,7 +9,7 @@ function ScreenNode( uv ) {
 
 ScreenNode.prototype = Object.create( TextureNode.prototype );
 ScreenNode.prototype.constructor = ScreenNode;
-ScreenNode.prototype.nodeType = "Screen";
+ScreenNode.prototype.nodeType = 'Screen';
 
 ScreenNode.prototype.getUnique = function () {
 

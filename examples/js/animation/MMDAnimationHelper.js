@@ -1,6 +1,4 @@
 /**
- * @author takahiro / https://github.com/takahirox
- *
  * MMDAnimationHelper handles animation of MMD assets loaded by MMDLoader
  * with MMD special features as IK, Grant, and Physics.
  *
@@ -948,8 +946,6 @@ THREE.MMDAnimationHelper = ( function () {
 
 			// 'duration' can be bigger than 'audioDuration + delayTime' because of sync configuration
 			if ( ( this.currentTime - this.delayTime ) > this.audioDuration ) return false;
-
-			this.audio.startTime = this.currentTime - this.delayTime;
 
 			return true;
 

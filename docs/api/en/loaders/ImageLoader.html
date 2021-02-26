@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -18,16 +17,11 @@
 			[page:CubeTextureLoader], [page:ObjectLoader] and [page:TextureLoader].
 		</p>
 
-		<h2>Example</h2>
-
-		<p>
-			[example:webgl_loader_obj WebGL / loader / obj]<br />
-			[example:webgl_shaders_ocean WebGL / shaders / ocean]
-		</p>
+		<h2>Code Example</h2>
 
 		<code>
 		// instantiate a loader
-		var loader = new THREE.ImageLoader();
+		const loader = new THREE.ImageLoader();
 
 		// load a image resource
 		loader.load(
@@ -37,8 +31,8 @@
 			// onLoad callback
 			function ( image ) {
 				// use the image, e.g. draw part of it on a canvas
-				var canvas = document.createElement( 'canvas' );
-				var context = canvas.getContext( '2d' );
+				const canvas = document.createElement( 'canvas' );
+				const context = canvas.getContext( '2d' );
 				context.drawImage( image, 100, 100 );
 			},
 
@@ -55,6 +49,13 @@
 		<p>
 		Please note three.js r84 dropped support for ImageLoader progress events. For an ImageLoader
 		that supports progress events, see [link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-275785639 this thread].
+		</p>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_loader_obj WebGL / loader / obj]<br />
+			[example:webgl_shaders_ocean WebGL / shaders / ocean]
 		</p>
 
 		<h2>Constructor</h2>

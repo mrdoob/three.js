@@ -3,16 +3,15 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr; [page:CylinderGeometry] &rarr;
+		[page:BufferGeometry] &rarr; [page:CylinderGeometry] &rarr;
 
 		<h1>[name]</h1>
 
-		<p class="desc">A class for generating cone geometries</p>
+		<p class="desc">A class for generating cone geometries.</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#ConeGeometry"></iframe>
 
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -32,11 +31,11 @@
 
 		</script>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
-		<code>var geometry = new THREE.ConeGeometry( 5, 20, 32 );
-		var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-		var cone = new THREE.Mesh( geometry, material );
+		<code>const geometry = new THREE.ConeGeometry( 5, 20, 32 );
+		const material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+		const cone = new THREE.Mesh( geometry, material );
 		scene.add( cone );
 		</code>
 
@@ -44,7 +43,7 @@
 
 		<h3>[name]([param:Float radius], [param:Float height], [param:Integer radialSegments], [param:Integer heightSegments], [param:Boolean openEnded], [param:Float thetaStart], [param:Float thetaLength])</h3>
 		<p>
-		radius — Radius of the cone at the base. Default is 1.<br />
+		radius — Radius of the cone base. Default is 1.<br />
 		height — Height of the cone. Default is 1.<br />
 		radialSegments — Number of segmented faces around the circumference of the cone. Default is 8<br />
 		heightSegments — Number of rows of faces along the height of the cone. Default is 1.<br />

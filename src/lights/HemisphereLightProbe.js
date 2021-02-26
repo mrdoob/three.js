@@ -1,54 +1,30 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- */
-
 import { Color } from '../math/Color.js';
 import { Vector3 } from '../math/Vector3.js';
 import { LightProbe } from './LightProbe.js';
 
-function HemisphereLightProbe( skyColor, groundColor, intensity ) {
+class HemisphereLightProbe extends LightProbe {
 
-	LightProbe.call( this, undefined, intensity );
+	constructor( skyColor, groundColor, intensity = 1 ) {
 
-	var color1 = new Color().set( skyColor );
-	var color2 = new Color().set( groundColor );
+		super( undefined, intensity );
 
-	var sky = new Vector3( color1.r, color1.g, color1.b );
-	var ground = new Vector3( color2.r, color2.g, color2.b );
+		const color1 = new Color().set( skyColor );
+		const color2 = new Color().set( groundColor );
 
-	// without extra factor of PI in the shader, should = 1 / Math.sqrt( Math.PI );
-	var c0 = Math.sqrt( Math.PI );
-	var c1 = c0 * Math.sqrt( 0.75 );
+		const sky = new Vector3( color1.r, color1.g, color1.b );
+		const ground = new Vector3( color2.r, color2.g, color2.b );
 
-	this.sh.coefficients[ 0 ].copy( sky ).add( ground ).multiplyScalar( c0 );
-	this.sh.coefficients[ 1 ].copy( sky ).sub( ground ).multiplyScalar( c1 );
+		// without extra factor of PI in the shader, should = 1 / Math.sqrt( Math.PI );
+		const c0 = Math.sqrt( Math.PI );
+		const c1 = c0 * Math.sqrt( 0.75 );
 
-}
-
-HemisphereLightProbe.prototype = Object.assign( Object.create( LightProbe.prototype ), {
-
-	constructor: HemisphereLightProbe,
-
-	isHemisphereLightProbe: true,
-
-	copy: function ( source ) { // modifying colors not currently supported
-
-		LightProbe.prototype.copy.call( this, source );
-
-		return this;
-
-	},
-
-	toJSON: function ( meta ) {
-
-		var data = LightProbe.prototype.toJSON.call( this, meta );
-
-		// data.sh = this.sh.toArray(); // todo
-
-		return data;
+		this.sh.coefficients[ 0 ].copy( sky ).add( ground ).multiplyScalar( c0 );
+		this.sh.coefficients[ 1 ].copy( sky ).sub( ground ).multiplyScalar( c1 );
 
 	}
 
-} );
+}
+
+HemisphereLightProbe.prototype.isHemisphereLightProbe = true;
 
 export { HemisphereLightProbe };

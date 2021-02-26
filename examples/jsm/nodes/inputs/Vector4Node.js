@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { Vector4 } from '../../../../build/three.module.js';
 
 import { InputNode } from '../core/InputNode.js';
@@ -17,13 +13,13 @@ function Vector4Node( x, y, z, w ) {
 
 Vector4Node.prototype = Object.create( InputNode.prototype );
 Vector4Node.prototype.constructor = Vector4Node;
-Vector4Node.prototype.nodeType = "Vector4";
+Vector4Node.prototype.nodeType = 'Vector4';
 
 NodeUtils.addShortcuts( Vector4Node.prototype, 'value', [ 'x', 'y', 'z', 'w' ] );
 
 Vector4Node.prototype.generateReadonly = function ( builder, output, uuid, type/*, ns, needsUpdate*/ ) {
 
-	return builder.format( "vec4( " + this.x + ", " + this.y + ", " + this.z + ", " + this.w + " )", type, output );
+	return builder.format( 'vec4( ' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ' )', type, output );
 
 };
 

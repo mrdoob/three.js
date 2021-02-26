@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { Node } from '../core/Node.js';
 
 function SwitchNode( node, components ) {
@@ -15,7 +11,7 @@ function SwitchNode( node, components ) {
 
 SwitchNode.prototype = Object.create( Node.prototype );
 SwitchNode.prototype.constructor = SwitchNode;
-SwitchNode.prototype.nodeType = "Switch";
+SwitchNode.prototype.nodeType = 'Switch';
 
 SwitchNode.prototype.getType = function ( builder ) {
 
@@ -52,7 +48,6 @@ SwitchNode.prototype.generate = function ( builder, output ) {
 
 		for ( i = 0; i < len; i ++ ) {
 
-			var elm = components.charAt( i );
 			var idx = builder.getIndexByElement( components.charAt( i ) );
 
 			if ( idx > outputLength ) idx = outputLength;

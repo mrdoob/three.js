@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { Color } from '../../../../build/three.module.js';
 
 import { InputNode } from '../core/InputNode.js';
@@ -17,13 +13,13 @@ function ColorNode( color, g, b ) {
 
 ColorNode.prototype = Object.create( InputNode.prototype );
 ColorNode.prototype.constructor = ColorNode;
-ColorNode.prototype.nodeType = "Color";
+ColorNode.prototype.nodeType = 'Color';
 
 NodeUtils.addShortcuts( ColorNode.prototype, 'value', [ 'r', 'g', 'b' ] );
 
 ColorNode.prototype.generateReadonly = function ( builder, output, uuid, type/*, ns, needsUpdate */ ) {
 
-	return builder.format( "vec3( " + this.r + ", " + this.g + ", " + this.b + " )", type, output );
+	return builder.format( 'vec3( ' + this.r + ', ' + this.g + ', ' + this.b + ' )', type, output );
 
 };
 

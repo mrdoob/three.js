@@ -1,86 +1,60 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
+
+import { ObjectLoader } from '../../../build/three.module.js';
 
 /**
  * @param editor Editor
  * @param object THREE.Object3D
  * @constructor
  */
+class RemoveObjectCommand extends Command {
 
-var RemoveObjectCommand = function ( editor, object ) {
+	constructor( editor, object ) {
 
-	Command.call( this, editor );
+		super( editor );
 
-	this.type = 'RemoveObjectCommand';
-	this.name = 'Remove Object';
+		this.type = 'RemoveObjectCommand';
+		this.name = 'Remove Object';
 
-	this.object = object;
-	this.parent = ( object !== undefined ) ? object.parent : undefined;
-	if ( this.parent !== undefined ) {
+		this.object = object;
+		this.parent = ( object !== undefined ) ? object.parent : undefined;
+		if ( this.parent !== undefined ) {
 
-		this.index = this.parent.children.indexOf( this.object );
+			this.index = this.parent.children.indexOf( this.object );
+
+		}
 
 	}
 
-};
+	execute() {
 
-RemoveObjectCommand.prototype = {
+		this.editor.removeObject( this.object );
+		this.editor.deselect();
 
-	execute: function () {
+	}
 
-		var scope = this.editor;
-		this.object.traverse( function ( child ) {
+	undo() {
 
-			scope.removeHelper( child );
-
-		} );
-
-		this.parent.remove( this.object );
-		this.editor.select( this.parent );
-
-		this.editor.signals.objectRemoved.dispatch( this.object );
-		this.editor.signals.sceneGraphChanged.dispatch();
-
-	},
-
-	undo: function () {
-
-		var scope = this.editor;
-
-		this.object.traverse( function ( child ) {
-
-			if ( child.geometry !== undefined ) scope.addGeometry( child.geometry );
-			if ( child.material !== undefined ) scope.addMaterial( child.material );
-
-			scope.addHelper( child );
-
-		} );
-
-		this.parent.children.splice( this.index, 0, this.object );
-		this.object.parent = this.parent;
+		this.editor.addObject( this.object, this.parent, this.index );
 		this.editor.select( this.object );
 
-		this.editor.signals.objectAdded.dispatch( this.object );
-		this.editor.signals.sceneGraphChanged.dispatch();
+	}
 
-	},
+	toJSON() {
 
-	toJSON: function () {
+		const output = super.toJSON( this );
 
-		var output = Command.prototype.toJSON.call( this );
 		output.object = this.object.toJSON();
 		output.index = this.index;
 		output.parentUuid = this.parent.uuid;
 
 		return output;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Command.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.parent = this.editor.objectByUuid( json.parentUuid );
 		if ( this.parent === undefined ) {
@@ -92,13 +66,16 @@ RemoveObjectCommand.prototype = {
 		this.index = json.index;
 
 		this.object = this.editor.objectByUuid( json.object.object.uuid );
+
 		if ( this.object === undefined ) {
 
-			var loader = new THREE.ObjectLoader();
+			const loader = new ObjectLoader();
 			this.object = loader.parse( json.object );
 
 		}
 
 	}
 
-};
+}
+
+export { RemoveObjectCommand };

@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { StereoCamera } from '../../../../src/cameras/StereoCamera';

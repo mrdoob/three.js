@@ -1,7 +1,3 @@
-/**
- * @author Takahiro / https://github.com/takahirox
- */
-
 // VRM Specification: https://dwango.github.io/vrm/vrm_spec/
 //
 // VRM is based on glTF 2.0 and VRM extension is defined
@@ -33,7 +29,25 @@ THREE.VRMLoader = ( function () {
 
 			this.gltfLoader.load( url, function ( gltf ) {
 
-				scope.parse( gltf, onLoad );
+				try {
+
+					scope.parse( gltf, onLoad );
+
+				} catch ( e ) {
+
+					if ( onError ) {
+
+						onError( e );
+
+					} else {
+
+						console.error( e );
+
+					}
+
+					scope.manager.itemError( url );
+
+				}
 
 			}, onProgress, onError );
 
@@ -41,7 +55,7 @@ THREE.VRMLoader = ( function () {
 
 		setDRACOLoader: function ( dracoLoader ) {
 
-			this.glTFLoader.setDRACOLoader( dracoLoader );
+			this.gltfLoader.setDRACOLoader( dracoLoader );
 			return this;
 
 		},

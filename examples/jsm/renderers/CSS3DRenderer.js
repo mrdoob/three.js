@@ -1,21 +1,19 @@
-/**
- * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
- * @author mrdoob / http://mrdoob.com/
- * @author yomotsu / https://yomotsu.net/
- */
-
 import {
 	Matrix4,
-	Object3D,
-	Vector3
-} from "../../../build/three.module.js";
+	Object3D
+} from '../../../build/three.module.js';
+
+/**
+ * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
+ */
 
 var CSS3DObject = function ( element ) {
 
 	Object3D.call( this );
 
-	this.element = element;
+	this.element = element || document.createElement( 'div' );
 	this.element.style.position = 'absolute';
+	this.element.style.pointerEvents = 'auto';
 
 	this.addEventListener( 'removed', function () {
 
@@ -33,8 +31,21 @@ var CSS3DObject = function ( element ) {
 
 };
 
-CSS3DObject.prototype = Object.create( Object3D.prototype );
-CSS3DObject.prototype.constructor = CSS3DObject;
+CSS3DObject.prototype = Object.assign( Object.create( Object3D.prototype ), {
+
+	constructor: CSS3DObject,
+
+	copy: function ( source, recursive ) {
+
+		Object3D.prototype.copy.call( this, source, recursive );
+
+		this.element = source.element.cloneNode( true );
+
+		return this;
+
+	}
+
+} );
 
 var CSS3DSprite = function ( element ) {
 
@@ -48,6 +59,8 @@ CSS3DSprite.prototype.constructor = CSS3DSprite;
 //
 
 var CSS3DRenderer = function () {
+
+	var _this = this;
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
@@ -66,12 +79,10 @@ var CSS3DRenderer = function () {
 
 	var cameraElement = document.createElement( 'div' );
 
-	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	cameraElement.style.transformStyle = 'preserve-3d';
+	cameraElement.style.pointerEvents = 'none';
 
 	domElement.appendChild( cameraElement );
-
-	var isIE = /Trident/i.test( navigator.userAgent );
 
 	this.getSize = function () {
 
@@ -128,7 +139,7 @@ var CSS3DRenderer = function () {
 
 	}
 
-	function getObjectCSSMatrix( matrix, cameraCSSMatrix ) {
+	function getObjectCSSMatrix( matrix ) {
 
 		var elements = matrix.elements;
 		var matrix3d = 'matrix3d(' +
@@ -150,22 +161,15 @@ var CSS3DRenderer = function () {
 			epsilon( elements[ 15 ] ) +
 		')';
 
-		if ( isIE ) {
-
-			return 'translate(-50%,-50%)' +
-				'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)' +
-				cameraCSSMatrix +
-				matrix3d;
-
-		}
-
 		return 'translate(-50%,-50%)' + matrix3d;
 
 	}
 
-	function renderObject( object, camera, cameraCSSMatrix ) {
+	function renderObject( object, scene, camera, cameraCSSMatrix ) {
 
 		if ( object instanceof CSS3DObject ) {
+
+			object.onBeforeRender( _this, scene, camera );
 
 			var style;
 
@@ -183,11 +187,11 @@ var CSS3DRenderer = function () {
 				matrix.elements[ 11 ] = 0;
 				matrix.elements[ 15 ] = 1;
 
-				style = getObjectCSSMatrix( matrix, cameraCSSMatrix );
+				style = getObjectCSSMatrix( matrix );
 
 			} else {
 
-				style = getObjectCSSMatrix( object.matrixWorld, cameraCSSMatrix );
+				style = getObjectCSSMatrix( object.matrixWorld );
 
 			}
 
@@ -196,20 +200,14 @@ var CSS3DRenderer = function () {
 
 			if ( cachedObject === undefined || cachedObject.style !== style ) {
 
-				element.style.WebkitTransform = style;
 				element.style.transform = style;
 
 				var objectData = { style: style };
-
-				if ( isIE ) {
-
-					objectData.distanceToCameraSquared = getDistanceToSquared( camera, object );
-
-				}
-
 				cache.objects.set( object, objectData );
 
 			}
+
+			element.style.display = object.visible ? '' : 'none';
 
 			if ( element.parentNode !== cameraElement ) {
 
@@ -217,62 +215,13 @@ var CSS3DRenderer = function () {
 
 			}
 
+			object.onAfterRender( _this, scene, camera );
+
 		}
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			renderObject( object.children[ i ], camera, cameraCSSMatrix );
-
-		}
-
-	}
-
-	var getDistanceToSquared = function () {
-
-		var a = new Vector3();
-		var b = new Vector3();
-
-		return function ( object1, object2 ) {
-
-			a.setFromMatrixPosition( object1.matrixWorld );
-			b.setFromMatrixPosition( object2.matrixWorld );
-
-			return a.distanceToSquared( b );
-
-		};
-
-	}();
-
-	function filterAndFlatten( scene ) {
-
-		var result = [];
-
-		scene.traverse( function ( object ) {
-
-			if ( object instanceof CSS3DObject ) result.push( object );
-
-		} );
-
-		return result;
-
-	}
-
-	function zOrder( scene ) {
-
-		var sorted = filterAndFlatten( scene ).sort( function ( a, b ) {
-
-			var distanceA = cache.objects.get( a ).distanceToCameraSquared;
-			var distanceB = cache.objects.get( b ).distanceToCameraSquared;
-
-			return distanceA - distanceB;
-
-		} );
-
-		var zMax = sorted.length;
-
-		for ( var i = 0, l = sorted.length; i < l; i ++ ) {
-
-			sorted[ i ].element.style.zIndex = zMax - i;
+			renderObject( object.children[ i ], scene, camera, cameraCSSMatrix );
 
 		}
 
@@ -284,24 +233,12 @@ var CSS3DRenderer = function () {
 
 		if ( cache.camera.fov !== fov ) {
 
-			if ( camera.isPerspectiveCamera ) {
-
-				domElement.style.WebkitPerspective = fov + 'px';
-				domElement.style.perspective = fov + 'px';
-
-			} else {
-
-				domElement.style.WebkitPerspective = '';
-				domElement.style.perspective = '';
-
-			}
-
+			domElement.style.perspective = camera.isPerspectiveCamera ? fov + 'px' : '';
 			cache.camera.fov = fov;
 
 		}
 
-		scene.updateMatrixWorld();
-
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		if ( camera.isOrthographicCamera ) {
@@ -318,26 +255,15 @@ var CSS3DRenderer = function () {
 		var style = cameraCSSMatrix +
 			'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)';
 
-		if ( cache.camera.style !== style && ! isIE ) {
+		if ( cache.camera.style !== style ) {
 
-			cameraElement.style.WebkitTransform = style;
 			cameraElement.style.transform = style;
 
 			cache.camera.style = style;
 
 		}
 
-		renderObject( scene, camera, cameraCSSMatrix );
-
-		if ( isIE ) {
-
-			// IE10 and 11 does not support 'preserve-3d'.
-			// Thus, z-order in 3D will not work.
-			// We have to calc z-order manually and set CSS z-index for IE.
-			// FYI: z-index can't handle object intersection
-			zOrder( scene );
-
-		}
+		renderObject( scene, scene, camera, cameraCSSMatrix );
 
 	};
 
