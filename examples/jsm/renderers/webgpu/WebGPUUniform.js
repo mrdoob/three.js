@@ -1,4 +1,4 @@
-import { Color, Matrix3, Matrix4, Vector2, Vector3, Vector4 } from '../../../../build/three.module.js';
+import { Color, Matrix3, Matrix4, Vector2, Vector3, Vector4 } from 'three';
 
 class WebGPUUniform {
 

@@ -10,9 +10,16 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - sandbox<br/>(Chrome Canary with flag: --enable-unsafe-webgpu)
 		</div>
 
+		<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
+		}
+		</script>
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
 
