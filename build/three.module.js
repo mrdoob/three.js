@@ -1,5 +1,5 @@
 // threejs.org/license
-const REVISION = '126';
+const REVISION = '127dev';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -13542,7 +13542,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 		}
 
-		if ( background && ( background.isCubeTexture || background.isWebGLCubeRenderTarget || background.mapping === CubeUVReflectionMapping ) ) {
+		if ( background && ( background.isCubeTexture || background.mapping === CubeUVReflectionMapping ) ) {
 
 			if ( boxMesh === undefined ) {
 
@@ -13581,14 +13581,6 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 				} );
 
 				objects.update( boxMesh );
-
-			}
-
-			if ( background.isWebGLCubeRenderTarget ) {
-
-				// TODO Deprecate
-
-				background = background.texture;
 
 			}
 
@@ -24035,10 +24027,6 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		if ( scene.isScene === true ) scene.onAfterRender( _this, scene, camera );
-
-		//
-
 		if ( _currentRenderTarget !== null ) {
 
 			// Generate mipmap if we're using any kind of mipmap filtering
@@ -24050,6 +24038,10 @@ function WebGLRenderer( parameters ) {
 			textures.updateMultisampleRenderTarget( _currentRenderTarget );
 
 		}
+
+		//
+
+		if ( scene.isScene === true ) scene.onAfterRender( _this, scene, camera );
 
 		// Ensure depth buffer writing is enabled so it can be cleared on next render
 

@@ -727,7 +727,7 @@
 		Function("r", "regeneratorRuntime = r")(runtime);
 	}
 
-	var REVISION = '126';
+	var REVISION = '127dev';
 	var MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -11660,7 +11660,7 @@
 				renderer.clear(renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil);
 			}
 
-			if (background && (background.isCubeTexture || background.isWebGLCubeRenderTarget || background.mapping === CubeUVReflectionMapping)) {
+			if (background && (background.isCubeTexture || background.mapping === CubeUVReflectionMapping)) {
 				if (boxMesh === undefined) {
 					boxMesh = new Mesh(new BoxGeometry(1, 1, 1), new ShaderMaterial({
 						name: 'BackgroundCubeMaterial',
@@ -11686,11 +11686,6 @@
 						}
 					});
 					objects.update(boxMesh);
-				}
-
-				if (background.isWebGLCubeRenderTarget) {
-					// TODO Deprecate
-					background = background.texture;
 				}
 
 				boxMesh.material.uniforms.envMap.value = background;
@@ -19018,15 +19013,15 @@
 			if (opaqueObjects.length > 0) renderObjects(opaqueObjects, scene, camera);
 			if (transparentObjects.length > 0) renderObjects(transparentObjects, scene, camera); //
 
-			if (scene.isScene === true) scene.onAfterRender(_this, scene, camera); //
-
 			if (_currentRenderTarget !== null) {
 				// Generate mipmap if we're using any kind of mipmap filtering
 				textures.updateRenderTargetMipmap(_currentRenderTarget); // resolve multisample renderbuffers to a single-sample texture if necessary
 
 				textures.updateMultisampleRenderTarget(_currentRenderTarget);
-			} // Ensure depth buffer writing is enabled so it can be cleared on next render
+			} //
 
+
+			if (scene.isScene === true) scene.onAfterRender(_this, scene, camera); // Ensure depth buffer writing is enabled so it can be cleared on next render
 
 			state.buffers.depth.setTest(true);
 			state.buffers.depth.setMask(true);
