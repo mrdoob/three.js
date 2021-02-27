@@ -615,6 +615,26 @@ function Loader( editor ) {
 
 				break;
 
+			case 'png':
+			case 'jpg':
+			case 'jpeg':
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const loader = new THREE.TextureLoader( manager );
+					loader.load( event.target.result, function ( texture ) {
+
+						texture.name = texture.image.name = file.name;
+
+						editor.addTexture( texture );
+
+					} );
+
+				} );
+				reader.readAsDataURL( file );
+
+				break;
+
 			default:
 
 				console.error( 'Unsupported file format (' + extension + ').' );
