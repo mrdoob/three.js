@@ -682,7 +682,7 @@ function Strings( config ) {
 			'menubar/edit/undo': '撤销 (Ctrl+Z)',
 			'menubar/edit/redo': '重做 (Ctrl+Shift+Z)',
 			'menubar/edit/clear_history': '清空历史记录',
-			'menubar/edit/center': 'Center',
+			'menubar/edit/center': '居中',
 			'menubar/edit/clone': '拷贝',
 			'menubar/edit/delete': '删除 (Del)',
 			'menubar/edit/fixcolormaps': '修复颜色贴图',
@@ -943,14 +943,14 @@ function Strings( config ) {
 			'sidebar/settings/language': '语言',
 			'sidebar/settings/exportPrecision': '输出精度',
 
-			'sidebar/settings/shortcuts': 'Shortcuts',
+			'sidebar/settings/shortcuts': '快捷键',
 			'sidebar/settings/shortcuts/translate': '移动',
 			'sidebar/settings/shortcuts/rotate': '旋转',
 			'sidebar/settings/shortcuts/scale': '缩放',
 			'sidebar/settings/shortcuts/undo': '撤销',
 			'sidebar/settings/shortcuts/focus': '聚焦',
 
-			'sidebar/settings/viewport': 'Viewport',
+			'sidebar/settings/viewport': '视窗',
 			'sidebar/settings/viewport/grid': '网格',
 			'sidebar/settings/viewport/helpers': '辅助',
 
