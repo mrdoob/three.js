@@ -2,6 +2,13 @@
  * https://github.com/mrdoob/eventdispatcher.js/
  */
 
+class Event {
+	constructor(type, target = undefined) {
+		this.type = String(type);
+		this.target = target;
+	}
+}
+
 function EventDispatcher() {}
 
 Object.assign( EventDispatcher.prototype, {
@@ -84,4 +91,4 @@ Object.assign( EventDispatcher.prototype, {
 } );
 
 
-export { EventDispatcher };
+export { Event, EventDispatcher };
