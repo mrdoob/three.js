@@ -73,6 +73,8 @@ function Editor() {
 		materialChanged: new Signal(),
 		materialRemoved: new Signal(),
 
+		textureAdded: new Signal(),
+
 		scriptAdded: new Signal(),
 		scriptChanged: new Signal(),
 		scriptRemoved: new Signal(),
@@ -360,6 +362,8 @@ Editor.prototype = {
 	addTexture: function ( texture ) {
 
 		this.textures[ texture.uuid ] = texture;
+
+		this.signals.textureAdded.dispatch();
 
 	},
 
