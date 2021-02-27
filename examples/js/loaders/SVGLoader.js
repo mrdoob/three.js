@@ -2319,11 +2319,11 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 
 					if ( start ) {
 
-						makeCircularSector( center, p2, p1, u, 0.5 );
+						makeCircularSector( center, p2, p1, u, 0 );
 
 					} else {
 
-						makeCircularSector( center, p1, p2, u, 0.5 );
+						makeCircularSector( center, p1, p2, u, 1 );
 
 					}
 
@@ -2446,9 +2446,9 @@ THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 	var steps = options.steps;
 	var vlen = vertices.length;
 	var flen = vlen / 3;
-	var i = 0;
+	var i;
 	var s;
-
+	var groups = [];
 
 	// Bottom faces
 	for ( i = 0; i < flen; i += 3 ) {
@@ -2456,6 +2456,8 @@ THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 		indices.push( i + 2, i + 1, i );
 
 	}
+
+	groups.push( [ 0, flen, 2 ] );
 
 	// Add stepped vertices...
 	for ( s = 1; s <= ( steps + 1 ); s ++ ) {
@@ -2477,6 +2479,8 @@ THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 
 	}
 
+	groups.push( [ flen, indices.length - flen, 1 ] );
+
 	// Front faces
 	for ( i = 0; i < vlen; i += 3 ) {
 
@@ -2490,8 +2494,11 @@ THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 
 	}
 
+	groups.push( [ indices.length - flen, flen, 0 ] );
+
 	var geometry = new THREE.BufferGeometry();
 	geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
 
 	if ( uvs ) {
 
@@ -2508,6 +2515,12 @@ THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 		}
 
 		geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+
+	}
+
+	for ( i = groups.length - 1; i >= 0; i ++ ) {
+
+		geometry.addGroup( groups[ i ][ 0 ], groups[ i ][ 1 ], groups[ i ][ 2 ] );
 
 	}
 
