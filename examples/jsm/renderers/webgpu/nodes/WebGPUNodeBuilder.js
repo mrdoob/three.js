@@ -310,14 +310,14 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			if ( uniform.type === 'texture' ) {
 
-				snippet += `layout(set = 0, binding = ${index ++}) uniform sampler ${uniform.name}_sampler;`;
-				snippet += `layout(set = 0, binding = ${index ++}) uniform texture2D ${uniform.name};`;
+				snippet += `layout(set = 0, binding = ${index ++}) uniform sampler ${uniform.name}_sampler; `;
+				snippet += `layout(set = 0, binding = ${index ++}) uniform texture2D ${uniform.name}; `;
 
 			} else {
 
 				const vectorType = this.getVectorType( uniform.type );
 
-				groupSnippet += `uniform ${vectorType} ${uniform.name};`;
+				groupSnippet += `uniform ${vectorType} ${uniform.name}; `;
 
 			}
 
@@ -325,7 +325,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		if ( groupSnippet ) {
 
-			snippet += `layout(set = 0, binding = ${index ++}) uniform NodeUniforms { ${groupSnippet} } nodeUniforms;`;
+			snippet += `layout(set = 0, binding = ${index ++}) uniform NodeUniforms { ${groupSnippet} } nodeUniforms; `;
 
 		}
 
