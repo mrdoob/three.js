@@ -1,43 +1,28 @@
 THREE.TGALoader = function ( manager ) {
 
-	THREE.Loader.call( this, manager );
+	THREE.DataTextureLoader.call( this, manager );
 
 };
 
-THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+THREE.TGALoader.prototype = Object.assign( Object.create( THREE.DataTextureLoader.prototype ), {
 
 	constructor: THREE.TGALoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		function onDataTextureLoad( texture, texData ) {
 
-		var texture = new THREE.DataTexture();
-		texture.flipY = true;
-		texture.generateMipmaps = true;
-		texture.unpackAlignment = 4;
-		texture.magFilter = THREE.LinearFilter;
-		texture.minFilter = THREE.LinearMipmapLinearFilter;
+			texture.flipY = true;
+			texture.generateMipmaps = true;
+			texture.unpackAlignment = 4;
+			texture.magFilter = THREE.LinearFilter;
+			texture.minFilter = THREE.LinearMipmapLinearFilter;
 
-		var loader = new THREE.FileLoader( this.manager );
-		loader.setResponseType( 'arraybuffer' );
-		loader.setPath( this.path );
-		loader.setWithCredentials( this.withCredentials );
+			if ( onLoad ) onLoad( texture, texData );
 
-		loader.load( url, function ( buffer ) {
+		}
 
-			texture.image = scope.parse( buffer );
-			texture.needsUpdate = true;
-
-			if ( onLoad !== undefined ) {
-
-				onLoad( texture );
-
-			}
-
-		}, onProgress, onError );
-
-		return texture;
+		return THREE.DataTextureLoader.prototype.load.call( this, url, onDataTextureLoad, onProgress, onError );
 
 	},
 
