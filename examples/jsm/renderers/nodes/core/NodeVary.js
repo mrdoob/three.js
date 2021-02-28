@@ -6,10 +6,10 @@ class NodeVary {
 		this.type = type;
 		this.snippet = snippet;
 
-		Object.defineProperty( this, 'isNodeVary', { value: true } );
-
 	}
 
 }
+
+NodeVary.prototype.isNodeVary = true;
 
 export default NodeVary;
