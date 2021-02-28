@@ -1,6 +1,5 @@
 import {
 	DataTextureLoader,
-	LinearFilter,
 	LinearMipmapLinearFilter
 } from '../../../build/three.module.js';
 
@@ -13,24 +12,6 @@ var TGALoader = function ( manager ) {
 TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype ), {
 
 	constructor: TGALoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		function onDataTextureLoad( texture, texData ) {
-
-			texture.flipY = true;
-			texture.generateMipmaps = true;
-			texture.unpackAlignment = 4;
-			texture.magFilter = LinearFilter;
-			texture.minFilter = LinearMipmapLinearFilter;
-
-			if ( onLoad ) onLoad( texture, texData );
-
-		}
-
-		return DataTextureLoader.prototype.load.call( this, url, onDataTextureLoad, onProgress, onError );
-
-	},
 
 	parse: function ( buffer ) {
 
@@ -526,6 +507,9 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			data: imageData,
 			width: header.width,
 			height: header.height,
+			flipY: true,
+			generateMipmaps: true,
+			minFilter: LinearMipmapLinearFilter,
 
 		};
 

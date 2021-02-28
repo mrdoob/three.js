@@ -8,24 +8,6 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 	constructor: THREE.TGALoader,
 
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		function onDataTextureLoad( texture, texData ) {
-
-			texture.flipY = true;
-			texture.generateMipmaps = true;
-			texture.unpackAlignment = 4;
-			texture.magFilter = THREE.LinearFilter;
-			texture.minFilter = THREE.LinearMipmapLinearFilter;
-
-			if ( onLoad ) onLoad( texture, texData );
-
-		}
-
-		return THREE.DataTextureLoader.prototype.load.call( this, url, onDataTextureLoad, onProgress, onError );
-
-	},
-
 	parse: function ( buffer ) {
 
 		// reference from vthibault, https://github.com/vthibault/roBrowser/blob/master/src/Loaders/Targa.js
@@ -520,6 +502,9 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			data: imageData,
 			width: header.width,
 			height: header.height,
+			flipY: true,
+			generateMipmaps: true,
+			minFilter: THREE.LinearMipmapLinearFilter,
 
 		};
 
