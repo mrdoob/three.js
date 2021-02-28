@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - materials</title>
+		<title>three.js webgpu - instance uniform</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -27,18 +27,46 @@
 
 			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
+			import Node from './jsm/renderers/nodes/core/Node.js';
 			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
-			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
-			import NormalNode from './jsm/renderers/nodes/accessors/NormalNode.js';
-			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
+			import { NodeUpdateType } from './jsm/renderers/nodes/core/constants.js';
+			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
 
 			import Stats from './jsm/libs/stats.module.js';
+
+			class InstanceUniformNode extends Node {
+
+				constructor() {
+
+					super( 'vec3' );
+
+					this.updateType = NodeUpdateType.Object;
+
+					this.inputNode = new ColorNode();
+
+				}
+
+				update( frame ) {
+
+					const mesh = frame.object;
+
+					this.inputNode.value.copy( mesh.color );
+
+				}
+
+				generate( builder, output ) {
+
+					return this.inputNode.build( builder, output );
+
+				}
+
+			}
 
 			let stats;
 
 			let camera, scene, renderer;
 
-			const objects = [], materials = [];
+			const objects = [];
 
 			init().then( animate ).catch( error );
 
@@ -69,52 +97,18 @@
 
 				// Materials
 
-				const textureLoader = new THREE.TextureLoader();
+				const instanceUniform = new InstanceUniformNode();
 
-				const texture = textureLoader.load( './textures/uv_grid_opengl.jpg' );
-				texture.wrapS = THREE.RepeatWrapping;
-				texture.wrapT = THREE.RepeatWrapping;
-
-				let material;
-
-				// PositionNode.LOCAL
-				material = new THREE.MeshBasicMaterial();
-				material.colorNode = new PositionNode( PositionNode.LOCAL );
-				materials.push( material );
-
-				// NormalNode.LOCAL
-				material = new THREE.MeshBasicMaterial();
-				material.colorNode = new NormalNode( NormalNode.LOCAL );
-				materials.push( material );
-
-				// NormalNode.WORLD
-				material = new THREE.MeshBasicMaterial();
-				material.colorNode = new NormalNode( NormalNode.WORLD );
-				materials.push( material );
-
-				// NormalNode.VIEW
-				material = new THREE.MeshBasicMaterial();
-				material.colorNode = new NormalNode( NormalNode.VIEW );
-				materials.push( material );
-
-				// TextureNode
-				material = new THREE.MeshBasicMaterial();
-				material.colorNode = new TextureNode( texture );
-				materials.push( material );
-
-				// Opacity
-				material = new THREE.MeshBasicMaterial();
-				material.opacityNode = new TextureNode( texture );
-				material.transparent = true;
-				materials.push( material );
+				const material = new THREE.MeshBasicMaterial();
+				material.colorNode = instanceUniform;
 
 				// Geometry
 
 				const geometry = new TeapotGeometry( 50, 18 );
 
-				for ( let i = 0, l = materials.length; i < l; i ++ ) {
+				for ( let i = 0, l = 12; i < l; i ++ ) {
 
-					addMesh( geometry, materials[ i ] );
+					addMesh( geometry, material );
 
 				}
 
@@ -141,6 +135,8 @@
 			function addMesh( geometry, material ) {
 
 				const mesh = new THREE.Mesh( geometry, material );
+
+				mesh.color = new THREE.Color( Math.random() * 0xffffff );
 
 				mesh.position.x = ( objects.length % 4 ) * 200 - 400;
 				mesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;

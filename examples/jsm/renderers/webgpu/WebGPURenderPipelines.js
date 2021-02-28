@@ -7,7 +7,7 @@ import {
 	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending,
 	AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor
-} from '../../../../build/three.module.js';
+} from 'three';
 
 class WebGPURenderPipelines {
 
@@ -57,7 +57,7 @@ class WebGPURenderPipelines {
 
 			// get shader
 
-			const nodeBuilder = this.nodes.get( material );
+			const nodeBuilder = this.nodes.get( object );
 
 			// shader modules
 
@@ -97,10 +97,14 @@ class WebGPURenderPipelines {
 
 			const materialProperties = properties.get( material );
 
-			const disposeCallback = onMaterialDispose.bind( this );
-			materialProperties.disposeCallback = disposeCallback;
+			if ( materialProperties.disposeCallback === undefined ) {
 
-			material.addEventListener( 'dispose', disposeCallback );
+				const disposeCallback = onMaterialDispose.bind( this );
+				materialProperties.disposeCallback = disposeCallback;
+
+				material.addEventListener( 'dispose', disposeCallback );
+
+			}
 
 			// determine shader attributes
 
@@ -730,20 +734,20 @@ class WebGPURenderPipelines {
 
 		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
 
-		if ( type === 'float' ) return GPUVertexFormat.Float;
-		if ( type === 'vec2' ) return GPUVertexFormat.Float2;
-		if ( type === 'vec3' ) return GPUVertexFormat.Float3;
-		if ( type === 'vec4' ) return GPUVertexFormat.Float4;
+		if ( type === 'float' ) return GPUVertexFormat.Float32;
+		if ( type === 'vec2' ) return GPUVertexFormat.Float32x2;
+		if ( type === 'vec3' ) return GPUVertexFormat.Float32x3;
+		if ( type === 'vec4' ) return GPUVertexFormat.Float32x4;
 
-		if ( type === 'int' ) return GPUVertexFormat.Int;
-		if ( type === 'ivec2' ) return GPUVertexFormat.Int2;
-		if ( type === 'ivec3' ) return GPUVertexFormat.Int3;
-		if ( type === 'ivec4' ) return GPUVertexFormat.Int4;
+		if ( type === 'int' ) return GPUVertexFormat.Sint32;
+		if ( type === 'ivec2' ) return GPUVertexFormat.Sint32x2;
+		if ( type === 'ivec3' ) return GPUVertexFormat.Sint32x3;
+		if ( type === 'ivec4' ) return GPUVertexFormat.Sint32x4;
 
-		if ( type === 'uint' ) return GPUVertexFormat.UInt;
-		if ( type === 'uvec2' ) return GPUVertexFormat.UInt2;
-		if ( type === 'uvec3' ) return GPUVertexFormat.UInt3;
-		if ( type === 'uvec4' ) return GPUVertexFormat.UInt4;
+		if ( type === 'uint' ) return GPUVertexFormat.Uint32;
+		if ( type === 'uvec2' ) return GPUVertexFormat.Uint32x2;
+		if ( type === 'uvec3' ) return GPUVertexFormat.Uint32x3;
+		if ( type === 'uvec4' ) return GPUVertexFormat.Uint32x4;
 
 		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
 
@@ -788,22 +792,15 @@ class WebGPURenderPipelines {
 function onMaterialDispose( event ) {
 
 	const properties = this.properties;
-	const nodes = this.nodes;
-	const shaderModules = this.shaderModules;
 
 	const material = event.target;
 	const materialProperties = properties.get( material );
-	const nodeBuilder = nodes.get( material );
 
 	material.removeEventListener( 'dispose', materialProperties.disposeCallback );
 
 	properties.remove( material );
-	nodes.remove( material );
 
-	shaderModules.vertex.delete( nodeBuilder.vertexShader );
-	shaderModules.fragment.delete( nodeBuilder.fragmentShader );
-
-	// @TODO: still needed remove bindings and pipeline
+	// @TODO: still needed remove nodes, bindings and pipeline
 
 }
 

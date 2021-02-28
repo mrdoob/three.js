@@ -1,5 +1,5 @@
 // threejs.org/license
-const REVISION = '126dev';
+const REVISION = '127dev';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -13542,7 +13542,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 		}
 
-		if ( background && ( background.isCubeTexture || background.isWebGLCubeRenderTarget || background.mapping === CubeUVReflectionMapping ) ) {
+		if ( background && ( background.isCubeTexture || background.mapping === CubeUVReflectionMapping ) ) {
 
 			if ( boxMesh === undefined ) {
 
@@ -13581,14 +13581,6 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 				} );
 
 				objects.update( boxMesh );
-
-			}
-
-			if ( background.isWebGLCubeRenderTarget ) {
-
-				// TODO Deprecate
-
-				background = background.texture;
 
 			}
 
@@ -24035,10 +24027,6 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		if ( scene.isScene === true ) scene.onAfterRender( _this, scene, camera );
-
-		//
-
 		if ( _currentRenderTarget !== null ) {
 
 			// Generate mipmap if we're using any kind of mipmap filtering
@@ -24050,6 +24038,10 @@ function WebGLRenderer( parameters ) {
 			textures.updateMultisampleRenderTarget( _currentRenderTarget );
 
 		}
+
+		//
+
+		if ( scene.isScene === true ) scene.onAfterRender( _this, scene, camera );
 
 		// Ensure depth buffer writing is enabled so it can be cleared on next render
 
@@ -24854,7 +24846,7 @@ function WebGLRenderer( parameters ) {
 
 				const halfFloatSupportedByExt = ( textureType === HalfFloatType ) && ( extensions.has( 'EXT_color_buffer_half_float' ) || ( capabilities.isWebGL2 && extensions.has( 'EXT_color_buffer_float' ) ) );
 
-				if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( 35738 ) && // IE11, Edge and Chrome Mac < 52 (#9513)
+				if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( 35738 ) && // Edge and Chrome Mac < 52 (#9513)
 					! ( textureType === FloatType && ( capabilities.isWebGL2 || extensions.has( 'OES_texture_float' ) || extensions.has( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
 					! halfFloatSupportedByExt ) {
 
@@ -32999,7 +32991,7 @@ class KeyframeTrack {
 		let json;
 
 		// derived classes can define a static toJSON method
-		if ( trackType.toJSON !== undefined ) {
+		if ( trackType.toJSON !== this.toJSON ) {
 
 			json = trackType.toJSON( track );
 
@@ -40054,7 +40046,7 @@ class Font {
 
 function createPaths( text, size, data ) {
 
-	const chars = Array.from ? Array.from( text ) : String( text ).split( '' ); // workaround for IE11, see #13988
+	const chars = Array.from( text );
 	const scale = size / data.resolution;
 	const line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
 

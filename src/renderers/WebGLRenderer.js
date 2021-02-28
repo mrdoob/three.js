@@ -1076,10 +1076,6 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		if ( scene.isScene === true ) scene.onAfterRender( _this, scene, camera );
-
-		//
-
 		if ( _currentRenderTarget !== null ) {
 
 			// Generate mipmap if we're using any kind of mipmap filtering
@@ -1091,6 +1087,10 @@ function WebGLRenderer( parameters ) {
 			textures.updateMultisampleRenderTarget( _currentRenderTarget );
 
 		}
+
+		//
+
+		if ( scene.isScene === true ) scene.onAfterRender( _this, scene, camera );
 
 		// Ensure depth buffer writing is enabled so it can be cleared on next render
 
@@ -1895,7 +1895,7 @@ function WebGLRenderer( parameters ) {
 
 				const halfFloatSupportedByExt = ( textureType === HalfFloatType ) && ( extensions.has( 'EXT_color_buffer_half_float' ) || ( capabilities.isWebGL2 && extensions.has( 'EXT_color_buffer_float' ) ) );
 
-				if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // IE11, Edge and Chrome Mac < 52 (#9513)
+				if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // Edge and Chrome Mac < 52 (#9513)
 					! ( textureType === FloatType && ( capabilities.isWebGL2 || extensions.has( 'OES_texture_float' ) || extensions.has( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
 					! halfFloatSupportedByExt ) {
 
