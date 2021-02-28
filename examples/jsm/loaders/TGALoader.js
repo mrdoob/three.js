@@ -1,5 +1,5 @@
 import {
-	DataTextureLoader,
+	DataTextureLoader
 } from '../../../build/three.module.js';
 
 var TGALoader = function ( manager ) {
