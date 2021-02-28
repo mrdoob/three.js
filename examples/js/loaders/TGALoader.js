@@ -1,12 +1,45 @@
 THREE.TGALoader = function ( manager ) {
 
-	THREE.DataTextureLoader.call( this, manager );
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.TGALoader.prototype = Object.assign( Object.create( THREE.DataTextureLoader.prototype ), {
+THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.TGALoader,
+
+	load: function ( url, onLoad, onProgress, onError ) {
+
+		var scope = this;
+
+		var texture = new THREE.DataTexture();
+		texture.flipY = true;
+		texture.generateMipmaps = true;
+		texture.unpackAlignment = 4;
+		texture.magFilter = THREE.LinearFilter;
+		texture.minFilter = THREE.LinearMipmapLinearFilter;
+
+		var loader = new THREE.FileLoader( this.manager );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setPath( this.path );
+		loader.setWithCredentials( this.withCredentials );
+
+		loader.load( url, function ( buffer ) {
+
+			texture.image = scope.parse( buffer );
+			texture.needsUpdate = true;
+
+			if ( onLoad !== undefined ) {
+
+				onLoad( texture );
+
+			}
+
+		}, onProgress, onError );
+
+		return texture;
+
+	},
 
 	parse: function ( buffer ) {
 

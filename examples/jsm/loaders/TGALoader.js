@@ -1,16 +1,53 @@
 import {
-	DataTextureLoader
+	DataTexture,
+	FileLoader,
+	LinearFilter,
+	LinearMipmapLinearFilter,
+	Loader
 } from '../../../build/three.module.js';
 
 var TGALoader = function ( manager ) {
 
-	DataTextureLoader.call( this, manager );
+	Loader.call( this, manager );
 
 };
 
-TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype ), {
+TGALoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: TGALoader,
+
+	load: function ( url, onLoad, onProgress, onError ) {
+
+		var scope = this;
+
+		var texture = new DataTexture();
+		texture.flipY = true;
+		texture.generateMipmaps = true;
+		texture.unpackAlignment = 4;
+		texture.minFilter = LinearMipmapLinearFilter;
+		texture.magFilter = LinearFilter;
+
+		var loader = new FileLoader( this.manager );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setPath( this.path );
+		loader.setWithCredentials( this.withCredentials );
+
+		loader.load( url, function ( buffer ) {
+
+			texture.image = scope.parse( buffer );
+			texture.needsUpdate = true;
+
+			if ( onLoad !== undefined ) {
+
+				onLoad( texture );
+
+			}
+
+		}, onProgress, onError );
+
+		return texture;
+
+	},
 
 	parse: function ( buffer ) {
 
