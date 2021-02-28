@@ -62,7 +62,7 @@ class ShapePath {
 
 	toShapes( fillRule ) {
 
-		const BIGNUMBER = 999999999;
+		const BIGNUMBER = Number.MAX_SAFE_INTEGER;
 
 		const IntersectionLocationType = {
 			ORIGIN: 0,
