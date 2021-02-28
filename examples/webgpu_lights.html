@@ -34,8 +34,9 @@
 			import CameraNode from './jsm/renderers/nodes/accessors/CameraNode.js';
 			import Object3DNode from './jsm/renderers/nodes/accessors/Object3DNode.js';
 			import ModelNode from './jsm/renderers/nodes/accessors/ModelNode.js';
+			import LightNode from './jsm/renderers/nodes/lights/LightNode.js';
+			import LightContextNode from './jsm/renderers/nodes/lights/LightContextNode.js';
 			import { rand } from './jsm/renderers/nodes/functions/MathFunctions.js';
-			import { RE_Direct_BlinnPhong } from './jsm/renderers/nodes/functions/BSDFunctions.js';
 
 			let controls, camera, scene, renderer;
 			let lightDummy;
@@ -74,39 +75,27 @@
 
 				const geometryTeapot = new TeapotGeometry( 1, 18 );
 				//const geometryTeapot = new THREE.SphereGeometry( 1, 32, 16 );
-				const materialTeapot = new THREE.MeshBasicMaterial();
+				const materialTeapot = new THREE.MeshPhongMaterial();
 
 				//materialTeapot.colorNode = new ColorNode( new THREE.Color( 0x0000FF ) );
-				materialTeapot.colorNode = new NormalNode( NormalNode.VIEW );
+				//materialTeapot.colorNode = new NormalNode( NormalNode.VIEW );
 
-				lightDummy = new THREE.Mesh( new THREE.SphereGeometry( .1, 32, 16 ), new THREE.MeshBasicMaterial() );
+				lightDummy = new THREE.Mesh( new THREE.SphereGeometry( .1, 32, 16 ), new THREE.MeshPhongMaterial() );
 				lightDummy.position.y = 2;
 				//lightDummy.position.x = 1;
 				scene.add( lightDummy );
 
-				materialTeapot.colorNode = RE_Direct_BlinnPhong.call( {
-					// light
-					lightPosition: new Object3DNode( Object3DNode.VIEW_POSITION, lightDummy ),
-					lightColor: new ColorNode( new THREE.Color( 0xFFFFFF ) ),
-					
-					// geometry
-					normalView: new NormalNode( NormalNode.VIEW ),
-					positionView: new PositionNode( PositionNode.VIEW ),
-					positionViewDir: new PositionNode( PositionNode.VIEW_DIRECTION ),
-					
-					// material
-					materialDiffuseColor: new ColorNode( new THREE.Color( 0x333333 ) ),
-					materialSpecularColor: new ColorNode( new THREE.Color( 0x111111 ) ),
-					materialSpecularShininess: new FloatNode( 30 ),
-					materialSpecularStrength: new FloatNode( 1 )
-				} );
-
-				//materialTeapot.colorNode = new NormalNode( NormalNode.WORLD );
+				
 				/*
 				materialTeapot.colorNode = rand.call({
 					uv: new UVNode()
 				});
 				*/
+
+				//materialTeapot.colorNode = new NormalNode( NormalNode.WORLD );
+				//materialTeapot.colorNode = new TextureNode( texture );
+				//materialTeapot.colorNode = new LightContextNode( new LightNode( lightDummy ) );
+				materialTeapot.lightNode = new LightNode( lightDummy );
 
 				teapot = new THREE.Mesh( geometryTeapot, materialTeapot );
 				scene.add( teapot );

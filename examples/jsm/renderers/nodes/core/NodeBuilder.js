@@ -1,7 +1,9 @@
 import NodeUniform from './NodeUniform.js';
 import NodeAttribute from './NodeAttribute.js';
 import NodeVary from './NodeVary.js';
+import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
+import NodeKeywords from './NodeKeywords.js';
 import { NodeUpdateType } from './constants.js';
 
 class NodeBuilder {
@@ -13,7 +15,7 @@ class NodeBuilder {
 
 		this.nodes = [];
 		this.updateNodes = [];
-
+		
 		this.vertexShader = null;
 		this.fragmentShader = null;
 
@@ -21,9 +23,14 @@ class NodeBuilder {
 		this.defines = { vertex: {}, fragment: {} };
 		this.uniforms = { vertex: [], fragment: [] };
 		this.nodeCodes = { vertex: [], fragment: [] };
+		this.vars = { vertex: [], fragment: [] };
 		this.attributes = [];
 		this.varys = [];
-
+		
+		this.context = {
+			'keywords': new NodeKeywords()
+		};
+		
 		this.nodesData = new WeakMap();
 
 		this.shaderStage = null;
@@ -58,6 +65,24 @@ class NodeBuilder {
 
 		this.defines[ shaderStage ][ name ] = value;
 
+	}
+	
+	setContext( context ) {
+		
+		this.context = context;
+		
+	}
+	
+	getContext() {
+		
+		return this.context;
+		
+	}
+	
+	getContextParameter( name ) {
+		
+		return this.context[ name ];
+		
 	}
 
 	getTexture( /* textureProperty, uvSnippet */ ) {
@@ -188,7 +213,7 @@ class NodeBuilder {
 			const uniforms = this.uniforms[ shaderStage ];
 			const index = uniforms.length;
 
-			nodeUniform = new NodeUniform( 'nodeU' + index, type, node );
+			nodeUniform = new NodeUniform( 'nodeUniform' + index, type, node );
 
 			uniforms.push( nodeUniform );
 
@@ -198,6 +223,29 @@ class NodeBuilder {
 
 		return nodeUniform;
 
+	}
+	
+	getVarFromNode( node, type, shaderStage = this.shaderStage ) {
+		
+		const nodeData = this.getDataFromNode( node, shaderStage );
+
+		let nodeVar = nodeData.variable;
+
+		if ( nodeVar === undefined ) {
+
+			const vars = this.vars[ shaderStage ];
+			const index = vars.length;
+
+			nodeVar = new NodeVar( 'nodeVar' + index, type );
+
+			vars.push( nodeVar );
+
+			nodeData.variable = nodeVar;
+
+		}
+
+		return nodeVar;
+		
 	}
 
 	getVaryFromNode( node, type ) {
@@ -211,7 +259,7 @@ class NodeBuilder {
 			const varys = this.varys;
 			const index = varys.length;
 
-			nodeVary = new NodeVary( 'nodeV' + index, type );
+			nodeVary = new NodeVary( 'nodeVary' + index, type );
 
 			varys.push( nodeVary );
 
@@ -234,7 +282,7 @@ class NodeBuilder {
 			const nodeCodes = this.nodeCodes[ shaderStage ];
 			const index = nodeCodes.length;
 
-			nodeCode = new NodeCode( 'nodeC' + index, type );
+			nodeCode = new NodeCode( 'nodeCode' + index, type );
 
 			nodeCodes.push( nodeCode );
 
@@ -301,6 +349,18 @@ class NodeBuilder {
 		console.warn( 'Abstract function.' );
 
 	}
+	
+	getVarsHeaderSnippet( /*shaderStage*/ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+	
+	getVarsBodySnippet( /*shaderStage*/ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
 
 	getUniformsHeaderSnippet( /*shaderStage*/ ) {
 
@@ -358,12 +418,16 @@ class NodeBuilder {
 			this.define( shaderStage, 'NODE_HEADER_UNIFORMS', this.getUniformsHeaderSnippet( shaderStage ) );
 			this.define( shaderStage, 'NODE_HEADER_ATTRIBUTES', this.getAttributesHeaderSnippet( shaderStage ) );
 			this.define( shaderStage, 'NODE_HEADER_VARYS', this.getVarysHeaderSnippet( shaderStage ) );
+			
+			this.define( shaderStage, 'NODE_BODY_VARYS', this.getVarysBodySnippet( shaderStage ) );			
+			this.define( shaderStage, 'NODE_BODY_VARS', this.getVarsBodySnippet( shaderStage )  );	
 
-			this.define( shaderStage, 'NODE_BODY_VARYS', this.getVarysBodySnippet( shaderStage ) );
+			let headerCode = '';
+			
+			headerCode += this.getVarsHeaderSnippet( shaderStage ) + '\n';
+			headerCode += this.getUniformsHeaderCodes( shaderStage );
 
-			const shaderCode = this.getUniformsHeaderCodes( shaderStage );
-
-			shaderData[ shaderStage ] = this._buildDefines( shaderStage ) + '\n' + shaderCode;
+			shaderData[ shaderStage ] = this._buildDefines( shaderStage ) + '\n' + headerCode;
 
 		}
 

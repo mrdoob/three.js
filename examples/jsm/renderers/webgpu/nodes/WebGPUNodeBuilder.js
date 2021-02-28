@@ -9,7 +9,7 @@ import { WebGPUSampledTexture } from '../WebGPUSampledTexture.js';
 import NodeSlot from '../../nodes/core/NodeSlot.js';
 import NodeBuilder from '../../nodes/core/NodeBuilder.js';
 import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode.js';
-
+import LightContextNode from '../../nodes/lights/LightContextNode.js';
 import ShaderLib from './ShaderLib.js';
 
 class WebGPUNodeBuilder extends NodeBuilder {
@@ -39,9 +39,10 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		// parse inputs
 
-		if ( material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
+		if ( material.isMeshPhongMaterial || material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
 
 			const mvpNode = new ModelViewProjectionNode();
+			const lightNode = material.lightNode;
 
 			if ( material.positionNode !== undefined ) {
 
@@ -56,6 +57,14 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				this.addSlot( 'fragment', new NodeSlot( material.colorNode, 'COLOR', 'vec4' ) );
 
 			}
+			
+			if ( lightNode !== undefined ) {
+				
+				const lightContextNode = new LightContextNode( lightNode );
+				
+				this.addSlot( 'fragment', new NodeSlot( lightContextNode, 'LIGHT', 'vec3' ) );
+				
+			}
 
 			if ( material.opacityNode !== undefined ) {
 
@@ -69,14 +78,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	getTexture( textureProperty, uvSnippet ) {
 
-		//return `texture( sampler2D( ${textureProperty}, ${textureProperty}_sampler ), ${uvSnippet} )`;
-		return `texture2D( ${textureProperty}, ${uvSnippet} )`;
+		return `texture( sampler2D( ${textureProperty}, ${textureProperty}_sampler ), ${uvSnippet} )`;
 
 	}
 
 	getPropertyName( node ) {
 
-		if ( node.isNodeUniform ) {
+		if ( node.isNodeUniform === true ) {
 
 			const name = node.name;
 			const type = node.type;
@@ -207,7 +215,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				const attribute = attributes[ index ];
 
-				snippet += `layout(location = ${index}) in ${attribute.type} ${attribute.name};`;
+				snippet += `layout(location = ${index}) in ${attribute.type} ${attribute.name}; `;
 
 			}
 
@@ -229,7 +237,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			const vary = varys[ index ];
 
-			snippet += `layout(location = ${index}) ${ioStage} ${vary.type} ${vary.name};`;
+			snippet += `layout(location = ${index}) ${ioStage} ${vary.type} ${vary.name}; `;
 
 		}
 
@@ -245,9 +253,43 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			for ( const vary of this.varys ) {
 
-				snippet += `${vary.name} = ${vary.snippet};`;
+				snippet += `${vary.name} = ${vary.snippet}; `;
 
 			}
+
+		}
+
+		return snippet;
+
+	}
+
+	getVarsHeaderSnippet( shaderStage ) {
+
+		let snippet = '';
+
+		const vars = this.vars[ shaderStage ];
+
+		for ( let index = 0; index < vars.length; index ++ ) {
+
+			const variable = vars[ index ];
+
+			snippet += `${variable.type} ${variable.name}; `;
+
+		}
+
+		return snippet;
+
+	}
+	
+	getVarsBodySnippet( shaderStage ) {
+
+		let snippet = '';
+
+		const vars = this.vars[ shaderStage ];
+
+		for ( const variable of vars ) {
+
+			snippet += `${variable.name} = ${variable.snippet}; `;
 
 		}
 

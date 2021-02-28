@@ -2,6 +2,7 @@ import { PI } from '../consts/MathConsts.js';
 import CodeNode from '../core/CodeNode.js';
 import FunctionNode from '../core/FunctionNode.js';
 
+// variadic macros
 export const saturateMacro = new CodeNode('#define saturate(a) clamp( a, 0.0, 1.0 )');
 export const whiteComplementMacro = new CodeNode('#define whiteComplement(a) ( 1.0 - saturate( a ) )');
 

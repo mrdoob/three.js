@@ -9,14 +9,12 @@ NODE_HEADER_VARYS
 void main(){
 	
 	NODE_BODY_VARYS
+	NODE_BODY_VARS
 	
 	gl_Position = NODE_MVP;
 	
 }`,
 		fragmentShader: `#version 450
-
-// Variadic Macros
-#define texture2D( a, b ) texture( sampler2D( a, a##_sampler ), b )
 
 NODE_HEADER_ATTRIBUTES
 NODE_HEADER_UNIFORMS
@@ -26,11 +24,19 @@ layout(location = 0) out vec4 outColor;
 
 void main() {
 
+	NODE_BODY_VARS
+
 	outColor = vec4( 1.0, 1.0, 1.0, 1.0 );
 
 	#ifdef NODE_COLOR
 
 		outColor = NODE_COLOR;
+
+	#endif
+
+	#ifdef NODE_LIGHT
+
+		outColor.rgb *= NODE_LIGHT;
 
 	#endif
 

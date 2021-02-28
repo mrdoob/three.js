@@ -42,7 +42,7 @@ class CodeNode extends Node {
 		const nodeCode = builder.getCodeFromNode( this, type );
 		
 		nodeCode.code = this.code;
-		
+		console.log(nodeCode.code);
 		return nodeCode.code;
 		
 	}

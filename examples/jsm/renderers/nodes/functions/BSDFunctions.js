@@ -1,5 +1,4 @@
 import { PI, RECIPROCAL_PI } from '../consts/MathConsts.js';
-import { saturateMacro } from './MathFunctions.js';
 import FunctionNode from '../core/FunctionNode.js';
 
 export const F_Schlick = new FunctionNode(`
@@ -41,13 +40,13 @@ vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 }`).setIncludes( [ RECIPROCAL_PI ] ); // validated
 
 export const BRDF_Specular_BlinnPhong = new FunctionNode(`
-vec3 BRDF_Specular_BlinnPhong( vec3 lightDirection, vec3 positionViewDir, vec3 normalView, vec3 specularColor, float shininess ) {
+vec3 BRDF_Specular_BlinnPhong( vec3 lightDirection, vec3 specularColor, float shininess ) {
 
-	vec3 halfDir = normalize( lightDirection + positionViewDir );
+	vec3 halfDir = normalize( lightDirection + PositionViewDirection );
 
-	//float dotNL = saturate( dot( normalView, lightDirection ) );
-	//float dotNV = saturate( dot( normalView, positionViewDir ) );
-	float dotNH = saturate( dot( normalView, halfDir ) );
+	//float dotNL = saturate( dot( NormalView, lightDirection ) );
+	//float dotNV = saturate( dot( NormalView, PositionViewDirection ) );
+	float dotNH = saturate( dot( NormalView, halfDir ) );
 	float dotLH = saturate( dot( lightDirection, halfDir ) );
 
 	vec3 F = F_Schlick( specularColor, dotLH );
@@ -58,7 +57,7 @@ vec3 BRDF_Specular_BlinnPhong( vec3 lightDirection, vec3 positionViewDir, vec3 n
 
 	return F * ( G * D );
 
-}`).setIncludes( [ saturateMacro, F_Schlick, G_BlinnPhong_Implicit, D_BlinnPhong ] ); // validated
+}`).setIncludes( [ F_Schlick, G_BlinnPhong_Implicit, D_BlinnPhong ] ); // validated
 
 export const punctualLightIntensityToIrradianceFactor = new FunctionNode(`
 float punctualLightIntensityToIrradianceFactor( float lightDistance, float cutoffDistance, float decayExponent ) {
@@ -92,12 +91,12 @@ float punctualLightIntensityToIrradianceFactor( float lightDistance, float cutof
 
 #endif
 
-}`).setIncludes( [ saturateMacro ] );
+}`);
 
 export const RE_Direct_BlinnPhong = new FunctionNode(`
-vec3 RE_Direct_BlinnPhong( vec3 lightPosition, vec3 lightColor, vec3 positionView, vec3 positionViewDir, vec3 normalView, vec3 materialDiffuseColor, vec3 materialSpecularColor, float materialSpecularShininess, float materialSpecularStrength ) {
+vec3 RE_Direct_BlinnPhong( vec3 lightPosition, vec3 lightColor, vec3 materialDiffuseColor, vec3 materialSpecularColor, float materialSpecularShininess, float materialSpecularStrength ) {
 
-	vec3 lVector = lightPosition - positionView;
+	vec3 lVector = lightPosition - PositionView;
 	vec3 lightDirection = normalize( lVector );
 
 	float lightDistance = length( lVector );
@@ -106,7 +105,7 @@ vec3 RE_Direct_BlinnPhong( vec3 lightPosition, vec3 lightColor, vec3 positionVie
 
 	//--
 
-	float dotNL = saturate( dot( normalView, lightDirection ) );
+	float dotNL = saturate( dot( NormalView, lightDirection ) );
 	vec3 irradiance = dotNL * lightColor;
 
 #ifndef PHYSICALLY_CORRECT_LIGHTS
@@ -119,8 +118,8 @@ vec3 RE_Direct_BlinnPhong( vec3 lightPosition, vec3 lightColor, vec3 positionVie
 
 	result += irradiance * BRDF_Diffuse_Lambert( materialDiffuseColor );
 
-	result += irradiance * BRDF_Specular_BlinnPhong( lightDirection, positionViewDir, normalView, materialSpecularColor, materialSpecularShininess ) * materialSpecularStrength;
+	result += irradiance * BRDF_Specular_BlinnPhong( lightDirection, materialSpecularColor, materialSpecularShininess ) * materialSpecularStrength;
 
 	return result;
 
-}`).setIncludes( [ PI, saturateMacro, punctualLightIntensityToIrradianceFactor, BRDF_Diffuse_Lambert, BRDF_Specular_BlinnPhong ] );
+}`).setIncludes( [ PI, punctualLightIntensityToIrradianceFactor, BRDF_Diffuse_Lambert, BRDF_Specular_BlinnPhong ] );

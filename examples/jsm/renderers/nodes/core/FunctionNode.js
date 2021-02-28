@@ -18,6 +18,8 @@ class FunctionNode extends CodeNode {
 		this.name = '';
 		this.needsUpdate = true;
 
+		this.useKeywords = true;
+
 		this.presicion = '';
 
 		this._includeCode = '';
@@ -25,7 +27,7 @@ class FunctionNode extends CodeNode {
 
 	}
 
-	getType( builder ) {
+	getType( /*builder*/ ) {
 		
 		if (this.needsUpdate === true) {
 			
@@ -37,7 +39,7 @@ class FunctionNode extends CodeNode {
 		
 	}
 	
-	getInputs( builder ) {
+	getInputs( /*builder*/ ) {
 		
 		if (this.needsUpdate === true) {
 			
@@ -61,10 +63,10 @@ class FunctionNode extends CodeNode {
 		
 		if (declaration !== null && declaration.length === 5) {
 			
+			// tokenizer
+			
 			const paramsCode = declaration[4];
 			const propsMatches = [];
-
-			// tokenizer
 			
 			let nameMatch = null;
 
@@ -77,6 +79,7 @@ class FunctionNode extends CodeNode {
 			// parser
 
 			const inputs = [];
+			const keywords = [];
 
 			let i = 0;
 
@@ -117,7 +120,7 @@ class FunctionNode extends CodeNode {
 			this.presicion = declaration[1] !== undefined ? declaration[1] : '';
 			
 			this.inputs = inputs;
-			
+
 			this._includeCode = pragmaMainIndex !== -1 ? code.substr( 0, pragmaMainIndex ) : '';
 			this._internalCode = `( ${paramsCode} ) ${blockCode}`;
 
@@ -141,8 +144,51 @@ class FunctionNode extends CodeNode {
 	
 	generate( builder, output ) {
 
-		super.generate( builder );
+		if ( this.useKeywords === true ) {
+			
+			const contextKeywords = builder.getContextParameter( 'keywords' );
+			
+			if (contextKeywords !== undefined) {
+			
+				const nodeData = builder.getDataFromNode( this, builder.shaderStage );
+				
+				if ( nodeData.keywords === undefined ) {
+					
+					nodeData.keywords = [];
+					
+				}
+				
+				if ( nodeData.keywords.indexOf( contextKeywords ) === -1 ) {
+					
+					const keywordNames = contextKeywords.keywords;
+					
+					const regExp = new RegExp( `\\b${keywordNames.join('\\b|\\b')}\\b`, 'g' )
+					
+					const codeKeywords = this.code.match( regExp );
+					
+					if ( codeKeywords !== null ) {
+						
+						for(const keyword of codeKeywords) {
+							
+							const keywordNode = contextKeywords.getNode( keyword );
+							
+							// build the code
+							keywordNode.build( builder );
+							
+						}
+						
+					}
+					
+					nodeData.keywords.push( contextKeywords );
+					
+				}
+				
+			}
+			
+		}
 		
+		super.generate( builder );
+
 		const type = this.getType( builder );
 		const nodeCode = builder.getCodeFromNode( this, type );
 		
