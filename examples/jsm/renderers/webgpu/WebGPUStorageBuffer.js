@@ -14,10 +14,10 @@ class WebGPUStorageBuffer extends WebGPUBinding {
 		this.attribute = attribute;
 		this.bufferGPU = null; // set by the renderer
 
-		Object.defineProperty( this, 'isStorageBuffer', { value: true } );
-
 	}
 
 }
+
+WebGPUStorageBuffer.prototype.isStorageBuffer = true;
 
 export default WebGPUStorageBuffer;

@@ -8,8 +8,6 @@ class InputNode extends Node {
 
 		this.constant = false;
 
-		Object.defineProperty( this, 'isInputNode', { value: true } );
-
 	}
 
 	setConst( value ) {
@@ -52,5 +50,7 @@ class InputNode extends Node {
 	}
 
 }
+
+InputNode.prototype.isInputNode = true;
 
 export default InputNode;

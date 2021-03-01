@@ -9,10 +9,10 @@ class Matrix3Node extends InputNode {
 
 		this.value = value;
 
-		Object.defineProperty( this, 'isMatrix3Node', { value: true } );
-
 	}
 
 }
+
+Matrix3Node.prototype.isMatrix3Node = true;
 
 export default Matrix3Node;
