@@ -1,4 +1,3 @@
-import { PI, RECIPROCAL_PI } from '../consts/MathConsts.js';
 import FunctionNode from '../core/FunctionNode.js';
 
 export const F_Schlick = new FunctionNode(`
@@ -30,14 +29,14 @@ float D_BlinnPhong( const in float shininess, const in float dotNH ) {
 
 	return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );
 
-}`).setIncludes( [ RECIPROCAL_PI ] ); // validated
+}`); // validated
 
 export const BRDF_Diffuse_Lambert = new FunctionNode(`
 vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 
 	return RECIPROCAL_PI * diffuseColor;
 
-}`).setIncludes( [ RECIPROCAL_PI ] ); // validated
+}`); // validated
 
 export const BRDF_Specular_BlinnPhong = new FunctionNode(`
 vec3 BRDF_Specular_BlinnPhong( vec3 lightDirection, vec3 specularColor, float shininess ) {
@@ -122,4 +121,4 @@ vec3 RE_Direct_BlinnPhong( vec3 lightPosition, vec3 lightColor, vec3 materialDif
 
 	return result;
 
-}`).setIncludes( [ PI, punctualLightIntensityToIrradianceFactor, BRDF_Diffuse_Lambert, BRDF_Specular_BlinnPhong ] );
+}`).setIncludes( [ punctualLightIntensityToIrradianceFactor, BRDF_Diffuse_Lambert, BRDF_Specular_BlinnPhong ] );

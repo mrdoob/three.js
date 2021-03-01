@@ -3,12 +3,16 @@ import VarNode from './VarNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 import NormalNode from '../accessors/NormalNode.js';
 
+import { PI, RECIPROCAL_PI } from '../consts/MathConsts.js';
 import { saturateMacro, whiteComplementMacro } from '../functions/MathFunctions.js';
 
 class NodeKeywords {
 
-	static SaturateMacro = 'saturate';
-	static WhiteComplementMacro = 'whiteComplement';
+	static PI = 'PI';
+	static RECIPROCAL_PI = 'RECIPROCAL_PI';
+
+	static Saturate = 'saturate';
+	static WhiteComplement = 'whiteComplement';
 
 	static PositionLocal = 'PositionLocal';
 	static PositionWorld = 'PositionWorld';
@@ -22,9 +26,12 @@ class NodeKeywords {
 	constructor() {
 
 		this.keywords = [
+			// consts
+			NodeKeywords.PI,
+			NodeKeywords.RECIPROCAL_PI,
 			// variadic macros
-			NodeKeywords.SaturateMacro,
-			NodeKeywords.WhiteComplementMacro,
+			NodeKeywords.Saturate,
+			NodeKeywords.WhiteComplement,
 			// nodes
 			NodeKeywords.PositionLocal,
 			NodeKeywords.PositionWorld,
@@ -47,13 +54,25 @@ class NodeKeywords {
 			
 			switch( name ) {
 				
-				case NodeKeywords.SaturateMacro:
+				case NodeKeywords.PI:
+				
+					node = PI;
+					
+					break;
+				
+				case NodeKeywords.RECIPROCAL_PI:
+				
+					node = RECIPROCAL_PI;
+					
+					break;
+				
+				case NodeKeywords.Saturate:
 				
 					node = saturateMacro;
 					
 					break;
 				
-				case NodeKeywords.WhiteComplementMacro:
+				case NodeKeywords.WhiteComplement:
 				
 					node = whiteComplementMacro;
 					
@@ -100,6 +119,7 @@ class NodeKeywords {
 					node = new VarNode( new NormalNode( NormalNode.VIEW ), name );
 					
 					break;
+					
 			}
 			
 			if ( node !== undefined ) {
