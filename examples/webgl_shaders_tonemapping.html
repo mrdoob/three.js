@@ -49,24 +49,22 @@
 			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
 			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
 
-			var container;
+			let bloomPass, adaptToneMappingPass, ldrToneMappingPass, hdrToneMappingPass;
+			let params;
 
-			var bloomPass, adaptToneMappingPass, ldrToneMappingPass, hdrToneMappingPass;
-			var params;
+			let camera, scene, renderer, dynamicHdrEffectComposer, hdrEffectComposer, ldrEffectComposer;
+			let cameraCube, sceneCube;
+			let cameraBG, debugScene;
+			let adaptiveLuminanceMat, currentLuminanceMat;
 
-			var camera, scene, renderer, dynamicHdrEffectComposer, hdrEffectComposer, ldrEffectComposer;
-			var cameraCube, sceneCube;
-			var cameraBG, debugScene;
-			var adaptiveLuminanceMat, currentLuminanceMat;
+			let directionalLight;
 
-			var directionalLight;
+			let orbitControls;
 
-			var orbitControls;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
-			var windowThirdX = window.innerWidth / 3;
+			let windowThirdX = window.innerWidth / 3;
 
 			init();
 			animate();
@@ -85,7 +83,7 @@
 					adaptionRate: 2.0
 				};
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				// CAMERAS
@@ -111,14 +109,14 @@
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x050505 );
+				const ambient = new THREE.AmbientLight( 0x050505 );
 				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, params.sunLight );
 				directionalLight.position.set( 2, 0, 10 ).normalize();
 				scene.add( directionalLight );
 
-				var atmoShader = {
+				const atmoShader = {
 					side: THREE.BackSide,
 					// blending: THREE.AdditiveBlending,
 					transparent: true,
@@ -181,14 +179,14 @@
 					].join( "\n" )
 				};
 
-				var earthAtmoMat = new THREE.ShaderMaterial( atmoShader );
+				const earthAtmoMat = new THREE.ShaderMaterial( atmoShader );
 
-				var earthMat = new THREE.MeshPhongMaterial( {
+				const earthMat = new THREE.MeshPhongMaterial( {
 					color: 0xffffff,
 					shininess: 200
 				} );
 
-				var textureLoader = new THREE.TextureLoader();
+				const textureLoader = new THREE.TextureLoader();
 
 				textureLoader.load( 'textures/planets/earth_atmos_4096.jpg', function ( tex ) {
 
@@ -196,24 +194,24 @@
 					earthMat.map.encoding = THREE.sRGBEncoding;
 					earthMat.needsUpdate = true;
 
-	} );
+				} );
 				textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function ( tex ) {
 
 					earthMat.specularMap = tex;
 					earthMat.specularMap.encoding = THREE.sRGBEncoding;
 					earthMat.needsUpdate = true;
 
-	} );
+				} );
 
-				// var earthNormal = textureLoader.load( 'textures/planets/earth-new-normal-2048.jpg', function( tex ) {
+				// let earthNormal = textureLoader.load( 'textures/planets/earth-new-normal-2048.jpg', function( tex ) {
 				// 	earthMat.normalMap = tex;
 				// 	earthMat.needsUpdate = true;
 				// } );
 
-				var earthLights = textureLoader.load( 'textures/planets/earth_lights_2048.png' );
+				const earthLights = textureLoader.load( 'textures/planets/earth_lights_2048.png' );
 				earthLights.encoding = THREE.sRGBEncoding;
 
-				var earthLightsMat = new THREE.MeshBasicMaterial( {
+				const earthLightsMat = new THREE.MeshBasicMaterial( {
 					color: 0xffffff,
 					blending: THREE.AdditiveBlending,
 					transparent: true,
@@ -222,10 +220,10 @@
 
 				} );
 
-				var clouds = textureLoader.load( 'textures/planets/earth_clouds_2048.png' );
+				const clouds = textureLoader.load( 'textures/planets/earth_clouds_2048.png' );
 				clouds.encoding = THREE.sRGBEncoding;
 
-				var earthCloudsMat = new THREE.MeshLambertMaterial( {
+				const earthCloudsMat = new THREE.MeshLambertMaterial( {
 					color: 0xffffff,
 					blending: THREE.NormalBlending,
 					transparent: true,
@@ -234,21 +232,21 @@
 				} );
 
 
-				var earthGeo = new THREE.SphereBufferGeometry( 600, 24, 24 );
-				var sphereMesh = new THREE.Mesh( earthGeo, earthMat );
+				const earthGeo = new THREE.SphereGeometry( 600, 24, 24 );
+				const sphereMesh = new THREE.Mesh( earthGeo, earthMat );
 				scene.add( sphereMesh );
 
-				var sphereLightsMesh = new THREE.Mesh( earthGeo, earthLightsMat );
+				const sphereLightsMesh = new THREE.Mesh( earthGeo, earthLightsMat );
 				scene.add( sphereLightsMesh );
 
-				var sphereCloudsMesh = new THREE.Mesh( earthGeo, earthCloudsMat );
+				const sphereCloudsMesh = new THREE.Mesh( earthGeo, earthCloudsMat );
 				scene.add( sphereCloudsMesh );
 
-				var sphereAtmoMesh = new THREE.Mesh( earthGeo, earthAtmoMat );
+				const sphereAtmoMesh = new THREE.Mesh( earthGeo, earthAtmoMat );
 				sphereAtmoMesh.scale.set( 1.05, 1.05, 1.05 );
 				scene.add( sphereAtmoMesh );
 
-				var vBGShader = [
+				const vBGShader = [
 					// "attribute vec2 uv;",
 					"varying vec2 vUv;",
 					"void main() {",
@@ -258,7 +256,7 @@
 
 				].join( "\n" );
 
-				var pBGShader = [
+				const pBGShader = [
 
 					"uniform sampler2D map;",
 					"varying vec2 vUv;",
@@ -297,24 +295,24 @@
 					// blending: THREE.NoBlending
 				} );
 
-				var quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.1, 0.1 ), currentLuminanceMat );
+				let quadBG = new THREE.Mesh( new THREE.PlaneGeometry( 0.1, 0.1 ), currentLuminanceMat );
 				quadBG.position.z = - 500;
 				quadBG.position.x = - window.innerWidth * 0.5 + window.innerWidth * 0.05;
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
 				debugScene.add( quadBG );
 
-				quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.1, 0.1 ), adaptiveLuminanceMat );
+				quadBG = new THREE.Mesh( new THREE.PlaneGeometry( 0.1, 0.1 ), adaptiveLuminanceMat );
 				quadBG.position.z = - 500;
 				quadBG.position.x = - window.innerWidth * 0.5 + window.innerWidth * 0.15;
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
 				debugScene.add( quadBG );
 
-				var r = "textures/cube/MilkyWay/";
-				var urls = [ r + "dark-s_px.jpg", r + "dark-s_nx.jpg",
+				const r = "textures/cube/MilkyWay/";
+				const urls = [ r + "dark-s_px.jpg", r + "dark-s_nx.jpg",
 							 r + "dark-s_py.jpg", r + "dark-s_ny.jpg",
 							 r + "dark-s_pz.jpg", r + "dark-s_nz.jpg" ];
 
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				const textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.encoding = THREE.sRGBEncoding;
 
 				sceneCube.background = textureCube;
@@ -326,30 +324,30 @@
 
 				container.appendChild( renderer.domElement );
 
-				// var width = window.innerWidth || 1;
-				var height = window.innerHeight || 1;
+				// let width = window.innerWidth || 1;
+				const height = window.innerHeight || 1;
 
-				var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
-				var regularRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
+				const parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
+				const regularRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
 				ldrEffectComposer = new EffectComposer( renderer, regularRenderTarget );
 
 				parameters.type = THREE.FloatType;
 
-				if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
+				if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'OES_texture_half_float_linear' ) === false ) {
 
 					parameters.type = undefined; // avoid usage of floating point textures
 
 				}
 
-				var hdrRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
+				const hdrRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
 				dynamicHdrEffectComposer = new EffectComposer( renderer, hdrRenderTarget );
 				dynamicHdrEffectComposer.setSize( window.innerWidth, window.innerHeight );
 				hdrEffectComposer = new EffectComposer( renderer, hdrRenderTarget );
 
-				var debugPass = new RenderPass( debugScene, cameraBG );
+				const debugPass = new RenderPass( debugScene, cameraBG );
 				debugPass.clear = false;
-				var scenePass = new RenderPass( scene, camera, undefined, undefined, undefined );
-				var skyboxPass = new RenderPass( sceneCube, cameraCube );
+				const scenePass = new RenderPass( scene, camera, undefined, undefined, undefined );
+				const skyboxPass = new RenderPass( sceneCube, cameraCube );
 				scenePass.clear = false;
 
 				adaptToneMappingPass = new AdaptiveToneMappingPass( true, 256 );
@@ -357,7 +355,7 @@
 				ldrToneMappingPass = new AdaptiveToneMappingPass( false, 256 );
 				hdrToneMappingPass = new AdaptiveToneMappingPass( false, 256 );
 				bloomPass = new BloomPass();
-				var gammaCorrectionPass = new ShaderPass( GammaCorrectionShader );
+				const gammaCorrectionPass = new ShaderPass( GammaCorrectionShader );
 
 				dynamicHdrEffectComposer.addPass( skyboxPass );
 				dynamicHdrEffectComposer.addPass( scenePass );
@@ -377,12 +375,12 @@
 				ldrEffectComposer.addPass( bloomPass );
 				ldrEffectComposer.addPass( gammaCorrectionPass );
 
-				var gui = new GUI();
+				const gui = new GUI();
 
-				var sceneGui = gui.addFolder( 'Scenes' );
-				var toneMappingGui = gui.addFolder( 'ToneMapping' );
-				var staticToneMappingGui = gui.addFolder( 'StaticOnly' );
-				var adaptiveToneMappingGui = gui.addFolder( 'AdaptiveOnly' );
+				const sceneGui = gui.addFolder( 'Scenes' );
+				const toneMappingGui = gui.addFolder( 'ToneMapping' );
+				const staticToneMappingGui = gui.addFolder( 'StaticOnly' );
+				const adaptiveToneMappingGui = gui.addFolder( 'AdaptiveOnly' );
 
 				sceneGui.add( params, 'bloomAmount', 0.0, 10.0 );
 				sceneGui.add( params, 'sunLight', 0.1, 12.0 );
@@ -396,7 +394,7 @@
 
 				gui.open();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

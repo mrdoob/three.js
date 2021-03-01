@@ -1,4 +1,3 @@
-console.warn( "THREE.MMDPhysics: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Dependencies
  *  - Ammo.js https://github.com/kripken/ammo.js
@@ -1311,7 +1310,7 @@ THREE.MMDPhysics = ( function () {
 						.copy( mesh.matrixWorld )
 						.decompose( position, quaternion, scale )
 						.compose( position, quaternion, scale.set( 1, 1, 1 ) )
-						.getInverse( matrixWorldInv );
+						.invert();
 
 					for ( var i = 0, il = bodies.length; i < il; i ++ ) {
 
@@ -1359,10 +1358,10 @@ THREE.MMDPhysics = ( function () {
 				switch ( param.shapeType ) {
 
 					case 0:
-						return new THREE.SphereBufferGeometry( param.width, 16, 8 );
+						return new THREE.SphereGeometry( param.width, 16, 8 );
 
 					case 1:
-						return new THREE.BoxBufferGeometry( param.width * 2, param.height * 2, param.depth * 2, 8, 8, 8 );
+						return new THREE.BoxGeometry( param.width * 2, param.height * 2, param.depth * 2, 8, 8, 8 );
 
 					case 2:
 						return new createCapsuleGeometry( param.width, param.height, 16, 8 );
@@ -1377,9 +1376,9 @@ THREE.MMDPhysics = ( function () {
 			// copy from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mytest37.js?ver=20160815
 			function createCapsuleGeometry( radius, cylinderHeight, segmentsRadius, segmentsHeight ) {
 
-				var geometry = new THREE.CylinderBufferGeometry( radius, radius, cylinderHeight, segmentsRadius, segmentsHeight, true );
-				var upperSphere = new THREE.Mesh( new THREE.SphereBufferGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, 0, Math.PI / 2 ) );
-				var lowerSphere = new THREE.Mesh( new THREE.SphereBufferGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2 ) );
+				var geometry = new THREE.CylinderGeometry( radius, radius, cylinderHeight, segmentsRadius, segmentsHeight, true );
+				var upperSphere = new THREE.Mesh( new THREE.SphereGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, 0, Math.PI / 2 ) );
+				var lowerSphere = new THREE.Mesh( new THREE.SphereGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2 ) );
 
 				upperSphere.position.set( 0, cylinderHeight / 2, 0 );
 				lowerSphere.position.set( 0, - cylinderHeight / 2, 0 );

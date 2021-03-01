@@ -18,11 +18,11 @@
 
 			import { FlyControls } from './jsm/controls/FlyControls.js';
 
-			var container;
+			let container;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer, controls;
 
-			var controls, clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -38,35 +38,33 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
 
-				var light = new THREE.PointLight( 0xff2200 );
-				light.position.set( 0, 0, 0 );
-				scene.add( light );
+				const pointLight = new THREE.PointLight( 0xff2200 );
+				pointLight.position.set( 0, 0, 0 );
+				scene.add( pointLight );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 0, 1 ).normalize();
-				scene.add( light );
+				const dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 0, 0, 1 ).normalize();
+				scene.add( dirLight );
 
-				var geometry = [
+				const geometry = [
 
-					[ new THREE.IcosahedronBufferGeometry( 100, 4 ), 50 ],
-					[ new THREE.IcosahedronBufferGeometry( 100, 3 ), 300 ],
-					[ new THREE.IcosahedronBufferGeometry( 100, 2 ), 1000 ],
-					[ new THREE.IcosahedronBufferGeometry( 100, 1 ), 2000 ],
-					[ new THREE.IcosahedronBufferGeometry( 100, 0 ), 8000 ]
+					[ new THREE.IcosahedronGeometry( 100, 16 ), 50 ],
+					[ new THREE.IcosahedronGeometry( 100, 8 ), 300 ],
+					[ new THREE.IcosahedronGeometry( 100, 4 ), 1000 ],
+					[ new THREE.IcosahedronGeometry( 100, 2 ), 2000 ],
+					[ new THREE.IcosahedronGeometry( 100, 1 ), 8000 ]
 
 				];
 
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true } );
+				const material = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true } );
 
-				var i, j, mesh, lod;
+				for ( let j = 0; j < 1000; j ++ ) {
 
-				for ( j = 0; j < 1000; j ++ ) {
+					const lod = new THREE.LOD();
 
-					lod = new THREE.LOD();
+					for ( let i = 0; i < geometry.length; i ++ ) {
 
-					for ( i = 0; i < geometry.length; i ++ ) {
-
-						mesh = new THREE.Mesh( geometry[ i ][ 0 ], material );
+						const mesh = new THREE.Mesh( geometry[ i ][ 0 ], material );
 						mesh.scale.set( 1.5, 1.5, 1.5 );
 						mesh.updateMatrix();
 						mesh.matrixAutoUpdate = false;
@@ -97,7 +95,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

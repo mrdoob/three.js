@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -12,31 +11,30 @@
 
 		<h1>立方相机（[name]）</h1>
 
-
-		<p class="desc">创建6个摄像机，并将它们所拍摄的场景渲染到[page:WebGLCubeRenderTarget]上。</p>
+		<p class="desc">创建6个渲染到[page:WebGLCubeRenderTarget]的摄像机。</p>
 
 		<h2>代码示例</h2>
 
 		<code>
 		// Create cube render target
-		var cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+		const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
 
 		// Create cube camera
-		var cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
+		const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
 		scene.add( cubeCamera );
 
 		// Create car
-		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
-		var car = new Mesh( carGeometry, chromeMaterial );
+		const chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
+		const car = new Mesh( carGeometry, chromeMaterial );
 		scene.add( car );
 
 		// Update the render target cube
-		car.setVisible( false );
+		car.visible = false;
 		cubeCamera.position.copy( car.position );
 		cubeCamera.update( renderer, scene );
 
 		// Render the scene
-		car.setVisible( true );
+		car.visible = true;
 		renderer.render( scene, camera );
 		</code>
 
@@ -53,14 +51,13 @@
 
 		<h3>[name]( [param:Number near], [param:Number far], [param:WebGLCubeRenderTarget renderTarget] )</h3>
 		<p>
-
 		near -- 近剪切面的距离<br />
 		far -- 远剪切面的距离<br />
 		renderTarget -- The destination cube render target.
 		</p>
 		<p>
-			构造一个包含6个[page:PerspectiveCamera PerspectiveCameras]（透视摄像机）的立方摄像机，并将其拍摄的场景渲染到一个[page:WebGLCubeRenderTarget]上。
-
+		构造一个包含6个[page:PerspectiveCamera PerspectiveCameras]（透视摄像机）的立方摄像机，
+		并将其拍摄的场景渲染到一个[page:WebGLCubeRenderTarget]上。
 		</p>
 
 
@@ -76,21 +73,13 @@
 		<p>共有方法请参见其基类[page:Object3D]。</p>
 
 
-
 		<h3>[method:null update]( [param:WebGLRenderer renderer], [param:Scene scene] )</h3>
 		<p>
 		renderer -- 当前的WebGL渲染器<br />
 		scene -- 当前的场景
 		</p>
 		<p>
-			这个方法用来更新[page:CubeCamera.renderTarget renderTarget]（渲染目标对象）。
-		</p>
-
-		<h3>[method:null clear]( [param:WebGLRenderer renderer], [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
-		<p>
-			这个方法用来来清除[page:CubeCamera.renderTarget renderTarget]的颜色、深度和/或模板缓冲区。
-			颜色缓冲区设置为渲染器当前的“清除”色。参数默认值均为*true*。
-
+		这个方法用来更新[page:CubeCamera.renderTarget renderTarget]（渲染目标对象）。
 		</p>
 
 		<h2>源代码</h2>

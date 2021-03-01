@@ -7,7 +7,7 @@ async function AmmoPhysics() {
 
 	}
 
-	const AmmoLib = await Ammo();
+	const AmmoLib = await Ammo(); // eslint-disable-line no-undef
 
 	const frameRate = 60;
 
@@ -28,7 +28,7 @@ async function AmmoPhysics() {
 
 		// TODO change type to is*
 
-		if ( geometry.type === 'BoxBufferGeometry' ) {
+		if ( geometry.type === 'BoxGeometry' ) {
 
 			const sx = parameters.width !== undefined ? parameters.width / 2 : 0.5;
 			const sy = parameters.height !== undefined ? parameters.height / 2 : 0.5;
@@ -39,12 +39,11 @@ async function AmmoPhysics() {
 
 			return shape;
 
-		} else if ( geometry.type === 'PlaneBufferGeometry' ) {
+		} else if ( geometry.type === 'SphereGeometry' || geometry.type === 'IcosahedronGeometry' ) {
 
-			const sx = parameters.width !== undefined ? parameters.width / 2 : 0.5;
-			const sy = parameters.height !== undefined ? parameters.height / 2 : 0.5;
+			const radius = parameters.radius !== undefined ? parameters.radius : 1;
 
-			const shape = new AmmoLib.btBoxShape( new AmmoLib.btVector3( sx, sy, 0.01 ) );
+			const shape = new AmmoLib.btSphereShape( radius );
 			shape.setMargin( 0.05 );
 
 			return shape;

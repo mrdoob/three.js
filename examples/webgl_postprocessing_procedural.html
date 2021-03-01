@@ -61,11 +61,11 @@
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			var postCamera, postScene, renderer;
-			var postMaterial, noiseRandom1DMaterial, noiseRandom2DMaterial, noiseRandom3DMaterial, postQuad;
-			var stats;
+			let postCamera, postScene, renderer;
+			let postMaterial, noiseRandom1DMaterial, noiseRandom2DMaterial, noiseRandom3DMaterial, postQuad;
+			let stats;
 
-			var params = { procedure: 'noiseRandom3D' };
+			const params = { procedure: 'noiseRandom3D' };
 
 			init();
 			animate();
@@ -74,14 +74,14 @@
 			// Init gui
 			function initGui() {
 
-				var gui = new GUI();
+				const gui = new GUI();
 				gui.add( params, 'procedure', [ 'noiseRandom1D', 'noiseRandom2D', 'noiseRandom3D' ] );
 
 			}
 
 			function init() {
 
-				var container = document.getElementById( "container" );
+				const container = document.getElementById( "container" );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -106,19 +106,19 @@
 					fragmentShader: document.querySelector( '#noiseRandom3D-frag' ).textContent.trim()
 				} );
 				postMaterial = noiseRandom3DMaterial;
-				var postPlane = new THREE.PlaneBufferGeometry( 2, 2 );
+				const postPlane = new THREE.PlaneGeometry( 2, 2 );
 				postQuad = new THREE.Mesh( postPlane, postMaterial );
 				postScene = new THREE.Scene();
 				postScene.add( postQuad );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				postCamera.aspect = width / height;
 				postCamera.updateProjectionMatrix();

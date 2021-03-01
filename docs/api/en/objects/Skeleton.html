@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -20,11 +19,11 @@
 		<code>
 		// Create a simple "arm"
 
-		var bones = [];
+		const bones = [];
 
-		var shoulder = new THREE.Bone();
-		var elbow = new THREE.Bone();
-		var hand = new THREE.Bone();
+		const shoulder = new THREE.Bone();
+		const elbow = new THREE.Bone();
+		const hand = new THREE.Bone();
 
 		shoulder.add( elbow );
 		elbow.add( hand );
@@ -37,7 +36,7 @@
 		elbow.position.y = 0;
 		hand.position.y = 5;
 
-		var armSkeleton = new THREE.Skeleton( bones );
+		const armSkeleton = new THREE.Skeleton( bones );
 		</code>
 
 		<p>
@@ -80,6 +79,10 @@
 		The [page:DataTexture] holding the bone data when using a vertex texture.
 		</p>
 
+		<h3>[property:Integer boneTextureSize]</h3>
+		<p>
+		The size of the [page:.boneTexture].
+		</p>
 
 		<h2>Methods</h2>
 

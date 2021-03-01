@@ -1,10 +1,3 @@
-import { Geometry } from '../core/Geometry.js';
-import { BufferGeometry } from '../core/BufferGeometry.js';
-import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector2 } from '../math/Vector2.js';
-import { Vector3 } from '../math/Vector3.js';
-import { ShapeUtils } from '../extras/ShapeUtils.js';
-
 /**
  * Creates extruded geometry from a path shape.
  *
@@ -27,49 +20,19 @@ import { ShapeUtils } from '../extras/ShapeUtils.js';
  * }
  */
 
-// ExtrudeGeometry
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { ShapeUtils } from '../extras/ShapeUtils.js';
 
-class ExtrudeGeometry extends Geometry {
+class ExtrudeGeometry extends BufferGeometry {
 
 	constructor( shapes, options ) {
 
 		super();
 
 		this.type = 'ExtrudeGeometry';
-
-		this.parameters = {
-			shapes: shapes,
-			options: options
-		};
-
-		this.fromBufferGeometry( new ExtrudeBufferGeometry( shapes, options ) );
-		this.mergeVertices();
-
-	}
-
-	toJSON() {
-
-		const data = super.toJSON();
-
-		const shapes = this.parameters.shapes;
-		const options = this.parameters.options;
-
-		return toJSON( shapes, options, data );
-
-	}
-
-}
-
-
-// ExtrudeBufferGeometry
-
-class ExtrudeBufferGeometry extends BufferGeometry {
-
-	constructor( shapes, options ) {
-
-		super();
-
-		this.type = 'ExtrudeBufferGeometry';
 
 		this.parameters = {
 			shapes: shapes,
@@ -212,7 +175,7 @@ class ExtrudeBufferGeometry extends BufferGeometry {
 
 			function scalePt2( pt, vec, size ) {
 
-				if ( ! vec ) console.error( "THREE.ExtrudeGeometry: vec does not exist" );
+				if ( ! vec ) console.error( 'THREE.ExtrudeGeometry: vec does not exist' );
 
 				return vec.clone().multiplyScalar( size ).add( pt );
 
@@ -789,6 +752,7 @@ const WorldUVGenerator = {
 		}
 
 	}
+
 };
 
 function toJSON( shapes, options, data ) {
@@ -818,4 +782,4 @@ function toJSON( shapes, options, data ) {
 }
 
 
-export { ExtrudeGeometry, ExtrudeBufferGeometry };
+export { ExtrudeGeometry, ExtrudeGeometry as ExtrudeBufferGeometry };

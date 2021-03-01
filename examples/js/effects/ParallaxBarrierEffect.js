@@ -1,5 +1,3 @@
-console.warn( "THREE.ParallaxBarrierEffect: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 	var _camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
@@ -17,51 +15,51 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 		uniforms: {
 
-			"mapLeft": { value: _renderTargetL.texture },
-			"mapRight": { value: _renderTargetR.texture }
+			'mapLeft': { value: _renderTargetL.texture },
+			'mapRight': { value: _renderTargetR.texture }
 
 		},
 
 		vertexShader: [
 
-			"varying vec2 vUv;",
+			'varying vec2 vUv;',
 
-			"void main() {",
+			'void main() {',
 
-			"	vUv = vec2( uv.x, uv.y );",
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			'	vUv = vec2( uv.x, uv.y );',
+			'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
-			"}"
+			'}'
 
-		].join( "\n" ),
+		].join( '\n' ),
 
 		fragmentShader: [
 
-			"uniform sampler2D mapLeft;",
-			"uniform sampler2D mapRight;",
-			"varying vec2 vUv;",
+			'uniform sampler2D mapLeft;',
+			'uniform sampler2D mapRight;',
+			'varying vec2 vUv;',
 
-			"void main() {",
+			'void main() {',
 
-			"	vec2 uv = vUv;",
+			'	vec2 uv = vUv;',
 
-			"	if ( ( mod( gl_FragCoord.y, 2.0 ) ) > 1.00 ) {",
+			'	if ( ( mod( gl_FragCoord.y, 2.0 ) ) > 1.00 ) {',
 
-			"		gl_FragColor = texture2D( mapLeft, uv );",
+			'		gl_FragColor = texture2D( mapLeft, uv );',
 
-			"	} else {",
+			'	} else {',
 
-			"		gl_FragColor = texture2D( mapRight, uv );",
+			'		gl_FragColor = texture2D( mapRight, uv );',
 
-			"	}",
+			'	}',
 
-			"}"
+			'}'
 
-		].join( "\n" )
+		].join( '\n' )
 
 	} );
 
-	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), _material );
+	var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _material );
 	_scene.add( mesh );
 
 	this.setSize = function ( width, height ) {

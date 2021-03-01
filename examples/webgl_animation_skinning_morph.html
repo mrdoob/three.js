@@ -43,10 +43,10 @@
 
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var container, stats, clock, gui, mixer, actions, activeAction, previousAction;
-			var camera, scene, renderer, model, face;
+			let container, stats, clock, gui, mixer, actions, activeAction, previousAction;
+			let camera, scene, renderer, model, face;
 
-			var api = { state: 'Walking' };
+			const api = { state: 'Walking' };
 
 			init();
 			animate();
@@ -68,28 +68,28 @@
 
 				// lights
 
-				var light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				light.position.set( 0, 20, 0 );
-				scene.add( light );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				hemiLight.position.set( 0, 20, 0 );
+				scene.add( hemiLight );
 
-				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 20, 10 );
-				scene.add( light );
+				const dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 0, 20, 10 );
+				scene.add( dirLight );
 
 				// ground
 
-				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
-				var grid = new THREE.GridHelper( 200, 40, 0x000000, 0x000000 );
+				const grid = new THREE.GridHelper( 200, 40, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
 				scene.add( grid );
 
 				// model
 
-				var loader = new GLTFLoader();
+				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/RobotExpressive/RobotExpressive.glb', function ( gltf ) {
 
 					model = gltf.scene;
@@ -109,7 +109,7 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// stats
 				stats = new Stats();
@@ -119,8 +119,8 @@
 
 			function createGUI( model, animations ) {
 
-				var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
-				var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
+				const states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
+				const emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
 
 				gui = new GUI();
 
@@ -128,10 +128,10 @@
 
 				actions = {};
 
-				for ( var i = 0; i < animations.length; i ++ ) {
+				for ( let i = 0; i < animations.length; i ++ ) {
 
-					var clip = animations[ i ];
-					var action = mixer.clipAction( clip );
+					const clip = animations[ i ];
+					const action = mixer.clipAction( clip );
 					actions[ clip.name ] = action;
 
 					if ( emotes.indexOf( clip.name ) >= 0 || states.indexOf( clip.name ) >= 4 ) {
@@ -145,9 +145,9 @@
 
 				// states
 
-				var statesFolder = gui.addFolder( 'States' );
+				const statesFolder = gui.addFolder( 'States' );
 
-				var clipCtrl = statesFolder.add( api, 'state' ).options( states );
+				const clipCtrl = statesFolder.add( api, 'state' ).options( states );
 
 				clipCtrl.onChange( function () {
 
@@ -159,7 +159,7 @@
 
 				// emotes
 
-				var emoteFolder = gui.addFolder( 'Emotes' );
+				const emoteFolder = gui.addFolder( 'Emotes' );
 
 				function createEmoteCallback( name ) {
 
@@ -183,7 +183,7 @@
 
 				}
 
-				for ( var i = 0; i < emotes.length; i ++ ) {
+				for ( let i = 0; i < emotes.length; i ++ ) {
 
 					createEmoteCallback( emotes[ i ] );
 
@@ -193,12 +193,12 @@
 
 				// expressions
 
-				face = model.getObjectByName( 'Head_2' );
+				face = model.getObjectByName( 'Head_4' );
 
-				var expressions = Object.keys( face.morphTargetDictionary );
-				var expressionFolder = gui.addFolder( 'Expressions' );
+				const expressions = Object.keys( face.morphTargetDictionary );
+				const expressionFolder = gui.addFolder( 'Expressions' );
 
-				for ( var i = 0; i < expressions.length; i ++ ) {
+				for ( let i = 0; i < expressions.length; i ++ ) {
 
 					expressionFolder.add( face.morphTargetInfluences, i, 0, 1, 0.01 ).name( expressions[ i ] );
 
@@ -244,7 +244,7 @@
 
 			function animate() {
 
-				var dt = clock.getDelta();
+				const dt = clock.getDelta();
 
 				if ( mixer ) mixer.update( dt );
 

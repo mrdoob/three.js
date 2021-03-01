@@ -43,9 +43,9 @@
 			import { CopyShader } from './jsm/shaders/CopyShader.js';
 			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
 
-			var camera, scene, renderer, clock, group, container;
+			let camera, scene, renderer, clock, group, container;
 
-			var composer1, composer2, fxaaPass;
+			let composer1, composer2, fxaaPass;
 
 			init();
 			animate();
@@ -65,11 +65,11 @@
 
 				//
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 1000, 0 );
 				scene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
 				dirLight.position.set( - 3000, 1000, - 1000 );
 				scene.add( dirLight );
 
@@ -77,12 +77,12 @@
 
 				group = new THREE.Group();
 
-				var geometry = new THREE.TetrahedronBufferGeometry( 10 );
-				var material = new THREE.MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
+				const geometry = new THREE.TetrahedronGeometry( 10 );
+				const material = new THREE.MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
 
-				for ( var i = 0; i < 100; i ++ ) {
+				for ( let i = 0; i < 100; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 500 - 250;
 					mesh.position.y = Math.random() * 500 - 250;
@@ -110,13 +110,13 @@
 
 				//
 
-				var renderPass = new RenderPass( scene, camera );
+				const renderPass = new RenderPass( scene, camera );
 
 				//
 
 				fxaaPass = new ShaderPass( FXAAShader );
 
-				var pixelRatio = renderer.getPixelRatio();
+				const pixelRatio = renderer.getPixelRatio();
 
 				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
 				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
@@ -127,7 +127,7 @@
 
 				//
 
-				var copyPass = new ShaderPass( CopyShader );
+				const copyPass = new ShaderPass( CopyShader );
 
 				composer2 = new EffectComposer( renderer );
 				composer2.addPass( renderPass );
@@ -135,7 +135,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -148,7 +148,7 @@
 				composer1.setSize( container.offsetWidth, container.offsetHeight );
 				composer2.setSize( container.offsetWidth, container.offsetHeight );
 
-				var pixelRatio = renderer.getPixelRatio();
+				const pixelRatio = renderer.getPixelRatio();
 
 				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
 				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
@@ -159,7 +159,7 @@
 
 				requestAnimationFrame( animate );
 
-				var halfWidth = container.offsetWidth / 2;
+				const halfWidth = container.offsetWidth / 2;
 
 				group.rotation.y += clock.getDelta() * 0.1;
 

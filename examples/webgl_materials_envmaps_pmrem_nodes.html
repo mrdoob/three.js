@@ -49,7 +49,7 @@
 				TextureCubeNode
 			} from './jsm/nodes/Nodes.js';
 
-			var params = {
+			const params = {
 				roughness: 0.0,
 				metalness: 0.0,
 				exposure: 1.0,
@@ -58,11 +58,11 @@
 				debug: false
 			};
 
-			var container, stats;
-			var camera, scene, renderer, controls;
-			var nodeMaterial, nodeTexture, nodeTextureIntensity, torusMesh, planeMesh;
-			var hdrCubeRenderTarget;
-			var hdrCubeMap;
+			let container, stats;
+			let camera, scene, renderer, controls;
+			let nodeMaterial, nodeTexture, nodeTextureIntensity, torusMesh, planeMesh;
+			let hdrCubeRenderTarget;
+			let hdrCubeMap;
 
 			init();
 			animate();
@@ -82,7 +82,7 @@
 
 				//
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				const geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
 
 				nodeMaterial = new StandardNodeMaterial();
 				nodeMaterial.color.value = new THREE.Color( 0xffffff );
@@ -98,12 +98,12 @@
 				torusMesh = new THREE.Mesh( geometry, nodeMaterial );
 				scene.add( torusMesh );
 
-				planeMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 200, 200 ), new THREE.MeshBasicMaterial() );
+				planeMesh = new THREE.Mesh( new THREE.PlaneGeometry( 200, 200 ), new THREE.MeshBasicMaterial() );
 				planeMesh.position.y = - 50;
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
-				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+				const hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
 				hdrCubeMap = new HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
 					.setDataType( THREE.UnsignedByteType )
@@ -124,7 +124,7 @@
 
 					} );
 
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileCubemapShader();
 
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -141,9 +141,9 @@
 				controls.minDistance = 50;
 				controls.maxDistance = 300;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'roughness', 0, 1, 0.01 );
 				gui.add( params, 'metalness', 0, 1, 0.01 );
@@ -157,8 +157,8 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();

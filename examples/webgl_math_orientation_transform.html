@@ -17,13 +17,13 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer, mesh, target;
+			let camera, scene, renderer, mesh, target;
 
-			var spherical = new THREE.Spherical();
-			var rotationMatrix = new THREE.Matrix4();
-			var targetQuaternion = new THREE.Quaternion();
-			var clock = new THREE.Clock();
-			var speed = 2;
+			const spherical = new THREE.Spherical();
+			const rotationMatrix = new THREE.Matrix4();
+			const targetQuaternion = new THREE.Quaternion();
+			const clock = new THREE.Clock();
+			const speed = 2;
 
 			init();
 			animate();
@@ -35,25 +35,25 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.ConeBufferGeometry( 0.1, 0.5, 8 );
+				const geometry = new THREE.ConeGeometry( 0.1, 0.5, 8 );
 				geometry.rotateX( Math.PI * 0.5 );
-				var material = new THREE.MeshNormalMaterial();
+				const material = new THREE.MeshNormalMaterial();
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				//
 
-				var targetGeometry = new THREE.SphereBufferGeometry( 0.05 );
-				var targetMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+				const targetGeometry = new THREE.SphereGeometry( 0.05 );
+				const targetMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 				target = new THREE.Mesh( targetGeometry, targetMaterial );
 				scene.add( target );
 
 				//
 
-				var sphereGeometry = new THREE.SphereBufferGeometry( 2, 32, 32 );
-				var sphereMaterial = new THREE.MeshBasicMaterial( { color: 0xcccccc, wireframe: true, transparent: true, opacity: 0.3 } );
-				var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+				const sphereGeometry = new THREE.SphereGeometry( 2, 32, 32 );
+				const sphereMaterial = new THREE.MeshBasicMaterial( { color: 0xcccccc, wireframe: true, transparent: true, opacity: 0.3 } );
+				const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
 				scene.add( sphere );
 
 				//
@@ -65,7 +65,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
@@ -73,7 +73,7 @@
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -86,11 +86,11 @@
 
 				requestAnimationFrame( animate );
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( ! mesh.quaternion.equals( targetQuaternion ) ) {
 
-					var step = speed * delta;
+					const step = speed * delta;
 					mesh.quaternion.rotateTowards( targetQuaternion, step );
 
 				}

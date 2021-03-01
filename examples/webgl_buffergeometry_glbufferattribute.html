@@ -17,13 +17,14 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var points;
+			let points;
 
-			var particles = 300000;
+			const particles = 300000;
+			let drawCount = 10000;
 
 			init();
 			animate();
@@ -51,32 +52,32 @@
 
 				//
 
-				var geometry = new THREE.BufferGeometry();
+				const geometry = new THREE.BufferGeometry();
 
-				var positions = [];
-				var positions2 = [];
-				var colors = [];
+				const positions = [];
+				const positions2 = [];
+				const colors = [];
 
-				var color = new THREE.Color();
+				const color = new THREE.Color();
 
-				var n = 1000, n2 = n / 2; // particles spread in the cube
+				const n = 1000, n2 = n / 2; // particles spread in the cube
 
-				for ( var i = 0; i < particles; i ++ ) {
+				for ( let i = 0; i < particles; i ++ ) {
 
 					// positions
 
-					var x = Math.random() * n - n2;
-					var y = Math.random() * n - n2;
-					var z = Math.random() * n - n2;
+					const x = Math.random() * n - n2;
+					const y = Math.random() * n - n2;
+					const z = Math.random() * n - n2;
 
 					positions.push( x, y, z );
 					positions2.push( z * 0.3, x * 0.3, y * 0.3 );
 
 					// colors
 
-					var vx = ( x / n ) + 0.5;
-					var vy = ( y / n ) + 0.5;
-					var vz = ( z / n ) + 0.5;
+					const vx = ( x / n ) + 0.5;
+					const vy = ( y / n ) + 0.5;
+					const vz = ( z / n ) + 0.5;
 
 					color.setRGB( vx, vy, vz );
 
@@ -84,27 +85,27 @@
 
 				}
 
-				var gl = renderer.getContext();
+				const gl = renderer.getContext();
 
-				var pos = gl.createBuffer();
+				const pos = gl.createBuffer();
 				gl.bindBuffer( gl.ARRAY_BUFFER, pos );
 				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( positions ), gl.STATIC_DRAW );
 
-				var pos2 = gl.createBuffer();
+				const pos2 = gl.createBuffer();
 				gl.bindBuffer( gl.ARRAY_BUFFER, pos2 );
 				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( positions2 ), gl.STATIC_DRAW );
 
-				var rgb = gl.createBuffer();
+				const rgb = gl.createBuffer();
 				gl.bindBuffer( gl.ARRAY_BUFFER, rgb );
 				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( colors ), gl.STATIC_DRAW );
 
-				var posAttr1 = new THREE.GLBufferAttribute( pos, gl.FLOAT, 3, 4, particles );
-				var posAttr2 = new THREE.GLBufferAttribute( pos2, gl.FLOAT, 3, 4, particles );
+				const posAttr1 = new THREE.GLBufferAttribute( pos, gl.FLOAT, 3, 4, particles );
+				const posAttr2 = new THREE.GLBufferAttribute( pos2, gl.FLOAT, 3, 4, particles );
 				geometry.setAttribute( 'position', posAttr1 );
 
 				setInterval( function () {
 
-					var attr = geometry.getAttribute( 'position' );
+					const attr = geometry.getAttribute( 'position' );
 
 					geometry.setAttribute( 'position', ( attr === posAttr1 ) ? posAttr2 : posAttr1 );
 
@@ -114,7 +115,7 @@
 
 				//
 
-				var material = new THREE.PointsMaterial( { size: 15, vertexColors: THREE.VertexColors } );
+				const material = new THREE.PointsMaterial( { size: 15, vertexColors: THREE.VertexColors } );
 
 				points = new THREE.Points( geometry, material );
 
@@ -131,7 +132,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -155,13 +156,12 @@
 
 			}
 
-			var drawCount = 10000;
 			function render() {
 
 				drawCount = ( Math.max( 5000, drawCount ) + Math.floor( 500 * Math.random() ) ) % particles;
 				points.geometry.setDrawRange( 0, drawCount );
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
 				points.rotation.x = time * 0.1;
 				points.rotation.y = time * 0.2;

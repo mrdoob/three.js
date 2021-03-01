@@ -1,4 +1,3 @@
-import './polyfills.js';
 import { REVISION } from './constants.js';
 
 export { WebGLMultisampleRenderTarget } from './renderers/WebGLMultisampleRenderTarget.js';
@@ -53,17 +52,14 @@ export { Loader } from './loaders/Loader.js';
 export { LoaderUtils } from './loaders/LoaderUtils.js';
 export { Cache } from './loaders/Cache.js';
 export { AudioLoader } from './loaders/AudioLoader.js';
-export { SpotLightShadow } from './lights/SpotLightShadow.js';
 export { SpotLight } from './lights/SpotLight.js';
 export { PointLight } from './lights/PointLight.js';
 export { RectAreaLight } from './lights/RectAreaLight.js';
 export { HemisphereLight } from './lights/HemisphereLight.js';
 export { HemisphereLightProbe } from './lights/HemisphereLightProbe.js';
-export { DirectionalLightShadow } from './lights/DirectionalLightShadow.js';
 export { DirectionalLight } from './lights/DirectionalLight.js';
 export { AmbientLight } from './lights/AmbientLight.js';
 export { AmbientLightProbe } from './lights/AmbientLightProbe.js';
-export { LightShadow } from './lights/LightShadow.js';
 export { Light } from './lights/Light.js';
 export { LightProbe } from './lights/LightProbe.js';
 export { StereoCamera } from './cameras/StereoCamera.js';
@@ -93,14 +89,12 @@ export { AnimationClip } from './animation/AnimationClip.js';
 export { Uniform } from './core/Uniform.js';
 export { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 export { BufferGeometry } from './core/BufferGeometry.js';
-export { Geometry } from './core/Geometry.js';
 export { InterleavedBufferAttribute } from './core/InterleavedBufferAttribute.js';
 export { InstancedInterleavedBuffer } from './core/InstancedInterleavedBuffer.js';
 export { InterleavedBuffer } from './core/InterleavedBuffer.js';
 export { InstancedBufferAttribute } from './core/InstancedBufferAttribute.js';
 export { GLBufferAttribute } from './core/GLBufferAttribute.js';
 export * from './core/BufferAttribute.js';
-export { Face3 } from './core/Face3.js';
 export { Object3D } from './core/Object3D.js';
 export { Raycaster } from './core/Raycaster.js';
 export { Layers } from './core/Layers.js';
@@ -152,6 +146,7 @@ export { ShapePath } from './extras/core/ShapePath.js';
 export { Font } from './extras/core/Font.js';
 export { CurvePath } from './extras/core/CurvePath.js';
 export { Curve } from './extras/core/Curve.js';
+export { DataUtils } from './extras/DataUtils.js';
 export { ImageUtils } from './extras/ImageUtils.js';
 export { ShapeUtils } from './extras/ShapeUtils.js';
 export { PMREMGenerator } from './extras/PMREMGenerator.js';
@@ -166,5 +161,19 @@ if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 		revision: REVISION,
 	} } ) );
 	/* eslint-enable no-undef */
+
+}
+
+if ( typeof window !== 'undefined' ) {
+
+	if ( window.__THREE__ ) {
+
+		console.warn( 'WARNING: Multiple instances of Three.js being imported.' );
+
+	} else {
+
+		window.__THREE__ = REVISION;
+
+	}
 
 }

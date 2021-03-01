@@ -7,18 +7,18 @@ import {
 	Mesh,
 	Vector3,
 	Vector4
-} from "../../../build/three.module.js";
-import { LineSegmentsGeometry } from "../lines/LineSegmentsGeometry.js";
-import { LineMaterial } from "../lines/LineMaterial.js";
+} from '../../../build/three.module.js';
+import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
+import { LineMaterial } from '../lines/LineMaterial.js';
 
 var LineSegments2 = function ( geometry, material ) {
 
-	Mesh.call( this );
+	if ( geometry === undefined ) geometry = new LineSegmentsGeometry();
+	if ( material === undefined ) material = new LineMaterial( { color: Math.random() * 0xffffff } );
+
+	Mesh.call( this, geometry, material );
 
 	this.type = 'LineSegments2';
-
-	this.geometry = geometry !== undefined ? geometry : new LineSegmentsGeometry();
-	this.material = material !== undefined ? material : new LineMaterial( { color: Math.random() * 0xffffff } );
 
 };
 
@@ -81,6 +81,8 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			}
 
+			var threshold = ( raycaster.params.Line2 !== undefined ) ? raycaster.params.Line2.threshold || 0 : 0;
+
 			var ray = raycaster.ray;
 			var camera = raycaster.camera;
 			var projectionMatrix = camera.projectionMatrix;
@@ -88,10 +90,13 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			var geometry = this.geometry;
 			var material = this.material;
 			var resolution = material.resolution;
-			var lineWidth = material.linewidth;
+			var lineWidth = material.linewidth + threshold;
 
 			var instanceStart = geometry.attributes.instanceStart;
 			var instanceEnd = geometry.attributes.instanceEnd;
+
+			// camera forward is negative
+			var near = - camera.near;
 
 			// pick a point 1 unit out along the ray to avoid the ray origin
 			// sitting at the camera origin which will cause "w" to be 0 when
@@ -126,6 +131,29 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 				start.applyMatrix4( mvMatrix );
 				end.applyMatrix4( mvMatrix );
 
+				// skip the segment if it's entirely behind the camera
+				var isBehindCameraNear = start.z > near && end.z > near;
+				if ( isBehindCameraNear ) {
+
+					continue;
+
+				}
+
+				// trim the segment if it extends behind camera near
+				if ( start.z > near ) {
+
+					const deltaDist = start.z - end.z;
+					const t = ( start.z - near ) / deltaDist;
+					start.lerp( end, t );
+
+				} else if ( end.z > near ) {
+
+					const deltaDist = end.z - start.z;
+					const t = ( end.z - near ) / deltaDist;
+					end.lerp( start, t );
+
+				}
+
 				// clip space
 				start.applyMatrix4( projectionMatrix );
 				end.applyMatrix4( projectionMatrix );
@@ -133,15 +161,6 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 				// ndc space [ - 1.0, 1.0 ]
 				start.multiplyScalar( 1 / start.w );
 				end.multiplyScalar( 1 / end.w );
-
-				// skip the segment if it's outside the camera near and far planes
-				var isBehindCameraNear = start.z < - 1 && end.z < - 1;
-				var isPastCameraFar = start.z > 1 && end.z > 1;
-				if ( isBehindCameraNear || isPastCameraFar ) {
-
-					continue;
-
-				}
 
 				// screen space
 				start.x *= resolution.x / 2;

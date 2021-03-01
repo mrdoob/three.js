@@ -2,23 +2,14 @@ import { Vector3 } from './Vector3.js';
 import { Sphere } from './Sphere.js';
 import { Plane } from './Plane.js';
 
-const _sphere = new Sphere();
-const _vector = new Vector3();
+const _sphere = /*@__PURE__*/ new Sphere();
+const _vector = /*@__PURE__*/ new Vector3();
 
 class Frustum {
 
-	constructor( p0, p1, p2, p3, p4, p5 ) {
+	constructor( p0 = new Plane(), p1 = new Plane(), p2 = new Plane(), p3 = new Plane(), p4 = new Plane(), p5 = new Plane() ) {
 
-		this.planes = [
-
-			( p0 !== undefined ) ? p0 : new Plane(),
-			( p1 !== undefined ) ? p1 : new Plane(),
-			( p2 !== undefined ) ? p2 : new Plane(),
-			( p3 !== undefined ) ? p3 : new Plane(),
-			( p4 !== undefined ) ? p4 : new Plane(),
-			( p5 !== undefined ) ? p5 : new Plane()
-
-		];
+		this.planes = [ p0, p1, p2, p3, p4, p5 ];
 
 	}
 
@@ -34,12 +25,6 @@ class Frustum {
 		planes[ 5 ].copy( p5 );
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -162,6 +147,12 @@ class Frustum {
 		}
 
 		return true;
+
+	}
+
+	clone() {
+
+		return new this.constructor().copy( this );
 
 	}
 

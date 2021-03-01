@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,7 +21,7 @@
 
 		<code>
 		// Instantiate a loader
-		var loader = new MMDLoader();
+		const loader = new MMDLoader();
 
 		// Load a MMD model
 		loader.load(
@@ -92,7 +91,7 @@
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
 		</p>
 		<p>
-		Begin loading VMD motion file(s) from url(s) and fire the callback function with the parsed [page:AnimatioinClip].
+		Begin loading VMD motion file(s) from url(s) and fire the callback function with the parsed [page:AnimationClip].
 		</p>
 
 		<h3>[method:null loadWithAnimation]( [param:String modelUrl], [param:String vmdUrl], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>

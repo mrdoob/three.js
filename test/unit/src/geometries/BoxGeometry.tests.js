@@ -1,13 +1,11 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import {
-	BoxBufferGeometry
-} from '../../../../src/geometries/BoxGeometry';
+import { BoxGeometry, BoxBufferGeometry } from '../../../../src/geometries/BoxGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'BoxBufferGeometry', ( hooks ) => {
+	QUnit.module( 'BoxGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -22,9 +20,10 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				new BoxBufferGeometry(),
-				new BoxBufferGeometry( parameters.width, parameters.height, parameters.depth ),
-				new BoxBufferGeometry( parameters.width, parameters.height, parameters.depth, parameters.widthSegments, parameters.heightSegments, parameters.depthSegments )
+				new BoxGeometry(),
+				new BoxGeometry( parameters.width, parameters.height, parameters.depth ),
+				new BoxGeometry( parameters.width, parameters.height, parameters.depth, parameters.widthSegments, parameters.heightSegments, parameters.depthSegments ),
+				new BoxBufferGeometry()
 			];
 
 		} );

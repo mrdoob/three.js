@@ -41,9 +41,10 @@ import {
 	Vector4,
 	VectorKeyframeTrack,
 	sRGBEncoding
-} from "../../../build/three.module.js";
-import { Inflate } from "../libs/inflate.module.min.js";
-import { NURBSCurve } from "../curves/NURBSCurve.js";
+} from '../../../build/three.module.js';
+import * as fflate from '../libs/fflate.module.min.js';
+import { NURBSCurve } from '../curves/NURBSCurve.js';
+
 /**
  * Loader loads FBX file and generates Group representing FBX scene.
  * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format
@@ -87,6 +88,7 @@ var FBXLoader = ( function () {
 			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
 			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 
 			loader.load( url, function ( buffer ) {
 
@@ -540,7 +542,7 @@ var FBXLoader = ( function () {
 
 				parameters.color = new Color().fromArray( materialNode.Diffuse.value );
 
-			} else if ( materialNode.DiffuseColor && materialNode.DiffuseColor.type === 'Color' ) {
+			} else if ( materialNode.DiffuseColor && ( materialNode.DiffuseColor.type === 'Color' || materialNode.DiffuseColor.type === 'ColorRGB' ) ) {
 
 				// The blender exporter exports diffuse here instead of in materialNode.Diffuse
 				parameters.color = new Color().fromArray( materialNode.DiffuseColor.value );
@@ -557,7 +559,7 @@ var FBXLoader = ( function () {
 
 				parameters.emissive = new Color().fromArray( materialNode.Emissive.value );
 
-			} else if ( materialNode.EmissiveColor && materialNode.EmissiveColor.type === 'Color' ) {
+			} else if ( materialNode.EmissiveColor && ( materialNode.EmissiveColor.type === 'Color' || materialNode.EmissiveColor.type === 'ColorRGB' ) ) {
 
 				// The blender exporter exports emissive color here instead of in materialNode.Emissive
 				parameters.emissive = new Color().fromArray( materialNode.EmissiveColor.value );
@@ -867,11 +869,17 @@ var FBXLoader = ( function () {
 
 				if ( node.userData.transformData ) {
 
-					if ( node.parent ) node.userData.transformData.parentMatrixWorld = node.parent.matrix;
+					if ( node.parent ) {
+
+						node.userData.transformData.parentMatrix = node.parent.matrix;
+						node.userData.transformData.parentMatrixWorld = node.parent.matrixWorld;
+
+					}
 
 					var transform = generateTransform( node.userData.transformData );
 
 					node.applyMatrix4( transform );
+					node.updateWorldMatrix();
 
 				}
 
@@ -2783,7 +2791,7 @@ var FBXLoader = ( function () {
 				postRotation.push( eulerOrder );
 
 				postRotation = new Euler().fromArray( postRotation );
-				postRotation = new Quaternion().setFromEuler( postRotation ).inverse();
+				postRotation = new Quaternion().setFromEuler( postRotation ).invert();
 
 			}
 
@@ -2835,16 +2843,34 @@ var FBXLoader = ( function () {
 			if ( curves.y !== undefined ) times = times.concat( curves.y.times );
 			if ( curves.z !== undefined ) times = times.concat( curves.z.times );
 
-			// then sort them and remove duplicates
+			// then sort them
 			times = times.sort( function ( a, b ) {
 
 				return a - b;
 
-			} ).filter( function ( elem, index, array ) {
-
-				return array.indexOf( elem ) == index;
-
 			} );
+
+			// and remove duplicates
+			if ( times.length > 1 ) {
+
+				var targetIndex = 1;
+				var lastValue = times[ 0 ];
+				for ( var i = 1; i < times.length; i ++ ) {
+
+					var currentValue = times[ i ];
+					if ( currentValue !== lastValue ) {
+
+						times[ targetIndex ] = currentValue;
+						lastValue = currentValue;
+						targetIndex ++;
+
+					}
+
+				}
+
+				times = times.slice( 0, targetIndex );
+
+			}
 
 			return times;
 
@@ -3590,14 +3616,14 @@ var FBXLoader = ( function () {
 
 					}
 
-					if ( typeof Inflate === 'undefined' ) {
+					if ( typeof fflate === 'undefined' ) {
 
-						console.error( 'THREE.FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
+						console.error( 'THREE.FBXLoader: External library fflate.min.js required.' );
 
 					}
 
-					var inflate = new Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
-					var reader2 = new BinaryReader( inflate.decompress().buffer );
+					var data = fflate.unzlibSync( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
+					var reader2 = new BinaryReader( data.buffer );
 
 					switch ( type ) {
 
@@ -4007,6 +4033,7 @@ var FBXLoader = ( function () {
 		var lRotationPivotM = new Matrix4();
 
 		var lParentGX = new Matrix4();
+		var lParentLX = new Matrix4();
 		var lGlobalT = new Matrix4();
 
 		var inheritType = ( transformData.inheritType ) ? transformData.inheritType : 0;
@@ -4034,6 +4061,7 @@ var FBXLoader = ( function () {
 			var array = transformData.postRotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
+			lPostRotationM.invert();
 
 		}
 
@@ -4046,41 +4074,51 @@ var FBXLoader = ( function () {
 		if ( transformData.rotationPivot ) lRotationPivotM.setPosition( tempVec.fromArray( transformData.rotationPivot ) );
 
 		// parent transform
-		if ( transformData.parentMatrixWorld ) lParentGX = transformData.parentMatrixWorld;
+		if ( transformData.parentMatrixWorld ) {
 
+			lParentLX.copy( transformData.parentMatrix );
+			lParentGX.copy( transformData.parentMatrixWorld );
+
+		}
+
+		var lLRM = new Matrix4().copy( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM );
 		// Global Rotation
-		var lLRM = lPreRotationM.multiply( lRotationM ).multiply( lPostRotationM );
 		var lParentGRM = new Matrix4();
-		lParentGX.extractRotation( lParentGRM );
+		lParentGRM.extractRotation( lParentGX );
 
 		// Global Shear*Scaling
 		var lParentTM = new Matrix4();
 		lParentTM.copyPosition( lParentGX );
 
 		var lParentGSM = new Matrix4();
-		lParentGSM.getInverse( lParentGRM ).multiply( lParentGX );
+		var lParentGRSM = new Matrix4().copy( lParentTM ).invert().multiply( lParentGX );
+		lParentGSM.copy( lParentGRM ).invert().multiply( lParentGRSM );
+		var lLSM = lScalingM;
 
 		var lGlobalRS = new Matrix4();
 
 		if ( inheritType === 0 ) {
 
-			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM ).multiply( lScalingM );
+			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM ).multiply( lLSM );
 
 		} else if ( inheritType === 1 ) {
 
-			lGlobalRS.copy( lParentGRM ).multiply( lParentGSM ).multiply( lLRM ).multiply( lScalingM );
+			lGlobalRS.copy( lParentGRM ).multiply( lParentGSM ).multiply( lLRM ).multiply( lLSM );
 
 		} else {
 
-			var lParentLSM_inv = new Matrix4().getInverse( lScalingM );
-			var lParentGSM_noLocal = new Matrix4().multiply( lParentGSM ).multiply( lParentLSM_inv );
+			var lParentLSM = new Matrix4().scale( new Vector3().setFromMatrixScale( lParentLX ) );
+			var lParentLSM_inv = new Matrix4().copy( lParentLSM ).invert();
+			var lParentGSM_noLocal = new Matrix4().copy( lParentGSM ).multiply( lParentLSM_inv );
 
-			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lScalingM );
+			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lLSM );
 
 		}
 
-		var lRotationPivotM_inv = new Matrix4().getInverse( lRotationPivotM );
-		var lScalingPivotM_inv = new Matrix4().getInverse( lScalingPivotM );
+		var lRotationPivotM_inv = new Matrix4();
+		lRotationPivotM_inv.copy( lRotationPivotM ).invert();
+		var lScalingPivotM_inv = new Matrix4();
+		lScalingPivotM_inv.copy( lScalingPivotM ).invert();
 		// Calculate the local transform matrix
 		var lTransform = new Matrix4();
 		lTransform.copy( lTranslationM ).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
@@ -4090,7 +4128,10 @@ var FBXLoader = ( function () {
 		var lGlobalTranslation = new Matrix4().copy( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
 		lGlobalT.copyPosition( lGlobalTranslation );
 
-		lTransform = new Matrix4().multiply( lGlobalT ).multiply( lGlobalRS );
+		lTransform = new Matrix4().copy( lGlobalT ).multiply( lGlobalRS );
+
+		// from global to local
+		lTransform.premultiply( lParentGX.invert() );
 
 		return lTransform;
 

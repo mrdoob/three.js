@@ -25,8 +25,8 @@
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
-			var container, stats;
-			var params = {
+			let container, stats;
+			const params = {
 				projection: 'normal',
 				autoRotate: true,
 				reflectivity: 1.0,
@@ -34,9 +34,11 @@
 				exposure: 1.0,
 				gemColor: 'Green'
 			};
-			var camera, scene, renderer, objects = [];
-			var gemBackMaterial, gemFrontMaterial;
-			var hdrCubeRenderTarget;
+			let camera, scene, renderer;
+			let gemBackMaterial, gemFrontMaterial;
+			let hdrCubeRenderTarget;
+
+			const objects = [];
 
 			init();
 			animate();
@@ -79,14 +81,14 @@
 					premultipliedAlpha: true
 				} );
 
-				var manager = new THREE.LoadingManager();
+				const manager = new THREE.LoadingManager();
 				manager.onProgress = function ( item, loaded, total ) {
 
 					console.log( item, loaded, total );
 
 				};
 
-				var loader = new OBJLoader( manager );
+				const loader = new OBJLoader( manager );
 				loader.load( 'models/obj/emerald.obj', function ( object ) {
 
 					object.traverse( function ( child ) {
@@ -94,10 +96,10 @@
 						if ( child instanceof THREE.Mesh ) {
 
 							child.material = gemBackMaterial;
-							var second = child.clone();
+							const second = child.clone();
 							second.material = gemFrontMaterial;
 
-							var parent = new THREE.Group();
+							const parent = new THREE.Group();
 							parent.add( second );
 							parent.add( child );
 							scene.add( parent );
@@ -126,27 +128,27 @@
 
 					} );
 
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
 				// Lights
 
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				var pointLight1 = new THREE.PointLight( 0xffffff );
+				const pointLight1 = new THREE.PointLight( 0xffffff );
 				pointLight1.position.set( 150, 10, 0 );
 				pointLight1.castShadow = false;
 				scene.add( pointLight1 );
 
-				var pointLight2 = new THREE.PointLight( 0xffffff );
+				const pointLight2 = new THREE.PointLight( 0xffffff );
 				pointLight2.position.set( - 150, 0, 0 );
 				scene.add( pointLight2 );
 
-				var pointLight3 = new THREE.PointLight( 0xffffff );
+				const pointLight3 = new THREE.PointLight( 0xffffff );
 				pointLight3.position.set( 0, - 10, - 150 );
 				scene.add( pointLight3 );
 
-				var pointLight4 = new THREE.PointLight( 0xffffff );
+				const pointLight4 = new THREE.PointLight( 0xffffff );
 				pointLight4.position.set( 0, 0, 150 );
 				scene.add( pointLight4 );
 
@@ -160,13 +162,13 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 20;
 				controls.maxDistance = 200;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'reflectivity', 0, 1 );
 				gui.add( params, 'exposure', 0.1, 2 );
@@ -178,8 +180,8 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -206,7 +208,7 @@
 
 					gemFrontMaterial.reflectivity = gemBackMaterial.reflectivity = params.reflectivity;
 
-					var newColor = gemBackMaterial.color;
+					let newColor = gemBackMaterial.color;
 					switch ( params.gemColor ) {
 
 						case 'Blue': newColor = new THREE.Color( 0x000088 ); break;
@@ -215,9 +217,9 @@
 						case 'White': newColor = new THREE.Color( 0x888888 ); break;
 						case 'Black': newColor = new THREE.Color( 0x0f0f0f ); break;
 
-		}
-					gemBackMaterial.color = gemFrontMaterial.color = newColor;
+					}
 
+					gemBackMaterial.color = gemFrontMaterial.color = newColor;
 
 				}
 
@@ -227,14 +229,14 @@
 
 				if ( params.autoRotate ) {
 
-					for ( var i = 0, l = objects.length; i < l; i ++ ) {
+					for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
-						var object = objects[ i ];
+						const object = objects[ i ];
 						object.rotation.y += 0.005;
 
 					}
 
-	}
+				}
 
 				renderer.render( scene, camera );
 

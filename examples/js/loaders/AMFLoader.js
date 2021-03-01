@@ -1,4 +1,3 @@
-console.warn( "THREE.AMFLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Description: Early release of an AMF Loader following the pattern of the
  * example loaders in the three.js project.
@@ -12,7 +11,7 @@ console.warn( "THREE.AMFLoader: As part of the transition to ES6 Modules, the fi
  *	});
  *
  * Materials now supported, material colors supported
- * Zip support, requires jszip
+ * Zip support, requires fflate
  * No constellation support (yet)!
  *
  */
@@ -35,6 +34,7 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -77,20 +77,20 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				try {
 
-					zip = new JSZip( data );
+					zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
 
 				} catch ( e ) {
 
 					if ( e instanceof ReferenceError ) {
 
-						console.log( 'THREE.AMFLoader: jszip missing and file is compressed.' );
+						console.log( 'THREE.AMFLoader: fflate missing and file is compressed.' );
 						return null;
 
 					}
 
 				}
 
-				for ( file in zip.files ) {
+				for ( var file in zip ) {
 
 					if ( file.toLowerCase().substr( - 4 ) === '.amf' ) {
 
@@ -101,7 +101,7 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 				}
 
 				console.log( 'THREE.AMFLoader: Trying to load file asset: ' + file );
-				view = new DataView( zip.file( file ).asArrayBuffer() );
+				view = new DataView( zip[ file ].buffer );
 
 			}
 

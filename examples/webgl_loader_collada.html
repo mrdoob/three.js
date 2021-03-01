@@ -22,8 +22,8 @@
 
 			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
 
-			var container, stats, clock;
-			var camera, scene, renderer, elf;
+			let container, stats, clock;
+			let camera, scene, renderer, elf;
 
 			init();
 			animate();
@@ -42,7 +42,7 @@
 
 				// loading manager
 
-				var loadingManager = new THREE.LoadingManager( function () {
+				const loadingManager = new THREE.LoadingManager( function () {
 
 					scene.add( elf );
 
@@ -50,7 +50,7 @@
 
 				// collada
 
-				var loader = new ColladaLoader( loadingManager );
+				const loader = new ColladaLoader( loadingManager );
 				loader.load( './models/collada/elf/elf.dae', function ( collada ) {
 
 					elf = collada.scene;
@@ -59,10 +59,10 @@
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
 				directionalLight.position.set( 1, 1, 0 ).normalize();
 				scene.add( directionalLight );
 
@@ -80,7 +80,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -104,7 +104,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( elf !== undefined ) {
 

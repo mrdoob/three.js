@@ -18,70 +18,70 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			// HACK:
+			class GIMesh extends THREE.Mesh {
 
-			THREE.Mesh.prototype.clone = function () {
+				copy( source ) {
 
-				var newMaterial = ( this.material.isMaterial ) ? this.material.clone() : this.material.slice();
+					super.copy( source );
 
-				return new this.constructor( this.geometry.clone(), newMaterial ).copy( this );
+					this.geometry = source.geometry.clone();
 
-			};
+					return this;
+
+				}
+
+			}
 
 			//
 
-			var SimpleGI = function ( renderer, scene ) {
+			const SimpleGI = function ( renderer, scene ) {
 
-				var SIZE = 32, SIZE2 = SIZE * SIZE;
+				const SIZE = 32, SIZE2 = SIZE * SIZE;
 
-				var camera = new THREE.PerspectiveCamera( 90, 1, 0.01, 100 );
+				const camera = new THREE.PerspectiveCamera( 90, 1, 0.01, 100 );
 
 				scene.updateMatrixWorld( true );
 
-				var clone = scene.clone();
+				let clone = scene.clone();
 				clone.autoUpdate = false;
 
-				var rt = new THREE.WebGLRenderTarget( SIZE, SIZE, {
-					wrapS: THREE.ClampToEdgeWrapping,
-					wrapT: THREE.ClampToEdgeWrapping,
-					depthBuffer: true
-				} );
+				const rt = new THREE.WebGLRenderTarget( SIZE, SIZE );
 
-				var normalMatrix = new THREE.Matrix3();
+				const normalMatrix = new THREE.Matrix3();
 
-				var position = new THREE.Vector3();
-				var normal = new THREE.Vector3();
+				const position = new THREE.Vector3();
+				const normal = new THREE.Vector3();
 
-				var bounces = 0;
-				var currentVertex = 0;
+				let bounces = 0;
+				let currentVertex = 0;
 
-				var color = new Float32Array( 3 );
-				var buffer = new Uint8Array( SIZE2 * 4 );
+				const color = new Float32Array( 3 );
+				const buffer = new Uint8Array( SIZE2 * 4 );
 
 				function compute() {
 
 					if ( bounces === 3 ) return;
 
-					var object = scene.children[ 0 ];
-					var geometry = object.geometry;
+					const object = scene.children[ 0 ]; // torusKnot
+					const geometry = object.geometry;
 
-					var attributes = geometry.attributes;
-					var positions = attributes.position.array;
-					var normals = attributes.normal.array;
+					const attributes = geometry.attributes;
+					const positions = attributes.position.array;
+					const normals = attributes.normal.array;
 
 					if ( attributes.color === undefined ) {
 
-						var colors = new Float32Array( positions.length );
+						const colors = new Float32Array( positions.length );
 						geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).setUsage( THREE.DynamicDrawUsage ) );
 
 					}
 
-					var colors = attributes.color.array;
+					const colors = attributes.color.array;
 
-					var startVertex = currentVertex;
-					var totalVertex = positions.length / 3;
+					const startVertex = currentVertex;
+					const totalVertex = positions.length / 3;
 
-					for ( var i = 0; i < 32; i ++ ) {
+					for ( let i = 0; i < 32; i ++ ) {
 
 						if ( currentVertex >= totalVertex ) break;
 
@@ -103,7 +103,7 @@
 						color[ 1 ] = 0;
 						color[ 2 ] = 0;
 
-						for ( var k = 0, kl = buffer.length; k < kl; k += 4 ) {
+						for ( let k = 0, kl = buffer.length; k < kl; k += 4 ) {
 
 							color[ 0 ] += buffer[ k + 0 ];
 							color[ 1 ] += buffer[ k + 1 ];
@@ -143,7 +143,7 @@
 
 			//
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
 			animate();
@@ -155,28 +155,28 @@
 
 				scene = new THREE.Scene();
 
-				// sphere
+				// torus knot
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 0.75, 0.3, 128, 32, 1 );
-				var material = new THREE.MeshBasicMaterial( { vertexColors: true } );
+				const torusGeometry = new THREE.TorusKnotGeometry( 0.75, 0.3, 128, 32, 1 );
+				const material = new THREE.MeshBasicMaterial( { vertexColors: true } );
 
-				var mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+				const torusKnot = new GIMesh( torusGeometry, material );
+				scene.add( torusKnot );
 
 				// room
 
-				var materials = [];
+				const materials = [];
 
-				for ( var i = 0; i < 8; i ++ ) {
+				for ( let i = 0; i < 8; i ++ ) {
 
 					materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.BackSide } ) );
 
 				}
 
-				var geometry = new THREE.BoxBufferGeometry( 3, 3, 3 );
+				const boxGeometry = new THREE.BoxGeometry( 3, 3, 3 );
 
-				var mesh = new THREE.Mesh( geometry, materials );
-				scene.add( mesh );
+				const box = new THREE.Mesh( boxGeometry, materials );
+				scene.add( box );
 
 				//
 
@@ -187,11 +187,11 @@
 
 				new SimpleGI( renderer, scene );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
 				controls.maxDistance = 10;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

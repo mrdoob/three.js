@@ -18,21 +18,21 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import * as Nodes from './jsm/nodes/Nodes.js';
 
-			var camera, scene, renderer;
-			var object, light, nodepost;
-			var gui;
+			let camera, scene, renderer;
+			let object, light, nodepost;
+			let gui;
 
-			var clock = new THREE.Clock();
-			var frame = new Nodes.NodeFrame();
+			const clock = new THREE.Clock();
+			const frame = new Nodes.NodeFrame();
 
-			var param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'color-adjustment' };
+			const param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'color-adjustment' };
 
-			var textureLoader = new THREE.TextureLoader();
+			const textureLoader = new THREE.TextureLoader();
 
-			var lensflare2 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
+			const lensflare2 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
 			lensflare2.wrapS = lensflare2.wrapT = THREE.RepeatWrapping;
 
-			var decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
+			const decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
 			decalNormal.wrapS = decalNormal.wrapT = THREE.RepeatWrapping;
 
 			init();
@@ -66,7 +66,7 @@
 
 			function addGui( name, value, callback, isColor, min, max ) {
 
-				var node;
+				let node;
 
 				param[ name ] = value;
 
@@ -104,7 +104,9 @@
 
 			function updateMaterial() {
 
-				var name = param.example;
+				const name = param.example;
+
+				let screen, fade, scale, size;
 
 				clearGui();
 
@@ -114,19 +116,19 @@
 
 						// POST
 
-						var screen = new Nodes.ScreenNode();
+						screen = new Nodes.ScreenNode();
 
-						var hue = new Nodes.FloatNode();
-						var sataturation = new Nodes.FloatNode( 1 );
-						var vibrance = new Nodes.FloatNode();
-						var brightness = new Nodes.FloatNode( 0 );
-						var contrast = new Nodes.FloatNode( 1 );
+						const hue = new Nodes.FloatNode();
+						const sataturation = new Nodes.FloatNode( 1 );
+						const vibrance = new Nodes.FloatNode();
+						const brightness = new Nodes.FloatNode( 0 );
+						const contrast = new Nodes.FloatNode( 1 );
 
-						var hueNode = new Nodes.ColorAdjustmentNode( screen, hue, Nodes.ColorAdjustmentNode.HUE );
-						var satNode = new Nodes.ColorAdjustmentNode( hueNode, sataturation, Nodes.ColorAdjustmentNode.SATURATION );
-						var vibranceNode = new Nodes.ColorAdjustmentNode( satNode, vibrance, Nodes.ColorAdjustmentNode.VIBRANCE );
-						var brightnessNode = new Nodes.ColorAdjustmentNode( vibranceNode, brightness, Nodes.ColorAdjustmentNode.BRIGHTNESS );
-						var contrastNode = new Nodes.ColorAdjustmentNode( brightnessNode, contrast, Nodes.ColorAdjustmentNode.CONTRAST );
+						const hueNode = new Nodes.ColorAdjustmentNode( screen, hue, Nodes.ColorAdjustmentNode.HUE );
+						const satNode = new Nodes.ColorAdjustmentNode( hueNode, sataturation, Nodes.ColorAdjustmentNode.SATURATION );
+						const vibranceNode = new Nodes.ColorAdjustmentNode( satNode, vibrance, Nodes.ColorAdjustmentNode.VIBRANCE );
+						const brightnessNode = new Nodes.ColorAdjustmentNode( vibranceNode, brightness, Nodes.ColorAdjustmentNode.BRIGHTNESS );
+						const contrastNode = new Nodes.ColorAdjustmentNode( brightnessNode, contrast, Nodes.ColorAdjustmentNode.CONTRAST );
 
 						nodepost.output = contrastNode;
 
@@ -168,10 +170,10 @@
 
 						// POST
 
-						var color = new Nodes.ColorNode( 0xFFFFFF );
-						var percent = new Nodes.FloatNode( .5 );
+						const color = new Nodes.ColorNode( 0xFFFFFF );
+						const percent = new Nodes.FloatNode( .5 );
 
-						var fade = new Nodes.MathNode(
+						fade = new Nodes.MathNode(
 							new Nodes.ScreenNode(),
 							color,
 							percent,
@@ -200,12 +202,12 @@
 
 						// POST
 
-						var alpha = new Nodes.FloatNode( 1 );
+						const alpha = new Nodes.FloatNode( 1 );
 
-						var screen = new Nodes.ScreenNode();
-						var inverted = new Nodes.MathNode( screen, Nodes.MathNode.INVERT );
+						screen = new Nodes.ScreenNode();
+						const inverted = new Nodes.MathNode( screen, Nodes.MathNode.INVERT );
 
-						var fade = new Nodes.MathNode(
+						fade = new Nodes.MathNode(
 							screen,
 							inverted,
 							alpha,
@@ -228,7 +230,7 @@
 
 						// POST
 
-						var multiply = new Nodes.OperatorNode(
+						const multiply = new Nodes.OperatorNode(
 							new Nodes.ScreenNode(),
 							new Nodes.TextureNode( lensflare2 ),
 							Nodes.OperatorNode.ADD
@@ -257,10 +259,10 @@
 
 						// PASS
 
-						var screen = new Nodes.ScreenNode();
-						var sat = new Nodes.FloatNode( 0 );
+						screen = new Nodes.ScreenNode();
+						const sat = new Nodes.FloatNode( 0 );
 
-						var satrgb = new Nodes.FunctionNode( [
+						const satrgb = new Nodes.FunctionNode( [
 							"vec3 satrgb( vec3 rgb, float adjustment ) {",
 							// include luminance function from LuminanceNode
 							"	vec3 intensity = vec3( luminance( rgb ) );",
@@ -268,7 +270,7 @@
 							"}"
 						].join( "\n" ), [ Nodes.LuminanceNode.Nodes.luminance ] );
 
-						var saturation = new Nodes.FunctionCallNode( satrgb );
+						const saturation = new Nodes.FunctionCallNode( satrgb );
 						saturation.inputs.rgb = screen;
 						saturation.inputs.adjustment = sat;
 
@@ -288,41 +290,41 @@
 
 						// POST
 
-						var normal = new Nodes.TextureNode( decalNormal );
-						var normalXY = new Nodes.SwitchNode( normal, 'xy' );
-						var scale = new Nodes.FloatNode( .5 );
+						const normal = new Nodes.TextureNode( decalNormal );
+						const normalXY = new Nodes.SwitchNode( normal, 'xy' );
+						scale = new Nodes.FloatNode( .5 );
 
-						var normalXYFlip = new Nodes.MathNode(
+						const normalXYFlip = new Nodes.MathNode(
 							normalXY,
 							Nodes.MathNode.INVERT
 						);
 
-						var offsetNormal = new Nodes.OperatorNode(
+						const offsetNormal = new Nodes.OperatorNode(
 							normalXYFlip,
 							new Nodes.FloatNode( .5 ),
 							Nodes.OperatorNode.ADD
 						);
 
-						var scaleTexture = new Nodes.OperatorNode(
+						const scaleTexture = new Nodes.OperatorNode(
 							new Nodes.SwitchNode( normal, 'z' ),
 							offsetNormal,
 							Nodes.OperatorNode.MUL
 						);
 
-						var scaleNormal = new Nodes.MathNode(
+						const scaleNormal = new Nodes.MathNode(
 							new Nodes.FloatNode( 1 ),
 							scaleTexture,
 							scale,
 							Nodes.MathNode.MIX
 						);
 
-						var offsetCoord = new Nodes.OperatorNode(
+						const offsetCoord = new Nodes.OperatorNode(
 							new Nodes.UVNode(),
 							scaleNormal,
 							Nodes.OperatorNode.MUL
 						);
 
-						var screen = new Nodes.ScreenNode( offsetCoord );
+						screen = new Nodes.ScreenNode( offsetCoord );
 
 						nodepost.output = screen;
 
@@ -348,20 +350,20 @@
 
 						// POST
 
-						var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+						size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 
-						var screen = new Nodes.ScreenNode();
+						screen = new Nodes.ScreenNode();
 
-						var previousFrame = new Nodes.RTTNode( size.width, size.height, screen );
+						const previousFrame = new Nodes.RTTNode( size.width, size.height, screen );
 
-						var motionBlur = new Nodes.MathNode(
+						const motionBlur = new Nodes.MathNode(
 							previousFrame,
 							screen,
 							new Nodes.FloatNode( .5 ),
 							Nodes.MathNode.MIX
 						);
 
-						var currentFrame = new Nodes.RTTNode( size.width, size.height, motionBlur );
+						const currentFrame = new Nodes.RTTNode( size.width, size.height, motionBlur );
 						currentFrame.saveTo = previousFrame;
 
 						nodepost.output = currentFrame;
@@ -372,28 +374,28 @@
 
 						// POST
 
-						var scale = new Nodes.FloatNode( 128 );
-						var fade = new Nodes.FloatNode( 1 );
-						var uv = new Nodes.UVNode();
+						scale = new Nodes.FloatNode( 128 );
+						fade = new Nodes.FloatNode( 1 );
+						const uv = new Nodes.UVNode();
 
-						var blocks = new Nodes.OperatorNode(
+						const blocks = new Nodes.OperatorNode(
 							uv,
 							scale,
 							Nodes.OperatorNode.MUL
 						);
 
-						var blocksSize = new Nodes.MathNode(
+						const blocksSize = new Nodes.MathNode(
 							blocks,
 							Nodes.MathNode.FLOOR
 						);
 
-						var mosaicUV = new Nodes.OperatorNode(
+						const mosaicUV = new Nodes.OperatorNode(
 							blocksSize,
 							scale,
 							Nodes.OperatorNode.DIV
 						);
 
-						var fadeScreen = new Nodes.MathNode(
+						const fadeScreen = new Nodes.MathNode(
 							uv,
 							mosaicUV,
 							fade,
@@ -430,9 +432,9 @@
 
 						// POST
 
-						var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+						size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 
-						var blurScreen = new Nodes.BlurNode( new Nodes.ScreenNode() );
+						const blurScreen = new Nodes.BlurNode( new Nodes.ScreenNode() );
 						blurScreen.size = new THREE.Vector2( size.width, size.height );
 
 						nodepost.output = blurScreen;
@@ -459,11 +461,11 @@
 
 				// test serialization
 				/*
-							var library = {};
+							let library = {};
 							library[ lensflare2.uuid ] = lensflare2;
 							library[ decalNormal.uuid ] = decalNormal;
 
-							var json = nodepost.toJSON();
+							let json = nodepost.toJSON();
 
 							nodepost.output = new NodeMaterialLoader( null, library ).parse( json ).value;
 						*/
@@ -490,12 +492,12 @@
 				object = new THREE.Object3D();
 				scene.add( object );
 
-				var geometry = new THREE.SphereBufferGeometry( 1, 4, 4 );
+				const geometry = new THREE.SphereGeometry( 1, 4, 4 );
 
-				for ( var i = 0; i < 100; i ++ ) {
+				for ( let i = 0; i < 100; i ++ ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0x888888 + ( Math.random() * 0x888888 ), flatShading: true } );
-					var mesh = new THREE.Mesh( geometry, material );
+					const material = new THREE.MeshPhongMaterial( { color: 0x888888 + ( Math.random() * 0x888888 ), flatShading: true } );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
 					mesh.position.multiplyScalar( Math.random() * 400 );
 					mesh.rotation.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
@@ -514,7 +516,7 @@
 
 				updateMaterial();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -531,7 +533,7 @@
 
 				requestAnimationFrame( animate );
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;

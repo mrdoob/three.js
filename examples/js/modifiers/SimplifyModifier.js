@@ -1,4 +1,3 @@
-console.warn( "THREE.SimplifyModifier: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  *	Simplification Geometry Modifier
  *    - based on code and technique
@@ -7,7 +6,15 @@ console.warn( "THREE.SimplifyModifier: As part of the transition to ES6 Modules,
  *    - http://www.melax.com/polychop/
  */
 
-THREE.SimplifyModifier = function () {};
+THREE.SimplifyModifier = function () {
+
+	if ( THREE.BufferGeometryUtils === undefined ) {
+
+		throw 'THREE.SimplifyModifier relies on THREE.BufferGeometryUtils';
+
+	}
+
+};
 
 ( function () {
 
@@ -380,54 +387,81 @@ THREE.SimplifyModifier = function () {};
 
 	THREE.SimplifyModifier.prototype.modify = function ( geometry, count ) {
 
-		if ( geometry.isBufferGeometry ) {
+		if ( geometry.isGeometry === true ) {
 
-			geometry = new THREE.Geometry().fromBufferGeometry( geometry );
+			console.error( 'THREE.SimplifyModifier no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
+			return;
 
 		}
 
-		geometry.mergeVertices();
+		geometry = geometry.clone();
+		var attributes = geometry.attributes;
 
-		var oldVertices = geometry.vertices; // Three Position
-		var oldFaces = geometry.faces; // Three Face
+		// this modifier can only process indexed and non-indexed geomtries with a position attribute
 
-		// conversion
-		var vertices = [];
-		var faces = [];
+		for ( var name in attributes ) {
 
-		var i, il;
+			if ( name !== 'position' ) geometry.deleteAttribute( name );
+
+		}
+
+		geometry = THREE.BufferGeometryUtils.mergeVertices( geometry );
 
 		//
 		// put data of original geometry in different data structures
 		//
 
+		var vertices = [];
+		var faces = [];
+
 		// add vertices
 
-		for ( i = 0, il = oldVertices.length; i < il; i ++ ) {
+		var positionAttribute = geometry.getAttribute( 'position' );
 
-			var vertex = new Vertex( oldVertices[ i ], i );
+		for ( var i = 0; i < positionAttribute.count; i ++ ) {
+
+			var v = new THREE.Vector3().fromBufferAttribute( positionAttribute, i );
+
+			var vertex = new Vertex( v, i );
 			vertices.push( vertex );
 
 		}
 
 		// add faces
 
-		for ( i = 0, il = oldFaces.length; i < il; i ++ ) {
+		var index = geometry.getIndex();
 
-			var face = oldFaces[ i ];
+		if ( index !== null ) {
 
-			var a = face.a;
-			var b = face.b;
-			var c = face.c;
+			for ( var i = 0; i < index.count; i += 3 ) {
 
-			var triangle = new Triangle( vertices[ a ], vertices[ b ], vertices[ c ], a, b, c );
-			faces.push( triangle );
+				var a = index.getX( i );
+				var b = index.getX( i + 1 );
+				var c = index.getX( i + 2 );
+
+				var triangle = new Triangle( vertices[ a ], vertices[ b ], vertices[ c ], a, b, c );
+				faces.push( triangle );
+
+			}
+
+		} else {
+
+			for ( var i = 0; i < positionAttribute.count; i += 3 ) {
+
+				var a = i;
+				var b = i + 1;
+				var c = i + 2;
+
+				var triangle = new Triangle( vertices[ a ], vertices[ b ], vertices[ c ], a, b, c );
+				faces.push( triangle );
+
+			}
 
 		}
 
 		// compute all edge collapse costs
 
-		for ( i = 0, il = vertices.length; i < il; i ++ ) {
+		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
 			computeEdgeCostAtVertex( vertices[ i ] );
 
@@ -460,7 +494,7 @@ THREE.SimplifyModifier = function () {};
 
 		//
 
-		for ( i = 0; i < vertices.length; i ++ ) {
+		for ( var i = 0; i < vertices.length; i ++ ) {
 
 			var vertex = vertices[ i ].position;
 			position.push( vertex.x, vertex.y, vertex.z );
@@ -469,7 +503,7 @@ THREE.SimplifyModifier = function () {};
 
 		//
 
-		for ( i = 0; i < faces.length; i ++ ) {
+		for ( var i = 0; i < faces.length; i ++ ) {
 
 			var face = faces[ i ];
 

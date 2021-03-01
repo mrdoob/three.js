@@ -15,16 +15,16 @@
 			import { Reflector } from './jsm/objects/Reflector.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var reflector;
+			let reflector;
 
 			init();
 			animate();
 
 			function init() {
 
-				var background = new THREE.CubeTextureLoader()
+				const background = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/MilkyWay/' )
 					.load( [ 'dark-s_px.jpg', 'dark-s_nx.jpg', 'dark-s_py.jpg', 'dark-s_ny.jpg', 'dark-s_pz.jpg', 'dark-s_nz.jpg' ] );
 
@@ -34,52 +34,52 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 1.6, 2 );
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.15, 150, 20 );
-				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2, envMap: background } );
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.y = 0.75;
-				mesh.position.z = - 2;
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
-				scene.add( mesh );
+				const torusGeometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );
+				const torusMaterial = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2, envMap: background } );
+				const torus = new THREE.Mesh( torusGeometry, torusMaterial );
+				torus.position.y = 0.75;
+				torus.position.z = - 2;
+				torus.castShadow = true;
+				torus.receiveShadow = true;
+				scene.add( torus );
 
-				var geometry = new THREE.BoxBufferGeometry( 1.5, 0.1, 1.5 );
-				var material = new THREE.MeshPhongMaterial();
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.y = - 0.2;
-				mesh.position.z = - 2;
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
-				scene.add( mesh );
+				const boxGeometry = new THREE.BoxGeometry( 1.5, 0.1, 1.5 );
+				const boxMaterial = new THREE.MeshPhongMaterial();
+				const box = new THREE.Mesh( boxGeometry, boxMaterial );
+				box.position.y = - 0.2;
+				box.position.z = - 2;
+				box.castShadow = true;
+				box.receiveShadow = true;
+				scene.add( box );
 
-				var light = new THREE.DirectionalLight( 0x8800ff );
-				light.position.set( - 1, 1.5, - 1.5 );
-				light.castShadow = true;
-				light.shadow.camera.zoom = 4;
-				scene.add( light );
-				light.target.position.set( 0, 0, - 2 );
-				scene.add( light.target );
+				const light1 = new THREE.DirectionalLight( 0x8800ff );
+				light1.position.set( - 1, 1.5, - 1.5 );
+				light1.castShadow = true;
+				light1.shadow.camera.zoom = 4;
+				scene.add( light1 );
+				light1.target.position.set( 0, 0, - 2 );
+				scene.add( light1.target );
 
-				// var helper = new CameraHelper( light.shadow.camera );
-				// scene.add( helper );
+				// const helper1 = new THREE.CameraHelper( light.shadow.camera );
+				// scene.add( helper1 );
 
-				var light = new THREE.DirectionalLight( 0xff0000 );
-				light.position.set( 1, 1.5, - 2.5 );
-				light.castShadow = true;
-				light.shadow.camera.zoom = 4;
-				scene.add( light );
-				light.target.position.set( 0, 0, - 2 );
-				scene.add( light.target );
+				const light2 = new THREE.DirectionalLight( 0xff0000 );
+				light2.position.set( 1, 1.5, - 2.5 );
+				light2.castShadow = true;
+				light2.shadow.camera.zoom = 4;
+				scene.add( light2 );
+				light2.target.position.set( 0, 0, - 2 );
+				scene.add( light2.target );
 
-				// var helper = new CameraHelper( light.shadow.camera );
-				// scene.add( helper );
+				// const helper2 = new THREE.CameraHelper( light.shadow.camera );
+				// scene.add( helper2 );
 
 				// lensflare
-				var loader = new THREE.TextureLoader();
-				var texture0 = loader.load( "textures/lensflare/lensflare0.png" );
-				var texture3 = loader.load( "textures/lensflare/lensflare3.png" );
+				const loader = new THREE.TextureLoader();
+				const texture0 = loader.load( "textures/lensflare/lensflare0.png" );
+				const texture3 = loader.load( "textures/lensflare/lensflare3.png" );
 
-				var lensflare = new Lensflare();
+				const lensflare = new Lensflare();
 				lensflare.position.set( 0, 5, - 5 );
 				lensflare.addElement( new LensflareElement( texture0, 700, 0 ) );
 				lensflare.addElement( new LensflareElement( texture3, 60, 0.6 ) );
@@ -90,8 +90,7 @@
 
 				//
 
-				var geometry = new THREE.PlaneBufferGeometry( 1.4, 1.4 );
-				reflector = new Reflector( geometry, {
+				reflector = new Reflector( new THREE.PlaneGeometry( 1.4, 1.4 ), {
 					textureWidth: window.innerWidth * window.devicePixelRatio,
 					textureHeight: window.innerHeight * window.devicePixelRatio
 				} );
@@ -101,13 +100,13 @@
 				reflector.rotation.y = - Math.PI / 4;
 				scene.add( reflector );
 
-				var geometry = new THREE.BoxBufferGeometry( 1.5, 1.5, 0.1 );
-				var material = new THREE.MeshPhongMaterial();
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.z = - 0.07;
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
-				reflector.add( mesh );
+				const frameGeometry = new THREE.BoxGeometry( 1.5, 1.5, 0.1 );
+				const frameMaterial = new THREE.MeshPhongMaterial();
+				const frame = new THREE.Mesh( frameGeometry, frameMaterial );
+				frame.position.z = - 0.07;
+				frame.castShadow = true;
+				frame.receiveShadow = true;
+				reflector.add( frame );
 
 				//
 
@@ -123,7 +122,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -144,10 +143,10 @@
 
 			function render() {
 
-				var time = performance.now() * 0.0002;
-				var mesh = scene.children[ 0 ];
-				mesh.rotation.x = time * 2;
-				mesh.rotation.y = time * 5;
+				const time = performance.now() * 0.0002;
+				const torus = scene.children[ 0 ];
+				torus.rotation.x = time * 2;
+				torus.rotation.y = time * 5;
 
 				renderer.render( scene, camera );
 

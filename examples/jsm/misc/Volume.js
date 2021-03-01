@@ -2,8 +2,9 @@ import {
 	Matrix3,
 	Matrix4,
 	Vector3
-} from "../../../build/three.module.js";
-import { VolumeSlice } from "../misc/VolumeSlice.js";
+} from '../../../build/three.module.js';
+import { VolumeSlice } from '../misc/VolumeSlice.js';
+
 /**
  * This class had been written to handle the output of the NRRD loader.
  * It contains a volume of data and informations about it.

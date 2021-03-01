@@ -1,4 +1,3 @@
-console.warn( "THREE.SSAARenderPass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
 *
 * Supersample Anti-Aliasing Render Pass
@@ -22,8 +21,9 @@ THREE.SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 	// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
 	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
 	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
+	this._oldClearColor = new THREE.Color();
 
-	if ( THREE.CopyShader === undefined ) console.error( "THREE.SSAARenderPass relies on THREE.CopyShader" );
+	if ( THREE.CopyShader === undefined ) console.error( 'THREE.SSAARenderPass relies on THREE.CopyShader' );
 
 	var copyShader = THREE.CopyShader;
 	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
@@ -69,7 +69,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		if ( ! this.sampleRenderTarget ) {
 
 			this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
-			this.sampleRenderTarget.texture.name = "SSAARenderPass.sample";
+			this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
 
 		}
 
@@ -78,12 +78,12 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		var oldClearColor = renderer.getClearColor().getHex();
+		renderer.getClearColor( this._oldClearColor );
 		var oldClearAlpha = renderer.getClearAlpha();
 
 		var baseSampleWeight = 1.0 / jitterOffsets.length;
 		var roundingRange = 1 / 32;
-		this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
+		this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
 
 		var width = readBuffer.width, height = readBuffer.height;
 
@@ -113,7 +113,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			}
 
-			this.copyUniforms[ "opacity" ].value = sampleWeight;
+			this.copyUniforms[ 'opacity' ].value = sampleWeight;
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
 			renderer.setRenderTarget( this.sampleRenderTarget );
 			renderer.clear();
@@ -135,7 +135,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
 
 		renderer.autoClear = autoClear;
-		renderer.setClearColor( oldClearColor, oldClearAlpha );
+		renderer.setClearColor( this._oldClearColor, oldClearAlpha );
 
 	}
 

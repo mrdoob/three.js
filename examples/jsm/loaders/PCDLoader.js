@@ -6,7 +6,7 @@ import {
 	LoaderUtils,
 	Points,
 	PointsMaterial
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var PCDLoader = function ( manager ) {
 
@@ -29,6 +29,7 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( data ) {
 
 			try {

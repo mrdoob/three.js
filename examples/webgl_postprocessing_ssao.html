@@ -26,10 +26,10 @@
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { SSAOPass } from './jsm/postprocessing/SSAOPass.js';
 
-			var container, stats;
-			var camera, scene, renderer;
-			var composer;
-			var group;
+			let container, stats;
+			let camera, scene, renderer;
+			let composer;
+			let group;
 
 			init();
 			animate();
@@ -55,15 +55,15 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+				const geometry = new THREE.BoxGeometry( 10, 10, 10 );
 
-				for ( var i = 0; i < 100; i ++ ) {
+				for ( let i = 0; i < 100; i ++ ) {
 
-					var material = new THREE.MeshLambertMaterial( {
+					const material = new THREE.MeshLambertMaterial( {
 						color: Math.random() * 0xffffff
 					} );
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 400 - 200;
 					mesh.position.y = Math.random() * 400 - 200;
 					mesh.position.z = Math.random() * 400 - 200;
@@ -79,17 +79,17 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				composer = new EffectComposer( renderer );
 
-				var ssaoPass = new SSAOPass( scene, camera, width, height );
+				const ssaoPass = new SSAOPass( scene, camera, width, height );
 				ssaoPass.kernelRadius = 16;
 				composer.addPass( ssaoPass );
 
 				// Init gui
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( ssaoPass, 'output', {
 					'Default': SSAOPass.OUTPUT.Default,
@@ -107,14 +107,14 @@
 				gui.add( ssaoPass, 'minDistance' ).min( 0.001 ).max( 0.02 );
 				gui.add( ssaoPass, 'maxDistance' ).min( 0.01 ).max( 0.3 );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -136,7 +136,7 @@
 
 			function render() {
 
-				var timer = performance.now();
+				const timer = performance.now();
 				group.rotation.x = timer * 0.0002;
 				group.rotation.y = timer * 0.0001;
 

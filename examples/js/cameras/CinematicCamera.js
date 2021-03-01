@@ -1,5 +1,3 @@
-console.warn( "THREE.CinematicCamera: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.CinematicCamera = function ( fov, aspect, near, far ) {
 
 	THREE.PerspectiveCamera.call( this, fov, aspect, near, far );
@@ -127,27 +125,27 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 
 		this.postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
-		this.postprocessing.bokeh_uniforms[ "tColor" ].value = this.postprocessing.rtTextureColor.texture;
-		this.postprocessing.bokeh_uniforms[ "tDepth" ].value = this.postprocessing.rtTextureDepth.texture;
+		this.postprocessing.bokeh_uniforms[ 'tColor' ].value = this.postprocessing.rtTextureColor.texture;
+		this.postprocessing.bokeh_uniforms[ 'tDepth' ].value = this.postprocessing.rtTextureDepth.texture;
 
-		this.postprocessing.bokeh_uniforms[ "manualdof" ].value = 0;
-		this.postprocessing.bokeh_uniforms[ "shaderFocus" ].value = 0;
+		this.postprocessing.bokeh_uniforms[ 'manualdof' ].value = 0;
+		this.postprocessing.bokeh_uniforms[ 'shaderFocus' ].value = 0;
 
-		this.postprocessing.bokeh_uniforms[ "fstop" ].value = 2.8;
+		this.postprocessing.bokeh_uniforms[ 'fstop' ].value = 2.8;
 
-		this.postprocessing.bokeh_uniforms[ "showFocus" ].value = 1;
+		this.postprocessing.bokeh_uniforms[ 'showFocus' ].value = 1;
 
-		this.postprocessing.bokeh_uniforms[ "focalDepth" ].value = 0.1;
+		this.postprocessing.bokeh_uniforms[ 'focalDepth' ].value = 0.1;
 
 		//console.log( this.postprocessing.bokeh_uniforms[ "focalDepth" ].value );
 
-		this.postprocessing.bokeh_uniforms[ "znear" ].value = this.near;
-		this.postprocessing.bokeh_uniforms[ "zfar" ].value = this.near;
+		this.postprocessing.bokeh_uniforms[ 'znear' ].value = this.near;
+		this.postprocessing.bokeh_uniforms[ 'zfar' ].value = this.near;
 
 
-		this.postprocessing.bokeh_uniforms[ "textureWidth" ].value = window.innerWidth;
+		this.postprocessing.bokeh_uniforms[ 'textureWidth' ].value = window.innerWidth;
 
-		this.postprocessing.bokeh_uniforms[ "textureHeight" ].value = window.innerHeight;
+		this.postprocessing.bokeh_uniforms[ 'textureHeight' ].value = window.innerHeight;
 
 		this.postprocessing.materialBokeh = new THREE.ShaderMaterial( {
 			uniforms: this.postprocessing.bokeh_uniforms,
@@ -160,7 +158,7 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 			}
 		} );
 
-		this.postprocessing.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight ), this.postprocessing.materialBokeh );
+		this.postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), this.postprocessing.materialBokeh );
 		this.postprocessing.quad.position.z = - 500;
 		this.postprocessing.scene.add( this.postprocessing.quad );
 

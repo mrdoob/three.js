@@ -20,7 +20,7 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var camera, scene, renderer, video;
+			let camera, scene, renderer, video;
 
 			init();
 			animate();
@@ -34,21 +34,21 @@
 
 				video = document.getElementById( 'video' );
 
-				var texture = new THREE.VideoTexture( video );
+				const texture = new THREE.VideoTexture( video );
 
-				var geometry = new THREE.PlaneBufferGeometry( 16, 9 );
+				const geometry = new THREE.PlaneGeometry( 16, 9 );
 				geometry.scale( 0.5, 0.5, 0.5 );
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				const material = new THREE.MeshBasicMaterial( { map: texture } );
 
-				var count = 128;
-				var radius = 32;
+				const count = 128;
+				const radius = 32;
 
-				for ( var i = 1, l = count; i <= l; i ++ ) {
+				for ( let i = 1, l = count; i <= l; i ++ ) {
 
-					var phi = Math.acos( - 1 + ( 2 * i ) / l );
-					var theta = Math.sqrt( l * Math.PI ) * phi;
+					const phi = Math.acos( - 1 + ( 2 * i ) / l );
+					const theta = Math.sqrt( l * Math.PI ) * phi;
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.setFromSphericalCoords( radius, phi, theta );
 					mesh.lookAt( camera.position );
 					scene.add( mesh );
@@ -60,17 +60,17 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableZoom = false;
 				controls.enablePan = false;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
 				if ( navigator.mediaDevices && navigator.mediaDevices.getUserMedia ) {
 
-					var constraints = { video: { width: 1280, height: 720, facingMode: 'user' } };
+					const constraints = { video: { width: 1280, height: 720, facingMode: 'user' } };
 
 					navigator.mediaDevices.getUserMedia( constraints ).then( function ( stream ) {
 

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -41,7 +40,7 @@
 
 		<code>
 		// White directional light at half intensity shining from the top.
-		var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+		const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 		scene.add( directionalLight );
 		</code>
 
@@ -51,8 +50,7 @@
 			[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]<br />
 			[example:webgl_effects_stereo effects / stereo ]<br />
 			[example:webgl_geometry_extrude_splines geometry / extrude / splines ]<br />
-			[example:webgl_materials_bumpmap materials / bumpmap ]<br />
-			[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection ]
+			[example:webgl_materials_bumpmap materials / bumpmap ]
 		</p>
 
 		<h2>Constructor</h2>
@@ -105,7 +103,7 @@
 			[page:Object3D.position position] property), like so:
 		</p>
 		<code>
-		var targetObject = new THREE.Object3D();
+		const targetObject = new THREE.Object3D();
 		scene.add(targetObject);
 
 		light.target = targetObject;

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,25 +13,25 @@
 
 		<p class="desc">
 			表示基于以三角形为[link:https://en.wikipedia.org/wiki/Polygon_mesh polygon mesh]（多边形网格）的物体的类。
-		  	同时也作为其他类的基类，例如[page:SkinnedMesh]。
+			同时也作为其他类的基类，例如[page:SkinnedMesh]。
 		</p>
 
 
 		<h2>代码示例</h2>
 
 		<code>
-		var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-		var mesh = new THREE.Mesh( geometry, material );
+		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 		</code>
 
 
 		<h2>构造器</h2>
 
-		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
 		<p>
-		[page:Geometry geometry] —— （可选）[page:Geometry]或者[page:BufferGeometry]的实例，默认值是一个新的[page:BufferGeometry]。<br />
+		[page:BufferGeometry geometry] —— （可选）[page:BufferGeometry]的实例，默认值是一个新的[page:BufferGeometry]。<br />
 		[page:Material material] —— （可选）一个[page:Material]，或是一个包含有[page:Material]的数组，默认是一个新的[page:MeshBasicMaterial]。
 		</p>
 
@@ -40,16 +39,14 @@
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:Object3D]。</p>
 
-		<h3>[property:Geometry geometry]</h3>
+		<h3>[property:BufferGeometry geometry]</h3>
 		<p>
-			[page:Geometry] 或 [page:BufferGeometry] 的实例或者派生类，定义了物体的结构。<br /><br />
-
-			如有可能，推荐总是使用[page:BufferGeometry]来获得最好的表现。
+			[page:BufferGeometry] 的实例或者派生类，定义了物体的结构。
 		</p>
 
 		<h3>[property:Material material]</h3>
 		<p>
-			由[page:Material]基类或者一个包含材质的数组派生而来的材质实例，定义了物体的外观。默认值是一个具有随机颜色的[page:MeshBasicMaterial]。
+			由[page:Material]基类或者一个包含材质的数组派生而来的材质实例，定义了物体的外观。默认值是一个[page:MeshBasicMaterial]。
 		</p>
 
 		<h3>[property:Array morphTargetInfluences]</h3>

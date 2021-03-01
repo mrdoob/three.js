@@ -5,8 +5,6 @@ class Vector3 {
 
 	constructor( x = 0, y = 0, z = 0 ) {
 
-		Object.defineProperty( this, 'isVector3', { value: true } );
-
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -667,9 +665,7 @@ class Vector3 {
 
 	}
 
-	fromArray( array, offset ) {
-
-		if ( offset === undefined ) offset = 0;
+	fromArray( array, offset = 0 ) {
 
 		this.x = array[ offset ];
 		this.y = array[ offset + 1 ];
@@ -679,10 +675,7 @@ class Vector3 {
 
 	}
 
-	toArray( array, offset ) {
-
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+	toArray( array = [], offset = 0 ) {
 
 		array[ offset ] = this.x;
 		array[ offset + 1 ] = this.y;
@@ -720,8 +713,9 @@ class Vector3 {
 
 }
 
-const _vector = new Vector3();
-const _quaternion = new Quaternion();
+Vector3.prototype.isVector3 = true;
 
+const _vector = /*@__PURE__*/ new Vector3();
+const _quaternion = /*@__PURE__*/ new Quaternion();
 
 export { Vector3 };

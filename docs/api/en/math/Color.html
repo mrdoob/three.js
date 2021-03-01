@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,24 +20,24 @@
 		</p>
 		<code>
 //empty constructor - will default white
-var color = new THREE.Color();
+const color1 = new THREE.Color();
 
 //Hexadecimal color (recommended)
-var color = new THREE.Color( 0xff0000 );
+const color2 = new THREE.Color( 0xff0000 );
 
 //RGB string
-var color = new THREE.Color("rgb(255, 0, 0)");
-var color = new THREE.Color("rgb(100%, 0%, 0%)");
+const color3 = new THREE.Color("rgb(255, 0, 0)");
+const color4 = new THREE.Color("rgb(100%, 0%, 0%)");
 
 //X11 color name - all 140 color names are supported.
 //Note the lack of CamelCase in the name
-var color = new THREE.Color( 'skyblue' );
+const color5 = new THREE.Color( 'skyblue' );
 
 //HSL string
-var color = new THREE.Color("hsl(0, 100%, 50%)");
+const color6 = new THREE.Color("hsl(0, 100%, 50%)");
 
 //Separate RGB values between 0 and 1
-var color = new THREE.Color( 1, 0, 0 );
+const color7 = new THREE.Color( 1, 0, 0 );
 		</code>
 
 		<h2>Constructor</h2>
@@ -217,6 +216,17 @@ var color = new THREE.Color( 1, 0, 0 );
 		Linearly interpolates this color's RGB values toward the RGB values of the passed argument.
 		The alpha argument can be thought of as the ratio between the two colors, where 0.0 is
 		this color and 1.0 is the first argument.
+		</p>
+
+		<h3>[method:this lerpColors]( [param:Color color1], [param:Color color2], [param:Float alpha] )</h3>
+		<p>
+		[page:Color color1] - the starting [page:Color].<br />
+		[page:Color color2] - [page:Color] to interpolate towards.<br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
+
+		Sets this color to be the color linearly interpolated between [page:Color color1] and
+		[page:Color color2] where alpha is the percent distance along the line connecting the two colors
+		- alpha = 0 will be [page:Color color1], and alpha = 1 will be [page:Color color2].
 		</p>
 
 		<h3>[method:Color lerpHSL]( [param:Color color], [param:Float alpha] ) </h3>

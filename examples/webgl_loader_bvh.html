@@ -28,21 +28,21 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { BVHLoader } from './jsm/loaders/BVHLoader.js';
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
-			var camera, controls, scene, renderer;
-			var mixer, skeletonHelper;
+			let camera, controls, scene, renderer;
+			let mixer, skeletonHelper;
 
 			init();
 			animate();
 
-			var loader = new BVHLoader();
+			const loader = new BVHLoader();
 			loader.load( "models/bvh/pirouette.bvh", function ( result ) {
 
 				skeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
 				skeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to THREE.SkeletonHelper directly
 
-				var boneContainer = new THREE.Group();
+				const boneContainer = new THREE.Group();
 				boneContainer.add( result.skeleton.bones[ 0 ] );
 
 				scene.add( skeletonHelper );
@@ -74,7 +74,7 @@
 				controls.minDistance = 300;
 				controls.maxDistance = 700;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -91,7 +91,7 @@
 
 				requestAnimationFrame( animate );
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 

@@ -1,16 +1,14 @@
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 
-// CircleGeometry
+class CircleGeometry extends BufferGeometry {
 
-class CircleGeometry extends Geometry {
-
-	constructor( radius, segments, thetaStart, thetaLength ) {
+	constructor( radius = 1, segments = 8, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
+
 		this.type = 'CircleGeometry';
 
 		this.parameters = {
@@ -20,35 +18,7 @@ class CircleGeometry extends Geometry {
 			thetaLength: thetaLength
 		};
 
-		this.fromBufferGeometry( new CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
-		this.mergeVertices();
-
-	}
-
-}
-
-// CircleBufferGeometry
-
-class CircleBufferGeometry extends BufferGeometry {
-
-	constructor( radius, segments, thetaStart, thetaLength ) {
-
-		super();
-
-		this.type = 'CircleBufferGeometry';
-
-		this.parameters = {
-			radius: radius,
-			segments: segments,
-			thetaStart: thetaStart,
-			thetaLength: thetaLength
-		};
-
-		radius = radius || 1;
-		segments = segments !== undefined ? Math.max( 3, segments ) : 8;
-
-		thetaStart = thetaStart !== undefined ? thetaStart : 0;
-		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+		segments = Math.max( 3, segments );
 
 		// buffers
 
@@ -112,4 +82,4 @@ class CircleBufferGeometry extends BufferGeometry {
 }
 
 
-export { CircleGeometry, CircleBufferGeometry };
+export { CircleGeometry, CircleGeometry as CircleBufferGeometry };

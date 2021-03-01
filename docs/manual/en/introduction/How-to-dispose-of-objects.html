@@ -4,7 +4,6 @@
 <head>
 	<meta charset="utf-8">
 	<base href="../../../" />
-	<script src="list.js"></script>
 	<script src="page.js"></script>
 	<link type="text/css" rel="stylesheet" href="page.css" />
 </head>
@@ -67,7 +66,7 @@
 	<p>
 		This question was asked many times by the community so it's important to clarify this matter. Fact is that *three.js* does not know the lifetime or scope
 		of user-created entities like geometries or materials. This is the responsibility of the application. For example even if a material is currently not used for rendering,
-		it might base necessary for the next frame. So if the application decides that a certain object can be deleted, it has to	notify the engine via calling the respective
+		it might be necessary for the next frame. So if the application decides that a certain object can be deleted, it has to	notify the engine via calling the respective
 		*dispose()* method.
 	</p>
 
@@ -81,7 +80,7 @@
 
 	<p>
 		Yes. It's possible to evaluate [page:WebGLRenderer.info], a special property of the renderer with a series of statistical information about the graphics board memory
-		and the rendering process. Among other things, it tells you have many textures, geometries and shader programs are internally stored. If you notice performance problems
+		and the rendering process. Among other things, it tells you how many textures, geometries and shader programs are internally stored. If you notice performance problems
 		in your application, it's a good idea to debug this property in order to easily identify a memory leak.
 	</p>
 

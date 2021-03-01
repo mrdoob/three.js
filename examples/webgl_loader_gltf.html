@@ -24,15 +24,14 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { RoughnessMipmapper } from './jsm/utils/RoughnessMipmapper.js';
 
-			var container, controls;
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
 			render();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
@@ -45,7 +44,7 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
-						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+						const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 
 						scene.background = envMap;
 						scene.environment = envMap;
@@ -58,9 +57,9 @@
 						// model
 
 						// use of RoughnessMipmapper is optional
-						var roughnessMipmapper = new RoughnessMipmapper( renderer );
+						const roughnessMipmapper = new RoughnessMipmapper( renderer );
 
-						var loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+						const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
 
 							gltf.scene.traverse( function ( child ) {
@@ -92,17 +91,17 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
 				controls.target.set( 0, 0, - 0.2 );
 				controls.update();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

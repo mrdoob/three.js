@@ -1,7 +1,10 @@
+import { Box3, Vector3 } from '../../build/three.module.js';
+
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
+import { SetPositionCommand } from './commands/SetPositionCommand.js';
 
 function MenubarEdit( editor ) {
 
@@ -85,6 +88,30 @@ function MenubarEdit( editor ) {
 
 	options.add( new UIHorizontalRule() );
 
+	// Center
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/edit/center' ) );
+	option.onClick( function () {
+
+		var object = editor.selected;
+
+		if ( object === null || object.parent === null ) return; // avoid centering the camera or scene
+
+		const aabb = new Box3().setFromObject( object );
+		const center = aabb.getCenter( new Vector3() );
+		const newPosition = new Vector3();
+
+		newPosition.x = object.position.x + ( object.position.x - center.x );
+		newPosition.y = object.position.y + ( object.position.y - center.y );
+		newPosition.z = object.position.z + ( object.position.z - center.z );
+
+		editor.execute( new SetPositionCommand( editor, object, newPosition ) );
+
+	} );
+	options.add( option );
+
 	// Clone
 
 	var option = new UIRow();
@@ -94,7 +121,7 @@ function MenubarEdit( editor ) {
 
 		var object = editor.selected;
 
-		if ( object.parent === null ) return; // avoid cloning the camera or scene
+		if ( object === null || object.parent === null ) return; // avoid cloning the camera or scene
 
 		object = object.clone();
 

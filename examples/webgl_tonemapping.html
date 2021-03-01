@@ -24,15 +24,15 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
-			var mesh, renderer, scene, camera, controls;
-			var gui, guiExposure = null;
+			let mesh, renderer, scene, camera, controls;
+			let gui, guiExposure = null;
 
-			var params = {
+			const params = {
 				exposure: 1.0,
 				toneMapping: 'ACESFilmic'
 			};
 
-			var toneMappingOptions = {
+			const toneMappingOptions = {
 				None: THREE.NoToneMapping,
 				Linear: THREE.LinearToneMapping,
 				Reinhard: THREE.ReinhardToneMapping,
@@ -84,23 +84,23 @@
 				controls.target.set( 0, 0, - 0.2 );
 				controls.update();
 
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
-				var rgbeLoader = new RGBELoader()
+				const rgbeLoader = new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' );
 
-				var gltfLoader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+				const gltfLoader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 
-				var [ texture, gltf ] = await Promise.all( [
+				const [ texture, gltf ] = await Promise.all( [
 					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
 					gltfLoader.loadAsync( 'DamagedHelmet.gltf' ),
 				] );
 
 				// environment
 
-				var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+				const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 
 				scene.background = envMap;
 				scene.environment = envMap;
@@ -123,7 +123,7 @@
 
 				render();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				gui = new GUI();
 

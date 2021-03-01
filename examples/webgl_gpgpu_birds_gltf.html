@@ -19,7 +19,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl gpgpu birds + GLTF mesh<br/>
-			Flamingo by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a><br/>
+			Flamingo by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="http://www.ro.me/" target="_blank" rel="noopener">rome</a><br/>
 			Move mouse to disturb birds.
 		</div>
 
@@ -179,7 +179,9 @@
 
 							// Attraction / Cohesion - move closer
 							float threshDelta = 1.0 - alignmentThresh;
-							float adjustedPercent = ( percent - alignmentThresh ) / threshDelta;
+							float adjustedPercent;
+							if( threshDelta == 0. ) adjustedPercent = 1.;
+							else adjustedPercent = ( percent - alignmentThresh ) / threshDelta;
 
 							f = ( 0.5 - ( cos( adjustedPercent * PI_2 ) * -0.5 + 0.5 ) ) * delta;
 
@@ -214,12 +216,12 @@
 			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
 
 			/* TEXTURE WIDTH FOR SIMULATION */
-			var WIDTH = 64;
-			var BIRDS = WIDTH * WIDTH;
+			const WIDTH = 64;
+			const BIRDS = WIDTH * WIDTH;
 
 			/* BAKE ANIMATION INTO TEXTURE and CREATE GEOMETRY FROM BASE MODEL */
-			var BirdGeometry = new THREE.BufferGeometry();
-			var textureAnimation, durationAnimation, birdMesh, materialShader, vertexPerBird;
+			const BirdGeometry = new THREE.BufferGeometry();
+			let textureAnimation, durationAnimation, birdMesh, materialShader, vertexPerBird;
 
 			function nextPowerOf2( n ) {
 
@@ -234,34 +236,34 @@
 
 			};
 
-			var gltfs = [ 'models/gltf/Parrot.glb', 'models/gltf/Flamingo.glb' ];
-			var colors = [ 0xccFFFF, 0xffdeff ];
-			var sizes = [ 0.2, 0.1 ];
-			var selectModel = Math.floor( Math.random() * gltfs.length );
+			const gltfs = [ 'models/gltf/Parrot.glb', 'models/gltf/Flamingo.glb' ];
+			const colors = [ 0xccFFFF, 0xffdeff ];
+			const sizes = [ 0.2, 0.1 ];
+			const selectModel = Math.floor( Math.random() * gltfs.length );
 			new GLTFLoader().load( gltfs[ selectModel ], function ( gltf ) {
 
-				var animations = gltf.animations;
+				const animations = gltf.animations;
 				durationAnimation = Math.round( animations[ 0 ].duration * 60 );
-				var birdGeo = gltf.scene.children[ 0 ].geometry;
-				var morphAttributes = birdGeo.morphAttributes.position;
-				var tHeight = nextPowerOf2( durationAnimation );
-				var tWidth = nextPowerOf2( birdGeo.getAttribute( 'position' ).count );
+				const birdGeo = gltf.scene.children[ 0 ].geometry;
+				const morphAttributes = birdGeo.morphAttributes.position;
+				const tHeight = nextPowerOf2( durationAnimation );
+				const tWidth = nextPowerOf2( birdGeo.getAttribute( 'position' ).count );
 				vertexPerBird = birdGeo.getAttribute( 'position' ).count;
-				var tData = new Float32Array( 3 * tWidth * tHeight );
+				const tData = new Float32Array( 3 * tWidth * tHeight );
 
-				for ( var i = 0; i < tWidth; i ++ ) {
+				for ( let i = 0; i < tWidth; i ++ ) {
 
-					for ( var j = 0; j < tHeight; j ++ ) {
+					for ( let j = 0; j < tHeight; j ++ ) {
 
-						var offset = j * tWidth * 3;
+						const offset = j * tWidth * 3;
 
-						var curMorph = Math.floor( j / durationAnimation * morphAttributes.length );
-						var nextMorph = ( Math.floor( j / durationAnimation * morphAttributes.length ) + 1 ) % morphAttributes.length;
-						var lerpAmount = j / durationAnimation * morphAttributes.length % 1;
+						const curMorph = Math.floor( j / durationAnimation * morphAttributes.length );
+						const nextMorph = ( Math.floor( j / durationAnimation * morphAttributes.length ) + 1 ) % morphAttributes.length;
+						const lerpAmount = j / durationAnimation * morphAttributes.length % 1;
 
 						if ( j < durationAnimation ) {
 
-							var d0, d1;
+							let d0, d1;
 
 							d0 = morphAttributes[ curMorph ].array[ i * 3 ];
 							d1 = morphAttributes[ nextMorph ].array[ i * 3 ];
@@ -287,33 +289,33 @@
 				textureAnimation = new THREE.DataTexture( tData, tWidth, tHeight, THREE.RGBFormat, THREE.FloatType );
 				textureAnimation.needsUpdate = true;
 
-				var vertices = [], color = [], reference = [], seeds = [], indices = [];
-				var totalVertices = birdGeo.getAttribute( 'position' ).count * 3 * BIRDS;
-				for ( var i = 0; i < totalVertices; i ++ ) {
+				const vertices = [], color = [], reference = [], seeds = [], indices = [];
+				const totalVertices = birdGeo.getAttribute( 'position' ).count * 3 * BIRDS;
+				for ( let i = 0; i < totalVertices; i ++ ) {
 
-					var bIndex = i % ( birdGeo.getAttribute( 'position' ).count * 3 );
+					const bIndex = i % ( birdGeo.getAttribute( 'position' ).count * 3 );
 					vertices.push( birdGeo.getAttribute( 'position' ).array[ bIndex ] );
 					color.push( birdGeo.getAttribute( 'color' ).array[ bIndex ] );
 
 				}
 
-				var r = Math.random();
-				for ( var i = 0; i < birdGeo.getAttribute( 'position' ).count * BIRDS; i ++ ) {
+				let r = Math.random();
+				for ( let i = 0; i < birdGeo.getAttribute( 'position' ).count * BIRDS; i ++ ) {
 
-					var bIndex = i % ( birdGeo.getAttribute( 'position' ).count );
-					var bird = Math.floor( i / birdGeo.getAttribute( 'position' ).count );
+					const bIndex = i % ( birdGeo.getAttribute( 'position' ).count );
+					const bird = Math.floor( i / birdGeo.getAttribute( 'position' ).count );
 					if ( bIndex == 0 ) r = Math.random();
-					var j = ~ ~ bird;
-					var x = ( j % WIDTH ) / WIDTH;
-					var y = ~ ~ ( j / WIDTH ) / WIDTH;
+					const j = ~ ~ bird;
+					const x = ( j % WIDTH ) / WIDTH;
+					const y = ~ ~ ( j / WIDTH ) / WIDTH;
 					reference.push( x, y, bIndex / tWidth, durationAnimation / tHeight );
 					seeds.push( bird, r, Math.random(), Math.random() );
 
 				}
 
-				for ( var i = 0; i < birdGeo.index.array.length * BIRDS; i ++ ) {
+				for ( let i = 0; i < birdGeo.index.array.length * BIRDS; i ++ ) {
 
-					var offset = Math.floor( i / birdGeo.index.array.length ) * ( birdGeo.getAttribute( 'position' ).count );
+					const offset = Math.floor( i / birdGeo.index.array.length ) * ( birdGeo.getAttribute( 'position' ).count );
 					indices.push( birdGeo.index.array[ i % birdGeo.index.array.length ] + offset );
 
 				}
@@ -331,22 +333,22 @@
 
 			} );
 
-			var container, stats;
-			var camera, scene, renderer;
-			var mouseX = 0, mouseY = 0;
+			let container, stats;
+			let camera, scene, renderer;
+			let mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
-			var BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
+			const BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
 
-			var last = performance.now();
+			let last = performance.now();
 
-			var gpuCompute;
-			var velocityVariable;
-			var positionVariable;
-			var positionUniforms;
-			var velocityUniforms;
+			let gpuCompute;
+			let velocityVariable;
+			let positionVariable;
+			let positionUniforms;
+			let velocityUniforms;
 
 			function init() {
 
@@ -362,13 +364,13 @@
 
 				// LIGHTS
 
-				var hemiLight = new THREE.HemisphereLight( colors[ selectModel ], 0xffffff, 1.6 );
+				const hemiLight = new THREE.HemisphereLight( colors[ selectModel ], 0xffffff, 1.6 );
 				hemiLight.color.setHSL( 0.6, 1, 0.6 );
 				hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
 				hemiLight.position.set( 0, 50, 0 );
 				scene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0x00CED1, 0.6 );
+				const dirLight = new THREE.DirectionalLight( 0x00CED1, 0.6 );
 				dirLight.color.setHSL( 0.1, 1, 0.95 );
 				dirLight.position.set( - 1, 1.75, 1 );
 				dirLight.position.multiplyScalar( 30 );
@@ -384,15 +386,14 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				container.style.touchAction = 'none';
+				container.addEventListener( 'pointermove', onPointerMove );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				var gui = new GUI();
+				const gui = new GUI();
 
-				var effectController = {
+				const effectController = {
 
 					separation: 20.0,
 					alignment: 20.0,
@@ -403,7 +404,7 @@
 
 				};
 
-				var valuesChanger = function () {
+				const valuesChanger = function () {
 
 					velocityUniforms[ "separationDistance" ].value = effectController.separation;
 					velocityUniforms[ "alignmentDistance" ].value = effectController.alignment;
@@ -423,7 +424,7 @@
 				gui.add( effectController, "count", 0, BIRDS, 1 ).onChange( valuesChanger );
 				gui.close();
 
-				initBirds();
+				initBirds( effectController );
 
 			}
 
@@ -437,8 +438,8 @@
 
 				}
 
-				var dtPosition = gpuCompute.createTexture();
-				var dtVelocity = gpuCompute.createTexture();
+				const dtPosition = gpuCompute.createTexture();
+				const dtVelocity = gpuCompute.createTexture();
 				fillPositionTexture( dtPosition );
 				fillVelocityTexture( dtVelocity );
 
@@ -468,7 +469,7 @@
 				positionVariable.wrapS = THREE.RepeatWrapping;
 				positionVariable.wrapT = THREE.RepeatWrapping;
 
-				var error = gpuCompute.init();
+				const error = gpuCompute.init();
 
 				if ( error !== null ) {
 
@@ -484,11 +485,11 @@
 
 			}
 
-			function initBirds() {
+			function initBirds( effectController ) {
 
-				var geometry = BirdGeometry;
+				const geometry = BirdGeometry;
 
-				var m = new THREE.MeshStandardMaterial( {
+				const m = new THREE.MeshStandardMaterial( {
 					vertexColors: true,
 					flatShading: true,
 					roughness: 1,
@@ -501,12 +502,12 @@
 					shader.uniforms.textureVelocity = { value: null };
 					shader.uniforms.textureAnimation = { value: textureAnimation };
 					shader.uniforms.time = { value: 1.0 };
-					shader.uniforms.size = { value: 0.1 };
+					shader.uniforms.size = { value: effectController.size };
 					shader.uniforms.delta = { value: 0.0 };
 
-					var token = '#define STANDARD';
+					let token = '#define STANDARD';
 
-					var insert = /* glsl */`
+					let insert = /* glsl */`
 						attribute vec4 reference;
 						attribute vec4 seeds;
 						attribute vec3 birdColor;
@@ -519,14 +520,14 @@
 
 					shader.vertexShader = shader.vertexShader.replace( token, token + insert );
 
-					var token = '#include <begin_vertex>';
+					token = '#include <begin_vertex>';
 
-					var insert = /* glsl */`
+					insert = /* glsl */`
 						vec4 tmpPos = texture2D( texturePosition, reference.xy );
 
 						vec3 pos = tmpPos.xyz;
 						vec3 velocity = normalize(texture2D( textureVelocity, reference.xy ).xyz);
-						vec3 aniPos = texture2D( textureAnimation, vec2( reference.z, mod( ( time + seeds.x ) * ( ( 0.0004 + seeds.y / 10000.0) + normalize( velocity ) / 20000.0 ), reference.w ) ) ).xyz;
+						vec3 aniPos = texture2D( textureAnimation, vec2( reference.z, mod( time + ( seeds.x ) * ( ( 0.0004 + seeds.y / 10000.0) + normalize( velocity ) / 20000.0 ), reference.w ) ) ).xyz;
 						vec3 newPosition = position;
 
 						newPosition = mat3( modelMatrix ) * ( newPosition + aniPos );
@@ -570,13 +571,13 @@
 
 			function fillPositionTexture( texture ) {
 
-				var theArray = texture.image.data;
+				const theArray = texture.image.data;
 
-				for ( var k = 0, kl = theArray.length; k < kl; k += 4 ) {
+				for ( let k = 0, kl = theArray.length; k < kl; k += 4 ) {
 
-					var x = Math.random() * BOUNDS - BOUNDS_HALF;
-					var y = Math.random() * BOUNDS - BOUNDS_HALF;
-					var z = Math.random() * BOUNDS - BOUNDS_HALF;
+					const x = Math.random() * BOUNDS - BOUNDS_HALF;
+					const y = Math.random() * BOUNDS - BOUNDS_HALF;
+					const z = Math.random() * BOUNDS - BOUNDS_HALF;
 
 					theArray[ k + 0 ] = x;
 					theArray[ k + 1 ] = y;
@@ -589,13 +590,13 @@
 
 			function fillVelocityTexture( texture ) {
 
-				var theArray = texture.image.data;
+				const theArray = texture.image.data;
 
-				for ( var k = 0, kl = theArray.length; k < kl; k += 4 ) {
+				for ( let k = 0, kl = theArray.length; k < kl; k += 4 ) {
 
-					var x = Math.random() - 0.5;
-					var y = Math.random() - 0.5;
-					var z = Math.random() - 0.5;
+					const x = Math.random() - 0.5;
+					const y = Math.random() - 0.5;
+					const z = Math.random() - 0.5;
 
 					theArray[ k + 0 ] = x * 10;
 					theArray[ k + 1 ] = y * 10;
@@ -605,7 +606,6 @@
 				}
 
 			}
-
 
 			function onWindowResize() {
 
@@ -619,36 +619,12 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
+
+				if ( event.isPrimary === false ) return;
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
-
-			}
-
-			function onDocumentTouchStart( event ) {
-
-				if ( event.touches.length === 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length === 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
 
 			}
 
@@ -665,8 +641,8 @@
 
 			function render() {
 
-				var now = performance.now();
-				var delta = ( now - last ) / 1000;
+				const now = performance.now();
+				let delta = ( now - last ) / 1000;
 
 				if ( delta > 1 ) delta = 1; // safety cap on large deltas
 				last = now;
@@ -675,7 +651,7 @@
 				positionUniforms[ "delta" ].value = delta;
 				velocityUniforms[ "time" ].value = now;
 				velocityUniforms[ "delta" ].value = delta;
-				if ( materialShader ) materialShader.uniforms[ "time" ].value = now;
+				if ( materialShader ) materialShader.uniforms[ "time" ].value = now / 1000;
 				if ( materialShader ) materialShader.uniforms[ "delta" ].value = delta;
 
 				velocityUniforms[ "predator" ].value.set( 0.5 * mouseX / windowHalfX, - 0.5 * mouseY / windowHalfY, 0 );

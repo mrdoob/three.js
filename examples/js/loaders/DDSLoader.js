@@ -1,5 +1,3 @@
-console.warn( "THREE.DDSLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.DDSLoader = function ( manager ) {
 
 	THREE.CompressedTextureLoader.call( this, manager );
@@ -99,10 +97,10 @@ THREE.DDSLoader.prototype = Object.assign( Object.create( THREE.CompressedTextur
 
 		}
 
-		var FOURCC_DXT1 = fourCCToInt32( "DXT1" );
-		var FOURCC_DXT3 = fourCCToInt32( "DXT3" );
-		var FOURCC_DXT5 = fourCCToInt32( "DXT5" );
-		var FOURCC_ETC1 = fourCCToInt32( "ETC1" );
+		var FOURCC_DXT1 = fourCCToInt32( 'DXT1' );
+		var FOURCC_DXT3 = fourCCToInt32( 'DXT3' );
+		var FOURCC_DXT5 = fourCCToInt32( 'DXT5' );
+		var FOURCC_ETC1 = fourCCToInt32( 'ETC1' );
 
 		var headerLengthInt = 31; // The header length in 32 bit ints
 
@@ -253,7 +251,7 @@ THREE.DDSLoader.prototype = Object.assign( Object.create( THREE.CompressedTextur
 
 				}
 
-				var mipmap = { "data": byteArray, "width": width, "height": height };
+				var mipmap = { 'data': byteArray, 'width': width, 'height': height };
 				dds.mipmaps.push( mipmap );
 
 				dataOffset += dataLength;

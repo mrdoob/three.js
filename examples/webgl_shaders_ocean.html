@@ -24,9 +24,9 @@
 			import { Water } from './jsm/objects/Water.js';
 			import { Sky } from './jsm/objects/Sky.js';
 
-			var container, stats;
-			var camera, scene, renderer;
-			var controls, water, sun, mesh;
+			let container, stats;
+			let camera, scene, renderer;
+			let controls, water, sun, mesh;
 
 			init();
 			animate();
@@ -55,7 +55,7 @@
 
 				// Water
 
-				var waterGeometry = new THREE.PlaneBufferGeometry( 10000, 10000 );
+				const waterGeometry = new THREE.PlaneGeometry( 10000, 10000 );
 
 				water = new Water(
 					waterGeometry,
@@ -82,28 +82,28 @@
 
 				// Skybox
 
-				var sky = new Sky();
+				const sky = new Sky();
 				sky.scale.setScalar( 10000 );
 				scene.add( sky );
 
-				var uniforms = sky.material.uniforms;
+				const skyUniforms = sky.material.uniforms;
 
-				uniforms[ 'turbidity' ].value = 10;
-				uniforms[ 'rayleigh' ].value = 2;
-				uniforms[ 'mieCoefficient' ].value = 0.005;
-				uniforms[ 'mieDirectionalG' ].value = 0.8;
+				skyUniforms[ 'turbidity' ].value = 10;
+				skyUniforms[ 'rayleigh' ].value = 2;
+				skyUniforms[ 'mieCoefficient' ].value = 0.005;
+				skyUniforms[ 'mieDirectionalG' ].value = 0.8;
 
-				var parameters = {
+				const parameters = {
 					inclination: 0.49,
 					azimuth: 0.205
 				};
 
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				function updateSun() {
 
-					var theta = Math.PI * ( parameters.inclination - 0.5 );
-					var phi = 2 * Math.PI * ( parameters.azimuth - 0.5 );
+					const theta = Math.PI * ( parameters.inclination - 0.5 );
+					const phi = 2 * Math.PI * ( parameters.azimuth - 0.5 );
 
 					sun.x = Math.cos( phi );
 					sun.y = Math.sin( phi ) * Math.sin( theta );
@@ -120,8 +120,8 @@
 
 				//
 
-				var geometry = new THREE.BoxBufferGeometry( 30, 30, 30 );
-				var material = new THREE.MeshStandardMaterial( { roughness: 0 } );
+				const geometry = new THREE.BoxGeometry( 30, 30, 30 );
+				const material = new THREE.MeshStandardMaterial( { roughness: 0 } );
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
@@ -142,24 +142,24 @@
 
 				// GUI
 
-				var gui = new GUI();
+				const gui = new GUI();
 
-				var folder = gui.addFolder( 'Sky' );
-				folder.add( parameters, 'inclination', 0, 0.5, 0.0001 ).onChange( updateSun );
-				folder.add( parameters, 'azimuth', 0, 1, 0.0001 ).onChange( updateSun );
-				folder.open();
+				const folderSky = gui.addFolder( 'Sky' );
+				folderSky.add( parameters, 'inclination', 0, 0.5, 0.0001 ).onChange( updateSun );
+				folderSky.add( parameters, 'azimuth', 0, 1, 0.0001 ).onChange( updateSun );
+				folderSky.open();
 
-				var uniforms = water.material.uniforms;
+				const waterUniforms = water.material.uniforms;
 
-				var folder = gui.addFolder( 'Water' );
-				folder.add( uniforms.distortionScale, 'value', 0, 8, 0.1 ).name( 'distortionScale' );
-				folder.add( uniforms.size, 'value', 0.1, 10, 0.1 ).name( 'size' );
-				folder.add( uniforms.alpha, 'value', 0.9, 1, .001 ).name( 'alpha' );
-				folder.open();
+				const folderWater = gui.addFolder( 'Water' );
+				folderWater.add( waterUniforms.distortionScale, 'value', 0, 8, 0.1 ).name( 'distortionScale' );
+				folderWater.add( waterUniforms.size, 'value', 0.1, 10, 0.1 ).name( 'size' );
+				folderWater.add( waterUniforms.alpha, 'value', 0.9, 1, .001 ).name( 'alpha' );
+				folderWater.open();
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -182,7 +182,7 @@
 
 			function render() {
 
-				var time = performance.now() * 0.001;
+				const time = performance.now() * 0.001;
 
 				mesh.position.y = Math.sin( time ) * 20 + 5;
 				mesh.rotation.x = time * 0.5;

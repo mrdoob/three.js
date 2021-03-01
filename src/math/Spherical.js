@@ -29,12 +29,6 @@ class Spherical {
 
 	}
 
-	clone() {
-
-		return new this.constructor().copy( this );
-
-	}
-
 	copy( other ) {
 
 		this.radius = other.radius;
@@ -78,6 +72,12 @@ class Spherical {
 		}
 
 		return this;
+
+	}
+
+	clone() {
+
+		return new this.constructor().copy( this );
 
 	}
 

@@ -21,12 +21,14 @@ function Strings( config ) {
 			'menubar/file/export/ply_binary': 'Export PLY (Binary)',
 			'menubar/file/export/stl': 'Export STL',
 			'menubar/file/export/stl_binary': 'Export STL (Binary)',
+			'menubar/file/export/usdz': 'Export USDZ',
 			'menubar/file/publish': 'Publish',
 
 			'menubar/edit': 'Edit',
 			'menubar/edit/undo': 'Undo (Ctrl+Z)',
 			'menubar/edit/redo': 'Redo (Ctrl+Shift+Z)',
 			'menubar/edit/clear_history': 'Clear History',
+			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Clone',
 			'menubar/edit/delete': 'Delete (Del)',
 			'menubar/edit/fixcolormaps': 'Fix Color Maps',
@@ -73,6 +75,11 @@ function Strings( config ) {
 			'menubar/help/source_code': 'Source Code',
 			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'About',
+
+			'sidebar/animations': 'Animations',
+			'sidebar/animations/play': 'Play',
+			'sidebar/animations/stop': 'Stop',
+			'sidebar/animations/timescale': 'Time Scale',
 
 			'sidebar/scene': 'Scene',
 			'sidebar/scene/background': 'Background',
@@ -154,9 +161,6 @@ function Strings( config ) {
 			'sidebar/geometry/extrude_geometry/bevelOffset': 'Offset',
 			'sidebar/geometry/extrude_geometry/bevelSegments': 'Segments',
 			'sidebar/geometry/extrude_geometry/shape': 'Convert to Shape',
-
-			'sidebar/geometry/geometry/vertices': 'Vertices',
-			'sidebar/geometry/geometry/faces': 'Faces',
 
 			'sidebar/geometry/dodecahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/dodecahedron_geometry/detail': 'Detail',
@@ -263,6 +267,8 @@ function Strings( config ) {
 			'sidebar/material/side/front': 'Front',
 			'sidebar/material/side/back': 'Back',
 			'sidebar/material/side/double': 'Double',
+			'sidebar/material/size': 'Size',
+			'sidebar/material/sizeAttenuation': 'Size Attenuation',
 			'sidebar/material/flatshaded': 'Flat Shaded',
 			'sidebar/material/blending': 'Blending',
 			'sidebar/material/blending/no': 'No',
@@ -299,12 +305,14 @@ function Strings( config ) {
 			'sidebar/settings/language': 'Language',
 			'sidebar/settings/exportPrecision': 'Export Precision',
 
+			'sidebar/settings/shortcuts': 'Shortcuts',
 			'sidebar/settings/shortcuts/translate': 'Translate',
 			'sidebar/settings/shortcuts/rotate': 'Rotate',
 			'sidebar/settings/shortcuts/scale': 'Scale',
 			'sidebar/settings/shortcuts/undo': 'Undo',
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
+			'sidebar/settings/viewport': 'Viewport',
 			'sidebar/settings/viewport/grid': 'Grid',
 			'sidebar/settings/viewport/helpers': 'Helpers',
 
@@ -340,12 +348,14 @@ function Strings( config ) {
 			'menubar/file/export/ply_binary': 'Exporter PLY (Binaire)',
 			'menubar/file/export/stl': 'Exporter STL',
 			'menubar/file/export/stl_binary': 'Exporter STL (Binaire)',
+			'menubar/file/export/usdz': 'Exporter USDZ',
 			'menubar/file/publish': 'Publier',
 
 			'menubar/edit': 'Edition',
 			'menubar/edit/undo': 'Annuler (Ctrl+Z)',
 			'menubar/edit/redo': 'Refaire (Ctrl+Shift+Z)',
 			'menubar/edit/clear_history': 'Supprimer Historique',
+			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Cloner',
 			'menubar/edit/delete': 'Supprimer (Supp)',
 			'menubar/edit/fixcolormaps': 'Correction des couleurs',
@@ -392,6 +402,11 @@ function Strings( config ) {
 			'menubar/help/source_code': 'Code Source',
 			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'A propos',
+
+			'sidebar/animations': 'Animations',
+			'sidebar/animations/play': 'Play',
+			'sidebar/animations/stop': 'Stop',
+			'sidebar/animations/timescale': 'Time Scale',
 
 			'sidebar/scene': 'Scène',
 			'sidebar/scene/background': 'Arrière Plan',
@@ -473,9 +488,6 @@ function Strings( config ) {
 			'sidebar/geometry/extrude_geometry/bevelOffset': 'Décalage',
 			'sidebar/geometry/extrude_geometry/bevelSegments': 'Segments',
 			'sidebar/geometry/extrude_geometry/shape': 'Convertir en forme',
-
-			'sidebar/geometry/geometry/vertices': 'Sommets',
-			'sidebar/geometry/geometry/faces': 'Faces',
 
 			'sidebar/geometry/dodecahedron_geometry/radius': 'Rayon',
 			'sidebar/geometry/dodecahedron_geometry/detail': 'Détail',
@@ -582,6 +594,8 @@ function Strings( config ) {
 			'sidebar/material/side/front': 'Face avant',
 			'sidebar/material/side/back': 'Face Arrière',
 			'sidebar/material/side/double': 'Double face',
+			'sidebar/material/size': 'Size',
+			'sidebar/material/sizeAttenuation': 'Size Attenuation',
 			'sidebar/material/flatshaded': 'Rendu plat',
 			'sidebar/material/blending': 'Mélange',
 			'sidebar/material/blending/no': 'Non',
@@ -618,12 +632,14 @@ function Strings( config ) {
 			'sidebar/settings/language': 'Langue',
 			'sidebar/settings/exportPrecision': 'Précision à l\'exportation',
 
+			'sidebar/settings/shortcuts': 'Shortcuts',
 			'sidebar/settings/shortcuts/translate': 'Position',
 			'sidebar/settings/shortcuts/rotate': 'Rotation',
 			'sidebar/settings/shortcuts/scale': 'Échelle',
 			'sidebar/settings/shortcuts/undo': 'Annuler',
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
+			'sidebar/settings/viewport': 'Viewport',
 			'sidebar/settings/viewport/grid': 'Grille',
 			'sidebar/settings/viewport/helpers': 'Helpers',
 
@@ -659,12 +675,14 @@ function Strings( config ) {
 			'menubar/file/export/ply_binary': '导出PLY(二进制)',
 			'menubar/file/export/stl': '导出STL',
 			'menubar/file/export/stl_binary': '导出STL(二进制)',
+			'menubar/file/export/usdz': '导出USDZ',
 			'menubar/file/publish': '发布',
 
 			'menubar/edit': '编辑',
 			'menubar/edit/undo': '撤销 (Ctrl+Z)',
 			'menubar/edit/redo': '重做 (Ctrl+Shift+Z)',
 			'menubar/edit/clear_history': '清空历史记录',
+			'menubar/edit/center': '居中',
 			'menubar/edit/clone': '拷贝',
 			'menubar/edit/delete': '删除 (Del)',
 			'menubar/edit/fixcolormaps': '修复颜色贴图',
@@ -712,6 +730,11 @@ function Strings( config ) {
 			'menubar/help/icons': '图标组件包',
 			'menubar/help/about': '关于',
 
+			'sidebar/animations': '动画',
+			'sidebar/animations/play': '播放',
+			'sidebar/animations/stop': '暂停',
+			'sidebar/animations/timescale': '时间缩放',
+
 			'sidebar/scene': '场景',
 			'sidebar/scene/background': '背景',
 			'sidebar/scene/environment': '环境',
@@ -745,7 +768,7 @@ function Strings( config ) {
 			'sidebar/object/decay': '衰减',
 			'sidebar/object/shadow': '阴影',
 			'sidebar/object/shadowBias': '阴影偏移',
-			'sidebar/object/shadowNormalBias': 'Shadow Normal Bias',
+			'sidebar/object/shadowNormalBias': '阴影法线偏移',
 			'sidebar/object/shadowRadius': '阴影半径',
 			'sidebar/object/cast': '产生',
 			'sidebar/object/receive': '接受',
@@ -782,9 +805,6 @@ function Strings( config ) {
 			'sidebar/geometry/cylinder_geometry/radialsegments': '径向分段',
 			'sidebar/geometry/cylinder_geometry/heightsegments': '高度分段',
 			'sidebar/geometry/cylinder_geometry/openended': '开端',
-
-			'sidebar/geometry/geometry/vertices': '顶点',
-			'sidebar/geometry/geometry/faces': '面',
 
 			'sidebar/geometry/dodecahedron_geometry/radius': '半径',
 			'sidebar/geometry/dodecahedron_geometry/detail': '面片分段',
@@ -885,6 +905,8 @@ function Strings( config ) {
 			'sidebar/material/side/front': '正面',
 			'sidebar/material/side/back': '背面',
 			'sidebar/material/side/double': '双面',
+			'sidebar/material/size': '大小',
+			'sidebar/material/sizeAttenuation': '大小衰减',
 			'sidebar/material/flatshaded': '平面着色',
 			'sidebar/material/blending': '混合',
 			'sidebar/material/blending/no': '无',
@@ -921,12 +943,14 @@ function Strings( config ) {
 			'sidebar/settings/language': '语言',
 			'sidebar/settings/exportPrecision': '输出精度',
 
+			'sidebar/settings/shortcuts': '快捷键',
 			'sidebar/settings/shortcuts/translate': '移动',
 			'sidebar/settings/shortcuts/rotate': '旋转',
 			'sidebar/settings/shortcuts/scale': '缩放',
 			'sidebar/settings/shortcuts/undo': '撤销',
 			'sidebar/settings/shortcuts/focus': '聚焦',
 
+			'sidebar/settings/viewport': '视窗',
 			'sidebar/settings/viewport/grid': '网格',
 			'sidebar/settings/viewport/helpers': '辅助',
 

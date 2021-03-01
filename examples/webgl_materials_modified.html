@@ -22,7 +22,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var camera, scene, renderer, stats;
+			let camera, scene, renderer, stats;
 
 			init();
 			animate();
@@ -34,17 +34,17 @@
 
 				scene = new THREE.Scene();
 
-				var loader = new GLTFLoader();
+				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
-					var geometry = gltf.scene.children[ 0 ].geometry;
+					const geometry = gltf.scene.children[ 0 ].geometry;
 
-					var mesh = new THREE.Mesh( geometry, buildTwistMaterial( 2.0 ) );
+					let mesh = new THREE.Mesh( geometry, buildTwistMaterial( 2.0 ) );
 					mesh.position.x = - 3.5;
 					mesh.position.y = - 0.5;
 					scene.add( mesh );
 
-					var mesh = new THREE.Mesh( geometry, buildTwistMaterial( - 2.0 ) );
+					mesh = new THREE.Mesh( geometry, buildTwistMaterial( - 2.0 ) );
 					mesh.position.x = 3.5;
 					mesh.position.y = - 0.5;
 					scene.add( mesh );
@@ -56,9 +56,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 1000;
-				controls.maxDistance = 5000;
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 10;
+				controls.maxDistance = 50;
 
 				//
 
@@ -67,13 +67,13 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function buildTwistMaterial( amount ) {
 
-				var material = new THREE.MeshNormalMaterial();
+				const material = new THREE.MeshNormalMaterial();
 				material.onBeforeCompile = function ( shader ) {
 
 					shader.uniforms.time = { value: 0 };
@@ -111,8 +111,8 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();

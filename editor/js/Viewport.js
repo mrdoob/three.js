@@ -9,6 +9,7 @@ import { EditorControls } from './EditorControls.js';
 import { ViewportCamera } from './Viewport.Camera.js';
 import { ViewportInfo } from './Viewport.Info.js';
 import { ViewHelper } from './Viewport.ViewHelper.js';
+import { VR } from './Viewport.VR.js';
 
 import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
@@ -41,22 +42,8 @@ function Viewport( editor ) {
 	// helpers
 
 	var grid = new THREE.GridHelper( 30, 30, 0x444444, 0x888888 );
-
-	var array = grid.geometry.attributes.color.array;
-
-	for ( var i = 0; i < array.length; i += 60 ) {
-
-		for ( var j = 0; j < 12; j ++ ) {
-
-			array[ i + j ] = 0.26;
-
-		}
-
-	}
-
-	//
-
 	var viewHelper = new ViewHelper( camera, container );
+	var vr = new VR( editor );
 
 	//
 
@@ -350,6 +337,7 @@ function Viewport( editor ) {
 
 		if ( renderer !== null ) {
 
+			renderer.setAnimationLoop( null );
 			renderer.dispose();
 			pmremGenerator.dispose();
 			pmremTexture = null;
@@ -360,6 +348,7 @@ function Viewport( editor ) {
 
 		renderer = newRenderer;
 
+		renderer.setAnimationLoop( animate );
 		renderer.setClearColor( 0xaaaaaa );
 
 		if ( window.matchMedia ) {
@@ -368,12 +357,14 @@ function Viewport( editor ) {
 			mediaQuery.addListener( function ( event ) {
 
 				renderer.setClearColor( event.matches ? 0x333333 : 0xaaaaaa );
+				updateGridColors( grid, event.matches ? [ 0x888888, 0x222222 ] : [ 0x282828, 0x888888 ] );
 
-				if ( scene.background === null ) render();
+				render();
 
 			} );
 
 			renderer.setClearColor( mediaQuery.matches ? 0x333333 : 0xaaaaaa );
+			updateGridColors( grid, mediaQuery.matches ? [ 0x888888, 0x222222 ] : [ 0x282828, 0x888888 ] );
 
 		}
 
@@ -524,6 +515,12 @@ function Viewport( editor ) {
 
 	} );
 
+	signals.animationStopped.add( function () {
+
+		render();
+
+	} );
+
 	// background
 
 	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, environmentType ) {
@@ -666,6 +663,8 @@ function Viewport( editor ) {
 
 	} );
 
+	signals.exitedVR.add( render );
+
 	//
 
 	signals.windowResize.add( function () {
@@ -702,8 +701,6 @@ function Viewport( editor ) {
 
 	function animate() {
 
-		requestAnimationFrame( animate );
-
 		var mixer = editor.mixer;
 		var delta = clock.getDelta();
 
@@ -723,11 +720,15 @@ function Viewport( editor ) {
 
 		}
 
+		if ( vr.currentSession !== null ) {
+
+			needsUpdate = true;
+
+		}
+
 		if ( needsUpdate === true ) render();
 
 	}
-
-	requestAnimationFrame( animate );
 
 	//
 
@@ -750,7 +751,7 @@ function Viewport( editor ) {
 
 			renderer.autoClear = false;
 			if ( showSceneHelpers === true ) renderer.render( sceneHelpers, camera );
-			viewHelper.render( renderer );
+			if ( vr.currentSession === null ) viewHelper.render( renderer );
 			renderer.autoClear = true;
 
 		}
@@ -761,6 +762,30 @@ function Viewport( editor ) {
 	}
 
 	return container;
+
+}
+
+function updateGridColors( grid, colors ) {
+
+	const color1 = new THREE.Color( colors[ 0 ] );
+	const color2 = new THREE.Color( colors[ 1 ] );
+
+	const attribute = grid.geometry.attributes.color;
+	const array = attribute.array;
+
+	for ( var i = 0; i < array.length; i += 12 ) {
+
+		const color = ( i % ( 12 * 5 ) === 0 ) ? color1 : color2;
+
+		for ( var j = 0; j < 12; j += 3 ) {
+
+			color.toArray( array, i + j );
+
+		}
+
+	}
+
+	attribute.needsUpdate = true;
 
 }
 

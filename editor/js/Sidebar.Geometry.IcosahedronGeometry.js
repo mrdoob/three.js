@@ -4,7 +4,7 @@ import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-function SidebarGeometryIcosahedronGeometry( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -39,7 +39,7 @@ function SidebarGeometryIcosahedronGeometry( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.IcosahedronBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.IcosahedronGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );
@@ -52,4 +52,4 @@ function SidebarGeometryIcosahedronGeometry( editor, object ) {
 
 }
 
-export { SidebarGeometryIcosahedronGeometry };
+export { GeometryParametersPanel };

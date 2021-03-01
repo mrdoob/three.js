@@ -20,12 +20,12 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer, effect;
-			var particleLight;
+			let camera, scene, renderer, effect;
+			let particleLight;
 
-			var loader = new THREE.FontLoader();
+			const loader = new THREE.FontLoader();
 			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
@@ -48,41 +48,41 @@
 
 				// Materials
 
-				var cubeWidth = 400;
-				var numberOfSphersPerSide = 5;
-				var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
-				var stepSize = 1.0 / numberOfSphersPerSide;
+				const cubeWidth = 400;
+				const numberOfSphersPerSide = 5;
+				const sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
+				const stepSize = 1.0 / numberOfSphersPerSide;
 
-				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
+				const geometry = new THREE.SphereGeometry( sphereRadius, 32, 16 );
 
-				for ( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
+				for ( let alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
 
-					var colors = new Uint8Array( alphaIndex + 2 );
+					const colors = new Uint8Array( alphaIndex + 2 );
 
-					for ( var c = 0; c <= colors.length; c ++ ) {
+					for ( let c = 0; c <= colors.length; c ++ ) {
 
 						colors[ c ] = ( c / colors.length ) * 256;
 
 					}
 
-					var gradientMap = new THREE.DataTexture( colors, colors.length, 1, THREE.LuminanceFormat );
+					const gradientMap = new THREE.DataTexture( colors, colors.length, 1, THREE.LuminanceFormat );
 					gradientMap.minFilter = THREE.NearestFilter;
 					gradientMap.magFilter = THREE.NearestFilter;
 					gradientMap.generateMipmaps = false;
 
-					for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
+					for ( let beta = 0; beta <= 1.0; beta += stepSize ) {
 
-						for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
+						for ( let gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
 							// basic monochromatic energy preservation
-							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 + 0.1 ).multiplyScalar( 1 - beta * 0.2 );
+							const diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 + 0.1 ).multiplyScalar( 1 - beta * 0.2 );
 
-							var material = new THREE.MeshToonMaterial( {
+							const material = new THREE.MeshToonMaterial( {
 								color: diffuseColor,
 								gradientMap: gradientMap
 							} );
 
-							var mesh = new THREE.Mesh( geometry, material );
+							const mesh = new THREE.Mesh( geometry, material );
 
 							mesh.position.x = alpha * 400 - 200;
 							mesh.position.y = beta * 400 - 200;
@@ -98,7 +98,7 @@
 
 				function addLabel( name, location ) {
 
-					var textGeo = new THREE.TextBufferGeometry( name, {
+					const textGeo = new THREE.TextGeometry( name, {
 
 						font: font,
 
@@ -108,8 +108,8 @@
 
 					} );
 
-					var textMaterial = new THREE.MeshBasicMaterial();
-					var textMesh = new THREE.Mesh( textGeo, textMaterial );
+					const textMaterial = new THREE.MeshBasicMaterial();
+					const textMesh = new THREE.Mesh( textGeo, textMaterial );
 					textMesh.position.copy( location );
 					scene.add( textMesh );
 
@@ -122,7 +122,7 @@
 				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
 
 				particleLight = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 4, 8, 8 ),
+					new THREE.SphereGeometry( 4, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff } )
 				);
 				scene.add( particleLight );
@@ -131,7 +131,7 @@
 
 				scene.add( new THREE.AmbientLight( 0x888888 ) );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
+				const pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
 				particleLight.add( pointLight );
 
 				//
@@ -149,11 +149,11 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 200;
 				controls.maxDistance = 2000;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -180,7 +180,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.00025;
+				const timer = Date.now() * 0.00025;
 
 				particleLight.position.x = Math.sin( timer * 7 ) * 300;
 				particleLight.position.y = Math.cos( timer * 5 ) * 400;

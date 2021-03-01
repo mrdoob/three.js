@@ -17,16 +17,16 @@ SpecularMIPLevelNode.Nodes = ( function () {
 
 	var getSpecularMIPLevel = new FunctionNode( [
 		// taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
-		"float getSpecularMIPLevel( const in float roughness, const in float maxMIPLevelScalar ) {",
+		'float getSpecularMIPLevel( const in float roughness, const in float maxMIPLevelScalar ) {',
 
-		"	float sigma = PI * roughness * roughness / ( 1.0 + roughness );",
-		"	float desiredMIPLevel = maxMIPLevelScalar + log2( sigma );",
+		'	float sigma = PI * roughness * roughness / ( 1.0 + roughness );',
+		'	float desiredMIPLevel = maxMIPLevelScalar + log2( sigma );',
 
 		// clamp to allowable LOD ranges.
-		"	return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );",
+		'	return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );',
 
-		"}"
-	].join( "\n" ) );
+		'}'
+	].join( '\n' ) );
 
 	return {
 		getSpecularMIPLevel: getSpecularMIPLevel
@@ -36,7 +36,7 @@ SpecularMIPLevelNode.Nodes = ( function () {
 
 SpecularMIPLevelNode.prototype = Object.create( TempNode.prototype );
 SpecularMIPLevelNode.prototype.constructor = SpecularMIPLevelNode;
-SpecularMIPLevelNode.prototype.nodeType = "SpecularMIPLevel";
+SpecularMIPLevelNode.prototype.nodeType = 'SpecularMIPLevel';
 
 SpecularMIPLevelNode.prototype.setTexture = function ( texture ) {
 
@@ -59,7 +59,7 @@ SpecularMIPLevelNode.prototype.generate = function ( builder, output ) {
 
 	} else {
 
-		console.warn( "THREE.SpecularMIPLevelNode is not compatible with " + builder.shader + " shader." );
+		console.warn( 'THREE.SpecularMIPLevelNode is not compatible with ' + builder.shader + ' shader.' );
 
 		return builder.format( '0.0', this.type, output );
 

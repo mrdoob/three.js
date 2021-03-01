@@ -27,13 +27,13 @@
 			import { ThreeMFLoader } from './jsm/loaders/3MFLoader.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			var camera, scene, renderer, object, loader, controls;
+			let camera, scene, renderer, object, loader, controls;
 
-			var params = {
+			const params = {
 				asset: 'cube_gears'
 			};
 
-			var assets = [
+			const assets = [
 				'cube_gears',
 				'facecolors',
 				'multipletextures',
@@ -69,15 +69,15 @@
 				controls.enablePan = false;
 				controls.update();
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 
-				var manager = new THREE.LoadingManager();
+				const manager = new THREE.LoadingManager();
 
 				manager.onLoad = function () {
 
-					var aabb = new THREE.Box3().setFromObject( object );
-					var center = aabb.getCenter( new THREE.Vector3() );
+					const aabb = new THREE.Box3().setFromObject( object );
+					const center = aabb.getCenter( new THREE.Vector3() );
 
 					object.position.x += ( object.position.x - center.x );
 					object.position.y += ( object.position.y - center.y );
@@ -93,11 +93,11 @@
 				loader = new ThreeMFLoader( manager );
 				loadAsset( params.asset );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
-				var gui = new GUI( { width: 300 } );
+				const gui = new GUI( { width: 300 } );
 				gui.add( params, 'asset', assets ).onChange( function ( value ) {
 
 					loadAsset( value );

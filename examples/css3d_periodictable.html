@@ -99,7 +99,7 @@
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
-			var table = [
+			const table = [
 				"H", "Hydrogen", "1.00794", 1, 1,
 				"He", "Helium", "4.002602", 18, 1,
 				"Li", "Lithium", "6.941", 1, 2,
@@ -220,11 +220,11 @@
 				"Og", "Oganesson", "(294)", 18, 7
 			];
 
-			var camera, scene, renderer;
-			var controls;
+			let camera, scene, renderer;
+			let controls;
 
-			var objects = [];
-			var targets = { table: [], sphere: [], helix: [], grid: [] };
+			const objects = [];
+			const targets = { table: [], sphere: [], helix: [], grid: [] };
 
 			init();
 			animate();
@@ -238,38 +238,38 @@
 
 				// table
 
-				for ( var i = 0; i < table.length; i += 5 ) {
+				for ( let i = 0; i < table.length; i += 5 ) {
 
-					var element = document.createElement( 'div' );
+					const element = document.createElement( 'div' );
 					element.className = 'element';
 					element.style.backgroundColor = 'rgba(0,127,127,' + ( Math.random() * 0.5 + 0.25 ) + ')';
 
-					var number = document.createElement( 'div' );
+					const number = document.createElement( 'div' );
 					number.className = 'number';
 					number.textContent = ( i / 5 ) + 1;
 					element.appendChild( number );
 
-					var symbol = document.createElement( 'div' );
+					const symbol = document.createElement( 'div' );
 					symbol.className = 'symbol';
 					symbol.textContent = table[ i ];
 					element.appendChild( symbol );
 
-					var details = document.createElement( 'div' );
+					const details = document.createElement( 'div' );
 					details.className = 'details';
 					details.innerHTML = table[ i + 1 ] + '<br>' + table[ i + 2 ];
 					element.appendChild( details );
 
-					var object = new CSS3DObject( element );
-					object.position.x = Math.random() * 4000 - 2000;
-					object.position.y = Math.random() * 4000 - 2000;
-					object.position.z = Math.random() * 4000 - 2000;
-					scene.add( object );
+					const objectCSS = new CSS3DObject( element );
+					objectCSS.position.x = Math.random() * 4000 - 2000;
+					objectCSS.position.y = Math.random() * 4000 - 2000;
+					objectCSS.position.z = Math.random() * 4000 - 2000;
+					scene.add( objectCSS );
 
-					objects.push( object );
+					objects.push( objectCSS );
 
 					//
 
-					var object = new THREE.Object3D();
+					const object = new THREE.Object3D();
 					object.position.x = ( table[ i + 3 ] * 140 ) - 1330;
 					object.position.y = - ( table[ i + 4 ] * 180 ) + 990;
 
@@ -279,14 +279,14 @@
 
 				// sphere
 
-				var vector = new THREE.Vector3();
+				const vector = new THREE.Vector3();
 
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+				for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
-					var phi = Math.acos( - 1 + ( 2 * i ) / l );
-					var theta = Math.sqrt( l * Math.PI ) * phi;
+					const phi = Math.acos( - 1 + ( 2 * i ) / l );
+					const theta = Math.sqrt( l * Math.PI ) * phi;
 
-					var object = new THREE.Object3D();
+					const object = new THREE.Object3D();
 
 					object.position.setFromSphericalCoords( 800, phi, theta );
 
@@ -300,14 +300,12 @@
 
 				// helix
 
-				var vector = new THREE.Vector3();
+				for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+					const theta = i * 0.175 + Math.PI;
+					const y = - ( i * 8 ) + 450;
 
-					var theta = i * 0.175 + Math.PI;
-					var y = - ( i * 8 ) + 450;
-
-					var object = new THREE.Object3D();
+					const object = new THREE.Object3D();
 
 					object.position.setFromCylindricalCoords( 900, theta, y );
 
@@ -323,9 +321,9 @@
 
 				// grid
 
-				for ( var i = 0; i < objects.length; i ++ ) {
+				for ( let i = 0; i < objects.length; i ++ ) {
 
-					var object = new THREE.Object3D();
+					const object = new THREE.Object3D();
 
 					object.position.x = ( ( i % 5 ) * 400 ) - 800;
 					object.position.y = ( - ( Math.floor( i / 5 ) % 5 ) * 400 ) + 800;
@@ -348,39 +346,39 @@
 				controls.maxDistance = 6000;
 				controls.addEventListener( 'change', render );
 
-				var button = document.getElementById( 'table' );
-				button.addEventListener( 'click', function () {
+				const buttonTable = document.getElementById( 'table' );
+				buttonTable.addEventListener( 'click', function () {
 
 					transform( targets.table, 2000 );
 
-				}, false );
+				} );
 
-				var button = document.getElementById( 'sphere' );
-				button.addEventListener( 'click', function () {
+				const buttonSphere = document.getElementById( 'sphere' );
+				buttonSphere.addEventListener( 'click', function () {
 
 					transform( targets.sphere, 2000 );
 
-				}, false );
+				} );
 
-				var button = document.getElementById( 'helix' );
-				button.addEventListener( 'click', function () {
+				const buttonHelix = document.getElementById( 'helix' );
+				buttonHelix.addEventListener( 'click', function () {
 
 					transform( targets.helix, 2000 );
 
-				}, false );
+				} );
 
-				var button = document.getElementById( 'grid' );
-				button.addEventListener( 'click', function () {
+				const buttonGrid = document.getElementById( 'grid' );
+				buttonGrid.addEventListener( 'click', function () {
 
 					transform( targets.grid, 2000 );
 
-				}, false );
+				} );
 
 				transform( targets.table, 2000 );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -388,10 +386,10 @@
 
 				TWEEN.removeAll();
 
-				for ( var i = 0; i < objects.length; i ++ ) {
+				for ( let i = 0; i < objects.length; i ++ ) {
 
-					var object = objects[ i ];
-					var target = targets[ i ];
+					const object = objects[ i ];
+					const target = targets[ i ];
 
 					new TWEEN.Tween( object.position )
 						.to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration )

@@ -1,14 +1,11 @@
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 
-// PolyhedronGeometry
+class PolyhedronGeometry extends BufferGeometry {
 
-class PolyhedronGeometry extends Geometry {
-
-	constructor( vertices, indices, radius, detail ) {
+	constructor( vertices, indices, radius = 1, detail = 0 ) {
 
 		super();
 
@@ -20,33 +17,6 @@ class PolyhedronGeometry extends Geometry {
 			radius: radius,
 			detail: detail
 		};
-
-		this.fromBufferGeometry( new PolyhedronBufferGeometry( vertices, indices, radius, detail ) );
-		this.mergeVertices();
-
-	}
-
-}
-
-// PolyhedronBufferGeometry
-
-class PolyhedronBufferGeometry extends BufferGeometry {
-
-	constructor( vertices, indices, radius, detail ) {
-
-		super();
-
-		this.type = 'PolyhedronBufferGeometry';
-
-		this.parameters = {
-			vertices: vertices,
-			indices: indices,
-			radius: radius,
-			detail: detail
-		};
-
-		radius = radius || 1;
-		detail = detail || 0;
 
 		// default buffer data
 
@@ -109,7 +79,7 @@ class PolyhedronBufferGeometry extends BufferGeometry {
 
 		function subdivideFace( a, b, c, detail ) {
 
-			const cols = Math.pow( 2, detail );
+			const cols = detail + 1;
 
 			// we use this multidimensional array as a data structure for creating the subdivision
 
@@ -330,5 +300,4 @@ class PolyhedronBufferGeometry extends BufferGeometry {
 
 }
 
-
-export { PolyhedronGeometry, PolyhedronBufferGeometry };
+export { PolyhedronGeometry, PolyhedronGeometry as PolyhedronBufferGeometry };
