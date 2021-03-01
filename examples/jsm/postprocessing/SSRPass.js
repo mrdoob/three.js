@@ -639,7 +639,7 @@ SSRPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.width = width;
 		this.height = height;
 
-		this.ssrMaterial.defines.MAX_STEP = Math.sqrt( width * width + height * height );
+		this.ssrMaterial.defines.MAX_STEP = Math.sqrt( width * width + height * height ).toFixed(1);
 		this.ssrMaterial.needsUpdate = true;
 		this.beautyRenderTarget.setSize( width, height );
 		this.prevRenderTarget.setSize( width, height );
