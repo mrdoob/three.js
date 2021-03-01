@@ -220,7 +220,7 @@ var SSRPass = function ( { renderer, scene, camera, width, height, selects, enco
 
 	this.ssrMaterial = new ShaderMaterial( {
 		defines: Object.assign( {}, SSRShader.defines, {
-			MAX_STEP: Math.sqrt( this.width * this.width + this.height * this.height ).toFixed(1)
+			MAX_STEP: Math.sqrt( this.width * this.width + this.height * this.height )
 		} ),
 		uniforms: UniformsUtils.clone( SSRShader.uniforms ),
 		vertexShader: SSRShader.vertexShader,
@@ -639,7 +639,7 @@ SSRPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.width = width;
 		this.height = height;
 
-		this.ssrMaterial.defines.MAX_STEP = Math.sqrt( width * width + height * height ).toFixed(1);
+		this.ssrMaterial.defines.MAX_STEP = Math.sqrt( width * width + height * height );
 		this.ssrMaterial.needsUpdate = true;
 		this.beautyRenderTarget.setSize( width, height );
 		this.prevRenderTarget.setSize( width, height );
