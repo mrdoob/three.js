@@ -1360,7 +1360,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( materialProperties.currentProgram === program && materialProperties.lightsStateVersion === lightsStateVersion ) {
 
-				updateCommonMaterialProperties( material, scene, parameters );
+				updateCommonMaterialProperties( material, parameters );
 
 				return program;
 
@@ -1387,7 +1387,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		updateCommonMaterialProperties( material, scene, parameters );
+		updateCommonMaterialProperties( material, parameters );
 
 		// store the light setup it was created for
 
@@ -1430,7 +1430,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function updateCommonMaterialProperties( material, scene, parameters ) {
+	function updateCommonMaterialProperties( material, parameters ) {
 
 		const materialProperties = properties.get( material );
 
