@@ -66,11 +66,11 @@ class Object3DNode extends Node {
 
 		} else if ( scope === Object3DNode.POSITION ) {
 
-			object.getWorldPosition( inputNode.value );
+			inputNode.value.setFromMatrixPosition( object.matrixWorld );
 
 		} else if ( scope === Object3DNode.VIEW_POSITION ) {
 
-			object.getWorldPosition( inputNode.value );
+			inputNode.value.setFromMatrixPosition( object.matrixWorld );
 
 			inputNode.value.applyMatrix4( camera.matrixWorldInverse );
 
