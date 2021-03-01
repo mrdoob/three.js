@@ -1433,10 +1433,7 @@ function WebGLRenderer( parameters ) {
 	function updateCommonMaterialProperties( material, scene, parameters ) {
 
 		const materialProperties = properties.get( material );
-		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 
-		materialProperties.envMap = cubemaps.get( material.envMap || environment );
-		materialProperties.fog = scene.fog;
 		materialProperties.outputEncoding = parameters.outputEncoding;
 		materialProperties.instancing = parameters.instancing;
 		materialProperties.numClippingPlanes = parameters.numClippingPlanes;
