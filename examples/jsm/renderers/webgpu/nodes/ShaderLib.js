@@ -1,6 +1,7 @@
 const ShaderLib = {
 	common: {
-		vertexShader: `#version 450
+		vertexShader: 
+`#version 450
 
 NODE_HEADER_ATTRIBUTES
 NODE_HEADER_UNIFORMS
@@ -14,7 +15,8 @@ void main(){
 	gl_Position = NODE_MVP;
 	
 }`,
-		fragmentShader: `#version 450
+		fragmentShader: 
+`#version 450
 
 NODE_HEADER_ATTRIBUTES
 NODE_HEADER_UNIFORMS
@@ -26,7 +28,7 @@ void main() {
 
 	NODE_BODY_VARS
 
-	outColor = vec4( 1.0, 1.0, 1.0, 1.0 );
+	outColor = vec4( 1.0 );
 
 	#ifdef NODE_COLOR
 
@@ -34,15 +36,15 @@ void main() {
 
 	#endif
 
-	#ifdef NODE_LIGHT
-
-		outColor.rgb *= NODE_LIGHT;
-
-	#endif
-
 	#ifdef NODE_OPACITY
 
 		outColor.a *= NODE_OPACITY;
+
+	#endif
+
+	#ifdef NODE_LIGHT
+
+		outColor.rgb *= NODE_LIGHT;
 
 	#endif
 
