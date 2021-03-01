@@ -33,6 +33,48 @@
 			in vec3 vCenter;
 			out vec4 outColor;
 
+			float edgeFactorTri() {
+
+				vec3 d = fwidth( vCenter.xyz );
+
+				vec3 a3 = smoothstep( vec3( 0.0 ), d * thickness, vCenter.xyz );
+
+				return min( min( a3.x, a3.y ), a3.z );
+
+			}
+
+			void main() {
+
+				if ( edgeFactorTri() > 0.99 ) discard;
+
+				outColor = gl_FrontFacing ? vec4( 0.9, 0.9, 1.0, 1.0 ) : vec4( 0.4, 0.4, 0.5, 1.0 );
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-vertex" id="vertexShaderATC">
+
+			in vec3 center;
+			out vec3 vCenter;
+
+			void main() {
+
+				vCenter = center;
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentShaderATC">
+
+			uniform float thickness;
+
+			in vec3 vCenter;
+			out vec4 outColor;
+
 			float aastep( float threshold, float dist ) {
 
 				float afwidth = fwidth( dist ) * 0.5;
@@ -62,10 +104,10 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			const API = {
-				thickness: 0.01
+				thickness: 1
 			};
 
-			let renderer, scene, camera, mesh2;
+			let renderer, scene, camera, mesh2, mesh3;
 
 			init();
 
@@ -79,7 +121,7 @@
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 500 );
-				camera.position.z = 150;
+				camera.position.z = 200;
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.enablePan = false;
@@ -87,7 +129,12 @@
 
 				new THREE.BufferGeometryLoader().load( 'models/json/WaltHeadLo_buffergeometry.json', function ( geometry ) {
 
-					// on the left
+					geometry.deleteAttribute( 'normal' );
+					geometry.deleteAttribute( 'uv' );
+
+					setupAttributes( geometry );
+
+					// left
 
 					const material1 = new THREE.MeshBasicMaterial( {
 
@@ -97,34 +144,44 @@
 					} );
 
 					const mesh1 = new THREE.Mesh( geometry, material1 );
-					mesh1.position.set( - 40, 0, 0 );
+					mesh1.position.set( - 60, 0, 0 );
 
 					scene.add( mesh1 );
 
-					// on the right
-
-					const uniforms = { 'thickness': { value: API.thickness } };
+					// middle
 
 					const material2 = new THREE.ShaderMaterial( {
 
-						uniforms: uniforms,
+						uniforms: { 'thickness': { value: API.thickness } },
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,
 						fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+						side: THREE.DoubleSide,
+						glslVersion: THREE.GLSL3
+
+					} );
+
+					mesh2 = new THREE.Mesh( geometry, material2 );
+					mesh2.position.set( 0, 0, 0 );
+
+					scene.add( mesh2 );
+
+					// right
+
+					const material3 = new THREE.ShaderMaterial( {
+
+						uniforms: { 'thickness': { value: API.thickness * 0.01 } },
+						vertexShader: document.getElementById( 'vertexShaderATC' ).textContent,
+						fragmentShader: document.getElementById( 'fragmentShaderATC' ).textContent,
 						side: THREE.DoubleSide,
 						glslVersion: THREE.GLSL3,
 						alphaToCoverage: true // only works when WebGLRenderer's "antialias" is set to "true"
 
 					} );
 
-					geometry.deleteAttribute( 'normal' );
-					geometry.deleteAttribute( 'uv' );
+					mesh3 = new THREE.Mesh( geometry, material3 );
+					mesh3.position.set( 60, 0, 0 );
 
-					setupAttributes( geometry );
-
-					mesh2 = new THREE.Mesh( geometry, material2 );
-					mesh2.position.set( 40, 0, 0 );
-
-					scene.add( mesh2 );
+					scene.add( mesh3 );
 
 					//
 
@@ -136,9 +193,10 @@
 
 				const gui = new GUI();
 
-				gui.add( API, 'thickness', 0.01, 0.1 ).onChange( function () {
+				gui.add( API, 'thickness', 0.4, 4 ).onChange( function () {
 
 					mesh2.material.uniforms.thickness.value = API.thickness;
+					mesh3.material.uniforms.thickness.value = API.thickness * 0.01;
 
 				} );
 
