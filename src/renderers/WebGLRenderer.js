@@ -68,8 +68,9 @@ function WebGLRenderer( parameters ) {
 	let currentRenderState = null;
 
 	// render() can be called from within a callback triggered by another render.
-	// We track this so that the nested render call gets its state isolated from the parent render call.
+	// We track this so that the nested render call gets its list and state isolated from the parent render call.
 
+	const renderListStack = [];
 	const renderStateStack = [];
 
 	// public properties
@@ -1023,8 +1024,10 @@ function WebGLRenderer( parameters ) {
 		_localClippingEnabled = this.localClippingEnabled;
 		_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
 
-		currentRenderList = renderLists.get( scene, camera );
+		currentRenderList = renderLists.get( scene, renderListStack.length );
 		currentRenderList.init();
+
+		renderListStack.push( currentRenderList );
 
 		projectObject( scene, camera, 0, _this.sortObjects );
 
@@ -1100,6 +1103,7 @@ function WebGLRenderer( parameters ) {
 		// _gl.finish();
 
 		renderStateStack.pop();
+
 		if ( renderStateStack.length > 0 ) {
 
 			currentRenderState = renderStateStack[ renderStateStack.length - 1 ];
@@ -1110,7 +1114,17 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		currentRenderList = null;
+		renderListStack.pop();
+
+		if ( renderListStack.length > 0 ) {
+
+			currentRenderList = renderListStack[ renderListStack.length - 1 ];
+
+		} else {
+
+			currentRenderList = null;
+
+		}
 
 	};
 
@@ -1750,18 +1764,6 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.getRenderList = function () {
-
-		return currentRenderList;
-
-	};
-
-	this.setRenderList = function ( renderList ) {
-
-		currentRenderList = renderList;
-
-	};
-
 	this.getRenderTarget = function () {
 
 		return _currentRenderTarget;
@@ -1782,8 +1784,17 @@ function WebGLRenderer( parameters ) {
 
 		let framebuffer = _framebuffer;
 		let isCube = false;
+		let isRenderTarget3D = false;
 
 		if ( renderTarget ) {
+
+			const texture = renderTarget.texture;
+
+			if ( texture.isDataTexture3D || texture.isDataTexture2DArray ) {
+
+				isRenderTarget3D = true;
+
+			}
 
 			const __webglFramebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
@@ -1829,6 +1840,12 @@ function WebGLRenderer( parameters ) {
 
 			const textureProperties = properties.get( renderTarget.texture );
 			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + activeCubeFace, textureProperties.__webglTexture, activeMipmapLevel );
+
+		} else if ( isRenderTarget3D ) {
+
+			const textureProperties = properties.get( renderTarget.texture );
+			const layer = activeCubeFace || 0;
+			_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureProperties.__webglTexture, activeMipmapLevel || 0, layer );
 
 		}
 
@@ -1878,7 +1895,7 @@ function WebGLRenderer( parameters ) {
 
 				const halfFloatSupportedByExt = ( textureType === HalfFloatType ) && ( extensions.has( 'EXT_color_buffer_half_float' ) || ( capabilities.isWebGL2 && extensions.has( 'EXT_color_buffer_float' ) ) );
 
-				if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // IE11, Edge and Chrome Mac < 52 (#9513)
+				if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // Edge and Chrome Mac < 52 (#9513)
 					! ( textureType === FloatType && ( capabilities.isWebGL2 || extensions.has( 'OES_texture_float' ) || extensions.has( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
 					! halfFloatSupportedByExt ) {
 
@@ -1967,6 +1984,80 @@ function WebGLRenderer( parameters ) {
 
 		// Generate mipmaps only when copying level 0
 		if ( level === 0 && dstTexture.generateMipmaps ) _gl.generateMipmap( _gl.TEXTURE_2D );
+
+		state.unbindTexture();
+
+	};
+
+	this.copyTextureToTexture3D = function ( sourceBox, position, srcTexture, dstTexture, level = 0 ) {
+
+		if ( _this.isWebGL1Renderer ) {
+
+			console.warn( 'THREE.WebGLRenderer.copyTextureToTexture3D: can only be used with WebGL2.' );
+			return;
+
+		}
+
+		const { width, height, data } = srcTexture.image;
+		const glFormat = utils.convert( dstTexture.format );
+		const glType = utils.convert( dstTexture.type );
+		let glTarget;
+
+		if ( dstTexture.isDataTexture3D ) {
+
+			textures.setTexture3D( dstTexture, 0 );
+			glTarget = _gl.TEXTURE_3D;
+
+		} else if ( dstTexture.isDataTexture2DArray ) {
+
+			textures.setTexture2DArray( dstTexture, 0 );
+			glTarget = _gl.TEXTURE_2D_ARRAY;
+
+		} else {
+
+			console.warn( 'THREE.WebGLRenderer.copyTextureToTexture3D: only supports THREE.DataTexture3D and THREE.DataTexture2DArray.' );
+			return;
+
+		}
+
+		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, dstTexture.flipY );
+		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
+		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
+
+		const unpackRowLen = _gl.getParameter( _gl.UNPACK_ROW_LENGTH );
+		const unpackImageHeight = _gl.getParameter( _gl.UNPACK_IMAGE_HEIGHT );
+		const unpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
+		const unpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
+		const unpackSkipImages = _gl.getParameter( _gl.UNPACK_SKIP_IMAGES );
+
+		_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, width );
+		_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, height );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, sourceBox.min.x );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, sourceBox.min.y );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, sourceBox.min.z );
+
+		_gl.texSubImage3D(
+			glTarget,
+			level,
+			position.x,
+			position.y,
+			position.z,
+			sourceBox.max.x - sourceBox.min.x + 1,
+			sourceBox.max.y - sourceBox.min.y + 1,
+			sourceBox.max.z - sourceBox.min.z + 1,
+			glFormat,
+			glType,
+			data
+		);
+
+		_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, unpackRowLen );
+		_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, unpackImageHeight );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, unpackSkipPixels );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, unpackSkipRows );
+		_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, unpackSkipImages );
+
+		// Generate mipmaps only when copying level 0
+		if ( level === 0 && dstTexture.generateMipmaps ) _gl.generateMipmap( glTarget );
 
 		state.unbindTexture();
 

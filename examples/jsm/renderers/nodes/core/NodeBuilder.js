@@ -1,4 +1,7 @@
 import NodeUniform from './NodeUniform.js';
+import NodeAttribute from './NodeAttribute.js';
+import NodeVary from './NodeVary.js';
+import { NodeUpdateType } from './constants.js';
 
 class NodeBuilder {
 
@@ -16,8 +19,8 @@ class NodeBuilder {
 		this.slots = { vertex: [], fragment: [] };
 		this.defines = { vertex: {}, fragment: {} };
 		this.uniforms = { vertex: [], fragment: [] };
-		this.attributes = {};
-		this.attributeCount = 0;
+		this.attributes = [];
+		this.varys = [];
 
 		this.nodesData = new WeakMap();
 
@@ -29,7 +32,9 @@ class NodeBuilder {
 
 		if ( this.nodes.indexOf( node ) === - 1 ) {
 
-			if ( node.needsUpdate === true ) {
+			const updateType = node.getUpdateType( this );
+
+			if ( updateType !== NodeUpdateType.None ) {
 
 				this.updateNodes.push( node );
 
@@ -55,7 +60,7 @@ class NodeBuilder {
 
 	getTexture( /* textureProperty, uvSnippet */ ) {
 
-
+		console.warn( 'Abstract function.' );
 
 	}
 
@@ -71,38 +76,53 @@ class NodeBuilder {
 
 	}
 
-	getAttribute( type, name, property = null ) {
+	getAttribute( name, type ) {
 
-		let attribute = this.attributes[ name ];
+		const attributes = this.attributes;
 
-		if ( attribute === undefined ) {
+		// find attribute
 
-			const index = this.attributeCount ++;
+		for ( const attribute of attributes ) {
 
-			if ( property === null ) {
+			if ( attribute.name === name ) {
 
-				property = `node_A${index}`;
+				return attribute;
 
 			}
 
-			attribute = {
-				type,
-				name,
-				index,
-				property
-			};
-
-			this.attributes[ name ] = attribute;
-
 		}
+
+		// create a new if no exist
+
+		const attribute = new NodeAttribute( name, type );
+
+		attributes.push( attribute );
 
 		return attribute;
 
 	}
 
-	getPropertyName( nodeUniform ) {
+	getPropertyName( node ) {
 
-		return nodeUniform.name;
+		return node.name;
+
+	}
+
+	isVector( type ) {
+
+		return /vec\d/.test( type );
+
+	}
+
+	isMatrix( type ) {
+
+		return /mat\d/.test( type );
+
+	}
+
+	isShaderStage( shaderStage ) {
+
+		return this.shaderStage === shaderStage;
 
 	}
 
@@ -178,6 +198,29 @@ class NodeBuilder {
 
 	}
 
+	getVaryFromNode( node, type ) {
+
+		const nodeData = this.getDataFromNode( node );
+
+		let nodeVary = nodeData.vary;
+
+		if ( nodeVary === undefined ) {
+
+			const varys = this.varys;
+			const index = varys.length;
+
+			nodeVary = new NodeVary( 'nodeV' + index, type );
+
+			varys.push( nodeVary );
+
+			nodeData.vary = nodeVary;
+
+		}
+
+		return nodeVary;
+
+	}
+
 	/*
 	analyzeNode( node ) {
 
@@ -212,60 +255,31 @@ class NodeBuilder {
 
 	getAttributesBodySnippet( /*shaderStage*/ ) {
 
-
+		console.warn( 'Abstract function.' );
 
 	}
 
 	getAttributesHeaderSnippet( /*shaderStage*/ ) {
 
-
-
-	}
-
-	getUniformsHeaderSnippet( shaderStage ) {
-
-		const uniforms = this.uniforms[ shaderStage ];
-
-		let snippet = '';
-
-		for ( const uniform of uniforms ) {
-
-			snippet += `${uniform.type} ${uniform.name}; `;
-
-		}
-
-		return snippet;
+		console.warn( 'Abstract function.' );
 
 	}
 
-	format( snippet, fromType, toType ) {
+	getVarysHeaderSnippet( /*shaderStage*/ ) {
 
-		fromType = this.getVectorType( fromType );
-		toType = this.getVectorType( toType );
+		console.warn( 'Abstract function.' );
 
-		const typeToType = `${fromType} to ${toType}`;
+	}
 
-		switch ( typeToType ) {
+	getVarysBodySnippet( /*shaderStage*/ ) {
 
-			case 'float to vec2' : return `vec2( ${snippet} )`;
-			case 'float to vec3' : return `vec3( ${snippet} )`;
-			case 'float to vec4' : return `vec4( vec3( ${snippet} ), 1.0 )`;
+		console.warn( 'Abstract function.' );
 
-			case 'vec2 to float' : return `${snippet}.x`;
-			case 'vec2 to vec3' : return `vec3( ${snippet}.x, ${snippet}.y, 0.0 )`;
-			case 'vec2 to vec4' : return `vec4( ${snippet}.x, ${snippet}.y, 0.0, 1.0 )`;
+	}
 
-			case 'vec3 to float' : return `${snippet}.x`;
-			case 'vec3 to vec2' : return `${snippet}.xy`;
-			case 'vec3 to vec4' : return `vec4( ${snippet}.x, ${snippet}.y, ${snippet}.z, 1.0 )`;
+	getUniformsHeaderSnippet( /*shaderStage*/ ) {
 
-			case 'vec4 to float' : return `${snippet}.x`;
-			case 'vec4 to vec2' : return `${snippet}.xy`;
-			case 'vec4 to vec3' : return `${snippet}.xyz`;
-
-		}
-
-		return snippet;
+		console.warn( 'Abstract function.' );
 
 	}
 
@@ -302,7 +316,9 @@ class NodeBuilder {
 
 			this.define( shaderStage, 'NODE_HEADER_UNIFORMS', this.getUniformsHeaderSnippet( shaderStage ) );
 			this.define( shaderStage, 'NODE_HEADER_ATTRIBUTES', this.getAttributesHeaderSnippet( shaderStage ) );
-			this.define( shaderStage, 'NODE_BODY_ATTRIBUTES', this.getAttributesBodySnippet( shaderStage ) );
+			this.define( shaderStage, 'NODE_HEADER_VARYS', this.getVarysHeaderSnippet( shaderStage ) );
+
+			this.define( shaderStage, 'NODE_BODY_VARYS', this.getVarysBodySnippet( shaderStage ) );
 
 			shaderData[ shaderStage ] = this._buildDefines( shaderStage );
 
@@ -314,6 +330,48 @@ class NodeBuilder {
 		return this;
 
 	}
+
+	format( snippet, fromType, toType ) {
+
+		fromType = this.getVectorType( fromType );
+		toType = this.getVectorType( toType );
+
+		const typeToType = `${fromType} to ${toType}`;
+
+		switch ( typeToType ) {
+
+			case 'float to vec2' : return `vec2( ${snippet} )`;
+			case 'float to vec3' : return `vec3( ${snippet} )`;
+			case 'float to vec4' : return `vec4( vec3( ${snippet} ), 1.0 )`;
+
+			case 'vec2 to float' : return `${snippet}.x`;
+			case 'vec2 to vec3' : return `vec3( ${snippet}, 0.0 )`;
+			case 'vec2 to vec4' : return `vec4( ${snippet}.xy, 0.0, 1.0 )`;
+
+			case 'vec3 to float' : return `${snippet}.x`;
+			case 'vec3 to vec2' : return `${snippet}.xy`;
+			case 'vec3 to vec4' : return `vec4( ${snippet}, 1.0 )`;
+
+			case 'vec4 to float' : return `${snippet}.x`;
+			case 'vec4 to vec2' : return `${snippet}.xy`;
+			case 'vec4 to vec3' : return `${snippet}.xyz`;
+
+			case 'mat3 to float' : return `( ${snippet} * vec3( 1.0 ) ).x`;
+			case 'mat3 to vec2' : return `( ${snippet} * vec3( 1.0 ) ).xy`;
+			case 'mat3 to vec3' : return `( ${snippet} * vec3( 1.0 ) ).xyz`;
+			case 'mat3 to vec4' : return `vec4( ${snippet} * vec3( 1.0 ), 1.0 )`;
+
+			case 'mat4 to float' : return `( ${snippet} * vec4( 1.0 ) ).x`;
+			case 'mat4 to vec2' : return `( ${snippet} * vec4( 1.0 ) ).xy`;
+			case 'mat4 to vec3' : return `( ${snippet} * vec4( 1.0 ) ).xyz`;
+			case 'mat4 to vec4' : return `( ${snippet} * vec4( 1.0 ) )`;
+
+		}
+
+		return snippet;
+
+	}
+
 
 }
 

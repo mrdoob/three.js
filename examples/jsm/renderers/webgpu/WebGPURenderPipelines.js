@@ -57,7 +57,7 @@ class WebGPURenderPipelines {
 
 			// get shader
 
-			const nodeBuilder = this.nodes.get( material );
+			const nodeBuilder = this.nodes.get( object );
 
 			// shader modules
 
@@ -97,10 +97,14 @@ class WebGPURenderPipelines {
 
 			const materialProperties = properties.get( material );
 
-			const disposeCallback = onMaterialDispose.bind( this );
-			materialProperties.disposeCallback = disposeCallback;
+			if ( materialProperties.disposeCallback === undefined ) {
 
-			material.addEventListener( 'dispose', onMaterialDispose.bind( this ) );
+				const disposeCallback = onMaterialDispose.bind( this );
+				materialProperties.disposeCallback = disposeCallback;
+
+				material.addEventListener( 'dispose', disposeCallback );
+
+			}
 
 			// determine shader attributes
 
@@ -788,21 +792,15 @@ class WebGPURenderPipelines {
 function onMaterialDispose( event ) {
 
 	const properties = this.properties;
-	const nodes = this.nodes;
-	const shaderModules = this.shaderModules;
 
 	const material = event.target;
-	const nodeBuilder = nodes.get( material );
+	const materialProperties = properties.get( material );
 
-	material.removeEventListener( 'dispose', onMaterialDispose );
+	material.removeEventListener( 'dispose', materialProperties.disposeCallback );
 
 	properties.remove( material );
-	nodes.remove( material );
 
-	shaderModules.vertex.delete( nodeBuilder.vertexShader );
-	shaderModules.fragment.delete( nodeBuilder.fragmentShader );
-
-	// @TODO: need implement pipeline
+	// @TODO: still needed remove nodes, bindings and pipeline
 
 }
 

@@ -60,8 +60,6 @@ var SSAOPass = function ( scene, camera, width, height ) {
 
 	var depthTexture = new DepthTexture();
 	depthTexture.type = UnsignedShortType;
-	depthTexture.minFilter = NearestFilter;
-	depthTexture.maxFilter = NearestFilter;
 
 	this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 		minFilter: LinearFilter,

@@ -128,8 +128,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const textureProperties = properties.get( texture );
 
-		// Note: Math.log( x ) * Math.LOG2E used instead of Math.log2( x ) which is not supported by IE11
-		textureProperties.__maxMipLevel = Math.log( Math.max( width, height ) ) * Math.LOG2E;
+		textureProperties.__maxMipLevel = Math.log2( Math.max( width, height ) );
 
 	}
 
@@ -244,8 +243,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function deallocateRenderTarget( renderTarget ) {
 
+		const texture = renderTarget.texture;
+
 		const renderTargetProperties = properties.get( renderTarget );
-		const textureProperties = properties.get( renderTarget.texture );
+		const textureProperties = properties.get( texture );
 
 		if ( ! renderTarget ) return;
 
@@ -280,7 +281,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		properties.remove( renderTarget.texture );
+		properties.remove( texture );
 		properties.remove( renderTarget );
 
 	}
@@ -453,12 +454,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		const extension = extensions.get( 'EXT_texture_filter_anisotropic' );
+		if ( extensions.has( 'EXT_texture_filter_anisotropic' ) === true ) {
 
-		if ( extension ) {
+			const extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 
-			if ( texture.type === FloatType && extensions.get( 'OES_texture_float_linear' ) === null ) return;
-			if ( texture.type === HalfFloatType && ( isWebGL2 || extensions.get( 'OES_texture_half_float_linear' ) ) === null ) return;
+			if ( texture.type === FloatType && extensions.has( 'OES_texture_float_linear' ) === false ) return; // verify extension for WebGL 1 and WebGL 2
+			if ( isWebGL2 === false && ( texture.type === HalfFloatType && extensions.has( 'OES_texture_half_float_linear' ) === false ) ) return; // verify extension for WebGL 1 only
 
 			if ( texture.anisotropy > 1 || properties.get( texture ).__currentAnisotropy ) {
 
@@ -502,6 +503,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+		_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, _gl.NONE );
 
 		const needsPowerOfTwo = textureNeedsPowerOfTwo( texture ) && isPowerOfTwo( texture.image ) === false;
 		const image = resizeImage( texture.image, needsPowerOfTwo, false, maxTextureSize );
@@ -711,6 +713,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+		_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, _gl.NONE );
 
 		const isCompressed = ( texture && ( texture.isCompressedTexture || texture.image[ 0 ].isCompressedTexture ) );
 		const isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
@@ -832,12 +835,24 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	// Setup storage for target texture and bind it to correct framebuffer
 	function setupFrameBufferTexture( framebuffer, renderTarget, attachment, textureTarget ) {
 
-		const glFormat = utils.convert( renderTarget.texture.format );
-		const glType = utils.convert( renderTarget.texture.type );
-		const glInternalFormat = getInternalFormat( renderTarget.texture.internalFormat, glFormat, glType );
-		state.texImage2D( textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
+		const texture = renderTarget.texture;
+
+		const glFormat = utils.convert( texture.format );
+		const glType = utils.convert( texture.type );
+		const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
+
+		if ( textureTarget === _gl.TEXTURE_3D || textureTarget === _gl.TEXTURE_2D_ARRAY ) {
+
+			state.texImage3D( textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, renderTarget.depth, 0, glFormat, glType, null );
+
+		} else {
+
+			state.texImage2D( textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
+
+		}
+
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
+		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( texture ).__webglTexture, 0 );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 	}
@@ -900,9 +915,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else {
 
-			const glFormat = utils.convert( renderTarget.texture.format );
-			const glType = utils.convert( renderTarget.texture.type );
-			const glInternalFormat = getInternalFormat( renderTarget.texture.internalFormat, glFormat, glType );
+			const texture = renderTarget.texture;
+
+			const glFormat = utils.convert( texture.format );
+			const glType = utils.convert( texture.type );
+			const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
 
 			if ( isMultisample ) {
 
@@ -1011,8 +1028,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	// Set up GL resources for the render target
 	function setupRenderTarget( renderTarget ) {
 
+		const texture = renderTarget.texture;
+
 		const renderTargetProperties = properties.get( renderTarget );
-		const textureProperties = properties.get( renderTarget.texture );
+		const textureProperties = properties.get( texture );
 
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
@@ -1022,13 +1041,14 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 		const isMultisample = ( renderTarget.isWebGLMultisampleRenderTarget === true );
+		const isRenderTarget3D = texture.isDataTexture3D || texture.isDataTexture2DArray;
 		const supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
 		// Handles WebGL2 RGBFormat fallback - #18858
 
-		if ( isWebGL2 && renderTarget.texture.format === RGBFormat && ( renderTarget.texture.type === FloatType || renderTarget.texture.type === HalfFloatType ) ) {
+		if ( isWebGL2 && texture.format === RGBFormat && ( texture.type === FloatType || texture.type === HalfFloatType ) ) {
 
-			renderTarget.texture.format = RGBAFormat;
+			texture.format = RGBAFormat;
 
 			console.warn( 'THREE.WebGLRenderer: Rendering to textures with RGB format is not supported. Using RGBA format instead.' );
 
@@ -1059,9 +1079,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer );
 
-					const glFormat = utils.convert( renderTarget.texture.format );
-					const glType = utils.convert( renderTarget.texture.type );
-					const glInternalFormat = getInternalFormat( renderTarget.texture.internalFormat, glFormat, glType );
+					const glFormat = utils.convert( texture.format );
+					const glType = utils.convert( texture.type );
+					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
 					const samples = getRenderTargetSamples( renderTarget );
 					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
@@ -1094,7 +1114,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		if ( isCube ) {
 
 			state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
-			setTextureParameters( _gl.TEXTURE_CUBE_MAP, renderTarget.texture, supportsMips );
+			setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, supportsMips );
 
 			for ( let i = 0; i < 6; i ++ ) {
 
@@ -1102,9 +1122,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			if ( textureNeedsGenerateMipmaps( renderTarget.texture, supportsMips ) ) {
+			if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
-				generateMipmap( _gl.TEXTURE_CUBE_MAP, renderTarget.texture, renderTarget.width, renderTarget.height );
+				generateMipmap( _gl.TEXTURE_CUBE_MAP, texture, renderTarget.width, renderTarget.height );
 
 			}
 
@@ -1112,13 +1132,32 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else {
 
-			state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
-			setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, supportsMips );
-			setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D );
+			let glTextureType = _gl.TEXTURE_2D;
 
-			if ( textureNeedsGenerateMipmaps( renderTarget.texture, supportsMips ) ) {
+			if ( isRenderTarget3D ) {
 
-				generateMipmap( _gl.TEXTURE_2D, renderTarget.texture, renderTarget.width, renderTarget.height );
+				// Render targets containing layers, i.e: Texture 3D and 2d arrays
+
+				if ( isWebGL2 ) {
+
+					const isTexture3D = texture.isDataTexture3D;
+					glTextureType = isTexture3D ? _gl.TEXTURE_3D : _gl.TEXTURE_2D_ARRAY;
+
+				} else {
+
+					console.warn( 'THREE.DataTexture3D and THREE.DataTexture2DArray only supported with WebGL2.' );
+
+				}
+
+			}
+
+			state.bindTexture( glTextureType, textureProperties.__webglTexture );
+			setTextureParameters( glTextureType, texture, supportsMips );
+			setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, glTextureType );
+
+			if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
+
+				generateMipmap( _gl.TEXTURE_2D, texture, renderTarget.width, renderTarget.height );
 
 			}
 
@@ -1139,6 +1178,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function updateRenderTargetMipmap( renderTarget ) {
 
 		const texture = renderTarget.texture;
+
 		const supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
 		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {

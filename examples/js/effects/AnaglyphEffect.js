@@ -1,24 +1,17 @@
 THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
-	// Matrices generated with angler.js https://github.com/tschw/angler.js/
-	// (in column-major element order, as accepted by WebGL)
+	// Dubois matrices from https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.7.6968&rep=rep1&type=pdf#page=4
 
 	this.colorMatrixLeft = new THREE.Matrix3().fromArray( [
-
-		1.0671679973602295, - 0.0016435992438346148, 0.0001777536963345483, // r out
-		- 0.028107794001698494, - 0.00019593400065787137, - 0.0002875397040043026, // g out
-		- 0.04279090091586113, 0.000015809757314855233, - 0.00024287120322696865 // b out
-
+		0.456100, - 0.0400822, - 0.0152161,
+		0.500484, - 0.0378246, - 0.0205971,
+		0.176381, - 0.0157589, - 0.00546856
 	] );
 
-	//		red						green 						blue  						in
-
 	this.colorMatrixRight = new THREE.Matrix3().fromArray( [
-
-		- 0.0355340838432312, - 0.06440307199954987, 0.018319187685847282, // r out
-		- 0.10269022732973099, 0.8079727292060852, - 0.04835830628871918, // g out
-		0.0001224992738571018, - 0.009558862075209618, 0.567823588848114 // b out
-
+		- 0.0434706, 0.378476, - 0.0721527,
+		- 0.0879388, 0.73364, - 0.112961,
+		- 0.00155529, - 0.0184503, 1.2264
 	] );
 
 	var _camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );

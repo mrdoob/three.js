@@ -13,6 +13,22 @@ import {
 	eps
 } from '../math/Constants.tests';
 
+const matrixEquals4 = ( a, b ) => {
+
+	for ( let i = 0; i < 16; i ++ ) {
+
+		if ( Math.abs( a.elements[ i ] - b.elements[ i ] ) >= eps ) {
+
+			return false;
+
+		}
+
+	}
+
+	return true;
+
+};
+
 export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'Object3D', () => {
@@ -423,6 +439,63 @@ export default QUnit.module( 'Core', () => {
 			assert.strictEqual( a.children.length, 0, "All childrens were removed" );
 			assert.strictEqual( child1.parent, null, "First child has no parent" );
 			assert.strictEqual( child2.parent, null, "Second child has no parent" );
+
+		} );
+
+		QUnit.test( "attach", ( assert ) => {
+
+			const object = new Object3D();
+			const oldParent = new Object3D();
+			const newParent = new Object3D();
+			const expectedMatrixWorld = new Matrix4();
+
+			// Attach to a parent
+
+			object.position.set( 1, 2, 3 );
+			object.rotation.set( Math.PI / 2, Math.PI / 3, Math.PI / 4 );
+			object.scale.set( 2, 3, 4 );
+			newParent.position.set( 4, 5, 6 );
+			newParent.rotation.set( Math.PI / 5, Math.PI / 6, Math.PI / 7 );
+			newParent.scale.set( 5, 5, 5 );
+
+			object.updateMatrixWorld();
+			newParent.updateMatrixWorld();
+			expectedMatrixWorld.copy( object.matrixWorld );
+
+			newParent.attach( object );
+
+			assert.ok( object.parent && object.parent == newParent &&
+				oldParent.children.indexOf( object ) === - 1,
+				"object is a child of a new parent" );
+
+			assert.ok( matrixEquals4( expectedMatrixWorld, object.matrixWorld ), "object's world matrix is maintained" );
+
+			// Attach to a new parent from an old parent
+
+			object.position.set( 1, 2, 3 );
+			object.rotation.set( Math.PI / 2, Math.PI / 3, Math.PI / 4 );
+			object.scale.set( 2, 3, 4 );
+			oldParent.position.set( 4, 5, 6 );
+			oldParent.rotation.set( Math.PI / 5, Math.PI / 6, Math.PI / 7 );
+			oldParent.scale.set( 5, 5, 5 );
+			newParent.position.set( 7, 8, 9 );
+			newParent.rotation.set( Math.PI / 8, Math.PI / 9, Math.PI / 10 );
+			newParent.scale.set( 6, 6, 6 );
+
+			oldParent.add( object );
+			oldParent.updateMatrixWorld();
+			newParent.updateMatrixWorld();
+			expectedMatrixWorld.copy( object.matrixWorld );
+
+			newParent.attach( object );
+
+			assert.ok( object.parent && object.parent == newParent &&
+				newParent.children.indexOf( object ) !== - 1 &&
+				oldParent.children.indexOf( object ) === - 1,
+				"object is no longer a child of an old parent and is a child of a new parent now" );
+
+			assert.ok( matrixEquals4( expectedMatrixWorld, object.matrixWorld ),
+				"object's world matrix is maintained even it had a parent" );
 
 		} );
 

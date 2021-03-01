@@ -88,7 +88,7 @@ function ViewportInfo( editor ) {
 
 	function updateFrametime( frametime ) {
 
-		frametimeText.setValue( Number( frametime ).toFixed( 2 ) + " ms" );
+		frametimeText.setValue( Number( frametime ).toFixed( 2 ) + ' ms' );
 
 	}
 

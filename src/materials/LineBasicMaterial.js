@@ -12,44 +12,45 @@ import { Color } from '../math/Color.js';
  * }
  */
 
-function LineBasicMaterial( parameters ) {
+class LineBasicMaterial extends Material {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.type = 'LineBasicMaterial';
+		super();
 
-	this.color = new Color( 0xffffff );
+		this.type = 'LineBasicMaterial';
 
-	this.linewidth = 1;
-	this.linecap = 'round';
-	this.linejoin = 'round';
+		this.color = new Color( 0xffffff );
 
-	this.morphTargets = false;
+		this.linewidth = 1;
+		this.linecap = 'round';
+		this.linejoin = 'round';
 
-	this.setValues( parameters );
+		this.morphTargets = false;
+
+		this.setValues( parameters );
+
+	}
+
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.color.copy( source.color );
+
+		this.linewidth = source.linewidth;
+		this.linecap = source.linecap;
+		this.linejoin = source.linejoin;
+
+		this.morphTargets = source.morphTargets;
+
+		return this;
+
+	}
 
 }
 
-LineBasicMaterial.prototype = Object.create( Material.prototype );
-LineBasicMaterial.prototype.constructor = LineBasicMaterial;
-
 LineBasicMaterial.prototype.isLineBasicMaterial = true;
-
-LineBasicMaterial.prototype.copy = function ( source ) {
-
-	Material.prototype.copy.call( this, source );
-
-	this.color.copy( source.color );
-
-	this.linewidth = source.linewidth;
-	this.linecap = source.linecap;
-	this.linejoin = source.linejoin;
-
-	this.morphTargets = source.morphTargets;
-
-	return this;
-
-};
-
 
 export { LineBasicMaterial };

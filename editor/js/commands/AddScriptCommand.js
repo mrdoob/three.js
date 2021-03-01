@@ -6,21 +6,21 @@ import { Command } from '../Command.js';
  * @param script javascript object
  * @constructor
  */
-function AddScriptCommand( editor, object, script ) {
+class AddScriptCommand extends Command {
 
-	Command.call( this, editor );
+	constructor( editor, object, script ) {
 
-	this.type = 'AddScriptCommand';
-	this.name = 'Add Script';
+		super( editor );
 
-	this.object = object;
-	this.script = script;
+		this.type = 'AddScriptCommand';
+		this.name = 'Add Script';
 
-}
+		this.object = object;
+		this.script = script;
 
-AddScriptCommand.prototype = {
+	}
 
-	execute: function () {
+	execute() {
 
 		if ( this.editor.scripts[ this.object.uuid ] === undefined ) {
 
@@ -32,13 +32,13 @@ AddScriptCommand.prototype = {
 
 		this.editor.signals.scriptAdded.dispatch( this.script );
 
-	},
+	}
 
-	undo: function () {
+	undo() {
 
 		if ( this.editor.scripts[ this.object.uuid ] === undefined ) return;
 
-		var index = this.editor.scripts[ this.object.uuid ].indexOf( this.script );
+		const index = this.editor.scripts[ this.object.uuid ].indexOf( this.script );
 
 		if ( index !== - 1 ) {
 
@@ -48,28 +48,28 @@ AddScriptCommand.prototype = {
 
 		this.editor.signals.scriptRemoved.dispatch( this.script );
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var output = Command.prototype.toJSON.call( this );
+		const output = super.toJSON( this );
 
 		output.objectUuid = this.object.uuid;
 		output.script = this.script;
 
 		return output;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Command.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.script = json.script;
 		this.object = this.editor.objectByUuid( json.objectUuid );
 
 	}
 
-};
+}
 
 export { AddScriptCommand };

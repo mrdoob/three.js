@@ -2,20 +2,10 @@ import babel from '@rollup/plugin-babel';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 
-if ( String.prototype.replaceAll === undefined ) {
-
-	String.prototype.replaceAll = function ( find, replace ) {
-
-		return this.split( find ).join( replace );
-
-	};
-
-}
-
 function glconstants() {
 
 	var constants = {
-		POINTS: 0, ZERO: 0,
+		POINTS: 0, ZERO: 0, NONE: 0,
 		LINES: 1, ONE: 1,
 		LINE_LOOP: 2,
 		LINE_STRIP: 3,
@@ -70,6 +60,7 @@ function glconstants() {
 		RGBA: 6408,
 		LUMINANCE: 6409,
 		LUMINANCE_ALPHA: 6410,
+		KEEP: 7680,
 		RED_INTEGER: 36244,
 		RG: 33319,
 		RG_INTEGER: 33320,
@@ -153,6 +144,12 @@ function glconstants() {
 		MAX_FRAGMENT_UNIFORM_VECTORS: 36349,
 		UNPACK_FLIP_Y_WEBGL: 37440,
 		UNPACK_PREMULTIPLY_ALPHA_WEBGL: 37441,
+		UNPACK_COLORSPACE_CONVERSION_WEBGL: 37443,
+		UNPACK_ROW_LENGTH: 3314,
+		UNPACK_IMAGE_HEIGHT: 32878,
+		UNPACK_SKIP_PIXELS: 3316,
+		UNPACK_SKIP_ROWS: 3315,
+		UNPACK_SKIP_IMAGES: 32877,
 		MAX_SAMPLES: 36183,
 		READ_FRAMEBUFFER: 36008,
 		DRAW_FRAMEBUFFER: 36009
@@ -278,10 +275,8 @@ function polyfills() {
 			if ( filePath.endsWith( 'src/Three.js' ) || filePath.endsWith( 'src\\Three.js' ) ) {
 
 				code = 'import \'regenerator-runtime\';\n' + code;
-				code = 'import \'./polyfills\';\n' + code;
 
 			}
-
 
 			return {
 				code: code,
@@ -305,14 +300,6 @@ const babelrc = {
 				targets: '>0.3%, not dead',
 				loose: true,
 				bugfixes: true,
-			},
-		],
-	],
-	plugins: [
-		[
-			'@babel/plugin-proposal-class-properties',
-			{
-				loose: true
 			}
 		]
 	]

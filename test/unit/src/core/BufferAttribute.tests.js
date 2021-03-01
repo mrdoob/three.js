@@ -243,6 +243,18 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( "toJSON", ( assert ) => {
+
+			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3, true );
+			assert.deepEqual( attr.toJSON(), {
+				itemSize: 3,
+				type: 'Float32Array',
+				array: [ 1, 2, 3, 4, 5, 6 ],
+				normalized: true
+			}, 'Serialized to JSON as expected' );
+
+		} );
+
 		// OTHERS
 		QUnit.test( "count", ( assert ) => {
 

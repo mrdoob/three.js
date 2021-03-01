@@ -5,37 +5,37 @@ import { PerspectiveCamera } from './PerspectiveCamera.js';
 const _eyeRight = new Matrix4();
 const _eyeLeft = new Matrix4();
 
-function StereoCamera() {
+class StereoCamera {
 
-	this.type = 'StereoCamera';
+	constructor() {
 
-	this.aspect = 1;
+		this.type = 'StereoCamera';
 
-	this.eyeSep = 0.064;
+		this.aspect = 1;
 
-	this.cameraL = new PerspectiveCamera();
-	this.cameraL.layers.enable( 1 );
-	this.cameraL.matrixAutoUpdate = false;
+		this.eyeSep = 0.064;
 
-	this.cameraR = new PerspectiveCamera();
-	this.cameraR.layers.enable( 2 );
-	this.cameraR.matrixAutoUpdate = false;
+		this.cameraL = new PerspectiveCamera();
+		this.cameraL.layers.enable( 1 );
+		this.cameraL.matrixAutoUpdate = false;
 
-	this._cache = {
-		focus: null,
-		fov: null,
-		aspect: null,
-		near: null,
-		far: null,
-		zoom: null,
-		eyeSep: null
-	};
+		this.cameraR = new PerspectiveCamera();
+		this.cameraR.layers.enable( 2 );
+		this.cameraR.matrixAutoUpdate = false;
 
-}
+		this._cache = {
+			focus: null,
+			fov: null,
+			aspect: null,
+			near: null,
+			far: null,
+			zoom: null,
+			eyeSep: null
+		};
 
-Object.assign( StereoCamera.prototype, {
+	}
 
-	update: function ( camera ) {
+	update( camera ) {
 
 		const cache = this._cache;
 
@@ -94,7 +94,6 @@ Object.assign( StereoCamera.prototype, {
 
 	}
 
-} );
-
+}
 
 export { StereoCamera };

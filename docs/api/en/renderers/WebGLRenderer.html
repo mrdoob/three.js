@@ -310,6 +310,9 @@
 		<h3>[method:null copyTextureToTexture]( [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )</h3>
 		<p>Copies all pixels of a texture to an existing texture starting from the given position. Enables access to [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texSubImage2D WebGLRenderingContext.texSubImage2D].</p>
 
+		<h3>[method:null copyTextureToTexture3D]( [param:Box3 sourceBox], [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )</h3>
+		<p>Copies the pixels of a texture in the bounds '[page:Box3 sourceBox]' in the desination texture starting from the given position. Enables access to [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texSubImage3D WebGL2RenderingContext.texSubImage3D].</p>
+
 		<h3>[method:null dispose]( )</h3>
 		<p>Dispose of the current rendering context.</p>
 

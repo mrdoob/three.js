@@ -3,7 +3,6 @@ import './utils/qunit-utils.js';
 
 //src
 import './src/constants.tests';
-import './src/polyfills.tests';
 import './src/utils.tests';
 
 
