@@ -1,5 +1,5 @@
 import ContextNode from '../core/ContextNode.js';
-import { RE_Direct_BlinnPhong } from '../functions/BSDFunctions.js';
+import { RE_Direct_BlinnPhong } from '../functions/BSDFs.js';
 
 class LightContextNode extends ContextNode {
 
