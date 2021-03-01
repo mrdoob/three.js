@@ -1341,7 +1341,7 @@ function WebGLRenderer( parameters ) {
 		materialProperties.fog = scene.fog;
 		materialProperties.envMap = cubemaps.get( material.envMap || materialProperties.environment );
 
-		if ( program === undefined ) {
+		if ( programs === undefined ) {
 
 			// new material
 
