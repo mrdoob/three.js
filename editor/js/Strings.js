@@ -682,7 +682,7 @@ function Strings( config ) {
 			'menubar/edit/undo': '撤销 (Ctrl+Z)',
 			'menubar/edit/redo': '重做 (Ctrl+Shift+Z)',
 			'menubar/edit/clear_history': '清空历史记录',
-			'menubar/edit/center': 'Center',
+			'menubar/edit/center': '中心',
 			'menubar/edit/clone': '拷贝',
 			'menubar/edit/delete': '删除 (Del)',
 			'menubar/edit/fixcolormaps': '修复颜色贴图',
