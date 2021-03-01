@@ -1335,7 +1335,7 @@ function WebGLRenderer( parameters ) {
 
 		let programs = materialProperties.programs;
 
-		// always update environment and fog - changing these trigger an initMaterial call, but it's possible that the program doesn't change
+		// always update environment and fog - changing these trigger an getProgram call, but it's possible that the program doesn't change
 
 		materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 		materialProperties.fog = scene.fog;
