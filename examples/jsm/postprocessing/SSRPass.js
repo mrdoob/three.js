@@ -219,9 +219,9 @@ var SSRPass = function ( { renderer, scene, camera, width, height, selects, enco
 	}
 
 	this.ssrMaterial = new ShaderMaterial( {
-		defines: Object.assign( {
-			MAX_STEP: Math.sqrt( window.innerWidth * window.innerWidth + window.innerHeight * window.innerHeight )
-		}, SSRShader.defines ),
+		defines: Object.assign( {}, SSRShader.defines, {
+			MAX_STEP: Math.sqrt( this.width * this.width + this.height + this.height ).toFixed(1)
+		} ),
 		uniforms: UniformsUtils.clone( SSRShader.uniforms ),
 		vertexShader: SSRShader.vertexShader,
 		fragmentShader: SSRShader.fragmentShader,
