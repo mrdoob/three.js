@@ -32,7 +32,7 @@ var Reflector = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || Reflector.ReflectorShader;
-	var useDepthTexture = Boolean( options.useDepthTexture );
+	var useDepthTexture = options.useDepthTexture === true;
 	var yAxis = new Vector3(0, 1, 0);
 	var vecTemp0 = new Vector3();
 	var vecTemp1 = new Vector3();
