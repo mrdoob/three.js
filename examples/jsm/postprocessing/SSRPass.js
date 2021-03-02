@@ -382,9 +382,11 @@ SSRPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		renderer.setRenderTarget( this.beautyRenderTarget );
 		renderer.clear();
 		if ( this.groundReflector ) {
+
 			this.groundReflector.visible = false;
 			this.groundReflector.doRender( this.renderer, this.scene, this.camera );
 			this.groundReflector.visible = true;
+
 		}
 
 		renderer.render( this.scene, this.camera );
