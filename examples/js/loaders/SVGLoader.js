@@ -2498,6 +2498,7 @@ THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 
 	var geometry = new THREE.BufferGeometry();
 	geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+	geometry.setIndex( indices );
 
 
 	if ( uvs ) {
@@ -2518,14 +2519,13 @@ THREE.SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 
 	}
 
-	for ( i = groups.length - 1; i >= 0; i ++ ) {
+	for ( i = groups.length - 1; i >= 0; i -- ) {
 
 		geometry.addGroup( groups[ i ][ 0 ], groups[ i ][ 1 ], groups[ i ][ 2 ] );
 
 	}
 
 	geometry.computeVertexNormals();
-	geometry.setIndex( indices );
 
 	return geometry;
 

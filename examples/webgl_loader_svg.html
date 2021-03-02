@@ -148,6 +148,10 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xb0b0b0 );
 
+				var light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+				light.position.set( 3, 1.75, 4 );
+				scene.add( light );
+
 				//
 
 				const helper = new THREE.GridHelper( 160, 10 );
@@ -175,12 +179,13 @@
 						const fillColor = path.userData.style.fill;
 						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none' ) {
 
-							const material = new THREE.MeshBasicMaterial( {
+							const materialClass = guiData.extrudeFillShapes ? THREE.MeshLambertMaterial : THREE.MeshBasicMaterial;
+							const material = new materialClass( {
 								color: new THREE.Color().setStyle( fillColor ),
 								opacity: path.userData.style.fillOpacity,
 								transparent: path.userData.style.fillOpacity < 1,
-								side: THREE.DoubleSide,
-								depthWrite: false,
+								side: guiData.extrudeFillShapes ? THREE.FrontSide : THREE.DoubleSide,
+								depthWrite: guiData.extrudeFillShapes,
 								wireframe: guiData.fillShapesWireframe
 							} );
 
@@ -203,12 +208,13 @@
 
 						if ( guiData.drawStrokes && strokeColor !== undefined && strokeColor !== 'none' ) {
 
-							const material = new THREE.MeshBasicMaterial( {
+							const materialClass = guiData.extrudeStrokes ? THREE.MeshLambertMaterial : THREE.MeshBasicMaterial;
+							const material = new materialClass( {
 								color: new THREE.Color().setStyle( strokeColor ),
 								opacity: path.userData.style.strokeOpacity,
 								transparent: path.userData.style.strokeOpacity < 1,
-								side: THREE.DoubleSide,
-								depthWrite: false,
+								side: guiData.extrudeStrokes ? THREE.FrontSide : THREE.DoubleSide,
+								depthWrite: guiData.extrudeStrokes,
 								wireframe: guiData.strokesWireframe
 							} );
 

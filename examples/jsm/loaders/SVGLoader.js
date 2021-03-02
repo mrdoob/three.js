@@ -2458,7 +2458,7 @@ SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 	var steps = options.steps;
 	var vlen = vertices.length;
 	var flen = vlen / 3;
-	var i = 0;
+	var i;
 	var s;
 	var groups = [];
 
@@ -2510,6 +2510,7 @@ SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 
 	var geometry = new BufferGeometry();
 	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.setIndex( indices );
 
 
 	if ( uvs ) {
@@ -2530,16 +2531,13 @@ SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
 
 	}
 
-	for ( i = 0; i < groups.length; i ++ ) {
+	for ( i = groups.length - 1; i >= 0; i -- ) {
 
 		geometry.addGroup( groups[ i ][ 0 ], groups[ i ][ 1 ], groups[ i ][ 2 ] );
 
 	}
 
-	console.log( geometry.groups );
-
 	geometry.computeVertexNormals();
-	geometry.setIndex( indices );
 
 	return geometry;
 
