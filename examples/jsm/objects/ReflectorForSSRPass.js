@@ -230,7 +230,9 @@ var Reflector = function ( geometry, options ) {
 		renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
 
 		if ( renderer.autoClear === false ) renderer.clear();
+		this.visible = false;
 		renderer.render( scene, virtualCamera );
+		this.visible = true;
 
 		renderer.xr.enabled = currentXrEnabled;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
