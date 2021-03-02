@@ -78,8 +78,10 @@
 			void main() {
 
 				vec3 afwidth = fwidth( vCenter.xyz );
-				vec3 pixelsToCenter = smoothstep( thickness * afwidth, ( thickness + 1.0 ) * afwidth, vCenter.xyz );
-				float edge = 1.0 - min( min( pixelsToCenter.x, pixelsToCenter.y ), pixelsToCenter.z );
+
+				vec3 edge3 = smoothstep( thickness * afwidth, ( thickness + 1.0 ) * afwidth, vCenter.xyz );
+				
+				float edge = 1.0 - min( min( edge3.x, edge3.y ), edge3.z );
 
 				outColor.rgb = gl_FrontFacing ? vec3( 0.9, 0.9, 1.0 ) : vec3( 0.4, 0.4, 0.5 );
 				outColor.a = edge;
