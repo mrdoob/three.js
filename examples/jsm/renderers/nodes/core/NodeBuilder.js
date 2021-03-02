@@ -28,7 +28,8 @@ class NodeBuilder {
 		this.varys = [];
 		
 		this.context = {
-			'keywords': new NodeKeywords()
+			keywords: new NodeKeywords(),
+			material: material
 		};
 		
 		this.nodesData = new WeakMap();

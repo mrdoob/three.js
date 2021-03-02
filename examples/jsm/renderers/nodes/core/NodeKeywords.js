@@ -1,5 +1,6 @@
 import CodeNode from './CodeNode.js';
 import VarNode from './VarNode.js';
+import PropertyNode from './PropertyNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 import NormalNode from '../accessors/NormalNode.js';
 
@@ -22,6 +23,8 @@ class NodeKeywords {
 	static NormalLocal = 'NormalLocal';
 	static NormalWorld = 'NormalWorld';
 	static NormalView = 'NormalView';
+	
+	static MaterialDiffuseColor = 'MaterialDiffuseColor';
 
 	constructor() {
 
@@ -40,6 +43,8 @@ class NodeKeywords {
 			NodeKeywords.NormalLocal,
 			NodeKeywords.NormalWorld,
 			NodeKeywords.NormalView,
+			// vars
+			NodeKeywords.MaterialDiffuseColor
 		];
 
 		this.nodes = [];
@@ -119,7 +124,13 @@ class NodeKeywords {
 					node = new VarNode( new NormalNode( NormalNode.VIEW ), name );
 					
 					break;
+				
+				case NodeKeywords.MaterialDiffuseColor:
+				
+					node = new PropertyNode( name, 'vec4' );
 					
+					break;
+				
 			}
 			
 			if ( node !== undefined ) {
@@ -131,6 +142,36 @@ class NodeKeywords {
 		}
 		
 		return node;
+		
+	}
+	
+	parse( code ) {
+		
+		const keywordNames = this.keywords;
+		
+		const regExp = new RegExp( `\\b${keywordNames.join('\\b|\\b')}\\b`, 'g' )
+		
+		const codeKeywords = code.match( regExp );
+		
+		const keywords = [];
+		
+		if ( codeKeywords !== null ) {
+			
+			for(const keyword of codeKeywords) {
+				
+				const node = this.getNode( keyword );
+				
+				if ( keywords.indexOf( node ) === -1 ) {
+					
+					keywords.push( node );
+					
+				}
+
+			}
+			
+		}
+		
+		return keywords;
 		
 	}
 

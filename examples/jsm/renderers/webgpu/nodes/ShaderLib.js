@@ -28,23 +28,28 @@ void main() {
 
 	NODE_BODY_VARS
 
-	outColor = vec4( 1.0 );
+	MaterialDiffuseColor = vec4( 1.0 );
 
 	#ifdef NODE_COLOR
 
-		outColor = NODE_COLOR;
+		MaterialDiffuseColor = NODE_COLOR;
 
 	#endif
 
 	#ifdef NODE_OPACITY
 
-		outColor.a *= NODE_OPACITY;
+		MaterialDiffuseColor.a *= NODE_OPACITY;
 
 	#endif
 
 	#ifdef NODE_LIGHT
 
-		outColor.rgb *= NODE_LIGHT;
+		outColor.rgb = NODE_LIGHT;
+		outColor.a = MaterialDiffuseColor.a;
+
+	#else
+	
+		outColor = MaterialDiffuseColor;
 
 	#endif
 

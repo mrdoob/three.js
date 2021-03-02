@@ -93,7 +93,7 @@ float punctualLightIntensityToIrradianceFactor( float lightDistance, float cutof
 }`);
 
 export const RE_Direct_BlinnPhong = new FunctionNode(`
-vec3 RE_Direct_BlinnPhong( vec3 lightPosition, vec3 lightColor, vec3 materialDiffuseColor, vec3 materialSpecularColor, float materialSpecularShininess, float materialSpecularStrength ) {
+vec3 RE_Direct_BlinnPhong( vec3 lightPosition, vec3 lightColor, vec3 materialSpecularColor, float materialSpecularShininess, float materialSpecularStrength ) {
 
 	vec3 lVector = lightPosition - PositionView;
 	vec3 lightDirection = normalize( lVector );
@@ -115,7 +115,7 @@ vec3 RE_Direct_BlinnPhong( vec3 lightPosition, vec3 lightColor, vec3 materialDif
 
 	vec3 result = vec3( 0.0 );
 
-	result += irradiance * BRDF_Diffuse_Lambert( materialDiffuseColor );
+	result += irradiance * BRDF_Diffuse_Lambert( MaterialDiffuseColor.rgb );
 
 	result += irradiance * BRDF_Specular_BlinnPhong( lightDirection, materialSpecularColor, materialSpecularShininess ) * materialSpecularStrength;
 

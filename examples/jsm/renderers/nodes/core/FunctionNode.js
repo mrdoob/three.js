@@ -160,22 +160,12 @@ class FunctionNode extends CodeNode {
 				
 				if ( nodeData.keywords.indexOf( contextKeywords ) === -1 ) {
 					
-					const keywordNames = contextKeywords.keywords;
+					const codeKeywords = contextKeywords.parse( this.code );
 					
-					const regExp = new RegExp( `\\b${keywordNames.join('\\b|\\b')}\\b`, 'g' )
-					
-					const codeKeywords = this.code.match( regExp );
-					
-					if ( codeKeywords !== null ) {
+					for(const keywordNode of codeKeywords) {
 						
-						for(const keyword of codeKeywords) {
-							
-							const keywordNode = contextKeywords.getNode( keyword );
-							
-							// build the code
-							keywordNode.build( builder );
-							
-						}
+						// include
+						keywordNode.build( builder );
 						
 					}
 					

@@ -34,6 +34,7 @@
 			import CameraNode from './jsm/renderers/nodes/accessors/CameraNode.js';
 			import Object3DNode from './jsm/renderers/nodes/accessors/Object3DNode.js';
 			import ModelNode from './jsm/renderers/nodes/accessors/ModelNode.js';
+			//import MaterialNode from './jsm/renderers/nodes/accessors/MaterialNode.js';
 			import LightNode from './jsm/renderers/nodes/lights/LightNode.js';
 			import LightContextNode from './jsm/renderers/nodes/lights/LightContextNode.js';
 			import { rand } from './jsm/renderers/nodes/functions/MathFunctions.js';
@@ -93,9 +94,11 @@
 				*/
 
 				//materialTeapot.colorNode = new NormalNode( NormalNode.WORLD );
-				//materialTeapot.colorNode = new TextureNode( texture );
+				materialTeapot.colorNode = new TextureNode( texture );
 				//materialTeapot.colorNode = new LightContextNode( new LightNode( lightDummy ) );
+				//materialTeapot.colorNode = new MaterialNode( MaterialNode.COLOR );
 				materialTeapot.lightNode = new LightNode( lightDummy );
+				//materialTeapot.color = new THREE.Color( 0xFF00FF );
 
 				teapot = new THREE.Mesh( geometryTeapot, materialTeapot );
 				scene.add( teapot );

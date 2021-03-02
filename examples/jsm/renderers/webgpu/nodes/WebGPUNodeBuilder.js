@@ -36,7 +36,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		// get shader
 
 		this.nativeShader = ShaderLib.common;
-
+		
 		// parse inputs
 
 		if ( material.isMeshPhongMaterial || material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
@@ -288,8 +288,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		const vars = this.vars[ shaderStage ];
 
 		for ( const variable of vars ) {
-
-			snippet += `${variable.name} = ${variable.snippet}; `;
+			
+			if ( variable.snippet !== '' ) {
+			
+				snippet += `${variable.name} = ${variable.snippet}; `;
+				
+			}
 
 		}
 
@@ -350,11 +354,28 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	build() {
 
+		const keywords = this.getContextParameter( 'keywords' );
+
+		for ( const shaderStage of [ 'vertex', 'fragment' ] ) {
+
+			this.shaderStage = shaderStage;
+
+			const nativeShaderKeywords = keywords.parse( this.nativeShader.fragmentShader );
+			
+			for(const keywordNode of nativeShaderKeywords) {
+				
+				// include
+				keywordNode.build( this );
+				
+			}
+			
+		}
+		
 		super.build();
 
 		this.vertexShader = this.composeShaderCode( this.nativeShader.vertexShader, this.vertexShader );
 		this.fragmentShader = this.composeShaderCode( this.nativeShader.fragmentShader, this.fragmentShader );
-console.log( this.fragmentShader )
+console.log( this.fragmentShader );
 		return this;
 
 	}

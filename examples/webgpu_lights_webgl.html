@@ -57,7 +57,9 @@
 				const geometryTeapot = new TeapotGeometry( 1, 18 );
 				//const geometryTeapot = new THREE.SphereGeometry( 1, 32, 16 );
 				const materialTeapot = new THREE.MeshPhongMaterial();
-				materialTeapot.color = new THREE.Color( 0x333333 );
+				//materialTeapot.color = new THREE.Color( 0x333333 );
+				materialTeapot.color = new THREE.Color( 0xFFFFFF );
+				materialTeapot.map = texture;
 				materialTeapot.specular = new THREE.Color( 0x111111 );
 				materialTeapot.shininess = 30;
 
