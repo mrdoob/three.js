@@ -1378,6 +1378,8 @@ const ImageUtils = {
 
 		if ( canvas.width > 2048 || canvas.height > 2048 ) {
 
+			console.warn( 'THREE.ImageUtils.getDataURL: Image converted to jpg for performance reasons', image );
+
 			return canvas.toDataURL( 'image/jpeg', 0.6 );
 
 		} else {
@@ -7893,6 +7895,7 @@ function Material() {
 	this.dithering = false;
 
 	this.alphaTest = 0;
+	this.alphaToCoverage = false;
 	this.premultipliedAlpha = false;
 
 	this.visible = true;
@@ -8132,6 +8135,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.dithering === true ) data.dithering = true;
 
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
+		if ( this.alphaToCoverage === true ) data.alphaToCoverage = this.alphaToCoverage;
 		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
@@ -8255,6 +8259,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.dithering = source.dithering;
 
 		this.alphaTest = source.alphaTest;
+		this.alphaToCoverage = source.alphaToCoverage;
 		this.premultipliedAlpha = source.premultipliedAlpha;
 
 		this.visible = source.visible;
@@ -19700,6 +19705,10 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
+		material.alphaToCoverage === true
+			? enable( 32926 )
+			: disable( 32926 );
+
 	}
 
 	//
@@ -19943,6 +19952,7 @@ function WebGLState( gl, extensions, capabilities ) {
 		gl.disable( 32823 );
 		gl.disable( 3089 );
 		gl.disable( 2960 );
+		gl.disable( 32926 );
 
 		gl.blendEquation( 32774 );
 		gl.blendFunc( 1, 0 );
@@ -21698,6 +21708,19 @@ Object.assign( WebXRController.prototype, {
 
 		if ( inputSource && frame.session.visibilityState !== 'visible-blurred' ) {
 
+			if ( targetRay !== null ) {
+
+				inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
+
+				if ( inputPose !== null ) {
+
+					targetRay.matrix.fromArray( inputPose.transform.matrix );
+					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+
+				}
+
+			}
+
 			if ( hand && inputSource.hand ) {
 
 				handPose = true;
@@ -21764,19 +21787,6 @@ Object.assign( WebXRController.prototype, {
 				}
 
 			} else {
-
-				if ( targetRay !== null ) {
-
-					inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
-
-					if ( inputPose !== null ) {
-
-						targetRay.matrix.fromArray( inputPose.transform.matrix );
-						targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
-
-					}
-
-				}
 
 				if ( grip !== null && inputSource.gripSpace ) {
 
@@ -34921,6 +34931,12 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 			}
 
+			if ( texData.generateMipmaps !== undefined ) {
+
+				texture.generateMipmaps = texData.generateMipmaps;
+
+			}
+
 			texture.needsUpdate = true;
 
 			if ( onLoad ) onLoad( texture, texData );
@@ -38006,6 +38022,9 @@ class MaterialLoader extends Loader {
 		if ( json.morphTargets !== undefined ) material.morphTargets = json.morphTargets;
 		if ( json.morphNormals !== undefined ) material.morphNormals = json.morphNormals;
 		if ( json.dithering !== undefined ) material.dithering = json.dithering;
+
+		if ( json.alphaToCoverage !== undefined ) material.alphaToCoverage = json.alphaToCoverage;
+		if ( json.premultipliedAlpha !== undefined ) material.premultipliedAlpha = json.premultipliedAlpha;
 
 		if ( json.vertexTangents !== undefined ) material.vertexTangents = json.vertexTangents;
 

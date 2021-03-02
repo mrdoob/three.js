@@ -1930,6 +1930,7 @@
 			}
 
 			if (canvas.width > 2048 || canvas.height > 2048) {
+				console.warn('THREE.ImageUtils.getDataURL: Image converted to jpg for performance reasons', image);
 				return canvas.toDataURL('image/jpeg', 0.6);
 			} else {
 				return canvas.toDataURL('image/png');
@@ -7087,6 +7088,7 @@
 		this.polygonOffsetUnits = 0;
 		this.dithering = false;
 		this.alphaTest = 0;
+		this.alphaToCoverage = false;
 		this.premultipliedAlpha = false;
 		this.visible = true;
 		this.toneMapped = true;
@@ -7260,6 +7262,7 @@
 			if (this.scale !== undefined) data.scale = this.scale;
 			if (this.dithering === true) data.dithering = true;
 			if (this.alphaTest > 0) data.alphaTest = this.alphaTest;
+			if (this.alphaToCoverage === true) data.alphaToCoverage = this.alphaToCoverage;
 			if (this.premultipliedAlpha === true) data.premultipliedAlpha = this.premultipliedAlpha;
 			if (this.wireframe === true) data.wireframe = this.wireframe;
 			if (this.wireframeLinewidth > 1) data.wireframeLinewidth = this.wireframeLinewidth;
@@ -7345,6 +7348,7 @@
 			this.polygonOffsetUnits = source.polygonOffsetUnits;
 			this.dithering = source.dithering;
 			this.alphaTest = source.alphaTest;
+			this.alphaToCoverage = source.alphaToCoverage;
 			this.premultipliedAlpha = source.premultipliedAlpha;
 			this.visible = source.visible;
 			this.toneMapped = source.toneMapped;
@@ -15989,6 +15993,7 @@
 			}
 
 			setPolygonOffset(material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits);
+			material.alphaToCoverage === true ? enable(32926) : disable(32926);
 		} //
 
 
@@ -16143,6 +16148,7 @@
 			gl.disable(32823);
 			gl.disable(3089);
 			gl.disable(2960);
+			gl.disable(32926);
 			gl.blendEquation(32774);
 			gl.blendFunc(1, 0);
 			gl.blendFuncSeparate(1, 0, 1, 0);
@@ -17346,6 +17352,15 @@
 			var hand = this._hand;
 
 			if (inputSource && frame.session.visibilityState !== 'visible-blurred') {
+				if (targetRay !== null) {
+					inputPose = frame.getPose(inputSource.targetRaySpace, referenceSpace);
+
+					if (inputPose !== null) {
+						targetRay.matrix.fromArray(inputPose.transform.matrix);
+						targetRay.matrix.decompose(targetRay.position, targetRay.rotation, targetRay.scale);
+					}
+				}
+
 				if (hand && inputSource.hand) {
 					handPose = true;
 
@@ -17400,15 +17415,6 @@
 						});
 					}
 				} else {
-					if (targetRay !== null) {
-						inputPose = frame.getPose(inputSource.targetRaySpace, referenceSpace);
-
-						if (inputPose !== null) {
-							targetRay.matrix.fromArray(inputPose.transform.matrix);
-							targetRay.matrix.decompose(targetRay.position, targetRay.rotation, targetRay.scale);
-						}
-					}
-
 					if (grip !== null && inputSource.gripSpace) {
 						gripPose = frame.getPose(inputSource.gripSpace, referenceSpace);
 
@@ -27350,6 +27356,10 @@
 					texture.minFilter = LinearFilter;
 				}
 
+				if (texData.generateMipmaps !== undefined) {
+					texture.generateMipmaps = texData.generateMipmaps;
+				}
+
 				texture.needsUpdate = true;
 				if (onLoad) onLoad(texture, texData);
 			}, onProgress, onError);
@@ -30026,6 +30036,8 @@
 			if (json.morphTargets !== undefined) material.morphTargets = json.morphTargets;
 			if (json.morphNormals !== undefined) material.morphNormals = json.morphNormals;
 			if (json.dithering !== undefined) material.dithering = json.dithering;
+			if (json.alphaToCoverage !== undefined) material.alphaToCoverage = json.alphaToCoverage;
+			if (json.premultipliedAlpha !== undefined) material.premultipliedAlpha = json.premultipliedAlpha;
 			if (json.vertexTangents !== undefined) material.vertexTangents = json.vertexTangents;
 			if (json.visible !== undefined) material.visible = json.visible;
 			if (json.toneMapped !== undefined) material.toneMapped = json.toneMapped;
