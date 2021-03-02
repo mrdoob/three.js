@@ -3,18 +3,15 @@ import { RE_Direct_BlinnPhong } from '../functions/BSDFs.js';
 
 class LightContextNode extends ContextNode {
 
-	constructor( node, material = null ) {
+	constructor( node ) {
 
 		super( node );
-		
-		this.material = material;
 		
 	}
 
 	generate( builder, output ) {
-
-		// use an alternative material if exist
-		const material = this.material !== null ? this.material : builder.material;
+		
+		const material = builder.material;
 
 		let RE_Direct = null;
 		
