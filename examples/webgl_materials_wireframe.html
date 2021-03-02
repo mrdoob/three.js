@@ -75,18 +75,13 @@
 			in vec3 vCenter;
 			out vec4 outColor;
 
-			float aastep( float threshold, float dist ) {
-
-				float afwidth = fwidth( dist ) * 0.5;
-				return smoothstep( threshold - afwidth, threshold + afwidth, dist );
-
-			}
-
 			void main() {
 
-				float d = min( min( vCenter.x, vCenter.y ), vCenter.z );
+				vec3 afwidth = fwidth( vCenter.xyz );
 
-				float edge = 1.0 - aastep( thickness, d );
+				vec3 edge3 = smoothstep( thickness * afwidth, ( thickness + 1.0 ) * afwidth, vCenter.xyz );
+				
+				float edge = 1.0 - min( min( edge3.x, edge3.y ), edge3.z );
 
 				outColor.rgb = gl_FrontFacing ? vec3( 0.9, 0.9, 1.0 ) : vec3( 0.4, 0.4, 0.5 );
 				outColor.a = edge;
@@ -196,7 +191,7 @@
 				gui.add( API, 'thickness', 0.4, 4 ).onChange( function () {
 
 					mesh2.material.uniforms.thickness.value = API.thickness;
-					mesh3.material.uniforms.thickness.value = API.thickness * 0.01;
+					mesh3.material.uniforms.thickness.value = API.thickness;
 
 				} );
 
