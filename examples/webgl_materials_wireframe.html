@@ -164,7 +164,7 @@
 
 					const material3 = new THREE.ShaderMaterial( {
 
-						uniforms: { 'thickness': { value: API.thickness * 0.01 } },
+						uniforms: { 'thickness': { value: API.thickness } },
 						vertexShader: document.getElementById( 'vertexShaderATC' ).textContent,
 						fragmentShader: document.getElementById( 'fragmentShaderATC' ).textContent,
 						side: THREE.DoubleSide,
