@@ -171,6 +171,7 @@
 					group.position.x = - 70;
 					group.position.y = 70;
 					group.scale.y *= - 1;
+					let zOffset = 0;
 
 					for ( let i = 0; i < paths.length; i ++ ) {
 
@@ -197,7 +198,8 @@
 
 								const geometry = guiData.extrudeFillShapes ? new THREE.ExtrudeBufferGeometry( shape, extrudeSettings ) : new THREE.ShapeGeometry( shape );
 								const mesh = new THREE.Mesh( geometry, material );
-
+								if(guiData.extrudeFillShapes)
+									mesh.position.z += zOffset++ * 0.01;
 								group.add( mesh );
 
 							}
@@ -227,6 +229,8 @@
 								if ( geometry ) {
 
 									const mesh = new THREE.Mesh( geometry, material );
+									if(guiData.extrudeStrokes)
+										mesh.position.z += zOffset++ * 0.01;
 
 									group.add( mesh );
 
