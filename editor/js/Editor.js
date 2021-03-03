@@ -74,6 +74,8 @@ function Editor() {
 		materialRemoved: new Signal(),
 
 		textureAdded: new Signal(),
+		textureChanged: new Signal(),
+		textureRemoved: new Signal(),
 
 		scriptAdded: new Signal(),
 		scriptChanged: new Signal(),

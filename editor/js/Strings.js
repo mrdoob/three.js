@@ -91,6 +91,9 @@ function Strings( config ) {
 			'sidebar/properties/material': 'Material',
 			'sidebar/properties/script': 'Script',
 
+			'sidebar/assets/textures': 'Textures',
+			'sidebar/assets/materials': 'Materials',
+
 			'sidebar/object/type': 'Type',
 			'sidebar/object/new': 'New',
 			'sidebar/object/uuid': 'UUID',
@@ -299,6 +302,7 @@ function Strings( config ) {
 			'sidebar/project/physicallyCorrectLights': 'Physical lights',
 			'sidebar/project/toneMapping': 'Tone mapping',
 			'sidebar/project/materials': 'Materials',
+			'sidebar/project/textures': 'Textures',
 			'sidebar/project/Assign': 'Assign',
 
 			'sidebar/settings': 'Settings',
