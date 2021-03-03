@@ -43,20 +43,20 @@
 			import { CopyShader } from './jsm/shaders/CopyShader.js';
 			import { WEBGL } from './jsm/WebGL.js';
 
-			if ( WEBGL.isWebGL2Available() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
-
-			}
-
 			let camera, renderer, clock, group, container;
 
 			let composer1, composer2;
 
 			init();
-			animate();
 
 			function init() {
+
+				if ( WEBGL.isWebGL2Available() === false ) {
+
+					document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+					return;
+
+				}
 
 				container = document.getElementById( 'container' );
 
@@ -139,6 +139,8 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				animate();
 
 			}
 
