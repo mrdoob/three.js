@@ -9538,7 +9538,7 @@
 
 			var face = {
 				a: a,
-				b: a,
+				b: b,
 				c: c,
 				normal: new Vector3(),
 				materialIndex: 0
