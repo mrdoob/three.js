@@ -1424,6 +1424,7 @@ function WebGLRenderer( parameters ) {
 		const progUniforms = program.getUniforms();
 		const uniformsList = WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
 
+		materialProperties.currentProgram = program;
 		materialProperties.uniformsList = uniformsList;
 
 		return program;
@@ -1524,7 +1525,6 @@ function WebGLRenderer( parameters ) {
 		if ( needsProgramChange === true ) {
 
 			program = getProgram( material, scene, object );
-			materialProperties.currentProgram = program;
 
 		}
 
