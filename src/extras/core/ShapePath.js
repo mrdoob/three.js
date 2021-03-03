@@ -1,9 +1,7 @@
 import { Color } from '../../math/Color.js';
-import { Vector2 } from '../../math/Vector2.js';
 import { Path } from './Path.js';
 import { Shape } from './Shape.js';
 import { ShapeUtils } from '../ShapeUtils.js';
-import { Box2 } from '../../../build/three.module.js';
 
 class ShapePath {
 
