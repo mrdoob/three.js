@@ -220,7 +220,7 @@ THREE.MMDAnimationHelper = ( function () {
 			mesh.updateMatrixWorld( true );
 
 			// PMX animation system special path
-			if ( this.configuration.pmxAnimation && 
+			if ( this.configuration.pmxAnimation &&
 				mesh.geometry.userData.MMD && mesh.geometry.userData.MMD.format === 'pmx' ) {
 
 				var sortedBonesData = this._sortBoneDataArray( mesh.geometry.userData.MMD.bones.slice() );
@@ -660,7 +660,7 @@ THREE.MMDAnimationHelper = ( function () {
 				grantResultMap.set( boneIndex, quaternion.copy( bone.quaternion ) );
 
 				// @TODO: Support global grant and grant position
-				if ( grantSolver && boneData.grant && 
+				if ( grantSolver && boneData.grant &&
 					! boneData.grant.isLocal && boneData.grant.affectRotation ) {
 
 					var parentIndex = boneData.grant.parentIndex;
@@ -679,7 +679,7 @@ THREE.MMDAnimationHelper = ( function () {
 				if ( ikSolver && boneData.ik ) {
 
 					// @TODO: Updating world matrices every time solving an IK bone is
-					// costly. Optimize if possible. 
+					// costly. Optimize if possible.
 					mesh.updateMatrixWorld( true );
 					ikSolver.updateOne( boneData.ik );
 
@@ -1209,7 +1209,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 		addGrantRotation: function () {
 
-			var quaternion = new Quaternion();
+			var quaternion = new THREE.Quaternion();
 
 			return function ( bone, q, ratio ) {
 
