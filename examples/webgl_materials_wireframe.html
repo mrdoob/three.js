@@ -151,6 +151,7 @@
 						side: THREE.DoubleSide
 
 					} );
+					material2.extensions.derivatives = true;
 
 					mesh2 = new THREE.Mesh( geometry, material2 );
 					mesh2.position.set( 0, 0, 0 );
@@ -168,6 +169,7 @@
 						alphaToCoverage: true // only works when WebGLRenderer's "antialias" is set to "true"
 
 					} );
+					material3.extensions.derivatives = true;
 
 					mesh3 = new THREE.Mesh( geometry, material3 );
 					mesh3.position.set( 60, 0, 0 );
