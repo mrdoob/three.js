@@ -15,13 +15,13 @@ class Camera extends Object3D {
 		this.projectionMatrix = new Matrix4();
 		this.projectionMatrixInverse = new Matrix4();
 
+		this.isCamera = true;
+
 	}
 
-	isCamera = true
+	copy( source, recursive ) {
 
-	copy ( source, recursive ) {
-
-		super.copy(source, recursive );
+		super.copy( source, recursive );
 
 		this.matrixWorldInverse.copy( source.matrixWorldInverse );
 
@@ -32,7 +32,7 @@ class Camera extends Object3D {
 
 	}
 
-	getWorldDirection ( target ) {
+	getWorldDirection( target ) {
 
 		if ( target === undefined ) {
 
@@ -49,7 +49,7 @@ class Camera extends Object3D {
 
 	}
 
-	updateMatrixWorld ( force ) {
+	updateMatrixWorld( force ) {
 
 		super.updateMatrixWorld( force );
 
@@ -57,7 +57,7 @@ class Camera extends Object3D {
 
 	}
 
-	updateWorldMatrix ( updateParents, updateChildren ) {
+	updateWorldMatrix( updateParents, updateChildren ) {
 
 		super.updateWorldMatrix( updateParents, updateChildren );
 
@@ -65,7 +65,7 @@ class Camera extends Object3D {
 
 	}
 
-	clone () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
