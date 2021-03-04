@@ -22,15 +22,15 @@ function SidebarProjectTextures( editor ) {
 
 	// Signals
 
-	function refreshMaterialBrowserUI() {
+	function refreshTextureBrowserUI() {
 
-		listbox.setItems( Object.values( editor.materials ) );
+		listbox.setItems( Object.values( editor.textures ) );
 
 	}
 
-	signals.textureAdded.add( refreshMaterialBrowserUI );
-	signals.textureChanged.add( refreshMaterialBrowserUI );
-	signals.textureRemoved.add( refreshMaterialBrowserUI );
+	signals.textureAdded.add( refreshTextureBrowserUI );
+	signals.textureChanged.add( refreshTextureBrowserUI );
+	signals.textureRemoved.add( refreshTextureBrowserUI );
 
 	return container;
 
