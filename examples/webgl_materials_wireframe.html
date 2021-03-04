@@ -13,8 +13,8 @@
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
-			in vec3 center;
-			out vec3 vCenter;
+			attribute vec3 center;
+			varying vec3 vCenter;
 
 			void main() {
 
@@ -30,8 +30,7 @@
 
 			uniform float thickness;
 
-			in vec3 vCenter;
-			out vec4 outColor;
+			varying vec3 vCenter;
 
 			float edgeFactorTri() {
 
@@ -47,7 +46,7 @@
 
 				if ( edgeFactorTri() > 0.99 ) discard;
 
-				outColor = gl_FrontFacing ? vec4( 0.9, 0.9, 1.0, 1.0 ) : vec4( 0.4, 0.4, 0.5, 1.0 );
+				gl_FragColor = gl_FrontFacing ? vec4( 0.9, 0.9, 1.0, 1.0 ) : vec4( 0.4, 0.4, 0.5, 1.0 );
 
 			}
 
@@ -55,8 +54,8 @@
 
 		<script type="x-shader/x-vertex" id="vertexShaderATC">
 
-			in vec3 center;
-			out vec3 vCenter;
+			attribute vec3 center;
+			varying vec3 vCenter;
 
 			void main() {
 
@@ -72,19 +71,18 @@
 
 			uniform float thickness;
 
-			in vec3 vCenter;
-			out vec4 outColor;
+			varying vec3 vCenter;
 
 			void main() {
 
 				vec3 afwidth = fwidth( vCenter.xyz );
 
 				vec3 edge3 = smoothstep( thickness * afwidth, ( thickness + 1.0 ) * afwidth, vCenter.xyz );
-				
+
 				float edge = 1.0 - min( min( edge3.x, edge3.y ), edge3.z );
 
-				outColor.rgb = gl_FrontFacing ? vec3( 0.9, 0.9, 1.0 ) : vec3( 0.4, 0.4, 0.5 );
-				outColor.a = edge;
+				gl_FragColor.rgb = gl_FrontFacing ? vec3( 0.9, 0.9, 1.0 ) : vec3( 0.4, 0.4, 0.5 );
+				gl_FragColor.a = edge;
 
 			}
 
@@ -150,10 +148,10 @@
 						uniforms: { 'thickness': { value: API.thickness } },
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,
 						fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-						side: THREE.DoubleSide,
-						glslVersion: THREE.GLSL3
+						side: THREE.DoubleSide
 
 					} );
+					material2.extensions.derivatives = true;
 
 					mesh2 = new THREE.Mesh( geometry, material2 );
 					mesh2.position.set( 0, 0, 0 );
@@ -168,10 +166,10 @@
 						vertexShader: document.getElementById( 'vertexShaderATC' ).textContent,
 						fragmentShader: document.getElementById( 'fragmentShaderATC' ).textContent,
 						side: THREE.DoubleSide,
-						glslVersion: THREE.GLSL3,
 						alphaToCoverage: true // only works when WebGLRenderer's "antialias" is set to "true"
 
 					} );
+					material3.extensions.derivatives = true;
 
 					mesh3 = new THREE.Mesh( geometry, material3 );
 					mesh3.position.set( 60, 0, 0 );
