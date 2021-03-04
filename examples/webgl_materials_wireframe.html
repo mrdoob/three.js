@@ -36,7 +36,7 @@
 
 				vec3 afwidth = fwidth( vCenter.xyz );
 
-				vec3 edge3 = smoothstep( thickness * afwidth, ( thickness + 1.0 ) * afwidth, vCenter.xyz );
+				vec3 edge3 = smoothstep( ( thickness - 1.0 ) * afwidth, thickness * afwidth, vCenter.xyz );
 
 				float edge = 1.0 - min( min( edge3.x, edge3.y ), edge3.z );
 
@@ -128,7 +128,7 @@
 
 				const gui = new GUI();
 
-				gui.add( API, 'thickness', 0.4, 4 ).onChange( function () {
+				gui.add( API, 'thickness', 0, 4 ).onChange( function () {
 
 					mesh2.material.uniforms.thickness.value = API.thickness;
 
