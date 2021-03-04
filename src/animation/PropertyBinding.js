@@ -34,18 +34,18 @@ const _trackRe = new RegExp( ''
 
 const _supportedObjectNames = [ 'material', 'materials', 'bones' ];
 
-function Composite( targetGroup, path, optionalParsedPath ) {
+class Composite {
 
-	const parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
+	constructor ( targetGroup, path, optionalParsedPath ) {
 
-	this._targetGroup = targetGroup;
-	this._bindings = targetGroup.subscribe_( path, parsedPath );
+		const parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
 
-}
+		this._targetGroup = targetGroup;
+		this._bindings = targetGroup.subscribe_( path, parsedPath );
 
-Object.assign( Composite.prototype, {
+	}
 
-	getValue: function ( array, offset ) {
+	getValue ( array, offset ) {
 
 		this.bind(); // bind all binding
 
@@ -55,9 +55,9 @@ Object.assign( Composite.prototype, {
 		// and only call .getValue on the first
 		if ( binding !== undefined ) binding.getValue( array, offset );
 
-	},
+	}
 
-	setValue: function ( array, offset ) {
+	setValue ( array, offset ) {
 
 		const bindings = this._bindings;
 
@@ -67,9 +67,9 @@ Object.assign( Composite.prototype, {
 
 		}
 
-	},
+	}
 
-	bind: function () {
+	bind () {
 
 		const bindings = this._bindings;
 
@@ -79,9 +79,9 @@ Object.assign( Composite.prototype, {
 
 		}
 
-	},
+	}
 
-	unbind: function () {
+	unbind () {
 
 		const bindings = this._bindings;
 
@@ -93,25 +93,24 @@ Object.assign( Composite.prototype, {
 
 	}
 
-} );
-
-
-function PropertyBinding( rootNode, path, parsedPath ) {
-
-	this.path = path;
-	this.parsedPath = parsedPath || PropertyBinding.parseTrackName( path );
-
-	this.node = PropertyBinding.findNode( rootNode, this.parsedPath.nodeName ) || rootNode;
-
-	this.rootNode = rootNode;
-
 }
 
-Object.assign( PropertyBinding, {
+class PropertyBinding {
 
-	Composite: Composite,
+	constructor( rootNode, path, parsedPath ) {
 
-	create: function ( root, path, parsedPath ) {
+		this.path = path;
+		this.parsedPath = parsedPath || PropertyBinding.parseTrackName( path );
+
+		this.node = PropertyBinding.findNode( rootNode, this.parsedPath.nodeName ) || rootNode;
+
+		this.rootNode = rootNode;
+
+	}
+
+	Composite = Composite
+
+	create ( root, path, parsedPath ) {
 
 		if ( ! ( root && root.isAnimationObjectGroup ) ) {
 
@@ -123,7 +122,7 @@ Object.assign( PropertyBinding, {
 
 		}
 
-	},
+	}
 
 	/**
 	 * Replaces spaces with underscores and removes unsupported characters from
@@ -132,13 +131,13 @@ Object.assign( PropertyBinding, {
 	 * @param {string} name Node name to be sanitized.
 	 * @return {string}
 	 */
-	sanitizeNodeName: function ( name ) {
+	sanitizeNodeName ( name ) {
 
 		return name.replace( /\s/g, '_' ).replace( _reservedRe, '' );
 
-	},
+	}
 
-	parseTrackName: function ( trackName ) {
+	parseTrackName ( trackName ) {
 
 		const matches = _trackRe.exec( trackName );
 
@@ -184,9 +183,9 @@ Object.assign( PropertyBinding, {
 
 		return results;
 
-	},
+	}
 
-	findNode: function ( root, nodeName ) {
+	findNode ( root, nodeName ) {
 
 		if ( ! nodeName || nodeName === '' || nodeName === '.' || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
 
@@ -246,28 +245,24 @@ Object.assign( PropertyBinding, {
 
 	}
 
-} );
-
-Object.assign( PropertyBinding.prototype, { // prototype, continued
-
 	// these are used to "bind" a nonexistent property
-	_getValue_unavailable: function () {},
-	_setValue_unavailable: function () {},
+	_getValue_unavailable () {}
+	_setValue_unavailable () {}
 
-	BindingType: {
+	BindingType = {
 		Direct: 0,
 		EntireArray: 1,
 		ArrayElement: 2,
 		HasFromToArray: 3
-	},
+	}
 
-	Versioning: {
+	Versioning = {
 		None: 0,
 		NeedsUpdate: 1,
 		MatrixWorldNeedsUpdate: 2
-	},
+	}
 
-	GetterByBindingType: [
+	GetterByBindingType = [
 
 		function getValue_direct( buffer, offset ) {
 
@@ -299,9 +294,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 		}
 
-	],
+	]
 
-	SetterByBindingTypeAndVersioning: [
+	SetterByBindingTypeAndVersioning = [
 
 		[
 			// Direct
@@ -420,9 +415,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 		]
 
-	],
+	]
 
-	getValue: function getValue_unbound( targetArray, offset ) {
+	getValue( targetArray, offset ) {
 
 		this.bind();
 		this.getValue( targetArray, offset );
@@ -433,17 +428,17 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		// the bound state. When the property is not found, the methods
 		// become no-ops.
 
-	},
+	}
 
-	setValue: function getValue_unbound( sourceArray, offset ) {
+	setValue ( sourceArray, offset ) {
 
 		this.bind();
 		this.setValue( sourceArray, offset );
 
-	},
+	}
 
 	// create getter / setter pair for a property in the scene graph
-	bind: function () {
+	bind () {
 
 		let targetObject = this.node;
 		const parsedPath = this.parsedPath;
@@ -657,9 +652,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		this.getValue = this.GetterByBindingType[ bindingType ];
 		this.setValue = this.SetterByBindingTypeAndVersioning[ bindingType ][ versioning ];
 
-	},
+	}
 
-	unbind: function () {
+	unbind () {
 
 		this.node = null;
 
@@ -670,7 +665,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 	}
 
-} );
+}
 
 // DECLARE ALIAS AFTER assign prototype
 Object.assign( PropertyBinding.prototype, {
