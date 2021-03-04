@@ -61,6 +61,7 @@ class UITexture extends UISpan {
 
 						hdrTexture.sourceFile = file.name;
 						hdrTexture.isHDRTexture = true;
+						hdrTexture.name = file.name;
 
 						scope.setValue( hdrTexture );
 
@@ -80,6 +81,7 @@ class UITexture extends UISpan {
 
 					const texture = new THREE.CanvasTexture( canvas, mapping );
 					texture.sourceFile = file.name;
+					texture.name = file.name;
 
 					scope.setValue( texture );
 
@@ -98,6 +100,7 @@ class UITexture extends UISpan {
 
 						const texture = new THREE.Texture( this, mapping );
 						texture.sourceFile = file.name;
+						texture.name = file.name;
 						texture.format = file.type === 'image/jpeg' ? THREE.RGBFormat : THREE.RGBAFormat;
 						texture.needsUpdate = true;
 
