@@ -146,7 +146,8 @@ controls.keys = {
 	RIGHT: 'ArrowRight', // right arrow
 	BOTTOM: 'ArrowDown' // down arrow
 }
-			 </code>请参阅[link:https://developer.mozilla.org/zh-CN/docs/Web/API/KeyboardEvent/code this page]来了解更多 KeyboardEvent.code 相关知识。
+			 </code>由于 [link:https://developer.mozilla.org/zh-CN/docs/Web/API/KeyboardEvent/keyCode KeyboardEvent.keyCode] 已经被废弃，所以我们使用 [link:https://developer.mozilla.org/zh-CN/docs/Web/API/KeyboardEvent/code KeyboardEvent.code]。
+注意：IE 浏览器并不支持 KeyboardEvent.code。
 		</p>
 
 		<h3>[property:Float maxAzimuthAngle]</h3>
