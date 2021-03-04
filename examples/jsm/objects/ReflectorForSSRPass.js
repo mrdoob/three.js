@@ -18,11 +18,11 @@ import {
 	NearestFilter
 } from '../../../build/three.module.js';
 
-var Reflector = function ( geometry, options ) {
+var ReflectorForSSRPass = function ( geometry, options ) {
 
 	Mesh.call( this, geometry );
 
-	this.type = 'Reflector';
+	this.type = 'ReflectorForSSRPass';
 
 	var scope = this;
 
@@ -32,7 +32,7 @@ var Reflector = function ( geometry, options ) {
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
-	var shader = options.shader || Reflector.ReflectorShader;
+	var shader = options.shader || ReflectorForSSRPass.ReflectorShader;
 	var useDepthTexture = options.useDepthTexture === true;
 	var yAxis = new Vector3(0, 1, 0);
 	var vecTemp0 = new Vector3();
@@ -41,12 +41,12 @@ var Reflector = function ( geometry, options ) {
 	//
 
 	scope.needsUpdate = false;
-	scope.maxDistance = Reflector.ReflectorShader.uniforms.maxDistance.value
-	scope.opacity = Reflector.ReflectorShader.uniforms.opacity.value
+	scope.maxDistance = ReflectorForSSRPass.ReflectorShader.uniforms.maxDistance.value
+	scope.opacity = ReflectorForSSRPass.ReflectorShader.uniforms.opacity.value
 	scope.worldYBias = options.worldYBias || 0;
 	scope.resolution = options.resolution || new Vector2( window.innerWidth, window.innerHeight );
 
-	scope._isDistanceAttenuation = Reflector.ReflectorShader.defines.isDistanceAttenuation
+	scope._isDistanceAttenuation = ReflectorForSSRPass.ReflectorShader.defines.isDistanceAttenuation
 	Object.defineProperty(scope, 'isDistanceAttenuation', {
 		get() {
 			return scope._isDistanceAttenuation
@@ -59,7 +59,7 @@ var Reflector = function ( geometry, options ) {
 		}
 	})
 
-	scope._isFresnel = Reflector.ReflectorShader.defines.isFresnel
+	scope._isFresnel = ReflectorForSSRPass.ReflectorShader.defines.isFresnel
 	Object.defineProperty(scope, 'isFresnel', {
 		get() {
 			return scope._isFresnel
@@ -111,7 +111,7 @@ var Reflector = function ( geometry, options ) {
 
 	var material = new ShaderMaterial( {
 		transparent: useDepthTexture,
-		defines: Object.assign( {}, Reflector.ReflectorShader.defines, {
+		defines: Object.assign( {}, ReflectorForSSRPass.ReflectorShader.defines, {
 			useDepthTexture
 		} ),
 		uniforms: UniformsUtils.clone( shader.uniforms ),
@@ -136,8 +136,7 @@ var Reflector = function ( geometry, options ) {
 
 		vecTemp0.copy(camera.position).normalize();
 		vecTemp1.copy(vecTemp0).reflect(yAxis);
-		material.uniforms[ 'fresnel' ].value = (vecTemp0.dot( vecTemp1 ) + 1.) / 2.; ///todo: Also need to use glsl viewPosition and viewNormal per pixel.
-		// console.log(material.uniforms['fresnel'].value)
+		material.uniforms[ 'fresnel' ].value = (vecTemp0.dot( vecTemp1 ) + 1.) / 2.; // TODO: Also need to use glsl viewPosition and viewNormal per pixel.
 
 		reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
@@ -195,29 +194,32 @@ var Reflector = function ( geometry, options ) {
 		textureMatrix.multiply( virtualCamera.matrixWorldInverse );
 		textureMatrix.multiply( scope.matrixWorld );
 
-		///todo:
-		// // Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
-		// // Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
-		// reflectorPlane.setFromNormalAndCoplanarPoint( normal, reflectorWorldPosition );
-		// reflectorPlane.applyMatrix4( virtualCamera.matrixWorldInverse );
+		/* Note: For the sake of accurate tDepth, temporarily turned off this Oblique Near-Plane Clipping feature. https://github.com/mrdoob/three.js/pull/21403
 
-		// clipPlane.set( reflectorPlane.normal.x, reflectorPlane.normal.y, reflectorPlane.normal.z, reflectorPlane.constant );
+			// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
+			// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
+			reflectorPlane.setFromNormalAndCoplanarPoint( normal, reflectorWorldPosition );
+			reflectorPlane.applyMatrix4( virtualCamera.matrixWorldInverse );
 
-		// var projectionMatrix = virtualCamera.projectionMatrix;
+			clipPlane.set( reflectorPlane.normal.x, reflectorPlane.normal.y, reflectorPlane.normal.z, reflectorPlane.constant );
 
-		// q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
-		// q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
-		// q.z = - 1.0;
-		// q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
+			var projectionMatrix = virtualCamera.projectionMatrix;
 
-		// // Calculate the scaled plane vector
-		// clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
+			q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
+			q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
+			q.z = - 1.0;
+			q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
 
-		// // Replacing the third row of the projection matrix
-		// projectionMatrix.elements[ 2 ] = clipPlane.x;
-		// projectionMatrix.elements[ 6 ] = clipPlane.y;
-		// projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
-		// projectionMatrix.elements[ 14 ] = clipPlane.w;
+			// Calculate the scaled plane vector
+			clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
+
+			// Replacing the third row of the projection matrix
+			projectionMatrix.elements[ 2 ] = clipPlane.x;
+			projectionMatrix.elements[ 6 ] = clipPlane.y;
+			projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
+			projectionMatrix.elements[ 14 ] = clipPlane.w;
+
+		*/
 
 		// Render
 
@@ -267,10 +269,10 @@ var Reflector = function ( geometry, options ) {
 
 };
 
-Reflector.prototype = Object.create( Mesh.prototype );
-Reflector.prototype.constructor = Reflector;
+ReflectorForSSRPass.prototype = Object.create( Mesh.prototype );
+ReflectorForSSRPass.prototype.constructor = ReflectorForSSRPass;
 
-Reflector.ReflectorShader = { ///todo: Will conflict with Reflector.js?
+ReflectorForSSRPass.ReflectorShader = {
 
 	defines: {
 		isDistanceAttenuation: true,
@@ -338,7 +340,7 @@ Reflector.ReflectorShader = { ///todo: Will conflict with Reflector.js?
 			return perspectiveDepthToViewZ( depth, virtualCameraNear, virtualCameraFar );
 		}
 		vec3 getViewPosition( const in vec2 uv, const in float depth/*clip space*/, const in float clipW ) {
-			vec4 clipPosition = vec4( ( vec3( uv, depth ) - 0.5 ) * 2.0, 1.0 );//ndc ///todo: use gl_FragCoord to get uv
+			vec4 clipPosition = vec4( ( vec3( uv, depth ) - 0.5 ) * 2.0, 1.0 );//ndc
 			clipPosition *= clipW; //clip
 			return ( virtualCameraInverseProjectionMatrix * clipPosition ).xyz;//view
 		}
@@ -352,8 +354,7 @@ Reflector.ReflectorShader = { ///todo: Will conflict with Reflector.js?
 				float clipW = virtualCameraProjectionMatrix[2][3] * viewZ+virtualCameraProjectionMatrix[3][3];
 				vec3 viewPosition=getViewPosition( uv, depth, clipW );
 				vec3 worldPosition=(virtualCameraMatrixWorld*vec4(viewPosition,1)).xyz;
-				// gl_FragColor=vec4(vec3(worldPosition.y),1);return;
-				worldPosition.y+=worldYBias; ///todo: Don't know why not start from zero, temporarily use manually defined bias, need fix afterwards.
+				worldPosition.y+=worldYBias; // TODO: Don't know why not start from zero, temporarily use manually defined bias, need fix afterwards.
 				worldPosition.y=max(0.,worldPosition.y);
 				if(worldPosition.y>maxDistance) discard;
 				float op=opacity;
@@ -373,4 +374,4 @@ Reflector.ReflectorShader = { ///todo: Will conflict with Reflector.js?
 	`,
 };
 
-export { Reflector };
+export { ReflectorForSSRPass };

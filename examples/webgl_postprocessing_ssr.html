@@ -27,7 +27,7 @@
 		import { GUI } from './jsm/libs/dat.gui.module.js';
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 		import { SSRPass } from './jsm/postprocessing/SSRPass.js';
-		import { Reflector } from './jsm/objects/ReflectorForSSRPass.js';
+		import { ReflectorForSSRPass } from './jsm/objects/ReflectorForSSRPass.js';
 
 		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
@@ -130,7 +130,7 @@
 			selects.push( mesh );
 
 			geometry = new THREE.PlaneBufferGeometry( 1, 1 );
-			groundReflector = new Reflector( geometry, {
+			groundReflector = new ReflectorForSSRPass( geometry, {
 				clipBias: 0,
 				worldYBias: - 0.027450980392156862,
 				textureWidth: window.innerWidth,
@@ -319,8 +319,8 @@
 
 			if ( params.enableSSR ) {
 
-				///todo: groundReflector has full ground info, need use it to solve reflection gaps problem on objects when camera near ground.
-				///todo: the normal info where groundReflector reflected need to be changed.
+				// TODO: groundReflector has full ground info, need use it to solve reflection gaps problem on objects when camera near ground.
+				// TODO: the normal and depth info where groundReflector reflected need to be changed.
 				composer.render();
 
 			} else {
