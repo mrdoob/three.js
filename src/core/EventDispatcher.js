@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
- class EventDispatcher {
+class EventDispatcher {
 
 	addEventListener( type, listener ) {
 
