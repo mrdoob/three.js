@@ -143,12 +143,13 @@
 			This object contains references to the keycodes for controlling camera panning. Default is the 4 arrow keys.
 			<code>
 controls.keys = {
-	LEFT: 37, //left arrow
-	UP: 38, // up arrow
-	RIGHT: 39, // right arrow
-	BOTTOM: 40 // down arrow
+	LEFT: 'ArrowLeft', //left arrow
+	UP: 'ArrowUp', // up arrow
+	RIGHT: 'ArrowRight', // right arrow
+	BOTTOM: 'ArrowDown' // down arrow
 }
-			 </code> See [link:https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode this page] for a full
+			 </code> [link:https://developer.mozilla.org/zh-CN/docs/Web/API/KeyboardEvent/keyCode KeyboardEvent.keyCode] is no longer recommended, so we use [link:https://developer.mozilla.org/zh-CN/docs/Web/API/KeyboardEvent/code KeyboardEvent.code].
+Sidenote: KeyboardEvent.code does not work in IE.
 			list of keycodes.
 		</p>
 
