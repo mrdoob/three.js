@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl wireframe demo
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - materials - wireframe
 		</div>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
@@ -32,52 +32,11 @@
 
 			varying vec3 vCenter;
 
-			float edgeFactorTri() {
-
-				vec3 d = fwidth( vCenter.xyz );
-
-				vec3 a3 = smoothstep( vec3( 0.0 ), d * thickness, vCenter.xyz );
-
-				return min( min( a3.x, a3.y ), a3.z );
-
-			}
-
-			void main() {
-
-				if ( edgeFactorTri() > 0.99 ) discard;
-
-				gl_FragColor = gl_FrontFacing ? vec4( 0.9, 0.9, 1.0, 1.0 ) : vec4( 0.4, 0.4, 0.5, 1.0 );
-
-			}
-
-		</script>
-
-		<script type="x-shader/x-vertex" id="vertexShaderATC">
-
-			attribute vec3 center;
-			varying vec3 vCenter;
-
-			void main() {
-
-				vCenter = center;
-
-				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-			}
-
-		</script>
-
-		<script type="x-shader/x-fragment" id="fragmentShaderATC">
-
-			uniform float thickness;
-
-			varying vec3 vCenter;
-
 			void main() {
 
 				vec3 afwidth = fwidth( vCenter.xyz );
 
-				vec3 edge3 = smoothstep( thickness * afwidth, ( thickness + 1.0 ) * afwidth, vCenter.xyz );
+				vec3 edge3 = smoothstep( ( thickness - 1.0 ) * afwidth, thickness * afwidth, vCenter.xyz );
 
 				float edge = 1.0 - min( min( edge3.x, edge3.y ), edge3.z );
 
@@ -100,7 +59,7 @@
 				thickness: 1
 			};
 
-			let renderer, scene, camera, mesh2, mesh3;
+			let renderer, scene, camera, mesh2;
 
 			init();
 
@@ -137,44 +96,27 @@
 					} );
 
 					const mesh1 = new THREE.Mesh( geometry, material1 );
-					mesh1.position.set( - 60, 0, 0 );
+					mesh1.position.set( - 40, 0, 0 );
 
 					scene.add( mesh1 );
 
-					// middle
+					// right
 
 					const material2 = new THREE.ShaderMaterial( {
 
 						uniforms: { 'thickness': { value: API.thickness } },
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,
 						fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-						side: THREE.DoubleSide
+						side: THREE.DoubleSide,
+						alphaToCoverage: true // only works when WebGLRenderer's "antialias" is set to "true"
 
 					} );
 					material2.extensions.derivatives = true;
 
 					mesh2 = new THREE.Mesh( geometry, material2 );
-					mesh2.position.set( 0, 0, 0 );
+					mesh2.position.set( 40, 0, 0 );
 
 					scene.add( mesh2 );
-
-					// right
-
-					const material3 = new THREE.ShaderMaterial( {
-
-						uniforms: { 'thickness': { value: API.thickness } },
-						vertexShader: document.getElementById( 'vertexShaderATC' ).textContent,
-						fragmentShader: document.getElementById( 'fragmentShaderATC' ).textContent,
-						side: THREE.DoubleSide,
-						alphaToCoverage: true // only works when WebGLRenderer's "antialias" is set to "true"
-
-					} );
-					material3.extensions.derivatives = true;
-
-					mesh3 = new THREE.Mesh( geometry, material3 );
-					mesh3.position.set( 60, 0, 0 );
-
-					scene.add( mesh3 );
 
 					//
 
@@ -186,10 +128,9 @@
 
 				const gui = new GUI();
 
-				gui.add( API, 'thickness', 0.4, 4 ).onChange( function () {
+				gui.add( API, 'thickness', 0, 4 ).onChange( function () {
 
 					mesh2.material.uniforms.thickness.value = API.thickness;
-					mesh3.material.uniforms.thickness.value = API.thickness;
 
 				} );
 
