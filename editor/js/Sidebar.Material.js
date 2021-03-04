@@ -764,6 +764,15 @@ function SidebarMaterial( editor ) {
 				if ( objectHasUvs ) {
 
 					var map = mapEnabled ? materialMap.getValue() : null;
+
+					// Add the texture to the editors textures map
+					if ( materialMap.getValue() !== null ) {
+
+						const texture = materialMap.getValue();
+						editor.addTexture( texture );
+
+					}
+
 					if ( material.map !== map ) {
 
 						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'map', map, currentMaterialSlot ) );
@@ -785,6 +794,15 @@ function SidebarMaterial( editor ) {
 				if ( objectHasUvs ) {
 
 					var matcap = mapEnabled ? materialMatcapMap.getValue() : null;
+
+					// Add the texture to the editors textures map
+					if ( materialMatcapMap.getValue() !== null ) {
+
+						const texture = materialMatcapMap.getValue();
+						editor.addTexture( texture );
+
+					}
+
 					if ( material.matcap !== matcap ) {
 
 						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'matcap', matcap, currentMaterialSlot ) );
@@ -806,6 +824,15 @@ function SidebarMaterial( editor ) {
 				if ( objectHasUvs ) {
 
 					var alphaMap = mapEnabled ? materialAlphaMap.getValue() : null;
+
+					// Add the texture to the editors textures map
+					if ( materialAlphaMap.getValue() !== null ) {
+
+						const texture = materialAlphaMap.getValue();
+						editor.addTexture( texture );
+
+					}
+
 					if ( material.alphaMap !== alphaMap ) {
 
 						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'alphaMap', alphaMap, currentMaterialSlot ) );
@@ -827,6 +854,15 @@ function SidebarMaterial( editor ) {
 				if ( objectHasUvs ) {
 
 					var bumpMap = bumpMapEnabled ? materialBumpMap.getValue() : null;
+
+					// Add the texture to the editors textures map
+					if ( materialBumpMap.getValue() !== null ) {
+
+						const texture = materialBumpMap.getValue();
+						editor.addTexture( texture );
+
+					}
+
 					if ( material.bumpMap !== bumpMap ) {
 
 						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'bumpMap', bumpMap, currentMaterialSlot ) );
@@ -854,6 +890,15 @@ function SidebarMaterial( editor ) {
 				if ( objectHasUvs ) {
 
 					var normalMap = normalMapEnabled ? materialNormalMap.getValue() : null;
+
+					// Add the texture to the editors textures map
+					if ( materialNormalMap.getValue() !== null ) {
+
+						const texture = materialNormalMap.getValue();
+						editor.addTexture( texture );
+
+					}
+
 					if ( material.normalMap !== normalMap ) {
 
 						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'normalMap', normalMap, currentMaterialSlot ) );
@@ -893,6 +938,14 @@ function SidebarMaterial( editor ) {
 
 					}
 
+					// Add the texture to the editors textures map
+					if ( materialClearcoatNormalMap.getValue() !== null ) {
+
+						const texture = materialClearcoatNormalMap.getValue();
+						editor.addTexture( texture );
+
+					}
+
 					if ( material.clearcoatNormalScale.x !== materialClearcoatNormalScaleX.getValue() ||
 						material.clearcoatNormalScale.y !== materialClearcoatNormalScaleY.getValue() ) {
 
@@ -919,6 +972,15 @@ function SidebarMaterial( editor ) {
 				if ( objectHasUvs ) {
 
 					var displacementMap = displacementMapEnabled ? materialDisplacementMap.getValue() : null;
+
+					// Add the texture to the editors textures map
+					if ( materialDisplacementMap.getValue() !== null ) {
+
+						const texture = materialDisplacementMap.getValue();
+						editor.addTexture( texture );
+
+					}
+
 					if ( material.displacementMap !== displacementMap ) {
 
 						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'displacementMap', displacementMap, currentMaterialSlot ) );
@@ -946,6 +1008,15 @@ function SidebarMaterial( editor ) {
 				if ( objectHasUvs ) {
 
 					var roughnessMap = roughnessMapEnabled ? materialRoughnessMap.getValue() : null;
+
+					// Add the texture to the editors textures map
+					if ( materialRoughnessMap.getValue() !== null ) {
+
+						const texture = materialRoughnessMap.getValue();
+						editor.addTexture( texture );
+
+					}
+
 					if ( material.roughnessMap !== roughnessMap ) {
 
 						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'roughnessMap', roughnessMap, currentMaterialSlot ) );
@@ -967,6 +1038,15 @@ function SidebarMaterial( editor ) {
 				if ( objectHasUvs ) {
 
 					var metalnessMap = metalnessMapEnabled ? materialMetalnessMap.getValue() : null;
+
+					// Add the texture to the editors textures map
+					if ( materialMetalnessMap.getValue() !== null ) {
+
+						const texture = materialMetalnessMap.getValue();
+						editor.addTexture( texture );
+
+					}
+
 					if ( material.metalnessMap !== metalnessMap ) {
 
 						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'metalnessMap', metalnessMap, currentMaterialSlot ) );
@@ -988,6 +1068,15 @@ function SidebarMaterial( editor ) {
 				if ( objectHasUvs ) {
 
 					var specularMap = specularMapEnabled ? materialSpecularMap.getValue() : null;
+
+					// Add the texture to the editors textures map
+					if ( materialSpecularMap.getValue() !== null ) {
+
+						const texture = materialSpecularMap.getValue();
+						editor.addTexture( texture );
+
+					}
+
 					if ( material.specularMap !== specularMap ) {
 
 						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'specularMap', specularMap, currentMaterialSlot ) );
@@ -1007,6 +1096,14 @@ function SidebarMaterial( editor ) {
 				var envMapEnabled = materialEnvMapEnabled.getValue() === true;
 
 				var envMap = envMapEnabled ? materialEnvMap.getValue() : null;
+
+				// Add the texture to the editors textures map
+				if ( materialEnvMap.getValue() !== null ) {
+
+					const texture = materialEnvMap.getValue();
+					editor.addTexture( texture );
+
+				}
 
 				if ( material.envMap !== envMap ) {
 
@@ -1035,6 +1132,15 @@ function SidebarMaterial( editor ) {
 				if ( objectHasUvs ) {
 
 					var lightMap = lightMapEnabled ? materialLightMap.getValue() : null;
+
+					// Add the texture to the editors textures map
+					if ( materialLightMap.getValue() !== null ) {
+
+						const texture = materialLightMap.getValue();
+						editor.addTexture( texture );
+
+					}
+
 					if ( material.lightMap !== lightMap ) {
 
 						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'lightMap', lightMap, currentMaterialSlot ) );
@@ -1056,6 +1162,15 @@ function SidebarMaterial( editor ) {
 				if ( objectHasUvs ) {
 
 					var aoMap = aoMapEnabled ? materialAOMap.getValue() : null;
+
+					// Add the texture to the editors textures map
+					if ( materialAOMap.getValue() !== null ) {
+
+						const texture = materialAOMap.getValue();
+						editor.addTexture( texture );
+
+					}
+
 					if ( material.aoMap !== aoMap ) {
 
 						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'aoMap', aoMap, currentMaterialSlot ) );
@@ -1083,6 +1198,15 @@ function SidebarMaterial( editor ) {
 				if ( objectHasUvs ) {
 
 					var emissiveMap = emissiveMapEnabled ? materialEmissiveMap.getValue() : null;
+
+					// Add the texture to the editors textures map
+					if ( materialEmissiveMap.getValue() !== null ) {
+
+						const texture = materialEmissiveMap.getValue();
+						editor.addTexture( texture );
+
+					}
+
 					if ( material.emissiveMap !== emissiveMap ) {
 
 						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'emissiveMap', emissiveMap, currentMaterialSlot ) );
@@ -1102,6 +1226,14 @@ function SidebarMaterial( editor ) {
 				var gradientMapEnabled = materialGradientMapEnabled.getValue() === true;
 
 				var gradientMap = gradientMapEnabled ? materialGradientMap.getValue() : null;
+
+				// Add the texture to the editors textures map
+				if ( materialGradientMap.getValue() !== null ) {
+
+					const texture = materialGradientMap.getValue();
+					editor.addTexture( texture );
+
+				}
 
 				if ( material.gradientMap !== gradientMap ) {
 
