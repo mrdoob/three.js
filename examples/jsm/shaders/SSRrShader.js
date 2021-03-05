@@ -115,6 +115,7 @@ var SSRrShader = {
 			return xy;
 		}
 		void main(){
+			gl_FragColor=vec4(0,0,.5,1);return;
 			vec3 viewNormal=getViewNormal( vUv );
 			gl_FragColor=vec4(viewNormal,1);return;
 			#ifdef isSelective

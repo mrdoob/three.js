@@ -73,7 +73,6 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 
 		}
 	});
-	console.log(2,selects)
 
 	this._isDistanceAttenuation = SSRrShader.defines.isDistanceAttenuation;
 	Object.defineProperty( this, 'isDistanceAttenuation', {
@@ -274,25 +273,47 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		renderer.setRenderTarget( this.beautyRenderTarget );
 		renderer.clear();
 
-		this.scene.traverse(child => {
-			if (this.selects.includes(child)) {
-				child.visible=false
-			} else {
-				child.visible=true
-			}
-		})
+		// this.scene.traverse(child => {
+		// 	if (this.selects.includes(child)) {
+		// 		child.visible=false
+		// 	} else {
+		// 		child.visible=true
+		// 	}
+		// })
+		// this.scene.children.forEach(child => {
+		// 	if (this.selects.includes(child)) {
+		// 		child.visible=false
+		// 	} else {
+		// 		child.visible = true
+		// 	}
+		// 	// console.log(child.name,child.visible)
+		// })
+		// debugger
+		this.scene.children.filter(n=>n.name==='bunny')[0].visible=false
+		this.scene.children.filter(n=>n.name==='sphere')[0].visible=true
 		renderer.render( this.scene, this.camera );
 
 		// render normals
 
-		this.scene.traverse(child => {
-			if (this.selects.includes(child)) {
-				child.visible=true
-			} else {
-				child.visible=true
-			}
-		})
+		/* // TODO: Why this not work?
+			this.scene.traverse(child => {
+				if (this.selects.includes(child)) {
+					child.visible=true
+				} else {
+					child.visible = false
+				}
+			})
+		*/
+		// this.scene.children.forEach(child => {
+		// 	if (this.selects.includes(child)) {
+		// 		child.visible=true
+		// 	} else {
+		// 		child.visible = false
+		// 	}
+		// })
 
+		this.scene.children.filter(n=>n.name==='bunny')[0].visible=true
+		this.scene.children.filter(n=>n.name==='sphere')[0].visible=false
 		this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0, 0 );
 
 		// render SSRr

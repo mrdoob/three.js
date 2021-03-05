@@ -76,15 +76,15 @@
 			window.scene=scene
 
 			// Lights
-			// const hemiLight = new THREE.HemisphereLight(0x443333, 0x111122);
-			// scene.add(hemiLight);
+			const hemiLight = new THREE.HemisphereLight(0x443333, 0x111122);
+			scene.add(hemiLight);
 
-			// const spotLight = new THREE.SpotLight();
-			// spotLight.angle = Math.PI / 16;
-			// spotLight.penumbra = 0.5;
-			// // spotLight.castShadow = true;
-			// spotLight.position.set(- 1, 1, 1);
-			// scene.add(spotLight);
+			const spotLight = new THREE.SpotLight();
+			spotLight.angle = Math.PI / 16;
+			spotLight.penumbra = 0.5;
+			// spotLight.castShadow = true;
+			spotLight.position.set(- 1, 1, 1);
+			scene.add(spotLight);
 
 			await new Promise(resolve => {
 				dracoLoader.load('models/draco/bunny.drc', function (geometry) {
@@ -111,7 +111,7 @@
 			material = new THREE.MeshStandardMaterial({ color: 'green' });
 			mesh = new THREE.Mesh(geometry, material);
 			mesh.position.set(- .12, .025, .015);
-			mesh.name='Box'
+			mesh.name='box'
 			scene.add(mesh);
 			otherMeshes.push(mesh);
 			// selects.push( mesh );
@@ -129,7 +129,7 @@
 			material = new THREE.MeshStandardMaterial({ color: 'yellow' });
 			mesh = new THREE.Mesh(geometry, material);
 			mesh.position.set(- .05, .025, - .055);
-			mesh.name='Cone'
+			mesh.name='cone'
 			scene.add(mesh);
 			otherMeshes.push(mesh);
 			// selects.push( mesh );
@@ -168,7 +168,6 @@
 				isPerspectiveCamera: isPerspectiveCamera,
 				selects: selects
 			});
-			console.log(1, selects)
 
 			composer.addPass(ssrrPass);
 
