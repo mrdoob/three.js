@@ -14,7 +14,7 @@
 	<div id="container"></div>
 	<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
-		SSRPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
+		SSRrPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
 	</div>
 
 	<script type="module">
@@ -26,26 +26,23 @@
 
 		import { GUI } from './jsm/libs/dat.gui.module.js';
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-		import { SSRPass } from './jsm/postprocessing/SSRPass.js';
-		import { ReflectorForSSRPass } from './jsm/objects/ReflectorForSSRPass.js';
+		import { SSRrPass } from './jsm/postprocessing/SSRrPass.js';
 
 		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
 		const params = {
-			enableSSR: true,
+			enableSSRr: true,
 			autoRotate: true,
 			isOtherMeshes: true,
-			isGroundReflector: true,
 		};
 		let composer;
-		let ssrPass;
+		let ssrrPass;
 		let gui;
 		const isPerspectiveCamera = true;
 		let stats;
 		let controls;
 		let camera, scene, renderer;
 		const otherMeshes = [];
-		let groundReflector;
 		const selects = [];
 
 		const container = document.querySelector( '#container' );
@@ -129,20 +126,6 @@
 			otherMeshes.push( mesh );
 			selects.push( mesh );
 
-			geometry = new THREE.PlaneBufferGeometry( 1, 1 );
-			groundReflector = new ReflectorForSSRPass( geometry, {
-				clipBias: 0,
-				worldYBias: - 0.027450980392156862,
-				textureWidth: window.innerWidth,
-				textureHeight: window.innerHeight,
-				color: 0x888888,
-				useDepthTexture: true,
-			} );
-			groundReflector.material.depthWrite = false;
-			groundReflector.rotation.x = - Math.PI / 2;
-			groundReflector.visible = false;
-			scene.add( groundReflector );
-
 			// renderer
 			renderer = new THREE.WebGLRenderer( { antialias: false } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -167,7 +150,7 @@
 			// composer
 
 			composer = new EffectComposer( renderer );
-			ssrPass = new SSRPass( {
+			ssrrPass = new SSRrPass( {
 				renderer,
 				scene,
 				camera,
@@ -175,31 +158,15 @@
 				height: innerHeight,
 				encoding: THREE.sRGBEncoding,
 				isPerspectiveCamera: isPerspectiveCamera,
-				groundReflector: params.isGroundReflector ? groundReflector : null,
-				selects: params.isGroundReflector ? selects : null
+				selects: selects
 			} );
 
-			composer.addPass( ssrPass );
+			composer.addPass( ssrrPass );
 
 			// GUI
 
 			gui = new GUI();
-			gui.add( params, 'enableSSR' ).name( 'Enable SSR' );
-			gui.add( params, 'isGroundReflector' ).onChange( () => {
-
-				if ( params.isGroundReflector ) {
-
-					ssrPass.groundReflector = groundReflector,
-					ssrPass.selects = selects;
-
-				} else {
-
-					ssrPass.groundReflector = null,
-					ssrPass.selects = null;
-
-				}
-
-			} );
+			gui.add( params, 'enableSSRr' ).name( 'Enable SSRr' );
 			gui.add( params, 'autoRotate' ).onChange( () => {
 
 				controls.enabled = ! params.autoRotate;
@@ -207,23 +174,10 @@
 			} );
 
 			const folder = gui.addFolder( 'more settings' );
-			folder.add( ssrPass, 'isFresnel' ).onChange( ()=>{
-
-				groundReflector.isFresnel = ssrPass.isFresnel;
-
-			} );
-			folder.add( ssrPass, 'isDistanceAttenuation' ).onChange( ()=>{
-
-				groundReflector.isDistanceAttenuation = ssrPass.isDistanceAttenuation;
-
-			} );
-			ssrPass.maxDistance = .1;
-			groundReflector.maxDistance = ssrPass.maxDistance;
-			folder.add( ssrPass, 'maxDistance' ).min( 0 ).max( .5 ).step( .001 ).onChange( ()=>{
-
-				groundReflector.maxDistance = ssrPass.maxDistance;
-
-			} );
+			folder.add( ssrrPass, 'isFresnel' )
+			folder.add( ssrrPass, 'isDistanceAttenuation' )
+			ssrrPass.maxDistance = .1;
+			folder.add( ssrrPass, 'maxDistance' ).min( 0 ).max( .5 ).step( .001 )
 			folder.add( params, 'isOtherMeshes' ).onChange( () => {
 
 				if ( params.isOtherMeshes ) {
@@ -237,42 +191,37 @@
 				}
 
 			} );
-			folder.add( ssrPass, 'isBouncing' );
-			folder.add( ssrPass, 'output', {
-				'Default': SSRPass.OUTPUT.Default,
-				'SSR Only': SSRPass.OUTPUT.SSR,
-				'Beauty': SSRPass.OUTPUT.Beauty,
-				'Depth': SSRPass.OUTPUT.Depth,
-				'Normal': SSRPass.OUTPUT.Normal,
-				'Metalness': SSRPass.OUTPUT.Metalness,
+			folder.add( ssrrPass, 'isBouncing' );
+			folder.add( ssrrPass, 'output', {
+				'Default': SSRrPass.OUTPUT.Default,
+				'SSRr Only': SSRrPass.OUTPUT.SSRr,
+				'Beauty': SSRrPass.OUTPUT.Beauty,
+				'Depth': SSRrPass.OUTPUT.Depth,
+				'Normal': SSRrPass.OUTPUT.Normal,
+				'Metalness': SSRrPass.OUTPUT.Metalness,
 			} ).onChange( function ( value ) {
 
-				ssrPass.output = parseInt( value );
+				ssrrPass.output = parseInt( value );
 
 			} );
-			ssrPass.opacity = 1;
-			groundReflector.opacity = ssrPass.opacity;
-			folder.add( ssrPass, 'opacity' ).min( 0 ).max( 1 ).onChange( ()=>{
-
-				groundReflector.opacity = ssrPass.opacity;
-
-			} );
+			ssrrPass.opacity = 1;
+			folder.add( ssrrPass, 'opacity' ).min( 0 ).max( 1 )
 
 			if ( isPerspectiveCamera ) {
 
-				ssrPass.surfDist = 0.0015;
-				folder.add( ssrPass, 'surfDist' ).min( 0 ).max( .005 ).step( .0001 );
+				ssrrPass.surfDist = 0.0015;
+				folder.add( ssrrPass, 'surfDist' ).min( 0 ).max( .005 ).step( .0001 );
 
 			} else {
 
-				ssrPass.surfDist = 2;
-				folder.add( ssrPass, 'surfDist' ).min( 0 ).max( 7 ).step( .01 );
+				ssrrPass.surfDist = 2;
+				folder.add( ssrrPass, 'surfDist' ).min( 0 ).max( 7 ).step( .01 );
 
 			}
 
-			folder.add( ssrPass, 'isInfiniteThick' );
-			folder.add( ssrPass, 'thickTolerance' ).min( 0 ).max( .05 ).step( .0001 );
-			folder.add( ssrPass, 'isBlur' );
+			folder.add( ssrrPass, 'isInfiniteThick' );
+			folder.add( ssrrPass, 'thickTolerance' ).min( 0 ).max( .05 ).step( .0001 );
+			folder.add( ssrrPass, 'isBlur' );
 			// gui.close()
 
 		}
@@ -285,8 +234,6 @@
 
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			composer.setSize( window.innerWidth, window.innerHeight );
-			groundReflector.getRenderTarget().setSize( window.innerWidth, window.innerHeight );
-			groundReflector.resolution.set( window.innerWidth, window.innerHeight );
 
 		}
 
@@ -317,10 +264,8 @@
 
 			}
 
-			if ( params.enableSSR ) {
+			if ( params.enableSSRr ) {
 
-				// TODO: groundReflector has full ground info, need use it to solve reflection gaps problem on objects when camera near ground.
-				// TODO: the normal and depth info where groundReflector reflected need to be changed.
 				composer.render();
 
 			} else {

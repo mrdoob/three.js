@@ -7,7 +7,7 @@ import {
  * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
  */
 
-var SSRShader = {
+var SSRrShader = {
 
   defines: {
     MAX_STEP: 0,
@@ -219,7 +219,7 @@ var SSRShader = {
 
 };
 
-var SSRDepthShader = {
+var SSRrDepthShader = {
 
   defines: {
     "PERSPECTIVE_CAMERA": 1
@@ -286,7 +286,7 @@ var SSRDepthShader = {
 
 };
 
-var SSRBlurShader = {
+var SSRrBlurShader = {
 
   uniforms: {
 
@@ -349,4 +349,4 @@ var SSRBlurShader = {
 
 };
 
-export { SSRShader, SSRDepthShader, SSRBlurShader };
+export { SSRrShader, SSRrDepthShader, SSRrBlurShader };
