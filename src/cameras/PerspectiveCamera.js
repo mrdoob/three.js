@@ -1,36 +1,39 @@
 import { Camera } from './Camera.js';
+import { Object3D } from '../core/Object3D.js';
 import { MathUtils } from '../math/MathUtils.js';
 
-class PerspectiveCamera extends Camera {
+function PerspectiveCamera( fov = 50, aspect = 1, near = 0.1, far = 2000 ) {
 
-	constructor( fov = 50, aspect = 1, near = 0.1, far = 2000 ) {
+	Camera.call( this );
 
-		super();
+	this.type = 'PerspectiveCamera';
 
-		this.type = 'PerspectiveCamera';
+	this.fov = fov;
+	this.zoom = 1;
 
-		this.fov = fov;
-		this.zoom = 1;
+	this.near = near;
+	this.far = far;
+	this.focus = 10;
 
-		this.near = near;
-		this.far = far;
-		this.focus = 10;
+	this.aspect = aspect;
+	this.view = null;
 
-		this.aspect = aspect;
-		this.view = null;
+	this.filmGauge = 35;	// width of the film (default in millimeters)
+	this.filmOffset = 0;	// horizontal film offset (same unit as gauge)
 
-		this.filmGauge = 35;	// width of the film (default in millimeters)
-		this.filmOffset = 0;	// horizontal film offset (same unit as gauge)
+	this.updateProjectionMatrix();
 
-		this.updateProjectionMatrix();
+}
 
-		this.isPerspectiveCamera = true;
+PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), {
 
-	}
+	constructor: PerspectiveCamera,
 
-	copy( source, recursive ) {
+	isPerspectiveCamera: true,
 
-		super.copy( source, recursive );
+	copy: function ( source, recursive ) {
+
+		Camera.prototype.copy.call( this, source, recursive );
 
 		this.fov = source.fov;
 		this.zoom = source.zoom;
@@ -47,7 +50,7 @@ class PerspectiveCamera extends Camera {
 
 		return this;
 
-	}
+	},
 
 	/**
 	 * Sets the FOV by focal length in respect to the current .filmGauge.
@@ -57,7 +60,7 @@ class PerspectiveCamera extends Camera {
 	 *
 	 * Values for focal length and film gauge must have the same unit.
 	 */
-	setFocalLength( focalLength ) {
+	setFocalLength: function ( focalLength ) {
 
 		/** see {@link http://www.bobatkins.com/photography/technical/field_of_view.html} */
 		const vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
@@ -65,39 +68,39 @@ class PerspectiveCamera extends Camera {
 		this.fov = MathUtils.RAD2DEG * 2 * Math.atan( vExtentSlope );
 		this.updateProjectionMatrix();
 
-	}
+	},
 
 	/**
 	 * Calculates the focal length from the current .fov and .filmGauge.
 	 */
-	getFocalLength() {
+	getFocalLength: function () {
 
 		const vExtentSlope = Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov );
 
 		return 0.5 * this.getFilmHeight() / vExtentSlope;
 
-	}
+	},
 
-	getEffectiveFOV() {
+	getEffectiveFOV: function () {
 
 		return MathUtils.RAD2DEG * 2 * Math.atan(
 			Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom );
 
-	}
+	},
 
-	getFilmWidth() {
+	getFilmWidth: function () {
 
 		// film not completely covered in portrait format (aspect < 1)
 		return this.filmGauge * Math.min( this.aspect, 1 );
 
-	}
+	},
 
-	getFilmHeight() {
+	getFilmHeight: function () {
 
 		// film not completely covered in landscape format (aspect > 1)
 		return this.filmGauge / Math.max( this.aspect, 1 );
 
-	}
+	},
 
 	/**
 	 * Sets an offset in a larger frustum. This is useful for multi-window or
@@ -134,7 +137,7 @@ class PerspectiveCamera extends Camera {
 	 *
 	 *   Note there is no reason monitors have to be the same size or in a grid.
 	 */
-	setViewOffset( fullWidth, fullHeight, x, y, width, height ) {
+	setViewOffset: function ( fullWidth, fullHeight, x, y, width, height ) {
 
 		this.aspect = fullWidth / fullHeight;
 
@@ -162,9 +165,9 @@ class PerspectiveCamera extends Camera {
 
 		this.updateProjectionMatrix();
 
-	}
+	},
 
-	clearViewOffset() {
+	clearViewOffset: function () {
 
 		if ( this.view !== null ) {
 
@@ -174,9 +177,9 @@ class PerspectiveCamera extends Camera {
 
 		this.updateProjectionMatrix();
 
-	}
+	},
 
-	updateProjectionMatrix() {
+	updateProjectionMatrix: function () {
 
 		const near = this.near;
 		let top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom;
@@ -204,11 +207,11 @@ class PerspectiveCamera extends Camera {
 
 		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 
-	}
+	},
 
-	toJSON( meta ) {
+	toJSON: function ( meta ) {
 
-		const data = super.toJSON( meta );
+		const data = Object3D.prototype.toJSON.call( this, meta );
 
 		data.object.fov = this.fov;
 		data.object.zoom = this.zoom;
@@ -228,7 +231,7 @@ class PerspectiveCamera extends Camera {
 
 	}
 
-}
+} );
 
 
 export { PerspectiveCamera };

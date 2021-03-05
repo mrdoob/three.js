@@ -2,26 +2,28 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
 import { Vector3 } from '../math/Vector3.js';
 
-class Camera extends Object3D {
+function Camera() {
 
-	constructor() {
+	Object3D.call( this );
 
-		super();
+	this.type = 'Camera';
 
-		this.type = 'Camera';
+	this.matrixWorldInverse = new Matrix4();
 
-		this.matrixWorldInverse = new Matrix4();
+	this.projectionMatrix = new Matrix4();
+	this.projectionMatrixInverse = new Matrix4();
 
-		this.projectionMatrix = new Matrix4();
-		this.projectionMatrixInverse = new Matrix4();
+}
 
-		this.isCamera = true;
+Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	}
+	constructor: Camera,
 
-	copy( source, recursive ) {
+	isCamera: true,
 
-		super.copy( source, recursive );
+	copy: function ( source, recursive ) {
+
+		Object3D.prototype.copy.call( this, source, recursive );
 
 		this.matrixWorldInverse.copy( source.matrixWorldInverse );
 
@@ -30,9 +32,9 @@ class Camera extends Object3D {
 
 		return this;
 
-	}
+	},
 
-	getWorldDirection( target ) {
+	getWorldDirection: function ( target ) {
 
 		if ( target === undefined ) {
 
@@ -47,30 +49,30 @@ class Camera extends Object3D {
 
 		return target.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
 
-	}
+	},
 
-	updateMatrixWorld( force ) {
+	updateMatrixWorld: function ( force ) {
 
-		super.updateMatrixWorld( force );
-
-		this.matrixWorldInverse.copy( this.matrixWorld ).invert();
-
-	}
-
-	updateWorldMatrix( updateParents, updateChildren ) {
-
-		super.updateWorldMatrix( updateParents, updateChildren );
+		Object3D.prototype.updateMatrixWorld.call( this, force );
 
 		this.matrixWorldInverse.copy( this.matrixWorld ).invert();
 
-	}
+	},
 
-	clone() {
+	updateWorldMatrix: function ( updateParents, updateChildren ) {
+
+		Object3D.prototype.updateWorldMatrix.call( this, updateParents, updateChildren );
+
+		this.matrixWorldInverse.copy( this.matrixWorld ).invert();
+
+	},
+
+	clone: function () {
 
 		return new this.constructor().copy( this );
 
 	}
 
-}
+} );
 
 export { Camera };
