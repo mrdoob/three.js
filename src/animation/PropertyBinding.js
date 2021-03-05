@@ -34,18 +34,18 @@ const _trackRe = new RegExp( ''
 
 const _supportedObjectNames = [ 'material', 'materials', 'bones' ];
 
-class Composite {
+function Composite( targetGroup, path, optionalParsedPath ) {
 
-	constructor( targetGroup, path, optionalParsedPath ) {
+	const parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
 
-		const parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
+	this._targetGroup = targetGroup;
+	this._bindings = targetGroup.subscribe_( path, parsedPath );
 
-		this._targetGroup = targetGroup;
-		this._bindings = targetGroup.subscribe_( path, parsedPath );
+}
 
-	}
+Object.assign( Composite.prototype, {
 
-	getValue( array, offset ) {
+	getValue: function ( array, offset ) {
 
 		this.bind(); // bind all binding
 
@@ -55,9 +55,9 @@ class Composite {
 		// and only call .getValue on the first
 		if ( binding !== undefined ) binding.getValue( array, offset );
 
-	}
+	},
 
-	setValue( array, offset ) {
+	setValue: function ( array, offset ) {
 
 		const bindings = this._bindings;
 
@@ -67,9 +67,9 @@ class Composite {
 
 		}
 
-	}
+	},
 
-	bind() {
+	bind: function () {
 
 		const bindings = this._bindings;
 
@@ -79,9 +79,9 @@ class Composite {
 
 		}
 
-	}
+	},
 
-	unbind() {
+	unbind: function () {
 
 		const bindings = this._bindings;
 
@@ -93,22 +93,25 @@ class Composite {
 
 	}
 
+} );
+
+
+function PropertyBinding( rootNode, path, parsedPath ) {
+
+	this.path = path;
+	this.parsedPath = parsedPath || PropertyBinding.parseTrackName( path );
+
+	this.node = PropertyBinding.findNode( rootNode, this.parsedPath.nodeName ) || rootNode;
+
+	this.rootNode = rootNode;
+
 }
 
-class PropertyBinding {
+Object.assign( PropertyBinding, {
 
-	constructor( rootNode, path, parsedPath ) {
+	Composite: Composite,
 
-		this.path = path;
-		this.parsedPath = parsedPath || PropertyBinding.parseTrackName( path );
-
-		this.node = PropertyBinding.findNode( rootNode, this.parsedPath.nodeName ) || rootNode;
-
-		this.rootNode = rootNode;
-
-	}
-
-	static create( root, path, parsedPath ) {
+	create: function ( root, path, parsedPath ) {
 
 		if ( ! ( root && root.isAnimationObjectGroup ) ) {
 
@@ -120,7 +123,7 @@ class PropertyBinding {
 
 		}
 
-	}
+	},
 
 	/**
 	 * Replaces spaces with underscores and removes unsupported characters from
@@ -129,13 +132,13 @@ class PropertyBinding {
 	 * @param {string} name Node name to be sanitized.
 	 * @return {string}
 	 */
-	static sanitizeNodeName( name ) {
+	sanitizeNodeName: function ( name ) {
 
 		return name.replace( /\s/g, '_' ).replace( _reservedRe, '' );
 
-	}
+	},
 
-	static parseTrackName( trackName ) {
+	parseTrackName: function ( trackName ) {
 
 		const matches = _trackRe.exec( trackName );
 
@@ -181,9 +184,9 @@ class PropertyBinding {
 
 		return results;
 
-	}
+	},
 
-	static findNode( root, nodeName ) {
+	findNode: function ( root, nodeName ) {
 
 		if ( ! nodeName || nodeName === '' || nodeName === '.' || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
 
@@ -243,11 +246,183 @@ class PropertyBinding {
 
 	}
 
-	// these are used to "bind" a nonexistent property
-	_getValue_unavailable() {}
-	_setValue_unavailable() {}
+} );
 
-	getValue( targetArray, offset ) {
+Object.assign( PropertyBinding.prototype, { // prototype, continued
+
+	// these are used to "bind" a nonexistent property
+	_getValue_unavailable: function () {},
+	_setValue_unavailable: function () {},
+
+	BindingType: {
+		Direct: 0,
+		EntireArray: 1,
+		ArrayElement: 2,
+		HasFromToArray: 3
+	},
+
+	Versioning: {
+		None: 0,
+		NeedsUpdate: 1,
+		MatrixWorldNeedsUpdate: 2
+	},
+
+	GetterByBindingType: [
+
+		function getValue_direct( buffer, offset ) {
+
+			buffer[ offset ] = this.node[ this.propertyName ];
+
+		},
+
+		function getValue_array( buffer, offset ) {
+
+			const source = this.resolvedProperty;
+
+			for ( let i = 0, n = source.length; i !== n; ++ i ) {
+
+				buffer[ offset ++ ] = source[ i ];
+
+			}
+
+		},
+
+		function getValue_arrayElement( buffer, offset ) {
+
+			buffer[ offset ] = this.resolvedProperty[ this.propertyIndex ];
+
+		},
+
+		function getValue_toArray( buffer, offset ) {
+
+			this.resolvedProperty.toArray( buffer, offset );
+
+		}
+
+	],
+
+	SetterByBindingTypeAndVersioning: [
+
+		[
+			// Direct
+
+			function setValue_direct( buffer, offset ) {
+
+				this.targetObject[ this.propertyName ] = buffer[ offset ];
+
+			},
+
+			function setValue_direct_setNeedsUpdate( buffer, offset ) {
+
+				this.targetObject[ this.propertyName ] = buffer[ offset ];
+				this.targetObject.needsUpdate = true;
+
+			},
+
+			function setValue_direct_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+				this.targetObject[ this.propertyName ] = buffer[ offset ];
+				this.targetObject.matrixWorldNeedsUpdate = true;
+
+			}
+
+		], [
+
+			// EntireArray
+
+			function setValue_array( buffer, offset ) {
+
+				const dest = this.resolvedProperty;
+
+				for ( let i = 0, n = dest.length; i !== n; ++ i ) {
+
+					dest[ i ] = buffer[ offset ++ ];
+
+				}
+
+			},
+
+			function setValue_array_setNeedsUpdate( buffer, offset ) {
+
+				const dest = this.resolvedProperty;
+
+				for ( let i = 0, n = dest.length; i !== n; ++ i ) {
+
+					dest[ i ] = buffer[ offset ++ ];
+
+				}
+
+				this.targetObject.needsUpdate = true;
+
+			},
+
+			function setValue_array_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+				const dest = this.resolvedProperty;
+
+				for ( let i = 0, n = dest.length; i !== n; ++ i ) {
+
+					dest[ i ] = buffer[ offset ++ ];
+
+				}
+
+				this.targetObject.matrixWorldNeedsUpdate = true;
+
+			}
+
+		], [
+
+			// ArrayElement
+
+			function setValue_arrayElement( buffer, offset ) {
+
+				this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
+
+			},
+
+			function setValue_arrayElement_setNeedsUpdate( buffer, offset ) {
+
+				this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
+				this.targetObject.needsUpdate = true;
+
+			},
+
+			function setValue_arrayElement_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+				this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
+				this.targetObject.matrixWorldNeedsUpdate = true;
+
+			}
+
+		], [
+
+			// HasToFromArray
+
+			function setValue_fromArray( buffer, offset ) {
+
+				this.resolvedProperty.fromArray( buffer, offset );
+
+			},
+
+			function setValue_fromArray_setNeedsUpdate( buffer, offset ) {
+
+				this.resolvedProperty.fromArray( buffer, offset );
+				this.targetObject.needsUpdate = true;
+
+			},
+
+			function setValue_fromArray_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+				this.resolvedProperty.fromArray( buffer, offset );
+				this.targetObject.matrixWorldNeedsUpdate = true;
+
+			}
+
+		]
+
+	],
+
+	getValue: function getValue_unbound( targetArray, offset ) {
 
 		this.bind();
 		this.getValue( targetArray, offset );
@@ -258,17 +433,17 @@ class PropertyBinding {
 		// the bound state. When the property is not found, the methods
 		// become no-ops.
 
-	}
+	},
 
-	setValue( sourceArray, offset ) {
+	setValue: function getValue_unbound( sourceArray, offset ) {
 
 		this.bind();
 		this.setValue( sourceArray, offset );
 
-	}
+	},
 
 	// create getter / setter pair for a property in the scene graph
-	bind() {
+	bind: function () {
 
 		let targetObject = this.node;
 		const parsedPath = this.parsedPath;
@@ -482,9 +657,9 @@ class PropertyBinding {
 		this.getValue = this.GetterByBindingType[ bindingType ];
 		this.setValue = this.SetterByBindingTypeAndVersioning[ bindingType ][ versioning ];
 
-	}
+	},
 
-	unbind() {
+	unbind: function () {
 
 		this.node = null;
 
@@ -495,177 +670,15 @@ class PropertyBinding {
 
 	}
 
-}
+} );
 
 // DECLARE ALIAS AFTER assign prototype
-// initial state of these methods that calls 'bind'
-PropertyBinding.prototype._getValue_unbound = PropertyBinding.prototype.getValue;
-PropertyBinding.prototype._setValue_unbound = PropertyBinding.prototype.setValue;
+Object.assign( PropertyBinding.prototype, {
 
-PropertyBinding.prototype.Composite = Composite;
-PropertyBinding.prototype.BindingType = {
-	Direct: 0,
-	EntireArray: 1,
-	ArrayElement: 2,
-	HasFromToArray: 3
-};
-PropertyBinding.prototype.Versioning = {
-	None: 0,
-	NeedsUpdate: 1,
-	MatrixWorldNeedsUpdate: 2
-};
-PropertyBinding.prototype.GetterByBindingType = [
+	// initial state of these methods that calls 'bind'
+	_getValue_unbound: PropertyBinding.prototype.getValue,
+	_setValue_unbound: PropertyBinding.prototype.setValue,
 
-	function getValue_direct( buffer, offset ) {
-
-		buffer[ offset ] = this.node[ this.propertyName ];
-
-	},
-
-	function getValue_array( buffer, offset ) {
-
-		const source = this.resolvedProperty;
-
-		for ( let i = 0, n = source.length; i !== n; ++ i ) {
-
-			buffer[ offset ++ ] = source[ i ];
-
-		}
-
-	},
-
-	function getValue_arrayElement( buffer, offset ) {
-
-		buffer[ offset ] = this.resolvedProperty[ this.propertyIndex ];
-
-	},
-
-	function getValue_toArray( buffer, offset ) {
-
-		this.resolvedProperty.toArray( buffer, offset );
-
-	}
-
-];
-PropertyBinding.prototype.SetterByBindingTypeAndVersioning = [
-
-	[
-		// Direct
-
-		function setValue_direct( buffer, offset ) {
-
-			this.targetObject[ this.propertyName ] = buffer[ offset ];
-
-		},
-
-		function setValue_direct_setNeedsUpdate( buffer, offset ) {
-
-			this.targetObject[ this.propertyName ] = buffer[ offset ];
-			this.targetObject.needsUpdate = true;
-
-		},
-
-		function setValue_direct_setMatrixWorldNeedsUpdate( buffer, offset ) {
-
-			this.targetObject[ this.propertyName ] = buffer[ offset ];
-			this.targetObject.matrixWorldNeedsUpdate = true;
-
-		}
-
-	], [
-
-		// EntireArray
-
-		function setValue_array( buffer, offset ) {
-
-			const dest = this.resolvedProperty;
-
-			for ( let i = 0, n = dest.length; i !== n; ++ i ) {
-
-				dest[ i ] = buffer[ offset ++ ];
-
-			}
-
-		},
-
-		function setValue_array_setNeedsUpdate( buffer, offset ) {
-
-			const dest = this.resolvedProperty;
-
-			for ( let i = 0, n = dest.length; i !== n; ++ i ) {
-
-				dest[ i ] = buffer[ offset ++ ];
-
-			}
-
-			this.targetObject.needsUpdate = true;
-
-		},
-
-		function setValue_array_setMatrixWorldNeedsUpdate( buffer, offset ) {
-
-			const dest = this.resolvedProperty;
-
-			for ( let i = 0, n = dest.length; i !== n; ++ i ) {
-
-				dest[ i ] = buffer[ offset ++ ];
-
-			}
-
-			this.targetObject.matrixWorldNeedsUpdate = true;
-
-		}
-
-	], [
-
-		// ArrayElement
-
-		function setValue_arrayElement( buffer, offset ) {
-
-			this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
-
-		},
-
-		function setValue_arrayElement_setNeedsUpdate( buffer, offset ) {
-
-			this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
-			this.targetObject.needsUpdate = true;
-
-		},
-
-		function setValue_arrayElement_setMatrixWorldNeedsUpdate( buffer, offset ) {
-
-			this.resolvedProperty[ this.propertyIndex ] = buffer[ offset ];
-			this.targetObject.matrixWorldNeedsUpdate = true;
-
-		}
-
-	], [
-
-		// HasToFromArray
-
-		function setValue_fromArray( buffer, offset ) {
-
-			this.resolvedProperty.fromArray( buffer, offset );
-
-		},
-
-		function setValue_fromArray_setNeedsUpdate( buffer, offset ) {
-
-			this.resolvedProperty.fromArray( buffer, offset );
-			this.targetObject.needsUpdate = true;
-
-		},
-
-		function setValue_fromArray_setMatrixWorldNeedsUpdate( buffer, offset ) {
-
-			this.resolvedProperty.fromArray( buffer, offset );
-			this.targetObject.matrixWorldNeedsUpdate = true;
-
-		}
-
-	]
-
-];
+} );
 
 export { PropertyBinding };
