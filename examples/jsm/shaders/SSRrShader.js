@@ -115,6 +115,8 @@ var SSRrShader = {
 			return xy;
 		}
 		void main(){
+			vec3 viewNormal=getViewNormal( vUv );
+			gl_FragColor=vec4(viewNormal,1);return;
 			#ifdef isSelective
 				float metalness=texture2D(tMetalness,vUv).r;
 				if(metalness==0.) return;
@@ -130,7 +132,7 @@ var SSRrShader = {
 			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
 
-			vec3 viewNormal=getViewNormal( vUv );
+			// vec3 viewNormal=getViewNormal( vUv );
 
 			#ifdef isPerspectiveCamera
 				vec3 viewIncidenceDir=normalize(viewPosition);

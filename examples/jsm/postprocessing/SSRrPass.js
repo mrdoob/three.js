@@ -23,7 +23,7 @@ import { SSRrBlurShader } from '../shaders/SSRrShader.js';
 import { SSRrDepthShader } from '../shaders/SSRrShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
-var SSRrPass = function ( { renderer, scene, camera, width, height, selects, encoding, isPerspectiveCamera = true, isBouncing = false, morphTargets = false } ) {
+var SSRrPass = function ( { renderer, scene, camera, width, height, selects, encoding, isPerspectiveCamera = true, morphTargets = false } ) {
 
 	Pass.call( this );
 
@@ -73,31 +73,8 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 			}
 
 		}
-	} );
-
-	this._isBouncing = isBouncing;
-	Object.defineProperty( this, 'isBouncing', {
-		get() {
-
-			return this._isBouncing;
-
-		},
-		set( val ) {
-
-			if ( this._isBouncing === val ) return;
-			this._isBouncing = val;
-			if ( val ) {
-
-				this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.prevRenderTarget.texture;
-
-			} else {
-
-				this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-
-			}
-
-		}
-	} );
+	});
+	console.log(2,selects)
 
 	this.isBlur = true;
 
@@ -169,13 +146,6 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 		depthBuffer: true
 	} );
 
-	//for bouncing
-	this.prevRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: LinearFilter,
-		magFilter: LinearFilter,
-		format: RGBAFormat,
-	} );
-
 	// normal render target
 
 	this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
@@ -184,16 +154,6 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 		format: RGBAFormat,
 		type: HalfFloatType,
 	} );
-
-	// metalness render target
-
-	// if (this.isSelective) {
-	this.metalnessRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: NearestFilter,
-		magFilter: NearestFilter,
-		format: RGBAFormat
-	} );
-	// }
 
 
 
@@ -238,7 +198,6 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	// if (this.isSelective) {
 	this.ssrrMaterial.defines.isSelective = this.isSelective;
 	this.ssrrMaterial.needsUpdate = true;
-	this.ssrrMaterial.uniforms[ 'tMetalness' ].value = this.metalnessRenderTarget.texture;
 	// }
 	this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 	this.ssrrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
@@ -252,20 +211,6 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 
 	this.normalMaterial = new MeshNormalMaterial( { morphTargets } );
 	this.normalMaterial.blending = NoBlending;
-
-	// if (this.isSelective) {
-	// metalnessOn material
-
-	this.metalnessOnMaterial = new MeshBasicMaterial( {
-		color: 'white'
-	} );
-
-	// metalnessOff material
-
-	this.metalnessOffMaterial = new MeshBasicMaterial( {
-		color: 'black'
-	} );
-	// }
 
 	// blur material
 
@@ -346,22 +291,14 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		// dispose render targets
 
 		this.beautyRenderTarget.dispose();
-		this.prevRenderTarget.dispose();
 		this.normalRenderTarget.dispose();
-		// if (this.isSelective)
-		this.metalnessRenderTarget.dispose();
 		this.ssrrRenderTarget.dispose();
 		this.blurRenderTarget.dispose();
 		this.blurRenderTarget2.dispose();
-		// this.blurRenderTarget3.dispose();
 
 		// dispose materials
 
 		this.normalMaterial.dispose();
-		// if (this.isSelective) {
-		this.metalnessOnMaterial.dispose();
-		this.metalnessOffMaterial.dispose();
-		// }
 		this.blurMaterial.dispose();
 		this.blurMaterial2.dispose();
 		this.copyMaterial.dispose();
@@ -381,19 +318,27 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		renderer.setRenderTarget( this.beautyRenderTarget );
 		renderer.clear();
 
+		this.scene.traverse(child => {
+			if (this.selects.includes(child)) {
+				child.visible=false
+			} else {
+				child.visible=true
+			}
+		})
 		renderer.render( this.scene, this.camera );
 
 		// render normals
 
+
+		this.scene.traverse(child => {
+			if (this.selects.includes(child)) {
+				child.visible=true
+			} else {
+				child.visible=false
+			}
+		})
+
 		this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0, 0 );
-
-		// render metalnesses
-
-		if ( this.isSelective ) {
-
-			this.renderMetalness( renderer, this.metalnessOnMaterial, this.metalnessRenderTarget, 0, 0 );
-
-		}
 
 		// render SSRr
 
@@ -420,37 +365,17 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 			case SSRrPass.OUTPUT.Default:
 
-				if ( this.isBouncing ) {
 
-					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-					this.copyMaterial.blending = NoBlending;
-					this.renderPass( renderer, this.copyMaterial, this.prevRenderTarget );
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+				this.copyMaterial.blending = NoBlending;
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
-					if ( this.isBlur )
-						this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget2.texture;
-					else
-						this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.texture;
-					this.copyMaterial.blending = NormalBlending;
-					this.renderPass( renderer, this.copyMaterial, this.prevRenderTarget );
-
-					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.prevRenderTarget.texture;
-					this.copyMaterial.blending = NoBlending;
-					this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
-
-				} else {
-
-					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-					this.copyMaterial.blending = NoBlending;
-					this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
-
-					if ( this.isBlur )
-						this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget2.texture;
-					else
-						this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.texture;
-					this.copyMaterial.blending = NormalBlending;
-					this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
-
-				}
+				if ( this.isBlur )
+					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget2.texture;
+				else
+					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.texture;
+				this.copyMaterial.blending = NormalBlending;
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 			case SSRrPass.OUTPUT.SSRr:
@@ -461,21 +386,6 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
-
-				if ( this.isBouncing ) {
-
-					if ( this.isBlur )
-						this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget2.texture;
-					else
-						this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-					this.copyMaterial.blending = NoBlending;
-					this.renderPass( renderer, this.copyMaterial, this.prevRenderTarget );
-
-					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.texture;
-					this.copyMaterial.blending = NormalBlending;
-					this.renderPass( renderer, this.copyMaterial, this.prevRenderTarget );
-
-				}
 
 				break;
 
@@ -496,14 +406,6 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 			case SSRrPass.OUTPUT.Normal:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
-				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
-
-				break;
-
-			case SSRrPass.OUTPUT.Metalness:
-
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.metalnessRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -577,55 +479,6 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	},
 
-	renderMetalness: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
-
-		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
-		var originalClearAlpha = renderer.getClearAlpha( this.tempColor );
-		var originalAutoClear = renderer.autoClear;
-
-		renderer.setRenderTarget( renderTarget );
-		renderer.autoClear = false;
-
-		clearColor = overrideMaterial.clearColor || clearColor;
-		clearAlpha = overrideMaterial.clearAlpha || clearAlpha;
-
-		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
-
-			renderer.setClearColor( clearColor );
-			renderer.setClearAlpha( clearAlpha || 0.0 );
-			renderer.clear();
-
-		}
-
-		this.scene.traverseVisible( child => {
-
-			child._SSRrPassMaterialBack = child.material;
-			if ( this._selects.includes( child ) ) {
-
-				child.material = this.metalnessOnMaterial;
-
-			} else {
-
-				child.material = this.metalnessOffMaterial;
-
-			}
-
-		} );
-		renderer.render( this.scene, this.camera );
-		this.scene.traverseVisible( child => {
-
-			child.material = child._SSRrPassMaterialBack;
-
-		} );
-
-		// restore original state
-
-		renderer.autoClear = originalAutoClear;
-		renderer.setClearColor( this.originalClearColor );
-		renderer.setClearAlpha( originalClearAlpha );
-
-	},
-
 	setSize: function ( width, height ) {
 
 		this.width = width;
@@ -634,11 +487,9 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.ssrrMaterial.defines.MAX_STEP = Math.sqrt( width * width + height * height );
 		this.ssrrMaterial.needsUpdate = true;
 		this.beautyRenderTarget.setSize( width, height );
-		this.prevRenderTarget.setSize( width, height );
 		this.ssrrRenderTarget.setSize( width, height );
 		this.normalRenderTarget.setSize( width, height );
 		// if (this.isSelective)
-		this.metalnessRenderTarget.setSize( width, height );
 		this.blurRenderTarget.setSize( width, height );
 		this.blurRenderTarget2.setSize( width, height );
 		// this.blurRenderTarget3.setSize(width, height);
@@ -660,7 +511,6 @@ SSRrPass.OUTPUT = {
 	'Beauty': 3,
 	'Depth': 4,
 	'Normal': 5,
-	'Metalness': 7,
 };
 
 export { SSRrPass };

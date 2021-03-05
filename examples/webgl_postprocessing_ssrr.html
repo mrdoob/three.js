@@ -32,7 +32,7 @@
 
 		const params = {
 			enableSSRr: true,
-			autoRotate: true,
+			autoRotate: false,
 			isOtherMeshes: true,
 		};
 		let composer;
@@ -45,112 +45,114 @@
 		const otherMeshes = [];
 		const selects = [];
 
-		const container = document.querySelector( '#container' );
+		const container = document.querySelector('#container');
 
 		// Configure and create Draco decoder.
 		const dracoLoader = new DRACOLoader();
-		dracoLoader.setDecoderPath( 'js/libs/draco/' );
-		dracoLoader.setDecoderConfig( { type: 'js' } );
+		dracoLoader.setDecoderPath('js/libs/draco/');
+		dracoLoader.setDecoderConfig({ type: 'js' });
 
 		init();
-		animate();
 
-		function init() {
+		async function init() {
 
-			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 15 );
-			camera.position.set( 0.13271600513224902, 0.3489546826045913, 0.43921296427927076 );
+			camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 15);
+			camera.position.set(0.13271600513224902, 0.3489546826045913, 0.43921296427927076);
 
 			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0x443333 );
-			scene.fog = new THREE.Fog( 0x443333, 1, 4 );
+			scene.background = new THREE.Color(0x443333);
+			scene.fog = new THREE.Fog(0x443333, 1, 4);
 
 			// Ground
 			const plane = new THREE.Mesh(
-				new THREE.PlaneGeometry( 8, 8 ),
-				new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
+				new THREE.PlaneGeometry(8, 8),
+				new THREE.MeshPhongMaterial({ color: 0x999999, specular: 0x101010 })
 			);
 			plane.rotation.x = - Math.PI / 2;
 			plane.position.y = - 0.0001;
 			// plane.receiveShadow = true;
-			scene.add( plane );
+			scene.add(plane);
 
 			// Lights
-			const hemiLight = new THREE.HemisphereLight( 0x443333, 0x111122 );
-			scene.add( hemiLight );
+			const hemiLight = new THREE.HemisphereLight(0x443333, 0x111122);
+			scene.add(hemiLight);
 
 			const spotLight = new THREE.SpotLight();
 			spotLight.angle = Math.PI / 16;
 			spotLight.penumbra = 0.5;
 			// spotLight.castShadow = true;
-			spotLight.position.set( - 1, 1, 1 );
-			scene.add( spotLight );
+			spotLight.position.set(- 1, 1, 1);
+			scene.add(spotLight);
 
-			dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
+			await new Promise(resolve => {
+				dracoLoader.load('models/draco/bunny.drc', function (geometry) {
 
-				geometry.computeVertexNormals();
+					geometry.computeVertexNormals();
 
-				const material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
-				const mesh = new THREE.Mesh( geometry, material );
-				mesh.position.y = - 0.0365;
-				scene.add( mesh );
-				selects.push( mesh );
+					const material = new THREE.MeshStandardMaterial({ color: 0x606060 });
+					const mesh = new THREE.Mesh(geometry, material);
+					mesh.position.y = - 0.0365;
+					scene.add(mesh);
+					selects.push(mesh);
 
-				// Release decoder resources.
-				dracoLoader.dispose();
+					// Release decoder resources.
+					dracoLoader.dispose();
 
-			} );
+					resolve()
+				});
+			})
 
 			let geometry, material, mesh;
 
-			geometry = new THREE.BoxBufferGeometry( .05, .05, .05 );
-			material = new THREE.MeshStandardMaterial( { color: 'green' } );
-			mesh = new THREE.Mesh( geometry, material );
-			mesh.position.set( - .12, .025, .015 );
-			scene.add( mesh );
-			otherMeshes.push( mesh );
-			selects.push( mesh );
+			geometry = new THREE.BoxBufferGeometry(.05, .05, .05);
+			material = new THREE.MeshStandardMaterial({ color: 'green' });
+			mesh = new THREE.Mesh(geometry, material);
+			mesh.position.set(- .12, .025, .015);
+			scene.add(mesh);
+			otherMeshes.push(mesh);
+			// selects.push( mesh );
 
-			geometry = new THREE.IcosahedronBufferGeometry( .025, 4 );
-			material = new THREE.MeshStandardMaterial( { color: 'cyan' } );
-			mesh = new THREE.Mesh( geometry, material );
-			mesh.position.set( - .05, .025, .08 );
-			scene.add( mesh );
-			otherMeshes.push( mesh );
-			selects.push( mesh );
+			geometry = new THREE.IcosahedronBufferGeometry(.025, 4);
+			material = new THREE.MeshStandardMaterial({ color: 'cyan' });
+			mesh = new THREE.Mesh(geometry, material);
+			mesh.position.set(- .05, .025, .08);
+			scene.add(mesh);
+			otherMeshes.push(mesh);
+			// selects.push( mesh );
 
-			geometry = new THREE.ConeBufferGeometry( .025, .05, 64 );
-			material = new THREE.MeshStandardMaterial( { color: 'yellow' } );
-			mesh = new THREE.Mesh( geometry, material );
-			mesh.position.set( - .05, .025, - .055 );
-			scene.add( mesh );
-			otherMeshes.push( mesh );
-			selects.push( mesh );
+			geometry = new THREE.ConeBufferGeometry(.025, .05, 64);
+			material = new THREE.MeshStandardMaterial({ color: 'yellow' });
+			mesh = new THREE.Mesh(geometry, material);
+			mesh.position.set(- .05, .025, - .055);
+			scene.add(mesh);
+			otherMeshes.push(mesh);
+			// selects.push( mesh );
 
 			// renderer
-			renderer = new THREE.WebGLRenderer( { antialias: false } );
-			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer = new THREE.WebGLRenderer({ antialias: false });
+			renderer.setSize(window.innerWidth, window.innerHeight);
 			renderer.outputEncoding = THREE.sRGBEncoding;
-			container.appendChild( renderer.domElement );
+			container.appendChild(renderer.domElement);
 
 			//
 
-			controls = new OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls(camera, renderer.domElement);
 			controls.enableDamping = true;
-			controls.target.set( 0, 0.0635, 0 );
+			controls.target.set(0, 0.0635, 0);
 			controls.update();
-			controls.enabled = ! params.autoRotate;
+			controls.enabled = !params.autoRotate;
 
 			// STATS
 
 			stats = new Stats();
-			container.appendChild( stats.dom );
+			container.appendChild(stats.dom);
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener('resize', onWindowResize, false);
 
 			// composer
 
-			composer = new EffectComposer( renderer );
-			ssrrPass = new SSRrPass( {
+			composer = new EffectComposer(renderer);
+			ssrrPass = new SSRrPass({
 				renderer,
 				scene,
 				camera,
@@ -159,70 +161,72 @@
 				encoding: THREE.sRGBEncoding,
 				isPerspectiveCamera: isPerspectiveCamera,
 				selects: selects
-			} );
+			});
+			console.log(1, selects)
 
-			composer.addPass( ssrrPass );
+			composer.addPass(ssrrPass);
 
 			// GUI
 
 			gui = new GUI();
-			gui.add( params, 'enableSSRr' ).name( 'Enable SSRr' );
-			gui.add( params, 'autoRotate' ).onChange( () => {
+			gui.add(params, 'enableSSRr').name('Enable SSRr');
+			gui.add(params, 'autoRotate').onChange(() => {
 
-				controls.enabled = ! params.autoRotate;
+				controls.enabled = !params.autoRotate;
 
-			} );
+			});
 
-			const folder = gui.addFolder( 'more settings' );
-			folder.add( ssrrPass, 'isFresnel' )
-			folder.add( ssrrPass, 'isDistanceAttenuation' )
+			const folder = gui.addFolder('more settings');
+			folder.add(ssrrPass, 'isFresnel')
+			folder.add(ssrrPass, 'isDistanceAttenuation')
 			ssrrPass.maxDistance = .1;
-			folder.add( ssrrPass, 'maxDistance' ).min( 0 ).max( .5 ).step( .001 )
-			folder.add( params, 'isOtherMeshes' ).onChange( () => {
+			folder.add(ssrrPass, 'maxDistance').min(0).max(.5).step(.001)
+			folder.add(params, 'isOtherMeshes').onChange(() => {
 
-				if ( params.isOtherMeshes ) {
+				if (params.isOtherMeshes) {
 
-					otherMeshes.forEach( mesh => mesh.visible = true );
+					otherMeshes.forEach(mesh => mesh.visible = true);
 
 				} else {
 
-					otherMeshes.forEach( mesh => mesh.visible = false );
+					otherMeshes.forEach(mesh => mesh.visible = false);
 
 				}
 
-			} );
-			folder.add( ssrrPass, 'isBouncing' );
-			folder.add( ssrrPass, 'output', {
+			});
+			folder.add(ssrrPass, 'output', {
 				'Default': SSRrPass.OUTPUT.Default,
 				'SSRr Only': SSRrPass.OUTPUT.SSRr,
 				'Beauty': SSRrPass.OUTPUT.Beauty,
 				'Depth': SSRrPass.OUTPUT.Depth,
 				'Normal': SSRrPass.OUTPUT.Normal,
 				'Metalness': SSRrPass.OUTPUT.Metalness,
-			} ).onChange( function ( value ) {
+			}).onChange(function (value) {
 
-				ssrrPass.output = parseInt( value );
+				ssrrPass.output = parseInt(value);
 
-			} );
+			});
 			ssrrPass.opacity = 1;
-			folder.add( ssrrPass, 'opacity' ).min( 0 ).max( 1 )
+			folder.add(ssrrPass, 'opacity').min(0).max(1)
 
-			if ( isPerspectiveCamera ) {
+			if (isPerspectiveCamera) {
 
 				ssrrPass.surfDist = 0.0015;
-				folder.add( ssrrPass, 'surfDist' ).min( 0 ).max( .005 ).step( .0001 );
+				folder.add(ssrrPass, 'surfDist').min(0).max(.005).step(.0001);
 
 			} else {
 
 				ssrrPass.surfDist = 2;
-				folder.add( ssrrPass, 'surfDist' ).min( 0 ).max( 7 ).step( .01 );
+				folder.add(ssrrPass, 'surfDist').min(0).max(7).step(.01);
 
 			}
 
-			folder.add( ssrrPass, 'isInfiniteThick' );
-			folder.add( ssrrPass, 'thickTolerance' ).min( 0 ).max( .05 ).step( .0001 );
-			folder.add( ssrrPass, 'isBlur' );
+			folder.add(ssrrPass, 'isInfiniteThick');
+			folder.add(ssrrPass, 'thickTolerance').min(0).max(.05).step(.0001);
+			folder.add(ssrrPass, 'isBlur');
 			// gui.close()
+
+			animate();
 
 		}
 
@@ -232,14 +236,14 @@
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
 
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			composer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			composer.setSize(window.innerWidth, window.innerHeight);
 
 		}
 
 		function animate() {
 
-			requestAnimationFrame( animate );
+			requestAnimationFrame(animate);
 
 			stats.begin();
 			render();
@@ -249,14 +253,14 @@
 
 		function render() {
 
-			if ( params.autoRotate ) {
+			if (params.autoRotate) {
 
 				const timer = Date.now() * 0.0003;
 
-				camera.position.x = Math.sin( timer ) * 0.5;
+				camera.position.x = Math.sin(timer) * 0.5;
 				camera.position.y = 0.2135;
-				camera.position.z = Math.cos( timer ) * 0.5;
-				camera.lookAt( 0, 0.0635, 0 );
+				camera.position.z = Math.cos(timer) * 0.5;
+				camera.lookAt(0, 0.0635, 0);
 
 			} else {
 
@@ -264,13 +268,13 @@
 
 			}
 
-			if ( params.enableSSRr ) {
+			if (params.enableSSRr) {
 
 				composer.render();
 
 			} else {
 
-				renderer.render( scene, camera );
+				renderer.render(scene, camera);
 
 			}
 
