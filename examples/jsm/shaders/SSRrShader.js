@@ -115,13 +115,16 @@ var SSRrShader = {
 			return xy;
 		}
 		void main(){
-			gl_FragColor=vec4(0,0,.5,1);return;
+			// gl_FragColor=vec4(0,0,.5,1);return;
 			vec3 viewNormal=getViewNormal( vUv );
-			gl_FragColor=vec4(viewNormal,1);return;
-			#ifdef isSelective
-				float metalness=texture2D(tMetalness,vUv).r;
-				if(metalness==0.) return;
-			#endif
+			// gl_FragColor=vec4(viewNormal,1);return;
+
+			if(viewNormal.x>0.||viewNormal.y>0.||viewNormal.z>0.){
+				vec4 diffuse=texture2D(tDiffuse,vUv);
+				gl_FragColor=diffuse;return;
+			}else{
+				gl_FragColor=vec4(0,1,1,1);return;
+			}
 
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
