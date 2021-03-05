@@ -67,7 +67,7 @@
 			let map=new THREE.TextureLoader().load('./textures/uv_grid_opengl.jpg')
 			map.wrapS = THREE.RepeatWrapping;
 			map.wrapT = THREE.RepeatWrapping;
-			map.repeat.set(100,100)
+			map.repeat.set(20,20)
 			const plane = new THREE.Mesh(
 				new THREE.PlaneGeometry(8, 8),
 				new THREE.MeshPhongMaterial({ 
@@ -192,8 +192,8 @@
 			const folder = gui.addFolder('more settings');
 			folder.add(ssrrPass, 'isFresnel')
 			folder.add(ssrrPass, 'isDistanceAttenuation')
-			ssrrPass.maxDistance = 100000000;
-			folder.add(ssrrPass, 'maxDistance').min(0).max(.5).step(.001)
+			ssrrPass.ior = .5;
+			folder.add(ssrrPass, 'ior').min(0).max(2).step(.001)
 			folder.add(params, 'isOtherMeshes').onChange(() => {
 
 				if (params.isOtherMeshes) {

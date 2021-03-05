@@ -25,7 +25,7 @@ var SSRrShader = {
     "resolution": { value: new Vector2() },
     "cameraProjectionMatrix": { value: new Matrix4() },
     "cameraInverseProjectionMatrix": { value: new Matrix4() },
-    "maxDistance": { value: 180 },
+    "ior": { value: .5 },
     "cameraRange": { value: 0 },
     "surfDist": { value: .007 },
     "thickTolerance": { value: .03 },
@@ -58,7 +58,7 @@ var SSRrShader = {
 		uniform vec2 resolution;
 		uniform float cameraNear;
 		uniform float cameraFar;
-		uniform float maxDistance;
+		uniform float ior;
 		uniform float surfDist;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
@@ -125,8 +125,6 @@ var SSRrShader = {
 			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
 
-			// vec3 viewNormal=getViewNormal( vUv );
-
 			#ifdef isPerspectiveCamera
 				vec3 viewIncidenceDir=normalize(viewPosition);
 			#else
@@ -134,17 +132,18 @@ var SSRrShader = {
 			#endif
 			// vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal);
 			// vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*10.);
-			vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*-.5);
-			// vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*-.05);
+			// vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*-.5);
+			vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*-ior);
 
+			float maxDistance=100000000000.;
 			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
-			// #ifdef isPerspectiveCamera
-			// 	if(d1viewPosition.z>-cameraNear){
-			// 		//https://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfLines.aspx
-			// 		float t=(-cameraNear-viewPosition.z)/viewRefractDir.z;
-			// 		d1viewPosition=viewPosition+viewRefractDir*t;
-			// 	}
-			// #endif
+			#ifdef isPerspectiveCamera
+				if(d1viewPosition.z>-cameraNear){
+					//https://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfLines.aspx
+					float t=(-cameraNear-viewPosition.z)/viewRefractDir.z;
+					d1viewPosition=viewPosition+viewRefractDir*t;
+				}
+			#endif
 			d1=viewPositionToXY(d1viewPosition);
 
 			float totalLen=length(d1-d0);
@@ -175,14 +174,7 @@ var SSRrShader = {
 					float sD=surfDist;
 				#endif
 
-				// float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
-
-
 				if(viewRefractRayZ<vZ){
-					// vec3 vN=getViewNormal( uv );
-					// if(dot(viewRefractDir,vN)>=0.) continue;
-					// float distance=pointPlaneDistance(vP,viewPosition,viewNormal);
-					// if(distance>maxDistance) break;
 					vec4 refractColor=texture2D(tDiffuse,uv);
 					gl_FragColor.xyz=refractColor.xyz;
 					gl_FragColor.a=1.;
