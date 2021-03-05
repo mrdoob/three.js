@@ -64,9 +64,17 @@
 			scene.fog = new THREE.Fog(0x443333, 1, 4);
 
 			// Ground
+			let map=new THREE.TextureLoader().load('./textures/uv_grid_opengl.jpg')
+			map.wrapS = THREE.RepeatWrapping;
+			map.wrapT = THREE.RepeatWrapping;
+			map.repeat.set(100,100)
 			const plane = new THREE.Mesh(
 				new THREE.PlaneGeometry(8, 8),
-				new THREE.MeshPhongMaterial({ color: 0x999999, specular: 0x101010 })
+				new THREE.MeshPhongMaterial({ 
+					color: 0x999999, 
+					specular: 0x101010,
+					map,
+				})
 			);
 			plane.rotation.x = - Math.PI / 2;
 			plane.position.y = - 0.0001;
