@@ -296,9 +296,7 @@ const babelrc = {
 			'@babel/preset-env',
 			{
 				modules: false,
-				// the supported browsers of the three.js browser bundle
-				// https://browsersl.ist/?q=%3E0.3%25%2C+not+dead
-				targets: '>0.3%, not dead',
+				targets: '>1%',
 				loose: true,
 				bugfixes: true,
 			}
