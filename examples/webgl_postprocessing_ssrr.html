@@ -72,17 +72,19 @@
 			plane.position.y = - 0.0001;
 			// plane.receiveShadow = true;
 			scene.add(plane);
+			plane.name='plane'
+			window.scene=scene
 
 			// Lights
-			const hemiLight = new THREE.HemisphereLight(0x443333, 0x111122);
-			scene.add(hemiLight);
+			// const hemiLight = new THREE.HemisphereLight(0x443333, 0x111122);
+			// scene.add(hemiLight);
 
-			const spotLight = new THREE.SpotLight();
-			spotLight.angle = Math.PI / 16;
-			spotLight.penumbra = 0.5;
-			// spotLight.castShadow = true;
-			spotLight.position.set(- 1, 1, 1);
-			scene.add(spotLight);
+			// const spotLight = new THREE.SpotLight();
+			// spotLight.angle = Math.PI / 16;
+			// spotLight.penumbra = 0.5;
+			// // spotLight.castShadow = true;
+			// spotLight.position.set(- 1, 1, 1);
+			// scene.add(spotLight);
 
 			await new Promise(resolve => {
 				dracoLoader.load('models/draco/bunny.drc', function (geometry) {
@@ -92,6 +94,7 @@
 					const material = new THREE.MeshStandardMaterial({ color: 0x606060 });
 					const mesh = new THREE.Mesh(geometry, material);
 					mesh.position.y = - 0.0365;
+					mesh.name='bunny'
 					scene.add(mesh);
 					selects.push(mesh);
 
@@ -108,6 +111,7 @@
 			material = new THREE.MeshStandardMaterial({ color: 'green' });
 			mesh = new THREE.Mesh(geometry, material);
 			mesh.position.set(- .12, .025, .015);
+			mesh.name='Box'
 			scene.add(mesh);
 			otherMeshes.push(mesh);
 			// selects.push( mesh );
@@ -116,6 +120,7 @@
 			material = new THREE.MeshStandardMaterial({ color: 'cyan' });
 			mesh = new THREE.Mesh(geometry, material);
 			mesh.position.set(- .05, .025, .08);
+			mesh.name='sphere'
 			scene.add(mesh);
 			otherMeshes.push(mesh);
 			// selects.push( mesh );
@@ -124,6 +129,7 @@
 			material = new THREE.MeshStandardMaterial({ color: 'yellow' });
 			mesh = new THREE.Mesh(geometry, material);
 			mesh.position.set(- .05, .025, - .055);
+			mesh.name='Cone'
 			scene.add(mesh);
 			otherMeshes.push(mesh);
 			// selects.push( mesh );
@@ -223,6 +229,7 @@
 
 			folder.add(ssrrPass, 'isInfiniteThick');
 			folder.add(ssrrPass, 'thickTolerance').min(0).max(.05).step(.0001);
+			folder.open()
 			// gui.close()
 
 			animate();

@@ -285,12 +285,11 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		// render normals
 
-
 		this.scene.traverse(child => {
 			if (this.selects.includes(child)) {
 				child.visible=true
 			} else {
-				child.visible=false
+				child.visible=true
 			}
 		})
 
