@@ -21559,21 +21559,19 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 }
 
-function ArrayCamera( array = [] ) {
+class ArrayCamera extends PerspectiveCamera {
 
-	PerspectiveCamera.call( this );
+	constructor( array = [] ) {
 
-	this.cameras = array;
+		super();
+
+		this.cameras = array;
+
+	}
 
 }
 
-ArrayCamera.prototype = Object.assign( Object.create( PerspectiveCamera.prototype ), {
-
-	constructor: ArrayCamera,
-
-	isArrayCamera: true
-
-} );
+ArrayCamera.prototype.isArrayCamera = true;
 
 class Group extends Object3D {
 

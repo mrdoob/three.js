@@ -16508,15 +16508,15 @@
 		};
 	}
 
-	function ArrayCamera(array = []) {
-		PerspectiveCamera.call(this);
-		this.cameras = array;
+	class ArrayCamera extends PerspectiveCamera {
+		constructor(array = []) {
+			super();
+			this.cameras = array;
+		}
+
 	}
 
-	ArrayCamera.prototype = Object.assign(Object.create(PerspectiveCamera.prototype), {
-		constructor: ArrayCamera,
-		isArrayCamera: true
-	});
+	ArrayCamera.prototype.isArrayCamera = true;
 
 	class Group extends Object3D {
 		constructor() {
