@@ -2,10 +2,6 @@ import {
   Matrix4,
   Vector2
 } from "../../../build/three.module.js";
-/**
- * References:
- * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
- */
 
 var SSRrShader = {
 
@@ -119,13 +115,7 @@ var SSRrShader = {
 			vec3 viewNormal=getViewNormal( vUv );
 			// gl_FragColor=vec4(viewNormal,1);return;
 
-			vec4 diffuse;
-			if(viewNormal.x>0.||viewNormal.y>0.||viewNormal.z>0.){
-				diffuse=texture2D(tDiffuse,vUv+viewNormal.xy*.1);
-			}else{
-				diffuse=texture2D(tDiffuse,vUv);
-			}
-			gl_FragColor=diffuse;return;
+			if(viewNormal.x==0.&&viewNormal.y==0.&&viewNormal.z==0.) return;
 
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
@@ -141,25 +131,17 @@ var SSRrShader = {
 
 			#ifdef isPerspectiveCamera
 				vec3 viewIncidenceDir=normalize(viewPosition);
-				vec3 viewReflectDir=reflect(viewIncidenceDir,viewNormal);
 			#else
 				vec3 viewIncidenceDir=vec3(0,0,-1);
-				vec3 viewReflectDir=reflect(viewIncidenceDir,viewNormal);
 			#endif
+			vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*-.05);
 
-			float maxReflectRayLen=maxDistance/dot(-viewIncidenceDir,viewNormal);
-			// dot(a,b)==length(a)*length(b)*cos(theta) // https://www.mathsisfun.com/algebra/vectors-dot-product.html
-			// if(a.isNormalized&&b.isNormalized) dot(a,b)==cos(theta)
-			// maxDistance/maxReflectRayLen=cos(theta)
-			// maxDistance/maxReflectRayLen==dot(a,b)
-			// maxReflectRayLen==maxDistance/dot(a,b)
-
-			vec3 d1viewPosition=viewPosition+viewReflectDir*maxReflectRayLen;
+			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
 			#ifdef isPerspectiveCamera
 				if(d1viewPosition.z>-cameraNear){
 					//https://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfLines.aspx
-					float t=(-cameraNear-viewPosition.z)/viewReflectDir.z;
-					d1viewPosition=viewPosition+viewReflectDir*t;
+					float t=(-cameraNear-viewPosition.z)/viewRefractDir.z;
+					d1viewPosition=viewPosition+viewRefractDir*t;
 				}
 			#endif
 			d1=viewPositionToXY(d1viewPosition);
@@ -179,44 +161,30 @@ var SSRrShader = {
 
 				float d = getDepth(uv);
 				float vZ = getViewZ( d );
-				if(-vZ>=cameraFar) continue;
 				float cW = cameraProjectionMatrix[2][3] * vZ+cameraProjectionMatrix[3][3];
 				vec3 vP=getViewPosition( uv, d, cW );
 
 				#ifdef isPerspectiveCamera
 					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 					float recipVPZ=1./viewPosition.z;
-					float viewReflectRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
+					float viewRefractRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
 					float sD=surfDist*cW;
 				#else
-					float viewReflectRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
+					float viewRefractRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
 					float sD=surfDist;
 				#endif
-				if(viewReflectRayZ-sD>vZ) continue;
 
-				#ifdef isInfiniteThick
-					if(viewReflectRayZ+thickTolerance*clipW<vP.z) break;
-				#endif
-				float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
+				// float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
 
 				float op=opacity;
 
-				if(away<sD){
-					vec3 vN=getViewNormal( uv );
-					if(dot(viewReflectDir,vN)>=0.) continue;
-					float distance=pointPlaneDistance(vP,viewPosition,viewNormal);
-					if(distance>maxDistance) break;
-					#ifdef isDistanceAttenuation
-						float ratio=1.-(distance/maxDistance);
-						float attenuation=ratio*ratio;
-						op=opacity*attenuation;
-					#endif
-					#ifdef isFresnel
-						float fresnel=(dot(viewIncidenceDir,viewReflectDir)+1.)/2.;
-						op*=fresnel;
-					#endif
-					vec4 reflectColor=texture2D(tDiffuse,uv);
-					gl_FragColor.xyz=reflectColor.xyz;
+				if(viewRefractRayZ-sD>vZ){
+					// vec3 vN=getViewNormal( uv );
+					// if(dot(viewRefractDir,vN)>=0.) continue;
+					// float distance=pointPlaneDistance(vP,viewPosition,viewNormal);
+					// if(distance>maxDistance) break;
+					vec4 refractColor=texture2D(tDiffuse,uv);
+					gl_FragColor.xyz=refractColor.xyz;
 					gl_FragColor.a=op;
 					break;
 				}

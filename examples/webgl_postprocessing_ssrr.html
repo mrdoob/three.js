@@ -184,7 +184,7 @@
 			const folder = gui.addFolder('more settings');
 			folder.add(ssrrPass, 'isFresnel')
 			folder.add(ssrrPass, 'isDistanceAttenuation')
-			ssrrPass.maxDistance = .1;
+			ssrrPass.maxDistance = 100000000;
 			folder.add(ssrrPass, 'maxDistance').min(0).max(.5).step(.001)
 			folder.add(params, 'isOtherMeshes').onChange(() => {
 
