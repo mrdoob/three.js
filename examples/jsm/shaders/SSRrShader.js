@@ -119,12 +119,13 @@ var SSRrShader = {
 			vec3 viewNormal=getViewNormal( vUv );
 			// gl_FragColor=vec4(viewNormal,1);return;
 
+			vec4 diffuse;
 			if(viewNormal.x>0.||viewNormal.y>0.||viewNormal.z>0.){
-				vec4 diffuse=texture2D(tDiffuse,vUv);
-				gl_FragColor=diffuse;return;
+				diffuse=texture2D(tDiffuse,vUv+viewNormal.xy*.1);
 			}else{
-				gl_FragColor=vec4(0,1,1,1);return;
+				diffuse=texture2D(tDiffuse,vUv);
 			}
+			gl_FragColor=diffuse;return;
 
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
