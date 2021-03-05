@@ -192,6 +192,7 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	this.ssrrMaterial.needsUpdate = true;
 	// }
 	this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+	this.ssrrMaterial.uniforms[ 'tDepthBunny' ].value = this.normalRenderTarget.depthTexture;
 	this.ssrrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 	this.ssrrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 	this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
@@ -289,11 +290,11 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		// 	// console.log(child.name,child.visible)
 		// })
 		// debugger
-		this.scene.children.filter(n=>n.name==='bunny')[0].visible=false
-		this.scene.children.filter(n=>n.name==='sphere')[0].visible=true
-		this.scene.children.filter(n=>n.name==='box')[0].visible=true
-		this.scene.children.filter(n=>n.name==='cone')[0].visible=true
-		this.scene.children.filter(n=>n.name==='plane')[0].visible=true
+		mesh_bunny.visible=false
+		mesh_sphere.visible=true
+		mesh_box.visible=true
+		mesh_cone.visible=true
+		mesh_plane.visible=true
 		renderer.render( this.scene, this.camera );
 
 		// render normals
@@ -315,11 +316,11 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		// 	}
 		// })
 
-		this.scene.children.filter(n=>n.name==='bunny')[0].visible=true
-		this.scene.children.filter(n=>n.name==='sphere')[0].visible=false
-		this.scene.children.filter(n=>n.name==='box')[0].visible=false
-		this.scene.children.filter(n=>n.name==='cone')[0].visible=false
-		this.scene.children.filter(n=>n.name==='plane')[0].visible=false
+		mesh_bunny.visible=true
+		mesh_sphere.visible=false
+		mesh_box.visible=false
+		mesh_cone.visible=false
+		mesh_plane.visible=false
 		this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0, 0 );
 
 		// render SSRr

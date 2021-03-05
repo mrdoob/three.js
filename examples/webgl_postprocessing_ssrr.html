@@ -81,6 +81,7 @@
 			// plane.receiveShadow = true;
 			scene.add(plane);
 			plane.name='plane'
+			window.mesh_plane=plane
 			window.scene=scene
 
 			// Lights
@@ -103,6 +104,7 @@
 					const mesh = new THREE.Mesh(geometry, material);
 					mesh.position.y = - 0.0365;
 					mesh.name='bunny'
+					window.mesh_bunny=mesh
 					scene.add(mesh);
 					selects.push(mesh);
 
@@ -120,6 +122,7 @@
 			mesh = new THREE.Mesh(geometry, material);
 			mesh.position.set(- .12, .025, .015);
 			mesh.name='box'
+			window.mesh_box=mesh
 			scene.add(mesh);
 			otherMeshes.push(mesh);
 			// selects.push( mesh );
@@ -129,6 +132,7 @@
 			mesh = new THREE.Mesh(geometry, material);
 			mesh.position.set(- .05, .025, .08);
 			mesh.name='sphere'
+			window.mesh_sphere=mesh
 			scene.add(mesh);
 			otherMeshes.push(mesh);
 			// selects.push( mesh );
@@ -138,6 +142,7 @@
 			mesh = new THREE.Mesh(geometry, material);
 			mesh.position.set(- .05, .025, - .055);
 			mesh.name='cone'
+			window.mesh_cone=mesh
 			scene.add(mesh);
 			otherMeshes.push(mesh);
 			// selects.push( mesh );
@@ -192,8 +197,8 @@
 			const folder = gui.addFolder('more settings');
 			folder.add(ssrrPass, 'isFresnel')
 			folder.add(ssrrPass, 'isDistanceAttenuation')
-			ssrrPass.ior = .5;
-			folder.add(ssrrPass, 'ior').min(0).max(2).step(.001)
+			ssrrPass.ior = .05;
+			folder.add(ssrrPass, 'ior').min(0).max(.2).step(.00001)
 			folder.add(params, 'isOtherMeshes').onChange(() => {
 
 				if (params.isOtherMeshes) {

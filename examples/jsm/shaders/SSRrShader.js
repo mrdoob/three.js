@@ -20,6 +20,7 @@ var SSRrShader = {
     "tNormal": { value: null },
     "tMetalness": { value: null },
     "tDepth": { value: null },
+    "tDepthBunny": { value: null },
     "cameraNear": { value: null },
     "cameraFar": { value: null },
     "resolution": { value: new Vector2() },
@@ -51,6 +52,7 @@ var SSRrShader = {
 		precision highp sampler2D;
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
+		uniform sampler2D tDepthBunny;
 		uniform sampler2D tNormal;
 		uniform sampler2D tMetalness;
 		uniform sampler2D tDiffuse;
@@ -82,6 +84,9 @@ var SSRrShader = {
 		}
 		float getDepth( const in vec2 uv ) {
 			return texture2D( tDepth, uv ).x;
+		}
+		float getDepthBunny( const in vec2 uv ) {
+			return texture2D( tDepthBunny, uv ).x;
 		}
 		float getViewZ( const in float depth ) {
 			#ifdef isPerspectiveCamera
@@ -115,7 +120,7 @@ var SSRrShader = {
 
 			if(viewNormal.x<=0.&&viewNormal.y<=0.&&viewNormal.z<=0.) return;
 
-			float depth = getDepth( vUv );
+			float depth = getDepthBunny( vUv );
 			float viewZ = getViewZ( depth );
 			// if(-viewZ>=cameraFar) return;
 
@@ -134,8 +139,9 @@ var SSRrShader = {
 			// vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*10.);
 			// vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*-.5);
 			vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*-ior);
+			// vec3 viewRefractDir=-viewNormal;
 
-			float maxDistance=100000000000.;
+			float maxDistance=100.;
 			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
 			#ifdef isPerspectiveCamera
 				if(d1viewPosition.z>-cameraNear){
