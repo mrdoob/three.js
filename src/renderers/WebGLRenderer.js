@@ -643,20 +643,24 @@ function WebGLRenderer( parameters ) {
 
 	function deallocateMaterial( material ) {
 
-		releaseMaterialProgramReference( material );
+		releaseMaterialProgramReferences( material );
 
 		properties.remove( material );
 
 	}
 
 
-	function releaseMaterialProgramReference( material ) {
+	function releaseMaterialProgramReferences( material ) {
 
-		const programInfo = properties.get( material ).program;
+		const programs = properties.get( material ).programs;
 
-		if ( programInfo !== undefined ) {
+		if ( programs !== undefined ) {
 
-			programCache.releaseProgram( programInfo );
+			programs.forEach( function ( program ) {
+
+				programCache.releaseProgram( program );
+
+			} );
 
 		}
 
@@ -900,8 +904,6 @@ function WebGLRenderer( parameters ) {
 
 		currentRenderState.setupLights();
 
-		const compiled = new WeakMap();
-
 		scene.traverse( function ( object ) {
 
 			const material = object.material;
@@ -914,19 +916,13 @@ function WebGLRenderer( parameters ) {
 
 						const material2 = material[ i ];
 
-						if ( compiled.has( material2 ) === false ) {
-
-							initMaterial( material2, scene, object );
-							compiled.set( material2 );
-
-						}
+						getProgram( material2, scene, object );
 
 					}
 
-				} else if ( compiled.has( material ) === false ) {
+				} else {
 
-					initMaterial( material, scene, object );
-					compiled.set( material );
+					getProgram( material, scene, object );
 
 				}
 
@@ -1323,7 +1319,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function initMaterial( material, scene, object ) {
+	function getProgram( material, scene, object ) {
 
 		if ( scene.isScene !== true ) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
 
@@ -1337,66 +1333,61 @@ function WebGLRenderer( parameters ) {
 		const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, object );
 		const programCacheKey = programCache.getProgramCacheKey( parameters );
 
-		let program = materialProperties.program;
-		let programChange = true;
+		let programs = materialProperties.programs;
 
-		// always update environment and fog - changing these trigger an initMaterial call, but it's possible that the program doesn't change
+		// always update environment and fog - changing these trigger an getProgram call, but it's possible that the program doesn't change
 
 		materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 		materialProperties.fog = scene.fog;
 		materialProperties.envMap = cubemaps.get( material.envMap || materialProperties.environment );
 
-		if ( program === undefined ) {
+		if ( programs === undefined ) {
 
 			// new material
+
 			material.addEventListener( 'dispose', onMaterialDispose );
 
-		} else if ( program.cacheKey !== programCacheKey ) {
-
-			// changed glsl or parameters
-			releaseMaterialProgramReference( material );
-
-		} else if ( materialProperties.lightsStateVersion !== lightsStateVersion ) {
-
-			programChange = false;
-
-		} else if ( parameters.shaderID !== undefined ) {
-
-			// same glsl and uniform list
-			return;
-
-		} else {
-
-			// only rebuild uniform list
-			programChange = false;
+			programs = new Map();
+			materialProperties.programs = programs;
 
 		}
 
-		if ( programChange ) {
+		let program = programs.get( programCacheKey );
+
+		if ( program !== undefined ) {
+
+			// early out if program and light state is identical
+
+			if ( materialProperties.currentProgram === program && materialProperties.lightsStateVersion === lightsStateVersion ) {
+
+				updateCommonMaterialProperties( material, parameters );
+
+				return program;
+
+			}
+
+		} else {
 
 			parameters.uniforms = programCache.getUniforms( material );
 
 			material.onBeforeCompile( parameters, _this );
 
 			program = programCache.acquireProgram( parameters, programCacheKey );
+			programs.set( programCacheKey, program );
 
-			materialProperties.program = program;
 			materialProperties.uniforms = parameters.uniforms;
-			materialProperties.outputEncoding = parameters.outputEncoding;
 
 		}
 
 		const uniforms = materialProperties.uniforms;
 
-		if ( ! material.isShaderMaterial &&
-			! material.isRawShaderMaterial ||
-			material.clipping === true ) {
+		if ( ( ! material.isShaderMaterial && ! material.isRawShaderMaterial ) || material.clipping === true ) {
 
-			materialProperties.numClippingPlanes = clipping.numPlanes;
-			materialProperties.numIntersection = clipping.numIntersection;
 			uniforms.clippingPlanes = clipping.uniform;
 
 		}
+
+		updateCommonMaterialProperties( material, parameters );
 
 		// store the light setup it was created for
 
@@ -1430,10 +1421,24 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		const progUniforms = materialProperties.program.getUniforms();
+		const progUniforms = program.getUniforms();
 		const uniformsList = WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
 
+		materialProperties.currentProgram = program;
 		materialProperties.uniformsList = uniformsList;
+
+		return program;
+
+	}
+
+	function updateCommonMaterialProperties( material, parameters ) {
+
+		const materialProperties = properties.get( material );
+
+		materialProperties.outputEncoding = parameters.outputEncoding;
+		materialProperties.instancing = parameters.instancing;
+		materialProperties.numClippingPlanes = parameters.numClippingPlanes;
+		materialProperties.numIntersection = parameters.numClipIntersection;
 
 	}
 
@@ -1468,40 +1473,58 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		//
+
+		let needsProgramChange = false;
+
 		if ( material.version === materialProperties.__version ) {
 
-			if ( material.fog && materialProperties.fog !== fog ) {
+			if ( materialProperties.needsLights && ( materialProperties.lightsStateVersion !== lights.state.version ) ) {
 
-				initMaterial( material, scene, object );
+				needsProgramChange = true;
 
-			} else if ( materialProperties.environment !== environment ) {
+			} else if ( materialProperties.outputEncoding !== encoding ) {
 
-				initMaterial( material, scene, object );
+				needsProgramChange = true;
 
-			} else if ( materialProperties.needsLights && ( materialProperties.lightsStateVersion !== lights.state.version ) ) {
+			} else if ( object.isInstancedMesh && materialProperties.instancing === false ) {
 
-				initMaterial( material, scene, object );
+				needsProgramChange = true;
+
+			} else if ( ! object.isInstancedMesh && materialProperties.instancing === true ) {
+
+				needsProgramChange = true;
+
+			} else if ( materialProperties.envMap !== envMap ) {
+
+				needsProgramChange = true;
+
+			} else if ( material.fog && materialProperties.fog !== fog ) {
+
+				needsProgramChange = true;
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== clipping.numPlanes ||
 				materialProperties.numIntersection !== clipping.numIntersection ) ) {
 
-				initMaterial( material, scene, object );
-
-			} else if ( materialProperties.outputEncoding !== encoding ) {
-
-				initMaterial( material, scene, object );
-
-			} else if ( materialProperties.envMap !== envMap ) {
-
-				initMaterial( material, scene, object );
+				needsProgramChange = true;
 
 			}
 
 		} else {
 
-			initMaterial( material, scene, object );
+			needsProgramChange = true;
 			materialProperties.__version = material.version;
+
+		}
+
+		//
+
+		let program = materialProperties.currentProgram;
+
+		if ( needsProgramChange === true ) {
+
+			program = getProgram( material, scene, object );
 
 		}
 
@@ -1509,8 +1532,7 @@ function WebGLRenderer( parameters ) {
 		let refreshMaterial = false;
 		let refreshLights = false;
 
-		const program = materialProperties.program,
-			p_uniforms = program.getUniforms(),
+		const p_uniforms = program.getUniforms(),
 			m_uniforms = materialProperties.uniforms;
 
 		if ( state.useProgram( program.program ) ) {
