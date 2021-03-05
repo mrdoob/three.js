@@ -291,6 +291,9 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		// debugger
 		this.scene.children.filter(n=>n.name==='bunny')[0].visible=false
 		this.scene.children.filter(n=>n.name==='sphere')[0].visible=true
+		this.scene.children.filter(n=>n.name==='box')[0].visible=true
+		this.scene.children.filter(n=>n.name==='cone')[0].visible=true
+		this.scene.children.filter(n=>n.name==='plane')[0].visible=true
 		renderer.render( this.scene, this.camera );
 
 		// render normals
@@ -314,6 +317,9 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.scene.children.filter(n=>n.name==='bunny')[0].visible=true
 		this.scene.children.filter(n=>n.name==='sphere')[0].visible=false
+		this.scene.children.filter(n=>n.name==='box')[0].visible=false
+		this.scene.children.filter(n=>n.name==='cone')[0].visible=false
+		this.scene.children.filter(n=>n.name==='plane')[0].visible=false
 		this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0, 0 );
 
 		// render SSRr
