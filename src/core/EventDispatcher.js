@@ -1,10 +1,12 @@
 /**
- * @author mrdoob / http://mrdoob.com/
+ * https://github.com/mrdoob/eventdispatcher.js/
  */
 
-class EventDispatcher {
+function EventDispatcher() {}
 
-	addEventListener( type, listener ) {
+Object.assign( EventDispatcher.prototype, {
+
+	addEventListener: function ( type, listener ) {
 
 		if ( this._listeners === undefined ) this._listeners = {};
 
@@ -22,9 +24,9 @@ class EventDispatcher {
 
 		}
 
-	}
+	},
 
-	hasEventListener( type, listener ) {
+	hasEventListener: function ( type, listener ) {
 
 		if ( this._listeners === undefined ) return false;
 
@@ -32,9 +34,9 @@ class EventDispatcher {
 
 		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
 
-	}
+	},
 
-	removeEventListener( type, listener ) {
+	removeEventListener: function ( type, listener ) {
 
 		if ( this._listeners === undefined ) return;
 
@@ -53,9 +55,9 @@ class EventDispatcher {
 
 		}
 
-	}
+	},
 
-	dispatchEvent( event ) {
+	dispatchEvent: function ( event ) {
 
 		if ( this._listeners === undefined ) return;
 
@@ -79,6 +81,7 @@ class EventDispatcher {
 
 	}
 
-}
+} );
+
 
 export { EventDispatcher };
