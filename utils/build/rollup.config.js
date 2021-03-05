@@ -259,7 +259,12 @@ function header() {
 
 		renderChunk( code ) {
 
-			return '// threejs.org/license\n' + code;
+			return `/**
+ * @license
+ * Copyright 2010-2021 Three.js Authors
+ * SPDX-License-Identifier: MIT
+ */
+${ code }`;
 
 		}
 
