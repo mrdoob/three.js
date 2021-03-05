@@ -25,7 +25,6 @@ var SSRrShader = {
     "resolution": { value: new Vector2() },
     "cameraProjectionMatrix": { value: new Matrix4() },
     "cameraInverseProjectionMatrix": { value: new Matrix4() },
-    "opacity": { value: .5 },
     "maxDistance": { value: 180 },
     "cameraRange": { value: 0 },
     "surfDist": { value: .007 },
@@ -57,7 +56,6 @@ var SSRrShader = {
 		uniform sampler2D tDiffuse;
 		uniform float cameraRange;
 		uniform vec2 resolution;
-		uniform float opacity;
 		uniform float cameraNear;
 		uniform float cameraFar;
 		uniform float maxDistance;
@@ -115,11 +113,11 @@ var SSRrShader = {
 			vec3 viewNormal=getViewNormal( vUv );
 			// gl_FragColor=vec4(viewNormal,1);return;
 
-			if(viewNormal.x==0.&&viewNormal.y==0.&&viewNormal.z==0.) return;
+			if(viewNormal.x<=0.&&viewNormal.y<=0.&&viewNormal.z<=0.) return;
 
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
-			if(-viewZ>=cameraFar) return;
+			// if(-viewZ>=cameraFar) return;
 
 			float clipW = cameraProjectionMatrix[2][3] * viewZ+cameraProjectionMatrix[3][3];
 			vec3 viewPosition=getViewPosition( vUv, depth, clipW );
@@ -134,16 +132,19 @@ var SSRrShader = {
 			#else
 				vec3 viewIncidenceDir=vec3(0,0,-1);
 			#endif
-			vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*-.05);
+			// vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal);
+			// vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*10.);
+			vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*-.5);
+			// vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*-.05);
 
 			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
-			#ifdef isPerspectiveCamera
-				if(d1viewPosition.z>-cameraNear){
-					//https://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfLines.aspx
-					float t=(-cameraNear-viewPosition.z)/viewRefractDir.z;
-					d1viewPosition=viewPosition+viewRefractDir*t;
-				}
-			#endif
+			// #ifdef isPerspectiveCamera
+			// 	if(d1viewPosition.z>-cameraNear){
+			// 		//https://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfLines.aspx
+			// 		float t=(-cameraNear-viewPosition.z)/viewRefractDir.z;
+			// 		d1viewPosition=viewPosition+viewRefractDir*t;
+			// 	}
+			// #endif
 			d1=viewPositionToXY(d1viewPosition);
 
 			float totalLen=length(d1-d0);
@@ -176,16 +177,15 @@ var SSRrShader = {
 
 				// float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
 
-				float op=opacity;
 
-				if(viewRefractRayZ-sD>vZ){
+				if(viewRefractRayZ<vZ){
 					// vec3 vN=getViewNormal( uv );
 					// if(dot(viewRefractDir,vN)>=0.) continue;
 					// float distance=pointPlaneDistance(vP,viewPosition,viewNormal);
 					// if(distance>maxDistance) break;
 					vec4 refractColor=texture2D(tDiffuse,uv);
 					gl_FragColor.xyz=refractColor.xyz;
-					gl_FragColor.a=op;
+					gl_FragColor.a=1.;
 					break;
 				}
 			}
@@ -261,67 +261,4 @@ var SSRrDepthShader = {
 
 };
 
-var SSRrBlurShader = {
-
-  uniforms: {
-
-    "tDiffuse": { value: null },
-    "resolution": { value: new Vector2() },
-    "opacity": { value: .5 },
-
-  },
-
-  vertexShader: /* glsl */`
-
-    varying vec2 vUv;
-
-    void main() {
-
-    	vUv = uv;
-    	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-    }
-
-  `,
-
-  fragmentShader: /* glsl */`
-
-    uniform sampler2D tDiffuse;
-    uniform vec2 resolution;
-    varying vec2 vUv;
-    void main() {
-			//reverse engineering from PhotoShop blur filter, then change coefficient
-
-    	vec2 texelSize = ( 1.0 / resolution );
-
-			vec4 c=texture2D(tDiffuse,vUv);
-
-			vec2 offset;
-
-			offset=(vec2(-1,0))*texelSize;
-			vec4 cl=texture2D(tDiffuse,vUv+offset);
-
-			offset=(vec2(1,0))*texelSize;
-			vec4 cr=texture2D(tDiffuse,vUv+offset);
-
-			offset=(vec2(0,-1))*texelSize;
-			vec4 cb=texture2D(tDiffuse,vUv+offset);
-
-			offset=(vec2(0,1))*texelSize;
-			vec4 ct=texture2D(tDiffuse,vUv+offset);
-
-			// float coeCenter=.5;
-			// float coeSide=.125;
-			float coeCenter=.2;
-			float coeSide=.2;
-			float a=c.a*coeCenter+cl.a*coeSide+cr.a*coeSide+cb.a*coeSide+ct.a*coeSide;
-			vec3 rgb=(c.rgb*c.a*coeCenter+cl.rgb*cl.a*coeSide+cr.rgb*cr.a*coeSide+cb.rgb*cb.a*coeSide+ct.rgb*ct.a*coeSide)/a;
-			gl_FragColor=vec4(rgb,a);
-
-		}
-	`
-
-
-};
-
-export { SSRrShader, SSRrDepthShader, SSRrBlurShader };
+export { SSRrShader, SSRrDepthShader };
