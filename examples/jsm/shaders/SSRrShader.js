@@ -114,11 +114,15 @@ var SSRrShader = {
 			return xy;
 		}
 		void main(){
+			float metalness=texture2D(tMetalness,vUv).r;
+			if(metalness==0.) return;
+
+			// TODO: Will if(ior===0.) return; improve performance?
 			// gl_FragColor=vec4(0,0,.5,1);return;
 			vec3 viewNormal=getViewNormal( vUv );
 			// gl_FragColor=vec4(viewNormal,1);return;
 
-			if(viewNormal.x<=0.&&viewNormal.y<=0.&&viewNormal.z<=0.) return;
+			// if(viewNormal.x<=0.&&viewNormal.y<=0.&&viewNormal.z<=0.) return;
 
 			float depth = getDepthBunny( vUv );
 			float viewZ = getViewZ( depth );

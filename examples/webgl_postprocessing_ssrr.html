@@ -32,7 +32,7 @@
 
 		const params = {
 			enableSSRr: true,
-			autoRotate: false,
+			autoRotate: true,
 			isOtherMeshes: true,
 		};
 		let composer;
@@ -151,6 +151,7 @@
 			renderer = new THREE.WebGLRenderer({ antialias: false });
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			renderer.outputEncoding = THREE.sRGBEncoding;
+			renderer.autoClear=false
 			container.appendChild(renderer.domElement);
 
 			//
@@ -188,6 +189,8 @@
 
 			gui = new GUI();
 			gui.add(params, 'enableSSRr').name('Enable SSRr');
+			ssrrPass.ior = .05;
+			gui.add(ssrrPass, 'ior').name('IOR').min(0).max(.2).step(.00001)
 			gui.add(params, 'autoRotate').onChange(() => {
 
 				controls.enabled = !params.autoRotate;
@@ -197,8 +200,6 @@
 			const folder = gui.addFolder('more settings');
 			folder.add(ssrrPass, 'isFresnel')
 			folder.add(ssrrPass, 'isDistanceAttenuation')
-			ssrrPass.ior = .05;
-			folder.add(ssrrPass, 'ior').min(0).max(.2).step(.00001)
 			folder.add(params, 'isOtherMeshes').onChange(() => {
 
 				if (params.isOtherMeshes) {
@@ -241,7 +242,7 @@
 
 			folder.add(ssrrPass, 'isInfiniteThick');
 			folder.add(ssrrPass, 'thickTolerance').min(0).max(.05).step(.0001);
-			folder.open()
+			// folder.open()
 			// gui.close()
 
 			animate();

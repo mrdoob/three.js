@@ -151,7 +151,13 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 		type: HalfFloatType,
 	} );
 
+	// metalness render target
 
+	this.metalnessRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+		minFilter: NearestFilter,
+		magFilter: NearestFilter,
+		format: RGBAFormat
+	} );
 
 	// ssrr render target
 
@@ -190,6 +196,7 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	// if (this.isSelective) {
 	this.ssrrMaterial.defines.isSelective = this.isSelective;
 	this.ssrrMaterial.needsUpdate = true;
+	this.ssrrMaterial.uniforms[ 'tMetalness' ].value = this.metalnessRenderTarget.texture;
 	// }
 	this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 	this.ssrrMaterial.uniforms[ 'tDepthBunny' ].value = this.normalRenderTarget.depthTexture;
@@ -204,6 +211,18 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 
 	this.normalMaterial = new MeshNormalMaterial( { morphTargets } );
 	this.normalMaterial.blending = NoBlending;
+
+	// metalnessOn material
+
+	this.metalnessOnMaterial = new MeshBasicMaterial( {
+		color: 'white'
+	} );
+
+	// metalnessOff material
+
+	this.metalnessOffMaterial = new MeshBasicMaterial( {
+		color: 'black'
+	} );
 
 	// material for rendering the depth
 
@@ -252,11 +271,14 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.beautyRenderTarget.dispose();
 		this.normalRenderTarget.dispose();
+		this.metalnessRenderTarget.dispose();
 		this.ssrrRenderTarget.dispose();
 
 		// dispose materials
 
 		this.normalMaterial.dispose();
+		this.metalnessOnMaterial.dispose();
+		this.metalnessOffMaterial.dispose();
 		this.copyMaterial.dispose();
 		this.depthRenderMaterial.dispose();
 
@@ -321,7 +343,9 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		mesh_box.visible=false
 		mesh_cone.visible=false
 		mesh_plane.visible=false
-		this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0, 0 );
+		this.renderOverride(renderer, this.normalMaterial, this.normalRenderTarget, 0, 0);
+
+		this.renderMetalness( renderer, this.metalnessOnMaterial, this.metalnessRenderTarget, 0, 0 );
 
 		// render SSRr
 
@@ -371,6 +395,14 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 			case SSRrPass.OUTPUT.Normal:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
+				this.copyMaterial.blending = NoBlending;
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+
+				break;
+
+			case SSRrPass.OUTPUT.Metalness:
+
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.metalnessRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -444,6 +476,65 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	},
 
+
+	renderMetalness: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
+
+		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
+		var originalClearAlpha = renderer.getClearAlpha( this.tempColor );
+		var originalAutoClear = renderer.autoClear;
+
+		renderer.setRenderTarget( renderTarget );
+		renderer.autoClear = false;
+
+		clearColor = overrideMaterial.clearColor || clearColor;
+		clearAlpha = overrideMaterial.clearAlpha || clearAlpha;
+
+		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
+
+			renderer.setClearColor( clearColor );
+			renderer.setClearAlpha( clearAlpha || 0.0 );
+			renderer.clear();
+
+		}
+
+
+		mesh_bunny.visible=true
+		mesh_sphere.visible=true
+		mesh_box.visible=true
+		mesh_cone.visible=true
+		mesh_plane.visible=true
+		this.scene.traverse( child => {
+
+			child._SSRPassMaterialBack = child.material;
+			if ( this._selects.includes( child ) ) {
+
+				child.material = this.metalnessOnMaterial;
+
+			} else {
+
+				child.material = this.metalnessOffMaterial;
+
+			}
+
+		});
+		this.scene._fog=this.scene.fog // TODO: Formal writing.
+		this.scene.fog=null
+		renderer.render(this.scene, this.camera);
+		this.scene.fog=this.scene._fog
+		this.scene.traverse( child => {
+
+			child.material = child._SSRPassMaterialBack;
+
+		} );
+
+		// restore original state
+
+		renderer.autoClear = originalAutoClear;
+		renderer.setClearColor( this.originalClearColor );
+		renderer.setClearAlpha( originalClearAlpha );
+
+	},
+
 	setSize: function ( width, height ) {
 
 		this.width = width;
@@ -469,6 +560,7 @@ SSRrPass.OUTPUT = {
 	'Beauty': 3,
 	'Depth': 4,
 	'Normal': 5,
+	'Metalness': 7,
 };
 
 export { SSRrPass };
