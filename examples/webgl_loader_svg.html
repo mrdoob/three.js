@@ -34,7 +34,7 @@
 			const extrudeSettings = {
 				steps: 2,
 				depth: 16,
-				bevelEnabled: true,
+				bevelEnabled: false,
 				bevelThickness: 1,
 				bevelSize: 1,
 				bevelOffset: 0,
@@ -43,25 +43,25 @@
 
 			const fileOptions = {
 
-				"Tiger": 'models/svg/tiger.svg',
-				"Three.js": 'models/svg/threejs.svg',
-				"Joins and caps": 'models/svg/lineJoinsAndCaps.svg',
-				"Hexagon": 'models/svg/hexagon.svg',
-				"Test 1": 'models/svg/tests/1.svg',
-				"Test 2": 'models/svg/tests/2.svg',
-				"Test 3": 'models/svg/tests/3.svg',
-				"Test 4": 'models/svg/tests/4.svg',
-				"Test 5": 'models/svg/tests/5.svg',
-				"Test 6": 'models/svg/tests/6.svg',
-				"Test 7": 'models/svg/tests/7.svg',
-				"Test 8": 'models/svg/tests/8.svg',
-				"Units": 'models/svg/tests/units.svg',
-				"Defs": 'models/svg/tests/testDefs/Svg-defs.svg',
-				"Defs2": 'models/svg/tests/testDefs/Svg-defs2.svg',
-				"Defs3": 'models/svg/tests/testDefs/Wave-defs.svg',
-				"Defs4": 'models/svg/tests/testDefs/defs4.svg',
-				"Zero Radius": 'models/svg/zero-radius.svg',
-				"Custom SVG": 'custom_url'
+				'Tiger': 'models/svg/tiger.svg',
+				'Three.js': 'models/svg/threejs.svg',
+				'Joins and caps': 'models/svg/lineJoinsAndCaps.svg',
+				'Hexagon': 'models/svg/hexagon.svg',
+				'Test 1': 'models/svg/tests/1.svg',
+				'Test 2': 'models/svg/tests/2.svg',
+				'Test 3': 'models/svg/tests/3.svg',
+				'Test 4': 'models/svg/tests/4.svg',
+				'Test 5': 'models/svg/tests/5.svg',
+				'Test 6': 'models/svg/tests/6.svg',
+				'Test 7': 'models/svg/tests/7.svg',
+				'Test 8': 'models/svg/tests/8.svg',
+				'Units': 'models/svg/tests/units.svg',
+				'Defs': 'models/svg/tests/testDefs/Svg-defs.svg',
+				'Defs2': 'models/svg/tests/testDefs/Svg-defs2.svg',
+				'Defs3': 'models/svg/tests/testDefs/Wave-defs.svg',
+				'Defs4': 'models/svg/tests/testDefs/defs4.svg',
+				'Zero Radius': 'models/svg/zero-radius.svg',
+				'Custom SVG': 'custom_url'
 
 			};
 
@@ -137,16 +137,13 @@
 				gui.add( guiData, 'extrudeStrokes' ).name( 'Extrude strokes' ).onChange( update );
 
 
-				function update(value) {
-					if(value === fileOptions["Custom SVG"]) {
-						promptFile("image/svg+xml", false).then(function (value) {
-							if (value) {
-								guiData.currentURL = URL.createObjectURL(value);
-								loadSVG(guiData.currentURL);
-							}
-						});
-					}
-					else if(guiData.currentURL !== fileOptions["Custom SVG"]) loadSVG( guiData.currentURL );
+				function update( value ) {
+
+					if ( value === fileOptions[ 'Custom SVG' ] )
+						promptFile( 'image/svg+xml', false ).then( loadSVG );
+
+					else if ( guiData.currentURL !== fileOptions[ 'Custom SVG' ] ) loadSVG( guiData.currentURL );
+
 				}
 
 
@@ -154,7 +151,7 @@
 
 			function loadSVG( url ) {
 
-				//
+				guiData.currentURL = url;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xb0b0b0 );
@@ -209,8 +206,8 @@
 
 								const geometry = guiData.extrudeFillShapes ? new THREE.ExtrudeBufferGeometry( shape, extrudeSettings ) : new THREE.ShapeGeometry( shape );
 								const mesh = new THREE.Mesh( geometry, material );
-								if(guiData.extrudeFillShapes)
-									mesh.position.z += zOffset++ * 0.01;
+								if ( guiData.extrudeFillShapes )
+									mesh.position.z += zOffset ++ * 0.01;
 								group.add( mesh );
 
 							}
@@ -240,8 +237,8 @@
 								if ( geometry ) {
 
 									const mesh = new THREE.Mesh( geometry, material );
-									if(guiData.extrudeStrokes)
-										mesh.position.z += zOffset++ * 0.01;
+									if ( guiData.extrudeStrokes )
+										mesh.position.z += zOffset ++ * 0.01;
 
 									group.add( mesh );
 
@@ -273,6 +270,7 @@
 				requestAnimationFrame( animate );
 
 				render();
+
 				stats.update();
 
 			}
@@ -284,22 +282,32 @@
 			}
 
 			let fileInput = null;
-			function promptFile(contentType, multiple) {
-				if(fileInput == null) {
-					fileInput = document.createElement("input");
+			function promptFile( contentType, multiple ) {
+
+				if ( fileInput == null ) {
+
+					fileInput = document.createElement( 'input' );
+
 				}
-				fileInput.type = "file";
+
+				fileInput.type = 'file';
 				fileInput.multiple = multiple;
 				fileInput.accept = contentType;
-				return new Promise(function(resolve) {
-					fileInput.onchange = function() {
-						const files = Array.from(fileInput.files);
-						if (multiple)
-							return resolve(files);
-						resolve(files[0]);
+				return new Promise( function ( resolve ) {
+
+					fileInput.onchange = function () {
+
+						const files = Array.from( fileInput.files ).map(f => f && URL.createObjectURL(f));
+						if ( multiple )
+							return resolve( files );
+						if(files.length > 0 && files[0])
+							resolve( files[ 0 ] );
 					};
+
 					fileInput.click();
-				});
+
+				} );
+
 			}
 
 		</script>
