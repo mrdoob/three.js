@@ -17,6 +17,28 @@ class MathNode extends Node {
 
 	}
 
+	getInputType( builder ) {
+		
+		const typeA = this.a.getType( builder );
+
+		if ( this.b !== null ) {
+			
+			const typeB = this.b.getType( builder );
+			
+			if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+
+				// anytype x anytype: use the greater length vector
+
+				return typeB;
+
+			}
+
+		}
+
+		return typeA;
+		
+	}
+
 	getType( builder ) {
 
 		const method = this.method;
@@ -34,23 +56,7 @@ class MathNode extends Node {
 
 		} else {
 
-			const typeA = this.a.getType( builder );
-
-			if ( this.b !== null ) {
-				
-				const typeB = this.b.getType( builder );
-				
-				if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
-
-					// anytype x anytype: use the greater length vector
-
-					return typeB;
-
-				}
-
-			}
-
-			return typeA;
+			return this.getInputType( builder );
 
 		}
 
@@ -59,7 +65,7 @@ class MathNode extends Node {
 	generate( builder, output ) {
 
 		const method = this.method;
-		const type = this.getType( builder );
+		const type = this.getInputType( builder );
 
 		const a = this.a.build( builder, type );
 		let b = null;

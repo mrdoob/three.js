@@ -26,6 +26,7 @@ class NodeBuilder {
 		this.vars = { vertex: [], fragment: [] };
 		this.attributes = [];
 		this.varys = [];
+		this.flow = { code: '' };
 		
 		this.context = {
 			keywords: new NodeKeywords(),
@@ -302,12 +303,33 @@ class NodeBuilder {
 	}
 	*/
 
+	addFlowCode( code ) {
+		
+		if ( !/;\s*$/.test( code ) ) {
+			
+			code += '; ';
+			
+		}
+		
+		this.flow.code += code;
+		
+	}
+
 	flowNode( node, output ) {
+		
+		const previousFlow = this.flow;
+		
+		const flow = {
+			code: previousFlow.code,
+		};
+		
+		this.flow = flow;
+		
+		flow.result = node.build( this, output );
 
-		const flowData = {};
-		flowData.result = node.build( this, output );
+		this.flow = previousFlow;
 
-		return flowData;
+		return flow;
 
 	}
 
@@ -406,6 +428,7 @@ class NodeBuilder {
 
 				const flowData = this.flowNode( slot.node, slot.output );
 
+				this.define( shaderStage, `NODE_CODE_${slot.name}`, flowData.code );
 				this.define( shaderStage, `NODE_${slot.name}`, flowData.result );
 
 			}

@@ -144,39 +144,6 @@ class FunctionNode extends CodeNode {
 	
 	generate( builder, output ) {
 
-		if ( this.useKeywords === true ) {
-			
-			const contextKeywords = builder.getContextParameter( 'keywords' );
-			
-			if (contextKeywords !== undefined) {
-			
-				const nodeData = builder.getDataFromNode( this, builder.shaderStage );
-				
-				if ( nodeData.keywords === undefined ) {
-					
-					nodeData.keywords = [];
-					
-				}
-				
-				if ( nodeData.keywords.indexOf( contextKeywords ) === -1 ) {
-					
-					const codeKeywords = contextKeywords.parse( this.code );
-					
-					for(const keywordNode of codeKeywords) {
-						
-						// include
-						keywordNode.build( builder );
-						
-					}
-					
-					nodeData.keywords.push( contextKeywords );
-					
-				}
-				
-			}
-			
-		}
-		
 		super.generate( builder );
 
 		const type = this.getType( builder );

@@ -24,6 +24,12 @@ class NodeKeywords {
 	static NormalWorld = 'NormalWorld';
 	static NormalView = 'NormalView';
 	
+	static Irradiance = 'Irradiance';
+	static ReflectedLightIndirectDiffuse = 'ReflectedLightIndirectDiffuse';
+	static ReflectedLightIndirectSpecular = 'ReflectedLightIndirectSpecular';
+	static ReflectedLightDirectDiffuse = 'ReflectedLightDirectDiffuse';
+	static ReflectedLightDirectSpecular = 'ReflectedLightDirectSpecular';
+	
 	static MaterialDiffuseColor = 'MaterialDiffuseColor';
 
 	constructor() {
@@ -43,7 +49,13 @@ class NodeKeywords {
 			NodeKeywords.NormalLocal,
 			NodeKeywords.NormalWorld,
 			NodeKeywords.NormalView,
-			// vars
+			// vars -> vec3
+			NodeKeywords.Irradiance,
+			NodeKeywords.ReflectedLightIndirectDiffuse,
+			NodeKeywords.ReflectedLightIndirectSpecular,
+			NodeKeywords.ReflectedLightDirectDiffuse,
+			NodeKeywords.ReflectedLightDirectSpecular,
+			// vars -> vec4
 			NodeKeywords.MaterialDiffuseColor
 		];
 
@@ -125,12 +137,22 @@ class NodeKeywords {
 					
 					break;
 				
+				case NodeKeywords.Irradiance:
+				case NodeKeywords.ReflectedLightIndirectDiffuse:
+				case NodeKeywords.ReflectedLightIndirectSpecular:
+				case NodeKeywords.ReflectedLightDirectDiffuse:
+				case NodeKeywords.ReflectedLightDirectSpecular:
+				
+					node = new PropertyNode( name, 'vec3' );
+					
+					break;
+				
 				case NodeKeywords.MaterialDiffuseColor:
 				
 					node = new PropertyNode( name, 'vec4' );
 					
 					break;
-				
+
 			}
 			
 			if ( node !== undefined ) {
@@ -172,6 +194,18 @@ class NodeKeywords {
 		}
 		
 		return keywords;
+		
+	}
+	
+	include( builder, code ) {
+		
+		const keywords = this.parse( code );
+		
+		for(const keywordNode of keywords) {
+			
+			keywordNode.build( builder );
+			
+		}
 		
 	}
 

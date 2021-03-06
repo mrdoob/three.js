@@ -360,14 +360,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			this.shaderStage = shaderStage;
 
-			const nativeShaderKeywords = keywords.parse( this.nativeShader.fragmentShader );
-			
-			for(const keywordNode of nativeShaderKeywords) {
-				
-				// include
-				keywordNode.build( this );
-				
-			}
+			keywords.include( this, this.nativeShader.fragmentShader );
 			
 		}
 		

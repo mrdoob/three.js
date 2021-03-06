@@ -32,18 +32,24 @@ void main() {
 
 	#ifdef NODE_COLOR
 
+		NODE_CODE_COLOR
+		
 		MaterialDiffuseColor = NODE_COLOR;
 
 	#endif
 
 	#ifdef NODE_OPACITY
-
+		
+		NODE_CODE_OPACITY
+		
 		MaterialDiffuseColor.a *= NODE_OPACITY;
 
 	#endif
 
 	#ifdef NODE_LIGHT
-
+		
+		NODE_CODE_LIGHT
+		
 		outColor.rgb = NODE_LIGHT;
 		outColor.a = MaterialDiffuseColor.a;
 
