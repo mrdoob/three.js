@@ -7,18 +7,10 @@ function SidebarProjectTextures( editor ) {
 
 	var container = new UIPanel();
 
-	var headerRow = new UIRow();
-	headerRow.add( new UIText( strings.getKey( 'sidebar/project/textures' ).toUpperCase() ) );
-
-	container.add( headerRow );
-
 	var listbox = new UIListbox();
 	container.add( listbox );
 
 	container.add( new UIBreak() );
-
-	var buttonsRow = new UIRow();
-	container.add( buttonsRow );
 
 	// Signals
 

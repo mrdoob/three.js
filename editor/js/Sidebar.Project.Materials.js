@@ -9,11 +9,6 @@ function SidebarProjectMaterials( editor ) {
 
 	var container = new UIPanel();
 
-	var headerRow = new UIRow();
-	headerRow.add( new UIText( strings.getKey( 'sidebar/project/materials' ).toUpperCase() ) );
-
-	container.add( headerRow );
-
 	var listbox = new UIListbox();
 	container.add( listbox );
 
