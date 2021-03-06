@@ -56,13 +56,18 @@ function addToProgressiveLightMap(object) {
 }
 
 function updateProgressiveLightMaps() {
-  camera.layers.disable(1);
-  camera.layers.enable(31);
+  //camera.layers.disable(1);
+  //camera.layers.enable(31);
+
+  for (let l = 0; l < lightmap_containers.length; l++) {
+    lightmap_containers[l].object.visible = false;
+  }
 
   for (let l = 0; l < lightmap_containers.length; l++){
+    lightmap_containers[l].object.visible = true;
     lightmap_containers[l].shadowPass.uniforms["averagingWindow"] = params.averagingWindow;
     lightmap_containers[l].object.material = lightmap_containers[l].uvMat;
-    lightmap_containers[l].object.layers.enable(31);
+    //lightmap_containers[l].object.layers.enable(31);
 
     scene.background = new THREE.Color(0x000000);
     lightmap_containers[l].composer.render(scene, camera);
@@ -70,13 +75,18 @@ function updateProgressiveLightMaps() {
 
     // Restore Object's Real-time Material
     lightmap_containers[l].object.material = lightmap_containers[l].basicMat;
-    lightmap_containers[l].object.layers.disable(31);
+    //lightmap_containers[l].object.layers.disable(31);
+    lightmap_containers[l].object.visible = false;
+  }
+
+  for (let l = 0; l < lightmap_containers.length; l++) {
+    lightmap_containers[l].object.visible = true;
   }
 
   // Restore Normal Scene Rendering
   scene.background = new THREE.Color(0x9a9a9a);
-  camera.layers.enable(1);
-  camera.layers.disable(31);
+  //camera.layers.enable(1);
+  //camera.layers.disable(31);
 }
 
 function init() {
@@ -108,6 +118,7 @@ function init() {
     dirLight.shadow.camera.bottom  = - 150;
     dirLight.shadow.mapSize.width  =   1024;
     dirLight.shadow.mapSize.height =   1024;
+    dirLight.shadow.autoUpdate     =   false;
 
     let lightTarget = new THREE.Group();
     lightTarget.position.set(0, 100, 0);
@@ -180,12 +191,13 @@ function render() {
   // Render Normal Scene
   renderer.render( scene, camera );
 
-  updateProgressiveLightMaps();
+  if (params.enable) { updateProgressiveLightMaps(); }
 
   for (let l = 0; l < dirLights.length; l++) {
     dirLights[l].position.set(200  + Math.random() * 300,
                               250  + Math.random() * 300,
                               400  + Math.random() * 300);
+    dirLights[l].shadow.needsUpdate = true;
   }
 
 }
