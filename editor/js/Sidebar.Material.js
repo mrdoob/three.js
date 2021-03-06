@@ -1,6 +1,6 @@
 import * as THREE from '../../build/three.module.js';
 
-import { UIPanel, UIRow, UIInput, UIButton, UIColor, UICheckbox, UISelect, UIText, UINumber } from './libs/ui.js';
+import { UIButton, UICheckbox, UIColor, UIInput, UINumber, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
 import { UITexture } from './libs/ui.three.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
@@ -104,7 +104,7 @@ function SidebarMaterial( editor ) {
 	materialProgramRow.add( new UIText( strings.getKey( 'sidebar/material/program' ) ).setWidth( '90px' ) );
 
 	var materialProgramInfo = new UIButton( strings.getKey( 'sidebar/material/info' ) );
-	materialProgramInfo.setMarginLeft( '4px' );
+	materialProgramInfo.setMarginRight( '4px' );
 	materialProgramInfo.onClick( function () {
 
 		signals.editScript.dispatch( currentObject, 'programInfo' );
@@ -113,7 +113,7 @@ function SidebarMaterial( editor ) {
 	materialProgramRow.add( materialProgramInfo );
 
 	var materialProgramVertex = new UIButton( strings.getKey( 'sidebar/material/vertex' ) );
-	materialProgramVertex.setMarginLeft( '4px' );
+	materialProgramVertex.setMarginRight( '4px' );
 	materialProgramVertex.onClick( function () {
 
 		signals.editScript.dispatch( currentObject, 'vertexShader' );
@@ -122,7 +122,7 @@ function SidebarMaterial( editor ) {
 	materialProgramRow.add( materialProgramVertex );
 
 	var materialProgramFragment = new UIButton( strings.getKey( 'sidebar/material/fragment' ) );
-	materialProgramFragment.setMarginLeft( '4px' );
+	materialProgramFragment.setMarginRight( '4px' );
 	materialProgramFragment.onClick( function () {
 
 		signals.editScript.dispatch( currentObject, 'fragmentShader' );
