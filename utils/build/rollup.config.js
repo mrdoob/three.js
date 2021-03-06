@@ -152,7 +152,8 @@ function glconstants() {
 		UNPACK_SKIP_IMAGES: 32877,
 		MAX_SAMPLES: 36183,
 		READ_FRAMEBUFFER: 36008,
-		DRAW_FRAMEBUFFER: 36009
+		DRAW_FRAMEBUFFER: 36009,
+		SAMPLE_ALPHA_TO_COVERAGE: 32926
 	};
 
 	return {
@@ -258,7 +259,12 @@ function header() {
 
 		renderChunk( code ) {
 
-			return '// threejs.org/license\n' + code;
+			return `/**
+ * @license
+ * Copyright 2010-2021 Three.js Authors
+ * SPDX-License-Identifier: MIT
+ */
+${ code }`;
 
 		}
 
@@ -295,9 +301,7 @@ const babelrc = {
 			'@babel/preset-env',
 			{
 				modules: false,
-				// the supported browsers of the three.js browser bundle
-				// https://browsersl.ist/?q=%3E0.3%25%2C+not+dead
-				targets: '>0.3%, not dead',
+				targets: '>1%',
 				loose: true,
 				bugfixes: true,
 			}

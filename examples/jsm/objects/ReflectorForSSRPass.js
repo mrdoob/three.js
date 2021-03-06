@@ -32,7 +32,7 @@ var Reflector = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || Reflector.ReflectorShader;
-	var useDepthTexture = options.useDepthTexture
+	var useDepthTexture = options.useDepthTexture === true;
 	var yAxis = new Vector3(0, 1, 0);
 	var vecTemp0 = new Vector3();
 	var vecTemp1 = new Vector3();
@@ -108,9 +108,9 @@ var Reflector = function ( geometry, options ) {
 
 	var material = new ShaderMaterial( {
 		transparent: useDepthTexture,
-    defines: Object.assign({
-      useDepthTexture: useDepthTexture
-    }, Reflector.ReflectorShader.defines),
+    defines: Object.assign( {}, Reflector.ReflectorShader.defines, {
+      useDepthTexture
+    } ),
 		uniforms: UniformsUtils.clone( shader.uniforms ),
 		fragmentShader: shader.fragmentShader,
 		vertexShader: shader.vertexShader

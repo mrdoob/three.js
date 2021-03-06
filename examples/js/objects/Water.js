@@ -283,24 +283,6 @@ THREE.Water = function ( geometry, options ) {
 
 		// Render
 
-		if ( renderer.outputEncoding !== THREE.LinearEncoding ) {
-
-			console.warn( 'THREE.Water: WebGLRenderer must use LinearEncoding as outputEncoding.' );
-			scope.onBeforeRender = function () {};
-
-			return;
-
-		}
-
-		if ( renderer.toneMapping !== THREE.NoToneMapping ) {
-
-			console.warn( 'THREE.Water: WebGLRenderer must use NoToneMapping as toneMapping.' );
-			scope.onBeforeRender = function () {};
-
-			return;
-
-		}
-
 		var currentRenderTarget = renderer.getRenderTarget();
 
 		var currentXrEnabled = renderer.xr.enabled;

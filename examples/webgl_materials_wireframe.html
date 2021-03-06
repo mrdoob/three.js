@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl wireframe demo
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - materials - wireframe
 		</div>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
@@ -28,25 +28,20 @@
 
 		<script type="x-shader/x-fragment" id="fragmentShader">
 
-			uniform float widthFactor;
+			uniform float thickness;
 
 			varying vec3 vCenter;
 
-			float edgeFactorTri() {
-
-				vec3 d = fwidth( vCenter.xyz );
-
-				vec3 a3 = smoothstep( vec3( 0.0 ), d * widthFactor, vCenter.xyz );
-
-				return min( min( a3.x, a3.y ), a3.z );
-
-			}
-
 			void main() {
 
-				if ( edgeFactorTri() > 0.99 ) discard;
+				vec3 afwidth = fwidth( vCenter.xyz );
 
-				gl_FragColor = gl_FrontFacing ? vec4( 0.9, 0.9, 1.0, 1.0 ) : vec4( 0.4, 0.4, 0.5, 1.0 );
+				vec3 edge3 = smoothstep( ( thickness - 1.0 ) * afwidth, thickness * afwidth, vCenter.xyz );
+
+				float edge = 1.0 - min( min( edge3.x, edge3.y ), edge3.z );
+
+				gl_FragColor.rgb = gl_FrontFacing ? vec3( 0.9, 0.9, 1.0 ) : vec3( 0.4, 0.4, 0.5 );
+				gl_FragColor.a = edge;
 
 			}
 
@@ -56,13 +51,15 @@
 
 			import * as THREE from '../build/three.module.js';
 
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			const API = {
-				widthFactor: 1
+				thickness: 1
 			};
 
-			let renderer, scene, camera, mesh1, mesh2;
+			let renderer, scene, camera, mesh2;
 
 			init();
 
@@ -76,11 +73,20 @@
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 500 );
-				camera.position.z = 150;
+				camera.position.z = 200;
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.enablePan = false;
+				controls.enableZoom = false;
 
 				new THREE.BufferGeometryLoader().load( 'models/json/WaltHeadLo_buffergeometry.json', function ( geometry ) {
 
-					// on the left
+					geometry.deleteAttribute( 'normal' );
+					geometry.deleteAttribute( 'uv' );
+
+					setupAttributes( geometry );
+
+					// left
 
 					const material1 = new THREE.MeshBasicMaterial( {
 
@@ -89,30 +95,23 @@
 
 					} );
 
-					mesh1 = new THREE.Mesh( geometry, material1 );
+					const mesh1 = new THREE.Mesh( geometry, material1 );
 					mesh1.position.set( - 40, 0, 0 );
 
 					scene.add( mesh1 );
 
-					// on the right
-
-					const uniforms = { 'widthFactor': { value: API.widthFactor } };
+					// right
 
 					const material2 = new THREE.ShaderMaterial( {
 
-						uniforms: uniforms,
+						uniforms: { 'thickness': { value: API.thickness } },
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,
 						fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-						side: THREE.DoubleSide
+						side: THREE.DoubleSide,
+						alphaToCoverage: true // only works when WebGLRenderer's "antialias" is set to "true"
 
 					} );
-
 					material2.extensions.derivatives = true;
-
-					geometry.deleteAttribute( 'normal' );
-					geometry.deleteAttribute( 'uv' );
-
-					setupAttributes( geometry );
 
 					mesh2 = new THREE.Mesh( geometry, material2 );
 					mesh2.position.set( 40, 0, 0 );
@@ -129,9 +128,9 @@
 
 				const gui = new GUI();
 
-				gui.add( API, 'widthFactor', 0.4, 4 ).onChange( function () {
+				gui.add( API, 'thickness', 0, 4 ).onChange( function () {
 
-					mesh2.material.uniforms.widthFactor.value = API.widthFactor;
+					mesh2.material.uniforms.thickness.value = API.thickness;
 
 				} );
 
@@ -176,10 +175,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				mesh1.rotation.y += 0.01;
-
-				mesh2.rotation.y += 0.01;
 
 				renderer.render( scene, camera );
 

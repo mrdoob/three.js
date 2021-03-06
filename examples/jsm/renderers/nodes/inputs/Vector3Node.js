@@ -9,10 +9,10 @@ class Vector3Node extends InputNode {
 
 		this.value = value;
 
-		Object.defineProperty( this, 'isVector3Node', { value: true } );
-
 	}
 
 }
+
+Vector3Node.prototype.isVector3Node = true;
 
 export default Vector3Node;
