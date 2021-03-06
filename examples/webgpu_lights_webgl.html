@@ -59,17 +59,28 @@
 				const materialTeapot = new THREE.MeshPhongMaterial();
 				//materialTeapot.color = new THREE.Color( 0x333333 );
 				materialTeapot.color = new THREE.Color( 0xFFFFFF );
-				materialTeapot.map = texture;
+				//materialTeapot.map = texture;
 				materialTeapot.specular = new THREE.Color( 0x111111 );
 				materialTeapot.shininess = 30;
 
-				lightDummy = new THREE.Mesh( new THREE.SphereGeometry( .1, 32, 16 ), new THREE.MeshBasicMaterial() );
+				const lightDummyMaterial = new THREE.MeshBasicMaterial({color:0xFFFFFF});
+
+				lightDummy = new THREE.Mesh( new THREE.SphereGeometry( .1, 32, 16 ), lightDummyMaterial );
 				lightDummy.position.y = 2;
 				//lightDummy.position.x = 1;
 				scene.add( lightDummy );
 				
-				light = new THREE.PointLight( 0xFFFFFF, 1, 0, 0 );
+				light = new THREE.PointLight( 0x00FFFF, 1, 10, 10 );
 				lightDummy.add( light );
+
+				let lightDummy2 = new THREE.Mesh( new THREE.SphereGeometry( .1, 32, 16 ), lightDummyMaterial );
+				lightDummy2.position.y = 2;
+				lightDummy2.position.x = 2;
+				//lightDummy.position.x = 1;
+				scene.add( lightDummy2 );
+
+				const light2 = new THREE.PointLight( 0xFF0000, 1, 15, 5 );
+				lightDummy2.add( light2 );
 
 				//materialTeapot.colorNode = new PositionNode( PositionNode.VIEW );
 

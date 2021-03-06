@@ -36,6 +36,7 @@
 			import ModelNode from './jsm/renderers/nodes/accessors/ModelNode.js';
 			//import MaterialNode from './jsm/renderers/nodes/accessors/MaterialNode.js';
 			import LightNode from './jsm/renderers/nodes/lights/LightNode.js';
+			import LightsNode from './jsm/renderers/nodes/lights/LightsNode.js';
 			import LightContextNode from './jsm/renderers/nodes/lights/LightContextNode.js';
 			import { rand } from './jsm/renderers/nodes/functions/MathFunctions.js';
 
@@ -86,6 +87,17 @@
 				//lightDummy.position.x = 1;
 				scene.add( lightDummy );
 
+				const light = new THREE.PointLight( 0x00FFFF, 1, 10, 10 );
+				lightDummy.add( light );
+				
+				let lightDummy2 = new THREE.Mesh( new THREE.SphereGeometry( .1, 32, 16 ), new THREE.MeshPhongMaterial() );
+				lightDummy2.position.y = 2;
+				lightDummy2.position.x = 2;
+				//lightDummy.position.x = 1;
+				scene.add( lightDummy2 );
+
+				const light2 = new THREE.PointLight( 0xFF0000, 1, 15, 5 );
+				lightDummy2.add( light2 );
 				
 				/*
 				materialTeapot.colorNode = rand.call({
@@ -94,10 +106,10 @@
 				*/
 
 				//materialTeapot.colorNode = new NormalNode( NormalNode.WORLD );
-				materialTeapot.colorNode = new TextureNode( texture );
+				//materialTeapot.colorNode = new TextureNode( texture );
 				//materialTeapot.colorNode = new LightContextNode( new LightNode( lightDummy ) );
 				//materialTeapot.colorNode = new MaterialNode( MaterialNode.COLOR );
-				materialTeapot.lightNode = new LightNode( lightDummy );
+				materialTeapot.lightNode = LightsNode.fromLights( [ light, light2 ] );
 				//materialTeapot.color = new THREE.Color( 0xFF00FF );
 
 				teapot = new THREE.Mesh( geometryTeapot, materialTeapot );
