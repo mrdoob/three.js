@@ -12,18 +12,16 @@ import { LambertUVSpace } from './jsm/shaders/ProgressiveShadowsShader.js';
 import { OrbitControls } from './jsm/controls/OrbitControls.js';
 import { ShadowMapViewer } from './jsm/utils/ShadowMapViewer.js';
 
-let camera, scene, renderer, composer, dirLights = [], controls, dirLightShadowMapViewers = [], smoothedTarget = false;
+let camera, scene, renderer, composer, dirLights = [], controls, lightmap_containers = [], smoothedTarget;
 
-let progressiveShadowsPass;
+let progressiveShadowsPass = new ProgressiveShadowsPass();
 let object = new THREE.Mesh();
 
 let basicMaterial = new THREE.MeshBasicMaterial();
 let uv_material = new THREE.MeshLambertMaterial({ depthTest: false });
 uv_material.onBeforeCompile = function (shader) {
-  shader.vertexShader = shader.vertexShader.replace('}',
-    `	gl_Position = vec4((uv - 0.5) * 2.0, 1.0, 1.0); }`
-
-  );
+  shader.vertexShader = shader.vertexShader.slice(0, -1) +
+    `	gl_Position = vec4((uv - 0.5) * 2.0, 1.0, 1.0); }`;
   uv_material.userData.shader = shader;
 };
 uv_material.depthTest = false;
@@ -33,6 +31,58 @@ const params = { enable: true };
 init();
 createGUI();
 animate();
+
+function addToProgressiveLightMap(object, renderer) {
+  let progressiveLightmap = new THREE.WebGLRenderTarget(1024, 1024, { type: THREE.FloatType });
+  
+  let composer = new EffectComposer(renderer, progressiveLightmap);
+  composer.renderToScreen = false;
+  composer.addPass( new RenderPass( scene, camera ) );
+  composer.addPass( progressiveShadowsPass ); // This accumulates the shadows over time
+
+  let oldMaterial = object.material;
+  oldMaterial.onBeforeCompile = (shader) => {
+    shader.vertexShader = shader.vertexShader.slice(0, -1) +
+                          '	gl_Position = vec4((uv - 0.5) * 2.0, 1.0, 1.0); }';
+    oldMaterial.userData.shader = shader;
+  };
+
+  // This material is unaffected by light
+  let basicMaterial    = new THREE.MeshBasicMaterial(); 
+  basicMaterial.map    = progressiveLightmap;
+  object.material      = basicMaterial;
+  object.castShadow    = true;
+  object.receiveShadow = true;
+  
+  lightmap_containers.push({
+    composer: composer,
+    basicMat: basicMaterial,
+    uvMat: oldMaterial
+  });
+}
+
+function updateProgressiveLightMaps() {
+  camera.layers.disable(1);
+  camera.layers.enable(31);
+
+  for (let l = 0; l < lightmap_containers.length; l++){
+    lightmap_containers[l].object.layers.enable(31);
+    lightmap_containers[l].object.material = uv_material;
+    scene.background = new THREE.Color(0x000000);
+    lightmap_containers[l].composer.renderToScreen = false;
+    lightmap_containers[l].composer.render(scene, camera);
+    lightmap_containers[l].composer.render();
+
+    // Restore Object's Real-time Material
+    lightmap_containers[l].object.material = basicMaterial;
+    lightmap_containers[l].object.layers.disable(31);
+  }
+
+  // Restore Normal Scene Rendering
+  scene.background = new THREE.Color(0x9a9a9a);
+  camera.layers.enable(1);
+  camera.layers.disable(31);
+}
 
 function init() {
 
@@ -69,18 +119,11 @@ function init() {
     dirLight.target = lightTarget;
     scene.add(lightTarget);
 
-    //let dirLightShadowMapViewer = new ShadowMapViewer(dirLight);
-    //dirLightShadowMapViewer.position.x = 10;
-    //dirLightShadowMapViewer.position.y = 10;
-    //dirLightShadowMapViewer.size.set(window.innerWidth * 0.15, window.innerWidth * 0.15);
-    //dirLightShadowMapViewer.update(); //Required when setting position or size directly
-    //dirLightShadowMapViewers.push(dirLightShadowMapViewer);
-
     scene.add(dirLight);
     dirLights.push(dirLight);
   }
 
-  let groundMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(2000, 2000),
+  let groundMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(1000, 1000),
                                   new THREE.MeshPhongMaterial({ color: 0xffffff, depthWrite: true}));
   groundMesh.position.y = -0.1;
   groundMesh.rotation.x = - Math.PI / 2;
@@ -109,10 +152,6 @@ function init() {
 
 	const manager = new THREE.LoadingManager( loadModel );
 
-	// texture
-	const textureLoader = new THREE.TextureLoader( manager );
-	const texture = textureLoader.load( 'textures/uv_grid_opengl.jpg' );
-
 	// model
 	const loader = new OBJLoader( manager );
   loader.load('models/obj/ShadowmappableMesh.obj', function (obj) { object = obj; });
@@ -132,8 +171,6 @@ function init() {
   composer = new EffectComposer(renderer, smoothedTarget);
   composer.renderToScreen = false;
   composer.addPass( new RenderPass( scene, camera ) );
-
-  progressiveShadowsPass = new ProgressiveShadowsPass();
   composer.addPass(progressiveShadowsPass);
 
   basicMaterial.map = smoothedTarget;
@@ -167,8 +204,6 @@ function render() {
   scene.background = new THREE.Color(0x9a9a9a);
   camera.layers.enable(1);
   camera.layers.disable(31);
-  renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
-  renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
   renderer.render( scene, camera );
 
   object.traverse( function ( child ) {
@@ -177,10 +212,6 @@ function render() {
   scene.background = new THREE.Color(0x000000);
   camera.layers.disable(1);
   camera.layers.enable(31);
-  //renderer.setViewport( 0, 0, 0.35 * window.innerWidth, 0.35 * window.innerHeight );
-  //renderer.setScissor ( 0, 0, 0.35 * window.innerWidth, 0.35 * window.innerHeight );
-  //renderer.setScissorTest( true );
-  //renderer.setClearColor(0x000000);
   composer.renderToScreen = false;
   composer.render(scene, camera);
   if ( params.enable ) {
