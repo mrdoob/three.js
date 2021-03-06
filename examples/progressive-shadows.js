@@ -12,7 +12,7 @@ import { LambertUVSpace } from './jsm/shaders/ProgressiveShadowsShader.js';
 import { OrbitControls } from './jsm/controls/OrbitControls.js';
 import { ShadowMapViewer } from './jsm/utils/ShadowMapViewer.js';
 
-let camera, scene, renderer, composer, dirLights = [], controls, dirLightShadowMapViewers = [];
+let camera, scene, renderer, composer, dirLights = [], controls, dirLightShadowMapViewers = [], smoothedTarget = false;
 
 let progressiveShadowsPass;
 let object = new THREE.Mesh();
@@ -128,11 +128,15 @@ function init() {
   controls.target.set(0, 100, 0);
 
   // postprocessing
-  composer = new EffectComposer( renderer );
+  smoothedTarget = new THREE.WebGLRenderTarget(1024, 1024, {type: THREE.FloatType});
+  composer = new EffectComposer(renderer, smoothedTarget);
+  composer.renderToScreen = false;
   composer.addPass( new RenderPass( scene, camera ) );
 
   progressiveShadowsPass = new ProgressiveShadowsPass();
-  composer.addPass( progressiveShadowsPass );
+  composer.addPass(progressiveShadowsPass);
+
+  basicMaterial.map = smoothedTarget;
 
   window.addEventListener( 'resize', onWindowResize );
 
@@ -156,7 +160,7 @@ function onWindowResize() {
 function render() {
   controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
 
-
+  // Render Normal Scene
   object.traverse( function ( child ) {
     if (child.isMesh) { child.material = basicMaterial; }
   } );
@@ -164,16 +168,8 @@ function render() {
   camera.layers.enable(1);
   camera.layers.disable(31);
   renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
-  renderer.setScissor ( 0, 0, window.innerWidth, window.innerHeight );
-  //renderer.setScissorTest( true );
-  //renderer.setClearColor( 0x000000 );
-  //renderer.render( scene, camera );
-
-  if ( params.enable ) {
-    composer.render();
-  } else {
-    renderer.render( scene, camera );
-  }
+  renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
+  renderer.render( scene, camera );
 
   object.traverse( function ( child ) {
     if (child.isMesh) { child.material = uv_material; }
@@ -181,11 +177,17 @@ function render() {
   scene.background = new THREE.Color(0x000000);
   camera.layers.disable(1);
   camera.layers.enable(31);
-  renderer.setViewport( 0, 0, 0.35 * window.innerWidth, 0.35 * window.innerHeight );
-  renderer.setScissor ( 0, 0, 0.35 * window.innerWidth, 0.35 * window.innerHeight );
-  renderer.setScissorTest( true );
-  renderer.setClearColor( 0x000000 );
-  renderer.render( scene, camera );
+  //renderer.setViewport( 0, 0, 0.35 * window.innerWidth, 0.35 * window.innerHeight );
+  //renderer.setScissor ( 0, 0, 0.35 * window.innerWidth, 0.35 * window.innerHeight );
+  //renderer.setScissorTest( true );
+  //renderer.setClearColor(0x000000);
+  composer.renderToScreen = false;
+  composer.render(scene, camera);
+  if ( params.enable ) {
+    composer.render();
+  } else {
+    renderer.render( scene, camera );
+  }
 
   for (let l = 0; l < dirLights.length; l++) {
     dirLights[l].position.set(200  + Math.random() * 300,
