@@ -25,7 +25,7 @@ class LightNode extends Node {
 		
 		this.light = light;
 		
-		this.color = new ColorNode( null );
+		this.color = new ColorNode( new Color() );
 		
 		this.lightCutoffDistance = new FloatNode( 0 );
 		this.lightDecayExponent = new FloatNode( 0 );
@@ -51,7 +51,7 @@ class LightNode extends Node {
 	
 	update( frame ) {
 		
-		this.color.value = this.light.color;
+		this.color.value.copy( this.light.color ).multiplyScalar( this.light.intensity );
 		this.lightCutoffDistance.value = this.light.distance;
 		this.lightDecayExponent.value = this.light.decay;
 
