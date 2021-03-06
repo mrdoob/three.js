@@ -292,6 +292,33 @@ Editor.prototype = {
 
 		}
 
+		const maps = [
+			'alphaMap',
+			'bumpMap',
+			'displacementMap',
+			'envMap',
+			'metalnessMap',
+			'map',
+			'normalMap',
+			'roughnessMap',
+			'clearCoatMap',
+			'clearCoatNormalMap',
+			'clearCoatRoughnessMap',
+			'transmissionMap'
+		];
+
+		for ( var i = 0; i <= maps.length; i ++ ) {
+
+			const map = material[ maps[ i ] ];
+
+			if ( map !== undefined && map !== null ) {
+
+				this.addTexture( map );
+
+			}
+
+		}
+
 	},
 
 	removeMaterial: function ( material ) {
