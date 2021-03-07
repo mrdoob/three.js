@@ -23,7 +23,7 @@
 			let camera, scene, renderer, dirLights = [], controls, control, control2,
 			lightmap_containers = [], object = new THREE.Mesh(), blurringPlane = null,
 			lightOrigin = null;
-			const params = { Enable: true, BlendWindow: 100, LightRadius: 20, AmbientBalance: 0.5 };
+			const params = { Enable: true, BlendWindow: 200, LightRadius: 50, Ambient: 0.5 };
 			let shadowMapRes = 512;
 
 			init();
@@ -79,8 +79,8 @@
 			// Lightmapping Functions
 			function addToProgressiveLightMap(object, res = shadowMapRes) {
 				// Create the Progressive Lightmap Texture
-				let progressiveLightmap1 = new THREE.WebGLRenderTarget(res, res, { type: THREE.HalfFloatType });
-				let progressiveLightmap2 = new THREE.WebGLRenderTarget(res, res, { type: THREE.HalfFloatType });
+				let progressiveLightmap1 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
+				let progressiveLightmap2 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
 
 				if(blurringPlane == null) { initializeProgressiveLightMapping(res, progressiveLightmap1); }
 
@@ -196,8 +196,8 @@
 				camera.name = "Camera";
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color(0x323232);
-				scene.fog = new THREE.Fog(0x323232, 1000, 3000);
+				scene.background = new THREE.Color(0x949494);
+				scene.fog = new THREE.Fog(0x949494, 1000, 3000);
 
 				// Transform Gizmo
 				lightOrigin = new THREE.Group();
@@ -229,7 +229,7 @@
 				}
 
 				// ground
-				let groundMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(1000, 1000),
+				let groundMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(600, 600),
 												new THREE.MeshPhongMaterial({ color: 0xffffff, depthWrite: true}));
 				groundMesh.position.y = -0.1;
 				groundMesh.rotation.x = - Math.PI / 2;
@@ -288,7 +288,7 @@
 				gui.add( params, 'Enable' );
 				gui.add( params, 'BlendWindow'   , 1, 500 ).step( 1 );
 				gui.add( params, 'LightRadius'   , 0, 200 ).step( 10 );
-				gui.add( params, 'AmbientBalance', 0, 1   ).step( 0.1 );
+				gui.add( params, 'Ambient', 0, 1   ).step( 0.1 );
 			}
 
 			function onWindowResize() {
@@ -308,7 +308,7 @@
 
 				// Manually Update the Directional Lights
 				for (let l = 0; l < dirLights.length; l++) {
-					if(Math.random() > params.AmbientBalance){
+					if(Math.random() > params.Ambient){
 						dirLights[l].position.set(lightOrigin.position.x + (Math.random() * params.LightRadius),
 												  lightOrigin.position.y + (Math.random() * params.LightRadius),
 												  lightOrigin.position.z + (Math.random() * params.LightRadius));
