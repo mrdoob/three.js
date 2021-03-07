@@ -257,6 +257,7 @@
 		"webgl_postprocessing_outline",
 		"webgl_postprocessing_pixel",
 		"webgl_postprocessing_procedural",
+		"webgl_postprocessing_progressive_surface",
 		"webgl_postprocessing_sao",
 		"webgl_postprocessing_smaa",
 		"webgl_postprocessing_sobel",
