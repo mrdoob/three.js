@@ -297,11 +297,12 @@
 
 					fileInput.onchange = function () {
 
-						const files = Array.from( fileInput.files ).map(f => f && URL.createObjectURL(f));
+						const files = Array.from( fileInput.files ).map( f => f && URL.createObjectURL( f ) );
 						if ( multiple )
 							return resolve( files );
-						if(files.length > 0 && files[0])
+						if ( files.length > 0 && files[ 0 ] )
 							resolve( files[ 0 ] );
+
 					};
 
 					fileInput.click();
