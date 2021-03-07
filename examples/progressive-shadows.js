@@ -1,35 +1,18 @@
 import * as THREE from '../build/three.module.js';
-
 import { GUI } from './jsm/libs/dat.gui.module.js';
-
 import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-
-import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-import { ProgressiveShadowsPass } from './jsm/postprocessing/ProgressiveShadowsPass.js';
-import { LambertUVSpace } from './jsm/shaders/ProgressiveShadowsShader.js';
-
 import { OrbitControls } from './jsm/controls/OrbitControls.js';
-import { ShadowMapViewer } from './jsm/utils/ShadowMapViewer.js';
 
-let camera, scene, renderer, dirLights = [], controls, lightmap_containers = [];
-
-let object = new THREE.Mesh();
-
+let camera, scene, renderer, dirLights = [], controls, lightmap_containers = [], object = new THREE.Mesh();
 const params = { enable: true,  averagingWindow: 100 };
 
 init();
 createGUI();
 animate();
 
+// Lightmapping Functions
 function addToProgressiveLightMap(object) {
   let progressiveLightmap = new THREE.WebGLRenderTarget(1024, 1024, { type: THREE.FloatType });
-  
-  let composer = new EffectComposer(renderer, progressiveLightmap);
-  composer.renderToScreen = false;
-  composer.addPass(new RenderPass(scene, camera));
-  let progressiveShadowsPass = new ProgressiveShadowsPass();
-  composer.addPass( progressiveShadowsPass ); // This accumulates the shadows over time
 
   let oldMaterial = object.material.clone();
   oldMaterial.onBeforeCompile = (shader) => {
@@ -46,11 +29,9 @@ function addToProgressiveLightMap(object) {
   object.receiveShadow = true;
   
   lightmap_containers.push({
-    composer: composer,
     basicMat: basicMaterial,
     uvMat   : oldMaterial,
     object  : object,
-    shadowPass: progressiveShadowsPass,
     lightmap: progressiveLightmap
   });
 }
@@ -62,15 +43,16 @@ function updateProgressiveLightMaps() {
 
   for (let l = 0; l < lightmap_containers.length; l++){
     lightmap_containers[l].object.visible = true;
-    lightmap_containers[l].shadowPass.uniforms["averagingWindow"] = params.averagingWindow;
+    //lightmap_containers[l].shadowPass.uniforms["averagingWindow"] = params.averagingWindow;
     lightmap_containers[l].object.material = lightmap_containers[l].uvMat;
-
     lightmap_containers[l].basicMat.needsUpdate = true;
     lightmap_containers[l].uvMat.needsUpdate = true;
 
+    // Render Shadows onto a shadowmap
     scene.background = new THREE.Color(0x000000);
-    lightmap_containers[l].composer.render();
-    lightmap_containers[l].composer.render();
+    renderer.setRenderTarget(lightmap_containers[l].lightmap);
+    renderer.render( scene, camera );
+    renderer.setRenderTarget(null);
 
     // Restore Object's Real-time Material
     lightmap_containers[l].object.material = lightmap_containers[l].basicMat;
@@ -127,6 +109,7 @@ function init() {
     dirLights.push(dirLight);
   }
 
+  // ground
   let groundMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(1000, 1000),
                                   new THREE.MeshPhongMaterial({ color: 0xffffff, depthWrite: true}));
   groundMesh.position.y = -0.1;
@@ -134,6 +117,7 @@ function init() {
   scene.add(groundMesh);
   addToProgressiveLightMap(groundMesh);
 
+  // model
   function loadModel() {
 		object.traverse( function ( child ) {
       if (child.isMesh) {
@@ -151,8 +135,6 @@ function init() {
 	}
 
 	const manager = new THREE.LoadingManager( loadModel );
-
-	// model
 	const loader = new OBJLoader( manager );
   loader.load('models/obj/ShadowmappableMesh.obj', function (obj) { object = obj; });
   
@@ -178,7 +160,6 @@ function createGUI() {
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-
   renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
