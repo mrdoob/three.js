@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - postprocessing - progressive shadows</title>
+		<title>three.js webgl - postprocessing - progressive surface accumulation</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -226,7 +226,7 @@
 				function loadModel() {
 					object.traverse( function ( child ) {
 						if (child.isMesh) {
-							child.material.shininess = 100;
+							child.material.shininess = 200;
 							addToProgressiveLightMap(child);
 						} else {
 							// These are lines; no need for lightmapping
