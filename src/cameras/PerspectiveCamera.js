@@ -1,5 +1,4 @@
 import { Camera } from './Camera.js';
-import { Object3D } from '../core/Object3D.js';
 import { MathUtils } from '../math/MathUtils.js';
 
 class PerspectiveCamera extends Camera {
@@ -25,13 +24,11 @@ class PerspectiveCamera extends Camera {
 
 		this.updateProjectionMatrix();
 
-		this.isPerspectiveCamera = true;
-
 	}
 
 	copy( source, recursive ) {
 
-		Camera.prototype.copy.call( this, source, recursive );
+		super.copy( source, recursive );
 
 		this.fov = source.fov;
 		this.zoom = source.zoom;
@@ -209,7 +206,7 @@ class PerspectiveCamera extends Camera {
 
 	toJSON( meta ) {
 
-		const data = Object3D.prototype.toJSON.call( this, meta );
+		const data = super.toJSON( meta );
 
 		data.object.fov = this.fov;
 		data.object.zoom = this.zoom;
@@ -230,5 +227,7 @@ class PerspectiveCamera extends Camera {
 	}
 
 }
+
+PerspectiveCamera.prototype.isPerspectiveCamera = true;
 
 export { PerspectiveCamera };
