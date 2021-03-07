@@ -91,6 +91,9 @@ function Strings( config ) {
 			'sidebar/properties/material': 'Material',
 			'sidebar/properties/script': 'Script',
 
+			'sidebar/assets/materials': 'Materials',
+			'sidebar/assets/textures': 'Textures',
+
 			'sidebar/object/type': 'Type',
 			'sidebar/object/new': 'New',
 			'sidebar/object/uuid': 'UUID',
@@ -284,6 +287,23 @@ function Strings( config ) {
 			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Wireframe',
 
+			'sidebar/texture/name': 'Name',
+			'sidebar/texture/anisotropy': 'Anisotropy',
+			'sidebar/texture/encoding': 'Encoding',
+			'sidebar/texture/center': 'Center',
+			'sidebar/texture/flipY': 'Flip Y',
+			'sidebar/texture/format': 'Format',
+			'sidebar/texture/magFilter': 'Mag Filter',
+			'sidebar/texture/minFilter': 'Min Filter',
+			'sidebar/texture/offset': 'Offset',
+			'sidebar/texture/premultiplyAlpha': 'Premultiply Alpha',
+			'sidebar/texture/repeat': 'Repeat',
+			'sidebar/texture/rotation': 'Rotation',
+			'sidebar/texture/type': 'Type',
+			'sidebar/texture/unpackAlignment': 'Unpack Alignment',
+			'sidebar/texture/wrapS': 'Wrap S',
+			'sidebar/texture/wrapT': 'Wrap T',
+
 			'sidebar/script': 'Script',
 			'sidebar/script/new': 'New',
 			'sidebar/script/edit': 'Edit',
@@ -298,8 +318,6 @@ function Strings( config ) {
 			'sidebar/project/shadows': 'Shadows',
 			'sidebar/project/physicallyCorrectLights': 'Physical lights',
 			'sidebar/project/toneMapping': 'Tone mapping',
-			'sidebar/project/materials': 'Materials',
-			'sidebar/project/textures': 'Textures',
 			'sidebar/project/Assign': 'Assign',
 
 			'sidebar/settings': 'Settings',
@@ -626,7 +644,6 @@ function Strings( config ) {
 			'sidebar/project/shadows': 'Ombres',
 			'sidebar/project/physicallyCorrectLights': 'Physical lights',
 			'sidebar/project/toneMapping': 'Mappage des nuances',
-			'sidebar/project/materials': 'Matériaux',
 			'sidebar/project/Assign': 'Attribuer',
 
 			'sidebar/settings': 'Paramètres',
@@ -937,7 +954,6 @@ function Strings( config ) {
 			'sidebar/project/shadows': '阴影',
 			'sidebar/project/physicallyCorrectLights': '物理灯',
 			'sidebar/project/toneMapping': '色调映射',
-			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
 
 			'sidebar/settings': '设置',
