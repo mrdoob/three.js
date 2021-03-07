@@ -153,6 +153,17 @@
 
 				guiData.currentURL = url;
 
+				if( scene ) {
+
+					scene.traverse( function ( child ) {
+
+						if ( child.material ) child.material.dispose();
+						if ( child.geometry ) child.geometry.dispose();
+
+					} );
+
+				}
+
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xb0b0b0 );
 
