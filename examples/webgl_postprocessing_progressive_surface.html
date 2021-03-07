@@ -20,21 +20,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			let camera, scene, renderer, dirLights = [], controls, lightmap_containers = [], object = new THREE.Mesh(), blurringPlane = null;
-			
-			function iOS() {
-				return [
-					'iPad Simulator',
-					'iPhone Simulator',
-					'iPod Simulator',
-					'iPad',
-					'iPhone',
-					'iPod'
-				].includes(navigator.platform)
-				// iPad on iOS 13 detection
-				|| (navigator.userAgent.includes("Mac") && "ontouchend" in document)
-			}
-			
-			const params = { enable: true, averagingWindow: iOS()?32:100, xPos: 200, jitter: 50 };
+			const params = { enable: true,  averagingWindow: 100, xPos: 200, jitter: 50 };
 			let shadowMapRes = 1024;
 
 			init();
@@ -90,8 +76,8 @@
 			// Lightmapping Functions
 			function addToProgressiveLightMap(object, res = shadowMapRes) {
 				// Create the Progressive Lightmap Texture
-				let progressiveLightmap1 = new THREE.WebGLRenderTarget(res, res, { type: iOS() ? THREE.UnsignedByteType : THREE.FloatType });
-				let progressiveLightmap2 = new THREE.WebGLRenderTarget(res, res, { type: iOS() ? THREE.UnsignedByteType : THREE.FloatType });
+				let progressiveLightmap1 = new THREE.WebGLRenderTarget(res, res, { type: THREE.HalfFloatType });
+				let progressiveLightmap2 = new THREE.WebGLRenderTarget(res, res, { type: THREE.HalfFloatType });
 
 				if(blurringPlane == null) { initializeProgressiveLightMapping(res, progressiveLightmap1); }
 
@@ -273,7 +259,7 @@
 
 			function createGUI() {
 				const gui = new GUI( { name: 'Averaging Setting' } );
-				gui.add( params, 'averagingWindow', 1, iOS()?32:500).step(1);
+				gui.add( params, 'averagingWindow', 1, 500).step(1);
 				gui.add( params, 'xPos', -200, 200).step( 1 );
 				gui.add( params, 'jitter', 0, 300 ).step( 1 );
 				gui.add( params, 'enable' );
