@@ -76,8 +76,8 @@
 			// Lightmapping Functions
 			function addToProgressiveLightMap(object, res = shadowMapRes) {
 				// Create the Progressive Lightmap Texture
-				let progressiveLightmap1 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
-				let progressiveLightmap2 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
+				let progressiveLightmap1 = new THREE.WebGLRenderTarget(res, res, { type: THREE.HalfFloatType });
+				let progressiveLightmap2 = new THREE.WebGLRenderTarget(res, res, { type: THREE.HalfFloatType });
 
 				if(blurringPlane == null) { initializeProgressiveLightMapping(res, progressiveLightmap1); }
 
