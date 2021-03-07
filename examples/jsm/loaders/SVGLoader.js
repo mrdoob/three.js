@@ -1,16 +1,16 @@
 import {
+	Box2,
 	BufferGeometry,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
 	Matrix3,
 	Path,
+	Shape,
 	ShapePath,
 	ShapeUtils,
 	Vector2,
-	Vector3,
-	Shape,
-	Box2
+	Vector3
 } from '../../../build/three.module.js';
 
 var SVGLoader = function ( manager ) {
@@ -967,7 +967,6 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			addStyle( 'fill', 'fill' );
 			addStyle( 'fill-opacity', 'fillOpacity', clamp );
-			addStyle( 'fill-rule', 'fillRule' );
 			addStyle( 'opacity', 'opacity', clamp );
 			addStyle( 'stroke', 'stroke' );
 			addStyle( 'stroke-opacity', 'strokeOpacity', clamp );
@@ -1630,60 +1629,6 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 } );
 
-SVGLoader.getStrokeStyle = function ( width, color, lineJoin, lineCap, miterLimit ) {
-
-	// Param width: Stroke width
-	// Param color: As returned by THREE.Color.getStyle()
-	// Param lineJoin: One of "round", "bevel", "miter" or "miter-limit"
-	// Param lineCap: One of "round", "square" or "butt"
-	// Param miterLimit: Maximum join length, in multiples of the "width" parameter (join is truncated if it exceeds that distance)
-	// Returns style object
-
-	width = width !== undefined ? width : 1;
-	color = color !== undefined ? color : '#000';
-	lineJoin = lineJoin !== undefined ? lineJoin : 'miter';
-	lineCap = lineCap !== undefined ? lineCap : 'butt';
-	miterLimit = miterLimit !== undefined ? miterLimit : 4;
-
-	return {
-		strokeColor: color,
-		strokeWidth: width,
-		strokeLineJoin: lineJoin,
-		strokeLineCap: lineCap,
-		strokeMiterLimit: miterLimit
-	};
-
-};
-
-SVGLoader.pointsToStroke = function ( points, style, arcDivisions, minDistance ) {
-
-	// Generates a stroke with some witdh around the given path.
-	// The path can be open or closed (last point equals to first point)
-	// Param points: Array of Vector2D (the path). Minimum 2 points.
-	// Param style: Object with SVG properties as returned by SVGLoader.getStrokeStyle(), or SVGLoader.parse() in the path.userData.style object
-	// Params arcDivisions: Arc divisions for round joins and endcaps. (Optional)
-	// Param minDistance: Points closer to this distance will be merged. (Optional)
-	// Returns BufferGeometry with stroke triangles (In plane z = 0). UV coordinates are generated ('u' along path. 'v' across it, from left to right)
-
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
-
-	if ( SVGLoader.pointsToStrokeWithBuffers( points, style, arcDivisions, minDistance, vertices, normals, uvs ) === 0 ) {
-
-		return null;
-
-	}
-
-	var geometry = new BufferGeometry();
-	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-	geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
-
-	return geometry;
-
-};
-
 SVGLoader.createShapes = function ( shapePath ) {
 
 	// Param shapePath: a shapepath as returned by the parse function of this class
@@ -1733,7 +1678,7 @@ SVGLoader.createShapes = function ( shapePath ) {
 
 				var classify = classifyPoint( edge2[ i ], edge1 );
 				//find position of this endpoints relatively to edge1
-				if ( classify.loc == IntersectionLocationType.ORIGIN || classify.loc == IntersectionLocationType.DESTINATION ) {
+				if ( classify.loc == IntersectionLocationType.ORIGIN ) {
 
 					interPoints.push( { x: edge2[ i ].x, y: edge2[ i ].y, t: classify.t } );
 
@@ -1741,7 +1686,7 @@ SVGLoader.createShapes = function ( shapePath ) {
 
 					x = + ( ( x1 + classify.t * ( x2 - x1 ) ).toPrecision( 10 ) );
 					y = + ( ( y1 + classify.t * ( y2 - y1 ) ).toPrecision( 10 ) );
-					interPoints.push( { x: x, y: y, t: classify.t } );
+					interPoints.push( { x: x, y: y, t: classify.t, } );
 
 				}
 
@@ -1757,7 +1702,7 @@ SVGLoader.createShapes = function ( shapePath ) {
 
 				var classify = classifyPoint( edge2[ i ], edge1 );
 
-				if ( classify.loc == IntersectionLocationType.ORIGIN || classify.loc == IntersectionLocationType.DESTINATION ) {
+				if ( classify.loc == IntersectionLocationType.ORIGIN ) {
 
 					interPoints.push( { x: edge2[ i ].x, y: edge2[ i ].y, t: classify.t } );
 
@@ -1801,36 +1746,27 @@ SVGLoader.createShapes = function ( shapePath ) {
 
 		}
 
-		var theta = ( polarAngle( [ edge[ 1 ], edge[ 0 ] ] ) -
-			polarAngle( [ { x: edge[ 1 ].x, y: edge[ 1 ].y }, { x: p.x, y: p.y } ] ) ) % 360;
+		if ( sa < - Number.EPSILON ) {
 
-		if ( theta < 0 ) {
-
-			theta = theta + 360;
+			return { loc: IntersectionLocationType.LEFT };
 
 		}
 
-		if ( sa < - 0.0000000001 ) {
+		if ( sa > Number.EPSILON ) {
 
-			return { loc: IntersectionLocationType.LEFT, theta: theta };
-
-		}
-
-		if ( sa > 0.00000000001 ) {
-
-			return { loc: IntersectionLocationType.RIGHT, theta: theta };
+			return { loc: IntersectionLocationType.RIGHT };
 
 		}
 
 		if ( ( ( ax * bx ) < 0 ) || ( ( ay * by ) < 0 ) ) {
 
-			return { loc: IntersectionLocationType.BEHIND, theta: 0 };
+			return { loc: IntersectionLocationType.BEHIND };
 
 		}
 
 		if ( ( Math.sqrt( ax * ax + ay * ay ) ) < ( Math.sqrt( bx * bx + by * by ) ) ) {
 
-			return { loc: IntersectionLocationType.BEYOND, theta: 180 };
+			return { loc: IntersectionLocationType.BEYOND };
 
 		}
 
@@ -1850,45 +1786,9 @@ SVGLoader.createShapes = function ( shapePath ) {
 
 	}
 
-	function polarAngle( edge ) {
-
-		var dx = edge[ 1 ].x - edge[ 0 ].x;
-		var dy = edge[ 1 ].y - edge[ 0 ].y;
-
-		if ( ( dx === 0 ) && ( dy === 0 ) ) {
-
-			return false;
-
-		}
-
-		if ( dx === 0 ) {
-
-			return ( ( dy > 0 ) ? 90 : 270 );
-
-		}
-
-		if ( dy === 0 ) {
-
-			return ( ( dx > 0 ) ? 0 : 180 );
-
-		}
-
-		var theta = Math.atan( dy / dx ) * 360 / ( 2 * Math.PI );
-
-		if ( dx > 0 ) {
-
-			return ( ( dy >= 0 ) ? theta : theta + 360 );
-
-		} else {
-
-			return ( theta + 180 );
-
-		}
-
-	}
-
 	function getIntersections( path1, path2 ) {
 
+		const intersectionsRaw = [];
 		const intersections = [];
 
 		for ( let index = 1; index < path1.length; index ++ ) {
@@ -1903,8 +1803,9 @@ SVGLoader.createShapes = function ( shapePath ) {
 
 				const intersection = findEdgeIntersection( [ path1EdgeStart, path1EdgeEnd ], [ path2EdgeStart, path2EdgeEnd ] );
 
-				if ( intersection.length !== 0 ) {
+				if ( intersection.length !== 0 && intersectionsRaw.find(i => i.t <= intersection[ 0 ].t + Number.EPSILON && i.t >= intersection[ 0 ].t - Number.EPSILON) === undefined ) {
 
+					intersectionsRaw.push(intersection[ 0 ]);
 					intersections.push( new Vector2( intersection[ 0 ].x, intersection[ 0 ].y ) );
 
 				}
@@ -1953,7 +1854,7 @@ SVGLoader.createShapes = function ( shapePath ) {
 
 	}
 
-	function isHoleTo( simplePath, allPaths, _fillRule ) {
+	function isHoleTo( simplePath, allPaths, scanlineMinX, scanlineMaxX, _fillRule ) {
 
 		if ( _fillRule === null || _fillRule === undefined || _fillRule === '' ) {
 
@@ -1964,9 +1865,15 @@ SVGLoader.createShapes = function ( shapePath ) {
 		const centerBoundingBox = new Vector2();
 		simplePath.boundingBox.getCenter( centerBoundingBox );
 
-		const scanline = [ new Vector2( - BIGNUMBER, centerBoundingBox.y ), new Vector2( BIGNUMBER, centerBoundingBox.y ) ];
+		const scanline = [ new Vector2( scanlineMinX, centerBoundingBox.y ), new Vector2( scanlineMaxX, centerBoundingBox.y ) ];
 
 		const scanlineIntersections = getScanlineIntersections( scanline, simplePath.boundingBox, allPaths );
+
+		scanlineIntersections.sort( ( i1, i2 ) => {
+
+			return i1.point.x - i2.point.x;
+
+		} );
 
 		const baseIntersections = [];
 		const otherIntersections = [];
@@ -1985,16 +1892,6 @@ SVGLoader.createShapes = function ( shapePath ) {
 
 		} );
 
-		otherIntersections.sort( ( i1, i2 ) => {
-
-			return i1.point.x - i2.point.x;
-
-		} );
-		baseIntersections.sort( ( i1, i2 ) => {
-
-			return i1.point.x - i2.point.x;
-
-		} );
 		const firstXOfPath = baseIntersections[ 0 ].point.x;
 
 		// build up the path hierarchy
@@ -2069,7 +1966,11 @@ SVGLoader.createShapes = function ( shapePath ) {
 
 	// prepare paths for hole detection
 	let identifier = 0;
-	const simplePaths = shapePath.subPaths.map( p => {
+
+	let scanlineMinX = BIGNUMBER;
+	let scanlineMaxX = -BIGNUMBER;
+
+	let simplePaths = shapePath.subPaths.map( p => {
 
 		const points = p.getPoints();
 		let maxY = - BIGNUMBER;
@@ -2109,12 +2010,24 @@ SVGLoader.createShapes = function ( shapePath ) {
 		
 		}
 
+		//
+		if (scanlineMaxX <= maxX) {
+			scanlineMaxX = maxX + 1;
+		}
+
+		if (scanlineMinX >= minX) {
+			scanlineMinX = minX - 1;
+		}
+
 		return { points: points, isCW: ShapeUtils.isClockWise( points ), identifier: identifier ++, boundingBox: new Box2( new Vector2( minX, minY ), new Vector2( maxX, maxY ) ) };
 
 	} );
 
+	simplePaths = simplePaths.filter(sp => sp.points.length > 0);
+
 	// check if path is solid or a hole
-	const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, shapePath.userData.style.fillRule ) );
+	const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData.style.fillRule ) );
+
 
 	const shapesToReturn = [];
 	simplePaths.forEach( p => {
@@ -2138,6 +2051,60 @@ SVGLoader.createShapes = function ( shapePath ) {
 	} );
 
 	return shapesToReturn;
+
+};
+
+SVGLoader.getStrokeStyle = function ( width, color, lineJoin, lineCap, miterLimit ) {
+
+	// Param width: Stroke width
+	// Param color: As returned by THREE.Color.getStyle()
+	// Param lineJoin: One of "round", "bevel", "miter" or "miter-limit"
+	// Param lineCap: One of "round", "square" or "butt"
+	// Param miterLimit: Maximum join length, in multiples of the "width" parameter (join is truncated if it exceeds that distance)
+	// Returns style object
+
+	width = width !== undefined ? width : 1;
+	color = color !== undefined ? color : '#000';
+	lineJoin = lineJoin !== undefined ? lineJoin : 'miter';
+	lineCap = lineCap !== undefined ? lineCap : 'butt';
+	miterLimit = miterLimit !== undefined ? miterLimit : 4;
+
+	return {
+		strokeColor: color,
+		strokeWidth: width,
+		strokeLineJoin: lineJoin,
+		strokeLineCap: lineCap,
+		strokeMiterLimit: miterLimit
+	};
+
+};
+
+SVGLoader.pointsToStroke = function ( points, style, arcDivisions, minDistance ) {
+
+	// Generates a stroke with some witdh around the given path.
+	// The path can be open or closed (last point equals to first point)
+	// Param points: Array of Vector2D (the path). Minimum 2 points.
+	// Param style: Object with SVG properties as returned by SVGLoader.getStrokeStyle(), or SVGLoader.parse() in the path.userData.style object
+	// Params arcDivisions: Arc divisions for round joins and endcaps. (Optional)
+	// Param minDistance: Points closer to this distance will be merged. (Optional)
+	// Returns BufferGeometry with stroke triangles (In plane z = 0). UV coordinates are generated ('u' along path. 'v' across it, from left to right)
+
+	var vertices = [];
+	var normals = [];
+	var uvs = [];
+
+	if ( SVGLoader.pointsToStrokeWithBuffers( points, style, arcDivisions, minDistance, vertices, normals, uvs ) === 0 ) {
+
+		return null;
+
+	}
+
+	var geometry = new BufferGeometry();
+	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+	geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+
+	return geometry;
 
 };
 
