@@ -31,7 +31,7 @@ function addToProgressiveLightMap(object) {
   let progressiveShadowsPass = new ProgressiveShadowsPass();
   composer.addPass( progressiveShadowsPass ); // This accumulates the shadows over time
 
-  let oldMaterial = object.material;
+  let oldMaterial = object.material.clone();
   oldMaterial.onBeforeCompile = (shader) => {
     shader.vertexShader = shader.vertexShader.slice(0, -1) +
                           '	gl_Position = vec4((uv - 0.5) * 2.0, 1.0, 1.0); }';
@@ -56,9 +56,6 @@ function addToProgressiveLightMap(object) {
 }
 
 function updateProgressiveLightMaps() {
-  //camera.layers.disable(1);
-  //camera.layers.enable(31);
-
   for (let l = 0; l < lightmap_containers.length; l++) {
     lightmap_containers[l].object.visible = false;
   }
@@ -67,16 +64,19 @@ function updateProgressiveLightMaps() {
     lightmap_containers[l].object.visible = true;
     lightmap_containers[l].shadowPass.uniforms["averagingWindow"] = params.averagingWindow;
     lightmap_containers[l].object.material = lightmap_containers[l].uvMat;
-    //lightmap_containers[l].object.layers.enable(31);
+
+    lightmap_containers[l].basicMat.needsUpdate = true;
+    lightmap_containers[l].uvMat.needsUpdate = true;
 
     scene.background = new THREE.Color(0x000000);
-    lightmap_containers[l].composer.render(scene, camera);
+    lightmap_containers[l].composer.render();
     lightmap_containers[l].composer.render();
 
     // Restore Object's Real-time Material
     lightmap_containers[l].object.material = lightmap_containers[l].basicMat;
-    //lightmap_containers[l].object.layers.disable(31);
     lightmap_containers[l].object.visible = false;
+    lightmap_containers[l].basicMat.needsUpdate = true;
+    lightmap_containers[l].uvMat.needsUpdate = true;
   }
 
   for (let l = 0; l < lightmap_containers.length; l++) {
@@ -85,8 +85,6 @@ function updateProgressiveLightMaps() {
 
   // Restore Normal Scene Rendering
   scene.background = new THREE.Color(0x9a9a9a);
-  //camera.layers.enable(1);
-  //camera.layers.disable(31);
 }
 
 function init() {
@@ -141,6 +139,7 @@ function init() {
       if (child.isMesh) {
         addToProgressiveLightMap(child);
       } else {
+        // These are lines; no need for lightmapping
         child.layers.disableAll();
         child.layers.enable(1);
       }
@@ -168,8 +167,6 @@ function init() {
   controls.target.set(0, 100, 0);
 
   window.addEventListener( 'resize', onWindowResize );
-
-  if ( typeof TESTING !== 'undefined' ) { for ( let i = 0; i < 45; i ++ ) { render(); }; };
 }
 
 function createGUI() {
