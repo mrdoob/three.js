@@ -91,9 +91,6 @@ function Strings( config ) {
 			'sidebar/properties/material': 'Material',
 			'sidebar/properties/script': 'Script',
 
-			'sidebar/assets/textures': 'Textures',
-			'sidebar/assets/materials': 'Materials',
-
 			'sidebar/object/type': 'Type',
 			'sidebar/object/new': 'New',
 			'sidebar/object/uuid': 'UUID',
