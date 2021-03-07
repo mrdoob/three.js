@@ -20,7 +20,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TransformControls } from './jsm/controls/TransformControls.js';
 
-			let camera, scene, renderer, dirLights = [], controls, control,
+			let camera, scene, renderer, dirLights = [], controls, control, control2,
 			lightmap_containers = [], object = new THREE.Mesh(), blurringPlane = null,
 			lightOrigin = null;
 			const params = { Enable: true, BlendWindow: 100, LightRadius: 20, AmbientBalance: 0.5 };
@@ -79,8 +79,8 @@
 			// Lightmapping Functions
 			function addToProgressiveLightMap(object, res = shadowMapRes) {
 				// Create the Progressive Lightmap Texture
-				let progressiveLightmap1 = new THREE.WebGLRenderTarget(res, res, { type: THREE.HalfFloatType });
-				let progressiveLightmap2 = new THREE.WebGLRenderTarget(res, res, { type: THREE.HalfFloatType });
+				let progressiveLightmap1 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
+				let progressiveLightmap2 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
 
 				if(blurringPlane == null) { initializeProgressiveLightMapping(res, progressiveLightmap1); }
 
@@ -143,6 +143,7 @@
 					}
 				});
 				control.visible = false;
+				if(control2) { control2.visible = false; }
 				blurringPlane.visible = true;
 
 				for (let l = 0; l < lightmap_containers.length; l++){
@@ -175,6 +176,7 @@
 
 				scene.traverse( function ( child ) { if(child.isMesh){ child.visible = child.wasVisible; } } );
 				control.visible = true;
+				if(control2) { control2.visible = true; }
 
 				// Restore Normal Scene Rendering
 				scene.background = originalBackground;
@@ -222,11 +224,6 @@
 					dirLight.shadow.mapSize.height =   shadowMapRes;
 					dirLight.shadow.autoUpdate     =   false;
 
-					let lightTarget = new THREE.Group();
-					lightTarget.position.set(0, 100, 0);
-					dirLight.target = lightTarget;
-					scene.add(lightTarget);
-
 					scene.add(dirLight);
 					dirLights.push(dirLight);
 				}
@@ -256,9 +253,18 @@
 					} );
 
 					scene.add(object);
-					object.name = "OBJ Parent";
 					object.scale.set(2, 2, 2);
-					object.position.set(0, -21, 0);
+					object.position.set(0, -16, 0);
+
+					control2 = new TransformControls( camera, renderer.domElement );
+					control2.addEventListener( 'dragging-changed', ( event ) => { controls.enabled = ! event.value; } );
+					control2.attach( object );
+					scene.add( control2 );
+
+					let lightTarget = new THREE.Group();
+					lightTarget.position.set(0, 20, 0);
+					for (let l = 0; l < dirLights.length; l++) { dirLights[l].target = lightTarget; }
+					object.add(lightTarget);
 				}
 
 				const manager = new THREE.LoadingManager( loadModel );
@@ -281,7 +287,7 @@
 			function createGUI() {
 				const gui = new GUI( { name: 'Accumulation Settings' } );
 				gui.add( params, 'Enable' );
-				gui.add( params, 'BlendWindow'   , 1, 500 ).step( 10 );
+				gui.add( params, 'BlendWindow'   , 1, 500 ).step( 1 );
 				gui.add( params, 'LightRadius'   , 0, 200 ).step( 10 );
 				gui.add( params, 'AmbientBalance', 0, 1   ).step( 0.1 );
 			}
@@ -303,14 +309,17 @@
 
 				// Manually Update the Directional Lights
 				for (let l = 0; l < dirLights.length; l++) {
-					if(Math.random() < params.AmbientBalance){
+					if(Math.random() > params.AmbientBalance){
 						dirLights[l].position.set(lightOrigin.position.x + (Math.random() * params.LightRadius),
 												  lightOrigin.position.y + (Math.random() * params.LightRadius),
 												  lightOrigin.position.z + (Math.random() * params.LightRadius));
 					}else{
-						dirLights[l].position.set((Math.random() * 100) - 50,
-												  (Math.random() * 100) + 100,
-												  (Math.random() * 100) - 50);
+						// Uniform Hemispherical Surface Distribution for Ambient Occlusion
+						let lambda = Math.acos(2 * Math.random() - 1) - (3.14159/2.0);
+						let phi = 2 * 3.14159 * Math.random();
+						dirLights[l].position.set(((Math.cos(lambda) * Math.cos(phi)) * 300) + object.position.x,
+										   Math.abs(Math.cos(lambda) * Math.sin(phi)) * 300  + object.position.y + 20,
+												   (Math.sin(lambda)                  * 300) + object.position.z    );
 					}
 					dirLights[l].shadow.needsUpdate = true;
 				}
