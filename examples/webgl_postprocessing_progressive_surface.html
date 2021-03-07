@@ -79,8 +79,8 @@
 			// Lightmapping Functions
 			function addToProgressiveLightMap(object, res = shadowMapRes) {
 				// Create the Progressive Lightmap Texture
-				let progressiveLightmap1 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
-				let progressiveLightmap2 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
+				let progressiveLightmap1 = new THREE.WebGLRenderTarget(res, res, { type: THREE.HalfFloatType });
+				let progressiveLightmap2 = new THREE.WebGLRenderTarget(res, res, { type: THREE.HalfFloatType });
 
 				if(blurringPlane == null) { initializeProgressiveLightMapping(res, progressiveLightmap1); }
 
@@ -116,8 +116,8 @@
 				};
 
 				// MeshBasicMaterial just renders the accumulated texture, no lighting
-				let basicMaterial    = new THREE.MeshBasicMaterial(); 
-				basicMaterial.map    = progressiveLightmap2.texture;
+				let basicMaterial    = new THREE.MeshBasicMaterial( 
+					{dithering: true, map: progressiveLightmap2.texture}); 
 				object.material      = basicMaterial;
 				object.castShadow    = true;
 				object.receiveShadow = true;
@@ -210,7 +210,7 @@
 
 				let lightCount = 8;
 				for (let l = 0; l < lightCount; l++){
-					let dirLight = new THREE.DirectionalLight(0xffffff, 0.5/lightCount);
+					let dirLight = new THREE.DirectionalLight(0xffffff, 1.0/lightCount);
 					dirLight.name = 'Dir. Light '+l;
 					dirLight.position.set(200, 200, 200);
 					dirLight.castShadow = true;
@@ -241,8 +241,7 @@
 				function loadModel() {
 					object.traverse( function ( child ) {
 						if (child.isMesh) {
-							child.name = "Loaded Mesh"
-							child.material.shininess = 200;
+							child.name = "Loaded Mesh";
 							addToProgressiveLightMap(child);
 						} else {
 							// These are lines; no need for lightmapping
