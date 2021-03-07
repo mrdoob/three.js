@@ -390,6 +390,8 @@ Editor.prototype = {
 
 	addTexture: function ( texture ) {
 
+		if ( texture === null ) return;
+
 		this.textures[ texture.uuid ] = texture;
 
 		this.signals.textureAdded.dispatch();
