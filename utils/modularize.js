@@ -212,7 +212,6 @@ var files = [
 	{ path: 'shaders/VignetteShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/VolumeShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/WaterRefractionShader.js', dependencies: [], ignoreList: [] },
-	{ path: 'shaders/ProgressiveShadowsShader.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'utils/BufferGeometryUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/GeometryUtils.js', dependencies: [], ignoreList: [] },

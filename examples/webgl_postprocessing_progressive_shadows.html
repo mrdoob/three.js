@@ -7,6 +7,238 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<script type="module" src="./progressive-shadows.js"></script>
+		<div id="container"></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			<br/>Progressive Surface Accumulator Demo by <a href="https://github.com/zalo" target="_blank" rel="noopener">zalo</a><br/>
+			[Inspired by <a href="http://madebyevan.com/shaders/lightmap/" target="_blank" rel="noopener">evanw's Lightmap Generation</a>]
+		</div>
+
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			let camera, scene, renderer, dirLights = [], controls, lightmap_containers = [], object = new THREE.Mesh();
+			const params = { enable: true,  averagingWindow: 100, xPos: 200, jitter: 200 };
+
+			init();
+			createGUI();
+			animate();
+
+			// Lightmapping Functions
+			function addToProgressiveLightMap(object, res = 1024) {
+				// Create the Progressive Lightmap Texture
+				let progressiveLightmap1 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
+				let progressiveLightmap2 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
+
+				// Inject some spicy new logic into whatever material this object has
+				let oldMaterial = object.material.clone();
+				oldMaterial.uniforms = {};
+				oldMaterial.onBeforeCompile = (shader) => {
+					// Set Vertex Positions to the Unwrapped UV Positions
+					shader.vertexShader =
+						'#define USE_UV\n' +
+						shader.vertexShader.slice(0, -1) +
+						'	gl_Position = vec4((uv - 0.5) * 2.0, 1.0, 1.0); }';
+					
+					// Set Pixels to average in the Previous frame's Shadows
+					let bodyStart    = shader.fragmentShader.indexOf('void main() {');
+					shader.fragmentShader =
+						'#define USE_UV\n'+
+						shader.fragmentShader.slice(0, bodyStart) +
+						'	uniform sampler2D previousShadowMap;\n	uniform float averagingWindow;\n' +
+						shader.fragmentShader.slice(   bodyStart-1, -1) +
+							`\nvec3 texelOld = texture(previousShadowMap, vUv).rgb;
+							gl_FragColor.rgb = mix(texelOld, gl_FragColor.rgb, 1.0/averagingWindow);
+						}`;
+					
+					// Set the Previous Frame's Texture Buffer and Averaging Window
+					shader.uniforms.previousShadowMap = { value: progressiveLightmap1.texture };
+					shader.uniforms.averagingWindow   = { value: params.averagingWindow };
+
+					oldMaterial.uniforms = shader.uniforms;
+					
+					// Set the new Shader to this
+					oldMaterial.userData.shader = shader;
+				};
+
+				// MeshBasicMaterial just renders the accumulated texture, no lighting
+				let basicMaterial    = new THREE.MeshBasicMaterial(); 
+				basicMaterial.map    = progressiveLightmap2.texture;
+				object.material      = basicMaterial;
+				object.castShadow    = true;
+				object.receiveShadow = true;
+
+				lightmap_containers.push({
+					basicMat: basicMaterial,
+					uvMat   : oldMaterial,
+					object  : object,
+					lightmap1: progressiveLightmap1,
+					lightmap2: progressiveLightmap2,
+					buffer1Active: true
+				});
+			}
+
+			function updateProgressiveLightMaps() {
+				for (let l = 0; l < lightmap_containers.length; l++) {
+					lightmap_containers[l].object.visible = false;
+				}
+
+				for (let l = 0; l < lightmap_containers.length; l++){
+					lightmap_containers[l].object.visible = true;
+					lightmap_containers[l].uvMat.uniforms.averagingWindow = { value: params.averagingWindow};
+					lightmap_containers[l].object.material = lightmap_containers[l].uvMat;
+					lightmap_containers[l].basicMat.needsUpdate = true;
+					lightmap_containers[l].uvMat.needsUpdate = true;
+
+					// Render Shadows onto a shadowmap
+					scene.background = new THREE.Color(0x000000);
+					if (lightmap_containers[l].buffer1Active) {
+						renderer.setRenderTarget(lightmap_containers[l].lightmap2);
+						lightmap_containers[l].uvMat.uniforms.previousShadowMap = { value: lightmap_containers[l].lightmap1.texture };
+					} else {
+						renderer.setRenderTarget(lightmap_containers[l].lightmap1);
+						lightmap_containers[l].uvMat.uniforms.previousShadowMap = { value: lightmap_containers[l].lightmap2.texture };
+					}
+					lightmap_containers[l].buffer1Active = !lightmap_containers[l].buffer1Active;
+					renderer.render( scene, camera );
+					renderer.setRenderTarget(null);
+
+					// Restore Object's Real-time Material
+					lightmap_containers[l].object.material = lightmap_containers[l].basicMat;
+					lightmap_containers[l].object.visible = false;
+					lightmap_containers[l].basicMat.needsUpdate = true;
+					lightmap_containers[l].uvMat.needsUpdate = true;
+				}
+
+				for (let l = 0; l < lightmap_containers.length; l++) {
+					lightmap_containers[l].object.visible = true;
+				}
+
+				// Restore Normal Scene Rendering
+				scene.background = new THREE.Color(0x9a9a9a);
+			}
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+				camera.position.set(0, 100, 200);
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color(0x9a9a9a);
+				scene.fog = new THREE.Fog(0x9a9a9a, 1000, 3000);
+				
+				let lightCount = 8;
+				for (let l = 0; l < lightCount; l++){
+					let dirLight = new THREE.DirectionalLight(0xffffff, 0.5/lightCount);
+					dirLight.name = 'Dir. Light '+l;
+					dirLight.position.set(200, 200, 200);
+					dirLight.castShadow = true;
+					dirLight.shadow.camera.near    =   100;
+					dirLight.shadow.camera.far     =   5000;
+					dirLight.shadow.camera.right   =   150;
+					dirLight.shadow.camera.left    = - 150;
+					dirLight.shadow.camera.top	   =   150;
+					dirLight.shadow.camera.bottom  = - 150;
+					dirLight.shadow.mapSize.width  =   1024;
+					dirLight.shadow.mapSize.height =   1024;
+					dirLight.shadow.autoUpdate     =   false;
+
+					let lightTarget = new THREE.Group();
+					lightTarget.position.set(0, 100, 0);
+					dirLight.target = lightTarget;
+					scene.add(lightTarget);
+
+					scene.add(dirLight);
+					dirLights.push(dirLight);
+				}
+
+				// ground
+				let groundMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(1000, 1000),
+																				new THREE.MeshPhongMaterial({ color: 0xffffff, depthWrite: true}));
+				groundMesh.position.y = -0.1;
+				groundMesh.rotation.x = - Math.PI / 2;
+				scene.add(groundMesh);
+				addToProgressiveLightMap(groundMesh);
+
+				// model
+				function loadModel() {
+					object.traverse( function ( child ) {
+						if (child.isMesh) {
+							child.material.shininess = 100;
+							addToProgressiveLightMap(child);
+						} else {
+							// These are lines; no need for lightmapping
+							child.layers.disableAll();
+							child.layers.enable(1);
+						}
+					} );
+
+					scene.add(object);
+					object.scale.set(2, 2, 2);
+					object.position.set(0, -20, 0);
+				}
+
+				const manager = new THREE.LoadingManager( loadModel );
+				const loader = new OBJLoader( manager );
+				loader.load('models/obj/ShadowmappableMesh.obj', function (obj) { object = obj; });
+				
+				// controls
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+				controls.dampingFactor = 0.05;
+				controls.screenSpacePanning = true;
+				controls.minDistance = 100;
+				controls.maxDistance = 500;
+				controls.maxPolarAngle = Math.PI / 1.5;
+				controls.target.set(0, 100, 0);
+
+				window.addEventListener( 'resize', onWindowResize );
+			}
+
+			function createGUI() {
+				const gui = new GUI( { name: 'Averaging Setting' } );
+				gui.add( params, 'averagingWindow', 1, 1000).step(1);
+				gui.add( params, 'xPos', -200, 200).step( 1 );
+				gui.add( params, 'jitter', 0, 300 ).step( 1 );
+				gui.add( params, 'enable' );
+			}
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+			function render() {
+				controls.update();
+
+				// Render Normal Scene
+				renderer.render( scene, camera );
+
+				// Accumulate 
+				if (params.enable) { updateProgressiveLightMaps(); }
+
+				// Manually Update the Directional Lights
+				for (let l = 0; l < dirLights.length; l++) {
+					dirLights[l].position.set(params.xPos  + Math.random() * params.jitter,
+																		250          + Math.random() * params.jitter,
+																		400          + Math.random() * params.jitter);
+					dirLights[l].shadow.needsUpdate = true;
+				}
+			}
+
+			function animate() {
+				requestAnimationFrame( animate );
+				render();
+			}
+		</script>
 	</body>
 </html>
