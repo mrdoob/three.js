@@ -255,6 +255,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		}
 
 		if ( this.size !== undefined ) data.size = this.size;
+		if ( this.shadowSide !== undefined ) data.shadowSide = this.shadowSide;
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
 
 		if ( this.blending !== NormalBlending ) data.blending = this.blending;
@@ -268,6 +269,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		data.depthFunc = this.depthFunc;
 		data.depthTest = this.depthTest;
 		data.depthWrite = this.depthWrite;
+		data.colorWrite = this.colorWrite;
 
 		data.stencilWrite = this.stencilWrite;
 		data.stencilWriteMask = this.stencilWriteMask;
