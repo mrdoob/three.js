@@ -17,11 +17,11 @@ var SSRrShader = {
   uniforms: {
 
     "tDiffuse": { value: null },
-    "tDiffuseBunny": { value: null },
+    "tDiffuseSelects": { value: null },
     "tNormal": { value: null },
     "tMetalness": { value: null },
     "tDepth": { value: null },
-    "tDepthBunny": { value: null },
+    "tDepthSelects": { value: null },
     "cameraNear": { value: null },
     "cameraFar": { value: null },
     "resolution": { value: new Vector2() },
@@ -53,11 +53,11 @@ var SSRrShader = {
 		precision highp sampler2D;
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
-		uniform sampler2D tDepthBunny;
+		uniform sampler2D tDepthSelects;
 		uniform sampler2D tNormal;
 		uniform sampler2D tMetalness;
 		uniform sampler2D tDiffuse;
-		uniform sampler2D tDiffuseBunny;
+		uniform sampler2D tDiffuseSelects;
 		uniform float cameraRange;
 		uniform vec2 resolution;
 		uniform float cameraNear;
@@ -87,8 +87,8 @@ var SSRrShader = {
 		float getDepth( const in vec2 uv ) {
 			return texture2D( tDepth, uv ).x;
 		}
-		float getDepthBunny( const in vec2 uv ) {
-			return texture2D( tDepthBunny, uv ).x;
+		float getDepthSelects( const in vec2 uv ) {
+			return texture2D( tDepthSelects, uv ).x;
 		}
 		float getViewZ( const in float depth ) {
 			#ifdef isPerspectiveCamera
@@ -126,7 +126,7 @@ var SSRrShader = {
 
 			// if(viewNormal.x<=0.&&viewNormal.y<=0.&&viewNormal.z<=0.) return;
 
-			float depth = getDepthBunny( vUv );
+			float depth = getDepthSelects( vUv );
 			float viewZ = getViewZ( depth );
 			// if(-viewZ>=cameraFar) return;
 
@@ -141,11 +141,7 @@ var SSRrShader = {
 			#else
 				vec3 viewIncidenceDir=vec3(0,0,-1);
 			#endif
-			// vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal);
-			// vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*10.);
-			// vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*-.5);
 			vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*-ior);
-			// vec3 viewRefractDir=-viewNormal;
 
 			float maxDistance=100.;
 			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
@@ -188,9 +184,9 @@ var SSRrShader = {
 
 				if(viewRefractRayZ<vZ){
 					vec4 refractColor=texture2D(tDiffuse,uv);
-					vec4 diffuseBunnyColor=texture2D(tDiffuseBunny,vUv);
-					gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),diffuseBunnyColor.r);
-					// gl_FragColor.xyz=refractColor.xyz*(1.+diffuseBunnyColor.r*3.);
+					vec4 diffuseSelectsColor=texture2D(tDiffuseSelects,vUv);
+					gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),diffuseSelectsColor.r);
+					// gl_FragColor.xyz=refractColor.xyz*(1.+diffuseSelectsColor.r*3.);
 					gl_FragColor.a=1.;
 					break;
 				}

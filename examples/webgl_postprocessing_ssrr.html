@@ -17,10 +17,10 @@
 		SSRrPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
 	</div>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
 	<script>
 		var vConsole = new VConsole();
-	</script>
+	</script> -->
 	<script type="module">
 		import * as THREE from '../build/three.module.js';
 
@@ -90,25 +90,25 @@
 
 			// Lights
 			const hemiLight = new THREE.HemisphereLight(0x443333, 0x111122);
+			hemiLight.name='hemiLight'
 			scene.add(hemiLight);
+			window.hemiLight=hemiLight
 
 			const spotLight = new THREE.SpotLight();
+			spotLight.name='spotLight'
 			spotLight.angle = Math.PI / 16;
 			spotLight.penumbra = 0.5;
 			// spotLight.castShadow = true;
 			spotLight.position.set(- 1, 1, 1);
 			scene.add(spotLight);
+			window.spotLight=spotLight
 
 			await new Promise(resolve => {
 				dracoLoader.load('models/draco/bunny.drc', function (geometry) {
 
 					geometry.computeVertexNormals();
 
-					const material = new THREE.MeshStandardMaterial({ 
-						color: 'black',
-						metalness: 0,
-						roughness: .2,
-					});
+					const material = new THREE.MeshStandardMaterial({ color: 0x606060 });
 					window.bunnyMaterial=material
 					const mesh = new THREE.Mesh(geometry, material);
 					mesh.position.y = - 0.0365;
@@ -134,7 +134,7 @@
 			window.mesh_box=mesh
 			scene.add(mesh);
 			otherMeshes.push(mesh);
-			// selects.push( mesh );
+			selects.push( mesh );
 
 			geometry = new THREE.IcosahedronBufferGeometry(.025, 4);
 			material = new THREE.MeshStandardMaterial({ color: 'cyan' });
@@ -200,8 +200,8 @@
 			gui.add(params, 'enableSSRr').name('Enable SSRr');
 			ssrrPass.ior = .05;
 			gui.add(ssrrPass, 'ior').name('IOR').min(0).max(.2).step(.00001)
-			gui.add(bunnyMaterial, 'metalness').min(0).max(1).step(.01)
-			gui.add(bunnyMaterial, 'roughness').min(0).max(1).step(.01)
+			// gui.add(bunnyMaterial, 'metalness').min(0).max(1).step(.01)
+			// gui.add(bunnyMaterial, 'roughness').min(0).max(1).step(.01)
 			gui.add(params, 'autoRotate').onChange(() => {
 
 				controls.enabled = !params.autoRotate;

@@ -16,6 +16,7 @@ import {
 	UnsignedShortType,
 	WebGLRenderTarget,
 	HalfFloatType,
+	MeshStandardMaterial
 } from '../../../build/three.module.js';
 import { Pass } from '../postprocessing/Pass.js';
 import { SSRrShader } from '../shaders/SSRrShader.js';
@@ -142,7 +143,7 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 		depthBuffer: true
 	} );
 
-	this.beautyRenderTargetBunny = new WebGLRenderTarget( this.width, this.height, { // TODO: Can merge with metalnessRenderTarget?
+	this.beautyRenderTargetSelects = new WebGLRenderTarget( this.width, this.height, { // TODO: Can merge with metalnessRenderTarget?
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
 		format: RGBAFormat,
@@ -198,7 +199,7 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	}
 
 	this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-	this.ssrrMaterial.uniforms[ 'tDiffuseBunny' ].value = this.beautyRenderTargetBunny.texture;
+	this.ssrrMaterial.uniforms[ 'tDiffuseSelects' ].value = this.beautyRenderTargetSelects.texture;
 	this.ssrrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
 	// if (this.isSelective) {
 	this.ssrrMaterial.defines.isSelective = this.isSelective;
@@ -206,7 +207,7 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	this.ssrrMaterial.uniforms[ 'tMetalness' ].value = this.metalnessRenderTarget.texture;
 	// }
 	this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
-	this.ssrrMaterial.uniforms[ 'tDepthBunny' ].value = this.normalRenderTarget.depthTexture;
+	this.ssrrMaterial.uniforms[ 'tDepthSelects' ].value = this.normalRenderTarget.depthTexture;
 	this.ssrrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 	this.ssrrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 	this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
@@ -229,7 +230,14 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 
 	this.metalnessOffMaterial = new MeshBasicMaterial( {
 		color: 'black'
-	} );
+	});
+
+	// specular material
+	this.specularMaterial = new MeshStandardMaterial({
+		color: 'black',
+		metalness: 0,
+		roughness: .2,
+	});
 
 	// material for rendering the depth
 
@@ -277,7 +285,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		// dispose render targets
 
 		this.beautyRenderTarget.dispose();
-		this.beautyRenderTargetBunny.dispose();
+		this.beautyRenderTargetSelects.dispose();
 		this.normalRenderTarget.dispose();
 		this.metalnessRenderTarget.dispose();
 		this.ssrrRenderTarget.dispose();
@@ -303,64 +311,44 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		if ( this.encoding ) this.beautyRenderTarget.texture.encoding = this.encoding;
 		renderer.setRenderTarget( this.beautyRenderTarget );
 		renderer.clear();
-
-		// this.scene.traverse(child => {
-		// 	if (this.selects.includes(child)) {
-		// 		child.visible=false
-		// 	} else {
-		// 		child.visible=true
-		// 	}
-		// })
-		// this.scene.children.forEach(child => {
-		// 	if (this.selects.includes(child)) {
-		// 		child.visible=false
-		// 	} else {
-		// 		child.visible = true
-		// 	}
-		// 	// console.log(child.name,child.visible)
-		// })
-		// debugger
-		mesh_bunny.visible=false
-		mesh_sphere.visible=true
-		mesh_box.visible=true
-		mesh_cone.visible=true
-		mesh_plane.visible=true
+		this.scene.children.forEach(child => {
+			if (this.selects.includes(child)) {
+				child.visible = false
+			} else {
+				child.visible = true
+			}
+		})
 		renderer.render(this.scene, this.camera);
 
-		renderer.setRenderTarget( this.beautyRenderTargetBunny );
+		renderer.setRenderTarget( this.beautyRenderTargetSelects );
 		renderer.clear();
-		mesh_bunny.visible=true
-		mesh_sphere.visible=false
-		mesh_box.visible=false
-		mesh_cone.visible=false
-		mesh_plane.visible=false
+		this.scene.children.forEach(child => {
+			if (this.selects.includes(child)) {
+				child.visible=true
+				child._SSRrPassMaterialBack = child.material
+				child.material=this.specularMaterial
+			} else if(!child.isLight) {
+				child.visible = false
+			}
+		})
 		renderer.render(this.scene, this.camera);
+		this.scene.children.forEach(child => {
+			if (this.selects.includes(child)) {
+				child.material=child._SSRrPassMaterialBack
+			}
+		})
 
 
 		// render normals
 
-		/* // TODO: Why this not work?
-			this.scene.traverse(child => {
-				if (this.selects.includes(child)) {
-					child.visible=true
-				} else {
-					child.visible = false
-				}
-			})
-		*/
-		// this.scene.children.forEach(child => {
-		// 	if (this.selects.includes(child)) {
-		// 		child.visible=true
-		// 	} else {
-		// 		child.visible = false
-		// 	}
-		// })
+		this.scene.children.forEach(child => {
+			if (this.selects.includes(child)) {
+				child.visible=true
+			} else{
+				child.visible = false
+			}
+		})
 
-		mesh_bunny.visible=true
-		mesh_sphere.visible=false
-		mesh_box.visible=false
-		mesh_cone.visible=false
-		mesh_plane.visible=false
 		this.renderOverride(renderer, this.normalMaterial, this.normalRenderTarget, 0, 0);
 
 		this.renderMetalness( renderer, this.metalnessOnMaterial, this.metalnessRenderTarget, 0, 0 );
@@ -370,7 +358,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.ssrrMaterial.uniforms[ 'ior' ].value = this.ior;
 		this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
 		this.ssrrMaterial.uniforms[ 'thickTolerance' ].value = this.thickTolerance;
-		this.ssrrMaterial.uniforms[ 'tDiffuseBunny' ].value = this.beautyRenderTargetBunny.texture;
+		this.ssrrMaterial.uniforms[ 'tDiffuseSelects' ].value = this.beautyRenderTargetSelects.texture;
 		this.renderPass( renderer, this.ssrrMaterial, this.ssrrRenderTarget );
 
 		// output result to screen
@@ -516,15 +504,12 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		}
 
-
-		mesh_bunny.visible=true
-		mesh_sphere.visible=true
-		mesh_box.visible=true
-		mesh_cone.visible=true
-		mesh_plane.visible=true
+		this.scene.children.forEach(child => {
+			child.visible=true
+		})
 		this.scene.traverse( child => {
 
-			child._SSRPassMaterialBack = child.material;
+			child._SSRrPassMaterialBack = child.material;
 			if ( this._selects.includes( child ) ) {
 
 				child.material = this.metalnessOnMaterial;
@@ -541,11 +526,11 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.scene._fog=this.scene.fog // TODO: Formal writing.
 		this.scene.fog=null
 		renderer.render(this.scene, this.camera);
-		this.scene.fog=this.scene._fog
+		this.scene.fog=this.scene._fog // TODO: Why final result no fog?
 		this.scene.background=this.scene._background
 		this.scene.traverse( child => {
 
-			child.material = child._SSRPassMaterialBack;
+			child.material = child._SSRrPassMaterialBack;
 
 		} );
 
@@ -565,7 +550,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.ssrrMaterial.defines.MAX_STEP = Math.sqrt( width * width + height * height );
 		this.ssrrMaterial.needsUpdate = true;
 		this.beautyRenderTarget.setSize( width, height );
-		this.beautyRenderTargetBunny.setSize( width, height );
+		this.beautyRenderTargetSelects.setSize( width, height );
 		this.ssrrRenderTarget.setSize( width, height );
 		this.normalRenderTarget.setSize( width, height );
 
