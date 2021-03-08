@@ -20,6 +20,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TransformControls } from './jsm/controls/TransformControls.js';
 			import { ProgressiveSurfacemap } from './jsm/misc/ProgressiveSurfacemap.js';
+			import { ShadowMapViewer } from './jsm/utils/ShadowMapViewer.js';
 
 			// ShadowMap Res and Number of Directional Lights
 			let shadowMapRes = 512, lightCount = 8;
@@ -49,7 +50,7 @@
 				scene.fog = new THREE.Fog(0x949494, 1000, 3000);
 
 				// Progressive Lightmap
-				progressiveSurfacemap = new ProgressiveSurfacemap(scene, renderer, 512);
+				progressiveSurfacemap = new ProgressiveSurfacemap(renderer, 512);
 
 				// Transform Gizmo
 				lightOrigin = new THREE.Group();
@@ -59,7 +60,6 @@
 				control.addEventListener( 'dragging-changed', ( event ) => { controls.enabled = ! event.value; } );
 				control.attach( lightOrigin );
 				scene.add( control );
-				progressiveSurfacemap.exclude(control); // Exclude the control gizmos from being rendered to the map
 
 				for (let l = 0; l < lightCount; l++){
 					let dirLight = new THREE.DirectionalLight(0xffffff, 1.0/lightCount);
@@ -76,7 +76,7 @@
 					dirLight.shadow.mapSize.height =   shadowMapRes;
 					dirLight.shadow.autoUpdate     =   false; // This technique needs autoupdates disabled!
 
-					scene.add(dirLight);
+					progressiveSurfacemap.add(dirLight);
 					dirLights.push(dirLight);
 				}
 
@@ -114,7 +114,6 @@
 					control2.addEventListener( 'dragging-changed', ( event ) => { controls.enabled = ! event.value; } );
 					control2.attach( object );
 					scene.add( control2 );
-					progressiveSurfacemap.exclude(control2); // Exclude the control gizmos from being rendered to the map
 
 					let lightTarget = new THREE.Group();
 					lightTarget.position.set(0, 20, 0);

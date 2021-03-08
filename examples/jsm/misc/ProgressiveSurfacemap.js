@@ -14,22 +14,27 @@ import * as THREE from '../../../build/three.module.js';
  * @param {Scene} scene The scene the objects are contextualized in
  * @param {WebGLRenderer} renderer A WebGL Rendering Context
  */
-var ProgressiveSurfacemap = function (scene, renderer) {
+var ProgressiveSurfacemap = function (renderer) {
 
 	this.surfacemapContainers = [];
 	this.blurringPlane = null;
 	this.compiled = false;
-	this.excludedObjects = [];
+	this.scene = new THREE.Scene();
+	this.scene.background = null;
+	let tinyTarget = new THREE.WebGLRenderTarget(1, 1);
 
 	/**
 	 * Replaces this objects' material with a surface map to be rendered to later.
 	 * @param {Object3D} object The object to create a surfacemap for.
 	 * @param {number} res The square resolution of this object's surfacemap.
 	 */
-	this.add = function(object, res = 512) {
+    this.add = function (object, res = 512) {
+		if (object.isLight) { this.scene.attach(object); return; }
+
 		// Create the Progressive Surfacemap Texture
-		let progressiveSurfacemap1 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
-		let progressiveSurfacemap2 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
+		let format = /(iPad|iPhone|iPod)/g.test(navigator.userAgent) ? THREE.HalfFloatType : THREE.FloatType;
+		let progressiveSurfacemap1 = new THREE.WebGLRenderTarget(res, res, { type: format });
+		let progressiveSurfacemap2 = new THREE.WebGLRenderTarget(res, res, { type: format });
 
 		if(this.blurringPlane == null) { this._initializeBlurPlane(res, progressiveSurfacemap1); }
 
@@ -91,32 +96,34 @@ var ProgressiveSurfacemap = function (scene, renderer) {
 	 * @param {number} blendWindow When >1, samples will accumulate over time.
 	 * @param {boolean} blurEdges  Whether to fix UV Edges via blurring
 	 */
-	this.update = function(camera, blendWindow = 100, blurEdges = true) {
-		let originalBackground = scene.background;
-		scene.background = null;
+	this.update = function (camera, blendWindow = 100, blurEdges = true) {
+		// Whether or not to blur the edges of the lightmap...
+		this.blurringPlane.visible = blurEdges;
 
-		// Don't try anything if the material is not compiled yet
-		if (!this.blurringPlane.material.uniforms) { return; }
+		// Phase 1: Bake Shadows
+		for (let l = 0; l < this.surfacemapContainers.length; l++) {
+			// Steal the Object3D from the real world to our special dimension
+			this.surfacemapContainers[l].object.oldScene = this.surfacemapContainers[l].object.parent;
+			this.scene.attach(this.surfacemapContainers[l].object);
+		}
 
-		// Hide all relevent objects
-		scene.traverse( function ( child ) {
-			if(child.isMesh){
-				child.wasVisible = child.visible; 
-				child.visible = false;
-			}
-		});
-		this.excludedObjects.forEach(child => {
-			child.wasVisible = child.visible; 
-			child.visible = false;
-		});
+		// Render once to bake the shadows
+		let oldTarget = renderer.getRenderTarget();
+		renderer.setRenderTarget(tinyTarget); // Tiny Target Hopefully keeps this from being expensive...
+		renderer.render(this.scene, camera);
 
-        // Unhide the Blurring Plane (to be placed behind the other objects)
-		if (blurEdges) { this.blurringPlane.visible = true; }
+		// Add them back to the outer scene to hide them from this one...
+		for (let l = 0; l < this.surfacemapContainers.length; l++) {
+			this.surfacemapContainers[l].object.oldScene.attach(this.surfacemapContainers[l].object);
+		}
 
-		// Iterate render each object's surface map individually
+		// Phase 2: Iterate and render each object's surface maps individually
 		for (let l = 0; l < this.surfacemapContainers.length; l++){
+			// Steal the Object3D from the real world to our special dimension
+			let oldScene = this.surfacemapContainers[l].object.parent;
+			this.scene.attach(this.surfacemapContainers[l].object);
+
 			// Set each object's material to the UV Unwrapped Surface Mapping Version
-			this.surfacemapContainers[l].object.visible                  = true;
 			this.surfacemapContainers[l].uvMat .uniforms.averagingWindow = { value: blendWindow };
 			this.surfacemapContainers[l].object.material                 = this.surfacemapContainers[l].uvMat;
 
@@ -133,28 +140,13 @@ var ProgressiveSurfacemap = function (scene, renderer) {
 			this.surfacemapContainers[l].uvMat.uniforms.previousShadowMap = { value: inactiveMap.texture };
 			this.blurringPlane.material       .uniforms.previousShadowMap = { value: inactiveMap.texture };
 			this.surfacemapContainers[l].buffer1Active = !this.surfacemapContainers[l].buffer1Active;
-			renderer.render( scene, camera );
-			renderer.setRenderTarget(null);
+			renderer.render( this.scene, camera );
 
-			// Restore the object's Real-time Material
+			// Restore the object's Real-time Material and add it back to the original world
 			this.surfacemapContainers[l].object.material = this.surfacemapContainers[l].basicMat;
-			this.surfacemapContainers[l].object.visible = false;
+			oldScene.attach(this.surfacemapContainers[l].object);
 		}
-
-		scene.traverse(function (child) { if (child.isMesh) { child.visible = child.wasVisible; } });
-		this.excludedObjects.forEach(child =>               { child.visible = child.wasvisible; });
-
-		// Restore Normal Scene Rendering
-		scene.background = originalBackground;
-		this.blurringPlane.visible = false;
-	}
-	
-	/**
-	 * Excludes an object from the progressive surface mapping routine.
-	 * @param {Object3D} toExclude The object to exclude.
-	 */
-	this.exclude = function (toExclude) {
-		this.excludedObjects.push(toExclude);
+		renderer.setRenderTarget(oldTarget);
 	}
 	
 	/**
@@ -203,10 +195,9 @@ var ProgressiveSurfacemap = function (scene, renderer) {
 		};
 
 		this.blurringPlane = new THREE.Mesh(new THREE.PlaneBufferGeometry(1, 1), blurMaterial);
-		this.blurringPlane.visible = false;
 		this.blurringPlane.name = "Blurring Plane"
 		this.blurringPlane.frustumCulled = false;
-		scene.add(this.blurringPlane);
+		this.scene.add(this.blurringPlane);
 	}
 }
 
