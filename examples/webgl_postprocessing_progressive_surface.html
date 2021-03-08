@@ -19,169 +19,18 @@
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TransformControls } from './jsm/controls/TransformControls.js';
+			import { ProgressiveSurfacemap } from './jsm/misc/ProgressiveSurfacemap.js';
 
-			let camera, scene, renderer, dirLights = [], controls, control, control2,
-			lightmap_containers = [], object = new THREE.Mesh(), blurringPlane = null,
-			lightOrigin = null;
-			const params = { Enable: true, BlendWindow: 200, LightRadius: 50, Ambient: 0.5 };
-			let shadowMapRes = 512;
+			// ShadowMap Res and Number of Directional Lights
+			let shadowMapRes = 512, lightCount = 8;
+
+			let camera, scene, renderer, dirLights = [], controls, control, control2, 
+				object = new THREE.Mesh(), lightOrigin = null, progressiveSurfacemap;
+			const params = { Enable: true, BlendWindow: 200, LightRadius: 50, AmbientWeight: 0.5, BlurEdges: true };
 
 			init();
 			createGUI();
 			animate();
-
-			function initializeProgressiveLightMapping(res = shadowMapRes, shadowMap = null) {
-				let blurMaterial = new THREE.MeshBasicMaterial();
-				blurMaterial.uniforms = { previousShadowMap : { value: null    },
-										  pixelOffset       : { value: 1.0/res },
-										  polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 3.0};
-				blurMaterial.onBeforeCompile = (shader) => {
-					// Set Vertex Positions to the Unwrapped UV Positions
-					shader.vertexShader =
-						'#define USE_UV\n' +
-						shader.vertexShader.slice(0, -1) +
-						'	gl_Position = vec4((uv - 0.5) * 2.0, 1.0, 1.0); }';
-					
-					// Set Pixels to 9-tap box blur the current frame's Shadows
-					let bodyStart    = shader.fragmentShader.indexOf('void main() {');
-					shader.fragmentShader =
-						'#define USE_UV\n'+
-						shader.fragmentShader.slice(0, bodyStart) +
-						'	uniform sampler2D previousShadowMap;\n	uniform float pixelOffset;\n' +
-						shader.fragmentShader.slice(   bodyStart-1, -1) +
-							`	gl_FragColor.rgb = (
-											texture(previousShadowMap, vUv + vec2( pixelOffset,  0.0        )).rgb + 
-											texture(previousShadowMap, vUv + vec2( 0.0        ,  pixelOffset)).rgb +
-											texture(previousShadowMap, vUv + vec2( 0.0        , -pixelOffset)).rgb +
-											texture(previousShadowMap, vUv + vec2(-pixelOffset,  0.0        )).rgb +
-											texture(previousShadowMap, vUv + vec2( pixelOffset,  pixelOffset)).rgb + 
-											texture(previousShadowMap, vUv + vec2(-pixelOffset,  pixelOffset)).rgb +
-											texture(previousShadowMap, vUv + vec2( pixelOffset, -pixelOffset)).rgb +
-											texture(previousShadowMap, vUv + vec2(-pixelOffset, -pixelOffset)).rgb)/8.0;
-						}`;
-					
-					// Set the Frame's Texture Buffer
-					shader.uniforms.previousShadowMap = { value: shadowMap.texture };
-					shader.uniforms.pixelOffset       = { value: 0.5/res           };
-					blurMaterial.uniforms             = shader.uniforms;
-					
-					// Set the new Shader to this
-					blurMaterial.userData.shader = shader;
-				};
-
-				blurringPlane = new THREE.Mesh(new THREE.PlaneBufferGeometry(1, 1), blurMaterial);
-				blurringPlane.visible = false;
-				blurringPlane.name = "Blurring Plane"
-				blurringPlane.frustumCulled = false;
-				scene.add(blurringPlane);
-			}
-
-			// Lightmapping Functions
-			function addToProgressiveLightMap(object, res = shadowMapRes) {
-				// Create the Progressive Lightmap Texture
-				let progressiveLightmap1 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
-				let progressiveLightmap2 = new THREE.WebGLRenderTarget(res, res, { type: THREE.FloatType });
-
-				if(blurringPlane == null) { initializeProgressiveLightMapping(res, progressiveLightmap1); }
-
-				// Inject some spicy new logic into whatever material this object has
-				let oldMaterial = object.material.clone();
-				oldMaterial.uniforms = {};
-				oldMaterial.onBeforeCompile = (shader) => {
-					// Set Vertex Positions to the Unwrapped UV Positions
-					shader.vertexShader =
-						'#define USE_UV\n' +
-						shader.vertexShader.slice(0, -1) +
-						'	gl_Position = vec4((uv - 0.5) * 2.0, 1.0, 1.0); }';
-					
-					// Set Pixels to average in the Previous frame's Shadows
-					let bodyStart    = shader.fragmentShader.indexOf('void main() {');
-					shader.fragmentShader =
-						'#define USE_UV\n'+
-						shader.fragmentShader.slice(0, bodyStart) +
-						'	uniform sampler2D previousShadowMap;\n	uniform float averagingWindow;\n' +
-						shader.fragmentShader.slice(   bodyStart-1, -1) +
-							`\nvec3 texelOld = texture(previousShadowMap, vUv).rgb;
-							gl_FragColor.rgb = mix(texelOld, gl_FragColor.rgb, 1.0/averagingWindow);
-						}`;
-					
-					// Set the Previous Frame's Texture Buffer and Averaging Window
-					shader.uniforms.previousShadowMap = { value: progressiveLightmap1.texture };
-					shader.uniforms.averagingWindow   = { value: params.BlendWindow };
-
-					oldMaterial.uniforms = shader.uniforms;
-					
-					// Set the new Shader to this
-					oldMaterial.userData.shader = shader;
-				};
-
-				// MeshBasicMaterial just renders the accumulated texture, no lighting
-				let basicMaterial    = new THREE.MeshBasicMaterial( 
-					{dithering: true, map: progressiveLightmap2.texture}); 
-				object.material      = basicMaterial;
-				object.castShadow    = true;
-				object.receiveShadow = true;
-
-				lightmap_containers.push({
-					basicMat: basicMaterial,
-					uvMat   : oldMaterial,
-					object  : object,
-					lightmap1: progressiveLightmap1,
-					lightmap2: progressiveLightmap2,
-					buffer1Active: true
-				});
-			}
-
-			function updateProgressiveLightMaps() {
-				let originalBackground = scene.background;
-				scene.background = null;
-
-				scene.traverse( function ( child ) {
-					if(child.isMesh){
-						child.wasVisible = child.visible; 
-						child.visible = false;
-					}
-				});
-				control.visible = false;
-				if(control2) { control2.visible = false; }
-				blurringPlane.visible = true;
-
-				for (let l = 0; l < lightmap_containers.length; l++){
-					lightmap_containers[l].object.visible = true;
-					lightmap_containers[l].uvMat.uniforms.averagingWindow = { value: params.BlendWindow};
-					lightmap_containers[l].object.material = lightmap_containers[l].uvMat;
-					lightmap_containers[l].basicMat.needsUpdate = true;
-					lightmap_containers[l].uvMat.needsUpdate = true;
-
-					// Render Shadows onto a shadowmap
-					if (lightmap_containers[l].buffer1Active) {
-						renderer.setRenderTarget(lightmap_containers[l].lightmap2);
-						lightmap_containers[l].uvMat.uniforms.previousShadowMap = { value: lightmap_containers[l].lightmap1.texture };
-						blurringPlane.material      .uniforms.previousShadowMap = { value: lightmap_containers[l].lightmap1.texture };
-					} else {
-						renderer.setRenderTarget(lightmap_containers[l].lightmap1);
-						lightmap_containers[l].uvMat.uniforms.previousShadowMap = { value: lightmap_containers[l].lightmap2.texture };
-						blurringPlane.material      .uniforms.previousShadowMap = { value: lightmap_containers[l].lightmap2.texture };
-					}
-					lightmap_containers[l].buffer1Active = !lightmap_containers[l].buffer1Active;
-					renderer.render( scene, camera );
-					renderer.setRenderTarget(null);
-
-					// Restore Object's Real-time Material
-					lightmap_containers[l].object.material = lightmap_containers[l].basicMat;
-					lightmap_containers[l].object.visible = false;
-					lightmap_containers[l].basicMat.needsUpdate = true;
-					lightmap_containers[l].uvMat.needsUpdate = true;
-				}
-
-				scene.traverse( function ( child ) { if(child.isMesh){ child.visible = child.wasVisible; } } );
-				control.visible = true;
-				if(control2) { control2.visible = true; }
-
-				// Restore Normal Scene Rendering
-				scene.background = originalBackground;
-				blurringPlane.visible = false;
-			}
 
 			function init() {
 
@@ -199,6 +48,9 @@
 				scene.background = new THREE.Color(0x949494);
 				scene.fog = new THREE.Fog(0x949494, 1000, 3000);
 
+				// Progressive Lightmap
+				progressiveSurfacemap = new ProgressiveSurfacemap(scene, renderer, 512);
+
 				// Transform Gizmo
 				lightOrigin = new THREE.Group();
 				lightOrigin.position.set(60, 150, 100);
@@ -207,8 +59,8 @@
 				control.addEventListener( 'dragging-changed', ( event ) => { controls.enabled = ! event.value; } );
 				control.attach( lightOrigin );
 				scene.add( control );
+				progressiveSurfacemap.exclude(control); // Exclude the control gizmos from being rendered to the map
 
-				let lightCount = 8;
 				for (let l = 0; l < lightCount; l++){
 					let dirLight = new THREE.DirectionalLight(0xffffff, 1.0/lightCount);
 					dirLight.name = 'Dir. Light '+l;
@@ -222,7 +74,7 @@
 					dirLight.shadow.camera.bottom  = - 150;
 					dirLight.shadow.mapSize.width  =   shadowMapRes;
 					dirLight.shadow.mapSize.height =   shadowMapRes;
-					dirLight.shadow.autoUpdate     =   false;
+					dirLight.shadow.autoUpdate     =   false; // This technique needs autoupdates disabled!
 
 					scene.add(dirLight);
 					dirLights.push(dirLight);
@@ -235,19 +87,22 @@
 				groundMesh.rotation.x = - Math.PI / 2;
 				groundMesh.name = "GroundMesh";
 				scene.add(groundMesh);
-				addToProgressiveLightMap(groundMesh);
+				// This adds the model to the surfacemap
+				// And replaces its material with a Basic SurfaceMap Material
+				progressiveSurfacemap.add(groundMesh);
 
 				// model
 				function loadModel() {
 					object.traverse( function ( child ) {
 						if (child.isMesh) {
 							child.name = "Loaded Mesh";
-							addToProgressiveLightMap(child);
+							child.castShadow    = true;
+							child.receiveShadow = true;
+							// This adds the model to the surfacemap
+							// And replaces its material with a Basic SurfaceMap Material
+							progressiveSurfacemap.add(child); 
 						} else {
-							// These are lines; no need for lightmapping
-							child.layers.disableAll();
-							child.layers.enable(1);
-							child.name = "Not Loaded Mesh"
+							child.layers.disableAll(); // Disable Rendering for this
 						}
 					} );
 
@@ -259,6 +114,7 @@
 					control2.addEventListener( 'dragging-changed', ( event ) => { controls.enabled = ! event.value; } );
 					control2.attach( object );
 					scene.add( control2 );
+					progressiveSurfacemap.exclude(control2); // Exclude the control gizmos from being rendered to the map
 
 					let lightTarget = new THREE.Group();
 					lightTarget.position.set(0, 20, 0);
@@ -286,9 +142,10 @@
 			function createGUI() {
 				const gui = new GUI( { name: 'Accumulation Settings' } );
 				gui.add( params, 'Enable' );
-				gui.add( params, 'BlendWindow'   , 1, 500 ).step( 1 );
-				gui.add( params, 'LightRadius'   , 0, 200 ).step( 10 );
-				gui.add( params, 'Ambient', 0, 1   ).step( 0.1 );
+				gui.add( params, 'BlurEdges');
+				gui.add( params, 'BlendWindow'      , 1, 500 ).step( 1 );
+				gui.add( params, 'LightRadius'      , 0, 200 ).step( 10 );
+				gui.add( params, 'AmbientWeight'    , 0, 1   ).step( 0.1 );
 			}
 
 			function onWindowResize() {
@@ -298,21 +155,21 @@
 			}
 
 			function render() {
+				// Update the inertia on the orbit controls
 				controls.update();
 
-				// Render Scene Normally
-				renderer.render( scene, camera );
-
 				// Accumulate Surface Maps
-				if (params.Enable) { updateProgressiveLightMaps(); }
+				if (params.Enable) { progressiveSurfacemap.update(camera, params.BlendWindow, params.BlurEdges); }
 
 				// Manually Update the Directional Lights
 				for (let l = 0; l < dirLights.length; l++) {
-					if(Math.random() > params.Ambient){
+					// Sometimes they will be sampled from the target direction
+					// Sometimes they will be uniformly sampled from the upper hemisphere
+					if(Math.random() > params.AmbientWeight){
 						dirLights[l].position.set(lightOrigin.position.x + (Math.random() * params.LightRadius),
 												  lightOrigin.position.y + (Math.random() * params.LightRadius),
 												  lightOrigin.position.z + (Math.random() * params.LightRadius));
-					}else{
+					} else {
 						// Uniform Hemispherical Surface Distribution for Ambient Occlusion
 						let lambda = Math.acos(2 * Math.random() - 1) - (3.14159/2.0);
 						let phi = 2 * 3.14159 * Math.random();
@@ -320,8 +177,11 @@
 										   Math.abs(Math.cos(lambda) * Math.sin(phi)) * 300  + object.position.y + 20,
 												   (Math.sin(lambda)                  * 300) + object.position.z    );
 					}
-					dirLights[l].shadow.needsUpdate = true;
+					dirLights[l].shadow.needsUpdate = true; // Don't forget to manually update the lights' shadows!
 				}
+
+				// Render Scene
+				renderer.render( scene, camera );
 			}
 
 			function animate() {
