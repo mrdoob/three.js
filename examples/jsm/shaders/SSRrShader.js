@@ -17,6 +17,7 @@ var SSRrShader = {
   uniforms: {
 
     "tDiffuse": { value: null },
+    "tDiffuseBunny": { value: null },
     "tNormal": { value: null },
     "tMetalness": { value: null },
     "tDepth": { value: null },
@@ -56,6 +57,7 @@ var SSRrShader = {
 		uniform sampler2D tNormal;
 		uniform sampler2D tMetalness;
 		uniform sampler2D tDiffuse;
+		uniform sampler2D tDiffuseBunny;
 		uniform float cameraRange;
 		uniform vec2 resolution;
 		uniform float cameraNear;
@@ -115,7 +117,7 @@ var SSRrShader = {
 		}
 		void main(){
 			float metalness=texture2D(tMetalness,vUv).r;
-			if(metalness==0.) return;
+			if(metalness<=0.) return;
 
 			// TODO: Will if(ior===0.) return; improve performance?
 			// gl_FragColor=vec4(0,0,.5,1);return;
@@ -186,7 +188,9 @@ var SSRrShader = {
 
 				if(viewRefractRayZ<vZ){
 					vec4 refractColor=texture2D(tDiffuse,uv);
-					gl_FragColor.xyz=refractColor.xyz;
+					vec4 diffuseBunnyColor=texture2D(tDiffuseBunny,vUv);
+					gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),diffuseBunnyColor.r);
+					// gl_FragColor.xyz=refractColor.xyz*(1.+diffuseBunnyColor.r*3.);
 					gl_FragColor.a=1.;
 					break;
 				}

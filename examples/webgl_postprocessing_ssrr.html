@@ -104,7 +104,12 @@
 
 					geometry.computeVertexNormals();
 
-					const material = new THREE.MeshStandardMaterial({ color: 0x606060 });
+					const material = new THREE.MeshStandardMaterial({ 
+						color: 'black',
+						metalness: 0,
+						roughness: .2,
+					});
+					window.bunnyMaterial=material
 					const mesh = new THREE.Mesh(geometry, material);
 					mesh.position.y = - 0.0365;
 					mesh.name='bunny'
@@ -195,6 +200,8 @@
 			gui.add(params, 'enableSSRr').name('Enable SSRr');
 			ssrrPass.ior = .05;
 			gui.add(ssrrPass, 'ior').name('IOR').min(0).max(.2).step(.00001)
+			gui.add(bunnyMaterial, 'metalness').min(0).max(1).step(.01)
+			gui.add(bunnyMaterial, 'roughness').min(0).max(1).step(.01)
 			gui.add(params, 'autoRotate').onChange(() => {
 
 				controls.enabled = !params.autoRotate;
