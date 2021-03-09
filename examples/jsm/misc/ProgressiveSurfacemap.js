@@ -180,8 +180,8 @@ var ProgressiveSurfacemap = function (renderer, res = 1024) {
 	*/
 	this.warned = false;
 	this.showDebugLightmap = function (visible, position = undefined) {
-		if (this.surfacemapContainers.length == 0 && !this.warned) {
-			console.warn("Call this after adding the objects!"); this.warned = true; return; }
+		if (this.surfacemapContainers.length == 0){ if(!this.warned) {
+			console.warn("Call this after adding the objects!"); this.warned = true; return; } }
 		if (this.labelMesh == null) {
 			this.labelMaterial = new THREE.MeshBasicMaterial(
 				{ map: this.progressiveSurfacemap1.texture, side: THREE.DoubleSide });
