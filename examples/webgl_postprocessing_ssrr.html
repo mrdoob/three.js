@@ -15,6 +15,7 @@
 	<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		SSRrPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
+		click object to toggle transparent<br/>
 	</div>
 
 	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
@@ -47,7 +48,11 @@
 		let controls;
 		let camera, scene, renderer;
 		const otherMeshes = [];
+		const objects = [];
 		const selects = [];
+		const raycaster = new THREE.Raycaster();
+		const mouseDown = new THREE.Vector2();
+		const mouse = new THREE.Vector2();
 
 		const container = document.querySelector('#container');
 
@@ -61,7 +66,9 @@
 		async function init() {
 
 			camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 15);
+			window.camera=camera
 			camera.position.set(0.13271600513224902, 0.3489546826045913, 0.43921296427927076);
+			// camera.position.set(0.29446848714184776, 0.18676188336260469, -0.4130312557062661);
 
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color(0x443333);
@@ -115,6 +122,7 @@
 					mesh.name='bunny'
 					window.mesh_bunny=mesh
 					scene.add(mesh);
+					objects.push(mesh);
 					selects.push(mesh);
 
 					// Release decoder resources.
@@ -134,6 +142,7 @@
 			window.mesh_box=mesh
 			scene.add(mesh);
 			otherMeshes.push(mesh);
+			objects.push( mesh );
 			selects.push( mesh );
 
 			geometry = new THREE.IcosahedronBufferGeometry(.025, 4);
@@ -144,6 +153,7 @@
 			window.mesh_sphere=mesh
 			scene.add(mesh);
 			otherMeshes.push(mesh);
+			objects.push( mesh );
 			// selects.push( mesh );
 
 			geometry = new THREE.ConeBufferGeometry(.025, .05, 64);
@@ -154,6 +164,7 @@
 			window.mesh_cone=mesh
 			scene.add(mesh);
 			otherMeshes.push(mesh);
+			objects.push( mesh );
 			// selects.push( mesh );
 
 			// renderer
@@ -177,6 +188,8 @@
 			container.appendChild(stats.dom);
 
 			window.addEventListener('resize', onWindowResize, false);
+			window.addEventListener( 'pointerdown', onPointerDown, false );
+			window.addEventListener( 'pointerup', onPointerUp, false );
 
 			// composer
 
@@ -200,8 +213,6 @@
 			gui.add(params, 'enableSSRr').name('Enable SSRr');
 			ssrrPass.ior = .05;
 			gui.add(ssrrPass, 'ior').name('IOR').min(0).max(.2).step(.00001)
-			// gui.add(bunnyMaterial, 'metalness').min(0).max(1).step(.01)
-			// gui.add(bunnyMaterial, 'roughness').min(0).max(1).step(.01)
 			gui.add(params, 'autoRotate').onChange(() => {
 
 				controls.enabled = !params.autoRotate;
@@ -209,6 +220,8 @@
 			});
 
 			const folder = gui.addFolder('more settings');
+			folder.add(ssrrPass.specularMaterial, 'metalness').min(0).max(1).step(.01)
+			folder.add(ssrrPass.specularMaterial, 'roughness').min(0).max(1).step(.01)
 			folder.add(ssrrPass, 'isFresnel')
 			folder.add(ssrrPass, 'isDistanceAttenuation')
 			folder.add(params, 'isOtherMeshes').onChange(() => {
@@ -258,6 +271,33 @@
 
 			animate();
 
+		}
+
+		function onPointerDown( event ) {
+			mouseDown.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			mouseDown.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+		}
+		function onPointerUp( event ) {
+
+			// calculate mouse position in normalized device coordinates
+			// (-1 to +1) for both components
+
+			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+			if(mouseDown.sub(mouse).length()>.03) return
+
+
+			raycaster.setFromCamera( mouse, camera );
+			const intersect = raycaster.intersectObjects( objects )[0];
+			if(intersect){
+				let index=selects.indexOf(intersect.object)
+				if(index>=0){
+					selects.splice(index,1)
+				}else{
+					selects.push(intersect.object)
+				}
+			}
 		}
 
 

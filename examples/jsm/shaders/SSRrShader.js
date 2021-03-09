@@ -183,6 +183,7 @@ var SSRrShader = {
 				#endif
 
 				if(viewRefractRayZ<vZ){
+				// if(viewRefractRayZ<vZ&&vZ-viewRefractRayZ<.05){
 					vec4 refractColor=texture2D(tDiffuse,uv);
 					vec4 diffuseSelectsColor=texture2D(tDiffuseSelects,vUv);
 					gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),diffuseSelectsColor.r);

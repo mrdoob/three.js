@@ -553,6 +553,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.beautyRenderTargetSelects.setSize( width, height );
 		this.ssrrRenderTarget.setSize( width, height );
 		this.normalRenderTarget.setSize( width, height );
+		this.metalnessRenderTarget.setSize( width, height );
 
 		this.ssrrMaterial.uniforms[ 'resolution' ].value.set( width, height );
 		this.ssrrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
