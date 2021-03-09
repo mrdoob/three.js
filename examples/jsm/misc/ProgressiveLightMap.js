@@ -141,7 +141,7 @@ class ProgressiveLightMap {
 
 		} );
 
-	};
+	}
 
 	/**
 	 * This function renders each mesh one at a time into their respective surface maps
