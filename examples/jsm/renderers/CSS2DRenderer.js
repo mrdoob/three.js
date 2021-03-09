@@ -99,7 +99,7 @@ var CSS2DRenderer = function () {
 
 			var element = object.element;
 
-			element.style.transform = 'translate(-50%,-50%) translate(' + ( vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - vector.y * _heightHalf + _heightHalf ) + 'px)';
+			element.style.transform = 'translate(-50%,-50%) translate(' + Math.round( vector.x * _widthHalf + _widthHalf ) + 'px,' + Math.round( - vector.y * _heightHalf + _heightHalf ) + 'px)';
 			element.style.display = ( object.visible && vector.z >= - 1 && vector.z <= 1 ) ? '' : 'none';
 
 			var objectData = {
