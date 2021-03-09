@@ -178,8 +178,10 @@ var ProgressiveSurfacemap = function (renderer, res = 1024) {
 	 * @param {boolean} visible Whether the debug plane should be visible
 	 * @param {Vector3} position Where the debug plane should be drawn
 	*/
+	this.warned = false;
 	this.showDebugLightmap = function (visible, position = undefined) {
-		if (this.surfacemapContainers.length == 0) { console.warn("Call this after adding the objects!"); return; }
+		if (this.surfacemapContainers.length == 0 && !this.warned) {
+			console.warn("Call this after adding the objects!"); this.warned = true; return; }
 		if (this.labelMesh == null) {
 			this.labelMaterial = new THREE.MeshBasicMaterial(
 				{ map: this.progressiveSurfacemap1.texture, side: THREE.DoubleSide });
