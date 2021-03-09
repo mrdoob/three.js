@@ -23,6 +23,7 @@ var ProgressiveSurfacemap = function (renderer, res = 1024) {
 	this.scene.background     = null;
 	this.tinyTarget           = new THREE.WebGLRenderTarget(1, 1);
 	this.buffer1Active        = false;
+	this.firstUpdate          = true;
 
 	// Create the Progressive Surfacemap Texture
 	let format = /(iPad|iPhone|iPod)/g.test(navigator.userAgent) ? THREE.HalfFloatType : THREE.FloatType;
@@ -76,14 +77,14 @@ var ProgressiveSurfacemap = function (renderer, res = 1024) {
 			if (object.isLight) { this.scene.attach(object); continue; }
 			if (!object.geometry.hasAttribute("uv")) { console.warn("All lightmap objects need UVs!"); continue; }
 	
-			if(this.blurringPlane == null) { this._initializeBlurPlane(res, this.progressiveSurfacemap1); }
+			if (this.blurringPlane == null) { this._initializeBlurPlane(res, this.progressiveSurfacemap1); }
 	
 			// Apply the lightmap to the object
 			object.material.lightMap  = this.progressiveSurfacemap2.texture;
 			object.material.dithering = true;
 			object.castShadow         = true;
 			object.receiveShadow      = true;
-			object.renderOrder        = 1000;
+			object.renderOrder        = 1000 + ob;
 	
 			// Prepare UV boxes for potpack 
 			// TODO: Size these by object surface area
@@ -120,23 +121,29 @@ var ProgressiveSurfacemap = function (renderer, res = 1024) {
 	this.update = function (camera, blendWindow = 100, blurEdges = true) {
 		if (this.blurringPlane == null) { return; }
 
+		// Store the original Render Target
+		let oldTarget = renderer.getRenderTarget();
+
 		// Whether or not to blur the edges of the lightmap...
 		this.blurringPlane.visible = blurEdges;
 
 		// Steal the Object3D from the real world to our special dimension
 		for (let l = 0; l < this.surfacemapContainers.length; l++) {
-			this.surfacemapContainers[l].object.oldScene = this.surfacemapContainers[l].object.parent;
+			this.surfacemapContainers[l].object.oldScene =
+				this.surfacemapContainers[l].object.parent;
 			this.scene.attach(this.surfacemapContainers[l].object);
 		}
 
-		// Render once to bake the shadows
-		let oldTarget = renderer.getRenderTarget();
-		renderer.setRenderTarget(this.tinyTarget); // Tiny for Speed
-		renderer.render(this.scene, camera);
+		// Render once normally to initialize everything
+		if (this.firstUpdate) {
+			renderer.setRenderTarget(this.tinyTarget); // Tiny for Speed
+			renderer.render(this.scene, camera);
+			this.firstUpdate = false;
+		}
 
 		// Set each object's material to the UV Unwrapped Surface Mapping Version
 		for (let l = 0; l < this.surfacemapContainers.length; l++){
-			this.uvMat .uniforms.averagingWindow = { value: blendWindow };
+			this.uvMat.uniforms.averagingWindow = { value: blendWindow };
 			this.surfacemapContainers[l].object.material = this.uvMat;
 			this.surfacemapContainers[l].object.oldFrustumCulled =
 				this.surfacemapContainers[l].object.frustumCulled;
@@ -161,7 +168,28 @@ var ProgressiveSurfacemap = function (renderer, res = 1024) {
 			this.surfacemapContainers[l].object.material = this.surfacemapContainers[l].basicMat;
 			this.surfacemapContainers[l].object.oldScene.attach(this.surfacemapContainers[l].object);
 		}
+
+		// Restore the original Render Target
 		renderer.setRenderTarget(oldTarget);
+	}
+
+	/** DEBUG 
+	 * Draw the lightmap in the main scene.  Call this after adding the objects to it.
+	 * @param {boolean} visible Whether the debug plane should be visible
+	 * @param {Vector3} position Where the debug plane should be drawn
+	*/
+	this.showDebugLightmap = function (visible, position = undefined) {
+		if (this.surfacemapContainers.length == 0) { console.warn("Call this after adding the objects!"); return; }
+		if (this.labelMesh == null) {
+			this.labelMaterial = new THREE.MeshBasicMaterial(
+				{ map: this.progressiveSurfacemap1.texture, side: THREE.DoubleSide });
+			this.labelPlane = new THREE.PlaneGeometry(100, 100);
+			this.labelMesh = new THREE.Mesh(this.labelPlane, this.labelMaterial);
+			this.labelMesh.position.y = 250;
+			this.surfacemapContainers[0].object.parent.add(this.labelMesh);
+		}
+		if (position != undefined) { this.labelMesh.position.copy(position); }
+		this.labelMesh.visible = visible;
 	}
 	
 	/**

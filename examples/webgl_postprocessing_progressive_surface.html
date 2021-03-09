@@ -21,12 +21,13 @@
 			import { TransformControls } from './jsm/controls/TransformControls.js';
 			import { ProgressiveSurfacemap } from './jsm/misc/ProgressiveSurfacemap.js';
 
-			// ShadowMap Res and Number of Directional Lights
+			// ShadowMap + LightMap Res and Number of Directional Lights
 			let shadowMapRes = 512, lightMapRes = 1024, lightCount = 8;
 
 			let camera, scene, renderer, dirLights = [], controls, control, control2, 
 				object = new THREE.Mesh(), lightOrigin = null, progressiveSurfacemap, lightmapObjects = [];
-			const params = { Enable: true, BlendWindow: 200, LightRadius: 50, AmbientWeight: 0.5, BlurEdges: true };
+			const params = { 'Enable': true, 'Blur Edges': true, 'Blend Window': 200, 
+							 'Light Radius': 50, 'Ambient Weight': 0.5, 'Debug Lightmap': false };
 
 			init();
 			createGUI();
@@ -65,7 +66,7 @@
 					dirLight.name = 'Dir. Light '+l;
 					dirLight.position.set(200, 200, 200);
 					dirLight.castShadow = true;
-					dirLight.shadow.camera.near    =   100;
+					dirLight.shadow.camera.near    =  -100;
 					dirLight.shadow.camera.far     =   5000;
 					dirLight.shadow.camera.right   =   150;
 					dirLight.shadow.camera.left    = - 150;
@@ -73,7 +74,6 @@
 					dirLight.shadow.camera.bottom  = - 150;
 					dirLight.shadow.mapSize.width  =   shadowMapRes;
 					dirLight.shadow.mapSize.height =   shadowMapRes;
-					dirLight.shadow.autoUpdate     =   false; // This technique needs autoupdates disabled!
 
 					lightmapObjects.push(dirLight);
 					dirLights.push(dirLight);
@@ -81,7 +81,7 @@
 
 				// ground
 				let groundMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(600, 600),
-												new THREE.MeshPhongMaterial({ color: 0xffffff, depthWrite: true}));
+												new THREE.MeshPhongMaterial({ color: 0xffffff, depthWrite: true }));
 				groundMesh.position.y = -0.1;
 				groundMesh.rotation.x = - Math.PI / 2;
 				groundMesh.name = "Ground Mesh";
@@ -138,10 +138,11 @@
 			function createGUI() {
 				const gui = new GUI( { name: 'Accumulation Settings' } );
 				gui.add( params, 'Enable'   );
-				gui.add( params, 'BlurEdges');
-				gui.add( params, 'BlendWindow'   , 1, 500 ).step( 1 );
-				gui.add( params, 'LightRadius'   , 0, 200 ).step( 10 );
-				gui.add( params, 'AmbientWeight' , 0, 1   ).step( 0.1 );
+				gui.add( params, 'Blur Edges');
+				gui.add( params, 'Blend Window'   , 1, 500 ).step( 1 );
+				gui.add( params, 'Light Radius'   , 0, 200 ).step( 10 );
+				gui.add( params, 'Ambient Weight' , 0, 1   ).step( 0.1 );
+				gui.add( params, 'Debug Lightmap');
 			}
 
 			function onWindowResize() {
@@ -155,16 +156,19 @@
 				controls.update();
 
 				// Accumulate Surface Maps
-				if (params.Enable) { progressiveSurfacemap.update(camera, params.BlendWindow, params.BlurEdges); }
+				if (params['Enable']) {
+					 progressiveSurfacemap.update(camera, params['Blend Window'], params['Blur Edges']); 
+					 progressiveSurfacemap.showDebugLightmap(params['Debug Lightmap']);
+				}
 
 				// Manually Update the Directional Lights
 				for (let l = 0; l < dirLights.length; l++) {
 					// Sometimes they will be sampled from the target direction
 					// Sometimes they will be uniformly sampled from the upper hemisphere
-					if(Math.random() > params.AmbientWeight){
-						dirLights[l].position.set(lightOrigin.position.x + (Math.random() * params.LightRadius),
-												  lightOrigin.position.y + (Math.random() * params.LightRadius),
-												  lightOrigin.position.z + (Math.random() * params.LightRadius));
+					if(Math.random() > params['Ambient Weight']){
+						dirLights[l].position.set(lightOrigin.position.x + (Math.random() * params['Light Radius']),
+												  lightOrigin.position.y + (Math.random() * params['Light Radius']),
+												  lightOrigin.position.z + (Math.random() * params['Light Radius']));
 					} else {
 						// Uniform Hemispherical Surface Distribution for Ambient Occlusion
 						let lambda = Math.acos(2 * Math.random() - 1) - (3.14159/2.0);
@@ -173,7 +177,6 @@
 										   Math.abs(Math.cos(lambda) * Math.sin(phi)) * 300  + object.position.y + 20,
 												   (Math.sin(lambda)                  * 300) + object.position.z    );
 					}
-					dirLights[l].shadow.needsUpdate = true; // Don't forget to manually update the lights' shadows!
 				}
 
 				// Render Scene
