@@ -22,10 +22,10 @@
 			import { ProgressiveSurfacemap } from './jsm/misc/ProgressiveSurfacemap.js';
 
 			// ShadowMap Res and Number of Directional Lights
-			let shadowMapRes = 512, lightCount = 8;
+			let shadowMapRes = 1024, lightCount = 8;
 
 			let camera, scene, renderer, dirLights = [], controls, control, control2, 
-				object = new THREE.Mesh(), lightOrigin = null, progressiveSurfacemap;
+				object = new THREE.Mesh(), lightOrigin = null, progressiveSurfacemap, lightmapObjects = [];
 			const params = { Enable: true, BlendWindow: 200, LightRadius: 50, AmbientWeight: 0.5, BlurEdges: true };
 
 			init();
@@ -49,7 +49,7 @@
 				scene.fog = new THREE.Fog(0x949494, 1000, 3000);
 
 				// Progressive Lightmap
-				progressiveSurfacemap = new ProgressiveSurfacemap(renderer, 512);
+				progressiveSurfacemap = new ProgressiveSurfacemap(renderer, 1024);
 
 				// Transform Gizmo
 				lightOrigin = new THREE.Group();
@@ -75,7 +75,7 @@
 					dirLight.shadow.mapSize.height =   shadowMapRes;
 					dirLight.shadow.autoUpdate     =   false; // This technique needs autoupdates disabled!
 
-					progressiveSurfacemap.add(dirLight);
+					lightmapObjects.push(dirLight);
 					dirLights.push(dirLight);
 				}
 
@@ -84,11 +84,9 @@
 												new THREE.MeshPhongMaterial({ color: 0xffffff, depthWrite: true}));
 				groundMesh.position.y = -0.1;
 				groundMesh.rotation.x = - Math.PI / 2;
-				groundMesh.name = "GroundMesh";
+				groundMesh.name = "Ground Mesh";
+				lightmapObjects.push(groundMesh);
 				scene.add(groundMesh);
-				// This adds the model to the surfacemap
-				// And replaces its material with a Basic SurfaceMap Material
-				progressiveSurfacemap.add(groundMesh);
 
 				// model
 				function loadModel() {
@@ -97,9 +95,9 @@
 							child.name = "Loaded Mesh";
 							child.castShadow    = true;
 							child.receiveShadow = true;
-							// This adds the model to the surfacemap
-							// And replaces its material with a Basic SurfaceMap Material
-							progressiveSurfacemap.add(child); 
+							// This adds the model to the lightmap
+							lightmapObjects.push(child);
+							progressiveSurfacemap.addObjectsToLightMap(lightmapObjects);
 						} else {
 							child.layers.disableAll(); // Disable Rendering for this
 						}
@@ -121,7 +119,7 @@
 				}
 
 				const manager = new THREE.LoadingManager( loadModel );
-				const loader = new OBJLoader( manager );
+				const loader  = new OBJLoader( manager );
 				loader.load('models/obj/ShadowmappableMesh.obj', function (obj) { object = obj; });
 				
 				// controls
@@ -139,11 +137,11 @@
 
 			function createGUI() {
 				const gui = new GUI( { name: 'Accumulation Settings' } );
-				gui.add( params, 'Enable' );
+				gui.add( params, 'Enable'   );
 				gui.add( params, 'BlurEdges');
-				gui.add( params, 'BlendWindow'      , 1, 500 ).step( 1 );
-				gui.add( params, 'LightRadius'      , 0, 200 ).step( 10 );
-				gui.add( params, 'AmbientWeight'    , 0, 1   ).step( 0.1 );
+				gui.add( params, 'BlendWindow'   , 1, 500 ).step( 1 );
+				gui.add( params, 'LightRadius'   , 0, 200 ).step( 10 );
+				gui.add( params, 'AmbientWeight' , 0, 1   ).step( 0.1 );
 			}
 
 			function onWindowResize() {
