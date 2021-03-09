@@ -91,10 +91,7 @@ var ProgressiveSurfacemap = function (renderer, res = 1024) {
 			this.uv_boxes.push({ w: 1 + (padding * 2),
 								 h: 1 + (padding * 2), index: ob });
 	
-			this.surfacemapContainers.push({
-				basicMat: object.material,
-				object  : object
-			});
+			this.surfacemapContainers.push({ basicMat: object.material, object: object });
 	
 			this.compiled = false;
 		}
@@ -181,7 +178,7 @@ var ProgressiveSurfacemap = function (renderer, res = 1024) {
 	this.warned = false;
 	this.showDebugLightmap = function (visible, position = undefined) {
 		if (this.surfacemapContainers.length == 0){ if(!this.warned) {
-			console.warn("Call this after adding the objects!"); this.warned = true; return; } }
+			console.warn("Call this after adding the objects!"); this.warned = true; } return; }
 		if (this.labelMesh == null) {
 			this.labelMaterial = new THREE.MeshBasicMaterial(
 				{ map: this.progressiveSurfacemap1.texture, side: THREE.DoubleSide });
