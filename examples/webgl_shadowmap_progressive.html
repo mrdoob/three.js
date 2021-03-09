@@ -140,6 +140,7 @@
 
 					object.add( lightTarget );
 
+					if ( typeof TESTING !== 'undefined' ) { for ( let i = 0; i < 300; i ++ ) { render(); }; };
 				}
 
 				const manager = new THREE.LoadingManager( loadModel );
