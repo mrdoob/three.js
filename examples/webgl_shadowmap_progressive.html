@@ -16,7 +16,7 @@
 		<script type="module">
 			import * as THREE from '../build/three.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TransformControls } from './jsm/controls/TransformControls.js';
 			import { ProgressiveLightMap } from './jsm/misc/ProgressiveLightMap.js';
@@ -107,6 +107,7 @@
 							child.name = "Loaded Mesh";
 							child.castShadow = true;
 							child.receiveShadow = true;
+							child.material = new THREE.MeshPhongMaterial();
 
 							// This adds the model to the lightmap
 							lightmapObjects.push( child );
@@ -144,10 +145,10 @@
 				}
 
 				const manager = new THREE.LoadingManager( loadModel );
-				const loader = new OBJLoader( manager );
-				loader.load( 'models/obj/ShadowmappableMesh.obj', function ( obj ) {
+				const loader = new GLTFLoader( manager );
+				loader.load( 'models/gltf/ShadowmappableMesh.glb', function ( obj ) {
 
-					object = obj;
+					object = obj.scene.children[0];
 
 				} );
 

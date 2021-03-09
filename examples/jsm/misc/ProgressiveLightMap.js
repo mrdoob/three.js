@@ -17,64 +17,71 @@ import { potpack } from '../libs/potpack.module.js';
  * @param {WebGLRenderer} renderer A WebGL Rendering Context
  * @param {number} res The side-long dimension of you total lightmap
  */
-var ProgressiveLightMap = function ( renderer, res = 1024 ) {
+class ProgressiveLightMap {
 
-	this.lightMapContainers = [];
-	this.compiled = false;
-	this.scene = new THREE.Scene();
-	this.scene.background = null;
-	this.tinyTarget = new THREE.WebGLRenderTarget( 1, 1 );
-	this.buffer1Active = false;
-	this.firstUpdate = true;
+	constructor( renderer, res = 1024 ) {
 
-	// Create the Progressive LightMap Texture
-	let format = /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ? THREE.HalfFloatType : THREE.FloatType;
-	this.progressiveLightMap1 = new THREE.WebGLRenderTarget( res, res, { type: format } );
-	this.progressiveLightMap2 = new THREE.WebGLRenderTarget( res, res, { type: format } );
+		this.renderer = renderer;
+		this.res = res;
+		this.lightMapContainers = [];
+		this.compiled = false;
+		this.scene = new THREE.Scene();
+		this.scene.background = null;
+		this.tinyTarget = new THREE.WebGLRenderTarget( 1, 1 );
+		this.buffer1Active = false;
+		this.firstUpdate = true;
+		this.warned = false;
 
-	// Inject some spicy new logic into a standard phong material
-	this.uvMat = new THREE.MeshPhongMaterial();
-	this.uvMat.uniforms = {};
-	this.uvMat.onBeforeCompile = ( shader ) => {
+		// Create the Progressive LightMap Texture
+		let format = /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ? THREE.HalfFloatType : THREE.FloatType;
+		this.progressiveLightMap1 = new THREE.WebGLRenderTarget( this.res, this.res, { type: format } );
+		this.progressiveLightMap2 = new THREE.WebGLRenderTarget( this.res, this.res, { type: format } );
 
-		// Vertex Shader: Set Vertex Positions to the Unwrapped UV Positions
-		shader.vertexShader =
-			'#define USE_UV\n#define USE_LIGHTMAP\n' +
-			shader.vertexShader.slice( 0, - 1 ) +
-			'	gl_Position = vec4((uv2 - 0.5) * 2.0, 1.0, 1.0); }';
+		// Inject some spicy new logic into a standard phong material
+		this.uvMat = new THREE.MeshPhongMaterial();
+		this.uvMat.uniforms = {};
+		this.uvMat.onBeforeCompile = ( shader ) => {
 
-		// Fragment Shader: Set Pixels to average in the Previous frame's Shadows
-		let bodyStart	= shader.fragmentShader.indexOf( 'void main() {' );
-		shader.fragmentShader =
-			'#define USE_UV\nvarying vec2 vUv2;\n' +
-			shader.fragmentShader.slice( 0, bodyStart ) +
-			'	uniform sampler2D previousShadowMap;\n	uniform float averagingWindow;\n' +
-			shader.fragmentShader.slice( bodyStart - 1, - 1 ) +
+			// Vertex Shader: Set Vertex Positions to the Unwrapped UV Positions
+			shader.vertexShader =
+				'#define USE_UV\n#define USE_LIGHTMAP\n' +
+				shader.vertexShader.slice( 0, - 1 ) +
+				'	gl_Position = vec4((uv2 - 0.5) * 2.0, 1.0, 1.0); }';
+
+			// Fragment Shader: Set Pixels to average in the Previous frame's Shadows
+			let bodyStart = shader.fragmentShader.indexOf( 'void main() {' );
+			shader.fragmentShader =
+				'#define USE_UV\nvarying vec2 vUv2;\n' +
+				shader.fragmentShader.slice( 0, bodyStart ) +
+				'	uniform sampler2D previousShadowMap;\n	uniform float averagingWindow;\n' +
+				shader.fragmentShader.slice( bodyStart - 1, - 1 ) +
 				`\nvec3 texelOld = texture(previousShadowMap, vUv2).rgb;
 				gl_FragColor.rgb = mix(texelOld, gl_FragColor.rgb, 1.0/averagingWindow);
 			}`;
 
-		// Set the Previous Frame's Texture Buffer and Averaging Window
-		shader.uniforms.previousShadowMap = { value: this.progressiveLightMap1.texture };
-		shader.uniforms.averagingWindow = { value: 100 };
+			// Set the Previous Frame's Texture Buffer and Averaging Window
+			shader.uniforms.previousShadowMap = { value: this.progressiveLightMap1.texture };
+			shader.uniforms.averagingWindow = { value: 100 };
 
-		this.uvMat.uniforms = shader.uniforms;
+			this.uvMat.uniforms = shader.uniforms;
 
-		// Set the new Shader to this
-		this.uvMat.userData.shader = shader;
+			// Set the new Shader to this
+			this.uvMat.userData.shader = shader;
 
-		this.compiled = true;
+			this.compiled = true;
 
-	};
+		};
+
+	}
 
 	/**
 	 * Sets these objects' materials' lightmaps and modifies their uv2's.
 	 * @param {Object3D} objects An array of objects and lights to set up your lightmap.
 	 */
-	this.addObjectsToLightMap = function ( objects ) {
+	addObjectsToLightMap( objects ) {
 
 		// Prepare list of UV bounding boxes for packing later...
-		this.uv_boxes = []; let padding = 3 / res;
+		this.uv_boxes = []; let padding = 3 / this.res;
 
 		for ( let ob = 0; ob < objects.length; ob ++ ) {
 
@@ -95,7 +102,7 @@ var ProgressiveLightMap = function ( renderer, res = 1024 ) {
 
 			if ( this.blurringPlane == null ) {
 
-				this._initializeBlurPlane( res, this.progressiveLightMap1 );
+				this._initializeBlurPlane( this.res, this.progressiveLightMap1 );
 
 			}
 
@@ -142,7 +149,7 @@ var ProgressiveLightMap = function ( renderer, res = 1024 ) {
 	 * @param {number} blendWindow When >1, samples will accumulate over time.
 	 * @param {boolean} blurEdges  Whether to fix UV Edges via blurring
 	 */
-	this.update = function ( camera, blendWindow = 100, blurEdges = true ) {
+	update( camera, blendWindow = 100, blurEdges = true ) {
 
 		if ( this.blurringPlane == null ) {
 
@@ -151,7 +158,7 @@ var ProgressiveLightMap = function ( renderer, res = 1024 ) {
 		}
 
 		// Store the original Render Target
-		let oldTarget = renderer.getRenderTarget();
+		let oldTarget = this.renderer.getRenderTarget();
 
 		// The blurring plane applies blur to the seams of the lightmap
 		this.blurringPlane.visible = blurEdges;
@@ -168,8 +175,8 @@ var ProgressiveLightMap = function ( renderer, res = 1024 ) {
 		// Render once normally to initialize everything
 		if ( this.firstUpdate ) {
 
-			renderer.setRenderTarget( this.tinyTarget ); // Tiny for Speed
-			renderer.render( this.scene, camera );
+			this.renderer.setRenderTarget( this.tinyTarget ); // Tiny for Speed
+			this.renderer.render( this.scene, camera );
 			this.firstUpdate = false;
 
 		}
@@ -190,11 +197,11 @@ var ProgressiveLightMap = function ( renderer, res = 1024 ) {
 		let inactiveMap = this.buffer1Active ? this.progressiveLightMap2 : this.progressiveLightMap1;
 
 		// Render the object's surface maps
-		renderer.setRenderTarget( activeMap );
+		this.renderer.setRenderTarget( activeMap );
 		this.uvMat.uniforms.previousShadowMap = { value: inactiveMap.texture };
 		this.blurringPlane.material.uniforms.previousShadowMap = { value: inactiveMap.texture };
 		this.buffer1Active = ! this.buffer1Active;
-		renderer.render( this.scene, camera );
+		this.renderer.render( this.scene, camera );
 
 		// Restore the object's Real-time Material and add it back to the original world
 		for ( let l = 0; l < this.lightMapContainers.length; l ++ ) {
@@ -207,17 +214,16 @@ var ProgressiveLightMap = function ( renderer, res = 1024 ) {
 		}
 
 		// Restore the original Render Target
-		renderer.setRenderTarget( oldTarget );
+		this.renderer.setRenderTarget( oldTarget );
 
-	};
+	}
 
 	/** DEBUG
 	 * Draw the lightmap in the main scene.  Call this after adding the objects to it.
 	 * @param {boolean} visible Whether the debug plane should be visible
 	 * @param {Vector3} position Where the debug plane should be drawn
 	*/
-	this.warned = false;
-	this.showDebugLightmap = function ( visible, position = undefined ) {
+	showDebugLightmap( visible, position = undefined ) {
 
 		if ( this.lightMapContainers.length == 0 ) {
 
@@ -250,14 +256,14 @@ var ProgressiveLightMap = function ( renderer, res = 1024 ) {
 
 		this.labelMesh.visible = visible;
 
-	};
+	}
 
 	/**
 	 * INTERNAL Creates the Blurring Plane
 	 * @param {number} res The square resolution of this object's lightMap.
 	 * @param {WebGLRenderTexture} lightMap The lightmap to initialize the plane with.
 	 */
-	this._initializeBlurPlane = function ( res, lightMap = null ) {
+	_initializeBlurPlane( res, lightMap = null ) {
 
 		let blurMaterial = new THREE.MeshBasicMaterial();
 		blurMaterial.uniforms = { previousShadowMap: { value: null },
@@ -308,8 +314,8 @@ var ProgressiveLightMap = function ( renderer, res = 1024 ) {
 		this.blurringPlane.material.depthWrite = false;
 		this.scene.add( this.blurringPlane );
 
-	};
+	}
 
-};
+}
 
 export { ProgressiveLightMap };
