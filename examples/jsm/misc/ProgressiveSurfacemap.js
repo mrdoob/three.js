@@ -38,8 +38,8 @@ var ProgressiveSurfacemap = function (renderer) {
 
 		if(this.blurringPlane == null) { this._initializeBlurPlane(res, progressiveSurfacemap1); }
 
-		// Inject some spicy new logic into whatever material this object has
-		let oldMaterial = object.material.clone();
+		// Inject some spicy new logic into a standard phong material
+		let oldMaterial = new THREE.MeshPhongMaterial();
 		oldMaterial.uniforms = {};
 		oldMaterial.onBeforeCompile = (shader) => {
 			// Set Vertex Positions to the Unwrapped UV Positions
@@ -71,15 +71,20 @@ var ProgressiveSurfacemap = function (renderer) {
 			this.compiled = true;
 		};
 
-		// MeshBasicMaterial just renders the accumulated texture, no surfaceing
-		let basicMaterial    = new THREE.MeshBasicMaterial( 
-			{dithering: true, map: progressiveSurfacemap2.texture}); 
-		object.material      = basicMaterial;
-		object.castShadow    = true;
-		object.receiveShadow = true;
+		// Apply the lightmap to the object
+		object.material.lightMap  = progressiveSurfacemap2.texture;
+		object.material.dithering = true;
+		object.castShadow         = true;
+		object.receiveShadow      = true;
+
+		// For now, clone the existing UVs over to the Lightmap UV Channel
+		if (object.geometry.hasAttribute("uv")) {
+			let uv1 = object.geometry.getAttribute("uv");
+			object.geometry.setAttribute("uv2", uv1.clone());
+		}
 
 		this.surfacemapContainers.push({
-			basicMat: basicMaterial,
+			basicMat: object.material,
 			uvMat   : oldMaterial,
 			object  : object,
 			surfacemap1: progressiveSurfacemap1,
