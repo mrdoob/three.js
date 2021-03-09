@@ -18,11 +18,11 @@ import { potpack } from '../libs/potpack.module.js';
 var ProgressiveSurfacemap = function (renderer, res = 1024) {
 
 	this.surfacemapContainers = [];
-	this.compiled = false;
-	this.scene = new THREE.Scene();
-	this.scene.background = null;
-	this.tinyTarget = new THREE.WebGLRenderTarget(1, 1);
-	this.buffer1Active = false;
+	this.compiled             = false;
+	this.scene                = new THREE.Scene();
+	this.scene.background     = null;
+	this.tinyTarget           = new THREE.WebGLRenderTarget(1, 1);
+	this.buffer1Active        = false;
 
 	// Create the Progressive Surfacemap Texture
 	let format = /(iPad|iPhone|iPod)/g.test(navigator.userAgent) ? THREE.HalfFloatType : THREE.FloatType;
@@ -67,9 +67,9 @@ var ProgressiveSurfacemap = function (renderer, res = 1024) {
 	 * @param {Object3D} object The object to create a surfacemap for.
 	 * @param {number} res The square resolution of this object's surfacemap.
 	 */
-	this.addObjectsToLightMap = function (objects, res = 1024) {
+	this.addObjectsToLightMap = function (objects) {
 		// Prepare list of UV bounding boxes for packing later...
-		this.uv_boxes = [];
+		this.uv_boxes = []; let padding = 3/res;
 
 		for (let ob = 0; ob < objects.length; ob++){
 			let object = objects[ob];
@@ -85,8 +85,10 @@ var ProgressiveSurfacemap = function (renderer, res = 1024) {
 			object.receiveShadow      = true;
 			object.renderOrder        = 1000;
 	
-			// Prepare map for potpack
-			this.uv_boxes.push({ w: 1, h: 1, index: ob });
+			// Prepare UV boxes for potpack 
+			// TODO: Size these by object surface area
+			this.uv_boxes.push({ w: 1 + (padding * 2),
+								 h: 1 + (padding * 2), index: ob });
 	
 			this.surfacemapContainers.push({
 				basicMat: object.material,
@@ -96,16 +98,13 @@ var ProgressiveSurfacemap = function (renderer, res = 1024) {
 			this.compiled = false;
 		}
 
-		// Pack all of the objects into the same "lightmap"
-		const dimensions = potpack(this.uv_boxes);
-		let maxDim = Math.max(dimensions.w, dimensions.h);
-
 		// Pack the objects' lightmap UVs into the same space
+		const dimensions = potpack(this.uv_boxes);
 		this.uv_boxes.forEach((box) => {
 			let uv2 = objects[box.index].geometry.getAttribute("uv").clone();
 			for (let i = 0; i < uv2.array.length; i += uv2.itemSize) {
-				uv2.array[i    ] = (uv2.array[i    ] + box.x) / dimensions.w;
-				uv2.array[i + 1] = (uv2.array[i + 1] + box.y) / dimensions.h;
+				uv2.array[i    ] = (uv2.array[i    ] + box.x + padding) / dimensions.w;
+				uv2.array[i + 1] = (uv2.array[i + 1] + box.y + padding) / dimensions.h;
 			}
 			objects[box.index].geometry.setAttribute("uv2", uv2);
 			objects[box.index].geometry.getAttribute("uv2").needsUpdate = true;

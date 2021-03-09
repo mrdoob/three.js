@@ -22,7 +22,7 @@
 			import { ProgressiveSurfacemap } from './jsm/misc/ProgressiveSurfacemap.js';
 
 			// ShadowMap Res and Number of Directional Lights
-			let shadowMapRes = 1024, lightCount = 8;
+			let shadowMapRes = 512, lightMapRes = 1024, lightCount = 8;
 
 			let camera, scene, renderer, dirLights = [], controls, control, control2, 
 				object = new THREE.Mesh(), lightOrigin = null, progressiveSurfacemap, lightmapObjects = [];
@@ -49,7 +49,7 @@
 				scene.fog = new THREE.Fog(0x949494, 1000, 3000);
 
 				// Progressive Lightmap
-				progressiveSurfacemap = new ProgressiveSurfacemap(renderer, 1024);
+				progressiveSurfacemap = new ProgressiveSurfacemap(renderer, lightMapRes);
 
 				// Transform Gizmo
 				lightOrigin = new THREE.Group();
