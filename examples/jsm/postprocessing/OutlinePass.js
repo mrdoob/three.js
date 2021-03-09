@@ -154,6 +154,7 @@ OutlinePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 	setSize: function ( width, height ) {
 
 		this.renderTargetMaskBuffer.setSize( width, height );
+		this.renderTargetDepthBuffer.setSize( width, height );
 
 		var resx = Math.round( width / this.downSampleRatio );
 		var resy = Math.round( height / this.downSampleRatio );
