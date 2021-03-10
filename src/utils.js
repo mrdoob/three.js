@@ -44,7 +44,16 @@ const TYPED_ARRAYS = {
 
 function getTypedArray( type, buffer ) {
 
-	return new TYPED_ARRAYS[ type ]( buffer );
+	const arrayType = TYPED_ARRAYS[ type ];
+	if ( buffer instanceof arrayType ) {
+
+		return buffer;
+
+	} else {
+
+		return new arrayType( buffer );
+
+	}
 
 }
 
