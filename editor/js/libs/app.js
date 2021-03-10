@@ -151,7 +151,7 @@ var APP = {
 
 		}
 
-		var time, prevTime;
+		var time, startTime, prevTime;
 
 		function animate() {
 
@@ -159,7 +159,7 @@ var APP = {
 
 			try {
 
-				dispatch( events.update, { time: time, delta: time - prevTime } );
+				dispatch( events.update, { time: time - startTime, delta: time - prevTime } );
 
 			} catch ( e ) {
 
@@ -177,7 +177,7 @@ var APP = {
 
 			if ( renderer.xr.enabled ) dom.append( vrButton );
 
-			prevTime = performance.now();
+			startTime = prevTime = performance.now();
 
 			document.addEventListener( 'keydown', onKeyDown );
 			document.addEventListener( 'keyup', onKeyUp );
