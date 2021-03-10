@@ -133,7 +133,7 @@ class WebGPURenderPipelines {
 
 			let indexFormat;
 
-			if ( object.isLine ) {
+			if ( object.isLine === true && object.isLineSegments !== true ) {
 
 				const count = ( geometry.index ) ? geometry.index.count : geometry.attributes.position.count;
 
@@ -598,8 +598,8 @@ class WebGPURenderPipelines {
 
 		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
 		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
-		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
+		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 
 	}
 
