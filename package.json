@@ -59,6 +59,7 @@
     "test-unit-examples": "npm run unit-examples --prefix test",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
+    "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
     "make-screenshot": "node test/e2e/puppeteer.js --make"
   },
   "keywords": [
@@ -94,6 +95,7 @@
     "eslint-plugin-html": "^6.1.1",
     "regenerator-runtime": "^0.13.7",
     "rollup": "^2.40.0",
+    "rollup-plugin-filesize": "^9.1.1",
     "rollup-plugin-terser": "^7.0.2",
     "servez": "^1.11.0"
   },
