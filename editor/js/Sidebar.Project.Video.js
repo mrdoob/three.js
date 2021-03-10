@@ -97,7 +97,7 @@ function SidebarProjectVideo( editor ) {
 
 		}
 
-		await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 6 ), 'out.mp4' );
+		await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 5 ), 'out.mp4' );
 
 		const data = ffmpeg.FS( 'readFile', 'out.mp4' );
 
