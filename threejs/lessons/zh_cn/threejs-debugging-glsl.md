@@ -50,7 +50,7 @@ gl_FragColor = vec4(fract(vUv), 0, 1);
 相反，如果设置 gl _ fragcolor 为红色后，我仍然看不到任何东西，那么我有一个提示，我的问题可能是在与顶点着色器相关的东西的方向上。某些矩阵可能是错误的，或者我的属性可能有错误的数据，或者设置不正确。
 
 我会先看一下矩阵。我可能会在调用 `renderer.render(scene, camera)`之后立即设置一个断点，然后开始在检查面板中展开内容。
-相机的`world matrix`和投影矩阵是不是`NaN`？扩展场景并观察它的`children`，我会检查坐标系矩阵看起来是否合理(没有 NaN) ，
+相机的`world matrix`和投影矩阵是不是`NaN`？扩展场景并观察它的`children`，我会检查`world matrix`看起来是否合理(没有 NaN) ，
 每个矩阵的最后4个值对于我的场景来说是否合理。如果我期望我的场景是50x50x50单位，而一些矩阵显示552352623.123显然有问题。
 
 <div class="threejs_center"><img src="resources/images/inspect-matrices.gif"></div>
