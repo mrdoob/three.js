@@ -2,26 +2,11 @@ Title: Three.js 사용자 지정 BufferGeometry
 Description: 사용자 지정 BufferGeometry를 만드는 법에 대해 알아봅니다
 TOC: 사용자 지정 BufferGeometry
 
-{{{warning msgId="updateNeeded" link="https://github.com/gfxfundamentals/threejsfundamentals/issues/187"}}}
+`BufferGeometry`는 Three.js 내의 모든 `geometry`를 나타냅니다(r125에서부터 `Geometry`가 제거되었습니다). 좀 더 자세히 말하면 특정 `BufferAttribute`라고 부르는 **속성**의 집합이죠.
 
-[이전 글](threejs-custom-geometry.html)에서는 `Geometry`의 사용법에 대해
-알아보았습니다. 예고한 대로 이번에는 `BufferGeometry`에 대해 살펴보도록 하죠.
-`BufferGeometry`는 비교적 쓰기가 어렵지만 *일반적으로* 초기화 속도가 빠르고
-메모리 점유율이 낮습니다.
-
-[이전 내용](threejs-custom-geometry.html)을 간단하게 환기하겠습니다. `Geometry`를
-만들기 위해 우리는 먼저 꼭지점을 나타내는 `Vector3` 인스턴스(위치값)를 배열로 넘기고,
-이 꼭지점 배열의 인덱스 값을 인자로 넘겨 삼각형, `Face3` 인스턴스를 만들었습니다. 또한
-각 `Face3` 인스턴스에 삼각형 면 법선이나 꼭지점 법선을 지정할 수 있다는 것, 삼각형 면
-또는 각 꼭지점 별로 색을 지정할 수 있다는 것도 배웠죠. 글의 마지막에서는 텍스처 좌표(UVs)
-배열의 평행 배열로 UV 매핑을 구현하기도 했습니다(각 삼각형 면마다 배열로 된 UV 배열 하나,
-각 꼭지점마다 UV 하나).
-
-<div class="threejs_center"><img src="resources/threejs-geometry.svg" style="width: 700px"></div>
-
-반면에 `BufferGeometry`는 `BufferAttribute`라는 것을 사용합니다. 각 `BufferAttribute`는
+각 `BufferAttribute`는
 위치(positions), 법선(normals), 색(colors), uv 데이터의 배열이고, 이들을 모으면 각 꼭지점에
-대한 *평행 배열* 형식의 데이터가 되죠.
+대한 *평행 배열* 형식의 데이터가 됩니다.
 
 <div class="threejs_center"><img src="resources/threejs-attributes.svg" style="width: 700px"></div>
 
@@ -34,23 +19,16 @@ index = 4 위치의 꼭지점 데이터를 보세요. 이 묶음이 하나의 �
 <div class="threejs_center"><img src="resources/cube-faces-vertex.svg" style="width: 500px"></div>
 
 이 경우 맞닿은 면의 색이 다르기에, 이 모서리는 각 면에 다른 법선을 제공해야 합니다.
-마찬가지로 UV도 달라야 하죠. 이는 `Geometry`와 `BufferGeometry`의 가장 큰 차이점입니다.
-`BufferGeometry`는 `Geometry`와 달리 꼭지점은 물론 어떤 요소도 공유할 수 없습니다.
+마찬가지로 UV도 달라야 하죠.
 하나의 *꼭지점*은 위 4개 속성의 묶음이고, 때문에 속성이 달라진다면 그건 다른 꼭지점이
 되는 것이죠.
-
-사실 `Geometry`는 `BufferGeometry`와 근본적으로 다르지 않습니다. 사용자가 `Geometry`를
-사용하면 Three.js가 알아서 이를 `BufferGeometry` 형식으로 변환해주는 것이죠. 메모리를 더
-많이 사용하는 것도 `Vector3`나, `Vector2`, `Face3`, 그리고 기타 데이터를 위와 같은 `BufferAttribute`
-형태로 변환하기 때문입니다. 반면에 `BufferGeometry`는 이런 변환 작업을 직접 해줘야 하죠.
 
 이전과 마찬가지로 `BufferGeometry`로 정육면체를 만들어보겠습니다. 굳이 정육면체를 쓰는
 이유는 모서리의 꼭지점을 공유하는 듯해도 사실 그렇지 않기 때문이죠. 필요한 꼭지점을
 전부 생성한 후, 꼭지점 데이터를 평행 배열로 변환해 `BufferAttribute`를 만들고, 이를
 `BufferGeometry`에 추가해야 합니다.
 
-일단 [이전 글](threejs-custom-geometry.html)의 텍스처 좌표 설정 예제를 가져옵니다.
-`Geometry`를 만드는 코드를 전부 삭제한 뒤, 정육면체를 만드는 데 필요한 데이터를 정렬합니다.
+먼저 정육면체를 만드는 데 필요한 데이터를 정렬합니다.
 아까 말했듯 꼭지점의 속성 중 하나라도 다르다면 별도의 꼭지점으로 분리해야 합니다. 정육면체의
 경우는 총 꼭지점 36개가 필요하죠. 면 6개, 면 하나당 삼각형 2개, 삼각형 하나 당 꼭지점 3개,
 총 36개입니다.
@@ -237,9 +215,9 @@ geometry.setAttribute(
 
 {{{example url="../threejs-custom-buffergeometry-cube-indexed.html"}}}
 
-`Geometry`와 마찬가지로 `BufferGeometry`에 법선을 지정하지 않았다면 [`computeVertexNormals`](BufferGeometry.computeVertexNormals)
+`BufferGeometry`에 법선을 지정하지 않았다면 [`computeVertexNormals`](BufferGeometry.computeVertexNormals)
 메서드를 호출해 자동으로 법선을 지정할 수 있습니다. 다만 데이터가 조금이라도 다르다면
-꼭지점을 공유할 수 없기에 `Geometry`의 경우와는 조금 다른 결과를 보여줄 겁니다.
+꼭지점을 공유할 수 없기에 구체나 원통 같은 물체를 만들려 하는 경우에는 이음새가 보일 수 있어요.
 
 <div class="spread">
   <div>
@@ -443,9 +421,8 @@ positionAttribute.needsUpdate = true;
 
 {{{example url="../threejs-custom-buffergeometry-dynamic.html"}}}
 
-`Geometry`와 `BufferGeometry` 중 어떤 것을 쓸 것인지는 전적으로 여러분의 선택입니다.
 이 글이 `BufferGeometry`로 사용자 지정 geometry를 만들고, `BufferAttribute`를 다루는
-데 도움이 되었으면 좋겠네요.
+데 도움이 되었으면 좋겠습니다.
 
 <canvas id="c"></canvas>
 <script type="module" src="resources/threejs-custom-buffergeometry.js"></script>
