@@ -33,7 +33,7 @@ class ProgressiveLightMap {
 		this.warned = false;
 
 		// Create the Progressive LightMap Texture
-		let format = /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ? THREE.HalfFloatType : THREE.FloatType;
+		let format = /(Android|iPad|iPhone|iPod)/g.test( navigator.userAgent ) ? THREE.HalfFloatType : THREE.FloatType;
 		this.progressiveLightMap1 = new THREE.WebGLRenderTarget( this.res, this.res, { type: format } );
 		this.progressiveLightMap2 = new THREE.WebGLRenderTarget( this.res, this.res, { type: format } );
 
@@ -44,18 +44,18 @@ class ProgressiveLightMap {
 
 			// Vertex Shader: Set Vertex Positions to the Unwrapped UV Positions
 			shader.vertexShader =
-				'#define USE_UV\n#define USE_LIGHTMAP\n' +
+				'#define USE_LIGHTMAP\n' +
 				shader.vertexShader.slice( 0, - 1 ) +
 				'	gl_Position = vec4((uv2 - 0.5) * 2.0, 1.0, 1.0); }';
 
 			// Fragment Shader: Set Pixels to average in the Previous frame's Shadows
 			let bodyStart = shader.fragmentShader.indexOf( 'void main() {' );
 			shader.fragmentShader =
-				'#define USE_UV\nvarying vec2 vUv2;\n' +
+				'varying vec2 vUv2;\n' +
 				shader.fragmentShader.slice( 0, bodyStart ) +
 				'	uniform sampler2D previousShadowMap;\n	uniform float averagingWindow;\n' +
 				shader.fragmentShader.slice( bodyStart - 1, - 1 ) +
-				`\nvec3 texelOld = texture(previousShadowMap, vUv2).rgb;
+				`\nvec3 texelOld = texture2D(previousShadowMap, vUv2).rgb;
 				gl_FragColor.rgb = mix(texelOld, gl_FragColor.rgb, 1.0/averagingWindow);
 			}`;
 
@@ -285,14 +285,14 @@ class ProgressiveLightMap {
 				'	uniform sampler2D previousShadowMap;\n	uniform float pixelOffset;\n' +
 				shader.fragmentShader.slice( bodyStart - 1, - 1 ) +
 					`	gl_FragColor.rgb = (
-									texture(previousShadowMap, vUv + vec2( pixelOffset,  0.0        )).rgb + 
-									texture(previousShadowMap, vUv + vec2( 0.0        ,  pixelOffset)).rgb +
-									texture(previousShadowMap, vUv + vec2( 0.0        , -pixelOffset)).rgb +
-									texture(previousShadowMap, vUv + vec2(-pixelOffset,  0.0        )).rgb +
-									texture(previousShadowMap, vUv + vec2( pixelOffset,  pixelOffset)).rgb + 
-									texture(previousShadowMap, vUv + vec2(-pixelOffset,  pixelOffset)).rgb +
-									texture(previousShadowMap, vUv + vec2( pixelOffset, -pixelOffset)).rgb +
-									texture(previousShadowMap, vUv + vec2(-pixelOffset, -pixelOffset)).rgb)/8.0;
+									texture2D(previousShadowMap, vUv + vec2( pixelOffset,  0.0        )).rgb + 
+									texture2D(previousShadowMap, vUv + vec2( 0.0        ,  pixelOffset)).rgb +
+									texture2D(previousShadowMap, vUv + vec2( 0.0        , -pixelOffset)).rgb +
+									texture2D(previousShadowMap, vUv + vec2(-pixelOffset,  0.0        )).rgb +
+									texture2D(previousShadowMap, vUv + vec2( pixelOffset,  pixelOffset)).rgb + 
+									texture2D(previousShadowMap, vUv + vec2(-pixelOffset,  pixelOffset)).rgb +
+									texture2D(previousShadowMap, vUv + vec2( pixelOffset, -pixelOffset)).rgb +
+									texture2D(previousShadowMap, vUv + vec2(-pixelOffset, -pixelOffset)).rgb)/8.0;
 				}`;
 
 			// Set the LightMap Accumulation Buffer

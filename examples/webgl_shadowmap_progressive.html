@@ -194,7 +194,7 @@
 				if ( params[ 'Enable' ] ) {
 
 					progressiveSurfacemap.update( camera, params[ 'Blend Window' ], params[ 'Blur Edges' ] );
-					progressiveSurfacemap.showDebugLightmap( params[ 'Debug Lightmap' ] );
+					if(!progressiveSurfacemap.firstUpdate) { progressiveSurfacemap.showDebugLightmap( params[ 'Debug Lightmap' ] ); }
 
 				}
 
