@@ -2093,6 +2093,14 @@ function WebGLRenderer( parameters ) {
 
 	this.resetState = function () {
 
+		_framebuffer = null;
+		_currentActiveCubeFace = 0;
+		_currentActiveMipmapLevel = 0;
+		_currentRenderTarget = null;
+		_currentFramebuffer = null;
+
+		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+
 		state.reset();
 		bindingStates.reset();
 
