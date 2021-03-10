@@ -15047,8 +15047,8 @@
 
 		let currentTextureSlot = null;
 		let currentBoundTextures = {};
-		const currentScissor = new Vector4();
-		const currentViewport = new Vector4();
+		const currentScissor = new Vector4(0, 0, gl.canvas.width, gl.canvas.height);
+		const currentViewport = new Vector4(0, 0, gl.canvas.width, gl.canvas.height);
 
 		function createTexture(type, target, count) {
 			const data = new Uint8Array(4); // 4 is required to match default unpack alignment of 4.
@@ -15453,6 +15453,8 @@
 			currentLineWidth = null;
 			currentPolygonOffsetFactor = null;
 			currentPolygonOffsetUnits = null;
+			currentScissor.set(0, 0, gl.canvas.width, gl.canvas.height);
+			currentViewport.set(0, 0, gl.canvas.width, gl.canvas.height);
 			colorBuffer.reset();
 			depthBuffer.reset();
 			stencilBuffer.reset();
@@ -17713,8 +17715,6 @@
 			extensions.init(capabilities);
 			utils = new WebGLUtils(_gl, extensions, capabilities);
 			state = new WebGLState(_gl, extensions, capabilities);
-			state.scissor(_currentScissor.copy(_scissor).multiplyScalar(_pixelRatio).floor());
-			state.viewport(_currentViewport.copy(_viewport).multiplyScalar(_pixelRatio).floor());
 			info = new WebGLInfo(_gl);
 			properties = new WebGLProperties();
 			textures = new WebGLTextures(_gl, extensions, state, properties, capabilities, utils, info);
@@ -18948,6 +18948,14 @@
 		};
 
 		this.resetState = function () {
+			_framebuffer = null;
+			_currentActiveCubeFace = 0;
+			_currentActiveMipmapLevel = 0;
+			_currentRenderTarget = null;
+			_currentFramebuffer = null;
+
+			_gl.bindFramebuffer(36160, null);
+
 			state.reset();
 			bindingStates.reset();
 		};
