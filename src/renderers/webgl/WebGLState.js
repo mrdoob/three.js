@@ -357,8 +357,8 @@ function WebGLState( gl, extensions, capabilities ) {
 	let currentTextureSlot = null;
 	let currentBoundTextures = {};
 
-	const currentScissor = new Vector4();
-	const currentViewport = new Vector4();
+	const currentScissor = new Vector4( 0, 0, gl.canvas.width, gl.canvas.height );
+	const currentViewport = new Vector4( 0, 0, gl.canvas.width, gl.canvas.height );
 
 	function createTexture( type, target, count ) {
 
@@ -947,6 +947,9 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		currentPolygonOffsetFactor = null;
 		currentPolygonOffsetUnits = null;
+
+		currentScissor.set( 0, 0, gl.canvas.width, gl.canvas.height );
+		currentViewport.set( 0, 0, gl.canvas.width, gl.canvas.height );
 
 		colorBuffer.reset();
 		depthBuffer.reset();
