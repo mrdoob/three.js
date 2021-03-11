@@ -851,9 +851,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+		state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( texture ).__webglTexture, 0 );
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+		state.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 	}
 
@@ -945,7 +945,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const isCube = ( renderTarget && renderTarget.isWebGLCubeRenderTarget );
 		if ( isCube ) throw new Error( 'Depth Texture with cube render targets is not supported' );
 
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+		state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 		if ( ! ( renderTarget.depthTexture && renderTarget.depthTexture.isDepthTexture ) ) {
 
@@ -1005,7 +1005,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				for ( let i = 0; i < 6; i ++ ) {
 
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
+					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
 					renderTargetProperties.__webglDepthbuffer[ i ] = _gl.createRenderbuffer();
 					setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget, false );
 
@@ -1013,7 +1013,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+				state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
 				renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
 				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget, false );
 
@@ -1021,7 +1021,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+		state.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 	}
 
@@ -1085,7 +1085,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					const samples = getRenderTargetSamples( renderTarget );
 					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
+					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
 					_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer );
 					_gl.bindRenderbuffer( _gl.RENDERBUFFER, null );
 
@@ -1096,7 +1096,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+					state.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 
 				} else {
@@ -1202,8 +1202,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				const renderTargetProperties = properties.get( renderTarget );
 
-				_gl.bindFramebuffer( _gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
-				_gl.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
+				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
 
 				const width = renderTarget.width;
 				const height = renderTarget.height;
@@ -1214,7 +1214,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST );
 
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer ); // see #18905
+				state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer ); // see #18905
 
 			} else {
 
