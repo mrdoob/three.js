@@ -47,7 +47,6 @@ import { DataTextureLoader } from './loaders/DataTextureLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
 import { LineBasicMaterial } from './materials/LineBasicMaterial.js';
-import { MeshPhongMaterial } from './materials/MeshPhongMaterial.js';
 import { MeshPhysicalMaterial } from './materials/MeshPhysicalMaterial.js';
 import { PointsMaterial } from './materials/PointsMaterial.js';
 import { ShaderMaterial } from './materials/ShaderMaterial.js';
@@ -69,10 +68,8 @@ import { Vector3 } from './math/Vector3.js';
 import { Vector4 } from './math/Vector4.js';
 import { Mesh } from './objects/Mesh.js';
 import { LineSegments } from './objects/LineSegments.js';
-import { LOD } from './objects/LOD.js';
 import { Points } from './objects/Points.js';
 import { Sprite } from './objects/Sprite.js';
-import { Skeleton } from './objects/Skeleton.js';
 import { SkinnedMesh } from './objects/SkinnedMesh.js';
 import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
@@ -938,34 +935,6 @@ Object.defineProperties( Mesh.prototype, {
 
 } );
 
-Object.defineProperties( LOD.prototype, {
-
-	objects: {
-		get: function () {
-
-			console.warn( 'THREE.LOD: .objects has been renamed to .levels.' );
-			return this.levels;
-
-		}
-	}
-
-} );
-
-Object.defineProperty( Skeleton.prototype, 'useVertexTexture', {
-
-	get: function () {
-
-		console.warn( 'THREE.Skeleton: useVertexTexture has been removed.' );
-
-	},
-	set: function () {
-
-		console.warn( 'THREE.Skeleton: useVertexTexture has been removed.' );
-
-	}
-
-} );
-
 SkinnedMesh.prototype.initBones = function () {
 
 	console.error( 'THREE.SkinnedMesh: initBones() has been removed.' );
@@ -1353,25 +1322,12 @@ Scene.prototype.dispose = function () {
 
 //
 
-Object.defineProperties( Uniform.prototype, {
+Uniform.prototype.onUpdate = function () {
 
-	dynamic: {
-		set: function () {
+	console.warn( 'THREE.Uniform: .onUpdate() has been removed. Use object.onBeforeRender() instead.' );
+	return this;
 
-			console.warn( 'THREE.Uniform: .dynamic has been removed. Use object.onBeforeRender() instead.' );
-
-		}
-	},
-	onUpdate: {
-		value: function () {
-
-			console.warn( 'THREE.Uniform: .onUpdate() has been removed. Use object.onBeforeRender() instead.' );
-			return this;
-
-		}
-	}
-
-} );
+};
 
 //
 
@@ -1437,24 +1393,6 @@ Object.defineProperties( Material.prototype, {
 
 			console.warn( 'THREE.' + this.type + ': .stencilMask has been removed. Use .stencilFuncMask instead.' );
 			this.stencilFuncMask = value;
-
-		}
-	}
-
-} );
-
-Object.defineProperties( MeshPhongMaterial.prototype, {
-
-	metal: {
-		get: function () {
-
-			console.warn( 'THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshStandardMaterial instead.' );
-			return false;
-
-		},
-		set: function () {
-
-			console.warn( 'THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshStandardMaterial instead' );
 
 		}
 	}
@@ -1968,32 +1906,20 @@ Object.defineProperties( WebGLRenderTarget.prototype, {
 
 //
 
-Object.defineProperties( Audio.prototype, {
+Audio.prototype.load = function ( file ) {
 
-	load: {
-		value: function ( file ) {
+	console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
+	const scope = this;
+	const audioLoader = new AudioLoader();
+	audioLoader.load( file, function ( buffer ) {
 
-			console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
-			const scope = this;
-			const audioLoader = new AudioLoader();
-			audioLoader.load( file, function ( buffer ) {
+		scope.setBuffer( buffer );
 
-				scope.setBuffer( buffer );
+	} );
+	return this;
 
-			} );
-			return this;
+};
 
-		}
-	},
-	startTime: {
-		set: function () {
-
-			console.warn( 'THREE.Audio: .startTime is now .play( delay ).' );
-
-		}
-	}
-
-} );
 
 AudioAnalyser.prototype.getData = function () {
 
