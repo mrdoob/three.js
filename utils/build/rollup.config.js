@@ -1,5 +1,4 @@
 import babel from '@rollup/plugin-babel';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 
 function glconstants() {
@@ -290,7 +289,6 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			nodeResolve(),
 			addons(),
 			glconstants(),
 			glsl(),
@@ -315,7 +313,6 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			nodeResolve(),
 			addons(),
 			glconstants(),
 			glsl(),
