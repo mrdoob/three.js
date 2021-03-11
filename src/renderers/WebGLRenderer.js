@@ -130,12 +130,9 @@ function WebGLRenderer( parameters ) {
 
 	// internal state cache
 
-	let _framebuffer = null;
-
 	let _currentActiveCubeFace = 0;
 	let _currentActiveMipmapLevel = 0;
 	let _currentRenderTarget = null;
-	let _currentFramebuffer = null;
 	let _currentMaterialId = - 1;
 
 	let _currentCamera = null;
@@ -1763,15 +1760,6 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	//
-	this.setFramebuffer = function ( value ) {
-
-		if ( _framebuffer !== value && _currentRenderTarget === null ) _gl.bindFramebuffer( _gl.FRAMEBUFFER, value );
-
-		_framebuffer = value;
-
-	};
-
 	this.getActiveCubeFace = function () {
 
 		return _currentActiveCubeFace;
@@ -1802,7 +1790,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		let framebuffer = _framebuffer;
+		let framebuffer = null;
 		let isCube = false;
 		let isRenderTarget3D = false;
 
@@ -1845,12 +1833,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( _currentFramebuffer !== framebuffer ) {
-
-			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-			_currentFramebuffer = framebuffer;
-
-		}
+		state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 		state.viewport( _currentViewport );
 		state.scissor( _currentScissor );
@@ -1890,15 +1873,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( framebuffer ) {
 
-			let restore = false;
-
-			if ( framebuffer !== _currentFramebuffer ) {
-
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-
-				restore = true;
-
-			}
+			state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 			try {
 
@@ -1942,11 +1917,10 @@ function WebGLRenderer( parameters ) {
 
 			} finally {
 
-				if ( restore ) {
+				// restore framebuffer of current render target if necessary
 
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, _currentFramebuffer );
-
-				}
+				const framebuffer = ( _currentRenderTarget !== null ) ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+				state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 			}
 
@@ -2093,13 +2067,9 @@ function WebGLRenderer( parameters ) {
 
 	this.resetState = function () {
 
-		_framebuffer = null;
 		_currentActiveCubeFace = 0;
 		_currentActiveMipmapLevel = 0;
 		_currentRenderTarget = null;
-		_currentFramebuffer = null;
-
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 		state.reset();
 		bindingStates.reset();

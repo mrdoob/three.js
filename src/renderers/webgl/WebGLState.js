@@ -316,6 +316,9 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	let enabledCapabilities = {};
 
+	let xrFramebuffer = null;
+	let currentBoundFramebuffers = {};
+
 	let currentProgram = null;
 
 	let currentBlendingEnabled = false;
@@ -417,6 +420,34 @@ function WebGLState( gl, extensions, capabilities ) {
 
 			gl.disable( id );
 			enabledCapabilities[ id ] = false;
+
+		}
+
+	}
+
+	function bindXRFramebuffer( framebuffer ) {
+
+		if ( framebuffer !== xrFramebuffer ) {
+
+			gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
+
+			xrFramebuffer = framebuffer;
+
+		}
+
+	}
+
+	function bindFramebuffer( target, framebuffer ) {
+
+		if ( target === gl.DRAW_FRAMEBUFFER ) target = gl.FRAMEBUFFER;
+
+		if ( framebuffer === null && xrFramebuffer !== null ) framebuffer = xrFramebuffer; // use active XR framebuffer if available
+
+		if ( currentBoundFramebuffers[ target ] !== framebuffer ) {
+
+			gl.bindFramebuffer( target, framebuffer );
+
+			currentBoundFramebuffers[ target ] = framebuffer;
 
 		}
 
@@ -914,6 +945,17 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		gl.activeTexture( gl.TEXTURE0 );
 
+		if ( isWebGL2 === true ) {
+
+			gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null ); // Equivalent to gl.FRAMEBUFFER
+			gl.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
+
+		} else {
+
+			gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+
+		}
+
 		gl.useProgram( null );
 
 		gl.lineWidth( 1 );
@@ -927,6 +969,9 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		currentTextureSlot = null;
 		currentBoundTextures = {};
+
+		xrFramebuffer = null;
+		currentBoundFramebuffers = {};
 
 		currentProgram = null;
 
@@ -967,6 +1012,9 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		enable: enable,
 		disable: disable,
+
+		bindFramebuffer: bindFramebuffer,
+		bindXRFramebuffer: bindXRFramebuffer,
 
 		useProgram: useProgram,
 
