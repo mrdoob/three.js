@@ -10,6 +10,11 @@
       <a href="http://github.com/greggman/threefundamentals/issues">Github</a>
     </div>
   `,
+  contribTemplate: '와우! <a href="${html_url}"><img src="${avatar_url}"> ${login}</a><br>님이 <a href="https://github.com/${owner}/${repo}/commits?author=${login}">커밋을 ${contributions}개 남겨주셨어요!</a>',
+  translations: {
+    badTranslation: '경고! 이 글의 일부는 최신 버전이 아닙니다. <a href="{{link}}">업데이트를 도와주시겠어요?</a>.',
+    updateNeeded: '경고! 이 글은 과거에 작성된 글이며 원문과 내용이 다릅니다. <a href="{{link}}">번역을 도와주세요!</a>.',
+  },
   missing: "아직 번역을 완료하지 못한 문서입니다. [한국어 번역에 동참](https://github.com/gfxfundamentals/threejsfundamentals)해주세요! 😄\n\n[영문으로 볼래요]({{{origLink}}}).",
   toc: '목차',
   categoryMapping: {
