@@ -272,29 +272,6 @@ ${ code }`;
 
 }
 
-function polyfills() {
-
-	return {
-
-		transform( code, filePath ) {
-
-			if ( filePath.endsWith( 'src/Three.js' ) || filePath.endsWith( 'src\\Three.js' ) ) {
-
-				code = 'import \'regenerator-runtime\';\n' + code;
-
-			}
-
-			return {
-				code: code,
-				map: null
-			};
-
-		}
-
-	};
-
-}
-
 const babelrc = {
 	presets: [
 		[
@@ -313,7 +290,6 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			polyfills(),
 			nodeResolve(),
 			addons(),
 			glconstants(),
@@ -339,7 +315,6 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			polyfills(),
 			nodeResolve(),
 			addons(),
 			glconstants(),
