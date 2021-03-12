@@ -19,31 +19,27 @@ function MenubarView( editor ) {
 	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( 'Fullscreen' );
+	/* eslint-disable no-undef */
 	option.onClick( function () {
 
-		if ( document.fullscreenElement === null ) {
+		if ( screenfull.isEnabled ) {
 
-			document.documentElement.requestFullscreen();
-
-		} else if ( document.exitFullscreen ) {
-
-			document.exitFullscreen();
-
-		}
-
-		// Safari
-
-		if ( document.webkitFullscreenElement === null ) {
-
-			document.documentElement.webkitRequestFullscreen();
-
-		} else if ( document.webkitExitFullscreen ) {
-
-			document.webkitExitFullscreen();
+			screenfull.toggle( document.documentElement );
 
 		}
 
 	} );
+	if ( screenfull.isEnabled ) {
+
+		screenfull.on( 'change', () => {
+
+			option.setTextContent( strings.getKey( 'menubar/view/' + ( screenfull.isFullscreen ? 'exit_fullscreen' : 'fullscreen' ) ) );
+
+		} );
+
+	}
+
+	/* eslint-enable no-undef */
 	options.add( option );
 
 	// VR (Work in progress)
