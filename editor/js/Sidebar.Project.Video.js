@@ -4,12 +4,14 @@ import { APP } from './libs/app.js';
 
 function SidebarProjectVideo( editor ) {
 
+	var strings = editor.strings;
+
 	var container = new UIPanel();
 	container.setId( 'render' );
 
 	// Video
 
-	container.add( new UIText( 'Video' ).setTextTransform( 'uppercase' ) );
+	container.add( new UIText( strings.getKey( 'sidebar/project/video' ) ) );
 	container.add( new UIBreak(), new UIBreak() );
 
 	// Resolution
@@ -17,7 +19,7 @@ function SidebarProjectVideo( editor ) {
 	var resolutionRow = new UIRow();
 	container.add( resolutionRow );
 
-	resolutionRow.add( new UIText( 'Resolution' ).setWidth( '90px' ) );
+	resolutionRow.add( new UIText( strings.getKey( 'sidebar/project/resolution' ) ).setWidth( '90px' ) );
 
 	var videoWidth = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
 	resolutionRow.add( videoWidth );
@@ -35,7 +37,7 @@ function SidebarProjectVideo( editor ) {
 	// Duration
 
 	var videoDurationRow = new UIRow();
-	videoDurationRow.add( new UIText( 'Duration' ).setWidth( '90px' ) );
+	videoDurationRow.add( new UIText( strings.getKey( 'sidebar/project/duration' ) ).setWidth( '90px' ) );
 
 	var videoDuration = new UIInteger( 10 );
 	videoDurationRow.add( videoDuration );
@@ -51,7 +53,7 @@ function SidebarProjectVideo( editor ) {
 	progress.setWidth( '170px' );
 	container.add( progress );
 
-	const renderButton = new UIButton( 'RENDER' );
+	const renderButton = new UIButton( strings.getKey( 'sidebar/project/render' ) );
 	renderButton.setWidth( '170px' );
 	renderButton.onClick( async () => {
 

@@ -2,12 +2,14 @@ import { UIPanel, UIRow } from './libs/ui.js';
 
 function MenubarView( editor ) {
 
+	var strings = editor.strings;
+
 	var container = new UIPanel();
 	container.setClass( 'menu' );
 
 	var title = new UIPanel();
 	title.setClass( 'title' );
-	title.setTextContent( 'View' );
+	title.setTextContent( strings.getKey( 'menubar/view' ) );
 	container.add( title );
 
 	var options = new UIPanel();
@@ -18,7 +20,7 @@ function MenubarView( editor ) {
 
 	var option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( 'Fullscreen' );
+	option.setTextContent( strings.getKey( 'menubar/view/fullscreen' ) );
 	/* eslint-disable no-undef */
 	option.onClick( function () {
 
@@ -38,8 +40,8 @@ function MenubarView( editor ) {
 		} );
 
 	}
-
 	/* eslint-enable no-undef */
+
 	options.add( option );
 
 	// VR (Work in progress)
