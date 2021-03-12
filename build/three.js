@@ -34222,22 +34222,6 @@
 			}
 		}
 	});
-	Object.defineProperties(LOD.prototype, {
-		objects: {
-			get: function () {
-				console.warn('THREE.LOD: .objects has been renamed to .levels.');
-				return this.levels;
-			}
-		}
-	});
-	Object.defineProperty(Skeleton.prototype, 'useVertexTexture', {
-		get: function () {
-			console.warn('THREE.Skeleton: useVertexTexture has been removed.');
-		},
-		set: function () {
-			console.warn('THREE.Skeleton: useVertexTexture has been removed.');
-		}
-	});
 
 	SkinnedMesh.prototype.initBones = function () {
 		console.error('THREE.SkinnedMesh: initBones() has been removed.');
@@ -34508,19 +34492,11 @@
 	}; //
 
 
-	Object.defineProperties(Uniform.prototype, {
-		dynamic: {
-			set: function () {
-				console.warn('THREE.Uniform: .dynamic has been removed. Use object.onBeforeRender() instead.');
-			}
-		},
-		onUpdate: {
-			value: function () {
-				console.warn('THREE.Uniform: .onUpdate() has been removed. Use object.onBeforeRender() instead.');
-				return this;
-			}
-		}
-	}); //
+	Uniform.prototype.onUpdate = function () {
+		console.warn('THREE.Uniform: .onUpdate() has been removed. Use object.onBeforeRender() instead.');
+		return this;
+	}; //
+
 
 	Object.defineProperties(Material.prototype, {
 		wrapAround: {
@@ -34562,17 +34538,6 @@
 			set: function (value) {
 				console.warn('THREE.' + this.type + ': .stencilMask has been removed. Use .stencilFuncMask instead.');
 				this.stencilFuncMask = value;
-			}
-		}
-	});
-	Object.defineProperties(MeshPhongMaterial.prototype, {
-		metal: {
-			get: function () {
-				console.warn('THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshStandardMaterial instead.');
-				return false;
-			},
-			set: function () {
-				console.warn('THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshStandardMaterial instead');
 			}
 		}
 	});
@@ -34928,24 +34893,15 @@
 		}
 	}); //
 
-	Object.defineProperties(Audio.prototype, {
-		load: {
-			value: function (file) {
-				console.warn('THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.');
-				const scope = this;
-				const audioLoader = new AudioLoader();
-				audioLoader.load(file, function (buffer) {
-					scope.setBuffer(buffer);
-				});
-				return this;
-			}
-		},
-		startTime: {
-			set: function () {
-				console.warn('THREE.Audio: .startTime is now .play( delay ).');
-			}
-		}
-	});
+	Audio.prototype.load = function (file) {
+		console.warn('THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.');
+		const scope = this;
+		const audioLoader = new AudioLoader();
+		audioLoader.load(file, function (buffer) {
+			scope.setBuffer(buffer);
+		});
+		return this;
+	};
 
 	AudioAnalyser.prototype.getData = function () {
 		console.warn('THREE.AudioAnalyser: .getData() is now .getFrequencyData().');
