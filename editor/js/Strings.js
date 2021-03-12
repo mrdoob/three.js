@@ -304,10 +304,10 @@ function Strings( config ) {
 			'sidebar/project/materials': 'Materials',
 			'sidebar/project/Assign': 'Assign',
 
-			'sidebar/project/video': 'VIDEO',
+			'sidebar/project/video': 'Video',
 			'sidebar/project/resolution': 'Resolution',
 			'sidebar/project/duration': 'Duration',
-			'sidebar/project/render': 'RENDER',
+			'sidebar/project/render': 'Render',
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
@@ -639,10 +639,10 @@ function Strings( config ) {
 			'sidebar/project/materials': 'Matériaux',
 			'sidebar/project/Assign': 'Attribuer',
 
-			'sidebar/project/video': 'VIDEO',
+			'sidebar/project/video': 'Video',
 			'sidebar/project/resolution': 'Resolution',
 			'sidebar/project/duration': 'Duration',
-			'sidebar/project/render': 'RENDER',
+			'sidebar/project/render': 'Render',
 
 			'sidebar/settings': 'Paramètres',
 			'sidebar/settings/language': 'Langue',
