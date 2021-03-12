@@ -214,9 +214,13 @@ THREE.ShaderLib[ 'line' ] = {
 			#endif
 
 			float alpha = opacity;
+
+			// define len2 outside of the conditional so it's available for the derivative
+			// taken in the conditional with ALPHA_TO_COVERAGE
+			float a = vUv.x;
+			float len2 = a * a;
 			if ( abs( vUv.y ) > 1.0 ) {
 
-				float a = vUv.x;
 				float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
 				float len2 = a * a + b * b;
 

@@ -222,15 +222,20 @@ ShaderLib[ 'line' ] = {
 			#endif
 
 			float alpha = opacity;
+
+			// define len2 outside of the conditional so it's available for the derivative
+			// taken in the conditional with ALPHA_TO_COVERAGE
+			float a = vUv.x;
+			float len2 = a * a;
 			if ( abs( vUv.y ) > 1.0 ) {
 
-				float a = vUv.x;
 				float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
 				float len2 = a * a + b * b;
 
 				#ifdef ALPHA_TO_COVERAGE
 
-				alpha = 1.0 - smoothstep( 1.0 - fwidth( len2 ), 1.0, len2 );
+				float dlen = fwidth( len2 );
+				alpha = 1.0 - smoothstep( 1.0 - dlen * 0.75, 1.0 + dlen * 0.25, len2 );
 
 				#else
 
@@ -440,10 +445,12 @@ var LineMaterial = function ( parameters ) {
 				if ( value ) {
 
 					this.defines.ALPHA_TO_COVERAGE = '';
+					this.extensions.derivatives = true;
 
 				} else {
 
 					delete this.defines.ALPHA_TO_COVERAGE;
+					this.extensions.derivatives = false;
 
 				}
 
