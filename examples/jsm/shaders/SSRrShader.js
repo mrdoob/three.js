@@ -17,7 +17,7 @@ var SSRrShader = {
   uniforms: {
 
     "tDiffuse": { value: null },
-    "tDiffuseSelects": { value: null },
+    "tSpecular": { value: null },
     "tNormal": { value: null },
     "tMetalness": { value: null },
     "tDepth": { value: null },
@@ -57,7 +57,7 @@ var SSRrShader = {
 		uniform sampler2D tNormal;
 		uniform sampler2D tMetalness;
 		uniform sampler2D tDiffuse;
-		uniform sampler2D tDiffuseSelects;
+		uniform sampler2D tSpecular;
 		uniform float cameraRange;
 		uniform vec2 resolution;
 		uniform float cameraNear;
@@ -188,13 +188,19 @@ var SSRrShader = {
 				if(viewRefractRayZ<vZ){
 				// if(viewRefractRayZ<vZ&&vZ-viewRefractRayZ<.05){
 					vec4 refractColor=texture2D(tDiffuse,uv);
-					vec4 diffuseSelectsColor=texture2D(tDiffuseSelects,vUv);
-					gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),diffuseSelectsColor.r);
-					// gl_FragColor.xyz=refractColor.xyz*(1.+diffuseSelectsColor.r*3.);
+					vec4 specularColor=texture2D(tSpecular,vUv);
+					gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);
+					// gl_FragColor.xyz=refractColor.xyz*(1.+specularColor.r*3.);
 					gl_FragColor.a=1.;
-					break;
+					return;
 				}
 			}
+
+			// TODO: Codes below can solve ( somewhat a hack ) the tiny gaps display error when viewNormal directly face camera. Need to find the root cause of the problem.
+			vec4 refractColor=texture2D(tDiffuse,vUv);
+			vec4 specularColor=texture2D(tSpecular,vUv);
+			gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);
+			gl_FragColor.a=1.;
 		}
 	`
 

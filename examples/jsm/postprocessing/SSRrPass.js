@@ -199,7 +199,7 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	}
 
 	this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-	this.ssrrMaterial.uniforms[ 'tDiffuseSelects' ].value = this.specularRenderTarget.texture;
+	this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
 	this.ssrrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
 	// if (this.isSelective) {
 	this.ssrrMaterial.defines.isSelective = this.isSelective;
@@ -358,7 +358,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.ssrrMaterial.uniforms[ 'ior' ].value = 1 / this.ior;
 		this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
 		this.ssrrMaterial.uniforms[ 'thickTolerance' ].value = this.thickTolerance;
-		this.ssrrMaterial.uniforms[ 'tDiffuseSelects' ].value = this.specularRenderTarget.texture;
+		this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
 		this.renderPass( renderer, this.ssrrMaterial, this.ssrrRenderTarget );
 
 		// output result to screen
