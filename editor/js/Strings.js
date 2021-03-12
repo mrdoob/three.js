@@ -71,6 +71,9 @@ function Strings( config ) {
 			'menubar/examples/Pong': 'Pong',
 			'menubar/examples/Shaders': 'Shaders',
 
+			'menubar/view': 'View',
+			'menubar/view/fullscreen': 'Fullscreen',
+
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
 			'menubar/help/icons': 'Icon Pack',
@@ -301,6 +304,11 @@ function Strings( config ) {
 			'sidebar/project/materials': 'Materials',
 			'sidebar/project/Assign': 'Assign',
 
+			'sidebar/project/video': 'VIDEO',
+			'sidebar/project/resolution': 'Resolution',
+			'sidebar/project/duration': 'Duration',
+			'sidebar/project/render': 'RENDER',
+
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
 			'sidebar/settings/exportPrecision': 'Export Precision',
@@ -397,6 +405,9 @@ function Strings( config ) {
 			'menubar/examples/Particles': 'Particles',
 			'menubar/examples/Pong': 'Pong',
 			'menubar/examples/Shaders': 'Shaders',
+
+			'menubar/view': 'View',
+			'menubar/view/fullscreen': 'Fullscreen',
 
 			'menubar/help': 'Aide',
 			'menubar/help/source_code': 'Code Source',
@@ -628,6 +639,11 @@ function Strings( config ) {
 			'sidebar/project/materials': 'Matériaux',
 			'sidebar/project/Assign': 'Attribuer',
 
+			'sidebar/project/video': 'VIDEO',
+			'sidebar/project/resolution': 'Resolution',
+			'sidebar/project/duration': 'Duration',
+			'sidebar/project/render': 'RENDER',
+
 			'sidebar/settings': 'Paramètres',
 			'sidebar/settings/language': 'Langue',
 			'sidebar/settings/exportPrecision': 'Précision à l\'exportation',
@@ -724,6 +740,9 @@ function Strings( config ) {
 			'menubar/examples/Particles': '粒子',
 			'menubar/examples/Pong': '乒乓球',
 			'menubar/examples/Shaders': '着色器',
+
+			'menubar/view': '视图',
+			'menubar/view/fullscreen': '全屏',
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
@@ -938,6 +957,11 @@ function Strings( config ) {
 			'sidebar/project/toneMapping': '色调映射',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
+
+			'sidebar/project/video': '视频',
+			'sidebar/project/resolution': '分辨率',
+			'sidebar/project/duration': '时长',
+			'sidebar/project/render': '渲染',
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
