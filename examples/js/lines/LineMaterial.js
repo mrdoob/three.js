@@ -433,10 +433,12 @@ THREE.LineMaterial = function ( parameters ) {
 				if ( value ) {
 
 					this.defines.ALPHA_TO_COVERAGE = '';
+					this.extensions.derivatives = true;
 
 				} else {
 
 					delete this.defines.ALPHA_TO_COVERAGE;
+					this.extensions.derivatives = false;
 
 				}
 
