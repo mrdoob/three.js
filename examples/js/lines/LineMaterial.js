@@ -226,8 +226,8 @@ THREE.ShaderLib[ 'line' ] = {
 
 				#ifdef ALPHA_TO_COVERAGE
 
-				float dlen = fwidth( len2 );
-				alpha = 1.0 - smoothstep( 1.0 - dlen * 0.75, 1.0 + dlen * 0.25, len2 );
+				float dlen = fwidth( sqrt( len2 ) );
+				alpha = 1.0 - smoothstep( 1.0 - dlen, 1.0 + dlen, len2 );
 
 				#else
 
