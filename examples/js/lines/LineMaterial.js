@@ -215,27 +215,33 @@ THREE.ShaderLib[ 'line' ] = {
 
 			float alpha = opacity;
 
-			// define len2 outside of the conditional so it's available for the derivative
-			// taken in the conditional with ALPHA_TO_COVERAGE
+			#ifdef ALPHA_TO_COVERAGE
+
+			// artifacts appear on some hardware if a derivative is taken within a conditional
 			float a = vUv.x;
-			float len2 = a * a;
+			float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
+			float len2 = a * a + b * b;
+			float dlen = fwidth( len2 );
+
 			if ( abs( vUv.y ) > 1.0 ) {
 
+				alpha = 1.0 - smoothstep( 1.0 - dlen, 1.0 + dlen, len2 );
+
+			}
+
+			#else
+
+			if ( abs( vUv.y ) > 1.0 ) {
+
+				float a = vUv.x;
 				float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
 				float len2 = a * a + b * b;
 
-				#ifdef ALPHA_TO_COVERAGE
-
-				float dlen = fwidth( sqrt( len2 ) );
-				alpha = 1.0 - smoothstep( 1.0 - dlen, 1.0 + dlen, len2 );
-
-				#else
-
 				if ( len2 > 1.0 ) discard;
 
-				#endif
-
 			}
+
+			#endif
 
 			vec4 diffuseColor = vec4( diffuse, alpha );
 
