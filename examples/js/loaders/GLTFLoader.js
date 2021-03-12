@@ -3559,6 +3559,39 @@ THREE.GLTFLoader = ( function () {
 
 	};
 
+	GLTFParser.prototype.createNodeMesh = function ( nodeIndex ) {
+
+		var json = this.json;
+		var parser = this;
+		var nodeDef = json.nodes[ nodeIndex ];
+
+		return parser.getDependency( 'mesh', nodeDef.mesh ).then( function ( mesh ) {
+
+			var node = parser._getNodeRef( parser.meshCache, nodeDef.mesh, mesh );
+
+			// if weights are provided on the node, override weights on the mesh.
+			if ( nodeDef.weights !== undefined ) {
+
+				node.traverse( function ( o ) {
+
+					if ( ! o.isMesh ) return;
+
+					for ( var i = 0, il = nodeDef.weights.length; i < il; i ++ ) {
+
+						o.morphTargetInfluences[ i ] = nodeDef.weights[ i ];
+
+					}
+
+				} );
+
+			}
+
+			return node;
+
+		} );
+
+	};
+
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#nodes-and-hierarchy
 	 * @param {number} nodeIndex
@@ -3581,28 +3614,9 @@ THREE.GLTFLoader = ( function () {
 
 			if ( nodeDef.mesh !== undefined ) {
 
-				pending.push( parser.getDependency( 'mesh', nodeDef.mesh ).then( function ( mesh ) {
+				pending.push( parser._invokeOne( function ( ext ) {
 
-					var node = parser._getNodeRef( parser.meshCache, nodeDef.mesh, mesh );
-
-					// if weights are provided on the node, override weights on the mesh.
-					if ( nodeDef.weights !== undefined ) {
-
-						node.traverse( function ( o ) {
-
-							if ( ! o.isMesh ) return;
-
-							for ( var i = 0, il = nodeDef.weights.length; i < il; i ++ ) {
-
-								o.morphTargetInfluences[ i ] = nodeDef.weights[ i ];
-
-							}
-
-						} );
-
-					}
-
-					return node;
+					return ext.createNodeMesh && ext.createNodeMesh( nodeIndex );
 
 				} ) );
 
