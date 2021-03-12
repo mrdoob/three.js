@@ -13771,7 +13771,7 @@
 
 	var vsm_vert = "void main() {\n\tgl_Position = vec4( position, 1.0 );\n}";
 
-	function WebGLShadowMap(_renderer, _objects, maxTextureSize) {
+	function WebGLShadowMap(_renderer, _objects, _capabilities) {
 		let _frustum = new Frustum();
 
 		const _shadowMapSize = new Vector2(),
@@ -13779,7 +13779,8 @@
 					_viewport = new Vector4(),
 					_depthMaterials = [],
 					_distanceMaterials = [],
-					_materialCache = {};
+					_materialCache = {},
+					_maxTextureSize = _capabilities.maxTextureSize;
 
 		const shadowSide = {
 			0: BackSide,
@@ -13857,15 +13858,15 @@
 
 				_viewportSize.copy(shadow.mapSize);
 
-				if (_shadowMapSize.x > maxTextureSize || _shadowMapSize.y > maxTextureSize) {
-					if (_shadowMapSize.x > maxTextureSize) {
-						_viewportSize.x = Math.floor(maxTextureSize / shadowFrameExtents.x);
+				if (_shadowMapSize.x > _maxTextureSize || _shadowMapSize.y > _maxTextureSize) {
+					if (_shadowMapSize.x > _maxTextureSize) {
+						_viewportSize.x = Math.floor(_maxTextureSize / shadowFrameExtents.x);
 						_shadowMapSize.x = _viewportSize.x * shadowFrameExtents.x;
 						shadow.mapSize.x = _viewportSize.x;
 					}
 
-					if (_shadowMapSize.y > maxTextureSize) {
-						_viewportSize.y = Math.floor(maxTextureSize / shadowFrameExtents.y);
+					if (_shadowMapSize.y > _maxTextureSize) {
+						_viewportSize.y = Math.floor(_maxTextureSize / shadowFrameExtents.y);
 						_shadowMapSize.y = _viewportSize.y * shadowFrameExtents.y;
 						shadow.mapSize.y = _viewportSize.y;
 					}
@@ -15500,6 +15501,7 @@
 			const textureProperties = properties.get(texture);
 			renderTarget.addEventListener('dispose', onRenderTargetDispose);
 			textureProperties.__webglTexture = _gl.createTexture();
+			textureProperties.__version = texture.version;
 			info.memory.textures++;
 			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
 			const isMultisample = renderTarget.isWebGLMultisampleRenderTarget === true;
@@ -17007,7 +17009,7 @@
 
 		let extensions, capabilities, state, info;
 		let properties, textures, cubemaps, attributes, geometries, objects;
-		let programCache, materials, renderLists, renderStates, clipping;
+		let programCache, materials, renderLists, renderStates, clipping, shadowMap;
 		let background, morphtargets, bufferRenderer, indexedBufferRenderer;
 		let utils, bindingStates;
 
@@ -17032,6 +17034,7 @@
 			renderLists = new WebGLRenderLists(properties);
 			renderStates = new WebGLRenderStates(extensions, capabilities);
 			background = new WebGLBackground(_this, cubemaps, state, objects, _premultipliedAlpha);
+			shadowMap = new WebGLShadowMap(_this, objects, capabilities);
 			bufferRenderer = new WebGLBufferRenderer(_gl, extensions, info, capabilities);
 			indexedBufferRenderer = new WebGLIndexedBufferRenderer(_gl, extensions, info, capabilities);
 			info.programs = programCache.programs;
@@ -17039,6 +17042,7 @@
 			_this.extensions = extensions;
 			_this.properties = properties;
 			_this.renderLists = renderLists;
+			_this.shadowMap = shadowMap;
 			_this.state = state;
 			_this.info = info;
 		}
@@ -17046,10 +17050,7 @@
 		initGLContext(); // xr
 
 		const xr = new WebXRManager(_this, _gl);
-		this.xr = xr; // shadow map
-
-		const shadowMap = new WebGLShadowMap(_this, objects, capabilities.maxTextureSize);
-		this.shadowMap = shadowMap; // API
+		this.xr = xr; // API
 
 		this.getContext = function () {
 			return _gl;
@@ -17249,7 +17250,17 @@
 		{
 			console.log('THREE.WebGLRenderer: Context Restored.');
 			_isContextLost = false;
+			const infoAutoReset = info.autoReset;
+			const shadowMapEnabled = shadowMap.enabled;
+			const shadowMapAutoUpdate = shadowMap.autoUpdate;
+			const shadowMapNeedsUpdate = shadowMap.needsUpdate;
+			const shadowMapType = shadowMap.type;
 			initGLContext();
+			info.autoReset = infoAutoReset;
+			shadowMap.enabled = shadowMapEnabled;
+			shadowMap.autoUpdate = shadowMapAutoUpdate;
+			shadowMap.needsUpdate = shadowMapNeedsUpdate;
+			shadowMap.type = shadowMapType;
 		}
 
 		function onMaterialDispose(event) {
