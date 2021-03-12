@@ -355,7 +355,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		// render SSRr
 
-		this.ssrrMaterial.uniforms[ 'ior' ].value = this.ior;
+		this.ssrrMaterial.uniforms[ 'ior' ].value = 1 / this.ior;
 		this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
 		this.ssrrMaterial.uniforms[ 'thickTolerance' ].value = this.thickTolerance;
 		this.ssrrMaterial.uniforms[ 'tDiffuseSelects' ].value = this.specularRenderTarget.texture;

@@ -27,7 +27,7 @@ var SSRrShader = {
     "resolution": { value: new Vector2() },
     "cameraProjectionMatrix": { value: new Matrix4() },
     "cameraInverseProjectionMatrix": { value: new Matrix4() },
-    "ior": { value: .5 },
+    "ior": { value: 1.03 },
     "cameraRange": { value: 0 },
     "surfDist": { value: .007 },
     "thickTolerance": { value: .03 },
@@ -116,10 +116,11 @@ var SSRrShader = {
 			return xy;
 		}
 		void main(){
+			if(ior==1.) return; // Adding this line may have better performance, but more importantly, it can avoid display errors at the very edges of the model when IOR is equal to 1.
+
 			float metalness=texture2D(tMetalness,vUv).r;
 			if(metalness<=0.) return;
 
-			// TODO: Will if(ior===0.) return; improve performance?
 			// gl_FragColor=vec4(0,0,.5,1);return;
 			vec3 viewNormal=getViewNormal( vUv );
 			// gl_FragColor=vec4(viewNormal,1);return;
@@ -137,11 +138,13 @@ var SSRrShader = {
 			vec2 d1;
 
 			#ifdef isPerspectiveCamera
-				vec3 viewIncidenceDir=normalize(viewPosition);
+				vec3 viewIncidentDir=normalize(viewPosition);
 			#else
-				vec3 viewIncidenceDir=vec3(0,0,-1);
+				vec3 viewIncidentDir=vec3(0,0,-1);
 			#endif
-			vec3 viewRefractDir=normalize(viewIncidenceDir+viewNormal*-ior);
+
+			vec3 viewRefractDir=refract(viewIncidentDir,viewNormal,ior);
+			// https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/refract.xhtml
 
 			float maxDistance=100.;
 			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
