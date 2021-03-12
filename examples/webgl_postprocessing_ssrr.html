@@ -4,7 +4,7 @@
 <head>
 
 	<head>
-		<title>three.js webgl - postprocessing - Screen Space Reflection</title>
+		<title>three.js webgl - postprocessing - Screen Space Refraction</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -285,7 +285,7 @@
 			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-			if(mouseDown.sub(mouse).length()>.03) return
+			if(mouseDown.sub(mouse).length()>0) return
 
 
 			raycaster.setFromCamera( mouse, camera );
