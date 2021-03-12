@@ -1036,6 +1036,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
 		textureProperties.__webglTexture = _gl.createTexture();
+		textureProperties.__version = texture.version;
 
 		info.memory.textures ++;
 
