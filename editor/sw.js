@@ -52,6 +52,8 @@ const assets = [
 	'../examples/jsm/curves/NURBSCurve.js',
 	'../examples/jsm/curves/NURBSUtils.js',
 
+	'../examples/jsm/environments/RoomEnvironment.js',
+
 	'../examples/jsm/exporters/ColladaExporter.js',
 	'../examples/jsm/exporters/DRACOExporter.js',
 	'../examples/jsm/exporters/GLTFExporter.js',
