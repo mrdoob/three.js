@@ -65,7 +65,6 @@ var files = [
 
 	{ path: 'loaders/3MFLoader.js', dependencies: [ { name: 'fflate', path: 'libs/fflate.module.min.js', importAll: true } ], ignoreList: [] },
 	{ path: 'loaders/AMFLoader.js', dependencies: [ { name: 'fflate', path: 'libs/fflate.module.min.js', importAll: true } ], ignoreList: [] },
-	{ path: 'loaders/AssimpLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/BasisTextureLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/BVHLoader.js', dependencies: [], ignoreList: [ 'Bones' ] },
 	{ path: 'loaders/ColladaLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' } ], ignoreList: [] },
