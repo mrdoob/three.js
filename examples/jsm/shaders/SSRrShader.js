@@ -6,8 +6,9 @@ import {
 var SSRrShader = {
 
   defines: {
-    MAX_STEP: 0,
-    isPerspectiveCamera: true,
+		MAX_STEP: 0,
+		isPerspectiveCamera: true,
+		specular: true,
   },
 
   uniforms: {
@@ -15,7 +16,7 @@ var SSRrShader = {
     "tDiffuse": { value: null },
     "tSpecular": { value: null },
     "tNormal": { value: null },
-    "tMetalness": { value: null },
+    "tRefractive": { value: null },
     "tDepth": { value: null },
     "tDepthSelects": { value: null },
     "cameraNear": { value: null },
@@ -49,7 +50,7 @@ var SSRrShader = {
 		uniform sampler2D tDepth;
 		uniform sampler2D tDepthSelects;
 		uniform sampler2D tNormal;
-		uniform sampler2D tMetalness;
+		uniform sampler2D tRefractive;
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tSpecular;
 		uniform float cameraRange;
@@ -110,8 +111,8 @@ var SSRrShader = {
 		void main(){
 			if(ior==1.) return; // Adding this line may have better performance, but more importantly, it can avoid display errors at the very edges of the model when IOR is equal to 1.
 
-			float metalness=texture2D(tMetalness,vUv).r;
-			if(metalness<=0.) return;
+			float refractive=texture2D(tRefractive,vUv).r;
+			if(refractive<=0.) return;
 
 			// gl_FragColor=vec4(0,0,.5,1);return;
 			vec3 viewNormal=getViewNormal( vUv );
@@ -178,19 +179,25 @@ var SSRrShader = {
 				if(viewRefractRayZ<vZ){
 				// if(viewRefractRayZ<vZ&&vZ-viewRefractRayZ<.05){
 					vec4 refractColor=texture2D(tDiffuse,uv);
-					vec4 specularColor=texture2D(tSpecular,vUv);
-					gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);
-					// gl_FragColor.xyz=refractColor.xyz*(1.+specularColor.r*3.);
+					#ifdef specular
+						vec4 specularColor=texture2D(tSpecular,vUv);
+						gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);
+						// gl_FragColor.xyz=refractColor.xyz*(1.+specularColor.r*3.);
+					#else
+						gl_FragColor.xyz=refractColor.xyz;
+					#endif
 					gl_FragColor.a=1.;
 					return;
 				}
 			}
 
-			// TODO: Codes below can solve ( somewhat a hack ) the tiny gaps display error when viewNormal directly face camera. Need to find the root cause of the problem.
-			vec4 refractColor=texture2D(tDiffuse,vUv);
-			vec4 specularColor=texture2D(tSpecular,vUv);
-			gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);
-			gl_FragColor.a=1.;
+			#ifdef specular
+				// TODO: Codes below can solve ( somewhat a hack ) the tiny gaps display error when viewNormal directly face camera. Need to find the root cause of the problem.
+				vec4 refractColor=texture2D(tDiffuse,vUv);
+				vec4 specularColor=texture2D(tSpecular,vUv);
+				gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);
+				gl_FragColor.a=1.;
+			#endif
 		}
 	`
 

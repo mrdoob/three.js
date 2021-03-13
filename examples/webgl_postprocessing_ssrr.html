@@ -38,7 +38,6 @@
 		let composer;
 		let ssrrPass;
 		let gui;
-		const isPerspectiveCamera = true;
 		let stats;
 		let controls;
 		let camera, scene, renderer;
@@ -179,7 +178,6 @@
 				width: innerWidth,
 				height: innerHeight,
 				encoding: THREE.sRGBEncoding,
-				isPerspectiveCamera: isPerspectiveCamera,
 				selects: selects
 			});
 
@@ -190,7 +188,7 @@
 			gui = new GUI();
 			gui.add(params, 'enableSSRr').name('Enable SSRr');
 			ssrrPass.ior = 1.03; // Why gui initial display is 1?
-			gui.add(ssrrPass, 'ior').name('IOR').min(1).max(1.1).step(.00001)
+			gui.add(ssrrPass, 'ior').name('IOR').min(1).max(1.1).step(.00001);
 			gui.add(params, 'autoRotate').onChange(() => {
 
 				controls.enabled = !params.autoRotate;
@@ -198,15 +196,16 @@
 			});
 
 			const folder = gui.addFolder('more settings');
-			folder.add(ssrrPass.specularMaterial, 'metalness').min(0).max(1).step(.01)
-			folder.add(ssrrPass.specularMaterial, 'roughness').min(0).max(1).step(.01)
+			folder.add( ssrrPass, 'specular' );
+			folder.add(ssrrPass.specularMaterial, 'metalness').min(0).max(1).step(.01);
+			folder.add(ssrrPass.specularMaterial, 'roughness').min(0).max(1).step(.01);
 			folder.add(ssrrPass, 'output', {
 				'Default': SSRrPass.OUTPUT.Default,
 				'SSRr Only': SSRrPass.OUTPUT.SSRr,
 				'Beauty': SSRrPass.OUTPUT.Beauty,
 				'Depth': SSRrPass.OUTPUT.Depth,
 				'Normal': SSRrPass.OUTPUT.Normal,
-				'Metalness': SSRrPass.OUTPUT.Metalness,
+				'Refractive': SSRrPass.OUTPUT.Refractive,
 			}).onChange(function (value) {
 
 				ssrrPass.output = parseInt(value);

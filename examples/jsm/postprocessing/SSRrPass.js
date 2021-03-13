@@ -47,6 +47,23 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 
 	this.selects = selects;
 
+	this._specular = SSRrShader.defines.specular;
+	Object.defineProperty( this, 'specular', {
+		get() {
+
+			return this._specular;
+
+		},
+		set( val ) {
+
+			if ( this._specular === val ) return;
+			this._specular = val;
+			this.ssrrMaterial.defines.specular = val;
+			this.ssrrMaterial.needsUpdate = true;
+
+		}
+	} );
+
 	// beauty render target with depth buffer
 
 	var depthTexture = new DepthTexture();
@@ -62,7 +79,7 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 		depthBuffer: true
 	} );
 
-	this.specularRenderTarget = new WebGLRenderTarget( this.width, this.height, { // TODO: Can merge with metalnessRenderTarget?
+	this.specularRenderTarget = new WebGLRenderTarget( this.width, this.height, { // TODO: Can merge with refractiveRenderTarget?
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
 		format: RGBAFormat,
@@ -77,9 +94,9 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 		type: HalfFloatType,
 	} );
 
-	// metalness render target
+	// refractive render target
 
-	this.metalnessRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+	this.refractiveRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 		minFilter: NearestFilter,
 		magFilter: NearestFilter,
 		format: RGBAFormat
@@ -121,7 +138,7 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
 	this.ssrrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
 	this.ssrrMaterial.needsUpdate = true;
-	this.ssrrMaterial.uniforms[ 'tMetalness' ].value = this.metalnessRenderTarget.texture;
+	this.ssrrMaterial.uniforms[ 'tRefractive' ].value = this.refractiveRenderTarget.texture;
 	this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 	this.ssrrMaterial.uniforms[ 'tDepthSelects' ].value = this.normalRenderTarget.depthTexture;
 	this.ssrrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
@@ -135,15 +152,15 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	this.normalMaterial = new MeshNormalMaterial( { morphTargets } );
 	this.normalMaterial.blending = NoBlending;
 
-	// metalnessOn material
+	// refractiveOn material
 
-	this.metalnessOnMaterial = new MeshBasicMaterial( {
+	this.refractiveOnMaterial = new MeshBasicMaterial( {
 		color: 'white'
 	} );
 
-	// metalnessOff material
+	// refractiveOff material
 
-	this.metalnessOffMaterial = new MeshBasicMaterial( {
+	this.refractiveOffMaterial = new MeshBasicMaterial( {
 		color: 'black'
 	});
 
@@ -202,14 +219,14 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.beautyRenderTarget.dispose();
 		this.specularRenderTarget.dispose();
 		this.normalRenderTarget.dispose();
-		this.metalnessRenderTarget.dispose();
+		this.refractiveRenderTarget.dispose();
 		this.ssrrRenderTarget.dispose();
 
 		// dispose materials
 
 		this.normalMaterial.dispose();
-		this.metalnessOnMaterial.dispose();
-		this.metalnessOffMaterial.dispose();
+		this.refractiveOnMaterial.dispose();
+		this.refractiveOffMaterial.dispose();
 		this.copyMaterial.dispose();
 		this.depthRenderMaterial.dispose();
 
@@ -266,7 +283,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.renderOverride(renderer, this.normalMaterial, this.normalRenderTarget, 0, 0);
 
-		this.renderMetalness( renderer, this.metalnessOnMaterial, this.metalnessRenderTarget, 0, 0 );
+		this.renderRefractive( renderer, this.refractiveOnMaterial, this.refractiveRenderTarget, 0, 0 );
 
 		// render SSRr
 
@@ -320,9 +337,9 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 				break;
 
-			case SSRrPass.OUTPUT.Metalness:
+			case SSRrPass.OUTPUT.Refractive:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.metalnessRenderTarget.texture;
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.refractiveRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -397,7 +414,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 	},
 
 
-	renderMetalness: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
+	renderRefractive: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
 		var originalClearAlpha = renderer.getClearAlpha( this.tempColor );
@@ -425,11 +442,11 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 			child._SSRrPassBackupMaterial = child.material;
 			if ( this.selects.includes( child ) ) {
 
-				child.material = this.metalnessOnMaterial;
+				child.material = this.refractiveOnMaterial;
 
 			} else {
 
-				child.material = this.metalnessOffMaterial;
+				child.material = this.refractiveOffMaterial;
 
 			}
 
@@ -466,7 +483,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.specularRenderTarget.setSize( width, height );
 		this.ssrrRenderTarget.setSize( width, height );
 		this.normalRenderTarget.setSize( width, height );
-		this.metalnessRenderTarget.setSize( width, height );
+		this.refractiveRenderTarget.setSize( width, height );
 
 		this.ssrrMaterial.uniforms[ 'resolution' ].value.set( width, height );
 		this.ssrrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
@@ -482,7 +499,7 @@ SSRrPass.OUTPUT = {
 	'Beauty': 3,
 	'Depth': 4,
 	'Normal': 5,
-	'Metalness': 7,
+	'Refractive': 7,
 };
 
 export { SSRrPass };
