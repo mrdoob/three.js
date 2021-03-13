@@ -27,7 +27,7 @@
 		import { GUI } from './jsm/libs/dat.gui.module.js';
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 		import { SSRPass } from './jsm/postprocessing/SSRPass.js';
-		import { ReflectorForSSRPass } from './jsm/objects/ReflectorForSSRPass.js';
+		import { Reflector } from './jsm/objects/ReflectorForSSRPass.js';
 
 		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
@@ -73,7 +73,7 @@
 				new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 			);
 			plane.rotation.x = - Math.PI / 2;
-			plane.position.y = - 0.0001;
+			plane.position.y = 0.0365;
 			// plane.receiveShadow = true;
 			scene.add( plane );
 
@@ -94,7 +94,6 @@
 
 				const material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
 				const mesh = new THREE.Mesh( geometry, material );
-				mesh.position.y = - 0.0365;
 				scene.add( mesh );
 				selects.push( mesh );
 
@@ -108,7 +107,7 @@
 			geometry = new THREE.BoxBufferGeometry( .05, .05, .05 );
 			material = new THREE.MeshStandardMaterial( { color: 'green' } );
 			mesh = new THREE.Mesh( geometry, material );
-			mesh.position.set( - .12, .025, .015 );
+			mesh.position.set( - .12, plane.position.y + .025, .015 );
 			scene.add( mesh );
 			otherMeshes.push( mesh );
 			selects.push( mesh );
@@ -116,7 +115,7 @@
 			geometry = new THREE.IcosahedronBufferGeometry( .025, 4 );
 			material = new THREE.MeshStandardMaterial( { color: 'cyan' } );
 			mesh = new THREE.Mesh( geometry, material );
-			mesh.position.set( - .05, .025, .08 );
+			mesh.position.set( - .05, plane.position.y + .025, .08 );
 			scene.add( mesh );
 			otherMeshes.push( mesh );
 			selects.push( mesh );
@@ -124,21 +123,21 @@
 			geometry = new THREE.ConeBufferGeometry( .025, .05, 64 );
 			material = new THREE.MeshStandardMaterial( { color: 'yellow' } );
 			mesh = new THREE.Mesh( geometry, material );
-			mesh.position.set( - .05, .025, - .055 );
+			mesh.position.set( - .05, plane.position.y + .025, - .055 );
 			scene.add( mesh );
 			otherMeshes.push( mesh );
 			selects.push( mesh );
 
-			geometry = new THREE.PlaneBufferGeometry( 1, 1 );
-			groundReflector = new ReflectorForSSRPass( geometry, {
-				clipBias: 0,
-				worldYBias: - 0.027450980392156862,
+			geometry = new THREE.PlaneBufferGeometry( 8, 8 );
+			groundReflector = new Reflector( geometry, {
+				clipBias: 0.003,
 				textureWidth: window.innerWidth,
 				textureHeight: window.innerHeight,
 				color: 0x888888,
 				useDepthTexture: true,
 			} );
 			groundReflector.material.depthWrite = false;
+			groundReflector.position.y = plane.position.y + .0001;
 			groundReflector.rotation.x = - Math.PI / 2;
 			groundReflector.visible = false;
 			scene.add( groundReflector );
@@ -153,7 +152,7 @@
 
 			controls = new OrbitControls( camera, renderer.domElement );
 			controls.enableDamping = true;
-			controls.target.set( 0, 0.0635, 0 );
+			controls.target.set( 0, 0.1, 0 );
 			controls.update();
 			controls.enabled = ! params.autoRotate;
 
@@ -286,7 +285,6 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			composer.setSize( window.innerWidth, window.innerHeight );
 			groundReflector.getRenderTarget().setSize( window.innerWidth, window.innerHeight );
-			groundReflector.resolution.set( window.innerWidth, window.innerHeight );
 
 		}
 
@@ -307,9 +305,9 @@
 				const timer = Date.now() * 0.0003;
 
 				camera.position.x = Math.sin( timer ) * 0.5;
-				camera.position.y = 0.2135;
+				camera.position.y = 0.25;
 				camera.position.z = Math.cos( timer ) * 0.5;
-				camera.lookAt( 0, 0.0635, 0 );
+				camera.lookAt( 0, 0.1, 0 );
 
 			} else {
 
@@ -319,8 +317,8 @@
 
 			if ( params.enableSSR ) {
 
-				// TODO: groundReflector has full ground info, need use it to solve reflection gaps problem on objects when camera near ground.
-				// TODO: the normal and depth info where groundReflector reflected need to be changed.
+				///todo: groundReflector has full ground info, need use it to solve reflection gaps problem on objects when camera near ground.
+				///todo: the normal info where groundReflector reflected need to be changed.
 				composer.render();
 
 			} else {

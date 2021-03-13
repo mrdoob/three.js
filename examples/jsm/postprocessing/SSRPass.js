@@ -76,7 +76,7 @@ var SSRPass = function ( { renderer, scene, camera, width, height, selects, enco
 		}
 	} );
 
-	this._isBouncing = isBouncing;
+	this._isBouncing = isBouncing; ///todo: don't need defineProperty
 	Object.defineProperty( this, 'isBouncing', {
 		get() {
 

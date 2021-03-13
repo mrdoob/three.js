@@ -40,93 +40,12 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	// this.output = 1;
 
 	this.ior = SSRrShader.uniforms.ior.value;
-	this.surfDist = SSRrShader.uniforms.surfDist.value;
 
 	this.encoding = encoding;
 
 	this.tempColor = new Color();
 
-	this._selects = selects;
-	this.isSelective = Array.isArray( this._selects );
-	Object.defineProperty( this, 'selects', {
-		get() {
-
-			return this._selects;
-
-		},
-		set( val ) {
-
-			if ( this._selects === val ) return;
-			this._selects = val;
-			if ( Array.isArray( val ) ) {
-
-				this.isSelective = true;
-				this.ssrrMaterial.defines.isSelective = true;
-				this.ssrrMaterial.needsUpdate = true;
-
-			} else {
-
-				this.isSelective = false;
-				this.ssrrMaterial.defines.isSelective = false;
-				this.ssrrMaterial.needsUpdate = true;
-
-			}
-
-		}
-	});
-
-	this._isDistanceAttenuation = SSRrShader.defines.isDistanceAttenuation;
-	Object.defineProperty( this, 'isDistanceAttenuation', {
-		get() {
-
-			return this._isDistanceAttenuation;
-
-		},
-		set( val ) {
-
-			if ( this._isDistanceAttenuation === val ) return;
-			this._isDistanceAttenuation = val;
-			this.ssrrMaterial.defines.isDistanceAttenuation = val;
-			this.ssrrMaterial.needsUpdate = true;
-
-		}
-	} );
-
-
-	this._isFresnel = SSRrShader.defines.isFresnel;
-	Object.defineProperty( this, 'isFresnel', {
-		get() {
-
-			return this._isFresnel;
-
-		},
-		set( val ) {
-
-			if ( this._isFresnel === val ) return;
-			this._isFresnel = val;
-			this.ssrrMaterial.defines.isFresnel = val;
-			this.ssrrMaterial.needsUpdate = true;
-
-		}
-	} );
-
-	this._isInfiniteThick = SSRrShader.defines.isInfiniteThick;
-	Object.defineProperty( this, 'isInfiniteThick', {
-		get() {
-
-			return this._isInfiniteThick;
-
-		},
-		set( val ) {
-
-			if ( this._isInfiniteThick === val ) return;
-			this._isInfiniteThick = val;
-			this.ssrrMaterial.defines.isInfiniteThick = val;
-			this.ssrrMaterial.needsUpdate = true;
-
-		}
-	} );
-	this.thickTolerance = SSRrShader.uniforms.thickTolerance.value;
+	this.selects = selects;
 
 	// beauty render target with depth buffer
 
@@ -201,16 +120,12 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 	this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
 	this.ssrrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
-	// if (this.isSelective) {
-	this.ssrrMaterial.defines.isSelective = this.isSelective;
 	this.ssrrMaterial.needsUpdate = true;
 	this.ssrrMaterial.uniforms[ 'tMetalness' ].value = this.metalnessRenderTarget.texture;
-	// }
 	this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 	this.ssrrMaterial.uniforms[ 'tDepthSelects' ].value = this.normalRenderTarget.depthTexture;
 	this.ssrrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 	this.ssrrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-	this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
 	this.ssrrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
 	this.ssrrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 	this.ssrrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
@@ -325,7 +240,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.scene.children.forEach(child => {
 			if (this.selects.includes(child)) {
 				child.visible=true
-				child._SSRrPassMaterialBack = child.material
+				child._SSRrPassBackupMaterial = child.material
 				child.material=this.specularMaterial
 			} else if(!child.isLight) {
 				child.visible = false
@@ -334,7 +249,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		renderer.render(this.scene, this.camera);
 		this.scene.children.forEach(child => {
 			if (this.selects.includes(child)) {
-				child.material=child._SSRrPassMaterialBack
+				child.material=child._SSRrPassBackupMaterial
 			}
 		})
 
@@ -355,9 +270,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		// render SSRr
 
-		this.ssrrMaterial.uniforms[ 'ior' ].value = 1 / this.ior;
-		this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
-		this.ssrrMaterial.uniforms[ 'thickTolerance' ].value = this.thickTolerance;
+		this.ssrrMaterial.uniforms[ 'ior' ].value = this.ior;
 		this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
 		this.renderPass( renderer, this.ssrrMaterial, this.ssrrRenderTarget );
 
@@ -509,8 +422,8 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		})
 		this.scene.traverse( child => {
 
-			child._SSRrPassMaterialBack = child.material;
-			if ( this._selects.includes( child ) ) {
+			child._SSRrPassBackupMaterial = child.material;
+			if ( this.selects.includes( child ) ) {
 
 				child.material = this.metalnessOnMaterial;
 
@@ -521,16 +434,16 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 			}
 
 		});
-		this.scene._background=this.scene.background
+		this.scene._SSRrPassBackupBackground=this.scene.background
 		this.scene.background=null
-		this.scene._fog=this.scene.fog // TODO: Formal writing.
+		this.scene._SSRrPassBackupFog=this.scene.fog
 		this.scene.fog=null
 		renderer.render(this.scene, this.camera);
-		this.scene.fog=this.scene._fog
-		this.scene.background=this.scene._background
+		this.scene.fog=this.scene._SSRrPassBackupFog
+		this.scene.background=this.scene._SSRrPassBackupBackground
 		this.scene.traverse( child => {
 
-			child.material = child._SSRrPassMaterialBack;
+			child.material = child._SSRrPassBackupMaterial;
 
 		} );
 

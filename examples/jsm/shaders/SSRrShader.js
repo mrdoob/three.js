@@ -8,10 +8,6 @@ var SSRrShader = {
   defines: {
     MAX_STEP: 0,
     isPerspectiveCamera: true,
-    isDistanceAttenuation: true,
-    isFresnel: true,
-    isInfiniteThick: false,
-    isSelective: false,
   },
 
   uniforms: {
@@ -29,8 +25,6 @@ var SSRrShader = {
     "cameraInverseProjectionMatrix": { value: new Matrix4() },
     "ior": { value: 1.03 },
     "cameraRange": { value: 0 },
-    "surfDist": { value: .007 },
-    "thickTolerance": { value: .03 },
 
   },
 
@@ -63,10 +57,8 @@ var SSRrShader = {
 		uniform float cameraNear;
 		uniform float cameraFar;
 		uniform float ior;
-		uniform float surfDist;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
-		uniform float thickTolerance;
 		#include <packing>
 		float pointToLineDistance(vec3 x0, vec3 x1, vec3 x2) {
 			//x0: point, x1: linePointA, x2: linePointB
@@ -143,7 +135,7 @@ var SSRrShader = {
 				vec3 viewIncidentDir=vec3(0,0,-1);
 			#endif
 
-			vec3 viewRefractDir=refract(viewIncidentDir,viewNormal,ior);
+			vec3 viewRefractDir=refract(viewIncidentDir,viewNormal,1./ior);
 			// https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/refract.xhtml
 
 			float maxDistance=100.;
@@ -179,10 +171,8 @@ var SSRrShader = {
 					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 					float recipVPZ=1./viewPosition.z;
 					float viewRefractRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
-					float sD=surfDist*cW;
 				#else
 					float viewRefractRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
-					float sD=surfDist;
 				#endif
 
 				if(viewRefractRayZ<vZ){

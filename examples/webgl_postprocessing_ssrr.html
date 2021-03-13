@@ -17,11 +17,7 @@
 		SSRrPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
 		click object to toggle transparent<br/>
 	</div>
-
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
-	<script>
-		var vConsole = new VConsole();
-	</script> -->
+	
 	<script type="module">
 		import * as THREE from '../build/three.module.js';
 
@@ -38,7 +34,6 @@
 		const params = {
 			enableSSRr: true,
 			autoRotate: true,
-			isOtherMeshes: true,
 		};
 		let composer;
 		let ssrrPass;
@@ -47,7 +42,6 @@
 		let stats;
 		let controls;
 		let camera, scene, renderer;
-		const otherMeshes = [];
 		const objects = [];
 		const selects = [];
 		const raycaster = new THREE.Raycaster();
@@ -62,13 +56,12 @@
 		dracoLoader.setDecoderConfig({ type: 'js' });
 
 		init();
+		animate();
 
-		async function init() {
+		function init() {
 
 			camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 15);
-			window.camera=camera
 			camera.position.set(0.13271600513224902, 0.3489546826045913, 0.43921296427927076);
-			// camera.position.set(0.29446848714184776, 0.18676188336260469, -0.4130312557062661);
 
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color(0x443333);
@@ -92,14 +85,11 @@
 			// plane.receiveShadow = true;
 			scene.add(plane);
 			plane.name='plane'
-			window.mesh_plane=plane
-			window.scene=scene
 
 			// Lights
 			const hemiLight = new THREE.HemisphereLight(0x443333, 0x111122);
 			hemiLight.name='hemiLight'
 			scene.add(hemiLight);
-			window.hemiLight=hemiLight
 
 			const spotLight = new THREE.SpotLight();
 			spotLight.name='spotLight'
@@ -108,29 +98,23 @@
 			// spotLight.castShadow = true;
 			spotLight.position.set(- 1, 1, 1);
 			scene.add(spotLight);
-			window.spotLight=spotLight
 
-			await new Promise(resolve => {
-				dracoLoader.load('models/draco/bunny.drc', function (geometry) {
+			dracoLoader.load('models/draco/bunny.drc', function (geometry) {
 
-					geometry.computeVertexNormals();
+				geometry.computeVertexNormals();
 
-					const material = new THREE.MeshStandardMaterial({ color: 0x606060 });
-					window.bunnyMaterial=material
-					const mesh = new THREE.Mesh(geometry, material);
-					mesh.position.y = - 0.0365;
-					mesh.name='bunny'
-					window.mesh_bunny=mesh
-					scene.add(mesh);
-					objects.push(mesh);
-					selects.push(mesh);
+				const material = new THREE.MeshStandardMaterial({ color: 0x606060 });
+				const mesh = new THREE.Mesh(geometry, material);
+				mesh.position.y = - 0.0365;
+				mesh.name='bunny'
+				scene.add(mesh);
+				objects.push(mesh);
+				selects.push(mesh);
 
-					// Release decoder resources.
-					dracoLoader.dispose();
+				// Release decoder resources.
+				dracoLoader.dispose();
 
-					resolve()
-				});
-			})
+			});
 
 			let geometry, material, mesh;
 
@@ -139,9 +123,7 @@
 			mesh = new THREE.Mesh(geometry, material);
 			mesh.position.set(- .12, .025, .015);
 			mesh.name='box'
-			window.mesh_box=mesh
 			scene.add(mesh);
-			otherMeshes.push(mesh);
 			objects.push( mesh );
 			selects.push( mesh );
 
@@ -150,9 +132,7 @@
 			mesh = new THREE.Mesh(geometry, material);
 			mesh.position.set(- .05, .025, .08);
 			mesh.name='sphere'
-			window.mesh_sphere=mesh
 			scene.add(mesh);
-			otherMeshes.push(mesh);
 			objects.push( mesh );
 			// selects.push( mesh );
 
@@ -161,9 +141,7 @@
 			mesh = new THREE.Mesh(geometry, material);
 			mesh.position.set(- .05, .025, - .055);
 			mesh.name='cone'
-			window.mesh_cone=mesh
 			scene.add(mesh);
-			otherMeshes.push(mesh);
 			objects.push( mesh );
 			// selects.push( mesh );
 
@@ -222,21 +200,6 @@
 			const folder = gui.addFolder('more settings');
 			folder.add(ssrrPass.specularMaterial, 'metalness').min(0).max(1).step(.01)
 			folder.add(ssrrPass.specularMaterial, 'roughness').min(0).max(1).step(.01)
-			folder.add(ssrrPass, 'isFresnel')
-			folder.add(ssrrPass, 'isDistanceAttenuation')
-			folder.add(params, 'isOtherMeshes').onChange(() => {
-
-				if (params.isOtherMeshes) {
-
-					otherMeshes.forEach(mesh => mesh.visible = true);
-
-				} else {
-
-					otherMeshes.forEach(mesh => mesh.visible = false);
-
-				}
-
-			});
 			folder.add(ssrrPass, 'output', {
 				'Default': SSRrPass.OUTPUT.Default,
 				'SSRr Only': SSRrPass.OUTPUT.SSRr,
@@ -249,27 +212,8 @@
 				ssrrPass.output = parseInt(value);
 
 			});
-			ssrrPass.opacity = 1;
-			folder.add(ssrrPass, 'opacity').min(0).max(1)
-
-			if (isPerspectiveCamera) {
-
-				ssrrPass.surfDist = 0.0015;
-				folder.add(ssrrPass, 'surfDist').min(0).max(.005).step(.0001);
-
-			} else {
-
-				ssrrPass.surfDist = 2;
-				folder.add(ssrrPass, 'surfDist').min(0).max(7).step(.01);
-
-			}
-
-			folder.add(ssrrPass, 'isInfiniteThick');
-			folder.add(ssrrPass, 'thickTolerance').min(0).max(.05).step(.0001);
 			// folder.open()
 			// gui.close()
-
-			animate();
 
 		}
 
