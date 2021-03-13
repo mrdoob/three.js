@@ -342,18 +342,17 @@
 
 		function extractQuery() {
 
-			const p = window.location.search.indexOf( '?q=' );
+			const search = window.location.search;
 
-			if ( p !== - 1 ) {
+			if ( search.indexOf( '?q=' ) !== - 1 ) {
 
-				return decodeURI( window.location.search.substr( 3 ) );
+				return decodeURI( search.substr( 3 ) );
 
 			}
 
 			return '';
 
 		}
-
 
 		function createElementFromHTML( htmlString ) {
 

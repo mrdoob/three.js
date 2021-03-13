@@ -133,6 +133,7 @@
 
 
 			// Functionality for search/filter input field
+
 			filterInput.onfocus = function () {
 
 				panel.classList.add( 'searchFocused' );
@@ -149,17 +150,17 @@
 
 			};
 
+			filterInput.oninput = function () {
+
+				updateFilter();
+
+			};
+
 			exitSearchButton.onclick = function () {
 
 				filterInput.value = '';
 				updateFilter();
 				panel.classList.remove( 'searchFocused' );
-
-			};
-
-			filterInput.oninput = function () {
-
-				updateFilter();
 
 			};
 
@@ -171,6 +172,18 @@
 
 			createNavigation( list, language );
 			createNewIframe();
+
+			// Handle search query
+
+			filterInput.value = extractQuery();
+
+			if ( filterInput.value !== '' ) {
+
+				panel.classList.add( 'searchFocused' );
+
+			}
+
+			updateFilter();
 
 		}
 
@@ -305,10 +318,36 @@
 
 		// Filtering
 
+		function extractQuery() {
+
+			const search = window.location.search;
+
+			if ( search.indexOf( '?q=' ) !== - 1 ) {
+
+				return decodeURI( search.substr( 3 ) );
+
+			}
+
+			return '';
+
+		}
+
 		function updateFilter() {
 
-			// (uncomment the following line and the "Query strings" section, if you want query strings):
-			// updateQueryString();
+			let v = filterInput.value.trim();
+			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
+
+			if ( v !== '' ) {
+
+				window.history.replaceState( {}, '', '?q=' + v + window.location.hash );
+
+			} else {
+
+				window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
+
+			}
+
+			//
 
 			const regExp = new RegExp( filterInput.value, 'gi' );
 
