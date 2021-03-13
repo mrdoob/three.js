@@ -2,7 +2,7 @@ import {
 	AnimationMixer,
 	Object3D,
 	Quaternion,
-	Vector3
+	Vector3,
 } from '../../../build/three.module.js';
 import { CCDIKSolver } from '../animation/CCDIKSolver.js';
 import { MMDPhysics } from '../animation/MMDPhysics.js';
@@ -316,13 +316,14 @@ var MMDAnimationHelper = ( function () {
 			this.objects.set( mesh, { looped: false } );
 
 			this._setupMeshAnimation( mesh, params.animation );
-
+			this._setupBoneOriginal( mesh );
+			
 			if ( params.physics !== false ) {
-
+				
 				this._setupMeshPhysics( mesh, params );
-
+				
 			}
-
+			
 			return this;
 
 		},
@@ -480,6 +481,24 @@ var MMDAnimationHelper = ( function () {
 			objects.grantSolver = this.createGrantSolver( mesh );
 
 			return this;
+
+		},
+
+		// Record original bone on userData
+		// because position grant need this.
+		_setupBoneOriginal: function ( mesh ) {
+
+			var bones = mesh.skeleton.bones;
+
+			for( var i = 0; i < bones.length; i++ ) {
+			
+				var bone = bones[i];
+
+				bone.userData = bone.userData || {};
+				bone.userData.MMD = bone.userData.MMD || {};
+				bone.userData.MMD.originalPos = bone.position.clone();
+
+			}
 
 		},
 
@@ -670,18 +689,28 @@ var MMDAnimationHelper = ( function () {
 
 				// @TODO: Support global grant and grant position
 				if ( grantSolver && boneData.grant &&
-					! boneData.grant.isLocal && boneData.grant.affectRotation ) {
+					! boneData.grant.isLocal ) {
 
 					var parentIndex = boneData.grant.parentIndex;
 					var ratio = boneData.grant.ratio;
 
-					if ( ! grantResultMap.has( parentIndex ) ) {
-
-						updateOne( mesh, parentIndex, ikSolver, grantSolver );
+					if( boneData.grant.affectRotation ) {
+	
+						if ( ! grantResultMap.has( parentIndex ) ) {
+	
+							updateOne( mesh, parentIndex, ikSolver, grantSolver );
+	
+						}
+	
+						grantSolver.addGrantRotation( bone, grantResultMap.get( parentIndex ), ratio );
 
 					}
 
-					grantSolver.addGrantRotation( bone, grantResultMap.get( parentIndex ), ratio );
+					if( boneData.grant.affectPosition && bones[parentIndex].userData.MMD ) {
+
+						grantSolver.addGrantPosition( bone, bones[parentIndex], ratio );
+
+					}
 
 				}
 
@@ -1201,7 +1230,7 @@ var MMDAnimationHelper = ( function () {
 
 				// TODO: implement
 				if ( grant.affectPosition ) {
-
+					
 				}
 
 				if ( grant.affectRotation ) {
@@ -1229,6 +1258,26 @@ var MMDAnimationHelper = ( function () {
 				return this;
 
 			};
+
+		}(),
+
+		addGrantPosition: function () {
+
+			var vector3 = new Vector3();
+
+			return function ( bone, parentBone, ratio ) {
+
+				vector3.subVectors(
+					parentBone.position,
+					parentBone.userData.MMD.originalPos
+				);
+				vector3.multiplyScalar( ratio );
+
+				bone.position.add( vector3 );
+				
+				return this;
+
+			}
 
 		}()
 
