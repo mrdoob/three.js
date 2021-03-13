@@ -7,8 +7,8 @@ var SSRrShader = {
 
   defines: {
 		MAX_STEP: 0,
-		isPerspectiveCamera: true,
-		specular: true,
+		PERSPECTIVE_CAMERA: true,
+		SPECULAR: true,
   },
 
   uniforms: {
@@ -84,7 +84,7 @@ var SSRrShader = {
 			return texture2D( tDepthSelects, uv ).x;
 		}
 		float getViewZ( const in float depth ) {
-			#ifdef isPerspectiveCamera
+			#ifdef PERSPECTIVE_CAMERA
 				return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
 			#else
 				return orthographicDepthToViewZ( depth, cameraNear, cameraFar );
@@ -130,7 +130,7 @@ var SSRrShader = {
 			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
 
-			#ifdef isPerspectiveCamera
+			#ifdef PERSPECTIVE_CAMERA
 				vec3 viewIncidentDir=normalize(viewPosition);
 			#else
 				vec3 viewIncidentDir=vec3(0,0,-1);
@@ -141,7 +141,7 @@ var SSRrShader = {
 
 			float maxDistance=100.;
 			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
-			#ifdef isPerspectiveCamera
+			#ifdef PERSPECTIVE_CAMERA
 				if(d1viewPosition.z>-cameraNear){
 					//https://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfLines.aspx
 					float t=(-cameraNear-viewPosition.z)/viewRefractDir.z;
@@ -168,7 +168,7 @@ var SSRrShader = {
 				float cW = cameraProjectionMatrix[2][3] * vZ+cameraProjectionMatrix[3][3];
 				vec3 vP=getViewPosition( uv, d, cW );
 
-				#ifdef isPerspectiveCamera
+				#ifdef PERSPECTIVE_CAMERA
 					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 					float recipVPZ=1./viewPosition.z;
 					float viewRefractRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
@@ -179,7 +179,7 @@ var SSRrShader = {
 				if(viewRefractRayZ<vZ){
 				// if(viewRefractRayZ<vZ&&vZ-viewRefractRayZ<.05){
 					vec4 refractColor=texture2D(tDiffuse,uv);
-					#ifdef specular
+					#ifdef SPECULAR
 						vec4 specularColor=texture2D(tSpecular,vUv);
 						gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);
 						// gl_FragColor.xyz=refractColor.xyz*(1.+specularColor.r*3.);
@@ -191,7 +191,7 @@ var SSRrShader = {
 				}
 			}
 
-			#ifdef specular
+			#ifdef SPECULAR
 				// TODO: Codes below can solve ( somewhat a hack ) the tiny gaps display error when viewNormal directly face camera. Need to find the root cause of the problem.
 				vec4 refractColor=texture2D(tDiffuse,vUv);
 				vec4 specularColor=texture2D(tSpecular,vUv);

@@ -23,7 +23,7 @@ import { SSRrShader } from '../shaders/SSRrShader.js';
 import { SSRrDepthShader } from '../shaders/SSRrShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
-var SSRrPass = function ( { renderer, scene, camera, width, height, selects, encoding, isPerspectiveCamera = true, morphTargets = false } ) {
+var SSRrPass = function ( { renderer, scene, camera, width, height, selects, encoding, morphTargets = false } ) {
 
 	Pass.call( this );
 
@@ -47,7 +47,7 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 
 	this.selects = selects;
 
-	this._specular = SSRrShader.defines.specular;
+	this._specular = SSRrShader.defines.SPECULAR;
 	Object.defineProperty( this, 'specular', {
 		get() {
 
@@ -58,7 +58,7 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 
 			if ( this._specular === val ) return;
 			this._specular = val;
-			this.ssrrMaterial.defines.specular = val;
+			this.ssrrMaterial.defines.SPECULAR = val;
 			this.ssrrMaterial.needsUpdate = true;
 
 		}
@@ -127,12 +127,6 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 		fragmentShader: SSRrShader.fragmentShader,
 		blending: NoBlending
 	} );
-	if ( ! isPerspectiveCamera ) {
-
-		this.ssrrMaterial.defines.isPerspectiveCamera = isPerspectiveCamera;
-		this.ssrrMaterial.needsUpdate = true;
-
-	}
 
 	this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 	this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
