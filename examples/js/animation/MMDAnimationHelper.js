@@ -307,6 +307,7 @@ THREE.MMDAnimationHelper = ( function () {
 			this.objects.set( mesh, { looped: false } );
 
 			this._setupMeshAnimation( mesh, params.animation );
+			this._setupBoneOriginal( mesh );
 
 			if ( params.physics !== false ) {
 
@@ -591,6 +592,24 @@ THREE.MMDAnimationHelper = ( function () {
 
 		},
 
+		// Record original bone on userData
+		// because position grant need this.
+		_setupBoneOriginal: function ( mesh ) {
+
+			var bones = mesh.skeleton.bones;
+
+			for( var i = 0; i < bones.length; i++ ) {
+			
+				var bone = bones[i];
+
+				bone.userData = bone.userData || {};
+				bone.userData.MMD = bone.userData.MMD || {};
+				bone.userData.MMD.originalPos = bone.position.clone();
+
+			}
+
+		},
+
 		// Sort bones in order by 1. transformationClass and 2. bone index.
 		// In PMX animation system, bone transformations should be processed
 		// in this order.
@@ -660,19 +679,28 @@ THREE.MMDAnimationHelper = ( function () {
 				grantResultMap.set( boneIndex, quaternion.copy( bone.quaternion ) );
 
 				// @TODO: Support global grant and grant position
-				if ( grantSolver && boneData.grant &&
-					! boneData.grant.isLocal && boneData.grant.affectRotation ) {
+				if ( grantSolver && boneData.grant && ! boneData.grant.isLocal ) {
 
 					var parentIndex = boneData.grant.parentIndex;
 					var ratio = boneData.grant.ratio;
 
-					if ( ! grantResultMap.has( parentIndex ) ) {
-
-						updateOne( mesh, parentIndex, ikSolver, grantSolver );
+					if( boneData.grant.affectRotation ) {
+	
+						if ( ! grantResultMap.has( parentIndex ) ) {
+	
+							updateOne( mesh, parentIndex, ikSolver, grantSolver );
+	
+						}
+	
+						grantSolver.addGrantRotation( bone, grantResultMap.get( parentIndex ), ratio );
 
 					}
 
-					grantSolver.addGrantRotation( bone, grantResultMap.get( parentIndex ), ratio );
+					if( boneData.grant.affectPosition && bones[parentIndex].userData.MMD ) {
+
+						grantSolver.addGrantPosition( bone, bones[parentIndex], ratio );
+
+					}
 
 				}
 
@@ -1220,6 +1248,26 @@ THREE.MMDAnimationHelper = ( function () {
 				return this;
 
 			};
+
+		}(),
+
+		addGrantPosition: function () {
+
+			var vector3 = new THREE.Vector3();
+
+			return function ( bone, parentBone, ratio ) {
+
+				vector3.subVectors(
+					parentBone.position,
+					parentBone.userData.MMD.originalPos
+				);
+				vector3.multiplyScalar( ratio );
+
+				bone.position.add( vector3 );
+				
+				return this;
+
+			}
 
 		}()
 

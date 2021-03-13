@@ -317,13 +317,13 @@ var MMDAnimationHelper = ( function () {
 
 			this._setupMeshAnimation( mesh, params.animation );
 			this._setupBoneOriginal( mesh );
-			
+
 			if ( params.physics !== false ) {
-				
+
 				this._setupMeshPhysics( mesh, params );
-				
+
 			}
-			
+
 			return this;
 
 		},
@@ -484,24 +484,6 @@ var MMDAnimationHelper = ( function () {
 
 		},
 
-		// Record original bone on userData
-		// because position grant need this.
-		_setupBoneOriginal: function ( mesh ) {
-
-			var bones = mesh.skeleton.bones;
-
-			for( var i = 0; i < bones.length; i++ ) {
-			
-				var bone = bones[i];
-
-				bone.userData = bone.userData || {};
-				bone.userData.MMD = bone.userData.MMD || {};
-				bone.userData.MMD.originalPos = bone.position.clone();
-
-			}
-
-		},
-
 		_setupCameraAnimation: function ( camera, animation ) {
 
 			var animations = Array.isArray( animation )
@@ -619,6 +601,24 @@ var MMDAnimationHelper = ( function () {
 
 		},
 
+		// Record original bone on userData
+		// because position grant need this.
+		_setupBoneOriginal: function ( mesh ) {
+
+			var bones = mesh.skeleton.bones;
+
+			for( var i = 0; i < bones.length; i++ ) {
+			
+				var bone = bones[i];
+
+				bone.userData = bone.userData || {};
+				bone.userData.MMD = bone.userData.MMD || {};
+				bone.userData.MMD.originalPos = bone.position.clone();
+
+			}
+
+		},
+
 		// Sort bones in order by 1. transformationClass and 2. bone index.
 		// In PMX animation system, bone transformations should be processed
 		// in this order.
@@ -688,8 +688,7 @@ var MMDAnimationHelper = ( function () {
 				grantResultMap.set( boneIndex, quaternion.copy( bone.quaternion ) );
 
 				// @TODO: Support global grant and grant position
-				if ( grantSolver && boneData.grant &&
-					! boneData.grant.isLocal ) {
+				if ( grantSolver && boneData.grant && ! boneData.grant.isLocal ) {
 
 					var parentIndex = boneData.grant.parentIndex;
 					var ratio = boneData.grant.ratio;
@@ -1230,7 +1229,7 @@ var MMDAnimationHelper = ( function () {
 
 				// TODO: implement
 				if ( grant.affectPosition ) {
-					
+
 				}
 
 				if ( grant.affectRotation ) {
