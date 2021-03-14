@@ -339,6 +339,14 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 				break;
 
+			case SSRrPass.OUTPUT.Specular:
+
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.specularRenderTarget.texture;
+				this.copyMaterial.blending = NoBlending;
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+
+				break;
+
 			default:
 				console.warn( 'THREE.SSRrPass: Unknown output type.' );
 
@@ -494,6 +502,7 @@ SSRrPass.OUTPUT = {
 	'Depth': 4,
 	'Normal': 5,
 	'Refractive': 7,
+	'Specular': 8,
 };
 
 export { SSRrPass };
