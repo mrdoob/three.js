@@ -1630,7 +1630,7 @@ THREE.SVGLoader.createShapes = function ( shapePath ) {
 		BEHIND: 5,
 		BEYOND: 6
 	};
-	
+
 	const classifyResult = {
 		loc: IntersectionLocationType.ORIGIN,
 		t: 0
@@ -1674,8 +1674,8 @@ THREE.SVGLoader.createShapes = function ( shapePath ) {
 
 				} else if ( classifyResult.loc == IntersectionLocationType.BETWEEN ) {
 
-					x = + ( ( x1 + classifyResult.t * ( x2 - x1 ) ).toPrecision( 10 ) );
-					y = + ( ( y1 + classifyResult.t * ( y2 - y1 ) ).toPrecision( 10 ) );
+					var x = + ( ( x1 + classifyResult.t * ( x2 - x1 ) ).toPrecision( 10 ) );
+					var y = + ( ( y1 + classifyResult.t * ( y2 - y1 ) ).toPrecision( 10 ) );
 					return { x: x, y: y, t: classifyResult.t, };
 
 				}
