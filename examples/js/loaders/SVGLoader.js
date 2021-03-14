@@ -1630,54 +1630,59 @@ THREE.SVGLoader.createShapes = function ( shapePath ) {
 		BEHIND: 5,
 		BEYOND: 6
 	};
+	
+	const classifyResult = {
+		loc: IntersectionLocationType.ORIGIN,
+		t: 0
+	}
 
-	function findEdgeIntersection( edge1, edge2 ) {
+	function findEdgeIntersection( a0, a1, b0, b1 ) {
 
-		var x1 = edge1[ 0 ].x;
-		var x2 = edge1[ 1 ].x;
-		var x3 = edge2[ 0 ].x;
-		var x4 = edge2[ 1 ].x;
-		var y1 = edge1[ 0 ].y;
-		var y2 = edge1[ 1 ].y;
-		var y3 = edge2[ 0 ].y;
-		var y4 = edge2[ 1 ].y;
+		var x1 = a0.x;
+		var x2 = a1.x;
+		var x3 = b0.x;
+		var x4 = b1.x;
+		var y1 = a0.y;
+		var y2 = a1.y;
+		var y3 = b0.y;
+		var y4 = b1.y;
 		var nom1 = ( x4 - x3 ) * ( y1 - y3 ) - ( y4 - y3 ) * ( x1 - x3 );
 		var nom2 = ( x2 - x1 ) * ( y1 - y3 ) - ( y2 - y1 ) * ( x1 - x3 );
 		var denom = ( y4 - y3 ) * ( x2 - x1 ) - ( x4 - x3 ) * ( y2 - y1 );
 		var t1 = nom1 / denom;
 		var t2 = nom2 / denom;
-		var interPoints = [];
 
 		if ( ( ( denom === 0 ) && ( nom1 !== 0 ) ) || ( t1 <= 0 ) || ( t1 >= 1 ) || ( t2 < 0 ) || ( t2 > 1 ) ) {
 
 			//1. lines are parallel or edges don't intersect
 
-			return interPoints;
+			return null;
 
 		} else if ( ( nom1 === 0 ) && ( denom === 0 ) ) {
 
 			//2. lines are colinear
 
-			//check if endpoints of edge2 lies on edge1
+			//check if endpoints of edge2 (b0-b1) lies on edge1 (a0-a1)
 			for ( var i = 0; i < 2; i ++ ) {
 
-				var classify = classifyPoint( edge2[ i ], edge1 );
+				classifyPoint( i === 0 ? b0 : b1, a0, a1 );
 				//find position of this endpoints relatively to edge1
-				if ( classify.loc == IntersectionLocationType.ORIGIN ) {
+				if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
 
-					interPoints.push( { x: edge2[ i ].x, y: edge2[ i ].y, t: classify.t } );
+					var point = ( i === 0 ? b0 : b1 );
+					return { x: point.x, y: point.y, t: classifyResult.t };
 
-				} else if ( classify.loc == IntersectionLocationType.BETWEEN ) {
+				} else if ( classifyResult.loc == IntersectionLocationType.BETWEEN ) {
 
-					x = + ( ( x1 + classify.t * ( x2 - x1 ) ).toPrecision( 10 ) );
-					y = + ( ( y1 + classify.t * ( y2 - y1 ) ).toPrecision( 10 ) );
-					interPoints.push( { x: x, y: y, t: classify.t, } );
+					x = + ( ( x1 + classifyResult.t * ( x2 - x1 ) ).toPrecision( 10 ) );
+					y = + ( ( y1 + classifyResult.t * ( y2 - y1 ) ).toPrecision( 10 ) );
+					return { x: x, y: y, t: classifyResult.t, };
 
 				}
 
 			}
 
-			return interPoints;
+			return null;
 
 		} else {
 
@@ -1685,73 +1690,75 @@ THREE.SVGLoader.createShapes = function ( shapePath ) {
 
 			for ( var i = 0; i < 2; i ++ ) {
 
-				var classify = classifyPoint( edge2[ i ], edge1 );
+				classifyPoint( i === 0 ? b0 : b1, a0, a1 );
 
-				if ( classify.loc == IntersectionLocationType.ORIGIN ) {
+				if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
 
-					interPoints.push( { x: edge2[ i ].x, y: edge2[ i ].y, t: classify.t } );
+					var point = ( i === 0 ? b0 : b1 );
+					return { x: point.x, y: point.y, t: classifyResult.t };
 
 				}
 
 			}
 
-			if ( interPoints.length > 0 ) {
-
-				return interPoints;
-
-			}
-
 			var x = + ( ( x1 + t1 * ( x2 - x1 ) ).toPrecision( 10 ) );
 			var y = + ( ( y1 + t1 * ( y2 - y1 ) ).toPrecision( 10 ) );
-			interPoints.push( { x: x, y: y, t: t1 } );
-
-			return interPoints;
+			return { x: x, y: y, t: t1 };
 
 		}
 
 	}
 
-	function classifyPoint( p, edge ) {
+	function classifyPoint( p, edgeStart, edgeEnd ) {
 
-		var ax = edge[ 1 ].x - edge[ 0 ].x;
-		var ay = edge[ 1 ].y - edge[ 0 ].y;
-		var bx = p.x - edge[ 0 ].x;
-		var by = p.y - edge[ 0 ].y;
+		var ax = edgeEnd.x - edgeStart.x;
+		var ay = edgeEnd.y - edgeStart.y;
+		var bx = p.x - edgeStart.x;
+		var by = p.y - edgeStart.y;
 		var sa = ax * by - bx * ay;
 
-		if ( ( p.x === edge[ 0 ].x ) && ( p.y === edge[ 0 ].y ) ) {
+		if ( ( p.x === edgeStart.x ) && ( p.y === edgeStart.y ) ) {
 
-			return { loc: IntersectionLocationType.ORIGIN, t: 0 };
+			classifyResult.loc = IntersectionLocationType.ORIGIN;
+			classifyResult.t = 0;
+			return;
 
 		}
 
-		if ( ( p.x === edge[ 1 ].x ) && ( p.y === edge[ 1 ].y ) ) {
+		if ( ( p.x === edgeEnd.x ) && ( p.y === edgeEnd.y ) ) {
 
-			return { loc: IntersectionLocationType.DESTINATION, t: 1 };
+			classifyResult.loc = IntersectionLocationType.DESTINATION;
+			classifyResult.t = 1;
+			return;
 
 		}
 
 		if ( sa < - Number.EPSILON ) {
 
-			return { loc: IntersectionLocationType.LEFT };
+			classifyResult.loc = IntersectionLocationType.LEFT;
+			return;
 
 		}
 
 		if ( sa > Number.EPSILON ) {
 
-			return { loc: IntersectionLocationType.RIGHT };
+			classifyResult.loc = IntersectionLocationType.RIGHT;
+			return;
+
 
 		}
 
 		if ( ( ( ax * bx ) < 0 ) || ( ( ay * by ) < 0 ) ) {
 
-			return { loc: IntersectionLocationType.BEHIND };
+			classifyResult.loc = IntersectionLocationType.BEHIND;
+			return;
 
 		}
 
 		if ( ( Math.sqrt( ax * ax + ay * ay ) ) < ( Math.sqrt( bx * bx + by * by ) ) ) {
 
-			return { loc: IntersectionLocationType.BEYOND };
+			classifyResult.loc = IntersectionLocationType.BEYOND;
+			return;
 
 		}
 
@@ -1767,7 +1774,8 @@ THREE.SVGLoader.createShapes = function ( shapePath ) {
 
 		}
 
-		return { loc: IntersectionLocationType.BETWEEN, t: t };
+		classifyResult.loc = IntersectionLocationType.BETWEEN;
+		classifyResult.t = t;
 
 	}
 
@@ -1786,12 +1794,12 @@ THREE.SVGLoader.createShapes = function ( shapePath ) {
 				const path2EdgeStart = path2[ index2 - 1 ];
 				const path2EdgeEnd = path2[ index2 ];
 
-				const intersection = findEdgeIntersection( [ path1EdgeStart, path1EdgeEnd ], [ path2EdgeStart, path2EdgeEnd ] );
+				const intersection = findEdgeIntersection( path1EdgeStart, path1EdgeEnd, path2EdgeStart, path2EdgeEnd );
 
-				if ( intersection.length !== 0 && intersectionsRaw.find(i => i.t <= intersection[ 0 ].t + Number.EPSILON && i.t >= intersection[ 0 ].t - Number.EPSILON) === undefined ) {
+				if ( intersection !== null && intersectionsRaw.find(i => i.t <= intersection.t + Number.EPSILON && i.t >= intersection.t - Number.EPSILON) === undefined ) {
 
-					intersectionsRaw.push(intersection[ 0 ]);
-					intersections.push( new THREE.Vector2( intersection[ 0 ].x, intersection[ 0 ].y ) );
+					intersectionsRaw.push( intersection );
+					intersections.push( new THREE.Vector2( intersection.x, intersection.y ) );
 
 				}
 
@@ -1953,7 +1961,7 @@ THREE.SVGLoader.createShapes = function ( shapePath ) {
 	let identifier = 0;
 
 	let scanlineMinX = BIGNUMBER;
-	let scanlineMaxX = -BIGNUMBER;
+	let scanlineMaxX = - BIGNUMBER;
 
 	let simplePaths = shapePath.subPaths.map( p => {
 
@@ -1967,7 +1975,7 @@ THREE.SVGLoader.createShapes = function ( shapePath ) {
 
 		for ( let i = 0; i < points.length; i ++ ) {
 
-			let p = points[i];
+			const p = points[ i ];
 
 			if ( p.y > maxY ) {
 
@@ -1992,23 +2000,27 @@ THREE.SVGLoader.createShapes = function ( shapePath ) {
 				minX = p.x;
 
 			}
-		
+
 		}
 
 		//
-		if (scanlineMaxX <= maxX) {
+		if ( scanlineMaxX <= maxX ) {
+
 			scanlineMaxX = maxX + 1;
+
 		}
 
-		if (scanlineMinX >= minX) {
+		if ( scanlineMinX >= minX ) {
+
 			scanlineMinX = minX - 1;
+
 		}
 
 		return { points: points, isCW: THREE.ShapeUtils.isClockWise( points ), identifier: identifier ++, boundingBox: new THREE.Box2( new THREE.Vector2( minX, minY ), new THREE.Vector2( maxX, maxY ) ) };
 
 	} );
 
-	simplePaths = simplePaths.filter(sp => sp.points.length > 0);
+	simplePaths = simplePaths.filter( sp => sp.points.length > 0 );
 
 	// check if path is solid or a hole
 	const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData.style.fillRule ) );
@@ -2018,7 +2030,7 @@ THREE.SVGLoader.createShapes = function ( shapePath ) {
 	simplePaths.forEach( p => {
 
 		const amIAHole = isAHole[ p.identifier ];
-		
+
 		if ( ! amIAHole.isHole ) {
 
 			const shape = new THREE.Shape( p.points );
