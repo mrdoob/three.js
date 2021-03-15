@@ -910,6 +910,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
+		// for simplicity the code assumes attributes are not shared across geometries, see #15811
+
 		data.data = { attributes: {} };
 
 		const index = this.index;
