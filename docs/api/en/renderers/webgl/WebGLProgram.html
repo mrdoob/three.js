@@ -56,8 +56,13 @@
 		<div>
 		<code>
 		#ifdef USE_COLOR
-			// vertex color attribute
-			attribute vec3 color;
+			#ifdef USE_VERTEX_ALPHA
+				// vertex color attribute with alpha channel
+				attribute vec4 color;
+			#else
+				// vertex color attribute without alpha channel
+				attribute vec3 color;
+			#endif
 		#endif
 		</code>
 		<code>

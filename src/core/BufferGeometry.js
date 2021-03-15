@@ -879,6 +879,14 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
+	hasColorAlpha: function () {
+
+		const colorAttribute = this.getAttribute( 'color' );
+
+		return colorAttribute !== undefined && colorAttribute.itemSize === 4;
+
+	},
+
 	toJSON: function () {
 
 		const data = {
