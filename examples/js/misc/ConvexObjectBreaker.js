@@ -347,7 +347,7 @@ THREE.ConvexObjectBreaker.prototype = {
 					var intersection = new THREE.Vector3();
 					intersection = localPlane.intersectLine( this.tempLine1, intersection );
 
-					if ( intersection === undefined ) {
+					if ( intersection === null ) {
 
 						// Shouldn't happen
 						console.error( 'Internal error: segment does not intersect plane.' );
