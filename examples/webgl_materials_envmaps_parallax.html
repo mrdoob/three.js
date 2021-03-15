@@ -362,7 +362,7 @@
 
 				RectAreaLightUniformsLib.init();
 
-				const blueRectLight = new THREE.RectAreaLight( 0xf3aaaa, intensity, width, height );
+				const blueRectLight = new THREE.RectAreaLight( 0x9aaeff, intensity, width, height );
 				blueRectLight.position.set( 99, 5, 0 );
 				blueRectLight.lookAt( 0, 5, 0 );
 				scene.add( blueRectLight );
@@ -370,7 +370,7 @@
 				const blueRectLightHelper = new RectAreaLightHelper( blueRectLight );
 				blueRectLight.add( blueRectLightHelper );
 
-				const redRectLight = new THREE.RectAreaLight( 0x9aaeff, intensity, width, height );
+				const redRectLight = new THREE.RectAreaLight( 0xf3aaaa, intensity, width, height );
 				redRectLight.position.set( - 99, 5, 0 );
 				redRectLight.lookAt( 0, 5, 0 );
 				scene.add( redRectLight );
