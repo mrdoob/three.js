@@ -14,7 +14,7 @@ import {
   InterleavedBuffer,
   InterleavedBufferAttribute,
   BufferAttribute
-} from 'three/build/three.module';
+} from '../../../../build/three.module';
 
 var IfcLoader = function (manager) {
   Loader.call(this, manager);
