@@ -1,28 +1,48 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
+import { RGBFormat, LinearFilter } from '../constants.js';
 import { Texture } from './Texture.js';
 
-function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+class VideoTexture extends Texture {
 
-	Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+	constructor( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.generateMipmaps = false;
+		super( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
-}
+		this.format = format !== undefined ? format : RGBFormat;
 
-VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
+		this.minFilter = minFilter !== undefined ? minFilter : LinearFilter;
+		this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
 
-	constructor: VideoTexture,
+		this.generateMipmaps = false;
 
-	isVideoTexture: true,
+		const scope = this;
 
-	update: function () {
+		function updateVideo() {
 
-		var video = this.image;
+			scope.needsUpdate = true;
+			video.requestVideoFrameCallback( updateVideo );
 
-		if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+		}
+
+		if ( 'requestVideoFrameCallback' in video ) {
+
+			video.requestVideoFrameCallback( updateVideo );
+
+		}
+
+	}
+
+	clone() {
+
+		return new this.constructor( this.image ).copy( this );
+
+	}
+
+	update() {
+
+		const video = this.image;
+		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
+
+		if ( hasVideoFrameCallback === false && video.readyState >= video.HAVE_CURRENT_DATA ) {
 
 			this.needsUpdate = true;
 
@@ -30,7 +50,8 @@ VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
 
 	}
 
-} );
+}
 
+VideoTexture.prototype.isVideoTexture = true;
 
 export { VideoTexture };

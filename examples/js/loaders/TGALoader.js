@@ -1,45 +1,12 @@
-/*
- * @author Daosheng Mu / https://github.com/DaoshengMu/
- * @author mrdoob / http://mrdoob.com/
- * @author takahirox / https://github.com/takahirox/
- */
-
 THREE.TGALoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.DataTextureLoader.call( this, manager );
 
 };
 
-THREE.TGALoader.prototype = {
+THREE.TGALoader.prototype = Object.assign( Object.create( THREE.DataTextureLoader.prototype ), {
 
 	constructor: THREE.TGALoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		var scope = this;
-
-		var texture = new THREE.Texture();
-
-		var loader = new THREE.FileLoader( this.manager );
-		loader.setResponseType( 'arraybuffer' );
-		loader.setPath( this.path );
-
-		loader.load( url, function ( buffer ) {
-
-			texture.image = scope.parse( buffer );
-			texture.needsUpdate = true;
-
-			if ( onLoad !== undefined ) {
-
-				onLoad( texture );
-
-			}
-
-		}, onProgress, onError );
-
-		return texture;
-
-	},
 
 	parse: function ( buffer ) {
 
@@ -58,9 +25,10 @@ THREE.TGALoader.prototype = {
 						console.error( 'THREE.TGALoader: Invalid type colormap data for indexed type.' );
 
 					}
+
 					break;
 
-				// check colormap type
+					// check colormap type
 
 				case TGA_TYPE_RGB:
 				case TGA_TYPE_GREY:
@@ -71,14 +39,15 @@ THREE.TGALoader.prototype = {
 						console.error( 'THREE.TGALoader: Invalid type colormap data for colormap type.' );
 
 					}
+
 					break;
 
-				// What the need of a file without data ?
+					// What the need of a file without data ?
 
 				case TGA_TYPE_NO_DATA:
 					console.error( 'THREE.TGALoader: No data.' );
 
-				// Invalid type ?
+					// Invalid type ?
 
 				default:
 					console.error( 'THREE.TGALoader: Invalid type "%s".', header.image_type );
@@ -166,11 +135,13 @@ THREE.TGALoader.prototype = {
 						// raw pixels
 
 						count *= pixel_size;
+
 						for ( i = 0; i < count; ++ i ) {
 
 							pixel_data[ shift + i ] = data[ offset ++ ];
 
 						}
+
 						shift += count;
 
 					}
@@ -471,7 +442,7 @@ THREE.TGALoader.prototype = {
 				flags: content[ offset ++ ]
 			};
 
-			// check tga if it is valid format
+		// check tga if it is valid format
 
 		tgaCheckHeader( header );
 
@@ -522,27 +493,21 @@ THREE.TGALoader.prototype = {
 
 		//
 
-		var canvas = document.createElement( 'canvas' );
-		canvas.width = header.width;
-		canvas.height = header.height;
-
-		var context = canvas.getContext( '2d' );
-		var imageData = context.createImageData( header.width, header.height );
-
+		var imageData = new Uint8Array( header.width * header.height * 4 );
 		var result = tgaParse( use_rle, use_pal, header, offset, content );
-		var rgbaData = getTgaRGBA( imageData.data, header.width, header.height, result.pixel_data, result.palettes );
+		getTgaRGBA( imageData, header.width, header.height, result.pixel_data, result.palettes );
 
-		context.putImageData( imageData, 0, 0 );
+		return {
 
-		return canvas;
+			data: imageData,
+			width: header.width,
+			height: header.height,
+			flipY: true,
+			generateMipmaps: true,
+			minFilter: THREE.LinearMipmapLinearFilter,
 
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
+		};
 
 	}
 
-};
+} );

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>如何创建VR内容（[name]）</h1>
+
+	<p>
+		本指南简要介绍了使用three.js来制作的基于Web的VR应用程序的基本组件。
+	</p>
+
+	<h2>工作流程</h2>
+
+	<p>
+		首先，你需要将[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/VRButton.js VRButton.js]
+		包含到你的项目中。
+	</p>
+
+	<code>
+import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
+	</code>
+
+	<p>*VRButton.createButton()*做了两件重要的事情：首先，它创建了一个按钮，指示了VR的兼容性；
+		此外，若用户激活了这个按钮，则它将开启一个VR会话。
+		你所要做的唯一一件事情，便是把下面的这一行代码加入到你的应用程序里。
+	</p>
+
+	<code>
+document.body.appendChild( VRButton.createButton( renderer ) );
+	</code>
+
+	<p>
+		接下来，你需要告诉你的*WebGLRenderer*实例来启用XR渲染。
+	</p>
+
+	<code>
+renderer.xr.enabled = true;
+	</code>
+
+	<p>
+		最后，你需要调整你的动画循环，因为在这里我们不能使用我们所熟知的
+		*window.requestAnimationFrame()*函数来更新场景。对于VR项目来说，我们使用的是[page:WebGLRenderer.setAnimationLoop setAnimationLoop]。
+
+		简短的示例代码如下：
+	</p>
+
+	<code>
+renderer.setAnimationLoop( function () {
+
+	renderer.render( scene, camera );
+
+} );
+	</code>
+
+	<h2>接下来的步骤</h2>
+
+	<p>
+		请查看官方示例中与WebVR相关的示例，了解这一工作流程的实际使用、运行情况。
+		<br /><br />
+
+		[example:webxr_vr_ballshooter WebXR / VR / ballshooter]<br />
+		[example:webxr_vr_cubes WebXR / VR / cubes]<br />
+		[example:webxr_vr_dragging WebXR / VR / dragging]<br />
+		[example:webxr_vr_lorenzattractor WebXR / VR / lorenzattractor]<br />
+		[example:webxr_vr_paint WebXR / VR / paint]<br />
+		[example:webxr_vr_panorama_depth WebXR / VR / panorama_depth]<br />
+		[example:webxr_vr_panorama WebXR / VR / panorama]<br />
+		[example:webxr_vr_rollercoaster WebXR / VR / rollercoaster]<br />
+		[example:webxr_vr_sandbox WebXR / VR / sandbox]<br />
+		[example:webxr_vr_sculpt WebXR / VR / sculpt]<br />
+		[example:webxr_vr_video WebXR / VR / video]
+	</p>
+
+</body>
+
+</html>

@@ -4,8 +4,6 @@ import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
 
 /**
- * @author WestLangley / http://github.com/WestLangley
- *
  * parameters = {
  *  color: <hex>,
  *  roughness: <float>,
@@ -51,7 +49,9 @@ import { Color } from '../math/Color.js';
  *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
- *  morphNormals: <bool>
+ *  morphNormals: <bool>,
+ *
+ *  flatShading: <bool>
  * }
  */
 
@@ -64,8 +64,8 @@ function MeshStandardMaterial( parameters ) {
 	this.type = 'MeshStandardMaterial';
 
 	this.color = new Color( 0xffffff ); // diffuse
-	this.roughness = 0.5;
-	this.metalness = 0.5;
+	this.roughness = 1.0;
+	this.metalness = 0.0;
 
 	this.map = null;
 
@@ -109,6 +109,10 @@ function MeshStandardMaterial( parameters ) {
 	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
+
+	this.flatShading = false;
+
+	this.vertexTangents = false;
 
 	this.setValues( parameters );
 
@@ -171,6 +175,10 @@ MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
+
+	this.flatShading = source.flatShading;
+
+	this.vertexTangents = source.vertexTangents;
 
 	return this;
 

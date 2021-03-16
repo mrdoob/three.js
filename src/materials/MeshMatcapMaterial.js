@@ -4,8 +4,6 @@ import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
 
 /**
- * @author WestLangley / http://github.com/WestLangley
- *
  * parameters = {
  *  color: <hex>,
  *  opacity: <float>,
@@ -30,100 +28,88 @@ import { Color } from '../math/Color.js';
  *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
+ *
+ *  flatShading: <bool>
  * }
  */
 
-function MeshMatcapMaterial( parameters ) {
+class MeshMatcapMaterial extends Material {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.defines = { 'MATCAP': '' };
+		super();
 
-	this.type = 'MeshMatcapMaterial';
+		this.defines = { 'MATCAP': '' };
 
-	this.color = new Color( 0xffffff ); // diffuse
+		this.type = 'MeshMatcapMaterial';
 
-	this.matcap = null;
+		this.color = new Color( 0xffffff ); // diffuse
 
-	this.map = null;
+		this.matcap = null;
 
-	this.bumpMap = null;
-	this.bumpScale = 1;
+		this.map = null;
 
-	this.normalMap = null;
-	this.normalMapType = TangentSpaceNormalMap;
-	this.normalScale = new Vector2( 1, 1 );
+		this.bumpMap = null;
+		this.bumpScale = 1;
 
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
+		this.normalMap = null;
+		this.normalMapType = TangentSpaceNormalMap;
+		this.normalScale = new Vector2( 1, 1 );
 
-	this.alphaMap = null;
+		this.displacementMap = null;
+		this.displacementScale = 1;
+		this.displacementBias = 0;
 
-	this.skinning = false;
-	this.morphTargets = false;
-	this.morphNormals = false;
+		this.alphaMap = null;
 
-	this.lights = false;
+		this.skinning = false;
+		this.morphTargets = false;
+		this.morphNormals = false;
 
-	this.setValues( parameters );
+		this.flatShading = false;
 
-	// a matcap is required
+		this.setValues( parameters );
 
-	if ( this.matcap === null ) {
+	}
 
-		var canvas = document.createElement( 'canvas' );
-		canvas.width = 1;
-		canvas.height = 1;
 
-		var context = canvas.getContext( '2d' );
+	copy( source ) {
 
-		context.fillStyle = '#fff';
-		context.fillRect( 0, 0, 1, 1 );
+		super.copy( source );
 
-		this.matcap = new THREE.CanvasTexture( canvas );
+		this.defines = { 'MATCAP': '' };
+
+		this.color.copy( source.color );
+
+		this.matcap = source.matcap;
+
+		this.map = source.map;
+
+		this.bumpMap = source.bumpMap;
+		this.bumpScale = source.bumpScale;
+
+		this.normalMap = source.normalMap;
+		this.normalMapType = source.normalMapType;
+		this.normalScale.copy( source.normalScale );
+
+		this.displacementMap = source.displacementMap;
+		this.displacementScale = source.displacementScale;
+		this.displacementBias = source.displacementBias;
+
+		this.alphaMap = source.alphaMap;
+
+		this.skinning = source.skinning;
+		this.morphTargets = source.morphTargets;
+		this.morphNormals = source.morphNormals;
+
+		this.flatShading = source.flatShading;
+
+		return this;
 
 	}
 
 }
 
-MeshMatcapMaterial.prototype = Object.create( Material.prototype );
-MeshMatcapMaterial.prototype.constructor = MeshMatcapMaterial;
-
 MeshMatcapMaterial.prototype.isMeshMatcapMaterial = true;
-
-MeshMatcapMaterial.prototype.copy = function ( source ) {
-
-	Material.prototype.copy.call( this, source );
-
-	this.defines = { 'MATCAP': '' };
-
-	this.color.copy( source.color );
-
-	this.matcap = source.matcap;
-
-	this.map = source.map;
-
-	this.bumpMap = source.bumpMap;
-	this.bumpScale = source.bumpScale;
-
-	this.normalMap = source.normalMap;
-	this.normalMapType = source.normalMapType;
-	this.normalScale.copy( source.normalScale );
-
-	this.displacementMap = source.displacementMap;
-	this.displacementScale = source.displacementScale;
-	this.displacementBias = source.displacementBias;
-
-	this.alphaMap = source.alphaMap;
-
-	this.skinning = source.skinning;
-	this.morphTargets = source.morphTargets;
-	this.morphNormals = source.morphNormals;
-
-	return this;
-
-};
-
 
 export { MeshMatcapMaterial };

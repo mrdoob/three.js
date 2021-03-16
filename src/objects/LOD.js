@@ -1,58 +1,62 @@
 import { Vector3 } from '../math/Vector3.js';
 import { Object3D } from '../core/Object3D.js';
 
-/**
- * @author mikael emtinger / http://gomo.se/
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- */
+const _v1 = /*@__PURE__*/ new Vector3();
+const _v2 = /*@__PURE__*/ new Vector3();
 
-function LOD() {
+class LOD extends Object3D {
 
-	Object3D.call( this );
+	constructor() {
 
-	this.type = 'LOD';
+		super();
 
-	Object.defineProperties( this, {
-		levels: {
-			enumerable: true,
-			value: []
-		}
-	} );
+		this._currentLevel = 0;
 
-}
+		this.type = 'LOD';
 
-LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
+		Object.defineProperties( this, {
+			levels: {
+				enumerable: true,
+				value: []
+			},
+			isLOD: {
+				value: true,
+			}
+		} );
 
-	constructor: LOD,
+		this.autoUpdate = true;
 
-	copy: function ( source ) {
+	}
 
-		Object3D.prototype.copy.call( this, source, false );
+	copy( source ) {
 
-		var levels = source.levels;
+		super.copy( source, false );
 
-		for ( var i = 0, l = levels.length; i < l; i ++ ) {
+		const levels = source.levels;
 
-			var level = levels[ i ];
+		for ( let i = 0, l = levels.length; i < l; i ++ ) {
+
+			const level = levels[ i ];
 
 			this.addLevel( level.object.clone(), level.distance );
 
 		}
 
+		this.autoUpdate = source.autoUpdate;
+
 		return this;
 
-	},
+	}
 
-	addLevel: function ( object, distance ) {
-
-		if ( distance === undefined ) distance = 0;
+	addLevel( object, distance = 0 ) {
 
 		distance = Math.abs( distance );
 
-		var levels = this.levels;
+		const levels = this.levels;
 
-		for ( var l = 0; l < levels.length; l ++ ) {
+		let l;
+
+		for ( l = 0; l < levels.length; l ++ ) {
 
 			if ( distance < levels[ l ].distance ) {
 
@@ -66,98 +70,113 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		this.add( object );
 
-	},
+		return this;
 
-	getObjectForDistance: function ( distance ) {
+	}
 
-		var levels = this.levels;
+	getCurrentLevel() {
 
-		for ( var i = 1, l = levels.length; i < l; i ++ ) {
+		return this._currentLevel;
 
-			if ( distance < levels[ i ].distance ) {
+	}
 
-				break;
+	getObjectForDistance( distance ) {
+
+		const levels = this.levels;
+
+		if ( levels.length > 0 ) {
+
+			let i, l;
+
+			for ( i = 1, l = levels.length; i < l; i ++ ) {
+
+				if ( distance < levels[ i ].distance ) {
+
+					break;
+
+				}
+
+			}
+
+			return levels[ i - 1 ].object;
+
+		}
+
+		return null;
+
+	}
+
+	raycast( raycaster, intersects ) {
+
+		const levels = this.levels;
+
+		if ( levels.length > 0 ) {
+
+			_v1.setFromMatrixPosition( this.matrixWorld );
+
+			const distance = raycaster.ray.origin.distanceTo( _v1 );
+
+			this.getObjectForDistance( distance ).raycast( raycaster, intersects );
+
+		}
+
+	}
+
+	update( camera ) {
+
+		const levels = this.levels;
+
+		if ( levels.length > 1 ) {
+
+			_v1.setFromMatrixPosition( camera.matrixWorld );
+			_v2.setFromMatrixPosition( this.matrixWorld );
+
+			const distance = _v1.distanceTo( _v2 ) / camera.zoom;
+
+			levels[ 0 ].object.visible = true;
+
+			let i, l;
+
+			for ( i = 1, l = levels.length; i < l; i ++ ) {
+
+				if ( distance >= levels[ i ].distance ) {
+
+					levels[ i - 1 ].object.visible = false;
+					levels[ i ].object.visible = true;
+
+				} else {
+
+					break;
+
+				}
+
+			}
+
+			this._currentLevel = i - 1;
+
+			for ( ; i < l; i ++ ) {
+
+				levels[ i ].object.visible = false;
 
 			}
 
 		}
 
-		return levels[ i - 1 ].object;
+	}
 
-	},
+	toJSON( meta ) {
 
-	raycast: ( function () {
+		const data = super.toJSON( meta );
 
-		var matrixPosition = new Vector3();
-
-		return function raycast( raycaster, intersects ) {
-
-			matrixPosition.setFromMatrixPosition( this.matrixWorld );
-
-			var distance = raycaster.ray.origin.distanceTo( matrixPosition );
-
-			this.getObjectForDistance( distance ).raycast( raycaster, intersects );
-
-		};
-
-	}() ),
-
-	update: function () {
-
-		var v1 = new Vector3();
-		var v2 = new Vector3();
-
-		return function update( camera ) {
-
-			var levels = this.levels;
-
-			if ( levels.length > 1 ) {
-
-				v1.setFromMatrixPosition( camera.matrixWorld );
-				v2.setFromMatrixPosition( this.matrixWorld );
-
-				var distance = v1.distanceTo( v2 );
-
-				levels[ 0 ].object.visible = true;
-
-				for ( var i = 1, l = levels.length; i < l; i ++ ) {
-
-					if ( distance >= levels[ i ].distance ) {
-
-						levels[ i - 1 ].object.visible = false;
-						levels[ i ].object.visible = true;
-
-					} else {
-
-						break;
-
-					}
-
-				}
-
-				for ( ; i < l; i ++ ) {
-
-					levels[ i ].object.visible = false;
-
-				}
-
-			}
-
-		};
-
-	}(),
-
-	toJSON: function ( meta ) {
-
-		var data = Object3D.prototype.toJSON.call( this, meta );
+		if ( this.autoUpdate === false ) data.object.autoUpdate = false;
 
 		data.object.levels = [];
 
-		var levels = this.levels;
+		const levels = this.levels;
 
-		for ( var i = 0, l = levels.length; i < l; i ++ ) {
+		for ( let i = 0, l = levels.length; i < l; i ++ ) {
 
-			var level = levels[ i ];
+			const level = levels[ i ];
 
 			data.object.levels.push( {
 				object: level.object.uuid,
@@ -170,7 +189,7 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
 
 
 export { LOD };

@@ -1,88 +1,87 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { Vector3 } from '../math/Vector3.js';
 import { Quaternion } from '../math/Quaternion.js';
 import { Audio } from './Audio.js';
-import { Object3D } from '../core/Object3D.js';
 
-function PositionalAudio( listener ) {
+const _position = /*@__PURE__*/ new Vector3();
+const _quaternion = /*@__PURE__*/ new Quaternion();
+const _scale = /*@__PURE__*/ new Vector3();
+const _orientation = /*@__PURE__*/ new Vector3();
 
-	Audio.call( this, listener );
+class PositionalAudio extends Audio {
 
-	this.panner = this.context.createPanner();
-	this.panner.connect( this.gain );
+	constructor( listener ) {
 
-}
+		super( listener );
 
-PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
+		this.panner = this.context.createPanner();
+		this.panner.panningModel = 'HRTF';
+		this.panner.connect( this.gain );
 
-	constructor: PositionalAudio,
+	}
 
-	getOutput: function () {
+	getOutput() {
 
 		return this.panner;
 
-	},
+	}
 
-	getRefDistance: function () {
+	getRefDistance() {
 
 		return this.panner.refDistance;
 
-	},
+	}
 
-	setRefDistance: function ( value ) {
+	setRefDistance( value ) {
 
 		this.panner.refDistance = value;
 
 		return this;
 
-	},
+	}
 
-	getRolloffFactor: function () {
+	getRolloffFactor() {
 
 		return this.panner.rolloffFactor;
 
-	},
+	}
 
-	setRolloffFactor: function ( value ) {
+	setRolloffFactor( value ) {
 
 		this.panner.rolloffFactor = value;
 
 		return this;
 
-	},
+	}
 
-	getDistanceModel: function () {
+	getDistanceModel() {
 
 		return this.panner.distanceModel;
 
-	},
+	}
 
-	setDistanceModel: function ( value ) {
+	setDistanceModel( value ) {
 
 		this.panner.distanceModel = value;
 
 		return this;
 
-	},
+	}
 
-	getMaxDistance: function () {
+	getMaxDistance() {
 
 		return this.panner.maxDistance;
 
-	},
+	}
 
-	setMaxDistance: function ( value ) {
+	setMaxDistance( value ) {
 
 		this.panner.maxDistance = value;
 
 		return this;
 
-	},
+	}
 
-	setDirectionalCone: function ( coneInnerAngle, coneOuterAngle, coneOuterGain ) {
+	setDirectionalCone( coneInnerAngle, coneOuterAngle, coneOuterGain ) {
 
 		this.panner.coneInnerAngle = coneInnerAngle;
 		this.panner.coneOuterAngle = coneOuterAngle;
@@ -90,33 +89,42 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	updateMatrixWorld: ( function () {
+	updateMatrixWorld( force ) {
 
-		var position = new Vector3();
-		var quaternion = new Quaternion();
-		var scale = new Vector3();
+		super.updateMatrixWorld( force );
 
-		var orientation = new Vector3();
+		if ( this.hasPlaybackControl === true && this.isPlaying === false ) return;
 
-		return function updateMatrixWorld( force ) {
+		this.matrixWorld.decompose( _position, _quaternion, _scale );
 
-			Object3D.prototype.updateMatrixWorld.call( this, force );
+		_orientation.set( 0, 0, 1 ).applyQuaternion( _quaternion );
 
-			var panner = this.panner;
-			this.matrixWorld.decompose( position, quaternion, scale );
+		const panner = this.panner;
 
-			orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
+		if ( panner.positionX ) {
 
-			panner.setPosition( position.x, position.y, position.z );
-			panner.setOrientation( orientation.x, orientation.y, orientation.z );
+			// code path for Chrome and Firefox (see #14393)
 
-		};
+			const endTime = this.context.currentTime + this.listener.timeDelta;
 
-	} )()
+			panner.positionX.linearRampToValueAtTime( _position.x, endTime );
+			panner.positionY.linearRampToValueAtTime( _position.y, endTime );
+			panner.positionZ.linearRampToValueAtTime( _position.z, endTime );
+			panner.orientationX.linearRampToValueAtTime( _orientation.x, endTime );
+			panner.orientationY.linearRampToValueAtTime( _orientation.y, endTime );
+			panner.orientationZ.linearRampToValueAtTime( _orientation.z, endTime );
 
+		} else {
 
-} );
+			panner.setPosition( _position.x, _position.y, _position.z );
+			panner.setOrientation( _orientation.x, _orientation.y, _orientation.z );
+
+		}
+
+	}
+
+}
 
 export { PositionalAudio };

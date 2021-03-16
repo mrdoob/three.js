@@ -1,7 +1,3 @@
-/**
- * @author alemures / https://github.com/alemures
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { arrayMin, arrayMax } from '../../../src/utils';
@@ -34,4 +30,3 @@ QUnit.module( 'utils', () => {
 
 
 } );
-

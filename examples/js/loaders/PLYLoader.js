@@ -1,6 +1,4 @@
 /**
- * @author Wei Meng / http://about.me/menway
- *
  * Description: A THREE loader for PLY ASCII files (known as the Polygon
  * File Format or the Stanford Triangle Format).
  *
@@ -29,13 +27,13 @@
 
 THREE.PLYLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 	this.propertyNameMapping = {};
 
 };
 
-THREE.PLYLoader.prototype = {
+THREE.PLYLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.PLYLoader,
 
@@ -44,10 +42,31 @@ THREE.PLYLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( this.manager );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -63,7 +82,7 @@ THREE.PLYLoader.prototype = {
 
 		function parseHeader( data ) {
 
-			var patternHeader = /ply([\s\S]*)end_header\s/;
+			var patternHeader = /ply([\s\S]*)end_header\r?\n/;
 			var headerText = '';
 			var headerLength = 0;
 			var result = patternHeader.exec( data );
@@ -71,14 +90,15 @@ THREE.PLYLoader.prototype = {
 			if ( result !== null ) {
 
 				headerText = result[ 1 ];
-				headerLength = result[ 0 ].length;
+				headerLength = new Blob( [ result[ 0 ] ] ).size;
 
 			}
 
 			var header = {
 				comments: [],
 				elements: [],
-				headerLength: headerLength
+				headerLength: headerLength,
+				objInfo: ''
 			};
 
 			var lines = headerText.split( '\n' );
@@ -155,6 +175,12 @@ THREE.PLYLoader.prototype = {
 					case 'property':
 
 						currentElement.properties.push( make_ply_element_property( lineValues, scope.propertyNameMapping ) );
+
+						break;
+
+					case 'obj_info':
+
+						header.objInfo = line;
 
 						break;
 
@@ -295,32 +321,32 @@ THREE.PLYLoader.prototype = {
 
 			}
 
-			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( buffer.vertices, 3 ) );
+			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( buffer.vertices, 3 ) );
 
 			// optional buffer data
 
 			if ( buffer.normals.length > 0 ) {
 
-				geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( buffer.normals, 3 ) );
+				geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( buffer.normals, 3 ) );
 
 			}
 
 			if ( buffer.uvs.length > 0 ) {
 
-				geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( buffer.uvs, 2 ) );
+				geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( buffer.uvs, 2 ) );
 
 			}
 
 			if ( buffer.colors.length > 0 ) {
 
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( buffer.colors, 3 ) );
+				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( buffer.colors, 3 ) );
 
 			}
 
 			if ( buffer.faceVertexUvs.length > 0 ) {
 
 				geometry = geometry.toNonIndexed();
-				geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( buffer.faceVertexUvs, 2 ) );
+				geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( buffer.faceVertexUvs, 2 ) );
 
 			}
 
@@ -494,4 +520,4 @@ THREE.PLYLoader.prototype = {
 
 	}
 
-};
+} );

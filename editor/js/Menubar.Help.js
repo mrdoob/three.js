@@ -1,45 +1,61 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UIPanel, UIRow } from './libs/ui.js';
 
-Menubar.Help = function ( editor ) {
+function MenubarHelp( editor ) {
 
-	var container = new UI.Panel();
+	var strings = editor.strings;
+
+	var container = new UIPanel();
 	container.setClass( 'menu' );
 
-	var title = new UI.Panel();
+	var title = new UIPanel();
 	title.setClass( 'title' );
-	title.setTextContent( 'Help' );
+	title.setTextContent( strings.getKey( 'menubar/help' ) );
 	container.add( title );
 
-	var options = new UI.Panel();
+	var options = new UIPanel();
 	options.setClass( 'options' );
 	container.add( options );
 
 	// Source code
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( 'Source code' );
+	option.setTextContent( strings.getKey( 'menubar/help/source_code' ) );
 	option.onClick( function () {
 
-		window.open( 'https://github.com/mrdoob/three.js/tree/master/editor', '_blank' )
+		window.open( 'https://github.com/mrdoob/three.js/tree/master/editor', '_blank' );
 
 	} );
 	options.add( option );
 
-	// About
+	/*
+	// Icon
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( 'About' );
+	option.setTextContent( strings.getKey( 'menubar/help/icons' ) );
 	option.onClick( function () {
 
-		window.open( 'http://threejs.org', '_blank' );
+		window.open( 'https://www.flaticon.com/packs/interface-44', '_blank' );
+
+	} );
+	options.add( option );
+	*/
+
+	// About
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/help/about' ) );
+	option.onClick( function () {
+
+		window.open( 'https://threejs.org', '_blank' );
 
 	} );
 	options.add( option );
 
 	return container;
 
-};
+}
+
+export { MenubarHelp };

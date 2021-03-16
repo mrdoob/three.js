@@ -1,81 +1,35 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UITabbedPanel, UISpan } from './libs/ui.js';
 
-var Sidebar = function ( editor ) {
+import { SidebarScene } from './Sidebar.Scene.js';
+import { SidebarProperties } from './Sidebar.Properties.js';
+import { SidebarScript } from './Sidebar.Script.js';
+import { SidebarAnimation } from './Sidebar.Animation.js';
+import { SidebarProject } from './Sidebar.Project.js';
+import { SidebarSettings } from './Sidebar.Settings.js';
 
-	var container = new UI.Panel();
+function Sidebar( editor ) {
+
+	var strings = editor.strings;
+
+	var container = new UITabbedPanel();
 	container.setId( 'sidebar' );
 
-	//
-
-	var sceneTab = new UI.Text( 'SCENE' ).onClick( onClick );
-	var projectTab = new UI.Text( 'PROJECT' ).onClick( onClick );
-	var settingsTab = new UI.Text( 'SETTINGS' ).onClick( onClick );
-
-	var tabs = new UI.Div();
-	tabs.setId( 'tabs' );
-	tabs.add( sceneTab, projectTab, settingsTab );
-	container.add( tabs );
-
-	function onClick( event ) {
-
-		select( event.target.textContent );
-
-	}
-
-	//
-
-	var scene = new UI.Span().add(
-		new Sidebar.Scene( editor ),
-		new Sidebar.Properties( editor ),
-		new Sidebar.Animation( editor ),
-		new Sidebar.Script( editor )
+	var scene = new UISpan().add(
+		new SidebarScene( editor ),
+		new SidebarProperties( editor ),
+		new SidebarAnimation( editor ),
+		new SidebarScript( editor )
 	);
-	container.add( scene );
+	var project = new SidebarProject( editor );
+	var settings = new SidebarSettings( editor );
 
-	var project = new UI.Span().add(
-		new Sidebar.Project( editor )
-	);
-	container.add( project );
-
-	var settings = new UI.Span().add(
-		new Sidebar.Settings( editor ),
-		new Sidebar.History( editor )
-	);
-	container.add( settings );
-
-	//
-
-	function select( section ) {
-
-		sceneTab.setClass( '' );
-		projectTab.setClass( '' );
-		settingsTab.setClass( '' );
-
-		scene.setDisplay( 'none' );
-		project.setDisplay( 'none' );
-		settings.setDisplay( 'none' );
-
-		switch ( section ) {
-			case 'SCENE':
-				sceneTab.setClass( 'selected' );
-				scene.setDisplay( '' );
-				break;
-			case 'PROJECT':
-				projectTab.setClass( 'selected' );
-				project.setDisplay( '' );
-				break;
-			case 'SETTINGS':
-				settingsTab.setClass( 'selected' );
-				settings.setDisplay( '' );
-				break;
-		}
-
-	}
-
-	select( 'SCENE' );
+	container.addTab( 'scene', strings.getKey( 'sidebar/scene' ), scene );
+	container.addTab( 'project', strings.getKey( 'sidebar/project' ), project );
+	container.addTab( 'settings', strings.getKey( 'sidebar/settings' ), settings );
+	container.select( 'scene' );
 
 	return container;
 
-};
+}
+
+export { Sidebar };

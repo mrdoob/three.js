@@ -1,10 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author greggman / http://games.greggman.com/
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * @author kaypiKun
- */
-
 THREE.CinematicCamera = function ( fov, aspect, near, far ) {
 
 	THREE.PerspectiveCamera.call( this, fov, aspect, near, far );
@@ -132,27 +125,27 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 
 		this.postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
-		this.postprocessing.bokeh_uniforms[ "tColor" ].value = this.postprocessing.rtTextureColor.texture;
-		this.postprocessing.bokeh_uniforms[ "tDepth" ].value = this.postprocessing.rtTextureDepth.texture;
+		this.postprocessing.bokeh_uniforms[ 'tColor' ].value = this.postprocessing.rtTextureColor.texture;
+		this.postprocessing.bokeh_uniforms[ 'tDepth' ].value = this.postprocessing.rtTextureDepth.texture;
 
-		this.postprocessing.bokeh_uniforms[ "manualdof" ].value = 0;
-		this.postprocessing.bokeh_uniforms[ "shaderFocus" ].value = 0;
+		this.postprocessing.bokeh_uniforms[ 'manualdof' ].value = 0;
+		this.postprocessing.bokeh_uniforms[ 'shaderFocus' ].value = 0;
 
-		this.postprocessing.bokeh_uniforms[ "fstop" ].value = 2.8;
+		this.postprocessing.bokeh_uniforms[ 'fstop' ].value = 2.8;
 
-		this.postprocessing.bokeh_uniforms[ "showFocus" ].value = 1;
+		this.postprocessing.bokeh_uniforms[ 'showFocus' ].value = 1;
 
-		this.postprocessing.bokeh_uniforms[ "focalDepth" ].value = 0.1;
+		this.postprocessing.bokeh_uniforms[ 'focalDepth' ].value = 0.1;
 
 		//console.log( this.postprocessing.bokeh_uniforms[ "focalDepth" ].value );
 
-		this.postprocessing.bokeh_uniforms[ "znear" ].value = this.near;
-		this.postprocessing.bokeh_uniforms[ "zfar" ].value = this.near;
+		this.postprocessing.bokeh_uniforms[ 'znear' ].value = this.near;
+		this.postprocessing.bokeh_uniforms[ 'zfar' ].value = this.near;
 
 
-		this.postprocessing.bokeh_uniforms[ "textureWidth" ].value = window.innerWidth;
+		this.postprocessing.bokeh_uniforms[ 'textureWidth' ].value = window.innerWidth;
 
-		this.postprocessing.bokeh_uniforms[ "textureHeight" ].value = window.innerHeight;
+		this.postprocessing.bokeh_uniforms[ 'textureHeight' ].value = window.innerHeight;
 
 		this.postprocessing.materialBokeh = new THREE.ShaderMaterial( {
 			uniforms: this.postprocessing.bokeh_uniforms,
@@ -165,7 +158,7 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 			}
 		} );
 
-		this.postprocessing.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight ), this.postprocessing.materialBokeh );
+		this.postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), this.postprocessing.materialBokeh );
 		this.postprocessing.quad.position.z = - 500;
 		this.postprocessing.scene.add( this.postprocessing.quad );
 
@@ -177,21 +170,30 @@ THREE.CinematicCamera.prototype.renderCinematic = function ( scene, renderer ) {
 
 	if ( this.postprocessing.enabled ) {
 
+		var currentRenderTarget = renderer.getRenderTarget();
+
 		renderer.clear();
 
 		// Render scene into texture
 
 		scene.overrideMaterial = null;
-		renderer.render( scene, camera, this.postprocessing.rtTextureColor, true );
+		renderer.setRenderTarget( this.postprocessing.rtTextureColor );
+		renderer.clear();
+		renderer.render( scene, this );
 
 		// Render depth into texture
 
 		scene.overrideMaterial = this.materialDepth;
-		renderer.render( scene, camera, this.postprocessing.rtTextureDepth, true );
+		renderer.setRenderTarget( this.postprocessing.rtTextureDepth );
+		renderer.clear();
+		renderer.render( scene, this );
 
 		// Render bokeh composite
 
+		renderer.setRenderTarget( null );
 		renderer.render( this.postprocessing.scene, this.postprocessing.camera );
+
+		renderer.setRenderTarget( currentRenderTarget );
 
 	}
 

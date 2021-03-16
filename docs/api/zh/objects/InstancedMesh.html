@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Mesh] &rarr;
+
+		<h1>实例化网格（[name]）</h1>
+
+		<p class="desc">
+		一种具有实例化渲染支持的特殊版本的[page:Mesh]。你可以使用 [name] 来渲染大量具有相同几何体与材质、但具有不同世界变换的物体。
+		使用 [name] 将帮助你减少 draw call 的数量，从而提升你应用程序的整体渲染性能。
+		</p>
+		<p>
+		当前的实现需要[name]和其它3D物体间不共享材质。
+		</p>
+
+		<h2>示例</h2>
+
+		<p>
+			[example:webgl_instancing_dynamic WebGL / instancing / dynamic]<br />
+			[example:webgl_instancing_modified WebGL / instancing / modified]<br />
+			[example:webgl_instancing_performance WebGL / instancing / performance]<br />
+			[example:webgl_instancing_scatter WebGL / instancing / scatter]<br />
+			[example:webgl_instancing_raycast WebGL / instancing / raycast]
+		</p>
+
+		<h2>构造函数</h2>
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material], [param:Integer count] )</h3>
+		<p>
+		[page:BufferGeometry geometry] - 一个 [page:BufferGeometry] 的实例。<br />
+		[page:Material material] - 一个 [page:Material] 的实例。默认为一个新的 [page:MeshBasicMaterial] 。<br />
+		[page:Integer count] - 实例的数量<br />
+		</p>
+
+		<h2>属性</h2>
+		<p>See the base [page:Mesh] class for common properties.</p>
+
+		<h3>[property:Integer count]</h3>
+		<p>
+			实例的数量。被传入到构造函数中的*count*表示mesh实例数量的最大值。
+			你可以在运行时改变这个数值到 [0, count] 区间的一个整数。
+		</p>
+		<p>
+			如果你需要比原先的数量更多的实例数量，你需要创建一个新的[name]。
+		</p>
+
+		<h3>[property:BufferAttribute instanceColor]</h3>
+		<p>
+			Represents the colors of all instances. *null* by default.
+			You have to set its [page:BufferAttribute.needsUpdate needsUpdate] flag to true if you modify instanced data via [page:.setColorAt]().
+		</p>
+
+		<h3>[property:BufferAttribute instanceMatrix]</h3>
+		<p>
+			表示所有实例的本地变换。
+			如果你要通过 [page:.setMatrixAt]() 来修改实例数据，你必须将它的 [page:BufferAttribute.needsUpdate needsUpdate] 标识为 true 。
+		</p>
+
+
+		<h2>方法</h2>
+		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>
+			Frees the internal resources of this instance.
+		</p>
+
+		<h3>[method:null getColorAt]( [param:Integer index], [param:Color color] )</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the range [0, count].
+		</p>
+		<p>
+			[page:Color color]: This color object will be set to the color of the defined instance.
+		</p>
+		<p>
+			Get the color of the defined instance.
+		</p>
+
+		<h3>[method:null getMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )</h3>
+		<p>
+			[page:Integer index]: 实例的索引。值必须在 [0, count] 区间。
+		</p>
+		<p>
+			[page:Matrix4 matrix]: 该4x4矩阵将会被设为已定义实例的本地变换矩阵。
+		</p>
+		<p>
+			获得已定义实例的本地变换矩阵。
+		</p>
+
+		<h3>[method:null setColorAt]( [param:Integer index], [param:Color color] )</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the range [0, count].
+		</p>
+		<p>
+			[page:Color color]: The color of a single instance.
+		</p>
+		<p>
+			Sets the given color to the defined instance.
+			Make sure you set [page:.instanceColor][page:BufferAttribute.needsUpdate .needsUpdate] to true after updating all the colors.
+		</p>
+
+		<h3>[method:null setMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )</h3>
+		<p>
+			[page:Integer index]: 实例的索引。值必须在 [0, count] 区间。
+		</p>
+		<p>
+			[page:Matrix4 matrix]: 一个4x4矩阵，表示单个实例本地变换。
+		</p>
+		<p>
+			设置给定的本地变换矩阵到已定义的实例。
+			请确保在更新所有矩阵后将 [page:.instanceMatrix][page:BufferAttribute.needsUpdate .needsUpdate] 设置为true。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

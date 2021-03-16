@@ -3,11 +3,12 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Loader] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc">
@@ -15,12 +16,11 @@
 			This uses the [page:FileLoader] internally for loading files.
 		</p>
 
-		<h2>Example</h2>
-
+		<h2>Code Example</h2>
 
 		<code>
 		// instantiate a loader
-		var loader = new THREE.MaterialLoader();
+		const loader = new THREE.MaterialLoader();
 
 		// load a resource
 		loader.load(
@@ -54,17 +54,13 @@
 		</p>
 
 		<h2>Properties</h2>
-
-		<h3>[property:LoadingManager manager]</h3>
-		<p>
-			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
-		</p>
+		<p>See the base [page:Loader] class for common properties.</p>
 
 		<h3>[property:Object textures]</h3>
 		<p>Object holding any textures used by the material. See [page:.setTextures].</p>
 
-
 		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -74,7 +70,7 @@
 		[page:Function onProgress] — Will be called while load progresses. The argument will be the progress event.<br />
 		[page:Function onError] — Will be called when load errors.<br /><br />
 
-		Begin loading from url and return the [page:Material] object that will contain the data.
+		Begin loading from url.
 		</p>
 
 		<h3>[method:Material parse]( [param:Object json] )</h3>
@@ -84,15 +80,15 @@
 		Parse a <em>JSON</em> structure and create a new [page:Material] of the type [page:String json.type] with parameters defined in the json object.
 		</p>
 
-		<h3>[method:null setTextures]( [param:Object textures] )</h3>
+		<h3>[method:MaterialLoader setTextures]( [param:Object textures] )</h3>
 		<p>
 		[page:Object textures] — object containing any textures used by the material.
 		</p>
 
-
-
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

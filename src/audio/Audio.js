@@ -1,47 +1,49 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Reece Aaron Lecrivain / http://reecenotes.com/
- */
-
 import { Object3D } from '../core/Object3D.js';
 
-function Audio( listener ) {
+class Audio extends Object3D {
 
-	Object3D.call( this );
+	constructor( listener ) {
 
-	this.type = 'Audio';
+		super();
 
-	this.context = listener.context;
+		this.type = 'Audio';
 
-	this.gain = this.context.createGain();
-	this.gain.connect( listener.getInput() );
+		this.listener = listener;
+		this.context = listener.context;
 
-	this.autoplay = false;
+		this.gain = this.context.createGain();
+		this.gain.connect( listener.getInput() );
 
-	this.buffer = null;
-	this.loop = false;
-	this.startTime = 0;
-	this.offset = 0;
-	this.playbackRate = 1;
-	this.isPlaying = false;
-	this.hasPlaybackControl = true;
-	this.sourceType = 'empty';
+		this.autoplay = false;
 
-	this.filters = [];
+		this.buffer = null;
+		this.detune = 0;
+		this.loop = false;
+		this.loopStart = 0;
+		this.loopEnd = 0;
+		this.offset = 0;
+		this.duration = undefined;
+		this.playbackRate = 1;
+		this.isPlaying = false;
+		this.hasPlaybackControl = true;
+		this.source = null;
+		this.sourceType = 'empty';
 
-}
+		this._startedAt = 0;
+		this._progress = 0;
+		this._connected = false;
 
-Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
+		this.filters = [];
 
-	constructor: Audio,
+	}
 
-	getOutput: function () {
+	getOutput() {
 
 		return this.gain;
 
-	},
+	}
 
-	setNodeSource: function ( audioNode ) {
+	setNodeSource( audioNode ) {
 
 		this.hasPlaybackControl = false;
 		this.sourceType = 'audioNode';
@@ -50,9 +52,9 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	setMediaElementSource: function ( mediaElement ) {
+	setMediaElementSource( mediaElement ) {
 
 		this.hasPlaybackControl = false;
 		this.sourceType = 'mediaNode';
@@ -61,9 +63,20 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	setBuffer: function ( audioBuffer ) {
+	setMediaStreamSource( mediaStream ) {
+
+		this.hasPlaybackControl = false;
+		this.sourceType = 'mediaStreamNode';
+		this.source = this.context.createMediaStreamSource( mediaStream );
+		this.connect();
+
+		return this;
+
+	}
+
+	setBuffer( audioBuffer ) {
 
 		this.buffer = audioBuffer;
 		this.sourceType = 'buffer';
@@ -72,9 +85,9 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	play: function () {
+	play( delay = 0 ) {
 
 		if ( this.isPlaying === true ) {
 
@@ -90,24 +103,28 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		var source = this.context.createBufferSource();
+		this._startedAt = this.context.currentTime + delay;
 
+		const source = this.context.createBufferSource();
 		source.buffer = this.buffer;
 		source.loop = this.loop;
+		source.loopStart = this.loopStart;
+		source.loopEnd = this.loopEnd;
 		source.onended = this.onEnded.bind( this );
-		source.playbackRate.setValueAtTime( this.playbackRate, this.startTime );
-		this.startTime = this.context.currentTime;
-		source.start( this.startTime, this.offset );
+		source.start( this._startedAt, this._progress + this.offset, this.duration );
 
 		this.isPlaying = true;
 
 		this.source = source;
 
+		this.setDetune( this.detune );
+		this.setPlaybackRate( this.playbackRate );
+
 		return this.connect();
 
-	},
+	}
 
-	pause: function () {
+	pause() {
 
 		if ( this.hasPlaybackControl === false ) {
 
@@ -118,18 +135,30 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.isPlaying === true ) {
 
+			// update current progress
+
+			this._progress += Math.max( this.context.currentTime - this._startedAt, 0 ) * this.playbackRate;
+
+			if ( this.loop === true ) {
+
+				// ensure _progress does not exceed duration with looped audios
+
+				this._progress = this._progress % ( this.duration || this.buffer.duration );
+
+			}
+
 			this.source.stop();
 			this.source.onended = null;
-			this.offset += ( this.context.currentTime - this.startTime ) * this.playbackRate;
+
 			this.isPlaying = false;
 
 		}
 
 		return this;
 
-	},
+	}
 
-	stop: function () {
+	stop() {
 
 		if ( this.hasPlaybackControl === false ) {
 
@@ -138,22 +167,23 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
+		this._progress = 0;
+
 		this.source.stop();
 		this.source.onended = null;
-		this.offset = 0;
 		this.isPlaying = false;
 
 		return this;
 
-	},
+	}
 
-	connect: function () {
+	connect() {
 
 		if ( this.filters.length > 0 ) {
 
 			this.source.connect( this.filters[ 0 ] );
 
-			for ( var i = 1, l = this.filters.length; i < l; i ++ ) {
+			for ( let i = 1, l = this.filters.length; i < l; i ++ ) {
 
 				this.filters[ i - 1 ].connect( this.filters[ i ] );
 
@@ -167,17 +197,19 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
+		this._connected = true;
+
 		return this;
 
-	},
+	}
 
-	disconnect: function () {
+	disconnect() {
 
 		if ( this.filters.length > 0 ) {
 
 			this.source.disconnect( this.filters[ 0 ] );
 
-			for ( var i = 1, l = this.filters.length; i < l; i ++ ) {
+			for ( let i = 1, l = this.filters.length; i < l; i ++ ) {
 
 				this.filters[ i - 1 ].disconnect( this.filters[ i ] );
 
@@ -191,49 +223,73 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
+		this._connected = false;
+
 		return this;
 
-	},
+	}
 
-	getFilters: function () {
+	getFilters() {
 
 		return this.filters;
 
-	},
+	}
 
-	setFilters: function ( value ) {
+	setFilters( value ) {
 
 		if ( ! value ) value = [];
 
-		if ( this.isPlaying === true ) {
+		if ( this._connected === true ) {
 
 			this.disconnect();
-			this.filters = value;
+			this.filters = value.slice();
 			this.connect();
 
 		} else {
 
-			this.filters = value;
+			this.filters = value.slice();
 
 		}
 
 		return this;
 
-	},
+	}
 
-	getFilter: function () {
+	setDetune( value ) {
+
+		this.detune = value;
+
+		if ( this.source.detune === undefined ) return; // only set detune when available
+
+		if ( this.isPlaying === true ) {
+
+			this.source.detune.setTargetAtTime( this.detune, this.context.currentTime, 0.01 );
+
+		}
+
+		return this;
+
+	}
+
+	getDetune() {
+
+		return this.detune;
+
+	}
+
+	getFilter() {
 
 		return this.getFilters()[ 0 ];
 
-	},
+	}
 
-	setFilter: function ( filter ) {
+	setFilter( filter ) {
 
 		return this.setFilters( filter ? [ filter ] : [] );
 
-	},
+	}
 
-	setPlaybackRate: function ( value ) {
+	setPlaybackRate( value ) {
 
 		if ( this.hasPlaybackControl === false ) {
 
@@ -246,27 +302,27 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.isPlaying === true ) {
 
-			this.source.playbackRate.setValueAtTime( this.playbackRate, this.context.currentTime );
+			this.source.playbackRate.setTargetAtTime( this.playbackRate, this.context.currentTime, 0.01 );
 
 		}
 
 		return this;
 
-	},
+	}
 
-	getPlaybackRate: function () {
+	getPlaybackRate() {
 
 		return this.playbackRate;
 
-	},
+	}
 
-	onEnded: function () {
+	onEnded() {
 
 		this.isPlaying = false;
 
-	},
+	}
 
-	getLoop: function () {
+	getLoop() {
 
 		if ( this.hasPlaybackControl === false ) {
 
@@ -277,9 +333,9 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this.loop;
 
-	},
+	}
 
-	setLoop: function ( value ) {
+	setLoop( value ) {
 
 		if ( this.hasPlaybackControl === false ) {
 
@@ -298,15 +354,31 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	getVolume: function () {
+	setLoopStart( value ) {
+
+		this.loopStart = value;
+
+		return this;
+
+	}
+
+	setLoopEnd( value ) {
+
+		this.loopEnd = value;
+
+		return this;
+
+	}
+
+	getVolume() {
 
 		return this.gain.gain.value;
 
-	},
+	}
 
-	setVolume: function ( value ) {
+	setVolume( value ) {
 
 		this.gain.gain.setTargetAtTime( value, this.context.currentTime, 0.01 );
 
@@ -314,6 +386,6 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
 
 export { Audio };

@@ -1,7 +1,3 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Clock } from '../../../../src/core/Clock';

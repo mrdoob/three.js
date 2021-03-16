@@ -1,9 +1,10 @@
 import { Material } from './Material.js';
-import { UniformsUtils } from '../renderers/shaders/UniformsUtils.js';
+import { cloneUniforms } from '../renderers/shaders/UniformsUtils.js';
+
+import default_vertex from '../renderers/shaders/ShaderChunk/default_vertex.glsl.js';
+import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.glsl.js';
 
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * parameters = {
  *  defines: { "label" : "value" },
  *  uniforms: { "parameter1": { value: 1.0 }, "parameter2": { value2: 2 } },
@@ -31,8 +32,8 @@ function ShaderMaterial( parameters ) {
 	this.defines = {};
 	this.uniforms = {};
 
-	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
-	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
+	this.vertexShader = default_vertex;
+	this.fragmentShader = default_fragment;
 
 	this.linewidth = 1;
 
@@ -65,6 +66,8 @@ function ShaderMaterial( parameters ) {
 	this.index0AttributeName = undefined;
 	this.uniformsNeedUpdate = false;
 
+	this.glslVersion = null;
+
 	if ( parameters !== undefined ) {
 
 		if ( parameters.attributes !== undefined ) {
@@ -91,7 +94,7 @@ ShaderMaterial.prototype.copy = function ( source ) {
 	this.fragmentShader = source.fragmentShader;
 	this.vertexShader = source.vertexShader;
 
-	this.uniforms = UniformsUtils.clone( source.uniforms );
+	this.uniforms = cloneUniforms( source.uniforms );
 
 	this.defines = Object.assign( {}, source.defines );
 
@@ -106,7 +109,9 @@ ShaderMaterial.prototype.copy = function ( source ) {
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
 
-	this.extensions = source.extensions;
+	this.extensions = Object.assign( {}, source.extensions );
+
+	this.glslVersion = source.glslVersion;
 
 	return this;
 
@@ -114,51 +119,59 @@ ShaderMaterial.prototype.copy = function ( source ) {
 
 ShaderMaterial.prototype.toJSON = function ( meta ) {
 
-	var data = Material.prototype.toJSON.call( this, meta );
+	const data = Material.prototype.toJSON.call( this, meta );
 
+	data.glslVersion = this.glslVersion;
 	data.uniforms = {};
 
-	for ( var name in this.uniforms ) {
+	for ( const name in this.uniforms ) {
 
-		var uniform = this.uniforms[ name ];
-		var value = uniform.value;
+		const uniform = this.uniforms[ name ];
+		const value = uniform.value;
 
-		if ( value.isTexture ) {
+		if ( value && value.isTexture ) {
 
 			data.uniforms[ name ] = {
 				type: 't',
 				value: value.toJSON( meta ).uuid
 			};
 
-		} else if ( value.isColor ) {
+		} else if ( value && value.isColor ) {
 
 			data.uniforms[ name ] = {
 				type: 'c',
 				value: value.getHex()
 			};
 
-		} else if ( value.isVector2 ) {
+		} else if ( value && value.isVector2 ) {
 
 			data.uniforms[ name ] = {
 				type: 'v2',
 				value: value.toArray()
 			};
 
-		} else if ( value.isVector3 ) {
+		} else if ( value && value.isVector3 ) {
 
 			data.uniforms[ name ] = {
 				type: 'v3',
 				value: value.toArray()
 			};
 
-		} else if ( value.isVector4 ) {
+		} else if ( value && value.isVector4 ) {
 
 			data.uniforms[ name ] = {
 				type: 'v4',
 				value: value.toArray()
 			};
 
-		} else if ( value.isMatrix4 ) {
+		} else if ( value && value.isMatrix3 ) {
+
+			data.uniforms[ name ] = {
+				type: 'm3',
+				value: value.toArray()
+			};
+
+		} else if ( value && value.isMatrix4 ) {
 
 			data.uniforms[ name ] = {
 				type: 'm4',
@@ -181,6 +194,16 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 
 	data.vertexShader = this.vertexShader;
 	data.fragmentShader = this.fragmentShader;
+
+	const extensions = {};
+
+	for ( const key in this.extensions ) {
+
+		if ( this.extensions[ key ] === true ) extensions[ key ] = true;
+
+	}
+
+	if ( Object.keys( extensions ).length > 0 ) data.extensions = extensions;
 
 	return data;
 

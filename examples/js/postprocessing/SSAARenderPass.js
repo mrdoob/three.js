@@ -2,8 +2,6 @@
 *
 * Supersample Anti-Aliasing Render Pass
 *
-* @author bhouston / http://clara.io/
-*
 * This manual approach to SSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
 *
 * References: https://en.wikipedia.org/wiki/Supersampling
@@ -23,8 +21,9 @@ THREE.SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 	// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
 	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
 	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
+	this._oldClearColor = new THREE.Color();
 
-	if ( THREE.CopyShader === undefined ) console.error( "THREE.SSAARenderPass relies on THREE.CopyShader" );
+	if ( THREE.CopyShader === undefined ) console.error( 'THREE.SSAARenderPass relies on THREE.CopyShader' );
 
 	var copyShader = THREE.CopyShader;
 	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
@@ -40,11 +39,7 @@ THREE.SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 		depthWrite: false
 	} );
 
-	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene2	= new THREE.Scene();
-	this.quad2 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), this.copyMaterial );
-	this.quad2.frustumCulled = false; // Avoid getting clipped
-	this.scene2.add( this.quad2 );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.copyMaterial );
 
 };
 
@@ -74,7 +69,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		if ( ! this.sampleRenderTarget ) {
 
 			this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
-			this.sampleRenderTarget.texture.name = "SSAARenderPass.sample";
+			this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
 
 		}
 
@@ -83,12 +78,12 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		var oldClearColor = renderer.getClearColor().getHex();
+		renderer.getClearColor( this._oldClearColor );
 		var oldClearAlpha = renderer.getClearAlpha();
 
 		var baseSampleWeight = 1.0 / jitterOffsets.length;
 		var roundingRange = 1 / 32;
-		this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
+		this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
 
 		var width = readBuffer.width, height = readBuffer.height;
 
@@ -100,7 +95,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 			if ( this.camera.setViewOffset ) {
 
 				this.camera.setViewOffset( width, height,
-					jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625,   // 0.0625 = 1 / 16
+					jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
 					width, height );
 
 			}
@@ -118,24 +113,29 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			}
 
-			this.copyUniforms[ "opacity" ].value = sampleWeight;
+			this.copyUniforms[ 'opacity' ].value = sampleWeight;
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
-			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
+			renderer.setRenderTarget( this.sampleRenderTarget );
+			renderer.clear();
+			renderer.render( this.scene, this.camera );
+
+			renderer.setRenderTarget( this.renderToScreen ? null : writeBuffer );
 
 			if ( i === 0 ) {
 
 				renderer.setClearColor( 0x000000, 0.0 );
+				renderer.clear();
 
 			}
 
-			renderer.render( this.scene2, this.camera2, this.renderToScreen ? null : writeBuffer, ( i === 0 ) );
+			this.fsQuad.render( renderer );
 
 		}
 
 		if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
 
 		renderer.autoClear = autoClear;
-		renderer.setClearColor( oldClearColor, oldClearAlpha );
+		renderer.setClearColor( this._oldClearColor, oldClearAlpha );
 
 	}
 

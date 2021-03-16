@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		[page:KeyframeTrack] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			문자열 키프레임 값 트랙.
+		</p>
+
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]( [param:String name], [param:Array times], [param:Array values] )</h3>
+		<p>
+			[page:String name] - (필수) KeyframeTrack의 식별자.<br />
+			[page:Array times] - (필수) 키프레임 시간 배열.<br />
+			[page:Array values] - 특정 시점의 키프레임 값.<br />
+			[page:Constant interpolation] - 기본 보간법 타입. 가능한 값들에 대해서는
+			[page:Animation Animation Constants] 를 확인하세요. 기본값은
+			[page:Animation InterpolateLinear] 입니다.
+		</p>
+
+
+		<h2>프로퍼티</h2>
+
+
+		<p class="desc">
+			상속 프로퍼티는 [page:KeyframeTrack]를 참고하세요.
+		</p>
+
+		<h3>[property:Constant DefaultInterpolation]</h3>
+		<p>
+			기본 보간법 타입, [page:Animation InterpolateDiscrete].
+		</p>
+
+		<h3>[property:String ValueTypeName]</h3>
+		<p>
+			문자열 'quaternion'.
+		</p>
+
+
+		<h2>메서드</h2>
+
+
+		<p class="desc">
+			상속 메서드는 [page:KeyframeTrack]를 참고하세요.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodLinear]()</h3>
+		<p>
+			이 메서드의 값은 'undefined'이기 때문에, 이산 프로퍼티에 영향을 미치지 않습니다.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodSmooth]()</h3>
+		<p>
+			이 메서드의 값은 'undefined'이기 때문에, 이산 프로퍼티에 영향을 미치지 않습니다.
+		</p>
+
+
+		<h2>소스 코드</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

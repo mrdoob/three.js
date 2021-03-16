@@ -1,32 +1,23 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { Cache } from './Cache.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader.js';
 
+class ImageLoader extends Loader {
 
-function ImageLoader( manager ) {
+	constructor( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		super( manager );
 
-}
+	}
 
-Object.assign( ImageLoader.prototype, {
-
-	crossOrigin: 'anonymous',
-
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		if ( url === undefined ) url = '';
+	load( url, onLoad, onProgress, onError ) {
 
 		if ( this.path !== undefined ) url = this.path + url;
 
 		url = this.manager.resolveURL( url );
 
-		var scope = this;
+		const scope = this;
 
-		var cached = Cache.get( url );
+		const cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -44,7 +35,7 @@ Object.assign( ImageLoader.prototype, {
 
 		}
 
-		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
+		const image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 
 		function onImageLoad() {
 
@@ -66,8 +57,8 @@ Object.assign( ImageLoader.prototype, {
 
 			if ( onError ) onError( event );
 
-			scope.manager.itemEnd( url );
 			scope.manager.itemError( url );
+			scope.manager.itemEnd( url );
 
 		}
 
@@ -86,23 +77,9 @@ Object.assign( ImageLoader.prototype, {
 
 		return image;
 
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
 	}
 
-} );
+}
 
 
 export { ImageLoader };

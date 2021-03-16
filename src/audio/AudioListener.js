@@ -1,38 +1,44 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { Vector3 } from '../math/Vector3.js';
 import { Quaternion } from '../math/Quaternion.js';
+import { Clock } from '../core/Clock.js';
 import { Object3D } from '../core/Object3D.js';
 import { AudioContext } from './AudioContext.js';
 
-function AudioListener() {
+const _position = /*@__PURE__*/ new Vector3();
+const _quaternion = /*@__PURE__*/ new Quaternion();
+const _scale = /*@__PURE__*/ new Vector3();
+const _orientation = /*@__PURE__*/ new Vector3();
 
-	Object3D.call( this );
+class AudioListener extends Object3D {
 
-	this.type = 'AudioListener';
+	constructor() {
 
-	this.context = AudioContext.getContext();
+		super();
 
-	this.gain = this.context.createGain();
-	this.gain.connect( this.context.destination );
+		this.type = 'AudioListener';
 
-	this.filter = null;
+		this.context = AudioContext.getContext();
 
-}
+		this.gain = this.context.createGain();
+		this.gain.connect( this.context.destination );
 
-AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
+		this.filter = null;
 
-	constructor: AudioListener,
+		this.timeDelta = 0;
 
-	getInput: function () {
+		// private
+
+		this._clock = new Clock();
+
+	}
+
+	getInput() {
 
 		return this.gain;
 
-	},
+	}
 
-	removeFilter: function ( ) {
+	removeFilter() {
 
 		if ( this.filter !== null ) {
 
@@ -45,15 +51,15 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	getFilter: function () {
+	getFilter() {
 
 		return this.filter;
 
-	},
+	}
 
-	setFilter: function ( value ) {
+	setFilter( value ) {
 
 		if ( this.filter !== null ) {
 
@@ -72,64 +78,60 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	getMasterVolume: function () {
+	getMasterVolume() {
 
 		return this.gain.gain.value;
 
-	},
+	}
 
-	setMasterVolume: function ( value ) {
+	setMasterVolume( value ) {
 
 		this.gain.gain.setTargetAtTime( value, this.context.currentTime, 0.01 );
 
 		return this;
 
-	},
+	}
 
-	updateMatrixWorld: ( function () {
+	updateMatrixWorld( force ) {
 
-		var position = new Vector3();
-		var quaternion = new Quaternion();
-		var scale = new Vector3();
+		super.updateMatrixWorld( force );
 
-		var orientation = new Vector3();
+		const listener = this.context.listener;
+		const up = this.up;
 
-		return function updateMatrixWorld( force ) {
+		this.timeDelta = this._clock.getDelta();
 
-			Object3D.prototype.updateMatrixWorld.call( this, force );
+		this.matrixWorld.decompose( _position, _quaternion, _scale );
 
-			var listener = this.context.listener;
-			var up = this.up;
+		_orientation.set( 0, 0, - 1 ).applyQuaternion( _quaternion );
 
-			this.matrixWorld.decompose( position, quaternion, scale );
+		if ( listener.positionX ) {
 
-			orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+			// code path for Chrome (see #14393)
 
-			if ( listener.positionX ) {
+			const endTime = this.context.currentTime + this.timeDelta;
 
-				listener.positionX.setValueAtTime( position.x, this.context.currentTime );
-				listener.positionY.setValueAtTime( position.y, this.context.currentTime );
-				listener.positionZ.setValueAtTime( position.z, this.context.currentTime );
-				listener.forwardX.setValueAtTime( orientation.x, this.context.currentTime );
-				listener.forwardY.setValueAtTime( orientation.y, this.context.currentTime );
-				listener.forwardZ.setValueAtTime( orientation.z, this.context.currentTime );
-				listener.upX.setValueAtTime( up.x, this.context.currentTime );
-				listener.upY.setValueAtTime( up.y, this.context.currentTime );
-				listener.upZ.setValueAtTime( up.z, this.context.currentTime );
+			listener.positionX.linearRampToValueAtTime( _position.x, endTime );
+			listener.positionY.linearRampToValueAtTime( _position.y, endTime );
+			listener.positionZ.linearRampToValueAtTime( _position.z, endTime );
+			listener.forwardX.linearRampToValueAtTime( _orientation.x, endTime );
+			listener.forwardY.linearRampToValueAtTime( _orientation.y, endTime );
+			listener.forwardZ.linearRampToValueAtTime( _orientation.z, endTime );
+			listener.upX.linearRampToValueAtTime( up.x, endTime );
+			listener.upY.linearRampToValueAtTime( up.y, endTime );
+			listener.upZ.linearRampToValueAtTime( up.z, endTime );
 
-			} else {
+		} else {
 
-				listener.setPosition( position.x, position.y, position.z );
-				listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );
+			listener.setPosition( _position.x, _position.y, _position.z );
+			listener.setOrientation( _orientation.x, _orientation.y, _orientation.z, up.x, up.y, up.z );
 
-			}
+		}
 
-		};
+	}
 
-	} )()
-
-} );
+}
 
 export { AudioListener };

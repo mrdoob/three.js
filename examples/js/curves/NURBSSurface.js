@@ -1,15 +1,8 @@
 /**
- * @author renej
  * NURBS surface object
  *
  * Implementation is based on (x, y [, z=0 [, w=1]]) control points with w=weight.
- *
  **/
-
-
-/**************************************************************
- *	NURBS surface
- **************************************************************/
 
 THREE.NURBSSurface = function ( degree1, degree2, knots1, knots2 /* arrays of reals */, controlPoints /* array^2 of Vector(2|3|4) */ ) {
 

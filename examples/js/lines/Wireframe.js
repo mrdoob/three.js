@@ -1,8 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
 THREE.Wireframe = function ( geometry, material ) {
 
 	THREE.Mesh.call( this );
@@ -31,9 +26,9 @@ THREE.Wireframe.prototype = Object.assign( Object.create( THREE.Mesh.prototype )
 
 			var instanceStart = geometry.attributes.instanceStart;
 			var instanceEnd = geometry.attributes.instanceEnd;
-			var lineDistances = new Float32Array( 2 * instanceStart.data.count );
+			var lineDistances = new Float32Array( 2 * instanceStart.count );
 
-			for ( var i = 0, j = 0, l = instanceStart.data.count; i < l; i ++, j += 2 ) {
+			for ( var i = 0, j = 0, l = instanceStart.count; i < l; i ++, j += 2 ) {
 
 				start.fromBufferAttribute( instanceStart, i );
 				end.fromBufferAttribute( instanceEnd, i );
@@ -45,21 +40,13 @@ THREE.Wireframe.prototype = Object.assign( Object.create( THREE.Mesh.prototype )
 
 			var instanceDistanceBuffer = new THREE.InstancedInterleavedBuffer( lineDistances, 2, 1 ); // d0, d1
 
-			geometry.addAttribute( 'instanceDistanceStart', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
-			geometry.addAttribute( 'instanceDistanceEnd', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
+			geometry.setAttribute( 'instanceDistanceStart', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
+			geometry.setAttribute( 'instanceDistanceEnd', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
 
 			return this;
 
 		};
 
-	}() ),
-
-	copy: function ( source ) {
-
-		// todo
-
-		return this;
-
-	}
+	}() )
 
 } );

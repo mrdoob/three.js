@@ -4,58 +4,33 @@
 		<title>three.js webgl - geometry - dynamic</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #aaccff;
-				margin: 0px;
-				overflow: hidden;
+				color: #666;
 			}
-
-			#info {
-				color: #ffffff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-
-				color: yellow;
-			}
-
-			#oldie {
-				background:rgb(0,0,50) !important;
-				color:#fff !important;
-			}
-
 		</style>
 	</head>
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - dynamic geometry demo - webgl<br />(left click: forward, right click: backward)</div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - dynamic geometry<br />
+			left click: forward, right click: backward
+		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/FirstPersonControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			let camera, controls, scene, renderer, stats;
 
-			var camera, controls, scene, renderer, stats;
+			let mesh, geometry, material, clock;
 
-			var mesh, texture, geometry, material, clock;
-
-			var worldWidth = 128, worldDepth = 128,
-			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
+			const worldWidth = 128, worldDepth = 128;
 
 			init();
 			animate();
@@ -67,29 +42,24 @@
 
 				clock = new THREE.Clock();
 
-				controls = new THREE.FirstPersonControls( camera );
-
-				controls.movementSpeed = 500;
-				controls.lookSpeed = 0.1;
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xaaccff );
 				scene.fog = new THREE.FogExp2( 0xaaccff, 0.0007 );
 
-				geometry = new THREE.PlaneBufferGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
+				geometry = new THREE.PlaneGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
-				var position = geometry.attributes.position;
-				position.dynamic = true;
+				const position = geometry.attributes.position;
+				position.usage = THREE.DynamicDrawUsage;
 
-				for ( var i = 0; i < position.count; i ++ ) {
+				for ( let i = 0; i < position.count; i ++ ) {
 
-					var y = 35 * Math.sin( i / 2 );
+					const y = 35 * Math.sin( i / 2 );
 					position.setY( i, y );
 
 				}
 
-				var texture = new THREE.TextureLoader().load( 'textures/water.jpg' );
+				const texture = new THREE.TextureLoader().load( 'textures/water.jpg' );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 5, 5 );
 
@@ -103,12 +73,17 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				controls = new FirstPersonControls( camera, renderer.domElement );
+
+				controls.movementSpeed = 500;
+				controls.lookSpeed = 0.1;
+
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -136,14 +111,14 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
-				var time = clock.getElapsedTime() * 10;
+				const delta = clock.getDelta();
+				const time = clock.getElapsedTime() * 10;
 
-				var position = geometry.attributes.position;
+				const position = geometry.attributes.position;
 
-				for ( var i = 0; i < position.count; i ++ ) {
+				for ( let i = 0; i < position.count; i ++ ) {
 
-					var y = 35 * Math.sin( i / 5 + ( time + i ) / 7 );
+					const y = 35 * Math.sin( i / 5 + ( time + i ) / 7 );
 					position.setY( i, y );
 
 				}
