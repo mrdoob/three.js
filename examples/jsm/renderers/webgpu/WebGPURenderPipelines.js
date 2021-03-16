@@ -131,18 +131,6 @@ class WebGPURenderPipelines {
 
 			//
 
-			let indexFormat;
-
-			if ( object.isLine === true && object.isLineSegments !== true ) {
-
-				const count = ( geometry.index ) ? geometry.index.count : geometry.attributes.position.count;
-
-				indexFormat = ( count > 65535 ) ? GPUIndexFormat.Uint32 : GPUIndexFormat.Uint16; // define data type for primitive restart value
-
-			}
-
-			//
-
 			let alphaBlend = {};
 			let colorBlend = {};
 
@@ -170,25 +158,24 @@ class WebGPURenderPipelines {
 
 			// pipeline
 
-			const primitiveTopology = this._getPrimitiveTopology( object );
-			const rasterizationState = this._getRasterizationStateDescriptor( material );
+			const primitiveState = this._getPrimitiveState( object, material );
 			const colorWriteMask = this._getColorWriteMask( material );
 			const depthCompare = this._getDepthCompare( material );
 			const colorFormat = this._getColorFormat( this.renderer );
 			const depthStencilFormat = this._getDepthStencilFormat( this.renderer );
 
 			pipeline = device.createRenderPipeline( {
-				vertexStage: moduleVertex,
-				fragmentStage: moduleFragment,
-				primitiveTopology: primitiveTopology,
-				rasterizationState: rasterizationState,
-				colorStates: [ {
+				vertex: Object.assign( {}, moduleVertex, { buffers: vertexBuffers } ),
+				fragment: Object.assign( {}, moduleFragment, { targets: [ {
 					format: colorFormat,
-					alphaBlend: alphaBlend,
-					colorBlend: colorBlend,
+					blend: {
+						alpha: alphaBlend,
+						color: colorBlend
+					},
 					writeMask: colorWriteMask
-				} ],
-				depthStencilState: {
+				} ] } ),
+				primitive: primitiveState,
+				depthStencil: {
 					format: depthStencilFormat,
 					depthWriteEnabled: material.depthWrite,
 					depthCompare: depthCompare,
@@ -197,11 +184,9 @@ class WebGPURenderPipelines {
 					stencilReadMask: material.stencilFuncMask,
 					stencilWriteMask: material.stencilWriteMask
 				},
-				vertexState: {
-					indexFormat: indexFormat,
-					vertexBuffers: vertexBuffers
-				},
-				sampleCount: this.sampleCount
+				multisample: {
+					count: this.sampleCount
+				}
 			} );
 
 			this.pipelines.set( object, pipeline );
@@ -594,18 +579,19 @@ class WebGPURenderPipelines {
 
 	}
 
-	_getPrimitiveTopology( object ) {
-
-		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
-		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
-		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
-		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
-
-	}
-
-	_getRasterizationStateDescriptor( material ) {
+	_getPrimitiveState( object, material ) {
 
 		const descriptor = {};
+
+		descriptor.topology = this._getPrimitiveTopology( object );
+
+		if ( object.isLine === true && object.isLineSegments !== true ) {
+
+			const geometry = object.geometry;
+			const count = ( geometry.index ) ? geometry.index.count : geometry.attributes.position.count;
+			descriptor.stripIndexFormat = ( count > 65535 ) ? GPUIndexFormat.Uint32 : GPUIndexFormat.Uint16; // define data type for primitive restart value
+
+		}
 
 		switch ( material.side ) {
 
@@ -631,6 +617,15 @@ class WebGPURenderPipelines {
 		}
 
 		return descriptor;
+
+	}
+
+	_getPrimitiveTopology( object ) {
+
+		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
+		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
+		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
+		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 
 	}
 
