@@ -53,11 +53,11 @@ class WebGPUTextureUtils {
 		this.pipelines = {};
 
 		this.mipmapVertexShaderModule = device.createShaderModule( {
-			 code: glslang.compileGLSL( mipmapVertexSource, 'vertex' ),
-		 } );
-		 this.mipmapFragmentShaderModule = device.createShaderModule( {
-			 code: glslang.compileGLSL( mipmapFragmentSource, 'fragment' ),
-		 } );
+			code: glslang.compileGLSL( mipmapVertexSource, 'vertex' ),
+		} );
+		this.mipmapFragmentShaderModule = device.createShaderModule( {
+			code: glslang.compileGLSL( mipmapFragmentSource, 'fragment' ),
+		} );
 
 	}
 
