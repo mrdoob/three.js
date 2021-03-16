@@ -24,7 +24,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
 			import { RGBMLoader } from './jsm/loaders/RGBMLoader.js';
-			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
+			import { DebugEnvironment } from './jsm/environments/DebugEnvironment.js';
 
 			import { MeshStandardNodeMaterial } from './jsm/nodes/Nodes.js';
 
@@ -134,7 +134,7 @@
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileCubemapShader();
 
-				const envScene = new RoomEnvironment();
+				const envScene = new DebugEnvironment();
 				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene );
 
 				renderer.setPixelRatio( window.devicePixelRatio );
