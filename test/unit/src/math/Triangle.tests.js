@@ -1,7 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Triangle } from '../../../../src/math/Triangle';

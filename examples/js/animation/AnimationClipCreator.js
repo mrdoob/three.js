@@ -1,11 +1,3 @@
-/**
- *
- * Creator of typical test AnimationClips / KeyframeTracks
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- */
-
 THREE.AnimationClipCreator = function () {};
 
 THREE.AnimationClipCreator.CreateRotationAnimation = function ( period, axis ) {

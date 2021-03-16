@@ -1,12 +1,7 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- *
- */
-
 import {
 	Color,
 	LinearFilter,
-	Math as _Math,
+	MathUtils,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
@@ -18,7 +13,7 @@ import {
 	Vector3,
 	Vector4,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var Refractor = function ( geometry, options ) {
 
@@ -52,13 +47,12 @@ var Refractor = function ( geometry, options ) {
 	var parameters = {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
-		format: RGBFormat,
-		stencilBuffer: false
+		format: RGBFormat
 	};
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
-	if ( ! _Math.isPowerOfTwo( textureWidth ) || ! _Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
 
 		renderTarget.texture.generateMipmaps = false;
 
@@ -73,9 +67,9 @@ var Refractor = function ( geometry, options ) {
 		transparent: true // ensures, refractors are drawn from farthest to closest
 	} );
 
-	this.material.uniforms[ "color" ].value = color;
-	this.material.uniforms[ "tDiffuse" ].value = renderTarget.texture;
-	this.material.uniforms[ "textureMatrix" ].value = textureMatrix;
+	this.material.uniforms[ 'color' ].value = color;
+	this.material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
+	this.material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 
 	// functions
 
@@ -137,7 +131,7 @@ var Refractor = function ( geometry, options ) {
 		return function updateVirtualCamera( camera ) {
 
 			virtualCamera.matrixWorld.copy( camera.matrixWorld );
-			virtualCamera.matrixWorldInverse.getInverse( virtualCamera.matrixWorld );
+			virtualCamera.matrixWorldInverse.copy( virtualCamera.matrixWorld ).invert();
 			virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 			virtualCamera.far = camera.far; // used in WebGLBackground
 
@@ -206,25 +200,27 @@ var Refractor = function ( geometry, options ) {
 		scope.visible = false;
 
 		var currentRenderTarget = renderer.getRenderTarget();
-		var currentVrEnabled = renderer.vr.enabled;
+		var currentXrEnabled = renderer.xr.enabled;
 		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 
-		renderer.vr.enabled = false; // avoid camera modification
+		renderer.xr.enabled = false; // avoid camera modification
 		renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
 
 		renderer.setRenderTarget( renderTarget );
-		renderer.clear();
+		if ( renderer.autoClear === false ) renderer.clear();
 		renderer.render( scene, virtualCamera );
 
-		renderer.vr.enabled = currentVrEnabled;
+		renderer.xr.enabled = currentXrEnabled;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 		renderer.setRenderTarget( currentRenderTarget );
 
 		// restore viewport
 
-		if ( camera.isArrayCamera ) {
+		var viewport = camera.viewport;
 
-			renderer.state.viewport( camera.viewport );
+		if ( viewport !== undefined ) {
+
+			renderer.state.viewport( viewport );
 
 		}
 
@@ -235,6 +231,10 @@ var Refractor = function ( geometry, options ) {
 	//
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
+
+		// Render
+
+		renderTarget.texture.encoding = renderer.outputEncoding;
 
 		// ensure refractors are rendered only once per frame
 

@@ -1,31 +1,21 @@
-/**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { ShapePath } from './ShapePath.js';
 
+class Font {
 
-function Font( data ) {
+	constructor( data ) {
 
-	this.type = 'Font';
+		this.type = 'Font';
 
-	this.data = data;
+		this.data = data;
 
-}
+	}
 
-Object.assign( Font.prototype, {
+	generateShapes( text, size = 100 ) {
 
-	isFont: true,
+		const shapes = [];
+		const paths = createPaths( text, size, this.data );
 
-	generateShapes: function ( text, size ) {
-
-		if ( size === undefined ) size = 100;
-
-		var shapes = [];
-		var paths = createPaths( text, size, this.data );
-
-		for ( var p = 0, pl = paths.length; p < pl; p ++ ) {
+		for ( let p = 0, pl = paths.length; p < pl; p ++ ) {
 
 			Array.prototype.push.apply( shapes, paths[ p ].toShapes() );
 
@@ -35,21 +25,21 @@ Object.assign( Font.prototype, {
 
 	}
 
-} );
+}
 
 function createPaths( text, size, data ) {
 
-	var chars = Array.from ? Array.from( text ) : String( text ).split( '' ); // see #13988
-	var scale = size / data.resolution;
-	var line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
+	const chars = Array.from( text );
+	const scale = size / data.resolution;
+	const line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
 
-	var paths = [];
+	const paths = [];
 
-	var offsetX = 0, offsetY = 0;
+	let offsetX = 0, offsetY = 0;
 
-	for ( var i = 0; i < chars.length; i ++ ) {
+	for ( let i = 0; i < chars.length; i ++ ) {
 
-		var char = chars[ i ];
+		const char = chars[ i ];
 
 		if ( char === '\n' ) {
 
@@ -58,7 +48,7 @@ function createPaths( text, size, data ) {
 
 		} else {
 
-			var ret = createPath( char, scale, offsetX, offsetY, data );
+			const ret = createPath( char, scale, offsetX, offsetY, data );
 			offsetX += ret.offsetX;
 			paths.push( ret.path );
 
@@ -72,21 +62,27 @@ function createPaths( text, size, data ) {
 
 function createPath( char, scale, offsetX, offsetY, data ) {
 
-	var glyph = data.glyphs[ char ] || data.glyphs[ '?' ];
+	const glyph = data.glyphs[ char ] || data.glyphs[ '?' ];
 
-	if ( ! glyph ) return;
+	if ( ! glyph ) {
 
-	var path = new ShapePath();
+		console.error( 'THREE.Font: character "' + char + '" does not exists in font family ' + data.familyName + '.' );
 
-	var x, y, cpx, cpy, cpx1, cpy1, cpx2, cpy2;
+		return;
+
+	}
+
+	const path = new ShapePath();
+
+	let x, y, cpx, cpy, cpx1, cpy1, cpx2, cpy2;
 
 	if ( glyph.o ) {
 
-		var outline = glyph._cachedOutline || ( glyph._cachedOutline = glyph.o.split( ' ' ) );
+		const outline = glyph._cachedOutline || ( glyph._cachedOutline = glyph.o.split( ' ' ) );
 
-		for ( var i = 0, l = outline.length; i < l; ) {
+		for ( let i = 0, l = outline.length; i < l; ) {
 
-			var action = outline[ i ++ ];
+			const action = outline[ i ++ ];
 
 			switch ( action ) {
 
@@ -141,5 +137,7 @@ function createPath( char, scale, offsetX, offsetY, data ) {
 	return { offsetX: glyph.ha * scale, path: path };
 
 }
+
+Font.prototype.isFont = true;
 
 export { Font };

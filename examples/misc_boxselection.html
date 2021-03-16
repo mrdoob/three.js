@@ -9,6 +9,7 @@
 			body {
 				background-color: #f0f0f0;
 				color: #000;
+				touch-action: none;
 			}
 
 			a {
@@ -25,19 +26,20 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - box selection
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - box selection
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script src="js/interactive/SelectionBox.js"></script>
-		<script src="js/interactive/SelectionHelper.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			var container, stats;
-			var camera, scene, renderer;
+			import { SelectionBox } from './jsm/interactive/SelectionBox.js';
+			import { SelectionHelper } from './jsm/interactive/SelectionHelper.js';
+
+			let container, stats;
+			let camera, scene, renderer;
 
 			init();
 			animate();
@@ -55,7 +57,7 @@
 
 				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
-				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				const light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
 				light.angle = Math.PI / 9;
 
@@ -67,11 +69,11 @@
 
 				scene.add( light );
 
-				var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				const geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
-				for ( var i = 0; i < 200; i ++ ) {
+				for ( let i = 0; i < 200; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 1600 - 800;
 					object.position.y = Math.random() * 900 - 450;
@@ -104,7 +106,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -134,14 +136,14 @@
 
 			}
 
-			var selectionBox = new THREE.SelectionBox( camera, scene );
-			var helper = new THREE.SelectionHelper( selectionBox, renderer, 'selectBox' );
+			const selectionBox = new SelectionBox( camera, scene );
+			const helper = new SelectionHelper( selectionBox, renderer, 'selectBox' );
 
-			document.addEventListener( 'mousedown', function ( event ) {
+			document.addEventListener( 'pointerdown', function ( event ) {
 
-				for ( var item of selectionBox.collection ) {
+				for ( const item of selectionBox.collection ) {
 
-					item.material.emissive = new THREE.Color( 0x000000 );
+					item.material.emissive.set( 0x000000 );
 
 				}
 
@@ -152,13 +154,13 @@
 
 			} );
 
-			document.addEventListener( 'mousemove', function ( event ) {
+			document.addEventListener( 'pointermove', function ( event ) {
 
 				if ( helper.isDown ) {
 
-					for ( var i = 0; i < selectionBox.collection.length; i ++ ) {
+					for ( let i = 0; i < selectionBox.collection.length; i ++ ) {
 
-						selectionBox.collection[ i ].material.emissive = new THREE.Color( 0x000000 );
+						selectionBox.collection[ i ].material.emissive.set( 0x000000 );
 
 					}
 
@@ -167,11 +169,11 @@
 						- ( event.clientY / window.innerHeight ) * 2 + 1,
 						0.5 );
 
-					var allSelected = selectionBox.select();
+					const allSelected = selectionBox.select();
 
-					for ( var i = 0; i < allSelected.length; i ++ ) {
+					for ( let i = 0; i < allSelected.length; i ++ ) {
 
-						allSelected[ i ].material.emissive = new THREE.Color( 0x0000ff );
+						allSelected[ i ].material.emissive.set( 0xffffff );
 
 					}
 
@@ -179,18 +181,18 @@
 
 			} );
 
-			document.addEventListener( 'mouseup', function ( event ) {
+			document.addEventListener( 'pointerup', function ( event ) {
 
 				selectionBox.endPoint.set(
 					( event.clientX / window.innerWidth ) * 2 - 1,
 					- ( event.clientY / window.innerHeight ) * 2 + 1,
 					0.5 );
 
-				var allSelected = selectionBox.select();
+				const allSelected = selectionBox.select();
 
-				for ( var i = 0; i < allSelected.length; i ++ ) {
+				for ( let i = 0; i < allSelected.length; i ++ ) {
 
-					allSelected[ i ].material.emissive = new THREE.Color( 0x0000ff );
+					allSelected[ i ].material.emissive.set( 0xffffff );
 
 				}
 

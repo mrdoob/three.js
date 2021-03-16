@@ -4,94 +4,104 @@
 		<title>three.js webgl - LWO loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - LWOLoader<br />
-			Loader for Lightwave LWO V3 file format, by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - LWOLoader
+			<P>Lightwave Object loader by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a></P>
+			Models by <a href="https://onthez.com/" target="_blank" rel="noopener">on the z</a> - Environment images by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/LWOLoader.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { LWOLoader } from './jsm/loaders/LWOLoader.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			let camera, scene, renderer;
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
-			var container, stats, controls;
-			var camera, scene, renderer;
+			init();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
-				camera.position.set( 5, 4, 20 );
+				camera.position.set( - 0.7, 14.6, 43.2 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
 
-				var ambientLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 2 );
+				const ambientLight = new THREE.AmbientLight( 0xaaaaaa, 1.75 );
+				scene.add( ambientLight );
 
-				var mainLight = new THREE.DirectionalLight( 0xffffff, 2 );
-				mainLight.position.set( 10, 10, - 10 );
+				const light1 = new THREE.DirectionalLight( 0xffffff, 1 );
+				light1.position.set( 0, 200, 100 );
+				light1.castShadow = true;
+				light1.shadow.camera.top = 180;
+				light1.shadow.camera.bottom = - 100;
+				light1.shadow.camera.left = - 120;
+				light1.shadow.camera.right = 120;
+				scene.add( light1 );
 
-				scene.add( ambientLight, mainLight );
+				const light2 = new THREE.DirectionalLight( 0xffffff, 0.7 );
+				light2.position.set( - 100, 200, - 100 );
+				scene.add( light2 );
 
-				var grid = new THREE.GridHelper( 200, 20, 0x000000, 0x000000 );
-				grid.material.opacity = 0.2;
+				const light3 = new THREE.DirectionalLight( 0xffffff, 0.4 );
+				light3.position.set( 100, - 200, 100 );
+				scene.add( light3 );
+
+				const light4 = new THREE.DirectionalLight( 0xffffff, 1 );
+				light4.position.set( - 100, - 100, 100 );
+				scene.add( light4 );
+
+				const grid = new THREE.GridHelper( 200, 20, 0x000000, 0x000000 );
+				grid.material.opacity = 0.3;
 				grid.material.transparent = true;
 				scene.add( grid );
 
-				var loader = new THREE.LWOLoader();
-				loader.load( 'models/lwo/StandardMaterials.lwo', function ( lwo ) {
+				const loader = new LWOLoader();
+				loader.load( 'models/lwo/Objects/LWO3/Demo.lwo', function ( object ) {
 
-					const mesh = lwo.meshes[ 0 ];
+					const phong = object.meshes[ 0 ];
+					phong.position.set( - 2, 12, 0 );
 
-					mesh.position.set( 3, 6, 0 );
+					const standard = object.meshes[ 1 ];
+					standard.position.set( 2, 12, 0 );
 
-					scene.add( mesh );
+					const rocket = object.meshes[ 2 ];
+					rocket.position.set( 0, 10.5, - 1 );
+
+					scene.add( phong, standard, rocket );
 
 				} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
 				renderer.physicallyCorrectLights = true;
-				renderer.gammaFactor = 2.2;
-				renderer.gammaOutput = true;
+				renderer.gammaFactor = 1.18;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.y = 4;
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 1.33, 10, - 6.7 );
 				controls.update();
 
 				renderer.setAnimationLoop( function () {
 
-					stats.begin();
-
 					renderer.render( scene, camera );
-
-					stats.end();
 
 				} );
 
-				window.addEventListener( 'resize', onWindowResize, false );
-
-				// stats
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -103,8 +113,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
-
-			init();
 
 		</script>
 

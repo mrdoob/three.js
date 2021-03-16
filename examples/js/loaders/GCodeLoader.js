@@ -5,40 +5,51 @@
  *
  * @class THREE.GCodeLoader
  * @param {Manager} manager Loading manager.
- * @author tentone
- * @author joewalnes
  */
 
 THREE.GCodeLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 	this.splitLayer = false;
 
 };
 
-THREE.GCodeLoader.prototype = {
+THREE.GCodeLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.GCodeLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var self = this;
+		var scope = this;
 
-		var loader = new THREE.FileLoader( self.manager );
-		loader.setPath( self.path );
+		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
-			onLoad( self.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -182,7 +193,7 @@ THREE.GCodeLoader.prototype = {
 		function addObject( vertex, extruding ) {
 
 			var geometry = new THREE.BufferGeometry();
-			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertex, 3 ) );
+			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertex, 3 ) );
 
 			var segments = new THREE.LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
 			segments.name = 'layer' + i;
@@ -210,9 +221,20 @@ THREE.GCodeLoader.prototype = {
 			for ( var i = 0; i < layers.length; i ++ ) {
 
 				var layer = layers[ i ];
+				var layerVertex = layer.vertex;
+				var layerPathVertex = layer.pathVertex;
 
-				vertex = vertex.concat( layer.vertex );
-				pathVertex = pathVertex.concat( layer.pathVertex );
+				for ( var j = 0; j < layerVertex.length; j ++ ) {
+
+					vertex.push( layerVertex[ j ] );
+
+				}
+
+				for ( var j = 0; j < layerPathVertex.length; j ++ ) {
+
+					pathVertex.push( layerPathVertex[ j ] );
+
+				}
 
 			}
 
@@ -227,4 +249,4 @@ THREE.GCodeLoader.prototype = {
 
 	}
 
-};
+} );

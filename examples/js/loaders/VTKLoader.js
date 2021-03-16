@@ -1,21 +1,12 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Alex Pletzer
- *
- * Updated on 22.03.2017
- * VTK header is now parsed and used to extract all the compressed data
- * @author Andrii Iudin https://github.com/andreyyudin
- * @author Paul Kibet Korir https://github.com/polarise
- * @author Sriram Somasundharam https://github.com/raamssundar
- */
-
 THREE.VTKLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
+THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+
+	constructor: THREE.VTKLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -24,18 +15,31 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -56,6 +60,9 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 			var normals = [];
 
 			var result;
+
+			// pattern for detecting the end of a number sequence
+			var patWord = /^[^\d.\s-]+/;
 
 			// pattern for reading vertices, 3 floats or integers
 			var pat3Floats = /(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)/g;
@@ -97,7 +104,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 			for ( var i in lines ) {
 
-				var line = lines[ i ];
+				var line = lines[ i ].trim();
 
 				if ( line.indexOf( 'DATASET' ) === 0 ) {
 
@@ -109,6 +116,8 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 					// get the vertices
 					while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+
+						if ( patWord.exec( line ) !== null ) break;
 
 						var x = parseFloat( result[ 1 ] );
 						var y = parseFloat( result[ 2 ] );
@@ -188,6 +197,8 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
 
+							if ( patWord.exec( line ) !== null ) break;
+
 							var r = parseFloat( result[ 1 ] );
 							var g = parseFloat( result[ 2 ] );
 							var b = parseFloat( result[ 3 ] );
@@ -200,6 +211,8 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 						// Get the normal vectors
 
 						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+
+							if ( patWord.exec( line ) !== null ) break;
 
 							var nx = parseFloat( result[ 1 ] );
 							var ny = parseFloat( result[ 2 ] );
@@ -266,11 +279,11 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 			var geometry = new THREE.BufferGeometry();
 			geometry.setIndex( indices );
-			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 
 			if ( normals.length === positions.length ) {
 
-				geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 
 			}
 
@@ -280,7 +293,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 				if ( colors.length === positions.length ) {
 
-					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+					geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				}
 
@@ -307,7 +320,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 					}
 
-					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( newColors, 3 ) );
+					geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( newColors, 3 ) );
 
 				}
 
@@ -386,6 +399,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 						pointIndex = pointIndex + 12;
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -434,6 +448,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 						}
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -471,6 +486,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 						}
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -513,11 +529,11 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 			var geometry = new THREE.BufferGeometry();
 			geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
+			geometry.setAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
 
 			if ( normals.length === points.length ) {
 
-				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
 			}
 
@@ -769,9 +785,8 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 					for ( var i = 0; i < dataOffsets.length - 1; i ++ ) {
 
-						var inflate = new Zlib.Inflate( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ), { resize: true, verify: true } ); // eslint-disable-line no-undef
-						content = inflate.decompress();
-						content = content.buffer;
+						var data = fflate.unzlibSync( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ) ); // eslint-disable-line no-undef
+						content = data.buffer;
 
 						if ( ele.attributes.type === 'Float32' ) {
 
@@ -1117,11 +1132,11 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 				var geometry = new THREE.BufferGeometry();
 				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
 
 				if ( normals.length === points.length ) {
 
-					geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+					geometry.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
 				}
 
@@ -1135,33 +1150,16 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		}
 
-		function getStringFile( data ) {
-
-			var stringFile = '';
-			var charArray = new Uint8Array( data );
-			var i = 0;
-			var len = charArray.length;
-
-			while ( len -- ) {
-
-				stringFile += String.fromCharCode( charArray[ i ++ ] );
-
-			}
-
-			return stringFile;
-
-		}
-
 		// get the 5 first lines of the files to check if there is the key word binary
 		var meta = THREE.LoaderUtils.decodeText( new Uint8Array( data, 0, 250 ) ).split( '\n' );
 
 		if ( meta[ 0 ].indexOf( 'xml' ) !== - 1 ) {
 
-			return parseXML( getStringFile( data ) );
+			return parseXML( THREE.LoaderUtils.decodeText( data ) );
 
 		} else if ( meta[ 2 ].includes( 'ASCII' ) ) {
 
-			return parseASCII( getStringFile( data ) );
+			return parseASCII( THREE.LoaderUtils.decodeText( data ) );
 
 		} else {
 

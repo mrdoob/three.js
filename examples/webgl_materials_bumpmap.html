@@ -9,42 +9,36 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - bump mapping without tangents<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - bump mapping without tangents<br/>
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			const statsEnabled = true;
 
-			}
+			let container, stats, loader;
 
-			var statsEnabled = true;
+			let camera, scene, renderer;
 
-			var container, stats, loader;
+			let mesh;
 
-			var camera, scene, renderer;
+			let spotLight;
 
-			var mesh;
+			let mouseX = 0;
+			let mouseY = 0;
 
-			var spotLight;
+			let targetX = 0;
+			let targetY = 0;
 
-			var mouseX = 0;
-			var mouseY = 0;
-
-			var targetX = 0;
-			var targetY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			const windowHalfX = window.innerWidth / 2;
+			const windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -85,9 +79,9 @@
 
 				//
 
-				var mapHeight = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				const mapHeight = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
-				var material = new THREE.MeshPhongMaterial( {
+				const material = new THREE.MeshPhongMaterial( {
 					color: 0x552811,
 					specular: 0x222222,
 					shininess: 25,
@@ -95,7 +89,7 @@
 					bumpScale: 12
 				} );
 
-				loader = new THREE.GLTFLoader();
+				loader = new GLTFLoader();
 				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
 					createScene( gltf.scene.children[ 0 ].geometry, 100, material );
@@ -108,11 +102,7 @@
 				container.appendChild( renderer.domElement );
 
 				renderer.shadowMap.enabled = true;
-
-				//
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
@@ -125,8 +115,8 @@
 
 				// EVENTS
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -9,30 +9,23 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl EXR texture loader example<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl EXR texture loader example<br/>
 			Image courtesy of <a href="http://www.pauldebevec.com/Research/HDR/" target="_blank" rel="noopener">Paul Debevec</a>.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/EXRLoader.js"></script>
+		<script type="module">
 
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
+			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
-			var params = {
+			const params = {
 				exposure: 2.0
 			};
 
-			var renderer, scene, camera;
+			let renderer, scene, camera;
 
 			init();
 
@@ -46,58 +39,58 @@
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = params.exposure;
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
-				new THREE.EXRLoader().load( 'textures/memorial.exr', function ( texture, textureData ) {
+				new EXRLoader()
+					.setDataType( THREE.FloatType )
+					.load( 'textures/memorial.exr', function ( texture, textureData ) {
 
-					//console.log( textureData );
-					//console.log( texture );
+						// memorial.exr is NPOT
 
-					texture.minFilter = THREE.NearestFilter;
-					texture.magFilter = THREE.NearestFilter;
+						//console.log( textureData );
+						//console.log( texture );
 
-					// these setting are currently set correctly by default
-					//texture.encoding = THREE.LinearEncoding;
-					//texture.minFilter = THREE.LinearMipMapLinearFilter;
-					//texture.magFilter = THREE.LinearFilter;
-					//texture.flipY = true;
+						// EXRLoader sets these default settings
+						//texture.generateMipmaps = false;
+						//texture.minFilter = LinearFilter;
+						//texture.magFilter = LinearFilter;
 
-					var material = new THREE.MeshBasicMaterial( { map: texture } );
+						const material = new THREE.MeshBasicMaterial( { map: texture } );
 
-					var quad = new THREE.PlaneBufferGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
+						const quad = new THREE.PlaneGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
 
-					var mesh = new THREE.Mesh( quad, material );
+						const mesh = new THREE.Mesh( quad, material );
 
-					scene.add( mesh );
+						scene.add( mesh );
 
-					render();
+						render();
 
-				} );
+					} );
 
 				//
 
-				var gui = new dat.GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'exposure', 0, 4, 0.01 ).onChange( render );
 				gui.open();
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function onWindowResize() {
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 
-				var frustumHeight = camera.top - camera.bottom;
+				const frustumHeight = camera.top - camera.bottom;
 
 				camera.left = - frustumHeight * aspect / 2;
 				camera.right = frustumHeight * aspect / 2;

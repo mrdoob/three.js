@@ -1,11 +1,7 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import {
 	BufferGeometry,
 	Float32BufferAttribute
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var BoxLineGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
@@ -64,7 +60,7 @@ var BoxLineGeometry = function ( width, height, depth, widthSegments, heightSegm
 
 	}
 
-	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 };
 

@@ -1,7 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	this.renderer = renderer;
@@ -11,8 +7,7 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 		var parameters = {
 			minFilter: THREE.LinearFilter,
 			magFilter: THREE.LinearFilter,
-			format: THREE.RGBAFormat,
-			stencilBuffer: false
+			format: THREE.RGBAFormat
 		};
 
 		var size = renderer.getSize( new THREE.Vector2() );
@@ -75,15 +70,26 @@ Object.assign( THREE.EffectComposer.prototype, {
 	addPass: function ( pass ) {
 
 		this.passes.push( pass );
-
-		var size = this.renderer.getDrawingBufferSize( new THREE.Vector2() );
-		pass.setSize( size.width, size.height );
+		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
 
 	},
 
 	insertPass: function ( pass, index ) {
 
 		this.passes.splice( index, 0, pass );
+		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
+
+	},
+
+	removePass: function ( pass ) {
+
+		const index = this.passes.indexOf( pass );
+
+		if ( index !== - 1 ) {
+
+			this.passes.splice( index, 1 );
+
+		}
 
 	},
 
@@ -132,13 +138,16 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 				if ( maskActive ) {
 
-					var context = this.renderer.context;
+					var context = this.renderer.getContext();
+					var stencil = this.renderer.state.buffers.stencil;
 
-					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
+					//context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
+					stencil.setFunc( context.NOTEQUAL, 1, 0xffffffff );
 
 					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime );
 
-					context.stencilFunc( context.EQUAL, 1, 0xffffffff );
+					//context.stencilFunc( context.EQUAL, 1, 0xffffffff );
+					stencil.setFunc( context.EQUAL, 1, 0xffffffff );
 
 				}
 
@@ -252,7 +261,7 @@ Object.assign( THREE.Pass.prototype, {
 THREE.Pass.FullScreenQuad = ( function () {
 
 	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+	var geometry = new THREE.PlaneGeometry( 2, 2 );
 
 	var FullScreenQuad = function ( material ) {
 
@@ -277,6 +286,12 @@ THREE.Pass.FullScreenQuad = ( function () {
 	} );
 
 	Object.assign( FullScreenQuad.prototype, {
+
+		dispose: function () {
+
+			this._mesh.geometry.dispose();
+
+		},
 
 		render: function ( renderer ) {
 

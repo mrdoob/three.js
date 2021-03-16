@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 THREE.BoxLineGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
 	THREE.BufferGeometry.call( this );
@@ -59,7 +55,7 @@ THREE.BoxLineGeometry = function ( width, height, depth, widthSegments, heightSe
 
 	}
 
-	this.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 };
 

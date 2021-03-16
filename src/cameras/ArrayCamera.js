@@ -1,14 +1,10 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
-function ArrayCamera( array ) {
+function ArrayCamera( array = [] ) {
 
 	PerspectiveCamera.call( this );
 
-	this.cameras = array || [];
+	this.cameras = array;
 
 }
 

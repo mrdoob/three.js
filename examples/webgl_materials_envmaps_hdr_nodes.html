@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - materials - hdr environment mapping</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
+			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { RGBMLoader } from './jsm/loaders/RGBMLoader.js';
+
+			import { MeshStandardNodeMaterial } from './jsm/nodes/Nodes.js';
+
+			const params = {
+				envMap: 'HDR',
+				roughness: 0.0,
+				metalness: 0.0,
+				exposure: 1.0,
+				nodes: true,
+				animate: true,
+				debug: false
+			};
+
+			let container, stats;
+			let camera, scene, renderer, controls;
+			let torusMesh, torusMeshNode, planeMesh;
+			let generatedCubeRenderTarget, ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
+			let ldrCubeMap, hdrCubeMap, rgbmCubeMap;
+
+			init();
+			animate();
+
+			function getEnvScene() {
+
+				const envScene = new THREE.Scene();
+
+				const geometry = new THREE.BoxGeometry();
+				geometry.deleteAttribute( 'uv' );
+				const roomMaterial = new THREE.MeshStandardMaterial( { metalness: 0, side: THREE.BackSide } );
+				const room = new THREE.Mesh( geometry, roomMaterial );
+				room.scale.setScalar( 10 );
+				envScene.add( room );
+
+				const mainLight = new THREE.PointLight( 0xffffff, 50, 0, 2 );
+				envScene.add( mainLight );
+
+				const lightMaterial = new THREE.MeshLambertMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 10 } );
+
+				const light1 = new THREE.Mesh( geometry, lightMaterial );
+				light1.position.set( - 5, 2, 0 );
+				light1.scale.set( 0.1, 1, 1 );
+				envScene.add( light1 );
+
+				const light2 = new THREE.Mesh( geometry, lightMaterial );
+				light2.position.set( 0, 5, 0 );
+				light2.scale.set( 1, 0.1, 1 );
+				envScene.add( light2 );
+
+				const light3 = new THREE.Mesh( geometry, lightMaterial );
+				light3.position.set( 2, 1, 5 );
+				light3.scale.set( 1.5, 2, 0.1 );
+				envScene.add( light3 );
+
+				return envScene;
+
+			}
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 0, 120 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.physicallyCorrectLights = true;
+
+				//
+
+				let geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
+
+				let material = new THREE.MeshStandardMaterial();
+				material.color = new THREE.Color( 0xffffff );
+				material.roughness = params.roughness;
+				material.metalness = params.metalness;
+
+				torusMesh = new THREE.Mesh( geometry, material );
+				scene.add( torusMesh );
+
+				material = new MeshStandardNodeMaterial();
+				material.color = new THREE.Color( 0xffffff );
+				material.roughness = params.roughness;
+				material.metalness = params.metalness;
+
+				torusMeshNode = new THREE.Mesh( geometry, material );
+				scene.add( torusMeshNode );
+
+				geometry = new THREE.PlaneGeometry( 200, 200 );
+				material = new THREE.MeshBasicMaterial();
+
+				planeMesh = new THREE.Mesh( geometry, material );
+				planeMesh.position.y = - 50;
+				planeMesh.rotation.x = - Math.PI * 0.5;
+				scene.add( planeMesh );
+
+				THREE.DefaultLoadingManager.onLoad = function ( ) {
+
+					pmremGenerator.dispose();
+
+				};
+
+				const hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+				hdrCubeMap = new HDRCubeTextureLoader()
+					.setPath( './textures/cube/pisaHDR/' )
+					.setDataType( THREE.UnsignedByteType )
+					.load( hdrUrls, function () {
+
+						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+
+						hdrCubeMap.magFilter = THREE.LinearFilter;
+						hdrCubeMap.needsUpdate = true;
+
+					} );
+
+				const ldrUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
+				ldrCubeMap = new THREE.CubeTextureLoader()
+					.setPath( './textures/cube/pisa/' )
+					.load( ldrUrls, function () {
+
+						ldrCubeMap.encoding = THREE.sRGBEncoding;
+
+						ldrCubeRenderTarget = pmremGenerator.fromCubemap( ldrCubeMap );
+
+					} );
+
+
+				const rgbmUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
+				rgbmCubeMap = new RGBMLoader()
+					.setPath( './textures/cube/pisaRGBM16/' )
+					.loadCubemap( rgbmUrls, function () {
+
+						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
+
+						rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
+
+					} );
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileCubemapShader();
+
+				const envScene = getEnvScene();
+				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene, 0.04 );
+
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 50;
+				controls.maxDistance = 300;
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				const gui = new GUI();
+
+				gui.add( params, 'envMap', [ 'Generated', 'LDR', 'HDR', 'RGBM16' ] );
+				gui.add( params, 'roughness', 0, 1, 0.01 );
+				gui.add( params, 'metalness', 0, 1, 0.01 );
+				gui.add( params, 'exposure', 0, 2, 0.01 );
+				gui.add( params, 'nodes', true );
+				gui.add( params, 'animate', true );
+				gui.add( params, 'debug', false );
+				gui.open();
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			function render() {
+
+				torusMesh.visible = ! params.nodes;
+				torusMeshNode.visible = params.nodes;
+
+				torusMesh.material.roughness = params.roughness;
+				torusMesh.material.metalness = params.metalness;
+
+				torusMeshNode.material.roughness = params.roughness;
+				torusMeshNode.material.metalness = params.metalness;
+
+				let renderTarget, cubeMap;
+
+				switch ( params.envMap ) {
+
+					case 'Generated':
+						renderTarget = generatedCubeRenderTarget;
+						cubeMap = generatedCubeRenderTarget.texture;
+						break;
+					case 'LDR':
+						renderTarget = ldrCubeRenderTarget;
+						cubeMap = ldrCubeMap;
+						break;
+					case 'HDR':
+						renderTarget = hdrCubeRenderTarget;
+						cubeMap = hdrCubeMap;
+						break;
+					case 'RGBM16':
+						renderTarget = rgbmCubeRenderTarget;
+						cubeMap = rgbmCubeMap;
+						break;
+
+				}
+
+				const newEnvMap = renderTarget ? renderTarget.texture : null;
+
+				if ( newEnvMap && newEnvMap !== torusMesh.material.envMap ) {
+
+					torusMesh.material.envMap = newEnvMap;
+					torusMesh.material.needsUpdate = true;
+
+					torusMeshNode.material.envMap = newEnvMap;
+					torusMeshNode.material.needsUpdate = true;
+
+					planeMesh.material.map = newEnvMap;
+					planeMesh.material.needsUpdate = true;
+
+				}
+
+				if ( params.animate ) {
+
+					torusMesh.rotation.y += 0.005;
+					torusMeshNode.rotation.y = torusMesh.rotation.y;
+
+				}
+
+				planeMesh.visible = params.debug;
+
+				scene.background = cubeMap;
+				renderer.toneMappingExposure = params.exposure;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -14,19 +14,20 @@
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - sandbox</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - sandbox</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/renderers/CSS3DRenderer.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer;
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
-			var scene2, renderer2;
+			let camera, scene, renderer;
 
-			var controls;
+			let scene2, renderer2;
+
+			let controls;
 
 			init();
 			animate();
@@ -41,19 +42,19 @@
 
 				scene2 = new THREE.Scene();
 
-				var material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1, side: THREE.DoubleSide } );
+				const material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1, side: THREE.DoubleSide } );
 
 				//
 
-				for ( var i = 0; i < 10; i ++ ) {
+				for ( let i = 0; i < 10; i ++ ) {
 
-					var element = document.createElement( 'div' );
+					const element = document.createElement( 'div' );
 					element.style.width = '100px';
 					element.style.height = '100px';
 					element.style.opacity = ( i < 5 ) ? 0.5 : 1;
 					element.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
 
-					var object = new THREE.CSS3DObject( element );
+					const object = new CSS3DObject( element );
 					object.position.x = Math.random() * 200 - 100;
 					object.position.y = Math.random() * 200 - 100;
 					object.position.z = Math.random() * 200 - 100;
@@ -64,8 +65,8 @@
 					object.scale.y = Math.random() + 0.5;
 					scene2.add( object );
 
-					var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-					var mesh = new THREE.Mesh( geometry, material );
+					const geometry = new THREE.PlaneGeometry( 100, 100 );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.copy( object.position );
 					mesh.rotation.copy( object.rotation );
 					mesh.scale.copy( object.scale );
@@ -80,13 +81,27 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				renderer2 = new THREE.CSS3DRenderer();
+				renderer2 = new CSS3DRenderer();
 				renderer2.setSize( window.innerWidth, window.innerHeight );
 				renderer2.domElement.style.position = 'absolute';
 				renderer2.domElement.style.top = 0;
 				document.body.appendChild( renderer2.domElement );
 
-				controls = new THREE.TrackballControls( camera, renderer2.domElement );
+				controls = new TrackballControls( camera, renderer2.domElement );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer2.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { CatmullRom, QuadraticBezier, CubicBezier } from '../../../../../src/extras/core/Interpolations';

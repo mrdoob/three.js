@@ -1,19 +1,17 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, AddEquation, DoubleSide, BackSide } from '../../constants.js';
+import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, DoubleSide, BackSide, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor } from '../../constants.js';
 import { Vector4 } from '../../math/Vector4.js';
 
-function WebGLState( gl, extensions, utils, capabilities ) {
+function WebGLState( gl, extensions, capabilities ) {
+
+	const isWebGL2 = capabilities.isWebGL2;
 
 	function ColorBuffer() {
 
-		var locked = false;
+		let locked = false;
 
-		var color = new Vector4();
-		var currentColorMask = null;
-		var currentColorClear = new Vector4( 0, 0, 0, 0 );
+		const color = new Vector4();
+		let currentColorMask = null;
+		const currentColorClear = new Vector4( 0, 0, 0, 0 );
 
 		return {
 
@@ -68,11 +66,11 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	function DepthBuffer() {
 
-		var locked = false;
+		let locked = false;
 
-		var currentDepthMask = null;
-		var currentDepthFunc = null;
-		var currentDepthClear = null;
+		let currentDepthMask = null;
+		let currentDepthFunc = null;
+		let currentDepthClear = null;
 
 		return {
 
@@ -200,28 +198,32 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	function StencilBuffer() {
 
-		var locked = false;
+		let locked = false;
 
-		var currentStencilMask = null;
-		var currentStencilFunc = null;
-		var currentStencilRef = null;
-		var currentStencilFuncMask = null;
-		var currentStencilFail = null;
-		var currentStencilZFail = null;
-		var currentStencilZPass = null;
-		var currentStencilClear = null;
+		let currentStencilMask = null;
+		let currentStencilFunc = null;
+		let currentStencilRef = null;
+		let currentStencilFuncMask = null;
+		let currentStencilFail = null;
+		let currentStencilZFail = null;
+		let currentStencilZPass = null;
+		let currentStencilClear = null;
 
 		return {
 
 			setTest: function ( stencilTest ) {
 
-				if ( stencilTest ) {
+				if ( ! locked ) {
 
-					enable( gl.STENCIL_TEST );
+					if ( stencilTest ) {
 
-				} else {
+						enable( gl.STENCIL_TEST );
 
-					disable( gl.STENCIL_TEST );
+					} else {
+
+						disable( gl.STENCIL_TEST );
+
+					}
 
 				}
 
@@ -241,7 +243,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 			setFunc: function ( stencilFunc, stencilRef, stencilMask ) {
 
 				if ( currentStencilFunc !== stencilFunc ||
-				     currentStencilRef 	!== stencilRef 	||
+				     currentStencilRef !== stencilRef ||
 				     currentStencilFuncMask !== stencilMask ) {
 
 					gl.stencilFunc( stencilFunc, stencilRef, stencilMask );
@@ -256,7 +258,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 			setOp: function ( stencilFail, stencilZFail, stencilZPass ) {
 
-				if ( currentStencilFail	 !== stencilFail 	||
+				if ( currentStencilFail !== stencilFail ||
 				     currentStencilZFail !== stencilZFail ||
 				     currentStencilZPass !== stencilZPass ) {
 
@@ -308,73 +310,66 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	//
 
-	var colorBuffer = new ColorBuffer();
-	var depthBuffer = new DepthBuffer();
-	var stencilBuffer = new StencilBuffer();
+	const colorBuffer = new ColorBuffer();
+	const depthBuffer = new DepthBuffer();
+	const stencilBuffer = new StencilBuffer();
 
-	var maxVertexAttributes = gl.getParameter( gl.MAX_VERTEX_ATTRIBS );
-	var newAttributes = new Uint8Array( maxVertexAttributes );
-	var enabledAttributes = new Uint8Array( maxVertexAttributes );
-	var attributeDivisors = new Uint8Array( maxVertexAttributes );
+	let enabledCapabilities = {};
 
-	var enabledCapabilities = {};
+	let currentProgram = null;
 
-	var compressedTextureFormats = null;
+	let currentBlendingEnabled = false;
+	let currentBlending = null;
+	let currentBlendEquation = null;
+	let currentBlendSrc = null;
+	let currentBlendDst = null;
+	let currentBlendEquationAlpha = null;
+	let currentBlendSrcAlpha = null;
+	let currentBlendDstAlpha = null;
+	let currentPremultipledAlpha = false;
 
-	var currentProgram = null;
+	let currentFlipSided = null;
+	let currentCullFace = null;
 
-	var currentBlendingEnabled = null;
-	var currentBlending = null;
-	var currentBlendEquation = null;
-	var currentBlendSrc = null;
-	var currentBlendDst = null;
-	var currentBlendEquationAlpha = null;
-	var currentBlendSrcAlpha = null;
-	var currentBlendDstAlpha = null;
-	var currentPremultipledAlpha = false;
+	let currentLineWidth = null;
 
-	var currentFlipSided = null;
-	var currentCullFace = null;
+	let currentPolygonOffsetFactor = null;
+	let currentPolygonOffsetUnits = null;
 
-	var currentLineWidth = null;
+	const maxTextures = gl.getParameter( gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS );
 
-	var currentPolygonOffsetFactor = null;
-	var currentPolygonOffsetUnits = null;
-
-	var maxTextures = gl.getParameter( gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS );
-
-	var lineWidthAvailable = false;
-	var version = 0;
-	var glVersion = gl.getParameter( gl.VERSION );
+	let lineWidthAvailable = false;
+	let version = 0;
+	const glVersion = gl.getParameter( gl.VERSION );
 
 	if ( glVersion.indexOf( 'WebGL' ) !== - 1 ) {
 
-		version = parseFloat( /^WebGL\ ([0-9])/.exec( glVersion )[ 1 ] );
+		version = parseFloat( /^WebGL (\d)/.exec( glVersion )[ 1 ] );
 		lineWidthAvailable = ( version >= 1.0 );
 
 	} else if ( glVersion.indexOf( 'OpenGL ES' ) !== - 1 ) {
 
-		version = parseFloat( /^OpenGL\ ES\ ([0-9])/.exec( glVersion )[ 1 ] );
+		version = parseFloat( /^OpenGL ES (\d)/.exec( glVersion )[ 1 ] );
 		lineWidthAvailable = ( version >= 2.0 );
 
 	}
 
-	var currentTextureSlot = null;
-	var currentBoundTextures = {};
+	let currentTextureSlot = null;
+	let currentBoundTextures = {};
 
-	var currentScissor = new Vector4();
-	var currentViewport = new Vector4();
+	const currentScissor = new Vector4();
+	const currentViewport = new Vector4();
 
 	function createTexture( type, target, count ) {
 
-		var data = new Uint8Array( 4 ); // 4 is required to match default unpack alignment of 4.
-		var texture = gl.createTexture();
+		const data = new Uint8Array( 4 ); // 4 is required to match default unpack alignment of 4.
+		const texture = gl.createTexture();
 
 		gl.bindTexture( type, texture );
 		gl.texParameteri( type, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
 		gl.texParameteri( type, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
 
-		for ( var i = 0; i < count; i ++ ) {
+		for ( let i = 0; i < count; i ++ ) {
 
 			gl.texImage2D( target + i, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data );
 
@@ -384,7 +379,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	}
 
-	var emptyTextures = {};
+	const emptyTextures = {};
 	emptyTextures[ gl.TEXTURE_2D ] = createTexture( gl.TEXTURE_2D, gl.TEXTURE_2D, 1 );
 	emptyTextures[ gl.TEXTURE_CUBE_MAP ] = createTexture( gl.TEXTURE_CUBE_MAP, gl.TEXTURE_CUBE_MAP_POSITIVE_X, 6 );
 
@@ -404,59 +399,6 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 	setBlending( NoBlending );
 
 	//
-
-	function initAttributes() {
-
-		for ( var i = 0, l = newAttributes.length; i < l; i ++ ) {
-
-			newAttributes[ i ] = 0;
-
-		}
-
-	}
-
-	function enableAttribute( attribute ) {
-
-		enableAttributeAndDivisor( attribute, 0 );
-
-	}
-
-	function enableAttributeAndDivisor( attribute, meshPerAttribute ) {
-
-		newAttributes[ attribute ] = 1;
-
-		if ( enabledAttributes[ attribute ] === 0 ) {
-
-			gl.enableVertexAttribArray( attribute );
-			enabledAttributes[ attribute ] = 1;
-
-		}
-
-		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
-
-			var extension = capabilities.isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
-
-			extension[ capabilities.isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
-			attributeDivisors[ attribute ] = meshPerAttribute;
-
-		}
-
-	}
-
-	function disableUnusedAttributes() {
-
-		for ( var i = 0, l = enabledAttributes.length; i !== l; ++ i ) {
-
-			if ( enabledAttributes[ i ] !== newAttributes[ i ] ) {
-
-				gl.disableVertexAttribArray( i );
-				enabledAttributes[ i ] = 0;
-
-			}
-
-		}
-
-	}
 
 	function enable( id ) {
 
@@ -480,33 +422,6 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	}
 
-	function getCompressedTextureFormats() {
-
-		if ( compressedTextureFormats === null ) {
-
-			compressedTextureFormats = [];
-
-			if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) ||
-			     extensions.get( 'WEBGL_compressed_texture_s3tc' ) ||
-			     extensions.get( 'WEBGL_compressed_texture_etc1' ) ||
-			     extensions.get( 'WEBGL_compressed_texture_astc' ) ) {
-
-				var formats = gl.getParameter( gl.COMPRESSED_TEXTURE_FORMATS );
-
-				for ( var i = 0; i < formats.length; i ++ ) {
-
-					compressedTextureFormats.push( formats[ i ] );
-
-				}
-
-			}
-
-		}
-
-		return compressedTextureFormats;
-
-	}
-
 	function useProgram( program ) {
 
 		if ( currentProgram !== program ) {
@@ -523,11 +438,49 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	}
 
+	const equationToGL = {
+		[ AddEquation ]: gl.FUNC_ADD,
+		[ SubtractEquation ]: gl.FUNC_SUBTRACT,
+		[ ReverseSubtractEquation ]: gl.FUNC_REVERSE_SUBTRACT
+	};
+
+	if ( isWebGL2 ) {
+
+		equationToGL[ MinEquation ] = gl.MIN;
+		equationToGL[ MaxEquation ] = gl.MAX;
+
+	} else {
+
+		const extension = extensions.get( 'EXT_blend_minmax' );
+
+		if ( extension !== null ) {
+
+			equationToGL[ MinEquation ] = extension.MIN_EXT;
+			equationToGL[ MaxEquation ] = extension.MAX_EXT;
+
+		}
+
+	}
+
+	const factorToGL = {
+		[ ZeroFactor ]: gl.ZERO,
+		[ OneFactor ]: gl.ONE,
+		[ SrcColorFactor ]: gl.SRC_COLOR,
+		[ SrcAlphaFactor ]: gl.SRC_ALPHA,
+		[ SrcAlphaSaturateFactor ]: gl.SRC_ALPHA_SATURATE,
+		[ DstColorFactor ]: gl.DST_COLOR,
+		[ DstAlphaFactor ]: gl.DST_ALPHA,
+		[ OneMinusSrcColorFactor ]: gl.ONE_MINUS_SRC_COLOR,
+		[ OneMinusSrcAlphaFactor ]: gl.ONE_MINUS_SRC_ALPHA,
+		[ OneMinusDstColorFactor ]: gl.ONE_MINUS_DST_COLOR,
+		[ OneMinusDstAlphaFactor ]: gl.ONE_MINUS_DST_ALPHA
+	};
+
 	function setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
 		if ( blending === NoBlending ) {
 
-			if ( currentBlendingEnabled ) {
+			if ( currentBlendingEnabled === true ) {
 
 				disable( gl.BLEND );
 				currentBlendingEnabled = false;
@@ -538,7 +491,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		}
 
-		if ( ! currentBlendingEnabled ) {
+		if ( currentBlendingEnabled === false ) {
 
 			enable( gl.BLEND );
 			currentBlendingEnabled = true;
@@ -634,7 +587,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		if ( blendEquation !== currentBlendEquation || blendEquationAlpha !== currentBlendEquationAlpha ) {
 
-			gl.blendEquationSeparate( utils.convert( blendEquation ), utils.convert( blendEquationAlpha ) );
+			gl.blendEquationSeparate( equationToGL[ blendEquation ], equationToGL[ blendEquationAlpha ] );
 
 			currentBlendEquation = blendEquation;
 			currentBlendEquationAlpha = blendEquationAlpha;
@@ -643,7 +596,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		if ( blendSrc !== currentBlendSrc || blendDst !== currentBlendDst || blendSrcAlpha !== currentBlendSrcAlpha || blendDstAlpha !== currentBlendDstAlpha ) {
 
-			gl.blendFuncSeparate( utils.convert( blendSrc ), utils.convert( blendDst ), utils.convert( blendSrcAlpha ), utils.convert( blendDstAlpha ) );
+			gl.blendFuncSeparate( factorToGL[ blendSrc ], factorToGL[ blendDst ], factorToGL[ blendSrcAlpha ], factorToGL[ blendDstAlpha ] );
 
 			currentBlendSrc = blendSrc;
 			currentBlendDst = blendDst;
@@ -663,7 +616,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 			? disable( gl.CULL_FACE )
 			: enable( gl.CULL_FACE );
 
-		var flipSided = ( material.side === BackSide );
+		let flipSided = ( material.side === BackSide );
 		if ( frontFaceCW ) flipSided = ! flipSided;
 
 		setFlipSided( flipSided );
@@ -676,6 +629,16 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 		depthBuffer.setTest( material.depthTest );
 		depthBuffer.setMask( material.depthWrite );
 		colorBuffer.setMask( material.colorWrite );
+
+		const stencilWrite = material.stencilWrite;
+		stencilBuffer.setTest( stencilWrite );
+		if ( stencilWrite ) {
+
+			stencilBuffer.setMask( material.stencilWriteMask );
+			stencilBuffer.setFunc( material.stencilFunc, material.stencilRef, material.stencilFuncMask );
+			stencilBuffer.setOp( material.stencilFail, material.stencilZFail, material.stencilZPass );
+
+		}
 
 		setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
@@ -809,7 +772,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		}
 
-		var boundTexture = currentBoundTextures[ currentTextureSlot ];
+		let boundTexture = currentBoundTextures[ currentTextureSlot ];
 
 		if ( boundTexture === undefined ) {
 
@@ -824,6 +787,21 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 			boundTexture.type = webglType;
 			boundTexture.texture = webglTexture;
+
+		}
+
+	}
+
+	function unbindTexture() {
+
+		const boundTexture = currentBoundTextures[ currentTextureSlot ];
+
+		if ( boundTexture !== undefined && boundTexture.type !== undefined ) {
+
+			gl.bindTexture( boundTexture.type, null );
+
+			boundTexture.type = undefined;
+			boundTexture.texture = undefined;
 
 		}
 
@@ -899,30 +877,71 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	function reset() {
 
-		for ( var i = 0; i < enabledAttributes.length; i ++ ) {
+		// reset state
 
-			if ( enabledAttributes[ i ] === 1 ) {
+		gl.disable( gl.BLEND );
+		gl.disable( gl.CULL_FACE );
+		gl.disable( gl.DEPTH_TEST );
+		gl.disable( gl.POLYGON_OFFSET_FILL );
+		gl.disable( gl.SCISSOR_TEST );
+		gl.disable( gl.STENCIL_TEST );
 
-				gl.disableVertexAttribArray( i );
-				enabledAttributes[ i ] = 0;
+		gl.blendEquation( gl.FUNC_ADD );
+		gl.blendFunc( gl.ONE, gl.ZERO );
+		gl.blendFuncSeparate( gl.ONE, gl.ZERO, gl.ONE, gl.ZERO );
 
-			}
+		gl.colorMask( true, true, true, true );
+		gl.clearColor( 0, 0, 0, 0 );
 
-		}
+		gl.depthMask( true );
+		gl.depthFunc( gl.LESS );
+		gl.clearDepth( 1 );
+
+		gl.stencilMask( 0xffffffff );
+		gl.stencilFunc( gl.ALWAYS, 0, 0xffffffff );
+		gl.stencilOp( gl.KEEP, gl.KEEP, gl.KEEP );
+		gl.clearStencil( 0 );
+
+		gl.cullFace( gl.BACK );
+		gl.frontFace( gl.CCW );
+
+		gl.polygonOffset( 0, 0 );
+
+		gl.activeTexture( gl.TEXTURE0 );
+
+		gl.useProgram( null );
+
+		gl.lineWidth( 1 );
+
+		gl.scissor( 0, 0, gl.canvas.width, gl.canvas.height );
+		gl.viewport( 0, 0, gl.canvas.width, gl.canvas.height );
+
+		// reset internals
 
 		enabledCapabilities = {};
-
-		compressedTextureFormats = null;
 
 		currentTextureSlot = null;
 		currentBoundTextures = {};
 
 		currentProgram = null;
 
+		currentBlendingEnabled = false;
 		currentBlending = null;
+		currentBlendEquation = null;
+		currentBlendSrc = null;
+		currentBlendDst = null;
+		currentBlendEquationAlpha = null;
+		currentBlendSrcAlpha = null;
+		currentBlendDstAlpha = null;
+		currentPremultipledAlpha = false;
 
 		currentFlipSided = null;
 		currentCullFace = null;
+
+		currentLineWidth = null;
+
+		currentPolygonOffsetFactor = null;
+		currentPolygonOffsetUnits = null;
 
 		colorBuffer.reset();
 		depthBuffer.reset();
@@ -938,13 +957,8 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 			stencil: stencilBuffer
 		},
 
-		initAttributes: initAttributes,
-		enableAttribute: enableAttribute,
-		enableAttributeAndDivisor: enableAttributeAndDivisor,
-		disableUnusedAttributes: disableUnusedAttributes,
 		enable: enable,
 		disable: disable,
-		getCompressedTextureFormats: getCompressedTextureFormats,
 
 		useProgram: useProgram,
 
@@ -961,6 +975,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		activeTexture: activeTexture,
 		bindTexture: bindTexture,
+		unbindTexture: unbindTexture,
 		compressedTexImage2D: compressedTexImage2D,
 		texImage2D: texImage2D,
 		texImage3D: texImage3D,
@@ -973,6 +988,5 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 	};
 
 }
-
 
 export { WebGLState };

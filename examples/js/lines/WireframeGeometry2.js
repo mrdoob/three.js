@@ -1,8 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
 THREE.WireframeGeometry2 = function ( geometry ) {
 
 	THREE.LineSegmentsGeometry.call( this );
@@ -19,14 +14,6 @@ THREE.WireframeGeometry2.prototype = Object.assign( Object.create( THREE.LineSeg
 
 	constructor: THREE.WireframeGeometry2,
 
-	isWireframeGeometry2: true,
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
-
-	}
+	isWireframeGeometry2: true
 
 } );

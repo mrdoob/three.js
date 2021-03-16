@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p>
+			You can install three.js with [link:https://www.npmjs.com/ npm] and modern build tools, or get started quickly with just static hosting or a CDN. For most users, installing from npm is the best choice.
+		</p>
+
+		<p>
+			Whichever you choose, be consistent and import all files from the same version of the library. Mixing files from different sources may cause duplicate code to be included, or even break the application in unexpected ways.
+		</p>
+
+		<p>
+			All methods of installing three.js depend on ES modules (see [link:https://eloquentjavascript.net/10_modules.html#h_hF2FmOVxw7 Eloquent JavaScript: ECMAScript Modules]), which allow you to include only the parts of the library needed in the final project.
+		</p>
+
+		<h2>Install from npm</h2>
+
+		<p>
+			To install the [link:https://www.npmjs.com/package/three three] npm module, open a terminal window in your project folder and run:
+		</p>
+
+		<code>
+		npm install --save three
+		</code>
+
+		<p>
+			The package will be downloaded and installed. Then you're ready to import it in your code:
+		</p>
+
+		<code>
+		// Option 1: Import the entire three.js core library.
+		import * as THREE from 'three';
+
+		const scene = new THREE.Scene();
+
+
+		// Option 2: Import just the parts you need.
+		import { Scene } from 'three';
+
+		const scene = new Scene();
+		</code>
+
+		<p>
+			When installing from npm, you'll almost always use some sort of [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC bundling tool] to combine all of the packages your project requires into a single JavaScript file. While any modern JavaScript bundler can be used with three.js, the most popular choice is [link:https://webpack.js.org/ webpack].
+		</p>
+
+		<p>
+			Not all features are accessed directly through the <em>three</em> module (also called a "bare import"). Other popular parts of the library — such as controls, loaders, and post-processing effects — must be imported from the [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] subfolder. To learn more, see <em>Examples</em> below.
+		</p>
+
+		<p>
+			Learn more about npm modules from [link:https://eloquentjavascript.net/20_node.html#h_J6hW/SmL/a Eloquent JavaScript: Installing with npm].
+		</p>
+
+		<h2>Install from CDN or static hosting</h2>
+
+		<p>
+			The three.js library can be used without any build system, either by uploading files to your own web server or by using an existing CDN. Because the library relies on ES modules, any script that references it must use <em>type="module"</em> as shown below:
+		</p>
+
+		<code>
+		&lt;script type="module">
+
+		  // Find the latest version by visiting https://unpkg.com/three.
+
+		  import * as THREE from 'https://unpkg.com/three@&lt;version&gt;/build/three.module.js';
+
+		  const scene = new THREE.Scene();
+
+		&lt;/script>
+		</code>
+
+		<p>
+			Not all features are accessed through the <em>build/three.module.js</em> module. Other popular parts of the library — such as controls, loaders, and post-processing effects — must be imported from the [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] subfolder. To learn more, see <em>Examples</em> below.
+		</p>
+
+
+		<h2>Examples</h2>
+
+		<p>
+			The core of three.js is focused on the most important components of a 3D engine. Many other useful components — such as controls, loaders, and post-processing effects — are part of the [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] directory. They are referred to as "examples," because while you can use them off the shelf, they're also meant to be remixed and customized. These components are always kept in sync with the core library, whereas similar third-party packages on npm are maintained by different people and may not be up to date.
+		</p>
+
+		<p>
+			Examples do not need to be <em>installed</em> separately, but do need to be <em>imported</em> separately. If three.js was installed with npm, you can load the [page:OrbitControls] component with:
+		</p>
+
+
+		<code>
+		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+		const controls = new OrbitControls();
+		</code>
+
+		<p>
+			If three.js was installed from a CDN, use the same CDN to install other components:
+		</p>
+
+		<code>
+		&lt;script type="module">
+
+		  // Find the latest version by visiting https://unpkg.com/three.
+
+		  import { OrbitControls } from 'https://unpkg.com/three@&lt;version&gt;/examples/jsm/controls/OrbitControls.js';
+
+		  const controls = new OrbitControls();
+
+		&lt;/script>
+		</code>
+
+		<p>
+			It's important that all files use the same version. Do not import different examples from different versions, or use examples from a different version than the three.js library itself.
+		</p>
+
+		<h2>Compatibility</h2>
+
+		<h3>CommonJS imports</h3>
+
+		<p>
+			While most modern JavaScript bundlers now support ES modules by default, some older build tools might not. In those cases you can likely configure the bundler to understand ES modules: [link:http://browserify.org/ Browserify] just needs the [link:https://github.com/babel/babelify babelify] plugin, for example.
+		</p>
+
+		<h3>Import maps</h3>
+
+		<p>
+			Imported paths differ when installing from npm, as compared to installing from static hosting or a CDN. We're aware that this is an ergonomic issue for both groups of users. Developers with build tools and bundlers prefer bare package specifiers (e.g. 'three') rather than relative paths, and files in the <em>examples/</em> folder use relative references to <em>three.module.js</em> that don't follow this expectation. Those who do not use build tools — for fast prototyping, learning, or personal preference — may similarly dislike those relative imports, which require certain folder structures and are less forgiving than a global <em>THREE.*</em> namespace.
+		</p>
+
+		<p>
+			We hope to remove these relative paths when [link:https://github.com/WICG/import-maps import maps] become broadly available, replacing them with bare package specifiers to the npm package name, 'three'. This matches build tool expectations for npm packages more closely, and allows both groups of users to write exactly the same code when importing a file. For users who prefer to avoid build tools, a simple JSON mapping can direct all imports to a CDN or static file folder. Experimentally, you can try using simpler imports today with an import map polyfill, as shown in our [link:https://glitch.com/edit/#!/three-import-map?path=index.html import map example].
+		</p>
+
+		<h3>Node.js</h3>
+
+		<p>
+			Using three.js in [link:https://eloquentjavascript.net/20_node.html Node.js] can be difficult, for two reasons:
+		</p>
+
+		<p>
+			First, because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
+		</p>
+
+		<p>
+			Second, Node.js support for ES modules is ... complicated. As of Node.js v12, the core library can be imported as a CommonJS module, with <em>require('three')</em>. However, most example components in <em>examples/jsm</em> cannot. Future versions of Node.js may resolve this, but in the meantime you may need to use workarounds like [link:https://github.com/standard-things/esm esm] to enable your Node.js application to recognize ES modules.
+		</p>
+
+	</body>
+</html>

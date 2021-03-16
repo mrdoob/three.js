@@ -1,8 +1,5 @@
 /**
- * @author Mugen87 / https://github.com/Mugen87
- *
  * Ported from: https://github.com/maurizzzio/quickhull3d/ by Mauricio Poppe (https://github.com/maurizzzio)
- *
  */
 
 THREE.ConvexHull = ( function () {
@@ -82,16 +79,8 @@ THREE.ConvexHull = ( function () {
 
 					if ( geometry.isGeometry ) {
 
-						var vertices = geometry.vertices;
-
-						for ( i = 0, l = vertices.length; i < l; i ++ ) {
-
-							point = vertices[ i ].clone();
-							point.applyMatrix4( node.matrixWorld );
-
-							points.push( point );
-
-						}
+						console.error( 'THREE.ConvexHull no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
+						return;
 
 					} else if ( geometry.isBufferGeometry ) {
 

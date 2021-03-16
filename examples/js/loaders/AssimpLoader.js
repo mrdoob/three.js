@@ -1,55 +1,48 @@
-/**
- * @author Virtulous / https://virtulo.us/
- */
-
 THREE.AssimpLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.AssimpLoader.prototype = {
+THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.AssimpLoader,
-
-	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+		var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
-		var loader = new THREE.FileLoader( this.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 
 		loader.load( url, function ( buffer ) {
 
-			onLoad( scope.parse( buffer, path ) );
+			try {
+
+				onLoad( scope.parse( buffer, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
-	setResourcePath: function ( value ) {
-
-		this.resourcePath = value;
-		return this;
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
 
 	},
 
@@ -74,6 +67,7 @@ THREE.AssimpLoader.prototype = {
 				return n;
 
 			};
+
 			this.lerp = function ( nextKey, time ) {
 
 				time -= this.time;
@@ -117,6 +111,7 @@ THREE.AssimpLoader.prototype = {
 				this.keys.push( key );
 
 			};
+
 			this.init = function () {
 
 				this.sortKeys();
@@ -160,6 +155,7 @@ THREE.AssimpLoader.prototype = {
 					this.addKey( new Virtulous.KeyFrame( i / fps || track[ i ].time, track[ i ].targets[ 0 ].data ) );
 
 				}
+
 				this.init();
 
 			};
@@ -521,6 +517,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 		}
+
 		function cloneTreeToBones( root, scene ) {
 
 			var rootBone = new THREE.Bone();
@@ -530,7 +527,7 @@ THREE.AssimpLoader.prototype = {
 			rootBone.quaternion.copy( root.quaternion );
 			rootBone.scale.copy( root.scale );
 			scene.nodeCount ++;
-			rootBone.name = "bone_" + root.name + scene.nodeCount.toString();
+			rootBone.name = 'bone_' + root.name + scene.nodeCount.toString();
 
 			if ( ! scene.nodeToBoneMap[ root.name ] )
 				scene.nodeToBoneMap[ root.name ] = [];
@@ -538,8 +535,7 @@ THREE.AssimpLoader.prototype = {
 			for ( var i in root.children ) {
 
 				var child = cloneTreeToBones( root.children[ i ], scene );
-				if ( child )
-					rootBone.add( child );
+				rootBone.add( child );
 
 			}
 
@@ -599,7 +595,7 @@ THREE.AssimpLoader.prototype = {
 
 		function findMatchingBone( root, name ) {
 
-			if ( root.name.indexOf( "bone_" + name ) == 0 )
+			if ( root.name.indexOf( 'bone_' + name ) == 0 )
 				return root;
 
 			for ( var i in root.children ) {
@@ -679,6 +675,7 @@ THREE.AssimpLoader.prototype = {
 					}
 
 				}
+
 				var skeleton = new THREE.Skeleton( allBones, offsetMatrix );
 
 				this.threeNode.bind( skeleton, new THREE.Matrix4() );
@@ -696,19 +693,19 @@ THREE.AssimpLoader.prototype = {
 				else
 					mat = new THREE.MeshLambertMaterial();
 				geometry.setIndex( new THREE.BufferAttribute( new Uint32Array( this.mIndexArray ), 1 ) );
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( this.mVertexBuffer, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( this.mVertexBuffer, 3 ) );
 				if ( this.mNormalBuffer && this.mNormalBuffer.length > 0 )
-					geometry.addAttribute( 'normal', new THREE.BufferAttribute( this.mNormalBuffer, 3 ) );
+					geometry.setAttribute( 'normal', new THREE.BufferAttribute( this.mNormalBuffer, 3 ) );
 				if ( this.mColorBuffer && this.mColorBuffer.length > 0 )
-					geometry.addAttribute( 'color', new THREE.BufferAttribute( this.mColorBuffer, 4 ) );
+					geometry.setAttribute( 'color', new THREE.BufferAttribute( this.mColorBuffer, 4 ) );
 				if ( this.mTexCoordsBuffers[ 0 ] && this.mTexCoordsBuffers[ 0 ].length > 0 )
-					geometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 0 ] ), 2 ) );
+					geometry.setAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 0 ] ), 2 ) );
 				if ( this.mTexCoordsBuffers[ 1 ] && this.mTexCoordsBuffers[ 1 ].length > 0 )
-					geometry.addAttribute( 'uv1', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 1 ] ), 2 ) );
+					geometry.setAttribute( 'uv1', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 1 ] ), 2 ) );
 				if ( this.mTangentBuffer && this.mTangentBuffer.length > 0 )
-					geometry.addAttribute( 'tangents', new THREE.BufferAttribute( this.mTangentBuffer, 3 ) );
+					geometry.setAttribute( 'tangents', new THREE.BufferAttribute( this.mTangentBuffer, 3 ) );
 				if ( this.mBitangentBuffer && this.mBitangentBuffer.length > 0 )
-					geometry.addAttribute( 'bitangents', new THREE.BufferAttribute( this.mBitangentBuffer, 3 ) );
+					geometry.setAttribute( 'bitangents', new THREE.BufferAttribute( this.mBitangentBuffer, 3 ) );
 				if ( this.mBones.length > 0 ) {
 
 					var weights = [];
@@ -761,8 +758,8 @@ THREE.AssimpLoader.prototype = {
 
 					}
 
-					geometry.addAttribute( 'skinWeight', new THREE.BufferAttribute( new Float32Array( _weights ), BONESPERVERT ) );
-					geometry.addAttribute( 'skinIndex', new THREE.BufferAttribute( new Float32Array( _bones ), BONESPERVERT ) );
+					geometry.setAttribute( 'skinWeight', new THREE.BufferAttribute( new Float32Array( _weights ), BONESPERVERT ) );
+					geometry.setAttribute( 'skinIndex', new THREE.BufferAttribute( new Float32Array( _bones ), BONESPERVERT ) );
 
 				}
 
@@ -919,7 +916,7 @@ THREE.AssimpLoader.prototype = {
 
 		function aiMaterialProperty() {
 
-			this.mKey = "";
+			this.mKey = '';
 			this.mSemantic = 0;
 			this.mIndex = 0;
 			this.mData = [];
@@ -981,41 +978,42 @@ THREE.AssimpLoader.prototype = {
 			};
 
 		}
+
 		var namePropMapping = {
 
-			"?mat.name": "name",
-			"$mat.shadingm": "shading",
-			"$mat.twosided": "twoSided",
-			"$mat.wireframe": "wireframe",
-			"$clr.ambient": "ambient",
-			"$clr.diffuse": "color",
-			"$clr.specular": "specular",
-			"$clr.emissive": "emissive",
-			"$clr.transparent": "transparent",
-			"$clr.reflective": "reflect",
-			"$mat.shininess": "shininess",
-			"$mat.reflectivity": "reflectivity",
-			"$mat.refracti": "refraction",
-			"$tex.file": "map"
+			'?mat.name': 'name',
+			'$mat.shadingm': 'shading',
+			'$mat.twosided': 'twoSided',
+			'$mat.wireframe': 'wireframe',
+			'$clr.ambient': 'ambient',
+			'$clr.diffuse': 'color',
+			'$clr.specular': 'specular',
+			'$clr.emissive': 'emissive',
+			'$clr.transparent': 'transparent',
+			'$clr.reflective': 'reflect',
+			'$mat.shininess': 'shininess',
+			'$mat.reflectivity': 'reflectivity',
+			'$mat.refracti': 'refraction',
+			'$tex.file': 'map'
 
 		};
 
 		var nameTypeMapping = {
 
-			"?mat.name": "string",
-			"$mat.shadingm": "bool",
-			"$mat.twosided": "bool",
-			"$mat.wireframe": "bool",
-			"$clr.ambient": "color",
-			"$clr.diffuse": "color",
-			"$clr.specular": "color",
-			"$clr.emissive": "color",
-			"$clr.transparent": "color",
-			"$clr.reflective": "color",
-			"$mat.shininess": "float",
-			"$mat.reflectivity": "float",
-			"$mat.refracti": "float",
-			"$tex.file": "map"
+			'?mat.name': 'string',
+			'$mat.shadingm': 'bool',
+			'$mat.twosided': 'bool',
+			'$mat.wireframe': 'bool',
+			'$clr.ambient': 'color',
+			'$clr.diffuse': 'color',
+			'$clr.specular': 'color',
+			'$clr.emissive': 'color',
+			'$clr.transparent': 'color',
+			'$clr.reflective': 'color',
+			'$mat.shininess': 'float',
+			'$mat.reflectivity': 'float',
+			'$mat.refracti': 'float',
+			'$tex.file': 'map'
 
 		};
 
@@ -1135,15 +1133,15 @@ THREE.AssimpLoader.prototype = {
 
 		function aiNodeAnim() {
 
-			this.mNodeName = "";
+			this.mNodeName = '';
 			this.mNumPositionKeys = 0;
 			this.mNumRotationKeys = 0;
 			this.mNumScalingKeys = 0;
 			this.mPositionKeys = [];
 			this.mRotationKeys = [];
 			this.mScalingKeys = [];
-			this.mPreState = "";
-			this.mPostState = "";
+			this.mPreState = '';
+			this.mPostState = '';
 			this.init = function ( tps ) {
 
 				if ( ! tps ) tps = 1;
@@ -1240,7 +1238,7 @@ THREE.AssimpLoader.prototype = {
 
 		function aiAnimation() {
 
-			this.mName = "";
+			this.mName = '';
 			this.mDuration = 0;
 			this.mTicksPerSecond = 0;
 			this.mNumChannels = 0;
@@ -1314,6 +1312,10 @@ THREE.AssimpLoader.prototype = {
 
 		function aiScene() {
 
+			this.versionMajor = 0;
+			this.versionMinor = 0;
+			this.versionRevision = 0;
+			this.compileFlags = 0;
 			this.mFlags = 0;
 			this.mNumMeshes = 0;
 			this.mNumMaterials = 0;
@@ -1560,14 +1562,14 @@ THREE.AssimpLoader.prototype = {
 		function ReadBounds( stream, T /*p*/, n ) {
 
 			// not sure what to do here, the data isn't really useful.
-			return stream.Seek( sizeof( T ) * n, aiOrigin_CUR );
+			return stream.Seek( sizeof( T ) * n, aiOrigin_CUR ); // eslint-disable-line no-undef
 
 		}
 
 		function ai_assert( bool ) {
 
 			if ( ! bool )
-				throw ( "asset failed" );
+				throw ( 'asset failed' );
 
 		}
 
@@ -1769,6 +1771,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// write faces. There are no floating-point calculations involved
 			// in these, so we can write a simple hash over the face data
 			// to the dump file. We generate a single 32 Bit hash for 512 faces
@@ -1825,7 +1828,7 @@ THREE.AssimpLoader.prototype = {
 
 					} else {
 
-						throw ( new Error( "Sorry, can't currently triangulate polys. Use the triangulate preprocessor in Assimp." ) );
+						throw ( new Error( 'Sorry, can\'t currently triangulate polys. Use the triangulate preprocessor in Assimp.' ) );
 
 					}
 
@@ -1834,6 +1837,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// write bones
 			if ( mesh.mNumBones ) {
 
@@ -1896,7 +1900,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryNodeAnim( stream, nd ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -1962,7 +1966,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryAnim( stream, anim ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2016,7 +2020,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryLight( stream, l ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2046,7 +2050,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryCamera( stream, cam ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2093,6 +2097,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// Read materials
 			if ( scene.mNumMaterials ) {
 
@@ -2106,6 +2111,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// Read all animations
 			if ( scene.mNumAnimations ) {
 
@@ -2119,6 +2125,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// Read all textures
 			if ( scene.mNumTextures ) {
 
@@ -2132,6 +2139,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// Read lights
 			if ( scene.mNumLights ) {
 
@@ -2145,6 +2153,7 @@ THREE.AssimpLoader.prototype = {
 				}
 
 			}
+
 			// Read cameras
 			if ( scene.mNumCameras ) {
 
@@ -2160,6 +2169,7 @@ THREE.AssimpLoader.prototype = {
 			}
 
 		}
+
 		var aiOrigin_CUR = 0;
 		var aiOrigin_BEG = 1;
 
@@ -2173,6 +2183,7 @@ THREE.AssimpLoader.prototype = {
 					stream.readOffset += off;
 
 				}
+
 				if ( ori == aiOrigin_BEG ) {
 
 					stream.readOffset = off;
@@ -2232,17 +2243,17 @@ THREE.AssimpLoader.prototype = {
 			extendStream( stream );
 			stream.Seek( 44, aiOrigin_CUR ); // signature
 			/*unsigned int versionMajor =*/
-			var versionMajor = Read_unsigned_int( stream );
+			pScene.versionMajor = Read_unsigned_int( stream );
 			/*unsigned int versionMinor =*/
-			var versionMinor = Read_unsigned_int( stream );
+			pScene.versionMinor = Read_unsigned_int( stream );
 			/*unsigned int versionRevision =*/
-			var versionRevision = Read_unsigned_int( stream );
+			pScene.versionRevision = Read_unsigned_int( stream );
 			/*unsigned int compileFlags =*/
-			var compileFlags = Read_unsigned_int( stream );
+			pScene.compileFlags = Read_unsigned_int( stream );
 			shortened = Read_uint16_t( stream ) > 0;
 			compressed = Read_uint16_t( stream ) > 0;
 			if ( shortened )
-				throw "Shortened binaries are not supported!";
+				throw 'Shortened binaries are not supported!';
 			stream.Seek( 256, aiOrigin_CUR ); // original filename
 			stream.Seek( 128, aiOrigin_CUR ); // options
 			stream.Seek( 64, aiOrigin_CUR ); // padding
@@ -2253,16 +2264,17 @@ THREE.AssimpLoader.prototype = {
 				var compressedData = [];
 				stream.Read( compressedData, 1, compressedSize );
 				var uncompressedData = [];
-				uncompress( uncompressedData, uncompressedSize, compressedData, compressedSize );
+				uncompress( uncompressedData, uncompressedSize, compressedData, compressedSize ); // eslint-disable-line no-undef
 				var buff = new ArrayBuffer( uncompressedData );
 				ReadBinaryScene( buff, pScene );
 
 			} else {
 
 				ReadBinaryScene( stream, pScene );
-				return pScene.toTHREE();
 
 			}
+
+			return pScene.toTHREE();
 
 		}
 
@@ -2270,4 +2282,4 @@ THREE.AssimpLoader.prototype = {
 
 	}
 
-};
+} );

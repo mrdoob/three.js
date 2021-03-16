@@ -1,24 +1,6 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 // ConvexGeometry
 
 THREE.ConvexGeometry = function ( points ) {
-
-	THREE.Geometry.call( this );
-
-	this.fromBufferGeometry( new THREE.ConvexBufferGeometry( points ) );
-	this.mergeVertices();
-
-};
-
-THREE.ConvexGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.ConvexGeometry.prototype.constructor = THREE.ConvexGeometry;
-
-// ConvexBufferGeometry
-
-THREE.ConvexBufferGeometry = function ( points ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -61,10 +43,10 @@ THREE.ConvexBufferGeometry = function ( points ) {
 
 	// build geometry
 
-	this.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+	this.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 
 };
 
-THREE.ConvexBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.ConvexBufferGeometry.prototype.constructor = THREE.ConvexBufferGeometry;
+THREE.ConvexGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.ConvexGeometry.prototype.constructor = THREE.ConvexGeometry;

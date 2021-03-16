@@ -1,5 +1,5 @@
 export default /* glsl */`
-#define PHYSICAL
+#define STANDARD
 
 varying vec3 vViewPosition;
 

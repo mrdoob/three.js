@@ -1,6 +1,4 @@
 /**
- * @author takahiro / https://github.com/takahirox
- *
  * Dependencies
  *  - Ammo.js https://github.com/kripken/ammo.js
  *
@@ -10,6 +8,8 @@
  * TODO
  *  - Physics in Worker
  */
+
+/* global Ammo */
 
 THREE.MMDPhysics = ( function () {
 
@@ -137,7 +137,7 @@ THREE.MMDPhysics = ( function () {
 		 */
 		reset: function () {
 
-			for ( var i = 0, il = this.bodies.length; i < il; i++ ) {
+			for ( var i = 0, il = this.bodies.length; i < il; i ++ ) {
 
 				this.bodies[ i ].reset();
 
@@ -155,7 +155,7 @@ THREE.MMDPhysics = ( function () {
 		 */
 		warmup: function ( cycles ) {
 
-			for ( var i = 0; i < cycles; i++ ) {
+			for ( var i = 0; i < cycles; i ++ ) {
 
 				this.update( 1 / 60 );
 
@@ -258,7 +258,7 @@ THREE.MMDPhysics = ( function () {
 
 		_initRigidBodies: function ( rigidBodies ) {
 
-			for ( var i = 0, il = rigidBodies.length; i < il; i++ ) {
+			for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {
 
 				this.bodies.push( new RigidBody(
 					this.mesh, this.world, rigidBodies[ i ], this.manager ) );
@@ -269,7 +269,7 @@ THREE.MMDPhysics = ( function () {
 
 		_initConstraints: function ( constraints ) {
 
-			for ( var i = 0, il = constraints.length; i < il; i++ ) {
+			for ( var i = 0, il = constraints.length; i < il; i ++ ) {
 
 				var params = constraints[ i ];
 				var bodyA = this.bodies[ params.rigidBodyIndex1 ];
@@ -307,7 +307,7 @@ THREE.MMDPhysics = ( function () {
 
 		_updateRigidBodies: function () {
 
-			for ( var i = 0, il = this.bodies.length; i < il; i++ ) {
+			for ( var i = 0, il = this.bodies.length; i < il; i ++ ) {
 
 				this.bodies[ i ].updateFromBone();
 
@@ -317,7 +317,7 @@ THREE.MMDPhysics = ( function () {
 
 		_updateBones: function () {
 
-			for ( var i = 0, il = this.bodies.length; i < il; i++ ) {
+			for ( var i = 0, il = this.bodies.length; i < il; i ++ ) {
 
 				this.bodies[ i ].updateBone();
 
@@ -476,32 +476,32 @@ THREE.MMDPhysics = ( function () {
 
 		},
 
-		getOrigin: function( t ) {
+		getOrigin: function ( t ) {
 
 			return t.getOrigin();
 
 		},
 
-		setOrigin: function( t, v ) {
+		setOrigin: function ( t, v ) {
 
 			t.getOrigin().setValue( v.x(), v.y(), v.z() );
 
 		},
 
-		copyOrigin: function( t1, t2 ) {
+		copyOrigin: function ( t1, t2 ) {
 
 			var o = t2.getOrigin();
 			this.setOrigin( t1, o );
 
 		},
 
-		setBasis: function( t, q ) {
+		setBasis: function ( t, q ) {
 
 			t.setRotation( q );
 
 		},
 
-		setBasisFromMatrix3: function( t, m ) {
+		setBasisFromMatrix3: function ( t, m ) {
 
 			var q = this.matrix3ToQuaternion( m );
 			this.setBasis( t, q );
@@ -626,7 +626,7 @@ THREE.MMDPhysics = ( function () {
 
 		},
 
-		addVector3: function( v1, v2 ) {
+		addVector3: function ( v1, v2 ) {
 
 			var v = this.allocVector3();
 			v.setValue( v1.x() + v2.x(), v1.y() + v2.y(), v1.z() + v2.z() );
@@ -634,13 +634,13 @@ THREE.MMDPhysics = ( function () {
 
 		},
 
-		dotVectors3: function( v1, v2 ) {
+		dotVectors3: function ( v1, v2 ) {
 
 			return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
 
 		},
 
-		rowOfMatrix3: function( m, i ) {
+		rowOfMatrix3: function ( m, i ) {
 
 			var v = this.allocVector3();
 			v.setValue( m[ i * 3 + 0 ], m[ i * 3 + 1 ], m[ i * 3 + 2 ] );
@@ -648,7 +648,7 @@ THREE.MMDPhysics = ( function () {
 
 		},
 
-		columnOfMatrix3: function( m, i ) {
+		columnOfMatrix3: function ( m, i ) {
 
 			var v = this.allocVector3();
 			v.setValue( m[ i + 0 ], m[ i + 3 ], m[ i + 6 ] );
@@ -656,10 +656,10 @@ THREE.MMDPhysics = ( function () {
 
 		},
 
-		negativeVector3: function( v ) {
+		negativeVector3: function ( v ) {
 
 			var v2 = this.allocVector3();
-			v2.setValue( -v.x(), -v.y(), -v.z() );
+			v2.setValue( - v.x(), - v.y(), - v.z() );
 			return v2;
 
 		},
@@ -685,7 +685,7 @@ THREE.MMDPhysics = ( function () {
 
 		},
 
-		transposeMatrix3: function( m ) {
+		transposeMatrix3: function ( m ) {
 
 			var m2 = [];
 			m2[ 0 ] = m[ 0 ];
@@ -736,12 +736,12 @@ THREE.MMDPhysics = ( function () {
 
 		},
 
-		matrix3ToQuaternion: function( m ) {
+		matrix3ToQuaternion: function ( m ) {
 
 			var t = m[ 0 ] + m[ 4 ] + m[ 8 ];
 			var s, x, y, z, w;
 
-			if( t > 0 ) {
+			if ( t > 0 ) {
 
 				s = Math.sqrt( t + 1.0 ) * 2;
 				w = 0.25 * s;
@@ -749,7 +749,7 @@ THREE.MMDPhysics = ( function () {
 				y = ( m[ 2 ] - m[ 6 ] ) / s;
 				z = ( m[ 3 ] - m[ 1 ] ) / s;
 
-			} else if( ( m[ 0 ] > m[ 4 ] ) && ( m[ 0 ] > m[ 8 ] ) ) {
+			} else if ( ( m[ 0 ] > m[ 4 ] ) && ( m[ 0 ] > m[ 8 ] ) ) {
 
 				s = Math.sqrt( 1.0 + m[ 0 ] - m[ 4 ] - m[ 8 ] ) * 2;
 				w = ( m[ 7 ] - m[ 5 ] ) / s;
@@ -757,7 +757,7 @@ THREE.MMDPhysics = ( function () {
 				y = ( m[ 1 ] + m[ 3 ] ) / s;
 				z = ( m[ 2 ] + m[ 6 ] ) / s;
 
-			} else if( m[ 4 ] > m[ 8 ] ) {
+			} else if ( m[ 4 ] > m[ 8 ] ) {
 
 				s = Math.sqrt( 1.0 + m[ 4 ] - m[ 0 ] - m[ 8 ] ) * 2;
 				w = ( m[ 2 ] - m[ 6 ] ) / s;
@@ -794,7 +794,7 @@ THREE.MMDPhysics = ( function () {
 	 */
 	function RigidBody( mesh, world, params, manager ) {
 
-		this.mesh  = mesh;
+		this.mesh = mesh;
 		this.world = world;
 		this.params = params;
 		this.manager = manager;
@@ -882,7 +882,7 @@ THREE.MMDPhysics = ( function () {
 
 			function generateShape( p ) {
 
-				switch( p.shapeType ) {
+				switch ( p.shapeType ) {
 
 					case 0:
 						return new Ammo.btSphereShape( p.width );
@@ -912,7 +912,7 @@ THREE.MMDPhysics = ( function () {
 			var localInertia = manager.allocVector3();
 			localInertia.setValue( 0, 0, 0 );
 
-			if( weight !== 0 ) {
+			if ( weight !== 0 ) {
 
 				shape.calculateLocalInertia( weight, localInertia );
 
@@ -1103,7 +1103,7 @@ THREE.MMDPhysics = ( function () {
 	 */
 	function Constraint( mesh, world, bodyA, bodyB, params, manager ) {
 
-		this.mesh  = mesh;
+		this.mesh = mesh;
 		this.world = world;
 		this.bodyA = bodyA;
 		this.bodyB = bodyB;
@@ -1171,9 +1171,9 @@ THREE.MMDPhysics = ( function () {
 			constraint.setAngularLowerLimit( all );
 			constraint.setAngularUpperLimit( aul );
 
-			for ( var i = 0; i < 3; i++ ) {
+			for ( var i = 0; i < 3; i ++ ) {
 
-				if( params.springPosition[ i ] !== 0 ) {
+				if ( params.springPosition[ i ] !== 0 ) {
 
 					constraint.enableSpring( i, true );
 					constraint.setStiffness( i, params.springPosition[ i ] );
@@ -1182,9 +1182,9 @@ THREE.MMDPhysics = ( function () {
 
 			}
 
-			for ( var i = 0; i < 3; i++ ) {
+			for ( var i = 0; i < 3; i ++ ) {
 
-				if( params.springRotation[ i ] !== 0 ) {
+				if ( params.springRotation[ i ] !== 0 ) {
 
 					constraint.enableSpring( i + 3, true );
 					constraint.setStiffness( i + 3, params.springRotation[ i ] );
@@ -1310,7 +1310,7 @@ THREE.MMDPhysics = ( function () {
 						.copy( mesh.matrixWorld )
 						.decompose( position, quaternion, scale )
 						.compose( position, quaternion, scale.set( 1, 1, 1 ) )
-						.getInverse( matrixWorldInv );
+						.invert();
 
 					for ( var i = 0, il = bodies.length; i < il; i ++ ) {
 
@@ -1358,10 +1358,10 @@ THREE.MMDPhysics = ( function () {
 				switch ( param.shapeType ) {
 
 					case 0:
-						return new THREE.SphereBufferGeometry( param.width, 16, 8 );
+						return new THREE.SphereGeometry( param.width, 16, 8 );
 
 					case 1:
-						return new THREE.BoxBufferGeometry( param.width * 2, param.height * 2, param.depth * 2, 8, 8, 8 );
+						return new THREE.BoxGeometry( param.width * 2, param.height * 2, param.depth * 2, 8, 8, 8 );
 
 					case 2:
 						return new createCapsuleGeometry( param.width, param.height, 16, 8 );
@@ -1376,9 +1376,9 @@ THREE.MMDPhysics = ( function () {
 			// copy from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mytest37.js?ver=20160815
 			function createCapsuleGeometry( radius, cylinderHeight, segmentsRadius, segmentsHeight ) {
 
-				var geometry = new THREE.CylinderBufferGeometry( radius, radius, cylinderHeight, segmentsRadius, segmentsHeight, true );
-				var upperSphere = new THREE.Mesh( new THREE.SphereBufferGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, 0, Math.PI / 2 ) );
-				var lowerSphere = new THREE.Mesh( new THREE.SphereBufferGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2 ) );
+				var geometry = new THREE.CylinderGeometry( radius, radius, cylinderHeight, segmentsRadius, segmentsHeight, true );
+				var upperSphere = new THREE.Mesh( new THREE.SphereGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, 0, Math.PI / 2 ) );
+				var lowerSphere = new THREE.Mesh( new THREE.SphereGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2 ) );
 
 				upperSphere.position.set( 0, cylinderHeight / 2, 0 );
 				lowerSphere.position.set( 0, - cylinderHeight / 2, 0 );

@@ -14,22 +14,17 @@
 			Dancing Stormtrooper by <a href="https://sketchfab.com/strykerdoesgames" target="_blank" rel="noopener">StrykerDoesAnimation</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/ColladaLoader.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			}
-
-			var container, stats, clock, controls;
-			var camera, scene, renderer, mixer;
+			let container, stats, clock, controls;
+			let camera, scene, renderer, mixer;
 
 			init();
 			animate();
@@ -47,11 +42,11 @@
 
 				// collada
 
-				var loader = new THREE.ColladaLoader();
+				const loader = new ColladaLoader();
 				loader.load( './models/collada/stormtrooper/stormtrooper.dae', function ( collada ) {
 
-					var animations = collada.animations;
-					var avatar = collada.scene;
+					const avatar = collada.scene;
+					const animations = avatar.animations;
 
 					avatar.traverse( function ( node ) {
 
@@ -64,7 +59,7 @@
 					} );
 
 					mixer = new THREE.AnimationMixer( avatar );
-					var action = mixer.clipAction( animations[ 0 ] ).play();
+					mixer.clipAction( animations[ 0 ] ).play();
 
 					scene.add( avatar );
 
@@ -72,15 +67,15 @@
 
 				//
 
-				var gridHelper = new THREE.GridHelper( 10, 20 );
+				const gridHelper = new THREE.GridHelper( 10, 20, 0x888888, 0x444444 );
 				scene.add( gridHelper );
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				scene.add( camera );
 				camera.add( pointLight );
 
@@ -93,7 +88,7 @@
 
 				//
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.screenSpacePanning = true;
 				controls.minDistance = 5;
 				controls.maxDistance = 40;
@@ -107,7 +102,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -131,7 +126,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( mixer !== undefined ) {
 

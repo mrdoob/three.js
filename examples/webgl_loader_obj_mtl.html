@@ -9,27 +9,23 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader + MTLLoader
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader + MTLLoader
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/DDSLoader.js"></script>
-		<script src="js/loaders/MTLLoader.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
+			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
+			import { MTLLoader } from './jsm/loaders/MTLLoader.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
-		<script>
+			let camera, scene, renderer;
 
-			var container, stats;
+			let mouseX = 0, mouseY = 0;
 
-			var camera, scene, renderer;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
 
 			init();
@@ -38,7 +34,7 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -48,37 +44,41 @@
 
 				scene = new THREE.Scene();
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
 				// model
 
-				var onProgress = function ( xhr ) {
+				const onProgress = function ( xhr ) {
 
 					if ( xhr.lengthComputable ) {
 
-						var percentComplete = xhr.loaded / xhr.total * 100;
+						const percentComplete = xhr.loaded / xhr.total * 100;
 						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
 
 					}
 
 				};
 
-				var onError = function () { };
+				const onError = function () { };
 
-				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
+				const manager = new THREE.LoadingManager();
+				manager.addHandler( /\.dds$/i, new DDSLoader() );
 
-				new THREE.MTLLoader()
+				// comment in the following line and import TGALoader if your asset uses TGA textures
+				// manager.addHandler( /\.tga$/i, new TGALoader() );
+
+				new MTLLoader( manager )
 					.setPath( 'models/obj/male02/' )
 					.load( 'male02_dds.mtl', function ( materials ) {
 
 						materials.preload();
 
-						new THREE.OBJLoader()
+						new OBJLoader( manager )
 							.setMaterials( materials )
 							.setPath( 'models/obj/male02/' )
 							.load( 'male02.obj', function ( object ) {
@@ -97,11 +97,11 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

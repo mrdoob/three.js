@@ -1,6 +1,4 @@
 /**
- * @author yomboprime https://github.com/yomboprime
- *
  * @fileoverview LightningStrike object for creating lightning strikes and voltaic arcs.
  *
  *
@@ -419,22 +417,22 @@ THREE.LightningStrike.prototype.createMesh = function () {
 	this.setIndex( new THREE.Uint32BufferAttribute( this.indices, 1 ) );
 
 	this.positionAttribute = new THREE.Float32BufferAttribute( this.vertices, 3 );
-	this.addAttribute( 'position', this.positionAttribute );
+	this.setAttribute( 'position', this.positionAttribute );
 
 	if ( this.generateUVs ) {
 
 		this.uvsAttribute = new THREE.Float32BufferAttribute( new Float32Array( this.uvs ), 2 );
-		this.addAttribute( 'uv', this.uvsAttribute );
+		this.setAttribute( 'uv', this.uvsAttribute );
 
 	}
 
 	if ( ! this.isStatic ) {
 
-		this.index.dynamic = true;
-		this.positionAttribute.dynamic = true;
+		this.index.usage = THREE.DynamicDrawUsage;
+		this.positionAttribute.usage = THREE.DynamicDrawUsage;
 		if ( this.generateUVs ) {
 
-			this.uvsAttribute.dynamic = true;
+			this.uvsAttribute.usage = THREE.DynamicDrawUsage;
 
 		}
 
@@ -532,7 +530,7 @@ THREE.LightningStrike.prototype.fillMesh = function ( time ) {
 
 };
 
-THREE.LightningStrike.prototype.addNewSubray = function ( rayParameters ) {
+THREE.LightningStrike.prototype.addNewSubray = function ( /*rayParameters*/ ) {
 
 	return this.subrays[ this.numSubrays ++ ];
 
@@ -577,8 +575,8 @@ THREE.LightningStrike.prototype.fractalRay = function ( time, segmentCallback ) 
 
 		this.randomGenerator.setSeed( subray.seed );
 
-		subray.endPropagationTime = THREE.Math.lerp( subray.birthTime, subray.deathTime, subray.propagationTimeFactor );
-		subray.beginVanishingTime = THREE.Math.lerp( subray.deathTime, subray.birthTime, 1 - subray.vanishingTimeFactor );
+		subray.endPropagationTime = THREE.MathUtils.lerp( subray.birthTime, subray.deathTime, subray.propagationTimeFactor );
+		subray.beginVanishingTime = THREE.MathUtils.lerp( subray.deathTime, subray.birthTime, 1 - subray.vanishingTimeFactor );
 
 		var random1 = this.randomGenerator.random;
 		subray.linPos0.set( random1(), random1(), random1() ).multiplyScalar( 1000 );
@@ -784,7 +782,7 @@ THREE.LightningStrike.prototype.createTriangleVerticesWithUVs = function ( pos, 
 
 };
 
-THREE.LightningStrike.prototype.createPrismFaces = function ( vertex, index ) {
+THREE.LightningStrike.prototype.createPrismFaces = function ( vertex/*, index*/ ) {
 
 	var indices = this.indices;
 	var vertex = this.currentVertex - 6;
@@ -823,7 +821,7 @@ THREE.LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function 
 		var period = lightningStrike.rayParameters.subrayPeriod;
 		var dutyCycle = lightningStrike.rayParameters.subrayDutyCycle;
 
-		var phase0 = ( lightningStrike.rayParameters.isEternal && subray.recursion == 0 ) ? - random1() * period : THREE.Math.lerp( subray.birthTime, subray.endPropagationTime, segment.fraction0 ) - random1() * period;
+		var phase0 = ( lightningStrike.rayParameters.isEternal && subray.recursion == 0 ) ? - random1() * period : THREE.MathUtils.lerp( subray.birthTime, subray.endPropagationTime, segment.fraction0 ) - random1() * period;
 
 		var phase = lightningStrike.time - phase0;
 		var currentCycle = Math.floor( phase / period );
@@ -832,7 +830,6 @@ THREE.LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function 
 
 		var isActive = phase % period <= dutyCycle * period;
 
-		probability = lightningStrike.subrayProbability;
 		var probability = 0;
 
 		if ( isActive ) {

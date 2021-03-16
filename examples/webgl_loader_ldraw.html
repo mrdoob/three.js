@@ -17,29 +17,29 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - LDrawLoader
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - LDrawLoader
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/LDrawLoader.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src='js/libs/dat.gui.min.js'></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { LDrawLoader } from './jsm/loaders/LDrawLoader.js';
 
-			var container, progressBarDiv;
+			let container, progressBarDiv;
 
-			var camera, scene, renderer, controls, gui, guiData;
+			let camera, scene, renderer, controls, gui, guiData;
 
-			var modelFileList, model, textureCube;
+			let model, textureCube;
 
-			var envMapActivated = false;
+			let envMapActivated = false;
 
-			var ldrawPath = 'models/ldraw/officialLibrary/';
+			const ldrawPath = 'models/ldraw/officialLibrary/';
 
-			var modelFileList = {
+			const modelFileList = {
 				'Car': 'models/car.ldr_Packed.mpd',
 				'Lunar Vehicle': 'models/1621-1-LunarMPVVehicle.mpd_Packed.mpd',
 				'Radar Truck': 'models/889-1-RadarTruck.mpd_Packed.mpd',
@@ -75,10 +75,10 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xdeebed );
 
-				var ambientLight = new THREE.AmbientLight( 0xdeebed, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xdeebed, 0.4 );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( - 1000, 1200, 1500 );
 				scene.add( directionalLight );
 
@@ -89,7 +89,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 
 				//
 
@@ -99,49 +99,12 @@
 					separateObjects: false,
 					displayLines: true,
 					conditionalLines: true,
-					smoothNormals: true
+					smoothNormals: true,
+					constructionStep: 0,
+					noConstructionSteps: "No steps."
 				};
 
-				gui = new dat.GUI();
-
-				gui.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
-
-					reloadObject( true );
-
-				} );
-
-				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function ( value ) {
-
-					envMapActivated = value;
-
-					reloadObject( false );
-
-				} );
-
-				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function ( value ) {
-
-					reloadObject( false );
-
-				} );
-
-				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function ( value ) {
-
-					reloadObject( false );
-
-				} );
-
-				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( function ( value ) {
-
-					updateLineSegments();
-
-				} );
-
-				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( function ( value ) {
-
-					updateLineSegments();
-
-				} );
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				progressBarDiv = document.createElement( 'div' );
 				progressBarDiv.innerText = "Loading...";
@@ -160,7 +123,7 @@
 
 			}
 
-			function updateLineSegments() {
+			function updateObjectsVisibility() {
 
 				model.traverse( c => {
 
@@ -175,6 +138,11 @@
 							c.visible = guiData.displayLines;
 
 						}
+
+					} else if ( c.isGroup ) {
+
+						// Hide objects with construction step > gui setting
+						c.visible = c.userData.constructionStep <= guiData.constructionStep;
 
 					}
 
@@ -195,7 +163,7 @@
 				updateProgressBar( 0 );
 				showProgressBar();
 
-				var lDrawLoader = new THREE.LDrawLoader();
+				const lDrawLoader = new LDrawLoader();
 				lDrawLoader.separateObjects = guiData.separateObjects;
 				lDrawLoader.smoothNormals = guiData.smoothNormals;
 				lDrawLoader
@@ -217,26 +185,25 @@
 
 						// Adjust materials
 
-						var materials = lDrawLoader.materials;
+						const materials = lDrawLoader.materials;
 
 						if ( envMapActivated ) {
 
 							if ( ! textureCube ) {
 
 								// Envmap texture
-								var r = "textures/cube/Bridge2/";
-								var urls = [ r + "posx.jpg", r + "negx.jpg",
+								const r = "textures/cube/Bridge2/";
+								const urls = [ r + "posx.jpg", r + "negx.jpg",
 									r + "posy.jpg", r + "negy.jpg",
 									r + "posz.jpg", r + "negz.jpg" ];
 								textureCube = new THREE.CubeTextureLoader().load( urls );
-								textureCube.format = THREE.RGBFormat;
 								textureCube.mapping = THREE.CubeReflectionMapping;
 
 							}
 
-							for ( var i = 0, n = materials.length; i < n; i ++ ) {
+							for ( let i = 0, n = materials.length; i < n; i ++ ) {
 
-								var material = materials[ i ];
+								const material = materials[ i ];
 
 								if ( material.userData.canHaveEnvMap ) {
 
@@ -248,13 +215,15 @@
 
 						}
 
-						updateLineSegments();
+						guiData.constructionStep = model.userData.numConstructionSteps - 1;
+
+						updateObjectsVisibility();
 
 						// Adjust camera and light
 
-						var bbox = new THREE.Box3().setFromObject( model );
-						var size = bbox.getSize( new THREE.Vector3() );
-						var radius = Math.max( size.x, Math.max( size.y, size.z ) ) * 0.5;
+						const bbox = new THREE.Box3().setFromObject( model );
+						const size = bbox.getSize( new THREE.Vector3() );
+						const radius = Math.max( size.x, Math.max( size.y, size.z ) ) * 0.5;
 
 						if ( resetCamera ) {
 
@@ -263,6 +232,8 @@
 							controls.reset();
 
 						}
+
+						createGUI();
 
 						hideProgressBar();
 
@@ -276,6 +247,60 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function createGUI() {
+
+				if ( gui ) {
+
+					gui.destroy();
+
+				}
+
+				gui = new GUI();
+
+				gui.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
+
+					reloadObject( true );
+
+				} );
+
+				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function () {
+
+					reloadObject( false );
+
+				} );
+
+				if ( guiData.separateObjects ) {
+
+					if ( model.userData.numConstructionSteps > 1 ) {
+
+						gui.add( guiData, 'constructionStep', 0, model.userData.numConstructionSteps - 1 ).step( 1 ).name( 'Construction step' ).onChange( updateObjectsVisibility );
+
+					} else {
+
+						gui.add( guiData, 'noConstructionSteps' ).name( 'Construction step' ).onChange( updateObjectsVisibility );
+
+					}
+
+				}
+
+				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function changeEnvMap( value ) {
+
+					envMapActivated = value;
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function changeNormals() {
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( updateObjectsVisibility );
+				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( updateObjectsVisibility );
 
 			}
 
@@ -308,7 +333,7 @@
 
 			function onError() {
 
-				var message = "Error loading model";
+				const message = "Error loading model";
 				progressBarDiv.innerText = message;
 				console.log( message );
 

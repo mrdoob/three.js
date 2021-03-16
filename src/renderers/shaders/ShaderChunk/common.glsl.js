@@ -1,14 +1,16 @@
 export default /* glsl */`
-#define PI 3.14159265359
-#define PI2 6.28318530718
-#define PI_HALF 1.5707963267949
-#define RECIPROCAL_PI 0.31830988618
-#define RECIPROCAL_PI2 0.15915494
-#define LOG2 1.442695
+#define PI 3.141592653589793
+#define PI2 6.283185307179586
+#define PI_HALF 1.5707963267948966
+#define RECIPROCAL_PI 0.3183098861837907
+#define RECIPROCAL_PI2 0.15915494309189535
 #define EPSILON 1e-6
 
+#ifndef saturate
+// <tonemapping_pars_fragment> may have defined saturate() already
 #define saturate(a) clamp( a, 0.0, 1.0 )
-#define whiteCompliment(a) ( 1.0 - saturate( a ) )
+#endif
+#define whiteComplement(a) ( 1.0 - saturate( a ) )
 
 float pow2( const in float x ) { return x*x; }
 float pow3( const in float x ) { return x*x*x; }
@@ -21,6 +23,16 @@ highp float rand( const in vec2 uv ) {
 	highp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );
 	return fract(sin(sn) * c);
 }
+
+#ifdef HIGH_PRECISION
+	float precisionSafeLength( vec3 v ) { return length( v ); }
+#else
+	float max3( vec3 v ) { return max( max( v.x, v.y ), v.z ); }
+	float precisionSafeLength( vec3 v ) {
+		float maxComponent = max3( abs( v ) );
+		return length( v / maxComponent ) * maxComponent;
+	}
+#endif
 
 struct IncidentLight {
 	vec3 color;
@@ -39,6 +51,9 @@ struct GeometricContext {
 	vec3 position;
 	vec3 normal;
 	vec3 viewDir;
+#ifdef CLEARCOAT
+	vec3 clearcoatNormal;
+#endif
 };
 
 vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
@@ -47,8 +62,10 @@ vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 
 }
 
-// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations
 vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {
+
+	// dir can be either a direction vector or a normal vector
+	// upper-left 3x3 of matrix is assumed to be orthogonal
 
 	return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );
 
@@ -92,6 +109,24 @@ float linearToRelativeLuminance( const in vec3 color ) {
 	vec3 weights = vec3( 0.2126, 0.7152, 0.0722 );
 
 	return dot( weights, color.rgb );
+
+}
+
+bool isPerspectiveMatrix( mat4 m ) {
+
+	return m[ 2 ][ 3 ] == - 1.0;
+
+}
+
+vec2 equirectUv( in vec3 dir ) {
+
+	// dir is assumed to be unit length
+
+	float u = atan( dir.z, dir.x ) * RECIPROCAL_PI2 + 0.5;
+
+	float v = asin( clamp( dir.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;
+
+	return vec2( u, v );
 
 }
 `;

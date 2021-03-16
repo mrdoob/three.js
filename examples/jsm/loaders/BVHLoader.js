@@ -1,35 +1,32 @@
+import {
+	AnimationClip,
+	Bone,
+	FileLoader,
+	Loader,
+	Quaternion,
+	QuaternionKeyframeTrack,
+	Skeleton,
+	Vector3,
+	VectorKeyframeTrack
+} from '../../../build/three.module.js';
+
 /**
- * @author herzig / http://github.com/herzig
- * @author Mugen87 / https://github.com/Mugen87
- *
  * Description: reads BVH files and outputs a single Skeleton and an AnimationClip
  *
  * Currently only supports bvh files containing a single root.
  *
  */
 
-import {
-	AnimationClip,
-	Bone,
-	DefaultLoadingManager,
-	FileLoader,
-	Quaternion,
-	QuaternionKeyframeTrack,
-	Skeleton,
-	Vector3,
-	VectorKeyframeTrack
-} from "../../../build/three.module.js";
-
 var BVHLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 	this.animateBonePositions = true;
 	this.animateBoneRotations = true;
 
 };
 
-BVHLoader.prototype = {
+BVHLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: BVHLoader,
 
@@ -39,18 +36,31 @@ BVHLoader.prototype = {
 
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -401,6 +411,7 @@ BVHLoader.prototype = {
 			var line;
 			// skip empty lines
 			while ( ( line = lines.shift().trim() ).length === 0 ) { }
+
 			return line;
 
 		}
@@ -423,6 +434,6 @@ BVHLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { BVHLoader };

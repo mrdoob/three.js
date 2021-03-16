@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br
- */
-
 import {
 	AnimationClip,
 	AnimationMixer,
@@ -13,9 +9,7 @@ import {
 	Vector2,
 	Vector3,
 	VectorKeyframeTrack
-} from "../../../build/three.module.js";
-
-'use strict';
+} from '../../../build/three.module.js';
 
 var SkeletonUtils = {
 
@@ -35,7 +29,7 @@ var SkeletonUtils = {
 			options.preservePosition = options.preservePosition !== undefined ? options.preservePosition : true;
 			options.preserveHipPosition = options.preserveHipPosition !== undefined ? options.preserveHipPosition : false;
 			options.useTargetMatrix = options.useTargetMatrix !== undefined ? options.useTargetMatrix : false;
-			options.hip = options.hip !== undefined ? options.hip : "hip";
+			options.hip = options.hip !== undefined ? options.hip : 'hip';
 			options.names = options.names || {};
 
 			var sourceBones = source.isObject3D ? source.skeleton.bones : this.getBones( source ),
@@ -131,7 +125,7 @@ var SkeletonUtils = {
 
 					} else {
 
-						relativeMatrix.getInverse( target.matrixWorld );
+						relativeMatrix.copy( target.matrixWorld ).invert();
 						relativeMatrix.multiply( boneTo.matrixWorld );
 
 					}
@@ -148,7 +142,7 @@ var SkeletonUtils = {
 					if ( target.isObject3D ) {
 
 						var boneIndex = bones.indexOf( bone ),
-							wBindMatrix = bindBones ? bindBones[ boneIndex ] : bindBoneMatrix.getInverse( target.skeleton.boneInverses[ boneIndex ] );
+							wBindMatrix = bindBones ? bindBones[ boneIndex ] : bindBoneMatrix.copy( target.skeleton.boneInverses[ boneIndex ] ).invert();
 
 						globalMatrix.multiply( wBindMatrix );
 
@@ -160,7 +154,7 @@ var SkeletonUtils = {
 
 				if ( bone.parent && bone.parent.isBone ) {
 
-					bone.matrix.getInverse( bone.parent.matrixWorld );
+					bone.matrix.copy( bone.parent.matrixWorld ).invert();
 					bone.matrix.multiply( globalMatrix );
 
 				} else {
@@ -316,7 +310,7 @@ var SkeletonUtils = {
 				if ( boneData.pos ) {
 
 					convertedTracks.push( new VectorKeyframeTrack(
-						".bones[" + boneData.bone.name + "].position",
+						'.bones[' + boneData.bone.name + '].position',
 						boneData.pos.times,
 						boneData.pos.values
 					) );
@@ -324,7 +318,7 @@ var SkeletonUtils = {
 				}
 
 				convertedTracks.push( new QuaternionKeyframeTrack(
-					".bones[" + boneData.bone.name + "].quaternion",
+					'.bones[' + boneData.bone.name + '].quaternion',
 					boneData.quat.times,
 					boneData.quat.values
 				) );
@@ -360,7 +354,7 @@ var SkeletonUtils = {
 		return function ( target, source, options ) {
 
 			options = options || {};
-			options.hip = options.hip !== undefined ? options.hip : "hip";
+			options.hip = options.hip !== undefined ? options.hip : 'hip';
 			options.names = options.names || {};
 
 			if ( ! source.isObject3D ) {
@@ -585,7 +579,7 @@ var SkeletonUtils = {
 };
 
 
-function parallelTraverse ( a, b, callback ) {
+function parallelTraverse( a, b, callback ) {
 
 	callback( a, b );
 

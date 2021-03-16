@@ -1,20 +1,18 @@
 /**
- * @author arya-s / https://github.com/arya-s
- *
  * This is a helper for visualising a given light's shadow map.
- * It works for shadow casting lights: THREE.DirectionalLight and THREE.SpotLight.
+ * It works for shadow casting lights: DirectionalLight and SpotLight.
  * It renders out the shadow map and displays it on a HUD.
  *
  * Example usage:
- *	1) Include <script src='examples/js/utils/ShadowMapViewer.js'><script> in your html file
+ *	1) Import ShadowMapViewer into your app.
  *
  *	2) Create a shadow casting light and name it optionally:
- *		var light = new THREE.DirectionalLight( 0xffffff, 1 );
+ *		var light = new DirectionalLight( 0xffffff, 1 );
  *		light.castShadow = true;
  *		light.name = 'Sun';
  *
  *	3) Create a shadow map viewer for that light and set its size and position optionally:
- *		var shadowMapViewer = new THREE.ShadowMapViewer( light );
+ *		var shadowMapViewer = new ShadowMapViewer( light );
  *		shadowMapViewer.size.set( 128, 128 );	//width, height  default: 256, 256
  *		shadowMapViewer.position.set( 10, 10 );	//x, y in pixel	 default: 0, 0 (top left corner)
  *
@@ -55,7 +53,7 @@ THREE.ShadowMapViewer = function ( light ) {
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader
 	} );
-	var plane = new THREE.PlaneBufferGeometry( frame.width, frame.height );
+	var plane = new THREE.PlaneGeometry( frame.width, frame.height );
 	var mesh = new THREE.Mesh( plane, material );
 
 	scene.add( mesh );
@@ -87,7 +85,7 @@ THREE.ShadowMapViewer = function ( light ) {
 		var labelMaterial = new THREE.MeshBasicMaterial( { map: labelTexture, side: THREE.DoubleSide } );
 		labelMaterial.transparent = true;
 
-		var labelPlane = new THREE.PlaneBufferGeometry( labelCanvas.width, labelCanvas.height );
+		var labelPlane = new THREE.PlaneGeometry( labelCanvas.width, labelCanvas.height );
 		labelMesh = new THREE.Mesh( labelPlane, labelMaterial );
 
 		scene.add( labelMesh );

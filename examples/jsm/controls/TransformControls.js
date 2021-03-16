@@ -1,12 +1,8 @@
-/**
- * @author arodic / https://github.com/arodic
- */
-
 import {
-	BoxBufferGeometry,
+	BoxGeometry,
 	BufferGeometry,
 	Color,
-	CylinderBufferGeometry,
+	CylinderGeometry,
 	DoubleSide,
 	Euler,
 	Float32BufferAttribute,
@@ -16,24 +12,28 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	Object3D,
-	OctahedronBufferGeometry,
-	OrthographicCamera,
-	PerspectiveCamera,
-	PlaneBufferGeometry,
+	OctahedronGeometry,
+	PlaneGeometry,
 	Quaternion,
 	Raycaster,
-	SphereBufferGeometry,
-	TorusBufferGeometry,
+	SphereGeometry,
+	TorusGeometry,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var TransformControls = function ( camera, domElement ) {
 
+	if ( domElement === undefined ) {
+
+		console.warn( 'THREE.TransformControls: The second parameter "domElement" is now mandatory.' );
+		domElement = document;
+
+	}
+
 	Object3D.call( this );
 
-	domElement = ( domElement !== undefined ) ? domElement : document;
-
 	this.visible = false;
+	this.domElement = domElement;
 
 	var _gizmo = new TransformControlsGizmo();
 	this.add( _gizmo );
@@ -47,28 +47,47 @@ var TransformControls = function ( camera, domElement ) {
 	// Setting the defined property will automatically trigger change event
 	// Defined properties are passed down to gizmo and plane
 
-	defineProperty( "camera", camera );
-	defineProperty( "object", undefined );
-	defineProperty( "enabled", true );
-	defineProperty( "axis", null );
-	defineProperty( "mode", "translate" );
-	defineProperty( "translationSnap", null );
-	defineProperty( "rotationSnap", null );
-	defineProperty( "space", "world" );
-	defineProperty( "size", 1 );
-	defineProperty( "dragging", false );
-	defineProperty( "showX", true );
-	defineProperty( "showY", true );
-	defineProperty( "showZ", true );
+	defineProperty( 'camera', camera );
+	defineProperty( 'object', undefined );
+	defineProperty( 'enabled', true );
+	defineProperty( 'axis', null );
+	defineProperty( 'mode', 'translate' );
+	defineProperty( 'translationSnap', null );
+	defineProperty( 'rotationSnap', null );
+	defineProperty( 'scaleSnap', null );
+	defineProperty( 'space', 'world' );
+	defineProperty( 'size', 1 );
+	defineProperty( 'dragging', false );
+	defineProperty( 'showX', true );
+	defineProperty( 'showY', true );
+	defineProperty( 'showZ', true );
 
-	var changeEvent = { type: "change" };
-	var mouseDownEvent = { type: "mouseDown" };
-	var mouseUpEvent = { type: "mouseUp", mode: scope.mode };
-	var objectChangeEvent = { type: "objectChange" };
+	var changeEvent = { type: 'change' };
+	var mouseDownEvent = { type: 'mouseDown' };
+	var mouseUpEvent = { type: 'mouseUp', mode: scope.mode };
+	var objectChangeEvent = { type: 'objectChange' };
 
 	// Reusable utility variables
 
-	var ray = new Raycaster();
+	var raycaster = new Raycaster();
+
+	function intersectObjectWithRay( object, raycaster, includeInvisible ) {
+
+		var allIntersections = raycaster.intersectObject( object, true );
+
+		for ( var i = 0; i < allIntersections.length; i ++ ) {
+
+			if ( allIntersections[ i ].object.visible || includeInvisible ) {
+
+				return allIntersections[ i ];
+
+			}
+
+		}
+
+		return false;
+
+	}
 
 	var _tempVector = new Vector3();
 	var _tempVector2 = new Vector3();
@@ -113,44 +132,32 @@ var TransformControls = function ( camera, domElement ) {
 
 	// TODO: remove properties unused in plane and gizmo
 
-	defineProperty( "worldPosition", worldPosition );
-	defineProperty( "worldPositionStart", worldPositionStart );
-	defineProperty( "worldQuaternion", worldQuaternion );
-	defineProperty( "worldQuaternionStart", worldQuaternionStart );
-	defineProperty( "cameraPosition", cameraPosition );
-	defineProperty( "cameraQuaternion", cameraQuaternion );
-	defineProperty( "pointStart", pointStart );
-	defineProperty( "pointEnd", pointEnd );
-	defineProperty( "rotationAxis", rotationAxis );
-	defineProperty( "rotationAngle", rotationAngle );
-	defineProperty( "eye", eye );
+	defineProperty( 'worldPosition', worldPosition );
+	defineProperty( 'worldPositionStart', worldPositionStart );
+	defineProperty( 'worldQuaternion', worldQuaternion );
+	defineProperty( 'worldQuaternionStart', worldQuaternionStart );
+	defineProperty( 'cameraPosition', cameraPosition );
+	defineProperty( 'cameraQuaternion', cameraQuaternion );
+	defineProperty( 'pointStart', pointStart );
+	defineProperty( 'pointEnd', pointEnd );
+	defineProperty( 'rotationAxis', rotationAxis );
+	defineProperty( 'rotationAngle', rotationAngle );
+	defineProperty( 'eye', eye );
 
 	{
 
-		domElement.addEventListener( "mousedown", onPointerDown, false );
-		domElement.addEventListener( "touchstart", onPointerDown, false );
-		domElement.addEventListener( "mousemove", onPointerHover, false );
-		domElement.addEventListener( "touchmove", onPointerHover, false );
-		domElement.addEventListener( "touchmove", onPointerMove, false );
-		document.addEventListener( "mouseup", onPointerUp, false );
-		domElement.addEventListener( "touchend", onPointerUp, false );
-		domElement.addEventListener( "touchcancel", onPointerUp, false );
-		domElement.addEventListener( "touchleave", onPointerUp, false );
+		domElement.addEventListener( 'pointerdown', onPointerDown );
+		domElement.addEventListener( 'pointermove', onPointerHover );
+		scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp );
 
 	}
 
 	this.dispose = function () {
 
-		domElement.removeEventListener( "mousedown", onPointerDown );
-		domElement.removeEventListener( "touchstart", onPointerDown );
-		domElement.removeEventListener( "mousemove", onPointerHover );
-		document.removeEventListener( "mousemove", onPointerMove );
-		domElement.removeEventListener( "touchmove", onPointerHover );
-		domElement.removeEventListener( "touchmove", onPointerMove );
-		document.removeEventListener( "mouseup", onPointerUp );
-		domElement.removeEventListener( "touchend", onPointerUp );
-		domElement.removeEventListener( "touchcancel", onPointerUp );
-		domElement.removeEventListener( "touchleave", onPointerUp );
+		domElement.removeEventListener( 'pointerdown', onPointerDown );
+		domElement.removeEventListener( 'pointermove', onPointerHover );
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
 
 		this.traverse( function ( child ) {
 
@@ -167,6 +174,8 @@ var TransformControls = function ( camera, domElement ) {
 		this.object = object;
 		this.visible = true;
 
+		return this;
+
 	};
 
 	// Detatch from object
@@ -175,6 +184,8 @@ var TransformControls = function ( camera, domElement ) {
 		this.object = undefined;
 		this.visible = false;
 		this.axis = null;
+
+		return this;
 
 	};
 
@@ -199,7 +210,7 @@ var TransformControls = function ( camera, domElement ) {
 					_plane[ propName ] = value;
 					_gizmo[ propName ] = value;
 
-					scope.dispatchEvent( { type: propName + "-changed", value: value } );
+					scope.dispatchEvent( { type: propName + '-changed', value: value } );
 					scope.dispatchEvent( changeEvent );
 
 				}
@@ -220,26 +231,28 @@ var TransformControls = function ( camera, domElement ) {
 		if ( this.object !== undefined ) {
 
 			this.object.updateMatrixWorld();
-			this.object.parent.matrixWorld.decompose( parentPosition, parentQuaternion, parentScale );
+
+			if ( this.object.parent === null ) {
+
+				console.error( 'TransformControls: The attached 3D object must be a part of the scene graph.' );
+
+			} else {
+
+				this.object.parent.matrixWorld.decompose( parentPosition, parentQuaternion, parentScale );
+
+			}
+
 			this.object.matrixWorld.decompose( worldPosition, worldQuaternion, worldScale );
 
-			parentQuaternionInv.copy( parentQuaternion ).inverse();
-			worldQuaternionInv.copy( worldQuaternion ).inverse();
+			parentQuaternionInv.copy( parentQuaternion ).invert();
+			worldQuaternionInv.copy( worldQuaternion ).invert();
 
 		}
 
 		this.camera.updateMatrixWorld();
 		this.camera.matrixWorld.decompose( cameraPosition, cameraQuaternion, cameraScale );
 
-		if ( this.camera instanceof PerspectiveCamera ) {
-
-			eye.copy( cameraPosition ).sub( worldPosition ).normalize();
-
-		} else if ( this.camera instanceof OrthographicCamera ) {
-
-			eye.copy( cameraPosition ).normalize();
-
-		}
+		eye.copy( cameraPosition ).sub( worldPosition ).normalize();
 
 		Object3D.prototype.updateMatrixWorld.call( this );
 
@@ -247,11 +260,11 @@ var TransformControls = function ( camera, domElement ) {
 
 	this.pointerHover = function ( pointer ) {
 
-		if ( this.object === undefined || this.dragging === true || ( pointer.button !== undefined && pointer.button !== 0 ) ) return;
+		if ( this.object === undefined || this.dragging === true ) return;
 
-		ray.setFromCamera( pointer, this.camera );
+		raycaster.setFromCamera( pointer, this.camera );
 
-		var intersect = ray.intersectObjects( _gizmo.picker[ this.mode ].children, true )[ 0 ] || false;
+		var intersect = intersectObjectWithRay( _gizmo.picker[ this.mode ], raycaster );
 
 		if ( intersect ) {
 
@@ -267,13 +280,13 @@ var TransformControls = function ( camera, domElement ) {
 
 	this.pointerDown = function ( pointer ) {
 
-		if ( this.object === undefined || this.dragging === true || ( pointer.button !== undefined && pointer.button !== 0 ) ) return;
+		if ( this.object === undefined || this.dragging === true || pointer.button !== 0 ) return;
 
-		if ( ( pointer.button === 0 || pointer.button === undefined ) && this.axis !== null ) {
+		if ( this.axis !== null ) {
 
-			ray.setFromCamera( pointer, this.camera );
+			raycaster.setFromCamera( pointer, this.camera );
 
-			var planeIntersect = ray.intersectObjects( [ _plane ], true )[ 0 ] || false;
+			var planeIntersect = intersectObjectWithRay( _plane, raycaster, true );
 
 			if ( planeIntersect ) {
 
@@ -337,13 +350,13 @@ var TransformControls = function ( camera, domElement ) {
 
 		}
 
-		if ( object === undefined || axis === null || this.dragging === false || ( pointer.button !== undefined && pointer.button !== 0 ) ) return;
+		if ( object === undefined || axis === null || this.dragging === false || pointer.button !== - 1 ) return;
 
-		ray.setFromCamera( pointer, this.camera );
+		raycaster.setFromCamera( pointer, this.camera );
 
-		var planeIntersect = ray.intersectObjects( [ _plane ], true )[ 0 ] || false;
+		var planeIntersect = intersectObjectWithRay( _plane, raycaster, true );
 
-		if ( planeIntersect === false ) return;
+		if ( ! planeIntersect ) return;
 
 		pointEnd.copy( planeIntersect.point ).sub( worldPositionStart );
 
@@ -381,7 +394,7 @@ var TransformControls = function ( camera, domElement ) {
 
 				if ( space === 'local' ) {
 
-					object.position.applyQuaternion( _tempQuaternion.copy( quaternionStart ).inverse() );
+					object.position.applyQuaternion( _tempQuaternion.copy( quaternionStart ).invert() );
 
 					if ( axis.search( 'X' ) !== - 1 ) {
 
@@ -466,11 +479,13 @@ var TransformControls = function ( camera, domElement ) {
 					_tempVector2.x = 1;
 
 				}
+
 				if ( axis.search( 'Y' ) === - 1 ) {
 
 					_tempVector2.y = 1;
 
 				}
+
 				if ( axis.search( 'Z' ) === - 1 ) {
 
 					_tempVector2.z = 1;
@@ -482,6 +497,28 @@ var TransformControls = function ( camera, domElement ) {
 			// Apply scale
 
 			object.scale.copy( scaleStart ).multiply( _tempVector2 );
+
+			if ( this.scaleSnap ) {
+
+				if ( axis.search( 'X' ) !== - 1 ) {
+
+					object.scale.x = Math.round( object.scale.x / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+				if ( axis.search( 'Y' ) !== - 1 ) {
+
+					object.scale.y = Math.round( object.scale.y / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+				if ( axis.search( 'Z' ) !== - 1 ) {
+
+					object.scale.z = Math.round( object.scale.z / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+			}
 
 		} else if ( mode === 'rotate' ) {
 
@@ -549,7 +586,7 @@ var TransformControls = function ( camera, domElement ) {
 
 	this.pointerUp = function ( pointer ) {
 
-		if ( pointer.button !== undefined && pointer.button !== 0 ) return;
+		if ( pointer.button !== 0 ) return;
 
 		if ( this.dragging && ( this.axis !== null ) ) {
 
@@ -559,8 +596,7 @@ var TransformControls = function ( camera, domElement ) {
 		}
 
 		this.dragging = false;
-
-		if ( pointer.button === undefined ) this.axis = null;
+		this.axis = null;
 
 	};
 
@@ -568,15 +604,27 @@ var TransformControls = function ( camera, domElement ) {
 
 	function getPointer( event ) {
 
-		var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+		if ( scope.domElement.ownerDocument.pointerLockElement ) {
 
-		var rect = domElement.getBoundingClientRect();
+			return {
+				x: 0,
+				y: 0,
+				button: event.button
+			};
 
-		return {
-			x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
-			y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
-			button: event.button
-		};
+		} else {
+
+			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+
+			var rect = domElement.getBoundingClientRect();
+
+			return {
+				x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
+				y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
+				button: event.button
+			};
+
+		}
 
 	}
 
@@ -586,7 +634,14 @@ var TransformControls = function ( camera, domElement ) {
 
 		if ( ! scope.enabled ) return;
 
-		scope.pointerHover( getPointer( event ) );
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+			case 'pen':
+				scope.pointerHover( getPointer( event ) );
+				break;
+
+		}
 
 	}
 
@@ -594,7 +649,8 @@ var TransformControls = function ( camera, domElement ) {
 
 		if ( ! scope.enabled ) return;
 
-		document.addEventListener( "mousemove", onPointerMove, false );
+		scope.domElement.style.touchAction = 'none'; // disable touch scroll
+		scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove );
 
 		scope.pointerHover( getPointer( event ) );
 		scope.pointerDown( getPointer( event ) );
@@ -613,13 +669,14 @@ var TransformControls = function ( camera, domElement ) {
 
 		if ( ! scope.enabled ) return;
 
-		document.removeEventListener( "mousemove", onPointerMove, false );
+		scope.domElement.style.touchAction = '';
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
 
 		scope.pointerUp( getPointer( event ) );
 
 	}
 
-	// TODO: depricate
+	// TODO: deprecate
 
 	this.getMode = function () {
 
@@ -645,6 +702,12 @@ var TransformControls = function ( camera, domElement ) {
 
 	};
 
+	this.setScaleSnap = function ( scaleSnap ) {
+
+		scope.scaleSnap = scaleSnap;
+
+	};
+
 	this.setSize = function ( size ) {
 
 		scope.size = size;
@@ -659,7 +722,7 @@ var TransformControls = function ( camera, domElement ) {
 
 	this.update = function () {
 
-		console.warn( 'THREE.TransformControls: update function has been depricated.' );
+		console.warn( 'THREE.TransformControls: update function has no more functionality and therefore has been deprecated.' );
 
 	};
 
@@ -689,7 +752,8 @@ var TransformControlsGizmo = function () {
 		depthWrite: false,
 		transparent: true,
 		side: DoubleSide,
-		fog: false
+		fog: false,
+		toneMapped: false
 	} );
 
 	var gizmoLineMaterial = new LineBasicMaterial( {
@@ -697,7 +761,8 @@ var TransformControlsGizmo = function () {
 		depthWrite: false,
 		transparent: true,
 		linewidth: 1,
-		fog: false
+		fog: false,
+		toneMapped: false
 	} );
 
 	// Make unique material for each axis/color
@@ -717,16 +782,16 @@ var TransformControlsGizmo = function () {
 	var matBlue = gizmoMaterial.clone();
 	matBlue.color.set( 0x0000ff );
 
-	var matWhiteTransperent = gizmoMaterial.clone();
-	matWhiteTransperent.opacity = 0.25;
+	var matWhiteTransparent = gizmoMaterial.clone();
+	matWhiteTransparent.opacity = 0.25;
 
-	var matYellowTransparent = matWhiteTransperent.clone();
+	var matYellowTransparent = matWhiteTransparent.clone();
 	matYellowTransparent.color.set( 0xffff00 );
 
-	var matCyanTransparent = matWhiteTransperent.clone();
+	var matCyanTransparent = matWhiteTransparent.clone();
 	matCyanTransparent.color.set( 0x00ffff );
 
-	var matMagentaTransparent = matWhiteTransperent.clone();
+	var matMagentaTransparent = matWhiteTransparent.clone();
 	matMagentaTransparent.color.set( 0xff00ff );
 
 	var matYellow = gizmoMaterial.clone();
@@ -758,12 +823,12 @@ var TransformControlsGizmo = function () {
 
 	// reusable geometry
 
-	var arrowGeometry = new CylinderBufferGeometry( 0, 0.05, 0.2, 12, 1, false );
+	var arrowGeometry = new CylinderGeometry( 0, 0.05, 0.2, 12, 1, false );
 
-	var scaleHandleGeometry = new BoxBufferGeometry( 0.125, 0.125, 0.125 );
+	var scaleHandleGeometry = new BoxGeometry( 0.125, 0.125, 0.125 );
 
-	var lineGeometry = new BufferGeometry( );
-	lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
+	var lineGeometry = new BufferGeometry();
+	lineGeometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
 
 	var CircleGeometry = function ( radius, arc ) {
 
@@ -776,7 +841,7 @@ var TransformControlsGizmo = function () {
 
 		}
 
-		geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 		return geometry;
 
@@ -788,7 +853,7 @@ var TransformControlsGizmo = function () {
 
 		var geometry = new BufferGeometry();
 
-		geometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
+		geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
 
 		return geometry;
 
@@ -813,20 +878,20 @@ var TransformControlsGizmo = function () {
 			[ new Line( lineGeometry, matLineBlue ), null, [ 0, - Math.PI / 2, 0 ]]
 		],
 		XYZ: [
-			[ new Mesh( new OctahedronBufferGeometry( 0.1, 0 ), matWhiteTransperent ), [ 0, 0, 0 ], [ 0, 0, 0 ]]
+			[ new Mesh( new OctahedronGeometry( 0.1, 0 ), matWhiteTransparent.clone() ), [ 0, 0, 0 ], [ 0, 0, 0 ]]
 		],
 		XY: [
-			[ new Mesh( new PlaneBufferGeometry( 0.295, 0.295 ), matYellowTransparent ), [ 0.15, 0.15, 0 ]],
+			[ new Mesh( new PlaneGeometry( 0.295, 0.295 ), matYellowTransparent.clone() ), [ 0.15, 0.15, 0 ]],
 			[ new Line( lineGeometry, matLineYellow ), [ 0.18, 0.3, 0 ], null, [ 0.125, 1, 1 ]],
 			[ new Line( lineGeometry, matLineYellow ), [ 0.3, 0.18, 0 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]]
 		],
 		YZ: [
-			[ new Mesh( new PlaneBufferGeometry( 0.295, 0.295 ), matCyanTransparent ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]],
+			[ new Mesh( new PlaneGeometry( 0.295, 0.295 ), matCyanTransparent.clone() ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]],
 			[ new Line( lineGeometry, matLineCyan ), [ 0, 0.18, 0.3 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]],
 			[ new Line( lineGeometry, matLineCyan ), [ 0, 0.3, 0.18 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
 		],
 		XZ: [
-			[ new Mesh( new PlaneBufferGeometry( 0.295, 0.295 ), matMagentaTransparent ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]],
+			[ new Mesh( new PlaneGeometry( 0.295, 0.295 ), matMagentaTransparent.clone() ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]],
 			[ new Line( lineGeometry, matLineMagenta ), [ 0.18, 0, 0.3 ], null, [ 0.125, 1, 1 ]],
 			[ new Line( lineGeometry, matLineMagenta ), [ 0.3, 0, 0.18 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
 		]
@@ -834,34 +899,34 @@ var TransformControlsGizmo = function () {
 
 	var pickerTranslate = {
 		X: [
-			[ new Mesh( new CylinderBufferGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0.6, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
+			[ new Mesh( new CylinderGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0.6, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
 		],
 		Y: [
-			[ new Mesh( new CylinderBufferGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0, 0.6, 0 ]]
+			[ new Mesh( new CylinderGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0, 0.6, 0 ]]
 		],
 		Z: [
-			[ new Mesh( new CylinderBufferGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0, 0, 0.6 ], [ Math.PI / 2, 0, 0 ]]
+			[ new Mesh( new CylinderGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0, 0, 0.6 ], [ Math.PI / 2, 0, 0 ]]
 		],
 		XYZ: [
-			[ new Mesh( new OctahedronBufferGeometry( 0.2, 0 ), matInvisible ) ]
+			[ new Mesh( new OctahedronGeometry( 0.2, 0 ), matInvisible ) ]
 		],
 		XY: [
-			[ new Mesh( new PlaneBufferGeometry( 0.4, 0.4 ), matInvisible ), [ 0.2, 0.2, 0 ]]
+			[ new Mesh( new PlaneGeometry( 0.4, 0.4 ), matInvisible ), [ 0.2, 0.2, 0 ]]
 		],
 		YZ: [
-			[ new Mesh( new PlaneBufferGeometry( 0.4, 0.4 ), matInvisible ), [ 0, 0.2, 0.2 ], [ 0, Math.PI / 2, 0 ]]
+			[ new Mesh( new PlaneGeometry( 0.4, 0.4 ), matInvisible ), [ 0, 0.2, 0.2 ], [ 0, Math.PI / 2, 0 ]]
 		],
 		XZ: [
-			[ new Mesh( new PlaneBufferGeometry( 0.4, 0.4 ), matInvisible ), [ 0.2, 0, 0.2 ], [ - Math.PI / 2, 0, 0 ]]
+			[ new Mesh( new PlaneGeometry( 0.4, 0.4 ), matInvisible ), [ 0.2, 0, 0.2 ], [ - Math.PI / 2, 0, 0 ]]
 		]
 	};
 
 	var helperTranslate = {
 		START: [
-			[ new Mesh( new OctahedronBufferGeometry( 0.01, 2 ), matHelper ), null, null, null, 'helper' ]
+			[ new Mesh( new OctahedronGeometry( 0.01, 2 ), matHelper ), null, null, null, 'helper' ]
 		],
 		END: [
-			[ new Mesh( new OctahedronBufferGeometry( 0.01, 2 ), matHelper ), null, null, null, 'helper' ]
+			[ new Mesh( new OctahedronGeometry( 0.01, 2 ), matHelper ), null, null, null, 'helper' ]
 		],
 		DELTA: [
 			[ new Line( TranslateHelperGeometry(), matHelper ), null, null, null, 'helper' ]
@@ -880,22 +945,22 @@ var TransformControlsGizmo = function () {
 	var gizmoRotate = {
 		X: [
 			[ new Line( CircleGeometry( 1, 0.5 ), matLineRed ) ],
-			[ new Mesh( new OctahedronBufferGeometry( 0.04, 0 ), matRed ), [ 0, 0, 0.99 ], null, [ 1, 3, 1 ]],
+			[ new Mesh( new OctahedronGeometry( 0.04, 0 ), matRed ), [ 0, 0, 0.99 ], null, [ 1, 3, 1 ]],
 		],
 		Y: [
 			[ new Line( CircleGeometry( 1, 0.5 ), matLineGreen ), null, [ 0, 0, - Math.PI / 2 ]],
-			[ new Mesh( new OctahedronBufferGeometry( 0.04, 0 ), matGreen ), [ 0, 0, 0.99 ], null, [ 3, 1, 1 ]],
+			[ new Mesh( new OctahedronGeometry( 0.04, 0 ), matGreen ), [ 0, 0, 0.99 ], null, [ 3, 1, 1 ]],
 		],
 		Z: [
 			[ new Line( CircleGeometry( 1, 0.5 ), matLineBlue ), null, [ 0, Math.PI / 2, 0 ]],
-			[ new Mesh( new OctahedronBufferGeometry( 0.04, 0 ), matBlue ), [ 0.99, 0, 0 ], null, [ 1, 3, 1 ]],
+			[ new Mesh( new OctahedronGeometry( 0.04, 0 ), matBlue ), [ 0.99, 0, 0 ], null, [ 1, 3, 1 ]],
 		],
 		E: [
 			[ new Line( CircleGeometry( 1.25, 1 ), matLineYellowTransparent ), null, [ 0, Math.PI / 2, 0 ]],
-			[ new Mesh( new CylinderBufferGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 1.17, 0, 0 ], [ 0, 0, - Math.PI / 2 ], [ 1, 1, 0.001 ]],
-			[ new Mesh( new CylinderBufferGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ - 1.17, 0, 0 ], [ 0, 0, Math.PI / 2 ], [ 1, 1, 0.001 ]],
-			[ new Mesh( new CylinderBufferGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 0, - 1.17, 0 ], [ Math.PI, 0, 0 ], [ 1, 1, 0.001 ]],
-			[ new Mesh( new CylinderBufferGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 0, 1.17, 0 ], [ 0, 0, 0 ], [ 1, 1, 0.001 ]],
+			[ new Mesh( new CylinderGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 1.17, 0, 0 ], [ 0, 0, - Math.PI / 2 ], [ 1, 1, 0.001 ]],
+			[ new Mesh( new CylinderGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ - 1.17, 0, 0 ], [ 0, 0, Math.PI / 2 ], [ 1, 1, 0.001 ]],
+			[ new Mesh( new CylinderGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 0, - 1.17, 0 ], [ Math.PI, 0, 0 ], [ 1, 1, 0.001 ]],
+			[ new Mesh( new CylinderGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 0, 1.17, 0 ], [ 0, 0, 0 ], [ 1, 1, 0.001 ]],
 		],
 		XYZE: [
 			[ new Line( CircleGeometry( 1, 1 ), matLineGray ), null, [ 0, Math.PI / 2, 0 ]]
@@ -910,19 +975,19 @@ var TransformControlsGizmo = function () {
 
 	var pickerRotate = {
 		X: [
-			[ new Mesh( new TorusBufferGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ 0, - Math.PI / 2, - Math.PI / 2 ]],
+			[ new Mesh( new TorusGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ 0, - Math.PI / 2, - Math.PI / 2 ]],
 		],
 		Y: [
-			[ new Mesh( new TorusBufferGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ Math.PI / 2, 0, 0 ]],
+			[ new Mesh( new TorusGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ Math.PI / 2, 0, 0 ]],
 		],
 		Z: [
-			[ new Mesh( new TorusBufferGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
+			[ new Mesh( new TorusGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
 		],
 		E: [
-			[ new Mesh( new TorusBufferGeometry( 1.25, 0.1, 2, 24 ), matInvisible ) ]
+			[ new Mesh( new TorusGeometry( 1.25, 0.1, 2, 24 ), matInvisible ) ]
 		],
 		XYZE: [
-			[ new Mesh( new SphereBufferGeometry( 0.7, 10, 8 ), matInvisible ) ]
+			[ new Mesh( new SphereGeometry( 0.7, 10, 8 ), matInvisible ) ]
 		]
 	};
 
@@ -955,25 +1020,25 @@ var TransformControlsGizmo = function () {
 			[ new Line( lineGeometry, matLineMagenta ), [ 0.98, 0, 0.855 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
 		],
 		XYZX: [
-			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 1.1, 0, 0 ]],
+			[ new Mesh( new BoxGeometry( 0.125, 0.125, 0.125 ), matWhiteTransparent.clone() ), [ 1.1, 0, 0 ]],
 		],
 		XYZY: [
-			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 1.1, 0 ]],
+			[ new Mesh( new BoxGeometry( 0.125, 0.125, 0.125 ), matWhiteTransparent.clone() ), [ 0, 1.1, 0 ]],
 		],
 		XYZZ: [
-			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 0, 1.1 ]],
+			[ new Mesh( new BoxGeometry( 0.125, 0.125, 0.125 ), matWhiteTransparent.clone() ), [ 0, 0, 1.1 ]],
 		]
 	};
 
 	var pickerScale = {
 		X: [
-			[ new Mesh( new CylinderBufferGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
+			[ new Mesh( new CylinderGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
 		],
 		Y: [
-			[ new Mesh( new CylinderBufferGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0, 0.5, 0 ]]
+			[ new Mesh( new CylinderGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0, 0.5, 0 ]]
 		],
 		Z: [
-			[ new Mesh( new CylinderBufferGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ]]
+			[ new Mesh( new CylinderGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ]]
 		],
 		XY: [
 			[ new Mesh( scaleHandleGeometry, matInvisible ), [ 0.85, 0.85, 0 ], null, [ 3, 3, 0.2 ]],
@@ -985,13 +1050,13 @@ var TransformControlsGizmo = function () {
 			[ new Mesh( scaleHandleGeometry, matInvisible ), [ 0.85, 0, 0.85 ], null, [ 3, 0.2, 3 ]],
 		],
 		XYZX: [
-			[ new Mesh( new BoxBufferGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 1.1, 0, 0 ]],
+			[ new Mesh( new BoxGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 1.1, 0, 0 ]],
 		],
 		XYZY: [
-			[ new Mesh( new BoxBufferGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 1.1, 0 ]],
+			[ new Mesh( new BoxGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 1.1, 0 ]],
 		],
 		XYZZ: [
-			[ new Mesh( new BoxBufferGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 0, 1.1 ]],
+			[ new Mesh( new BoxGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 0, 1.1 ]],
 		]
 	};
 
@@ -1032,11 +1097,13 @@ var TransformControlsGizmo = function () {
 					object.position.set( position[ 0 ], position[ 1 ], position[ 2 ] );
 
 				}
+
 				if ( rotation ) {
 
 					object.rotation.set( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ] );
 
 				}
+
 				if ( scale ) {
 
 					object.scale.set( scale[ 0 ], scale[ 1 ], scale[ 2 ] );
@@ -1046,7 +1113,7 @@ var TransformControlsGizmo = function () {
 				object.updateMatrix();
 
 				var tempGeometry = object.geometry.clone();
-				tempGeometry.applyMatrix( object.matrix );
+				tempGeometry.applyMatrix4( object.matrix );
 				object.geometry = tempGeometry;
 				object.renderOrder = Infinity;
 
@@ -1085,21 +1152,21 @@ var TransformControlsGizmo = function () {
 	this.picker = {};
 	this.helper = {};
 
-	this.add( this.gizmo[ "translate" ] = setupGizmo( gizmoTranslate ) );
-	this.add( this.gizmo[ "rotate" ] = setupGizmo( gizmoRotate ) );
-	this.add( this.gizmo[ "scale" ] = setupGizmo( gizmoScale ) );
-	this.add( this.picker[ "translate" ] = setupGizmo( pickerTranslate ) );
-	this.add( this.picker[ "rotate" ] = setupGizmo( pickerRotate ) );
-	this.add( this.picker[ "scale" ] = setupGizmo( pickerScale ) );
-	this.add( this.helper[ "translate" ] = setupGizmo( helperTranslate ) );
-	this.add( this.helper[ "rotate" ] = setupGizmo( helperRotate ) );
-	this.add( this.helper[ "scale" ] = setupGizmo( helperScale ) );
+	this.add( this.gizmo[ 'translate' ] = setupGizmo( gizmoTranslate ) );
+	this.add( this.gizmo[ 'rotate' ] = setupGizmo( gizmoRotate ) );
+	this.add( this.gizmo[ 'scale' ] = setupGizmo( gizmoScale ) );
+	this.add( this.picker[ 'translate' ] = setupGizmo( pickerTranslate ) );
+	this.add( this.picker[ 'rotate' ] = setupGizmo( pickerRotate ) );
+	this.add( this.picker[ 'scale' ] = setupGizmo( pickerScale ) );
+	this.add( this.helper[ 'translate' ] = setupGizmo( helperTranslate ) );
+	this.add( this.helper[ 'rotate' ] = setupGizmo( helperRotate ) );
+	this.add( this.helper[ 'scale' ] = setupGizmo( helperScale ) );
 
 	// Pickers should be hidden always
 
-	this.picker[ "translate" ].visible = false;
-	this.picker[ "rotate" ].visible = false;
-	this.picker[ "scale" ].visible = false;
+	this.picker[ 'translate' ].visible = false;
+	this.picker[ 'rotate' ].visible = false;
+	this.picker[ 'scale' ].visible = false;
 
 	// updateMatrixWorld will update transformations and appearance of individual handles
 
@@ -1109,17 +1176,17 @@ var TransformControlsGizmo = function () {
 
 		if ( this.mode === 'scale' ) space = 'local'; // scale always oriented to local rotation
 
-		var quaternion = space === "local" ? this.worldQuaternion : identityQuaternion;
+		var quaternion = space === 'local' ? this.worldQuaternion : identityQuaternion;
 
 		// Show only gizmos for current transform mode
 
-		this.gizmo[ "translate" ].visible = this.mode === "translate";
-		this.gizmo[ "rotate" ].visible = this.mode === "rotate";
-		this.gizmo[ "scale" ].visible = this.mode === "scale";
+		this.gizmo[ 'translate' ].visible = this.mode === 'translate';
+		this.gizmo[ 'rotate' ].visible = this.mode === 'rotate';
+		this.gizmo[ 'scale' ].visible = this.mode === 'scale';
 
-		this.helper[ "translate" ].visible = this.mode === "translate";
-		this.helper[ "rotate" ].visible = this.mode === "rotate";
-		this.helper[ "scale" ].visible = this.mode === "scale";
+		this.helper[ 'translate' ].visible = this.mode === 'translate';
+		this.helper[ 'rotate' ].visible = this.mode === 'rotate';
+		this.helper[ 'scale' ].visible = this.mode === 'scale';
 
 
 		var handles = [];
@@ -1137,8 +1204,19 @@ var TransformControlsGizmo = function () {
 			handle.rotation.set( 0, 0, 0 );
 			handle.position.copy( this.worldPosition );
 
-			var eyeDistance = this.worldPosition.distanceTo( this.cameraPosition );
-			handle.scale.set( 1, 1, 1 ).multiplyScalar( eyeDistance * this.size / 7 );
+			var factor;
+
+			if ( this.camera.isOrthographicCamera ) {
+
+				factor = ( this.camera.top - this.camera.bottom ) / this.camera.zoom;
+
+			} else {
+
+				factor = this.worldPosition.distanceTo( this.cameraPosition ) * Math.min( 1.9 * Math.tan( Math.PI * this.camera.fov / 360 ) / this.camera.zoom, 7 );
+
+			}
+
+			handle.scale.set( 1, 1, 1 ).multiplyScalar( factor * this.size / 7 );
 
 			// TODO: simplify helpers and consider decoupling from gizmo
 
@@ -1222,7 +1300,7 @@ var TransformControlsGizmo = function () {
 					handle.position.copy( this.worldPositionStart );
 					handle.quaternion.copy( this.worldQuaternionStart );
 					tempVector.set( 1e-10, 1e-10, 1e-10 ).add( this.worldPositionStart ).sub( this.worldPosition ).multiplyScalar( - 1 );
-					tempVector.applyQuaternion( this.worldQuaternionStart.clone().inverse() );
+					tempVector.applyQuaternion( this.worldQuaternionStart.clone().invert() );
 					handle.scale.copy( tempVector );
 					handle.visible = this.dragging;
 
@@ -1276,6 +1354,7 @@ var TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'Y' || handle.name === 'XYZY' ) {
 
 					if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
@@ -1286,6 +1365,7 @@ var TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'Z' || handle.name === 'XYZZ' ) {
 
 					if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
@@ -1296,6 +1376,7 @@ var TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'XY' ) {
 
 					if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
@@ -1306,6 +1387,7 @@ var TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'YZ' ) {
 
 					if ( Math.abs( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
@@ -1316,6 +1398,7 @@ var TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'XZ' ) {
 
 					if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
@@ -1400,9 +1483,9 @@ var TransformControlsGizmo = function () {
 				// Align handles to current local or world rotation
 
 				tempQuaternion2.copy( quaternion );
-				alignVector.copy( this.eye ).applyQuaternion( tempQuaternion.copy( quaternion ).inverse() );
+				alignVector.copy( this.eye ).applyQuaternion( tempQuaternion.copy( quaternion ).invert() );
 
-				if ( handle.name.search( "E" ) !== - 1 ) {
+				if ( handle.name.search( 'E' ) !== - 1 ) {
 
 					handle.quaternion.setFromRotationMatrix( lookAtMatrix.lookAt( this.eye, zeroVector, unitY ) );
 
@@ -1435,10 +1518,10 @@ var TransformControlsGizmo = function () {
 			}
 
 			// Hide disabled axes
-			handle.visible = handle.visible && ( handle.name.indexOf( "X" ) === - 1 || this.showX );
-			handle.visible = handle.visible && ( handle.name.indexOf( "Y" ) === - 1 || this.showY );
-			handle.visible = handle.visible && ( handle.name.indexOf( "Z" ) === - 1 || this.showZ );
-			handle.visible = handle.visible && ( handle.name.indexOf( "E" ) === - 1 || ( this.showX && this.showY && this.showZ ) );
+			handle.visible = handle.visible && ( handle.name.indexOf( 'X' ) === - 1 || this.showX );
+			handle.visible = handle.visible && ( handle.name.indexOf( 'Y' ) === - 1 || this.showY );
+			handle.visible = handle.visible && ( handle.name.indexOf( 'Z' ) === - 1 || this.showZ );
+			handle.visible = handle.visible && ( handle.name.indexOf( 'E' ) === - 1 || ( this.showX && this.showY && this.showZ ) );
 
 			// highlight selected axis
 
@@ -1500,8 +1583,8 @@ var TransformControlsPlane = function () {
 	'use strict';
 
 	Mesh.call( this,
-		new PlaneBufferGeometry( 100000, 100000, 2, 2 ),
-		new MeshBasicMaterial( { visible: false, wireframe: true, side: DoubleSide, transparent: true, opacity: 0.1 } )
+		new PlaneGeometry( 100000, 100000, 2, 2 ),
+		new MeshBasicMaterial( { visible: false, wireframe: true, side: DoubleSide, transparent: true, opacity: 0.1, toneMapped: false } )
 	);
 
 	this.type = 'TransformControlsPlane';
@@ -1524,9 +1607,9 @@ var TransformControlsPlane = function () {
 
 		if ( this.mode === 'scale' ) space = 'local'; // scale always oriented to local rotation
 
-		unitX.set( 1, 0, 0 ).applyQuaternion( space === "local" ? this.worldQuaternion : identityQuaternion );
-		unitY.set( 0, 1, 0 ).applyQuaternion( space === "local" ? this.worldQuaternion : identityQuaternion );
-		unitZ.set( 0, 0, 1 ).applyQuaternion( space === "local" ? this.worldQuaternion : identityQuaternion );
+		unitX.set( 1, 0, 0 ).applyQuaternion( space === 'local' ? this.worldQuaternion : identityQuaternion );
+		unitY.set( 0, 1, 0 ).applyQuaternion( space === 'local' ? this.worldQuaternion : identityQuaternion );
+		unitZ.set( 0, 0, 1 ).applyQuaternion( space === 'local' ? this.worldQuaternion : identityQuaternion );
 
 		// Align the plane for current transform mode, axis and space.
 
@@ -1566,6 +1649,7 @@ var TransformControlsPlane = function () {
 						break;
 
 				}
+
 				break;
 			case 'rotate':
 			default:

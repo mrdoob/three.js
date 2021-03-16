@@ -1,7 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Frustum } from '../../../../src/math/Frustum';
@@ -134,10 +130,10 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromMatrix/makeOrthographic/containsPoint", ( assert ) => {
+		QUnit.test( "setFromProjectionMatrix/makeOrthographic/containsPoint", ( assert ) => {
 
 			var m = new Matrix4().makeOrthographic( - 1, 1, - 1, 1, 1, 100 );
-			var a = new Frustum().setFromMatrix( m );
+			var a = new Frustum().setFromProjectionMatrix( m );
 
 			assert.ok( ! a.containsPoint( new Vector3( 0, 0, 0 ) ), "Passed!" );
 			assert.ok( a.containsPoint( new Vector3( 0, 0, - 50 ) ), "Passed!" );
@@ -155,10 +151,10 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromMatrix/makePerspective/containsPoint", ( assert ) => {
+		QUnit.test( "setFromProjectionMatrix/makePerspective/containsPoint", ( assert ) => {
 
 			var m = new Matrix4().makePerspective( - 1, 1, 1, - 1, 1, 100 );
-			var a = new Frustum().setFromMatrix( m );
+			var a = new Frustum().setFromProjectionMatrix( m );
 
 			assert.ok( ! a.containsPoint( new Vector3( 0, 0, 0 ) ), "Passed!" );
 			assert.ok( a.containsPoint( new Vector3( 0, 0, - 50 ) ), "Passed!" );
@@ -176,10 +172,10 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromMatrix/makePerspective/intersectsSphere", ( assert ) => {
+		QUnit.test( "setFromProjectionMatrix/makePerspective/intersectsSphere", ( assert ) => {
 
 			var m = new Matrix4().makePerspective( - 1, 1, 1, - 1, 1, 100 );
-			var a = new Frustum().setFromMatrix( m );
+			var a = new Frustum().setFromProjectionMatrix( m );
 
 			assert.ok( ! a.intersectsSphere( new Sphere( new Vector3( 0, 0, 0 ), 0 ) ), "Passed!" );
 			assert.ok( ! a.intersectsSphere( new Sphere( new Vector3( 0, 0, 0 ), 0.9 ) ), "Passed!" );
@@ -207,7 +203,7 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "intersectsObject", ( assert ) => {
 
 			var m = new Matrix4().makePerspective( - 1, 1, 1, - 1, 1, 100 );
-			var a = new Frustum().setFromMatrix( m );
+			var a = new Frustum().setFromProjectionMatrix( m );
 			var object = new Mesh( new BoxGeometry( 1, 1, 1 ) );
 			var intersects;
 
@@ -231,7 +227,7 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "intersectsSprite", ( assert ) => {
 
 			var m = new Matrix4().makePerspective( - 1, 1, 1, - 1, 1, 100 );
-			var a = new Frustum().setFromMatrix( m );
+			var a = new Frustum().setFromProjectionMatrix( m );
 			var sprite = new Sprite();
 			var intersects;
 
@@ -255,7 +251,7 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "intersectsBox", ( assert ) => {
 
 			var m = new Matrix4().makePerspective( - 1, 1, 1, - 1, 1, 100 );
-			var a = new Frustum().setFromMatrix( m );
+			var a = new Frustum().setFromProjectionMatrix( m );
 			var box = new Box3( zero3.clone(), one3.clone() );
 			var intersects;
 

@@ -13,27 +13,18 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 			<a href="http://3mf.io" target="_blank" rel="noopener">3MF</a> file with materials
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/3MFLoader.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/jszip.min.js"></script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ThreeMFLoader } from './jsm/loaders/3MFLoader.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
 
@@ -43,19 +34,17 @@
 				scene.background = new THREE.Color( 0xa0a0a0 );
 				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 500 );
 
-				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
-
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
 				camera.position.set( - 50, 40, 50 );
 				scene.add( camera );
 
 				//
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 100, 0 );
 				scene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				const dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( - 0, 40, 50 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.top = 50;
@@ -71,7 +60,9 @@
 
 				//
 
-				var loader = new THREE.ThreeMFLoader();
+				const manager = new THREE.LoadingManager();
+
+				const loader = new ThreeMFLoader( manager );
 				loader.load( './models/3mf/truck.3mf', function ( object ) {
 
 					object.quaternion.setFromEuler( new THREE.Euler( - Math.PI / 2, 0, 0 ) ); 	// z-up conversion
@@ -84,13 +75,19 @@
 
 					scene.add( object );
 
-					render();
-
 				} );
 
 				//
 
-				var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1000, 1000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				manager.onLoad = function () {
+
+					render();
+
+				};
+
+				//
+
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.position.y = 11;
 				ground.receiveShadow = true;
@@ -101,15 +98,14 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
-				renderer.gammaFactor = 2.2;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 50;
 				controls.maxDistance = 200;
@@ -117,7 +113,7 @@
 				controls.target.set( 0, 20, 0 );
 				controls.update();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				render();
 

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		듀얼 [page:PerspectiveCamera PerspectiveCamera]로서 [link:https://en.wikipedia.org/wiki/Anaglyph_3D 3D Anaglyph] 
+		혹은 [link:https://en.wikipedia.org/wiki/parallax_barrier Parallax Barrier] 효과에 사용됩니다.
+		</p>
+
+		<h2>예제</h2>
+
+		<p>
+			[example:webgl_effects_anaglyph effects / anaglyph ]<br />
+			[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]<br />
+			[example:webgl_effects_stereo effects / stereo ]
+		</p>
+
+		<h2>생성자</h2>
+
+		<h3>[name]( )</h3>
+
+		<h2>프로퍼티</h2>
+
+		<h3>[property:Float aspect]</h3>
+		<p>기본값은 *1*입니다.</p>
+
+		<h3>[property:Float eyeSep]</h3>
+		<p>기본값은 *0.064*입니다.</p>
+
+		<h3>[property:PerspectiveCamera cameraL]</h3>
+		<p>왼쪽 카메라입니다. [page:Layers layer 1]에 추가됩니다. - 왼쪽 카메라에 렌더링되는 객체들은 이 레이어에도 추가되어야 합니다.</p>
+
+		<h3>[property:PerspectiveCamera cameraR]</h3>
+		<p>오른쪽 카메라입니다. [page:Layers layer 2]에 추가됩니다. - 오른쪽 카메라에 렌더링되는 객체들은 이 레이어에도 추가되어야 합니다.</p>
+
+
+		<h2>메서드</h2>
+
+		<h3>[method:null update]( [param:PerspectiveCamera camera] )</h3>
+		<p>
+		전달받은 카메라에 기반해 스테레오 카메라를 업데이트합니다.
+		</p>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

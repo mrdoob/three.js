@@ -1,22 +1,23 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UIElement, UIPanel, UIText } from './libs/ui.js';
 
-var Script = function ( editor ) {
+import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';
+import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
+
+function Script( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UIPanel();
 	container.setId( 'script' );
 	container.setPosition( 'absolute' );
 	container.setBackgroundColor( '#272822' );
 	container.setDisplay( 'none' );
 
-	var header = new UI.Panel();
+	var header = new UIPanel();
 	header.setPadding( '10px' );
 	container.add( header );
 
-	var title = new UI.Text().setColor( '#fff' );
+	var title = new UIText().setColor( '#fff' );
 	header.add( title );
 
 	var buttonSVG = ( function () {
@@ -32,7 +33,7 @@ var Script = function ( editor ) {
 
 	} )();
 
-	var close = new UI.Element( buttonSVG );
+	var close = new UIElement( buttonSVG );
 	close.setPosition( 'absolute' );
 	close.setTop( '3px' );
 	close.setRight( '1px' );
@@ -86,9 +87,10 @@ var Script = function ( editor ) {
 
 				if ( value !== currentScript.source ) {
 
-					editor.execute( new SetScriptValueCommand( currentObject, currentScript, 'source', value ) );
+					editor.execute( new SetScriptValueCommand( editor, currentObject, currentScript, 'source', value ) );
 
 				}
+
 				return;
 
 			}
@@ -99,21 +101,23 @@ var Script = function ( editor ) {
 
 			if ( JSON.stringify( currentObject.material.defines ) !== JSON.stringify( json.defines ) ) {
 
-				var cmd = new SetMaterialValueCommand( currentObject, 'defines', json.defines );
+				var cmd = new SetMaterialValueCommand( editor, currentObject, 'defines', json.defines );
 				cmd.updatable = false;
 				editor.execute( cmd );
 
 			}
+
 			if ( JSON.stringify( currentObject.material.uniforms ) !== JSON.stringify( json.uniforms ) ) {
 
-				var cmd = new SetMaterialValueCommand( currentObject, 'uniforms', json.uniforms );
+				var cmd = new SetMaterialValueCommand( editor, currentObject, 'uniforms', json.uniforms );
 				cmd.updatable = false;
 				editor.execute( cmd );
 
 			}
+
 			if ( JSON.stringify( currentObject.material.attributes ) !== JSON.stringify( json.attributes ) ) {
 
-				var cmd = new SetMaterialValueCommand( currentObject, 'attributes', json.attributes );
+				var cmd = new SetMaterialValueCommand( editor, currentObject, 'attributes', json.attributes );
 				cmd.updatable = false;
 				editor.execute( cmd );
 
@@ -217,35 +221,6 @@ var Script = function ( editor ) {
 
 				case 'glsl':
 
-					try {
-
-						var shaderType = currentScript === 'vertexShader' ?
-							glslprep.Shader.VERTEX : glslprep.Shader.FRAGMENT;
-
-						glslprep.parseGlsl( string, shaderType );
-
-					} catch ( error ) {
-
-						if ( error instanceof glslprep.SyntaxError ) {
-
-							errors.push( {
-
-								lineNumber: error.line,
-								message: "Syntax Error: " + error.message
-
-							} );
-
-						} else {
-
-							console.error( error.stack || error );
-
-						}
-
-					}
-
-					if ( errors.length !== 0 ) break;
-					if ( renderer instanceof THREE.WebGLRenderer === false ) break;
-
 					currentObject.material[ currentScript ] = string;
 					currentObject.material.needsUpdate = true;
 					signals.materialChanged.dispatch( currentObject.material );
@@ -320,13 +295,41 @@ var Script = function ( editor ) {
 	} );
 
 	codemirror.setOption( 'extraKeys', {
-		'Ctrl-Space': function ( cm ) { server.complete( cm ); },
-		'Ctrl-I': function ( cm ) { server.showType( cm ); },
-		'Ctrl-O': function ( cm ) { server.showDocs( cm ); },
-		'Alt-.': function ( cm ) { server.jumpToDef( cm ); },
-		'Alt-,': function ( cm ) { server.jumpBack( cm ); },
-		'Ctrl-Q': function ( cm ) { server.rename( cm ); },
-		'Ctrl-.': function ( cm ) { server.selectName( cm ); }
+		'Ctrl-Space': function ( cm ) {
+
+			server.complete( cm );
+
+		},
+		'Ctrl-I': function ( cm ) {
+
+			server.showType( cm );
+
+		},
+		'Ctrl-O': function ( cm ) {
+
+			server.showDocs( cm );
+
+		},
+		'Alt-.': function ( cm ) {
+
+			server.jumpToDef( cm );
+
+		},
+		'Alt-,': function ( cm ) {
+
+			server.jumpBack( cm );
+
+		},
+		'Ctrl-Q': function ( cm ) {
+
+			server.rename( cm );
+
+		},
+		'Ctrl-.': function ( cm ) {
+
+			server.selectName( cm );
+
+		}
 	} );
 
 	codemirror.on( 'cursorActivity', function ( cm ) {
@@ -376,7 +379,7 @@ var Script = function ( editor ) {
 
 					mode = 'glsl';
 					name = 'Vertex Shader';
-					source = object.material.vertexShader || "";
+					source = object.material.vertexShader || '';
 
 					break;
 
@@ -384,7 +387,7 @@ var Script = function ( editor ) {
 
 					mode = 'glsl';
 					name = 'Fragment Shader';
-					source = object.material.fragmentShader || "";
+					source = object.material.fragmentShader || '';
 
 					break;
 
@@ -400,6 +403,7 @@ var Script = function ( editor ) {
 					source = JSON.stringify( json, null, '\t' );
 
 			}
+
 			title.setValue( object.material.name + ' / ' + name );
 
 		}
@@ -428,4 +432,6 @@ var Script = function ( editor ) {
 
 	return container;
 
-};
+}
+
+export { Script };

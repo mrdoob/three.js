@@ -1,7 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- */
-
 import { Vector2 } from '../../../../src/math/Vector2';
 import { Vector3 } from '../../../../src/math/Vector3';
 
@@ -12,6 +8,9 @@ export const w = 5;
 
 export const negInf2 = new Vector2( - Infinity, - Infinity );
 export const posInf2 = new Vector2( Infinity, Infinity );
+
+
+export const negOne2 = new Vector2( - 1, - 1 );
 
 export const zero2 = new Vector2();
 export const one2 = new Vector2( 1, 1 );

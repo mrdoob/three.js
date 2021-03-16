@@ -1,9 +1,3 @@
-/**
- * Loads a Wavefront .mtl file specifying materials
- *
- * @author angelxuanchang
- */
-
 import {
 	Color,
 	DefaultLoadingManager,
@@ -15,19 +9,21 @@ import {
 	RepeatWrapping,
 	TextureLoader,
 	Vector2
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
+
+/**
+ * Loads a Wavefront .mtl file specifying materials
+ */
 
 var MTLLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-MTLLoader.prototype = {
+MTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: MTLLoader,
-
-	crossOrigin: 'anonymous',
 
 	/**
 	 * Loads and parses a MTL asset from a URL.
@@ -46,67 +42,35 @@ MTLLoader.prototype = {
 
 		var scope = this;
 
-		var path = ( this.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : this.path;
+		var path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 
 		var loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text, path ) );
+			try {
+
+				onLoad( scope.parse( text, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
-
-	},
-
-	/**
-	 * Set base path for resolving references.
-	 * If set this path will be prepended to each loaded and found reference.
-	 *
-	 * @see setResourcePath
-	 * @param {String} path
-	 * @return {MTLLoader}
-	 *
-	 * @example
-	 *     mtlLoader.setPath( 'assets/obj/' );
-	 *     mtlLoader.load( 'my.mtl', ... );
-	 */
-	setPath: function ( path ) {
-
-		this.path = path;
-		return this;
-
-	},
-
-	/**
-	 * Set base path for additional resources like textures.
-	 *
-	 * @see setPath
-	 * @param {String} path
-	 * @return {MTLLoader}
-	 *
-	 * @example
-	 *     mtlLoader.setPath( 'assets/obj/' );
-	 *     mtlLoader.setResourcePath( 'assets/textures/' );
-	 *     mtlLoader.load( 'my.mtl', ... );
-	 */
-	setResourcePath: function ( path ) {
-
-		this.resourcePath = path;
-		return this;
-
-	},
-
-	setTexturePath: function ( path ) {
-
-		console.warn( 'THREE.MTLLoader: .setTexturePath() has been renamed to .setResourcePath().' );
-		return this.setResourcePath( path );
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
 
 	},
 
@@ -187,10 +151,10 @@ MTLLoader.prototype = {
 
 	}
 
-};
+} );
 
 /**
- * Create a new THREE-MTLLoader.MaterialCreator
+ * Create a new MTLLoader.MaterialCreator
  * @param baseUrl - Url relative to which textures are loaded
  * @param options - Set of options on how to construct the materials
  *                  side: Which side to apply the material
@@ -439,7 +403,7 @@ MTLLoader.MaterialCreator.prototype = {
 
 					// Diffuse texture map
 
-					setMapForType( "map", value );
+					setMapForType( 'map', value );
 
 					break;
 
@@ -447,7 +411,7 @@ MTLLoader.MaterialCreator.prototype = {
 
 					// Specular map
 
-					setMapForType( "specularMap", value );
+					setMapForType( 'specularMap', value );
 
 					break;
 
@@ -455,13 +419,13 @@ MTLLoader.MaterialCreator.prototype = {
 
 					// Emissive map
 
-					setMapForType( "emissiveMap", value );
+					setMapForType( 'emissiveMap', value );
 
 					break;
 
 				case 'norm':
 
-					setMapForType( "normalMap", value );
+					setMapForType( 'normalMap', value );
 
 					break;
 
@@ -470,7 +434,7 @@ MTLLoader.MaterialCreator.prototype = {
 
 					// Bump texture map
 
-					setMapForType( "bumpMap", value );
+					setMapForType( 'bumpMap', value );
 
 					break;
 
@@ -478,7 +442,7 @@ MTLLoader.MaterialCreator.prototype = {
 
 					// Alpha map
 
-					setMapForType( "alphaMap", value );
+					setMapForType( 'alphaMap', value );
 					params.transparent = true;
 
 					break;
@@ -577,8 +541,8 @@ MTLLoader.MaterialCreator.prototype = {
 	loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
 
 		var texture;
-		var loader = Loader.Handlers.get( url );
 		var manager = ( this.manager !== undefined ) ? this.manager : DefaultLoadingManager;
+		var loader = manager.getHandler( url );
 
 		if ( loader === null ) {
 

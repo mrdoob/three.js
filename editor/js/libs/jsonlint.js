@@ -4,7 +4,7 @@
 //
 // Copyright (C) 2012 Zachary Carter
 //
-// Permission is hereby granted, free of charge, to any person obtaining a 
+// Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
 // the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -41,7 +41,7 @@ case 1: // replace escaped characters with actual character
                      .replace(/\\v/g,'\v')
                      .replace(/\\f/g,'\f')
                      .replace(/\\b/g,'\b');
-        
+
 break;
 case 2:this.$ = Number(yytext);
 break;
@@ -120,7 +120,7 @@ parse: function parse(input) {
         return token;
     }
 
-    var symbol, preErrorSymbol, state, action, a, r, yyval={},p,len,newState, expected;
+    var symbol, preErrorSymbol, state, action, r, yyval={},p,len,newState, expected;
     while (true) {
         // retreive state number from top of stack
         state = stack[stack.length-1];
@@ -260,7 +260,6 @@ parse: function parse(input) {
 
     }
 
-    return true;
 }};
 /* Jison generated lexer */
 var lexer = (function(){
@@ -329,7 +328,6 @@ next:function () {
             match,
             tempMatch,
             index,
-            col,
             lines;
         if (!this._more) {
             this.yytext = '';
@@ -350,7 +348,7 @@ next:function () {
             this.yylloc = {first_line: this.yylloc.last_line,
                            last_line: this.yylineno+1,
                            first_column: this.yylloc.last_column,
-                           last_column: lines ? lines[lines.length-1].length-1 : this.yylloc.last_column + match[0].length}
+                           last_column: lines ? lines[lines.length-1].length-1 : this.yylloc.last_column + match[0].length};
             this.yytext += match[0];
             this.match += match[0];
             this.yyleng = this.yytext.length;
@@ -365,7 +363,7 @@ next:function () {
         if (this._input === "") {
             return this.EOF;
         } else {
-            this.parseError('Lexical error on line '+(this.yylineno+1)+'. Unrecognized text.\n'+this.showPosition(), 
+            this.parseError('Lexical error on line '+(this.yylineno+1)+'. Unrecognized text.\n'+this.showPosition(),
                     {text: "", token: null, line: this.yylineno});
         }
     },
@@ -393,9 +391,8 @@ pushState:function begin(condition) {
         this.begin(condition);
     }});
 lexer.options = {};
-lexer.performAction = function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
+lexer.performAction = function anonymous(yy,yy_,$avoiding_name_collisions) {
 
-var YYSTATE=YY_START
 switch($avoiding_name_collisions) {
 case 0:/* skip whitespace */
 break;

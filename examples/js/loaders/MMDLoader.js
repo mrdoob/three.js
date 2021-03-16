@@ -1,6 +1,4 @@
 /**
- * @author takahiro / https://github.com/takahirox
- *
  * Dependencies
  *  - mmd-parser https://github.com/takahirox/mmd-parser
  *  - THREE.TGALoader
@@ -13,7 +11,7 @@
  * VPD is a posing data format used in MMD(Miku Miku Dance).
  *
  * MMD official site
- *  - http://www.geocities.jp/higuchuu4/index_e.htm
+ *  - https://sites.google.com/view/evpvp/
  *
  * PMD, VMD format (in Japanese)
  *  - http://blog.goo.ne.jp/torisu_tetosuki/e/209ad341d3ece2b1b4df24abf619d6e4
@@ -36,7 +34,7 @@ THREE.MMDLoader = ( function () {
 	 */
 	function MMDLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 		this.loader = new THREE.FileLoader( this.manager );
 
@@ -46,22 +44,9 @@ THREE.MMDLoader = ( function () {
 
 	}
 
-	MMDLoader.prototype = {
+	MMDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: MMDLoader,
-
-		crossOrigin: 'anonymous',
-
-		/**
-		 * @param {string} crossOrigin
-		 * @return {THREE.MMDLoader}
-		 */
-		setCrossOrigin: function ( crossOrigin ) {
-
-			this.crossOrigin = crossOrigin;
-			return this;
-
-		},
 
 		/**
 		 * @param {string} animationPath
@@ -70,28 +55,6 @@ THREE.MMDLoader = ( function () {
 		setAnimationPath: function ( animationPath ) {
 
 			this.animationPath = animationPath;
-			return this;
-
-		},
-
-		/**
-		 * @param {string} path
-		 * @return {THREE.MMDLoader}
-		 */
-		setPath: function ( path ) {
-
-			this.path = path;
-			return this;
-
-		},
-
-		/**
-		 * @param {string} resourcePath
-		 * @return {THREE.MMDLoader}
-		 */
-		setResoucePath: function ( resourcePath ) {
-
-			this.resourcePath = resourcePath;
 			return this;
 
 		},
@@ -114,11 +77,11 @@ THREE.MMDLoader = ( function () {
 
 			var resourcePath;
 
-			if ( this.resourcePath !== undefined ) {
+			if ( this.resourcePath !== '' ) {
 
 				resourcePath = this.resourcePath;
 
-			} else if ( this.path !== undefined ) {
+			} else if ( this.path !== '' ) {
 
 				resourcePath = this.path;
 
@@ -219,6 +182,8 @@ THREE.MMDLoader = ( function () {
 				.setMimeType( undefined )
 				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader )
+				.setWithCredentials( this.withCredentials )
 				.load( url, function ( buffer ) {
 
 					onLoad( parser.parsePmd( buffer, true ) );
@@ -243,6 +208,8 @@ THREE.MMDLoader = ( function () {
 				.setMimeType( undefined )
 				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader )
+				.setWithCredentials( this.withCredentials )
 				.load( url, function ( buffer ) {
 
 					onLoad( parser.parsePmx( buffer, true ) );
@@ -272,7 +239,9 @@ THREE.MMDLoader = ( function () {
 			this.loader
 				.setMimeType( undefined )
 				.setPath( this.animationPath )
-				.setResponseType( 'arraybuffer' );
+				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader )
+				.setWithCredentials( this.withCredentials );
 
 			for ( var i = 0, il = urls.length; i < il; i ++ ) {
 
@@ -305,6 +274,8 @@ THREE.MMDLoader = ( function () {
 				.setMimeType( isUnicode ? undefined : 'text/plain; charset=shift_jis' )
 				.setPath( this.animationPath )
 				.setResponseType( 'text' )
+				.setRequestHeader( this.requestHeader )
+				.setWithCredentials( this.withCredentials )
 				.load( url, function ( text ) {
 
 					onLoad( parser.parseVpd( text, true ) );
@@ -332,7 +303,7 @@ THREE.MMDLoader = ( function () {
 
 				}
 
-				this.parser = new MMDParser.Parser();
+				this.parser = new MMDParser.Parser(); // eslint-disable-line no-undef
 
 			}
 
@@ -340,7 +311,7 @@ THREE.MMDLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	// Utilities
 
@@ -940,11 +911,11 @@ THREE.MMDLoader = ( function () {
 
 			var geometry = new THREE.BufferGeometry();
 
-			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-			geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-			geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
-			geometry.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
-			geometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+			geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+			geometry.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+			geometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
 			geometry.setIndex( indices );
 
 			for ( var i = 0, il = groups.length; i < il; i ++ ) {
@@ -957,6 +928,7 @@ THREE.MMDLoader = ( function () {
 
 			geometry.morphTargets = morphTargets;
 			geometry.morphAttributes.position = morphPositions;
+			geometry.morphTargetsRelative = false;
 
 			geometry.userData.MMD = {
 				bones: bones,
@@ -1026,7 +998,7 @@ THREE.MMDLoader = ( function () {
 		 * @param {function} onError
 		 * @return {Array<THREE.MeshToonMaterial>}
 		 */
-		build: function ( data, geometry, onProgress, onError ) {
+		build: function ( data, geometry /*, onProgress, onError */ ) {
 
 			var materials = [];
 
@@ -1049,7 +1021,6 @@ THREE.MMDLoader = ( function () {
 				 *
 				 * MMD         MeshToonMaterial
 				 * diffuse  -  color
-				 * specular -  specular
 				 * ambient  -  emissive * a
 				 *               (a = 1.0 without map texture or 0.2 with map texture)
 				 *
@@ -1058,16 +1029,13 @@ THREE.MMDLoader = ( function () {
 				 */
 				params.color = new THREE.Color().fromArray( material.diffuse );
 				params.opacity = material.diffuse[ 3 ];
-				params.specular = new THREE.Color().fromArray( material.specular );
 				params.emissive = new THREE.Color().fromArray( material.ambient );
-				params.shininess = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
 				params.transparent = params.opacity !== 1.0;
 
 				//
 
 				params.skinning = geometry.bones.length > 0 ? true : false;
 				params.morphTargets = geometry.morphTargets.length > 0 ? true : false;
-				params.lights = true;
 				params.fog = true;
 
 				// blend
@@ -1110,8 +1078,7 @@ THREE.MMDLoader = ( function () {
 
 							params.envMap = this._loadTexture(
 								fileNames[ 1 ],
-								textures,
-								{ sphericalReflectionMapping: true }
+								textures
 							);
 
 							params.combine = extension === '.sph'
@@ -1162,7 +1129,7 @@ THREE.MMDLoader = ( function () {
 
 						params.envMap = this._loadTexture(
 							data.textures[ material.envTextureIndex ],
-							textures, { sphericalReflectionMapping: true }
+							textures
 						);
 
 						params.combine = material.envFlag === 1
@@ -1319,7 +1286,7 @@ THREE.MMDLoader = ( function () {
 
 				try {
 
-					index = parseInt( filePath.match( 'toon([0-9]{2})\.bmp$' )[ 1 ] );
+					index = parseInt( filePath.match( /toon([0-9]{2})\.bmp$/ )[ 1 ] );
 
 				} catch ( e ) {
 
@@ -1340,7 +1307,7 @@ THREE.MMDLoader = ( function () {
 
 			if ( textures[ fullPath ] !== undefined ) return textures[ fullPath ];
 
-			var loader = THREE.Loader.Handlers.get( fullPath );
+			var loader = this.manager.getHandler( fullPath );
 
 			if ( loader === null ) {
 
@@ -1377,12 +1344,6 @@ THREE.MMDLoader = ( function () {
 				delete texture.readyCallbacks;
 
 			}, onProgress, onError );
-
-			if ( params.sphericalReflectionMapping === true ) {
-
-				texture.mapping = THREE.SphericalReflectionMapping;
-
-			}
 
 			texture.readyCallbacks = [];
 

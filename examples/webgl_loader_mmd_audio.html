@@ -7,7 +7,6 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #fff;
 				color: #444;
 			}
 			a {
@@ -17,53 +16,54 @@
 	</head>
 
 	<body>
+		<div id="overlay">
+			<button id="startButton">Play</button>
+		</div>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
 		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br />
 		Copyright
-		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank" rel="noopener">Model Data</a>
+		<a href="https://sites.google.com/view/evpvp/" target="_blank" rel="noopener">Model Data</a>
 		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank" rel="noopener">Dance Data</a>
 		<a href="http://www.nicovideo.jp/watch/sm11938255" target="_blank" rel="noopener">Audio Data</a><br />
 		Camera is customized from <a href="http://www.nicovideo.jp/watch/sm19168559" target="_blank" rel="noopener">this Data</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script src="js/libs/ammo.wasm.js"></script>
 
-		<script src="js/libs/mmdparser.min.js"></script>
-		<script src="js/libs/ammo.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/TGALoader.js"></script>
-		<script src="js/loaders/MMDLoader.js"></script>
-		<script src="js/effects/OutlineEffect.js"></script>
-		<script src="js/animation/CCDIKSolver.js"></script>
-		<script src="js/animation/MMDPhysics.js"></script>
-		<script src="js/animation/MMDAnimationHelper.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
+			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
+			import { MMDLoader } from './jsm/loaders/MMDLoader.js';
+			import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
 
-		<script>
+			let mesh, camera, scene, renderer, effect;
+			let helper;
 
-			var container;
+			let ready = false;
 
-			var mesh, camera, scene, renderer, effect;
-			var helper;
+			const clock = new THREE.Clock();
 
-			var ready = false;
+			const startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', function () {
 
-			var clock = new THREE.Clock();
+				Ammo().then( function () {
 
-			Ammo().then( function( AmmoLib ) {
+					init();
+					animate();
 
-				Ammo = AmmoLib;
-
-				init();
-				animate();
+				} );
 
 			} );
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const overlay = document.getElementById( 'overlay' );
+				overlay.remove();
+
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -75,10 +75,14 @@
 
 				scene.add( new THREE.PolarGridHelper( 30, 10 ) );
 
-				var ambient = new THREE.AmbientLight( 0x666666 );
+				const listener = new THREE.AudioListener();
+				camera.add( listener );
+				scene.add( camera );
+
+				const ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0x887766 );
+				const directionalLight = new THREE.DirectionalLight( 0x887766 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
@@ -89,7 +93,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				effect = new THREE.OutlineEffect( renderer );
+				effect = new OutlineEffect( renderer );
 
 				// model
 
@@ -97,22 +101,22 @@
 
 					if ( xhr.lengthComputable ) {
 
-						var percentComplete = xhr.loaded / xhr.total * 100;
+						const percentComplete = xhr.loaded / xhr.total * 100;
 						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
 
 					}
 
 				}
 
-				var modelFile = 'models/mmd/miku/miku_v2.pmd';
-				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
-				var cameraFiles = [ 'models/mmd/vmds/wavefile_camera.vmd' ];
-				var audioFile = 'models/mmd/audios/wavefile_short.mp3';
-				var audioParams = { delayTime: 160 * 1 / 30 };
+				const modelFile = 'models/mmd/miku/miku_v2.pmd';
+				const vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
+				const cameraFiles = [ 'models/mmd/vmds/wavefile_camera.vmd' ];
+				const audioFile = 'models/mmd/audios/wavefile_short.mp3';
+				const audioParams = { delayTime: 160 * 1 / 30 };
 
-				helper = new THREE.MMDAnimationHelper();
+				helper = new MMDAnimationHelper();
 
-				var loader = new THREE.MMDLoader();
+				const loader = new MMDLoader();
 
 				loader.loadWithAnimation( modelFile, vmdFiles, function ( mmd ) {
 
@@ -131,15 +135,9 @@
 
 						new THREE.AudioLoader().load( audioFile, function ( buffer ) {
 
-							var listener = new THREE.AudioListener();
-							var audio = new THREE.Audio( listener ).setBuffer( buffer );
-
-							listener.position.z = 1;
+							const audio = new THREE.Audio( listener ).setBuffer( buffer );
 
 							helper.add( audio, audioParams );
-
-							scene.add( audio );
-							scene.add( listener );
 							scene.add( mesh );
 
 							ready = true;
@@ -152,7 +150,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

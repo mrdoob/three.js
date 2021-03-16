@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		내부적으로 사용되는 가중치 축적을 허용하는 버퍼 장면 그래프 프로퍼티입니다.
+		</p>
+
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]( [param:PropertyBinding binding], [param:String typeName], [param:Number valueSize] )</h3>
+		<p>
+			-- binding <br />
+			-- typeName <br />
+			-- valueSize <br />
+		</p>
+
+
+		<h2>프로퍼티</h2>
+
+
+		<h3>[property:PropertyBinding binding]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:TypedArray buffer]</h3>
+		<p>
+			[page:PropertyMixer valueSize] * 4 크기의 버퍼입니다. <br /><br />
+			다음과 같은 레이아웃을 가지고 있습니다: [ incoming | accu0 | accu1 | orig ]<br /><br />
+			보간법에서 .result처름 .buffer를 사용할 수 있으며 데이터는 'incoming'으로 갑니다.
+			'accu0' 와 'accu1' 는 누적 결과의 프레임 교차 및 변화 비교감지에 사용됩니다.
+			'orig'는 프로퍼티의 원래 상태를 저장합니다.
+		</p>
+
+		<h3>[property:Number cumulativeWeight]</h3>
+		<p>
+			기본값은 *0*입니다.
+		</p>
+
+		<h3>[property:Number valueSize]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:Number referenceCount]</h3>
+		<p>
+			기본값은 *0*입니다.
+		</p>
+
+		<h3>[property:Number useCount]</h3>
+		<p>
+			기본값은 *0*입니다.
+		</p>
+
+
+		<h2>메서드</h2>
+
+
+		<h3>[method:null accumulate]( [param:Number accuIndex], [param:Number weight] )</h3>
+		<p>
+			[page:PropertyMixer.buffer buffer][accuIndex] 'incoming' 영역의 데이터를 'accu[i]'에 축적합니다.<br />
+
+			가중치가 *0*이면 아무 동작을 하지 않습니다.
+		</p>
+
+		<h3>[method:null apply]( [param:Number accuIndex] )</h3>
+		<p>
+			누적치가 달라지면 [page:PropertyMixer.buffer buffer] 'accu[i]'의 상태를 적용합니다.
+		</p>
+
+		<h3>[method:null saveOriginalState]( )</h3>
+		<p>
+			기본 프로퍼티의 상태를 기억하고 양 쪽의 누적치에 복사합니다.
+		</p>
+
+		<h3>[method:null restoreOriginalState](  )</h3>
+		<p>
+			'saveOriginalState'로 받은 이전 상태를 다시 연결합니다.
+		</p>
+
+
+		<h2>소스 코드</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

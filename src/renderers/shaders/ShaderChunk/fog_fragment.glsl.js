@@ -3,7 +3,7 @@ export default /* glsl */`
 
 	#ifdef FOG_EXP2
 
-		float fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * fogDepth * fogDepth * LOG2 ) );
+		float fogFactor = 1.0 - exp( - fogDensity * fogDensity * fogDepth * fogDepth );
 
 	#else
 

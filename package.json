@@ -1,12 +1,14 @@
 {
   "name": "three",
-  "version": "0.105.2",
+  "version": "0.126.1",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
-  "repository": "mrdoob/three.js",
-  "jsnext:main": "build/three.module.js",
   "module": "build/three.module.js",
-  "types": "src/Three.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrdoob/three.js"
+  },
+  "sideEffects": false,
   "files": [
     "build/three.js",
     "build/three.min.js",
@@ -25,40 +27,54 @@
     "test": "test"
   },
   "eslintConfig": {
-    "parser": "@typescript-eslint/parser",
+    "root": true,
     "extends": "mdcs",
     "plugins": [
-      "html",
-      "@typescript-eslint"
+      "html"
     ],
     "rules": {
-      "@typescript-eslint/no-unused-vars": 1,
-      "@typescript-eslint/indent": [
+      "quotes": [
         "error",
-        "tab",
+        "single"
+      ],
+      "prefer-const": [
+        "error",
         {
-          "SwitchCase": 1
+          "destructuring": "any",
+          "ignoreReadBeforeAssign": false
         }
       ]
     }
   },
   "scripts": {
-    "build": "rollup -c",
-    "build-test": "rollup -c test/rollup.unit.config.js",
-    "build-closure": "rollup -c && google-closure-compiler --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
-    "build-examples": "rollup -c rollup-examples.config.js",
-    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
-    "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
     "start": "npm run dev",
-    "lint": "eslint src --ext js --ext ts",
-    "test": "npm run build-test && qunit test/unit/three.source.unit.js",
-    "travis": "npm run lint && npm test"
+    "test": "npm run test-lint && npm run test-unit",
+    "build": "rollup -c utils/build/rollup.config.js",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
+    "lint-fix": "eslint src --ext js --fix && eslint examples/js examples/jsm --ext js --ignore-pattern libs --fix",
+    "lint-docs": "eslint docs --ext html",
+    "lint-examples": "eslint examples/js examples/jsm --ext js --ignore-pattern libs",
+    "test-lint": "eslint src --ext js",
+    "test-unit": "npm run unit --prefix test",
+    "test-unit-examples": "npm run unit-examples --prefix test",
+    "test-e2e": "node test/e2e/puppeteer.js",
+    "test-e2e-cov": "node test/e2e/check-coverage.js",
+    "make-screenshot": "node test/e2e/puppeteer.js --make"
   },
   "keywords": [
     "three",
     "three.js",
+    "javascript",
     "3d",
-    "webgl"
+    "virtual-reality",
+    "augmented-reality",
+    "webgl",
+    "webgl2",
+    "webaudio",
+    "webxr",
+    "canvas",
+    "svg",
+    "html5"
   ],
   "author": "mrdoob",
   "license": "MIT",
@@ -67,17 +83,19 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "concurrently": "^4.1.0",
-    "eslint": "^5.16.0",
-    "eslint-config-mdcs": "^4.2.3",
-    "eslint-plugin-html": "^5.0.3",
-    "@typescript-eslint/parser": "^1.9.0",
-    "@typescript-eslint/eslint-plugin": "^1.9.0",
-    "typescript": "^3.4.5",
-    "google-closure-compiler": "20190415.0.0",
-    "http-server": "^0.11.1",
-    "qunit": "^2.9.2",
-    "rollup": "^1.10.1"
+    "@babel/core": "^7.12.16",
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
+    "@babel/preset-env": "^7.12.16",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-node-resolve": "^11.2.0",
+    "concurrently": "^5.3.0",
+    "eslint": "^7.20.0",
+    "eslint-config-mdcs": "^5.0.0",
+    "eslint-plugin-html": "^6.1.1",
+    "regenerator-runtime": "^0.13.7",
+    "rollup": "^2.39.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "servez": "^1.11.0"
   },
   "jspm": {
     "files": [

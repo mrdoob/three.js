@@ -1,12 +1,19 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 THREE.PointerLockControls = function ( camera, domElement ) {
 
-	this.domElement = domElement || document.body;
+	if ( domElement === undefined ) {
+
+		console.warn( 'THREE.PointerLockControls: The second parameter "domElement" is now mandatory.' );
+		domElement = document.body;
+
+	}
+
+	this.domElement = domElement;
 	this.isLocked = false;
+
+	// Set to constrain the pitch of the camera
+	// Range is 0 to Math.PI radians
+	this.minPolarAngle = 0; // radians
+	this.maxPolarAngle = Math.PI; // radians
 
 	//
 	// internals
@@ -22,6 +29,8 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	var PI_2 = Math.PI / 2;
 
+	var vec = new THREE.Vector3();
+
 	function onMouseMove( event ) {
 
 		if ( scope.isLocked === false ) return;
@@ -34,7 +43,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 		euler.y -= movementX * 0.002;
 		euler.x -= movementY * 0.002;
 
-		euler.x = Math.max( - PI_2, Math.min( PI_2, euler.x ) );
+		euler.x = Math.max( PI_2 - scope.maxPolarAngle, Math.min( PI_2 - scope.minPolarAngle, euler.x ) );
 
 		camera.quaternion.setFromEuler( euler );
 
@@ -44,7 +53,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	function onPointerlockChange() {
 
-		if ( document.pointerLockElement === scope.domElement ) {
+		if ( scope.domElement.ownerDocument.pointerLockElement === scope.domElement ) {
 
 			scope.dispatchEvent( lockEvent );
 
@@ -68,17 +77,17 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	this.connect = function () {
 
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'pointerlockchange', onPointerlockChange, false );
-		document.addEventListener( 'pointerlockerror', onPointerlockError, false );
+		scope.domElement.ownerDocument.addEventListener( 'mousemove', onMouseMove );
+		scope.domElement.ownerDocument.addEventListener( 'pointerlockchange', onPointerlockChange );
+		scope.domElement.ownerDocument.addEventListener( 'pointerlockerror', onPointerlockError );
 
 	};
 
 	this.disconnect = function () {
 
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'pointerlockchange', onPointerlockChange, false );
-		document.removeEventListener( 'pointerlockerror', onPointerlockError, false );
+		scope.domElement.ownerDocument.removeEventListener( 'mousemove', onMouseMove );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerlockchange', onPointerlockChange );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerlockerror', onPointerlockError );
 
 	};
 
@@ -106,6 +115,27 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	}();
 
+	this.moveForward = function ( distance ) {
+
+		// move forward parallel to the xz-plane
+		// assumes camera.up is y-up
+
+		vec.setFromMatrixColumn( camera.matrix, 0 );
+
+		vec.crossVectors( camera.up, vec );
+
+		camera.position.addScaledVector( vec, distance );
+
+	};
+
+	this.moveRight = function ( distance ) {
+
+		vec.setFromMatrixColumn( camera.matrix, 0 );
+
+		camera.position.addScaledVector( vec, distance );
+
+	};
+
 	this.lock = function () {
 
 		this.domElement.requestPointerLock();
@@ -114,7 +144,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	this.unlock = function () {
 
-		document.exitPointerLock();
+		scope.domElement.ownerDocument.exitPointerLock();
 
 	};
 

@@ -1,19 +1,17 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { Cache } from './Cache.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader.js';
 
-var loading = {};
+const loading = {};
 
 function FileLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 }
 
-Object.assign( FileLoader.prototype, {
+FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+
+	constructor: FileLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -23,9 +21,9 @@ Object.assign( FileLoader.prototype, {
 
 		url = this.manager.resolveURL( url );
 
-		var scope = this;
+		const scope = this;
 
-		var cached = Cache.get( url );
+		const cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -60,33 +58,34 @@ Object.assign( FileLoader.prototype, {
 		}
 
 		// Check for data: URI
-		var dataUriRegex = /^data:(.*?)(;base64)?,(.*)$/;
-		var dataUriRegexResult = url.match( dataUriRegex );
+		const dataUriRegex = /^data:(.*?)(;base64)?,(.*)$/;
+		const dataUriRegexResult = url.match( dataUriRegex );
+		let request;
 
 		// Safari can not handle Data URIs through XMLHttpRequest so process manually
 		if ( dataUriRegexResult ) {
 
-			var mimeType = dataUriRegexResult[ 1 ];
-			var isBase64 = !! dataUriRegexResult[ 2 ];
-			var data = dataUriRegexResult[ 3 ];
+			const mimeType = dataUriRegexResult[ 1 ];
+			const isBase64 = !! dataUriRegexResult[ 2 ];
 
+			let data = dataUriRegexResult[ 3 ];
 			data = decodeURIComponent( data );
 
 			if ( isBase64 ) data = atob( data );
 
 			try {
 
-				var response;
-				var responseType = ( this.responseType || '' ).toLowerCase();
+				let response;
+				const responseType = ( this.responseType || '' ).toLowerCase();
 
 				switch ( responseType ) {
 
 					case 'arraybuffer':
 					case 'blob':
 
-						var view = new Uint8Array( data.length );
+						const view = new Uint8Array( data.length );
 
-						for ( var i = 0; i < data.length; i ++ ) {
+						for ( let i = 0; i < data.length; i ++ ) {
 
 							view[ i ] = data.charCodeAt( i );
 
@@ -106,7 +105,7 @@ Object.assign( FileLoader.prototype, {
 
 					case 'document':
 
-						var parser = new DOMParser();
+						const parser = new DOMParser();
 						response = parser.parseFromString( data, mimeType );
 
 						break;
@@ -162,17 +161,15 @@ Object.assign( FileLoader.prototype, {
 
 			} );
 
-			var request = new XMLHttpRequest();
+			request = new XMLHttpRequest();
 
 			request.open( 'GET', url, true );
 
 			request.addEventListener( 'load', function ( event ) {
 
-				var response = this.response;
+				const response = this.response;
 
-				Cache.add( url, response );
-
-				var callbacks = loading[ url ];
+				const callbacks = loading[ url ];
 
 				delete loading[ url ];
 
@@ -183,9 +180,13 @@ Object.assign( FileLoader.prototype, {
 
 					if ( this.status === 0 ) console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
-					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+					// Add to cache only on HTTP success, so that we do not cache
+					// error response bodies as proper responses to requests.
+					Cache.add( url, response );
 
-						var callback = callbacks[ i ];
+					for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+
+						const callback = callbacks[ i ];
 						if ( callback.onLoad ) callback.onLoad( response );
 
 					}
@@ -194,9 +195,9 @@ Object.assign( FileLoader.prototype, {
 
 				} else {
 
-					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+					for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
-						var callback = callbacks[ i ];
+						const callback = callbacks[ i ];
 						if ( callback.onError ) callback.onError( event );
 
 					}
@@ -210,11 +211,11 @@ Object.assign( FileLoader.prototype, {
 
 			request.addEventListener( 'progress', function ( event ) {
 
-				var callbacks = loading[ url ];
+				const callbacks = loading[ url ];
 
-				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
-					var callback = callbacks[ i ];
+					const callback = callbacks[ i ];
 					if ( callback.onProgress ) callback.onProgress( event );
 
 				}
@@ -223,13 +224,13 @@ Object.assign( FileLoader.prototype, {
 
 			request.addEventListener( 'error', function ( event ) {
 
-				var callbacks = loading[ url ];
+				const callbacks = loading[ url ];
 
 				delete loading[ url ];
 
-				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
-					var callback = callbacks[ i ];
+					const callback = callbacks[ i ];
 					if ( callback.onError ) callback.onError( event );
 
 				}
@@ -241,13 +242,13 @@ Object.assign( FileLoader.prototype, {
 
 			request.addEventListener( 'abort', function ( event ) {
 
-				var callbacks = loading[ url ];
+				const callbacks = loading[ url ];
 
 				delete loading[ url ];
 
-				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
-					var callback = callbacks[ i ];
+					const callback = callbacks[ i ];
 					if ( callback.onError ) callback.onError( event );
 
 				}
@@ -262,7 +263,7 @@ Object.assign( FileLoader.prototype, {
 
 			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
 
-			for ( var header in this.requestHeader ) {
+			for ( const header in this.requestHeader ) {
 
 				request.setRequestHeader( header, this.requestHeader[ header ] );
 
@@ -278,13 +279,6 @@ Object.assign( FileLoader.prototype, {
 
 	},
 
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
 	setResponseType: function ( value ) {
 
 		this.responseType = value;
@@ -292,23 +286,9 @@ Object.assign( FileLoader.prototype, {
 
 	},
 
-	setWithCredentials: function ( value ) {
-
-		this.withCredentials = value;
-		return this;
-
-	},
-
 	setMimeType: function ( value ) {
 
 		this.mimeType = value;
-		return this;
-
-	},
-
-	setRequestHeader: function ( value ) {
-
-		this.requestHeader = value;
 		return this;
 
 	}

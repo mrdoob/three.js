@@ -1,8 +1,3 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- * @author mrdoob / http://mrdoob.com/
- */
-
 import {
 	AdditiveBlending,
 	Box2,
@@ -20,7 +15,7 @@ import {
 	Vector2,
 	Vector3,
 	Vector4
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var Lensflare = function () {
 
@@ -42,14 +37,12 @@ var Lensflare = function () {
 	tempMap.magFilter = NearestFilter;
 	tempMap.wrapS = ClampToEdgeWrapping;
 	tempMap.wrapT = ClampToEdgeWrapping;
-	tempMap.needsUpdate = true;
 
 	var occlusionMap = new DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, RGBFormat );
 	occlusionMap.minFilter = NearestFilter;
 	occlusionMap.magFilter = NearestFilter;
 	occlusionMap.wrapS = ClampToEdgeWrapping;
 	occlusionMap.wrapT = ClampToEdgeWrapping;
-	occlusionMap.needsUpdate = true;
 
 	// material
 
@@ -218,8 +211,8 @@ var Lensflare = function () {
 			// render pink quad
 
 			var uniforms = material1a.uniforms;
-			uniforms[ "scale" ].value = scale;
-			uniforms[ "screenPosition" ].value = positionScreen;
+			uniforms[ 'scale' ].value = scale;
+			uniforms[ 'screenPosition' ].value = positionScreen;
 
 			renderer.renderBufferDirect( camera, null, geometry, material1a, mesh1, null );
 
@@ -230,8 +223,8 @@ var Lensflare = function () {
 			// restore graphics
 
 			var uniforms = material1b.uniforms;
-			uniforms[ "scale" ].value = scale;
-			uniforms[ "screenPosition" ].value = positionScreen;
+			uniforms[ 'scale' ].value = scale;
+			uniforms[ 'screenPosition' ].value = positionScreen;
 
 			renderer.renderBufferDirect( camera, null, geometry, material1b, mesh1, null );
 
@@ -246,15 +239,15 @@ var Lensflare = function () {
 
 				var uniforms = material2.uniforms;
 
-				uniforms[ "color" ].value.copy( element.color );
-				uniforms[ "map" ].value = element.texture;
-				uniforms[ "screenPosition" ].value.x = positionScreen.x + vecX * element.distance;
-				uniforms[ "screenPosition" ].value.y = positionScreen.y + vecY * element.distance;
+				uniforms[ 'color' ].value.copy( element.color );
+				uniforms[ 'map' ].value = element.texture;
+				uniforms[ 'screenPosition' ].value.x = positionScreen.x + vecX * element.distance;
+				uniforms[ 'screenPosition' ].value.y = positionScreen.y + vecY * element.distance;
 
 				var size = element.size / viewport.w;
 				var invAspect = viewport.w / viewport.z;
 
-				uniforms[ "scale" ].value.set( size * invAspect, size );
+				uniforms[ 'scale' ].value.set( size * invAspect, size );
 
 				material2.uniformsNeedUpdate = true;
 
@@ -390,8 +383,8 @@ Lensflare.Geometry = ( function () {
 	var interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
 
 	geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-	geometry.addAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-	geometry.addAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+	geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+	geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
 
 	return geometry;
 

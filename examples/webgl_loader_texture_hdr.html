@@ -9,30 +9,23 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl HDR (RGBE) texture loader example<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl HDR (RGBE) texture loader example<br/>
 			Image courtesy of <a href="http://www.pauldebevec.com/Research/HDR/" target="_blank" rel="noopener">Paul Debevec</a>.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/RGBELoader.js"></script>
+		<script type="module">
 
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
-			var params = {
+			const params = {
 				exposure: 2.0
 			};
 
-			var renderer, scene, camera;
+			let renderer, scene, camera;
 
 			init();
 
@@ -46,50 +39,26 @@
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = params.exposure;
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
-				var type = THREE.UnsignedByteType;
-				//var type = THREE.FloatType;
-
-				new THREE.RGBELoader()
-					.setType( type )
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType ) // alt: FloatType, HalfFloatType
 					.load( 'textures/memorial.hdr', function ( texture, textureData ) {
-
-						switch ( type ) {
-
-							case THREE.UnsignedByteType:
-
-								texture.encoding = THREE.RGBEEncoding;
-								texture.minFilter = THREE.NearestFilter;
-								texture.magFilter = THREE.NearestFilter;
-								break;
-
-							case THREE.FloatType:
-
-								texture.encoding = THREE.LinearEncoding;
-								texture.minFilter = THREE.LinearFilter;
-								texture.magFilter = THREE.LinearFilter;
-								break;
-
-						}
-
-						texture.generateMipmaps = false;
-						texture.flipY = true;
 
 						//console.log( textureData );
 						//console.log( texture );
 
-						var material = new THREE.MeshBasicMaterial( { map: texture } );
+						const material = new THREE.MeshBasicMaterial( { map: texture } );
 
-						var quad = new THREE.PlaneBufferGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
+						const quad = new THREE.PlaneGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
 
-						var mesh = new THREE.Mesh( quad, material );
+						const mesh = new THREE.Mesh( quad, material );
 
 						scene.add( mesh );
 
@@ -99,22 +68,22 @@
 
 				//
 
-				var gui = new dat.GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'exposure', 0, 4, 0.01 ).onChange( render );
 				gui.open();
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function onWindowResize() {
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 
-				var frustumHeight = camera.top - camera.bottom;
+				const frustumHeight = camera.top - camera.bottom;
 
 				camera.left = - frustumHeight * aspect / 2;
 				camera.right = frustumHeight * aspect / 2;

@@ -33,10 +33,10 @@ void main() {
 
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
-	#include <premultiplied_alpha_fragment>
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
 	#include <fog_fragment>
+	#include <premultiplied_alpha_fragment>
 
 }
 `;

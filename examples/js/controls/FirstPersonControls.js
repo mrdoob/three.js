@@ -1,14 +1,16 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author paulirish / http://paulirish.com/
- */
-
 THREE.FirstPersonControls = function ( object, domElement ) {
 
-	this.object = object;
+	if ( domElement === undefined ) {
 
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+		console.warn( 'THREE.FirstPersonControls: The second parameter "domElement" is now mandatory.' );
+		domElement = document;
+
+	}
+
+	this.object = object;
+	this.domElement = domElement;
+
+	// API
 
 	this.enabled = true;
 
@@ -29,6 +31,10 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.verticalMin = 0;
 	this.verticalMax = Math.PI;
 
+	this.mouseDragOn = false;
+
+	// internals
+
 	this.autoSpeedFactor = 0.0;
 
 	this.mouseX = 0;
@@ -38,8 +44,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.moveBackward = false;
 	this.moveLeft = false;
 	this.moveRight = false;
-
-	this.mouseDragOn = false;
 
 	this.viewHalfX = 0;
 	this.viewHalfY = 0;
@@ -145,22 +149,22 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		//event.preventDefault();
 
-		switch ( event.keyCode ) {
+		switch ( event.code ) {
 
-			case 38: /*up*/
-			case 87: /*W*/ this.moveForward = true; break;
+			case 'ArrowUp':
+			case 'KeyW': this.moveForward = true; break;
 
-			case 37: /*left*/
-			case 65: /*A*/ this.moveLeft = true; break;
+			case 'ArrowLeft':
+			case 'KeyA': this.moveLeft = true; break;
 
-			case 40: /*down*/
-			case 83: /*S*/ this.moveBackward = true; break;
+			case 'ArrowDown':
+			case 'KeyS': this.moveBackward = true; break;
 
-			case 39: /*right*/
-			case 68: /*D*/ this.moveRight = true; break;
+			case 'ArrowRight':
+			case 'KeyD': this.moveRight = true; break;
 
-			case 82: /*R*/ this.moveUp = true; break;
-			case 70: /*F*/ this.moveDown = true; break;
+			case 'KeyR': this.moveUp = true; break;
+			case 'KeyF': this.moveDown = true; break;
 
 		}
 
@@ -168,22 +172,22 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.onKeyUp = function ( event ) {
 
-		switch ( event.keyCode ) {
+		switch ( event.code ) {
 
-			case 38: /*up*/
-			case 87: /*W*/ this.moveForward = false; break;
+			case 'ArrowUp':
+			case 'KeyW': this.moveForward = false; break;
 
-			case 37: /*left*/
-			case 65: /*A*/ this.moveLeft = false; break;
+			case 'ArrowLeft':
+			case 'KeyA': this.moveLeft = false; break;
 
-			case 40: /*down*/
-			case 83: /*S*/ this.moveBackward = false; break;
+			case 'ArrowDown':
+			case 'KeyS': this.moveBackward = false; break;
 
-			case 39: /*right*/
-			case 68: /*D*/ this.moveRight = false; break;
+			case 'ArrowRight':
+			case 'KeyD': this.moveRight = false; break;
 
-			case 82: /*R*/ this.moveUp = false; break;
-			case 70: /*F*/ this.moveDown = false; break;
+			case 'KeyR': this.moveUp = false; break;
+			case 'KeyF': this.moveDown = false; break;
 
 		}
 
@@ -219,7 +223,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 			if ( this.heightSpeed ) {
 
-				var y = THREE.Math.clamp( this.object.position.y, this.heightMin, this.heightMax );
+				var y = THREE.MathUtils.clamp( this.object.position.y, this.heightMin, this.heightMax );
 				var heightDelta = y - this.heightMin;
 
 				this.autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
@@ -262,12 +266,12 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 			lat = Math.max( - 85, Math.min( 85, lat ) );
 
-			var phi = THREE.Math.degToRad( 90 - lat );
-			var theta = THREE.Math.degToRad( lon );
+			var phi = THREE.MathUtils.degToRad( 90 - lat );
+			var theta = THREE.MathUtils.degToRad( lon );
 
 			if ( this.constrainVertical ) {
 
-				phi = THREE.Math.mapLinear( phi, 0, Math.PI, this.verticalMin, this.verticalMax );
+				phi = THREE.MathUtils.mapLinear( phi, 0, Math.PI, this.verticalMin, this.verticalMax );
 
 			}
 
@@ -289,13 +293,13 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.dispose = function () {
 
-		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
-		this.domElement.removeEventListener( 'mousedown', _onMouseDown, false );
-		this.domElement.removeEventListener( 'mousemove', _onMouseMove, false );
-		this.domElement.removeEventListener( 'mouseup', _onMouseUp, false );
+		this.domElement.removeEventListener( 'contextmenu', contextmenu );
+		this.domElement.removeEventListener( 'mousedown', _onMouseDown );
+		this.domElement.removeEventListener( 'mousemove', _onMouseMove );
+		this.domElement.removeEventListener( 'mouseup', _onMouseUp );
 
-		window.removeEventListener( 'keydown', _onKeyDown, false );
-		window.removeEventListener( 'keyup', _onKeyUp, false );
+		window.removeEventListener( 'keydown', _onKeyDown );
+		window.removeEventListener( 'keyup', _onKeyUp );
 
 	};
 
@@ -305,13 +309,13 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	var _onKeyDown = bind( this, this.onKeyDown );
 	var _onKeyUp = bind( this, this.onKeyUp );
 
-	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
-	this.domElement.addEventListener( 'mousemove', _onMouseMove, false );
-	this.domElement.addEventListener( 'mousedown', _onMouseDown, false );
-	this.domElement.addEventListener( 'mouseup', _onMouseUp, false );
+	this.domElement.addEventListener( 'contextmenu', contextmenu );
+	this.domElement.addEventListener( 'mousemove', _onMouseMove );
+	this.domElement.addEventListener( 'mousedown', _onMouseDown );
+	this.domElement.addEventListener( 'mouseup', _onMouseUp );
 
-	window.addEventListener( 'keydown', _onKeyDown, false );
-	window.addEventListener( 'keyup', _onKeyUp, false );
+	window.addEventListener( 'keydown', _onKeyDown );
+	window.addEventListener( 'keyup', _onKeyUp );
 
 	function bind( scope, fn ) {
 
@@ -330,8 +334,8 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		lookDirection.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 		spherical.setFromVector3( lookDirection );
 
-		lat = 90 - THREE.Math.radToDeg( spherical.phi );
-		lon = THREE.Math.radToDeg( spherical.theta );
+		lat = 90 - THREE.MathUtils.radToDeg( spherical.phi );
+		lon = THREE.MathUtils.radToDeg( spherical.theta );
 
 	}
 

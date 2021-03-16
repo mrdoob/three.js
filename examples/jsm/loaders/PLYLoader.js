@@ -1,6 +1,12 @@
+import {
+	BufferGeometry,
+	FileLoader,
+	Float32BufferAttribute,
+	Loader,
+	LoaderUtils
+} from '../../../build/three.module.js';
+
 /**
- * @author Wei Meng / http://about.me/menway
- *
  * Description: A THREE loader for PLY ASCII files (known as the Polygon
  * File Format or the Stanford Triangle Format).
  *
@@ -26,24 +32,16 @@
  *
  */
 
-import {
-	BufferGeometry,
-	DefaultLoadingManager,
-	FileLoader,
-	Float32BufferAttribute,
-	LoaderUtils
-} from "../../../build/three.module.js";
-
 
 var PLYLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 	this.propertyNameMapping = {};
 
 };
 
-PLYLoader.prototype = {
+PLYLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: PLYLoader,
 
@@ -54,18 +52,31 @@ PLYLoader.prototype = {
 		var loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -87,14 +98,15 @@ PLYLoader.prototype = {
 			if ( result !== null ) {
 
 				headerText = result[ 1 ];
-				headerLength = result[ 0 ].length;
+				headerLength = new Blob( [ result[ 0 ] ] ).size;
 
 			}
 
 			var header = {
 				comments: [],
 				elements: [],
-				headerLength: headerLength
+				headerLength: headerLength,
+				objInfo: ''
 			};
 
 			var lines = headerText.split( '\n' );
@@ -171,6 +183,12 @@ PLYLoader.prototype = {
 					case 'property':
 
 						currentElement.properties.push( make_ply_element_property( lineValues, scope.propertyNameMapping ) );
+
+						break;
+
+					case 'obj_info':
+
+						header.objInfo = line;
 
 						break;
 
@@ -311,32 +329,32 @@ PLYLoader.prototype = {
 
 			}
 
-			geometry.addAttribute( 'position', new Float32BufferAttribute( buffer.vertices, 3 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( buffer.vertices, 3 ) );
 
 			// optional buffer data
 
 			if ( buffer.normals.length > 0 ) {
 
-				geometry.addAttribute( 'normal', new Float32BufferAttribute( buffer.normals, 3 ) );
+				geometry.setAttribute( 'normal', new Float32BufferAttribute( buffer.normals, 3 ) );
 
 			}
 
 			if ( buffer.uvs.length > 0 ) {
 
-				geometry.addAttribute( 'uv', new Float32BufferAttribute( buffer.uvs, 2 ) );
+				geometry.setAttribute( 'uv', new Float32BufferAttribute( buffer.uvs, 2 ) );
 
 			}
 
 			if ( buffer.colors.length > 0 ) {
 
-				geometry.addAttribute( 'color', new Float32BufferAttribute( buffer.colors, 3 ) );
+				geometry.setAttribute( 'color', new Float32BufferAttribute( buffer.colors, 3 ) );
 
 			}
 
 			if ( buffer.faceVertexUvs.length > 0 ) {
 
 				geometry = geometry.toNonIndexed();
-				geometry.addAttribute( 'uv', new Float32BufferAttribute( buffer.faceVertexUvs, 2 ) );
+				geometry.setAttribute( 'uv', new Float32BufferAttribute( buffer.faceVertexUvs, 2 ) );
 
 			}
 
@@ -510,6 +528,6 @@ PLYLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { PLYLoader };
