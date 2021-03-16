@@ -68,19 +68,19 @@ class WebGPUTextureUtils {
 		if ( pipeline === undefined ) {
 
 			pipeline = this.device.createRenderPipeline( {
-				vertexStage: {
+				vertex: {
 					module: this.mipmapVertexShaderModule,
 					entryPoint: 'main',
 				},
-				fragmentStage: {
+				fragment: {
 					module: this.mipmapFragmentShaderModule,
 					entryPoint: 'main',
+					targets: [ { format } ],
 				},
-				primitiveTopology: GPUPrimitiveTopology.TriangleStrip,
-				vertexState: {
-					indexFormat: GPUIndexFormat.Uint32
-				},
-				colorStates: [ { format } ],
+				primitive: {
+					topology: GPUPrimitiveTopology.TriangleStrip,
+					stripIndexFormat: GPUIndexFormat.Uint32
+				}
 			} );
 			this.pipelines[ format ] = pipeline;
 
