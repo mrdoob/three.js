@@ -1094,7 +1094,7 @@ function WebGLRenderer( parameters ) {
 		state.setPolygonOffset( false );
 
 		// _gl.finish();
-    
+ 
 		bindingStates.resetDefaultState();
 		_currentMaterialId = - 1;
 		_currentCamera = null;
