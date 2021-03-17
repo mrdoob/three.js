@@ -492,7 +492,7 @@ function Loader( editor ) {
 							depthWrite: false
 						} );
 
-						var shapes = path.toShapes( true );
+						var shapes = SVGLoader.createShapes( path );
 
 						for ( var j = 0; j < shapes.length; j ++ ) {
 

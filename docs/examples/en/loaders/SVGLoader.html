@@ -41,7 +41,7 @@
 						depthWrite: false
 					} );
 
-					const shapes = path.toShapes( true );
+					const shapes = SVGLoader.createShapes( path );
 
 					for ( let j = 0; j < shapes.length; j ++ ) {
 
@@ -102,6 +102,16 @@
 		</p>
 		<p>
 		Begin loading from url and call onLoad with the response content.
+		</p>
+
+		<h2>Static Methods</h2>
+
+		<h3>[method:Array createShapes]( [param:ShapePath shape] )</h3>
+		<p>
+		[page:ShapePath shape] — A ShapePath from the array of [page:ShapePath], given as argument in the onLoad function for the load function of [page:SVGLoader].<br />
+		</p>
+		<p>
+		Returns one or more [page:Shape] objects created from the [param:ShapePath shape] provided as an argument in this function.
 		</p>
 
 		<h2>Source</h2>
