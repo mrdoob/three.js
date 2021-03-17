@@ -73,11 +73,9 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( index !== null ) {
 
-				const indices = index.array;
+				for ( let i = 0, il = index.count; i < il; i ++ ) {
 
-				for ( let i = 0, il = indices.length; i < il; i ++ ) {
-
-					const a = indices[ i ];
+					const a = index.getX( i );
 
 					_position.fromBufferAttribute( positionAttribute, a );
 

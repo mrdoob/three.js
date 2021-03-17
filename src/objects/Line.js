@@ -122,12 +122,10 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( index !== null ) {
 
-				const indices = index.array;
+				for ( let i = 0, l = index.count - 1; i < l; i += step ) {
 
-				for ( let i = 0, l = indices.length - 1; i < l; i += step ) {
-
-					const a = indices[ i ];
-					const b = indices[ i + 1 ];
+					const a = index.getX( i );
+					const b = index.getX( i + 1 );
 
 					vStart.fromBufferAttribute( positionAttribute, a );
 					vEnd.fromBufferAttribute( positionAttribute, b );
