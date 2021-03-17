@@ -5542,13 +5542,13 @@
 				} // Unsure if this is the correct method to handle this case.
 
 
-				return undefined;
+				return null;
 			}
 
 			const t = -(line.start.dot(this.normal) + this.constant) / denominator;
 
 			if (t < 0 || t > 1) {
-				return undefined;
+				return null;
 			}
 
 			return target.copy(direction).multiplyScalar(t).add(line.start);
@@ -7120,12 +7120,16 @@
 			return new this.constructor(this.array, this.itemSize).copy(this);
 		},
 		toJSON: function () {
-			return {
+			const data = {
 				itemSize: this.itemSize,
 				type: this.array.constructor.name,
 				array: Array.prototype.slice.call(this.array),
 				normalized: this.normalized
 			};
+			if (this.name !== '') data.name = this.name;
+			if (this.usage !== StaticDrawUsage) data.usage = this.usage;
+			if (this.updateRange.offset !== 0 || this.updateRange.count !== -1) data.updateRange = this.updateRange;
+			return data;
 		}
 	}); //
 
@@ -7833,7 +7837,8 @@
 				}
 
 				return data;
-			}
+			} // for simplicity the code assumes attributes are not shared across geometries, see #15811
+
 
 			data.data = {
 				attributes: {}
@@ -7851,9 +7856,7 @@
 
 			for (const key in attributes) {
 				const attribute = attributes[key];
-				const attributeData = attribute.toJSON(data.data);
-				if (attribute.name !== '') attributeData.name = attribute.name;
-				data.data.attributes[key] = attributeData;
+				data.data.attributes[key] = attribute.toJSON(data.data);
 			}
 
 			const morphAttributes = {};
@@ -7865,9 +7868,7 @@
 
 				for (let i = 0, il = attributeArray.length; i < il; i++) {
 					const attribute = attributeArray[i];
-					const attributeData = attribute.toJSON(data.data);
-					if (attribute.name !== '') attributeData.name = attribute.name;
-					array.push(attributeData);
+					array.push(attribute.toJSON(data.data));
 				}
 
 				if (array.length > 0) {
@@ -17500,11 +17501,7 @@
 				return;
 			}
 
-			if (_isContextLost === true) return; // reset caching for this frame
-
-			bindingStates.resetDefaultState();
-			_currentMaterialId = -1;
-			_currentCamera = null; // update scene graph
+			if (_isContextLost === true) return; // update scene graph
 
 			if (scene.autoUpdate === true) scene.updateMatrixWorld(); // update camera matrices and frustum
 
@@ -17573,6 +17570,9 @@
 			state.buffers.color.setMask(true);
 			state.setPolygonOffset(false); // _gl.finish();
 
+			bindingStates.resetDefaultState();
+			_currentMaterialId = -1;
+			_currentCamera = null;
 			renderStateStack.pop();
 
 			if (renderStateStack.length > 0) {
@@ -19400,11 +19400,9 @@
 				const positionAttribute = attributes.position;
 
 				if (index !== null) {
-					const indices = index.array;
-
-					for (let i = 0, l = indices.length - 1; i < l; i += step) {
-						const a = indices[i];
-						const b = indices[i + 1];
+					for (let i = 0, l = index.count - 1; i < l; i += step) {
+						const a = index.getX(i);
+						const b = index.getX(i + 1);
 						vStart.fromBufferAttribute(positionAttribute, a);
 						vEnd.fromBufferAttribute(positionAttribute, b);
 
@@ -19631,10 +19629,8 @@
 				const positionAttribute = attributes.position;
 
 				if (index !== null) {
-					const indices = index.array;
-
-					for (let i = 0, il = indices.length; i < il; i++) {
-						const a = indices[i];
+					for (let i = 0, il = index.count; i < il; i++) {
+						const a = index.getX(i);
 
 						_position$1.fromBufferAttribute(positionAttribute, a);
 
@@ -27574,6 +27570,13 @@
 				}
 
 				if (attribute.name !== undefined) bufferAttribute.name = attribute.name;
+				if (attribute.usage !== undefined) bufferAttribute.setUsage(attribute.usage);
+
+				if (attribute.updateRange !== undefined) {
+					bufferAttribute.updateRange.offset = attribute.updateRange.offset;
+					bufferAttribute.updateRange.count = attribute.updateRange.count;
+				}
+
 				geometry.setAttribute(key, bufferAttribute);
 			}
 
