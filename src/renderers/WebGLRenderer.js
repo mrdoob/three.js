@@ -989,12 +989,6 @@ function WebGLRenderer( parameters ) {
 
 		if ( _isContextLost === true ) return;
 
-		// reset caching for this frame
-
-		bindingStates.resetDefaultState();
-		_currentMaterialId = - 1;
-		_currentCamera = null;
-
 		// update scene graph
 
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
@@ -1100,6 +1094,10 @@ function WebGLRenderer( parameters ) {
 		state.setPolygonOffset( false );
 
 		// _gl.finish();
+
+		bindingStates.resetDefaultState();
+		_currentMaterialId = - 1;
+		_currentCamera = null;
 
 		renderStateStack.pop();
 
