@@ -583,6 +583,8 @@ THREE.MMDLoader = ( function () {
 				var boneData = data.bones[ i ];
 
 				var bone = {
+					index: i,
+					transformationClass: boneData.transformationClass,
 					parent: boneData.parentIndex,
 					name: boneData.name,
 					pos: boneData.position.slice( 0, 3 ),
@@ -691,6 +693,10 @@ THREE.MMDLoader = ( function () {
 
 					iks.push( param );
 
+					// Save the reference even from bone data for efficiently
+					// simulating PMX animation system
+					bones[ i ].ik = param;
+
 				}
 
 			}
@@ -698,6 +704,9 @@ THREE.MMDLoader = ( function () {
 			// grants
 
 			if ( data.metadata.format === 'pmx' ) {
+
+				// bone index -> grant entry map
+				var grantEntryMap = {};
 
 				for ( var i = 0; i < data.metadata.boneCount; i ++ ) {
 
@@ -716,15 +725,54 @@ THREE.MMDLoader = ( function () {
 						transformationClass: boneData.transformationClass
 					};
 
-					grants.push( param );
+					grantEntryMap[ i ] = { parent: null, children: [], param: param, visited: false };
 
 				}
 
-				grants.sort( function ( a, b ) {
+				var rootEntry = { parent: null, children: [], param: null, visited: false };
 
-					return a.transformationClass - b.transformationClass;
+				// Build a tree representing grant hierarchy
 
-				} );
+				for ( var boneIndex in grantEntryMap ) {
+
+					var grantEntry = grantEntryMap[ boneIndex ];
+					var parentGrantEntry = grantEntryMap[ grantEntry.parentIndex ] || rootEntry;
+
+					grantEntry.parent = parentGrantEntry;
+					parentGrantEntry.children.push( grantEntry );
+
+				}
+
+				// Sort grant parameters from parents to children because
+				// grant uses parent's transform that parent's grant is already applied
+				// so grant should be applied in order from parents to children
+
+				function traverse( entry ) {
+
+					if ( entry.param ) {
+
+						grants.push( entry.param );
+
+						// Save the reference even from bone data for efficiently
+						// simulating PMX animation system
+						bones[ entry.param.index ].grant = entry.param;
+
+					}
+
+					entry.visited = true;
+
+					for ( var i = 0, il = entry.children.length; i < il; i ++ ) {
+
+						var child = entry.children[ i ];
+
+						// Cut off a loop if exists. (Is a grant loop invalid?)
+						if ( ! child.visited ) traverse( child );
+
+					}
+
+				}
+
+				traverse( rootEntry );
 
 			}
 

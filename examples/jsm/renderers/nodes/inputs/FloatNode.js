@@ -8,10 +8,10 @@ class FloatNode extends InputNode {
 
 		this.value = value;
 
-		Object.defineProperty( this, 'isFloatNode', { value: true } );
-
 	}
 
 }
+
+FloatNode.prototype.isFloatNode = true;
 
 export default FloatNode;

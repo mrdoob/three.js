@@ -213,6 +213,24 @@ THREE.ShaderLib[ 'line' ] = {
 
 			#endif
 
+			float alpha = opacity;
+
+			#ifdef ALPHA_TO_COVERAGE
+
+			// artifacts appear on some hardware if a derivative is taken within a conditional
+			float a = vUv.x;
+			float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
+			float len2 = a * a + b * b;
+			float dlen = fwidth( len2 );
+
+			if ( abs( vUv.y ) > 1.0 ) {
+
+				alpha = 1.0 - smoothstep( 1.0 - dlen, 1.0 + dlen, len2 );
+
+			}
+
+			#else
+
 			if ( abs( vUv.y ) > 1.0 ) {
 
 				float a = vUv.x;
@@ -223,12 +241,14 @@ THREE.ShaderLib[ 'line' ] = {
 
 			}
 
-			vec4 diffuseColor = vec4( diffuse, opacity );
+			#endif
+
+			vec4 diffuseColor = vec4( diffuse, alpha );
 
 			#include <logdepthbuf_fragment>
 			#include <color_fragment>
 
-			gl_FragColor = vec4( diffuseColor.rgb, diffuseColor.a );
+			gl_FragColor = vec4( diffuseColor.rgb, alpha );
 
 			#include <tonemapping_fragment>
 			#include <encodings_fragment>
@@ -397,6 +417,40 @@ THREE.LineMaterial = function ( parameters ) {
 			set: function ( value ) {
 
 				this.uniforms.resolution.value.copy( value );
+
+			}
+
+		},
+
+		alphaToCoverage: {
+
+			enumerable: true,
+
+			get: function () {
+
+				return Boolean( 'ALPHA_TO_COVERAGE' in this.defines );
+
+			},
+
+			set: function ( value ) {
+
+				if ( Boolean( value ) !== Boolean( 'ALPHA_TO_COVERAGE' in this.defines ) ) {
+
+					this.needsUpdate = true;
+
+				}
+
+				if ( value ) {
+
+					this.defines.ALPHA_TO_COVERAGE = '';
+					this.extensions.derivatives = true;
+
+				} else {
+
+					delete this.defines.ALPHA_TO_COVERAGE;
+					this.extensions.derivatives = false;
+
+				}
 
 			}
 

@@ -105,6 +105,15 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _worldPosition.setFromMatrixPosition( object.matrixWorld ) );
 
+			if ( _hovered !== object && _hovered !== null) {
+
+				scope.dispatchEvent( { type: 'hoveroff', object: _hovered } );
+
+				_domElement.style.cursor = 'auto';
+				_hovered = null;
+
+			}
+			
 			if ( _hovered !== object ) {
 
 				scope.dispatchEvent( { type: 'hoveron', object: object } );

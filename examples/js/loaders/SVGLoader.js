@@ -846,9 +846,9 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		function parseCircleNode( node ) {
 
-			var x = parseFloatWithUnits( node.getAttribute( 'cx' ) );
-			var y = parseFloatWithUnits( node.getAttribute( 'cy' ) );
-			var r = parseFloatWithUnits( node.getAttribute( 'r' ) );
+			var x = parseFloatWithUnits( node.getAttribute( 'cx' ) || 0 );
+			var y = parseFloatWithUnits( node.getAttribute( 'cy' ) || 0 );
+			var r = parseFloatWithUnits( node.getAttribute( 'r' ) || 0 );
 
 			var subpath = new THREE.Path();
 			subpath.absarc( x, y, r, 0, Math.PI * 2 );
@@ -862,10 +862,10 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		function parseEllipseNode( node ) {
 
-			var x = parseFloatWithUnits( node.getAttribute( 'cx' ) );
-			var y = parseFloatWithUnits( node.getAttribute( 'cy' ) );
-			var rx = parseFloatWithUnits( node.getAttribute( 'rx' ) );
-			var ry = parseFloatWithUnits( node.getAttribute( 'ry' ) );
+			var x = parseFloatWithUnits( node.getAttribute( 'cx' ) || 0 );
+			var y = parseFloatWithUnits( node.getAttribute( 'cy' ) || 0 );
+			var rx = parseFloatWithUnits( node.getAttribute( 'rx' ) || 0 );
+			var ry = parseFloatWithUnits( node.getAttribute( 'ry' ) || 0 );
 
 			var subpath = new THREE.Path();
 			subpath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
@@ -879,10 +879,10 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		function parseLineNode( node ) {
 
-			var x1 = parseFloatWithUnits( node.getAttribute( 'x1' ) );
-			var y1 = parseFloatWithUnits( node.getAttribute( 'y1' ) );
-			var x2 = parseFloatWithUnits( node.getAttribute( 'x2' ) );
-			var y2 = parseFloatWithUnits( node.getAttribute( 'y2' ) );
+			var x1 = parseFloatWithUnits( node.getAttribute( 'x1' ) || 0 );
+			var y1 = parseFloatWithUnits( node.getAttribute( 'y1' ) || 0 );
+			var x2 = parseFloatWithUnits( node.getAttribute( 'x2' ) || 0 );
+			var y2 = parseFloatWithUnits( node.getAttribute( 'y2' ) || 0 );
 
 			var path = new THREE.ShapePath();
 			path.moveTo( x1, y1 );

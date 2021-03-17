@@ -22,8 +22,6 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		this.array = null; // set by the renderer
 		this.bufferGPU = null; // set by the renderer
 
-		Object.defineProperty( this, 'isUniformsGroup', { value: true } );
-
 	}
 
 	addUniform( uniform ) {
@@ -291,5 +289,7 @@ function arraysEqual( a, b, offset ) {
 	return true;
 
 }
+
+WebGPUUniformsGroup.prototype.isUniformsGroup = true;
 
 export default WebGPUUniformsGroup;
