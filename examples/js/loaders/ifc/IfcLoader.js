@@ -4738,14 +4738,14 @@ var IfcAPI = class {
   }
 };
 
-THREE.IfcLoader = function (manager) {
+THREE.IFCLoader = function (manager) {
   THREE.Loader.call(this, manager);
 };
 
 var ifcAPI = new IfcAPI();
 
-THREE.IfcLoader.prototype = Object.assign(Object.create(THREE.Loader.prototype), {
-  constructor: THREE.IfcLoader,
+THREE.IFCLoader.prototype = Object.assign(Object.create(THREE.Loader.prototype), {
+  constructor: THREE.IFCLoader,
 
   load: async function (url, onLoad, onProgress, onError) {
     var scope = this;

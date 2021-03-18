@@ -25,7 +25,7 @@
 			import * as THREE from "../build/three.module.js";
 			import { OrbitControls } from "./jsm/controls/OrbitControls.js";
 
-			import { IfcLoader } from "./jsm/loaders/ifc/IfcLoader.js";
+			import { IFCLoader } from "./jsm/loaders/ifc/IFCLoader.js";
 
 			//Scene
 			const scene = new THREE.Scene();
@@ -70,7 +70,9 @@
 			});
 
 			//Setup IFC Loader
-			const ifcLoader = new IfcLoader();
+			const ifcLoader = new IFCLoader();
+
+			//Load IFC file
 			ifcLoader.load('models/ifc/rac_advanced_sample_project.ifc', (geometry) => scene.add(geometry));
 
 			//Animation
