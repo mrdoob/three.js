@@ -1649,7 +1649,7 @@ SVGLoader.createShapes = function ( shapePath ) {
 	const classifyResult = {
 		loc: IntersectionLocationType.ORIGIN,
 		t: 0
-	}
+	};
 
 	function findEdgeIntersection( a0, a1, b0, b1 ) {
 
@@ -1811,7 +1811,7 @@ SVGLoader.createShapes = function ( shapePath ) {
 
 				const intersection = findEdgeIntersection( path1EdgeStart, path1EdgeEnd, path2EdgeStart, path2EdgeEnd );
 
-				if ( intersection !== null && intersectionsRaw.find(i => i.t <= intersection.t + Number.EPSILON && i.t >= intersection.t - Number.EPSILON) === undefined ) {
+				if ( intersection !== null && intersectionsRaw.find( i => i.t <= intersection.t + Number.EPSILON && i.t >= intersection.t - Number.EPSILON ) === undefined ) {
 
 					intersectionsRaw.push( intersection );
 					intersections.push( new Vector2( intersection.x, intersection.y ) );

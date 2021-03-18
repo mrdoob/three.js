@@ -33,7 +33,7 @@ class ProgressiveLightMap {
 		this.warned = false;
 
 		// Create the Progressive LightMap Texture
-		let format = /(Android|iPad|iPhone|iPod)/g.test( navigator.userAgent ) ? THREE.HalfFloatType : THREE.FloatType;
+		const format = /(Android|iPad|iPhone|iPod)/g.test( navigator.userAgent ) ? THREE.HalfFloatType : THREE.FloatType;
 		this.progressiveLightMap1 = new THREE.WebGLRenderTarget( this.res, this.res, { type: format } );
 		this.progressiveLightMap2 = new THREE.WebGLRenderTarget( this.res, this.res, { type: format } );
 
@@ -49,7 +49,7 @@ class ProgressiveLightMap {
 				'	gl_Position = vec4((uv2 - 0.5) * 2.0, 1.0, 1.0); }';
 
 			// Fragment Shader: Set Pixels to average in the Previous frame's Shadows
-			let bodyStart = shader.fragmentShader.indexOf( 'void main() {' );
+			const bodyStart = shader.fragmentShader.indexOf( 'void main() {' );
 			shader.fragmentShader =
 				'varying vec2 vUv2;\n' +
 				shader.fragmentShader.slice( 0, bodyStart ) +
@@ -81,11 +81,11 @@ class ProgressiveLightMap {
 	addObjectsToLightMap( objects ) {
 
 		// Prepare list of UV bounding boxes for packing later...
-		this.uv_boxes = []; let padding = 3 / this.res;
+		this.uv_boxes = []; const padding = 3 / this.res;
 
 		for ( let ob = 0; ob < objects.length; ob ++ ) {
 
-			let object = objects[ ob ];
+			const object = objects[ ob ];
 
 			// If this object is a light, simply add it to the internal scene
 			if ( object.isLight ) {
@@ -94,9 +94,9 @@ class ProgressiveLightMap {
 
 			}
 
-			if ( ! object.geometry.hasAttribute( "uv" ) ) {
+			if ( ! object.geometry.hasAttribute( 'uv' ) ) {
 
-				console.warn( "All lightmap objects need UVs!" ); continue;
+				console.warn( 'All lightmap objects need UVs!' ); continue;
 
 			}
 
@@ -128,7 +128,7 @@ class ProgressiveLightMap {
 		const dimensions = potpack( this.uv_boxes );
 		this.uv_boxes.forEach( ( box ) => {
 
-			let uv2 = objects[ box.index ].geometry.getAttribute( "uv" ).clone();
+			const uv2 = objects[ box.index ].geometry.getAttribute( 'uv' ).clone();
 			for ( let i = 0; i < uv2.array.length; i += uv2.itemSize ) {
 
 				uv2.array[ i ] = ( uv2.array[ i ] + box.x + padding ) / dimensions.w;
@@ -136,8 +136,8 @@ class ProgressiveLightMap {
 
 			}
 
-			objects[ box.index ].geometry.setAttribute( "uv2", uv2 );
-			objects[ box.index ].geometry.getAttribute( "uv2" ).needsUpdate = true;
+			objects[ box.index ].geometry.setAttribute( 'uv2', uv2 );
+			objects[ box.index ].geometry.getAttribute( 'uv2' ).needsUpdate = true;
 
 		} );
 
@@ -158,7 +158,7 @@ class ProgressiveLightMap {
 		}
 
 		// Store the original Render Target
-		let oldTarget = this.renderer.getRenderTarget();
+		const oldTarget = this.renderer.getRenderTarget();
 
 		// The blurring plane applies blur to the seams of the lightmap
 		this.blurringPlane.visible = blurEdges;
@@ -193,8 +193,8 @@ class ProgressiveLightMap {
 		}
 
 		// Ping-pong two surface buffers for reading/writing
-		let activeMap = this.buffer1Active ? this.progressiveLightMap1 : this.progressiveLightMap2;
-		let inactiveMap = this.buffer1Active ? this.progressiveLightMap2 : this.progressiveLightMap1;
+		const activeMap = this.buffer1Active ? this.progressiveLightMap1 : this.progressiveLightMap2;
+		const inactiveMap = this.buffer1Active ? this.progressiveLightMap2 : this.progressiveLightMap1;
 
 		// Render the object's surface maps
 		this.renderer.setRenderTarget( activeMap );
@@ -229,7 +229,7 @@ class ProgressiveLightMap {
 
 			if ( ! this.warned ) {
 
-				console.warn( "Call this after adding the objects!" ); this.warned = true;
+				console.warn( 'Call this after adding the objects!' ); this.warned = true;
 
 			}
 
@@ -265,7 +265,7 @@ class ProgressiveLightMap {
 	 */
 	_initializeBlurPlane( res, lightMap = null ) {
 
-		let blurMaterial = new THREE.MeshBasicMaterial();
+		const blurMaterial = new THREE.MeshBasicMaterial();
 		blurMaterial.uniforms = { previousShadowMap: { value: null },
 								  pixelOffset: { value: 1.0 / res },
 								  polygonOffset: true, polygonOffsetFactor: - 1, polygonOffsetUnits: 3.0 };
@@ -278,18 +278,18 @@ class ProgressiveLightMap {
 				'	gl_Position = vec4((uv - 0.5) * 2.0, 1.0, 1.0); }';
 
 			// Fragment Shader: Set Pixels to 9-tap box blur the current frame's Shadows
-			let bodyStart	= shader.fragmentShader.indexOf( 'void main() {' );
+			const bodyStart	= shader.fragmentShader.indexOf( 'void main() {' );
 			shader.fragmentShader =
 				'#define USE_UV\n' +
 				shader.fragmentShader.slice( 0, bodyStart ) +
 				'	uniform sampler2D previousShadowMap;\n	uniform float pixelOffset;\n' +
 				shader.fragmentShader.slice( bodyStart - 1, - 1 ) +
 					`	gl_FragColor.rgb = (
-									texture2D(previousShadowMap, vUv + vec2( pixelOffset,  0.0        )).rgb + 
+									texture2D(previousShadowMap, vUv + vec2( pixelOffset,  0.0        )).rgb +
 									texture2D(previousShadowMap, vUv + vec2( 0.0        ,  pixelOffset)).rgb +
 									texture2D(previousShadowMap, vUv + vec2( 0.0        , -pixelOffset)).rgb +
 									texture2D(previousShadowMap, vUv + vec2(-pixelOffset,  0.0        )).rgb +
-									texture2D(previousShadowMap, vUv + vec2( pixelOffset,  pixelOffset)).rgb + 
+									texture2D(previousShadowMap, vUv + vec2( pixelOffset,  pixelOffset)).rgb +
 									texture2D(previousShadowMap, vUv + vec2(-pixelOffset,  pixelOffset)).rgb +
 									texture2D(previousShadowMap, vUv + vec2( pixelOffset, -pixelOffset)).rgb +
 									texture2D(previousShadowMap, vUv + vec2(-pixelOffset, -pixelOffset)).rgb)/8.0;
@@ -308,7 +308,7 @@ class ProgressiveLightMap {
 		};
 
 		this.blurringPlane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), blurMaterial );
-		this.blurringPlane.name = "Blurring Plane";
+		this.blurringPlane.name = 'Blurring Plane';
 		this.blurringPlane.frustumCulled = false;
 		this.blurringPlane.renderOrder = 0;
 		this.blurringPlane.material.depthWrite = false;
