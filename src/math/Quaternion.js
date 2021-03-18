@@ -363,11 +363,11 @@ class Quaternion {
 
 		// assumes direction vectors vFrom and vTo are normalized
 
-		const EPS = 0.000001;
-
 		let r = vFrom.dot( vTo ) + 1;
 
-		if ( r < EPS ) {
+		if ( r < Number.EPSILON ) {
+
+			// vFrom and vTo point in opposite directions
 
 			r = 0;
 
