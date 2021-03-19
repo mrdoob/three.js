@@ -2170,10 +2170,10 @@
 
 		setFromUnitVectors(vFrom, vTo) {
 			// assumes direction vectors vFrom and vTo are normalized
-			const EPS = 0.000001;
 			let r = vFrom.dot(vTo) + 1;
 
-			if (r < EPS) {
+			if (r < Number.EPSILON) {
+				// vFrom and vTo point in opposite directions
 				r = 0;
 
 				if (Math.abs(vFrom.x) > Math.abs(vFrom.z)) {
@@ -6071,6 +6071,7 @@
 			}
 
 			if (this.size !== undefined) data.size = this.size;
+			if (this.shadowSide !== null) data.shadowSide = this.shadowSide;
 			if (this.sizeAttenuation !== undefined) data.sizeAttenuation = this.sizeAttenuation;
 			if (this.blending !== NormalBlending) data.blending = this.blending;
 			if (this.side !== FrontSide) data.side = this.side;
@@ -6080,6 +6081,7 @@
 			data.depthFunc = this.depthFunc;
 			data.depthTest = this.depthTest;
 			data.depthWrite = this.depthWrite;
+			data.colorWrite = this.colorWrite;
 			data.stencilWrite = this.stencilWrite;
 			data.stencilWriteMask = this.stencilWriteMask;
 			data.stencilFunc = this.stencilFunc;
@@ -27258,6 +27260,7 @@
 			if (json.blending !== undefined) material.blending = json.blending;
 			if (json.combine !== undefined) material.combine = json.combine;
 			if (json.side !== undefined) material.side = json.side;
+			if (json.shadowSide !== undefined) material.shadowSide = json.shadowSide;
 			if (json.opacity !== undefined) material.opacity = json.opacity;
 			if (json.transparent !== undefined) material.transparent = json.transparent;
 			if (json.alphaTest !== undefined) material.alphaTest = json.alphaTest;
