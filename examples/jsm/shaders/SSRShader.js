@@ -208,6 +208,9 @@ var SSRShader = {
 						float fresnel=(dot(viewIncidenceDir,viewReflectDir)+1.)/2.;
 						op*=fresnel;
 					#endif
+					#ifdef isSelective
+						op*=metalness;
+					#endif
 					vec4 reflectColor=texture2D(tDiffuse,uv);
 					gl_FragColor.xyz=reflectColor.xyz;
 					gl_FragColor.a=op;

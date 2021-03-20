@@ -33,7 +33,7 @@
 
 		const params = {
 			enableSSR: true,
-			autoRotate: true,
+			autoRotate: false,
 			isOtherMeshes: true,
 			isGroundReflector: true,
 		};
@@ -47,6 +47,7 @@
 		const otherMeshes = [];
 		let groundReflector;
 		const selects = [];
+		let bunny, cube, sphere, cone;
 
 		const container = document.querySelector( '#container' );
 
@@ -56,14 +57,14 @@
 		dracoLoader.setDecoderConfig( { type: 'js' } );
 
 		init();
-		animate();
 
-		function init() {
+		async function init() {
 
 			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 15 );
 			camera.position.set( 0.13271600513224902, 0.3489546826045913, 0.43921296427927076 );
 
 			scene = new THREE.Scene();
+			window.scene=scene
 			scene.background = new THREE.Color( 0x443333 );
 			scene.fog = new THREE.Fog( 0x443333, 1, 4 );
 
@@ -88,45 +89,52 @@
 			spotLight.position.set( - 1, 1, 1 );
 			scene.add( spotLight );
 
-			dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
+			await new Promise(resolve=>{
+				dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
 
-				geometry.computeVertexNormals();
+					geometry.computeVertexNormals();
 
-				const material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
-				const mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
-				selects.push( mesh );
+					const material = new THREE.MeshStandardMaterial( { metalness: 0.9, color: 0x606060 } );
+					const mesh = new THREE.Mesh( geometry, material );
+					scene.add( mesh );
+					selects.push( mesh );
+					bunny=mesh
 
-				// Release decoder resources.
-				dracoLoader.dispose();
+					// Release decoder resources.
+					dracoLoader.dispose();
 
-			} );
+					resolve()
+				} );
+			})
 
 			let geometry, material, mesh;
 
 			geometry = new THREE.BoxBufferGeometry( .05, .05, .05 );
-			material = new THREE.MeshStandardMaterial( { color: 'green' } );
+			material = new THREE.MeshStandardMaterial( { metalness: .6, color: 'green' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .12, plane.position.y + .025, .015 );
 			scene.add( mesh );
 			otherMeshes.push( mesh );
 			selects.push( mesh );
+			cube=mesh
 
 			geometry = new THREE.IcosahedronBufferGeometry( .025, 4 );
-			material = new THREE.MeshStandardMaterial( { color: 'cyan' } );
+			material = new THREE.MeshStandardMaterial( { metalness: .3, color: 'cyan' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, plane.position.y + .025, .08 );
 			scene.add( mesh );
 			otherMeshes.push( mesh );
 			selects.push( mesh );
+			sphere=mesh
 
 			geometry = new THREE.ConeBufferGeometry( .025, .05, 64 );
-			material = new THREE.MeshStandardMaterial( { color: 'yellow' } );
+			material = new THREE.MeshStandardMaterial( { metalness: .1, color: 'yellow' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, plane.position.y + .025, - .055 );
 			scene.add( mesh );
 			otherMeshes.push( mesh );
 			selects.push( mesh );
+			cone=mesh
 
 			geometry = new THREE.PlaneBufferGeometry( 8, 8 );
 			groundReflector = new Reflector( geometry, {
@@ -204,6 +212,23 @@
 				controls.enabled = ! params.autoRotate;
 
 			} );
+			// ssrPass.output=SSRPass.OUTPUT.Metalness
+			gui.add( ssrPass, 'output', {
+				'Default': SSRPass.OUTPUT.Default,
+				'SSR Only': SSRPass.OUTPUT.SSR,
+				'Beauty': SSRPass.OUTPUT.Beauty,
+				'Depth': SSRPass.OUTPUT.Depth,
+				'Normal': SSRPass.OUTPUT.Normal,
+				'Metalness': SSRPass.OUTPUT.Metalness,
+			} ).onChange( function ( value ) {
+
+				ssrPass.output = parseInt( value );
+
+			} );
+			gui.add(bunny.material,'metalness').name('bunny metalness').min(0).max(1)
+			gui.add(cube.material,'metalness').name('cube metalness').min(0).max(1)
+			gui.add(sphere.material,'metalness').name('sphere metalness').min(0).max(1)
+			gui.add(cone.material,'metalness').name('cone metalness').min(0).max(1)
 
 			const folder = gui.addFolder( 'more settings' );
 			folder.add( ssrPass, 'isFresnel' ).onChange( ()=>{
@@ -237,18 +262,6 @@
 
 			} );
 			folder.add( ssrPass, 'isBouncing' );
-			folder.add( ssrPass, 'output', {
-				'Default': SSRPass.OUTPUT.Default,
-				'SSR Only': SSRPass.OUTPUT.SSR,
-				'Beauty': SSRPass.OUTPUT.Beauty,
-				'Depth': SSRPass.OUTPUT.Depth,
-				'Normal': SSRPass.OUTPUT.Normal,
-				'Metalness': SSRPass.OUTPUT.Metalness,
-			} ).onChange( function ( value ) {
-
-				ssrPass.output = parseInt( value );
-
-			} );
 			ssrPass.opacity = 1;
 			groundReflector.opacity = ssrPass.opacity;
 			folder.add( ssrPass, 'opacity' ).min( 0 ).max( 1 ).onChange( ()=>{
@@ -273,6 +286,8 @@
 			folder.add( ssrPass, 'thickTolerance' ).min( 0 ).max( .05 ).step( .0001 );
 			folder.add( ssrPass, 'isBlur' );
 			// gui.close()
+
+			animate()
 
 		}
 
