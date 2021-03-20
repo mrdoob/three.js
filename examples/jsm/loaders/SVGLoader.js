@@ -1050,6 +1050,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				// check for flags
 				if ( Array.isArray( flags ) && flags.includes( result.length % stride ) && RE.FLAGS.test( current ) ) {
 
+					state = INT;
 					number = current;
 					newNumber();
 					continue;
