@@ -15,7 +15,7 @@ var SSRrShader = {
 
     "tDiffuse": { value: null },
     "tSpecular": { value: null },
-    "tNormal": { value: null },
+    "tNormalSelects": { value: null },
     "tRefractive": { value: null },
     "tDepth": { value: null },
     "tDepthSelects": { value: null },
@@ -49,7 +49,7 @@ var SSRrShader = {
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tDepthSelects;
-		uniform sampler2D tNormal;
+		uniform sampler2D tNormalSelects;
 		uniform sampler2D tRefractive;
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tSpecular;
@@ -95,8 +95,8 @@ var SSRrShader = {
 			clipPosition *= clipW; //clip
 			return ( cameraInverseProjectionMatrix * clipPosition ).xyz;//view
 		}
-		vec3 getViewNormal( const in vec2 uv ) {
-			return unpackRGBToNormal( texture2D( tNormal, uv ).xyz );
+		vec3 getViewNormalSelects( const in vec2 uv ) {
+			return unpackRGBToNormal( texture2D( tNormalSelects, uv ).xyz );
 		}
 		vec2 viewPositionToXY(vec3 viewPosition){
 			vec2 xy;
@@ -115,10 +115,10 @@ var SSRrShader = {
 			if(refractive<=0.) return;
 
 			// gl_FragColor=vec4(0,0,.5,1);return;
-			vec3 viewNormal=getViewNormal( vUv );
-			// gl_FragColor=vec4(viewNormal,1);return;
+			vec3 viewNormalSelects=getViewNormalSelects( vUv );
+			// gl_FragColor=vec4(viewNormalSelects,1);return;
 
-			// if(viewNormal.x<=0.&&viewNormal.y<=0.&&viewNormal.z<=0.) return;
+			// if(viewNormalSelects.x<=0.&&viewNormalSelects.y<=0.&&viewNormalSelects.z<=0.) return;
 
 			float depth = getDepthSelects( vUv );
 			float viewZ = getViewZ( depth );
@@ -136,7 +136,7 @@ var SSRrShader = {
 				vec3 viewIncidentDir=vec3(0,0,-1);
 			#endif
 
-			vec3 viewRefractDir=refract(viewIncidentDir,viewNormal,1./ior);
+			vec3 viewRefractDir=refract(viewIncidentDir,viewNormalSelects,1./ior);
 			// https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/refract.xhtml
 
 			float maxDistance=100.;
@@ -192,7 +192,7 @@ var SSRrShader = {
 			}
 
 			#ifdef SPECULAR
-				// TODO: Codes below can solve ( somewhat a hack ) the tiny gaps display error when viewNormal directly face camera. Need to find the root cause of the problem.
+				// TODO: Codes below can solve ( somewhat a hack ) the tiny gaps display error when viewNormalSelects directly face camera. Need to find the root cause of the problem.
 				vec4 refractColor=texture2D(tDiffuse,vUv);
 				vec4 specularColor=texture2D(tSpecular,vUv);
 				gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);

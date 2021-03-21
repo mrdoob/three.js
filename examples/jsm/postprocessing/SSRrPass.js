@@ -85,14 +85,14 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 		format: RGBAFormat,
 	} );
 
-	// normal render target
+	// normalSelects render target
 
 	var depthTextureSelects = new DepthTexture();
 	depthTextureSelects.type = UnsignedShortType;
 	depthTextureSelects.minFilter = NearestFilter;
 	depthTextureSelects.maxFilter = NearestFilter;
 
-	this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+	this.normalSelectsRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 		minFilter: NearestFilter,
 		magFilter: NearestFilter,
 		format: RGBAFormat,
@@ -137,11 +137,11 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 
 	this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 	this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
-	this.ssrrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
+	this.ssrrMaterial.uniforms[ 'tNormalSelects' ].value = this.normalSelectsRenderTarget.texture;
 	this.ssrrMaterial.needsUpdate = true;
 	this.ssrrMaterial.uniforms[ 'tRefractive' ].value = this.refractiveRenderTarget.texture;
 	this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
-	this.ssrrMaterial.uniforms[ 'tDepthSelects' ].value = this.normalRenderTarget.depthTexture;
+	this.ssrrMaterial.uniforms[ 'tDepthSelects' ].value = this.normalSelectsRenderTarget.depthTexture;
 	this.ssrrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 	this.ssrrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 	this.ssrrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
@@ -219,7 +219,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.beautyRenderTarget.dispose();
 		this.specularRenderTarget.dispose();
-		this.normalRenderTarget.dispose();
+		this.normalSelectsRenderTarget.dispose();
 		this.refractiveRenderTarget.dispose();
 		this.ssrrRenderTarget.dispose();
 
@@ -272,7 +272,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		})
 
 
-		// render normals
+		// render normalSelectss
 
 		this.scene.children.forEach(child => {
 			if (this.selects.includes(child)) {
@@ -282,7 +282,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 			}
 		})
 
-		this.renderOverride(renderer, this.normalMaterial, this.normalRenderTarget, 0, 0);
+		this.renderOverride(renderer, this.normalMaterial, this.normalSelectsRenderTarget, 0, 0);
 
 		this.renderRefractive( renderer, this.refractiveOnMaterial, this.refractiveRenderTarget, 0, 0 );
 
@@ -333,14 +333,14 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 			case SSRrPass.OUTPUT.DepthSelects:
 
-				this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.normalRenderTarget.depthTexture;
+				this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.normalSelectsRenderTarget.depthTexture;
 				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
-			case SSRrPass.OUTPUT.Normal:
+			case SSRrPass.OUTPUT.NormalSelects:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalSelectsRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -499,7 +499,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.beautyRenderTarget.setSize( width, height );
 		this.specularRenderTarget.setSize( width, height );
 		this.ssrrRenderTarget.setSize( width, height );
-		this.normalRenderTarget.setSize( width, height );
+		this.normalSelectsRenderTarget.setSize( width, height );
 		this.refractiveRenderTarget.setSize( width, height );
 
 		this.ssrrMaterial.uniforms[ 'resolution' ].value.set( width, height );
@@ -516,7 +516,7 @@ SSRrPass.OUTPUT = {
 	'Beauty': 3,
 	'Depth': 4,
 	'DepthSelects': 9,
-	'Normal': 5,
+	'NormalSelects': 5,
 	'Refractive': 7,
 	'Specular': 8,
 };
