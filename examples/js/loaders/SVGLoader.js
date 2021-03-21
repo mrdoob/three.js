@@ -383,7 +383,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						break;
 
 					case 'A':
-						var numbers = parseFloats( data );
+						var numbers = parseFloats( data, [ 3, 4 ], 7 );
 
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
 
@@ -575,7 +575,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						break;
 
 					case 'a':
-						var numbers = parseFloats( data );
+						var numbers = parseFloats( data, [ 3, 4 ], 7 );
 
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
 
@@ -975,7 +975,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		// from https://github.com/ppvg/svg-numbers (MIT License)
 
-		function parseFloats( input ) {
+		function parseFloats( input, flags, stride ) {
 
 			if ( typeof input !== 'string' ) {
 
@@ -991,7 +991,8 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 				SIGN: /[-+]/,
 				POINT: /\./,
 				COMMA: /,/,
-				EXP: /e/i
+				EXP: /e/i,
+				FLAGS: /[01]/
 			};
 
 			// States
@@ -1030,6 +1031,16 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 			for ( i = 0; i < length; i ++ ) {
 
 				current = input[ i ];
+
+				// check for flags
+				if ( Array.isArray( flags ) && flags.includes( result.length % stride ) && RE.FLAGS.test( current ) ) {
+
+					state = INT;
+					number = current;
+					newNumber();
+					continue;
+
+				}
 
 				// parse until next number
 				if ( state === SEP ) {
@@ -1136,7 +1147,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 				}
 
 				// parse exponent part
-				if ( state == EXP ) {
+				if ( state === EXP ) {
 
 					if ( RE.DIGIT.test( current ) ) {
 
