@@ -213,6 +213,8 @@
 				ssrrPass.output = parseInt(value);
 
 			});
+			ssrrPass.surfDist = 0.1;
+			folder.add( ssrrPass, 'surfDist' ).min( 0 ).max( .3 ).step( .001 );
 			folder.open()
 			// gui.close()
 

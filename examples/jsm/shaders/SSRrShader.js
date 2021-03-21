@@ -26,6 +26,7 @@ var SSRrShader = {
     "cameraInverseProjectionMatrix": { value: new Matrix4() },
     "ior": { value: 1.03 },
     "cameraRange": { value: 0 },
+    "surfDist": { value: .007 },
 
   },
 
@@ -60,6 +61,7 @@ var SSRrShader = {
 		uniform float ior;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
+		uniform float surfDist;
 		#include <packing>
 		float pointToLineDistance(vec3 x0, vec3 x1, vec3 x2) {
 			//x0: point, x1: linePointA, x2: linePointB
@@ -172,12 +174,15 @@ var SSRrShader = {
 					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 					float recipVPZ=1./viewPosition.z;
 					float viewRefractRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
+					float sD=surfDist*cW;
 				#else
 					float viewRefractRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
+					float sD=surfDist;
 				#endif
 
-				if(viewRefractRayZ<vZ){
-				// if(viewRefractRayZ<vZ&&vZ-viewRefractRayZ<.05){
+				// if(viewRefractRayZ<=vZ){
+				float away=vZ-viewRefractRayZ;
+				if(away>=0.&&away<=sD){
 					vec4 refractColor=texture2D(tDiffuse,uv);
 					#ifdef SPECULAR
 						vec4 specularColor=texture2D(tSpecular,vUv);
