@@ -478,13 +478,13 @@ GUIも調整してみましょう。
 const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 10, 0.01);
-gui.add(light, 'width', 0, 20).onChange(updateLight);
-gui.add(light, 'height', 0, 20).onChange(updateLight);
-gui.add(new DegRadHelper(light.rotation, 'x'), 'value', -180, 180).name('x rotation').onChange(updateLight);
-gui.add(new DegRadHelper(light.rotation, 'y'), 'value', -180, 180).name('y rotation').onChange(updateLight);
-gui.add(new DegRadHelper(light.rotation, 'z'), 'value', -180, 180).name('z rotation').onChange(updateLight);
+gui.add(light, 'width', 0, 20);
+gui.add(light, 'height', 0, 20);
+gui.add(new DegRadHelper(light.rotation, 'x'), 'value', -180, 180).name('x rotation');
+gui.add(new DegRadHelper(light.rotation, 'y'), 'value', -180, 180).name('y rotation');
+gui.add(new DegRadHelper(light.rotation, 'z'), 'value', -180, 180).name('z rotation');
 
-makeXYZGUI(gui, light.position, 'position', updateLight);
+makeXYZGUI(gui, light.position, 'position');
 ```
 
 そして、これが結果です。
