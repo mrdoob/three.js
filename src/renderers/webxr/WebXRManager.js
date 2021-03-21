@@ -289,7 +289,7 @@ class WebXRManager extends EventDispatcher {
 
 		scope = this;
 
-		state = renderer.state;
+		state = _renderer.state;
 
 		renderer = _renderer;
 		gl = _gl;
