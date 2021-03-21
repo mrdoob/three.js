@@ -87,11 +87,18 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 
 	// normal render target
 
+	var depthTextureSelects = new DepthTexture();
+	depthTextureSelects.type = UnsignedShortType;
+	depthTextureSelects.minFilter = NearestFilter;
+	depthTextureSelects.maxFilter = NearestFilter;
+
 	this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 		minFilter: NearestFilter,
 		magFilter: NearestFilter,
 		format: RGBAFormat,
 		type: HalfFloatType,
+		depthTexture: depthTextureSelects,
+		depthBuffer: true
 	} );
 
 	// refractive render target
@@ -319,6 +326,14 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 			case SSRrPass.OUTPUT.Depth:
 
+				this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
+
+				break;
+
+			case SSRrPass.OUTPUT.DepthSelects:
+
+				this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.normalRenderTarget.depthTexture;
 				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
@@ -500,6 +515,7 @@ SSRrPass.OUTPUT = {
 	'SSRr': 1,
 	'Beauty': 3,
 	'Depth': 4,
+	'DepthSelects': 9,
 	'Normal': 5,
 	'Refractive': 7,
 	'Specular': 8,
