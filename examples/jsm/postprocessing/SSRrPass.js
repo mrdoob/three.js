@@ -5,7 +5,6 @@ import {
 	DepthTexture,
 	SrcAlphaFactor,
 	OneMinusSrcAlphaFactor,
-	LinearFilter,
 	MeshNormalMaterial,
 	MeshBasicMaterial,
 	NearestFilter,
@@ -71,19 +70,19 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	var depthTexture = new DepthTexture();
 	depthTexture.type = UnsignedShortType;
 	depthTexture.minFilter = NearestFilter;
-	depthTexture.maxFilter = NearestFilter;
+	depthTexture.magFilter = NearestFilter;
 
 	this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: LinearFilter,
-		magFilter: LinearFilter,
+		minFilter: NearestFilter,
+		magFilter: NearestFilter,
 		format: RGBAFormat,
 		depthTexture: depthTexture,
 		depthBuffer: true
 	} );
 
 	this.specularRenderTarget = new WebGLRenderTarget( this.width, this.height, { // TODO: Can merge with refractiveRenderTarget?
-		minFilter: LinearFilter,
-		magFilter: LinearFilter,
+		minFilter: NearestFilter,
+		magFilter: NearestFilter,
 		format: RGBAFormat,
 	} );
 
@@ -92,7 +91,7 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	var depthTextureSelects = new DepthTexture();
 	depthTextureSelects.type = UnsignedShortType;
 	depthTextureSelects.minFilter = NearestFilter;
-	depthTextureSelects.maxFilter = NearestFilter;
+	depthTextureSelects.magFilter = NearestFilter;
 
 	this.normalSelectsRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 		minFilter: NearestFilter,
@@ -114,8 +113,8 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	// ssrr render target
 
 	this.ssrrRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: LinearFilter,
-		magFilter: LinearFilter,
+		minFilter: NearestFilter,
+		magFilter: NearestFilter,
 		format: RGBAFormat
 	} );
 
