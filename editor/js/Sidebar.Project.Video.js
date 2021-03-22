@@ -77,7 +77,7 @@ function SidebarProjectVideo( editor ) {
 
 		ffmpeg.setProgress( ( { ratio } ) => {
 
-			progress.setValue( ratio );
+			progress.setValue( ( ratio * 0.5 ) + 0.5 );
 
 		} );
 
@@ -95,7 +95,7 @@ function SidebarProjectVideo( editor ) {
 			ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
 			currentTime += 1 / fps;
 
-			progress.setValue( i / frames );
+			progress.setValue( ( i / frames ) * 0.5 );
 
 		}
 
