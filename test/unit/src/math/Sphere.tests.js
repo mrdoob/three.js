@@ -271,13 +271,13 @@ export default QUnit.module( 'Maths', () => {
 
 			// d contains c (demonstrates why it is necessary to process two points in union)
 
-			var c = new THREE.Sphere( new THREE.Vector3(), 1 );
-			var d = new THREE.Sphere( new THREE.Vector3( 1, 0, 0 ), 4 );
+			var c = new Sphere( new Vector3(), 1 );
+			var d = new Sphere( new Vector3( 1, 0, 0 ), 4 );
 
 			c.union( d );
 
-			assert.ok( a.center.equals( new Vector3( 1, 0, 0 ) ), 'Passed!' );
-			assert.ok( a.radius === 4, 'Passed!' );
+			assert.ok( c.center.equals( new Vector3( 1, 0, 0 ) ), 'Passed!' );
+			assert.ok( c.radius === 4, 'Passed!' );
 
 		} );
 
