@@ -180,10 +180,10 @@ var SSRrShader = {
 					float viewRefractRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
 					float sD=surfDist;
 				#endif
+				if(viewRefractRayZ-sD>vZ) continue;
 
-				// if(viewRefractRayZ<=vZ){
-				float away=vZ-viewRefractRayZ;
-				if(away>=0.&&away<=sD){
+				float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
+				if(away<=sD){
 					vec4 refractColor=texture2D(tDiffuse,uv);
 					#ifdef SPECULAR
 						vec4 specularColor=texture2D(tSpecular,vUv);
@@ -196,14 +196,6 @@ var SSRrShader = {
 					return;
 				}
 			}
-
-			#ifdef SPECULAR
-				// TODO: Codes below can solve ( somewhat a hack ) the tiny gaps display error when viewNormalSelects directly face camera. Need to find the root cause of the problem.
-				vec4 refractColor=texture2D(tDiffuse,vUv);
-				vec4 specularColor=texture2D(tSpecular,vUv);
-				gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);
-				gl_FragColor.a=1.;
-			#endif
 		}
 	`
 
