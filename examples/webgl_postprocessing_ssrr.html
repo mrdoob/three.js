@@ -188,7 +188,7 @@
 			gui = new GUI();
 			gui.add(params, 'enableSSRr').name('Enable SSRr');
 			ssrrPass.ior = 1.1;
-			gui.add(ssrrPass, 'ior').name('IOR').min(1).max(1.5).step(.00001);
+			gui.add(ssrrPass, 'ior').name('IOR').min(1).max(1.5).step(.0001);
 			gui.add(params, 'autoRotate').onChange(() => {
 
 				controls.enabled = !params.autoRotate;
@@ -213,9 +213,11 @@
 				ssrrPass.output = parseInt(value);
 
 			});
-			ssrrPass.surfDist = 0.1;
+			ssrrPass.surfDist = 0.05;
 			folder.add( ssrrPass, 'surfDist' ).min( 0 ).max( .3 ).step( .001 );
-			folder.open()
+			ssrrPass.maxDistance = 15;
+			folder.add( ssrrPass, 'maxDistance' ).min( 0 ).max( 20 ).step( .001 )
+			// folder.open()
 			// gui.close()
 
 		}

@@ -40,6 +40,7 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 	// this.output = 1;
 
 	this.ior = SSRrShader.uniforms.ior.value;
+	this.maxDistance = SSRrShader.uniforms.maxDistance.value;
 	this.surfDist = SSRrShader.uniforms.surfDist.value;
 
 	this.encoding = encoding;
@@ -290,6 +291,7 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		// render SSRr
 
 		this.ssrrMaterial.uniforms[ 'ior' ].value = this.ior;
+		this.ssrrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
 		this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
 		this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
 		this.renderPass( renderer, this.ssrrMaterial, this.ssrrRenderTarget );

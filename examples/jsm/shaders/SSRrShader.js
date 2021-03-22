@@ -26,6 +26,7 @@ var SSRrShader = {
     "cameraInverseProjectionMatrix": { value: new Matrix4() },
     "ior": { value: 1.03 },
     "cameraRange": { value: 0 },
+    "maxDistance": { value: 180 },
     "surfDist": { value: .007 },
 
   },
@@ -61,6 +62,7 @@ var SSRrShader = {
 		uniform float ior;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
+		uniform float maxDistance;
 		uniform float surfDist;
 		#include <packing>
 		float pointToLineDistance(vec3 x0, vec3 x1, vec3 x2) {
@@ -141,7 +143,6 @@ var SSRrShader = {
 			vec3 viewRefractDir=refract(viewIncidentDir,viewNormalSelects,1./ior);
 			// https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/refract.xhtml
 
-			float maxDistance=100.;
 			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
 			#ifdef PERSPECTIVE_CAMERA
 				if(d1viewPosition.z>-cameraNear){
