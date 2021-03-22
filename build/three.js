@@ -18492,6 +18492,32 @@
 
 			return this;
 		},
+		applyNormalMatrix: function (m) {
+			for (let i = 0, l = this.count; i < l; i++) {
+				_vector$6.x = this.getX(i);
+				_vector$6.y = this.getY(i);
+				_vector$6.z = this.getZ(i);
+
+				_vector$6.applyNormalMatrix(m);
+
+				this.setXYZ(i, _vector$6.x, _vector$6.y, _vector$6.z);
+			}
+
+			return this;
+		},
+		transformDirection: function (m) {
+			for (let i = 0, l = this.count; i < l; i++) {
+				_vector$6.x = this.getX(i);
+				_vector$6.y = this.getY(i);
+				_vector$6.z = this.getZ(i);
+
+				_vector$6.transformDirection(m);
+
+				this.setXYZ(i, _vector$6.x, _vector$6.y, _vector$6.z);
+			}
+
+			return this;
+		},
 		setX: function (index, x) {
 			this.data.array[index * this.data.stride + this.offset] = x;
 			return this;
@@ -19373,7 +19399,8 @@
 		raycast: function (raycaster, intersects) {
 			const geometry = this.geometry;
 			const matrixWorld = this.matrixWorld;
-			const threshold = raycaster.params.Line.threshold; // Checking boundingSphere distance to ray
+			const threshold = raycaster.params.Line.threshold;
+			const drawRange = geometry.drawRange; // Checking boundingSphere distance to ray
 
 			if (geometry.boundingSphere === null) geometry.computeBoundingSphere();
 
@@ -19402,7 +19429,10 @@
 				const positionAttribute = attributes.position;
 
 				if (index !== null) {
-					for (let i = 0, l = index.count - 1; i < l; i += step) {
+					const start = Math.max(0, drawRange.start);
+					const end = Math.min(index.count, drawRange.start + drawRange.count);
+
+					for (let i = start, l = end - 1; i < l; i += step) {
 						const a = index.getX(i);
 						const b = index.getX(i + 1);
 						vStart.fromBufferAttribute(positionAttribute, a);
@@ -19427,7 +19457,10 @@
 						});
 					}
 				} else {
-					for (let i = 0, l = positionAttribute.count - 1; i < l; i += step) {
+					const start = Math.max(0, drawRange.start);
+					const end = Math.min(positionAttribute.count, drawRange.start + drawRange.count);
+
+					for (let i = start, l = end - 1; i < l; i += step) {
 						vStart.fromBufferAttribute(positionAttribute, i);
 						vEnd.fromBufferAttribute(positionAttribute, i + 1);
 
@@ -19607,7 +19640,8 @@
 		raycast: function (raycaster, intersects) {
 			const geometry = this.geometry;
 			const matrixWorld = this.matrixWorld;
-			const threshold = raycaster.params.Points.threshold; // Checking boundingSphere distance to ray
+			const threshold = raycaster.params.Points.threshold;
+			const drawRange = geometry.drawRange; // Checking boundingSphere distance to ray
 
 			if (geometry.boundingSphere === null) geometry.computeBoundingSphere();
 
@@ -19631,7 +19665,10 @@
 				const positionAttribute = attributes.position;
 
 				if (index !== null) {
-					for (let i = 0, il = index.count; i < il; i++) {
+					const start = Math.max(0, drawRange.start);
+					const end = Math.min(index.count, drawRange.start + drawRange.count);
+
+					for (let i = start, il = end; i < il; i++) {
 						const a = index.getX(i);
 
 						_position$1.fromBufferAttribute(positionAttribute, a);
@@ -19639,7 +19676,10 @@
 						testPoint(_position$1, a, localThresholdSq, matrixWorld, raycaster, intersects, this);
 					}
 				} else {
-					for (let i = 0, l = positionAttribute.count; i < l; i++) {
+					const start = Math.max(0, drawRange.start);
+					const end = Math.min(positionAttribute.count, drawRange.start + drawRange.count);
+
+					for (let i = start, l = end; i < l; i++) {
 						_position$1.fromBufferAttribute(positionAttribute, i);
 
 						testPoint(_position$1, i, localThresholdSq, matrixWorld, raycaster, intersects, this);
