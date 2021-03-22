@@ -13,7 +13,7 @@ THREE.Wireframe = class Wireframe extends THREE.Mesh {
 
 };
 
-THREE.Wireframe.prototype.computeLineDistances = computeLineDistances = ( function () { // for backwards-compatability, but could be a method of LineSegmentsGeometry...
+THREE.Wireframe.prototype.computeLineDistances = ( function () { // for backwards-compatability, but could be a method of LineSegmentsGeometry...
 
 	var start = new THREE.Vector3();
 	var end = new THREE.Vector3();
