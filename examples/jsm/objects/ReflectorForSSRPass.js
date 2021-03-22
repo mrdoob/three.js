@@ -46,28 +46,28 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 	scope.worldYBias = options.worldYBias || 0;
 	scope.resolution = options.resolution || new Vector2( window.innerWidth, window.innerHeight );
 
-	scope._isDistanceAttenuation = ReflectorForSSRPass.ReflectorShader.defines.isDistanceAttenuation
-	Object.defineProperty(scope, 'isDistanceAttenuation', {
+	scope._distanceAttenuation = ReflectorForSSRPass.ReflectorShader.defines.DISTANCE_ATTENUATION
+	Object.defineProperty(scope, 'distanceAttenuation', {
 		get() {
-			return scope._isDistanceAttenuation
+			return scope._distanceAttenuation
 		},
 		set(val) {
-			if (scope._isDistanceAttenuation === val) return
-			scope._isDistanceAttenuation = val
-			scope.material.defines.isDistanceAttenuation = val
+			if (scope._distanceAttenuation === val) return
+			scope._distanceAttenuation = val
+			scope.material.defines.DISTANCE_ATTENUATION = val
 			scope.material.needsUpdate = true
 		}
 	})
 
-	scope._isFresnel = ReflectorForSSRPass.ReflectorShader.defines.isFresnel
-	Object.defineProperty(scope, 'isFresnel', {
+	scope._fresnel = ReflectorForSSRPass.ReflectorShader.defines.FRESNEL
+	Object.defineProperty(scope, 'fresnel', {
 		get() {
-			return scope._isFresnel
+			return scope._fresnel
 		},
 		set(val) {
-			if (scope._isFresnel === val) return
-			scope._isFresnel = val
-			scope.material.defines.isFresnel = val
+			if (scope._fresnel === val) return
+			scope._fresnel = val
+			scope.material.defines.FRESNEL = val
 			scope.material.needsUpdate = true
 		}
 	})
@@ -91,7 +91,7 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 		var depthTexture = new DepthTexture();
 		depthTexture.type = UnsignedShortType;
 		depthTexture.minFilter = NearestFilter;
-		depthTexture.maxFilter = NearestFilter;
+		depthTexture.magFilter = NearestFilter;
 	}
 
 	var parameters = {
@@ -136,7 +136,7 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 
 		vecTemp0.copy(camera.position).normalize();
 		vecTemp1.copy(vecTemp0).reflect(yAxis);
-		material.uniforms[ 'fresnel' ].value = (vecTemp0.dot( vecTemp1 ) + 1.) / 2.; // TODO: Also need to use glsl viewPosition and viewNormal per pixel.
+		material.uniforms[ 'fresnelCoe' ].value = (vecTemp0.dot( vecTemp1 ) + 1.) / 2.; // TODO: Also need to use glsl viewPosition and viewNormal per pixel.
 
 		reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
@@ -275,8 +275,8 @@ ReflectorForSSRPass.prototype.constructor = ReflectorForSSRPass;
 ReflectorForSSRPass.ReflectorShader = {
 
 	defines: {
-		isDistanceAttenuation: true,
-		isFresnel: true,
+		DISTANCE_ATTENUATION: true,
+		FRESNEL: true,
 	},
 
 	uniforms: {
@@ -287,7 +287,7 @@ ReflectorForSSRPass.ReflectorShader = {
 		textureMatrix: { value: new Matrix4() },
 		maxDistance: { value: 180 },
 		opacity: { value: .5 },
-		fresnel: { value: null },
+		fresnelCoe: { value: null },
 		worldYBias: { value: null },
 		virtualCameraNear: { value: null },
 		virtualCameraFar: { value: null },
@@ -317,7 +317,7 @@ ReflectorForSSRPass.ReflectorShader = {
 		uniform sampler2D tDepth;
 		uniform float maxDistance;
 		uniform float opacity;
-		uniform float fresnel;
+		uniform float fresnelCoe;
 		uniform float worldYBias;
 		uniform float virtualCameraNear;
 		uniform float virtualCameraFar;
@@ -358,13 +358,13 @@ ReflectorForSSRPass.ReflectorShader = {
 				worldPosition.y=max(0.,worldPosition.y);
 				if(worldPosition.y>maxDistance) discard;
 				float op=opacity;
-				#ifdef isDistanceAttenuation
+				#ifdef DISTANCE_ATTENUATION
 					float ratio=1.-(worldPosition.y/maxDistance);
 					float attenuation=ratio*ratio;
 					op=opacity*attenuation;
 				#endif
-				#ifdef isFresnel
-					op*=fresnel;
+				#ifdef FRESNEL
+					op*=fresnelCoe;
 				#endif
 				gl_FragColor = vec4( blendOverlay( base.rgb, color ), op );
 			#else

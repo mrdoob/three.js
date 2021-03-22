@@ -11,11 +11,11 @@ var SSRShader = {
 
   defines: {
     MAX_STEP: 0,
-    isPerspectiveCamera: true,
-    isDistanceAttenuation: true,
-    isFresnel: true,
-    isInfiniteThick: false,
-    isSelective: false,
+    PERSPECTIVE_CAMERA: true,
+    DISTANCE_ATTENUATION: true,
+    FRESNEL: true,
+    INFINITE_THICK: false,
+    SELECTIVE: false,
   },
 
   uniforms: {
@@ -90,7 +90,7 @@ var SSRShader = {
 			return texture2D( tDepth, uv ).x;
 		}
 		float getViewZ( const in float depth ) {
-			#ifdef isPerspectiveCamera
+			#ifdef PERSPECTIVE_CAMERA
 				return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
 			#else
 				return orthographicDepthToViewZ( depth, cameraNear, cameraFar );
@@ -115,7 +115,7 @@ var SSRShader = {
 			return xy;
 		}
 		void main(){
-			#ifdef isSelective
+			#ifdef SELECTIVE
 				float metalness=texture2D(tMetalness,vUv).r;
 				if(metalness==0.) return;
 			#endif
@@ -132,15 +132,15 @@ var SSRShader = {
 
 			vec3 viewNormal=getViewNormal( vUv );
 
-			#ifdef isPerspectiveCamera
-				vec3 viewIncidenceDir=normalize(viewPosition);
-				vec3 viewReflectDir=reflect(viewIncidenceDir,viewNormal);
+			#ifdef PERSPECTIVE_CAMERA
+				vec3 viewIncidentDir=normalize(viewPosition);
+				vec3 viewReflectDir=reflect(viewIncidentDir,viewNormal);
 			#else
-				vec3 viewIncidenceDir=vec3(0,0,-1);
-				vec3 viewReflectDir=reflect(viewIncidenceDir,viewNormal);
+				vec3 viewIncidentDir=vec3(0,0,-1);
+				vec3 viewReflectDir=reflect(viewIncidentDir,viewNormal);
 			#endif
 
-			float maxReflectRayLen=maxDistance/dot(-viewIncidenceDir,viewNormal);
+			float maxReflectRayLen=maxDistance/dot(-viewIncidentDir,viewNormal);
 			// dot(a,b)==length(a)*length(b)*cos(theta) // https://www.mathsisfun.com/algebra/vectors-dot-product.html
 			// if(a.isNormalized&&b.isNormalized) dot(a,b)==cos(theta)
 			// maxDistance/maxReflectRayLen=cos(theta)
@@ -148,7 +148,7 @@ var SSRShader = {
 			// maxReflectRayLen==maxDistance/dot(a,b)
 
 			vec3 d1viewPosition=viewPosition+viewReflectDir*maxReflectRayLen;
-			#ifdef isPerspectiveCamera
+			#ifdef PERSPECTIVE_CAMERA
 				if(d1viewPosition.z>-cameraNear){
 					//https://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfLines.aspx
 					float t=(-cameraNear-viewPosition.z)/viewReflectDir.z;
@@ -176,7 +176,7 @@ var SSRShader = {
 				float cW = cameraProjectionMatrix[2][3] * vZ+cameraProjectionMatrix[3][3];
 				vec3 vP=getViewPosition( uv, d, cW );
 
-				#ifdef isPerspectiveCamera
+				#ifdef PERSPECTIVE_CAMERA
 					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 					float recipVPZ=1./viewPosition.z;
 					float viewReflectRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
@@ -187,7 +187,7 @@ var SSRShader = {
 				#endif
 				if(viewReflectRayZ-sD>vZ) continue;
 
-				#ifdef isInfiniteThick
+				#ifdef INFINITE_THICK
 					if(viewReflectRayZ+thickTolerance*clipW<vP.z) break;
 				#endif
 				float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
@@ -199,14 +199,14 @@ var SSRShader = {
 					if(dot(viewReflectDir,vN)>=0.) continue;
 					float distance=pointPlaneDistance(vP,viewPosition,viewNormal);
 					if(distance>maxDistance) break;
-					#ifdef isDistanceAttenuation
+					#ifdef DISTANCE_ATTENUATION
 						float ratio=1.-(distance/maxDistance);
 						float attenuation=ratio*ratio;
 						op=opacity*attenuation;
 					#endif
-					#ifdef isFresnel
-						float fresnel=(dot(viewIncidenceDir,viewReflectDir)+1.)/2.;
-						op*=fresnel;
+					#ifdef FRESNEL
+						float fresnelCoe=(dot(viewIncidentDir,viewReflectDir)+1.)/2.;
+						op*=fresnelCoe;
 					#endif
 					vec4 reflectColor=texture2D(tDiffuse,uv);
 					gl_FragColor.xyz=reflectColor.xyz;
