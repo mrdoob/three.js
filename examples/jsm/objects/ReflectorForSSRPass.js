@@ -133,6 +133,7 @@ var Reflector = function ( geometry, options ) {
 		// need precise calculation like this https://github.com/mrdoob/three.js/pull/20156/commits/8181946068e386d14a283cbd4f8877bc7ae066d3 ,
 		// after fully understand http://www.terathon.com/lengyel/Lengyel-Oblique.pdf .
 
+		material.uniforms['color'].value = scope.color;
 		material.uniforms['opacity'].value = scope.opacity;
 
 		vecTemp0.copy(camera.position).normalize();
