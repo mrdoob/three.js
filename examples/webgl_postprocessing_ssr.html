@@ -274,6 +274,13 @@
 			folder.add( ssrPass, 'isBlur' );
 			// gui.close()
 
+			{
+				const param = {};
+				param.color = ssrPass.groundReflector.color.getHex();
+				folder.addColor(param, 'color').onChange((c) => {
+					ssrPass.groundReflector.color.setHex(c);
+				});
+			}
 		}
 
 
