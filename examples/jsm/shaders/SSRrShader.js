@@ -9,6 +9,7 @@ var SSRrShader = {
 		MAX_STEP: 0,
 		PERSPECTIVE_CAMERA: true,
 		SPECULAR: true,
+    INFINITE_THICK: true,
   },
 
   uniforms: {
@@ -180,10 +181,14 @@ var SSRrShader = {
 					float viewRefractRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
 					float sD=surfDist;
 				#endif
-				if(viewRefractRayZ-sD>vZ) continue;
 
-				float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
-				if(away<=sD){
+				#ifdef INFINITE_THICK
+					if(viewRefractRayZ<=vZ){
+				#else
+					if(viewRefractRayZ-sD>vZ) continue;
+					float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
+					if(away<=sD){
+				#endif
 					vec4 refractColor=texture2D(tDiffuse,uv);
 					#ifdef SPECULAR
 						vec4 specularColor=texture2D(tSpecular,vUv);

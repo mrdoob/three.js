@@ -65,6 +65,23 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 		}
 	} );
 
+	this._infiniteThick = SSRrShader.defines.INFINITE_THICK;
+	Object.defineProperty( this, 'infiniteThick', {
+		get() {
+
+			return this._infiniteThick;
+
+		},
+		set( val ) {
+
+			if ( this._infiniteThick === val ) return;
+			this._infiniteThick = val;
+			this.ssrrMaterial.defines.INFINITE_THICK = val;
+			this.ssrrMaterial.needsUpdate = true;
+
+		}
+	} );
+
 	// beauty render target with depth buffer
 
 	var depthTexture = new DepthTexture();
