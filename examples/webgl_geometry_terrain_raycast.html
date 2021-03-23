@@ -41,7 +41,7 @@
 			let helper;
 
 			const raycaster = new THREE.Raycaster();
-			const mouse = new THREE.Vector2();
+			const pointer = new THREE.Vector2();
 
 			init();
 			animate();
@@ -49,7 +49,7 @@
 			function init() {
 
 				container = document.getElementById( 'container' );
-				container.innerHTML = "";
+				container.innerHTML = '';
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -103,7 +103,7 @@
 				helper = new THREE.Mesh( geometryHelper, new THREE.MeshNormalMaterial() );
 				scene.add( helper );
 
-				container.addEventListener( 'pointermove', onMouseMove );
+				container.addEventListener( 'pointermove', onPointerMove );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -232,11 +232,11 @@
 
 			}
 
-			function onMouseMove( event ) {
+			function onPointerMove( event ) {
 
-				mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
-				raycaster.setFromCamera( mouse, camera );
+				pointer.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
+				raycaster.setFromCamera( pointer, camera );
 
 				// See if the ray from the camera into the world hits one of our meshes
 				const intersects = raycaster.intersectObject( mesh );

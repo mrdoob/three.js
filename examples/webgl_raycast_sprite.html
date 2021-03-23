@@ -20,12 +20,17 @@
 	<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raycast sprite<br></div>
 
 	<script type="module">
+
 		import * as THREE from '../build/three.module.js';
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 		let renderer, scene, camera;
 		let controls, group;
+
+		let selectedObject = null;
+		const raycaster = new THREE.Raycaster();
+		const pointer = new THREE.Vector2();
 
 		init();
 		animate();
@@ -81,7 +86,7 @@
 			group2.add( sprite3 );
 
 			window.addEventListener( 'resize', onWindowResize );
-			window.addEventListener( "pointermove", onDocumentMouseMove, false );
+			document.addEventListener( 'pointermove', onPointerMove );
 
 		}
 
@@ -101,11 +106,8 @@
 
 		}
 
-		let selectedObject = null;
+		function onPointerMove( event ) {
 
-		function onDocumentMouseMove( event ) {
-
-			event.preventDefault();
 			if ( selectedObject ) {
 
 				selectedObject.material.color.set( '#69f' );
@@ -113,7 +115,12 @@
 
 			}
 
-			const intersects = getIntersects( event.layerX, event.layerY );
+			pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+			raycaster.setFromCamera( pointer, camera );
+
+			const intersects = raycaster.intersectObject( group, true );
 
 			if ( intersects.length > 0 ) {
 
@@ -134,20 +141,6 @@
 
 		}
 
-		const raycaster = new THREE.Raycaster();
-		const mouseVector = new THREE.Vector3();
-
-		function getIntersects( x, y ) {
-
-			x = ( x / window.innerWidth ) * 2 - 1;
-			y = - ( y / window.innerHeight ) * 2 + 1;
-
-			mouseVector.set( x, y, 0.5 );
-			raycaster.setFromCamera( mouseVector, camera );
-
-			return raycaster.intersectObject( group, true );
-
-		}
 	</script>
 </body>
 </html>
