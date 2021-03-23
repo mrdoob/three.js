@@ -119,10 +119,10 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			}
 
 			sphere.copy( geometry.boundingSphere ).applyMatrix4( matrixWorld );
-			var distancetoSphere = Math.max( 0.0, sphere.distanceToPoint( ray.origin ) );
+			var distanceToSphere = Math.max( camera.near, sphere.distanceToPoint( ray.origin ) );
 
 			// get the w component to scale the world space line width
-			clipToWorldVector.set( 0, 0, distancetoSphere, 1.0 ).applyMatrix4( camera.projectionMatrix );
+			clipToWorldVector.set( 0, 0, - distanceToSphere, 1.0 ).applyMatrix4( camera.projectionMatrix );
 			clipToWorldVector.multiplyScalar( 1.0 / clipToWorldVector.w );
 			clipToWorldVector.applyMatrix4( camera.projectionMatrixInverse );
 
@@ -146,10 +146,10 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			}
 
 			box.copy( geometry.boundingBox ).applyMatrix4( matrixWorld );
-			var distanceToBox = box.distanceToPoint( ray.origin );
+			var distanceToBox = Math.max( camera.near, box.distanceToPoint( ray.origin ) );
 
 			// get the w component to scale the world space line width
-			clipToWorldVector.set( 0, 0, distanceToBox, 1.0 ).applyMatrix4( camera.projectionMatrix );
+			clipToWorldVector.set( 0, 0, - distanceToBox, 1.0 ).applyMatrix4( camera.projectionMatrix );
 			clipToWorldVector.multiplyScalar( 1.0 / clipToWorldVector.w );
 			clipToWorldVector.applyMatrix4( camera.projectionMatrixInverse );
 
@@ -158,9 +158,9 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			box.max.x += boxMargin;
 			box.max.y += boxMargin;
 			box.max.z += boxMargin;
-			box.min.x += boxMargin;
-			box.min.y += boxMargin;
-			box.min.z += boxMargin;
+			box.min.x -= boxMargin;
+			box.min.y -= boxMargin;
+			box.min.z -= boxMargin;
 
 			if ( raycaster.ray.intersectsBox( box ) === false ) {
 
