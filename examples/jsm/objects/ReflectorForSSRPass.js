@@ -33,50 +33,62 @@ var Reflector = function ( geometry, options ) {
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || Reflector.ReflectorShader;
 	var useDepthTexture = options.useDepthTexture === true;
-	var yAxis = new Vector3(0, 1, 0);
+	var yAxis = new Vector3( 0, 1, 0 );
 	var vecTemp0 = new Vector3();
 	var vecTemp1 = new Vector3();
 
 	//
 
 	scope.needsUpdate = false;
-	scope.maxDistance = Reflector.ReflectorShader.uniforms.maxDistance.value
-	scope.opacity = Reflector.ReflectorShader.uniforms.opacity.value
+	scope.maxDistance = Reflector.ReflectorShader.uniforms.maxDistance.value;
+	scope.opacity = Reflector.ReflectorShader.uniforms.opacity.value;
 
-	Object.defineProperty(scope, 'color', {
+	Object.defineProperty( scope, 'color', {
 		get() {
-			return scope.material.uniforms[ 'color' ].value; 
+
+			return scope.material.uniforms[ 'color' ].value;
+
 		},
-		set(val) {
+		set( val ) {
+
 			scope.material.uniforms[ 'color' ].value = new Color( val );
+
 		}
-	});
+	} );
 
-  scope._isDistanceAttenuation = Reflector.ReflectorShader.defines.isDistanceAttenuation
-  Object.defineProperty(scope, 'isDistanceAttenuation', {
-    get() {
-      return scope._isDistanceAttenuation
-    },
-    set(val) {
-      if (scope._isDistanceAttenuation === val) return
-      scope._isDistanceAttenuation = val
-      scope.material.defines.isDistanceAttenuation = val
-      scope.material.needsUpdate = true
-    }
-	})
+	scope._isDistanceAttenuation = Reflector.ReflectorShader.defines.isDistanceAttenuation;
+	Object.defineProperty( scope, 'isDistanceAttenuation', {
+		get() {
 
-  scope._isFresnel = Reflector.ReflectorShader.defines.isFresnel
-  Object.defineProperty(scope, 'isFresnel', {
-    get() {
-      return scope._isFresnel
-    },
-    set(val) {
-      if (scope._isFresnel === val) return
-      scope._isFresnel = val
-      scope.material.defines.isFresnel = val
-      scope.material.needsUpdate = true
-    }
-	})
+			return scope._isDistanceAttenuation;
+
+		},
+		set( val ) {
+
+			if ( scope._isDistanceAttenuation === val ) return;
+			scope._isDistanceAttenuation = val;
+			scope.material.defines.isDistanceAttenuation = val;
+			scope.material.needsUpdate = true;
+
+		}
+	} );
+
+	scope._isFresnel = Reflector.ReflectorShader.defines.isFresnel;
+	Object.defineProperty( scope, 'isFresnel', {
+		get() {
+
+			return scope._isFresnel;
+
+		},
+		set( val ) {
+
+			if ( scope._isFresnel === val ) return;
+			scope._isFresnel = val;
+			scope.material.defines.isFresnel = val;
+			scope.material.needsUpdate = true;
+
+		}
+	} );
 
 	var reflectorPlane = new Plane();
 	var normal = new Vector3();
@@ -93,18 +105,20 @@ var Reflector = function ( geometry, options ) {
 	var textureMatrix = new Matrix4();
 	var virtualCamera = new PerspectiveCamera();
 
-	if( useDepthTexture ){
+	if ( useDepthTexture ) {
+
 		var depthTexture = new DepthTexture();
 		depthTexture.type = UnsignedShortType;
 		depthTexture.minFilter = NearestFilter;
 		depthTexture.maxFilter = NearestFilter;
+
 	}
 
 	var parameters = {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
 		format: RGBFormat,
-    depthTexture: useDepthTexture ? depthTexture : null,
+		depthTexture: useDepthTexture ? depthTexture : null,
 	};
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
@@ -117,9 +131,9 @@ var Reflector = function ( geometry, options ) {
 
 	var material = new ShaderMaterial( {
 		transparent: useDepthTexture,
-    defines: Object.assign( {}, Reflector.ReflectorShader.defines, {
-      useDepthTexture
-    } ),
+		defines: Object.assign( {}, Reflector.ReflectorShader.defines, {
+			useDepthTexture
+		} ),
 		uniforms: UniformsUtils.clone( shader.uniforms ),
 		fragmentShader: shader.fragmentShader,
 		vertexShader: shader.vertexShader
@@ -128,24 +142,26 @@ var Reflector = function ( geometry, options ) {
 	material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
 	material.uniforms[ 'color' ].value = color;
 	material.uniforms[ 'textureMatrix' ].value = textureMatrix;
-	if (useDepthTexture) {
+	if ( useDepthTexture ) {
+
 		material.uniforms[ 'tDepth' ].value = renderTarget.depthTexture;
+
 	}
 
 	this.material = material;
 
 	this.doRender = function ( renderer, scene, camera ) {
 
-		material.uniforms['maxDistance'].value = scope.maxDistance * (camera.position.length() / camera.position.y);
+		material.uniforms[ 'maxDistance' ].value = scope.maxDistance * ( camera.position.length() / camera.position.y );
 		///todo: Temporary hack,
 		// need precise calculation like this https://github.com/mrdoob/three.js/pull/20156/commits/8181946068e386d14a283cbd4f8877bc7ae066d3 ,
 		// after fully understand http://www.terathon.com/lengyel/Lengyel-Oblique.pdf .
 
-		material.uniforms['opacity'].value = scope.opacity;
+		material.uniforms[ 'opacity' ].value = scope.opacity;
 
-		vecTemp0.copy(camera.position).normalize();
-		vecTemp1.copy(vecTemp0).reflect(yAxis);
-		material.uniforms['fresnel'].value = (vecTemp0.dot( vecTemp1 ) + 1.) / 2.; ///todo: Also need to use glsl viewPosition and viewNormal per pixel.
+		vecTemp0.copy( camera.position ).normalize();
+		vecTemp1.copy( vecTemp0 ).reflect( yAxis );
+		material.uniforms[ 'fresnel' ].value = ( vecTemp0.dot( vecTemp1 ) + 1. ) / 2.; ///todo: Also need to use glsl viewPosition and viewNormal per pixel.
 		// console.log(material.uniforms['fresnel'].value)
 
 		reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
@@ -273,10 +289,10 @@ Reflector.prototype.constructor = Reflector;
 
 Reflector.ReflectorShader = { ///todo: Will conflict with Reflector.js?
 
-  defines: {
-    isDistanceAttenuation: true,
-    isFresnel: true,
-  },
+	defines: {
+		isDistanceAttenuation: true,
+		isFresnel: true,
+	},
 
 	uniforms: {
 
@@ -284,9 +300,9 @@ Reflector.ReflectorShader = { ///todo: Will conflict with Reflector.js?
 		tDiffuse: { value: null },
 		tDepth: { value: null },
 		textureMatrix: { value: null },
-    maxDistance: { value: 180 },
-    opacity: { value: .5 },
-    fresnel: { value: null },
+		maxDistance: { value: 180 },
+		opacity: { value: 0.5 },
+		fresnel: { value: null },
 
 	},
 
