@@ -42,19 +42,7 @@ var Reflector = function ( geometry, options ) {
 	scope.needsUpdate = false;
 	scope.maxDistance = Reflector.ReflectorShader.uniforms.maxDistance.value;
 	scope.opacity = Reflector.ReflectorShader.uniforms.opacity.value;
-
-	Object.defineProperty( scope, 'color', {
-		get() {
-
-			return scope.material.uniforms[ 'color' ].value;
-
-		},
-		set( val ) {
-
-			scope.material.uniforms[ 'color' ].value = new Color( val );
-
-		}
-	} );
+	scope.color = color;
 
 	scope._isDistanceAttenuation = Reflector.ReflectorShader.defines.isDistanceAttenuation;
 	Object.defineProperty( scope, 'isDistanceAttenuation', {
@@ -140,7 +128,7 @@ var Reflector = function ( geometry, options ) {
 	} );
 
 	material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
-	material.uniforms[ 'color' ].value = color;
+	material.uniforms[ 'color' ].value = scope.color;
 	material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 	if ( useDepthTexture ) {
 
@@ -157,6 +145,7 @@ var Reflector = function ( geometry, options ) {
 		// need precise calculation like this https://github.com/mrdoob/three.js/pull/20156/commits/8181946068e386d14a283cbd4f8877bc7ae066d3 ,
 		// after fully understand http://www.terathon.com/lengyel/Lengyel-Oblique.pdf .
 
+		material.uniforms[ 'color' ].value = scope.color;
 		material.uniforms[ 'opacity' ].value = scope.opacity;
 
 		vecTemp0.copy( camera.position ).normalize();
