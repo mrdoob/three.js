@@ -1,4 +1,4 @@
-// r126.1
+const cacheName = 'threejs-editor-r126';
 
 const assets = [
 	'./',
@@ -214,7 +214,7 @@ const assets = [
 
 self.addEventListener( 'install', async function () {
 
-	const cache = await caches.open( 'threejs-editor' );
+	const cache = await caches.open( cacheName );
 
 	assets.forEach( function ( asset ) {
 
