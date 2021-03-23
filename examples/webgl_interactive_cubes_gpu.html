@@ -165,13 +165,15 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				renderer.domElement.addEventListener( 'mousemove', onMouseMove );
+				renderer.domElement.addEventListener( 'pointermove', onMouseMove, false );
 
 			}
 
 			//
 
 			function onMouseMove( e ) {
+
+				e.preventDefault();
 
 				mouse.x = e.clientX;
 				mouse.y = e.clientY;
