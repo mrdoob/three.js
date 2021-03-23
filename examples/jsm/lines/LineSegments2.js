@@ -105,7 +105,8 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			// camera forward is negative
 			var near = - camera.near;
 
-			// clip space is [ - 1, 1 ]
+			// clip space is [ - 1, 1 ] so multiply by two to get the full
+			// width in clip space
 			var ssMaxWidth = 2.0 * Math.max( lineWidth / resolution.width, lineWidth / resolution.height );
 
 			//
