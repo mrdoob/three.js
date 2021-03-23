@@ -1,10 +1,12 @@
 import {
+	Box3,
 	InstancedInterleavedBuffer,
 	InterleavedBufferAttribute,
 	Line3,
 	MathUtils,
 	Matrix4,
 	Mesh,
+	Sphere,
 	Vector3,
 	Vector4
 } from '../../../build/three.module.js';
@@ -73,6 +75,10 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 		var line = new Line3();
 		var closestPoint = new Vector3();
 
+		var box = new Box3();
+		var sphere = new Sphere();
+		var clipToWorldVector = new Vector4();
+
 		return function raycast( raycaster, intersects ) {
 
 			if ( raycaster.camera === null ) {
@@ -87,6 +93,7 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			var camera = raycaster.camera;
 			var projectionMatrix = camera.projectionMatrix;
 
+			var matrixWorld = this.matrixWorld;
 			var geometry = this.geometry;
 			var material = this.material;
 			var resolution = material.resolution;
@@ -97,6 +104,72 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			// camera forward is negative
 			var near = - camera.near;
+
+			var ssMaxWidth = 2.0 * Math.max( lineWidth / resolution.width, lineWidth / resolution.height ) - 1.0;
+			var cameraRange = camera.far - camera.near;
+
+			//
+
+			// check if we intersect the sphere bounds
+			if ( geometry.boundingSphere === null ) {
+
+				geometry.computeBoundingSphere();
+
+			}
+
+			sphere.copy( geometry.boundingSphere ).applyMatrix4( matrixWorld );
+			var distancetoSphere = Math.max( 0.0, sphere.distanceToPoint( ray.origin ) );
+
+			// near to far is mapped from [ - 1, 1 ]
+			clipToWorldVector
+				.set( 0, 0, 2.0 * ( ( distancetoSphere - camera.near ) / cameraRange ) - 1.0, 1.0 )
+				.applyMatrix4( camera.projectionMatrixInverse );
+
+			// increase the sphere bounds by the worst case line screen space width
+			var sphereMargin = Math.abs( ssMaxWidth / clipToWorldVector.w );
+			sphere.radius += sphereMargin;
+
+			if ( raycaster.ray.intersectsSphere( sphere ) === false ) {
+
+				return;
+
+			}
+
+			//
+
+			// check if we intersect the box bounds
+			if ( geometry.boundingBox === null ) {
+
+				geometry.computeBoundingBox();
+
+			}
+
+			box.copy( geometry.boundingBox ).applyMatrix4( matrixWorld );
+			var distanceToBox = box.distanceToPoint( ray.origin );
+
+			// near to far is mapped from [ - 1, 1 ]
+			clipToWorldVector
+				.set( 0, 0, 2.0 * ( ( distanceToBox - camera.near ) / cameraRange ) - 1.0, 1.0 )
+				.applyMatrix4( camera.projectionMatrixInverse );
+
+			// increase the sphere bounds by the worst case line screen space width
+			var boxMargin = Math.abs( ssMaxWidth / clipToWorldVector.w );
+			box.max.x += boxMargin;
+			box.max.y += boxMargin;
+			box.max.z += boxMargin;
+			box.min.x += boxMargin;
+			box.min.y += boxMargin;
+			box.min.z += boxMargin;
+
+			if ( raycaster.ray.intersectsBox( box ) === false ) {
+
+				return;
+
+			}
+
+			console.log( distancetoSphere, distanceToBox, sphereMargin, boxMargin );
+
+			//
 
 			// pick a point 1 unit out along the ray to avoid the ray origin
 			// sitting at the camera origin which will cause "w" to be 0 when
@@ -116,7 +189,6 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			ssOrigin3.copy( ssOrigin );
 
-			var matrixWorld = this.matrixWorld;
 			mvMatrix.multiplyMatrices( camera.matrixWorldInverse, matrixWorld );
 
 			for ( var i = 0, l = instanceStart.count; i < l; i ++ ) {
