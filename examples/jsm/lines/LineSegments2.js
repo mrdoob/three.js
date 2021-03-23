@@ -105,8 +105,8 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			// camera forward is negative
 			var near = - camera.near;
 
-			var ssMaxWidth = 2.0 * Math.max( lineWidth / resolution.width, lineWidth / resolution.height ) - 1.0;
-			var cameraRange = camera.far - camera.near;
+			// clip space is [ - 1, 1 ]
+			var ssMaxWidth = 2.0 * Math.max( lineWidth / resolution.width, lineWidth / resolution.height );
 
 			//
 
@@ -120,13 +120,13 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			sphere.copy( geometry.boundingSphere ).applyMatrix4( matrixWorld );
 			var distancetoSphere = Math.max( 0.0, sphere.distanceToPoint( ray.origin ) );
 
-			// near to far is mapped from [ - 1, 1 ]
-			clipToWorldVector
-				.set( 0, 0, 2.0 * ( ( distancetoSphere - camera.near ) / cameraRange ) - 1.0, 1.0 )
-				.applyMatrix4( camera.projectionMatrixInverse );
+			// get the w component to scale the world space line width
+			clipToWorldVector.set( 0, 0, distancetoSphere, 1.0 ).applyMatrix4( camera.projectionMatrix );
+			clipToWorldVector.multiplyScalar( 1.0 / clipToWorldVector.w );
+			clipToWorldVector.applyMatrix4( camera.projectionMatrixInverse );
 
 			// increase the sphere bounds by the worst case line screen space width
-			var sphereMargin = Math.abs( ssMaxWidth / clipToWorldVector.w );
+			var sphereMargin = Math.abs( ssMaxWidth / clipToWorldVector.w ) * 0.5;
 			sphere.radius += sphereMargin;
 
 			if ( raycaster.ray.intersectsSphere( sphere ) === false ) {
@@ -147,13 +147,13 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			box.copy( geometry.boundingBox ).applyMatrix4( matrixWorld );
 			var distanceToBox = box.distanceToPoint( ray.origin );
 
-			// near to far is mapped from [ - 1, 1 ]
-			clipToWorldVector
-				.set( 0, 0, 2.0 * ( ( distanceToBox - camera.near ) / cameraRange ) - 1.0, 1.0 )
-				.applyMatrix4( camera.projectionMatrixInverse );
+			// get the w component to scale the world space line width
+			clipToWorldVector.set( 0, 0, distanceToBox, 1.0 ).applyMatrix4( camera.projectionMatrix );
+			clipToWorldVector.multiplyScalar( 1.0 / clipToWorldVector.w );
+			clipToWorldVector.applyMatrix4( camera.projectionMatrixInverse );
 
 			// increase the sphere bounds by the worst case line screen space width
-			var boxMargin = Math.abs( ssMaxWidth / clipToWorldVector.w );
+			var boxMargin = Math.abs( ssMaxWidth / clipToWorldVector.w ) * 0.5;
 			box.max.x += boxMargin;
 			box.max.y += boxMargin;
 			box.max.z += boxMargin;
@@ -166,8 +166,6 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 				return;
 
 			}
-
-			console.log( distancetoSphere, distanceToBox, sphereMargin, boxMargin );
 
 			//
 
