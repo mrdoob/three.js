@@ -43,6 +43,15 @@ var Reflector = function ( geometry, options ) {
 	scope.maxDistance = Reflector.ReflectorShader.uniforms.maxDistance.value
 	scope.opacity = Reflector.ReflectorShader.uniforms.opacity.value
 
+	Object.defineProperty(scope, 'color', {
+		get() {
+			return scope.material.uniforms[ 'color' ].value; 
+		},
+		set(val) {
+			scope.material.uniforms[ 'color' ].value = new Color( val );
+		}
+	});
+
   scope._isDistanceAttenuation = Reflector.ReflectorShader.defines.isDistanceAttenuation
   Object.defineProperty(scope, 'isDistanceAttenuation', {
     get() {
