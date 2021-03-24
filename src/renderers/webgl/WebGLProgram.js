@@ -526,7 +526,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			'#ifdef USE_COLOR',
 
-			' #ifdef USE_VERTEX_ALPHA',
+			'	#ifdef USE_VERTEX_ALPHA',
 
 			'		attribute vec4 color;',
 

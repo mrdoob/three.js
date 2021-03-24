@@ -1456,7 +1456,7 @@ function WebGLRenderer( parameters ) {
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
 		const envMap = cubemaps.get( material.envMap || environment );
-		const vertexAlpha = ( ( object.isMesh || object.isLine || object.isPoints ) && object.geometry.hasColorAlpha() );
+		const vertexAlpha = ( ( object.isMesh || object.isLine || object.isPoints ) && object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4 );
 
 		const materialProperties = properties.get( material );
 		const lights = currentRenderState.state.lights;
