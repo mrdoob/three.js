@@ -364,7 +364,6 @@
 
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 
@@ -386,7 +385,6 @@
 				const folder = gui.addFolder( 'THREE.MeshDepthMaterial' );
 
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
 
@@ -398,7 +396,6 @@
 
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 
 			}
 
@@ -435,7 +432,6 @@
 				folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
 
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 
@@ -486,7 +482,6 @@
 				folder.add( material, 'shininess', 0, 100 );
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
@@ -536,7 +531,6 @@
 				folder.add( material, 'metalness', 0, 1 );
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
@@ -571,7 +565,6 @@
 				folder.add( material, 'clearcoatRoughness', 0, 1 ).step( 0.01 );
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
