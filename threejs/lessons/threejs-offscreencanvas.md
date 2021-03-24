@@ -648,22 +648,22 @@ Digging through the [OrbitControls source code](https://github.com/gfxfundamenta
 it looks like we need to handle the following events.
 
 * contextmenu
-* mousedown
-* mousemove
-* mouseup
+* pointerdown
+* pointermove
+* pointerup
 * touchstart
 * touchmove
 * touchend
 * wheel
 * keydown
 
-For the mouse events we need the `ctrlKey`, `metaKey`, `shiftKey`, 
-`button`, `clientX`, `clientY`, `pageX`, and `pageY`, properties
+For the pointer events we need the `ctrlKey`, `metaKey`, `shiftKey`, 
+`button`, `pointerType`, `clientX`, `clientY`, `pageX`, and `pageY`, properties.
 
 For the keydown events we need the `ctrlKey`, `metaKey`, `shiftKey`, 
 and `keyCode` properties.
 
-For the wheel event we only need the `deltaY` property
+For the wheel event we only need the `deltaY` property.
 
 And for the touch events we only need `pageX` and `pageY` from
 the `touches` property.
@@ -882,6 +882,9 @@ function startWorker(canvas) {
 +    mousedown: mouseEventHandler,
 +    mousemove: mouseEventHandler,
 +    mouseup: mouseEventHandler,
++    pointerdown: mouseEventHandler,
++    pointermove: mouseEventHandler,
++    pointerup: mouseEventHandler,
 +    touchstart: touchEventHandler,
 +    touchmove: touchEventHandler,
 +    touchend: touchEventHandler,
@@ -908,6 +911,7 @@ const mouseEventHandler = makeSendPropertiesHandler([
   'metaKey',
   'shiftKey',
   'button',
+  'pointerType',
   'clientX',
   'clientY',
   'pageX',
@@ -1143,7 +1147,7 @@ function render(time) {
   ...
 ```
 
-A few more hacks. The OrbitControls add `mousemove` and `mouseup` events to the
+A few more hacks. The OrbitControls add `pointermove` and `pointerup` events to the
 `ownerDocument` of the element to handle mouse capture (when the mouse goes
 outside the window).
 

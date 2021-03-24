@@ -622,9 +622,9 @@ window.addEventListener('touchend', clearPickPosition);
 
 
 * contextmenu
-* mousedown
-* mousemove
-* mouseup
+* pointerdown
+* pointermove
+* pointerup
 * touchstart
 * touchmove
 * touchend
@@ -632,7 +632,7 @@ window.addEventListener('touchend', clearPickPosition);
 * keydown
 
 Для событий мыши нам нужны свойства  `ctrlKey`, `metaKey`, `shiftKey`, 
-`button`, `clientX`, `clientY`, `pageX`, и `pageY`.
+`button`, `pointerType`, `clientX`, `clientY`, `pageX`, и `pageY`.
 
 Для событий нажатия клавиатуры нам нужны свойства  `ctrlKey`, `metaKey`, `shiftKey`, 
 и `keyCode`.
@@ -838,6 +838,9 @@ function startWorker(canvas) {
 +    mousedown: mouseEventHandler,
 +    mousemove: mouseEventHandler,
 +    mouseup: mouseEventHandler,
++    pointerdown: mouseEventHandler,
++    pointermove: mouseEventHandler,
++    pointerup: mouseEventHandler,
 +    touchstart: touchEventHandler,
 +    touchmove: touchEventHandler,
 +    touchend: touchEventHandler,
@@ -862,6 +865,7 @@ const mouseEventHandler = makeSendPropertiesHandler([
   'metaKey',
   'shiftKey',
   'button',
+  'pointerType',
   'clientX',
   'clientY',
   'pageX',
@@ -1095,7 +1099,7 @@ function render(time) {
 ```
 
 
-Еще несколько приемов. `OrbitControls` добавляют события `mousemove` и `mouseup` в `ownerDocument` элемента для обработки захвата мыши (когда мышь выходит за пределы окна).
+Еще несколько приемов. `OrbitControls` добавляют события `pointermove` и `pointerup` в `ownerDocument` элемента для обработки захвата мыши (когда мышь выходит за пределы окна).
 
 Далее код ссылается на глобальный `document`, но в воркере нет глобального документа.
 

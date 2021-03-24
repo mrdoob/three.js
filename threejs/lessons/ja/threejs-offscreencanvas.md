@@ -616,16 +616,16 @@ OrbitControlsが必要とする機能をサポートする必要があります�
 [OrbitControlsのソースコード](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r125/examples/js/controls/OrbitControls.js)を掘り下げてみると、次のイベントを処理する必要があるように見えます。
 
 * contextmenu
-* mousedown
-* mousemove
-* mouseup
+* pointerdown
+* pointermove
+* pointerup
 * touchstart
 * touchmove
 * touchend
 * wheel
 * keydown
 
-マウスイベントには `ctrlKey`、 `metaKey`、 `shiftKey`、 `button`、 `clientX`、 `clientY`、 `pageX`、 `pageY` プロパティが必要です。
+マウスイベントには `ctrlKey`、 `metaKey`、 `shiftKey`、 `button`、 `pointerType`、 `clientX`、 `clientY`、 `pageX`、 `pageY` プロパティが必要です。
 
 キーダウンイベントには `ctrlKey`, `metaKey`, `shiftKey`, `keyCode` プロパティが必要です。
 
@@ -834,6 +834,9 @@ function startWorker(canvas) {
 +    mousedown: mouseEventHandler,
 +    mousemove: mouseEventHandler,
 +    mouseup: mouseEventHandler,
++    pointerdown: mouseEventHandler,
++    pointermove: mouseEventHandler,
++    pointerup: mouseEventHandler,
 +    touchstart: touchEventHandler,
 +    touchmove: touchEventHandler,
 +    touchend: touchEventHandler,
@@ -861,6 +864,7 @@ const mouseEventHandler = makeSendPropertiesHandler([
   'metaKey',
   'shiftKey',
   'button',
+  'pointerType',
   'clientX',
   'clientY',
   'pageX',
@@ -1094,7 +1098,7 @@ function render(time) {
 ```
 
 他にもいくつかのハックがあります。
-OrbitControlsは `mousemove` と `mouseup` イベントをマウスキャプチャ（マウスがウィンドウの外に出た時）を処理するための要素の `ownerDocument` です。
+OrbitControlsは `pointermove` と `pointerup` イベントをマウスキャプチャ（マウスがウィンドウの外に出た時）を処理するための要素の `ownerDocument` です。
 
 さらにコードはグローバルな `document` を参照していますが、Workerにはグローバルなdocumentはありません。
 

@@ -575,16 +575,16 @@ window.addEventListener('touchend', clearPickPosition);
 [`OrbitControls`의 소스 코드](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r125/examples/js/controls/OrbitControls.js)를 분석해보니 아래의 이벤트만 지원하면 될 듯합니다.
 
 * contextmenu
-* mousedown
-* mousemove
-* mouseup
+* pointerdown
+* pointermove
+* pointerup
 * touchstart
 * touchmove
 * touchend
 * wheel
 * keydown
 
-마우스 이벤트 중 `OrbitControls`가 사용하는 속성은 `ctrlKey`, `metaKey`, `shiftKey`, `button`, `clientX`, `clientY`, `pageX`, `pageY`이고,
+마우스 이벤트 중 `OrbitControls`가 사용하는 속성은 `ctrlKey`, `metaKey`, `shiftKey`, `button`, `pointerType`, `clientX`, `clientY`, `pageX`, `pageY`이고,
 
 keydown 이벤트의 경우는 `ctrlKey`, `metaKey`, `shiftKey`, `keyCode` 속성,
 
@@ -785,6 +785,9 @@ function startWorker(canvas) {
 +    mousedown: mouseEventHandler,
 +    mousemove: mouseEventHandler,
 +    mouseup: mouseEventHandler,
++    pointerdown: mouseEventHandler,
++    pointermove: mouseEventHandler,
++    pointerup: mouseEventHandler,
 +    touchstart: touchEventHandler,
 +    touchmove: touchEventHandler,
 +    touchend: touchEventHandler,
@@ -809,6 +812,7 @@ const mouseEventHandler = makeSendPropertiesHandler([
   'metaKey',
   'shiftKey',
   'button',
+  'pointerType',
   'clientX',
   'clientY',
   'pageX',
@@ -1037,7 +1041,7 @@ function render(time) {
   ...
 ```
 
-`OrbitControls`는 마우스 이벤트를 감지하기 위해 해당 요소의 `ownerDocument`에 `mousemove`와 `mouseup` 리스너를 추가합니다(마우스가 창 밖으로 나갔을 경우를 위해).
+`OrbitControls`는 마우스 이벤트를 감지하기 위해 해당 요소의 `ownerDocument`에 `pointermove`와 `pointerup` 리스너를 추가합니다(마우스가 창 밖으로 나갔을 경우를 위해).
 
 또한 코드는 전역 `document` 객체를 참조하지만 워커에는 전역 `document` 객체가 없습니다.
 
