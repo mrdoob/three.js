@@ -579,6 +579,7 @@
 			function chooseFromHash( gui, mesh, geometry ) {
 
 				const selectedMaterial = window.location.hash.substring( 1 ) || 'MeshBasicMaterial';
+
 				let material;
 
 				switch ( selectedMaterial ) {
@@ -729,8 +730,8 @@
 			scene.background = new THREE.Color( 0x444444 );
 			scene.environment = pmremGenerator.fromScene( environment ).texture;
 
-			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 10, 50 );
-			camera.position.z = 30;
+			const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 10, 100 );
+			camera.position.z = 35;
 
 			const ambientLight = new THREE.AmbientLight( 0x000000 );
 			scene.add( ambientLight );
@@ -749,8 +750,7 @@
 
 			guiScene( gui, scene, camera );
 
-			let geometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
-			geometry = geometry.toNonIndexed();
+			const geometry = new THREE.TorusKnotGeometry( 10, 3, 200, 32 ).toNonIndexed();
 
 			generateVertexColors( geometry );
 
