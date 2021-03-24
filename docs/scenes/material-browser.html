@@ -637,8 +637,8 @@
 
 						// only use a single point light
 
-						lights[ 0 ].visible = false;
-						lights[ 2 ].visible = false;
+						light1.visible = false;
+						light3.visible = false;
 
 						return material;
 
@@ -718,18 +718,17 @@
 			const ambientLight = new THREE.AmbientLight( 0x000000 );
 			scene.add( ambientLight );
 
-			const lights = [];
-			lights[ 0 ] = new THREE.PointLight( 0xffffff, 1, 0 );
-			lights[ 1 ] = new THREE.PointLight( 0xffffff, 1, 0 );
-			lights[ 2 ] = new THREE.PointLight( 0xffffff, 1, 0 );
+			const light1 = new THREE.PointLight( 0xffffff, 1, 0 );
+			light1.position.set( 0, 200, 0 );
+			scene.add( light1 );
 
-			lights[ 0 ].position.set( 0, 200, 0 );
-			lights[ 1 ].position.set( 100, 200, 100 );
-			lights[ 2 ].position.set( - 100, - 200, - 100 );
+			const light2 = new THREE.PointLight( 0xffffff, 1, 0 );
+			light2.position.set( 100, 200, 100 );
+			scene.add( light2 );
 
-			scene.add( lights[ 0 ] );
-			scene.add( lights[ 1 ] );
-			scene.add( lights[ 2 ] );
+			const light3 = new THREE.PointLight( 0xffffff, 1, 0 );
+			light3.position.set( - 100, - 200, - 100 );
+			scene.add( light3 );
 
 			guiScene( gui, scene, camera );
 
