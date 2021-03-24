@@ -616,6 +616,12 @@
 						guiMaterial( gui, mesh, material, geometry );
 						guiMeshMatcapMaterial( gui, mesh, material, geometry );
 
+						// no need for lights
+
+						light1.visible = false;
+						light2.visible = false;
+						light3.visible = false;
+
 						return material;
 
 						break;
