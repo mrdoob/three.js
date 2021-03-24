@@ -223,6 +223,7 @@ async function AmmoPhysics() {
 				}
 
 				mesh.instanceMatrix.needsUpdate = true;
+				mesh.computeBoundingSphere();
 
 			} else if ( mesh.isMesh ) {
 

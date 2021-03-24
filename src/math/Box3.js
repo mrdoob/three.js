@@ -209,20 +209,37 @@ class Box3 {
 
 		object.updateWorldMatrix( false, false );
 
-		const geometry = object.geometry;
+		if ( object.boundingBox !== undefined ) {
 
-		if ( geometry !== undefined ) {
+			if ( object.boundingBox === null ) {
 
-			if ( geometry.boundingBox === null ) {
-
-				geometry.computeBoundingBox();
+				object.computeBoundingBox();
 
 			}
 
-			_box.copy( geometry.boundingBox );
+			_box.copy( object.boundingBox );
 			_box.applyMatrix4( object.matrixWorld );
 
 			this.union( _box );
+
+		} else {
+
+			const geometry = object.geometry;
+
+			if ( geometry !== undefined ) {
+
+				if ( geometry.boundingBox === null ) {
+
+					geometry.computeBoundingBox();
+
+				}
+
+				_box.copy( geometry.boundingBox );
+				_box.applyMatrix4( object.matrixWorld );
+
+				this.union( _box );
+
+			}
 
 		}
 

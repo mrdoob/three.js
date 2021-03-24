@@ -1,13 +1,17 @@
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { Mesh } from './Mesh.js';
+import { Box3 } from '../math/Box3.js';
 import { Matrix4 } from '../math/Matrix4.js';
+import { Sphere } from '../math/Sphere.js';
 
 const _instanceLocalMatrix = new Matrix4();
 const _instanceWorldMatrix = new Matrix4();
 
 const _instanceIntersects = [];
 
+const _box3 = new Box3();
 const _mesh = new Mesh();
+const _sphere = new Sphere();
 
 function InstancedMesh( geometry, material, count ) {
 
@@ -18,7 +22,8 @@ function InstancedMesh( geometry, material, count ) {
 
 	this.count = count;
 
-	this.frustumCulled = false;
+	this.boundingBox = null;
+	this.boundingSphere = null;
 
 }
 
@@ -27,6 +32,72 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 	constructor: InstancedMesh,
 
 	isInstancedMesh: true,
+
+	computeBoundingBox: function () {
+
+		const geometry = this.geometry;
+		const count = this.count;
+
+		if ( this.boundingBox === null ) {
+
+			this.boundingBox = new Box3();
+
+		}
+
+		if ( geometry.boundingBox === null ) {
+
+			geometry.computeBoundingBox();
+
+		}
+
+		this.boundingBox.makeEmpty();
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			this.getMatrixAt( i, _instanceLocalMatrix );
+
+			_box3.copy( geometry.boundingBox ).applyMatrix4( _instanceLocalMatrix );
+
+			this.boundingBox.union( _box3 );
+
+		}
+
+		return this;
+
+	},
+
+	computeBoundingSphere: function () {
+
+		const geometry = this.geometry;
+		const count = this.count;
+
+		if ( this.boundingSphere === null ) {
+
+			this.boundingSphere = new Sphere();
+
+		}
+
+		if ( geometry.boundingSphere === null ) {
+
+			geometry.computeBoundingSphere();
+
+		}
+
+		this.boundingSphere.makeEmpty();
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			this.getMatrixAt( i, _instanceLocalMatrix );
+
+			_sphere.copy( geometry.boundingSphere ).applyMatrix4( _instanceLocalMatrix );
+
+			this.boundingSphere.union( _sphere );
+
+		}
+
+		return this;
+
+	},
 
 	copy: function ( source ) {
 
