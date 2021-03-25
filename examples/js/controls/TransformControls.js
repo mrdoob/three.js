@@ -9,6 +9,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	THREE.Object3D.call( this );
 
+	this.raycaster = new THREE.Raycaster();
 	this.visible = false;
 	this.domElement = domElement;
 
@@ -45,8 +46,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 	var objectChangeEvent = { type: 'objectChange' };
 
 	// Reusable utility variables
-
-	var raycaster = new THREE.Raycaster();
 
 	function intersectObjectWithRay( object, raycaster, includeInvisible ) {
 
@@ -239,6 +238,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		if ( this.object === undefined || this.dragging === true ) return;
 
+		var raycaster = this.raycaster;
+
 		raycaster.setFromCamera( pointer, this.camera );
 
 		var intersect = intersectObjectWithRay( _gizmo.picker[ this.mode ], raycaster );
@@ -260,6 +261,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 		if ( this.object === undefined || this.dragging === true || pointer.button !== 0 ) return;
 
 		if ( this.axis !== null ) {
+
+			var raycaster = this.raycaster;
 
 			raycaster.setFromCamera( pointer, this.camera );
 
@@ -316,6 +319,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 		var mode = this.mode;
 		var object = this.object;
 		var space = this.space;
+		var raycaster = this.raycaster;
 
 		if ( mode === 'scale' ) {
 
