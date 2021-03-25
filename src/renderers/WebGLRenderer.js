@@ -117,11 +117,6 @@ function WebGLRenderer( parameters ) {
 	this.toneMapping = NoToneMapping;
 	this.toneMappingExposure = 1.0;
 
-	// morphs
-
-	this.maxMorphTargets = 8;
-	this.maxMorphNormals = 4;
-
 	// internal properties
 
 	const _this = this;
