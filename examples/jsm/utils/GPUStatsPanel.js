@@ -26,11 +26,18 @@ export class GPUStatsPanel extends Stats.Panel {
 		this.context = context;
 		this.extension = extension;
 		this.maxTime = 30;
+		this.activeQueries = 0;
 
 		this.startQuery = function () {
 
 			const gl = this.context;
 			const ext = this.extension;
+
+			if ( ext === null ) {
+
+				return;
+
+			}
 
 			// create the query object
 			let query;
@@ -45,6 +52,8 @@ export class GPUStatsPanel extends Stats.Panel {
 				ext.beginQueryEXT( ext.TIME_ELAPSED_EXT, query );
 
 			}
+
+			this.activeQueries ++;
 
 			const checkQuery = () => {
 
@@ -74,6 +83,9 @@ export class GPUStatsPanel extends Stats.Panel {
 
 					}
 
+					this.activeQueries --;
+
+
 				} else {
 
 					// otherwise try again the next frame
@@ -92,6 +104,13 @@ export class GPUStatsPanel extends Stats.Panel {
 			// finish the query measurement
 			const ext = this.extension;
 			const gl = this.context;
+
+			if ( ext === null ) {
+
+				return;
+
+			}
+
 			if ( isWebGL2 ) {
 
 				gl.endQuery( ext.TIME_ELAPSED_EXT );
