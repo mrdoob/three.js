@@ -290,7 +290,6 @@ export default [
 		input: 'src/Three.js',
 		plugins: [
 			addons(),
-			glconstants(),
 			glsl(),
 			babel( {
 				babelHelpers: 'bundled',
