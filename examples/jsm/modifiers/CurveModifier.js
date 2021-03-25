@@ -291,6 +291,7 @@ export class InstancedFlow extends Flow {
 		);
 		this.object3D.setMatrixAt( index, matrix );
 		this.object3D.instanceMatrix.needsUpdate = true;
+		this.object3D.computeBoundingSphere();
 
 	}
 

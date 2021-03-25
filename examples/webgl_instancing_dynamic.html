@@ -12,6 +12,8 @@
 
 			import * as THREE from '../build/three.module.js';
 
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
@@ -29,7 +31,6 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( amount * 0.9, amount * 0.9, amount * 0.9 );
-				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
@@ -69,6 +70,10 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 10;
+				controls.maxDistance = 50;
 
 			}
 
@@ -126,6 +131,7 @@
 					}
 
 					mesh.instanceMatrix.needsUpdate = true;
+					mesh.computeBoundingSphere();
 
 				}
 
