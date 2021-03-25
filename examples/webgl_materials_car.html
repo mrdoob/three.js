@@ -83,7 +83,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xeeeeee );
-				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment() ).texture;
 				scene.fog = new THREE.Fog( 0xeeeeee, 10, 50 );
 
 				grid = new THREE.GridHelper( 100, 40, 0x000000, 0x000000 );
