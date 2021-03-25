@@ -723,12 +723,11 @@
 			renderer.outputEncoding = THREE.sRGBEncoding;
 			document.body.appendChild( renderer.domElement );
 
-			const environment = new RoomEnvironment();
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x444444 );
-			scene.environment = pmremGenerator.fromScene( environment ).texture;
+			scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
 			const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 10, 100 );
 			camera.position.z = 35;
