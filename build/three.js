@@ -3166,14 +3166,14 @@
 
 			_v0$2.subVectors(triangle.a, _center);
 
-			_v1$6.subVectors(triangle.b, _center);
+			_v1$7.subVectors(triangle.b, _center);
 
 			_v2$3.subVectors(triangle.c, _center); // compute edge vectors for triangle
 
 
-			_f0.subVectors(_v1$6, _v0$2);
+			_f0.subVectors(_v1$7, _v0$2);
 
-			_f1.subVectors(_v2$3, _v1$6);
+			_f1.subVectors(_v2$3, _v1$7);
 
 			_f2.subVectors(_v0$2, _v2$3); // test against axes that are given by cross product combinations of the edges of the triangle and the edges of the aabb
 			// make an axis testing of each of the 3 sides of the aabb against each of the 3 sides of the triangle = 9 axis of separation
@@ -3182,14 +3182,14 @@
 
 			let axes = [0, -_f0.z, _f0.y, 0, -_f1.z, _f1.y, 0, -_f2.z, _f2.y, _f0.z, 0, -_f0.x, _f1.z, 0, -_f1.x, _f2.z, 0, -_f2.x, -_f0.y, _f0.x, 0, -_f1.y, _f1.x, 0, -_f2.y, _f2.x, 0];
 
-			if (!satForAxes(axes, _v0$2, _v1$6, _v2$3, _extents)) {
+			if (!satForAxes(axes, _v0$2, _v1$7, _v2$3, _extents)) {
 				return false;
 			} // test 3 face normals from the aabb
 
 
 			axes = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 
-			if (!satForAxes(axes, _v0$2, _v1$6, _v2$3, _extents)) {
+			if (!satForAxes(axes, _v0$2, _v1$7, _v2$3, _extents)) {
 				return false;
 			} // finally testing the face normal of the triangle
 			// use already existing triangle edge vectors here
@@ -3198,7 +3198,7 @@
 			_triangleNormal.crossVectors(_f0, _f1);
 
 			axes = [_triangleNormal.x, _triangleNormal.y, _triangleNormal.z];
-			return satForAxes(axes, _v0$2, _v1$6, _v2$3, _extents);
+			return satForAxes(axes, _v0$2, _v1$7, _v2$3, _extents);
 		}
 
 		clampPoint(point, target) {
@@ -3294,7 +3294,7 @@
 
 	const _v0$2 = /*@__PURE__*/new Vector3();
 
-	const _v1$6 = /*@__PURE__*/new Vector3();
+	const _v1$7 = /*@__PURE__*/new Vector3();
 
 	const _v2$3 = /*@__PURE__*/new Vector3(); // triangle edge vectors
 
@@ -3335,6 +3335,12 @@
 	}
 
 	const _box$2 = /*@__PURE__*/new Box3();
+
+	const _v1$6 = /*@__PURE__*/new Vector3();
+
+	const _toFarthestPoint = /*@__PURE__*/new Vector3();
+
+	const _toPoint = /*@__PURE__*/new Vector3();
 
 	class Sphere {
 		constructor(center = new Vector3(), radius = -1) {
@@ -3447,6 +3453,37 @@
 
 		translate(offset) {
 			this.center.add(offset);
+			return this;
+		}
+
+		expandByPoint(point) {
+			// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L649-L671
+			_toPoint.subVectors(point, this.center);
+
+			const lengthSq = _toPoint.lengthSq();
+
+			if (lengthSq > this.radius * this.radius) {
+				const length = Math.sqrt(lengthSq);
+				const missingRadiusHalf = (length - this.radius) * 0.5; // Nudge this sphere towards the target point. Add half the missing distance to radius,
+				// and the other half to position. This gives a tighter enclosure, instead of if
+				// the whole missing distance were just added to radius.
+
+				this.center.add(_toPoint.multiplyScalar(missingRadiusHalf / length));
+				this.radius += missingRadiusHalf;
+			}
+
+			return this;
+		}
+
+		union(sphere) {
+			// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L759-L769
+			// To enclose another sphere into this sphere, we only need to enclose two points:
+			// 1) Enclose the farthest point on the other sphere into this sphere.
+			// 2) Enclose the opposite point of the farthest point into this sphere.
+			_toFarthestPoint.subVectors(sphere.center, this.center).normalize().multiplyScalar(sphere.radius);
+
+			this.expandByPoint(_v1$6.copy(sphere.center).add(_toFarthestPoint));
+			this.expandByPoint(_v1$6.copy(sphere.center).sub(_toFarthestPoint));
 			return this;
 		}
 
@@ -5311,6 +5348,7 @@
 				object.type = 'InstancedMesh';
 				object.count = this.count;
 				object.instanceMatrix = this.instanceMatrix.toJSON();
+				if (this.instanceColor !== null) object.instanceColor = this.instanceColor.toJSON();
 			} //
 
 
@@ -14385,7 +14423,6 @@
 		}
 
 		function bindFramebuffer(target, framebuffer) {
-			if (target === 36009) target = 36160;
 			if (framebuffer === null && xrFramebuffer !== null) framebuffer = xrFramebuffer; // use active XR framebuffer if available
 
 			if (currentBoundFramebuffers[target] !== framebuffer) {
@@ -14731,13 +14768,11 @@
 			gl.frontFace(2305);
 			gl.polygonOffset(0, 0);
 			gl.activeTexture(33984);
+			gl.bindFramebuffer(36160, null);
 
 			if (isWebGL2 === true) {
-				gl.bindFramebuffer(36009, null); // Equivalent to 36160
-
+				gl.bindFramebuffer(36009, null);
 				gl.bindFramebuffer(36008, null);
-			} else {
-				gl.bindFramebuffer(36160, null);
 			}
 
 			gl.useProgram(null);
@@ -28233,8 +28268,10 @@
 					material = getMaterial(data.material);
 					const count = data.count;
 					const instanceMatrix = data.instanceMatrix;
+					const instanceColor = data.instanceColor;
 					object = new InstancedMesh(geometry, material, count);
 					object.instanceMatrix = new BufferAttribute(new Float32Array(instanceMatrix.array), 16);
+					if (instanceColor !== undefined) object.instanceColor = new BufferAttribute(new Float32Array(instanceColor.array), 3);
 					break;
 
 				case 'LOD':
