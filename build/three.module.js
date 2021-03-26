@@ -17261,8 +17261,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 		'roughnessMap', 'metalnessMap', 'gradientMap',
 		'alphaMap', 'combine', 'vertexColors', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
 		'flatShading', 'sizeAttenuation', 'logarithmicDepthBuffer', 'skinning',
-		'maxBones', 'useVertexTexture', 'morphTargets', 'morphNormals',
-		'maxMorphTargets', 'maxMorphNormals', 'premultipliedAlpha',
+		'maxBones', 'useVertexTexture', 'morphTargets', 'morphNormals', 'premultipliedAlpha',
 		'numDirLights', 'numPointLights', 'numSpotLights', 'numHemiLights', 'numRectAreaLights',
 		'numDirLightShadows', 'numPointLightShadows', 'numSpotLightShadows',
 		'shadowMapEnabled', 'shadowMapType', 'toneMapping', 'physicallyCorrectLights',
@@ -17448,8 +17447,6 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
-			maxMorphTargets: renderer.maxMorphTargets,
-			maxMorphNormals: renderer.maxMorphNormals,
 
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,
@@ -23183,11 +23180,6 @@ function WebGLRenderer( parameters ) {
 	this.toneMapping = NoToneMapping;
 	this.toneMappingExposure = 1.0;
 
-	// morphs
-
-	this.maxMorphTargets = 8;
-	this.maxMorphNormals = 4;
-
 	// internal properties
 
 	const _this = this;
@@ -23660,6 +23652,9 @@ function WebGLRenderer( parameters ) {
 
 		xr.dispose();
 
+		xr.removeEventListener( 'sessionstart', onXRSessionStart );
+		xr.removeEventListener( 'sessionend', onXRSessionEnd );
+
 		animation.stop();
 
 	};
@@ -24007,8 +24002,19 @@ function WebGLRenderer( parameters ) {
 
 	function onAnimationFrame( time ) {
 
-		if ( xr.isPresenting ) return;
 		if ( onAnimationFrameCallback ) onAnimationFrameCallback( time );
+
+	}
+
+	function onXRSessionStart() {
+
+		animation.stop();
+
+	}
+
+	function onXRSessionEnd() {
+
+		animation.start();
 
 	}
 
@@ -24025,6 +24031,9 @@ function WebGLRenderer( parameters ) {
 		( callback === null ) ? animation.stop() : animation.start();
 
 	};
+
+	xr.addEventListener( 'sessionstart', onXRSessionStart );
+	xr.addEventListener( 'sessionend', onXRSessionEnd );
 
 	// Rendering
 
@@ -37361,6 +37370,16 @@ class SpotLightShadow extends LightShadow {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.focus = source.focus;
+
+		return this;
+
+	}
+
 }
 
 SpotLightShadow.prototype.isSpotLightShadow = true;
@@ -37482,6 +37501,15 @@ class PointLightShadow extends LightShadow {
 
 		const camera = this.camera;
 		const shadowMatrix = this.matrix;
+
+		const far = light.distance || camera.far;
+
+		if ( far !== camera.far ) {
+
+			camera.far = far;
+			camera.updateProjectionMatrix();
+
+		}
 
 		_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
 		camera.position.copy( _lightPositionWorld );
@@ -46153,7 +46181,10 @@ const _axisDirections = [
  * even more filtered 'mips' at the same LOD_MIN resolution, associated with
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
- */
+ *
+ * Paper: Fast, Accurate Image-Based Lighting
+ * https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view
+*/
 
 function convertLinearToRGBE( color ) {
 
