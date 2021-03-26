@@ -589,6 +589,9 @@ function WebGLRenderer( parameters ) {
 
 		xr.dispose();
 
+		xr.removeEventListener( 'sessionstart', onXRSessionStart );
+		xr.removeEventListener( 'sessionend', onXRSessionEnd );
+
 		animation.stop();
 
 	};
