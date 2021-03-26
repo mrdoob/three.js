@@ -1,3 +1,4 @@
+import { Vector3 } from '../../math/Vector3.js';
 import { Group } from '../../objects/Group.js';
 
 function WebXRController() {
@@ -36,6 +37,10 @@ Object.assign( WebXRController.prototype, {
 			this._targetRay = new Group();
 			this._targetRay.matrixAutoUpdate = false;
 			this._targetRay.visible = false;
+			this._targetRay.hasLinearVelocity = false;
+			this._targetRay.linearVelocity = new Vector3();
+			this._targetRay.hasAngularVelocity = false;
+			this._targetRay.angularVelocity = new Vector3();
 
 		}
 
@@ -50,6 +55,10 @@ Object.assign( WebXRController.prototype, {
 			this._grip = new Group();
 			this._grip.matrixAutoUpdate = false;
 			this._grip.visible = false;
+			this._grip.hasLinearVelocity = false;
+			this._grip.linearVelocity = new Vector3();
+			this._grip.hasAngularVelocity = false;
+			this._grip.angularVelocity = new Vector3();
 
 		}
 
@@ -127,6 +136,26 @@ Object.assign( WebXRController.prototype, {
 
 					targetRay.matrix.fromArray( inputPose.transform.matrix );
 					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+
+					if (inputPose.linearVelocity !== null)
+					{
+						targetRay.hasLinearVelocity = true;
+						targetRay.linearVelocity.set(inputPose.linearVelocity.x, inputPose.linearVelocity.y, inputPose.linearVelocity.z);
+					}
+					else
+					{
+						targetRay.hasLinearVelocity = false;
+					}
+
+					if (inputPose.angularVelocity !== null)
+					{
+						targetRay.hasAngularVelocity = true;
+						targetRay.angularVelocity.set(inputPose.angularVelocity.x, inputPose.angularVelocity.y, inputPose.angularVelocity.z);
+					}
+					else
+					{
+						targetRay.hasAngularVelocity = false;
+					}
 
 				}
 
@@ -208,6 +237,25 @@ Object.assign( WebXRController.prototype, {
 						grip.matrix.fromArray( gripPose.transform.matrix );
 						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
 
+						if (gripPose.linearVelocity !== null)
+						{
+							grip.hasLinearVelocity = true;
+							grip.linearVelocity.set(gripPose.linearVelocity.x, gripPose.linearVelocity.y, gripPose.linearVelocity.z);
+						}
+						else
+						{
+							grip.hasLinearVelocity = false;
+						}
+	
+						if (inputPose.angularVelocity !== null)
+						{
+							grip.hasAngularVelocity = true;
+							grip.angularVelocity.set(gripPose.angularVelocity.x, gripPose.angularVelocity.y, gripPose.angularVelocity.z);
+						}
+						else
+						{
+							grip.hasAngularVelocity = false;
+						}
 					}
 
 				}
