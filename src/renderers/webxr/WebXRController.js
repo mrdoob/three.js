@@ -138,7 +138,7 @@ Object.assign( WebXRController.prototype, {
 					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
 
 					if ( inputPose.linearVelocity !== null ) {
-						
+
 						targetRay.hasLinearVelocity = true;
 						targetRay.linearVelocity.set( inputPose.linearVelocity.x, inputPose.linearVelocity.y, inputPose.linearVelocity.z );
 
@@ -249,7 +249,7 @@ Object.assign( WebXRController.prototype, {
 							grip.hasLinearVelocity = false;
 
 						}
-	
+
 						if ( gripPose.angularVelocity !== null ) {
 
 							grip.hasAngularVelocity = true;
