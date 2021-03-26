@@ -94,7 +94,10 @@ const _axisDirections = [
  * even more filtered 'mips' at the same LOD_MIN resolution, associated with
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
- */
+ *
+ * Paper: Fast, Accurate Image-Based Lighting
+ * https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view
+*/
 
 function convertLinearToRGBE( color ) {
 
