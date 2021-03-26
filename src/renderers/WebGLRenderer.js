@@ -1452,6 +1452,7 @@ function WebGLRenderer( parameters ) {
 		materialProperties.instancing = parameters.instancing;
 		materialProperties.numClippingPlanes = parameters.numClippingPlanes;
 		materialProperties.numIntersection = parameters.numClipIntersection;
+		materialProperties.vertexAlpha = parameters.vertexAlpha;
 
 	}
 
@@ -1465,6 +1466,7 @@ function WebGLRenderer( parameters ) {
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
 		const envMap = cubemaps.get( material.envMap || environment );
+		const vertexAlpha = ( ( object.isMesh || object.isLine || object.isPoints ) && object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4 );
 
 		const materialProperties = properties.get( material );
 		const lights = currentRenderState.state.lights;
@@ -1519,6 +1521,10 @@ function WebGLRenderer( parameters ) {
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== clipping.numPlanes ||
 				materialProperties.numIntersection !== clipping.numIntersection ) ) {
+
+				needsProgramChange = true;
+
+			} else if ( materialProperties.vertexAlpha !== vertexAlpha ) {
 
 				needsProgramChange = true;
 
