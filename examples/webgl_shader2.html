@@ -157,7 +157,7 @@
 
 				clock = new THREE.Clock();
 
-				const geometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 0.75 );
+				const geometry = new THREE.BoxGeometry( 0.75, 0.75, 0.75 );
 
 				uniforms1 = {
 					"time": { value: 1.0 }
@@ -203,7 +203,7 @@
 
 				onWindowResize();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

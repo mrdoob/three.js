@@ -8,7 +8,7 @@ function BasicNodeMaterial() {
 
 	NodeMaterial.call( this, node, node );
 
-	this.type = "BasicNodeMaterial";
+	this.type = 'BasicNodeMaterial';
 
 }
 

@@ -16,7 +16,7 @@ THREE.SkeletonUtils = {
 			options.preservePosition = options.preservePosition !== undefined ? options.preservePosition : true;
 			options.preserveHipPosition = options.preserveHipPosition !== undefined ? options.preserveHipPosition : false;
 			options.useTargetMatrix = options.useTargetMatrix !== undefined ? options.useTargetMatrix : false;
-			options.hip = options.hip !== undefined ? options.hip : "hip";
+			options.hip = options.hip !== undefined ? options.hip : 'hip';
 			options.names = options.names || {};
 
 			var sourceBones = source.isObject3D ? source.skeleton.bones : this.getBones( source ),
@@ -297,7 +297,7 @@ THREE.SkeletonUtils = {
 				if ( boneData.pos ) {
 
 					convertedTracks.push( new THREE.VectorKeyframeTrack(
-						".bones[" + boneData.bone.name + "].position",
+						'.bones[' + boneData.bone.name + '].position',
 						boneData.pos.times,
 						boneData.pos.values
 					) );
@@ -305,7 +305,7 @@ THREE.SkeletonUtils = {
 				}
 
 				convertedTracks.push( new THREE.QuaternionKeyframeTrack(
-					".bones[" + boneData.bone.name + "].quaternion",
+					'.bones[' + boneData.bone.name + '].quaternion',
 					boneData.quat.times,
 					boneData.quat.values
 				) );
@@ -341,7 +341,7 @@ THREE.SkeletonUtils = {
 		return function ( target, source, options ) {
 
 			options = options || {};
-			options.hip = options.hip !== undefined ? options.hip : "hip";
+			options.hip = options.hip !== undefined ? options.hip : 'hip';
 			options.names = options.names || {};
 
 			if ( ! source.isObject3D ) {

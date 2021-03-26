@@ -54,7 +54,7 @@
 				scene.add( hemiLight );
 
 				const size = new THREE.Vector3( 10, 5, 6 );
-				const geometry = new THREE.BoxBufferGeometry( size.x, size.y, size.z );
+				const geometry = new THREE.BoxGeometry( size.x, size.y, size.z );
 
 				// setup OBB on geometry level (doing this manually for now)
 
@@ -112,9 +112,9 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				document.addEventListener( 'click', onClick, false );
+				document.addEventListener( 'click', onClick );
 
 			}
 

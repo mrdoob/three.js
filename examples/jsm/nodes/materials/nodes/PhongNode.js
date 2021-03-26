@@ -19,7 +19,7 @@ function PhongNode() {
 
 PhongNode.prototype = Object.create( Node.prototype );
 PhongNode.prototype.constructor = PhongNode;
-PhongNode.prototype.nodeType = "Phong";
+PhongNode.prototype.nodeType = 'Phong';
 
 PhongNode.prototype.build = function ( builder ) {
 
@@ -41,64 +41,64 @@ PhongNode.prototype.build = function ( builder ) {
 		] ) );
 
 		builder.addParsCode( [
-			"varying vec3 vViewPosition;",
+			'varying vec3 vViewPosition;',
 
-			"#ifndef FLAT_SHADED",
+			'#ifndef FLAT_SHADED',
 
-			"	varying vec3 vNormal;",
+			'	varying vec3 vNormal;',
 
-			"#endif",
+			'#endif',
 
 			//"#include <encodings_pars_fragment>", // encoding functions
-			"#include <fog_pars_vertex>",
-			"#include <morphtarget_pars_vertex>",
-			"#include <skinning_pars_vertex>",
-			"#include <shadowmap_pars_vertex>",
-			"#include <logdepthbuf_pars_vertex>",
-			"#include <clipping_planes_pars_vertex>"
-		].join( "\n" ) );
+			'#include <fog_pars_vertex>',
+			'#include <morphtarget_pars_vertex>',
+			'#include <skinning_pars_vertex>',
+			'#include <shadowmap_pars_vertex>',
+			'#include <logdepthbuf_pars_vertex>',
+			'#include <clipping_planes_pars_vertex>'
+		].join( '\n' ) );
 
 		var output = [
-			"#include <beginnormal_vertex>",
-			"#include <morphnormal_vertex>",
-			"#include <skinbase_vertex>",
-			"#include <skinnormal_vertex>",
-			"#include <defaultnormal_vertex>",
+			'#include <beginnormal_vertex>',
+			'#include <morphnormal_vertex>',
+			'#include <skinbase_vertex>',
+			'#include <skinnormal_vertex>',
+			'#include <defaultnormal_vertex>',
 
-			"#ifndef FLAT_SHADED", // normal computed with derivatives when FLAT_SHADED
+			'#ifndef FLAT_SHADED', // normal computed with derivatives when FLAT_SHADED
 
-			"	vNormal = normalize( transformedNormal );",
+			'	vNormal = normalize( transformedNormal );',
 
-			"#endif",
+			'#endif',
 
-			"#include <begin_vertex>"
+			'#include <begin_vertex>'
 		];
 
 		if ( position ) {
 
 			output.push(
 				position.code,
-				position.result ? "transformed = " + position.result + ";" : ''
+				position.result ? 'transformed = ' + position.result + ';' : ''
 			);
 
 		}
 
 		output.push(
-			"	#include <morphtarget_vertex>",
-			"	#include <skinning_vertex>",
-			"	#include <project_vertex>",
-			"	#include <fog_vertex>",
-			"	#include <logdepthbuf_vertex>",
-			"	#include <clipping_planes_vertex>",
+			'	#include <morphtarget_vertex>',
+			'	#include <skinning_vertex>',
+			'	#include <project_vertex>',
+			'	#include <fog_vertex>',
+			'	#include <logdepthbuf_vertex>',
+			'	#include <clipping_planes_vertex>',
 
-			"	vViewPosition = - mvPosition.xyz;",
+			'	vViewPosition = - mvPosition.xyz;',
 
-			"	#include <worldpos_vertex>",
-			"	#include <shadowmap_vertex>",
-			"	#include <fog_vertex>"
+			'	#include <worldpos_vertex>',
+			'	#include <shadowmap_vertex>',
+			'	#include <fog_vertex>'
 		);
 
-		code = output.join( "\n" );
+		code = output.join( '\n' );
 
 	} else {
 
@@ -149,20 +149,20 @@ PhongNode.prototype.build = function ( builder ) {
 		builder.requires.transparent = alpha !== undefined;
 
 		builder.addParsCode( [
-			"#include <fog_pars_fragment>",
-			"#include <bsdfs>",
-			"#include <lights_pars_begin>",
-			"#include <lights_phong_pars_fragment>",
-			"#include <shadowmap_pars_fragment>",
-			"#include <logdepthbuf_pars_fragment>"
-		].join( "\n" ) );
+			'#include <fog_pars_fragment>',
+			'#include <bsdfs>',
+			'#include <lights_pars_begin>',
+			'#include <lights_phong_pars_fragment>',
+			'#include <shadowmap_pars_fragment>',
+			'#include <logdepthbuf_pars_fragment>'
+		].join( '\n' ) );
 
 		var output = [
 			// prevent undeclared normal
-			"#include <normal_fragment_begin>",
+			'#include <normal_fragment_begin>',
 
 			// prevent undeclared material
-			"	BlinnPhongMaterial material;"
+			'	BlinnPhongMaterial material;'
 		];
 
 		if ( mask ) {
@@ -176,18 +176,18 @@ PhongNode.prototype.build = function ( builder ) {
 
 		output.push(
 			color.code,
-			"	vec3 diffuseColor = " + color.result + ";",
-			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
+			'	vec3 diffuseColor = ' + color.result + ';',
+			'	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );',
 
-			"#include <logdepthbuf_fragment>",
+			'#include <logdepthbuf_fragment>',
 
 			specular.code,
-			"	vec3 specular = " + specular.result + ";",
+			'	vec3 specular = ' + specular.result + ';',
 
 			shininess.code,
-			"	float shininess = max( 0.0001, " + shininess.result + " );",
+			'	float shininess = max( 0.0001, ' + shininess.result + ' );',
 
-			"	float specularStrength = 1.0;" // Ignored in MaterialNode ( replace to specular )
+			'	float specularStrength = 1.0;' // Ignored in MaterialNode ( replace to specular )
 		);
 
 		if ( alpha ) {
@@ -222,22 +222,22 @@ PhongNode.prototype.build = function ( builder ) {
 			'material.specularShininess = shininess;',
 			'material.specularStrength = specularStrength;',
 
-			"#include <lights_fragment_begin>",
-			"#include <lights_fragment_end>"
+			'#include <lights_fragment_begin>',
+			'#include <lights_fragment_end>'
 		);
 
 		if ( light ) {
 
 			output.push(
 				light.code,
-				"reflectedLight.directDiffuse = " + light.result + ";"
+				'reflectedLight.directDiffuse = ' + light.result + ';'
 			);
 
 			// apply color
 
 			output.push(
-				"reflectedLight.directDiffuse *= diffuseColor;",
-				"reflectedLight.indirectDiffuse *= diffuseColor;"
+				'reflectedLight.directDiffuse *= diffuseColor;',
+				'reflectedLight.indirectDiffuse *= diffuseColor;'
 			);
 
 		}
@@ -246,7 +246,7 @@ PhongNode.prototype.build = function ( builder ) {
 
 			output.push(
 				ao.code,
-				"reflectedLight.indirectDiffuse *= " + ao.result + ";"
+				'reflectedLight.indirectDiffuse *= ' + ao.result + ';'
 			);
 
 		}
@@ -255,7 +255,7 @@ PhongNode.prototype.build = function ( builder ) {
 
 			output.push(
 				ambient.code,
-				"reflectedLight.indirectDiffuse += " + ambient.result + ";"
+				'reflectedLight.indirectDiffuse += ' + ambient.result + ';'
 			);
 
 		}
@@ -264,8 +264,8 @@ PhongNode.prototype.build = function ( builder ) {
 
 			output.push(
 				shadow.code,
-				"reflectedLight.directDiffuse *= " + shadow.result + ";",
-				"reflectedLight.directSpecular *= " + shadow.result + ";"
+				'reflectedLight.directDiffuse *= ' + shadow.result + ';',
+				'reflectedLight.directSpecular *= ' + shadow.result + ';'
 			);
 
 		}
@@ -274,12 +274,12 @@ PhongNode.prototype.build = function ( builder ) {
 
 			output.push(
 				emissive.code,
-				"reflectedLight.directDiffuse += " + emissive.result + ";"
+				'reflectedLight.directDiffuse += ' + emissive.result + ';'
 			);
 
 		}
 
-		output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular;" );
+		output.push( 'vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular;' );
 
 		if ( environment ) {
 
@@ -289,12 +289,12 @@ PhongNode.prototype.build = function ( builder ) {
 
 				output.push(
 					environmentAlpha.code,
-					"outgoingLight = mix( outgoingLight, " + environment.result + ", " + environmentAlpha.result + " );"
+					'outgoingLight = mix( outgoingLight, ' + environment.result + ', ' + environmentAlpha.result + ' );'
 				);
 
 			} else {
 
-				output.push( "outgoingLight = " + environment.result + ";" );
+				output.push( 'outgoingLight = ' + environment.result + ';' );
 
 			}
 
@@ -315,22 +315,22 @@ PhongNode.prototype.build = function ( builder ) {
 
 		if ( alpha ) {
 
-			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
+			output.push( 'gl_FragColor = vec4( outgoingLight, ' + alpha.result + ' );' );
 
 		} else {
 
-			output.push( "gl_FragColor = vec4( outgoingLight, 1.0 );" );
+			output.push( 'gl_FragColor = vec4( outgoingLight, 1.0 );' );
 
 		}
 
 		output.push(
-			"#include <tonemapping_fragment>",
-			"#include <encodings_fragment>",
-			"#include <fog_fragment>",
-			"#include <premultiplied_alpha_fragment>"
+			'#include <tonemapping_fragment>',
+			'#include <encodings_fragment>',
+			'#include <fog_fragment>',
+			'#include <premultiplied_alpha_fragment>'
 		);
 
-		code = output.join( "\n" );
+		code = output.join( '\n' );
 
 	}
 

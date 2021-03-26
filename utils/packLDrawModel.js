@@ -172,7 +172,7 @@ function parseObject( fileName, isRoot ) {
 
 	}
 
-	var objectPath = path.join( prefix, fileName );
+	var objectPath = path.join( prefix, fileName ).trim().replace( /\\/g, '/' );
 
 	if ( ! objectContent ) {
 

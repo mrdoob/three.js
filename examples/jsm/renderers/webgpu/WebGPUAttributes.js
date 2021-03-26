@@ -95,7 +95,7 @@ class WebGPUAttributes {
 
 			// Not using update ranges
 
-			this.device.defaultQueue.writeBuffer(
+			this.device.queue.writeBuffer(
 				buffer,
 				0,
 				array,
@@ -104,7 +104,7 @@ class WebGPUAttributes {
 
 		} else {
 
-			this.device.defaultQueue.writeBuffer(
+			this.device.queue.writeBuffer(
 				buffer,
 				0,
 				array,

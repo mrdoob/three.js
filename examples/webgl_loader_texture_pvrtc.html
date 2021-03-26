@@ -31,7 +31,7 @@
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
 
 				//
 
@@ -126,7 +126,7 @@
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				const torus = new THREE.TorusBufferGeometry( 100, 50, 32, 24 );
+				const torus = new THREE.TorusGeometry( 100, 50, 32, 24 );
 
 				mesh = new THREE.Mesh( torus, material6 );
 				mesh.position.x = 166;
@@ -147,7 +147,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -122,7 +122,7 @@
 				light3.position.y = - 70;
 				scene.add( light3 );
 
-				const geometry = new THREE.SphereBufferGeometry( 1, 48, 24 );
+				const geometry = new THREE.SphereGeometry( 1, 48, 24 );
 
 				const material = new THREE.MeshStandardMaterial();
 				material.roughness = 0.5 * Math.random() + 0.25;
@@ -179,7 +179,7 @@
 				const controls = new OrbitControls( cameraP, renderer.domElement );
 				controls.enableZoom = false;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

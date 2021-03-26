@@ -72,7 +72,7 @@
 
 				//
 
-				const geometry = new THREE.BoxBufferGeometry( 1.0, 1.0, 1.0 );
+				const geometry = new THREE.BoxGeometry( 1.0, 1.0, 1.0 );
 				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
@@ -97,7 +97,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

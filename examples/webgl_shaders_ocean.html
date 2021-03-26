@@ -40,6 +40,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
 				//
@@ -55,7 +56,7 @@
 
 				// Water
 
-				const waterGeometry = new THREE.PlaneBufferGeometry( 10000, 10000 );
+				const waterGeometry = new THREE.PlaneGeometry( 10000, 10000 );
 
 				water = new Water(
 					waterGeometry,
@@ -67,7 +68,6 @@
 							texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
 						} ),
-						alpha: 1.0,
 						sunDirection: new THREE.Vector3(),
 						sunColor: 0xffffff,
 						waterColor: 0x001e0f,
@@ -120,7 +120,7 @@
 
 				//
 
-				const geometry = new THREE.BoxBufferGeometry( 30, 30, 30 );
+				const geometry = new THREE.BoxGeometry( 30, 30, 30 );
 				const material = new THREE.MeshStandardMaterial( { roughness: 0 } );
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -154,12 +154,11 @@
 				const folderWater = gui.addFolder( 'Water' );
 				folderWater.add( waterUniforms.distortionScale, 'value', 0, 8, 0.1 ).name( 'distortionScale' );
 				folderWater.add( waterUniforms.size, 'value', 0.1, 10, 0.1 ).name( 'size' );
-				folderWater.add( waterUniforms.alpha, 'value', 0.9, 1, .001 ).name( 'alpha' );
 				folderWater.open();
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

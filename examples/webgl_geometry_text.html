@@ -172,7 +172,7 @@
 				loadFont();
 
 				const plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 10000, 10000 ),
+					new THREE.PlaneGeometry( 10000, 10000 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
 				);
 				plane.position.y = 100;
@@ -194,10 +194,10 @@
 				// EVENTS
 
 				container.style.touchAction = 'none';
-				container.addEventListener( 'pointerdown', onPointerDown, false );
+				container.addEventListener( 'pointerdown', onPointerDown );
 
-				document.addEventListener( 'keypress', onDocumentKeyPress, false );
-				document.addEventListener( 'keydown', onDocumentKeyDown, false );
+				document.addEventListener( 'keypress', onDocumentKeyPress );
+				document.addEventListener( 'keydown', onDocumentKeyDown );
 
 				document.getElementById( "color" ).addEventListener( 'click', function () {
 
@@ -206,7 +206,7 @@
 
 					updatePermalink();
 
-				}, false );
+				} );
 
 				document.getElementById( "font" ).addEventListener( 'click', function () {
 
@@ -216,7 +216,7 @@
 
 					loadFont();
 
-				}, false );
+				} );
 
 
 				document.getElementById( "weight" ).addEventListener( 'click', function () {
@@ -233,7 +233,7 @@
 
 					loadFont();
 
-				}, false );
+				} );
 
 				document.getElementById( "bevel" ).addEventListener( 'click', function () {
 
@@ -241,11 +241,11 @@
 
 					refreshText();
 
-				}, false );
+				} );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -354,55 +354,8 @@
 				} );
 
 				textGeo.computeBoundingBox();
-				textGeo.computeVertexNormals();
-
-				const triangle = new THREE.Triangle();
-
-				// "fix" side normals by removing z-component of normals for side faces
-				// (this doesn't work well for beveled geometry as then we lose nice curvature around z-axis)
-
-				if ( ! bevelEnabled ) {
-
-					const triangleAreaHeuristics = 0.1 * ( height * size );
-
-					for ( let i = 0; i < textGeo.faces.length; i ++ ) {
-
-						const face = textGeo.faces[ i ];
-
-						if ( face.materialIndex == 1 ) {
-
-							for ( let j = 0; j < face.vertexNormals.length; j ++ ) {
-
-								face.vertexNormals[ j ].z = 0;
-								face.vertexNormals[ j ].normalize();
-
-							}
-
-							const va = textGeo.vertices[ face.a ];
-							const vb = textGeo.vertices[ face.b ];
-							const vc = textGeo.vertices[ face.c ];
-
-							const s = triangle.set( va, vb, vc ).getArea();
-
-							if ( s > triangleAreaHeuristics ) {
-
-								for ( let j = 0; j < face.vertexNormals.length; j ++ ) {
-
-									face.vertexNormals[ j ].copy( face.normal );
-
-								}
-
-							}
-
-						}
-
-					}
-
-				}
 
 				const centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
-
-				textGeo = new THREE.BufferGeometry().fromGeometry( textGeo );
 
 				textMesh1 = new THREE.Mesh( textGeo, materials );
 
@@ -452,8 +405,8 @@
 				pointerXOnPointerDown = event.clientX - windowHalfX;
 				targetRotationOnPointerDown = targetRotation;
 
-				document.addEventListener( 'pointermove', onPointerMove, false );
-				document.addEventListener( 'pointerup', onPointerUp, false );
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerup', onPointerUp );
 
 			}
 

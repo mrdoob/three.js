@@ -213,6 +213,16 @@
 		将该颜色的RGB值线性插值到传入参数的RGB值。alpha参数可以被认为是两种颜色之间的比例值，其中0是当前颜色和1.0是第一个参数的颜色。
 		</p>
 
+		<h3>[method:this lerpColors]( [param:Color color1], [param:Color color2], [param:Float alpha] )</h3>
+		<p>
+		[page:Color color1] - 开始的颜色。<br />
+		[page:Color color2] - 结束收敛的颜色。<br />
+		[page:Float alpha] - 介于0到1的数字。<br /><br />
+
+		将该颜色设置为线性插值颜色 [page:Color color1] 和 [page:Color color2] - 在此 alpha 是连接两种颜色的直线百分比距离
+		alpha = 0 时为 [page:Color color1]， alpha = 1 时为 [page:Color color2]。
+		</p>
+
 		<h3>[method:Color lerpHSL]( [param:Color color], [param:Float alpha] ) </h3>
 		<p>
 		[page:Color color] - 用于收敛的颜色。<br />

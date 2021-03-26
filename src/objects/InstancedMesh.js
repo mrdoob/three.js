@@ -33,6 +33,9 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 		Mesh.prototype.copy.call( this, source );
 
 		this.instanceMatrix.copy( source.instanceMatrix );
+
+		if ( source.instanceColor !== null ) this.instanceColor = source.instanceColor.clone();
+
 		this.count = source.count;
 
 		return this;
@@ -111,6 +114,12 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 	},
 
 	updateMorphTargets: function () {
+
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 

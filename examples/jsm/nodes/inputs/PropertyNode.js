@@ -11,7 +11,7 @@ function PropertyNode( object, property, type ) {
 
 PropertyNode.prototype = Object.create( InputNode.prototype );
 PropertyNode.prototype.constructor = PropertyNode;
-PropertyNode.prototype.nodeType = "Property";
+PropertyNode.prototype.nodeType = 'Property';
 
 Object.defineProperties( PropertyNode.prototype, {
 

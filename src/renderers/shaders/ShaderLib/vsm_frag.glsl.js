@@ -15,7 +15,7 @@ void main() {
 
 	for ( float i = -1.0; i < 1.0 ; i += SAMPLE_RATE) {
 
-		#ifdef HORIZONAL_PASS
+		#ifdef HORIZONTAL_PASS
 
 			vec2 distribution = unpackRGBATo2Half( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( i, 0.0 ) * radius ) / resolution ) );
 			mean += distribution.x;

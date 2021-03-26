@@ -6,39 +6,39 @@ THREE.CopyShader = {
 
 	uniforms: {
 
-		"tDiffuse": { value: null },
-		"opacity": { value: 1.0 }
+		'tDiffuse': { value: null },
+		'opacity': { value: 1.0 }
 
 	},
 
 	vertexShader: [
 
-		"varying vec2 vUv;",
+		'varying vec2 vUv;',
 
-		"void main() {",
+		'void main() {',
 
-		"	vUv = uv;",
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		'	vUv = uv;',
+		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
-		"}"
+		'}'
 
-	].join( "\n" ),
+	].join( '\n' ),
 
 	fragmentShader: [
 
-		"uniform float opacity;",
+		'uniform float opacity;',
 
-		"uniform sampler2D tDiffuse;",
+		'uniform sampler2D tDiffuse;',
 
-		"varying vec2 vUv;",
+		'varying vec2 vUv;',
 
-		"void main() {",
+		'void main() {',
 
-		"	vec4 texel = texture2D( tDiffuse, vUv );",
-		"	gl_FragColor = opacity * texel;",
+		'	vec4 texel = texture2D( tDiffuse, vUv );',
+		'	gl_FragColor = opacity * texel;',
 
-		"}"
+		'}'
 
-	].join( "\n" )
+	].join( '\n' )
 
 };

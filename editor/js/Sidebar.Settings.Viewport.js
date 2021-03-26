@@ -1,4 +1,4 @@
-import { UIDiv, UIText, UIRow } from './libs/ui.js';
+import { UIPanel, UIText, UIRow } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
 
 
@@ -7,7 +7,11 @@ function SidebarSettingsViewport( editor ) {
 	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var container = new UIDiv();
+	var container = new UIPanel();
+
+	var headerRow = new UIRow();
+	headerRow.add( new UIText( strings.getKey( 'sidebar/settings/viewport' ).toUpperCase() ) );
+	container.add( headerRow );
 
 	// grid
 

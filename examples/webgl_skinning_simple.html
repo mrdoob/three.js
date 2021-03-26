@@ -9,8 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - simple skinning -
-			<a href="https://github.com/mrdoob/three.js/blob/master/examples/models/skinned/simple/simple.blend" target="_blank" rel="noopener">Blender File</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - simple skinning
 		</div>
 
 		<script type="module">
@@ -43,7 +42,7 @@
 
 				// ground
 
-				const geometry = new THREE.PlaneBufferGeometry( 500, 500 );
+				const geometry = new THREE.PlaneGeometry( 500, 500 );
 				const material = new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } );
 
 				const ground = new THREE.Mesh( geometry, material );

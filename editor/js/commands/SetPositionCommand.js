@@ -1,6 +1,5 @@
 import { Command } from '../Command.js';
-
-import * as THREE from '../../../build/three.module.js';
+import { Vector3 } from '../../../build/three.module.js';
 
 /**
  * @param editor Editor
@@ -9,58 +8,58 @@ import * as THREE from '../../../build/three.module.js';
  * @param optionalOldPosition THREE.Vector3
  * @constructor
  */
-function SetPositionCommand( editor, object, newPosition, optionalOldPosition ) {
+class SetPositionCommand extends Command {
 
-	Command.call( this, editor );
+	constructor( editor, object, newPosition, optionalOldPosition ) {
 
-	this.type = 'SetPositionCommand';
-	this.name = 'Set Position';
-	this.updatable = true;
+		super( editor );
 
-	this.object = object;
+		this.type = 'SetPositionCommand';
+		this.name = 'Set Position';
+		this.updatable = true;
 
-	if ( object !== undefined && newPosition !== undefined ) {
+		this.object = object;
 
-		this.oldPosition = object.position.clone();
-		this.newPosition = newPosition.clone();
+		if ( object !== undefined && newPosition !== undefined ) {
+
+			this.oldPosition = object.position.clone();
+			this.newPosition = newPosition.clone();
+
+		}
+
+		if ( optionalOldPosition !== undefined ) {
+
+			this.oldPosition = optionalOldPosition.clone();
+
+		}
 
 	}
 
-	if ( optionalOldPosition !== undefined ) {
-
-		this.oldPosition = optionalOldPosition.clone();
-
-	}
-
-}
-
-SetPositionCommand.prototype = {
-
-	execute: function () {
+	execute() {
 
 		this.object.position.copy( this.newPosition );
 		this.object.updateMatrixWorld( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
-	},
+	}
 
-	undo: function () {
+	undo() {
 
 		this.object.position.copy( this.oldPosition );
 		this.object.updateMatrixWorld( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
-	},
+	}
 
-	update: function ( command ) {
+	update( command ) {
 
 		this.newPosition.copy( command.newPosition );
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var output = Command.prototype.toJSON.call( this );
+		const output = super.toJSON( this );
 
 		output.objectUuid = this.object.uuid;
 		output.oldPosition = this.oldPosition.toArray();
@@ -68,18 +67,18 @@ SetPositionCommand.prototype = {
 
 		return output;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Command.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.oldPosition = new THREE.Vector3().fromArray( json.oldPosition );
-		this.newPosition = new THREE.Vector3().fromArray( json.newPosition );
+		this.oldPosition = new Vector3().fromArray( json.oldPosition );
+		this.newPosition = new Vector3().fromArray( json.newPosition );
 
 	}
 
-};
+}
 
 export { SetPositionCommand };

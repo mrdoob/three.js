@@ -19,7 +19,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	this.currentLuminanceRT = null;
 
 	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.CopyShader" );
+		console.error( 'THREE.AdaptiveToneMappingPass relies on THREE.CopyShader' );
 
 	var copyShader = THREE.CopyShader;
 
@@ -36,7 +36,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	} );
 
 	if ( THREE.LuminosityShader === undefined )
-		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.LuminosityShader" );
+		console.error( 'THREE.AdaptiveToneMappingPass relies on THREE.LuminosityShader' );
 
 	this.materialLuminance = new THREE.ShaderMaterial( {
 
@@ -48,51 +48,51 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.adaptLuminanceShader = {
 		defines: {
-			"MIP_LEVEL_1X1": ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed( 1 )
+			'MIP_LEVEL_1X1': ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed( 1 )
 		},
 		uniforms: {
-			"lastLum": { value: null },
-			"currentLum": { value: null },
-			"minLuminance": { value: 0.01 },
-			"delta": { value: 0.016 },
-			"tau": { value: 1.0 }
+			'lastLum': { value: null },
+			'currentLum': { value: null },
+			'minLuminance': { value: 0.01 },
+			'delta': { value: 0.016 },
+			'tau': { value: 1.0 }
 		},
 		vertexShader: [
-			"varying vec2 vUv;",
+			'varying vec2 vUv;',
 
-			"void main() {",
+			'void main() {',
 
-			"	vUv = uv;",
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			'	vUv = uv;',
+			'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
-			"}"
+			'}'
 		].join( '\n' ),
 		fragmentShader: [
-			"varying vec2 vUv;",
+			'varying vec2 vUv;',
 
-			"uniform sampler2D lastLum;",
-			"uniform sampler2D currentLum;",
-			"uniform float minLuminance;",
-			"uniform float delta;",
-			"uniform float tau;",
+			'uniform sampler2D lastLum;',
+			'uniform sampler2D currentLum;',
+			'uniform float minLuminance;',
+			'uniform float delta;',
+			'uniform float tau;',
 
-			"void main() {",
+			'void main() {',
 
-			"	vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );",
-			"	vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );",
+			'	vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );',
+			'	vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );',
 
-			"	float fLastLum = max( minLuminance, lastLum.r );",
-			"	float fCurrentLum = max( minLuminance, currentLum.r );",
+			'	float fLastLum = max( minLuminance, lastLum.r );',
+			'	float fCurrentLum = max( minLuminance, currentLum.r );',
 
 			//The adaption seems to work better in extreme lighting differences
 			//if the input luminance is squared.
-			"	fCurrentLum *= fCurrentLum;",
+			'	fCurrentLum *= fCurrentLum;',
 
 			// Adapt the luminance using Pattanaik's technique
-			"	float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));",
+			'	float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));',
 			// "fAdaptedLum = sqrt(fAdaptedLum);",
-			"	gl_FragColor.r = fAdaptedLum;",
-			"}"
+			'	gl_FragColor.r = fAdaptedLum;',
+			'}'
 		].join( '\n' )
 	};
 
@@ -106,7 +106,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	} );
 
 	if ( THREE.ToneMapShader === undefined )
-		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.ToneMapShader" );
+		console.error( 'THREE.AdaptiveToneMappingPass relies on THREE.ToneMapShader' );
 
 	this.materialToneMap = new THREE.ShaderMaterial( {
 
@@ -206,22 +206,22 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat }; // was RGB format. changed to RGBA format. see discussion in #8415 / #8450
 
 		this.luminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
-		this.luminanceRT.texture.name = "AdaptiveToneMappingPass.l";
+		this.luminanceRT.texture.name = 'AdaptiveToneMappingPass.l';
 		this.luminanceRT.texture.generateMipmaps = false;
 
 		this.previousLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
-		this.previousLuminanceRT.texture.name = "AdaptiveToneMappingPass.pl";
+		this.previousLuminanceRT.texture.name = 'AdaptiveToneMappingPass.pl';
 		this.previousLuminanceRT.texture.generateMipmaps = false;
 
 		// We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
 		pars.minFilter = THREE.LinearMipmapLinearFilter;
 		pars.generateMipmaps = true;
 		this.currentLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
-		this.currentLuminanceRT.texture.name = "AdaptiveToneMappingPass.cl";
+		this.currentLuminanceRT.texture.name = 'AdaptiveToneMappingPass.cl';
 
 		if ( this.adaptive ) {
 
-			this.materialToneMap.defines[ "ADAPTED_LUMINANCE" ] = "";
+			this.materialToneMap.defines[ 'ADAPTED_LUMINANCE' ] = '';
 			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT.texture;
 
 		}
@@ -242,13 +242,13 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 		if ( adaptive ) {
 
 			this.adaptive = true;
-			this.materialToneMap.defines[ "ADAPTED_LUMINANCE" ] = "";
+			this.materialToneMap.defines[ 'ADAPTED_LUMINANCE' ] = '';
 			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT.texture;
 
 		} else {
 
 			this.adaptive = false;
-			delete this.materialToneMap.defines[ "ADAPTED_LUMINANCE" ];
+			delete this.materialToneMap.defines[ 'ADAPTED_LUMINANCE' ];
 			this.materialToneMap.uniforms.luminanceMap.value = null;
 
 		}

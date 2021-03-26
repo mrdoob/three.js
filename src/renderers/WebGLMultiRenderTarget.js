@@ -1,33 +1,24 @@
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 
-/**
- * @author Matt DesLauriers / @mattdesl
- * @author Takahiro https://github.com/takahirox
- */
+class WebGLMultiRenderTarget extends WebGLRenderTarget {
 
-function WebGLMultiRenderTarget( width, height, numAttachments, options ) {
+	constructor( width, height, numAttachments, options ) {
 
-	WebGLRenderTarget.call( this, width, height, options );
+		super( width, height, options );
 
-	this.textures = [];
+		this.textures = [];
 
-	for ( let i = 0; i < numAttachments; i ++ ) {
+		for ( let i = 0; i < numAttachments; i ++ ) {
 
-		this.textures[ i ] = this.texture.clone();
+			this.textures[ i ] = this.texture.clone();
+
+		}
 
 	}
 
-}
+	copy( source ) {
 
-WebGLMultiRenderTarget.prototype = Object.assign( Object.create( WebGLRenderTarget.prototype ), {
-
-	constructor: WebGLMultiRenderTarget,
-
-	isWebGLMultiRenderTarget: true,
-
-	copy: function ( source ) {
-
-		WebGLRenderTarget.prototype.copy.call( this, source );
+		super.copy.call( this, source );
 
 		this.textures.length = 0;
 
@@ -39,7 +30,7 @@ WebGLMultiRenderTarget.prototype = Object.assign( Object.create( WebGLRenderTarg
 
 		return this;
 
-	},
+	}
 
 	setNumAttachments( num ) {
 
@@ -63,9 +54,12 @@ WebGLMultiRenderTarget.prototype = Object.assign( Object.create( WebGLRenderTarg
 
 		}
 
+		return this;
+
 	}
 
-} );
+}
 
+WebGLMultiRenderTarget.prototype.isWebGLMultiRenderTarget = true;
 
 export { WebGLMultiRenderTarget };

@@ -49,14 +49,14 @@
 			directionalLight.position.set( 0.0, 0.5, 0.5 ).normalize();
 			scene.add( directionalLight );
 
-			const pointLight1 = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888888 } ) );
+			const pointLight1 = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888888 } ) );
 			pointLight1.add( new THREE.PointLight( 0x888888, 7.0, 300 ) );
 			scene.add( pointLight1 );
 			pointLight1.position.x = 0;
 			pointLight1.position.y = - 50;
 			pointLight1.position.z = 350;
 
-			const pointLight2 = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888800 } ) );
+			const pointLight2 = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888800 } ) );
 			pointLight2.add( new THREE.PointLight( 0x888800, 1.0, 500 ) );
 			scene.add( pointLight2 );
 			pointLight2.position.x = - 100;
@@ -78,7 +78,7 @@
 			controls.minDistance = 500;
 			controls.maxDistance = 3000;
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 			initMaterial();
 

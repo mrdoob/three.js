@@ -10,7 +10,7 @@ function IntNode( value ) {
 
 IntNode.prototype = Object.create( InputNode.prototype );
 IntNode.prototype.constructor = IntNode;
-IntNode.prototype.nodeType = "Int";
+IntNode.prototype.nodeType = 'Int';
 
 IntNode.prototype.generateReadonly = function ( builder, output, uuid, type/*, ns, needsUpdate */ ) {
 

@@ -46,7 +46,7 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1, 1000 );
 
-				const geometry = new THREE.BoxBufferGeometry( 150, 150, 150, 2, 2, 2 );
+				const geometry = new THREE.BoxGeometry( 150, 150, 150, 2, 2, 2 );
 				const material = new THREE.MeshNormalMaterial();
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
@@ -59,7 +59,7 @@
 				afterimagePass = new AfterimagePass();
 				composer.addPass( afterimagePass );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				if ( typeof TESTING !== 'undefined' ) { for ( let i = 0; i < 45; i ++ ) { render(); }; };
 

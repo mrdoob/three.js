@@ -11,7 +11,7 @@ function SwitchNode( node, components ) {
 
 SwitchNode.prototype = Object.create( Node.prototype );
 SwitchNode.prototype.constructor = SwitchNode;
-SwitchNode.prototype.nodeType = "Switch";
+SwitchNode.prototype.nodeType = 'Switch';
 
 SwitchNode.prototype.getType = function ( builder ) {
 

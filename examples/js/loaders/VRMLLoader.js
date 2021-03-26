@@ -159,7 +159,7 @@ THREE.VRMLLoader = ( function () {
 
 				//
 
-				var StringLiteral = createToken( { name: "StringLiteral", pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/ } );
+				var StringLiteral = createToken( { name: 'StringLiteral', pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/ } );
 				var HexLiteral = createToken( { name: 'HexLiteral', pattern: /0[xX][0-9a-fA-F]+/ } );
 				var NumberLiteral = createToken( { name: 'NumberLiteral', pattern: /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/ } );
 				var TrueLiteral = createToken( { name: 'TrueLiteral', pattern: /TRUE/ } );
@@ -723,6 +723,12 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
+				if ( build !== undefined && node.DEF !== undefined && build.hasOwnProperty( 'name' ) === true ) {
+
+					build.name = node.DEF;
+
+				}
+
 				return build;
 
 			}
@@ -868,7 +874,7 @@ THREE.VRMLLoader = ( function () {
 
 				if ( skyColor ) {
 
-					var skyGeometry = new THREE.SphereBufferGeometry( radius, 32, 16 );
+					var skyGeometry = new THREE.SphereGeometry( radius, 32, 16 );
 					var skyMaterial = new THREE.MeshBasicMaterial( { fog: false, side: THREE.BackSide, depthWrite: false, depthTest: false } );
 
 					if ( skyColor.length > 3 ) {
@@ -893,7 +899,7 @@ THREE.VRMLLoader = ( function () {
 
 					if ( groundColor.length > 0 ) {
 
-						var groundGeometry = new THREE.SphereBufferGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
+						var groundGeometry = new THREE.SphereGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
 						var groundMaterial = new THREE.MeshBasicMaterial( { fog: false, side: THREE.BackSide, vertexColors: true, depthWrite: false, depthTest: false } );
 
 						paintFaces( groundGeometry, radius, groundAngle, toColorArray( groundColor ), false );
@@ -1228,26 +1234,26 @@ THREE.VRMLLoader = ( function () {
 
 					case TEXTURE_TYPE.INTENSITY_ALPHA:
 						// Intensity+Alpha texture: A two-component image specifies the intensity in the first (high) byte and the alpha opacity in the second (low) byte.
-						var value = parseInt( "0x" + hex.substring( 2, 4 ) );
+						var value = parseInt( '0x' + hex.substring( 2, 4 ) );
 						color.r = value;
 						color.g = value;
 						color.b = value;
-						color.a = parseInt( "0x" + hex.substring( 4, 6 ) );
+						color.a = parseInt( '0x' + hex.substring( 4, 6 ) );
 						break;
 
 					case TEXTURE_TYPE.RGB:
 						// RGB texture: Pixels in a three-component image specify the red component in the first (high) byte, followed by the green and blue components
-						color.r = parseInt( "0x" + hex.substring( 2, 4 ) );
-						color.g = parseInt( "0x" + hex.substring( 4, 6 ) );
-						color.b = parseInt( "0x" + hex.substring( 6, 8 ) );
+						color.r = parseInt( '0x' + hex.substring( 2, 4 ) );
+						color.g = parseInt( '0x' + hex.substring( 4, 6 ) );
+						color.b = parseInt( '0x' + hex.substring( 6, 8 ) );
 						break;
 
 					case TEXTURE_TYPE.RGBA:
 						// RGBA texture: Four-component images specify the alpha opacity byte after red/green/blue
-						color.r = parseInt( "0x" + hex.substring( 2, 4 ) );
-						color.g = parseInt( "0x" + hex.substring( 4, 6 ) );
-						color.b = parseInt( "0x" + hex.substring( 6, 8 ) );
-						color.a = parseInt( "0x" + hex.substring( 8, 10 ) );
+						color.r = parseInt( '0x' + hex.substring( 2, 4 ) );
+						color.g = parseInt( '0x' + hex.substring( 4, 6 ) );
+						color.b = parseInt( '0x' + hex.substring( 6, 8 ) );
+						color.a = parseInt( '0x' + hex.substring( 8, 10 ) );
 						break;
 
 					default:
@@ -1974,7 +1980,7 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new THREE.BoxBufferGeometry( size.x, size.y, size.z );
+				var geometry = new THREE.BoxGeometry( size.x, size.y, size.z );
 
 				return geometry;
 
@@ -2018,7 +2024,7 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new THREE.ConeBufferGeometry( radius, height, 16, 1, openEnded );
+				var geometry = new THREE.ConeGeometry( radius, height, 16, 1, openEnded );
 
 				return geometry;
 
@@ -2066,7 +2072,7 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new THREE.CylinderBufferGeometry( radius, radius, height, 16, 1 );
+				var geometry = new THREE.CylinderGeometry( radius, radius, height, 16, 1 );
 
 				return geometry;
 
@@ -2098,7 +2104,7 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new THREE.SphereBufferGeometry( radius, 16, 16 );
+				var geometry = new THREE.SphereGeometry( radius, 16, 16 );
 
 				return geometry;
 

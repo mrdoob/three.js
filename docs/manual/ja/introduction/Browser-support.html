@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+<body>
+	<h1>[name]</h1>
+
+	<h2>概要</h2>
+	<div>
+		<p>
+			モダンなブラウザ上であれば、Three.jsはWebGLを使ってsceneを描画出来ます。古いブラウザ(特にInternet Explore 10以下)では、他の[link:https://github.com/mrdoob/three.js/tree/master/examples/jsm/renderers renderers] (CSS2DRenderer, CSS3DRenderer, SVGRenderer)に後方互換する必要があるでしょう。さらに、特に [link:https://github.com/mrdoob/three.js/tree/master/examples /examples] フォルダのファイルを使用している場合は、いくつかのpolyfillを含める必要がある可能性があります。
+		</p>
+		<p>
+			注意事項: もし古いブラウザをサポートする必要がないなら、WebGLRenderer以外を使うことはおすすめしません。というのも、他のrendererは遅い上に、サポートしている機能が少ないからです。
+		</p>
+	</div>
+
+	<h2>WebGLをサポートしているブラウザ</h2>
+	<div>
+		<p>
+			Google Chrome 9以上、Firefox 4以上、Opera 15以上、Safari 5.1以上、Internet Explore 11以上、もしくはMicrosoft Edge。
+			どのブラウザがWebGLをサポートしているのかは[link:https://caniuse.com/#feat=webgl Can I use WebGL]を確認してください。
+		</p>
+	</div>
+
+	<h2>three.jsで使用されるJavaScriptの機能とWeb APIs</h2>
+	<div>
+		<p>
+			three.jsで使われる機能の中には追加のpolyfillsが必要になるものがあります。
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>機能</th>
+					<th>スコープ</th>
+					<th>モジュール</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Typed Arrays</td>
+					<td>Source</td>
+					<td>BufferAttribute, BufferGeometry, etc.</td>
+				</tr>
+				<tr>
+					<td>Web Audio API</td>
+					<td>Source</td>
+					<td>Audio, AudioContext, AudioListener, etc.</td>
+				</tr>
+				<tr>
+					<td>WebXR Device API</td>
+					<td>Source</td>
+					<td>WebXRManager</td>
+				</tr>
+				<tr>
+					<td>Blob</td>
+					<td>Source</td>
+					<td>FileLoader, etc.</td>
+				</tr>
+				<tr>
+					<td>Promise</td>
+					<td>Examples</td>
+					<td>GLTFLoader, DRACOLoader, BasisTextureLoader, GLTFExporter, VRButton, ARButton, etc.</td>
+				</tr>
+				<tr>
+					<td>Fetch</td>
+					<td>Examples</td>
+					<td>ImageBitmapLoader, etc.</td>
+				</tr>
+				<tr>
+					<td>File API</td>
+					<td>Examples</td>
+					<td>GLTFExporter, etc.</td>
+				</tr>
+				<tr>
+					<td>URL API</td>
+					<td>Examples</td>
+					<td>GLTFLoader, etc.</td>
+				</tr>
+				<tr>
+					<td>Pointer Lock API</td>
+					<td>Examples</td>
+					<td>PointerLockControls</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h2>Polyfills</h2>
+	<div>
+		<p>
+			要件に応じてポリフィルをインポートするだけです。例えば、IE9の場合は少なくとも以下の機能を追加する必要があります。
+		</p>
+		<ul>
+			<li>Typed Arrays</li>
+			<li>Blob</li>
+		</ul>
+	</div>
+
+	<h3>おすすめのpolyfills</h3>
+	<div>
+		<ul>
+			<li>
+				[link:https://github.com/zloirock/core-js core-js]
+			</li>
+			<li>
+				[link:https://github.com/inexorabletash/polyfill/blob/master/typedarray.js typedarray.js]
+			</li>
+			<li>
+				[link:https://github.com/stefanpenner/es6-promise/ ES6-Promise]
+			</li>
+			<li>
+				[link:https://github.com/eligrey/Blob.js Blob.js]
+			</li>
+			<li>
+				[link:https://github.com/github/fetch fetch]
+			</li>
+		</ul>
+	</div>
+</body>
+</html>

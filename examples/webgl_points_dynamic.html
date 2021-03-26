@@ -92,7 +92,7 @@
 				parent = new THREE.Object3D();
 				scene.add( parent );
 
-				const grid = new THREE.Points( new THREE.PlaneBufferGeometry( 15000, 15000, 64, 64 ), new THREE.PointsMaterial( { color: 0xff0000, size: 10 } ) );
+				const grid = new THREE.Points( new THREE.PlaneGeometry( 15000, 15000, 64, 64 ), new THREE.PointsMaterial( { color: 0xff0000, size: 10 } ) );
 				grid.position.y = - 400;
 				grid.rotation.x = - Math.PI / 2;
 				parent.add( grid );
@@ -119,7 +119,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

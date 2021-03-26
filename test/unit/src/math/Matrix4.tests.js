@@ -1,5 +1,6 @@
 /* global QUnit */
 
+import { Matrix3 } from '../../../../src/math/Matrix3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Euler } from '../../../../src/math/Euler';
@@ -160,6 +161,25 @@ export default QUnit.module( 'Maths', () => {
 			// ensure that it is a true copy
 			a.elements[ 0 ] = 2;
 			assert.ok( ! matrixEquals4( a, b ), "Passed!" );
+
+		} );
+
+		QUnit.test( "setFromMatrix4", ( assert ) => {
+
+			var a = new Matrix3().set(
+				0, 1, 2,
+				3, 4, 5,
+				6, 7, 8
+			);
+			var b = new Matrix4();
+			var c = new Matrix4().set(
+				0, 1, 2, 0,
+				3, 4, 5, 0,
+				6, 7, 8, 0,
+				0, 0, 0, 1
+			);
+			b.setFromMatrix3( a );
+			assert.ok( b.equals( c ) );
 
 		} );
 

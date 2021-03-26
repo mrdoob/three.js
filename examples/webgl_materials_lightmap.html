@@ -93,7 +93,7 @@
 				};
 				uniforms.topColor.value.copy( light.color );
 
-				const skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
+				const skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
 				const skyMat = new THREE.ShaderMaterial( {
 					uniforms: uniforms,
 					vertexShader: vertexShader,
@@ -134,7 +134,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

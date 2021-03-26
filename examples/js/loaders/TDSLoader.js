@@ -286,16 +286,16 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			} else if ( next === MAT_SHININESS ) {
 
-				var shininess = this.readWord( data );
-				material.shininess = shininess;
+				var shininess = this.readPercentage( data );
+				material.shininess = shininess * 100;
 				this.debugMessage( '   Shininess : ' + shininess );
 
 			} else if ( next === MAT_TRANSPARENCY ) {
 
-				var opacity = this.readWord( data );
-				material.opacity = opacity * 0.01;
-				this.debugMessage( '  Opacity : ' + opacity );
-				material.transparent = opacity < 100 ? true : false;
+				var transparency = this.readPercentage( data );
+				material.opacity = 1 - transparency;
+				this.debugMessage( '  Transparency : ' + transparency );
+				material.transparent = material.opacity < 1 ? true : false;
 
 			} else if ( next === MAT_TEXMAP ) {
 
@@ -494,41 +494,48 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		//The rest of the FACE_ARRAY chunk is subchunks
 
+		var materialIndex = 0;
+		var start = 0;
+
 		while ( this.position < chunk.end ) {
 
-			var chunk = this.readChunk( data );
+			var subchunk = this.readChunk( data );
 
-			if ( chunk.id === MSH_MAT_GROUP ) {
+			if ( subchunk.id === MSH_MAT_GROUP ) {
 
 				this.debugMessage( '      Material Group' );
 
 				this.resetPosition( data );
 
 				var group = this.readMaterialGroup( data );
+				var count = group.index.length * 3; // assuming successive indices
+
+				mesh.geometry.addGroup( start, count, materialIndex );
+
+				start += count;
+				materialIndex ++;
 
 				var material = this.materials[ group.name ];
 
+				if ( Array.isArray( mesh.material ) === false ) mesh.material = [];
+
 				if ( material !== undefined )	{
 
-					mesh.material = material;
-
-					if ( material.name === '' )		{
-
-						material.name = mesh.name;
-
-					}
+					mesh.material.push( material );
 
 				}
 
 			} else {
 
-				this.debugMessage( '      Unknown face array chunk: ' + chunk.toString( 16 ) );
+				this.debugMessage( '      Unknown face array chunk: ' + subchunk.toString( 16 ) );
 
 			}
 
-			this.endChunk( chunk );
+			this.endChunk( subchunk );
 
 		}
+
+		if ( mesh.material.length === 1 ) mesh.material = mesh.material[ 0 ]; // for backwards compatibility
 
 		this.endChunk( chunk );
 
@@ -870,6 +877,39 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	},
 
 	/**
+	 * Read percentage value.
+	 *
+	 * @method readPercentage
+	 * @param {DataView} data Dataview to read data from.
+	 * @return {Number} Data read from the dataview.
+	 */
+	readPercentage: function ( data ) {
+
+		var chunk = this.readChunk( data );
+		var value;
+
+		switch ( chunk.id ) {
+
+			case INT_PERCENTAGE:
+				value = ( this.readShort( data ) / 100 );
+				break;
+
+			case FLOAT_PERCENTAGE:
+				value = this.readFloat( data );
+				break;
+
+			default:
+				this.debugMessage( '      Unknown percentage chunk: ' + chunk.toString( 16 ) );
+
+		}
+
+		this.endChunk( chunk );
+
+		return value;
+
+	},
+
+	/**
 	 * Print debug message to the console.
 	 *
 	 * Is controlled by a flag to show or hide debug messages.
@@ -902,8 +942,8 @@ var COLOR_F = 0x0010;
 var COLOR_24 = 0x0011;
 var LIN_COLOR_24 = 0x0012;
 var LIN_COLOR_F = 0x0013;
-// var INT_PERCENTAGE = 0x0030;
-// var FLOAT_PERCENTAGE = 0x0031;
+var INT_PERCENTAGE = 0x0030;
+var FLOAT_PERCENTAGE = 0x0031;
 var MDATA = 0x3D3D;
 var MESH_VERSION = 0x3D3E;
 var MASTER_SCALE = 0x0100;

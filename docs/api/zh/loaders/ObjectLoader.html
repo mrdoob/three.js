@@ -91,101 +91,51 @@
 		[page:Function onLoad] — 当解析完成时被调用，其中参数被解析为[page:Object3D object].<br /><br />
 
 			解析一个<em>JSON</em>结构，并返回一个threejs对象.
-		内部使用[page:.load]进行加载, 但也可以直接用于解析先前加载的JSON结构。
+		内部使用[page:.load]()进行加载, 但也可以直接用于解析先前加载的JSON结构。
 		</p>
 
 		<h3>[method:Object3D parseGeometries]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] — 必选参数，需要被解析的JSON源。<br /><br />
 
-			此函数以JSON结构，用[page:.parse]去解析[page:Geometry geometries]或[page:BufferGeometry buffer geometries]。
+			此函数以JSON结构，用[page:.parse]()去解析[page:BufferGeometry geometries]。
 		</p>
 
 		<h3>[method:Object3D parseMaterials]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
 
-		此函数通过[page:.parse]来使用[page:MaterialLoader]，以解析JSON结构中任意材质。
+		此函数通过[page:.parse()来使用[page:MaterialLoader]，以解析JSON结构中任意材质。
 		</p>
 
 		<h3>[method:Object3D parseAnimations]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
 
-		此函数通过[page:.parse]来使用[page:AnimationClip.parse]， 以解析JSON结构中任意动画。
+		此函数通过[page:.parse]()来使用[page:AnimationClip.parse]()， 以解析JSON结构中任意动画。
 		</p>
 
 		<h3>[method:Object3D parseImages]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
 
-			此函数通过[page:.parse]来使用[page:ImageLoader]， 以解析JSON结构中任意图片。
+			此函数通过[page:.parse]()来使用[page:ImageLoader]， 以解析JSON结构中任意图片。
 		</p>
 
 		<h3>[method:Object3D parseTextures]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
-			此函数通过[page:.parse]来解析JSON结构中任意纹理。
+			此函数通过[page:.parse]()来解析JSON结构中任意纹理。
 		</p>
 
-		<h3>[method:Object3D parseObject]( [param:Object json] )</h3>
+		<h3>[method:Object3D parseObject]( [param:Object json], [param:BufferGeometry geometries], [param:Material materials], [param:AnimationClip animations] )</h3>
 		<p>
-		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
+		[page:Object json] —  必选参数，需要被解析的JSON源。<br />
+		[page:BufferGeometry geometries] — required. The geometries of the JSON.<br />
+		[page:Material materials] — required. The materials of the JSON.<br />
+		[page:AnimationClip animations] — required. The animations of the JSON.<br /><br />
 
-			此函数通过[page:.parse]来解析JSON结构中任意对象。
-		对象可以为如下类型：
-
-		<ul>
-			<li>
-				[page:Scene]
-			</li>
-			<li>
-				[page:PerspectiveCamera]
-			</li>
-			<li>
-				[page:OrthographicCamera]
-			</li>
-			<li>
-				[page:AmbientLight]
-			</li>
-			<li>
-				[page:DirectionalLight]
-			</li>
-			<li>
-				[page:PointLight]
-			</li>
-			<li>
-				[page:SpotLight]
-			</li>
-			<li>
-				[page:HemisphereLight]
-			</li>
-			<li>
-				[page:Mesh]
-			</li>
-			<li>
-				[page:LOD]
-			</li>
-			<li>
-				[page:Line]
-			</li>
-			<li>
-				[page:LineSegments]
-			</li>
-			<li>
-				[page:Points]
-			</li>
-			<li>
-				[page:Sprite]
-			</li>
-			<li>
-				[page:Group]
-			</li>
-			<li>
-				[page:Object3D]
-			</li>
-
-		</ul>
+		此函数通过[page:.parse]()来解析JSON结构中任意对象。
 		</p>
 
 		<h2>源</h2>

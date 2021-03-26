@@ -8,6 +8,6 @@ function ExpressionNode( src, type, keywords, extensions, includes ) {
 
 ExpressionNode.prototype = Object.create( FunctionNode.prototype );
 ExpressionNode.prototype.constructor = ExpressionNode;
-ExpressionNode.prototype.nodeType = "Expression";
+ExpressionNode.prototype.nodeType = 'Expression';
 
 export { ExpressionNode };

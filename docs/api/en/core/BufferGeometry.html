@@ -10,15 +10,12 @@
 		<h1>[name]</h1>
 
 		<p>
-		An efficient representation of mesh, line, or point geometry. Includes vertex positions, face
+		A representation of mesh, line, or point geometry. Includes vertex positions, face
 		indices, normals, colors, UVs, and custom attributes within buffers, reducing the cost of
 		passing all this data to the GPU.
 		</p>
 		<p>
 		To read and edit data in BufferGeometry attributes, see [page:BufferAttribute] documentation.
-		</p>
-		<p>
-		For a less efficient but easier-to-use representation of geometry, see [page:Geometry].
 		</p>
 
 		<h2>Code Example</h2>
@@ -123,9 +120,8 @@
 
 		<h3>[property:BufferAttribute index]</h3>
 		<p>
-			Allows for vertices to be re-used across multiple triangles; this is called using "indexed triangles" and
-			works much the same as it does in [page:Geometry]: each triangle is associated with the indices of three vertices.
-			This attribute therefore stores the index of each vertex for each triangular face.
+			Allows for vertices to be re-used across multiple triangles; this is called using "indexed triangles".
+			Each triangle is associated with the indices of three vertices. This attribute therefore stores the index of each vertex for each triangular face.
 
 			If this attribute is not set, the [page:WebGLRenderer renderer] assumes that each three contiguous
 			positions represent a single triangle.
@@ -135,7 +131,7 @@
 
 		<h3>[property:Object morphAttributes]</h3>
 		<p>
-			Hashmap of [page:BufferAttribute]s holding details of the geometry's [page:Geometry.morphTargets morphTargets].
+			Hashmap of [page:BufferAttribute]s holding details of the geometry's morph targets.
 		</p>
 
 		<h3>[property:Boolean morphTargetsRelative]</h3>
@@ -207,6 +203,12 @@
 		Bounding spheres aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
 		</p>
 
+		<h3>[method:null computeTangents]()</h3>
+		<p>
+		Calculates and adds a tangent attribute to this geometry.<br />
+		The computation is only supported for indexed geometries and if position, normal, and uv attributes are defined.
+		</p>
+
 		<h3>[method:null computeVertexNormals]()</h3>
 		<p>Computes vertex normals by averaging face normals.</p>
 
@@ -216,22 +218,14 @@
 		You need to call this when you want the BufferGeometry removed while the application is running.
 		</p>
 
-		<h3>[method:BufferGeometry fromDirectGeometry]( [param:Geometry] )</h3>
-		<p>
-			Populates this BufferGeometry with data from a [page:DirectGeometry] object containing faces. Not implemented for a line geometry.<br /><br />
-
-			Note: [page:DirectGeometry] is mainly used as an intermediary object for converting between [page:Geometry]
-			and BufferGeometry.
-		</p>
-
-		<h3>[method:BufferGeometry fromGeometry]( [param:Geometry] )</h3>
-		<p>Populates this BufferGeometry with data from a [page:Geometry] object containing faces. Not implemented for a line geometry.</p>
-
 		<h3>[method:BufferAttribute getAttribute]( [param:String name] )</h3>
 		<p>Returns the [page:BufferAttribute attribute] with the specified name.</p>
 
 		<h3>[method:BufferAttribute getIndex] ()</h3>
 		<p>Return the [page:.index] buffer.</p>
+
+		<h3>[method:Boolean hasAttribute]( [param:String name] )</h3>
+		<p>Returns *true* if the attribute with the specified name exists.</p>
 
 		<h3>[method:BufferGeometry lookAt] ( [param:Vector3 vector] )</h3>
 		<p>
@@ -284,9 +278,6 @@
 		<p>Set the [page:.drawRange] property. For non-indexed BufferGeometry, count is the number of vertices to render.
 		For indexed BufferGeometry, count is the number of indices to render.</p>
 
-		<h3>[method:BufferGeometry setFromObject] ( [param:Object3D object] )</h3>
-		<p>Sets the attributes for this BufferGeometry from an [page:Object3D].</p>
-
 		<h3>[method:BufferGeometry setFromPoints] ( [param:Array points] )</h3>
 		<p>Sets the attributes for this BufferGeometry from an array of points.</p>
 
@@ -299,27 +290,8 @@
 		<h3>[method:BufferGeometry translate] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 		Translate the geometry. This is typically done as a one time operation, and not during a loop.
-    Use [page:Object3D.position] for typical real-time mesh translation.
+		Use [page:Object3D.position] for typical real-time mesh translation.
 		</p>
-
-		<h3>[method:BufferGeometry updateFromObject] ( [param:Object3D object] )</h3>
-		<div>Updates the attributes for this BufferGeometry from an [page:Object3D].</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 		<h2>Source</h2>
 

@@ -91,7 +91,7 @@
 				} );
 
 				const plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 10000, 10000 ),
+					new THREE.PlaneGeometry( 10000, 10000 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
 				);
 				plane.position.y = 100;
@@ -108,12 +108,12 @@
 				// EVENTS
 
 				container.style.touchAction = 'none';
-				container.addEventListener( 'pointerdown', onPointerDown, false );
+				container.addEventListener( 'pointerdown', onPointerDown );
 
-				document.addEventListener( 'keypress', onDocumentKeyPress, false );
-				document.addEventListener( 'keydown', onDocumentKeyDown, false );
+				document.addEventListener( 'keypress', onDocumentKeyPress );
+				document.addEventListener( 'keydown', onDocumentKeyDown );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -177,7 +177,7 @@
 
 			function createText() {
 
-				textGeo = new THREE.TextBufferGeometry( text, {
+				textGeo = new THREE.TextGeometry( text, {
 
 					font: font,
 
@@ -242,8 +242,8 @@
 				pointerXOnPointerDown = event.clientX - windowHalfX;
 				targetRotationOnPointerDown = targetRotation;
 
-				document.addEventListener( 'pointermove', onPointerMove, false );
-				document.addEventListener( 'pointerup', onPointerUp, false );
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerup', onPointerUp );
 
 			}
 

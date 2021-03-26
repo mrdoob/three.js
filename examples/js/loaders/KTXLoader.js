@@ -146,7 +146,7 @@ var KhronosTextureContainer = ( function () {
 
 				var byteArray = new Uint8Array( this.arrayBuffer, dataOffset, imageSize );
 
-				mipmaps.push( { "data": byteArray, "width": width, "height": height } );
+				mipmaps.push( { 'data': byteArray, 'width': width, 'height': height } );
 
 				dataOffset += imageSize;
 				dataOffset += 3 - ( ( imageSize + 3 ) % 4 ); // add padding for odd sized image

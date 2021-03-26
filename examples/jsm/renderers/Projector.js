@@ -1,24 +1,14 @@
 import {
-	BackSide,
 	Box3,
-	BufferGeometry,
 	Color,
 	DoubleSide,
-	FrontSide,
 	Frustum,
-	Geometry,
-	Light,
-	Line,
-	LineSegments,
 	Matrix3,
 	Matrix4,
-	Mesh,
-	Points,
-	Sprite,
 	Vector2,
 	Vector3,
 	Vector4
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var RenderableObject = function () {
 
@@ -135,12 +125,7 @@ var Projector = function () {
 		_modelMatrix,
 		_modelViewProjectionMatrix = new Matrix4(),
 
-		_normalMatrix = new Matrix3(),
-
-		_frustum = new Frustum(),
-
-		_clippedVertex1PositionScreen = new Vector4(),
-		_clippedVertex2PositionScreen = new Vector4();
+		_frustum = new Frustum();
 
 	//
 
@@ -369,18 +354,18 @@ var Projector = function () {
 
 		if ( object.visible === false ) return;
 
-		if ( object instanceof Light ) {
+		if ( object.isLight ) {
 
 			_renderData.lights.push( object );
 
-		} else if ( object instanceof Mesh || object instanceof Line || object instanceof Points ) {
+		} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
 			if ( object.material.visible === false ) return;
 			if ( object.frustumCulled === true && _frustum.intersectsObject( object ) === false ) return;
 
 			addObject( object );
 
-		} else if ( object instanceof Sprite ) {
+		} else if ( object.isSprite ) {
 
 			if ( object.material.visible === false ) return;
 			if ( object.frustumCulled === true && _frustum.intersectsSprite( object ) === false ) return;
@@ -460,9 +445,9 @@ var Projector = function () {
 
 			_vertexCount = 0;
 
-			if ( object instanceof Mesh ) {
+			if ( object.isMesh ) {
 
-				if ( geometry instanceof BufferGeometry ) {
+				if ( geometry.isBufferGeometry ) {
 
 					var material = object.material;
 
@@ -621,142 +606,18 @@ var Projector = function () {
 
 					}
 
-				} else if ( geometry instanceof Geometry ) {
+				} else if ( geometry.isGeometry ) {
 
-					var vertices = geometry.vertices;
-					var faces = geometry.faces;
-					var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
-
-					_normalMatrix.getNormalMatrix( _modelMatrix );
-
-					var material = object.material;
-
-					var isMultiMaterial = Array.isArray( material );
-
-					for ( var v = 0, vl = vertices.length; v < vl; v ++ ) {
-
-						var vertex = vertices[ v ];
-
-						_vector3.copy( vertex );
-
-						if ( material.morphTargets === true ) {
-
-							var morphTargets = geometry.morphTargets;
-							var morphInfluences = object.morphTargetInfluences;
-
-							for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
-
-								var influence = morphInfluences[ t ];
-
-								if ( influence === 0 ) continue;
-
-								var target = morphTargets[ t ];
-								var targetVertex = target.vertices[ v ];
-
-								_vector3.x += ( targetVertex.x - vertex.x ) * influence;
-								_vector3.y += ( targetVertex.y - vertex.y ) * influence;
-								_vector3.z += ( targetVertex.z - vertex.z ) * influence;
-
-							}
-
-						}
-
-						renderList.pushVertex( _vector3.x, _vector3.y, _vector3.z );
-
-					}
-
-					for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
-
-						var face = faces[ f ];
-
-						material = isMultiMaterial === true
-							 ? object.material[ face.materialIndex ]
-							 : object.material;
-
-						if ( material === undefined ) continue;
-
-						var side = material.side;
-
-						var v1 = _vertexPool[ face.a ];
-						var v2 = _vertexPool[ face.b ];
-						var v3 = _vertexPool[ face.c ];
-
-						if ( renderList.checkTriangleVisibility( v1, v2, v3 ) === false ) continue;
-
-						var visible = renderList.checkBackfaceCulling( v1, v2, v3 );
-
-						if ( side !== DoubleSide ) {
-
-							if ( side === FrontSide && visible === false ) continue;
-							if ( side === BackSide && visible === true ) continue;
-
-						}
-
-						_face = getNextFaceInPool();
-
-						_face.id = object.id;
-						_face.v1.copy( v1 );
-						_face.v2.copy( v2 );
-						_face.v3.copy( v3 );
-
-						_face.normalModel.copy( face.normal );
-
-						if ( visible === false && ( side === BackSide || side === DoubleSide ) ) {
-
-							_face.normalModel.negate();
-
-						}
-
-						_face.normalModel.applyMatrix3( _normalMatrix ).normalize();
-
-						var faceVertexNormals = face.vertexNormals;
-
-						for ( var n = 0, nl = Math.min( faceVertexNormals.length, 3 ); n < nl; n ++ ) {
-
-							var normalModel = _face.vertexNormalsModel[ n ];
-							normalModel.copy( faceVertexNormals[ n ] );
-
-							if ( visible === false && ( side === BackSide || side === DoubleSide ) ) {
-
-								normalModel.negate();
-
-							}
-
-							normalModel.applyMatrix3( _normalMatrix ).normalize();
-
-						}
-
-						_face.vertexNormalsLength = faceVertexNormals.length;
-
-						var vertexUvs = faceVertexUvs[ f ];
-
-						if ( vertexUvs !== undefined ) {
-
-							for ( var u = 0; u < 3; u ++ ) {
-
-								_face.uvs[ u ].copy( vertexUvs[ u ] );
-
-							}
-
-						}
-
-						_face.color = face.color;
-						_face.material = material;
-
-						_face.z = ( v1.positionScreen.z + v2.positionScreen.z + v3.positionScreen.z ) / 3;
-						_face.renderOrder = object.renderOrder;
-
-						_renderData.elements.push( _face );
-
-					}
+					console.error( 'THREE.Projector no longer supports Geometry. Use THREE.BufferGeometry instead.' );
+					return;
 
 				}
 
-			} else if ( object instanceof Line ) {
+			} else if ( object.isLine ) {
 
 				_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
 
-				if ( geometry instanceof BufferGeometry ) {
+				if ( geometry.isBufferGeometry ) {
 
 					var attributes = geometry.attributes;
 
@@ -794,7 +655,7 @@ var Projector = function () {
 
 						} else {
 
-							var step = object instanceof LineSegments ? 2 : 1;
+							var step = object.isLineSegments ? 2 : 1;
 
 							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i += step ) {
 
@@ -806,81 +667,23 @@ var Projector = function () {
 
 					}
 
-				} else if ( geometry instanceof Geometry ) {
+				} else if ( geometry.isGeometry ) {
 
-					var vertices = object.geometry.vertices;
-
-					if ( vertices.length === 0 ) continue;
-
-					v1 = getNextVertexInPool();
-					v1.positionScreen.copy( vertices[ 0 ] ).applyMatrix4( _modelViewProjectionMatrix );
-
-					var step = object instanceof LineSegments ? 2 : 1;
-
-					for ( var v = 1, vl = vertices.length; v < vl; v ++ ) {
-
-						v1 = getNextVertexInPool();
-						v1.positionScreen.copy( vertices[ v ] ).applyMatrix4( _modelViewProjectionMatrix );
-
-						if ( ( v + 1 ) % step > 0 ) continue;
-
-						v2 = _vertexPool[ _vertexCount - 2 ];
-
-						_clippedVertex1PositionScreen.copy( v1.positionScreen );
-						_clippedVertex2PositionScreen.copy( v2.positionScreen );
-
-						if ( clipLine( _clippedVertex1PositionScreen, _clippedVertex2PositionScreen ) === true ) {
-
-							// Perform the perspective divide
-							_clippedVertex1PositionScreen.multiplyScalar( 1 / _clippedVertex1PositionScreen.w );
-							_clippedVertex2PositionScreen.multiplyScalar( 1 / _clippedVertex2PositionScreen.w );
-
-							_line = getNextLineInPool();
-
-							_line.id = object.id;
-							_line.v1.positionScreen.copy( _clippedVertex1PositionScreen );
-							_line.v2.positionScreen.copy( _clippedVertex2PositionScreen );
-
-							_line.z = Math.max( _clippedVertex1PositionScreen.z, _clippedVertex2PositionScreen.z );
-							_line.renderOrder = object.renderOrder;
-
-							_line.material = object.material;
-
-							if ( object.material.vertexColors ) {
-
-								_line.vertexColors[ 0 ].copy( object.geometry.colors[ v ] );
-								_line.vertexColors[ 1 ].copy( object.geometry.colors[ v - 1 ] );
-
-							}
-
-							_renderData.elements.push( _line );
-
-						}
-
-					}
+					console.error( 'THREE.Projector no longer supports Geometry. Use THREE.BufferGeometry instead.' );
+					return;
 
 				}
 
-			} else if ( object instanceof Points ) {
+			} else if ( object.isPoints ) {
 
 				_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
 
-				if ( geometry instanceof Geometry ) {
+				if ( geometry.isGeometry ) {
 
-					var vertices = object.geometry.vertices;
+					console.error( 'THREE.Projector no longer supports Geometry. Use THREE.BufferGeometry instead.' );
+					return;
 
-					for ( var v = 0, vl = vertices.length; v < vl; v ++ ) {
-
-						var vertex = vertices[ v ];
-
-						_vector4.set( vertex.x, vertex.y, vertex.z, 1 );
-						_vector4.applyMatrix4( _modelViewProjectionMatrix );
-
-						pushPoint( _vector4, object, camera );
-
-					}
-
-				} else if ( geometry instanceof BufferGeometry ) {
+				} else if ( geometry.isBufferGeometry ) {
 
 					var attributes = geometry.attributes;
 
@@ -901,7 +704,7 @@ var Projector = function () {
 
 				}
 
-			} else if ( object instanceof Sprite ) {
+			} else if ( object.isSprite ) {
 
 				object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 				_vector4.set( _modelMatrix.elements[ 12 ], _modelMatrix.elements[ 13 ], _modelMatrix.elements[ 14 ], 1 );

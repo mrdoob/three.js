@@ -1,7 +1,7 @@
 import { GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension } from './constants.js';
 import { CubeTexture, Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping,
 	RGBFormat, RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, sRGBEncoding
-} from '../../../../build/three.module.js';
+} from 'three';
 import WebGPUTextureUtils from './WebGPUTextureUtils.js';
 
 class WebGPUTextures {
@@ -203,10 +203,10 @@ class WebGPUTextures {
 				size: {
 					width: width,
 					height: height,
-					depth: 1
+					depthOrArrayLayers: 1
 				},
 				format: colorTextureFormat,
-				usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.SAMPLED
+				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.SAMPLED
 			} );
 
 			this.info.memory.textures ++;
@@ -231,10 +231,10 @@ class WebGPUTextures {
 					size: {
 						width: width,
 						height: height,
-						depth: 1
+						depthOrArrayLayers: 1
 					},
 					format: depthTextureFormat,
-					usage: GPUTextureUsage.OUTPUT_ATTACHMENT
+					usage: GPUTextureUsage.RENDER_ATTACHMENT
 				} );
 
 				this.info.memory.textures ++;
@@ -320,9 +320,9 @@ class WebGPUTextures {
 
 		if ( needsMipmaps === true ) {
 
-			// current mipmap generation requires OUTPUT_ATTACHMENT
+			// current mipmap generation requires RENDER_ATTACHMENT
 
-			usage |= GPUTextureUsage.OUTPUT_ATTACHMENT;
+			usage |= GPUTextureUsage.RENDER_ATTACHMENT;
 
 		}
 
@@ -332,7 +332,7 @@ class WebGPUTextures {
 			size: {
 				width: width,
 				height: height,
-				depth: depth,
+				depthOrArrayLayers: depth,
 			},
 			mipLevelCount: mipLevelCount,
 			sampleCount: 1,
@@ -390,7 +390,7 @@ class WebGPUTextures {
 		const bytesPerTexel = this._getBytesPerTexel( format );
 		const bytesPerRow = Math.ceil( image.width * bytesPerTexel / 256 ) * 256;
 
-		this.device.defaultQueue.writeTexture(
+		this.device.queue.writeTexture(
 			{
 				texture: textureGPU,
 				mipLevel: 0
@@ -403,7 +403,7 @@ class WebGPUTextures {
 			{
 				width: image.width,
 				height: image.height,
-				depth: ( image.depth !== undefined ) ? image.depth : 1
+				depthOrArrayLayers: ( image.depth !== undefined ) ? image.depth : 1
 			} );
 
 	}
@@ -426,7 +426,7 @@ class WebGPUTextures {
 
 	_copyImageBitmapToTexture( image, textureGPU, origin = { x: 0, y: 0, z: 0 } ) {
 
-		this.device.defaultQueue.copyImageBitmapToTexture(
+		this.device.queue.copyImageBitmapToTexture(
 			{
 				imageBitmap: image
 			}, {
@@ -436,7 +436,7 @@ class WebGPUTextures {
 			}, {
 				width: image.width,
 				height: image.height,
-				depth: 1
+				depthOrArrayLayers: 1
 			}
 		);
 
@@ -457,7 +457,7 @@ class WebGPUTextures {
 
 			const bytesPerRow = Math.ceil( width / blockData.width ) * blockData.byteLength;
 
-			this.device.defaultQueue.writeTexture(
+			this.device.queue.writeTexture(
 				{
 					texture: textureGPU,
 					mipLevel: i
@@ -470,7 +470,7 @@ class WebGPUTextures {
 				{
 					width: Math.ceil( width / blockData.width ) * blockData.width,
 					height: Math.ceil( height / blockData.width ) * blockData.width,
-					depth: 1,
+					depthOrArrayLayers: 1,
 				} );
 
 		}

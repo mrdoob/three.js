@@ -8,7 +8,7 @@ function NodePass() {
 
 	ShaderPass.call( this );
 
-	this.name = "";
+	this.name = '';
 	this.uuid = MathUtils.generateUUID();
 
 	this.userData = {};
@@ -71,11 +71,11 @@ NodePass.prototype.toJSON = function ( meta ) {
 		var data = {};
 
 		data.uuid = this.uuid;
-		data.type = "NodePass";
+		data.type = 'NodePass';
 
 		meta.passes[ this.uuid ] = data;
 
-		if ( this.name !== "" ) data.name = this.name;
+		if ( this.name !== '' ) data.name = this.name;
 
 		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 

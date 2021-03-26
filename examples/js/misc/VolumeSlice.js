@@ -199,7 +199,7 @@ THREE.VolumeSlice.prototype = {
 
 		if ( this.geometry ) this.geometry.dispose(); // dispose existing geometry
 
-		this.geometry = new THREE.PlaneBufferGeometry( extracted.planeWidth, extracted.planeHeight );
+		this.geometry = new THREE.PlaneGeometry( extracted.planeWidth, extracted.planeHeight );
 
 		if ( this.mesh ) {
 

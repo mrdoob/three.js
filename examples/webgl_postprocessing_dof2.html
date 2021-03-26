@@ -89,7 +89,7 @@
 
 				// plane particles
 
-				const planePiece = new THREE.PlaneBufferGeometry( 10, 10, 1, 1 );
+				const planePiece = new THREE.PlaneGeometry( 10, 10, 1, 1 );
 
 				const planeMat = new THREE.MeshPhongMaterial( {
 					color: 0xffffff * 0.4,
@@ -154,7 +154,7 @@
 
 				// add balls
 
-				const geometry = new THREE.SphereBufferGeometry( 1, 20, 20 );
+				const geometry = new THREE.SphereGeometry( 1, 20, 20 );
 
 				for ( let i = 0; i < 20; i ++ ) {
 
@@ -192,7 +192,7 @@
 				container.appendChild( stats.dom );
 
 				container.style.touchAction = 'none';
-				container.addEventListener( 'pointermove', onPointerMove, false );
+				container.addEventListener( 'pointermove', onPointerMove );
 
 				effectController = {
 
@@ -275,7 +275,7 @@
 
 				matChanger();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -342,7 +342,7 @@
 
 				} );
 
-				postprocessing.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
+				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
 				postprocessing.quad.position.z = - 500;
 				postprocessing.scene.add( postprocessing.quad );
 

@@ -114,6 +114,7 @@ export class LUT3dlLoader extends Loader {
 		texture.format = RGBFormat;
 		texture.type = UnsignedByteType;
 		texture.magFilter = LinearFilter;
+		texture.minFilter = LinearFilter;
 		texture.wrapS = ClampToEdgeWrapping;
 		texture.wrapT = ClampToEdgeWrapping;
 		texture.generateMipmaps = false;
@@ -126,6 +127,7 @@ export class LUT3dlLoader extends Loader {
 		texture3D.format = RGBFormat;
 		texture3D.type = UnsignedByteType;
 		texture3D.magFilter = LinearFilter;
+		texture3D.minFilter = LinearFilter;
 		texture3D.wrapS = ClampToEdgeWrapping;
 		texture3D.wrapT = ClampToEdgeWrapping;
 		texture3D.wrapR = ClampToEdgeWrapping;

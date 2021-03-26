@@ -12,7 +12,7 @@ function ResolutionNode() {
 
 ResolutionNode.prototype = Object.create( Vector2Node.prototype );
 ResolutionNode.prototype.constructor = ResolutionNode;
-ResolutionNode.prototype.nodeType = "Resolution";
+ResolutionNode.prototype.nodeType = 'Resolution';
 
 ResolutionNode.prototype.updateFrame = function ( frame ) {
 
@@ -27,7 +27,7 @@ ResolutionNode.prototype.updateFrame = function ( frame ) {
 
 	} else {
 
-		console.warn( "ResolutionNode need a renderer in NodeFrame" );
+		console.warn( 'ResolutionNode need a renderer in NodeFrame' );
 
 	}
 
