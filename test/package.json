@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "test-deps-intaller",
   "version": "1.0.0",
   "description": "This package hiding test dependincies from main repo because puppeteer is pretty big.",
