@@ -2,7 +2,6 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	Object3D,
-	Quaternion,
 	SphereGeometry,
 } from '../../../build/three.module.js';
 
