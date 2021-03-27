@@ -140,7 +140,7 @@ Object.assign( WebXRController.prototype, {
 					if ( inputPose.linearVelocity != null ) {
 
 						targetRay.hasLinearVelocity = true;
-						targetRay.linearVelocity.set( inputPose.linearVelocity.x, inputPose.linearVelocity.y, inputPose.linearVelocity.z );
+						targetRay.linearVelocity.copy( inputPose.linearVelocity );
 
 					} else {
 
@@ -151,7 +151,7 @@ Object.assign( WebXRController.prototype, {
 					if ( inputPose.angularVelocity != null ) {
 
 						targetRay.hasAngularVelocity = true;
-						targetRay.angularVelocity.set( inputPose.angularVelocity.x, inputPose.angularVelocity.y, inputPose.angularVelocity.z );
+						targetRay.angularVelocity.copy( inputPose.angularVelocity );
 
 					} else {
 
@@ -242,7 +242,7 @@ Object.assign( WebXRController.prototype, {
 						if ( gripPose.linearVelocity != null ) {
 
 							grip.hasLinearVelocity = true;
-							grip.linearVelocity.set( gripPose.linearVelocity.x, gripPose.linearVelocity.y, gripPose.linearVelocity.z );
+							grip.linearVelocity.copy( gripPose.linearVelocity );
 
 						} else {
 
@@ -253,7 +253,7 @@ Object.assign( WebXRController.prototype, {
 						if ( gripPose.angularVelocity != null ) {
 
 							grip.hasAngularVelocity = true;
-							grip.angularVelocity.set( gripPose.angularVelocity.x, gripPose.angularVelocity.y, gripPose.angularVelocity.z );
+							grip.angularVelocity.copy( gripPose.angularVelocity );
 
 						} else {
 
