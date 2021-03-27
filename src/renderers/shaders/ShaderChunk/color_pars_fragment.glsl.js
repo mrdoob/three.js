@@ -1,15 +1,11 @@
 export default /* glsl */`
-#ifdef USE_COLOR
+#if defined( USE_COLOR_ALPHA )
 
-	#if defined( USE_VERTEX_ALPHA )
+	varying vec4 vColor;
 
-		varying vec4 vColor;
+#elif defined( USE_COLOR )
 
-	#else
-
-		varying vec3 vColor;
-
-	#endif
+	varying vec3 vColor;
 
 #endif
 `;

@@ -55,14 +55,12 @@
 		<h3>顶点着色器(有条件的):</h3>
 		<div>
 		<code>
-		#ifdef USE_COLOR
-			#ifdef USE_VERTEX_ALPHA
-				// vertex color attribute with alpha channel
-				attribute vec4 color;
-			#else
-				// vertex color attribute without alpha channel
-				attribute vec3 color;
-			#endif
+		#if defined( USE_COLOR_ALPHA )
+			// vertex color attribute with alpha
+			attribute vec4 color;
+		#elif defined( USE_COLOR )
+			// vertex color attribute
+			attribute vec3 color;
 		#endif
 		</code>
 		<code>
