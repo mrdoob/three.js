@@ -13,7 +13,7 @@ class Quaternion {
 
 	static slerp( qa, qb, qm, t ) {
 
-		console.warn( 'THREE.Quaternion: Static .slerp() has been deprecated. Use is now qm.slerpQuaternions( qa, qb, t ) instead.' );
+		console.warn( 'THREE.Quaternion: Static .slerp() has been deprecated. Use qm.slerpQuaternions( qa, qb, t ) instead.' );
 		return qm.slerpQuaternions( qa, qb, t );
 
 	}
