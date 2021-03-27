@@ -102,7 +102,7 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
 		format: RGBFormat,
-    depthTexture: useDepthTexture ? depthTexture : null,
+		depthTexture: useDepthTexture ? depthTexture : null,
 	};
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
