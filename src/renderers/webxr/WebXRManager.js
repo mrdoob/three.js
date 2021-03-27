@@ -9,6 +9,7 @@ import { WebXRController } from './WebXRController.js';
 function WebXRManager( renderer, gl ) {
 
 	const scope = this;
+	const state = renderer.state;
 
 	let session = null;
 
@@ -119,10 +120,13 @@ function WebXRManager( renderer, gl ) {
 		_currentDepthNear = null;
 		_currentDepthFar = null;
 
+		// restore framebuffer/rendering state
+
+		state.bindXRFramebuffer( null );
+		renderer.setRenderTarget( renderer.getRenderTarget() );
+
 		//
 
-		renderer.setFramebuffer( null );
-		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
 
 		scope.isPresenting = false;
@@ -412,7 +416,7 @@ function WebXRManager( renderer, gl ) {
 			const views = pose.views;
 			const baseLayer = session.renderState.baseLayer;
 
-			renderer.setFramebuffer( baseLayer.framebuffer );
+			state.bindXRFramebuffer( baseLayer.framebuffer );
 
 			let cameraVRNeedsUpdate = false;
 

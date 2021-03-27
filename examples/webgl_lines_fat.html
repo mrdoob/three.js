@@ -97,7 +97,8 @@
 					linewidth: 5, // in pixels
 					vertexColors: true,
 					//resolution:  // to be set by renderer, eventually
-					dashed: false
+					dashed: false,
+					alphaToCoverage: true,
 
 				} );
 
@@ -198,6 +199,7 @@
 				const param = {
 					'line type': 0,
 					'width (px)': 5,
+					'alphaToCoverage': true,
 					'dashed': false,
 					'dash scale': 1,
 					'dash / gap': 1
@@ -228,6 +230,12 @@
 				gui.add( param, 'width (px)', 1, 10 ).onChange( function ( val ) {
 
 					matLine.linewidth = val;
+
+				} );
+
+				gui.add( param, 'alphaToCoverage' ).onChange( function ( val ) { 
+
+					matLine.alphaToCoverage = val;
 
 				} );
 
