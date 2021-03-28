@@ -65,6 +65,23 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 		}
 	} );
 
+	this._fillHole = SSRrShader.defines.FILL_HOLE;
+	Object.defineProperty( this, 'fillHole', {
+		get() {
+
+			return this._fillHole;
+
+		},
+		set( val ) {
+
+			if ( this._fillHole === val ) return;
+			this._fillHole = val;
+			this.ssrrMaterial.defines.FILL_HOLE = val;
+			this.ssrrMaterial.needsUpdate = true;
+
+		}
+	} );
+
 	this._infiniteThick = SSRrShader.defines.INFINITE_THICK;
 	Object.defineProperty( this, 'infiniteThick', {
 		get() {

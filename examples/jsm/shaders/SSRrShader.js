@@ -9,7 +9,8 @@ var SSRrShader = {
 		MAX_STEP: 0,
 		PERSPECTIVE_CAMERA: true,
 		SPECULAR: true,
-    INFINITE_THICK: true,
+    FILL_HOLE: true,
+    INFINITE_THICK: false,
   },
 
   uniforms: {
@@ -113,6 +114,18 @@ var SSRrShader = {
 			xy*=resolution;//screen
 			return xy;
 		}
+		void setResultColor(vec2 uv){
+			vec4 refractColor=texture2D(tDiffuse,uv);
+			#ifdef SPECULAR
+				vec4 specularColor=texture2D(tSpecular,vUv);
+				gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);
+				// gl_FragColor.xyz=refractColor.xyz*(1.+specularColor.r*3.);
+			#else
+				gl_FragColor.xyz=refractColor.xyz;
+			#endif
+			gl_FragColor.a=1.;
+
+		}
 		void main(){
 			if(ior==1.) return; // Adding this line may have better performance, but more importantly, it can avoid display errors at the very edges of the model when IOR is equal to 1.
 
@@ -160,6 +173,10 @@ var SSRrShader = {
 			float totalStep=max(abs(xLen),abs(yLen));
 			float xSpan=xLen/totalStep;
 			float ySpan=yLen/totalStep;
+			#ifdef FILL_HOLE
+				bool isRough=false;
+				vec2 uvRough;
+			#endif
 			for(float i=0.;i<float(MAX_STEP);i++){
 				if(i>=totalStep) break;
 				vec2 xy=vec2(d0.x+i*xSpan,d0.y+i*ySpan);
@@ -182,25 +199,39 @@ var SSRrShader = {
 					float sD=surfDist;
 				#endif
 
-				#ifdef INFINITE_THICK
+				#ifdef FILL_HOLE // TODO: May can improve performance by check if INFINITE_THICK too.
 					if(viewRefractRayZ<=vZ){
+						if(!isRough){
+							uvRough=uv;
+							isRough=true;
+						}
+					}
+				#endif
+
+				bool hit;
+				#ifdef INFINITE_THICK
+					hit=viewRefractRayZ<=vZ;
 				#else
 					if(viewRefractRayZ-sD>vZ) continue;
 					float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
-					if(away<=sD){
+					hit=away<=sD;
 				#endif
-					vec4 refractColor=texture2D(tDiffuse,uv);
-					#ifdef SPECULAR
-						vec4 specularColor=texture2D(tSpecular,vUv);
-						gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);
-						// gl_FragColor.xyz=refractColor.xyz*(1.+specularColor.r*3.);
-					#else
-						gl_FragColor.xyz=refractColor.xyz;
-					#endif
-					gl_FragColor.a=1.;
+				if(hit){
+					setResultColor(uv);
 					return;
 				}
 			}
+
+			#ifdef FILL_HOLE
+				if(isRough){
+					setResultColor(uvRough);
+				}
+				// else{
+				// 	gl_FragColor=texture2D(tDiffuse,vUv);//For afterward add color mix feature.
+				// }
+			#else
+				// gl_FragColor=texture2D(tDiffuse,vUv);//For afterward add color mix feature.
+			#endif
 		}
 	`
 
