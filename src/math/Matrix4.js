@@ -331,9 +331,9 @@ class Matrix4 {
 		_x.normalize();
 		_y.crossVectors( _z, _x );
 
-		te[ 0 ] = _x.x; te[ 4 ] = _y.x; te[ 8 ] = _z.x;
-		te[ 1 ] = _x.y; te[ 5 ] = _y.y; te[ 9 ] = _z.y;
-		te[ 2 ] = _x.z; te[ 6 ] = _y.z; te[ 10 ] = _z.z;
+		te[ 0 ] = _x.x; te[ 4 ] = _x.y; te[ 8 ] = _x.z;
+		te[ 1 ] = _y.x; te[ 5 ] = _y.y; te[ 9 ] = _y.z;
+		te[ 2 ] = _z.x; te[ 6 ] = _z.y; te[ 10 ] = _z.z;
 
 		return this;
 
