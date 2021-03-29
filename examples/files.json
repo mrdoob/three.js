@@ -317,7 +317,8 @@
 		"webgpu_sandbox",
 		"webgpu_rtt",
 		"webgpu_compute",
-		"webgpu_materials"
+		"webgpu_materials",
+		"webgpu_selective_lights"
 	],
 	"webaudio": [
 		"webaudio_orientation",
