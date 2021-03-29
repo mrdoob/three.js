@@ -13,9 +13,16 @@
 			<b style="color:red">Left: Red lights</b> - <b>Center all lights</b> - <b style="color:blue">Right: blue Light</b>
 		</div>
 
+		<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
+		}
+		</script>
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
