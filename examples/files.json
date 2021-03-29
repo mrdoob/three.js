@@ -315,12 +315,11 @@
 	],
 	"webgpu": [
 		"webgpu_compute",
-		"webgpu_materials",
 		"webgpu_instance_uniform",
+		"webgpu_lights_selective",
 		"webgpu_materials",
 		"webgpu_rtt",
-		"webgpu_sandbox",
-		"webgpu_selective_lights
+		"webgpu_sandbox"
 	],
 	"webaudio": [
 		"webaudio_orientation",
