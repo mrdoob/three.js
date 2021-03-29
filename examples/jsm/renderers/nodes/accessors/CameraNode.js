@@ -8,6 +8,7 @@ class CameraNode extends Object3DNode {
 	constructor( scope = CameraNode.POSITION ) {
 
 		super( scope );
+
 	}
 
 	getType( builder ) {

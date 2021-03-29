@@ -61,7 +61,7 @@ class NormalNode extends Node {
 
 			if ( worldNormalNode === undefined ) {
 
-				const vertexNormalNode = inverseTransformDirection.call({dir: new NormalNode( NormalNode.VIEW ), matrix:new CameraNode( CameraNode.VIEW_MATRIX ) } );
+				const vertexNormalNode = inverseTransformDirection.call( { dir: new NormalNode( NormalNode.VIEW ), matrix: new CameraNode( CameraNode.VIEW_MATRIX ) } );
 
 				worldNormalNode = new MathNode( MathNode.NORMALIZE, new VaryNode( vertexNormalNode ) );
 

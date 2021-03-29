@@ -1,4 +1,3 @@
-import CodeNode from './CodeNode.js';
 import VarNode from './VarNode.js';
 import PropertyNode from './PropertyNode.js';
 import PositionNode from '../accessors/PositionNode.js';
@@ -75,7 +74,7 @@ class NodeKeywords {
 
 		if ( node === undefined ) {
 
-			switch( name ) {
+			switch ( name ) {
 
 				case NodeKeywords.PI:
 
@@ -187,7 +186,7 @@ class NodeKeywords {
 
 		const keywordNames = this.keywords;
 
-		const regExp = new RegExp( `\\b${keywordNames.join('\\b|\\b')}\\b`, 'g' )
+		const regExp = new RegExp( `\\b${keywordNames.join( '\\b|\\b' )}\\b`, 'g' );
 
 		const codeKeywords = code.match( regExp );
 
@@ -195,11 +194,11 @@ class NodeKeywords {
 
 		if ( codeKeywords !== null ) {
 
-			for(const keyword of codeKeywords) {
+			for ( const keyword of codeKeywords ) {
 
 				const node = this.getNode( keyword );
 
-				if ( keywords.indexOf( node ) === -1 ) {
+				if ( keywords.indexOf( node ) === - 1 ) {
 
 					keywords.push( node );
 
@@ -217,7 +216,7 @@ class NodeKeywords {
 
 		const keywords = this.parse( code );
 
-		for(const keywordNode of keywords) {
+		for ( const keywordNode of keywords ) {
 
 			keywordNode.build( builder );
 

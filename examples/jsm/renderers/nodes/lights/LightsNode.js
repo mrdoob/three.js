@@ -21,7 +21,7 @@ class LightsNode extends Node {
 
 		}
 
-		return 'vec3( 0.0 )';
+		return builder.format( 'vec3( 0.0 )',  this.getType( builder ), output );
 
 	}
 

@@ -79,7 +79,6 @@ class FunctionNode extends CodeNode {
 			// parser
 
 			const inputs = [];
-			const keywords = [];
 
 			let i = 0;
 

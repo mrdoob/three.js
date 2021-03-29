@@ -1,5 +1,4 @@
 import Node from './Node.js';
-import { NodeShaderStage } from './constants.js';
 
 class PropertyNode extends Node {
 

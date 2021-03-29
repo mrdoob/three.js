@@ -40,7 +40,7 @@ class FunctionCallNode extends Node {
 		const inputs = functionNode.getInputs( builder );
 		const parameters = this.parameters;
 
-		for ( const inputNode of functionNode.inputs ) {
+		for ( const inputNode of inputs ) {
 
 			const node = parameters[ inputNode.name ];
 

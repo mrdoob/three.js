@@ -45,7 +45,7 @@ class PositionNode extends Node {
 
 			if ( worldPositionNode === undefined ) {
 
-				const vertexPositionNode = transformDirection.call( {dir: localPositionNode, matrix: new ModelNode( ModelNode.WORLD_MATRIX ) } );
+				const vertexPositionNode = transformDirection.call( { dir: localPositionNode, matrix: new ModelNode( ModelNode.WORLD_MATRIX ) } );
 
 				worldPositionNode = new VaryNode( vertexPositionNode );
 

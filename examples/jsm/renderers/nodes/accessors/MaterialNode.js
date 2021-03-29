@@ -44,17 +44,16 @@ class MaterialNode extends Node {
 
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
 		const material = builder.getContextParameter( 'material' );
 		const scope = this.scope;
 
 		let node = null;
 
-		if (scope === MaterialNode.COLOR) {
+		if ( scope === MaterialNode.COLOR ) {
 
 			const colorNode = new MaterialReferenceNode( 'color', 'color' );
 
-			if (material.map !== null && material.map !== undefined) {
+			if ( material.map !== null && material.map !== undefined ) {
 
 				node = new OperatorNode( '*', colorNode, new MaterialReferenceNode( 'map', 'texture' ) );
 
@@ -64,11 +63,11 @@ class MaterialNode extends Node {
 
 			}
 
-		} else if (scope === MaterialNode.OPACITY) {
+		} else if ( scope === MaterialNode.OPACITY ) {
 
 			const opacityNode = new MaterialReferenceNode( 'opacity', 'float' );
 
-			if (material.alphaMap !== null && material.alphaMap !== undefined) {
+			if ( material.alphaMap !== null && material.alphaMap !== undefined ) {
 
 				node = new OperatorNode( '*', opacityNode, new MaterialReferenceNode( 'alphaMap', 'texture' ) );
 
@@ -78,11 +77,11 @@ class MaterialNode extends Node {
 
 			}
 
-		} else if (scope === MaterialNode.SPECULAR) {
+		} else if ( scope === MaterialNode.SPECULAR ) {
 
 			const specularColorNode = new MaterialReferenceNode( 'specular', 'color' );
 
-			if (material.specularMap !== null && material.specularMap !== undefined) {
+			if ( material.specularMap !== null && material.specularMap !== undefined ) {
 
 				node = new OperatorNode( '*', specularColorNode, new MaterialReferenceNode( 'specularMap', 'texture' ) );
 
@@ -92,7 +91,7 @@ class MaterialNode extends Node {
 
 			}
 
-		} else if (scope === MaterialNode.SHININESS) {
+		} else if ( scope === MaterialNode.SHININESS ) {
 
 			node = new MaterialReferenceNode( 'shininess', 'float' );
 

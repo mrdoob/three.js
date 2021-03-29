@@ -43,7 +43,7 @@ class MathNode extends Node {
 
 		const method = this.method;
 
-		if (method === MathNode.LENGTH) {
+		if ( method === MathNode.LENGTH ) {
 
 			return 'float';
 

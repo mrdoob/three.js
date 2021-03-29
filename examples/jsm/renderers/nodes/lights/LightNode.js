@@ -66,7 +66,7 @@ class LightNode extends Node {
 
 		const indirectDiffuseFunctionCallNode = indirectDiffuseFunctionNode.call( {
 			lightDirection: this.lightDirection,
-			lightColor: this.lightColor,
+			lightColor: this.lightColor
 		} );
 
 		builder.addFlowCode( directFunctionCallNode.build( builder ) );
