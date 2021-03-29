@@ -413,7 +413,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		this.vertexShader = this.composeShaderCode( this.nativeShader.vertexShader, this.vertexShader );
 		this.fragmentShader = this.composeShaderCode( this.nativeShader.fragmentShader, this.fragmentShader );
-		console.log( this.fragmentShader );
+
 		return this;
 
 	}

@@ -29,7 +29,7 @@
 
 			let camera, scene, renderer,
 				light1, light2, light3, light4,
-				object, stats, controls;
+				stats, controls;
 
 			const clock = new THREE.Clock();
 
@@ -46,7 +46,7 @@
 				}
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.z = 100;
+				camera.position.z = 70;
 
 				scene = new THREE.Scene();
 
@@ -78,11 +78,11 @@
 
 				//models
 
-				const geometryTeapot = new TeapotGeometry( 15, 18 );
+				const geometryTeapot = new TeapotGeometry( 8, 18 );
 
 				const leftObject = new THREE.Mesh( geometryTeapot, new THREE.MeshPhongMaterial( { color: 0x555555 } ) );
 				leftObject.material.lightNode = redLightNode;
-				leftObject.position.x = - 50;
+				leftObject.position.x = - 30;
 				scene.add( leftObject );
 
 				const centerObject = new THREE.Mesh( geometryTeapot, new THREE.MeshPhongMaterial( { color: 0x555555 } ) );
@@ -91,8 +91,10 @@
 
 				const rightObject = new THREE.Mesh( geometryTeapot, new THREE.MeshPhongMaterial( { color: 0x555555 } ) );
 				rightObject.material.lightNode = blueLightNode;
-				rightObject.position.x = 50;
+				rightObject.position.x = 30;
 				scene.add( rightObject );
+
+				leftObject.material.shininess = centerObject.material.shininess = rightObject.material.shininess = 70;
 
 				leftObject.rotation.y = centerObject.rotation.y = rightObject.rotation.y = Math.PI * - 0.5;
 				leftObject.position.y = centerObject.position.y = rightObject.position.y =  - 10;
@@ -143,8 +145,6 @@
 
 				const time = Date.now() * 0.0005;
 				const delta = clock.getDelta();
-
-				if ( object ) object.rotation.y -= 0.5 * delta;
 
 				light1.position.x = Math.sin( time * 0.7 ) * 30;
 				light1.position.y = Math.cos( time * 0.5 ) * 40;
