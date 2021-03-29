@@ -53,7 +53,7 @@ THREE.ShadowMapViewer = function ( light ) {
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader
 	} );
-	var plane = new THREE.PlaneBufferGeometry( frame.width, frame.height );
+	var plane = new THREE.PlaneGeometry( frame.width, frame.height );
 	var mesh = new THREE.Mesh( plane, material );
 
 	scene.add( mesh );
@@ -85,7 +85,7 @@ THREE.ShadowMapViewer = function ( light ) {
 		var labelMaterial = new THREE.MeshBasicMaterial( { map: labelTexture, side: THREE.DoubleSide } );
 		labelMaterial.transparent = true;
 
-		var labelPlane = new THREE.PlaneBufferGeometry( labelCanvas.width, labelCanvas.height );
+		var labelPlane = new THREE.PlaneGeometry( labelCanvas.width, labelCanvas.height );
 		labelMesh = new THREE.Mesh( labelPlane, labelMaterial );
 
 		scene.add( labelMesh );

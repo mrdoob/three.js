@@ -66,7 +66,7 @@
 
 				for ( let i = 1; i <= 30; i += 2 ) {
 
-					const geometry = new THREE.SphereBufferGeometry( i / 30, 48, 24 );
+					const geometry = new THREE.SphereGeometry( i / 30, 48, 24 );
 
 					const material = new THREE.MeshLambertMaterial( {
 
@@ -132,7 +132,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

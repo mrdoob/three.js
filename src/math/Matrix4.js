@@ -4,8 +4,6 @@ class Matrix4 {
 
 	constructor() {
 
-		Object.defineProperty( this, 'isMatrix4', { value: true } );
-
 		this.elements = [
 
 			1, 0, 0, 0,
@@ -78,6 +76,23 @@ class Matrix4 {
 		te[ 12 ] = me[ 12 ];
 		te[ 13 ] = me[ 13 ];
 		te[ 14 ] = me[ 14 ];
+
+		return this;
+
+	}
+
+	setFromMatrix3( m ) {
+
+		const me = m.elements;
+
+		this.set(
+
+			me[ 0 ], me[ 3 ], me[ 6 ], 0,
+			me[ 1 ], me[ 4 ], me[ 7 ], 0,
+			me[ 2 ], me[ 5 ], me[ 8 ], 0,
+			0, 0, 0, 1
+
+		);
 
 		return this;
 
@@ -483,22 +498,15 @@ class Matrix4 {
 
 	}
 
-	getInverse( m, throwOnDegenerate ) {
-
-		if ( throwOnDegenerate !== undefined ) {
-
-			console.warn( "THREE.Matrix4: .getInverse() can no longer be configured to throw on degenerate." );
-
-		}
+	invert() {
 
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
 		const te = this.elements,
-			me = m.elements,
 
-			n11 = me[ 0 ], n21 = me[ 1 ], n31 = me[ 2 ], n41 = me[ 3 ],
-			n12 = me[ 4 ], n22 = me[ 5 ], n32 = me[ 6 ], n42 = me[ 7 ],
-			n13 = me[ 8 ], n23 = me[ 9 ], n33 = me[ 10 ], n43 = me[ 11 ],
-			n14 = me[ 12 ], n24 = me[ 13 ], n34 = me[ 14 ], n44 = me[ 15 ],
+			n11 = te[ 0 ], n21 = te[ 1 ], n31 = te[ 2 ], n41 = te[ 3 ],
+			n12 = te[ 4 ], n22 = te[ 5 ], n32 = te[ 6 ], n42 = te[ 7 ],
+			n13 = te[ 8 ], n23 = te[ 9 ], n33 = te[ 10 ], n43 = te[ 11 ],
+			n14 = te[ 12 ], n24 = te[ 13 ], n34 = te[ 14 ], n44 = te[ 15 ],
 
 			t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44,
 			t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44,
@@ -863,6 +871,8 @@ class Matrix4 {
 	}
 
 }
+
+Matrix4.prototype.isMatrix4 = true;
 
 const _v1 = /*@__PURE__*/ new Vector3();
 const _m1 = /*@__PURE__*/ new Matrix4();

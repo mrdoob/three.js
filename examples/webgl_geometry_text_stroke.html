@@ -61,7 +61,7 @@
 
 					const shapes = font.generateShapes( message, 100 );
 
-					const geometry = new THREE.ShapeBufferGeometry( shapes );
+					const geometry = new THREE.ShapeGeometry( shapes );
 
 					geometry.computeBoundingBox();
 
@@ -130,7 +130,7 @@
 				controls.target.set( 0, 0, 0 );
 				controls.update();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			} // end init
 

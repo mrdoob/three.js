@@ -82,21 +82,21 @@
 					reflectivity: 1
 				} );
 
-				sphere = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 20, 8 ), material );
+				sphere = new THREE.Mesh( new THREE.IcosahedronGeometry( 20, 8 ), material );
 				scene.add( sphere );
 
-				cube = new THREE.Mesh( new THREE.BoxBufferGeometry( 20, 20, 20 ), material );
+				cube = new THREE.Mesh( new THREE.BoxGeometry( 20, 20, 20 ), material );
 				scene.add( cube );
 
-				torus = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 10, 5, 128, 16 ), material );
+				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 10, 5, 128, 16 ), material );
 				scene.add( torus );
 
 				//
 
-				document.addEventListener( 'pointerdown', onPointerDown, false );
-				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+				document.addEventListener( 'pointerdown', onPointerDown );
+				document.addEventListener( 'wheel', onDocumentMouseWheel );
 
-				window.addEventListener( 'resize', onWindowResized, false );
+				window.addEventListener( 'resize', onWindowResized );
 
 			}
 
@@ -119,8 +119,8 @@
 				onPointerDownLon = lon;
 				onPointerDownLat = lat;
 
-				document.addEventListener( 'pointermove', onPointerMove, false );
-				document.addEventListener( 'pointerup', onPointerUp, false );
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerup', onPointerUp );
 
 			}
 
@@ -133,8 +133,8 @@
 
 			function onPointerUp() {
 
-				document.removeEventListener( 'pointermove', onPointerMove, false );
-				document.removeEventListener( 'pointerup', onPointerUp, false );
+				document.removeEventListener( 'pointermove', onPointerMove );
+				document.removeEventListener( 'pointerup', onPointerUp );
 
 			}
 

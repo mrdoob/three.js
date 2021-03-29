@@ -1,14 +1,17 @@
 import {
+	Box2,
 	BufferGeometry,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
 	Matrix3,
 	Path,
+	Shape,
 	ShapePath,
+	ShapeUtils,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var SVGLoader = function ( manager ) {
 
@@ -18,7 +21,7 @@ var SVGLoader = function ( manager ) {
 	this.defaultDPI = 90;
 
 	// Accepted units: 'mm', 'cm', 'in', 'pt', 'pc', 'px'
-	this.defaultUnit = "px";
+	this.defaultUnit = 'px';
 
 };
 
@@ -136,7 +139,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					} else {
 
-						console.warn( "SVGLoader: 'use node' references non-existent node id: " + usedNodeId );
+						console.warn( 'SVGLoader: \'use node\' references non-existent node id: ' + usedNodeId );
 
 					}
 
@@ -395,9 +398,12 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						break;
 
 					case 'A':
-						var numbers = parseFloats( data );
+						var numbers = parseFloats( data, [ 3, 4 ], 7 );
 
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
+
+							// skip command if start point == end point
+							if ( numbers[ j + 5 ] == point.x && numbers[ j + 6 ] == point.y ) continue;
 
 							var start = point.clone();
 							point.x = numbers[ j + 5 ];
@@ -584,9 +590,12 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						break;
 
 					case 'a':
-						var numbers = parseFloats( data );
+						var numbers = parseFloats( data, [ 3, 4 ], 7 );
 
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
+
+							// skip command if no displacement
+							if ( numbers[ j + 5 ] == 0 && numbers[ j + 6 ] == 0 ) continue;
 
 							var start = point.clone();
 							point.x += numbers[ j + 5 ];
@@ -671,6 +680,14 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		 */
 
 		function parseArcCommand( path, rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, start, end ) {
+
+			if ( rx == 0 || ry == 0 ) {
+
+				// draw a line if either of the radii == 0
+				path.lineTo( end.x, end.y );
+				return;
+
+			}
 
 			x_axis_rotation = x_axis_rotation * Math.PI / 180;
 
@@ -844,9 +861,9 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function parseCircleNode( node ) {
 
-			var x = parseFloatWithUnits( node.getAttribute( 'cx' ) );
-			var y = parseFloatWithUnits( node.getAttribute( 'cy' ) );
-			var r = parseFloatWithUnits( node.getAttribute( 'r' ) );
+			var x = parseFloatWithUnits( node.getAttribute( 'cx' ) || 0 );
+			var y = parseFloatWithUnits( node.getAttribute( 'cy' ) || 0 );
+			var r = parseFloatWithUnits( node.getAttribute( 'r' ) || 0 );
 
 			var subpath = new Path();
 			subpath.absarc( x, y, r, 0, Math.PI * 2 );
@@ -860,10 +877,10 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function parseEllipseNode( node ) {
 
-			var x = parseFloatWithUnits( node.getAttribute( 'cx' ) );
-			var y = parseFloatWithUnits( node.getAttribute( 'cy' ) );
-			var rx = parseFloatWithUnits( node.getAttribute( 'rx' ) );
-			var ry = parseFloatWithUnits( node.getAttribute( 'ry' ) );
+			var x = parseFloatWithUnits( node.getAttribute( 'cx' ) || 0 );
+			var y = parseFloatWithUnits( node.getAttribute( 'cy' ) || 0 );
+			var rx = parseFloatWithUnits( node.getAttribute( 'rx' ) || 0 );
+			var ry = parseFloatWithUnits( node.getAttribute( 'ry' ) || 0 );
 
 			var subpath = new Path();
 			subpath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
@@ -877,10 +894,10 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function parseLineNode( node ) {
 
-			var x1 = parseFloatWithUnits( node.getAttribute( 'x1' ) );
-			var y1 = parseFloatWithUnits( node.getAttribute( 'y1' ) );
-			var x2 = parseFloatWithUnits( node.getAttribute( 'x2' ) );
-			var y2 = parseFloatWithUnits( node.getAttribute( 'y2' ) );
+			var x1 = parseFloatWithUnits( node.getAttribute( 'x1' ) || 0 );
+			var y1 = parseFloatWithUnits( node.getAttribute( 'y1' ) || 0 );
+			var x2 = parseFloatWithUnits( node.getAttribute( 'x2' ) || 0 );
+			var y2 = parseFloatWithUnits( node.getAttribute( 'y2' ) || 0 );
 
 			var path = new ShapePath();
 			path.moveTo( x1, y1 );
@@ -924,7 +941,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				if ( adjustFunction === undefined ) adjustFunction = function copy( v ) {
 
-					if ( v.startsWith( 'url' ) ) console.warn( "SVGLoader: url access in attributes is not implemented." );
+					if ( v.startsWith( 'url' ) ) console.warn( 'SVGLoader: url access in attributes is not implemented.' );
 
 					return v;
 
@@ -971,35 +988,246 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function parseFloats( string ) {
+		// from https://github.com/ppvg/svg-numbers (MIT License)
 
-			var array = string.split( /[\s,]+|(?=\s?[+\-])/ );
+		function parseFloats( input, flags, stride ) {
 
-			for ( var i = 0; i < array.length; i ++ ) {
+			if ( typeof input !== 'string' ) {
 
-				var number = array[ i ];
+				throw new TypeError( 'Invalid input: ' + typeof input );
 
-				// Handle values like 48.6037.7.8
-				// TODO Find a regex for this
+			}
 
-				if ( number.indexOf( '.' ) !== number.lastIndexOf( '.' ) ) {
+			// Character groups
+			var RE = {
+				SEPARATOR: /[ \t\r\n\,.\-+]/,
+				WHITESPACE: /[ \t\r\n]/,
+				DIGIT: /[\d]/,
+				SIGN: /[-+]/,
+				POINT: /\./,
+				COMMA: /,/,
+				EXP: /e/i,
+				FLAGS: /[01]/
+			};
 
-					var split = number.split( '.' );
+			// States
+			var SEP = 0;
+			var INT = 1;
+			var FLOAT = 2;
+			var EXP = 3;
 
-					for ( var s = 2; s < split.length; s ++ ) {
+			var state = SEP;
+			var seenComma = true;
+			var result = [], number = '', exponent = '';
 
-						array.splice( i + s - 1, 0, '0.' + split[ s ] );
+			function throwSyntaxError( current, i, partial ) {
+
+				var error = new SyntaxError( 'Unexpected character "' + current + '" at index ' + i + '.' );
+				error.partial = partial;
+				throw error;
+
+			}
+
+			function newNumber() {
+
+				if ( number !== '' ) {
+
+					if ( exponent === '' ) result.push( Number( number ) );
+					else result.push( Number( number ) * Math.pow( 10, Number( exponent ) ) );
+
+				}
+
+				number = '';
+				exponent = '';
+
+			}
+
+			var current, i = 0, length = input.length;
+			for ( i = 0; i < length; i ++ ) {
+
+				current = input[ i ];
+
+				// check for flags
+				if ( Array.isArray( flags ) && flags.includes( result.length % stride ) && RE.FLAGS.test( current ) ) {
+
+					state = INT;
+					number = current;
+					newNumber();
+					continue;
+
+				}
+
+				// parse until next number
+				if ( state === SEP ) {
+
+					// eat whitespace
+					if ( RE.WHITESPACE.test( current ) ) {
+
+						continue;
+
+					}
+
+					// start new number
+					if ( RE.DIGIT.test( current ) || RE.SIGN.test( current ) ) {
+
+						state = INT;
+						number = current;
+						continue;
+
+					}
+
+					if ( RE.POINT.test( current ) ) {
+
+						state = FLOAT;
+						number = current;
+						continue;
+
+					}
+
+					// throw on double commas (e.g. "1, , 2")
+					if ( RE.COMMA.test( current ) ) {
+
+						if ( seenComma ) {
+
+							throwSyntaxError( current, i, result );
+
+						}
+
+						seenComma = true;
 
 					}
 
 				}
 
-				array[ i ] = parseFloatWithUnits( number );
+				// parse integer part
+				if ( state === INT ) {
+
+					if ( RE.DIGIT.test( current ) ) {
+
+						number += current;
+						continue;
+
+					}
+
+					if ( RE.POINT.test( current ) ) {
+
+						number += current;
+						state = FLOAT;
+						continue;
+
+					}
+
+					if ( RE.EXP.test( current ) ) {
+
+						state = EXP;
+						continue;
+
+					}
+
+					// throw on double signs ("-+1"), but not on sign as separator ("-1-2")
+					if ( RE.SIGN.test( current )
+							&& number.length === 1
+							&& RE.SIGN.test( number[ 0 ] ) ) {
+
+						throwSyntaxError( current, i, result );
+
+					}
+
+				}
+
+				// parse decimal part
+				if ( state === FLOAT ) {
+
+					if ( RE.DIGIT.test( current ) ) {
+
+						number += current;
+						continue;
+
+					}
+
+					if ( RE.EXP.test( current ) ) {
+
+						state = EXP;
+						continue;
+
+					}
+
+					// throw on double decimal points (e.g. "1..2")
+					if ( RE.POINT.test( current ) && number[ number.length - 1 ] === '.' ) {
+
+						throwSyntaxError( current, i, result );
+
+					}
+
+				}
+
+				// parse exponent part
+				if ( state === EXP ) {
+
+					if ( RE.DIGIT.test( current ) ) {
+
+						exponent += current;
+						continue;
+
+					}
+
+					if ( RE.SIGN.test( current ) ) {
+
+						if ( exponent === '' ) {
+
+							exponent += current;
+							continue;
+
+						}
+
+						if ( exponent.length === 1 && RE.SIGN.test( exponent ) ) {
+
+							throwSyntaxError( current, i, result );
+
+						}
+
+					}
+
+				}
+
+
+				// end of number
+				if ( RE.WHITESPACE.test( current ) ) {
+
+					newNumber();
+					state = SEP;
+					seenComma = false;
+
+				} else if ( RE.COMMA.test( current ) ) {
+
+					newNumber();
+					state = SEP;
+					seenComma = true;
+
+				} else if ( RE.SIGN.test( current ) ) {
+
+					newNumber();
+					state = INT;
+					number = current;
+
+				} else if ( RE.POINT.test( current ) ) {
+
+					newNumber();
+					state = FLOAT;
+					number = current;
+
+				} else {
+
+					throwSyntaxError( current, i, result );
+
+				}
 
 			}
 
-			return array;
+			// add the last number found (if any)
+			newNumber();
 
+			return result;
 
 		}
 
@@ -1010,55 +1238,55 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		// Conversion: [ fromUnit ][ toUnit ] (-1 means dpi dependent)
 		var unitConversion = {
 
-			"mm": {
-				"mm": 1,
-				"cm": 0.1,
-				"in": 1 / 25.4,
-				"pt": 72 / 25.4,
-				"pc": 6 / 25.4,
-				"px": - 1
+			'mm': {
+				'mm': 1,
+				'cm': 0.1,
+				'in': 1 / 25.4,
+				'pt': 72 / 25.4,
+				'pc': 6 / 25.4,
+				'px': - 1
 			},
-			"cm": {
-				"mm": 10,
-				"cm": 1,
-				"in": 1 / 2.54,
-				"pt": 72 / 2.54,
-				"pc": 6 / 2.54,
-				"px": - 1
+			'cm': {
+				'mm': 10,
+				'cm': 1,
+				'in': 1 / 2.54,
+				'pt': 72 / 2.54,
+				'pc': 6 / 2.54,
+				'px': - 1
 			},
-			"in": {
-				"mm": 25.4,
-				"cm": 2.54,
-				"in": 1,
-				"pt": 72,
-				"pc": 6,
-				"px": - 1
+			'in': {
+				'mm': 25.4,
+				'cm': 2.54,
+				'in': 1,
+				'pt': 72,
+				'pc': 6,
+				'px': - 1
 			},
-			"pt": {
-				"mm": 25.4 / 72,
-				"cm": 2.54 / 72,
-				"in": 1 / 72,
-				"pt": 1,
-				"pc": 6 / 72,
-				"px": - 1
+			'pt': {
+				'mm': 25.4 / 72,
+				'cm': 2.54 / 72,
+				'in': 1 / 72,
+				'pt': 1,
+				'pc': 6 / 72,
+				'px': - 1
 			},
-			"pc": {
-				"mm": 25.4 / 6,
-				"cm": 2.54 / 6,
-				"in": 1 / 6,
-				"pt": 72 / 6,
-				"pc": 1,
-				"px": - 1
+			'pc': {
+				'mm': 25.4 / 6,
+				'cm': 2.54 / 6,
+				'in': 1 / 6,
+				'pt': 72 / 6,
+				'pc': 1,
+				'px': - 1
 			},
-			"px": {
-				"px": 1
+			'px': {
+				'px': 1
 			}
 
 		};
 
 		function parseFloatWithUnits( string ) {
 
-			var theUnit = "px";
+			var theUnit = 'px';
 
 			if ( typeof string === 'string' || string instanceof String ) {
 
@@ -1080,11 +1308,11 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var scale = undefined;
 
-			if ( theUnit === "px" && scope.defaultUnit !== "px" ) {
+			if ( theUnit === 'px' && scope.defaultUnit !== 'px' ) {
 
 				// Conversion scale from  pixels to inches, then to default units
 
-				scale = unitConversion[ "in" ][ scope.defaultUnit ] / scope.defaultDPI;
+				scale = unitConversion[ 'in' ][ scope.defaultUnit ] / scope.defaultDPI;
 
 			} else {
 
@@ -1094,7 +1322,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					// Conversion scale to pixels
 
-					scale = unitConversion[ theUnit ][ "in" ] * scope.defaultDPI;
+					scale = unitConversion[ theUnit ][ 'in' ] * scope.defaultDPI;
 
 				}
 
@@ -1166,7 +1394,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 						switch ( transformType ) {
 
-							case "translate":
+							case 'translate':
 
 								if ( array.length >= 1 ) {
 
@@ -1185,7 +1413,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 								break;
 
-							case "rotate":
+							case 'rotate':
 
 								if ( array.length >= 1 ) {
 
@@ -1215,7 +1443,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 								break;
 
-							case "scale":
+							case 'scale':
 
 								if ( array.length >= 1 ) {
 
@@ -1234,7 +1462,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 								break;
 
-							case "skewX":
+							case 'skewX':
 
 								if ( array.length === 1 ) {
 
@@ -1248,7 +1476,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 								break;
 
-							case "skewY":
+							case 'skewY':
 
 								if ( array.length === 1 ) {
 
@@ -1262,7 +1490,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 								break;
 
-							case "matrix":
+							case 'matrix':
 
 								if ( array.length === 6 ) {
 
@@ -1335,7 +1563,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 						if ( isRotated ) {
 
-							console.warn( "SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented." );
+							console.warn( 'SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented.' );
 
 						}
 
@@ -1411,6 +1639,443 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	}
 
 } );
+
+SVGLoader.createShapes = function ( shapePath ) {
+
+	// Param shapePath: a shapepath as returned by the parse function of this class
+	// Returns Shape object
+
+	const BIGNUMBER = 999999999;
+
+	const IntersectionLocationType = {
+		ORIGIN: 0,
+		DESTINATION: 1,
+		BETWEEN: 2,
+		LEFT: 3,
+		RIGHT: 4,
+		BEHIND: 5,
+		BEYOND: 6
+	};
+
+	const classifyResult = {
+		loc: IntersectionLocationType.ORIGIN,
+		t: 0
+	};
+
+	function findEdgeIntersection( a0, a1, b0, b1 ) {
+
+		var x1 = a0.x;
+		var x2 = a1.x;
+		var x3 = b0.x;
+		var x4 = b1.x;
+		var y1 = a0.y;
+		var y2 = a1.y;
+		var y3 = b0.y;
+		var y4 = b1.y;
+		var nom1 = ( x4 - x3 ) * ( y1 - y3 ) - ( y4 - y3 ) * ( x1 - x3 );
+		var nom2 = ( x2 - x1 ) * ( y1 - y3 ) - ( y2 - y1 ) * ( x1 - x3 );
+		var denom = ( y4 - y3 ) * ( x2 - x1 ) - ( x4 - x3 ) * ( y2 - y1 );
+		var t1 = nom1 / denom;
+		var t2 = nom2 / denom;
+
+		if ( ( ( denom === 0 ) && ( nom1 !== 0 ) ) || ( t1 <= 0 ) || ( t1 >= 1 ) || ( t2 < 0 ) || ( t2 > 1 ) ) {
+
+			//1. lines are parallel or edges don't intersect
+
+			return null;
+
+		} else if ( ( nom1 === 0 ) && ( denom === 0 ) ) {
+
+			//2. lines are colinear
+
+			//check if endpoints of edge2 (b0-b1) lies on edge1 (a0-a1)
+			for ( var i = 0; i < 2; i ++ ) {
+
+				classifyPoint( i === 0 ? b0 : b1, a0, a1 );
+				//find position of this endpoints relatively to edge1
+				if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
+
+					var point = ( i === 0 ? b0 : b1 );
+					return { x: point.x, y: point.y, t: classifyResult.t };
+
+				} else if ( classifyResult.loc == IntersectionLocationType.BETWEEN ) {
+
+					var x = + ( ( x1 + classifyResult.t * ( x2 - x1 ) ).toPrecision( 10 ) );
+					var y = + ( ( y1 + classifyResult.t * ( y2 - y1 ) ).toPrecision( 10 ) );
+					return { x: x, y: y, t: classifyResult.t, };
+
+				}
+
+			}
+
+			return null;
+
+		} else {
+
+			//3. edges intersect
+
+			for ( var i = 0; i < 2; i ++ ) {
+
+				classifyPoint( i === 0 ? b0 : b1, a0, a1 );
+
+				if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
+
+					var point = ( i === 0 ? b0 : b1 );
+					return { x: point.x, y: point.y, t: classifyResult.t };
+
+				}
+
+			}
+
+			var x = + ( ( x1 + t1 * ( x2 - x1 ) ).toPrecision( 10 ) );
+			var y = + ( ( y1 + t1 * ( y2 - y1 ) ).toPrecision( 10 ) );
+			return { x: x, y: y, t: t1 };
+
+		}
+
+	}
+
+	function classifyPoint( p, edgeStart, edgeEnd ) {
+
+		var ax = edgeEnd.x - edgeStart.x;
+		var ay = edgeEnd.y - edgeStart.y;
+		var bx = p.x - edgeStart.x;
+		var by = p.y - edgeStart.y;
+		var sa = ax * by - bx * ay;
+
+		if ( ( p.x === edgeStart.x ) && ( p.y === edgeStart.y ) ) {
+
+			classifyResult.loc = IntersectionLocationType.ORIGIN;
+			classifyResult.t = 0;
+			return;
+
+		}
+
+		if ( ( p.x === edgeEnd.x ) && ( p.y === edgeEnd.y ) ) {
+
+			classifyResult.loc = IntersectionLocationType.DESTINATION;
+			classifyResult.t = 1;
+			return;
+
+		}
+
+		if ( sa < - Number.EPSILON ) {
+
+			classifyResult.loc = IntersectionLocationType.LEFT;
+			return;
+
+		}
+
+		if ( sa > Number.EPSILON ) {
+
+			classifyResult.loc = IntersectionLocationType.RIGHT;
+			return;
+
+
+		}
+
+		if ( ( ( ax * bx ) < 0 ) || ( ( ay * by ) < 0 ) ) {
+
+			classifyResult.loc = IntersectionLocationType.BEHIND;
+			return;
+
+		}
+
+		if ( ( Math.sqrt( ax * ax + ay * ay ) ) < ( Math.sqrt( bx * bx + by * by ) ) ) {
+
+			classifyResult.loc = IntersectionLocationType.BEYOND;
+			return;
+
+		}
+
+		var t;
+
+		if ( ax !== 0 ) {
+
+			t = bx / ax;
+
+		} else {
+
+			t = by / ay;
+
+		}
+
+		classifyResult.loc = IntersectionLocationType.BETWEEN;
+		classifyResult.t = t;
+
+	}
+
+	function getIntersections( path1, path2 ) {
+
+		const intersectionsRaw = [];
+		const intersections = [];
+
+		for ( let index = 1; index < path1.length; index ++ ) {
+
+			const path1EdgeStart = path1[ index - 1 ];
+			const path1EdgeEnd = path1[ index ];
+
+			for ( let index2 = 1; index2 < path2.length; index2 ++ ) {
+
+				const path2EdgeStart = path2[ index2 - 1 ];
+				const path2EdgeEnd = path2[ index2 ];
+
+				const intersection = findEdgeIntersection( path1EdgeStart, path1EdgeEnd, path2EdgeStart, path2EdgeEnd );
+
+				if ( intersection !== null && intersectionsRaw.find( i => i.t <= intersection.t + Number.EPSILON && i.t >= intersection.t - Number.EPSILON ) === undefined ) {
+
+					intersectionsRaw.push( intersection );
+					intersections.push( new Vector2( intersection.x, intersection.y ) );
+
+				}
+
+			}
+
+		}
+
+		return intersections;
+
+	}
+
+	function getScanlineIntersections( scanline, boundingBox, paths ) {
+
+		const center = new Vector2();
+		boundingBox.getCenter( center );
+
+		const allIntersections = [];
+
+		paths.forEach( path => {
+
+			// check if the center of the bounding box is in the bounding box of the paths.
+			// this is a pruning method to limit the search of intersections in paths that can't envelop of the current path.
+			// if a path envelops another path. The center of that oter path, has to be inside the bounding box of the enveloping path.
+			if ( path.boundingBox.containsPoint( center ) ) {
+
+				const intersections = getIntersections( scanline, path.points );
+
+				intersections.forEach( p => {
+
+					allIntersections.push( { identifier: path.identifier, isCW: path.isCW, point: p } );
+
+				} );
+
+			}
+
+		} );
+
+		allIntersections.sort( ( i1, i2 ) => {
+
+			return i1.point.x - i2.point.x;
+
+		} );
+
+		return allIntersections;
+
+	}
+
+	function isHoleTo( simplePath, allPaths, scanlineMinX, scanlineMaxX, _fillRule ) {
+
+		if ( _fillRule === null || _fillRule === undefined || _fillRule === '' ) {
+
+			_fillRule = 'nonzero';
+
+		}
+
+		const centerBoundingBox = new Vector2();
+		simplePath.boundingBox.getCenter( centerBoundingBox );
+
+		const scanline = [ new Vector2( scanlineMinX, centerBoundingBox.y ), new Vector2( scanlineMaxX, centerBoundingBox.y ) ];
+
+		const scanlineIntersections = getScanlineIntersections( scanline, simplePath.boundingBox, allPaths );
+
+		scanlineIntersections.sort( ( i1, i2 ) => {
+
+			return i1.point.x - i2.point.x;
+
+		} );
+
+		const baseIntersections = [];
+		const otherIntersections = [];
+
+		scanlineIntersections.forEach( i => {
+
+			if ( i.identifier === simplePath.identifier ) {
+
+				baseIntersections.push( i );
+
+			} else {
+
+				otherIntersections.push( i );
+
+			}
+
+		} );
+
+		const firstXOfPath = baseIntersections[ 0 ].point.x;
+
+		// build up the path hierarchy
+		const stack = [];
+		let i = 0;
+
+		while ( i < otherIntersections.length && otherIntersections[ i ].point.x < firstXOfPath ) {
+
+			if ( stack.length > 0 && stack[ stack.length - 1 ] === otherIntersections[ i ].identifier ) {
+
+				stack.pop();
+
+			} else {
+
+				stack.push( otherIntersections[ i ].identifier );
+
+			}
+
+			i ++;
+
+		}
+
+		stack.push( simplePath.identifier );
+
+		if ( _fillRule === 'evenodd' ) {
+
+			const isHole = stack.length % 2 === 0 ? true : false;
+			const isHoleFor = stack[ stack.length - 2 ];
+
+			return { identifier: simplePath.identifier, isHole: isHole, for: isHoleFor };
+
+		} else if ( _fillRule === 'nonzero' ) {
+
+			// check if path is a hole by counting the amount of paths with alternating rotations it has to cross.
+			let isHole = true;
+			let isHoleFor = null;
+			let lastCWValue = null;
+
+			for ( let i = 0; i < stack.length; i ++ ) {
+
+				const identifier = stack[ i ];
+				if ( isHole ) {
+
+					lastCWValue = allPaths[ identifier ].isCW;
+					isHole = false;
+					isHoleFor = identifier;
+
+				} else if ( lastCWValue !== allPaths[ identifier ].isCW ) {
+
+					lastCWValue = allPaths[ identifier ].isCW;
+					isHole = true;
+
+				}
+
+			}
+
+			return { identifier: simplePath.identifier, isHole: isHole, for: isHoleFor };
+
+		} else {
+
+			console.warn( 'fill-rule: "' + _fillRule + '" is currently not implemented.' );
+
+		}
+
+	}
+
+	// check for self intersecting paths
+	// TODO
+
+	// check intersecting paths
+	// TODO
+
+	// prepare paths for hole detection
+	let identifier = 0;
+
+	let scanlineMinX = BIGNUMBER;
+	let scanlineMaxX = - BIGNUMBER;
+
+	let simplePaths = shapePath.subPaths.map( p => {
+
+		const points = p.getPoints();
+		let maxY = - BIGNUMBER;
+		let minY = BIGNUMBER;
+		let maxX = - BIGNUMBER;
+		let minX = BIGNUMBER;
+
+      	//points.forEach(p => p.y *= -1);
+
+		for ( let i = 0; i < points.length; i ++ ) {
+
+			const p = points[ i ];
+
+			if ( p.y > maxY ) {
+
+				maxY = p.y;
+
+			}
+
+			if ( p.y < minY ) {
+
+				minY = p.y;
+
+			}
+
+			if ( p.x > maxX ) {
+
+				maxX = p.x;
+
+			}
+
+			if ( p.x < minX ) {
+
+				minX = p.x;
+
+			}
+
+		}
+
+		//
+		if ( scanlineMaxX <= maxX ) {
+
+			scanlineMaxX = maxX + 1;
+
+		}
+
+		if ( scanlineMinX >= minX ) {
+
+			scanlineMinX = minX - 1;
+
+		}
+
+		return { points: points, isCW: ShapeUtils.isClockWise( points ), identifier: identifier ++, boundingBox: new Box2( new Vector2( minX, minY ), new Vector2( maxX, maxY ) ) };
+
+	} );
+
+	simplePaths = simplePaths.filter( sp => sp.points.length > 0 );
+
+	// check if path is solid or a hole
+	const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData.style.fillRule ) );
+
+
+	const shapesToReturn = [];
+	simplePaths.forEach( p => {
+
+		const amIAHole = isAHole[ p.identifier ];
+
+		if ( ! amIAHole.isHole ) {
+
+			const shape = new Shape( p.points );
+			const holes = isAHole.filter( h => h.isHole && h.for === p.identifier );
+			holes.forEach( h => {
+
+				const path = simplePaths[ h.identifier ];
+				shape.holes.push( new Path( path.points ) );
+
+			} );
+			shapesToReturn.push( shape );
+
+		}
+
+	} );
+
+	return shapesToReturn;
+
+};
 
 SVGLoader.getStrokeStyle = function ( width, color, lineJoin, lineCap, miterLimit ) {
 

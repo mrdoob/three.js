@@ -81,6 +81,18 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 	},
 
+	removePass: function ( pass ) {
+
+		const index = this.passes.indexOf( pass );
+
+		if ( index !== - 1 ) {
+
+			this.passes.splice( index, 1 );
+
+		}
+
+	},
+
 	isLastEnabledPass: function ( passIndex ) {
 
 		for ( var i = passIndex + 1; i < this.passes.length; i ++ ) {
@@ -249,7 +261,7 @@ Object.assign( THREE.Pass.prototype, {
 THREE.Pass.FullScreenQuad = ( function () {
 
 	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+	var geometry = new THREE.PlaneGeometry( 2, 2 );
 
 	var FullScreenQuad = function ( material ) {
 

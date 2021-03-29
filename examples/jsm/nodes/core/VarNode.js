@@ -10,7 +10,7 @@ function VarNode( type, value ) {
 
 VarNode.prototype = Object.create( Node.prototype );
 VarNode.prototype.constructor = VarNode;
-VarNode.prototype.nodeType = "Var";
+VarNode.prototype.nodeType = 'Var';
 
 VarNode.prototype.getType = function ( builder ) {
 

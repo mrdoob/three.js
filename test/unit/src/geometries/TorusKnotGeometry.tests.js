@@ -1,11 +1,11 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { TorusKnotBufferGeometry } from '../../../../src/geometries/TorusKnotBufferGeometry';
+import { TorusKnotGeometry, TorusKnotBufferGeometry } from '../../../../src/geometries/TorusKnotGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'TorusKnotBufferGeometry', ( hooks ) => {
+	QUnit.module( 'TorusKnotGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -20,12 +20,13 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				new TorusKnotBufferGeometry(),
-				new TorusKnotBufferGeometry( parameters.radius ),
-				new TorusKnotBufferGeometry( parameters.radius, parameters.tube ),
-				new TorusKnotBufferGeometry( parameters.radius, parameters.tube, parameters.tubularSegments ),
-				new TorusKnotBufferGeometry( parameters.radius, parameters.tube, parameters.tubularSegments, parameters.radialSegments ),
-				new TorusKnotBufferGeometry( parameters.radius, parameters.tube, parameters.tubularSegments, parameters.radialSegments, parameters.p, parameters.q ),
+				new TorusKnotGeometry(),
+				new TorusKnotGeometry( parameters.radius ),
+				new TorusKnotGeometry( parameters.radius, parameters.tube ),
+				new TorusKnotGeometry( parameters.radius, parameters.tube, parameters.tubularSegments ),
+				new TorusKnotGeometry( parameters.radius, parameters.tube, parameters.tubularSegments, parameters.radialSegments ),
+				new TorusKnotGeometry( parameters.radius, parameters.tube, parameters.tubularSegments, parameters.radialSegments, parameters.p, parameters.q ),
+				new TorusKnotBufferGeometry()
 			];
 
 		} );

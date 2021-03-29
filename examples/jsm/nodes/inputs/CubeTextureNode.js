@@ -15,7 +15,7 @@ function CubeTextureNode( value, uv, bias ) {
 
 CubeTextureNode.prototype = Object.create( InputNode.prototype );
 CubeTextureNode.prototype.constructor = CubeTextureNode;
-CubeTextureNode.prototype.nodeType = "CubeTexture";
+CubeTextureNode.prototype.nodeType = 'CubeTexture';
 
 CubeTextureNode.prototype.getTexture = function ( builder, output ) {
 

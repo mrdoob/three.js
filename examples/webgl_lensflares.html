@@ -10,7 +10,7 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - lensflares<br/>
-			textures from <a href="http://ro.me">ro.me</a><br/>
+			textures from <a href="http://www.ro.me" target="_blank" rel="noopener">ro.me</a><br/>
 			fly with WASD/RF/QE + mouse
 		</div>
 
@@ -53,7 +53,7 @@
 
 				const s = 250;
 
-				const geometry = new THREE.BoxBufferGeometry( s, s, s );
+				const geometry = new THREE.BoxGeometry( s, s, s );
 				const material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
 				for ( let i = 0; i < 3000; i ++ ) {
@@ -135,7 +135,7 @@
 
 				// events
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

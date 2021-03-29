@@ -65,7 +65,7 @@
 
 				const materialBg = new THREE.MeshBasicMaterial( { map: mapBg } );
 
-				const meshBg = new THREE.Mesh( new THREE.PlaneBufferGeometry( 4000, 2000 ), materialBg );
+				const meshBg = new THREE.Mesh( new THREE.PlaneGeometry( 4000, 2000 ), materialBg );
 				meshBg.position.set( 0, 0, - 1 );
 				scene.add( meshBg );
 
@@ -85,8 +85,8 @@
 				const map3 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
 				const map4 = textureLoader.load( 'textures/lensflare/lensflare0_alpha.png' );
 
-				const geo1 = new THREE.PlaneBufferGeometry( 100, 100 );
-				const geo2 = new THREE.PlaneBufferGeometry( 100, 25 );
+				const geo1 = new THREE.PlaneGeometry( 100, 100 );
+				const geo2 = new THREE.PlaneGeometry( 100, 25 );
 
 				addImageRow( map0, 300 );
 				addImageRow( map1, 150 );
@@ -129,7 +129,7 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

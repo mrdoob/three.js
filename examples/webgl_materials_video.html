@@ -61,7 +61,7 @@
 				init();
 				animate();
 
-			}, false );
+			} );
 
 			function init() {
 
@@ -91,7 +91,7 @@
 
 					this.currentTime = 3;
 
-				}, false );
+				} );
 
 				texture = new THREE.VideoTexture( video );
 
@@ -116,7 +116,7 @@
 						ox = i;
 						oy = j;
 
-						geometry = new THREE.BoxBufferGeometry( xsize, ysize, xsize );
+						geometry = new THREE.BoxGeometry( xsize, ysize, xsize );
 
 						change_uvs( geometry, ux, uy, ox, oy );
 
@@ -152,7 +152,7 @@
 
 				renderer.autoClear = false;
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 				// postprocessing
 
@@ -168,7 +168,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

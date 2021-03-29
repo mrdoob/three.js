@@ -257,19 +257,19 @@ function loopReplacer( match, start, end, snippet ) {
 
 function generatePrecision( parameters ) {
 
-	let precisionstring = "precision " + parameters.precision + " float;\nprecision " + parameters.precision + " int;";
+	let precisionstring = 'precision ' + parameters.precision + ' float;\nprecision ' + parameters.precision + ' int;';
 
-	if ( parameters.precision === "highp" ) {
+	if ( parameters.precision === 'highp' ) {
 
-		precisionstring += "\n#define HIGH_PRECISION";
+		precisionstring += '\n#define HIGH_PRECISION';
 
-	} else if ( parameters.precision === "mediump" ) {
+	} else if ( parameters.precision === 'mediump' ) {
 
-		precisionstring += "\n#define MEDIUM_PRECISION";
+		precisionstring += '\n#define MEDIUM_PRECISION';
 
-	} else if ( parameters.precision === "lowp" ) {
+	} else if ( parameters.precision === 'lowp' ) {
 
-		precisionstring += "\n#define LOW_PRECISION";
+		precisionstring += '\n#define LOW_PRECISION';
 
 	}
 
@@ -399,7 +399,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	const program = gl.createProgram();
 
 	let prefixVertex, prefixFragment;
-	let versionString = parameters.glslVersion ? '#version ' + parameters.glslVersion + "\n" : '';
+	let versionString = parameters.glslVersion ? '#version ' + parameters.glslVersion + '\n' : '';
 
 	if ( parameters.isRawShaderMaterial ) {
 
@@ -472,6 +472,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
+			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
 			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
 
@@ -523,7 +524,11 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			'#endif',
 
-			'#ifdef USE_COLOR',
+			'#if defined( USE_COLOR_ALPHA )',
+
+			'	attribute vec4 color;',
+
+			'#elif defined( USE_COLOR )',
 
 			'	attribute vec3 color;',
 
@@ -608,6 +613,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors || parameters.instancingColor ? '#define USE_COLOR' : '',
+			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
 			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
 

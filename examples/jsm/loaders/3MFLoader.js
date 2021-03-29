@@ -19,8 +19,8 @@ import {
 	RepeatWrapping,
 	TextureLoader,
 	sRGBEncoding
-} from "../../../build/three.module.js";
-import { JSZip } from "../libs/jszip.module.min.js";
+} from '../../../build/three.module.js';
+import * as fflate from '../libs/fflate.module.min.js';
 
 /**
  *
@@ -112,20 +112,20 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			try {
 
-				zip = new JSZip( data ); // eslint-disable-line no-undef
+				zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
 
 			} catch ( e ) {
 
 				if ( e instanceof ReferenceError ) {
 
-					console.error( 'THREE.3MFLoader: jszip missing and file is compressed.' );
+					console.error( 'THREE.3MFLoader: fflate missing and file is compressed.' );
 					return null;
 
 				}
 
 			}
 
-			for ( file in zip.files ) {
+			for ( file in zip ) {
 
 				if ( file.match( /\_rels\/.rels$/ ) ) {
 
@@ -157,7 +157,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			//
 
-			var relsView = new Uint8Array( zip.file( relsName ).asArrayBuffer() );
+			var relsView = zip[ relsName ];
 			var relsFileText = LoaderUtils.decodeText( relsView );
 			rels = parseRelsXml( relsFileText );
 
@@ -165,7 +165,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			if ( modelRelsName ) {
 
-				var relsView = new Uint8Array( zip.file( modelRelsName ).asArrayBuffer() );
+				var relsView = zip[ modelRelsName ];
 				var relsFileText = LoaderUtils.decodeText( relsView );
 				modelRels = parseRelsXml( relsFileText );
 
@@ -176,7 +176,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			for ( var i = 0; i < modelPartNames.length; i ++ ) {
 
 				var modelPart = modelPartNames[ i ];
-				var view = new Uint8Array( zip.file( modelPart ).asArrayBuffer() );
+				var view = zip[ modelPart ];
 
 				var fileText = LoaderUtils.decodeText( view );
 				var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
@@ -219,7 +219,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			for ( var i = 0; i < texturesPartNames.length; i ++ ) {
 
 				var texturesPartName = texturesPartNames[ i ];
-				texturesParts[ texturesPartName ] = zip.file( texturesPartName ).asArrayBuffer();
+				texturesParts[ texturesPartName ] = zip[ texturesPartName ].buffer;
 
 			}
 
@@ -1411,11 +1411,24 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		function fetch3DModelPart( rels ) {
+
+			for ( var i = 0; i < rels.length; i ++ ) {
+
+				var rel = rels[ i ];
+				var extension = rel.target.split( '.' ).pop();
+
+				if ( extension.toLowerCase() === 'model' ) return rel;
+
+			}
+
+		}
+
 		function build( objects, data3mf ) {
 
 			var group = new Group();
 
-			var relationship = data3mf[ 'rels' ][ 0 ];
+			var relationship = fetch3DModelPart( data3mf[ 'rels' ] );
 			var buildData = data3mf.model[ relationship[ 'target' ].substring( 1 ) ][ 'build' ];
 
 			for ( var i = 0; i < buildData.length; i ++ ) {

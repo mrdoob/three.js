@@ -61,7 +61,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.getElementById( "container" ).appendChild( renderer.domElement );
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				camera.position.set( 0, 2.5, 10 );
 				scene.add( camera );
@@ -94,27 +94,27 @@
 				scene.add( arrowHelper3 );
 
 				// LIGHTBULB
-				const lightSphereGeometry = new THREE.SphereBufferGeometry( 0.09 );
+				const lightSphereGeometry = new THREE.SphereGeometry( 0.09 );
 				const lightSphereMaterial = new THREE.MeshBasicMaterial( { color: 'rgb(255,255,255)' } );
 				lightSphere = new THREE.Mesh( lightSphereGeometry, lightSphereMaterial );
 				scene.add( lightSphere );
 				lightSphere.visible = false;
 
-				const lightHolderGeometry = new THREE.CylinderBufferGeometry( 0.05, 0.05, 0.13 );
+				const lightHolderGeometry = new THREE.CylinderGeometry( 0.05, 0.05, 0.13 );
 				const lightHolderMaterial = new THREE.MeshBasicMaterial( { color: 'rgb(75,75,75)' } );
 				lightHolder = new THREE.Mesh( lightHolderGeometry, lightHolderMaterial );
 				scene.add( lightHolder );
 				lightHolder.visible = false;
 
 				// GROUND
-				const groundGeometry = new THREE.BoxBufferGeometry( 30, 0.01, 40 );
+				const groundGeometry = new THREE.BoxGeometry( 30, 0.01, 40 );
 				const groundMaterial = new THREE.MeshLambertMaterial( { color: 'rgb(0,130,0)' } );
 				groundMesh = new THREE.Mesh( groundGeometry, groundMaterial );
 				groundMesh.position.y = 0.0; //this value must be slightly lower than the planeConstant (0.01) parameter above
 				scene.add( groundMesh );
 
 				// RED CUBE and CUBE's SHADOW
-				const cubeGeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+				const cubeGeometry = new THREE.BoxGeometry( 1, 1, 1 );
 				const cubeMaterial = new THREE.MeshLambertMaterial( { color: 'rgb(255,0,0)', emissive: 0x200000 } );
 				cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
 				cube.position.z = - 1;
@@ -124,7 +124,7 @@
 				scene.add( cubeShadow );
 
 				// BLUE CYLINDER and CYLINDER's SHADOW
-				const cylinderGeometry = new THREE.CylinderBufferGeometry( 0.3, 0.3, 2 );
+				const cylinderGeometry = new THREE.CylinderGeometry( 0.3, 0.3, 2 );
 				const cylinderMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(0,0,255)', emissive: 0x000020 } );
 				cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
 				cylinder.position.z = - 2.5;
@@ -134,7 +134,7 @@
 				scene.add( cylinderShadow );
 
 				// MAGENTA TORUS and TORUS' SHADOW
-				const torusGeometry = new THREE.TorusBufferGeometry( 1, 0.2, 10, 16, TWO_PI );
+				const torusGeometry = new THREE.TorusGeometry( 1, 0.2, 10, 16, TWO_PI );
 				const torusMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,0,255)', emissive: 0x200020 } );
 				torus = new THREE.Mesh( torusGeometry, torusMaterial );
 				torus.position.z = - 6;
@@ -144,7 +144,7 @@
 				scene.add( torusShadow );
 
 				// WHITE SPHERE and SPHERE'S SHADOW
-				const sphereGeometry = new THREE.SphereBufferGeometry( 0.5, 20, 10 );
+				const sphereGeometry = new THREE.SphereGeometry( 0.5, 20, 10 );
 				const sphereMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,255,255)', emissive: 0x222222 } );
 				sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
 				sphere.position.set( 4, 0.5, 2 );
@@ -154,7 +154,7 @@
 				scene.add( sphereShadow );
 
 				// YELLOW PYRAMID and PYRAMID'S SHADOW
-				const pyramidGeometry = new THREE.CylinderBufferGeometry( 0, 0.5, 2, 4 );
+				const pyramidGeometry = new THREE.CylinderGeometry( 0, 0.5, 2, 4 );
 				const pyramidMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,255,0)', emissive: 0x440000, flatShading: true, shininess: 0 } );
 				pyramid = new THREE.Mesh( pyramidGeometry, pyramidMaterial );
 				pyramid.position.set( - 4, 1, 2 );

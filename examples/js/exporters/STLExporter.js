@@ -30,9 +30,9 @@ THREE.STLExporter.prototype = {
 
 				var geometry = object.geometry;
 
-				if ( geometry.isGeometry ) {
+				if ( geometry.isBufferGeometry !== true ) {
 
-					geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+					throw new Error( 'THREE.STLExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 				}
 

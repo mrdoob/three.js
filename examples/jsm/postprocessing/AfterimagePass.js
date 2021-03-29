@@ -6,22 +6,22 @@ import {
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
-import { AfterimageShader } from "../shaders/AfterimageShader.js";
+} from '../../../build/three.module.js';
+import { Pass } from '../postprocessing/Pass.js';
+import { AfterimageShader } from '../shaders/AfterimageShader.js';
 
 var AfterimagePass = function ( damp ) {
 
 	Pass.call( this );
 
 	if ( AfterimageShader === undefined )
-		console.error( "AfterimagePass relies on AfterimageShader" );
+		console.error( 'THREE.AfterimagePass relies on AfterimageShader' );
 
 	this.shader = AfterimageShader;
 
 	this.uniforms = UniformsUtils.clone( this.shader.uniforms );
 
-	this.uniforms[ "damp" ].value = damp !== undefined ? damp : 0.96;
+	this.uniforms[ 'damp' ].value = damp !== undefined ? damp : 0.96;
 
 	this.textureComp = new WebGLRenderTarget( window.innerWidth, window.innerHeight, {
 
@@ -60,8 +60,8 @@ AfterimagePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	render: function ( renderer, writeBuffer, readBuffer ) {
 
-		this.uniforms[ "tOld" ].value = this.textureOld.texture;
-		this.uniforms[ "tNew" ].value = readBuffer.texture;
+		this.uniforms[ 'tOld' ].value = this.textureOld.texture;
+		this.uniforms[ 'tNew' ].value = readBuffer.texture;
 
 		renderer.setRenderTarget( this.textureComp );
 		this.compFsQuad.render( renderer );

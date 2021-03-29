@@ -71,6 +71,42 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 	},
 
+	applyNormalMatrix: function ( m ) {
+
+		for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
+
+			_vector.applyNormalMatrix( m );
+
+			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+
+		}
+
+		return this;
+
+	},
+
+	transformDirection: function ( m ) {
+
+		for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
+
+			_vector.transformDirection( m );
+
+			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+
+		}
+
+		return this;
+
+	},
+
 	setX: function ( index, x ) {
 
 		this.data.array[ index * this.data.stride + this.offset ] = x;

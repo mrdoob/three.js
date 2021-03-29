@@ -7,6 +7,8 @@ class WebGPUBinding {
 
 		this.type = null; // read-only
 
+		this.isShared = false;
+
 	}
 
 	setVisibility( visibility ) {

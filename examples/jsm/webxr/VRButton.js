@@ -14,11 +14,11 @@ class VRButton {
 
 			let currentSession = null;
 
-			function onSessionStarted( session ) {
+			async function onSessionStarted( session ) {
 
 				session.addEventListener( 'end', onSessionEnded );
 
-				renderer.xr.setSession( session );
+				await renderer.xr.setSession( session );
 				button.textContent = 'EXIT VR';
 
 				currentSession = session;

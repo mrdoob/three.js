@@ -62,7 +62,7 @@
 
 				//
 
-				const geometry = new THREE.IcosahedronBufferGeometry( 400, 15 );
+				const geometry = new THREE.IcosahedronGeometry( 400, 15 );
 				sphereMaterial = new THREE.MeshLambertMaterial( { envMap: textureCube } );
 				sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
 				scene.add( sphereMesh );
@@ -125,7 +125,7 @@
 				} );
 				gui.open();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

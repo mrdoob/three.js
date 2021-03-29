@@ -109,7 +109,7 @@
 					object.rotation.copy( rot );
 					scene2.add( object );
 
-					const geometry = new THREE.PlaneBufferGeometry( width, height );
+					const geometry = new THREE.PlaneGeometry( width, height );
 					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.copy( object.position );
 					mesh.rotation.copy( object.rotation );
@@ -117,7 +117,7 @@
 
 				}
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

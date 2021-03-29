@@ -14,8 +14,6 @@
 			<a href="https://github.com/binomialLLC/basis_universal" target="_blank">Basis Universal GPU Texture Codec</a>
 		</div>
 
-		<script src="./js/libs/basis/msc_basis_transcoder.js"></script>
-
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -42,8 +40,8 @@
 			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.autoRotate = true;
 
-			// PlaneBufferGeometry UVs assume flipY=true, which compressed textures don't support.
-			const geometry = flipY( new THREE.PlaneBufferGeometry() );
+			// PlaneGeometry UVs assume flipY=true, which compressed textures don't support.
+			const geometry = flipY( new THREE.PlaneGeometry() );
 			const material = new THREE.MeshBasicMaterial( {
 				color: 0xFFFFFF,
 				side: THREE.DoubleSide
@@ -65,6 +63,7 @@
 
 			// Samples: sample_etc1s.ktx2, sample_uastc.ktx2
 			new KTX2Loader()
+				.setTranscoderPath( 'js/libs/basis/' )
 				.detectSupport( renderer )
 				.load( './textures/compressed/sample_uastc.ktx2', ( texture ) => {
 
@@ -89,7 +88,9 @@
 
 			}
 
-			window.addEventListener( 'resize', () => {
+			window.addEventListener( 'resize', onWindowResize );
+
+			function onWindowResize() {
 
 				const width = window.innerWidth;
 				const height = window.innerHeight;
@@ -98,7 +99,7 @@
 				camera.updateProjectionMatrix();
 				renderer.setSize( width, height );
 
-			}, false );
+			}
 
 			/** Correct UVs to be compatible with `flipY=false` textures. */
 			function flipY( geometry ) {

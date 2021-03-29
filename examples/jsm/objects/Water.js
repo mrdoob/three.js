@@ -1,12 +1,10 @@
 import {
 	Color,
 	FrontSide,
-	LinearEncoding,
 	LinearFilter,
 	MathUtils,
 	Matrix4,
 	Mesh,
-	NoToneMapping,
 	PerspectiveCamera,
 	Plane,
 	RGBFormat,
@@ -16,7 +14,7 @@ import {
 	Vector3,
 	Vector4,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * Work based on :
@@ -86,17 +84,17 @@ var Water = function ( geometry, options ) {
 			UniformsLib[ 'fog' ],
 			UniformsLib[ 'lights' ],
 			{
-				"normalSampler": { value: null },
-				"mirrorSampler": { value: null },
-				"alpha": { value: 1.0 },
-				"time": { value: 0.0 },
-				"size": { value: 1.0 },
-				"distortionScale": { value: 20.0 },
-				"textureMatrix": { value: new Matrix4() },
-				"sunColor": { value: new Color( 0x7F7F7F ) },
-				"sunDirection": { value: new Vector3( 0.70707, 0.70707, 0 ) },
-				"eye": { value: new Vector3() },
-				"waterColor": { value: new Color( 0x555555 ) }
+				'normalSampler': { value: null },
+				'mirrorSampler': { value: null },
+				'alpha': { value: 1.0 },
+				'time': { value: 0.0 },
+				'size': { value: 1.0 },
+				'distortionScale': { value: 20.0 },
+				'textureMatrix': { value: new Matrix4() },
+				'sunColor': { value: new Color( 0x7F7F7F ) },
+				'sunDirection': { value: new Vector3( 0.70707, 0.70707, 0 ) },
+				'eye': { value: new Vector3() },
+				'waterColor': { value: new Color( 0x555555 ) }
 			}
 		] ),
 
@@ -212,17 +210,17 @@ var Water = function ( geometry, options ) {
 		fog: fog
 	} );
 
-	material.uniforms[ "mirrorSampler" ].value = renderTarget.texture;
-	material.uniforms[ "textureMatrix" ].value = textureMatrix;
-	material.uniforms[ "alpha" ].value = alpha;
-	material.uniforms[ "time" ].value = time;
-	material.uniforms[ "normalSampler" ].value = normalSampler;
-	material.uniforms[ "sunColor" ].value = sunColor;
-	material.uniforms[ "waterColor" ].value = waterColor;
-	material.uniforms[ "sunDirection" ].value = sunDirection;
-	material.uniforms[ "distortionScale" ].value = distortionScale;
+	material.uniforms[ 'mirrorSampler' ].value = renderTarget.texture;
+	material.uniforms[ 'textureMatrix' ].value = textureMatrix;
+	material.uniforms[ 'alpha' ].value = alpha;
+	material.uniforms[ 'time' ].value = time;
+	material.uniforms[ 'normalSampler' ].value = normalSampler;
+	material.uniforms[ 'sunColor' ].value = sunColor;
+	material.uniforms[ 'waterColor' ].value = waterColor;
+	material.uniforms[ 'sunDirection' ].value = sunDirection;
+	material.uniforms[ 'distortionScale' ].value = distortionScale;
 
-	material.uniforms[ "eye" ].value = eye;
+	material.uniforms[ 'eye' ].value = eye;
 
 	scope.material = material;
 
@@ -302,24 +300,6 @@ var Water = function ( geometry, options ) {
 		eye.setFromMatrixPosition( camera.matrixWorld );
 
 		// Render
-
-		if ( renderer.outputEncoding !== LinearEncoding ) {
-
-			console.warn( 'THREE.Water: WebGLRenderer must use LinearEncoding as outputEncoding.' );
-			scope.onBeforeRender = function () {};
-
-			return;
-
-		}
-
-		if ( renderer.toneMapping !== NoToneMapping ) {
-
-			console.warn( 'THREE.Water: WebGLRenderer must use NoToneMapping as toneMapping.' );
-			scope.onBeforeRender = function () {};
-
-			return;
-
-		}
 
 		var currentRenderTarget = renderer.getRenderTarget();
 

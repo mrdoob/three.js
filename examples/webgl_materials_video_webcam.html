@@ -36,7 +36,7 @@
 
 				const texture = new THREE.VideoTexture( video );
 
-				const geometry = new THREE.PlaneBufferGeometry( 16, 9 );
+				const geometry = new THREE.PlaneGeometry( 16, 9 );
 				geometry.scale( 0.5, 0.5, 0.5 );
 				const material = new THREE.MeshBasicMaterial( { map: texture } );
 
@@ -64,7 +64,7 @@
 				controls.enableZoom = false;
 				controls.enablePan = false;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 

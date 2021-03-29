@@ -217,7 +217,7 @@
 
 			function init( geom ) {
 
-				const sphereGeom = new THREE.SphereBufferGeometry( 0.5, 32, 32 );
+				const sphereGeom = new THREE.SphereGeometry( 0.5, 32, 32 );
 				const tIndex = Math.round( Math.random() * 3 );
 
 				Object.keys( Heads ).forEach( function ( t, index ) {
@@ -330,7 +330,7 @@
 
 			}
 
-			function resize() {
+			function onWindowResize() {
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -358,10 +358,10 @@
 
 				const geometry = object.children[ 0 ].geometry;
 
-				window.addEventListener( 'resize', resize );
+				window.addEventListener( 'resize', onWindowResize );
 
 				init( geometry );
-				resize();
+				onWindowResize();
 
 				renderer.setAnimationLoop( function ( time ) {
 

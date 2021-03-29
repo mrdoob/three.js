@@ -6,9 +6,9 @@ import {
 	TextureLoader,
 	UVMapping,
 	sRGBEncoding
-} from "../../../build/three.module.js";
-import { MD2Loader } from "../loaders/MD2Loader.js";
-import { MorphBlendMesh } from "../misc/MorphBlendMesh.js";
+} from '../../../build/three.module.js';
+import { MD2Loader } from '../loaders/MD2Loader.js';
+import { MorphBlendMesh } from '../misc/MorphBlendMesh.js';
 
 var MD2CharacterComplex = function () {
 
@@ -155,8 +155,8 @@ var MD2CharacterComplex = function () {
 
 		// SKINS
 
-		this.skinsBody = loadTextures( config.baseUrl + "skins/", config.skins );
-		this.skinsWeapon = loadTextures( config.baseUrl + "skins/", weaponsTextures );
+		this.skinsBody = loadTextures( config.baseUrl + 'skins/', config.skins );
+		this.skinsWeapon = loadTextures( config.baseUrl + 'skins/', weaponsTextures );
 
 		// BODY
 
@@ -350,13 +350,13 @@ var MD2CharacterComplex = function () {
 
 		if ( controls.crouch ) {
 
-			moveAnimation = animations[ "crouchMove" ];
-			idleAnimation = animations[ "crouchIdle" ];
+			moveAnimation = animations[ 'crouchMove' ];
+			idleAnimation = animations[ 'crouchIdle' ];
 
 		} else {
 
-			moveAnimation = animations[ "move" ];
-			idleAnimation = animations[ "idle" ];
+			moveAnimation = animations[ 'move' ];
+			idleAnimation = animations[ 'idle' ];
 
 		}
 
@@ -364,8 +364,8 @@ var MD2CharacterComplex = function () {
 
 		if ( controls.jump ) {
 
-			moveAnimation = animations[ "jump" ];
-			idleAnimation = animations[ "jump" ];
+			moveAnimation = animations[ 'jump' ];
+			idleAnimation = animations[ 'jump' ];
 
 		}
 
@@ -373,13 +373,13 @@ var MD2CharacterComplex = function () {
 
 			if ( controls.crouch ) {
 
-				moveAnimation = animations[ "crouchAttack" ];
-				idleAnimation = animations[ "crouchAttack" ];
+				moveAnimation = animations[ 'crouchAttack' ];
+				idleAnimation = animations[ 'crouchAttack' ];
 
 			} else {
 
-				moveAnimation = animations[ "attack" ];
-				idleAnimation = animations[ "attack" ];
+				moveAnimation = animations[ 'attack' ];
+				idleAnimation = animations[ 'attack' ];
 
 			}
 

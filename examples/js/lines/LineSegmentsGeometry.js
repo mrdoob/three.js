@@ -134,7 +134,8 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 
 		if ( geometry.isGeometry ) {
 
-			this.setPositions( geometry.vertices );
+			console.error( 'THREE.LineSegmentsGeometry no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
+			return;
 
 		} else if ( geometry.isBufferGeometry ) {
 

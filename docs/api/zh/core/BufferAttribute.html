@@ -116,7 +116,7 @@
 			拷贝 TypedArray 相关注意事项详见 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]。
 		</p>
 
-		<h3>[method:null copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
+		<h3>[method:this copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
 		<p>将一个矢量从 bufferAttribute[index2] 拷贝到 [page:BufferAttribute.array array][index1] 中。</p>
 
 		<h3>[method:BufferAttribute copyColorsArray]( [param:Array colors] ) </h3>
@@ -143,7 +143,7 @@
 		<h3>[method:Number getW]( [param:Integer index] ) </h3>
 		<p>获取给定索引的矢量的第四维元素 （即 W 值）。</p>
 
-		<h3>[method:null onUpload]( [param:Function callback] ) </h3>
+		<h3>[method:this onUpload]( [param:Function callback] ) </h3>
 		<p>见 onUploadCallback 属性。<br /><br />
 			在 [example:webgl_buffergeometry WebGL / Buffergeometry] 中，该方在缓存数据传递给 GPU 后，用于释放内存。
 		</p>

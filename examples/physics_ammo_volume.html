@@ -119,7 +119,7 @@
 				container.appendChild( stats.domElement );
 
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -162,11 +162,11 @@
 				// Create soft volumes
 				const volumeMass = 15;
 
-				const sphereGeometry = new THREE.SphereBufferGeometry( 1.5, 40, 25 );
+				const sphereGeometry = new THREE.SphereGeometry( 1.5, 40, 25 );
 				sphereGeometry.translate( 5, 5, 0 );
 				createSoftVolume( sphereGeometry, volumeMass, 250 );
 
-				const boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 5, 4, 4, 20 );
+				const boxGeometry = new THREE.BoxGeometry( 1, 1, 5, 4, 4, 20 );
 				boxGeometry.translate( - 2, 5, 0 );
 				createSoftVolume( boxGeometry, volumeMass, 120 );
 
@@ -297,7 +297,7 @@
 
 			function createParalellepiped( sx, sy, sz, mass, pos, quat, material ) {
 
-				const threeObject = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
+				const threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
 				const shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 				shape.setMargin( margin );
 
@@ -358,7 +358,7 @@
 
 					}
 
-				}, false );
+				} );
 
 			}
 
@@ -372,7 +372,7 @@
 					const ballMass = 3;
 					const ballRadius = 0.4;
 
-					const ball = new THREE.Mesh( new THREE.SphereBufferGeometry( ballRadius, 18, 16 ), ballMaterial );
+					const ball = new THREE.Mesh( new THREE.SphereGeometry( ballRadius, 18, 16 ), ballMaterial );
 					ball.castShadow = true;
 					ball.receiveShadow = true;
 					const ballShape = new Ammo.btSphereShape( ballRadius );

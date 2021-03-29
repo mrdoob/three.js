@@ -7,23 +7,25 @@ import {
 	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending,
 	AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor
-} from '../../../../build/three.module.js';
+} from 'three';
 
 class WebGPURenderPipelines {
 
-	constructor( renderer, properties, device, glslang, sampleCount ) {
+	constructor( renderer, properties, device, glslang, sampleCount, nodes ) {
 
 		this.renderer = renderer;
 		this.properties = properties;
 		this.device = device;
 		this.glslang = glslang;
 		this.sampleCount = sampleCount;
+		this.nodes = nodes;
 
 		this.pipelines = new WeakMap();
 		this.shaderAttributes = new WeakMap();
+
 		this.shaderModules = {
-			vertex: new WeakMap(),
-			fragment: new WeakMap()
+			vertex: new Map(),
+			fragment: new Map()
 		};
 
 	}
@@ -49,67 +51,64 @@ class WebGPURenderPipelines {
 		if ( pipeline === undefined ) {
 
 			const device = this.device;
+			const properties = this.properties;
+
 			const material = object.material;
 
-			// shader source
+			// get shader
 
-			let shader;
-
-			if ( material.isMeshBasicMaterial ) {
-
-				shader = ShaderLib.mesh_basic;
-
-			} else if ( material.isPointsMaterial ) {
-
-				shader = ShaderLib.points_basic;
-
-			} else if ( material.isLineBasicMaterial ) {
-
-				shader = ShaderLib.line_basic;
-
-			} else {
-
-				console.error( 'THREE.WebGPURenderer: Unknwon shader type.' );
-
-			}
+			const nodeBuilder = this.nodes.get( object );
 
 			// shader modules
 
 			const glslang = this.glslang;
 
-			let moduleVertex = this.shaderModules.vertex.get( shader );
+			let moduleVertex = this.shaderModules.vertex.get( nodeBuilder.vertexShader );
 
 			if ( moduleVertex === undefined ) {
 
-				const byteCodeVertex = glslang.compileGLSL( shader.vertexShader, 'vertex' );
+				const byteCodeVertex = glslang.compileGLSL( nodeBuilder.vertexShader, 'vertex' );
 
 				moduleVertex = {
 					module: device.createShaderModule( { code: byteCodeVertex } ),
 					entryPoint: 'main'
 				};
 
-				this.shaderModules.vertex.set( shader, moduleVertex );
+				this.shaderModules.vertex.set( nodeBuilder.vertexShader, moduleVertex );
 
 			}
 
-			let moduleFragment = this.shaderModules.fragment.get( shader );
+			let moduleFragment = this.shaderModules.fragment.get( nodeBuilder.fragmentShader );
 
 			if ( moduleFragment === undefined ) {
 
-				const byteCodeFragment = glslang.compileGLSL( shader.fragmentShader, 'fragment' );
+				const byteCodeFragment = glslang.compileGLSL( nodeBuilder.fragmentShader, 'fragment' );
 
 				moduleFragment = {
 					module: device.createShaderModule( { code: byteCodeFragment } ),
 					entryPoint: 'main'
 				};
 
-				this.shaderModules.fragment.set( shader, moduleFragment );
+				this.shaderModules.fragment.set( nodeBuilder.fragmentShader, moduleFragment );
+
+			}
+
+			// dispose material
+
+			const materialProperties = properties.get( material );
+
+			if ( materialProperties.disposeCallback === undefined ) {
+
+				const disposeCallback = onMaterialDispose.bind( this );
+				materialProperties.disposeCallback = disposeCallback;
+
+				material.addEventListener( 'dispose', disposeCallback );
 
 			}
 
 			// determine shader attributes
 
-			const shaderAttributes = this._parseShaderAttributes( shader.vertexShader );
+			const shaderAttributes = this._parseShaderAttributes( nodeBuilder.vertexShader );
 
 			// vertex buffers
 
@@ -127,18 +126,6 @@ class WebGPURenderPipelines {
 					attributes: [ { shaderLocation: attribute.slot, offset: 0, format: attribute.format } ],
 					stepMode: stepMode
 				} );
-
-			}
-
-			//
-
-			let indexFormat;
-
-			if ( object.isLine ) {
-
-				const count = ( geometry.index ) ? geometry.index.count : geometry.attributes.position.count;
-
-				indexFormat = ( count > 65535 ) ? GPUIndexFormat.Uint32 : GPUIndexFormat.Uint16; // define data type for primitive restart value
 
 			}
 
@@ -171,25 +158,24 @@ class WebGPURenderPipelines {
 
 			// pipeline
 
-			const primitiveTopology = this._getPrimitiveTopology( object );
-			const rasterizationState = this._getRasterizationStateDescriptor( material );
+			const primitiveState = this._getPrimitiveState( object, material );
 			const colorWriteMask = this._getColorWriteMask( material );
 			const depthCompare = this._getDepthCompare( material );
 			const colorFormat = this._getColorFormat( this.renderer );
 			const depthStencilFormat = this._getDepthStencilFormat( this.renderer );
 
 			pipeline = device.createRenderPipeline( {
-				vertexStage: moduleVertex,
-				fragmentStage: moduleFragment,
-				primitiveTopology: primitiveTopology,
-				rasterizationState: rasterizationState,
-				colorStates: [ {
+				vertex: Object.assign( {}, moduleVertex, { buffers: vertexBuffers } ),
+				fragment: Object.assign( {}, moduleFragment, { targets: [ {
 					format: colorFormat,
-					alphaBlend: alphaBlend,
-					colorBlend: colorBlend,
+					blend: {
+						alpha: alphaBlend,
+						color: colorBlend
+					},
 					writeMask: colorWriteMask
-				} ],
-				depthStencilState: {
+				} ] } ),
+				primitive: primitiveState,
+				depthStencil: {
 					format: depthStencilFormat,
 					depthWriteEnabled: material.depthWrite,
 					depthCompare: depthCompare,
@@ -198,11 +184,9 @@ class WebGPURenderPipelines {
 					stencilReadMask: material.stencilFuncMask,
 					stencilWriteMask: material.stencilWriteMask
 				},
-				vertexState: {
-					indexFormat: indexFormat,
-					vertexBuffers: vertexBuffers
-				},
-				sampleCount: this.sampleCount
+				multisample: {
+					count: this.sampleCount
+				}
 			} );
 
 			this.pipelines.set( object, pipeline );
@@ -225,8 +209,8 @@ class WebGPURenderPipelines {
 		this.pipelines = new WeakMap();
 		this.shaderAttributes = new WeakMap();
 		this.shaderModules = {
-			vertex: new WeakMap(),
-			fragment: new WeakMap()
+			vertex: new Map(),
+			fragment: new Map()
 		};
 
 	}
@@ -595,18 +579,19 @@ class WebGPURenderPipelines {
 
 	}
 
-	_getPrimitiveTopology( object ) {
-
-		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
-		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
-		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
-		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
-
-	}
-
-	_getRasterizationStateDescriptor( material ) {
+	_getPrimitiveState( object, material ) {
 
 		const descriptor = {};
+
+		descriptor.topology = this._getPrimitiveTopology( object );
+
+		if ( object.isLine === true && object.isLineSegments !== true ) {
+
+			const geometry = object.geometry;
+			const count = ( geometry.index ) ? geometry.index.count : geometry.attributes.position.count;
+			descriptor.stripIndexFormat = ( count > 65535 ) ? GPUIndexFormat.Uint32 : GPUIndexFormat.Uint16; // define data type for primitive restart value
+
+		}
 
 		switch ( material.side ) {
 
@@ -632,6 +617,15 @@ class WebGPURenderPipelines {
 		}
 
 		return descriptor;
+
+	}
+
+	_getPrimitiveTopology( object ) {
+
+		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
+		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
+		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
+		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 
 	}
 
@@ -735,20 +729,20 @@ class WebGPURenderPipelines {
 
 		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
 
-		if ( type === 'float' ) return GPUVertexFormat.Float;
-		if ( type === 'vec2' ) return GPUVertexFormat.Float2;
-		if ( type === 'vec3' ) return GPUVertexFormat.Float3;
-		if ( type === 'vec4' ) return GPUVertexFormat.Float4;
+		if ( type === 'float' ) return GPUVertexFormat.Float32;
+		if ( type === 'vec2' ) return GPUVertexFormat.Float32x2;
+		if ( type === 'vec3' ) return GPUVertexFormat.Float32x3;
+		if ( type === 'vec4' ) return GPUVertexFormat.Float32x4;
 
-		if ( type === 'int' ) return GPUVertexFormat.Int;
-		if ( type === 'ivec2' ) return GPUVertexFormat.Int2;
-		if ( type === 'ivec3' ) return GPUVertexFormat.Int3;
-		if ( type === 'ivec4' ) return GPUVertexFormat.Int4;
+		if ( type === 'int' ) return GPUVertexFormat.Sint32;
+		if ( type === 'ivec2' ) return GPUVertexFormat.Sint32x2;
+		if ( type === 'ivec3' ) return GPUVertexFormat.Sint32x3;
+		if ( type === 'ivec4' ) return GPUVertexFormat.Sint32x4;
 
-		if ( type === 'uint' ) return GPUVertexFormat.UInt;
-		if ( type === 'uvec2' ) return GPUVertexFormat.UInt2;
-		if ( type === 'uvec3' ) return GPUVertexFormat.UInt3;
-		if ( type === 'uvec4' ) return GPUVertexFormat.UInt4;
+		if ( type === 'uint' ) return GPUVertexFormat.Uint32;
+		if ( type === 'uvec2' ) return GPUVertexFormat.Uint32x2;
+		if ( type === 'uvec3' ) return GPUVertexFormat.Uint32x3;
+		if ( type === 'uvec4' ) return GPUVertexFormat.Uint32x4;
 
 		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
 
@@ -758,7 +752,7 @@ class WebGPURenderPipelines {
 
 		// find "layout (location = num) in type name" in vertex shader
 
-		const regex = /^\s*layout\s*\(\s*location\s*=\s*(?<location>[0-9]+)\s*\)\s*in\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
+		const regex = /\s*layout\s*\(\s*location\s*=\s*(?<location>[0-9]+)\s*\)\s*in\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
 		let shaderAttribute = null;
 
 		const attributes = [];
@@ -790,98 +784,19 @@ class WebGPURenderPipelines {
 
 }
 
-const ShaderLib = {
-	mesh_basic: {
-		vertexShader: `#version 450
+function onMaterialDispose( event ) {
 
-		layout(location = 0) in vec3 position;
-		layout(location = 1) in vec2 uv;
+	const properties = this.properties;
 
-		layout(location = 0) out vec2 vUv;
+	const material = event.target;
+	const materialProperties = properties.get( material );
 
-		layout(set = 0, binding = 0) uniform ModelUniforms {
-			mat4 modelMatrix;
-			mat4 modelViewMatrix;
-			mat3 normalMatrix;
-		} modelUniforms;
+	material.removeEventListener( 'dispose', materialProperties.disposeCallback );
 
-		layout(set = 0, binding = 1) uniform CameraUniforms {
-			mat4 projectionMatrix;
-			mat4 viewMatrix;
-		} cameraUniforms;
+	properties.remove( material );
 
-		void main(){
-			vUv = uv;
-			gl_Position = cameraUniforms.projectionMatrix * modelUniforms.modelViewMatrix * vec4( position, 1.0 );
-		}`,
-		fragmentShader: `#version 450
-		layout(set = 0, binding = 2) uniform OpacityUniforms {
-			float opacity;
-		} opacityUniforms;
+	// @TODO: still needed remove nodes, bindings and pipeline
 
-		layout(set = 0, binding = 3) uniform sampler mySampler;
-		layout(set = 0, binding = 4) uniform texture2D myTexture;
-
-		layout(location = 0) in vec2 vUv;
-		layout(location = 0) out vec4 outColor;
-
-		void main() {
-			outColor = texture( sampler2D( myTexture, mySampler ), vUv );
-			outColor.a *= opacityUniforms.opacity;
-		}`
-	},
-	points_basic: {
-		vertexShader: `#version 450
-
-		layout(location = 0) in vec3 position;
-
-		layout(set = 0, binding = 0) uniform ModelUniforms {
-			mat4 modelMatrix;
-			mat4 modelViewMatrix;
-		} modelUniforms;
-
-		layout(set = 0, binding = 1) uniform CameraUniforms {
-			mat4 projectionMatrix;
-			mat4 viewMatrix;
-		} cameraUniforms;
-
-		void main(){
-			gl_Position = cameraUniforms.projectionMatrix * modelUniforms.modelViewMatrix * vec4( position, 1.0 );
-		}`,
-		fragmentShader: `#version 450
-
-		layout(location = 0) out vec4 outColor;
-
-		void main() {
-			outColor = vec4( 1.0, 0.0, 0.0, 1.0 );
-		}`
-	},
-	line_basic: {
-		vertexShader: `#version 450
-
-		layout(location = 0) in vec3 position;
-
-		layout(set = 0, binding = 0) uniform ModelUniforms {
-			mat4 modelMatrix;
-			mat4 modelViewMatrix;
-		} modelUniforms;
-
-		layout(set = 0, binding = 1) uniform CameraUniforms {
-			mat4 projectionMatrix;
-			mat4 viewMatrix;
-		} cameraUniforms;
-
-		void main(){
-			gl_Position = cameraUniforms.projectionMatrix * modelUniforms.modelViewMatrix * vec4( position, 1.0 );
-		}`,
-		fragmentShader: `#version 450
-
-		layout(location = 0) out vec4 outColor;
-
-		void main() {
-			outColor = vec4( 1.0, 0.0, 0.0, 1.0 );
-		}`
-	}
-};
+}
 
 export default WebGPURenderPipelines;

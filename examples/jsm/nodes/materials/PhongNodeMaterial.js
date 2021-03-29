@@ -8,7 +8,7 @@ function PhongNodeMaterial() {
 
 	NodeMaterial.call( this, node, node );
 
-	this.type = "PhongNodeMaterial";
+	this.type = 'PhongNodeMaterial';
 
 }
 

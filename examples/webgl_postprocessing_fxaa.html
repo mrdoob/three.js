@@ -77,7 +77,7 @@
 
 				group = new THREE.Group();
 
-				const geometry = new THREE.TetrahedronBufferGeometry( 10 );
+				const geometry = new THREE.TetrahedronGeometry( 10 );
 				const material = new THREE.MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
 
 				for ( let i = 0; i < 100; i ++ ) {
@@ -135,7 +135,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -10,7 +10,7 @@ function AttributeNode( name, type ) {
 
 AttributeNode.prototype = Object.create( Node.prototype );
 AttributeNode.prototype.constructor = AttributeNode;
-AttributeNode.prototype.nodeType = "Attribute";
+AttributeNode.prototype.nodeType = 'Attribute';
 
 AttributeNode.prototype.getAttributeType = function ( builder ) {
 

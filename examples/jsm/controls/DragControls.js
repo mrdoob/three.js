@@ -5,7 +5,7 @@ import {
 	Raycaster,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var DragControls = function ( _objects, _camera, _domElement ) {
 
@@ -27,25 +27,25 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	function activate() {
 
-		_domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
-		_domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
-		_domElement.addEventListener( 'mouseup', onDocumentMouseCancel, false );
-		_domElement.addEventListener( 'mouseleave', onDocumentMouseCancel, false );
-		_domElement.addEventListener( 'touchmove', onDocumentTouchMove, false );
-		_domElement.addEventListener( 'touchstart', onDocumentTouchStart, false );
-		_domElement.addEventListener( 'touchend', onDocumentTouchEnd, false );
+		_domElement.addEventListener( 'pointermove', onPointerMove );
+		_domElement.addEventListener( 'pointerdown', onPointerDown );
+		_domElement.addEventListener( 'pointerup', onPointerCancel );
+		_domElement.addEventListener( 'pointerleave', onPointerCancel );
+		_domElement.addEventListener( 'touchmove', onTouchMove );
+		_domElement.addEventListener( 'touchstart', onTouchStart );
+		_domElement.addEventListener( 'touchend', onTouchEnd );
 
 	}
 
 	function deactivate() {
 
-		_domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-		_domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
-		_domElement.removeEventListener( 'mouseup', onDocumentMouseCancel, false );
-		_domElement.removeEventListener( 'mouseleave', onDocumentMouseCancel, false );
-		_domElement.removeEventListener( 'touchmove', onDocumentTouchMove, false );
-		_domElement.removeEventListener( 'touchstart', onDocumentTouchStart, false );
-		_domElement.removeEventListener( 'touchend', onDocumentTouchEnd, false );
+		_domElement.removeEventListener( 'pointermove', onPointerMove );
+		_domElement.removeEventListener( 'pointerdown', onPointerDown );
+		_domElement.removeEventListener( 'pointerup', onPointerCancel );
+		_domElement.removeEventListener( 'pointerleave', onPointerCancel );
+		_domElement.removeEventListener( 'touchmove', onTouchMove );
+		_domElement.removeEventListener( 'touchstart', onTouchStart );
+		_domElement.removeEventListener( 'touchend', onTouchEnd );
 
 		_domElement.style.cursor = '';
 
@@ -63,9 +63,24 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
-	function onDocumentMouseMove( event ) {
+	function onPointerMove( event ) {
 
 		event.preventDefault();
+
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+			case 'pen':
+				onMouseMove( event );
+				break;
+
+			// TODO touch
+
+		}
+
+	}
+
+	function onMouseMove( event ) {
 
 		var rect = _domElement.getBoundingClientRect();
 
@@ -99,6 +114,15 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _worldPosition.setFromMatrixPosition( object.matrixWorld ) );
 
+			if ( _hovered !== object && _hovered !== null) {
+
+				scope.dispatchEvent( { type: 'hoveroff', object: _hovered } );
+
+				_domElement.style.cursor = 'auto';
+				_hovered = null;
+
+			}
+			
 			if ( _hovered !== object ) {
 
 				scope.dispatchEvent( { type: 'hoveron', object: object } );
@@ -123,7 +147,24 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
-	function onDocumentMouseDown( event ) {
+	function onPointerDown( event ) {
+
+		event.preventDefault();
+
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+			case 'pen':
+				onMouseDown( event );
+				break;
+
+			// TODO touch
+
+		}
+
+	}
+
+	function onMouseDown( event ) {
 
 		event.preventDefault();
 
@@ -138,7 +179,7 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-				_inverseMatrix.getInverse( _selected.parent.matrixWorld );
+				_inverseMatrix.copy( _selected.parent.matrixWorld ).invert();
 				_offset.copy( _intersection ).sub( _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
 
 			}
@@ -152,7 +193,24 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
-	function onDocumentMouseCancel( event ) {
+	function onPointerCancel( event ) {
+
+		event.preventDefault();
+
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+			case 'pen':
+				onMouseCancel( event );
+				break;
+
+			// TODO touch
+
+		}
+
+	}
+
+	function onMouseCancel( event ) {
 
 		event.preventDefault();
 
@@ -168,7 +226,7 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
-	function onDocumentTouchMove( event ) {
+	function onTouchMove( event ) {
 
 		event.preventDefault();
 		event = event.changedTouches[ 0 ];
@@ -196,7 +254,7 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
-	function onDocumentTouchStart( event ) {
+	function onTouchStart( event ) {
 
 		event.preventDefault();
 		event = event.changedTouches[ 0 ];
@@ -219,7 +277,7 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-				_inverseMatrix.getInverse( _selected.parent.matrixWorld );
+				_inverseMatrix.copy( _selected.parent.matrixWorld ).invert();
 				_offset.copy( _intersection ).sub( _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
 
 			}
@@ -233,7 +291,7 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
-	function onDocumentTouchEnd( event ) {
+	function onTouchEnd( event ) {
 
 		event.preventDefault();
 

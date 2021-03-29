@@ -215,7 +215,7 @@ function SidebarObject( editor ) {
 	// intensity
 
 	var objectIntensityRow = new UIRow();
-	var objectIntensity = new UINumber().setRange( 0, Infinity ).onChange( update );
+	var objectIntensity = new UINumber().onChange( update );
 
 	objectIntensityRow.add( new UIText( strings.getKey( 'sidebar/object/intensity' ) ).setWidth( '90px' ) );
 	objectIntensityRow.add( objectIntensity );

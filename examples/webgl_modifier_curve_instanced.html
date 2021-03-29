@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - animation - groups</title>
+		<title>three.js webgl - curve modifier - instanced</title>
 		<meta charset="utf-8" />
 		<meta
 			name="viewport"
@@ -11,10 +11,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener"
-				>three.js</a
-			>
-			webgl - curve modifier - instanced
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - curve modifier - instanced
 		</div>
 
 		<script type="module">
@@ -26,6 +23,7 @@
 			const ACTION_SELECT = 1,
 				ACTION_NONE = 0;
 			const curveHandles = [];
+			const mouse = new THREE.Vector2();
 
 			let stats;
 			let scene,
@@ -33,7 +31,6 @@
 				renderer,
 				rayCaster,
 				control,
-				mouse,
 				flow,
 				action = ACTION_NONE;
 
@@ -54,7 +51,7 @@
 				camera.lookAt( scene.position );
 
 				const boxGeometry = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
-				const boxMaterial = new THREE.MeshBasicMaterial( 0x99ff99 );
+				const boxMaterial = new THREE.MeshBasicMaterial();
 
 				const curves = [[
 					{ x: 1, y: - 0.5, z: - 1 },
@@ -118,7 +115,7 @@
 					font
 				) {
 
-					const geometry = new THREE.TextBufferGeometry( "Hello three.js!", {
+					const geometry = new THREE.TextGeometry( "Hello three.js!", {
 						font: font,
 						size: 0.2,
 						height: 0.05,
@@ -164,18 +161,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				mouse = new THREE.Vector2();
-				renderer.domElement.addEventListener(
-					"click",
-					function ( event ) {
-
-						action = ACTION_SELECT;
-						mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-						mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-					},
-					false
-				);
+				renderer.domElement.addEventListener( 'pointerdown', onPointerDown );
 
 				rayCaster = new THREE.Raycaster();
 				control = new TransformControls( camera, renderer.domElement );
@@ -208,6 +194,14 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onPointerDown( event ) {
+
+				action = ACTION_SELECT;
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 			}
 

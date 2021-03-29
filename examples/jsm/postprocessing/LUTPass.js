@@ -31,42 +31,44 @@ const LUTShader = {
 
 
 	fragmentShader: /* glsl */`
-		precision highp sampler3D;
 
+		uniform float lutSize;
 		#if USE_3DTEXTURE
+		precision highp sampler3D;
 		uniform sampler3D lut3d;
 		#else
 		uniform sampler2D lut;
-		uniform float lutSize;
 
 		vec3 lutLookup( sampler2D tex, float size, vec3 rgb ) {
 
-			// clamp the sample in by half a pixel to avoid interpolation
-			// artifacts between slices laid out next to each other.
-			float halfPixelWidth = 0.5 / size;
-			rgb.rg = clamp( rgb.rg, halfPixelWidth, 1.0 - halfPixelWidth );
+			float sliceHeight = 1.0 / size;
+			float yPixelHeight = 1.0 / ( size * size );
 
-			// green offset into a LUT layer
-			float gOffset = rgb.g / size;
-			vec2 uv1 = vec2( rgb.r, gOffset );
-			vec2 uv2 = vec2( rgb.r, gOffset );
+			// Get the slices on either side of the sample
+			float slice = rgb.b * size;
+			float interp = fract( slice );
+			float slice0 = slice - interp;
+			float centeredInterp = interp - 0.5;
 
-			// adjust b slice offset
-			float bNormalized = size * rgb.b;
-			float bSlice = min( floor( size * rgb.b ), size - 1.0 );
-			float bMix = ( bNormalized - bSlice ) / size;
+			float slice1 = slice0 + sign( centeredInterp );
 
-			// get the first lut slice and then the one to interpolate to
-			float b1 = bSlice / size;
-			float b2 = ( bSlice + 1.0 ) / size;
+			// Pull y sample in by half a pixel in each direction to avoid color
+			// bleeding from adjacent slices.
+			float greenOffset = clamp( rgb.g * sliceHeight, yPixelHeight * 0.5, sliceHeight - yPixelHeight * 0.5 );
 
-			uv1.y += b1;
-			uv2.y += b2;
+			vec2 uv0 = vec2(
+				rgb.r,
+				slice0 * sliceHeight + greenOffset
+			);
+			vec2 uv1 = vec2(
+				rgb.r,
+				slice1 * sliceHeight + greenOffset
+			);
 
+			vec3 sample0 = texture2D( tex, uv0 ).rgb;
 			vec3 sample1 = texture2D( tex, uv1 ).rgb;
-			vec3 sample2 = texture2D( tex, uv2 ).rgb;
 
-			return mix( sample1, sample2, bMix );
+			return mix( sample0, sample1, abs( centeredInterp ) );
 
 		}
 		#endif
@@ -78,12 +80,24 @@ const LUTShader = {
 
 			vec4 val = texture2D( tDiffuse, vUv );
 			vec4 lutVal;
+
+			// pull the sample in by half a pixel so the sample begins
+			// at the center of the edge pixels.
+			float pixelWidth = 1.0 / lutSize;
+			float halfPixelWidth = 0.5 / lutSize;
+			vec3 uvw = vec3( halfPixelWidth ) + val.rgb * ( 1.0 - pixelWidth );
+
 			#if USE_3DTEXTURE
-			lutVal = vec4( texture( lut3d, val.rgb ).rgb, val.a );
+
+			lutVal = vec4( texture( lut3d, uvw ).rgb, val.a );
+
 			#else
-			lutVal = vec4( lutLookup( lut, lutSize, val.rgb ), val.a );
+
+			lutVal = vec4( lutLookup( lut, lutSize, uvw ), val.a );
+
 			#endif
-			gl_FragColor = mix( val, lutVal, intensity );
+
+			gl_FragColor = vec4( mix( val, lutVal, intensity ) );
 
 		}
 
@@ -111,6 +125,7 @@ class LUTPass extends ShaderPass {
 
 				}
 
+				material.uniforms.lutSize.value = v.image.width;
 				if ( v.isDataTexture3D ) {
 
 					material.uniforms.lut3d.value = v;
@@ -118,7 +133,6 @@ class LUTPass extends ShaderPass {
 				} else {
 
 					material.uniforms.lut.value = v;
-					material.uniforms.lutSize.value = v.image.width;
 
 				}
 

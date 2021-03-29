@@ -4,7 +4,7 @@ import {
 	MathUtils,
 	Quaternion,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * W3C Device Orientation control (http://w3c.github.io/deviceorientation/spec-source-orientation.html)
@@ -12,8 +12,14 @@ import {
 
 var DeviceOrientationControls = function ( object ) {
 
+	if ( window.isSecureContext === false ) {
+
+		console.error( 'THREE.DeviceOrientationControls: DeviceOrientationEvent is only available in secure contexts (https)' );
+
+	}
+
 	var scope = this;
-	var changeEvent = { type: "change" };
+	var changeEvent = { type: 'change' };
 	var EPS = 0.000001;
 
 	this.object = object;
@@ -76,8 +82,8 @@ var DeviceOrientationControls = function ( object ) {
 
 				if ( response == 'granted' ) {
 
-					window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
-					window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+					window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent );
+					window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent );
 
 				}
 
@@ -89,8 +95,8 @@ var DeviceOrientationControls = function ( object ) {
 
 		} else {
 
-			window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
-			window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+			window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent );
+			window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent );
 
 		}
 
@@ -100,8 +106,8 @@ var DeviceOrientationControls = function ( object ) {
 
 	this.disconnect = function () {
 
-		window.removeEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
-		window.removeEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+		window.removeEventListener( 'orientationchange', onScreenOrientationChangeEvent );
+		window.removeEventListener( 'deviceorientation', onDeviceOrientationChangeEvent );
 
 		scope.enabled = false;
 

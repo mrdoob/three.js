@@ -52,7 +52,7 @@
 
 				//
 
-				let geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				let geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
 				let material = new THREE.MeshStandardMaterial( {
 					metalness: params.roughness,
 					roughness: params.metalness,
@@ -62,7 +62,7 @@
 				torusMesh = new THREE.Mesh( geometry, material );
 				scene.add( torusMesh );
 
-				geometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				geometry = new THREE.PlaneGeometry( 200, 200 );
 				material = new THREE.MeshBasicMaterial();
 
 				planeMesh = new THREE.Mesh( geometry, material );
@@ -117,7 +117,7 @@
 				controls.minDistance = 50;
 				controls.maxDistance = 300;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				const gui = new GUI();
 

@@ -19,7 +19,7 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl hemisphere light example<br/>
-			flamingo by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a><br/><br/>
+			flamingo by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="http://www.ro.me" target="_blank" rel="noopener">ro.me</a><br/><br/>
 			<button id="hemisphereButton">toggle hemisphere light</button>
 			<button id="directionalButton">toggle directional light</button>
 		</div>
@@ -125,7 +125,7 @@
 
 				// GROUND
 
-				const groundGeo = new THREE.PlaneBufferGeometry( 10000, 10000 );
+				const groundGeo = new THREE.PlaneGeometry( 10000, 10000 );
 				const groundMat = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 				groundMat.color.setHSL( 0.095, 1, 0.75 );
 
@@ -149,7 +149,7 @@
 
 				scene.fog.color.copy( uniforms[ "bottomColor" ].value );
 
-				const skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
+				const skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
 				const skyMat = new THREE.ShaderMaterial( {
 					uniforms: uniforms,
 					vertexShader: vertexShader,
@@ -200,7 +200,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				const hemisphereButton = document.getElementById( 'hemisphereButton' );
 				hemisphereButton.addEventListener( 'click', function () {

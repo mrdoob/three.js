@@ -19,7 +19,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - morph targets - horse<br/>
-			model by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a>
+			model by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="http://www.ro.me" target="_blank" rel="noopener">rome</a>
 		</div>
 
 		<script type="module">
@@ -50,7 +50,6 @@
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 300;
-				camera.target = new THREE.Vector3( 0, 150, 0 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
@@ -95,7 +94,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -126,7 +125,7 @@
 				camera.position.x = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
 				camera.position.z = radius * Math.cos( THREE.MathUtils.degToRad( theta ) );
 
-				camera.lookAt( camera.target );
+				camera.lookAt( 0, 150, 0 );
 
 				if ( mixer ) {
 

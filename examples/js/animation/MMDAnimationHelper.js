@@ -40,7 +40,9 @@ THREE.MMDAnimationHelper = ( function () {
 			afterglow: params.afterglow !== undefined
 				? params.afterglow : 0.0,
 			resetPhysicsOnLoop: params.resetPhysicsOnLoop !== undefined
-				? params.resetPhysicsOnLoop : true
+				? params.resetPhysicsOnLoop : true,
+			pmxAnimation: params.pmxAnimation !== undefined
+				? params.pmxAnimation : false
 		};
 
 		this.enabled = {
@@ -217,15 +219,28 @@ THREE.MMDAnimationHelper = ( function () {
 
 			mesh.updateMatrixWorld( true );
 
-			if ( params.ik !== false ) {
+			// PMX animation system special path
+			if ( this.configuration.pmxAnimation &&
+				mesh.geometry.userData.MMD && mesh.geometry.userData.MMD.format === 'pmx' ) {
 
-				this._createCCDIKSolver( mesh ).update( params.saveOriginalBonesBeforeIK ); // this param is experimental
+				var sortedBonesData = this._sortBoneDataArray( mesh.geometry.userData.MMD.bones.slice() );
+				var ikSolver = params.ik !== false ? this._createCCDIKSolver( mesh ) : null;
+				var grantSolver = params.grant !== false ? this.createGrantSolver( mesh ) : null;
+				this._animatePMXMesh( mesh, sortedBonesData, ikSolver, grantSolver );
 
-			}
+			} else {
 
-			if ( params.grant !== false ) {
+				if ( params.ik !== false ) {
 
-				this.createGrantSolver( mesh ).update();
+					this._createCCDIKSolver( mesh ).update();
+
+				}
+
+				if ( params.grant !== false ) {
+
+					this.createGrantSolver( mesh ).update();
+
+				}
 
 			}
 
@@ -515,11 +530,11 @@ THREE.MMDAnimationHelper = ( function () {
 			var physics = objects.physics;
 			var looped = objects.looped;
 
-			// alternate solution to save/restore bones but less performant?
-			//mesh.pose();
-			//this._updatePropertyMixersBuffer( mesh );
-
 			if ( mixer && this.enabled.animation ) {
+
+				// alternate solution to save/restore bones but less performant?
+				//mesh.pose();
+				//this._updatePropertyMixersBuffer( mesh );
 
 				this._restoreBones( mesh );
 
@@ -527,16 +542,33 @@ THREE.MMDAnimationHelper = ( function () {
 
 				this._saveBones( mesh );
 
-				if ( ikSolver && this.enabled.ik ) {
+				// PMX animation system special path
+				if ( this.configuration.pmxAnimation &&
+					mesh.geometry.userData.MMD && mesh.geometry.userData.MMD.format === 'pmx' ) {
 
-					mesh.updateMatrixWorld( true );
-					ikSolver.update();
+					if ( ! objects.sortedBonesData ) objects.sortedBonesData = this._sortBoneDataArray( mesh.geometry.userData.MMD.bones.slice() );
 
-				}
+					this._animatePMXMesh(
+						mesh,
+						objects.sortedBonesData,
+						ikSolver && this.enabled.ik ? ikSolver : null,
+						grantSolver && this.enabled.grant ? grantSolver : null
+					);
 
-				if ( grantSolver && this.enabled.grant ) {
+				} else {
 
-					grantSolver.update();
+					if ( ikSolver && this.enabled.ik ) {
+
+						mesh.updateMatrixWorld( true );
+						ikSolver.update();
+
+					}
+
+					if ( grantSolver && this.enabled.grant ) {
+
+						grantSolver.update();
+
+					}
 
 				}
 
@@ -558,6 +590,142 @@ THREE.MMDAnimationHelper = ( function () {
 			}
 
 		},
+
+		// Sort bones in order by 1. transformationClass and 2. bone index.
+		// In PMX animation system, bone transformations should be processed
+		// in this order.
+		_sortBoneDataArray: function ( boneDataArray ) {
+
+			return boneDataArray.sort( function ( a, b ) {
+
+				if ( a.transformationClass !== b.transformationClass ) {
+
+					return a.transformationClass - b.transformationClass;
+
+				} else {
+
+					return a.index - b.index;
+
+				}
+
+			} );
+
+		},
+
+		// PMX Animation system is a bit too complex and doesn't great match to
+		// Three.js Animation system. This method attempts to simulate it as much as
+		// possible but doesn't perfectly simulate.
+		// This method is more costly than the regular one so
+		// you are recommended to set constructor parameter "pmxAnimation: true"
+		// only if your PMX model animation doesn't work well.
+		// If you need better method you would be required to write your own.
+		_animatePMXMesh: function () {
+
+			// Keep working quaternions for less GC
+			var quaternions = [];
+			var quaternionIndex = 0;
+
+			function getQuaternion() {
+
+				if ( quaternionIndex >= quaternions.length ) {
+
+					quaternions.push( new THREE.Quaternion() );
+
+				}
+
+				return quaternions[ quaternionIndex ++ ];
+
+			}
+
+			// Save rotation whose grant and IK are already applied
+			// used by grant children
+			var grantResultMap = new Map();
+
+			function updateOne( mesh, boneIndex, ikSolver, grantSolver ) {
+
+				var bones = mesh.skeleton.bones;
+				var bonesData = mesh.geometry.userData.MMD.bones;
+				var boneData = bonesData[ boneIndex ];
+				var bone = bones[ boneIndex ];
+
+				// Return if already updated by being referred as a grant parent.
+				if ( grantResultMap.has( boneIndex ) ) return;
+
+				var quaternion = getQuaternion();
+
+				// Initialize grant result here to prevent infinite loop.
+				// If it's referred before updating with actual result later
+				// result without applyting IK or grant is gotten
+				// but better than composing of infinite loop.
+				grantResultMap.set( boneIndex, quaternion.copy( bone.quaternion ) );
+
+				// @TODO: Support global grant and grant position
+				if ( grantSolver && boneData.grant &&
+					! boneData.grant.isLocal && boneData.grant.affectRotation ) {
+
+					var parentIndex = boneData.grant.parentIndex;
+					var ratio = boneData.grant.ratio;
+
+					if ( ! grantResultMap.has( parentIndex ) ) {
+
+						updateOne( mesh, parentIndex, ikSolver, grantSolver );
+
+					}
+
+					grantSolver.addGrantRotation( bone, grantResultMap.get( parentIndex ), ratio );
+
+				}
+
+				if ( ikSolver && boneData.ik ) {
+
+					// @TODO: Updating world matrices every time solving an IK bone is
+					// costly. Optimize if possible.
+					mesh.updateMatrixWorld( true );
+					ikSolver.updateOne( boneData.ik );
+
+					// No confident, but it seems the grant results with ik links should be updated?
+					var links = boneData.ik.links;
+
+					for ( var i = 0, il = links.length; i < il; i ++ ) {
+
+						var link = links[ i ];
+
+						if ( link.enabled === false ) continue;
+
+						var linkIndex = link.index;
+
+						if ( grantResultMap.has( linkIndex ) ) {
+
+							grantResultMap.set( linkIndex, grantResultMap.get( linkIndex ).copy( bones[ linkIndex ].quaternion ) );
+
+						}
+
+					}
+
+				}
+
+				// Update with the actual result here
+				quaternion.copy( bone.quaternion );
+
+			}
+
+			return function ( mesh, sortedBonesData, ikSolver, grantSolver ) {
+
+				quaternionIndex = 0;
+				grantResultMap.clear();
+
+				for ( var i = 0, il = sortedBonesData.length; i < il; i ++ ) {
+
+					updateOne( mesh, sortedBonesData[ i ].index, ikSolver, grantSolver );
+
+				}
+
+				mesh.updateMatrixWorld( true );
+				return this;
+
+			};
+
+		}(),
 
 		_animateCamera: function ( camera, delta ) {
 
@@ -961,6 +1129,10 @@ THREE.MMDAnimationHelper = ( function () {
 	};
 
 	/**
+	 * Solver for Grant (Fuyo in Japanese. I just google translated because
+	 * Fuyo may be MMD specific term and may not be common word in 3D CG terms.)
+	 * Grant propagates a bone's transform to other bones transforms even if
+	 * they are not children.
 	 * @param {THREE.SkinnedMesh} mesh
 	 * @param {Array<Object>} grants
 	 */
@@ -976,53 +1148,74 @@ THREE.MMDAnimationHelper = ( function () {
 		constructor: GrantSolver,
 
 		/**
+		 * Solve all the grant bones
 		 * @return {GrantSolver}
 		 */
 		update: function () {
 
-			var quaternion = new THREE.Quaternion();
+			var grants = this.grants;
 
-			return function () {
+			for ( var i = 0, il = grants.length; i < il; i ++ ) {
 
-				var bones = this.mesh.skeleton.bones;
-				var grants = this.grants;
+				this.updateOne( grants[ i ] );
 
-				for ( var i = 0, il = grants.length; i < il; i ++ ) {
+			}
 
-					var grant = grants[ i ];
-					var bone = bones[ grant.index ];
-					var parentBone = bones[ grant.parentIndex ];
+			return this;
 
-					if ( grant.isLocal ) {
+		},
 
-						// TODO: implement
-						if ( grant.affectPosition ) {
+		/**
+		 * Solve a grant bone
+		 * @param {Object} grant - grant parameter
+		 * @return {GrantSolver}
+		 */
+		updateOne: function ( grant ) {
 
-						}
+			var bones = this.mesh.skeleton.bones;
+			var bone = bones[ grant.index ];
+			var parentBone = bones[ grant.parentIndex ];
 
-						// TODO: implement
-						if ( grant.affectRotation ) {
+			if ( grant.isLocal ) {
 
-						}
-
-					} else {
-
-						// TODO: implement
-						if ( grant.affectPosition ) {
-
-						}
-
-						if ( grant.affectRotation ) {
-
-							quaternion.set( 0, 0, 0, 1 );
-							quaternion.slerp( parentBone.quaternion, grant.ratio );
-							bone.quaternion.multiply( quaternion );
-
-						}
-
-					}
+				// TODO: implement
+				if ( grant.affectPosition ) {
 
 				}
+
+				// TODO: implement
+				if ( grant.affectRotation ) {
+
+				}
+
+			} else {
+
+				// TODO: implement
+				if ( grant.affectPosition ) {
+
+				}
+
+				if ( grant.affectRotation ) {
+
+					this.addGrantRotation( bone, parentBone.quaternion, grant.ratio );
+
+				}
+
+			}
+
+			return this;
+
+		},
+
+		addGrantRotation: function () {
+
+			var quaternion = new THREE.Quaternion();
+
+			return function ( bone, q, ratio ) {
+
+				quaternion.set( 0, 0, 0, 1 );
+				quaternion.slerp( q, ratio );
+				bone.quaternion.multiply( quaternion );
 
 				return this;
 

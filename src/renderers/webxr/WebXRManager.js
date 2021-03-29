@@ -9,6 +9,7 @@ import { WebXRController } from './WebXRController.js';
 function WebXRManager( renderer, gl ) {
 
 	const scope = this;
+	const state = renderer.state;
 
 	let session = null;
 
@@ -116,28 +117,21 @@ function WebXRManager( renderer, gl ) {
 
 		inputSourcesMap.clear();
 
+		_currentDepthNear = null;
+		_currentDepthFar = null;
+
+		// restore framebuffer/rendering state
+
+		state.bindXRFramebuffer( null );
+		renderer.setRenderTarget( renderer.getRenderTarget() );
+
 		//
 
-		renderer.setFramebuffer( null );
-		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
 
 		scope.isPresenting = false;
 
 		scope.dispatchEvent( { type: 'sessionend' } );
-
-	}
-
-	function onRequestReferenceSpace( value ) {
-
-		referenceSpace = value;
-
-		animation.setContext( session );
-		animation.start();
-
-		scope.isPresenting = true;
-
-		scope.dispatchEvent( { type: 'sessionstart' } );
 
 	}
 
@@ -177,7 +171,7 @@ function WebXRManager( renderer, gl ) {
 
 	};
 
-	this.setSession = function ( value ) {
+	this.setSession = async function ( value ) {
 
 		session = value;
 
@@ -190,12 +184,13 @@ function WebXRManager( renderer, gl ) {
 			session.addEventListener( 'squeezestart', onSessionEvent );
 			session.addEventListener( 'squeezeend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
+			session.addEventListener( 'inputsourceschange', onInputSourcesChange );
 
 			const attributes = gl.getContextAttributes();
 
 			if ( attributes.xrCompatible !== true ) {
 
-				gl.makeXRCompatible();
+				await gl.makeXRCompatible();
 
 			}
 
@@ -212,17 +207,20 @@ function WebXRManager( renderer, gl ) {
 
 			session.updateRenderState( { baseLayer: baseLayer } );
 
-			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
+			referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
 
-			//
+			animation.setContext( session );
+			animation.start();
 
-			session.addEventListener( 'inputsourceschange', updateInputSources );
+			scope.isPresenting = true;
+
+			scope.dispatchEvent( { type: 'sessionstart' } );
 
 		}
 
 	};
 
-	function updateInputSources( event ) {
+	function onInputSourcesChange( event ) {
 
 		const inputSources = session.inputSources;
 
@@ -311,7 +309,7 @@ function WebXRManager( renderer, gl ) {
 		camera.translateX( xOffset );
 		camera.translateZ( zOffset );
 		camera.matrixWorld.compose( camera.position, camera.quaternion, camera.scale );
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+		camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
 
 		// Find the union of the frustum values of the cameras and scale
 		// the values so that the near plane's position does not change in world space,
@@ -339,7 +337,7 @@ function WebXRManager( renderer, gl ) {
 
 		}
 
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+		camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
 
 	}
 
@@ -376,6 +374,8 @@ function WebXRManager( renderer, gl ) {
 		// update camera and its children
 
 		camera.matrixWorld.copy( cameraVR.matrixWorld );
+		camera.matrix.copy( cameraVR.matrix );
+		camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
 
 		const children = camera.children;
 
@@ -416,7 +416,7 @@ function WebXRManager( renderer, gl ) {
 			const views = pose.views;
 			const baseLayer = session.renderState.baseLayer;
 
-			renderer.setFramebuffer( baseLayer.framebuffer );
+			state.bindXRFramebuffer( baseLayer.framebuffer );
 
 			let cameraVRNeedsUpdate = false;
 

@@ -31,14 +31,14 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 
 				switch ( rgbe_error_code ) {
 
-					case rgbe_read_error: console.error( "THREE.RGBELoader Read Error: " + ( msg || '' ) );
+					case rgbe_read_error: console.error( 'THREE.RGBELoader Read Error: ' + ( msg || '' ) );
 						break;
-					case rgbe_write_error: console.error( "THREE.RGBELoader Write Error: " + ( msg || '' ) );
+					case rgbe_write_error: console.error( 'THREE.RGBELoader Write Error: ' + ( msg || '' ) );
 						break;
-					case rgbe_format_error: console.error( "THREE.RGBELoader Bad File Format: " + ( msg || '' ) );
+					case rgbe_format_error: console.error( 'THREE.RGBELoader Bad File Format: ' + ( msg || '' ) );
 						break;
 					default:
-					case rgbe_memory_error: console.error( "THREE.RGBELoader: Error: " + ( msg || '' ) );
+					case rgbe_memory_error: console.error( 'THREE.RGBELoader: Error: ' + ( msg || '' ) );
 
 				}
 
@@ -59,7 +59,7 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 			RGBE_VALID_FORMAT = 2,
 			RGBE_VALID_DIMENSIONS = 4,
 
-			NEWLINE = "\n",
+			NEWLINE = '\n',
 
 			fgets = function ( buffer, lineLimit, consume ) {
 
@@ -99,7 +99,7 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 				var line, match,
 
 					// regexes to parse header info fields
-					magic_token_re = /^#\?(\S+)$/,
+					magic_token_re = /^#\?(\S+)/,
 					gamma_re = /^\s*GAMMA\s*=\s*(\d+(\.\d+)?)\s*$/,
 					exposure_re = /^\s*EXPOSURE\s*=\s*(\d+(\.\d+)?)\s*$/,
 					format_re = /^\s*FORMAT=(\S+)\s*$/,
@@ -128,30 +128,30 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 
 				if ( buffer.pos >= buffer.byteLength || ! ( line = fgets( buffer ) ) ) {
 
-					return rgbe_error( rgbe_read_error, "no header found" );
+					return rgbe_error( rgbe_read_error, 'no header found' );
 
 				}
 
 				/* if you want to require the magic token then uncomment the next line */
 				if ( ! ( match = line.match( magic_token_re ) ) ) {
 
-					return rgbe_error( rgbe_format_error, "bad initial token" );
+					return rgbe_error( rgbe_format_error, 'bad initial token' );
 
 				}
 
 				header.valid |= RGBE_VALID_PROGRAMTYPE;
 				header.programtype = match[ 1 ];
-				header.string += line + "\n";
+				header.string += line + '\n';
 
 				while ( true ) {
 
 					line = fgets( buffer );
 					if ( false === line ) break;
-					header.string += line + "\n";
+					header.string += line + '\n';
 
 					if ( '#' === line.charAt( 0 ) ) {
 
-						header.comments += line + "\n";
+						header.comments += line + '\n';
 						continue; // comment line
 
 					}
@@ -189,13 +189,13 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 
 				if ( ! ( header.valid & RGBE_VALID_FORMAT ) ) {
 
-					return rgbe_error( rgbe_format_error, "missing format specifier" );
+					return rgbe_error( rgbe_format_error, 'missing format specifier' );
 
 				}
 
 				if ( ! ( header.valid & RGBE_VALID_DIMENSIONS ) ) {
 
-					return rgbe_error( rgbe_format_error, "missing image size specifier" );
+					return rgbe_error( rgbe_format_error, 'missing image size specifier' );
 
 				}
 
@@ -224,7 +224,7 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 
 				if ( scanline_width !== ( ( buffer[ 2 ] << 8 ) | buffer[ 3 ] ) ) {
 
-					return rgbe_error( rgbe_format_error, "wrong scanline width" );
+					return rgbe_error( rgbe_format_error, 'wrong scanline width' );
 
 				}
 
@@ -232,7 +232,7 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 
 				if ( ! data_rgba.length ) {
 
-					return rgbe_error( rgbe_memory_error, "unable to allocate buffer space" );
+					return rgbe_error( rgbe_memory_error, 'unable to allocate buffer space' );
 
 				}
 
@@ -256,7 +256,7 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 
 					if ( ( 2 != rgbeStart[ 0 ] ) || ( 2 != rgbeStart[ 1 ] ) || ( ( ( rgbeStart[ 2 ] << 8 ) | rgbeStart[ 3 ] ) != scanline_width ) ) {
 
-						return rgbe_error( rgbe_format_error, "bad rgbe scanline format" );
+						return rgbe_error( rgbe_format_error, 'bad rgbe scanline format' );
 
 					}
 
@@ -271,7 +271,7 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 
 						if ( ( 0 === count ) || ( ptr + count > ptr_end ) ) {
 
-							return rgbe_error( rgbe_format_error, "bad scanline data" );
+							return rgbe_error( rgbe_format_error, 'bad scanline data' );
 
 						}
 
