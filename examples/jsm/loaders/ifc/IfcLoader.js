@@ -24,7 +24,7 @@ var ifcAPI = new IfcAPI();
 ifcAPI.Init();
 
 IFCLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-	varructor: IFCLoader,
+	constructor: IFCLoader,
 
 	setDecoderPath: function (path) {
 		var loader = new FileLoader(this.manager);
