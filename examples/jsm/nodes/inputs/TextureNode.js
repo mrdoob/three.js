@@ -16,7 +16,7 @@ function TextureNode( value, uv, bias, project ) {
 
 TextureNode.prototype = Object.create( InputNode.prototype );
 TextureNode.prototype.constructor = TextureNode;
-TextureNode.prototype.nodeType = "Texture";
+TextureNode.prototype.nodeType = 'Texture';
 
 TextureNode.prototype.getTexture = function ( builder, output ) {
 

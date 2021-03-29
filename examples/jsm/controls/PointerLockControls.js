@@ -2,7 +2,7 @@ import {
 	Euler,
 	EventDispatcher,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var PointerLockControls = function ( camera, domElement ) {
 
@@ -83,17 +83,17 @@ var PointerLockControls = function ( camera, domElement ) {
 
 	this.connect = function () {
 
-		scope.domElement.ownerDocument.addEventListener( 'mousemove', onMouseMove, false );
-		scope.domElement.ownerDocument.addEventListener( 'pointerlockchange', onPointerlockChange, false );
-		scope.domElement.ownerDocument.addEventListener( 'pointerlockerror', onPointerlockError, false );
+		scope.domElement.ownerDocument.addEventListener( 'mousemove', onMouseMove );
+		scope.domElement.ownerDocument.addEventListener( 'pointerlockchange', onPointerlockChange );
+		scope.domElement.ownerDocument.addEventListener( 'pointerlockerror', onPointerlockError );
 
 	};
 
 	this.disconnect = function () {
 
-		scope.domElement.ownerDocument.removeEventListener( 'mousemove', onMouseMove, false );
-		scope.domElement.ownerDocument.removeEventListener( 'pointerlockchange', onPointerlockChange, false );
-		scope.domElement.ownerDocument.removeEventListener( 'pointerlockerror', onPointerlockError, false );
+		scope.domElement.ownerDocument.removeEventListener( 'mousemove', onMouseMove );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerlockchange', onPointerlockChange );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerlockerror', onPointerlockError );
 
 	};
 

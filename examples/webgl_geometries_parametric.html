@@ -77,13 +77,9 @@
 
 				const GrannyKnot = new Curves.GrannyKnot();
 
-				let torus = new ParametricGeometries.TorusKnotGeometry( 50, 10, 50, 20, 2, 3 );
-				let sphere = new ParametricGeometries.SphereGeometry( 50, 20, 10 );
-				let tube = new ParametricGeometries.TubeGeometry( GrannyKnot, 100, 3, 8, true );
-
-				torus = new THREE.BufferGeometry().fromGeometry( torus );
-				sphere = new THREE.BufferGeometry().fromGeometry( sphere );
-				tube = new THREE.BufferGeometry().fromGeometry( tube );
+				const torus = new ParametricGeometries.TorusKnotGeometry( 50, 10, 50, 20, 2, 3 );
+				const sphere = new ParametricGeometries.SphereGeometry( 50, 20, 10 );
+				const tube = new ParametricGeometries.TubeGeometry( GrannyKnot, 100, 3, 8, true );
 
 				object = new THREE.Mesh( torus, material );
 				object.position.set( - 200, 0, - 200 );
@@ -108,7 +104,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

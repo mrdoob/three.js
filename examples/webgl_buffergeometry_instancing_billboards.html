@@ -84,7 +84,7 @@
 
 			renderer = new THREE.WebGLRenderer();
 
-			if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
+			if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'ANGLE_instanced_arrays' ) === false ) {
 
 				document.getElementById( 'notSupported' ).style.display = '';
 				return false;
@@ -99,7 +99,7 @@
 
 			scene = new THREE.Scene();
 
-			const circleGeometry = new THREE.CircleBufferGeometry( 1, 6 );
+			const circleGeometry = new THREE.CircleGeometry( 1, 6 );
 
 			geometry = new THREE.InstancedBufferGeometry();
 			geometry.index = circleGeometry.index;
@@ -141,7 +141,7 @@
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 			return true;
 

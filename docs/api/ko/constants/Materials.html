@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>재질 상수</h1>
+
+		<p class="desc">
+		이 상수들은	[page:MeshBasicMaterial.combine MeshBasicMaterial], 
+		[page:MeshLambertMaterial.combine MeshLambertMaterial] 및 
+		[page:MeshPhongMaterial.combine MeshPhongMaterial]에만 적용되는 텍스쳐 결합 연산을 제외한
+		모든 재질 타입에 공통 속성을 정의합니다.
+		<br />
+		</p>
+
+
+		<h2>측면</h2>
+		<code>
+		THREE.FrontSide
+		THREE.BackSide
+		THREE.DoubleSide
+		</code>
+		<p>
+		어느 측면(앞,뒤 혹은 둘 다)이 렌더링 될 지 정의합니다.
+		기본값은 [page:Constant FrontSide]입니다.
+		</p>
+
+		<h2>혼합 모드</h2>
+		<code>
+		THREE.NoBlending
+		THREE.NormalBlending
+		THREE.AdditiveBlending
+		THREE.SubtractiveBlending
+		THREE.MultiplyBlending
+		THREE.CustomBlending
+		</code>
+
+
+		<p>
+		WebGL에서 사용되는 WebGLRender에 보내진 재료의 RGB값과 알파값에 대한 소스와 표적 혼합 방정식을 제어합니다.<br />
+		기본값은 [page:Constant NormalBlending]입니다.<br />
+		[page:CustomBlendingEquation Custom Blending Equations]를 사용하기 위해서는 [page:Constant CustomBlending]이 반드시 설정되어야 하는 것을 주의하세요.<br />
+		[example:webgl_materials_blending materials / blending] 예제를 참고하세요.<br />
+		</p>
+
+		<h2>깊이 모드</h2>
+		<code>
+		THREE.NeverDepth
+		THREE.AlwaysDepth
+		THREE.LessDepth
+		THREE.LessEqualDepth
+		THREE.GreaterEqualDepth
+		THREE.GreaterDepth
+		THREE.NotEqualDepth
+		</code>
+		<p>
+		재질에서 다음 픽셀의 Z-depth를 현재 Z-depth 버퍼 값과 비교하는데 사용되는 함수입니다. 비교 결과가 true면 픽셀이 그려집니다.<br />
+		[page:Materials NeverDepth]는 절대 true를 리턴하지 않습니다.<br />
+		[page:Materials AlwaysDepth]는 항상 true를 리턴합니다.<br />
+		[page:Materials LessDepth] 다음 픽셀의 Z-depth가 현재 버퍼의 Z-depth보다 작으면 true를 리턴합니다.<br />
+		[page:Materials LessEqualDepth] 다음 픽셀의 Z-depth가 현재 버퍼의 Z-depth보다 작거나 같으면 true를 리턴합니다.<br />
+		[page:Materials GreaterEqualDepth] 다음 픽셀의 Z-depth가 현재 버퍼의 Z-depth보다 크거나 같으면 true를 리턴합니다.<br />
+		[page:Materials GreaterDepth] 다음 픽셀의 Z-depth가 현재 버퍼의 Z-depth보다 크면 true를 리턴합니다<br />
+		[page:Materials NotEqualDepth] 다음 픽셀의 Z-depth가 현재 버퍼의 Z-depth와 다르면 true를 리턴합니다.<br />
+		</p>
+
+		<h2>텍스쳐 결합 연산</h2>
+		<code>
+		THREE.MultiplyOperation
+		THREE.MixOperation
+		THREE.AddOperation
+		</code>
+		<p>
+		[page:MeshBasicMaterial.combine MeshBasicMaterial], [page:MeshLambertMaterial.combine MeshLambertMaterial] 및 [page:MeshPhongMaterial.combine MeshPhongMaterial]과 관련해
+		표면 색상의 결과를 환경 맵과 결합하는 방법을 정의합니다(있는 경우).<br />
+		[page:Constant MultiplyOperation]이 기본값이며 환경맵 색상과 표면 색상을 곱합니다.<br />
+		[page:Constant MixOperation] 두 색상 혼합을 위해 반사율을 사용합니다.<br />
+		[page:Constant AddOperation] 두 색상을 더합니다.
+		</p>
+
+		<h2>스텐실 함수</h2>
+		<code>
+		THREE.NeverStencilFunc
+		THREE.LessStencilFunc
+		THREE.EqualStencilFunc
+		THREE.LessEqualStencilFunc
+		THREE.GreaterStencilFunc
+		THREE.NotEqualStencilFunc
+		THREE.GreaterEqualStencilFunc
+		THREE.AlwaysStencilFunc
+		</code>
+		<p>
+		재질에서 스텐실 연산을 수행할지 말지 정의하는 함수들입니다.<br />
+		[page:Materials NeverStencilFunc]는 절대 true를 리턴하지 않습니다.<br />
+		[page:Materials LessStencilFunc]는 스텐실 참조값이 현재 스텐실 값보다 작으면 true를 리턴합니다.<br />
+		[page:Materials EqualStencilFunc]는 스텐실 참조값이 현재 스텐실 값과 같으면 true를 리턴합니다.<br />
+		[page:Materials LessEqualStencilFunc]는 스텐실 참조값이 현재 스텐실 값보다 작거나 같으면 true를 리턴합니다.<br />
+		[page:Materials GreaterStencilFunc] 는 스텐실 참조값이 현재 스텐실 값보다 크면 true를 리턴합니다..<br />
+		[page:Materials NotEqualStencilFunc] 는 스텐실 참조값이 현재 스텐실 값과 다르면 true를 리턴합니다.<br />
+		[page:Materials GreaterEqualStencilFunc] 는 스텐실 참조값이 현재 스텐실 값보다 크거나 같으면 true를 리턴합니다.<br />
+		[page:Materials AlwaysStencilFunc]는 항상 true를 리턴합니다.<br />
+		</p>
+
+		<h2>스텐실 연산</h2>
+		<code>
+		THREE.ZeroStencilOp
+		THREE.KeepStencilOp
+		THREE.ReplaceStencilOp
+		THREE.IncrementStencilOp
+		THREE.DecrementStencilOp
+		THREE.IncrementWrapStencilOp
+		THREE.DecrementWrapStencilOp
+		THREE.InvertStencilOp
+		</code>
+		<p>
+		재질의 스텐실 버퍼 픽셀에서 스텐실 함수로부터 실행되는 스텐실 연산입니다.<br />
+		[page:Materials ZeroStencilOp]는 스텐실 값을 0으로 만듭니다.<br />
+		[page:Materials KeepStencilOp]는 현재 스텐실 값을 변경시키지 않습니다.<br />
+		[page:Materials ReplaceStencilOp]는 스텐실 값을 특정 스텐실 참조값으로 교체합니다.<br />
+		[page:Materials IncrementStencilOp]는 현재 스텐실 값을 1 증가시킵니다.<br />
+		[page:Materials DecrementStencilOp]는 현재 스텐실 값을 1 감소시킵니다.<br />
+		[page:Materials IncrementWrapStencilOp]는 현재 스텐실 값을 1 증가시킵니다. 만약 증가된 값이 255를 넘으면 0으로 설정됩니다.<br />
+		[page:Materials DecrementWrapStencilOp]는 현재 스텐실 값을 1 감소시킵니다. 만약 감소된 값이 0 아래로 내려가면 255로 설정됩니다.<br />
+		[page:Materials InvertStencilOp]는 현재 스텐실 값의 비트값 반전을 수행합니다.<br />
+		</p>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

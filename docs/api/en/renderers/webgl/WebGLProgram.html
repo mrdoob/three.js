@@ -55,7 +55,10 @@
 		<h3>Vertex shader (conditional):</h3>
 		<div>
 		<code>
-		#ifdef USE_COLOR
+		#if defined( USE_COLOR_ALPHA )
+			// vertex color attribute with alpha
+			attribute vec4 color;
+		#elif defined( USE_COLOR )
 			// vertex color attribute
 			attribute vec3 color;
 		#endif

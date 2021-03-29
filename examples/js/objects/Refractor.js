@@ -50,9 +50,9 @@ THREE.Refractor = function ( geometry, options ) {
 		transparent: true // ensures, refractors are drawn from farthest to closest
 	} );
 
-	this.material.uniforms[ "color" ].value = color;
-	this.material.uniforms[ "tDiffuse" ].value = renderTarget.texture;
-	this.material.uniforms[ "textureMatrix" ].value = textureMatrix;
+	this.material.uniforms[ 'color' ].value = color;
+	this.material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
+	this.material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 
 	// functions
 
@@ -114,7 +114,7 @@ THREE.Refractor = function ( geometry, options ) {
 		return function updateVirtualCamera( camera ) {
 
 			virtualCamera.matrixWorld.copy( camera.matrixWorld );
-			virtualCamera.matrixWorldInverse.getInverse( virtualCamera.matrixWorld );
+			virtualCamera.matrixWorldInverse.copy( virtualCamera.matrixWorld ).invert();
 			virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 			virtualCamera.far = camera.far; // used in WebGLBackground
 

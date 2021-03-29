@@ -8,7 +8,7 @@ function MeshStandardNodeMaterial() {
 
 	NodeMaterial.call( this, node, node );
 
-	this.type = "MeshStandardNodeMaterial";
+	this.type = 'MeshStandardNodeMaterial';
 
 }
 
@@ -16,15 +16,15 @@ MeshStandardNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
 MeshStandardNodeMaterial.prototype.constructor = MeshStandardNodeMaterial;
 
 NodeUtils.addShortcuts( MeshStandardNodeMaterial.prototype, 'properties', [
-	"color",
-	"roughness",
-	"metalness",
-	"map",
-	"normalMap",
-	"normalScale",
-	"metalnessMap",
-	"roughnessMap",
-	"envMap"
+	'color',
+	'roughness',
+	'metalness',
+	'map',
+	'normalMap',
+	'normalScale',
+	'metalnessMap',
+	'roughnessMap',
+	'envMap'
 ] );
 
 export { MeshStandardNodeMaterial };

@@ -4,12 +4,10 @@ const _vector = /*@__PURE__*/ new Vector2();
 
 class Box2 {
 
-	constructor( min, max ) {
+	constructor( min = new Vector2( + Infinity, + Infinity ), max = new Vector2( - Infinity, - Infinity ) ) {
 
-		Object.defineProperty( this, 'isBox2', { value: true } );
-
-		this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
-		this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );
+		this.min = min;
+		this.max = max;
 
 	}
 
@@ -228,5 +226,6 @@ class Box2 {
 
 }
 
+Box2.prototype.isBox2 = true;
 
 export { Box2 };

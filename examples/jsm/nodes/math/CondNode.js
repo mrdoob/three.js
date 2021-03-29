@@ -25,7 +25,7 @@ CondNode.OR = '||';
 
 CondNode.prototype = Object.create( TempNode.prototype );
 CondNode.prototype.constructor = CondNode;
-CondNode.prototype.nodeType = "Cond";
+CondNode.prototype.nodeType = 'Cond';
 
 CondNode.prototype.getType = function ( builder ) {
 

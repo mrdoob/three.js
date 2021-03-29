@@ -39,7 +39,7 @@
 				diffuseMap.minFilter = THREE.LinearFilter;
 				diffuseMap.generateMipmaps = false;
 
-				const geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+				const geometry = new THREE.PlaneGeometry( 2, 2 );
 				const material = new THREE.MeshBasicMaterial( { map: diffuseMap } );
 
 				const mesh = new THREE.Mesh( geometry, material );
@@ -62,7 +62,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -102,7 +102,7 @@
 				const floorMaterial = new THREE.MeshPhongMaterial( { color: '#252a34' } );
 				csm.setupMaterial( floorMaterial );
 
-				const floor = new THREE.Mesh( new THREE.PlaneBufferGeometry( 10000, 10000, 8, 8 ), floorMaterial );
+				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000, 8, 8 ), floorMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				floor.castShadow = true;
 				floor.receiveShadow = true;
@@ -114,7 +114,7 @@
 				const material2 = new THREE.MeshPhongMaterial( { color: '#ff2e63' } );
 				csm.setupMaterial( material2 );
 
-				const geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+				const geometry = new THREE.BoxGeometry( 10, 10, 10 );
 
 				for ( let i = 0; i < 40; i ++ ) {
 
@@ -248,7 +248,7 @@
 
 					renderer.setSize( window.innerWidth, window.innerHeight );
 
-				}, false );
+				} );
 
 			}
 

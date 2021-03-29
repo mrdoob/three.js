@@ -1,11 +1,11 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { PlaneBufferGeometry } from '../../../../src/geometries/PlaneBufferGeometry';
+import { PlaneGeometry, PlaneBufferGeometry } from '../../../../src/geometries/PlaneGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'PlaneBufferGeometry', ( hooks ) => {
+	QUnit.module( 'PlaneGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -18,11 +18,12 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				new PlaneBufferGeometry(),
-				new PlaneBufferGeometry( parameters.width ),
-				new PlaneBufferGeometry( parameters.width, parameters.height ),
-				new PlaneBufferGeometry( parameters.width, parameters.height, parameters.widthSegments ),
-				new PlaneBufferGeometry( parameters.width, parameters.height, parameters.widthSegments, parameters.heightSegments ),
+				new PlaneGeometry(),
+				new PlaneGeometry( parameters.width ),
+				new PlaneGeometry( parameters.width, parameters.height ),
+				new PlaneGeometry( parameters.width, parameters.height, parameters.widthSegments ),
+				new PlaneGeometry( parameters.width, parameters.height, parameters.widthSegments, parameters.heightSegments ),
+				new PlaneBufferGeometry()
 			];
 
 		} );

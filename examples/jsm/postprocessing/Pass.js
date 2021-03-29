@@ -1,8 +1,8 @@
 import {
 	OrthographicCamera,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	Mesh
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 function Pass() {
 
@@ -41,7 +41,7 @@ Object.assign( Pass.prototype, {
 Pass.FullScreenQuad = ( function () {
 
 	var camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	var geometry = new PlaneBufferGeometry( 2, 2 );
+	var geometry = new PlaneGeometry( 2, 2 );
 
 	var FullScreenQuad = function ( material ) {
 

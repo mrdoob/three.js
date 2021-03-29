@@ -128,7 +128,8 @@ m.elements = [ 11, 21, 31, 41,
 
 		<h3>[method:null decompose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
 		<p>
-			将矩阵分解到给定的平移[page:Vector3 position] ,旋转 [page:Quaternion quaternion]，缩放[page:Vector3 scale]分量中。
+			将矩阵分解到给定的平移[page:Vector3 position] ,旋转 [page:Quaternion quaternion]，缩放[page:Vector3 scale]分量中。<br/><br/>
+			Note: Not all matrices are decomposable in this way. For example, if an object has a non-uniformly scaled parent, then the object's world matrix may not be decomposable, and this method may not be appropriate.
 		</p>
 
 		<h3>[method:Float determinant]()</h3>
@@ -170,16 +171,13 @@ zAxis = (c, g, k)
 			[page:Integer offset] - (可选参数) 数组的偏移量，默认值为 0。<br /><br />
 
 			使用基于列优先格式[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]的数组来设置该矩阵。
-			</p>
+		</p>
 
-		<h3>[method:this getInverse]( [param:Matrix4 m] )</h3>
+		<h3>[method:this invert]()</h3>
 		<p>
-			[page:Matrix3 m] - 取逆的矩阵。<br /><br />
+		Inverts this matrix, using the [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method].
 
-			Set this matrix to the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] of the passed matrix [page:Matrix4 m],
-			using the method outlined [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm here].
-
-			You can not invert a matrix with a determinant of zero. If you attempt this, the method returns a zero matrix instead.
+		You can not invert with a determinant of zero. If you attempt this, the method produces a zero matrix instead.
 		</p>
 
 		<h3>[method:Float getMaxScaleOnAxis]()</h3>
@@ -353,6 +351,9 @@ x, y, 1, 0,
 		<p>
 			以行优先的格式将传入的数值设置给该矩阵中的元素[page:.elements elements]。
 		</p>
+
+		<h3>[method:this setFromMatrix3]( [param:Matrix3 m] )</h3>
+		<p>Set the upper 3x3 elements of this matrix to the values of the Matrix3 [page:Matrix3 m].</p>
 
 		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
 		<h3>[method:this setPosition]( [param:Float x], [param:Float y], [param:Float z] ) // optional API</h3>

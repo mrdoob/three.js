@@ -28,6 +28,12 @@
 <p>设置运行alphaTest时要使用的alpha值。如果不透明度低于此值，则不会渲染材质。默认值为*0*。
 </p>
 
+<h3>[property:Float alphaToCoverage]</h3>
+<p>
+Enables alpha to coverage. Can only be used with MSAA-enabled contexts (meaning when the renderer was created with *antialias* parameter set to *true*).
+Default is *false*.
+</p>
+
 <h3>[property:Integer blendDst]</h3>
 <p> 混合目标。默认值为[page:CustomBlendingEquation OneMinusSrcAlphaFactor]。
 	目标因子所有可能的取值请参阅[page:CustomBlendingEquation constants]。
@@ -142,10 +148,6 @@ Which stencil operation to perform when the comparison function returns true but
 Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
 </p>
 
-<h3>[property:Boolean flatShading]</h3>
-<p> 定义材质是否使用平面着色进行渲染。默认值为false。
-</p>
-
 <h3>[property:Boolean fog]</h3>
 <p>材质是否受雾影响。默认为*true*。</p>
 
@@ -254,7 +256,7 @@ This starts at *0* and counts how many times [property:Boolean needsUpdate] is s
 
 <h3>[property:Boolean vertexColors]</h3>
 <p>
-Defines whether vertex coloring is used. Default is *false*.
+是否使用顶点着色。默认值为false。
 </p>
 
 <h3>[property:Boolean visible]</h3>

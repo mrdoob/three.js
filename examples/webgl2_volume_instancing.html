@@ -15,7 +15,7 @@
 		<script type="module">
 			import * as THREE from '../build/three.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { VOXLoader } from './jsm/loaders/VOXLoader.js';
+			import { VOXLoader, VOXDataTexture3D } from './jsm/loaders/VOXLoader.js';
 
 			import { WEBGL } from './jsm/WebGL.js';
 
@@ -165,34 +165,12 @@
 					for ( var i = 0; i < chunks.length; i ++ ) {
 
 						const chunk = chunks[ i ];
-						const data = chunk.data;
-						const size = chunk.size;
 
-						const array = new Uint8Array( size.x * size.y * size.z );
-
-						for ( var j = 0, k = 0; j < data.length; j += 4, k ++ ) {
-
-							const x = data[ j + 0 ];
-							const y = data[ j + 1 ];
-							const z = data[ j + 2 ];
-
-							const index = x + ( y * size.x ) + ( z * size.x * size.y );
-
-							array[ index ] = 255.0;
-
-						}
-
-						const texture = new THREE.DataTexture3D( array, size.x, size.y, size.z );
-						texture.format = THREE.RedFormat;
-						texture.minFilter = THREE.NearestFilter;
-						texture.magFilter = THREE.LinearFilter;
-						texture.unpackAlignment = 1;
-
-						const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+						const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 						const material = new THREE.RawShaderMaterial( {
 							glslVersion: THREE.GLSL3,
 							uniforms: {
-								map: { value: texture },
+								map: { value: new VOXDataTexture3D( chunk ) },
 								cameraPos: { value: new THREE.Vector3() }
 							},
 							vertexShader,
@@ -200,7 +178,7 @@
 							side: THREE.BackSide
 						} );
 
-						const mesh = new THREE.InstancedMesh( geometry, material, 100000 );
+						const mesh = new THREE.InstancedMesh( geometry, material, 50000 );
 						mesh.onBeforeRender = function () {
 
 							this.material.uniforms.cameraPos.value.copy( camera.position );
@@ -227,7 +205,7 @@
 
 				} );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

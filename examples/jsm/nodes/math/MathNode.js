@@ -61,8 +61,8 @@ MathNode.FACEFORWARD = 'faceforward';
 
 MathNode.prototype = Object.create( TempNode.prototype );
 MathNode.prototype.constructor = MathNode;
-MathNode.prototype.nodeType = "Math";
-MathNode.prototype.hashProperties = [ "method" ];
+MathNode.prototype.nodeType = 'Math';
+MathNode.prototype.hashProperties = [ 'method' ];
 
 MathNode.prototype.getNumInputs = function ( /*builder*/ ) {
 

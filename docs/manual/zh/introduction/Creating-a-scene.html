@@ -23,7 +23,6 @@
 				&lt;title&gt;My first three.js app&lt;/title&gt;
 				&lt;style&gt;
 					body { margin: 0; }
-					canvas { display: block; }
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
@@ -54,7 +53,7 @@
 
 		<p>three.js里有几种不同的相机，在这里，我们使用的是<strong>PerspectiveCamera</strong>（透视摄像机）。</p>
 
-		<p>第一个参数是<strong>视野角度（FOV）</strong>。视野角度就是无论在什么时候，你所能在显示器上看到的场景的范围，它的值是角度单位。</p>
+		<p>第一个参数是<strong>视野角度（FOV）</strong>。视野角度就是无论在什么时候，你所能在显示器上看到的场景的范围，它的单位是角度(与弧度区分开)。</p>
 
 		<p>第二个参数是<strong>长宽比（aspect ratio）</strong>。 也就是你用一个物体的宽除以它的高的值。比如说，当你在一个宽屏电视上播放老电影时，可以看到图像仿佛是被压扁的。</p>
 
@@ -118,15 +117,15 @@
 		<h2>结果</h2>
 		<p>祝贺你！你现在已经成功完成了你的第一个Three.js应用程序。虽然它很简单，但现在你已经有了一个入门的起点。</p>
 
-		<p>下面是完整的代码，可在[link:https://jsfiddle.net/mkba0ecu/ live example]运行、编辑；运行或者修改代码有助于你更好的理解它是如何工作的。</p>
+		<p>下面是完整的代码，可在[link:https://jsfiddle.net/fxurzeb4/ live example]运行、编辑；运行或者修改代码有助于你更好的理解它是如何工作的。</p>
 
 		<code>
 		&lt;html&gt;
 			&lt;head&gt;
+				&lt;meta charset="utf-8"&gt;
 				&lt;title&gt;My first three.js app&lt;/title&gt;
 				&lt;style&gt;
 					body { margin: 0; }
-					canvas { display: block; }
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;

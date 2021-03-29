@@ -379,7 +379,7 @@ function Script( editor ) {
 
 					mode = 'glsl';
 					name = 'Vertex Shader';
-					source = object.material.vertexShader || "";
+					source = object.material.vertexShader || '';
 
 					break;
 
@@ -387,7 +387,7 @@ function Script( editor ) {
 
 					mode = 'glsl';
 					name = 'Fragment Shader';
-					source = object.material.fragmentShader || "";
+					source = object.material.fragmentShader || '';
 
 					break;
 
@@ -403,6 +403,7 @@ function Script( editor ) {
 					source = JSON.stringify( json, null, '\t' );
 
 			}
+
 			title.setValue( object.material.name + ' / ' + name );
 
 		}

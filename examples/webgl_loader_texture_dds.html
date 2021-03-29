@@ -32,7 +32,7 @@
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
 
 				/*
 				This is how compressed textures are supposed to be used:
@@ -100,7 +100,7 @@
 				const material7 = new THREE.MeshBasicMaterial( { map: map5 } );
 				const material8 = new THREE.MeshBasicMaterial( { map: map6 } );
 
-				let mesh = new THREE.Mesh( new THREE.TorusBufferGeometry( 100, 50, 32, 16 ), material1 );
+				let mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 50, 32, 16 ), material1 );
 				mesh.position.x = - 600;
 				mesh.position.y = - 200;
 				scene.add( mesh );
@@ -153,7 +153,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

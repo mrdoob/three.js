@@ -95,7 +95,7 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				const helper = new THREE.BoxHelper( new THREE.Mesh( new THREE.BoxBufferGeometry( r, r, r ) ) );
+				const helper = new THREE.BoxHelper( new THREE.Mesh( new THREE.BoxGeometry( r, r, r ) ) );
 				helper.material.color.setHex( 0x101010 );
 				helper.material.blending = THREE.AdditiveBlending;
 				helper.material.transparent = true;
@@ -174,7 +174,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

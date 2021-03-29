@@ -5,6 +5,25 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			#loader {
+				border: 5px solid #f3f3f3; /* Light grey */
+                border-top: 5px solid #3d3d3d; /* Grey */
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                z-index: 2;
+            }
+			
+			@keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+		</style>
 	</head>
 
 	<body>
@@ -12,6 +31,7 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Rhino 3DM loader
 		</div>
 
+		<div id="loader"></div>
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -46,12 +66,15 @@
 				scene.add( directionalLight );
 
 				const loader = new Rhino3dmLoader();
-				loader.setLibraryPath( 'jsm/libs/rhino3dm/' );
+				loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/' );
 
 				loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
 
 					scene.add( object );
 					initGUI( object.userData.layers );
+
+					// hide spinner
+					document.getElementById( 'loader' ).style.display = 'none';
 
 				} );
 
@@ -65,7 +88,7 @@
 
 				controls = new OrbitControls( camera, container );
 
-				window.addEventListener( 'resize', resize, false );
+				window.addEventListener( 'resize', resize );
 
 			}
 

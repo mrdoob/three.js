@@ -111,7 +111,7 @@ line.geometry.computeBoundingSphere();
 
 			<p>
 				هنا مثال يعرض خطًا متحركًا يمكن تكييفه مع حالة الاستخدام الخاصة بك.
-				[link:http://jsfiddle.net/w67tzfhx/ Here is a fiddle]
+				[link:https://jsfiddle.net/xvnctbL0/2/ Here is a fiddle]
 			</p>
 
 			<h3>أمثلة</h3>
@@ -120,33 +120,6 @@ line.geometry.computeBoundingSphere();
 				[example:webgl_custom_attributes WebGL / custom / attributes]<br />
 				[example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
 			</p>
-
-		</div>
-
-		<h2>الهندسة (Geometry)</h2>
-		<div>
-			<p>
-				تتحكم العلامات التالية في تحديث سمات الهندسة المختلفة. قم بتعيين العلامات فقط للسمات التي تحتاج إلى تحديثها ، فالتحديثات مكلفة. بمجرد تغيير المخازن المؤقتة ، يتم إعادة تعيين هذه العلامات تلقائيًا إلى false. تحتاج إلى الاستمرار في ضبطها على true إذا كنت تريد الاستمرار في تحديث المخازن المؤقتة. لاحظ أن هذا ينطبق فقط على [page:Geometry] وليس [page:BufferGeometry].
-			</p>
-			<code>
-const geometry = new THREE.Geometry();
-geometry.verticesNeedUpdate = true;
-geometry.elementsNeedUpdate = true;
-geometry.morphTargetsNeedUpdate = true;
-geometry.uvsNeedUpdate = true;
-geometry.normalsNeedUpdate = true;
-geometry.colorsNeedUpdate = true;
-geometry.tangentsNeedUpdate = true;
-			</code>
-
-			<p>
-				في الإصدارات السابقة لـ [link:https://github.com/mrdoob/three.js/releases/tag/r66 r66] ، تحتاج الشبكات أيضًا إلى تمكين العلامة  <em>الديناميكية</em> (للاحتفاظ بالمصفوفات المكتوبة داخليًا):
-			</p>
-
-			<code>
-	//removed after r66
-	geometry.dynamic = true;
-			</code>
 
 		</div>
 

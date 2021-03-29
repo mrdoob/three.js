@@ -201,9 +201,10 @@ THREE.ColladaExporter.prototype = {
 
 				// convert the geometry to bufferGeometry if it isn't already
 				var bufferGeometry = g;
-				if ( bufferGeometry instanceof THREE.Geometry ) {
 
-					bufferGeometry = ( new THREE.BufferGeometry() ).fromGeometry( bufferGeometry );
+				if ( bufferGeometry.isBufferGeometry !== true ) {
+
+					throw new Error( 'THREE.ColladaExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 				}
 
@@ -296,7 +297,7 @@ THREE.ColladaExporter.prototype = {
 
 				}
 
-				gnode += `</mesh></geometry>`;
+				gnode += '</mesh></geometry>';
 
 				libraryGeometries.push( gnode );
 
@@ -363,11 +364,11 @@ THREE.ColladaExporter.prototype = {
 
 				var type = 'phong';
 
-				if ( m instanceof THREE.MeshLambertMaterial ) {
+				if ( m.isMeshLambertMaterial === true ) {
 
 					type = 'lambert';
 
-				} else if ( m instanceof THREE.MeshBasicMaterial ) {
+				} else if ( m.isMeshBasicMaterial === true ) {
 
 					type = 'constant';
 
@@ -395,10 +396,10 @@ THREE.ColladaExporter.prototype = {
 				if ( m.transparent === true ) {
 
 					transparencyNode +=
-						`<transparent>` +
+						'<transparent>' +
 						(
 							m.map ?
-								`<texture texture="diffuse-sampler"></texture>` :
+								'<texture texture="diffuse-sampler"></texture>' :
 								'<float>1</float>'
 						) +
 						'</transparent>';
@@ -515,7 +516,7 @@ THREE.ColladaExporter.prototype = {
 
 					(
 						m.side === THREE.DoubleSide ?
-							`<extra><technique profile="THREEJS"><double_sided sid="double_sided" type="int">1</double_sided></technique></extra>` :
+							'<extra><technique profile="THREEJS"><double_sided sid="double_sided" type="int">1</double_sided></technique></extra>' :
 							''
 					) +
 
@@ -543,7 +544,7 @@ THREE.ColladaExporter.prototype = {
 
 			node += getTransform( o );
 
-			if ( o instanceof THREE.Mesh && o.geometry != null ) {
+			if ( o.isMesh === true && o.geometry !== null ) {
 
 				// function returns the id associated with the mesh and a "BufferGeometry" version
 				// of the geometry in case it's not a geometry.

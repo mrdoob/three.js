@@ -15,15 +15,7 @@ function SidebarGeometryModifiers( editor, object ) {
 
 		geometry.computeVertexNormals();
 
-		if ( geometry.isBufferGeometry ) {
-
-			geometry.attributes.normal.needsUpdate = true;
-
-		} else {
-
-			geometry.normalsNeedUpdate = true;
-
-		}
+		geometry.attributes.normal.needsUpdate = true;
 
 		signals.geometryChanged.dispatch( object );
 

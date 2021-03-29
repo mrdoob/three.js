@@ -15,7 +15,7 @@ import {
 	Vector2,
 	Vector3,
 	Vector4
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 var Lensflare = function () {
 
@@ -211,8 +211,8 @@ var Lensflare = function () {
 			// render pink quad
 
 			var uniforms = material1a.uniforms;
-			uniforms[ "scale" ].value = scale;
-			uniforms[ "screenPosition" ].value = positionScreen;
+			uniforms[ 'scale' ].value = scale;
+			uniforms[ 'screenPosition' ].value = positionScreen;
 
 			renderer.renderBufferDirect( camera, null, geometry, material1a, mesh1, null );
 
@@ -223,8 +223,8 @@ var Lensflare = function () {
 			// restore graphics
 
 			var uniforms = material1b.uniforms;
-			uniforms[ "scale" ].value = scale;
-			uniforms[ "screenPosition" ].value = positionScreen;
+			uniforms[ 'scale' ].value = scale;
+			uniforms[ 'screenPosition' ].value = positionScreen;
 
 			renderer.renderBufferDirect( camera, null, geometry, material1b, mesh1, null );
 
@@ -239,15 +239,15 @@ var Lensflare = function () {
 
 				var uniforms = material2.uniforms;
 
-				uniforms[ "color" ].value.copy( element.color );
-				uniforms[ "map" ].value = element.texture;
-				uniforms[ "screenPosition" ].value.x = positionScreen.x + vecX * element.distance;
-				uniforms[ "screenPosition" ].value.y = positionScreen.y + vecY * element.distance;
+				uniforms[ 'color' ].value.copy( element.color );
+				uniforms[ 'map' ].value = element.texture;
+				uniforms[ 'screenPosition' ].value.x = positionScreen.x + vecX * element.distance;
+				uniforms[ 'screenPosition' ].value.y = positionScreen.y + vecY * element.distance;
 
 				var size = element.size / viewport.w;
 				var invAspect = viewport.w / viewport.z;
 
-				uniforms[ "scale" ].value.set( size * invAspect, size );
+				uniforms[ 'scale' ].value.set( size * invAspect, size );
 
 				material2.uniformsNeedUpdate = true;
 

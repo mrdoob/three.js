@@ -1,11 +1,19 @@
-import { Geometry } from '../core/Geometry.js';
-import { TetrahedronBufferGeometry } from './TetrahedronBufferGeometry.js';
+import { PolyhedronGeometry } from './PolyhedronGeometry.js';
 
-class TetrahedronGeometry extends Geometry {
+class TetrahedronGeometry extends PolyhedronGeometry {
 
-	constructor( radius, detail ) {
+	constructor( radius = 1, detail = 0 ) {
 
-		super();
+		const vertices = [
+			1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1
+		];
+
+		const indices = [
+			2, 1, 0, 	0, 3, 2,	1, 3, 0,	2, 3, 1
+		];
+
+		super( vertices, indices, radius, detail );
+
 		this.type = 'TetrahedronGeometry';
 
 		this.parameters = {
@@ -13,11 +21,8 @@ class TetrahedronGeometry extends Geometry {
 			detail: detail
 		};
 
-		this.fromBufferGeometry( new TetrahedronBufferGeometry( radius, detail ) );
-		this.mergeVertices();
-
 	}
 
 }
 
-export { TetrahedronGeometry };
+export { TetrahedronGeometry, TetrahedronGeometry as TetrahedronBufferGeometry };

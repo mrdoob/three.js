@@ -63,7 +63,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				createScene();
 
@@ -250,7 +250,7 @@
 
 				// Ground
 
-				const ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 200000, 200000 ), new THREE.MeshPhongMaterial( { color: 0xC0C0C0, shininess: 0 } ) );
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 200000, 200000 ), new THREE.MeshPhongMaterial( { color: 0xC0C0C0, shininess: 0 } ) );
 				ground.rotation.x = - Math.PI * 0.5;
 				scene.add( ground );
 
@@ -265,7 +265,7 @@
 
 				scene.userData.camera.position.set( 5 * coneHeight, 4 * coneHeight, 18 * coneHeight );
 
-				const coneMesh1 = new THREE.Mesh( new THREE.ConeBufferGeometry( coneHeight, coneHeight, 30, 1, false ), new THREE.MeshPhongMaterial( { color: 0xFFFF00, emissive: 0x1F1F00 } ) );
+				const coneMesh1 = new THREE.Mesh( new THREE.ConeGeometry( coneHeight, coneHeight, 30, 1, false ), new THREE.MeshPhongMaterial( { color: 0xFFFF00, emissive: 0x1F1F00 } ) );
 				coneMesh1.rotation.x = Math.PI;
 				coneMesh1.position.y = conesDistance + coneHeight;
 				scene.add( coneMesh1 );
@@ -433,25 +433,25 @@
 
 				scene.userData.camera.position.set( 5 * sphereRadius, 2 * sphereHeight, 6 * sphereRadius );
 
-				const sphereMesh = new THREE.Mesh( new THREE.SphereBufferGeometry( sphereRadius, 80, 40 ), sphereMaterial );
+				const sphereMesh = new THREE.Mesh( new THREE.SphereGeometry( sphereRadius, 80, 40 ), sphereMaterial );
 				sphereMesh.position.set( 0, sphereHeight, 0 );
 				ballScene.add( sphereMesh );
 
 				const sphere = new THREE.Sphere( sphereMesh.position, sphereRadius );
 
-				const spherePlasma = new THREE.Mesh( new THREE.SphereBufferGeometry( sphereRadius * 0.05, 24, 12 ), scene.userData.lightningMaterial );
+				const spherePlasma = new THREE.Mesh( new THREE.SphereGeometry( sphereRadius * 0.05, 24, 12 ), scene.userData.lightningMaterial );
 				spherePlasma.position.copy( sphereMesh.position );
 				spherePlasma.scale.y = 0.6;
 				scene.add( spherePlasma );
 
 				const post = new THREE.Mesh(
-					new THREE.CylinderBufferGeometry( sphereRadius * 0.06, sphereRadius * 0.06, sphereHeight, 6, 1, true ),
+					new THREE.CylinderGeometry( sphereRadius * 0.06, sphereRadius * 0.06, sphereHeight, 6, 1, true ),
 					new THREE.MeshLambertMaterial( { color: 0x020202 } )
 				);
 				post.position.y = sphereHeight * 0.5 - sphereRadius * 0.05 * 1.2;
 				scene.add( post );
 
-				const box = new THREE.Mesh( new THREE.BoxBufferGeometry( sphereHeight * 0.5, sphereHeight * 0.1, sphereHeight * 0.5 ), post.material );
+				const box = new THREE.Mesh( new THREE.BoxGeometry( sphereHeight * 0.5, sphereHeight * 0.1, sphereHeight * 0.5 ), post.material );
 				box.position.y = sphereHeight * 0.05 * 0.5;
 				scene.add( box );
 
@@ -566,7 +566,7 @@
 				// THREE.Sphere mouse raycasting
 
 				container.style.touchAction = 'none';
-				container.addEventListener( 'pointermove', onPointerMove, false );
+				container.addEventListener( 'pointermove', onPointerMove );
 
 				function onPointerMove( event ) {
 
@@ -628,7 +628,7 @@
 
 				scene.userData.camera.position.set( 0, 0.2, 1.6 ).multiplyScalar( GROUND_SIZE * 0.5 );
 
-				const ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( GROUND_SIZE, GROUND_SIZE ), new THREE.MeshLambertMaterial( { color: 0x072302 } ) );
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( GROUND_SIZE, GROUND_SIZE ), new THREE.MeshLambertMaterial( { color: 0x072302 } ) );
 				ground.rotation.x = - Math.PI * 0.5;
 				scene.add( ground );
 

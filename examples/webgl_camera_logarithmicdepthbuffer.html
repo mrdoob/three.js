@@ -127,9 +127,9 @@
 				border = document.getElementById( 'renderer_border' );
 				border.addEventListener( 'pointerdown', onBorderPointerDown );
 
-				window.addEventListener( 'mousemove', onMouseMove, false );
-				window.addEventListener( 'resize', onWindowResize, false );
-				window.addEventListener( 'wheel', onMouseWheel, false );
+				window.addEventListener( 'mousemove', onMouseMove );
+				window.addEventListener( 'resize', onWindowResize );
+				window.addEventListener( 'wheel', onMouseWheel );
 
 			}
 
@@ -168,13 +168,13 @@
 					emissive: 0x000000
 				};
 
-				const geometry = new THREE.SphereBufferGeometry( 0.5, 24, 12 );
+				const geometry = new THREE.SphereGeometry( 0.5, 24, 12 );
 
 				for ( let i = 0; i < labeldata.length; i ++ ) {
 
 					const scale = labeldata[ i ].scale || 1;
 
-					const labelgeo = new THREE.TextBufferGeometry( labeldata[ i ].label, {
+					const labelgeo = new THREE.TextGeometry( labeldata[ i ].label, {
 						font: font,
 						size: labeldata[ i ].size,
 						height: labeldata[ i ].size / 2

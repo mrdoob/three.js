@@ -5,8 +5,8 @@ import {
 	Float32BufferAttribute,
 	Loader,
 	LoaderUtils
-} from "../../../build/three.module.js";
-import { Inflate } from "../libs/inflate.module.min.js";
+} from '../../../build/three.module.js';
+import * as fflate from '../libs/fflate.module.min.js';
 
 var VTKLoader = function ( manager ) {
 
@@ -795,9 +795,8 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					for ( var i = 0; i < dataOffsets.length - 1; i ++ ) {
 
-						var inflate = new Inflate( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ), { resize: true, verify: true } ); // eslint-disable-line no-undef
-						content = inflate.decompress();
-						content = content.buffer;
+						var data = fflate.unzlibSync( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ) ); // eslint-disable-line no-undef
+						content = data.buffer;
 
 						if ( ele.attributes.type === 'Float32' ) {
 

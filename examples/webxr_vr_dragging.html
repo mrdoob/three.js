@@ -49,7 +49,7 @@
 				controls.target.set( 0, 1.6, 0 );
 				controls.update();
 
-				const floorGeometry = new THREE.PlaneBufferGeometry( 4, 4 );
+				const floorGeometry = new THREE.PlaneGeometry( 4, 4 );
 				const floorMaterial = new THREE.MeshStandardMaterial( {
 					color: 0xeeeeee,
 					roughness: 1.0,
@@ -76,11 +76,11 @@
 				scene.add( group );
 
 				const geometries = [
-					new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 ),
-					new THREE.ConeBufferGeometry( 0.2, 0.2, 64 ),
-					new THREE.CylinderBufferGeometry( 0.2, 0.2, 0.2, 64 ),
-					new THREE.IcosahedronBufferGeometry( 0.2, 8 ),
-					new THREE.TorusBufferGeometry( 0.2, 0.04, 64, 32 )
+					new THREE.BoxGeometry( 0.2, 0.2, 0.2 ),
+					new THREE.ConeGeometry( 0.2, 0.2, 64 ),
+					new THREE.CylinderGeometry( 0.2, 0.2, 0.2, 64 ),
+					new THREE.IcosahedronGeometry( 0.2, 8 ),
+					new THREE.TorusGeometry( 0.2, 0.04, 64, 32 )
 				];
 
 				for ( let i = 0; i < 50; i ++ ) {
@@ -160,7 +160,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

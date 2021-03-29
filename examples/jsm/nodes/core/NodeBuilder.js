@@ -74,28 +74,28 @@ function NodeBuilder() {
 	this.attributes = {};
 
 	this.prefixCode = [
-		"#ifdef TEXTURE_LOD_EXT",
+		'#ifdef TEXTURE_LOD_EXT',
 
-		"	#define texCube(a, b) textureCube(a, b)",
-		"	#define texCubeBias(a, b, c) textureCubeLodEXT(a, b, c)",
+		'	#define texCube(a, b) textureCube(a, b)',
+		'	#define texCubeBias(a, b, c) textureCubeLodEXT(a, b, c)',
 
-		"	#define tex2D(a, b) texture2D(a, b)",
-		"	#define tex2DBias(a, b, c) texture2DLodEXT(a, b, c)",
+		'	#define tex2D(a, b) texture2D(a, b)',
+		'	#define tex2DBias(a, b, c) texture2DLodEXT(a, b, c)',
 
-		"#else",
+		'#else',
 
-		"	#define texCube(a, b) textureCube(a, b)",
-		"	#define texCubeBias(a, b, c) textureCube(a, b, c)",
+		'	#define texCube(a, b) textureCube(a, b)',
+		'	#define texCubeBias(a, b, c) textureCube(a, b, c)',
 
-		"	#define tex2D(a, b) texture2D(a, b)",
-		"	#define tex2DBias(a, b, c) texture2D(a, b, c)",
+		'	#define tex2D(a, b) texture2D(a, b)',
+		'	#define tex2DBias(a, b, c) texture2D(a, b, c)',
 
-		"#endif",
+		'#endif',
 
-		"#include <packing>",
-		"#include <common>"
+		'#include <packing>',
+		'#include <common>'
 
-	].join( "\n" );
+	].join( '\n' );
 
 	this.parsCode = {
 		vertex: '',
@@ -522,7 +522,7 @@ NodeBuilder.prototype = {
 			this.resultCode[ shader ],
 			this.finalCode[ shader ],
 			'}'
-		].join( "\n" );
+		].join( '\n' );
 
 	},
 
@@ -542,7 +542,7 @@ NodeBuilder.prototype = {
 
 			if ( formatType === undefined ) {
 
-				throw new Error( "Node pars " + formatType + " not found." );
+				throw new Error( 'Node pars ' + formatType + ' not found.' );
 
 			}
 
@@ -677,7 +677,7 @@ NodeBuilder.prototype = {
 
 		} else {
 
-			throw new Error( "Include not found." );
+			throw new Error( 'Include not found.' );
 
 		}
 
@@ -964,7 +964,7 @@ NodeBuilder.prototype = {
 
 		} else if ( map.isWebGLRenderTarget ) {
 
-			console.warn( "THREE.WebGLPrograms.getTextureEncodingFromMap: don't use render targets as textures. Use their .texture property instead." );
+			console.warn( 'THREE.WebGLPrograms.getTextureEncodingFromMap: don\'t use render targets as textures. Use their .texture property instead.' );
 			encoding = map.texture.encoding;
 
 		}

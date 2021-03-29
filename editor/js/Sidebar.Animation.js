@@ -10,9 +10,9 @@ function SidebarAnimation( editor ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		var animations = editor.animations[ object !== null ? object.uuid : '' ];
+		if ( object !== null && object.animations.length > 0 ) {
 
-		if ( animations !== undefined ) {
+			var animations = object.animations;
 
 			container.setDisplay( '' );
 
@@ -42,9 +42,7 @@ function SidebarAnimation( editor ) {
 
 	signals.objectRemoved.add( function ( object ) {
 
-		var animations = editor.animations[ object !== null ? object.uuid : '' ];
-
-		if ( animations !== undefined ) {
+		if ( object !== null && object.animations.length > 0 ) {
 
 			mixer.uncacheRoot( object );
 
@@ -61,6 +59,8 @@ function SidebarAnimation( editor ) {
 	function stopAction() {
 
 		actions[ animationsSelect.getValue() ].stop();
+
+		signals.animationStopped.dispatch();
 
 	}
 

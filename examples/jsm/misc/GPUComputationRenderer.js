@@ -5,12 +5,12 @@ import {
 	FloatType,
 	Mesh,
 	NearestFilter,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	RGBAFormat,
 	Scene,
 	ShaderMaterial,
 	WebGLRenderTarget
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * GPUComputationRenderer, based on SimulationRenderer by zz85
@@ -128,7 +128,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	var passThruShader = createShaderMaterial( getPassThroughFragmentShader(), passThruUniforms );
 
-	var mesh = new Mesh( new PlaneBufferGeometry( 2, 2 ), passThruShader );
+	var mesh = new Mesh( new PlaneGeometry( 2, 2 ), passThruShader );
 	scene.add( mesh );
 
 
@@ -169,16 +169,15 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.init = function () {
 
-		if ( ! renderer.capabilities.isWebGL2 &&
-			 ! renderer.extensions.get( "OES_texture_float" ) ) {
+		if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'OES_texture_float' ) === false ) {
 
-			return "No OES_texture_float support for float textures.";
+			return 'No OES_texture_float support for float textures.';
 
 		}
 
 		if ( renderer.capabilities.maxVertexTextures === 0 ) {
 
-			return "No support for vertex shader textures.";
+			return 'No support for vertex shader textures.';
 
 		}
 
@@ -219,7 +218,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 						if ( ! found ) {
 
-							return "Variable dependency not found. Variable=" + variable.name + ", dependency=" + depVar.name;
+							return 'Variable dependency not found. Variable=' + variable.name + ', dependency=' + depVar.name;
 
 						}
 
@@ -227,7 +226,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 					uniforms[ depVar.name ] = { value: null };
 
-					material.fragmentShader = "\nuniform sampler2D " + depVar.name + ";\n" + material.fragmentShader;
+					material.fragmentShader = '\nuniform sampler2D ' + depVar.name + ';\n' + material.fragmentShader;
 
 				}
 
@@ -287,7 +286,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	function addResolutionDefine( materialShader ) {
 
-		materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + " )";
+		materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + ' )';
 
 	}
 
@@ -377,25 +376,25 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	function getPassThroughVertexShader() {
 
-		return	"void main()	{\n" +
-				"\n" +
-				"	gl_Position = vec4( position, 1.0 );\n" +
-				"\n" +
-				"}\n";
+		return	'void main()	{\n' +
+				'\n' +
+				'	gl_Position = vec4( position, 1.0 );\n' +
+				'\n' +
+				'}\n';
 
 	}
 
 	function getPassThroughFragmentShader() {
 
-		return	"uniform sampler2D passThruTexture;\n" +
-				"\n" +
-				"void main() {\n" +
-				"\n" +
-				"	vec2 uv = gl_FragCoord.xy / resolution.xy;\n" +
-				"\n" +
-				"	gl_FragColor = texture2D( passThruTexture, uv );\n" +
-				"\n" +
-				"}\n";
+		return	'uniform sampler2D passThruTexture;\n' +
+				'\n' +
+				'void main() {\n' +
+				'\n' +
+				'	vec2 uv = gl_FragCoord.xy / resolution.xy;\n' +
+				'\n' +
+				'	gl_FragColor = texture2D( passThruTexture, uv );\n' +
+				'\n' +
+				'}\n';
 
 	}
 

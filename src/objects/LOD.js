@@ -1,37 +1,36 @@
 import { Vector3 } from '../math/Vector3.js';
 import { Object3D } from '../core/Object3D.js';
 
-const _v1 = new Vector3();
-const _v2 = new Vector3();
+const _v1 = /*@__PURE__*/ new Vector3();
+const _v2 = /*@__PURE__*/ new Vector3();
 
-function LOD() {
+class LOD extends Object3D {
 
-	Object3D.call( this );
+	constructor() {
 
-	this._currentLevel = 0;
+		super();
 
-	this.type = 'LOD';
+		this._currentLevel = 0;
 
-	Object.defineProperties( this, {
-		levels: {
-			enumerable: true,
-			value: []
-		}
-	} );
+		this.type = 'LOD';
 
-	this.autoUpdate = true;
+		Object.defineProperties( this, {
+			levels: {
+				enumerable: true,
+				value: []
+			},
+			isLOD: {
+				value: true,
+			}
+		} );
 
-}
+		this.autoUpdate = true;
 
-LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
+	}
 
-	constructor: LOD,
+	copy( source ) {
 
-	isLOD: true,
-
-	copy: function ( source ) {
-
-		Object3D.prototype.copy.call( this, source, false );
+		super.copy( source, false );
 
 		const levels = source.levels;
 
@@ -47,11 +46,9 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	addLevel: function ( object, distance ) {
-
-		if ( distance === undefined ) distance = 0;
+	addLevel( object, distance = 0 ) {
 
 		distance = Math.abs( distance );
 
@@ -75,15 +72,15 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	getCurrentLevel: function () {
+	getCurrentLevel() {
 
 		return this._currentLevel;
 
-	},
+	}
 
-	getObjectForDistance: function ( distance ) {
+	getObjectForDistance( distance ) {
 
 		const levels = this.levels;
 
@@ -107,9 +104,9 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return null;
 
-	},
+	}
 
-	raycast: function ( raycaster, intersects ) {
+	raycast( raycaster, intersects ) {
 
 		const levels = this.levels;
 
@@ -123,9 +120,9 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-	},
+	}
 
-	update: function ( camera ) {
+	update( camera ) {
 
 		const levels = this.levels;
 
@@ -165,11 +162,11 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
-		const data = Object3D.prototype.toJSON.call( this, meta );
+		const data = super.toJSON( meta );
 
 		if ( this.autoUpdate === false ) data.object.autoUpdate = false;
 
@@ -192,7 +189,7 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
 
 
 export { LOD };

@@ -100,7 +100,7 @@
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.BoxBufferGeometry( 120, 120, 120 );
+				const geometry = new THREE.BoxGeometry( 120, 120, 120 );
 				const material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
 				const mesh1 = new THREE.Mesh( geometry, material1 );
@@ -134,7 +134,7 @@
 				copyPass = new ShaderPass( CopyShader );
 				composer.addPass( copyPass );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

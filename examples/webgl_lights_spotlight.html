@@ -77,7 +77,7 @@
 
 				let material = new THREE.MeshPhongMaterial( { color: 0x808080, dithering: true } );
 
-				let geometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
+				let geometry = new THREE.PlaneGeometry( 2000, 2000 );
 
 				let mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, - 1, 0 );
@@ -89,7 +89,7 @@
 
 				material = new THREE.MeshPhongMaterial( { color: 0x4080ff, dithering: true } );
 
-				geometry = new THREE.CylinderBufferGeometry( 5, 5, 2, 32, 1, false );
+				geometry = new THREE.CylinderGeometry( 5, 5, 2, 32, 1, false );
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, 5, 0 );
@@ -98,11 +98,11 @@
 
 				render();
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

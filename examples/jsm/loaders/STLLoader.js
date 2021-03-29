@@ -6,7 +6,7 @@ import {
 	Loader,
 	LoaderUtils,
 	Vector3
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 /**
  * Description: A THREE loader for STL ASCII files, as created by Solidworks and other CAD programs.

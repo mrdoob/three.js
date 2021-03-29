@@ -16,7 +16,7 @@ PositionNode.PROJECTION = 'projection';
 
 PositionNode.prototype = Object.create( TempNode.prototype );
 PositionNode.prototype.constructor = PositionNode;
-PositionNode.prototype.nodeType = "Position";
+PositionNode.prototype.nodeType = 'Position';
 
 PositionNode.prototype.getType = function ( ) {
 

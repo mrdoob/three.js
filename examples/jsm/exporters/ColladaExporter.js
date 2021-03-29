@@ -1,13 +1,9 @@
 import {
-	BufferGeometry,
 	Color,
 	DoubleSide,
-	Geometry,
 	Matrix4,
-	Mesh,
-	MeshBasicMaterial,
-	MeshLambertMaterial
-} from "../../../build/three.module.js";
+	MeshBasicMaterial
+} from '../../../build/three.module.js';
 
 /**
  * https://github.com/gkjohnson/collada-exporter-js
@@ -212,9 +208,10 @@ ColladaExporter.prototype = {
 
 				// convert the geometry to bufferGeometry if it isn't already
 				var bufferGeometry = g;
-				if ( bufferGeometry instanceof Geometry ) {
 
-					bufferGeometry = ( new BufferGeometry() ).fromGeometry( bufferGeometry );
+				if ( bufferGeometry.isBufferGeometry !== true ) {
+
+					throw new Error( 'THREE.ColladaExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 				}
 
@@ -307,7 +304,7 @@ ColladaExporter.prototype = {
 
 				}
 
-				gnode += `</mesh></geometry>`;
+				gnode += '</mesh></geometry>';
 
 				libraryGeometries.push( gnode );
 
@@ -374,11 +371,11 @@ ColladaExporter.prototype = {
 
 				var type = 'phong';
 
-				if ( m instanceof MeshLambertMaterial ) {
+				if ( m.isMeshLambertMaterial === true ) {
 
 					type = 'lambert';
 
-				} else if ( m instanceof MeshBasicMaterial ) {
+				} else if ( m.isMeshBasicMaterial === true ) {
 
 					type = 'constant';
 
@@ -406,10 +403,10 @@ ColladaExporter.prototype = {
 				if ( m.transparent === true ) {
 
 					transparencyNode +=
-						`<transparent>` +
+						'<transparent>' +
 						(
 							m.map ?
-								`<texture texture="diffuse-sampler"></texture>` :
+								'<texture texture="diffuse-sampler"></texture>' :
 								'<float>1</float>'
 						) +
 						'</transparent>';
@@ -526,7 +523,7 @@ ColladaExporter.prototype = {
 
 					(
 						m.side === DoubleSide ?
-							`<extra><technique profile="THREEJS"><double_sided sid="double_sided" type="int">1</double_sided></technique></extra>` :
+							'<extra><technique profile="THREEJS"><double_sided sid="double_sided" type="int">1</double_sided></technique></extra>' :
 							''
 					) +
 
@@ -554,7 +551,7 @@ ColladaExporter.prototype = {
 
 			node += getTransform( o );
 
-			if ( o instanceof Mesh && o.geometry != null ) {
+			if ( o.isMesh === true && o.geometry !== null ) {
 
 				// function returns the id associated with the mesh and a "BufferGeometry" version
 				// of the geometry in case it's not a geometry.

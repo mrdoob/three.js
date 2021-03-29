@@ -4,8 +4,6 @@ class Fog {
 
 	constructor( color, near, far ) {
 
-		Object.defineProperty( this, 'isFog', { value: true } );
-
 		this.name = '';
 
 		this.color = new Color( color );
@@ -34,5 +32,6 @@ class Fog {
 
 }
 
+Fog.prototype.isFog = true;
 
 export { Fog };

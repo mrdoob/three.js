@@ -121,13 +121,13 @@
 
 				} );
 
-				const plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+				const plane = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
 
 				quad = new THREE.Mesh( plane, material );
 				quad.position.z = - 100;
 				sceneRTT.add( quad );
 
-				const geometry = new THREE.TorusBufferGeometry( 100, 25, 15, 30 );
+				const geometry = new THREE.TorusGeometry( 100, 25, 15, 30 );
 
 				const mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
 				const mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
@@ -158,7 +158,7 @@
 
 				valueNode = document.getElementById( 'values' );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			}
 

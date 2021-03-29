@@ -6,10 +6,10 @@ const _startEnd = /*@__PURE__*/ new Vector3();
 
 class Line3 {
 
-	constructor( start, end ) {
+	constructor( start = new Vector3(), end = new Vector3() ) {
 
-		this.start = ( start !== undefined ) ? start : new Vector3();
-		this.end = ( end !== undefined ) ? end : new Vector3();
+		this.start = start;
+		this.end = end;
 
 	}
 
@@ -19,12 +19,6 @@ class Line3 {
 		this.end.copy( end );
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -138,7 +132,12 @@ class Line3 {
 
 	}
 
-}
+	clone() {
 
+		return new this.constructor().copy( this );
+
+	}
+
+}
 
 export { Line3 };

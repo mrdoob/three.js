@@ -100,7 +100,7 @@
 				loadCubeTextureWithMipmaps().then( function ( cubeTexture ) {
 
 					//model
-					const sphere = new THREE.SphereBufferGeometry( 100, 128, 128 );
+					const sphere = new THREE.SphereGeometry( 100, 128, 128 );
 
 					//manual mipmaps
 					let material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: cubeTexture } );
@@ -139,7 +139,7 @@
 				controls.minPolarAngle = Math.PI / 4;
 				controls.maxPolarAngle = Math.PI / 1.5;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
