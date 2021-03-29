@@ -53,7 +53,7 @@ class MaterialNode extends Node {
 
 			const colorNode = new MaterialReferenceNode( 'color', 'color' );
 
-			if ( material.map !== null && material.map !== undefined ) {
+			if ( material.map !== null && material.map !== undefined && material.map.isTexture === true ) {
 
 				node = new OperatorNode( '*', colorNode, new MaterialReferenceNode( 'map', 'texture' ) );
 
@@ -67,7 +67,7 @@ class MaterialNode extends Node {
 
 			const opacityNode = new MaterialReferenceNode( 'opacity', 'float' );
 
-			if ( material.alphaMap !== null && material.alphaMap !== undefined ) {
+			if ( material.alphaMap !== null && material.alphaMap !== undefined && material.alphaMap.isTexture === true ) {
 
 				node = new OperatorNode( '*', opacityNode, new MaterialReferenceNode( 'alphaMap', 'texture' ) );
 
@@ -81,7 +81,7 @@ class MaterialNode extends Node {
 
 			const specularColorNode = new MaterialReferenceNode( 'specular', 'color' );
 
-			if ( material.specularMap !== null && material.specularMap !== undefined ) {
+			if ( material.specularMap !== null && material.specularMap !== undefined && material.specularMap.isTexture === true ) {
 
 				node = new OperatorNode( '*', specularColorNode, new MaterialReferenceNode( 'specularMap', 'texture' ) );
 
