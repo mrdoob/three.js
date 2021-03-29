@@ -33,7 +33,7 @@ var SSRShader = {
     "maxDistance": { value: 180 },
     "cameraRange": { value: 0 },
     "surfDist": { value: .007 },
-    "thickTolerance": { value: .03 },
+    "thickTolerance": { value: 0 },
 
   },
 
@@ -187,14 +187,17 @@ var SSRShader = {
 				#endif
 				if(viewReflectRayZ-sD>vZ) continue;
 
-				#ifdef INFINITE_THICK
-					if(viewReflectRayZ+thickTolerance*clipW<vP.z) break;
-				#endif
-				float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
-
 				float op=opacity;
 
-				if(away<sD){
+				bool hit;
+				#ifdef INFINITE_THICK
+					hit=(viewReflectRayZ+thickTolerance*clipW)<=vZ;
+				#else
+					float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
+					hit=away<=sD;
+				#endif
+
+				if(hit){
 					vec3 vN=getViewNormal( uv );
 					if(dot(viewReflectDir,vN)>=0.) continue;
 					float distance=pointPlaneDistance(vP,viewPosition,viewNormal);

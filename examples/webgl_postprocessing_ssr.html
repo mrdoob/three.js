@@ -35,7 +35,7 @@
 			enableSSR: true,
 			autoRotate: true,
 			otherMeshes: true,
-			groundReflector: true,
+			groundReflector: false,
 		};
 		let composer;
 		let ssrPass;
@@ -198,6 +198,8 @@
 				}
 
 			} );
+			ssrPass.infiniteThick = true
+			gui.add( ssrPass, 'infiniteThick' );
 			gui.add( params, 'autoRotate' ).onChange( () => {
 
 				controls.enabled = ! params.autoRotate;
@@ -257,7 +259,6 @@
 			} );
 			ssrPass.surfDist = 0.0015;
 			folder.add( ssrPass, 'surfDist' ).min( 0 ).max( .005 ).step( .0001 );
-			folder.add( ssrPass, 'infiniteThick' );
 			folder.add( ssrPass, 'thickTolerance' ).min( 0 ).max( .05 ).step( .0001 );
 			folder.add( ssrPass, 'blur' );
 			// gui.close()
