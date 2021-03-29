@@ -39,9 +39,9 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			var instanceStart = geometry.attributes.instanceStart;
 			var instanceEnd = geometry.attributes.instanceEnd;
-			var lineDistances = new Float32Array( 2 * instanceStart.data.count );
+			var lineDistances = new Float32Array( 2 * instanceStart.count );
 
-			for ( var i = 0, j = 0, l = instanceStart.data.count; i < l; i ++, j += 2 ) {
+			for ( var i = 0, j = 0, l = instanceStart.count; i < l; i ++, j += 2 ) {
 
 				start.fromBufferAttribute( instanceStart, i );
 				end.fromBufferAttribute( instanceEnd, i );

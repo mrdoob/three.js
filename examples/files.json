@@ -62,7 +62,6 @@
 		"webgl_lights_hemisphere",
 		"webgl_lights_physical",
 		"webgl_lights_pointlights",
-		"webgl_lights_pointlights2",
 		"webgl_lights_spotlight",
 		"webgl_lights_spotlights",
 		"webgl_lights_rectarealight",
@@ -76,7 +75,6 @@
 		"webgl_loader_3mf",
 		"webgl_loader_3mf_materials",
 		"webgl_loader_amf",
-		"webgl_loader_assimp",
 		"webgl_loader_bvh",
 		"webgl_loader_collada",
 		"webgl_loader_collada_kinematics",
@@ -207,7 +205,6 @@
 		"webgl_shader_lava",
 		"webgl_shader2",
 		"webgl_shaders_ocean",
-		"webgl_shaders_ocean2",
 		"webgl_shaders_sky",
 		"webgl_shaders_tonemapping",
 		"webgl_shading_physical",
@@ -263,6 +260,7 @@
 		"webgl_postprocessing_smaa",
 		"webgl_postprocessing_sobel",
 		"webgl_postprocessing_ssao",
+		"webgl_postprocessing_ssr",
 		"webgl_postprocessing_taa",
 		"webgl_postprocessing_unreal_bloom",
 		"webgl_postprocessing_unreal_bloom_selective"
@@ -299,6 +297,7 @@
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_csm",
 		"webgl_shadowmap_pcss",
+		"webgl_shadowmap_progressive",
 		"webgl_simple_gi",
 		"webgl_tiled_forward",
 		"webgl_worker_offscreencanvas"
@@ -307,6 +306,7 @@
 		"webgl2_buffergeometry_attributes_integer",
 		"webgl2_materials_texture2darray",
 		"webgl2_materials_texture3d",
+		"webgl2_materials_texture3d_partialupdate",
 		"webgl2_multisampled_renderbuffers",
 		"webgl2_rendertarget_texture2darray",
 		"webgl2_volume_cloud",
@@ -314,11 +314,13 @@
 		"webgl2_volume_perlin"
 	],
 	"webgpu": [
-		"webgpu_sandbox",
-		"webgpu_rtt",
 		"webgpu_compute",
 		"webgpu_materials",
-		"webgpu_selective_lights"
+		"webgpu_instance_uniform",
+		"webgpu_materials",
+		"webgpu_rtt",
+		"webgpu_sandbox",
+		"webgpu_selective_lights
 	],
 	"webaudio": [
 		"webaudio_orientation",
@@ -329,6 +331,7 @@
 	"webxr": [
 		"webxr_ar_cones",
 		"webxr_ar_hittest",
+		"webxr_ar_lighting",
 		"webxr_ar_paint",
 		"webxr_vr_ballshooter",
 		"webxr_vr_cubes",
@@ -376,7 +379,6 @@
 		"misc_exporter_ply",
 		"misc_exporter_stl",
 		"misc_exporter_usdz",
-		"misc_legacy",
 		"misc_lookat"
 	],
 	"css2d": [

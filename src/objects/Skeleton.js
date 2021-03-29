@@ -2,29 +2,29 @@ import { Bone } from './Bone.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { MathUtils } from '../math/MathUtils.js';
 
-const _offsetMatrix = new Matrix4();
-const _identityMatrix = new Matrix4();
+const _offsetMatrix = /*@__PURE__*/ new Matrix4();
+const _identityMatrix = /*@__PURE__*/ new Matrix4();
 
-function Skeleton( bones = [], boneInverses = [] ) {
+class Skeleton {
 
-	this.uuid = MathUtils.generateUUID();
+	constructor( bones = [], boneInverses = [] ) {
 
-	this.bones = bones.slice( 0 );
-	this.boneInverses = boneInverses;
-	this.boneMatrices = null;
+		this.uuid = MathUtils.generateUUID();
 
-	this.boneTexture = null;
-	this.boneTextureSize = 0;
+		this.bones = bones.slice( 0 );
+		this.boneInverses = boneInverses;
+		this.boneMatrices = null;
 
-	this.frame = - 1;
+		this.boneTexture = null;
+		this.boneTextureSize = 0;
 
-	this.init();
+		this.frame = - 1;
 
-}
+		this.init();
 
-Object.assign( Skeleton.prototype, {
+	}
 
-	init: function () {
+	init() {
 
 		const bones = this.bones;
 		const boneInverses = this.boneInverses;
@@ -57,9 +57,9 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	calculateInverses: function () {
+	calculateInverses() {
 
 		this.boneInverses.length = 0;
 
@@ -77,9 +77,9 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	pose: function () {
+	pose() {
 
 		// recover the bind-time world matrices
 
@@ -120,9 +120,9 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	update: function () {
+	update() {
 
 		const bones = this.bones;
 		const boneInverses = this.boneInverses;
@@ -148,15 +148,15 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new Skeleton( this.bones, this.boneInverses );
 
-	},
+	}
 
-	getBoneByName: function ( name ) {
+	getBoneByName( name ) {
 
 		for ( let i = 0, il = this.bones.length; i < il; i ++ ) {
 
@@ -172,9 +172,9 @@ Object.assign( Skeleton.prototype, {
 
 		return undefined;
 
-	},
+	}
 
-	dispose: function ( ) {
+	dispose( ) {
 
 		if ( this.boneTexture !== null ) {
 
@@ -184,9 +184,9 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	fromJSON: function ( json, bones ) {
+	fromJSON( json, bones ) {
 
 		this.uuid = json.uuid;
 
@@ -211,9 +211,9 @@ Object.assign( Skeleton.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		const data = {
 			metadata: {
@@ -244,7 +244,6 @@ Object.assign( Skeleton.prototype, {
 
 	}
 
-} );
-
+}
 
 export { Skeleton };

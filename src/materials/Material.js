@@ -59,6 +59,7 @@ function Material() {
 	this.dithering = false;
 
 	this.alphaTest = 0;
+	this.alphaToCoverage = false;
 	this.premultipliedAlpha = false;
 
 	this.visible = true;
@@ -261,6 +262,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		}
 
 		if ( this.size !== undefined ) data.size = this.size;
+		if ( this.shadowSide !== null ) data.shadowSide = this.shadowSide;
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
 
 		if ( this.blending !== NormalBlending ) data.blending = this.blending;
@@ -273,6 +275,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		data.depthFunc = this.depthFunc;
 		data.depthTest = this.depthTest;
 		data.depthWrite = this.depthWrite;
+		data.colorWrite = this.colorWrite;
 
 		data.stencilWrite = this.stencilWrite;
 		data.stencilWriteMask = this.stencilWriteMask;
@@ -298,6 +301,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.dithering === true ) data.dithering = true;
 
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
+		if ( this.alphaToCoverage === true ) data.alphaToCoverage = this.alphaToCoverage;
 		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
@@ -421,6 +425,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.dithering = source.dithering;
 
 		this.alphaTest = source.alphaTest;
+		this.alphaToCoverage = source.alphaToCoverage;
 		this.premultipliedAlpha = source.premultipliedAlpha;
 
 		this.visible = source.visible;

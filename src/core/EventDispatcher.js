@@ -77,6 +77,8 @@ Object.assign( EventDispatcher.prototype, {
 
 			}
 
+			event.target = null;
+
 		}
 
 	}

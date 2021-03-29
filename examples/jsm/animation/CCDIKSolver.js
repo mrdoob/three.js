@@ -53,11 +53,31 @@ var CCDIKSolver = ( function () {
 		constructor: CCDIKSolver,
 
 		/**
-		 * Update IK bones.
+		 * Update all IK bones.
 		 *
 		 * @return {CCDIKSolver}
 		 */
 		update: function () {
+
+			var iks = this.iks;
+
+			for ( var i = 0, il = iks.length; i < il; i ++ ) {
+
+				this.updateOne( iks[ i ] );
+
+			}
+
+			return this;
+
+		},
+
+		/**
+		 * Update one IK bone
+		 *
+		 * @param {Object} ik parameter
+		 * @return {CCDIKSolver}
+		 */
+		updateOne: function () {
 
 			var q = new Quaternion();
 			var targetPos = new Vector3();
@@ -70,136 +90,130 @@ var CCDIKSolver = ( function () {
 			var axis = new Vector3();
 			var vector = new Vector3();
 
-			return function update() {
+			return function update( ik ) {
 
 				var bones = this.mesh.skeleton.bones;
-				var iks = this.iks;
 
 				// for reference overhead reduction in loop
 				var math = Math;
 
-				for ( var i = 0, il = iks.length; i < il; i ++ ) {
+				var effector = bones[ ik.effector ];
+				var target = bones[ ik.target ];
 
-					var ik = iks[ i ];
-					var effector = bones[ ik.effector ];
-					var target = bones[ ik.target ];
+				// don't use getWorldPosition() here for the performance
+				// because it calls updateMatrixWorld( true ) inside.
+				targetPos.setFromMatrixPosition( target.matrixWorld );
 
-					// don't use getWorldPosition() here for the performance
-					// because it calls updateMatrixWorld( true ) inside.
-					targetPos.setFromMatrixPosition( target.matrixWorld );
+				var links = ik.links;
+				var iteration = ik.iteration !== undefined ? ik.iteration : 1;
 
-					var links = ik.links;
-					var iteration = ik.iteration !== undefined ? ik.iteration : 1;
+				for ( var i = 0; i < iteration; i ++ ) {
 
-					for ( var j = 0; j < iteration; j ++ ) {
+					var rotated = false;
 
-						var rotated = false;
+					for ( var j = 0, jl = links.length; j < jl; j ++ ) {
 
-						for ( var k = 0, kl = links.length; k < kl; k ++ ) {
+						var link = bones[ links[ j ].index ];
 
-							var link = bones[ links[ k ].index ];
+						// skip this link and following links.
+						// this skip is used for MMD performance optimization.
+						if ( links[ j ].enabled === false ) break;
 
-							// skip this link and following links.
-							// this skip is used for MMD performance optimization.
-							if ( links[ k ].enabled === false ) break;
+						var limitation = links[ j ].limitation;
+						var rotationMin = links[ j ].rotationMin;
+						var rotationMax = links[ j ].rotationMax;
 
-							var limitation = links[ k ].limitation;
-							var rotationMin = links[ k ].rotationMin;
-							var rotationMax = links[ k ].rotationMax;
+						// don't use getWorldPosition/Quaternion() here for the performance
+						// because they call updateMatrixWorld( true ) inside.
+						link.matrixWorld.decompose( linkPos, invLinkQ, linkScale );
+						invLinkQ.invert();
+						effectorPos.setFromMatrixPosition( effector.matrixWorld );
 
-							// don't use getWorldPosition/Quaternion() here for the performance
-							// because they call updateMatrixWorld( true ) inside.
-							link.matrixWorld.decompose( linkPos, invLinkQ, linkScale );
-							invLinkQ.invert();
-							effectorPos.setFromMatrixPosition( effector.matrixWorld );
+						// work in link world
+						effectorVec.subVectors( effectorPos, linkPos );
+						effectorVec.applyQuaternion( invLinkQ );
+						effectorVec.normalize();
 
-							// work in link world
-							effectorVec.subVectors( effectorPos, linkPos );
-							effectorVec.applyQuaternion( invLinkQ );
-							effectorVec.normalize();
+						targetVec.subVectors( targetPos, linkPos );
+						targetVec.applyQuaternion( invLinkQ );
+						targetVec.normalize();
 
-							targetVec.subVectors( targetPos, linkPos );
-							targetVec.applyQuaternion( invLinkQ );
-							targetVec.normalize();
+						var angle = targetVec.dot( effectorVec );
 
-							var angle = targetVec.dot( effectorVec );
+						if ( angle > 1.0 ) {
 
-							if ( angle > 1.0 ) {
+							angle = 1.0;
 
-								angle = 1.0;
+						} else if ( angle < - 1.0 ) {
 
-							} else if ( angle < - 1.0 ) {
-
-								angle = - 1.0;
-
-							}
-
-							angle = math.acos( angle );
-
-							// skip if changing angle is too small to prevent vibration of bone
-							// Refer to http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mmd.three.js
-							if ( angle < 1e-5 ) continue;
-
-							if ( ik.minAngle !== undefined && angle < ik.minAngle ) {
-
-								angle = ik.minAngle;
-
-							}
-
-							if ( ik.maxAngle !== undefined && angle > ik.maxAngle ) {
-
-								angle = ik.maxAngle;
-
-							}
-
-							axis.crossVectors( effectorVec, targetVec );
-							axis.normalize();
-
-							q.setFromAxisAngle( axis, angle );
-							link.quaternion.multiply( q );
-
-							// TODO: re-consider the limitation specification
-							if ( limitation !== undefined ) {
-
-								var c = link.quaternion.w;
-
-								if ( c > 1.0 ) c = 1.0;
-
-								var c2 = math.sqrt( 1 - c * c );
-								link.quaternion.set( limitation.x * c2,
-								                     limitation.y * c2,
-								                     limitation.z * c2,
-								                     c );
-
-							}
-
-							if ( rotationMin !== undefined ) {
-
-								link.rotation.setFromVector3(
-									link.rotation
-										.toVector3( vector )
-										.max( rotationMin ) );
-
-							}
-
-							if ( rotationMax !== undefined ) {
-
-								link.rotation.setFromVector3(
-									link.rotation
-										.toVector3( vector )
-										.min( rotationMax ) );
-
-							}
-
-							link.updateMatrixWorld( true );
-
-							rotated = true;
+							angle = - 1.0;
 
 						}
 
-						if ( ! rotated ) break;
+						angle = math.acos( angle );
+
+						// skip if changing angle is too small to prevent vibration of bone
+						// Refer to http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mmd.three.js
+						if ( angle < 1e-5 ) continue;
+
+						if ( ik.minAngle !== undefined && angle < ik.minAngle ) {
+
+							angle = ik.minAngle;
+
+						}
+
+						if ( ik.maxAngle !== undefined && angle > ik.maxAngle ) {
+
+							angle = ik.maxAngle;
+
+						}
+
+						axis.crossVectors( effectorVec, targetVec );
+						axis.normalize();
+
+						q.setFromAxisAngle( axis, angle );
+						link.quaternion.multiply( q );
+
+						// TODO: re-consider the limitation specification
+						if ( limitation !== undefined ) {
+
+							var c = link.quaternion.w;
+
+							if ( c > 1.0 ) c = 1.0;
+
+							var c2 = math.sqrt( 1 - c * c );
+							link.quaternion.set( limitation.x * c2,
+							                     limitation.y * c2,
+							                     limitation.z * c2,
+							                     c );
+
+						}
+
+						if ( rotationMin !== undefined ) {
+
+							link.rotation.setFromVector3(
+								link.rotation
+									.toVector3( vector )
+									.max( rotationMin ) );
+
+						}
+
+						if ( rotationMax !== undefined ) {
+
+							link.rotation.setFromVector3(
+								link.rotation
+									.toVector3( vector )
+									.min( rotationMax ) );
+
+						}
+
+						link.updateMatrixWorld( true );
+
+						rotated = true;
 
 					}
+
+					if ( ! rotated ) break;
 
 				}
 

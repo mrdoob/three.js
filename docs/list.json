@@ -1043,6 +1043,35 @@
 
 		}
 
-	}
+	},
+
+    "ja": {
+        "マニュアル": {
+            "はじめてみましょう": {
+                "シーンの作成": "manual/ja/introduction/Creating-a-scene",
+                "インストールの方法": "manual/ja/introduction/Installation",
+                "サポートしているブラウザ": "manual/ja/introduction/Browser-support",
+                "WebGLの互換性の確認": "manual/ja/introduction/WebGL-compatibility-check",
+                "localで実行する方法": "manual/ja/introduction/How-to-run-things-locally",
+                "線を引く": "manual/ja/introduction/Drawing-lines",
+                "テキストを作成する": "manual/ja/introduction/Creating-text",
+                "3Dモデルをロードする": "manual/ja/introduction/Loading-3D-models",
+                "ライブラリとプラグイン": "manual/ja/introduction/Libraries-and-Plugins",
+                "FAQ": "manual/ja/introduction/FAQ",
+                "役にたつリンク集": "manual/ja/introduction/Useful-links"
+            },
+            "次の段階": {
+                "更新の仕方": "manual/ja/introduction/How-to-update-things",
+                "オブジェクトを廃棄する方法": "manual/ja/introduction/How-to-dispose-of-objects",
+                "VRコンテンツの作り方": "manual/ja/introduction/How-to-create-VR-content",
+                "post-processingの使い方": "manual/ja/introduction/How-to-use-post-processing",
+                "行列の変換": "manual/ja/introduction/Matrix-transformations",
+                "アニメーションシステム": "manual/ja/introduction/Animation-system"
+            },
+            "ビルドツール": {
+                "NPMでテストを実行する": "manual/ja/buildTools/Testing-with-NPM"
+            }
+        }
+    }
 
 }

@@ -8,8 +8,6 @@ class Node {
 
 		this.updateType = NodeUpdateType.None;
 
-		Object.defineProperty( this, 'isNode', { value: true } );
-
 	}
 
 	getUpdateType( /*builder*/ ) {
@@ -59,5 +57,7 @@ class Node {
 	}
 
 }
+
+Node.prototype.isNode = true;
 
 export default Node;

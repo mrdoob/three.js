@@ -13,36 +13,36 @@ import { LineBasicMaterial } from './LineBasicMaterial.js';
  * }
  */
 
-function LineDashedMaterial( parameters ) {
+class LineDashedMaterial extends LineBasicMaterial {
 
-	LineBasicMaterial.call( this );
+	constructor( parameters ) {
 
-	this.type = 'LineDashedMaterial';
+		super();
 
-	this.scale = 1;
-	this.dashSize = 3;
-	this.gapSize = 1;
+		this.type = 'LineDashedMaterial';
 
-	this.setValues( parameters );
+		this.scale = 1;
+		this.dashSize = 3;
+		this.gapSize = 1;
+
+		this.setValues( parameters );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.scale = source.scale;
+		this.dashSize = source.dashSize;
+		this.gapSize = source.gapSize;
+
+		return this;
+
+	}
 
 }
 
-LineDashedMaterial.prototype = Object.create( LineBasicMaterial.prototype );
-LineDashedMaterial.prototype.constructor = LineDashedMaterial;
-
 LineDashedMaterial.prototype.isLineDashedMaterial = true;
-
-LineDashedMaterial.prototype.copy = function ( source ) {
-
-	LineBasicMaterial.prototype.copy.call( this, source );
-
-	this.scale = source.scale;
-	this.dashSize = source.dashSize;
-	this.gapSize = source.gapSize;
-
-	return this;
-
-};
-
 
 export { LineDashedMaterial };

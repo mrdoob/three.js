@@ -4,8 +4,6 @@ class Quaternion {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
-		Object.defineProperty( this, 'isQuaternion', { value: true } );
-
 		this._x = x;
 		this._y = y;
 		this._z = z;
@@ -15,7 +13,8 @@ class Quaternion {
 
 	static slerp( qa, qb, qm, t ) {
 
-		return qm.copy( qa ).slerp( qb, t );
+		console.warn( 'THREE.Quaternion: Static .slerp() has been deprecated. Use qm.slerpQuaternions( qa, qb, t ) instead.' );
+		return qm.slerpQuaternions( qa, qb, t );
 
 	}
 
@@ -365,11 +364,11 @@ class Quaternion {
 
 		// assumes direction vectors vFrom and vTo are normalized
 
-		const EPS = 0.000001;
-
 		let r = vFrom.dot( vTo ) + 1;
 
-		if ( r < EPS ) {
+		if ( r < Number.EPSILON ) {
+
+			// vFrom and vTo point in opposite directions
 
 			r = 0;
 
@@ -603,6 +602,12 @@ class Quaternion {
 
 	}
 
+	slerpQuaternions( qa, qb, t ) {
+
+		this.copy( qa ).slerp( qb, t );
+
+	}
+
 	equals( quaternion ) {
 
 		return ( quaternion._x === this._x ) && ( quaternion._y === this._y ) && ( quaternion._z === this._z ) && ( quaternion._w === this._w );
@@ -655,5 +660,7 @@ class Quaternion {
 	_onChangeCallback() {}
 
 }
+
+Quaternion.prototype.isQuaternion = true;
 
 export { Quaternion };

@@ -1,4 +1,4 @@
-// r125
+const cacheName = 'threejs-editor-r126';
 
 const assets = [
 	'./',
@@ -23,6 +23,8 @@ const assets = [
 	'../examples/js/libs/draco/gltf/draco_decoder.js',
 	'../examples/js/libs/draco/gltf/draco_decoder.wasm',
 	'../examples/js/libs/draco/gltf/draco_wasm_wrapper.js',
+
+	'../examples/jsm/libs/motion-controllers.module.js',
 
 	'../examples/jsm/libs/rhino3dm/rhino3dm.wasm',
 	'../examples/jsm/libs/rhino3dm/rhino3dm.js',
@@ -52,6 +54,8 @@ const assets = [
 	'../examples/jsm/curves/NURBSCurve.js',
 	'../examples/jsm/curves/NURBSUtils.js',
 
+	'../examples/jsm/environments/RoomEnvironment.js',
+
 	'../examples/jsm/exporters/ColladaExporter.js',
 	'../examples/jsm/exporters/DRACOExporter.js',
 	'../examples/jsm/exporters/GLTFExporter.js',
@@ -65,6 +69,7 @@ const assets = [
 	'../examples/jsm/geometries/TeapotGeometry.js',
 
 	'../examples/jsm/webxr/VRButton.js',
+	'../examples/jsm/webxr/XRControllerModelFactory.js',
 
 	'./images/rotate.svg',
 	'./images/scale.svg',
@@ -100,7 +105,7 @@ const assets = [
 	'./js/libs/tern-threejs/threejs.js',
 
 	'./js/libs/signals.min.js',
-	'./js/libs/fflate-deflate.min.module.js',
+	'./js/libs/three.html.js',
 	'./js/libs/ui.js',
 	'./js/libs/ui.three.js',
 
@@ -127,6 +132,7 @@ const assets = [
 	'./js/Menubar.Play.js',
 	'./js/Menubar.Examples.js',
 	'./js/Menubar.Help.js',
+	'./js/Menubar.View.js',
 	'./js/Menubar.Status.js',
 	'./js/Resizer.js',
 	'./js/Sidebar.js',
@@ -170,6 +176,7 @@ const assets = [
 	'./js/Viewport.Camera.js',
 	'./js/Viewport.Info.js',
 	'./js/Viewport.ViewHelper.js',
+	'./js/Viewport.VR.js',
 
 	'./js/Command.js',
 	'./js/commands/AddObjectCommand.js',
@@ -207,13 +214,13 @@ const assets = [
 
 self.addEventListener( 'install', async function () {
 
-	const cache = await caches.open( 'threejs-editor' );
+	const cache = await caches.open( cacheName );
 
 	assets.forEach( function ( asset ) {
 
 		cache.add( asset ).catch( function () {
 
-			console.error( '[SW] Cound\'t cache:', asset );
+			console.warn( '[SW] Cound\'t cache:', asset );
 
 		} );
 
@@ -234,7 +241,7 @@ async function cacheFirst( request ) {
 
 	if ( cachedResponse === undefined ) {
 
-		console.error( '[SW] Not cached:', request.url );
+		console.warn( '[SW] Not cached:', request.url );
 		return fetch( request );
 
 	}

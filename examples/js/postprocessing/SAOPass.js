@@ -53,8 +53,6 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 
 		var depthTexture = new THREE.DepthTexture();
 		depthTexture.type = THREE.UnsignedShortType;
-		depthTexture.minFilter = THREE.NearestFilter;
-		depthTexture.maxFilter = THREE.NearestFilter;
 
 		this.beautyRenderTarget.depthTexture = depthTexture;
 		this.beautyRenderTarget.depthBuffer = true;

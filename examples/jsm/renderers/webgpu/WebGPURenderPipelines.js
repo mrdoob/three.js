@@ -7,7 +7,7 @@ import {
 	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending,
 	AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor
-} from '../../../../build/three.module.js';
+} from 'three';
 
 class WebGPURenderPipelines {
 
@@ -57,7 +57,7 @@ class WebGPURenderPipelines {
 
 			// get shader
 
-			const nodeBuilder = this.nodes.get( material );
+			const nodeBuilder = this.nodes.get( object );
 
 			// shader modules
 
@@ -97,10 +97,14 @@ class WebGPURenderPipelines {
 
 			const materialProperties = properties.get( material );
 
-			const disposeCallback = onMaterialDispose.bind( this );
-			materialProperties.disposeCallback = disposeCallback;
+			if ( materialProperties.disposeCallback === undefined ) {
 
-			material.addEventListener( 'dispose', disposeCallback );
+				const disposeCallback = onMaterialDispose.bind( this );
+				materialProperties.disposeCallback = disposeCallback;
+
+				material.addEventListener( 'dispose', disposeCallback );
+
+			}
 
 			// determine shader attributes
 
@@ -122,18 +126,6 @@ class WebGPURenderPipelines {
 					attributes: [ { shaderLocation: attribute.slot, offset: 0, format: attribute.format } ],
 					stepMode: stepMode
 				} );
-
-			}
-
-			//
-
-			let indexFormat;
-
-			if ( object.isLine ) {
-
-				const count = ( geometry.index ) ? geometry.index.count : geometry.attributes.position.count;
-
-				indexFormat = ( count > 65535 ) ? GPUIndexFormat.Uint32 : GPUIndexFormat.Uint16; // define data type for primitive restart value
 
 			}
 
@@ -166,25 +158,24 @@ class WebGPURenderPipelines {
 
 			// pipeline
 
-			const primitiveTopology = this._getPrimitiveTopology( object );
-			const rasterizationState = this._getRasterizationStateDescriptor( material );
+			const primitiveState = this._getPrimitiveState( object, material );
 			const colorWriteMask = this._getColorWriteMask( material );
 			const depthCompare = this._getDepthCompare( material );
 			const colorFormat = this._getColorFormat( this.renderer );
 			const depthStencilFormat = this._getDepthStencilFormat( this.renderer );
 
 			pipeline = device.createRenderPipeline( {
-				vertexStage: moduleVertex,
-				fragmentStage: moduleFragment,
-				primitiveTopology: primitiveTopology,
-				rasterizationState: rasterizationState,
-				colorStates: [ {
+				vertex: Object.assign( {}, moduleVertex, { buffers: vertexBuffers } ),
+				fragment: Object.assign( {}, moduleFragment, { targets: [ {
 					format: colorFormat,
-					alphaBlend: alphaBlend,
-					colorBlend: colorBlend,
+					blend: {
+						alpha: alphaBlend,
+						color: colorBlend
+					},
 					writeMask: colorWriteMask
-				} ],
-				depthStencilState: {
+				} ] } ),
+				primitive: primitiveState,
+				depthStencil: {
 					format: depthStencilFormat,
 					depthWriteEnabled: material.depthWrite,
 					depthCompare: depthCompare,
@@ -193,11 +184,9 @@ class WebGPURenderPipelines {
 					stencilReadMask: material.stencilFuncMask,
 					stencilWriteMask: material.stencilWriteMask
 				},
-				vertexState: {
-					indexFormat: indexFormat,
-					vertexBuffers: vertexBuffers
-				},
-				sampleCount: this.sampleCount
+				multisample: {
+					count: this.sampleCount
+				}
 			} );
 
 			this.pipelines.set( object, pipeline );
@@ -590,18 +579,19 @@ class WebGPURenderPipelines {
 
 	}
 
-	_getPrimitiveTopology( object ) {
-
-		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
-		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
-		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
-		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
-
-	}
-
-	_getRasterizationStateDescriptor( material ) {
+	_getPrimitiveState( object, material ) {
 
 		const descriptor = {};
+
+		descriptor.topology = this._getPrimitiveTopology( object );
+
+		if ( object.isLine === true && object.isLineSegments !== true ) {
+
+			const geometry = object.geometry;
+			const count = ( geometry.index ) ? geometry.index.count : geometry.attributes.position.count;
+			descriptor.stripIndexFormat = ( count > 65535 ) ? GPUIndexFormat.Uint32 : GPUIndexFormat.Uint16; // define data type for primitive restart value
+
+		}
 
 		switch ( material.side ) {
 
@@ -627,6 +617,15 @@ class WebGPURenderPipelines {
 		}
 
 		return descriptor;
+
+	}
+
+	_getPrimitiveTopology( object ) {
+
+		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
+		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
+		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
+		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 
 	}
 
@@ -730,20 +729,20 @@ class WebGPURenderPipelines {
 
 		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
 
-		if ( type === 'float' ) return GPUVertexFormat.Float;
-		if ( type === 'vec2' ) return GPUVertexFormat.Float2;
-		if ( type === 'vec3' ) return GPUVertexFormat.Float3;
-		if ( type === 'vec4' ) return GPUVertexFormat.Float4;
+		if ( type === 'float' ) return GPUVertexFormat.Float32;
+		if ( type === 'vec2' ) return GPUVertexFormat.Float32x2;
+		if ( type === 'vec3' ) return GPUVertexFormat.Float32x3;
+		if ( type === 'vec4' ) return GPUVertexFormat.Float32x4;
 
-		if ( type === 'int' ) return GPUVertexFormat.Int;
-		if ( type === 'ivec2' ) return GPUVertexFormat.Int2;
-		if ( type === 'ivec3' ) return GPUVertexFormat.Int3;
-		if ( type === 'ivec4' ) return GPUVertexFormat.Int4;
+		if ( type === 'int' ) return GPUVertexFormat.Sint32;
+		if ( type === 'ivec2' ) return GPUVertexFormat.Sint32x2;
+		if ( type === 'ivec3' ) return GPUVertexFormat.Sint32x3;
+		if ( type === 'ivec4' ) return GPUVertexFormat.Sint32x4;
 
-		if ( type === 'uint' ) return GPUVertexFormat.UInt;
-		if ( type === 'uvec2' ) return GPUVertexFormat.UInt2;
-		if ( type === 'uvec3' ) return GPUVertexFormat.UInt3;
-		if ( type === 'uvec4' ) return GPUVertexFormat.UInt4;
+		if ( type === 'uint' ) return GPUVertexFormat.Uint32;
+		if ( type === 'uvec2' ) return GPUVertexFormat.Uint32x2;
+		if ( type === 'uvec3' ) return GPUVertexFormat.Uint32x3;
+		if ( type === 'uvec4' ) return GPUVertexFormat.Uint32x4;
 
 		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
 
@@ -788,22 +787,15 @@ class WebGPURenderPipelines {
 function onMaterialDispose( event ) {
 
 	const properties = this.properties;
-	const nodes = this.nodes;
-	const shaderModules = this.shaderModules;
 
 	const material = event.target;
 	const materialProperties = properties.get( material );
-	const nodeBuilder = nodes.get( material );
 
 	material.removeEventListener( 'dispose', materialProperties.disposeCallback );
 
 	properties.remove( material );
-	nodes.remove( material );
 
-	shaderModules.vertex.delete( nodeBuilder.vertexShader );
-	shaderModules.fragment.delete( nodeBuilder.fragmentShader );
-
-	// @TODO: still needed remove bindings and pipeline
+	// @TODO: still needed remove nodes, bindings and pipeline
 
 }
 

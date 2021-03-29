@@ -14,7 +14,7 @@ import WebGPUNodes from './nodes/WebGPUNodes.js';
 
 import glslang from '../../libs/glslang.js';
 
-import { Frustum, Matrix4, Vector3, Color } from '../../../../build/three.module.js';
+import { Frustum, Matrix4, Vector3, Color } from 'three';
 
 console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
 
@@ -136,8 +136,8 @@ class WebGPURenderer {
 
 		}
 
-		this._parameters.extensions = ( parameters.extensions === undefined ) ? [] : parameters.extensions;
-		this._parameters.limits = ( parameters.limits === undefined ) ? {} : parameters.limits;
+		this._parameters.nonGuaranteedFeatures = ( parameters.nonGuaranteedFeatures === undefined ) ? [] : parameters.nonGuaranteedFeatures;
+		this._parameters.nonGuaranteedLimits = ( parameters.nonGuaranteedLimits === undefined ) ? {} : parameters.nonGuaranteedLimits;
 
 	}
 
@@ -152,8 +152,8 @@ class WebGPURenderer {
 		const adapter = await navigator.gpu.requestAdapter( adapterOptions );
 
 		const deviceDescriptor = {
-			extensions: parameters.extensions,
-			limits: parameters.limits
+			nonGuaranteedFeatures: parameters.nonGuaranteedFeatures,
+			nonGuaranteedLimits: parameters.nonGuaranteedLimits
 		};
 
 		const device = await adapter.requestDevice( deviceDescriptor );
@@ -852,7 +852,7 @@ class WebGPURenderer {
 				size: {
 					width: this._width * this._pixelRatio,
 					height: this._height * this._pixelRatio,
-					depth: 1
+					depthOrArrayLayers: 1
 				},
 				sampleCount: this._parameters.sampleCount,
 				format: GPUTextureFormat.BRGA8Unorm,
@@ -875,7 +875,7 @@ class WebGPURenderer {
 				size: {
 					width: this._width * this._pixelRatio,
 					height: this._height * this._pixelRatio,
-					depth: 1
+					depthOrArrayLayers: 1
 				},
 				sampleCount: this._parameters.sampleCount,
 				format: GPUTextureFormat.Depth24PlusStencil8,

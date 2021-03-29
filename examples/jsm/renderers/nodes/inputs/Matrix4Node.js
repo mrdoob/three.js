@@ -9,10 +9,10 @@ class Matrix4Node extends InputNode {
 
 		this.value = value;
 
-		Object.defineProperty( this, 'isMatrix4Node', { value: true } );
-
 	}
 
 }
+
+Matrix4Node.prototype.isMatrix4Node = true;
 
 export default Matrix4Node;

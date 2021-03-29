@@ -66,7 +66,7 @@
 			const PARTICLE_SIZE = 20;
 
 			let raycaster, intersects;
-			let mouse, INTERSECTED;
+			let pointer, INTERSECTED;
 
 			init();
 			animate();
@@ -144,7 +144,7 @@
 				//
 
 				raycaster = new THREE.Raycaster();
-				mouse = new THREE.Vector2();
+				pointer = new THREE.Vector2();
 
 				//
 
@@ -154,16 +154,14 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
-				document.addEventListener( 'mousemove', onDocumentMouseMove );
+				document.addEventListener( 'pointermove', onPointerMove );
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
 
-				event.preventDefault();
-
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 			}
 
@@ -193,7 +191,7 @@
 				const geometry = particles.geometry;
 				const attributes = geometry.attributes;
 
-				raycaster.setFromCamera( mouse, camera );
+				raycaster.setFromCamera( pointer, camera );
 
 				intersects = raycaster.intersectObject( particles );
 

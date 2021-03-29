@@ -26,7 +26,7 @@
 			let container, stats;
 			let camera, scene, raycaster, renderer, parentTransform, sphereInter;
 
-			const mouse = new THREE.Vector2();
+			const pointer = new THREE.Vector2();
 			const radius = 100;
 			let theta = 0;
 
@@ -136,7 +136,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove );
+				document.addEventListener( 'pointermove', onPointerMove );
 
 				//
 
@@ -153,12 +153,10 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
 
-				event.preventDefault();
-
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 			}
 
@@ -186,7 +184,7 @@
 
 				// find intersections
 
-				raycaster.setFromCamera( mouse, camera );
+				raycaster.setFromCamera( pointer, camera );
 
 				const intersects = raycaster.intersectObjects( parentTransform.children, true );
 

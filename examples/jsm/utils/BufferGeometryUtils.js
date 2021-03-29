@@ -686,13 +686,13 @@ var BufferGeometryUtils = {
 				for ( var i = 0, il = morphAttribute.length; i < il; i ++ ) {
 
 					var influence = morphInfluences[ i ];
-					var morphAttribute = morphAttribute[ i ];
+					var morph = morphAttribute[ i ];
 
 					if ( influence === 0 ) continue;
 
-					_tempA.fromBufferAttribute( morphAttribute, a );
-					_tempB.fromBufferAttribute( morphAttribute, b );
-					_tempC.fromBufferAttribute( morphAttribute, c );
+					_tempA.fromBufferAttribute( morph, a );
+					_tempB.fromBufferAttribute( morph, b );
+					_tempC.fromBufferAttribute( morph, c );
 
 					if ( morphTargetsRelative ) {
 

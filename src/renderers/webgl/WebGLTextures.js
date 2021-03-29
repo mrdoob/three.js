@@ -128,8 +128,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const textureProperties = properties.get( texture );
 
-		// Note: Math.log( x ) * Math.LOG2E used instead of Math.log2( x ) which is not supported by IE11
-		textureProperties.__maxMipLevel = Math.log( Math.max( width, height ) ) * Math.LOG2E;
+		textureProperties.__maxMipLevel = Math.log2( Math.max( width, height ) );
 
 	}
 
@@ -504,6 +503,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+		_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, _gl.NONE );
 
 		const needsPowerOfTwo = textureNeedsPowerOfTwo( texture ) && isPowerOfTwo( texture.image ) === false;
 		const image = resizeImage( texture.image, needsPowerOfTwo, false, maxTextureSize );
@@ -713,6 +713,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+		_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, _gl.NONE );
 
 		const isCompressed = ( texture && ( texture.isCompressedTexture || texture.image[ 0 ].isCompressedTexture ) );
 		const isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
@@ -850,9 +851,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+		state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( texture ).__webglTexture, 0 );
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+		state.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 	}
 
@@ -944,7 +945,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const isCube = ( renderTarget && renderTarget.isWebGLCubeRenderTarget );
 		if ( isCube ) throw new Error( 'Depth Texture with cube render targets is not supported' );
 
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+		state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 		if ( ! ( renderTarget.depthTexture && renderTarget.depthTexture.isDepthTexture ) ) {
 
@@ -1004,7 +1005,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				for ( let i = 0; i < 6; i ++ ) {
 
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
+					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
 					renderTargetProperties.__webglDepthbuffer[ i ] = _gl.createRenderbuffer();
 					setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget, false );
 
@@ -1012,7 +1013,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+				state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
 				renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
 				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget, false );
 
@@ -1020,7 +1021,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+		state.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 	}
 
@@ -1035,6 +1036,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
 		textureProperties.__webglTexture = _gl.createTexture();
+		textureProperties.__version = texture.version;
 
 		info.memory.textures ++;
 
@@ -1084,7 +1086,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					const samples = getRenderTargetSamples( renderTarget );
 					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
+					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
 					_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer );
 					_gl.bindRenderbuffer( _gl.RENDERBUFFER, null );
 
@@ -1095,7 +1097,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+					state.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 
 				} else {
@@ -1201,8 +1203,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				const renderTargetProperties = properties.get( renderTarget );
 
-				_gl.bindFramebuffer( _gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
-				_gl.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
+				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
 
 				const width = renderTarget.width;
 				const height = renderTarget.height;
@@ -1213,7 +1215,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST );
 
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer ); // see #18905
+				state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer ); // see #18905
 
 			} else {
 

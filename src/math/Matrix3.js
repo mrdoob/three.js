@@ -2,8 +2,6 @@ class Matrix3 {
 
 	constructor() {
 
-		Object.defineProperty( this, 'isMatrix3', { value: true } );
-
 		this.elements = [
 
 			1, 0, 0,
@@ -43,12 +41,6 @@ class Matrix3 {
 		);
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().fromArray( this.elements );
 
 	}
 
@@ -206,7 +198,7 @@ class Matrix3 {
 
 	getNormalMatrix( matrix4 ) {
 
-		return this.setFromMatrix4( matrix4 ).copy( this ).invert().transpose();
+		return this.setFromMatrix4( matrix4 ).invert().transpose();
 
 	}
 
@@ -334,6 +326,14 @@ class Matrix3 {
 
 	}
 
+	clone() {
+
+		return new this.constructor().fromArray( this.elements );
+
+	}
+
 }
+
+Matrix3.prototype.isMatrix3 = true;
 
 export { Matrix3 };

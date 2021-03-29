@@ -8,8 +8,6 @@ class HemisphereLight extends Light {
 
 		super( skyColor, intensity );
 
-		Object.defineProperty( this, 'isHemisphereLight', { value: true } );
-
 		this.type = 'HemisphereLight';
 
 		this.position.copy( Object3D.DefaultUp );
@@ -30,5 +28,7 @@ class HemisphereLight extends Light {
 	}
 
 }
+
+HemisphereLight.prototype.isHemisphereLight = true;
 
 export { HemisphereLight };

@@ -34,16 +34,43 @@ class USDZExporter {
 		output += buildMaterials( materials );
 		output += buildTextures( textures );
 
-		const files = {};
+		const files = { 'model.usda': strToU8( output ) };
 
 		for ( const uuid in textures ) {
 
 			const texture = textures[ uuid ];
-			files[ 'Texture_' + texture.id + '.jpg' ] = await imgToU8( texture.image );
+			files[ 'textures/Texture_' + texture.id + '.jpg' ] = await imgToU8( texture.image );
 
 		}
 
-		return zipSync( { 'model.usda': strToU8( output ), 'textures': files }, { level: 0 } );
+		// 64 byte alignment
+		// https://github.com/101arrowz/fflate/issues/39#issuecomment-777263109
+
+		let offset = 0;
+
+		for ( const filename in files ) {
+
+			const file = files[ filename ];
+			const headerSize = 34 + filename.length;
+
+			offset += headerSize;
+
+			const offsetMod64 = offset & 63;
+
+			if ( offsetMod64 !== 4 ) {
+
+				const padLength = 64 - offsetMod64;
+				const padding = new Uint8Array( padLength );
+
+				files[ filename ] = [ file, { extra: { 12345: padding } } ];
+
+			}
+
+			offset = file.length;
+
+		}
+
+		return zipSync( files, { level: 0 } );
 
 	}
 
@@ -56,9 +83,11 @@ async function imgToU8( image ) {
 		( typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas ) ||
 		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
+		const scale = 1024 / Math.max( image.width, image.height );
+
 		const canvas = document.createElement( 'canvas' );
-		canvas.width = image.width;
-		canvas.height = image.height;
+		canvas.width = image.width * Math.min( 1, scale );
+		canvas.height = image.height * Math.min( 1, scale );
 
 		const context = canvas.getContext( '2d' );
 		context.drawImage( image, 0, 0, canvas.width, canvas.height );
@@ -72,11 +101,15 @@ async function imgToU8( image ) {
 
 //
 
+const PRECISION = 7;
+
 function buildHeader() {
 
 	return `#usda 1.0
 (
-    doc = "Three.js"
+    customLayerData = {
+        string creator = "Three.js USDZExporter"
+    }
     metersPerUnit = 1
     upAxis = "Y"
 )
@@ -126,6 +159,12 @@ function buildMesh( geometry, material ) {
 	const attributes = geometry.attributes;
 	const count = attributes.position.count;
 
+	if ( 'uv2' in attributes ) {
+
+		console.warn( 'THREE.USDZExporter: uv2 not supported yet.' );
+
+	}
+
 	return `def Mesh "${ name }"
     {
         int[] faceVertexCounts = [${ buildMeshVertexCount( geometry ) }]
@@ -136,10 +175,8 @@ function buildMesh( geometry, material ) {
         )
         point3f[] points = [${ buildVector3Array( attributes.position, count )}]
         float2[] primvars:st = [${ buildVector2Array( attributes.uv, count )}] (
-            elementSize = 1
             interpolation = "vertex"
         )
-        int[] primvars:st:indices
         uniform token subdivisionScheme = "none"
     }
 `;
@@ -189,7 +226,7 @@ function buildVector3Array( attribute, count ) {
 
 	for ( let i = 0; i < data.length; i += 3 ) {
 
-		array.push( `(${ data[ i + 0 ] }, ${ data[ i + 1 ] }, ${ data[ i + 2 ] })` );
+		array.push( `(${ data[ i + 0 ].toPrecision( PRECISION ) }, ${ data[ i + 1 ].toPrecision( PRECISION ) }, ${ data[ i + 2 ].toPrecision( PRECISION ) })` );
 
 	}
 
@@ -211,7 +248,7 @@ function buildVector2Array( attribute, count ) {
 
 	for ( let i = 0; i < data.length; i += 2 ) {
 
-		array.push( `(${ data[ i + 0 ] }, ${ 1 - data[ i + 1 ] })` );
+		array.push( `(${ data[ i + 0 ].toPrecision( PRECISION ) }, ${ 1 - data[ i + 1 ].toPrecision( PRECISION ) })` );
 
 	}
 
@@ -251,27 +288,27 @@ function buildMaterial( material ) {
 
 	if ( material.map !== null ) {
 
-		parameters.push( `${ pad }float3 inputs:diffuseColor.connect = </Textures/Texture_${ material.map.id }.outputs:rgb>` );
+		parameters.push( `${ pad }color3f inputs:diffuseColor.connect = </Textures/Texture_${ material.map.id }.outputs:rgb>` );
 
 	} else {
 
-		parameters.push( `${ pad }float3 inputs:diffuseColor = ${ buildColor( material.color ) }` );
+		parameters.push( `${ pad }color3f inputs:diffuseColor = ${ buildColor( material.color ) }` );
 
 	}
 
 	if ( material.emissiveMap !== null ) {
 
-		parameters.push( `${ pad }float3 inputs:emissiveColor.connect = </Textures/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }color3f inputs:emissiveColor.connect = </Textures/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
 
-	} else {
+	} else if ( material.emissive.getHex() > 0 ) {
 
-		parameters.push( `${ pad }float3 inputs:emissiveColor = ${ buildColor( material.emissive ) }` );
+		parameters.push( `${ pad }color3f inputs:emissiveColor = ${ buildColor( material.emissive ) }` );
 
 	}
 
 	if ( material.normalMap !== null ) {
 
-		parameters.push( `${ pad }float3 inputs:normal.connect = </Textures/Texture_${ material.normalMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }normal3f inputs:normal.connect = </Textures/Texture_${ material.normalMap.id }.outputs:rgb>` );
 
 	}
 
@@ -346,7 +383,6 @@ function buildTexture( texture ) {
     {
         uniform token info:id = "UsdUVTexture"
         asset inputs:file = @textures/Texture_${ texture.id }.jpg@
-        token inputs:isSRGB = "auto"
         token inputs:wrapS = "repeat"
         token inputs:wrapT = "repeat"
         float outputs:r

@@ -14,8 +14,6 @@ class WebGPUSampler extends WebGPUBinding {
 
 		this.samplerGPU = null; // set by the renderer
 
-		Object.defineProperty( this, 'isSampler', { value: true } );
-
 	}
 
 	getTexture() {
@@ -25,5 +23,7 @@ class WebGPUSampler extends WebGPUBinding {
 	}
 
 }
+
+WebGPUSampler.prototype.isSampler = true;
 
 export default WebGPUSampler;

@@ -922,7 +922,7 @@ var GLTFExporter = ( function () {
 
 			};
 
-			if ( attribute.normalized === true ) gltfAccessor.normalized = true;
+			if ( attribute.normalized === true ) accessorDef.normalized = true;
 			if ( ! json.accessors ) json.accessors = [];
 
 			return json.accessors.push( accessorDef ) - 1;
@@ -1128,7 +1128,7 @@ var GLTFExporter = ( function () {
 			// @QUESTION Should we avoid including any attribute that has the default value?
 			var materialDef = {	pbrMetallicRoughness: {} };
 
-			if ( ! material.isMeshStandardMaterial || ! material.isMeshBasicMaterial ) {
+			if ( material.isMeshStandardMaterial !== true && material.isMeshBasicMaterial !== true ) {
 
 				console.warn( 'GLTFExporter: Use MeshStandardMaterial or MeshBasicMaterial for best results.' );
 
