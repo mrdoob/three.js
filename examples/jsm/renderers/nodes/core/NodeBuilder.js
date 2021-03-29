@@ -158,7 +158,7 @@ class NodeBuilder {
 	getVectorType( type ) {
 
 		if ( type === 'color' ) return 'vec3';
-		else if ( type === 'texture' ) return 'vec4';
+		if ( type === 'texture' ) return 'vec4';
 
 		return type;
 
@@ -476,26 +476,26 @@ class NodeBuilder {
 			case 'float to vec4' : return `vec4( vec3( ${snippet} ), 1.0 )`;
 
 			case 'vec2 to float' : return `${snippet}.x`;
-			case 'vec2 to vec3' : return `vec3( ${snippet}, 0.0 )`;
-			case 'vec2 to vec4' : return `vec4( ${snippet}.xy, 0.0, 1.0 )`;
+			case 'vec2 to vec3'  : return `vec3( ${snippet}, 0.0 )`;
+			case 'vec2 to vec4'  : return `vec4( ${snippet}.xy, 0.0, 1.0 )`;
 
 			case 'vec3 to float' : return `${snippet}.x`;
-			case 'vec3 to vec2' : return `${snippet}.xy`;
-			case 'vec3 to vec4' : return `vec4( ${snippet}, 1.0 )`;
+			case 'vec3 to vec2'  : return `${snippet}.xy`;
+			case 'vec3 to vec4'  : return `vec4( ${snippet}, 1.0 )`;
 
 			case 'vec4 to float' : return `${snippet}.x`;
-			case 'vec4 to vec2' : return `${snippet}.xy`;
-			case 'vec4 to vec3' : return `${snippet}.xyz`;
+			case 'vec4 to vec2'  : return `${snippet}.xy`;
+			case 'vec4 to vec3'  : return `${snippet}.xyz`;
 
 			case 'mat3 to float' : return `( ${snippet} * vec3( 1.0 ) ).x`;
-			case 'mat3 to vec2' : return `( ${snippet} * vec3( 1.0 ) ).xy`;
-			case 'mat3 to vec3' : return `( ${snippet} * vec3( 1.0 ) ).xyz`;
-			case 'mat3 to vec4' : return `vec4( ${snippet} * vec3( 1.0 ), 1.0 )`;
+			case 'mat3 to vec2'  : return `( ${snippet} * vec3( 1.0 ) ).xy`;
+			case 'mat3 to vec3'  : return `( ${snippet} * vec3( 1.0 ) ).xyz`;
+			case 'mat3 to vec4'  : return `vec4( ${snippet} * vec3( 1.0 ), 1.0 )`;
 
 			case 'mat4 to float' : return `( ${snippet} * vec4( 1.0 ) ).x`;
-			case 'mat4 to vec2' : return `( ${snippet} * vec4( 1.0 ) ).xy`;
-			case 'mat4 to vec3' : return `( ${snippet} * vec4( 1.0 ) ).xyz`;
-			case 'mat4 to vec4' : return `( ${snippet} * vec4( 1.0 ) )`;
+			case 'mat4 to vec2'  : return `( ${snippet} * vec4( 1.0 ) ).xy`;
+			case 'mat4 to vec3'  : return `( ${snippet} * vec4( 1.0 ) ).xyz`;
+			case 'mat4 to vec4'  : return `( ${snippet} * vec4( 1.0 ) )`;
 
 		}
 

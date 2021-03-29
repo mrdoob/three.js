@@ -18,6 +18,12 @@ class WebGPUSampler extends WebGPUBinding {
 
 	}
 
+	getTexture() {
+
+		return this.texture; 
+
+	}
+
 }
 
 export default WebGPUSampler;

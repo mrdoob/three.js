@@ -3,11 +3,12 @@ import {
 	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from './WebGPUNodeUniform.js';
-import WebGPUSampler from '../WebGPUSampler.js';
-import { WebGPUSampledTexture } from '../WebGPUSampledTexture.js';
+import WebGPUNodeSampler from './WebGPUNodeSampler.js';
+import { WebGPUNodeSampledTexture } from './WebGPUNodeSampledTexture.js';
 
 import NodeSlot from '../../nodes/core/NodeSlot.js';
 import NodeBuilder from '../../nodes/core/NodeBuilder.js';
+import MaterialNode from '../../nodes/accessors/MaterialNode.js';
 import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode.js';
 import LightContextNode from '../../nodes/lights/LightContextNode.js';
 import ShaderLib from './ShaderLib.js';
@@ -35,7 +36,19 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		// get shader
 
-		this.nativeShader = ShaderLib.common;
+		let shader = null;
+
+		if (material.isMeshPhongMaterial) {
+
+			shader = ShaderLib.phong;
+			
+		} else {
+			
+			shader = ShaderLib.common;
+			
+		}
+		
+		this.nativeShader = shader;
 		
 		// parse inputs
 
@@ -56,6 +69,44 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				this.addSlot( 'fragment', new NodeSlot( material.colorNode, 'COLOR', 'vec4' ) );
 
+			} else {
+				
+				this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.COLOR ), 'COLOR', 'vec4' ) );
+				
+			}
+			
+			if ( material.opacityNode !== undefined ) {
+
+				this.addSlot( 'fragment', new NodeSlot( material.opacityNode, 'OPACITY', 'float' ) );
+
+			} else {
+				
+				this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.OPACITY ), 'OPACITY', 'float' ) );
+				
+			}
+			
+			if ( material.isMeshPhongMaterial ) {
+			
+				if ( material.specularNode !== undefined ) {
+
+					this.addSlot( 'fragment', new NodeSlot( material.specularNode, 'SPECULAR', 'vec3' ) );
+
+				} else {
+					
+					this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.SPECULAR ), 'SPECULAR', 'vec3' ) );
+					
+				}
+				
+				if ( material.shininessNode !== undefined ) {
+
+					this.addSlot( 'fragment', new NodeSlot( material.shininessNode, 'SHININESS', 'float' ) );
+
+				} else {
+					
+					this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.SHININESS ), 'SHININESS', 'float' ) );
+					
+				}
+
 			}
 			
 			if ( lightNode !== undefined ) {
@@ -64,12 +115,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				
 				this.addSlot( 'fragment', new NodeSlot( lightContextNode, 'LIGHT', 'vec3' ) );
 				
-			}
-
-			if ( material.opacityNode !== undefined ) {
-
-				this.addSlot( 'fragment', new NodeSlot( material.opacityNode, 'OPACITY', 'float' ) );
-
 			}
 
 		}
@@ -126,8 +171,8 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			if ( type === 'texture' ) {
 
-				const sampler = new WebGPUSampler( `${uniformNode.name}_sampler`, uniformNode.value );
-				const texture = new WebGPUSampledTexture( uniformNode.name, uniformNode.value );
+				const sampler = new WebGPUNodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
+				const texture = new WebGPUNodeSampledTexture( uniformNode.name, uniformNode.node );
 
 				// add first textures in sequence and group for last
 				const lastBinding = bindings[ bindings.length - 1 ];

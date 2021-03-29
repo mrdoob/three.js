@@ -20,6 +20,11 @@ class WebGPUSampledTexture extends WebGPUBinding {
 
 	}
 
+	getTexture() {
+
+		return this.texture;
+
+	}
 
 }
 

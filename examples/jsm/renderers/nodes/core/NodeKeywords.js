@@ -31,6 +31,9 @@ class NodeKeywords {
 	static ReflectedLightDirectSpecular = 'ReflectedLightDirectSpecular';
 	
 	static MaterialDiffuseColor = 'MaterialDiffuseColor';
+	
+	static MaterialSpecularShininess = 'MaterialSpecularShininess';
+	static MaterialSpecularColor = 'MaterialSpecularColor';
 
 	constructor() {
 
@@ -49,12 +52,15 @@ class NodeKeywords {
 			NodeKeywords.NormalLocal,
 			NodeKeywords.NormalWorld,
 			NodeKeywords.NormalView,
+			// vars -> float
+			NodeKeywords.MaterialSpecularShininess,
 			// vars -> vec3
 			NodeKeywords.Irradiance,
 			NodeKeywords.ReflectedLightIndirectDiffuse,
 			NodeKeywords.ReflectedLightIndirectSpecular,
 			NodeKeywords.ReflectedLightDirectDiffuse,
 			NodeKeywords.ReflectedLightDirectSpecular,
+			NodeKeywords.MaterialSpecularColor,
 			// vars -> vec4
 			NodeKeywords.MaterialDiffuseColor
 		];
@@ -137,16 +143,26 @@ class NodeKeywords {
 					
 					break;
 				
+				// floats properties
+				case NodeKeywords.MaterialSpecularShininess:
+				
+					node = new PropertyNode( name, 'float' );
+				
+					break;
+				
+				// vec3 properties
 				case NodeKeywords.Irradiance:
 				case NodeKeywords.ReflectedLightIndirectDiffuse:
 				case NodeKeywords.ReflectedLightIndirectSpecular:
 				case NodeKeywords.ReflectedLightDirectDiffuse:
 				case NodeKeywords.ReflectedLightDirectSpecular:
+				case NodeKeywords.MaterialSpecularColor:
 				
 					node = new PropertyNode( name, 'vec3' );
 					
 					break;
 				
+				// vec4 properties
 				case NodeKeywords.MaterialDiffuseColor:
 				
 					node = new PropertyNode( name, 'vec4' );

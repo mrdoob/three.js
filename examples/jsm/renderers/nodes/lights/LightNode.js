@@ -65,19 +65,11 @@ class LightNode extends Node {
 		const indirectDiffuseFunctionNode = builder.getContextParameter( 'RE_IndirectDiffuse' );
 		
 		const directFunctionCallNode = directFunctionNode.call( {
-			// light
 			lightDirection: this.lightDirection,
-			lightColor: this.lightColor,
-			
-			// material
-			materialDiffuseColor: new ColorNode( new Color( 0x333333 ) ),
-			materialSpecularColor: new ColorNode( new Color( 0x111111 ) ),
-			materialSpecularShininess: new FloatNode( 30 ),
-			materialSpecularStrength: new FloatNode( 1 )
+			lightColor: this.lightColor
 		} );
 		
 		const indirectDiffuseFunctionCallNode = indirectDiffuseFunctionNode.call( {
-			// light
 			lightDirection: this.lightDirection,
 			lightColor: this.lightColor,
 		} );
