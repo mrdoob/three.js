@@ -11,26 +11,26 @@ class ConstNode extends CodeNode {
 		this.name = name;
 
 	}
-	
+
 	generate( builder, output ) {
-		
+
 		const code = super.generate( builder );
-		
+
 		const type = this.getType( builder );
 		const nodeCode = builder.getCodeFromNode( this, type );
-		
+
 		if ( this.name !== '' ) {
-			
+
 			// use a custom property name
-			
+
 			nodeCode.name = this.name;
-			
+
 		}
-		
+
 		const propertyName = builder.getPropertyName( nodeCode );
-		
+
 		nodeCode.code = `#define ${propertyName} ${code}`;
-	
+
 		return builder.format( propertyName, type, output );
 
 	}

@@ -9,11 +9,11 @@ class WebGPUNodeSampler extends WebGPUSampler {
 		this.textureNode = textureNode;
 
 	}
-	
+
 	getTexture() {
 
 		return this.textureNode.value;
-		
+
 	}
 
 }

@@ -15,7 +15,7 @@ class NodeBuilder {
 
 		this.nodes = [];
 		this.updateNodes = [];
-		
+
 		this.vertexShader = null;
 		this.fragmentShader = null;
 
@@ -27,12 +27,12 @@ class NodeBuilder {
 		this.attributes = [];
 		this.varys = [];
 		this.flow = { code: '' };
-		
+
 		this.context = {
 			keywords: new NodeKeywords(),
 			material: material
 		};
-		
+
 		this.nodesData = new WeakMap();
 
 		this.shaderStage = null;
@@ -68,23 +68,23 @@ class NodeBuilder {
 		this.defines[ shaderStage ][ name ] = value;
 
 	}
-	
+
 	setContext( context ) {
-		
+
 		this.context = context;
-		
+
 	}
-	
+
 	getContext() {
-		
+
 		return this.context;
-		
+
 	}
-	
+
 	getContextParameter( name ) {
-		
+
 		return this.context[ name ];
-		
+
 	}
 
 	getTexture( /* textureProperty, uvSnippet */ ) {
@@ -226,9 +226,9 @@ class NodeBuilder {
 		return nodeUniform;
 
 	}
-	
+
 	getVarFromNode( node, type, shaderStage = this.shaderStage ) {
-		
+
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
 		let nodeVar = nodeData.variable;
@@ -247,7 +247,7 @@ class NodeBuilder {
 		}
 
 		return nodeVar;
-		
+
 	}
 
 	getVaryFromNode( node, type ) {
@@ -293,7 +293,7 @@ class NodeBuilder {
 		}
 
 		return nodeCode;
-	
+
 	}
 
 	/*
@@ -304,27 +304,27 @@ class NodeBuilder {
 	*/
 
 	addFlowCode( code ) {
-		
-		if ( !/;\s*$/.test( code ) ) {
-			
+
+		if ( ! /;\s*$/.test( code ) ) {
+
 			code += '; ';
-			
+
 		}
-		
+
 		this.flow.code += code;
-		
+
 	}
 
 	flowNode( node, output ) {
-		
+
 		const previousFlow = this.flow;
-		
+
 		const flow = {
 			code: previousFlow.code,
 		};
-		
+
 		this.flow = flow;
-		
+
 		flow.result = node.build( this, output );
 
 		this.flow = previousFlow;
@@ -372,13 +372,13 @@ class NodeBuilder {
 		console.warn( 'Abstract function.' );
 
 	}
-	
+
 	getVarsHeaderSnippet( /*shaderStage*/ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
-	
+
 	getVarsBodySnippet( /*shaderStage*/ ) {
 
 		console.warn( 'Abstract function.' );
@@ -390,7 +390,7 @@ class NodeBuilder {
 		console.warn( 'Abstract function.' );
 
 	}
-	
+
 	getUniformsHeaderCodes( shaderStage ) {
 
 		const nodeCodes = this.nodeCodes[ shaderStage ];
@@ -402,7 +402,7 @@ class NodeBuilder {
 			code += nodeCode.code + '\n';
 
 		}
-		
+
 		return code;
 
 	}
@@ -442,12 +442,12 @@ class NodeBuilder {
 			this.define( shaderStage, 'NODE_HEADER_UNIFORMS', this.getUniformsHeaderSnippet( shaderStage ) );
 			this.define( shaderStage, 'NODE_HEADER_ATTRIBUTES', this.getAttributesHeaderSnippet( shaderStage ) );
 			this.define( shaderStage, 'NODE_HEADER_VARYS', this.getVarysHeaderSnippet( shaderStage ) );
-			
-			this.define( shaderStage, 'NODE_BODY_VARYS', this.getVarysBodySnippet( shaderStage ) );			
-			this.define( shaderStage, 'NODE_BODY_VARS', this.getVarsBodySnippet( shaderStage )  );	
+
+			this.define( shaderStage, 'NODE_BODY_VARYS', this.getVarysBodySnippet( shaderStage ) );
+			this.define( shaderStage, 'NODE_BODY_VARS', this.getVarsBodySnippet( shaderStage ) );
 
 			let headerCode = '';
-			
+
 			headerCode += this.getVarsHeaderSnippet( shaderStage ) + '\n';
 			headerCode += this.getUniformsHeaderCodes( shaderStage );
 
@@ -476,26 +476,26 @@ class NodeBuilder {
 			case 'float to vec4' : return `vec4( vec3( ${snippet} ), 1.0 )`;
 
 			case 'vec2 to float' : return `${snippet}.x`;
-			case 'vec2 to vec3'  : return `vec3( ${snippet}, 0.0 )`;
-			case 'vec2 to vec4'  : return `vec4( ${snippet}.xy, 0.0, 1.0 )`;
+			case 'vec2 to vec3' : return `vec3( ${snippet}, 0.0 )`;
+			case 'vec2 to vec4' : return `vec4( ${snippet}.xy, 0.0, 1.0 )`;
 
 			case 'vec3 to float' : return `${snippet}.x`;
-			case 'vec3 to vec2'  : return `${snippet}.xy`;
-			case 'vec3 to vec4'  : return `vec4( ${snippet}, 1.0 )`;
+			case 'vec3 to vec2' : return `${snippet}.xy`;
+			case 'vec3 to vec4' : return `vec4( ${snippet}, 1.0 )`;
 
 			case 'vec4 to float' : return `${snippet}.x`;
-			case 'vec4 to vec2'  : return `${snippet}.xy`;
-			case 'vec4 to vec3'  : return `${snippet}.xyz`;
+			case 'vec4 to vec2' : return `${snippet}.xy`;
+			case 'vec4 to vec3' : return `${snippet}.xyz`;
 
 			case 'mat3 to float' : return `( ${snippet} * vec3( 1.0 ) ).x`;
-			case 'mat3 to vec2'  : return `( ${snippet} * vec3( 1.0 ) ).xy`;
-			case 'mat3 to vec3'  : return `( ${snippet} * vec3( 1.0 ) ).xyz`;
-			case 'mat3 to vec4'  : return `vec4( ${snippet} * vec3( 1.0 ), 1.0 )`;
+			case 'mat3 to vec2' : return `( ${snippet} * vec3( 1.0 ) ).xy`;
+			case 'mat3 to vec3' : return `( ${snippet} * vec3( 1.0 ) ).xyz`;
+			case 'mat3 to vec4' : return `vec4( ${snippet} * vec3( 1.0 ), 1.0 )`;
 
 			case 'mat4 to float' : return `( ${snippet} * vec4( 1.0 ) ).x`;
-			case 'mat4 to vec2'  : return `( ${snippet} * vec4( 1.0 ) ).xy`;
-			case 'mat4 to vec3'  : return `( ${snippet} * vec4( 1.0 ) ).xyz`;
-			case 'mat4 to vec4'  : return `( ${snippet} * vec4( 1.0 ) )`;
+			case 'mat4 to vec2' : return `( ${snippet} * vec4( 1.0 ) ).xy`;
+			case 'mat4 to vec3' : return `( ${snippet} * vec4( 1.0 ) ).xyz`;
+			case 'mat4 to vec4' : return `( ${snippet} * vec4( 1.0 ) )`;
 
 		}
 

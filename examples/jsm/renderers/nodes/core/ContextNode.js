@@ -5,9 +5,9 @@ class ContextNode extends Node {
 	constructor( node, parameters = {} ) {
 
 		super();
-		
+
 		this.node = node;
-		
+
 		this.parameters = parameters;
 
 		Object.defineProperty( this, 'isContextNode', { value: true } );
@@ -29,9 +29,9 @@ class ContextNode extends Node {
 	}
 
 	getType( builder ) {
-		
+
 		return this.node.getType( builder );
-		
+
 	}
 
 	generate( builder, output ) {
@@ -41,9 +41,9 @@ class ContextNode extends Node {
 		builder.setContext( Object.assign( {}, builder.context, this.parameters ) );
 
 		const snippet = this.node.build( builder, output );
-		
+
 		builder.setContext( previousContext );
-		
+
 		return snippet;
 
 	}

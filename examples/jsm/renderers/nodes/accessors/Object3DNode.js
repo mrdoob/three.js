@@ -38,9 +38,9 @@ class Object3DNode extends Node {
 			return 'mat3';
 
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION ) {
-			
+
 			return 'vec3';
-			
+
 		}
 
 	}

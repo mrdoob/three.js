@@ -9,7 +9,7 @@ class MaterialReferenceNode extends ReferenceNode {
 		this.material = material;
 
 	}
-	
+
 	update( frame ) {
 
 		this.object = this.material !== null ? this.material : frame.material;

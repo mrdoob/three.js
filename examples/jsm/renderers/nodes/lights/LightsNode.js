@@ -6,37 +6,37 @@ class LightsNode extends Node {
 	constructor( lightNodes = [] ) {
 
 		super( 'vec3' );
-		
+
 		this.lightNodes = lightNodes;
 
 	}
-	
+
 	generate( builder, output ) {
-		
+
 		const lightNodes = this.lightNodes;
-		
-		for( const lightNode of lightNodes ) {
-			
+
+		for ( const lightNode of lightNodes ) {
+
 			lightNode.build( builder );
-			
+
 		}
-		
+
 		return 'vec3( 0.0 )';
-		
+
 	}
-	
+
 	static fromLights( lights ) {
-		
+
 		const lightNodes = [];
 
-		for( const light of lights ) {
-			
+		for ( const light of lights ) {
+
 			lightNodes.push( new LightNode( light ) );
-			
+
 		}
-		
+
 		return new LightsNode( lightNodes );
-		
+
 	}
 
 }

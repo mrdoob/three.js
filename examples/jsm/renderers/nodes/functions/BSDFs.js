@@ -1,6 +1,6 @@
 import FunctionNode from '../core/FunctionNode.js';
 
-export const F_Schlick = new FunctionNode(`
+export const F_Schlick = new FunctionNode( `
 vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {
 
 	// Original approximation by Christophe Schlick '94
@@ -12,33 +12,33 @@ vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {
 
 	return ( 1.0 - specularColor ) * fresnel + specularColor;
 
-}`); // validated
+}` ); // validated
 
-export const G_BlinnPhong_Implicit = new FunctionNode(`
+export const G_BlinnPhong_Implicit = new FunctionNode( `
 float G_BlinnPhong_Implicit() {
 
 	// ( const in float dotNL, const in float dotNV )
 	// geometry term is (n dot l)(n dot v) / 4(n dot l)(n dot v)
-	
+
 	return 0.25;
 
-}`); // validated
+}` ); // validated
 
-export const D_BlinnPhong = new FunctionNode(`
+export const D_BlinnPhong = new FunctionNode( `
 float D_BlinnPhong( const in float shininess, const in float dotNH ) {
 
 	return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );
 
-}`); // validated
+}` ); // validated
 
-export const BRDF_Diffuse_Lambert = new FunctionNode(`
+export const BRDF_Diffuse_Lambert = new FunctionNode( `
 vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 
 	return RECIPROCAL_PI * diffuseColor;
 
-}`); // validated
+}` ); // validated
 
-export const BRDF_Specular_BlinnPhong = new FunctionNode(`
+export const BRDF_Specular_BlinnPhong = new FunctionNode( `
 vec3 BRDF_Specular_BlinnPhong( vec3 lightDirection, vec3 specularColor, float shininess ) {
 
 	vec3 halfDir = normalize( lightDirection + PositionViewDirection );
@@ -56,9 +56,9 @@ vec3 BRDF_Specular_BlinnPhong( vec3 lightDirection, vec3 specularColor, float sh
 
 	return F * ( G * D );
 
-}`).setIncludes( [ F_Schlick, G_BlinnPhong_Implicit, D_BlinnPhong ] ); // validated
+}` ).setIncludes( [ F_Schlick, G_BlinnPhong_Implicit, D_BlinnPhong ] ); // validated
 
-export const punctualLightIntensityToIrradianceFactor = new FunctionNode(`
+export const punctualLightIntensityToIrradianceFactor = new FunctionNode( `
 float punctualLightIntensityToIrradianceFactor( float lightDistance, float cutoffDistance, float decayExponent ) {
 
 #if defined ( PHYSICALLY_CORRECT_LIGHTS )
@@ -90,9 +90,9 @@ float punctualLightIntensityToIrradianceFactor( float lightDistance, float cutof
 
 #endif
 
-}`);
+}` );
 
-export const RE_Direct_BlinnPhong = new FunctionNode(`
+export const RE_Direct_BlinnPhong = new FunctionNode( `
 void RE_Direct_BlinnPhong( vec3 lightDirection, vec3 lightColor ) {
 
 	float dotNL = saturate( dot( NormalView, lightDirection ) );
@@ -108,11 +108,11 @@ void RE_Direct_BlinnPhong( vec3 lightDirection, vec3 lightColor ) {
 
 	ReflectedLightDirectSpecular += irradiance * BRDF_Specular_BlinnPhong( lightDirection, MaterialSpecularColor, MaterialSpecularShininess );
 
-}`).setIncludes( [ BRDF_Diffuse_Lambert, BRDF_Specular_BlinnPhong ] );
+}` ).setIncludes( [ BRDF_Diffuse_Lambert, BRDF_Specular_BlinnPhong ] );
 
-export const RE_IndirectDiffuse_BlinnPhong = new FunctionNode(`
+export const RE_IndirectDiffuse_BlinnPhong = new FunctionNode( `
 void RE_IndirectDiffuse_BlinnPhong( ) {
 
 	ReflectedLightIndirectDiffuse += Irradiance * BRDF_Diffuse_Lambert( MaterialDiffuseColor.rgb );
 
-}`).setIncludes( [ BRDF_Diffuse_Lambert ] );
+}` ).setIncludes( [ BRDF_Diffuse_Lambert ] );

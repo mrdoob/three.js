@@ -5,7 +5,7 @@ class MathNode extends Node {
 	static NORMALIZE = 'normalize';
 	static NEGATE = 'negate';
 	static LENGTH = 'length';
-	
+
 	constructor( method, a, b = null ) {
 
 		super();
@@ -18,13 +18,13 @@ class MathNode extends Node {
 	}
 
 	getInputType( builder ) {
-		
+
 		const typeA = this.a.getType( builder );
 
 		if ( this.b !== null ) {
-			
+
 			const typeB = this.b.getType( builder );
-			
+
 			if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
 
 				// anytype x anytype: use the greater length vector
@@ -36,7 +36,7 @@ class MathNode extends Node {
 		}
 
 		return typeA;
-		
+
 	}
 
 	getType( builder ) {
@@ -44,12 +44,12 @@ class MathNode extends Node {
 		const method = this.method;
 
 		if (method === MathNode.LENGTH) {
-			
+
 			return 'float';
-			
-		} else if ( 
+
+		} else if (
 			method === MathNode.TRANSFORM_DIRETION ||
-			method === MathNode.INVERSE_TRANSFORM_DIRETION 
+			method === MathNode.INVERSE_TRANSFORM_DIRETION
 		) {
 
 			return 'vec3';
@@ -87,9 +87,9 @@ class MathNode extends Node {
 				return builder.format( `( -${a} )`, type, output );
 
 			} else {
-				
+
 				return builder.format( `${method}( ${a} )`, type, output );
-				
+
 			}
 
 		}

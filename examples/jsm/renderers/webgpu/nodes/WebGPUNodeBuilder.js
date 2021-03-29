@@ -38,18 +38,18 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		let shader = null;
 
-		if (material.isMeshPhongMaterial) {
+		if ( material.isMeshPhongMaterial ) {
 
 			shader = ShaderLib.phong;
-			
+
 		} else {
-			
+
 			shader = ShaderLib.common;
-			
+
 		}
-		
+
 		this.nativeShader = shader;
-		
+
 		// parse inputs
 
 		if ( material.isMeshPhongMaterial || material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
@@ -70,51 +70,51 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				this.addSlot( 'fragment', new NodeSlot( material.colorNode, 'COLOR', 'vec4' ) );
 
 			} else {
-				
+
 				this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.COLOR ), 'COLOR', 'vec4' ) );
-				
+
 			}
-			
+
 			if ( material.opacityNode !== undefined ) {
 
 				this.addSlot( 'fragment', new NodeSlot( material.opacityNode, 'OPACITY', 'float' ) );
 
 			} else {
-				
+
 				this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.OPACITY ), 'OPACITY', 'float' ) );
-				
+
 			}
-			
+
 			if ( material.isMeshPhongMaterial ) {
-			
+
 				if ( material.specularNode !== undefined ) {
 
 					this.addSlot( 'fragment', new NodeSlot( material.specularNode, 'SPECULAR', 'vec3' ) );
 
 				} else {
-					
+
 					this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.SPECULAR ), 'SPECULAR', 'vec3' ) );
-					
+
 				}
-				
+
 				if ( material.shininessNode !== undefined ) {
 
 					this.addSlot( 'fragment', new NodeSlot( material.shininessNode, 'SHININESS', 'float' ) );
 
 				} else {
-					
+
 					this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.SHININESS ), 'SHININESS', 'float' ) );
-					
+
 				}
 
 			}
-			
+
 			if ( lightNode !== undefined ) {
-				
+
 				const lightContextNode = new LightContextNode( lightNode );
-				
+
 				this.addSlot( 'fragment', new NodeSlot( lightContextNode, 'LIGHT', 'vec3' ) );
-				
+
 			}
 
 		}
@@ -325,7 +325,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		return snippet;
 
 	}
-	
+
 	getVarsBodySnippet( shaderStage ) {
 
 		let snippet = '';
@@ -333,11 +333,11 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		const vars = this.vars[ shaderStage ];
 
 		for ( const variable of vars ) {
-			
+
 			if ( variable.snippet !== '' ) {
-			
+
 				snippet += `${variable.name} = ${variable.snippet}; `;
-				
+
 			}
 
 		}
@@ -406,14 +406,14 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			this.shaderStage = shaderStage;
 
 			keywords.include( this, this.nativeShader.fragmentShader );
-			
+
 		}
-		
+
 		super.build();
 
 		this.vertexShader = this.composeShaderCode( this.nativeShader.vertexShader, this.vertexShader );
 		this.fragmentShader = this.composeShaderCode( this.nativeShader.fragmentShader, this.fragmentShader );
-console.log( this.fragmentShader );
+		console.log( this.fragmentShader );
 		return this;
 
 	}

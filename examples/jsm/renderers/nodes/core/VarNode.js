@@ -28,9 +28,9 @@ class VarNode extends Node {
 		nodeVary.snippet = snippet;
 
 		if ( this.name !== '' ) {
-			
+
 			nodeVary.name = this.name;
-			
+
 		}
 
 		const propertyName = builder.getPropertyName( nodeVary );
