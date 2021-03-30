@@ -5,13 +5,11 @@ import {
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
-	Plane,
 	RGBFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector2,
 	Vector3,
-	Vector4,
 	WebGLRenderTarget,
 	DepthTexture,
 	UnsignedShortType,
@@ -31,7 +29,6 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 	var color = ( options.color !== undefined ) ? new Color( options.color ) : new Color( 0x7F7F7F );
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
-	var clipBias = options.clipBias || 0;
 	var shader = options.shader || ReflectorForSSRPass.ReflectorShader;
 	var useDepthTexture = options.useDepthTexture === true;
 	var yAxis = new Vector3( 0, 1, 0 );
@@ -50,40 +47,45 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 	scope._distanceAttenuation = ReflectorForSSRPass.ReflectorShader.defines.DISTANCE_ATTENUATION;
 	Object.defineProperty( scope, 'distanceAttenuation', {
 		get() {
+
 			return scope._distanceAttenuation;
+
 		},
 		set( val ) {
+
 			if ( scope._distanceAttenuation === val ) return;
 			scope._distanceAttenuation = val;
 			scope.material.defines.DISTANCE_ATTENUATION = val;
 			scope.material.needsUpdate = true;
+
 		}
 	} );
 
 	scope._fresnel = ReflectorForSSRPass.ReflectorShader.defines.FRESNEL;
 	Object.defineProperty( scope, 'fresnel', {
 		get() {
+
 			return scope._fresnel;
+
 		},
 		set( val ) {
+
 			if ( scope._fresnel === val ) return;
 			scope._fresnel = val;
 			scope.material.defines.FRESNEL = val;
 			scope.material.needsUpdate = true;
+
 		}
 	} );
 
-	var reflectorPlane = new Plane();
 	var normal = new Vector3();
 	var reflectorWorldPosition = new Vector3();
 	var cameraWorldPosition = new Vector3();
 	var rotationMatrix = new Matrix4();
 	var lookAtPosition = new Vector3( 0, 0, - 1 );
-	var clipPlane = new Vector4();
 
 	var view = new Vector3();
 	var target = new Vector3();
-	var q = new Vector4();
 
 	var textureMatrix = new Matrix4();
 	var virtualCamera = new PerspectiveCamera();
