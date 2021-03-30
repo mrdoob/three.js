@@ -37,7 +37,7 @@ var TrackballControls = function ( object, domElement ) {
 	this.minDistance = 0;
 	this.maxDistance = Infinity;
 
-	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
+	this.keys = [ 'KeyA' /*A*/, 'KeyS' /*S*/, 'KeyD' /*D*/ ];
 
 	this.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
 
@@ -462,15 +462,15 @@ var TrackballControls = function ( object, domElement ) {
 
 			return;
 
-		} else if ( event.keyCode === scope.keys[ STATE.ROTATE ] && ! scope.noRotate ) {
+		} else if ( event.code === scope.keys[ STATE.ROTATE ] && ! scope.noRotate ) {
 
 			_keyState = STATE.ROTATE;
 
-		} else if ( event.keyCode === scope.keys[ STATE.ZOOM ] && ! scope.noZoom ) {
+		} else if ( event.code === scope.keys[ STATE.ZOOM ] && ! scope.noZoom ) {
 
 			_keyState = STATE.ZOOM;
 
-		} else if ( event.keyCode === scope.keys[ STATE.PAN ] && ! scope.noPan ) {
+		} else if ( event.code === scope.keys[ STATE.PAN ] && ! scope.noPan ) {
 
 			_keyState = STATE.PAN;
 
