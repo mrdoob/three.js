@@ -1,10 +1,10 @@
 import {
+	BufferGeometry,
 	Clock,
+	Float32BufferAttribute,
 	LinearFilter,
 	Mesh,
 	OrthographicCamera,
-	BufferGeometry,
-	BufferAttribute,
 	RGBAFormat,
 	Vector2,
 	WebGLRenderTarget
@@ -277,11 +277,12 @@ Object.assign( Pass.prototype, {
 Pass.FullScreenQuad = ( function () {
 
 	var camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+
+	// https://github.com/mrdoob/three.js/pull/21358
+
 	var geometry = new BufferGeometry();
-	const vertices = new Float32Array([-1, 3, 0, -1, -1, 0, 3, -1, 0]);
-	geometry.setAttribute("position", new BufferAttribute(vertices, 3));
-	const uv = new Float32Array([0, 2, 0, 0, 2, 0]);
-	geometry.setAttribute("uv", new BufferAttribute(uv, 2));
+	geometry.setAttribute( 'position', new Float32BufferAttribute( [ - 1, 3, 0, - 1, - 1, 0, 3, - 1, 0 ], 3 ) );
+	geometry.setAttribute( 'uv', new Float32BufferAttribute( [ 0, 2, 0, 0, 2, 0 ], 2 ) );
 
 	var FullScreenQuad = function ( material ) {
 
