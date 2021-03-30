@@ -2032,6 +2032,8 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
+		return null;
+
 	};
 
 	GLTFParser.prototype._invokeAll = function ( func ) {
@@ -3565,6 +3567,8 @@ THREE.GLTFLoader = ( function () {
 		var parser = this;
 		var nodeDef = json.nodes[ nodeIndex ];
 
+		if ( nodeDef.mesh === undefined ) return null;
+
 		return parser.getDependency( 'mesh', nodeDef.mesh ).then( function ( mesh ) {
 
 			var node = parser._getNodeRef( parser.meshCache, nodeDef.mesh, mesh );
@@ -3612,13 +3616,15 @@ THREE.GLTFLoader = ( function () {
 
 			var pending = [];
 
-			if ( nodeDef.mesh !== undefined ) {
+			var meshPromise = parser._invokeOne( function ( ext ) {
 
-				pending.push( parser._invokeOne( function ( ext ) {
+				return ext.createNodeMesh && ext.createNodeMesh( nodeIndex );
 
-					return ext.createNodeMesh && ext.createNodeMesh( nodeIndex );
+			} );
 
-				} ) );
+			if ( meshPromise ) {
+
+				pending.push( meshPromise );
 
 			}
 
