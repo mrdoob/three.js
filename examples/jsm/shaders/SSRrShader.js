@@ -1,53 +1,53 @@
 import {
-  Matrix4,
-  Vector2
+	Matrix4,
+	Vector2
 } from "../../../build/three.module.js";
 
 var SSRrShader = {
 
-  defines: {
+	defines: {
 		MAX_STEP: 0,
 		PERSPECTIVE_CAMERA: true,
 		SPECULAR: true,
-    FILL_HOLE: true,
-    INFINITE_THICK: false,
-  },
+		FILL_HOLE: true,
+		INFINITE_THICK: false,
+	},
 
-  uniforms: {
+	uniforms: {
 
-    "tDiffuse": { value: null },
-    "tSpecular": { value: null },
-    "tNormalSelects": { value: null },
-    "tRefractive": { value: null },
-    "tDepth": { value: null },
-    "tDepthSelects": { value: null },
-    "cameraNear": { value: null },
-    "cameraFar": { value: null },
-    "resolution": { value: new Vector2() },
-    "cameraProjectionMatrix": { value: new Matrix4() },
-    "cameraInverseProjectionMatrix": { value: new Matrix4() },
-    "ior": { value: 1.03 },
-    "cameraRange": { value: 0 },
-    "maxDistance": { value: 180 },
-    "surfDist": { value: .007 },
+		"tDiffuse": { value: null },
+		"tSpecular": { value: null },
+		"tNormalSelects": { value: null },
+		"tRefractive": { value: null },
+		"tDepth": { value: null },
+		"tDepthSelects": { value: null },
+		"cameraNear": { value: null },
+		"cameraFar": { value: null },
+		"resolution": { value: new Vector2() },
+		"cameraProjectionMatrix": { value: new Matrix4() },
+		"cameraInverseProjectionMatrix": { value: new Matrix4() },
+		"ior": { value: 1.03 },
+		"cameraRange": { value: 0 },
+		"maxDistance": { value: 180 },
+		"surfDist": { value: .007 },
 
-  },
+	},
 
-  vertexShader: /* glsl */`
+	vertexShader: /* glsl */`
 
-    varying vec2 vUv;
+		varying vec2 vUv;
 
-    void main() {
+		void main() {
 
 			vUv = uv;
 
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-    }
+		}
 
-  `,
+	`,
 
-  fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */`
 		// precision highp float;
 		precision highp sampler2D;
 		varying vec2 vUv;
@@ -239,41 +239,41 @@ var SSRrShader = {
 
 var SSRrDepthShader = {
 
-  defines: {
-    "PERSPECTIVE_CAMERA": 1
-  },
+	defines: {
+		"PERSPECTIVE_CAMERA": 1
+	},
 
-  uniforms: {
+	uniforms: {
 
-    "tDepth": { value: null },
-    "cameraNear": { value: null },
-    "cameraFar": { value: null },
+		"tDepth": { value: null },
+		"cameraNear": { value: null },
+		"cameraFar": { value: null },
 
-  },
+	},
 
-  vertexShader: /* glsl */`
+	vertexShader: /* glsl */`
 
-    varying vec2 vUv;
+		varying vec2 vUv;
 
-    void main() {
+		void main() {
 
-    	vUv = uv;
-    	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-    }
+		}
 
-  `,
+	`,
 
-  fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */`
 
-    uniform sampler2D tDepth;
+		uniform sampler2D tDepth;
 
-    uniform float cameraNear;
-    uniform float cameraFar;
+		uniform float cameraNear;
+		uniform float cameraFar;
 
-    varying vec2 vUv;
+		varying vec2 vUv;
 
-    #include <packing>
+		#include <packing>
 
 		float getLinearDepth( const in vec2 uv ) {
 
@@ -291,16 +291,16 @@ var SSRrDepthShader = {
 
 		}
 
-    void main() {
+		void main() {
 
-    	float depth = getLinearDepth( vUv );
+			float depth = getLinearDepth( vUv );
 			float d = 1.0 - depth;
 			// d=(d-.999)*1000.;
-    	gl_FragColor = vec4( vec3( d ), 1.0 );
+			gl_FragColor = vec4( vec3( d ), 1.0 );
 
-    }
+		}
 
-  `
+	`
 
 };
 
