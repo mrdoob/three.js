@@ -58,7 +58,15 @@ const MathUtils = {
 
 	inverseLerp: function ( a, b, value ) {
 
-		return MathUtils.clamp( ( value - a ) / ( b - a ) );
+		if ( a !== b ) {
+
+			return MathUtils.clamp( ( value - a ) / ( b - a ), 0, 1 );
+
+		 } else {
+
+			return 0;
+
+		 }
 
 	},
 
