@@ -56,11 +56,11 @@ const MathUtils = {
 
 	// https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/inverse-lerp-a-super-useful-yet-often-overlooked-function-r5230/
 
-	inverseLerp: function ( a, b, value ) {
+	inverseLerp: function ( x, y, value ) {
 
-		if ( a !== b ) {
+		if ( x !== y ) {
 
-			return MathUtils.clamp( ( value - a ) / ( b - a ), 0, 1 );
+			return MathUtils.clamp( ( value - x ) / ( y - x ), 0, 1 );
 
 		 } else {
 
