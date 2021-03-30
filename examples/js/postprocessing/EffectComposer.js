@@ -261,7 +261,11 @@ Object.assign( THREE.Pass.prototype, {
 THREE.Pass.FullScreenQuad = ( function () {
 
 	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	var geometry = new THREE.PlaneGeometry( 2, 2 );
+	var geometry = new THREE.BufferGeometry();
+	const vertices = new Float32Array([-1, 3, 0, -1, -1, 0, 3, -1, 0]);
+	geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+	const uv = new Float32Array([0, 2, 0, 0, 2, 0]);
+	geometry.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
 
 	var FullScreenQuad = function ( material ) {
 
