@@ -54,6 +54,12 @@ const MathUtils = {
 
 	},
 
+     // https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/inverse-lerp-a-super-useful-yet-often-overlooked-function-r5230/
+     
+     inverseLerp(a, b, value) {
+          return MathUtils.clamp((value - a) / (b - a));
+     },
+
 	// https://en.wikipedia.org/wiki/Linear_interpolation
 
 	lerp: function ( x, y, t ) {
