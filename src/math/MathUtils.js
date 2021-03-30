@@ -60,7 +60,7 @@ const MathUtils = {
 
 		if ( x !== y ) {
 
-			return MathUtils.clamp( ( value - x ) / ( y - x ), 0, 1 );
+			return ( value - x ) / ( y - x );
 
 		 } else {
 
