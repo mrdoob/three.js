@@ -299,11 +299,6 @@ function Loader( editor ) {
 			case 'js':
 			case 'json':
 
-			case '3geo':
-			case '3mat':
-			case '3obj':
-			case '3scn':
-
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
