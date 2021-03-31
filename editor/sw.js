@@ -1,4 +1,4 @@
-const cacheName = 'threejs-editor-r126';
+const cacheName = 'threejs-editor-r127';
 
 const assets = [
 	'./',

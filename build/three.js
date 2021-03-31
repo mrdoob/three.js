@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 }(this, (function (exports) { 'use strict';
 
-	const REVISION = '127dev';
+	const REVISION = '127';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -302,6 +302,14 @@
 		// Linear mapping from range <a1, a2> to range <b1, b2>
 		mapLinear: function (x, a1, a2, b1, b2) {
 			return b1 + (x - a1) * (b2 - b1) / (a2 - a1);
+		},
+		// https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/inverse-lerp-a-super-useful-yet-often-overlooked-function-r5230/
+		inverseLerp: function (x, y, value) {
+			if (x !== y) {
+				return (value - x) / (y - x);
+			} else {
+				return 0;
+			}
 		},
 		// https://en.wikipedia.org/wiki/Linear_interpolation
 		lerp: function (x, y, t) {
@@ -18389,10 +18397,10 @@
 	WebGL1Renderer.prototype.isWebGL1Renderer = true;
 
 	class FogExp2 {
-		constructor(color, density) {
+		constructor(color, density = 0.00025) {
 			this.name = '';
 			this.color = new Color(color);
-			this.density = density !== undefined ? density : 0.00025;
+			this.density = density;
 		}
 
 		clone() {
@@ -18414,11 +18422,11 @@
 	FogExp2.prototype.isFogExp2 = true;
 
 	class Fog {
-		constructor(color, near, far) {
+		constructor(color, near = 1, far = 1000) {
 			this.name = '';
 			this.color = new Color(color);
-			this.near = near !== undefined ? near : 1;
-			this.far = far !== undefined ? far : 1000;
+			this.near = near;
+			this.far = far;
 		}
 
 		clone() {
