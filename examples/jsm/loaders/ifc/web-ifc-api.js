@@ -539,7 +539,8 @@ var require_web_ifc = __commonJS((exports, module) => {
       function isFileURI(filename) {
         return hasPrefix(filename, fileURIPrefix);
       }
-      var wasmBinaryFile = "jsm/loaders/ifc/web-ifc.wasm";
+      var path = import.meta.url.substring(0, import.meta.url.lastIndexOf("/")+1);
+      var wasmBinaryFile = path + "web-ifc.wasm";
       if (!isDataURI(wasmBinaryFile)) {
         wasmBinaryFile = locateFile(wasmBinaryFile);
       }
