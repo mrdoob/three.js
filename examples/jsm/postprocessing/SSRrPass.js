@@ -198,14 +198,14 @@ var SSRrPass = function ( { renderer, scene, camera, width, height, selects, enc
 
 	this.refractiveOffMaterial = new MeshBasicMaterial( {
 		color: 'black'
-	});
+	} );
 
 	// specular material
-	this.specularMaterial = new MeshStandardMaterial({
+	this.specularMaterial = new MeshStandardMaterial( {
 		color: 'black',
 		metalness: 0,
 		roughness: .2,
-	});
+	} );
 
 	// material for rendering the depth
 
@@ -279,45 +279,67 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		if ( this.encoding ) this.beautyRenderTarget.texture.encoding = this.encoding;
 		renderer.setRenderTarget( this.beautyRenderTarget );
 		renderer.clear();
-		this.scene.children.forEach(child => {
-			if (this.selects.includes(child)) {
-				child.visible = false
+		this.scene.children.forEach( child => {
+
+			if ( this.selects.includes( child ) ) {
+
+				child.visible = false;
+
 			} else {
-				child.visible = true
+
+				child.visible = true;
+
 			}
-		})
-		renderer.render(this.scene, this.camera);
+
+		} );
+		renderer.render( this.scene, this.camera );
 
 		renderer.setRenderTarget( this.specularRenderTarget );
 		renderer.clear();
-		this.scene.children.forEach(child => {
-			if (this.selects.includes(child)) {
-				child.visible=true
-				child._SSRrPassBackupMaterial = child.material
-				child.material=this.specularMaterial
-			} else if(!child.isLight) {
-				child.visible = false
+		this.scene.children.forEach( child => {
+
+			if ( this.selects.includes( child ) ) {
+
+				child.visible = true;
+				child._SSRrPassBackupMaterial = child.material;
+				child.material = this.specularMaterial;
+
+			} else if ( ! child.isLight ) {
+
+				child.visible = false;
+
 			}
-		})
-		renderer.render(this.scene, this.camera);
-		this.scene.children.forEach(child => {
-			if (this.selects.includes(child)) {
-				child.material=child._SSRrPassBackupMaterial
+
+		} );
+		renderer.render( this.scene, this.camera );
+		this.scene.children.forEach( child => {
+
+			if ( this.selects.includes( child ) ) {
+
+				child.material = child._SSRrPassBackupMaterial;
+
 			}
-		})
+
+		} );
 
 
 		// render normalSelectss
 
-		this.scene.children.forEach(child => {
-			if (this.selects.includes(child)) {
-				child.visible=true
-			} else{
-				child.visible = false
-			}
-		})
+		this.scene.children.forEach( child => {
 
-		this.renderOverride(renderer, this.normalMaterial, this.normalSelectsRenderTarget, 0, 0);
+			if ( this.selects.includes( child ) ) {
+
+				child.visible = true;
+
+			} else {
+
+				child.visible = false;
+
+			}
+
+		} );
+
+		this.renderOverride( renderer, this.normalMaterial, this.normalSelectsRenderTarget, 0, 0 );
 
 		this.renderRefractive( renderer, this.refractiveOnMaterial, this.refractiveRenderTarget, 0, 0 );
 
@@ -488,9 +510,11 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		}
 
-		this.scene.children.forEach(child => {
-			child.visible=true
-		})
+		this.scene.children.forEach( child => {
+
+			child.visible = true;
+
+		} );
 		this.scene.traverse( child => {
 
 			child._SSRrPassBackupMaterial = child.material;
@@ -504,14 +528,14 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 			}
 
-		});
-		this.scene._SSRrPassBackupBackground=this.scene.background
-		this.scene.background=null
-		this.scene._SSRrPassBackupFog=this.scene.fog
-		this.scene.fog=null
-		renderer.render(this.scene, this.camera);
-		this.scene.fog=this.scene._SSRrPassBackupFog
-		this.scene.background=this.scene._SSRrPassBackupBackground
+		} );
+		this.scene._SSRrPassBackupBackground = this.scene.background;
+		this.scene.background = null;
+		this.scene._SSRrPassBackupFog = this.scene.fog;
+		this.scene.fog = null;
+		renderer.render( this.scene, this.camera );
+		this.scene.fog = this.scene._SSRrPassBackupFog;
+		this.scene.background = this.scene._SSRrPassBackupBackground;
 		this.scene.traverse( child => {
 
 			child.material = child._SSRrPassBackupMaterial;
