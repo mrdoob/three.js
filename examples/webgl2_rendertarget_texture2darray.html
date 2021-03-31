@@ -33,13 +33,12 @@
 
 	uniform sampler2DArray uTexture;
 	uniform int uDepth;
-	uniform float uSampleLeft;
-	uniform float uSampleWidth;
+	uniform float uIntensity;
 
 	void main()
 	{
 		float voxel = texture(uTexture, vec3( vUv, uDepth )).r;
-		gl_FragColor.r = (voxel - uSampleLeft) / uSampleWidth;
+		gl_FragColor.r = voxel * uIntensity;
 	}
 
 	</script>
@@ -87,8 +86,7 @@
 
 			<p>
 				This example shows how to render to an array of 2D texture.</br>
-				WebGL2 allows to render to specific "layers" in 3D texture and array of textures.</br>
-				You can use the mouse left click to change the intensity of the render target.
+				WebGL2 allows to render to specific "layers" in 3D texture and array of textures.
 			</p>
 
 			Scanned head data by
@@ -103,6 +101,7 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { unzipSync } from './jsm/libs/fflate.module.min.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { WEBGL } from './jsm/WebGL.js';
 
@@ -118,8 +117,8 @@
 				depth: 109
 			};
 
-			const App = {
-				mousePrevious: new THREE.Vector2()
+			const params = {
+				intensity: 1
 			};
 
 			/** Post-processing objects */
@@ -139,8 +138,7 @@
 				uniforms: {
 					uTexture: { value: null },
 					uDepth: { value: 55 },
-					uSampleLeft: { value: 0 },
-					uSampleWidth: { value: 1.0 },
+					uIntensity: { value: 1.0 }
 				},
 				vertexShader: document.getElementById( 'vertex-postprocess' ).textContent.trim(),
 				fragmentShader: document.getElementById( 'fragment-postprocess' ).textContent.trim()
@@ -178,12 +176,15 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.domElement.addEventListener( 'mousedown', onMouseDown );
-
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				const gui = new GUI();
+
+				gui.add( params, 'intensity', 0, 1 ).step( 0.01 ).onChange( value => postProcessMaterial.uniforms.uIntensity.value = value );
+				gui.open();
 
 				// width 256, height 256, depth 109, 8-bit, zip archived raw data
 
@@ -219,35 +220,6 @@
 						animate();
 
 					} );
-
-			}
-
-			function onMouseDown(e) {
-
-				renderer.domElement.addEventListener('mouseup', onMouseUp);
-				renderer.domElement.addEventListener('mousemove', onMouseMove);
-
-				App.mousePrevious.set(e.clientX, e.clientY);
-
-			}
-
-			function onMouseUp() {
-
-				renderer.domElement.removeEventListener('mousemove', onMouseMove);
-				renderer.domElement.removeEventListener('mouseup', onMouseUp);
-
-			}
-
-			function onMouseMove(e) {
-
-				const x = e.clientX;
-				const y = e.clientY;
-				const deltaX = ( x - App.mousePrevious.x ) * 0.001;
-				const deltaY = ( y - App.mousePrevious.y ) * 0.001;
-				postProcessMaterial.uniforms.uSampleLeft.value += deltaX;
-				postProcessMaterial.uniforms.uSampleWidth.value += deltaY;
-
-				App.mousePrevious.set( x, y );
 
 			}
 

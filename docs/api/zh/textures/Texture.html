@@ -137,21 +137,42 @@
 
 		<h3>[property:Vector2 offset]</h3>
 		<p>
-		纹理在单次重复时，从一开始将分别在U、V方向上偏移多少。
-		这个值的范围通常在*0.0*之间*1.0*。
-		请注意：这一属性是一个非常方便的修改器，仅仅影响纹理对模型上第一组UV的应用。
-		如果该纹理被用于需要额外的UV集的贴图（例如一些成品材质中的aoMap或lightMap），
-		这些UV必须被手动调整来实现所期望的偏移。
+		How much a single repetition of the texture is offset from the beginning, in each direction U and V.
+		Typical range is *0.0* to *1.0*.
+		</p>
+		<p>
+			The below texture types share the *first* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			the following priorities and then shared by those textures:
+			<ol>
+				<li>color map</li>
+				<li>specular map</li>
+				<li>displacement map</li>
+				<li>normal map</li>
+				<li>bump map</li>
+				<li>roughness map</li>
+				<li>metalness map</li>
+				<li>alpha map</li>
+				<li>emissive map</li>
+				<li>clearcoat map</li>
+				<li>clearcoat normal map</li>
+				<li>clearcoat roughnessMap map</li>
+			</ol>
+		</p>
+		<p>
+			The below texture types share the *second* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			the following priorities and then shared by those textures:
+			<ol>
+				<li>ao map</li>
+				<li>light map</li>
+			</ol>
 		</p>
 
 		<h3>[property:Vector2 repeat]</h3>
 		<p>
-		纹理将在表面上，分别在U、V方向重复多少次。如果这个值在任意方向上设置为大于1，
-		则对应的Wrap参数应当也被设为[page:Textures THREE.RepeatWrapping]或[page:Textures THREE.MirroredRepeatWrapping]，
-		以实现所期望的平铺效果。
-		请注意：这一属性是一个非常方便的修改器，仅仅影响纹理对模型上第一组UV的应用。
-		如果该纹理被用于需要额外的UV集的贴图（例如一些成品材质中的aoMap或lightMap），
-		这些UV必须被手动调整来实现所期望的重复。
+		How many times the texture is repeated across the surface, in each direction U and V.  If repeat is set
+		greater than 1 in either direction, the corresponding Wrap parameter should also be set to
+		[page:Textures THREE.RepeatWrapping] or [page:Textures THREE.MirroredRepeatWrapping] to achieve the desired
+		tiling effect. Setting different repeat values for textures is restricted in the same way like [page:.offset].
 		</p>
 
 		<h3>[property:number rotation]</h3>

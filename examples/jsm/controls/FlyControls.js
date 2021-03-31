@@ -123,7 +123,6 @@ var FlyControls = function ( object, domElement ) {
 		}
 
 		event.preventDefault();
-		event.stopPropagation();
 
 		if ( this.dragToLook ) {
 
@@ -164,7 +163,6 @@ var FlyControls = function ( object, domElement ) {
 	this.mouseup = function ( event ) {
 
 		event.preventDefault();
-		event.stopPropagation();
 
 		if ( this.dragToLook ) {
 

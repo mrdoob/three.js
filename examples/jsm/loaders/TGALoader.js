@@ -1,46 +1,17 @@
 import {
-	FileLoader,
-	Loader,
-	Texture
+	DataTextureLoader,
+	LinearMipmapLinearFilter
 } from '../../../build/three.module.js';
 
 var TGALoader = function ( manager ) {
 
-	Loader.call( this, manager );
+	DataTextureLoader.call( this, manager );
 
 };
 
-TGALoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype ), {
 
 	constructor: TGALoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		var scope = this;
-
-		var texture = new Texture();
-
-		var loader = new FileLoader( this.manager );
-		loader.setResponseType( 'arraybuffer' );
-		loader.setPath( this.path );
-		loader.setWithCredentials( this.withCredentials );
-
-		loader.load( url, function ( buffer ) {
-
-			texture.image = scope.parse( buffer );
-			texture.needsUpdate = true;
-
-			if ( onLoad !== undefined ) {
-
-				onLoad( texture );
-
-			}
-
-		}, onProgress, onError );
-
-		return texture;
-
-	},
 
 	parse: function ( buffer ) {
 
@@ -527,21 +498,20 @@ TGALoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		//
 
-		var useOffscreen = typeof OffscreenCanvas !== 'undefined';
-
-		var canvas = useOffscreen ? new OffscreenCanvas( header.width, header.height ) : document.createElement( 'canvas' );
-		canvas.width = header.width;
-		canvas.height = header.height;
-
-		var context = canvas.getContext( '2d' );
-		var imageData = context.createImageData( header.width, header.height );
-
+		var imageData = new Uint8Array( header.width * header.height * 4 );
 		var result = tgaParse( use_rle, use_pal, header, offset, content );
-		getTgaRGBA( imageData.data, header.width, header.height, result.pixel_data, result.palettes );
+		getTgaRGBA( imageData, header.width, header.height, result.pixel_data, result.palettes );
 
-		context.putImageData( imageData, 0, 0 );
+		return {
 
-		return canvas;
+			data: imageData,
+			width: header.width,
+			height: header.height,
+			flipY: true,
+			generateMipmaps: true,
+			minFilter: LinearMipmapLinearFilter,
+
+		};
 
 	}
 

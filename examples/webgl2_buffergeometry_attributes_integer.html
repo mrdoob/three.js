@@ -48,6 +48,14 @@
 
 			import * as THREE from '../build/three.module.js';
 
+			import { WEBGL } from './jsm/WebGL.js';
+
+			if ( WEBGL.isWebGL2Available() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+
+			}
+
 			let camera, scene, renderer, mesh;
 
 			init();
