@@ -347,6 +347,23 @@ function Loader( editor ) {
 
 				break;
 
+			case 'ifc':
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					var { IFCLoader } = await import( '../../examples/jsm/loaders/IFCLoader.js' );
+
+					var loader = new IFCLoader();
+					var scene = await loader.parse( event.target.result );
+
+					scene.name = filename;
+
+					editor.execute( new AddObjectCommand( editor, scene ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
 
 			case 'kmz':
 
