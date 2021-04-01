@@ -138,13 +138,13 @@
 			해당 객체는 카메라 패닝을 제어하기위한 키 코드에 대한 참조를 포함합니다. 기본값은 4 개의 화살표 키입니다.
 			<code>
 controls.keys = {
-	LEFT: 37, // 왼쪽 화살표
-	UP: 38, // 위쪽 화살표
-	RIGHT: 39, // 오른쪽 화살표
-	BOTTOM: 40 // 아래쪽 화살표
+	LEFT: 'ArrowLeft', // 왼쪽 화살표
+	UP: 'ArrowUp', // 위쪽 화살표
+	RIGHT: 'ArrowRight', // 오른쪽 화살표
+	BOTTOM: 'ArrowDown' // 아래쪽 화살표
 }
 			 </code>
-			 전체 키코드 목록은 [link:https://developer.mozilla.org/ko/docs/Web/API/KeyboardEvent/keyCode this page] 를 참조하세요.
+			 전체 키코드 목록은 [link:https://developer.mozilla.org/ko/docs/Web/API/KeyboardEvent/code KeyboardEvent.code] 를 참조하세요.
 		</p>
 
 		<h3>[property:Float maxAzimuthAngle]</h3>

@@ -5,13 +5,11 @@ import {
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
-	Plane,
 	RGBFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector2,
 	Vector3,
-	Vector4,
 	WebGLRenderTarget,
 	DepthTexture,
 	UnsignedShortType,
@@ -31,7 +29,6 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 	var color = ( options.color !== undefined ) ? new Color( options.color ) : new Color( 0x7F7F7F );
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
-	var clipBias = options.clipBias || 0;
 	var shader = options.shader || ReflectorForSSRPass.ReflectorShader;
 	var useDepthTexture = options.useDepthTexture === true;
 	var yAxis = new Vector3( 0, 1, 0 );
@@ -44,47 +41,51 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 	scope.maxDistance = ReflectorForSSRPass.ReflectorShader.uniforms.maxDistance.value;
 	scope.opacity = ReflectorForSSRPass.ReflectorShader.uniforms.opacity.value;
 	scope.color = color;
-	scope.worldYBias = options.worldYBias || 0;
 	scope.resolution = options.resolution || new Vector2( window.innerWidth, window.innerHeight );
 
 
 	scope._distanceAttenuation = ReflectorForSSRPass.ReflectorShader.defines.DISTANCE_ATTENUATION;
 	Object.defineProperty( scope, 'distanceAttenuation', {
 		get() {
+
 			return scope._distanceAttenuation;
+
 		},
 		set( val ) {
+
 			if ( scope._distanceAttenuation === val ) return;
 			scope._distanceAttenuation = val;
 			scope.material.defines.DISTANCE_ATTENUATION = val;
 			scope.material.needsUpdate = true;
+
 		}
 	} );
 
 	scope._fresnel = ReflectorForSSRPass.ReflectorShader.defines.FRESNEL;
 	Object.defineProperty( scope, 'fresnel', {
 		get() {
+
 			return scope._fresnel;
+
 		},
 		set( val ) {
+
 			if ( scope._fresnel === val ) return;
 			scope._fresnel = val;
 			scope.material.defines.FRESNEL = val;
 			scope.material.needsUpdate = true;
+
 		}
 	} );
 
-	var reflectorPlane = new Plane();
 	var normal = new Vector3();
 	var reflectorWorldPosition = new Vector3();
 	var cameraWorldPosition = new Vector3();
 	var rotationMatrix = new Matrix4();
 	var lookAtPosition = new Vector3( 0, 0, - 1 );
-	var clipPlane = new Vector4();
 
 	var view = new Vector3();
 	var target = new Vector3();
-	var q = new Vector4();
 
 	var textureMatrix = new Matrix4();
 	var virtualCamera = new PerspectiveCamera();
@@ -139,7 +140,6 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 		material.uniforms[ 'maxDistance' ].value = scope.maxDistance;
 		material.uniforms[ 'color' ].value = scope.color;
 		material.uniforms[ 'opacity' ].value = scope.opacity;
-		material.uniforms[ 'worldYBias' ].value = scope.worldYBias;
 
 		vecTemp0.copy( camera.position ).normalize();
 		vecTemp1.copy( vecTemp0 ).reflect( yAxis );
@@ -183,11 +183,11 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 		virtualCamera.updateMatrixWorld();
 		virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 
-		material.uniforms[ 'virtualCameraNear' ].value = virtualCamera.near;
-		material.uniforms[ 'virtualCameraFar' ].value = virtualCamera.far;
-		material.uniforms[ 'virtualCameraMatrixWorld' ].value= virtualCamera.matrixWorld;
-		material.uniforms[ 'virtualCameraProjectionMatrix' ].value= virtualCamera.projectionMatrix;
-		material.uniforms[ 'virtualCameraInverseProjectionMatrix' ].value= virtualCamera.projectionMatrixInverse;
+		material.uniforms[ 'virtualCameraNear' ].value = camera.near;
+		material.uniforms[ 'virtualCameraFar' ].value = camera.far;
+		material.uniforms[ 'virtualCameraMatrixWorld' ].value = virtualCamera.matrixWorld;
+		material.uniforms[ 'virtualCameraProjectionMatrix' ].value = camera.projectionMatrix;
+		material.uniforms[ 'virtualCameraProjectionMatrixInverse' ].value = camera.projectionMatrixInverse;
 		material.uniforms[ 'resolution' ].value = scope.resolution;
 
 		// Update the texture matrix
@@ -295,12 +295,11 @@ ReflectorForSSRPass.ReflectorShader = {
 		maxDistance: { value: 180 },
 		opacity: { value: 0.5 },
 		fresnelCoe: { value: null },
-		worldYBias: { value: null },
 		virtualCameraNear: { value: null },
 		virtualCameraFar: { value: null },
 		virtualCameraProjectionMatrix: { value: new Matrix4() },
 		virtualCameraMatrixWorld: { value: new Matrix4() },
-		virtualCameraInverseProjectionMatrix: { value: new Matrix4() },
+		virtualCameraProjectionMatrixInverse: { value: new Matrix4() },
 		resolution: { value: new Vector2() },
 
 	},
@@ -325,11 +324,10 @@ ReflectorForSSRPass.ReflectorShader = {
 		uniform float maxDistance;
 		uniform float opacity;
 		uniform float fresnelCoe;
-		uniform float worldYBias;
 		uniform float virtualCameraNear;
 		uniform float virtualCameraFar;
 		uniform mat4 virtualCameraProjectionMatrix;
-		uniform mat4 virtualCameraInverseProjectionMatrix;
+		uniform mat4 virtualCameraProjectionMatrixInverse;
 		uniform mat4 virtualCameraMatrixWorld;
 		uniform vec2 resolution;
 		varying vec4 vUv;
@@ -349,7 +347,7 @@ ReflectorForSSRPass.ReflectorShader = {
 		vec3 getViewPosition( const in vec2 uv, const in float depth/*clip space*/, const in float clipW ) {
 			vec4 clipPosition = vec4( ( vec3( uv, depth ) - 0.5 ) * 2.0, 1.0 );//ndc
 			clipPosition *= clipW; //clip
-			return ( virtualCameraInverseProjectionMatrix * clipPosition ).xyz;//view
+			return ( virtualCameraProjectionMatrixInverse * clipPosition ).xyz;//view
 		}
 		void main() {
 			vec4 base = texture2DProj( tDiffuse, vUv );
@@ -361,8 +359,6 @@ ReflectorForSSRPass.ReflectorShader = {
 				float clipW = virtualCameraProjectionMatrix[2][3] * viewZ+virtualCameraProjectionMatrix[3][3];
 				vec3 viewPosition=getViewPosition( uv, depth, clipW );
 				vec3 worldPosition=(virtualCameraMatrixWorld*vec4(viewPosition,1)).xyz;
-				worldPosition.y+=worldYBias; // TODO: Don't know why not start from zero, temporarily use manually defined bias, need fix afterwards.
-				worldPosition.y=max(0.,worldPosition.y);
 				if(worldPosition.y>maxDistance) discard;
 				float op=opacity;
 				#ifdef DISTANCE_ATTENUATION
