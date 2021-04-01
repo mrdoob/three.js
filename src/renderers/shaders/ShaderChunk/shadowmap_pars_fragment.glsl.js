@@ -71,6 +71,22 @@ export default /* glsl */`
 
 	}
 
+	bool isShadowCoordInFrustum( vec4 shadowCoord ) {
+
+		// if ( something && something ) breaks ATI OpenGL shader compiler
+		// if ( all( something, something ) ) using this instead
+
+		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
+		bool inFrustum = all( inFrustumVec );
+
+		bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );
+
+		bool frustumTest = all( frustumTestVec );
+
+		return frustumTest;
+
+	}
+
 	float VSMShadow (sampler2D shadow, vec2 uv, float compare ){
 
 		float occlusion = 1.0;
@@ -92,26 +108,16 @@ export default /* glsl */`
 
 	}
 
-	float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
+	float getShadowPCF( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
 
 		float shadow = 1.0;
 
 		shadowCoord.xyz /= shadowCoord.w;
 		shadowCoord.z += shadowBias;
 
-		// if ( something && something ) breaks ATI OpenGL shader compiler
-		// if ( all( something, something ) ) using this instead
-
-		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
-		bool inFrustum = all( inFrustumVec );
-
-		bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );
-
-		bool frustumTest = all( frustumTestVec );
+		bool frustumTest = isShadowCoordInFrustum( shadowCoord );
 
 		if ( frustumTest ) {
-
-		#if defined( SHADOWMAP_TYPE_PCF )
 
 			vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
 
@@ -144,7 +150,22 @@ export default /* glsl */`
 				texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
 			) * ( 1.0 / 17.0 );
 
-		#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
+		}
+
+		return shadow;
+
+	}
+
+	float getShadowPCFSoft( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, vec4 shadowCoord ) {
+
+		float shadow = 1.0;
+
+		shadowCoord.xyz /= shadowCoord.w;
+		shadowCoord.z += shadowBias;
+
+		bool frustumTest = isShadowCoordInFrustum( shadowCoord );
+
+		if ( frustumTest ) {
 
 			vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
 			float dx = texelSize.x;
@@ -159,36 +180,65 @@ export default /* glsl */`
 				texture2DCompare( shadowMap, uv + vec2( dx, 0.0 ), shadowCoord.z ) +
 				texture2DCompare( shadowMap, uv + vec2( 0.0, dy ), shadowCoord.z ) +
 				texture2DCompare( shadowMap, uv + texelSize, shadowCoord.z ) +
-				mix( texture2DCompare( shadowMap, uv + vec2( -dx, 0.0 ), shadowCoord.z ), 
+				mix( texture2DCompare( shadowMap, uv + vec2( -dx, 0.0 ), shadowCoord.z ),
 					 texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, 0.0 ), shadowCoord.z ),
 					 f.x ) +
-				mix( texture2DCompare( shadowMap, uv + vec2( -dx, dy ), shadowCoord.z ), 
+				mix( texture2DCompare( shadowMap, uv + vec2( -dx, dy ), shadowCoord.z ),
 					 texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, dy ), shadowCoord.z ),
 					 f.x ) +
-				mix( texture2DCompare( shadowMap, uv + vec2( 0.0, -dy ), shadowCoord.z ), 
+				mix( texture2DCompare( shadowMap, uv + vec2( 0.0, -dy ), shadowCoord.z ),
 					 texture2DCompare( shadowMap, uv + vec2( 0.0, 2.0 * dy ), shadowCoord.z ),
 					 f.y ) +
-				mix( texture2DCompare( shadowMap, uv + vec2( dx, -dy ), shadowCoord.z ), 
+				mix( texture2DCompare( shadowMap, uv + vec2( dx, -dy ), shadowCoord.z ),
 					 texture2DCompare( shadowMap, uv + vec2( dx, 2.0 * dy ), shadowCoord.z ),
 					 f.y ) +
-				mix( mix( texture2DCompare( shadowMap, uv + vec2( -dx, -dy ), shadowCoord.z ), 
+				mix( mix( texture2DCompare( shadowMap, uv + vec2( -dx, -dy ), shadowCoord.z ),
 						  texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, -dy ), shadowCoord.z ),
 						  f.x ),
-					 mix( texture2DCompare( shadowMap, uv + vec2( -dx, 2.0 * dy ), shadowCoord.z ), 
+					 mix( texture2DCompare( shadowMap, uv + vec2( -dx, 2.0 * dy ), shadowCoord.z ),
 						  texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, 2.0 * dy ), shadowCoord.z ),
 						  f.x ),
 					 f.y )
 			) * ( 1.0 / 9.0 );
 
-		#elif defined( SHADOWMAP_TYPE_VSM )
+		}
+
+		return shadow;
+
+	}
+
+	float getShadowVSM( sampler2D shadowMap, float shadowBias, vec4 shadowCoord ) {
+
+		float shadow = 1.0;
+
+		shadowCoord.xyz /= shadowCoord.w;
+		shadowCoord.z += shadowBias;
+
+		bool frustumTest = isShadowCoordInFrustum( shadowCoord );
+
+		if ( frustumTest ) {
 
 			shadow = VSMShadow( shadowMap, shadowCoord.xy, shadowCoord.z );
 
-		#else // no percentage-closer filtering:
+		}
 
+		return shadow;
+
+	}
+
+	float getShadow( sampler2D shadowMap, float shadowBias, vec4 shadowCoord ) {
+
+		float shadow = 1.0;
+
+		shadowCoord.xyz /= shadowCoord.w;
+		shadowCoord.z += shadowBias;
+
+		bool frustumTest = isShadowCoordInFrustum( shadowCoord );
+
+		if ( frustumTest ) {
+
+			// no percentage-closer filtering:
 			shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );
-
-		#endif
 
 		}
 

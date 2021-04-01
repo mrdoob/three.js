@@ -13,7 +13,16 @@ float getShadowMask() {
 	for ( int i = 0; i < NUM_DIR_LIGHT_SHADOWS; i ++ ) {
 
 		directionalLight = directionalLightShadows[ i ];
-		shadow *= receiveShadow ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+
+		#if defined( SHADOWMAP_TYPE_PCF )
+		shadow *= receiveShadow ? getShadowPCF( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+		#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
+		shadow *= receiveShadow ? getShadowPCFSoft( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, vDirectionalShadowCoord[ i ] ) : 1.0;
+		#elif defined( SHADOWMAP_TYPE_VSM )
+		shadow *= receiveShadow ? getShadowVSM( directionalShadowMap[ i ], directionalLight.shadowBias, vDirectionalShadowCoord[ i ] ) : 1.0;
+		#else
+		shadow *= receiveShadow ? getShadow( directionalShadowMap[ i ], directionalLight.shadowBias, vDirectionalShadowCoord[ i ] ) : 1.0;
+		#endif
 
 	}
 	#pragma unroll_loop_end
@@ -28,7 +37,16 @@ float getShadowMask() {
 	for ( int i = 0; i < NUM_SPOT_LIGHT_SHADOWS; i ++ ) {
 
 		spotLight = spotLightShadows[ i ];
-		shadow *= receiveShadow ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
+
+		#if defined( SHADOWMAP_TYPE_PCF )
+		shadow *= receiveShadow ? getShadowPCF( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
+		#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
+		shadow *= receiveShadow ? getShadowPCFSoft( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, vSpotShadowCoord[ i ] ) : 1.0;
+		#elif defined( SHADOWMAP_TYPE_VSM )
+		shadow *= receiveShadow ? getShadowVSM( spotShadowMap[ i ], spotLight.shadowBias, vSpotShadowCoord[ i ] ) : 1.0;
+		#else
+		shadow *= receiveShadow ? getShadow( spotShadowMap[ i ], spotLight.shadowBias, vSpotShadowCoord[ i ] ) : 1.0;
+		#endif
 
 	}
 	#pragma unroll_loop_end
