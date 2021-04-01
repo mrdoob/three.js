@@ -41,7 +41,7 @@ var SSRPass = function ( { renderer, scene, camera, width, height, selects, enco
 	this.output = 0;
 
 	this.maxDistance = SSRShader.uniforms.maxDistance.value;
-	this.surfDist = SSRShader.uniforms.surfDist.value;
+	this.thickness = SSRShader.uniforms.thickness.value;
 
 	this.encoding = encoding;
 
@@ -153,7 +153,6 @@ var SSRPass = function ( { renderer, scene, camera, width, height, selects, enco
 
 		}
 	} );
-	this.thickTolerance = SSRShader.uniforms.thickTolerance.value;
 
 	// beauty render target with depth buffer
 
@@ -234,7 +233,7 @@ var SSRPass = function ( { renderer, scene, camera, width, height, selects, enco
 	this.ssrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 	this.ssrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 	this.ssrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-	this.ssrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
+	this.ssrMaterial.uniforms[ 'thickness' ].value = this.thickness;
 	this.ssrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
 	this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 	this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
@@ -393,8 +392,7 @@ SSRPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.ssrMaterial.uniforms[ 'opacity' ].value = this.opacity;
 		this.ssrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
-		this.ssrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
-		this.ssrMaterial.uniforms[ 'thickTolerance' ].value = this.thickTolerance;
+		this.ssrMaterial.uniforms[ 'thickness' ].value = this.thickness;
 		this.renderPass( renderer, this.ssrMaterial, this.ssrRenderTarget );
 
 

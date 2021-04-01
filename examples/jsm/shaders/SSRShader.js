@@ -32,8 +32,7 @@ var SSRShader = {
     "opacity": { value: .5 },
     "maxDistance": { value: 180 },
     "cameraRange": { value: 0 },
-    "surfDist": { value: .007 },
-    "thickTolerance": { value: 0 },
+    "thickness": { value: .007 },
 
   },
 
@@ -65,10 +64,9 @@ var SSRShader = {
 		uniform float cameraNear;
 		uniform float cameraFar;
 		uniform float maxDistance;
-		uniform float surfDist;
+		uniform float thickness;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
-		uniform float thickTolerance;
 		#include <packing>
 		float pointToLineDistance(vec3 x0, vec3 x1, vec3 x2) {
 			//x0: point, x1: linePointA, x2: linePointB
@@ -180,21 +178,20 @@ var SSRShader = {
 					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 					float recipVPZ=1./viewPosition.z;
 					float viewReflectRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
-					float sD=surfDist*cW;
+					float tk=thickness*cW;
 				#else
 					float viewReflectRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
-					float sD=surfDist;
+					float tk=thickness;
 				#endif
-				if(viewReflectRayZ-sD>vZ) continue;
 
-				float op=opacity;
+				if(viewReflectRayZ>vZ) continue;
 
 				bool hit;
 				#ifdef INFINITE_THICK
-					hit=(viewReflectRayZ+thickTolerance*clipW)<=vZ;
+					hit=true;
 				#else
 					float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
-					hit=away<=sD;
+					hit=away<=tk;
 				#endif
 
 				if(hit){
@@ -202,6 +199,7 @@ var SSRShader = {
 					if(dot(viewReflectDir,vN)>=0.) continue;
 					float distance=pointPlaneDistance(vP,viewPosition,viewNormal);
 					if(distance>maxDistance) break;
+					float op=opacity;
 					#ifdef DISTANCE_ATTENUATION
 						float ratio=1.-(distance/maxDistance);
 						float attenuation=ratio*ratio;
