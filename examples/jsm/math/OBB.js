@@ -320,7 +320,7 @@ Object.assign( OBB.prototype, {
 
 		// create a 4x4 transformation matrix
 
-		matrix4FromRotationMatrix( matrix, this.rotation );
+		matrix.setFromMatrix3( this.rotation );
 		matrix.setPosition( this.center );
 
 		// transform ray to the local space of the OBB
@@ -417,33 +417,6 @@ Object.assign( OBB.prototype, {
 	}
 
 } );
-
-function matrix4FromRotationMatrix( matrix4, matrix3 ) {
-
-	var e = matrix4.elements;
-	var me = matrix3.elements;
-
-	e[ 0 ] = me[ 0 ];
-	e[ 1 ] = me[ 1 ];
-	e[ 2 ] = me[ 2 ];
-	e[ 3 ] = 0;
-
-	e[ 4 ] = me[ 3 ];
-	e[ 5 ] = me[ 4 ];
-	e[ 6 ] = me[ 5 ];
-	e[ 7 ] = 0;
-
-	e[ 8 ] = me[ 6 ];
-	e[ 9 ] = me[ 7 ];
-	e[ 10 ] = me[ 8 ];
-	e[ 11 ] = 0;
-
-	e[ 12 ] = 0;
-	e[ 13 ] = 0;
-	e[ 14 ] = 0;
-	e[ 15 ] = 1;
-
-}
 
 var obb = new OBB();
 
