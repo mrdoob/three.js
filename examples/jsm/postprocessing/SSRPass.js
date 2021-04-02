@@ -5,7 +5,6 @@ import {
 	DepthTexture,
 	SrcAlphaFactor,
 	OneMinusSrcAlphaFactor,
-	LinearFilter,
 	MeshNormalMaterial,
 	MeshBasicMaterial,
 	NearestFilter,
@@ -162,8 +161,8 @@ var SSRPass = function ( { renderer, scene, camera, width, height, selects, enco
 	depthTexture.magFilter = NearestFilter;
 
 	this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: LinearFilter,
-		magFilter: LinearFilter,
+		minFilter: NearestFilter,
+		magFilter: NearestFilter,
 		format: RGBAFormat,
 		depthTexture: depthTexture,
 		depthBuffer: true
@@ -171,8 +170,8 @@ var SSRPass = function ( { renderer, scene, camera, width, height, selects, enco
 
 	//for bouncing
 	this.prevRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: LinearFilter,
-		magFilter: LinearFilter,
+		minFilter: NearestFilter,
+		magFilter: NearestFilter,
 		format: RGBAFormat,
 	} );
 
@@ -198,8 +197,8 @@ var SSRPass = function ( { renderer, scene, camera, width, height, selects, enco
 	// ssr render target
 
 	this.ssrRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: LinearFilter,
-		magFilter: LinearFilter,
+		minFilter: NearestFilter,
+		magFilter: NearestFilter,
 		format: RGBAFormat
 	} );
 
