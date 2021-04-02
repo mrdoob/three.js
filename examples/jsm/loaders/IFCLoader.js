@@ -1,6 +1,6 @@
 //Example: https://github.com/tomvandig/web-ifc-three/tree/main/examples/jsm
 
-import { IfcAPI } from '.../libs/ifc/web-ifc-api.js';
+import { IfcAPI } from '../libs/ifc/web-ifc-api.js';
 import {
 	FileLoader,
 	Loader,
