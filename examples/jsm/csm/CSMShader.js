@@ -1,6 +1,6 @@
 import { ShaderChunk } from '../../../build/three.module.js';
 
-export default {
+const CSMShader = {
 	lights_fragment_begin: /* glsl */`
 GeometricContext geometry;
 
@@ -231,3 +231,5 @@ uniform float shadowFar;
 #endif
 	` + ShaderChunk.lights_pars_begin
 };
+
+export { CSMShader };
