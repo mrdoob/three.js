@@ -378,7 +378,7 @@ class OBB {
 
 		const e = matrix.elements;
 
-		const sx = v1.set( e[ 0 ], e[ 1 ], e[ 2 ] ).length();
+		let sx = v1.set( e[ 0 ], e[ 1 ], e[ 2 ] ).length();
 		const sy = v1.set( e[ 4 ], e[ 5 ], e[ 6 ] ).length();
 		const sz = v1.set( e[ 8 ], e[ 9 ], e[ 10 ] ).length();
 
