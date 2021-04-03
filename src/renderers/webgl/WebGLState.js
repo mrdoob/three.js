@@ -447,17 +447,21 @@ function WebGLState( gl, extensions, capabilities ) {
 
 			currentBoundFramebuffers[ target ] = framebuffer;
 
-			// gl.DRAW_FRAMEBUFFER is equivalent to gl.FRAMEBUFFER
+			if ( isWebGL2 ) {
 
-			if ( target === gl.DRAW_FRAMEBUFFER ) {
+				// gl.DRAW_FRAMEBUFFER is equivalent to gl.FRAMEBUFFER
 
-				currentBoundFramebuffers[ gl.FRAMEBUFFER ] = framebuffer;
+				if ( target === gl.DRAW_FRAMEBUFFER ) {
 
-			}
+					currentBoundFramebuffers[ gl.FRAMEBUFFER ] = framebuffer;
 
-			if ( target === gl.FRAMEBUFFER ) {
+				}
 
-				currentBoundFramebuffers[ gl.DRAW_FRAMEBUFFER ] = framebuffer;
+				if ( target === gl.FRAMEBUFFER ) {
+
+					currentBoundFramebuffers[ gl.DRAW_FRAMEBUFFER ] = framebuffer;
+
+				}
 
 			}
 
