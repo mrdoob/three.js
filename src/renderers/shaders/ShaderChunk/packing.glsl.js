@@ -42,6 +42,8 @@ float orthographicDepthToViewZ( const in float linearClipZ, const in float near,
 	return linearClipZ * ( near - far ) - near;
 }
 
+// NOTE: https://twitter.com/gonnavis/status/1377183786949959682
+
 float viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {
 	return (( near + viewZ ) * far ) / (( far - near ) * viewZ );
 }
