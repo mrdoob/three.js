@@ -2,7 +2,6 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	Object3D,
-	Quaternion,
 	SphereGeometry,
 } from '../../../build/three.module.js';
 
@@ -86,10 +85,9 @@ XRControllerModel.prototype = Object.assign( Object.create( Object3D.prototype )
 
 				} else if ( valueNodeProperty === MotionControllerConstants.VisualResponseProperty.TRANSFORM ) {
 
-					Quaternion.slerp(
+					valueNode.quaternion.slerpQuaternions(
 						minNode.quaternion,
 						maxNode.quaternion,
-						valueNode.quaternion,
 						value
 					);
 

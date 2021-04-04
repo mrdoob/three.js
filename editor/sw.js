@@ -1,4 +1,4 @@
-const cacheName = 'threejs-editor-r126';
+const cacheName = 'threejs-editor-r127';
 
 const assets = [
 	'./',
@@ -37,6 +37,9 @@ const assets = [
 	'../examples/jsm/loaders/FBXLoader.js',
 	'../examples/jsm/loaders/GLTFLoader.js',
 	'../examples/jsm/loaders/KMZLoader.js',
+	'../examples/jsm/loaders/IFCLoader.js',
+	'../examples/jsm/loaders/ifc/web-ifc-api.js',
+	'../examples/jsm/loaders/ifc/web-ifc.wasm',
 	'../examples/jsm/loaders/MD2Loader.js',
 	'../examples/jsm/loaders/OBJLoader.js',
 	'../examples/jsm/loaders/MTLLoader.js',
