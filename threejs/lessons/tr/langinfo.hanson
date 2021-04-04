@@ -24,8 +24,8 @@
   `,
   contribTemplate: '<a href="https://github.com/${owner}/${repo}/commits?author=${login}">${contributions} adet katkın</a><br>için teşekkürler <a href="${html_url}"><img src="${avatar_url}"> ${login}</a>',
   translations: {
-    badTranslation: 'Üzgünüz, bu alandaki çeviri güncel değil. <a href="{{link}}">Lütfen düzeltmeye yardım etmeyi düşünün</a>.',
-    updateNeeded: 'Bu makaledeki çeviri güncel değil.  <a href="{{link}}">Lütfen düzeltmeye yardım etmeyi düşünün</a>.',
+    badTranslation: 'Üzgünüz, bu alandaki çeviri güncel değil. <a href="{{link}}">Lütfen düzeltmemize yardım edin</a>.',
+    updateNeeded: 'Bu makaledeki çeviri güncel değil.  <a href="{{link}}">Lütfen düzeltmemize yardım edin</a>.',
   },
   toc: 'İçindekiler',
   categoryMapping: {
