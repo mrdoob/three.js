@@ -7,6 +7,7 @@ class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 		super( width, height, options );
 
 		this.samples = 4;
+		this.toScreen = false;
 
 	}
 
@@ -15,6 +16,7 @@ class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 		super.copy.call( this, source );
 
 		this.samples = source.samples;
+		this.toScreen = source.toScreen;
 
 		return this;
 

@@ -29,13 +29,18 @@
 
 		<h2>Properties</h2>
 
+		<p>[page:WebGLRenderTarget WebGLRenderTarget] properties are available on this class.</p>
+
 		<h3>[property:number samples]</h3>
 		<p>
 		Specifies the number of samples to be used for the renderbuffer storage. However, the maximum supported
-		size for multisampling is platform dependent and defined via *gl.MAX_SAMPLES*.
+		size for multisampling is platform dependent and defined via *gl.MAX_SAMPLES*. Default is *4*.
 		</p>
 
-		<p>[page:WebGLRenderTarget WebGLRenderTarget] properties are available on this class.</p>
+		<h3>[property:boolean toScreen]</h3>
+		<p>
+		Whether this render target should be resolved to the default framebuffer (screen) or not. Default is *false*.
+		</p>
 
 		<h2>Methods</h2>
 

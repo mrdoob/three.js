@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js WebGL 2 - Multisampled Renderbuffers</title>
+		<title>three.js WebGL 2 - Post-Processing - MSAA</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -27,8 +27,8 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Multisampled Renderbuffers<br />
-			Left: WebGLRenderTarget, Right: WebGLMultisampleRenderTarget.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Post-Processing - MSAA<br />
+			Left: No MSAA, Right: MSAA 4x
 		</div>
 		<div id="container">
 		</div>
@@ -40,7 +40,7 @@
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { SepiaShader } from './jsm/shaders/SepiaShader.js';
 			import { WEBGL } from './jsm/WebGL.js';
 
 			let camera, renderer, clock, group, container;
@@ -122,19 +122,19 @@
 				const renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
 
 				const renderPass = new RenderPass( scene, camera );
-				const copyPass = new ShaderPass( CopyShader );
+				const shaderPass = new ShaderPass( SepiaShader );
 
 				//
 
 				composer1 = new EffectComposer( renderer );
 				composer1.addPass( renderPass );
-				composer1.addPass( copyPass );
+				composer1.addPass( shaderPass );
 
 				//
 
 				composer2 = new EffectComposer( renderer, renderTarget );
 				composer2.addPass( renderPass );
-				composer2.addPass( copyPass );
+				composer2.addPass( shaderPass );
 
 				//
 
@@ -150,8 +150,10 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
-				composer1.setSize( container.offsetWidth, container.offsetHeight );
-				composer2.setSize( container.offsetWidth, container.offsetHeight );
+
+				const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+				composer1.setSize( size.width, size.height );
+				composer2.setSize( size.width, size.height );
 
 			}
 
