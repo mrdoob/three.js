@@ -19676,6 +19676,24 @@ function WebGLState( gl, extensions, capabilities ) {
 
 			currentBoundFramebuffers[ target ] = framebuffer;
 
+			if ( isWebGL2 ) {
+
+				// 36009 is equivalent to 36160
+
+				if ( target === 36009 ) {
+
+					currentBoundFramebuffers[ 36160 ] = framebuffer;
+
+				}
+
+				if ( target === 36160 ) {
+
+					currentBoundFramebuffers[ 36009 ] = framebuffer;
+
+				}
+
+			}
+
 		}
 
 	}
@@ -21470,11 +21488,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( isWebGL2 ) {
 
-				const renderTargetProperties = properties.get( renderTarget );
-
-				state.bindFramebuffer( 36008, renderTargetProperties.__webglMultisampledFramebuffer );
-				state.bindFramebuffer( 36009, renderTargetProperties.__webglFramebuffer );
-
 				const width = renderTarget.width;
 				const height = renderTarget.height;
 				let mask = 16384;
@@ -21482,9 +21495,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				if ( renderTarget.depthBuffer ) mask |= 256;
 				if ( renderTarget.stencilBuffer ) mask |= 1024;
 
+				const renderTargetProperties = properties.get( renderTarget );
+
+				state.bindFramebuffer( 36008, renderTargetProperties.__webglMultisampledFramebuffer );
+				state.bindFramebuffer( 36009, renderTargetProperties.__webglFramebuffer );
+
 				_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, 9728 );
 
-				state.bindFramebuffer( 36160, renderTargetProperties.__webglMultisampledFramebuffer ); // see #18905
+				state.bindFramebuffer( 36008, null );
+				state.bindFramebuffer( 36009, renderTargetProperties.__webglMultisampledFramebuffer );
 
 			} else {
 

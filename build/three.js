@@ -14512,6 +14512,17 @@
 			if (currentBoundFramebuffers[target] !== framebuffer) {
 				gl.bindFramebuffer(target, framebuffer);
 				currentBoundFramebuffers[target] = framebuffer;
+
+				if (isWebGL2) {
+					// gl.DRAW_FRAMEBUFFER is equivalent to gl.FRAMEBUFFER
+					if (target === gl.DRAW_FRAMEBUFFER) {
+						currentBoundFramebuffers[gl.FRAMEBUFFER] = framebuffer;
+					}
+
+					if (target === gl.FRAMEBUFFER) {
+						currentBoundFramebuffers[gl.DRAW_FRAMEBUFFER] = framebuffer;
+					}
+				}
 			}
 		}
 
@@ -15739,18 +15750,19 @@
 		function updateMultisampleRenderTarget(renderTarget) {
 			if (renderTarget.isWebGLMultisampleRenderTarget) {
 				if (isWebGL2) {
-					const renderTargetProperties = properties.get(renderTarget);
-					state.bindFramebuffer(_gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer);
-					state.bindFramebuffer(_gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer);
 					const width = renderTarget.width;
 					const height = renderTarget.height;
 					let mask = _gl.COLOR_BUFFER_BIT;
 					if (renderTarget.depthBuffer) mask |= _gl.DEPTH_BUFFER_BIT;
 					if (renderTarget.stencilBuffer) mask |= _gl.STENCIL_BUFFER_BIT;
+					const renderTargetProperties = properties.get(renderTarget);
+					state.bindFramebuffer(_gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer);
+					state.bindFramebuffer(_gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer);
 
 					_gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST);
 
-					state.bindFramebuffer(_gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer); // see #18905
+					state.bindFramebuffer(_gl.READ_FRAMEBUFFER, null);
+					state.bindFramebuffer(_gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer);
 				} else {
 					console.warn('THREE.WebGLRenderer: WebGLMultisampleRenderTarget can only be used with WebGL2.');
 				}
