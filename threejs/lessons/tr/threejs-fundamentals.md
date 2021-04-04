@@ -4,24 +4,19 @@ TOC: Temel Bilgiler
 
 Bu three.js ile alakalı makale serisindeki ilk makaledir. [Three.js](https://threejs.org) bir web sayfasına 3D içerik sağlamayı mümkün olduğunca kolaylaştırmaya çalışan bir 3D kütüphanedir.
 
-Three.js sıklıkla WebGL ile karıştırılır fakat her zaman değil, three.js 3D çizim için WebGL kullanır.
+Three.js her zaman olmasa da öncesine göre daha sıklıkla WebGl ile karıştırılır, three.js 3D çizim için WebGL kullanır.
 [WebGL yalnızca noktalar, çizgiler ve üçgenler çizen çok düşük seviyeli bir sistemdir](https://webglfundamentals.org).
 WebGL ile herhangi yararlı bir şey yapmak birazcık kod gerektirir ve three.js burada devreye girer.
 Sahneler, ışıklar, gölgeler, malzemeler, dokular, 3d matematik gibi şeyleri halleder, eğer direkt olarak WebGL kullansaydınız bunların hepsini kendiniz yazmak zorunda kalırdınız.
 
-These tutorials assume you already know JavaScript and, for the
-most part they will use ES6 style. [See here for a
-terse list of things you're expected to already know](threejs-prerequisites.html).
-Most browsers that support three.js are auto-updated so most users should
-be able to run this code. If you'd like to make this code run
-on really old browsers look into a transpiler like [Babel](https://babeljs.io).
-Of course users running really old browsers probably have machines
-that can't run three.js.
+Bu dersler halihazırda Javascript bildiğinizi varsayar ve çoğu bölümünde ES6 stilini kullanacaklar. [Halihazırda bilmenizin beklendiği şeylerin kısa listesine buradan bakabilirsiniz](threejs-prerequisites.html).
+Three.js'i destekleyen çoğu tarayıcı otomatik olarak desteklendiğinden çoğu kullanıcı bu kodu çalıştırabilir. Eğer bu kodu gerçekten eski tarayıcılarda çalıştırmak istiyorsanız [Babel](https://babeljs.io) gibi bir aktarıcıya bakın.
+Elbette gerçekten eski tarayıcılarda çalışan kullanıcıların makineleri muhtemelen three.js'i çalıştırmayacaktır.
 
-When learning most programming languages the first thing people
-do is make the computer print `"Hello World!"`. For 3D one
-of the most common first things to do is to make a 3D cube.
-So let's start with "Hello Cube!"
+Çoğu programlama dilini öğrenirken insanların ilk yaptığı şey
+bilgisayara `"Hello World!"` yazısını yazdırmaktır.
+3D için ise en yaygın olarak yapılan ilk şeylerden biri 3D bir küp yapmaktır.
+Öyleyse gelin "Hello Cube!" ile başlayalım!
 
 Before we get started let's try to give you an idea of the structure
 of a three.js app. A three.js app requires you to create a bunch of
