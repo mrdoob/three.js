@@ -13,7 +13,8 @@ import {
 	WebGLRenderTarget,
 	DepthTexture,
 	UnsignedShortType,
-	NearestFilter
+	NearestFilter,
+	Plane
 } from '../../../build/three.module.js';
 
 var ReflectorForSSRPass = function ( geometry, options ) {
@@ -29,6 +30,7 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 	var color = ( options.color !== undefined ) ? new Color( options.color ) : new Color( 0x7F7F7F );
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
+	var clipBias = options.clipBias || 0;
 	var shader = options.shader || ReflectorForSSRPass.ReflectorShader;
 	var useDepthTexture = options.useDepthTexture === true;
 	var yAxis = new Vector3( 0, 1, 0 );
@@ -135,6 +137,9 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 
 	this.material = material;
 
+	const globalPlane = new Plane( new Vector3( 0, 1, 0 ), clipBias );
+	const globalPlanes = [ globalPlane ];
+
 	this.doRender = function ( renderer, scene, camera ) {
 
 		material.uniforms[ 'maxDistance' ].value = scope.maxDistance;
@@ -201,33 +206,6 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 		textureMatrix.multiply( virtualCamera.matrixWorldInverse );
 		textureMatrix.multiply( scope.matrixWorld );
 
-		/* Note: For the sake of accurate tDepth, temporarily turned off this Oblique Near-Plane Clipping feature. https://github.com/mrdoob/three.js/pull/21403
-
-			// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
-			// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
-			reflectorPlane.setFromNormalAndCoplanarPoint( normal, reflectorWorldPosition );
-			reflectorPlane.applyMatrix4( virtualCamera.matrixWorldInverse );
-
-			clipPlane.set( reflectorPlane.normal.x, reflectorPlane.normal.y, reflectorPlane.normal.z, reflectorPlane.constant );
-
-			var projectionMatrix = virtualCamera.projectionMatrix;
-
-			q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
-			q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
-			q.z = - 1.0;
-			q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
-
-			// Calculate the scaled plane vector
-			clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
-
-			// Replacing the third row of the projection matrix
-			projectionMatrix.elements[ 2 ] = clipPlane.x;
-			projectionMatrix.elements[ 6 ] = clipPlane.y;
-			projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
-			projectionMatrix.elements[ 14 ] = clipPlane.w;
-
-		*/
-
 		// Render
 
 		renderTarget.texture.encoding = renderer.outputEncoding;
@@ -238,9 +216,11 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 
 		var currentXrEnabled = renderer.xr.enabled;
 		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+		var currentClippingPlanes = renderer.clippingPlanes;
 
 		renderer.xr.enabled = false; // Avoid camera modification
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
+		renderer.clippingPlanes = globalPlanes;
 
 		renderer.setRenderTarget( renderTarget );
 
@@ -251,6 +231,7 @@ var ReflectorForSSRPass = function ( geometry, options ) {
 
 		renderer.xr.enabled = currentXrEnabled;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+		renderer.clippingPlanes = currentClippingPlanes;
 
 		renderer.setRenderTarget( currentRenderTarget );
 
