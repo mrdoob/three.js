@@ -19,11 +19,11 @@ class DirectionalLight extends Light {
 
 	}
 
-    dispose() {
+	dispose() {
 
-        this.shadow.dispose();
+		this.shadow.dispose();
 
-    }
+	}
 
 	copy( source ) {
 

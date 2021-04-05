@@ -32,11 +32,11 @@ class PointLight extends Light {
 
 	}
 
-    dispose() {
+	dispose() {
 
-        this.shadow.dispose();
+		this.shadow.dispose();
 
-    }
+	}
 
 	copy( source ) {
 

@@ -177,12 +177,12 @@ class CameraHelper extends LineSegments {
 
 	}
 
-    dispose() {
+	dispose() {
 
-        this.geometry.dispose();
-        this.material.dispose();
+		this.geometry.dispose();
+		this.material.dispose();
 
-    }
+	}
 
 }
 

@@ -91,21 +91,21 @@ class LightShadow {
 
 	}
 
-    dispose() {
+	dispose() {
 
-        if (this.map) {
+		if ( this.map ) {
 
-            this.map.dispose();
+			this.map.dispose();
 
-        }
+		}
 
-        if (this.mapPass) {
+		if ( this.mapPass ) {
 
-            this.mapPass.dispose();
+			this.mapPass.dispose();
 
-        }
+		}
 
-    }
+	}
 
 	copy( source ) {
 

@@ -14,11 +14,11 @@ class Light extends Object3D {
 
 	}
 
-    dispose() {
+	dispose() {
 
-        // Empty here in base class; some subclasses override.
+		// Empty here in base class; some subclasses override.
 
-    }
+	}
 
 	copy( source ) {
 
