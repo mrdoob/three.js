@@ -2,6 +2,12 @@ Title: Three.js Пользовательская Geometry
 Description: Как сделать свою собственную геометрию.
 TOC: Пользовательская Geometry
 
+<div class="warning">
+<strong>NOTE!</strong> This article is deprecated. Three.js r125
+removed support for <code>Geometry</code>. Please refer to
+the article on <a href="threejs-custom-buffergeometry.html">custom BufferGeometry</a>.
+</div>
+
 В [предыдущей статье](threejs-primitives.html) рассказывалось о различных встроенных примитивах, включенных в THREE.js. В этой статье мы рассмотрим создание нашей собственной геометрии. 
 
 Просто для ясности, если вы серьезно относитесь к созданию 3D-контента, наиболее распространенный способ - использовать пакет 3D-моделирования, такой как [Blender](https://blender.org),

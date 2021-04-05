@@ -2,6 +2,13 @@ Title: Three.jsのカスタムジオメトリ
 Description: カスタムジオメトリを作る
 TOC: カスタムジオメトリ
 
+<div class="warning">
+<strong>NOTE!</strong> This article is deprecated. Three.js r125
+removed support for <code>Geometry</code>. Please refer to
+the article on <a href="threejs-custom-buffergeometry.html">custom BufferGeometry</a>.
+</div>
+
+
 前回の[記事](threejs-primitives.html)ではTHREE.jsにある基本ジオメトリであるプリミティブジオメトリを紹介しました。この記事ではカスタムジオメトリを紹介します。
 
 まず最初に断っておきますが、本格的な３Dコンテンツを作りたい場合は

@@ -2,9 +2,11 @@ Title: Three.js Custom Geometry
 Description: How to make your own geometry.
 TOC: Custom Geometry
 
-> **NOTE!** This article is deprecated. Three.js r125
-> removed support for `Geometry`. Please refer to
-> the article on [custom BufferGeometry](threejs-custom-buffergeometry.html).
+<div class="warning">
+<strong>NOTE!</strong> This article is deprecated. Three.js r125
+removed support for <code>Geometry</code>. Please refer to
+the article on <a href="threejs-custom-buffergeometry.html">custom BufferGeometry</a>.
+</div>
 
 A [previous article](threejs-primitives.html) gave a tour of
 the various built in primitives included in THREE.js. In this

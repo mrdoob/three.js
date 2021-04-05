@@ -2,6 +2,13 @@ Title: Three.js 사용자 지정 Geometry
 Description: 사용자 지정 geometry를 만드는 법에 대해 알아봅니다
 TOC: 사용자 지정 Geometry
 
+<div class="warning">
+<strong>NOTE!</strong> This article is deprecated. Three.js r125
+removed support for <code>Geometry</code>. Please refer to
+the article on <a href="threejs-custom-buffergeometry.html">custom BufferGeometry</a>.
+</div>
+
+
 [이전 글](threejs-primitives.html)에서는 Three.js의 내장 원시 모델에
 대해 살펴보았죠. 이 글에서는 이런 모델, geometry를 직접 만들어 볼 것입니다.
 
