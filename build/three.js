@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 }(this, (function (exports) { 'use strict';
 
-	const REVISION = '127';
+	const REVISION = '128dev';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -19192,15 +19192,15 @@
 		}
 	});
 
-	function Bone() {
-		Object3D.call(this);
-		this.type = 'Bone';
+	class Bone extends Object3D {
+		constructor() {
+			super();
+			this.type = 'Bone';
+		}
+
 	}
 
-	Bone.prototype = Object.assign(Object.create(Object3D.prototype), {
-		constructor: Bone,
-		isBone: true
-	});
+	Bone.prototype.isBone = true;
 
 	const _offsetMatrix = /*@__PURE__*/new Matrix4();
 
@@ -26721,6 +26721,9 @@
 			this.intensity = intensity;
 		}
 
+		dispose() {// Empty here in base class; some subclasses override.
+		}
+
 		copy(source) {
 			super.copy(source);
 			this.color.copy(source.color);
@@ -26826,6 +26829,16 @@
 			return this._frameExtents;
 		}
 
+		dispose() {
+			if (this.map) {
+				this.map.dispose();
+			}
+
+			if (this.mapPass) {
+				this.mapPass.dispose();
+			}
+		}
+
 		copy(source) {
 			this.camera = source.camera.clone();
 			this.bias = source.bias;
@@ -26908,6 +26921,10 @@
 			// intensity = power per solid angle.
 			// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 			this.intensity = power / Math.PI;
+		}
+
+		dispose() {
+			this.shadow.dispose();
 		}
 
 		copy(source) {
@@ -27011,6 +27028,10 @@
 			// intensity = power per solid angle.
 			// ref: equation (15) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 			this.intensity = power / (4 * Math.PI);
+		}
+
+		dispose() {
+			this.shadow.dispose();
 		}
 
 		copy(source) {
@@ -27141,6 +27162,10 @@
 			this.updateMatrix();
 			this.target = new Object3D();
 			this.shadow = new DirectionalLightShadow();
+		}
+
+		dispose() {
+			this.shadow.dispose();
 		}
 
 		copy(source) {
@@ -32674,6 +32699,11 @@
 			geometry.getAttribute('position').needsUpdate = true;
 		}
 
+		dispose() {
+			this.geometry.dispose();
+			this.material.dispose();
+		}
+
 	}
 
 	function setPoint(point, pointMap, geometry, camera, x, y, z) {
@@ -32934,6 +32964,11 @@
 			});
 			super(geometry, material);
 			this.type = 'AxesHelper';
+		}
+
+		dispose() {
+			this.geometry.dispose();
+			this.material.dispose();
 		}
 
 	}

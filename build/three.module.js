@@ -3,7 +3,7 @@
  * Copyright 2010-2021 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '127';
+const REVISION = '128dev';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -26440,21 +26440,19 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 } );
 
-function Bone() {
+class Bone extends Object3D {
 
-	Object3D.call( this );
+	constructor() {
 
-	this.type = 'Bone';
+		super();
+
+		this.type = 'Bone';
+
+	}
 
 }
 
-Bone.prototype = Object.assign( Object.create( Object3D.prototype ), {
-
-	constructor: Bone,
-
-	isBone: true
-
-} );
+Bone.prototype.isBone = true;
 
 const _offsetMatrix = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
@@ -37290,6 +37288,12 @@ class Light extends Object3D {
 
 	}
 
+	dispose() {
+
+		// Empty here in base class; some subclasses override.
+
+	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -37441,6 +37445,22 @@ class LightShadow {
 
 	}
 
+	dispose() {
+
+		if ( this.map ) {
+
+			this.map.dispose();
+
+		}
+
+		if ( this.mapPass ) {
+
+			this.mapPass.dispose();
+
+		}
+
+	}
+
 	copy( source ) {
 
 		this.camera = source.camera.clone();
@@ -37558,6 +37578,12 @@ class SpotLight extends Light {
 		// intensity = power per solid angle.
 		// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 		this.intensity = power / Math.PI;
+
+	}
+
+	dispose() {
+
+		this.shadow.dispose();
 
 	}
 
@@ -37698,6 +37724,12 @@ class PointLight extends Light {
 		// intensity = power per solid angle.
 		// ref: equation (15) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 		this.intensity = power / ( 4 * Math.PI );
+
+	}
+
+	dispose() {
+
+		this.shadow.dispose();
 
 	}
 
@@ -37877,6 +37909,12 @@ class DirectionalLight extends Light {
 		this.target = new Object3D();
 
 		this.shadow = new DirectionalLightShadow();
+
+	}
+
+	dispose() {
+
+		this.shadow.dispose();
 
 	}
 
@@ -45861,6 +45899,13 @@ class CameraHelper extends LineSegments {
 
 	}
 
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+	}
+
 }
 
 
@@ -46191,6 +46236,13 @@ class AxesHelper extends LineSegments {
 		super( geometry, material );
 
 		this.type = 'AxesHelper';
+
+	}
+
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
 
 	}
 
