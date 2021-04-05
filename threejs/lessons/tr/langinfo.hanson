@@ -17,10 +17,10 @@
     </div>
   `,
   missing: `
-     Üzgünüz, bu makale henüz çevrilmedi.
-     [Çeviriler Serbest](https://github.com/gfxfundamentals/threejsfundamentals)! 😄
+Üzgünüz, bu makale henüz çevrilmedi.
+[Çeviriler Serbest](https://github.com/gfxfundamentals/threejsfundamentals)! 😄
 
-     [Şimdilik orijinal İngilizce makale burada]({{{origLink}}}).
+[Şimdilik orijinal İngilizce makale burada]({{{origLink}}}).
   `,
   contribTemplate: '<a href="https://github.com/${owner}/${repo}/commits?author=${login}">${contributions} adet katkın</a><br>için teşekkürler <a href="${html_url}"><img src="${avatar_url}"> ${login}</a>',
   translations: {
