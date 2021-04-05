@@ -91,6 +91,22 @@ class LightShadow {
 
 	}
 
+	dispose() {
+
+		if ( this.map ) {
+
+			this.map.dispose();
+
+		}
+
+		if ( this.mapPass ) {
+
+			this.mapPass.dispose();
+
+		}
+
+	}
+
 	copy( source ) {
 
 		this.camera = source.camera.clone();
