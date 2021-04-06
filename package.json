@@ -36,9 +36,7 @@
       "potpack": true,
       "fflate": true,
       "ZSTDDecoder": true,
-      "read": true,
-      "bodymovin": true,
-      "XRWebGLBinding": true
+      "bodymovin": true
     },
     "rules": {
       "quotes": [
@@ -102,6 +100,7 @@
     "eslint": "^7.23.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-html": "^6.1.2",
+    "glob": "^7.1.6",
     "rollup": "^2.44.0",
     "rollup-plugin-filesize": "^9.1.1",
     "rollup-plugin-terser": "^7.0.2",
