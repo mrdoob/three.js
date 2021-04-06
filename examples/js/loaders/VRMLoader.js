@@ -1,79 +1,74 @@
-// VRM Specification: https://dwango.github.io/vrm/vrm_spec/
-//
-// VRM is based on glTF 2.0 and VRM extension is defined
-// in top-level json.extensions.VRM
+( function () {
 
-THREE.VRMLoader = ( function () {
+	//
+	// VRM is based on glTF 2.0 and VRM extension is defined
+	// in top-level json.extensions.VRM
 
-	function VRMLoader( manager ) {
+	var VRMLoader = function () {
 
-		if ( THREE.GLTFLoader === undefined ) {
+		function VRMLoader( manager ) {
 
-			throw new Error( 'THREE.VRMLoader: Import THREE.GLTFLoader.' );
+			if ( THREE.GLTFLoader === undefined ) {
+
+				throw new Error( 'THREE.VRMLoader: Import THREE.GLTFLoader.' );
+
+			}
+
+			THREE.Loader.call( this, manager );
+			this.gltfLoader = new THREE.GLTFLoader( this.manager );
 
 		}
 
-		THREE.Loader.call( this, manager );
+		VRMLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+			constructor: VRMLoader,
+			load: function ( url, onLoad, onProgress, onError ) {
 
-		this.gltfLoader = new THREE.GLTFLoader( this.manager );
+				var scope = this;
+				this.gltfLoader.load( url, function ( gltf ) {
 
-	}
+					try {
 
-	VRMLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+						scope.parse( gltf, onLoad );
 
-		constructor: VRMLoader,
+					} catch ( e ) {
 
-		load: function ( url, onLoad, onProgress, onError ) {
+						if ( onError ) {
 
-			var scope = this;
+							onError( e );
 
-			this.gltfLoader.load( url, function ( gltf ) {
+						} else {
 
-				try {
+							console.error( e );
 
-					scope.parse( gltf, onLoad );
+						}
 
-				} catch ( e ) {
-
-					if ( onError ) {
-
-						onError( e );
-
-					} else {
-
-						console.error( e );
+						scope.manager.itemError( url );
 
 					}
 
-					scope.manager.itemError( url );
+				}, onProgress, onError );
 
-				}
+			},
+			setDRACOLoader: function ( dracoLoader ) {
 
-			}, onProgress, onError );
+				this.gltfLoader.setDRACOLoader( dracoLoader );
+				return this;
 
-		},
+			},
+			parse: function ( gltf, onLoad ) {
 
-		setDRACOLoader: function ( dracoLoader ) {
+				// var gltfParser = gltf.parser;
+				// var gltfExtensions = gltf.userData.gltfExtensions || {};
+				// var vrmExtension = gltfExtensions.VRM || {};
+				// handle VRM Extension here
+				onLoad( gltf );
 
-			this.gltfLoader.setDRACOLoader( dracoLoader );
-			return this;
+			}
+		} );
+		return VRMLoader;
 
-		},
+	}();
 
-		parse: function ( gltf, onLoad ) {
-
-			// var gltfParser = gltf.parser;
-			// var gltfExtensions = gltf.userData.gltfExtensions || {};
-			// var vrmExtension = gltfExtensions.VRM || {};
-
-			// handle VRM Extension here
-
-			onLoad( gltf );
-
-		}
-
-	} );
-
-	return VRMLoader;
+	THREE.VRMLoader = VRMLoader;
 
 } )();

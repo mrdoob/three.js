@@ -1,9 +1,14 @@
-THREE.ReflectorRTT = function ( geometry, options ) {
+( function () {
 
-	THREE.Reflector.call( this, geometry, options );
+	var ReflectorRTT = function ( geometry, options ) {
 
-	this.geometry.setDrawRange( 0, 0 ); // avoid rendering geometry
+		THREE.Reflector.call( this, geometry, options );
+		this.geometry.setDrawRange( 0, 0 ); // avoid rendering geometry
 
-};
+	};
 
-THREE.ReflectorRTT.prototype = Object.create( THREE.Reflector.prototype );
+	ReflectorRTT.prototype = Object.create( THREE.Reflector.prototype );
+
+	THREE.ReflectorRTT = ReflectorRTT;
+
+} )();
