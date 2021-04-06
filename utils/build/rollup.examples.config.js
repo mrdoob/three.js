@@ -123,6 +123,8 @@ function unmodularize() {
 			// remove newline at the start of file
 			code = code.trimStart();
 
+			code = `( function () {\n${code}\n} )();`;
+
 			return {
 				code: code,
 				map: null
