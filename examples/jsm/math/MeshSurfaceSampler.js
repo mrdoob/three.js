@@ -21,7 +21,7 @@ class MeshSurfaceSampler {
 
 	constructor( mesh ) {
 
-		const geometry = mesh.geometry;
+		let geometry = mesh.geometry;
 
 		if ( ! geometry.isBufferGeometry || geometry.attributes.position.itemSize !== 3 ) {
 
