@@ -32,6 +32,14 @@
     "plugins": [
       "html"
     ],
+    "globals": {
+      "potpack": true,
+      "fflate": true,
+      "ZSTDDecoder": true,
+      "read": true,
+      "bodymovin": true,
+      "XRWebGLBinding": true
+    },
     "rules": {
       "quotes": [
         "error",
@@ -50,6 +58,7 @@
     "start": "npm run dev",
     "test": "npm run test-lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
+    "build-examples": "rollup -c utils/build/rollup.examples.config.js && echo '\nFormatting...' && eslint examples/js --ext js --ignore-pattern libs --ignore-pattern ifc --fix",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
     "lint-fix": "eslint src --ext js --fix && eslint examples/js examples/jsm --ext js --ignore-pattern libs --ignore-pattern ifc --fix",
     "lint-docs": "eslint docs --ext html",
