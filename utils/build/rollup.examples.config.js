@@ -103,9 +103,9 @@ function unmodularize() {
 			// fix for BasisTextureLoader.js
 			imports.forEach( imp => {
 
-				code = code.replace( new RegExp( `\n(\\s)THREE\.${imp}:`, 'g' ), ( match, p1 ) => {
+				code = code.replace( new RegExp( `${EOL}(\\s)THREE\\.${imp}:`, 'g' ), ( match, p1 ) => {
 
-					return `\n${p1}${imp}:`;
+					return `${EOL}${p1}${imp}:`;
 
 				} );
 
