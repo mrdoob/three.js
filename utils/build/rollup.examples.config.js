@@ -1,7 +1,10 @@
 import babel from '@rollup/plugin-babel';
 import path from 'path';
+import os from 'os';
 import glob from 'glob';
 import babelrc from './.babelrc.json';
+
+const EOL = os.EOL;
 
 function babelCleanup() {
 
@@ -21,7 +24,7 @@ function babelCleanup() {
 			//    {
 			//             ↓
 			// 	  setSize: function () {
-			code = code.replace( /\(\)\n\s*\/\*([a-zA-Z0-9_, ]+)\*\/\n\s*{/g, '( ) {' );
+			code = code.replace( new RegExp( `\\(\\)${EOL}\\s*\\/\\*([a-zA-Z0-9_, ]+)\\*\\/${EOL}\\s*{`, 'g' ), '( ) {' );
 
 
 			return {
@@ -52,14 +55,14 @@ function unmodularize() {
 			code = code.replace( /export { ([a-zA-Z0-9_, ]+) };/g, ( match, p1 ) => {
 
 				const exps = p1.split( ', ' );
-				return exps.map( exp => `THREE.${exp} = ${exp};` ).join( '\n' );
+				return exps.map( exp => `THREE.${exp} = ${exp};` ).join( EOL );
 
 			} );
 
 			// import { Example } from '...';
 			// but excluding imports importing from the libs/ folder
 			const imports = [];
-			code = code.replace( /import { ([a-zA-Z0-9_, ]+) } from '((?!libs).)*';\n/g, ( match, p1 ) => {
+			code = code.replace( /import { ([a-zA-Z0-9_, ]+) } from '((?!libs).)*';/g, ( match, p1 ) => {
 
 				const imps = p1.split( ', ' );
 				imps.reverse();
@@ -100,30 +103,30 @@ function unmodularize() {
 			// fix for BasisTextureLoader.js
 			imports.forEach( imp => {
 
-				code = code.replace( new RegExp( `\n(\\s)THREE\.${imp}:`, 'g' ), ( match, p1 ) => {
+				code = code.replace( new RegExp( `${EOL}(\\s)THREE\\.${imp}:`, 'g' ), ( match, p1 ) => {
 
-					return `\n${p1}${imp}:`;
+					return `${EOL}${p1}${imp}:`;
 
 				} );
 
 			} );
 
 			// import * as THREE from '...';
-			code = code.replace( /import \* as THREE from '(.*)';\n/g, '' );
+			code = code.replace( /import \* as THREE from '(.*)';/g, '' );
 
 			// Remove library imports that are exposed as
 			// global variables in the non-module world
-			code = code.replace( 'import * as fflate from \'../libs/fflate.module.min.js\';\n', '' );
-			code = code.replace( 'import { MMDParser } from \'../libs/mmdparser.module.js\';\n', '' );
-			code = code.replace( 'import { potpack } from \'../libs/potpack.module.js\';\n', '' );
-			code = code.replace( 'import { opentype } from \'../libs/opentype.module.min.js\';\n', '' );
-			code = code.replace( 'import { chevrotain } from \'../libs/chevrotain.module.min.js\';\n', '' );
-			code = code.replace( 'import { ZSTDDecoder } from \'../libs/zstddec.module.js\';\n', '' );
+			code = code.replace( 'import * as fflate from \'../libs/fflate.module.min.js\';', '' );
+			code = code.replace( 'import { MMDParser } from \'../libs/mmdparser.module.js\';', '' );
+			code = code.replace( 'import { potpack } from \'../libs/potpack.module.js\';', '' );
+			code = code.replace( 'import { opentype } from \'../libs/opentype.module.min.js\';', '' );
+			code = code.replace( 'import { chevrotain } from \'../libs/chevrotain.module.min.js\';', '' );
+			code = code.replace( 'import { ZSTDDecoder } from \'../libs/zstddec.module.js\';', '' );
 
 			// remove newline at the start of file
 			code = code.trimStart();
 
-			code = `( function () {\n${code}\n} )();`;
+			code = `( function () {${EOL}${code}${EOL}} )();`;
 
 			return {
 				code: code,
