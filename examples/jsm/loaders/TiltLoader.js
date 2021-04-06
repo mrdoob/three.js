@@ -12,7 +12,7 @@ import {
 	Quaternion,
 	Vector3
 } from '../../../build/three.module.js';
-import { unzipSync, strFromU8 } from '../libs/fflate.module.min.js';
+import * as fflate from '../libs/fflate.module.min.js';
 
 class TiltLoader extends Loader {
 
@@ -56,7 +56,7 @@ class TiltLoader extends Loader {
 		const group = new Group();
 		// https://docs.google.com/document/d/11ZsHozYn9FnWG7y3s3WAyKIACfbfwb4PbaS8cZ_xjvo/edit#
 
-		const zip = unzipSync( new Uint8Array( buffer.slice( 16 ) ) );
+		const zip = fflate.unzipSync( new Uint8Array( buffer.slice( 16 ) ) );
 
 		/*
 		const thumbnail = zip[ 'thumbnail.png' ].buffer;
@@ -65,7 +65,7 @@ class TiltLoader extends Loader {
 		document.body.appendChild( img );
 		*/
 
-		const metadata = JSON.parse( strFromU8( zip[ 'metadata.json' ] ) );
+		const metadata = JSON.parse( fflate.strFromU8( zip[ 'metadata.json' ] ) );
 
 		/*
 		const blob = new Blob( [ zip[ 'data.sketch' ].buffer ], { type: 'application/octet-stream' } );
