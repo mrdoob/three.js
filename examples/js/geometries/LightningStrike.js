@@ -108,7 +108,6 @@
 			super();
 			this.type = 'LightningStrike'; // Set parameters, and set undefined parameters to default values
 
-			rayParameters = rayParameters;
 			this.init( LightningStrike.copyParameters( rayParameters, rayParameters ) ); // Creates and populates the mesh
 
 			this.createMesh();
@@ -151,9 +150,6 @@
 		}
 
 		static copyParameters( dest = {}, source = {} ) {
-
-			source = source;
-			dest = dest;
 
 			const vecCopy = function ( v ) {
 
