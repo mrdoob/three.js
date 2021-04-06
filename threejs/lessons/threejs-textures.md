@@ -97,9 +97,9 @@ It works!
 {{{example url="../threejs-textured-cube-6-textures.html" }}}
 
 It should be noted though that not all geometry types supports multiple
-materials. `BoxGeometry` and `BoxGeometry` can use 6 materials one for each face.
-`ConeGeometry` and `ConeGeometry` can use 2 materials, one for the bottom and one for the cone.
-`CylinderGeometry` and `CylinderGeometry` can use 3 materials, bottom, top, and side.
+materials. `BoxGeometry` can use 6 materials one for each face.
+`ConeGeometry` can use 2 materials, one for the bottom and one for the cone.
+`CylinderGeometry` can use 3 materials, bottom, top, and side.
 For other cases you will need to build or load custom geometry and/or modify texture coordinates.
 
 It's far more common in other 3D engines and far more performant to use a
@@ -340,7 +340,7 @@ Now, when the cube is drawn so small that it's only 1 or 2 pixels large the GPU 
 to use just the smallest or next to smallest mip level to decide what color to make the
 tiny cube.
 
-In three you can choose what happens both when the texture is drawn
+In three.js you can choose what happens both when the texture is drawn
 larger than its original size and what happens when it's drawn smaller than its
 original size.
 
