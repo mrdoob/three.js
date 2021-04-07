@@ -14,22 +14,26 @@
  * Three.js integration by zz85 http://twitter.com/blurspline
 */
 
-	var Sky = function () {
+	class Sky extends THREE.Mesh {
 
-		var shader = Sky.SkyShader;
-		var material = new THREE.ShaderMaterial( {
-			name: 'SkyShader',
-			fragmentShader: shader.fragmentShader,
-			vertexShader: shader.vertexShader,
-			uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
-			side: THREE.BackSide,
-			depthWrite: false
-		} );
-		THREE.Mesh.call( this, new THREE.BoxGeometry( 1, 1, 1 ), material );
+		constructor() {
 
-	};
+			const shader = Sky.SkyShader;
+			const material = new THREE.ShaderMaterial( {
+				name: 'SkyShader',
+				fragmentShader: shader.fragmentShader,
+				vertexShader: shader.vertexShader,
+				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+				side: THREE.BackSide,
+				depthWrite: false
+			} );
+			super( new THREE.BoxGeometry( 1, 1, 1 ), material );
 
-	Sky.prototype = Object.create( THREE.Mesh.prototype );
+		}
+
+	}
+
+	Sky.prototype.isSky = true;
 	Sky.SkyShader = {
 		uniforms: {
 			'turbidity': {
