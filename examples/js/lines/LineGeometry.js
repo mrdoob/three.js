@@ -1,16 +1,15 @@
 ( function () {
 
-	var LineGeometry = function () {
+	class LineGeometry extends THREE.LineSegmentsGeometry {
 
-		THREE.LineSegmentsGeometry.call( this );
-		this.type = 'LineGeometry';
+		constructor() {
 
-	};
+			super();
+			this.type = 'LineGeometry';
 
-	LineGeometry.prototype = Object.assign( Object.create( THREE.LineSegmentsGeometry.prototype ), {
-		constructor: LineGeometry,
-		isLineGeometry: true,
-		setPositions: function ( array ) {
+		}
+
+		setPositions( array ) {
 
 			// converts [ x1, y1, z1,	x2, y2, z2, ... ] to pairs format
 			var length = array.length - 3;
@@ -27,11 +26,12 @@
 
 			}
 
-			THREE.LineSegmentsGeometry.prototype.setPositions.call( this, points );
+			super.setPositions( points );
 			return this;
 
-		},
-		setColors: function ( array ) {
+		}
+
+		setColors( array ) {
 
 			// converts [ r1, g1, b1,	r2, g2, b2, ... ] to pairs format
 			var length = array.length - 3;
@@ -48,11 +48,12 @@
 
 			}
 
-			THREE.LineSegmentsGeometry.prototype.setColors.call( this, colors );
+			super.setColors( colors );
 			return this;
 
-		},
-		fromLine: function ( line ) {
+		}
+
+		fromLine( line ) {
 
 			var geometry = line.geometry;
 
@@ -70,14 +71,18 @@
 
 			return this;
 
-		},
-		copy: function ( ) {
+		}
+
+		copy( ) {
 
 			// todo
 			return this;
 
 		}
-	} );
+
+	}
+
+	LineGeometry.prototype.isLineGeometry = true;
 
 	THREE.LineGeometry = LineGeometry;
 
