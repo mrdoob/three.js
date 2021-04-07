@@ -238,7 +238,7 @@
 
 			}
 
-			const r = p;
+			let r = p;
 
 			for ( let k = 1; k <= n; ++ k ) {
 
