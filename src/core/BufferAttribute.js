@@ -417,6 +417,8 @@ function Int8BufferAttribute( array, itemSize, normalized ) {
 
 	BufferAttribute.call( this, new Int8Array( array ), itemSize, normalized );
 
+	this.integer = false;
+
 }
 
 Int8BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
@@ -426,6 +428,8 @@ Int8BufferAttribute.prototype.constructor = Int8BufferAttribute;
 function Uint8BufferAttribute( array, itemSize, normalized ) {
 
 	BufferAttribute.call( this, new Uint8Array( array ), itemSize, normalized );
+
+	this.integer = false;
 
 }
 
@@ -447,6 +451,8 @@ function Int16BufferAttribute( array, itemSize, normalized ) {
 
 	BufferAttribute.call( this, new Int16Array( array ), itemSize, normalized );
 
+	this.integer = false;
+
 }
 
 Int16BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
@@ -456,6 +462,8 @@ Int16BufferAttribute.prototype.constructor = Int16BufferAttribute;
 function Uint16BufferAttribute( array, itemSize, normalized ) {
 
 	BufferAttribute.call( this, new Uint16Array( array ), itemSize, normalized );
+
+	this.integer = false;
 
 }
 

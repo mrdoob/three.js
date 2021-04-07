@@ -288,9 +288,9 @@
 
 	}
 
-	function vertexAttribPointer( index, size, type, normalized, stride, offset ) {
+	function vertexAttribPointer( index, size, type, normalized, stride, offset, integer ) {
 
-		if ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT ) ) {
+		if ( integer === true ) {
 
 			gl.vertexAttribIPointer( index, size, type, stride, offset );
 
@@ -341,6 +341,10 @@
 					const type = attribute.type;
 					const bytesPerElement = attribute.bytesPerElement;
 
+					// check for integer attributes (WebGL 2 only)
+
+					const integer = ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT || geometryAttribute.integer === true ) );
+
 					if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
 						const data = geometryAttribute.data;
@@ -364,7 +368,7 @@
 						}
 
 						gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-						vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
+						vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement, integer );
 
 					} else {
 
@@ -385,7 +389,7 @@
 						}
 
 						gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-						vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
+						vertexAttribPointer( programAttribute, size, type, normalized, 0, 0, integer );
 
 					}
 
