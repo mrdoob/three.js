@@ -923,10 +923,10 @@ class MarchingCubes extends ImmediateRenderObject {
 		this.generateBufferGeometry = function () {
 
 			const geo = new BufferGeometry();
-			const posArray = new Float32Array();
-			const normArray = new Float32Array();
-			const colorArray = new Float32Array();
-			const uvArray = new Float32Array();
+			let posArray = new Float32Array();
+			let normArray = new Float32Array();
+			let colorArray = new Float32Array();
+			let uvArray = new Float32Array();
 			const scope = this;
 
 			const geo_callback = function ( object ) {

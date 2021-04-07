@@ -155,8 +155,7 @@ class LightningStorm extends Object3D {
 
 		}
 
-		let i = 0;
-		const il = this.lightningsMeshes.length;
+		let i = 0, il = this.lightningsMeshes.length;
 
 		while ( i < il ) {
 
