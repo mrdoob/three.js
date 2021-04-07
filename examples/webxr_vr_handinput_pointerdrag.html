@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>three.js webxr hands - point and drag</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link type="text/css" rel="stylesheet" href="main.css">
+</head>
+
+<body>
+
+  <div id="info">
+    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>  vr - handinput - point and drag<br />
+    (Oculus Browser with #webxr-hands flag enabled)
+  </div>
+
+  <script type="module">
+
+    import * as THREE from '../build/three.module.js';
+    import { VRButton } from './jsm/webxr/VRButton.js';
+    import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
+    import { OculusHandModel } from './jsm/webxr/OculusHandModel.js';
+    import { OculusHandPointerModel } from './jsm/webxr/OculusHandPointerModel.js';
+    import { createText } from './jsm/webxr/Text2D.js';
+    import { GameObject, Component, GameObjectManager } from './jsm/webxr/EntityComponentSystem.js';
+    import { PointerButtonComponent } from './jsm/webxr/PointerButtonComponent.js';
+    import { PointerDragComponent } from './jsm/webxr/PointerDragComponent.js';
+
+    let container;
+    let camera, scene, renderer;
+    let hand1, hand2;
+    let handModel1, handModel2;
+    let handPointer1, handPointer2;
+    let menuObject, floor, cubesGroup, instructionText, exitText;
+    let resetButton, exitButton;
+    let controller1, controller2;
+    let controllerGrip1, controllerGrip2;
+    let xrSession;
+    let gameObjectManager;
+    let positionCalibrated = false;
+    let intersectable = [];
+
+    init();
+    animate();
+
+    function makeButtonMesh(x, y, z, color) {
+      const geometry = new THREE.BoxGeometry(x, y, z);
+      const material = new THREE.MeshPhongMaterial({ color: color });
+      const buttonMesh = new THREE.Mesh(geometry, material);
+      return buttonMesh;
+    }
+
+
+    function init() {
+
+      container = document.createElement('div');
+      document.body.appendChild(container);
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x444444);
+
+      camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10);
+      camera.position.set(0, 1.2, 0.3);
+
+
+      const floorGeometry = new THREE.PlaneGeometry(4, 4);
+      const floorMaterial = new THREE.MeshPhongMaterial({ color: 0x222222 });
+      floor = new THREE.Mesh(floorGeometry, floorMaterial);
+      floor.rotation.x = - Math.PI / 2;
+      // floor.receiveShadow = true;
+      scene.add(floor);
+
+      scene.add(new THREE.HemisphereLight(0x808080, 0x606060));
+
+      const light = new THREE.DirectionalLight(0xffffff);
+      light.position.set(0, 6, 0);
+      light.castShadow = true;
+      light.shadow.camera.top = 2;
+      light.shadow.camera.bottom = - 2;
+      light.shadow.camera.right = 2;
+      light.shadow.camera.left = - 2;
+      light.shadow.mapSize.set(4096, 4096);
+      scene.add(light);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.shadowMap.enabled = true;
+      renderer.xr.enabled = true;
+
+      container.appendChild(renderer.domElement);
+
+      document.body.appendChild(VRButton.createButton(renderer));
+
+      // controllers
+
+      controller1 = renderer.xr.getController(0);
+      scene.add(controller1);
+
+      controller2 = renderer.xr.getController(1);
+      scene.add(controller2);
+
+      const controllerModelFactory = new XRControllerModelFactory();
+
+      // Hand 1
+      controllerGrip1 = renderer.xr.getControllerGrip(0);
+      controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1));
+      scene.add(controllerGrip1);
+
+      hand1 = renderer.xr.getHand(0);
+      handModel1 = new OculusHandModel(hand1);
+      hand1.add(handModel1);
+      handPointer1 = new OculusHandPointerModel(hand1, controller1);
+      hand1.add(handPointer1);
+
+      scene.add(hand1);
+
+      // Hand 2
+      controllerGrip2 = renderer.xr.getControllerGrip(1);
+      controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
+      scene.add(controllerGrip2);
+
+      hand2 = renderer.xr.getHand(1);
+      handModel2 = new OculusHandModel(hand2);
+      hand2.add(handModel2);
+      handPointer2 = new OculusHandPointerModel(hand2, controller2);
+      hand2.add(handPointer2);
+      scene.add(hand2);
+
+      gameObjectManager = new GameObjectManager();
+
+      cubesGroup = new THREE.Group();
+      scene.add(cubesGroup);
+
+      // buttons
+      menuObject = new THREE.Object3D();
+      menuObject.position.set(0.4, 1, -1);
+      menuObject.rotation.y = - Math.PI / 12;
+      scene.add(menuObject);
+
+      let resetButtonObject = gameObjectManager.createGameObject(menuObject, "exit-button");
+      resetButton = makeButtonMesh(0.2, 0.1, 0.01, 0x355c7d);
+      let resetText = createText("reset", 0.06);
+      resetButton.add(resetText);
+      resetText.position.set(0, 0, 0.0051);
+      resetButtonObject.transform.add(resetButton);
+      resetButtonObject.transform.position.set(0, -0.06, 0);
+      resetButtonObject.addComponent(PointerButtonComponent, [handPointer1, handPointer2], resetCubes);
+
+      let exitButtonObject = gameObjectManager.createGameObject(menuObject, "exit-button");
+      exitButton = makeButtonMesh(0.2, 0.1, 0.01, 0xff0000);
+      let exitText = createText("exit", 0.06);
+      exitButton.add(exitText);
+      exitText.position.set(0, 0, 0.0051);
+      exitButtonObject.transform.add(exitButton);
+      exitButtonObject.transform.position.set(0, -0.18, 0);
+      let exitButtonAction = function () {
+        exitText.visible = true;
+        setTimeout(function () { exitText.visible = false; renderer.xr.getSession().end(); }, 2000);
+      }
+      exitButtonObject.addComponent(PointerButtonComponent, [handPointer1, handPointer2], exitButtonAction);
+
+      resetCubes();
+
+      instructionText = createText("This is a WebXR Hands demo, please explore with hands.", 0.04);
+      instructionText.position.set(0, 1.6, -0.6);
+      scene.add(instructionText);
+
+      exitText = createText("Exiting session...", 0.04);
+      exitText.position.set(0, 1.5, -0.6);
+      exitText.visible = false;
+      scene.add(exitText);
+
+      window.addEventListener('resize', onWindowResize);
+
+    }
+
+    function resetCubes() {
+      const geometry = new THREE.BoxGeometry(0.15, 0.15, 0.15);
+
+      gameObjectManager.gameObjects.forEach((gameObject) => {
+        if (gameObject.name.startsWith("cube-")) {
+          gameObjectManager.removeGameObject(gameObject);
+        }
+      });
+
+      intersectable = [floor, resetButton, exitButton];
+
+      for (let i = 0; i < 20; i++) {
+
+        const object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff }));
+
+        let cubeObject = gameObjectManager.createGameObject(cubesGroup, "cube-" + i);
+        intersectable.push(object);
+        cubeObject.transform.add(object);
+
+        cubeObject.transform.position.x = Math.random() * 2 - 1;
+        cubeObject.transform.position.y = Math.random() * 2;
+        cubeObject.transform.position.z = Math.random() * 2 - 1;
+
+        cubeObject.transform.rotation.x = Math.random() * 2 * Math.PI;
+        cubeObject.transform.rotation.y = Math.random() * 2 * Math.PI;
+        cubeObject.transform.rotation.z = Math.random() * 2 * Math.PI;
+
+        object.scale.x = Math.random() + 0.5;
+        object.scale.y = Math.random() + 0.5;
+        object.scale.z = Math.random() + 0.5;
+
+        cubeObject.addComponent(PointerDragComponent, [handPointer1, handPointer2], menuObject);
+
+      }
+    }
+
+    function onWindowResize() {
+
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+    }
+    //
+
+    function animate() {
+
+      renderer.setAnimationLoop(render);
+
+    }
+
+    function render() {
+      gameObjectManager.update();
+      instructionText.visible = controllerGrip1.visible || controllerGrip2.visible;
+      handPointer1.checkIntersections(intersectable);
+      handPointer2.checkIntersections(intersectable);
+      renderer.render(scene, camera);
+
+      // adjusting console position when user first go immersive
+      if (renderer.xr.getSession() && !positionCalibrated) {
+        let xrCamera = renderer.xr.getCamera(camera);
+        menuObject.position.x = xrCamera.position.x + 0.4;
+        menuObject.position.y = xrCamera.position.y;
+        menuObject.position.z = xrCamera.position.z - 1;
+        positionCalibrated = true;
+      }
+    }
+
+  </script>
+</body>
+
+</html>
