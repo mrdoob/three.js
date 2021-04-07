@@ -13,7 +13,6 @@ class AnimationClipCreator {
 
 		const times = [ 0, period ], values = [ 0, 360 ];
 
-		axis = axis;
 		const trackName = '.rotation[' + axis + ']';
 
 		const track = new NumberKeyframeTrack( trackName, times, values );
@@ -26,7 +25,6 @@ class AnimationClipCreator {
 
 		const times = [ 0, period ], values = [ 0, 1 ];
 
-		axis = axis;
 		const trackName = '.scale[' + axis + ']';
 
 		const track = new NumberKeyframeTrack( trackName, times, values );

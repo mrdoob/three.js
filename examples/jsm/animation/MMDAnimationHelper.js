@@ -958,7 +958,7 @@ class MMDAnimationHelper {
 
 // Keep working quaternions for less GC
 const _quaternions = [];
-const _quaternionIndex = 0;
+let _quaternionIndex = 0;
 
 function getQuaternion() {
 

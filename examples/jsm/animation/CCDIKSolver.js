@@ -173,7 +173,7 @@ class CCDIKSolver {
 				// TODO: re-consider the limitation specification
 				if ( limitation !== undefined ) {
 
-					const c = link.quaternion.w;
+					let c = link.quaternion.w;
 
 					if ( c > 1.0 ) c = 1.0;
 

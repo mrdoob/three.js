@@ -171,7 +171,7 @@
 
 					if ( limitation !== undefined ) {
 
-						const c = link.quaternion.w;
+						let c = link.quaternion.w;
 						if ( c > 1.0 ) c = 1.0;
 						const c2 = math.sqrt( 1 - c * c );
 						link.quaternion.set( limitation.x * c2, limitation.y * c2, limitation.z * c2, c );
