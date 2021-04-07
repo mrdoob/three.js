@@ -2,29 +2,26 @@
 
 	/**
  * Usage:
- *	var exporter = new STLExporter();
+ *	const exporter = new STLExporter();
  *
  *	// second argument is a list of options
- *	var data = exporter.parse( mesh, { binary: true } );
+ *	const data = exporter.parse( mesh, { binary: true } );
  *
  */
 
-	var STLExporter = function () {};
+	class STLExporter {
 
-	STLExporter.prototype = {
-		constructor: STLExporter,
-		parse: function ( scene, options ) {
+		parse( scene, options = {} ) {
 
-			if ( options === undefined ) options = {};
-			var binary = options.binary !== undefined ? options.binary : false; //
+			const binary = options.binary !== undefined ? options.binary : false; //
 
-			var objects = [];
-			var triangles = 0;
+			const objects = [];
+			let triangles = 0;
 			scene.traverse( function ( object ) {
 
 				if ( object.isMesh ) {
 
-					var geometry = object.geometry;
+					const geometry = object.geometry;
 
 					if ( geometry.isBufferGeometry !== true ) {
 
@@ -32,8 +29,8 @@
 
 					}
 
-					var index = geometry.index;
-					var positionAttribute = geometry.getAttribute( 'position' );
+					const index = geometry.index;
+					const positionAttribute = geometry.getAttribute( 'position' );
 					triangles += index !== null ? index.count / 3 : positionAttribute.count / 3;
 					objects.push( {
 						object3d: object,
@@ -43,13 +40,13 @@
 				}
 
 			} );
-			var output;
-			var offset = 80; // skip header
+			let output;
+			let offset = 80; // skip header
 
 			if ( binary === true ) {
 
-				var bufferLength = triangles * 2 + triangles * 3 * 4 * 4 + 80 + 4;
-				var arrayBuffer = new ArrayBuffer( bufferLength );
+				const bufferLength = triangles * 2 + triangles * 3 * 4 * 4 + 80 + 4;
+				const arrayBuffer = new ArrayBuffer( bufferLength );
 				output = new DataView( arrayBuffer );
 				output.setUint32( offset, triangles, true );
 				offset += 4;
@@ -61,28 +58,28 @@
 
 			}
 
-			var vA = new THREE.Vector3();
-			var vB = new THREE.Vector3();
-			var vC = new THREE.Vector3();
-			var cb = new THREE.Vector3();
-			var ab = new THREE.Vector3();
-			var normal = new THREE.Vector3();
+			const vA = new THREE.Vector3();
+			const vB = new THREE.Vector3();
+			const vC = new THREE.Vector3();
+			const cb = new THREE.Vector3();
+			const ab = new THREE.Vector3();
+			const normal = new THREE.Vector3();
 
-			for ( var i = 0, il = objects.length; i < il; i ++ ) {
+			for ( let i = 0, il = objects.length; i < il; i ++ ) {
 
-				var object = objects[ i ].object3d;
-				var geometry = objects[ i ].geometry;
-				var index = geometry.index;
-				var positionAttribute = geometry.getAttribute( 'position' );
+				const object = objects[ i ].object3d;
+				const geometry = objects[ i ].geometry;
+				const index = geometry.index;
+				const positionAttribute = geometry.getAttribute( 'position' );
 
 				if ( index !== null ) {
 
 					// indexed geometry
-					for ( var j = 0; j < index.count; j += 3 ) {
+					for ( let j = 0; j < index.count; j += 3 ) {
 
-						var a = index.getX( j + 0 );
-						var b = index.getX( j + 1 );
-						var c = index.getX( j + 2 );
+						const a = index.getX( j + 0 );
+						const b = index.getX( j + 1 );
+						const c = index.getX( j + 2 );
 						writeFace( a, b, c, positionAttribute, object );
 
 					}
@@ -90,11 +87,11 @@
 				} else {
 
 					// non-indexed geometry
-					for ( var j = 0; j < positionAttribute.count; j += 3 ) {
+					for ( let j = 0; j < positionAttribute.count; j += 3 ) {
 
-						var a = j + 0;
-						var b = j + 1;
-						var c = j + 2;
+						const a = j + 0;
+						const b = j + 1;
+						const c = j + 2;
 						writeFace( a, b, c, positionAttribute, object );
 
 					}
@@ -192,7 +189,8 @@
 			}
 
 		}
-	};
+
+	}
 
 	THREE.STLExporter = STLExporter;
 
