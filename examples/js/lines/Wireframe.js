@@ -1,52 +1,52 @@
 ( function () {
 
-	var Wireframe = function ( geometry, material ) {
+	const _start = new THREE.Vector3();
 
-		THREE.Mesh.call( this );
-		this.type = 'Wireframe';
-		this.geometry = geometry !== undefined ? geometry : new THREE.LineSegmentsGeometry();
-		this.material = material !== undefined ? material : new THREE.LineMaterial( {
+	const _end = new THREE.Vector3();
+
+	class Wireframe extends THREE.Mesh {
+
+		constructor( geometry = new THREE.LineSegmentsGeometry(), material = new THREE.LineMaterial( {
 			color: Math.random() * 0xffffff
-		} );
+		} ) ) {
 
-	};
+			super( geometry, material );
+			this.type = 'Wireframe';
 
-	Wireframe.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
-		constructor: Wireframe,
-		isWireframe: true,
-		computeLineDistances: function () {
+		} // for backwards-compatability, but could be a method of THREE.LineSegmentsGeometry...
 
-			// for backwards-compatability, but could be a method of THREE.LineSegmentsGeometry...
-			var start = new THREE.Vector3();
-			var end = new THREE.Vector3();
-			return function computeLineDistances() {
 
-				var geometry = this.geometry;
-				var instanceStart = geometry.attributes.instanceStart;
-				var instanceEnd = geometry.attributes.instanceEnd;
-				var lineDistances = new Float32Array( 2 * instanceStart.count );
+		computeLineDistances() {
 
-				for ( var i = 0, j = 0, l = instanceStart.count; i < l; i ++, j += 2 ) {
+			const geometry = this.geometry;
+			const instanceStart = geometry.attributes.instanceStart;
+			const instanceEnd = geometry.attributes.instanceEnd;
+			const lineDistances = new Float32Array( 2 * instanceStart.count );
 
-					start.fromBufferAttribute( instanceStart, i );
-					end.fromBufferAttribute( instanceEnd, i );
-					lineDistances[ j ] = j === 0 ? 0 : lineDistances[ j - 1 ];
-					lineDistances[ j + 1 ] = lineDistances[ j ] + start.distanceTo( end );
+			for ( let i = 0, j = 0, l = instanceStart.count; i < l; i ++, j += 2 ) {
 
-				}
+				_start.fromBufferAttribute( instanceStart, i );
 
-				var instanceDistanceBuffer = new THREE.InstancedInterleavedBuffer( lineDistances, 2, 1 ); // d0, d1
+				_end.fromBufferAttribute( instanceEnd, i );
 
-				geometry.setAttribute( 'instanceDistanceStart', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
+				lineDistances[ j ] = j === 0 ? 0 : lineDistances[ j - 1 ];
+				lineDistances[ j + 1 ] = lineDistances[ j ] + _start.distanceTo( _end );
 
-				geometry.setAttribute( 'instanceDistanceEnd', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
+			}
 
-				return this;
+			const instanceDistanceBuffer = new THREE.InstancedInterleavedBuffer( lineDistances, 2, 1 ); // d0, d1
 
-			};
+			geometry.setAttribute( 'instanceDistanceStart', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
 
-		}()
-	} );
+			geometry.setAttribute( 'instanceDistanceEnd', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
+
+			return this;
+
+		}
+
+	}
+
+	Wireframe.prototype.isWireframe = true;
 
 	THREE.Wireframe = Wireframe;
 
