@@ -445,9 +445,9 @@
 
 							for ( let i = 0, l = positions.length; i < l; i += 3 ) {
 
-								const x = positions[ i ];
-								const y = positions[ i + 1 ];
-								const z = positions[ i + 2 ];
+								let x = positions[ i ];
+								let y = positions[ i + 1 ];
+								let z = positions[ i + 2 ];
 
 								if ( material.morphTargets === true ) {
 
