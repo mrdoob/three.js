@@ -25,8 +25,6 @@
 
 		<!-- Write to G-Buffer -->
 		<script id="gbuffer-vert" type="x-shader/x-vertex">
-			#version 300 es
-
 			in vec3 position;
 			in vec3 normal;
 			in vec2 uv;
@@ -53,8 +51,6 @@
 			}
 		</script>
 		<script id="gbuffer-frag" type="x-shader/x-fragment">
-			#version 300 es
-
 			precision highp float;
 			precision highp int;
 
@@ -80,8 +76,6 @@
 
 		<!-- Read G-Buffer and render to screen -->
 		<script id="render-vert" type="x-shader/x-vertex">
-			#version 300 es
-
 			in vec3 position;
 			in vec2 uv;
 
@@ -98,8 +92,6 @@
 			}
 		</script>
 		<script id="render-frag" type="x-shader/x-fragment">
-			#version 300 es
-
 			precision highp float;
 			precision highp int;
 
@@ -134,22 +126,30 @@
 
 			import * as THREE from '../build/three.module.js';
 
+			import { WEBGL } from './jsm/WebGL.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var container;
-			var camera, scene, renderer, controls;
-			var renderTarget;
-			var postScene, postCamera;
+			let container;
+			let camera, scene, renderer, controls;
+			let renderTarget;
+			let postScene, postCamera;
 
 			init();
 
 			function init() {
 
+				if ( WEBGL.isWebGL2Available() === false ) {
+
+					document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+					return;
+
+				}
+
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var canvas = document.createElement( 'canvas' );
-				var context = canvas.getContext( 'webgl2' );
+				const canvas = document.createElement( 'canvas' );
+				const context = canvas.getContext( 'webgl2' );
 
 				renderer = new THREE.WebGLRenderer( {
 					canvas: canvas,
@@ -167,13 +167,9 @@
 					window.innerHeight * window.devicePixelRatio,
 					2,
 					{
-						format: THREE.RGBAFormat,
 						minFilter: THREE.NearestFilter,
 						magFilter: THREE.NearestFilter,
-						type: THREE.FloatType,
-						generateMipmaps: false,
-						stencilBuffer: false,
-						depthBuffer: true
+						type: THREE.FloatType
 					}
 				);
 
@@ -189,7 +185,7 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10 );
 				camera.position.z = 4;
 
-				var diffuse = new THREE.TextureLoader().load(
+				const diffuse = new THREE.TextureLoader().load(
 
 					'textures/brick_diffuse.jpg',
 
@@ -213,7 +209,7 @@
 							tDiffuse: { value: diffuse },
 							repeat: { value: new THREE.Vector2( 5, 0.5 ) }
 						},
-						lights: false
+						glslVersion: THREE.GLSL3
 					} )
 				) );
 
@@ -231,7 +227,7 @@
 							tDiffuse: { value: renderTarget.textures[ 0 ] },
 							tNormal: { value: renderTarget.textures[ 1 ] },
 						},
-						lights: false
+						glslVersion: THREE.GLSL3
 					} )
 				) );
 
@@ -253,7 +249,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				var dpr = renderer.getPixelRatio();
+				const dpr = renderer.getPixelRatio();
 				renderTarget.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 
 				render();

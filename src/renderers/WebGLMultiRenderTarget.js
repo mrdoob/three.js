@@ -2,13 +2,13 @@ import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 
 class WebGLMultiRenderTarget extends WebGLRenderTarget {
 
-	constructor( width, height, numAttachments, options ) {
+	constructor( width, height, count, options ) {
 
 		super( width, height, options );
 
 		this.textures = [];
 
-		for ( let i = 0; i < numAttachments; i ++ ) {
+		for ( let i = 0; i < count; i ++ ) {
 
 			this.textures[ i ] = this.texture.clone();
 
@@ -32,15 +32,15 @@ class WebGLMultiRenderTarget extends WebGLRenderTarget {
 
 	}
 
-	setNumAttachments( num ) {
+	setCount( count ) {
 
-		if ( this.textures.length !== num ) {
+		if ( this.textures.length !== count ) {
 
 			this.dispose();
 
-			if ( num > this.textures.length ) {
+			if ( count > this.textures.length ) {
 
-				for ( let i = this.textures.length; i < num; i ++ ) {
+				for ( let i = this.textures.length; i < count; i ++ ) {
 
 					this.textures[ i ] = this.texture.clone();
 
@@ -48,7 +48,7 @@ class WebGLMultiRenderTarget extends WebGLRenderTarget {
 
 			} else {
 
-				this.textures.length = num;
+				this.textures.length = count;
 
 			}
 
