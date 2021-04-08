@@ -65,7 +65,8 @@
 		<p>Modify pitch, measured in cents. +/- 100 is a semitone. +/- 1200 is an octave. Default is *0*.</p>
 
 		<h3>[property:Array filters]</h3>
-		<p>Represents an array of [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes]. Can be used to apply a variety of low-order filters to create more complex sound effects. Filters are set via [page:Audio.setFilter] or [page:Audio.setFilters].</p>
+		<p>Represents an array of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioNode AudioNodes]. Can be used to apply a variety of low-order filters to create more complex sound effects.
+			In most cases, the array contains instances of [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes]. Filters are set via [page:Audio.setFilter] or [page:Audio.setFilters].</p>
 
 		<h3>[property:GainNode gain]</h3>
 		<p>A [link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode] created
@@ -169,13 +170,13 @@
 
 		<h3>[method:Audio setFilter]( filter )</h3>
 		<p>
-		Applies a single [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNode] to the audio.
+		Applies a single filter node to the audio.
 		</p>
 
 		<h3>[method:Audio setFilters]( [param:Array value] )</h3>
 		<p>
 		value - arrays of filters.<br />
-		Applies an array of [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes] to the audio.
+		Applies an array of filter nodes to the audio.
 		</p>
 
 		<h3>[method:Audio setLoop]( [param:Boolean value] )</h3>

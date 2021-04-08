@@ -117,11 +117,6 @@ function WebGLRenderer( parameters ) {
 	this.toneMapping = NoToneMapping;
 	this.toneMappingExposure = 1.0;
 
-	// morphs
-
-	this.maxMorphTargets = 8;
-	this.maxMorphNormals = 4;
-
 	// internal properties
 
 	const _this = this;
@@ -130,12 +125,9 @@ function WebGLRenderer( parameters ) {
 
 	// internal state cache
 
-	let _framebuffer = null;
-
 	let _currentActiveCubeFace = 0;
 	let _currentActiveMipmapLevel = 0;
 	let _currentRenderTarget = null;
-	let _currentFramebuffer = null;
 	let _currentMaterialId = - 1;
 
 	let _currentCamera = null;
@@ -265,7 +257,7 @@ function WebGLRenderer( parameters ) {
 
 	let extensions, capabilities, state, info;
 	let properties, textures, cubemaps, attributes, geometries, objects;
-	let programCache, materials, renderLists, renderStates, clipping;
+	let programCache, materials, renderLists, renderStates, clipping, shadowMap;
 
 	let background, morphtargets, bufferRenderer, indexedBufferRenderer;
 
@@ -282,8 +274,6 @@ function WebGLRenderer( parameters ) {
 		utils = new WebGLUtils( _gl, extensions, capabilities );
 
 		state = new WebGLState( _gl, extensions, capabilities );
-		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor() );
-		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor() );
 
 		info = new WebGLInfo( _gl );
 		properties = new WebGLProperties();
@@ -300,6 +290,7 @@ function WebGLRenderer( parameters ) {
 		renderLists = new WebGLRenderLists( properties );
 		renderStates = new WebGLRenderStates( extensions, capabilities );
 		background = new WebGLBackground( _this, cubemaps, state, objects, _premultipliedAlpha );
+		shadowMap = new WebGLShadowMap( _this, objects, capabilities );
 
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info, capabilities );
 		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info, capabilities );
@@ -310,6 +301,7 @@ function WebGLRenderer( parameters ) {
 		_this.extensions = extensions;
 		_this.properties = properties;
 		_this.renderLists = renderLists;
+		_this.shadowMap = shadowMap;
 		_this.state = state;
 		_this.info = info;
 
@@ -322,12 +314,6 @@ function WebGLRenderer( parameters ) {
 	const xr = new WebXRManager( _this, _gl );
 
 	this.xr = xr;
-
-	// shadow map
-
-	const shadowMap = new WebGLShadowMap( _this, objects, capabilities.maxTextureSize );
-
-	this.shadowMap = shadowMap;
 
 	// API
 
@@ -603,6 +589,9 @@ function WebGLRenderer( parameters ) {
 
 		xr.dispose();
 
+		xr.removeEventListener( 'sessionstart', onXRSessionStart );
+		xr.removeEventListener( 'sessionend', onXRSessionEnd );
+
 		animation.stop();
 
 	};
@@ -625,7 +614,19 @@ function WebGLRenderer( parameters ) {
 
 		_isContextLost = false;
 
+		const infoAutoReset = info.autoReset;
+		const shadowMapEnabled = shadowMap.enabled;
+		const shadowMapAutoUpdate = shadowMap.autoUpdate;
+		const shadowMapNeedsUpdate = shadowMap.needsUpdate;
+		const shadowMapType = shadowMap.type;
+
 		initGLContext();
+
+		info.autoReset = infoAutoReset;
+		shadowMap.enabled = shadowMapEnabled;
+		shadowMap.autoUpdate = shadowMapAutoUpdate;
+		shadowMap.needsUpdate = shadowMapNeedsUpdate;
+		shadowMap.type = shadowMapType;
 
 	}
 
@@ -938,8 +939,19 @@ function WebGLRenderer( parameters ) {
 
 	function onAnimationFrame( time ) {
 
-		if ( xr.isPresenting ) return;
 		if ( onAnimationFrameCallback ) onAnimationFrameCallback( time );
+
+	}
+
+	function onXRSessionStart() {
+
+		animation.stop();
+
+	}
+
+	function onXRSessionEnd() {
+
+		animation.start();
 
 	}
 
@@ -956,6 +968,9 @@ function WebGLRenderer( parameters ) {
 		( callback === null ) ? animation.stop() : animation.start();
 
 	};
+
+	xr.addEventListener( 'sessionstart', onXRSessionStart );
+	xr.addEventListener( 'sessionend', onXRSessionEnd );
 
 	// Rendering
 
@@ -985,12 +1000,6 @@ function WebGLRenderer( parameters ) {
 		}
 
 		if ( _isContextLost === true ) return;
-
-		// reset caching for this frame
-
-		bindingStates.resetDefaultState();
-		_currentMaterialId = - 1;
-		_currentCamera = null;
 
 		// update scene graph
 
@@ -1097,6 +1106,10 @@ function WebGLRenderer( parameters ) {
 		state.setPolygonOffset( false );
 
 		// _gl.finish();
+
+		bindingStates.resetDefaultState();
+		_currentMaterialId = - 1;
+		_currentCamera = null;
 
 		renderStateStack.pop();
 
@@ -1439,6 +1452,7 @@ function WebGLRenderer( parameters ) {
 		materialProperties.instancing = parameters.instancing;
 		materialProperties.numClippingPlanes = parameters.numClippingPlanes;
 		materialProperties.numIntersection = parameters.numClipIntersection;
+		materialProperties.vertexAlphas = parameters.vertexAlphas;
 
 	}
 
@@ -1452,6 +1466,7 @@ function WebGLRenderer( parameters ) {
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
 		const envMap = cubemaps.get( material.envMap || environment );
+		const vertexAlphas = material.vertexColors === true && object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4;
 
 		const materialProperties = properties.get( material );
 		const lights = currentRenderState.state.lights;
@@ -1506,6 +1521,10 @@ function WebGLRenderer( parameters ) {
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== clipping.numPlanes ||
 				materialProperties.numIntersection !== clipping.numIntersection ) ) {
+
+				needsProgramChange = true;
+
+			} else if ( materialProperties.vertexAlphas !== vertexAlphas ) {
 
 				needsProgramChange = true;
 
@@ -1765,15 +1784,6 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	//
-	this.setFramebuffer = function ( value ) {
-
-		if ( _framebuffer !== value && _currentRenderTarget === null ) _gl.bindFramebuffer( _gl.FRAMEBUFFER, value );
-
-		_framebuffer = value;
-
-	};
-
 	this.getActiveCubeFace = function () {
 
 		return _currentActiveCubeFace;
@@ -1804,7 +1814,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		let framebuffer = _framebuffer;
+		let framebuffer = null;
 		let isCube = false;
 		let isRenderTarget3D = false;
 
@@ -1847,12 +1857,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( _currentFramebuffer !== framebuffer ) {
-
-			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-			_currentFramebuffer = framebuffer;
-
-		}
+		state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 		state.viewport( _currentViewport );
 		state.scissor( _currentScissor );
@@ -1892,15 +1897,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( framebuffer ) {
 
-			let restore = false;
-
-			if ( framebuffer !== _currentFramebuffer ) {
-
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-
-				restore = true;
-
-			}
+			state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 			try {
 
@@ -1944,11 +1941,10 @@ function WebGLRenderer( parameters ) {
 
 			} finally {
 
-				if ( restore ) {
+				// restore framebuffer of current render target if necessary
 
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, _currentFramebuffer );
-
-				}
+				const framebuffer = ( _currentRenderTarget !== null ) ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+				state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 			}
 
@@ -2094,6 +2090,10 @@ function WebGLRenderer( parameters ) {
 	};
 
 	this.resetState = function () {
+
+		_currentActiveCubeFace = 0;
+		_currentActiveMipmapLevel = 0;
+		_currentRenderTarget = null;
 
 		state.reset();
 		bindingStates.reset();

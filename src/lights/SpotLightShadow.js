@@ -33,6 +33,16 @@ class SpotLightShadow extends LightShadow {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.focus = source.focus;
+
+		return this;
+
+	}
+
 }
 
 SpotLightShadow.prototype.isSpotLightShadow = true;

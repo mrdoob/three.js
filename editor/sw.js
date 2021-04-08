@@ -1,4 +1,4 @@
-// r126.1
+const cacheName = 'threejs-editor';
 
 const assets = [
 	'./',
@@ -24,6 +24,8 @@ const assets = [
 	'../examples/js/libs/draco/gltf/draco_decoder.wasm',
 	'../examples/js/libs/draco/gltf/draco_wasm_wrapper.js',
 
+	'../examples/jsm/libs/motion-controllers.module.js',
+
 	'../examples/jsm/libs/rhino3dm/rhino3dm.wasm',
 	'../examples/jsm/libs/rhino3dm/rhino3dm.js',
 
@@ -35,6 +37,9 @@ const assets = [
 	'../examples/jsm/loaders/FBXLoader.js',
 	'../examples/jsm/loaders/GLTFLoader.js',
 	'../examples/jsm/loaders/KMZLoader.js',
+	'../examples/jsm/loaders/IFCLoader.js',
+	'../examples/jsm/loaders/ifc/web-ifc-api.js',
+	'../examples/jsm/loaders/ifc/web-ifc.wasm',
 	'../examples/jsm/loaders/MD2Loader.js',
 	'../examples/jsm/loaders/OBJLoader.js',
 	'../examples/jsm/loaders/MTLLoader.js',
@@ -52,6 +57,8 @@ const assets = [
 	'../examples/jsm/curves/NURBSCurve.js',
 	'../examples/jsm/curves/NURBSUtils.js',
 
+	'../examples/jsm/environments/RoomEnvironment.js',
+
 	'../examples/jsm/exporters/ColladaExporter.js',
 	'../examples/jsm/exporters/DRACOExporter.js',
 	'../examples/jsm/exporters/GLTFExporter.js',
@@ -65,6 +72,7 @@ const assets = [
 	'../examples/jsm/geometries/TeapotGeometry.js',
 
 	'../examples/jsm/webxr/VRButton.js',
+	'../examples/jsm/webxr/XRControllerModelFactory.js',
 
 	'./images/rotate.svg',
 	'./images/scale.svg',
@@ -209,7 +217,7 @@ const assets = [
 
 self.addEventListener( 'install', async function () {
 
-	const cache = await caches.open( 'threejs-editor' );
+	const cache = await caches.open( cacheName );
 
 	assets.forEach( function ( asset ) {
 
@@ -226,10 +234,29 @@ self.addEventListener( 'install', async function () {
 self.addEventListener( 'fetch', async function ( event ) {
 
 	const request = event.request;
-	event.respondWith( cacheFirst( request ) );
+	event.respondWith( networkFirst( request ) );
 
 } );
 
+async function networkFirst( request ) {
+
+	return fetch( request ).catch( async function () {
+
+		const cachedResponse = await caches.match( request );
+
+		if ( cachedResponse === undefined ) {
+
+			console.warn( '[SW] Not cached:', request.url );
+
+		}
+
+		return cachedResponse;
+
+	} );
+
+}
+
+/*
 async function cacheFirst( request ) {
 
 	const cachedResponse = await caches.match( request );
@@ -244,3 +271,4 @@ async function cacheFirst( request ) {
 	return cachedResponse;
 
 }
+*/

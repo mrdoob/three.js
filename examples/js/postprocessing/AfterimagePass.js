@@ -1,89 +1,70 @@
-THREE.AfterimagePass = function ( damp ) {
+( function () {
 
-	THREE.Pass.call( this );
+	var AfterimagePass = function ( damp ) {
 
-	if ( THREE.AfterimageShader === undefined )
-		console.error( 'THREE.AfterimagePass relies on THREE.AfterimageShader' );
+		THREE.Pass.call( this );
+		if ( THREE.AfterimageShader === undefined ) console.error( 'THREE.AfterimagePass relies on THREE.AfterimageShader' );
+		this.shader = THREE.AfterimageShader;
+		this.uniforms = THREE.UniformsUtils.clone( this.shader.uniforms );
+		this.uniforms[ 'damp' ].value = damp !== undefined ? damp : 0.96;
+		this.textureComp = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
+			minFilter: THREE.LinearFilter,
+			magFilter: THREE.NearestFilter,
+			format: THREE.RGBAFormat
+		} );
+		this.textureOld = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
+			minFilter: THREE.LinearFilter,
+			magFilter: THREE.NearestFilter,
+			format: THREE.RGBAFormat
+		} );
+		this.shaderMaterial = new THREE.ShaderMaterial( {
+			uniforms: this.uniforms,
+			vertexShader: this.shader.vertexShader,
+			fragmentShader: this.shader.fragmentShader
+		} );
+		this.compFsQuad = new THREE.Pass.FullScreenQuad( this.shaderMaterial );
+		var material = new THREE.MeshBasicMaterial();
+		this.copyFsQuad = new THREE.Pass.FullScreenQuad( material );
 
-	this.shader = THREE.AfterimageShader;
+	};
 
-	this.uniforms = THREE.UniformsUtils.clone( this.shader.uniforms );
+	AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+		constructor: AfterimagePass,
+		render: function ( renderer, writeBuffer, readBuffer ) {
 
-	this.uniforms[ 'damp' ].value = damp !== undefined ? damp : 0.96;
+			this.uniforms[ 'tOld' ].value = this.textureOld.texture;
+			this.uniforms[ 'tNew' ].value = readBuffer.texture;
+			renderer.setRenderTarget( this.textureComp );
+			this.compFsQuad.render( renderer );
+			this.copyFsQuad.material.map = this.textureComp.texture;
 
-	this.textureComp = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
+			if ( this.renderToScreen ) {
 
-		minFilter: THREE.LinearFilter,
-		magFilter: THREE.NearestFilter,
-		format: THREE.RGBAFormat
+				renderer.setRenderTarget( null );
+				this.copyFsQuad.render( renderer );
 
-	} );
+			} else {
 
-	this.textureOld = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
+				renderer.setRenderTarget( writeBuffer );
+				if ( this.clear ) renderer.clear();
+				this.copyFsQuad.render( renderer );
 
-		minFilter: THREE.LinearFilter,
-		magFilter: THREE.NearestFilter,
-		format: THREE.RGBAFormat
+			} // Swap buffers.
 
-	} );
 
-	this.shaderMaterial = new THREE.ShaderMaterial( {
+			var temp = this.textureOld;
+			this.textureOld = this.textureComp;
+			this.textureComp = temp; // Now textureOld contains the latest image, ready for the next frame.
 
-		uniforms: this.uniforms,
-		vertexShader: this.shader.vertexShader,
-		fragmentShader: this.shader.fragmentShader
+		},
+		setSize: function ( width, height ) {
 
-	} );
-
-	this.compFsQuad = new THREE.Pass.FullScreenQuad( this.shaderMaterial );
-
-	var material = new THREE.MeshBasicMaterial();
-	this.copyFsQuad = new THREE.Pass.FullScreenQuad( material );
-
-};
-
-THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
-
-	constructor: THREE.AfterimagePass,
-
-	render: function ( renderer, writeBuffer, readBuffer ) {
-
-		this.uniforms[ 'tOld' ].value = this.textureOld.texture;
-		this.uniforms[ 'tNew' ].value = readBuffer.texture;
-
-		renderer.setRenderTarget( this.textureComp );
-		this.compFsQuad.render( renderer );
-
-		this.copyFsQuad.material.map = this.textureComp.texture;
-
-		if ( this.renderToScreen ) {
-
-			renderer.setRenderTarget( null );
-			this.copyFsQuad.render( renderer );
-
-		} else {
-
-			renderer.setRenderTarget( writeBuffer );
-
-			if ( this.clear ) renderer.clear();
-
-			this.copyFsQuad.render( renderer );
+			this.textureComp.setSize( width, height );
+			this.textureOld.setSize( width, height );
 
 		}
+	} );
 
-		// Swap buffers.
-		var temp = this.textureOld;
-		this.textureOld = this.textureComp;
-		this.textureComp = temp;
-		// Now textureOld contains the latest image, ready for the next frame.
+	THREE.AfterimagePass = AfterimagePass;
 
-	},
-
-	setSize: function ( width, height ) {
-
-		this.textureComp.setSize( width, height );
-		this.textureOld.setSize( width, height );
-
-	}
-
-} );
+} )();

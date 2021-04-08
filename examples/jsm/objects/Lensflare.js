@@ -17,281 +17,287 @@ import {
 	Vector4
 } from '../../../build/three.module.js';
 
-var Lensflare = function () {
+class Lensflare extends Mesh {
 
-	Mesh.call( this, Lensflare.Geometry, new MeshBasicMaterial( { opacity: 0, transparent: true } ) );
+	constructor() {
 
-	this.type = 'Lensflare';
-	this.frustumCulled = false;
-	this.renderOrder = Infinity;
+		super( Lensflare.Geometry, new MeshBasicMaterial( { opacity: 0, transparent: true } ) );
 
-	//
+		this.type = 'Lensflare';
+		this.frustumCulled = false;
+		this.renderOrder = Infinity;
 
-	var positionScreen = new Vector3();
-	var positionView = new Vector3();
+		//
 
-	// textures
+		const positionScreen = new Vector3();
+		const positionView = new Vector3();
 
-	var tempMap = new DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, RGBFormat );
-	tempMap.minFilter = NearestFilter;
-	tempMap.magFilter = NearestFilter;
-	tempMap.wrapS = ClampToEdgeWrapping;
-	tempMap.wrapT = ClampToEdgeWrapping;
+		// textures
 
-	var occlusionMap = new DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, RGBFormat );
-	occlusionMap.minFilter = NearestFilter;
-	occlusionMap.magFilter = NearestFilter;
-	occlusionMap.wrapS = ClampToEdgeWrapping;
-	occlusionMap.wrapT = ClampToEdgeWrapping;
+		const tempMap = new DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, RGBFormat );
+		tempMap.minFilter = NearestFilter;
+		tempMap.magFilter = NearestFilter;
+		tempMap.wrapS = ClampToEdgeWrapping;
+		tempMap.wrapT = ClampToEdgeWrapping;
 
-	// material
+		const occlusionMap = new DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, RGBFormat );
+		occlusionMap.minFilter = NearestFilter;
+		occlusionMap.magFilter = NearestFilter;
+		occlusionMap.wrapS = ClampToEdgeWrapping;
+		occlusionMap.wrapT = ClampToEdgeWrapping;
 
-	var geometry = Lensflare.Geometry;
+		// material
 
-	var material1a = new RawShaderMaterial( {
-		uniforms: {
-			'scale': { value: null },
-			'screenPosition': { value: null }
-		},
-		vertexShader: [
+		const geometry = Lensflare.Geometry;
 
-			'precision highp float;',
+		const material1a = new RawShaderMaterial( {
+			uniforms: {
+				'scale': { value: null },
+				'screenPosition': { value: null }
+			},
+			vertexShader: [
 
-			'uniform vec3 screenPosition;',
-			'uniform vec2 scale;',
+				'precision highp float;',
 
-			'attribute vec3 position;',
+				'uniform vec3 screenPosition;',
+				'uniform vec2 scale;',
 
-			'void main() {',
+				'attribute vec3 position;',
 
-			'	gl_Position = vec4( position.xy * scale + screenPosition.xy, screenPosition.z, 1.0 );',
+				'void main() {',
 
-			'}'
+				'	gl_Position = vec4( position.xy * scale + screenPosition.xy, screenPosition.z, 1.0 );',
 
-		].join( '\n' ),
-		fragmentShader: [
+				'}'
 
-			'precision highp float;',
+			].join( '\n' ),
+			fragmentShader: [
 
-			'void main() {',
+				'precision highp float;',
 
-			'	gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );',
+				'void main() {',
 
-			'}'
+				'	gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );',
 
-		].join( '\n' ),
-		depthTest: true,
-		depthWrite: false,
-		transparent: false
-	} );
+				'}'
 
-	var material1b = new RawShaderMaterial( {
-		uniforms: {
-			'map': { value: tempMap },
-			'scale': { value: null },
-			'screenPosition': { value: null }
-		},
-		vertexShader: [
+			].join( '\n' ),
+			depthTest: true,
+			depthWrite: false,
+			transparent: false
+		} );
 
-			'precision highp float;',
+		const material1b = new RawShaderMaterial( {
+			uniforms: {
+				'map': { value: tempMap },
+				'scale': { value: null },
+				'screenPosition': { value: null }
+			},
+			vertexShader: [
 
-			'uniform vec3 screenPosition;',
-			'uniform vec2 scale;',
+				'precision highp float;',
 
-			'attribute vec3 position;',
-			'attribute vec2 uv;',
+				'uniform vec3 screenPosition;',
+				'uniform vec2 scale;',
 
-			'varying vec2 vUV;',
+				'attribute vec3 position;',
+				'attribute vec2 uv;',
 
-			'void main() {',
+				'varying vec2 vUV;',
 
-			'	vUV = uv;',
+				'void main() {',
 
-			'	gl_Position = vec4( position.xy * scale + screenPosition.xy, screenPosition.z, 1.0 );',
+				'	vUV = uv;',
 
-			'}'
+				'	gl_Position = vec4( position.xy * scale + screenPosition.xy, screenPosition.z, 1.0 );',
 
-		].join( '\n' ),
-		fragmentShader: [
+				'}'
 
-			'precision highp float;',
+			].join( '\n' ),
+			fragmentShader: [
 
-			'uniform sampler2D map;',
+				'precision highp float;',
 
-			'varying vec2 vUV;',
+				'uniform sampler2D map;',
 
-			'void main() {',
+				'varying vec2 vUV;',
 
-			'	gl_FragColor = texture2D( map, vUV );',
+				'void main() {',
 
-			'}'
+				'	gl_FragColor = texture2D( map, vUV );',
 
-		].join( '\n' ),
-		depthTest: false,
-		depthWrite: false,
-		transparent: false
-	} );
+				'}'
 
-	// the following object is used for occlusionMap generation
+			].join( '\n' ),
+			depthTest: false,
+			depthWrite: false,
+			transparent: false
+		} );
 
-	var mesh1 = new Mesh( geometry, material1a );
+		// the following object is used for occlusionMap generation
 
-	//
+		const mesh1 = new Mesh( geometry, material1a );
 
-	var elements = [];
+		//
 
-	var shader = LensflareElement.Shader;
+		const elements = [];
 
-	var material2 = new RawShaderMaterial( {
-		uniforms: {
-			'map': { value: null },
-			'occlusionMap': { value: occlusionMap },
-			'color': { value: new Color( 0xffffff ) },
-			'scale': { value: new Vector2() },
-			'screenPosition': { value: new Vector3() }
-		},
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader,
-		blending: AdditiveBlending,
-		transparent: true,
-		depthWrite: false
-	} );
+		const shader = LensflareElement.Shader;
 
-	var mesh2 = new Mesh( geometry, material2 );
+		const material2 = new RawShaderMaterial( {
+			uniforms: {
+				'map': { value: null },
+				'occlusionMap': { value: occlusionMap },
+				'color': { value: new Color( 0xffffff ) },
+				'scale': { value: new Vector2() },
+				'screenPosition': { value: new Vector3() }
+			},
+			vertexShader: shader.vertexShader,
+			fragmentShader: shader.fragmentShader,
+			blending: AdditiveBlending,
+			transparent: true,
+			depthWrite: false
+		} );
 
-	this.addElement = function ( element ) {
+		const mesh2 = new Mesh( geometry, material2 );
 
-		elements.push( element );
+		this.addElement = function ( element ) {
 
-	};
+			elements.push( element );
 
-	//
+		};
 
-	var scale = new Vector2();
-	var screenPositionPixels = new Vector2();
-	var validArea = new Box2();
-	var viewport = new Vector4();
+		//
 
-	this.onBeforeRender = function ( renderer, scene, camera ) {
+		const scale = new Vector2();
+		const screenPositionPixels = new Vector2();
+		const validArea = new Box2();
+		const viewport = new Vector4();
 
-		renderer.getCurrentViewport( viewport );
+		this.onBeforeRender = function ( renderer, scene, camera ) {
 
-		var invAspect = viewport.w / viewport.z;
-		var halfViewportWidth = viewport.z / 2.0;
-		var halfViewportHeight = viewport.w / 2.0;
+			renderer.getCurrentViewport( viewport );
 
-		var size = 16 / viewport.w;
-		scale.set( size * invAspect, size );
+			const invAspect = viewport.w / viewport.z;
+			const halfViewportWidth = viewport.z / 2.0;
+			const halfViewportHeight = viewport.w / 2.0;
 
-		validArea.min.set( viewport.x, viewport.y );
-		validArea.max.set( viewport.x + ( viewport.z - 16 ), viewport.y + ( viewport.w - 16 ) );
+			let size = 16 / viewport.w;
+			scale.set( size * invAspect, size );
 
-		// calculate position in screen space
+			validArea.min.set( viewport.x, viewport.y );
+			validArea.max.set( viewport.x + ( viewport.z - 16 ), viewport.y + ( viewport.w - 16 ) );
 
-		positionView.setFromMatrixPosition( this.matrixWorld );
-		positionView.applyMatrix4( camera.matrixWorldInverse );
+			// calculate position in screen space
 
-		if ( positionView.z > 0 ) return; // lensflare is behind the camera
+			positionView.setFromMatrixPosition( this.matrixWorld );
+			positionView.applyMatrix4( camera.matrixWorldInverse );
 
-		positionScreen.copy( positionView ).applyMatrix4( camera.projectionMatrix );
+			if ( positionView.z > 0 ) return; // lensflare is behind the camera
 
-		// horizontal and vertical coordinate of the lower left corner of the pixels to copy
+			positionScreen.copy( positionView ).applyMatrix4( camera.projectionMatrix );
 
-		screenPositionPixels.x = viewport.x + ( positionScreen.x * halfViewportWidth ) + halfViewportWidth - 8;
-		screenPositionPixels.y = viewport.y + ( positionScreen.y * halfViewportHeight ) + halfViewportHeight - 8;
+			// horizontal and vertical coordinate of the lower left corner of the pixels to copy
 
-		// screen cull
+			screenPositionPixels.x = viewport.x + ( positionScreen.x * halfViewportWidth ) + halfViewportWidth - 8;
+			screenPositionPixels.y = viewport.y + ( positionScreen.y * halfViewportHeight ) + halfViewportHeight - 8;
 
-		if ( validArea.containsPoint( screenPositionPixels ) ) {
+			// screen cull
 
-			// save current RGB to temp texture
+			if ( validArea.containsPoint( screenPositionPixels ) ) {
 
-			renderer.copyFramebufferToTexture( screenPositionPixels, tempMap );
+				// save current RGB to temp texture
 
-			// render pink quad
+				renderer.copyFramebufferToTexture( screenPositionPixels, tempMap );
 
-			var uniforms = material1a.uniforms;
-			uniforms[ 'scale' ].value = scale;
-			uniforms[ 'screenPosition' ].value = positionScreen;
+				// render pink quad
 
-			renderer.renderBufferDirect( camera, null, geometry, material1a, mesh1, null );
+				let uniforms = material1a.uniforms;
+				uniforms[ 'scale' ].value = scale;
+				uniforms[ 'screenPosition' ].value = positionScreen;
 
-			// copy result to occlusionMap
+				renderer.renderBufferDirect( camera, null, geometry, material1a, mesh1, null );
 
-			renderer.copyFramebufferToTexture( screenPositionPixels, occlusionMap );
+				// copy result to occlusionMap
 
-			// restore graphics
+				renderer.copyFramebufferToTexture( screenPositionPixels, occlusionMap );
 
-			var uniforms = material1b.uniforms;
-			uniforms[ 'scale' ].value = scale;
-			uniforms[ 'screenPosition' ].value = positionScreen;
+				// restore graphics
 
-			renderer.renderBufferDirect( camera, null, geometry, material1b, mesh1, null );
+				uniforms = material1b.uniforms;
+				uniforms[ 'scale' ].value = scale;
+				uniforms[ 'screenPosition' ].value = positionScreen;
 
-			// render elements
+				renderer.renderBufferDirect( camera, null, geometry, material1b, mesh1, null );
 
-			var vecX = - positionScreen.x * 2;
-			var vecY = - positionScreen.y * 2;
+				// render elements
 
-			for ( var i = 0, l = elements.length; i < l; i ++ ) {
+				const vecX = - positionScreen.x * 2;
+				const vecY = - positionScreen.y * 2;
 
-				var element = elements[ i ];
+				for ( let i = 0, l = elements.length; i < l; i ++ ) {
 
-				var uniforms = material2.uniforms;
+					const element = elements[ i ];
 
-				uniforms[ 'color' ].value.copy( element.color );
-				uniforms[ 'map' ].value = element.texture;
-				uniforms[ 'screenPosition' ].value.x = positionScreen.x + vecX * element.distance;
-				uniforms[ 'screenPosition' ].value.y = positionScreen.y + vecY * element.distance;
+					const uniforms = material2.uniforms;
 
-				var size = element.size / viewport.w;
-				var invAspect = viewport.w / viewport.z;
+					uniforms[ 'color' ].value.copy( element.color );
+					uniforms[ 'map' ].value = element.texture;
+					uniforms[ 'screenPosition' ].value.x = positionScreen.x + vecX * element.distance;
+					uniforms[ 'screenPosition' ].value.y = positionScreen.y + vecY * element.distance;
 
-				uniforms[ 'scale' ].value.set( size * invAspect, size );
+					size = element.size / viewport.w;
+					const invAspect = viewport.w / viewport.z;
 
-				material2.uniformsNeedUpdate = true;
+					uniforms[ 'scale' ].value.set( size * invAspect, size );
 
-				renderer.renderBufferDirect( camera, null, geometry, material2, mesh2, null );
+					material2.uniformsNeedUpdate = true;
+
+					renderer.renderBufferDirect( camera, null, geometry, material2, mesh2, null );
+
+				}
 
 			}
 
-		}
+		};
 
-	};
+		this.dispose = function () {
 
-	this.dispose = function () {
+			material1a.dispose();
+			material1b.dispose();
+			material2.dispose();
 
-		material1a.dispose();
-		material1b.dispose();
-		material2.dispose();
+			tempMap.dispose();
+			occlusionMap.dispose();
 
-		tempMap.dispose();
-		occlusionMap.dispose();
+			for ( let i = 0, l = elements.length; i < l; i ++ ) {
 
-		for ( var i = 0, l = elements.length; i < l; i ++ ) {
+				elements[ i ].texture.dispose();
 
-			elements[ i ].texture.dispose();
+			}
 
-		}
+		};
 
-	};
+	}
 
-};
+}
 
-Lensflare.prototype = Object.create( Mesh.prototype );
-Lensflare.prototype.constructor = Lensflare;
 Lensflare.prototype.isLensflare = true;
 
 //
 
-var LensflareElement = function ( texture, size, distance, color ) {
+class LensflareElement {
 
-	this.texture = texture;
-	this.size = size || 1;
-	this.distance = distance || 0;
-	this.color = color || new Color( 0xffffff );
+	constructor( texture, size = 1, distance = 0, color = new Color( 0xffffff ) ) {
 
-};
+		this.texture = texture;
+		this.size = size;
+		this.distance = distance;
+		this.color = color;
+
+	}
+
+}
 
 LensflareElement.Shader = {
 
@@ -371,16 +377,16 @@ LensflareElement.Shader = {
 
 Lensflare.Geometry = ( function () {
 
-	var geometry = new BufferGeometry();
+	const geometry = new BufferGeometry();
 
-	var float32Array = new Float32Array( [
+	const float32Array = new Float32Array( [
 		- 1, - 1, 0, 0, 0,
 		1, - 1, 0, 1, 0,
 		1, 1, 0, 1, 1,
 		- 1, 1, 0, 0, 1
 	] );
 
-	var interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
+	const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
 
 	geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
 	geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
