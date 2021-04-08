@@ -16,23 +16,21 @@ import {
 	BufferAttribute,
 } from '../../../build/three.module.js';
 
-var ifcAPI = new IfcAPI();
+const ifcAPI = new IfcAPI();
 
-function IFCLoader( manager ) {
+class IFCLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-IFCLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: IFCLoader,
+	load( url, onLoad, onProgress, onError ) {
 
-	load: function ( url, onLoad, onProgress, onError ) {
+		const scope = this;
 
-		var scope = this;
-
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
@@ -66,9 +64,9 @@ IFCLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			onError
 		);
 
-	},
+	}
 
-	parse: async function ( buffer ) {
+	async parse( buffer ) {
 
 		if ( ifcAPI.wasmModule === undefined ) {
 
@@ -76,18 +74,18 @@ IFCLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		var data = new Uint8Array( buffer );
-		var modelID = ifcAPI.OpenModel( 'example.ifc', data );
+		const data = new Uint8Array( buffer );
+		const modelID = ifcAPI.OpenModel( 'example.ifc', data );
 		return loadAllGeometry( modelID );
 
 		function loadAllGeometry( modelID ) {
 
-			var flatMeshes = getFlatMeshes( modelID );
-			var mainObject = new Object3D();
-			for ( var i = 0; i < flatMeshes.size(); i ++ ) {
+			const flatMeshes = getFlatMeshes( modelID );
+			const mainObject = new Object3D();
+			for ( let i = 0; i < flatMeshes.size(); i ++ ) {
 
-				var placedGeometries = flatMeshes.get( i ).geometries;
-				for ( var j = 0; j < placedGeometries.size(); j ++ )
+				const placedGeometries = flatMeshes.get( i ).geometries;
+				for ( let j = 0; j < placedGeometries.size(); j ++ )
 					mainObject.add( getPlacedGeometry( modelID, placedGeometries.get( j ) ) );
 
 			}
@@ -98,16 +96,16 @@ IFCLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function getFlatMeshes( modelID ) {
 
-			var flatMeshes = ifcAPI.LoadAllGeometry( modelID );
+			const flatMeshes = ifcAPI.LoadAllGeometry( modelID );
 			return flatMeshes;
 
 		}
 
 		function getPlacedGeometry( modelID, placedGeometry ) {
 
-			var geometry = getBufferGeometry( modelID, placedGeometry );
-			var material = getMeshMaterial( placedGeometry.color );
-			var mesh = new Mesh( geometry, material );
+			const geometry = getBufferGeometry( modelID, placedGeometry );
+			const material = getMeshMaterial( placedGeometry.color );
+			const mesh = new Mesh( geometry, material );
 			mesh.matrix = getMeshMatrix( placedGeometry.flatTransformation );
 			mesh.matrixAutoUpdate = false;
 			return mesh;
@@ -116,27 +114,27 @@ IFCLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function getBufferGeometry( modelID, placedGeometry ) {
 
-			var geometry = ifcAPI.GetGeometry(
+			const geometry = ifcAPI.GetGeometry(
 				modelID,
 				placedGeometry.geometryExpressID
 			);
-			var verts = ifcAPI.GetVertexArray(
+			const verts = ifcAPI.GetVertexArray(
 				geometry.GetVertexData(),
 				geometry.GetVertexDataSize()
 			);
-			var indices = ifcAPI.GetIndexArray(
+			const indices = ifcAPI.GetIndexArray(
 				geometry.GetIndexData(),
 				geometry.GetIndexDataSize()
 			);
-			var bufferGeometry = ifcGeometryToBuffer( verts, indices );
+			const bufferGeometry = ifcGeometryToBuffer( verts, indices );
 			return bufferGeometry;
 
 		}
 
 		function getMeshMaterial( color ) {
 
-			var col = new Color( color.x, color.y, color.z );
-			var material = new MeshPhongMaterial( { color: col, side: DoubleSide } );
+			const col = new Color( color.x, color.y, color.z );
+			const material = new MeshPhongMaterial( { color: col, side: DoubleSide } );
 			material.transparent = color.w !== 1;
 			if ( material.transparent ) material.opacity = color.w;
 			return material;
@@ -145,7 +143,7 @@ IFCLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function getMeshMatrix( matrix ) {
 
-			var mat = new Matrix4();
+			const mat = new Matrix4();
 			mat.fromArray( matrix );
 			// mat.elements[15 - 3] *= 0.001;
 			// mat.elements[15 - 2] *= 0.001;
@@ -156,8 +154,8 @@ IFCLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function ifcGeometryToBuffer( vertexData, indexData ) {
 
-			var geometry = new BufferGeometry();
-			var buffer32 = new InterleavedBuffer( vertexData, 6 );
+			const geometry = new BufferGeometry();
+			const buffer32 = new InterleavedBuffer( vertexData, 6 );
 			geometry.setAttribute(
 				'position',
 				new InterleavedBufferAttribute( buffer32, 3, 0 )
@@ -172,6 +170,7 @@ IFCLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		}
 
 	}
-} );
+
+}
 
 export { IFCLoader };

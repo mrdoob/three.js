@@ -7,17 +7,17 @@
  * ported from https://github.com/BabylonJS/Babylon.js/blob/master/src/Tools/babylon.khronosTextureContainer.ts
  */
 
-	var KTXLoader = function ( manager ) {
+	class KTXLoader extends THREE.CompressedTextureLoader {
 
-		THREE.CompressedTextureLoader.call( this, manager );
+		constructor( manager ) {
 
-	};
+			super( manager );
 
-	KTXLoader.prototype = Object.assign( Object.create( THREE.CompressedTextureLoader.prototype ), {
-		constructor: KTXLoader,
-		parse: function ( buffer, loadMipmaps ) {
+		}
 
-			var ktx = new KhronosTextureContainer( buffer, 1 );
+		parse( buffer, loadMipmaps ) {
+
+			const ktx = new KhronosTextureContainer( buffer, 1 );
 			return {
 				mipmaps: ktx.mipmaps( loadMipmaps ),
 				width: ktx.pixelWidth,
@@ -28,9 +28,18 @@
 			};
 
 		}
-	} );
 
-	var KhronosTextureContainer = function () {
+	}
+
+	const HEADER_LEN = 12 + 13 * 4; // identifier + header elements (not including key value meta-data pairs)
+	// load types
+
+	const COMPRESSED_2D = 0; // uses a gl.compressedTexImage2D()
+	//const COMPRESSED_3D = 1; // uses a gl.compressedTexImage3D()
+	//const TEX_2D = 2; // uses a gl.texImage2D()
+	//const TEX_3D = 3; // uses a gl.texImage3D()
+
+	class KhronosTextureContainer {
 
 		/**
 	 * @param {ArrayBuffer} arrayBuffer- contents of the KTX container file
@@ -38,7 +47,7 @@
 	 * @param {boolean} threeDExpected- provision for indicating that data should be a 3D texture, not implemented
 	 * @param {boolean} textureArrayExpected- provision for indicating that data should be a texture array, not implemented
 	 */
-		function KhronosTextureContainer( arrayBuffer, facesExpected
+		constructor( arrayBuffer, facesExpected
 			/*, threeDExpected, textureArrayExpected */
 		) {
 
@@ -46,7 +55,7 @@
 			// '´', 'K', 'T', 'X', ' ', '1', '1', 'ª', '\r', '\n', '\x1A', '\n'
 			// 0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A
 
-			var identifier = new Uint8Array( this.arrayBuffer, 0, 12 );
+			const identifier = new Uint8Array( this.arrayBuffer, 0, 12 );
 
 			if ( identifier[ 0 ] !== 0xAB || identifier[ 1 ] !== 0x4B || identifier[ 2 ] !== 0x54 || identifier[ 3 ] !== 0x58 || identifier[ 4 ] !== 0x20 || identifier[ 5 ] !== 0x31 || identifier[ 6 ] !== 0x31 || identifier[ 7 ] !== 0xBB || identifier[ 8 ] !== 0x0D || identifier[ 9 ] !== 0x0A || identifier[ 10 ] !== 0x1A || identifier[ 11 ] !== 0x0A ) {
 
@@ -56,10 +65,10 @@
 			} // load the reset of the header in native 32 bit uint
 
 
-			var dataSize = Uint32Array.BYTES_PER_ELEMENT;
-			var headerDataView = new DataView( this.arrayBuffer, 12, 13 * dataSize );
-			var endianness = headerDataView.getUint32( 0, true );
-			var littleEndian = endianness === 0x04030201;
+			const dataSize = Uint32Array.BYTES_PER_ELEMENT;
+			const headerDataView = new DataView( this.arrayBuffer, 12, 13 * dataSize );
+			const endianness = headerDataView.getUint32( 0, true );
+			const littleEndian = endianness === 0x04030201;
 			this.glType = headerDataView.getUint32( 1 * dataSize, littleEndian ); // must be 0 for compressed textures
 
 			this.glTypeSize = headerDataView.getUint32( 2 * dataSize, littleEndian ); // must be 1 for compressed textures
@@ -120,29 +129,28 @@
 			// would need to make this more elaborate & adjust checks above to support more than one load type
 
 
-			this.loadType = KhronosTextureContainer.COMPRESSED_2D;
+			this.loadType = COMPRESSED_2D;
 
-		} // return mipmaps for js
+		}
 
+		mipmaps( loadMipmaps ) {
 
-		KhronosTextureContainer.prototype.mipmaps = function ( loadMipmaps ) {
+			const mipmaps = []; // initialize width & height for level 1
 
-			var mipmaps = []; // initialize width & height for level 1
+			let dataOffset = HEADER_LEN + this.bytesOfKeyValueData;
+			let width = this.pixelWidth;
+			let height = this.pixelHeight;
+			const mipmapCount = loadMipmaps ? this.numberOfMipmapLevels : 1;
 
-			var dataOffset = KhronosTextureContainer.HEADER_LEN + this.bytesOfKeyValueData;
-			var width = this.pixelWidth;
-			var height = this.pixelHeight;
-			var mipmapCount = loadMipmaps ? this.numberOfMipmapLevels : 1;
+			for ( let level = 0; level < mipmapCount; level ++ ) {
 
-			for ( var level = 0; level < mipmapCount; level ++ ) {
-
-				var imageSize = new Int32Array( this.arrayBuffer, dataOffset, 1 )[ 0 ]; // size per face, since not supporting array cubemaps
+				const imageSize = new Int32Array( this.arrayBuffer, dataOffset, 1 )[ 0 ]; // size per face, since not supporting array cubemaps
 
 				dataOffset += 4; // size of the image + 4 for the imageSize field
 
-				for ( var face = 0; face < this.numberOfFaces; face ++ ) {
+				for ( let face = 0; face < this.numberOfFaces; face ++ ) {
 
-					var byteArray = new Uint8Array( this.arrayBuffer, dataOffset, imageSize );
+					const byteArray = new Uint8Array( this.arrayBuffer, dataOffset, imageSize );
 					mipmaps.push( {
 						'data': byteArray,
 						'width': width,
@@ -160,22 +168,9 @@
 
 			return mipmaps;
 
-		};
+		}
 
-		KhronosTextureContainer.HEADER_LEN = 12 + 13 * 4; // identifier + header elements (not including key value meta-data pairs)
-		// load types
-
-		KhronosTextureContainer.COMPRESSED_2D = 0; // uses a gl.compressedTexImage2D()
-
-		KhronosTextureContainer.COMPRESSED_3D = 1; // uses a gl.compressedTexImage3D()
-
-		KhronosTextureContainer.TEX_2D = 2; // uses a gl.texImage2D()
-
-		KhronosTextureContainer.TEX_3D = 3; // uses a gl.texImage3D()
-
-		return KhronosTextureContainer;
-
-	}();
+	}
 
 	THREE.KTXLoader = KTXLoader;
 

@@ -1,16 +1,16 @@
 ( function () {
 
-	var HDRCubeTextureLoader = function ( manager ) {
+	class HDRCubeTextureLoader extends THREE.Loader {
 
-		THREE.Loader.call( this, manager );
-		this.hdrLoader = new THREE.RGBELoader();
-		this.type = THREE.UnsignedByteType;
+		constructor( manager ) {
 
-	};
+			super( manager );
+			this.hdrLoader = new THREE.RGBELoader();
+			this.type = THREE.UnsignedByteType;
 
-	HDRCubeTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-		constructor: HDRCubeTextureLoader,
-		load: function ( urls, onLoad, onProgress, onError ) {
+		}
+
+		load( urls, onLoad, onProgress, onError ) {
 
 			if ( ! Array.isArray( urls ) ) {
 
@@ -23,7 +23,7 @@
 
 			}
 
-			var texture = new THREE.CubeTexture();
+			const texture = new THREE.CubeTexture();
 			texture.type = this.type;
 
 			switch ( texture.type ) {
@@ -54,20 +54,20 @@
 
 			}
 
-			var scope = this;
-			var loaded = 0;
+			const scope = this;
+			let loaded = 0;
 
 			function loadHDRData( i, onLoad, onProgress, onError ) {
 
 				new THREE.FileLoader( scope.manager ).setPath( scope.path ).setResponseType( 'arraybuffer' ).setWithCredentials( scope.withCredentials ).load( urls[ i ], function ( buffer ) {
 
 					loaded ++;
-					var texData = scope.hdrLoader.parse( buffer );
+					const texData = scope.hdrLoader.parse( buffer );
 					if ( ! texData ) return;
 
 					if ( texData.data !== undefined ) {
 
-						var dataTexture = new THREE.DataTexture( texData.data, texData.width, texData.height );
+						const dataTexture = new THREE.DataTexture( texData.data, texData.width, texData.height );
 						dataTexture.type = texture.type;
 						dataTexture.encoding = texture.encoding;
 						dataTexture.format = texture.format;
@@ -89,7 +89,7 @@
 
 			}
 
-			for ( var i = 0; i < urls.length; i ++ ) {
+			for ( let i = 0; i < urls.length; i ++ ) {
 
 				loadHDRData( i, onLoad, onProgress, onError );
 
@@ -97,15 +97,17 @@
 
 			return texture;
 
-		},
-		setDataType: function ( value ) {
+		}
+
+		setDataType( value ) {
 
 			this.type = value;
 			this.hdrLoader.setDataType( value );
 			return this;
 
 		}
-	} );
+
+	}
 
 	THREE.HDRCubeTextureLoader = HDRCubeTextureLoader;
 
