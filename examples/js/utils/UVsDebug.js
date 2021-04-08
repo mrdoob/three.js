@@ -8,21 +8,21 @@
  *
  */
 
-	var UVsDebug = function ( geometry, size ) {
+	function UVsDebug( geometry, size = 1024 ) {
 
 		// handles wrapping of uv.x > 1 only
-		var abc = 'abc';
-		var a = new THREE.Vector2();
-		var b = new THREE.Vector2();
-		var uvs = [ new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() ];
-		var face = [];
-		var canvas = document.createElement( 'canvas' );
-		var width = size || 1024; // power of 2 required for wrapping
+		const abc = 'abc';
+		const a = new THREE.Vector2();
+		const b = new THREE.Vector2();
+		const uvs = [ new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() ];
+		const face = [];
+		const canvas = document.createElement( 'canvas' );
+		const width = size; // power of 2 required for wrapping
 
-		var height = size || 1024;
+		const height = size;
 		canvas.width = width;
 		canvas.height = height;
-		var ctx = canvas.getContext( '2d' );
+		const ctx = canvas.getContext( '2d' );
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = 'rgb( 63, 63, 63 )';
 		ctx.textAlign = 'center'; // paint background white
@@ -37,13 +37,13 @@
 
 		} else {
 
-			var index = geometry.index;
-			var uvAttribute = geometry.attributes.uv;
+			const index = geometry.index;
+			const uvAttribute = geometry.attributes.uv;
 
 			if ( index ) {
 
 				// indexed geometry
-				for ( var i = 0, il = index.count; i < il; i += 3 ) {
+				for ( let i = 0, il = index.count; i < il; i += 3 ) {
 
 					face[ 0 ] = index.getX( i );
 					face[ 1 ] = index.getX( i + 1 );
@@ -58,7 +58,7 @@
 			} else {
 
 				// non-indexed geometry
-				for ( var i = 0, il = uvAttribute.count; i < il; i += 3 ) {
+				for ( let i = 0, il = uvAttribute.count; i < il; i += 3 ) {
 
 					face[ 0 ] = i;
 					face[ 1 ] = i + 1;
@@ -82,9 +82,9 @@
 			ctx.beginPath();
 			a.set( 0, 0 );
 
-			for ( var j = 0, jl = uvs.length; j < jl; j ++ ) {
+			for ( let j = 0, jl = uvs.length; j < jl; j ++ ) {
 
-				var uv = uvs[ j ];
+				const uv = uvs[ j ];
 				a.x += uv.x;
 				a.y += uv.y;
 
@@ -120,11 +120,11 @@
 			ctx.font = '12px Arial';
 			ctx.fillStyle = 'rgb( 191, 191, 191 )'; // label uv edge orders
 
-			for ( j = 0, jl = uvs.length; j < jl; j ++ ) {
+			for ( let j = 0, jl = uvs.length; j < jl; j ++ ) {
 
-				var uv = uvs[ j ];
+				const uv = uvs[ j ];
 				b.addVectors( a, uv ).divideScalar( 2 );
-				var vnum = face[ j ];
+				const vnum = face[ j ];
 				ctx.fillText( abc[ j ] + vnum, b.x * width, ( 1 - b.y ) * height );
 
 				if ( b.x > 0.95 ) {
@@ -138,7 +138,7 @@
 
 		}
 
-	};
+	}
 
 	THREE.UVsDebug = UVsDebug;
 
