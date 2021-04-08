@@ -1,17 +1,17 @@
 ( function () {
 
-	var PDBLoader = function ( manager ) {
+	class PDBLoader extends THREE.Loader {
 
-		THREE.Loader.call( this, manager );
+		constructor( manager ) {
 
-	};
+			super( manager );
 
-	PDBLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-		constructor: PDBLoader,
-		load: function ( url, onLoad, onProgress, onError ) {
+		}
 
-			var scope = this;
-			var loader = new THREE.FileLoader( scope.manager );
+		load( url, onLoad, onProgress, onError ) {
+
+			const scope = this;
+			const loader = new THREE.FileLoader( scope.manager );
 			loader.setPath( scope.path );
 			loader.setRequestHeader( scope.requestHeader );
 			loader.setWithCredentials( scope.withCredentials );
@@ -39,9 +39,10 @@
 
 			}, onProgress, onError );
 
-		},
-		// Based on CanvasMol PDB parser
-		parse: function ( text ) {
+		} // Based on CanvasMol PDB parser
+
+
+		parse( text ) {
 
 			function trim( text ) {
 
@@ -61,13 +62,13 @@
 
 			}
 
-			function parseBond( start, length ) {
+			function parseBond( start, length, satom, i ) {
 
-				var eatom = parseInt( lines[ i ].substr( start, length ) );
+				const eatom = parseInt( lines[ i ].substr( start, length ) );
 
 				if ( eatom ) {
 
-					var h = hash( satom, eatom );
+					const h = hash( satom, eatom );
 
 					if ( _bhash[ h ] === undefined ) {
 
@@ -87,46 +88,44 @@
 
 			function buildGeometry() {
 
-				var build = {
+				const build = {
 					geometryAtoms: new THREE.BufferGeometry(),
 					geometryBonds: new THREE.BufferGeometry(),
 					json: {
 						atoms: atoms
 					}
 				};
-				var geometryAtoms = build.geometryAtoms;
-				var geometryBonds = build.geometryBonds;
-				var i, l;
-				var x, y, z;
-				var verticesAtoms = [];
-				var colorsAtoms = [];
-				var verticesBonds = []; // atoms
+				const geometryAtoms = build.geometryAtoms;
+				const geometryBonds = build.geometryBonds;
+				const verticesAtoms = [];
+				const colorsAtoms = [];
+				const verticesBonds = []; // atoms
 
-				for ( i = 0, l = atoms.length; i < l; i ++ ) {
+				for ( let i = 0, l = atoms.length; i < l; i ++ ) {
 
-					var atom = atoms[ i ];
-					x = atom[ 0 ];
-					y = atom[ 1 ];
-					z = atom[ 2 ];
+					const atom = atoms[ i ];
+					const x = atom[ 0 ];
+					const y = atom[ 1 ];
+					const z = atom[ 2 ];
 					verticesAtoms.push( x, y, z );
-					var r = atom[ 3 ][ 0 ] / 255;
-					var g = atom[ 3 ][ 1 ] / 255;
-					var b = atom[ 3 ][ 2 ] / 255;
+					const r = atom[ 3 ][ 0 ] / 255;
+					const g = atom[ 3 ][ 1 ] / 255;
+					const b = atom[ 3 ][ 2 ] / 255;
 					colorsAtoms.push( r, g, b );
 
 				} // bonds
 
 
-				for ( i = 0, l = _bonds.length; i < l; i ++ ) {
+				for ( let i = 0, l = _bonds.length; i < l; i ++ ) {
 
-					var bond = _bonds[ i ];
-					var start = bond[ 0 ];
-					var end = bond[ 1 ];
-					var startAtom = _atomMap[ start ];
-					var endAtom = _atomMap[ end ];
-					x = startAtom[ 0 ];
-					y = startAtom[ 1 ];
-					z = startAtom[ 2 ];
+					const bond = _bonds[ i ];
+					const start = bond[ 0 ];
+					const end = bond[ 1 ];
+					const startAtom = _atomMap[ start ];
+					const endAtom = _atomMap[ end ];
+					let x = startAtom[ 0 ];
+					let y = startAtom[ 1 ];
+					let z = startAtom[ 2 ];
 					verticesBonds.push( x, y, z );
 					x = endAtom[ 0 ];
 					y = endAtom[ 1 ];
@@ -143,7 +142,7 @@
 
 			}
 
-			var CPK = {
+			const CPK = {
 				h: [ 255, 255, 255 ],
 				he: [ 217, 255, 255 ],
 				li: [ 204, 128, 255 ],
@@ -263,23 +262,22 @@
 				uus: [ 235, 0, 38 ],
 				uuo: [ 235, 0, 38 ]
 			};
-			var atoms = [];
-			var _bonds = [];
-			var _bhash = {};
-			var _atomMap = {};
-			var x, y, z, index, e; // parse
+			const atoms = [];
+			const _bonds = [];
+			const _bhash = {};
+			const _atomMap = {}; // parse
 
-			var lines = text.split( '\n' );
+			const lines = text.split( '\n' );
 
-			for ( var i = 0, l = lines.length; i < l; i ++ ) {
+			for ( let i = 0, l = lines.length; i < l; i ++ ) {
 
 				if ( lines[ i ].substr( 0, 4 ) === 'ATOM' || lines[ i ].substr( 0, 6 ) === 'HETATM' ) {
 
-					x = parseFloat( lines[ i ].substr( 30, 7 ) );
-					y = parseFloat( lines[ i ].substr( 38, 7 ) );
-					z = parseFloat( lines[ i ].substr( 46, 7 ) );
-					index = parseInt( lines[ i ].substr( 6, 5 ) ) - 1;
-					e = trim( lines[ i ].substr( 76, 2 ) ).toLowerCase();
+					const x = parseFloat( lines[ i ].substr( 30, 7 ) );
+					const y = parseFloat( lines[ i ].substr( 38, 7 ) );
+					const z = parseFloat( lines[ i ].substr( 46, 7 ) );
+					const index = parseInt( lines[ i ].substr( 6, 5 ) ) - 1;
+					let e = trim( lines[ i ].substr( 76, 2 ) ).toLowerCase();
 
 					if ( e === '' ) {
 
@@ -287,17 +285,17 @@
 
 					}
 
-					var atomData = [ x, y, z, CPK[ e ], capitalize( e ) ];
+					const atomData = [ x, y, z, CPK[ e ], capitalize( e ) ];
 					atoms.push( atomData );
 					_atomMap[ index ] = atomData;
 
 				} else if ( lines[ i ].substr( 0, 6 ) === 'CONECT' ) {
 
-					var satom = parseInt( lines[ i ].substr( 6, 5 ) );
-					parseBond( 11, 5 );
-					parseBond( 16, 5 );
-					parseBond( 21, 5 );
-					parseBond( 26, 5 );
+					const satom = parseInt( lines[ i ].substr( 6, 5 ) );
+					parseBond( 11, 5, satom, i );
+					parseBond( 16, 5, satom, i );
+					parseBond( 21, 5, satom, i );
+					parseBond( 26, 5, satom, i );
 
 				}
 
@@ -307,7 +305,8 @@
 			return buildGeometry();
 
 		}
-	} );
+
+	}
 
 	THREE.PDBLoader = PDBLoader;
 

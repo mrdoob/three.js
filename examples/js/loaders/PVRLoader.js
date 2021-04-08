@@ -6,19 +6,19 @@
  *	 TODO : implement loadMipmaps option
  */
 
-	var PVRLoader = function ( manager ) {
+	class PVRLoader extends THREE.CompressedTextureLoader {
 
-		THREE.CompressedTextureLoader.call( this, manager );
+		constructor( manager ) {
 
-	};
+			super( manager );
 
-	PVRLoader.prototype = Object.assign( Object.create( THREE.CompressedTextureLoader.prototype ), {
-		constructor: PVRLoader,
-		parse: function ( buffer, loadMipmaps ) {
+		}
 
-			var headerLengthInt = 13;
-			var header = new Uint32Array( buffer, 0, headerLengthInt );
-			var pvrDatas = {
+		parse( buffer, loadMipmaps ) {
+
+			const headerLengthInt = 13;
+			const header = new Uint32Array( buffer, 0, headerLengthInt );
+			const pvrDatas = {
 				buffer: buffer,
 				header: header,
 				loadMipmaps: loadMipmaps
@@ -27,12 +27,12 @@
 			if ( header[ 0 ] === 0x03525650 ) {
 
 				// PVR v3
-				return PVRLoader._parseV3( pvrDatas );
+				return _parseV3( pvrDatas );
 
 			} else if ( header[ 11 ] === 0x21525650 ) {
 
 				// PVR v2
-				return PVRLoader._parseV2( pvrDatas );
+				return _parseV2( pvrDatas );
 
 			} else {
 
@@ -41,13 +41,14 @@
 			}
 
 		}
-	} );
 
-	PVRLoader._parseV3 = function ( pvrDatas ) {
+	}
 
-		var header = pvrDatas.header;
-		var bpp, format;
-		var metaLen = header[ 12 ],
+	function _parseV3( pvrDatas ) {
+
+		const header = pvrDatas.header;
+		let bpp, format;
+		const metaLen = header[ 12 ],
 			pixelFormat = header[ 2 ],
 			height = header[ 6 ],
 			width = header[ 7 ],
@@ -94,14 +95,14 @@
 		pvrDatas.numSurfaces = numFaces;
 		pvrDatas.numMipmaps = numMipmaps;
 		pvrDatas.isCubemap = numFaces === 6;
-		return PVRLoader._extract( pvrDatas );
+		return _extract( pvrDatas );
 
-	};
+	}
 
-	PVRLoader._parseV2 = function ( pvrDatas ) {
+	function _parseV2( pvrDatas ) {
 
-		var header = pvrDatas.header;
-		var headerLength = header[ 0 ],
+		const header = pvrDatas.header;
+		const headerLength = header[ 0 ],
 			height = header[ 1 ],
 			width = header[ 2 ],
 			numMipmaps = header[ 3 ],
@@ -114,13 +115,13 @@
 			bitmaskAlpha = header[ 10 ],
 			// pvrTag = header[ 11 ],
 			numSurfs = header[ 12 ];
-		var TYPE_MASK = 0xff;
-		var PVRTC_2 = 24,
+		const TYPE_MASK = 0xff;
+		const PVRTC_2 = 24,
 			PVRTC_4 = 25;
-		var formatFlags = flags & TYPE_MASK;
-		var bpp, format;
+		const formatFlags = flags & TYPE_MASK;
+		let bpp, format;
 
-		var _hasAlpha = bitmaskAlpha > 0;
+		const _hasAlpha = bitmaskAlpha > 0;
 
 		if ( formatFlags === PVRTC_4 ) {
 
@@ -148,13 +149,13 @@
 		// it juste a pvr containing 6 surface (no explicit cubemap type)
 
 		pvrDatas.isCubemap = numSurfs === 6;
-		return PVRLoader._extract( pvrDatas );
+		return _extract( pvrDatas );
 
-	};
+	}
 
-	PVRLoader._extract = function ( pvrDatas ) {
+	function _extract( pvrDatas ) {
 
-		var pvr = {
+		const pvr = {
 			mipmaps: [],
 			width: pvrDatas.width,
 			height: pvrDatas.height,
@@ -162,16 +163,16 @@
 			mipmapCount: pvrDatas.numMipmaps,
 			isCubemap: pvrDatas.isCubemap
 		};
-		var buffer = pvrDatas.buffer;
-		var dataOffset = pvrDatas.dataPtr,
-			bpp = pvrDatas.bpp,
-			numSurfs = pvrDatas.numSurfaces,
+		const buffer = pvrDatas.buffer;
+		let dataOffset = pvrDatas.dataPtr,
 			dataSize = 0,
 			blockSize = 0,
 			blockWidth = 0,
 			blockHeight = 0,
 			widthBlocks = 0,
 			heightBlocks = 0;
+		const bpp = pvrDatas.bpp,
+			numSurfs = pvrDatas.numSurfaces;
 
 		if ( bpp === 2 ) {
 
@@ -187,11 +188,11 @@
 
 		blockSize = blockWidth * blockHeight * bpp / 8;
 		pvr.mipmaps.length = pvrDatas.numMipmaps * numSurfs;
-		var mipLevel = 0;
+		let mipLevel = 0;
 
 		while ( mipLevel < pvrDatas.numMipmaps ) {
 
-			var sWidth = pvrDatas.width >> mipLevel,
+			const sWidth = pvrDatas.width >> mipLevel,
 				sHeight = pvrDatas.height >> mipLevel;
 			widthBlocks = sWidth / blockWidth;
 			heightBlocks = sHeight / blockHeight; // Clamp to minimum number of blocks
@@ -200,10 +201,10 @@
 			if ( heightBlocks < 2 ) heightBlocks = 2;
 			dataSize = widthBlocks * heightBlocks * blockSize;
 
-			for ( var surfIndex = 0; surfIndex < numSurfs; surfIndex ++ ) {
+			for ( let surfIndex = 0; surfIndex < numSurfs; surfIndex ++ ) {
 
-				var byteArray = new Uint8Array( buffer, dataOffset, dataSize );
-				var mipmap = {
+				const byteArray = new Uint8Array( buffer, dataOffset, dataSize );
+				const mipmap = {
 					data: byteArray,
 					width: sWidth,
 					height: sHeight
@@ -219,7 +220,7 @@
 
 		return pvr;
 
-	};
+	}
 
 	THREE.PVRLoader = PVRLoader;
 

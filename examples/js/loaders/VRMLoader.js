@@ -4,9 +4,9 @@
 	// VRM is based on glTF 2.0 and VRM extension is defined
 	// in top-level json.extensions.VRM
 
-	var VRMLoader = function () {
+	class VRMLoader extends THREE.Loader {
 
-		function VRMLoader( manager ) {
+		constructor( manager ) {
 
 			if ( THREE.GLTFLoader === undefined ) {
 
@@ -14,60 +14,58 @@
 
 			}
 
-			THREE.Loader.call( this, manager );
-			this.gltfLoader = new THREE.GLTFLoader( this.manager );
+			super( manager );
+			this.gltfLoader = new THREE.GLTFLoader( manager );
 
 		}
 
-		VRMLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-			constructor: VRMLoader,
-			load: function ( url, onLoad, onProgress, onError ) {
+		load( url, onLoad, onProgress, onError ) {
 
-				var scope = this;
-				this.gltfLoader.load( url, function ( gltf ) {
+			const scope = this;
+			this.gltfLoader.load( url, function ( gltf ) {
 
-					try {
+				try {
 
-						scope.parse( gltf, onLoad );
+					scope.parse( gltf, onLoad );
 
-					} catch ( e ) {
+				} catch ( e ) {
 
-						if ( onError ) {
+					if ( onError ) {
 
-							onError( e );
+						onError( e );
 
-						} else {
+					} else {
 
-							console.error( e );
-
-						}
-
-						scope.manager.itemError( url );
+						console.error( e );
 
 					}
 
-				}, onProgress, onError );
+					scope.manager.itemError( url );
 
-			},
-			setDRACOLoader: function ( dracoLoader ) {
+				}
 
-				this.gltfLoader.setDRACOLoader( dracoLoader );
-				return this;
+			}, onProgress, onError );
 
-			},
-			parse: function ( gltf, onLoad ) {
+		}
 
-				// var gltfParser = gltf.parser;
-				// var gltfExtensions = gltf.userData.gltfExtensions || {};
-				// var vrmExtension = gltfExtensions.VRM || {};
-				// handle VRM Extension here
-				onLoad( gltf );
+		setDRACOLoader( dracoLoader ) {
 
-			}
-		} );
-		return VRMLoader;
+			this.gltfLoader.setDRACOLoader( dracoLoader );
+			return this;
 
-	}();
+		}
+
+		parse( gltf, onLoad ) {
+
+			// const gltfParser = gltf.parser;
+			// const gltfExtensions = gltf.userData.gltfExtensions || {};
+			// const vrmExtension = gltfExtensions.VRM || {};
+			// handle VRM Extension here
+			onLoad( gltf );
+
+		}
+
+	}
 
 	THREE.VRMLoader = VRMLoader;
 

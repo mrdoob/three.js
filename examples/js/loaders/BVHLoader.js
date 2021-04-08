@@ -7,20 +7,20 @@
  *
  */
 
-	var BVHLoader = function ( manager ) {
+	class BVHLoader extends THREE.Loader {
 
-		THREE.Loader.call( this, manager );
-		this.animateBonePositions = true;
-		this.animateBoneRotations = true;
+		constructor( manager ) {
 
-	};
+			super( manager );
+			this.animateBonePositions = true;
+			this.animateBoneRotations = true;
 
-	BVHLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-		constructor: BVHLoader,
-		load: function ( url, onLoad, onProgress, onError ) {
+		}
 
-			var scope = this;
-			var loader = new THREE.FileLoader( scope.manager );
+		load( url, onLoad, onProgress, onError ) {
+
+			const scope = this;
+			const loader = new THREE.FileLoader( scope.manager );
 			loader.setPath( scope.path );
 			loader.setRequestHeader( scope.requestHeader );
 			loader.setWithCredentials( scope.withCredentials );
@@ -48,8 +48,9 @@
 
 			}, onProgress, onError );
 
-		},
-		parse: function ( text ) {
+		}
+
+		parse( text ) {
 
 			/*
 			reads a string array (lines) from a BVH file
@@ -66,9 +67,9 @@
 
 				}
 
-				var list = []; // collects flat array of all bones
+				const list = []; // collects flat array of all bones
 
-				var root = readNode( lines, nextLine( lines ), list ); // read motion data
+				const root = readNode( lines, nextLine( lines ), list ); // read motion data
 
 				if ( nextLine( lines ) !== 'MOTION' ) {
 
@@ -77,8 +78,8 @@
 				} // number of frames
 
 
-				var tokens = nextLine( lines ).split( /[\s]+/ );
-				var numFrames = parseInt( tokens[ 1 ] );
+				let tokens = nextLine( lines ).split( /[\s]+/ );
+				const numFrames = parseInt( tokens[ 1 ] );
 
 				if ( isNaN( numFrames ) ) {
 
@@ -88,7 +89,7 @@
 
 
 				tokens = nextLine( lines ).split( /[\s]+/ );
-				var frameTime = parseFloat( tokens[ 2 ] );
+				const frameTime = parseFloat( tokens[ 2 ] );
 
 				if ( isNaN( frameTime ) ) {
 
@@ -97,7 +98,7 @@
 				} // read frame data line by line
 
 
-				for ( var i = 0; i < numFrames; i ++ ) {
+				for ( let i = 0; i < numFrames; i ++ ) {
 
 					tokens = nextLine( lines ).split( /[\s]+/ );
 					readFrameData( tokens, i * frameTime, root );
@@ -123,18 +124,18 @@
 				// end sites have no motion data
 				if ( bone.type === 'ENDSITE' ) return; // add keyframe
 
-				var keyframe = {
+				const keyframe = {
 					time: frameTime,
 					position: new THREE.Vector3(),
 					rotation: new THREE.Quaternion()
 				};
 				bone.frames.push( keyframe );
-				var quat = new THREE.Quaternion();
-				var vx = new THREE.Vector3( 1, 0, 0 );
-				var vy = new THREE.Vector3( 0, 1, 0 );
-				var vz = new THREE.Vector3( 0, 0, 1 ); // parse values for each channel in node
+				const quat = new THREE.Quaternion();
+				const vx = new THREE.Vector3( 1, 0, 0 );
+				const vy = new THREE.Vector3( 0, 1, 0 );
+				const vz = new THREE.Vector3( 0, 0, 1 ); // parse values for each channel in node
 
-				for ( var i = 0; i < bone.channels.length; i ++ ) {
+				for ( let i = 0; i < bone.channels.length; i ++ ) {
 
 					switch ( bone.channels[ i ] ) {
 
@@ -173,7 +174,7 @@
 				} // parse child nodes
 
 
-				for ( var i = 0; i < bone.children.length; i ++ ) {
+				for ( let i = 0; i < bone.children.length; i ++ ) {
 
 					readFrameData( data, frameTime, bone.children[ i ] );
 
@@ -191,14 +192,14 @@
 
 			function readNode( lines, firstline, list ) {
 
-				var node = {
+				const node = {
 					name: '',
 					type: '',
 					frames: []
 				};
 				list.push( node ); // parse node type and name
 
-				var tokens = firstline.split( /[\s]+/ );
+				let tokens = firstline.split( /[\s]+/ );
 
 				if ( tokens[ 0 ].toUpperCase() === 'END' && tokens[ 1 ].toUpperCase() === 'SITE' ) {
 
@@ -233,7 +234,7 @@
 
 				}
 
-				var offset = new THREE.Vector3( parseFloat( tokens[ 1 ] ), parseFloat( tokens[ 2 ] ), parseFloat( tokens[ 3 ] ) );
+				const offset = new THREE.Vector3( parseFloat( tokens[ 1 ] ), parseFloat( tokens[ 2 ] ), parseFloat( tokens[ 3 ] ) );
 
 				if ( isNaN( offset.x ) || isNaN( offset.y ) || isNaN( offset.z ) ) {
 
@@ -253,7 +254,7 @@
 
 					}
 
-					var numChannels = parseInt( tokens[ 1 ] );
+					const numChannels = parseInt( tokens[ 1 ] );
 					node.channels = tokens.splice( 2, numChannels );
 					node.children = [];
 
@@ -262,7 +263,7 @@
 
 				while ( true ) {
 
-					var line = nextLine( lines );
+					const line = nextLine( lines );
 
 					if ( line === '}' ) {
 
@@ -287,14 +288,14 @@
 
 			function toTHREEBone( source, list ) {
 
-				var bone = new THREE.Bone();
+				const bone = new THREE.Bone();
 				list.push( bone );
 				bone.position.add( source.offset );
 				bone.name = source.name;
 
 				if ( source.type !== 'ENDSITE' ) {
 
-					for ( var i = 0; i < source.children.length; i ++ ) {
+					for ( let i = 0; i < source.children.length; i ++ ) {
 
 						bone.add( toTHREEBone( source.children[ i ], list ) );
 
@@ -314,20 +315,20 @@
 
 			function toTHREEAnimation( bones ) {
 
-				var tracks = []; // create a position and quaternion animation track for each node
+				const tracks = []; // create a position and quaternion animation track for each node
 
-				for ( var i = 0; i < bones.length; i ++ ) {
+				for ( let i = 0; i < bones.length; i ++ ) {
 
-					var bone = bones[ i ];
+					const bone = bones[ i ];
 					if ( bone.type === 'ENDSITE' ) continue; // track data
 
-					var times = [];
-					var positions = [];
-					var rotations = [];
+					const times = [];
+					const positions = [];
+					const rotations = [];
 
-					for ( var j = 0; j < bone.frames.length; j ++ ) {
+					for ( let j = 0; j < bone.frames.length; j ++ ) {
 
-						var frame = bone.frames[ j ];
+						const frame = bone.frames[ j ];
 						times.push( frame.time ); // the animation system animates the position property,
 						// so we have to add the joint offset to all values
 
@@ -365,7 +366,7 @@
 
 			function nextLine( lines ) {
 
-				var line; // skip empty lines
+				let line; // skip empty lines
 
 				while ( ( line = lines.shift().trim() ).length === 0 ) {}
 
@@ -373,19 +374,20 @@
 
 			}
 
-			var scope = this;
-			var lines = text.split( /[\r\n]+/g );
-			var bones = readBvh( lines );
-			var threeBones = [];
+			const scope = this;
+			const lines = text.split( /[\r\n]+/g );
+			const bones = readBvh( lines );
+			const threeBones = [];
 			toTHREEBone( bones[ 0 ], threeBones );
-			var threeClip = toTHREEAnimation( bones );
+			const threeClip = toTHREEAnimation( bones );
 			return {
 				skeleton: new THREE.Skeleton( threeBones ),
 				clip: threeClip
 			};
 
 		}
-	} );
+
+	}
 
 	THREE.BVHLoader = BVHLoader;
 
