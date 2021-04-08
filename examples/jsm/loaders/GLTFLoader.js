@@ -2123,6 +2123,8 @@ var GLTFLoader = ( function () {
 
 		}
 
+		return null;
+
 	};
 
 	GLTFParser.prototype._invokeAll = function ( func ) {
@@ -3644,6 +3646,41 @@ var GLTFLoader = ( function () {
 
 	};
 
+	GLTFParser.prototype.createNodeMesh = function ( nodeIndex ) {
+
+		var json = this.json;
+		var parser = this;
+		var nodeDef = json.nodes[ nodeIndex ];
+
+		if ( nodeDef.mesh === undefined ) return null;
+
+		return parser.getDependency( 'mesh', nodeDef.mesh ).then( function ( mesh ) {
+
+			var node = parser._getNodeRef( parser.meshCache, nodeDef.mesh, mesh );
+
+			// if weights are provided on the node, override weights on the mesh.
+			if ( nodeDef.weights !== undefined ) {
+
+				node.traverse( function ( o ) {
+
+					if ( ! o.isMesh ) return;
+
+					for ( var i = 0, il = nodeDef.weights.length; i < il; i ++ ) {
+
+						o.morphTargetInfluences[ i ] = nodeDef.weights[ i ];
+
+					}
+
+				} );
+
+			}
+
+			return node;
+
+		} );
+
+	};
+
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#nodes-and-hierarchy
 	 * @param {number} nodeIndex
@@ -3664,32 +3701,15 @@ var GLTFLoader = ( function () {
 
 			var pending = [];
 
-			if ( nodeDef.mesh !== undefined ) {
+			var meshPromise = parser._invokeOne( function ( ext ) {
 
-				pending.push( parser.getDependency( 'mesh', nodeDef.mesh ).then( function ( mesh ) {
+				return ext.createNodeMesh && ext.createNodeMesh( nodeIndex );
 
-					var node = parser._getNodeRef( parser.meshCache, nodeDef.mesh, mesh );
+			} );
 
-					// if weights are provided on the node, override weights on the mesh.
-					if ( nodeDef.weights !== undefined ) {
+			if ( meshPromise ) {
 
-						node.traverse( function ( o ) {
-
-							if ( ! o.isMesh ) return;
-
-							for ( var i = 0, il = nodeDef.weights.length; i < il; i ++ ) {
-
-								o.morphTargetInfluences[ i ] = nodeDef.weights[ i ];
-
-							}
-
-						} );
-
-					}
-
-					return node;
-
-				} ) );
+				pending.push( meshPromise );
 
 			}
 
