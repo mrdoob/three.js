@@ -2,19 +2,19 @@
 
 	// http://en.wikipedia.org/wiki/RGBE_image_format
 
-	var RGBELoader = function ( manager ) {
+	class RGBELoader extends THREE.DataTextureLoader {
 
-		THREE.DataTextureLoader.call( this, manager );
-		this.type = THREE.UnsignedByteType;
+		constructor( manager ) {
 
-	};
+			super( manager );
+			this.type = THREE.UnsignedByteType;
 
-	RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoader.prototype ), {
-		constructor: RGBELoader,
-		// adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
-		parse: function ( buffer ) {
+		} // adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
 
-			var
+
+		parse( buffer ) {
+
+			const
 				/* return codes for rgbe routines */
 				//RGBE_RETURN_SUCCESS = 0,
 				RGBE_RETURN_FAILURE = - 1,
@@ -65,12 +65,12 @@
 				NEWLINE = '\n',
 				fgets = function ( buffer, lineLimit, consume ) {
 
+					const chunkSize = 128;
 					lineLimit = ! lineLimit ? 1024 : lineLimit;
-					var p = buffer.pos,
+					let p = buffer.pos,
 						i = - 1,
 						len = 0,
 						s = '',
-						chunkSize = 128,
 						chunk = String.fromCharCode.apply( null, new Uint16Array( buffer.subarray( p, p + chunkSize ) ) );
 
 					while ( 0 > ( i = chunk.indexOf( NEWLINE ) ) && len < lineLimit && p < buffer.byteLength ) {
@@ -102,10 +102,8 @@
 				/* minimal header reading.	modify if you want to parse more information */
 				RGBE_ReadHeader = function ( buffer ) {
 
-					var line,
-						match,
-						// regexes to parse header info fields
-						magic_token_re = /^#\?(\S+)/,
+					// regexes to parse header info fields
+					const magic_token_re = /^#\?(\S+)/,
 						gamma_re = /^\s*GAMMA\s*=\s*(\d+(\.\d+)?)\s*$/,
 						exposure_re = /^\s*EXPOSURE\s*=\s*(\d+(\.\d+)?)\s*$/,
 						format_re = /^\s*FORMAT=(\S+)\s*$/,
@@ -138,6 +136,7 @@
 							/* image dimensions, width/height */
 
 						};
+					let line, match;
 
 					if ( buffer.pos >= buffer.byteLength || ! ( line = fgets( buffer ) ) ) {
 
@@ -218,21 +217,7 @@
 				},
 				RGBE_ReadPixels_RLE = function ( buffer, w, h ) {
 
-					var data_rgba,
-						offset,
-						pos,
-						count,
-						byteValue,
-						scanline_buffer,
-						ptr,
-						ptr_end,
-						i,
-						l,
-						off,
-						isEncodedRun,
-						scanline_width = w,
-						num_scanlines = h,
-						rgbeStart;
+					const scanline_width = w;
 
 					if ( // run length encoding is not allowed so read flat
 						scanline_width < 8 || scanline_width > 0x7fff || // this file is not run length encoded
@@ -249,7 +234,7 @@
 
 					}
 
-					data_rgba = new Uint8Array( 4 * w * h );
+					const data_rgba = new Uint8Array( 4 * w * h );
 
 					if ( ! data_rgba.length ) {
 
@@ -257,11 +242,12 @@
 
 					}
 
-					offset = 0;
-					pos = 0;
-					ptr_end = 4 * scanline_width;
-					rgbeStart = new Uint8Array( 4 );
-					scanline_buffer = new Uint8Array( ptr_end ); // read in each successive scanline
+					let offset = 0,
+						pos = 0;
+					const ptr_end = 4 * scanline_width;
+					const rgbeStart = new Uint8Array( 4 );
+					const scanline_buffer = new Uint8Array( ptr_end );
+					let num_scanlines = h; // read in each successive scanline
 
 					while ( num_scanlines > 0 && pos < buffer.byteLength ) {
 
@@ -284,12 +270,13 @@
 						// first red, then green, then blue, then exponent
 
 
-						ptr = 0;
+						let ptr = 0,
+							count;
 
 						while ( ptr < ptr_end && pos < buffer.byteLength ) {
 
 							count = buffer[ pos ++ ];
-							isEncodedRun = count > 128;
+							const isEncodedRun = count > 128;
 							if ( isEncodedRun ) count -= 128;
 
 							if ( 0 === count || ptr + count > ptr_end ) {
@@ -301,9 +288,9 @@
 							if ( isEncodedRun ) {
 
 								// a (encoded) run of the same value
-								byteValue = buffer[ pos ++ ];
+								const byteValue = buffer[ pos ++ ];
 
-								for ( i = 0; i < count; i ++ ) {
+								for ( let i = 0; i < count; i ++ ) {
 
 									scanline_buffer[ ptr ++ ] = byteValue;
 
@@ -322,11 +309,11 @@
 						// first red, then green, then blue, then exponent (alpha)
 
 
-						l = scanline_width; //scanline_buffer.byteLength;
+						const l = scanline_width; //scanline_buffer.byteLength;
 
-						for ( i = 0; i < l; i ++ ) {
+						for ( let i = 0; i < l; i ++ ) {
 
-							off = 0;
+							let off = 0;
 							data_rgba[ offset ] = scanline_buffer[ i + off ];
 							off += scanline_width; //1;
 
@@ -349,75 +336,78 @@
 
 				};
 
-			var RGBEByteToRGBFloat = function ( sourceArray, sourceOffset, destArray, destOffset ) {
+			const RGBEByteToRGBFloat = function ( sourceArray, sourceOffset, destArray, destOffset ) {
 
-				var e = sourceArray[ sourceOffset + 3 ];
-				var scale = Math.pow( 2.0, e - 128.0 ) / 255.0;
+				const e = sourceArray[ sourceOffset + 3 ];
+				const scale = Math.pow( 2.0, e - 128.0 ) / 255.0;
 				destArray[ destOffset + 0 ] = sourceArray[ sourceOffset + 0 ] * scale;
 				destArray[ destOffset + 1 ] = sourceArray[ sourceOffset + 1 ] * scale;
 				destArray[ destOffset + 2 ] = sourceArray[ sourceOffset + 2 ] * scale;
 
 			};
 
-			var RGBEByteToRGBHalf = function ( sourceArray, sourceOffset, destArray, destOffset ) {
+			const RGBEByteToRGBHalf = function ( sourceArray, sourceOffset, destArray, destOffset ) {
 
-				var e = sourceArray[ sourceOffset + 3 ];
-				var scale = Math.pow( 2.0, e - 128.0 ) / 255.0;
+				const e = sourceArray[ sourceOffset + 3 ];
+				const scale = Math.pow( 2.0, e - 128.0 ) / 255.0;
 				destArray[ destOffset + 0 ] = THREE.DataUtils.toHalfFloat( sourceArray[ sourceOffset + 0 ] * scale );
 				destArray[ destOffset + 1 ] = THREE.DataUtils.toHalfFloat( sourceArray[ sourceOffset + 1 ] * scale );
 				destArray[ destOffset + 2 ] = THREE.DataUtils.toHalfFloat( sourceArray[ sourceOffset + 2 ] * scale );
 
 			};
 
-			var byteArray = new Uint8Array( buffer );
+			const byteArray = new Uint8Array( buffer );
 			byteArray.pos = 0;
-			var rgbe_header_info = RGBE_ReadHeader( byteArray );
+			const rgbe_header_info = RGBE_ReadHeader( byteArray );
 
 			if ( RGBE_RETURN_FAILURE !== rgbe_header_info ) {
 
-				var w = rgbe_header_info.width,
+				const w = rgbe_header_info.width,
 					h = rgbe_header_info.height,
 					image_rgba_data = RGBE_ReadPixels_RLE( byteArray.subarray( byteArray.pos ), w, h );
 
 				if ( RGBE_RETURN_FAILURE !== image_rgba_data ) {
 
+					let data, format, type;
+					let numElements;
+
 					switch ( this.type ) {
 
 						case THREE.UnsignedByteType:
-							var data = image_rgba_data;
-							var format = THREE.RGBEFormat; // handled as THREE.RGBAFormat in shaders
+							data = image_rgba_data;
+							format = THREE.RGBEFormat; // handled as THREE.RGBAFormat in shaders
 
-							var type = THREE.UnsignedByteType;
+							type = THREE.UnsignedByteType;
 							break;
 
 						case THREE.FloatType:
-							var numElements = image_rgba_data.length / 4 * 3;
-							var floatArray = new Float32Array( numElements );
+							numElements = image_rgba_data.length / 4 * 3;
+							const floatArray = new Float32Array( numElements );
 
-							for ( var j = 0; j < numElements; j ++ ) {
+							for ( let j = 0; j < numElements; j ++ ) {
 
 								RGBEByteToRGBFloat( image_rgba_data, j * 4, floatArray, j * 3 );
 
 							}
 
-							var data = floatArray;
-							var format = THREE.RGBFormat;
-							var type = THREE.FloatType;
+							data = floatArray;
+							format = THREE.RGBFormat;
+							type = THREE.FloatType;
 							break;
 
 						case THREE.HalfFloatType:
-							var numElements = image_rgba_data.length / 4 * 3;
-							var halfArray = new Uint16Array( numElements );
+							numElements = image_rgba_data.length / 4 * 3;
+							const halfArray = new Uint16Array( numElements );
 
-							for ( var j = 0; j < numElements; j ++ ) {
+							for ( let j = 0; j < numElements; j ++ ) {
 
 								RGBEByteToRGBHalf( image_rgba_data, j * 4, halfArray, j * 3 );
 
 							}
 
-							var data = halfArray;
-							var format = THREE.RGBFormat;
-							var type = THREE.HalfFloatType;
+							data = halfArray;
+							format = THREE.RGBFormat;
+							type = THREE.HalfFloatType;
 							break;
 
 						default:
@@ -443,14 +433,16 @@
 
 			return null;
 
-		},
-		setDataType: function ( value ) {
+		}
+
+		setDataType( value ) {
 
 			this.type = value;
 			return this;
 
-		},
-		load: function ( url, onLoad, onProgress, onError ) {
+		}
+
+		load( url, onLoad, onProgress, onError ) {
 
 			function onLoadCallback( texture, texData ) {
 
@@ -486,10 +478,11 @@
 
 			}
 
-			return THREE.DataTextureLoader.prototype.load.call( this, url, onLoadCallback, onProgress, onError );
+			return super.load( url, onLoadCallback, onProgress, onError );
 
 		}
-	} );
+
+	}
 
 	THREE.RGBELoader = RGBELoader;
 
