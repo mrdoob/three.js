@@ -9,19 +9,19 @@
  * @param {Manager} manager Loading manager.
  */
 
-	var GCodeLoader = function ( manager ) {
+	class GCodeLoader extends THREE.Loader {
 
-		THREE.Loader.call( this, manager );
-		this.splitLayer = false;
+		constructor( manager ) {
 
-	};
+			super( manager );
+			this.splitLayer = false;
 
-	GCodeLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-		constructor: GCodeLoader,
-		load: function ( url, onLoad, onProgress, onError ) {
+		}
 
-			var scope = this;
-			var loader = new THREE.FileLoader( scope.manager );
+		load( url, onLoad, onProgress, onError ) {
+
+			const scope = this;
+			const loader = new THREE.FileLoader( scope.manager );
 			loader.setPath( scope.path );
 			loader.setRequestHeader( scope.requestHeader );
 			loader.setWithCredentials( scope.withCredentials );
@@ -49,8 +49,9 @@
 
 			}, onProgress, onError );
 
-		},
-		parse: function ( data ) {
+		}
+
+		parse( data ) {
 
 			var state = {
 				x: 0,
@@ -248,7 +249,8 @@
 			return object;
 
 		}
-	} );
+
+	}
 
 	THREE.GCodeLoader = GCodeLoader;
 

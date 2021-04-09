@@ -1,17 +1,17 @@
 ( function () {
 
-	var VTKLoader = function ( manager ) {
+	class VTKLoader extends THREE.Loader {
 
-		THREE.Loader.call( this, manager );
+		constructor( manager ) {
 
-	};
+			super( manager );
 
-	VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-		constructor: VTKLoader,
-		load: function ( url, onLoad, onProgress, onError ) {
+		}
 
-			var scope = this;
-			var loader = new THREE.FileLoader( scope.manager );
+		load( url, onLoad, onProgress, onError ) {
+
+			const scope = this;
+			const loader = new THREE.FileLoader( scope.manager );
 			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
 			loader.setRequestHeader( scope.requestHeader );
@@ -40,8 +40,9 @@
 
 			}, onProgress, onError );
 
-		},
-		parse: function ( data ) {
+		}
+
+		parse( data ) {
 
 			function parseASCII( data ) {
 
@@ -511,7 +512,7 @@
 
 			function Float32Concat( first, second ) {
 
-				var firstLength = first.length,
+				const firstLength = first.length,
 					result = new Float32Array( firstLength + second.length );
 				result.set( first );
 				result.set( second, firstLength );
@@ -1121,7 +1122,8 @@
 			}
 
 		}
-	} );
+
+	}
 
 	THREE.VTKLoader = VTKLoader;
 
