@@ -1,288 +1,288 @@
 ( function () {
 
-	var SSRPass = function ( {
-		renderer,
-		scene,
-		camera,
-		width,
-		height,
-		selects,
-		encoding,
-		bouncing = false,
-		morphTargets = false,
-		groundReflector
-	} ) {
+	class SSRPass extends THREE.Pass {
 
-		THREE.Pass.call( this );
-		this.width = width !== undefined ? width : 512;
-		this.height = height !== undefined ? height : 512;
-		this.clear = true;
-		this.renderer = renderer;
-		this.scene = scene;
-		this.camera = camera;
-		this.groundReflector = groundReflector;
-		this.opacity = THREE.SSRShader.uniforms.opacity.value;
-		this.output = 0;
-		this.maxDistance = THREE.SSRShader.uniforms.maxDistance.value;
-		this.surfDist = THREE.SSRShader.uniforms.surfDist.value;
-		this.encoding = encoding;
-		this.tempColor = new THREE.Color();
-		this._selects = selects;
-		this.selective = Array.isArray( this._selects );
-		Object.defineProperty( this, 'selects', {
-			get() {
+		constructor( {
+			renderer,
+			scene,
+			camera,
+			width,
+			height,
+			selects,
+			encoding,
+			bouncing = false,
+			morphTargets = false,
+			groundReflector
+		} ) {
 
-				return this._selects;
+			super();
+			this.width = width !== undefined ? width : 512;
+			this.height = height !== undefined ? height : 512;
+			this.clear = true;
+			this.renderer = renderer;
+			this.scene = scene;
+			this.camera = camera;
+			this.groundReflector = groundReflector;
+			this.opacity = THREE.SSRShader.uniforms.opacity.value;
+			this.output = 0;
+			this.maxDistance = THREE.SSRShader.uniforms.maxDistance.value;
+			this.surfDist = THREE.SSRShader.uniforms.surfDist.value;
+			this.encoding = encoding;
+			this.tempColor = new THREE.Color();
+			this._selects = selects;
+			this.selective = Array.isArray( this._selects );
+			Object.defineProperty( this, 'selects', {
+				get() {
 
-			},
+					return this._selects;
 
-			set( val ) {
+				},
 
-				if ( this._selects === val ) return;
-				this._selects = val;
+				set( val ) {
 
-				if ( Array.isArray( val ) ) {
+					if ( this._selects === val ) return;
+					this._selects = val;
 
-					this.selective = true;
-					this.ssrMaterial.defines.SELECTIVE = true;
-					this.ssrMaterial.needsUpdate = true;
+					if ( Array.isArray( val ) ) {
 
-				} else {
+						this.selective = true;
+						this.ssrMaterial.defines.SELECTIVE = true;
+						this.ssrMaterial.needsUpdate = true;
 
-					this.selective = false;
-					this.ssrMaterial.defines.SELECTIVE = false;
+					} else {
+
+						this.selective = false;
+						this.ssrMaterial.defines.SELECTIVE = false;
+						this.ssrMaterial.needsUpdate = true;
+
+					}
+
+				}
+
+			} );
+			this._bouncing = bouncing;
+			Object.defineProperty( this, 'bouncing', {
+				get() {
+
+					return this._bouncing;
+
+				},
+
+				set( val ) {
+
+					if ( this._bouncing === val ) return;
+					this._bouncing = val;
+
+					if ( val ) {
+
+						this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.prevRenderTarget.texture;
+
+					} else {
+
+						this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+
+					}
+
+				}
+
+			} );
+			this.blur = true;
+			this._distanceAttenuation = THREE.SSRShader.defines.DISTANCE_ATTENUATION;
+			Object.defineProperty( this, 'distanceAttenuation', {
+				get() {
+
+					return this._distanceAttenuation;
+
+				},
+
+				set( val ) {
+
+					if ( this._distanceAttenuation === val ) return;
+					this._distanceAttenuation = val;
+					this.ssrMaterial.defines.DISTANCE_ATTENUATION = val;
 					this.ssrMaterial.needsUpdate = true;
 
 				}
 
-			}
+			} );
+			this._fresnel = THREE.SSRShader.defines.FRESNEL;
+			Object.defineProperty( this, 'fresnel', {
+				get() {
 
-		} );
-		this._bouncing = bouncing;
-		Object.defineProperty( this, 'bouncing', {
-			get() {
+					return this._fresnel;
 
-				return this._bouncing;
+				},
 
-			},
+				set( val ) {
 
-			set( val ) {
-
-				if ( this._bouncing === val ) return;
-				this._bouncing = val;
-
-				if ( val ) {
-
-					this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.prevRenderTarget.texture;
-
-				} else {
-
-					this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+					if ( this._fresnel === val ) return;
+					this._fresnel = val;
+					this.ssrMaterial.defines.FRESNEL = val;
+					this.ssrMaterial.needsUpdate = true;
 
 				}
 
+			} );
+			this._infiniteThick = THREE.SSRShader.defines.INFINITE_THICK;
+			Object.defineProperty( this, 'infiniteThick', {
+				get() {
+
+					return this._infiniteThick;
+
+				},
+
+				set( val ) {
+
+					if ( this._infiniteThick === val ) return;
+					this._infiniteThick = val;
+					this.ssrMaterial.defines.INFINITE_THICK = val;
+					this.ssrMaterial.needsUpdate = true;
+
+				}
+
+			} );
+			this.thickTolerance = THREE.SSRShader.uniforms.thickTolerance.value; // beauty render target with depth buffer
+
+			const depthTexture = new THREE.DepthTexture();
+			depthTexture.type = THREE.UnsignedShortType;
+			depthTexture.minFilter = THREE.NearestFilter;
+			depthTexture.magFilter = THREE.NearestFilter;
+			this.beautyRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
+				minFilter: THREE.LinearFilter,
+				magFilter: THREE.LinearFilter,
+				format: THREE.RGBAFormat,
+				depthTexture: depthTexture,
+				depthBuffer: true
+			} ); //for bouncing
+
+			this.prevRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
+				minFilter: THREE.LinearFilter,
+				magFilter: THREE.LinearFilter,
+				format: THREE.RGBAFormat
+			} ); // normal render target
+
+			this.normalRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
+				minFilter: THREE.NearestFilter,
+				magFilter: THREE.NearestFilter,
+				format: THREE.RGBAFormat,
+				type: THREE.HalfFloatType
+			} ); // metalness render target
+
+			this.metalnessRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
+				minFilter: THREE.NearestFilter,
+				magFilter: THREE.NearestFilter,
+				format: THREE.RGBAFormat
+			} ); // ssr render target
+
+			this.ssrRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
+				minFilter: THREE.LinearFilter,
+				magFilter: THREE.LinearFilter,
+				format: THREE.RGBAFormat
+			} );
+			this.blurRenderTarget = this.ssrRenderTarget.clone();
+			this.blurRenderTarget2 = this.ssrRenderTarget.clone(); // this.blurRenderTarget3 = this.ssrRenderTarget.clone();
+			// ssr material
+
+			if ( THREE.SSRShader === undefined ) {
+
+				console.error( 'THREE.SSRPass: The pass relies on THREE.SSRShader.' );
+
 			}
 
-		} );
-		this.blur = true;
-		this._distanceAttenuation = THREE.SSRShader.defines.DISTANCE_ATTENUATION;
-		Object.defineProperty( this, 'distanceAttenuation', {
-			get() {
+			this.ssrMaterial = new THREE.ShaderMaterial( {
+				defines: Object.assign( {}, THREE.SSRShader.defines, {
+					MAX_STEP: Math.sqrt( this.width * this.width + this.height * this.height )
+				} ),
+				uniforms: THREE.UniformsUtils.clone( THREE.SSRShader.uniforms ),
+				vertexShader: THREE.SSRShader.vertexShader,
+				fragmentShader: THREE.SSRShader.fragmentShader,
+				blending: THREE.NoBlending
+			} );
+			this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+			this.ssrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
+			this.ssrMaterial.defines.SELECTIVE = this.selective;
+			this.ssrMaterial.needsUpdate = true;
+			this.ssrMaterial.uniforms[ 'tMetalness' ].value = this.metalnessRenderTarget.texture;
+			this.ssrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+			this.ssrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+			this.ssrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
+			this.ssrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
+			this.ssrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
+			this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
+			this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse ); // normal material
 
-				return this._distanceAttenuation;
+			this.normalMaterial = new THREE.MeshNormalMaterial( {
+				morphTargets
+			} );
+			this.normalMaterial.blending = THREE.NoBlending; // metalnessOn material
 
-			},
+			this.metalnessOnMaterial = new THREE.MeshBasicMaterial( {
+				color: 'white'
+			} ); // metalnessOff material
 
-			set( val ) {
+			this.metalnessOffMaterial = new THREE.MeshBasicMaterial( {
+				color: 'black'
+			} ); // blur material
 
-				if ( this._distanceAttenuation === val ) return;
-				this._distanceAttenuation = val;
-				this.ssrMaterial.defines.DISTANCE_ATTENUATION = val;
-				this.ssrMaterial.needsUpdate = true;
+			this.blurMaterial = new THREE.ShaderMaterial( {
+				defines: Object.assign( {}, THREE.SSRBlurShader.defines ),
+				uniforms: THREE.UniformsUtils.clone( THREE.SSRBlurShader.uniforms ),
+				vertexShader: THREE.SSRBlurShader.vertexShader,
+				fragmentShader: THREE.SSRBlurShader.fragmentShader
+			} );
+			this.blurMaterial.uniforms[ 'tDiffuse' ].value = this.ssrRenderTarget.texture;
+			this.blurMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height ); // blur material 2
 
-			}
+			this.blurMaterial2 = new THREE.ShaderMaterial( {
+				defines: Object.assign( {}, THREE.SSRBlurShader.defines ),
+				uniforms: THREE.UniformsUtils.clone( THREE.SSRBlurShader.uniforms ),
+				vertexShader: THREE.SSRBlurShader.vertexShader,
+				fragmentShader: THREE.SSRBlurShader.fragmentShader
+			} );
+			this.blurMaterial2.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
+			this.blurMaterial2.uniforms[ 'resolution' ].value.set( this.width, this.height ); // // blur material 3
+			// this.blurMaterial3 = new THREE.ShaderMaterial({
+			//	 defines: Object.assign({}, THREE.SSRBlurShader.defines),
+			//	 uniforms: THREE.UniformsUtils.clone(THREE.SSRBlurShader.uniforms),
+			//	 vertexShader: THREE.SSRBlurShader.vertexShader,
+			//	 fragmentShader: THREE.SSRBlurShader.fragmentShader
+			// });
+			// this.blurMaterial3.uniforms['tDiffuse'].value = this.blurRenderTarget2.texture;
+			// this.blurMaterial3.uniforms['resolution'].value.set(this.width, this.height);
+			// material for rendering the depth
 
-		} );
-		this._fresnel = THREE.SSRShader.defines.FRESNEL;
-		Object.defineProperty( this, 'fresnel', {
-			get() {
+			this.depthRenderMaterial = new THREE.ShaderMaterial( {
+				defines: Object.assign( {}, THREE.SSRDepthShader.defines ),
+				uniforms: THREE.UniformsUtils.clone( THREE.SSRDepthShader.uniforms ),
+				vertexShader: THREE.SSRDepthShader.vertexShader,
+				fragmentShader: THREE.SSRDepthShader.fragmentShader,
+				blending: THREE.NoBlending
+			} );
+			this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+			this.depthRenderMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+			this.depthRenderMaterial.uniforms[ 'cameraFar' ].value = this.camera.far; // material for rendering the content of a render target
 
-				return this._fresnel;
+			this.copyMaterial = new THREE.ShaderMaterial( {
+				uniforms: THREE.UniformsUtils.clone( THREE.CopyShader.uniforms ),
+				vertexShader: THREE.CopyShader.vertexShader,
+				fragmentShader: THREE.CopyShader.fragmentShader,
+				transparent: true,
+				depthTest: false,
+				depthWrite: false,
+				blendSrc: THREE.SrcAlphaFactor,
+				blendDst: THREE.OneMinusSrcAlphaFactor,
+				blendEquation: THREE.AddEquation,
+				blendSrcAlpha: THREE.SrcAlphaFactor,
+				blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
+				blendEquationAlpha: THREE.AddEquation // premultipliedAlpha:true,
 
-			},
-
-			set( val ) {
-
-				if ( this._fresnel === val ) return;
-				this._fresnel = val;
-				this.ssrMaterial.defines.FRESNEL = val;
-				this.ssrMaterial.needsUpdate = true;
-
-			}
-
-		} );
-		this._infiniteThick = THREE.SSRShader.defines.INFINITE_THICK;
-		Object.defineProperty( this, 'infiniteThick', {
-			get() {
-
-				return this._infiniteThick;
-
-			},
-
-			set( val ) {
-
-				if ( this._infiniteThick === val ) return;
-				this._infiniteThick = val;
-				this.ssrMaterial.defines.INFINITE_THICK = val;
-				this.ssrMaterial.needsUpdate = true;
-
-			}
-
-		} );
-		this.thickTolerance = THREE.SSRShader.uniforms.thickTolerance.value; // beauty render target with depth buffer
-
-		var depthTexture = new THREE.DepthTexture();
-		depthTexture.type = THREE.UnsignedShortType;
-		depthTexture.minFilter = THREE.NearestFilter;
-		depthTexture.magFilter = THREE.NearestFilter;
-		this.beautyRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
-			minFilter: THREE.LinearFilter,
-			magFilter: THREE.LinearFilter,
-			format: THREE.RGBAFormat,
-			depthTexture: depthTexture,
-			depthBuffer: true
-		} ); //for bouncing
-
-		this.prevRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
-			minFilter: THREE.LinearFilter,
-			magFilter: THREE.LinearFilter,
-			format: THREE.RGBAFormat
-		} ); // normal render target
-
-		this.normalRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
-			minFilter: THREE.NearestFilter,
-			magFilter: THREE.NearestFilter,
-			format: THREE.RGBAFormat,
-			type: THREE.HalfFloatType
-		} ); // metalness render target
-
-		this.metalnessRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
-			minFilter: THREE.NearestFilter,
-			magFilter: THREE.NearestFilter,
-			format: THREE.RGBAFormat
-		} ); // ssr render target
-
-		this.ssrRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
-			minFilter: THREE.LinearFilter,
-			magFilter: THREE.LinearFilter,
-			format: THREE.RGBAFormat
-		} );
-		this.blurRenderTarget = this.ssrRenderTarget.clone();
-		this.blurRenderTarget2 = this.ssrRenderTarget.clone(); // this.blurRenderTarget3 = this.ssrRenderTarget.clone();
-		// ssr material
-
-		if ( THREE.SSRShader === undefined ) {
-
-			console.error( 'THREE.SSRPass: The pass relies on THREE.SSRShader.' );
+			} );
+			this.fsQuad = new THREE.FullScreenQuad( null );
+			this.originalClearColor = new THREE.Color();
 
 		}
 
-		this.ssrMaterial = new THREE.ShaderMaterial( {
-			defines: Object.assign( {}, THREE.SSRShader.defines, {
-				MAX_STEP: Math.sqrt( this.width * this.width + this.height * this.height )
-			} ),
-			uniforms: THREE.UniformsUtils.clone( THREE.SSRShader.uniforms ),
-			vertexShader: THREE.SSRShader.vertexShader,
-			fragmentShader: THREE.SSRShader.fragmentShader,
-			blending: THREE.NoBlending
-		} );
-		this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-		this.ssrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
-		this.ssrMaterial.defines.SELECTIVE = this.selective;
-		this.ssrMaterial.needsUpdate = true;
-		this.ssrMaterial.uniforms[ 'tMetalness' ].value = this.metalnessRenderTarget.texture;
-		this.ssrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
-		this.ssrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
-		this.ssrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-		this.ssrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
-		this.ssrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
-		this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-		this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse ); // normal material
-
-		this.normalMaterial = new THREE.MeshNormalMaterial( {
-			morphTargets
-		} );
-		this.normalMaterial.blending = THREE.NoBlending; // metalnessOn material
-
-		this.metalnessOnMaterial = new THREE.MeshBasicMaterial( {
-			color: 'white'
-		} ); // metalnessOff material
-
-		this.metalnessOffMaterial = new THREE.MeshBasicMaterial( {
-			color: 'black'
-		} ); // blur material
-
-		this.blurMaterial = new THREE.ShaderMaterial( {
-			defines: Object.assign( {}, THREE.SSRBlurShader.defines ),
-			uniforms: THREE.UniformsUtils.clone( THREE.SSRBlurShader.uniforms ),
-			vertexShader: THREE.SSRBlurShader.vertexShader,
-			fragmentShader: THREE.SSRBlurShader.fragmentShader
-		} );
-		this.blurMaterial.uniforms[ 'tDiffuse' ].value = this.ssrRenderTarget.texture;
-		this.blurMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height ); // blur material 2
-
-		this.blurMaterial2 = new THREE.ShaderMaterial( {
-			defines: Object.assign( {}, THREE.SSRBlurShader.defines ),
-			uniforms: THREE.UniformsUtils.clone( THREE.SSRBlurShader.uniforms ),
-			vertexShader: THREE.SSRBlurShader.vertexShader,
-			fragmentShader: THREE.SSRBlurShader.fragmentShader
-		} );
-		this.blurMaterial2.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
-		this.blurMaterial2.uniforms[ 'resolution' ].value.set( this.width, this.height ); // // blur material 3
-		// this.blurMaterial3 = new THREE.ShaderMaterial({
-		//	 defines: Object.assign({}, THREE.SSRBlurShader.defines),
-		//	 uniforms: THREE.UniformsUtils.clone(THREE.SSRBlurShader.uniforms),
-		//	 vertexShader: THREE.SSRBlurShader.vertexShader,
-		//	 fragmentShader: THREE.SSRBlurShader.fragmentShader
-		// });
-		// this.blurMaterial3.uniforms['tDiffuse'].value = this.blurRenderTarget2.texture;
-		// this.blurMaterial3.uniforms['resolution'].value.set(this.width, this.height);
-		// material for rendering the depth
-
-		this.depthRenderMaterial = new THREE.ShaderMaterial( {
-			defines: Object.assign( {}, THREE.SSRDepthShader.defines ),
-			uniforms: THREE.UniformsUtils.clone( THREE.SSRDepthShader.uniforms ),
-			vertexShader: THREE.SSRDepthShader.vertexShader,
-			fragmentShader: THREE.SSRDepthShader.fragmentShader,
-			blending: THREE.NoBlending
-		} );
-		this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
-		this.depthRenderMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
-		this.depthRenderMaterial.uniforms[ 'cameraFar' ].value = this.camera.far; // material for rendering the content of a render target
-
-		this.copyMaterial = new THREE.ShaderMaterial( {
-			uniforms: THREE.UniformsUtils.clone( THREE.CopyShader.uniforms ),
-			vertexShader: THREE.CopyShader.vertexShader,
-			fragmentShader: THREE.CopyShader.fragmentShader,
-			transparent: true,
-			depthTest: false,
-			depthWrite: false,
-			blendSrc: THREE.SrcAlphaFactor,
-			blendDst: THREE.OneMinusSrcAlphaFactor,
-			blendEquation: THREE.AddEquation,
-			blendSrcAlpha: THREE.SrcAlphaFactor,
-			blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
-			blendEquationAlpha: THREE.AddEquation // premultipliedAlpha:true,
-
-		} );
-		this.fsQuad = new THREE.Pass.FullScreenQuad( null );
-		this.originalClearColor = new THREE.Color();
-
-	};
-
-	SSRPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
-		constructor: SSRPass,
-		dispose: function () {
+		dispose() {
 
 			// dispose render targets
 			this.beautyRenderTarget.dispose();
@@ -304,8 +304,9 @@
 
 			this.fsQuad.dispose();
 
-		},
-		render: function ( renderer, writeBuffer
+		}
+
+		render( renderer, writeBuffer
 			/*, readBuffer, deltaTime, maskActive */
 		) {
 
@@ -421,13 +422,14 @@
 
 			}
 
-		},
-		renderPass: function ( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
+		}
+
+		renderPass( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
 
 			// save original state
 			this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
-			var originalClearAlpha = renderer.getClearAlpha( this.tempColor );
-			var originalAutoClear = renderer.autoClear;
+			const originalClearAlpha = renderer.getClearAlpha( this.tempColor );
+			const originalAutoClear = renderer.autoClear;
 			renderer.setRenderTarget( renderTarget ); // setup pass state
 
 			renderer.autoClear = false;
@@ -447,12 +449,13 @@
 			renderer.setClearColor( this.originalClearColor );
 			renderer.setClearAlpha( originalClearAlpha );
 
-		},
-		renderOverride: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
+		}
+
+		renderOverride( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
 			this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
-			var originalClearAlpha = renderer.getClearAlpha( this.tempColor );
-			var originalAutoClear = renderer.autoClear;
+			const originalClearAlpha = renderer.getClearAlpha( this.tempColor );
+			const originalAutoClear = renderer.autoClear;
 			renderer.setRenderTarget( renderTarget );
 			renderer.autoClear = false;
 			clearColor = overrideMaterial.clearColor || clearColor;
@@ -474,12 +477,13 @@
 			renderer.setClearColor( this.originalClearColor );
 			renderer.setClearAlpha( originalClearAlpha );
 
-		},
-		renderMetalness: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
+		}
+
+		renderMetalness( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
 			this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
-			var originalClearAlpha = renderer.getClearAlpha( this.tempColor );
-			var originalAutoClear = renderer.autoClear;
+			const originalClearAlpha = renderer.getClearAlpha( this.tempColor );
+			const originalAutoClear = renderer.autoClear;
 			renderer.setRenderTarget( renderTarget );
 			renderer.autoClear = false;
 			clearColor = overrideMaterial.clearColor || clearColor;
@@ -519,8 +523,9 @@
 			renderer.setClearColor( this.originalClearColor );
 			renderer.setClearAlpha( originalClearAlpha );
 
-		},
-		setSize: function ( width, height ) {
+		}
+
+		setSize( width, height ) {
 
 			this.width = width;
 			this.height = height;
@@ -541,7 +546,9 @@
 			this.blurMaterial2.uniforms[ 'resolution' ].value.set( width, height );
 
 		}
-	} );
+
+	}
+
 	SSRPass.OUTPUT = {
 		'Default': 0,
 		'SSR': 1,
