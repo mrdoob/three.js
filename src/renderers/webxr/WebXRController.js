@@ -220,23 +220,17 @@ Object.assign( WebXRController.prototype, {
 
 			targetRay.visible = ( inputPose !== null );
 
-			if ( targetRay.visible ) targetRay.dispatchEvent( { type: 'controllermove' } );
-
 		}
 
 		if ( grip !== null ) {
 
 			grip.visible = ( gripPose !== null );
 
-			if ( grip.visible ) grip.dispatchEvent( { type: 'controllermove' } );
-
 		}
 
 		if ( hand !== null ) {
 
 			hand.visible = ( handPose !== null );
-
-			if ( hand.visible ) hand.dispatchEvent( { type: 'controllermove' } );
 
 		}
 
