@@ -1,8 +1,8 @@
 let _canvas;
 
-const ImageUtils = {
+class ImageUtils {
 
-	getDataURL: function ( image ) {
+	getDataURL( image ) {
 
 		if ( /^data:/i.test( image.src ) ) {
 
@@ -59,6 +59,6 @@ const ImageUtils = {
 
 	}
 
-};
+}
 
 export { ImageUtils };

@@ -1,28 +1,29 @@
 import { Object3D } from '../../core/Object3D.js';
 
-function ImmediateRenderObject( material ) {
+class ImmediateRenderObject extends Object3D {
 
-	Object3D.call( this );
+	constructor( material ) {
 
-	this.material = material;
-	this.render = function ( /* renderCallback */ ) {};
+		super();
 
-	this.hasPositions = false;
-	this.hasNormals = false;
-	this.hasColors = false;
-	this.hasUvs = false;
+		this.material = material;
+		this.render = function ( /* renderCallback */ ) {};
 
-	this.positionArray = null;
-	this.normalArray = null;
-	this.colorArray = null;
-	this.uvArray = null;
+		this.hasPositions = false;
+		this.hasNormals = false;
+		this.hasColors = false;
+		this.hasUvs = false;
 
-	this.count = 0;
+		this.positionArray = null;
+		this.normalArray = null;
+		this.colorArray = null;
+		this.uvArray = null;
+
+		this.count = 0;
+
+	}
 
 }
-
-ImmediateRenderObject.prototype = Object.create( Object3D.prototype );
-ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;
 
 ImmediateRenderObject.prototype.isImmediateRenderObject = true;
 
