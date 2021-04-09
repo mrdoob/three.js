@@ -2,18 +2,19 @@ import { MeshStandardNode } from './nodes/MeshStandardNode.js';
 import { NodeMaterial } from './NodeMaterial.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
-function MeshStandardNodeMaterial() {
+class MeshStandardNodeMaterial extends NodeMaterial {
 
-	var node = new MeshStandardNode();
+	constructor() {
 
-	NodeMaterial.call( this, node, node );
+		const node = new MeshStandardNode();
 
-	this.type = 'MeshStandardNodeMaterial';
+		super( node, node );
+
+		this.type = 'MeshStandardNodeMaterial';
+
+	}
 
 }
-
-MeshStandardNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
-MeshStandardNodeMaterial.prototype.constructor = MeshStandardNodeMaterial;
 
 NodeUtils.addShortcuts( MeshStandardNodeMaterial.prototype, 'properties', [
 	'color',
