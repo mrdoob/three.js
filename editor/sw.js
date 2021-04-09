@@ -1,4 +1,4 @@
-const cacheName = 'threejs-editor-r126';
+const cacheName = 'threejs-editor';
 
 const assets = [
 	'./',
@@ -37,6 +37,9 @@ const assets = [
 	'../examples/jsm/loaders/FBXLoader.js',
 	'../examples/jsm/loaders/GLTFLoader.js',
 	'../examples/jsm/loaders/KMZLoader.js',
+	'../examples/jsm/loaders/IFCLoader.js',
+	'../examples/jsm/loaders/ifc/web-ifc-api.js',
+	'../examples/jsm/loaders/ifc/web-ifc.wasm',
 	'../examples/jsm/loaders/MD2Loader.js',
 	'../examples/jsm/loaders/OBJLoader.js',
 	'../examples/jsm/loaders/MTLLoader.js',
@@ -231,10 +234,29 @@ self.addEventListener( 'install', async function () {
 self.addEventListener( 'fetch', async function ( event ) {
 
 	const request = event.request;
-	event.respondWith( cacheFirst( request ) );
+	event.respondWith( networkFirst( request ) );
 
 } );
 
+async function networkFirst( request ) {
+
+	return fetch( request ).catch( async function () {
+
+		const cachedResponse = await caches.match( request );
+
+		if ( cachedResponse === undefined ) {
+
+			console.warn( '[SW] Not cached:', request.url );
+
+		}
+
+		return cachedResponse;
+
+	} );
+
+}
+
+/*
 async function cacheFirst( request ) {
 
 	const cachedResponse = await caches.match( request );
@@ -249,3 +271,4 @@ async function cacheFirst( request ) {
 	return cachedResponse;
 
 }
+*/

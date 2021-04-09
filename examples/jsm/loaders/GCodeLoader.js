@@ -18,23 +18,21 @@ import {
  * @param {Manager} manager Loading manager.
  */
 
-var GCodeLoader = function ( manager ) {
+class GCodeLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.splitLayer = false;
+		super( manager );
 
-};
+		this.splitLayer = false;
 
-GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: GCodeLoader,
+	load( url, onLoad, onProgress, onError ) {
 
-	load: function ( url, onLoad, onProgress, onError ) {
+		const scope = this;
 
-		var scope = this;
-
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
@@ -62,9 +60,9 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	parse( data ) {
 
 		var state = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false, relative: false };
 		var layers = [];
@@ -260,6 +258,6 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 export { GCodeLoader };

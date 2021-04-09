@@ -439,8 +439,6 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	function bindFramebuffer( target, framebuffer ) {
 
-		if ( target === gl.DRAW_FRAMEBUFFER ) target = gl.FRAMEBUFFER;
-
 		if ( framebuffer === null && xrFramebuffer !== null ) framebuffer = xrFramebuffer; // use active XR framebuffer if available
 
 		if ( currentBoundFramebuffers[ target ] !== framebuffer ) {
@@ -448,6 +446,24 @@ function WebGLState( gl, extensions, capabilities ) {
 			gl.bindFramebuffer( target, framebuffer );
 
 			currentBoundFramebuffers[ target ] = framebuffer;
+
+			if ( isWebGL2 ) {
+
+				// gl.DRAW_FRAMEBUFFER is equivalent to gl.FRAMEBUFFER
+
+				if ( target === gl.DRAW_FRAMEBUFFER ) {
+
+					currentBoundFramebuffers[ gl.FRAMEBUFFER ] = framebuffer;
+
+				}
+
+				if ( target === gl.FRAMEBUFFER ) {
+
+					currentBoundFramebuffers[ gl.DRAW_FRAMEBUFFER ] = framebuffer;
+
+				}
+
+			}
 
 		}
 
@@ -945,14 +961,12 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		gl.activeTexture( gl.TEXTURE0 );
 
+		gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+
 		if ( isWebGL2 === true ) {
 
-			gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null ); // Equivalent to gl.FRAMEBUFFER
+			gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
 			gl.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
-
-		} else {
-
-			gl.bindFramebuffer( gl.FRAMEBUFFER, null );
 
 		}
 

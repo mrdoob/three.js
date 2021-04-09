@@ -12,6 +12,12 @@ import {
 
 var DeviceOrientationControls = function ( object ) {
 
+	if ( window.isSecureContext === false ) {
+
+		console.error( 'THREE.DeviceOrientationControls: DeviceOrientationEvent is only available in secure contexts (https)' );
+
+	}
+
 	var scope = this;
 	var changeEvent = { type: 'change' };
 	var EPS = 0.000001;

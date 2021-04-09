@@ -54,6 +54,22 @@ const MathUtils = {
 
 	},
 
+	// https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/inverse-lerp-a-super-useful-yet-often-overlooked-function-r5230/
+
+	inverseLerp: function ( x, y, value ) {
+
+		if ( x !== y ) {
+
+			return ( value - x ) / ( y - x );
+
+		 } else {
+
+			return 0;
+
+		 }
+
+	},
+
 	// https://en.wikipedia.org/wiki/Linear_interpolation
 
 	lerp: function ( x, y, t ) {
