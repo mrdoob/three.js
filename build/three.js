@@ -1029,8 +1029,8 @@
 
 	let _canvas;
 
-	const ImageUtils = {
-		getDataURL: function (image) {
+	class ImageUtils {
+		static getDataURL(image) {
 			if (/^data:/i.test(image.src)) {
 				return image.src;
 			}
@@ -1066,7 +1066,8 @@
 				return canvas.toDataURL('image/png');
 			}
 		}
-	};
+
+	}
 
 	let textureId = 0;
 
@@ -8049,53 +8050,51 @@
 		}
 	});
 
-	const _inverseMatrix$2 = new Matrix4();
+	const _inverseMatrix$2 = /*@__PURE__*/new Matrix4();
 
-	const _ray$2 = new Ray();
+	const _ray$2 = /*@__PURE__*/new Ray();
 
-	const _sphere$3 = new Sphere();
+	const _sphere$3 = /*@__PURE__*/new Sphere();
 
-	const _vA$1 = new Vector3();
+	const _vA$1 = /*@__PURE__*/new Vector3();
 
-	const _vB$1 = new Vector3();
+	const _vB$1 = /*@__PURE__*/new Vector3();
 
-	const _vC$1 = new Vector3();
+	const _vC$1 = /*@__PURE__*/new Vector3();
 
-	const _tempA = new Vector3();
+	const _tempA = /*@__PURE__*/new Vector3();
 
-	const _tempB = new Vector3();
+	const _tempB = /*@__PURE__*/new Vector3();
 
-	const _tempC = new Vector3();
+	const _tempC = /*@__PURE__*/new Vector3();
 
-	const _morphA = new Vector3();
+	const _morphA = /*@__PURE__*/new Vector3();
 
-	const _morphB = new Vector3();
+	const _morphB = /*@__PURE__*/new Vector3();
 
-	const _morphC = new Vector3();
+	const _morphC = /*@__PURE__*/new Vector3();
 
-	const _uvA$1 = new Vector2();
+	const _uvA$1 = /*@__PURE__*/new Vector2();
 
-	const _uvB$1 = new Vector2();
+	const _uvB$1 = /*@__PURE__*/new Vector2();
 
-	const _uvC$1 = new Vector2();
+	const _uvC$1 = /*@__PURE__*/new Vector2();
 
-	const _intersectionPoint = new Vector3();
+	const _intersectionPoint = /*@__PURE__*/new Vector3();
 
-	const _intersectionPointWorld = new Vector3();
+	const _intersectionPointWorld = /*@__PURE__*/new Vector3();
 
-	function Mesh(geometry = new BufferGeometry(), material = new MeshBasicMaterial()) {
-		Object3D.call(this);
-		this.type = 'Mesh';
-		this.geometry = geometry;
-		this.material = material;
-		this.updateMorphTargets();
-	}
+	class Mesh extends Object3D {
+		constructor(geometry = new BufferGeometry(), material = new MeshBasicMaterial()) {
+			super();
+			this.type = 'Mesh';
+			this.geometry = geometry;
+			this.material = material;
+			this.updateMorphTargets();
+		}
 
-	Mesh.prototype = Object.assign(Object.create(Object3D.prototype), {
-		constructor: Mesh,
-		isMesh: true,
-		copy: function (source) {
-			Object3D.prototype.copy.call(this, source);
+		copy(source) {
+			super.copy(source);
 
 			if (source.morphTargetInfluences !== undefined) {
 				this.morphTargetInfluences = source.morphTargetInfluences.slice();
@@ -8108,8 +8107,9 @@
 			this.material = source.material;
 			this.geometry = source.geometry;
 			return this;
-		},
-		updateMorphTargets: function () {
+		}
+
+		updateMorphTargets() {
 			const geometry = this.geometry;
 
 			if (geometry.isBufferGeometry) {
@@ -8137,8 +8137,9 @@
 					console.error('THREE.Mesh.updateMorphTargets() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
 				}
 			}
-		},
-		raycast: function (raycaster, intersects) {
+		}
+
+		raycast(raycaster, intersects) {
 			const geometry = this.geometry;
 			const material = this.material;
 			const matrixWorld = this.matrixWorld;
@@ -8258,7 +8259,10 @@
 				console.error('THREE.Mesh.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
 			}
 		}
-	});
+
+	}
+
+	Mesh.prototype.isMesh = true;
 
 	function checkIntersection(object, material, raycaster, ray, pA, pB, pC, point) {
 		let intersect;
@@ -8690,25 +8694,24 @@
 		return data;
 	};
 
-	function Camera() {
-		Object3D.call(this);
-		this.type = 'Camera';
-		this.matrixWorldInverse = new Matrix4();
-		this.projectionMatrix = new Matrix4();
-		this.projectionMatrixInverse = new Matrix4();
-	}
+	class Camera extends Object3D {
+		constructor() {
+			super();
+			this.type = 'Camera';
+			this.matrixWorldInverse = new Matrix4();
+			this.projectionMatrix = new Matrix4();
+			this.projectionMatrixInverse = new Matrix4();
+		}
 
-	Camera.prototype = Object.assign(Object.create(Object3D.prototype), {
-		constructor: Camera,
-		isCamera: true,
-		copy: function (source, recursive) {
-			Object3D.prototype.copy.call(this, source, recursive);
+		copy(source, recursive) {
+			super.copy(source, recursive);
 			this.matrixWorldInverse.copy(source.matrixWorldInverse);
 			this.projectionMatrix.copy(source.projectionMatrix);
 			this.projectionMatrixInverse.copy(source.projectionMatrixInverse);
 			return this;
-		},
-		getWorldDirection: function (target) {
+		}
+
+		getWorldDirection(target) {
 			if (target === undefined) {
 				console.warn('THREE.Camera: .getWorldDirection() target is now required');
 				target = new Vector3();
@@ -8717,42 +8720,46 @@
 			this.updateWorldMatrix(true, false);
 			const e = this.matrixWorld.elements;
 			return target.set(-e[8], -e[9], -e[10]).normalize();
-		},
-		updateMatrixWorld: function (force) {
-			Object3D.prototype.updateMatrixWorld.call(this, force);
+		}
+
+		updateMatrixWorld(force) {
+			super.updateMatrixWorld(force);
 			this.matrixWorldInverse.copy(this.matrixWorld).invert();
-		},
-		updateWorldMatrix: function (updateParents, updateChildren) {
-			Object3D.prototype.updateWorldMatrix.call(this, updateParents, updateChildren);
+		}
+
+		updateWorldMatrix(updateParents, updateChildren) {
+			super.updateWorldMatrix(updateParents, updateChildren);
 			this.matrixWorldInverse.copy(this.matrixWorld).invert();
-		},
-		clone: function () {
+		}
+
+		clone() {
 			return new this.constructor().copy(this);
 		}
-	});
 
-	function PerspectiveCamera(fov = 50, aspect = 1, near = 0.1, far = 2000) {
-		Camera.call(this);
-		this.type = 'PerspectiveCamera';
-		this.fov = fov;
-		this.zoom = 1;
-		this.near = near;
-		this.far = far;
-		this.focus = 10;
-		this.aspect = aspect;
-		this.view = null;
-		this.filmGauge = 35; // width of the film (default in millimeters)
-
-		this.filmOffset = 0; // horizontal film offset (same unit as gauge)
-
-		this.updateProjectionMatrix();
 	}
 
-	PerspectiveCamera.prototype = Object.assign(Object.create(Camera.prototype), {
-		constructor: PerspectiveCamera,
-		isPerspectiveCamera: true,
-		copy: function (source, recursive) {
-			Camera.prototype.copy.call(this, source, recursive);
+	Camera.prototype.isCamera = true;
+
+	class PerspectiveCamera extends Camera {
+		constructor(fov = 50, aspect = 1, near = 0.1, far = 2000) {
+			super();
+			this.type = 'PerspectiveCamera';
+			this.fov = fov;
+			this.zoom = 1;
+			this.near = near;
+			this.far = far;
+			this.focus = 10;
+			this.aspect = aspect;
+			this.view = null;
+			this.filmGauge = 35; // width of the film (default in millimeters)
+
+			this.filmOffset = 0; // horizontal film offset (same unit as gauge)
+
+			this.updateProjectionMatrix();
+		}
+
+		copy(source, recursive) {
+			super.copy(source, recursive);
 			this.fov = source.fov;
 			this.zoom = source.zoom;
 			this.near = source.near;
@@ -8763,8 +8770,7 @@
 			this.filmGauge = source.filmGauge;
 			this.filmOffset = source.filmOffset;
 			return this;
-		},
-
+		}
 		/**
 		 * Sets the FOV by focal length in respect to the current .filmGauge.
 		 *
@@ -8773,32 +8779,37 @@
 		 *
 		 * Values for focal length and film gauge must have the same unit.
 		 */
-		setFocalLength: function (focalLength) {
+
+
+		setFocalLength(focalLength) {
 			/** see {@link http://www.bobatkins.com/photography/technical/field_of_view.html} */
 			const vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
 			this.fov = MathUtils.RAD2DEG * 2 * Math.atan(vExtentSlope);
 			this.updateProjectionMatrix();
-		},
-
+		}
 		/**
 		 * Calculates the focal length from the current .fov and .filmGauge.
 		 */
-		getFocalLength: function () {
+
+
+		getFocalLength() {
 			const vExtentSlope = Math.tan(MathUtils.DEG2RAD * 0.5 * this.fov);
 			return 0.5 * this.getFilmHeight() / vExtentSlope;
-		},
-		getEffectiveFOV: function () {
+		}
+
+		getEffectiveFOV() {
 			return MathUtils.RAD2DEG * 2 * Math.atan(Math.tan(MathUtils.DEG2RAD * 0.5 * this.fov) / this.zoom);
-		},
-		getFilmWidth: function () {
+		}
+
+		getFilmWidth() {
 			// film not completely covered in portrait format (aspect < 1)
 			return this.filmGauge * Math.min(this.aspect, 1);
-		},
-		getFilmHeight: function () {
+		}
+
+		getFilmHeight() {
 			// film not completely covered in landscape format (aspect > 1)
 			return this.filmGauge / Math.max(this.aspect, 1);
-		},
-
+		}
 		/**
 		 * Sets an offset in a larger frustum. This is useful for multi-window or
 		 * multi-monitor/multi-machine setups.
@@ -8834,7 +8845,9 @@
 		 *
 		 *	 Note there is no reason monitors have to be the same size or in a grid.
 		 */
-		setViewOffset: function (fullWidth, fullHeight, x, y, width, height) {
+
+
+		setViewOffset(fullWidth, fullHeight, x, y, width, height) {
 			this.aspect = fullWidth / fullHeight;
 
 			if (this.view === null) {
@@ -8857,15 +8870,17 @@
 			this.view.width = width;
 			this.view.height = height;
 			this.updateProjectionMatrix();
-		},
-		clearViewOffset: function () {
+		}
+
+		clearViewOffset() {
 			if (this.view !== null) {
 				this.view.enabled = false;
 			}
 
 			this.updateProjectionMatrix();
-		},
-		updateProjectionMatrix: function () {
+		}
+
+		updateProjectionMatrix() {
 			const near = this.near;
 			let top = near * Math.tan(MathUtils.DEG2RAD * 0.5 * this.fov) / this.zoom;
 			let height = 2 * top;
@@ -8886,9 +8901,10 @@
 			if (skew !== 0) left += near * skew / this.getFilmWidth();
 			this.projectionMatrix.makePerspective(left, left + width, top, top - height, near, this.far);
 			this.projectionMatrixInverse.copy(this.projectionMatrix).invert();
-		},
-		toJSON: function (meta) {
-			const data = Object3D.prototype.toJSON.call(this, meta);
+		}
+
+		toJSON(meta) {
+			const data = super.toJSON(meta);
 			data.object.fov = this.fov;
 			data.object.zoom = this.zoom;
 			data.object.near = this.near;
@@ -8900,7 +8916,10 @@
 			data.object.filmOffset = this.filmOffset;
 			return data;
 		}
-	});
+
+	}
+
+	PerspectiveCamera.prototype.isPerspectiveCamera = true;
 
 	const fov = 90,
 				aspect = 1;
@@ -19089,36 +19108,35 @@
 
 	}
 
-	const _basePosition = new Vector3();
+	const _basePosition = /*@__PURE__*/new Vector3();
 
-	const _skinIndex = new Vector4();
+	const _skinIndex = /*@__PURE__*/new Vector4();
 
-	const _skinWeight = new Vector4();
+	const _skinWeight = /*@__PURE__*/new Vector4();
 
-	const _vector$5 = new Vector3();
+	const _vector$5 = /*@__PURE__*/new Vector3();
 
-	const _matrix = new Matrix4();
+	const _matrix = /*@__PURE__*/new Matrix4();
 
-	function SkinnedMesh(geometry, material) {
-		Mesh.call(this, geometry, material);
-		this.type = 'SkinnedMesh';
-		this.bindMode = 'attached';
-		this.bindMatrix = new Matrix4();
-		this.bindMatrixInverse = new Matrix4();
-	}
+	class SkinnedMesh extends Mesh {
+		constructor(geometry, material) {
+			super(geometry, material);
+			this.type = 'SkinnedMesh';
+			this.bindMode = 'attached';
+			this.bindMatrix = new Matrix4();
+			this.bindMatrixInverse = new Matrix4();
+		}
 
-	SkinnedMesh.prototype = Object.assign(Object.create(Mesh.prototype), {
-		constructor: SkinnedMesh,
-		isSkinnedMesh: true,
-		copy: function (source) {
-			Mesh.prototype.copy.call(this, source);
+		copy(source) {
+			super.copy(source);
 			this.bindMode = source.bindMode;
 			this.bindMatrix.copy(source.bindMatrix);
 			this.bindMatrixInverse.copy(source.bindMatrixInverse);
 			this.skeleton = source.skeleton;
 			return this;
-		},
-		bind: function (skeleton, bindMatrix) {
+		}
+
+		bind(skeleton, bindMatrix) {
 			this.skeleton = skeleton;
 
 			if (bindMatrix === undefined) {
@@ -19129,11 +19147,13 @@
 
 			this.bindMatrix.copy(bindMatrix);
 			this.bindMatrixInverse.copy(bindMatrix).invert();
-		},
-		pose: function () {
+		}
+
+		pose() {
 			this.skeleton.pose();
-		},
-		normalizeSkinWeights: function () {
+		}
+
+		normalizeSkinWeights() {
 			const vector = new Vector4();
 			const skinWeight = this.geometry.attributes.skinWeight;
 
@@ -19152,9 +19172,10 @@
 
 				skinWeight.setXYZW(i, vector.x, vector.y, vector.z, vector.w);
 			}
-		},
-		updateMatrixWorld: function (force) {
-			Mesh.prototype.updateMatrixWorld.call(this, force);
+		}
+
+		updateMatrixWorld(force) {
+			super.updateMatrixWorld(force);
 
 			if (this.bindMode === 'attached') {
 				this.bindMatrixInverse.copy(this.matrixWorld).invert();
@@ -19163,8 +19184,9 @@
 			} else {
 				console.warn('THREE.SkinnedMesh: Unrecognized bindMode: ' + this.bindMode);
 			}
-		},
-		boneTransform: function (index, target) {
+		}
+
+		boneTransform(index, target) {
 			const skeleton = this.skeleton;
 			const geometry = this.geometry;
 
@@ -19190,7 +19212,10 @@
 
 			return target.applyMatrix4(this.bindMatrixInverse);
 		}
-	});
+
+	}
+
+	SkinnedMesh.prototype.isSkinnedMesh = true;
 
 	class Bone extends Object3D {
 		constructor() {
@@ -19368,39 +19393,40 @@
 
 	}
 
-	const _instanceLocalMatrix = new Matrix4();
+	const _instanceLocalMatrix = /*@__PURE__*/new Matrix4();
 
-	const _instanceWorldMatrix = new Matrix4();
+	const _instanceWorldMatrix = /*@__PURE__*/new Matrix4();
 
 	const _instanceIntersects = [];
 
-	const _mesh = new Mesh();
+	const _mesh = /*@__PURE__*/new Mesh();
 
-	function InstancedMesh(geometry, material, count) {
-		Mesh.call(this, geometry, material);
-		this.instanceMatrix = new BufferAttribute(new Float32Array(count * 16), 16);
-		this.instanceColor = null;
-		this.count = count;
-		this.frustumCulled = false;
-	}
+	class InstancedMesh extends Mesh {
+		constructor(geometry, material, count) {
+			super(geometry, material);
+			this.instanceMatrix = new BufferAttribute(new Float32Array(count * 16), 16);
+			this.instanceColor = null;
+			this.count = count;
+			this.frustumCulled = false;
+		}
 
-	InstancedMesh.prototype = Object.assign(Object.create(Mesh.prototype), {
-		constructor: InstancedMesh,
-		isInstancedMesh: true,
-		copy: function (source) {
-			Mesh.prototype.copy.call(this, source);
+		copy(source) {
+			super.copy(source);
 			this.instanceMatrix.copy(source.instanceMatrix);
 			if (source.instanceColor !== null) this.instanceColor = source.instanceColor.clone();
 			this.count = source.count;
 			return this;
-		},
-		getColorAt: function (index, color) {
+		}
+
+		getColorAt(index, color) {
 			color.fromArray(this.instanceColor.array, index * 3);
-		},
-		getMatrixAt: function (index, matrix) {
+		}
+
+		getMatrixAt(index, matrix) {
 			matrix.fromArray(this.instanceMatrix.array, index * 16);
-		},
-		raycast: function (raycaster, intersects) {
+		}
+
+		raycast(raycaster, intersects) {
 			const matrixWorld = this.matrixWorld;
 			const raycastTimes = this.count;
 			_mesh.geometry = this.geometry;
@@ -19428,24 +19454,31 @@
 
 				_instanceIntersects.length = 0;
 			}
-		},
-		setColorAt: function (index, color) {
+		}
+
+		setColorAt(index, color) {
 			if (this.instanceColor === null) {
 				this.instanceColor = new BufferAttribute(new Float32Array(this.count * 3), 3);
 			}
 
 			color.toArray(this.instanceColor.array, index * 3);
-		},
-		setMatrixAt: function (index, matrix) {
+		}
+
+		setMatrixAt(index, matrix) {
 			matrix.toArray(this.instanceMatrix.array, index * 16);
-		},
-		updateMorphTargets: function () {},
-		dispose: function () {
+		}
+
+		updateMorphTargets() {}
+
+		dispose() {
 			this.dispatchEvent({
 				type: 'dispose'
 			});
 		}
-	});
+
+	}
+
+	InstancedMesh.prototype.isInstancedMesh = true;
 
 	/**
 	 * parameters = {
@@ -19484,34 +19517,33 @@
 
 	LineBasicMaterial.prototype.isLineBasicMaterial = true;
 
-	const _start$1 = new Vector3();
+	const _start$1 = /*@__PURE__*/new Vector3();
 
-	const _end$1 = new Vector3();
+	const _end$1 = /*@__PURE__*/new Vector3();
 
-	const _inverseMatrix$1 = new Matrix4();
+	const _inverseMatrix$1 = /*@__PURE__*/new Matrix4();
 
-	const _ray$1 = new Ray();
+	const _ray$1 = /*@__PURE__*/new Ray();
 
-	const _sphere$1 = new Sphere();
+	const _sphere$1 = /*@__PURE__*/new Sphere();
 
-	function Line(geometry = new BufferGeometry(), material = new LineBasicMaterial()) {
-		Object3D.call(this);
-		this.type = 'Line';
-		this.geometry = geometry;
-		this.material = material;
-		this.updateMorphTargets();
-	}
+	class Line extends Object3D {
+		constructor(geometry = new BufferGeometry(), material = new LineBasicMaterial()) {
+			super();
+			this.type = 'Line';
+			this.geometry = geometry;
+			this.material = material;
+			this.updateMorphTargets();
+		}
 
-	Line.prototype = Object.assign(Object.create(Object3D.prototype), {
-		constructor: Line,
-		isLine: true,
-		copy: function (source) {
-			Object3D.prototype.copy.call(this, source);
+		copy(source) {
+			super.copy(source);
 			this.material = source.material;
 			this.geometry = source.geometry;
 			return this;
-		},
-		computeLineDistances: function () {
+		}
+
+		computeLineDistances() {
 			const geometry = this.geometry;
 
 			if (geometry.isBufferGeometry) {
@@ -19538,8 +19570,9 @@
 			}
 
 			return this;
-		},
-		raycast: function (raycaster, intersects) {
+		}
+
+		raycast(raycaster, intersects) {
 			const geometry = this.geometry;
 			const matrixWorld = this.matrixWorld;
 			const threshold = raycaster.params.Line.threshold;
@@ -19629,8 +19662,9 @@
 			} else if (geometry.isGeometry) {
 				console.error('THREE.Line.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
 			}
-		},
-		updateMorphTargets: function () {
+		}
+
+		updateMorphTargets() {
 			const geometry = this.geometry;
 
 			if (geometry.isBufferGeometry) {
@@ -19659,21 +19693,22 @@
 				}
 			}
 		}
-	});
 
-	const _start = new Vector3();
-
-	const _end = new Vector3();
-
-	function LineSegments(geometry, material) {
-		Line.call(this, geometry, material);
-		this.type = 'LineSegments';
 	}
 
-	LineSegments.prototype = Object.assign(Object.create(Line.prototype), {
-		constructor: LineSegments,
-		isLineSegments: true,
-		computeLineDistances: function () {
+	Line.prototype.isLine = true;
+
+	const _start = /*@__PURE__*/new Vector3();
+
+	const _end = /*@__PURE__*/new Vector3();
+
+	class LineSegments extends Line {
+		constructor(geometry, material) {
+			super(geometry, material);
+			this.type = 'LineSegments';
+		}
+
+		computeLineDistances() {
 			const geometry = this.geometry;
 
 			if (geometry.isBufferGeometry) {
@@ -19701,7 +19736,10 @@
 
 			return this;
 		}
-	});
+
+	}
+
+	LineSegments.prototype.isLineSegments = true;
 
 	class LineLoop extends Line {
 		constructor(geometry, material) {
@@ -19755,32 +19793,31 @@
 
 	PointsMaterial.prototype.isPointsMaterial = true;
 
-	const _inverseMatrix = new Matrix4();
+	const _inverseMatrix = /*@__PURE__*/new Matrix4();
 
-	const _ray = new Ray();
+	const _ray = /*@__PURE__*/new Ray();
 
-	const _sphere = new Sphere();
+	const _sphere = /*@__PURE__*/new Sphere();
 
-	const _position$2 = new Vector3();
+	const _position$2 = /*@__PURE__*/new Vector3();
 
-	function Points(geometry = new BufferGeometry(), material = new PointsMaterial()) {
-		Object3D.call(this);
-		this.type = 'Points';
-		this.geometry = geometry;
-		this.material = material;
-		this.updateMorphTargets();
-	}
+	class Points extends Object3D {
+		constructor(geometry = new BufferGeometry(), material = new PointsMaterial()) {
+			super();
+			this.type = 'Points';
+			this.geometry = geometry;
+			this.material = material;
+			this.updateMorphTargets();
+		}
 
-	Points.prototype = Object.assign(Object.create(Object3D.prototype), {
-		constructor: Points,
-		isPoints: true,
-		copy: function (source) {
-			Object3D.prototype.copy.call(this, source);
+		copy(source) {
+			super.copy(source);
 			this.material = source.material;
 			this.geometry = source.geometry;
 			return this;
-		},
-		raycast: function (raycaster, intersects) {
+		}
+
+		raycast(raycaster, intersects) {
 			const geometry = this.geometry;
 			const matrixWorld = this.matrixWorld;
 			const threshold = raycaster.params.Points.threshold;
@@ -19831,8 +19868,9 @@
 			} else {
 				console.error('THREE.Points.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
 			}
-		},
-		updateMorphTargets: function () {
+		}
+
+		updateMorphTargets() {
 			const geometry = this.geometry;
 
 			if (geometry.isBufferGeometry) {
@@ -19861,7 +19899,10 @@
 				}
 			}
 		}
-	});
+
+	}
+
+	Points.prototype.isPoints = true;
 
 	function testPoint(point, index, localThresholdSq, matrixWorld, raycaster, intersects, object) {
 		const rayPointDistanceSq = _ray.distanceSqToPoint(point);
@@ -21129,9 +21170,9 @@
 		return sum;
 	}
 
-	const ShapeUtils = {
+	class ShapeUtils {
 		// calculate area of the contour polygon
-		area: function (contour) {
+		static area(contour) {
 			const n = contour.length;
 			let a = 0.0;
 
@@ -21140,11 +21181,13 @@
 			}
 
 			return a * 0.5;
-		},
-		isClockWise: function (pts) {
+		}
+
+		static isClockWise(pts) {
 			return ShapeUtils.area(pts) < 0;
-		},
-		triangulateShape: function (contour, holes) {
+		}
+
+		static triangulateShape(contour, holes) {
 			const vertices = []; // flat array of vertices like [ x0,y0, x1,y1, x2,y2, ... ]
 
 			const holeIndices = []; // array of hole indices
@@ -21172,7 +21215,8 @@
 
 			return faces;
 		}
-	};
+
+	}
 
 	function removeDupEndPts(points) {
 		const l = points.length;
@@ -24716,152 +24760,162 @@
 		}
 	};
 
-	function LoadingManager(onLoad, onProgress, onError) {
-		const scope = this;
-		let isLoading = false;
-		let itemsLoaded = 0;
-		let itemsTotal = 0;
-		let urlModifier = undefined;
-		const handlers = []; // Refer to #5689 for the reason why we don't set .onStart
-		// in the constructor
+	class LoadingManager {
+		constructor(onLoad, onProgress, onError) {
+			const scope = this;
+			let isLoading = false;
+			let itemsLoaded = 0;
+			let itemsTotal = 0;
+			let urlModifier = undefined;
+			const handlers = []; // Refer to #5689 for the reason why we don't set .onStart
+			// in the constructor
 
-		this.onStart = undefined;
-		this.onLoad = onLoad;
-		this.onProgress = onProgress;
-		this.onError = onError;
+			this.onStart = undefined;
+			this.onLoad = onLoad;
+			this.onProgress = onProgress;
+			this.onError = onError;
 
-		this.itemStart = function (url) {
-			itemsTotal++;
+			this.itemStart = function (url) {
+				itemsTotal++;
 
-			if (isLoading === false) {
-				if (scope.onStart !== undefined) {
-					scope.onStart(url, itemsLoaded, itemsTotal);
+				if (isLoading === false) {
+					if (scope.onStart !== undefined) {
+						scope.onStart(url, itemsLoaded, itemsTotal);
+					}
 				}
-			}
 
-			isLoading = true;
-		};
+				isLoading = true;
+			};
 
-		this.itemEnd = function (url) {
-			itemsLoaded++;
+			this.itemEnd = function (url) {
+				itemsLoaded++;
 
-			if (scope.onProgress !== undefined) {
-				scope.onProgress(url, itemsLoaded, itemsTotal);
-			}
-
-			if (itemsLoaded === itemsTotal) {
-				isLoading = false;
-
-				if (scope.onLoad !== undefined) {
-					scope.onLoad();
+				if (scope.onProgress !== undefined) {
+					scope.onProgress(url, itemsLoaded, itemsTotal);
 				}
-			}
-		};
 
-		this.itemError = function (url) {
-			if (scope.onError !== undefined) {
-				scope.onError(url);
-			}
-		};
+				if (itemsLoaded === itemsTotal) {
+					isLoading = false;
 
-		this.resolveURL = function (url) {
-			if (urlModifier) {
-				return urlModifier(url);
-			}
-
-			return url;
-		};
-
-		this.setURLModifier = function (transform) {
-			urlModifier = transform;
-			return this;
-		};
-
-		this.addHandler = function (regex, loader) {
-			handlers.push(regex, loader);
-			return this;
-		};
-
-		this.removeHandler = function (regex) {
-			const index = handlers.indexOf(regex);
-
-			if (index !== -1) {
-				handlers.splice(index, 2);
-			}
-
-			return this;
-		};
-
-		this.getHandler = function (file) {
-			for (let i = 0, l = handlers.length; i < l; i += 2) {
-				const regex = handlers[i];
-				const loader = handlers[i + 1];
-				if (regex.global) regex.lastIndex = 0; // see #17920
-
-				if (regex.test(file)) {
-					return loader;
+					if (scope.onLoad !== undefined) {
+						scope.onLoad();
+					}
 				}
-			}
+			};
 
-			return null;
-		};
+			this.itemError = function (url) {
+				if (scope.onError !== undefined) {
+					scope.onError(url);
+				}
+			};
+
+			this.resolveURL = function (url) {
+				if (urlModifier) {
+					return urlModifier(url);
+				}
+
+				return url;
+			};
+
+			this.setURLModifier = function (transform) {
+				urlModifier = transform;
+				return this;
+			};
+
+			this.addHandler = function (regex, loader) {
+				handlers.push(regex, loader);
+				return this;
+			};
+
+			this.removeHandler = function (regex) {
+				const index = handlers.indexOf(regex);
+
+				if (index !== -1) {
+					handlers.splice(index, 2);
+				}
+
+				return this;
+			};
+
+			this.getHandler = function (file) {
+				for (let i = 0, l = handlers.length; i < l; i += 2) {
+					const regex = handlers[i];
+					const loader = handlers[i + 1];
+					if (regex.global) regex.lastIndex = 0; // see #17920
+
+					if (regex.test(file)) {
+						return loader;
+					}
+				}
+
+				return null;
+			};
+		}
+
 	}
 
 	const DefaultLoadingManager = new LoadingManager();
 
-	function Loader(manager) {
-		this.manager = manager !== undefined ? manager : DefaultLoadingManager;
-		this.crossOrigin = 'anonymous';
-		this.withCredentials = false;
-		this.path = '';
-		this.resourcePath = '';
-		this.requestHeader = {};
-	}
+	class Loader {
+		constructor(manager) {
+			this.manager = manager !== undefined ? manager : DefaultLoadingManager;
+			this.crossOrigin = 'anonymous';
+			this.withCredentials = false;
+			this.path = '';
+			this.resourcePath = '';
+			this.requestHeader = {};
+		}
 
-	Object.assign(Loader.prototype, {
-		load: function ()
+		load()
 		/* url, onLoad, onProgress, onError */
-		{},
-		loadAsync: function (url, onProgress) {
+		{}
+
+		loadAsync(url, onProgress) {
 			const scope = this;
 			return new Promise(function (resolve, reject) {
 				scope.load(url, resolve, onProgress, reject);
 			});
-		},
-		parse: function ()
+		}
+
+		parse()
 		/* data */
-		{},
-		setCrossOrigin: function (crossOrigin) {
+		{}
+
+		setCrossOrigin(crossOrigin) {
 			this.crossOrigin = crossOrigin;
 			return this;
-		},
-		setWithCredentials: function (value) {
+		}
+
+		setWithCredentials(value) {
 			this.withCredentials = value;
 			return this;
-		},
-		setPath: function (path) {
+		}
+
+		setPath(path) {
 			this.path = path;
 			return this;
-		},
-		setResourcePath: function (resourcePath) {
+		}
+
+		setResourcePath(resourcePath) {
 			this.resourcePath = resourcePath;
 			return this;
-		},
-		setRequestHeader: function (requestHeader) {
+		}
+
+		setRequestHeader(requestHeader) {
 			this.requestHeader = requestHeader;
 			return this;
 		}
-	});
+
+	}
 
 	const loading = {};
 
-	function FileLoader(manager) {
-		Loader.call(this, manager);
-	}
+	class FileLoader extends Loader {
+		constructor(manager) {
+			super(manager);
+		}
 
-	FileLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-		constructor: FileLoader,
-		load: function (url, onLoad, onProgress, onError) {
+		load(url, onLoad, onProgress, onError) {
 			if (url === undefined) url = '';
 			if (this.path !== undefined) url = this.path + url;
 			url = this.manager.resolveURL(url);
@@ -25034,16 +25088,19 @@
 
 			scope.manager.itemStart(url);
 			return request;
-		},
-		setResponseType: function (value) {
+		}
+
+		setResponseType(value) {
 			this.responseType = value;
 			return this;
-		},
-		setMimeType: function (value) {
+		}
+
+		setMimeType(value) {
 			this.mimeType = value;
 			return this;
 		}
-	});
+
+	}
 
 	class AnimationLoader extends Loader {
 		constructor(manager) {
@@ -25090,13 +25147,12 @@
 	 * Sub classes have to implement the parse() method which will be used in load().
 	 */
 
-	function CompressedTextureLoader(manager) {
-		Loader.call(this, manager);
-	}
+	class CompressedTextureLoader extends Loader {
+		constructor(manager) {
+			super(manager);
+		}
 
-	CompressedTextureLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-		constructor: CompressedTextureLoader,
-		load: function (url, onLoad, onProgress, onError) {
+		load(url, onLoad, onProgress, onError) {
 			const scope = this;
 			const images = [];
 			const texture = new CompressedTexture();
@@ -25172,7 +25228,8 @@
 
 			return texture;
 		}
-	});
+
+	}
 
 	class ImageLoader extends Loader {
 		constructor(manager) {
@@ -25265,13 +25322,12 @@
 	 * Sub classes have to implement the parse() method which will be used in load().
 	 */
 
-	function DataTextureLoader(manager) {
-		Loader.call(this, manager);
-	}
+	class DataTextureLoader extends Loader {
+		constructor(manager) {
+			super(manager);
+		}
 
-	DataTextureLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-		constructor: DataTextureLoader,
-		load: function (url, onLoad, onProgress, onError) {
+		load(url, onLoad, onProgress, onError) {
 			const scope = this;
 			const texture = new DataTexture();
 			const loader = new FileLoader(this.manager);
@@ -25331,15 +25387,15 @@
 			}, onProgress, onError);
 			return texture;
 		}
-	});
 
-	function TextureLoader(manager) {
-		Loader.call(this, manager);
 	}
 
-	TextureLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-		constructor: TextureLoader,
-		load: function (url, onLoad, onProgress, onError) {
+	class TextureLoader extends Loader {
+		constructor(manager) {
+			super(manager);
+		}
+
+		load(url, onLoad, onProgress, onError) {
 			const texture = new Texture();
 			const loader = new ImageLoader(this.manager);
 			loader.setCrossOrigin(this.crossOrigin);
@@ -25357,7 +25413,8 @@
 			}, onProgress, onError);
 			return texture;
 		}
-	});
+
+	}
 
 	/**
 	 * Extensible curve object.
@@ -25389,28 +25446,30 @@
 	 *
 	 **/
 
-	function Curve() {
-		this.type = 'Curve';
-		this.arcLengthDivisions = 200;
-	}
-
-	Object.assign(Curve.prototype, {
-		// Virtual base class method to overwrite and implement in subclasses
+	class Curve {
+		constructor() {
+			this.type = 'Curve';
+			this.arcLengthDivisions = 200;
+		} // Virtual base class method to overwrite and implement in subclasses
 		//	- t [0 .. 1]
-		getPoint: function ()
+
+
+		getPoint()
 		/* t, optionalTarget */
 		{
 			console.warn('THREE.Curve: .getPoint() not implemented.');
 			return null;
-		},
-		// Get point at relative position in curve according to arc length
+		} // Get point at relative position in curve according to arc length
 		// - u [0 .. 1]
-		getPointAt: function (u, optionalTarget) {
+
+
+		getPointAt(u, optionalTarget) {
 			const t = this.getUtoTmapping(u);
 			return this.getPoint(t, optionalTarget);
-		},
-		// Get sequence of points using getPoint( t )
-		getPoints: function (divisions = 5) {
+		} // Get sequence of points using getPoint( t )
+
+
+		getPoints(divisions = 5) {
 			const points = [];
 
 			for (let d = 0; d <= divisions; d++) {
@@ -25418,9 +25477,10 @@
 			}
 
 			return points;
-		},
-		// Get sequence of points using getPointAt( u )
-		getSpacedPoints: function (divisions = 5) {
+		} // Get sequence of points using getPointAt( u )
+
+
+		getSpacedPoints(divisions = 5) {
 			const points = [];
 
 			for (let d = 0; d <= divisions; d++) {
@@ -25428,14 +25488,16 @@
 			}
 
 			return points;
-		},
-		// Get total curve arc length
-		getLength: function () {
+		} // Get total curve arc length
+
+
+		getLength() {
 			const lengths = this.getLengths();
 			return lengths[lengths.length - 1];
-		},
-		// Get list of cumulative segment lengths
-		getLengths: function (divisions) {
+		} // Get list of cumulative segment lengths
+
+
+		getLengths(divisions) {
 			if (divisions === undefined) divisions = this.arcLengthDivisions;
 
 			if (this.cacheArcLengths && this.cacheArcLengths.length === divisions + 1 && !this.needsUpdate) {
@@ -25458,13 +25520,15 @@
 
 			this.cacheArcLengths = cache;
 			return cache; // { sums: cache, sum: sum }; Sum is in the last element.
-		},
-		updateArcLengths: function () {
+		}
+
+		updateArcLengths() {
 			this.needsUpdate = true;
 			this.getLengths();
-		},
-		// Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equidistant
-		getUtoTmapping: function (u, distance) {
+		} // Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equidistant
+
+
+		getUtoTmapping(u, distance) {
 			const arcLengths = this.getLengths();
 			let i = 0;
 			const il = arcLengths.length;
@@ -25511,12 +25575,13 @@
 
 			const t = (i + segmentFraction) / (il - 1);
 			return t;
-		},
-		// Returns a unit vector tangent at t
+		} // Returns a unit vector tangent at t
 		// In case any sub curve does not implement its tangent derivation,
 		// 2 points a small delta apart will be used to find its gradient
 		// which seems to give a reasonable approximation
-		getTangent: function (t, optionalTarget) {
+
+
+		getTangent(t, optionalTarget) {
 			const delta = 0.0001;
 			let t1 = t - delta;
 			let t2 = t + delta; // Capping in case of danger
@@ -25528,12 +25593,14 @@
 			const tangent = optionalTarget || (pt1.isVector2 ? new Vector2() : new Vector3());
 			tangent.copy(pt2).sub(pt1).normalize();
 			return tangent;
-		},
-		getTangentAt: function (u, optionalTarget) {
+		}
+
+		getTangentAt(u, optionalTarget) {
 			const t = this.getUtoTmapping(u);
 			return this.getTangent(t, optionalTarget);
-		},
-		computeFrenetFrames: function (segments, closed) {
+		}
+
+		computeFrenetFrames(segments, closed) {
 			// see http://www.cs.indiana.edu/pub/techreports/TR425.pdf
 			const normal = new Vector3();
 			const tangents = [];
@@ -25611,15 +25678,18 @@
 				normals: normals,
 				binormals: binormals
 			};
-		},
-		clone: function () {
+		}
+
+		clone() {
 			return new this.constructor().copy(this);
-		},
-		copy: function (source) {
+		}
+
+		copy(source) {
 			this.arcLengthDivisions = source.arcLengthDivisions;
 			return this;
-		},
-		toJSON: function () {
+		}
+
+		toJSON() {
 			const data = {
 				metadata: {
 					version: 4.5,
@@ -25630,12 +25700,14 @@
 			data.arcLengthDivisions = this.arcLengthDivisions;
 			data.type = this.type;
 			return data;
-		},
-		fromJSON: function (json) {
+		}
+
+		fromJSON(json) {
 			this.arcLengthDivisions = json.arcLengthDivisions;
 			return this;
 		}
-	});
+
+	}
 
 	class EllipseCurve extends Curve {
 		constructor(aX = 0, aY = 0, xRadius = 1, yRadius = 1, aStartAngle = 0, aEndAngle = Math.PI * 2, aClockwise = false, aRotation = 0) {
@@ -27129,7 +27201,7 @@
 		}
 
 		toJSON(meta) {
-			const data = Object3D.prototype.toJSON.call(this, meta);
+			const data = super.toJSON(meta);
 			data.object.zoom = this.zoom;
 			data.object.left = this.left;
 			data.object.right = this.right;
@@ -27636,8 +27708,8 @@
 
 	}
 
-	const LoaderUtils = {
-		decodeText: function (array) {
+	class LoaderUtils {
+		static decodeText(array) {
 			if (typeof TextDecoder !== 'undefined') {
 				return new TextDecoder().decode(array);
 			} // Avoid the String.fromCharCode.apply(null, array) shortcut, which
@@ -27658,13 +27730,15 @@
 				// see #16358
 				return s;
 			}
-		},
-		extractUrlBase: function (url) {
+		}
+
+		static extractUrlBase(url) {
 			const index = url.lastIndexOf('/');
 			if (index === -1) return './';
 			return url.substr(0, index + 1);
 		}
-	};
+
+	}
 
 	function InstancedBufferGeometry() {
 		BufferGeometry.call(this);
@@ -28568,29 +28642,29 @@
 		LinearMipmapLinearFilter: LinearMipmapLinearFilter
 	};
 
-	function ImageBitmapLoader(manager) {
-		if (typeof createImageBitmap === 'undefined') {
-			console.warn('THREE.ImageBitmapLoader: createImageBitmap() not supported.');
+	class ImageBitmapLoader extends Loader {
+		constructor(manager) {
+			super(manager);
+
+			if (typeof createImageBitmap === 'undefined') {
+				console.warn('THREE.ImageBitmapLoader: createImageBitmap() not supported.');
+			}
+
+			if (typeof fetch === 'undefined') {
+				console.warn('THREE.ImageBitmapLoader: fetch() not supported.');
+			}
+
+			this.options = {
+				premultiplyAlpha: 'none'
+			};
 		}
 
-		if (typeof fetch === 'undefined') {
-			console.warn('THREE.ImageBitmapLoader: fetch() not supported.');
-		}
-
-		Loader.call(this, manager);
-		this.options = {
-			premultiplyAlpha: 'none'
-		};
-	}
-
-	ImageBitmapLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-		constructor: ImageBitmapLoader,
-		isImageBitmapLoader: true,
-		setOptions: function setOptions(options) {
+		setOptions(options) {
 			this.options = options;
 			return this;
-		},
-		load: function (url, onLoad, onProgress, onError) {
+		}
+
+		load(url, onLoad, onProgress, onError) {
 			if (url === undefined) url = '';
 			if (this.path !== undefined) url = this.path + url;
 			url = this.manager.resolveURL(url);
@@ -28626,7 +28700,10 @@
 			});
 			scope.manager.itemStart(url);
 		}
-	});
+
+	}
+
+	ImageBitmapLoader.prototype.isImageBitmapLoader = true;
 
 	class ShapePath {
 		constructor() {
@@ -32141,27 +32218,28 @@
 
 	}
 
-	function ImmediateRenderObject(material) {
-		Object3D.call(this);
-		this.material = material;
+	class ImmediateRenderObject extends Object3D {
+		constructor(material) {
+			super();
+			this.material = material;
 
-		this.render = function ()
-		/* renderCallback */
-		{};
+			this.render = function ()
+			/* renderCallback */
+			{};
 
-		this.hasPositions = false;
-		this.hasNormals = false;
-		this.hasColors = false;
-		this.hasUvs = false;
-		this.positionArray = null;
-		this.normalArray = null;
-		this.colorArray = null;
-		this.uvArray = null;
-		this.count = 0;
+			this.hasPositions = false;
+			this.hasNormals = false;
+			this.hasColors = false;
+			this.hasUvs = false;
+			this.positionArray = null;
+			this.normalArray = null;
+			this.colorArray = null;
+			this.uvArray = null;
+			this.count = 0;
+		}
+
 	}
 
-	ImmediateRenderObject.prototype = Object.create(Object3D.prototype);
-	ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;
 	ImmediateRenderObject.prototype.isImmediateRenderObject = true;
 
 	const _vector$3 = /*@__PURE__*/new Vector3();
@@ -32977,9 +33055,9 @@
 
 	const _int32View = new Int32Array(_floatView.buffer);
 
-	const DataUtils = {
+	class DataUtils {
 		// Converts float32 to float16 (stored as uint16 value).
-		toHalfFloat: function (val) {
+		static toHalfFloat(val) {
 			// Source: http://gamedev.stackexchange.com/questions/17326/conversion-of-a-number-from-single-precision-floating-point-representation-to-a/17410#17410
 
 			/* This method is faster than the OpenEXR implementation (very often
@@ -33029,7 +33107,8 @@
 			bits += m & 1;
 			return bits;
 		}
-	};
+
+	}
 
 	const LOD_MIN = 4;
 	const LOD_MAX = 8;
