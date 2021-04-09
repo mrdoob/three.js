@@ -92,7 +92,7 @@ class AdaptiveToneMappingPass extends Pass {
 				uniform float delta;
 				uniform float tau;
 
-				void main() {',
+				void main() {
 
 					vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );
 					vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );
