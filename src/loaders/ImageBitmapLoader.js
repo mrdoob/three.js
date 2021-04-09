@@ -73,7 +73,7 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		} ).then( function ( blob ) {
 
-			return createImageBitmap( blob, scope.options );
+			return createImageBitmap( blob, Object.assign( scope.options, { colorSpaceConversion: 'none' } ) );
 
 		} ).then( function ( imageBitmap ) {
 

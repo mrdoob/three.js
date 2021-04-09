@@ -34,7 +34,7 @@ class KeyframeTrack {
 		let json;
 
 		// derived classes can define a static toJSON method
-		if ( trackType.toJSON !== undefined ) {
+		if ( trackType.toJSON !== this.toJSON ) {
 
 			json = trackType.toJSON( track );
 

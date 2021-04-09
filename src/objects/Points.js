@@ -46,6 +46,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		const geometry = this.geometry;
 		const matrixWorld = this.matrixWorld;
 		const threshold = raycaster.params.Points.threshold;
+		const drawRange = geometry.drawRange;
 
 		// Checking boundingSphere distance to ray
 
@@ -73,11 +74,12 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( index !== null ) {
 
-				const indices = index.array;
+				const start = Math.max( 0, drawRange.start );
+				const end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
 
-				for ( let i = 0, il = indices.length; i < il; i ++ ) {
+				for ( let i = start, il = end; i < il; i ++ ) {
 
-					const a = indices[ i ];
+					const a = index.getX( i );
 
 					_position.fromBufferAttribute( positionAttribute, a );
 
@@ -87,7 +89,10 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			} else {
 
-				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
+				const start = Math.max( 0, drawRange.start );
+				const end = Math.min( positionAttribute.count, ( drawRange.start + drawRange.count ) );
+
+				for ( let i = start, l = end; i < l; i ++ ) {
 
 					_position.fromBufferAttribute( positionAttribute, i );
 

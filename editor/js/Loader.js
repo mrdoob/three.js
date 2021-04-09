@@ -299,11 +299,6 @@ function Loader( editor ) {
 			case 'js':
 			case 'json':
 
-			case '3geo':
-			case '3mat':
-			case '3obj':
-			case '3scn':
-
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
@@ -352,6 +347,23 @@ function Loader( editor ) {
 
 				break;
 
+			case 'ifc':
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					var { IFCLoader } = await import( '../../examples/jsm/loaders/IFCLoader.js' );
+
+					var loader = new IFCLoader();
+					var scene = await loader.parse( event.target.result );
+
+					scene.name = filename;
+
+					editor.execute( new AddObjectCommand( editor, scene ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
 
 			case 'kmz':
 
@@ -492,7 +504,7 @@ function Loader( editor ) {
 							depthWrite: false
 						} );
 
-						var shapes = path.toShapes( true );
+						var shapes = SVGLoader.createShapes( path );
 
 						for ( var j = 0; j < shapes.length; j ++ ) {
 

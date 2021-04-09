@@ -93,6 +93,12 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 			}
 
+			if ( texData.generateMipmaps !== undefined ) {
+
+				texture.generateMipmaps = texData.generateMipmaps;
+
+			}
+
 			texture.needsUpdate = true;
 
 			if ( onLoad ) onLoad( texture, texData );

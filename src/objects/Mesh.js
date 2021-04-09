@@ -402,7 +402,7 @@ function checkBufferGeometryIntersection( object, material, raycaster, ray, posi
 
 		const face = {
 			a: a,
-			b: a,
+			b: b,
 			c: c,
 			normal: new Vector3(),
 			materialIndex: 0

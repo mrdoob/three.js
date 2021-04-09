@@ -19,9 +19,6 @@ let textureId = 0;
 
 class Texture extends EventDispatcher {
 
-	static DEFAULT_IMAGE = undefined;
-	static DEFAULT_MAPPING = UVMapping;
-
 	constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1, encoding = LinearEncoding ) {
 
 		super();
@@ -329,6 +326,9 @@ class Texture extends EventDispatcher {
 	}
 
 }
+
+Texture.DEFAULT_IMAGE = undefined;
+Texture.DEFAULT_MAPPING = UVMapping;
 
 Texture.prototype.isTexture = true;
 

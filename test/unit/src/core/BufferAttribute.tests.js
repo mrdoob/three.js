@@ -245,13 +245,28 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( "toJSON", ( assert ) => {
 
-			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3, true );
+			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 );
 			assert.deepEqual( attr.toJSON(), {
 				itemSize: 3,
 				type: 'Float32Array',
 				array: [ 1, 2, 3, 4, 5, 6 ],
-				normalized: true
+				normalized: false
 			}, 'Serialized to JSON as expected' );
+
+			const attr2 = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3, true );
+			attr2.name = 'attributeName';
+			attr2.setUsage( DynamicDrawUsage );
+			attr2.updateRange.offset = 1;
+			attr2.updateRange.count = 2;
+			assert.deepEqual( attr2.toJSON(), {
+				itemSize: 3,
+				type: 'Float32Array',
+				array: [ 1, 2, 3, 4, 5, 6 ],
+				normalized: true,
+				name: 'attributeName',
+				usage: DynamicDrawUsage,
+				updateRange: { offset: 1, count: 2 }
+			}, 'Serialized to JSON as expected with non-default values' );
 
 		} );
 

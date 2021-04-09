@@ -75,7 +75,6 @@
 		"webgl_loader_3mf",
 		"webgl_loader_3mf_materials",
 		"webgl_loader_amf",
-		"webgl_loader_assimp",
 		"webgl_loader_bvh",
 		"webgl_loader_collada",
 		"webgl_loader_collada_kinematics",
@@ -88,6 +87,7 @@
 		"webgl_loader_gltf_compressed",
 		"webgl_loader_gltf_extensions",
 		"webgl_loader_gltf_variants",
+		"webgl_loader_ifc",
 		"webgl_loader_imagebitmap",
 		"webgl_loader_kmz",
 		"webgl_loader_ldraw",
@@ -261,6 +261,8 @@
 		"webgl_postprocessing_smaa",
 		"webgl_postprocessing_sobel",
 		"webgl_postprocessing_ssao",
+		"webgl_postprocessing_ssr",
+		"webgl_postprocessing_ssrr",
 		"webgl_postprocessing_taa",
 		"webgl_postprocessing_unreal_bloom",
 		"webgl_postprocessing_unreal_bloom_selective"
@@ -297,6 +299,7 @@
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_csm",
 		"webgl_shadowmap_pcss",
+		"webgl_shadowmap_progressive",
 		"webgl_simple_gi",
 		"webgl_tiled_forward",
 		"webgl_worker_offscreencanvas"
@@ -313,10 +316,11 @@
 		"webgl2_volume_perlin"
 	],
 	"webgpu": [
-		"webgpu_sandbox",
-		"webgpu_rtt",
 		"webgpu_compute",
-		"webgpu_materials"
+		"webgpu_instance_uniform",
+		"webgpu_materials",
+		"webgpu_rtt",
+		"webgpu_sandbox"
 	],
 	"webaudio": [
 		"webaudio_orientation",
@@ -327,6 +331,7 @@
 	"webxr": [
 		"webxr_ar_cones",
 		"webxr_ar_hittest",
+		"webxr_ar_lighting",
 		"webxr_ar_paint",
 		"webxr_vr_ballshooter",
 		"webxr_vr_cubes",
@@ -375,7 +380,6 @@
 		"misc_exporter_ply",
 		"misc_exporter_stl",
 		"misc_exporter_usdz",
-		"misc_legacy",
 		"misc_lookat"
 	],
 	"css2d": [

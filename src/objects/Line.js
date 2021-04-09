@@ -89,6 +89,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		const geometry = this.geometry;
 		const matrixWorld = this.matrixWorld;
 		const threshold = raycaster.params.Line.threshold;
+		const drawRange = geometry.drawRange;
 
 		// Checking boundingSphere distance to ray
 
@@ -122,12 +123,13 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( index !== null ) {
 
-				const indices = index.array;
+				const start = Math.max( 0, drawRange.start );
+				const end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
 
-				for ( let i = 0, l = indices.length - 1; i < l; i += step ) {
+				for ( let i = start, l = end - 1; i < l; i += step ) {
 
-					const a = indices[ i ];
-					const b = indices[ i + 1 ];
+					const a = index.getX( i );
+					const b = index.getX( i + 1 );
 
 					vStart.fromBufferAttribute( positionAttribute, a );
 					vEnd.fromBufferAttribute( positionAttribute, b );
@@ -159,7 +161,10 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			} else {
 
-				for ( let i = 0, l = positionAttribute.count - 1; i < l; i += step ) {
+				const start = Math.max( 0, drawRange.start );
+				const end = Math.min( positionAttribute.count, ( drawRange.start + drawRange.count ) );
+
+				for ( let i = start, l = end - 1; i < l; i += step ) {
 
 					vStart.fromBufferAttribute( positionAttribute, i );
 					vEnd.fromBufferAttribute( positionAttribute, i + 1 );

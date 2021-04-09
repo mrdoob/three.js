@@ -29,7 +29,7 @@ class Font {
 
 function createPaths( text, size, data ) {
 
-	const chars = Array.from ? Array.from( text ) : String( text ).split( '' ); // workaround for IE11, see #13988
+	const chars = Array.from( text );
 	const scale = size / data.resolution;
 	const line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
 
