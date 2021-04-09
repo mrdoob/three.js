@@ -37,6 +37,7 @@ var SelectionBox = ( function () {
 		this.endPoint = new Vector3();
 		this.collection = [];
 		this.deep = deep || Number.MAX_VALUE;
+		this.frustum = frustum
 
 	}
 
