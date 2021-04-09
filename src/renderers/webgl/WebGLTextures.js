@@ -223,8 +223,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		deallocateRenderTarget( renderTarget );
 
-		info.memory.textures --;
-
 	}
 
 	//
@@ -253,6 +251,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		if ( textureProperties.__webglTexture !== undefined ) {
 
 			_gl.deleteTexture( textureProperties.__webglTexture );
+
+			info.memory.textures --;
 
 		}
 
@@ -283,11 +283,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.isWebGLMultiRenderTarget ) {
 
-			const textures = renderTarget.textures;
+			for ( let i = 0, il = texture.length; i < il; i ++ ) {
 
-			for ( let i = 0, il = textures.length; i < il; i ++ ) {
-
-				const attachmentProperties = properties.get( textures[ i ] );
+				const attachmentProperties = properties.get( texture[ i ] );
 
 				if ( attachmentProperties.__webglTexture ) {
 
@@ -297,7 +295,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				properties.remove( textures[ i ] );
+				properties.remove( texture[ i ] );
 
 			}
 
@@ -935,7 +933,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else {
 
-			const texture = renderTarget.texture;
+			// Use the first texture for MRT so far
+			const texture = renderTarget.isWebGLMultiRenderTarget === true ? renderTarget.texture[ 0 ] : renderTarget.texture;
 
 			const glFormat = utils.convert( texture.format );
 			const glType = utils.convert( texture.type );
@@ -1055,10 +1054,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
-		textureProperties.__webglTexture = _gl.createTexture();
-		textureProperties.__version = texture.version;
+		if ( renderTarget.isWebGLMultiRenderTarget !== true ) {
 
-		info.memory.textures ++;
+			textureProperties.__webglTexture = _gl.createTexture();
+			textureProperties.__version = texture.version;
+			info.memory.textures ++;
+
+		}
 
 		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 		const isMultiRenderTarget = ( renderTarget.isWebGLMultiRenderTarget === true );
@@ -1096,9 +1098,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( capabilities.multiRenderTarget ) {
 
-					for ( let i = 0, il = renderTarget.textures.length; i < il; i ++ ) {
+					for ( let i = 0, il = renderTarget.texture.length; i < il; i ++ ) {
 
-						const attachmentProperties = properties.get( renderTarget.textures[ i ] );
+						const attachmentProperties = properties.get( renderTarget.texture[ i ] );
 
 						if ( attachmentProperties.__webglTexture === undefined ) {
 
@@ -1178,18 +1180,18 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else if ( isMultiRenderTarget ) {
 
-			const textures = renderTarget.textures;
+			const texture = renderTarget.texture;
 
-			for ( let i = 0, il = textures.length; i < il; i ++ ) {
+			for ( let i = 0, il = texture.length; i < il; i ++ ) {
 
-				const attachment = textures[ i ];
+				const attachment = texture[ i ];
 				const attachmentProperties = properties.get( attachment );
 
 				state.bindTexture( _gl.TEXTURE_2D, attachmentProperties.__webglTexture );
 				setTextureParameters( _gl.TEXTURE_2D, attachment, supportsMips );
 				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, attachment, _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D );
 
-				if ( textureNeedsGenerateMipmaps( renderTarget.texture, supportsMips ) ) {
+				if ( textureNeedsGenerateMipmaps( attachment, supportsMips ) ) {
 
 					generateMipmap( _gl.TEXTURE_2D, attachment, renderTarget.width, renderTarget.height );
 
@@ -1246,18 +1248,24 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function updateRenderTargetMipmap( renderTarget ) {
 
-		const texture = renderTarget.texture;
-
 		const supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
-		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
+		const textures = renderTarget.isWebGLMultiRenderTarget === true ? renderTarget.texture : [ renderTarget.texture ];
 
-			const target = renderTarget.isWebGLCubeRenderTarget ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
-			const webglTexture = properties.get( texture ).__webglTexture;
+		for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
-			state.bindTexture( target, webglTexture );
-			generateMipmap( target, texture, renderTarget.width, renderTarget.height );
-			state.bindTexture( target, null );
+			const texture = textures[ i ];
+
+			if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
+
+				const target = renderTarget.isWebGLCubeRenderTarget ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
+				const webglTexture = properties.get( texture ).__webglTexture;
+
+				state.bindTexture( target, webglTexture );
+				generateMipmap( target, texture, renderTarget.width, renderTarget.height );
+				state.bindTexture( target, null );
+
+			}
 
 		}
 

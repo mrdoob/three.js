@@ -1869,15 +1869,15 @@ function WebGLRenderer( parameters ) {
 
 			if ( renderTarget && renderTarget.isWebGLMultiRenderTarget ) {
 
-				if ( _currentDrawBuffers.length !== renderTarget.textures.length || _currentDrawBuffers[ 0 ] !== _gl.COLOR_ATTACHMENT0 ) {
+				if ( _currentDrawBuffers.length !== renderTarget.texture.length || _currentDrawBuffers[ 0 ] !== _gl.COLOR_ATTACHMENT0 ) {
 
-					for ( let i = 0, il = renderTarget.textures.length; i < il; i ++ ) {
+					for ( let i = 0, il = renderTarget.texture.length; i < il; i ++ ) {
 
 						_currentDrawBuffers[ i ] = _gl.COLOR_ATTACHMENT0 + i;
 
 					}
 
-					_currentDrawBuffers.length = renderTarget.textures.length;
+					_currentDrawBuffers.length = renderTarget.texture.length;
 					needsUpdate = true;
 
 				}

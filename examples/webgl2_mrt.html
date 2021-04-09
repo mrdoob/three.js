@@ -165,18 +165,21 @@
 				renderTarget = new THREE.WebGLMultiRenderTarget(
 					window.innerWidth * window.devicePixelRatio,
 					window.innerHeight * window.devicePixelRatio,
-					2,
-					{
-						minFilter: THREE.NearestFilter,
-						magFilter: THREE.NearestFilter,
-						type: THREE.FloatType
-					}
+					2
 				);
+
+				for ( let i = 0, il = renderTarget.texture.length; i < il; i ++ ) {
+
+					renderTarget.texture[ i ].minFilter = THREE.NearestFilter;
+					renderTarget.texture[ i ].magFilter = THREE.NearestFilter;
+					renderTarget.texture[ i ].type = THREE.FloatType;
+
+				}
 
 				// Name our G-Buffer attachments for debugging
 
-				renderTarget.textures[ 0 ].name = 'diffuse';
-				renderTarget.textures[ 1 ].name = 'normal';
+				renderTarget.texture[ 0 ].name = 'diffuse';
+				renderTarget.texture[ 1 ].name = 'normal';
 
 				// Scene setup
 
@@ -224,8 +227,8 @@
 						vertexShader: document.querySelector( '#render-vert' ).textContent.trim(),
 						fragmentShader: document.querySelector( '#render-frag' ).textContent.trim(),
 						uniforms: {
-							tDiffuse: { value: renderTarget.textures[ 0 ] },
-							tNormal: { value: renderTarget.textures[ 1 ] },
+							tDiffuse: { value: renderTarget.texture[ 0 ] },
+							tNormal: { value: renderTarget.texture[ 1 ] },
 						},
 						glslVersion: THREE.GLSL3
 					} )
