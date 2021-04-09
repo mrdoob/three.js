@@ -713,19 +713,19 @@
 		parseColourMetaDirective( lineParser ) {
 
 			// Parses a colour definition and returns a THREE.Material or null if error
-			var code = null; // Triangle and line colours
+			let code = null; // Triangle and line colours
 
-			var colour = 0xFF00FF;
-			var edgeColour = 0xFF00FF; // Transparency
+			let colour = 0xFF00FF;
+			let edgeColour = 0xFF00FF; // Transparency
 
-			var alpha = 1;
-			var isTransparent = false; // Self-illumination:
+			let alpha = 1;
+			let isTransparent = false; // Self-illumination:
 
-			var luminance = 0;
-			var finishType = FINISH_TYPE_DEFAULT;
-			var canHaveEnvMap = true;
-			var edgeMaterial = null;
-			var name = lineParser.getToken();
+			let luminance = 0;
+			let finishType = FINISH_TYPE_DEFAULT;
+			let canHaveEnvMap = true;
+			let edgeMaterial = null;
+			const name = lineParser.getToken();
 
 			if ( ! name ) {
 
@@ -734,7 +734,7 @@
 			} // Parse tag tokens and their parameters
 
 
-			var token = null;
+			let token = null;
 
 			while ( true ) {
 
@@ -856,7 +856,7 @@
 
 			}
 
-			var material = null;
+			let material = null;
 
 			switch ( finishType ) {
 
@@ -871,8 +871,8 @@
 
 				case FINISH_TYPE_PEARLESCENT:
 				// Try to imitate pearlescency by setting the specular to the complementary of the color, and low shininess
-					var specular = new THREE.Color( colour );
-					var hsl = specular.getHSL( {
+					const specular = new THREE.Color( colour );
+					const hsl = specular.getHSL( {
 						h: 0,
 						s: 0,
 						l: 0
@@ -988,18 +988,18 @@
 		objectParse( text ) {
 
 			// Retrieve data from the parent parse scope
-			var parentParseScope = this.getParentParseScope(); // Main colour codes passed to this subobject (or default codes 16 and 24 if it is the root object)
+			const parentParseScope = this.getParentParseScope(); // Main colour codes passed to this subobject (or default codes 16 and 24 if it is the root object)
 
-			var mainColourCode = parentParseScope.mainColourCode;
-			var mainEdgeColourCode = parentParseScope.mainEdgeColourCode;
-			var currentParseScope = this.getCurrentParseScope(); // Parse result variables
+			const mainColourCode = parentParseScope.mainColourCode;
+			const mainEdgeColourCode = parentParseScope.mainEdgeColourCode;
+			const currentParseScope = this.getCurrentParseScope(); // Parse result variables
 
-			var triangles;
-			var lineSegments;
-			var conditionalSegments;
-			var subobjects = [];
-			var category = null;
-			var keywords = null;
+			let triangles;
+			let lineSegments;
+			let conditionalSegments;
+			const subobjects = [];
+			let category = null;
+			let keywords = null;
 
 			if ( text.indexOf( '\r\n' ) !== - 1 ) {
 
@@ -1008,24 +1008,23 @@
 
 			}
 
-			var lines = text.split( '\n' );
-			var numLines = lines.length;
-			var lineIndex = 0;
-			var parsingEmbeddedFiles = false;
-			var currentEmbeddedFileName = null;
-			var currentEmbeddedText = null;
-			var bfcCertified = false;
-			var bfcCCW = true;
-			var bfcInverted = false;
-			var bfcCull = true;
-			var type = '';
-			var startingConstructionStep = false;
-			var scope = this;
+			const lines = text.split( '\n' );
+			const numLines = lines.length;
+			let parsingEmbeddedFiles = false;
+			let currentEmbeddedFileName = null;
+			let currentEmbeddedText = null;
+			let bfcCertified = false;
+			let bfcCCW = true;
+			let bfcInverted = false;
+			let bfcCull = true;
+			let type = '';
+			let startingConstructionStep = false;
+			const scope = this;
 
 			function parseColourCode( lineParser, forEdge ) {
 
 				// Parses next colour code and returns a THREE.Material
-				var colourCode = lineParser.getToken();
+				let colourCode = lineParser.getToken();
 
 				if ( ! forEdge && colourCode === '16' ) {
 
@@ -1039,7 +1038,7 @@
 
 				}
 
-				var material = scope.getMaterial( colourCode );
+				const material = scope.getMaterial( colourCode );
 
 				if ( ! material ) {
 
@@ -1053,7 +1052,7 @@
 
 			function parseVector( lp ) {
 
-				var v = new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
+				const v = new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
 
 				if ( ! scope.separateObjects ) {
 
@@ -1066,9 +1065,9 @@
 			} // Parse all line commands
 
 
-			for ( lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
+			for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
 
-				var line = lines[ lineIndex ];
+				const line = lines[ lineIndex ];
 				if ( line.length === 0 ) continue;
 
 				if ( parsingEmbeddedFiles ) {
@@ -1091,7 +1090,7 @@
 
 				}
 
-				var lp = new LineParser( line, lineIndex + 1 );
+				const lp = new LineParser( line, lineIndex + 1 );
 				lp.seekNonSpace();
 
 				if ( lp.isAtTheEnd() ) {
@@ -1102,14 +1101,20 @@
 				} // Parse the line type
 
 
-				var lineType = lp.getToken();
+				const lineType = lp.getToken();
+				let material;
+				let segment;
+				let inverted;
+				let ccw;
+				let doubleSided;
+				let v0, v1, v2, v3, faceNormal;
 
 				switch ( lineType ) {
 
 					// Line type 0: Comment or META
 					case '0':
 					// Parse meta directive
-						var meta = lp.getToken();
+						const meta = lp.getToken();
 
 						if ( meta ) {
 
@@ -1121,7 +1126,7 @@
 									currentParseScope.lineSegments = [];
 									currentParseScope.conditionalSegments = [];
 									currentParseScope.type = type;
-									var isRoot = ! parentParseScope.isFromParse;
+									const isRoot = ! parentParseScope.isFromParse;
 
 									if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
 
@@ -1132,9 +1137,7 @@
 									// needs to be flipped.
 
 
-									var matrix = currentParseScope.matrix;
-
-									if ( matrix.determinant() < 0 && ( scope.separateObjects && isPrimitiveType( type ) || ! scope.separateObjects ) ) {
+									if ( currentParseScope.matrix.determinant() < 0 && ( scope.separateObjects && isPrimitiveType( type ) || ! scope.separateObjects ) ) {
 
 										currentParseScope.inverted = ! currentParseScope.inverted;
 
@@ -1146,7 +1149,7 @@
 									break;
 
 								case '!COLOUR':
-									var material = this.parseColourMetaDirective( lp );
+									material = this.parseColourMetaDirective( lp );
 
 									if ( material ) {
 
@@ -1165,7 +1168,7 @@
 									break;
 
 								case '!KEYWORDS':
-									var newKeywords = lp.getRemainingString().split( ',' );
+									const newKeywords = lp.getRemainingString().split( ',' );
 
 									if ( newKeywords.length > 0 ) {
 
@@ -1203,7 +1206,7 @@
 								// Changes to the backface culling state
 									while ( ! lp.isAtTheEnd() ) {
 
-										var token = lp.getToken();
+										const token = lp.getToken();
 
 										switch ( token ) {
 
@@ -1253,21 +1256,21 @@
 						// Line type 1: Sub-object file
 
 					case '1':
-						var material = parseColourCode( lp );
-						var posX = parseFloat( lp.getToken() );
-						var posY = parseFloat( lp.getToken() );
-						var posZ = parseFloat( lp.getToken() );
-						var m0 = parseFloat( lp.getToken() );
-						var m1 = parseFloat( lp.getToken() );
-						var m2 = parseFloat( lp.getToken() );
-						var m3 = parseFloat( lp.getToken() );
-						var m4 = parseFloat( lp.getToken() );
-						var m5 = parseFloat( lp.getToken() );
-						var m6 = parseFloat( lp.getToken() );
-						var m7 = parseFloat( lp.getToken() );
-						var m8 = parseFloat( lp.getToken() );
-						var matrix = new THREE.Matrix4().set( m0, m1, m2, posX, m3, m4, m5, posY, m6, m7, m8, posZ, 0, 0, 0, 1 );
-						var fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
+						material = parseColourCode( lp );
+						const posX = parseFloat( lp.getToken() );
+						const posY = parseFloat( lp.getToken() );
+						const posZ = parseFloat( lp.getToken() );
+						const m0 = parseFloat( lp.getToken() );
+						const m1 = parseFloat( lp.getToken() );
+						const m2 = parseFloat( lp.getToken() );
+						const m3 = parseFloat( lp.getToken() );
+						const m4 = parseFloat( lp.getToken() );
+						const m5 = parseFloat( lp.getToken() );
+						const m6 = parseFloat( lp.getToken() );
+						const m7 = parseFloat( lp.getToken() );
+						const m8 = parseFloat( lp.getToken() );
+						const matrix = new THREE.Matrix4().set( m0, m1, m2, posX, m3, m4, m5, posY, m6, m7, m8, posZ, 0, 0, 0, 1 );
+						const fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
 
 						if ( scope.fileMap[ fileName ] ) {
 
@@ -1305,8 +1308,8 @@
 						// Line type 2: Line segment
 
 					case '2':
-						var material = parseColourCode( lp, true );
-						var segment = {
+						material = parseColourCode( lp, true );
+						segment = {
 							material: material.userData.edgeMaterial,
 							colourCode: material.userData.code,
 							v0: parseVector( lp ),
@@ -1317,8 +1320,8 @@
 						// Line type 5: Conditional Line segment
 
 					case '5':
-						var material = parseColourCode( lp, true );
-						var segment = {
+						material = parseColourCode( lp, true );
+						segment = {
 							material: material.userData.edgeMaterial.userData.conditionalEdgeMaterial,
 							colourCode: material.userData.code,
 							v0: parseVector( lp ),
@@ -1331,11 +1334,10 @@
 						// Line type 3: Triangle
 
 					case '3':
-						var material = parseColourCode( lp );
-						var inverted = currentParseScope.inverted;
-						var ccw = bfcCCW !== inverted;
-						var doubleSided = ! bfcCertified || ! bfcCull;
-						var v0, v1, v2, faceNormal;
+						material = parseColourCode( lp );
+						inverted = currentParseScope.inverted;
+						ccw = bfcCCW !== inverted;
+						doubleSided = ! bfcCertified || ! bfcCull;
 
 						if ( ccw === true ) {
 
@@ -1388,11 +1390,10 @@
 						// Line type 4: Quadrilateral
 
 					case '4':
-						var material = parseColourCode( lp );
-						var inverted = currentParseScope.inverted;
-						var ccw = bfcCCW !== inverted;
-						var doubleSided = ! bfcCertified || ! bfcCull;
-						var v0, v1, v2, v3, faceNormal;
+						material = parseColourCode( lp );
+						inverted = currentParseScope.inverted;
+						ccw = bfcCCW !== inverted;
+						doubleSided = ! bfcCertified || ! bfcCull;
 
 						if ( ccw === true ) {
 
@@ -1492,7 +1493,7 @@
 		computeConstructionSteps( model ) {
 
 			// Sets userdata.constructionStep number in THREE.Group objects and userData.numConstructionSteps number in the root THREE.Group object.
-			var stepNumber = 0;
+			let stepNumber = 0;
 			model.traverse( c => {
 
 				if ( c.isGroup ) {
@@ -1514,10 +1515,10 @@
 
 		processObject( text, onProcessed, subobject, url ) {
 
-			var scope = this;
-			var parseScope = scope.newParseScopeLevel();
+			const scope = this;
+			const parseScope = scope.newParseScopeLevel();
 			parseScope.url = url;
-			var parentParseScope = scope.getParentParseScope(); // Set current matrix
+			const parentParseScope = scope.getParentParseScope(); // Set current matrix
 
 			if ( subobject ) {
 
@@ -1529,7 +1530,7 @@
 			} // Add to cache
 
 
-			var currentFileName = parentParseScope.currentFileName;
+			let currentFileName = parentParseScope.currentFileName;
 
 			if ( currentFileName !== null ) {
 
@@ -1545,7 +1546,7 @@
 
 
 			scope.objectParse( text );
-			var finishedCount = 0;
+			let finishedCount = 0;
 			onSubobjectFinish();
 
 			function onSubobjectFinish() {
@@ -1564,7 +1565,7 @@
 					// Promise.resolve is used as an approach to asynchronously schedule a task _before_ this frame ends to
 					// avoid stack overflow exceptions when loading many subobjects from the cache. RequestAnimationFrame
 					// will work but causes the load to happen after the next frame which causes the load to take significantly longer.
-					var subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
+					const subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
 					Promise.resolve().then( function () {
 
 						loadSubobject( subobject );
@@ -1584,7 +1585,7 @@
 
 				}
 
-				var isRoot = ! parentParseScope.isFromParse;
+				const isRoot = ! parentParseScope.isFromParse;
 
 				if ( scope.separateObjects && ! isPrimitiveType( parseScope.type ) || isRoot ) {
 
@@ -1620,17 +1621,17 @@
 
 				} else {
 
-					var separateObjects = scope.separateObjects;
-					var parentLineSegments = parentParseScope.lineSegments;
-					var parentConditionalSegments = parentParseScope.conditionalSegments;
-					var parentTriangles = parentParseScope.triangles;
-					var lineSegments = parseScope.lineSegments;
-					var conditionalSegments = parseScope.conditionalSegments;
-					var triangles = parseScope.triangles;
+					const separateObjects = scope.separateObjects;
+					const parentLineSegments = parentParseScope.lineSegments;
+					const parentConditionalSegments = parentParseScope.conditionalSegments;
+					const parentTriangles = parentParseScope.triangles;
+					const lineSegments = parseScope.lineSegments;
+					const conditionalSegments = parseScope.conditionalSegments;
+					const triangles = parseScope.triangles;
 
-					for ( var i = 0, l = lineSegments.length; i < l; i ++ ) {
+					for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
-						var ls = lineSegments[ i ];
+						const ls = lineSegments[ i ];
 
 						if ( separateObjects ) {
 
@@ -1643,9 +1644,9 @@
 
 					}
 
-					for ( var i = 0, l = conditionalSegments.length; i < l; i ++ ) {
+					for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
 
-						var os = conditionalSegments[ i ];
+						const os = conditionalSegments[ i ];
 
 						if ( separateObjects ) {
 
@@ -1660,9 +1661,9 @@
 
 					}
 
-					for ( var i = 0, l = triangles.length; i < l; i ++ ) {
+					for ( let i = 0, l = triangles.length; i < l; i ++ ) {
 
-						var tri = triangles[ i ];
+						const tri = triangles[ i ];
 
 						if ( separateObjects ) {
 
@@ -1706,7 +1707,7 @@
 				parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
 				parseScope.currentFileName = subobject.originalFileName; // If subobject was cached previously, use the cached one
 
-				var cached = scope.subobjectCache[ subobject.originalFileName.toLowerCase() ];
+				const cached = scope.subobjectCache[ subobject.originalFileName.toLowerCase() ];
 
 				if ( cached ) {
 
@@ -1722,8 +1723,8 @@
 				// Update also subobject.locationState for the next try if this load fails.
 
 
-				var subobjectURL = subobject.fileName;
-				var newLocationState = FILE_LOCATION_NOT_FOUND;
+				let subobjectURL = subobject.fileName;
+				let newLocationState = FILE_LOCATION_NOT_FOUND;
 
 				switch ( subobject.locationState ) {
 
@@ -1781,7 +1782,7 @@
 				// Use another file loader here so we can keep track of the subobject information
 				// and use it when processing the next model.
 
-				var fileLoader = new THREE.FileLoader( scope.manager );
+				const fileLoader = new THREE.FileLoader( scope.manager );
 				fileLoader.setPath( scope.path );
 				fileLoader.setRequestHeader( scope.requestHeader );
 				fileLoader.setWithCredentials( scope.withCredentials );
