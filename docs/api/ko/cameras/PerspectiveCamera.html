@@ -130,6 +130,30 @@
 		기본적으로 초점 길이는 35mm(전체 프레임) 카메라로 지정됩니다.
 		</p>
 
+		<h3>[method:Float getHorizontalFOV]()</h3>
+		<p>Returns the current horizontal field of view angle in degrees, calculated from [page:.fov .fov] and [page:.aspect .aspect].</p>
+
+		<h3>[method:null setHorizontalFOV]( [param:Float horizontalFOV] )</h3>
+		<p>Sets the [page:.fov .fov] by horizontal field of view in degrees and [page:.aspect .aspect].</p>
+
+		<p>
+			To maintain a constant horizontal fov, you would call it like this:<br />
+
+			<code>function onWindowResize( event ) {
+
+	renderer.setSize( window.innerWidth, window.innerHeight );
+
+	// maintain a constant horizontal fov
+	const hfov = camera.getHorizontalFOV();
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.setHorizontalFOV( hfov );
+
+	render(); // if there is no animation loop
+
+}
+</code>
+		</p>
+
 		<h3>[method:null setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
 		<p>
 		fullWidth — 멀티뷰 설정의 최대너비<br />

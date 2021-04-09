@@ -127,6 +127,30 @@
 		<br /><br />
 			默认情况下，焦距是为35mm（全画幅）摄像机而指定的。</p>
 
+			<h3>[method:Float getHorizontalFOV]()</h3>
+			<p>返回从[page:.fov .fov]和[page:.aspect .aspect]计算得出的当前水平视野度数。</p>
+	
+			<h3>[method:null setHorizontalFOV]( [param:Float horizontalFOV] )</h3>
+			<p>通过水平视野度数和[page:.aspect .aspect]设置[page:.fov .fov]。</p>
+	
+			<p>
+				为了保持固定的水平视野，你可以这样来设置、调用：<br />
+				
+				<code>function onWindowResize( event ) {
+	
+		renderer.setSize( window.innerWidth, window.innerHeight );
+	
+		// maintain a constant horizontal fov
+		const hfov = camera.getHorizontalFOV();
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.setHorizontalFOV( hfov );
+	
+		render(); // if there is no animation loop
+	
+	}
+	</code>
+			</p>
+
 		<h3>[method:null setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
 		<p>
 		fullWidth — 多视图的全宽设置<br />

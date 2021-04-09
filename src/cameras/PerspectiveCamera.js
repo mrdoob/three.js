@@ -81,6 +81,20 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	},
 
+	setHorizontalFOV: function ( horizontalFOV ) {
+
+		this.fov = Math.atan( Math.tan( horizontalFOV * MathUtils.DEG2RAD * 0.5 ) / this.aspect ) * MathUtils.RAD2DEG * 2; // degrees
+
+		this.updateProjectionMatrix();
+
+	},
+
+	getHorizontalFOV: function () {
+
+		return Math.atan( Math.tan( this.fov * MathUtils.DEG2RAD * 0.5 ) * this.aspect ) * MathUtils.RAD2DEG * 2; // degrees
+
+	},
+
 	getEffectiveFOV: function () {
 
 		return MathUtils.RAD2DEG * 2 * Math.atan(
