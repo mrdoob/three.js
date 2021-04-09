@@ -1,68 +1,71 @@
 ( function () {
 
-	var MD2CharacterComplex = function () {
+	class MD2CharacterComplex {
 
-		var scope = this;
-		this.scale = 1; // animation parameters
+		constructor() {
 
-		this.animationFPS = 6;
-		this.transitionFrames = 15; // movement model parameters
+			this.scale = 1; // animation parameters
 
-		this.maxSpeed = 275;
-		this.maxReverseSpeed = - 275;
-		this.frontAcceleration = 600;
-		this.backAcceleration = 600;
-		this.frontDecceleration = 600;
-		this.angularSpeed = 2.5; // rig
+			this.animationFPS = 6;
+			this.transitionFrames = 15; // movement model parameters
 
-		this.root = new THREE.Object3D();
-		this.meshBody = null;
-		this.meshWeapon = null;
-		this.controls = null; // skins
+			this.maxSpeed = 275;
+			this.maxReverseSpeed = - 275;
+			this.frontAcceleration = 600;
+			this.backAcceleration = 600;
+			this.frontDecceleration = 600;
+			this.angularSpeed = 2.5; // rig
 
-		this.skinsBody = [];
-		this.skinsWeapon = [];
-		this.weapons = [];
-		this.currentSkin = undefined; //
+			this.root = new THREE.Object3D();
+			this.meshBody = null;
+			this.meshWeapon = null;
+			this.controls = null; // skins
 
-		this.onLoadComplete = function () {}; // internals
+			this.skinsBody = [];
+			this.skinsWeapon = [];
+			this.weapons = [];
+			this.currentSkin = undefined; //
+
+			this.onLoadComplete = function () {}; // internals
 
 
-		this.meshes = [];
-		this.animations = {};
-		this.loadCounter = 0; // internal movement control variables
+			this.meshes = [];
+			this.animations = {};
+			this.loadCounter = 0; // internal movement control variables
 
-		this.speed = 0;
-		this.bodyOrientation = 0;
-		this.walkSpeed = this.maxSpeed;
-		this.crouchSpeed = this.maxSpeed * 0.5; // internal animation parameters
+			this.speed = 0;
+			this.bodyOrientation = 0;
+			this.walkSpeed = this.maxSpeed;
+			this.crouchSpeed = this.maxSpeed * 0.5; // internal animation parameters
 
-		this.activeAnimation = null;
-		this.oldAnimation = null; // API
+			this.activeAnimation = null;
+			this.oldAnimation = null; // API
 
-		this.enableShadows = function ( enable ) {
+		}
 
-			for ( var i = 0; i < this.meshes.length; i ++ ) {
+		enableShadows( enable ) {
+
+			for ( let i = 0; i < this.meshes.length; i ++ ) {
 
 				this.meshes[ i ].castShadow = enable;
 				this.meshes[ i ].receiveShadow = enable;
 
 			}
 
-		};
+		}
 
-		this.setVisible = function ( enable ) {
+		setVisible( enable ) {
 
-			for ( var i = 0; i < this.meshes.length; i ++ ) {
+			for ( let i = 0; i < this.meshes.length; i ++ ) {
 
 				this.meshes[ i ].visible = enable;
 				this.meshes[ i ].visible = enable;
 
 			}
 
-		};
+		}
 
-		this.shareParts = function ( original ) {
+		shareParts( original ) {
 
 			this.animations = original.animations;
 			this.walkSpeed = original.walkSpeed;
@@ -70,16 +73,18 @@
 			this.skinsBody = original.skinsBody;
 			this.skinsWeapon = original.skinsWeapon; // BODY
 
-			var mesh = createPart( original.meshBody.geometry, this.skinsBody[ 0 ] );
+			const mesh = this._createPart( original.meshBody.geometry, this.skinsBody[ 0 ] );
+
 			mesh.scale.set( this.scale, this.scale, this.scale );
 			this.root.position.y = original.root.position.y;
 			this.root.add( mesh );
 			this.meshBody = mesh;
 			this.meshes.push( mesh ); // WEAPONS
 
-			for ( var i = 0; i < original.weapons.length; i ++ ) {
+			for ( let i = 0; i < original.weapons.length; i ++ ) {
 
-				var meshWeapon = createPart( original.weapons[ i ].geometry, this.skinsWeapon[ i ] );
+				const meshWeapon = this._createPart( original.weapons[ i ].geometry, this.skinsWeapon[ i ] );
+
 				meshWeapon.scale.set( this.scale, this.scale, this.scale );
 				meshWeapon.visible = false;
 				meshWeapon.name = original.weapons[ i ].name;
@@ -90,29 +95,58 @@
 
 			}
 
-		};
+		}
 
-		this.loadParts = function ( config ) {
+		loadParts( config ) {
+
+			const scope = this;
+
+			function loadTextures( baseUrl, textureUrls ) {
+
+				const textureLoader = new THREE.TextureLoader();
+				const textures = [];
+
+				for ( let i = 0; i < textureUrls.length; i ++ ) {
+
+					textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
+					textures[ i ].mapping = THREE.UVMapping;
+					textures[ i ].name = textureUrls[ i ];
+					textures[ i ].encoding = THREE.sRGBEncoding;
+
+				}
+
+				return textures;
+
+			}
+
+			function checkLoadingComplete() {
+
+				scope.loadCounter -= 1;
+				if ( scope.loadCounter === 0 ) scope.onLoadComplete();
+
+			}
 
 			this.animations = config.animations;
 			this.walkSpeed = config.walkSpeed;
 			this.crouchSpeed = config.crouchSpeed;
 			this.loadCounter = config.weapons.length * 2 + config.skins.length + 1;
-			var weaponsTextures = [];
+			const weaponsTextures = [];
 
-			for ( var i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ]; // SKINS
+			for ( let i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ]; // SKINS
 
 
 			this.skinsBody = loadTextures( config.baseUrl + 'skins/', config.skins );
 			this.skinsWeapon = loadTextures( config.baseUrl + 'skins/', weaponsTextures ); // BODY
 
-			var loader = new THREE.MD2Loader();
+			const loader = new THREE.MD2Loader();
 			loader.load( config.baseUrl + config.body, function ( geo ) {
 
-				var boundingBox = new THREE.Box3();
+				const boundingBox = new THREE.Box3();
 				boundingBox.setFromBufferAttribute( geo.attributes.position );
 				scope.root.position.y = - scope.scale * boundingBox.min.y;
-				var mesh = createPart( geo, scope.skinsBody[ 0 ] );
+
+				const mesh = scope._createPart( geo, scope.skinsBody[ 0 ] );
+
 				mesh.scale.set( scope.scale, scope.scale, scope.scale );
 				scope.root.add( mesh );
 				scope.meshBody = mesh;
@@ -121,11 +155,12 @@
 
 			} ); // WEAPONS
 
-			var generateCallback = function ( index, name ) {
+			const generateCallback = function ( index, name ) {
 
 				return function ( geo ) {
 
-					var mesh = createPart( geo, scope.skinsWeapon[ index ] );
+					const mesh = scope._createPart( geo, scope.skinsWeapon[ index ] );
+
 					mesh.scale.set( scope.scale, scope.scale, scope.scale );
 					mesh.visible = false;
 					mesh.name = name;
@@ -139,22 +174,22 @@
 
 			};
 
-			for ( var i = 0; i < config.weapons.length; i ++ ) {
+			for ( let i = 0; i < config.weapons.length; i ++ ) {
 
 				loader.load( config.baseUrl + config.weapons[ i ][ 0 ], generateCallback( i, config.weapons[ i ][ 0 ] ) );
 
 			}
 
-		};
+		}
 
-		this.setPlaybackRate = function ( rate ) {
+		setPlaybackRate( rate ) {
 
 			if ( this.meshBody ) this.meshBody.duration = this.meshBody.baseDuration / rate;
 			if ( this.meshWeapon ) this.meshWeapon.duration = this.meshWeapon.baseDuration / rate;
 
-		};
+		}
 
-		this.setWireframe = function ( wireframeEnabled ) {
+		setWireframe( wireframeEnabled ) {
 
 			if ( wireframeEnabled ) {
 
@@ -168,9 +203,9 @@
 
 			}
 
-		};
+		}
 
-		this.setSkin = function ( index ) {
+		setSkin( index ) {
 
 			if ( this.meshBody && this.meshBody.material.wireframe === false ) {
 
@@ -179,13 +214,13 @@
 
 			}
 
-		};
+		}
 
-		this.setWeapon = function ( index ) {
+		setWeapon( index ) {
 
-			for ( var i = 0; i < this.weapons.length; i ++ ) this.weapons[ i ].visible = false;
+			for ( let i = 0; i < this.weapons.length; i ++ ) this.weapons[ i ].visible = false;
 
-			var activeWeapon = this.weapons[ index ];
+			const activeWeapon = this.weapons[ index ];
 
 			if ( activeWeapon ) {
 
@@ -201,9 +236,9 @@
 
 			}
 
-		};
+		}
 
-		this.setAnimation = function ( animationName ) {
+		setAnimation( animationName ) {
 
 			if ( animationName === this.activeAnimation || ! animationName ) return;
 
@@ -224,9 +259,9 @@
 
 			}
 
-		};
+		}
 
-		this.update = function ( delta ) {
+		update( delta ) {
 
 			if ( this.controls ) this.updateMovementModel( delta );
 
@@ -237,11 +272,11 @@
 
 			}
 
-		};
+		}
 
-		this.updateAnimations = function ( delta ) {
+		updateAnimations( delta ) {
 
-			var mix = 1;
+			let mix = 1;
 
 			if ( this.blendCounter > 0 ) {
 
@@ -266,13 +301,13 @@
 
 			}
 
-		};
+		}
 
-		this.updateBehaviors = function () {
+		updateBehaviors() {
 
-			var controls = this.controls;
-			var animations = this.animations;
-			var moveAnimation, idleAnimation; // crouch vs stand
+			const controls = this.controls;
+			const animations = this.animations;
+			let moveAnimation, idleAnimation; // crouch vs stand
 
 			if ( controls.crouch ) {
 
@@ -368,11 +403,17 @@
 
 			}
 
-		};
+		}
 
-		this.updateMovementModel = function ( delta ) {
+		updateMovementModel( delta ) {
 
-			var controls = this.controls; // speed based on controls
+			function exponentialEaseOut( k ) {
+
+				return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1;
+
+			}
+
+			const controls = this.controls; // speed based on controls
 
 			if ( controls.crouch ) this.maxSpeed = this.crouchSpeed; else this.maxSpeed = this.walkSpeed;
 			this.maxReverseSpeed = - this.maxSpeed;
@@ -380,7 +421,7 @@
 			if ( controls.moveBackward ) this.speed = THREE.MathUtils.clamp( this.speed - delta * this.backAcceleration, this.maxReverseSpeed, this.maxSpeed ); // orientation based on controls
 			// (don't just stand while turning)
 
-			var dir = 1;
+			const dir = 1;
 
 			if ( controls.moveLeft ) {
 
@@ -401,12 +442,12 @@
 
 				if ( this.speed > 0 ) {
 
-					var k = exponentialEaseOut( this.speed / this.maxSpeed );
+					const k = exponentialEaseOut( this.speed / this.maxSpeed );
 					this.speed = THREE.MathUtils.clamp( this.speed - k * delta * this.frontDecceleration, 0, this.maxSpeed );
 
 				} else {
 
-					var k = exponentialEaseOut( this.speed / this.maxReverseSpeed );
+					const k = exponentialEaseOut( this.speed / this.maxReverseSpeed );
 					this.speed = THREE.MathUtils.clamp( this.speed + k * delta * this.backAcceleration, this.maxReverseSpeed, 0 );
 
 				}
@@ -414,42 +455,24 @@
 			} // displacement
 
 
-			var forwardDelta = this.speed * delta;
+			const forwardDelta = this.speed * delta;
 			this.root.position.x += Math.sin( this.bodyOrientation ) * forwardDelta;
 			this.root.position.z += Math.cos( this.bodyOrientation ) * forwardDelta; // steering
 
 			this.root.rotation.y = this.bodyOrientation;
 
-		}; // internal helpers
+		} // internal
 
 
-		function loadTextures( baseUrl, textureUrls ) {
+		_createPart( geometry, skinMap ) {
 
-			var textureLoader = new THREE.TextureLoader();
-			var textures = [];
-
-			for ( var i = 0; i < textureUrls.length; i ++ ) {
-
-				textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
-				textures[ i ].mapping = THREE.UVMapping;
-				textures[ i ].name = textureUrls[ i ];
-				textures[ i ].encoding = THREE.sRGBEncoding;
-
-			}
-
-			return textures;
-
-		}
-
-		function createPart( geometry, skinMap ) {
-
-			var materialWireframe = new THREE.MeshLambertMaterial( {
+			const materialWireframe = new THREE.MeshLambertMaterial( {
 				color: 0xffaa00,
 				wireframe: true,
 				morphTargets: true,
 				morphNormals: true
 			} );
-			var materialTexture = new THREE.MeshLambertMaterial( {
+			const materialTexture = new THREE.MeshLambertMaterial( {
 				color: 0xffffff,
 				wireframe: false,
 				map: skinMap,
@@ -457,31 +480,18 @@
 				morphNormals: true
 			} ); //
 
-			var mesh = new THREE.MorphBlendMesh( geometry, materialTexture );
+			const mesh = new THREE.MorphBlendMesh( geometry, materialTexture );
 			mesh.rotation.y = - Math.PI / 2; //
 
 			mesh.materialTexture = materialTexture;
 			mesh.materialWireframe = materialWireframe; //
 
-			mesh.autoCreateAnimations( scope.animationFPS );
+			mesh.autoCreateAnimations( this.animationFPS );
 			return mesh;
 
 		}
 
-		function checkLoadingComplete() {
-
-			scope.loadCounter -= 1;
-			if ( scope.loadCounter === 0 ) scope.onLoadComplete();
-
-		}
-
-		function exponentialEaseOut( k ) {
-
-			return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1;
-
-		}
-
-	};
+	}
 
 	THREE.MD2CharacterComplex = MD2CharacterComplex;
 
