@@ -3,7 +3,7 @@ import {
 	Vector2
 } from '../../../build/three.module.js';
 
-var SSRrShader = {
+const SSRrShader = {
 
 	defines: {
 		MAX_STEP: 0,

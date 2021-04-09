@@ -1,6 +1,6 @@
 ( function () {
 
-	var SSRrShader = {
+	const SSRrShader = {
 		defines: {
 			MAX_STEP: 0,
 			PERSPECTIVE_CAMERA: true,
