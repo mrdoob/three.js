@@ -2,7 +2,7 @@ let _canvas;
 
 class ImageUtils {
 
-	getDataURL( image ) {
+	static getDataURL( image ) {
 
 		if ( /^data:/i.test( image.src ) ) {
 

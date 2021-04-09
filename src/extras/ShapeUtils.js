@@ -4,7 +4,7 @@ class ShapeUtils {
 
 	// calculate area of the contour polygon
 
-	area( contour ) {
+	static area( contour ) {
 
 		const n = contour.length;
 		let a = 0.0;
@@ -19,13 +19,13 @@ class ShapeUtils {
 
 	}
 
-	isClockWise( pts ) {
+	static isClockWise( pts ) {
 
 		return ShapeUtils.area( pts ) < 0;
 
 	}
 
-	triangulateShape( contour, holes ) {
+	static triangulateShape( contour, holes ) {
 
 		const vertices = []; // flat array of vertices like [ x0,y0, x1,y1, x2,y2, ... ]
 		const holeIndices = []; // array of hole indices
