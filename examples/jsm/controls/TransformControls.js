@@ -1577,29 +1577,30 @@ TransformControlsGizmo.prototype = Object.assign( Object.create( Object3D.protot
 
 } );
 
+const _unitX = new Vector3( 1, 0, 0 );
+const _unitY = new Vector3( 0, 1, 0 );
+const _unitZ = new Vector3( 0, 0, 1 );
 
-var TransformControlsPlane = function () {
+const _tempVector = new Vector3();
+const _dirVector = new Vector3();
+const _alignVector = new Vector3();
+const _tempMatrix = new Matrix4();
+const _identityQuaternion = new Quaternion();
 
-	'use strict';
+class TransformControlsPlane extends Mesh {
 
-	Mesh.call( this,
-		new PlaneGeometry( 100000, 100000, 2, 2 ),
-		new MeshBasicMaterial( { visible: false, wireframe: true, side: DoubleSide, transparent: true, opacity: 0.1, toneMapped: false } )
-	);
+	constructor() {
 
-	this.type = 'TransformControlsPlane';
+		super(
+			new PlaneGeometry( 100000, 100000, 2, 2 ),
+			new MeshBasicMaterial( { visible: false, wireframe: true, side: DoubleSide, transparent: true, opacity: 0.1, toneMapped: false } )
+		);
 
-	var unitX = new Vector3( 1, 0, 0 );
-	var unitY = new Vector3( 0, 1, 0 );
-	var unitZ = new Vector3( 0, 0, 1 );
+		this.type = 'TransformControlsPlane';
 
-	var tempVector = new Vector3();
-	var dirVector = new Vector3();
-	var alignVector = new Vector3();
-	var tempMatrix = new Matrix4();
-	var identityQuaternion = new Quaternion();
+	}
 
-	this.updateMatrixWorld = function () {
+	updateMatrixWorld( force ) {
 
 		var space = this.space;
 
@@ -1607,13 +1608,13 @@ var TransformControlsPlane = function () {
 
 		if ( this.mode === 'scale' ) space = 'local'; // scale always oriented to local rotation
 
-		unitX.set( 1, 0, 0 ).applyQuaternion( space === 'local' ? this.worldQuaternion : identityQuaternion );
-		unitY.set( 0, 1, 0 ).applyQuaternion( space === 'local' ? this.worldQuaternion : identityQuaternion );
-		unitZ.set( 0, 0, 1 ).applyQuaternion( space === 'local' ? this.worldQuaternion : identityQuaternion );
+		_unitX.set( 1, 0, 0 ).applyQuaternion( space === 'local' ? this.worldQuaternion : _identityQuaternion );
+		_unitY.set( 0, 1, 0 ).applyQuaternion( space === 'local' ? this.worldQuaternion : _identityQuaternion );
+		_unitZ.set( 0, 0, 1 ).applyQuaternion( space === 'local' ? this.worldQuaternion : _identityQuaternion );
 
 		// Align the plane for current transform mode, axis and space.
 
-		alignVector.copy( unitY );
+		_alignVector.copy( _unitY );
 
 		switch ( this.mode ) {
 
@@ -1622,30 +1623,30 @@ var TransformControlsPlane = function () {
 				switch ( this.axis ) {
 
 					case 'X':
-						alignVector.copy( this.eye ).cross( unitX );
-						dirVector.copy( unitX ).cross( alignVector );
+						_alignVector.copy( this.eye ).cross( _unitX );
+						_dirVector.copy( _unitX ).cross( _alignVector );
 						break;
 					case 'Y':
-						alignVector.copy( this.eye ).cross( unitY );
-						dirVector.copy( unitY ).cross( alignVector );
+						_alignVector.copy( this.eye ).cross( _unitY );
+						_dirVector.copy( _unitY ).cross( _alignVector );
 						break;
 					case 'Z':
-						alignVector.copy( this.eye ).cross( unitZ );
-						dirVector.copy( unitZ ).cross( alignVector );
+						_alignVector.copy( this.eye ).cross( _unitZ );
+						_dirVector.copy( _unitZ ).cross( _alignVector );
 						break;
 					case 'XY':
-						dirVector.copy( unitZ );
+						_dirVector.copy( _unitZ );
 						break;
 					case 'YZ':
-						dirVector.copy( unitX );
+						_dirVector.copy( _unitX );
 						break;
 					case 'XZ':
-						alignVector.copy( unitZ );
-						dirVector.copy( unitY );
+						_alignVector.copy( _unitZ );
+						_dirVector.copy( _unitY );
 						break;
 					case 'XYZ':
 					case 'E':
-						dirVector.set( 0, 0, 0 );
+						_dirVector.set( 0, 0, 0 );
 						break;
 
 				}
@@ -1654,35 +1655,29 @@ var TransformControlsPlane = function () {
 			case 'rotate':
 			default:
 				// special case for rotate
-				dirVector.set( 0, 0, 0 );
+				_dirVector.set( 0, 0, 0 );
 
 		}
 
-		if ( dirVector.length() === 0 ) {
+		if ( _dirVector.length() === 0 ) {
 
 			// If in rotate mode, make the plane parallel to camera
 			this.quaternion.copy( this.cameraQuaternion );
 
 		} else {
 
-			tempMatrix.lookAt( tempVector.set( 0, 0, 0 ), dirVector, alignVector );
+			_tempMatrix.lookAt( _tempVector.set( 0, 0, 0 ), _dirVector, _alignVector );
 
-			this.quaternion.setFromRotationMatrix( tempMatrix );
+			this.quaternion.setFromRotationMatrix( _tempMatrix );
 
 		}
 
-		Object3D.prototype.updateMatrixWorld.call( this );
+		super.updateMatrixWorld( force );
 
-	};
+	}
 
-};
+}
 
-TransformControlsPlane.prototype = Object.assign( Object.create( Mesh.prototype ), {
-
-	constructor: TransformControlsPlane,
-
-	isTransformControlsPlane: true
-
-} );
+TransformControlsPlane.prototype.isTransformControlsPlane = true;
 
 export { TransformControls, TransformControlsGizmo, TransformControlsPlane };
