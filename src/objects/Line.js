@@ -7,43 +7,39 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
-const _start = new Vector3();
-const _end = new Vector3();
-const _inverseMatrix = new Matrix4();
-const _ray = new Ray();
-const _sphere = new Sphere();
+const _start = /*@__PURE__*/ new Vector3();
+const _end = /*@__PURE__*/ new Vector3();
+const _inverseMatrix = /*@__PURE__*/ new Matrix4();
+const _ray = /*@__PURE__*/ new Ray();
+const _sphere = /*@__PURE__*/ new Sphere();
 
-function Line( geometry = new BufferGeometry(), material = new LineBasicMaterial() ) {
+class Line extends Object3D {
 
-	Object3D.call( this );
+	constructor( geometry = new BufferGeometry(), material = new LineBasicMaterial() ) {
 
-	this.type = 'Line';
+		super();
 
-	this.geometry = geometry;
-	this.material = material;
+		this.type = 'Line';
 
-	this.updateMorphTargets();
+		this.geometry = geometry;
+		this.material = material;
 
-}
+		this.updateMorphTargets();
 
-Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
+	}
 
-	constructor: Line,
+	copy( source ) {
 
-	isLine: true,
-
-	copy: function ( source ) {
-
-		Object3D.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.material = source.material;
 		this.geometry = source.geometry;
 
 		return this;
 
-	},
+	}
 
-	computeLineDistances: function () {
+	computeLineDistances() {
 
 		const geometry = this.geometry;
 
@@ -82,9 +78,9 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	raycast: function ( raycaster, intersects ) {
+	raycast( raycaster, intersects ) {
 
 		const geometry = this.geometry;
 		const matrixWorld = this.matrixWorld;
@@ -202,9 +198,9 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-	},
+	}
 
-	updateMorphTargets: function () {
+	updateMorphTargets() {
 
 		const geometry = this.geometry;
 
@@ -249,7 +245,9 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
+
+Line.prototype.isLine = true;
 
 
 export { Line };
