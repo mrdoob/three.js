@@ -776,24 +776,24 @@ class LDrawLoader extends Loader {
 
 		// Parses a colour definition and returns a THREE.Material or null if error
 
-		var code = null;
+		let code = null;
 
 		// Triangle and line colours
-		var colour = 0xFF00FF;
-		var edgeColour = 0xFF00FF;
+		let colour = 0xFF00FF;
+		let edgeColour = 0xFF00FF;
 
 		// Transparency
-		var alpha = 1;
-		var isTransparent = false;
+		let alpha = 1;
+		let isTransparent = false;
 		// Self-illumination:
-		var luminance = 0;
+		let luminance = 0;
 
-		var finishType = FINISH_TYPE_DEFAULT;
-		var canHaveEnvMap = true;
+		let finishType = FINISH_TYPE_DEFAULT;
+		let canHaveEnvMap = true;
 
-		var edgeMaterial = null;
+		let edgeMaterial = null;
 
-		var name = lineParser.getToken();
+		const name = lineParser.getToken();
 		if ( ! name ) {
 
 			throw 'LDrawLoader: Material name was expected after "!COLOUR tag' + lineParser.getLineNumberString() + '.';
@@ -801,7 +801,7 @@ class LDrawLoader extends Loader {
 		}
 
 		// Parse tag tokens and their parameters
-		var token = null;
+		let token = null;
 		while ( true ) {
 
 			token = lineParser.getToken();
@@ -925,7 +925,7 @@ class LDrawLoader extends Loader {
 
 		}
 
-		var material = null;
+		let material = null;
 
 		switch ( finishType ) {
 
@@ -937,8 +937,8 @@ class LDrawLoader extends Loader {
 			case FINISH_TYPE_PEARLESCENT:
 
 				// Try to imitate pearlescency by setting the specular to the complementary of the color, and low shininess
-				var specular = new Color( colour );
-				var hsl = specular.getHSL( { h: 0, s: 0, l: 0 } );
+				const specular = new Color( colour );
+				const hsl = specular.getHSL( { h: 0, s: 0, l: 0 } );
 				hsl.h = ( hsl.h + 0.5 ) % 1;
 				hsl.l = Math.min( 1, hsl.l + ( 1 - hsl.l ) * 0.7 );
 				specular.setHSL( hsl.h, hsl.s, hsl.l );
@@ -1043,23 +1043,23 @@ class LDrawLoader extends Loader {
 	objectParse( text ) {
 
 		// Retrieve data from the parent parse scope
-		var parentParseScope = this.getParentParseScope();
+		const parentParseScope = this.getParentParseScope();
 
 		// Main colour codes passed to this subobject (or default codes 16 and 24 if it is the root object)
-		var mainColourCode = parentParseScope.mainColourCode;
-		var mainEdgeColourCode = parentParseScope.mainEdgeColourCode;
+		const mainColourCode = parentParseScope.mainColourCode;
+		const mainEdgeColourCode = parentParseScope.mainEdgeColourCode;
 
-		var currentParseScope = this.getCurrentParseScope();
+		const currentParseScope = this.getCurrentParseScope();
 
 		// Parse result variables
-		var triangles;
-		var lineSegments;
-		var conditionalSegments;
+		let triangles;
+		let lineSegments;
+		let conditionalSegments;
 
-		var subobjects = [];
+		const subobjects = [];
 
-		var category = null;
-		var keywords = null;
+		let category = null;
+		let keywords = null;
 
 		if ( text.indexOf( '\r\n' ) !== - 1 ) {
 
@@ -1068,28 +1068,27 @@ class LDrawLoader extends Loader {
 
 		}
 
-		var lines = text.split( '\n' );
-		var numLines = lines.length;
-		var lineIndex = 0;
+		const lines = text.split( '\n' );
+		const numLines = lines.length;
 
-		var parsingEmbeddedFiles = false;
-		var currentEmbeddedFileName = null;
-		var currentEmbeddedText = null;
+		let parsingEmbeddedFiles = false;
+		let currentEmbeddedFileName = null;
+		let currentEmbeddedText = null;
 
-		var bfcCertified = false;
-		var bfcCCW = true;
-		var bfcInverted = false;
-		var bfcCull = true;
-		var type = '';
+		let bfcCertified = false;
+		let bfcCCW = true;
+		let bfcInverted = false;
+		let bfcCull = true;
+		let type = '';
 
-		var startingConstructionStep = false;
+		let startingConstructionStep = false;
 
-		var scope = this;
+		const scope = this;
 		function parseColourCode( lineParser, forEdge ) {
 
 			// Parses next colour code and returns a THREE.Material
 
-			var colourCode = lineParser.getToken();
+			let colourCode = lineParser.getToken();
 
 			if ( ! forEdge && colourCode === '16' ) {
 
@@ -1103,7 +1102,7 @@ class LDrawLoader extends Loader {
 
 			}
 
-			var material = scope.getMaterial( colourCode );
+			const material = scope.getMaterial( colourCode );
 
 			if ( ! material ) {
 
@@ -1117,7 +1116,7 @@ class LDrawLoader extends Loader {
 
 		function parseVector( lp ) {
 
-			var v = new Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
+			const v = new Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
 
 			if ( ! scope.separateObjects ) {
 
@@ -1130,9 +1129,9 @@ class LDrawLoader extends Loader {
 		}
 
 		// Parse all line commands
-		for ( lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
+		for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
 
-			var line = lines[ lineIndex ];
+			const line = lines[ lineIndex ];
 
 			if ( line.length === 0 ) continue;
 
@@ -1157,7 +1156,7 @@ class LDrawLoader extends Loader {
 
 			}
 
-			var lp = new LineParser( line, lineIndex + 1 );
+			const lp = new LineParser( line, lineIndex + 1 );
 
 			lp.seekNonSpace();
 
@@ -1169,7 +1168,14 @@ class LDrawLoader extends Loader {
 			}
 
 			// Parse the line type
-			var lineType = lp.getToken();
+			const lineType = lp.getToken();
+
+			let material;
+			let segment;
+			let inverted;
+			let ccw;
+			let doubleSided;
+			let v0, v1, v2, v3, faceNormal;
 
 			switch ( lineType ) {
 
@@ -1177,7 +1183,7 @@ class LDrawLoader extends Loader {
 				case '0':
 
 					// Parse meta directive
-					var meta = lp.getToken();
+					const meta = lp.getToken();
 
 					if ( meta ) {
 
@@ -1192,7 +1198,7 @@ class LDrawLoader extends Loader {
 								currentParseScope.conditionalSegments = [];
 								currentParseScope.type = type;
 
-								var isRoot = ! parentParseScope.isFromParse;
+								const isRoot = ! parentParseScope.isFromParse;
 								if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
 
 									currentParseScope.groupObject = new Group();
@@ -1203,9 +1209,8 @@ class LDrawLoader extends Loader {
 
 								// If the scale of the object is negated then the triangle winding order
 								// needs to be flipped.
-								var matrix = currentParseScope.matrix;
 								if (
-									matrix.determinant() < 0 && (
+									currentParseScope.matrix.determinant() < 0 && (
 										scope.separateObjects && isPrimitiveType( type ) ||
 											! scope.separateObjects
 									) ) {
@@ -1222,7 +1227,7 @@ class LDrawLoader extends Loader {
 
 							case '!COLOUR':
 
-								var material = this.parseColourMetaDirective( lp );
+								material = this.parseColourMetaDirective( lp );
 								if ( material ) {
 
 									this.addMaterial( material );
@@ -1242,7 +1247,7 @@ class LDrawLoader extends Loader {
 
 							case '!KEYWORDS':
 
-								var newKeywords = lp.getRemainingString().split( ',' );
+								const newKeywords = lp.getRemainingString().split( ',' );
 								if ( newKeywords.length > 0 ) {
 
 									if ( ! keywords ) {
@@ -1282,7 +1287,7 @@ class LDrawLoader extends Loader {
 								// Changes to the backface culling state
 								while ( ! lp.isAtTheEnd() ) {
 
-									var token = lp.getToken();
+									const token = lp.getToken();
 
 									switch ( token ) {
 
@@ -1345,29 +1350,29 @@ class LDrawLoader extends Loader {
 					// Line type 1: Sub-object file
 				case '1':
 
-					var material = parseColourCode( lp );
+					material = parseColourCode( lp );
 
-					var posX = parseFloat( lp.getToken() );
-					var posY = parseFloat( lp.getToken() );
-					var posZ = parseFloat( lp.getToken() );
-					var m0 = parseFloat( lp.getToken() );
-					var m1 = parseFloat( lp.getToken() );
-					var m2 = parseFloat( lp.getToken() );
-					var m3 = parseFloat( lp.getToken() );
-					var m4 = parseFloat( lp.getToken() );
-					var m5 = parseFloat( lp.getToken() );
-					var m6 = parseFloat( lp.getToken() );
-					var m7 = parseFloat( lp.getToken() );
-					var m8 = parseFloat( lp.getToken() );
+					const posX = parseFloat( lp.getToken() );
+					const posY = parseFloat( lp.getToken() );
+					const posZ = parseFloat( lp.getToken() );
+					const m0 = parseFloat( lp.getToken() );
+					const m1 = parseFloat( lp.getToken() );
+					const m2 = parseFloat( lp.getToken() );
+					const m3 = parseFloat( lp.getToken() );
+					const m4 = parseFloat( lp.getToken() );
+					const m5 = parseFloat( lp.getToken() );
+					const m6 = parseFloat( lp.getToken() );
+					const m7 = parseFloat( lp.getToken() );
+					const m8 = parseFloat( lp.getToken() );
 
-					var matrix = new Matrix4().set(
+					const matrix = new Matrix4().set(
 						m0, m1, m2, posX,
 						m3, m4, m5, posY,
 						m6, m7, m8, posZ,
 						0, 0, 0, 1
 					);
 
-					var fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
+					const fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
 
 					if ( scope.fileMap[ fileName ] ) {
 
@@ -1408,9 +1413,9 @@ class LDrawLoader extends Loader {
 					// Line type 2: Line segment
 				case '2':
 
-					var material = parseColourCode( lp, true );
+					material = parseColourCode( lp, true );
 
-					var segment = {
+					segment = {
 						material: material.userData.edgeMaterial,
 						colourCode: material.userData.code,
 						v0: parseVector( lp ),
@@ -1424,9 +1429,9 @@ class LDrawLoader extends Loader {
 					// Line type 5: Conditional Line segment
 				case '5':
 
-					var material = parseColourCode( lp, true );
+					material = parseColourCode( lp, true );
 
-					var segment = {
+					segment = {
 						material: material.userData.edgeMaterial.userData.conditionalEdgeMaterial,
 						colourCode: material.userData.code,
 						v0: parseVector( lp ),
@@ -1442,12 +1447,11 @@ class LDrawLoader extends Loader {
 					// Line type 3: Triangle
 				case '3':
 
-					var material = parseColourCode( lp );
+					material = parseColourCode( lp );
 
-					var inverted = currentParseScope.inverted;
-					var ccw = bfcCCW !== inverted;
-					var doubleSided = ! bfcCertified || ! bfcCull;
-					var v0, v1, v2, faceNormal;
+					inverted = currentParseScope.inverted;
+					ccw = bfcCCW !== inverted;
+					doubleSided = ! bfcCertified || ! bfcCull;
 
 					if ( ccw === true ) {
 
@@ -1502,12 +1506,11 @@ class LDrawLoader extends Loader {
 					// Line type 4: Quadrilateral
 				case '4':
 
-					var material = parseColourCode( lp );
+					material = parseColourCode( lp );
 
-					var inverted = currentParseScope.inverted;
-					var ccw = bfcCCW !== inverted;
-					var doubleSided = ! bfcCertified || ! bfcCull;
-					var v0, v1, v2, v3, faceNormal;
+					inverted = currentParseScope.inverted;
+					ccw = bfcCCW !== inverted;
+					doubleSided = ! bfcCertified || ! bfcCull;
 
 					if ( ccw === true ) {
 
@@ -1611,7 +1614,7 @@ class LDrawLoader extends Loader {
 
 		// Sets userdata.constructionStep number in Group objects and userData.numConstructionSteps number in the root Group object.
 
-		var stepNumber = 0;
+		let stepNumber = 0;
 
 		model.traverse( c => {
 
@@ -1635,12 +1638,12 @@ class LDrawLoader extends Loader {
 
 	processObject( text, onProcessed, subobject, url ) {
 
-		var scope = this;
+		const scope = this;
 
-		var parseScope = scope.newParseScopeLevel();
+		const parseScope = scope.newParseScopeLevel();
 		parseScope.url = url;
 
-		var parentParseScope = scope.getParentParseScope();
+		const parentParseScope = scope.getParentParseScope();
 
 		// Set current matrix
 		if ( subobject ) {
@@ -1653,7 +1656,7 @@ class LDrawLoader extends Loader {
 		}
 
 		// Add to cache
-		var currentFileName = parentParseScope.currentFileName;
+		let currentFileName = parentParseScope.currentFileName;
 		if ( currentFileName !== null ) {
 
 			currentFileName = parentParseScope.currentFileName.toLowerCase();
@@ -1669,7 +1672,7 @@ class LDrawLoader extends Loader {
 
 		// Parse the object (returns a Group)
 		scope.objectParse( text );
-		var finishedCount = 0;
+		let finishedCount = 0;
 		onSubobjectFinish();
 
 		function onSubobjectFinish() {
@@ -1688,7 +1691,7 @@ class LDrawLoader extends Loader {
 				// Promise.resolve is used as an approach to asynchronously schedule a task _before_ this frame ends to
 				// avoid stack overflow exceptions when loading many subobjects from the cache. RequestAnimationFrame
 				// will work but causes the load to happen after the next frame which causes the load to take significantly longer.
-				var subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
+				const subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
 				Promise.resolve().then( function () {
 
 					loadSubobject( subobject );
@@ -1708,7 +1711,7 @@ class LDrawLoader extends Loader {
 
 			}
 
-			var isRoot = ! parentParseScope.isFromParse;
+			const isRoot = ! parentParseScope.isFromParse;
 			if ( scope.separateObjects && ! isPrimitiveType( parseScope.type ) || isRoot ) {
 
 				const objGroup = parseScope.groupObject;
@@ -1744,18 +1747,18 @@ class LDrawLoader extends Loader {
 
 			} else {
 
-				var separateObjects = scope.separateObjects;
-				var parentLineSegments = parentParseScope.lineSegments;
-				var parentConditionalSegments = parentParseScope.conditionalSegments;
-				var parentTriangles = parentParseScope.triangles;
+				const separateObjects = scope.separateObjects;
+				const parentLineSegments = parentParseScope.lineSegments;
+				const parentConditionalSegments = parentParseScope.conditionalSegments;
+				const parentTriangles = parentParseScope.triangles;
 
-				var lineSegments = parseScope.lineSegments;
-				var conditionalSegments = parseScope.conditionalSegments;
-				var triangles = parseScope.triangles;
+				const lineSegments = parseScope.lineSegments;
+				const conditionalSegments = parseScope.conditionalSegments;
+				const triangles = parseScope.triangles;
 
-				for ( var i = 0, l = lineSegments.length; i < l; i ++ ) {
+				for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
-					var ls = lineSegments[ i ];
+					const ls = lineSegments[ i ];
 
 					if ( separateObjects ) {
 
@@ -1768,9 +1771,9 @@ class LDrawLoader extends Loader {
 
 				}
 
-				for ( var i = 0, l = conditionalSegments.length; i < l; i ++ ) {
+				for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
 
-					var os = conditionalSegments[ i ];
+					const os = conditionalSegments[ i ];
 
 					if ( separateObjects ) {
 
@@ -1785,9 +1788,9 @@ class LDrawLoader extends Loader {
 
 				}
 
-				for ( var i = 0, l = triangles.length; i < l; i ++ ) {
+				for ( let i = 0, l = triangles.length; i < l; i ++ ) {
 
-					var tri = triangles[ i ];
+					const tri = triangles[ i ];
 
 					if ( separateObjects ) {
 
@@ -1832,7 +1835,7 @@ class LDrawLoader extends Loader {
 
 
 			// If subobject was cached previously, use the cached one
-			var cached = scope.subobjectCache[ subobject.originalFileName.toLowerCase() ];
+			const cached = scope.subobjectCache[ subobject.originalFileName.toLowerCase() ];
 			if ( cached ) {
 
 				scope.processObject( cached, function ( subobjectGroup ) {
@@ -1848,8 +1851,8 @@ class LDrawLoader extends Loader {
 
 			// Adjust file name to locate the subobject file path in standard locations (always under directory scope.path)
 			// Update also subobject.locationState for the next try if this load fails.
-			var subobjectURL = subobject.fileName;
-			var newLocationState = FILE_LOCATION_NOT_FOUND;
+			let subobjectURL = subobject.fileName;
+			let newLocationState = FILE_LOCATION_NOT_FOUND;
 
 			switch ( subobject.locationState ) {
 
@@ -1911,7 +1914,7 @@ class LDrawLoader extends Loader {
 			// Load the subobject
 			// Use another file loader here so we can keep track of the subobject information
 			// and use it when processing the next model.
-			var fileLoader = new FileLoader( scope.manager );
+			const fileLoader = new FileLoader( scope.manager );
 			fileLoader.setPath( scope.path );
 			fileLoader.setRequestHeader( scope.requestHeader );
 			fileLoader.setWithCredentials( scope.withCredentials );
