@@ -1,22 +1,22 @@
 ( function () {
 
-	var ClearPass = function ( clearColor, clearAlpha ) {
+	class ClearPass extends THREE.Pass {
 
-		THREE.Pass.call( this );
-		this.needsSwap = false;
-		this.clearColor = clearColor !== undefined ? clearColor : 0x000000;
-		this.clearAlpha = clearAlpha !== undefined ? clearAlpha : 0;
-		this._oldClearColor = new THREE.Color();
+		constructor( clearColor, clearAlpha ) {
 
-	};
+			super();
+			this.needsSwap = false;
+			this.clearColor = clearColor !== undefined ? clearColor : 0x000000;
+			this.clearAlpha = clearAlpha !== undefined ? clearAlpha : 0;
+			this._oldClearColor = new THREE.Color();
 
-	ClearPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
-		constructor: ClearPass,
-		render: function ( renderer, writeBuffer, readBuffer
+		}
+
+		render( renderer, writeBuffer, readBuffer
 			/*, deltaTime, maskActive */
 		) {
 
-			var oldClearAlpha;
+			let oldClearAlpha;
 
 			if ( this.clearColor ) {
 
@@ -36,7 +36,8 @@
 			}
 
 		}
-	} );
+
+	}
 
 	THREE.ClearPass = ClearPass;
 

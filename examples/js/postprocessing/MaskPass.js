@@ -1,24 +1,24 @@
 ( function () {
 
-	var MaskPass = function ( scene, camera ) {
+	class MaskPass extends THREE.Pass {
 
-		THREE.Pass.call( this );
-		this.scene = scene;
-		this.camera = camera;
-		this.clear = true;
-		this.needsSwap = false;
-		this.inverse = false;
+		constructor( scene, camera ) {
 
-	};
+			super();
+			this.scene = scene;
+			this.camera = camera;
+			this.clear = true;
+			this.needsSwap = false;
+			this.inverse = false;
 
-	MaskPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
-		constructor: MaskPass,
-		render: function ( renderer, writeBuffer, readBuffer
+		}
+
+		render( renderer, writeBuffer, readBuffer
 			/*, deltaTime, maskActive */
 		) {
 
-			var context = renderer.getContext();
-			var state = renderer.state; // don't update color or depth
+			const context = renderer.getContext();
+			const state = renderer.state; // don't update color or depth
 
 			state.buffers.color.setMask( false );
 			state.buffers.depth.setMask( false ); // lock buffers
@@ -26,7 +26,7 @@
 			state.buffers.color.setLocked( true );
 			state.buffers.depth.setLocked( true ); // set up stencil
 
-			var writeValue, clearValue;
+			let writeValue, clearValue;
 
 			if ( this.inverse ) {
 
@@ -63,18 +63,19 @@
 			state.buffers.stencil.setLocked( true );
 
 		}
-	} );
 
-	var ClearMaskPass = function () {
+	}
 
-		THREE.Pass.call( this );
-		this.needsSwap = false;
+	class ClearMaskPass extends THREE.Pass {
 
-	};
+		constructor() {
 
-	ClearMaskPass.prototype = Object.create( THREE.Pass.prototype );
-	Object.assign( ClearMaskPass.prototype, {
-		render: function ( renderer
+			super();
+			this.needsSwap = false;
+
+		}
+
+		render( renderer
 			/*, writeBuffer, readBuffer, deltaTime, maskActive */
 		) {
 
@@ -82,7 +83,8 @@
 			renderer.state.buffers.stencil.setTest( false );
 
 		}
-	} );
+
+	}
 
 	THREE.ClearMaskPass = ClearMaskPass;
 	THREE.MaskPass = MaskPass;

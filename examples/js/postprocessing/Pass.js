@@ -1,72 +1,75 @@
 ( function () {
 
-	function Pass() {
+	class Pass {
 
-		// if set to true, the pass is processed by the composer
-		this.enabled = true; // if set to true, the pass indicates to swap read and write buffer after rendering
+		constructor() {
 
-		this.needsSwap = true; // if set to true, the pass clears its buffer before rendering
+			// if set to true, the pass is processed by the composer
+			this.enabled = true; // if set to true, the pass indicates to swap read and write buffer after rendering
 
-		this.clear = false; // if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
+			this.needsSwap = true; // if set to true, the pass clears its buffer before rendering
 
-		this.renderToScreen = false;
+			this.clear = false; // if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
 
-	}
+			this.renderToScreen = false;
 
-	Object.assign( Pass.prototype, {
-		setSize: function ( ) {},
-		render: function ( ) {
+		}
+
+		setSize( ) {}
+
+		render( ) {
 
 			console.error( 'THREE.Pass: .render() must be implemented in derived pass.' );
 
 		}
-	} ); // Helper for passes that need to fill the viewport with a single quad.
-	// Important: It's actually a hack to put FullScreenQuad into the Pass namespace. This is only
-	// done to make examples/js code work. Normally, FullScreenQuad should be exported
-	// from this module like Pass.
 
-	Pass.FullScreenQuad = function () {
+	} // Helper for passes that need to fill the viewport with a single quad.
 
-		var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 ); // https://github.com/mrdoob/three.js/pull/21358
 
-		var geometry = new THREE.BufferGeometry();
-		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( [ - 1, 3, 0, - 1, - 1, 0, 3, - 1, 0 ], 3 ) );
-		geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( [ 0, 2, 0, 0, 2, 0 ], 2 ) );
+	const _camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 ); // https://github.com/mrdoob/three.js/pull/21358
 
-		var FullScreenQuad = function ( material ) {
 
-			this._mesh = new THREE.Mesh( geometry, material );
+	const _geometry = new THREE.BufferGeometry();
 
-		};
+	_geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( [ - 1, 3, 0, - 1, - 1, 0, 3, - 1, 0 ], 3 ) );
 
-		Object.defineProperty( FullScreenQuad.prototype, 'material', {
-			get: function () {
+	_geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( [ 0, 2, 0, 0, 2, 0 ], 2 ) );
 
-				return this._mesh.material;
+	class FullScreenQuad {
 
-			},
-			set: function ( value ) {
+		constructor( material ) {
 
-				this._mesh.material = value;
+			this._mesh = new THREE.Mesh( _geometry, material );
 
-			}
-		} );
-		Object.assign( FullScreenQuad.prototype, {
-			dispose: function () {
+		}
 
-				this._mesh.geometry.dispose();
+		dispose() {
 
-			},
-			render: function ( renderer ) {
+			this._mesh.geometry.dispose();
 
-				renderer.render( this._mesh, camera );
+		}
 
-			}
-		} );
-		return FullScreenQuad;
+		render( renderer ) {
 
-	}();
+			renderer.render( this._mesh, _camera );
 
+		}
+
+		get material() {
+
+			return this._mesh.material;
+
+		}
+
+		set material( value ) {
+
+			this._mesh.material = value;
+
+		}
+
+	}
+
+	THREE.FullScreenQuad = FullScreenQuad;
 	THREE.Pass = Pass;
 
 } )();
