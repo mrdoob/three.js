@@ -1372,7 +1372,7 @@ class LDrawLoader extends Loader {
 						0, 0, 0, 1
 					);
 
-					const fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
+					let fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
 
 					if ( scope.fileMap[ fileName ] ) {
 
