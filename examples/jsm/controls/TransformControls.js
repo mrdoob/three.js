@@ -736,447 +736,454 @@ TransformControls.prototype = Object.assign( Object.create( Object3D.prototype )
 
 } );
 
+//
 
-var TransformControlsGizmo = function () {
+// Reusable utility variables
 
-	'use strict';
+const _tempVector = new Vector3( 0, 0, 0 );
+const _tempEuler = new Euler();
+const _alignVector = new Vector3( 0, 1, 0 );
+const _zeroVector = new Vector3( 0, 0, 0 );
+const _lookAtMatrix = new Matrix4();
+const _tempQuaternion = new Quaternion();
+const _tempQuaternion2 = new Quaternion();
+const _identityQuaternion = new Quaternion();
+const _dirVector = new Vector3();
+const _tempMatrix = new Matrix4();
 
-	Object3D.call( this );
+const _unitX = new Vector3( 1, 0, 0 );
+const _unitY = new Vector3( 0, 1, 0 );
+const _unitZ = new Vector3( 0, 0, 1 );
 
-	this.type = 'TransformControlsGizmo';
+const _v1 = new Vector3();
+const _v2 = new Vector3();
+const _v3 = new Vector3();
 
-	// shared materials
+class TransformControlsGizmo extends Object3D {
 
-	var gizmoMaterial = new MeshBasicMaterial( {
-		depthTest: false,
-		depthWrite: false,
-		transparent: true,
-		side: DoubleSide,
-		fog: false,
-		toneMapped: false
-	} );
+	constructor() {
 
-	var gizmoLineMaterial = new LineBasicMaterial( {
-		depthTest: false,
-		depthWrite: false,
-		transparent: true,
-		linewidth: 1,
-		fog: false,
-		toneMapped: false
-	} );
+		super();
 
-	// Make unique material for each axis/color
+		this.type = 'TransformControlsGizmo';
 
-	var matInvisible = gizmoMaterial.clone();
-	matInvisible.opacity = 0.15;
+		// shared materials
 
-	var matHelper = gizmoMaterial.clone();
-	matHelper.opacity = 0.33;
+		const gizmoMaterial = new MeshBasicMaterial( {
+			depthTest: false,
+			depthWrite: false,
+			transparent: true,
+			side: DoubleSide,
+			fog: false,
+			toneMapped: false
+		} );
 
-	var matRed = gizmoMaterial.clone();
-	matRed.color.set( 0xff0000 );
+		const gizmoLineMaterial = new LineBasicMaterial( {
+			depthTest: false,
+			depthWrite: false,
+			transparent: true,
+			linewidth: 1,
+			fog: false,
+			toneMapped: false
+		} );
 
-	var matGreen = gizmoMaterial.clone();
-	matGreen.color.set( 0x00ff00 );
+		// Make unique material for each axis/color
 
-	var matBlue = gizmoMaterial.clone();
-	matBlue.color.set( 0x0000ff );
+		const matInvisible = gizmoMaterial.clone();
+		matInvisible.opacity = 0.15;
 
-	var matWhiteTransparent = gizmoMaterial.clone();
-	matWhiteTransparent.opacity = 0.25;
+		const matHelper = gizmoMaterial.clone();
+		matHelper.opacity = 0.33;
 
-	var matYellowTransparent = matWhiteTransparent.clone();
-	matYellowTransparent.color.set( 0xffff00 );
+		const matRed = gizmoMaterial.clone();
+		matRed.color.set( 0xff0000 );
 
-	var matCyanTransparent = matWhiteTransparent.clone();
-	matCyanTransparent.color.set( 0x00ffff );
+		const matGreen = gizmoMaterial.clone();
+		matGreen.color.set( 0x00ff00 );
 
-	var matMagentaTransparent = matWhiteTransparent.clone();
-	matMagentaTransparent.color.set( 0xff00ff );
+		const matBlue = gizmoMaterial.clone();
+		matBlue.color.set( 0x0000ff );
 
-	var matYellow = gizmoMaterial.clone();
-	matYellow.color.set( 0xffff00 );
+		const matWhiteTransparent = gizmoMaterial.clone();
+		matWhiteTransparent.opacity = 0.25;
 
-	var matLineRed = gizmoLineMaterial.clone();
-	matLineRed.color.set( 0xff0000 );
+		const matYellowTransparent = matWhiteTransparent.clone();
+		matYellowTransparent.color.set( 0xffff00 );
 
-	var matLineGreen = gizmoLineMaterial.clone();
-	matLineGreen.color.set( 0x00ff00 );
+		const matCyanTransparent = matWhiteTransparent.clone();
+		matCyanTransparent.color.set( 0x00ffff );
 
-	var matLineBlue = gizmoLineMaterial.clone();
-	matLineBlue.color.set( 0x0000ff );
+		const matMagentaTransparent = matWhiteTransparent.clone();
+		matMagentaTransparent.color.set( 0xff00ff );
 
-	var matLineCyan = gizmoLineMaterial.clone();
-	matLineCyan.color.set( 0x00ffff );
+		const matYellow = gizmoMaterial.clone();
+		matYellow.color.set( 0xffff00 );
 
-	var matLineMagenta = gizmoLineMaterial.clone();
-	matLineMagenta.color.set( 0xff00ff );
+		const matLineRed = gizmoLineMaterial.clone();
+		matLineRed.color.set( 0xff0000 );
 
-	var matLineYellow = gizmoLineMaterial.clone();
-	matLineYellow.color.set( 0xffff00 );
+		const matLineGreen = gizmoLineMaterial.clone();
+		matLineGreen.color.set( 0x00ff00 );
 
-	var matLineGray = gizmoLineMaterial.clone();
-	matLineGray.color.set( 0x787878 );
+		const matLineBlue = gizmoLineMaterial.clone();
+		matLineBlue.color.set( 0x0000ff );
 
-	var matLineYellowTransparent = matLineYellow.clone();
-	matLineYellowTransparent.opacity = 0.25;
+		const matLineCyan = gizmoLineMaterial.clone();
+		matLineCyan.color.set( 0x00ffff );
 
-	// reusable geometry
+		const matLineMagenta = gizmoLineMaterial.clone();
+		matLineMagenta.color.set( 0xff00ff );
 
-	var arrowGeometry = new CylinderGeometry( 0, 0.05, 0.2, 12, 1, false );
+		const matLineYellow = gizmoLineMaterial.clone();
+		matLineYellow.color.set( 0xffff00 );
 
-	var scaleHandleGeometry = new BoxGeometry( 0.125, 0.125, 0.125 );
+		const matLineGray = gizmoLineMaterial.clone();
+		matLineGray.color.set( 0x787878 );
 
-	var lineGeometry = new BufferGeometry();
-	lineGeometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
-
-	var CircleGeometry = function ( radius, arc ) {
-
-		var geometry = new BufferGeometry( );
-		var vertices = [];
-
-		for ( var i = 0; i <= 64 * arc; ++ i ) {
-
-			vertices.push( 0, Math.cos( i / 32 * Math.PI ) * radius, Math.sin( i / 32 * Math.PI ) * radius );
-
-		}
-
-		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-
-		return geometry;
-
-	};
-
-	// Special geometry for transform helper. If scaled with position vector it spans from [0,0,0] to position
-
-	var TranslateHelperGeometry = function () {
-
-		var geometry = new BufferGeometry();
-
-		geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
-
-		return geometry;
-
-	};
-
-	// Gizmo definitions - custom hierarchy definitions for setupGizmo() function
-
-	var gizmoTranslate = {
-		X: [
-			[ new Mesh( arrowGeometry, matRed ), [ 1, 0, 0 ], [ 0, 0, - Math.PI / 2 ], null, 'fwd' ],
-			[ new Mesh( arrowGeometry, matRed ), [ 1, 0, 0 ], [ 0, 0, Math.PI / 2 ], null, 'bwd' ],
-			[ new Line( lineGeometry, matLineRed ) ]
-		],
-		Y: [
-			[ new Mesh( arrowGeometry, matGreen ), [ 0, 1, 0 ], null, null, 'fwd' ],
-			[ new Mesh( arrowGeometry, matGreen ), [ 0, 1, 0 ], [ Math.PI, 0, 0 ], null, 'bwd' ],
-			[ new Line( lineGeometry, matLineGreen ), null, [ 0, 0, Math.PI / 2 ]]
-		],
-		Z: [
-			[ new Mesh( arrowGeometry, matBlue ), [ 0, 0, 1 ], [ Math.PI / 2, 0, 0 ], null, 'fwd' ],
-			[ new Mesh( arrowGeometry, matBlue ), [ 0, 0, 1 ], [ - Math.PI / 2, 0, 0 ], null, 'bwd' ],
-			[ new Line( lineGeometry, matLineBlue ), null, [ 0, - Math.PI / 2, 0 ]]
-		],
-		XYZ: [
-			[ new Mesh( new OctahedronGeometry( 0.1, 0 ), matWhiteTransparent.clone() ), [ 0, 0, 0 ], [ 0, 0, 0 ]]
-		],
-		XY: [
-			[ new Mesh( new PlaneGeometry( 0.295, 0.295 ), matYellowTransparent.clone() ), [ 0.15, 0.15, 0 ]],
-			[ new Line( lineGeometry, matLineYellow ), [ 0.18, 0.3, 0 ], null, [ 0.125, 1, 1 ]],
-			[ new Line( lineGeometry, matLineYellow ), [ 0.3, 0.18, 0 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]]
-		],
-		YZ: [
-			[ new Mesh( new PlaneGeometry( 0.295, 0.295 ), matCyanTransparent.clone() ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]],
-			[ new Line( lineGeometry, matLineCyan ), [ 0, 0.18, 0.3 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]],
-			[ new Line( lineGeometry, matLineCyan ), [ 0, 0.3, 0.18 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
-		],
-		XZ: [
-			[ new Mesh( new PlaneGeometry( 0.295, 0.295 ), matMagentaTransparent.clone() ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]],
-			[ new Line( lineGeometry, matLineMagenta ), [ 0.18, 0, 0.3 ], null, [ 0.125, 1, 1 ]],
-			[ new Line( lineGeometry, matLineMagenta ), [ 0.3, 0, 0.18 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
-		]
-	};
-
-	var pickerTranslate = {
-		X: [
-			[ new Mesh( new CylinderGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0.6, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
-		],
-		Y: [
-			[ new Mesh( new CylinderGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0, 0.6, 0 ]]
-		],
-		Z: [
-			[ new Mesh( new CylinderGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0, 0, 0.6 ], [ Math.PI / 2, 0, 0 ]]
-		],
-		XYZ: [
-			[ new Mesh( new OctahedronGeometry( 0.2, 0 ), matInvisible ) ]
-		],
-		XY: [
-			[ new Mesh( new PlaneGeometry( 0.4, 0.4 ), matInvisible ), [ 0.2, 0.2, 0 ]]
-		],
-		YZ: [
-			[ new Mesh( new PlaneGeometry( 0.4, 0.4 ), matInvisible ), [ 0, 0.2, 0.2 ], [ 0, Math.PI / 2, 0 ]]
-		],
-		XZ: [
-			[ new Mesh( new PlaneGeometry( 0.4, 0.4 ), matInvisible ), [ 0.2, 0, 0.2 ], [ - Math.PI / 2, 0, 0 ]]
-		]
-	};
-
-	var helperTranslate = {
-		START: [
-			[ new Mesh( new OctahedronGeometry( 0.01, 2 ), matHelper ), null, null, null, 'helper' ]
-		],
-		END: [
-			[ new Mesh( new OctahedronGeometry( 0.01, 2 ), matHelper ), null, null, null, 'helper' ]
-		],
-		DELTA: [
-			[ new Line( TranslateHelperGeometry(), matHelper ), null, null, null, 'helper' ]
-		],
-		X: [
-			[ new Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
-		],
-		Y: [
-			[ new Line( lineGeometry, matHelper.clone() ), [ 0, - 1e3, 0 ], [ 0, 0, Math.PI / 2 ], [ 1e6, 1, 1 ], 'helper' ]
-		],
-		Z: [
-			[ new Line( lineGeometry, matHelper.clone() ), [ 0, 0, - 1e3 ], [ 0, - Math.PI / 2, 0 ], [ 1e6, 1, 1 ], 'helper' ]
-		]
-	};
-
-	var gizmoRotate = {
-		X: [
-			[ new Line( CircleGeometry( 1, 0.5 ), matLineRed ) ],
-			[ new Mesh( new OctahedronGeometry( 0.04, 0 ), matRed ), [ 0, 0, 0.99 ], null, [ 1, 3, 1 ]],
-		],
-		Y: [
-			[ new Line( CircleGeometry( 1, 0.5 ), matLineGreen ), null, [ 0, 0, - Math.PI / 2 ]],
-			[ new Mesh( new OctahedronGeometry( 0.04, 0 ), matGreen ), [ 0, 0, 0.99 ], null, [ 3, 1, 1 ]],
-		],
-		Z: [
-			[ new Line( CircleGeometry( 1, 0.5 ), matLineBlue ), null, [ 0, Math.PI / 2, 0 ]],
-			[ new Mesh( new OctahedronGeometry( 0.04, 0 ), matBlue ), [ 0.99, 0, 0 ], null, [ 1, 3, 1 ]],
-		],
-		E: [
-			[ new Line( CircleGeometry( 1.25, 1 ), matLineYellowTransparent ), null, [ 0, Math.PI / 2, 0 ]],
-			[ new Mesh( new CylinderGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 1.17, 0, 0 ], [ 0, 0, - Math.PI / 2 ], [ 1, 1, 0.001 ]],
-			[ new Mesh( new CylinderGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ - 1.17, 0, 0 ], [ 0, 0, Math.PI / 2 ], [ 1, 1, 0.001 ]],
-			[ new Mesh( new CylinderGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 0, - 1.17, 0 ], [ Math.PI, 0, 0 ], [ 1, 1, 0.001 ]],
-			[ new Mesh( new CylinderGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 0, 1.17, 0 ], [ 0, 0, 0 ], [ 1, 1, 0.001 ]],
-		],
-		XYZE: [
-			[ new Line( CircleGeometry( 1, 1 ), matLineGray ), null, [ 0, Math.PI / 2, 0 ]]
-		]
-	};
-
-	var helperRotate = {
-		AXIS: [
-			[ new Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
-		]
-	};
-
-	var pickerRotate = {
-		X: [
-			[ new Mesh( new TorusGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ 0, - Math.PI / 2, - Math.PI / 2 ]],
-		],
-		Y: [
-			[ new Mesh( new TorusGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ Math.PI / 2, 0, 0 ]],
-		],
-		Z: [
-			[ new Mesh( new TorusGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
-		],
-		E: [
-			[ new Mesh( new TorusGeometry( 1.25, 0.1, 2, 24 ), matInvisible ) ]
-		],
-		XYZE: [
-			[ new Mesh( new SphereGeometry( 0.7, 10, 8 ), matInvisible ) ]
-		]
-	};
-
-	var gizmoScale = {
-		X: [
-			[ new Mesh( scaleHandleGeometry, matRed ), [ 0.8, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
-			[ new Line( lineGeometry, matLineRed ), null, null, [ 0.8, 1, 1 ]]
-		],
-		Y: [
-			[ new Mesh( scaleHandleGeometry, matGreen ), [ 0, 0.8, 0 ]],
-			[ new Line( lineGeometry, matLineGreen ), null, [ 0, 0, Math.PI / 2 ], [ 0.8, 1, 1 ]]
-		],
-		Z: [
-			[ new Mesh( scaleHandleGeometry, matBlue ), [ 0, 0, 0.8 ], [ Math.PI / 2, 0, 0 ]],
-			[ new Line( lineGeometry, matLineBlue ), null, [ 0, - Math.PI / 2, 0 ], [ 0.8, 1, 1 ]]
-		],
-		XY: [
-			[ new Mesh( scaleHandleGeometry, matYellowTransparent ), [ 0.85, 0.85, 0 ], null, [ 2, 2, 0.2 ]],
-			[ new Line( lineGeometry, matLineYellow ), [ 0.855, 0.98, 0 ], null, [ 0.125, 1, 1 ]],
-			[ new Line( lineGeometry, matLineYellow ), [ 0.98, 0.855, 0 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]]
-		],
-		YZ: [
-			[ new Mesh( scaleHandleGeometry, matCyanTransparent ), [ 0, 0.85, 0.85 ], null, [ 0.2, 2, 2 ]],
-			[ new Line( lineGeometry, matLineCyan ), [ 0, 0.855, 0.98 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]],
-			[ new Line( lineGeometry, matLineCyan ), [ 0, 0.98, 0.855 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
-		],
-		XZ: [
-			[ new Mesh( scaleHandleGeometry, matMagentaTransparent ), [ 0.85, 0, 0.85 ], null, [ 2, 0.2, 2 ]],
-			[ new Line( lineGeometry, matLineMagenta ), [ 0.855, 0, 0.98 ], null, [ 0.125, 1, 1 ]],
-			[ new Line( lineGeometry, matLineMagenta ), [ 0.98, 0, 0.855 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
-		],
-		XYZX: [
-			[ new Mesh( new BoxGeometry( 0.125, 0.125, 0.125 ), matWhiteTransparent.clone() ), [ 1.1, 0, 0 ]],
-		],
-		XYZY: [
-			[ new Mesh( new BoxGeometry( 0.125, 0.125, 0.125 ), matWhiteTransparent.clone() ), [ 0, 1.1, 0 ]],
-		],
-		XYZZ: [
-			[ new Mesh( new BoxGeometry( 0.125, 0.125, 0.125 ), matWhiteTransparent.clone() ), [ 0, 0, 1.1 ]],
-		]
-	};
-
-	var pickerScale = {
-		X: [
-			[ new Mesh( new CylinderGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
-		],
-		Y: [
-			[ new Mesh( new CylinderGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0, 0.5, 0 ]]
-		],
-		Z: [
-			[ new Mesh( new CylinderGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ]]
-		],
-		XY: [
-			[ new Mesh( scaleHandleGeometry, matInvisible ), [ 0.85, 0.85, 0 ], null, [ 3, 3, 0.2 ]],
-		],
-		YZ: [
-			[ new Mesh( scaleHandleGeometry, matInvisible ), [ 0, 0.85, 0.85 ], null, [ 0.2, 3, 3 ]],
-		],
-		XZ: [
-			[ new Mesh( scaleHandleGeometry, matInvisible ), [ 0.85, 0, 0.85 ], null, [ 3, 0.2, 3 ]],
-		],
-		XYZX: [
-			[ new Mesh( new BoxGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 1.1, 0, 0 ]],
-		],
-		XYZY: [
-			[ new Mesh( new BoxGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 1.1, 0 ]],
-		],
-		XYZZ: [
-			[ new Mesh( new BoxGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 0, 1.1 ]],
-		]
-	};
-
-	var helperScale = {
-		X: [
-			[ new Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
-		],
-		Y: [
-			[ new Line( lineGeometry, matHelper.clone() ), [ 0, - 1e3, 0 ], [ 0, 0, Math.PI / 2 ], [ 1e6, 1, 1 ], 'helper' ]
-		],
-		Z: [
-			[ new Line( lineGeometry, matHelper.clone() ), [ 0, 0, - 1e3 ], [ 0, - Math.PI / 2, 0 ], [ 1e6, 1, 1 ], 'helper' ]
-		]
-	};
-
-	// Creates an Object3D with gizmos described in custom hierarchy definition.
-
-	var setupGizmo = function ( gizmoMap ) {
-
-		var gizmo = new Object3D();
-
-		for ( var name in gizmoMap ) {
-
-			for ( var i = gizmoMap[ name ].length; i --; ) {
-
-				var object = gizmoMap[ name ][ i ][ 0 ].clone();
-				var position = gizmoMap[ name ][ i ][ 1 ];
-				var rotation = gizmoMap[ name ][ i ][ 2 ];
-				var scale = gizmoMap[ name ][ i ][ 3 ];
-				var tag = gizmoMap[ name ][ i ][ 4 ];
-
-				// name and tag properties are essential for picking and updating logic.
-				object.name = name;
-				object.tag = tag;
-
-				if ( position ) {
-
-					object.position.set( position[ 0 ], position[ 1 ], position[ 2 ] );
-
-				}
-
-				if ( rotation ) {
-
-					object.rotation.set( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ] );
-
-				}
-
-				if ( scale ) {
-
-					object.scale.set( scale[ 0 ], scale[ 1 ], scale[ 2 ] );
-
-				}
-
-				object.updateMatrix();
-
-				var tempGeometry = object.geometry.clone();
-				tempGeometry.applyMatrix4( object.matrix );
-				object.geometry = tempGeometry;
-				object.renderOrder = Infinity;
-
-				object.position.set( 0, 0, 0 );
-				object.rotation.set( 0, 0, 0 );
-				object.scale.set( 1, 1, 1 );
-
-				gizmo.add( object );
+		const matLineYellowTransparent = matLineYellow.clone();
+		matLineYellowTransparent.opacity = 0.25;
+
+		// reusable geometry
+
+		const arrowGeometry = new CylinderGeometry( 0, 0.05, 0.2, 12, 1, false );
+
+		const scaleHandleGeometry = new BoxGeometry( 0.125, 0.125, 0.125 );
+
+		const lineGeometry = new BufferGeometry();
+		lineGeometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
+
+		function CircleGeometry( radius, arc ) {
+
+			const geometry = new BufferGeometry( );
+			const vertices = [];
+
+			for ( let i = 0; i <= 64 * arc; ++ i ) {
+
+				vertices.push( 0, Math.cos( i / 32 * Math.PI ) * radius, Math.sin( i / 32 * Math.PI ) * radius );
 
 			}
 
+			geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+
+			return geometry;
+
 		}
 
-		return gizmo;
+		// Special geometry for transform helper. If scaled with position vector it spans from [0,0,0] to position
 
-	};
+		function TranslateHelperGeometry() {
 
-	// Reusable utility variables
+			const geometry = new BufferGeometry();
 
-	var tempVector = new Vector3( 0, 0, 0 );
-	var tempEuler = new Euler();
-	var alignVector = new Vector3( 0, 1, 0 );
-	var zeroVector = new Vector3( 0, 0, 0 );
-	var lookAtMatrix = new Matrix4();
-	var tempQuaternion = new Quaternion();
-	var tempQuaternion2 = new Quaternion();
-	var identityQuaternion = new Quaternion();
+			geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
 
-	var unitX = new Vector3( 1, 0, 0 );
-	var unitY = new Vector3( 0, 1, 0 );
-	var unitZ = new Vector3( 0, 0, 1 );
+			return geometry;
 
-	// Gizmo creation
+		}
 
-	this.gizmo = {};
-	this.picker = {};
-	this.helper = {};
+		// Gizmo definitions - custom hierarchy definitions for setupGizmo() function
 
-	this.add( this.gizmo[ 'translate' ] = setupGizmo( gizmoTranslate ) );
-	this.add( this.gizmo[ 'rotate' ] = setupGizmo( gizmoRotate ) );
-	this.add( this.gizmo[ 'scale' ] = setupGizmo( gizmoScale ) );
-	this.add( this.picker[ 'translate' ] = setupGizmo( pickerTranslate ) );
-	this.add( this.picker[ 'rotate' ] = setupGizmo( pickerRotate ) );
-	this.add( this.picker[ 'scale' ] = setupGizmo( pickerScale ) );
-	this.add( this.helper[ 'translate' ] = setupGizmo( helperTranslate ) );
-	this.add( this.helper[ 'rotate' ] = setupGizmo( helperRotate ) );
-	this.add( this.helper[ 'scale' ] = setupGizmo( helperScale ) );
+		const gizmoTranslate = {
+			X: [
+				[ new Mesh( arrowGeometry, matRed ), [ 1, 0, 0 ], [ 0, 0, - Math.PI / 2 ], null, 'fwd' ],
+				[ new Mesh( arrowGeometry, matRed ), [ 1, 0, 0 ], [ 0, 0, Math.PI / 2 ], null, 'bwd' ],
+				[ new Line( lineGeometry, matLineRed ) ]
+			],
+			Y: [
+				[ new Mesh( arrowGeometry, matGreen ), [ 0, 1, 0 ], null, null, 'fwd' ],
+				[ new Mesh( arrowGeometry, matGreen ), [ 0, 1, 0 ], [ Math.PI, 0, 0 ], null, 'bwd' ],
+				[ new Line( lineGeometry, matLineGreen ), null, [ 0, 0, Math.PI / 2 ]]
+			],
+			Z: [
+				[ new Mesh( arrowGeometry, matBlue ), [ 0, 0, 1 ], [ Math.PI / 2, 0, 0 ], null, 'fwd' ],
+				[ new Mesh( arrowGeometry, matBlue ), [ 0, 0, 1 ], [ - Math.PI / 2, 0, 0 ], null, 'bwd' ],
+				[ new Line( lineGeometry, matLineBlue ), null, [ 0, - Math.PI / 2, 0 ]]
+			],
+			XYZ: [
+				[ new Mesh( new OctahedronGeometry( 0.1, 0 ), matWhiteTransparent.clone() ), [ 0, 0, 0 ], [ 0, 0, 0 ]]
+			],
+			XY: [
+				[ new Mesh( new PlaneGeometry( 0.295, 0.295 ), matYellowTransparent.clone() ), [ 0.15, 0.15, 0 ]],
+				[ new Line( lineGeometry, matLineYellow ), [ 0.18, 0.3, 0 ], null, [ 0.125, 1, 1 ]],
+				[ new Line( lineGeometry, matLineYellow ), [ 0.3, 0.18, 0 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]]
+			],
+			YZ: [
+				[ new Mesh( new PlaneGeometry( 0.295, 0.295 ), matCyanTransparent.clone() ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]],
+				[ new Line( lineGeometry, matLineCyan ), [ 0, 0.18, 0.3 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]],
+				[ new Line( lineGeometry, matLineCyan ), [ 0, 0.3, 0.18 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
+			],
+			XZ: [
+				[ new Mesh( new PlaneGeometry( 0.295, 0.295 ), matMagentaTransparent.clone() ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]],
+				[ new Line( lineGeometry, matLineMagenta ), [ 0.18, 0, 0.3 ], null, [ 0.125, 1, 1 ]],
+				[ new Line( lineGeometry, matLineMagenta ), [ 0.3, 0, 0.18 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
+			]
+		};
 
-	// Pickers should be hidden always
+		const pickerTranslate = {
+			X: [
+				[ new Mesh( new CylinderGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0.6, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
+			],
+			Y: [
+				[ new Mesh( new CylinderGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0, 0.6, 0 ]]
+			],
+			Z: [
+				[ new Mesh( new CylinderGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0, 0, 0.6 ], [ Math.PI / 2, 0, 0 ]]
+			],
+			XYZ: [
+				[ new Mesh( new OctahedronGeometry( 0.2, 0 ), matInvisible ) ]
+			],
+			XY: [
+				[ new Mesh( new PlaneGeometry( 0.4, 0.4 ), matInvisible ), [ 0.2, 0.2, 0 ]]
+			],
+			YZ: [
+				[ new Mesh( new PlaneGeometry( 0.4, 0.4 ), matInvisible ), [ 0, 0.2, 0.2 ], [ 0, Math.PI / 2, 0 ]]
+			],
+			XZ: [
+				[ new Mesh( new PlaneGeometry( 0.4, 0.4 ), matInvisible ), [ 0.2, 0, 0.2 ], [ - Math.PI / 2, 0, 0 ]]
+			]
+		};
 
-	this.picker[ 'translate' ].visible = false;
-	this.picker[ 'rotate' ].visible = false;
-	this.picker[ 'scale' ].visible = false;
+		const helperTranslate = {
+			START: [
+				[ new Mesh( new OctahedronGeometry( 0.01, 2 ), matHelper ), null, null, null, 'helper' ]
+			],
+			END: [
+				[ new Mesh( new OctahedronGeometry( 0.01, 2 ), matHelper ), null, null, null, 'helper' ]
+			],
+			DELTA: [
+				[ new Line( TranslateHelperGeometry(), matHelper ), null, null, null, 'helper' ]
+			],
+			X: [
+				[ new Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
+			],
+			Y: [
+				[ new Line( lineGeometry, matHelper.clone() ), [ 0, - 1e3, 0 ], [ 0, 0, Math.PI / 2 ], [ 1e6, 1, 1 ], 'helper' ]
+			],
+			Z: [
+				[ new Line( lineGeometry, matHelper.clone() ), [ 0, 0, - 1e3 ], [ 0, - Math.PI / 2, 0 ], [ 1e6, 1, 1 ], 'helper' ]
+			]
+		};
+
+		const gizmoRotate = {
+			X: [
+				[ new Line( CircleGeometry( 1, 0.5 ), matLineRed ) ],
+				[ new Mesh( new OctahedronGeometry( 0.04, 0 ), matRed ), [ 0, 0, 0.99 ], null, [ 1, 3, 1 ]],
+			],
+			Y: [
+				[ new Line( CircleGeometry( 1, 0.5 ), matLineGreen ), null, [ 0, 0, - Math.PI / 2 ]],
+				[ new Mesh( new OctahedronGeometry( 0.04, 0 ), matGreen ), [ 0, 0, 0.99 ], null, [ 3, 1, 1 ]],
+			],
+			Z: [
+				[ new Line( CircleGeometry( 1, 0.5 ), matLineBlue ), null, [ 0, Math.PI / 2, 0 ]],
+				[ new Mesh( new OctahedronGeometry( 0.04, 0 ), matBlue ), [ 0.99, 0, 0 ], null, [ 1, 3, 1 ]],
+			],
+			E: [
+				[ new Line( CircleGeometry( 1.25, 1 ), matLineYellowTransparent ), null, [ 0, Math.PI / 2, 0 ]],
+				[ new Mesh( new CylinderGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 1.17, 0, 0 ], [ 0, 0, - Math.PI / 2 ], [ 1, 1, 0.001 ]],
+				[ new Mesh( new CylinderGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ - 1.17, 0, 0 ], [ 0, 0, Math.PI / 2 ], [ 1, 1, 0.001 ]],
+				[ new Mesh( new CylinderGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 0, - 1.17, 0 ], [ Math.PI, 0, 0 ], [ 1, 1, 0.001 ]],
+				[ new Mesh( new CylinderGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 0, 1.17, 0 ], [ 0, 0, 0 ], [ 1, 1, 0.001 ]],
+			],
+			XYZE: [
+				[ new Line( CircleGeometry( 1, 1 ), matLineGray ), null, [ 0, Math.PI / 2, 0 ]]
+			]
+		};
+
+		const helperRotate = {
+			AXIS: [
+				[ new Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
+			]
+		};
+
+		const pickerRotate = {
+			X: [
+				[ new Mesh( new TorusGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ 0, - Math.PI / 2, - Math.PI / 2 ]],
+			],
+			Y: [
+				[ new Mesh( new TorusGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ Math.PI / 2, 0, 0 ]],
+			],
+			Z: [
+				[ new Mesh( new TorusGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
+			],
+			E: [
+				[ new Mesh( new TorusGeometry( 1.25, 0.1, 2, 24 ), matInvisible ) ]
+			],
+			XYZE: [
+				[ new Mesh( new SphereGeometry( 0.7, 10, 8 ), matInvisible ) ]
+			]
+		};
+
+		var gizmoScale = {
+			X: [
+				[ new Mesh( scaleHandleGeometry, matRed ), [ 0.8, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
+				[ new Line( lineGeometry, matLineRed ), null, null, [ 0.8, 1, 1 ]]
+			],
+			Y: [
+				[ new Mesh( scaleHandleGeometry, matGreen ), [ 0, 0.8, 0 ]],
+				[ new Line( lineGeometry, matLineGreen ), null, [ 0, 0, Math.PI / 2 ], [ 0.8, 1, 1 ]]
+			],
+			Z: [
+				[ new Mesh( scaleHandleGeometry, matBlue ), [ 0, 0, 0.8 ], [ Math.PI / 2, 0, 0 ]],
+				[ new Line( lineGeometry, matLineBlue ), null, [ 0, - Math.PI / 2, 0 ], [ 0.8, 1, 1 ]]
+			],
+			XY: [
+				[ new Mesh( scaleHandleGeometry, matYellowTransparent ), [ 0.85, 0.85, 0 ], null, [ 2, 2, 0.2 ]],
+				[ new Line( lineGeometry, matLineYellow ), [ 0.855, 0.98, 0 ], null, [ 0.125, 1, 1 ]],
+				[ new Line( lineGeometry, matLineYellow ), [ 0.98, 0.855, 0 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]]
+			],
+			YZ: [
+				[ new Mesh( scaleHandleGeometry, matCyanTransparent ), [ 0, 0.85, 0.85 ], null, [ 0.2, 2, 2 ]],
+				[ new Line( lineGeometry, matLineCyan ), [ 0, 0.855, 0.98 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]],
+				[ new Line( lineGeometry, matLineCyan ), [ 0, 0.98, 0.855 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
+			],
+			XZ: [
+				[ new Mesh( scaleHandleGeometry, matMagentaTransparent ), [ 0.85, 0, 0.85 ], null, [ 2, 0.2, 2 ]],
+				[ new Line( lineGeometry, matLineMagenta ), [ 0.855, 0, 0.98 ], null, [ 0.125, 1, 1 ]],
+				[ new Line( lineGeometry, matLineMagenta ), [ 0.98, 0, 0.855 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
+			],
+			XYZX: [
+				[ new Mesh( new BoxGeometry( 0.125, 0.125, 0.125 ), matWhiteTransparent.clone() ), [ 1.1, 0, 0 ]],
+			],
+			XYZY: [
+				[ new Mesh( new BoxGeometry( 0.125, 0.125, 0.125 ), matWhiteTransparent.clone() ), [ 0, 1.1, 0 ]],
+			],
+			XYZZ: [
+				[ new Mesh( new BoxGeometry( 0.125, 0.125, 0.125 ), matWhiteTransparent.clone() ), [ 0, 0, 1.1 ]],
+			]
+		};
+
+		const pickerScale = {
+			X: [
+				[ new Mesh( new CylinderGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
+			],
+			Y: [
+				[ new Mesh( new CylinderGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0, 0.5, 0 ]]
+			],
+			Z: [
+				[ new Mesh( new CylinderGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ]]
+			],
+			XY: [
+				[ new Mesh( scaleHandleGeometry, matInvisible ), [ 0.85, 0.85, 0 ], null, [ 3, 3, 0.2 ]],
+			],
+			YZ: [
+				[ new Mesh( scaleHandleGeometry, matInvisible ), [ 0, 0.85, 0.85 ], null, [ 0.2, 3, 3 ]],
+			],
+			XZ: [
+				[ new Mesh( scaleHandleGeometry, matInvisible ), [ 0.85, 0, 0.85 ], null, [ 3, 0.2, 3 ]],
+			],
+			XYZX: [
+				[ new Mesh( new BoxGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 1.1, 0, 0 ]],
+			],
+			XYZY: [
+				[ new Mesh( new BoxGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 1.1, 0 ]],
+			],
+			XYZZ: [
+				[ new Mesh( new BoxGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 0, 1.1 ]],
+			]
+		};
+
+		const helperScale = {
+			X: [
+				[ new Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
+			],
+			Y: [
+				[ new Line( lineGeometry, matHelper.clone() ), [ 0, - 1e3, 0 ], [ 0, 0, Math.PI / 2 ], [ 1e6, 1, 1 ], 'helper' ]
+			],
+			Z: [
+				[ new Line( lineGeometry, matHelper.clone() ), [ 0, 0, - 1e3 ], [ 0, - Math.PI / 2, 0 ], [ 1e6, 1, 1 ], 'helper' ]
+			]
+		};
+
+		// Creates an Object3D with gizmos described in custom hierarchy definition.
+
+		function setupGizmo( gizmoMap ) {
+
+			const gizmo = new Object3D();
+
+			for ( const name in gizmoMap ) {
+
+				for ( let i = gizmoMap[ name ].length; i --; ) {
+
+					const object = gizmoMap[ name ][ i ][ 0 ].clone();
+					const position = gizmoMap[ name ][ i ][ 1 ];
+					const rotation = gizmoMap[ name ][ i ][ 2 ];
+					const scale = gizmoMap[ name ][ i ][ 3 ];
+					const tag = gizmoMap[ name ][ i ][ 4 ];
+
+					// name and tag properties are essential for picking and updating logic.
+					object.name = name;
+					object.tag = tag;
+
+					if ( position ) {
+
+						object.position.set( position[ 0 ], position[ 1 ], position[ 2 ] );
+
+					}
+
+					if ( rotation ) {
+
+						object.rotation.set( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ] );
+
+					}
+
+					if ( scale ) {
+
+						object.scale.set( scale[ 0 ], scale[ 1 ], scale[ 2 ] );
+
+					}
+
+					object.updateMatrix();
+
+					const tempGeometry = object.geometry.clone();
+					tempGeometry.applyMatrix4( object.matrix );
+					object.geometry = tempGeometry;
+					object.renderOrder = Infinity;
+
+					object.position.set( 0, 0, 0 );
+					object.rotation.set( 0, 0, 0 );
+					object.scale.set( 1, 1, 1 );
+
+					gizmo.add( object );
+
+				}
+
+			}
+
+			return gizmo;
+
+		}
+
+		// Gizmo creation
+
+		this.gizmo = {};
+		this.picker = {};
+		this.helper = {};
+
+		this.add( this.gizmo[ 'translate' ] = setupGizmo( gizmoTranslate ) );
+		this.add( this.gizmo[ 'rotate' ] = setupGizmo( gizmoRotate ) );
+		this.add( this.gizmo[ 'scale' ] = setupGizmo( gizmoScale ) );
+		this.add( this.picker[ 'translate' ] = setupGizmo( pickerTranslate ) );
+		this.add( this.picker[ 'rotate' ] = setupGizmo( pickerRotate ) );
+		this.add( this.picker[ 'scale' ] = setupGizmo( pickerScale ) );
+		this.add( this.helper[ 'translate' ] = setupGizmo( helperTranslate ) );
+		this.add( this.helper[ 'rotate' ] = setupGizmo( helperRotate ) );
+		this.add( this.helper[ 'scale' ] = setupGizmo( helperScale ) );
+
+		// Pickers should be hidden always
+
+		this.picker[ 'translate' ].visible = false;
+		this.picker[ 'rotate' ].visible = false;
+		this.picker[ 'scale' ].visible = false;
+
+	}
 
 	// updateMatrixWorld will update transformations and appearance of individual handles
 
-	this.updateMatrixWorld = function () {
+	updateMatrixWorld( force ) {
 
-		var space = this.space;
+		const space = ( this.mode === 'scale' ) ? this.space : 'local'; // scale always oriented to local rotation
 
-		if ( this.mode === 'scale' ) space = 'local'; // scale always oriented to local rotation
-
-		var quaternion = space === 'local' ? this.worldQuaternion : identityQuaternion;
+		const quaternion = ( space === 'local' ) ? this.worldQuaternion : _identityQuaternion;
 
 		// Show only gizmos for current transform mode
 
@@ -1189,14 +1196,14 @@ var TransformControlsGizmo = function () {
 		this.helper[ 'scale' ].visible = this.mode === 'scale';
 
 
-		var handles = [];
+		let handles = [];
 		handles = handles.concat( this.picker[ this.mode ].children );
 		handles = handles.concat( this.gizmo[ this.mode ].children );
 		handles = handles.concat( this.helper[ this.mode ].children );
 
-		for ( var i = 0; i < handles.length; i ++ ) {
+		for ( let i = 0; i < handles.length; i ++ ) {
 
-			var handle = handles[ i ];
+			const handle = handles[ i ];
 
 			// hide aligned to camera
 
@@ -1204,7 +1211,7 @@ var TransformControlsGizmo = function () {
 			handle.rotation.set( 0, 0, 0 );
 			handle.position.copy( this.worldPosition );
 
-			var factor;
+			let factor;
 
 			if ( this.camera.isOrthographicCamera ) {
 
@@ -1231,10 +1238,10 @@ var TransformControlsGizmo = function () {
 
 					if ( this.axis === 'X' ) {
 
-						tempQuaternion.setFromEuler( tempEuler.set( 0, 0, 0 ) );
-						handle.quaternion.copy( quaternion ).multiply( tempQuaternion );
+						_tempQuaternion.setFromEuler( _tempEuler.set( 0, 0, 0 ) );
+						handle.quaternion.copy( quaternion ).multiply( _tempQuaternion );
 
-						if ( Math.abs( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.9 ) {
+						if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.9 ) {
 
 							handle.visible = false;
 
@@ -1244,10 +1251,10 @@ var TransformControlsGizmo = function () {
 
 					if ( this.axis === 'Y' ) {
 
-						tempQuaternion.setFromEuler( tempEuler.set( 0, 0, Math.PI / 2 ) );
-						handle.quaternion.copy( quaternion ).multiply( tempQuaternion );
+						_tempQuaternion.setFromEuler( _tempEuler.set( 0, 0, Math.PI / 2 ) );
+						handle.quaternion.copy( quaternion ).multiply( _tempQuaternion );
 
-						if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.9 ) {
+						if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.9 ) {
 
 							handle.visible = false;
 
@@ -1257,10 +1264,10 @@ var TransformControlsGizmo = function () {
 
 					if ( this.axis === 'Z' ) {
 
-						tempQuaternion.setFromEuler( tempEuler.set( 0, Math.PI / 2, 0 ) );
-						handle.quaternion.copy( quaternion ).multiply( tempQuaternion );
+						_tempQuaternion.setFromEuler( _tempEuler.set( 0, Math.PI / 2, 0 ) );
+						handle.quaternion.copy( quaternion ).multiply( _tempQuaternion );
 
-						if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.9 ) {
+						if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.9 ) {
 
 							handle.visible = false;
 
@@ -1270,10 +1277,10 @@ var TransformControlsGizmo = function () {
 
 					if ( this.axis === 'XYZE' ) {
 
-						tempQuaternion.setFromEuler( tempEuler.set( 0, Math.PI / 2, 0 ) );
-						alignVector.copy( this.rotationAxis );
-						handle.quaternion.setFromRotationMatrix( lookAtMatrix.lookAt( zeroVector, alignVector, unitY ) );
-						handle.quaternion.multiply( tempQuaternion );
+						_tempQuaternion.setFromEuler( _tempEuler.set( 0, Math.PI / 2, 0 ) );
+						_alignVector.copy( this.rotationAxis );
+						handle.quaternion.setFromRotationMatrix( _lookAtMatrix.lookAt( _zeroVector, _alignVector, _unitY ) );
+						handle.quaternion.multiply( _tempQuaternion );
 						handle.visible = this.dragging;
 
 					}
@@ -1299,9 +1306,9 @@ var TransformControlsGizmo = function () {
 
 					handle.position.copy( this.worldPositionStart );
 					handle.quaternion.copy( this.worldQuaternionStart );
-					tempVector.set( 1e-10, 1e-10, 1e-10 ).add( this.worldPositionStart ).sub( this.worldPosition ).multiplyScalar( - 1 );
-					tempVector.applyQuaternion( this.worldQuaternionStart.clone().invert() );
-					handle.scale.copy( tempVector );
+					_tempVector.set( 1e-10, 1e-10, 1e-10 ).add( this.worldPositionStart ).sub( this.worldPosition ).multiplyScalar( - 1 );
+					_tempVector.applyQuaternion( this.worldQuaternionStart.clone().invert() );
+					handle.scale.copy( _tempVector );
 					handle.visible = this.dragging;
 
 				} else {
@@ -1339,14 +1346,13 @@ var TransformControlsGizmo = function () {
 
 				// Hide translate and scale axis facing the camera
 
-				var AXIS_HIDE_TRESHOLD = 0.99;
-				var PLANE_HIDE_TRESHOLD = 0.2;
-				var AXIS_FLIP_TRESHOLD = 0.0;
-
+				const AXIS_HIDE_TRESHOLD = 0.99;
+				const PLANE_HIDE_TRESHOLD = 0.2;
+				const AXIS_FLIP_TRESHOLD = 0.0;
 
 				if ( handle.name === 'X' || handle.name === 'XYZX' ) {
 
-					if ( Math.abs( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
+					if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
 
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
@@ -1357,7 +1363,7 @@ var TransformControlsGizmo = function () {
 
 				if ( handle.name === 'Y' || handle.name === 'XYZY' ) {
 
-					if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
+					if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
 
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
@@ -1368,7 +1374,7 @@ var TransformControlsGizmo = function () {
 
 				if ( handle.name === 'Z' || handle.name === 'XYZZ' ) {
 
-					if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
+					if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
 
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
@@ -1379,7 +1385,7 @@ var TransformControlsGizmo = function () {
 
 				if ( handle.name === 'XY' ) {
 
-					if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
+					if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
 
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
@@ -1390,7 +1396,7 @@ var TransformControlsGizmo = function () {
 
 				if ( handle.name === 'YZ' ) {
 
-					if ( Math.abs( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
+					if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
 
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
@@ -1401,7 +1407,7 @@ var TransformControlsGizmo = function () {
 
 				if ( handle.name === 'XZ' ) {
 
-					if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
+					if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
 
 						handle.scale.set( 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
@@ -1414,7 +1420,7 @@ var TransformControlsGizmo = function () {
 
 				if ( handle.name.search( 'X' ) !== - 1 ) {
 
-					if ( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) < AXIS_FLIP_TRESHOLD ) {
+					if ( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) < AXIS_FLIP_TRESHOLD ) {
 
 						if ( handle.tag === 'fwd' ) {
 
@@ -1436,7 +1442,7 @@ var TransformControlsGizmo = function () {
 
 				if ( handle.name.search( 'Y' ) !== - 1 ) {
 
-					if ( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) < AXIS_FLIP_TRESHOLD ) {
+					if ( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) < AXIS_FLIP_TRESHOLD ) {
 
 						if ( handle.tag === 'fwd' ) {
 
@@ -1458,7 +1464,7 @@ var TransformControlsGizmo = function () {
 
 				if ( handle.name.search( 'Z' ) !== - 1 ) {
 
-					if ( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) < AXIS_FLIP_TRESHOLD ) {
+					if ( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) < AXIS_FLIP_TRESHOLD ) {
 
 						if ( handle.tag === 'fwd' ) {
 
@@ -1482,36 +1488,36 @@ var TransformControlsGizmo = function () {
 
 				// Align handles to current local or world rotation
 
-				tempQuaternion2.copy( quaternion );
-				alignVector.copy( this.eye ).applyQuaternion( tempQuaternion.copy( quaternion ).invert() );
+				_tempQuaternion2.copy( quaternion );
+				_alignVector.copy( this.eye ).applyQuaternion( _tempQuaternion.copy( quaternion ).invert() );
 
 				if ( handle.name.search( 'E' ) !== - 1 ) {
 
-					handle.quaternion.setFromRotationMatrix( lookAtMatrix.lookAt( this.eye, zeroVector, unitY ) );
+					handle.quaternion.setFromRotationMatrix( _lookAtMatrix.lookAt( this.eye, _zeroVector, _unitY ) );
 
 				}
 
 				if ( handle.name === 'X' ) {
 
-					tempQuaternion.setFromAxisAngle( unitX, Math.atan2( - alignVector.y, alignVector.z ) );
-					tempQuaternion.multiplyQuaternions( tempQuaternion2, tempQuaternion );
-					handle.quaternion.copy( tempQuaternion );
+					_tempQuaternion.setFromAxisAngle( _unitX, Math.atan2( - _alignVector.y, _alignVector.z ) );
+					_tempQuaternion.multiplyQuaternions( _tempQuaternion2, _tempQuaternion );
+					handle.quaternion.copy( _tempQuaternion );
 
 				}
 
 				if ( handle.name === 'Y' ) {
 
-					tempQuaternion.setFromAxisAngle( unitY, Math.atan2( alignVector.x, alignVector.z ) );
-					tempQuaternion.multiplyQuaternions( tempQuaternion2, tempQuaternion );
-					handle.quaternion.copy( tempQuaternion );
+					_tempQuaternion.setFromAxisAngle( _unitY, Math.atan2( _alignVector.x, _alignVector.z ) );
+					_tempQuaternion.multiplyQuaternions( _tempQuaternion2, _tempQuaternion );
+					handle.quaternion.copy( _tempQuaternion );
 
 				}
 
 				if ( handle.name === 'Z' ) {
 
-					tempQuaternion.setFromAxisAngle( unitZ, Math.atan2( alignVector.y, alignVector.x ) );
-					tempQuaternion.multiplyQuaternions( tempQuaternion2, tempQuaternion );
-					handle.quaternion.copy( tempQuaternion );
+					_tempQuaternion.setFromAxisAngle( _unitZ, Math.atan2( _alignVector.y, _alignVector.x ) );
+					_tempQuaternion.multiplyQuaternions( _tempQuaternion2, _tempQuaternion );
+					handle.quaternion.copy( _tempQuaternion );
 
 				}
 
@@ -1563,29 +1569,15 @@ var TransformControlsGizmo = function () {
 
 		}
 
-		Object3D.prototype.updateMatrixWorld.call( this );
+		super.updateMatrixWorld( force );
 
-	};
+	}
 
-};
+}
 
-TransformControlsGizmo.prototype = Object.assign( Object.create( Object3D.prototype ), {
+TransformControlsGizmo.prototype.isTransformControlsGizmo = true;
 
-	constructor: TransformControlsGizmo,
-
-	isTransformControlsGizmo: true
-
-} );
-
-const _unitX = new Vector3( 1, 0, 0 );
-const _unitY = new Vector3( 0, 1, 0 );
-const _unitZ = new Vector3( 0, 0, 1 );
-
-const _tempVector = new Vector3();
-const _dirVector = new Vector3();
-const _alignVector = new Vector3();
-const _tempMatrix = new Matrix4();
-const _identityQuaternion = new Quaternion();
+//
 
 class TransformControlsPlane extends Mesh {
 
@@ -1608,13 +1600,13 @@ class TransformControlsPlane extends Mesh {
 
 		if ( this.mode === 'scale' ) space = 'local'; // scale always oriented to local rotation
 
-		_unitX.set( 1, 0, 0 ).applyQuaternion( space === 'local' ? this.worldQuaternion : _identityQuaternion );
-		_unitY.set( 0, 1, 0 ).applyQuaternion( space === 'local' ? this.worldQuaternion : _identityQuaternion );
-		_unitZ.set( 0, 0, 1 ).applyQuaternion( space === 'local' ? this.worldQuaternion : _identityQuaternion );
+		_v1.copy( _unitX ).applyQuaternion( space === 'local' ? this.worldQuaternion : _identityQuaternion );
+		_v2.copy( _unitY ).applyQuaternion( space === 'local' ? this.worldQuaternion : _identityQuaternion );
+		_v3.copy( _unitZ ).applyQuaternion( space === 'local' ? this.worldQuaternion : _identityQuaternion );
 
 		// Align the plane for current transform mode, axis and space.
 
-		_alignVector.copy( _unitY );
+		_alignVector.copy( _v2 );
 
 		switch ( this.mode ) {
 
@@ -1623,26 +1615,26 @@ class TransformControlsPlane extends Mesh {
 				switch ( this.axis ) {
 
 					case 'X':
-						_alignVector.copy( this.eye ).cross( _unitX );
-						_dirVector.copy( _unitX ).cross( _alignVector );
+						_alignVector.copy( this.eye ).cross( _v1 );
+						_dirVector.copy( _v1 ).cross( _alignVector );
 						break;
 					case 'Y':
-						_alignVector.copy( this.eye ).cross( _unitY );
-						_dirVector.copy( _unitY ).cross( _alignVector );
+						_alignVector.copy( this.eye ).cross( _v2 );
+						_dirVector.copy( _v2 ).cross( _alignVector );
 						break;
 					case 'Z':
-						_alignVector.copy( this.eye ).cross( _unitZ );
-						_dirVector.copy( _unitZ ).cross( _alignVector );
+						_alignVector.copy( this.eye ).cross( _v3 );
+						_dirVector.copy( _v3 ).cross( _alignVector );
 						break;
 					case 'XY':
-						_dirVector.copy( _unitZ );
+						_dirVector.copy( _v3 );
 						break;
 					case 'YZ':
-						_dirVector.copy( _unitX );
+						_dirVector.copy( _v1 );
 						break;
 					case 'XZ':
-						_alignVector.copy( _unitZ );
-						_dirVector.copy( _unitY );
+						_alignVector.copy( _v3 );
+						_dirVector.copy( _v2 );
 						break;
 					case 'XYZ':
 					case 'E':
