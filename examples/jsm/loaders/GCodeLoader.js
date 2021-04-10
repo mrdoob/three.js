@@ -69,10 +69,10 @@ class GCodeLoader extends Loader {
 
 		let currentLayer = undefined;
 
-		let pathMaterial = new LineBasicMaterial( { color: 0xFF0000 } );
+		const pathMaterial = new LineBasicMaterial( { color: 0xFF0000 } );
 		pathMaterial.name = 'path';
 
-		let extrudingMaterial = new LineBasicMaterial( { color: 0x00FF00 } );
+		const extrudingMaterial = new LineBasicMaterial( { color: 0x00FF00 } );
 		extrudingMaterial.name = 'extruded';
 
 		function newLayer( line ) {
@@ -91,7 +91,7 @@ class GCodeLoader extends Loader {
 
 			}
 
-			if ( line.extruding ) {
+			if ( state.extruding ) {
 
 				currentLayer.vertex.push( p1.x, p1.y, p1.z );
 				currentLayer.vertex.push( p2.x, p2.y, p2.z );
@@ -201,15 +201,15 @@ class GCodeLoader extends Loader {
 
 		function addObject( vertex, extruding, i ) {
 
-			let geometry = new THREE.BufferGeometry();
-			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertex, 3 ) );
-			let segments = new THREE.LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
+			let geometry = new BufferGeometry();
+			geometry.setAttribute( 'position', new Float32BufferAttribute( vertex, 3 ) );
+			let segments = new LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
 			segments.name = 'layer' + i;
 			object.add( segments );
 
 		}
 
-		let object = new THREE.Group();
+		const object = new Group();
 		object.name = 'gcode';
 
 		if ( this.splitLayer ) {
@@ -224,7 +224,7 @@ class GCodeLoader extends Loader {
 
 		} else {
 
-			let vertex = [],
+			const vertex = [],
 				pathVertex = [];
 
 			for ( let i = 0; i < layers.length; i ++ ) {
@@ -247,8 +247,8 @@ class GCodeLoader extends Loader {
 
 			}
 
-			addObject( vertex, true, i );
-			addObject( pathVertex, false, i );
+			addObject( vertex, true, layers.length );
+			addObject( pathVertex, false, layers.length );
 
 		}
 

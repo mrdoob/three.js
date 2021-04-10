@@ -64,14 +64,17 @@
 			};
 			let layers = [];
 			let currentLayer = undefined;
-			let pathMaterial = new THREE.LineBasicMaterial( {
+
+			const pathMaterial = new THREE.LineBasicMaterial( {
 				color: 0xFF0000
 			} );
 			pathMaterial.name = 'path';
-			let extrudingMaterial = new THREE.LineBasicMaterial( {
+
+			const extrudingMaterial = new THREE.LineBasicMaterial( {
 				color: 0x00FF00
 			} );
 			extrudingMaterial.name = 'extruded';
+			
 
 			function newLayer( line ) {
 
@@ -93,7 +96,7 @@
 
 				}
 
-				if ( line.extruding ) {
+				if ( state.extruding ) {
 
 					currentLayer.vertex.push( p1.x, p1.y, p1.z );
 					currentLayer.vertex.push( p2.x, p2.y, p2.z );
@@ -202,7 +205,7 @@
 
 			}
 
-			let object = new THREE.Group();
+			const object = new THREE.Group();
 			object.name = 'gcode';
 
 			if ( this.splitLayer ) {
@@ -217,7 +220,7 @@
 
 			} else {
 
-				let vertex = [],
+				const vertex = [],
 					pathVertex = [];
 
 				for ( let i = 0; i < layers.length; i ++ ) {
@@ -240,8 +243,8 @@
 
 				}
 
-				addObject( vertex, true, i );
-				addObject( pathVertex, false, i );
+				addObject( vertex, true, layers.length );
+				addObject( pathVertex, false, layers.length );
 
 			}
 
