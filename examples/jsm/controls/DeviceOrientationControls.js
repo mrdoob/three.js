@@ -17,6 +17,8 @@ class DeviceOrientationControls extends EventDispatcher {
 
 	constructor( object ) {
 
+		super();
+
 		if ( window.isSecureContext === false ) {
 
 			console.error( 'THREE.DeviceOrientationControls: DeviceOrientationEvent is only available in secure contexts (https)' );
