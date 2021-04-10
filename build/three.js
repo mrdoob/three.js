@@ -11653,6 +11653,7 @@
 			this.wrapR = ClampToEdgeWrapping;
 			this.generateMipmaps = false;
 			this.flipY = false;
+			this.unpackAlignment = 1;
 			this.needsUpdate = true;
 		}
 
@@ -11681,6 +11682,7 @@
 			this.wrapR = ClampToEdgeWrapping;
 			this.generateMipmaps = false;
 			this.flipY = false;
+			this.unpackAlignment = 1;
 			this.needsUpdate = true;
 		}
 
@@ -23720,16 +23722,18 @@
 	 * 		http://www.oodesign.com/template-method-pattern.html
 	 *
 	 */
-	function Interpolant(parameterPositions, sampleValues, sampleSize, resultBuffer) {
-		this.parameterPositions = parameterPositions;
-		this._cachedIndex = 0;
-		this.resultBuffer = resultBuffer !== undefined ? resultBuffer : new sampleValues.constructor(sampleSize);
-		this.sampleValues = sampleValues;
-		this.valueSize = sampleSize;
-	}
+	class Interpolant {
+		constructor(parameterPositions, sampleValues, sampleSize, resultBuffer) {
+			this.parameterPositions = parameterPositions;
+			this._cachedIndex = 0;
+			this.resultBuffer = resultBuffer !== undefined ? resultBuffer : new sampleValues.constructor(sampleSize);
+			this.sampleValues = sampleValues;
+			this.valueSize = sampleSize;
+			this.settings = null;
+			this.DefaultSettings_ = {};
+		}
 
-	Object.assign(Interpolant.prototype, {
-		evaluate: function (t) {
+		evaluate(t) {
 			const pp = this.parameterPositions;
 			let i1 = this._cachedIndex,
 					t1 = pp[i1],
@@ -23845,16 +23849,13 @@
 
 
 			return this.interpolate_(i1, t0, t, t1);
-		},
-		settings: null,
-		// optional, subclass-specific settings structure
-		// Note: The indirection allows central control of many interpolants.
-		// --- Protected interface
-		DefaultSettings_: {},
-		getSettings_: function () {
+		}
+
+		getSettings_() {
 			return this.settings || this.DefaultSettings_;
-		},
-		copySampleValue_: function (index) {
+		}
+
+		copySampleValue_(index) {
 			// copies a sample value to the result buffer
 			const result = this.resultBuffer,
 						values = this.sampleValues,
@@ -23866,25 +23867,25 @@
 			}
 
 			return result;
-		},
-		// Template methods for derived classes:
-		interpolate_: function ()
+		} // Template methods for derived classes:
+
+
+		interpolate_()
 		/* i1, t0, t, t1 */
 		{
 			throw new Error('call to abstract method'); // implementations shall return this.resultBuffer
-		},
-		intervalChanged_: function ()
+		}
+
+		intervalChanged_()
 		/* i1, t0, t1 */
 		{// empty
 		}
-	}); // DECLARE ALIAS AFTER assign prototype
 
-	Object.assign(Interpolant.prototype, {
-		//( 0, t, t0 ), returns this.resultBuffer
-		beforeStart_: Interpolant.prototype.copySampleValue_,
-		//( N-1, tN-1, t ), returns this.resultBuffer
-		afterEnd_: Interpolant.prototype.copySampleValue_
-	});
+	} // ALIAS DEFINITIONS
+
+
+	Interpolant.prototype.beforeStart_ = Interpolant.prototype.copySampleValue_;
+	Interpolant.prototype.afterEnd_ = Interpolant.prototype.copySampleValue_;
 
 	/**
 	 * Fast and simple cubic spline interpolant.
@@ -23894,21 +23895,20 @@
 	 * over their parameter interval.
 	 */
 
-	function CubicInterpolant(parameterPositions, sampleValues, sampleSize, resultBuffer) {
-		Interpolant.call(this, parameterPositions, sampleValues, sampleSize, resultBuffer);
-		this._weightPrev = -0;
-		this._offsetPrev = -0;
-		this._weightNext = -0;
-		this._offsetNext = -0;
-	}
+	class CubicInterpolant extends Interpolant {
+		constructor(parameterPositions, sampleValues, sampleSize, resultBuffer) {
+			super(parameterPositions, sampleValues, sampleSize, resultBuffer);
+			this._weightPrev = -0;
+			this._offsetPrev = -0;
+			this._weightNext = -0;
+			this._offsetNext = -0;
+			this.DefaultSettings_ = {
+				endingStart: ZeroCurvatureEnding,
+				endingEnd: ZeroCurvatureEnding
+			};
+		}
 
-	CubicInterpolant.prototype = Object.assign(Object.create(Interpolant.prototype), {
-		constructor: CubicInterpolant,
-		DefaultSettings_: {
-			endingStart: ZeroCurvatureEnding,
-			endingEnd: ZeroCurvatureEnding
-		},
-		intervalChanged_: function (i1, t0, t1) {
+		intervalChanged_(i1, t0, t1) {
 			const pp = this.parameterPositions;
 			let iPrev = i1 - 2,
 					iNext = i1 + 1,
@@ -23965,8 +23965,9 @@
 			this._weightNext = halfDt / (tNext - t1);
 			this._offsetPrev = iPrev * stride;
 			this._offsetNext = iNext * stride;
-		},
-		interpolate_: function (i1, t0, t, t1) {
+		}
+
+		interpolate_(i1, t0, t, t1) {
 			const result = this.resultBuffer,
 						values = this.sampleValues,
 						stride = this.valueSize,
@@ -23991,15 +23992,15 @@
 
 			return result;
 		}
-	});
 
-	function LinearInterpolant(parameterPositions, sampleValues, sampleSize, resultBuffer) {
-		Interpolant.call(this, parameterPositions, sampleValues, sampleSize, resultBuffer);
 	}
 
-	LinearInterpolant.prototype = Object.assign(Object.create(Interpolant.prototype), {
-		constructor: LinearInterpolant,
-		interpolate_: function (i1, t0, t, t1) {
+	class LinearInterpolant extends Interpolant {
+		constructor(parameterPositions, sampleValues, sampleSize, resultBuffer) {
+			super(parameterPositions, sampleValues, sampleSize, resultBuffer);
+		}
+
+		interpolate_(i1, t0, t, t1) {
 			const result = this.resultBuffer,
 						values = this.sampleValues,
 						stride = this.valueSize,
@@ -24014,7 +24015,8 @@
 
 			return result;
 		}
-	});
+
+	}
 
 	/**
 	 *
@@ -24022,18 +24024,18 @@
 	 * the parameter.
 	 */
 
-	function DiscreteInterpolant(parameterPositions, sampleValues, sampleSize, resultBuffer) {
-		Interpolant.call(this, parameterPositions, sampleValues, sampleSize, resultBuffer);
-	}
+	class DiscreteInterpolant extends Interpolant {
+		constructor(parameterPositions, sampleValues, sampleSize, resultBuffer) {
+			super(parameterPositions, sampleValues, sampleSize, resultBuffer);
+		}
 
-	DiscreteInterpolant.prototype = Object.assign(Object.create(Interpolant.prototype), {
-		constructor: DiscreteInterpolant,
-		interpolate_: function (i1
+		interpolate_(i1
 		/*, t0, t, t1 */
 		) {
 			return this.copySampleValue_(i1 - 1);
 		}
-	});
+
+	}
 
 	class KeyframeTrack {
 		constructor(name, times, values, interpolation) {
@@ -24375,13 +24377,12 @@
 	 * Spherical linear unit quaternion interpolant.
 	 */
 
-	function QuaternionLinearInterpolant(parameterPositions, sampleValues, sampleSize, resultBuffer) {
-		Interpolant.call(this, parameterPositions, sampleValues, sampleSize, resultBuffer);
-	}
+	class QuaternionLinearInterpolant extends Interpolant {
+		constructor(parameterPositions, sampleValues, sampleSize, resultBuffer) {
+			super(parameterPositions, sampleValues, sampleSize, resultBuffer);
+		}
 
-	QuaternionLinearInterpolant.prototype = Object.assign(Object.create(Interpolant.prototype), {
-		constructor: QuaternionLinearInterpolant,
-		interpolate_: function (i1, t0, t, t1) {
+		interpolate_(i1, t0, t, t1) {
 			const result = this.resultBuffer,
 						values = this.sampleValues,
 						stride = this.valueSize,
@@ -24394,7 +24395,8 @@
 
 			return result;
 		}
-	});
+
+	}
 
 	/**
 	 * A Track of quaternion keyframe values.
