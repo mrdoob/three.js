@@ -1,6 +1,6 @@
 import {
-	InstancedInterleavedBuffer,
-	InterleavedBufferAttribute,
+	InterleavedBuffer,
+	InstancedInterleavedBufferAttribute,
 	Mesh,
 	Vector3
 } from '../../../build/three.module.js';
@@ -40,10 +40,10 @@ class Wireframe extends Mesh {
 
 		}
 
-		const instanceDistanceBuffer = new InstancedInterleavedBuffer( lineDistances, 2, 1 ); // d0, d1
+		const interleavedDistanceBuffer = new InterleavedBuffer( lineDistances ); // d0, d1
 
-		geometry.setAttribute( 'instanceDistanceStart', new InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
-		geometry.setAttribute( 'instanceDistanceEnd', new InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
+		geometry.setAttribute( 'instanceDistanceStart', new InstancedInterleavedBufferAttribute( interleavedDistanceBuffer, 1, Float32Array, false, 8, 0, lineDistances.length / 2, 1 ) ); // d0
+		geometry.setAttribute( 'instanceDistanceEnd', new InstancedInterleavedBufferAttribute( interleavedDistanceBuffer, 1, Float32Array, false, 8, 4, lineDistances.length / 2, 1 ) ); // d1
 
 		return this;
 

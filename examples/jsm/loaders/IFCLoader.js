@@ -154,15 +154,18 @@ class IFCLoader extends Loader {
 
 		function ifcGeometryToBuffer( vertexData, indexData ) {
 
+			const typedArray = vertexData.constructor;
+
 			const geometry = new BufferGeometry();
-			const buffer32 = new InterleavedBuffer( vertexData, 6 );
+			const buffer32 = new InterleavedBuffer( vertexData.buffer );
+
 			geometry.setAttribute(
 				'position',
-				new InterleavedBufferAttribute( buffer32, 3, 0 )
+				new InterleavedBufferAttribute( buffer32, 3, typedArray, false, 6 * typedArray.BYTES_PER_ELEMENT, 0, vertexData.length / 6 )
 			);
 			geometry.setAttribute(
 				'normal',
-				new InterleavedBufferAttribute( buffer32, 3, 3 )
+				new InterleavedBufferAttribute( buffer32, 3, typedArray, false, 6 * typedArray.BYTES_PER_ELEMENT, 3 * typedArray.BYTES_PER_ELEMENT, 0, vertexData.length / 6 )
 			);
 			geometry.setIndex( new BufferAttribute( indexData, 1 ) );
 			return geometry;

@@ -386,11 +386,11 @@ Lensflare.Geometry = ( function () {
 		- 1, 1, 0, 0, 1
 	] );
 
-	const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
+	const interleavedBuffer = new InterleavedBuffer( float32Array.buffer );
 
 	geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-	geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-	geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+	geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, Float32Array, false, 20, 0, 4 ) );
+	geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, Float32Array, false, 20, 12, 4 ) );
 
 	return geometry;
 

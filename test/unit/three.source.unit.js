@@ -49,7 +49,7 @@ import './src/core/Clock.tests';
 import './src/core/EventDispatcher.tests';
 import './src/core/InstancedBufferAttribute.tests';
 import './src/core/InstancedBufferGeometry.tests';
-import './src/core/InstancedInterleavedBuffer.tests';
+import './src/core/InstancedInterleavedBufferAttribute.tests';
 import './src/core/InterleavedBuffer.tests';
 import './src/core/InterleavedBufferAttribute.tests';
 import './src/core/Layers.tests';

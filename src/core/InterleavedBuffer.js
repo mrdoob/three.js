@@ -1,11 +1,9 @@
 import { MathUtils } from '../math/MathUtils.js';
 import { StaticDrawUsage } from '../constants.js';
 
-function InterleavedBuffer( array, stride ) {
+function InterleavedBuffer( buffer ) {
 
-	this.array = array;
-	this.stride = stride;
-	this.count = array !== undefined ? array.length / stride : 0;
+	this.array = new Uint8Array( buffer );
 
 	this.usage = StaticDrawUsage;
 	this.updateRange = { offset: 0, count: - 1 };
@@ -42,33 +40,8 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	copy: function ( source ) {
 
-		this.array = new source.array.constructor( source.array );
-		this.count = source.count;
-		this.stride = source.stride;
+		this.array = source.array.slice();
 		this.usage = source.usage;
-
-		return this;
-
-	},
-
-	copyAt: function ( index1, attribute, index2 ) {
-
-		index1 *= this.stride;
-		index2 *= attribute.stride;
-
-		for ( let i = 0, l = this.stride; i < l; i ++ ) {
-
-			this.array[ index1 + i ] = attribute.array[ index2 + i ];
-
-		}
-
-		return this;
-
-	},
-
-	set: function ( value, offset = 0 ) {
-
-		this.array.set( value, offset );
 
 		return this;
 
@@ -94,9 +67,7 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		}
 
-		const array = new this.array.constructor( data.arrayBuffers[ this.array.buffer._uuid ] );
-
-		const ib = new InterleavedBuffer( array, this.stride );
+		const ib = new InterleavedBuffer( data.arrayBuffers[ this.array.buffer._uuid ] );
 		ib.setUsage( this.usage );
 
 		return ib;
@@ -135,12 +106,15 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		//
 
-		return {
+		const output = {
 			uuid: this.uuid,
-			buffer: this.array.buffer._uuid,
-			type: this.array.constructor.name,
-			stride: this.stride
+			buffer: this.array.buffer._uuid
 		};
+
+		if ( this.usage !== StaticDrawUsage ) output.usage = this.usage;
+		if ( this.updateRange.offset !== 0 || this.updateRange.count !== - 1 ) output.updateRange = this.updateRange;
+
+		return output;
 
 	}
 

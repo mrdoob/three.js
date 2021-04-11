@@ -87,11 +87,27 @@
 
 				}
 
-				const interleavedBuffer32 = new THREE.InterleavedBuffer( interleavedFloat32Buffer, 4 );
-				const interleavedBuffer8 = new THREE.InterleavedBuffer( interleavedUint8Buffer, 16 );
+				const interleavedBuffer = new THREE.InterleavedBuffer( arrayBuffer );
 
-				geometry.setAttribute( 'position', new THREE.InterleavedBufferAttribute( interleavedBuffer32, 3, 0, false ) );
-				geometry.setAttribute( 'color', new THREE.InterleavedBufferAttribute( interleavedBuffer8, 3, 12, true ) );
+				geometry.setAttribute( 'position', new THREE.InterleavedBufferAttribute(
+					interleavedBuffer,
+					3, // item size
+					Float32Array, // type
+					false, // normalized
+					16, // stride bytes
+					0, // offset bytes
+					particles // count
+				) );
+
+				geometry.setAttribute( 'color', new THREE.InterleavedBufferAttribute(
+					interleavedBuffer,
+					3, // item size
+					Uint8Array, // type
+					true, // normalized
+					16, // stride bytes
+					12, // offset bytes
+					particles // count
+				) );
 
 				//
 

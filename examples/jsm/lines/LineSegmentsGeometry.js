@@ -2,8 +2,8 @@ import {
 	Box3,
 	Float32BufferAttribute,
 	InstancedBufferGeometry,
-	InstancedInterleavedBuffer,
-	InterleavedBufferAttribute,
+	InstancedInterleavedBufferAttribute,
+	InterleavedBuffer,
 	Sphere,
 	Vector3,
 	WireframeGeometry
@@ -75,10 +75,10 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		}
 
-		const instanceBuffer = new InstancedInterleavedBuffer( lineSegments, 6, 1 ); // xyz, xyz
+		const interleavedBuffer = new InterleavedBuffer( lineSegments.buffer ); // xyz, xyz
 
-		this.setAttribute( 'instanceStart', new InterleavedBufferAttribute( instanceBuffer, 3, 0 ) ); // xyz
-		this.setAttribute( 'instanceEnd', new InterleavedBufferAttribute( instanceBuffer, 3, 3 ) ); // xyz
+		this.setAttribute( 'instanceStart', new InstancedInterleavedBufferAttribute( interleavedBuffer, 3, Float32Array, false, 24, 0, lineSegments.length / 6, 1 ) ); // xyz
+		this.setAttribute( 'instanceEnd', new InstancedInterleavedBufferAttribute( interleavedBuffer, 3, Float32Array, false, 24, 12, lineSegments.length / 6, 1 ) ); // xyz
 
 		//
 
@@ -103,10 +103,10 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		}
 
-		const instanceColorBuffer = new InstancedInterleavedBuffer( colors, 6, 1 ); // rgb, rgb
+		const interleavedColorBuffer = new InterleavedBuffer( colors.buffer ); // rgb, rgb
 
-		this.setAttribute( 'instanceColorStart', new InterleavedBufferAttribute( instanceColorBuffer, 3, 0 ) ); // rgb
-		this.setAttribute( 'instanceColorEnd', new InterleavedBufferAttribute( instanceColorBuffer, 3, 3 ) ); // rgb
+		this.setAttribute( 'instanceColorStart', new InstancedInterleavedBufferAttribute( interleavedColorBuffer, 3, Float32Array, false, 24, 0, colors.length / 6, 1 ) ); // rgb
+		this.setAttribute( 'instanceColorEnd', new InstancedInterleavedBufferAttribute( interleavedColorBuffer, 3, Float32Array, false, 24, 12, colors.length / 6, 1 ) ); // rgb
 
 		return this;
 
