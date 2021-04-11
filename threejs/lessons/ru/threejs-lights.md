@@ -537,7 +537,7 @@ makeXYZGUI(gui, light.position, 'position');
 
 Давайте проверим это.
 
-Сначала мы включим физически правильное осещение
+Сначала мы включим физически правильное освещение
 
 ```js
 const renderer = new THREE.WebGLRenderer({canvas});
