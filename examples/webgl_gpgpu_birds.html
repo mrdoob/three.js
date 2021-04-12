@@ -312,93 +312,96 @@
 			const BIRDS = WIDTH * WIDTH;
 
 			// Custom Geometry - using 3 triangles each. No UVs, no normals currently.
-			function BirdGeometry() {
+			class BirdGeometry extends THREE.BufferGeometry {
 
-				const triangles = BIRDS * 3;
-				const points = triangles * 3;
+				constructor() {
 
-				THREE.BufferGeometry.call( this );
+					super();
 
-				const vertices = new THREE.BufferAttribute( new Float32Array( points * 3 ), 3 );
-				const birdColors = new THREE.BufferAttribute( new Float32Array( points * 3 ), 3 );
-				const references = new THREE.BufferAttribute( new Float32Array( points * 2 ), 2 );
-				const birdVertex = new THREE.BufferAttribute( new Float32Array( points ), 1 );
+					const triangles = BIRDS * 3;
+					const points = triangles * 3;
 
-				this.setAttribute( 'position', vertices );
-				this.setAttribute( 'birdColor', birdColors );
-				this.setAttribute( 'reference', references );
-				this.setAttribute( 'birdVertex', birdVertex );
+					const vertices = new THREE.BufferAttribute( new Float32Array( points * 3 ), 3 );
+					const birdColors = new THREE.BufferAttribute( new Float32Array( points * 3 ), 3 );
+					const references = new THREE.BufferAttribute( new Float32Array( points * 2 ), 2 );
+					const birdVertex = new THREE.BufferAttribute( new Float32Array( points ), 1 );
 
-				// this.setAttribute( 'normal', new Float32Array( points * 3 ), 3 );
+					this.setAttribute( 'position', vertices );
+					this.setAttribute( 'birdColor', birdColors );
+					this.setAttribute( 'reference', references );
+					this.setAttribute( 'birdVertex', birdVertex );
+
+					// this.setAttribute( 'normal', new Float32Array( points * 3 ), 3 );
 
 
-				let v = 0;
+					let v = 0;
 
-				function verts_push() {
+					function verts_push() {
 
-					for ( let i = 0; i < arguments.length; i ++ ) {
+						for ( let i = 0; i < arguments.length; i ++ ) {
 
-						vertices.array[ v ++ ] = arguments[ i ];
+							vertices.array[ v ++ ] = arguments[ i ];
+
+						}
 
 					}
 
+					const wingsSpan = 20;
+
+					for ( let f = 0; f < BIRDS; f ++ ) {
+
+						// Body
+						verts_push(
+							0, - 0, - 20,
+							0, 4, - 20,
+							0, 0, 30
+						);
+
+						// Left Wing
+						verts_push(
+							0, 0, - 15,
+							- wingsSpan, 0, 0,
+							0, 0, 15
+						);
+
+						// Right Wing
+						verts_push(
+							0, 0, 15,
+							wingsSpan, 0, 0,
+							0, 0, - 15
+						);
+
+					}
+
+					for ( let v = 0; v < triangles * 3; v ++ ) {
+
+						const i = ~ ~ ( v / 3 );
+						const x = ( i % WIDTH ) / WIDTH;
+						const y = ~ ~ ( i / WIDTH ) / WIDTH;
+
+						const c = new THREE.Color(
+							0x444444 +
+							~ ~ ( v / 9 ) / BIRDS * 0x666666
+						);
+
+						birdColors.array[ v * 3 + 0 ] = c.r;
+						birdColors.array[ v * 3 + 1 ] = c.g;
+						birdColors.array[ v * 3 + 2 ] = c.b;
+
+						references.array[ v * 2 ] = x;
+						references.array[ v * 2 + 1 ] = y;
+
+						birdVertex.array[ v ] = v % 9;
+
+					}
+
+					this.scale( 0.2, 0.2, 0.2 );
+
 				}
-
-				const wingsSpan = 20;
-
-				for ( let f = 0; f < BIRDS; f ++ ) {
-
-					// Body
-					verts_push(
-						0, - 0, - 20,
-						0, 4, - 20,
-						0, 0, 30
-					);
-
-					// Left Wing
-					verts_push(
-						0, 0, - 15,
-						- wingsSpan, 0, 0,
-						0, 0, 15
-					);
-
-					// Right Wing
-					verts_push(
-						0, 0, 15,
-						wingsSpan, 0, 0,
-						0, 0, - 15
-					);
-
-				}
-
-				for ( let v = 0; v < triangles * 3; v ++ ) {
-
-					const i = ~ ~ ( v / 3 );
-					const x = ( i % WIDTH ) / WIDTH;
-					const y = ~ ~ ( i / WIDTH ) / WIDTH;
-
-					const c = new THREE.Color(
-						0x444444 +
-						~ ~ ( v / 9 ) / BIRDS * 0x666666
-					);
-
-					birdColors.array[ v * 3 + 0 ] = c.r;
-					birdColors.array[ v * 3 + 1 ] = c.g;
-					birdColors.array[ v * 3 + 2 ] = c.b;
-
-					references.array[ v * 2 ] = x;
-					references.array[ v * 2 + 1 ] = y;
-
-					birdVertex.array[ v ] = v % 9;
-
-				}
-
-				this.scale( 0.2, 0.2, 0.2 );
 
 			}
 
-			BirdGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-
+			//
 
 			let container, stats;
 			let camera, scene, renderer;
