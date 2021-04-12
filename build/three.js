@@ -6926,37 +6926,37 @@
 
 	const _vector2 = new Vector2();
 
-	function BufferAttribute(array, itemSize, normalized) {
-		if (Array.isArray(array)) {
-			throw new TypeError('THREE.BufferAttribute: array should be a Typed Array.');
+	class BufferAttribute {
+		constructor(array, itemSize, normalized) {
+			if (Array.isArray(array)) {
+				throw new TypeError('THREE.BufferAttribute: array should be a Typed Array.');
+			}
+
+			this.name = '';
+			this.array = array;
+			this.itemSize = itemSize;
+			this.count = array !== undefined ? array.length / itemSize : 0;
+			this.normalized = normalized === true;
+			this.usage = StaticDrawUsage;
+			this.updateRange = {
+				offset: 0,
+				count: -1
+			};
+			this.version = 0;
+
+			this.onUploadCallback = function () {};
 		}
 
-		this.name = '';
-		this.array = array;
-		this.itemSize = itemSize;
-		this.count = array !== undefined ? array.length / itemSize : 0;
-		this.normalized = normalized === true;
-		this.usage = StaticDrawUsage;
-		this.updateRange = {
-			offset: 0,
-			count: -1
-		};
-		this.version = 0;
-	}
-
-	Object.defineProperty(BufferAttribute.prototype, 'needsUpdate', {
-		set: function (value) {
+		set needsUpdate(value) {
 			if (value === true) this.version++;
 		}
-	});
-	Object.assign(BufferAttribute.prototype, {
-		isBufferAttribute: true,
-		onUploadCallback: function () {},
-		setUsage: function (value) {
+
+		setUsage(value) {
 			this.usage = value;
 			return this;
-		},
-		copy: function (source) {
+		}
+
+		copy(source) {
 			this.name = source.name;
 			this.array = new source.array.constructor(source.array);
 			this.itemSize = source.itemSize;
@@ -6964,8 +6964,9 @@
 			this.normalized = source.normalized;
 			this.usage = source.usage;
 			return this;
-		},
-		copyAt: function (index1, attribute, index2) {
+		}
+
+		copyAt(index1, attribute, index2) {
 			index1 *= this.itemSize;
 			index2 *= attribute.itemSize;
 
@@ -6974,12 +6975,14 @@
 			}
 
 			return this;
-		},
-		copyArray: function (array) {
+		}
+
+		copyArray(array) {
 			this.array.set(array);
 			return this;
-		},
-		copyColorsArray: function (colors) {
+		}
+
+		copyColorsArray(colors) {
 			const array = this.array;
 			let offset = 0;
 
@@ -6997,8 +7000,9 @@
 			}
 
 			return this;
-		},
-		copyVector2sArray: function (vectors) {
+		}
+
+		copyVector2sArray(vectors) {
 			const array = this.array;
 			let offset = 0;
 
@@ -7015,8 +7019,9 @@
 			}
 
 			return this;
-		},
-		copyVector3sArray: function (vectors) {
+		}
+
+		copyVector3sArray(vectors) {
 			const array = this.array;
 			let offset = 0;
 
@@ -7034,8 +7039,9 @@
 			}
 
 			return this;
-		},
-		copyVector4sArray: function (vectors) {
+		}
+
+		copyVector4sArray(vectors) {
 			const array = this.array;
 			let offset = 0;
 
@@ -7054,8 +7060,9 @@
 			}
 
 			return this;
-		},
-		applyMatrix3: function (m) {
+		}
+
+		applyMatrix3(m) {
 			if (this.itemSize === 2) {
 				for (let i = 0, l = this.count; i < l; i++) {
 					_vector2.fromBufferAttribute(this, i);
@@ -7075,8 +7082,9 @@
 			}
 
 			return this;
-		},
-		applyMatrix4: function (m) {
+		}
+
+		applyMatrix4(m) {
 			for (let i = 0, l = this.count; i < l; i++) {
 				_vector$9.x = this.getX(i);
 				_vector$9.y = this.getY(i);
@@ -7088,8 +7096,9 @@
 			}
 
 			return this;
-		},
-		applyNormalMatrix: function (m) {
+		}
+
+		applyNormalMatrix(m) {
 			for (let i = 0, l = this.count; i < l; i++) {
 				_vector$9.x = this.getX(i);
 				_vector$9.y = this.getY(i);
@@ -7101,8 +7110,9 @@
 			}
 
 			return this;
-		},
-		transformDirection: function (m) {
+		}
+
+		transformDirection(m) {
 			for (let i = 0, l = this.count; i < l; i++) {
 				_vector$9.x = this.getX(i);
 				_vector$9.y = this.getY(i);
@@ -7114,68 +7124,83 @@
 			}
 
 			return this;
-		},
-		set: function (value, offset = 0) {
+		}
+
+		set(value, offset = 0) {
 			this.array.set(value, offset);
 			return this;
-		},
-		getX: function (index) {
+		}
+
+		getX(index) {
 			return this.array[index * this.itemSize];
-		},
-		setX: function (index, x) {
+		}
+
+		setX(index, x) {
 			this.array[index * this.itemSize] = x;
 			return this;
-		},
-		getY: function (index) {
+		}
+
+		getY(index) {
 			return this.array[index * this.itemSize + 1];
-		},
-		setY: function (index, y) {
+		}
+
+		setY(index, y) {
 			this.array[index * this.itemSize + 1] = y;
 			return this;
-		},
-		getZ: function (index) {
+		}
+
+		getZ(index) {
 			return this.array[index * this.itemSize + 2];
-		},
-		setZ: function (index, z) {
+		}
+
+		setZ(index, z) {
 			this.array[index * this.itemSize + 2] = z;
 			return this;
-		},
-		getW: function (index) {
+		}
+
+		getW(index) {
 			return this.array[index * this.itemSize + 3];
-		},
-		setW: function (index, w) {
+		}
+
+		setW(index, w) {
 			this.array[index * this.itemSize + 3] = w;
 			return this;
-		},
-		setXY: function (index, x, y) {
+		}
+
+		setXY(index, x, y) {
 			index *= this.itemSize;
 			this.array[index + 0] = x;
 			this.array[index + 1] = y;
 			return this;
-		},
-		setXYZ: function (index, x, y, z) {
+		}
+
+		setXYZ(index, x, y, z) {
 			index *= this.itemSize;
 			this.array[index + 0] = x;
 			this.array[index + 1] = y;
 			this.array[index + 2] = z;
 			return this;
-		},
-		setXYZW: function (index, x, y, z, w) {
+		}
+
+		setXYZW(index, x, y, z, w) {
 			index *= this.itemSize;
 			this.array[index + 0] = x;
 			this.array[index + 1] = y;
 			this.array[index + 2] = z;
 			this.array[index + 3] = w;
 			return this;
-		},
-		onUpload: function (callback) {
+		}
+
+		onUpload(callback) {
 			this.onUploadCallback = callback;
 			return this;
-		},
-		clone: function () {
+		}
+
+		clone() {
 			return new this.constructor(this.array, this.itemSize).copy(this);
-		},
-		toJSON: function () {
+		}
+
+		toJSON() {
 			const data = {
 				itemSize: this.itemSize,
 				type: this.array.constructor.name,
@@ -7187,78 +7212,82 @@
 			if (this.updateRange.offset !== 0 || this.updateRange.count !== -1) data.updateRange = this.updateRange;
 			return data;
 		}
-	}); //
 
-	function Int8BufferAttribute(array, itemSize, normalized) {
-		BufferAttribute.call(this, new Int8Array(array), itemSize, normalized);
 	}
 
-	Int8BufferAttribute.prototype = Object.create(BufferAttribute.prototype);
-	Int8BufferAttribute.prototype.constructor = Int8BufferAttribute;
+	BufferAttribute.prototype.isBufferAttribute = true; //
 
-	function Uint8BufferAttribute(array, itemSize, normalized) {
-		BufferAttribute.call(this, new Uint8Array(array), itemSize, normalized);
+	class Int8BufferAttribute extends BufferAttribute {
+		constructor(array, itemSize, normalized) {
+			super(new Int8Array(array), itemSize, normalized);
+		}
+
 	}
 
-	Uint8BufferAttribute.prototype = Object.create(BufferAttribute.prototype);
-	Uint8BufferAttribute.prototype.constructor = Uint8BufferAttribute;
+	class Uint8BufferAttribute extends BufferAttribute {
+		constructor(array, itemSize, normalized) {
+			super(new Uint8Array(array), itemSize, normalized);
+		}
 
-	function Uint8ClampedBufferAttribute(array, itemSize, normalized) {
-		BufferAttribute.call(this, new Uint8ClampedArray(array), itemSize, normalized);
 	}
 
-	Uint8ClampedBufferAttribute.prototype = Object.create(BufferAttribute.prototype);
-	Uint8ClampedBufferAttribute.prototype.constructor = Uint8ClampedBufferAttribute;
+	class Uint8ClampedBufferAttribute extends BufferAttribute {
+		constructor(array, itemSize, normalized) {
+			super(new Uint8ClampedArray(array), itemSize, normalized);
+		}
 
-	function Int16BufferAttribute(array, itemSize, normalized) {
-		BufferAttribute.call(this, new Int16Array(array), itemSize, normalized);
 	}
 
-	Int16BufferAttribute.prototype = Object.create(BufferAttribute.prototype);
-	Int16BufferAttribute.prototype.constructor = Int16BufferAttribute;
+	class Int16BufferAttribute extends BufferAttribute {
+		constructor(array, itemSize, normalized) {
+			super(new Int16Array(array), itemSize, normalized);
+		}
 
-	function Uint16BufferAttribute(array, itemSize, normalized) {
-		BufferAttribute.call(this, new Uint16Array(array), itemSize, normalized);
 	}
 
-	Uint16BufferAttribute.prototype = Object.create(BufferAttribute.prototype);
-	Uint16BufferAttribute.prototype.constructor = Uint16BufferAttribute;
+	class Uint16BufferAttribute extends BufferAttribute {
+		constructor(array, itemSize, normalized) {
+			super(new Uint16Array(array), itemSize, normalized);
+		}
 
-	function Int32BufferAttribute(array, itemSize, normalized) {
-		BufferAttribute.call(this, new Int32Array(array), itemSize, normalized);
 	}
 
-	Int32BufferAttribute.prototype = Object.create(BufferAttribute.prototype);
-	Int32BufferAttribute.prototype.constructor = Int32BufferAttribute;
+	class Int32BufferAttribute extends BufferAttribute {
+		constructor(array, itemSize, normalized) {
+			super(new Int32Array(array), itemSize, normalized);
+		}
 
-	function Uint32BufferAttribute(array, itemSize, normalized) {
-		BufferAttribute.call(this, new Uint32Array(array), itemSize, normalized);
 	}
 
-	Uint32BufferAttribute.prototype = Object.create(BufferAttribute.prototype);
-	Uint32BufferAttribute.prototype.constructor = Uint32BufferAttribute;
+	class Uint32BufferAttribute extends BufferAttribute {
+		constructor(array, itemSize, normalized) {
+			super(new Uint32Array(array), itemSize, normalized);
+		}
 
-	function Float16BufferAttribute(array, itemSize, normalized) {
-		BufferAttribute.call(this, new Uint16Array(array), itemSize, normalized);
 	}
 
-	Float16BufferAttribute.prototype = Object.create(BufferAttribute.prototype);
-	Float16BufferAttribute.prototype.constructor = Float16BufferAttribute;
+	class Float16BufferAttribute extends BufferAttribute {
+		constructor(array, itemSize, normalized) {
+			super(new Uint16Array(array), itemSize, normalized);
+		}
+
+	}
+
 	Float16BufferAttribute.prototype.isFloat16BufferAttribute = true;
 
-	function Float32BufferAttribute(array, itemSize, normalized) {
-		BufferAttribute.call(this, new Float32Array(array), itemSize, normalized);
+	class Float32BufferAttribute extends BufferAttribute {
+		constructor(array, itemSize, normalized) {
+			super(new Float32Array(array), itemSize, normalized);
+		}
+
 	}
 
-	Float32BufferAttribute.prototype = Object.create(BufferAttribute.prototype);
-	Float32BufferAttribute.prototype.constructor = Float32BufferAttribute;
+	class Float64BufferAttribute extends BufferAttribute {
+		constructor(array, itemSize, normalized) {
+			super(new Float64Array(array), itemSize, normalized);
+		}
 
-	function Float64BufferAttribute(array, itemSize, normalized) {
-		BufferAttribute.call(this, new Float64Array(array), itemSize, normalized);
-	}
-
-	Float64BufferAttribute.prototype = Object.create(BufferAttribute.prototype);
-	Float64BufferAttribute.prototype.constructor = Float64BufferAttribute; //
+	} //
 
 	function arrayMax(array) {
 		if (array.length === 0) return -Infinity;
@@ -7301,34 +7330,34 @@
 
 	const _vector$8 = new Vector3();
 
-	function BufferGeometry() {
-		Object.defineProperty(this, 'id', {
-			value: _id++
-		});
-		this.uuid = MathUtils.generateUUID();
-		this.name = '';
-		this.type = 'BufferGeometry';
-		this.index = null;
-		this.attributes = {};
-		this.morphAttributes = {};
-		this.morphTargetsRelative = false;
-		this.groups = [];
-		this.boundingBox = null;
-		this.boundingSphere = null;
-		this.drawRange = {
-			start: 0,
-			count: Infinity
-		};
-		this.userData = {};
-	}
+	class BufferGeometry extends EventDispatcher {
+		constructor() {
+			super();
+			Object.defineProperty(this, 'id', {
+				value: _id++
+			});
+			this.uuid = MathUtils.generateUUID();
+			this.name = '';
+			this.type = 'BufferGeometry';
+			this.index = null;
+			this.attributes = {};
+			this.morphAttributes = {};
+			this.morphTargetsRelative = false;
+			this.groups = [];
+			this.boundingBox = null;
+			this.boundingSphere = null;
+			this.drawRange = {
+				start: 0,
+				count: Infinity
+			};
+			this.userData = {};
+		}
 
-	BufferGeometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
-		constructor: BufferGeometry,
-		isBufferGeometry: true,
-		getIndex: function () {
+		getIndex() {
 			return this.index;
-		},
-		setIndex: function (index) {
+		}
+
+		setIndex(index) {
 			if (Array.isArray(index)) {
 				this.index = new (arrayMax(index) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute)(index, 1);
 			} else {
@@ -7336,36 +7365,44 @@
 			}
 
 			return this;
-		},
-		getAttribute: function (name) {
+		}
+
+		getAttribute(name) {
 			return this.attributes[name];
-		},
-		setAttribute: function (name, attribute) {
+		}
+
+		setAttribute(name, attribute) {
 			this.attributes[name] = attribute;
 			return this;
-		},
-		deleteAttribute: function (name) {
+		}
+
+		deleteAttribute(name) {
 			delete this.attributes[name];
 			return this;
-		},
-		hasAttribute: function (name) {
+		}
+
+		hasAttribute(name) {
 			return this.attributes[name] !== undefined;
-		},
-		addGroup: function (start, count, materialIndex = 0) {
+		}
+
+		addGroup(start, count, materialIndex = 0) {
 			this.groups.push({
 				start: start,
 				count: count,
 				materialIndex: materialIndex
 			});
-		},
-		clearGroups: function () {
+		}
+
+		clearGroups() {
 			this.groups = [];
-		},
-		setDrawRange: function (start, count) {
+		}
+
+		setDrawRange(start, count) {
 			this.drawRange.start = start;
 			this.drawRange.count = count;
-		},
-		applyMatrix4: function (matrix) {
+		}
+
+		applyMatrix4(matrix) {
 			const position = this.attributes.position;
 
 			if (position !== undefined) {
@@ -7397,57 +7434,65 @@
 			}
 
 			return this;
-		},
-		rotateX: function (angle) {
+		}
+
+		rotateX(angle) {
 			// rotate geometry around world x-axis
 			_m1.makeRotationX(angle);
 
 			this.applyMatrix4(_m1);
 			return this;
-		},
-		rotateY: function (angle) {
+		}
+
+		rotateY(angle) {
 			// rotate geometry around world y-axis
 			_m1.makeRotationY(angle);
 
 			this.applyMatrix4(_m1);
 			return this;
-		},
-		rotateZ: function (angle) {
+		}
+
+		rotateZ(angle) {
 			// rotate geometry around world z-axis
 			_m1.makeRotationZ(angle);
 
 			this.applyMatrix4(_m1);
 			return this;
-		},
-		translate: function (x, y, z) {
+		}
+
+		translate(x, y, z) {
 			// translate geometry
 			_m1.makeTranslation(x, y, z);
 
 			this.applyMatrix4(_m1);
 			return this;
-		},
-		scale: function (x, y, z) {
+		}
+
+		scale(x, y, z) {
 			// scale geometry
 			_m1.makeScale(x, y, z);
 
 			this.applyMatrix4(_m1);
 			return this;
-		},
-		lookAt: function (vector) {
+		}
+
+		lookAt(vector) {
 			_obj.lookAt(vector);
 
 			_obj.updateMatrix();
 
 			this.applyMatrix4(_obj.matrix);
 			return this;
-		},
-		center: function () {
+		}
+
+		center() {
 			this.computeBoundingBox();
 			this.boundingBox.getCenter(_offset).negate();
 			this.translate(_offset.x, _offset.y, _offset.z);
 			return this;
-		},
-		setFromPoints: function (points) {
+		}
+
+		setFromPoints(points) {
 			const position = [];
 
 			for (let i = 0, l = points.length; i < l; i++) {
@@ -7457,8 +7502,9 @@
 
 			this.setAttribute('position', new Float32BufferAttribute(position, 3));
 			return this;
-		},
-		computeBoundingBox: function () {
+		}
+
+		computeBoundingBox() {
 			if (this.boundingBox === null) {
 				this.boundingBox = new Box3();
 			}
@@ -7502,8 +7548,9 @@
 			if (isNaN(this.boundingBox.min.x) || isNaN(this.boundingBox.min.y) || isNaN(this.boundingBox.min.z)) {
 				console.error('THREE.BufferGeometry.computeBoundingBox(): Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this);
 			}
-		},
-		computeBoundingSphere: function () {
+		}
+
+		computeBoundingSphere() {
 			if (this.boundingSphere === null) {
 				this.boundingSphere = new Sphere();
 			}
@@ -7584,10 +7631,12 @@
 					console.error('THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this);
 				}
 			}
-		},
-		computeFaceNormals: function () {// backwards compatibility
-		},
-		computeTangents: function () {
+		}
+
+		computeFaceNormals() {// backwards compatibility
+		}
+
+		computeTangents() {
 			const index = this.index;
 			const attributes = this.attributes; // based on http://www.terathon.com/code/tangent.html
 			// (per vertex tangents)
@@ -7701,8 +7750,9 @@
 					handleVertex(indices[j + 2]);
 				}
 			}
-		},
-		computeVertexNormals: function () {
+		}
+
+		computeVertexNormals() {
 			const index = this.index;
 			const positionAttribute = this.getAttribute('position');
 
@@ -7767,8 +7817,9 @@
 				this.normalizeNormals();
 				normalAttribute.needsUpdate = true;
 			}
-		},
-		merge: function (geometry, offset) {
+		}
+
+		merge(geometry, offset) {
 			if (!(geometry && geometry.isBufferGeometry)) {
 				console.error('THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry);
 				return;
@@ -7796,8 +7847,9 @@
 			}
 
 			return this;
-		},
-		normalizeNormals: function () {
+		}
+
+		normalizeNormals() {
 			const normals = this.attributes.normal;
 
 			for (let i = 0, il = normals.count; i < il; i++) {
@@ -7807,8 +7859,9 @@
 
 				normals.setXYZ(i, _vector$8.x, _vector$8.y, _vector$8.z);
 			}
-		},
-		toNonIndexed: function () {
+		}
+
+		toNonIndexed() {
 			function convertBufferAttribute(attribute, indices) {
 				const array = attribute.array;
 				const itemSize = attribute.itemSize;
@@ -7870,8 +7923,9 @@
 			}
 
 			return geometry2;
-		},
-		toJSON: function () {
+		}
+
+		toJSON() {
 			const data = {
 				metadata: {
 					version: 4.5,
@@ -7954,8 +8008,9 @@
 			}
 
 			return data;
-		},
-		clone: function () {
+		}
+
+		clone() {
 			/*
 			 // Handle primitives
 				 const parameters = this.parameters;
@@ -7971,8 +8026,9 @@
 				 return new this.constructor().copy( this );
 			 */
 			return new BufferGeometry().copy(this);
-		},
-		copy: function (source) {
+		}
+
+		copy(source) {
 			// reset
 			this.index = null;
 			this.attributes = {};
@@ -8042,13 +8098,17 @@
 
 			this.userData = source.userData;
 			return this;
-		},
-		dispose: function () {
+		}
+
+		dispose() {
 			this.dispatchEvent({
 				type: 'dispose'
 			});
 		}
-	});
+
+	}
+
+	BufferGeometry.prototype.isBufferGeometry = true;
 
 	const _inverseMatrix$2 = /*@__PURE__*/new Matrix4();
 
@@ -18523,39 +18583,40 @@
 
 	Scene.prototype.isScene = true;
 
-	function InterleavedBuffer(array, stride) {
-		this.array = array;
-		this.stride = stride;
-		this.count = array !== undefined ? array.length / stride : 0;
-		this.usage = StaticDrawUsage;
-		this.updateRange = {
-			offset: 0,
-			count: -1
-		};
-		this.version = 0;
-		this.uuid = MathUtils.generateUUID();
-	}
+	class InterleavedBuffer {
+		constructor(array, stride) {
+			this.array = array;
+			this.stride = stride;
+			this.count = array !== undefined ? array.length / stride : 0;
+			this.usage = StaticDrawUsage;
+			this.updateRange = {
+				offset: 0,
+				count: -1
+			};
+			this.version = 0;
+			this.uuid = MathUtils.generateUUID();
 
-	Object.defineProperty(InterleavedBuffer.prototype, 'needsUpdate', {
-		set: function (value) {
+			this.onUploadCallback = function () {};
+		}
+
+		set needsUpdate(value) {
 			if (value === true) this.version++;
 		}
-	});
-	Object.assign(InterleavedBuffer.prototype, {
-		isInterleavedBuffer: true,
-		onUploadCallback: function () {},
-		setUsage: function (value) {
+
+		setUsage(value) {
 			this.usage = value;
 			return this;
-		},
-		copy: function (source) {
+		}
+
+		copy(source) {
 			this.array = new source.array.constructor(source.array);
 			this.count = source.count;
 			this.stride = source.stride;
 			this.usage = source.usage;
 			return this;
-		},
-		copyAt: function (index1, attribute, index2) {
+		}
+
+		copyAt(index1, attribute, index2) {
 			index1 *= this.stride;
 			index2 *= attribute.stride;
 
@@ -18564,12 +18625,14 @@
 			}
 
 			return this;
-		},
-		set: function (value, offset = 0) {
+		}
+
+		set(value, offset = 0) {
 			this.array.set(value, offset);
 			return this;
-		},
-		clone: function (data) {
+		}
+
+		clone(data) {
 			if (data.arrayBuffers === undefined) {
 				data.arrayBuffers = {};
 			}
@@ -18586,12 +18649,14 @@
 			const ib = new InterleavedBuffer(array, this.stride);
 			ib.setUsage(this.usage);
 			return ib;
-		},
-		onUpload: function (callback) {
+		}
+
+		onUpload(callback) {
 			this.onUploadCallback = callback;
 			return this;
-		},
-		toJSON: function (data) {
+		}
+
+		toJSON(data) {
 			if (data.arrayBuffers === undefined) {
 				data.arrayBuffers = {};
 			} // generate UUID for array buffer if necessary
@@ -18613,38 +18678,35 @@
 				stride: this.stride
 			};
 		}
-	});
+
+	}
+
+	InterleavedBuffer.prototype.isInterleavedBuffer = true;
 
 	const _vector$6 = new Vector3();
 
-	function InterleavedBufferAttribute(interleavedBuffer, itemSize, offset, normalized) {
-		this.name = '';
-		this.data = interleavedBuffer;
-		this.itemSize = itemSize;
-		this.offset = offset;
-		this.normalized = normalized === true;
-	}
-
-	Object.defineProperties(InterleavedBufferAttribute.prototype, {
-		count: {
-			get: function () {
-				return this.data.count;
-			}
-		},
-		array: {
-			get: function () {
-				return this.data.array;
-			}
-		},
-		needsUpdate: {
-			set: function (value) {
-				this.data.needsUpdate = value;
-			}
+	class InterleavedBufferAttribute {
+		constructor(interleavedBuffer, itemSize, offset, normalized) {
+			this.name = '';
+			this.data = interleavedBuffer;
+			this.itemSize = itemSize;
+			this.offset = offset;
+			this.normalized = normalized === true;
 		}
-	});
-	Object.assign(InterleavedBufferAttribute.prototype, {
-		isInterleavedBufferAttribute: true,
-		applyMatrix4: function (m) {
+
+		get count() {
+			return this.data.count;
+		}
+
+		get array() {
+			return this.data.array;
+		}
+
+		set needsUpdate(value) {
+			this.data.needsUpdate = value;
+		}
+
+		applyMatrix4(m) {
 			for (let i = 0, l = this.data.count; i < l; i++) {
 				_vector$6.x = this.getX(i);
 				_vector$6.y = this.getY(i);
@@ -18656,8 +18718,9 @@
 			}
 
 			return this;
-		},
-		applyNormalMatrix: function (m) {
+		}
+
+		applyNormalMatrix(m) {
 			for (let i = 0, l = this.count; i < l; i++) {
 				_vector$6.x = this.getX(i);
 				_vector$6.y = this.getY(i);
@@ -18669,8 +18732,9 @@
 			}
 
 			return this;
-		},
-		transformDirection: function (m) {
+		}
+
+		transformDirection(m) {
 			for (let i = 0, l = this.count; i < l; i++) {
 				_vector$6.x = this.getX(i);
 				_vector$6.y = this.getY(i);
@@ -18682,57 +18746,69 @@
 			}
 
 			return this;
-		},
-		setX: function (index, x) {
+		}
+
+		setX(index, x) {
 			this.data.array[index * this.data.stride + this.offset] = x;
 			return this;
-		},
-		setY: function (index, y) {
+		}
+
+		setY(index, y) {
 			this.data.array[index * this.data.stride + this.offset + 1] = y;
 			return this;
-		},
-		setZ: function (index, z) {
+		}
+
+		setZ(index, z) {
 			this.data.array[index * this.data.stride + this.offset + 2] = z;
 			return this;
-		},
-		setW: function (index, w) {
+		}
+
+		setW(index, w) {
 			this.data.array[index * this.data.stride + this.offset + 3] = w;
 			return this;
-		},
-		getX: function (index) {
+		}
+
+		getX(index) {
 			return this.data.array[index * this.data.stride + this.offset];
-		},
-		getY: function (index) {
+		}
+
+		getY(index) {
 			return this.data.array[index * this.data.stride + this.offset + 1];
-		},
-		getZ: function (index) {
+		}
+
+		getZ(index) {
 			return this.data.array[index * this.data.stride + this.offset + 2];
-		},
-		getW: function (index) {
+		}
+
+		getW(index) {
 			return this.data.array[index * this.data.stride + this.offset + 3];
-		},
-		setXY: function (index, x, y) {
+		}
+
+		setXY(index, x, y) {
 			index = index * this.data.stride + this.offset;
 			this.data.array[index + 0] = x;
 			this.data.array[index + 1] = y;
 			return this;
-		},
-		setXYZ: function (index, x, y, z) {
+		}
+
+		setXYZ(index, x, y, z) {
 			index = index * this.data.stride + this.offset;
 			this.data.array[index + 0] = x;
 			this.data.array[index + 1] = y;
 			this.data.array[index + 2] = z;
 			return this;
-		},
-		setXYZW: function (index, x, y, z, w) {
+		}
+
+		setXYZW(index, x, y, z, w) {
 			index = index * this.data.stride + this.offset;
 			this.data.array[index + 0] = x;
 			this.data.array[index + 1] = y;
 			this.data.array[index + 2] = z;
 			this.data.array[index + 3] = w;
 			return this;
-		},
-		clone: function (data) {
+		}
+
+		clone(data) {
 			if (data === undefined) {
 				console.log('THREE.InterleavedBufferAttribute.clone(): Cloning an interlaved buffer attribute will deinterleave buffer data.');
 				const array = [];
@@ -18757,8 +18833,9 @@
 
 				return new InterleavedBufferAttribute(data.interleavedBuffers[this.data.uuid], this.itemSize, this.offset, this.normalized);
 			}
-		},
-		toJSON: function (data) {
+		}
+
+		toJSON(data) {
 			if (data === undefined) {
 				console.log('THREE.InterleavedBufferAttribute.toJSON(): Serializing an interlaved buffer attribute will deinterleave buffer data.');
 				const array = [];
@@ -18797,7 +18874,10 @@
 				};
 			}
 		}
-	});
+
+	}
+
+	InterleavedBufferAttribute.prototype.isInterleavedBufferAttribute = true;
 
 	/**
 	 * parameters = {
@@ -21868,89 +21948,89 @@
 	 * based on the brilliant article by @prideout https://prideout.net/blog/old/blog/index.html@p=44.html
 	 */
 
-	function ParametricGeometry(func, slices, stacks) {
-		BufferGeometry.call(this);
-		this.type = 'ParametricGeometry';
-		this.parameters = {
-			func: func,
-			slices: slices,
-			stacks: stacks
-		}; // buffers
+	class ParametricGeometry extends BufferGeometry {
+		constructor(func, slices, stacks) {
+			super();
+			this.type = 'ParametricGeometry';
+			this.parameters = {
+				func: func,
+				slices: slices,
+				stacks: stacks
+			}; // buffers
 
-		const indices = [];
-		const vertices = [];
-		const normals = [];
-		const uvs = [];
-		const EPS = 0.00001;
-		const normal = new Vector3();
-		const p0 = new Vector3(),
-					p1 = new Vector3();
-		const pu = new Vector3(),
-					pv = new Vector3();
+			const indices = [];
+			const vertices = [];
+			const normals = [];
+			const uvs = [];
+			const EPS = 0.00001;
+			const normal = new Vector3();
+			const p0 = new Vector3(),
+						p1 = new Vector3();
+			const pu = new Vector3(),
+						pv = new Vector3();
 
-		if (func.length < 3) {
-			console.error('THREE.ParametricGeometry: Function must now modify a Vector3 as third parameter.');
-		} // generate vertices, normals and uvs
+			if (func.length < 3) {
+				console.error('THREE.ParametricGeometry: Function must now modify a Vector3 as third parameter.');
+			} // generate vertices, normals and uvs
 
 
-		const sliceCount = slices + 1;
+			const sliceCount = slices + 1;
 
-		for (let i = 0; i <= stacks; i++) {
-			const v = i / stacks;
+			for (let i = 0; i <= stacks; i++) {
+				const v = i / stacks;
 
-			for (let j = 0; j <= slices; j++) {
-				const u = j / slices; // vertex
+				for (let j = 0; j <= slices; j++) {
+					const u = j / slices; // vertex
 
-				func(u, v, p0);
-				vertices.push(p0.x, p0.y, p0.z); // normal
-				// approximate tangent vectors via finite differences
+					func(u, v, p0);
+					vertices.push(p0.x, p0.y, p0.z); // normal
+					// approximate tangent vectors via finite differences
 
-				if (u - EPS >= 0) {
-					func(u - EPS, v, p1);
-					pu.subVectors(p0, p1);
-				} else {
-					func(u + EPS, v, p1);
-					pu.subVectors(p1, p0);
+					if (u - EPS >= 0) {
+						func(u - EPS, v, p1);
+						pu.subVectors(p0, p1);
+					} else {
+						func(u + EPS, v, p1);
+						pu.subVectors(p1, p0);
+					}
+
+					if (v - EPS >= 0) {
+						func(u, v - EPS, p1);
+						pv.subVectors(p0, p1);
+					} else {
+						func(u, v + EPS, p1);
+						pv.subVectors(p1, p0);
+					} // cross product of tangent vectors returns surface normal
+
+
+					normal.crossVectors(pu, pv).normalize();
+					normals.push(normal.x, normal.y, normal.z); // uv
+
+					uvs.push(u, v);
 				}
-
-				if (v - EPS >= 0) {
-					func(u, v - EPS, p1);
-					pv.subVectors(p0, p1);
-				} else {
-					func(u, v + EPS, p1);
-					pv.subVectors(p1, p0);
-				} // cross product of tangent vectors returns surface normal
+			} // generate indices
 
 
-				normal.crossVectors(pu, pv).normalize();
-				normals.push(normal.x, normal.y, normal.z); // uv
+			for (let i = 0; i < stacks; i++) {
+				for (let j = 0; j < slices; j++) {
+					const a = i * sliceCount + j;
+					const b = i * sliceCount + j + 1;
+					const c = (i + 1) * sliceCount + j + 1;
+					const d = (i + 1) * sliceCount + j; // faces one and two
 
-				uvs.push(u, v);
-			}
-		} // generate indices
-
-
-		for (let i = 0; i < stacks; i++) {
-			for (let j = 0; j < slices; j++) {
-				const a = i * sliceCount + j;
-				const b = i * sliceCount + j + 1;
-				const c = (i + 1) * sliceCount + j + 1;
-				const d = (i + 1) * sliceCount + j; // faces one and two
-
-				indices.push(a, b, d);
-				indices.push(b, c, d);
-			}
-		} // build geometry
+					indices.push(a, b, d);
+					indices.push(b, c, d);
+				}
+			} // build geometry
 
 
-		this.setIndex(indices);
-		this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-		this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
-		this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+			this.setIndex(indices);
+			this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+			this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
+			this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+		}
+
 	}
-
-	ParametricGeometry.prototype = Object.create(BufferGeometry.prototype);
-	ParametricGeometry.prototype.constructor = ParametricGeometry;
 
 	class RingGeometry extends BufferGeometry {
 		constructor(innerRadius = 0.5, outerRadius = 1, thetaSegments = 8, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2) {
@@ -27745,57 +27825,62 @@
 
 	}
 
-	function InstancedBufferGeometry() {
-		BufferGeometry.call(this);
-		this.type = 'InstancedBufferGeometry';
-		this.instanceCount = Infinity;
-	}
+	class InstancedBufferGeometry extends BufferGeometry {
+		constructor() {
+			super();
+			this.type = 'InstancedBufferGeometry';
+			this.instanceCount = Infinity;
+		}
 
-	InstancedBufferGeometry.prototype = Object.assign(Object.create(BufferGeometry.prototype), {
-		constructor: InstancedBufferGeometry,
-		isInstancedBufferGeometry: true,
-		copy: function (source) {
-			BufferGeometry.prototype.copy.call(this, source);
+		copy(source) {
+			super.copy(source);
 			this.instanceCount = source.instanceCount;
 			return this;
-		},
-		clone: function () {
+		}
+
+		clone() {
 			return new this.constructor().copy(this);
-		},
-		toJSON: function () {
-			const data = BufferGeometry.prototype.toJSON.call(this);
+		}
+
+		toJSON() {
+			const data = super.toJSON(this);
 			data.instanceCount = this.instanceCount;
 			data.isInstancedBufferGeometry = true;
 			return data;
 		}
-	});
 
-	function InstancedBufferAttribute(array, itemSize, normalized, meshPerAttribute) {
-		if (typeof normalized === 'number') {
-			meshPerAttribute = normalized;
-			normalized = false;
-			console.error('THREE.InstancedBufferAttribute: The constructor now expects normalized as the third argument.');
-		}
-
-		BufferAttribute.call(this, array, itemSize, normalized);
-		this.meshPerAttribute = meshPerAttribute || 1;
 	}
 
-	InstancedBufferAttribute.prototype = Object.assign(Object.create(BufferAttribute.prototype), {
-		constructor: InstancedBufferAttribute,
-		isInstancedBufferAttribute: true,
-		copy: function (source) {
-			BufferAttribute.prototype.copy.call(this, source);
+	InstancedBufferGeometry.prototype.isInstancedBufferGeometry = true;
+
+	class InstancedBufferAttribute extends BufferAttribute {
+		constructor(array, itemSize, normalized, meshPerAttribute) {
+			if (typeof normalized === 'number') {
+				meshPerAttribute = normalized;
+				normalized = false;
+				console.error('THREE.InstancedBufferAttribute: The constructor now expects normalized as the third argument.');
+			}
+
+			super(array, itemSize, normalized);
+			this.meshPerAttribute = meshPerAttribute || 1;
+		}
+
+		copy(source) {
+			super.copy(source);
 			this.meshPerAttribute = source.meshPerAttribute;
 			return this;
-		},
-		toJSON: function () {
-			const data = BufferAttribute.prototype.toJSON.call(this);
+		}
+
+		toJSON() {
+			const data = super.toJSON();
 			data.meshPerAttribute = this.meshPerAttribute;
 			data.isInstancedBufferAttribute = true;
 			return data;
 		}
-	});
+
+	}
+
+	InstancedBufferAttribute.prototype.isInstancedBufferAttribute = true;
 
 	class BufferGeometryLoader extends Loader {
 		constructor(manager) {
@@ -31766,93 +31851,130 @@
 
 	}
 
-	function InstancedInterleavedBuffer(array, stride, meshPerAttribute) {
-		InterleavedBuffer.call(this, array, stride);
-		this.meshPerAttribute = meshPerAttribute || 1;
-	}
+	class InstancedInterleavedBuffer extends InterleavedBuffer {
+		constructor(array, stride, meshPerAttribute = 1) {
+			super(array, stride);
+			this.meshPerAttribute = meshPerAttribute || 1;
+		}
 
-	InstancedInterleavedBuffer.prototype = Object.assign(Object.create(InterleavedBuffer.prototype), {
-		constructor: InstancedInterleavedBuffer,
-		isInstancedInterleavedBuffer: true,
-		copy: function (source) {
-			InterleavedBuffer.prototype.copy.call(this, source);
+		copy(source) {
+			super.copy(source);
 			this.meshPerAttribute = source.meshPerAttribute;
 			return this;
-		},
-		clone: function (data) {
-			const ib = InterleavedBuffer.prototype.clone.call(this, data);
+		}
+
+		clone(data) {
+			const ib = super.clone(data);
 			ib.meshPerAttribute = this.meshPerAttribute;
 			return ib;
-		},
-		toJSON: function (data) {
-			const json = InterleavedBuffer.prototype.toJSON.call(this, data);
+		}
+
+		toJSON(data) {
+			const json = super.toJSON(data);
 			json.isInstancedInterleavedBuffer = true;
 			json.meshPerAttribute = this.meshPerAttribute;
 			return json;
 		}
-	});
 
-	function GLBufferAttribute(buffer, type, itemSize, elementSize, count) {
-		this.buffer = buffer;
-		this.type = type;
-		this.itemSize = itemSize;
-		this.elementSize = elementSize;
-		this.count = count;
-		this.version = 0;
 	}
 
-	Object.defineProperty(GLBufferAttribute.prototype, 'needsUpdate', {
-		set: function (value) {
+	InstancedInterleavedBuffer.prototype.isInstancedInterleavedBuffer = true;
+
+	class GLBufferAttribute {
+		constructor(buffer, type, itemSize, elementSize, count) {
+			this.buffer = buffer;
+			this.type = type;
+			this.itemSize = itemSize;
+			this.elementSize = elementSize;
+			this.count = count;
+			this.version = 0;
+		}
+
+		set needsUpdate(value) {
 			if (value === true) this.version++;
 		}
-	});
-	Object.assign(GLBufferAttribute.prototype, {
-		isGLBufferAttribute: true,
-		setBuffer: function (buffer) {
+
+		setBuffer(buffer) {
 			this.buffer = buffer;
 			return this;
-		},
-		setType: function (type, elementSize) {
+		}
+
+		setType(type, elementSize) {
 			this.type = type;
 			this.elementSize = elementSize;
 			return this;
-		},
-		setItemSize: function (itemSize) {
+		}
+
+		setItemSize(itemSize) {
 			this.itemSize = itemSize;
 			return this;
-		},
-		setCount: function (count) {
+		}
+
+		setCount(count) {
 			this.count = count;
 			return this;
 		}
-	});
 
-	function Raycaster(origin, direction, near = 0, far = Infinity) {
-		this.ray = new Ray(origin, direction); // direction is assumed to be normalized (for accurate distance calculations)
+	}
 
-		this.near = near;
-		this.far = far;
-		this.camera = null;
-		this.layers = new Layers();
-		this.params = {
-			Mesh: {},
-			Line: {
-				threshold: 1
-			},
-			LOD: {},
-			Points: {
-				threshold: 1
-			},
-			Sprite: {}
-		};
-		Object.defineProperties(this.params, {
-			PointCloud: {
-				get: function () {
-					console.warn('THREE.Raycaster: params.PointCloud has been renamed to params.Points.');
-					return this.Points;
-				}
+	GLBufferAttribute.prototype.isGLBufferAttribute = true;
+
+	class Raycaster {
+		constructor(origin, direction, near = 0, far = Infinity) {
+			this.ray = new Ray(origin, direction); // direction is assumed to be normalized (for accurate distance calculations)
+
+			this.near = near;
+			this.far = far;
+			this.camera = null;
+			this.layers = new Layers();
+			this.params = {
+				Mesh: {},
+				Line: {
+					threshold: 1
+				},
+				LOD: {},
+				Points: {
+					threshold: 1
+				},
+				Sprite: {}
+			};
+		}
+
+		set(origin, direction) {
+			// direction is assumed to be normalized (for accurate distance calculations)
+			this.ray.set(origin, direction);
+		}
+
+		setFromCamera(coords, camera) {
+			if (camera && camera.isPerspectiveCamera) {
+				this.ray.origin.setFromMatrixPosition(camera.matrixWorld);
+				this.ray.direction.set(coords.x, coords.y, 0.5).unproject(camera).sub(this.ray.origin).normalize();
+				this.camera = camera;
+			} else if (camera && camera.isOrthographicCamera) {
+				this.ray.origin.set(coords.x, coords.y, (camera.near + camera.far) / (camera.near - camera.far)).unproject(camera); // set origin in plane of camera
+
+				this.ray.direction.set(0, 0, -1).transformDirection(camera.matrixWorld);
+				this.camera = camera;
+			} else {
+				console.error('THREE.Raycaster: Unsupported camera type: ' + camera.type);
 			}
-		});
+		}
+
+		intersectObject(object, recursive = false, intersects = []) {
+			intersectObject(object, this, intersects, recursive);
+			intersects.sort(ascSort);
+			return intersects;
+		}
+
+		intersectObjects(objects, recursive = false, intersects = []) {
+			for (let i = 0, l = objects.length; i < l; i++) {
+				intersectObject(objects[i], this, intersects, recursive);
+			}
+
+			intersects.sort(ascSort);
+			return intersects;
+		}
+
 	}
 
 	function ascSort(a, b) {
@@ -31872,40 +31994,6 @@
 			}
 		}
 	}
-
-	Object.assign(Raycaster.prototype, {
-		set: function (origin, direction) {
-			// direction is assumed to be normalized (for accurate distance calculations)
-			this.ray.set(origin, direction);
-		},
-		setFromCamera: function (coords, camera) {
-			if (camera && camera.isPerspectiveCamera) {
-				this.ray.origin.setFromMatrixPosition(camera.matrixWorld);
-				this.ray.direction.set(coords.x, coords.y, 0.5).unproject(camera).sub(this.ray.origin).normalize();
-				this.camera = camera;
-			} else if (camera && camera.isOrthographicCamera) {
-				this.ray.origin.set(coords.x, coords.y, (camera.near + camera.far) / (camera.near - camera.far)).unproject(camera); // set origin in plane of camera
-
-				this.ray.direction.set(0, 0, -1).transformDirection(camera.matrixWorld);
-				this.camera = camera;
-			} else {
-				console.error('THREE.Raycaster: Unsupported camera type: ' + camera.type);
-			}
-		},
-		intersectObject: function (object, recursive = false, intersects = []) {
-			intersectObject(object, this, intersects, recursive);
-			intersects.sort(ascSort);
-			return intersects;
-		},
-		intersectObjects: function (objects, recursive = false, intersects = []) {
-			for (let i = 0, l = objects.length; i < l; i++) {
-				intersectObject(objects[i], this, intersects, recursive);
-			}
-
-			intersects.sort(ascSort);
-			return intersects;
-		}
-	});
 
 	/**
 	 * Ref: https://en.wikipedia.org/wiki/Spherical_coordinate_system

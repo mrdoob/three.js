@@ -9089,53 +9089,47 @@ MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
 const _vector$9 = new Vector3();
 const _vector2 = new Vector2();
 
-function BufferAttribute( array, itemSize, normalized ) {
+class BufferAttribute {
 
-	if ( Array.isArray( array ) ) {
+	constructor( array, itemSize, normalized ) {
 
-		throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+		if ( Array.isArray( array ) ) {
+
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+		}
+
+		this.name = '';
+
+		this.array = array;
+		this.itemSize = itemSize;
+		this.count = array !== undefined ? array.length / itemSize : 0;
+		this.normalized = normalized === true;
+
+		this.usage = StaticDrawUsage;
+		this.updateRange = { offset: 0, count: - 1 };
+
+		this.version = 0;
+
+		this.onUploadCallback = function () {};
 
 	}
 
-	this.name = '';
-
-	this.array = array;
-	this.itemSize = itemSize;
-	this.count = array !== undefined ? array.length / itemSize : 0;
-	this.normalized = normalized === true;
-
-	this.usage = StaticDrawUsage;
-	this.updateRange = { offset: 0, count: - 1 };
-
-	this.version = 0;
-
-}
-
-Object.defineProperty( BufferAttribute.prototype, 'needsUpdate', {
-
-	set: function ( value ) {
+	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
 
 	}
 
-} );
-
-Object.assign( BufferAttribute.prototype, {
-
-	isBufferAttribute: true,
-
-	onUploadCallback: function () {},
-
-	setUsage: function ( value ) {
+	setUsage( value ) {
 
 		this.usage = value;
 
 		return this;
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		this.name = source.name;
 		this.array = new source.array.constructor( source.array );
@@ -9147,9 +9141,9 @@ Object.assign( BufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyAt: function ( index1, attribute, index2 ) {
+	copyAt( index1, attribute, index2 ) {
 
 		index1 *= this.itemSize;
 		index2 *= attribute.itemSize;
@@ -9162,17 +9156,17 @@ Object.assign( BufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyArray: function ( array ) {
+	copyArray( array ) {
 
 		this.array.set( array );
 
 		return this;
 
-	},
+	}
 
-	copyColorsArray: function ( colors ) {
+	copyColorsArray( colors ) {
 
 		const array = this.array;
 		let offset = 0;
@@ -9196,9 +9190,9 @@ Object.assign( BufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyVector2sArray: function ( vectors ) {
+	copyVector2sArray( vectors ) {
 
 		const array = this.array;
 		let offset = 0;
@@ -9221,9 +9215,9 @@ Object.assign( BufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyVector3sArray: function ( vectors ) {
+	copyVector3sArray( vectors ) {
 
 		const array = this.array;
 		let offset = 0;
@@ -9247,9 +9241,9 @@ Object.assign( BufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyVector4sArray: function ( vectors ) {
+	copyVector4sArray( vectors ) {
 
 		const array = this.array;
 		let offset = 0;
@@ -9274,9 +9268,9 @@ Object.assign( BufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	applyMatrix3: function ( m ) {
+	applyMatrix3( m ) {
 
 		if ( this.itemSize === 2 ) {
 
@@ -9304,9 +9298,9 @@ Object.assign( BufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	applyMatrix4: function ( m ) {
+	applyMatrix4( m ) {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
@@ -9322,9 +9316,9 @@ Object.assign( BufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	applyNormalMatrix: function ( m ) {
+	applyNormalMatrix( m ) {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
@@ -9340,9 +9334,9 @@ Object.assign( BufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	transformDirection: function ( m ) {
+	transformDirection( m ) {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
@@ -9358,73 +9352,73 @@ Object.assign( BufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	set: function ( value, offset = 0 ) {
+	set( value, offset = 0 ) {
 
 		this.array.set( value, offset );
 
 		return this;
 
-	},
+	}
 
-	getX: function ( index ) {
+	getX( index ) {
 
 		return this.array[ index * this.itemSize ];
 
-	},
+	}
 
-	setX: function ( index, x ) {
+	setX( index, x ) {
 
 		this.array[ index * this.itemSize ] = x;
 
 		return this;
 
-	},
+	}
 
-	getY: function ( index ) {
+	getY( index ) {
 
 		return this.array[ index * this.itemSize + 1 ];
 
-	},
+	}
 
-	setY: function ( index, y ) {
+	setY( index, y ) {
 
 		this.array[ index * this.itemSize + 1 ] = y;
 
 		return this;
 
-	},
+	}
 
-	getZ: function ( index ) {
+	getZ( index ) {
 
 		return this.array[ index * this.itemSize + 2 ];
 
-	},
+	}
 
-	setZ: function ( index, z ) {
+	setZ( index, z ) {
 
 		this.array[ index * this.itemSize + 2 ] = z;
 
 		return this;
 
-	},
+	}
 
-	getW: function ( index ) {
+	getW( index ) {
 
 		return this.array[ index * this.itemSize + 3 ];
 
-	},
+	}
 
-	setW: function ( index, w ) {
+	setW( index, w ) {
 
 		this.array[ index * this.itemSize + 3 ] = w;
 
 		return this;
 
-	},
+	}
 
-	setXY: function ( index, x, y ) {
+	setXY( index, x, y ) {
 
 		index *= this.itemSize;
 
@@ -9433,9 +9427,9 @@ Object.assign( BufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setXYZ: function ( index, x, y, z ) {
+	setXYZ( index, x, y, z ) {
 
 		index *= this.itemSize;
 
@@ -9445,9 +9439,9 @@ Object.assign( BufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setXYZW: function ( index, x, y, z, w ) {
+	setXYZW( index, x, y, z, w ) {
 
 		index *= this.itemSize;
 
@@ -9458,23 +9452,23 @@ Object.assign( BufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	onUpload: function ( callback ) {
+	onUpload( callback ) {
 
 		this.onUploadCallback = callback;
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor( this.array, this.itemSize ).copy( this );
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		const data = {
 			itemSize: this.itemSize,
@@ -9491,107 +9485,113 @@ Object.assign( BufferAttribute.prototype, {
 
 	}
 
-} );
+}
+
+BufferAttribute.prototype.isBufferAttribute = true;
 
 //
 
-function Int8BufferAttribute( array, itemSize, normalized ) {
+class Int8BufferAttribute extends BufferAttribute {
 
-	BufferAttribute.call( this, new Int8Array( array ), itemSize, normalized );
+	constructor( array, itemSize, normalized ) {
 
-}
+		super( new Int8Array( array ), itemSize, normalized );
 
-Int8BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
-Int8BufferAttribute.prototype.constructor = Int8BufferAttribute;
-
-
-function Uint8BufferAttribute( array, itemSize, normalized ) {
-
-	BufferAttribute.call( this, new Uint8Array( array ), itemSize, normalized );
+	}
 
 }
 
-Uint8BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
-Uint8BufferAttribute.prototype.constructor = Uint8BufferAttribute;
+class Uint8BufferAttribute extends BufferAttribute {
 
+	constructor( array, itemSize, normalized ) {
 
-function Uint8ClampedBufferAttribute( array, itemSize, normalized ) {
+		super( new Uint8Array( array ), itemSize, normalized );
 
-	BufferAttribute.call( this, new Uint8ClampedArray( array ), itemSize, normalized );
-
-}
-
-Uint8ClampedBufferAttribute.prototype = Object.create( BufferAttribute.prototype );
-Uint8ClampedBufferAttribute.prototype.constructor = Uint8ClampedBufferAttribute;
-
-
-function Int16BufferAttribute( array, itemSize, normalized ) {
-
-	BufferAttribute.call( this, new Int16Array( array ), itemSize, normalized );
+	}
 
 }
 
-Int16BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
-Int16BufferAttribute.prototype.constructor = Int16BufferAttribute;
+class Uint8ClampedBufferAttribute extends BufferAttribute {
 
+	constructor( array, itemSize, normalized ) {
 
-function Uint16BufferAttribute( array, itemSize, normalized ) {
+		super( new Uint8ClampedArray( array ), itemSize, normalized );
 
-	BufferAttribute.call( this, new Uint16Array( array ), itemSize, normalized );
-
-}
-
-Uint16BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
-Uint16BufferAttribute.prototype.constructor = Uint16BufferAttribute;
-
-
-function Int32BufferAttribute( array, itemSize, normalized ) {
-
-	BufferAttribute.call( this, new Int32Array( array ), itemSize, normalized );
+	}
 
 }
 
-Int32BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
-Int32BufferAttribute.prototype.constructor = Int32BufferAttribute;
+class Int16BufferAttribute extends BufferAttribute {
 
+	constructor( array, itemSize, normalized ) {
 
-function Uint32BufferAttribute( array, itemSize, normalized ) {
+		super( new Int16Array( array ), itemSize, normalized );
 
-	BufferAttribute.call( this, new Uint32Array( array ), itemSize, normalized );
-
-}
-
-Uint32BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
-Uint32BufferAttribute.prototype.constructor = Uint32BufferAttribute;
-
-function Float16BufferAttribute( array, itemSize, normalized ) {
-
-	BufferAttribute.call( this, new Uint16Array( array ), itemSize, normalized );
+	}
 
 }
 
-Float16BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
-Float16BufferAttribute.prototype.constructor = Float16BufferAttribute;
+class Uint16BufferAttribute extends BufferAttribute {
+
+	constructor( array, itemSize, normalized ) {
+
+		super( new Uint16Array( array ), itemSize, normalized );
+
+	}
+
+}
+
+class Int32BufferAttribute extends BufferAttribute {
+
+	constructor( array, itemSize, normalized ) {
+
+		super( new Int32Array( array ), itemSize, normalized );
+
+	}
+
+}
+
+class Uint32BufferAttribute extends BufferAttribute {
+
+	constructor( array, itemSize, normalized ) {
+
+		super( new Uint32Array( array ), itemSize, normalized );
+
+	}
+
+}
+
+class Float16BufferAttribute extends BufferAttribute {
+
+	constructor( array, itemSize, normalized ) {
+
+		super( new Uint16Array( array ), itemSize, normalized );
+
+	}
+
+}
+
 Float16BufferAttribute.prototype.isFloat16BufferAttribute = true;
 
-function Float32BufferAttribute( array, itemSize, normalized ) {
+class Float32BufferAttribute extends BufferAttribute {
 
-	BufferAttribute.call( this, new Float32Array( array ), itemSize, normalized );
+	constructor( array, itemSize, normalized ) {
 
-}
+		super( new Float32Array( array ), itemSize, normalized );
 
-Float32BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
-Float32BufferAttribute.prototype.constructor = Float32BufferAttribute;
-
-
-function Float64BufferAttribute( array, itemSize, normalized ) {
-
-	BufferAttribute.call( this, new Float64Array( array ), itemSize, normalized );
+	}
 
 }
 
-Float64BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
-Float64BufferAttribute.prototype.constructor = Float64BufferAttribute;
+class Float64BufferAttribute extends BufferAttribute {
+
+	constructor( array, itemSize, normalized ) {
+
+		super( new Float64Array( array ), itemSize, normalized );
+
+	}
+
+}
 
 function arrayMax( array ) {
 
@@ -9636,45 +9636,43 @@ const _box$1 = new Box3();
 const _boxMorphTargets = new Box3();
 const _vector$8 = new Vector3();
 
-function BufferGeometry() {
+class BufferGeometry extends EventDispatcher {
 
-	Object.defineProperty( this, 'id', { value: _id ++ } );
+	constructor() {
 
-	this.uuid = MathUtils.generateUUID();
+		super();
 
-	this.name = '';
-	this.type = 'BufferGeometry';
+		Object.defineProperty( this, 'id', { value: _id ++ } );
 
-	this.index = null;
-	this.attributes = {};
+		this.uuid = MathUtils.generateUUID();
 
-	this.morphAttributes = {};
-	this.morphTargetsRelative = false;
+		this.name = '';
+		this.type = 'BufferGeometry';
 
-	this.groups = [];
+		this.index = null;
+		this.attributes = {};
 
-	this.boundingBox = null;
-	this.boundingSphere = null;
+		this.morphAttributes = {};
+		this.morphTargetsRelative = false;
 
-	this.drawRange = { start: 0, count: Infinity };
+		this.groups = [];
 
-	this.userData = {};
+		this.boundingBox = null;
+		this.boundingSphere = null;
 
-}
+		this.drawRange = { start: 0, count: Infinity };
 
-BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+		this.userData = {};
 
-	constructor: BufferGeometry,
+	}
 
-	isBufferGeometry: true,
-
-	getIndex: function () {
+	getIndex() {
 
 		return this.index;
 
-	},
+	}
 
-	setIndex: function ( index ) {
+	setIndex( index ) {
 
 		if ( Array.isArray( index ) ) {
 
@@ -9688,37 +9686,37 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	getAttribute: function ( name ) {
+	getAttribute( name ) {
 
 		return this.attributes[ name ];
 
-	},
+	}
 
-	setAttribute: function ( name, attribute ) {
+	setAttribute( name, attribute ) {
 
 		this.attributes[ name ] = attribute;
 
 		return this;
 
-	},
+	}
 
-	deleteAttribute: function ( name ) {
+	deleteAttribute( name ) {
 
 		delete this.attributes[ name ];
 
 		return this;
 
-	},
+	}
 
-	hasAttribute: function ( name ) {
+	hasAttribute( name ) {
 
 		return this.attributes[ name ] !== undefined;
 
-	},
+	}
 
-	addGroup: function ( start, count, materialIndex = 0 ) {
+	addGroup( start, count, materialIndex = 0 ) {
 
 		this.groups.push( {
 
@@ -9728,22 +9726,22 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		} );
 
-	},
+	}
 
-	clearGroups: function () {
+	clearGroups() {
 
 		this.groups = [];
 
-	},
+	}
 
-	setDrawRange: function ( start, count ) {
+	setDrawRange( start, count ) {
 
 		this.drawRange.start = start;
 		this.drawRange.count = count;
 
-	},
+	}
 
-	applyMatrix4: function ( matrix ) {
+	applyMatrix4( matrix ) {
 
 		const position = this.attributes.position;
 
@@ -9791,9 +9789,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	rotateX: function ( angle ) {
+	rotateX( angle ) {
 
 		// rotate geometry around world x-axis
 
@@ -9803,9 +9801,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	rotateY: function ( angle ) {
+	rotateY( angle ) {
 
 		// rotate geometry around world y-axis
 
@@ -9815,9 +9813,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	rotateZ: function ( angle ) {
+	rotateZ( angle ) {
 
 		// rotate geometry around world z-axis
 
@@ -9827,9 +9825,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	translate: function ( x, y, z ) {
+	translate( x, y, z ) {
 
 		// translate geometry
 
@@ -9839,9 +9837,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	scale: function ( x, y, z ) {
+	scale( x, y, z ) {
 
 		// scale geometry
 
@@ -9851,9 +9849,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	lookAt: function ( vector ) {
+	lookAt( vector ) {
 
 		_obj.lookAt( vector );
 
@@ -9863,9 +9861,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	center: function () {
+	center() {
 
 		this.computeBoundingBox();
 
@@ -9875,9 +9873,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	setFromPoints: function ( points ) {
+	setFromPoints( points ) {
 
 		const position = [];
 
@@ -9892,9 +9890,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	computeBoundingBox: function () {
+	computeBoundingBox() {
 
 		if ( this.boundingBox === null ) {
 
@@ -9962,9 +9960,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	computeBoundingSphere: function () {
+	computeBoundingSphere() {
 
 		if ( this.boundingSphere === null ) {
 
@@ -10074,15 +10072,15 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	computeFaceNormals: function () {
+	computeFaceNormals() {
 
 		// backwards compatibility
 
-	},
+	}
 
-	computeTangents: function () {
+	computeTangents() {
 
 		const index = this.index;
 		const attributes = this.attributes;
@@ -10245,9 +10243,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	computeVertexNormals: function () {
+	computeVertexNormals() {
 
 		const index = this.index;
 		const positionAttribute = this.getAttribute( 'position' );
@@ -10337,9 +10335,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	merge: function ( geometry, offset ) {
+	merge( geometry, offset ) {
 
 		if ( ! ( geometry && geometry.isBufferGeometry ) ) {
 
@@ -10384,9 +10382,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	normalizeNormals: function () {
+	normalizeNormals() {
 
 		const normals = this.attributes.normal;
 
@@ -10400,9 +10398,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	toNonIndexed: function () {
+	toNonIndexed() {
 
 		function convertBufferAttribute( attribute, indices ) {
 
@@ -10494,9 +10492,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return geometry2;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		const data = {
 			metadata: {
@@ -10607,9 +10605,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return data;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		/*
 		 // Handle primitives
@@ -10637,9 +10635,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return new BufferGeometry().copy( this );
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		// reset
 
@@ -10742,15 +10740,17 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	dispose: function () {
+	dispose() {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
-} );
+}
+
+BufferGeometry.prototype.isBufferGeometry = true;
 
 const _inverseMatrix$2 = /*@__PURE__*/ new Matrix4();
 const _ray$2 = /*@__PURE__*/ new Ray();
@@ -25427,46 +25427,40 @@ class Scene extends Object3D {
 
 Scene.prototype.isScene = true;
 
-function InterleavedBuffer( array, stride ) {
+class InterleavedBuffer {
 
-	this.array = array;
-	this.stride = stride;
-	this.count = array !== undefined ? array.length / stride : 0;
+	constructor( array, stride ) {
 
-	this.usage = StaticDrawUsage;
-	this.updateRange = { offset: 0, count: - 1 };
+		this.array = array;
+		this.stride = stride;
+		this.count = array !== undefined ? array.length / stride : 0;
 
-	this.version = 0;
+		this.usage = StaticDrawUsage;
+		this.updateRange = { offset: 0, count: - 1 };
 
-	this.uuid = MathUtils.generateUUID();
+		this.version = 0;
 
-}
+		this.uuid = MathUtils.generateUUID();
 
-Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
+		this.onUploadCallback = function () {};
 
-	set: function ( value ) {
+	}
+
+	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
 
 	}
 
-} );
-
-Object.assign( InterleavedBuffer.prototype, {
-
-	isInterleavedBuffer: true,
-
-	onUploadCallback: function () {},
-
-	setUsage: function ( value ) {
+	setUsage( value ) {
 
 		this.usage = value;
 
 		return this;
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		this.array = new source.array.constructor( source.array );
 		this.count = source.count;
@@ -25475,9 +25469,9 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyAt: function ( index1, attribute, index2 ) {
+	copyAt( index1, attribute, index2 ) {
 
 		index1 *= this.stride;
 		index2 *= attribute.stride;
@@ -25490,17 +25484,17 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		return this;
 
-	},
+	}
 
-	set: function ( value, offset = 0 ) {
+	set( value, offset = 0 ) {
 
 		this.array.set( value, offset );
 
 		return this;
 
-	},
+	}
 
-	clone: function ( data ) {
+	clone( data ) {
 
 		if ( data.arrayBuffers === undefined ) {
 
@@ -25527,17 +25521,17 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		return ib;
 
-	},
+	}
 
-	onUpload: function ( callback ) {
+	onUpload( callback ) {
 
 		this.onUploadCallback = callback;
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( data ) {
+	toJSON( data ) {
 
 		if ( data.arrayBuffers === undefined ) {
 
@@ -25570,61 +25564,45 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	}
 
-} );
+}
+
+InterleavedBuffer.prototype.isInterleavedBuffer = true;
 
 const _vector$6 = new Vector3();
 
-function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
+class InterleavedBufferAttribute {
 
-	this.name = '';
+	constructor( interleavedBuffer, itemSize, offset, normalized ) {
 
-	this.data = interleavedBuffer;
-	this.itemSize = itemSize;
-	this.offset = offset;
+		this.name = '';
 
-	this.normalized = normalized === true;
+		this.data = interleavedBuffer;
+		this.itemSize = itemSize;
+		this.offset = offset;
 
-}
-
-Object.defineProperties( InterleavedBufferAttribute.prototype, {
-
-	count: {
-
-		get: function () {
-
-			return this.data.count;
-
-		}
-
-	},
-
-	array: {
-
-		get: function () {
-
-			return this.data.array;
-
-		}
-
-	},
-
-	needsUpdate: {
-
-		set: function ( value ) {
-
-			this.data.needsUpdate = value;
-
-		}
+		this.normalized = normalized === true;
 
 	}
 
-} );
+	get count() {
 
-Object.assign( InterleavedBufferAttribute.prototype, {
+		return this.data.count;
 
-	isInterleavedBufferAttribute: true,
+	}
 
-	applyMatrix4: function ( m ) {
+	get array() {
+
+		return this.data.array;
+
+	}
+
+	set needsUpdate( value ) {
+
+		this.data.needsUpdate = value;
+
+	}
+
+	applyMatrix4( m ) {
 
 		for ( let i = 0, l = this.data.count; i < l; i ++ ) {
 
@@ -25640,9 +25618,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	applyNormalMatrix: function ( m ) {
+	applyNormalMatrix( m ) {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
@@ -25658,9 +25636,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	transformDirection: function ( m ) {
+	transformDirection( m ) {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
@@ -25676,65 +25654,65 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setX: function ( index, x ) {
+	setX( index, x ) {
 
 		this.data.array[ index * this.data.stride + this.offset ] = x;
 
 		return this;
 
-	},
+	}
 
-	setY: function ( index, y ) {
+	setY( index, y ) {
 
 		this.data.array[ index * this.data.stride + this.offset + 1 ] = y;
 
 		return this;
 
-	},
+	}
 
-	setZ: function ( index, z ) {
+	setZ( index, z ) {
 
 		this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
 
 		return this;
 
-	},
+	}
 
-	setW: function ( index, w ) {
+	setW( index, w ) {
 
 		this.data.array[ index * this.data.stride + this.offset + 3 ] = w;
 
 		return this;
 
-	},
+	}
 
-	getX: function ( index ) {
+	getX( index ) {
 
 		return this.data.array[ index * this.data.stride + this.offset ];
 
-	},
+	}
 
-	getY: function ( index ) {
+	getY( index ) {
 
 		return this.data.array[ index * this.data.stride + this.offset + 1 ];
 
-	},
+	}
 
-	getZ: function ( index ) {
+	getZ( index ) {
 
 		return this.data.array[ index * this.data.stride + this.offset + 2 ];
 
-	},
+	}
 
-	getW: function ( index ) {
+	getW( index ) {
 
 		return this.data.array[ index * this.data.stride + this.offset + 3 ];
 
-	},
+	}
 
-	setXY: function ( index, x, y ) {
+	setXY( index, x, y ) {
 
 		index = index * this.data.stride + this.offset;
 
@@ -25743,9 +25721,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setXYZ: function ( index, x, y, z ) {
+	setXYZ( index, x, y, z ) {
 
 		index = index * this.data.stride + this.offset;
 
@@ -25755,9 +25733,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setXYZW: function ( index, x, y, z, w ) {
+	setXYZW( index, x, y, z, w ) {
 
 		index = index * this.data.stride + this.offset;
 
@@ -25768,9 +25746,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function ( data ) {
+	clone( data ) {
 
 		if ( data === undefined ) {
 
@@ -25810,9 +25788,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		}
 
-	},
+	}
 
-	toJSON: function ( data ) {
+	toJSON( data ) {
 
 		if ( data === undefined ) {
 
@@ -25869,7 +25847,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 	}
 
-} );
+}
+
+InterleavedBufferAttribute.prototype.isInterleavedBufferAttribute = true;
 
 /**
  * parameters = {
@@ -30260,127 +30240,128 @@ class OctahedronGeometry extends PolyhedronGeometry {
  * based on the brilliant article by @prideout https://prideout.net/blog/old/blog/index.html@p=44.html
  */
 
-function ParametricGeometry( func, slices, stacks ) {
+class ParametricGeometry extends BufferGeometry {
 
-	BufferGeometry.call( this );
+	constructor( func, slices, stacks ) {
 
-	this.type = 'ParametricGeometry';
+		super();
 
-	this.parameters = {
-		func: func,
-		slices: slices,
-		stacks: stacks
-	};
+		this.type = 'ParametricGeometry';
 
-	// buffers
+		this.parameters = {
+			func: func,
+			slices: slices,
+			stacks: stacks
+		};
 
-	const indices = [];
-	const vertices = [];
-	const normals = [];
-	const uvs = [];
+		// buffers
 
-	const EPS = 0.00001;
+		const indices = [];
+		const vertices = [];
+		const normals = [];
+		const uvs = [];
 
-	const normal = new Vector3();
+		const EPS = 0.00001;
 
-	const p0 = new Vector3(), p1 = new Vector3();
-	const pu = new Vector3(), pv = new Vector3();
+		const normal = new Vector3();
 
-	if ( func.length < 3 ) {
+		const p0 = new Vector3(), p1 = new Vector3();
+		const pu = new Vector3(), pv = new Vector3();
 
-		console.error( 'THREE.ParametricGeometry: Function must now modify a Vector3 as third parameter.' );
+		if ( func.length < 3 ) {
 
-	}
-
-	// generate vertices, normals and uvs
-
-	const sliceCount = slices + 1;
-
-	for ( let i = 0; i <= stacks; i ++ ) {
-
-		const v = i / stacks;
-
-		for ( let j = 0; j <= slices; j ++ ) {
-
-			const u = j / slices;
-
-			// vertex
-
-			func( u, v, p0 );
-			vertices.push( p0.x, p0.y, p0.z );
-
-			// normal
-
-			// approximate tangent vectors via finite differences
-
-			if ( u - EPS >= 0 ) {
-
-				func( u - EPS, v, p1 );
-				pu.subVectors( p0, p1 );
-
-			} else {
-
-				func( u + EPS, v, p1 );
-				pu.subVectors( p1, p0 );
-
-			}
-
-			if ( v - EPS >= 0 ) {
-
-				func( u, v - EPS, p1 );
-				pv.subVectors( p0, p1 );
-
-			} else {
-
-				func( u, v + EPS, p1 );
-				pv.subVectors( p1, p0 );
-
-			}
-
-			// cross product of tangent vectors returns surface normal
-
-			normal.crossVectors( pu, pv ).normalize();
-			normals.push( normal.x, normal.y, normal.z );
-
-			// uv
-
-			uvs.push( u, v );
+			console.error( 'THREE.ParametricGeometry: Function must now modify a Vector3 as third parameter.' );
 
 		}
 
-	}
+		// generate vertices, normals and uvs
 
-	// generate indices
+		const sliceCount = slices + 1;
 
-	for ( let i = 0; i < stacks; i ++ ) {
+		for ( let i = 0; i <= stacks; i ++ ) {
 
-		for ( let j = 0; j < slices; j ++ ) {
+			const v = i / stacks;
 
-			const a = i * sliceCount + j;
-			const b = i * sliceCount + j + 1;
-			const c = ( i + 1 ) * sliceCount + j + 1;
-			const d = ( i + 1 ) * sliceCount + j;
+			for ( let j = 0; j <= slices; j ++ ) {
 
-			// faces one and two
+				const u = j / slices;
 
-			indices.push( a, b, d );
-			indices.push( b, c, d );
+				// vertex
+
+				func( u, v, p0 );
+				vertices.push( p0.x, p0.y, p0.z );
+
+				// normal
+
+				// approximate tangent vectors via finite differences
+
+				if ( u - EPS >= 0 ) {
+
+					func( u - EPS, v, p1 );
+					pu.subVectors( p0, p1 );
+
+				} else {
+
+					func( u + EPS, v, p1 );
+					pu.subVectors( p1, p0 );
+
+				}
+
+				if ( v - EPS >= 0 ) {
+
+					func( u, v - EPS, p1 );
+					pv.subVectors( p0, p1 );
+
+				} else {
+
+					func( u, v + EPS, p1 );
+					pv.subVectors( p1, p0 );
+
+				}
+
+				// cross product of tangent vectors returns surface normal
+
+				normal.crossVectors( pu, pv ).normalize();
+				normals.push( normal.x, normal.y, normal.z );
+
+				// uv
+
+				uvs.push( u, v );
+
+			}
 
 		}
 
+		// generate indices
+
+		for ( let i = 0; i < stacks; i ++ ) {
+
+			for ( let j = 0; j < slices; j ++ ) {
+
+				const a = i * sliceCount + j;
+				const b = i * sliceCount + j + 1;
+				const c = ( i + 1 ) * sliceCount + j + 1;
+				const d = ( i + 1 ) * sliceCount + j;
+
+				// faces one and two
+
+				indices.push( a, b, d );
+				indices.push( b, c, d );
+
+			}
+
+		}
+
+		// build geometry
+
+		this.setIndex( indices );
+		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+
 	}
-
-	// build geometry
-
-	this.setIndex( indices );
-	this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-	this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 }
-
-ParametricGeometry.prototype = Object.create( BufferGeometry.prototype );
-ParametricGeometry.prototype.constructor = ParametricGeometry;
 
 class RingGeometry extends BufferGeometry {
 
@@ -38571,40 +38552,36 @@ class LoaderUtils {
 
 }
 
-function InstancedBufferGeometry() {
+class InstancedBufferGeometry extends BufferGeometry {
 
-	BufferGeometry.call( this );
+	constructor() {
 
-	this.type = 'InstancedBufferGeometry';
-	this.instanceCount = Infinity;
+		super();
 
-}
+		this.type = 'InstancedBufferGeometry';
+		this.instanceCount = Infinity;
 
-InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry.prototype ), {
+	}
 
-	constructor: InstancedBufferGeometry,
+	copy( source ) {
 
-	isInstancedBufferGeometry: true,
-
-	copy: function ( source ) {
-
-		BufferGeometry.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.instanceCount = source.instanceCount;
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		const data = BufferGeometry.prototype.toJSON.call( this );
+		const data = super.toJSON( this );
 
 		data.instanceCount = this.instanceCount;
 
@@ -38614,45 +38591,43 @@ InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry
 
 	}
 
-} );
+}
 
-function InstancedBufferAttribute( array, itemSize, normalized, meshPerAttribute ) {
+InstancedBufferGeometry.prototype.isInstancedBufferGeometry = true;
 
-	if ( typeof ( normalized ) === 'number' ) {
+class InstancedBufferAttribute extends BufferAttribute {
 
-		meshPerAttribute = normalized;
+	constructor( array, itemSize, normalized, meshPerAttribute ) {
 
-		normalized = false;
+		if ( typeof ( normalized ) === 'number' ) {
 
-		console.error( 'THREE.InstancedBufferAttribute: The constructor now expects normalized as the third argument.' );
+			meshPerAttribute = normalized;
+
+			normalized = false;
+
+			console.error( 'THREE.InstancedBufferAttribute: The constructor now expects normalized as the third argument.' );
+
+		}
+
+		super( array, itemSize, normalized );
+
+		this.meshPerAttribute = meshPerAttribute || 1;
 
 	}
 
-	BufferAttribute.call( this, array, itemSize, normalized );
+	copy( source ) {
 
-	this.meshPerAttribute = meshPerAttribute || 1;
-
-}
-
-InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribute.prototype ), {
-
-	constructor: InstancedBufferAttribute,
-
-	isInstancedBufferAttribute: true,
-
-	copy: function ( source ) {
-
-		BufferAttribute.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.meshPerAttribute = source.meshPerAttribute;
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ()	{
+	toJSON()	{
 
-		const data = BufferAttribute.prototype.toJSON.call( this );
+		const data = super.toJSON();
 
 		data.meshPerAttribute = this.meshPerAttribute;
 
@@ -38662,7 +38637,9 @@ InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribu
 
 	}
 
-} );
+}
+
+InstancedBufferAttribute.prototype.isInstancedBufferAttribute = true;
 
 class BufferGeometryLoader extends Loader {
 
@@ -44402,43 +44379,39 @@ class Uniform {
 
 }
 
-function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
+class InstancedInterleavedBuffer extends InterleavedBuffer {
 
-	InterleavedBuffer.call( this, array, stride );
+	constructor( array, stride, meshPerAttribute = 1 ) {
 
-	this.meshPerAttribute = meshPerAttribute || 1;
+		super( array, stride );
 
-}
+		this.meshPerAttribute = meshPerAttribute || 1;
 
-InstancedInterleavedBuffer.prototype = Object.assign( Object.create( InterleavedBuffer.prototype ), {
+	}
 
-	constructor: InstancedInterleavedBuffer,
+	copy( source ) {
 
-	isInstancedInterleavedBuffer: true,
-
-	copy: function ( source ) {
-
-		InterleavedBuffer.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.meshPerAttribute = source.meshPerAttribute;
 
 		return this;
 
-	},
+	}
 
-	clone: function ( data ) {
+	clone( data ) {
 
-		const ib = InterleavedBuffer.prototype.clone.call( this, data );
+		const ib = super.clone( data );
 
 		ib.meshPerAttribute = this.meshPerAttribute;
 
 		return ib;
 
-	},
+	}
 
-	toJSON: function ( data ) {
+	toJSON( data ) {
 
-		const json = InterleavedBuffer.prototype.toJSON.call( this, data );
+		const json = super.toJSON( data );
 
 		json.isInstancedInterleavedBuffer = true;
 		json.meshPerAttribute = this.meshPerAttribute;
@@ -44447,97 +44420,142 @@ InstancedInterleavedBuffer.prototype = Object.assign( Object.create( Interleaved
 
 	}
 
-} );
-
-function GLBufferAttribute( buffer, type, itemSize, elementSize, count ) {
-
-	this.buffer = buffer;
-	this.type = type;
-	this.itemSize = itemSize;
-	this.elementSize = elementSize;
-	this.count = count;
-
-	this.version = 0;
-
 }
 
-Object.defineProperty( GLBufferAttribute.prototype, 'needsUpdate', {
+InstancedInterleavedBuffer.prototype.isInstancedInterleavedBuffer = true;
 
-	set: function ( value ) {
+class GLBufferAttribute {
+
+	constructor( buffer, type, itemSize, elementSize, count ) {
+
+		this.buffer = buffer;
+		this.type = type;
+		this.itemSize = itemSize;
+		this.elementSize = elementSize;
+		this.count = count;
+
+		this.version = 0;
+
+	}
+
+	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
 
 	}
 
-} );
-
-Object.assign( GLBufferAttribute.prototype, {
-
-	isGLBufferAttribute: true,
-
-	setBuffer: function ( buffer ) {
+	setBuffer( buffer ) {
 
 		this.buffer = buffer;
 
 		return this;
 
-	},
+	}
 
-	setType: function ( type, elementSize ) {
+	setType( type, elementSize ) {
 
 		this.type = type;
 		this.elementSize = elementSize;
 
 		return this;
 
-	},
+	}
 
-	setItemSize: function ( itemSize ) {
+	setItemSize( itemSize ) {
 
 		this.itemSize = itemSize;
 
 		return this;
 
-	},
+	}
 
-	setCount: function ( count ) {
+	setCount( count ) {
 
 		this.count = count;
 
 		return this;
 
-	},
+	}
 
-} );
+}
 
-function Raycaster( origin, direction, near = 0, far = Infinity ) {
+GLBufferAttribute.prototype.isGLBufferAttribute = true;
 
-	this.ray = new Ray( origin, direction );
-	// direction is assumed to be normalized (for accurate distance calculations)
+class Raycaster {
 
-	this.near = near;
-	this.far = far;
-	this.camera = null;
-	this.layers = new Layers();
+	constructor( origin, direction, near = 0, far = Infinity ) {
 
-	this.params = {
-		Mesh: {},
-		Line: { threshold: 1 },
-		LOD: {},
-		Points: { threshold: 1 },
-		Sprite: {}
-	};
+		this.ray = new Ray( origin, direction );
+		// direction is assumed to be normalized (for accurate distance calculations)
 
-	Object.defineProperties( this.params, {
-		PointCloud: {
-			get: function () {
+		this.near = near;
+		this.far = far;
+		this.camera = null;
+		this.layers = new Layers();
 
-				console.warn( 'THREE.Raycaster: params.PointCloud has been renamed to params.Points.' );
-				return this.Points;
+		this.params = {
+			Mesh: {},
+			Line: { threshold: 1 },
+			LOD: {},
+			Points: { threshold: 1 },
+			Sprite: {}
+		};
 
-			}
+	}
+
+	set( origin, direction ) {
+
+		// direction is assumed to be normalized (for accurate distance calculations)
+
+		this.ray.set( origin, direction );
+
+	}
+
+	setFromCamera( coords, camera ) {
+
+		if ( camera && camera.isPerspectiveCamera ) {
+
+			this.ray.origin.setFromMatrixPosition( camera.matrixWorld );
+			this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( this.ray.origin ).normalize();
+			this.camera = camera;
+
+		} else if ( camera && camera.isOrthographicCamera ) {
+
+			this.ray.origin.set( coords.x, coords.y, ( camera.near + camera.far ) / ( camera.near - camera.far ) ).unproject( camera ); // set origin in plane of camera
+			this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
+			this.camera = camera;
+
+		} else {
+
+			console.error( 'THREE.Raycaster: Unsupported camera type: ' + camera.type );
+
 		}
-	} );
+
+	}
+
+	intersectObject( object, recursive = false, intersects = [] ) {
+
+		intersectObject( object, this, intersects, recursive );
+
+		intersects.sort( ascSort );
+
+		return intersects;
+
+	}
+
+	intersectObjects( objects, recursive = false, intersects = [] ) {
+
+		for ( let i = 0, l = objects.length; i < l; i ++ ) {
+
+			intersectObject( objects[ i ], this, intersects, recursive );
+
+		}
+
+		intersects.sort( ascSort );
+
+		return intersects;
+
+	}
 
 }
 
@@ -44568,64 +44586,6 @@ function intersectObject( object, raycaster, intersects, recursive ) {
 	}
 
 }
-
-Object.assign( Raycaster.prototype, {
-
-	set: function ( origin, direction ) {
-
-		// direction is assumed to be normalized (for accurate distance calculations)
-
-		this.ray.set( origin, direction );
-
-	},
-
-	setFromCamera: function ( coords, camera ) {
-
-		if ( camera && camera.isPerspectiveCamera ) {
-
-			this.ray.origin.setFromMatrixPosition( camera.matrixWorld );
-			this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( this.ray.origin ).normalize();
-			this.camera = camera;
-
-		} else if ( camera && camera.isOrthographicCamera ) {
-
-			this.ray.origin.set( coords.x, coords.y, ( camera.near + camera.far ) / ( camera.near - camera.far ) ).unproject( camera ); // set origin in plane of camera
-			this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
-			this.camera = camera;
-
-		} else {
-
-			console.error( 'THREE.Raycaster: Unsupported camera type: ' + camera.type );
-
-		}
-
-	},
-
-	intersectObject: function ( object, recursive = false, intersects = [] ) {
-
-		intersectObject( object, this, intersects, recursive );
-
-		intersects.sort( ascSort );
-
-		return intersects;
-
-	},
-
-	intersectObjects: function ( objects, recursive = false, intersects = [] ) {
-
-		for ( let i = 0, l = objects.length; i < l; i ++ ) {
-
-			intersectObject( objects[ i ], this, intersects, recursive );
-
-		}
-
-		intersects.sort( ascSort );
-
-		return intersects;
-
-	}
-
-} );
 
 /**
  * Ref: https://en.wikipedia.org/wiki/Spherical_coordinate_system
