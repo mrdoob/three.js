@@ -139,6 +139,16 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	setMatrix: function ( m ) {
+
+		this.matrix.copy( m );
+
+		this.matrix.decompose( this.position, this.quaternion, this.scale );
+
+		this.matrixWorldNeedsUpdate = true;
+
+	},
+
 	setRotationFromAxisAngle: function ( axis, angle ) {
 
 		// assumes axis is normalized
