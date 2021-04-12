@@ -59,6 +59,21 @@ function WebXRManager( renderer, gl ) {
 
 		}
 
+		return controller;
+
+	};
+
+	this.getControllerTargetRay = function ( index ) {
+
+		let controller = controllers[ index ];
+
+		if ( controller === undefined ) {
+
+			controller = new WebXRController();
+			controllers[ index ] = controller;
+
+		}
+
 		return controller.getTargetRaySpace();
 
 	};
@@ -241,7 +256,7 @@ function WebXRManager( renderer, gl ) {
 
 			if ( controller ) {
 
-				controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
+				controller.disconnect( inputSource );
 				inputSourcesMap.delete( inputSource );
 
 			}
@@ -257,7 +272,7 @@ function WebXRManager( renderer, gl ) {
 
 			if ( controller ) {
 
-				controller.dispatchEvent( { type: 'connected', data: inputSource } );
+				controller.connect( inputSource );
 
 			}
 

@@ -103,7 +103,7 @@
 
 				}
 
-				controller1 = renderer.xr.getController( 0 );
+				controller1 = renderer.xr.getControllerTargetRay( 0 );
 				controller1.addEventListener( 'selectstart', onSelectStart );
 				controller1.addEventListener( 'selectend', onSelectEnd );
 				controller1.addEventListener( 'connected', function ( event ) {
@@ -118,7 +118,7 @@
 				} );
 				scene.add( controller1 );
 
-				controller2 = renderer.xr.getController( 1 );
+				controller2 = renderer.xr.getControllerTargetRay( 1 );
 				controller2.addEventListener( 'selectstart', onSelectStart );
 				controller2.addEventListener( 'selectend', onSelectEnd );
 				controller2.addEventListener( 'connected', function ( event ) {
