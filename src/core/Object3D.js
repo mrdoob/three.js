@@ -85,6 +85,31 @@ function Object3D() {
 		},
 		normalMatrix: {
 			value: new Matrix3()
+		},
+		matrixWorldNeedsUpdate: {
+			get() {
+
+				return this._matrixWorldNeedsUpdate;
+
+			},
+			set( value ) {
+
+				if ( value && ! this._matrixWorldNeedsUpdate ) {
+
+					let p = this;
+					while ( p && ! p._matrixWorldNeedsChildrenUpdate ) {
+
+						p._matrixWorldNeedsChildrenUpdate = true;
+						p = p.parent;
+
+					}
+
+				}
+
+				this._matrixWorldNeedsUpdate = value;
+
+			}
+
 		}
 	} );
 
@@ -92,7 +117,8 @@ function Object3D() {
 	this.matrixWorld = new Matrix4();
 
 	this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
-	this.matrixWorldNeedsUpdate = false;
+	this._matrixWorldNeedsUpdate = false;
+	this._matrixWorldNeedsChildrenUpdate = false;
 
 	this.layers = new Layers();
 	this.visible = true;
@@ -330,6 +356,18 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			object.parent = this;
 			this.children.push( object );
+
+			if ( object._matrixWorldNeedsChildrenUpdate || object._matrixWorldNeedsUpdate ) {
+
+				let p = this;
+				while ( p && ! p._matrixWorldNeedsChildrenUpdate ) {
+
+					p._matrixWorldNeedsChildrenUpdate = true;
+					p = p.parent;
+
+				}
+
+			}
 
 			object.dispatchEvent( _addedEvent );
 
@@ -574,7 +612,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
-		if ( this.matrixWorldNeedsUpdate || force ) {
+		if ( this._matrixWorldNeedsUpdate || force ) {
 
 			if ( this.parent === null ) {
 
@@ -586,7 +624,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			}
 
-			this.matrixWorldNeedsUpdate = false;
+			this._matrixWorldNeedsUpdate = false;
 
 			force = true;
 
@@ -594,11 +632,17 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// update children
 
-		const children = this.children;
+		if ( this._matrixWorldNeedsChildrenUpdate || force ) {
 
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
+			const children = this.children;
 
-			children[ i ].updateMatrixWorld( force );
+			for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+				children[ i ].updateMatrixWorld( force );
+
+			}
+
+			this._matrixWorldNeedsChildrenUpdate = false;
 
 		}
 
@@ -880,7 +924,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.matrixWorld.copy( source.matrixWorld );
 
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
-		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
+		this._matrixWorldNeedsUpdate = source._matrixWorldNeedsUpdate;
+		this._matrixWorldNeedsChildrenUpdate = source._matrixWorldNeedsChildrenUpdate;
 
 		this.layers.mask = source.layers.mask;
 		this.visible = source.visible;
