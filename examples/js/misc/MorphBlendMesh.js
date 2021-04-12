@@ -1,27 +1,27 @@
 ( function () {
 
-	var MorphBlendMesh = function ( geometry, material ) {
+	class MorphBlendMesh extends THREE.Mesh {
 
-		THREE.Mesh.call( this, geometry, material );
-		this.animationsMap = {};
-		this.animationsList = []; // prepare default animation
-		// (all frames played together in 1 second)
+		constructor( geometry, material ) {
 
-		var numFrames = Object.keys( this.morphTargetDictionary ).length;
-		var name = '__default';
-		var startFrame = 0;
-		var endFrame = numFrames - 1;
-		var fps = numFrames / 1;
-		this.createAnimation( name, startFrame, endFrame, fps );
-		this.setAnimationWeight( name, 1 );
+			super( geometry, material );
+			this.animationsMap = {};
+			this.animationsList = []; // prepare default animation
+			// (all frames played together in 1 second)
 
-	};
+			const numFrames = Object.keys( this.morphTargetDictionary ).length;
+			const name = '__default';
+			const startFrame = 0;
+			const endFrame = numFrames - 1;
+			const fps = numFrames / 1;
+			this.createAnimation( name, startFrame, endFrame, fps );
+			this.setAnimationWeight( name, 1 );
 
-	MorphBlendMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
-		constructor: MorphBlendMesh,
-		createAnimation: function ( name, start, end, fps ) {
+		}
 
-			var animation = {
+		createAnimation( name, start, end, fps ) {
+
+			const animation = {
 				start: start,
 				end: end,
 				length: end - start + 1,
@@ -39,26 +39,27 @@
 			this.animationsMap[ name ] = animation;
 			this.animationsList.push( animation );
 
-		},
-		autoCreateAnimations: function ( fps ) {
+		}
 
-			var pattern = /([a-z]+)_?(\d+)/i;
-			var firstAnimation,
-				frameRanges = {};
-			var i = 0;
+		autoCreateAnimations( fps ) {
 
-			for ( var key in this.morphTargetDictionary ) {
+			const pattern = /([a-z]+)_?(\d+)/i;
+			let firstAnimation;
+			const frameRanges = {};
+			let i = 0;
 
-				var chunks = key.match( pattern );
+			for ( const key in this.morphTargetDictionary ) {
+
+				const chunks = key.match( pattern );
 
 				if ( chunks && chunks.length > 1 ) {
 
-					var name = chunks[ 1 ];
+					const name = chunks[ 1 ];
 					if ( ! frameRanges[ name ] ) frameRanges[ name ] = {
 						start: Infinity,
 						end: - Infinity
 					};
-					var range = frameRanges[ name ];
+					const range = frameRanges[ name ];
 					if ( i < range.start ) range.start = i;
 					if ( i > range.end ) range.end = i;
 					if ( ! firstAnimation ) firstAnimation = name;
@@ -69,19 +70,20 @@
 
 			}
 
-			for ( var name in frameRanges ) {
+			for ( const name in frameRanges ) {
 
-				var range = frameRanges[ name ];
+				const range = frameRanges[ name ];
 				this.createAnimation( name, range.start, range.end, fps );
 
 			}
 
 			this.firstAnimation = firstAnimation;
 
-		},
-		setAnimationDirectionForward: function ( name ) {
+		}
 
-			var animation = this.animationsMap[ name ];
+		setAnimationDirectionForward( name ) {
+
+			const animation = this.animationsMap[ name ];
 
 			if ( animation ) {
 
@@ -90,10 +92,11 @@
 
 			}
 
-		},
-		setAnimationDirectionBackward: function ( name ) {
+		}
 
-			var animation = this.animationsMap[ name ];
+		setAnimationDirectionBackward( name ) {
+
+			const animation = this.animationsMap[ name ];
 
 			if ( animation ) {
 
@@ -102,10 +105,11 @@
 
 			}
 
-		},
-		setAnimationFPS: function ( name, fps ) {
+		}
 
-			var animation = this.animationsMap[ name ];
+		setAnimationFPS( name, fps ) {
+
+			const animation = this.animationsMap[ name ];
 
 			if ( animation ) {
 
@@ -114,10 +118,11 @@
 
 			}
 
-		},
-		setAnimationDuration: function ( name, duration ) {
+		}
 
-			var animation = this.animationsMap[ name ];
+		setAnimationDuration( name, duration ) {
+
+			const animation = this.animationsMap[ name ];
 
 			if ( animation ) {
 
@@ -126,10 +131,11 @@
 
 			}
 
-		},
-		setAnimationWeight: function ( name, weight ) {
+		}
 
-			var animation = this.animationsMap[ name ];
+		setAnimationWeight( name, weight ) {
+
+			const animation = this.animationsMap[ name ];
 
 			if ( animation ) {
 
@@ -137,10 +143,11 @@
 
 			}
 
-		},
-		setAnimationTime: function ( name, time ) {
+		}
 
-			var animation = this.animationsMap[ name ];
+		setAnimationTime( name, time ) {
+
+			const animation = this.animationsMap[ name ];
 
 			if ( animation ) {
 
@@ -148,11 +155,12 @@
 
 			}
 
-		},
-		getAnimationTime: function ( name ) {
+		}
 
-			var time = 0;
-			var animation = this.animationsMap[ name ];
+		getAnimationTime( name ) {
+
+			let time = 0;
+			const animation = this.animationsMap[ name ];
 
 			if ( animation ) {
 
@@ -162,11 +170,12 @@
 
 			return time;
 
-		},
-		getAnimationDuration: function ( name ) {
+		}
 
-			var duration = - 1;
-			var animation = this.animationsMap[ name ];
+		getAnimationDuration( name ) {
+
+			let duration = - 1;
+			const animation = this.animationsMap[ name ];
 
 			if ( animation ) {
 
@@ -176,10 +185,11 @@
 
 			return duration;
 
-		},
-		playAnimation: function ( name ) {
+		}
 
-			var animation = this.animationsMap[ name ];
+		playAnimation( name ) {
+
+			const animation = this.animationsMap[ name ];
 
 			if ( animation ) {
 
@@ -192,10 +202,11 @@
 
 			}
 
-		},
-		stopAnimation: function ( name ) {
+		}
 
-			var animation = this.animationsMap[ name ];
+		stopAnimation( name ) {
+
+			const animation = this.animationsMap[ name ];
 
 			if ( animation ) {
 
@@ -203,14 +214,15 @@
 
 			}
 
-		},
-		update: function ( delta ) {
+		}
 
-			for ( var i = 0, il = this.animationsList.length; i < il; i ++ ) {
+		update( delta ) {
 
-				var animation = this.animationsList[ i ];
+			for ( let i = 0, il = this.animationsList.length; i < il; i ++ ) {
+
+				const animation = this.animationsList[ i ];
 				if ( ! animation.active ) continue;
-				var frameTime = animation.duration / animation.length;
+				const frameTime = animation.duration / animation.length;
 				animation.time += animation.direction * delta;
 
 				if ( animation.mirroredLoop ) {
@@ -242,8 +254,8 @@
 
 				}
 
-				var keyframe = animation.start + THREE.MathUtils.clamp( Math.floor( animation.time / frameTime ), 0, animation.length - 1 );
-				var weight = animation.weight;
+				const keyframe = animation.start + THREE.MathUtils.clamp( Math.floor( animation.time / frameTime ), 0, animation.length - 1 );
+				const weight = animation.weight;
 
 				if ( keyframe !== animation.currentFrame ) {
 
@@ -255,7 +267,7 @@
 
 				}
 
-				var mix = animation.time % frameTime / frameTime;
+				let mix = animation.time % frameTime / frameTime;
 				if ( animation.directionBackwards ) mix = 1 - mix;
 
 				if ( animation.currentFrame !== animation.lastFrame ) {
@@ -272,7 +284,8 @@
 			}
 
 		}
-	} );
+
+	}
 
 	THREE.MorphBlendMesh = MorphBlendMesh;
 

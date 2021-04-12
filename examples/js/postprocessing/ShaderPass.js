@@ -1,34 +1,34 @@
 ( function () {
 
-	var ShaderPass = function ( shader, textureID ) {
+	class ShaderPass extends THREE.Pass {
 
-		THREE.Pass.call( this );
-		this.textureID = textureID !== undefined ? textureID : 'tDiffuse';
+		constructor( shader, textureID ) {
 
-		if ( shader instanceof THREE.ShaderMaterial ) {
+			super();
+			this.textureID = textureID !== undefined ? textureID : 'tDiffuse';
 
-			this.uniforms = shader.uniforms;
-			this.material = shader;
+			if ( shader instanceof THREE.ShaderMaterial ) {
 
-		} else if ( shader ) {
+				this.uniforms = shader.uniforms;
+				this.material = shader;
 
-			this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-			this.material = new THREE.ShaderMaterial( {
-				defines: Object.assign( {}, shader.defines ),
-				uniforms: this.uniforms,
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
-			} );
+			} else if ( shader ) {
+
+				this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+				this.material = new THREE.ShaderMaterial( {
+					defines: Object.assign( {}, shader.defines ),
+					uniforms: this.uniforms,
+					vertexShader: shader.vertexShader,
+					fragmentShader: shader.fragmentShader
+				} );
+
+			}
+
+			this.fsQuad = new THREE.FullScreenQuad( this.material );
 
 		}
 
-		this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
-
-	};
-
-	ShaderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
-		constructor: ShaderPass,
-		render: function ( renderer, writeBuffer, readBuffer
+		render( renderer, writeBuffer, readBuffer
 			/*, deltaTime, maskActive */
 		) {
 
@@ -55,7 +55,8 @@
 			}
 
 		}
-	} );
+
+	}
 
 	THREE.ShaderPass = ShaderPass;
 

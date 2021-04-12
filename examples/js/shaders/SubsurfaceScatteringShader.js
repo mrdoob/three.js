@@ -14,9 +14,9 @@
 
 	}
 
-	var meshphong_frag_head = THREE.ShaderChunk[ 'meshphong_frag' ].slice( 0, THREE.ShaderChunk[ 'meshphong_frag' ].indexOf( 'void main() {' ) );
-	var meshphong_frag_body = THREE.ShaderChunk[ 'meshphong_frag' ].slice( THREE.ShaderChunk[ 'meshphong_frag' ].indexOf( 'void main() {' ) );
-	var SubsurfaceScatteringShader = {
+	const meshphong_frag_head = THREE.ShaderChunk[ 'meshphong_frag' ].slice( 0, THREE.ShaderChunk[ 'meshphong_frag' ].indexOf( 'void main() {' ) );
+	const meshphong_frag_body = THREE.ShaderChunk[ 'meshphong_frag' ].slice( THREE.ShaderChunk[ 'meshphong_frag' ].indexOf( 'void main() {' ) );
+	const SubsurfaceScatteringShader = {
 		uniforms: THREE.UniformsUtils.merge( [ THREE.ShaderLib[ 'phong' ].uniforms, {
 			'thicknessMap': {
 				value: null
