@@ -295,6 +295,7 @@ class Rhino3dmLoader extends Loader {
 		object.userData[ 'settings' ] = data.settings;
 		object.userData[ 'objectType' ] = 'File3dm';
 		object.userData[ 'materials' ] = null;
+		object.warnings = data.warnings;
 		object.name = this.url;
 
 		let objects = data.objects;
@@ -328,12 +329,12 @@ class Rhino3dmLoader extends Loader {
 						const rMaterial = materials[ attributes.materialIndex ];
 						let material = this._createMaterial( rMaterial );
 						material = this._compareMaterials( material );
-						_object = this._createObject( obj, material );
+						_object = this._createObject( obj, material, warning =>object.warnings.push( warning ) );
 
 					} else {
 
 						const material = this._createMaterial( );
-						_object = this._createObject( obj, material );
+						_object = this._createObject( obj, material, warning =>object.warnings.push( warning ) );
 
 					}
 
@@ -422,7 +423,7 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
-	_createObject( obj, mat ) {
+	_createObject( obj, mat, onWarning ) {
 
 		const loader = new BufferGeometryLoader();
 
@@ -616,6 +617,7 @@ class Rhino3dmLoader extends Loader {
 				} else if ( geometry.isLinearLight ) {
 
 					console.warn( 'THREE.3DMLoader:  No conversion exists for linear lights.' );
+					onWarning( 'THREE.3DMLoader:  No conversion exists for linear lights.' );
 
 					return;
 
@@ -832,6 +834,7 @@ function Rhino3dmWorker() {
 		const views = [];
 		const namedViews = [];
 		const groups = [];
+		const warnings = [];
 
 		//Handle objects
 
@@ -842,7 +845,7 @@ function Rhino3dmWorker() {
 
 			const _object = objs.get( i );
 
-			const object = extractObjectData( _object, doc );
+			const object = extractObjectData( _object, doc, ( warning )=>warnings.push( warning ) );
 
 			_object.delete();
 
@@ -928,6 +931,7 @@ function Rhino3dmWorker() {
 					} else {
 
 						console.warn( `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.` );
+						warnings.push( `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.` );
 						texture.image = null;
 
 					}
@@ -1060,11 +1064,11 @@ function Rhino3dmWorker() {
 
 		doc.delete();
 
-		return { objects, materials, layers, views, namedViews, groups, settings };
+		return { objects, materials, layers, views, namedViews, groups, settings, warnings };
 
 	}
 
-	function extractObjectData( object, doc ) {
+	function extractObjectData( object, doc, onWarning ) {
 
 		const _geometry = object.geometry();
 		const _attributes = object.attributes();
@@ -1226,6 +1230,7 @@ function Rhino3dmWorker() {
 
 			default:
 				console.warn( `THREE.3DMLoader: TODO: Implement ${objectType.constructor.name}` );
+				onWarning( `THREE.3DMLoader: TODO: Implement ${objectType.constructor.name}` );
 				break;
 
 		}
@@ -1263,6 +1268,7 @@ function Rhino3dmWorker() {
 		} else {
 
 			console.warn( `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.` );
+			onWarning( `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.` );
 
 		}
 
