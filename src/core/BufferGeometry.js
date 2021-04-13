@@ -12,12 +12,12 @@ import { arrayMax } from '../utils.js';
 
 let _id = 0;
 
-const _m1 = new Matrix4();
-const _obj = new Object3D();
-const _offset = new Vector3();
-const _box = new Box3();
-const _boxMorphTargets = new Box3();
-const _vector = new Vector3();
+const _m1 = new /*@__PURE__*/ Matrix4();
+const _obj = new /*@__PURE__*/ Object3D();
+const _offset = new /*@__PURE__*/ Vector3();
+const _box = new /*@__PURE__*/ Box3();
+const _boxMorphTargets = new /*@__PURE__*/ Box3();
+const _vector = new /*@__PURE__*/ Vector3();
 
 class BufferGeometry extends EventDispatcher {
 
