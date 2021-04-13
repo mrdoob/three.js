@@ -36,8 +36,8 @@ class DragControls extends EventDispatcher {
 			_domElement.addEventListener( 'pointerdown', onPointerDown );
 			_domElement.addEventListener( 'pointerup', onPointerCancel );
 			_domElement.addEventListener( 'pointerleave', onPointerCancel );
-			_domElement.addEventListener( 'touchmove', onTouchMove );
-			_domElement.addEventListener( 'touchstart', onTouchStart );
+			_domElement.addEventListener( 'touchmove', onTouchMove, { passive: false } );
+			_domElement.addEventListener( 'touchstart', onTouchStart, { passive: false } );
 			_domElement.addEventListener( 'touchend', onTouchEnd );
 
 		}
