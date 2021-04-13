@@ -21,212 +21,163 @@ import {
 	Vector3
 } from '../../../build/three.module.js';
 
-var TransformControls = function ( camera, domElement ) {
+const _raycaster = new Raycaster();
 
-	if ( domElement === undefined ) {
+const _tempVector = new Vector3();
+const _tempVector2 = new Vector3();
+const _tempQuaternion = new Quaternion();
+const _unit = {
+	X: new Vector3( 1, 0, 0 ),
+	Y: new Vector3( 0, 1, 0 ),
+	Z: new Vector3( 0, 0, 1 )
+};
 
-		console.warn( 'THREE.TransformControls: The second parameter "domElement" is now mandatory.' );
-		domElement = document;
+const _changeEvent = { type: 'change' };
+const _mouseDownEvent = { type: 'mouseDown' };
+const _mouseUpEvent = { type: 'mouseUp', mode: null };
+const _objectChangeEvent = { type: 'objectChange' };
 
-	}
+class TransformControls extends Object3D {
 
-	Object3D.call( this );
+	constructor( camera, domElement ) {
 
-	this.visible = false;
-	this.domElement = domElement;
+		super();
 
-	var _gizmo = new TransformControlsGizmo();
-	this.add( _gizmo );
+		if ( domElement === undefined ) {
 
-	var _plane = new TransformControlsPlane();
-	this.add( _plane );
-
-	var scope = this;
-
-	// Define properties with getters/setter
-	// Setting the defined property will automatically trigger change event
-	// Defined properties are passed down to gizmo and plane
-
-	defineProperty( 'camera', camera );
-	defineProperty( 'object', undefined );
-	defineProperty( 'enabled', true );
-	defineProperty( 'axis', null );
-	defineProperty( 'mode', 'translate' );
-	defineProperty( 'translationSnap', null );
-	defineProperty( 'rotationSnap', null );
-	defineProperty( 'scaleSnap', null );
-	defineProperty( 'space', 'world' );
-	defineProperty( 'size', 1 );
-	defineProperty( 'dragging', false );
-	defineProperty( 'showX', true );
-	defineProperty( 'showY', true );
-	defineProperty( 'showZ', true );
-
-	var changeEvent = { type: 'change' };
-	var mouseDownEvent = { type: 'mouseDown' };
-	var mouseUpEvent = { type: 'mouseUp', mode: scope.mode };
-	var objectChangeEvent = { type: 'objectChange' };
-
-	// Reusable utility variables
-
-	var raycaster = new Raycaster();
-
-	function intersectObjectWithRay( object, raycaster, includeInvisible ) {
-
-		var allIntersections = raycaster.intersectObject( object, true );
-
-		for ( var i = 0; i < allIntersections.length; i ++ ) {
-
-			if ( allIntersections[ i ].object.visible || includeInvisible ) {
-
-				return allIntersections[ i ];
-
-			}
+			console.warn( 'THREE.TransformControls: The second parameter "domElement" is now mandatory.' );
+			domElement = document;
 
 		}
 
-		return false;
-
-	}
-
-	var _tempVector = new Vector3();
-	var _tempVector2 = new Vector3();
-	var _tempQuaternion = new Quaternion();
-	var _unit = {
-		X: new Vector3( 1, 0, 0 ),
-		Y: new Vector3( 0, 1, 0 ),
-		Z: new Vector3( 0, 0, 1 )
-	};
-
-	var pointStart = new Vector3();
-	var pointEnd = new Vector3();
-	var offset = new Vector3();
-	var rotationAxis = new Vector3();
-	var startNorm = new Vector3();
-	var endNorm = new Vector3();
-	var rotationAngle = 0;
-
-	var cameraPosition = new Vector3();
-	var cameraQuaternion = new Quaternion();
-	var cameraScale = new Vector3();
-
-	var parentPosition = new Vector3();
-	var parentQuaternion = new Quaternion();
-	var parentQuaternionInv = new Quaternion();
-	var parentScale = new Vector3();
-
-	var worldPositionStart = new Vector3();
-	var worldQuaternionStart = new Quaternion();
-	var worldScaleStart = new Vector3();
-
-	var worldPosition = new Vector3();
-	var worldQuaternion = new Quaternion();
-	var worldQuaternionInv = new Quaternion();
-	var worldScale = new Vector3();
-
-	var eye = new Vector3();
-
-	var positionStart = new Vector3();
-	var quaternionStart = new Quaternion();
-	var scaleStart = new Vector3();
-
-	// TODO: remove properties unused in plane and gizmo
-
-	defineProperty( 'worldPosition', worldPosition );
-	defineProperty( 'worldPositionStart', worldPositionStart );
-	defineProperty( 'worldQuaternion', worldQuaternion );
-	defineProperty( 'worldQuaternionStart', worldQuaternionStart );
-	defineProperty( 'cameraPosition', cameraPosition );
-	defineProperty( 'cameraQuaternion', cameraQuaternion );
-	defineProperty( 'pointStart', pointStart );
-	defineProperty( 'pointEnd', pointEnd );
-	defineProperty( 'rotationAxis', rotationAxis );
-	defineProperty( 'rotationAngle', rotationAngle );
-	defineProperty( 'eye', eye );
-
-	{
-
-		domElement.addEventListener( 'pointerdown', onPointerDown );
-		domElement.addEventListener( 'pointermove', onPointerHover );
-		scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp );
-
-	}
-
-	this.dispose = function () {
-
-		domElement.removeEventListener( 'pointerdown', onPointerDown );
-		domElement.removeEventListener( 'pointermove', onPointerHover );
-		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
-		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
-
-		this.traverse( function ( child ) {
-
-			if ( child.geometry ) child.geometry.dispose();
-			if ( child.material ) child.material.dispose();
-
-		} );
-
-	};
-
-	// Set current object
-	this.attach = function ( object ) {
-
-		this.object = object;
-		this.visible = true;
-
-		return this;
-
-	};
-
-	// Detatch from object
-	this.detach = function () {
-
-		this.object = undefined;
 		this.visible = false;
-		this.axis = null;
+		this.domElement = domElement;
 
-		return this;
+		const _gizmo = new TransformControlsGizmo();
+		this._gizmo = _gizmo;
+		this.add( _gizmo );
 
-	};
+		const _plane = new TransformControlsPlane();
+		this._plane = _plane;
+		this.add( _plane );
 
-	// Defined getter, setter and store for a property
-	function defineProperty( propName, defaultValue ) {
+		const scope = this;
 
-		var propValue = defaultValue;
+		// Defined getter, setter and store for a property
+		function defineProperty( propName, defaultValue ) {
 
-		Object.defineProperty( scope, propName, {
+			let propValue = defaultValue;
 
-			get: function () {
+			Object.defineProperty( scope, propName, {
 
-				return propValue !== undefined ? propValue : defaultValue;
+				get: function () {
 
-			},
+					return propValue !== undefined ? propValue : defaultValue;
 
-			set: function ( value ) {
+				},
 
-				if ( propValue !== value ) {
+				set: function ( value ) {
 
-					propValue = value;
-					_plane[ propName ] = value;
-					_gizmo[ propName ] = value;
+					if ( propValue !== value ) {
 
-					scope.dispatchEvent( { type: propName + '-changed', value: value } );
-					scope.dispatchEvent( changeEvent );
+						propValue = value;
+						_plane[ propName ] = value;
+						_gizmo[ propName ] = value;
+
+						scope.dispatchEvent( { type: propName + '-changed', value: value } );
+						scope.dispatchEvent( _changeEvent );
+
+					}
 
 				}
 
-			}
+			} );
 
-		} );
+			scope[ propName ] = defaultValue;
+			_plane[ propName ] = defaultValue;
+			_gizmo[ propName ] = defaultValue;
 
-		scope[ propName ] = defaultValue;
-		_plane[ propName ] = defaultValue;
-		_gizmo[ propName ] = defaultValue;
+		}
+
+		// Define properties with getters/setter
+		// Setting the defined property will automatically trigger change event
+		// Defined properties are passed down to gizmo and plane
+
+		defineProperty( 'camera', camera );
+		defineProperty( 'object', undefined );
+		defineProperty( 'enabled', true );
+		defineProperty( 'axis', null );
+		defineProperty( 'mode', 'translate' );
+		defineProperty( 'translationSnap', null );
+		defineProperty( 'rotationSnap', null );
+		defineProperty( 'scaleSnap', null );
+		defineProperty( 'space', 'world' );
+		defineProperty( 'size', 1 );
+		defineProperty( 'dragging', false );
+		defineProperty( 'showX', true );
+		defineProperty( 'showY', true );
+		defineProperty( 'showZ', true );
+
+		// Reusable utility variables
+
+		const worldPosition = new Vector3();
+		const worldPositionStart = new Vector3();
+		const worldQuaternion = new Quaternion();
+		const worldQuaternionStart = new Quaternion();
+		const cameraPosition = new Vector3();
+		const cameraQuaternion = new Quaternion();
+		const pointStart = new Vector3();
+		const pointEnd = new Vector3();
+		const rotationAxis = new Vector3();
+		const rotationAngle = 0;
+		const eye = new Vector3();
+
+		// TODO: remove properties unused in plane and gizmo
+
+		defineProperty( 'worldPosition', worldPosition );
+		defineProperty( 'worldPositionStart', worldPositionStart );
+		defineProperty( 'worldQuaternion', worldQuaternion );
+		defineProperty( 'worldQuaternionStart', worldQuaternionStart );
+		defineProperty( 'cameraPosition', cameraPosition );
+		defineProperty( 'cameraQuaternion', cameraQuaternion );
+		defineProperty( 'pointStart', pointStart );
+		defineProperty( 'pointEnd', pointEnd );
+		defineProperty( 'rotationAxis', rotationAxis );
+		defineProperty( 'rotationAngle', rotationAngle );
+		defineProperty( 'eye', eye );
+
+		this._offset = new Vector3();
+		this._startNorm = new Vector3();
+		this._endNorm = new Vector3();
+		this._cameraScale = new Vector3();
+
+		this._parentPosition = new Vector3();
+		this._parentQuaternion = new Quaternion();
+		this._parentQuaternionInv = new Quaternion();
+		this._parentScale = new Vector3();
+
+		this._worldScaleStart = new Vector3();
+		this._worldQuaternionInv = new Quaternion();
+		this._worldScale = new Vector3();
+
+		this._positionStart = new Vector3();
+		this._quaternionStart = new Quaternion();
+		this._scaleStart = new Vector3();
+
+		this._getPointer = getPointer.bind( this );
+		this._onPointerDown = onPointerDown.bind( this );
+		this._onPointerHover = onPointerHover.bind( this );
+		this._onPointerMove = onPointerMove.bind( this );
+		this._onPointerUp = onPointerUp.bind( this );
+
+		this.domElement.addEventListener( 'pointerdown', this._onPointerDown );
+		this.domElement.addEventListener( 'pointermove', this._onPointerHover );
+		this.domElement.ownerDocument.addEventListener( 'pointerup', this._onPointerUp );
 
 	}
 
 	// updateMatrixWorld  updates key transformation variables
-	this.updateMatrixWorld = function () {
+	updateMatrixWorld() {
 
 		if ( this.object !== undefined ) {
 
@@ -238,33 +189,33 @@ var TransformControls = function ( camera, domElement ) {
 
 			} else {
 
-				this.object.parent.matrixWorld.decompose( parentPosition, parentQuaternion, parentScale );
+				this.object.parent.matrixWorld.decompose( this._parentPosition, this._parentQuaternion, this._parentScale );
 
 			}
 
-			this.object.matrixWorld.decompose( worldPosition, worldQuaternion, worldScale );
+			this.object.matrixWorld.decompose( this.worldPosition, this.worldQuaternion, this._worldScale );
 
-			parentQuaternionInv.copy( parentQuaternion ).invert();
-			worldQuaternionInv.copy( worldQuaternion ).invert();
+			this._parentQuaternionInv.copy( this._parentQuaternion ).invert();
+			this._worldQuaternionInv.copy( this.worldQuaternion ).invert();
 
 		}
 
 		this.camera.updateMatrixWorld();
-		this.camera.matrixWorld.decompose( cameraPosition, cameraQuaternion, cameraScale );
+		this.camera.matrixWorld.decompose( this.cameraPosition, this.cameraQuaternion, this._cameraScale );
 
-		eye.copy( cameraPosition ).sub( worldPosition ).normalize();
+		this.eye.copy( this.cameraPosition ).sub( this.worldPosition ).normalize();
 
-		Object3D.prototype.updateMatrixWorld.call( this );
+		super.updateMatrixWorld( this );
 
-	};
+	}
 
-	this.pointerHover = function ( pointer ) {
+	pointerHover( pointer ) {
 
 		if ( this.object === undefined || this.dragging === true ) return;
 
-		raycaster.setFromCamera( pointer, this.camera );
+		_raycaster.setFromCamera( pointer, this.camera );
 
-		var intersect = intersectObjectWithRay( _gizmo.picker[ this.mode ], raycaster );
+		const intersect = intersectObjectWithRay( this._gizmo.picker[ this.mode ], _raycaster );
 
 		if ( intersect ) {
 
@@ -276,21 +227,21 @@ var TransformControls = function ( camera, domElement ) {
 
 		}
 
-	};
+	}
 
-	this.pointerDown = function ( pointer ) {
+	pointerDown( pointer ) {
 
 		if ( this.object === undefined || this.dragging === true || pointer.button !== 0 ) return;
 
 		if ( this.axis !== null ) {
 
-			raycaster.setFromCamera( pointer, this.camera );
+			_raycaster.setFromCamera( pointer, this.camera );
 
-			var planeIntersect = intersectObjectWithRay( _plane, raycaster, true );
+			const planeIntersect = intersectObjectWithRay( this._plane, _raycaster, true );
 
 			if ( planeIntersect ) {
 
-				var space = this.space;
+				let space = this.space;
 
 				if ( this.mode === 'scale' ) {
 
@@ -304,7 +255,7 @@ var TransformControls = function ( camera, domElement ) {
 
 				if ( space === 'local' && this.mode === 'rotate' ) {
 
-					var snap = this.rotationSnap;
+					const snap = this.rotationSnap;
 
 					if ( this.axis === 'X' && snap ) this.object.rotation.x = Math.round( this.object.rotation.x / snap ) * snap;
 					if ( this.axis === 'Y' && snap ) this.object.rotation.y = Math.round( this.object.rotation.y / snap ) * snap;
@@ -315,30 +266,30 @@ var TransformControls = function ( camera, domElement ) {
 				this.object.updateMatrixWorld();
 				this.object.parent.updateMatrixWorld();
 
-				positionStart.copy( this.object.position );
-				quaternionStart.copy( this.object.quaternion );
-				scaleStart.copy( this.object.scale );
+				this._positionStart.copy( this.object.position );
+				this._quaternionStart.copy( this.object.quaternion );
+				this._scaleStart.copy( this.object.scale );
 
-				this.object.matrixWorld.decompose( worldPositionStart, worldQuaternionStart, worldScaleStart );
+				this.object.matrixWorld.decompose( this.worldPositionStart, this.worldQuaternionStart, this._worldScaleStart );
 
-				pointStart.copy( planeIntersect.point ).sub( worldPositionStart );
+				this.pointStart.copy( planeIntersect.point ).sub( this.worldPositionStart );
 
 			}
 
 			this.dragging = true;
-			mouseDownEvent.mode = this.mode;
-			this.dispatchEvent( mouseDownEvent );
+			_mouseDownEvent.mode = this.mode;
+			this.dispatchEvent( _mouseDownEvent );
 
 		}
 
-	};
+	}
 
-	this.pointerMove = function ( pointer ) {
+	pointerMove( pointer ) {
 
-		var axis = this.axis;
-		var mode = this.mode;
-		var object = this.object;
-		var space = this.space;
+		const axis = this.axis;
+		const mode = this.mode;
+		const object = this.object;
+		let space = this.space;
 
 		if ( mode === 'scale' ) {
 
@@ -352,41 +303,41 @@ var TransformControls = function ( camera, domElement ) {
 
 		if ( object === undefined || axis === null || this.dragging === false || pointer.button !== - 1 ) return;
 
-		raycaster.setFromCamera( pointer, this.camera );
+		_raycaster.setFromCamera( pointer, this.camera );
 
-		var planeIntersect = intersectObjectWithRay( _plane, raycaster, true );
+		const planeIntersect = intersectObjectWithRay( this._plane, _raycaster, true );
 
 		if ( ! planeIntersect ) return;
 
-		pointEnd.copy( planeIntersect.point ).sub( worldPositionStart );
+		this.pointEnd.copy( planeIntersect.point ).sub( this.worldPositionStart );
 
 		if ( mode === 'translate' ) {
 
 			// Apply translate
 
-			offset.copy( pointEnd ).sub( pointStart );
+			this._offset.copy( this.pointEnd ).sub( this.pointStart );
 
 			if ( space === 'local' && axis !== 'XYZ' ) {
 
-				offset.applyQuaternion( worldQuaternionInv );
+				this._offset.applyQuaternion( this._worldQuaternionInv );
 
 			}
 
-			if ( axis.indexOf( 'X' ) === - 1 ) offset.x = 0;
-			if ( axis.indexOf( 'Y' ) === - 1 ) offset.y = 0;
-			if ( axis.indexOf( 'Z' ) === - 1 ) offset.z = 0;
+			if ( axis.indexOf( 'X' ) === - 1 ) this._offset.x = 0;
+			if ( axis.indexOf( 'Y' ) === - 1 ) this._offset.y = 0;
+			if ( axis.indexOf( 'Z' ) === - 1 ) this._offset.z = 0;
 
 			if ( space === 'local' && axis !== 'XYZ' ) {
 
-				offset.applyQuaternion( quaternionStart ).divide( parentScale );
+				this._offset.applyQuaternion( this._quaternionStart ).divide( this._parentScale );
 
 			} else {
 
-				offset.applyQuaternion( parentQuaternionInv ).divide( parentScale );
+				this._offset.applyQuaternion( this._parentQuaternionInv ).divide( this._parentScale );
 
 			}
 
-			object.position.copy( offset ).add( positionStart );
+			object.position.copy( this._offset ).add( this._positionStart );
 
 			// Apply translation snap
 
@@ -394,7 +345,7 @@ var TransformControls = function ( camera, domElement ) {
 
 				if ( space === 'local' ) {
 
-					object.position.applyQuaternion( _tempQuaternion.copy( quaternionStart ).invert() );
+					object.position.applyQuaternion( _tempQuaternion.copy( this._quaternionStart ).invert() );
 
 					if ( axis.search( 'X' ) !== - 1 ) {
 
@@ -414,7 +365,7 @@ var TransformControls = function ( camera, domElement ) {
 
 					}
 
-					object.position.applyQuaternion( quaternionStart );
+					object.position.applyQuaternion( this._quaternionStart );
 
 				}
 
@@ -458,19 +409,19 @@ var TransformControls = function ( camera, domElement ) {
 
 			if ( axis.search( 'XYZ' ) !== - 1 ) {
 
-				var d = pointEnd.length() / pointStart.length();
+				let d = this.pointEnd.length() / this.pointStart.length();
 
-				if ( pointEnd.dot( pointStart ) < 0 ) d *= - 1;
+				if ( this.pointEnd.dot( this.pointStart ) < 0 ) d *= - 1;
 
 				_tempVector2.set( d, d, d );
 
 			} else {
 
-				_tempVector.copy( pointStart );
-				_tempVector2.copy( pointEnd );
+				_tempVector.copy( this.pointStart );
+				_tempVector2.copy( this.pointEnd );
 
-				_tempVector.applyQuaternion( worldQuaternionInv );
-				_tempVector2.applyQuaternion( worldQuaternionInv );
+				_tempVector.applyQuaternion( this._worldQuaternionInv );
+				_tempVector2.applyQuaternion( this._worldQuaternionInv );
 
 				_tempVector2.divide( _tempVector );
 
@@ -496,7 +447,7 @@ var TransformControls = function ( camera, domElement ) {
 
 			// Apply scale
 
-			object.scale.copy( scaleStart ).multiply( _tempVector2 );
+			object.scale.copy( this._scaleStart ).multiply( _tempVector2 );
 
 			if ( this.scaleSnap ) {
 
@@ -522,230 +473,275 @@ var TransformControls = function ( camera, domElement ) {
 
 		} else if ( mode === 'rotate' ) {
 
-			offset.copy( pointEnd ).sub( pointStart );
+			this._offset.copy( this.pointEnd ).sub( this.pointStart );
 
-			var ROTATION_SPEED = 20 / worldPosition.distanceTo( _tempVector.setFromMatrixPosition( this.camera.matrixWorld ) );
+			const ROTATION_SPEED = 20 / this.worldPosition.distanceTo( _tempVector.setFromMatrixPosition( this.camera.matrixWorld ) );
 
 			if ( axis === 'E' ) {
 
-				rotationAxis.copy( eye );
-				rotationAngle = pointEnd.angleTo( pointStart );
+				this.rotationAxis.copy( this.eye );
+				this.rotationAngle = this.pointEnd.angleTo( this.pointStart );
 
-				startNorm.copy( pointStart ).normalize();
-				endNorm.copy( pointEnd ).normalize();
+				this._startNorm.copy( this.pointStart ).normalize();
+				this._endNorm.copy( this.pointEnd ).normalize();
 
-				rotationAngle *= ( endNorm.cross( startNorm ).dot( eye ) < 0 ? 1 : - 1 );
+				this.rotationAngle *= ( this._endNorm.cross( this._startNorm ).dot( this.eye ) < 0 ? 1 : - 1 );
 
 			} else if ( axis === 'XYZE' ) {
 
-				rotationAxis.copy( offset ).cross( eye ).normalize();
-				rotationAngle = offset.dot( _tempVector.copy( rotationAxis ).cross( this.eye ) ) * ROTATION_SPEED;
+				this.rotationAxis.copy( this._offset ).cross( this.eye ).normalize();
+				this.rotationAngle = this._offset.dot( _tempVector.copy( this.rotationAxis ).cross( this.eye ) ) * ROTATION_SPEED;
 
 			} else if ( axis === 'X' || axis === 'Y' || axis === 'Z' ) {
 
-				rotationAxis.copy( _unit[ axis ] );
+				this.rotationAxis.copy( _unit[ axis ] );
 
 				_tempVector.copy( _unit[ axis ] );
 
 				if ( space === 'local' ) {
 
-					_tempVector.applyQuaternion( worldQuaternion );
+					_tempVector.applyQuaternion( this.worldQuaternion );
 
 				}
 
-				rotationAngle = offset.dot( _tempVector.cross( eye ).normalize() ) * ROTATION_SPEED;
+				this.rotationAngle = this._offset.dot( _tempVector.cross( this.eye ).normalize() ) * ROTATION_SPEED;
 
 			}
 
 			// Apply rotation snap
 
-			if ( this.rotationSnap ) rotationAngle = Math.round( rotationAngle / this.rotationSnap ) * this.rotationSnap;
+			if ( this.rotationSnap ) this.rotationAngle = Math.round( this.rotationAngle / this.rotationSnap ) * this.rotationSnap;
 
-			this.rotationAngle = rotationAngle;
+			this.rotationAngle = this.rotationAngle;
 
 			// Apply rotate
 			if ( space === 'local' && axis !== 'E' && axis !== 'XYZE' ) {
 
-				object.quaternion.copy( quaternionStart );
-				object.quaternion.multiply( _tempQuaternion.setFromAxisAngle( rotationAxis, rotationAngle ) ).normalize();
+				object.quaternion.copy( this._quaternionStart );
+				object.quaternion.multiply( _tempQuaternion.setFromAxisAngle( this.rotationAxis, this.rotationAngle ) ).normalize();
 
 			} else {
 
-				rotationAxis.applyQuaternion( parentQuaternionInv );
-				object.quaternion.copy( _tempQuaternion.setFromAxisAngle( rotationAxis, rotationAngle ) );
-				object.quaternion.multiply( quaternionStart ).normalize();
+				this.rotationAxis.applyQuaternion( this._parentQuaternionInv );
+				object.quaternion.copy( _tempQuaternion.setFromAxisAngle( this.rotationAxis, this.rotationAngle ) );
+				object.quaternion.multiply( this._quaternionStart ).normalize();
 
 			}
 
 		}
 
-		this.dispatchEvent( changeEvent );
-		this.dispatchEvent( objectChangeEvent );
+		this.dispatchEvent( _changeEvent );
+		this.dispatchEvent( _objectChangeEvent );
 
-	};
+	}
 
-	this.pointerUp = function ( pointer ) {
+	pointerUp( pointer ) {
 
 		if ( pointer.button !== 0 ) return;
 
 		if ( this.dragging && ( this.axis !== null ) ) {
 
-			mouseUpEvent.mode = this.mode;
-			this.dispatchEvent( mouseUpEvent );
+			_mouseUpEvent.mode = this.mode;
+			this.dispatchEvent( _mouseUpEvent );
 
 		}
 
 		this.dragging = false;
 		this.axis = null;
 
-	};
+	}
 
-	// normalize mouse / touch pointer and remap {x,y} to view space.
+	dispose() {
 
-	function getPointer( event ) {
+		this.domElement.removeEventListener( 'pointerdown', this._onPointerDown );
+		this.domElement.removeEventListener( 'pointermove', this._onPointerHover );
+		this.domElement.ownerDocument.removeEventListener( 'pointermove', this._onPointerMove );
+		this.domElement.ownerDocument.removeEventListener( 'pointerup', this._onPointerUp );
 
-		if ( scope.domElement.ownerDocument.pointerLockElement ) {
+		this.traverse( function ( child ) {
 
-			return {
-				x: 0,
-				y: 0,
-				button: event.button
-			};
+			if ( child.geometry ) child.geometry.dispose();
+			if ( child.material ) child.material.dispose();
 
-		} else {
-
-			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
-
-			var rect = domElement.getBoundingClientRect();
-
-			return {
-				x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
-				y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
-				button: event.button
-			};
-
-		}
+		} );
 
 	}
 
-	// mouse / touch event handlers
+	// Set current object
+	attach( object ) {
 
-	function onPointerHover( event ) {
+		this.object = object;
+		this.visible = true;
 
-		if ( ! scope.enabled ) return;
-
-		switch ( event.pointerType ) {
-
-			case 'mouse':
-			case 'pen':
-				scope.pointerHover( getPointer( event ) );
-				break;
-
-		}
+		return this;
 
 	}
 
-	function onPointerDown( event ) {
+	// Detatch from object
+	detach() {
 
-		if ( ! scope.enabled ) return;
+		this.object = undefined;
+		this.visible = false;
+		this.axis = null;
 
-		scope.domElement.style.touchAction = 'none'; // disable touch scroll
-		scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove );
-
-		scope.pointerHover( getPointer( event ) );
-		scope.pointerDown( getPointer( event ) );
-
-	}
-
-	function onPointerMove( event ) {
-
-		if ( ! scope.enabled ) return;
-
-		scope.pointerMove( getPointer( event ) );
-
-	}
-
-	function onPointerUp( event ) {
-
-		if ( ! scope.enabled ) return;
-
-		scope.domElement.style.touchAction = '';
-		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
-
-		scope.pointerUp( getPointer( event ) );
+		return this;
 
 	}
 
 	// TODO: deprecate
 
-	this.getMode = function () {
+	getMode() {
 
-		return scope.mode;
+		return this.mode;
 
-	};
+	}
 
-	this.setMode = function ( mode ) {
+	setMode( mode ) {
 
-		scope.mode = mode;
+		this.mode = mode;
 
-	};
+	}
 
-	this.setTranslationSnap = function ( translationSnap ) {
+	setTranslationSnap( translationSnap ) {
 
-		scope.translationSnap = translationSnap;
+		this.translationSnap = translationSnap;
 
-	};
+	}
 
-	this.setRotationSnap = function ( rotationSnap ) {
+	setRotationSnap( rotationSnap ) {
 
-		scope.rotationSnap = rotationSnap;
+		this.rotationSnap = rotationSnap;
 
-	};
+	}
 
-	this.setScaleSnap = function ( scaleSnap ) {
+	setScaleSnap( scaleSnap ) {
 
-		scope.scaleSnap = scaleSnap;
+		this.scaleSnap = scaleSnap;
 
-	};
+	}
 
-	this.setSize = function ( size ) {
+	setSize( size ) {
 
-		scope.size = size;
+		this.size = size;
 
-	};
+	}
 
-	this.setSpace = function ( space ) {
+	setSpace( space ) {
 
-		scope.space = space;
+		this.space = space;
 
-	};
+	}
 
-	this.update = function () {
+	update() {
 
 		console.warn( 'THREE.TransformControls: update function has no more functionality and therefore has been deprecated.' );
 
-	};
+	}
 
-};
+}
 
-TransformControls.prototype = Object.assign( Object.create( Object3D.prototype ), {
+TransformControls.prototype.isTransformControls = true;
 
-	constructor: TransformControls,
+// mouse / touch event handlers
 
-	isTransformControls: true
+function getPointer( event ) {
 
-} );
+	if ( this.domElement.ownerDocument.pointerLockElement ) {
+
+		return {
+			x: 0,
+			y: 0,
+			button: event.button
+		};
+
+	} else {
+
+		const pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+
+		const rect = this.domElement.getBoundingClientRect();
+
+		return {
+			x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
+			y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
+			button: event.button
+		};
+
+	}
+
+}
+
+function onPointerHover( event ) {
+
+	if ( ! this.enabled ) return;
+
+	switch ( event.pointerType ) {
+
+		case 'mouse':
+		case 'pen':
+			this.pointerHover( this._getPointer( event ) );
+			break;
+
+	}
+
+}
+
+function onPointerDown( event ) {
+
+	if ( ! this.enabled ) return;
+
+	this.domElement.style.touchAction = 'none'; // disable touch scroll
+	this.domElement.ownerDocument.addEventListener( 'pointermove', this._onPointerMove );
+
+	this.pointerHover( this._getPointer( event ) );
+	this.pointerDown( this._getPointer( event ) );
+
+}
+
+function onPointerMove( event ) {
+
+	if ( ! this.enabled ) return;
+
+	this.pointerMove( this._getPointer( event ) );
+
+}
+
+function onPointerUp( event ) {
+
+	if ( ! this.enabled ) return;
+
+	this.domElement.style.touchAction = '';
+	this.domElement.ownerDocument.removeEventListener( 'pointermove', this._onPointerMove );
+
+	this.pointerUp( this._getPointer( event ) );
+
+}
+
+function intersectObjectWithRay( object, raycaster, includeInvisible ) {
+
+	const allIntersections = raycaster.intersectObject( object, true );
+
+	for ( let i = 0; i < allIntersections.length; i ++ ) {
+
+		if ( allIntersections[ i ].object.visible || includeInvisible ) {
+
+			return allIntersections[ i ];
+
+		}
+
+	}
+
+	return false;
+
+}
 
 //
 
 // Reusable utility variables
 
-const _tempVector = new Vector3( 0, 0, 0 );
 const _tempEuler = new Euler();
 const _alignVector = new Vector3( 0, 1, 0 );
 const _zeroVector = new Vector3( 0, 0, 0 );
 const _lookAtMatrix = new Matrix4();
-const _tempQuaternion = new Quaternion();
 const _tempQuaternion2 = new Quaternion();
 const _identityQuaternion = new Quaternion();
 const _dirVector = new Vector3();
@@ -1013,7 +1009,7 @@ class TransformControlsGizmo extends Object3D {
 			]
 		};
 
-		var gizmoScale = {
+		const gizmoScale = {
 			X: [
 				[ new Mesh( scaleHandleGeometry, matRed ), [ 0.8, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
 				[ new Line( lineGeometry, matLineRed ), null, null, [ 0.8, 1, 1 ]]
@@ -1594,7 +1590,7 @@ class TransformControlsPlane extends Mesh {
 
 	updateMatrixWorld( force ) {
 
-		var space = this.space;
+		let space = this.space;
 
 		this.position.copy( this.worldPosition );
 
