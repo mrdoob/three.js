@@ -89,7 +89,7 @@ class Rhino3dmLoader extends Loader {
 
 			this.decodeObjects( buffer, url )
 				.then( onLoad )
-				.catch( onError );
+				.catch( e => onError( e ) );
 
 		}, onProgress, onError );
 
@@ -126,7 +126,11 @@ class Rhino3dmLoader extends Loader {
 				} );
 
 			} )
-			.then( ( message ) => this._createGeometry( message.data ) );
+			.then( ( message ) => this._createGeometry( message.data ) ).catch( e => {
+
+				throw e;
+
+			} );
 
 		// Remove task from the task list.
 		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
@@ -160,7 +164,7 @@ class Rhino3dmLoader extends Loader {
 
 		this.decodeObjects( data, '' )
 			.then( onLoad )
-			.catch( onError );
+			.catch( e => onError( e ) );
 
 	}
 
@@ -811,9 +815,22 @@ function Rhino3dmWorker() {
 				const buffer = message.buffer;
 				libraryPending.then( () => {
 
+<<<<<<< HEAD
 					const data = decodeObjects( rhino, buffer );
 
 					self.postMessage( { type: 'decode', id: message.id, data } );
+=======
+					try {
+
+						var data = decodeObjects( rhino, buffer );
+						self.postMessage( { type: 'decode', id: message.id, data } );
+
+					} catch ( error ) {
+
+						self.postMessage( { type: 'error', id: message.id, error } );
+
+					}
+>>>>>>> Pass worker erros to onError callback
 
 				} );
 
