@@ -35,9 +35,13 @@
 
 				_domElement.addEventListener( 'pointerleave', onPointerCancel );
 
-				_domElement.addEventListener( 'touchmove', onTouchMove );
+				_domElement.addEventListener( 'touchmove', onTouchMove, {
+					passive: false
+				} );
 
-				_domElement.addEventListener( 'touchstart', onTouchStart );
+				_domElement.addEventListener( 'touchstart', onTouchStart, {
+					passive: false
+				} );
 
 				_domElement.addEventListener( 'touchend', onTouchEnd );
 

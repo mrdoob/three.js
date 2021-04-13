@@ -696,10 +696,16 @@
 
 			this.domElement.addEventListener( 'contextmenu', contextmenu );
 			this.domElement.addEventListener( 'pointerdown', onPointerDown );
-			this.domElement.addEventListener( 'wheel', mousewheel );
-			this.domElement.addEventListener( 'touchstart', touchstart );
+			this.domElement.addEventListener( 'wheel', mousewheel, {
+				passive: false
+			} );
+			this.domElement.addEventListener( 'touchstart', touchstart, {
+				passive: false
+			} );
 			this.domElement.addEventListener( 'touchend', touchend );
-			this.domElement.addEventListener( 'touchmove', touchmove );
+			this.domElement.addEventListener( 'touchmove', touchmove, {
+				passive: false
+			} );
 			this.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove );
 			this.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp );
 			window.addEventListener( 'keydown', keydown );
