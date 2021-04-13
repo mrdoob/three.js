@@ -1,7 +1,3 @@
-/**
- * @author Kai Salmen / www.kaisalmen.de
- */
-
 import {
 	DataTransport,
 	MaterialsTransport,
@@ -61,6 +57,8 @@ const OBJLoaderWorker = {
 		const dataTransport = new DataTransport().loadData( config );
 
 		context.objLoader.loader.objectId = dataTransport.getId();
+		let materials = context.objLoader.materials;
+		materials[ 'create' ] = function fakeMat( name ) { return materials[ name ]; };
 		context.objLoader.loader.setMaterials( context.objLoader.materials );
 
 		const enc = new TextDecoder("utf-8");
