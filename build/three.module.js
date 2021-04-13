@@ -9086,8 +9086,8 @@ class MeshBasicMaterial extends Material {
 
 MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
 
-const _vector$9 = new Vector3();
-const _vector2 = new Vector2();
+const _vector$9 = new /*@__PURE__*/ Vector3();
+const _vector2 = new /*@__PURE__*/ Vector2();
 
 class BufferAttribute {
 
@@ -9629,12 +9629,12 @@ function getTypedArray( type, buffer ) {
 
 let _id = 0;
 
-const _m1 = new Matrix4();
-const _obj = new Object3D();
-const _offset = new Vector3();
-const _box$1 = new Box3();
-const _boxMorphTargets = new Box3();
-const _vector$8 = new Vector3();
+const _m1 = new /*@__PURE__*/ Matrix4();
+const _obj = new /*@__PURE__*/ Object3D();
+const _offset = new /*@__PURE__*/ Vector3();
+const _box$1 = new /*@__PURE__*/ Box3();
+const _boxMorphTargets = new /*@__PURE__*/ Box3();
+const _vector$8 = new /*@__PURE__*/ Vector3();
 
 class BufferGeometry extends EventDispatcher {
 
@@ -25568,7 +25568,7 @@ class InterleavedBuffer {
 
 InterleavedBuffer.prototype.isInterleavedBuffer = true;
 
-const _vector$6 = new Vector3();
+const _vector$6 = new /*@__PURE__*/ Vector3();
 
 class InterleavedBufferAttribute {
 
