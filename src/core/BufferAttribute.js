@@ -4,8 +4,8 @@ import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
 import { StaticDrawUsage } from '../constants.js';
 
-const _vector = new Vector3();
-const _vector2 = new Vector2();
+const _vector = new /*@__PURE__*/ Vector3();
+const _vector2 = new /*@__PURE__*/ Vector2();
 
 class BufferAttribute {
 
