@@ -121,7 +121,7 @@ class Rhino3dmLoader extends Loader {
 
 					worker.postMessage( { type: 'decode', id: taskID, buffer }, [ buffer ] );
 
-					//this.debug();
+					// //this.debug();
 
 				} );
 
@@ -815,14 +815,9 @@ function Rhino3dmWorker() {
 				const buffer = message.buffer;
 				libraryPending.then( () => {
 
-<<<<<<< HEAD
-					const data = decodeObjects( rhino, buffer );
-
-					self.postMessage( { type: 'decode', id: message.id, data } );
-=======
 					try {
 
-						var data = decodeObjects( rhino, buffer );
+						const data = decodeObjects( rhino, buffer );
 						self.postMessage( { type: 'decode', id: message.id, data } );
 
 					} catch ( error ) {
@@ -830,7 +825,6 @@ function Rhino3dmWorker() {
 						self.postMessage( { type: 'error', id: message.id, error } );
 
 					}
->>>>>>> Pass worker erros to onError callback
 
 				} );
 
