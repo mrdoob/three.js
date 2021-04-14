@@ -941,23 +941,6 @@ SkinnedMesh.prototype.initBones = function () {
 
 };
 
-Object.defineProperty( Curve.prototype, '__arcLengthDivisions', {
-
-	get: function () {
-
-		console.warn( 'THREE.Curve: .__arcLengthDivisions is now .arcLengthDivisions.' );
-		return this.arcLengthDivisions;
-
-	},
-	set: function ( value ) {
-
-		console.warn( 'THREE.Curve: .__arcLengthDivisions is now .arcLengthDivisions.' );
-		this.arcLengthDivisions = value;
-
-	}
-
-} );
-
 //
 
 PerspectiveCamera.prototype.setLens = function ( focalLength, filmGauge ) {
@@ -1215,63 +1198,6 @@ Object.defineProperties( BufferGeometry.prototype, {
 
 			console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .groups.' );
 			return this.groups;
-
-		}
-	}
-
-} );
-
-Object.defineProperties( InstancedBufferGeometry.prototype, {
-
-	maxInstancedCount: {
-		get: function () {
-
-			console.warn( 'THREE.InstancedBufferGeometry: .maxInstancedCount has been renamed to .instanceCount.' );
-			return this.instanceCount;
-
-		},
-		set: function ( value ) {
-
-			console.warn( 'THREE.InstancedBufferGeometry: .maxInstancedCount has been renamed to .instanceCount.' );
-			this.instanceCount = value;
-
-		}
-	}
-
-} );
-
-Object.defineProperties( Raycaster.prototype, {
-
-	linePrecision: {
-		get: function () {
-
-			console.warn( 'THREE.Raycaster: .linePrecision has been deprecated. Use .params.Line.threshold instead.' );
-			return this.params.Line.threshold;
-
-		},
-		set: function ( value ) {
-
-			console.warn( 'THREE.Raycaster: .linePrecision has been deprecated. Use .params.Line.threshold instead.' );
-			this.params.Line.threshold = value;
-
-		}
-	}
-
-} );
-
-Object.defineProperties( InterleavedBuffer.prototype, {
-
-	dynamic: {
-		get: function () {
-
-			console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
-			return this.usage === DynamicDrawUsage;
-
-		},
-		set: function ( value ) {
-
-			console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
-			this.setUsage( value );
 
 		}
 	}
