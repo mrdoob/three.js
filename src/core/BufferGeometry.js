@@ -7,7 +7,7 @@ import { Sphere } from '../math/Sphere.js';
 import { Object3D } from './Object3D.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Matrix3 } from '../math/Matrix3.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 import { arrayMax } from '../utils.js';
 
 let _id = 0;

@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { MathUtils } from '../../../../src/math/MathUtils';
+import * as MathUtils from '../../../../src/math/MathUtils';
 
 export default QUnit.module( 'Maths', () => {
 
