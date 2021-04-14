@@ -1,5 +1,5 @@
 import { Camera } from './Camera.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 
 class PerspectiveCamera extends Camera {
 

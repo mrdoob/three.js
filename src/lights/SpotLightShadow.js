@@ -1,5 +1,5 @@
 import { LightShadow } from './LightShadow.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 
 class SpotLightShadow extends LightShadow {
