@@ -19,6 +19,7 @@ test/*
 test/*.cmd
 test/unit/build
 test/treeshake/index.bundle.js
+test/treeshake/index.bundle.min.js
 
 
 **/node_modules
