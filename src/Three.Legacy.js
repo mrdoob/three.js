@@ -22,11 +22,9 @@ import {
 	BufferAttribute
 } from './core/BufferAttribute.js';
 import { BufferGeometry } from './core/BufferGeometry.js';
-import { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 import { InterleavedBuffer } from './core/InterleavedBuffer.js';
 import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform.js';
-import { Raycaster } from './core/Raycaster.js';
 import { Curve } from './extras/core/Curve.js';
 import { Path } from './extras/core/Path.js';
 import { AxesHelper } from './helpers/AxesHelper.js';
@@ -47,7 +45,6 @@ import { DataTextureLoader } from './loaders/DataTextureLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
 import { LineBasicMaterial } from './materials/LineBasicMaterial.js';
-import { MeshPhysicalMaterial } from './materials/MeshPhysicalMaterial.js';
 import { PointsMaterial } from './materials/PointsMaterial.js';
 import { ShaderMaterial } from './materials/ShaderMaterial.js';
 import { Box2 } from './math/Box2.js';
