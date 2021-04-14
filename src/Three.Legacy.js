@@ -22,11 +22,9 @@ import {
 	BufferAttribute
 } from './core/BufferAttribute.js';
 import { BufferGeometry } from './core/BufferGeometry.js';
-import { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 import { InterleavedBuffer } from './core/InterleavedBuffer.js';
 import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform.js';
-import { Raycaster } from './core/Raycaster.js';
 import { Curve } from './extras/core/Curve.js';
 import { Path } from './extras/core/Path.js';
 import { AxesHelper } from './helpers/AxesHelper.js';
@@ -47,7 +45,6 @@ import { DataTextureLoader } from './loaders/DataTextureLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
 import { LineBasicMaterial } from './materials/LineBasicMaterial.js';
-import { MeshPhysicalMaterial } from './materials/MeshPhysicalMaterial.js';
 import { PointsMaterial } from './materials/PointsMaterial.js';
 import { ShaderMaterial } from './materials/ShaderMaterial.js';
 import { Box2 } from './math/Box2.js';
@@ -941,23 +938,6 @@ SkinnedMesh.prototype.initBones = function () {
 
 };
 
-Object.defineProperty( Curve.prototype, '__arcLengthDivisions', {
-
-	get: function () {
-
-		console.warn( 'THREE.Curve: .__arcLengthDivisions is now .arcLengthDivisions.' );
-		return this.arcLengthDivisions;
-
-	},
-	set: function ( value ) {
-
-		console.warn( 'THREE.Curve: .__arcLengthDivisions is now .arcLengthDivisions.' );
-		this.arcLengthDivisions = value;
-
-	}
-
-} );
-
 //
 
 PerspectiveCamera.prototype.setLens = function ( focalLength, filmGauge ) {
@@ -1221,63 +1201,6 @@ Object.defineProperties( BufferGeometry.prototype, {
 
 } );
 
-Object.defineProperties( InstancedBufferGeometry.prototype, {
-
-	maxInstancedCount: {
-		get: function () {
-
-			console.warn( 'THREE.InstancedBufferGeometry: .maxInstancedCount has been renamed to .instanceCount.' );
-			return this.instanceCount;
-
-		},
-		set: function ( value ) {
-
-			console.warn( 'THREE.InstancedBufferGeometry: .maxInstancedCount has been renamed to .instanceCount.' );
-			this.instanceCount = value;
-
-		}
-	}
-
-} );
-
-Object.defineProperties( Raycaster.prototype, {
-
-	linePrecision: {
-		get: function () {
-
-			console.warn( 'THREE.Raycaster: .linePrecision has been deprecated. Use .params.Line.threshold instead.' );
-			return this.params.Line.threshold;
-
-		},
-		set: function ( value ) {
-
-			console.warn( 'THREE.Raycaster: .linePrecision has been deprecated. Use .params.Line.threshold instead.' );
-			this.params.Line.threshold = value;
-
-		}
-	}
-
-} );
-
-Object.defineProperties( InterleavedBuffer.prototype, {
-
-	dynamic: {
-		get: function () {
-
-			console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
-			return this.usage === DynamicDrawUsage;
-
-		},
-		set: function ( value ) {
-
-			console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
-			this.setUsage( value );
-
-		}
-	}
-
-} );
-
 InterleavedBuffer.prototype.setDynamic = function ( value ) {
 
 	console.warn( 'THREE.InterleavedBuffer: .setDynamic() has been deprecated. Use .setUsage() instead.' );
@@ -1393,25 +1316,6 @@ Object.defineProperties( Material.prototype, {
 
 			console.warn( 'THREE.' + this.type + ': .stencilMask has been removed. Use .stencilFuncMask instead.' );
 			this.stencilFuncMask = value;
-
-		}
-	}
-
-} );
-
-Object.defineProperties( MeshPhysicalMaterial.prototype, {
-
-	transparency: {
-		get: function () {
-
-			console.warn( 'THREE.MeshPhysicalMaterial: .transparency has been renamed to .transmission.' );
-			return this.transmission;
-
-		},
-		set: function ( value ) {
-
-			console.warn( 'THREE.MeshPhysicalMaterial: .transparency has been renamed to .transmission.' );
-			this.transmission = value;
 
 		}
 	}
