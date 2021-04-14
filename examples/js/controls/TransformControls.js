@@ -480,8 +480,7 @@
 				} // Apply rotation snap
 
 
-				if ( this.rotationSnap ) this.rotationAngle = Math.round( this.rotationAngle / this.rotationSnap ) * this.rotationSnap;
-				this.rotationAngle = this.rotationAngle; // Apply rotate
+				if ( this.rotationSnap ) this.rotationAngle = Math.round( this.rotationAngle / this.rotationSnap ) * this.rotationSnap; // Apply rotate
 
 				if ( space === 'local' && axis !== 'E' && axis !== 'XYZE' ) {
 
