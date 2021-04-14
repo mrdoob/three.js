@@ -1325,25 +1325,6 @@ Object.defineProperties( Material.prototype, {
 
 } );
 
-Object.defineProperties( MeshPhysicalMaterial.prototype, {
-
-	transparency: {
-		get: function () {
-
-			console.warn( 'THREE.MeshPhysicalMaterial: .transparency has been renamed to .transmission.' );
-			return this.transmission;
-
-		},
-		set: function ( value ) {
-
-			console.warn( 'THREE.MeshPhysicalMaterial: .transparency has been renamed to .transmission.' );
-			this.transmission = value;
-
-		}
-	}
-
-} );
-
 Object.defineProperties( ShaderMaterial.prototype, {
 
 	derivatives: {
