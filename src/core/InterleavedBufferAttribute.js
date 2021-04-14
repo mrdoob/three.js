@@ -1,42 +1,32 @@
 import { Vector3 } from '../math/Vector3.js';
 import { BufferAttribute } from './BufferAttribute.js';
 
-const _vector = new Vector3();
+const _vector = new /*@__PURE__*/ Vector3();
 
-function InterleavedBufferAttribute( buffer, itemSize, type, normalized, stride, offset, count ) {
+class InterleavedBufferAttribute {
 
-	this.name = '';
+	constructor( buffer, itemSize, type, normalized, stride, offset, count ) {
 
-	this.data = buffer;
-	this.array = new type( buffer.array.buffer, offset );
-	this.itemSize = itemSize;
-	this.type = type;
-	this.normalized = normalized === true;
-	this.stride = stride;
-	this.offset = offset;
-	this.count = count;
+		this.name = '';
 
-}
-
-Object.defineProperties( InterleavedBufferAttribute.prototype, {
-
-	needsUpdate: {
-
-		set: function ( value ) {
-
-			this.data.needsUpdate = value;
-
-		}
+		this.data = buffer;
+		this.array = new type( buffer.array.buffer, offset );
+		this.itemSize = itemSize;
+		this.type = type;
+		this.normalized = normalized === true;
+		this.stride = stride;
+		this.offset = offset;
+		this.count = count;
 
 	}
 
-} );
+	set needsUpdate( value ) {
 
-Object.assign( InterleavedBufferAttribute.prototype, {
+		this.data.needsUpdate = value;
 
-	isInterleavedBufferAttribute: true,
+	}
 
-	applyMatrix4: function ( m ) {
+	applyMatrix4( m ) {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
@@ -52,9 +42,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	applyNormalMatrix: function ( m ) {
+	applyNormalMatrix( m ) {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
@@ -70,9 +60,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	transformDirection: function ( m ) {
+	transformDirection( m ) {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
@@ -88,9 +78,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setX: function ( index, x ) {
+	setX( index, x ) {
 
 		// Note: Assuming stride is multiple of type.BYTES_PER_ELEMENT
 
@@ -98,57 +88,57 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setY: function ( index, y ) {
+	setY( index, y ) {
 
 		this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT + 1 ] = y;
 
 		return this;
 
-	},
+	}
 
-	setZ: function ( index, z ) {
+	setZ( index, z ) {
 
 		this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT + 2 ] = z;
 
 		return this;
 
-	},
+	}
 
-	setW: function ( index, w ) {
+	setW( index, w ) {
 
 		this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT + 3 ] = w;
 
 		return this;
 
-	},
+	}
 
-	getX: function ( index ) {
+	getX( index ) {
 
 		return this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT ];
 
-	},
+	}
 
-	getY: function ( index ) {
+	getY( index ) {
 
 		return this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT + 1 ];
 
-	},
+	}
 
-	getZ: function ( index ) {
+	getZ( index ) {
 
 		return this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT + 2 ];
 
-	},
+	}
 
-	getW: function ( index ) {
+	getW( index ) {
 
 		return this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT + 3 ];
 
-	},
+	}
 
-	setXY: function ( index, x, y ) {
+	setXY( index, x, y ) {
 
 		index = index * this.stride / this.type.BYTES_PER_ELEMENT;
 
@@ -157,9 +147,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setXYZ: function ( index, x, y, z ) {
+	setXYZ( index, x, y, z ) {
 
 		index = index * this.stride / this.type.BYTES_PER_ELEMENT;
 
@@ -169,9 +159,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setXYZW: function ( index, x, y, z, w ) {
+	setXYZW( index, x, y, z, w ) {
 
 		index = index * this.stride / this.type.BYTES_PER_ELEMENT;
 
@@ -182,9 +172,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		this.name = source.name;
 		this.data = source.data;
@@ -198,9 +188,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function ( data ) {
+	clone( data ) {
 
 		if ( data === undefined ) {
 
@@ -248,9 +238,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		}
 
-	},
+	}
 
-	toJSON: function ( data ) {
+	toJSON( data ) {
 
 		if ( data === undefined ) {
 
@@ -310,6 +300,8 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 	}
 
-} );
+}
+
+InterleavedBufferAttribute.prototype.isInterleavedBufferAttribute = true;
 
 export { InterleavedBufferAttribute };

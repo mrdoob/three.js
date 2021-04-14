@@ -1270,7 +1270,7 @@
 						const m7 = parseFloat( lp.getToken() );
 						const m8 = parseFloat( lp.getToken() );
 						const matrix = new THREE.Matrix4().set( m0, m1, m2, posX, m3, m4, m5, posY, m6, m7, m8, posZ, 0, 0, 0, 1 );
-						const fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
+						let fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
 
 						if ( scope.fileMap[ fileName ] ) {
 

@@ -1,42 +1,38 @@
 import { InterleavedBufferAttribute } from './InterleavedBufferAttribute.js';
 
-function InstancedInterleavedBufferAttribute( buffer, itemSize, type, normalized, stride, offset, count, meshPerAttribute ) {
+class InstancedInterleavedBufferAttribute extends InterleavedBufferAttribute {
 
-	InterleavedBufferAttribute.call( this, buffer, itemSize, type, normalized, stride, offset, count );
+	constructor( buffer, itemSize, type, normalized, stride, offset, count, meshPerAttribute ) {
 
-	this.meshPerAttribute = meshPerAttribute || 1;
+		super( buffer, itemSize, type, normalized, stride, offset, count );
 
-}
+		this.meshPerAttribute = meshPerAttribute || 1;
 
-InstancedInterleavedBufferAttribute.prototype = Object.assign( Object.create( InterleavedBufferAttribute.prototype ), {
+	}
 
-	constructor: InstancedInterleavedBufferAttribute,
+	copy( source ) {
 
-	isInstancedInterleavedBufferAttribute: true,
-
-	copy: function ( source ) {
-
-		InterleavedBufferAttribute.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.meshPerAttribute = source.meshPerAttribute;
 
 		return this;
 
-	},
+	}
 
-	clone: function ( data ) {
+	clone( data ) {
 
-		const ib = InterleavedBufferAttribute.prototype.clone.call( this, data );
+		const ib = super.clone( data );
 
 		ib.meshPerAttribute = this.meshPerAttribute;
 
 		return ib;
 
-	},
+	}
 
-	toJSON: function ( data ) {
+	toJSON( data ) {
 
-		const json = InterleavedBufferAttribute.prototype.toJSON.call( this, data );
+		const json = super.toJSON( data );
 
 		json.isInstancedInterleavedBufferAttribute = true;
 		json.meshPerAttribute = this.meshPerAttribute;
@@ -45,6 +41,8 @@ InstancedInterleavedBufferAttribute.prototype = Object.assign( Object.create( In
 
 	}
 
-} );
+}
+
+InstancedInterleavedBufferAttribute.prototype.isInstancedInterleavedBufferAttribute = true;
 
 export { InstancedInterleavedBufferAttribute };
