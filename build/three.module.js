@@ -21815,19 +21815,17 @@ class Group extends Object3D {
 
 Group.prototype.isGroup = true;
 
-function WebXRController() {
+class WebXRController {
 
-	this._targetRay = null;
-	this._grip = null;
-	this._hand = null;
+	constructor() {
 
-}
+		this._targetRay = null;
+		this._grip = null;
+		this._hand = null;
 
-Object.assign( WebXRController.prototype, {
+	}
 
-	constructor: WebXRController,
-
-	getHandSpace: function () {
+	getHandSpace() {
 
 		if ( this._hand === null ) {
 
@@ -21842,9 +21840,9 @@ Object.assign( WebXRController.prototype, {
 
 		return this._hand;
 
-	},
+	}
 
-	getTargetRaySpace: function () {
+	getTargetRaySpace() {
 
 		if ( this._targetRay === null ) {
 
@@ -21856,9 +21854,9 @@ Object.assign( WebXRController.prototype, {
 
 		return this._targetRay;
 
-	},
+	}
 
-	getGripSpace: function () {
+	getGripSpace() {
 
 		if ( this._grip === null ) {
 
@@ -21870,9 +21868,9 @@ Object.assign( WebXRController.prototype, {
 
 		return this._grip;
 
-	},
+	}
 
-	dispatchEvent: function ( event ) {
+	dispatchEvent( event ) {
 
 		if ( this._targetRay !== null ) {
 
@@ -21894,9 +21892,9 @@ Object.assign( WebXRController.prototype, {
 
 		return this;
 
-	},
+	}
 
-	disconnect: function ( inputSource ) {
+	disconnect( inputSource ) {
 
 		this.dispatchEvent( { type: 'disconnected', data: inputSource } );
 
@@ -21920,9 +21918,9 @@ Object.assign( WebXRController.prototype, {
 
 		return this;
 
-	},
+	}
 
-	update: function ( inputSource, frame, referenceSpace ) {
+	update( inputSource, frame, referenceSpace ) {
 
 		let inputPose = null;
 		let gripPose = null;
@@ -22053,7 +22051,7 @@ Object.assign( WebXRController.prototype, {
 
 	}
 
-} );
+}
 
 class WebXRManager extends EventDispatcher {
 

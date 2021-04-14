@@ -16099,15 +16099,14 @@
 
 	Group.prototype.isGroup = true;
 
-	function WebXRController() {
-		this._targetRay = null;
-		this._grip = null;
-		this._hand = null;
-	}
+	class WebXRController {
+		constructor() {
+			this._targetRay = null;
+			this._grip = null;
+			this._hand = null;
+		}
 
-	Object.assign(WebXRController.prototype, {
-		constructor: WebXRController,
-		getHandSpace: function () {
+		getHandSpace() {
 			if (this._hand === null) {
 				this._hand = new Group();
 				this._hand.matrixAutoUpdate = false;
@@ -16119,8 +16118,9 @@
 			}
 
 			return this._hand;
-		},
-		getTargetRaySpace: function () {
+		}
+
+		getTargetRaySpace() {
 			if (this._targetRay === null) {
 				this._targetRay = new Group();
 				this._targetRay.matrixAutoUpdate = false;
@@ -16128,8 +16128,9 @@
 			}
 
 			return this._targetRay;
-		},
-		getGripSpace: function () {
+		}
+
+		getGripSpace() {
 			if (this._grip === null) {
 				this._grip = new Group();
 				this._grip.matrixAutoUpdate = false;
@@ -16137,8 +16138,9 @@
 			}
 
 			return this._grip;
-		},
-		dispatchEvent: function (event) {
+		}
+
+		dispatchEvent(event) {
 			if (this._targetRay !== null) {
 				this._targetRay.dispatchEvent(event);
 			}
@@ -16152,8 +16154,9 @@
 			}
 
 			return this;
-		},
-		disconnect: function (inputSource) {
+		}
+
+		disconnect(inputSource) {
 			this.dispatchEvent({
 				type: 'disconnected',
 				data: inputSource
@@ -16172,8 +16175,9 @@
 			}
 
 			return this;
-		},
-		update: function (inputSource, frame, referenceSpace) {
+		}
+
+		update(inputSource, frame, referenceSpace) {
 			let inputPose = null;
 			let gripPose = null;
 			let handPose = null;
@@ -16268,7 +16272,8 @@
 
 			return this;
 		}
-	});
+
+	}
 
 	class WebXRManager extends EventDispatcher {
 		constructor(renderer, gl) {
