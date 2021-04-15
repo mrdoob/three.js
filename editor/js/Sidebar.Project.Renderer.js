@@ -117,6 +117,7 @@ function SidebarProjectRenderer( editor ) {
 		currentRenderer.toneMappingExposure = toneMappingExposure.getValue();
 
 		signals.rendererCreated.dispatch( currentRenderer );
+		signals.rendererUpdated.dispatch();
 
 	}
 
