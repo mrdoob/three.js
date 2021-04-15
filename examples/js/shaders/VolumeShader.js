@@ -27,7 +27,11 @@
 				value: null
 			}
 		},
-		vertexShader: `varying vec4 v_nearpos;
+		vertexShader:
+	/* glsl */
+	`
+
+		varying vec4 v_nearpos;
 		varying vec4 v_farpos;
 		varying vec3 v_position;
 
@@ -56,7 +60,11 @@
 				v_position = position;
 				gl_Position = projectionMatrix * viewMatrix * modelMatrix * position4;
 		}`,
-		fragmentShader: `precision highp float;
+		fragmentShader:
+	/* glsl */
+	`
+
+				precision highp float;
 				precision mediump sampler3D;
 
 				uniform vec3 u_size;

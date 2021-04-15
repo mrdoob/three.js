@@ -17,9 +17,9 @@ var HorizontalBlurShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -28,9 +28,9 @@ var HorizontalBlurShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform sampler2D tDiffuse;
+		uniform sampler2D tDiffuse;
 		uniform float h;
 
 		varying vec2 vUv;

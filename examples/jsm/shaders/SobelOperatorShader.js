@@ -18,9 +18,9 @@ const SobelOperatorShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -30,9 +30,9 @@ const SobelOperatorShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform sampler2D tDiffuse;
+		uniform sampler2D tDiffuse;
 		uniform vec2 resolution;
 		varying vec2 vUv;
 

@@ -18,9 +18,9 @@ const NormalMapShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -29,9 +29,9 @@ const NormalMapShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform float height;
+		uniform float height;
 		uniform vec2 resolution;
 		uniform sampler2D heightMap;
 

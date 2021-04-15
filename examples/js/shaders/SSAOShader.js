@@ -53,7 +53,11 @@
 				value: 0.05
 			}
 		},
-		vertexShader: `varying vec2 vUv;
+		vertexShader:
+	/* glsl */
+	`
+
+		varying vec2 vUv;
 
 		void main() {
 
@@ -62,7 +66,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `uniform sampler2D tDiffuse;
+		fragmentShader:
+	/* glsl */
+	`
+
+		uniform sampler2D tDiffuse;
 		uniform sampler2D tNormal;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNoise;

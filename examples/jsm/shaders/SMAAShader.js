@@ -23,9 +23,9 @@ const SMAAEdgesShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`uniform vec2 resolution;
+		uniform vec2 resolution;
 
 		varying vec2 vUv;
 		varying vec4 vOffset[ 3 ];
@@ -46,9 +46,9 @@ const SMAAEdgesShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform sampler2D tDiffuse;
+		uniform sampler2D tDiffuse;
 
 		varying vec2 vUv;
 		varying vec4 vOffset[ 3 ];
@@ -133,9 +133,9 @@ const SMAAWeightsShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`uniform vec2 resolution;
+		uniform vec2 resolution;
 
 		varying vec2 vUv;
 		varying vec4 vOffset[ 3 ];
@@ -163,9 +163,9 @@ const SMAAWeightsShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`#define SMAASampleLevelZeroOffset( tex, coord, offset ) texture2D( tex, coord + float( offset ) * resolution, 0.0 )
+		#define SMAASampleLevelZeroOffset( tex, coord, offset ) texture2D( tex, coord + float( offset ) * resolution, 0.0 )
 
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tArea;
@@ -377,9 +377,9 @@ const SMAABlendShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`uniform vec2 resolution;
+		uniform vec2 resolution;
 
 		varying vec2 vUv;
 		varying vec4 vOffset[ 2 ];
@@ -399,9 +399,9 @@ const SMAABlendShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform sampler2D tDiffuse;
+		uniform sampler2D tDiffuse;
 		uniform sampler2D tColor;
 		uniform vec2 resolution;
 

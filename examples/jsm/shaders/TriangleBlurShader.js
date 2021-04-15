@@ -21,9 +21,9 @@ const TriangleBlurShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -32,9 +32,9 @@ const TriangleBlurShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`#include <common>
+		#include <common>
 
 		#define ITERATIONS 10.0
 

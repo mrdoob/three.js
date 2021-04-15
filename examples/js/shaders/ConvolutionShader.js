@@ -22,7 +22,11 @@
 				value: []
 			}
 		},
-		vertexShader: `uniform vec2 uImageIncrement;
+		vertexShader:
+	/* glsl */
+	`
+
+		uniform vec2 uImageIncrement;
 
 		varying vec2 vUv;
 
@@ -32,7 +36,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `uniform float cKernel[ KERNEL_SIZE_INT ];
+		fragmentShader:
+	/* glsl */
+	`
+
+		uniform float cKernel[ KERNEL_SIZE_INT ];
 
 		uniform sampler2D tDiffuse;
 		uniform vec2 uImageIncrement;

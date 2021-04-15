@@ -20,7 +20,11 @@
 				value: 0.05
 			}
 		},
-		vertexShader: `varying vec2 vUv;
+		vertexShader:
+	/* glsl */
+	`
+
+		varying vec2 vUv;
 
 		void main() {
 
@@ -28,7 +32,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `uniform float height;
+		fragmentShader:
+	/* glsl */
+	`
+
+		uniform float height;
 		uniform vec2 resolution;
 		uniform sampler2D heightMap;
 

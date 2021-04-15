@@ -14,9 +14,9 @@ const VignetteShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -25,9 +25,9 @@ const VignetteShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform float offset;
+		uniform float offset;
 		uniform float darkness;
 
 		uniform sampler2D tDiffuse;

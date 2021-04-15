@@ -13,9 +13,9 @@ const BlendShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -24,9 +24,9 @@ const BlendShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform float opacity;
+		uniform float opacity;
 		uniform float mixRatio;
 
 		uniform sampler2D tDiffuse1;

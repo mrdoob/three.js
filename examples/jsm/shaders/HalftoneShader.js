@@ -23,9 +23,9 @@ const HalftoneShader = {
 		'disable': { value: false }
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUV;
+		varying vec2 vUV;
 
 		void main() {
 
@@ -34,9 +34,9 @@ const HalftoneShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`#define SQRT2_MINUS_ONE 0.41421356
+		#define SQRT2_MINUS_ONE 0.41421356
 		#define SQRT2_HALF_MINUS_ONE 0.20710678
 		#define PI2 6.28318531
 		#define SHAPE_DOT 1

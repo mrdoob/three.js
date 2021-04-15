@@ -15,9 +15,9 @@ const DOFMipMapShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -26,9 +26,9 @@ const DOFMipMapShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform float focus;
+		uniform float focus;
 		uniform float maxblur;
 
 		uniform sampler2D tColor;

@@ -17,7 +17,11 @@
 				value: null
 			}
 		},
-		vertexShader: `varying vec2 vUv;
+		vertexShader:
+	/* glsl */
+	`
+
+		varying vec2 vUv;
 
 		void main() {
 
@@ -25,7 +29,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `uniform float damp;
+		fragmentShader:
+	/* glsl */
+	`
+
+		uniform float damp;
 
 		uniform sampler2D tOld;
 		uniform sampler2D tNew;

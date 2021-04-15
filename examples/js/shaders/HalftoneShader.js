@@ -48,7 +48,11 @@
 				value: false
 			}
 		},
-		vertexShader: `varying vec2 vUV;
+		vertexShader:
+	/* glsl */
+	`
+
+		varying vec2 vUV;
 
 		void main() {
 
@@ -56,7 +60,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 
 		}`,
-		fragmentShader: `#define SQRT2_MINUS_ONE 0.41421356
+		fragmentShader:
+	/* glsl */
+	`
+
+		#define SQRT2_MINUS_ONE 0.41421356
 		#define SQRT2_HALF_MINUS_ONE 0.20710678
 		#define PI2 6.28318531
 		#define SHAPE_DOT 1

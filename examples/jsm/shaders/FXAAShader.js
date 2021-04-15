@@ -18,9 +18,9 @@ const FXAAShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -67,7 +67,9 @@ const FXAAShader = {
 	//
 	//----------------------------------------------------------------------------------
 
-		`precision highp float;
+		/* glsl */`
+
+		precision highp float;
 
 		uniform sampler2D tDiffuse;
 

@@ -21,8 +21,9 @@ const ParallaxShader = {
 		'parallaxMaxLayers': { value: null }
 	},
 
-	vertexShader:
-		`varying vec2 vUv;
+	vertexShader: /* glsl */`
+
+		varying vec2 vUv;
 		varying vec3 vViewPosition;
 		varying vec3 vNormal;
 
@@ -36,8 +37,9 @@ const ParallaxShader = {
 
 		}`,
 
-	fragmentShader:
-		`uniform sampler2D bumpMap;
+	fragmentShader: /* glsl */`
+
+		uniform sampler2D bumpMap;
 		uniform sampler2D map;
 
 		uniform float parallaxScale;

@@ -36,7 +36,11 @@
 				value: 1000.0
 			}
 		},
-		vertexShader: `varying vec2 vUv;
+		vertexShader:
+	/* glsl */
+	`
+
+		varying vec2 vUv;
 
 		void main() {
 
@@ -44,7 +48,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `#include <common>
+		fragmentShader:
+	/* glsl */
+	`
+
+		#include <common>
 
 		varying vec2 vUv;
 

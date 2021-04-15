@@ -24,9 +24,9 @@ const WaterRefractionShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`uniform mat4 textureMatrix;
+		uniform mat4 textureMatrix;
 
 		varying vec2 vUv;
 		varying vec4 vUvRefraction;
@@ -41,9 +41,9 @@ const WaterRefractionShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform vec3 color;
+		uniform vec3 color;
 		uniform float time;
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tDudv;
