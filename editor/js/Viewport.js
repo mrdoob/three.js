@@ -347,7 +347,7 @@ function Viewport( editor ) {
 
 	} );
 
-	signals.rendererChanged.add( function ( newRenderer ) {
+	signals.rendererCreated.add( function ( newRenderer ) {
 
 		if ( renderer !== null ) {
 

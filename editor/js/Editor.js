@@ -41,7 +41,7 @@ function Editor() {
 		transformModeChanged: new Signal(),
 		snapChanged: new Signal(),
 		spaceChanged: new Signal(),
-		rendererChanged: new Signal(),
+		rendererCreated: new Signal(),
 		rendererUpdated: new Signal(),
 
 		sceneBackgroundChanged: new Signal(),
