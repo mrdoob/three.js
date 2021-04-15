@@ -21,9 +21,7 @@ import {
 	CanvasTexture,
 	LinearFilter,
 	ClampToEdgeWrapping,
-	TextureLoader,
-	LatheGeometry,
-	LinearToneMapping
+	TextureLoader
 } from '../../../build/three.module.js';
 
 const _taskCache = new WeakMap();
