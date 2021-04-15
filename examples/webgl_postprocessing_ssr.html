@@ -197,6 +197,10 @@
 				}
 
 			} );
+			ssrPass.thickness = 0.018;
+			gui.add( ssrPass, 'thickness' ).min( 0 ).max( .1 ).step( .0001 );
+			ssrPass.infiniteThick = false
+			gui.add( ssrPass, 'infiniteThick' );
 			gui.add( params, 'autoRotate' ).onChange( () => {
 
 				controls.enabled = ! params.autoRotate;
@@ -254,11 +258,8 @@
 				groundReflector.opacity = ssrPass.opacity;
 
 			} );
-			ssrPass.surfDist = 0.0015;
-			folder.add( ssrPass, 'surfDist' ).min( 0 ).max( .005 ).step( .0001 );
-			folder.add( ssrPass, 'infiniteThick' );
-			folder.add( ssrPass, 'thickTolerance' ).min( 0 ).max( .05 ).step( .0001 );
 			folder.add( ssrPass, 'blur' );
+			// folder.open()
 			// gui.close()
 
 		}

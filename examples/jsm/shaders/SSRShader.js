@@ -32,9 +32,8 @@ var SSRShader = {
 		'opacity': { value: .5 },
 		'maxDistance': { value: 180 },
 		'cameraRange': { value: 0 },
-		'surfDist': { value: .007 },
-		'thickTolerance': { value: .03 },
-
+		'thickness': { value: .018 },
+		
 	},
 
 	vertexShader: /* glsl */`
@@ -65,10 +64,9 @@ var SSRShader = {
 		uniform float cameraNear;
 		uniform float cameraFar;
 		uniform float maxDistance;
-		uniform float surfDist;
+		uniform float thickness;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
-		uniform float thickTolerance;
 		#include <packing>
 		float pointToLineDistance(vec3 x0, vec3 x1, vec3 x2) {
 			//x0: point, x1: linePointA, x2: linePointB
@@ -180,25 +178,36 @@ var SSRShader = {
 					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 					float recipVPZ=1./viewPosition.z;
 					float viewReflectRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
-					float sD=surfDist*cW;
 				#else
 					float viewReflectRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
-					float sD=surfDist;
 				#endif
-				if(viewReflectRayZ-sD>vZ) continue;
 
+				if(viewReflectRayZ>vZ) continue;
+
+				bool hit;
 				#ifdef INFINITE_THICK
-					if(viewReflectRayZ+thickTolerance*clipW<vP.z) break;
+					hit=true;
+				#else
+					float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
+
+					float minThickness;
+					vec2 xyNeighbor=xy;
+					xyNeighbor.x+=1.;
+					vec2 uvNeighbor=xyNeighbor/resolution;
+					vec3 vPNeighbor=getViewPosition(uvNeighbor,d,cW);
+					minThickness=vPNeighbor.x-vP.x;
+					minThickness*=3.;
+					float tk=max(minThickness,thickness);
+
+					hit=away<=tk;
 				#endif
-				float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
 
-				float op=opacity;
-
-				if(away<sD){
+				if(hit){
 					vec3 vN=getViewNormal( uv );
 					if(dot(viewReflectDir,vN)>=0.) continue;
 					float distance=pointPlaneDistance(vP,viewPosition,viewNormal);
 					if(distance>maxDistance) break;
+					float op=opacity;
 					#ifdef DISTANCE_ATTENUATION
 						float ratio=1.-(distance/maxDistance);
 						float attenuation=ratio*ratio;
