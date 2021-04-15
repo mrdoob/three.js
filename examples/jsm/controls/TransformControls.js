@@ -52,7 +52,12 @@ class TransformControls extends Object3D {
 
 		this.visible = false;
 		this.domElement = domElement;
-		this.previousState = null;
+		this.previousState = {
+			isActive: false,
+			position: new Vector3(),
+			quaternion: new Quaternion(),
+			scale: new Vector3()
+		};
 
 		const _gizmo = new TransformControlsGizmo();
 		this._gizmo = _gizmo;
@@ -234,11 +239,10 @@ class TransformControls extends Object3D {
 
 		if ( this.object === undefined || this.dragging === true || pointer.button !== 0 ) return;
 
-		this.previousState = {
-			position: this.object.position.clone(),
-			quaternion: this.object.quaternion.clone(),
-			scale: this.object.scale.clone()
-		};
+		this.previousState.position.copy( this.object.position );
+		this.previousState.quaternion.copy( this.object.quaternion );
+		this.previousState.scale.copy( this.object.scale );
+		this.previousState.isActive = true;
 
 		if ( this.axis !== null ) {
 
@@ -553,7 +557,7 @@ class TransformControls extends Object3D {
 
 		this.dragging = false;
 		this.axis = null;
-		this.previousState = null;
+		this.previousState.isActive = false;
 
 	}
 
@@ -589,7 +593,7 @@ class TransformControls extends Object3D {
 		this.object = undefined;
 		this.visible = false;
 		this.axis = null;
-		this.previousState = null;
+		this.previousState.isActive = false;
 
 		return this;
 
@@ -662,7 +666,7 @@ class TransformControls extends Object3D {
 
 	cancel( continueTransform ) {
 
-		if ( this.previousState !== null ) {
+		if ( this.previousState.isActive ) {
 
 			this.object.position.copy( this.previousState.position );
 			this.object.quaternion.copy( this.previousState.quaternion );
