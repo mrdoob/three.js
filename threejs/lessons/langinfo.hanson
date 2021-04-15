@@ -7,6 +7,7 @@
   link: 'http://threejsfundamentals.org/',
   commentSectionHeader: `
     <div>
+       <a href="https://github.com/gfxfundamentals/threejsfundamentals/discussions">Question</a>?
        <a href="https://github.com/gfxfundamentals/threejsfundamentals/issues/new?assignees=&labels=suggested+topic&template=suggest-topic.md&title=%5BSUGGESTION%5D">Suggestion</a>?
        <a href="https://github.com/gfxfundamentals/threejsfundamentals/issues/new?assignees=&labels=&template=request.md&title=">Request</a>?
        <a href="https://github.com/gfxfundamentals/threejsfundamentals/issues/new?assignees=&labels=bug+%2F+issue&template=bug-issue-report.md&title=">Issue</a>?
