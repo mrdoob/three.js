@@ -7,7 +7,7 @@ import {
 	UniformsUtils,
 	WebGLRenderTarget
 } from '../../../build/three.module.js';
-import { Pass } from '../postprocessing/Pass.js';
+import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 /**
@@ -20,46 +20,44 @@ import { CopyShader } from '../shaders/CopyShader.js';
 *
 */
 
-var SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
+class SSAARenderPass extends Pass {
 
-	Pass.call( this );
+	constructor( scene, camera, clearColor, clearAlpha ) {
 
-	this.scene = scene;
-	this.camera = camera;
+		super();
 
-	this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
-	this.unbiased = true;
+		this.scene = scene;
+		this.camera = camera;
 
-	// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
-	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
-	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
-	this._oldClearColor = new Color();
+		this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
+		this.unbiased = true;
 
-	if ( CopyShader === undefined ) console.error( 'THREE.SSAARenderPass relies on CopyShader' );
+		// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
+		this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
+		this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
+		this._oldClearColor = new Color();
 
-	var copyShader = CopyShader;
-	this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
+		if ( CopyShader === undefined ) console.error( 'THREE.SSAARenderPass relies on CopyShader' );
 
-	this.copyMaterial = new ShaderMaterial(	{
-		uniforms: this.copyUniforms,
-		vertexShader: copyShader.vertexShader,
-		fragmentShader: copyShader.fragmentShader,
-		premultipliedAlpha: true,
-		transparent: true,
-		blending: AdditiveBlending,
-		depthTest: false,
-		depthWrite: false
-	} );
+		const copyShader = CopyShader;
+		this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
 
-	this.fsQuad = new Pass.FullScreenQuad( this.copyMaterial );
+		this.copyMaterial = new ShaderMaterial(	{
+			uniforms: this.copyUniforms,
+			vertexShader: copyShader.vertexShader,
+			fragmentShader: copyShader.fragmentShader,
+			premultipliedAlpha: true,
+			transparent: true,
+			blending: AdditiveBlending,
+			depthTest: false,
+			depthWrite: false
+		} );
 
-};
+		this.fsQuad = new FullScreenQuad( this.copyMaterial );
 
-SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
+	}
 
-	constructor: SSAARenderPass,
-
-	dispose: function () {
+	dispose() {
 
 		if ( this.sampleRenderTarget ) {
 
@@ -68,15 +66,15 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		}
 
-	},
+	}
 
-	setSize: function ( width, height ) {
+	setSize( width, height ) {
 
 		if ( this.sampleRenderTarget )	this.sampleRenderTarget.setSize( width, height );
 
-	},
+	}
 
-	render: function ( renderer, writeBuffer, readBuffer ) {
+	render( renderer, writeBuffer, readBuffer ) {
 
 		if ( ! this.sampleRenderTarget ) {
 
@@ -85,24 +83,24 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		}
 
-		var jitterOffsets = SSAARenderPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
+		const jitterOffsets = _JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
 
-		var autoClear = renderer.autoClear;
+		const autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
 		renderer.getClearColor( this._oldClearColor );
-		var oldClearAlpha = renderer.getClearAlpha();
+		const oldClearAlpha = renderer.getClearAlpha();
 
-		var baseSampleWeight = 1.0 / jitterOffsets.length;
-		var roundingRange = 1 / 32;
+		const baseSampleWeight = 1.0 / jitterOffsets.length;
+		const roundingRange = 1 / 32;
 		this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
 
-		var width = readBuffer.width, height = readBuffer.height;
+		const width = readBuffer.width, height = readBuffer.height;
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
-		for ( var i = 0; i < jitterOffsets.length; i ++ ) {
+		for ( let i = 0; i < jitterOffsets.length; i ++ ) {
 
-			var jitterOffset = jitterOffsets[ i ];
+			const jitterOffset = jitterOffsets[ i ];
 
 			if ( this.camera.setViewOffset ) {
 
@@ -112,7 +110,7 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 			}
 
-			var sampleWeight = baseSampleWeight;
+			let sampleWeight = baseSampleWeight;
 
 			if ( this.unbiased ) {
 
@@ -120,7 +118,7 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 				// The following equation varies the sampleWeight per sample so that it is uniformly distributed
 				// across a range of values whose rounding errors cancel each other out.
 
-				var uniformCenteredDistribution = ( - 0.5 + ( i + 0.5 ) / jitterOffsets.length );
+				const uniformCenteredDistribution = ( - 0.5 + ( i + 0.5 ) / jitterOffsets.length );
 				sampleWeight += roundingRange * uniformCenteredDistribution;
 
 			}
@@ -151,7 +149,7 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	}
 
-} );
+}
 
 
 // These jitter vectors are specified in integers because it is easier.
@@ -159,7 +157,7 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 // before being used, thus these integers need to be scaled by 1/16.
 //
 // Sample patterns reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ff476218%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
-SSAARenderPass.JitterVectors = [
+const _JitterVectors = [
 	[
 		[ 0, 0 ]
 	],

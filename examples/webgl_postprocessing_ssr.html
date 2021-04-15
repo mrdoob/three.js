@@ -130,7 +130,7 @@
 
 			geometry = new THREE.PlaneBufferGeometry( 1, 1 );
 			groundReflector = new ReflectorForSSRPass( geometry, {
-				clipBias: 0,
+				clipBias: 0.0003,
 				textureWidth: window.innerWidth,
 				textureHeight: window.innerHeight,
 				color: 0x888888,

@@ -1,4 +1,4 @@
-import { zipSync, strToU8 } from '../libs/fflate.module.min.js';
+import * as fflate from '../libs/fflate.module.min.js';
 
 class USDZExporter {
 
@@ -34,7 +34,7 @@ class USDZExporter {
 		output += buildMaterials( materials );
 		output += buildTextures( textures );
 
-		const files = { 'model.usda': strToU8( output ) };
+		const files = { 'model.usda': fflate.strToU8( output ) };
 
 		for ( const uuid in textures ) {
 
@@ -70,7 +70,7 @@ class USDZExporter {
 
 		}
 
-		return zipSync( files, { level: 0 } );
+		return fflate.zipSync( files, { level: 0 } );
 
 	}
 

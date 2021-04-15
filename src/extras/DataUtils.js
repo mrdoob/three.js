@@ -1,11 +1,11 @@
 const _floatView = new Float32Array( 1 );
 const _int32View = new Int32Array( _floatView.buffer );
 
-const DataUtils = {
+class DataUtils {
 
 	// Converts float32 to float16 (stored as uint16 value).
 
-	toHalfFloat: function ( val ) {
+	static toHalfFloat( val ) {
 
 		// Source: http://gamedev.stackexchange.com/questions/17326/conversion-of-a-number-from-single-precision-floating-point-representation-to-a/17410#17410
 
@@ -54,6 +54,6 @@ const DataUtils = {
 
 	}
 
-};
+}
 
 export { DataUtils };
