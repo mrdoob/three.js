@@ -13,7 +13,11 @@
 				value: new THREE.Color( 0xffffff )
 			}
 		},
-		vertexShader: `varying vec2 vUv;
+		vertexShader:
+	/* glsl */
+	`
+
+		varying vec2 vUv;
 
 		void main() {
 
@@ -21,7 +25,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `uniform vec3 color;
+		fragmentShader:
+	/* glsl */
+	`
+
+		uniform vec3 color;
 		uniform sampler2D tDiffuse;
 
 		varying vec2 vUv;

@@ -24,7 +24,11 @@
 				value: null
 			}
 		},
-		vertexShader: `varying vec2 vUv;
+		vertexShader:
+	/* glsl */
+	`
+
+		varying vec2 vUv;
 
 		void main() {
 
@@ -32,7 +36,11 @@
 		 gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 	 }`,
-		fragmentShader: `varying vec2 vUv;
+		fragmentShader:
+	/* glsl */
+	`
+
+		varying vec2 vUv;
 
 		uniform sampler2D tInput;
 
@@ -69,7 +77,11 @@
 				value: new THREE.Vector3()
 			}
 		},
-		vertexShader: `varying vec2 vUv;
+		vertexShader:
+	/* glsl */
+	`
+
+		varying vec2 vUv;
 
 		void main() {
 
@@ -77,7 +89,11 @@
 		 gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 	 }`,
-		fragmentShader: `#define TAPS_PER_PASS 6.0
+		fragmentShader:
+	/* glsl */
+	`
+
+		#define TAPS_PER_PASS 6.0
 
 		varying vec2 vUv;
 
@@ -178,7 +194,11 @@
 				value: 0.69
 			}
 		},
-		vertexShader: `varying vec2 vUv;
+		vertexShader:
+	/* glsl */
+	`
+
+		varying vec2 vUv;
 
 		void main() {
 
@@ -186,7 +206,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `varying vec2 vUv;
+		fragmentShader:
+	/* glsl */
+	`
+
+		varying vec2 vUv;
 
 		uniform sampler2D tColors;
 		uniform sampler2D tGodRays;
@@ -224,7 +248,11 @@
 				value: new THREE.Color( 0x000000 )
 			}
 		},
-		vertexShader: `varying vec2 vUv;
+		vertexShader:
+	/* glsl */
+	`
+
+		varying vec2 vUv;
 
 		void main() {
 
@@ -232,7 +260,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `varying vec2 vUv;
+		fragmentShader:
+	/* glsl */
+	`
+
+		varying vec2 vUv;
 
 		uniform vec3 vSunPositionScreenSpace;
 		uniform float fAspect;

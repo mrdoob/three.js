@@ -18,9 +18,9 @@ const KaleidoShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -29,9 +29,9 @@ const KaleidoShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform sampler2D tDiffuse;
+		uniform sampler2D tDiffuse;
 		uniform float sides;
 		uniform float angle;
 

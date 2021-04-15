@@ -31,9 +31,9 @@ const GodRaysDepthMaskShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -42,9 +42,9 @@ const GodRaysDepthMaskShader = {
 
 	 }`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		uniform sampler2D tInput;
 
@@ -88,9 +88,9 @@ const GodRaysGenerateShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -99,9 +99,9 @@ const GodRaysGenerateShader = {
 
 	 }`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`#define TAPS_PER_PASS 6.0
+		#define TAPS_PER_PASS 6.0
 
 		varying vec2 vUv;
 
@@ -210,9 +210,9 @@ const GodRaysCombineShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -221,9 +221,9 @@ const GodRaysCombineShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		uniform sampler2D tColors;
 		uniform sampler2D tGodRays;
@@ -271,9 +271,9 @@ const GodRaysFakeSunShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -282,9 +282,9 @@ const GodRaysFakeSunShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		uniform vec3 vSunPositionScreenSpace;
 		uniform float fAspect;

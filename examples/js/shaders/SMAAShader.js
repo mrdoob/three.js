@@ -18,7 +18,11 @@
 				value: new THREE.Vector2( 1 / 1024, 1 / 512 )
 			}
 		},
-		vertexShader: `uniform vec2 resolution;
+		vertexShader:
+	/* glsl */
+	`
+
+		uniform vec2 resolution;
 
 		varying vec2 vUv;
 		varying vec4 vOffset[ 3 ];
@@ -38,7 +42,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `uniform sampler2D tDiffuse;
+		fragmentShader:
+	/* glsl */
+	`
+
+		uniform sampler2D tDiffuse;
 
 		varying vec2 vUv;
 		varying vec4 vOffset[ 3 ];
@@ -122,7 +130,11 @@
 				value: new THREE.Vector2( 1 / 1024, 1 / 512 )
 			}
 		},
-		vertexShader: `uniform vec2 resolution;
+		vertexShader:
+	/* glsl */
+	`
+
+		uniform vec2 resolution;
 
 		varying vec2 vUv;
 		varying vec4 vOffset[ 3 ];
@@ -149,7 +161,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `#define SMAASampleLevelZeroOffset( tex, coord, offset ) texture2D( tex, coord + float( offset ) * resolution, 0.0 )
+		fragmentShader:
+	/* glsl */
+	`
+
+		#define SMAASampleLevelZeroOffset( tex, coord, offset ) texture2D( tex, coord + float( offset ) * resolution, 0.0 )
 
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tArea;
@@ -361,7 +377,11 @@
 				value: new THREE.Vector2( 1 / 1024, 1 / 512 )
 			}
 		},
-		vertexShader: `uniform vec2 resolution;
+		vertexShader:
+	/* glsl */
+	`
+
+		uniform vec2 resolution;
 
 		varying vec2 vUv;
 		varying vec4 vOffset[ 2 ];
@@ -380,7 +400,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `uniform sampler2D tDiffuse;
+		fragmentShader:
+	/* glsl */
+	`
+
+		uniform sampler2D tDiffuse;
 		uniform sampler2D tColor;
 		uniform vec2 resolution;
 

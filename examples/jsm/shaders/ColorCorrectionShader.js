@@ -17,9 +17,9 @@ const ColorCorrectionShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -29,9 +29,9 @@ const ColorCorrectionShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform sampler2D tDiffuse;
+		uniform sampler2D tDiffuse;
 		uniform vec3 powRGB;
 		uniform vec3 mulRGB;
 		uniform vec3 addRGB;

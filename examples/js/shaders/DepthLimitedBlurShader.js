@@ -36,7 +36,11 @@
 				value: 10
 			}
 		},
-		vertexShader: `#include <common>
+		vertexShader:
+	/* glsl */
+	`
+
+		#include <common>
 
 		uniform vec2 size;
 
@@ -49,7 +53,11 @@
 
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 		}`,
-		fragmentShader: `#include <common>
+		fragmentShader:
+	/* glsl */
+	`
+
+		#include <common>
 		#include <packing>
 
 		uniform sampler2D tDiffuse;

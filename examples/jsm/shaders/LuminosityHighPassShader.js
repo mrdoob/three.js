@@ -21,9 +21,9 @@ const LuminosityHighPassShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -33,9 +33,9 @@ const LuminosityHighPassShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform sampler2D tDiffuse;
+		uniform sampler2D tDiffuse;
 		uniform vec3 defaultColor;
 		uniform float defaultOpacity;
 		uniform float luminosityThreshold;

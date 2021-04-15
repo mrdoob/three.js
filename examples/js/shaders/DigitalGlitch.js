@@ -50,12 +50,20 @@
 				value: 0.05
 			}
 		},
-		vertexShader: `varying vec2 vUv;
+		vertexShader:
+	/* glsl */
+	`
+
+		varying vec2 vUv;
 		void main() {
 			vUv = uv;
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 		}`,
-		fragmentShader: `uniform int byp; //should we apply the glitch ?
+		fragmentShader:
+	/* glsl */
+	`
+
+		uniform int byp; //should we apply the glitch ?
 
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tDisp;

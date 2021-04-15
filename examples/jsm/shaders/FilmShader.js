@@ -31,9 +31,9 @@ const FilmShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -42,9 +42,9 @@ const FilmShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`#include <common>
+		#include <common>
 
 		// control parameter
 		uniform float time;

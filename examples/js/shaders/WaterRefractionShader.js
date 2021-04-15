@@ -18,7 +18,11 @@
 				value: null
 			}
 		},
-		vertexShader: `uniform mat4 textureMatrix;
+		vertexShader:
+	/* glsl */
+	`
+
+		uniform mat4 textureMatrix;
 
 		varying vec2 vUv;
 		varying vec4 vUvRefraction;
@@ -32,7 +36,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `uniform vec3 color;
+		fragmentShader:
+	/* glsl */
+	`
+
+		uniform vec3 color;
 		uniform float time;
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tDudv;

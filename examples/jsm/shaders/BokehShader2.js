@@ -48,9 +48,9 @@ const BokehShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -59,9 +59,9 @@ const BokehShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`#include <common>
+		#include <common>
 
 		varying vec2 vUv;
 
@@ -358,9 +358,9 @@ const BokehDepthShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying float vViewZDepth;
+		varying float vViewZDepth;
 
 		void main() {
 
@@ -371,9 +371,9 @@ const BokehDepthShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform float mNear;
+		uniform float mNear;
 		uniform float mFar;
 
 		varying float vViewZDepth;

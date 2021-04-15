@@ -15,9 +15,9 @@ const ACESFilmicToneMappingShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -26,9 +26,9 @@ const ACESFilmicToneMappingShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`#define saturate(a) clamp( a, 0.0, 1.0 )
+		#define saturate(a) clamp( a, 0.0, 1.0 )
 
 		uniform sampler2D tDiffuse;
 

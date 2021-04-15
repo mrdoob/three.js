@@ -25,9 +25,9 @@ const ConvolutionShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`uniform vec2 uImageIncrement;
+		uniform vec2 uImageIncrement;
 
 		varying vec2 vUv;
 
@@ -38,9 +38,9 @@ const ConvolutionShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform float cKernel[ KERNEL_SIZE_INT ];
+		uniform float cKernel[ KERNEL_SIZE_INT ];
 
 		uniform sampler2D tDiffuse;
 		uniform vec2 uImageIncrement;

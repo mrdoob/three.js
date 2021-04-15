@@ -21,7 +21,11 @@
 				value: null
 			}
 		},
-		vertexShader: `uniform float mRefractionRatio;
+		vertexShader:
+	/* glsl */
+	`
+
+		uniform float mRefractionRatio;
 		uniform float mFresnelBias;
 		uniform float mFresnelScale;
 		uniform float mFresnelPower;
@@ -48,7 +52,11 @@
 			gl_Position = projectionMatrix * mvPosition;
 
 		}`,
-		fragmentShader: `uniform samplerCube tCube;
+		fragmentShader:
+	/* glsl */
+	`
+
+		uniform samplerCube tCube;
 
 		varying vec3 vReflect;
 		varying vec3 vRefract[3];
