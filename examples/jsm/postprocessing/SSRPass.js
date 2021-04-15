@@ -5,7 +5,6 @@ import {
 	DepthTexture,
 	SrcAlphaFactor,
 	OneMinusSrcAlphaFactor,
-	LinearFilter,
 	MeshNormalMaterial,
 	MeshBasicMaterial,
 	NearestFilter,
@@ -155,7 +154,6 @@ class SSRPass extends Pass {
 
 			}
 		} );
-	this.thickTolerance = SSRShader.uniforms.thickTolerance.value;
 
 		// beauty render target with depth buffer
 

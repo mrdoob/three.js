@@ -32,7 +32,7 @@ var SSRShader = {
 		'opacity': { value: .5 },
 		'maxDistance': { value: 180 },
 		'cameraRange': { value: 0 },
-    		'thickness': { value: .007 },
+		'thickness': { value: .018 },
 		
 	},
 
@@ -178,12 +178,10 @@ var SSRShader = {
 					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 					float recipVPZ=1./viewPosition.z;
 					float viewReflectRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
-					float tk=thickness*cW;
 				#else
 					float viewReflectRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
-					float tk=thickness;
 				#endif
-				
+
 				if(viewReflectRayZ>vZ) continue;
 
 				bool hit;
@@ -191,6 +189,16 @@ var SSRShader = {
 					hit=true;
 				#else
 					float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
+
+					float minThickness;
+					vec2 xyNeighbor=xy;
+					xyNeighbor.x+=1.;
+					vec2 uvNeighbor=xyNeighbor/resolution;
+					vec3 vPNeighbor=getViewPosition(uvNeighbor,d,cW);
+					minThickness=vPNeighbor.x-vP.x;
+					minThickness*=3.;
+					float tk=max(minThickness,thickness);
+
 					hit=away<=tk;
 				#endif
 
