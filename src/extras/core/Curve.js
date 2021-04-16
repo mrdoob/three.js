@@ -106,9 +106,7 @@ class Curve {
 
 	// Get list of cumulative segment lengths
 
-	getLengths( divisions ) {
-
-		if ( divisions === undefined ) divisions = this.arcLengthDivisions;
+	getLengths( divisions = this.arcLengthDivisions ) {
 
 		if ( this.cacheArcLengths &&
 			( this.cacheArcLengths.length === divisions + 1 ) &&
