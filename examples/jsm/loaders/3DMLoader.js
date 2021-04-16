@@ -906,7 +906,7 @@ function Rhino3dmWorker() {
 			const _material = doc.materials().get( i );
 			const _pbrMaterial = _material.physicallyBased();
 
-			const material = extractProperties( _material );
+			let material = extractProperties( _material );
 
 			const textures = [];
 
@@ -915,7 +915,7 @@ function Rhino3dmWorker() {
 				const _texture = _material.getTexture( textureTypes[ j ] );
 				if ( _texture ) {
 
-					const textureType = textureTypes[ j ].constructor.name;
+					let textureType = textureTypes[ j ].constructor.name;
 					textureType = textureType.substring( 12, textureType.length );
 					const texture = { type: textureType };
 
@@ -952,7 +952,7 @@ function Rhino3dmWorker() {
 					if ( _texture ) {
 
 						const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
-						const textureType = textureTypes[ j ].constructor.name;
+						let textureType = textureTypes[ j ].constructor.name;
 						textureType = textureType.substring( 12, textureType.length );
 						const texture = { type: textureType, image: 'data:image/png;base64,' + image };
 						textures.push( texture );
