@@ -26,7 +26,7 @@
 			this.opacity = THREE.SSRShader.uniforms.opacity.value;
 			this.output = 0;
 			this.maxDistance = THREE.SSRShader.uniforms.maxDistance.value;
-			this.surfDist = THREE.SSRShader.uniforms.surfDist.value;
+			this.thickness = THREE.SSRShader.uniforms.thickness.value;
 			this.encoding = encoding;
 			this.tempColor = new THREE.Color();
 			this._selects = selects;
@@ -140,24 +140,23 @@
 
 				}
 
-			} );
-			this.thickTolerance = THREE.SSRShader.uniforms.thickTolerance.value; // beauty render target with depth buffer
+			} ); // beauty render target with depth buffer
 
 			const depthTexture = new THREE.DepthTexture();
 			depthTexture.type = THREE.UnsignedShortType;
 			depthTexture.minFilter = THREE.NearestFilter;
 			depthTexture.magFilter = THREE.NearestFilter;
 			this.beautyRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
+				minFilter: THREE.NearestFilter,
+				magFilter: THREE.NearestFilter,
 				format: THREE.RGBAFormat,
 				depthTexture: depthTexture,
 				depthBuffer: true
 			} ); //for bouncing
 
 			this.prevRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
+				minFilter: THREE.NearestFilter,
+				magFilter: THREE.NearestFilter,
 				format: THREE.RGBAFormat
 			} ); // normal render target
 
@@ -175,8 +174,8 @@
 			} ); // ssr render target
 
 			this.ssrRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
+				minFilter: THREE.NearestFilter,
+				magFilter: THREE.NearestFilter,
 				format: THREE.RGBAFormat
 			} );
 			this.blurRenderTarget = this.ssrRenderTarget.clone();
@@ -206,7 +205,7 @@
 			this.ssrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 			this.ssrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 			this.ssrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-			this.ssrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
+			this.ssrMaterial.uniforms[ 'thickness' ].value = this.thickness;
 			this.ssrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
 			this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 			this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse ); // normal material
@@ -337,8 +336,7 @@
 
 			this.ssrMaterial.uniforms[ 'opacity' ].value = this.opacity;
 			this.ssrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
-			this.ssrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
-			this.ssrMaterial.uniforms[ 'thickTolerance' ].value = this.thickTolerance;
+			this.ssrMaterial.uniforms[ 'thickness' ].value = this.thickness;
 			this.renderPass( renderer, this.ssrMaterial, this.ssrRenderTarget ); // render blur
 
 			if ( this.blur ) {
