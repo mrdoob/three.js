@@ -235,7 +235,7 @@ Passing in the height of the equirectangular image seems like a good bet.
 +    () => {
 +      const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
 +      rt.fromEquirectangularTexture(renderer, texture);
-+      scene.background = rt;
++      scene.background = rt.texture;
 +    });
 }
 ```

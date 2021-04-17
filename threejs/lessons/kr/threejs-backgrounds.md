@@ -222,7 +222,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +    () => {
 +      const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
 +      rt.fromEquirectangularTexture(renderer, texture);
-+      scene.background = rt;
++      scene.background = rt.texture;
 +    });
 }
 ```
