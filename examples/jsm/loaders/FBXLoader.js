@@ -3892,7 +3892,7 @@ class FBXTree {
 
 function isFbxFormatBinary( buffer ) {
 
-	const CORRECT = 'Kaydara FBX Binary  \0';
+	const CORRECT = 'Kaydara\u0020FBX\u0020Binary\u0020\u0020\0';
 
 	return buffer.byteLength >= CORRECT.length && CORRECT === convertArrayBufferToString( buffer, 0, CORRECT.length );
 
