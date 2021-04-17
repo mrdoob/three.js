@@ -151,6 +151,16 @@
 			</p>
 		</p>
 
+		<h3>[method:null cancel] ( [param:Boolean continueTransform] )</h3>
+		<p>
+			<p>
+				[page:Boolean continueTransform]: (optional) Keep transforming the object after resetting its position, rotation and scale. Default is false.
+			</p>
+			<p>
+				Cancels the current transform action and resets the object's position, rotation and scale to when the transform dragging began.
+			</p>
+		</p>
+
 		<h3>[method:TransformControls detach] ()</h3>
 		<p>
 			Removes the current 3D object from the controls and makes the helper UI is invisible.
@@ -214,6 +224,11 @@
 			<p>
 				Sets the translation snap.
 			</p>
+		</p>
+
+		<h3>[method:null stop] ()</h3>
+		<p>
+			Can be called to stop the dragging action without releasing the mouse button.
 		</p>
 
 		<h2>Source</h2>
