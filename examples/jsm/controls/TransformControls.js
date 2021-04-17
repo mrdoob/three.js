@@ -52,7 +52,7 @@ class TransformControls extends Object3D {
 
 		this.visible = false;
 		this.domElement = domElement;
-		this.previousState = {
+		this.previousObjectState = {
 			isActive: false,
 			position: new Vector3(),
 			quaternion: new Quaternion(),
@@ -239,10 +239,10 @@ class TransformControls extends Object3D {
 
 		if ( this.object === undefined || this.dragging === true || pointer.button !== 0 ) return;
 
-		this.previousState.position.copy( this.object.position );
-		this.previousState.quaternion.copy( this.object.quaternion );
-		this.previousState.scale.copy( this.object.scale );
-		this.previousState.isActive = true;
+		this.previousObjectState.position.copy( this.object.position );
+		this.previousObjectState.quaternion.copy( this.object.quaternion );
+		this.previousObjectState.scale.copy( this.object.scale );
+		this.previousObjectState.isActive = true;
 
 		if ( this.axis !== null ) {
 
@@ -557,7 +557,7 @@ class TransformControls extends Object3D {
 
 		this.dragging = false;
 		this.axis = null;
-		this.previousState.isActive = false;
+		this.previousObjectState.isActive = false;
 
 	}
 
@@ -593,7 +593,7 @@ class TransformControls extends Object3D {
 		this.object = undefined;
 		this.visible = false;
 		this.axis = null;
-		this.previousState.isActive = false;
+		this.previousObjectState.isActive = false;
 
 		return this;
 
@@ -666,11 +666,11 @@ class TransformControls extends Object3D {
 
 	cancel( continueTransform ) {
 
-		if ( this.previousState.isActive ) {
+		if ( this.previousObjectState.isActive ) {
 
-			this.object.position.copy( this.previousState.position );
-			this.object.quaternion.copy( this.previousState.quaternion );
-			this.object.scale.copy( this.previousState.scale );
+			this.object.position.copy( this.previousObjectState.position );
+			this.object.quaternion.copy( this.previousObjectState.quaternion );
+			this.object.scale.copy( this.previousObjectState.scale );
 
 		}
 
