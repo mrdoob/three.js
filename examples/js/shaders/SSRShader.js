@@ -204,45 +204,48 @@
 					float viewReflectRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
 				#endif
 
-				if(viewReflectRayZ>vZ) continue;
+				// if(viewReflectRayZ>vZ) continue; // will cause "npm run make-screenshot webgl_postprocessing_ssr" high probability hang.
+				// https://github.com/mrdoob/three.js/pull/21539#issuecomment-821061164
+				if(viewReflectRayZ<=vZ){
 
-				bool hit;
-				#ifdef INFINITE_THICK
-					hit=true;
-				#else
-					float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
+					bool hit;
+					#ifdef INFINITE_THICK
+						hit=true;
+					#else
+						float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
 
-					float minThickness;
-					vec2 xyNeighbor=xy;
-					xyNeighbor.x+=1.;
-					vec2 uvNeighbor=xyNeighbor/resolution;
-					vec3 vPNeighbor=getViewPosition(uvNeighbor,d,cW);
-					minThickness=vPNeighbor.x-vP.x;
-					minThickness*=3.;
-					float tk=max(minThickness,thickness);
+						float minThickness;
+						vec2 xyNeighbor=xy;
+						xyNeighbor.x+=1.;
+						vec2 uvNeighbor=xyNeighbor/resolution;
+						vec3 vPNeighbor=getViewPosition(uvNeighbor,d,cW);
+						minThickness=vPNeighbor.x-vP.x;
+						minThickness*=3.;
+						float tk=max(minThickness,thickness);
 
-					hit=away<=tk;
-				#endif
-
-				if(hit){
-					vec3 vN=getViewNormal( uv );
-					if(dot(viewReflectDir,vN)>=0.) continue;
-					float distance=pointPlaneDistance(vP,viewPosition,viewNormal);
-					if(distance>maxDistance) break;
-					float op=opacity;
-					#ifdef DISTANCE_ATTENUATION
-						float ratio=1.-(distance/maxDistance);
-						float attenuation=ratio*ratio;
-						op=opacity*attenuation;
+						hit=away<=tk;
 					#endif
-					#ifdef FRESNEL
-						float fresnelCoe=(dot(viewIncidentDir,viewReflectDir)+1.)/2.;
-						op*=fresnelCoe;
-					#endif
-					vec4 reflectColor=texture2D(tDiffuse,uv);
-					gl_FragColor.xyz=reflectColor.xyz;
-					gl_FragColor.a=op;
-					break;
+
+					if(hit){
+						vec3 vN=getViewNormal( uv );
+						if(dot(viewReflectDir,vN)>=0.) continue;
+						float distance=pointPlaneDistance(vP,viewPosition,viewNormal);
+						if(distance>maxDistance) break;
+						float op=opacity;
+						#ifdef DISTANCE_ATTENUATION
+							float ratio=1.-(distance/maxDistance);
+							float attenuation=ratio*ratio;
+							op=opacity*attenuation;
+						#endif
+						#ifdef FRESNEL
+							float fresnelCoe=(dot(viewIncidentDir,viewReflectDir)+1.)/2.;
+							op*=fresnelCoe;
+						#endif
+						vec4 reflectColor=texture2D(tDiffuse,uv);
+						gl_FragColor.xyz=reflectColor.xyz;
+						gl_FragColor.a=op;
+						break;
+					}
 				}
 			}
 		}
