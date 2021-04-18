@@ -243,10 +243,10 @@ it for skinned animated characters. Fortunately there's a utility function,
 the utils.
 
 ```js
-import * as THREE from './resources/three/r125/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from './resources/threejs/r125/examples/jsm/loaders/GLTFLoader.js';
-+import {SkeletonUtils} from './resources/threejs/r125/examples/jsm/utils/SkeletonUtils.js';
+import * as THREE from './resources/three/r127/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from './resources/threejs/r127/examples/jsm/loaders/GLTFLoader.js';
++import {SkeletonUtils} from './resources/threejs/r127/examples/jsm/utils/SkeletonUtils.js';
 ```
 
 Then we can clone the models we just loaded
@@ -1678,10 +1678,10 @@ While we're at it lets make it so we can turn them on/off using dat.GUI like
 we've used else where
 
 ```js
-import * as THREE from './resources/three/r125/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from './resources/threejs/r125/examples/jsm/loaders/GLTFLoader.js';
-import {SkeletonUtils} from './resources/threejs/r125/examples/jsm/utils/SkeletonUtils.js';
+import * as THREE from './resources/three/r127/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from './resources/threejs/r127/examples/jsm/loaders/GLTFLoader.js';
+import {SkeletonUtils} from './resources/threejs/r127/examples/jsm/utils/SkeletonUtils.js';
 +import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 

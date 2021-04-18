@@ -41,7 +41,7 @@ Three.js로 프로젝트를 진행할 때, 3D 모델 파일을 불러와 사용�
 다음으로 먼저 `OBJLoader` 모듈을 스크립트에 로드합니다.
 
 ```js
-import { OBJLoader } from './resources/threejs/r125/examples/jsm/loaders/OBJLoader.js';
+import { OBJLoader } from './resources/threejs/r127/examples/jsm/loaders/OBJLoader.js';
 ```
 
 `OBJLoader`의 인스턴스를 생성한 뒤 .OBJ 파일의 경로와 콜백 함수를 넘겨
@@ -133,10 +133,10 @@ map_Ns windmill_001_base_SPEC.jpg
 `MTLLoader` 모듈을 불러옵니다.
 
 ```js
-import * as THREE from './resources/three/r125/build/three.module.js';
-import { OrbitControls } from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
-import { OBJLoader } from './resources/threejs/r125/examples/jsm/loaders/OBJLoader.js';
-+import { MTLLoader } from './resources/threejs/r125/examples/jsm/loaders/MTLLoader.js';
+import * as THREE from './resources/three/r127/build/three.module.js';
+import { OrbitControls } from './resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
+import { OBJLoader } from './resources/threejs/r127/examples/jsm/loaders/OBJLoader.js';
++import { MTLLoader } from './resources/threejs/r127/examples/jsm/loaders/MTLLoader.js';
 ```
 
 {{{warning msgId="badTranslation"}}}

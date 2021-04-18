@@ -97,10 +97,10 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) => {
 また `OBJLoader` を取り除き `GLTFLoader` を含める必要があります。
 
 ```html
--import {LoaderSupport} from './resources/threejs/r125/examples/jsm/loaders/LoaderSupport.js';
--import {OBJLoader} from './resources/threejs/r125/examples/jsm/loaders/OBJLoader.js';
--import {MTLLoader} from './resources/threejs/r125/examples/jsm/loaders/MTLLoader.js';
-+import {GLTFLoader} from './resources/threejs/r125/examples/jsm/loaders/GLTFLoader.js';
+-import {LoaderSupport} from './resources/threejs/r127/examples/jsm/loaders/LoaderSupport.js';
+-import {OBJLoader} from './resources/threejs/r127/examples/jsm/loaders/OBJLoader.js';
+-import {MTLLoader} from './resources/threejs/r127/examples/jsm/loaders/MTLLoader.js';
++import {GLTFLoader} from './resources/threejs/r127/examples/jsm/loaders/GLTFLoader.js';
 ```
 
 実行すると以下になりました。

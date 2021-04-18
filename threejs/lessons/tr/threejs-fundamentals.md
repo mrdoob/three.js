@@ -86,7 +86,7 @@ First let's load three.js
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r125/build/three.module.js';
+import * as THREE from './resources/threejs/r127/build/three.module.js';
 </script>
 ```
 
@@ -109,7 +109,7 @@ We will ask three.js to draw into that canvas so we need to look it up.
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r125/build/three.module.js';
+import * as THREE from './resources/threejs/r127/build/three.module.js';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
@@ -407,7 +407,7 @@ both
 </p>
 <pre class=prettyprint>
 &lt;script type="module"&gt;
-import * as THREE from './resources/threejs/r125/build/three.module.js';
+import * as THREE from './resources/threejs/r127/build/three.module.js';
 
 ...
 
@@ -478,6 +478,3 @@ version of this site so going forward this site will only show es6 module style.
 to support legacy browsers look into a <a href="https://babeljs.io">transpiler</a>.</p>
 </div>
 
-<!-- needed in English only to prevent warning from outdated translations -->
-<a href="threejs-geometry.html"></a>
-<a href="Geometry"></a>

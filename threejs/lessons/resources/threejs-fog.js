@@ -1,5 +1,5 @@
-import * as THREE from '../../resources/threejs/r125/build/three.module.js';
-import {GLTFLoader} from '../../resources/threejs/r125/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from '../../resources/threejs/r127/build/three.module.js';
+import {GLTFLoader} from '../../resources/threejs/r127/examples/jsm/loaders/GLTFLoader.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {

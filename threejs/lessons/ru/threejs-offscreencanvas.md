@@ -261,7 +261,7 @@ function main() {
 предыдущего файла `offscreencanvas-cubes.js`. Сначала мы копируем весь файл `offscreencanvas-cubes.js` в `shared-cube.js`. Затем мы переименовываем `main` в `init`, так как у нас уже есть `main` в нашем HTML-файле, и нам нужно экспортировать `init` и состояние
 
 ```js
-import * as THREE from './resources/threejs/r125/build/three.module.js';
+import * as THREE from './resources/threejs/r127/build/three.module.js';
 
 -const state = {
 +export const state = {
@@ -617,7 +617,7 @@ window.addEventListener('touchend', clearPickPosition);
 
 В отличие от нашего кода, мы не можем использовать объект глобального `state`, не переписав весь код `OrbitControls` для работы с ним. `OrbitControls` принимают элемент, к которому они присоединяют большинство используемых ими событий DOM. Возможно, мы могли бы передать наш собственный объект, имеющий ту же поверхность API, что и элемент DOM. Нам нужно только поддерживать функции, которые необходимы `OrbitControls`.
 
-Копаясь в  [исходном коде OrbitControls](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r125/examples/js/controls/OrbitControls.js)
+Копаясь в  [исходном коде OrbitControls](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r127/examples/js/controls/OrbitControls.js)
 похоже, что нам нужно обработать следующие события.
 
 
@@ -647,7 +647,7 @@ window.addEventListener('touchend', clearPickPosition);
 Вот код рабочей части.
 
 ```js
-import {EventDispatcher} from './resources/threejs/r125/build/three.module.js';
+import {EventDispatcher} from './resources/threejs/r127/build/three.module.js';
 
 class ElementProxyReceiver extends EventDispatcher {
   constructor() {
@@ -726,8 +726,8 @@ self.onmessage = function(e) {
 Нам также нужно добавить `OrbitControls` в начало скрипта.
 
 ```js
-import * as THREE from './resources/threejs/r125/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/threejs/r127/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
 
 export function init(data) {
 -  const {canvas} = data;

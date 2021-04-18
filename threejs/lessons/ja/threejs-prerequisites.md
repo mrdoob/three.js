@@ -20,7 +20,7 @@ es6モジュールはスクリプトの中で `import` キーワード、また�
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r125/build/three.module.js';
+import * as THREE from './resources/threejs/r127/build/three.module.js';
 
 ...
 

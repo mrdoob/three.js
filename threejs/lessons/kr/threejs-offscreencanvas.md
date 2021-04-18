@@ -226,7 +226,7 @@ function main() {
 `shared-cubes.js`와 `offscreencanvas-worker-cubes.js`는 단순히 이전 `offscreencanvas-cubes.js` 파일을 쪼갠 것입니다. 먼저 `offscreencanvas-cube.js`를 `shared-cube.js`로 옮긴 뒤, 메인 HTML 파일에 이미 `main` 함수가 있어 `main` 함수의 이름만 `init`으로 바꿔야 하죠. 여기에 추가로 `init`과 `state` 함수를 export 시켜줘야 합니다.
 
 ```js
-import * as THREE from './resources/threejs/r125/build/three.module.js';
+import * as THREE from './resources/threejs/r127/build/three.module.js';
  
 -const state = {
 +export const state = {
@@ -572,7 +572,7 @@ window.addEventListener('touchend', clearPickPosition);
 
 여태까지는 전역 `state` 객체를 사용했지만, `OrbitControls`의 경우는 객체 속성이 너무 많아 그걸 전부 다 하드 코딩하는 건 너무 번거롭습니다. `OrbitControls`는 필요한 DOM 이벤트의 대부분을 인자로 받는 `HTMLElement`에 바인딩합니다. 이를 이용해 DOM 요소와 같은 구조의 객체를 넘겨준다면 어떨까요? `OrbitControls`에 필요한 기능만 살려서 말이죠.
 
-[`OrbitControls`의 소스 코드](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r125/examples/js/controls/OrbitControls.js)를 분석해보니 아래의 이벤트만 지원하면 될 듯합니다.
+[`OrbitControls`의 소스 코드](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r127/examples/js/controls/OrbitControls.js)를 분석해보니 아래의 이벤트만 지원하면 될 듯합니다.
 
 * contextmenu
 * pointerdown
@@ -597,7 +597,7 @@ wheel 이벤트는 `deltaY` 속성만,
 아래는 워커 안의 코드입니다.
 
 ```js
-import { EventDispatcher } from './resources/threejs/r125/build/three.module.js';
+import { EventDispatcher } from './resources/threejs/r127/build/three.module.js';
 
 class ElementProxyReceiver extends EventDispatcher {
   constructor() {
@@ -675,8 +675,8 @@ self.onmessage = function(e) {
 Three.js의 공통 코드에 `OrbitControls` 모듈도 불러와 설정해야 합니다.
 
 ```js
-import * as THREE from './resources/threejs/r125/build/three.module.js';
-+import { OrbitControls } from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/threejs/r127/build/three.module.js';
++import { OrbitControls } from './resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
 
 export function init(data) {
 -  const { canvas } = data;

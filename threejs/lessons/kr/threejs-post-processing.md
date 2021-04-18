@@ -82,10 +82,10 @@ composer.addPass(filmPass);
 또 이 클래스들을 사용하기 위해 여러 스크립트를 불러와야 합니다.
 
 ```js
-import { EffectComposer } from './resources/threejs/r125/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from './resources/threejs/r125/examples/jsm/postprocessing/RenderPass.js';
-import { BloomPass } from './resources/threejs/r125/examples/jsm/postprocessing/BloomPass.js';
-import { FilmPass } from './resources/threejs/r125/examples/jsm/postprocessing/FilmPass.js';
+import { EffectComposer } from './resources/threejs/r127/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from './resources/threejs/r127/examples/jsm/postprocessing/RenderPass.js';
+import { BloomPass } from './resources/threejs/r127/examples/jsm/postprocessing/BloomPass.js';
+import { FilmPass } from './resources/threejs/r127/examples/jsm/postprocessing/FilmPass.js';
 ```
 
 대부분의 후처리에는 `EffectComposer.js`와 `RenderPass.js`가 필수입니다.

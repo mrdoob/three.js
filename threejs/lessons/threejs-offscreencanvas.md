@@ -280,7 +280,7 @@ we rename `main` to `init` since we already have a `main` in our
 HTML file and we need to export `init` and `state`
 
 ```js
-import * as THREE from './resources/threejs/r125/build/three.module.js';
+import * as THREE from './resources/threejs/r127/build/three.module.js';
 
 -const state = {
 +export const state = {
@@ -644,7 +644,7 @@ of the DOM events they use. Maybe we could pass in our own
 object that has the same API surface as a DOM element. 
 We only need to support the features the OrbitControls need.
 
-Digging through the [OrbitControls source code](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r125/examples/js/controls/OrbitControls.js)
+Digging through the [OrbitControls source code](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r127/examples/js/controls/OrbitControls.js)
 it looks like we need to handle the following events.
 
 * contextmenu
@@ -678,7 +678,7 @@ tell the difference.
 Here's the code for the worker part.
 
 ```js
-import {EventDispatcher} from './resources/threejs/r125/build/three.module.js';
+import {EventDispatcher} from './resources/threejs/r127/build/three.module.js';
 
 class ElementProxyReceiver extends EventDispatcher {
   constructor() {
@@ -763,8 +763,8 @@ self.onmessage = function(e) {
 In our shared three.js code we need to import the `OrbitControls` and set them up.
 
 ```js
-import * as THREE from './resources/threejs/r125/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r125/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/threejs/r127/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
 
 export function init(data) {
 -  const {canvas} = data;

@@ -134,7 +134,7 @@ function createMaterial() {
 但现在我们不会绘制很多图形，所以没有必要太担心。
 
 接着，创建一个函数，`addSolidGeometry`，我们传入一个几何体，
-它通过 `createMaerial` 创建一个随机颜色的材质，通过 `addObject` 添加到场景中。
+它通过 `createMaterial` 创建一个随机颜色的材质，通过 `addObject` 添加到场景中。
 
 ```js
 function addSolidGeometry(x, y, geometry) {

@@ -288,7 +288,7 @@ We also need to capture an image of the thing we want to apply the LUT to, in th
 We then go it into an image editor, in my case Photoshop, load up the sample image, and paste the 3DLUT in the top left corner
 
 > note: I first tried dragging and dropping the lut file on top of the image
-> in Photoshop but that didn't work. Photoshop made the image twice a large.
+> in Photoshop but that didn't work. Photoshop made the image twice as large.
 > I'm guessing it was trying to match DPI or something. Loading the lut file
 > separately and then copying and pasting it into the screen capture worked.
 
@@ -418,7 +418,7 @@ One last thing, just for fun, it turns out there's a standard LUT format defined
 
 I wrote a quick loader. Unfortunately there's 4 variations of the format but I could only find examples of 1 variation so I couldn't easily test that all variations work.
 
-I also write a quick drag and drop library. Let's use both to make it so you can drag and drop an Adobe LUT file to see it take affect.
+I also wrote a quick drag and drop library. Let's use both to make it so you can drag and drop an Adobe LUT file to see it take affect.
 
 First we need the 2 libraries
 
@@ -491,7 +491,7 @@ so you should be able to [download an Adobe LUT](https://www.google.com/search?q
 
 Note that Adobe LUTs are not designed for online usage. They are large files. You can convert them to smaller files and save as our PNG format by dragging and dropping on the sample below, choosing a size and clicking "Save...".
 
-The sample below is just a modification of the code above. We only draw the background picture, no glTF file. That picture is the an identity lut image created from the script above. We then use the effect to apply whatever LUT file is loaded so the result is the image we'd need to reproduce the LUT file as a PNG.
+The sample below is just a modification of the code above. We only draw the background picture, no glTF file. That picture is an identity lut image created from the script above. We then use the effect to apply whatever LUT file is loaded so the result is the image we'd need to reproduce the LUT file as a PNG.
 
 {{{example url="../threejs-postprocessing-adobe-lut-to-png-converter.html" }}}
 
