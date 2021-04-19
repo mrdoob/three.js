@@ -11,7 +11,7 @@
 
 		setPositions( array ) {
 
-			// converts [ x1, y1, z1,	x2, y2, z2, ... ] to pairs format
+			// converts [ x1, y1, z1,  x2, y2, z2, ... ] to pairs format
 			var length = array.length - 3;
 			var points = new Float32Array( 2 * length );
 
@@ -33,7 +33,7 @@
 
 		setColors( array ) {
 
-			// converts [ r1, g1, b1,	r2, g2, b2, ... ] to pairs format
+			// converts [ r1, g1, b1,  r2, g2, b2, ... ] to pairs format
 			var length = array.length - 3;
 			var colors = new Float32Array( 2 * length );
 

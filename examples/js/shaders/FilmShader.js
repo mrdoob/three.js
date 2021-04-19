@@ -41,8 +41,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -53,8 +53,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		#include <common>
 
@@ -103,7 +103,7 @@
 
 			}
 
-			gl_FragColor =	vec4( cResult, cTextureScreen.a );
+			gl_FragColor =  vec4( cResult, cTextureScreen.a );
 
 		}`
 	};

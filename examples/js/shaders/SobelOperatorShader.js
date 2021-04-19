@@ -17,8 +17,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -30,8 +30,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform sampler2D tDiffuse;
 		uniform vec2 resolution;
@@ -51,20 +51,20 @@
 		// first column
 
 			float tx0y0 = texture2D( tDiffuse, vUv + texel * vec2( -1, -1 ) ).r;
-			float tx0y1 = texture2D( tDiffuse, vUv + texel * vec2( -1,	0 ) ).r;
-			float tx0y2 = texture2D( tDiffuse, vUv + texel * vec2( -1,	1 ) ).r;
+			float tx0y1 = texture2D( tDiffuse, vUv + texel * vec2( -1,  0 ) ).r;
+			float tx0y2 = texture2D( tDiffuse, vUv + texel * vec2( -1,  1 ) ).r;
 
 		// second column
 
-			float tx1y0 = texture2D( tDiffuse, vUv + texel * vec2(	0, -1 ) ).r;
-			float tx1y1 = texture2D( tDiffuse, vUv + texel * vec2(	0,	0 ) ).r;
-			float tx1y2 = texture2D( tDiffuse, vUv + texel * vec2(	0,	1 ) ).r;
+			float tx1y0 = texture2D( tDiffuse, vUv + texel * vec2(  0, -1 ) ).r;
+			float tx1y1 = texture2D( tDiffuse, vUv + texel * vec2(  0,  0 ) ).r;
+			float tx1y2 = texture2D( tDiffuse, vUv + texel * vec2(  0,  1 ) ).r;
 
 		// third column
 
-			float tx2y0 = texture2D( tDiffuse, vUv + texel * vec2(	1, -1 ) ).r;
-			float tx2y1 = texture2D( tDiffuse, vUv + texel * vec2(	1,	0 ) ).r;
-			float tx2y2 = texture2D( tDiffuse, vUv + texel * vec2(	1,	1 ) ).r;
+			float tx2y0 = texture2D( tDiffuse, vUv + texel * vec2(  1, -1 ) ).r;
+			float tx2y1 = texture2D( tDiffuse, vUv + texel * vec2(  1,  0 ) ).r;
+			float tx2y2 = texture2D( tDiffuse, vUv + texel * vec2(  1,  1 ) ).r;
 
 		// gradient value in x direction
 

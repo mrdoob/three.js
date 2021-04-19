@@ -150,7 +150,7 @@
 			this.domElement.addEventListener( 'pointermove', this._onPointerHover );
 			this.domElement.ownerDocument.addEventListener( 'pointerup', this._onPointerUp );
 
-		} // updateMatrixWorld	updates key transformation variables
+		} // updateMatrixWorld  updates key transformation variables
 
 
 		updateMatrixWorld() {
@@ -1438,7 +1438,7 @@
 
 				case 'rotate':
 				default:
-				// special case for rotate
+					// special case for rotate
 					_dirVector.set( 0, 0, 0 );
 
 			}

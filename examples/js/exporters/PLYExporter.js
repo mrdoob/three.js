@@ -4,10 +4,10 @@
  * https://github.com/gkjohnson/ply-exporter-js
  *
  * Usage:
- *	const exporter = new PLYExporter();
+ *  const exporter = new PLYExporter();
  *
- *	// second argument is a list of options
- *	exporter.parse(mesh, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ], littleEndian: true });
+ *  // second argument is a list of options
+ *  exporter.parse(mesh, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ], littleEndian: true });
  *
  * Format Definition:
  * http://paulbourke.net/dataformats/ply/
@@ -120,7 +120,7 @@
 
 			const indexByteCount = 4;
 			let header = 'ply\n' + `format ${options.binary ? options.littleEndian ? 'binary_little_endian' : 'binary_big_endian' : 'ascii'} 1.0\n` + `element vertex ${vertexCount}\n` + // position
-		'property float x\n' + 'property float y\n' + 'property float z\n';
+    'property float x\n' + 'property float y\n' + 'property float z\n';
 
 			if ( includeNormals === true ) {
 

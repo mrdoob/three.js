@@ -111,10 +111,10 @@
 
 		}
 		/**
-	 * @param {ArrayBuffer[]} buffers
-	 * @param {object?} config
-	 * @return {Promise<CompressedTexture>}
-	 */
+   * @param {ArrayBuffer[]} buffers
+   * @param {object?} config
+   * @return {Promise<CompressedTexture>}
+   */
 
 
 		_createTexture( buffers, config = {} ) {

@@ -23,8 +23,8 @@
 		setFromProjectionMatrix( projectionMatrix, maxFar ) {
 
 			const isOrthographic = projectionMatrix.elements[ 2 * 4 + 3 ] === 0;
-			inverseProjectionMatrix.copy( projectionMatrix ).invert(); // 3 --- 0	vertices.near/far order
-			// |		 |
+			inverseProjectionMatrix.copy( projectionMatrix ).invert(); // 3 --- 0  vertices.near/far order
+			// |     |
 			// 2 --- 1
 			// clip space spans from [-1, 1]
 

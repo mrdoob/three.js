@@ -420,7 +420,7 @@
 
 			// save original normals
 			// - create temp variables on first access
-			//	 otherwise just copy (for faster repeated calls)
+			//   otherwise just copy (for faster repeated calls)
 			for ( let f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 				const face = this.faces[ f ];
@@ -663,10 +663,10 @@
 
 		}
 		/*
-	 * Checks for duplicate vertices with hashmap.
-	 * Duplicated vertices are removed
-	 * and faces' vertices are updated.
-	 */
+   * Checks for duplicate vertices with hashmap.
+   * Duplicated vertices are removed
+   * and faces' vertices are updated.
+   */
 
 
 		mergeVertices( precisionPoints = 4 ) {
@@ -970,19 +970,19 @@
 		clone() {
 
 			/*
-		 // Handle primitives
-			 const parameters = this.parameters;
-			 if ( parameters !== undefined ) {
-			 const values = [];
-			 for ( const key in parameters ) {
-			 values.push( parameters[ key ] );
-			 }
-			 const geometry = Object.create( this.constructor.prototype );
-		 this.constructor.apply( geometry, values );
-		 return geometry;
-			 }
-			 return new this.constructor().copy( this );
-		 */
+     // Handle primitives
+    	 const parameters = this.parameters;
+    	 if ( parameters !== undefined ) {
+    	 const values = [];
+    	 for ( const key in parameters ) {
+    	 values.push( parameters[ key ] );
+    	 }
+    	 const geometry = Object.create( this.constructor.prototype );
+     this.constructor.apply( geometry, values );
+     return geometry;
+    	 }
+    	 return new this.constructor().copy( this );
+     */
 			return new Geometry().copy( this );
 
 		}

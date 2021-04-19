@@ -235,7 +235,7 @@
 							break;
 
 						case 'animation':
-						// hierarchy of related animations
+							// hierarchy of related animations
 							parseAnimation( child );
 							hasChildren = true;
 							break;
@@ -297,7 +297,7 @@
 
 				if ( memberSyntax ) {
 
-					//	member selection access
+					//  member selection access
 					parts = sid.split( '.' );
 					sid = parts.shift();
 					data.member = parts.shift();
@@ -678,7 +678,7 @@
 					switch ( child.nodeName ) {
 
 						case 'skin':
-						// there is exactly one skin per controller
+							// there is exactly one skin per controller
 							data.id = parseId( child.getAttribute( 'source' ) );
 							data.skin = parseSkin( child );
 							break;
@@ -1250,7 +1250,7 @@
 
 						case 'wrapU':
 						case 'wrapV':
-						// some files have values for wrapU/wrapV which become NaN via parseInt
+							// some files have values for wrapU/wrapV which become NaN via parseInt
 							if ( child.textContent.toUpperCase() === 'TRUE' ) {
 
 								data.technique[ child.nodeName ] = 1;
@@ -1885,7 +1885,7 @@
 							break;
 
 						case 'vertices':
-						// data.sources[ id ] = data.sources[ parseId( getElementsByTagName( child, 'input' )[ 0 ].getAttribute( 'source' ) ) ];
+							// data.sources[ id ] = data.sources[ parseId( getElementsByTagName( child, 'input' )[ 0 ].getAttribute( 'source' ) ) ];
 							data.vertices = parseGeometryVertices( child );
 							break;
 

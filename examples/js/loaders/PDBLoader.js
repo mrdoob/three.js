@@ -77,9 +77,9 @@
 						_bhash[ h ] = _bonds.length - 1;
 
 					} else { // doesn't really work as almost all PDBs
-					// have just normal bonds appearing multiple
-					// times instead of being double/triple bonds
-					// bonds[bhash[h]][2] += 1;
+						// have just normal bonds appearing multiple
+						// times instead of being double/triple bonds
+						// bonds[bhash[h]][2] += 1;
 					}
 
 				}

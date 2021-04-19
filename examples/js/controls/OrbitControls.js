@@ -2,9 +2,9 @@
 
 	// Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
 	//
-	//		Orbit - left mouse / touch: one-finger move
-	//		Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-	//		Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
+	//    Orbit - left mouse / touch: one-finger move
+	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+	//    Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
 
 	const _changeEvent = {
 		type: 'change'
@@ -703,7 +703,7 @@
 					case 'pen':
 						onMouseDown( event );
 						break;
-				// TODO touch
+        // TODO touch
 
 				}
 
@@ -719,7 +719,7 @@
 					case 'pen':
 						onMouseMove( event );
 						break;
-				// TODO touch
+        // TODO touch
 
 				}
 
@@ -733,7 +733,7 @@
 					case 'pen':
 						onMouseUp( event );
 						break;
-				// TODO touch
+        // TODO touch
 
 				}
 
@@ -1018,9 +1018,9 @@
 	// Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
 	// This is very similar to OrbitControls, another set of touch behavior
 	//
-	//		Orbit - right mouse, or left mouse + ctrl/meta/shiftKey / touch: two-finger rotate
-	//		Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-	//		Pan - left mouse, or arrow keys / touch: one-finger move
+	//    Orbit - right mouse, or left mouse + ctrl/meta/shiftKey / touch: two-finger rotate
+	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+	//    Pan - left mouse, or arrow keys / touch: one-finger move
 
 
 	class MapControls extends OrbitControls {

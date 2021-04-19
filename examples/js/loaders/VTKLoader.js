@@ -781,7 +781,7 @@
 
 						if ( ele.attributes.format === 'binary' && ! compressed ) {
 
-							var content = Base64toByteArray( ele[ '#text' ] ); //	VTP data for the uncompressed case has the following structure:
+							var content = Base64toByteArray( ele[ '#text' ] ); //  VTP data for the uncompressed case has the following structure:
 							// [#bytes][DATA]
 							// where "[#bytes]" is an integer value specifying the number of bytes in the block of data following it.
 

@@ -22,14 +22,14 @@
 
 		}
 		/**
-	 * Load 3ds file from url.
-	 *
-	 * @method load
-	 * @param {[type]} url URL for the file.
-	 * @param {Function} onLoad onLoad callback, receives group Object3D as argument.
-	 * @param {Function} onProgress onProgress callback.
-	 * @param {Function} onError onError callback.
-	 */
+   * Load 3ds file from url.
+   *
+   * @method load
+   * @param {[type]} url URL for the file.
+   * @param {Function} onLoad onLoad callback, receives group Object3D as argument.
+   * @param {Function} onProgress onProgress callback.
+   * @param {Function} onError onError callback.
+   */
 
 
 		load( url, onLoad, onProgress, onError ) {
@@ -67,13 +67,13 @@
 
 		}
 		/**
-	 * Parse arraybuffer data and load 3ds file.
-	 *
-	 * @method parse
-	 * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
-	 * @param {String} path Path for external resources.
-	 * @return {Group} THREE.Group loaded from 3ds file.
-	 */
+   * Parse arraybuffer data and load 3ds file.
+   *
+   * @method parse
+   * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
+   * @param {String} path Path for external resources.
+   * @return {Group} THREE.Group loaded from 3ds file.
+   */
 
 
 		parse( arraybuffer, path ) {
@@ -94,12 +94,12 @@
 
 		}
 		/**
-	 * Decode file content to read 3ds data.
-	 *
-	 * @method readFile
-	 * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
-	 * @param {String} path Path for external resources.
-	 */
+   * Decode file content to read 3ds data.
+   *
+   * @method readFile
+   * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
+   * @param {String} path Path for external resources.
+   */
 
 
 		readFile( arraybuffer, path ) {
@@ -139,12 +139,12 @@
 
 		}
 		/**
-	 * Read mesh data chunk.
-	 *
-	 * @method readMeshData
-	 * @param {Dataview} data Dataview in use.
-	 * @param {String} path Path for external resources.
-	 */
+   * Read mesh data chunk.
+   *
+   * @method readMeshData
+   * @param {Dataview} data Dataview in use.
+   * @param {String} path Path for external resources.
+   */
 
 
 		readMeshData( data, path ) {
@@ -189,11 +189,11 @@
 
 		}
 		/**
-	 * Read named object chunk.
-	 *
-	 * @method readNamedObject
-	 * @param {Dataview} data Dataview in use.
-	 */
+   * Read named object chunk.
+   *
+   * @method readNamedObject
+   * @param {Dataview} data Dataview in use.
+   */
 
 
 		readNamedObject( data ) {
@@ -226,12 +226,12 @@
 
 		}
 		/**
-	 * Read material data chunk and add it to the material list.
-	 *
-	 * @method readMaterialEntry
-	 * @param {Dataview} data Dataview in use.
-	 * @param {String} path Path for external resources.
-	 */
+   * Read material data chunk and add it to the material list.
+   *
+   * @method readMaterialEntry
+   * @param {Dataview} data Dataview in use.
+   * @param {String} path Path for external resources.
+   */
 
 
 		readMaterialEntry( data, path ) {
@@ -245,84 +245,84 @@
 				if ( next === MAT_NAME ) {
 
 					material.name = this.readString( data, 64 );
-					this.debugMessage( '	 Name: ' + material.name );
+					this.debugMessage( '   Name: ' + material.name );
 
 				} else if ( next === MAT_WIRE ) {
 
-					this.debugMessage( '	 Wireframe' );
+					this.debugMessage( '   Wireframe' );
 					material.wireframe = true;
 
 				} else if ( next === MAT_WIRE_SIZE ) {
 
 					const value = this.readByte( data );
 					material.wireframeLinewidth = value;
-					this.debugMessage( '	 Wireframe Thickness: ' + value );
+					this.debugMessage( '   Wireframe Thickness: ' + value );
 
 				} else if ( next === MAT_TWO_SIDE ) {
 
 					material.side = THREE.DoubleSide;
-					this.debugMessage( '	 DoubleSided' );
+					this.debugMessage( '   DoubleSided' );
 
 				} else if ( next === MAT_ADDITIVE ) {
 
-					this.debugMessage( '	 Additive Blending' );
+					this.debugMessage( '   Additive Blending' );
 					material.blending = THREE.AdditiveBlending;
 
 				} else if ( next === MAT_DIFFUSE ) {
 
-					this.debugMessage( '	 Diffuse THREE.Color' );
+					this.debugMessage( '   Diffuse THREE.Color' );
 					material.color = this.readColor( data );
 
 				} else if ( next === MAT_SPECULAR ) {
 
-					this.debugMessage( '	 Specular THREE.Color' );
+					this.debugMessage( '   Specular THREE.Color' );
 					material.specular = this.readColor( data );
 
 				} else if ( next === MAT_AMBIENT ) {
 
-					this.debugMessage( '	 Ambient color' );
+					this.debugMessage( '   Ambient color' );
 					material.color = this.readColor( data );
 
 				} else if ( next === MAT_SHININESS ) {
 
 					const shininess = this.readPercentage( data );
 					material.shininess = shininess * 100;
-					this.debugMessage( '	 Shininess : ' + shininess );
+					this.debugMessage( '   Shininess : ' + shininess );
 
 				} else if ( next === MAT_TRANSPARENCY ) {
 
 					const transparency = this.readPercentage( data );
 					material.opacity = 1 - transparency;
-					this.debugMessage( '	Transparency : ' + transparency );
+					this.debugMessage( '  Transparency : ' + transparency );
 					material.transparent = material.opacity < 1 ? true : false;
 
 				} else if ( next === MAT_TEXMAP ) {
 
-					this.debugMessage( '	 ColorMap' );
+					this.debugMessage( '   ColorMap' );
 					this.resetPosition( data );
 					material.map = this.readMap( data, path );
 
 				} else if ( next === MAT_BUMPMAP ) {
 
-					this.debugMessage( '	 BumpMap' );
+					this.debugMessage( '   BumpMap' );
 					this.resetPosition( data );
 					material.bumpMap = this.readMap( data, path );
 
 				} else if ( next === MAT_OPACMAP ) {
 
-					this.debugMessage( '	 OpacityMap' );
+					this.debugMessage( '   OpacityMap' );
 					this.resetPosition( data );
 					material.alphaMap = this.readMap( data, path );
 
 				} else if ( next === MAT_SPECMAP ) {
 
-					this.debugMessage( '	 SpecularMap' );
+					this.debugMessage( '   SpecularMap' );
 					this.resetPosition( data );
 					material.specularMap = this.readMap( data, path );
 
 				} else {
 
-					this.debugMessage( '	 Unknown material chunk: ' + next.toString( 16 ) );
+					this.debugMessage( '   Unknown material chunk: ' + next.toString( 16 ) );
 
 				}
 
@@ -335,12 +335,12 @@
 
 		}
 		/**
-	 * Read mesh data chunk.
-	 *
-	 * @method readMesh
-	 * @param {Dataview} data Dataview in use.
-	 * @return {Mesh} The parsed mesh.
-	 */
+   * Read mesh data chunk.
+   *
+   * @method readMesh
+   * @param {Dataview} data Dataview in use.
+   * @return {Mesh} The parsed mesh.
+   */
 
 
 		readMesh( data ) {
@@ -357,7 +357,7 @@
 				if ( next === POINT_ARRAY ) {
 
 					const points = this.readWord( data );
-					this.debugMessage( '	 Vertex: ' + points ); //BufferGeometry
+					this.debugMessage( '   Vertex: ' + points ); //BufferGeometry
 
 					const vertices = [];
 
@@ -379,7 +379,7 @@
 				} else if ( next === TEX_VERTS ) {
 
 					const texels = this.readWord( data );
-					this.debugMessage( '	 UV: ' + texels ); //BufferGeometry
+					this.debugMessage( '   UV: ' + texels ); //BufferGeometry
 
 					const uvs = [];
 
@@ -394,7 +394,7 @@
 
 				} else if ( next === MESH_MATRIX ) {
 
-					this.debugMessage( '	 Tranformation Matrix (TODO)' );
+					this.debugMessage( '   Tranformation Matrix (TODO)' );
 					const values = [];
 
 					for ( let i = 0; i < 12; i ++ ) {
@@ -432,7 +432,7 @@
 
 				} else {
 
-					this.debugMessage( '	 Unknown mesh chunk: ' + next.toString( 16 ) );
+					this.debugMessage( '   Unknown mesh chunk: ' + next.toString( 16 ) );
 
 				}
 
@@ -446,19 +446,19 @@
 
 		}
 		/**
-	 * Read face array data chunk.
-	 *
-	 * @method readFaceArray
-	 * @param {Dataview} data Dataview in use.
-	 * @param {Mesh} mesh THREE.Mesh to be filled with the data read.
-	 */
+   * Read face array data chunk.
+   *
+   * @method readFaceArray
+   * @param {Dataview} data Dataview in use.
+   * @param {Mesh} mesh THREE.Mesh to be filled with the data read.
+   */
 
 
 		readFaceArray( data, mesh ) {
 
 			const chunk = this.readChunk( data );
 			const faces = this.readWord( data );
-			this.debugMessage( '	 Faces: ' + faces );
+			this.debugMessage( '   Faces: ' + faces );
 			const index = [];
 
 			for ( let i = 0; i < faces; ++ i ) {
@@ -479,7 +479,7 @@
 
 				if ( subchunk.id === MSH_MAT_GROUP ) {
 
-					this.debugMessage( '			Material THREE.Group' );
+					this.debugMessage( '      Material THREE.Group' );
 					this.resetPosition( data );
 					const group = this.readMaterialGroup( data );
 					const count = group.index.length * 3; // assuming successive indices
@@ -498,7 +498,7 @@
 
 				} else {
 
-					this.debugMessage( '			Unknown face array chunk: ' + subchunk.toString( 16 ) );
+					this.debugMessage( '      Unknown face array chunk: ' + subchunk.toString( 16 ) );
 
 				}
 
@@ -512,13 +512,13 @@
 
 		}
 		/**
-	 * Read texture map data chunk.
-	 *
-	 * @method readMap
-	 * @param {Dataview} data Dataview in use.
-	 * @param {String} path Path for external resources.
-	 * @return {Texture} Texture read from this data chunk.
-	 */
+   * Read texture map data chunk.
+   *
+   * @method readMap
+   * @param {Dataview} data Dataview in use.
+   * @param {String} path Path for external resources.
+   * @return {Texture} Texture read from this data chunk.
+   */
 
 
 		readMap( data, path ) {
@@ -535,31 +535,31 @@
 
 					const name = this.readString( data, 128 );
 					texture = loader.load( name );
-					this.debugMessage( '			File: ' + path + name );
+					this.debugMessage( '      File: ' + path + name );
 
 				} else if ( next === MAT_MAP_UOFFSET ) {
 
 					texture.offset.x = this.readFloat( data );
-					this.debugMessage( '			OffsetX: ' + texture.offset.x );
+					this.debugMessage( '      OffsetX: ' + texture.offset.x );
 
 				} else if ( next === MAT_MAP_VOFFSET ) {
 
 					texture.offset.y = this.readFloat( data );
-					this.debugMessage( '			OffsetY: ' + texture.offset.y );
+					this.debugMessage( '      OffsetY: ' + texture.offset.y );
 
 				} else if ( next === MAT_MAP_USCALE ) {
 
 					texture.repeat.x = this.readFloat( data );
-					this.debugMessage( '			RepeatX: ' + texture.repeat.x );
+					this.debugMessage( '      RepeatX: ' + texture.repeat.x );
 
 				} else if ( next === MAT_MAP_VSCALE ) {
 
 					texture.repeat.y = this.readFloat( data );
-					this.debugMessage( '			RepeatY: ' + texture.repeat.y );
+					this.debugMessage( '      RepeatY: ' + texture.repeat.y );
 
 				} else {
 
-					this.debugMessage( '			Unknown map chunk: ' + next.toString( 16 ) );
+					this.debugMessage( '      Unknown map chunk: ' + next.toString( 16 ) );
 
 				}
 
@@ -572,12 +572,12 @@
 
 		}
 		/**
-	 * Read material group data chunk.
-	 *
-	 * @method readMaterialGroup
-	 * @param {Dataview} data Dataview in use.
-	 * @return {Object} Object with name and index of the object.
-	 */
+   * Read material group data chunk.
+   *
+   * @method readMaterialGroup
+   * @param {Dataview} data Dataview in use.
+   * @return {Object} Object with name and index of the object.
+   */
 
 
 		readMaterialGroup( data ) {
@@ -585,8 +585,8 @@
 			this.readChunk( data );
 			const name = this.readString( data, 64 );
 			const numFaces = this.readWord( data );
-			this.debugMessage( '				 Name: ' + name );
-			this.debugMessage( '				 Faces: ' + numFaces );
+			this.debugMessage( '         Name: ' + name );
+			this.debugMessage( '         Faces: ' + numFaces );
 			const index = [];
 
 			for ( let i = 0; i < numFaces; ++ i ) {
@@ -602,12 +602,12 @@
 
 		}
 		/**
-	 * Read a color value.
-	 *
-	 * @method readColor
-	 * @param {DataView} data Dataview.
-	 * @return {Color} THREE.Color value read..
-	 */
+   * Read a color value.
+   *
+   * @method readColor
+   * @param {DataView} data Dataview.
+   * @return {Color} THREE.Color value read..
+   */
 
 
 		readColor( data ) {
@@ -621,7 +621,7 @@
 				const g = this.readByte( data );
 				const b = this.readByte( data );
 				color.setRGB( r / 255, g / 255, b / 255 );
-				this.debugMessage( '			THREE.Color: ' + color.r + ', ' + color.g + ', ' + color.b );
+				this.debugMessage( '      THREE.Color: ' + color.r + ', ' + color.g + ', ' + color.b );
 
 			} else if ( chunk.id === COLOR_F || chunk.id === LIN_COLOR_F ) {
 
@@ -629,11 +629,11 @@
 				const g = this.readFloat( data );
 				const b = this.readFloat( data );
 				color.setRGB( r, g, b );
-				this.debugMessage( '			THREE.Color: ' + color.r + ', ' + color.g + ', ' + color.b );
+				this.debugMessage( '      THREE.Color: ' + color.r + ', ' + color.g + ', ' + color.b );
 
 			} else {
 
-				this.debugMessage( '			Unknown color chunk: ' + chunk.toString( 16 ) );
+				this.debugMessage( '      Unknown color chunk: ' + chunk.toString( 16 ) );
 
 			}
 
@@ -642,12 +642,12 @@
 
 		}
 		/**
-	 * Read next chunk of data.
-	 *
-	 * @method readChunk
-	 * @param {DataView} data Dataview.
-	 * @return {Object} Chunk of data read.
-	 */
+   * Read next chunk of data.
+   *
+   * @method readChunk
+   * @param {DataView} data Dataview.
+   * @return {Object} Chunk of data read.
+   */
 
 
 		readChunk( data ) {
@@ -662,11 +662,11 @@
 
 		}
 		/**
-	 * Set position to the end of the current chunk of data.
-	 *
-	 * @method endChunk
-	 * @param {Object} chunk Data chunk.
-	 */
+   * Set position to the end of the current chunk of data.
+   *
+   * @method endChunk
+   * @param {Object} chunk Data chunk.
+   */
 
 
 		endChunk( chunk ) {
@@ -675,12 +675,12 @@
 
 		}
 		/**
-	 * Move to the next data chunk.
-	 *
-	 * @method nextChunk
-	 * @param {DataView} data Dataview.
-	 * @param {Object} chunk Data chunk.
-	 */
+   * Move to the next data chunk.
+   *
+   * @method nextChunk
+   * @param {DataView} data Dataview.
+   * @param {Object} chunk Data chunk.
+   */
 
 
 		nextChunk( data, chunk ) {
@@ -708,10 +708,10 @@
 
 		}
 		/**
-	 * Reset dataview position.
-	 *
-	 * @method resetPosition
-	 */
+   * Reset dataview position.
+   *
+   * @method resetPosition
+   */
 
 
 		resetPosition() {
@@ -720,12 +720,12 @@
 
 		}
 		/**
-	 * Read byte value.
-	 *
-	 * @method readByte
-	 * @param {DataView} data Dataview to read data from.
-	 * @return {Number} Data read from the dataview.
-	 */
+   * Read byte value.
+   *
+   * @method readByte
+   * @param {DataView} data Dataview to read data from.
+   * @return {Number} Data read from the dataview.
+   */
 
 
 		readByte( data ) {
@@ -736,12 +736,12 @@
 
 		}
 		/**
-	 * Read 32 bit float value.
-	 *
-	 * @method readFloat
-	 * @param {DataView} data Dataview to read data from.
-	 * @return {Number} Data read from the dataview.
-	 */
+   * Read 32 bit float value.
+   *
+   * @method readFloat
+   * @param {DataView} data Dataview to read data from.
+   * @return {Number} Data read from the dataview.
+   */
 
 
 		readFloat( data ) {
@@ -760,12 +760,12 @@
 
 		}
 		/**
-	 * Read 32 bit signed integer value.
-	 *
-	 * @method readInt
-	 * @param {DataView} data Dataview to read data from.
-	 * @return {Number} Data read from the dataview.
-	 */
+   * Read 32 bit signed integer value.
+   *
+   * @method readInt
+   * @param {DataView} data Dataview to read data from.
+   * @return {Number} Data read from the dataview.
+   */
 
 
 		readInt( data ) {
@@ -776,12 +776,12 @@
 
 		}
 		/**
-	 * Read 16 bit signed integer value.
-	 *
-	 * @method readShort
-	 * @param {DataView} data Dataview to read data from.
-	 * @return {Number} Data read from the dataview.
-	 */
+   * Read 16 bit signed integer value.
+   *
+   * @method readShort
+   * @param {DataView} data Dataview to read data from.
+   * @return {Number} Data read from the dataview.
+   */
 
 
 		readShort( data ) {
@@ -792,12 +792,12 @@
 
 		}
 		/**
-	 * Read 64 bit unsigned integer value.
-	 *
-	 * @method readDWord
-	 * @param {DataView} data Dataview to read data from.
-	 * @return {Number} Data read from the dataview.
-	 */
+   * Read 64 bit unsigned integer value.
+   *
+   * @method readDWord
+   * @param {DataView} data Dataview to read data from.
+   * @return {Number} Data read from the dataview.
+   */
 
 
 		readDWord( data ) {
@@ -808,12 +808,12 @@
 
 		}
 		/**
-	 * Read 32 bit unsigned integer value.
-	 *
-	 * @method readWord
-	 * @param {DataView} data Dataview to read data from.
-	 * @return {Number} Data read from the dataview.
-	 */
+   * Read 32 bit unsigned integer value.
+   *
+   * @method readWord
+   * @param {DataView} data Dataview to read data from.
+   * @return {Number} Data read from the dataview.
+   */
 
 
 		readWord( data ) {
@@ -824,13 +824,13 @@
 
 		}
 		/**
-	 * Read string value.
-	 *
-	 * @method readString
-	 * @param {DataView} data Dataview to read data from.
-	 * @param {Number} maxLength Max size of the string to be read.
-	 * @return {String} Data read from the dataview.
-	 */
+   * Read string value.
+   *
+   * @method readString
+   * @param {DataView} data Dataview to read data from.
+   * @param {Number} maxLength Max size of the string to be read.
+   * @return {String} Data read from the dataview.
+   */
 
 
 		readString( data, maxLength ) {
@@ -855,12 +855,12 @@
 
 		}
 		/**
-	 * Read percentage value.
-	 *
-	 * @method readPercentage
-	 * @param {DataView} data Dataview to read data from.
-	 * @return {Number} Data read from the dataview.
-	 */
+   * Read percentage value.
+   *
+   * @method readPercentage
+   * @param {DataView} data Dataview to read data from.
+   * @return {Number} Data read from the dataview.
+   */
 
 
 		readPercentage( data ) {
@@ -879,7 +879,7 @@
 					break;
 
 				default:
-					this.debugMessage( '			Unknown percentage chunk: ' + chunk.toString( 16 ) );
+					this.debugMessage( '      Unknown percentage chunk: ' + chunk.toString( 16 ) );
 
 			}
 
@@ -888,13 +888,13 @@
 
 		}
 		/**
-	 * Print debug message to the console.
-	 *
-	 * Is controlled by a flag to show or hide debug messages.
-	 *
-	 * @method debugMessage
-	 * @param {Object} message Debug message to print to the console.
-	 */
+   * Print debug message to the console.
+   *
+   * Is controlled by a flag to show or hide debug messages.
+   *
+   * @method debugMessage
+   * @param {Object} message Debug message to print to the console.
+   */
 
 
 		debugMessage( message ) {

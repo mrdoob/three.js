@@ -56,8 +56,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -71,8 +71,8 @@
 
 	`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 		// precision highp float;
 		precision highp sampler2D;
 		varying vec2 vUv;
@@ -267,8 +267,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -281,8 +281,8 @@
 
 	`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform sampler2D tDepth;
 
@@ -333,8 +333,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -347,8 +347,8 @@
 
 	`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform sampler2D tDiffuse;
 		uniform vec2 resolution;

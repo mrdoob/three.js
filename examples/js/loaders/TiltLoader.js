@@ -41,17 +41,17 @@
 
 			const zip = fflate.unzipSync( new Uint8Array( buffer.slice( 16 ) ) );
 			/*
-		const thumbnail = zip[ 'thumbnail.png' ].buffer;
-		const img = document.createElement( 'img' );
-		img.src = URL.createObjectURL( new Blob( [ thumbnail ] ) );
-		document.body.appendChild( img );
-		*/
+    const thumbnail = zip[ 'thumbnail.png' ].buffer;
+    const img = document.createElement( 'img' );
+    img.src = URL.createObjectURL( new Blob( [ thumbnail ] ) );
+    document.body.appendChild( img );
+    */
 
 			const metadata = JSON.parse( fflate.strFromU8( zip[ 'metadata.json' ] ) );
 			/*
-		const blob = new Blob( [ zip[ 'data.sketch' ].buffer ], { type: 'application/octet-stream' } );
-		window.open( URL.createObjectURL( blob ) );
-		*/
+    const blob = new Blob( [ zip[ 'data.sketch' ].buffer ], { type: 'application/octet-stream' } );
+    window.open( URL.createObjectURL( blob ) );
+    */
 
 			const data = new DataView( zip[ 'data.sketch' ].buffer );
 			const num_strokes = data.getInt32( 16, true );
