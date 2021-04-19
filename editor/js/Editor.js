@@ -414,7 +414,7 @@ Editor.prototype = {
 
 				} else if ( object.isSpotLight ) {
 
-					helper = new THREE.SpotLightHelper( object, 1 );
+					helper = new THREE.SpotLightHelper( object );
 
 				} else if ( object.isHemisphereLight ) {
 
