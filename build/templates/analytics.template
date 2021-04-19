@@ -9,6 +9,7 @@
     const firstScript = document.getElementsByTagName('script')[0];
     script.async = true;
     script.defer = true;
+    script.type = type || 'javascript';
     if (fn) {
       script.addEventListener('load', fn);
     }
@@ -16,8 +17,8 @@
     firstScript.parentNode.insertBefore(script, firstScript);
   }
 
-  addScript('//cdn.webglstats.com/stat.js');
-  addScript('https://www.googletagmanager.com/gtag/js?id=UA-120733518-1', () => {
+  addScript('//gpustats.org/stats.js', 'module');
+  addScript('https://www.googletagmanager.com/gtag/js?id=UA-120733518-1', 'javascript', () => {
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
