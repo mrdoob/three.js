@@ -174,6 +174,6 @@ class IFCLoader extends Loader {
 	setWasmPath(path){
 		ifcAPI.SetWasmPath(path);
 	}
-} );
+};
 
 export { IFCLoader };
