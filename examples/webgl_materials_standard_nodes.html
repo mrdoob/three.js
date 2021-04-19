@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - standard</title>
+		<title>three.js webgl - materials - standard (nodes)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -83,8 +83,9 @@
 						const diffuseMap = loader.load( 'Cerberus_A.jpg' );
 						diffuseMap.wrapS = THREE.RepeatWrapping;
 						diffuseMap.encoding = THREE.sRGBEncoding;
+
 						//material.map = diffuseMap;
-						material.colorNode = new OperatorNode( '*', new TextureNode( diffuseMap ), new Vector3Node( new THREE.Vector3( 1, 1, 1 ) ) );
+						material.colorNode = new OperatorNode( '*', new TextureNode( diffuseMap ), new Vector3Node( material.color ) );
 
 						// roughness is in G channel, metalness is in B channel
 						material.metalnessMap = material.roughnessMap = loader.load( 'Cerberus_RM.jpg' );

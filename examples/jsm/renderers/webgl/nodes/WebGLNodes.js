@@ -3,43 +3,42 @@ import { WebGLNodeBuilder } from './WebGLNodeBuilder.js';
 import { Material } from '../../../../../build/three.module.js';
 
 function addCodeAfterSnippet( source, snippet, code ) {
-	
+
 	const index = source.indexOf( snippet );
-	
-	if ( index !== -1 ) {
-		
+
+	if ( index !== - 1 ) {
+
 		const start = source.substring( 0, index + snippet.length );
 		const end = source.substring( index + snippet.length );
-		
+
 		return `${start}\n${code}\n${end}`;
-		
+
 	}
-	
+
 	return source;
-	
+
 }
 
 Material.prototype.onNodeBuild = function ( parameters, renderer ) {
 
 	const nodeBuilder = new WebGLNodeBuilder( this, renderer, parameters ).build();
-	
+
 	let fragmentShader = parameters.fragmentShader;
 
-	fragmentShader = addCodeAfterSnippet( fragmentShader, '#include <color_pars_fragment>', 
-`#ifdef NODE_HEADER_UNIFORMS
+	fragmentShader = addCodeAfterSnippet( fragmentShader, '#include <color_pars_fragment>',
+		`#ifdef NODE_HEADER_UNIFORMS
 
 	NODE_HEADER_UNIFORMS
 
-#endif`);
+#endif` );
 
-	fragmentShader = addCodeAfterSnippet( fragmentShader, '#include <color_fragment>', 
-`#ifdef NODE_COLOR
+	fragmentShader = addCodeAfterSnippet( fragmentShader, '#include <color_fragment>',
+		`#ifdef NODE_COLOR
 
 	diffuseColor *= NODE_COLOR;
 
-#endif`);
+#endif` );
 
 	parameters.fragmentShader = fragmentShader;
 
 };
-

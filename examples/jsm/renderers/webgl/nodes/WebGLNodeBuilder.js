@@ -1,5 +1,4 @@
 import NodeBuilder from '../../nodes/core/NodeBuilder.js';
-
 import NodeSlot from '../../nodes/core/NodeSlot.js';
 
 class WebGLNodeBuilder extends NodeBuilder {
@@ -29,17 +28,17 @@ class WebGLNodeBuilder extends NodeBuilder {
 	}
 
 	getVaryFromNode( node, type ) {
-		
+
 		const vary = super.getVaryFromNode( node, type );
-		
+
 		if ( node.isUVNode ) {
-			
+
 			vary.name = 'vUv';
-			
+
 		}
-		
+
 		return vary;
-		
+
 	}
 
 	getTexture( textureProperty, uvSnippet ) {
@@ -87,26 +86,26 @@ class WebGLNodeBuilder extends NodeBuilder {
 	}
 
 	composeUniforms() {
-		
+
 		const uniforms = this.uniforms[ 'fragment' ];
-		
+
 		for ( let uniform of uniforms ) {
-			
+
 			this.properties.uniforms[ uniform.name ] = uniform;
-			
+
 		}
-		
+
 	}
 
 	build() {
 
 		super.build();
-		
-		this.properties.defines['NODE_HEADER_UNIFORMS'] = this.defines['fragment']['NODE_HEADER_UNIFORMS'];
-		this.properties.defines['NODE_COLOR'] = this.defines['fragment']['NODE_COLOR'];
+
+		this.properties.defines[ 'NODE_HEADER_UNIFORMS' ] = this.defines[ 'fragment' ][ 'NODE_HEADER_UNIFORMS' ];
+		this.properties.defines[ 'NODE_COLOR' ] = this.defines[ 'fragment' ][ 'NODE_COLOR' ];
 
 		this.composeUniforms();
-		
+
 		return this;
 
 	}
