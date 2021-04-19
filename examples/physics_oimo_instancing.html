@@ -18,6 +18,7 @@
 			import * as THREE from '../build/three.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import Stats from './jsm/libs/stats.module.js';
+			// Or use latest version from NPM `oimophysics`
 			import {oimo} from './oimophysics/OimoPhysics.js';
 
 
@@ -30,7 +31,6 @@
 			const Shape = oimo.dynamics.rigidbody.Shape;
 			const OBoxGeometry = oimo.collision.geometry.BoxGeometry;
 			const OSphereGeometry = oimo.collision.geometry.SphereGeometry;
-
 
 
 
@@ -51,10 +51,7 @@
 				boxesPhys = [];
 				spheresPhys = [];
 
-				// physics = await AmmoPhysics();
 				position = new THREE.Vector3();
-
-				//
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( - 1, 1.5, 2 );
@@ -81,9 +78,6 @@
 				floor.receiveShadow = true;
 				floor.userData.physics = addRigidBody(world, vec3FromVector3(floor.position), new OBoxGeometry(new Vec3(10 / 2, 5 / 2, 10 / 2)), true);
 				scene.add( floor );
-
-
-				//
 
 				const material = new THREE.MeshLambertMaterial();
 
@@ -160,8 +154,6 @@
 
 				requestAnimationFrame( animate );
 
-				//
-
 				world.step(1 / 60);
 
 				// updating data of visual objects from physical objects
@@ -201,13 +193,13 @@
 
 			// adding a physical object to the world of physics
 			function addRigidBody(w, center, geom, wall) {
-				const shapec = new ShapeConfig();
-				shapec.geometry = geom;
-				const bodyc = new RigidBodyConfig();
-				bodyc.type = wall ? RigidBodyType.STATIC : RigidBodyType.DYNAMIC;
-				bodyc.position = center;
-				let body = new RigidBody(bodyc);
-				body.addShape(new Shape(shapec));
+				const shapeConfig = new ShapeConfig();
+				shapeConfig.geometry = geom;
+				const bodyConfig = new RigidBodyConfig();
+				bodyConfig.type = wall ? RigidBodyType.STATIC : RigidBodyType.DYNAMIC;
+				bodyConfig.position = center;
+				let body = new RigidBody(bodyConfig);
+				body.addShape(new Shape(shapeConfig));
 				w.addRigidBody(body);
 				return body;
 			}
