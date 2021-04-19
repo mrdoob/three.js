@@ -28,16 +28,16 @@ Material.prototype.onBuild = function ( parameters, renderer ) {
 	fragmentShader = addCodeAfterSnippet( fragmentShader, '#include <color_pars_fragment>',
 		`#ifdef NODE_HEADER_UNIFORMS
 
-	NODE_HEADER_UNIFORMS
+			NODE_HEADER_UNIFORMS
 
-#endif` );
+		#endif` );
 
 	fragmentShader = addCodeAfterSnippet( fragmentShader, '#include <color_fragment>',
 		`#ifdef NODE_COLOR
 
-	diffuseColor *= NODE_COLOR;
+			diffuseColor *= NODE_COLOR;
 
-#endif` );
+		#endif` );
 
 	parameters.fragmentShader = fragmentShader;
 
