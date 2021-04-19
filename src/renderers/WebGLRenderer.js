@@ -1383,7 +1383,7 @@ function WebGLRenderer( parameters ) {
 
 			parameters.uniforms = programCache.getUniforms( material );
 
-			material.onNodeBuild( parameters, _this );
+			material.onBuild( parameters, _this );
 
 			material.onBeforeCompile( parameters, _this );
 

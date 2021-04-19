@@ -19,7 +19,7 @@ function addCodeAfterSnippet( source, snippet, code ) {
 
 }
 
-Material.prototype.onNodeBuild = function ( parameters, renderer ) {
+Material.prototype.onBuild = function ( parameters, renderer ) {
 
 	const nodeBuilder = new WebGLNodeBuilder( this, renderer, parameters ).build();
 
