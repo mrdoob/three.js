@@ -12,18 +12,18 @@
 
 		}
 		/**
-	 * Loads and parses a MTL asset from a URL.
-	 *
-	 * @param {String} url - URL to the MTL file.
-	 * @param {Function} [onLoad] - Callback invoked with the loaded object.
-	 * @param {Function} [onProgress] - Callback for download progress.
-	 * @param {Function} [onError] - Callback for download errors.
-	 *
-	 * @see setPath setResourcePath
-	 *
-	 * @note In order for relative texture references to resolve correctly
-	 * you must call setResourcePath() explicitly prior to load.
-	 */
+   * Loads and parses a MTL asset from a URL.
+   *
+   * @param {String} url - URL to the MTL file.
+   * @param {Function} [onLoad] - Callback invoked with the loaded object.
+   * @param {Function} [onProgress] - Callback for download progress.
+   * @param {Function} [onError] - Callback for download errors.
+   *
+   * @see setPath setResourcePath
+   *
+   * @note In order for relative texture references to resolve correctly
+   * you must call setResourcePath() explicitly prior to load.
+   */
 
 
 		load( url, onLoad, onProgress, onError ) {
@@ -67,16 +67,16 @@
 
 		}
 		/**
-	 * Parses a MTL file.
-	 *
-	 * @param {String} text - Content of MTL file
-	 * @return {MaterialCreator}
-	 *
-	 * @see setPath setResourcePath
-	 *
-	 * @note In order for relative texture references to resolve correctly
-	 * you must call setResourcePath() explicitly prior to parse.
-	 */
+   * Parses a MTL file.
+   *
+   * @param {String} text - Content of MTL file
+   * @return {MaterialCreator}
+   *
+   * @see setPath setResourcePath
+   *
+   * @note In order for relative texture references to resolve correctly
+   * you must call setResourcePath() explicitly prior to parse.
+   */
 
 
 		parse( text, path ) {
@@ -142,14 +142,14 @@
  * Create a new MTLLoader.MaterialCreator
  * @param baseUrl - Url relative to which textures are loaded
  * @param options - Set of options on how to construct the materials
- *									side: Which side to apply the material
- *												THREE.FrontSide (default), THREE.BackSide, THREE.DoubleSide
- *									wrap: What type of wrapping to apply for textures
- *												THREE.RepeatWrapping (default), THREE.ClampToEdgeWrapping, THREE.MirroredRepeatWrapping
- *									normalizeRGB: RGBs need to be normalized to 0-1 from 0-255
- *																Default: false, assumed to be already normalized
- *									ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's
- *																	Default: false
+ *                  side: Which side to apply the material
+ *                        THREE.FrontSide (default), THREE.BackSide, THREE.DoubleSide
+ *                  wrap: What type of wrapping to apply for textures
+ *                        THREE.RepeatWrapping (default), THREE.ClampToEdgeWrapping, THREE.MirroredRepeatWrapping
+ *                  normalizeRGB: RGBs need to be normalized to 0-1 from 0-255
+ *                                Default: false, assumed to be already normalized
+ *                  ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's
+ *                                  Default: false
  * @constructor
  */
 
@@ -215,7 +215,7 @@
 						case 'kd':
 						case 'ka':
 						case 'ks':
-						// Diffuse color (color under white light) using RGB values
+							// Diffuse color (color under white light) using RGB values
 							if ( this.options && this.options.normalizeRGB ) {
 
 								value = [ value[ 0 ] / 255, value[ 1 ] / 255, value[ 2 ] / 255 ];
@@ -341,32 +341,32 @@
 
 					// Ns is material specular exponent
 					case 'kd':
-					// Diffuse color (color under white light) using RGB values
+						// Diffuse color (color under white light) using RGB values
 						params.color = new THREE.Color().fromArray( value );
 						break;
 
 					case 'ks':
-					// Specular color (color when light is reflected from shiny surface) using RGB values
+						// Specular color (color when light is reflected from shiny surface) using RGB values
 						params.specular = new THREE.Color().fromArray( value );
 						break;
 
 					case 'ke':
-					// Emissive using RGB values
+						// Emissive using RGB values
 						params.emissive = new THREE.Color().fromArray( value );
 						break;
 
 					case 'map_kd':
-					// Diffuse texture map
+						// Diffuse texture map
 						setMapForType( 'map', value );
 						break;
 
 					case 'map_ks':
-					// Specular map
+						// Specular map
 						setMapForType( 'specularMap', value );
 						break;
 
 					case 'map_ke':
-					// Emissive map
+						// Emissive map
 						setMapForType( 'emissiveMap', value );
 						break;
 
@@ -376,19 +376,19 @@
 
 					case 'map_bump':
 					case 'bump':
-					// Bump texture map
+						// Bump texture map
 						setMapForType( 'bumpMap', value );
 						break;
 
 					case 'map_d':
-					// Alpha map
+						// Alpha map
 						setMapForType( 'alphaMap', value );
 						params.transparent = true;
 						break;
 
 					case 'ns':
-					// The specular exponent (defines the focus of the specular highlight)
-					// A high exponent results in a tight, concentrated highlight. Ns values normally range from 0 to 1000.
+						// The specular exponent (defines the focus of the specular highlight)
+						// A high exponent results in a tight, concentrated highlight. Ns values normally range from 0 to 1000.
 						params.shininess = parseFloat( value );
 						break;
 

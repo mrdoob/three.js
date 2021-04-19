@@ -13,12 +13,12 @@
 	class NURBSUtils {
 
 		/*
-	Finds knot vector span.
-		p : degree
-	u : parametric value
-	U : knot vector
-		returns the span
-	*/
+  Finds knot vector span.
+  	p : degree
+  u : parametric value
+  U : knot vector
+  	returns the span
+  */
 		static findSpan( p, u, U ) {
 
 			const n = U.length - p - 1;
@@ -59,13 +59,13 @@
 
 		}
 		/*
-	Calculate basis functions. See The NURBS Book, page 70, algorithm A2.2
-		span : span in which u lies
-	u		: parametric point
-	p		: degree
-	U		: knot vector
-		returns array[p+1] with basis functions values.
-	*/
+  Calculate basis functions. See The NURBS Book, page 70, algorithm A2.2
+  	span : span in which u lies
+  u    : parametric point
+  p    : degree
+  U    : knot vector
+  	returns array[p+1] with basis functions values.
+  */
 
 
 		static calcBasisFunctions( span, u, p, U ) {
@@ -99,13 +99,13 @@
 
 		}
 		/*
-	Calculate B-Spline curve points. See The NURBS Book, page 82, algorithm A3.1.
-		p : degree of B-Spline
-	U : knot vector
-	P : control points (x, y, z, w)
-	u : parametric point
-		returns point for given u
-	*/
+  Calculate B-Spline curve points. See The NURBS Book, page 82, algorithm A3.1.
+  	p : degree of B-Spline
+  U : knot vector
+  P : control points (x, y, z, w)
+  u : parametric point
+  	returns point for given u
+  */
 
 
 		static calcBSplinePoint( p, U, P, u ) {
@@ -130,14 +130,14 @@
 
 		}
 		/*
-	Calculate basis functions derivatives. See The NURBS Book, page 72, algorithm A2.3.
-		span : span in which u lies
-	u		: parametric point
-	p		: degree
-	n		: number of derivatives to calculate
-	U		: knot vector
-		returns array[n+1][p+1] with basis functions derivatives
-	*/
+  Calculate basis functions derivatives. See The NURBS Book, page 72, algorithm A2.3.
+  	span : span in which u lies
+  u    : parametric point
+  p    : degree
+  n    : number of derivatives to calculate
+  U    : knot vector
+  	returns array[n+1][p+1] with basis functions derivatives
+  */
 
 
 		static calcBasisFunctionDerivatives( span, u, p, n, U ) {
@@ -256,14 +256,14 @@
 
 		}
 		/*
-		Calculate derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
-			p	: degree
-		U	: knot vector
-		P	: control points
-		u	: Parametric points
-		nd : number of derivatives
-			returns array[d+1] with derivatives
-		*/
+  	Calculate derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
+  		p  : degree
+  	U  : knot vector
+  	P  : control points
+  	u  : Parametric points
+  	nd : number of derivatives
+  		returns array[d+1] with derivatives
+  	*/
 
 
 		static calcBSplineDerivatives( p, U, P, u, nd ) {
@@ -309,9 +309,9 @@
 
 		}
 		/*
-	Calculate "K over I"
-		returns k!/(i!(k-i)!)
-	*/
+  Calculate "K over I"
+  	returns k!/(i!(k-i)!)
+  */
 
 
 		static calcKoverI( k, i ) {
@@ -342,10 +342,10 @@
 
 		}
 		/*
-	Calculate derivatives (0-nd) of rational curve. See The NURBS Book, page 127, algorithm A4.2.
-		Pders : result of function calcBSplineDerivatives
-		returns array with derivatives for rational curve.
-	*/
+  Calculate derivatives (0-nd) of rational curve. See The NURBS Book, page 127, algorithm A4.2.
+  	Pders : result of function calcBSplineDerivatives
+  	returns array with derivatives for rational curve.
+  */
 
 
 		static calcRationalCurveDerivatives( Pders ) {
@@ -382,14 +382,14 @@
 
 		}
 		/*
-	Calculate NURBS curve derivatives. See The NURBS Book, page 127, algorithm A4.2.
-		p	: degree
-	U	: knot vector
-	P	: control points in homogeneous space
-	u	: parametric points
-	nd : number of derivatives
-		returns array with derivatives.
-	*/
+  Calculate NURBS curve derivatives. See The NURBS Book, page 127, algorithm A4.2.
+  	p  : degree
+  U  : knot vector
+  P  : control points in homogeneous space
+  u  : parametric points
+  nd : number of derivatives
+  	returns array with derivatives.
+  */
 
 
 		static calcNURBSDerivatives( p, U, P, u, nd ) {
@@ -399,13 +399,13 @@
 
 		}
 		/*
-	Calculate rational B-Spline surface point. See The NURBS Book, page 134, algorithm A4.3.
-		p1, p2 : degrees of B-Spline surface
-	U1, U2 : knot vectors
-	P			: control points (x, y, z, w)
-	u, v	 : parametric values
-		returns point for given (u, v)
-	*/
+  Calculate rational B-Spline surface point. See The NURBS Book, page 134, algorithm A4.3.
+  	p1, p2 : degrees of B-Spline surface
+  U1, U2 : knot vectors
+  P      : control points (x, y, z, w)
+  u, v   : parametric values
+  	returns point for given (u, v)
+  */
 
 
 		static calcSurfacePoint( p, q, U, V, P, u, v, target ) {

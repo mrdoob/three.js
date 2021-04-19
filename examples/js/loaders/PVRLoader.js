@@ -2,8 +2,8 @@
 
 	/*
  *	 PVR v2 (legacy) parser
- *	 TODO : Add Support for PVR v3 format
- *	 TODO : implement loadMipmaps option
+ *   TODO : Add Support for PVR v3 format
+ *   TODO : implement loadMipmaps option
  */
 
 	class PVRLoader extends THREE.CompressedTextureLoader {
@@ -59,25 +59,25 @@
 		switch ( pixelFormat ) {
 
 			case 0:
-			// PVRTC 2bpp RGB
+				// PVRTC 2bpp RGB
 				bpp = 2;
 				format = THREE.RGB_PVRTC_2BPPV1_Format;
 				break;
 
 			case 1:
-			// PVRTC 2bpp RGBA
+				// PVRTC 2bpp RGBA
 				bpp = 2;
 				format = THREE.RGBA_PVRTC_2BPPV1_Format;
 				break;
 
 			case 2:
-			// PVRTC 4bpp RGB
+				// PVRTC 4bpp RGB
 				bpp = 4;
 				format = THREE.RGB_PVRTC_4BPPV1_Format;
 				break;
 
 			case 3:
-			// PVRTC 4bpp RGBA
+				// PVRTC 4bpp RGBA
 				bpp = 4;
 				format = THREE.RGBA_PVRTC_4BPPV1_Format;
 				break;
@@ -108,7 +108,7 @@
 			numMipmaps = header[ 3 ],
 			flags = header[ 4 ],
 			// dataLength = header[ 5 ],
-			// bpp =	header[ 6 ],
+			// bpp =  header[ 6 ],
 			// bitmaskRed = header[ 7 ],
 			// bitmaskGreen = header[ 8 ],
 			// bitmaskBlue = header[ 9 ],

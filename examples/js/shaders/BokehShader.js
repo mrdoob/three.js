@@ -37,8 +37,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -49,8 +49,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		#include <common>
 
@@ -104,49 +104,49 @@
 			vec4 col = vec4( 0.0 );
 
 			col += texture2D( tColor, vUv.xy );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.0,	 0.4	) * aspectcorrect ) * dofblur );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.15,	0.37 ) * aspectcorrect ) * dofblur );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.29,	0.29 ) * aspectcorrect ) * dofblur );
-			col += texture2D( tColor, vUv.xy + ( vec2( -0.37,	0.15 ) * aspectcorrect ) * dofblur );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.40,	0.0	) * aspectcorrect ) * dofblur );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.37, -0.15 ) * aspectcorrect ) * dofblur );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.29, -0.29 ) * aspectcorrect ) * dofblur );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.15,  0.37 ) * aspectcorrect ) * dofblur );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur );
+			col += texture2D( tColor, vUv.xy + ( vec2( -0.37,  0.15 ) * aspectcorrect ) * dofblur );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.40,  0.0  ) * aspectcorrect ) * dofblur );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.37, -0.15 ) * aspectcorrect ) * dofblur );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur );
 			col += texture2D( tColor, vUv.xy + ( vec2( -0.15, -0.37 ) * aspectcorrect ) * dofblur );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.0,	-0.4	) * aspectcorrect ) * dofblur );
-			col += texture2D( tColor, vUv.xy + ( vec2( -0.15,	0.37 ) * aspectcorrect ) * dofblur );
-			col += texture2D( tColor, vUv.xy + ( vec2( -0.29,	0.29 ) * aspectcorrect ) * dofblur );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.37,	0.15 ) * aspectcorrect ) * dofblur );
-			col += texture2D( tColor, vUv.xy + ( vec2( -0.4,	 0.0	) * aspectcorrect ) * dofblur );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur );
+			col += texture2D( tColor, vUv.xy + ( vec2( -0.15,  0.37 ) * aspectcorrect ) * dofblur );
+			col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.37,  0.15 ) * aspectcorrect ) * dofblur );
+			col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur );
 			col += texture2D( tColor, vUv.xy + ( vec2( -0.37, -0.15 ) * aspectcorrect ) * dofblur );
 			col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.15, -0.37 ) * aspectcorrect ) * dofblur );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.15, -0.37 ) * aspectcorrect ) * dofblur );
 
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.15,	0.37 ) * aspectcorrect ) * dofblur9 );
-			col += texture2D( tColor, vUv.xy + ( vec2( -0.37,	0.15 ) * aspectcorrect ) * dofblur9 );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.37, -0.15 ) * aspectcorrect ) * dofblur9 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.15,  0.37 ) * aspectcorrect ) * dofblur9 );
+			col += texture2D( tColor, vUv.xy + ( vec2( -0.37,  0.15 ) * aspectcorrect ) * dofblur9 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.37, -0.15 ) * aspectcorrect ) * dofblur9 );
 			col += texture2D( tColor, vUv.xy + ( vec2( -0.15, -0.37 ) * aspectcorrect ) * dofblur9 );
-			col += texture2D( tColor, vUv.xy + ( vec2( -0.15,	0.37 ) * aspectcorrect ) * dofblur9 );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.37,	0.15 ) * aspectcorrect ) * dofblur9 );
+			col += texture2D( tColor, vUv.xy + ( vec2( -0.15,  0.37 ) * aspectcorrect ) * dofblur9 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.37,  0.15 ) * aspectcorrect ) * dofblur9 );
 			col += texture2D( tColor, vUv.xy + ( vec2( -0.37, -0.15 ) * aspectcorrect ) * dofblur9 );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.15, -0.37 ) * aspectcorrect ) * dofblur9 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.15, -0.37 ) * aspectcorrect ) * dofblur9 );
 
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.29,	0.29 ) * aspectcorrect ) * dofblur7 );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.40,	0.0	) * aspectcorrect ) * dofblur7 );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.29, -0.29 ) * aspectcorrect ) * dofblur7 );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.0,	-0.4	) * aspectcorrect ) * dofblur7 );
-			col += texture2D( tColor, vUv.xy + ( vec2( -0.29,	0.29 ) * aspectcorrect ) * dofblur7 );
-			col += texture2D( tColor, vUv.xy + ( vec2( -0.4,	 0.0	) * aspectcorrect ) * dofblur7 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur7 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.40,  0.0  ) * aspectcorrect ) * dofblur7 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur7 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur7 );
+			col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur7 );
+			col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur7 );
 			col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur7 );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.0,	 0.4	) * aspectcorrect ) * dofblur7 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur7 );
 
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.29,	0.29 ) * aspectcorrect ) * dofblur4 );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.4,	 0.0	) * aspectcorrect ) * dofblur4 );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.29, -0.29 ) * aspectcorrect ) * dofblur4 );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.0,	-0.4	) * aspectcorrect ) * dofblur4 );
-			col += texture2D( tColor, vUv.xy + ( vec2( -0.29,	0.29 ) * aspectcorrect ) * dofblur4 );
-			col += texture2D( tColor, vUv.xy + ( vec2( -0.4,	 0.0	) * aspectcorrect ) * dofblur4 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur4 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.4,   0.0  ) * aspectcorrect ) * dofblur4 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur4 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur4 );
+			col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur4 );
+			col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur4 );
 			col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur4 );
-			col += texture2D( tColor, vUv.xy + ( vec2(	0.0,	 0.4	) * aspectcorrect ) * dofblur4 );
+			col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur4 );
 
 			gl_FragColor = col / 41.0;
 			gl_FragColor.a = 1.0;

@@ -48,9 +48,9 @@
 			this.maxDistance = Infinity;
 			this.keys = [ 'KeyA',
 				/*A*/
-		 'KeyS',
+				'KeyS',
 				/*S*/
-		 'KeyD'
+				'KeyD'
 				/*D*/
 			];
 			this.mouseButtons = {
@@ -389,7 +389,7 @@
 					case 'pen':
 						onMouseDown( event );
 						break;
-				// TODO touch
+        // TODO touch
 
 				}
 
@@ -405,7 +405,7 @@
 					case 'pen':
 						onMouseMove( event );
 						break;
-				// TODO touch
+        // TODO touch
 
 				}
 
@@ -421,7 +421,7 @@
 					case 'pen':
 						onMouseUp( event );
 						break;
-				// TODO touch
+        // TODO touch
 
 				}
 
@@ -559,17 +559,17 @@
 				switch ( event.deltaMode ) {
 
 					case 2:
-					// Zoom in pages
+						// Zoom in pages
 						_zoomStart.y -= event.deltaY * 0.025;
 						break;
 
 					case 1:
-					// Zoom in lines
+						// Zoom in lines
 						_zoomStart.y -= event.deltaY * 0.01;
 						break;
 
 					default:
-					// undefined, 0, assume pixels
+						// undefined, 0, assume pixels
 						_zoomStart.y -= event.deltaY * 0.00025;
 						break;
 
@@ -597,7 +597,7 @@
 						break;
 
 					default:
-					// 2 or more
+						// 2 or more
 						_state = STATE.TOUCH_ZOOM_PAN;
 						const dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
 						const dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
@@ -632,7 +632,7 @@
 						break;
 
 					default:
-					// 2 or more
+						// 2 or more
 						const dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
 						const dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
 						_touchZoomDistanceEnd = Math.sqrt( dx * dx + dy * dy );

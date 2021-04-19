@@ -566,7 +566,7 @@
 
 		parse( text, path, onLoad ) {
 
-			// Async parse.	This function calls onParse with the parsed THREE.Object3D as parameter
+			// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
 			this.processObject( text, onLoad, null, path );
 
 		}
@@ -844,7 +844,7 @@
 						break;
 
 					case 'MATERIAL':
-					// Not implemented
+						// Not implemented
 						lineParser.setToEnd();
 						break;
 
@@ -870,7 +870,7 @@
 					break;
 
 				case FINISH_TYPE_PEARLESCENT:
-				// Try to imitate pearlescency by setting the specular to the complementary of the color, and low shininess
+					// Try to imitate pearlescency by setting the specular to the complementary of the color, and low shininess
 					const specular = new THREE.Color( colour );
 					const hsl = specular.getHSL( {
 						h: 0,
@@ -889,7 +889,7 @@
 					break;
 
 				case FINISH_TYPE_CHROME:
-				// Mirror finish surface
+					// Mirror finish surface
 					material = new THREE.MeshStandardMaterial( {
 						color: colour,
 						roughness: 0,
@@ -898,7 +898,7 @@
 					break;
 
 				case FINISH_TYPE_RUBBER:
-				// Rubber finish
+					// Rubber finish
 					material = new THREE.MeshStandardMaterial( {
 						color: colour,
 						roughness: 0.9,
@@ -908,7 +908,7 @@
 					break;
 
 				case FINISH_TYPE_MATTE_METALLIC:
-				// Brushed metal finish
+					// Brushed metal finish
 					material = new THREE.MeshStandardMaterial( {
 						color: colour,
 						roughness: 0.8,
@@ -917,7 +917,7 @@
 					break;
 
 				case FINISH_TYPE_METAL:
-				// Average metal finish
+					// Average metal finish
 					material = new THREE.MeshStandardMaterial( {
 						color: colour,
 						roughness: 0.2,
@@ -926,7 +926,7 @@
 					break;
 
 				default:
-				// Should not happen
+					// Should not happen
 					break;
 
 			}
@@ -1113,7 +1113,7 @@
 
 					// Line type 0: Comment or META
 					case '0':
-					// Parse meta directive
+						// Parse meta directive
 						const meta = lp.getToken();
 
 						if ( meta ) {
@@ -1203,7 +1203,7 @@
 									break;
 
 								case 'BFC':
-								// Changes to the backface culling state
+									// Changes to the backface culling state
 									while ( ! lp.isAtTheEnd() ) {
 
 										const token = lp.getToken();
@@ -1245,7 +1245,7 @@
 									break;
 
 								default:
-								// Other meta directives are not implemented
+									// Other meta directives are not implemented
 									break;
 
 							}
@@ -1771,7 +1771,7 @@
 						break;
 
 					case FILE_LOCATION_NOT_FOUND:
-					// All location possibilities have been tried, give up loading this object
+						// All location possibilities have been tried, give up loading this object
 						console.warn( 'LDrawLoader: Subobject "' + subobject.originalFileName + '" could not be found.' );
 						return;
 

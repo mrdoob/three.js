@@ -166,7 +166,7 @@
 					state = line;
 
 				} else if ( cmd === 'G2' || cmd === 'G3' ) { //G2/G3 - Arc Movement ( G2 clock wise and G3 counter clock wise )
-				//console.warn( 'THREE.GCodeLoader: Arc command not supported' );
+					//console.warn( 'THREE.GCodeLoader: Arc command not supported' );
 				} else if ( cmd === 'G90' ) {
 
 					//G90: Set to Absolute Positioning

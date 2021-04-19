@@ -982,9 +982,9 @@
 	CameraControls.prototype = Object.create( THREE.EventDispatcher.prototype );
 	CameraControls.prototype.constructor = CameraControls; // OrbitControls maintains the "up" direction, camera.up (+Y by default).
 	//
-	//		Orbit - left mouse / touch: one-finger move
-	//		Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-	//		Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
+	//    Orbit - left mouse / touch: one-finger move
+	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+	//    Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
 
 	var OrbitControls = function ( object, domElement ) {
 
@@ -999,9 +999,9 @@
 	OrbitControls.prototype = Object.create( THREE.EventDispatcher.prototype );
 	OrbitControls.prototype.constructor = OrbitControls; // MapControls maintains the "up" direction, camera.up (+Y by default)
 	//
-	//		Orbit - right mouse, or left mouse + ctrl/meta/shiftKey / touch: two-finger rotate
-	//		Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-	//		Pan - left mouse, or left right + ctrl/meta/shiftKey, or arrow keys / touch: one-finger move
+	//    Orbit - right mouse, or left mouse + ctrl/meta/shiftKey / touch: two-finger rotate
+	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+	//    Pan - left mouse, or left right + ctrl/meta/shiftKey, or arrow keys / touch: one-finger move
 
 	var MapControls = function ( object, domElement ) {
 
@@ -1016,9 +1016,9 @@
 	MapControls.prototype = Object.create( THREE.EventDispatcher.prototype );
 	MapControls.prototype.constructor = MapControls; // TrackballControls allows the camera to rotate over the polls and does not maintain camera.up
 	//
-	//		Orbit - left mouse / touch: one-finger move
-	//		Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-	//		Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
+	//    Orbit - left mouse / touch: one-finger move
+	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+	//    Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
 
 	var TrackballControls = function ( object, domElement ) {
 

@@ -120,10 +120,10 @@
 
 	};
 	/*********************************************
-	*
-	* Parametric Replacement for TorusKnotGeometry
-	*
-	*********************************************/
+  *
+  * Parametric Replacement for TorusKnotGeometry
+  *
+  *********************************************/
 
 	ParametricGeometries.TorusKnotGeometry = class TorusKnotGeometry extends ParametricGeometries.TubeGeometry {
 
@@ -160,10 +160,10 @@
 
 	};
 	/*********************************************
-	*
-	* Parametric Replacement for SphereGeometry
-	*
-	*********************************************/
+  *
+  * Parametric Replacement for SphereGeometry
+  *
+  *********************************************/
 
 	ParametricGeometries.SphereGeometry = class SphereGeometry extends THREE.ParametricGeometry {
 
@@ -186,10 +186,10 @@
 
 	};
 	/*********************************************
-	*
-	* Parametric Replacement for PlaneGeometry
-	*
-	*********************************************/
+  *
+  * Parametric Replacement for PlaneGeometry
+  *
+  *********************************************/
 
 	ParametricGeometries.PlaneGeometry = class PlaneGeometry extends THREE.ParametricGeometry {
 

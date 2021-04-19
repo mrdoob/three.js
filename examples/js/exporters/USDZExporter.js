@@ -97,11 +97,11 @@
 
 		return `#usda 1.0
 (
-		customLayerData = {
-				string creator = "Three.js USDZExporter"
-		}
-		metersPerUnit = 1
-		upAxis = "Y"
+    customLayerData = {
+        string creator = "Three.js USDZExporter"
+    }
+    metersPerUnit = 1
+    upAxis = "Y"
 )
 
 `;
@@ -115,10 +115,10 @@
 		const transform = buildMatrix( object.matrixWorld );
 		return `def Xform "${name}"
 {
-		matrix4d xformOp:transform = ${transform}
-		uniform token[] xformOpOrder = ["xformOp:transform"]
+    matrix4d xformOp:transform = ${transform}
+    uniform token[] xformOpOrder = ["xformOp:transform"]
 
-		${define}
+    ${define}
 }
 
 `;
@@ -152,19 +152,19 @@
 		}
 
 		return `def Mesh "${name}"
-		{
-				int[] faceVertexCounts = [${buildMeshVertexCount( geometry )}]
-				int[] faceVertexIndices = [${buildMeshVertexIndices( geometry )}]
-				rel material:binding = </Materials/Material_${material.id}>
-				normal3f[] normals = [${buildVector3Array( attributes.normal, count )}] (
-						interpolation = "vertex"
-				)
-				point3f[] points = [${buildVector3Array( attributes.position, count )}]
-				float2[] primvars:st = [${buildVector2Array( attributes.uv, count )}] (
-						interpolation = "vertex"
-				)
-				uniform token subdivisionScheme = "none"
-		}
+    {
+        int[] faceVertexCounts = [${buildMeshVertexCount( geometry )}]
+        int[] faceVertexIndices = [${buildMeshVertexIndices( geometry )}]
+        rel material:binding = </Materials/Material_${material.id}>
+        normal3f[] normals = [${buildVector3Array( attributes.normal, count )}] (
+            interpolation = "vertex"
+        )
+        point3f[] points = [${buildVector3Array( attributes.position, count )}]
+        float2[] primvars:st = [${buildVector2Array( attributes.uv, count )}] (
+            interpolation = "vertex"
+        )
+        uniform token subdivisionScheme = "none"
+    }
 `;
 
 	}
@@ -265,7 +265,7 @@ ${array.join( '' )}
 	function buildMaterial( material ) {
 
 		// https://graphics.pixar.com/usd/docs/UsdPreviewSurface-Proposal.html
-		const pad = '						';
+		const pad = '            ';
 		const parameters = [];
 
 		if ( material.map !== null ) {
@@ -321,18 +321,18 @@ ${array.join( '' )}
 		}
 
 		return `
-		def Material "Material_${material.id}"
-		{
-				token outputs:surface.connect = </Materials/Material_${material.id}/PreviewSurface.outputs:surface>
+    def Material "Material_${material.id}"
+    {
+        token outputs:surface.connect = </Materials/Material_${material.id}/PreviewSurface.outputs:surface>
 
-				def Shader "PreviewSurface"
-				{
-						uniform token info:id = "UsdPreviewSurface"
+        def Shader "PreviewSurface"
+        {
+            uniform token info:id = "UsdPreviewSurface"
 ${parameters.join( '\n' )}
-						int inputs:useSpecularWorkflow = 0
-						token outputs:surface
-				}
-		}
+            int inputs:useSpecularWorkflow = 0
+            token outputs:surface
+        }
+    }
 `;
 
 	}
@@ -360,17 +360,17 @@ ${array.join( '' )}
 	function buildTexture( texture ) {
 
 		return `
-		def Shader "Texture_${texture.id}"
-		{
-				uniform token info:id = "UsdUVTexture"
-				asset inputs:file = @textures/Texture_${texture.id}.jpg@
-				token inputs:wrapS = "repeat"
-				token inputs:wrapT = "repeat"
-				float outputs:r
-				float outputs:g
-				float outputs:b
-				float3 outputs:rgb
-		}
+    def Shader "Texture_${texture.id}"
+    {
+        uniform token info:id = "UsdUVTexture"
+        asset inputs:file = @textures/Texture_${texture.id}.jpg@
+        token inputs:wrapS = "repeat"
+        token inputs:wrapT = "repeat"
+        float outputs:r
+        float outputs:g
+        float outputs:b
+        float3 outputs:rgb
+    }
 `;
 
 	}

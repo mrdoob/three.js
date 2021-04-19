@@ -241,10 +241,10 @@
 			this.blurMaterial2.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
 			this.blurMaterial2.uniforms[ 'resolution' ].value.set( this.width, this.height ); // // blur material 3
 			// this.blurMaterial3 = new THREE.ShaderMaterial({
-			//	 defines: Object.assign({}, THREE.SSRBlurShader.defines),
-			//	 uniforms: THREE.UniformsUtils.clone(THREE.SSRBlurShader.uniforms),
-			//	 vertexShader: THREE.SSRBlurShader.vertexShader,
-			//	 fragmentShader: THREE.SSRBlurShader.fragmentShader
+			//   defines: Object.assign({}, THREE.SSRBlurShader.defines),
+			//   uniforms: THREE.UniformsUtils.clone(THREE.SSRBlurShader.uniforms),
+			//   vertexShader: THREE.SSRBlurShader.vertexShader,
+			//   fragmentShader: THREE.SSRBlurShader.fragmentShader
 			// });
 			// this.blurMaterial3.uniforms['tDiffuse'].value = this.blurRenderTarget2.texture;
 			// this.blurMaterial3.uniforms['resolution'].value.set(this.width, this.height);

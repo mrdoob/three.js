@@ -651,7 +651,7 @@
 					case 'Fog':
 					case 'NavigationInfo':
 					case 'Viewpoint':
-					// node not supported yet
+						// node not supported yet
 						break;
 
 					default:
@@ -685,15 +685,15 @@
 					switch ( fieldName ) {
 
 						case 'bboxCenter':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'bboxSize':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'center':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'children':
@@ -701,7 +701,7 @@
 							break;
 
 						case 'collide':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'rotation':
@@ -715,7 +715,7 @@
 							break;
 
 						case 'scaleOrientation':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'translation':
@@ -723,7 +723,7 @@
 							break;
 
 						case 'proxy':
-						// field not supported
+							// field not supported
 							break;
 
 						default:
@@ -762,27 +762,27 @@
 							break;
 
 						case 'backUrl':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'bottomUrl':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'frontUrl':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'leftUrl':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'rightUrl':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'topUrl':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'skyAngle':
@@ -1119,7 +1119,7 @@
 					switch ( fieldName ) {
 
 						case 'ambientIntensity':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'diffuseColor':
@@ -1161,7 +1161,7 @@
 				switch ( textureType ) {
 
 					case TEXTURE_TYPE.INTENSITY:
-					// Intensity texture: A one-component image specifies one-byte hexadecimal or integer values representing the intensity of the image
+						// Intensity texture: A one-component image specifies one-byte hexadecimal or integer values representing the intensity of the image
 						value = parseInt( hex );
 						color.r = value;
 						color.g = value;
@@ -1169,7 +1169,7 @@
 						break;
 
 					case TEXTURE_TYPE.INTENSITY_ALPHA:
-					// Intensity+Alpha texture: A two-component image specifies the intensity in the first (high) byte and the alpha opacity in the second (low) byte.
+						// Intensity+Alpha texture: A two-component image specifies the intensity in the first (high) byte and the alpha opacity in the second (low) byte.
 						value = parseInt( '0x' + hex.substring( 2, 4 ) );
 						color.r = value;
 						color.g = value;
@@ -1178,14 +1178,14 @@
 						break;
 
 					case TEXTURE_TYPE.RGB:
-					// RGB texture: Pixels in a three-component image specify the red component in the first (high) byte, followed by the green and blue components
+						// RGB texture: Pixels in a three-component image specify the red component in the first (high) byte, followed by the green and blue components
 						color.r = parseInt( '0x' + hex.substring( 2, 4 ) );
 						color.g = parseInt( '0x' + hex.substring( 4, 6 ) );
 						color.b = parseInt( '0x' + hex.substring( 6, 8 ) );
 						break;
 
 					case TEXTURE_TYPE.RGBA:
-					// RGBA texture: Four-component images specify the alpha opacity byte after red/green/blue
+						// RGBA texture: Four-component images specify the alpha opacity byte after red/green/blue
 						color.r = parseInt( '0x' + hex.substring( 2, 4 ) );
 						color.g = parseInt( '0x' + hex.substring( 4, 6 ) );
 						color.b = parseInt( '0x' + hex.substring( 6, 8 ) );
@@ -1521,7 +1521,7 @@
 							break;
 
 						case 'convex':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'coordIndex':
@@ -1907,7 +1907,7 @@
 							break;
 
 						case 'side':
-						// field not supported
+							// field not supported
 							break;
 
 						default:
@@ -1938,7 +1938,7 @@
 					switch ( fieldName ) {
 
 						case 'bottom':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'radius':
@@ -1950,11 +1950,11 @@
 							break;
 
 						case 'side':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'top':
-						// field not supported
+							// field not supported
 							break;
 
 						default:
@@ -2311,7 +2311,7 @@
 							break;
 
 						case 'convex':
-						// field not supported
+							// field not supported
 							break;
 
 						case 'creaseAngle':
@@ -2839,27 +2839,27 @@
 
 			}
 			/**
-		 * Vertically paints the faces interpolating between the
-		 * specified colors at the specified angels. This is used for the Background
-		 * node, but could be applied to other nodes with multiple faces as well.
-		 *
-		 * When used with the Background node, default is directionIsDown is true if
-		 * interpolating the skyColor down from the Zenith. When interpolationg up from
-		 * the Nadir i.e. interpolating the groundColor, the directionIsDown is false.
-		 *
-		 * The first angle is never specified, it is the Zenith (0 rad). Angles are specified
-		 * in radians. The geometry is thought a sphere, but could be anything. The color interpolation
-		 * is linear along the Y axis in any case.
-		 *
-		 * You must specify one more color than you have angles at the beginning of the colors array.
-		 * This is the color of the Zenith (the top of the shape).
-		 *
-		 * @param {BufferGeometry} geometry
-		 * @param {number} radius
-		 * @param {array} angles
-		 * @param {array} colors
-		 * @param {boolean} topDown - Whether to work top down or bottom up.
-		 */
+     * Vertically paints the faces interpolating between the
+     * specified colors at the specified angels. This is used for the Background
+     * node, but could be applied to other nodes with multiple faces as well.
+     *
+     * When used with the Background node, default is directionIsDown is true if
+     * interpolating the skyColor down from the Zenith. When interpolationg up from
+     * the Nadir i.e. interpolating the groundColor, the directionIsDown is false.
+     *
+     * The first angle is never specified, it is the Zenith (0 rad). Angles are specified
+     * in radians. The geometry is thought a sphere, but could be anything. The color interpolation
+     * is linear along the Y axis in any case.
+     *
+     * You must specify one more color than you have angles at the beginning of the colors array.
+     * This is the color of the Zenith (the top of the shape).
+     *
+     * @param {BufferGeometry} geometry
+     * @param {number} radius
+     * @param {array} angles
+     * @param {array} colors
+     * @param {boolean} topDown - Whether to work top down or bottom up.
+     */
 
 
 			function paintFaces( geometry, radius, angles, colors, topDown ) {

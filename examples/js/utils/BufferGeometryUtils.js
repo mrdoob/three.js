@@ -9,10 +9,10 @@
 
 		}
 		/**
-	 * @param	{Array<BufferGeometry>} geometries
-	 * @param	{Boolean} useGroups
-	 * @return {BufferGeometry}
-	 */
+   * @param  {Array<BufferGeometry>} geometries
+   * @param  {Boolean} useGroups
+   * @return {BufferGeometry}
+   */
 
 
 		static mergeBufferGeometries( geometries, useGroups = false ) {
@@ -74,7 +74,7 @@
 
 					if ( ! morphAttributesUsed.has( name ) ) {
 
-						console.error( 'THREE.BufferGeometryUtils: .mergeBufferGeometries() failed with geometry at index ' + i + '.	.morphAttributes must be consistent throughout all geometries.' );
+						console.error( 'THREE.BufferGeometryUtils: .mergeBufferGeometries() failed with geometry at index ' + i + '.  .morphAttributes must be consistent throughout all geometries.' );
 						return null;
 
 					}
@@ -191,9 +191,9 @@
 
 		}
 		/**
-	 * @param {Array<BufferAttribute>} attributes
-	 * @return {BufferAttribute}
-	 */
+   * @param {Array<BufferAttribute>} attributes
+   * @return {BufferAttribute}
+   */
 
 
 		static mergeBufferAttributes( attributes ) {
@@ -259,9 +259,9 @@
 
 		}
 		/**
-	 * @param {Array<BufferAttribute>} attributes
-	 * @return {Array<InterleavedBufferAttribute>}
-	 */
+   * @param {Array<BufferAttribute>} attributes
+   * @return {Array<InterleavedBufferAttribute>}
+   */
 
 
 		static interleaveAttributes( attributes ) {
@@ -322,9 +322,9 @@
 
 		}
 		/**
-	 * @param {Array<BufferGeometry>} geometry
-	 * @return {number}
-	 */
+   * @param {Array<BufferGeometry>} geometry
+   * @return {number}
+   */
 
 
 		static estimateBytesUsed( geometry ) {
@@ -347,10 +347,10 @@
 
 		}
 		/**
-	 * @param {BufferGeometry} geometry
-	 * @param {number} tolerance
-	 * @return {BufferGeometry>}
-	 */
+   * @param {BufferGeometry} geometry
+   * @param {number} tolerance
+   * @return {BufferGeometry>}
+   */
 
 
 		static mergeVertices( geometry, tolerance = 1e-4 ) {
@@ -488,10 +488,10 @@
 
 		}
 		/**
-	 * @param {BufferGeometry} geometry
-	 * @param {number} drawMode
-	 * @return {BufferGeometry>}
-	 */
+   * @param {BufferGeometry} geometry
+   * @param {number} drawMode
+   * @return {BufferGeometry>}
+   */
 
 
 		static toTrianglesDrawMode( geometry, drawMode ) {
@@ -591,11 +591,11 @@
 
 		}
 		/**
-	 * Calculates the morphed attributes of a morphed/skinned THREE.BufferGeometry.
-	 * Helpful for Raytracing or Decals.
-	 * @param {Mesh | Line | Points} object An instance of Mesh, Line or Points.
-	 * @return {Object} An Object with original position/normal attributes and morphed ones.
-	 */
+   * Calculates the morphed attributes of a morphed/skinned THREE.BufferGeometry.
+   * Helpful for Raytracing or Decals.
+   * @param {Mesh | Line | Points} object An instance of Mesh, Line or Points.
+   * @return {Object} An Object with original position/normal attributes and morphed ones.
+   */
 
 
 		static computeMorphedAttributes( object ) {

@@ -23,8 +23,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform vec2 uImageIncrement;
 
@@ -37,8 +37,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform float cKernel[ KERNEL_SIZE_INT ];
 
