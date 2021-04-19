@@ -1,3 +1,8 @@
+export const NodeShaderStage = {
+	Vertex: 'vertex',
+	Fragment: 'fragment'
+};
+
 export const NodeUpdateType = {
 	None: 'none',
 	Frame: 'frame',

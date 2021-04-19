@@ -1,15 +1,15 @@
 class NodeVary {
 
-	constructor( name, type, value ) {
+	constructor( name, type, snippet = '' ) {
 
 		this.name = name;
 		this.type = type;
-		this.value = value;
-
-		Object.defineProperty( this, 'isNodeVary', { value: true } );
+		this.snippet = snippet;
 
 	}
 
 }
+
+NodeVary.prototype.isNodeVary = true;
 
 export default NodeVary;

@@ -1,16 +1,15 @@
-
 var APP = {
 
 	Player: function () {
 
 		var renderer = new THREE.WebGLRenderer( { antialias: true } );
-		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setPixelRatio( window.devicePixelRatio ); // TODO: Use player.setPixelRatio()
 		renderer.outputEncoding = THREE.sRGBEncoding;
 
 		var loader = new THREE.ObjectLoader();
 		var camera, scene;
 
-		var vrButton = VRButton.createButton( renderer );
+		var vrButton = VRButton.createButton( renderer ); // eslint-disable-line no-undef
 
 		var events = {};
 
@@ -116,6 +115,12 @@ var APP = {
 
 		};
 
+		this.setPixelRatio = function ( pixelRatio ) {
+
+			renderer.setPixelRatio( pixelRatio );
+
+		};
+
 		this.setSize = function ( width, height ) {
 
 			this.width = width;
@@ -146,7 +151,7 @@ var APP = {
 
 		}
 
-		var time, prevTime;
+		var time, startTime, prevTime;
 
 		function animate() {
 
@@ -154,7 +159,7 @@ var APP = {
 
 			try {
 
-				dispatch( events.update, { time: time, delta: time - prevTime } );
+				dispatch( events.update, { time: time - startTime, delta: time - prevTime } );
 
 			} catch ( e ) {
 
@@ -172,7 +177,7 @@ var APP = {
 
 			if ( renderer.xr.enabled ) dom.append( vrButton );
 
-			prevTime = performance.now();
+			startTime = prevTime = performance.now();
 
 			document.addEventListener( 'keydown', onKeyDown );
 			document.addEventListener( 'keyup', onKeyUp );
@@ -199,6 +204,14 @@ var APP = {
 			dispatch( events.stop, arguments );
 
 			renderer.setAnimationLoop( null );
+
+		};
+
+		this.render = function ( time ) {
+
+			dispatch( events.update, { time: time * 1000, delta: 0 /* TODO */ } );
+
+			renderer.render( scene, camera );
 
 		};
 

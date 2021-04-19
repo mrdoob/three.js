@@ -9,7 +9,6 @@ class CubicBezierCurve extends Curve {
 		super();
 
 		this.type = 'CubicBezierCurve';
-		Object.defineProperty( this, 'isCubicBezierCurve', { value: true } );
 
 		this.v0 = v0;
 		this.v1 = v1;
@@ -32,6 +31,7 @@ class CubicBezierCurve extends Curve {
 		return point;
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -44,6 +44,7 @@ class CubicBezierCurve extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -56,6 +57,7 @@ class CubicBezierCurve extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );
@@ -70,5 +72,7 @@ class CubicBezierCurve extends Curve {
 	}
 
 }
+
+CubicBezierCurve.prototype.isCubicBezierCurve = true;
 
 export { CubicBezierCurve };

@@ -1,32 +1,27 @@
-// VRM Specification: https://dwango.github.io/vrm/vrm_spec/
-//
-// VRM is based on glTF 2.0 and VRM extension is defined
-// in top-level json.extensions.VRM
+( function () {
 
-THREE.VRMLoader = ( function () {
+	//
+	// VRM is based on glTF 2.0 and VRM extension is defined
+	// in top-level json.extensions.VRM
 
-	function VRMLoader( manager ) {
+	class VRMLoader extends THREE.Loader {
 
-		if ( THREE.GLTFLoader === undefined ) {
+		constructor( manager ) {
 
-			throw new Error( 'THREE.VRMLoader: Import THREE.GLTFLoader.' );
+			if ( THREE.GLTFLoader === undefined ) {
+
+				throw new Error( 'THREE.VRMLoader: Import THREE.GLTFLoader.' );
+
+			}
+
+			super( manager );
+			this.gltfLoader = new THREE.GLTFLoader( manager );
 
 		}
 
-		THREE.Loader.call( this, manager );
+		load( url, onLoad, onProgress, onError ) {
 
-		this.gltfLoader = new THREE.GLTFLoader( this.manager );
-
-	}
-
-	VRMLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-
-		constructor: VRMLoader,
-
-		load: function ( url, onLoad, onProgress, onError ) {
-
-			var scope = this;
-
+			const scope = this;
 			this.gltfLoader.load( url, function ( gltf ) {
 
 				try {
@@ -51,29 +46,27 @@ THREE.VRMLoader = ( function () {
 
 			}, onProgress, onError );
 
-		},
+		}
 
-		setDRACOLoader: function ( dracoLoader ) {
+		setDRACOLoader( dracoLoader ) {
 
 			this.gltfLoader.setDRACOLoader( dracoLoader );
 			return this;
 
-		},
+		}
 
-		parse: function ( gltf, onLoad ) {
+		parse( gltf, onLoad ) {
 
-			// var gltfParser = gltf.parser;
-			// var gltfExtensions = gltf.userData.gltfExtensions || {};
-			// var vrmExtension = gltfExtensions.VRM || {};
-
+			// const gltfParser = gltf.parser;
+			// const gltfExtensions = gltf.userData.gltfExtensions || {};
+			// const vrmExtension = gltfExtensions.VRM || {};
 			// handle VRM Extension here
-
 			onLoad( gltf );
 
 		}
 
-	} );
+	}
 
-	return VRMLoader;
+	THREE.VRMLoader = VRMLoader;
 
 } )();

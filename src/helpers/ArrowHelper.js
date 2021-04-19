@@ -13,19 +13,13 @@ let _lineGeometry, _coneGeometry;
 
 class ArrowHelper extends Object3D {
 
-	constructor( dir, origin, length, color, headLength, headWidth ) {
+	// dir is assumed to be normalized
+
+	constructor( dir = new Vector3( 0, 0, 1 ), origin = new Vector3( 0, 0, 0 ), length = 1, color = 0xffff00, headLength = length * 0.2, headWidth = headLength * 0.2 ) {
 
 		super();
-		// dir is assumed to be normalized
 
 		this.type = 'ArrowHelper';
-
-		if ( dir === undefined ) dir = new Vector3( 0, 0, 1 );
-		if ( origin === undefined ) origin = new Vector3( 0, 0, 0 );
-		if ( length === undefined ) length = 1;
-		if ( color === undefined ) color = 0xffff00;
-		if ( headLength === undefined ) headLength = 0.2 * length;
-		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
 		if ( _lineGeometry === undefined ) {
 
@@ -76,10 +70,7 @@ class ArrowHelper extends Object3D {
 
 	}
 
-	setLength( length, headLength, headWidth ) {
-
-		if ( headLength === undefined ) headLength = 0.2 * length;
-		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
+	setLength( length, headLength = length * 0.2, headWidth = headLength * 0.2 ) {
 
 		this.line.scale.set( 1, Math.max( 0.0001, length - headLength ), 1 ); // see #17458
 		this.line.updateMatrix();

@@ -9,13 +9,13 @@ class QuadraticBezierCurve extends Curve {
 		super();
 
 		this.type = 'QuadraticBezierCurve';
-		Object.defineProperty( this, 'isQuadraticBezierCurve', { value: true } );
 
 		this.v0 = v0;
 		this.v1 = v1;
 		this.v2 = v2;
 
 	}
+
 	getPoint( t, optionalTarget = new Vector2() ) {
 
 		const point = optionalTarget;
@@ -30,6 +30,7 @@ class QuadraticBezierCurve extends Curve {
 		return point;
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -41,6 +42,7 @@ class QuadraticBezierCurve extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -52,6 +54,7 @@ class QuadraticBezierCurve extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );
@@ -65,5 +68,7 @@ class QuadraticBezierCurve extends Curve {
 	}
 
 }
+
+QuadraticBezierCurve.prototype.isQuadraticBezierCurve = true;
 
 export { QuadraticBezierCurve };

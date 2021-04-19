@@ -198,7 +198,7 @@ class NodeBuilder {
 
 	}
 
-	getVaryFromNode( node, type, value ) {
+	getVaryFromNode( node, type ) {
 
 		const nodeData = this.getDataFromNode( node );
 
@@ -209,7 +209,7 @@ class NodeBuilder {
 			const varys = this.varys;
 			const index = varys.length;
 
-			nodeVary = new NodeVary( 'nodeV' + index, type, value );
+			nodeVary = new NodeVary( 'nodeV' + index, type );
 
 			varys.push( nodeVary );
 

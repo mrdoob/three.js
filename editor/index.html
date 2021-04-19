@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js / editor</title>
+		<title>three.js editor</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="apple-touch-icon" href="images/icon.png">
@@ -10,6 +10,8 @@
 	</head>
 	<body>
 		<link rel="stylesheet" href="css/main.css">
+
+		<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.9.6/dist/ffmpeg.min.js" defer></script>
 
 		<script src="../examples/js/libs/draco/draco_encoder.js"></script>
 
@@ -61,7 +63,7 @@
 
 			Number.prototype.format = function () {
 
-				return this.toString().replace( /(\d)(?=(\d{3})+(?!\d))/g, "$1," );
+				return this.toString().replace( /(\d)(?=(\d{3})+(?!\d))/g, '$1,' );
 
 			};
 

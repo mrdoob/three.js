@@ -5,10 +5,10 @@ class NodeAttribute {
 		this.name = name;
 		this.type = type;
 
-		Object.defineProperty( this, 'isNodeAttribute', { value: true } );
-
 	}
 
 }
+
+NodeAttribute.prototype.isNodeAttribute = true;
 
 export default NodeAttribute;

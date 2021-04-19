@@ -174,24 +174,25 @@ function WebGLRenderLists( properties ) {
 
 	let lists = new WeakMap();
 
-	function get( scene, camera ) {
+	function get( scene, renderCallDepth ) {
 
-		const cameras = lists.get( scene );
 		let list;
 
-		if ( cameras === undefined ) {
+		if ( lists.has( scene ) === false ) {
 
 			list = new WebGLRenderList( properties );
-			lists.set( scene, new WeakMap() );
-			lists.get( scene ).set( camera, list );
+			lists.set( scene, [ list ] );
 
 		} else {
 
-			list = cameras.get( camera );
-			if ( list === undefined ) {
+			if ( renderCallDepth >= lists.get( scene ).length ) {
 
 				list = new WebGLRenderList( properties );
-				cameras.set( camera, list );
+				lists.get( scene ).push( list );
+
+			} else {
+
+				list = lists.get( scene )[ renderCallDepth ];
 
 			}
 

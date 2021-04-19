@@ -28,6 +28,12 @@
 <p>设置运行alphaTest时要使用的alpha值。如果不透明度低于此值，则不会渲染材质。默认值为*0*。
 </p>
 
+<h3>[property:Float alphaToCoverage]</h3>
+<p>
+Enables alpha to coverage. Can only be used with MSAA-enabled contexts (meaning when the renderer was created with *antialias* parameter set to *true*).
+Default is *false*.
+</p>
+
 <h3>[property:Integer blendDst]</h3>
 <p> 混合目标。默认值为[page:CustomBlendingEquation OneMinusSrcAlphaFactor]。
 	目标因子所有可能的取值请参阅[page:CustomBlendingEquation constants]。

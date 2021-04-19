@@ -40,6 +40,15 @@
 		<h3>[method:Boolean isPowerOfTwo]( [param:Number n] )</h3>
 		<p>如果 [page:Number n] 是2的幂，返回true。</p>
 
+		<h3>[method:Float inverseLerp]( [param:Float x], [param:Float y], [param:Float value] )</h3>
+		<p>
+		[page:Float x] - Start point.<br />
+		[page:Float y] - End point.<br />
+		[page:Float value] - A value between start and end.<br><br />
+
+		Returns the percentage in the closed interval [0, 1] of the given value between the start and end point.
+		</p>
+
 		<h3>[method:Float lerp]( [param:Float x], [param:Float y], [param:Float t] )</h3>
 		<p>
 		[page:Float x] - 起始点。 <br />
@@ -104,7 +113,7 @@
 		<p>
 		[page:Float x] - 根据其在最小值和最大值之间的位置来计算的值。 <br />
 		[page:Float min] - 任何x比最小值还小会返回0.<br />
-		[page:Float max] - 任何x比最大值还大会返回0.<br /><br />
+		[page:Float max] - 任何x比最大值还大会返回1.<br /><br />
 
 		返回0-1之间的值，该值表示x在最小值和最大值之间移动的百分比，但是当x接近最小值和最大值时，变化程度会平滑或减慢。<br/><br/>
 

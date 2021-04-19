@@ -21,11 +21,12 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		super( size, size, options );
 
-		Object.defineProperty( this, 'isWebGLCubeRenderTarget', { value: true } );
-
 		options = options || {};
 
 		this.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+
+		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
+		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 
 		this.texture._needsFlipEnvMap = false;
 
@@ -140,5 +141,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 }
 
+WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
 
 export { WebGLCubeRenderTarget };

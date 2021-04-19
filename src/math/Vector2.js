@@ -2,8 +2,6 @@ class Vector2 {
 
 	constructor( x = 0, y = 0 ) {
 
-		Object.defineProperty( this, 'isVector2', { value: true } );
-
 		this.x = x;
 		this.y = y;
 
@@ -474,5 +472,6 @@ class Vector2 {
 
 }
 
+Vector2.prototype.isVector2 = true;
 
 export { Vector2 };

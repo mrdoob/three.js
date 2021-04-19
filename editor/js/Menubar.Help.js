@@ -28,6 +28,7 @@ function MenubarHelp( editor ) {
 	} );
 	options.add( option );
 
+	/*
 	// Icon
 
 	var option = new UIRow();
@@ -39,6 +40,7 @@ function MenubarHelp( editor ) {
 
 	} );
 	options.add( option );
+	*/
 
 	// About
 

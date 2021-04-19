@@ -88,7 +88,7 @@ class CatmullRomCurve3 extends Curve {
 		super();
 
 		this.type = 'CatmullRomCurve3';
-		Object.defineProperty( this, 'isCatmullRomCurve3', { value: true } );
+
 		this.points = points;
 		this.closed = closed;
 		this.curveType = curveType;
@@ -181,6 +181,7 @@ class CatmullRomCurve3 extends Curve {
 		return point;
 
 	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -202,6 +203,7 @@ class CatmullRomCurve3 extends Curve {
 		return this;
 
 	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -222,6 +224,7 @@ class CatmullRomCurve3 extends Curve {
 		return data;
 
 	}
+
 	fromJSON( json ) {
 
 		super.fromJSON( json );
@@ -244,5 +247,7 @@ class CatmullRomCurve3 extends Curve {
 	}
 
 }
+
+CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
 
 export { CatmullRomCurve3 };
