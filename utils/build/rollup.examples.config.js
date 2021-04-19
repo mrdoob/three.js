@@ -8,14 +8,9 @@ const EOL = os.EOL;
 
 function babelCleanup() {
 
-	const doubleSpaces = / {2}/g;
-
 	return {
 
 		transform( code ) {
-
-			code = code.replace( doubleSpaces, '\t' );
-
 
 			// remove comments messed up by babel that break eslint
 			// example:
@@ -25,7 +20,6 @@ function babelCleanup() {
 			//             ↓
 			// 	  setSize: function () {
 			code = code.replace( new RegExp( `\\(\\)${EOL}\\s*\\/\\*([a-zA-Z0-9_, ]+)\\*\\/${EOL}\\s*{`, 'g' ), '( ) {' );
-
 
 			return {
 				code: code,
@@ -103,7 +97,7 @@ function unmodularize() {
 			// fix for BasisTextureLoader.js
 			imports.forEach( imp => {
 
-				code = code.replace( new RegExp( `${EOL}(\\s)THREE\\.${imp}:`, 'g' ), ( match, p1 ) => {
+				code = code.replace( new RegExp( `${EOL}(\\s)*THREE\\.${imp}:`, 'g' ), ( match, p1 ) => {
 
 					return `${EOL}${p1}${imp}:`;
 
