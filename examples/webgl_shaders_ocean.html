@@ -145,7 +145,7 @@
 				const gui = new GUI();
 
 				const folderSky = gui.addFolder( 'Sky' );
-				folderSky.add( parameters, 'inclination', 0, 1, 0.0001 ).onChange( updateSun );
+				folderSky.add( parameters, 'inclination', - 1, 1, 0.0001 ).onChange( updateSun );
 				folderSky.add( parameters, 'azimuth', 0, 1, 0.0001 ).onChange( updateSun );
 				folderSky.open();
 
