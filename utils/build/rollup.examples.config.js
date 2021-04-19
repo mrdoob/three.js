@@ -116,7 +116,7 @@ function unmodularize() {
 
 			// Remove library imports that are exposed as
 			// global variables in the non-module world
-			code = code.replace( 'import * as fflate from \'../libs/fflate.module.min.js\';', '' );
+			code = code.replace( 'import * as fflate from \'../libs/fflate.module.js\';', '' );
 			code = code.replace( 'import { MMDParser } from \'../libs/mmdparser.module.js\';', '' );
 			code = code.replace( 'import { potpack } from \'../libs/potpack.module.js\';', '' );
 			code = code.replace( 'import { opentype } from \'../libs/opentype.module.min.js\';', '' );

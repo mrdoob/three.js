@@ -13,7 +13,7 @@ const assets = [
 	'../examples/jsm/controls/TransformControls.js',
 
 	'../examples/jsm/libs/chevrotain.module.min.js',
-	'../examples/jsm/libs/fflate.module.min.js',
+	'../examples/jsm/libs/fflate.module.js',
 
 	'../examples/js/libs/draco/draco_decoder.js',
 	'../examples/js/libs/draco/draco_decoder.wasm',
