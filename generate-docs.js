@@ -47,7 +47,7 @@ let i = 0
                             })
                         })
                         list[locale][sec][cat][page] = {
-                            "url": list[locale][sec][cat][page],
+                            "url": list[locale][sec][cat][page]["url"],
                             "methods": methods,
                             "props": props
                         }
