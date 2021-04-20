@@ -78,6 +78,8 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	isMaterial: true,
 
+	onBuild: function ( /* shaderobject, renderer */ ) {},
+
 	onBeforeCompile: function ( /* shaderobject, renderer */ ) {},
 
 	customProgramCacheKey: function () {

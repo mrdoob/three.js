@@ -232,6 +232,7 @@
 		"webgl_materials_envmaps_hdr_nodes",
 		"webgl_materials_envmaps_pmrem_nodes",
 		"webgl_materials_nodes",
+		"webgl_materials_standard_nodes",
 		"webgl_mirror_nodes",
 		"webgl_performance_nodes",
 		"webgl_postprocessing_nodes",
