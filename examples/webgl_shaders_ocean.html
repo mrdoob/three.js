@@ -94,20 +94,18 @@
 				skyUniforms[ 'mieDirectionalG' ].value = 0.8;
 
 				const parameters = {
-					inclination: 0.02,
-					azimuth: 0.045
+					elevation: 2,
+					azimuth: 180
 				};
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				function updateSun() {
 
-					const theta = 0.5 * Math.PI * ( 1 - parameters.inclination );
-					const phi = 2 * Math.PI * ( parameters.azimuth - 0.5 );
+					const phi = THREE.MathUtils.degToRad( 90 - parameters.elevation );
+					const theta = THREE.MathUtils.degToRad( parameters.azimuth );
 
-					sun.x = Math.sin( theta ) * Math.sin( phi );
-					sun.y = Math.cos( theta );
-					sun.z = Math.sin( theta ) * Math.cos( phi );
+					sun.setFromSphericalCoords( 1, phi, theta );
 
 					sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
 					water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
@@ -145,8 +143,8 @@
 				const gui = new GUI();
 
 				const folderSky = gui.addFolder( 'Sky' );
-				folderSky.add( parameters, 'inclination', - 1, 1, 0.0001 ).onChange( updateSun );
-				folderSky.add( parameters, 'azimuth', 0, 1, 0.0001 ).onChange( updateSun );
+				folderSky.add( parameters, 'elevation', 0, 90, 0.1 ).onChange( updateSun );
+				folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
 				folderSky.open();
 
 				const waterUniforms = water.material.uniforms;

@@ -42,27 +42,25 @@
 					rayleigh: 3,
 					mieCoefficient: 0.005,
 					mieDirectionalG: 0.7,
-					inclination: 0.02, // elevation / inclination
-					azimuth: 0, // Facing front
+					elevation: 2,
+					azimuth: 180,
 					exposure: renderer.toneMappingExposure
 				};
 
 				function guiChanged() {
 
 					const uniforms = sky.material.uniforms;
-					uniforms[ "turbidity" ].value = effectController.turbidity;
-					uniforms[ "rayleigh" ].value = effectController.rayleigh;
-					uniforms[ "mieCoefficient" ].value = effectController.mieCoefficient;
-					uniforms[ "mieDirectionalG" ].value = effectController.mieDirectionalG;
+					uniforms[ 'turbidity' ].value = effectController.turbidity;
+					uniforms[ 'rayleigh' ].value = effectController.rayleigh;
+					uniforms[ 'mieCoefficient' ].value = effectController.mieCoefficient;
+					uniforms[ 'mieDirectionalG' ].value = effectController.mieDirectionalG;
 
-					const theta = 0.5 * Math.PI * ( 1 - effectController.inclination );
-					const phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
+					const phi = THREE.MathUtils.degToRad( 90 - effectController.elevation );
+					const theta = THREE.MathUtils.degToRad( effectController.azimuth );
 
-					sun.x = Math.sin( theta ) * Math.sin( phi );
-					sun.y = Math.cos( theta );
-					sun.z = Math.sin( theta ) * Math.cos( phi );
+					sun.setFromSphericalCoords( 1, phi, theta );
 
-					uniforms[ "sunPosition" ].value.copy( sun );
+					uniforms[ 'sunPosition' ].value.copy( sun );
 
 					renderer.toneMappingExposure = effectController.exposure;
 					renderer.render( scene, camera );
@@ -71,13 +69,13 @@
 
 				const gui = new GUI();
 
-				gui.add( effectController, "turbidity", 0.0, 20.0, 0.1 ).onChange( guiChanged );
-				gui.add( effectController, "rayleigh", 0.0, 4, 0.001 ).onChange( guiChanged );
-				gui.add( effectController, "mieCoefficient", 0.0, 0.1, 0.001 ).onChange( guiChanged );
-				gui.add( effectController, "mieDirectionalG", 0.0, 1, 0.001 ).onChange( guiChanged );
-				gui.add( effectController, "inclination", -1, 1, 0.0001 ).onChange( guiChanged );
-				gui.add( effectController, "azimuth", 0, 1, 0.0001 ).onChange( guiChanged );
-				gui.add( effectController, "exposure", 0, 1, 0.0001 ).onChange( guiChanged );
+				gui.add( effectController, 'turbidity', 0.0, 20.0, 0.1 ).onChange( guiChanged );
+				gui.add( effectController, 'rayleigh', 0.0, 4, 0.001 ).onChange( guiChanged );
+				gui.add( effectController, 'mieCoefficient', 0.0, 0.1, 0.001 ).onChange( guiChanged );
+				gui.add( effectController, 'mieDirectionalG', 0.0, 1, 0.001 ).onChange( guiChanged );
+				gui.add( effectController, 'elevation', 0, 90, 0.1 ).onChange( guiChanged );
+				gui.add( effectController, 'azimuth', - 180, 180, 0.1 ).onChange( guiChanged );
+				gui.add( effectController, 'exposure', 0, 1, 0.0001 ).onChange( guiChanged );
 
 				guiChanged();
 
