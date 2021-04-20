@@ -53,7 +53,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		let snippet = '';
 
-		for ( let uniform of uniforms ) {
+		for ( const uniform of uniforms ) {
 
 			if ( uniform.type === 'texture' ) {
 
@@ -61,7 +61,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 			} else {
 
-				let vectorType = this.getVectorType( uniform.type );
+				const vectorType = this.getVectorType( uniform.type );
 
 				snippet += `uniform ${vectorType} ${uniform.name};`;
 
@@ -89,7 +89,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		const uniforms = this.uniforms[ 'fragment' ];
 
-		for ( let uniform of uniforms ) {
+		for ( const uniform of uniforms ) {
 
 			this.properties.uniforms[ uniform.name ] = uniform;
 
