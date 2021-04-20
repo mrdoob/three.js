@@ -21,7 +21,7 @@ function addCodeAfterSnippet( source, snippet, code ) {
 
 Material.prototype.onBuild = function ( parameters, renderer ) {
 
-	const nodeBuilder = new WebGLNodeBuilder( this, renderer, parameters ).build();
+	new WebGLNodeBuilder( this, renderer, parameters ).build();
 
 	let fragmentShader = parameters.fragmentShader;
 

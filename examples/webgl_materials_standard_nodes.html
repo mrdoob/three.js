@@ -30,8 +30,6 @@
 			import Vector3Node from './jsm/renderers/nodes/inputs/Vector3Node.js';
 			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
 
-			const statsEnabled = true;
-
 			let container, stats;
 
 			let camera, scene, renderer, controls;
@@ -118,7 +116,7 @@
 
 				};
 
-				function loadEnvironment(name) {
+				function loadEnvironment( name ) {
 
 					if ( environments[ name ].texture !== undefined ) {
 
@@ -130,18 +128,18 @@
 
 					const filename = environments[ name ].filename;
 					new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
-					.setPath( 'textures/equirectangular/' )
-					.load( filename, function ( hdrEquirect ) {
+						.setDataType( THREE.UnsignedByteType )
+						.setPath( 'textures/equirectangular/' )
+						.load( filename, function ( hdrEquirect ) {
 
-						const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
-						hdrEquirect.dispose();
+							const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
+							hdrEquirect.dispose();
 
-						scene.background = hdrCubeRenderTarget.texture;
-						scene.environment = hdrCubeRenderTarget.texture;
-						environments[ name ].texture = hdrCubeRenderTarget.texture;
+							scene.background = hdrCubeRenderTarget.texture;
+							scene.environment = hdrCubeRenderTarget.texture;
+							environments[ name ].texture = hdrCubeRenderTarget.texture;
 
-					} );
+						} );
 
 				}
 
@@ -153,9 +151,9 @@
 				loadEnvironment( params.environment );
 
 				const gui = new GUI();
-				gui.add( params, 'environment', Object.keys( environments ) ).onChange( function( value ) {
+				gui.add( params, 'environment', Object.keys( environments ) ).onChange( function ( value ) {
 
-					loadEnvironment(value);
+					loadEnvironment( value );
 
 				} );
 				gui.open();
@@ -165,12 +163,8 @@
 
 				//
 
-				if ( statsEnabled ) {
-
-					stats = new Stats();
-					container.appendChild( stats.dom );
-
-				}
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -196,7 +190,7 @@
 				controls.update();
 				renderer.render( scene, camera );
 
-				if ( statsEnabled ) stats.update();
+				stats.update();
 
 			}
 
