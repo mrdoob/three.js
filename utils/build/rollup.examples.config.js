@@ -155,6 +155,7 @@ const files = glob.sync( '**/*.js', { cwd: jsmFolder, ignore: [
 	// https://unpkg.com/browse/ktx-parse@0.2.1/dist/
 	'loaders/KTX2Loader.js',
 
+	'renderers/webgl/**/*',
 	'renderers/webgpu/**/*',
 	'renderers/nodes/**/*',
 	'nodes/**/*',
