@@ -7997,6 +7997,8 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	isMaterial: true,
 
+	onBuild: function ( /* shaderobject, renderer */ ) {},
+
 	onBeforeCompile: function ( /* shaderobject, renderer */ ) {},
 
 	customProgramCacheKey: function () {
@@ -24585,6 +24587,8 @@ function WebGLRenderer( parameters ) {
 
 			parameters.uniforms = programCache.getUniforms( material );
 
+			material.onBuild( parameters, _this );
+
 			material.onBeforeCompile( parameters, _this );
 
 			program = programCache.acquireProgram( parameters, programCacheKey );
@@ -35353,9 +35357,7 @@ class Curve {
 
 	// Get list of cumulative segment lengths
 
-	getLengths( divisions ) {
-
-		if ( divisions === undefined ) divisions = this.arcLengthDivisions;
+	getLengths( divisions = this.arcLengthDivisions ) {
 
 		if ( this.cacheArcLengths &&
 			( this.cacheArcLengths.length === divisions + 1 ) &&
@@ -40762,9 +40764,9 @@ class StereoCamera {
 
 class Clock {
 
-	constructor( autoStart ) {
+	constructor( autoStart = true ) {
 
-		this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
+		this.autoStart = autoStart;
 
 		this.startTime = 0;
 		this.oldTime = 0;

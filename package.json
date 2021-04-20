@@ -73,7 +73,8 @@
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
-    "make-screenshot": "node test/e2e/puppeteer.js --make"
+    "make-screenshot": "node test/e2e/puppeteer.js --make",
+    "prepublishOnly": "node utils/prepublish.js"
   },
   "keywords": [
     "three",

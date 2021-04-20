@@ -6076,6 +6076,9 @@
 	Material.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
 		constructor: Material,
 		isMaterial: true,
+		onBuild: function ()
+		/* shaderobject, renderer */
+		{},
 		onBeforeCompile: function ()
 		/* shaderobject, renderer */
 		{},
@@ -18059,6 +18062,7 @@
 				}
 			} else {
 				parameters.uniforms = programCache.getUniforms(material);
+				material.onBuild(parameters, _this);
 				material.onBeforeCompile(parameters, _this);
 				program = programCache.acquireProgram(parameters, programCacheKey);
 				programs.set(programCacheKey, program);
@@ -25675,9 +25679,7 @@
 		} // Get list of cumulative segment lengths
 
 
-		getLengths(divisions) {
-			if (divisions === undefined) divisions = this.arcLengthDivisions;
-
+		getLengths(divisions = this.arcLengthDivisions) {
 			if (this.cacheArcLengths && this.cacheArcLengths.length === divisions + 1 && !this.needsUpdate) {
 				return this.cacheArcLengths;
 			}
@@ -29387,8 +29389,8 @@
 	}
 
 	class Clock {
-		constructor(autoStart) {
-			this.autoStart = autoStart !== undefined ? autoStart : true;
+		constructor(autoStart = true) {
+			this.autoStart = autoStart;
 			this.startTime = 0;
 			this.oldTime = 0;
 			this.elapsedTime = 0;
