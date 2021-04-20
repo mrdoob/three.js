@@ -17,41 +17,22 @@
 
 			import * as THREE from '../build/three.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OimoPhysics } from './jsm/physics/OimoPhysics.js';
 			import Stats from './jsm/libs/stats.module.js';
-			// Or use latest version from NPM `oimophysics`
-			import {oimo} from './jsm/libs/OimoPhysics.js';
-
-
-			const Vec3 = oimo.common.Vec3;
-			const World = oimo.dynamics.World;
-			const RigidBodyType = oimo.dynamics.rigidbody.RigidBodyType;
-			const RigidBodyConfig = oimo.dynamics.rigidbody.RigidBodyConfig;
-			const ShapeConfig = oimo.dynamics.rigidbody.ShapeConfig;
-			const RigidBody = oimo.dynamics.rigidbody.RigidBody;
-			const Shape = oimo.dynamics.rigidbody.Shape;
-			const OBoxGeometry = oimo.collision.geometry.BoxGeometry;
-			const OSphereGeometry = oimo.collision.geometry.SphereGeometry;
-
-
 
 			let camera, scene, renderer, stats;
 			let physics, position;
-			let world;
 
 			let boxes, spheres;
-			let boxesPhys, spheresPhys;
-
-			const dummy = new THREE.Object3D();
 
 			init();
 
 			async function init() {
-				world = new World(2, new Vec3(0, -9.8, 0));
 
-				boxesPhys = [];
-				spheresPhys = [];
-
+				physics = await OimoPhysics();
 				position = new THREE.Vector3();
+
+				//
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( - 1, 1.5, 2 );
@@ -76,8 +57,10 @@
 				);
 				floor.position.y = - 2.5;
 				floor.receiveShadow = true;
-				floor.userData.physics = addRigidBody(world, vec3FromVector3(floor.position), new OBoxGeometry(new Vec3(10 / 2, 5 / 2, 10 / 2)), true);
 				scene.add( floor );
+				physics.addMesh( floor );
+
+				//
 
 				const material = new THREE.MeshLambertMaterial();
 
@@ -85,8 +68,8 @@
 				const color = new THREE.Color();
 
 				// Boxes
-				const boxSideSize = 0.1;
-				const geometryBox = new THREE.BoxGeometry( boxSideSize, boxSideSize, boxSideSize );
+
+				const geometryBox = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
 				boxes = new THREE.InstancedMesh( geometryBox, material, 100 );
 				boxes.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
 				boxes.castShadow = true;
@@ -94,16 +77,17 @@
 				scene.add( boxes );
 
 				for ( let i = 0; i < boxes.count; i ++ ) {
-					position.set(Math.random() - 0.5, Math.random() * 10, Math.random() - 0.5);
-					matrix.setPosition( position.x, position.y, position.z );
+
+					matrix.setPosition( Math.random() - 0.5, Math.random() * 2, Math.random() - 0.5 );
 					boxes.setMatrixAt( i, matrix );
 					boxes.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
-					// size of the side of the cube should be 2 times smaller
-					boxesPhys.push(addRigidBody(world, vec3FromVector3(position), new OBoxGeometry(new Vec3(boxSideSize / 2, boxSideSize / 2, boxSideSize / 2)), false));
+
 				}
 
+				physics.addMesh( boxes, 1 );
 
 				// Spheres
+
 				const geometrySphere = new THREE.IcosahedronGeometry( 0.075, 3 );
 				spheres = new THREE.InstancedMesh( geometrySphere, material, 100 );
 				spheres.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
@@ -112,13 +96,14 @@
 				scene.add( spheres );
 
 				for ( let i = 0; i < spheres.count; i ++ ) {
-					position.set(Math.random() - 0.5, Math.random() * 10, Math.random() - 0.5);
-					matrix.setPosition( position.x, position.y, position.z );
+
+					matrix.setPosition( Math.random() - 0.5, Math.random() * 2, Math.random() - 0.5 );
 					spheres.setMatrixAt( i, matrix );
 					spheres.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
-					spheresPhys.push(addRigidBody(world, vec3FromVector3(position), new OSphereGeometry(0.075), false));
+
 				}
 
+				physics.addMesh( spheres, 1 );
 
 				//
 
@@ -138,80 +123,32 @@
 				controls.target.y = 0.5;
 				controls.update();
 
-				window.addEventListener('resize', onWindowResize);
-
 				animate();
 
-			}
-
-			function onWindowResize() {
-				camera.aspect = document.body.clientWidth / document.body.clientHeight;
-				camera.updateProjectionMatrix();
-				renderer.setSize(document.body.clientWidth, document.body.clientHeight);
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
 
-				world.step(1 / 60);
-
-				// updating data of visual objects from physical objects
-				// BOXES
-				boxesPhys.forEach((elPhys, index) => {
-					const posVec3 = elPhys.getPosition();
-					dummy.position.set(posVec3.x, posVec3.y, posVec3.z);
-					dummy.setRotationFromQuaternion(quaternionFromQuat(elPhys.getOrientation()));
-					dummy.updateMatrix();
-					boxes.setMatrixAt( index, dummy.matrix );
-				});
+				//
 
 				let index = Math.floor( Math.random() * boxes.count );
-				boxesPhys[index].setPosition( new Vec3(0, Math.random() + 1, 0) );
-				boxes.instanceMatrix.needsUpdate = true;
 
+				position.set( 0, Math.random() + 1, 0 );
+				physics.setMeshPosition( boxes, position, index );
 
-
-				// SPHERES
-				spheresPhys.forEach((elPhys, index) => {
-					const posVec3 = elPhys.getPosition();
-					dummy.position.set(posVec3.x, posVec3.y, posVec3.z);
-					dummy.setRotationFromQuaternion(quaternionFromQuat(elPhys.getOrientation()));
-					dummy.updateMatrix();
-					spheres.setMatrixAt( index, dummy.matrix );
-				});
+				//
 
 				index = Math.floor( Math.random() * spheres.count );
-				spheresPhys[index].setPosition( new Vec3(0, Math.random() + 1, 0) );
-				spheres.instanceMatrix.needsUpdate = true;
 
+				position.set( 0, Math.random() + 1, 0 );
+				physics.setMeshPosition( spheres, position, index );
 
 				renderer.render( scene, camera );
 
 				stats.update();
-			}
 
-			// adding a physical object to the world of physics
-			function addRigidBody(w, center, geom, wall) {
-				const shapeConfig = new ShapeConfig();
-				shapeConfig.geometry = geom;
-				const bodyConfig = new RigidBodyConfig();
-				bodyConfig.type = wall ? RigidBodyType.STATIC : RigidBodyType.DYNAMIC;
-				bodyConfig.position = center;
-				let body = new RigidBody(bodyConfig);
-				body.addShape(new Shape(shapeConfig));
-				w.addRigidBody(body);
-				return body;
-			}
-
-			// convert threejs Vector3 to oimo Vec3
-			function vec3FromVector3(position) {
-				return new Vec3(...position.toArray());
-			}
-
-			// convert oimo Quat to threejs quaternion
-			function quaternionFromQuat(quat) {
-				return new THREE.Quaternion(quat.x, quat.y, quat.z, quat.w);
 			}
 
 		</script>
