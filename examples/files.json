@@ -87,6 +87,7 @@
 		"webgl_loader_gltf_compressed",
 		"webgl_loader_gltf_extensions",
 		"webgl_loader_gltf_variants",
+		"webgl_loader_ifc",
 		"webgl_loader_imagebitmap",
 		"webgl_loader_kmz",
 		"webgl_loader_ldraw",
@@ -122,7 +123,6 @@
 		"webgl_loader_vrm",
 		"webgl_loader_vrml",
 		"webgl_loader_vtk",
-		"webgl_loader_x",
 		"webgl_loader_xyz",
 		"webgl_lod",
 		"webgl_marchingcubes",
@@ -261,6 +261,7 @@
 		"webgl_postprocessing_sobel",
 		"webgl_postprocessing_ssao",
 		"webgl_postprocessing_ssr",
+		"webgl_postprocessing_ssrr",
 		"webgl_postprocessing_taa",
 		"webgl_postprocessing_unreal_bloom",
 		"webgl_postprocessing_unreal_bloom_selective"

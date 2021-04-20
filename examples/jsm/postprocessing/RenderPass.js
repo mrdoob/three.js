@@ -3,35 +3,33 @@ import {
 } from '../../../build/three.module.js';
 import { Pass } from '../postprocessing/Pass.js';
 
-var RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
+class RenderPass extends Pass {
 
-	Pass.call( this );
+	constructor( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
 
-	this.scene = scene;
-	this.camera = camera;
+		super();
 
-	this.overrideMaterial = overrideMaterial;
+		this.scene = scene;
+		this.camera = camera;
 
-	this.clearColor = clearColor;
-	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
+		this.overrideMaterial = overrideMaterial;
 
-	this.clear = true;
-	this.clearDepth = false;
-	this.needsSwap = false;
-	this._oldClearColor = new Color();
+		this.clearColor = clearColor;
+		this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
 
-};
+		this.clear = true;
+		this.clearDepth = false;
+		this.needsSwap = false;
+		this._oldClearColor = new Color();
 
-RenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
+	}
 
-	constructor: RenderPass,
+	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
-	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
-
-		var oldAutoClear = renderer.autoClear;
+		const oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		var oldClearAlpha, oldOverrideMaterial;
+		let oldClearAlpha, oldOverrideMaterial;
 
 		if ( this.overrideMaterial !== undefined ) {
 
@@ -78,6 +76,6 @@ RenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	}
 
-} );
+}
 
 export { RenderPass };

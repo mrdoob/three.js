@@ -1,4 +1,4 @@
-// r126.1
+const cacheName = 'threejs-editor';
 
 const assets = [
 	'./',
@@ -13,7 +13,7 @@ const assets = [
 	'../examples/jsm/controls/TransformControls.js',
 
 	'../examples/jsm/libs/chevrotain.module.min.js',
-	'../examples/jsm/libs/fflate.module.min.js',
+	'../examples/jsm/libs/fflate.module.js',
 
 	'../examples/js/libs/draco/draco_decoder.js',
 	'../examples/js/libs/draco/draco_decoder.wasm',
@@ -37,6 +37,9 @@ const assets = [
 	'../examples/jsm/loaders/FBXLoader.js',
 	'../examples/jsm/loaders/GLTFLoader.js',
 	'../examples/jsm/loaders/KMZLoader.js',
+	'../examples/jsm/loaders/IFCLoader.js',
+	'../examples/jsm/loaders/ifc/web-ifc-api.js',
+	'../examples/jsm/loaders/ifc/web-ifc.wasm',
 	'../examples/jsm/loaders/MD2Loader.js',
 	'../examples/jsm/loaders/OBJLoader.js',
 	'../examples/jsm/loaders/MTLLoader.js',
@@ -214,7 +217,7 @@ const assets = [
 
 self.addEventListener( 'install', async function () {
 
-	const cache = await caches.open( 'threejs-editor' );
+	const cache = await caches.open( cacheName );
 
 	assets.forEach( function ( asset ) {
 
@@ -231,10 +234,29 @@ self.addEventListener( 'install', async function () {
 self.addEventListener( 'fetch', async function ( event ) {
 
 	const request = event.request;
-	event.respondWith( cacheFirst( request ) );
+	event.respondWith( networkFirst( request ) );
 
 } );
 
+async function networkFirst( request ) {
+
+	return fetch( request ).catch( async function () {
+
+		const cachedResponse = await caches.match( request );
+
+		if ( cachedResponse === undefined ) {
+
+			console.warn( '[SW] Not cached:', request.url );
+
+		}
+
+		return cachedResponse;
+
+	} );
+
+}
+
+/*
 async function cacheFirst( request ) {
 
 	const cachedResponse = await caches.match( request );
@@ -249,3 +271,4 @@ async function cacheFirst( request ) {
 	return cachedResponse;
 
 }
+*/

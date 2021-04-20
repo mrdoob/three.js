@@ -41,7 +41,7 @@ function Editor() {
 		transformModeChanged: new Signal(),
 		snapChanged: new Signal(),
 		spaceChanged: new Signal(),
-		rendererChanged: new Signal(),
+		rendererCreated: new Signal(),
 		rendererUpdated: new Signal(),
 
 		sceneBackgroundChanged: new Signal(),
@@ -414,7 +414,7 @@ Editor.prototype = {
 
 				} else if ( object.isSpotLight ) {
 
-					helper = new THREE.SpotLightHelper( object, 1 );
+					helper = new THREE.SpotLightHelper( object );
 
 				} else if ( object.isHemisphereLight ) {
 

@@ -92,9 +92,9 @@ class XRHandOculusMeshModel {
 
 					const bone = object.getObjectByName( boneName.replace( /%/g, handedness === 'right' ? 'r' : 'l' ) );
 
-					if ( bone !== undefined) {
+					if ( bone !== undefined ) {
 
-						bone.jointName = joints [ i ];
+						bone.jointName = joints[ i ];
 
 					}
 
