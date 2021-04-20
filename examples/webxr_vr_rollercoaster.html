@@ -48,7 +48,7 @@
 
 			// environment
 
-			geometry = new THREE.PlaneBufferGeometry( 500, 500, 15, 15 );
+			geometry = new THREE.PlaneGeometry( 500, 500, 15, 15 );
 			geometry.rotateX( - Math.PI / 2 );
 
 			const positions = geometry.attributes.position.array;
@@ -152,10 +152,9 @@
 
 			//
 
-			geometry = new THREE.CylinderBufferGeometry( 10, 10, 5, 15 );
+			geometry = new THREE.CylinderGeometry( 10, 10, 5, 15 );
 			material = new THREE.MeshLambertMaterial( {
-				color: 0xff8080,
-				//flatShading: true // Lambert does not support flat shading
+				color: 0xff8080
 			} );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - 80, 10, - 70 );
@@ -164,10 +163,9 @@
 
 			funfairs.push( mesh );
 
-			geometry = new THREE.CylinderBufferGeometry( 5, 6, 4, 10 );
+			geometry = new THREE.CylinderGeometry( 5, 6, 4, 10 );
 			material = new THREE.MeshLambertMaterial( {
-				color: 0x8080ff,
-				//flatShading: true // Lambert does not support flat shading
+				color: 0x8080ff
 			} );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( 50, 2, 30 );
@@ -177,7 +175,7 @@
 
 			//
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 			function onWindowResize() {
 

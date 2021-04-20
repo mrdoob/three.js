@@ -27,7 +27,7 @@ function TextureCubeNode( value, uv, bias ) {
 
 TextureCubeNode.prototype = Object.create( TempNode.prototype );
 TextureCubeNode.prototype.constructor = TextureCubeNode;
-TextureCubeNode.prototype.nodeType = "TextureCube";
+TextureCubeNode.prototype.nodeType = 'TextureCube';
 
 TextureCubeNode.prototype.generate = function ( builder, output ) {
 
@@ -47,7 +47,7 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 
 	} else {
 
-		console.warn( "THREE.TextureCubeNode is not compatible with " + builder.shader + " shader." );
+		console.warn( 'THREE.TextureCubeNode is not compatible with ' + builder.shader + ' shader.' );
 
 		return builder.format( 'vec4( 0.0 )', this.getType( builder ), output );
 

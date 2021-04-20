@@ -10,7 +10,7 @@ function RawNode( value ) {
 
 RawNode.prototype = Object.create( Node.prototype );
 RawNode.prototype.constructor = RawNode;
-RawNode.prototype.nodeType = "Raw";
+RawNode.prototype.nodeType = 'Raw';
 
 RawNode.prototype.generate = function ( builder ) {
 

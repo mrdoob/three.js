@@ -51,7 +51,7 @@
 
 				//
 
-				const geometry = new THREE.TorusKnotBufferGeometry( 8, 3, 256, 32, 2, 3 );
+				const geometry = new THREE.TorusKnotGeometry( 8, 3, 256, 32, 2, 3 );
 				const material = new THREE.MeshPhongMaterial( { color: 0xffff00 } );
 
 				const mesh = new THREE.Mesh( geometry, material );
@@ -107,7 +107,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

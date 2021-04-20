@@ -75,7 +75,7 @@
 
 				if ( singleMaterial ) zmaterial = [ cubeMaterial ];
 
-				const geo = new THREE.SphereBufferGeometry( 1, 20, 10 );
+				const geo = new THREE.SphereGeometry( 1, 20, 10 );
 
 				const xgrid = 14, ygrid = 9, zgrid = 14;
 
@@ -132,9 +132,9 @@
 				container.appendChild( stats.dom );
 
 				container.style.touchAction = 'none';
-				container.addEventListener( 'pointermove', onPointerMove, false );
+				container.addEventListener( 'pointermove', onPointerMove );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				const effectController = {
 

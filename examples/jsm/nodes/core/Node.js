@@ -4,7 +4,7 @@ function Node( type ) {
 
 	this.uuid = MathUtils.generateUUID();
 
-	this.name = "";
+	this.name = '';
 
 	this.type = type;
 
@@ -197,12 +197,12 @@ Node.prototype = {
 
 		var data = {};
 
-		if ( typeof this.nodeType !== "string" ) throw new Error( "Node does not allow serialization." );
+		if ( typeof this.nodeType !== 'string' ) throw new Error( 'Node does not allow serialization.' );
 
 		data.uuid = this.uuid;
 		data.nodeType = this.nodeType;
 
-		if ( this.name !== "" ) data.name = this.name;
+		if ( this.name !== '' ) data.name = this.name;
 
 		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 

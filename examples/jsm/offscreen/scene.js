@@ -22,7 +22,7 @@ function init( canvas, width, height, pixelRatio, path ) {
 
 		var texture = new THREE.CanvasTexture( imageBitmap );
 
-		var geometry = new THREE.IcosahedronBufferGeometry( 5, 8 );
+		var geometry = new THREE.IcosahedronGeometry( 5, 8 );
 		var materials = [
 			new THREE.MeshMatcapMaterial( { color: 0xaa24df, matcap: texture } ),
 			new THREE.MeshMatcapMaterial( { color: 0x605d90, matcap: texture } ),

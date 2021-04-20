@@ -63,7 +63,7 @@
 
 						const material = new THREE.MeshBasicMaterial( { map: texture } );
 
-						const quad = new THREE.PlaneBufferGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
+						const quad = new THREE.PlaneGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
 
 						const mesh = new THREE.Mesh( quad, material );
 
@@ -82,7 +82,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -12,7 +12,7 @@ function Matrix3Node( matrix ) {
 
 Matrix3Node.prototype = Object.create( InputNode.prototype );
 Matrix3Node.prototype.constructor = Matrix3Node;
-Matrix3Node.prototype.nodeType = "Matrix3";
+Matrix3Node.prototype.nodeType = 'Matrix3';
 
 Object.defineProperties( Matrix3Node.prototype, {
 
@@ -36,7 +36,7 @@ Object.defineProperties( Matrix3Node.prototype, {
 
 Matrix3Node.prototype.generateReadonly = function ( builder, output, uuid, type/*, ns, needsUpdate */ ) {
 
-	return builder.format( "mat3( " + this.value.elements.join( ", " ) + " )", type, output );
+	return builder.format( 'mat3( ' + this.value.elements.join( ', ' ) + ' )', type, output );
 
 };
 

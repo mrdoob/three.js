@@ -13,13 +13,13 @@ function Vector3Node( x, y, z ) {
 
 Vector3Node.prototype = Object.create( InputNode.prototype );
 Vector3Node.prototype.constructor = Vector3Node;
-Vector3Node.prototype.nodeType = "Vector3";
+Vector3Node.prototype.nodeType = 'Vector3';
 
 NodeUtils.addShortcuts( Vector3Node.prototype, 'value', [ 'x', 'y', 'z' ] );
 
 Vector3Node.prototype.generateReadonly = function ( builder, output, uuid, type/*, ns, needsUpdate*/ ) {
 
-	return builder.format( "vec3( " + this.x + ", " + this.y + ", " + this.z + " )", type, output );
+	return builder.format( 'vec3( ' + this.x + ', ' + this.y + ', ' + this.z + ' )', type, output );
 
 };
 

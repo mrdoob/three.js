@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p>
+			three.jsはJavaScriptベースのライブラリですが、[link:https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html 宣言ファイル](*d.ts*　ファイル)は公開されているので、TypeScriptプロジェクトで使用することも可能です。
+		</p>
+
+		<p>
+			Typescriptのコンパイラがthree.jsの型を判別するために最小限の設定は必要です。<br>
+			[link:https://www.typescriptlang.org/docs/handbook/module-resolution.html moduleResolution]を *node* に、[link:https://www.typescriptlang.org/docs/handbook/compiler-options.html target]を *es6* 以降に設定する必要があります。
+		</p>
+
+		<code>
+		// Example of minimal `tsconfig.json` file
+		{
+			"compilerOptions": {
+				"target": "es6",
+				"moduleResolution": "node",
+			},
+			"include": [ "./src/**/*.ts" ],
+		}
+		</code>
+
+		<p>
+			注意事項 : 今のところ、この２つのオプションを使わずにthree.jsの型を使うことはできません。
+		</p>
+
+		<p>
+			注意事項 : いくつかの宣言が間違っていたり欠けていたりすることがあります。宣言ファイルの改良に貢献することは、コミュニティにとって非常に有益であり、three.jsの型付けをより正確で良いものにします。
+		</p>
+	</body>
+</html>

@@ -15,11 +15,11 @@ const _vcp = /*@__PURE__*/ new Vector3();
 
 class Triangle {
 
-	constructor( a, b, c ) {
+	constructor( a = new Vector3(), b = new Vector3(), c = new Vector3() ) {
 
-		this.a = ( a !== undefined ) ? a : new Vector3();
-		this.b = ( b !== undefined ) ? b : new Vector3();
-		this.c = ( c !== undefined ) ? c : new Vector3();
+		this.a = a;
+		this.b = b;
+		this.c = c;
 
 	}
 
@@ -321,6 +321,5 @@ class Triangle {
 	}
 
 }
-
 
 export { Triangle };

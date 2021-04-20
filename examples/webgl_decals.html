@@ -91,7 +91,6 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 120;
-				camera.target = new THREE.Vector3();
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
@@ -117,11 +116,11 @@
 
 				raycaster = new THREE.Raycaster();
 
-				mouseHelper = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 10 ), new THREE.MeshNormalMaterial() );
+				mouseHelper = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 10 ), new THREE.MeshNormalMaterial() );
 				mouseHelper.visible = false;
 				scene.add( mouseHelper );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				let moved = false;
 
@@ -135,7 +134,7 @@
 
 					moved = false;
 
-				}, false );
+				} );
 
 				window.addEventListener( 'pointerup', function ( event ) {
 

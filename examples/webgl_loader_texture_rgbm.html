@@ -18,6 +18,8 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
+			import { RGBMLoader } from './jsm/loaders/RGBMLoader.js';
+
 			const params = {
 				exposure: 2.0
 			};
@@ -44,17 +46,13 @@
 
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
-				new THREE.TextureLoader().load( 'textures/memorial.png', function ( texture ) {
+				new RGBMLoader().load( 'textures/memorial.png', function ( texture ) {
 
 					texture.encoding = THREE.RGBM16Encoding;
 
-					texture.minFilter = THREE.LinearFilter;
-					texture.magFilter = THREE.LinearFilter;
-					texture.flipY = true;
-
 					const material = new THREE.MeshBasicMaterial( { map: texture } );
 
-					const quad = new THREE.PlaneBufferGeometry( 1.5 * texture.width / texture.height, 1.5 );
+					const quad = new THREE.PlaneGeometry( 1, 1.5 );
 
 					const mesh = new THREE.Mesh( quad, material );
 
@@ -73,7 +71,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

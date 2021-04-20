@@ -92,7 +92,7 @@
 
 				// planet
 
-				geometry = new THREE.SphereBufferGeometry( radius, 100, 50 );
+				geometry = new THREE.SphereGeometry( radius, 100, 50 );
 
 				meshPlanet = new THREE.Mesh( geometry, materialNormalMap );
 				meshPlanet.rotation.y = 0;
@@ -205,7 +205,7 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// postprocessing
 

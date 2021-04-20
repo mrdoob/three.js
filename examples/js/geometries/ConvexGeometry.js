@@ -1,66 +1,48 @@
-// ConvexGeometry
+( function () {
 
-THREE.ConvexGeometry = function ( points ) {
+	class ConvexGeometry extends THREE.BufferGeometry {
 
-	THREE.Geometry.call( this );
+		constructor( points ) {
 
-	this.fromBufferGeometry( new THREE.ConvexBufferGeometry( points ) );
-	this.mergeVertices();
+			super(); // buffers
 
-};
+			const vertices = [];
+			const normals = [];
 
-THREE.ConvexGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.ConvexGeometry.prototype.constructor = THREE.ConvexGeometry;
+			if ( THREE.ConvexHull === undefined ) {
 
-// ConvexBufferGeometry
+				console.error( 'THREE.ConvexBufferGeometry: ConvexBufferGeometry relies on THREE.ConvexHull' );
 
-THREE.ConvexBufferGeometry = function ( points ) {
+			}
 
-	THREE.BufferGeometry.call( this );
+			const convexHull = new THREE.ConvexHull().setFromPoints( points ); // generate vertices and normals
 
-	// buffers
+			const faces = convexHull.faces;
 
-	var vertices = [];
-	var normals = [];
+			for ( let i = 0; i < faces.length; i ++ ) {
 
-	if ( THREE.ConvexHull === undefined ) {
+				const face = faces[ i ];
+				let edge = face.edge; // we move along a doubly-connected edge list to access all face points (see HalfEdge docs)
 
-		console.error( 'THREE.ConvexBufferGeometry: ConvexBufferGeometry relies on THREE.ConvexHull' );
+				do {
 
-	}
+					const point = edge.head().point;
+					vertices.push( point.x, point.y, point.z );
+					normals.push( face.normal.x, face.normal.y, face.normal.z );
+					edge = edge.next;
 
-	var convexHull = new THREE.ConvexHull().setFromPoints( points );
+				} while ( edge !== face.edge );
 
-	// generate vertices and normals
+			} // build geometry
 
-	var faces = convexHull.faces;
 
-	for ( var i = 0; i < faces.length; i ++ ) {
+			this.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+			this.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 
-		var face = faces[ i ];
-		var edge = face.edge;
-
-		// we move along a doubly-connected edge list to access all face points (see HalfEdge docs)
-
-		do {
-
-			var point = edge.head().point;
-
-			vertices.push( point.x, point.y, point.z );
-			normals.push( face.normal.x, face.normal.y, face.normal.z );
-
-			edge = edge.next;
-
-		} while ( edge !== face.edge );
+		}
 
 	}
 
-	// build geometry
+	THREE.ConvexGeometry = ConvexGeometry;
 
-	this.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-	this.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-
-};
-
-THREE.ConvexBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.ConvexBufferGeometry.prototype.constructor = THREE.ConvexBufferGeometry;
+} )();

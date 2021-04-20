@@ -22,8 +22,6 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		this.array = null; // set by the renderer
 		this.bufferGPU = null; // set by the renderer
 
-		Object.defineProperty( this, 'isUniformsGroup', { value: true } );
-
 	}
 
 	addUniform( uniform ) {
@@ -127,7 +125,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		let updated = false;
 
 		const a = this.array;
-		const v = uniform.value;
+		const v = uniform.getValue();
 		const offset = uniform.offset;
 
 		if ( a[ offset ] !== v ) {
@@ -146,7 +144,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		let updated = false;
 
 		const a = this.array;
-		const v = uniform.value;
+		const v = uniform.getValue();
 		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y ) {
@@ -167,7 +165,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		let updated = false;
 
 		const a = this.array;
-		const v = uniform.value;
+		const v = uniform.getValue();
 		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z ) {
@@ -189,7 +187,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		let updated = false;
 
 		const a = this.array;
-		const v = uniform.value;
+		const v = uniform.getValue();
 		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z || a[ offset + 4 ] !== v.w ) {
@@ -197,7 +195,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 			a[ offset + 0 ] = v.x;
 			a[ offset + 1 ] = v.y;
 			a[ offset + 2 ] = v.z;
-			a[ offset + 3 ] = v.z;
+			a[ offset + 3 ] = v.w;
 
 			updated = true;
 
@@ -212,7 +210,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		let updated = false;
 
 		const a = this.array;
-		const c = uniform.value;
+		const c = uniform.getValue();
 		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== c.r || a[ offset + 1 ] !== c.g || a[ offset + 2 ] !== c.b ) {
@@ -234,7 +232,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		let updated = false;
 
 		const a = this.array;
-		const e = uniform.value.elements;
+		const e = uniform.getValue().elements;
 		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== e[ 0 ] || a[ offset + 1 ] !== e[ 1 ] || a[ offset + 2 ] !== e[ 2 ] ||
@@ -264,7 +262,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		let updated = false;
 
 		const a = this.array;
-		const e = uniform.value.elements;
+		const e = uniform.getValue().elements;
 		const offset = uniform.offset;
 
 		if ( arraysEqual( a, e, offset ) === false ) {
@@ -291,5 +289,7 @@ function arraysEqual( a, b, offset ) {
 	return true;
 
 }
+
+WebGPUUniformsGroup.prototype.isUniformsGroup = true;
 
 export default WebGPUUniformsGroup;

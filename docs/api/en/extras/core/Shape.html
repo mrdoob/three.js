@@ -31,7 +31,7 @@
 
 		const extrudeSettings = { amount: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
 
-		const geometry = new THREE.ExtrudeBufferGeometry( heartShape, extrudeSettings );
+		const geometry = new THREE.ExtrudeGeometry( heartShape, extrudeSettings );
 
 		const mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		</code>

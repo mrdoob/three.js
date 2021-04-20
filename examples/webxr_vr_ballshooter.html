@@ -57,7 +57,7 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				const geometry = new THREE.IcosahedronBufferGeometry( radius, 3 );
+				const geometry = new THREE.IcosahedronGeometry( radius, 3 );
 
 				for ( let i = 0; i < 200; i ++ ) {
 
@@ -150,7 +150,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -172,7 +172,7 @@
 
 					case 'gaze':
 
-						geometry = new THREE.RingBufferGeometry( 0.02, 0.04, 32 ).translate( 0, 0, - 1 );
+						geometry = new THREE.RingGeometry( 0.02, 0.04, 32 ).translate( 0, 0, - 1 );
 						material = new THREE.MeshBasicMaterial( { opacity: 0.5, transparent: true } );
 						return new THREE.Mesh( geometry, material );
 

@@ -59,7 +59,7 @@
 				camera.add( light );
 
 				const colors = [ 0xff0000, 0x00ff00, 0x0000ff ];
-				const geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				const geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
 				for ( let i = 0; i < 300; i ++ ) {
 
@@ -136,7 +136,7 @@
 				gui.add( layers, 'enable all' );
 				gui.add( layers, 'disable all' );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

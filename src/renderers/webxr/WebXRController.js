@@ -1,18 +1,16 @@
 import { Group } from '../../objects/Group.js';
 
-function WebXRController() {
+class WebXRController {
 
-	this._targetRay = null;
-	this._grip = null;
-	this._hand = null;
+	constructor() {
 
-}
+		this._targetRay = null;
+		this._grip = null;
+		this._hand = null;
 
-Object.assign( WebXRController.prototype, {
+	}
 
-	constructor: WebXRController,
-
-	getHandSpace: function () {
+	getHandSpace() {
 
 		if ( this._hand === null ) {
 
@@ -20,32 +18,16 @@ Object.assign( WebXRController.prototype, {
 			this._hand.matrixAutoUpdate = false;
 			this._hand.visible = false;
 
-			this._hand.joints = [];
+			this._hand.joints = {};
 			this._hand.inputState = { pinching: false };
-
-			if ( window.XRHand ) {
-
-				for ( let i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
-
-					// The transform of this joint will be updated with the joint pose on each frame
-					const joint = new Group();
-					joint.matrixAutoUpdate = false;
-					joint.visible = false;
-					this._hand.joints.push( joint );
-					// ??
-					this._hand.add( joint );
-
-				}
-
-			}
 
 		}
 
 		return this._hand;
 
-	},
+	}
 
-	getTargetRaySpace: function () {
+	getTargetRaySpace() {
 
 		if ( this._targetRay === null ) {
 
@@ -57,9 +39,9 @@ Object.assign( WebXRController.prototype, {
 
 		return this._targetRay;
 
-	},
+	}
 
-	getGripSpace: function () {
+	getGripSpace() {
 
 		if ( this._grip === null ) {
 
@@ -71,9 +53,9 @@ Object.assign( WebXRController.prototype, {
 
 		return this._grip;
 
-	},
+	}
 
-	dispatchEvent: function ( event ) {
+	dispatchEvent( event ) {
 
 		if ( this._targetRay !== null ) {
 
@@ -95,9 +77,9 @@ Object.assign( WebXRController.prototype, {
 
 		return this;
 
-	},
+	}
 
-	disconnect: function ( inputSource ) {
+	disconnect( inputSource ) {
 
 		this.dispatchEvent( { type: 'disconnected', data: inputSource } );
 
@@ -121,9 +103,9 @@ Object.assign( WebXRController.prototype, {
 
 		return this;
 
-	},
+	}
 
-	update: function ( inputSource, frame, referenceSpace ) {
+	update( inputSource, frame, referenceSpace ) {
 
 		let inputPose = null;
 		let gripPose = null;
@@ -133,78 +115,87 @@ Object.assign( WebXRController.prototype, {
 		const grip = this._grip;
 		const hand = this._hand;
 
-		if ( inputSource ) {
+		if ( inputSource && frame.session.visibilityState !== 'visible-blurred' ) {
+
+			if ( targetRay !== null ) {
+
+				inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
+
+				if ( inputPose !== null ) {
+
+					targetRay.matrix.fromArray( inputPose.transform.matrix );
+					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+
+				}
+
+			}
 
 			if ( hand && inputSource.hand ) {
 
 				handPose = true;
 
-				for ( let i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
+				for ( const inputjoint of inputSource.hand.values() ) {
 
-					if ( inputSource.hand[ i ] ) {
+					// Update the joints groups with the XRJoint poses
+					const jointPose = frame.getJointPose( inputjoint, referenceSpace );
 
-						// Update the joints groups with the XRJoint poses
-						const jointPose = frame.getJointPose( inputSource.hand[ i ], referenceSpace );
-						const joint = hand.joints[ i ];
+					if ( hand.joints[ inputjoint.jointName ] === undefined ) {
 
-						if ( jointPose !== null ) {
-
-							joint.matrix.fromArray( jointPose.transform.matrix );
-							joint.matrix.decompose( joint.position, joint.rotation, joint.scale );
-							joint.jointRadius = jointPose.radius;
-
-						}
-
-						joint.visible = jointPose !== null;
-
-						// Custom events
-
-						// Check pinch
-						const indexTip = hand.joints[ window.XRHand.INDEX_PHALANX_TIP ];
-						const thumbTip = hand.joints[ window.XRHand.THUMB_PHALANX_TIP ];
-						const distance = indexTip.position.distanceTo( thumbTip.position );
-
-						const distanceToPinch = 0.02;
-						const threshold = 0.005;
-
-						if ( hand.inputState.pinching && distance > distanceToPinch + threshold ) {
-
-							hand.inputState.pinching = false;
-							this.dispatchEvent( {
-								type: "pinchend",
-								handedness: inputSource.handedness,
-								target: this
-							} );
-
-						} else if ( ! hand.inputState.pinching && distance <= distanceToPinch - threshold ) {
-
-							hand.inputState.pinching = true;
-							this.dispatchEvent( {
-								type: "pinchstart",
-								handedness: inputSource.handedness,
-								target: this
-							} );
-
-						}
+						// The transform of this joint will be updated with the joint pose on each frame
+						const joint = new Group();
+						joint.matrixAutoUpdate = false;
+						joint.visible = false;
+						hand.joints[ inputjoint.jointName ] = joint;
+						// ??
+						hand.add( joint );
 
 					}
+
+					const joint = hand.joints[ inputjoint.jointName ];
+
+					if ( jointPose !== null ) {
+
+						joint.matrix.fromArray( jointPose.transform.matrix );
+						joint.matrix.decompose( joint.position, joint.rotation, joint.scale );
+						joint.jointRadius = jointPose.radius;
+
+					}
+
+					joint.visible = jointPose !== null;
+
+				}
+
+				// Custom events
+
+				// Check pinchz
+				const indexTip = hand.joints[ 'index-finger-tip' ];
+				const thumbTip = hand.joints[ 'thumb-tip' ];
+				const distance = indexTip.position.distanceTo( thumbTip.position );
+
+				const distanceToPinch = 0.02;
+				const threshold = 0.005;
+
+				if ( hand.inputState.pinching && distance > distanceToPinch + threshold ) {
+
+					hand.inputState.pinching = false;
+					this.dispatchEvent( {
+						type: 'pinchend',
+						handedness: inputSource.handedness,
+						target: this
+					} );
+
+				} else if ( ! hand.inputState.pinching && distance <= distanceToPinch - threshold ) {
+
+					hand.inputState.pinching = true;
+					this.dispatchEvent( {
+						type: 'pinchstart',
+						handedness: inputSource.handedness,
+						target: this
+					} );
 
 				}
 
 			} else {
-
-				if ( targetRay !== null ) {
-
-					inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
-
-					if ( inputPose !== null ) {
-
-						targetRay.matrix.fromArray( inputPose.transform.matrix );
-						targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
-
-					}
-
-				}
 
 				if ( grip !== null && inputSource.gripSpace ) {
 
@@ -245,7 +236,7 @@ Object.assign( WebXRController.prototype, {
 
 	}
 
-} );
+}
 
 
 export { WebXRController };
