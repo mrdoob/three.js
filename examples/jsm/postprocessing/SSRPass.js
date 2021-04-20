@@ -228,13 +228,13 @@ class SSRPass extends Pass {
 
 		this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 		this.ssrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
-			this.ssrMaterial.defines.SELECTIVE = this.selective;
+		this.ssrMaterial.defines.SELECTIVE = this.selective;
 		this.ssrMaterial.needsUpdate = true;
 		this.ssrMaterial.uniforms[ 'tMetalness' ].value = this.metalnessRenderTarget.texture;
 		this.ssrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 		this.ssrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 		this.ssrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-			this.ssrMaterial.uniforms[ 'thickness' ].value = this.thickness;
+		this.ssrMaterial.uniforms[ 'thickness' ].value = this.thickness;
 		this.ssrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
 		this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 		this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
@@ -317,7 +317,6 @@ class SSRPass extends Pass {
 			this.fsQuad = new FullScreenQuad( null );
 	
 			this.originalClearColor = new Color();
-
 	}
 
 	dispose() {
