@@ -85,32 +85,6 @@ class WebGLMultiRenderTarget extends WebGLRenderTarget {
 
 	}
 
-	setCount( count ) {
-
-		if ( this.texture.length !== count ) {
-
-			this.dispose();
-
-			if ( count > this.texture.length ) {
-
-				for ( let i = this.texture.length; i < count; i ++ ) {
-
-					this.texture[ i ] = this.texture[ 0 ].clone();
-
-				}
-
-			} else {
-
-				this.texture.length = count;
-
-			}
-
-		}
-
-		return this;
-
-	}
-
 }
 
 WebGLMultiRenderTarget.prototype.isWebGLMultiRenderTarget = true;
