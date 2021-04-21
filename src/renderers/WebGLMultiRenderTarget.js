@@ -20,6 +20,8 @@ class WebGLMultiRenderTarget extends WebGLRenderTarget {
 
 	setTexture( texture ) {
 
+		this.dispose();
+
 		this.texture.length = 0;
 
 		for ( let i = 0, il = texture.length; i < il; i ++ ) {
@@ -67,11 +69,14 @@ class WebGLMultiRenderTarget extends WebGLRenderTarget {
 
 	copy( source ) {
 
+		this.dispose();
+
 		this.width = source.width;
 		this.height = source.height;
 		this.depth = source.depth;
 
-		this.viewport.copy( source.viewport );
+		this.viewport.set( 0, 0, this.width, this.height );
+		this.scissor.set( 0, 0, this.width, this.height );
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
