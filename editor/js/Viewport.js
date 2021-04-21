@@ -575,7 +575,7 @@ function Viewport( editor ) {
 					renderTarget.fromEquirectangularTexture( renderer, backgroundEquirectangularTexture );
 					renderTarget.toJSON = function () { return null }; // TODO Remove hack
 
-					scene.background = renderTarget;
+					scene.background = renderTarget.texture;
 
 				}
 
