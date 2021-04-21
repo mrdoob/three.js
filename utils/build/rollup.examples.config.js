@@ -114,7 +114,7 @@ function unmodularize() {
 			code = code.replace( 'import { MMDParser } from \'../libs/mmdparser.module.js\';', '' );
 			code = code.replace( 'import { potpack } from \'../libs/potpack.module.js\';', '' );
 			code = code.replace( 'import { opentype } from \'../libs/opentype.module.min.js\';', '' );
-			code = code.replace( 'import { chevrotain } from \'../libs/chevrotain.module.min.js\';', '' );
+			code = code.replace( 'import chevrotain from \'../libs/chevrotain.module.min.js\';', '' );
 			code = code.replace( 'import { ZSTDDecoder } from \'../libs/zstddec.module.js\';', '' );
 
 			// remove newline at the start of file

@@ -2979,9 +2979,9 @@
 
 	}
 
-	const ChevrotainParser = chevrotain.Parser; // eslint-disable-line no-undef
+	const CstParser = chevrotain.CstParser; // eslint-disable-line no-undef
 
-	class VRMLParser extends ChevrotainParser {
+	class VRMLParser extends CstParser {
 
 		constructor( tokenVocabulary ) {
 
