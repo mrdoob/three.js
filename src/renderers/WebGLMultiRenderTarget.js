@@ -34,6 +34,8 @@ class WebGLMultiRenderTarget extends WebGLRenderTarget {
 
 		}
 
+		return this;
+
 	}
 
 	setSize( width, height, depth = 1 ) {
@@ -58,6 +60,8 @@ class WebGLMultiRenderTarget extends WebGLRenderTarget {
 
 		this.viewport.set( 0, 0, width, height );
 		this.scissor.set( 0, 0, width, height );
+
+		return this;
 
 	}
 
