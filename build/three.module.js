@@ -21826,6 +21826,8 @@ class Group extends Object3D {
 
 Group.prototype.isGroup = true;
 
+const _moveEvent = { type: 'move' };
+
 class WebXRController {
 
 	constructor() {
@@ -21860,6 +21862,10 @@ class WebXRController {
 			this._targetRay = new Group();
 			this._targetRay.matrixAutoUpdate = false;
 			this._targetRay.visible = false;
+			this._targetRay.hasLinearVelocity = false;
+			this._targetRay.linearVelocity = new Vector3();
+			this._targetRay.hasAngularVelocity = false;
+			this._targetRay.angularVelocity = new Vector3();
 
 		}
 
@@ -21874,6 +21880,10 @@ class WebXRController {
 			this._grip = new Group();
 			this._grip.matrixAutoUpdate = false;
 			this._grip.visible = false;
+			this._grip.hasLinearVelocity = false;
+			this._grip.linearVelocity = new Vector3();
+			this._grip.hasAngularVelocity = false;
+			this._grip.angularVelocity = new Vector3();
 
 		}
 
@@ -21952,7 +21962,29 @@ class WebXRController {
 					targetRay.matrix.fromArray( inputPose.transform.matrix );
 					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
 
-					this.dispatchEvent( { type: 'move' } );
+					if ( inputPose.linearVelocity !== null ) {
+
+						targetRay.hasLinearVelocity = true;
+						targetRay.linearVelocity.copy( inputPose.linearVelocity );
+
+					} else {
+
+						targetRay.hasLinearVelocity = false;
+
+					}
+
+					if ( inputPose.angularVelocity !== null ) {
+
+						targetRay.hasAngularVelocity = true;
+						targetRay.angularVelocity.copy( inputPose.angularVelocity );
+
+					} else {
+
+						targetRay.hasAngularVelocity = false;
+
+					}
+
+					this.dispatchEvent( _moveEvent );
 
 				}
 
@@ -22033,6 +22065,28 @@ class WebXRController {
 
 						grip.matrix.fromArray( gripPose.transform.matrix );
 						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
+
+						if ( gripPose.linearVelocity !== null ) {
+
+							grip.hasLinearVelocity = true;
+							grip.linearVelocity.copy( gripPose.linearVelocity );
+
+						} else {
+
+							grip.hasLinearVelocity = false;
+
+						}
+
+						if ( gripPose.angularVelocity !== null ) {
+
+							grip.hasAngularVelocity = true;
+							grip.angularVelocity.copy( gripPose.angularVelocity );
+
+						} else {
+
+							grip.hasAngularVelocity = false;
+
+						}
 
 					}
 
