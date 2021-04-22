@@ -137,7 +137,7 @@ Object.assign( WebXRController.prototype, {
 					targetRay.matrix.fromArray( inputPose.transform.matrix );
 					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
 
-					if ( inputPose.linearVelocity != null ) {
+					if ( inputPose.linearVelocity !== null ) {
 
 						targetRay.hasLinearVelocity = true;
 						targetRay.linearVelocity.copy( inputPose.linearVelocity );
@@ -148,7 +148,7 @@ Object.assign( WebXRController.prototype, {
 
 					}
 
-					if ( inputPose.angularVelocity != null ) {
+					if ( inputPose.angularVelocity !== null ) {
 
 						targetRay.hasAngularVelocity = true;
 						targetRay.angularVelocity.copy( inputPose.angularVelocity );
@@ -239,7 +239,7 @@ Object.assign( WebXRController.prototype, {
 						grip.matrix.fromArray( gripPose.transform.matrix );
 						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
 
-						if ( gripPose.linearVelocity != null ) {
+						if ( gripPose.linearVelocity !== null ) {
 
 							grip.hasLinearVelocity = true;
 							grip.linearVelocity.copy( gripPose.linearVelocity );
@@ -250,7 +250,7 @@ Object.assign( WebXRController.prototype, {
 
 						}
 
-						if ( gripPose.angularVelocity != null ) {
+						if ( gripPose.angularVelocity !== null ) {
 
 							grip.hasAngularVelocity = true;
 							grip.angularVelocity.copy( gripPose.angularVelocity );
