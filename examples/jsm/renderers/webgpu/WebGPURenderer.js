@@ -189,10 +189,10 @@ class WebGPURenderer {
 
 		this._renderPassDescriptor = {
 			colorAttachments: [ {
-				attachment: null
+				view: null
 			} ],
 			 depthStencilAttachment: {
-				attachment: null,
+				view: null,
 				depthStoreOp: GPUStoreOp.Store,
 				stencilStoreOp: GPUStoreOp.Store
 			}
@@ -246,24 +246,24 @@ class WebGPURenderer {
 
 			const renderTargetProperties = this._properties.get( renderTarget );
 
-			colorAttachment.attachment = renderTargetProperties.colorTextureGPU.createView();
-			depthStencilAttachment.attachment = renderTargetProperties.depthTextureGPU.createView();
+			colorAttachment.view = renderTargetProperties.colorTextureGPU.createView();
+			depthStencilAttachment.view = renderTargetProperties.depthTextureGPU.createView();
 
 		} else {
 
 			if ( this._parameters.antialias === true ) {
 
-				colorAttachment.attachment = this._colorBuffer.createView();
+				colorAttachment.view = this._colorBuffer.createView();
 				colorAttachment.resolveTarget = this._swapChain.getCurrentTexture().createView();
 
 			} else {
 
-				colorAttachment.attachment = this._swapChain.getCurrentTexture().createView();
+				colorAttachment.view = this._swapChain.getCurrentTexture().createView();
 				colorAttachment.resolveTarget = undefined;
 
 			}
 
-			depthStencilAttachment.attachment = this._depthBuffer.createView();
+			depthStencilAttachment.view = this._depthBuffer.createView();
 
 		}
 
