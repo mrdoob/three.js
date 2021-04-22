@@ -126,6 +126,8 @@ class WebXRController {
 					targetRay.matrix.fromArray( inputPose.transform.matrix );
 					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
 
+					this.dispatchEvent( { type: 'move' } );
+
 				}
 
 			}
