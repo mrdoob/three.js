@@ -41,8 +41,6 @@
 
 					const light = new THREE.PointLight( color, intensity, 20 );
 					light.castShadow = true;
-					light.shadow.camera.near = 1;
-					light.shadow.camera.far = 60;
 					light.shadow.bias = - 0.005; // reduces self-shadowing on double-sided objects
 
 					let geometry = new THREE.SphereGeometry( 0.3, 12, 6 );

@@ -40,6 +40,12 @@ class SpotLight extends Light {
 
 	}
 
+	dispose() {
+
+		this.shadow.dispose();
+
+	}
+
 	copy( source ) {
 
 		super.copy( source );
