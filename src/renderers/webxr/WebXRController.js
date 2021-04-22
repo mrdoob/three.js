@@ -159,7 +159,7 @@ class WebXRController {
 
 					}
 
-          this.dispatchEvent( _moveEvent );
+					this.dispatchEvent( _moveEvent );
 
 				}
 
