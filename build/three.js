@@ -6672,7 +6672,7 @@
 
 		setColorName(style) {
 			// color keywords
-			const hex = _colorKeywords[style];
+			const hex = _colorKeywords[style.toLowerCase()];
 
 			if (hex !== undefined) {
 				// red
@@ -16237,6 +16237,9 @@
 					if (inputPose !== null) {
 						targetRay.matrix.fromArray(inputPose.transform.matrix);
 						targetRay.matrix.decompose(targetRay.position, targetRay.rotation, targetRay.scale);
+						this.dispatchEvent({
+							type: 'move'
+						});
 					}
 				}
 
