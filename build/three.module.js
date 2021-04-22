@@ -21962,7 +21962,7 @@ class WebXRController {
 					targetRay.matrix.fromArray( inputPose.transform.matrix );
 					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
 
-					if ( inputPose.linearVelocity !== null ) {
+					if ( inputPose.linearVelocity ) {
 
 						targetRay.hasLinearVelocity = true;
 						targetRay.linearVelocity.copy( inputPose.linearVelocity );
@@ -21973,7 +21973,7 @@ class WebXRController {
 
 					}
 
-					if ( inputPose.angularVelocity !== null ) {
+					if ( inputPose.angularVelocity ) {
 
 						targetRay.hasAngularVelocity = true;
 						targetRay.angularVelocity.copy( inputPose.angularVelocity );
@@ -22066,7 +22066,7 @@ class WebXRController {
 						grip.matrix.fromArray( gripPose.transform.matrix );
 						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
 
-						if ( gripPose.linearVelocity !== null ) {
+						if ( gripPose.linearVelocity ) {
 
 							grip.hasLinearVelocity = true;
 							grip.linearVelocity.copy( gripPose.linearVelocity );
@@ -22077,7 +22077,7 @@ class WebXRController {
 
 						}
 
-						if ( gripPose.angularVelocity !== null ) {
+						if ( gripPose.angularVelocity ) {
 
 							grip.hasAngularVelocity = true;
 							grip.angularVelocity.copy( gripPose.angularVelocity );

@@ -16250,14 +16250,14 @@
 						targetRay.matrix.fromArray(inputPose.transform.matrix);
 						targetRay.matrix.decompose(targetRay.position, targetRay.rotation, targetRay.scale);
 
-						if (inputPose.linearVelocity !== null) {
+						if (inputPose.linearVelocity) {
 							targetRay.hasLinearVelocity = true;
 							targetRay.linearVelocity.copy(inputPose.linearVelocity);
 						} else {
 							targetRay.hasLinearVelocity = false;
 						}
 
-						if (inputPose.angularVelocity !== null) {
+						if (inputPose.angularVelocity) {
 							targetRay.hasAngularVelocity = true;
 							targetRay.angularVelocity.copy(inputPose.angularVelocity);
 						} else {
@@ -16327,14 +16327,14 @@
 							grip.matrix.fromArray(gripPose.transform.matrix);
 							grip.matrix.decompose(grip.position, grip.rotation, grip.scale);
 
-							if (gripPose.linearVelocity !== null) {
+							if (gripPose.linearVelocity) {
 								grip.hasLinearVelocity = true;
 								grip.linearVelocity.copy(gripPose.linearVelocity);
 							} else {
 								grip.hasLinearVelocity = false;
 							}
 
-							if (gripPose.angularVelocity !== null) {
+							if (gripPose.angularVelocity) {
 								grip.hasAngularVelocity = true;
 								grip.angularVelocity.copy(gripPose.angularVelocity);
 							} else {
