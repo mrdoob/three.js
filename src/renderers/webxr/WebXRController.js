@@ -1,5 +1,7 @@
 import { Group } from '../../objects/Group.js';
 
+const _moveEvent = { type: 'move' };
+
 class WebXRController {
 
 	constructor() {
@@ -126,7 +128,7 @@ class WebXRController {
 					targetRay.matrix.fromArray( inputPose.transform.matrix );
 					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
 
-					this.dispatchEvent( { type: 'move' } );
+					this.dispatchEvent( _moveEvent );
 
 				}
 
