@@ -135,23 +135,22 @@
 				renderer.xr.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
 				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
-				document.body.appendChild( VRButton.createButton( renderer ) );
-
-				const controller1 = renderer.xr.getController( 0 );
-				scene.add( controller1 );
-
-				const controller2 = renderer.xr.getController( 1 );
-				scene.add( controller2 );
-
 				const geometry = new THREE.BufferGeometry();
 				geometry.setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 5 ) ] );
 
+				const controller1 = renderer.xr.getController( 0 );
 				controller1.add( new THREE.Line( geometry ) );
+				scene.add( controller1 );
+
+				const controller2 = renderer.xr.getController( 1 );
 				controller2.add( new THREE.Line( geometry ) );
+				scene.add( controller2 );
 
 				//
 
@@ -177,8 +176,8 @@
 				const gui = new GUI( { width: 300 } );
 				gui.add( parameters, 'radius', 0.0, 1.0 ).onChange( onChange );
 				gui.add( parameters, 'tube', 0.0, 1.0 ).onChange( onChange );
-				gui.add( parameters, 'tubularSegments', 3, 150, 1 ).onChange( onChange );
-				gui.add( parameters, 'radialSegments', 1, 20, 1 ).onChange( onChange );
+				gui.add( parameters, 'tubularSegments', 10, 150, 1 ).onChange( onChange );
+				gui.add( parameters, 'radialSegments', 2, 20, 1 ).onChange( onChange );
 				gui.add( parameters, 'p', 0, 10, 1 ).onChange( onChange );
 				gui.add( parameters, 'q', 0, 10, 1 ).onChange( onChange );
 
