@@ -15,8 +15,8 @@
 			import { Reflector } from './jsm/objects/Reflector.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
 
-			import { HTMLMesh } from '../editor/js/libs/three.html.js';
-			import { InteractionManager } from './jsm/webxr/InteractionManager.js';
+			import { HTMLMesh } from './jsm/interactive/HTMLMesh.js';
+			import { InteractiveGroup } from './jsm/interactive/InteractiveGroup.js';
 			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -181,19 +181,18 @@
 				gui.add( parameters, 'p', 0, 10, 1 ).onChange( onChange );
 				gui.add( parameters, 'q', 0, 10, 1 ).onChange( onChange );
 
+				const group = new InteractiveGroup( renderer );
+				scene.add( group );
+
 				const mesh = new HTMLMesh( gui.domElement );
 				mesh.position.x = - 1;
 				mesh.position.y = 1;
 				mesh.position.z = - 1;
 				mesh.visible = false;
-				scene.add( mesh );
+				group.add( mesh );
 
 				renderer.xr.addEventListener( 'sessionstart', () => { mesh.visible = true; } );
 				renderer.xr.addEventListener( 'sessionend', () => { mesh.visible = false; } );
-
-				const interaction = new InteractionManager( [ mesh ] );
-				interaction.listenXRControllerEvents( controller1 );
-				interaction.listenXRControllerEvents( controller2 );
 
 			}
 

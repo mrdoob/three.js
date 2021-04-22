@@ -1,21 +1,41 @@
-import * as THREE from '../../../build/three.module.js';
+import {
+	CanvasTexture,
+	LinearFilter,
+	Mesh,
+	MeshBasicMaterial,
+	PlaneGeometry,
+	sRGBEncoding
+} from '../../../build/three.module.js';
 
-class HTMLMesh extends THREE.Mesh {
+class HTMLMesh extends Mesh {
 
 	constructor( dom ) {
 
 		const texture = new HTMLTexture( dom );
 
-		const geometry = new THREE.PlaneGeometry( texture.image.width * 0.002, texture.image.height * 0.002 );
-		const material = new THREE.MeshBasicMaterial( { map: texture, toneMapped: false } );
+		const geometry = new PlaneGeometry( texture.image.width * 0.002, texture.image.height * 0.002 );
+		const material = new MeshBasicMaterial( { map: texture, toneMapped: false } );
 
 		super( geometry, material );
+
+		function onEvent( event ) {
+
+			console.log( event.type );
+
+			material.map.dispatchEvent( event );
+
+		}
+
+		this.addEventListener( 'mousedown', onEvent );
+		this.addEventListener( 'mousemove', onEvent );
+		this.addEventListener( 'mouseup', onEvent );
+		this.addEventListener( 'click', onEvent );
 
 	}
 
 }
 
-class HTMLTexture extends THREE.CanvasTexture {
+class HTMLTexture extends CanvasTexture {
 
 	constructor( dom ) {
 
@@ -24,15 +44,15 @@ class HTMLTexture extends THREE.CanvasTexture {
 		this.dom = dom;
 
 		this.anisotropy = 16;
-		this.encoding = THREE.sRGBEncoding;
-		this.minFilter = THREE.LinearFilter;
-		this.magFilter = THREE.LinearFilter;
+		this.encoding = sRGBEncoding;
+		this.minFilter = LinearFilter;
+		this.magFilter = LinearFilter;
 
 	}
 
-	dispatchEvent( event, x, y ) {
+	dispatchEvent( event ) {
 
-		htmlevent( this.dom, event, x, y );
+		htmlevent( this.dom, event.type, event.data.x, event.data.y );
 
 		this.update();
 
@@ -288,4 +308,4 @@ function htmlevent( element, event, x, y ) {
 
 }
 
-export { HTMLMesh, HTMLTexture };
+export { HTMLMesh };
