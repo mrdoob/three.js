@@ -18,28 +18,6 @@ class WebGLMultiRenderTarget extends WebGLRenderTarget {
 
 	}
 
-	setTexture( texture ) {
-
-		this.dispose();
-
-		this.texture.length = 0;
-
-		for ( let i = 0, il = texture.length; i < il; i ++ ) {
-
-			texture[ i ].image = {
-				width: this.width,
-				height: this.height,
-				depth: this.depth
-			};
-
-			this.texture[ i ] = texture[ i ];
-
-		}
-
-		return this;
-
-	}
-
 	setSize( width, height, depth = 1 ) {
 
 		if ( this.width !== width || this.height !== height || this.depth !== depth ) {
