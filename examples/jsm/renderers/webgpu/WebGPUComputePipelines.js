@@ -41,13 +41,13 @@ class WebGPUComputePipelines {
 
 			//
 
-			const computeStage = {
+			const compute = {
 				module: moduleCompute,
 				entryPoint: 'main'
 			};
 
 			pipeline = device.createComputePipeline( {
-				computeStage: computeStage
+				compute: compute
 			} );
 
 			this.pipelines.set( param, pipeline );

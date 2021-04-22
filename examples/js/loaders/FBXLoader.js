@@ -1,5 +1,7 @@
-/**
- * Loader loads FBX file and generates Group representing FBX scene.
+( function () {
+
+	/**
+ * THREE.Loader loads FBX file and generates THREE.Group representing FBX scene.
  * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format
  * Versions lower than this may load but will probably have errors
  *
@@ -14,35 +16,27 @@
  *		https://code.blender.org/2013/08/fbx-binary-file-format-specification/
  */
 
+	let fbxTree;
+	let connections;
+	let sceneGraph;
 
-THREE.FBXLoader = ( function () {
+	class FBXLoader extends THREE.Loader {
 
-	var fbxTree;
-	var connections;
-	var sceneGraph;
+		constructor( manager ) {
 
-	function FBXLoader( manager ) {
+			super( manager );
 
-		THREE.Loader.call( this, manager );
+		}
 
-	}
+		load( url, onLoad, onProgress, onError ) {
 
-	FBXLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-
-		constructor: FBXLoader,
-
-		load: function ( url, onLoad, onProgress, onError ) {
-
-			var scope = this;
-
-			var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
-
-			var loader = new THREE.FileLoader( this.manager );
+			const scope = this;
+			const path = scope.path === '' ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+			const loader = new THREE.FileLoader( this.manager );
 			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
 			loader.setRequestHeader( scope.requestHeader );
 			loader.setWithCredentials( scope.withCredentials );
-
 			loader.load( url, function ( buffer ) {
 
 				try {
@@ -67,9 +61,9 @@ THREE.FBXLoader = ( function () {
 
 			}, onProgress, onError );
 
-		},
+		}
 
-		parse: function ( FBXBuffer, path ) {
+		parse( FBXBuffer, path ) {
 
 			if ( isFbxFormatBinary( FBXBuffer ) ) {
 
@@ -77,7 +71,7 @@ THREE.FBXLoader = ( function () {
 
 			} else {
 
-				var FBXText = convertArrayBufferToString( FBXBuffer );
+				const FBXText = convertArrayBufferToString( FBXBuffer );
 
 				if ( ! isFbxFormatASCII( FBXText ) ) {
 
@@ -93,61 +87,53 @@ THREE.FBXLoader = ( function () {
 
 				fbxTree = new TextParser().parse( FBXText );
 
-			}
+			} // console.log( fbxTree );
 
-			// console.log( fbxTree );
 
-			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
-
+			const textureLoader = new THREE.TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 			return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
 
 		}
 
-	} );
+	} // Parse the FBXTree object returned by the BinaryParser or TextParser and return a THREE.Group
 
-	// Parse the FBXTree object returned by the BinaryParser or TextParser and return a THREE.Group
-	function FBXTreeParser( textureLoader, manager ) {
 
-		this.textureLoader = textureLoader;
-		this.manager = manager;
+	class FBXTreeParser {
 
-	}
+		constructor( textureLoader, manager ) {
 
-	FBXTreeParser.prototype = {
+			this.textureLoader = textureLoader;
+			this.manager = manager;
 
-		constructor: FBXTreeParser,
+		}
 
-		parse: function () {
+		parse() {
 
 			connections = this.parseConnections();
-
-			var images = this.parseImages();
-			var textures = this.parseTextures( images );
-			var materials = this.parseMaterials( textures );
-			var deformers = this.parseDeformers();
-			var geometryMap = new GeometryParser().parse( deformers );
-
+			const images = this.parseImages();
+			const textures = this.parseTextures( images );
+			const materials = this.parseMaterials( textures );
+			const deformers = this.parseDeformers();
+			const geometryMap = new GeometryParser().parse( deformers );
 			this.parseScene( deformers, geometryMap, materials );
-
 			return sceneGraph;
 
-		},
-
-		// Parses FBXTree.Connections which holds parent-child connections between objects (e.g. material -> texture, model->geometry )
+		} // Parses FBXTree.Connections which holds parent-child connections between objects (e.g. material -> texture, model->geometry )
 		// and details the connection type
-		parseConnections: function () {
 
-			var connectionMap = new Map();
+
+		parseConnections() {
+
+			const connectionMap = new Map();
 
 			if ( 'Connections' in fbxTree ) {
 
-				var rawConnections = fbxTree.Connections.connections;
-
+				const rawConnections = fbxTree.Connections.connections;
 				rawConnections.forEach( function ( rawConnection ) {
 
-					var fromID = rawConnection[ 0 ];
-					var toID = rawConnection[ 1 ];
-					var relationship = rawConnection[ 2 ];
+					const fromID = rawConnection[ 0 ];
+					const toID = rawConnection[ 1 ];
+					const relationship = rawConnection[ 2 ];
 
 					if ( ! connectionMap.has( fromID ) ) {
 
@@ -158,7 +144,10 @@ THREE.FBXLoader = ( function () {
 
 					}
 
-					var parentRelationship = { ID: toID, relationship: relationship };
+					const parentRelationship = {
+						ID: toID,
+						relationship: relationship
+					};
 					connectionMap.get( fromID ).parents.push( parentRelationship );
 
 					if ( ! connectionMap.has( toID ) ) {
@@ -170,7 +159,10 @@ THREE.FBXLoader = ( function () {
 
 					}
 
-					var childRelationship = { ID: fromID, relationship: relationship };
+					const childRelationship = {
+						ID: fromID,
+						relationship: relationship
+					};
 					connectionMap.get( toID ).children.push( childRelationship );
 
 				} );
@@ -179,38 +171,34 @@ THREE.FBXLoader = ( function () {
 
 			return connectionMap;
 
-		},
-
-		// Parse FBXTree.Objects.Video for embedded image data
+		} // Parse FBXTree.Objects.Video for embedded image data
 		// These images are connected to textures in FBXTree.Objects.Textures
 		// via FBXTree.Connections.
-		parseImages: function () {
 
-			var images = {};
-			var blobs = {};
+
+		parseImages() {
+
+			const images = {};
+			const blobs = {};
 
 			if ( 'Video' in fbxTree.Objects ) {
 
-				var videoNodes = fbxTree.Objects.Video;
+				const videoNodes = fbxTree.Objects.Video;
 
-				for ( var nodeID in videoNodes ) {
+				for ( const nodeID in videoNodes ) {
 
-					var videoNode = videoNodes[ nodeID ];
+					const videoNode = videoNodes[ nodeID ];
+					const id = parseInt( nodeID );
+					images[ id ] = videoNode.RelativeFilename || videoNode.Filename; // raw image data is in videoNode.Content
 
-					var id = parseInt( nodeID );
-
-					images[ id ] = videoNode.RelativeFilename || videoNode.Filename;
-
-					// raw image data is in videoNode.Content
 					if ( 'Content' in videoNode ) {
 
-						var arrayBufferContent = ( videoNode.Content instanceof ArrayBuffer ) && ( videoNode.Content.byteLength > 0 );
-						var base64Content = ( typeof videoNode.Content === 'string' ) && ( videoNode.Content !== '' );
+						const arrayBufferContent = videoNode.Content instanceof ArrayBuffer && videoNode.Content.byteLength > 0;
+						const base64Content = typeof videoNode.Content === 'string' && videoNode.Content !== '';
 
 						if ( arrayBufferContent || base64Content ) {
 
-							var image = this.parseImage( videoNodes[ nodeID ] );
-
+							const image = this.parseImage( videoNodes[ nodeID ] );
 							blobs[ videoNode.RelativeFilename || videoNode.Filename ] = image;
 
 						}
@@ -221,53 +209,45 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			for ( var id in images ) {
+			for ( const id in images ) {
 
-				var filename = images[ id ];
-
-				if ( blobs[ filename ] !== undefined ) images[ id ] = blobs[ filename ];
-				else images[ id ] = images[ id ].split( '\\' ).pop();
+				const filename = images[ id ];
+				if ( blobs[ filename ] !== undefined ) images[ id ] = blobs[ filename ]; else images[ id ] = images[ id ].split( '\\' ).pop();
 
 			}
 
 			return images;
 
-		},
+		} // Parse embedded image data in FBXTree.Video.Content
 
-		// Parse embedded image data in FBXTree.Video.Content
-		parseImage: function ( videoNode ) {
 
-			var content = videoNode.Content;
-			var fileName = videoNode.RelativeFilename || videoNode.Filename;
-			var extension = fileName.slice( fileName.lastIndexOf( '.' ) + 1 ).toLowerCase();
+		parseImage( videoNode ) {
 
-			var type;
+			const content = videoNode.Content;
+			const fileName = videoNode.RelativeFilename || videoNode.Filename;
+			const extension = fileName.slice( fileName.lastIndexOf( '.' ) + 1 ).toLowerCase();
+			let type;
 
 			switch ( extension ) {
 
 				case 'bmp':
-
 					type = 'image/bmp';
 					break;
 
 				case 'jpg':
 				case 'jpeg':
-
 					type = 'image/jpeg';
 					break;
 
 				case 'png':
-
 					type = 'image/png';
 					break;
 
 				case 'tif':
-
 					type = 'image/tiff';
 					break;
 
 				case 'tga':
-
 					if ( this.manager.getHandler( '.tga' ) === null ) {
 
 						console.warn( 'FBXLoader: TGA loader not found, skipping ', fileName );
@@ -278,38 +258,42 @@ THREE.FBXLoader = ( function () {
 					break;
 
 				default:
-
 					console.warn( 'FBXLoader: Image type "' + extension + '" is not supported.' );
 					return;
 
 			}
 
-			if ( typeof content === 'string' ) { // ASCII format
+			if ( typeof content === 'string' ) {
 
+				// ASCII format
 				return 'data:' + type + ';base64,' + content;
 
-			} else { // Binary Format
+			} else {
 
-				var array = new Uint8Array( content );
-				return window.URL.createObjectURL( new Blob( [ array ], { type: type } ) );
+				// Binary Format
+				const array = new Uint8Array( content );
+				return window.URL.createObjectURL( new Blob( [ array ], {
+					type: type
+				} ) );
 
 			}
 
-		},
-
-		// Parse nodes in FBXTree.Objects.Texture
+		} // Parse nodes in FBXTree.Objects.Texture
 		// These contain details such as UV scaling, cropping, rotation etc and are connected
 		// to images in FBXTree.Objects.Video
-		parseTextures: function ( images ) {
 
-			var textureMap = new Map();
+
+		parseTextures( images ) {
+
+			const textureMap = new Map();
 
 			if ( 'Texture' in fbxTree.Objects ) {
 
-				var textureNodes = fbxTree.Objects.Texture;
-				for ( var nodeID in textureNodes ) {
+				const textureNodes = fbxTree.Objects.Texture;
 
-					var texture = this.parseTexture( textureNodes[ nodeID ], images );
+				for ( const nodeID in textureNodes ) {
+
+					const texture = this.parseTexture( textureNodes[ nodeID ], images );
 					textureMap.set( parseInt( nodeID ), texture );
 
 				}
@@ -318,24 +302,18 @@ THREE.FBXLoader = ( function () {
 
 			return textureMap;
 
-		},
+		} // Parse individual node in FBXTree.Objects.Texture
 
-		// Parse individual node in FBXTree.Objects.Texture
-		parseTexture: function ( textureNode, images ) {
 
-			var texture = this.loadTexture( textureNode, images );
+		parseTexture( textureNode, images ) {
 
+			const texture = this.loadTexture( textureNode, images );
 			texture.ID = textureNode.id;
-
 			texture.name = textureNode.attrName;
-
-			var wrapModeU = textureNode.WrapModeU;
-			var wrapModeV = textureNode.WrapModeV;
-
-			var valueU = wrapModeU !== undefined ? wrapModeU.value : 0;
-			var valueV = wrapModeV !== undefined ? wrapModeV.value : 0;
-
-			// http://download.autodesk.com/us/fbx/SDKdocs/FBX_SDK_Help/files/fbxsdkref/class_k_fbx_texture.html#889640e63e2e681259ea81061b85143a
+			const wrapModeU = textureNode.WrapModeU;
+			const wrapModeV = textureNode.WrapModeV;
+			const valueU = wrapModeU !== undefined ? wrapModeU.value : 0;
+			const valueV = wrapModeV !== undefined ? wrapModeV.value : 0; // http://download.autodesk.com/us/fbx/SDKdocs/FBX_SDK_Help/files/fbxsdkref/class_k_fbx_texture.html#889640e63e2e681259ea81061b85143a
 			// 0: repeat(default), 1: clamp
 
 			texture.wrapS = valueU === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
@@ -343,8 +321,7 @@ THREE.FBXLoader = ( function () {
 
 			if ( 'Scaling' in textureNode ) {
 
-				var values = textureNode.Scaling.value;
-
+				const values = textureNode.Scaling.value;
 				texture.repeat.x = values[ 0 ];
 				texture.repeat.y = values[ 1 ];
 
@@ -352,16 +329,14 @@ THREE.FBXLoader = ( function () {
 
 			return texture;
 
-		},
+		} // load a texture specified as a blob or data URI, or via an external URL using THREE.TextureLoader
 
-		// load a texture specified as a blob or data URI, or via an external URL using THREE.TextureLoader
-		loadTexture: function ( textureNode, images ) {
 
-			var fileName;
+		loadTexture( textureNode, images ) {
 
-			var currentPath = this.textureLoader.path;
-
-			var children = connections.get( textureNode.id ).children;
+			let fileName;
+			const currentPath = this.textureLoader.path;
+			const children = connections.get( textureNode.id ).children;
 
 			if ( children !== undefined && children.length > 0 && images[ children[ 0 ].ID ] !== undefined ) {
 
@@ -375,13 +350,12 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			var texture;
-
-			var extension = textureNode.FileName.slice( - 3 ).toLowerCase();
+			let texture;
+			const extension = textureNode.FileName.slice( - 3 ).toLowerCase();
 
 			if ( extension === 'tga' ) {
 
-				var loader = this.manager.getHandler( '.tga' );
+				const loader = this.manager.getHandler( '.tga' );
 
 				if ( loader === null ) {
 
@@ -406,24 +380,22 @@ THREE.FBXLoader = ( function () {
 			}
 
 			this.textureLoader.setPath( currentPath );
-
 			return texture;
 
-		},
+		} // Parse nodes in FBXTree.Objects.Material
 
-		// Parse nodes in FBXTree.Objects.Material
-		parseMaterials: function ( textureMap ) {
 
-			var materialMap = new Map();
+		parseMaterials( textureMap ) {
+
+			const materialMap = new Map();
 
 			if ( 'Material' in fbxTree.Objects ) {
 
-				var materialNodes = fbxTree.Objects.Material;
+				const materialNodes = fbxTree.Objects.Material;
 
-				for ( var nodeID in materialNodes ) {
+				for ( const nodeID in materialNodes ) {
 
-					var material = this.parseMaterial( materialNodes[ nodeID ], textureMap );
-
+					const material = this.parseMaterial( materialNodes[ nodeID ], textureMap );
 					if ( material !== null ) materialMap.set( parseInt( nodeID ), material );
 
 				}
@@ -432,41 +404,40 @@ THREE.FBXLoader = ( function () {
 
 			return materialMap;
 
-		},
-
-		// Parse single node in FBXTree.Objects.Material
+		} // Parse single node in FBXTree.Objects.Material
 		// Materials are connected to texture maps in FBXTree.Objects.Textures
 		// FBX format currently only supports Lambert and Phong shading models
-		parseMaterial: function ( materialNode, textureMap ) {
 
-			var ID = materialNode.id;
-			var name = materialNode.attrName;
-			var type = materialNode.ShadingModel;
 
-			// Case where FBX wraps shading model in property object.
+		parseMaterial( materialNode, textureMap ) {
+
+			const ID = materialNode.id;
+			const name = materialNode.attrName;
+			let type = materialNode.ShadingModel; // Case where FBX wraps shading model in property object.
+
 			if ( typeof type === 'object' ) {
 
 				type = type.value;
 
-			}
+			} // Ignore unused materials which don't have any connections.
 
-			// Ignore unused materials which don't have any connections.
+
 			if ( ! connections.has( ID ) ) return null;
-
-			var parameters = this.parseParameters( materialNode, textureMap, ID );
-
-			var material;
+			const parameters = this.parseParameters( materialNode, textureMap, ID );
+			let material;
 
 			switch ( type.toLowerCase() ) {
 
 				case 'phong':
 					material = new THREE.MeshPhongMaterial();
 					break;
+
 				case 'lambert':
 					material = new THREE.MeshLambertMaterial();
 					break;
+
 				default:
-					console.warn( 'THREE.FBXLoader: unknown material type "%s". Defaulting to MeshPhongMaterial.', type );
+					console.warn( 'THREE.FBXLoader: unknown material type "%s". Defaulting to THREE.MeshPhongMaterial.', type );
 					material = new THREE.MeshPhongMaterial();
 					break;
 
@@ -474,16 +445,15 @@ THREE.FBXLoader = ( function () {
 
 			material.setValues( parameters );
 			material.name = name;
-
 			return material;
 
-		},
-
-		// Parse FBX material and return parameters suitable for a three.js material
+		} // Parse FBX material and return parameters suitable for a three.js material
 		// Also parse the texture map and return any textures associated with the material
-		parseParameters: function ( materialNode, textureMap, ID ) {
 
-			var parameters = {};
+
+		parseParameters( materialNode, textureMap, ID ) {
+
+			const parameters = {};
 
 			if ( materialNode.BumpFactor ) {
 
@@ -560,10 +530,10 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			var scope = this;
+			const scope = this;
 			connections.get( ID ).children.forEach( function ( child ) {
 
-				var type = child.relationship;
+				const type = child.relationship;
 
 				switch ( type ) {
 
@@ -614,8 +584,11 @@ THREE.FBXLoader = ( function () {
 
 					case 'AmbientColor':
 					case 'ShininessExponent': // AKA glossiness map
+
 					case 'SpecularFactor': // AKA specularLevel
+
 					case 'VectorDisplacementColor': // NOTE: Seems to be a copy of DisplacementColor
+
 					default:
 						console.warn( 'THREE.FBXLoader: %s map is not supported in three.js, skipping texture.', type );
 						break;
@@ -623,13 +596,12 @@ THREE.FBXLoader = ( function () {
 				}
 
 			} );
-
 			return parameters;
 
-		},
+		} // get a texture from the textureMap for use by a material.
 
-		// get a texture from the textureMap for use by a material.
-		getTexture: function ( textureMap, id ) {
+
+		getTexture( textureMap, id ) {
 
 			// if the texture is a layered texture, just use the first layer and issue a warning
 			if ( 'LayeredTexture' in fbxTree.Objects && id in fbxTree.Objects.LayeredTexture ) {
@@ -641,47 +613,41 @@ THREE.FBXLoader = ( function () {
 
 			return textureMap.get( id );
 
-		},
-
-		// Parse nodes in FBXTree.Objects.Deformer
+		} // Parse nodes in FBXTree.Objects.Deformer
 		// Deformer node can contain skinning or Vertex Cache animation data, however only skinning is supported here
-		// Generates map of Skeleton-like objects for use later when generating and binding skeletons.
-		parseDeformers: function () {
+		// Generates map of THREE.Skeleton-like objects for use later when generating and binding skeletons.
 
-			var skeletons = {};
-			var morphTargets = {};
+
+		parseDeformers() {
+
+			const skeletons = {};
+			const morphTargets = {};
 
 			if ( 'Deformer' in fbxTree.Objects ) {
 
-				var DeformerNodes = fbxTree.Objects.Deformer;
+				const DeformerNodes = fbxTree.Objects.Deformer;
 
-				for ( var nodeID in DeformerNodes ) {
+				for ( const nodeID in DeformerNodes ) {
 
-					var deformerNode = DeformerNodes[ nodeID ];
-
-					var relationships = connections.get( parseInt( nodeID ) );
+					const deformerNode = DeformerNodes[ nodeID ];
+					const relationships = connections.get( parseInt( nodeID ) );
 
 					if ( deformerNode.attrType === 'Skin' ) {
 
-						var skeleton = this.parseSkeleton( relationships, DeformerNodes );
+						const skeleton = this.parseSkeleton( relationships, DeformerNodes );
 						skeleton.ID = nodeID;
-
 						if ( relationships.parents.length > 1 ) console.warn( 'THREE.FBXLoader: skeleton attached to more than one geometry is not supported.' );
 						skeleton.geometryID = relationships.parents[ 0 ].ID;
-
 						skeletons[ nodeID ] = skeleton;
 
 					} else if ( deformerNode.attrType === 'BlendShape' ) {
 
-						var morphTarget = {
-							id: nodeID,
+						const morphTarget = {
+							id: nodeID
 						};
-
 						morphTarget.rawTargets = this.parseMorphTargets( relationships, DeformerNodes );
 						morphTarget.id = nodeID;
-
 						if ( relationships.parents.length > 1 ) console.warn( 'THREE.FBXLoader: morph target attached to more than one geometry is not supported.' );
-
 						morphTargets[ nodeID ] = morphTarget;
 
 					}
@@ -691,34 +657,27 @@ THREE.FBXLoader = ( function () {
 			}
 
 			return {
-
 				skeletons: skeletons,
-				morphTargets: morphTargets,
-
+				morphTargets: morphTargets
 			};
 
-		},
-
-		// Parse single nodes in FBXTree.Objects.Deformer
+		} // Parse single nodes in FBXTree.Objects.Deformer
 		// The top level skeleton node has type 'Skin' and sub nodes have type 'Cluster'
 		// Each skin node represents a skeleton and each cluster node represents a bone
-		parseSkeleton: function ( relationships, deformerNodes ) {
 
-			var rawBones = [];
 
+		parseSkeleton( relationships, deformerNodes ) {
+
+			const rawBones = [];
 			relationships.children.forEach( function ( child ) {
 
-				var boneNode = deformerNodes[ child.ID ];
-
+				const boneNode = deformerNodes[ child.ID ];
 				if ( boneNode.attrType !== 'Cluster' ) return;
-
-				var rawBone = {
-
+				const rawBone = {
 					ID: child.ID,
 					indices: [],
 					weights: [],
-					transformLink: new THREE.Matrix4().fromArray( boneNode.TransformLink.a ),
-					// transform: new THREE.Matrix4().fromArray( boneNode.Transform.a ),
+					transformLink: new THREE.Matrix4().fromArray( boneNode.TransformLink.a ) // transform: new THREE.Matrix4().fromArray( boneNode.Transform.a ),
 					// linkMode: boneNode.Mode,
 
 				};
@@ -733,72 +692,57 @@ THREE.FBXLoader = ( function () {
 				rawBones.push( rawBone );
 
 			} );
-
 			return {
-
 				rawBones: rawBones,
 				bones: []
-
 			};
 
-		},
+		} // The top level morph deformer node has type "BlendShape" and sub nodes have type "BlendShapeChannel"
 
-		// The top level morph deformer node has type "BlendShape" and sub nodes have type "BlendShapeChannel"
-		parseMorphTargets: function ( relationships, deformerNodes ) {
 
-			var rawMorphTargets = [];
+		parseMorphTargets( relationships, deformerNodes ) {
 
-			for ( var i = 0; i < relationships.children.length; i ++ ) {
+			const rawMorphTargets = [];
 
-				var child = relationships.children[ i ];
+			for ( let i = 0; i < relationships.children.length; i ++ ) {
 
-				var morphTargetNode = deformerNodes[ child.ID ];
-
-				var rawMorphTarget = {
-
+				const child = relationships.children[ i ];
+				const morphTargetNode = deformerNodes[ child.ID ];
+				const rawMorphTarget = {
 					name: morphTargetNode.attrName,
 					initialWeight: morphTargetNode.DeformPercent,
 					id: morphTargetNode.id,
 					fullWeights: morphTargetNode.FullWeights.a
-
 				};
-
 				if ( morphTargetNode.attrType !== 'BlendShapeChannel' ) return;
-
 				rawMorphTarget.geoID = connections.get( parseInt( child.ID ) ).children.filter( function ( child ) {
 
 					return child.relationship === undefined;
 
 				} )[ 0 ].ID;
-
 				rawMorphTargets.push( rawMorphTarget );
 
 			}
 
 			return rawMorphTargets;
 
-		},
+		} // create the main THREE.Group() to be returned by the loader
 
-		// create the main THREE.Group() to be returned by the loader
-		parseScene: function ( deformers, geometryMap, materialMap ) {
+
+		parseScene( deformers, geometryMap, materialMap ) {
 
 			sceneGraph = new THREE.Group();
-
-			var modelMap = this.parseModels( deformers.skeletons, geometryMap, materialMap );
-
-			var modelNodes = fbxTree.Objects.Model;
-
-			var scope = this;
+			const modelMap = this.parseModels( deformers.skeletons, geometryMap, materialMap );
+			const modelNodes = fbxTree.Objects.Model;
+			const scope = this;
 			modelMap.forEach( function ( model ) {
 
-				var modelNode = modelNodes[ model.ID ];
+				const modelNode = modelNodes[ model.ID ];
 				scope.setLookAtProperties( model, modelNode );
-
-				var parentConnections = connections.get( model.ID ).parents;
-
+				const parentConnections = connections.get( model.ID ).parents;
 				parentConnections.forEach( function ( connection ) {
 
-					var parent = modelMap.get( connection.ID );
+					const parent = modelMap.get( connection.ID );
 					if ( parent !== undefined ) parent.add( model );
 
 				} );
@@ -809,15 +753,10 @@ THREE.FBXLoader = ( function () {
 
 				}
 
-
 			} );
-
 			this.bindSkeleton( deformers.skeletons, geometryMap, modelMap );
-
 			this.createAmbientLight();
-
 			this.setupMorphMaterials();
-
 			sceneGraph.traverse( function ( node ) {
 
 				if ( node.userData.transformData ) {
@@ -829,18 +768,15 @@ THREE.FBXLoader = ( function () {
 
 					}
 
-					var transform = generateTransform( node.userData.transformData );
-
+					const transform = generateTransform( node.userData.transformData );
 					node.applyMatrix4( transform );
 					node.updateWorldMatrix();
 
 				}
 
 			} );
+			const animations = new AnimationParser().parse(); // if all the models where already combined in a single group, just return that
 
-			var animations = new AnimationParser().parse();
-
-			// if all the models where already combined in a single group, just return that
 			if ( sceneGraph.children.length === 1 && sceneGraph.children[ 0 ].isGroup ) {
 
 				sceneGraph.children[ 0 ].animations = animations;
@@ -850,21 +786,20 @@ THREE.FBXLoader = ( function () {
 
 			sceneGraph.animations = animations;
 
-		},
+		} // parse nodes in FBXTree.Objects.Model
 
-		// parse nodes in FBXTree.Objects.Model
-		parseModels: function ( skeletons, geometryMap, materialMap ) {
 
-			var modelMap = new Map();
-			var modelNodes = fbxTree.Objects.Model;
+		parseModels( skeletons, geometryMap, materialMap ) {
 
-			for ( var nodeID in modelNodes ) {
+			const modelMap = new Map();
+			const modelNodes = fbxTree.Objects.Model;
 
-				var id = parseInt( nodeID );
-				var node = modelNodes[ nodeID ];
-				var relationships = connections.get( id );
+			for ( const nodeID in modelNodes ) {
 
-				var model = this.buildSkeleton( relationships, skeletons, id, node.attrName );
+				const id = parseInt( nodeID );
+				const node = modelNodes[ nodeID ];
+				const relationships = connections.get( id );
+				let model = this.buildSkeleton( relationships, skeletons, id, node.attrName );
 
 				if ( ! model ) {
 
@@ -873,19 +808,24 @@ THREE.FBXLoader = ( function () {
 						case 'Camera':
 							model = this.createCamera( relationships );
 							break;
+
 						case 'Light':
 							model = this.createLight( relationships );
 							break;
+
 						case 'Mesh':
 							model = this.createMesh( relationships, geometryMap, materialMap );
 							break;
+
 						case 'NurbsCurve':
 							model = this.createCurve( relationships, geometryMap );
 							break;
+
 						case 'LimbNode':
 						case 'Root':
 							model = new THREE.Bone();
 							break;
+
 						case 'Null':
 						default:
 							model = new THREE.Group();
@@ -894,7 +834,6 @@ THREE.FBXLoader = ( function () {
 					}
 
 					model.name = node.attrName ? THREE.PropertyBinding.sanitizeNodeName( node.attrName ) : '';
-
 					model.ID = id;
 
 				}
@@ -906,36 +845,29 @@ THREE.FBXLoader = ( function () {
 
 			return modelMap;
 
-		},
+		}
 
-		buildSkeleton: function ( relationships, skeletons, id, name ) {
+		buildSkeleton( relationships, skeletons, id, name ) {
 
-			var bone = null;
-
+			let bone = null;
 			relationships.parents.forEach( function ( parent ) {
 
-				for ( var ID in skeletons ) {
+				for ( const ID in skeletons ) {
 
-					var skeleton = skeletons[ ID ];
-
+					const skeleton = skeletons[ ID ];
 					skeleton.rawBones.forEach( function ( rawBone, i ) {
 
 						if ( rawBone.ID === parent.ID ) {
 
-							var subBone = bone;
+							const subBone = bone;
 							bone = new THREE.Bone();
-
-							bone.matrixWorld.copy( rawBone.transformLink );
-
-							// set name and id here - otherwise in cases where "subBone" is created it will not have a name / id
+							bone.matrixWorld.copy( rawBone.transformLink ); // set name and id here - otherwise in cases where "subBone" is created it will not have a name / id
 
 							bone.name = name ? THREE.PropertyBinding.sanitizeNodeName( name ) : '';
 							bone.ID = id;
-
-							skeleton.bones[ i ] = bone;
-
-							// In cases where a bone is shared between multiple meshes
+							skeleton.bones[ i ] = bone; // In cases where a bone is shared between multiple meshes
 							// duplicate the bone here and and it as a child of the first bone
+
 							if ( subBone !== null ) {
 
 								bone.add( subBone );
@@ -949,20 +881,18 @@ THREE.FBXLoader = ( function () {
 				}
 
 			} );
-
 			return bone;
 
-		},
+		} // create a THREE.PerspectiveCamera or THREE.OrthographicCamera
 
-		// create a THREE.PerspectiveCamera or THREE.OrthographicCamera
-		createCamera: function ( relationships ) {
 
-			var model;
-			var cameraAttribute;
+		createCamera( relationships ) {
 
+			let model;
+			let cameraAttribute;
 			relationships.children.forEach( function ( child ) {
 
-				var attr = fbxTree.Objects.NodeAttribute[ child.ID ];
+				const attr = fbxTree.Objects.NodeAttribute[ child.ID ];
 
 				if ( attr !== undefined ) {
 
@@ -978,30 +908,32 @@ THREE.FBXLoader = ( function () {
 
 			} else {
 
-				var type = 0;
+				let type = 0;
+
 				if ( cameraAttribute.CameraProjectionType !== undefined && cameraAttribute.CameraProjectionType.value === 1 ) {
 
 					type = 1;
 
 				}
 
-				var nearClippingPlane = 1;
+				let nearClippingPlane = 1;
+
 				if ( cameraAttribute.NearPlane !== undefined ) {
 
 					nearClippingPlane = cameraAttribute.NearPlane.value / 1000;
 
 				}
 
-				var farClippingPlane = 1000;
+				let farClippingPlane = 1000;
+
 				if ( cameraAttribute.FarPlane !== undefined ) {
 
 					farClippingPlane = cameraAttribute.FarPlane.value / 1000;
 
 				}
 
-
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				let width = window.innerWidth;
+				let height = window.innerHeight;
 
 				if ( cameraAttribute.AspectWidth !== undefined && cameraAttribute.AspectHeight !== undefined ) {
 
@@ -1010,25 +942,27 @@ THREE.FBXLoader = ( function () {
 
 				}
 
-				var aspect = width / height;
+				const aspect = width / height;
+				let fov = 45;
 
-				var fov = 45;
 				if ( cameraAttribute.FieldOfView !== undefined ) {
 
 					fov = cameraAttribute.FieldOfView.value;
 
 				}
 
-				var focalLength = cameraAttribute.FocalLength ? cameraAttribute.FocalLength.value : null;
+				const focalLength = cameraAttribute.FocalLength ? cameraAttribute.FocalLength.value : null;
 
 				switch ( type ) {
 
-					case 0: // Perspective
+					case 0:
+						// Perspective
 						model = new THREE.PerspectiveCamera( fov, aspect, nearClippingPlane, farClippingPlane );
 						if ( focalLength !== null ) model.setFocalLength( focalLength );
 						break;
 
-					case 1: // Orthographic
+					case 1:
+						// Orthographic
 						model = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, nearClippingPlane, farClippingPlane );
 						break;
 
@@ -1043,17 +977,16 @@ THREE.FBXLoader = ( function () {
 
 			return model;
 
-		},
+		} // Create a THREE.DirectionalLight, THREE.PointLight or THREE.SpotLight
 
-		// Create a THREE.DirectionalLight, THREE.PointLight or THREE.SpotLight
-		createLight: function ( relationships ) {
 
-			var model;
-			var lightAttribute;
+		createLight( relationships ) {
 
+			let model;
+			let lightAttribute;
 			relationships.children.forEach( function ( child ) {
 
-				var attr = fbxTree.Objects.NodeAttribute[ child.ID ];
+				const attr = fbxTree.Objects.NodeAttribute[ child.ID ];
 
 				if ( attr !== undefined ) {
 
@@ -1069,9 +1002,8 @@ THREE.FBXLoader = ( function () {
 
 			} else {
 
-				var type;
+				let type; // LightType can be undefined for Point lights
 
-				// LightType can be undefined for Point lights
 				if ( lightAttribute.LightType === undefined ) {
 
 					type = 0;
@@ -1082,7 +1014,7 @@ THREE.FBXLoader = ( function () {
 
 				}
 
-				var color = 0xffffff;
+				let color = 0xffffff;
 
 				if ( lightAttribute.Color !== undefined ) {
 
@@ -1090,16 +1022,16 @@ THREE.FBXLoader = ( function () {
 
 				}
 
-				var intensity = ( lightAttribute.Intensity === undefined ) ? 1 : lightAttribute.Intensity.value / 100;
+				let intensity = lightAttribute.Intensity === undefined ? 1 : lightAttribute.Intensity.value / 100; // light disabled
 
-				// light disabled
 				if ( lightAttribute.CastLightOnObject !== undefined && lightAttribute.CastLightOnObject.value === 0 ) {
 
 					intensity = 0;
 
 				}
 
-				var distance = 0;
+				let distance = 0;
+
 				if ( lightAttribute.FarAttenuationEnd !== undefined ) {
 
 					if ( lightAttribute.EnableFarAttenuation !== undefined && lightAttribute.EnableFarAttenuation.value === 0 ) {
@@ -1112,23 +1044,26 @@ THREE.FBXLoader = ( function () {
 
 					}
 
-				}
+				} // TODO: could this be calculated linearly from FarAttenuationStart to FarAttenuationEnd?
 
-				// TODO: could this be calculated linearly from FarAttenuationStart to FarAttenuationEnd?
-				var decay = 1;
+
+				const decay = 1;
 
 				switch ( type ) {
 
-					case 0: // Point
+					case 0:
+						// Point
 						model = new THREE.PointLight( color, intensity, distance, decay );
 						break;
 
-					case 1: // Directional
+					case 1:
+						// Directional
 						model = new THREE.DirectionalLight( color, intensity );
 						break;
 
-					case 2: // Spot
-						var angle = Math.PI / 3;
+					case 2:
+						// Spot
+						let angle = Math.PI / 3;
 
 						if ( lightAttribute.InnerAngle !== undefined ) {
 
@@ -1136,7 +1071,8 @@ THREE.FBXLoader = ( function () {
 
 						}
 
-						var penumbra = 0;
+						let penumbra = 0;
+
 						if ( lightAttribute.OuterAngle !== undefined ) {
 
 							// TODO: this is not correct - FBX calculates outer and inner angle in degrees
@@ -1167,16 +1103,15 @@ THREE.FBXLoader = ( function () {
 
 			return model;
 
-		},
+		}
 
-		createMesh: function ( relationships, geometryMap, materialMap ) {
+		createMesh( relationships, geometryMap, materialMap ) {
 
-			var model;
-			var geometry = null;
-			var material = null;
-			var materials = [];
+			let model;
+			let geometry = null;
+			let material = null;
+			const materials = []; // get geometry and materials(s) from connections
 
-			// get geometry and materials(s) from connections
 			relationships.children.forEach( function ( child ) {
 
 				if ( geometryMap.has( child.ID ) ) {
@@ -1203,7 +1138,9 @@ THREE.FBXLoader = ( function () {
 
 			} else {
 
-				material = new THREE.MeshPhongMaterial( { color: 0xcccccc } );
+				material = new THREE.MeshPhongMaterial( {
+					color: 0xcccccc
+				} );
 				materials.push( material );
 
 			}
@@ -1225,7 +1162,6 @@ THREE.FBXLoader = ( function () {
 					material.skinning = true;
 
 				} );
-
 				model = new THREE.SkinnedMesh( geometry, material );
 				model.normalizeSkinWeights();
 
@@ -1237,76 +1173,67 @@ THREE.FBXLoader = ( function () {
 
 			return model;
 
-		},
+		}
 
-		createCurve: function ( relationships, geometryMap ) {
+		createCurve( relationships, geometryMap ) {
 
-			var geometry = relationships.children.reduce( function ( geo, child ) {
+			const geometry = relationships.children.reduce( function ( geo, child ) {
 
 				if ( geometryMap.has( child.ID ) ) geo = geometryMap.get( child.ID );
-
 				return geo;
 
-			}, null );
+			}, null ); // FBX does not list materials for Nurbs lines, so we'll just put our own in here.
 
-			// FBX does not list materials for Nurbs lines, so we'll just put our own in here.
-			var material = new THREE.LineBasicMaterial( { color: 0x3300ff, linewidth: 1 } );
+			const material = new THREE.LineBasicMaterial( {
+				color: 0x3300ff,
+				linewidth: 1
+			} );
 			return new THREE.Line( geometry, material );
 
-		},
+		} // parse the model node for transform data
 
-		// parse the model node for transform data
-		getTransformData: function ( model, modelNode ) {
 
-			var transformData = {};
+		getTransformData( model, modelNode ) {
 
+			const transformData = {};
 			if ( 'InheritType' in modelNode ) transformData.inheritType = parseInt( modelNode.InheritType.value );
-
-			if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = getEulerOrder( modelNode.RotationOrder.value );
-			else transformData.eulerOrder = 'ZYX';
-
+			if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = getEulerOrder( modelNode.RotationOrder.value ); else transformData.eulerOrder = 'ZYX';
 			if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
-
 			if ( 'PreRotation' in modelNode ) transformData.preRotation = modelNode.PreRotation.value;
 			if ( 'Lcl_Rotation' in modelNode ) transformData.rotation = modelNode.Lcl_Rotation.value;
 			if ( 'PostRotation' in modelNode ) transformData.postRotation = modelNode.PostRotation.value;
-
 			if ( 'Lcl_Scaling' in modelNode ) transformData.scale = modelNode.Lcl_Scaling.value;
-
 			if ( 'ScalingOffset' in modelNode ) transformData.scalingOffset = modelNode.ScalingOffset.value;
 			if ( 'ScalingPivot' in modelNode ) transformData.scalingPivot = modelNode.ScalingPivot.value;
-
 			if ( 'RotationOffset' in modelNode ) transformData.rotationOffset = modelNode.RotationOffset.value;
 			if ( 'RotationPivot' in modelNode ) transformData.rotationPivot = modelNode.RotationPivot.value;
-
 			model.userData.transformData = transformData;
 
-		},
+		}
 
-		setLookAtProperties: function ( model, modelNode ) {
+		setLookAtProperties( model, modelNode ) {
 
 			if ( 'LookAtProperty' in modelNode ) {
 
-				var children = connections.get( model.ID ).children;
-
+				const children = connections.get( model.ID ).children;
 				children.forEach( function ( child ) {
 
 					if ( child.relationship === 'LookAtProperty' ) {
 
-						var lookAtTarget = fbxTree.Objects.Model[ child.ID ];
+						const lookAtTarget = fbxTree.Objects.Model[ child.ID ];
 
 						if ( 'Lcl_Translation' in lookAtTarget ) {
 
-							var pos = lookAtTarget.Lcl_Translation.value;
+							const pos = lookAtTarget.Lcl_Translation.value; // THREE.DirectionalLight, THREE.SpotLight
 
-							// DirectionalLight, SpotLight
 							if ( model.target !== undefined ) {
 
 								model.target.position.fromArray( pos );
 								sceneGraph.add( model.target );
 
-							} else { // Cameras and other Object3Ds
+							} else {
 
+								// Cameras and other Object3Ds
 								model.lookAt( new THREE.Vector3().fromArray( pos ) );
 
 							}
@@ -1319,31 +1246,27 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-		},
+		}
 
-		bindSkeleton: function ( skeletons, geometryMap, modelMap ) {
+		bindSkeleton( skeletons, geometryMap, modelMap ) {
 
-			var bindMatrices = this.parsePoseNodes();
+			const bindMatrices = this.parsePoseNodes();
 
-			for ( var ID in skeletons ) {
+			for ( const ID in skeletons ) {
 
-				var skeleton = skeletons[ ID ];
-
-				var parents = connections.get( parseInt( skeleton.ID ) ).parents;
-
+				const skeleton = skeletons[ ID ];
+				const parents = connections.get( parseInt( skeleton.ID ) ).parents;
 				parents.forEach( function ( parent ) {
 
 					if ( geometryMap.has( parent.ID ) ) {
 
-						var geoID = parent.ID;
-						var geoRelationships = connections.get( geoID );
-
+						const geoID = parent.ID;
+						const geoRelationships = connections.get( geoID );
 						geoRelationships.parents.forEach( function ( geoConnParent ) {
 
 							if ( modelMap.has( geoConnParent.ID ) ) {
 
-								var model = modelMap.get( geoConnParent.ID );
-
+								const model = modelMap.get( geoConnParent.ID );
 								model.bind( new THREE.Skeleton( skeleton.bones ), bindMatrices[ geoConnParent.ID ] );
 
 							}
@@ -1356,21 +1279,21 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-		},
+		}
 
-		parsePoseNodes: function () {
+		parsePoseNodes() {
 
-			var bindMatrices = {};
+			const bindMatrices = {};
 
 			if ( 'Pose' in fbxTree.Objects ) {
 
-				var BindPoseNode = fbxTree.Objects.Pose;
+				const BindPoseNode = fbxTree.Objects.Pose;
 
-				for ( var nodeID in BindPoseNode ) {
+				for ( const nodeID in BindPoseNode ) {
 
 					if ( BindPoseNode[ nodeID ].attrType === 'BindPose' ) {
 
-						var poseNodes = BindPoseNode[ nodeID ].PoseNode;
+						const poseNodes = BindPoseNode[ nodeID ].PoseNode;
 
 						if ( Array.isArray( poseNodes ) ) {
 
@@ -1394,32 +1317,32 @@ THREE.FBXLoader = ( function () {
 
 			return bindMatrices;
 
-		},
+		} // Parse ambient color in FBXTree.GlobalSettings - if it's not set to black (default), create an ambient light
 
-		// Parse ambient color in FBXTree.GlobalSettings - if it's not set to black (default), create an ambient light
-		createAmbientLight: function () {
+
+		createAmbientLight() {
 
 			if ( 'GlobalSettings' in fbxTree && 'AmbientColor' in fbxTree.GlobalSettings ) {
 
-				var ambientColor = fbxTree.GlobalSettings.AmbientColor.value;
-				var r = ambientColor[ 0 ];
-				var g = ambientColor[ 1 ];
-				var b = ambientColor[ 2 ];
+				const ambientColor = fbxTree.GlobalSettings.AmbientColor.value;
+				const r = ambientColor[ 0 ];
+				const g = ambientColor[ 1 ];
+				const b = ambientColor[ 2 ];
 
 				if ( r !== 0 || g !== 0 || b !== 0 ) {
 
-					var color = new THREE.Color( r, g, b );
+					const color = new THREE.Color( r, g, b );
 					sceneGraph.add( new THREE.AmbientLight( color, 1 ) );
 
 				}
 
 			}
 
-		},
+		}
 
-		setupMorphMaterials: function () {
+		setupMorphMaterials() {
 
-			var scope = this;
+			const scope = this;
 			sceneGraph.traverse( function ( child ) {
 
 				if ( child.isMesh ) {
@@ -1446,16 +1369,14 @@ THREE.FBXLoader = ( function () {
 
 			} );
 
-		},
+		}
 
-		setupMorphMaterial: function ( child, material, index ) {
+		setupMorphMaterial( child, material, index ) {
 
-			var uuid = child.uuid;
-			var matUuid = material.uuid;
+			const uuid = child.uuid;
+			const matUuid = material.uuid; // if a geometry has morph targets, it cannot share the material with other geometries
 
-			// if a geometry has morph targets, it cannot share the material with other geometries
-			var sharedMat = false;
-
+			let sharedMat = false;
 			sceneGraph.traverse( function ( node ) {
 
 				if ( node.isMesh ) {
@@ -1476,39 +1397,32 @@ THREE.FBXLoader = ( function () {
 
 			if ( sharedMat === true ) {
 
-				var clonedMat = material.clone();
+				const clonedMat = material.clone();
 				clonedMat.morphTargets = true;
-
-				if ( index === undefined ) child.material = clonedMat;
-				else child.material[ index ] = clonedMat;
+				if ( index === undefined ) child.material = clonedMat; else child.material[ index ] = clonedMat;
 
 			} else material.morphTargets = true;
 
 		}
 
-	};
+	} // parse Geometry data from FBXTree and return map of BufferGeometries
 
-	// parse Geometry data from FBXTree and return map of BufferGeometries
-	function GeometryParser() {}
 
-	GeometryParser.prototype = {
-
-		constructor: GeometryParser,
+	class GeometryParser {
 
 		// Parse nodes in FBXTree.Objects.Geometry
-		parse: function ( deformers ) {
+		parse( deformers ) {
 
-			var geometryMap = new Map();
+			const geometryMap = new Map();
 
 			if ( 'Geometry' in fbxTree.Objects ) {
 
-				var geoNodes = fbxTree.Objects.Geometry;
+				const geoNodes = fbxTree.Objects.Geometry;
 
-				for ( var nodeID in geoNodes ) {
+				for ( const nodeID in geoNodes ) {
 
-					var relationships = connections.get( parseInt( nodeID ) );
-					var geo = this.parseGeometry( relationships, geoNodes[ nodeID ], deformers );
-
+					const relationships = connections.get( parseInt( nodeID ) );
+					const geo = this.parseGeometry( relationships, geoNodes[ nodeID ], deformers );
 					geometryMap.set( parseInt( nodeID ), geo );
 
 				}
@@ -1517,10 +1431,10 @@ THREE.FBXLoader = ( function () {
 
 			return geometryMap;
 
-		},
+		} // Parse single node in FBXTree.Objects.Geometry
 
-		// Parse single node in FBXTree.Objects.Geometry
-		parseGeometry: function ( relationships, geoNode, deformers ) {
+
+		parseGeometry( relationships, geoNode, deformers ) {
 
 			switch ( geoNode.attrType ) {
 
@@ -1534,32 +1448,26 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-		},
+		} // Parse single node mesh geometry in FBXTree.Objects.Geometry
 
 
-		// Parse single node mesh geometry in FBXTree.Objects.Geometry
-		parseMeshGeometry: function ( relationships, geoNode, deformers ) {
+		parseMeshGeometry( relationships, geoNode, deformers ) {
 
-			var skeletons = deformers.skeletons;
-			var morphTargets = [];
-
-			var modelNodes = relationships.parents.map( function ( parent ) {
+			const skeletons = deformers.skeletons;
+			const morphTargets = [];
+			const modelNodes = relationships.parents.map( function ( parent ) {
 
 				return fbxTree.Objects.Model[ parent.ID ];
 
-			} );
+			} ); // don't create geometry if it is not associated with any models
 
-			// don't create geometry if it is not associated with any models
 			if ( modelNodes.length === 0 ) return;
-
-			var skeleton = relationships.children.reduce( function ( skeleton, child ) {
+			const skeleton = relationships.children.reduce( function ( skeleton, child ) {
 
 				if ( skeletons[ child.ID ] !== undefined ) skeleton = skeletons[ child.ID ];
-
 				return skeleton;
 
 			}, null );
-
 			relationships.children.forEach( function ( child ) {
 
 				if ( deformers.morphTargets[ child.ID ] !== undefined ) {
@@ -1568,40 +1476,30 @@ THREE.FBXLoader = ( function () {
 
 				}
 
-			} );
-
-			// Assume one model and get the preRotation from that
+			} ); // Assume one model and get the preRotation from that
 			// if there is more than one model associated with the geometry this may cause problems
-			var modelNode = modelNodes[ 0 ];
 
-			var transformData = {};
-
+			const modelNode = modelNodes[ 0 ];
+			const transformData = {};
 			if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = getEulerOrder( modelNode.RotationOrder.value );
 			if ( 'InheritType' in modelNode ) transformData.inheritType = parseInt( modelNode.InheritType.value );
-
 			if ( 'GeometricTranslation' in modelNode ) transformData.translation = modelNode.GeometricTranslation.value;
 			if ( 'GeometricRotation' in modelNode ) transformData.rotation = modelNode.GeometricRotation.value;
 			if ( 'GeometricScaling' in modelNode ) transformData.scale = modelNode.GeometricScaling.value;
-
-			var transform = generateTransform( transformData );
-
+			const transform = generateTransform( transformData );
 			return this.genGeometry( geoNode, skeleton, morphTargets, transform );
 
-		},
+		} // Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
 
-		// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
-		genGeometry: function ( geoNode, skeleton, morphTargets, preTransform ) {
 
-			var geo = new THREE.BufferGeometry();
+		genGeometry( geoNode, skeleton, morphTargets, preTransform ) {
+
+			const geo = new THREE.BufferGeometry();
 			if ( geoNode.attrName ) geo.name = geoNode.attrName;
-
-			var geoInfo = this.parseGeoNode( geoNode, skeleton );
-			var buffers = this.genBuffers( geoInfo );
-
-			var positionAttribute = new THREE.Float32BufferAttribute( buffers.vertex, 3 );
-
+			const geoInfo = this.parseGeoNode( geoNode, skeleton );
+			const buffers = this.genBuffers( geoInfo );
+			const positionAttribute = new THREE.Float32BufferAttribute( buffers.vertex, 3 );
 			positionAttribute.applyMatrix4( preTransform );
-
 			geo.setAttribute( 'position', positionAttribute );
 
 			if ( buffers.colors.length > 0 ) {
@@ -1613,21 +1511,17 @@ THREE.FBXLoader = ( function () {
 			if ( skeleton ) {
 
 				geo.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( buffers.weightsIndices, 4 ) );
+				geo.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( buffers.vertexWeights, 4 ) ); // used later to bind the skeleton to the model
 
-				geo.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( buffers.vertexWeights, 4 ) );
-
-				// used later to bind the skeleton to the model
 				geo.FBX_Deformer = skeleton;
 
 			}
 
 			if ( buffers.normal.length > 0 ) {
 
-				var normalMatrix = new THREE.Matrix3().getNormalMatrix( preTransform );
-
-				var normalAttribute = new THREE.Float32BufferAttribute( buffers.normal, 3 );
+				const normalMatrix = new THREE.Matrix3().getNormalMatrix( preTransform );
+				const normalAttribute = new THREE.Float32BufferAttribute( buffers.normal, 3 );
 				normalAttribute.applyNormalMatrix( normalMatrix );
-
 				geo.setAttribute( 'normal', normalAttribute );
 
 			}
@@ -1635,9 +1529,8 @@ THREE.FBXLoader = ( function () {
 			buffers.uvs.forEach( function ( uvBuffer, i ) {
 
 				// subsequent uv buffers are called 'uv1', 'uv2', ...
-				var name = 'uv' + ( i + 1 ).toString();
+				let name = 'uv' + ( i + 1 ).toString(); // the first uv buffer is just called 'uv'
 
-				// the first uv buffer is just called 'uv'
 				if ( i === 0 ) {
 
 					name = 'uv';
@@ -1651,27 +1544,24 @@ THREE.FBXLoader = ( function () {
 			if ( geoInfo.material && geoInfo.material.mappingType !== 'AllSame' ) {
 
 				// Convert the material indices of each vertex into rendering groups on the geometry.
-				var prevMaterialIndex = buffers.materialIndex[ 0 ];
-				var startIndex = 0;
-
+				let prevMaterialIndex = buffers.materialIndex[ 0 ];
+				let startIndex = 0;
 				buffers.materialIndex.forEach( function ( currentIndex, i ) {
 
 					if ( currentIndex !== prevMaterialIndex ) {
 
 						geo.addGroup( startIndex, i - startIndex, prevMaterialIndex );
-
 						prevMaterialIndex = currentIndex;
 						startIndex = i;
 
 					}
 
-				} );
+				} ); // the loop above doesn't add the last group, do that here.
 
-				// the loop above doesn't add the last group, do that here.
 				if ( geo.groups.length > 0 ) {
 
-					var lastGroup = geo.groups[ geo.groups.length - 1 ];
-					var lastIndex = lastGroup.start + lastGroup.count;
+					const lastGroup = geo.groups[ geo.groups.length - 1 ];
+					const lastIndex = lastGroup.start + lastGroup.count;
 
 					if ( lastIndex !== buffers.materialIndex.length ) {
 
@@ -1679,10 +1569,10 @@ THREE.FBXLoader = ( function () {
 
 					}
 
-				}
-
-				// case where there are multiple materials but the whole geometry is only
+				} // case where there are multiple materials but the whole geometry is only
 				// using one of them
+
+
 				if ( geo.groups.length === 0 ) {
 
 					geo.addGroup( 0, buffers.materialIndex.length, buffers.materialIndex[ 0 ] );
@@ -1692,17 +1582,15 @@ THREE.FBXLoader = ( function () {
 			}
 
 			this.addMorphTargets( geo, geoNode, morphTargets, preTransform );
-
 			return geo;
 
-		},
+		}
 
-		parseGeoNode: function ( geoNode, skeleton ) {
+		parseGeoNode( geoNode, skeleton ) {
 
-			var geoInfo = {};
-
-			geoInfo.vertexPositions = ( geoNode.Vertices !== undefined ) ? geoNode.Vertices.a : [];
-			geoInfo.vertexIndices = ( geoNode.PolygonVertexIndex !== undefined ) ? geoNode.PolygonVertexIndex.a : [];
+			const geoInfo = {};
+			geoInfo.vertexPositions = geoNode.Vertices !== undefined ? geoNode.Vertices.a : [];
+			geoInfo.vertexIndices = geoNode.PolygonVertexIndex !== undefined ? geoNode.PolygonVertexIndex.a : [];
 
 			if ( geoNode.LayerElementColor ) {
 
@@ -1725,8 +1613,8 @@ THREE.FBXLoader = ( function () {
 			if ( geoNode.LayerElementUV ) {
 
 				geoInfo.uv = [];
+				let i = 0;
 
-				var i = 0;
 				while ( geoNode.LayerElementUV[ i ] ) {
 
 					if ( geoNode.LayerElementUV[ i ].UV ) {
@@ -1746,19 +1634,15 @@ THREE.FBXLoader = ( function () {
 			if ( skeleton !== null ) {
 
 				geoInfo.skeleton = skeleton;
-
 				skeleton.rawBones.forEach( function ( rawBone, i ) {
 
 					// loop over the bone's vertex indices and weights
 					rawBone.indices.forEach( function ( index, j ) {
 
 						if ( geoInfo.weightTable[ index ] === undefined ) geoInfo.weightTable[ index ] = [];
-
 						geoInfo.weightTable[ index ].push( {
-
 							id: i,
-							weight: rawBone.weights[ j ],
-
+							weight: rawBone.weights[ j ]
 						} );
 
 					} );
@@ -1769,60 +1653,56 @@ THREE.FBXLoader = ( function () {
 
 			return geoInfo;
 
-		},
+		}
 
-		genBuffers: function ( geoInfo ) {
+		genBuffers( geoInfo ) {
 
-			var buffers = {
+			const buffers = {
 				vertex: [],
 				normal: [],
 				colors: [],
 				uvs: [],
 				materialIndex: [],
 				vertexWeights: [],
-				weightsIndices: [],
+				weightsIndices: []
 			};
+			let polygonIndex = 0;
+			let faceLength = 0;
+			let displayedWeightsWarning = false; // these will hold data for a single face
 
-			var polygonIndex = 0;
-			var faceLength = 0;
-			var displayedWeightsWarning = false;
-
-			// these will hold data for a single face
-			var facePositionIndexes = [];
-			var faceNormals = [];
-			var faceColors = [];
-			var faceUVs = [];
-			var faceWeights = [];
-			var faceWeightIndices = [];
-
-			var scope = this;
+			let facePositionIndexes = [];
+			let faceNormals = [];
+			let faceColors = [];
+			let faceUVs = [];
+			let faceWeights = [];
+			let faceWeightIndices = [];
+			const scope = this;
 			geoInfo.vertexIndices.forEach( function ( vertexIndex, polygonVertexIndex ) {
 
-				var endOfFace = false;
-
-				// Face index and vertex index arrays are combined in a single array
+				let materialIndex;
+				let endOfFace = false; // Face index and vertex index arrays are combined in a single array
 				// A cube with quad faces looks like this:
 				// PolygonVertexIndex: *24 {
 				//  a: 0, 1, 3, -3, 2, 3, 5, -5, 4, 5, 7, -7, 6, 7, 1, -1, 1, 7, 5, -4, 6, 0, 2, -5
 				//  }
 				// Negative numbers mark the end of a face - first face here is 0, 1, 3, -3
 				// to find index of last vertex bit shift the index: ^ - 1
+
 				if ( vertexIndex < 0 ) {
 
 					vertexIndex = vertexIndex ^ - 1; // equivalent to ( x * -1 ) - 1
+
 					endOfFace = true;
 
 				}
 
-				var weightIndices = [];
-				var weights = [];
-
+				let weightIndices = [];
+				let weights = [];
 				facePositionIndexes.push( vertexIndex * 3, vertexIndex * 3 + 1, vertexIndex * 3 + 2 );
 
 				if ( geoInfo.color ) {
 
-					var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.color );
-
+					const data = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.color );
 					faceColors.push( data[ 0 ], data[ 1 ], data[ 2 ] );
 
 				}
@@ -1838,7 +1718,6 @@ THREE.FBXLoader = ( function () {
 
 						} );
 
-
 					}
 
 					if ( weights.length > 4 ) {
@@ -1850,22 +1729,19 @@ THREE.FBXLoader = ( function () {
 
 						}
 
-						var wIndex = [ 0, 0, 0, 0 ];
-						var Weight = [ 0, 0, 0, 0 ];
-
+						const wIndex = [ 0, 0, 0, 0 ];
+						const Weight = [ 0, 0, 0, 0 ];
 						weights.forEach( function ( weight, weightIndex ) {
 
-							var currentWeight = weight;
-							var currentIndex = weightIndices[ weightIndex ];
-
+							let currentWeight = weight;
+							let currentIndex = weightIndices[ weightIndex ];
 							Weight.forEach( function ( comparedWeight, comparedWeightIndex, comparedWeightArray ) {
 
 								if ( currentWeight > comparedWeight ) {
 
 									comparedWeightArray[ comparedWeightIndex ] = currentWeight;
 									currentWeight = comparedWeight;
-
-									var tmp = wIndex[ comparedWeightIndex ];
+									const tmp = wIndex[ comparedWeightIndex ];
 									wIndex[ comparedWeightIndex ] = currentIndex;
 									currentIndex = tmp;
 
@@ -1874,13 +1750,12 @@ THREE.FBXLoader = ( function () {
 							} );
 
 						} );
-
 						weightIndices = wIndex;
 						weights = Weight;
 
-					}
+					} // if the weight array is shorter than 4 pad with 0s
 
-					// if the weight array is shorter than 4 pad with 0s
+
 					while ( weights.length < 4 ) {
 
 						weights.push( 0 );
@@ -1888,7 +1763,7 @@ THREE.FBXLoader = ( function () {
 
 					}
 
-					for ( var i = 0; i < 4; ++ i ) {
+					for ( let i = 0; i < 4; ++ i ) {
 
 						faceWeights.push( weights[ i ] );
 						faceWeightIndices.push( weightIndices[ i ] );
@@ -1899,15 +1774,14 @@ THREE.FBXLoader = ( function () {
 
 				if ( geoInfo.normal ) {
 
-					var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.normal );
-
+					const data = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.normal );
 					faceNormals.push( data[ 0 ], data[ 1 ], data[ 2 ] );
 
 				}
 
 				if ( geoInfo.material && geoInfo.material.mappingType !== 'AllSame' ) {
 
-					var materialIndex = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.material )[ 0 ];
+					materialIndex = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.material )[ 0 ];
 
 				}
 
@@ -1915,7 +1789,7 @@ THREE.FBXLoader = ( function () {
 
 					geoInfo.uv.forEach( function ( uv, i ) {
 
-						var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, uv );
+						const data = getData( polygonVertexIndex, polygonIndex, vertexIndex, uv );
 
 						if ( faceUVs[ i ] === undefined ) {
 
@@ -1935,11 +1809,9 @@ THREE.FBXLoader = ( function () {
 				if ( endOfFace ) {
 
 					scope.genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength );
-
 					polygonIndex ++;
-					faceLength = 0;
+					faceLength = 0; // reset arrays for the next face
 
-					// reset arrays for the next face
 					facePositionIndexes = [];
 					faceNormals = [];
 					faceColors = [];
@@ -1950,24 +1822,21 @@ THREE.FBXLoader = ( function () {
 				}
 
 			} );
-
 			return buffers;
 
-		},
+		} // Generate data for a single face in a geometry. If the face is a quad then split it into 2 tris
 
-		// Generate data for a single face in a geometry. If the face is a quad then split it into 2 tris
-		genFace: function ( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength ) {
 
-			for ( var i = 2; i < faceLength; i ++ ) {
+		genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength ) {
+
+			for ( let i = 2; i < faceLength; i ++ ) {
 
 				buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ 0 ] ] );
 				buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ 1 ] ] );
 				buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ 2 ] ] );
-
 				buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ ( i - 1 ) * 3 ] ] );
 				buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ ( i - 1 ) * 3 + 1 ] ] );
 				buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ ( i - 1 ) * 3 + 2 ] ] );
-
 				buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i * 3 ] ] );
 				buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i * 3 + 1 ] ] );
 				buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i * 3 + 2 ] ] );
@@ -1978,27 +1847,22 @@ THREE.FBXLoader = ( function () {
 					buffers.vertexWeights.push( faceWeights[ 1 ] );
 					buffers.vertexWeights.push( faceWeights[ 2 ] );
 					buffers.vertexWeights.push( faceWeights[ 3 ] );
-
 					buffers.vertexWeights.push( faceWeights[ ( i - 1 ) * 4 ] );
 					buffers.vertexWeights.push( faceWeights[ ( i - 1 ) * 4 + 1 ] );
 					buffers.vertexWeights.push( faceWeights[ ( i - 1 ) * 4 + 2 ] );
 					buffers.vertexWeights.push( faceWeights[ ( i - 1 ) * 4 + 3 ] );
-
 					buffers.vertexWeights.push( faceWeights[ i * 4 ] );
 					buffers.vertexWeights.push( faceWeights[ i * 4 + 1 ] );
 					buffers.vertexWeights.push( faceWeights[ i * 4 + 2 ] );
 					buffers.vertexWeights.push( faceWeights[ i * 4 + 3 ] );
-
 					buffers.weightsIndices.push( faceWeightIndices[ 0 ] );
 					buffers.weightsIndices.push( faceWeightIndices[ 1 ] );
 					buffers.weightsIndices.push( faceWeightIndices[ 2 ] );
 					buffers.weightsIndices.push( faceWeightIndices[ 3 ] );
-
 					buffers.weightsIndices.push( faceWeightIndices[ ( i - 1 ) * 4 ] );
 					buffers.weightsIndices.push( faceWeightIndices[ ( i - 1 ) * 4 + 1 ] );
 					buffers.weightsIndices.push( faceWeightIndices[ ( i - 1 ) * 4 + 2 ] );
 					buffers.weightsIndices.push( faceWeightIndices[ ( i - 1 ) * 4 + 3 ] );
-
 					buffers.weightsIndices.push( faceWeightIndices[ i * 4 ] );
 					buffers.weightsIndices.push( faceWeightIndices[ i * 4 + 1 ] );
 					buffers.weightsIndices.push( faceWeightIndices[ i * 4 + 2 ] );
@@ -2011,11 +1875,9 @@ THREE.FBXLoader = ( function () {
 					buffers.colors.push( faceColors[ 0 ] );
 					buffers.colors.push( faceColors[ 1 ] );
 					buffers.colors.push( faceColors[ 2 ] );
-
 					buffers.colors.push( faceColors[ ( i - 1 ) * 3 ] );
 					buffers.colors.push( faceColors[ ( i - 1 ) * 3 + 1 ] );
 					buffers.colors.push( faceColors[ ( i - 1 ) * 3 + 2 ] );
-
 					buffers.colors.push( faceColors[ i * 3 ] );
 					buffers.colors.push( faceColors[ i * 3 + 1 ] );
 					buffers.colors.push( faceColors[ i * 3 + 2 ] );
@@ -2035,11 +1897,9 @@ THREE.FBXLoader = ( function () {
 					buffers.normal.push( faceNormals[ 0 ] );
 					buffers.normal.push( faceNormals[ 1 ] );
 					buffers.normal.push( faceNormals[ 2 ] );
-
 					buffers.normal.push( faceNormals[ ( i - 1 ) * 3 ] );
 					buffers.normal.push( faceNormals[ ( i - 1 ) * 3 + 1 ] );
 					buffers.normal.push( faceNormals[ ( i - 1 ) * 3 + 2 ] );
-
 					buffers.normal.push( faceNormals[ i * 3 ] );
 					buffers.normal.push( faceNormals[ i * 3 + 1 ] );
 					buffers.normal.push( faceNormals[ i * 3 + 2 ] );
@@ -2051,13 +1911,10 @@ THREE.FBXLoader = ( function () {
 					geoInfo.uv.forEach( function ( uv, j ) {
 
 						if ( buffers.uvs[ j ] === undefined ) buffers.uvs[ j ] = [];
-
 						buffers.uvs[ j ].push( faceUVs[ j ][ 0 ] );
 						buffers.uvs[ j ].push( faceUVs[ j ][ 1 ] );
-
 						buffers.uvs[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 ] );
 						buffers.uvs[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 + 1 ] );
-
 						buffers.uvs[ j ].push( faceUVs[ j ][ i * 2 ] );
 						buffers.uvs[ j ].push( faceUVs[ j ][ i * 2 + 1 ] );
 
@@ -2067,23 +1924,20 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-		},
+		}
 
-		addMorphTargets: function ( parentGeo, parentGeoNode, morphTargets, preTransform ) {
+		addMorphTargets( parentGeo, parentGeoNode, morphTargets, preTransform ) {
 
 			if ( morphTargets.length === 0 ) return;
-
 			parentGeo.morphTargetsRelative = true;
+			parentGeo.morphAttributes.position = []; // parentGeo.morphAttributes.normal = []; // not implemented
 
-			parentGeo.morphAttributes.position = [];
-			// parentGeo.morphAttributes.normal = []; // not implemented
-
-			var scope = this;
+			const scope = this;
 			morphTargets.forEach( function ( morphTarget ) {
 
 				morphTarget.rawTargets.forEach( function ( rawTarget ) {
 
-					var morphGeoNode = fbxTree.Objects.Geometry[ rawTarget.geoID ];
+					const morphGeoNode = fbxTree.Objects.Geometry[ rawTarget.geoID ];
 
 					if ( morphGeoNode !== undefined ) {
 
@@ -2095,57 +1949,50 @@ THREE.FBXLoader = ( function () {
 
 			} );
 
-		},
-
-		// a morph geometry node is similar to a standard  node, and the node is also contained
+		} // a morph geometry node is similar to a standard  node, and the node is also contained
 		// in FBXTree.Objects.Geometry, however it can only have attributes for position, normal
 		// and a special attribute Index defining which vertices of the original geometry are affected
 		// Normal and position attributes only have data for the vertices that are affected by the morph
-		genMorphGeometry: function ( parentGeo, parentGeoNode, morphGeoNode, preTransform, name ) {
 
-			var vertexIndices = ( parentGeoNode.PolygonVertexIndex !== undefined ) ? parentGeoNode.PolygonVertexIndex.a : [];
 
-			var morphPositionsSparse = ( morphGeoNode.Vertices !== undefined ) ? morphGeoNode.Vertices.a : [];
-			var indices = ( morphGeoNode.Indexes !== undefined ) ? morphGeoNode.Indexes.a : [];
+		genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, name ) {
 
-			var length = parentGeo.attributes.position.count * 3;
-			var morphPositions = new Float32Array( length );
+			const vertexIndices = parentGeoNode.PolygonVertexIndex !== undefined ? parentGeoNode.PolygonVertexIndex.a : [];
+			const morphPositionsSparse = morphGeoNode.Vertices !== undefined ? morphGeoNode.Vertices.a : [];
+			const indices = morphGeoNode.Indexes !== undefined ? morphGeoNode.Indexes.a : [];
+			const length = parentGeo.attributes.position.count * 3;
+			const morphPositions = new Float32Array( length );
 
-			for ( var i = 0; i < indices.length; i ++ ) {
+			for ( let i = 0; i < indices.length; i ++ ) {
 
-				var morphIndex = indices[ i ] * 3;
-
+				const morphIndex = indices[ i ] * 3;
 				morphPositions[ morphIndex ] = morphPositionsSparse[ i * 3 ];
 				morphPositions[ morphIndex + 1 ] = morphPositionsSparse[ i * 3 + 1 ];
 				morphPositions[ morphIndex + 2 ] = morphPositionsSparse[ i * 3 + 2 ];
 
-			}
+			} // TODO: add morph normal support
 
-			// TODO: add morph normal support
-			var morphGeoInfo = {
+
+			const morphGeoInfo = {
 				vertexIndices: vertexIndices,
-				vertexPositions: morphPositions,
-
+				vertexPositions: morphPositions
 			};
-
-			var morphBuffers = this.genBuffers( morphGeoInfo );
-
-			var positionAttribute = new THREE.Float32BufferAttribute( morphBuffers.vertex, 3 );
+			const morphBuffers = this.genBuffers( morphGeoInfo );
+			const positionAttribute = new THREE.Float32BufferAttribute( morphBuffers.vertex, 3 );
 			positionAttribute.name = name || morphGeoNode.attrName;
-
 			positionAttribute.applyMatrix4( preTransform );
-
 			parentGeo.morphAttributes.position.push( positionAttribute );
 
-		},
+		} // Parse normal from FBXTree.Objects.Geometry.LayerElementNormal if it exists
 
-		// Parse normal from FBXTree.Objects.Geometry.LayerElementNormal if it exists
-		parseNormals: function ( NormalNode ) {
 
-			var mappingType = NormalNode.MappingInformationType;
-			var referenceType = NormalNode.ReferenceInformationType;
-			var buffer = NormalNode.Normals.a;
-			var indexBuffer = [];
+		parseNormals( NormalNode ) {
+
+			const mappingType = NormalNode.MappingInformationType;
+			const referenceType = NormalNode.ReferenceInformationType;
+			const buffer = NormalNode.Normals.a;
+			let indexBuffer = [];
+
 			if ( referenceType === 'IndexToDirect' ) {
 
 				if ( 'NormalIndex' in NormalNode ) {
@@ -2168,15 +2015,16 @@ THREE.FBXLoader = ( function () {
 				referenceType: referenceType
 			};
 
-		},
+		} // Parse UVs from FBXTree.Objects.Geometry.LayerElementUV if it exists
 
-		// Parse UVs from FBXTree.Objects.Geometry.LayerElementUV if it exists
-		parseUVs: function ( UVNode ) {
 
-			var mappingType = UVNode.MappingInformationType;
-			var referenceType = UVNode.ReferenceInformationType;
-			var buffer = UVNode.UV.a;
-			var indexBuffer = [];
+		parseUVs( UVNode ) {
+
+			const mappingType = UVNode.MappingInformationType;
+			const referenceType = UVNode.ReferenceInformationType;
+			const buffer = UVNode.UV.a;
+			let indexBuffer = [];
+
 			if ( referenceType === 'IndexToDirect' ) {
 
 				indexBuffer = UVNode.UVIndex.a;
@@ -2191,15 +2039,16 @@ THREE.FBXLoader = ( function () {
 				referenceType: referenceType
 			};
 
-		},
+		} // Parse Vertex Colors from FBXTree.Objects.Geometry.LayerElementColor if it exists
 
-		// Parse Vertex Colors from FBXTree.Objects.Geometry.LayerElementColor if it exists
-		parseVertexColors: function ( ColorNode ) {
 
-			var mappingType = ColorNode.MappingInformationType;
-			var referenceType = ColorNode.ReferenceInformationType;
-			var buffer = ColorNode.Colors.a;
-			var indexBuffer = [];
+		parseVertexColors( ColorNode ) {
+
+			const mappingType = ColorNode.MappingInformationType;
+			const referenceType = ColorNode.ReferenceInformationType;
+			const buffer = ColorNode.Colors.a;
+			let indexBuffer = [];
+
 			if ( referenceType === 'IndexToDirect' ) {
 
 				indexBuffer = ColorNode.ColorIndex.a;
@@ -2214,13 +2063,13 @@ THREE.FBXLoader = ( function () {
 				referenceType: referenceType
 			};
 
-		},
+		} // Parse mapping and material data in FBXTree.Objects.Geometry.LayerElementMaterial if it exists
 
-		// Parse mapping and material data in FBXTree.Objects.Geometry.LayerElementMaterial if it exists
-		parseMaterialIndices: function ( MaterialNode ) {
 
-			var mappingType = MaterialNode.MappingInformationType;
-			var referenceType = MaterialNode.ReferenceInformationType;
+		parseMaterialIndices( MaterialNode ) {
+
+			const mappingType = MaterialNode.MappingInformationType;
+			const referenceType = MaterialNode.ReferenceInformationType;
 
 			if ( mappingType === 'NoMappingInformation' ) {
 
@@ -2234,14 +2083,13 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			var materialIndexBuffer = MaterialNode.Materials.a;
-
-			// Since materials are stored as indices, there's a bit of a mismatch between FBX and what
+			const materialIndexBuffer = MaterialNode.Materials.a; // Since materials are stored as indices, there's a bit of a mismatch between FBX and what
 			// we expect.So we create an intermediate buffer that points to the index in the buffer,
 			// for conforming with the other functions we've written for other data.
-			var materialIndices = [];
 
-			for ( var i = 0; i < materialIndexBuffer.length; ++ i ) {
+			const materialIndices = [];
+
+			for ( let i = 0; i < materialIndexBuffer.length; ++ i ) {
 
 				materialIndices.push( i );
 
@@ -2255,10 +2103,10 @@ THREE.FBXLoader = ( function () {
 				referenceType: referenceType
 			};
 
-		},
+		} // Generate a NurbGeometry from a node in FBXTree.Objects.Geometry
 
-		// Generate a NurbGeometry from a node in FBXTree.Objects.Geometry
-		parseNurbsGeometry: function ( geoNode ) {
+
+		parseNurbsGeometry( geoNode ) {
 
 			if ( THREE.NURBSCurve === undefined ) {
 
@@ -2267,7 +2115,7 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			var order = parseInt( geoNode.Order );
+			const order = parseInt( geoNode.Order );
 
 			if ( isNaN( order ) ) {
 
@@ -2276,19 +2124,18 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			var degree = order - 1;
+			const degree = order - 1;
+			const knots = geoNode.KnotVector.a;
+			const controlPoints = [];
+			const pointsValues = geoNode.Points.a;
 
-			var knots = geoNode.KnotVector.a;
-			var controlPoints = [];
-			var pointsValues = geoNode.Points.a;
-
-			for ( var i = 0, l = pointsValues.length; i < l; i += 4 ) {
+			for ( let i = 0, l = pointsValues.length; i < l; i += 4 ) {
 
 				controlPoints.push( new THREE.Vector4().fromArray( pointsValues, i ) );
 
 			}
 
-			var startKnot, endKnot;
+			let startKnot, endKnot;
 
 			if ( geoNode.Form === 'Closed' ) {
 
@@ -2299,7 +2146,7 @@ THREE.FBXLoader = ( function () {
 				startKnot = degree;
 				endKnot = knots.length - 1 - startKnot;
 
-				for ( var i = 0; i < degree; ++ i ) {
+				for ( let i = 0; i < degree; ++ i ) {
 
 					controlPoints.push( controlPoints[ i ] );
 
@@ -2307,48 +2154,37 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			var curve = new THREE.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
-			var vertices = curve.getPoints( controlPoints.length * 7 );
-
-			var positions = new Float32Array( vertices.length * 3 );
-
+			const curve = new THREE.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
+			const vertices = curve.getPoints( controlPoints.length * 7 );
+			const positions = new Float32Array( vertices.length * 3 );
 			vertices.forEach( function ( vertex, i ) {
 
 				vertex.toArray( positions, i * 3 );
 
 			} );
-
-			var geometry = new THREE.BufferGeometry();
+			const geometry = new THREE.BufferGeometry();
 			geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-
 			return geometry;
 
-		},
+		}
 
-	};
+	} // parse animation data from FBXTree
 
-	// parse animation data from FBXTree
-	function AnimationParser() {}
 
-	AnimationParser.prototype = {
-
-		constructor: AnimationParser,
+	class AnimationParser {
 
 		// take raw animation clips and turn them into three.js animation clips
-		parse: function () {
+		parse() {
 
-			var animationClips = [];
-
-			var rawClips = this.parseClips();
+			const animationClips = [];
+			const rawClips = this.parseClips();
 
 			if ( rawClips !== undefined ) {
 
-				for ( var key in rawClips ) {
+				for ( const key in rawClips ) {
 
-					var rawClip = rawClips[ key ];
-
-					var clip = this.addClip( rawClip );
-
+					const rawClip = rawClips[ key ];
+					const clip = this.addClip( rawClip );
 					animationClips.push( clip );
 
 				}
@@ -2357,48 +2193,40 @@ THREE.FBXLoader = ( function () {
 
 			return animationClips;
 
-		},
+		}
 
-		parseClips: function () {
+		parseClips() {
 
 			// since the actual transformation data is stored in FBXTree.Objects.AnimationCurve,
 			// if this is undefined we can safely assume there are no animations
 			if ( fbxTree.Objects.AnimationCurve === undefined ) return undefined;
-
-			var curveNodesMap = this.parseAnimationCurveNodes();
-
+			const curveNodesMap = this.parseAnimationCurveNodes();
 			this.parseAnimationCurves( curveNodesMap );
-
-			var layersMap = this.parseAnimationLayers( curveNodesMap );
-			var rawClips = this.parseAnimStacks( layersMap );
-
+			const layersMap = this.parseAnimationLayers( curveNodesMap );
+			const rawClips = this.parseAnimStacks( layersMap );
 			return rawClips;
 
-		},
-
-		// parse nodes in FBXTree.Objects.AnimationCurveNode
+		} // parse nodes in FBXTree.Objects.AnimationCurveNode
 		// each AnimationCurveNode holds data for an animation transform for a model (e.g. left arm rotation )
 		// and is referenced by an AnimationLayer
-		parseAnimationCurveNodes: function () {
 
-			var rawCurveNodes = fbxTree.Objects.AnimationCurveNode;
 
-			var curveNodesMap = new Map();
+		parseAnimationCurveNodes() {
 
-			for ( var nodeID in rawCurveNodes ) {
+			const rawCurveNodes = fbxTree.Objects.AnimationCurveNode;
+			const curveNodesMap = new Map();
 
-				var rawCurveNode = rawCurveNodes[ nodeID ];
+			for ( const nodeID in rawCurveNodes ) {
+
+				const rawCurveNode = rawCurveNodes[ nodeID ];
 
 				if ( rawCurveNode.attrName.match( /S|R|T|DeformPercent/ ) !== null ) {
 
-					var curveNode = {
-
+					const curveNode = {
 						id: rawCurveNode.id,
 						attr: rawCurveNode.attrName,
-						curves: {},
-
+						curves: {}
 					};
-
 					curveNodesMap.set( curveNode.id, curveNode );
 
 				}
@@ -2407,38 +2235,33 @@ THREE.FBXLoader = ( function () {
 
 			return curveNodesMap;
 
-		},
-
-		// parse nodes in FBXTree.Objects.AnimationCurve and connect them up to
+		} // parse nodes in FBXTree.Objects.AnimationCurve and connect them up to
 		// previously parsed AnimationCurveNodes. Each AnimationCurve holds data for a single animated
 		// axis ( e.g. times and values of x rotation)
-		parseAnimationCurves: function ( curveNodesMap ) {
 
-			var rawCurves = fbxTree.Objects.AnimationCurve;
 
-			// TODO: Many values are identical up to roundoff error, but won't be optimised
+		parseAnimationCurves( curveNodesMap ) {
+
+			const rawCurves = fbxTree.Objects.AnimationCurve; // TODO: Many values are identical up to roundoff error, but won't be optimised
 			// e.g. position times: [0, 0.4, 0. 8]
 			// position values: [7.23538335023477e-7, 93.67518615722656, -0.9982695579528809, 7.23538335023477e-7, 93.67518615722656, -0.9982695579528809, 7.235384487103147e-7, 93.67520904541016, -0.9982695579528809]
 			// clearly, this should be optimised to
 			// times: [0], positions [7.23538335023477e-7, 93.67518615722656, -0.9982695579528809]
 			// this shows up in nearly every FBX file, and generally time array is length > 100
 
-			for ( var nodeID in rawCurves ) {
+			for ( const nodeID in rawCurves ) {
 
-				var animationCurve = {
-
+				const animationCurve = {
 					id: rawCurves[ nodeID ].id,
 					times: rawCurves[ nodeID ].KeyTime.a.map( convertFBXTimeToSeconds ),
-					values: rawCurves[ nodeID ].KeyValueFloat.a,
-
+					values: rawCurves[ nodeID ].KeyValueFloat.a
 				};
-
-				var relationships = connections.get( animationCurve.id );
+				const relationships = connections.get( animationCurve.id );
 
 				if ( relationships !== undefined ) {
 
-					var animationCurveID = relationships.parents[ 0 ].ID;
-					var animationCurveRelationship = relationships.parents[ 0 ].relationship;
+					const animationCurveID = relationships.parents[ 0 ].ID;
+					const animationCurveRelationship = relationships.parents[ 0 ].relationship;
 
 					if ( animationCurveRelationship.match( /X/ ) ) {
 
@@ -2462,40 +2285,36 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-		},
-
-		// parse nodes in FBXTree.Objects.AnimationLayer. Each layers holds references
+		} // parse nodes in FBXTree.Objects.AnimationLayer. Each layers holds references
 		// to various AnimationCurveNodes and is referenced by an AnimationStack node
 		// note: theoretically a stack can have multiple layers, however in practice there always seems to be one per stack
-		parseAnimationLayers: function ( curveNodesMap ) {
 
-			var rawLayers = fbxTree.Objects.AnimationLayer;
 
-			var layersMap = new Map();
+		parseAnimationLayers( curveNodesMap ) {
 
-			for ( var nodeID in rawLayers ) {
+			const rawLayers = fbxTree.Objects.AnimationLayer;
+			const layersMap = new Map();
 
-				var layerCurveNodes = [];
+			for ( const nodeID in rawLayers ) {
 
-				var connection = connections.get( parseInt( nodeID ) );
+				const layerCurveNodes = [];
+				const connection = connections.get( parseInt( nodeID ) );
 
 				if ( connection !== undefined ) {
 
 					// all the animationCurveNodes used in the layer
-					var children = connection.children;
-
+					const children = connection.children;
 					children.forEach( function ( child, i ) {
 
 						if ( curveNodesMap.has( child.ID ) ) {
 
-							var curveNode = curveNodesMap.get( child.ID );
+							const curveNode = curveNodesMap.get( child.ID ); // check that the curves are defined for at least one axis, otherwise ignore the curveNode
 
-							// check that the curves are defined for at least one axis, otherwise ignore the curveNode
 							if ( curveNode.curves.x !== undefined || curveNode.curves.y !== undefined || curveNode.curves.z !== undefined ) {
 
 								if ( layerCurveNodes[ i ] === undefined ) {
 
-									var modelID = connections.get( child.ID ).parents.filter( function ( parent ) {
+									const modelID = connections.get( child.ID ).parents.filter( function ( parent ) {
 
 										return parent.relationship !== undefined;
 
@@ -2503,7 +2322,7 @@ THREE.FBXLoader = ( function () {
 
 									if ( modelID !== undefined ) {
 
-										var rawModel = fbxTree.Objects.Model[ modelID.toString() ];
+										const rawModel = fbxTree.Objects.Model[ modelID.toString() ];
 
 										if ( rawModel === undefined ) {
 
@@ -2512,35 +2331,28 @@ THREE.FBXLoader = ( function () {
 
 										}
 
-										var node = {
-
+										const node = {
 											modelName: rawModel.attrName ? THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',
 											ID: rawModel.id,
 											initialPosition: [ 0, 0, 0 ],
 											initialRotation: [ 0, 0, 0 ],
-											initialScale: [ 1, 1, 1 ],
-
+											initialScale: [ 1, 1, 1 ]
 										};
-
 										sceneGraph.traverse( function ( child ) {
 
 											if ( child.ID === rawModel.id ) {
 
 												node.transform = child.matrix;
-
 												if ( child.userData.transformData ) node.eulerOrder = child.userData.transformData.eulerOrder;
 
 											}
 
 										} );
-
-										if ( ! node.transform ) node.transform = new THREE.Matrix4();
-
-										// if the animated model is pre rotated, we'll have to apply the pre rotations to every
+										if ( ! node.transform ) node.transform = new THREE.Matrix4(); // if the animated model is pre rotated, we'll have to apply the pre rotations to every
 										// animation value as well
+
 										if ( 'PreRotation' in rawModel ) node.preRotation = rawModel.PreRotation.value;
 										if ( 'PostRotation' in rawModel ) node.postRotation = rawModel.PostRotation.value;
-
 										layerCurveNodes[ i ] = node;
 
 									}
@@ -2553,27 +2365,20 @@ THREE.FBXLoader = ( function () {
 
 								if ( layerCurveNodes[ i ] === undefined ) {
 
-									var deformerID = connections.get( child.ID ).parents.filter( function ( parent ) {
+									const deformerID = connections.get( child.ID ).parents.filter( function ( parent ) {
 
 										return parent.relationship !== undefined;
 
 									} )[ 0 ].ID;
+									const morpherID = connections.get( deformerID ).parents[ 0 ].ID;
+									const geoID = connections.get( morpherID ).parents[ 0 ].ID; // assuming geometry is not used in more than one model
 
-									var morpherID = connections.get( deformerID ).parents[ 0 ].ID;
-									var geoID = connections.get( morpherID ).parents[ 0 ].ID;
-
-									// assuming geometry is not used in more than one model
-									var modelID = connections.get( geoID ).parents[ 0 ].ID;
-
-									var rawModel = fbxTree.Objects.Model[ modelID ];
-
-									var node = {
-
+									const modelID = connections.get( geoID ).parents[ 0 ].ID;
+									const rawModel = fbxTree.Objects.Model[ modelID ];
+									const node = {
 										modelName: rawModel.attrName ? THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',
-										morphName: fbxTree.Objects.Deformer[ deformerID ].attrName,
-
+										morphName: fbxTree.Objects.Deformer[ deformerID ].attrName
 									};
-
 									layerCurveNodes[ i ] = node;
 
 								}
@@ -2585,7 +2390,6 @@ THREE.FBXLoader = ( function () {
 						}
 
 					} );
-
 					layersMap.set( parseInt( nodeID ), layerCurveNodes );
 
 				}
@@ -2594,20 +2398,19 @@ THREE.FBXLoader = ( function () {
 
 			return layersMap;
 
-		},
-
-		// parse nodes in FBXTree.Objects.AnimationStack. These are the top level node in the animation
+		} // parse nodes in FBXTree.Objects.AnimationStack. These are the top level node in the animation
 		// hierarchy. Each Stack node will be used to create a THREE.AnimationClip
-		parseAnimStacks: function ( layersMap ) {
 
-			var rawStacks = fbxTree.Objects.AnimationStack;
 
-			// connect the stacks (clips) up to the layers
-			var rawClips = {};
+		parseAnimStacks( layersMap ) {
 
-			for ( var nodeID in rawStacks ) {
+			const rawStacks = fbxTree.Objects.AnimationStack; // connect the stacks (clips) up to the layers
 
-				var children = connections.get( parseInt( nodeID ) ).children;
+			const rawClips = {};
+
+			for ( const nodeID in rawStacks ) {
+
+				const children = connections.get( parseInt( nodeID ) ).children;
 
 				if ( children.length > 1 ) {
 
@@ -2617,92 +2420,83 @@ THREE.FBXLoader = ( function () {
 
 				}
 
-				var layer = layersMap.get( children[ 0 ].ID );
-
+				const layer = layersMap.get( children[ 0 ].ID );
 				rawClips[ nodeID ] = {
-
 					name: rawStacks[ nodeID ].attrName,
-					layer: layer,
-
+					layer: layer
 				};
 
 			}
 
 			return rawClips;
 
-		},
+		}
 
-		addClip: function ( rawClip ) {
+		addClip( rawClip ) {
 
-			var tracks = [];
-
-			var scope = this;
+			let tracks = [];
+			const scope = this;
 			rawClip.layer.forEach( function ( rawTracks ) {
 
 				tracks = tracks.concat( scope.generateTracks( rawTracks ) );
 
 			} );
-
 			return new THREE.AnimationClip( rawClip.name, - 1, tracks );
 
-		},
+		}
 
-		generateTracks: function ( rawTracks ) {
+		generateTracks( rawTracks ) {
 
-			var tracks = [];
-
-			var initialPosition = new THREE.Vector3();
-			var initialRotation = new THREE.Quaternion();
-			var initialScale = new THREE.Vector3();
-
+			const tracks = [];
+			let initialPosition = new THREE.Vector3();
+			let initialRotation = new THREE.Quaternion();
+			let initialScale = new THREE.Vector3();
 			if ( rawTracks.transform ) rawTracks.transform.decompose( initialPosition, initialRotation, initialScale );
-
 			initialPosition = initialPosition.toArray();
 			initialRotation = new THREE.Euler().setFromQuaternion( initialRotation, rawTracks.eulerOrder ).toArray();
 			initialScale = initialScale.toArray();
 
 			if ( rawTracks.T !== undefined && Object.keys( rawTracks.T.curves ).length > 0 ) {
 
-				var positionTrack = this.generateVectorTrack( rawTracks.modelName, rawTracks.T.curves, initialPosition, 'position' );
+				const positionTrack = this.generateVectorTrack( rawTracks.modelName, rawTracks.T.curves, initialPosition, 'position' );
 				if ( positionTrack !== undefined ) tracks.push( positionTrack );
 
 			}
 
 			if ( rawTracks.R !== undefined && Object.keys( rawTracks.R.curves ).length > 0 ) {
 
-				var rotationTrack = this.generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, initialRotation, rawTracks.preRotation, rawTracks.postRotation, rawTracks.eulerOrder );
+				const rotationTrack = this.generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, initialRotation, rawTracks.preRotation, rawTracks.postRotation, rawTracks.eulerOrder );
 				if ( rotationTrack !== undefined ) tracks.push( rotationTrack );
 
 			}
 
 			if ( rawTracks.S !== undefined && Object.keys( rawTracks.S.curves ).length > 0 ) {
 
-				var scaleTrack = this.generateVectorTrack( rawTracks.modelName, rawTracks.S.curves, initialScale, 'scale' );
+				const scaleTrack = this.generateVectorTrack( rawTracks.modelName, rawTracks.S.curves, initialScale, 'scale' );
 				if ( scaleTrack !== undefined ) tracks.push( scaleTrack );
 
 			}
 
 			if ( rawTracks.DeformPercent !== undefined ) {
 
-				var morphTrack = this.generateMorphTrack( rawTracks );
+				const morphTrack = this.generateMorphTrack( rawTracks );
 				if ( morphTrack !== undefined ) tracks.push( morphTrack );
 
 			}
 
 			return tracks;
 
-		},
+		}
 
-		generateVectorTrack: function ( modelName, curves, initialValue, type ) {
+		generateVectorTrack( modelName, curves, initialValue, type ) {
 
-			var times = this.getTimesForAllAxes( curves );
-			var values = this.getKeyframeTrackValues( times, curves, initialValue );
-
+			const times = this.getTimesForAllAxes( curves );
+			const values = this.getKeyframeTrackValues( times, curves, initialValue );
 			return new THREE.VectorKeyframeTrack( modelName + '.' + type, times, values );
 
-		},
+		}
 
-		generateRotationTrack: function ( modelName, curves, initialValue, preRotation, postRotation, eulerOrder ) {
+		generateRotationTrack( modelName, curves, initialValue, preRotation, postRotation, eulerOrder ) {
 
 			if ( curves.x !== undefined ) {
 
@@ -2725,14 +2519,13 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			var times = this.getTimesForAllAxes( curves );
-			var values = this.getKeyframeTrackValues( times, curves, initialValue );
+			const times = this.getTimesForAllAxes( curves );
+			const values = this.getKeyframeTrackValues( times, curves, initialValue );
 
 			if ( preRotation !== undefined ) {
 
 				preRotation = preRotation.map( THREE.MathUtils.degToRad );
 				preRotation.push( eulerOrder );
-
 				preRotation = new THREE.Euler().fromArray( preRotation );
 				preRotation = new THREE.Quaternion().setFromEuler( preRotation );
 
@@ -2742,75 +2535,67 @@ THREE.FBXLoader = ( function () {
 
 				postRotation = postRotation.map( THREE.MathUtils.degToRad );
 				postRotation.push( eulerOrder );
-
 				postRotation = new THREE.Euler().fromArray( postRotation );
 				postRotation = new THREE.Quaternion().setFromEuler( postRotation ).invert();
 
 			}
 
-			var quaternion = new THREE.Quaternion();
-			var euler = new THREE.Euler();
+			const quaternion = new THREE.Quaternion();
+			const euler = new THREE.Euler();
+			const quaternionValues = [];
 
-			var quaternionValues = [];
-
-			for ( var i = 0; i < values.length; i += 3 ) {
+			for ( let i = 0; i < values.length; i += 3 ) {
 
 				euler.set( values[ i ], values[ i + 1 ], values[ i + 2 ], eulerOrder );
-
 				quaternion.setFromEuler( euler );
-
 				if ( preRotation !== undefined ) quaternion.premultiply( preRotation );
 				if ( postRotation !== undefined ) quaternion.multiply( postRotation );
-
-				quaternion.toArray( quaternionValues, ( i / 3 ) * 4 );
+				quaternion.toArray( quaternionValues, i / 3 * 4 );
 
 			}
 
 			return new THREE.QuaternionKeyframeTrack( modelName + '.quaternion', times, quaternionValues );
 
-		},
+		}
 
-		generateMorphTrack: function ( rawTracks ) {
+		generateMorphTrack( rawTracks ) {
 
-			var curves = rawTracks.DeformPercent.curves.morph;
-			var values = curves.values.map( function ( val ) {
+			const curves = rawTracks.DeformPercent.curves.morph;
+			const values = curves.values.map( function ( val ) {
 
 				return val / 100;
 
 			} );
-
-			var morphNum = sceneGraph.getObjectByName( rawTracks.modelName ).morphTargetDictionary[ rawTracks.morphName ];
-
+			const morphNum = sceneGraph.getObjectByName( rawTracks.modelName ).morphTargetDictionary[ rawTracks.morphName ];
 			return new THREE.NumberKeyframeTrack( rawTracks.modelName + '.morphTargetInfluences[' + morphNum + ']', curves.times, values );
 
-		},
-
-		// For all animated objects, times are defined separately for each axis
+		} // For all animated objects, times are defined separately for each axis
 		// Here we'll combine the times into one sorted array without duplicates
-		getTimesForAllAxes: function ( curves ) {
 
-			var times = [];
 
-			// first join together the times for each axis, if defined
+		getTimesForAllAxes( curves ) {
+
+			let times = []; // first join together the times for each axis, if defined
+
 			if ( curves.x !== undefined ) times = times.concat( curves.x.times );
 			if ( curves.y !== undefined ) times = times.concat( curves.y.times );
-			if ( curves.z !== undefined ) times = times.concat( curves.z.times );
+			if ( curves.z !== undefined ) times = times.concat( curves.z.times ); // then sort them
 
-			// then sort them
 			times = times.sort( function ( a, b ) {
 
 				return a - b;
 
-			} );
+			} ); // and remove duplicates
 
-			// and remove duplicates
 			if ( times.length > 1 ) {
 
-				var targetIndex = 1;
-				var lastValue = times[ 0 ];
-				for ( var i = 1; i < times.length; i ++ ) {
+				let targetIndex = 1;
+				let lastValue = times[ 0 ];
 
-					var currentValue = times[ i ];
+				for ( let i = 1; i < times.length; i ++ ) {
+
+					const currentValue = times[ i ];
+
 					if ( currentValue !== lastValue ) {
 
 						times[ targetIndex ] = currentValue;
@@ -2827,28 +2612,24 @@ THREE.FBXLoader = ( function () {
 
 			return times;
 
-		},
+		}
 
-		getKeyframeTrackValues: function ( times, curves, initialValue ) {
+		getKeyframeTrackValues( times, curves, initialValue ) {
 
-			var prevValue = initialValue;
-
-			var values = [];
-
-			var xIndex = - 1;
-			var yIndex = - 1;
-			var zIndex = - 1;
-
+			const prevValue = initialValue;
+			const values = [];
+			let xIndex = - 1;
+			let yIndex = - 1;
+			let zIndex = - 1;
 			times.forEach( function ( time ) {
 
 				if ( curves.x ) xIndex = curves.x.times.indexOf( time );
 				if ( curves.y ) yIndex = curves.y.times.indexOf( time );
-				if ( curves.z ) zIndex = curves.z.times.indexOf( time );
+				if ( curves.z ) zIndex = curves.z.times.indexOf( time ); // if there is an x value defined for this frame, use that
 
-				// if there is an x value defined for this frame, use that
 				if ( xIndex !== - 1 ) {
 
-					var xValue = curves.x.values[ xIndex ];
+					const xValue = curves.x.values[ xIndex ];
 					values.push( xValue );
 					prevValue[ 0 ] = xValue;
 
@@ -2861,7 +2642,7 @@ THREE.FBXLoader = ( function () {
 
 				if ( yIndex !== - 1 ) {
 
-					var yValue = curves.y.values[ yIndex ];
+					const yValue = curves.y.values[ yIndex ];
 					values.push( yValue );
 					prevValue[ 1 ] = yValue;
 
@@ -2873,7 +2654,7 @@ THREE.FBXLoader = ( function () {
 
 				if ( zIndex !== - 1 ) {
 
-					var zValue = curves.z.values[ zIndex ];
+					const zValue = curves.z.values[ zIndex ];
 					values.push( zValue );
 					prevValue[ 2 ] = zValue;
 
@@ -2884,43 +2665,37 @@ THREE.FBXLoader = ( function () {
 				}
 
 			} );
-
 			return values;
 
-		},
-
-		// Rotations are defined as Euler angles which can have values  of any size
+		} // Rotations are defined as THREE.Euler angles which can have values  of any size
 		// These will be converted to quaternions which don't support values greater than
 		// PI, so we'll interpolate large rotations
-		interpolateRotations: function ( curve ) {
 
-			for ( var i = 1; i < curve.values.length; i ++ ) {
 
-				var initialValue = curve.values[ i - 1 ];
-				var valuesSpan = curve.values[ i ] - initialValue;
+		interpolateRotations( curve ) {
 
-				var absoluteSpan = Math.abs( valuesSpan );
+			for ( let i = 1; i < curve.values.length; i ++ ) {
+
+				const initialValue = curve.values[ i - 1 ];
+				const valuesSpan = curve.values[ i ] - initialValue;
+				const absoluteSpan = Math.abs( valuesSpan );
 
 				if ( absoluteSpan >= 180 ) {
 
-					var numSubIntervals = absoluteSpan / 180;
-
-					var step = valuesSpan / numSubIntervals;
-					var nextValue = initialValue + step;
-
-					var initialTime = curve.times[ i - 1 ];
-					var timeSpan = curve.times[ i ] - initialTime;
-					var interval = timeSpan / numSubIntervals;
-					var nextTime = initialTime + interval;
-
-					var interpolatedTimes = [];
-					var interpolatedValues = [];
+					const numSubIntervals = absoluteSpan / 180;
+					const step = valuesSpan / numSubIntervals;
+					let nextValue = initialValue + step;
+					const initialTime = curve.times[ i - 1 ];
+					const timeSpan = curve.times[ i ] - initialTime;
+					const interval = timeSpan / numSubIntervals;
+					let nextTime = initialTime + interval;
+					const interpolatedTimes = [];
+					const interpolatedValues = [];
 
 					while ( nextTime < curve.times[ i ] ) {
 
 						interpolatedTimes.push( nextTime );
 						nextTime += interval;
-
 						interpolatedValues.push( nextValue );
 						nextValue += step;
 
@@ -2933,79 +2708,69 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-		},
+		}
 
-	};
+	} // parse an FBX file in ASCII format
 
-	// parse an FBX file in ASCII format
-	function TextParser() {}
 
-	TextParser.prototype = {
+	class TextParser {
 
-		constructor: TextParser,
-
-		getPrevNode: function () {
+		getPrevNode() {
 
 			return this.nodeStack[ this.currentIndent - 2 ];
 
-		},
+		}
 
-		getCurrentNode: function () {
+		getCurrentNode() {
 
 			return this.nodeStack[ this.currentIndent - 1 ];
 
-		},
+		}
 
-		getCurrentProp: function () {
+		getCurrentProp() {
 
 			return this.currentProp;
 
-		},
+		}
 
-		pushStack: function ( node ) {
+		pushStack( node ) {
 
 			this.nodeStack.push( node );
 			this.currentIndent += 1;
 
-		},
+		}
 
-		popStack: function () {
+		popStack() {
 
 			this.nodeStack.pop();
 			this.currentIndent -= 1;
 
-		},
+		}
 
-		setCurrentProp: function ( val, name ) {
+		setCurrentProp( val, name ) {
 
 			this.currentProp = val;
 			this.currentPropName = name;
 
-		},
+		}
 
-		parse: function ( text ) {
+		parse( text ) {
 
 			this.currentIndent = 0;
-
 			this.allNodes = new FBXTree();
 			this.nodeStack = [];
 			this.currentProp = [];
 			this.currentPropName = '';
-
-			var scope = this;
-
-			var split = text.split( /[\r\n]+/ );
-
+			const scope = this;
+			const split = text.split( /[\r\n]+/ );
 			split.forEach( function ( line, i ) {
 
-				var matchComment = line.match( /^[\s\t]*;/ );
-				var matchEmpty = line.match( /^[\s\t]*$/ );
-
+				const matchComment = line.match( /^[\s\t]*;/ );
+				const matchEmpty = line.match( /^[\s\t]*$/ );
 				if ( matchComment || matchEmpty ) return;
-
-				var matchBeginning = line.match( '^\\t{' + scope.currentIndent + '}(\\w+):(.*){', '' );
-				var matchProperty = line.match( '^\\t{' + ( scope.currentIndent ) + '}(\\w+):[\\s\\t\\r\\n](.*)' );
-				var matchEnd = line.match( '^\\t{' + ( scope.currentIndent - 1 ) + '}}' );
+				const matchBeginning = line.match( '^\\t{' + scope.currentIndent + '}(\\w+):(.*){', '' );
+				const matchProperty = line.match( '^\\t{' + scope.currentIndent + '}(\\w+):[\\s\\t\\r\\n](.*)' );
+				const matchEnd = line.match( '^\\t{' + ( scope.currentIndent - 1 ) + '}}' );
 
 				if ( matchBeginning ) {
 
@@ -3028,33 +2793,31 @@ THREE.FBXLoader = ( function () {
 				}
 
 			} );
-
 			return this.allNodes;
 
-		},
+		}
 
-		parseNodeBegin: function ( line, property ) {
+		parseNodeBegin( line, property ) {
 
-			var nodeName = property[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, '' );
-
-			var nodeAttrs = property[ 2 ].split( ',' ).map( function ( attr ) {
+			const nodeName = property[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, '' );
+			const nodeAttrs = property[ 2 ].split( ',' ).map( function ( attr ) {
 
 				return attr.trim().replace( /^"/, '' ).replace( /"$/, '' );
 
 			} );
+			const node = {
+				name: nodeName
+			};
+			const attrs = this.parseNodeAttr( nodeAttrs );
+			const currentNode = this.getCurrentNode(); // a top node
 
-			var node = { name: nodeName };
-			var attrs = this.parseNodeAttr( nodeAttrs );
-
-			var currentNode = this.getCurrentNode();
-
-			// a top node
 			if ( this.currentIndent === 0 ) {
 
 				this.allNodes.add( nodeName, node );
 
-			} else { // a subnode
+			} else {
 
+				// a subnode
 				// if the subnode already exists, append it
 				if ( nodeName in currentNode ) {
 
@@ -3079,8 +2842,7 @@ THREE.FBXLoader = ( function () {
 
 				} else if ( nodeName !== 'Properties70' ) {
 
-					if ( nodeName === 'PoseNode' )	currentNode[ nodeName ] = [ node ];
-					else currentNode[ nodeName ] = node;
+					if ( nodeName === 'PoseNode' ) currentNode[ nodeName ] = [ node ]; else currentNode[ nodeName ] = node;
 
 				}
 
@@ -3089,14 +2851,13 @@ THREE.FBXLoader = ( function () {
 			if ( typeof attrs.id === 'number' ) node.id = attrs.id;
 			if ( attrs.name !== '' ) node.attrName = attrs.name;
 			if ( attrs.type !== '' ) node.attrType = attrs.type;
-
 			this.pushStack( node );
 
-		},
+		}
 
-		parseNodeAttr: function ( attrs ) {
+		parseNodeAttr( attrs ) {
 
-			var id = attrs[ 0 ];
+			let id = attrs[ 0 ];
 
 			if ( attrs[ 0 ] !== '' ) {
 
@@ -3110,7 +2871,8 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			var name = '', type = '';
+			let name = '',
+				type = '';
 
 			if ( attrs.length > 1 ) {
 
@@ -3119,49 +2881,49 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			return { id: id, name: name, type: type };
+			return {
+				id: id,
+				name: name,
+				type: type
+			};
 
-		},
+		}
 
-		parseNodeProperty: function ( line, property, contentLine ) {
+		parseNodeProperty( line, property, contentLine ) {
 
-			var propName = property[ 1 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
-			var propValue = property[ 2 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
-
-			// for special case: base64 image data follows "Content: ," line
+			let propName = property[ 1 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
+			let propValue = property[ 2 ].replace( /^"/, '' ).replace( /"$/, '' ).trim(); // for special case: base64 image data follows "Content: ," line
 			//	Content: ,
 			//	 "/9j/4RDaRXhpZgAATU0A..."
+
 			if ( propName === 'Content' && propValue === ',' ) {
 
 				propValue = contentLine.replace( /"/g, '' ).replace( /,$/, '' ).trim();
 
 			}
 
-			var currentNode = this.getCurrentNode();
-			var parentName = currentNode.name;
+			const currentNode = this.getCurrentNode();
+			const parentName = currentNode.name;
 
 			if ( parentName === 'Properties70' ) {
 
 				this.parseNodeSpecialProperty( line, propName, propValue );
 				return;
 
-			}
+			} // Connections
 
-			// Connections
+
 			if ( propName === 'C' ) {
 
-				var connProps = propValue.split( ',' ).slice( 1 );
-				var from = parseInt( connProps[ 0 ] );
-				var to = parseInt( connProps[ 1 ] );
-
-				var rest = propValue.split( ',' ).slice( 3 );
-
+				const connProps = propValue.split( ',' ).slice( 1 );
+				const from = parseInt( connProps[ 0 ] );
+				const to = parseInt( connProps[ 1 ] );
+				let rest = propValue.split( ',' ).slice( 3 );
 				rest = rest.map( function ( elem ) {
 
 					return elem.trim().replace( /^"/, '' );
 
 				} );
-
 				propName = 'connections';
 				propValue = [ from, to ];
 				append( propValue, rest );
@@ -3172,70 +2934,63 @@ THREE.FBXLoader = ( function () {
 
 				}
 
-			}
+			} // Node
 
-			// Node
-			if ( propName === 'Node' ) currentNode.id = propValue;
 
-			// connections
+			if ( propName === 'Node' ) currentNode.id = propValue; // connections
+
 			if ( propName in currentNode && Array.isArray( currentNode[ propName ] ) ) {
 
 				currentNode[ propName ].push( propValue );
 
 			} else {
 
-				if ( propName !== 'a' ) currentNode[ propName ] = propValue;
-				else currentNode.a = propValue;
+				if ( propName !== 'a' ) currentNode[ propName ] = propValue; else currentNode.a = propValue;
 
 			}
 
-			this.setCurrentProp( currentNode, propName );
+			this.setCurrentProp( currentNode, propName ); // convert string to array, unless it ends in ',' in which case more will be added to it
 
-			// convert string to array, unless it ends in ',' in which case more will be added to it
 			if ( propName === 'a' && propValue.slice( - 1 ) !== ',' ) {
 
 				currentNode.a = parseNumberArray( propValue );
 
 			}
 
-		},
+		}
 
-		parseNodePropertyContinued: function ( line ) {
+		parseNodePropertyContinued( line ) {
 
-			var currentNode = this.getCurrentNode();
-
-			currentNode.a += line;
-
-			// if the line doesn't end in ',' we have reached the end of the property value
+			const currentNode = this.getCurrentNode();
+			currentNode.a += line; // if the line doesn't end in ',' we have reached the end of the property value
 			// so convert the string to an array
+
 			if ( line.slice( - 1 ) !== ',' ) {
 
 				currentNode.a = parseNumberArray( currentNode.a );
 
 			}
 
-		},
+		} // parse "Property70"
 
-		// parse "Property70"
-		parseNodeSpecialProperty: function ( line, propName, propValue ) {
+
+		parseNodeSpecialProperty( line, propName, propValue ) {
 
 			// split this
 			// P: "Lcl Scaling", "Lcl Scaling", "", "A",1,1,1
 			// into array like below
 			// ["Lcl Scaling", "Lcl Scaling", "", "A", "1,1,1" ]
-			var props = propValue.split( '",' ).map( function ( prop ) {
+			const props = propValue.split( '",' ).map( function ( prop ) {
 
 				return prop.trim().replace( /^\"/, '' ).replace( /\s/, '_' );
 
 			} );
+			const innerPropName = props[ 0 ];
+			const innerPropType1 = props[ 1 ];
+			const innerPropType2 = props[ 2 ];
+			const innerPropFlag = props[ 3 ];
+			let innerPropValue = props[ 4 ]; // cast values where needed, otherwise leave as strings
 
-			var innerPropName = props[ 0 ];
-			var innerPropType1 = props[ 1 ];
-			var innerPropType2 = props[ 2 ];
-			var innerPropFlag = props[ 3 ];
-			var innerPropValue = props[ 4 ];
-
-			// cast values where needed, otherwise leave as strings
 			switch ( innerPropType1 ) {
 
 				case 'int':
@@ -3257,37 +3012,30 @@ THREE.FBXLoader = ( function () {
 					innerPropValue = parseNumberArray( innerPropValue );
 					break;
 
-			}
+			} // CAUTION: these props must append to parent's parent
 
-			// CAUTION: these props must append to parent's parent
+
 			this.getPrevNode()[ innerPropName ] = {
-
 				'type': innerPropType1,
 				'type2': innerPropType2,
 				'flag': innerPropFlag,
 				'value': innerPropValue
-
 			};
-
 			this.setCurrentProp( this.getPrevNode(), innerPropName );
 
-		},
+		}
 
-	};
+	} // Parse an FBX file in Binary format
 
-	// Parse an FBX file in Binary format
-	function BinaryParser() {}
 
-	BinaryParser.prototype = {
+	class BinaryParser {
 
-		constructor: BinaryParser,
+		parse( buffer ) {
 
-		parse: function ( buffer ) {
-
-			var reader = new BinaryReader( buffer );
+			const reader = new BinaryReader( buffer );
 			reader.skip( 23 ); // skip magic 23 bytes
 
-			var version = reader.getUint32();
+			const version = reader.getUint32();
 
 			if ( version < 6400 ) {
 
@@ -3295,21 +3043,21 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			var allNodes = new FBXTree();
+			const allNodes = new FBXTree();
 
 			while ( ! this.endOfContent( reader ) ) {
 
-				var node = this.parseNode( reader, version );
+				const node = this.parseNode( reader, version );
 				if ( node !== null ) allNodes.add( node.name, node );
 
 			}
 
 			return allNodes;
 
-		},
+		} // Check if reader has reached the end of content.
 
-		// Check if reader has reached the end of content.
-		endOfContent: function ( reader ) {
+
+		endOfContent( reader ) {
 
 			// footer size: 160bytes + 16-byte alignment padding
 			// - 16bytes: magic
@@ -3321,7 +3069,7 @@ THREE.FBXLoader = ( function () {
 			// - 16bytes: magic
 			if ( reader.size() % 16 === 0 ) {
 
-				return ( ( reader.getOffset() + 160 + 16 ) & ~ 0xf ) >= reader.size();
+				return ( reader.getOffset() + 160 + 16 & ~ 0xf ) >= reader.size();
 
 			} else {
 
@@ -3329,46 +3077,40 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-		},
+		} // recursively parse nodes until the end of the file is reached
 
-		// recursively parse nodes until the end of the file is reached
-		parseNode: function ( reader, version ) {
 
-			var node = {};
+		parseNode( reader, version ) {
 
-			// The first three data sizes depends on version.
-			var endOffset = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
-			var numProperties = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
+			const node = {}; // The first three data sizes depends on version.
 
-			( version >= 7500 ) ? reader.getUint64() : reader.getUint32(); // the returned propertyListLen is not used
+			const endOffset = version >= 7500 ? reader.getUint64() : reader.getUint32();
+			const numProperties = version >= 7500 ? reader.getUint64() : reader.getUint32();
+			version >= 7500 ? reader.getUint64() : reader.getUint32(); // the returned propertyListLen is not used
 
-			var nameLen = reader.getUint8();
-			var name = reader.getString( nameLen );
+			const nameLen = reader.getUint8();
+			const name = reader.getString( nameLen ); // Regards this node as NULL-record if endOffset is zero
 
-			// Regards this node as NULL-record if endOffset is zero
 			if ( endOffset === 0 ) return null;
+			const propertyList = [];
 
-			var propertyList = [];
-
-			for ( var i = 0; i < numProperties; i ++ ) {
+			for ( let i = 0; i < numProperties; i ++ ) {
 
 				propertyList.push( this.parseProperty( reader ) );
 
-			}
+			} // Regards the first three elements in propertyList as id, attrName, and attrType
 
-			// Regards the first three elements in propertyList as id, attrName, and attrType
-			var id = propertyList.length > 0 ? propertyList[ 0 ] : '';
-			var attrName = propertyList.length > 1 ? propertyList[ 1 ] : '';
-			var attrType = propertyList.length > 2 ? propertyList[ 2 ] : '';
 
-			// check if this node represents just a single property
+			const id = propertyList.length > 0 ? propertyList[ 0 ] : '';
+			const attrName = propertyList.length > 1 ? propertyList[ 1 ] : '';
+			const attrType = propertyList.length > 2 ? propertyList[ 2 ] : ''; // check if this node represents just a single property
 			// like (name, 0) set or (name2, [0, 1, 2]) set of {name: 0, name2: [0, 1, 2]}
-			node.singleProperty = ( numProperties === 1 && reader.getOffset() === endOffset ) ? true : false;
+
+			node.singleProperty = numProperties === 1 && reader.getOffset() === endOffset ? true : false;
 
 			while ( endOffset > reader.getOffset() ) {
 
-				var subNode = this.parseNode( reader, version );
-
+				const subNode = this.parseNode( reader, version );
 				if ( subNode !== null ) this.parseSubNode( name, node, subNode );
 
 			}
@@ -3379,22 +3121,20 @@ THREE.FBXLoader = ( function () {
 			if ( attrName !== '' ) node.attrName = attrName;
 			if ( attrType !== '' ) node.attrType = attrType;
 			if ( name !== '' ) node.name = name;
-
 			return node;
 
-		},
+		}
 
-		parseSubNode: function ( name, node, subNode ) {
+		parseSubNode( name, node, subNode ) {
 
 			// special case: child node is single property
 			if ( subNode.singleProperty === true ) {
 
-				var value = subNode.propertyList[ 0 ];
+				const value = subNode.propertyList[ 0 ];
 
 				if ( Array.isArray( value ) ) {
 
 					node[ subNode.name ] = subNode;
-
 					subNode.a = value;
 
 				} else {
@@ -3405,8 +3145,7 @@ THREE.FBXLoader = ( function () {
 
 			} else if ( name === 'Connections' && subNode.name === 'C' ) {
 
-				var array = [];
-
+				const array = [];
 				subNode.propertyList.forEach( function ( property, i ) {
 
 					// first Connection is FBX type (OO, OP, etc.). We'll discard these
@@ -3424,8 +3163,7 @@ THREE.FBXLoader = ( function () {
 
 			} else if ( subNode.name === 'Properties70' ) {
 
-				var keys = Object.keys( subNode );
-
+				const keys = Object.keys( subNode );
 				keys.forEach( function ( key ) {
 
 					node[ key ] = subNode[ key ];
@@ -3434,37 +3172,30 @@ THREE.FBXLoader = ( function () {
 
 			} else if ( name === 'Properties70' && subNode.name === 'P' ) {
 
-				var innerPropName = subNode.propertyList[ 0 ];
-				var innerPropType1 = subNode.propertyList[ 1 ];
-				var innerPropType2 = subNode.propertyList[ 2 ];
-				var innerPropFlag = subNode.propertyList[ 3 ];
-				var innerPropValue;
-
+				let innerPropName = subNode.propertyList[ 0 ];
+				let innerPropType1 = subNode.propertyList[ 1 ];
+				const innerPropType2 = subNode.propertyList[ 2 ];
+				const innerPropFlag = subNode.propertyList[ 3 ];
+				let innerPropValue;
 				if ( innerPropName.indexOf( 'Lcl ' ) === 0 ) innerPropName = innerPropName.replace( 'Lcl ', 'Lcl_' );
 				if ( innerPropType1.indexOf( 'Lcl ' ) === 0 ) innerPropType1 = innerPropType1.replace( 'Lcl ', 'Lcl_' );
 
 				if ( innerPropType1 === 'Color' || innerPropType1 === 'ColorRGB' || innerPropType1 === 'Vector' || innerPropType1 === 'Vector3D' || innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
 
-					innerPropValue = [
-						subNode.propertyList[ 4 ],
-						subNode.propertyList[ 5 ],
-						subNode.propertyList[ 6 ]
-					];
+					innerPropValue = [ subNode.propertyList[ 4 ], subNode.propertyList[ 5 ], subNode.propertyList[ 6 ] ];
 
 				} else {
 
 					innerPropValue = subNode.propertyList[ 4 ];
 
-				}
+				} // this will be copied to parent, see above
 
-				// this will be copied to parent, see above
+
 				node[ innerPropName ] = {
-
 					'type': innerPropType1,
 					'type2': innerPropType2,
 					'flag': innerPropFlag,
 					'value': innerPropValue
-
 				};
 
 			} else if ( node[ subNode.name ] === undefined ) {
@@ -3500,11 +3231,12 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-		},
+		}
 
-		parseProperty: function ( reader ) {
+		parseProperty( reader ) {
 
-			var type = reader.getString( 1 );
+			const type = reader.getString( 1 );
+			let length;
 
 			switch ( type ) {
 
@@ -3524,11 +3256,11 @@ THREE.FBXLoader = ( function () {
 					return reader.getInt64();
 
 				case 'R':
-					var length = reader.getUint32();
+					length = reader.getUint32();
 					return reader.getArrayBuffer( length );
 
 				case 'S':
-					var length = reader.getUint32();
+					length = reader.getUint32();
 					return reader.getString( length );
 
 				case 'Y':
@@ -3540,10 +3272,10 @@ THREE.FBXLoader = ( function () {
 				case 'f':
 				case 'i':
 				case 'l':
+					const arrayLength = reader.getUint32();
+					const encoding = reader.getUint32(); // 0: non-compressed, 1: compressed
 
-					var arrayLength = reader.getUint32();
-					var encoding = reader.getUint32(); // 0: non-compressed, 1: compressed
-					var compressedLength = reader.getUint32();
+					const compressedLength = reader.getUint32();
 
 					if ( encoding === 0 ) {
 
@@ -3575,8 +3307,9 @@ THREE.FBXLoader = ( function () {
 
 					}
 
-					var data = fflate.unzlibSync( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
-					var reader2 = new BinaryReader( data.buffer );
+					const data = fflate.unzlibSync( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
+
+					const reader2 = new BinaryReader( data.buffer );
 
 					switch ( type ) {
 
@@ -3605,52 +3338,50 @@ THREE.FBXLoader = ( function () {
 
 		}
 
-	};
-
-	function BinaryReader( buffer, littleEndian ) {
-
-		this.dv = new DataView( buffer );
-		this.offset = 0;
-		this.littleEndian = ( littleEndian !== undefined ) ? littleEndian : true;
-
 	}
 
-	BinaryReader.prototype = {
+	class BinaryReader {
 
-		constructor: BinaryReader,
+		constructor( buffer, littleEndian ) {
 
-		getOffset: function () {
+			this.dv = new DataView( buffer );
+			this.offset = 0;
+			this.littleEndian = littleEndian !== undefined ? littleEndian : true;
+
+		}
+
+		getOffset() {
 
 			return this.offset;
 
-		},
+		}
 
-		size: function () {
+		size() {
 
 			return this.dv.buffer.byteLength;
 
-		},
+		}
 
-		skip: function ( length ) {
+		skip( length ) {
 
 			this.offset += length;
 
-		},
-
-		// seems like true/false representation depends on exporter.
+		} // seems like true/false representation depends on exporter.
 		// true: 1 or 'Y'(=0x59), false: 0 or 'T'(=0x54)
 		// then sees LSB.
-		getBoolean: function () {
+
+
+		getBoolean() {
 
 			return ( this.getUint8() & 1 ) === 1;
 
-		},
+		}
 
-		getBooleanArray: function ( size ) {
+		getBooleanArray( size ) {
 
-			var a = [];
+			const a = [];
 
-			for ( var i = 0; i < size; i ++ ) {
+			for ( let i = 0; i < size; i ++ ) {
 
 				a.push( this.getBoolean() );
 
@@ -3658,37 +3389,37 @@ THREE.FBXLoader = ( function () {
 
 			return a;
 
-		},
+		}
 
-		getUint8: function () {
+		getUint8() {
 
-			var value = this.dv.getUint8( this.offset );
+			const value = this.dv.getUint8( this.offset );
 			this.offset += 1;
 			return value;
 
-		},
+		}
 
-		getInt16: function () {
+		getInt16() {
 
-			var value = this.dv.getInt16( this.offset, this.littleEndian );
+			const value = this.dv.getInt16( this.offset, this.littleEndian );
 			this.offset += 2;
 			return value;
 
-		},
+		}
 
-		getInt32: function () {
+		getInt32() {
 
-			var value = this.dv.getInt32( this.offset, this.littleEndian );
+			const value = this.dv.getInt32( this.offset, this.littleEndian );
 			this.offset += 4;
 			return value;
 
-		},
+		}
 
-		getInt32Array: function ( size ) {
+		getInt32Array( size ) {
 
-			var a = [];
+			const a = [];
 
-			for ( var i = 0; i < size; i ++ ) {
+			for ( let i = 0; i < size; i ++ ) {
 
 				a.push( this.getInt32() );
 
@@ -3696,24 +3427,24 @@ THREE.FBXLoader = ( function () {
 
 			return a;
 
-		},
+		}
 
-		getUint32: function () {
+		getUint32() {
 
-			var value = this.dv.getUint32( this.offset, this.littleEndian );
+			const value = this.dv.getUint32( this.offset, this.littleEndian );
 			this.offset += 4;
 			return value;
 
-		},
-
-		// JavaScript doesn't support 64-bit integer so calculate this here
+		} // JavaScript doesn't support 64-bit integer so calculate this here
 		// 1 << 32 will return 1 so using multiply operation instead here.
 		// There's a possibility that this method returns wrong value if the value
 		// is out of the range between Number.MAX_SAFE_INTEGER and Number.MIN_SAFE_INTEGER.
 		// TODO: safely handle 64-bit integer
-		getInt64: function () {
 
-			var low, high;
+
+		getInt64() {
+
+			let low, high;
 
 			if ( this.littleEndian ) {
 
@@ -3725,31 +3456,28 @@ THREE.FBXLoader = ( function () {
 				high = this.getUint32();
 				low = this.getUint32();
 
-			}
+			} // calculate negative value
 
-			// calculate negative value
+
 			if ( high & 0x80000000 ) {
 
 				high = ~ high & 0xFFFFFFFF;
 				low = ~ low & 0xFFFFFFFF;
-
-				if ( low === 0xFFFFFFFF ) high = ( high + 1 ) & 0xFFFFFFFF;
-
-				low = ( low + 1 ) & 0xFFFFFFFF;
-
+				if ( low === 0xFFFFFFFF ) high = high + 1 & 0xFFFFFFFF;
+				low = low + 1 & 0xFFFFFFFF;
 				return - ( high * 0x100000000 + low );
 
 			}
 
 			return high * 0x100000000 + low;
 
-		},
+		}
 
-		getInt64Array: function ( size ) {
+		getInt64Array( size ) {
 
-			var a = [];
+			const a = [];
 
-			for ( var i = 0; i < size; i ++ ) {
+			for ( let i = 0; i < size; i ++ ) {
 
 				a.push( this.getInt64() );
 
@@ -3757,12 +3485,12 @@ THREE.FBXLoader = ( function () {
 
 			return a;
 
-		},
+		} // Note: see getInt64() comment
 
-		// Note: see getInt64() comment
-		getUint64: function () {
 
-			var low, high;
+		getUint64() {
+
+			let low, high;
 
 			if ( this.littleEndian ) {
 
@@ -3778,21 +3506,21 @@ THREE.FBXLoader = ( function () {
 
 			return high * 0x100000000 + low;
 
-		},
+		}
 
-		getFloat32: function () {
+		getFloat32() {
 
-			var value = this.dv.getFloat32( this.offset, this.littleEndian );
+			const value = this.dv.getFloat32( this.offset, this.littleEndian );
 			this.offset += 4;
 			return value;
 
-		},
+		}
 
-		getFloat32Array: function ( size ) {
+		getFloat32Array( size ) {
 
-			var a = [];
+			const a = [];
 
-			for ( var i = 0; i < size; i ++ ) {
+			for ( let i = 0; i < size; i ++ ) {
 
 				a.push( this.getFloat32() );
 
@@ -3800,21 +3528,21 @@ THREE.FBXLoader = ( function () {
 
 			return a;
 
-		},
+		}
 
-		getFloat64: function () {
+		getFloat64() {
 
-			var value = this.dv.getFloat64( this.offset, this.littleEndian );
+			const value = this.dv.getFloat64( this.offset, this.littleEndian );
 			this.offset += 8;
 			return value;
 
-		},
+		}
 
-		getFloat64Array: function ( size ) {
+		getFloat64Array( size ) {
 
-			var a = [];
+			const a = [];
 
-			for ( var i = 0; i < size; i ++ ) {
+			for ( let i = 0; i < size; i ++ ) {
 
 				a.push( this.getFloat64() );
 
@@ -3822,80 +3550,73 @@ THREE.FBXLoader = ( function () {
 
 			return a;
 
-		},
+		}
 
-		getArrayBuffer: function ( size ) {
+		getArrayBuffer( size ) {
 
-			var value = this.dv.buffer.slice( this.offset, this.offset + size );
+			const value = this.dv.buffer.slice( this.offset, this.offset + size );
 			this.offset += size;
 			return value;
 
-		},
+		}
 
-		getString: function ( size ) {
+		getString( size ) {
 
 			// note: safari 9 doesn't support Uint8Array.indexOf; create intermediate array instead
-			var a = [];
+			let a = [];
 
-			for ( var i = 0; i < size; i ++ ) {
+			for ( let i = 0; i < size; i ++ ) {
 
 				a[ i ] = this.getUint8();
 
 			}
 
-			var nullByte = a.indexOf( 0 );
+			const nullByte = a.indexOf( 0 );
 			if ( nullByte >= 0 ) a = a.slice( 0, nullByte );
-
 			return THREE.LoaderUtils.decodeText( new Uint8Array( a ) );
 
 		}
 
-	};
-
-	// FBXTree holds a representation of the FBX data, returned by the TextParser ( FBX ASCII format)
+	} // FBXTree holds a representation of the FBX data, returned by the TextParser ( FBX ASCII format)
 	// and BinaryParser( FBX Binary format)
-	function FBXTree() {}
 
-	FBXTree.prototype = {
 
-		constructor: FBXTree,
+	class FBXTree {
 
-		add: function ( key, val ) {
+		add( key, val ) {
 
 			this[ key ] = val;
 
-		},
+		}
 
-	};
+	} // ************** UTILITY FUNCTIONS **************
 
-	// ************** UTILITY FUNCTIONS **************
 
 	function isFbxFormatBinary( buffer ) {
 
-		var CORRECT = 'Kaydara FBX Binary  \0';
-
+		const CORRECT = 'Kaydara\u0020FBX\u0020Binary\u0020\u0020\0';
 		return buffer.byteLength >= CORRECT.length && CORRECT === convertArrayBufferToString( buffer, 0, CORRECT.length );
 
 	}
 
 	function isFbxFormatASCII( text ) {
 
-		var CORRECT = [ 'K', 'a', 'y', 'd', 'a', 'r', 'a', '\\', 'F', 'B', 'X', '\\', 'B', 'i', 'n', 'a', 'r', 'y', '\\', '\\' ];
-
-		var cursor = 0;
+		const CORRECT = [ 'K', 'a', 'y', 'd', 'a', 'r', 'a', '\\', 'F', 'B', 'X', '\\', 'B', 'i', 'n', 'a', 'r', 'y', '\\', '\\' ];
+		let cursor = 0;
 
 		function read( offset ) {
 
-			var result = text[ offset - 1 ];
+			const result = text[ offset - 1 ];
 			text = text.slice( cursor + offset );
 			cursor ++;
 			return result;
 
 		}
 
-		for ( var i = 0; i < CORRECT.length; ++ i ) {
+		for ( let i = 0; i < CORRECT.length; ++ i ) {
 
-			var num = read( 1 );
+			const num = read( 1 );
+
 			if ( num === CORRECT[ i ] ) {
 
 				return false;
@@ -3910,92 +3631,88 @@ THREE.FBXLoader = ( function () {
 
 	function getFbxVersion( text ) {
 
-		var versionRegExp = /FBXVersion: (\d+)/;
-		var match = text.match( versionRegExp );
+		const versionRegExp = /FBXVersion: (\d+)/;
+		const match = text.match( versionRegExp );
 
 		if ( match ) {
 
-			var version = parseInt( match[ 1 ] );
+			const version = parseInt( match[ 1 ] );
 			return version;
 
 		}
 
 		throw new Error( 'THREE.FBXLoader: Cannot find the version number for the file given.' );
 
-	}
+	} // Converts FBX ticks into real time seconds.
 
-	// Converts FBX ticks into real time seconds.
+
 	function convertFBXTimeToSeconds( time ) {
 
 		return time / 46186158000;
 
 	}
 
-	var dataArray = [];
+	const dataArray = []; // extracts the data from the correct position in the FBX array based on indexing type
 
-	// extracts the data from the correct position in the FBX array based on indexing type
 	function getData( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
 
-		var index;
+		let index;
 
 		switch ( infoObject.mappingType ) {
 
-			case 'ByPolygonVertex' :
+			case 'ByPolygonVertex':
 				index = polygonVertexIndex;
 				break;
-			case 'ByPolygon' :
+
+			case 'ByPolygon':
 				index = polygonIndex;
 				break;
-			case 'ByVertice' :
+
+			case 'ByVertice':
 				index = vertexIndex;
 				break;
-			case 'AllSame' :
+
+			case 'AllSame':
 				index = infoObject.indices[ 0 ];
 				break;
-			default :
+
+			default:
 				console.warn( 'THREE.FBXLoader: unknown attribute mapping type ' + infoObject.mappingType );
 
 		}
 
 		if ( infoObject.referenceType === 'IndexToDirect' ) index = infoObject.indices[ index ];
-
-		var from = index * infoObject.dataSize;
-		var to = from + infoObject.dataSize;
-
+		const from = index * infoObject.dataSize;
+		const to = from + infoObject.dataSize;
 		return slice( dataArray, infoObject.buffer, from, to );
 
 	}
 
-	var tempEuler = new THREE.Euler();
-	var tempVec = new THREE.Vector3();
-
-	// generate transformation from FBX transform data
+	const tempEuler = new THREE.Euler();
+	const tempVec = new THREE.Vector3(); // generate transformation from FBX transform data
 	// ref: https://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_10CDD63C_79C1_4F2D_BB28_AD2BE65A02ED_htm
 	// ref: http://docs.autodesk.com/FBX/2014/ENU/FBX-SDK-Documentation/index.html?url=cpp_ref/_transformations_2main_8cxx-example.html,topicNumber=cpp_ref__transformations_2main_8cxx_example_htmlfc10a1e1-b18d-4e72-9dc0-70d0f1959f5e
+
 	function generateTransform( transformData ) {
 
-		var lTranslationM = new THREE.Matrix4();
-		var lPreRotationM = new THREE.Matrix4();
-		var lRotationM = new THREE.Matrix4();
-		var lPostRotationM = new THREE.Matrix4();
-
-		var lScalingM = new THREE.Matrix4();
-		var lScalingPivotM = new THREE.Matrix4();
-		var lScalingOffsetM = new THREE.Matrix4();
-		var lRotationOffsetM = new THREE.Matrix4();
-		var lRotationPivotM = new THREE.Matrix4();
-
-		var lParentGX = new THREE.Matrix4();
-		var lParentLX = new THREE.Matrix4();
-		var lGlobalT = new THREE.Matrix4();
-
-		var inheritType = ( transformData.inheritType ) ? transformData.inheritType : 0;
-
+		const lTranslationM = new THREE.Matrix4();
+		const lPreRotationM = new THREE.Matrix4();
+		const lRotationM = new THREE.Matrix4();
+		const lPostRotationM = new THREE.Matrix4();
+		const lScalingM = new THREE.Matrix4();
+		const lScalingPivotM = new THREE.Matrix4();
+		const lScalingOffsetM = new THREE.Matrix4();
+		const lRotationOffsetM = new THREE.Matrix4();
+		const lRotationPivotM = new THREE.Matrix4();
+		const lParentGX = new THREE.Matrix4();
+		const lParentLX = new THREE.Matrix4();
+		const lGlobalT = new THREE.Matrix4();
+		const inheritType = transformData.inheritType ? transformData.inheritType : 0;
 		if ( transformData.translation ) lTranslationM.setPosition( tempVec.fromArray( transformData.translation ) );
 
 		if ( transformData.preRotation ) {
 
-			var array = transformData.preRotation.map( THREE.MathUtils.degToRad );
+			const array = transformData.preRotation.map( THREE.MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4003,7 +3720,7 @@ THREE.FBXLoader = ( function () {
 
 		if ( transformData.rotation ) {
 
-			var array = transformData.rotation.map( THREE.MathUtils.degToRad );
+			const array = transformData.rotation.map( THREE.MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4011,22 +3728,20 @@ THREE.FBXLoader = ( function () {
 
 		if ( transformData.postRotation ) {
 
-			var array = transformData.postRotation.map( THREE.MathUtils.degToRad );
+			const array = transformData.postRotation.map( THREE.MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 			lPostRotationM.invert();
 
 		}
 
-		if ( transformData.scale ) lScalingM.scale( tempVec.fromArray( transformData.scale ) );
+		if ( transformData.scale ) lScalingM.scale( tempVec.fromArray( transformData.scale ) ); // Pivots and offsets
 
-		// Pivots and offsets
 		if ( transformData.scalingOffset ) lScalingOffsetM.setPosition( tempVec.fromArray( transformData.scalingOffset ) );
 		if ( transformData.scalingPivot ) lScalingPivotM.setPosition( tempVec.fromArray( transformData.scalingPivot ) );
 		if ( transformData.rotationOffset ) lRotationOffsetM.setPosition( tempVec.fromArray( transformData.rotationOffset ) );
-		if ( transformData.rotationPivot ) lRotationPivotM.setPosition( tempVec.fromArray( transformData.rotationPivot ) );
+		if ( transformData.rotationPivot ) lRotationPivotM.setPosition( tempVec.fromArray( transformData.rotationPivot ) ); // parent transform
 
-		// parent transform
 		if ( transformData.parentMatrixWorld ) {
 
 			lParentLX.copy( transformData.parentMatrix );
@@ -4034,21 +3749,18 @@ THREE.FBXLoader = ( function () {
 
 		}
 
-		var lLRM = new THREE.Matrix4().copy( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM );
-		// Global Rotation
-		var lParentGRM = new THREE.Matrix4();
-		lParentGRM.extractRotation( lParentGX );
+		const lLRM = new THREE.Matrix4().copy( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ); // Global Rotation
 
-		// Global Shear*Scaling
-		var lParentTM = new THREE.Matrix4();
+		const lParentGRM = new THREE.Matrix4();
+		lParentGRM.extractRotation( lParentGX ); // Global Shear*Scaling
+
+		const lParentTM = new THREE.Matrix4();
 		lParentTM.copyPosition( lParentGX );
-
-		var lParentGSM = new THREE.Matrix4();
-		var lParentGRSM = new THREE.Matrix4().copy( lParentTM ).invert().multiply( lParentGX );
+		const lParentGSM = new THREE.Matrix4();
+		const lParentGRSM = new THREE.Matrix4().copy( lParentTM ).invert().multiply( lParentGX );
 		lParentGSM.copy( lParentGRM ).invert().multiply( lParentGRSM );
-		var lLSM = lScalingM;
-
-		var lGlobalRS = new THREE.Matrix4();
+		const lLSM = lScalingM;
+		const lGlobalRS = new THREE.Matrix4();
 
 		if ( inheritType === 0 ) {
 
@@ -4060,73 +3772,64 @@ THREE.FBXLoader = ( function () {
 
 		} else {
 
-			var lParentLSM = new THREE.Matrix4().scale( new THREE.Vector3().setFromMatrixScale( lParentLX ) );
-			var lParentLSM_inv = new THREE.Matrix4().copy( lParentLSM ).invert();
-			var lParentGSM_noLocal = new THREE.Matrix4().copy( lParentGSM ).multiply( lParentLSM_inv );
-
+			const lParentLSM = new THREE.Matrix4().scale( new THREE.Vector3().setFromMatrixScale( lParentLX ) );
+			const lParentLSM_inv = new THREE.Matrix4().copy( lParentLSM ).invert();
+			const lParentGSM_noLocal = new THREE.Matrix4().copy( lParentGSM ).multiply( lParentLSM_inv );
 			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lLSM );
 
 		}
 
-		var lRotationPivotM_inv = new THREE.Matrix4();
+		const lRotationPivotM_inv = new THREE.Matrix4();
 		lRotationPivotM_inv.copy( lRotationPivotM ).invert();
-		var lScalingPivotM_inv = new THREE.Matrix4();
-		lScalingPivotM_inv.copy( lScalingPivotM ).invert();
-		// Calculate the local transform matrix
-		var lTransform = new THREE.Matrix4();
+		const lScalingPivotM_inv = new THREE.Matrix4();
+		lScalingPivotM_inv.copy( lScalingPivotM ).invert(); // Calculate the local transform matrix
+
+		let lTransform = new THREE.Matrix4();
 		lTransform.copy( lTranslationM ).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
-
-		var lLocalTWithAllPivotAndOffsetInfo = new THREE.Matrix4().copyPosition( lTransform );
-
-		var lGlobalTranslation = new THREE.Matrix4().copy( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
+		const lLocalTWithAllPivotAndOffsetInfo = new THREE.Matrix4().copyPosition( lTransform );
+		const lGlobalTranslation = new THREE.Matrix4().copy( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
 		lGlobalT.copyPosition( lGlobalTranslation );
+		lTransform = new THREE.Matrix4().copy( lGlobalT ).multiply( lGlobalRS ); // from global to local
 
-		lTransform = new THREE.Matrix4().copy( lGlobalT ).multiply( lGlobalRS );
-
-		// from global to local
 		lTransform.premultiply( lParentGX.invert() );
-
 		return lTransform;
 
-	}
-
-	// Returns the three.js intrinsic Euler order corresponding to FBX extrinsic Euler order
+	} // Returns the three.js intrinsic THREE.Euler order corresponding to FBX extrinsic THREE.Euler order
 	// ref: http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
+
+
 	function getEulerOrder( order ) {
 
 		order = order || 0;
-
-		var enums = [
-			'ZYX', // -> XYZ extrinsic
+		const enums = [ 'ZYX', // -> XYZ extrinsic
 			'YZX', // -> XZY extrinsic
 			'XZY', // -> YZX extrinsic
 			'ZXY', // -> YXZ extrinsic
 			'YXZ', // -> ZXY extrinsic
-			'XYZ', // -> ZYX extrinsic
+			'XYZ' // -> ZYX extrinsic
 			//'SphericXYZ', // not possible to support
 		];
 
 		if ( order === 6 ) {
 
-			console.warn( 'THREE.FBXLoader: unsupported Euler Order: Spherical XYZ. Animations and rotations may be incorrect.' );
+			console.warn( 'THREE.FBXLoader: unsupported THREE.Euler Order: Spherical XYZ. Animations and rotations may be incorrect.' );
 			return enums[ 0 ];
 
 		}
 
 		return enums[ order ];
 
-	}
-
-	// Parses comma separated list of numbers and returns them an array.
+	} // Parses comma separated list of numbers and returns them an array.
 	// Used internally by the TextParser
+
+
 	function parseNumberArray( value ) {
 
-		var array = value.split( ',' ).map( function ( val ) {
+		const array = value.split( ',' ).map( function ( val ) {
 
 			return parseFloat( val );
 
 		} );
-
 		return array;
 
 	}
@@ -4135,14 +3838,13 @@ THREE.FBXLoader = ( function () {
 
 		if ( from === undefined ) from = 0;
 		if ( to === undefined ) to = buffer.byteLength;
-
 		return THREE.LoaderUtils.decodeText( new Uint8Array( buffer, from, to ) );
 
 	}
 
 	function append( a, b ) {
 
-		for ( var i = 0, j = a.length, l = b.length; i < l; i ++, j ++ ) {
+		for ( let i = 0, j = a.length, l = b.length; i < l; i ++, j ++ ) {
 
 			a[ j ] = b[ i ];
 
@@ -4152,7 +3854,7 @@ THREE.FBXLoader = ( function () {
 
 	function slice( a, b, from, to ) {
 
-		for ( var i = from, j = 0; i < to; i ++, j ++ ) {
+		for ( let i = from, j = 0; i < to; i ++, j ++ ) {
 
 			a[ j ] = b[ i ];
 
@@ -4160,15 +3862,15 @@ THREE.FBXLoader = ( function () {
 
 		return a;
 
-	}
+	} // inject array a2 into array a1 at index
 
-	// inject array a2 into array a1 at index
+
 	function inject( a1, index, a2 ) {
 
 		return a1.slice( 0, index ).concat( a2 ).concat( a1.slice( index ) );
 
 	}
 
-	return FBXLoader;
+	THREE.FBXLoader = FBXLoader;
 
 } )();

@@ -1,41 +1,37 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
 
-function ImageBitmapLoader( manager ) {
+class ImageBitmapLoader extends Loader {
 
-	if ( typeof createImageBitmap === 'undefined' ) {
+	constructor( manager ) {
 
-		console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
+		super( manager );
+
+		if ( typeof createImageBitmap === 'undefined' ) {
+
+			console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
+
+		}
+
+		if ( typeof fetch === 'undefined' ) {
+
+			console.warn( 'THREE.ImageBitmapLoader: fetch() not supported.' );
+
+		}
+
+		this.options = { premultiplyAlpha: 'none' };
 
 	}
 
-	if ( typeof fetch === 'undefined' ) {
-
-		console.warn( 'THREE.ImageBitmapLoader: fetch() not supported.' );
-
-	}
-
-	Loader.call( this, manager );
-
-	this.options = { premultiplyAlpha: 'none' };
-
-}
-
-ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
-
-	constructor: ImageBitmapLoader,
-
-	isImageBitmapLoader: true,
-
-	setOptions: function setOptions( options ) {
+	setOptions( options ) {
 
 		this.options = options;
 
 		return this;
 
-	},
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		if ( url === undefined ) url = '';
 
@@ -96,6 +92,8 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 	}
 
-} );
+}
+
+ImageBitmapLoader.prototype.isImageBitmapLoader = true;
 
 export { ImageBitmapLoader };

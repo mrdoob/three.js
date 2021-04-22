@@ -1,4 +1,4 @@
-const cacheName = 'threejs-editor-r127';
+const cacheName = 'threejs-editor';
 
 const assets = [
 	'./',
@@ -13,7 +13,7 @@ const assets = [
 	'../examples/jsm/controls/TransformControls.js',
 
 	'../examples/jsm/libs/chevrotain.module.min.js',
-	'../examples/jsm/libs/fflate.module.min.js',
+	'../examples/jsm/libs/fflate.module.js',
 
 	'../examples/js/libs/draco/draco_decoder.js',
 	'../examples/js/libs/draco/draco_decoder.wasm',
@@ -234,10 +234,29 @@ self.addEventListener( 'install', async function () {
 self.addEventListener( 'fetch', async function ( event ) {
 
 	const request = event.request;
-	event.respondWith( cacheFirst( request ) );
+	event.respondWith( networkFirst( request ) );
 
 } );
 
+async function networkFirst( request ) {
+
+	return fetch( request ).catch( async function () {
+
+		const cachedResponse = await caches.match( request );
+
+		if ( cachedResponse === undefined ) {
+
+			console.warn( '[SW] Not cached:', request.url );
+
+		}
+
+		return cachedResponse;
+
+	} );
+
+}
+
+/*
 async function cacheFirst( request ) {
 
 	const cachedResponse = await caches.match( request );
@@ -252,3 +271,4 @@ async function cacheFirst( request ) {
 	return cachedResponse;
 
 }
+*/

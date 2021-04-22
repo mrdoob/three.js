@@ -3,17 +3,15 @@ import { ImageLoader } from './ImageLoader.js';
 import { Texture } from '../textures/Texture.js';
 import { Loader } from './Loader.js';
 
-function TextureLoader( manager ) {
+class TextureLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-TextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: TextureLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const texture = new Texture();
 
@@ -43,7 +41,7 @@ TextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 
 export { TextureLoader };

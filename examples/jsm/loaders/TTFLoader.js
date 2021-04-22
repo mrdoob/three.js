@@ -10,24 +10,21 @@ import { opentype } from '../libs/opentype.module.min.js';
  * to create THREE.Font objects.
  */
 
-var TTFLoader = function ( manager ) {
+class TTFLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.reversed = false;
+		super( manager );
 
-};
+		this.reversed = false;
 
+	}
 
-TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	load( url, onLoad, onProgress, onError ) {
 
-	constructor: TTFLoader,
+		const scope = this;
 
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		var scope = this;
-
-		var loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
@@ -56,28 +53,28 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( arraybuffer ) {
+	parse( arraybuffer ) {
 
 		function convert( font, reversed ) {
 
-			var round = Math.round;
+			const round = Math.round;
 
-			var glyphs = {};
-			var scale = ( 100000 ) / ( ( font.unitsPerEm || 2048 ) * 72 );
+			const glyphs = {};
+			const scale = ( 100000 ) / ( ( font.unitsPerEm || 2048 ) * 72 );
 
-			var glyphIndexMap = font.encoding.cmap.glyphIndexMap;
-			var unicodes = Object.keys( glyphIndexMap );
+			const glyphIndexMap = font.encoding.cmap.glyphIndexMap;
+			const unicodes = Object.keys( glyphIndexMap );
 
-			for ( var i = 0; i < unicodes.length; i ++ ) {
+			for ( let i = 0; i < unicodes.length; i ++ ) {
 
-				var unicode = unicodes[ i ];
-				var glyph = font.glyphs.glyphs[ glyphIndexMap[ unicode ] ];
+				const unicode = unicodes[ i ];
+				const glyph = font.glyphs.glyphs[ glyphIndexMap[ unicode ] ];
 
 				if ( unicode !== undefined ) {
 
-					var token = {
+					const token = {
 						ha: round( glyph.advanceWidth * scale ),
 						x_min: round( glyph.xMin * scale ),
 						x_max: round( glyph.xMax * scale ),
@@ -147,8 +144,8 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function reverseCommands( commands ) {
 
-			var paths = [];
-			var path;
+			const paths = [];
+			let path;
 
 			commands.forEach( function ( c ) {
 
@@ -165,11 +162,11 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			} );
 
-			var reversed = [];
+			const reversed = [];
 
 			paths.forEach( function ( p ) {
 
-				var result = {
+				const result = {
 					type: 'm',
 					x: p[ p.length - 1 ].x,
 					y: p[ p.length - 1 ].y
@@ -177,10 +174,10 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				reversed.push( result );
 
-				for ( var i = p.length - 1; i > 0; i -- ) {
+				for ( let i = p.length - 1; i > 0; i -- ) {
 
-					var command = p[ i ];
-					var result = { type: command.type };
+					const command = p[ i ];
+					const result = { type: command.type };
 
 					if ( command.x2 !== undefined && command.y2 !== undefined ) {
 
@@ -219,6 +216,6 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 export { TTFLoader };

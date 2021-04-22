@@ -1,6 +1,6 @@
 import * as THREE from '../../build/three.module.js';
 
-import { zipSync, strToU8 } from '../../examples/jsm/libs/fflate.module.min.js';
+import { zipSync, strToU8 } from '../../examples/jsm/libs/fflate.module.js';
 
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 

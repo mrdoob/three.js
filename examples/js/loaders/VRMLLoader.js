@@ -1,32 +1,25 @@
-THREE.VRMLLoader = ( function () {
+( function () {
 
-	// dependency check
+	class VRMLLoader extends THREE.Loader {
 
-	if ( typeof chevrotain === 'undefined' ) { // eslint-disable-line no-undef
+		constructor( manager ) {
 
-		throw Error( 'THREE.VRMLLoader: External library chevrotain.min.js required.' );
+			super( manager ); // dependency check
 
-	}
+			if ( typeof chevrotain === 'undefined' ) {
 
-	// class definitions
+				// eslint-disable-line no-undef
+				throw Error( 'THREE.VRMLLoader: External library chevrotain.min.js required.' );
 
-	function VRMLLoader( manager ) {
+			}
 
-		THREE.Loader.call( this, manager );
+		}
 
-	}
+		load( url, onLoad, onProgress, onError ) {
 
-	VRMLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-
-		constructor: VRMLLoader,
-
-		load: function ( url, onLoad, onProgress, onError ) {
-
-			var scope = this;
-
-			var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
-
-			var loader = new THREE.FileLoader( scope.manager );
+			const scope = this;
+			const path = scope.path === '' ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+			const loader = new THREE.FileLoader( scope.manager );
 			loader.setPath( scope.path );
 			loader.setRequestHeader( scope.requestHeader );
 			loader.setWithCredentials( scope.withCredentials );
@@ -54,60 +47,54 @@ THREE.VRMLLoader = ( function () {
 
 			}, onProgress, onError );
 
-		},
+		}
 
-		parse: function ( data, path ) {
+		parse( data, path ) {
 
-			var nodeMap = {};
+			const nodeMap = {};
 
 			function generateVRMLTree( data ) {
 
 				// create lexer, parser and visitor
+				const tokenData = createTokens();
+				const lexer = new VRMLLexer( tokenData.tokens );
+				const parser = new VRMLParser( tokenData.tokenVocabulary );
+				const visitor = createVisitor( parser.getBaseCstVisitorConstructor() ); // lexing
 
-				var tokenData = createTokens();
+				const lexingResult = lexer.lex( data );
+				parser.input = lexingResult.tokens; // parsing
 
-				var lexer = new VRMLLexer( tokenData.tokens );
-				var parser = new VRMLParser( tokenData.tokenVocabulary );
-				var visitor = createVisitor( parser.getBaseCstVisitorConstructor() );
-
-				// lexing
-
-				var lexingResult = lexer.lex( data );
-				parser.input = lexingResult.tokens;
-
-				// parsing
-
-				var cstOutput = parser.vrml();
+				const cstOutput = parser.vrml();
 
 				if ( parser.errors.length > 0 ) {
 
 					console.error( parser.errors );
-
 					throw Error( 'THREE.VRMLLoader: Parsing errors detected.' );
 
-				}
+				} // actions
 
-				// actions
 
-				var ast = visitor.visit( cstOutput );
-
+				const ast = visitor.visit( cstOutput );
 				return ast;
 
 			}
 
 			function createTokens() {
 
-				var createToken = chevrotain.createToken; // eslint-disable-line no-undef
-
+				const createToken = chevrotain.createToken; // eslint-disable-line no-undef
 				// from http://gun.teipir.gr/VRML-amgem/spec/part1/concepts.html#SyntaxBasics
 
-				var RouteIdentifier = createToken( { name: 'RouteIdentifier', pattern: /[^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*[\.][^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*/ } );
-				var Identifier = createToken( { name: 'Identifier', pattern: /[^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*/, longer_alt: RouteIdentifier } );
+				const RouteIdentifier = createToken( {
+					name: 'RouteIdentifier',
+					pattern: /[^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*[\.][^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*/
+				} );
+				const Identifier = createToken( {
+					name: 'Identifier',
+					pattern: /[^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*/,
+					longer_alt: RouteIdentifier
+				} ); // from http://gun.teipir.gr/VRML-amgem/spec/part1/nodesRef.html
 
-				// from http://gun.teipir.gr/VRML-amgem/spec/part1/nodesRef.html
-
-				var nodeTypes = [
-					'Anchor', 'Billboard', 'Collision', 'Group', 'Transform', // grouping nodes
+				const nodeTypes = [ 'Anchor', 'Billboard', 'Collision', 'Group', 'Transform', // grouping nodes
 					'Inline', 'LOD', 'Switch', // special groups
 					'AudioClip', 'DirectionalLight', 'PointLight', 'Script', 'Shape', 'Sound', 'SpotLight', 'WorldInfo', // common nodes
 					'CylinderSensor', 'PlaneSensor', 'ProximitySensor', 'SphereSensor', 'TimeSensor', 'TouchSensor', 'VisibilitySensor', // sensors
@@ -117,150 +104,143 @@ THREE.VRMLLoader = ( function () {
 					'ColorInterpolator', 'CoordinateInterpolator', 'NormalInterpolator', 'OrientationInterpolator', 'PositionInterpolator', 'ScalarInterpolator', // interpolators
 					'Background', 'Fog', 'NavigationInfo', 'Viewpoint', // bindable nodes
 					'Text' // Text must be placed at the end of the regex so there are no matches for TextureTransform and TextureCoordinate
-				];
+				]; //
 
-				//
-
-				var Version = createToken( {
+				const Version = createToken( {
 					name: 'Version',
 					pattern: /#VRML.*/,
 					longer_alt: Identifier
 				} );
-
-				var NodeName = createToken( {
+				const NodeName = createToken( {
 					name: 'NodeName',
 					pattern: new RegExp( nodeTypes.join( '|' ) ),
 					longer_alt: Identifier
 				} );
-
-				var DEF = createToken( {
+				const DEF = createToken( {
 					name: 'DEF',
 					pattern: /DEF/,
 					longer_alt: Identifier
 				} );
-
-				var USE = createToken( {
+				const USE = createToken( {
 					name: 'USE',
 					pattern: /USE/,
 					longer_alt: Identifier
 				} );
-
-				var ROUTE = createToken( {
+				const ROUTE = createToken( {
 					name: 'ROUTE',
 					pattern: /ROUTE/,
 					longer_alt: Identifier
 				} );
-
-				var TO = createToken( {
+				const TO = createToken( {
 					name: 'TO',
 					pattern: /TO/,
 					longer_alt: Identifier
+				} ); //
+
+				const StringLiteral = createToken( {
+					name: 'StringLiteral',
+					pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
 				} );
-
-				//
-
-				var StringLiteral = createToken( { name: 'StringLiteral', pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/ } );
-				var HexLiteral = createToken( { name: 'HexLiteral', pattern: /0[xX][0-9a-fA-F]+/ } );
-				var NumberLiteral = createToken( { name: 'NumberLiteral', pattern: /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/ } );
-				var TrueLiteral = createToken( { name: 'TrueLiteral', pattern: /TRUE/ } );
-				var FalseLiteral = createToken( { name: 'FalseLiteral', pattern: /FALSE/ } );
-				var NullLiteral = createToken( { name: 'NullLiteral', pattern: /NULL/ } );
-				var LSquare = createToken( { name: 'LSquare', pattern: /\[/ } );
-				var RSquare = createToken( { name: 'RSquare', pattern: /]/ } );
-				var LCurly = createToken( { name: 'LCurly', pattern: /{/ } );
-				var RCurly = createToken( { name: 'RCurly', pattern: /}/ } );
-				var Comment = createToken( {
+				const HexLiteral = createToken( {
+					name: 'HexLiteral',
+					pattern: /0[xX][0-9a-fA-F]+/
+				} );
+				const NumberLiteral = createToken( {
+					name: 'NumberLiteral',
+					pattern: /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/
+				} );
+				const TrueLiteral = createToken( {
+					name: 'TrueLiteral',
+					pattern: /TRUE/
+				} );
+				const FalseLiteral = createToken( {
+					name: 'FalseLiteral',
+					pattern: /FALSE/
+				} );
+				const NullLiteral = createToken( {
+					name: 'NullLiteral',
+					pattern: /NULL/
+				} );
+				const LSquare = createToken( {
+					name: 'LSquare',
+					pattern: /\[/
+				} );
+				const RSquare = createToken( {
+					name: 'RSquare',
+					pattern: /]/
+				} );
+				const LCurly = createToken( {
+					name: 'LCurly',
+					pattern: /{/
+				} );
+				const RCurly = createToken( {
+					name: 'RCurly',
+					pattern: /}/
+				} );
+				const Comment = createToken( {
 					name: 'Comment',
 					pattern: /#.*/,
 					group: chevrotain.Lexer.SKIPPED // eslint-disable-line no-undef
-				} );
 
-				// commas, blanks, tabs, newlines and carriage returns are whitespace characters wherever they appear outside of string fields
+				} ); // commas, blanks, tabs, newlines and carriage returns are whitespace characters wherever they appear outside of string fields
 
-				var WhiteSpace = createToken( {
+				const WhiteSpace = createToken( {
 					name: 'WhiteSpace',
 					pattern: /[ ,\s]/,
 					group: chevrotain.Lexer.SKIPPED // eslint-disable-line no-undef
+
 				} );
+				const tokens = [ WhiteSpace, // keywords appear before the Identifier
+					NodeName, DEF, USE, ROUTE, TO, TrueLiteral, FalseLiteral, NullLiteral, // the Identifier must appear after the keywords because all keywords are valid identifiers
+					Version, Identifier, RouteIdentifier, StringLiteral, HexLiteral, NumberLiteral, LSquare, RSquare, LCurly, RCurly, Comment ];
+				const tokenVocabulary = {};
 
-				var tokens = [
-					WhiteSpace,
-					// keywords appear before the Identifier
-					NodeName,
-					DEF,
-					USE,
-					ROUTE,
-					TO,
-					TrueLiteral,
-					FalseLiteral,
-					NullLiteral,
-					// the Identifier must appear after the keywords because all keywords are valid identifiers
-					Version,
-					Identifier,
-					RouteIdentifier,
-					StringLiteral,
-					HexLiteral,
-					NumberLiteral,
-					LSquare,
-					RSquare,
-					LCurly,
-					RCurly,
-					Comment
-				];
+				for ( let i = 0, l = tokens.length; i < l; i ++ ) {
 
-				var tokenVocabulary = {};
-
-				for ( var i = 0, l = tokens.length; i < l; i ++ ) {
-
-					var token = tokens[ i ];
-
+					const token = tokens[ i ];
 					tokenVocabulary[ token.name ] = token;
 
 				}
 
-				return { tokens: tokens, tokenVocabulary: tokenVocabulary };
+				return {
+					tokens: tokens,
+					tokenVocabulary: tokenVocabulary
+				};
 
 			}
-
 
 			function createVisitor( BaseVRMLVisitor ) {
 
 				// the visitor is created dynmaically based on the given base class
-
 				function VRMLToASTVisitor() {
 
 					BaseVRMLVisitor.call( this );
-
 					this.validateVisitor();
 
 				}
 
 				VRMLToASTVisitor.prototype = Object.assign( Object.create( BaseVRMLVisitor.prototype ), {
-
 					constructor: VRMLToASTVisitor,
-
 					vrml: function ( ctx ) {
 
-						var data = {
+						const data = {
 							version: this.visit( ctx.version ),
 							nodes: [],
 							routes: []
 						};
 
-						for ( var i = 0, l = ctx.node.length; i < l; i ++ ) {
+						for ( let i = 0, l = ctx.node.length; i < l; i ++ ) {
 
-							var node = ctx.node[ i ];
-
+							const node = ctx.node[ i ];
 							data.nodes.push( this.visit( node ) );
 
 						}
 
 						if ( ctx.route ) {
 
-							for ( var i = 0, l = ctx.route.length; i < l; i ++ ) {
+							for ( let i = 0, l = ctx.route.length; i < l; i ++ ) {
 
-								var route = ctx.route[ i ];
-
+								const route = ctx.route[ i ];
 								data.routes.push( this.visit( route ) );
 
 							}
@@ -270,33 +250,29 @@ THREE.VRMLLoader = ( function () {
 						return data;
 
 					},
-
 					version: function ( ctx ) {
 
 						return ctx.Version[ 0 ].image;
 
 					},
-
 					node: function ( ctx ) {
 
-						var data = {
+						const data = {
 							name: ctx.NodeName[ 0 ].image,
 							fields: []
 						};
 
 						if ( ctx.field ) {
 
-							for ( var i = 0, l = ctx.field.length; i < l; i ++ ) {
+							for ( let i = 0, l = ctx.field.length; i < l; i ++ ) {
 
-								var field = ctx.field[ i ];
-
+								const field = ctx.field[ i ];
 								data.fields.push( this.visit( field ) );
 
 							}
 
-						}
+						} // DEF
 
-						// DEF
 
 						if ( ctx.def ) {
 
@@ -307,26 +283,21 @@ THREE.VRMLLoader = ( function () {
 						return data;
 
 					},
-
 					field: function ( ctx ) {
 
-						var data = {
+						const data = {
 							name: ctx.Identifier[ 0 ].image,
 							type: null,
 							values: null
 						};
-
-						var result;
-
-						// SFValue
+						let result; // SFValue
 
 						if ( ctx.singleFieldValue ) {
 
 							result = this.visit( ctx.singleFieldValue[ 0 ] );
 
-						}
+						} // MFValue
 
-						// MFValue
 
 						if ( ctx.multiFieldValue ) {
 
@@ -336,51 +307,45 @@ THREE.VRMLLoader = ( function () {
 
 						data.type = result.type;
 						data.values = result.values;
-
 						return data;
 
 					},
-
 					def: function ( ctx ) {
 
 						return ( ctx.Identifier || ctx.NodeName )[ 0 ].image;
 
 					},
-
 					use: function ( ctx ) {
 
-						return { USE: ( ctx.Identifier || ctx.NodeName )[ 0 ].image };
+						return {
+							USE: ( ctx.Identifier || ctx.NodeName )[ 0 ].image
+						};
 
 					},
-
 					singleFieldValue: function ( ctx ) {
 
 						return processField( this, ctx );
 
 					},
-
 					multiFieldValue: function ( ctx ) {
 
 						return processField( this, ctx );
 
 					},
-
 					route: function ( ctx ) {
 
-						var data = {
+						const data = {
 							FROM: ctx.RouteIdentifier[ 0 ].image,
 							TO: ctx.RouteIdentifier[ 1 ].image
 						};
-
 						return data;
 
 					}
-
 				} );
 
 				function processField( scope, ctx ) {
 
-					var field = {
+					const field = {
 						type: null,
 						values: []
 					};
@@ -389,10 +354,9 @@ THREE.VRMLLoader = ( function () {
 
 						field.type = 'node';
 
-						for ( var i = 0, l = ctx.node.length; i < l; i ++ ) {
+						for ( let i = 0, l = ctx.node.length; i < l; i ++ ) {
 
-							var node = ctx.node[ i ];
-
+							const node = ctx.node[ i ];
 							field.values.push( scope.visit( node ) );
 
 						}
@@ -403,10 +367,9 @@ THREE.VRMLLoader = ( function () {
 
 						field.type = 'use';
 
-						for ( var i = 0, l = ctx.use.length; i < l; i ++ ) {
+						for ( let i = 0, l = ctx.use.length; i < l; i ++ ) {
 
-							var use = ctx.use[ i ];
-
+							const use = ctx.use[ i ];
 							field.values.push( scope.visit( use ) );
 
 						}
@@ -417,10 +380,9 @@ THREE.VRMLLoader = ( function () {
 
 						field.type = 'string';
 
-						for ( var i = 0, l = ctx.StringLiteral.length; i < l; i ++ ) {
+						for ( let i = 0, l = ctx.StringLiteral.length; i < l; i ++ ) {
 
-							var stringLiteral = ctx.StringLiteral[ i ];
-
+							const stringLiteral = ctx.StringLiteral[ i ];
 							field.values.push( stringLiteral.image.replace( /'|"/g, '' ) );
 
 						}
@@ -431,10 +393,9 @@ THREE.VRMLLoader = ( function () {
 
 						field.type = 'number';
 
-						for ( var i = 0, l = ctx.NumberLiteral.length; i < l; i ++ ) {
+						for ( let i = 0, l = ctx.NumberLiteral.length; i < l; i ++ ) {
 
-							var numberLiteral = ctx.NumberLiteral[ i ];
-
+							const numberLiteral = ctx.NumberLiteral[ i ];
 							field.values.push( parseFloat( numberLiteral.image ) );
 
 						}
@@ -445,10 +406,9 @@ THREE.VRMLLoader = ( function () {
 
 						field.type = 'hex';
 
-						for ( var i = 0, l = ctx.HexLiteral.length; i < l; i ++ ) {
+						for ( let i = 0, l = ctx.HexLiteral.length; i < l; i ++ ) {
 
-							var hexLiteral = ctx.HexLiteral[ i ];
-
+							const hexLiteral = ctx.HexLiteral[ i ];
 							field.values.push( hexLiteral.image );
 
 						}
@@ -459,10 +419,9 @@ THREE.VRMLLoader = ( function () {
 
 						field.type = 'boolean';
 
-						for ( var i = 0, l = ctx.TrueLiteral.length; i < l; i ++ ) {
+						for ( let i = 0, l = ctx.TrueLiteral.length; i < l; i ++ ) {
 
-							var trueLiteral = ctx.TrueLiteral[ i ];
-
+							const trueLiteral = ctx.TrueLiteral[ i ];
 							if ( trueLiteral.image === 'TRUE' ) field.values.push( true );
 
 						}
@@ -473,10 +432,9 @@ THREE.VRMLLoader = ( function () {
 
 						field.type = 'boolean';
 
-						for ( var i = 0, l = ctx.FalseLiteral.length; i < l; i ++ ) {
+						for ( let i = 0, l = ctx.FalseLiteral.length; i < l; i ++ ) {
 
-							var falseLiteral = ctx.FalseLiteral[ i ];
-
+							const falseLiteral = ctx.FalseLiteral[ i ];
 							if ( falseLiteral.image === 'FALSE' ) field.values.push( false );
 
 						}
@@ -486,7 +444,6 @@ THREE.VRMLLoader = ( function () {
 					if ( ctx.NullLiteral ) {
 
 						field.type = 'null';
-
 						ctx.NullLiteral.forEach( function () {
 
 							field.values.push( null );
@@ -506,29 +463,22 @@ THREE.VRMLLoader = ( function () {
 			function parseTree( tree ) {
 
 				// console.log( JSON.stringify( tree, null, 2 ) );
+				const nodes = tree.nodes;
+				const scene = new THREE.Scene(); // first iteration: build nodemap based on DEF statements
 
-				var nodes = tree.nodes;
-				var scene = new THREE.Scene();
+				for ( let i = 0, l = nodes.length; i < l; i ++ ) {
 
-				// first iteration: build nodemap based on DEF statements
-
-				for ( var i = 0, l = nodes.length; i < l; i ++ ) {
-
-					var node = nodes[ i ];
-
+					const node = nodes[ i ];
 					buildNodeMap( node );
 
-				}
+				} // second iteration: build nodes
 
-				// second iteration: build nodes
 
-				for ( var i = 0, l = nodes.length; i < l; i ++ ) {
+				for ( let i = 0, l = nodes.length; i < l; i ++ ) {
 
-					var node = nodes[ i ];
-					var object = getNode( node );
-
+					const node = nodes[ i ];
+					const object = getNode( node );
 					if ( object instanceof THREE.Object3D ) scene.add( object );
-
 					if ( node.name === 'WorldInfo' ) scene.userData.worldInfo = object;
 
 				}
@@ -545,17 +495,17 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var fields = node.fields;
+				const fields = node.fields;
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-					var field = fields[ i ];
+					const field = fields[ i ];
 
 					if ( field.type === 'node' ) {
 
-						var fieldValues = field.values;
+						const fieldValues = field.values;
 
-						for ( var j = 0, jl = fieldValues.length; j < jl; j ++ ) {
+						for ( let j = 0, jl = fieldValues.length; j < jl; j ++ ) {
 
 							buildNodeMap( fieldValues[ j ] );
 
@@ -563,16 +513,13 @@ THREE.VRMLLoader = ( function () {
 
 					}
 
-
 				}
 
 			}
 
-
 			function getNode( node ) {
 
 				// handle case where a node refers to a different one
-
 				if ( node.USE ) {
 
 					return resolveUSE( node.USE );
@@ -580,19 +527,16 @@ THREE.VRMLLoader = ( function () {
 				}
 
 				if ( node.build !== undefined ) return node.build;
-
 				node.build = buildNode( node );
-
 				return node.build;
 
-			}
+			} // node builder
 
-			// node builder
 
 			function buildNode( node ) {
 
-				var nodeName = node.name;
-				var build;
+				const nodeName = node.name;
+				let build;
 
 				switch ( nodeName ) {
 
@@ -679,18 +623,15 @@ THREE.VRMLLoader = ( function () {
 
 					case 'Anchor':
 					case 'Billboard':
-
 					case 'Inline':
 					case 'LOD':
 					case 'Switch':
-
 					case 'AudioClip':
 					case 'DirectionalLight':
 					case 'PointLight':
 					case 'Script':
 					case 'Sound':
 					case 'SpotLight':
-
 					case 'CylinderSensor':
 					case 'PlaneSensor':
 					case 'ProximitySensor':
@@ -698,19 +639,15 @@ THREE.VRMLLoader = ( function () {
 					case 'TimeSensor':
 					case 'TouchSensor':
 					case 'VisibilitySensor':
-
 					case 'Text':
-
 					case 'FontStyle':
 					case 'MovieTexture':
-
 					case 'ColorInterpolator':
 					case 'CoordinateInterpolator':
 					case 'NormalInterpolator':
 					case 'OrientationInterpolator':
 					case 'PositionInterpolator':
 					case 'ScalarInterpolator':
-
 					case 'Fog':
 					case 'NavigationInfo':
 					case 'Viewpoint':
@@ -735,17 +672,15 @@ THREE.VRMLLoader = ( function () {
 
 			function buildGroupingNode( node ) {
 
-				var object = new THREE.Group();
+				const object = new THREE.Group(); //
 
-				//
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
@@ -770,8 +705,8 @@ THREE.VRMLLoader = ( function () {
 							break;
 
 						case 'rotation':
-							var axis = new THREE.Vector3( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
-							var angle = fieldValues[ 3 ];
+							const axis = new THREE.Vector3( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
+							const angle = fieldValues[ 3 ];
 							object.quaternion.setFromAxisAngle( axis, angle );
 							break;
 
@@ -805,18 +740,16 @@ THREE.VRMLLoader = ( function () {
 
 			function buildBackgroundNode( node ) {
 
-				var group = new THREE.Group();
+				const group = new THREE.Group();
+				let groundAngle, groundColor;
+				let skyAngle, skyColor;
+				const fields = node.fields;
 
-				var groundAngle, groundColor;
-				var skyAngle, skyColor;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				var fields = node.fields;
-
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
@@ -868,14 +801,17 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var radius = 10000;
-
-				// sky
+				const radius = 10000; // sky
 
 				if ( skyColor ) {
 
-					var skyGeometry = new THREE.SphereGeometry( radius, 32, 16 );
-					var skyMaterial = new THREE.MeshBasicMaterial( { fog: false, side: THREE.BackSide, depthWrite: false, depthTest: false } );
+					const skyGeometry = new THREE.SphereGeometry( radius, 32, 16 );
+					const skyMaterial = new THREE.MeshBasicMaterial( {
+						fog: false,
+						side: THREE.BackSide,
+						depthWrite: false,
+						depthTest: false
+					} );
 
 					if ( skyColor.length > 3 ) {
 
@@ -888,51 +824,52 @@ THREE.VRMLLoader = ( function () {
 
 					}
 
-					var sky = new THREE.Mesh( skyGeometry, skyMaterial );
+					const sky = new THREE.Mesh( skyGeometry, skyMaterial );
 					group.add( sky );
 
-				}
+				} // ground
 
-				// ground
 
 				if ( groundColor ) {
 
 					if ( groundColor.length > 0 ) {
 
-						var groundGeometry = new THREE.SphereGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
-						var groundMaterial = new THREE.MeshBasicMaterial( { fog: false, side: THREE.BackSide, vertexColors: true, depthWrite: false, depthTest: false } );
-
+						const groundGeometry = new THREE.SphereGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
+						const groundMaterial = new THREE.MeshBasicMaterial( {
+							fog: false,
+							side: THREE.BackSide,
+							vertexColors: true,
+							depthWrite: false,
+							depthTest: false
+						} );
 						paintFaces( groundGeometry, radius, groundAngle, toColorArray( groundColor ), false );
-
-						var ground = new THREE.Mesh( groundGeometry, groundMaterial );
+						const ground = new THREE.Mesh( groundGeometry, groundMaterial );
 						group.add( ground );
 
 					}
 
-				}
+				} // render background group first
 
-				// render background group first
 
 				group.renderOrder = - Infinity;
-
 				return group;
 
 			}
 
 			function buildShapeNode( node ) {
 
-				var fields = node.fields;
+				const fields = node.fields; // if the appearance field is NULL or unspecified, lighting is off and the unlit object color is (0, 0, 0)
 
-				// if the appearance field is NULL or unspecified, lighting is off and the unlit object color is (0, 0, 0)
+				let material = new THREE.MeshBasicMaterial( {
+					color: 0x000000
+				} );
+				let geometry;
 
-				var material = new THREE.MeshBasicMaterial( { color: 0x000000 } );
-				var geometry;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
@@ -960,19 +897,21 @@ THREE.VRMLLoader = ( function () {
 
 					}
 
-				}
+				} // build 3D object
 
-				// build 3D object
 
-				var object;
+				let object;
 
 				if ( geometry && geometry.attributes.position ) {
 
-					var type = geometry._type;
+					const type = geometry._type;
 
-					if ( type === 'points' ) { // points
+					if ( type === 'points' ) {
 
-						var pointsMaterial = new THREE.PointsMaterial( { color: 0xffffff } );
+						// points
+						const pointsMaterial = new THREE.PointsMaterial( {
+							color: 0xffffff
+						} );
 
 						if ( geometry.attributes.color !== undefined ) {
 
@@ -981,7 +920,6 @@ THREE.VRMLLoader = ( function () {
 						} else {
 
 							// if the color field is NULL and there is a material defined for the appearance affecting this PointSet, then use the emissiveColor of the material to draw the points
-
 							if ( material.isMeshPhongMaterial ) {
 
 								pointsMaterial.color.copy( material.emissive );
@@ -992,9 +930,12 @@ THREE.VRMLLoader = ( function () {
 
 						object = new THREE.Points( geometry, pointsMaterial );
 
-					} else if ( type === 'line' ) { // lines
+					} else if ( type === 'line' ) {
 
-						var lineMaterial = new THREE.LineBasicMaterial( { color: 0xffffff } );
+						// lines
+						const lineMaterial = new THREE.LineBasicMaterial( {
+							color: 0xffffff
+						} );
 
 						if ( geometry.attributes.color !== undefined ) {
 
@@ -1003,7 +944,6 @@ THREE.VRMLLoader = ( function () {
 						} else {
 
 							// if the color field is NULL and there is a material defined for the appearance affecting this IndexedLineSet, then use the emissiveColor of the material to draw the lines
-
 							if ( material.isMeshPhongMaterial ) {
 
 								lineMaterial.color.copy( material.emissive );
@@ -1014,17 +954,16 @@ THREE.VRMLLoader = ( function () {
 
 						object = new THREE.LineSegments( geometry, lineMaterial );
 
-					} else { // consider meshes
+					} else {
 
+						// consider meshes
 						// check "solid" hint (it's placed in the geometry but affects the material)
-
 						if ( geometry._solid !== undefined ) {
 
-							material.side = ( geometry._solid ) ? THREE.FrontSide : THREE.DoubleSide;
+							material.side = geometry._solid ? THREE.FrontSide : THREE.DoubleSide;
 
-						}
+						} // check for vertex colors
 
-						// check for vertex colors
 
 						if ( geometry.attributes.color !== undefined ) {
 
@@ -1038,9 +977,7 @@ THREE.VRMLLoader = ( function () {
 
 				} else {
 
-					object = new THREE.Object3D();
-
-					// if the geometry field is NULL or no vertices are defined the object is not drawn
+					object = new THREE.Object3D(); // if the geometry field is NULL or no vertices are defined the object is not drawn
 
 					object.visible = false;
 
@@ -1052,24 +989,22 @@ THREE.VRMLLoader = ( function () {
 
 			function buildAppearanceNode( node ) {
 
-				var material = new THREE.MeshPhongMaterial();
-				var transformData;
+				let material = new THREE.MeshPhongMaterial();
+				let transformData;
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
 						case 'material':
 							if ( fieldValues[ 0 ] !== null ) {
 
-								var materialData = getNode( fieldValues[ 0 ] );
-
+								const materialData = getNode( fieldValues[ 0 ] );
 								if ( materialData.diffuseColor ) material.color.copy( materialData.diffuseColor );
 								if ( materialData.emissiveColor ) material.emissive.copy( materialData.emissiveColor );
 								if ( materialData.shininess ) material.shininess = materialData.shininess;
@@ -1080,25 +1015,24 @@ THREE.VRMLLoader = ( function () {
 							} else {
 
 								// if the material field is NULL or unspecified, lighting is off and the unlit object color is (0, 0, 0)
-
-								material = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+								material = new THREE.MeshBasicMaterial( {
+									color: 0x000000
+								} );
 
 							}
 
 							break;
 
 						case 'texture':
-							var textureNode = fieldValues[ 0 ];
+							const textureNode = fieldValues[ 0 ];
+
 							if ( textureNode !== null ) {
 
 								if ( textureNode.name === 'ImageTexture' || textureNode.name === 'PixelTexture' ) {
 
 									material.map = getNode( textureNode );
 
-								} else {
-
-									// MovieTexture not supported yet
-
+								} else { // MovieTexture not supported yet
 								}
 
 							}
@@ -1120,29 +1054,31 @@ THREE.VRMLLoader = ( function () {
 
 					}
 
-				}
+				} // only apply texture transform data if a texture was defined
 
-				// only apply texture transform data if a texture was defined
 
 				if ( material.map ) {
 
 					// respect VRML lighting model
-
 					if ( material.map.__type ) {
 
 						switch ( material.map.__type ) {
 
 							case TEXTURE_TYPE.INTENSITY_ALPHA:
 								material.opacity = 1; // ignore transparency
+
 								break;
 
 							case TEXTURE_TYPE.RGB:
 								material.color.set( 0xffffff ); // ignore material color
+
 								break;
 
 							case TEXTURE_TYPE.RGBA:
 								material.color.set( 0xffffff ); // ignore material color
+
 								material.opacity = 1; // ignore transparency
+
 								break;
 
 							default:
@@ -1151,9 +1087,8 @@ THREE.VRMLLoader = ( function () {
 
 						delete material.map.__type;
 
-					}
+					} // apply texture transform
 
-					// apply texture transform
 
 					if ( transformData ) {
 
@@ -1172,15 +1107,14 @@ THREE.VRMLLoader = ( function () {
 
 			function buildMaterialNode( node ) {
 
-				var materialData = {};
+				const materialData = {};
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
@@ -1222,11 +1156,13 @@ THREE.VRMLLoader = ( function () {
 
 			function parseHexColor( hex, textureType, color ) {
 
+				let value;
+
 				switch ( textureType ) {
 
 					case TEXTURE_TYPE.INTENSITY:
 						// Intensity texture: A one-component image specifies one-byte hexadecimal or integer values representing the intensity of the image
-						var value = parseInt( hex );
+						value = parseInt( hex );
 						color.r = value;
 						color.g = value;
 						color.b = value;
@@ -1234,7 +1170,7 @@ THREE.VRMLLoader = ( function () {
 
 					case TEXTURE_TYPE.INTENSITY_ALPHA:
 						// Intensity+Alpha texture: A two-component image specifies the intensity in the first (high) byte and the alpha opacity in the second (low) byte.
-						var value = parseInt( '0x' + hex.substring( 2, 4 ) );
+						value = parseInt( '0x' + hex.substring( 2, 4 ) );
 						color.r = value;
 						color.g = value;
 						color.b = value;
@@ -1264,7 +1200,7 @@ THREE.VRMLLoader = ( function () {
 
 			function getTextureType( num_components ) {
 
-				var type;
+				let type;
 
 				switch ( num_components ) {
 
@@ -1294,41 +1230,41 @@ THREE.VRMLLoader = ( function () {
 
 			function buildPixelTextureNode( node ) {
 
-				var texture;
-				var wrapS = THREE.RepeatWrapping;
-				var wrapT = THREE.RepeatWrapping;
+				let texture;
+				let wrapS = THREE.RepeatWrapping;
+				let wrapT = THREE.RepeatWrapping;
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
 						case 'image':
-							var width = fieldValues[ 0 ];
-							var height = fieldValues[ 1 ];
-							var num_components = fieldValues[ 2 ];
+							const width = fieldValues[ 0 ];
+							const height = fieldValues[ 1 ];
+							const num_components = fieldValues[ 2 ];
+							const useAlpha = num_components === 2 || num_components === 4;
+							const textureType = getTextureType( num_components );
+							const size = ( useAlpha === true ? 4 : 3 ) * ( width * height );
+							const data = new Uint8Array( size );
+							const color = {
+								r: 0,
+								g: 0,
+								b: 0,
+								a: 0
+							};
 
-							var useAlpha = ( num_components === 2 || num_components === 4 );
-							var textureType = getTextureType( num_components );
-
-							var size = ( ( useAlpha === true ) ? 4 : 3 ) * ( width * height );
-							var data = new Uint8Array( size );
-
-							var color = { r: 0, g: 0, b: 0, a: 0 };
-
-							for ( var j = 3, k = 0, jl = fieldValues.length; j < jl; j ++, k ++ ) {
+							for ( let j = 3, k = 0, jl = fieldValues.length; j < jl; j ++, k ++ ) {
 
 								parseHexColor( fieldValues[ j ], textureType, color );
 
 								if ( useAlpha === true ) {
 
-									var stride = k * 4;
-
+									const stride = k * 4;
 									data[ stride + 0 ] = color.r;
 									data[ stride + 1 ] = color.g;
 									data[ stride + 2 ] = color.b;
@@ -1336,8 +1272,7 @@ THREE.VRMLLoader = ( function () {
 
 								} else {
 
-									var stride = k * 3;
-
+									const stride = k * 3;
 									data[ stride + 0 ] = color.r;
 									data[ stride + 1 ] = color.g;
 									data[ stride + 2 ] = color.b;
@@ -1346,8 +1281,9 @@ THREE.VRMLLoader = ( function () {
 
 							}
 
-							texture = new THREE.DataTexture( data, width, height, ( useAlpha === true ) ? THREE.RGBAFormat : THREE.RGBFormat );
+							texture = new THREE.DataTexture( data, width, height, useAlpha === true ? THREE.RGBAFormat : THREE.RGBFormat );
 							texture.__type = textureType; // needed for material modifications
+
 							break;
 
 						case 'repeatS':
@@ -1379,22 +1315,21 @@ THREE.VRMLLoader = ( function () {
 
 			function buildImageTextureNode( node ) {
 
-				var texture;
-				var wrapS = THREE.RepeatWrapping;
-				var wrapT = THREE.RepeatWrapping;
+				let texture;
+				let wrapS = THREE.RepeatWrapping;
+				let wrapT = THREE.RepeatWrapping;
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
 						case 'url':
-							var url = fieldValues[ 0 ];
+							const url = fieldValues[ 0 ];
 							if ( url ) texture = textureLoader.load( url );
 							break;
 
@@ -1427,20 +1362,19 @@ THREE.VRMLLoader = ( function () {
 
 			function buildTextureTransformNode( node ) {
 
-				var transformData = {
+				const transformData = {
 					center: new THREE.Vector2(),
 					rotation: new THREE.Vector2(),
 					scale: new THREE.Vector2(),
 					translation: new THREE.Vector2()
 				};
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
@@ -1480,15 +1414,14 @@ THREE.VRMLLoader = ( function () {
 
 			function buildWorldInfoNode( node ) {
 
-				var worldInfo = {};
+				const worldInfo = {};
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
@@ -1514,23 +1447,25 @@ THREE.VRMLLoader = ( function () {
 
 			function buildIndexedFaceSetNode( node ) {
 
-				var color, coord, normal, texCoord;
-				var ccw = true, solid = true, creaseAngle = 0;
-				var colorIndex, coordIndex, normalIndex, texCoordIndex;
-				var colorPerVertex = true, normalPerVertex = true;
+				let color, coord, normal, texCoord;
+				let ccw = true,
+					solid = true,
+					creaseAngle = 0;
+				let colorIndex, coordIndex, normalIndex, texCoordIndex;
+				let colorPerVertex = true,
+					normalPerVertex = true;
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
 						case 'color':
-							var colorNode = fieldValues[ 0 ];
+							const colorNode = fieldValues[ 0 ];
 
 							if ( colorNode !== null ) {
 
@@ -1541,7 +1476,7 @@ THREE.VRMLLoader = ( function () {
 							break;
 
 						case 'coord':
-							var coordNode = fieldValues[ 0 ];
+							const coordNode = fieldValues[ 0 ];
 
 							if ( coordNode !== null ) {
 
@@ -1552,7 +1487,7 @@ THREE.VRMLLoader = ( function () {
 							break;
 
 						case 'normal':
-							var normalNode = fieldValues[ 0 ];
+							const normalNode = fieldValues[ 0 ];
 
 							if ( normalNode !== null ) {
 
@@ -1563,7 +1498,7 @@ THREE.VRMLLoader = ( function () {
 							break;
 
 						case 'texCoord':
-							var texCoordNode = fieldValues[ 0 ];
+							const texCoordNode = fieldValues[ 0 ];
 
 							if ( texCoordNode !== null ) {
 
@@ -1624,17 +1559,14 @@ THREE.VRMLLoader = ( function () {
 				if ( coordIndex === undefined ) {
 
 					console.warn( 'THREE.VRMLLoader: Missing coordIndex.' );
-
 					return new THREE.BufferGeometry(); // handle VRML files with incomplete geometry definition
 
 				}
 
-				var triangulatedCoordIndex = triangulateFaceIndex( coordIndex, ccw );
-
-				var positionAttribute;
-				var colorAttribute;
-				var normalAttribute;
-				var uvAttribute;
+				const triangulatedCoordIndex = triangulateFaceIndex( coordIndex, ccw );
+				let colorAttribute;
+				let normalAttribute;
+				let uvAttribute;
 
 				if ( color ) {
 
@@ -1643,14 +1575,12 @@ THREE.VRMLLoader = ( function () {
 						if ( colorIndex && colorIndex.length > 0 ) {
 
 							// if the colorIndex field is not empty, then it is used to choose colors for each vertex of the IndexedFaceSet.
-
-							var triangulatedColorIndex = triangulateFaceIndex( colorIndex, ccw );
+							const triangulatedColorIndex = triangulateFaceIndex( colorIndex, ccw );
 							colorAttribute = computeAttributeFromIndexedData( triangulatedCoordIndex, triangulatedColorIndex, color, 3 );
 
 						} else {
 
-							// if the colorIndex field is empty, then the coordIndex field is used to choose colors from the Color node
-
+							// if the colorIndex field is empty, then the coordIndex field is used to choose colors from the THREE.Color node
 							colorAttribute = toNonIndexedAttribute( triangulatedCoordIndex, new THREE.Float32BufferAttribute( color, 3 ) );
 
 						}
@@ -1660,18 +1590,15 @@ THREE.VRMLLoader = ( function () {
 						if ( colorIndex && colorIndex.length > 0 ) {
 
 							// if the colorIndex field is not empty, then they are used to choose one color for each face of the IndexedFaceSet
-
-							var flattenFaceColors = flattenData( color, colorIndex );
-							var triangulatedFaceColors = triangulateFaceData( flattenFaceColors, coordIndex );
+							const flattenFaceColors = flattenData( color, colorIndex );
+							const triangulatedFaceColors = triangulateFaceData( flattenFaceColors, coordIndex );
 							colorAttribute = computeAttributeFromFaceData( triangulatedCoordIndex, triangulatedFaceColors );
 
 						} else {
 
 							// if the colorIndex field is empty, then the color are applied to each face of the IndexedFaceSet in order
-
-							var triangulatedFaceColors = triangulateFaceData( color, coordIndex );
+							const triangulatedFaceColors = triangulateFaceData( color, coordIndex );
 							colorAttribute = computeAttributeFromFaceData( triangulatedCoordIndex, triangulatedFaceColors );
-
 
 						}
 
@@ -1684,18 +1611,15 @@ THREE.VRMLLoader = ( function () {
 					if ( normalPerVertex === true ) {
 
 						// consider vertex normals
-
 						if ( normalIndex && normalIndex.length > 0 ) {
 
 							// if the normalIndex field is not empty, then it is used to choose normals for each vertex of the IndexedFaceSet.
-
-							var triangulatedNormalIndex = triangulateFaceIndex( normalIndex, ccw );
+							const triangulatedNormalIndex = triangulateFaceIndex( normalIndex, ccw );
 							normalAttribute = computeAttributeFromIndexedData( triangulatedCoordIndex, triangulatedNormalIndex, normal, 3 );
 
 						} else {
 
 							// if the normalIndex field is empty, then the coordIndex field is used to choose normals from the Normal node
-
 							normalAttribute = toNonIndexedAttribute( triangulatedCoordIndex, new THREE.Float32BufferAttribute( normal, 3 ) );
 
 						}
@@ -1703,20 +1627,17 @@ THREE.VRMLLoader = ( function () {
 					} else {
 
 						// consider face normals
-
 						if ( normalIndex && normalIndex.length > 0 ) {
 
 							// if the normalIndex field is not empty, then they are used to choose one normal for each face of the IndexedFaceSet
-
-							var flattenFaceNormals = flattenData( normal, normalIndex );
-							var triangulatedFaceNormals = triangulateFaceData( flattenFaceNormals, coordIndex );
+							const flattenFaceNormals = flattenData( normal, normalIndex );
+							const triangulatedFaceNormals = triangulateFaceData( flattenFaceNormals, coordIndex );
 							normalAttribute = computeAttributeFromFaceData( triangulatedCoordIndex, triangulatedFaceNormals );
 
 						} else {
 
 							// if the normalIndex field is empty, then the normals are applied to each face of the IndexedFaceSet in order
-
-							var triangulatedFaceNormals = triangulateFaceData( normal, coordIndex );
+							const triangulatedFaceNormals = triangulateFaceData( normal, coordIndex );
 							normalAttribute = computeAttributeFromFaceData( triangulatedCoordIndex, triangulatedFaceNormals );
 
 						}
@@ -1726,7 +1647,6 @@ THREE.VRMLLoader = ( function () {
 				} else {
 
 					// if the normal field is NULL, then the loader should automatically generate normals, using creaseAngle to determine if and how normals are smoothed across shared vertices
-
 					normalAttribute = computeNormalAttribute( triangulatedCoordIndex, coord, creaseAngle );
 
 				}
@@ -1734,63 +1654,52 @@ THREE.VRMLLoader = ( function () {
 				if ( texCoord ) {
 
 					// texture coordinates are always defined on vertex level
-
 					if ( texCoordIndex && texCoordIndex.length > 0 ) {
 
 						// if the texCoordIndex field is not empty, then it is used to choose texture coordinates for each vertex of the IndexedFaceSet.
-
-						var triangulatedTexCoordIndex = triangulateFaceIndex( texCoordIndex, ccw );
+						const triangulatedTexCoordIndex = triangulateFaceIndex( texCoordIndex, ccw );
 						uvAttribute = computeAttributeFromIndexedData( triangulatedCoordIndex, triangulatedTexCoordIndex, texCoord, 2 );
-
 
 					} else {
 
 						// if the texCoordIndex field is empty, then the coordIndex array is used to choose texture coordinates from the TextureCoordinate node
-
 						uvAttribute = toNonIndexedAttribute( triangulatedCoordIndex, new THREE.Float32BufferAttribute( texCoord, 2 ) );
 
 					}
 
 				}
 
-				var geometry = new THREE.BufferGeometry();
-				positionAttribute = toNonIndexedAttribute( triangulatedCoordIndex, new THREE.Float32BufferAttribute( coord, 3 ) );
-
+				const geometry = new THREE.BufferGeometry();
+				const positionAttribute = toNonIndexedAttribute( triangulatedCoordIndex, new THREE.Float32BufferAttribute( coord, 3 ) );
 				geometry.setAttribute( 'position', positionAttribute );
-				geometry.setAttribute( 'normal', normalAttribute );
-
-				// optional attributes
+				geometry.setAttribute( 'normal', normalAttribute ); // optional attributes
 
 				if ( colorAttribute ) geometry.setAttribute( 'color', colorAttribute );
-				if ( uvAttribute ) geometry.setAttribute( 'uv', uvAttribute );
-
-				// "solid" influences the material so let's store it for later use
+				if ( uvAttribute ) geometry.setAttribute( 'uv', uvAttribute ); // "solid" influences the material so let's store it for later use
 
 				geometry._solid = solid;
 				geometry._type = 'mesh';
-
 				return geometry;
 
 			}
 
 			function buildIndexedLineSetNode( node ) {
 
-				var color, coord;
-				var colorIndex, coordIndex;
-				var colorPerVertex = true;
+				let color, coord;
+				let colorIndex, coordIndex;
+				let colorPerVertex = true;
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
 						case 'color':
-							var colorNode = fieldValues[ 0 ];
+							const colorNode = fieldValues[ 0 ];
 
 							if ( colorNode !== null ) {
 
@@ -1801,7 +1710,7 @@ THREE.VRMLLoader = ( function () {
 							break;
 
 						case 'coord':
-							var coordNode = fieldValues[ 0 ];
+							const coordNode = fieldValues[ 0 ];
 
 							if ( coordNode !== null ) {
 
@@ -1829,13 +1738,11 @@ THREE.VRMLLoader = ( function () {
 
 					}
 
-				}
+				} // build lines
 
-				// build lines
 
-				var colorAttribute;
-
-				var expandedLineIndex = expandLineIndex( coordIndex ); // create an index for three.js's linesegment primitive
+				let colorAttribute;
+				const expandedLineIndex = expandLineIndex( coordIndex ); // create an index for three.js's linesegment primitive
 
 				if ( color ) {
 
@@ -1844,14 +1751,13 @@ THREE.VRMLLoader = ( function () {
 						if ( colorIndex.length > 0 ) {
 
 							// if the colorIndex field is not empty, then one color is used for each polyline of the IndexedLineSet.
+							const expandedColorIndex = expandLineIndex( colorIndex ); // compute colors for each line segment (rendering primitve)
 
-							var expandedColorIndex = expandLineIndex( colorIndex ); // compute colors for each line segment (rendering primitve)
 							colorAttribute = computeAttributeFromIndexedData( expandedLineIndex, expandedColorIndex, color, 3 ); // compute data on vertex level
 
 						} else {
 
 							// if the colorIndex field is empty, then the colors are applied to each polyline of the IndexedLineSet in order.
-
 							colorAttribute = toNonIndexedAttribute( expandedLineIndex, new THREE.Float32BufferAttribute( color, 3 ) );
 
 						}
@@ -1861,57 +1767,50 @@ THREE.VRMLLoader = ( function () {
 						if ( colorIndex.length > 0 ) {
 
 							// if the colorIndex field is not empty, then colors are applied to each vertex of the IndexedLineSet
+							const flattenLineColors = flattenData( color, colorIndex ); // compute colors for each VRML primitve
 
-							var flattenLineColors = flattenData( color, colorIndex ); // compute colors for each VRML primitve
-							var expandedLineColors = expandLineData( flattenLineColors, coordIndex ); // compute colors for each line segment (rendering primitve)
+							const expandedLineColors = expandLineData( flattenLineColors, coordIndex ); // compute colors for each line segment (rendering primitve)
+
 							colorAttribute = computeAttributeFromLineData( expandedLineIndex, expandedLineColors ); // compute data on vertex level
-
 
 						} else {
 
-							// if the colorIndex field is empty, then the coordIndex field is used to choose colors from the Color node
+							// if the colorIndex field is empty, then the coordIndex field is used to choose colors from the THREE.Color node
+							const expandedLineColors = expandLineData( color, coordIndex ); // compute colors for each line segment (rendering primitve)
 
-							var expandedLineColors = expandLineData( color, coordIndex ); // compute colors for each line segment (rendering primitve)
 							colorAttribute = computeAttributeFromLineData( expandedLineIndex, expandedLineColors ); // compute data on vertex level
 
 						}
 
 					}
 
-				}
+				} //
 
-				//
 
-				var geometry = new THREE.BufferGeometry();
-
-				var positionAttribute = toNonIndexedAttribute( expandedLineIndex, new THREE.Float32BufferAttribute( coord, 3 ) );
+				const geometry = new THREE.BufferGeometry();
+				const positionAttribute = toNonIndexedAttribute( expandedLineIndex, new THREE.Float32BufferAttribute( coord, 3 ) );
 				geometry.setAttribute( 'position', positionAttribute );
-
 				if ( colorAttribute ) geometry.setAttribute( 'color', colorAttribute );
-
 				geometry._type = 'line';
-
 				return geometry;
 
 			}
 
 			function buildPointSetNode( node ) {
 
-				var geometry;
-				var color, coord;
+				let color, coord;
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
 						case 'color':
-							var colorNode = fieldValues[ 0 ];
+							const colorNode = fieldValues[ 0 ];
 
 							if ( colorNode !== null ) {
 
@@ -1922,7 +1821,7 @@ THREE.VRMLLoader = ( function () {
 							break;
 
 						case 'coord':
-							var coordNode = fieldValues[ 0 ];
+							const coordNode = fieldValues[ 0 ];
 
 							if ( coordNode !== null ) {
 
@@ -1932,7 +1831,6 @@ THREE.VRMLLoader = ( function () {
 
 							break;
 
-
 						default:
 							console.warn( 'THREE.VRMLLoader: Unknown field:', fieldName );
 							break;
@@ -1941,28 +1839,24 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new THREE.BufferGeometry();
-
+				const geometry = new THREE.BufferGeometry();
 				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( coord, 3 ) );
 				if ( color ) geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( color, 3 ) );
-
 				geometry._type = 'points';
-
 				return geometry;
 
 			}
 
 			function buildBoxNode( node ) {
 
-				var size = new THREE.Vector3( 2, 2, 2 );
+				const size = new THREE.Vector3( 2, 2, 2 );
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
@@ -1980,23 +1874,23 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new THREE.BoxGeometry( size.x, size.y, size.z );
-
+				const geometry = new THREE.BoxGeometry( size.x, size.y, size.z );
 				return geometry;
 
 			}
 
 			function buildConeNode( node ) {
 
-				var radius = 1, height = 2, openEnded = false;
+				let radius = 1,
+					height = 2,
+					openEnded = false;
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
@@ -2024,23 +1918,22 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new THREE.ConeGeometry( radius, height, 16, 1, openEnded );
-
+				const geometry = new THREE.ConeGeometry( radius, height, 16, 1, openEnded );
 				return geometry;
 
 			}
 
 			function buildCylinderNode( node ) {
 
-				var radius = 1, height = 2;
+				let radius = 1,
+					height = 2;
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
@@ -2072,23 +1965,21 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new THREE.CylinderGeometry( radius, radius, height, 16, 1 );
-
+				const geometry = new THREE.CylinderGeometry( radius, radius, height, 16, 1 );
 				return geometry;
 
 			}
 
 			function buildSphereNode( node ) {
 
-				var radius = 1;
+				let radius = 1;
+				const fields = node.fields;
 
-				var fields = node.fields;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
@@ -2104,41 +1995,38 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var geometry = new THREE.SphereGeometry( radius, 16, 16 );
-
+				const geometry = new THREE.SphereGeometry( radius, 16, 16 );
 				return geometry;
 
 			}
 
 			function buildElevationGridNode( node ) {
 
-				var color;
-				var normal;
-				var texCoord;
-				var height;
+				let color;
+				let normal;
+				let texCoord;
+				let height;
+				let colorPerVertex = true;
+				let normalPerVertex = true;
+				let solid = true;
+				let ccw = true;
+				let creaseAngle = 0;
+				let xDimension = 2;
+				let zDimension = 2;
+				let xSpacing = 1;
+				let zSpacing = 1;
+				const fields = node.fields;
 
-				var colorPerVertex = true;
-				var normalPerVertex = true;
-				var solid = true;
-				var ccw = true;
-				var creaseAngle = 0;
-				var xDimension = 2;
-				var zDimension = 2;
-				var xSpacing = 1;
-				var zSpacing = 1;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				var fields = node.fields;
-
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
 						case 'color':
-							var colorNode = fieldValues[ 0 ];
+							const colorNode = fieldValues[ 0 ];
 
 							if ( colorNode !== null ) {
 
@@ -2149,7 +2037,7 @@ THREE.VRMLLoader = ( function () {
 							break;
 
 						case 'normal':
-							var normalNode = fieldValues[ 0 ];
+							const normalNode = fieldValues[ 0 ];
 
 							if ( normalNode !== null ) {
 
@@ -2160,7 +2048,7 @@ THREE.VRMLLoader = ( function () {
 							break;
 
 						case 'texCoord':
-							var texCoordNode = fieldValues[ 0 ];
+							const texCoordNode = fieldValues[ 0 ];
 
 							if ( texCoordNode !== null ) {
 
@@ -2216,64 +2104,51 @@ THREE.VRMLLoader = ( function () {
 
 					}
 
-				}
+				} // vertex data
 
-				// vertex data
 
-				var vertices = [];
-				var normals = [];
-				var colors = [];
-				var uvs = [];
+				const vertices = [];
+				const normals = [];
+				const colors = [];
+				const uvs = [];
 
-				for ( var i = 0; i < zDimension; i ++ ) {
+				for ( let i = 0; i < zDimension; i ++ ) {
 
-					for ( var j = 0; j < xDimension; j ++ ) {
+					for ( let j = 0; j < xDimension; j ++ ) {
 
 						// compute a row major index
+						const index = i * xDimension + j; // vertices
 
-						var index = ( i * xDimension ) + j;
-
-						// vertices
-
-						var x = xSpacing * i;
-						var y = height[ index ];
-						var z = zSpacing * j;
-
-						vertices.push( x, y, z );
-
-						// colors
+						const x = xSpacing * i;
+						const y = height[ index ];
+						const z = zSpacing * j;
+						vertices.push( x, y, z ); // colors
 
 						if ( color && colorPerVertex === true ) {
 
-							var r = color[ index * 3 + 0 ];
-							var g = color[ index * 3 + 1 ];
-							var b = color[ index * 3 + 2 ];
-
+							const r = color[ index * 3 + 0 ];
+							const g = color[ index * 3 + 1 ];
+							const b = color[ index * 3 + 2 ];
 							colors.push( r, g, b );
 
-						}
+						} // normals
 
-						// normals
 
 						if ( normal && normalPerVertex === true ) {
 
-							var xn = normal[ index * 3 + 0 ];
-							var yn = normal[ index * 3 + 1 ];
-							var zn = normal[ index * 3 + 2 ];
-
+							const xn = normal[ index * 3 + 0 ];
+							const yn = normal[ index * 3 + 1 ];
+							const zn = normal[ index * 3 + 2 ];
 							normals.push( xn, yn, zn );
 
-						}
+						} // uvs
 
-						// uvs
 
 						if ( texCoord ) {
 
-							var s = texCoord[ index * 2 + 0 ];
-							var t = texCoord[ index * 2 + 1 ];
-
+							const s = texCoord[ index * 2 + 0 ];
+							const t = texCoord[ index * 2 + 1 ];
 							uvs.push( s, t );
-
 
 						} else {
 
@@ -2283,24 +2158,20 @@ THREE.VRMLLoader = ( function () {
 
 					}
 
-				}
+				} // indices
 
-				// indices
 
-				var indices = [];
+				const indices = [];
 
-				for ( var i = 0; i < xDimension - 1; i ++ ) {
+				for ( let i = 0; i < xDimension - 1; i ++ ) {
 
-					for ( var j = 0; j < zDimension - 1; j ++ ) {
+					for ( let j = 0; j < zDimension - 1; j ++ ) {
 
 						// from https://tecfa.unige.ch/guides/vrml/vrml97/spec/part1/nodesRef.html#ElevationGrid
-
-						var a = i + j * xDimension;
-						var b = i + ( j + 1 ) * xDimension;
-						var c = ( i + 1 ) + ( j + 1 ) * xDimension;
-						var d = ( i + 1 ) + j * xDimension;
-
-						// faces
+						const a = i + j * xDimension;
+						const b = i + ( j + 1 ) * xDimension;
+						const c = i + 1 + ( j + 1 ) * xDimension;
+						const d = i + 1 + j * xDimension; // faces
 
 						if ( ccw === true ) {
 
@@ -2316,35 +2187,33 @@ THREE.VRMLLoader = ( function () {
 
 					}
 
-				}
+				} //
 
-				//
 
-				var positionAttribute = toNonIndexedAttribute( indices, new THREE.Float32BufferAttribute( vertices, 3 ) );
-				var uvAttribute = toNonIndexedAttribute( indices, new THREE.Float32BufferAttribute( uvs, 2 ) );
-				var colorAttribute;
-				var normalAttribute;
-
-				// color attribute
+				const positionAttribute = toNonIndexedAttribute( indices, new THREE.Float32BufferAttribute( vertices, 3 ) );
+				const uvAttribute = toNonIndexedAttribute( indices, new THREE.Float32BufferAttribute( uvs, 2 ) );
+				let colorAttribute;
+				let normalAttribute; // color attribute
 
 				if ( color ) {
 
 					if ( colorPerVertex === false ) {
 
-						for ( var i = 0; i < xDimension - 1; i ++ ) {
+						for ( let i = 0; i < xDimension - 1; i ++ ) {
 
-							for ( var j = 0; j < zDimension - 1; j ++ ) {
+							for ( let j = 0; j < zDimension - 1; j ++ ) {
 
-								var index = i + j * ( xDimension - 1 );
+								const index = i + j * ( xDimension - 1 );
+								const r = color[ index * 3 + 0 ];
+								const g = color[ index * 3 + 1 ];
+								const b = color[ index * 3 + 2 ]; // one color per quad
 
-								var r = color[ index * 3 + 0 ];
-								var g = color[ index * 3 + 1 ];
-								var b = color[ index * 3 + 2 ];
-
-								// one color per quad
-
-								colors.push( r, g, b ); colors.push( r, g, b ); colors.push( r, g, b );
-								colors.push( r, g, b ); colors.push( r, g, b ); colors.push( r, g, b );
+								colors.push( r, g, b );
+								colors.push( r, g, b );
+								colors.push( r, g, b );
+								colors.push( r, g, b );
+								colors.push( r, g, b );
+								colors.push( r, g, b );
 
 							}
 
@@ -2358,28 +2227,28 @@ THREE.VRMLLoader = ( function () {
 
 					}
 
-				}
+				} // normal attribute
 
-				// normal attribute
 
 				if ( normal ) {
 
 					if ( normalPerVertex === false ) {
 
-						for ( var i = 0; i < xDimension - 1; i ++ ) {
+						for ( let i = 0; i < xDimension - 1; i ++ ) {
 
-							for ( var j = 0; j < zDimension - 1; j ++ ) {
+							for ( let j = 0; j < zDimension - 1; j ++ ) {
 
-								var index = i + j * ( xDimension - 1 );
+								const index = i + j * ( xDimension - 1 );
+								const xn = normal[ index * 3 + 0 ];
+								const yn = normal[ index * 3 + 1 ];
+								const zn = normal[ index * 3 + 2 ]; // one normal per quad
 
-								var xn = normal[ index * 3 + 0 ];
-								var yn = normal[ index * 3 + 1 ];
-								var zn = normal[ index * 3 + 2 ];
-
-								// one normal per quad
-
-								normals.push( xn, yn, zn ); normals.push( xn, yn, zn ); normals.push( xn, yn, zn );
-								normals.push( xn, yn, zn ); normals.push( xn, yn, zn ); normals.push( xn, yn, zn );
+								normals.push( xn, yn, zn );
+								normals.push( xn, yn, zn );
+								normals.push( xn, yn, zn );
+								normals.push( xn, yn, zn );
+								normals.push( xn, yn, zn );
+								normals.push( xn, yn, zn );
 
 							}
 
@@ -2397,46 +2266,39 @@ THREE.VRMLLoader = ( function () {
 
 					normalAttribute = computeNormalAttribute( indices, vertices, creaseAngle );
 
-				}
+				} // build geometry
 
-				// build geometry
 
-				var geometry = new THREE.BufferGeometry();
+				const geometry = new THREE.BufferGeometry();
 				geometry.setAttribute( 'position', positionAttribute );
 				geometry.setAttribute( 'normal', normalAttribute );
 				geometry.setAttribute( 'uv', uvAttribute );
-
-				if ( colorAttribute ) geometry.setAttribute( 'color', colorAttribute );
-
-				// "solid" influences the material so let's store it for later use
+				if ( colorAttribute ) geometry.setAttribute( 'color', colorAttribute ); // "solid" influences the material so let's store it for later use
 
 				geometry._solid = solid;
 				geometry._type = 'mesh';
-
 				return geometry;
 
 			}
 
 			function buildExtrusionNode( node ) {
 
-				var crossSection = [ 1, 1, 1, - 1, - 1, - 1, - 1, 1, 1, 1 ];
-				var spine = [ 0, 0, 0, 0, 1, 0 ];
-				var scale;
-				var orientation;
+				let crossSection = [ 1, 1, 1, - 1, - 1, - 1, - 1, 1, 1, 1 ];
+				let spine = [ 0, 0, 0, 0, 1, 0 ];
+				let scale;
+				let orientation;
+				let beginCap = true;
+				let ccw = true;
+				let creaseAngle = 0;
+				let endCap = true;
+				let solid = true;
+				const fields = node.fields;
 
-				var beginCap = true;
-				var ccw = true;
-				var creaseAngle = 0;
-				var endCap = true;
-				var solid = true;
+				for ( let i = 0, l = fields.length; i < l; i ++ ) {
 
-				var fields = node.fields;
-
-				for ( var i = 0, l = fields.length; i < l; i ++ ) {
-
-					var field = fields[ i ];
-					var fieldName = field.name;
-					var fieldValues = field.values;
+					const field = fields[ i ];
+					const fieldName = field.name;
+					const fieldValues = field.values;
 
 					switch ( fieldName ) {
 
@@ -2478,6 +2340,7 @@ THREE.VRMLLoader = ( function () {
 
 						case 'spine':
 							spine = fieldValues; // only extrusion along the Y-axis are supported so far
+
 							break;
 
 						default:
@@ -2488,73 +2351,59 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var crossSectionClosed = ( crossSection[ 0 ] === crossSection[ crossSection.length - 2 ] && crossSection[ 1 ] === crossSection[ crossSection.length - 1 ] );
+				const crossSectionClosed = crossSection[ 0 ] === crossSection[ crossSection.length - 2 ] && crossSection[ 1 ] === crossSection[ crossSection.length - 1 ]; // vertices
 
-				// vertices
+				const vertices = [];
+				const spineVector = new THREE.Vector3();
+				const scaling = new THREE.Vector3();
+				const axis = new THREE.Vector3();
+				const vertex = new THREE.Vector3();
+				const quaternion = new THREE.Quaternion();
 
-				var vertices = [];
-				var spineVector = new THREE.Vector3();
-				var scaling = new THREE.Vector3();
-
-				var axis = new THREE.Vector3();
-				var vertex = new THREE.Vector3();
-				var quaternion = new THREE.Quaternion();
-
-				for ( var i = 0, j = 0, o = 0, il = spine.length; i < il; i += 3, j += 2, o += 4 ) {
+				for ( let i = 0, j = 0, o = 0, il = spine.length; i < il; i += 3, j += 2, o += 4 ) {
 
 					spineVector.fromArray( spine, i );
-
 					scaling.x = scale ? scale[ j + 0 ] : 1;
 					scaling.y = 1;
 					scaling.z = scale ? scale[ j + 1 ] : 1;
-
 					axis.x = orientation ? orientation[ o + 0 ] : 0;
 					axis.y = orientation ? orientation[ o + 1 ] : 0;
 					axis.z = orientation ? orientation[ o + 2 ] : 1;
-					var angle = orientation ? orientation[ o + 3 ] : 0;
+					const angle = orientation ? orientation[ o + 3 ] : 0;
 
-					for ( var k = 0, kl = crossSection.length; k < kl; k += 2 ) {
+					for ( let k = 0, kl = crossSection.length; k < kl; k += 2 ) {
 
 						vertex.x = crossSection[ k + 0 ];
 						vertex.y = 0;
-						vertex.z = crossSection[ k + 1 ];
+						vertex.z = crossSection[ k + 1 ]; // scale
 
-						// scale
-
-						vertex.multiply( scaling );
-
-						// rotate
+						vertex.multiply( scaling ); // rotate
 
 						quaternion.setFromAxisAngle( axis, angle );
-						vertex.applyQuaternion( quaternion );
-
-						// translate
+						vertex.applyQuaternion( quaternion ); // translate
 
 						vertex.add( spineVector );
-
 						vertices.push( vertex.x, vertex.y, vertex.z );
 
 					}
 
-				}
+				} // indices
 
-				// indices
 
-				var indices = [];
+				const indices = [];
+				const spineCount = spine.length / 3;
+				const crossSectionCount = crossSection.length / 2;
 
-				var spineCount = spine.length / 3;
-				var crossSectionCount = crossSection.length / 2;
+				for ( let i = 0; i < spineCount - 1; i ++ ) {
 
-				for ( var i = 0; i < spineCount - 1; i ++ ) {
+					for ( let j = 0; j < crossSectionCount - 1; j ++ ) {
 
-					for ( var j = 0; j < crossSectionCount - 1; j ++ ) {
+						const a = j + i * crossSectionCount;
+						let b = j + 1 + i * crossSectionCount;
+						const c = j + ( i + 1 ) * crossSectionCount;
+						let d = j + 1 + ( i + 1 ) * crossSectionCount;
 
-						var a = j + i * crossSectionCount;
-						var b = ( j + 1 ) + i * crossSectionCount;
-						var c = j + ( i + 1 ) * crossSectionCount;
-						var d = ( j + 1 ) + ( i + 1 ) * crossSectionCount;
-
-						if ( ( j === crossSectionCount - 2 ) && ( crossSectionClosed === true ) ) {
+						if ( j === crossSectionCount - 2 && crossSectionClosed === true ) {
 
 							b = i * crossSectionCount;
 							d = ( i + 1 ) * crossSectionCount;
@@ -2575,36 +2424,33 @@ THREE.VRMLLoader = ( function () {
 
 					}
 
-				}
+				} // triangulate cap
 
-				// triangulate cap
 
 				if ( beginCap === true || endCap === true ) {
 
-					var contour = [];
+					const contour = [];
 
-					for ( var i = 0, l = crossSection.length; i < l; i += 2 ) {
+					for ( let i = 0, l = crossSection.length; i < l; i += 2 ) {
 
 						contour.push( new THREE.Vector2( crossSection[ i ], crossSection[ i + 1 ] ) );
 
 					}
 
-					var faces = THREE.ShapeUtils.triangulateShape( contour, [] );
-					var capIndices = [];
+					const faces = THREE.ShapeUtils.triangulateShape( contour, [] );
+					const capIndices = [];
 
-					for ( var i = 0, l = faces.length; i < l; i ++ ) {
+					for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
-						var face = faces[ i ];
-
+						const face = faces[ i ];
 						capIndices.push( face[ 0 ], face[ 1 ], face[ 2 ] );
 
-					}
+					} // begin cap
 
-					// begin cap
 
 					if ( beginCap === true ) {
 
-						for ( var i = 0, l = capIndices.length; i < l; i += 3 ) {
+						for ( let i = 0, l = capIndices.length; i < l; i += 3 ) {
 
 							if ( ccw === true ) {
 
@@ -2618,15 +2464,14 @@ THREE.VRMLLoader = ( function () {
 
 						}
 
-					}
+					} // end cap
 
-					// end cap
 
 					if ( endCap === true ) {
 
-						var indexOffset = crossSectionCount * ( spineCount - 1 ); // references to the first vertex of the last cross section
+						const indexOffset = crossSectionCount * ( spineCount - 1 ); // references to the first vertex of the last cross section
 
-						for ( var i = 0, l = capIndices.length; i < l; i += 3 ) {
+						for ( let i = 0, l = capIndices.length; i < l; i += 3 ) {
 
 							if ( ccw === true ) {
 
@@ -2644,44 +2489,36 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				var positionAttribute = toNonIndexedAttribute( indices, new THREE.Float32BufferAttribute( vertices, 3 ) );
-				var normalAttribute = computeNormalAttribute( indices, vertices, creaseAngle );
-
-				var geometry = new THREE.BufferGeometry();
+				const positionAttribute = toNonIndexedAttribute( indices, new THREE.Float32BufferAttribute( vertices, 3 ) );
+				const normalAttribute = computeNormalAttribute( indices, vertices, creaseAngle );
+				const geometry = new THREE.BufferGeometry();
 				geometry.setAttribute( 'position', positionAttribute );
-				geometry.setAttribute( 'normal', normalAttribute );
-				// no uvs yet
-
+				geometry.setAttribute( 'normal', normalAttribute ); // no uvs yet
 				// "solid" influences the material so let's store it for later use
 
 				geometry._solid = solid;
 				geometry._type = 'mesh';
-
 				return geometry;
 
-			}
+			} // helper functions
 
-			// helper functions
 
 			function resolveUSE( identifier ) {
 
-				var node = nodeMap[ identifier ];
-				var build = getNode( node );
-
-				// because the same 3D objects can have different transformations, it's necessary to clone them.
+				const node = nodeMap[ identifier ];
+				const build = getNode( node ); // because the same 3D objects can have different transformations, it's necessary to clone them.
 				// materials can be influenced by the geometry (e.g. vertex normals). cloning is necessary to avoid
 				// any side effects
 
-				return ( build.isObject3D || build.isMaterial ) ? build.clone() : build;
+				return build.isObject3D || build.isMaterial ? build.clone() : build;
 
 			}
 
 			function parseFieldChildren( children, owner ) {
 
-				for ( var i = 0, l = children.length; i < l; i ++ ) {
+				for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-					var object = getNode( children[ i ] );
-
+					const object = getNode( children[ i ] );
 					if ( object instanceof THREE.Object3D ) owner.add( object );
 
 				}
@@ -2690,22 +2527,17 @@ THREE.VRMLLoader = ( function () {
 
 			function triangulateFaceIndex( index, ccw ) {
 
-				var indices = [];
-
-				// since face defintions can have more than three vertices, it's necessary to
+				const indices = []; // since face defintions can have more than three vertices, it's necessary to
 				// perform a simple triangulation
 
-				var start = 0;
+				let start = 0;
 
-				for ( var i = 0, l = index.length; i < l; i ++ ) {
+				for ( let i = 0, l = index.length; i < l; i ++ ) {
 
-					var i1 = index[ start ];
-					var i2 = index[ i + ( ccw ? 1 : 2 ) ];
-					var i3 = index[ i + ( ccw ? 2 : 1 ) ];
-
-					indices.push( i1, i2, i3 );
-
-					// an index of -1 indicates that the current face has ended and the next one begins
+					const i1 = index[ start ];
+					const i2 = index[ i + ( ccw ? 1 : 2 ) ];
+					const i3 = index[ i + ( ccw ? 2 : 1 ) ];
+					indices.push( i1, i2, i3 ); // an index of -1 indicates that the current face has ended and the next one begins
 
 					if ( index[ i + 3 ] === - 1 || i + 3 >= l ) {
 
@@ -2722,21 +2554,16 @@ THREE.VRMLLoader = ( function () {
 
 			function triangulateFaceData( data, index ) {
 
-				var triangulatedData = [];
+				const triangulatedData = [];
+				let start = 0;
 
-				var start = 0;
+				for ( let i = 0, l = index.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = index.length; i < l; i ++ ) {
-
-					var stride = start * 3;
-
-					var x = data[ stride ];
-					var y = data[ stride + 1 ];
-					var z = data[ stride + 2 ];
-
-					triangulatedData.push( x, y, z );
-
-					// an index of -1 indicates that the current face has ended and the next one begins
+					const stride = start * 3;
+					const x = data[ stride ];
+					const y = data[ stride + 1 ];
+					const z = data[ stride + 2 ];
+					triangulatedData.push( x, y, z ); // an index of -1 indicates that the current face has ended and the next one begins
 
 					if ( index[ i + 3 ] === - 1 || i + 3 >= l ) {
 
@@ -2753,18 +2580,15 @@ THREE.VRMLLoader = ( function () {
 
 			function flattenData( data, index ) {
 
-				var flattenData = [];
+				const flattenData = [];
 
-				for ( var i = 0, l = index.length; i < l; i ++ ) {
+				for ( let i = 0, l = index.length; i < l; i ++ ) {
 
-					var i1 = index[ i ];
-
-					var stride = i1 * 3;
-
-					var x = data[ stride ];
-					var y = data[ stride + 1 ];
-					var z = data[ stride + 2 ];
-
+					const i1 = index[ i ];
+					const stride = i1 * 3;
+					const x = data[ stride ];
+					const y = data[ stride + 1 ];
+					const z = data[ stride + 2 ];
 					flattenData.push( x, y, z );
 
 				}
@@ -2775,16 +2599,13 @@ THREE.VRMLLoader = ( function () {
 
 			function expandLineIndex( index ) {
 
-				var indices = [];
+				const indices = [];
 
-				for ( var i = 0, l = index.length; i < l; i ++ ) {
+				for ( let i = 0, l = index.length; i < l; i ++ ) {
 
-					var i1 = index[ i ];
-					var i2 = index[ i + 1 ];
-
-					indices.push( i1, i2 );
-
-					// an index of -1 indicates that the current line has ended and the next one begins
+					const i1 = index[ i ];
+					const i2 = index[ i + 1 ];
+					indices.push( i1, i2 ); // an index of -1 indicates that the current line has ended and the next one begins
 
 					if ( index[ i + 2 ] === - 1 || i + 2 >= l ) {
 
@@ -2800,21 +2621,16 @@ THREE.VRMLLoader = ( function () {
 
 			function expandLineData( data, index ) {
 
-				var triangulatedData = [];
+				const triangulatedData = [];
+				let start = 0;
 
-				var start = 0;
+				for ( let i = 0, l = index.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = index.length; i < l; i ++ ) {
-
-					var stride = start * 3;
-
-					var x = data[ stride ];
-					var y = data[ stride + 1 ];
-					var z = data[ stride + 2 ];
-
-					triangulatedData.push( x, y, z );
-
-					// an index of -1 indicates that the current line has ended and the next one begins
+					const stride = start * 3;
+					const x = data[ stride ];
+					const y = data[ stride + 1 ];
+					const z = data[ stride + 2 ];
+					triangulatedData.push( x, y, z ); // an index of -1 indicates that the current line has ended and the next one begins
 
 					if ( index[ i + 2 ] === - 1 || i + 2 >= l ) {
 
@@ -2829,32 +2645,28 @@ THREE.VRMLLoader = ( function () {
 
 			}
 
-			var vA = new THREE.Vector3();
-			var vB = new THREE.Vector3();
-			var vC = new THREE.Vector3();
-
-			var uvA = new THREE.Vector2();
-			var uvB = new THREE.Vector2();
-			var uvC = new THREE.Vector2();
+			const vA = new THREE.Vector3();
+			const vB = new THREE.Vector3();
+			const vC = new THREE.Vector3();
+			const uvA = new THREE.Vector2();
+			const uvB = new THREE.Vector2();
+			const uvC = new THREE.Vector2();
 
 			function computeAttributeFromIndexedData( coordIndex, index, data, itemSize ) {
 
-				var array = [];
+				const array = []; // we use the coordIndex.length as delimiter since normalIndex must contain at least as many indices
 
-				// we use the coordIndex.length as delimiter since normalIndex must contain at least as many indices
+				for ( let i = 0, l = coordIndex.length; i < l; i += 3 ) {
 
-				for ( var i = 0, l = coordIndex.length; i < l; i += 3 ) {
-
-					var a = index[ i ];
-					var b = index[ i + 1 ];
-					var c = index[ i + 2 ];
+					const a = index[ i ];
+					const b = index[ i + 1 ];
+					const c = index[ i + 2 ];
 
 					if ( itemSize === 2 ) {
 
 						uvA.fromArray( data, a * itemSize );
 						uvB.fromArray( data, b * itemSize );
 						uvC.fromArray( data, c * itemSize );
-
 						array.push( uvA.x, uvA.y );
 						array.push( uvB.x, uvB.y );
 						array.push( uvC.x, uvC.y );
@@ -2864,7 +2676,6 @@ THREE.VRMLLoader = ( function () {
 						vA.fromArray( data, a * itemSize );
 						vB.fromArray( data, b * itemSize );
 						vC.fromArray( data, c * itemSize );
-
 						array.push( vA.x, vA.y, vA.z );
 						array.push( vB.x, vB.y, vB.z );
 						array.push( vC.x, vC.y, vC.z );
@@ -2879,12 +2690,11 @@ THREE.VRMLLoader = ( function () {
 
 			function computeAttributeFromFaceData( index, faceData ) {
 
-				var array = [];
+				const array = [];
 
-				for ( var i = 0, j = 0, l = index.length; i < l; i += 3, j ++ ) {
+				for ( let i = 0, j = 0, l = index.length; i < l; i += 3, j ++ ) {
 
 					vA.fromArray( faceData, j * 3 );
-
 					array.push( vA.x, vA.y, vA.z );
 					array.push( vA.x, vA.y, vA.z );
 					array.push( vA.x, vA.y, vA.z );
@@ -2897,12 +2707,11 @@ THREE.VRMLLoader = ( function () {
 
 			function computeAttributeFromLineData( index, lineData ) {
 
-				var array = [];
+				const array = [];
 
-				for ( var i = 0, j = 0, l = index.length; i < l; i += 2, j ++ ) {
+				for ( let i = 0, j = 0, l = index.length; i < l; i += 2, j ++ ) {
 
 					vA.fromArray( lineData, j * 3 );
-
 					array.push( vA.x, vA.y, vA.z );
 					array.push( vA.x, vA.y, vA.z );
 
@@ -2914,18 +2723,17 @@ THREE.VRMLLoader = ( function () {
 
 			function toNonIndexedAttribute( indices, attribute ) {
 
-				var array = attribute.array;
-				var itemSize = attribute.itemSize;
+				const array = attribute.array;
+				const itemSize = attribute.itemSize;
+				const array2 = new array.constructor( indices.length * itemSize );
+				let index = 0,
+					index2 = 0;
 
-				var array2 = new array.constructor( indices.length * itemSize );
-
-				var index = 0, index2 = 0;
-
-				for ( var i = 0, l = indices.length; i < l; i ++ ) {
+				for ( let i = 0, l = indices.length; i < l; i ++ ) {
 
 					index = indices[ i ] * itemSize;
 
-					for ( var j = 0; j < itemSize; j ++ ) {
+					for ( let j = 0; j < itemSize; j ++ ) {
 
 						array2[ index2 ++ ] = array[ index ++ ];
 
@@ -2937,64 +2745,50 @@ THREE.VRMLLoader = ( function () {
 
 			}
 
-			var ab = new THREE.Vector3();
-			var cb = new THREE.Vector3();
+			const ab = new THREE.Vector3();
+			const cb = new THREE.Vector3();
 
 			function computeNormalAttribute( index, coord, creaseAngle ) {
 
-				var faces = [];
-				var vertexNormals = {};
+				const faces = [];
+				const vertexNormals = {}; // prepare face and raw vertex normals
 
-				// prepare face and raw vertex normals
+				for ( let i = 0, l = index.length; i < l; i += 3 ) {
 
-				for ( var i = 0, l = index.length; i < l; i += 3 ) {
-
-					var a = index[ i ];
-					var b = index[ i + 1 ];
-					var c = index[ i + 2 ];
-
-					var face = new Face( a, b, c );
-
+					const a = index[ i ];
+					const b = index[ i + 1 ];
+					const c = index[ i + 2 ];
+					const face = new Face( a, b, c );
 					vA.fromArray( coord, a * 3 );
 					vB.fromArray( coord, b * 3 );
 					vC.fromArray( coord, c * 3 );
-
 					cb.subVectors( vC, vB );
 					ab.subVectors( vA, vB );
 					cb.cross( ab );
-
 					cb.normalize();
-
 					face.normal.copy( cb );
-
 					if ( vertexNormals[ a ] === undefined ) vertexNormals[ a ] = [];
 					if ( vertexNormals[ b ] === undefined ) vertexNormals[ b ] = [];
 					if ( vertexNormals[ c ] === undefined ) vertexNormals[ c ] = [];
-
 					vertexNormals[ a ].push( face.normal );
 					vertexNormals[ b ].push( face.normal );
 					vertexNormals[ c ].push( face.normal );
-
 					faces.push( face );
 
-				}
+				} // compute vertex normals and build final geometry
 
-				// compute vertex normals and build final geometry
 
-				var normals = [];
+				const normals = [];
 
-				for ( var i = 0, l = faces.length; i < l; i ++ ) {
+				for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
-					var face = faces[ i ];
-
-					var nA = weightedNormal( vertexNormals[ face.a ], face.normal, creaseAngle );
-					var nB = weightedNormal( vertexNormals[ face.b ], face.normal, creaseAngle );
-					var nC = weightedNormal( vertexNormals[ face.c ], face.normal, creaseAngle );
-
+					const face = faces[ i ];
+					const nA = weightedNormal( vertexNormals[ face.a ], face.normal, creaseAngle );
+					const nB = weightedNormal( vertexNormals[ face.b ], face.normal, creaseAngle );
+					const nC = weightedNormal( vertexNormals[ face.c ], face.normal, creaseAngle );
 					vA.fromArray( coord, face.a * 3 );
 					vB.fromArray( coord, face.b * 3 );
 					vC.fromArray( coord, face.c * 3 );
-
 					normals.push( nA.x, nA.y, nA.z );
 					normals.push( nB.x, nB.y, nB.z );
 					normals.push( nC.x, nC.y, nC.z );
@@ -3007,7 +2801,7 @@ THREE.VRMLLoader = ( function () {
 
 			function weightedNormal( normals, vector, creaseAngle ) {
 
-				var normal = new THREE.Vector3();
+				const normal = new THREE.Vector3();
 
 				if ( creaseAngle === 0 ) {
 
@@ -3015,7 +2809,7 @@ THREE.VRMLLoader = ( function () {
 
 				} else {
 
-					for ( var i = 0, l = normals.length; i < l; i ++ ) {
+					for ( let i = 0, l = normals.length; i < l; i ++ ) {
 
 						if ( normals[ i ].angleTo( vector ) < creaseAngle ) {
 
@@ -3033,9 +2827,9 @@ THREE.VRMLLoader = ( function () {
 
 			function toColorArray( colors ) {
 
-				var array = [];
+				const array = [];
 
-				for ( var i = 0, l = colors.length; i < l; i += 3 ) {
+				for ( let i = 0, l = colors.length; i < l; i += 3 ) {
 
 					array.push( new THREE.Color( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] ) );
 
@@ -3044,81 +2838,73 @@ THREE.VRMLLoader = ( function () {
 				return array;
 
 			}
-
 			/**
-			 * Vertically paints the faces interpolating between the
-			 * specified colors at the specified angels. This is used for the Background
-			 * node, but could be applied to other nodes with multiple faces as well.
-			 *
-			 * When used with the Background node, default is directionIsDown is true if
-			 * interpolating the skyColor down from the Zenith. When interpolationg up from
-			 * the Nadir i.e. interpolating the groundColor, the directionIsDown is false.
-			 *
-			 * The first angle is never specified, it is the Zenith (0 rad). Angles are specified
-			 * in radians. The geometry is thought a sphere, but could be anything. The color interpolation
-			 * is linear along the Y axis in any case.
-			 *
-			 * You must specify one more color than you have angles at the beginning of the colors array.
-			 * This is the color of the Zenith (the top of the shape).
-			 *
-			 * @param {BufferGeometry} geometry
-			 * @param {number} radius
-			 * @param {array} angles
-			 * @param {array} colors
-			 * @param {boolean} topDown - Whether to work top down or bottom up.
-			 */
+     * Vertically paints the faces interpolating between the
+     * specified colors at the specified angels. This is used for the Background
+     * node, but could be applied to other nodes with multiple faces as well.
+     *
+     * When used with the Background node, default is directionIsDown is true if
+     * interpolating the skyColor down from the Zenith. When interpolationg up from
+     * the Nadir i.e. interpolating the groundColor, the directionIsDown is false.
+     *
+     * The first angle is never specified, it is the Zenith (0 rad). Angles are specified
+     * in radians. The geometry is thought a sphere, but could be anything. The color interpolation
+     * is linear along the Y axis in any case.
+     *
+     * You must specify one more color than you have angles at the beginning of the colors array.
+     * This is the color of the Zenith (the top of the shape).
+     *
+     * @param {BufferGeometry} geometry
+     * @param {number} radius
+     * @param {array} angles
+     * @param {array} colors
+     * @param {boolean} topDown - Whether to work top down or bottom up.
+     */
+
+
 			function paintFaces( geometry, radius, angles, colors, topDown ) {
 
 				// compute threshold values
+				const thresholds = [];
+				const startAngle = topDown === true ? 0 : Math.PI;
 
-				var thresholds = [];
-				var startAngle = ( topDown === true ) ? 0 : Math.PI;
+				for ( let i = 0, l = colors.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = colors.length; i < l; i ++ ) {
-
-					var angle = ( i === 0 ) ? 0 : angles[ i - 1 ];
-					angle = ( topDown === true ) ? angle : ( startAngle - angle );
-
-					var point = new THREE.Vector3();
+					let angle = i === 0 ? 0 : angles[ i - 1 ];
+					angle = topDown === true ? angle : startAngle - angle;
+					const point = new THREE.Vector3();
 					point.setFromSphericalCoords( radius, angle, 0 );
-
 					thresholds.push( point );
 
-				}
+				} // generate vertex colors
 
-				// generate vertex colors
 
-				var indices = geometry.index;
-				var positionAttribute = geometry.attributes.position;
-				var colorAttribute = new THREE.BufferAttribute( new Float32Array( geometry.attributes.position.count * 3 ), 3 );
+				const indices = geometry.index;
+				const positionAttribute = geometry.attributes.position;
+				const colorAttribute = new THREE.BufferAttribute( new Float32Array( geometry.attributes.position.count * 3 ), 3 );
+				const position = new THREE.Vector3();
+				const color = new THREE.Color();
 
-				var position = new THREE.Vector3();
-				var color = new THREE.Color();
+				for ( let i = 0; i < indices.count; i ++ ) {
 
-				for ( var i = 0; i < indices.count; i ++ ) {
-
-					var index = indices.getX( i );
+					const index = indices.getX( i );
 					position.fromBufferAttribute( positionAttribute, index );
+					let thresholdIndexA, thresholdIndexB;
+					let t = 1;
 
-					var thresholdIndexA, thresholdIndexB;
-					var t = 1;
-
-					for ( var j = 1; j < thresholds.length; j ++ ) {
+					for ( let j = 1; j < thresholds.length; j ++ ) {
 
 						thresholdIndexA = j - 1;
 						thresholdIndexB = j;
-
-						var thresholdA = thresholds[ thresholdIndexA ];
-						var thresholdB = thresholds[ thresholdIndexB ];
+						const thresholdA = thresholds[ thresholdIndexA ];
+						const thresholdB = thresholds[ thresholdIndexB ];
 
 						if ( topDown === true ) {
 
 							// interpolation for sky color
-
 							if ( position.y <= thresholdA.y && position.y > thresholdB.y ) {
 
 								t = Math.abs( thresholdA.y - position.y ) / Math.abs( thresholdA.y - thresholdB.y );
-
 								break;
 
 							}
@@ -3126,11 +2912,9 @@ THREE.VRMLLoader = ( function () {
 						} else {
 
 							// interpolation for ground color
-
 							if ( position.y >= thresholdA.y && position.y < thresholdB.y ) {
 
 								t = Math.abs( thresholdA.y - position.y ) / Math.abs( thresholdA.y - thresholdB.y );
-
 								break;
 
 							}
@@ -3139,64 +2923,52 @@ THREE.VRMLLoader = ( function () {
 
 					}
 
-					var colorA = colors[ thresholdIndexA ];
-					var colorB = colors[ thresholdIndexB ];
-
+					const colorA = colors[ thresholdIndexA ];
+					const colorB = colors[ thresholdIndexB ];
 					color.copy( colorA ).lerp( colorB, t );
-
 					colorAttribute.setXYZ( index, color.r, color.g, color.b );
 
 				}
 
 				geometry.setAttribute( 'color', colorAttribute );
 
-			}
+			} //
 
-			//
 
-			var textureLoader = new THREE.TextureLoader( this.manager );
-			textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
-
-			// check version (only 2.0 is supported)
+			const textureLoader = new THREE.TextureLoader( this.manager );
+			textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin ); // check version (only 2.0 is supported)
 
 			if ( data.indexOf( '#VRML V2.0' ) === - 1 ) {
 
 				throw Error( 'THREE.VRMLLexer: Version of VRML asset not supported.' );
 
-			}
+			} // create JSON representing the tree structure of the VRML asset
 
-			// create JSON representing the tree structure of the VRML asset
 
-			var tree = generateVRMLTree( data );
+			const tree = generateVRMLTree( data ); // parse the tree structure to a three.js scene
 
-			// parse the tree structure to a three.js scene
-
-			var scene = parseTree( tree );
-
+			const scene = parseTree( tree );
 			return scene;
 
 		}
 
-	} );
-
-	function VRMLLexer( tokens ) {
-
-		this.lexer = new chevrotain.Lexer( tokens ); // eslint-disable-line no-undef
-
 	}
 
-	VRMLLexer.prototype = {
+	class VRMLLexer {
 
-		constructor: VRMLLexer,
+		constructor( tokens ) {
 
-		lex: function ( inputText ) {
+			this.lexer = new chevrotain.Lexer( tokens ); // eslint-disable-line no-undef
 
-			var lexingResult = this.lexer.tokenize( inputText );
+		}
+
+		lex( inputText ) {
+
+			const lexingResult = this.lexer.tokenize( inputText );
 
 			if ( lexingResult.errors.length > 0 ) {
 
 				console.error( lexingResult.errors );
-
 				throw Error( 'THREE.VRMLLexer: Lexing errors detected.' );
 
 			}
@@ -3205,256 +2977,263 @@ THREE.VRMLLoader = ( function () {
 
 		}
 
-	};
+	}
 
-	function VRMLParser( tokenVocabulary ) {
+	const CstParser = chevrotain.CstParser; // eslint-disable-line no-undef
 
-		chevrotain.Parser.call( this, tokenVocabulary ); // eslint-disable-line no-undef
+	class VRMLParser extends CstParser {
 
-		var $ = this;
+		constructor( tokenVocabulary ) {
 
-		var Version = tokenVocabulary[ 'Version' ];
-		var LCurly = tokenVocabulary[ 'LCurly' ];
-		var RCurly = tokenVocabulary[ 'RCurly' ];
-		var LSquare = tokenVocabulary[ 'LSquare' ];
-		var RSquare = tokenVocabulary[ 'RSquare' ];
-		var Identifier = tokenVocabulary[ 'Identifier' ];
-		var RouteIdentifier = tokenVocabulary[ 'RouteIdentifier' ];
-		var StringLiteral = tokenVocabulary[ 'StringLiteral' ];
-		var HexLiteral = tokenVocabulary[ 'HexLiteral' ];
-		var NumberLiteral = tokenVocabulary[ 'NumberLiteral' ];
-		var TrueLiteral = tokenVocabulary[ 'TrueLiteral' ];
-		var FalseLiteral = tokenVocabulary[ 'FalseLiteral' ];
-		var NullLiteral = tokenVocabulary[ 'NullLiteral' ];
-		var DEF = tokenVocabulary[ 'DEF' ];
-		var USE = tokenVocabulary[ 'USE' ];
-		var ROUTE = tokenVocabulary[ 'ROUTE' ];
-		var TO = tokenVocabulary[ 'TO' ];
-		var NodeName = tokenVocabulary[ 'NodeName' ];
+			super( tokenVocabulary );
+			const $ = this;
+			const Version = tokenVocabulary[ 'Version' ];
+			const LCurly = tokenVocabulary[ 'LCurly' ];
+			const RCurly = tokenVocabulary[ 'RCurly' ];
+			const LSquare = tokenVocabulary[ 'LSquare' ];
+			const RSquare = tokenVocabulary[ 'RSquare' ];
+			const Identifier = tokenVocabulary[ 'Identifier' ];
+			const RouteIdentifier = tokenVocabulary[ 'RouteIdentifier' ];
+			const StringLiteral = tokenVocabulary[ 'StringLiteral' ];
+			const HexLiteral = tokenVocabulary[ 'HexLiteral' ];
+			const NumberLiteral = tokenVocabulary[ 'NumberLiteral' ];
+			const TrueLiteral = tokenVocabulary[ 'TrueLiteral' ];
+			const FalseLiteral = tokenVocabulary[ 'FalseLiteral' ];
+			const NullLiteral = tokenVocabulary[ 'NullLiteral' ];
+			const DEF = tokenVocabulary[ 'DEF' ];
+			const USE = tokenVocabulary[ 'USE' ];
+			const ROUTE = tokenVocabulary[ 'ROUTE' ];
+			const TO = tokenVocabulary[ 'TO' ];
+			const NodeName = tokenVocabulary[ 'NodeName' ];
+			$.RULE( 'vrml', function () {
 
-		$.RULE( 'vrml', function () {
+				$.SUBRULE( $.version );
+				$.AT_LEAST_ONE( function () {
 
-			$.SUBRULE( $.version );
-			$.AT_LEAST_ONE( function () {
+					$.SUBRULE( $.node );
 
-				$.SUBRULE( $.node );
+				} );
+				$.MANY( function () {
 
-			} );
-			$.MANY( function () {
+					$.SUBRULE( $.route );
 
-				$.SUBRULE( $.route );
-
-			} );
-
-		} );
-
-		$.RULE( 'version', function () {
-
-			$.CONSUME( Version );
-
-		} );
-
-		$.RULE( 'node', function () {
-
-			$.OPTION( function () {
-
-				$.SUBRULE( $.def );
+				} );
 
 			} );
+			$.RULE( 'version', function () {
 
-			$.CONSUME( NodeName );
-			$.CONSUME( LCurly );
-			$.MANY( function () {
-
-				$.SUBRULE( $.field );
+				$.CONSUME( Version );
 
 			} );
-			$.CONSUME( RCurly );
+			$.RULE( 'node', function () {
 
-		} );
+				$.OPTION( function () {
 
-		$.RULE( 'field', function () {
+					$.SUBRULE( $.def );
 
-			$.CONSUME( Identifier );
+				} );
+				$.CONSUME( NodeName );
+				$.CONSUME( LCurly );
+				$.MANY( function () {
 
-			$.OR2( [
-				{ ALT: function () {
+					$.SUBRULE( $.field );
 
-					$.SUBRULE( $.singleFieldValue );
-
-				} },
-				{ ALT: function () {
-
-					$.SUBRULE( $.multiFieldValue );
-
-				} }
-			] );
-
-		} );
-
-		$.RULE( 'def', function () {
-
-			$.CONSUME( DEF );
-			$.OR( [
-				{ ALT: function () {
-
-					$.CONSUME( Identifier );
-
-				} },
-				{ ALT: function () {
-
-					$.CONSUME( NodeName );
-
-				} }
-			] );
-
-		} );
-
-		$.RULE( 'use', function () {
-
-			$.CONSUME( USE );
-			$.OR( [
-				{ ALT: function () {
-
-					$.CONSUME( Identifier );
-
-				} },
-				{ ALT: function () {
-
-					$.CONSUME( NodeName );
-
-				} }
-			] );
-
-		} );
-
-		$.RULE( 'singleFieldValue', function () {
-
-			$.AT_LEAST_ONE( function () {
-
-				$.OR( [
-					{ ALT: function () {
-
-						$.SUBRULE( $.node );
-
-					} },
-					{ ALT: function () {
-
-						$.SUBRULE( $.use );
-
-					} },
-					{ ALT: function () {
-
-						$.CONSUME( StringLiteral );
-
-					} },
-					{ ALT: function () {
-
-						$.CONSUME( HexLiteral );
-
-					} },
-					{ ALT: function () {
-
-						$.CONSUME( NumberLiteral );
-
-					} },
-					{ ALT: function () {
-
-						$.CONSUME( TrueLiteral );
-
-					} },
-					{ ALT: function () {
-
-						$.CONSUME( FalseLiteral );
-
-					} },
-					{ ALT: function () {
-
-						$.CONSUME( NullLiteral );
-
-					} }
-				] );
-
+				} );
+				$.CONSUME( RCurly );
 
 			} );
+			$.RULE( 'field', function () {
 
-		} );
+				$.CONSUME( Identifier );
+				$.OR2( [ {
+					ALT: function () {
 
-		$.RULE( 'multiFieldValue', function () {
+						$.SUBRULE( $.singleFieldValue );
 
-			$.CONSUME( LSquare );
-			$.MANY( function () {
+					}
+				}, {
+					ALT: function () {
 
-				$.OR( [
-					{ ALT: function () {
+						$.SUBRULE( $.multiFieldValue );
 
-						$.SUBRULE( $.node );
-
-					} },
-					{ ALT: function () {
-
-						$.SUBRULE( $.use );
-
-					} },
-					{ ALT: function () {
-
-						$.CONSUME( StringLiteral );
-
-					} },
-					{ ALT: function () {
-
-						$.CONSUME( HexLiteral );
-
-					} },
-					{ ALT: function () {
-
-						$.CONSUME( NumberLiteral );
-
-					} },
-					{ ALT: function () {
-
-						$.CONSUME( NullLiteral );
-
-					} }
-				] );
+					}
+				} ] );
 
 			} );
-			$.CONSUME( RSquare );
+			$.RULE( 'def', function () {
 
-		} );
+				$.CONSUME( DEF );
+				$.OR( [ {
+					ALT: function () {
 
-		$.RULE( 'route', function () {
+						$.CONSUME( Identifier );
 
-			$.CONSUME( ROUTE );
-			$.CONSUME( RouteIdentifier );
-			$.CONSUME( TO );
-			$.CONSUME2( RouteIdentifier );
+					}
+				}, {
+					ALT: function () {
 
-		} );
+						$.CONSUME( NodeName );
 
-		this.performSelfAnalysis();
+					}
+				} ] );
+
+			} );
+			$.RULE( 'use', function () {
+
+				$.CONSUME( USE );
+				$.OR( [ {
+					ALT: function () {
+
+						$.CONSUME( Identifier );
+
+					}
+				}, {
+					ALT: function () {
+
+						$.CONSUME( NodeName );
+
+					}
+				} ] );
+
+			} );
+			$.RULE( 'singleFieldValue', function () {
+
+				$.AT_LEAST_ONE( function () {
+
+					$.OR( [ {
+						ALT: function () {
+
+							$.SUBRULE( $.node );
+
+						}
+					}, {
+						ALT: function () {
+
+							$.SUBRULE( $.use );
+
+						}
+					}, {
+						ALT: function () {
+
+							$.CONSUME( StringLiteral );
+
+						}
+					}, {
+						ALT: function () {
+
+							$.CONSUME( HexLiteral );
+
+						}
+					}, {
+						ALT: function () {
+
+							$.CONSUME( NumberLiteral );
+
+						}
+					}, {
+						ALT: function () {
+
+							$.CONSUME( TrueLiteral );
+
+						}
+					}, {
+						ALT: function () {
+
+							$.CONSUME( FalseLiteral );
+
+						}
+					}, {
+						ALT: function () {
+
+							$.CONSUME( NullLiteral );
+
+						}
+					} ] );
+
+				} );
+
+			} );
+			$.RULE( 'multiFieldValue', function () {
+
+				$.CONSUME( LSquare );
+				$.MANY( function () {
+
+					$.OR( [ {
+						ALT: function () {
+
+							$.SUBRULE( $.node );
+
+						}
+					}, {
+						ALT: function () {
+
+							$.SUBRULE( $.use );
+
+						}
+					}, {
+						ALT: function () {
+
+							$.CONSUME( StringLiteral );
+
+						}
+					}, {
+						ALT: function () {
+
+							$.CONSUME( HexLiteral );
+
+						}
+					}, {
+						ALT: function () {
+
+							$.CONSUME( NumberLiteral );
+
+						}
+					}, {
+						ALT: function () {
+
+							$.CONSUME( NullLiteral );
+
+						}
+					} ] );
+
+				} );
+				$.CONSUME( RSquare );
+
+			} );
+			$.RULE( 'route', function () {
+
+				$.CONSUME( ROUTE );
+				$.CONSUME( RouteIdentifier );
+				$.CONSUME( TO );
+				$.CONSUME2( RouteIdentifier );
+
+			} );
+			this.performSelfAnalysis();
+
+		}
 
 	}
 
-	VRMLParser.prototype = Object.create( chevrotain.Parser.prototype ); // eslint-disable-line no-undef
-	VRMLParser.prototype.constructor = VRMLParser;
+	class Face {
 
-	function Face( a, b, c ) {
+		constructor( a, b, c ) {
 
-		this.a = a;
-		this.b = b;
-		this.c = c;
-		this.normal = new THREE.Vector3();
+			this.a = a;
+			this.b = b;
+			this.c = c;
+			this.normal = new THREE.Vector3();
+
+		}
 
 	}
 
-	var TEXTURE_TYPE = {
+	const TEXTURE_TYPE = {
 		INTENSITY: 1,
 		INTENSITY_ALPHA: 2,
 		RGB: 3,
 		RGBA: 4
 	};
 
-	return VRMLLoader;
+	THREE.VRMLLoader = VRMLLoader;
 
 } )();
