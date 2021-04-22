@@ -46,7 +46,7 @@ class VR {
 				group.add( controller1 );
 
 				const controller2 = renderer.xr.getController( 1 );
-				controller2.addEventListener( 'selectstart', onSelect );
+				controller2.addEventListener( 'select', onSelect );
 				group.add( controller2 );
 
 				const geometry = new THREE.BufferGeometry();
@@ -116,7 +116,7 @@ class VR {
 				const object = intersection.object;
 				const uv = intersection.uv;
 
-				object.material.map.click( uv.x, 1 - uv.y );
+				object.material.map.dispatchEvent( 'click', uv.x, 1 - uv.y );
 
 			}
 

@@ -15,9 +15,23 @@
 			import { Reflector } from './jsm/objects/Reflector.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
 
-			let camera, scene, renderer;
+			import { HTMLMesh } from '../editor/js/libs/three.html.js';
+			import { InteractionManager } from './jsm/webxr/InteractionManager.js';
+			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			let camera, scene, renderer;
 			let reflector;
+
+			const parameters = {
+				radius: 0.4,
+				tube: 0.15,
+				tubularSegments: 150,
+				radialSegments: 20,
+				p: 2,
+				q: 3
+			};
 
 			init();
 			animate();
@@ -34,9 +48,12 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 1.6, 2 );
 
-				const torusGeometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );
+				//
+
+				const torusGeometry = new THREE.TorusKnotGeometry( ...Object.values( parameters ) );
 				const torusMaterial = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2, envMap: background } );
 				const torus = new THREE.Mesh( torusGeometry, torusMaterial );
+				torus.name = 'torus';
 				torus.position.y = 0.75;
 				torus.position.z = - 2;
 				torus.castShadow = true;
@@ -118,11 +135,66 @@
 				renderer.xr.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
-				document.body.appendChild( VRButton.createButton( renderer ) );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize );
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				const controller1 = renderer.xr.getController( 0 );
+				scene.add( controller1 );
+
+				const controller2 = renderer.xr.getController( 1 );
+				scene.add( controller2 );
+
+				const geometry = new THREE.BufferGeometry();
+				geometry.setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 5 ) ] );
+
+				controller1.add( new THREE.Line( geometry ) );
+				controller2.add( new THREE.Line( geometry ) );
+
+				//
+
+				const controllerModelFactory = new XRControllerModelFactory();
+
+				const controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				const controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
+
+				// GUI
+
+				function onChange() {
+
+					torus.geometry.dispose();
+					torus.geometry = new THREE.TorusKnotGeometry( ...Object.values( parameters ) );
+
+				}
+
+				const gui = new GUI( { width: 300 } );
+				gui.add( parameters, 'radius', 0.0, 1.0 ).onChange( onChange );
+				gui.add( parameters, 'tube', 0.0, 1.0 ).onChange( onChange );
+				gui.add( parameters, 'tubularSegments', 3, 150, 1 ).onChange( onChange );
+				gui.add( parameters, 'radialSegments', 1, 20, 1 ).onChange( onChange );
+				gui.add( parameters, 'p', 0, 10, 1 ).onChange( onChange );
+				gui.add( parameters, 'q', 0, 10, 1 ).onChange( onChange );
+
+				const mesh = new HTMLMesh( gui.domElement );
+				mesh.position.x = - 1;
+				mesh.position.y = 1;
+				mesh.position.z = - 1;
+				mesh.visible = false;
+				scene.add( mesh );
+
+				renderer.xr.addEventListener( 'sessionstart', () => { mesh.visible = true; } );
+				renderer.xr.addEventListener( 'sessionend', () => { mesh.visible = false; } );
+
+				const interaction = new InteractionManager( [ mesh ] );
+				interaction.listenXRControllerEvents( controller1 );
+				interaction.listenXRControllerEvents( controller2 );
 
 			}
 
@@ -144,7 +216,7 @@
 			function render() {
 
 				const time = performance.now() * 0.0002;
-				const torus = scene.children[ 0 ];
+				const torus = scene.getObjectByName( 'torus' );
 				torus.rotation.x = time * 2;
 				torus.rotation.y = time * 5;
 

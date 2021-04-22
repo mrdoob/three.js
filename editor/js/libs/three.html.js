@@ -30,9 +30,9 @@ class HTMLTexture extends THREE.CanvasTexture {
 
 	}
 
-	click( x, y ) {
+	dispatchEvent( event, x, y ) {
 
-		htmlclick( this.dom, x, y );
+		htmlevent( this.dom, event, x, y );
 
 		this.update();
 
@@ -93,12 +93,14 @@ function html2canvas( element ) {
 		}
 
 		return {
+
 			add: function ( clip ) {
 
 				clips.push( clip );
 				doClip();
 
 			},
+
 			remove: function () {
 
 				clips.pop();
@@ -235,26 +237,25 @@ function html2canvas( element ) {
 
 	var clipper = new Clipper( context );
 
-	console.time( 'drawElement' );
+	// console.time( 'drawElement' );
 
 	drawElement( element );
 
-	console.timeEnd( 'drawElement' );
+	// console.timeEnd( 'drawElement' );
 
 	return canvas;
 
 }
 
-function htmlclick( element, x, y ) {
+function htmlevent( element, event, x, y ) {
 
-	/*
 	const mouseEventInit = {
 		clientX: ( x * element.offsetWidth ) + element.offsetLeft,
 		clientY: ( y * element.offsetHeight ) + element.offsetTop,
 		view: element.ownerDocument.defaultView
 	};
-	element.dispatchEvent( new MouseEvent( 'click', mouseEventInit ) );
-	*/
+
+	window.dispatchEvent( new MouseEvent( event, mouseEventInit ) );
 
 	const rect = element.getBoundingClientRect();
 
@@ -269,7 +270,7 @@ function htmlclick( element, x, y ) {
 
 			if ( x > rect.left && x < rect.right && y > rect.top && y < rect.bottom ) {
 
-				element.click();
+				element.dispatchEvent( new MouseEvent( event, mouseEventInit ) );
 
 			}
 
