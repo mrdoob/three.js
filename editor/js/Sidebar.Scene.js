@@ -216,7 +216,8 @@ function SidebarScene( editor ) {
 	var environmentType = new UISelect().setOptions( {
 
 		'None': '',
-		'Background': 'Background'
+		'Background': 'Background',
+		'ModelViewer': 'ModelViewer'
 
 	} ).setWidth( '150px' );
 	environmentType.setValue( 'None' );

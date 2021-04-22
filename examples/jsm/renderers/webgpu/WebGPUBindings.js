@@ -24,11 +24,10 @@ class WebGPUBindings {
 		if ( data === undefined ) {
 
 			const pipeline = this.pipelines.get( object );
-			const material = object.material;
-
-			const nodeBuilder = this.nodes.get( material );
 
 			// each material defines an array of bindings (ubos, textures, samplers etc.)
+
+			const nodeBuilder = this.nodes.get( object );
 
 			const bindings = nodeBuilder.getBindings();
 

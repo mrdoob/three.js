@@ -66,7 +66,7 @@
 	<p>
 		This question was asked many times by the community so it's important to clarify this matter. Fact is that *three.js* does not know the lifetime or scope
 		of user-created entities like geometries or materials. This is the responsibility of the application. For example even if a material is currently not used for rendering,
-		it might base necessary for the next frame. So if the application decides that a certain object can be deleted, it has to	notify the engine via calling the respective
+		it might be necessary for the next frame. So if the application decides that a certain object can be deleted, it has to	notify the engine via calling the respective
 		*dispose()* method.
 	</p>
 

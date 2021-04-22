@@ -9,10 +9,13 @@ import { EditorControls } from './EditorControls.js';
 import { ViewportCamera } from './Viewport.Camera.js';
 import { ViewportInfo } from './Viewport.Info.js';
 import { ViewHelper } from './Viewport.ViewHelper.js';
+import { VR } from './Viewport.VR.js';
 
 import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
+
+import { RoomEnvironment } from '../../examples/jsm/environments/RoomEnvironment.js';
 
 function Viewport( editor ) {
 
@@ -40,8 +43,21 @@ function Viewport( editor ) {
 
 	// helpers
 
-	var grid = new THREE.GridHelper( 30, 30, 0x444444, 0x888888 );
+	var grid = new THREE.Group();
+
+	var grid1 = new THREE.GridHelper( 30, 30, 0x888888 );
+	grid1.material.color.setHex( 0x888888 );
+	grid1.material.vertexColors = false;
+	grid.add( grid1 );
+
+	var grid2 = new THREE.GridHelper( 30, 6, 0x222222 );
+	grid2.material.color.setHex( 0x222222 );
+	grid2.material.depthFunc = THREE.AlwaysDepth;
+	grid2.material.vertexColors = false;
+	grid.add( grid2 );
+
 	var viewHelper = new ViewHelper( camera, container );
+	var vr = new VR( editor );
 
 	//
 
@@ -326,10 +342,11 @@ function Viewport( editor ) {
 
 	} );
 
-	signals.rendererChanged.add( function ( newRenderer ) {
+	signals.rendererCreated.add( function ( newRenderer ) {
 
 		if ( renderer !== null ) {
 
+			renderer.setAnimationLoop( null );
 			renderer.dispose();
 			pmremGenerator.dispose();
 			pmremTexture = null;
@@ -340,6 +357,7 @@ function Viewport( editor ) {
 
 		renderer = newRenderer;
 
+		renderer.setAnimationLoop( animate );
 		renderer.setClearColor( 0xaaaaaa );
 
 		if ( window.matchMedia ) {
@@ -348,14 +366,14 @@ function Viewport( editor ) {
 			mediaQuery.addListener( function ( event ) {
 
 				renderer.setClearColor( event.matches ? 0x333333 : 0xaaaaaa );
-				updateGridColors( grid, event.matches ? [ 0x888888, 0x222222 ] : [ 0x282828, 0x888888 ] );
+				updateGridColors( grid1, grid2, event.matches ? [ 0x222222, 0x888888 ] : [ 0x888888, 0x282828 ] );
 
 				render();
 
 			} );
 
 			renderer.setClearColor( mediaQuery.matches ? 0x333333 : 0xaaaaaa );
-			updateGridColors( grid, mediaQuery.matches ? [ 0x888888, 0x222222 ] : [ 0x282828, 0x888888 ] );
+			updateGridColors( grid1, grid2, mediaQuery.matches ? [ 0x222222, 0x888888 ] : [ 0x888888, 0x282828 ] );
 
 		}
 
@@ -552,7 +570,7 @@ function Viewport( editor ) {
 					renderTarget.fromEquirectangularTexture( renderer, backgroundEquirectangularTexture );
 					renderTarget.toJSON = function () { return null }; // TODO Remove hack
 
-					scene.background = renderTarget;
+					scene.background = renderTarget.texture;
 
 				}
 
@@ -581,6 +599,9 @@ function Viewport( editor ) {
 				break;
 			case 'Background':
 				scene.environment = pmremTexture;
+				break;
+			case 'ModelViewer':
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 				break;
 
 		}
@@ -654,6 +675,8 @@ function Viewport( editor ) {
 
 	} );
 
+	signals.exitedVR.add( render );
+
 	//
 
 	signals.windowResize.add( function () {
@@ -690,8 +713,6 @@ function Viewport( editor ) {
 
 	function animate() {
 
-		requestAnimationFrame( animate );
-
 		var mixer = editor.mixer;
 		var delta = clock.getDelta();
 
@@ -711,11 +732,15 @@ function Viewport( editor ) {
 
 		}
 
+		if ( vr.currentSession !== null ) {
+
+			needsUpdate = true;
+
+		}
+
 		if ( needsUpdate === true ) render();
 
 	}
-
-	requestAnimationFrame( animate );
 
 	//
 
@@ -738,7 +763,7 @@ function Viewport( editor ) {
 
 			renderer.autoClear = false;
 			if ( showSceneHelpers === true ) renderer.render( sceneHelpers, camera );
-			viewHelper.render( renderer );
+			if ( vr.currentSession === null ) viewHelper.render( renderer );
 			renderer.autoClear = true;
 
 		}
@@ -752,27 +777,10 @@ function Viewport( editor ) {
 
 }
 
-function updateGridColors( grid, colors ) {
+function updateGridColors( grid1, grid2, colors ) {
 
-	const color1 = new THREE.Color( colors[ 0 ] );
-	const color2 = new THREE.Color( colors[ 1 ] );
-
-	const attribute = grid.geometry.attributes.color;
-	const array = attribute.array;
-
-	for ( var i = 0; i < array.length; i += 12 ) {
-
-		const color = ( i % ( 12 * 5 ) === 0 ) ? color1 : color2;
-
-		for ( var j = 0; j < 12; j += 3 ) {
-
-			color.toArray( array, i + j );
-
-		}
-
-	}
-
-	attribute.needsUpdate = true;
+	grid1.material.color.setHex( colors[ 0 ] );
+	grid2.material.color.setHex( colors[ 1 ] );
 
 }
 

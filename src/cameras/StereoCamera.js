@@ -1,9 +1,9 @@
 import { Matrix4 } from '../math/Matrix4.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
-const _eyeRight = new Matrix4();
-const _eyeLeft = new Matrix4();
+const _eyeRight = /*@__PURE__*/ new Matrix4();
+const _eyeLeft = /*@__PURE__*/ new Matrix4();
 
 class StereoCamera {
 

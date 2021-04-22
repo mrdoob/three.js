@@ -10,7 +10,7 @@ import {
 	LinearFilter,
 	UVMapping
 } from '../constants.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { ImageUtils } from '../extras/ImageUtils.js';
@@ -18,9 +18,6 @@ import { ImageUtils } from '../extras/ImageUtils.js';
 let textureId = 0;
 
 class Texture extends EventDispatcher {
-
-	static DEFAULT_IMAGE = undefined;
-	static DEFAULT_MAPPING = UVMapping;
 
 	constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1, encoding = LinearEncoding ) {
 
@@ -329,6 +326,9 @@ class Texture extends EventDispatcher {
 	}
 
 }
+
+Texture.DEFAULT_IMAGE = undefined;
+Texture.DEFAULT_MAPPING = UVMapping;
 
 Texture.prototype.isTexture = true;
 

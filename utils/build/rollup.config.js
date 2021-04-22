@@ -1,12 +1,11 @@
 import babel from '@rollup/plugin-babel';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
-import babelrc from '../../.babelrc.json';
+import babelrc from './.babelrc.json';
 
-function glconstants() {
+export function glconstants() {
 
 	var constants = {
-		POINTS: 0, ZERO: 0,
+		POINTS: 0, ZERO: 0, NONE: 0,
 		LINES: 1, ONE: 1,
 		LINE_LOOP: 2,
 		LINE_STRIP: 3,
@@ -145,6 +144,7 @@ function glconstants() {
 		MAX_FRAGMENT_UNIFORM_VECTORS: 36349,
 		UNPACK_FLIP_Y_WEBGL: 37440,
 		UNPACK_PREMULTIPLY_ALPHA_WEBGL: 37441,
+		UNPACK_COLORSPACE_CONVERSION_WEBGL: 37443,
 		UNPACK_ROW_LENGTH: 3314,
 		UNPACK_IMAGE_HEIGHT: 32878,
 		UNPACK_SKIP_PIXELS: 3316,
@@ -152,7 +152,8 @@ function glconstants() {
 		UNPACK_SKIP_IMAGES: 32877,
 		MAX_SAMPLES: 36183,
 		READ_FRAMEBUFFER: 36008,
-		DRAW_FRAMEBUFFER: 36009
+		DRAW_FRAMEBUFFER: 36009,
+		SAMPLE_ALPHA_TO_COVERAGE: 32926
 	};
 
 	return {
@@ -199,7 +200,7 @@ function addons() {
 
 }
 
-function glsl() {
+export function glsl() {
 
 	return {
 
@@ -258,30 +259,12 @@ function header() {
 
 		renderChunk( code ) {
 
-			return '// threejs.org/license\n' + code;
-
-		}
-
-	};
-
-}
-
-function polyfills() {
-
-	return {
-
-		transform( code, filePath ) {
-
-			if ( filePath.endsWith( 'src/Three.js' ) || filePath.endsWith( 'src\\Three.js' ) ) {
-
-				code = 'import \'regenerator-runtime\';\n' + code;
-
-			}
-
-			return {
-				code: code,
-				map: null
-			};
+			return `/**
+ * @license
+ * Copyright 2010-2021 Three.js Authors
+ * SPDX-License-Identifier: MIT
+ */
+${ code }`;
 
 		}
 
@@ -293,10 +276,7 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			polyfills(),
-			nodeResolve(),
 			addons(),
-			glconstants(),
 			glsl(),
 			babel( {
 				babelHelpers: 'bundled',
@@ -319,8 +299,6 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			polyfills(),
-			nodeResolve(),
 			addons(),
 			glconstants(),
 			glsl(),

@@ -31,7 +31,13 @@ class ARButton {
 				path.setAttribute( 'stroke-width', 2 );
 				svg.appendChild( path );
 
-				sessionInit.optionalFeatures = [ 'dom-overlay' ];
+				if ( sessionInit.optionalFeatures === undefined ) {
+
+					sessionInit.optionalFeatures = [];
+
+				}
+
+				sessionInit.optionalFeatures.push( 'dom-overlay' );
 				sessionInit.domOverlay = { root: overlay };
 
 			}
@@ -47,7 +53,7 @@ class ARButton {
 				renderer.xr.setReferenceSpaceType( 'local' );
 
 				await renderer.xr.setSession( session );
-        
+
 				button.textContent = 'STOP AR';
 				sessionInit.domOverlay.root.style.display = '';
 

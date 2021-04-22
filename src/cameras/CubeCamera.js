@@ -65,12 +65,7 @@ class CubeCamera extends Object3D {
 
 		const renderTarget = this.renderTarget;
 
-		const cameraPX = this.children[ 0 ];
-		const cameraNX = this.children[ 1 ];
-		const cameraPY = this.children[ 2 ];
-		const cameraNY = this.children[ 3 ];
-		const cameraPZ = this.children[ 4 ];
-		const cameraNZ = this.children[ 5 ];
+		const [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ] = this.children;
 
 		const currentXrEnabled = renderer.xr.enabled;
 		const currentRenderTarget = renderer.getRenderTarget();

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<head>
+		<title>three.js webgl - postprocessing - Screen Space Refraction</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+<body>
+	<div id="container"></div>
+	<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
+		SSRrPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
+		click object to toggle transparent<br/>
+	</div>
+	
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		import Stats from './jsm/libs/stats.module.js';
+
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+		import { SSRrPass } from './jsm/postprocessing/SSRrPass.js';
+
+		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+
+		const params = {
+			enableSSRr: true,
+			autoRotate: true,
+		};
+		let composer;
+		let ssrrPass;
+		let gui;
+		let stats;
+		let controls;
+		let camera, scene, renderer;
+		const objects = [];
+		const selects = [];
+		const raycaster = new THREE.Raycaster();
+		const mouseDown = new THREE.Vector2();
+		const mouse = new THREE.Vector2();
+
+		const container = document.querySelector('#container');
+
+		// Configure and create Draco decoder.
+		const dracoLoader = new DRACOLoader();
+		dracoLoader.setDecoderPath('js/libs/draco/');
+		dracoLoader.setDecoderConfig({ type: 'js' });
+
+		init();
+		animate();
+
+		function init() {
+
+			camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 15);
+			camera.position.set(0.13271600513224902, 0.3489546826045913, 0.43921296427927076);
+
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color(0x443333);
+			scene.fog = new THREE.Fog(0x443333, 1, 4);
+
+			// Ground
+			let map=new THREE.TextureLoader().load('./textures/uv_grid_opengl.jpg')
+			map.wrapS = THREE.RepeatWrapping;
+			map.wrapT = THREE.RepeatWrapping;
+			map.repeat.set(20,20)
+			const plane = new THREE.Mesh(
+				new THREE.PlaneGeometry(8, 8),
+				new THREE.MeshPhongMaterial({ 
+					color: 0x999999, 
+					specular: 0x101010,
+					map,
+				})
+			);
+			plane.rotation.x = - Math.PI / 2;
+			plane.position.y = - 0.0001;
+			// plane.receiveShadow = true;
+			scene.add(plane);
+			plane.name='plane'
+
+			// Lights
+			const hemiLight = new THREE.HemisphereLight(0x443333, 0x111122);
+			hemiLight.name='hemiLight'
+			scene.add(hemiLight);
+
+			const spotLight = new THREE.SpotLight();
+			spotLight.name='spotLight'
+			spotLight.angle = Math.PI / 16;
+			spotLight.penumbra = 0.5;
+			// spotLight.castShadow = true;
+			spotLight.position.set(- 1, 1, 1);
+			scene.add(spotLight);
+
+			dracoLoader.load('models/draco/bunny.drc', function (geometry) {
+
+				geometry.computeVertexNormals();
+
+				const material = new THREE.MeshStandardMaterial({ color: 0x606060 });
+				const mesh = new THREE.Mesh(geometry, material);
+				mesh.position.y = - 0.0365;
+				mesh.name='bunny'
+				scene.add(mesh);
+				objects.push(mesh);
+				selects.push(mesh);
+
+				// Release decoder resources.
+				dracoLoader.dispose();
+
+			});
+
+			let geometry, material, mesh;
+
+			geometry = new THREE.BoxBufferGeometry(.05, .05, .05);
+			material = new THREE.MeshStandardMaterial({ color: 'green' });
+			mesh = new THREE.Mesh(geometry, material);
+			mesh.position.set(- .12, .025, .015);
+			mesh.name='box'
+			scene.add(mesh);
+			objects.push( mesh );
+			selects.push( mesh );
+
+			geometry = new THREE.IcosahedronBufferGeometry(.025, 4);
+			material = new THREE.MeshStandardMaterial({ color: 'cyan' });
+			mesh = new THREE.Mesh(geometry, material);
+			mesh.position.set(- .05, .025, .08);
+			mesh.name='sphere'
+			scene.add(mesh);
+			objects.push( mesh );
+			// selects.push( mesh );
+
+			geometry = new THREE.ConeBufferGeometry(.025, .05, 64);
+			material = new THREE.MeshStandardMaterial({ color: 'yellow' });
+			mesh = new THREE.Mesh(geometry, material);
+			mesh.position.set(- .05, .025, - .055);
+			mesh.name='cone'
+			scene.add(mesh);
+			objects.push( mesh );
+			// selects.push( mesh );
+
+			// renderer
+			renderer = new THREE.WebGLRenderer({ antialias: false });
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.outputEncoding = THREE.sRGBEncoding;
+			renderer.autoClear=false
+			container.appendChild(renderer.domElement);
+
+			//
+
+			controls = new OrbitControls(camera, renderer.domElement);
+			controls.enableDamping = true;
+			controls.target.set(0, 0.0635, 0);
+			controls.update();
+			controls.enabled = !params.autoRotate;
+
+			// STATS
+
+			stats = new Stats();
+			container.appendChild(stats.dom);
+
+			window.addEventListener('resize', onWindowResize, false);
+			window.addEventListener( 'pointerdown', onPointerDown, false );
+			window.addEventListener( 'pointerup', onPointerUp, false );
+
+			// composer
+
+			composer = new EffectComposer(renderer);
+			ssrrPass = new SSRrPass({
+				renderer,
+				scene,
+				camera,
+				width: innerWidth,
+				height: innerHeight,
+				encoding: THREE.sRGBEncoding,
+				selects: selects
+			});
+
+			composer.addPass(ssrrPass);
+
+			// GUI
+
+			gui = new GUI();
+			gui.add(params, 'enableSSRr').name('Enable SSRr');
+			ssrrPass.ior = 1.1;
+			gui.add(ssrrPass, 'ior').name('IOR').min(1).max(1.5).step(.0001);
+			gui.add( ssrrPass, 'fillHole' );
+			gui.add(params, 'autoRotate').onChange(() => {
+
+				controls.enabled = !params.autoRotate;
+
+			});
+
+			const folder = gui.addFolder('more settings');
+			folder.add( ssrrPass, 'specular' );
+			folder.add(ssrrPass.specularMaterial, 'metalness').min(0).max(1).step(.01);
+			folder.add(ssrrPass.specularMaterial, 'roughness').min(0).max(1).step(.01);
+			folder.add(ssrrPass, 'output', {
+				'Default': SSRrPass.OUTPUT.Default,
+				'SSRr Only': SSRrPass.OUTPUT.SSRr,
+				'Beauty': SSRrPass.OUTPUT.Beauty,
+				'Depth': SSRrPass.OUTPUT.Depth,
+				'DepthSelects': SSRrPass.OUTPUT.DepthSelects,
+				'NormalSelects': SSRrPass.OUTPUT.NormalSelects,
+				'Refractive': SSRrPass.OUTPUT.Refractive,
+				'Specular': SSRrPass.OUTPUT.Specular,
+			}).onChange(function (value) {
+
+				ssrrPass.output = parseInt(value);
+
+			});
+			ssrrPass.surfDist = 0.0015;
+			folder.add( ssrrPass, 'surfDist' ).min( 0 ).max( .005 ).step( .0001 );
+			ssrrPass.maxDistance = 50;
+			folder.add( ssrrPass, 'maxDistance' ).min( 0 ).max( 100 ).step( .001 )
+			folder.add( ssrrPass, 'infiniteThick' );
+			// folder.open()
+			// gui.close()
+
+		}
+
+		function onPointerDown( event ) {
+			mouseDown.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			mouseDown.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+		}
+		function onPointerUp( event ) {
+
+			// calculate mouse position in normalized device coordinates
+			// (-1 to +1) for both components
+
+			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+			if(mouseDown.sub(mouse).length()>0) return
+
+
+			raycaster.setFromCamera( mouse, camera );
+			const intersect = raycaster.intersectObjects( objects )[0];
+			if(intersect){
+				let index=selects.indexOf(intersect.object)
+				if(index>=0){
+					selects.splice(index,1)
+				}else{
+					selects.push(intersect.object)
+				}
+			}
+		}
+
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			composer.setSize(window.innerWidth, window.innerHeight);
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame(animate);
+
+			stats.begin();
+			render();
+			stats.end();
+
+		}
+
+		function render() {
+
+			if (params.autoRotate) {
+
+				const timer = Date.now() * 0.0003;
+
+				camera.position.x = Math.sin(timer) * 0.5;
+				camera.position.y = 0.2135;
+				camera.position.z = Math.cos(timer) * 0.5;
+				camera.lookAt(0, 0.0635, 0);
+
+			} else {
+
+				controls.update();
+
+			}
+
+			if (params.enableSSRr) {
+
+				composer.render();
+
+			} else {
+
+				renderer.render(scene, camera);
+
+			}
+
+		}
+	</script>
+</body>
+
+</html>
