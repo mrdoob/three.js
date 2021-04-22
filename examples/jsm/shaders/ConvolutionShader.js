@@ -8,7 +8,7 @@ import {
  * http://o3d.googlecode.com/svn/trunk/samples/convolution.html
  */
 
-var ConvolutionShader = {
+const ConvolutionShader = {
 
 	defines: {
 
@@ -25,67 +25,58 @@ var ConvolutionShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
 
-		'uniform vec2 uImageIncrement;',
+		uniform vec2 uImageIncrement;
 
-		'varying vec2 vUv;',
+		varying vec2 vUv;
 
-		'void main() {',
+		void main() {
 
-		'	vUv = uv - ( ( KERNEL_SIZE_FLOAT - 1.0 ) / 2.0 ) * uImageIncrement;',
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+			vUv = uv - ( ( KERNEL_SIZE_FLOAT - 1.0 ) / 2.0 ) * uImageIncrement;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		'}'
+		}`,
 
-	].join( '\n' ),
+	fragmentShader: /* glsl */`
 
-	fragmentShader: [
+		uniform float cKernel[ KERNEL_SIZE_INT ];
 
-		'uniform float cKernel[ KERNEL_SIZE_INT ];',
+		uniform sampler2D tDiffuse;
+		uniform vec2 uImageIncrement;
 
-		'uniform sampler2D tDiffuse;',
-		'uniform vec2 uImageIncrement;',
+		varying vec2 vUv;
 
-		'varying vec2 vUv;',
+		void main() {
 
-		'void main() {',
+			vec2 imageCoord = vUv;
+			vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );
 
-		'	vec2 imageCoord = vUv;',
-		'	vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );',
+			for( int i = 0; i < KERNEL_SIZE_INT; i ++ ) {
 
-		'	for( int i = 0; i < KERNEL_SIZE_INT; i ++ ) {',
+				sum += texture2D( tDiffuse, imageCoord ) * cKernel[ i ];
+				imageCoord += uImageIncrement;
 
-		'		sum += texture2D( tDiffuse, imageCoord ) * cKernel[ i ];',
-		'		imageCoord += uImageIncrement;',
+			}
 
-		'	}',
+			gl_FragColor = sum;
 
-		'	gl_FragColor = sum;',
-
-		'}'
-
-
-	].join( '\n' ),
+		}`,
 
 	buildKernel: function ( sigma ) {
 
 		// We lop off the sqrt(2 * pi) * sigma term, since we're going to normalize anyway.
 
-		function gauss( x, sigma ) {
-
-			return Math.exp( - ( x * x ) / ( 2.0 * sigma * sigma ) );
-
-		}
-
-		var i, values, sum, halfWidth, kMaxKernelSize = 25, kernelSize = 2 * Math.ceil( sigma * 3.0 ) + 1;
+		const kMaxKernelSize = 25;
+		let kernelSize = 2 * Math.ceil( sigma * 3.0 ) + 1;
 
 		if ( kernelSize > kMaxKernelSize ) kernelSize = kMaxKernelSize;
-		halfWidth = ( kernelSize - 1 ) * 0.5;
 
-		values = new Array( kernelSize );
-		sum = 0.0;
-		for ( i = 0; i < kernelSize; ++ i ) {
+		const halfWidth = ( kernelSize - 1 ) * 0.5;
+
+		const values = new Array( kernelSize );
+		let sum = 0.0;
+		for ( let i = 0; i < kernelSize; ++ i ) {
 
 			values[ i ] = gauss( i - halfWidth, sigma );
 			sum += values[ i ];
@@ -94,12 +85,18 @@ var ConvolutionShader = {
 
 		// normalize the kernel
 
-		for ( i = 0; i < kernelSize; ++ i ) values[ i ] /= sum;
+		for ( let i = 0; i < kernelSize; ++ i ) values[ i ] /= sum;
 
 		return values;
 
 	}
 
 };
+
+function gauss( x, sigma ) {
+
+	return Math.exp( - ( x * x ) / ( 2.0 * sigma * sigma ) );
+
+}
 
 export { ConvolutionShader };

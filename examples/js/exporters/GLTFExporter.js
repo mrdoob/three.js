@@ -47,11 +47,11 @@
 
 		}
 		/**
-	 * Parse scenes and generate GLTF output
-	 * @param	{Scene or [THREE.Scenes]} input	 THREE.Scene or Array of THREE.Scenes
-	 * @param	{Function} onDone	Callback on completed
-	 * @param	{Object} options options
-	 */
+   * Parse scenes and generate GLTF output
+   * @param  {Scene or [THREE.Scenes]} input   THREE.Scene or Array of THREE.Scenes
+   * @param  {Function} onDone  Callback on completed
+   * @param  {Object} options options
+   */
 
 
 		parse( input, onDone, options ) {
@@ -128,9 +128,9 @@
 
 	/**
  * Compare two arrays
- * @param	{Array} array1 Array 1 to compare
- * @param	{Array} array2 Array 2 to compare
- * @return {Boolean}				Returns true if both arrays are equal
+ * @param  {Array} array1 Array 1 to compare
+ * @param  {Array} array2 Array 2 to compare
+ * @return {Boolean}        Returns true if both arrays are equal
  */
 
 	function equalArray( array1, array2 ) {
@@ -144,7 +144,7 @@
 	}
 	/**
  * Converts a string to an ArrayBuffer.
- * @param	{string} text
+ * @param  {string} text
  * @return {ArrayBuffer}
  */
 
@@ -185,9 +185,9 @@
 	}
 	/**
  * Get the min and max vectors from the given attribute
- * @param	{BufferAttribute} attribute Attribute to find the min/max in range from start to start + count
- * @param	{Integer} start
- * @param	{Integer} count
+ * @param  {BufferAttribute} attribute Attribute to find the min/max in range from start to start + count
+ * @param  {Integer} start
+ * @param  {Integer} count
  * @return {Object} Object containing the `min` and `max` values (As an array of attribute.itemSize components)
  */
 
@@ -320,17 +320,17 @@
 
 		}
 		/**
-	 * Parse scenes and generate GLTF output
-	 * @param	{Scene or [THREE.Scenes]} input	 THREE.Scene or Array of THREE.Scenes
-	 * @param	{Function} onDone	Callback on completed
-	 * @param	{Object} options options
-	 */
+   * Parse scenes and generate GLTF output
+   * @param  {Scene or [THREE.Scenes]} input   THREE.Scene or Array of THREE.Scenes
+   * @param  {Function} onDone  Callback on completed
+   * @param  {Object} options options
+   */
 
 
 		write( input, onDone, options ) {
 
 			this.options = Object.assign( {}, {
-			// default options
+				// default options
 				binary: false,
 				trs: false,
 				onlyVisible: true,
@@ -432,11 +432,11 @@
 
 		}
 		/**
-	 * Serializes a userData.
-	 *
-	 * @param {THREE.Object3D|THREE.Material} object
-	 * @param {Object} objectDef
-	 */
+   * Serializes a userData.
+   *
+   * @param {THREE.Object3D|THREE.Material} object
+   * @param {Object} objectDef
+   */
 
 
 		serializeUserData( object, objectDef ) {
@@ -474,11 +474,11 @@
 
 		}
 		/**
-	 * Assign and return a temporal unique id for an object
-	 * especially which doesn't have .uuid
-	 * @param	{Object} object
-	 * @return {Integer}
-	 */
+   * Assign and return a temporal unique id for an object
+   * especially which doesn't have .uuid
+   * @param  {Object} object
+   * @return {Integer}
+   */
 
 
 		getUID( object ) {
@@ -488,11 +488,11 @@
 
 		}
 		/**
-	 * Checks if normal attribute values are normalized.
-	 *
-	 * @param {BufferAttribute} normal
-	 * @returns {Boolean}
-	 */
+   * Checks if normal attribute values are normalized.
+   *
+   * @param {BufferAttribute} normal
+   * @returns {Boolean}
+   */
 
 
 		isNormalizedNormalAttribute( normal ) {
@@ -512,12 +512,12 @@
 
 		}
 		/**
-	 * Creates normalized normal buffer attribute.
-	 *
-	 * @param {BufferAttribute} normal
-	 * @returns {BufferAttribute}
-	 *
-	 */
+   * Creates normalized normal buffer attribute.
+   *
+   * @param {BufferAttribute} normal
+   * @returns {BufferAttribute}
+   *
+   */
 
 
 		createNormalizedNormalAttribute( normal ) {
@@ -551,12 +551,12 @@
 
 		}
 		/**
-	 * Applies a texture transform, if present, to the map definition. Requires
-	 * the KHR_texture_transform extension.
-	 *
-	 * @param {Object} mapDef
-	 * @param {THREE.Texture} texture
-	 */
+   * Applies a texture transform, if present, to the map definition. Requires
+   * the KHR_texture_transform extension.
+   *
+   * @param {Object} mapDef
+   * @param {THREE.Texture} texture
+   */
 
 
 		applyTextureTransform( mapDef, texture ) {
@@ -595,10 +595,10 @@
 
 		}
 		/**
-	 * Process a buffer to append to the default one.
-	 * @param	{ArrayBuffer} buffer
-	 * @return {Integer}
-	 */
+   * Process a buffer to append to the default one.
+   * @param  {ArrayBuffer} buffer
+   * @return {Integer}
+   */
 
 
 		processBuffer( buffer ) {
@@ -614,14 +614,14 @@
 
 		}
 		/**
-	 * Process and generate a BufferView
-	 * @param	{BufferAttribute} attribute
-	 * @param	{number} componentType
-	 * @param	{number} start
-	 * @param	{number} count
-	 * @param	{number} target (Optional) Target usage of the BufferView
-	 * @return {Object}
-	 */
+   * Process and generate a BufferView
+   * @param  {BufferAttribute} attribute
+   * @param  {number} componentType
+   * @param  {number} start
+   * @param  {number} count
+   * @param  {number} target (Optional) Target usage of the BufferView
+   * @return {Object}
+   */
 
 
 		processBufferView( attribute, componentType, start, count, target ) {
@@ -715,10 +715,10 @@
 
 		}
 		/**
-	 * Process and generate a BufferView from an image Blob.
-	 * @param {Blob} blob
-	 * @return {Promise<Integer>}
-	 */
+   * Process and generate a BufferView from an image Blob.
+   * @param {Blob} blob
+   * @return {Promise<Integer>}
+   */
 
 
 		processBufferViewImage( blob ) {
@@ -748,13 +748,13 @@
 
 		}
 		/**
-	 * Process attribute to generate an accessor
-	 * @param	{BufferAttribute} attribute Attribute to process
-	 * @param	{THREE.BufferGeometry} geometry (Optional) Geometry used for truncated draw range
-	 * @param	{Integer} start (Optional)
-	 * @param	{Integer} count (Optional)
-	 * @return {Integer|null} Index of the processed accessor on the "accessors" array
-	 */
+   * Process attribute to generate an accessor
+   * @param  {BufferAttribute} attribute Attribute to process
+   * @param  {THREE.BufferGeometry} geometry (Optional) Geometry used for truncated draw range
+   * @param  {Integer} start (Optional)
+   * @param  {Integer} count (Optional)
+   * @return {Integer|null} Index of the processed accessor on the "accessors" array
+   */
 
 
 		processAccessor( attribute, geometry, start, count ) {
@@ -833,12 +833,12 @@
 
 		}
 		/**
-	 * Process image
-	 * @param	{Image} image to process
-	 * @param	{Integer} format of the image (e.g. THREE.RGBFormat, THREE.RGBAFormat etc)
-	 * @param	{Boolean} flipY before writing out the image
-	 * @return {Integer}		 Index of the processed texture in the "images" array
-	 */
+   * Process image
+   * @param  {Image} image to process
+   * @param  {Integer} format of the image (e.g. THREE.RGBFormat, THREE.RGBAFormat etc)
+   * @param  {Boolean} flipY before writing out the image
+   * @return {Integer}     Index of the processed texture in the "images" array
+   */
 
 
 		processImage( image, format, flipY ) {
@@ -946,10 +946,10 @@
 
 		}
 		/**
-	 * Process sampler
-	 * @param	{Texture} map Texture to process
-	 * @return {Integer}		 Index of the processed texture in the "samplers" array
-	 */
+   * Process sampler
+   * @param  {Texture} map Texture to process
+   * @return {Integer}     Index of the processed texture in the "samplers" array
+   */
 
 
 		processSampler( map ) {
@@ -966,10 +966,10 @@
 
 		}
 		/**
-	 * Process texture
-	 * @param	{Texture} map Map to process
-	 * @return {Integer} Index of the processed texture in the "textures" array
-	 */
+   * Process texture
+   * @param  {Texture} map Map to process
+   * @return {Integer} Index of the processed texture in the "textures" array
+   */
 
 
 		processTexture( map ) {
@@ -996,10 +996,10 @@
 
 		}
 		/**
-	 * Process material
-	 * @param	{THREE.Material} material Material to process
-	 * @return {Integer|null} Index of the processed material in the "materials" array
-	 */
+   * Process material
+   * @param  {THREE.Material} material Material to process
+   * @return {Integer|null} Index of the processed material in the "materials" array
+   */
 
 
 		processMaterial( material ) {
@@ -1178,10 +1178,10 @@
 
 		}
 		/**
-	 * Process mesh
-	 * @param	{THREE.Mesh} mesh Mesh to process
-	 * @return {Integer|null} Index of the processed mesh in the "meshes" array
-	 */
+   * Process mesh
+   * @param  {THREE.Mesh} mesh Mesh to process
+   * @return {Integer|null} Index of the processed mesh in the "meshes" array
+   */
 
 
 		processMesh( mesh ) {
@@ -1458,10 +1458,10 @@
 
 		}
 		/**
-	 * Process camera
-	 * @param	{THREE.Camera} camera Camera to process
-	 * @return {Integer}			Index of the processed mesh in the "camera" array
-	 */
+   * Process camera
+   * @param  {THREE.Camera} camera Camera to process
+   * @return {Integer}      Index of the processed mesh in the "camera" array
+   */
 
 
 		processCamera( camera ) {
@@ -1499,15 +1499,15 @@
 
 		}
 		/**
-	 * Creates glTF animation entry from AnimationClip object.
-	 *
-	 * Status:
-	 * - Only properties listed in PATH_PROPERTIES may be animated.
-	 *
-	 * @param {THREE.AnimationClip} clip
-	 * @param {THREE.Object3D} root
-	 * @return {number|null}
-	 */
+   * Creates glTF animation entry from AnimationClip object.
+   *
+   * Status:
+   * - Only properties listed in PATH_PROPERTIES may be animated.
+   *
+   * @param {THREE.AnimationClip} clip
+   * @param {THREE.Object3D} root
+   * @return {number|null}
+   */
 
 
 		processAnimation( clip, root ) {
@@ -1604,9 +1604,9 @@
 
 		}
 		/**
-	 * @param {THREE.Object3D} object
-	 * @return {number|null}
-	 */
+   * @param {THREE.Object3D} object
+   * @return {number|null}
+   */
 
 
 		processSkin( object ) {
@@ -1641,10 +1641,10 @@
 
 		}
 		/**
-	 * Process Object3D node
-	 * @param	{THREE.Object3D} node Object3D to processNode
-	 * @return {Integer} Index of the node in the nodes list
-	 */
+   * Process Object3D node
+   * @param  {THREE.Object3D} node Object3D to processNode
+   * @return {Integer} Index of the node in the nodes list
+   */
 
 
 		processNode( object ) {
@@ -1745,9 +1745,9 @@
 
 		}
 		/**
-	 * Process THREE.Scene
-	 * @param	{Scene} node THREE.Scene to process
-	 */
+   * Process THREE.Scene
+   * @param  {Scene} node THREE.Scene to process
+   */
 
 
 		processScene( scene ) {
@@ -1785,9 +1785,9 @@
 
 		}
 		/**
-	 * Creates a THREE.Scene to hold a list of objects and parse it
-	 * @param	{Array} objects List of objects to process
-	 */
+   * Creates a THREE.Scene to hold a list of objects and parse it
+   * @param  {Array} objects List of objects to process
+   */
 
 
 		processObjects( objects ) {
@@ -1807,8 +1807,8 @@
 
 		}
 		/**
-	 * @param {THREE.Object3D|Array<THREE.Object3D>} input
-	 */
+   * @param {THREE.Object3D|Array<THREE.Object3D>} input
+   */
 
 
 		processInput( input ) {

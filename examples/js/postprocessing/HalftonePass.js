@@ -4,43 +4,43 @@
  * RGB Halftone pass for three.js effects composer. Requires THREE.HalftoneShader.
  */
 
-	var HalftonePass = function ( width, height, params ) {
+	class HalftonePass extends THREE.Pass {
 
-		THREE.Pass.call( this );
+		constructor( width, height, params ) {
 
-		if ( THREE.HalftoneShader === undefined ) {
+			super();
 
-			console.error( 'THREE.HalftonePass requires THREE.HalftoneShader' );
+			if ( THREE.HalftoneShader === undefined ) {
 
-		}
-
-		this.uniforms = THREE.UniformsUtils.clone( THREE.HalftoneShader.uniforms );
-		this.material = new THREE.ShaderMaterial( {
-			uniforms: this.uniforms,
-			fragmentShader: THREE.HalftoneShader.fragmentShader,
-			vertexShader: THREE.HalftoneShader.vertexShader
-		} ); // set params
-
-		this.uniforms.width.value = width;
-		this.uniforms.height.value = height;
-
-		for ( var key in params ) {
-
-			if ( params.hasOwnProperty( key ) && this.uniforms.hasOwnProperty( key ) ) {
-
-				this.uniforms[ key ].value = params[ key ];
+				console.error( 'THREE.HalftonePass requires THREE.HalftoneShader' );
 
 			}
 
+			this.uniforms = THREE.UniformsUtils.clone( THREE.HalftoneShader.uniforms );
+			this.material = new THREE.ShaderMaterial( {
+				uniforms: this.uniforms,
+				fragmentShader: THREE.HalftoneShader.fragmentShader,
+				vertexShader: THREE.HalftoneShader.vertexShader
+			} ); // set params
+
+			this.uniforms.width.value = width;
+			this.uniforms.height.value = height;
+
+			for ( const key in params ) {
+
+				if ( params.hasOwnProperty( key ) && this.uniforms.hasOwnProperty( key ) ) {
+
+					this.uniforms[ key ].value = params[ key ];
+
+				}
+
+			}
+
+			this.fsQuad = new THREE.FullScreenQuad( this.material );
+
 		}
 
-		this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
-
-	};
-
-	HalftonePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
-		constructor: HalftonePass,
-		render: function ( renderer, writeBuffer, readBuffer
+		render( renderer, writeBuffer, readBuffer
 			/*, deltaTime, maskActive*/
 		) {
 
@@ -59,14 +59,16 @@
 
 			}
 
-		},
-		setSize: function ( width, height ) {
+		}
+
+		setSize( width, height ) {
 
 			this.uniforms.width.value = width;
 			this.uniforms.height.value = height;
 
 		}
-	} );
+
+	}
 
 	THREE.HalftonePass = HalftonePass;
 

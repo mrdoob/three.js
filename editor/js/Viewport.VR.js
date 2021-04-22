@@ -153,7 +153,7 @@ class VR {
 
 		} );
 
-		signals.rendererChanged.add( ( value ) => {
+		signals.rendererCreated.add( ( value ) => {
 
 			renderer = value;
 			renderer.xr.enabled = true;

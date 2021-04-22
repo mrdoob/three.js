@@ -12,14 +12,14 @@
 	// All rights reserved.
 	// Redistribution and use in source and binary forms, with or without
 	// modification, are permitted provided that the following conditions are met:
-	//		 * Redistributions of source code must retain the above copyright
-	//			 notice, this list of conditions and the following disclaimer.
-	//		 * Redistributions in binary form must reproduce the above copyright
-	//			 notice, this list of conditions and the following disclaimer in the
-	//			 documentation and/or other materials provided with the distribution.
-	//		 * Neither the name of the Syoyo Fujita nor the
-	//			 names of its contributors may be used to endorse or promote products
-	//			 derived from this software without specific prior written permission.
+	//     * Redistributions of source code must retain the above copyright
+	//       notice, this list of conditions and the following disclaimer.
+	//     * Redistributions in binary form must reproduce the above copyright
+	//       notice, this list of conditions and the following disclaimer in the
+	//       documentation and/or other materials provided with the distribution.
+	//     * Neither the name of the Syoyo Fujita nor the
+	//       names of its contributors may be used to endorse or promote products
+	//       derived from this software without specific prior written permission.
 	// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 	// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 	// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -42,13 +42,13 @@
 	// // Redistribution and use in source and binary forms, with or without
 	// // modification, are permitted provided that the following conditions are
 	// // met:
-	// // *			 Redistributions of source code must retain the above copyright
+	// // *       Redistributions of source code must retain the above copyright
 	// // notice, this list of conditions and the following disclaimer.
-	// // *			 Redistributions in binary form must reproduce the above
+	// // *       Redistributions in binary form must reproduce the above
 	// // copyright notice, this list of conditions and the following disclaimer
 	// // in the documentation and/or other materials provided with the
 	// // distribution.
-	// // *			 Neither the name of Industrial Light & Magic nor the names of
+	// // *       Neither the name of Industrial Light & Magic nor the names of
 	// // its contributors may be used to endorse or promote products derived
 	// // from this software without specific prior written permission.
 	// //
@@ -67,16 +67,16 @@
 	// ///////////////////////////////////////////////////////////////////////////
 	// // End of OpenEXR license -------------------------------------------------
 
-	var EXRLoader = function ( manager ) {
+	class EXRLoader extends THREE.DataTextureLoader {
 
-		THREE.DataTextureLoader.call( this, manager );
-		this.type = THREE.FloatType;
+		constructor( manager ) {
 
-	};
+			super( manager );
+			this.type = THREE.FloatType;
 
-	EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoader.prototype ), {
-		constructor: EXRLoader,
-		parse: function ( buffer ) {
+		}
+
+		parse( buffer ) {
 
 			const USHORT_RANGE = 1 << 16;
 			const BITMAP_SIZE = USHORT_RANGE >> 3;
@@ -2155,14 +2155,16 @@
 				type: this.type
 			};
 
-		},
-		setDataType: function ( value ) {
+		}
+
+		setDataType( value ) {
 
 			this.type = value;
 			return this;
 
-		},
-		load: function ( url, onLoad, onProgress, onError ) {
+		}
+
+		load( url, onLoad, onProgress, onError ) {
 
 			function onLoadCallback( texture, texData ) {
 
@@ -2191,10 +2193,11 @@
 
 			}
 
-			return THREE.DataTextureLoader.prototype.load.call( this, url, onLoadCallback, onProgress, onError );
+			return super.load( url, onLoadCallback, onProgress, onError );
 
 		}
-	} );
+
+	}
 
 	THREE.EXRLoader = EXRLoader;
 

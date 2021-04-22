@@ -1,7 +1,7 @@
 ( function () {
 
 	/**
- *	This helper must be added as a child of the light
+ *  This helper must be added as a child of the light
  */
 
 	class RectAreaLightHelper extends THREE.Line {

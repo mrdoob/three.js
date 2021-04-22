@@ -5,7 +5,7 @@ import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Euler } from '../../../../src/math/Euler';
 import { Quaternion } from '../../../../src/math/Quaternion';
-import { MathUtils } from '../../../../src/math/MathUtils';
+import * as MathUtils from '../../../../src/math/MathUtils';
 import { eps } from './Constants.tests';
 
 

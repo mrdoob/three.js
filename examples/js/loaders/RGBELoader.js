@@ -19,7 +19,7 @@
 				//RGBE_RETURN_SUCCESS = 0,
 				RGBE_RETURN_FAILURE = - 1,
 
-				/* default error routine.	change this to change error handling */
+				/* default error routine.  change this to change error handling */
 				rgbe_read_error = 1,
 				rgbe_write_error = 2,
 				rgbe_format_error = 3,
@@ -85,11 +85,11 @@
 					if ( - 1 < i ) {
 
 						/*for (i=l-1; i>=0; i--) {
-					byteCode = m.charCodeAt(i);
-					if (byteCode > 0x7f && byteCode <= 0x7ff) byteLen++;
-					else if (byteCode > 0x7ff && byteCode <= 0xffff) byteLen += 2;
-					if (byteCode >= 0xDC00 && byteCode <= 0xDFFF) i--; //trail surrogate
-				}*/
+        	byteCode = m.charCodeAt(i);
+        	if (byteCode > 0x7f && byteCode <= 0x7ff) byteLen++;
+        	else if (byteCode > 0x7ff && byteCode <= 0xffff) byteLen += 2;
+        	if (byteCode >= 0xDC00 && byteCode <= 0xDFFF) i--; //trail surrogate
+        }*/
 						if ( false !== consume ) buffer.pos += len + i + 1;
 						return s + chunk.slice( 0, i );
 
@@ -99,7 +99,7 @@
 
 				},
 
-				/* minimal header reading.	modify if you want to parse more information */
+				/* minimal header reading.  modify if you want to parse more information */
 				RGBE_ReadHeader = function ( buffer ) {
 
 					// regexes to parse header info fields
@@ -221,7 +221,7 @@
 
 					if ( // run length encoding is not allowed so read flat
 						scanline_width < 8 || scanline_width > 0x7fff || // this file is not run length encoded
-			2 !== buffer[ 0 ] || 2 !== buffer[ 1 ] || buffer[ 2 ] & 0x80 ) {
+      2 !== buffer[ 0 ] || 2 !== buffer[ 1 ] || buffer[ 2 ] & 0x80 ) {
 
 						// return the flat buffer
 						return new Uint8Array( buffer );

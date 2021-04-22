@@ -1,29 +1,29 @@
 ( function () {
 
-	var RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
+	class RenderPass extends THREE.Pass {
 
-		THREE.Pass.call( this );
-		this.scene = scene;
-		this.camera = camera;
-		this.overrideMaterial = overrideMaterial;
-		this.clearColor = clearColor;
-		this.clearAlpha = clearAlpha !== undefined ? clearAlpha : 0;
-		this.clear = true;
-		this.clearDepth = false;
-		this.needsSwap = false;
-		this._oldClearColor = new THREE.Color();
+		constructor( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
 
-	};
+			super();
+			this.scene = scene;
+			this.camera = camera;
+			this.overrideMaterial = overrideMaterial;
+			this.clearColor = clearColor;
+			this.clearAlpha = clearAlpha !== undefined ? clearAlpha : 0;
+			this.clear = true;
+			this.clearDepth = false;
+			this.needsSwap = false;
+			this._oldClearColor = new THREE.Color();
 
-	RenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
-		constructor: RenderPass,
-		render: function ( renderer, writeBuffer, readBuffer
+		}
+
+		render( renderer, writeBuffer, readBuffer
 			/*, deltaTime, maskActive */
 		) {
 
-			var oldAutoClear = renderer.autoClear;
+			const oldAutoClear = renderer.autoClear;
 			renderer.autoClear = false;
-			var oldClearAlpha, oldOverrideMaterial;
+			let oldClearAlpha, oldOverrideMaterial;
 
 			if ( this.overrideMaterial !== undefined ) {
 
@@ -66,7 +66,8 @@
 			renderer.autoClear = oldAutoClear;
 
 		}
-	} );
+
+	}
 
 	THREE.RenderPass = RenderPass;
 

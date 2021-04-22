@@ -6,23 +6,21 @@ import {
 	Loader,
 	LoaderUtils
 } from '../../../build/three.module.js';
-import * as fflate from '../libs/fflate.module.min.js';
+import * as fflate from '../libs/fflate.module.js';
 
-var VTKLoader = function ( manager ) {
+class VTKLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-};
+		super( manager );
 
-VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: VTKLoader,
+	load( url, onLoad, onProgress, onError ) {
 
-	load: function ( url, onLoad, onProgress, onError ) {
+		const scope = this;
 
-		var scope = this;
-
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
@@ -51,9 +49,9 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	parse( data ) {
 
 		function parseASCII( data ) {
 
@@ -553,23 +551,23 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function Float32Concat( first, second ) {
 
-		    var firstLength = first.length, result = new Float32Array( firstLength + second.length );
+			const firstLength = first.length, result = new Float32Array( firstLength + second.length );
 
-		    result.set( first );
-		    result.set( second, firstLength );
+			result.set( first );
+			result.set( second, firstLength );
 
-		    return result;
+			return result;
 
 		}
 
 		function Int32Concat( first, second ) {
 
-		    var firstLength = first.length, result = new Int32Array( firstLength + second.length );
+			var firstLength = first.length, result = new Int32Array( firstLength + second.length );
 
-		    result.set( first );
-		    result.set( second, firstLength );
+			result.set( first );
+			result.set( second, firstLength );
 
-		    return result;
+			return result;
 
 		}
 
@@ -1179,6 +1177,6 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 export { VTKLoader };

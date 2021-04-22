@@ -6,7 +6,7 @@ import {
 	LinearEncoding,
 	NoToneMapping
 } from '../constants.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
@@ -1382,6 +1382,8 @@ function WebGLRenderer( parameters ) {
 		} else {
 
 			parameters.uniforms = programCache.getUniforms( material );
+
+			material.onBuild( parameters, _this );
 
 			material.onBeforeCompile( parameters, _this );
 

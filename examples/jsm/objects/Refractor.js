@@ -286,50 +286,45 @@ Refractor.RefractorShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
 
-		'uniform mat4 textureMatrix;',
+		uniform mat4 textureMatrix;
 
-		'varying vec4 vUv;',
+		varying vec4 vUv;
 
-		'void main() {',
+		void main() {
 
-		'	vUv = textureMatrix * vec4( position, 1.0 );',
+			vUv = textureMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+		}`,
 
-		'}'
+	fragmentShader: /* glsl */`
 
-	].join( '\n' ),
+		uniform vec3 color;
+		uniform sampler2D tDiffuse;
 
-	fragmentShader: [
+		varying vec4 vUv;
 
-		'uniform vec3 color;',
-		'uniform sampler2D tDiffuse;',
+		float blendOverlay( float base, float blend ) {
 
-		'varying vec4 vUv;',
+			return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
 
-		'float blendOverlay( float base, float blend ) {',
+		}
 
-		'	return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );',
+		vec3 blendOverlay( vec3 base, vec3 blend ) {
 
-		'}',
+			return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );
 
-		'vec3 blendOverlay( vec3 base, vec3 blend ) {',
+		}
 
-		'	return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );',
+		void main() {
 
-		'}',
+			vec4 base = texture2DProj( tDiffuse, vUv );
+			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 
-		'void main() {',
+		}`
 
-		'	vec4 base = texture2DProj( tDiffuse, vUv );',
-
-		'	gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );',
-
-		'}'
-
-	].join( '\n' )
 };
 
 export { Refractor };

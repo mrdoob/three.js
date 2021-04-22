@@ -51,16 +51,13 @@
 			'cameraRange': {
 				value: 0
 			},
-			'surfDist': {
-				value: .007
-			},
-			'thickTolerance': {
-				value: .03
+			'thickness': {
+				value: .018
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -74,8 +71,8 @@
 
 	`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 		// precision highp float;
 		precision highp sampler2D;
 		varying vec2 vUv;
@@ -89,10 +86,9 @@
 		uniform float cameraNear;
 		uniform float cameraFar;
 		uniform float maxDistance;
-		uniform float surfDist;
+		uniform float thickness;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
-		uniform float thickTolerance;
 		#include <packing>
 		float pointToLineDistance(vec3 x0, vec3 x1, vec3 x2) {
 			//x0: point, x1: linePointA, x2: linePointB
@@ -204,38 +200,52 @@
 					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 					float recipVPZ=1./viewPosition.z;
 					float viewReflectRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
-					float sD=surfDist*cW;
 				#else
 					float viewReflectRayZ=viewPosition.z+s*(d1viewPosition.z-viewPosition.z);
-					float sD=surfDist;
 				#endif
-				if(viewReflectRayZ-sD>vZ) continue;
 
-				#ifdef INFINITE_THICK
-					if(viewReflectRayZ+thickTolerance*clipW<vP.z) break;
-				#endif
-				float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
+				// if(viewReflectRayZ>vZ) continue; // will cause "npm run make-screenshot webgl_postprocessing_ssr" high probability hang.
+				// https://github.com/mrdoob/three.js/pull/21539#issuecomment-821061164
+				if(viewReflectRayZ<=vZ){
 
-				float op=opacity;
+					bool hit;
+					#ifdef INFINITE_THICK
+						hit=true;
+					#else
+						float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
 
-				if(away<sD){
-					vec3 vN=getViewNormal( uv );
-					if(dot(viewReflectDir,vN)>=0.) continue;
-					float distance=pointPlaneDistance(vP,viewPosition,viewNormal);
-					if(distance>maxDistance) break;
-					#ifdef DISTANCE_ATTENUATION
-						float ratio=1.-(distance/maxDistance);
-						float attenuation=ratio*ratio;
-						op=opacity*attenuation;
+						float minThickness;
+						vec2 xyNeighbor=xy;
+						xyNeighbor.x+=1.;
+						vec2 uvNeighbor=xyNeighbor/resolution;
+						vec3 vPNeighbor=getViewPosition(uvNeighbor,d,cW);
+						minThickness=vPNeighbor.x-vP.x;
+						minThickness*=3.;
+						float tk=max(minThickness,thickness);
+
+						hit=away<=tk;
 					#endif
-					#ifdef FRESNEL
-						float fresnelCoe=(dot(viewIncidentDir,viewReflectDir)+1.)/2.;
-						op*=fresnelCoe;
-					#endif
-					vec4 reflectColor=texture2D(tDiffuse,uv);
-					gl_FragColor.xyz=reflectColor.xyz;
-					gl_FragColor.a=op;
-					break;
+
+					if(hit){
+						vec3 vN=getViewNormal( uv );
+						if(dot(viewReflectDir,vN)>=0.) continue;
+						float distance=pointPlaneDistance(vP,viewPosition,viewNormal);
+						if(distance>maxDistance) break;
+						float op=opacity;
+						#ifdef DISTANCE_ATTENUATION
+							float ratio=1.-(distance/maxDistance);
+							float attenuation=ratio*ratio;
+							op=opacity*attenuation;
+						#endif
+						#ifdef FRESNEL
+							float fresnelCoe=(dot(viewIncidentDir,viewReflectDir)+1.)/2.;
+							op*=fresnelCoe;
+						#endif
+						vec4 reflectColor=texture2D(tDiffuse,uv);
+						gl_FragColor.xyz=reflectColor.xyz;
+						gl_FragColor.a=op;
+						break;
+					}
 				}
 			}
 		}
@@ -257,8 +267,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -271,8 +281,8 @@
 
 	`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform sampler2D tDepth;
 
@@ -323,8 +333,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -337,8 +347,8 @@
 
 	`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform sampler2D tDiffuse;
 		uniform vec2 resolution;

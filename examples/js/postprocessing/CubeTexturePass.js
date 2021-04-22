@@ -1,41 +1,41 @@
 ( function () {
 
-	var CubeTexturePass = function ( camera, envMap, opacity ) {
+	class CubeTexturePass extends THREE.Pass {
 
-		THREE.Pass.call( this );
-		this.camera = camera;
-		this.needsSwap = false;
-		this.cubeShader = THREE.ShaderLib[ 'cube' ];
-		this.cubeMesh = new THREE.Mesh( new THREE.BoxGeometry( 10, 10, 10 ), new THREE.ShaderMaterial( {
-			uniforms: THREE.UniformsUtils.clone( this.cubeShader.uniforms ),
-			vertexShader: this.cubeShader.vertexShader,
-			fragmentShader: this.cubeShader.fragmentShader,
-			depthTest: false,
-			depthWrite: false,
-			side: THREE.BackSide
-		} ) );
-		Object.defineProperty( this.cubeMesh.material, 'envMap', {
-			get: function () {
+		constructor( camera, envMap, opacity = 1 ) {
 
-				return this.uniforms.envMap.value;
+			super();
+			this.camera = camera;
+			this.needsSwap = false;
+			this.cubeShader = THREE.ShaderLib[ 'cube' ];
+			this.cubeMesh = new THREE.Mesh( new THREE.BoxGeometry( 10, 10, 10 ), new THREE.ShaderMaterial( {
+				uniforms: THREE.UniformsUtils.clone( this.cubeShader.uniforms ),
+				vertexShader: this.cubeShader.vertexShader,
+				fragmentShader: this.cubeShader.fragmentShader,
+				depthTest: false,
+				depthWrite: false,
+				side: THREE.BackSide
+			} ) );
+			Object.defineProperty( this.cubeMesh.material, 'envMap', {
+				get: function () {
 
-			}
-		} );
-		this.envMap = envMap;
-		this.opacity = opacity !== undefined ? opacity : 1.0;
-		this.cubeScene = new THREE.Scene();
-		this.cubeCamera = new THREE.PerspectiveCamera();
-		this.cubeScene.add( this.cubeMesh );
+					return this.uniforms.envMap.value;
 
-	};
+				}
+			} );
+			this.envMap = envMap;
+			this.opacity = opacity;
+			this.cubeScene = new THREE.Scene();
+			this.cubeCamera = new THREE.PerspectiveCamera();
+			this.cubeScene.add( this.cubeMesh );
 
-	CubeTexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
-		constructor: CubeTexturePass,
-		render: function ( renderer, writeBuffer, readBuffer
+		}
+
+		render( renderer, writeBuffer, readBuffer
 			/*, deltaTime, maskActive*/
 		) {
 
-			var oldAutoClear = renderer.autoClear;
+			const oldAutoClear = renderer.autoClear;
 			renderer.autoClear = false;
 			this.cubeCamera.projectionMatrix.copy( this.camera.projectionMatrix );
 			this.cubeCamera.quaternion.setFromRotationMatrix( this.camera.matrixWorld );
@@ -49,7 +49,8 @@
 			renderer.autoClear = oldAutoClear;
 
 		}
-	} );
+
+	}
 
 	THREE.CubeTexturePass = CubeTexturePass;
 
