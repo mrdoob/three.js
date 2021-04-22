@@ -154,10 +154,10 @@
 		<h3>[method:null cancel] ( [param:Boolean continueTransform] )</h3>
 		<p>
 			<p>
-				[page:Boolean continueTransform]: (optional) Keep transforming the object after resetting its position, rotation and scale. Default is false.
+				[page:Boolean continueTransform]: (optional) Keep transforming the object after resetting its position, rotation and scale. Default is *false*.
 			</p>
 			<p>
-				Cancels the current transform action and resets the object's position, rotation and scale to when the transform dragging began.
+				Resets the object's position, rotation and scale to when the current dragging's transform action began and calls [page:.stop stop()] if [param:Boolean continueTransform] evaluates to false.
 			</p>
 		</p>
 
@@ -228,7 +228,7 @@
 
 		<h3>[method:null stop] ()</h3>
 		<p>
-			Can be called to stop the dragging action without releasing the mouse button.
+			Stops the current transform action and does the same as mouse up.
 		</p>
 
 		<h2>Source</h2>
