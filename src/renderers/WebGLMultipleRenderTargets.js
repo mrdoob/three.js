@@ -1,6 +1,6 @@
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 
-class WebGLMultiRenderTarget extends WebGLRenderTarget {
+class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 
 	constructor( width, height, count ) {
 
@@ -74,6 +74,6 @@ class WebGLMultiRenderTarget extends WebGLRenderTarget {
 
 }
 
-WebGLMultiRenderTarget.prototype.isWebGLMultiRenderTarget = true;
+WebGLMultipleRenderTargets.prototype.isWebGLMultipleRenderTargets = true;
 
-export { WebGLMultiRenderTarget };
+export { WebGLMultipleRenderTargets };

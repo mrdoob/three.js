@@ -281,7 +281,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		if ( renderTarget.isWebGLMultiRenderTarget ) {
+		if ( renderTarget.isWebGLMultipleRenderTargets ) {
 
 			for ( let i = 0, il = texture.length; i < il; i ++ ) {
 
@@ -934,7 +934,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		} else {
 
 			// Use the first texture for MRT so far
-			const texture = renderTarget.isWebGLMultiRenderTarget === true ? renderTarget.texture[ 0 ] : renderTarget.texture;
+			const texture = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture[ 0 ] : renderTarget.texture;
 
 			const glFormat = utils.convert( texture.format );
 			const glType = utils.convert( texture.type );
@@ -1054,7 +1054,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
-		if ( renderTarget.isWebGLMultiRenderTarget !== true ) {
+		if ( renderTarget.isWebGLMultipleRenderTargets !== true ) {
 
 			textureProperties.__webglTexture = _gl.createTexture();
 			textureProperties.__version = texture.version;
@@ -1063,7 +1063,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		}
 
 		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
-		const isMultiRenderTarget = ( renderTarget.isWebGLMultiRenderTarget === true );
+		const isMultiRenderTarget = ( renderTarget.isWebGLMultipleRenderTargets === true );
 		const isMultisample = ( renderTarget.isWebGLMultisampleRenderTarget === true );
 		const isRenderTarget3D = texture.isDataTexture3D || texture.isDataTexture2DArray;
 		const supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
@@ -1114,7 +1114,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				} else {
 
-					console.warn( 'THREE.WebGLRenderer: WebGLMultiRenderTarget can only be used with WebGL2 or WEBGL_draw_buffers extension.' );
+					console.warn( 'THREE.WebGLRenderer: WebGLMultipleRenderTargets can only be used with WebGL2 or WEBGL_draw_buffers extension.' );
 
 				}
 
@@ -1250,7 +1250,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
-		const textures = renderTarget.isWebGLMultiRenderTarget === true ? renderTarget.texture : [ renderTarget.texture ];
+		const textures = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture : [ renderTarget.texture ];
 
 		for ( let i = 0, il = textures.length; i < il; i ++ ) {
 

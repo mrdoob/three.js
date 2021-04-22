@@ -1867,7 +1867,7 @@ function WebGLRenderer( parameters ) {
 
 			let needsUpdate = false;
 
-			if ( renderTarget && renderTarget.isWebGLMultiRenderTarget ) {
+			if ( renderTarget && renderTarget.isWebGLMultipleRenderTargets ) {
 
 				if ( _currentDrawBuffers.length !== renderTarget.texture.length || _currentDrawBuffers[ 0 ] !== _gl.COLOR_ATTACHMENT0 ) {
 
