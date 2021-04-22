@@ -48,6 +48,7 @@
 		let groundReflector;
 		const selects = [];
 		let bunny, cube, sphere, cone;
+		let folder
 
 		const container = document.querySelector( '#container' );
 
@@ -94,7 +95,7 @@
 
 					geometry.computeVertexNormals();
 
-					const material = new THREE.MeshStandardMaterial( { metalness: .6, roughness:0, color: 0x606060 } );
+					const material = new THREE.MeshStandardMaterial( { metalness: .5, roughness:.5, color: 0x606060 } );
 					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.y = - 0.0365;
 					scene.add( mesh );
@@ -111,7 +112,7 @@
 			let geometry, material, mesh;
 
 			geometry = new THREE.BoxBufferGeometry( .05, .05, .05 );
-			material = new THREE.MeshStandardMaterial( { metalness: .6, roughness:.5, color: 'green' } );
+			material = new THREE.MeshStandardMaterial( { metalness: .5, roughness:.5, color: 'green' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .12, .025, .015 );
 			scene.add( mesh );
@@ -120,7 +121,7 @@
 			cube=mesh
 
 			geometry = new THREE.IcosahedronBufferGeometry( .025, 4 );
-			material = new THREE.MeshStandardMaterial( { metalness: .6, roughness:.5, color: 'cyan' } );
+			material = new THREE.MeshStandardMaterial( { metalness: .5, roughness:.5, color: 'cyan' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, .08 );
 			scene.add( mesh );
@@ -129,7 +130,7 @@
 			sphere=mesh
 
 			geometry = new THREE.ConeBufferGeometry( .025, .05, 64 );
-			material = new THREE.MeshStandardMaterial( { metalness: .6, roughness:.5, color: 'yellow' } );
+			material = new THREE.MeshStandardMaterial( { metalness: .5, roughness:.5, color: 'yellow' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, - .055 );
 			scene.add( mesh );
@@ -253,16 +254,25 @@
 				ssrPass.output = parseInt( value );
 
 			} );
-			gui.add(bunny.material,'metalness').name('bunny metalness').min(0).max(1)
-			// gui.add(bunny.material,'roughness').name('bunny roughness').min(0).max(1)
-			gui.add(cube.material,'metalness').name('cube metalness').min(0).max(1)
-			// // gui.add(cube.material,'roughness').name('cube roughness').min(0).max(1)
-			gui.add(sphere.material,'metalness').name('sphere metalness').min(0).max(1)
-			// // gui.add(sphere.material,'roughness').name('sphere roughness').min(0).max(1)
-			gui.add(cone.material,'metalness').name('cone metalness').min(0).max(1)
-			// // gui.add(cone.material,'roughness').name('cone roughness').min(0).max(1)
+			folder=gui.addFolder('bunny')
+			folder.open()
+			folder.add(bunny.material,'envMapIntensity').name('ssr & env intensity').min(0).max(1)
+			folder.add(bunny.material,'metalness').name('bunny metalness').min(0).max(1)
+			folder.add(bunny.material,'roughness').name('bunny roughness').min(0).max(1)
+			folder=gui.addFolder('cube')
+			folder.add(cube.material,'envMapIntensity').name('ssr & env intensity').min(0).max(1)
+			folder.add(cube.material,'metalness').name('cube metalness').min(0).max(1)
+			folder.add(cube.material,'roughness').name('cube roughness').min(0).max(1)
+			folder=gui.addFolder('sphere')
+			folder.add(sphere.material,'envMapIntensity').name('ssr & env intensity').min(0).max(1)
+			folder.add(sphere.material,'metalness').name('sphere metalness').min(0).max(1)
+			folder.add(sphere.material,'roughness').name('sphere roughness').min(0).max(1)
+			folder=gui.addFolder('cone')
+			folder.add(cone.material,'envMapIntensity').name('ssr & env intensity').min(0).max(1)
+			folder.add(cone.material,'metalness').name('cone metalness').min(0).max(1)
+			folder.add(cone.material,'roughness').name('cone roughness').min(0).max(1)
 
-			const folder = gui.addFolder( 'more settings' );
+			folder = gui.addFolder( 'more settings' );
 			folder.add( ssrPass, 'fresnel' ).onChange( ()=>{
 
 				groundReflector.fresnel = ssrPass.fresnel;
