@@ -28,6 +28,7 @@
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 		import { SSRPass } from './jsm/postprocessing/SSRPass.js';
 		import { ReflectorForSSRPass } from './jsm/objects/ReflectorForSSRPass.js';
+		import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
@@ -35,7 +36,7 @@
 			enableSSR: true,
 			autoRotate: false,
 			otherMeshes: true,
-			groundReflector: true,
+			groundReflector: false,
 		};
 		let composer;
 		let ssrPass;
@@ -64,8 +65,7 @@
 
 			scene = new THREE.Scene();
 			window.scene=scene
-			scene.background = new THREE.Color( 0x443333 );
-			scene.fog = new THREE.Fog( 0x443333, 1, 4 );
+			// scene.fog = new THREE.Fog( 0x443333, 1, 4 );
 
 			// Ground
 			const plane = new THREE.Mesh(
@@ -76,6 +76,7 @@
 			plane.position.y = - 0.0001;
 			// plane.receiveShadow = true;
 			scene.add( plane );
+			selects.push(plane)
 
 			// Lights
 			const hemiLight = new THREE.HemisphereLight( 0x443333, 0x111122 );
@@ -93,7 +94,7 @@
 
 					geometry.computeVertexNormals();
 
-					const material = new THREE.MeshStandardMaterial( { metalness: 0.9, color: 0x606060 } );
+					const material = new THREE.MeshStandardMaterial( { metalness: .6, roughness:0, color: 0x606060 } );
 					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.y = - 0.0365;
 					scene.add( mesh );
@@ -110,7 +111,7 @@
 			let geometry, material, mesh;
 
 			geometry = new THREE.BoxBufferGeometry( .05, .05, .05 );
-			material = new THREE.MeshStandardMaterial( { metalness: .6, color: 'green' } );
+			material = new THREE.MeshStandardMaterial( { metalness: .6, roughness:.5, color: 'green' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .12, .025, .015 );
 			scene.add( mesh );
@@ -119,7 +120,7 @@
 			cube=mesh
 
 			geometry = new THREE.IcosahedronBufferGeometry( .025, 4 );
-			material = new THREE.MeshStandardMaterial( { metalness: .3, color: 'cyan' } );
+			material = new THREE.MeshStandardMaterial( { metalness: .6, roughness:.5, color: 'cyan' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, .08 );
 			scene.add( mesh );
@@ -128,7 +129,7 @@
 			sphere=mesh
 
 			geometry = new THREE.ConeBufferGeometry( .025, .05, 64 );
-			material = new THREE.MeshStandardMaterial( { metalness: .1, color: 'yellow' } );
+			material = new THREE.MeshStandardMaterial( { metalness: .6, roughness:.5, color: 'yellow' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, - .055 );
 			scene.add( mesh );
@@ -154,6 +155,32 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.outputEncoding = THREE.sRGBEncoding;
 			container.appendChild( renderer.domElement );
+			// scene.background = new THREE.Color( 0x443333 );
+			// new THREE.TextureLoader().load('textures/equirectangular/venice_sunset_1k.hdr', envMap=>{
+			// 	scene.background=envMap
+			// })
+			
+
+			const pmremGenerator = new THREE.PMREMGenerator( renderer );
+			pmremGenerator.compileEquirectangularShader();
+			new RGBELoader()
+					.setDataType( THREE.UnsignedByteType )
+					.setPath( 'textures/equirectangular/' )
+					.load( 'venice_sunset_1k.hdr', function ( texture ) {
+
+						let envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+						pmremGenerator.dispose();
+
+						scene.background = envMap;
+						scene.environment = envMap;
+
+						//
+
+						// buildGUI();
+						// initScene( scenes[ state.scene ] );
+						// animate();
+
+					} );
 
 			//
 
@@ -180,8 +207,9 @@
 				width: innerWidth,
 				height: innerHeight,
 				encoding: THREE.sRGBEncoding,
-				groundReflector: params.groundReflector ? groundReflector : null,
-				selects: params.groundReflector ? selects : null
+				// groundReflector: params.groundReflector ? groundReflector : null,
+				// selects: params.groundReflector ? selects : null
+				selects,
 			} );
 
 			composer.addPass( ssrPass );
@@ -190,25 +218,23 @@
 
 			gui = new GUI( { width: 260 } );
 			gui.add( params, 'enableSSR' ).name( 'Enable SSR' );
-			gui.add( params, 'groundReflector' ).onChange( () => {
+			// gui.add( params, 'groundReflector' ).onChange( () => {
 
-				if ( params.groundReflector ) {
+			// 	if ( params.groundReflector ) {
 
-					ssrPass.groundReflector = groundReflector,
-					ssrPass.selects = selects;
+			// 		ssrPass.groundReflector = groundReflector,
+			// 		ssrPass.selects = selects;
 
-				} else {
+			// 	} else {
 
-					ssrPass.groundReflector = null,
-					ssrPass.selects = null;
+			// 		ssrPass.groundReflector = null,
+			// 		ssrPass.selects = null;
 
-				}
+			// 	}
 
-			} );
+			// } );
 			ssrPass.thickness = 0.018;
 			gui.add( ssrPass, 'thickness' ).min( 0 ).max( .1 ).step( .0001 );
-			ssrPass.infiniteThick = false;
-			gui.add( ssrPass, 'infiniteThick' );
 			gui.add( params, 'autoRotate' ).onChange( () => {
 
 				controls.enabled = ! params.autoRotate;
@@ -228,9 +254,13 @@
 
 			} );
 			gui.add(bunny.material,'metalness').name('bunny metalness').min(0).max(1)
+			// gui.add(bunny.material,'roughness').name('bunny roughness').min(0).max(1)
 			gui.add(cube.material,'metalness').name('cube metalness').min(0).max(1)
+			// // gui.add(cube.material,'roughness').name('cube roughness').min(0).max(1)
 			gui.add(sphere.material,'metalness').name('sphere metalness').min(0).max(1)
+			// // gui.add(sphere.material,'roughness').name('sphere roughness').min(0).max(1)
 			gui.add(cone.material,'metalness').name('cone metalness').min(0).max(1)
+			// // gui.add(cone.material,'roughness').name('cone roughness').min(0).max(1)
 
 			const folder = gui.addFolder( 'more settings' );
 			folder.add( ssrPass, 'fresnel' ).onChange( ()=>{
@@ -276,6 +306,10 @@
 				ssrPass.output = parseInt( value );
 
 			} );
+			folder.add(bunny.material,'metalness').name('bunny metalness').min(0).max(1)
+			folder.add(cube.material,'metalness').name('cube metalness').min(0).max(1)
+			folder.add(sphere.material,'metalness').name('sphere metalness').min(0).max(1)
+			folder.add(cone.material,'metalness').name('cone metalness').min(0).max(1)
 			ssrPass.opacity = 1;
 			groundReflector.opacity = ssrPass.opacity;
 			folder.add( ssrPass, 'opacity' ).min( 0 ).max( 1 ).onChange( ()=>{
@@ -284,6 +318,8 @@
 
 			} );
 			folder.add( ssrPass, 'blur' );
+			ssrPass.infiniteThick = false;
+			folder.add( ssrPass, 'infiniteThick' );
 			// folder.open()
 			// gui.close()
 
