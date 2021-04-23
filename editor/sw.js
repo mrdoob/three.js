@@ -57,6 +57,9 @@ const assets = [
 	'../examples/jsm/curves/NURBSCurve.js',
 	'../examples/jsm/curves/NURBSUtils.js',
 
+	'../examples/jsm/interactive/HTMLMesh.js',
+	'../examples/jsm/interactive/InteractiveGroup.js',
+
 	'../examples/jsm/environments/RoomEnvironment.js',
 
 	'../examples/jsm/exporters/ColladaExporter.js',
@@ -108,7 +111,6 @@ const assets = [
 	'./js/libs/tern-threejs/threejs.js',
 
 	'./js/libs/signals.min.js',
-	'./js/libs/three.html.js',
 	'./js/libs/ui.js',
 	'./js/libs/ui.three.js',
 
