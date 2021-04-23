@@ -38,8 +38,8 @@ class LightContextNode extends ContextNode {
 
 		}
 
-		const resetTotalLight = `Irradiance = vec3( 0.0 ); ReflectedLightDirectDiffuse = vec3( 0.0 ); ReflectedLightDirectSpecular = vec3( 0.0 );`;
-		const resultTotalLight = `ReflectedLightDirectDiffuse + ReflectedLightDirectSpecular`;
+		const resetTotalLight = 'Irradiance = vec3( 0.0 ); ReflectedLightDirectDiffuse = vec3( 0.0 ); ReflectedLightDirectSpecular = vec3( 0.0 );';
+		const resultTotalLight = 'ReflectedLightDirectDiffuse + ReflectedLightDirectSpecular';
 
 		// include keywords
 
