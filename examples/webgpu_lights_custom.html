@@ -92,6 +92,8 @@
 				const RE_Direct = new FunctionNode( `
 					void ( vec3 lightColor ) {
 
+						// lightColor returns the color with the intensity calculated
+
 						ReflectedLightDirectDiffuse += lightColor;
 
 					}` );
