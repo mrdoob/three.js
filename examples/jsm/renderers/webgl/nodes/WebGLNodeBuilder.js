@@ -77,6 +77,14 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getVarsHeaderSnippet( /*shaderStage*/ ) {
+
+	}
+
+	getVarsBodySnippet( /*shaderStage*/ ) {
+
+	}
+
 	getVarysHeaderSnippet( /*shaderStage*/ ) {
 
 	}
