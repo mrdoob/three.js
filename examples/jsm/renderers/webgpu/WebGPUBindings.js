@@ -123,7 +123,7 @@ class WebGPUBindings {
 
 			} else if ( binding.isSampler ) {
 
-				const texture = binding.texture;
+				const texture = binding.getTexture();
 
 				textures.updateSampler( texture );
 
@@ -138,7 +138,7 @@ class WebGPUBindings {
 
 			} else if ( binding.isSampledTexture ) {
 
-				const texture = binding.texture;
+				const texture = binding.getTexture();
 
 				const forceUpdate = textures.updateTexture( texture );
 				const textureGPU = textures.getTextureGPU( texture );

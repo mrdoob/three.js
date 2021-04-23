@@ -1,6 +1,9 @@
 import NodeUniform from './NodeUniform.js';
 import NodeAttribute from './NodeAttribute.js';
 import NodeVary from './NodeVary.js';
+import NodeVar from './NodeVar.js';
+import NodeCode from './NodeCode.js';
+import NodeKeywords from './NodeKeywords.js';
 import { NodeUpdateType } from './constants.js';
 
 class NodeBuilder {
@@ -19,8 +22,16 @@ class NodeBuilder {
 		this.slots = { vertex: [], fragment: [] };
 		this.defines = { vertex: {}, fragment: {} };
 		this.uniforms = { vertex: [], fragment: [] };
+		this.nodeCodes = { vertex: [], fragment: [] };
+		this.vars = { vertex: [], fragment: [] };
 		this.attributes = [];
 		this.varys = [];
+		this.flow = { code: '' };
+
+		this.context = {
+			keywords: new NodeKeywords(),
+			material: material
+		};
 
 		this.nodesData = new WeakMap();
 
@@ -58,6 +69,24 @@ class NodeBuilder {
 
 	}
 
+	setContext( context ) {
+
+		this.context = context;
+
+	}
+
+	getContext() {
+
+		return this.context;
+
+	}
+
+	getContextParameter( name ) {
+
+		return this.context[ name ];
+
+	}
+
 	getTexture( /* textureProperty, uvSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
@@ -72,7 +101,7 @@ class NodeBuilder {
 		if ( type === 'vec4' ) return `vec4( ${value.x}, ${value.y}, ${value.z}, ${value.w} )`;
 		if ( type === 'color' ) return `vec3( ${value.r}, ${value.g}, ${value.b} )`;
 
-		throw new Error( `Type '${type}' not found in generate constant attempt.` );
+		throw new Error( `NodeBuilder: Type '${type}' not found in generate constant attempt.` );
 
 	}
 
@@ -129,7 +158,7 @@ class NodeBuilder {
 	getVectorType( type ) {
 
 		if ( type === 'color' ) return 'vec3';
-		else if ( type === 'texture' ) return 'vec4';
+		if ( type === 'texture' ) return 'vec4';
 
 		return type;
 
@@ -186,7 +215,7 @@ class NodeBuilder {
 			const uniforms = this.uniforms[ shaderStage ];
 			const index = uniforms.length;
 
-			nodeUniform = new NodeUniform( 'nodeU' + index, type, node );
+			nodeUniform = new NodeUniform( 'nodeUniform' + index, type, node );
 
 			uniforms.push( nodeUniform );
 
@@ -195,6 +224,29 @@ class NodeBuilder {
 		}
 
 		return nodeUniform;
+
+	}
+
+	getVarFromNode( node, type, shaderStage = this.shaderStage ) {
+
+		const nodeData = this.getDataFromNode( node, shaderStage );
+
+		let nodeVar = nodeData.variable;
+
+		if ( nodeVar === undefined ) {
+
+			const vars = this.vars[ shaderStage ];
+			const index = vars.length;
+
+			nodeVar = new NodeVar( 'nodeVar' + index, type );
+
+			vars.push( nodeVar );
+
+			nodeData.variable = nodeVar;
+
+		}
+
+		return nodeVar;
 
 	}
 
@@ -209,7 +261,7 @@ class NodeBuilder {
 			const varys = this.varys;
 			const index = varys.length;
 
-			nodeVary = new NodeVary( 'nodeV' + index, type );
+			nodeVary = new NodeVary( 'nodeVary' + index, type );
 
 			varys.push( nodeVary );
 
@@ -221,6 +273,29 @@ class NodeBuilder {
 
 	}
 
+	getCodeFromNode( node, type, shaderStage = this.shaderStage ) {
+
+		const nodeData = this.getDataFromNode( node );
+
+		let nodeCode = nodeData.code;
+
+		if ( nodeCode === undefined ) {
+
+			const nodeCodes = this.nodeCodes[ shaderStage ];
+			const index = nodeCodes.length;
+
+			nodeCode = new NodeCode( 'nodeCode' + index, type );
+
+			nodeCodes.push( nodeCode );
+
+			nodeData.code = nodeCode;
+
+		}
+
+		return nodeCode;
+
+	}
+
 	/*
 	analyzeNode( node ) {
 
@@ -228,12 +303,33 @@ class NodeBuilder {
 	}
 	*/
 
+	addFlowCode( code ) {
+
+		if ( ! /;\s*$/.test( code ) ) {
+
+			code += '; ';
+
+		}
+
+		this.flow.code += code;
+
+	}
+
 	flowNode( node, output ) {
 
-		const flowData = {};
-		flowData.result = node.build( this, output );
+		const previousFlow = this.flow;
 
-		return flowData;
+		const flow = {
+			code: previousFlow.code,
+		};
+
+		this.flow = flow;
+
+		flow.result = node.build( this, output );
+
+		this.flow = previousFlow;
+
+		return flow;
 
 	}
 
@@ -277,9 +373,37 @@ class NodeBuilder {
 
 	}
 
+	getVarsHeaderSnippet( /*shaderStage*/ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getVarsBodySnippet( /*shaderStage*/ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
 	getUniformsHeaderSnippet( /*shaderStage*/ ) {
 
 		console.warn( 'Abstract function.' );
+
+	}
+
+	getUniformsHeaderCodes( shaderStage ) {
+
+		const nodeCodes = this.nodeCodes[ shaderStage ];
+
+		let code = '';
+
+		for ( const nodeCode of nodeCodes ) {
+
+			code += nodeCode.code + '\n';
+
+		}
+
+		return code;
 
 	}
 
@@ -304,6 +428,7 @@ class NodeBuilder {
 
 				const flowData = this.flowNode( slot.node, slot.output );
 
+				this.define( shaderStage, `NODE_CODE_${slot.name}`, flowData.code );
 				this.define( shaderStage, `NODE_${slot.name}`, flowData.result );
 
 			}
@@ -319,8 +444,14 @@ class NodeBuilder {
 			this.define( shaderStage, 'NODE_HEADER_VARYS', this.getVarysHeaderSnippet( shaderStage ) );
 
 			this.define( shaderStage, 'NODE_BODY_VARYS', this.getVarysBodySnippet( shaderStage ) );
+			this.define( shaderStage, 'NODE_BODY_VARS', this.getVarsBodySnippet( shaderStage ) );
 
-			shaderData[ shaderStage ] = this._buildDefines( shaderStage );
+			let headerCode = '';
+
+			headerCode += this.getVarsHeaderSnippet( shaderStage ) + '\n';
+			headerCode += this.getUniformsHeaderCodes( shaderStage );
+
+			shaderData[ shaderStage ] = this._buildDefines( shaderStage ) + '\n' + headerCode;
 
 		}
 
