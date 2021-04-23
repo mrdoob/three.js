@@ -576,7 +576,7 @@ class SSRPass extends Pass {
 		}
 
 		this.selects.forEach(child => {
-			this.metalnessMaterial.color.setScalar( (typeof(child.material.envMapIntensity)==='number') ? child.material.envMapIntensity : 1 )
+			this.metalnessMaterial.color.setScalar( (typeof(child.material.reflectivity)==='number') ? child.material.reflectivity : 1 )
 			let materialBack = child.material;
 			child.material = this.metalnessMaterial
 			renderer.render(child, this.camera)
