@@ -18,23 +18,21 @@ import {
  * @param {Manager} manager Loading manager.
  */
 
-var GCodeLoader = function ( manager ) {
+class GCodeLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.splitLayer = false;
+		super( manager );
 
-};
+		this.splitLayer = false;
 
-GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: GCodeLoader,
+	load( url, onLoad, onProgress, onError ) {
 
-	load: function ( url, onLoad, onProgress, onError ) {
+		const scope = this;
 
-		var scope = this;
-
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
@@ -62,19 +60,19 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	parse( data ) {
 
-		var state = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false, relative: false };
-		var layers = [];
+		let state = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false, relative: false };
+		let layers = [];
 
-		var currentLayer = undefined;
+		let currentLayer = undefined;
 
-		var pathMaterial = new LineBasicMaterial( { color: 0xFF0000 } );
+		const pathMaterial = new LineBasicMaterial( { color: 0xFF0000 } );
 		pathMaterial.name = 'path';
 
-		var extrudingMaterial = new LineBasicMaterial( { color: 0x00FF00 } );
+		const extrudingMaterial = new LineBasicMaterial( { color: 0x00FF00 } );
 		extrudingMaterial.name = 'extruded';
 
 		function newLayer( line ) {
@@ -93,7 +91,7 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			if ( line.extruding ) {
+			if ( state.extruding ) {
 
 				currentLayer.vertex.push( p1.x, p1.y, p1.z );
 				currentLayer.vertex.push( p2.x, p2.y, p2.z );
@@ -119,21 +117,21 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		var lines = data.replace( /;.+/g, '' ).split( '\n' );
+		let lines = data.replace( /;.+/g, '' ).split( '\n' );
 
-		for ( var i = 0; i < lines.length; i ++ ) {
+		for ( let i = 0; i < lines.length; i ++ ) {
 
-			var tokens = lines[ i ].split( ' ' );
-			var cmd = tokens[ 0 ].toUpperCase();
+			let tokens = lines[ i ].split( ' ' );
+			let cmd = tokens[ 0 ].toUpperCase();
 
 			//Argumments
-			var args = {};
+			let args = {};
 			tokens.splice( 1 ).forEach( function ( token ) {
 
 				if ( token[ 0 ] !== undefined ) {
 
-					var key = token[ 0 ].toLowerCase();
-					var value = parseFloat( token.substring( 1 ) );
+					let key = token[ 0 ].toLowerCase();
+					let value = parseFloat( token.substring( 1 ) );
 					args[ key ] = value;
 
 				}
@@ -144,7 +142,7 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			//G0/G1 – Linear Movement
 			if ( cmd === 'G0' || cmd === 'G1' ) {
 
-				var line = {
+				let line = {
 					x: args.x !== undefined ? absolute( state.x, args.x ) : state.x,
 					y: args.y !== undefined ? absolute( state.y, args.y ) : state.y,
 					z: args.z !== undefined ? absolute( state.z, args.z ) : state.z,
@@ -186,7 +184,7 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			} else if ( cmd === 'G92' ) {
 
 				//G92: Set Position
-				var line = state;
+				let line = state;
 				line.x = args.x !== undefined ? args.x : line.x;
 				line.y = args.y !== undefined ? args.y : line.y;
 				line.z = args.z !== undefined ? args.z : line.z;
@@ -201,47 +199,47 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function addObject( vertex, extruding ) {
+		function addObject( vertex, extruding, i ) {
 
-			var geometry = new BufferGeometry();
+			let geometry = new BufferGeometry();
 			geometry.setAttribute( 'position', new Float32BufferAttribute( vertex, 3 ) );
-
-			var segments = new LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
+			let segments = new LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
 			segments.name = 'layer' + i;
 			object.add( segments );
 
 		}
 
-		var object = new Group();
+		const object = new Group();
 		object.name = 'gcode';
 
 		if ( this.splitLayer ) {
 
-			for ( var i = 0; i < layers.length; i ++ ) {
+			for ( let i = 0; i < layers.length; i ++ ) {
 
-				var layer = layers[ i ];
-				addObject( layer.vertex, true );
-				addObject( layer.pathVertex, false );
+				let layer = layers[ i ];
+				addObject( layer.vertex, true, i );
+				addObject( layer.pathVertex, false, i );
 
 			}
 
 		} else {
 
-			var vertex = [], pathVertex = [];
+			const vertex = [],
+				pathVertex = [];
 
-			for ( var i = 0; i < layers.length; i ++ ) {
+			for ( let i = 0; i < layers.length; i ++ ) {
 
-				var layer = layers[ i ];
-				var layerVertex = layer.vertex;
-				var layerPathVertex = layer.pathVertex;
+				let layer = layers[ i ];
+				let layerVertex = layer.vertex;
+				let layerPathVertex = layer.pathVertex;
 
-				for ( var j = 0; j < layerVertex.length; j ++ ) {
+				for ( let j = 0; j < layerVertex.length; j ++ ) {
 
 					vertex.push( layerVertex[ j ] );
 
 				}
 
-				for ( var j = 0; j < layerPathVertex.length; j ++ ) {
+				for ( let j = 0; j < layerPathVertex.length; j ++ ) {
 
 					pathVertex.push( layerPathVertex[ j ] );
 
@@ -249,8 +247,8 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			addObject( vertex, true );
-			addObject( pathVertex, false );
+			addObject( vertex, true, layers.length );
+			addObject( pathVertex, false, layers.length );
 
 		}
 
@@ -260,6 +258,6 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 export { GCodeLoader };

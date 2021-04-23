@@ -7,7 +7,7 @@ import { SetSceneCommand } from './commands/SetSceneCommand.js';
 
 import { LoaderUtils } from './LoaderUtils.js';
 
-import { unzipSync, strFromU8 } from '../../examples/jsm/libs/fflate.module.min.js';
+import { unzipSync, strFromU8 } from '../../examples/jsm/libs/fflate.module.js';
 
 function Loader( editor ) {
 

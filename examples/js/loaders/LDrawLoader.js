@@ -1,6 +1,25 @@
-THREE.LDrawLoader = ( function () {
+( function () {
 
-	var conditionalLineVertShader = /* glsl */`
+	// Note: "MATERIAL" tag (e.g. GLITTER, SPECKLE) is not implemented
+
+	const FINISH_TYPE_DEFAULT = 0;
+	const FINISH_TYPE_CHROME = 1;
+	const FINISH_TYPE_PEARLESCENT = 2;
+	const FINISH_TYPE_RUBBER = 3;
+	const FINISH_TYPE_MATTE_METALLIC = 4;
+	const FINISH_TYPE_METAL = 5; // State machine to search a subobject path.
+	// The LDraw standard establishes these various possible subfolders.
+
+	const FILE_LOCATION_AS_IS = 0;
+	const FILE_LOCATION_TRY_PARTS = 1;
+	const FILE_LOCATION_TRY_P = 2;
+	const FILE_LOCATION_TRY_MODELS = 3;
+	const FILE_LOCATION_TRY_RELATIVE = 4;
+	const FILE_LOCATION_TRY_ABSOLUTE = 5;
+	const FILE_LOCATION_NOT_FOUND = 6;
+	const conditionalLineVertShader =
+/* glsl */
+`
 	attribute vec3 control0;
 	attribute vec3 control1;
 	attribute vec3 direction;
@@ -47,8 +66,9 @@ THREE.LDrawLoader = ( function () {
 		#include <fog_vertex>
 	}
 	`;
-
-	var conditionalLineFragShader = /* glsl */`
+	const conditionalLineFragShader =
+/* glsl */
+`
 	uniform vec3 diffuse;
 	uniform float opacity;
 	varying float discardFlag;
@@ -76,10 +96,10 @@ THREE.LDrawLoader = ( function () {
 	}
 	`;
 
+	const _tempVec0 = new THREE.Vector3();
 
+	const _tempVec1 = new THREE.Vector3();
 
-	var tempVec0 = new THREE.Vector3();
-	var tempVec1 = new THREE.Vector3();
 	function smoothNormals( triangles, lineSegments ) {
 
 		function hashVertex( v ) {
@@ -87,80 +107,78 @@ THREE.LDrawLoader = ( function () {
 			// NOTE: 1e2 is pretty coarse but was chosen because it allows edges
 			// to be smoothed as expected (see minifig arms). The errors between edges
 			// could be due to matrix multiplication.
-			var x = ~ ~ ( v.x * 1e2 );
-			var y = ~ ~ ( v.y * 1e2 );
-			var z = ~ ~ ( v.z * 1e2 );
-			return `${ x },${ y },${ z }`;
+			const x = ~ ~ ( v.x * 1e2 );
+			const y = ~ ~ ( v.y * 1e2 );
+			const z = ~ ~ ( v.z * 1e2 );
+			return `${x},${y},${z}`;
 
 		}
 
 		function hashEdge( v0, v1 ) {
 
-			return `${ hashVertex( v0 ) }_${ hashVertex( v1 ) }`;
+			return `${hashVertex( v0 )}_${hashVertex( v1 )}`;
 
 		}
 
-		var hardEdges = new Set();
-		var halfEdgeList = {};
-		var fullHalfEdgeList = {};
-		var normals = [];
+		const hardEdges = new Set();
+		const halfEdgeList = {};
+		const fullHalfEdgeList = {};
+		const normals = []; // Save the list of hard edges by hash
 
-		// Save the list of hard edges by hash
-		for ( var i = 0, l = lineSegments.length; i < l; i ++ ) {
+		for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
-			var ls = lineSegments[ i ];
-			var v0 = ls.v0;
-			var v1 = ls.v1;
+			const ls = lineSegments[ i ];
+			const v0 = ls.v0;
+			const v1 = ls.v1;
 			hardEdges.add( hashEdge( v0, v1 ) );
 			hardEdges.add( hashEdge( v1, v0 ) );
 
-		}
+		} // track the half edges associated with each triangle
 
-		// track the half edges associated with each triangle
-		for ( var i = 0, l = triangles.length; i < l; i ++ ) {
 
-			var tri = triangles[ i ];
-			for ( var i2 = 0, l2 = 3; i2 < l2; i2 ++ ) {
+		for ( let i = 0, l = triangles.length; i < l; i ++ ) {
 
-				var index = i2;
-				var next = ( i2 + 1 ) % 3;
-				var v0 = tri[ `v${ index }` ];
-				var v1 = tri[ `v${ next }` ];
-				var hash = hashEdge( v0, v1 );
+			const tri = triangles[ i ];
 
-				// don't add the triangle if the edge is supposed to be hard
+			for ( let i2 = 0, l2 = 3; i2 < l2; i2 ++ ) {
+
+				const index = i2;
+				const next = ( i2 + 1 ) % 3;
+				const v0 = tri[ `v${index}` ];
+				const v1 = tri[ `v${next}` ];
+				const hash = hashEdge( v0, v1 ); // don't add the triangle if the edge is supposed to be hard
+
 				if ( hardEdges.has( hash ) ) continue;
 				halfEdgeList[ hash ] = tri;
 				fullHalfEdgeList[ hash ] = tri;
 
 			}
 
-		}
-
-		// NOTE: Some of the normals wind up being skewed in an unexpected way because
+		} // NOTE: Some of the normals wind up being skewed in an unexpected way because
 		// quads provide more "influence" to some vertex normals than a triangle due to
 		// the fact that a quad is made up of two triangles and all triangles are weighted
 		// equally. To fix this quads could be tracked separately so their vertex normals
 		// are weighted appropriately or we could try only adding a normal direction
 		// once per normal.
-
 		// Iterate until we've tried to connect all triangles to share normals
+
+
 		while ( true ) {
 
 			// Stop if there are no more triangles left
-			var halfEdges = Object.keys( halfEdgeList );
-			if ( halfEdges.length === 0 ) break;
+			const halfEdges = Object.keys( halfEdgeList );
+			if ( halfEdges.length === 0 ) break; // Exhaustively find all connected triangles
 
-			// Exhaustively find all connected triangles
-			var i = 0;
-			var queue = [ fullHalfEdgeList[ halfEdges[ 0 ] ] ];
+			let i = 0;
+			const queue = [ fullHalfEdgeList[ halfEdges[ 0 ] ] ];
+
 			while ( i < queue.length ) {
 
 				// initialize all vertex normals in this triangle
-				var tri = queue[ i ];
+				const tri = queue[ i ];
 				i ++;
+				const faceNormal = tri.faceNormal;
 
-				var faceNormal = tri.faceNormal;
 				if ( tri.n0 === null ) {
 
 					tri.n0 = faceNormal.clone();
@@ -180,22 +198,21 @@ THREE.LDrawLoader = ( function () {
 					tri.n2 = faceNormal.clone();
 					normals.push( tri.n2 );
 
-				}
+				} // Check if any edge is connected to another triangle edge
 
-				// Check if any edge is connected to another triangle edge
-				for ( var i2 = 0, l2 = 3; i2 < l2; i2 ++ ) {
 
-					var index = i2;
-					var next = ( i2 + 1 ) % 3;
-					var v0 = tri[ `v${ index }` ];
-					var v1 = tri[ `v${ next }` ];
+				for ( let i2 = 0, l2 = 3; i2 < l2; i2 ++ ) {
 
-					// delete this triangle from the list so it won't be found again
-					var hash = hashEdge( v0, v1 );
+					const index = i2;
+					const next = ( i2 + 1 ) % 3;
+					const v0 = tri[ `v${index}` ];
+					const v1 = tri[ `v${next}` ]; // delete this triangle from the list so it won't be found again
+
+					const hash = hashEdge( v0, v1 );
 					delete halfEdgeList[ hash ];
+					const reverseHash = hashEdge( v1, v0 );
+					const otherTri = fullHalfEdgeList[ reverseHash ];
 
-					var reverseHash = hashEdge( v1, v0 );
-					var otherTri = fullHalfEdgeList[ reverseHash ];
 					if ( otherTri ) {
 
 						// NOTE: If the angle between triangles is > 67.5 degrees then assume it's
@@ -205,41 +222,41 @@ THREE.LDrawLoader = ( function () {
 
 							continue;
 
-						}
-
-						// if this triangle has already been traversed then it won't be in
+						} // if this triangle has already been traversed then it won't be in
 						// the halfEdgeList. If it has not then add it to the queue and delete
 						// it so it won't be found again.
+
+
 						if ( reverseHash in halfEdgeList ) {
 
 							queue.push( otherTri );
 							delete halfEdgeList[ reverseHash ];
 
-						}
+						} // Find the matching edge in this triangle and copy the normal vector over
 
-						// Find the matching edge in this triangle and copy the normal vector over
-						for ( var i3 = 0, l3 = 3; i3 < l3; i3 ++ ) {
 
-							var otherIndex = i3;
-							var otherNext = ( i3 + 1 ) % 3;
-							var otherV0 = otherTri[ `v${ otherIndex }` ];
-							var otherV1 = otherTri[ `v${ otherNext }` ];
+						for ( let i3 = 0, l3 = 3; i3 < l3; i3 ++ ) {
 
-							var otherHash = hashEdge( otherV0, otherV1 );
+							const otherIndex = i3;
+							const otherNext = ( i3 + 1 ) % 3;
+							const otherV0 = otherTri[ `v${otherIndex}` ];
+							const otherV1 = otherTri[ `v${otherNext}` ];
+							const otherHash = hashEdge( otherV0, otherV1 );
+
 							if ( otherHash === reverseHash ) {
 
-								if ( otherTri[ `n${ otherIndex }` ] === null ) {
+								if ( otherTri[ `n${otherIndex}` ] === null ) {
 
-									var norm = tri[ `n${ next }` ];
-									otherTri[ `n${ otherIndex }` ] = norm;
+									const norm = tri[ `n${next}` ];
+									otherTri[ `n${otherIndex}` ] = norm;
 									norm.add( otherTri.faceNormal );
 
 								}
 
-								if ( otherTri[ `n${ otherNext }` ] === null ) {
+								if ( otherTri[ `n${otherNext}` ] === null ) {
 
-									var norm = tri[ `n${ index }` ];
-									otherTri[ `n${ otherNext }` ] = norm;
+									const norm = tri[ `n${index}` ];
+									otherTri[ `n${otherNext}` ] = norm;
 									norm.add( otherTri.faceNormal );
 
 								}
@@ -256,10 +273,10 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-		}
+		} // The normals of each face have been added up so now we average them by normalizing the vector.
 
-		// The normals of each face have been added up so now we average them by normalizing the vector.
-		for ( var i = 0, l = normals.length; i < l; i ++ ) {
+
+		for ( let i = 0, l = normals.length; i < l; i ++ ) {
 
 			normals[ i ].normalize();
 
@@ -273,21 +290,19 @@ THREE.LDrawLoader = ( function () {
 
 	}
 
-	function LineParser( line, lineNumber ) {
+	class LineParser {
 
-		this.line = line;
-		this.lineLength = line.length;
-		this.currentCharIndex = 0;
-		this.currentChar = ' ';
-		this.lineNumber = lineNumber;
+		constructor( line, lineNumber ) {
 
-	}
+			this.line = line;
+			this.lineLength = line.length;
+			this.currentCharIndex = 0;
+			this.currentChar = ' ';
+			this.lineNumber = lineNumber;
 
-	LineParser.prototype = {
+		}
 
-		constructor: LineParser,
-
-		seekNonSpace: function () {
+		seekNonSpace() {
 
 			while ( this.currentCharIndex < this.lineLength ) {
 
@@ -303,13 +318,12 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-		},
+		}
 
-		getToken: function () {
+		getToken() {
 
-			var pos0 = this.currentCharIndex ++;
+			const pos0 = this.currentCharIndex ++; // Seek space
 
-			// Seek space
 			while ( this.currentCharIndex < this.lineLength ) {
 
 				this.currentChar = this.line.charAt( this.currentCharIndex );
@@ -324,40 +338,37 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-			var pos1 = this.currentCharIndex;
-
+			const pos1 = this.currentCharIndex;
 			this.seekNonSpace();
-
 			return this.line.substring( pos0, pos1 );
 
-		},
+		}
 
-		getRemainingString: function () {
+		getRemainingString() {
 
 			return this.line.substring( this.currentCharIndex, this.lineLength );
 
-		},
+		}
 
-		isAtTheEnd: function () {
+		isAtTheEnd() {
 
 			return this.currentCharIndex >= this.lineLength;
 
-		},
+		}
 
-		setToEnd: function () {
+		setToEnd() {
 
 			this.currentCharIndex = this.lineLength;
 
-		},
+		}
 
-		getLineNumberString: function () {
+		getLineNumberString() {
 
 			return this.lineNumber >= 0 ? ' at line ' + this.lineNumber : '';
 
 		}
 
-
-	};
+	}
 
 	function sortByMaterial( a, b ) {
 
@@ -381,33 +392,30 @@ THREE.LDrawLoader = ( function () {
 
 		// Creates a THREE.LineSegments (elementSize = 2) or a THREE.Mesh (elementSize = 3 )
 		// With per face / segment material, implemented with mesh groups and materials array
-
 		// Sort the triangles or line segments by colour code to make later the mesh groups
 		elements.sort( sortByMaterial );
+		const positions = [];
+		const normals = [];
+		const materials = [];
+		const bufferGeometry = new THREE.BufferGeometry();
+		let prevMaterial = null;
+		let index0 = 0;
+		let numGroupVerts = 0;
 
-		var positions = [];
-		var normals = [];
-		var materials = [];
+		for ( let iElem = 0, nElem = elements.length; iElem < nElem; iElem ++ ) {
 
-		var bufferGeometry = new THREE.BufferGeometry();
-		var prevMaterial = null;
-		var index0 = 0;
-		var numGroupVerts = 0;
+			const elem = elements[ iElem ];
+			const v0 = elem.v0;
+			const v1 = elem.v1; // Note that LDraw coordinate system is rotated 180 deg. in the X axis w.r.t. Three.js's one
 
-		for ( var iElem = 0, nElem = elements.length; iElem < nElem; iElem ++ ) {
-
-			var elem = elements[ iElem ];
-			var v0 = elem.v0;
-			var v1 = elem.v1;
-			// Note that LDraw coordinate system is rotated 180 deg. in the X axis w.r.t. Three.js's one
 			positions.push( v0.x, v0.y, v0.z, v1.x, v1.y, v1.z );
+
 			if ( elementSize === 3 ) {
 
 				positions.push( elem.v2.x, elem.v2.y, elem.v2.z );
-
-				var n0 = elem.n0 || elem.faceNormal;
-				var n1 = elem.n1 || elem.faceNormal;
-				var n2 = elem.n2 || elem.faceNormal;
+				const n0 = elem.n0 || elem.faceNormal;
+				const n1 = elem.n1 || elem.faceNormal;
+				const n2 = elem.n2 || elem.faceNormal;
 				normals.push( n0.x, n0.y, n0.z );
 				normals.push( n1.x, n1.y, n1.z );
 				normals.push( n2.x, n2.y, n2.z );
@@ -423,7 +431,6 @@ THREE.LDrawLoader = ( function () {
 				}
 
 				materials.push( elem.material );
-
 				prevMaterial = elem.material;
 				index0 = iElem * elementSize;
 				numGroupVerts = elementSize;
@@ -450,7 +457,7 @@ THREE.LDrawLoader = ( function () {
 
 		}
 
-		var object3d = null;
+		let object3d = null;
 
 		if ( elementSize === 2 ) {
 
@@ -465,32 +472,30 @@ THREE.LDrawLoader = ( function () {
 		if ( isConditionalSegments ) {
 
 			object3d.isConditionalLine = true;
+			const controlArray0 = new Float32Array( elements.length * 3 * 2 );
+			const controlArray1 = new Float32Array( elements.length * 3 * 2 );
+			const directionArray = new Float32Array( elements.length * 3 * 2 );
 
-			var controlArray0 = new Float32Array( elements.length * 3 * 2 );
-			var controlArray1 = new Float32Array( elements.length * 3 * 2 );
-			var directionArray = new Float32Array( elements.length * 3 * 2 );
-			for ( var i = 0, l = elements.length; i < l; i ++ ) {
+			for ( let i = 0, l = elements.length; i < l; i ++ ) {
 
-				var os = elements[ i ];
-				var c0 = os.c0;
-				var c1 = os.c1;
-				var v0 = os.v0;
-				var v1 = os.v1;
-				var index = i * 3 * 2;
+				const os = elements[ i ];
+				const c0 = os.c0;
+				const c1 = os.c1;
+				const v0 = os.v0;
+				const v1 = os.v1;
+				const index = i * 3 * 2;
 				controlArray0[ index + 0 ] = c0.x;
 				controlArray0[ index + 1 ] = c0.y;
 				controlArray0[ index + 2 ] = c0.z;
 				controlArray0[ index + 3 ] = c0.x;
 				controlArray0[ index + 4 ] = c0.y;
 				controlArray0[ index + 5 ] = c0.z;
-
 				controlArray1[ index + 0 ] = c1.x;
 				controlArray1[ index + 1 ] = c1.y;
 				controlArray1[ index + 2 ] = c1.z;
 				controlArray1[ index + 3 ] = c1.x;
 				controlArray1[ index + 4 ] = c1.y;
 				controlArray1[ index + 5 ] = c1.z;
-
 				directionArray[ index + 0 ] = v1.x - v0.x;
 				directionArray[ index + 1 ] = v1.y - v0.y;
 				directionArray[ index + 2 ] = v1.z - v0.z;
@@ -508,69 +513,37 @@ THREE.LDrawLoader = ( function () {
 
 		return object3d;
 
-	}
+	} //
 
-	//
 
-	function LDrawLoader( manager ) {
+	class LDrawLoader extends THREE.Loader {
 
-		THREE.Loader.call( this, manager );
+		constructor( manager ) {
 
-		// This is a stack of 'parse scopes' with one level per subobject loaded file.
-		// Each level contains a material lib and also other runtime variables passed between parent and child subobjects
-		// When searching for a material code, the stack is read from top of the stack to bottom
-		// Each material library is an object map keyed by colour codes.
-		this.parseScopesStack = null;
+			super( manager ); // This is a stack of 'parse scopes' with one level per subobject loaded file.
+			// Each level contains a material lib and also other runtime variables passed between parent and child subobjects
+			// When searching for a material code, the stack is read from top of the stack to bottom
+			// Each material library is an object map keyed by colour codes.
 
-		// Array of THREE.Material
-		this.materials = [];
+			this.parseScopesStack = null; // Array of THREE.Material
 
-		// Not using THREE.Cache here because it returns the previous HTML error response instead of calling onError()
-		// This also allows to handle the embedded text files ("0 FILE" lines)
-		this.subobjectCache = {};
+			this.materials = []; // Not using THREE.Cache here because it returns the previous HTML error response instead of calling onError()
+			// This also allows to handle the embedded text files ("0 FILE" lines)
 
-		// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
-		this.fileMap = null;
+			this.subobjectCache = {}; // This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
 
-		// Add default main triangle and line edge materials (used in piecess that can be coloured with a main color)
-		this.setMaterials( [
-			this.parseColourMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ),
-			this.parseColourMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) )
-		] );
+			this.fileMap = null; // Add default main triangle and line edge materials (used in piecess that can be coloured with a main color)
 
-		// If this flag is set to true, each subobject will be a THREE.Object.
-		// If not (the default), only one object which contains all the merged primitives will be created.
-		this.separateObjects = false;
+			this.setMaterials( [ this.parseColourMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ), this.parseColourMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) ) ] ); // If this flag is set to true, each subobject will be a Object.
+			// If not (the default), only one object which contains all the merged primitives will be created.
 
-		// If this flag is set to true the vertex normals will be smoothed.
-		this.smoothNormals = true;
+			this.separateObjects = false; // If this flag is set to true the vertex normals will be smoothed.
 
-	}
+			this.smoothNormals = true;
 
-	// Special surface finish tag types.
-	// Note: "MATERIAL" tag (e.g. GLITTER, SPECKLE) is not implemented
-	LDrawLoader.FINISH_TYPE_DEFAULT = 0;
-	LDrawLoader.FINISH_TYPE_CHROME = 1;
-	LDrawLoader.FINISH_TYPE_PEARLESCENT = 2;
-	LDrawLoader.FINISH_TYPE_RUBBER = 3;
-	LDrawLoader.FINISH_TYPE_MATTE_METALLIC = 4;
-	LDrawLoader.FINISH_TYPE_METAL = 5;
+		}
 
-	// State machine to search a subobject path.
-	// The LDraw standard establishes these various possible subfolders.
-	LDrawLoader.FILE_LOCATION_AS_IS = 0;
-	LDrawLoader.FILE_LOCATION_TRY_PARTS = 1;
-	LDrawLoader.FILE_LOCATION_TRY_P = 2;
-	LDrawLoader.FILE_LOCATION_TRY_MODELS = 3;
-	LDrawLoader.FILE_LOCATION_TRY_RELATIVE = 4;
-	LDrawLoader.FILE_LOCATION_TRY_ABSOLUTE = 5;
-	LDrawLoader.FILE_LOCATION_NOT_FOUND = 6;
-
-	LDrawLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-
-		constructor: LDrawLoader,
-
-		load: function ( url, onLoad, onProgress, onError ) {
+		load( url, onLoad, onProgress, onError ) {
 
 			if ( ! this.fileMap ) {
 
@@ -578,9 +551,8 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-			var scope = this;
-
-			var fileLoader = new THREE.FileLoader( this.manager );
+			const scope = this;
+			const fileLoader = new THREE.FileLoader( this.manager );
 			fileLoader.setPath( this.path );
 			fileLoader.setRequestHeader( this.requestHeader );
 			fileLoader.setWithCredentials( this.withCredentials );
@@ -590,63 +562,53 @@ THREE.LDrawLoader = ( function () {
 
 			}, onProgress, onError );
 
-		},
+		}
 
-		parse: function ( text, path, onLoad ) {
+		parse( text, path, onLoad ) {
 
 			// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
-
 			this.processObject( text, onLoad, null, path );
 
-		},
+		}
 
-		setMaterials: function ( materials ) {
+		setMaterials( materials ) {
 
 			// Clears parse scopes stack, adds new scope with material library
-
 			this.parseScopesStack = [];
-
 			this.newParseScopeLevel( materials );
-
 			this.getCurrentParseScope().isFromParse = false;
-
 			this.materials = materials;
-
 			return this;
 
-		},
+		}
 
-		setFileMap: function ( fileMap ) {
+		setFileMap( fileMap ) {
 
 			this.fileMap = fileMap;
-
 			return this;
 
-		},
+		}
 
-		newParseScopeLevel: function ( materials ) {
+		newParseScopeLevel( materials ) {
 
 			// Adds a new scope level, assign materials to it and returns it
-
-			var matLib = {};
+			const matLib = {};
 
 			if ( materials ) {
 
-				for ( var i = 0, n = materials.length; i < n; i ++ ) {
+				for ( let i = 0, n = materials.length; i < n; i ++ ) {
 
-					var material = materials[ i ];
+					const material = materials[ i ];
 					matLib[ material.userData.code ] = material;
 
 				}
 
 			}
 
-			var topParseScope = this.getCurrentParseScope();
-			var newParseScope = {
-
+			const topParseScope = this.getCurrentParseScope();
+			const newParseScope = {
 				lib: matLib,
 				url: null,
-
 				// Subobjects
 				subobjects: null,
 				numSubobjects: 0,
@@ -654,44 +616,36 @@ THREE.LDrawLoader = ( function () {
 				inverted: false,
 				category: null,
 				keywords: null,
-
 				// Current subobject
 				currentFileName: null,
 				mainColourCode: topParseScope ? topParseScope.mainColourCode : '16',
 				mainEdgeColourCode: topParseScope ? topParseScope.mainEdgeColourCode : '24',
 				currentMatrix: new THREE.Matrix4(),
 				matrix: new THREE.Matrix4(),
-
 				// If false, it is a root material scope previous to parse
 				isFromParse: true,
-
 				triangles: null,
 				lineSegments: null,
 				conditionalSegments: null,
-
 				// If true, this object is the start of a construction step
 				startingConstructionStep: false
 			};
-
 			this.parseScopesStack.push( newParseScope );
-
 			return newParseScope;
 
-		},
+		}
 
-		removeScopeLevel: function () {
+		removeScopeLevel() {
 
 			this.parseScopesStack.pop();
-
 			return this;
 
-		},
+		}
 
-		addMaterial: function ( material ) {
+		addMaterial( material ) {
 
 			// Adds a material to the material library which is on top of the parse scopes stack. And also to the materials array
-
-			var matLib = this.getCurrentParseScope().lib;
+			const matLib = this.getCurrentParseScope().lib;
 
 			if ( ! matLib[ material.userData.code ] ) {
 
@@ -700,28 +654,24 @@ THREE.LDrawLoader = ( function () {
 			}
 
 			matLib[ material.userData.code ] = material;
-
 			return this;
 
-		},
+		}
 
-		getMaterial: function ( colourCode ) {
+		getMaterial( colourCode ) {
 
 			// Given a colour code search its material in the parse scopes stack
-
 			if ( colourCode.startsWith( '0x2' ) ) {
 
 				// Special 'direct' material value (RGB colour)
-
-				var colour = colourCode.substring( 3 );
-
+				const colour = colourCode.substring( 3 );
 				return this.parseColourMetaDirective( new LineParser( 'Direct_Color_' + colour + ' CODE -1 VALUE #' + colour + ' EDGE #' + colour + '' ) );
 
 			}
 
-			for ( var i = this.parseScopesStack.length - 1; i >= 0; i -- ) {
+			for ( let i = this.parseScopesStack.length - 1; i >= 0; i -- ) {
 
-				var material = this.parseScopesStack[ i ].lib[ colourCode ];
+				const material = this.parseScopesStack[ i ].lib[ colourCode ];
 
 				if ( material ) {
 
@@ -729,14 +679,14 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-			}
+			} // Material was not found
 
-			// Material was not found
+
 			return null;
 
-		},
+		}
 
-		getParentParseScope: function () {
+		getParentParseScope() {
 
 			if ( this.parseScopesStack.length > 1 ) {
 
@@ -746,9 +696,9 @@ THREE.LDrawLoader = ( function () {
 
 			return null;
 
-		},
+		}
 
-		getCurrentParseScope: function () {
+		getCurrentParseScope() {
 
 			if ( this.parseScopesStack.length > 0 ) {
 
@@ -758,38 +708,34 @@ THREE.LDrawLoader = ( function () {
 
 			return null;
 
-		},
+		}
 
-		parseColourMetaDirective: function ( lineParser ) {
+		parseColourMetaDirective( lineParser ) {
 
 			// Parses a colour definition and returns a THREE.Material or null if error
+			let code = null; // Triangle and line colours
 
-			var code = null;
+			let colour = 0xFF00FF;
+			let edgeColour = 0xFF00FF; // Transparency
 
-			// Triangle and line colours
-			var colour = 0xFF00FF;
-			var edgeColour = 0xFF00FF;
+			let alpha = 1;
+			let isTransparent = false; // Self-illumination:
 
-			// Transparency
-			var alpha = 1;
-			var isTransparent = false;
-			// Self-illumination:
-			var luminance = 0;
+			let luminance = 0;
+			let finishType = FINISH_TYPE_DEFAULT;
+			let canHaveEnvMap = true;
+			let edgeMaterial = null;
+			const name = lineParser.getToken();
 
-			var finishType = LDrawLoader.FINISH_TYPE_DEFAULT;
-			var canHaveEnvMap = true;
-
-			var edgeMaterial = null;
-
-			var name = lineParser.getToken();
 			if ( ! name ) {
 
 				throw 'LDrawLoader: Material name was expected after "!COLOUR tag' + lineParser.getLineNumberString() + '.';
 
-			}
+			} // Parse tag tokens and their parameters
 
-			// Parse tag tokens and their parameters
-			var token = null;
+
+			let token = null;
+
 			while ( true ) {
 
 				token = lineParser.getToken();
@@ -803,13 +749,12 @@ THREE.LDrawLoader = ( function () {
 				switch ( token.toUpperCase() ) {
 
 					case 'CODE':
-
 						code = lineParser.getToken();
 						break;
 
 					case 'VALUE':
-
 						colour = lineParser.getToken();
+
 						if ( colour.startsWith( '0x' ) ) {
 
 							colour = '#' + colour.substring( 2 );
@@ -823,8 +768,8 @@ THREE.LDrawLoader = ( function () {
 						break;
 
 					case 'EDGE':
-
 						edgeColour = lineParser.getToken();
+
 						if ( edgeColour.startsWith( '0x' ) ) {
 
 							edgeColour = '#' + edgeColour.substring( 2 );
@@ -833,13 +778,14 @@ THREE.LDrawLoader = ( function () {
 
 							// Try to see if edge colour is a colour code
 							edgeMaterial = this.getMaterial( edgeColour );
+
 							if ( ! edgeMaterial ) {
 
 								throw 'LDrawLoader: Invalid edge colour while parsing material' + lineParser.getLineNumberString() + '.';
 
-							}
+							} // Get the edge material for this triangle material
 
-							// Get the edge material for this triangle material
+
 							edgeMaterial = edgeMaterial.userData.edgeMaterial;
 
 						}
@@ -847,7 +793,6 @@ THREE.LDrawLoader = ( function () {
 						break;
 
 					case 'ALPHA':
-
 						alpha = parseInt( lineParser.getToken() );
 
 						if ( isNaN( alpha ) ) {
@@ -867,7 +812,6 @@ THREE.LDrawLoader = ( function () {
 						break;
 
 					case 'LUMINANCE':
-
 						luminance = parseInt( lineParser.getToken() );
 
 						if ( isNaN( luminance ) ) {
@@ -877,27 +821,26 @@ THREE.LDrawLoader = ( function () {
 						}
 
 						luminance = Math.max( 0, Math.min( 1, luminance / 255 ) );
-
 						break;
 
 					case 'CHROME':
-						finishType = LDrawLoader.FINISH_TYPE_CHROME;
+						finishType = FINISH_TYPE_CHROME;
 						break;
 
 					case 'PEARLESCENT':
-						finishType = LDrawLoader.FINISH_TYPE_PEARLESCENT;
+						finishType = FINISH_TYPE_PEARLESCENT;
 						break;
 
 					case 'RUBBER':
-						finishType = LDrawLoader.FINISH_TYPE_RUBBER;
+						finishType = FINISH_TYPE_RUBBER;
 						break;
 
 					case 'MATTE_METALLIC':
-						finishType = LDrawLoader.FINISH_TYPE_MATTE_METALLIC;
+						finishType = FINISH_TYPE_MATTE_METALLIC;
 						break;
 
 					case 'METAL':
-						finishType = LDrawLoader.FINISH_TYPE_METAL;
+						finishType = FINISH_TYPE_METAL;
 						break;
 
 					case 'MATERIAL':
@@ -913,50 +856,73 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-			var material = null;
+			let material = null;
 
 			switch ( finishType ) {
 
-				case LDrawLoader.FINISH_TYPE_DEFAULT:
-
-					material = new THREE.MeshStandardMaterial( { color: colour, roughness: 0.3, envMapIntensity: 0.3, metalness: 0 } );
+				case FINISH_TYPE_DEFAULT:
+					material = new THREE.MeshStandardMaterial( {
+						color: colour,
+						roughness: 0.3,
+						envMapIntensity: 0.3,
+						metalness: 0
+					} );
 					break;
 
-				case LDrawLoader.FINISH_TYPE_PEARLESCENT:
-
+				case FINISH_TYPE_PEARLESCENT:
 					// Try to imitate pearlescency by setting the specular to the complementary of the color, and low shininess
-					var specular = new THREE.Color( colour );
-					var hsl = specular.getHSL( { h: 0, s: 0, l: 0 } );
+					const specular = new THREE.Color( colour );
+					const hsl = specular.getHSL( {
+						h: 0,
+						s: 0,
+						l: 0
+					} );
 					hsl.h = ( hsl.h + 0.5 ) % 1;
 					hsl.l = Math.min( 1, hsl.l + ( 1 - hsl.l ) * 0.7 );
 					specular.setHSL( hsl.h, hsl.s, hsl.l );
-
-					material = new THREE.MeshPhongMaterial( { color: colour, specular: specular, shininess: 10, reflectivity: 0.3 } );
+					material = new THREE.MeshPhongMaterial( {
+						color: colour,
+						specular: specular,
+						shininess: 10,
+						reflectivity: 0.3
+					} );
 					break;
 
-				case LDrawLoader.FINISH_TYPE_CHROME:
-
+				case FINISH_TYPE_CHROME:
 					// Mirror finish surface
-					material = new THREE.MeshStandardMaterial( { color: colour, roughness: 0, metalness: 1 } );
+					material = new THREE.MeshStandardMaterial( {
+						color: colour,
+						roughness: 0,
+						metalness: 1
+					} );
 					break;
 
-				case LDrawLoader.FINISH_TYPE_RUBBER:
-
+				case FINISH_TYPE_RUBBER:
 					// Rubber finish
-					material = new THREE.MeshStandardMaterial( { color: colour, roughness: 0.9, metalness: 0 } );
+					material = new THREE.MeshStandardMaterial( {
+						color: colour,
+						roughness: 0.9,
+						metalness: 0
+					} );
 					canHaveEnvMap = false;
 					break;
 
-				case LDrawLoader.FINISH_TYPE_MATTE_METALLIC:
-
+				case FINISH_TYPE_MATTE_METALLIC:
 					// Brushed metal finish
-					material = new THREE.MeshStandardMaterial( { color: colour, roughness: 0.8, metalness: 0.4 } );
+					material = new THREE.MeshStandardMaterial( {
+						color: colour,
+						roughness: 0.8,
+						metalness: 0.4
+					} );
 					break;
 
-				case LDrawLoader.FINISH_TYPE_METAL:
-
+				case FINISH_TYPE_METAL:
 					// Average metal finish
-					material = new THREE.MeshStandardMaterial( { color: colour, roughness: 0.2, metalness: 0.85 } );
+					material = new THREE.MeshStandardMaterial( {
+						color: colour,
+						roughness: 0.2,
+						metalness: 0.85
+					} );
 					break;
 
 				default:
@@ -969,10 +935,8 @@ THREE.LDrawLoader = ( function () {
 			material.premultipliedAlpha = true;
 			material.opacity = alpha;
 			material.depthWrite = ! isTransparent;
-
 			material.polygonOffset = true;
 			material.polygonOffsetFactor = 1;
-
 			material.userData.canHaveEnvMap = canHaveEnvMap;
 
 			if ( luminance !== 0 ) {
@@ -992,23 +956,19 @@ THREE.LDrawLoader = ( function () {
 				} );
 				edgeMaterial.userData.code = code;
 				edgeMaterial.name = name + ' - Edge';
-				edgeMaterial.userData.canHaveEnvMap = false;
+				edgeMaterial.userData.canHaveEnvMap = false; // This is the material used for conditional edges
 
-				// This is the material used for conditional edges
 				edgeMaterial.userData.conditionalEdgeMaterial = new THREE.ShaderMaterial( {
 					vertexShader: conditionalLineVertShader,
 					fragmentShader: conditionalLineFragShader,
-					uniforms: THREE.UniformsUtils.merge( [
-						THREE.UniformsLib.fog,
-						{
-							diffuse: {
-								value: new THREE.Color( edgeColour )
-							},
-							opacity: {
-								value: alpha
-							}
+					uniforms: THREE.UniformsUtils.merge( [ THREE.UniformsLib.fog, {
+						diffuse: {
+							value: new THREE.Color( edgeColour )
+						},
+						opacity: {
+							value: alpha
 						}
-					] ),
+					} ] ),
 					fog: true,
 					transparent: isTransparent,
 					depthWrite: ! isTransparent
@@ -1019,35 +979,27 @@ THREE.LDrawLoader = ( function () {
 
 			material.userData.code = code;
 			material.name = name;
-
 			material.userData.edgeMaterial = edgeMaterial;
-
 			return material;
 
-		},
+		} //
 
-		//
 
-		objectParse: function ( text ) {
+		objectParse( text ) {
 
 			// Retrieve data from the parent parse scope
-			var parentParseScope = this.getParentParseScope();
+			const parentParseScope = this.getParentParseScope(); // Main colour codes passed to this subobject (or default codes 16 and 24 if it is the root object)
 
-			// Main colour codes passed to this subobject (or default codes 16 and 24 if it is the root object)
-			var mainColourCode = parentParseScope.mainColourCode;
-			var mainEdgeColourCode = parentParseScope.mainEdgeColourCode;
+			const mainColourCode = parentParseScope.mainColourCode;
+			const mainEdgeColourCode = parentParseScope.mainEdgeColourCode;
+			const currentParseScope = this.getCurrentParseScope(); // Parse result variables
 
-			var currentParseScope = this.getCurrentParseScope();
-
-			// Parse result variables
-			var triangles;
-			var lineSegments;
-			var conditionalSegments;
-
-			var subobjects = [];
-
-			var category = null;
-			var keywords = null;
+			let triangles;
+			let lineSegments;
+			let conditionalSegments;
+			const subobjects = [];
+			let category = null;
+			let keywords = null;
 
 			if ( text.indexOf( '\r\n' ) !== - 1 ) {
 
@@ -1056,28 +1008,23 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-			var lines = text.split( '\n' );
-			var numLines = lines.length;
-			var lineIndex = 0;
+			const lines = text.split( '\n' );
+			const numLines = lines.length;
+			let parsingEmbeddedFiles = false;
+			let currentEmbeddedFileName = null;
+			let currentEmbeddedText = null;
+			let bfcCertified = false;
+			let bfcCCW = true;
+			let bfcInverted = false;
+			let bfcCull = true;
+			let type = '';
+			let startingConstructionStep = false;
+			const scope = this;
 
-			var parsingEmbeddedFiles = false;
-			var currentEmbeddedFileName = null;
-			var currentEmbeddedText = null;
-
-			var bfcCertified = false;
-			var bfcCCW = true;
-			var bfcInverted = false;
-			var bfcCull = true;
-			var type = '';
-
-			var startingConstructionStep = false;
-
-			var scope = this;
 			function parseColourCode( lineParser, forEdge ) {
 
 				// Parses next colour code and returns a THREE.Material
-
-				var colourCode = lineParser.getToken();
+				let colourCode = lineParser.getToken();
 
 				if ( ! forEdge && colourCode === '16' ) {
 
@@ -1091,7 +1038,7 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-				var material = scope.getMaterial( colourCode );
+				const material = scope.getMaterial( colourCode );
 
 				if ( ! material ) {
 
@@ -1105,7 +1052,7 @@ THREE.LDrawLoader = ( function () {
 
 			function parseVector( lp ) {
 
-				var v = new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
+				const v = new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
 
 				if ( ! scope.separateObjects ) {
 
@@ -1115,13 +1062,12 @@ THREE.LDrawLoader = ( function () {
 
 				return v;
 
-			}
+			} // Parse all line commands
 
-			// Parse all line commands
-			for ( lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
 
-				var line = lines[ lineIndex ];
+			for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
 
+				const line = lines[ lineIndex ];
 				if ( line.length === 0 ) continue;
 
 				if ( parsingEmbeddedFiles ) {
@@ -1129,9 +1075,8 @@ THREE.LDrawLoader = ( function () {
 					if ( line.startsWith( '0 FILE ' ) ) {
 
 						// Save previous embedded file in the cache
-						this.subobjectCache[ currentEmbeddedFileName.toLowerCase() ] = currentEmbeddedText;
+						this.subobjectCache[ currentEmbeddedFileName.toLowerCase() ] = currentEmbeddedText; // New embedded text file
 
-						// New embedded text file
 						currentEmbeddedFileName = line.substring( 7 );
 						currentEmbeddedText = '';
 
@@ -1145,8 +1090,7 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-				var lp = new LineParser( line, lineIndex + 1 );
-
+				const lp = new LineParser( line, lineIndex + 1 );
 				lp.seekNonSpace();
 
 				if ( lp.isAtTheEnd() ) {
@@ -1154,49 +1098,46 @@ THREE.LDrawLoader = ( function () {
 					// Empty line
 					continue;
 
-				}
+				} // Parse the line type
 
-				// Parse the line type
-				var lineType = lp.getToken();
+
+				const lineType = lp.getToken();
+				let material;
+				let segment;
+				let inverted;
+				let ccw;
+				let doubleSided;
+				let v0, v1, v2, v3, faceNormal;
 
 				switch ( lineType ) {
 
 					// Line type 0: Comment or META
 					case '0':
-
 						// Parse meta directive
-						var meta = lp.getToken();
+						const meta = lp.getToken();
 
 						if ( meta ) {
 
 							switch ( meta ) {
 
 								case '!LDRAW_ORG':
-
 									type = lp.getToken();
-
 									currentParseScope.triangles = [];
 									currentParseScope.lineSegments = [];
 									currentParseScope.conditionalSegments = [];
 									currentParseScope.type = type;
+									const isRoot = ! parentParseScope.isFromParse;
 
-									var isRoot = ! parentParseScope.isFromParse;
 									if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
 
 										currentParseScope.groupObject = new THREE.Group();
-
 										currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
 
-									}
-
-									// If the scale of the object is negated then the triangle winding order
+									} // If the scale of the object is negated then the triangle winding order
 									// needs to be flipped.
-									var matrix = currentParseScope.matrix;
-									if (
-										matrix.determinant() < 0 && (
-											scope.separateObjects && isPrimitiveType( type ) ||
-											! scope.separateObjects
-										) ) {
+
+
+									if ( currentParseScope.matrix.determinant() < 0 && ( scope.separateObjects && isPrimitiveType( type ) || ! scope.separateObjects ) ) {
 
 										currentParseScope.inverted = ! currentParseScope.inverted;
 
@@ -1205,17 +1146,16 @@ THREE.LDrawLoader = ( function () {
 									triangles = currentParseScope.triangles;
 									lineSegments = currentParseScope.lineSegments;
 									conditionalSegments = currentParseScope.conditionalSegments;
-
 									break;
 
 								case '!COLOUR':
+									material = this.parseColourMetaDirective( lp );
 
-									var material = this.parseColourMetaDirective( lp );
 									if ( material ) {
 
 										this.addMaterial( material );
 
-									}	else {
+									} else {
 
 										console.warn( 'LDrawLoader: Error parsing material' + lp.getLineNumberString() );
 
@@ -1224,13 +1164,12 @@ THREE.LDrawLoader = ( function () {
 									break;
 
 								case '!CATEGORY':
-
 									category = lp.getToken();
 									break;
 
 								case '!KEYWORDS':
+									const newKeywords = lp.getRemainingString().split( ',' );
 
-									var newKeywords = lp.getRemainingString().split( ',' );
 									if ( newKeywords.length > 0 ) {
 
 										if ( ! keywords ) {
@@ -1250,14 +1189,12 @@ THREE.LDrawLoader = ( function () {
 									break;
 
 								case 'FILE':
-
 									if ( lineIndex > 0 ) {
 
 										// Start embedded text files parsing
 										parsingEmbeddedFiles = true;
 										currentEmbeddedFileName = lp.getRemainingString();
 										currentEmbeddedText = '';
-
 										bfcCertified = false;
 										bfcCCW = true;
 
@@ -1266,46 +1203,35 @@ THREE.LDrawLoader = ( function () {
 									break;
 
 								case 'BFC':
-
 									// Changes to the backface culling state
 									while ( ! lp.isAtTheEnd() ) {
 
-										var token = lp.getToken();
+										const token = lp.getToken();
 
 										switch ( token ) {
 
 											case 'CERTIFY':
 											case 'NOCERTIFY':
-
 												bfcCertified = token === 'CERTIFY';
 												bfcCCW = true;
-
 												break;
 
 											case 'CW':
 											case 'CCW':
-
 												bfcCCW = token === 'CCW';
-
 												break;
 
 											case 'INVERTNEXT':
-
 												bfcInverted = true;
-
 												break;
 
 											case 'CLIP':
 											case 'NOCLIP':
-
-											  bfcCull = token === 'CLIP';
-
+												bfcCull = token === 'CLIP';
 												break;
 
 											default:
-
 												console.warn( 'THREE.LDrawLoader: BFC directive "' + token + '" is unknown.' );
-
 												break;
 
 										}
@@ -1315,9 +1241,7 @@ THREE.LDrawLoader = ( function () {
 									break;
 
 								case 'STEP':
-
 									startingConstructionStep = true;
-
 									break;
 
 								default:
@@ -1329,40 +1253,31 @@ THREE.LDrawLoader = ( function () {
 						}
 
 						break;
+						// Line type 1: Sub-object file
 
-					// Line type 1: Sub-object file
 					case '1':
-
-						var material = parseColourCode( lp );
-
-						var posX = parseFloat( lp.getToken() );
-						var posY = parseFloat( lp.getToken() );
-						var posZ = parseFloat( lp.getToken() );
-						var m0 = parseFloat( lp.getToken() );
-						var m1 = parseFloat( lp.getToken() );
-						var m2 = parseFloat( lp.getToken() );
-						var m3 = parseFloat( lp.getToken() );
-						var m4 = parseFloat( lp.getToken() );
-						var m5 = parseFloat( lp.getToken() );
-						var m6 = parseFloat( lp.getToken() );
-						var m7 = parseFloat( lp.getToken() );
-						var m8 = parseFloat( lp.getToken() );
-
-						var matrix = new THREE.Matrix4().set(
-							m0, m1, m2, posX,
-							m3, m4, m5, posY,
-							m6, m7, m8, posZ,
-							0, 0, 0, 1
-						);
-
-						var fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
+						material = parseColourCode( lp );
+						const posX = parseFloat( lp.getToken() );
+						const posY = parseFloat( lp.getToken() );
+						const posZ = parseFloat( lp.getToken() );
+						const m0 = parseFloat( lp.getToken() );
+						const m1 = parseFloat( lp.getToken() );
+						const m2 = parseFloat( lp.getToken() );
+						const m3 = parseFloat( lp.getToken() );
+						const m4 = parseFloat( lp.getToken() );
+						const m5 = parseFloat( lp.getToken() );
+						const m6 = parseFloat( lp.getToken() );
+						const m7 = parseFloat( lp.getToken() );
+						const m8 = parseFloat( lp.getToken() );
+						const matrix = new THREE.Matrix4().set( m0, m1, m2, posX, m3, m4, m5, posY, m6, m7, m8, posZ, 0, 0, 0, 1 );
+						let fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
 
 						if ( scope.fileMap[ fileName ] ) {
 
 							// Found the subobject path in the preloaded file path map
 							fileName = scope.fileMap[ fileName ];
 
-						}	else {
+						} else {
 
 							// Standardized subfolders
 							if ( fileName.startsWith( 's/' ) ) {
@@ -1382,39 +1297,31 @@ THREE.LDrawLoader = ( function () {
 							matrix: matrix,
 							fileName: fileName,
 							originalFileName: fileName,
-							locationState: LDrawLoader.FILE_LOCATION_AS_IS,
+							locationState: FILE_LOCATION_AS_IS,
 							url: null,
 							triedLowerCase: false,
 							inverted: bfcInverted !== currentParseScope.inverted,
 							startingConstructionStep: startingConstructionStep
 						} );
-
 						bfcInverted = false;
-
 						break;
+						// Line type 2: Line segment
 
-					// Line type 2: Line segment
 					case '2':
-
-						var material = parseColourCode( lp, true );
-
-						var segment = {
+						material = parseColourCode( lp, true );
+						segment = {
 							material: material.userData.edgeMaterial,
 							colourCode: material.userData.code,
 							v0: parseVector( lp ),
 							v1: parseVector( lp )
 						};
-
 						lineSegments.push( segment );
-
 						break;
+						// Line type 5: Conditional Line segment
 
-					// Line type 5: Conditional Line segment
 					case '5':
-
-						var material = parseColourCode( lp, true );
-
-						var segment = {
+						material = parseColourCode( lp, true );
+						segment = {
 							material: material.userData.edgeMaterial.userData.conditionalEdgeMaterial,
 							colourCode: material.userData.code,
 							v0: parseVector( lp ),
@@ -1422,20 +1329,15 @@ THREE.LDrawLoader = ( function () {
 							c0: parseVector( lp ),
 							c1: parseVector( lp )
 						};
-
 						conditionalSegments.push( segment );
-
 						break;
+						// Line type 3: Triangle
 
-					// Line type 3: Triangle
 					case '3':
-
-						var material = parseColourCode( lp );
-
-						var inverted = currentParseScope.inverted;
-						var ccw = bfcCCW !== inverted;
-						var doubleSided = ! bfcCertified || ! bfcCull;
-						var v0, v1, v2, faceNormal;
+						material = parseColourCode( lp );
+						inverted = currentParseScope.inverted;
+						ccw = bfcCCW !== inverted;
+						doubleSided = ! bfcCertified || ! bfcCull;
 
 						if ( ccw === true ) {
 
@@ -1451,12 +1353,11 @@ THREE.LDrawLoader = ( function () {
 
 						}
 
-						tempVec0.subVectors( v1, v0 );
-						tempVec1.subVectors( v2, v1 );
-						faceNormal = new THREE.Vector3()
-							.crossVectors( tempVec0, tempVec1 )
-							.normalize();
+						_tempVec0.subVectors( v1, v0 );
 
+						_tempVec1.subVectors( v2, v1 );
+
+						faceNormal = new THREE.Vector3().crossVectors( _tempVec0, _tempVec1 ).normalize();
 						triangles.push( {
 							material: material,
 							colourCode: material.userData.code,
@@ -1486,16 +1387,13 @@ THREE.LDrawLoader = ( function () {
 						}
 
 						break;
+						// Line type 4: Quadrilateral
 
-					// Line type 4: Quadrilateral
 					case '4':
-
-						var material = parseColourCode( lp );
-
-						var inverted = currentParseScope.inverted;
-						var ccw = bfcCCW !== inverted;
-						var doubleSided = ! bfcCertified || ! bfcCull;
-						var v0, v1, v2, v3, faceNormal;
+						material = parseColourCode( lp );
+						inverted = currentParseScope.inverted;
+						ccw = bfcCCW !== inverted;
+						doubleSided = ! bfcCertified || ! bfcCull;
 
 						if ( ccw === true ) {
 
@@ -1513,12 +1411,11 @@ THREE.LDrawLoader = ( function () {
 
 						}
 
-						tempVec0.subVectors( v1, v0 );
-						tempVec1.subVectors( v2, v1 );
-						faceNormal = new THREE.Vector3()
-							.crossVectors( tempVec0, tempVec1 )
-							.normalize();
+						_tempVec0.subVectors( v1, v0 );
 
+						_tempVec1.subVectors( v2, v1 );
+
+						faceNormal = new THREE.Vector3().crossVectors( _tempVec0, _tempVec1 ).normalize();
 						triangles.push( {
 							material: material,
 							colourCode: material.userData.code,
@@ -1530,7 +1427,6 @@ THREE.LDrawLoader = ( function () {
 							n1: null,
 							n2: null
 						} );
-
 						triangles.push( {
 							material: material,
 							colourCode: material.userData.code,
@@ -1556,7 +1452,6 @@ THREE.LDrawLoader = ( function () {
 								n1: null,
 								n2: null
 							} );
-
 							triangles.push( {
 								material: material,
 								colourCode: material.userData.code,
@@ -1593,14 +1488,12 @@ THREE.LDrawLoader = ( function () {
 			currentParseScope.numSubobjects = subobjects.length;
 			currentParseScope.subobjectIndex = 0;
 
-		},
+		}
 
-		computeConstructionSteps: function ( model ) {
+		computeConstructionSteps( model ) {
 
-			// Sets userdata.constructionStep number in Group objects and userData.numConstructionSteps number in the root Group object.
-
-			var stepNumber = 0;
-
+			// Sets userdata.constructionStep number in THREE.Group objects and userData.numConstructionSteps number in the root THREE.Group object.
+			let stepNumber = 0;
 			model.traverse( c => {
 
 				if ( c.isGroup ) {
@@ -1616,21 +1509,17 @@ THREE.LDrawLoader = ( function () {
 				}
 
 			} );
-
 			model.userData.numConstructionSteps = stepNumber + 1;
 
-		},
+		}
 
-		processObject: function ( text, onProcessed, subobject, url ) {
+		processObject( text, onProcessed, subobject, url ) {
 
-			var scope = this;
-
-			var parseScope = scope.newParseScopeLevel();
+			const scope = this;
+			const parseScope = scope.newParseScopeLevel();
 			parseScope.url = url;
+			const parentParseScope = scope.getParentParseScope(); // Set current matrix
 
-			var parentParseScope = scope.getParentParseScope();
-
-			// Set current matrix
 			if ( subobject ) {
 
 				parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
@@ -1638,10 +1527,11 @@ THREE.LDrawLoader = ( function () {
 				parseScope.inverted = subobject.inverted;
 				parseScope.startingConstructionStep = subobject.startingConstructionStep;
 
-			}
+			} // Add to cache
 
-			// Add to cache
-			var currentFileName = parentParseScope.currentFileName;
+
+			let currentFileName = parentParseScope.currentFileName;
+
 			if ( currentFileName !== null ) {
 
 				currentFileName = parentParseScope.currentFileName.toLowerCase();
@@ -1652,12 +1542,11 @@ THREE.LDrawLoader = ( function () {
 
 				scope.subobjectCache[ currentFileName ] = text;
 
-			}
+			} // Parse the object (returns a THREE.Group)
 
 
-			// Parse the object (returns a THREE.Group)
 			scope.objectParse( text );
-			var finishedCount = 0;
+			let finishedCount = 0;
 			onSubobjectFinish();
 
 			function onSubobjectFinish() {
@@ -1676,7 +1565,7 @@ THREE.LDrawLoader = ( function () {
 					// Promise.resolve is used as an approach to asynchronously schedule a task _before_ this frame ends to
 					// avoid stack overflow exceptions when loading many subobjects from the cache. RequestAnimationFrame
 					// will work but causes the load to happen after the next frame which causes the load to take significantly longer.
-					var subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
+					const subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
 					Promise.resolve().then( function () {
 
 						loadSubobject( subobject );
@@ -1696,7 +1585,8 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-				var isRoot = ! parentParseScope.isFromParse;
+				const isRoot = ! parentParseScope.isFromParse;
+
 				if ( scope.separateObjects && ! isPrimitiveType( parseScope.type ) || isRoot ) {
 
 					const objGroup = parseScope.groupObject;
@@ -1725,25 +1615,23 @@ THREE.LDrawLoader = ( function () {
 						objGroup.userData.category = parseScope.category;
 						objGroup.userData.keywords = parseScope.keywords;
 						parseScope.matrix.decompose( objGroup.position, objGroup.quaternion, objGroup.scale );
-
 						parentParseScope.groupObject.add( objGroup );
 
 					}
 
 				} else {
 
-					var separateObjects = scope.separateObjects;
-					var parentLineSegments = parentParseScope.lineSegments;
-					var parentConditionalSegments = parentParseScope.conditionalSegments;
-					var parentTriangles = parentParseScope.triangles;
+					const separateObjects = scope.separateObjects;
+					const parentLineSegments = parentParseScope.lineSegments;
+					const parentConditionalSegments = parentParseScope.conditionalSegments;
+					const parentTriangles = parentParseScope.triangles;
+					const lineSegments = parseScope.lineSegments;
+					const conditionalSegments = parseScope.conditionalSegments;
+					const triangles = parseScope.triangles;
 
-					var lineSegments = parseScope.lineSegments;
-					var conditionalSegments = parseScope.conditionalSegments;
-					var triangles = parseScope.triangles;
+					for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
-					for ( var i = 0, l = lineSegments.length; i < l; i ++ ) {
-
-						var ls = lineSegments[ i ];
+						const ls = lineSegments[ i ];
 
 						if ( separateObjects ) {
 
@@ -1756,9 +1644,9 @@ THREE.LDrawLoader = ( function () {
 
 					}
 
-					for ( var i = 0, l = conditionalSegments.length; i < l; i ++ ) {
+					for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
 
-						var os = conditionalSegments[ i ];
+						const os = conditionalSegments[ i ];
 
 						if ( separateObjects ) {
 
@@ -1773,9 +1661,9 @@ THREE.LDrawLoader = ( function () {
 
 					}
 
-					for ( var i = 0, l = triangles.length; i < l; i ++ ) {
+					for ( let i = 0, l = triangles.length; i < l; i ++ ) {
 
-						var tri = triangles[ i ];
+						const tri = triangles[ i ];
 
 						if ( separateObjects ) {
 
@@ -1783,9 +1671,11 @@ THREE.LDrawLoader = ( function () {
 							tri.v1 = tri.v1.clone().applyMatrix4( parseScope.matrix );
 							tri.v2 = tri.v2.clone().applyMatrix4( parseScope.matrix );
 
-							tempVec0.subVectors( tri.v1, tri.v0 );
-							tempVec1.subVectors( tri.v2, tri.v1 );
-							tri.faceNormal.crossVectors( tempVec0, tempVec1 ).normalize();
+							_tempVec0.subVectors( tri.v1, tri.v0 );
+
+							_tempVec1.subVectors( tri.v2, tri.v1 );
+
+							tri.faceNormal.crossVectors( _tempVec0, _tempVec1 ).normalize();
 
 						}
 
@@ -1795,9 +1685,8 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-				scope.removeScopeLevel();
+				scope.removeScopeLevel(); // If it is root object, compute construction steps
 
-				// If it is root object, compute construction steps
 				if ( ! parentParseScope.isFromParse ) {
 
 					scope.computeConstructionSteps( parseScope.groupObject );
@@ -1816,11 +1705,10 @@ THREE.LDrawLoader = ( function () {
 
 				parseScope.mainColourCode = subobject.material.userData.code;
 				parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
-				parseScope.currentFileName = subobject.originalFileName;
+				parseScope.currentFileName = subobject.originalFileName; // If subobject was cached previously, use the cached one
 
+				const cached = scope.subobjectCache[ subobject.originalFileName.toLowerCase() ];
 
-				// If subobject was cached previously, use the cached one
-				var cached = scope.subobjectCache[ subobject.originalFileName.toLowerCase() ];
 				if ( cached ) {
 
 					scope.processObject( cached, function ( subobjectGroup ) {
@@ -1829,48 +1717,46 @@ THREE.LDrawLoader = ( function () {
 						onSubobjectFinish();
 
 					}, subobject, url );
-
 					return;
 
-				}
-
-				// Adjust file name to locate the subobject file path in standard locations (always under directory scope.path)
+				} // Adjust file name to locate the subobject file path in standard locations (always under directory scope.path)
 				// Update also subobject.locationState for the next try if this load fails.
-				var subobjectURL = subobject.fileName;
-				var newLocationState = LDrawLoader.FILE_LOCATION_NOT_FOUND;
+
+
+				let subobjectURL = subobject.fileName;
+				let newLocationState = FILE_LOCATION_NOT_FOUND;
 
 				switch ( subobject.locationState ) {
 
-					case LDrawLoader.FILE_LOCATION_AS_IS:
+					case FILE_LOCATION_AS_IS:
 						newLocationState = subobject.locationState + 1;
 						break;
 
-					case LDrawLoader.FILE_LOCATION_TRY_PARTS:
+					case FILE_LOCATION_TRY_PARTS:
 						subobjectURL = 'parts/' + subobjectURL;
 						newLocationState = subobject.locationState + 1;
 						break;
 
-					case LDrawLoader.FILE_LOCATION_TRY_P:
+					case FILE_LOCATION_TRY_P:
 						subobjectURL = 'p/' + subobjectURL;
 						newLocationState = subobject.locationState + 1;
 						break;
 
-					case LDrawLoader.FILE_LOCATION_TRY_MODELS:
+					case FILE_LOCATION_TRY_MODELS:
 						subobjectURL = 'models/' + subobjectURL;
 						newLocationState = subobject.locationState + 1;
 						break;
 
-					case LDrawLoader.FILE_LOCATION_TRY_RELATIVE:
+					case FILE_LOCATION_TRY_RELATIVE:
 						subobjectURL = url.substring( 0, url.lastIndexOf( '/' ) + 1 ) + subobjectURL;
 						newLocationState = subobject.locationState + 1;
 						break;
 
-					case LDrawLoader.FILE_LOCATION_TRY_ABSOLUTE:
-
+					case FILE_LOCATION_TRY_ABSOLUTE:
 						if ( subobject.triedLowerCase ) {
 
 							// Try absolute path
-							newLocationState = LDrawLoader.FILE_LOCATION_NOT_FOUND;
+							newLocationState = FILE_LOCATION_NOT_FOUND;
 
 						} else {
 
@@ -1878,28 +1764,25 @@ THREE.LDrawLoader = ( function () {
 							subobject.fileName = subobject.fileName.toLowerCase();
 							subobjectURL = subobject.fileName;
 							subobject.triedLowerCase = true;
-							newLocationState = LDrawLoader.FILE_LOCATION_AS_IS;
+							newLocationState = FILE_LOCATION_AS_IS;
 
 						}
 
 						break;
 
-					case LDrawLoader.FILE_LOCATION_NOT_FOUND:
-
+					case FILE_LOCATION_NOT_FOUND:
 						// All location possibilities have been tried, give up loading this object
 						console.warn( 'LDrawLoader: Subobject "' + subobject.originalFileName + '" could not be found.' );
-
 						return;
 
 				}
 
 				subobject.locationState = newLocationState;
-				subobject.url = subobjectURL;
-
-				// Load the subobject
+				subobject.url = subobjectURL; // Load the subobject
 				// Use another file loader here so we can keep track of the subobject information
 				// and use it when processing the next model.
-				var fileLoader = new THREE.FileLoader( scope.manager );
+
+				const fileLoader = new THREE.FileLoader( scope.manager );
 				fileLoader.setPath( scope.path );
 				fileLoader.setRequestHeader( scope.requestHeader );
 				fileLoader.setWithCredentials( scope.withCredentials );
@@ -1943,8 +1826,8 @@ THREE.LDrawLoader = ( function () {
 
 		}
 
-	} );
+	}
 
-	return LDrawLoader;
+	THREE.LDrawLoader = LDrawLoader;
 
 } )();

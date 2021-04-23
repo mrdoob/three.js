@@ -17,238 +17,236 @@ import {
 	HalfFloatType,
 	MeshStandardMaterial
 } from '../../../build/three.module.js';
-import { Pass } from '../postprocessing/Pass.js';
+import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
 import { SSRrShader } from '../shaders/SSRrShader.js';
 import { SSRrDepthShader } from '../shaders/SSRrShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
-var SSRrPass = function ( { renderer, scene, camera, width, height, selects, encoding, morphTargets = false } ) {
+class SSRrPass extends Pass {
 
-	Pass.call( this );
+	constructor( { renderer, scene, camera, width, height, selects, encoding, morphTargets = false } ) {
 
-	this.width = ( width !== undefined ) ? width : 512;
-	this.height = ( height !== undefined ) ? height : 512;
+		super();
 
-	this.clear = true;
+		this.width = ( width !== undefined ) ? width : 512;
+		this.height = ( height !== undefined ) ? height : 512;
 
-	this.renderer = renderer;
-	this.scene = scene;
-	this.camera = camera;
+		this.clear = true;
 
-	this.output = 0;
-	// this.output = 1;
+		this.renderer = renderer;
+		this.scene = scene;
+		this.camera = camera;
 
-	this.ior = SSRrShader.uniforms.ior.value;
-	this.maxDistance = SSRrShader.uniforms.maxDistance.value;
-	this.surfDist = SSRrShader.uniforms.surfDist.value;
+		this.output = 0;
+		// this.output = 1;
 
-	this.encoding = encoding;
+		this.ior = SSRrShader.uniforms.ior.value;
+		this.maxDistance = SSRrShader.uniforms.maxDistance.value;
+		this.surfDist = SSRrShader.uniforms.surfDist.value;
 
-	this.tempColor = new Color();
+		this.encoding = encoding;
 
-	this.selects = selects;
+		this.tempColor = new Color();
 
-	this._specular = SSRrShader.defines.SPECULAR;
-	Object.defineProperty( this, 'specular', {
-		get() {
+		this.selects = selects;
 
-			return this._specular;
+		this._specular = SSRrShader.defines.SPECULAR;
+		Object.defineProperty( this, 'specular', {
+			get() {
 
-		},
-		set( val ) {
+				return this._specular;
 
-			if ( this._specular === val ) return;
-			this._specular = val;
-			this.ssrrMaterial.defines.SPECULAR = val;
-			this.ssrrMaterial.needsUpdate = true;
+			},
+			set( val ) {
+
+				if ( this._specular === val ) return;
+				this._specular = val;
+				this.ssrrMaterial.defines.SPECULAR = val;
+				this.ssrrMaterial.needsUpdate = true;
+
+			}
+		} );
+
+		this._fillHole = SSRrShader.defines.FILL_HOLE;
+		Object.defineProperty( this, 'fillHole', {
+			get() {
+
+				return this._fillHole;
+
+			},
+			set( val ) {
+
+				if ( this._fillHole === val ) return;
+				this._fillHole = val;
+				this.ssrrMaterial.defines.FILL_HOLE = val;
+				this.ssrrMaterial.needsUpdate = true;
+
+			}
+		} );
+
+		this._infiniteThick = SSRrShader.defines.INFINITE_THICK;
+		Object.defineProperty( this, 'infiniteThick', {
+			get() {
+
+				return this._infiniteThick;
+
+			},
+			set( val ) {
+
+				if ( this._infiniteThick === val ) return;
+				this._infiniteThick = val;
+				this.ssrrMaterial.defines.INFINITE_THICK = val;
+				this.ssrrMaterial.needsUpdate = true;
+
+			}
+		} );
+
+		// beauty render target with depth buffer
+
+		const depthTexture = new DepthTexture();
+		depthTexture.type = UnsignedShortType;
+		depthTexture.minFilter = NearestFilter;
+		depthTexture.magFilter = NearestFilter;
+
+		this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+			minFilter: NearestFilter,
+			magFilter: NearestFilter,
+			format: RGBAFormat,
+			depthTexture: depthTexture,
+			depthBuffer: true
+		} );
+
+		this.specularRenderTarget = new WebGLRenderTarget( this.width, this.height, { // TODO: Can merge with refractiveRenderTarget?
+			minFilter: NearestFilter,
+			magFilter: NearestFilter,
+			format: RGBAFormat,
+		} );
+
+		// normalSelects render target
+
+		const depthTextureSelects = new DepthTexture();
+		depthTextureSelects.type = UnsignedShortType;
+		depthTextureSelects.minFilter = NearestFilter;
+		depthTextureSelects.magFilter = NearestFilter;
+
+		this.normalSelectsRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+			minFilter: NearestFilter,
+			magFilter: NearestFilter,
+			format: RGBAFormat,
+			type: HalfFloatType,
+			depthTexture: depthTextureSelects,
+			depthBuffer: true
+		} );
+
+		// refractive render target
+
+		this.refractiveRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+			minFilter: NearestFilter,
+			magFilter: NearestFilter,
+			format: RGBAFormat
+		} );
+
+		// ssrr render target
+
+		this.ssrrRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+			minFilter: NearestFilter,
+			magFilter: NearestFilter,
+			format: RGBAFormat
+		} );
+
+		// ssrr material
+
+		if ( SSRrShader === undefined ) {
+
+			console.error( 'THREE.SSRrPass: The pass relies on SSRrShader.' );
 
 		}
-	} );
 
-	this._fillHole = SSRrShader.defines.FILL_HOLE;
-	Object.defineProperty( this, 'fillHole', {
-		get() {
+		this.ssrrMaterial = new ShaderMaterial( {
+			defines: Object.assign( {}, SSRrShader.defines, {
+				MAX_STEP: Math.sqrt( this.width * this.width + this.height * this.height )
+			} ),
+			uniforms: UniformsUtils.clone( SSRrShader.uniforms ),
+			vertexShader: SSRrShader.vertexShader,
+			fragmentShader: SSRrShader.fragmentShader,
+			blending: NoBlending
+		} );
 
-			return this._fillHole;
+		this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+		this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
+		this.ssrrMaterial.uniforms[ 'tNormalSelects' ].value = this.normalSelectsRenderTarget.texture;
+		this.ssrrMaterial.needsUpdate = true;
+		this.ssrrMaterial.uniforms[ 'tRefractive' ].value = this.refractiveRenderTarget.texture;
+		this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+		this.ssrrMaterial.uniforms[ 'tDepthSelects' ].value = this.normalSelectsRenderTarget.depthTexture;
+		this.ssrrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+		this.ssrrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
+		this.ssrrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
+		this.ssrrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
+		this.ssrrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 
-		},
-		set( val ) {
+		// normal material
 
-			if ( this._fillHole === val ) return;
-			this._fillHole = val;
-			this.ssrrMaterial.defines.FILL_HOLE = val;
-			this.ssrrMaterial.needsUpdate = true;
+		this.normalMaterial = new MeshNormalMaterial( { morphTargets } );
+		this.normalMaterial.blending = NoBlending;
 
-		}
-	} );
+		// refractiveOn material
 
-	this._infiniteThick = SSRrShader.defines.INFINITE_THICK;
-	Object.defineProperty( this, 'infiniteThick', {
-		get() {
+		this.refractiveOnMaterial = new MeshBasicMaterial( {
+			color: 'white'
+		} );
 
-			return this._infiniteThick;
+		// refractiveOff material
 
-		},
-		set( val ) {
+		this.refractiveOffMaterial = new MeshBasicMaterial( {
+			color: 'black'
+		} );
 
-			if ( this._infiniteThick === val ) return;
-			this._infiniteThick = val;
-			this.ssrrMaterial.defines.INFINITE_THICK = val;
-			this.ssrrMaterial.needsUpdate = true;
+		// specular material
+		this.specularMaterial = new MeshStandardMaterial( {
+			color: 'black',
+			metalness: 0,
+			roughness: .2,
+		} );
 
-		}
-	} );
+		// material for rendering the depth
 
-	// beauty render target with depth buffer
+		this.depthRenderMaterial = new ShaderMaterial( {
+			defines: Object.assign( {}, SSRrDepthShader.defines ),
+			uniforms: UniformsUtils.clone( SSRrDepthShader.uniforms ),
+			vertexShader: SSRrDepthShader.vertexShader,
+			fragmentShader: SSRrDepthShader.fragmentShader,
+			blending: NoBlending
+		} );
+		this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+		this.depthRenderMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+		this.depthRenderMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 
-	var depthTexture = new DepthTexture();
-	depthTexture.type = UnsignedShortType;
-	depthTexture.minFilter = NearestFilter;
-	depthTexture.magFilter = NearestFilter;
+		// material for rendering the content of a render target
 
-	this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: NearestFilter,
-		magFilter: NearestFilter,
-		format: RGBAFormat,
-		depthTexture: depthTexture,
-		depthBuffer: true
-	} );
+		this.copyMaterial = new ShaderMaterial( {
+			uniforms: UniformsUtils.clone( CopyShader.uniforms ),
+			vertexShader: CopyShader.vertexShader,
+			fragmentShader: CopyShader.fragmentShader,
+			transparent: true,
+			depthTest: false,
+			depthWrite: false,
+			blendSrc: SrcAlphaFactor,
+			blendDst: OneMinusSrcAlphaFactor,
+			blendEquation: AddEquation,
+			blendSrcAlpha: SrcAlphaFactor,
+			blendDstAlpha: OneMinusSrcAlphaFactor,
+			blendEquationAlpha: AddEquation,
+			// premultipliedAlpha:true,
+		} );
 
-	this.specularRenderTarget = new WebGLRenderTarget( this.width, this.height, { // TODO: Can merge with refractiveRenderTarget?
-		minFilter: NearestFilter,
-		magFilter: NearestFilter,
-		format: RGBAFormat,
-	} );
+		this.fsQuad = new FullScreenQuad( null );
 
-	// normalSelects render target
-
-	var depthTextureSelects = new DepthTexture();
-	depthTextureSelects.type = UnsignedShortType;
-	depthTextureSelects.minFilter = NearestFilter;
-	depthTextureSelects.magFilter = NearestFilter;
-
-	this.normalSelectsRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: NearestFilter,
-		magFilter: NearestFilter,
-		format: RGBAFormat,
-		type: HalfFloatType,
-		depthTexture: depthTextureSelects,
-		depthBuffer: true
-	} );
-
-	// refractive render target
-
-	this.refractiveRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: NearestFilter,
-		magFilter: NearestFilter,
-		format: RGBAFormat
-	} );
-
-	// ssrr render target
-
-	this.ssrrRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: NearestFilter,
-		magFilter: NearestFilter,
-		format: RGBAFormat
-	} );
-
-	// ssrr material
-
-	if ( SSRrShader === undefined ) {
-
-		console.error( 'THREE.SSRrPass: The pass relies on SSRrShader.' );
+		this.originalClearColor = new Color();
 
 	}
 
-	this.ssrrMaterial = new ShaderMaterial( {
-		defines: Object.assign( {}, SSRrShader.defines, {
-			MAX_STEP: Math.sqrt( this.width * this.width + this.height * this.height )
-		} ),
-		uniforms: UniformsUtils.clone( SSRrShader.uniforms ),
-		vertexShader: SSRrShader.vertexShader,
-		fragmentShader: SSRrShader.fragmentShader,
-		blending: NoBlending
-	} );
-
-	this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-	this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
-	this.ssrrMaterial.uniforms[ 'tNormalSelects' ].value = this.normalSelectsRenderTarget.texture;
-	this.ssrrMaterial.needsUpdate = true;
-	this.ssrrMaterial.uniforms[ 'tRefractive' ].value = this.refractiveRenderTarget.texture;
-	this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
-	this.ssrrMaterial.uniforms[ 'tDepthSelects' ].value = this.normalSelectsRenderTarget.depthTexture;
-	this.ssrrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
-	this.ssrrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-	this.ssrrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
-	this.ssrrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-	this.ssrrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
-
-	// normal material
-
-	this.normalMaterial = new MeshNormalMaterial( { morphTargets } );
-	this.normalMaterial.blending = NoBlending;
-
-	// refractiveOn material
-
-	this.refractiveOnMaterial = new MeshBasicMaterial( {
-		color: 'white'
-	} );
-
-	// refractiveOff material
-
-	this.refractiveOffMaterial = new MeshBasicMaterial( {
-		color: 'black'
-	} );
-
-	// specular material
-	this.specularMaterial = new MeshStandardMaterial( {
-		color: 'black',
-		metalness: 0,
-		roughness: .2,
-	} );
-
-	// material for rendering the depth
-
-	this.depthRenderMaterial = new ShaderMaterial( {
-		defines: Object.assign( {}, SSRrDepthShader.defines ),
-		uniforms: UniformsUtils.clone( SSRrDepthShader.uniforms ),
-		vertexShader: SSRrDepthShader.vertexShader,
-		fragmentShader: SSRrDepthShader.fragmentShader,
-		blending: NoBlending
-	} );
-	this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
-	this.depthRenderMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
-	this.depthRenderMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-
-	// material for rendering the content of a render target
-
-	this.copyMaterial = new ShaderMaterial( {
-		uniforms: UniformsUtils.clone( CopyShader.uniforms ),
-		vertexShader: CopyShader.vertexShader,
-		fragmentShader: CopyShader.fragmentShader,
-		transparent: true,
-		depthTest: false,
-		depthWrite: false,
-		blendSrc: SrcAlphaFactor,
-		blendDst: OneMinusSrcAlphaFactor,
-		blendEquation: AddEquation,
-		blendSrcAlpha: SrcAlphaFactor,
-		blendDstAlpha: OneMinusSrcAlphaFactor,
-		blendEquationAlpha: AddEquation,
-		// premultipliedAlpha:true,
-	} );
-
-	this.fsQuad = new Pass.FullScreenQuad( null );
-
-	this.originalClearColor = new Color();
-
-};
-
-SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
-
-	constructor: SSRrPass,
-
-	dispose: function () {
+	dispose() {
 
 		// dispose render targets
 
@@ -270,9 +268,9 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.fsQuad.dispose();
 
-	},
+	}
 
-	render: function ( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
+	render( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
 
 		// render beauty and depth
 
@@ -426,14 +424,14 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		}
 
-	},
+	}
 
-	renderPass: function ( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
+	renderPass( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
 		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
-		var originalClearAlpha = renderer.getClearAlpha( this.tempColor );
-		var originalAutoClear = renderer.autoClear;
+		const originalClearAlpha = renderer.getClearAlpha( this.tempColor );
+		const originalAutoClear = renderer.autoClear;
 
 		renderer.setRenderTarget( renderTarget );
 
@@ -455,13 +453,13 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		renderer.setClearColor( this.originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
-	},
+	}
 
-	renderOverride: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
+	renderOverride( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
-		var originalClearAlpha = renderer.getClearAlpha( this.tempColor );
-		var originalAutoClear = renderer.autoClear;
+		const originalClearAlpha = renderer.getClearAlpha( this.tempColor );
+		const originalAutoClear = renderer.autoClear;
 
 		renderer.setRenderTarget( renderTarget );
 		renderer.autoClear = false;
@@ -487,14 +485,13 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		renderer.setClearColor( this.originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
-	},
+	}
 
-
-	renderRefractive: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
+	renderRefractive( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
-		var originalClearAlpha = renderer.getClearAlpha( this.tempColor );
-		var originalAutoClear = renderer.autoClear;
+		const originalClearAlpha = renderer.getClearAlpha( this.tempColor );
+		const originalAutoClear = renderer.autoClear;
 
 		renderer.setRenderTarget( renderTarget );
 		renderer.autoClear = false;
@@ -548,9 +545,9 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		renderer.setClearColor( this.originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
-	},
+	}
 
-	setSize: function ( width, height ) {
+	setSize( width, height ) {
 
 		this.width = width;
 		this.height = height;
@@ -567,9 +564,9 @@ SSRrPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.ssrrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 		this.ssrrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 
-	},
+	}
 
-} );
+}
 
 SSRrPass.OUTPUT = {
 	'Default': 0,

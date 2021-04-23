@@ -19,10 +19,10 @@ function replaceAll( string, find, replace ) {
 
 }
 
-var meshphong_frag_head = ShaderChunk[ 'meshphong_frag' ].slice( 0, ShaderChunk[ 'meshphong_frag' ].indexOf( 'void main() {' ) );
-var meshphong_frag_body = ShaderChunk[ 'meshphong_frag' ].slice( ShaderChunk[ 'meshphong_frag' ].indexOf( 'void main() {' ) );
+const meshphong_frag_head = ShaderChunk[ 'meshphong_frag' ].slice( 0, ShaderChunk[ 'meshphong_frag' ].indexOf( 'void main() {' ) );
+const meshphong_frag_body = ShaderChunk[ 'meshphong_frag' ].slice( ShaderChunk[ 'meshphong_frag' ].indexOf( 'void main() {' ) );
 
-var SubsurfaceScatteringShader = {
+const SubsurfaceScatteringShader = {
 
 	uniforms: UniformsUtils.merge( [
 		ShaderLib[ 'phong' ].uniforms,
