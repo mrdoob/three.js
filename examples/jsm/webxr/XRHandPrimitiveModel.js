@@ -1,4 +1,5 @@
 import {
+	DynamicDrawUsage,
 	SphereGeometry,
 	BoxGeometry,
 	MeshStandardMaterial,
@@ -30,7 +31,7 @@ class XRHandPrimitiveModel {
 		const material = new MeshStandardMaterial();
 
 		this.handMesh = new InstancedMesh( geometry, material, 30 );
-		this.handMesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
+		this.handMesh.instanceMatrix.setUsage( DynamicDrawUsage ); // will be updated every frame
 		this.handMesh.castShadow = true;
 		this.handMesh.receiveShadow = true;
 		this.handModel.add( this.handMesh );
