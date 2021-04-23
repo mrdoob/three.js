@@ -116,8 +116,6 @@
 
 			if ( mass > 0 ) {
 
-				mesh.instanceMatrix.setUsage( 35048 ); // THREE.DynamicDrawUsage = 35048
-
 				meshes.push( mesh );
 				meshMap.set( mesh, bodies );
 
