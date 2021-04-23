@@ -16,7 +16,6 @@ class XRHandPrimitiveModel {
 		this.envMap = null;
 
 		let geometry;
-		const jointMaterial = new MeshStandardMaterial( { color: 0xffffff, roughness: 1, metalness: 0 } );
 
 		if ( ! options || ! options.primitive || options.primitive === 'sphere' ) {
 
@@ -28,7 +27,10 @@ class XRHandPrimitiveModel {
 
 		}
 
-		this.handMesh = new InstancedMesh( geometry, jointMaterial, 30 );
+		const material = new MeshStandardMaterial();
+
+		this.handMesh = new InstancedMesh( geometry, material, 30 );
+		this.handMesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
 		this.handMesh.castShadow = true;
 		this.handMesh.receiveShadow = true;
 		this.handModel.add( this.handMesh );
@@ -61,26 +63,28 @@ class XRHandPrimitiveModel {
 			'pinky-finger-tip'
 		];
 
-		this.tempMat = new Matrix4(); this.tempVec = new Vector3( 1, 1, 1 );
+		this.tempMat = new Matrix4();
+		this.tempVec = new Vector3();
 
 	}
 
 	updateMesh() {
 
 		const defaultRadius = 0.008;
+		const joints = this.controller.joints;
 
-		// XR Joints
-		const XRJoints = this.controller.joints;
 		let count = 0;
 
 		for ( let i = 0; i < this.joints.length; i ++ ) {
 
-			const XRJoint = XRJoints[ this.joints[ i ] ];
+			const joint = joints[ this.joints[ i ] ];
 
-			if ( XRJoint.visible ) {
+			if ( joint.visible ) {
 
-				this.handMesh.setMatrixAt( i, this.tempMat.compose( XRJoint.position, XRJoint.quaternion,
-					this.tempVec.set( 1, 1, 1 ).multiplyScalar( XRJoint.jointRadius || defaultRadius ) ) );
+				this.tempVec.setScalar( joint.jointRadius || defaultRadius );
+				this.tempMat.compose( joint.position, joint.quaternion, this.tempVec );
+				this.handMesh.setMatrixAt( i, this.tempMat );
+
 				count ++;
 
 			}
@@ -88,11 +92,7 @@ class XRHandPrimitiveModel {
 		}
 
 		this.handMesh.count = count;
-		if ( this.handMesh.instanceMatrix ) {
-
-			this.handMesh.instanceMatrix.needsUpdate = true;
-
-		}
+		this.handMesh.instanceMatrix.needsUpdate = true;
 
 	}
 
