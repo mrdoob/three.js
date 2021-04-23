@@ -8,6 +8,9 @@ import {
 	Vector3
 } from '../../../build/three.module.js';
 
+const _matrix = new Matrix4();
+const _vector = new Vector3();
+
 class XRHandPrimitiveModel {
 
 	constructor( handModel, controller, path, handedness, options ) {
@@ -64,9 +67,6 @@ class XRHandPrimitiveModel {
 			'pinky-finger-tip'
 		];
 
-		this.tempMat = new Matrix4();
-		this.tempVec = new Vector3();
-
 	}
 
 	updateMesh() {
@@ -82,9 +82,9 @@ class XRHandPrimitiveModel {
 
 			if ( joint.visible ) {
 
-				this.tempVec.setScalar( joint.jointRadius || defaultRadius );
-				this.tempMat.compose( joint.position, joint.quaternion, this.tempVec );
-				this.handMesh.setMatrixAt( i, this.tempMat );
+				_vector.setScalar( joint.jointRadius || defaultRadius );
+				_matrix.compose( joint.position, joint.quaternion, _vector );
+				this.handMesh.setMatrixAt( i, _matrix );
 
 				count ++;
 
