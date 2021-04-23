@@ -1,4 +1,4 @@
-import { Object3D, SphereGeometry, Sphere, Box3 } from "../../../build/three.module.js";
+import { Object3D, Sphere, Box3 } from "../../../build/three.module.js";
 import { FBXLoader } from "../loaders/FBXLoader.js";
 
 const JOINTS = [
@@ -39,8 +39,8 @@ class XRHandOculusMeshModel {
     this.bones = [];
     const loader = new FBXLoader();
 
-    loader.setPath("../../models/fbx/");
-    loader.load("OculusHandNew_" + handedness + ".fbx", (object) => {
+    // loader.setPath("");
+    loader.load("models/fbx/OculusHandNew_" + handedness + ".fbx", (object) => {
       this.handModel.add(object);
       // Hack because of the scale of the skinnedmesh
       object.scale.setScalar(0.01);
