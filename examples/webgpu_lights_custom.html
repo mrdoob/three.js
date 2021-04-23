@@ -106,11 +106,11 @@
 
 					}` );
 
-				const customModelLight = new ContextNode( allLightsNode );
-				customModelLight.setParameter( 'RE_Direct', RE_Direct );
-				customModelLight.setParameter( 'RE_IndirectDiffuse', RE_IndirectDiffuse );
+				const lightingModelContext = new ContextNode( allLightsNode );
+				lightingModelContext.setParameter( 'RE_Direct', RE_Direct );
+				lightingModelContext.setParameter( 'RE_IndirectDiffuse', RE_IndirectDiffuse );
 
-				materialPoints.lightNode = customModelLight;
+				materialPoints.lightNode = lightingModelContext;
 
 				//
 
