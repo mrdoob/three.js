@@ -13,7 +13,7 @@ class HTMLMesh extends Mesh {
 
 		const texture = new HTMLTexture( dom );
 
-		const geometry = new PlaneGeometry( texture.image.width * 0.002, texture.image.height * 0.002 );
+		const geometry = new PlaneGeometry( texture.image.width * 0.001, texture.image.height * 0.001 );
 		const material = new MeshBasicMaterial( { map: texture, toneMapped: false } );
 
 		super( geometry, material );

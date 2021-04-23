@@ -1,7 +1,7 @@
 import * as THREE from '../../build/three.module.js';
 
-import { InteractiveGroup } from '../../examples/jsm/interactive/InteractiveGroup.js';
 import { HTMLMesh } from '../../examples/jsm/interactive/HTMLMesh.js';
+import { InteractiveGroup } from '../../examples/jsm/interactive/InteractiveGroup.js';
 
 import { XRControllerModelFactory } from '../../examples/jsm/webxr/XRControllerModelFactory.js';
 
@@ -36,6 +36,7 @@ class VR {
 				const mesh = new HTMLMesh( sidebar );
 				mesh.position.set( 1, 1.5, - 0.5 );
 				mesh.rotation.y = - 0.5;
+				mesh.scale.setScalar( 2 );
 				group.add( mesh );
 
 				intersectables.push( mesh );
