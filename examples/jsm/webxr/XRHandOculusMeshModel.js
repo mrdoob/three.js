@@ -9,10 +9,11 @@ class XRHandOculusMeshModel {
 
 		this.bones = [];
 		const loader = new FBXLoader();
-		const low = options && options.model === 'lowpoly' ? '_low' : '';
+		// low poly option disabled until low poly hands model is fixed
+		// const low = options && options.model === 'lowpoly' ? '_low' : '';
 
 		loader.setPath( path );
-		loader.load( `OculusHand_${handedness === 'right' ? 'R' : 'L'}${low}.fbx`, object => {
+		loader.load( `OculusHandNew_${handedness}.fbx`, object => {
 
 			this.handModel.add( object );
 			// Hack because of the scale of the skinnedmesh
@@ -31,29 +32,29 @@ class XRHandOculusMeshModel {
 				'b_%_thumb3', // XRHand.THUMB_PHALANX_DISTAL,
 				'b_%_thumb_null', // XRHand.THUMB_PHALANX_TIP,
 
-				null, //'b_%_index1', // XRHand.INDEX_METACARPAL,
+				'b_%_index0', // XRHand.INDEX_METACARPAL,
 				'b_%_index1', // XRHand.INDEX_PHALANX_PROXIMAL,
 				'b_%_index2', // XRHand.INDEX_PHALANX_INTERMEDIATE,
 				'b_%_index3', // XRHand.INDEX_PHALANX_DISTAL,
 				'b_%_index_null', // XRHand.INDEX_PHALANX_TIP,
 
-				null, //'b_%_middle1', // XRHand.MIDDLE_METACARPAL,
+				'b_%_middle0', // XRHand.MIDDLE_METACARPAL,
 				'b_%_middle1', // XRHand.MIDDLE_PHALANX_PROXIMAL,
 				'b_%_middle2', // XRHand.MIDDLE_PHALANX_INTERMEDIATE,
 				'b_%_middle3', // XRHand.MIDDLE_PHALANX_DISTAL,
-				'b_%_middlenull', // XRHand.MIDDLE_PHALANX_TIP,
+				'b_%_middle_null', // XRHand.MIDDLE_PHALANX_TIP,
 
-				null, //'b_%_ring1', // XRHand.RING_METACARPAL,
+				'b_%_ring0', // XRHand.RING_METACARPAL,
 				'b_%_ring1', // XRHand.RING_PHALANX_PROXIMAL,
 				'b_%_ring2', // XRHand.RING_PHALANX_INTERMEDIATE,
 				'b_%_ring3', // XRHand.RING_PHALANX_DISTAL,
-				'b_%_ring_inull', // XRHand.RING_PHALANX_TIP,
+				'b_%_ring_null', // XRHand.RING_PHALANX_TIP,
 
 				'b_%_pinky0', // XRHand.LITTLE_METACARPAL,
 				'b_%_pinky1', // XRHand.LITTLE_PHALANX_PROXIMAL,
 				'b_%_pinky2', // XRHand.LITTLE_PHALANX_INTERMEDIATE,
 				'b_%_pinky3', // XRHand.LITTLE_PHALANX_DISTAL,
-				'b_%_pinkynull', // XRHand.LITTLE_PHALANX_TIP
+				'b_%_pinky_null', // XRHand.LITTLE_PHALANX_TIP
 			];
 
 			const joints = [

@@ -114,7 +114,8 @@
 				handModels.left = [
 					handModelFactory.createHandModel( hand1, "boxes" ),
 					handModelFactory.createHandModel( hand1, "spheres" ),
-					handModelFactory.createHandModel( hand1, "oculus", { model: "lowpoly" } ),
+					// low poly option disabled until low poly hands model is fixed
+					// handModelFactory.createHandModel( hand1, "oculus", { model: "lowpoly" } ),
 					handModelFactory.createHandModel( hand1, "oculus" )
 				];
 
@@ -153,7 +154,8 @@
 				handModels.right = [
 					handModelFactory.createHandModel( hand2, "boxes" ),
 					handModelFactory.createHandModel( hand2, "spheres" ),
-					handModelFactory.createHandModel( hand2, "oculus", { model: "lowpoly" } ),
+					// low poly option disabled until low poly hands model is fixed
+					// handModelFactory.createHandModel( hand2, "oculus", { model: "lowpoly" } ),
 					handModelFactory.createHandModel( hand2, "oculus" )
 				];
 				handModels.right.forEach( model => {
