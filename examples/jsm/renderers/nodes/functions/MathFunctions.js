@@ -23,13 +23,13 @@ vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {
 
 }` );
 
-export const pow2 = new FunctionNode( `float pow2( const in float x ) { return x*x; }` );
-export const pow3 = new FunctionNode( `float pow3( const in float x ) { return x*x*x; }` );
-export const pow4 = new FunctionNode( `float pow4( const in float x ) { float x2 = x*x; return x2*x2; }` );
+export const pow2 = new FunctionNode( 'float pow2( const in float x ) { return x*x; }' );
+export const pow3 = new FunctionNode( 'float pow3( const in float x ) { return x*x*x; }' );
+export const pow4 = new FunctionNode( 'float pow4( const in float x ) { float x2 = x*x; return x2*x2; }' );
 
-export const average = new FunctionNode( `float average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }` );
+export const average = new FunctionNode( 'float average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }' );
 
-export const max3 = new FunctionNode( `float max3( vec3 v ) { return max( max( v.x, v.y ), v.z ); }` );
+export const max3 = new FunctionNode( 'float max3( vec3 v ) { return max( max( v.x, v.y ), v.z ); }' );
 
 // expects values in the range of [0,1]x[0,1], returns values in the [0,1] range.
 // do not collapse into a single function per: http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
@@ -44,4 +44,4 @@ highp float rand( const in vec2 uv ) {
 
 }` ).setIncludes( [ PI ] );
 
-export const precisionSafeLength = new FunctionNode( `float precisionSafeLength( vec3 v ) { return length( v ); }` );
+export const precisionSafeLength = new FunctionNode( 'float precisionSafeLength( vec3 v ) { return length( v ); }' );

@@ -44,7 +44,7 @@ class LightNode extends Node {
 
 	}
 
-	update( frame ) {
+	update( /* frame */ ) {
 
 		this.color.value.copy( this.light.color ).multiplyScalar( this.light.intensity );
 		this.lightCutoffDistance.value = this.light.distance;

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - selective lights</title>
+		<title>three.js - WebGPU - Selective Lights</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,8 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - selective lights WebGPU demo.<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - Selective Lights<br />
+			(Chrome Canary with flag: --enable-unsafe-webgpu)<br />
 			<b style="color:red">Left: Red lights</b> - <b>Center: All lights</b> - <b style="color:blue">Right: blue light</b>
 		</div>
 
@@ -102,7 +103,7 @@
 				leftObject.material.shininess = centerObject.material.shininess = rightObject.material.shininess = 70;
 
 				leftObject.rotation.y = centerObject.rotation.y = rightObject.rotation.y = Math.PI * - 0.5;
-				leftObject.position.y = centerObject.position.y = rightObject.position.y =  - 10;
+				leftObject.position.y = centerObject.position.y = rightObject.position.y = - 10;
 
 				//renderer
 
