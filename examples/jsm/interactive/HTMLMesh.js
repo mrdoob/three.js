@@ -20,8 +20,6 @@ class HTMLMesh extends Mesh {
 
 		function onEvent( event ) {
 
-			console.log( event.type );
-
 			material.map.dispatchEvent( event );
 
 		}

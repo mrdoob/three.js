@@ -5,11 +5,12 @@ import {
 	Vector2
 } from '../../../build/three.module.js';
 
-const _event = { type: '', data: new Vector2() };
+const _pointer = new Vector2();
+const _event = { type: '', data: _pointer };
 
 class InteractiveGroup extends Group {
 
-	constructor( renderer ) {
+	constructor( renderer, camera ) {
 
 		super();
 
@@ -18,7 +19,47 @@ class InteractiveGroup extends Group {
 		const raycaster = new Raycaster();
 		const tempMatrix = new Matrix4();
 
-		// TODO PointerEvents
+		// Pointer Events
+
+		const element = renderer.domElement;
+
+		function onPointerEvent( event ) {
+
+			event.stopPropagation();
+
+			_pointer.x = ( event.clientX / element.clientWidth ) * 2 - 1;
+			_pointer.y = - ( event.clientY / element.clientHeight ) * 2 + 1;
+
+			raycaster.setFromCamera( _pointer, camera );
+
+			const intersects = raycaster.intersectObjects( scope.children );
+
+			if ( intersects.length > 0 ) {
+
+				const intersection = intersects[ 0 ];
+
+				const object = intersection.object;
+				const uv = intersection.uv;
+
+				_event.type = event.type;
+				_event.data.set( uv.x, 1 - uv.y );
+
+				object.dispatchEvent( _event );
+
+			}
+
+		}
+
+		element.addEventListener( 'pointerdown', onPointerEvent );
+		element.addEventListener( 'pointerup', onPointerEvent );
+		element.addEventListener( 'pointermove', onPointerEvent );
+		element.addEventListener( 'mousedown', onPointerEvent );
+		element.addEventListener( 'mouseup', onPointerEvent );
+		element.addEventListener( 'mousemove', onPointerEvent );
+		element.addEventListener( 'click', onPointerEvent );
+
+		// WebXR Controller Events
+		// TODO: Dispatch pointerevents too
 
 		const events = {
 			'move': 'mousemove',

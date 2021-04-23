@@ -180,19 +180,16 @@
 				gui.add( parameters, 'radialSegments', 2, 20, 1 ).onChange( onChange );
 				gui.add( parameters, 'p', 0, 10, 1 ).onChange( onChange );
 				gui.add( parameters, 'q', 0, 10, 1 ).onChange( onChange );
+				gui.domElement.style.visibility = 'hidden';
 
-				const group = new InteractiveGroup( renderer );
+				const group = new InteractiveGroup( renderer, camera );
 				scene.add( group );
 
 				const mesh = new HTMLMesh( gui.domElement );
 				mesh.position.x = - 1;
 				mesh.position.y = 1;
 				mesh.position.z = - 1;
-				mesh.visible = false;
 				group.add( mesh );
-
-				renderer.xr.addEventListener( 'sessionstart', () => { mesh.visible = true; } );
-				renderer.xr.addEventListener( 'sessionend', () => { mesh.visible = false; } );
 
 			}
 
