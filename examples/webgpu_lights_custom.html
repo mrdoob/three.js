@@ -87,7 +87,7 @@
 				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
 				const materialPoints = new THREE.PointsMaterial();
 
-				// custom model light
+				// custom lighting model
 
 				const RE_Direct = new FunctionNode( `
 					void ( vec3 lightColor ) {
