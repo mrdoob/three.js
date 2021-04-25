@@ -35,6 +35,12 @@ class ImageLoader extends Loader {
 
 		}
 
+		if ( typeof document === 'undefined' ) {
+
+			return null;
+
+		}
+
 		const image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 
 		function onImageLoad() {
