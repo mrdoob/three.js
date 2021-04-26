@@ -1969,6 +1969,40 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.copyFramebufferToTexture3D = function ( position, dstPosition, texture, level = 0 ) {
+
+		const levelScale = Math.pow( 2, - level );
+		const width = Math.floor( texture.image.width * levelScale );
+		const height = Math.floor( texture.image.height * levelScale );
+		const glFormat = utils.convert( texture.format );
+
+		// textures.setTexture2D( texture, 0 );
+
+		let glTarget;
+
+		if ( texture.isDataTexture3D ) {
+
+			textures.setTexture3D( texture, 0 );
+			glTarget = _gl.TEXTURE_3D;
+
+		} else if ( texture.isDataTexture2DArray ) {
+
+			textures.setTexture2DArray( texture, 0 );
+			glTarget = _gl.TEXTURE_2D_ARRAY;
+
+		} else {
+
+			console.warn( 'THREE.WebGLRenderer.copyFramebufferToTexture3D: only supports THREE.DataTexture3D and THREE.DataTexture2DArray.' );
+			return;
+
+		}
+
+		_gl.copyTexSubImage3D( glTarget, level, dstPosition.x, dstPosition.y, dstPosition.z, position.x, position.y, width, height );
+
+		state.unbindTexture();
+
+	};
+
 	this.copyTextureToTexture = function ( position, srcTexture, dstTexture, level = 0 ) {
 
 		const width = srcTexture.image.width;
