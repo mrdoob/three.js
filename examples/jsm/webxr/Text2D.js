@@ -1,15 +1,14 @@
 import * as THREE from "../../../build/three.module.js";
 
 function createText(message, height) {
-  var canvas = document.createElement("canvas");
-  var context = canvas.getContext("2d");
-  var metrics = null,
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  let metrics = null,
     textHeight = 100,
-    textWidth = 100,
-    actualFontSize = 2;
+    textWidth = 100;
   context.font = "normal " + textHeight + "px Arial";
   metrics = context.measureText(message);
-  var textWidth = metrics.width;
+  textWidth = metrics.width;
   canvas.width = textWidth;
   canvas.height = textHeight;
   context.font = "normal " + textHeight + "px Arial";
@@ -18,16 +17,16 @@ function createText(message, height) {
   context.fillStyle = "#ffffff";
   context.fillText(message, textWidth / 2, textHeight / 2);
 
-  var texture = new THREE.Texture(canvas);
+  const texture = new THREE.Texture(canvas);
   texture.needsUpdate = true;
   //var spriteAlignment = new THREE.Vector2(0,0) ;
-  var material = new THREE.MeshBasicMaterial({
+  const material = new THREE.MeshBasicMaterial({
     color: 0xffffff,
     side: THREE.DoubleSide,
     map: texture,
     transparent: true,
   });
-  var geometry = new THREE.PlaneGeometry(
+  const geometry = new THREE.PlaneGeometry(
     (height * textWidth) / textHeight,
     height
   );
