@@ -1,4 +1,4 @@
-import { FBXLoader } from '../loaders/FBXLoader.js';
+import { GLTFLoader } from '../loaders/GLTFLoader.js';
 
 class XRHandOculusMeshModel {
 
@@ -8,13 +8,13 @@ class XRHandOculusMeshModel {
 		this.handModel = handModel;
 
 		this.bones = [];
-		const loader = new FBXLoader();
+		const loader = new GLTFLoader();
 		// low poly option disabled until low poly hands model is fixed
 		// const low = options && options.model === 'lowpoly' ? '_low' : '';
 
 		loader.setPath( path );
-		loader.load( `OculusHandNew_${handedness}.fbx`, object => {
-
+		loader.load( `OculusHandNew_${handedness}.glb`, gltf => {
+			const object = gltf.scene.children[0];
 			this.handModel.add( object );
 			// Hack because of the scale of the skinnedmesh
 			object.scale.setScalar( 0.01 );
