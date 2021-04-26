@@ -334,95 +334,107 @@
 		`
 		}
 	};
-	const loader = new THREE.TextureLoader().setPath( './textures/tiltbrush/' );
-	const shaders = {
-		'Light': {
-			uniforms: {
-				mainTex: {
-					value: loader.load( 'Light.webp' )
-				},
-				alphaTest: {
-					value: 0.067
-				},
-				emission_gain: {
-					value: 0.45
-				},
-				alpha: {
-					value: 1
+	let shaders = null;
+
+	function getShaders() {
+
+		if ( shaders === null ) {
+
+			const loader = new THREE.TextureLoader().setPath( './textures/tiltbrush/' );
+			shaders = {
+				'Light': {
+					uniforms: {
+						mainTex: {
+							value: loader.load( 'Light.webp' )
+						},
+						alphaTest: {
+							value: 0.067
+						},
+						emission_gain: {
+							value: 0.45
+						},
+						alpha: {
+							value: 1
+						}
+					},
+					vertexShader: `
+					precision highp float;
+					precision highp int;
+
+					attribute vec2 uv;
+					attribute vec4 color;
+					attribute vec3 position;
+
+					uniform mat4 modelMatrix;
+					uniform mat4 modelViewMatrix;
+					uniform mat4 projectionMatrix;
+					uniform mat4 viewMatrix;
+					uniform mat3 normalMatrix;
+					uniform vec3 cameraPosition;
+
+					varying vec2 vUv;
+					varying vec3 vColor;
+
+					${common.colors.LinearToSrgb}
+					${common.colors.hsv}
+
+					void main() {
+
+						vUv = uv;
+
+						vColor = lookup(color.rgb);
+
+						vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+						gl_Position = projectionMatrix * mvPosition;
+
+					}
+				`,
+					fragmentShader: `
+					precision highp float;
+					precision highp int;
+
+					uniform float emission_gain;
+
+					uniform sampler2D mainTex;
+					uniform float alphaTest;
+
+					varying vec2 vUv;
+					varying vec3 vColor;
+
+					${common.colors.BloomColor}
+					${common.colors.SrgbToLinear}
+
+					void main(){
+						vec4 col = texture2D(mainTex, vUv);
+						vec3 color = vColor;
+						color = BloomColor(color, emission_gain);
+						color = color * col.rgb;
+						color = color * col.a;
+						color = SrgbToLinear(color);
+						gl_FragColor = vec4(color, 1.0);
+					}
+				`,
+					side: 2,
+					transparent: true,
+					depthFunc: 2,
+					depthWrite: true,
+					depthTest: false,
+					blending: 5,
+					blendDst: 201,
+					blendDstAlpha: 201,
+					blendEquation: 100,
+					blendEquationAlpha: 100,
+					blendSrc: 201,
+					blendSrcAlpha: 201
 				}
-			},
-			vertexShader: `
-			precision highp float;
-			precision highp int;
+			};
 
-			attribute vec2 uv;
-			attribute vec4 color;
-			attribute vec3 position;
-
-			uniform mat4 modelMatrix;
-			uniform mat4 modelViewMatrix;
-			uniform mat4 projectionMatrix;
-			uniform mat4 viewMatrix;
-			uniform mat3 normalMatrix;
-			uniform vec3 cameraPosition;
-
-			varying vec2 vUv;
-			varying vec3 vColor;
-
-			${common.colors.LinearToSrgb}
-			${common.colors.hsv}
-
-			void main() {
-
-				vUv = uv;
-
-				vColor = lookup(color.rgb);
-
-				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-
-				gl_Position = projectionMatrix * mvPosition;
-
-			}
-		`,
-			fragmentShader: `
-			precision highp float;
-			precision highp int;
-
-			uniform float emission_gain;
-
-			uniform sampler2D mainTex;
-			uniform float alphaTest;
-
-			varying vec2 vUv;
-			varying vec3 vColor;
-
-			${common.colors.BloomColor}
-			${common.colors.SrgbToLinear}
-
-			void main(){
-				vec4 col = texture2D(mainTex, vUv);
-				vec3 color = vColor;
-				color = BloomColor(color, emission_gain);
-				color = color * col.rgb;
-				color = color * col.a;
-				color = SrgbToLinear(color);
-				gl_FragColor = vec4(color, 1.0);
-			}
-		`,
-			side: 2,
-			transparent: true,
-			depthFunc: 2,
-			depthWrite: true,
-			depthTest: false,
-			blending: 5,
-			blendDst: 201,
-			blendDstAlpha: 201,
-			blendEquation: 100,
-			blendEquationAlpha: 100,
-			blendSrc: 201,
-			blendSrcAlpha: 201
 		}
-	};
+
+		return shaders;
+
+	}
 
 	function getMaterial( GUID ) {
 
@@ -431,7 +443,7 @@
 		switch ( name ) {
 
 			case 'Light':
-				return new THREE.RawShaderMaterial( shaders.Light );
+				return new THREE.RawShaderMaterial( getShaders().Light );
 
 			default:
 				return new THREE.MeshBasicMaterial( {
