@@ -10,13 +10,13 @@
 	class GeometryCompressionUtils {
 
 		/**
-		 * Make the input mesh.geometry's normal attribute encoded and compressed by 3 different methods.
-		 * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the normal data.
-		 *
-		 * @param {THREE.Mesh} mesh
-		 * @param {String} encodeMethod		"DEFAULT" || "OCT1Byte" || "OCT2Byte" || "ANGLES"
-		 *
-		 */
+  	 * Make the input mesh.geometry's normal attribute encoded and compressed by 3 different methods.
+  	 * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the normal data.
+  	 *
+  	 * @param {THREE.Mesh} mesh
+  	 * @param {String} encodeMethod		"DEFAULT" || "OCT1Byte" || "OCT2Byte" || "ANGLES"
+  	 *
+  	 */
 		static compressNormals( mesh, encodeMethod ) {
 
 			if ( ! mesh.geometry ) {
@@ -65,10 +65,10 @@
 			} else if ( encodeMethod == 'OCT1Byte' ) {
 
 				/**
-			* It is not recommended to use 1-byte octahedron normals encoding unless you want to extremely reduce the memory usage
-			* As it makes vertex data not aligned to a 4 byte boundary which may harm some WebGL implementations and sometimes the normal distortion is visible
-			* Please refer to @zeux 's comments in https://github.com/mrdoob/three.js/pull/18208
-			*/
+      * It is not recommended to use 1-byte octahedron normals encoding unless you want to extremely reduce the memory usage
+      * As it makes vertex data not aligned to a 4 byte boundary which may harm some WebGL implementations and sometimes the normal distortion is visible
+      * Please refer to @zeux 's comments in https://github.com/mrdoob/three.js/pull/18208
+      */
 				result = new Int8Array( count * 2 );
 
 				for ( let idx = 0; idx < array.length; idx += 3 ) {
@@ -154,12 +154,12 @@
 
 		}
 		/**
-		 * Make the input mesh.geometry's position attribute encoded and compressed.
-		 * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the position data.
-		 *
-		 * @param {THREE.Mesh} mesh
-		 *
-		 */
+  	 * Make the input mesh.geometry's position attribute encoded and compressed.
+  	 * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the position data.
+  	 *
+  	 * @param {THREE.Mesh} mesh
+  	 *
+  	 */
 
 
 		static compressPositions( mesh ) {
@@ -211,12 +211,12 @@
 
 		}
 		/**
-		 * Make the input mesh.geometry's uv attribute encoded and compressed.
-		 * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the uv data.
-		 *
-		 * @param {THREE.Mesh} mesh
-		 *
-		 */
+  	 * Make the input mesh.geometry's uv attribute encoded and compressed.
+  	 * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the uv data.
+  	 *
+  	 * @param {THREE.Mesh} mesh
+  	 *
+  	 */
 
 
 		static compressUvs( mesh ) {

@@ -24,8 +24,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -36,8 +36,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform float screenWidth;
 		uniform float screenHeight;
@@ -62,7 +62,7 @@
 
 			f = ( waveFactor * 100.0 + sample_dist ) * sampleDistance * 4.0;
 
-			vec2 sampleSize = vec2(	1.0 / screenWidth, 1.0 / screenHeight ) * vec2( f );
+			vec2 sampleSize = vec2(  1.0 / screenWidth, 1.0 / screenHeight ) * vec2( f );
 
 			add += tmp = texture2D( tDiffuse, uv + vec2( 0.111964, 0.993712 ) * sampleSize );
 			if( tmp.b < color.b ) color = tmp;

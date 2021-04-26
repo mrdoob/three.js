@@ -58,8 +58,8 @@
 						break;
 
 					case 'LUT_3D_SIZE':
-					// TODO: A .CUBE LUT file specifies floating point values and could be represented with
-					// more precision than can be captured with Uint8Array.
+						// TODO: A .CUBE LUT file specifies floating point values and could be represented with
+						// more precision than can be captured with Uint8Array.
 						const sizeToken = split[ 1 ];
 						size = parseFloat( sizeToken );
 						data = new Uint8Array( size * size * size * 3 );

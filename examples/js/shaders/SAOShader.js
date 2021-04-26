@@ -58,8 +58,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -68,8 +68,8 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		#include <common>
 
@@ -204,7 +204,7 @@
 			float ambientOcclusion = getAmbientOcclusion( viewPosition );
 
 			gl_FragColor = getDefaultColor( vUv );
-			gl_FragColor.xyz *=	1.0 - ambientOcclusion;
+			gl_FragColor.xyz *=  1.0 - ambientOcclusion;
 		}`
 	};
 

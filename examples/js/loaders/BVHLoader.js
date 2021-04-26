@@ -53,11 +53,11 @@
 		parse( text ) {
 
 			/*
-			reads a string array (lines) from a BVH file
-			and outputs a skeleton structure including motion data
-				returns thee root node:
-			{ name: '', channels: [], children: [] }
-		*/
+    	reads a string array (lines) from a BVH file
+    	and outputs a skeleton structure including motion data
+    		returns thee root node:
+    	{ name: '', channels: [], children: [] }
+    */
 			function readBvh( lines ) {
 
 				// read model structure
@@ -109,14 +109,14 @@
 
 			}
 			/*
-			Recursively reads data from a single frame into the bone hierarchy.
-			The passed bone hierarchy has to be structured in the same order as the BVH file.
-			keyframe data is stored in bone.frames.
-				- data: splitted string array (frame values), values are shift()ed so
-			this should be empty after parsing the whole hierarchy.
-			- frameTime: playback time for this keyframe.
-			- bone: the bone to read frame data from.
-		*/
+    	Recursively reads data from a single frame into the bone hierarchy.
+    	The passed bone hierarchy has to be structured in the same order as the BVH file.
+    	keyframe data is stored in bone.frames.
+    		- data: splitted string array (frame values), values are shift()ed so
+    	this should be empty after parsing the whole hierarchy.
+    	- frameTime: playback time for this keyframe.
+    	- bone: the bone to read frame data from.
+    */
 
 
 			function readFrameData( data, frameTime, bone ) {
@@ -182,12 +182,12 @@
 
 			}
 			/*
-		 Recursively parses the HIERACHY section of the BVH file
-			 - lines: all lines of the file. lines are consumed as we go along.
-		 - firstline: line containing the node type and name e.g. 'JOINT hip'
-		 - list: collects a flat list of nodes
-			 returns: a BVH node including children
-		*/
+     Recursively parses the HIERACHY section of the BVH file
+    	 - lines: all lines of the file. lines are consumed as we go along.
+     - firstline: line containing the node type and name e.g. 'JOINT hip'
+     - list: collects a flat list of nodes
+    	 returns: a BVH node including children
+    */
 
 
 			function readNode( lines, firstline, list ) {
@@ -279,11 +279,11 @@
 
 			}
 			/*
-			recursively converts the internal bvh node structure to a THREE.Bone hierarchy
-				source: the bvh root node
-			list: pass an empty array, collects a flat list of all converted THREE.Bones
-				returns the root THREE.Bone
-		*/
+    	recursively converts the internal bvh node structure to a THREE.Bone hierarchy
+    		source: the bvh root node
+    	list: pass an empty array, collects a flat list of all converted THREE.Bones
+    		returns the root THREE.Bone
+    */
 
 
 			function toTHREEBone( source, list ) {
@@ -307,10 +307,10 @@
 
 			}
 			/*
-			builds a THREE.AnimationClip from the keyframe data saved in each bone.
-				bone: bvh root node
-				returns: a THREE.AnimationClip containing position and quaternion tracks
-		*/
+    	builds a THREE.AnimationClip from the keyframe data saved in each bone.
+    		bone: bvh root node
+    		returns: a THREE.AnimationClip containing position and quaternion tracks
+    */
 
 
 			function toTHREEAnimation( bones ) {
@@ -360,8 +360,8 @@
 
 			}
 			/*
-			returns the next non-empty line in lines
-		*/
+    	returns the next non-empty line in lines
+    */
 
 
 			function nextLine( lines ) {

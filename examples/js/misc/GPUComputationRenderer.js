@@ -50,7 +50,7 @@
  * const error = gpuCompute.init();
  * if ( error !== null ) {
  *		console.error( error );
-	* }
+  * }
  *
  *
  * // In each frame...
@@ -95,7 +95,7 @@
  * @param {int} sizeX Computation problem size is always 2d: sizeX * sizeY elements.
  * @param {int} sizeY Computation problem size is always 2d: sizeX * sizeY elements.
  * @param {WebGLRenderer} renderer The renderer
-	*/
+  */
 
 	class GPUComputationRenderer {
 

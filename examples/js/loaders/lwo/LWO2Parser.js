@@ -28,7 +28,7 @@
 			switch ( blockID ) {
 
 				case 'FORM':
-				// form blocks may consist of sub -chunks or sub-forms
+					// form blocks may consist of sub -chunks or sub-forms
 					this.IFF.parseForm( length );
 					break;
 					// SKIPPED CHUNKS
@@ -177,7 +177,7 @@
 				case 'IINY':
 				case 'IINZ':
 				case 'IREF':
-				// possibly a VX for reused texture nodes
+					// possibly a VX for reused texture nodes
 					if ( length === 4 ) this.IFF.currentNode[ blockID ] = this.IFF.reader.getInt32(); else this.IFF.reader.skip( length );
 					break;
 
@@ -222,7 +222,7 @@
 					// Misc CHUNKS
 
 				case 'DESC':
-				// Description Line
+					// Description Line
 					this.IFF.currentForm.description = this.IFF.reader.getString();
 					break;
 
@@ -308,7 +308,7 @@
 					break;
 
 				case 'CHAN':
-				// NOTE: ENVL Forms may also have CHAN chunk, however ENVL is currently ignored
+					// NOTE: ENVL Forms may also have CHAN chunk, however ENVL is currently ignored
 					if ( length === 4 ) this.IFF.currentForm.textureChannel = this.IFF.reader.getIDTag(); else this.IFF.reader.skip( length );
 					break;
 					// LWO2 Spec chunks: these are needed since the SURF FORMs are often in LWO2 format
@@ -400,23 +400,23 @@
 					break;
 
 				case 'IUVI':
-				// uv channel name
+					// uv channel name
 					this.IFF.currentNode.UVChannel = this.IFF.reader.getString( length );
 					break;
 
 				case 'IUTL':
-				// widthWrappingMode: 0 = Reset, 1 = Repeat, 2 = Mirror, 3 = Edge
+					// widthWrappingMode: 0 = Reset, 1 = Repeat, 2 = Mirror, 3 = Edge
 					this.IFF.currentNode.widthWrappingMode = this.IFF.reader.getUint32();
 					break;
 
 				case 'IVTL':
-				// heightWrappingMode
+					// heightWrappingMode
 					this.IFF.currentNode.heightWrappingMode = this.IFF.reader.getUint32();
 					break;
 					// LWO2 USE
 
 				case 'BLOK':
-				// skip
+					// skip
 					break;
 
 				default:

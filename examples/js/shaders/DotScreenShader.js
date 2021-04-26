@@ -25,8 +25,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -37,8 +37,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform vec2 center;
 		uniform float angle;

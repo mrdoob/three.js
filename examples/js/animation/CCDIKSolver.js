@@ -23,13 +23,13 @@
 	const _matrix = new THREE.Matrix4();
 	/**
  * CCD Algorithm
- *	- https://sites.google.com/site/auraliusproject/ccd-algorithm
+ *  - https://sites.google.com/site/auraliusproject/ccd-algorithm
  *
  * // ik parameter example
  * //
  * // target, effector, index in links are bone index in skeleton.bones.
  * // the bones relation should be
- * // <-- parent																	child -->
+ * // <-- parent                                  child -->
  * // links[ n ], links[ n - 1 ], ..., links[ 0 ], effector
  * iks = [ {
  *	target: 1,
@@ -45,9 +45,9 @@
 	class CCDIKSolver {
 
 		/**
-	 * @param {THREE.SkinnedMesh} mesh
-	 * @param {Array<Object>} iks
-	 */
+   * @param {THREE.SkinnedMesh} mesh
+   * @param {Array<Object>} iks
+   */
 		constructor( mesh, iks = [] ) {
 
 			this.mesh = mesh;
@@ -57,10 +57,10 @@
 
 		}
 		/**
-	 * Update all IK bones.
-	 *
-	 * @return {CCDIKSolver}
-	 */
+   * Update all IK bones.
+   *
+   * @return {CCDIKSolver}
+   */
 
 
 		update() {
@@ -77,11 +77,11 @@
 
 		}
 		/**
-	 * Update one IK bone
-	 *
-	 * @param {Object} ik parameter
-	 * @return {CCDIKSolver}
-	 */
+   * Update one IK bone
+   *
+   * @param {Object} ik parameter
+   * @return {CCDIKSolver}
+   */
 
 
 		updateOne( ik ) {
@@ -203,10 +203,10 @@
 
 		}
 		/**
-	 * Creates Helper
-	 *
-	 * @return {CCDIKHelper}
-	 */
+   * Creates Helper
+   *
+   * @return {CCDIKHelper}
+   */
 
 
 		createHelper() {
@@ -310,8 +310,8 @@
 
 		}
 		/**
-	 * Updates IK bones visualization.
-	 */
+   * Updates IK bones visualization.
+   */
 
 
 		updateMatrixWorld( force ) {

@@ -22,8 +22,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform float mRefractionRatio;
 		uniform float mFresnelBias;
@@ -53,8 +53,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform samplerCube tCube;
 

@@ -42,7 +42,7 @@ import {
 	VectorKeyframeTrack,
 	sRGBEncoding
 } from '../../../build/three.module.js';
-import * as fflate from '../libs/fflate.module.min.js';
+import * as fflate from '../libs/fflate.module.js';
 import { NURBSCurve } from '../curves/NURBSCurve.js';
 
 /**
@@ -3892,7 +3892,7 @@ class FBXTree {
 
 function isFbxFormatBinary( buffer ) {
 
-	const CORRECT = 'Kaydara FBX Binary  \0';
+	const CORRECT = 'Kaydara\u0020FBX\u0020Binary\u0020\u0020\0';
 
 	return buffer.byteLength >= CORRECT.length && CORRECT === convertArrayBufferToString( buffer, 0, CORRECT.length );
 

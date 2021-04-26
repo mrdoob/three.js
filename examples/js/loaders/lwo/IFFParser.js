@@ -6,25 +6,25 @@
  * - LWO3 files are in IFF format and can contain the following data types, referred to by shorthand codes
  *
  * ATOMIC DATA TYPES
- *	ID Tag - 4x 7 bit uppercase ASCII chars: ID4
- *	signed integer, 1, 2, or 4 byte length: I1, I2, I4
- *	unsigned integer, 1, 2, or 4 byte length: U1, U2, U4
- *	float, 4 byte length: F4
- *	string, series of ASCII chars followed by null byte (If the length of the string including the null terminating byte is odd, an extra null is added so that the data that follows will begin on an even byte boundary): S0
+ *  ID Tag - 4x 7 bit uppercase ASCII chars: ID4
+ *  signed integer, 1, 2, or 4 byte length: I1, I2, I4
+ *  unsigned integer, 1, 2, or 4 byte length: U1, U2, U4
+ *  float, 4 byte length: F4
+ *  string, series of ASCII chars followed by null byte (If the length of the string including the null terminating byte is odd, an extra null is added so that the data that follows will begin on an even byte boundary): S0
  *
  * COMPOUND DATA TYPES
- *	Variable-length Index (index into an array or collection): U2 or U4 : VX
- *	Color (RGB): F4 + F4 + F4: COL12
- *	Coordinate (x, y, z): F4 + F4 + F4: VEC12
- *	Percentage F4 data type from 0->1 with 1 = 100%: FP4
- *	Angle in radian F4: ANG4
- *	Filename (string) S0: FNAM0
- *	XValue F4 + index (VX) + optional envelope( ENVL ): XVAL
- *	XValue vector VEC12 + index (VX) + optional envelope( ENVL ): XVAL3
+ *  Variable-length Index (index into an array or collection): U2 or U4 : VX
+ *  Color (RGB): F4 + F4 + F4: COL12
+ *  Coordinate (x, y, z): F4 + F4 + F4: VEC12
+ *  Percentage F4 data type from 0->1 with 1 = 100%: FP4
+ *  Angle in radian F4: ANG4
+ *  Filename (string) S0: FNAM0
+ *  XValue F4 + index (VX) + optional envelope( ENVL ): XVAL
+ *  XValue vector VEC12 + index (VX) + optional envelope( ENVL ): XVAL3
  *
- *	The IFF file is arranged in chunks:
- *	CHUNK = ID4 + length (U4) + length X bytes of data + optional 0 pad byte
- *	optional 0 pad byte is there to ensure chunk ends on even boundary, not counted in size
+ *  The IFF file is arranged in chunks:
+ *  CHUNK = ID4 + length (U4) + length X bytes of data + optional 0 pad byte
+ *  optional 0 pad byte is there to ensure chunk ends on even boundary, not counted in size
  *
  * COMPOUND DATA TYPES
  * - Chunks are combined in Forms (collections of chunks)
@@ -174,7 +174,7 @@
 				case 'IIMG': // hold reference to image path
 
 				case 'TXTR':
-				// this.setupForm( type, length );
+					// this.setupForm( type, length );
 					this.debugger.length = 4;
 					this.debugger.skipped = true;
 					break;
@@ -216,7 +216,7 @@
 					break;
 
 				case 'XREF':
-				// clone of another STIL
+					// clone of another STIL
 					this.reader.skip( 8 ); // unknown
 
 					this.currentForm.referenceTexture = {
@@ -237,7 +237,7 @@
 					break;
 
 				case 'VALU':
-				// Not in spec
+					// Not in spec
 					this.parseValueForm( length );
 					break;
 
@@ -248,7 +248,7 @@
 				case 'ATTR': // BSDF Node Attributes
 
 				case 'SATR':
-				// Standard Node Attributes
+					// Standard Node Attributes
 					this.setupForm( 'attributes', length );
 					break;
 
@@ -267,7 +267,7 @@
 					break;
 
 				case 'ENTR':
-				// Not in spec
+					// Not in spec
 					this.parseEntryForm( length );
 					break;
 					// Image Map Layer
@@ -519,7 +519,7 @@
 		// ENVL forms are currently ignored
 		parseEnvelope( length ) {
 
-			this.reader.skip( length - 4 ); // skipping	entirely for now
+			this.reader.skip( length - 4 ); // skipping  entirely for now
 
 		},
 
@@ -669,7 +669,7 @@
 		// VMAP: { type[ID4], dimension[U2], name[S0], ( vert[VX], value[F4] # dimension ) * }
 		// VMAD Associates a set of floating-point vectors with the vertices of specific polygons.
 		// Similar to VMAP UVs, but associates with polygon vertices rather than points
-		// to solve to problem of UV seams:	VMAD chunks are paired with VMAPs of the same name,
+		// to solve to problem of UV seams:  VMAD chunks are paired with VMAPs of the same name,
 		// if they exist. The vector values in the VMAD will then replace those in the
 		// corresponding VMAP, but only for calculations involving the specified polygons.
 		// VMAD { type[ID4], dimension[U2], name[S0], ( vert[VX], poly[VX], value[F4] # dimension ) * }
@@ -1052,7 +1052,7 @@
 			return a.filter( Boolean ); // return array with any empty strings removed
 
 		}
-	}; // ************** DEBUGGER	**************
+	}; // ************** DEBUGGER  **************
 
 	function Debugger() {
 

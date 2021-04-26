@@ -2,10 +2,10 @@
 
 	/**
  * Usage:
- *	const exporter = new STLExporter();
+ *  const exporter = new STLExporter();
  *
- *	// second argument is a list of options
- *	const data = exporter.parse( mesh, { binary: true } );
+ *  // second argument is a list of options
+ *  const data = exporter.parse( mesh, { binary: true } );
  *
  */
 

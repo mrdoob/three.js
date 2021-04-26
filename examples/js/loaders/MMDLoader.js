@@ -2,9 +2,9 @@
 
 	/**
  * Dependencies
- *	- mmd-parser https://github.com/takahirox/mmd-parser
- *	- THREE.TGALoader
- *	- OutlineEffect
+ *  - mmd-parser https://github.com/takahirox/mmd-parser
+ *  - THREE.TGALoader
+ *  - OutlineEffect
  *
  * MMDLoader creates Three.js Objects from MMD resources as
  * PMD, PMX, VMD, and VPD files.
@@ -13,20 +13,20 @@
  * VPD is a posing data format used in MMD(Miku Miku Dance).
  *
  * MMD official site
- *	- https://sites.google.com/view/evpvp/
+ *  - https://sites.google.com/view/evpvp/
  *
  * PMD, VMD format (in Japanese)
- *	- http://blog.goo.ne.jp/torisu_tetosuki/e/209ad341d3ece2b1b4df24abf619d6e4
+ *  - http://blog.goo.ne.jp/torisu_tetosuki/e/209ad341d3ece2b1b4df24abf619d6e4
  *
  * PMX format
- *	- https://gist.github.com/felixjones/f8a06bd48f9da9a4539f
+ *  - https://gist.github.com/felixjones/f8a06bd48f9da9a4539f
  *
  * TODO
- *	- light motion in vmd support.
- *	- SDEF support.
- *	- uv/material/bone morphing support.
- *	- more precise grant skinning support.
- *	- shadow support.
+ *  - light motion in vmd support.
+ *  - SDEF support.
+ *  - uv/material/bone morphing support.
+ *  - more precise grant skinning support.
+ *  - shadow support.
  */
 
 	/**
@@ -46,9 +46,9 @@
 
 		}
 		/**
-	 * @param {string} animationPath
-	 * @return {MMDLoader}
-	 */
+   * @param {string} animationPath
+   * @return {MMDLoader}
+   */
 
 
 		setAnimationPath( animationPath ) {
@@ -59,13 +59,13 @@
 		} // Load MMD assets as Three.js Object
 
 		/**
-	 * Loads Model file (.pmd or .pmx) as a THREE.SkinnedMesh.
-	 *
-	 * @param {string} url - url to Model(.pmd or .pmx) file
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads Model file (.pmd or .pmx) as a THREE.SkinnedMesh.
+   *
+   * @param {string} url - url to Model(.pmd or .pmx) file
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		load( url, onLoad, onProgress, onError ) {
@@ -106,15 +106,15 @@
 
 		}
 		/**
-	 * Loads Motion file(s) (.vmd) as a THREE.AnimationClip.
-	 * If two or more files are specified, they'll be merged.
-	 *
-	 * @param {string|Array<string>} url - url(s) to animation(.vmd) file(s)
-	 * @param {SkinnedMesh|THREE.Camera} object - tracks will be fitting to this object
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads Motion file(s) (.vmd) as a THREE.AnimationClip.
+   * If two or more files are specified, they'll be merged.
+   *
+   * @param {string|Array<string>} url - url(s) to animation(.vmd) file(s)
+   * @param {SkinnedMesh|THREE.Camera} object - tracks will be fitting to this object
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		loadAnimation( url, object, onLoad, onProgress, onError ) {
@@ -128,16 +128,16 @@
 
 		}
 		/**
-	 * Loads mode file and motion file(s) as an object containing
-	 * a THREE.SkinnedMesh and a THREE.AnimationClip.
-	 * Tracks of THREE.AnimationClip are fitting to the model.
-	 *
-	 * @param {string} modelUrl - url to Model(.pmd or .pmx) file
-	 * @param {string|Array{string}} vmdUrl - url(s) to animation(.vmd) file
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads mode file and motion file(s) as an object containing
+   * a THREE.SkinnedMesh and a THREE.AnimationClip.
+   * Tracks of THREE.AnimationClip are fitting to the model.
+   *
+   * @param {string} modelUrl - url to Model(.pmd or .pmx) file
+   * @param {string|Array{string}} vmdUrl - url(s) to animation(.vmd) file
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		loadWithAnimation( modelUrl, vmdUrl, onLoad, onProgress, onError ) {
@@ -159,13 +159,13 @@
 		} // Load MMD assets as Object data parsed by MMDParser
 
 		/**
-	 * Loads .pmd file as an Object.
-	 *
-	 * @param {string} url - url to .pmd file
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads .pmd file as an Object.
+   *
+   * @param {string} url - url to .pmd file
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		loadPMD( url, onLoad, onProgress, onError ) {
@@ -180,13 +180,13 @@
 
 		}
 		/**
-	 * Loads .pmx file as an Object.
-	 *
-	 * @param {string} url - url to .pmx file
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads .pmx file as an Object.
+   *
+   * @param {string} url - url to .pmx file
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		loadPMX( url, onLoad, onProgress, onError ) {
@@ -201,14 +201,14 @@
 
 		}
 		/**
-	 * Loads .vmd file as an Object. If two or more files are specified
-	 * they'll be merged.
-	 *
-	 * @param {string|Array<string>} url - url(s) to .vmd file(s)
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads .vmd file as an Object. If two or more files are specified
+   * they'll be merged.
+   *
+   * @param {string|Array<string>} url - url(s) to .vmd file(s)
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		loadVMD( url, onLoad, onProgress, onError ) {
@@ -234,14 +234,14 @@
 
 		}
 		/**
-	 * Loads .vpd file as an Object.
-	 *
-	 * @param {string} url - url to .vpd file
-	 * @param {boolean} isUnicode
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads .vpd file as an Object.
+   *
+   * @param {string} url - url to .vpd file
+   * @param {boolean} isUnicode
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		loadVPD( url, isUnicode, onLoad, onProgress, onError ) {
@@ -307,9 +307,9 @@
 
 		}
 		/**
-	 * @param {string} crossOrigin
-	 * @return {MeshBuilder}
-	 */
+   * @param {string} crossOrigin
+   * @return {MeshBuilder}
+   */
 
 
 		setCrossOrigin( crossOrigin ) {
@@ -319,12 +319,12 @@
 
 		}
 		/**
-	 * @param {Object} data - parsed PMD/PMX data
-	 * @param {string} resourcePath
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 * @return {SkinnedMesh}
-	 */
+   * @param {Object} data - parsed PMD/PMX data
+   * @param {string} resourcePath
+   * @param {function} onProgress
+   * @param {function} onError
+   * @return {SkinnedMesh}
+   */
 
 
 		build( data, resourcePath, onProgress, onError ) {
@@ -396,9 +396,9 @@
 	class GeometryBuilder {
 
 		/**
-	 * @param {Object} data - parsed PMD/PMX data
-	 * @return {BufferGeometry}
-	 */
+   * @param {Object} data - parsed PMD/PMX data
+   * @return {BufferGeometry}
+   */
 		build( data ) {
 
 			// for geometry
@@ -754,19 +754,19 @@
 						updateAttributes( attribute, morph, 1.0 );
 
 					} else if ( morph.type === 2 ) { // bone
-					// TODO: implement
+						// TODO: implement
 					} else if ( morph.type === 3 ) { // uv
-					// TODO: implement
+						// TODO: implement
 					} else if ( morph.type === 4 ) { // additional uv1
-					// TODO: implement
+						// TODO: implement
 					} else if ( morph.type === 5 ) { // additional uv2
-					// TODO: implement
+						// TODO: implement
 					} else if ( morph.type === 6 ) { // additional uv3
-					// TODO: implement
+						// TODO: implement
 					} else if ( morph.type === 7 ) { // additional uv4
-					// TODO: implement
+						// TODO: implement
 					} else if ( morph.type === 8 ) { // material
-					// TODO: implement
+						// TODO: implement
 					}
 
 				}
@@ -788,10 +788,10 @@
 
 				}
 				/*
-				 * RigidBody position parameter in PMX seems global position
-				 * while the one in PMD seems offset from corresponding bone.
-				 * So unify being offset.
-				 */
+      	 * RigidBody position parameter in PMX seems global position
+      	 * while the one in PMD seems offset from corresponding bone.
+      	 * So unify being offset.
+      	 */
 
 
 				if ( data.metadata.format === 'pmx' ) {
@@ -892,9 +892,9 @@
 
 		}
 		/**
-	 * @param {string} crossOrigin
-	 * @return {MaterialBuilder}
-	 */
+   * @param {string} crossOrigin
+   * @return {MaterialBuilder}
+   */
 
 
 		setCrossOrigin( crossOrigin ) {
@@ -904,9 +904,9 @@
 
 		}
 		/**
-	 * @param {string} resourcePath
-	 * @return {MaterialBuilder}
-	 */
+   * @param {string} resourcePath
+   * @return {MaterialBuilder}
+   */
 
 
 		setResourcePath( resourcePath ) {
@@ -916,12 +916,12 @@
 
 		}
 		/**
-	 * @param {Object} data - parsed PMD/PMX data
-	 * @param {BufferGeometry} geometry - some properties are dependend on geometry
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 * @return {Array<MeshToonMaterial>}
-	 */
+   * @param {Object} data - parsed PMD/PMX data
+   * @param {BufferGeometry} geometry - some properties are dependend on geometry
+   * @param {function} onProgress
+   * @param {function} onError
+   * @return {Array<MeshToonMaterial>}
+   */
 
 
 		build( data, geometry
@@ -940,16 +940,16 @@
 				};
 				if ( material.name !== undefined ) params.name = material.name;
 				/*
-				 * THREE.Color
-				 *
-				 * MMD				 THREE.MeshToonMaterial
-				 * diffuse	-	color
-				 * ambient	-	emissive * a
-				 *							 (a = 1.0 without map texture or 0.2 with map texture)
-				 *
-				 * THREE.MeshToonMaterial doesn't have ambient. Set it to emissive instead.
-				 * It'll be too bright if material has map texture so using coef 0.2.
-				 */
+      	 * THREE.Color
+      	 *
+      	 * MMD         THREE.MeshToonMaterial
+      	 * diffuse  -  color
+      	 * ambient  -  emissive * a
+      	 *               (a = 1.0 without map texture or 0.2 with map texture)
+      	 *
+      	 * THREE.MeshToonMaterial doesn't have ambient. Set it to emissive instead.
+      	 * It'll be too bright if material has map texture so using coef 0.2.
+      	 */
 
 				params.color = new THREE.Color().fromArray( material.diffuse );
 				params.opacity = material.diffuse[ 3 ];
@@ -1293,12 +1293,12 @@
 
 				}
 				/*
-				 * This method expects
-				 *	 texture.flipY = false
-				 *	 texture.wrapS = THREE.RepeatWrapping
-				 *	 texture.wrapT = THREE.RepeatWrapping
-				 * TODO: more precise
-				 */
+      	 * This method expects
+      	 *   texture.flipY = false
+      	 *   texture.wrapS = THREE.RepeatWrapping
+      	 *   texture.wrapT = THREE.RepeatWrapping
+      	 * TODO: more precise
+      	 */
 
 
 				function getAlphaByUv( image, uv ) {
@@ -1333,10 +1333,10 @@
 	class AnimationBuilder {
 
 		/**
-	 * @param {Object} vmd - parsed VMD data
-	 * @param {SkinnedMesh} mesh - tracks will be fitting to mesh
-	 * @return {AnimationClip}
-	 */
+   * @param {Object} vmd - parsed VMD data
+   * @param {SkinnedMesh} mesh - tracks will be fitting to mesh
+   * @return {AnimationClip}
+   */
 		build( vmd, mesh ) {
 
 			// combine skeletal and morph animations
@@ -1353,10 +1353,10 @@
 
 		}
 		/**
-	 * @param {Object} vmd - parsed VMD data
-	 * @param {SkinnedMesh} mesh - tracks will be fitting to mesh
-	 * @return {AnimationClip}
-	 */
+   * @param {Object} vmd - parsed VMD data
+   * @param {SkinnedMesh} mesh - tracks will be fitting to mesh
+   * @return {AnimationClip}
+   */
 
 
 		buildSkeletalAnimation( vmd, mesh ) {
@@ -1437,10 +1437,10 @@
 
 		}
 		/**
-	 * @param {Object} vmd - parsed VMD data
-	 * @param {SkinnedMesh} mesh - tracks will be fitting to mesh
-	 * @return {AnimationClip}
-	 */
+   * @param {Object} vmd - parsed VMD data
+   * @param {SkinnedMesh} mesh - tracks will be fitting to mesh
+   * @return {AnimationClip}
+   */
 
 
 		buildMorphAnimation( vmd, mesh ) {
@@ -1485,9 +1485,9 @@
 
 		}
 		/**
-	 * @param {Object} vmd - parsed VMD data
-	 * @return {AnimationClip}
-	 */
+   * @param {Object} vmd - parsed VMD data
+   * @return {AnimationClip}
+   */
 
 
 		buildCameraAnimation( vmd ) {
@@ -1594,10 +1594,10 @@
 		_createTrack( node, typedKeyframeTrack, times, values, interpolations ) {
 
 			/*
-			 * optimizes here not to let KeyframeTrackPrototype optimize
-			 * because KeyframeTrackPrototype optimizes times and values but
-			 * doesn't optimize interpolations.
-			 */
+    	 * optimizes here not to let KeyframeTrackPrototype optimize
+    	 * because KeyframeTrackPrototype optimizes times and values but
+    	 * doesn't optimize interpolations.
+    	 */
 			if ( times.length > 2 ) {
 
 				times = times.slice();
@@ -1732,41 +1732,41 @@
 		_calculate( x1, x2, y1, y2, x ) {
 
 			/*
-			 * Cubic Bezier curves
-			 *	 https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Cubic_B.C3.A9zier_curves
-			 *
-			 * B(t) = ( 1 - t ) ^ 3 * P0
-			 *			+ 3 * ( 1 - t ) ^ 2 * t * P1
-			 *			+ 3 * ( 1 - t ) * t^2 * P2
-			 *			+ t ^ 3 * P3
-			 *			( 0 <= t <= 1 )
-			 *
-			 * MMD uses Cubic Bezier curves for bone and camera animation interpolation.
-			 *	 http://d.hatena.ne.jp/edvakf/20111016/1318716097
-			 *
-			 *		x = ( 1 - t ) ^ 3 * x0
-			 *			+ 3 * ( 1 - t ) ^ 2 * t * x1
-			 *			+ 3 * ( 1 - t ) * t^2 * x2
-			 *			+ t ^ 3 * x3
-			 *		y = ( 1 - t ) ^ 3 * y0
-			 *			+ 3 * ( 1 - t ) ^ 2 * t * y1
-			 *			+ 3 * ( 1 - t ) * t^2 * y2
-			 *			+ t ^ 3 * y3
-			 *			( x0 = 0, y0 = 0 )
-			 *			( x3 = 1, y3 = 1 )
-			 *			( 0 <= t, x1, x2, y1, y2 <= 1 )
-			 *
-			 * Here solves this equation with Bisection method,
-			 *	 https://en.wikipedia.org/wiki/Bisection_method
-			 * gets t, and then calculate y.
-			 *
-			 * f(t) = 3 * ( 1 - t ) ^ 2 * t * x1
-			 *			+ 3 * ( 1 - t ) * t^2 * x2
-			 *			+ t ^ 3 - x = 0
-			 *
-			 * (Another option: Newton's method
-			 *		https://en.wikipedia.org/wiki/Newton%27s_method)
-			 */
+    	 * Cubic Bezier curves
+    	 *   https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Cubic_B.C3.A9zier_curves
+    	 *
+    	 * B(t) = ( 1 - t ) ^ 3 * P0
+    	 *      + 3 * ( 1 - t ) ^ 2 * t * P1
+    	 *      + 3 * ( 1 - t ) * t^2 * P2
+    	 *      + t ^ 3 * P3
+    	 *      ( 0 <= t <= 1 )
+    	 *
+    	 * MMD uses Cubic Bezier curves for bone and camera animation interpolation.
+    	 *   http://d.hatena.ne.jp/edvakf/20111016/1318716097
+    	 *
+    	 *    x = ( 1 - t ) ^ 3 * x0
+    	 *      + 3 * ( 1 - t ) ^ 2 * t * x1
+    	 *      + 3 * ( 1 - t ) * t^2 * x2
+    	 *      + t ^ 3 * x3
+    	 *    y = ( 1 - t ) ^ 3 * y0
+    	 *      + 3 * ( 1 - t ) ^ 2 * t * y1
+    	 *      + 3 * ( 1 - t ) * t^2 * y2
+    	 *      + t ^ 3 * y3
+    	 *      ( x0 = 0, y0 = 0 )
+    	 *      ( x3 = 1, y3 = 1 )
+    	 *      ( 0 <= t, x1, x2, y1, y2 <= 1 )
+    	 *
+    	 * Here solves this equation with Bisection method,
+    	 *   https://en.wikipedia.org/wiki/Bisection_method
+    	 * gets t, and then calculate y.
+    	 *
+    	 * f(t) = 3 * ( 1 - t ) ^ 2 * t * x1
+    	 *      + 3 * ( 1 - t ) * t^2 * x2
+    	 *      + t ^ 3 - x = 0
+    	 *
+    	 * (Another option: Newton's method
+    	 *    https://en.wikipedia.org/wiki/Newton%27s_method)
+    	 */
 			let c = 0.5;
 			let t = c;
 			let s = 1.0 - t;

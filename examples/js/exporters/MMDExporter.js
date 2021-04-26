@@ -2,33 +2,33 @@
 
 	/**
  * Dependencies
- *	- mmd-parser https://github.com/takahirox/mmd-parser
+ *  - mmd-parser https://github.com/takahirox/mmd-parser
  */
 
 	class MMDExporter {
 
 		/* TODO: implement
-	// mesh -> pmd
-	this.parsePmd = function ( object ) {
-		};
-	*/
+  // mesh -> pmd
+  this.parsePmd = function ( object ) {
+  	};
+  */
 
 		/* TODO: implement
-	// mesh -> pmx
-	this.parsePmx = function ( object ) {
-		};
-	*/
+  // mesh -> pmx
+  this.parsePmx = function ( object ) {
+  	};
+  */
 
 		/* TODO: implement
-	// animation + skeleton -> vmd
-	this.parseVmd = function ( object ) {
-		};
-	*/
+  // animation + skeleton -> vmd
+  this.parseVmd = function ( object ) {
+  	};
+  */
 
 		/*
-	 * skeleton -> vpd
-	 * Returns Shift_JIS encoded Uint8Array. Otherwise return strings.
-	 */
+   * skeleton -> vpd
+   * Returns Shift_JIS encoded Uint8Array. Otherwise return strings.
+   */
 		parseVpd( skin, outputShiftJis, useOriginalBones ) {
 
 			if ( skin.isSkinnedMesh !== true ) {
@@ -90,9 +90,9 @@
 				const bone = bones[ i ];
 				const bone2 = bones2[ i ];
 				/*
-			 * use the bone matrix saved before solving IK.
-			 * see CCDIKSolver for the detail.
-			 */
+       * use the bone matrix saved before solving IK.
+       * see CCDIKSolver for the detail.
+       */
 
 				if ( useOriginalBones === true && bone.userData.ik !== undefined && bone.userData.ik.originalMatrix !== undefined ) {
 
@@ -113,8 +113,8 @@
 				qArray[ 0 ] = - qArray[ 0 ];
 				qArray[ 1 ] = - qArray[ 1 ];
 				array.push( 'Bone' + i + '{' + bone.name );
-				array.push( '	' + toStringsFromArray( pArray ) + ';' );
-				array.push( '	' + toStringsFromArray( qArray ) + ';' );
+				array.push( '  ' + toStringsFromArray( pArray ) + ';' );
+				array.push( '  ' + toStringsFromArray( qArray ) + ';' );
 				array.push( '}' );
 				array.push( '' );
 

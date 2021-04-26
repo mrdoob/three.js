@@ -1,6 +1,7 @@
 import * as THREE from '../../build/three.module.js';
 
-import { HTMLMesh } from './libs/three.html.js';
+import { HTMLMesh } from '../../examples/jsm/interactive/HTMLMesh.js';
+import { InteractiveGroup } from '../../examples/jsm/interactive/InteractiveGroup.js';
 
 import { XRControllerModelFactory } from '../../examples/jsm/webxr/XRControllerModelFactory.js';
 
@@ -29,31 +30,29 @@ class VR {
 
 			if ( group === null ) {
 
-				group = new THREE.Group();
+				group = new InteractiveGroup( renderer );
 				editor.sceneHelpers.add( group );
 
 				const mesh = new HTMLMesh( sidebar );
 				mesh.position.set( 1, 1.5, - 0.5 );
 				mesh.rotation.y = - 0.5;
+				mesh.scale.setScalar( 2 );
 				group.add( mesh );
 
 				intersectables.push( mesh );
 
 				// controllers
 
-				const controller1 = renderer.xr.getController( 0 );
-				controller1.addEventListener( 'select', onSelect );
-				group.add( controller1 );
-
-				const controller2 = renderer.xr.getController( 1 );
-				controller2.addEventListener( 'selectstart', onSelect );
-				group.add( controller2 );
-
 				const geometry = new THREE.BufferGeometry();
 				geometry.setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 5 ) ] );
 
+				const controller1 = renderer.xr.getController( 0 );
 				controller1.add( new THREE.Line( geometry ) );
+				group.add( controller1 );
+
+				const controller2 = renderer.xr.getController( 1 );
 				controller2.add( new THREE.Line( geometry ) );
+				group.add( controller2 );
 
 				//
 
@@ -100,41 +99,6 @@ class VR {
 			signals.exitedVR.dispatch();
 
 		};
-
-		//
-
-		function onSelect( event ) {
-
-			const controller = event.target;
-
-			const intersections = getIntersections( controller );
-
-			if ( intersections.length > 0 ) {
-
-				const intersection = intersections[ 0 ];
-
-				const object = intersection.object;
-				const uv = intersection.uv;
-
-				object.material.map.click( uv.x, 1 - uv.y );
-
-			}
-
-		}
-
-		const raycaster = new THREE.Raycaster();
-		const tempMatrix = new THREE.Matrix4();
-
-		function getIntersections( controller ) {
-
-			tempMatrix.identity().extractRotation( controller.matrixWorld );
-
-			raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-			raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
-
-			return raycaster.intersectObjects( intersectables );
-
-		}
 
 		// signals
 

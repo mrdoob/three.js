@@ -144,8 +144,8 @@
 				}
 			},
 			vertexShader:
-		/* glsl */
-		`
+    /* glsl */
+    `
 			precision mediump float;
 			precision mediump int;
 
@@ -163,8 +163,8 @@
 			}
 		`,
 			fragmentShader:
-		/* glsl */
-		`
+    /* glsl */
+    `
 			precision mediump float;
 			precision mediump int;
 

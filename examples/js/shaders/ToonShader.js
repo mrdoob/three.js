@@ -25,8 +25,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec3 vNormal;
 		varying vec3 vRefract;
@@ -46,8 +46,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform vec3 uBaseColor;
 
@@ -112,8 +112,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec3 vNormal;
 
@@ -124,8 +124,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform vec3 uBaseColor;
 		uniform vec3 uLineColor1;
@@ -189,8 +189,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec3 vNormal;
 
@@ -201,8 +201,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform vec3 uBaseColor;
 		uniform vec3 uLineColor1;
@@ -285,8 +285,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec3 vNormal;
 
@@ -297,8 +297,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform vec3 uBaseColor;
 		uniform vec3 uLineColor1;

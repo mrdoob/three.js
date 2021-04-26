@@ -13,13 +13,13 @@
  *
  * Requisites for the object:
  *
- *	- THREE.Mesh object must have a BufferGeometry (not Geometry) and a Material
+ *  - THREE.Mesh object must have a BufferGeometry (not Geometry) and a Material
  *
- *	- Vertex normals must be planar (not smoothed)
+ *  - Vertex normals must be planar (not smoothed)
  *
- *	- The geometry must be convex (this is not checked in the library). You can create convex
- *	geometries with THREE.ConvexGeometry. The BoxGeometry, SphereGeometry and other convex primitives
- *	can also be used.
+ *  - The geometry must be convex (this is not checked in the library). You can create convex
+ *  geometries with THREE.ConvexGeometry. The BoxGeometry, SphereGeometry and other convex primitives
+ *  can also be used.
  *
  * Note: This lib adds member variables to object's userData member (see prepareBreakableObject function)
  * Use with caution and read the code when using with other libs.
@@ -83,11 +83,11 @@
 
 		}
 		/*
-	 * @param {int} maxRadialIterations Iterations for radial cuts.
-	 * @param {int} maxRandomIterations Max random iterations for not-radial cuts
-	 *
-	 * Returns the array of pieces
-	 */
+   * @param {int} maxRadialIterations Iterations for radial cuts.
+   * @param {int} maxRandomIterations Max random iterations for not-radial cuts
+   *
+   * Returns the array of pieces
+   */
 
 
 		subdivideByImpact( object, pointOfImpact, normal, maxRadialIterations, maxRandomIterations ) {

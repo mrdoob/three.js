@@ -2,14 +2,14 @@
 
 	/**
  * parameters = {
- *	color: <hex>,
- *	linewidth: <float>,
- *	dashed: <boolean>,
- *	dashScale: <float>,
- *	dashSize: <float>,
- *	dashOffset: <float>,
- *	gapSize: <float>,
- *	resolution: <Vector2>, // to be set by renderer
+ *  color: <hex>,
+ *  linewidth: <float>,
+ *  dashed: <boolean>,
+ *  dashScale: <float>,
+ *  dashSize: <float>,
+ *  dashOffset: <float>,
+ *  gapSize: <float>,
+ *  resolution: <Vector2>, // to be set by renderer
  * }
  */
 

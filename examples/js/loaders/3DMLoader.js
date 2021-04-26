@@ -539,7 +539,7 @@
 
 					} else if ( geometry.isLinearLight ) {
 
-						console.warn( 'THREE.3DMLoader:	No conversion exists for linear lights.' );
+						console.warn( 'THREE.3DMLoader:  No conversion exists for linear lights.' );
 						return;
 
 					}
@@ -920,14 +920,14 @@
 			// console.log( `Document Strings Count: ${doc.strings().count()}` );
 
 			/*
-		for( var i = 0; i < doc.strings().count(); i++ ){
-				var _string= doc.strings().get( i );
-				console.log(_string);
-			var string = extractProperties( _group );
-				strings.push( string );
-				_string.delete();
-			}
-		*/
+    for( var i = 0; i < doc.strings().count(); i++ ){
+    		var _string= doc.strings().get( i );
+    		console.log(_string);
+    	var string = extractProperties( _group );
+    		strings.push( string );
+    		_string.delete();
+    	}
+    */
 
 			doc.delete();
 			return {
@@ -1068,7 +1068,7 @@
 					break;
 
 				case rhino.ObjectType.SubD:
-				// TODO: precalculate resulting vertices and faces and warn on excessive results
+					// TODO: precalculate resulting vertices and faces and warn on excessive results
 					_geometry.subdivide( 3 );
 
 					mesh = rhino.Mesh.createFromSubDControlNet( _geometry );
@@ -1083,10 +1083,10 @@
 					break;
 
 					/*
-			case rhino.ObjectType.Annotation:
-			case rhino.ObjectType.Hatch:
-			case rhino.ObjectType.ClipPlane:
-			*/
+      case rhino.ObjectType.Annotation:
+      case rhino.ObjectType.Hatch:
+      case rhino.ObjectType.ClipPlane:
+      */
 
 				default:
 					console.warn( `THREE.3DMLoader: TODO: Implement ${objectType.constructor.name}` );
@@ -1158,7 +1158,7 @@
 					}
 
 				} else { // these are functions that could be called to extract more data.
-				//console.log( `${property}: ${object[ property ].constructor.name}` );
+					//console.log( `${property}: ${object[ property ].constructor.name}` );
 				}
 
 			}

@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.127.0",
+  "version": "0.128.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "module": "build/three.module.js",
@@ -29,6 +29,12 @@
   "eslintConfig": {
     "root": true,
     "extends": "mdcs",
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+      "babelOptions": {
+        "configFile": "./utils/build/.babelrc.json"
+      }
+    },
     "plugins": [
       "html"
     ],
@@ -67,7 +73,8 @@
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
-    "make-screenshot": "node test/e2e/puppeteer.js --make"
+    "make-screenshot": "node test/e2e/puppeteer.js --make",
+    "prepublishOnly": "node utils/prepublish.js"
   },
   "keywords": [
     "three",
@@ -92,6 +99,7 @@
   "homepage": "https://threejs.org/",
   "devDependencies": {
     "@babel/core": "^7.13.15",
+    "@babel/eslint-parser": "^7.13.14",
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.13.15",
     "@rollup/plugin-babel": "^5.3.0",

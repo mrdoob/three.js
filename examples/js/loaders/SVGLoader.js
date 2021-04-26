@@ -537,7 +537,7 @@
 						default:
 							console.warn( command );
 
-					} // console.log( type, parseFloats( data ), parseFloats( data ).length	)
+					} // console.log( type, parseFloats( data ), parseFloats( data ).length  )
 
 
 					doSetFirstPoint = false;
@@ -568,13 +568,13 @@
 
 			}
 			/**
-		 * https://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes
-		 * https://mortoray.com/2017/02/16/rendering-an-svg-elliptical-arc-as-bezier-curves/ Appendix: Endpoint to center arc conversion
-		 * From
-		 * rx ry x-axis-rotation large-arc-flag sweep-flag x y
-		 * To
-		 * aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation
-		 */
+     * https://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes
+     * https://mortoray.com/2017/02/16/rendering-an-svg-elliptical-arc-as-bezier-curves/ Appendix: Endpoint to center arc conversion
+     * From
+     * rx ry x-axis-rotation large-arc-flag sweep-flag x y
+     * To
+     * aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation
+     */
 
 
 			function parseArcCommand( path, rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, start, end ) {
@@ -642,9 +642,9 @@
 
 			}
 			/*
-		* According to https://www.w3.org/TR/SVG/shapes.html#RectElementRXAttribute
-		* rounded corner should be rendered to elliptical arc, but bezier curve does the job well enough
-		*/
+    * According to https://www.w3.org/TR/SVG/shapes.html#RectElementRXAttribute
+    * rounded corner should be rendered to elliptical arc, but bezier curve does the job well enough
+    */
 
 
 			function parseRectNode( node ) {
@@ -1168,7 +1168,7 @@
 
 				if ( theUnit === 'px' && scope.defaultUnit !== 'px' ) {
 
-					// Conversion scale from	pixels to inches, then to default units
+					// Conversion scale from  pixels to inches, then to default units
 					scale = unitConversion[ 'in' ][ scope.defaultUnit ] / scope.defaultDPI;
 
 				} else {
@@ -2106,7 +2106,7 @@
 								break;
 
 							case 'round':
-							// Segment triangles
+								// Segment triangles
 								createSegmentTrianglesWithMiddleSection( joinIsOnLeftSide, innerSideModified ); // Join triangles
 
 								if ( joinIsOnLeftSide ) {
@@ -2567,7 +2567,7 @@
 
 					case 'butt':
 					default:
-					// Nothing to do here
+						// Nothing to do here
 						break;
 
 				}

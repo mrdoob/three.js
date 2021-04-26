@@ -1,21 +1,39 @@
-import * as THREE from '../../../build/three.module.js';
+import {
+	CanvasTexture,
+	LinearFilter,
+	Mesh,
+	MeshBasicMaterial,
+	PlaneGeometry,
+	sRGBEncoding
+} from '../../../build/three.module.js';
 
-class HTMLMesh extends THREE.Mesh {
+class HTMLMesh extends Mesh {
 
 	constructor( dom ) {
 
 		const texture = new HTMLTexture( dom );
 
-		const geometry = new THREE.PlaneGeometry( texture.image.width * 0.002, texture.image.height * 0.002 );
-		const material = new THREE.MeshBasicMaterial( { map: texture, toneMapped: false } );
+		const geometry = new PlaneGeometry( texture.image.width * 0.001, texture.image.height * 0.001 );
+		const material = new MeshBasicMaterial( { map: texture, toneMapped: false } );
 
 		super( geometry, material );
+
+		function onEvent( event ) {
+
+			material.map.dispatchEvent( event );
+
+		}
+
+		this.addEventListener( 'mousedown', onEvent );
+		this.addEventListener( 'mousemove', onEvent );
+		this.addEventListener( 'mouseup', onEvent );
+		this.addEventListener( 'click', onEvent );
 
 	}
 
 }
 
-class HTMLTexture extends THREE.CanvasTexture {
+class HTMLTexture extends CanvasTexture {
 
 	constructor( dom ) {
 
@@ -24,15 +42,15 @@ class HTMLTexture extends THREE.CanvasTexture {
 		this.dom = dom;
 
 		this.anisotropy = 16;
-		this.encoding = THREE.sRGBEncoding;
-		this.minFilter = THREE.LinearFilter;
-		this.magFilter = THREE.LinearFilter;
+		this.encoding = sRGBEncoding;
+		this.minFilter = LinearFilter;
+		this.magFilter = LinearFilter;
 
 	}
 
-	click( x, y ) {
+	dispatchEvent( event ) {
 
-		htmlclick( this.dom, x, y );
+		htmlevent( this.dom, event.type, event.data.x, event.data.y );
 
 		this.update();
 
@@ -93,12 +111,14 @@ function html2canvas( element ) {
 		}
 
 		return {
+
 			add: function ( clip ) {
 
 				clips.push( clip );
 				doClip();
 
 			},
+
 			remove: function () {
 
 				clips.pop();
@@ -235,26 +255,25 @@ function html2canvas( element ) {
 
 	var clipper = new Clipper( context );
 
-	console.time( 'drawElement' );
+	// console.time( 'drawElement' );
 
 	drawElement( element );
 
-	console.timeEnd( 'drawElement' );
+	// console.timeEnd( 'drawElement' );
 
 	return canvas;
 
 }
 
-function htmlclick( element, x, y ) {
+function htmlevent( element, event, x, y ) {
 
-	/*
 	const mouseEventInit = {
 		clientX: ( x * element.offsetWidth ) + element.offsetLeft,
 		clientY: ( y * element.offsetHeight ) + element.offsetTop,
 		view: element.ownerDocument.defaultView
 	};
-	element.dispatchEvent( new MouseEvent( 'click', mouseEventInit ) );
-	*/
+
+	window.dispatchEvent( new MouseEvent( event, mouseEventInit ) );
 
 	const rect = element.getBoundingClientRect();
 
@@ -269,7 +288,7 @@ function htmlclick( element, x, y ) {
 
 			if ( x > rect.left && x < rect.right && y > rect.top && y < rect.bottom ) {
 
-				element.click();
+				element.dispatchEvent( new MouseEvent( event, mouseEventInit ) );
 
 			}
 
@@ -287,4 +306,4 @@ function htmlclick( element, x, y ) {
 
 }
 
-export { HTMLMesh, HTMLTexture };
+export { HTMLMesh };

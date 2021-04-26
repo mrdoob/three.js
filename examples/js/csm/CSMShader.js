@@ -2,8 +2,8 @@
 
 	const CSMShader = {
 		lights_fragment_begin:
-	/* glsl */
-	`
+  /* glsl */
+  `
 GeometricContext geometry;
 
 geometry.position = - vViewPosition;
@@ -226,8 +226,8 @@ IncidentLight directLight;
 #endif
 `,
 		lights_pars_begin:
-	/* glsl */
-	`
+  /* glsl */
+  `
 #if defined( USE_CSM ) && defined( CSM_CASCADES )
 uniform vec2 CSM_cascades[CSM_CASCADES];
 uniform float cameraNear;

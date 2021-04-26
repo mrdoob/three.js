@@ -25,8 +25,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -37,8 +37,8 @@
 
 	 }`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -78,8 +78,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -90,8 +90,8 @@
 
 	 }`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		#define TAPS_PER_PASS 6.0
 
@@ -195,8 +195,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -207,8 +207,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -249,8 +249,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -261,8 +261,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 

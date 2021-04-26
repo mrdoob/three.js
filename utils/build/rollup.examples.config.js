@@ -8,14 +8,9 @@ const EOL = os.EOL;
 
 function babelCleanup() {
 
-	const doubleSpaces = / {2}/g;
-
 	return {
 
 		transform( code ) {
-
-			code = code.replace( doubleSpaces, '\t' );
-
 
 			// remove comments messed up by babel that break eslint
 			// example:
@@ -25,7 +20,6 @@ function babelCleanup() {
 			//             ↓
 			// 	  setSize: function () {
 			code = code.replace( new RegExp( `\\(\\)${EOL}\\s*\\/\\*([a-zA-Z0-9_, ]+)\\*\\/${EOL}\\s*{`, 'g' ), '( ) {' );
-
 
 			return {
 				code: code,
@@ -103,7 +97,7 @@ function unmodularize() {
 			// fix for BasisTextureLoader.js
 			imports.forEach( imp => {
 
-				code = code.replace( new RegExp( `${EOL}(\\s)THREE\\.${imp}:`, 'g' ), ( match, p1 ) => {
+				code = code.replace( new RegExp( `${EOL}(\\s)*THREE\\.${imp}:`, 'g' ), ( match, p1 ) => {
 
 					return `${EOL}${p1}${imp}:`;
 
@@ -116,11 +110,11 @@ function unmodularize() {
 
 			// Remove library imports that are exposed as
 			// global variables in the non-module world
-			code = code.replace( 'import * as fflate from \'../libs/fflate.module.min.js\';', '' );
+			code = code.replace( 'import * as fflate from \'../libs/fflate.module.js\';', '' );
 			code = code.replace( 'import { MMDParser } from \'../libs/mmdparser.module.js\';', '' );
 			code = code.replace( 'import { potpack } from \'../libs/potpack.module.js\';', '' );
 			code = code.replace( 'import { opentype } from \'../libs/opentype.module.min.js\';', '' );
-			code = code.replace( 'import { chevrotain } from \'../libs/chevrotain.module.min.js\';', '' );
+			code = code.replace( 'import chevrotain from \'../libs/chevrotain.module.min.js\';', '' );
 			code = code.replace( 'import { ZSTDDecoder } from \'../libs/zstddec.module.js\';', '' );
 
 			// remove newline at the start of file
@@ -161,6 +155,7 @@ const files = glob.sync( '**/*.js', { cwd: jsmFolder, ignore: [
 	// https://unpkg.com/browse/ktx-parse@0.2.1/dist/
 	'loaders/KTX2Loader.js',
 
+	'renderers/webgl/**/*',
 	'renderers/webgpu/**/*',
 	'renderers/nodes/**/*',
 	'nodes/**/*',
