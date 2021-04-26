@@ -88,10 +88,8 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		this.viewport.copy( source.viewport );
 
-		// By default texture.clone retains a reference to the original image data which
-		// isn't correct for WebGLRenderTarget. See issue #20328.
 		this.texture = source.texture.clone();
-		this.texture.image = { ...this.texture.image };
+		this.texture.image = { ...this.texture.image }; // See #20328.
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
