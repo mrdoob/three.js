@@ -4,11 +4,10 @@ function createText(message, height) {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
   let metrics = null,
-    textHeight = 100,
-    textWidth = 100;
+    textHeight = 100;
   context.font = "normal " + textHeight + "px Arial";
   metrics = context.measureText(message);
-  textWidth = metrics.width;
+  const textWidth = metrics.width;
   canvas.width = textWidth;
   canvas.height = textHeight;
   context.font = "normal " + textHeight + "px Arial";
