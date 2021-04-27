@@ -15,7 +15,6 @@ var SSRShader = {
 		DISTANCE_ATTENUATION: true,
 		FRESNEL: true,
 		INFINITE_THICK: false,
-		SELECTIVE: false,
 	},
 
 	uniforms: {
@@ -113,10 +112,8 @@ var SSRShader = {
 			return xy;
 		}
 		void main(){
-			#ifdef SELECTIVE
-				float metalness=texture2D(tMetalness,vUv).r;
-				if(metalness==0.) return;
-			#endif
+			float metalness=texture2D(tMetalness,vUv).r;
+			if(metalness==0.) return;
 
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
@@ -219,9 +216,7 @@ var SSRShader = {
 							float fresnelCoe=(dot(viewIncidentDir,viewReflectDir)+1.)/2.;
 							op*=fresnelCoe;
 						#endif
-						#ifdef SELECTIVE
-							op*=metalness;
-						#endif
+						op*=metalness;
 						vec4 reflectColor=texture2D(tDiffuse,uv);
 						gl_FragColor.xyz=reflectColor.xyz;
 						gl_FragColor.a=op;

@@ -974,16 +974,16 @@ function WebGLRenderer( parameters ) {
 
 	// Rendering
 
-	this.render = function ( scene, camera ) {
+	this.render = function ( scene, camera, includeChildren = true ) {
 
 		let renderTarget, forceClear;
 
-		if ( arguments[ 2 ] !== undefined ) {
+		// if ( arguments[ 2 ] !== undefined ) {
 
-			console.warn( 'THREE.WebGLRenderer.render(): the renderTarget argument has been removed. Use .setRenderTarget() instead.' );
-			renderTarget = arguments[ 2 ];
+		// 	console.warn( 'THREE.WebGLRenderer.render(): the renderTarget argument has been removed. Use .setRenderTarget() instead.' );
+		// 	renderTarget = arguments[ 2 ];
 
-		}
+		// }
 
 		if ( arguments[ 3 ] !== undefined ) {
 
@@ -1034,7 +1034,7 @@ function WebGLRenderer( parameters ) {
 
 		renderListStack.push( currentRenderList );
 
-		projectObject( scene, camera, 0, _this.sortObjects );
+		projectObject( scene, camera, 0, _this.sortObjects, includeChildren );
 
 		currentRenderList.finish();
 
@@ -1137,7 +1137,7 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	function projectObject( object, camera, groupOrder, sortObjects ) {
+	function projectObject( object, camera, groupOrder, sortObjects, includeChildren = true ) {
 
 		if ( object.visible === false ) return;
 
@@ -1252,11 +1252,15 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		const children = object.children;
+		if( includeChildren ) {
 
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
+			const children = object.children;
 
-			projectObject( children[ i ], camera, groupOrder, sortObjects );
+			for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+				projectObject( children[ i ], camera, groupOrder, sortObjects, true );
+
+			}
 
 		}
 
