@@ -958,7 +958,7 @@
 
 		updateMatrixWorld( force ) {
 
-			const space = this.mode === 'scale' ? this.space : 'local'; // scale always oriented to local rotation
+			const space = this.mode === 'scale' ? 'local' : this.space; // scale always oriented to local rotation
 
 			const quaternion = space === 'local' ? this.worldQuaternion : _identityQuaternion; // Show only gizmos for current transform mode
 
