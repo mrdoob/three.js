@@ -2614,10 +2614,7 @@ class GLTFParser {
 			texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || RepeatWrapping;
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
 
-			parser.associations.set( texture, {
-				type: 'textures',
-				index: textureIndex
-			} );
+			parser.associations.set( texture, { textures: textureIndex } );
 
 			return texture;
 
@@ -2956,7 +2953,7 @@ class GLTFParser {
 
 			assignExtrasToUserData( material, materialDef );
 
-			parser.associations.set( material, { type: 'materials', index: materialIndex } );
+			parser.associations.set( material, { materials: materialIndex } );
 
 			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
 
@@ -3169,6 +3166,15 @@ class GLTFParser {
 
 			}
 
+			for ( let i = 0, il = meshes.length; i < il; i ++ ) {
+
+				parser.associations.set( meshes[ i ], {
+					meshes: meshIndex,
+					primitives: i
+				} );
+
+			}
+
 			if ( meshes.length === 1 ) {
 
 				return meshes[ 0 ];
@@ -3176,6 +3182,8 @@ class GLTFParser {
 			}
 
 			const group = new Group();
+
+			parser.associations.set( group, { meshes: meshIndex } );
 
 			for ( let i = 0, il = meshes.length; i < il; i ++ ) {
 
@@ -3584,7 +3592,13 @@ class GLTFParser {
 
 			}
 
-			parser.associations.set( node, { type: 'nodes', index: nodeIndex } );
+			if ( ! parser.associations.has( node ) ) {
+
+				parser.associations.set( node, {} );
+
+			}
+
+			parser.associations.get( node ).nodes = nodeIndex;
 
 			return node;
 
