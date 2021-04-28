@@ -95,7 +95,19 @@ class SSAARenderPass extends Pass {
 		const roundingRange = 1 / 32;
 		this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
 
-		const width = readBuffer.width, height = readBuffer.height;
+    const view = this.camera.view !== null && this.camera.view.enabled ? Object.assign( {}, this.camera.view ) : null;
+
+		const fullWidth = view ? view.fullWidth : readBuffer.width;
+    
+    const fullHeight = view ? view.fullHeight : readBuffer.height;
+    
+    const offsetX = view ? view.offsetX : 0;
+    
+    const offsetY = view ? view.offsetY : 0;
+    
+    const width = view ? view.width : readBuffer.width;
+    
+    const height = view ? view.height : readBuffer.height;
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		for ( let i = 0; i < jitterOffsets.length; i ++ ) {
@@ -104,8 +116,8 @@ class SSAARenderPass extends Pass {
 
 			if ( this.camera.setViewOffset ) {
 
-				this.camera.setViewOffset( width, height,
-					jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
+				this.camera.setViewOffset( fullWidth, fullHeight,
+					offsetX + jitterOffset[ 0 ] * 0.0625, offsetY + jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
 					width, height );
 
 			}
@@ -142,7 +154,13 @@ class SSAARenderPass extends Pass {
 
 		}
 
-		if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
+		if ( this.camera.clearViewOffset ) {
+      
+      if ( view ) this.camera.setViewOffset( fullWidth, fullHeight, offsetX, offsetY, width, height );
+      
+      else this.camera.clearViewOffset();
+      
+    }
 
 		renderer.autoClear = autoClear;
 		renderer.setClearColor( this._oldClearColor, oldClearAlpha );
