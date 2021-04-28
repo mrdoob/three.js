@@ -95,9 +95,9 @@ class SSAARenderPass extends Pass {
 		const roundingRange = 1 / 32;
 		this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
 
+		const originalView = Object.assign( {}, this.camera.view );
+
 		const view = {
-			
-			enabled: false,
 			
 			fullWidth: readBuffer.width,
 			
@@ -113,7 +113,7 @@ class SSAARenderPass extends Pass {
 		
 		};
 
-		if ( this.camera.view !== null && this.camera.view.enabled ) Object.assign( view, this.camera.view );
+		if ( originalView !== null && originalView.enabled ) Object.assign( view, originalView );
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		for ( let i = 0; i < jitterOffsets.length; i ++ ) {
@@ -160,13 +160,7 @@ class SSAARenderPass extends Pass {
 
 		}
 
-		if ( this.camera.clearViewOffset ) {
-			
-			if ( view.enabled ) this.camera.view = Object.assign( {}, view );
-			
-			else this.camera.clearViewOffset();
-			
-		}
+		if ( this.camera.clearViewOffset ) this.camera.view = Object.assign( {}, originalView );
 
 		renderer.autoClear = autoClear;
 		renderer.setClearColor( this._oldClearColor, oldClearAlpha );
