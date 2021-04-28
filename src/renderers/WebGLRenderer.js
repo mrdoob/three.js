@@ -1974,9 +1974,6 @@ function WebGLRenderer( parameters ) {
 		const levelScale = Math.pow( 2, - level );
 		const width = Math.floor( texture.image.width * levelScale );
 		const height = Math.floor( texture.image.height * levelScale );
-		const glFormat = utils.convert( texture.format );
-
-		// textures.setTexture2D( texture, 0 );
 
 		let glTarget;
 
