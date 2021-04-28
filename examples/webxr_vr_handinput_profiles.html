@@ -70,6 +70,8 @@
 				const light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
+				// Prevent shadow acne on the hands
+				light.shadow.bias = -0.0001;
 				light.shadow.camera.top = 2;
 				light.shadow.camera.bottom = - 2;
 				light.shadow.camera.right = 2;
@@ -99,7 +101,7 @@
 				scene.add( controller2 );
 
 				const controllerModelFactory = new XRControllerModelFactory();
-				const handModelFactory = new XRHandModelFactory().setPath( "./models/fbx/" );
+				const handModelFactory = new XRHandModelFactory().setPath( "./models/gltf/hands/" );
 
 				// Hand 1
 
@@ -113,8 +115,7 @@
 				handModels.left = [
 					handModelFactory.createHandModel( hand1, "boxes" ),
 					handModelFactory.createHandModel( hand1, "spheres" ),
-					handModelFactory.createHandModel( hand1, "oculus", { model: "lowpoly" } ),
-					handModelFactory.createHandModel( hand1, "oculus" )
+					handModelFactory.createHandModel( hand1, "mesh" )
 				];
 
 				handModels.left.forEach( model => {
@@ -152,8 +153,7 @@
 				handModels.right = [
 					handModelFactory.createHandModel( hand2, "boxes" ),
 					handModelFactory.createHandModel( hand2, "spheres" ),
-					handModelFactory.createHandModel( hand2, "oculus", { model: "lowpoly" } ),
-					handModelFactory.createHandModel( hand2, "oculus" )
+					handModelFactory.createHandModel( hand2, "mesh" )
 				];
 				handModels.right.forEach( model => {
 

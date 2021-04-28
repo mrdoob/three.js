@@ -42,7 +42,7 @@ class XRHandModelFactory {
 
 	constructor() {
 
-		this.path = '';
+		this.path = null;
 
 	}
 
@@ -53,7 +53,7 @@ class XRHandModelFactory {
 
 	}
 
-	createHandModel( controller, profile, options ) {
+	createHandModel( controller, profile ) {
 
 		const handModel = new XRHandModel( controller );
 
@@ -75,9 +75,9 @@ class XRHandModelFactory {
 
 					handModel.motionController = new XRHandPrimitiveModel( handModel, controller, this.path, xrInputSource.handedness, { primitive: 'box' } );
 
-				} else if ( profile === 'oculus' ) {
+				} else if ( profile === 'mesh' || profile === 'oculus' ) {
 
-					handModel.motionController = new XRHandOculusMeshModel( handModel, controller, this.path, xrInputSource.handedness, options );
+					handModel.motionController = new XRHandOculusMeshModel( handModel, controller, this.path, xrInputSource.handedness );
 
 				}
 
