@@ -22,6 +22,7 @@ class WebGPURenderPipelines {
 
 		this.pipelines = new WeakMap();
 		this.shaderAttributes = new WeakMap();
+		this.objectCache = new WeakMap();
 
 		this.shaderModules = {
 			vertex: new Map(),
@@ -32,23 +33,9 @@ class WebGPURenderPipelines {
 
 	get( object ) {
 
-		// @TODO: Avoid a 1:1 relationship between pipelines and objects. It's necessary
-		// to check various conditions in order to request an appropriate pipeline.
-		//
-		// - material's version and node configuration
-		// - environment map (material)
-		// - fog and environment (scene)
-		// - output encoding (renderer)
-		// - light state
-		// - clipping planes
-		//
-		// The renderer needs to manage multiple pipelines per object so
-		// GPUDevice.createRenderPipeline() is only called when no pipeline exists for the
-		// current configuration.
-
 		let pipeline = this.pipelines.get( object );
 
-		if ( pipeline === undefined ) {
+		if ( this.needsUpdate( object ) ) {
 
 			const device = this.device;
 			const properties = this.properties;
@@ -195,6 +182,69 @@ class WebGPURenderPipelines {
 		}
 
 		return pipeline;
+
+	}
+
+	needsUpdate( object ) {
+
+		let cache = this.objectCache.get( object );
+
+		if ( cache === undefined ) {
+
+			cache = {};
+			this.objectCache.set( object, cache );
+
+		}
+
+		const material = object.material;
+
+		let needsUpdate = false;
+
+		// check material state
+
+		if ( cache.material !== material || cache.materialVersion !== material.version ||
+			cache.transparent !== material.transparent || cache.blending !== material.blending || cache.premultipliedAlpha !== material.premultipliedAlpha ||
+			cache.blendSrc !== material.blendSrc || cache.blendDst !== material.blendDst || cache.blendEquation !== material.blendEquation ||
+			cache.blendSrcAlpha !== material.blendSrcAlpha || cache.blendDstAlpha !== material.blendDstAlpha || cache.blendEquationAlpha !== material.blendEquationAlpha ||
+			cache.colorWrite !== material.colorWrite ||
+			cache.depthWrite !== material.depthWrite || cache.depthTest !== material.depthTest || cache.depthFunc !== material.depthFunc ||
+			cache.stencilWrite !== material.stencilWrite || cache.stencilFunc !== material.stencilFunc ||
+			cache.stencilFail !== material.stencilFail || cache.stencilZFail !== material.stencilZFail || cache.stencilZPass !== material.stencilZPass ||
+			cache.stencilFuncMask !== material.stencilFuncMask || cache.stencilWriteMask !== material.stencilWriteMask ||
+			cache.side !== material.side
+		) {
+
+			needsUpdate = true;
+
+			cache.material = material; cache.materialVersion = material.version;
+			cache.transparent = material.transparent; cache.blending = material.blending; cache.premultipliedAlpha = material.premultipliedAlpha;
+			cache.blendSrc = material.blendSrc; cache.blendDst = material.blendDst; cache.blendEquation = material.blendEquation;
+			cache.blendSrcAlpha = material.blendSrcAlpha; cache.blendDstAlpha = material.blendDstAlpha; cache.blendEquationAlpha = material.blendEquationAlpha;
+			cache.colorWrite = material.colorWrite;
+			cache.depthWrite = material.depthWrite; cache.depthTest = material.depthTest; cache.depthFunc = material.depthFunc;
+			cache.stencilWrite = material.stencilWrite; cache.stencilFunc = material.stencilFunc;
+			cache.stencilFail = material.stencilFail; cache.stencilZFail = material.stencilZFail; cache.stencilZPass = material.stencilZPass;
+			cache.stencilFuncMask = material.stencilFuncMask; cache.stencilWriteMask = material.stencilWriteMask;
+			cache.side = material.side;
+
+		}
+
+		// check renderer state (TODO: Add full support for color and depthStencil formats)
+
+		const renderer = this.renderer;
+		const renderTarget = renderer.getRenderTarget();
+		const encoding = ( renderTarget !== null ) ? renderTarget.texture.encoding : renderer.outputEncoding;
+
+		if ( cache.sampleCount !== this.sampleCount || cache.encoding !== encoding ) {
+
+			needsUpdate = true;
+
+			cache.sampleCount = this.sampleCount;
+			cache.encoding = encoding;
+
+		}
+
+		return needsUpdate;
 
 	}
 
