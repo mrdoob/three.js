@@ -94,7 +94,7 @@
 
 				cameraP = new THREE.PerspectiveCamera( 65, aspect, 3, 10 );
 				cameraP.position.z = 7;
-        cameraP.setViewOffset( width, height, params.viewOffset, 0, width, height );
+        cameraP.setViewOffset( width, height, params.viewOffsetX, 0, width, height );
 
 				cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 3, 10 );
 				cameraO.position.z = 7;

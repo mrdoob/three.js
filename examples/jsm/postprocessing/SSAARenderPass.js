@@ -95,19 +95,25 @@ class SSAARenderPass extends Pass {
 		const roundingRange = 1 / 32;
 		this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
 
-    const view = this.camera.view !== null && this.camera.view.enabled ? Object.assign( {}, this.camera.view ) : null;
+    const view = {
+      
+      enabled: false,
+      
+      fullWidth: readBuffer.width,
+      
+      fullHeight: readBuffer.height,
+      
+      offsetX: 0,
+      
+      offsetY: 0,
+      
+      width: readBuffer.width,
+      
+      height: readBuffer.height
+    
+    };
 
-		const fullWidth = view ? view.fullWidth : readBuffer.width;
-    
-    const fullHeight = view ? view.fullHeight : readBuffer.height;
-    
-    const offsetX = view ? view.offsetX : 0;
-    
-    const offsetY = view ? view.offsetY : 0;
-    
-    const width = view ? view.width : readBuffer.width;
-    
-    const height = view ? view.height : readBuffer.height;
+    if ( this.camera.view !== null && this.camera.view.enabled ) Object.assign( view, this.camera.view );
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		for ( let i = 0; i < jitterOffsets.length; i ++ ) {
@@ -116,9 +122,9 @@ class SSAARenderPass extends Pass {
 
 			if ( this.camera.setViewOffset ) {
 
-				this.camera.setViewOffset( fullWidth, fullHeight,
-					offsetX + jitterOffset[ 0 ] * 0.0625, offsetY + jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
-					width, height );
+				this.camera.setViewOffset( view.fullWidth, view.fullHeight,
+					view.offsetX + jitterOffset[ 0 ] * 0.0625, view.offsetY + jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
+					view.width, view.height );
 
 			}
 
@@ -156,7 +162,7 @@ class SSAARenderPass extends Pass {
 
 		if ( this.camera.clearViewOffset ) {
       
-      if ( view ) this.camera.setViewOffset( fullWidth, fullHeight, offsetX, offsetY, width, height );
+      if ( view.enabled ) this.camera.view = Object.assign( {}, view );
       
       else this.camera.clearViewOffset();
       
