@@ -32,7 +32,7 @@ var SSRShader = {
 		'maxDistance': { value: 180 },
 		'cameraRange': { value: 0 },
 		'thickness': { value: .018 },
-		
+
 	},
 
 	vertexShader: /* glsl */`

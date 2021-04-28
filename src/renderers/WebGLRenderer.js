@@ -1252,7 +1252,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if( includeChildren ) {
+		if ( includeChildren ) {
 
 			const children = object.children;
 

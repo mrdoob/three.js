@@ -48,9 +48,9 @@
 		const otherMeshes = [];
 		let groundReflector;
 		const selects = [];
-		window.selects=selects
+		window.selects = selects;
 		let bunny, cube, sphere, cone;
-		let folder
+		let folder;
 
 		const container = document.querySelector( '#container' );
 
@@ -67,7 +67,7 @@
 			camera.position.set( 0.13271600513224902, 0.3489546826045913, 0.43921296427927076 );
 
 			scene = new THREE.Scene();
-			window.scene=scene
+			window.scene = scene;
 			// scene.fog = new THREE.Fog( 0x443333, 1, 4 );
 
 			// Ground
@@ -79,9 +79,9 @@
 			groundPlane.position.y = - 0.0001;
 			// groundPlane.receiveShadow = true;
 			scene.add( groundPlane );
-			selects.push(groundPlane)
-			groundPlane.name='groundPlane'
-			window.groundPlane=groundPlane
+			selects.push( groundPlane );
+			groundPlane.name = 'groundPlane';
+			window.groundPlane = groundPlane;
 
 			// Lights
 			const hemiLight = new THREE.HemisphereLight( 0x443333, 0x111122 );
@@ -94,68 +94,71 @@
 			spotLight.position.set( - 1, 1, 1 );
 			scene.add( spotLight );
 
-			await new Promise(resolve=>{
+			await new Promise( resolve=>{
+
 				dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
-					const material = new THREE.MeshStandardMaterial( { metalness: .5, roughness:.5, color: 0x606060 } );
+					const material = new THREE.MeshStandardMaterial( { metalness: .5, roughness: .5, color: 0x606060 } );
 					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.y = - 0.0365;
 					scene.add( mesh );
 					selects.push( mesh );
-					bunny=mesh
-					mesh.name='bunny'
+					bunny = mesh;
+					mesh.name = 'bunny';
 
 					// Release decoder resources.
 					dracoLoader.dispose();
 
-					resolve()
+					resolve();
+
 				} );
-			})
+
+			} );
 
 			let geometry, material, mesh;
-			let group=new THREE.Group()
-			window.group=group
-			scene.add(group)
-			otherMeshes.push(group)
-			selects.push(group)
-			group.name='group'
+			let group = new THREE.Group();
+			window.group = group;
+			scene.add( group );
+			otherMeshes.push( group );
+			selects.push( group );
+			group.name = 'group';
 
 			geometry = new THREE.BoxBufferGeometry( .05, .05, .05 );
-			material = new THREE.MeshStandardMaterial( { metalness: .5, roughness:.5, color: 'green' } );
+			material = new THREE.MeshStandardMaterial( { metalness: .5, roughness: .5, color: 'green' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .12, .025, .015 );
 			group.add( mesh );
 			// otherMeshes.push( mesh );
 			// selects.push( mesh );
-			cube=mesh
-			mesh.name='cube'
-			window.cube=cube
+			cube = mesh;
+			mesh.name = 'cube';
+			window.cube = cube;
 
 			geometry = new THREE.IcosahedronBufferGeometry( .025, 4 );
-			material = new THREE.MeshPhysicalMaterial( { metalness: .5, roughness:.5, color: 'cyan' } );
+			material = new THREE.MeshPhysicalMaterial( { metalness: .5, roughness: .5, color: 'cyan' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, .08 );
 			group.add( mesh );
 			// otherMeshes.push( mesh );
 			// selects.push( mesh );
-			sphere=mesh
-			mesh.name='sphere'
-			window.sphere=sphere
+			sphere = mesh;
+			mesh.name = 'sphere';
+			window.sphere = sphere;
 
 			geometry = new THREE.ConeBufferGeometry( .025, .05, 64 );
-			material = new THREE.MeshStandardMaterial( { metalness: .5, roughness:.5, color: 'yellow' } );
+			material = new THREE.MeshStandardMaterial( { metalness: .5, roughness: .5, color: 'yellow' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, - .055 );
 			scene.add( mesh );
 			// otherMeshes.push( mesh );
 			// selects.push( mesh );
-			cube.add(mesh)
-			mesh.position.sub(cube.position)
-			cone=mesh
-			mesh.name='cone'
-			window.cone=cone
+			cube.add( mesh );
+			mesh.position.sub( cube.position );
+			cone = mesh;
+			mesh.name = 'cone';
+			window.cone = cone;
 
 			geometry = new THREE.PlaneBufferGeometry( 1, 1 );
 			groundReflector = new ReflectorForSSRPass( geometry, {
@@ -169,7 +172,7 @@
 			groundReflector.rotation.x = - Math.PI / 2;
 			groundReflector.visible = false;
 			scene.add( groundReflector );
-			groundReflector.name='groundReflector'
+			groundReflector.name = 'groundReflector';
 
 			// renderer
 			renderer = new THREE.WebGLRenderer( { antialias: false } );
@@ -180,28 +183,28 @@
 			// new THREE.TextureLoader().load('textures/equirectangular/venice_sunset_1k.hdr', envMap=>{
 			// 	scene.background=envMap
 			// })
-			
+
 
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 			pmremGenerator.compileEquirectangularShader();
 			new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
-					.setPath( 'textures/equirectangular/' )
-					.load( 'venice_sunset_1k.hdr', function ( texture ) {
+				.setDataType( THREE.UnsignedByteType )
+				.setPath( 'textures/equirectangular/' )
+				.load( 'venice_sunset_1k.hdr', function ( texture ) {
 
-						let envMap = pmremGenerator.fromEquirectangular( texture ).texture;
-						pmremGenerator.dispose();
+					let envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+					pmremGenerator.dispose();
 
-						scene.background = envMap;
-						scene.environment = envMap;
+					scene.background = envMap;
+					scene.environment = envMap;
 
-						//
+					//
 
-						// buildGUI();
-						// initScene( scenes[ state.scene ] );
-						// animate();
+					// buildGUI();
+					// initScene( scenes[ state.scene ] );
+					// animate();
 
-					} );
+				} );
 
 			//
 
@@ -232,8 +235,8 @@
 				// selects: params.groundReflector ? selects : null
 				selects,
 			} );
-			ssrPass.selects=selects; // trigger defineProperty watch
-			window.ssrPass=ssrPass
+			ssrPass.selects = selects; // trigger defineProperty watch
+			window.ssrPass = ssrPass;
 
 			composer.addPass( ssrPass );
 
@@ -276,31 +279,31 @@
 				ssrPass.output = parseInt( value );
 
 			} );
-			gui.add(ssrPass,'defaultIntensity').min(0).max(1)
-			folder=gui.addFolder('bunny')
-			folder.open()
+			gui.add( ssrPass, 'defaultIntensity' ).min( 0 ).max( 1 );
+			folder = gui.addFolder( 'bunny' );
+			folder.open();
 			// folder.add(bunny.material,'reflectivity').name('ssr&reflectivity').min(0).max(1)
-			folder.add(bunny.material,'envMapIntensity').name('ssr&envMapIntensity').min(0).max(1)
-			folder.add(bunny.material,'metalness').name('bunnyMetalness').min(0).max(1)
-			folder.add(bunny.material,'roughness').name('bunnyRoughness').min(0).max(1)
-			folder=gui.addFolder('cube')
-			folder.open()
+			folder.add( bunny.material, 'envMapIntensity' ).name( 'ssr&envMapIntensity' ).min( 0 ).max( 1 );
+			folder.add( bunny.material, 'metalness' ).name( 'bunnyMetalness' ).min( 0 ).max( 1 );
+			folder.add( bunny.material, 'roughness' ).name( 'bunnyRoughness' ).min( 0 ).max( 1 );
+			folder = gui.addFolder( 'cube' );
+			folder.open();
 			// // folder.add(cube.material,'reflectivity').name('ssr&reflectivity').min(0).max(1)
-			folder.add(cube.material,'envMapIntensity').name('ssr&envMapIntensity').min(0).max(1)
-			folder.add(cube.material,'metalness').name('cubeMetalness').min(0).max(1)
-			folder.add(cube.material,'roughness').name('cubeRoughness').min(0).max(1)
-			folder=gui.addFolder('sphere')
-			folder.open()
+			folder.add( cube.material, 'envMapIntensity' ).name( 'ssr&envMapIntensity' ).min( 0 ).max( 1 );
+			folder.add( cube.material, 'metalness' ).name( 'cubeMetalness' ).min( 0 ).max( 1 );
+			folder.add( cube.material, 'roughness' ).name( 'cubeRoughness' ).min( 0 ).max( 1 );
+			folder = gui.addFolder( 'sphere' );
+			folder.open();
 			// // folder.add(sphere.material,'reflectivity').name('ssr&reflectivity').min(0).max(1)
-			folder.add(sphere.material,'envMapIntensity').name('ssr&envMapIntensity').min(0).max(1)
-			folder.add(sphere.material,'metalness').name('sphereMetalness').min(0).max(1)
-			folder.add(sphere.material,'roughness').name('sphereRoughness').min(0).max(1)
-			folder=gui.addFolder('cone')
-			folder.open()
+			folder.add( sphere.material, 'envMapIntensity' ).name( 'ssr&envMapIntensity' ).min( 0 ).max( 1 );
+			folder.add( sphere.material, 'metalness' ).name( 'sphereMetalness' ).min( 0 ).max( 1 );
+			folder.add( sphere.material, 'roughness' ).name( 'sphereRoughness' ).min( 0 ).max( 1 );
+			folder = gui.addFolder( 'cone' );
+			folder.open();
 			// // folder.add(cone.material,'reflectivity').name('ssr&reflectivity').min(0).max(1)
-			folder.add(cone.material,'envMapIntensity').name('ssr&envMapIntensity').min(0).max(1)
-			folder.add(cone.material,'metalness').name('coneMetalness').min(0).max(1)
-			folder.add(cone.material,'roughness').name('coneRoughness').min(0).max(1)
+			folder.add( cone.material, 'envMapIntensity' ).name( 'ssr&envMapIntensity' ).min( 0 ).max( 1 );
+			folder.add( cone.material, 'metalness' ).name( 'coneMetalness' ).min( 0 ).max( 1 );
+			folder.add( cone.material, 'roughness' ).name( 'coneRoughness' ).min( 0 ).max( 1 );
 
 			folder = gui.addFolder( 'more settings' );
 			folder.add( ssrPass, 'fresnel' ).onChange( ()=>{
@@ -347,7 +350,7 @@
 			// folder.open()
 			// gui.close()
 
-			animate()
+			animate();
 
 		}
 
@@ -404,6 +407,7 @@
 			}
 
 		}
+
 	</script>
 </body>
 

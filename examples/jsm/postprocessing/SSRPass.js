@@ -58,18 +58,24 @@ class SSRPass extends Pass {
 			},
 			set( val ) {
 
-				let arr=[]
-				val.forEach(obj3d=>{
-					console.log(1)
-					obj3d.traverseVisible(child=>{
-						console.log(2)
-						if(child.material&&typeof child.material.envMapIntensity==='number'){
-							arr.push(child)
+				let arr = [];
+				val.forEach( obj3d=>{
+
+					console.log( 1 );
+					obj3d.traverseVisible( child=>{
+
+						console.log( 2 );
+						if ( child.material && typeof child.material.envMapIntensity === 'number' ) {
+
+							arr.push( child );
+
 						}
-					})
-				})
-				arr=Array.from(new Set(arr))
-				this._selects=arr
+
+					} );
+
+				} );
+				arr = Array.from( new Set( arr ) );
+				this._selects = arr;
 
 			}
 		} );
@@ -234,20 +240,20 @@ class SSRPass extends Pass {
 		this.ssrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
 		this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 		this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
-	
+
 		// normal material
-	
+
 		this.normalMaterial = new MeshNormalMaterial( { morphTargets } );
 		this.normalMaterial.blending = NoBlending;
-	
+
 		// metalness material
-	
+
 		this.metalnessMaterial = new MeshBasicMaterial( {
 			color: 'white'
 		} );
-	
+
 		// blur material
-	
+
 		this.blurMaterial = new ShaderMaterial( {
 			defines: Object.assign( {}, SSRBlurShader.defines ),
 			uniforms: UniformsUtils.clone( SSRBlurShader.uniforms ),
@@ -256,9 +262,9 @@ class SSRPass extends Pass {
 		} );
 		this.blurMaterial.uniforms[ 'tDiffuse' ].value = this.ssrRenderTarget.texture;
 		this.blurMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
-	
+
 		// blur material 2
-	
+
 		this.blurMaterial2 = new ShaderMaterial( {
 			defines: Object.assign( {}, SSRBlurShader.defines ),
 			uniforms: UniformsUtils.clone( SSRBlurShader.uniforms ),
@@ -267,9 +273,9 @@ class SSRPass extends Pass {
 		} );
 		this.blurMaterial2.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
 		this.blurMaterial2.uniforms[ 'resolution' ].value.set( this.width, this.height );
-	
+
 		// // blur material 3
-	
+
 		// this.blurMaterial3 = new ShaderMaterial({
 		//   defines: Object.assign({}, SSRBlurShader.defines),
 		//   uniforms: UniformsUtils.clone(SSRBlurShader.uniforms),
@@ -278,9 +284,9 @@ class SSRPass extends Pass {
 		// });
 		// this.blurMaterial3.uniforms['tDiffuse'].value = this.blurRenderTarget2.texture;
 		// this.blurMaterial3.uniforms['resolution'].value.set(this.width, this.height);
-	
+
 		// material for rendering the depth
-	
+
 		this.depthRenderMaterial = new ShaderMaterial( {
 			defines: Object.assign( {}, SSRDepthShader.defines ),
 			uniforms: UniformsUtils.clone( SSRDepthShader.uniforms ),
@@ -291,9 +297,9 @@ class SSRPass extends Pass {
 		this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 		this.depthRenderMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 		this.depthRenderMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-	
+
 		// material for rendering the content of a render target
-	
+
 		this.copyMaterial = new ShaderMaterial( {
 			uniforms: UniformsUtils.clone( CopyShader.uniforms ),
 			vertexShader: CopyShader.vertexShader,
@@ -309,10 +315,11 @@ class SSRPass extends Pass {
 			blendEquationAlpha: AddEquation,
 			// premultipliedAlpha:true,
 		} );
-	
-			this.fsQuad = new FullScreenQuad( null );
-	
-			this.originalClearColor = new Color();
+
+		this.fsQuad = new FullScreenQuad( null );
+
+		this.originalClearColor = new Color();
+
 	}
 
 	dispose() {
@@ -582,7 +589,7 @@ class SSRPass extends Pass {
 
 		// renderer.setClearColor('red')
 		// renderer.clear()
-		let materialBack
+		let materialBack;
 
 		// this.metalnessMaterial.color.setScalar( .7 )
 		// cube.material = this.metalnessMaterial
@@ -631,21 +638,27 @@ class SSRPass extends Pass {
 		// 	}
 		// })
 
-		this.scene.traverseVisible(child => {
-			if(this.selects.includes(child)&&child.material&&typeof(child.material.envMapIntensity)==='number'){
-				this.metalnessMaterial.color.setScalar( child.material.envMapIntensity )
+		this.scene.traverseVisible( child => {
+
+			if ( this.selects.includes( child ) && child.material && typeof ( child.material.envMapIntensity ) === 'number' ) {
+
+				this.metalnessMaterial.color.setScalar( child.material.envMapIntensity );
 				let materialBack = child.material;
-				child.material = this.metalnessMaterial
-				renderer.render(child, this.camera, false) // TODO: Will render all descendants?
-				child.material = materialBack
-			}else if(child.material){
-				this.metalnessMaterial.color.setScalar( this.defaultIntensity )
+				child.material = this.metalnessMaterial;
+				renderer.render( child, this.camera, false ); // TODO: Will render all descendants?
+				child.material = materialBack;
+
+			} else if ( child.material ) {
+
+				this.metalnessMaterial.color.setScalar( this.defaultIntensity );
 				let materialBack = child.material;
-				child.material = this.metalnessMaterial
-				renderer.render(child, this.camera, false) // TODO: Will render all descendants?
-				child.material = materialBack
+				child.material = this.metalnessMaterial;
+				renderer.render( child, this.camera, false ); // TODO: Will render all descendants?
+				child.material = materialBack;
+
 			}
-		})
+
+		} );
 
 		// restore original state
 
