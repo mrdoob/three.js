@@ -184,14 +184,14 @@ class WebGPURenderPipelines {
 			pipelines[ i ] = pipelines[ pipelines.length - 1 ];
 			pipelines.pop();
 
-			this._relaseStage( pipeline.stageVertex );
-			this._relaseStage( pipeline.stageFragment );
+			this._releaseStage( pipeline.stageVertex );
+			this._releaseStage( pipeline.stageFragment );
 
 		}
 
 	}
 
-	_relaseStage( stage ) {
+	_releaseStage( stage ) {
 
 		if ( -- stage.usedTimes === 0 ) {
 
