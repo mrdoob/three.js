@@ -1,12 +1,12 @@
 class WebGPUBindings {
 
-	constructor( device, info, properties, textures, pipelines, computePipelines, attributes, nodes ) {
+	constructor( device, info, properties, textures, renderPipelines, computePipelines, attributes, nodes ) {
 
 		this.device = device;
 		this.info = info;
 		this.properties = properties;
 		this.textures = textures;
-		this.pipelines = pipelines;
+		this.renderPipelines = renderPipelines;
 		this.computePipelines = computePipelines;
 		this.attributes = attributes;
 		this.nodes = nodes;
@@ -23,7 +23,7 @@ class WebGPUBindings {
 
 		if ( data === undefined ) {
 
-			const pipeline = this.pipelines.get( object );
+			const renderPipelines = this.renderPipelines.get( object );
 
 			// each material defines an array of bindings (ubos, textures, samplers etc.)
 
@@ -33,7 +33,7 @@ class WebGPUBindings {
 
 			// setup (static) binding layout and (dynamic) binding group
 
-			const bindLayout = pipeline.getBindGroupLayout( 0 );
+			const bindLayout = renderPipelines.pipeline.getBindGroupLayout( 0 );
 			const bindGroup = this._createBindGroup( bindings, bindLayout );
 
 			data = {
