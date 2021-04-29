@@ -11,10 +11,12 @@ import {
 
 class WebGPURenderPipeline {
 
-	constructor( cacheKey, device, renderer, sampleCount ) {
+	constructor( device, renderer, sampleCount ) {
 
-		this.cacheKey = cacheKey;
+		this.cacheKey = null;
 		this.shaderAttributes = null;
+		this.stageVertex = null;
+		this.stageFragment = null;
 		this.usedTimes = 0;
 
 		this._device = device;
@@ -23,7 +25,7 @@ class WebGPURenderPipeline {
 
 	}
 
-	init( moduleVertex, moduleFragment, object, nodeBuilder ) {
+	init( cacheKey, stageVertex, stageFragment, object, nodeBuilder ) {
 
 		const material = object.material;
 		const geometry = object.geometry;
@@ -50,7 +52,10 @@ class WebGPURenderPipeline {
 
 		}
 
+		this.cacheKey = cacheKey;
 		this.shaderAttributes = shaderAttributes;
+		this.stageVertex = stageVertex;
+		this.stageFragment = stageFragment;
 
 		// blending
 
@@ -88,8 +93,8 @@ class WebGPURenderPipeline {
 		const depthStencilFormat = this._renderer.getCurrentDepthStencilFormat();
 
 		this.pipeline = this._device.createRenderPipeline( {
-			vertex: Object.assign( {}, moduleVertex, { buffers: vertexBuffers } ),
-			fragment: Object.assign( {}, moduleFragment, { targets: [ {
+			vertex: Object.assign( {}, stageVertex.stage, { buffers: vertexBuffers } ),
+			fragment: Object.assign( {}, stageFragment.stage, { targets: [ {
 				format: colorFormat,
 				blend: {
 					alpha: alphaBlend,
