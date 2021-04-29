@@ -111,9 +111,9 @@ class SSAARenderPass extends Pass {
 		
 		};
 
-		let originalViewOffset = this.camera.view === null ? null : Object.assign( {}, this.camera.view );
+		let originalViewOffset = Object.assign( {}, this.camera.view );
 	
-		if ( originalViewOffset !== null && originalViewOffset.enabled ) Object.assign( viewOffset, originalViewOffset );
+		if ( originalViewOffset.enabled ) Object.assign( viewOffset, originalViewOffset );
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		for ( let i = 0; i < jitterOffsets.length; i ++ ) {
@@ -166,7 +166,7 @@ class SSAARenderPass extends Pass {
 
 		}
 			
-		if ( this.camera.setViewOffset && originalViewOffset !== null && originalViewOffset.enabled ) {
+		if ( this.camera.setViewOffset && originalViewOffset.enabled ) {
 			
 			this.camera.setViewOffset(
 				
