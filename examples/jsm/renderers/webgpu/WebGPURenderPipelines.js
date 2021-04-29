@@ -299,8 +299,6 @@ function onMaterialDispose( event ) {
 
 	}
 
-	// @TODO: still need remove nodes and bindings
-
 }
 
 export default WebGPURenderPipelines;
