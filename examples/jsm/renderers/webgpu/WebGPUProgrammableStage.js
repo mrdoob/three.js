@@ -14,8 +14,7 @@ class WebGPUProgrammableStage {
 
 		this.stage = {
 			module: device.createShaderModule( { code: byteCode } ),
-			entryPoint: 'main',
-			id: _id ++
+			entryPoint: 'main'
 		};
 
 	}
