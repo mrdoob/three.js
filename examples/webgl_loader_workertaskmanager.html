@@ -134,7 +134,8 @@
 
 							return [
 								{ url: threeJsLocation },
-								{ code: ObjectUtils.serializeClass( THREE.BufferGeometry ) },
+								{ code: 'const BufferGeometry = THREE.BufferGeometry;\n' },
+								{ code: 'const EventDispatcher = THREE.EventDispatcher;\n' },
 								{ code: ObjectUtils.serializeClass( DataTransport ) },
 								{ code: ObjectUtils.serializeClass( GeometryTransport ) },
 								{ code: ObjectUtils.serializeClass( MaterialUtils ) },

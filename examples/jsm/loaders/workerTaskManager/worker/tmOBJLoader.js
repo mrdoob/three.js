@@ -21,6 +21,7 @@ const OBJLoaderWorker = {
 			{ code: 'const Material = THREE.Material;\n' },
 			{ code: 'const Texture = THREE.Texture;\n' },
 			{ code: 'const BufferGeometry = THREE.BufferGeometry;\n' },
+			{ code: 'const EventDispatcher = THREE.EventDispatcher;\n' },
 			{ code: '\n\n' },
 			{ url: objLoaderLocation },
 			{ code: '\n\nconst OBJLoader = THREE.OBJLoader;\n\n' },
