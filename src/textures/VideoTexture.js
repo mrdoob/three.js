@@ -1,4 +1,4 @@
-import { RGBFormat, LinearFilter } from '../constants.js';
+import { RGBAFormat, LinearFilter } from '../constants.js';
 import { Texture } from './Texture.js';
 
 class VideoTexture extends Texture {
@@ -7,7 +7,7 @@ class VideoTexture extends Texture {
 
 		super( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
-		this.format = format !== undefined ? format : RGBFormat;
+		this.format = format !== undefined ? format : RGBAFormat;
 
 		this.minFilter = minFilter !== undefined ? minFilter : LinearFilter;
 		this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
