@@ -1,6 +1,7 @@
 import { UIPanel, UIRow, UIText, UIListbox, UIInput, UINumber, UICheckbox, UISelect } from './libs/ui.js';
 import { SetTextureValueCommand } from './commands/SetTextureValueCommand.js';
 import { SetTextureVectorCommand } from './commands/SetTextureVectorCommand.js';
+import { UITexture } from './libs/ui.three.js';
 
 function SidebarProjectTextures( editor ) {
 
@@ -41,6 +42,18 @@ function SidebarProjectTextures( editor ) {
 	propertiesContainer.setDisplay( 'none' );
 
 	container.add( propertiesContainer );
+
+	// Preview
+	var previewRow = new UIRow();
+
+	var preview = new UITexture();
+	preview.dom.childNodes[ 0 ].width = preview.dom.childNodes[ 0 ].height = 32;
+	previewRow.add( preview );
+
+	var textureUUID = new UIInput().setWidth( '170px' ).setFontSize( '12px' ).setDisabled( true );
+	previewRow.add( textureUUID );
+
+	propertiesContainer.add( previewRow );
 
 	// name
 
@@ -277,6 +290,10 @@ function SidebarProjectTextures( editor ) {
 	function refreshPropertiesUI( ) {
 
 		if ( selectedTexture === null ) return;
+
+		textureUUID.setValue( selectedTexture.uuid );
+
+		preview.setValue( selectedTexture );
 
 		textureName.setValue( selectedTexture.name );
 
