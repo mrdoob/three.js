@@ -10,6 +10,7 @@ function SidebarProjectTextures( editor ) {
 	var selectedTexture = null;
 
 	var container = new UIPanel();
+	container.setBorderTop( '0' );
 
 	// Texture List Box
 	var listbox = new UIListbox();
