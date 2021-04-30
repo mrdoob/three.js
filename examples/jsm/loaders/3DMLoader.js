@@ -944,25 +944,13 @@ function Rhino3dmWorker() {
 
 			if ( _pbrMaterial.supported ) {
 
-				console.log( 'pbr true' );
-
 				for ( let j = 0; j < pbrTextureTypes.length; j ++ ) {
 
-					let _texture = null;
-					try {
-
-					 _texture = _material.getTexture( textureTypes[ j ] );
-
-					} catch ( err ) {
-
-						console.error( `THREE.3DMLoader: Error ${err}`);
-
-					}
-
+					const _texture = _material.getTexture( pbrTextureTypes[ j ] );
 					if ( _texture ) {
 
 						const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
-						let textureType = textureTypes[ j ].constructor.name;
+						let textureType = pbrTextureTypes[ j ].constructor.name;
 						textureType = textureType.substring( 12, textureType.length );
 						const texture = { type: textureType, image: 'data:image/png;base64,' + image };
 						textures.push( texture );
