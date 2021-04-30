@@ -14,6 +14,8 @@
 
 	const _capsule = new THREE.Capsule();
 
+	const epsilon = new THREE.Vector3( 0.01, 0.01, 0.01 );
+
 	class Octree {
 
 		constructor( box ) {
@@ -66,8 +68,8 @@
 
 						const v = _v1.set( x, y, z );
 
-						box.min.copy( this.box.min ).add( v.multiply( halfsize ) );
-						box.max.copy( box.min ).add( halfsize );
+						box.min.copy( this.box.min ).add( v.multiply( halfsize ) ).sub( epsilon );
+						box.max.copy( box.min ).add( halfsize ).addScaledVector( epsilon, 2 );
 						subTrees.push( new Octree( box ) );
 
 					}
