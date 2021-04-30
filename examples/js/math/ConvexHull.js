@@ -30,10 +30,10 @@
 			// let 'a' and 'b' be 'Face' instances
 			// let 'v' be points wrapped as instance of 'Vertex'
 			//
-			//		 [v, v, ..., v, v, v, ...]
-			//			^						 ^
-			//			|						 |
-			//	a.outside		 b.outside
+			//     [v, v, ..., v, v, v, ...]
+			//      ^             ^
+			//      |             |
+			//  a.outside     b.outside
 			//
 
 			this.assigned = new VertexList();
@@ -127,7 +127,7 @@
 
 		intersectRay( ray, target ) {
 
-			// based on "Fast Ray-Convex Polyhedron Intersection"	by Eric Haines, GRAPHICS GEMS II
+			// based on "Fast Ray-Convex Polyhedron Intersection"  by Eric Haines, GRAPHICS GEMS II
 			const faces = this.faces;
 			let tNear = - Infinity;
 			let tFar = Infinity;
@@ -149,7 +149,7 @@
 
 				if ( vD > 0 ) {
 
-					//	plane faces away from the ray, so this plane is a back-face
+					//  plane faces away from the ray, so this plane is a back-face
 					tFar = Math.min( t, tFar );
 
 				} else {
@@ -699,8 +699,8 @@
 			face.getEdge( - 1 ).setTwin( horizonEdge.twin );
 			return face.getEdge( 0 ); // the half edge whose vertex is the eyeVertex
 
-		} //	Adds 'horizon.length' faces to the hull, each face will be linked with the
-		//	horizon opposite face and the face on the left/right
+		} //  Adds 'horizon.length' faces to the hull, each face will be linked with the
+		//  horizon opposite face and the face on the left/right
 
 
 		addNewFaces( eyeVertex, horizon ) {

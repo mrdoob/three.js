@@ -6,8 +6,8 @@
 	const BasicShader = {
 		uniforms: {},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		void main() {
 
@@ -15,8 +15,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		void main() {
 

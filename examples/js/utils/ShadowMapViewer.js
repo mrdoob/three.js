@@ -15,7 +15,7 @@
  *
  *	3) Create a shadow map viewer for that light and set its size and position optionally:
  *		let shadowMapViewer = new ShadowMapViewer( light );
- *		shadowMapViewer.size.set( 128, 128 );	//width, height	default: 256, 256
+ *		shadowMapViewer.size.set( 128, 128 );	//width, height  default: 256, 256
  *		shadowMapViewer.position.set( 10, 10 );	//x, y in pixel	 default: 0, 0 (top left corner)
  *
  *	4) Render the shadow map viewer in your render loop:

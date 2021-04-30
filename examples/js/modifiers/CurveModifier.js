@@ -162,9 +162,9 @@ rowOffset += instanceMatrix[3][1] * ${TEXTURE_HEIGHT}.;
 #endif
 
 vec3 spinePos = texture2D(spineTexture, vec2(mt, (0. + rowOffset + 0.5) / textureLayers)).xyz;
-vec3 a =				texture2D(spineTexture, vec2(mt, (1. + rowOffset + 0.5) / textureLayers)).xyz;
-vec3 b =				texture2D(spineTexture, vec2(mt, (2. + rowOffset + 0.5) / textureLayers)).xyz;
-vec3 c =				texture2D(spineTexture, vec2(mt, (3. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 a =        texture2D(spineTexture, vec2(mt, (1. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 b =        texture2D(spineTexture, vec2(mt, (2. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 c =        texture2D(spineTexture, vec2(mt, (3. + rowOffset + 0.5) / textureLayers)).xyz;
 mat3 basis = mat3(a, b, c);
 
 vec3 transformed = basis
@@ -186,9 +186,9 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 	class Flow {
 
 		/**
-	 * @param {Mesh} mesh The mesh to clone and modify to bend around the curve
-	 * @param {number} numberOfCurves The amount of space that should preallocated for additional curves
-	 */
+   * @param {Mesh} mesh The mesh to clone and modify to bend around the curve
+   * @param {number} numberOfCurves The amount of space that should preallocated for additional curves
+   */
 		constructor( mesh, numberOfCurves = 1 ) {
 
 			const obj3D = mesh.clone();
@@ -238,12 +238,12 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 	class InstancedFlow extends Flow {
 
 		/**
-	 *
-	 * @param {number} count The number of instanced elements
-	 * @param {number} curveCount The number of curves to preallocate for
-	 * @param {Geometry} geometry The geometry to use for the instanced mesh
-	 * @param {Material} material The material to use for the instanced mesh
-	 */
+   *
+   * @param {number} count The number of instanced elements
+   * @param {number} curveCount The number of curves to preallocate for
+   * @param {Geometry} geometry The geometry to use for the instanced mesh
+   * @param {Material} material The material to use for the instanced mesh
+   */
 		constructor( count, curveCount, geometry, material ) {
 
 			const mesh = new THREE.InstancedMesh( geometry, material, count );
@@ -254,11 +254,11 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 
 		}
 		/**
-	 * The extra information about which curve and curve position is stored in the translation components of the matrix for the instanced objects
-	 * This writes that information to the matrix and marks it as needing update.
-	 *
-	 * @param {number} index of the instanced element to update
-	 */
+   * The extra information about which curve and curve position is stored in the translation components of the matrix for the instanced objects
+   * This writes that information to the matrix and marks it as needing update.
+   *
+   * @param {number} index of the instanced element to update
+   */
 
 
 		writeChanges( index ) {
@@ -269,11 +269,11 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 
 		}
 		/**
-	 * Move an individual element along the curve by a specific amount
-	 *
-	 * @param {number} index Which element to update
-	 * @param {number} offset Move by how much
-	 */
+   * Move an individual element along the curve by a specific amount
+   *
+   * @param {number} index Which element to update
+   * @param {number} offset Move by how much
+   */
 
 
 		moveIndividualAlongCurve( index, offset ) {
@@ -283,11 +283,11 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 
 		}
 		/**
-	 * Select which curve to use for an element
-	 *
-	 * @param {number} index the index of the instanced element to update
-	 * @param {number} curveNo the index of the curve it should use
-	 */
+   * Select which curve to use for an element
+   *
+   * @param {number} index the index of the instanced element to update
+   * @param {number} curveNo the index of the curve it should use
+   */
 
 
 		setCurve( index, curveNo ) {

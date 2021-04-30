@@ -42,11 +42,11 @@
 	class KhronosTextureContainer {
 
 		/**
-	 * @param {ArrayBuffer} arrayBuffer- contents of the KTX container file
-	 * @param {number} facesExpected- should be either 1 or 6, based whether a cube texture or or
-	 * @param {boolean} threeDExpected- provision for indicating that data should be a 3D texture, not implemented
-	 * @param {boolean} textureArrayExpected- provision for indicating that data should be a texture array, not implemented
-	 */
+   * @param {ArrayBuffer} arrayBuffer- contents of the KTX container file
+   * @param {number} facesExpected- should be either 1 or 6, based whether a cube texture or or
+   * @param {boolean} threeDExpected- provision for indicating that data should be a 3D texture, not implemented
+   * @param {boolean} textureArrayExpected- provision for indicating that data should be a texture array, not implemented
+   */
 		constructor( arrayBuffer, facesExpected
 			/*, threeDExpected, textureArrayExpected */
 		) {
@@ -92,7 +92,7 @@
 			this.numberOfMipmapLevels = headerDataView.getUint32( 11 * dataSize, littleEndian ); // number of levels; disregard possibility of 0 for compressed textures
 
 			this.bytesOfKeyValueData = headerDataView.getUint32( 12 * dataSize, littleEndian ); // the amount of space after the header for meta-data
-			// Make sure we have a compressed type.	Not only reduces work, but probably better to let dev know they are not compressing.
+			// Make sure we have a compressed type.  Not only reduces work, but probably better to let dev know they are not compressing.
 
 			if ( this.glType !== 0 ) {
 
@@ -101,7 +101,7 @@
 
 			} else {
 
-				// value of zero is an indication to generate mipmaps @ runtime.	Not usually allowed for compressed, so disregard.
+				// value of zero is an indication to generate mipmaps @ runtime.  Not usually allowed for compressed, so disregard.
 				this.numberOfMipmapLevels = Math.max( 1, this.numberOfMipmapLevels );
 
 			}

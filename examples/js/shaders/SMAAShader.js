@@ -19,8 +19,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform vec2 resolution;
 
@@ -28,9 +28,9 @@
 		varying vec4 vOffset[ 3 ];
 
 		void SMAAEdgeDetectionVS( vec2 texcoord ) {
-			vOffset[ 0 ] = texcoord.xyxy + resolution.xyxy * vec4( -1.0, 0.0, 0.0,	1.0 ); // WebGL port note: Changed sign in W component
-			vOffset[ 1 ] = texcoord.xyxy + resolution.xyxy * vec4(	1.0, 0.0, 0.0, -1.0 ); // WebGL port note: Changed sign in W component
-			vOffset[ 2 ] = texcoord.xyxy + resolution.xyxy * vec4( -2.0, 0.0, 0.0,	2.0 ); // WebGL port note: Changed sign in W component
+			vOffset[ 0 ] = texcoord.xyxy + resolution.xyxy * vec4( -1.0, 0.0, 0.0,  1.0 ); // WebGL port note: Changed sign in W component
+			vOffset[ 1 ] = texcoord.xyxy + resolution.xyxy * vec4(  1.0, 0.0, 0.0, -1.0 ); // WebGL port note: Changed sign in W component
+			vOffset[ 2 ] = texcoord.xyxy + resolution.xyxy * vec4( -2.0, 0.0, 0.0,  2.0 ); // WebGL port note: Changed sign in W component
 		}
 
 		void main() {
@@ -43,8 +43,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform sampler2D tDiffuse;
 
@@ -78,7 +78,7 @@
 			t = abs( C - Cright );
 			delta.z = max( max( t.r, t.g ), t.b );
 
-			vec3 Cbottom	= texture2D( colorTex, offset[1].zw ).rgb;
+			vec3 Cbottom  = texture2D( colorTex, offset[1].zw ).rgb;
 			t = abs( C - Cbottom );
 			delta.w = max( max( t.r, t.g ), t.b );
 
@@ -86,7 +86,7 @@
 			float maxDelta = max( max( max( delta.x, delta.y ), delta.z ), delta.w );
 
 			// Calculate left-left and top-top deltas:
-			vec3 Cleftleft	= texture2D( colorTex, offset[2].xy ).rgb;
+			vec3 Cleftleft  = texture2D( colorTex, offset[2].xy ).rgb;
 			t = abs( C - Cleftleft );
 			delta.z = max( max( t.r, t.g ), t.b );
 
@@ -131,8 +131,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform vec2 resolution;
 
@@ -162,8 +162,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		#define SMAASampleLevelZeroOffset( tex, coord, offset ) texture2D( tex, coord + float( offset ) * resolution, 0.0 )
 
@@ -186,7 +186,7 @@
 			// Not required if searchTex accesses are set to point:
 			// float2 SEARCH_TEX_PIXEL_SIZE = 1.0 / float2(66.0, 33.0);
 			// e = float2(bias, 0.0) + 0.5 * SEARCH_TEX_PIXEL_SIZE +
-			//		 e * float2(scale, 1.0) * float2(64.0, 32.0) * SEARCH_TEX_PIXEL_SIZE;
+			//     e * float2(scale, 1.0) * float2(64.0, 32.0) * SEARCH_TEX_PIXEL_SIZE;
 			e.r = bias + e.r * scale;
 			return 255.0 * texture2D( searchTex, e, 0.0 ).r;
 		}
@@ -378,8 +378,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform vec2 resolution;
 
@@ -401,8 +401,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tColor;

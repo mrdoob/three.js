@@ -5,22 +5,22 @@
  * with MMD special features as IK, Grant, and Physics.
  *
  * Dependencies
- *	- ammo.js https://github.com/kripken/ammo.js
- *	- THREE.MMDPhysics
- *	- THREE.CCDIKSolver
+ *  - ammo.js https://github.com/kripken/ammo.js
+ *  - THREE.MMDPhysics
+ *  - THREE.CCDIKSolver
  *
  * TODO
- *	- more precise grant skinning support.
+ *  - more precise grant skinning support.
  */
 
 	class MMDAnimationHelper {
 
 		/**
-	 * @param {Object} params - (optional)
-	 * @param {boolean} params.sync - Whether animation durations of added objects are synched. Default is true.
-	 * @param {Number} params.afterglow - Default is 0.0.
-	 * @param {boolean} params.resetPhysicsOnLoop - Default is true.
-	 */
+   * @param {Object} params - (optional)
+   * @param {boolean} params.sync - Whether animation durations of added objects are synched. Default is true.
+   * @param {Number} params.afterglow - Default is 0.0.
+   * @param {boolean} params.resetPhysicsOnLoop - Default is true.
+   */
 		constructor( params = {} ) {
 
 			this.meshes = [];
@@ -52,21 +52,21 @@
 
 		}
 		/**
-	 * Adds an Three.js Object to helper and setups animation.
-	 * The anmation durations of added objects are synched
-	 * if this.configuration.sync is true.
-	 *
-	 * @param {THREE.SkinnedMesh|THREE.Camera|THREE.Audio} object
-	 * @param {Object} params - (optional)
-	 * @param {THREE.AnimationClip|Array<THREE.AnimationClip>} params.animation - Only for THREE.SkinnedMesh and THREE.Camera. Default is undefined.
-	 * @param {boolean} params.physics - Only for THREE.SkinnedMesh. Default is true.
-	 * @param {Integer} params.warmup - Only for THREE.SkinnedMesh and physics is true. Default is 60.
-	 * @param {Number} params.unitStep - Only for THREE.SkinnedMesh and physics is true. Default is 1 / 65.
-	 * @param {Integer} params.maxStepNum - Only for THREE.SkinnedMesh and physics is true. Default is 3.
-	 * @param {Vector3} params.gravity - Only for THREE.SkinnedMesh and physics is true. Default ( 0, - 9.8 * 10, 0 ).
-	 * @param {Number} params.delayTime - Only for THREE.Audio. Default is 0.0.
-	 * @return {MMDAnimationHelper}
-	 */
+   * Adds an Three.js Object to helper and setups animation.
+   * The anmation durations of added objects are synched
+   * if this.configuration.sync is true.
+   *
+   * @param {THREE.SkinnedMesh|THREE.Camera|THREE.Audio} object
+   * @param {Object} params - (optional)
+   * @param {THREE.AnimationClip|Array<THREE.AnimationClip>} params.animation - Only for THREE.SkinnedMesh and THREE.Camera. Default is undefined.
+   * @param {boolean} params.physics - Only for THREE.SkinnedMesh. Default is true.
+   * @param {Integer} params.warmup - Only for THREE.SkinnedMesh and physics is true. Default is 60.
+   * @param {Number} params.unitStep - Only for THREE.SkinnedMesh and physics is true. Default is 1 / 65.
+   * @param {Integer} params.maxStepNum - Only for THREE.SkinnedMesh and physics is true. Default is 3.
+   * @param {Vector3} params.gravity - Only for THREE.SkinnedMesh and physics is true. Default ( 0, - 9.8 * 10, 0 ).
+   * @param {Number} params.delayTime - Only for THREE.Audio. Default is 0.0.
+   * @return {MMDAnimationHelper}
+   */
 
 
 		add( object, params = {} ) {
@@ -94,11 +94,11 @@
 
 		}
 		/**
-	 * Removes an Three.js Object from helper.
-	 *
-	 * @param {THREE.SkinnedMesh|THREE.Camera|THREE.Audio} object
-	 * @return {MMDAnimationHelper}
-	 */
+   * Removes an Three.js Object from helper.
+   *
+   * @param {THREE.SkinnedMesh|THREE.Camera|THREE.Audio} object
+   * @return {MMDAnimationHelper}
+   */
 
 
 		remove( object ) {
@@ -126,11 +126,11 @@
 
 		}
 		/**
-	 * Updates the animation.
-	 *
-	 * @param {Number} delta
-	 * @return {MMDAnimationHelper}
-	 */
+   * Updates the animation.
+   *
+   * @param {Number} delta
+   * @return {MMDAnimationHelper}
+   */
 
 
 		update( delta ) {
@@ -149,16 +149,16 @@
 
 		}
 		/**
-	 * Changes the pose of SkinnedMesh as VPD specifies.
-	 *
-	 * @param {THREE.SkinnedMesh} mesh
-	 * @param {Object} vpd - VPD content parsed MMDParser
-	 * @param {Object} params - (optional)
-	 * @param {boolean} params.resetPose - Default is true.
-	 * @param {boolean} params.ik - Default is true.
-	 * @param {boolean} params.grant - Default is true.
-	 * @return {MMDAnimationHelper}
-	 */
+   * Changes the pose of SkinnedMesh as VPD specifies.
+   *
+   * @param {THREE.SkinnedMesh} mesh
+   * @param {Object} vpd - VPD content parsed MMDParser
+   * @param {Object} params - (optional)
+   * @param {boolean} params.resetPose - Default is true.
+   * @param {boolean} params.ik - Default is true.
+   * @param {boolean} params.grant - Default is true.
+   * @return {MMDAnimationHelper}
+   */
 
 
 		pose( mesh, vpd, params = {} ) {
@@ -219,12 +219,12 @@
 
 		}
 		/**
-	 * Enabes/Disables an animation feature.
-	 *
-	 * @param {string} key
-	 * @param {boolean} enabled
-	 * @return {MMDAnimationHelper}
-	 */
+   * Enabes/Disables an animation feature.
+   *
+   * @param {string} key
+   * @param {boolean} enabled
+   * @return {MMDAnimationHelper}
+   */
 
 
 		enable( key, enabled ) {
@@ -251,11 +251,11 @@
 
 		}
 		/**
-	 * Creates an GrantSolver instance.
-	 *
-	 * @param {THREE.SkinnedMesh} mesh
-	 * @return {GrantSolver}
-	 */
+   * Creates an GrantSolver instance.
+   *
+   * @param {THREE.SkinnedMesh} mesh
+   * @return {GrantSolver}
+   */
 
 
 		createGrantSolver( mesh ) {
@@ -644,9 +644,9 @@
 
 		}
 		/*
-	 * Detects the longest duration and then sets it to them to sync.
-	 * TODO: Not to access private properties ( ._actions and ._clip )
-	 */
+   * Detects the longest duration and then sets it to them to sync.
+   * TODO: Not to access private properties ( ._actions and ._clip )
+   */
 
 
 		_syncDuration() {
@@ -770,14 +770,14 @@
 
 		}
 		/*
-	 * Avoiding these two issues by restore/save bones before/after mixer animation.
-	 *
-	 * 1. PropertyMixer used by THREE.AnimationMixer holds cache value in .buffer.
-	 *		Calculating IK, Grant, and Physics after mixer animation can break
-	 *		the cache coherency.
-	 *
-	 * 2. Applying Grant two or more times without reset the posing breaks model.
-	 */
+   * Avoiding these two issues by restore/save bones before/after mixer animation.
+   *
+   * 1. PropertyMixer used by THREE.AnimationMixer holds cache value in .buffer.
+   *    Calculating IK, Grant, and Physics after mixer animation can break
+   *    the cache coherency.
+   *
+   * 2. Applying Grant two or more times without reset the posing breaks model.
+   */
 
 
 		_saveBones( mesh ) {
@@ -965,10 +965,10 @@
 	class AudioManager {
 
 		/**
-	 * @param {THREE.Audio} audio
-	 * @param {Object} params - (optional)
-	 * @param {Nuumber} params.delayTime
-	 */
+   * @param {THREE.Audio} audio
+   * @param {Object} params - (optional)
+   * @param {Nuumber} params.delayTime
+   */
 		constructor( audio, params = {} ) {
 
 			this.audio = audio;
@@ -980,9 +980,9 @@
 
 		}
 		/**
-	 * @param {Number} delta
-	 * @return {AudioManager}
-	 */
+   * @param {Number} delta
+   * @return {AudioManager}
+   */
 
 
 		control( delta ) {
@@ -1041,9 +1041,9 @@
 
 		}
 		/**
-	 * Solve all the grant bones
-	 * @return {GrantSolver}
-	 */
+   * Solve all the grant bones
+   * @return {GrantSolver}
+   */
 
 
 		update() {
@@ -1060,10 +1060,10 @@
 
 		}
 		/**
-	 * Solve a grant bone
-	 * @param {Object} grant - grant parameter
-	 * @return {GrantSolver}
-	 */
+   * Solve a grant bone
+   * @param {Object} grant - grant parameter
+   * @return {GrantSolver}
+   */
 
 
 		updateOne( grant ) {

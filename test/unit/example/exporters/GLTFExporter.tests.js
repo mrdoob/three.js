@@ -395,7 +395,7 @@ export default QUnit.module( 'Exporters', () => {
 
 			const scene = new Scene();
 			const mesh = new Mesh(
-				new BoxBufferGeometry( 1, 1, 1 ),
+				new BoxGeometry( 1, 1, 1 ),
 				new MeshBasicMaterial()
 			);
 			scene.add( mesh );

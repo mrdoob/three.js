@@ -150,7 +150,7 @@
 			this.domElement.addEventListener( 'pointermove', this._onPointerHover );
 			this.domElement.ownerDocument.addEventListener( 'pointerup', this._onPointerUp );
 
-		} // updateMatrixWorld	updates key transformation variables
+		} // updateMatrixWorld  updates key transformation variables
 
 
 		updateMatrixWorld() {
@@ -958,7 +958,7 @@
 
 		updateMatrixWorld( force ) {
 
-			const space = this.mode === 'scale' ? this.space : 'local'; // scale always oriented to local rotation
+			const space = this.mode === 'scale' ? 'local' : this.space; // scale always oriented to local rotation
 
 			const quaternion = space === 'local' ? this.worldQuaternion : _identityQuaternion; // Show only gizmos for current transform mode
 
@@ -1438,7 +1438,7 @@
 
 				case 'rotate':
 				default:
-				// special case for rotate
+					// special case for rotate
 					_dirVector.set( 0, 0, 0 );
 
 			}

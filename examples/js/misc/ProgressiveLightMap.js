@@ -68,9 +68,9 @@
 
 		}
 		/**
-	 * Sets these objects' materials' lightmaps and modifies their uv2's.
-	 * @param {Object3D} objects An array of objects and lights to set up your lightmap.
-	 */
+   * Sets these objects' materials' lightmaps and modifies their uv2's.
+   * @param {Object3D} objects An array of objects and lights to set up your lightmap.
+   */
 
 
 		addObjectsToLightMap( objects ) {
@@ -144,11 +144,11 @@
 
 		}
 		/**
-	 * This function renders each mesh one at a time into their respective surface maps
-	 * @param {Camera} camera Standard Rendering Camera
-	 * @param {number} blendWindow When >1, samples will accumulate over time.
-	 * @param {boolean} blurEdges	Whether to fix UV Edges via blurring
-	 */
+   * This function renders each mesh one at a time into their respective surface maps
+   * @param {Camera} camera Standard Rendering Camera
+   * @param {number} blendWindow When >1, samples will accumulate over time.
+   * @param {boolean} blurEdges  Whether to fix UV Edges via blurring
+   */
 
 
 		update( camera, blendWindow = 100, blurEdges = true ) {
@@ -220,10 +220,10 @@
 
 		}
 		/** DEBUG
-	 * Draw the lightmap in the main scene.	Call this after adding the objects to it.
-	 * @param {boolean} visible Whether the debug plane should be visible
-	 * @param {Vector3} position Where the debug plane should be drawn
-	*/
+   * Draw the lightmap in the main scene.  Call this after adding the objects to it.
+   * @param {boolean} visible Whether the debug plane should be visible
+   * @param {Vector3} position Where the debug plane should be drawn
+  */
 
 
 		showDebugLightmap( visible, position = undefined ) {
@@ -264,10 +264,10 @@
 
 		}
 		/**
-	 * INTERNAL Creates the Blurring Plane
-	 * @param {number} res The square resolution of this object's lightMap.
-	 * @param {WebGLRenderTexture} lightMap The lightmap to initialize the plane with.
-	 */
+   * INTERNAL Creates the Blurring Plane
+   * @param {number} res The square resolution of this object's lightMap.
+   * @param {WebGLRenderTexture} lightMap The lightmap to initialize the plane with.
+   */
 
 
 		_initializeBlurPlane( res, lightMap = null ) {
@@ -292,12 +292,12 @@
 
 				const bodyStart = shader.fragmentShader.indexOf( 'void main() {' );
 				shader.fragmentShader = '#define USE_UV\n' + shader.fragmentShader.slice( 0, bodyStart ) + '	uniform sampler2D previousShadowMap;\n	uniform float pixelOffset;\n' + shader.fragmentShader.slice( bodyStart - 1, - 1 ) + `	gl_FragColor.rgb = (
-									texture2D(previousShadowMap, vUv + vec2( pixelOffset,	0.0				)).rgb +
-									texture2D(previousShadowMap, vUv + vec2( 0.0				,	pixelOffset)).rgb +
-									texture2D(previousShadowMap, vUv + vec2( 0.0				, -pixelOffset)).rgb +
-									texture2D(previousShadowMap, vUv + vec2(-pixelOffset,	0.0				)).rgb +
-									texture2D(previousShadowMap, vUv + vec2( pixelOffset,	pixelOffset)).rgb +
-									texture2D(previousShadowMap, vUv + vec2(-pixelOffset,	pixelOffset)).rgb +
+									texture2D(previousShadowMap, vUv + vec2( pixelOffset,  0.0        )).rgb +
+									texture2D(previousShadowMap, vUv + vec2( 0.0        ,  pixelOffset)).rgb +
+									texture2D(previousShadowMap, vUv + vec2( 0.0        , -pixelOffset)).rgb +
+									texture2D(previousShadowMap, vUv + vec2(-pixelOffset,  0.0        )).rgb +
+									texture2D(previousShadowMap, vUv + vec2( pixelOffset,  pixelOffset)).rgb +
+									texture2D(previousShadowMap, vUv + vec2(-pixelOffset,  pixelOffset)).rgb +
 									texture2D(previousShadowMap, vUv + vec2( pixelOffset, -pixelOffset)).rgb +
 									texture2D(previousShadowMap, vUv + vec2(-pixelOffset, -pixelOffset)).rgb)/8.0;
 				}`; // Set the LightMap Accumulation Buffer

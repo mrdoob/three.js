@@ -17,8 +17,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -29,8 +29,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		#define saturate(a) clamp( a, 0.0, 1.0 )
 
@@ -59,9 +59,9 @@
 
 		// ODT_SAT => XYZ => D60_2_D65 => sRGB
 			const mat3 ACESOutputMat = mat3(
-				vec3(	1.60475, -0.10208, -0.00327 ), // transposed from source
-				vec3( -0.53108,	1.10813, -0.07276 ),
-				vec3( -0.07367, -0.00605,	1.07602 )
+				vec3(  1.60475, -0.10208, -0.00327 ), // transposed from source
+				vec3( -0.53108,  1.10813, -0.07276 ),
+				vec3( -0.07367, -0.00605,  1.07602 )
 			);
 
 			color = ACESInputMat * color;

@@ -28,8 +28,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec4 v_nearpos;
 		varying vec4 v_farpos;
@@ -61,8 +61,8 @@
 				gl_Position = projectionMatrix * viewMatrix * modelMatrix * position4;
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 				precision highp float;
 				precision mediump sampler3D;

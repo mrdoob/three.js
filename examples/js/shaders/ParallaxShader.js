@@ -1,11 +1,11 @@
 ( function () {
 
 	// Parallax Occlusion shaders from
-	//		http://sunandblackcat.com/tipFullView.php?topicid=28
+	//    http://sunandblackcat.com/tipFullView.php?topicid=28
 	// No tangent-space transforms logic based on
-	//	 http://mmikkelsen3d.blogspot.sk/2012/02/parallaxpoc-mapping-and-no-tangent.html
+	//   http://mmikkelsen3d.blogspot.sk/2012/02/parallaxpoc-mapping-and-no-tangent.html
 	const ParallaxShader = {
-	// Ordered from fastest to best quality.
+		// Ordered from fastest to best quality.
 		modes: {
 			none: 'NO_PARALLAX',
 			basic: 'USE_BASIC_PARALLAX',
@@ -32,8 +32,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 		varying vec3 vViewPosition;
@@ -49,8 +49,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform sampler2D bumpMap;
 		uniform sampler2D map;

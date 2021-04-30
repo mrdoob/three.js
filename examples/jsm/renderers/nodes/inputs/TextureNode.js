@@ -3,7 +3,7 @@ import UVNode from '../accessors/UVNode.js';
 
 class TextureNode extends InputNode {
 
-	constructor( value, uv = new UVNode() ) {
+	constructor( value = null, uv = new UVNode() ) {
 
 		super( 'texture' );
 

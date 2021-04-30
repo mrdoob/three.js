@@ -2,10 +2,10 @@
 
 	/**
  *	Simplification Geometry Modifier
- *		- based on code and technique
- *		- by Stan Melax in 1998
- *		- Progressive Mesh type Polygon Reduction Algorithm
- *		- http://www.melax.com/polychop/
+ *    - based on code and technique
+ *	  - by Stan Melax in 1998
+ *	  - Progressive Mesh type Polygon Reduction Algorithm
+ *    - http://www.melax.com/polychop/
  */
 
 	const _cb = new THREE.Vector3(),
@@ -217,7 +217,7 @@
 	function computeEdgeCostAtVertex( v ) {
 
 		// compute the edge collapse cost for all edges that start
-		// from vertex v.	Since we are only interested in reducing
+		// from vertex v.  Since we are only interested in reducing
 		// the object by selecting the min cost edge at each step, we
 		// only cache the cost of the least cost edge at this vertex
 		// (in member variable collapse) as well as the value of the

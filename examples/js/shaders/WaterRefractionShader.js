@@ -19,8 +19,8 @@
 			}
 		},
 		vertexShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform mat4 textureMatrix;
 
@@ -37,8 +37,8 @@
 
 		}`,
 		fragmentShader:
-	/* glsl */
-	`
+  /* glsl */
+  `
 
 		uniform vec3 color;
 		uniform float time;
