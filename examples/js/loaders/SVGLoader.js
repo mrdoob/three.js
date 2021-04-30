@@ -1873,7 +1873,7 @@
 				};
 
 			} );
-			simplePaths = simplePaths.filter( sp => sp.points.length > 0 ); // check if path is solid or a hole
+			simplePaths = simplePaths.filter( sp => sp.points.length > 1 ); // check if path is solid or a hole
 
 			const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData.style.fillRule ) );
 			const shapesToReturn = [];
