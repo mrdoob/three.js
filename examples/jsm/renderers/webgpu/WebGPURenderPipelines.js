@@ -61,9 +61,6 @@ class WebGPURenderPipelines {
 
 			}
 
-			stageVertex.usedTimes ++;
-			stageFragment.usedTimes ++;
-
 			// determine render pipeline
 
 			currentPipeline = this._acquirePipeline( stageVertex, stageFragment, object, nodeBuilder );
@@ -83,7 +80,10 @@ class WebGPURenderPipelines {
 			if ( materialPipelines.has( currentPipeline ) === false ) {
 
 				materialPipelines.add( currentPipeline );
+
 				currentPipeline.usedTimes ++;
+				stageVertex.usedTimes ++;
+				stageFragment.usedTimes ++;
 
 			}
 
