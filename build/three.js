@@ -4951,25 +4951,25 @@
 
 	let _object3DId = 0;
 
-	const _v1$4 = new /*@__PURE__*/Vector3();
+	const _v1$4 = /*@__PURE__*/new Vector3();
 
-	const _q1 = new /*@__PURE__*/Quaternion();
+	const _q1 = /*@__PURE__*/new Quaternion();
 
-	const _m1$1 = new /*@__PURE__*/Matrix4();
+	const _m1$1 = /*@__PURE__*/new Matrix4();
 
-	const _target = new /*@__PURE__*/Vector3();
+	const _target = /*@__PURE__*/new Vector3();
 
-	const _position$3 = new /*@__PURE__*/Vector3();
+	const _position$3 = /*@__PURE__*/new Vector3();
 
-	const _scale$2 = new /*@__PURE__*/Vector3();
+	const _scale$2 = /*@__PURE__*/new Vector3();
 
-	const _quaternion$2 = new /*@__PURE__*/Quaternion();
+	const _quaternion$2 = /*@__PURE__*/new Quaternion();
 
-	const _xAxis = new /*@__PURE__*/Vector3(1, 0, 0);
+	const _xAxis = /*@__PURE__*/new Vector3(1, 0, 0);
 
-	const _yAxis = new /*@__PURE__*/Vector3(0, 1, 0);
+	const _yAxis = /*@__PURE__*/new Vector3(0, 1, 0);
 
-	const _zAxis = new /*@__PURE__*/Vector3(0, 0, 1);
+	const _zAxis = /*@__PURE__*/new Vector3(0, 0, 1);
 
 	const _addedEvent = {
 		type: 'added'
@@ -7011,9 +7011,9 @@
 
 	MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
 
-	const _vector$9 = new /*@__PURE__*/Vector3();
+	const _vector$9 = /*@__PURE__*/new Vector3();
 
-	const _vector2 = new /*@__PURE__*/Vector2();
+	const _vector2 = /*@__PURE__*/new Vector2();
 
 	class BufferAttribute {
 		constructor(array, itemSize, normalized) {
@@ -7407,17 +7407,17 @@
 
 	let _id = 0;
 
-	const _m1 = new /*@__PURE__*/Matrix4();
+	const _m1 = /*@__PURE__*/new Matrix4();
 
-	const _obj = new /*@__PURE__*/Object3D();
+	const _obj = /*@__PURE__*/new Object3D();
 
-	const _offset = new /*@__PURE__*/Vector3();
+	const _offset = /*@__PURE__*/new Vector3();
 
-	const _box$1 = new /*@__PURE__*/Box3();
+	const _box$1 = /*@__PURE__*/new Box3();
 
-	const _boxMorphTargets = new /*@__PURE__*/Box3();
+	const _boxMorphTargets = /*@__PURE__*/new Box3();
 
-	const _vector$8 = new /*@__PURE__*/Vector3();
+	const _vector$8 = /*@__PURE__*/new Vector3();
 
 	class BufferGeometry extends EventDispatcher {
 		constructor() {
@@ -18822,7 +18822,7 @@
 
 	InterleavedBuffer.prototype.isInterleavedBuffer = true;
 
-	const _vector$6 = new /*@__PURE__*/Vector3();
+	const _vector$6 = /*@__PURE__*/new Vector3();
 
 	class InterleavedBufferAttribute {
 		constructor(interleavedBuffer, itemSize, offset, normalized) {
