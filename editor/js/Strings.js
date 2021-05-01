@@ -825,6 +825,16 @@ function Strings( config ) {
 			'sidebar/geometry/cylinder_geometry/heightsegments': '高度分段',
 			'sidebar/geometry/cylinder_geometry/openended': '开端',
 
+			'sidebar/geometry/extrude_geometry/curveSegments': '曲线段',
+			'sidebar/geometry/extrude_geometry/steps': '细分点数',
+			'sidebar/geometry/extrude_geometry/depth': '深度',
+			'sidebar/geometry/extrude_geometry/bevelEnabled': '启用斜角',
+			'sidebar/geometry/extrude_geometry/bevelThickness': '斜角厚度',
+			'sidebar/geometry/extrude_geometry/bevelSize': '斜角大小',
+			'sidebar/geometry/extrude_geometry/bevelOffset': '斜角偏移量',
+			'sidebar/geometry/extrude_geometry/bevelSegments': '斜角分段',
+			'sidebar/geometry/extrude_geometry/shape': '转换图形',
+
 			'sidebar/geometry/dodecahedron_geometry/radius': '半径',
 			'sidebar/geometry/dodecahedron_geometry/detail': '面片分段',
 
@@ -853,6 +863,9 @@ function Strings( config ) {
 			'sidebar/geometry/ring_geometry/phiSegments': '经度分段',
 			'sidebar/geometry/ring_geometry/thetastart': '弧度起点',
 			'sidebar/geometry/ring_geometry/thetalength': '弧度长度',
+
+			'sidebar/geometry/shape_geometry/curveSegments': '曲线段',
+			'sidebar/geometry/shape_geometry/extrude': '拉伸',
 
 			'sidebar/geometry/sphere_geometry/radius': '半径',
 			'sidebar/geometry/sphere_geometry/widthsegments': '宽度分段',
@@ -896,8 +909,10 @@ function Strings( config ) {
 			'sidebar/material/vertex': '顶点',
 			'sidebar/material/fragment': '片元',
 			'sidebar/material/color': '颜色',
+			'sidebar/material/depthPacking': 'Depth Packing',
 			'sidebar/material/roughness': '粗糙度',
 			'sidebar/material/metalness': '金属度',
+			'sidebar/material/sheen': '光泽',
 			'sidebar/material/emissive': '自发光',
 			'sidebar/material/specular': '高光',
 			'sidebar/material/shininess': '高光大小',
@@ -920,6 +935,7 @@ function Strings( config ) {
 			'sidebar/material/lightmap': '光照贴图',
 			'sidebar/material/aomap': '环境光遮蔽贴图',
 			'sidebar/material/emissivemap': '自发光贴图',
+			'sidebar/material/gradientmap': '渐变贴图',
 			'sidebar/material/side': '面',
 			'sidebar/material/side/front': '正面',
 			'sidebar/material/side/back': '背面',
