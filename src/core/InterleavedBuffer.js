@@ -16,9 +16,9 @@ class InterleavedBuffer {
 
 		this.uuid = MathUtils.generateUUID();
 
-		this.onUploadCallback = function () {};
-
 	}
+
+	onUploadCallback() {}
 
 	set needsUpdate( value ) {
 
