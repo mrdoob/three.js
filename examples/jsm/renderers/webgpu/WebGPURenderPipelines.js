@@ -29,13 +29,13 @@ class WebGPURenderPipelines {
 		const properties = this.properties;
 
 		const material = object.material;
-
 		const materialProperties = properties.get( material );
-		const objectProperties = properties.get( object );
 
-		let currentPipeline = objectProperties.currentPipeline;
+		const cache = this._getCache( object );
 
-		if ( this._needsUpdate( object ) ) {
+		let currentPipeline;
+
+		if ( this._needsUpdate( object, cache ) ) {
 
 			// get shader
 
@@ -64,7 +64,7 @@ class WebGPURenderPipelines {
 			// determine render pipeline
 
 			currentPipeline = this._acquirePipeline( stageVertex, stageFragment, object, nodeBuilder );
-			objectProperties.currentPipeline = currentPipeline;
+			cache.currentPipeline = currentPipeline;
 
 			// keep track of all pipelines which are used by a material
 
@@ -97,6 +97,10 @@ class WebGPURenderPipelines {
 				material.addEventListener( 'dispose', disposeCallback );
 
 			}
+
+		} else {
+
+			currentPipeline = cache.currentPipeline;
 
 		}
 
@@ -174,6 +178,21 @@ class WebGPURenderPipelines {
 
 	}
 
+	_getCache( object ) {
+
+		let cache = this.objectCache.get( object );
+
+		if ( cache === undefined ) {
+
+			cache = {};
+			this.objectCache.set( object, cache );
+
+		}
+
+		return cache;
+
+	}
+
 	_releasePipeline( pipeline ) {
 
 		if ( -- pipeline.usedTimes === 0 ) {
@@ -204,16 +223,7 @@ class WebGPURenderPipelines {
 
 	}
 
-	_needsUpdate( object ) {
-
-		let cache = this.objectCache.get( object );
-
-		if ( cache === undefined ) {
-
-			cache = {};
-			this.objectCache.set( object, cache );
-
-		}
+	_needsUpdate( object, cache ) {
 
 		const material = object.material;
 
