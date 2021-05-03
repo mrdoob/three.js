@@ -320,6 +320,7 @@ ${array.join( '' )}
 
 		}
 
+		parameters.push( `${pad}float inputs:opacity = ${material.opacity}` );
 		return `
     def Material "Material_${material.id}"
     {
