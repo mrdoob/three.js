@@ -4,7 +4,11 @@
 
 		async parse( scene ) {
 
+			const files = {};
+			const modelFileName = 'model.usda';
+			const geometryFileName = 'geometry.usd';
 			let output = buildHeader();
+			const geometries = {};
 			const materials = {};
 			const textures = {};
 			scene.traverse( object => {
@@ -13,23 +17,37 @@
 
 					const geometry = object.geometry;
 					const material = object.material;
-					materials[ material.uuid ] = material;
-					if ( material.map !== null ) textures[ material.map.uuid ] = material.map;
-					if ( material.normalMap !== null ) textures[ material.normalMap.uuid ] = material.normalMap;
-					if ( material.aoMap !== null ) textures[ material.aoMap.uuid ] = material.aoMap;
-					if ( material.roughnessMap !== null ) textures[ material.roughnessMap.uuid ] = material.roughnessMap;
-					if ( material.metalnessMap !== null ) textures[ material.metalnessMap.uuid ] = material.metalnessMap;
-					if ( material.emissiveMap !== null ) textures[ material.emissiveMap.uuid ] = material.emissiveMap;
-					output += buildXform( object, buildMesh( geometry, material ) );
+
+					if ( ! ( geometry.uuid in geometries ) ) {
+
+						geometries[ geometry.uuid ] = geometry;
+
+					}
+
+					if ( ! ( material.uuid in materials ) ) {
+
+						materials[ material.uuid ] = material;
+						if ( material.map !== null ) textures[ material.map.uuid ] = material.map;
+						if ( material.normalMap !== null ) textures[ material.normalMap.uuid ] = material.normalMap;
+						if ( material.aoMap !== null ) textures[ material.aoMap.uuid ] = material.aoMap;
+						if ( material.roughnessMap !== null ) textures[ material.roughnessMap.uuid ] = material.roughnessMap;
+						if ( material.metalnessMap !== null ) textures[ material.metalnessMap.uuid ] = material.metalnessMap;
+						if ( material.emissiveMap !== null ) textures[ material.emissiveMap.uuid ] = material.emissiveMap;
+
+					}
+
+					const referencedMesh = `prepend references = @./${geometryFileName}@</Geometry_${geometry.id}>`;
+					const referencedMaterial = `rel material:binding = </Materials/Material_${material.id}>`;
+					output += buildXform( object, referencedMesh, referencedMaterial );
 
 				}
 
 			} );
 			output += buildMaterials( materials );
 			output += buildTextures( textures );
-			const files = {
-				'model.usda': fflate.strToU8( output )
-			};
+			files[ modelFileName ] = fflate.strToU8( output );
+			output = null;
+			files[ geometryFileName ] = fflate.strToU8( buildMeshFileString( geometries ) );
 
 			for ( const uuid in textures ) {
 
@@ -109,16 +127,19 @@
 	} // Xform
 
 
-	function buildXform( object, define ) {
+	function buildXform( object, referencedMesh, referencedMaterial ) {
 
 		const name = 'Object_' + object.id;
 		const transform = buildMatrix( object.matrixWorld );
 		return `def Xform "${name}"
+(
+	${referencedMesh}
+)
 {
     matrix4d xformOp:transform = ${transform}
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
-    ${define}
+    ${referencedMaterial}
 }
 
 `;
@@ -139,7 +160,35 @@
 	} // Mesh
 
 
-	function buildMesh( geometry, material ) {
+	function buildMeshFileString( geometries ) {
+
+		let output = buildHeader();
+
+		for ( const uuid in geometries ) {
+
+			const geometry = geometries[ uuid ];
+			output += buildMeshObject( geometry );
+
+		}
+
+		return output;
+
+	}
+
+	function buildMeshObject( geometry ) {
+
+		const name = 'Geometry_' + geometry.id;
+		const mesh = buildMesh( geometry );
+		return `
+def "${name}"
+{
+	${mesh}
+}
+`;
+
+	}
+
+	function buildMesh( geometry ) {
 
 		const name = 'Geometry_' + geometry.id;
 		const attributes = geometry.attributes;
@@ -151,11 +200,11 @@
 
 		}
 
-		return `def Mesh "${name}"
+		return `
+	def Mesh "${name}"
     {
         int[] faceVertexCounts = [${buildMeshVertexCount( geometry )}]
         int[] faceVertexIndices = [${buildMeshVertexIndices( geometry )}]
-        rel material:binding = </Materials/Material_${material.id}>
         normal3f[] normals = [${buildVector3Array( attributes.normal, count )}] (
             interpolation = "vertex"
         )
