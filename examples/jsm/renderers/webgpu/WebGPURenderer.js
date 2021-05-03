@@ -14,7 +14,7 @@ import WebGPUNodes from './nodes/WebGPUNodes.js';
 
 import glslang from '../../libs/glslang.js';
 
-import { Frustum, Matrix4, Vector3, Color } from 'three';
+import { Frustum, Matrix4, Vector3, Color, LinearEncoding } from 'three';
 
 console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
 
@@ -75,6 +75,8 @@ class WebGPURenderer {
 		this.autoClearColor = true;
 		this.autoClearDepth = true;
 		this.autoClearStencil = true;
+
+		this.outputEncoding = LinearEncoding;
 
 		this.sortObjects = true;
 
@@ -463,6 +465,55 @@ class WebGPURenderer {
 
 	}
 
+	getCurrentEncoding() {
+
+		const renderTarget = this.getRenderTarget();
+		return ( renderTarget !== null ) ? renderTarget.texture.encoding : this.outputEncoding;
+
+	}
+
+	getCurrentColorFormat() {
+
+		let format;
+
+		const renderTarget = this.getRenderTarget();
+
+		if ( renderTarget !== null ) {
+
+			const renderTargetProperties = this._properties.get( renderTarget );
+			format = renderTargetProperties.colorTextureFormat;
+
+		} else {
+
+			format = GPUTextureFormat.BRGA8Unorm; // default swap chain format
+
+		}
+
+		return format;
+
+	}
+
+	getCurrentDepthStencilFormat() {
+
+		let format;
+
+		const renderTarget = this.getRenderTarget();
+
+		if ( renderTarget !== null ) {
+
+			const renderTargetProperties = this._properties.get( renderTarget );
+			format = renderTargetProperties.depthTextureFormat;
+
+		} else {
+
+			format = GPUTextureFormat.Depth24PlusStencil8;
+
+		}
+
+		return format;
+
+	}
+
 	getClearColor( target ) {
 
 		return target.copy( this._clearColor );
@@ -757,8 +808,8 @@ class WebGPURenderer {
 
 		// pipeline
 
-		const pipeline = this._renderPipelines.get( object );
-		passEncoder.setPipeline( pipeline );
+		const renderPipeline = this._renderPipelines.get( object );
+		passEncoder.setPipeline( renderPipeline.pipeline );
 
 		// bind group
 
@@ -780,7 +831,7 @@ class WebGPURenderer {
 
 		// vertex buffers
 
-		this._setupVertexBuffers( geometry.attributes, passEncoder, pipeline );
+		this._setupVertexBuffers( geometry.attributes, passEncoder, renderPipeline );
 
 		// draw
 
@@ -818,9 +869,9 @@ class WebGPURenderer {
 
 	}
 
-	_setupVertexBuffers( geometryAttributes, encoder, pipeline ) {
+	_setupVertexBuffers( geometryAttributes, encoder, renderPipeline ) {
 
-		const shaderAttributes = this._renderPipelines.getShaderAttributes( pipeline );
+		const shaderAttributes = renderPipeline.shaderAttributes;
 
 		for ( const shaderAttribute of shaderAttributes ) {
 

@@ -10,6 +10,7 @@
 	"webgl_geometry_colors_lookuptable": [ "vertex" ],
 	"webgl_geometry_nurbs": [ "curve", "surface" ],
 	"webgl_geometry_spline_editor": [ "curve" ],
+	"webgl_geometry_terrain": [ "fog" ],
 	"webgl_geometry_text": [ "font" ],
 	"webgl_geometry_text_shapes": [ "font" ],
 	"webgl_geometry_text_stroke": [ "font" ],
