@@ -6,11 +6,12 @@ class USDZExporter {
 
 		const files = {};
 		const modelFileName = 'model.usda';
-		const geometryFileName = 'geometry.usd';
+
+		// model file should be first in USDZ archive so we init it here
+		files[ modelFileName ] = null;
 
 		let output = buildHeader();
 
-		const geometries = {};
 		const materials = {};
 		const textures = {};
 
@@ -21,9 +22,12 @@ class USDZExporter {
 				const geometry = object.geometry;
 				const material = object.material;
 
-				if ( ! ( geometry.uuid in geometries ) ) {
+				const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
 
-					geometries[ geometry.uuid ] = geometry;
+				if ( ! ( geometryFileName in files ) ) {
+
+					const meshObject = buildMeshObject( geometry );
+					files[ geometryFileName ] = buildUSDFileAsString( meshObject );
 
 				}
 
@@ -39,7 +43,8 @@ class USDZExporter {
 
 				}
 
-				const referencedMesh = `prepend references = @./${geometryFileName}@</Geometry_${ geometry.id }>`;
+
+				const referencedMesh = `prepend references = @./${ geometryFileName }@</Geometry>`;
 				const referencedMaterial = `rel material:binding = </Materials/Material_${ material.id }>`;
 				output += buildXform( object, referencedMesh, referencedMaterial );
 
@@ -52,8 +57,6 @@ class USDZExporter {
 
 		files[ modelFileName ] = fflate.strToU8( output );
 		output = null;
-
-		files[ geometryFileName ] = fflate.strToU8( buildMeshFileString( geometries ) );
 
 		for ( const uuid in textures ) {
 
@@ -137,6 +140,14 @@ function buildHeader() {
 
 }
 
+function buildUSDFileAsString( dataToInsert ) {
+
+	let output = buildHeader();
+	output += dataToInsert;
+	return fflate.strToU8( output );
+
+}
+
 // Xform
 
 function buildXform( object, referencedMesh, referencedMaterial ) {
@@ -175,27 +186,11 @@ function buildMatrixRow( array, offset ) {
 
 // Mesh
 
-function buildMeshFileString( geometries ) {
-
-	let output = buildHeader();
-
-	for ( const uuid in geometries ) {
-
-		const geometry = geometries[ uuid ];
-		output += buildMeshObject( geometry );
-
-	}
-
-	return output;
-
-}
-
 function buildMeshObject( geometry ) {
 
-	const name = 'Geometry_' + geometry.id;
 	const mesh = buildMesh( geometry );
 	return `
-def "${name}"
+def "Geometry"
 {
 	${mesh}
 }
@@ -205,7 +200,7 @@ def "${name}"
 
 function buildMesh( geometry ) {
 
-	const name = 'Geometry_' + geometry.id;
+	const name = 'Geometry';
 	const attributes = geometry.attributes;
 	const count = attributes.position.count;
 
