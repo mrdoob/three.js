@@ -1264,15 +1264,13 @@ function WebGLRenderer( parameters ) {
 
 	function renderObjects( renderList, scene, camera ) {
 
-		const overrideMaterial = scene.isScene === true ? scene.overrideMaterial : null;
-
 		for ( let i = 0, l = renderList.length; i < l; i ++ ) {
 
 			const renderItem = renderList[ i ];
 
 			const object = renderItem.object;
 			const geometry = renderItem.geometry;
-			const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
+			const material = renderItem.material;
 			const group = renderItem.group;
 
 			if ( camera.isArrayCamera ) {
@@ -1308,6 +1306,12 @@ function WebGLRenderer( parameters ) {
 	function renderObject( object, scene, camera, geometry, material, group ) {
 
 		object.onBeforeRender( _this, scene, camera, geometry, material, group );
+
+		if ( scene.isScene === true && scene.overrideMaterial !== null ) {
+
+			material = scene.overrideMaterial;
+
+		}
 
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
