@@ -106,6 +106,7 @@ class Rhino3dmLoader extends Loader {
 
 		let worker;
 		let taskID;
+		let warnings =[];
 
 		const taskCost = buffer.byteLength;
 
@@ -117,7 +118,7 @@ class Rhino3dmLoader extends Loader {
 
 				return new Promise( ( resolve, reject ) => {
 
-					worker._callbacks[ taskID ] = { resolve, reject };
+					worker._callbacks[ taskID ] = { resolve, reject, warn: warning =>warnings.push(warning) };
 
 					worker.postMessage( { type: 'decode', id: taskID, buffer }, [ buffer ] );
 
@@ -126,7 +127,11 @@ class Rhino3dmLoader extends Loader {
 				} );
 
 			} )
-			.then( ( message ) => this._createGeometry( message.data ) ).catch( e => {
+			.then( ( message ) => {
+				const geometry = this._createGeometry( message.data, taskID );
+				geometry.warnings = warnings;
+				return geometry;
+			}).catch( e => {
 
 				throw e;
 
@@ -285,7 +290,7 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
-	_createGeometry( data ) {
+	_createGeometry( data, taskID ) {
 
 		// console.log(data);
 
@@ -299,7 +304,6 @@ class Rhino3dmLoader extends Loader {
 		object.userData[ 'settings' ] = data.settings;
 		object.userData[ 'objectType' ] = 'File3dm';
 		object.userData[ 'materials' ] = null;
-		object.warnings = data.warnings;
 		object.name = this.url;
 
 		let objects = data.objects;
@@ -333,12 +337,12 @@ class Rhino3dmLoader extends Loader {
 						const rMaterial = materials[ attributes.materialIndex ];
 						let material = this._createMaterial( rMaterial );
 						material = this._compareMaterials( material );
-						_object = this._createObject( obj, material, warning =>object.warnings.push( warning ) );
+						_object = this._createObject( obj, material, taskID );
 
 					} else {
 
 						const material = this._createMaterial( );
-						_object = this._createObject( obj, material, warning =>object.warnings.push( warning ) );
+						_object = this._createObject( obj, material, taskID );
 
 					}
 
@@ -427,7 +431,7 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
-	_createObject( obj, mat, onWarning ) {
+	_createObject( obj, mat, taskID ) {
 
 		const loader = new BufferGeometryLoader();
 
@@ -620,8 +624,7 @@ class Rhino3dmLoader extends Loader {
 
 				} else if ( geometry.isLinearLight ) {
 
-					console.warn( 'THREE.3DMLoader:  No conversion exists for linear lights.' );
-					onWarning( 'THREE.3DMLoader:  No conversion exists for linear lights.' );
+					self.postMessage( { type: 'warning', id: taskID, message: 'THREE.3DMLoader:  No conversion exists for linear lights.' } );
 
 					return;
 
@@ -714,6 +717,9 @@ class Rhino3dmLoader extends Loader {
 					const message = e.data;
 
 					switch ( message.type ) {
+						case 'warning':
+							worker._callbacks[ message.id ].warn( message );
+							break;
 
 						case 'decode':
 							worker._callbacks[ message.id ].resolve( message );
@@ -817,7 +823,7 @@ function Rhino3dmWorker() {
 
 					try {
 
-						const data = decodeObjects( rhino, buffer );
+						const data = decodeObjects( rhino, buffer, message.id );
 						self.postMessage( { type: 'decode', id: message.id, data } );
 
 					} catch ( error ) {
@@ -834,7 +840,7 @@ function Rhino3dmWorker() {
 
 	};
 
-	function decodeObjects( rhino, buffer ) {
+	function decodeObjects( rhino, buffer, taskID ) {
 
 		const arr = new Uint8Array( buffer );
 		const doc = rhino.File3dm.fromByteArray( arr );
@@ -845,7 +851,6 @@ function Rhino3dmWorker() {
 		const views = [];
 		const namedViews = [];
 		const groups = [];
-		const warnings = [];
 
 		//Handle objects
 
@@ -856,7 +861,7 @@ function Rhino3dmWorker() {
 
 			const _object = objs.get( i );
 
-			const object = extractObjectData( _object, doc, ( warning )=>warnings.push( warning ) );
+			const object = extractObjectData( _object, doc, taskID );
 
 			_object.delete();
 
@@ -940,11 +945,8 @@ function Rhino3dmWorker() {
 						texture.image = 'data:image/png;base64,' + image;
 
 					} else {
-
-						console.warn( `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.` );
-						warnings.push( `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.` );
+						self.postMessage( { type: 'warning', id: taskID, message:`THREE.3DMLoader: Image for ${textureType} texture not embedded in file.` } );
 						texture.image = null;
-
 					}
 
 					textures.push( texture );
@@ -1075,11 +1077,11 @@ function Rhino3dmWorker() {
 
 		doc.delete();
 
-		return { objects, materials, layers, views, namedViews, groups, settings, warnings };
+		return { objects, materials, layers, views, namedViews, groups, settings };
 
 	}
 
-	function extractObjectData( object, doc, onWarning ) {
+	function extractObjectData( object, doc, taskID ) {
 
 		const _geometry = object.geometry();
 		const _attributes = object.attributes();
@@ -1240,8 +1242,7 @@ function Rhino3dmWorker() {
 				*/
 
 			default:
-				console.warn( `THREE.3DMLoader: TODO: Implement ${objectType.constructor.name}` );
-				onWarning( `THREE.3DMLoader: TODO: Implement ${objectType.constructor.name}` );
+				self.postMessage( { type: 'warning', id: taskID, message:`THREE.3DMLoader: TODO: Implement ${objectType.constructor.name}` } );
 				break;
 
 		}
@@ -1277,10 +1278,7 @@ function Rhino3dmWorker() {
 			return { geometry, attributes, objectType };
 
 		} else {
-
-			console.warn( `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.` );
-			onWarning( `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.` );
-
+			self.postMessage( { type: 'warning', id: taskID, message:`THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.`  } );
 		}
 
 	}
