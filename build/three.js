@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 }(this, (function (exports) { 'use strict';
 
-	const REVISION = '128';
+	const REVISION = '129dev';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -7032,9 +7032,9 @@
 				count: -1
 			};
 			this.version = 0;
-
-			this.onUploadCallback = function () {};
 		}
+
+		onUploadCallback() {}
 
 		set needsUpdate(value) {
 			if (value === true) this.version++;
@@ -18734,9 +18734,9 @@
 			};
 			this.version = 0;
 			this.uuid = generateUUID();
-
-			this.onUploadCallback = function () {};
 		}
+
+		onUploadCallback() {}
 
 		set needsUpdate(value) {
 			if (value === true) this.version++;
