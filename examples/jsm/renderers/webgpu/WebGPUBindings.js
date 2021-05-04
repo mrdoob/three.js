@@ -30,9 +30,9 @@ class WebGPUBindings {
 
 			// setup (static) binding layout and (dynamic) binding group
 
-			const renderPipelines = this.renderPipelines.get( object );
+			const renderPipeline = this.renderPipelines.get( object );
 
-			const bindLayout = renderPipelines.pipeline.getBindGroupLayout( 0 );
+			const bindLayout = renderPipeline.pipeline.getBindGroupLayout( 0 );
 			const bindGroup = this._createBindGroup( bindings, bindLayout );
 
 			data = {
@@ -55,9 +55,13 @@ class WebGPUBindings {
 
 		if ( data === undefined ) {
 
-			const pipeline = this.computePipelines.get( param );
+			// bindings are not yet retrieved via node material
+
 			const bindings = param.bindings !== undefined ? param.bindings.slice() : [];
-			const bindLayout = pipeline.getBindGroupLayout( 0 );
+
+			const computePipeline = this.computePipelines.get( param );
+
+			const bindLayout = computePipeline.getBindGroupLayout( 0 );
 			const bindGroup = this._createBindGroup( bindings, bindLayout );
 
 			data = {
