@@ -23,15 +23,14 @@ class WebGPUBindings {
 
 		if ( data === undefined ) {
 
-			const renderPipelines = this.renderPipelines.get( object );
-
-			// each material defines an array of bindings (ubos, textures, samplers etc.)
+			// each object defines an array of bindings (ubos, textures, samplers etc.)
 
 			const nodeBuilder = this.nodes.get( object );
-
 			const bindings = nodeBuilder.getBindings();
 
 			// setup (static) binding layout and (dynamic) binding group
+
+			const renderPipelines = this.renderPipelines.get( object );
 
 			const bindLayout = renderPipelines.pipeline.getBindGroupLayout( 0 );
 			const bindGroup = this._createBindGroup( bindings, bindLayout );
