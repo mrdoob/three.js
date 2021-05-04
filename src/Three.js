@@ -90,7 +90,7 @@ export { Uniform } from './core/Uniform.js';
 export { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 export { BufferGeometry } from './core/BufferGeometry.js';
 export { InterleavedBufferAttribute } from './core/InterleavedBufferAttribute.js';
-export { InstancedInterleavedBuffer } from './core/InstancedInterleavedBuffer.js';
+export { InstancedInterleavedBufferAttribute } from './core/InstancedInterleavedBufferAttribute.js';
 export { InterleavedBuffer } from './core/InterleavedBuffer.js';
 export { InstancedBufferAttribute } from './core/InstancedBufferAttribute.js';
 export { GLBufferAttribute } from './core/GLBufferAttribute.js';

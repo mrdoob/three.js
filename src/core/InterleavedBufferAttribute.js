@@ -5,27 +5,18 @@ const _vector = /*@__PURE__*/ new Vector3();
 
 class InterleavedBufferAttribute {
 
-	constructor( interleavedBuffer, itemSize, offset, normalized ) {
+	constructor( buffer, itemSize, type, normalized, stride, offset, count ) {
 
 		this.name = '';
 
-		this.data = interleavedBuffer;
+		this.data = buffer;
+		this.array = new type( buffer.array.buffer, offset );
 		this.itemSize = itemSize;
-		this.offset = offset;
-
+		this.type = type;
 		this.normalized = normalized === true;
-
-	}
-
-	get count() {
-
-		return this.data.count;
-
-	}
-
-	get array() {
-
-		return this.data.array;
+		this.stride = stride;
+		this.offset = offset;
+		this.count = count;
 
 	}
 
@@ -37,7 +28,7 @@ class InterleavedBufferAttribute {
 
 	applyMatrix4( m ) {
 
-		for ( let i = 0, l = this.data.count; i < l; i ++ ) {
+		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
 			_vector.x = this.getX( i );
 			_vector.y = this.getY( i );
@@ -91,7 +82,9 @@ class InterleavedBufferAttribute {
 
 	setX( index, x ) {
 
-		this.data.array[ index * this.data.stride + this.offset ] = x;
+		// Note: Assuming stride is multiple of type.BYTES_PER_ELEMENT
+
+		this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT ] = x;
 
 		return this;
 
@@ -99,7 +92,7 @@ class InterleavedBufferAttribute {
 
 	setY( index, y ) {
 
-		this.data.array[ index * this.data.stride + this.offset + 1 ] = y;
+		this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT + 1 ] = y;
 
 		return this;
 
@@ -107,7 +100,7 @@ class InterleavedBufferAttribute {
 
 	setZ( index, z ) {
 
-		this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
+		this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT + 2 ] = z;
 
 		return this;
 
@@ -115,7 +108,7 @@ class InterleavedBufferAttribute {
 
 	setW( index, w ) {
 
-		this.data.array[ index * this.data.stride + this.offset + 3 ] = w;
+		this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT + 3 ] = w;
 
 		return this;
 
@@ -123,34 +116,34 @@ class InterleavedBufferAttribute {
 
 	getX( index ) {
 
-		return this.data.array[ index * this.data.stride + this.offset ];
+		return this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT ];
 
 	}
 
 	getY( index ) {
 
-		return this.data.array[ index * this.data.stride + this.offset + 1 ];
+		return this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT + 1 ];
 
 	}
 
 	getZ( index ) {
 
-		return this.data.array[ index * this.data.stride + this.offset + 2 ];
+		return this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT + 2 ];
 
 	}
 
 	getW( index ) {
 
-		return this.data.array[ index * this.data.stride + this.offset + 3 ];
+		return this.array[ index * this.stride / this.type.BYTES_PER_ELEMENT + 3 ];
 
 	}
 
 	setXY( index, x, y ) {
 
-		index = index * this.data.stride + this.offset;
+		index = index * this.stride / this.type.BYTES_PER_ELEMENT;
 
-		this.data.array[ index + 0 ] = x;
-		this.data.array[ index + 1 ] = y;
+		this.array[ index + 0 ] = x;
+		this.array[ index + 1 ] = y;
 
 		return this;
 
@@ -158,11 +151,11 @@ class InterleavedBufferAttribute {
 
 	setXYZ( index, x, y, z ) {
 
-		index = index * this.data.stride + this.offset;
+		index = index * this.stride / this.type.BYTES_PER_ELEMENT;
 
-		this.data.array[ index + 0 ] = x;
-		this.data.array[ index + 1 ] = y;
-		this.data.array[ index + 2 ] = z;
+		this.array[ index + 0 ] = x;
+		this.array[ index + 1 ] = y;
+		this.array[ index + 2 ] = z;
 
 		return this;
 
@@ -170,12 +163,28 @@ class InterleavedBufferAttribute {
 
 	setXYZW( index, x, y, z, w ) {
 
-		index = index * this.data.stride + this.offset;
+		index = index * this.stride / this.type.BYTES_PER_ELEMENT;
 
-		this.data.array[ index + 0 ] = x;
-		this.data.array[ index + 1 ] = y;
-		this.data.array[ index + 2 ] = z;
-		this.data.array[ index + 3 ] = w;
+		this.array[ index + 0 ] = x;
+		this.array[ index + 1 ] = y;
+		this.array[ index + 2 ] = z;
+		this.array[ index + 3 ] = w;
+
+		return this;
+
+	}
+
+	copy( source ) {
+
+		this.name = source.name;
+		this.data = source.data;
+		this.array = new source.type( source.data.array.buffer );
+		this.itemSize = source.itemSize;
+		this.type = source.type;
+		this.normalized = source.normalized;
+		this.stride = source.stride;
+		this.offset = source.offset;
+		this.count = source.count;
 
 		return this;
 
@@ -191,33 +200,41 @@ class InterleavedBufferAttribute {
 
 			for ( let i = 0; i < this.count; i ++ ) {
 
-				const index = i * this.data.stride + this.offset;
+				const index = i * this.stride / this.type.BYTES_PER_ELEMENT;
 
 				for ( let j = 0; j < this.itemSize; j ++ ) {
 
-					array.push( this.data.array[ index + j ] );
+					array.push( this.array[ index + j ] );
 
 				}
 
 			}
 
-			return new BufferAttribute( new this.array.constructor( array ), this.itemSize, this.normalized );
+			return new BufferAttribute( new this.type( array ), this.itemSize, this.normalized );
 
 		} else {
 
-			if ( data.interleavedBuffers === undefined ) {
+			if ( data.buffers === undefined ) {
 
-				data.interleavedBuffers = {};
-
-			}
-
-			if ( data.interleavedBuffers[ this.data.uuid ] === undefined ) {
-
-				data.interleavedBuffers[ this.data.uuid ] = this.data.clone( data );
+				data.buffers = {};
 
 			}
 
-			return new InterleavedBufferAttribute( data.interleavedBuffers[ this.data.uuid ], this.itemSize, this.offset, this.normalized );
+			if ( data.buffers[ this.data.uuid ] === undefined ) {
+
+				data.buffers[ this.data.uuid ] = this.data.clone( data );
+
+			}
+
+			return new InterleavedBufferAttribute(
+				data.buffers[ this.data.uuid ],
+				this.itemSize,
+				this.type,
+				this.normalized,
+				this.stride,
+				this.offset,
+				this.count
+			);
 
 		}
 
@@ -233,11 +250,11 @@ class InterleavedBufferAttribute {
 
 			for ( let i = 0; i < this.count; i ++ ) {
 
-				const index = i * this.data.stride + this.offset;
+				const index = i * this.stride / this.type.BYTES_PER_ELEMENT;
 
 				for ( let j = 0; j < this.itemSize; j ++ ) {
 
-					array.push( this.data.array[ index + j ] );
+					array.push( this.array[ index + j ] );
 
 				}
 
@@ -247,7 +264,7 @@ class InterleavedBufferAttribute {
 
 			return {
 				itemSize: this.itemSize,
-				type: this.array.constructor.name,
+				type: this.type.name,
 				array: array,
 				normalized: this.normalized
 			};
@@ -256,15 +273,15 @@ class InterleavedBufferAttribute {
 
 			// save as true interlaved attribtue
 
-			if ( data.interleavedBuffers === undefined ) {
+			if ( data.buffers === undefined ) {
 
-				data.interleavedBuffers = {};
+				data.buffers = {};
 
 			}
 
-			if ( data.interleavedBuffers[ this.data.uuid ] === undefined ) {
+			if ( data.buffers[ this.data.uuid ] === undefined ) {
 
-				data.interleavedBuffers[ this.data.uuid ] = this.data.toJSON( data );
+				data.buffers[ this.data.uuid ] = this.data.toJSON( data );
 
 			}
 
@@ -273,7 +290,10 @@ class InterleavedBufferAttribute {
 				itemSize: this.itemSize,
 				data: this.data.uuid,
 				offset: this.offset,
-				normalized: this.normalized
+				normalized: this.normalized,
+				type: this.type.name,
+				stride: this.stride,
+				count: this.count
 			};
 
 		}
@@ -283,6 +303,5 @@ class InterleavedBufferAttribute {
 }
 
 InterleavedBufferAttribute.prototype.isInterleavedBufferAttribute = true;
-
 
 export { InterleavedBufferAttribute };

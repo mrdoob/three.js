@@ -4,6 +4,62 @@ function WebGLAttributes( gl, capabilities ) {
 
 	const buffers = new WeakMap();
 
+	function getGLType( attribute, array ) {
+
+		if ( array instanceof Float32Array ) {
+
+			return gl.FLOAT;
+
+		} else if ( array instanceof Float64Array ) {
+
+			console.warn( 'THREE.WebGLAttributes: Unsupported data buffer format: Float64Array.' );
+
+		} else if ( array instanceof Uint16Array ) {
+
+			if ( attribute.isFloat16BufferAttribute ) {
+
+				if ( isWebGL2 ) {
+
+					return gl.HALF_FLOAT;
+
+				} else {
+
+					console.warn( 'THREE.WebGLAttributes: Usage of Float16BufferAttribute requires WebGL2.' );
+
+				}
+
+			} else {
+
+				return gl.UNSIGNED_SHORT;
+
+			}
+
+		} else if ( array instanceof Int16Array ) {
+
+			return gl.SHORT;
+
+		} else if ( array instanceof Uint32Array ) {
+
+			return gl.UNSIGNED_INT;
+
+		} else if ( array instanceof Int32Array ) {
+
+			return gl.INT;
+
+		} else if ( array instanceof Int8Array ) {
+
+			return gl.BYTE;
+
+		} else if ( array instanceof Uint8Array ) {
+
+			return gl.UNSIGNED_BYTE;
+
+		}
+
+		return gl.FLOAT;
+
+	}
+
 	function createBuffer( attribute, bufferType ) {
 
 		const array = attribute.array;
@@ -16,61 +72,9 @@ function WebGLAttributes( gl, capabilities ) {
 
 		attribute.onUploadCallback();
 
-		let type = gl.FLOAT;
-
-		if ( array instanceof Float32Array ) {
-
-			type = gl.FLOAT;
-
-		} else if ( array instanceof Float64Array ) {
-
-			console.warn( 'THREE.WebGLAttributes: Unsupported data buffer format: Float64Array.' );
-
-		} else if ( array instanceof Uint16Array ) {
-
-			if ( attribute.isFloat16BufferAttribute ) {
-
-				if ( isWebGL2 ) {
-
-					type = gl.HALF_FLOAT;
-
-				} else {
-
-					console.warn( 'THREE.WebGLAttributes: Usage of Float16BufferAttribute requires WebGL2.' );
-
-				}
-
-			} else {
-
-				type = gl.UNSIGNED_SHORT;
-
-			}
-
-		} else if ( array instanceof Int16Array ) {
-
-			type = gl.SHORT;
-
-		} else if ( array instanceof Uint32Array ) {
-
-			type = gl.UNSIGNED_INT;
-
-		} else if ( array instanceof Int32Array ) {
-
-			type = gl.INT;
-
-		} else if ( array instanceof Int8Array ) {
-
-			type = gl.BYTE;
-
-		} else if ( array instanceof Uint8Array ) {
-
-			type = gl.UNSIGNED_BYTE;
-
-		}
-
 		return {
 			buffer: buffer,
-			type: type,
+			type: getGLType( attribute, array ),
 			bytesPerElement: array.BYTES_PER_ELEMENT,
 			version: attribute.version
 		};
@@ -114,23 +118,33 @@ function WebGLAttributes( gl, capabilities ) {
 
 	function get( attribute ) {
 
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
-
 		return buffers.get( attribute );
 
 	}
 
 	function remove( attribute ) {
 
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+		if ( ! buffers.has( attribute ) ) return;
 
 		const data = buffers.get( attribute );
 
-		if ( data ) {
+		buffers.delete( attribute );
+
+		if ( attribute.isInterleavedBufferAttribute ) {
+
+			data.data.count --;
+
+			if ( data.data.count === 0 ) {
+
+				buffers.delete( attribute.data );
+
+				gl.deleteBuffer( data.buffer );
+
+			}
+
+		} else {
 
 			gl.deleteBuffer( data.buffer );
-
-			buffers.delete( attribute );
 
 		}
 
@@ -157,19 +171,36 @@ function WebGLAttributes( gl, capabilities ) {
 
 		}
 
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+		const attributeData = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
 
-		const data = buffers.get( attribute );
+		let data = buffers.get( attributeData );
 
 		if ( data === undefined ) {
 
-			buffers.set( attribute, createBuffer( attribute, bufferType ) );
+			data = createBuffer( attributeData, bufferType );
 
-		} else if ( data.version < attribute.version ) {
+			buffers.set( attributeData, data );
 
-			updateBuffer( data.buffer, attribute, bufferType );
+		} else if ( data.version < attributeData.version ) {
 
-			data.version = attribute.version;
+			updateBuffer( data.buffer, attributeData, bufferType );
+
+			data.version = attributeData.version;
+
+		}
+
+		// For InterleavedBufferAttribute
+		if ( ! buffers.has( attribute ) ) {
+
+			// reference count for shared interleaved buffer
+			data.count = ( data.count || 0 ) + 1;
+
+			buffers.set( attribute, {
+				buffer: data.buffer,
+				data: data,
+				type: getGLType( attribute, attribute.array ),
+				bytesPerElement: attribute.array.BYTES_PER_ELEMENT,
+			} );
 
 		}
 

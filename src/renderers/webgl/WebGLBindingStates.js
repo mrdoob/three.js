@@ -328,9 +328,6 @@
 
 				if ( geometryAttribute !== undefined ) {
 
-					const normalized = geometryAttribute.normalized;
-					const size = geometryAttribute.itemSize;
-
 					const attribute = attributes.get( geometryAttribute );
 
 					// TODO Attribute may not be available on context restore
@@ -339,55 +336,29 @@
 
 					const buffer = attribute.buffer;
 					const type = attribute.type;
-					const bytesPerElement = attribute.bytesPerElement;
+					const size = geometryAttribute.itemSize;
+					const normalized = geometryAttribute.normalized;
+					const stride = geometryAttribute.isInterleavedBufferAttribute ? geometryAttribute.stride : 0;
+					const offset = geometryAttribute.isInterleavedBufferAttribute ? geometryAttribute.offset : 0;
 
-					if ( geometryAttribute.isInterleavedBufferAttribute ) {
+					if ( geometryAttribute.isInstancedBufferAttribute || geometryAttribute.isInstancedInterleavedBufferAttribute ) {
 
-						const data = geometryAttribute.data;
-						const stride = data.stride;
-						const offset = geometryAttribute.offset;
+						enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
 
-						if ( data && data.isInstancedInterleavedBuffer ) {
+						if ( geometry._maxInstanceCount === undefined ) {
 
-							enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
-
-							if ( geometry._maxInstanceCount === undefined ) {
-
-								geometry._maxInstanceCount = data.meshPerAttribute * data.count;
-
-							}
-
-						} else {
-
-							enableAttribute( programAttribute );
+							geometry._maxInstanceCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
 
 						}
-
-						gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-						vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
 
 					} else {
 
-						if ( geometryAttribute.isInstancedBufferAttribute ) {
-
-							enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
-
-							if ( geometry._maxInstanceCount === undefined ) {
-
-								geometry._maxInstanceCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
-
-							}
-
-						} else {
-
-							enableAttribute( programAttribute );
-
-						}
-
-						gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-						vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
+						enableAttribute( programAttribute );
 
 					}
+
+					gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
+					vertexAttribPointer( programAttribute, size, type, normalized, stride, offset );
 
 				} else if ( name === 'instanceMatrix' ) {
 

@@ -316,7 +316,7 @@ class BufferGeometryUtils {
 		}
 
 		// Create the set of buffer attributes
-		const interleavedBuffer = new InterleavedBuffer( new TypedArray( arrayLength ), stride );
+		const interleavedBuffer = new InterleavedBuffer( new TypedArray( arrayLength ) );
 		let offset = 0;
 		const res = [];
 		const getters = [ 'getX', 'getY', 'getZ', 'getW' ];
@@ -327,7 +327,7 @@ class BufferGeometryUtils {
 			const attribute = attributes[ j ];
 			const itemSize = attribute.itemSize;
 			const count = attribute.count;
-			const iba = new InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, attribute.normalized );
+			const iba = new InterleavedBufferAttribute( interleavedBuffer, itemSize, TypedArray, attribute.normalized, stride * TypedArray.BYTES_PER_ELEMENT, offset * TypedArray.BYTES_PER_ELEMENT, attribute.normalized, count );
 			res.push( iba );
 
 			offset += itemSize;
