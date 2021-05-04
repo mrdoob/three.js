@@ -18,7 +18,7 @@ class WebGPUComputePipelines {
 
 		let pipeline = this.pipelines.get( param );
 
-		// @TODO: Reuse compute pipeline if possible
+		// @TODO: Reuse compute pipeline if possible, introduce WebGPUComputePipeline
 
 		if ( pipeline === undefined ) {
 
