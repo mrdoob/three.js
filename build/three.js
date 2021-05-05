@@ -18769,7 +18769,7 @@
 			}
 
 			const array = new this.array.constructor(data.arrayBuffers[this.array.buffer._uuid]);
-			const ib = new InterleavedBuffer(array, this.stride);
+			const ib = new this.constructor(array, this.stride);
 			ib.setUsage(this.usage);
 			return ib;
 		}
