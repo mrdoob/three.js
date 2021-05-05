@@ -221,7 +221,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
 
-			skinning: material.skinning && maxBones > 0,
+			skinning: object.isSkinnedMesh === true && maxBones > 0,
 			maxBones: maxBones,
 			useVertexTexture: floatVertexTextures,
 

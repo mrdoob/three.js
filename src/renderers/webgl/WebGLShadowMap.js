@@ -228,9 +228,9 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 	}
 
-	function getDepthMaterialVariant( useMorphing, useSkinning, useInstancing ) {
+	function getDepthMaterialVariant( useMorphing ) {
 
-		const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
+		const index = useMorphing << 0;
 
 		let material = _depthMaterials[ index ];
 
@@ -240,8 +240,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 				depthPacking: RGBADepthPacking,
 
-				morphTargets: useMorphing,
-				skinning: useSkinning
+				morphTargets: useMorphing
 
 			} );
 
@@ -253,9 +252,9 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 	}
 
-	function getDistanceMaterialVariant( useMorphing, useSkinning, useInstancing ) {
+	function getDistanceMaterialVariant( useMorphing ) {
 
-		const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
+		const index = useMorphing << 0;
 
 		let material = _distanceMaterials[ index ];
 
@@ -263,8 +262,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			material = new MeshDistanceMaterial( {
 
-				morphTargets: useMorphing,
-				skinning: useSkinning
+				morphTargets: useMorphing
 
 			} );
 
@@ -300,25 +298,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			}
 
-			let useSkinning = false;
-
-			if ( object.isSkinnedMesh === true ) {
-
-				if ( material.skinning === true ) {
-
-					useSkinning = true;
-
-				} else {
-
-					console.warn( 'THREE.WebGLShadowMap: THREE.SkinnedMesh with material.skinning set to false:', object );
-
-				}
-
-			}
-
-			const useInstancing = object.isInstancedMesh === true;
-
-			result = getMaterialVariant( useMorphing, useSkinning, useInstancing );
+			result = getMaterialVariant( useMorphing );
 
 		} else {
 

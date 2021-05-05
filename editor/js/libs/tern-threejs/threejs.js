@@ -2161,10 +2161,6 @@
           "!type": "boolean",
           "!doc": "This setting might not have any effect when used with certain renderers."
         },
-        "skinning": {
-          "!type": "bool",
-          "!doc": "Define whether the material uses skinning. Default is false."
-        },
         "morphTargets": {
           "!type": "bool",
           "!doc": "Define whether the material uses morphTargets. Default is false."
@@ -2299,10 +2295,6 @@
         "vertexColors": {
           "!type": "boolean",
           "!doc": "This setting might not have any effect when used with certain renderers."
-        },
-        "skinning": {
-          "!type": "bool",
-          "!doc": "Define whether the material uses skinning. Default is *false*."
         },
         "morphTargets": {
           "!type": "bool",
@@ -2444,10 +2436,6 @@
           "!type": "bool",
           "!doc": "This setting might not have any effect when used with certain renderers."
         },
-        "skinning": {
-          "!type": "bool",
-          "!doc": "Define whether the material uses skinning. Default is *false*."
-        },
         "morphTargets": {
           "!type": "bool",
           "!doc": "Define whether the material uses morphTargets. Default is *false*."
@@ -2550,10 +2538,6 @@
         "vertexColors": {
           "!type": "bool",
           "!doc": "Define how the vertices are colored, by defining how the *colors* attribute gets populated. Default is false."
-        },
-        "skinning": {
-          "!type": "bool",
-          "!doc": "Define whether the material uses skinning; true to pass skinning attributes to the shader. Default is false."
         },
         "morphTargets": {
           "!type": "bool",

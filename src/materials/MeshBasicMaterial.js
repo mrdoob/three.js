@@ -29,7 +29,6 @@ import { Color } from '../math/Color.js';
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>
  * }
  */
@@ -66,7 +65,6 @@ class MeshBasicMaterial extends Material {
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
-		this.skinning = false;
 		this.morphTargets = false;
 
 		this.setValues( parameters );
@@ -101,7 +99,6 @@ class MeshBasicMaterial extends Material {
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
-		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 
 		return this;

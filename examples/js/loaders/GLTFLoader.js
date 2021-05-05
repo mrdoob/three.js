@@ -2418,7 +2418,6 @@
 			const useVertexTangents = geometry.attributes.tangent !== undefined;
 			const useVertexColors = geometry.attributes.color !== undefined;
 			const useFlatShading = geometry.attributes.normal === undefined;
-			const useSkinning = mesh.isSkinnedMesh === true;
 			const useMorphTargets = Object.keys( geometry.morphAttributes ).length > 0;
 			const useMorphNormals = useMorphTargets && geometry.morphAttributes.normal !== undefined;
 
@@ -2460,11 +2459,10 @@
 			} // Clone the material if it will be modified
 
 
-			if ( useVertexTangents || useVertexColors || useFlatShading || useSkinning || useMorphTargets ) {
+			if ( useVertexTangents || useVertexColors || useFlatShading || useMorphTargets ) {
 
 				let cacheKey = 'ClonedMaterial:' + material.uuid + ':';
 				if ( material.isGLTFSpecularGlossinessMaterial ) cacheKey += 'specular-glossiness:';
-				if ( useSkinning ) cacheKey += 'skinning:';
 				if ( useVertexTangents ) cacheKey += 'vertex-tangents:';
 				if ( useVertexColors ) cacheKey += 'vertex-colors:';
 				if ( useFlatShading ) cacheKey += 'flat-shading:';
@@ -2475,7 +2473,6 @@
 				if ( ! cachedMaterial ) {
 
 					cachedMaterial = material.clone();
-					if ( useSkinning ) cachedMaterial.skinning = true;
 					if ( useVertexColors ) cachedMaterial.vertexColors = true;
 					if ( useFlatShading ) cachedMaterial.flatShading = true;
 					if ( useMorphTargets ) cachedMaterial.morphTargets = true;
