@@ -4,6 +4,10 @@
 
 		async parse( scene ) {
 
+			const files = {};
+			const modelFileName = 'model.usda'; // model file should be first in USDZ archive so we init it here
+
+			files[ modelFileName ] = null;
 			let output = buildHeader();
 			const materials = {};
 			const textures = {};
@@ -13,23 +17,38 @@
 
 					const geometry = object.geometry;
 					const material = object.material;
-					materials[ material.uuid ] = material;
-					if ( material.map !== null ) textures[ material.map.uuid ] = material.map;
-					if ( material.normalMap !== null ) textures[ material.normalMap.uuid ] = material.normalMap;
-					if ( material.aoMap !== null ) textures[ material.aoMap.uuid ] = material.aoMap;
-					if ( material.roughnessMap !== null ) textures[ material.roughnessMap.uuid ] = material.roughnessMap;
-					if ( material.metalnessMap !== null ) textures[ material.metalnessMap.uuid ] = material.metalnessMap;
-					if ( material.emissiveMap !== null ) textures[ material.emissiveMap.uuid ] = material.emissiveMap;
-					output += buildXform( object, buildMesh( geometry, material ) );
+					const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
+
+					if ( ! ( geometryFileName in files ) ) {
+
+						const meshObject = buildMeshObject( geometry );
+						files[ geometryFileName ] = buildUSDFileAsString( meshObject );
+
+					}
+
+					if ( ! ( material.uuid in materials ) ) {
+
+						materials[ material.uuid ] = material;
+						if ( material.map !== null ) textures[ material.map.uuid ] = material.map;
+						if ( material.normalMap !== null ) textures[ material.normalMap.uuid ] = material.normalMap;
+						if ( material.aoMap !== null ) textures[ material.aoMap.uuid ] = material.aoMap;
+						if ( material.roughnessMap !== null ) textures[ material.roughnessMap.uuid ] = material.roughnessMap;
+						if ( material.metalnessMap !== null ) textures[ material.metalnessMap.uuid ] = material.metalnessMap;
+						if ( material.emissiveMap !== null ) textures[ material.emissiveMap.uuid ] = material.emissiveMap;
+
+					}
+
+					const referencedMesh = `prepend references = @./${geometryFileName}@</Geometry>`;
+					const referencedMaterial = `rel material:binding = </Materials/Material_${material.id}>`;
+					output += buildXform( object, referencedMesh, referencedMaterial );
 
 				}
 
 			} );
 			output += buildMaterials( materials );
 			output += buildTextures( textures );
-			const files = {
-				'model.usda': fflate.strToU8( output )
-			};
+			files[ modelFileName ] = fflate.strToU8( output );
+			output = null;
 
 			for ( const uuid in textures ) {
 
@@ -106,19 +125,30 @@
 
 `;
 
+	}
+
+	function buildUSDFileAsString( dataToInsert ) {
+
+		let output = buildHeader();
+		output += dataToInsert;
+		return fflate.strToU8( output );
+
 	} // Xform
 
 
-	function buildXform( object, define ) {
+	function buildXform( object, referencedMesh, referencedMaterial ) {
 
 		const name = 'Object_' + object.id;
 		const transform = buildMatrix( object.matrixWorld );
 		return `def Xform "${name}"
+(
+	${referencedMesh}
+)
 {
     matrix4d xformOp:transform = ${transform}
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
-    ${define}
+    ${referencedMaterial}
 }
 
 `;
@@ -139,9 +169,21 @@
 	} // Mesh
 
 
-	function buildMesh( geometry, material ) {
+	function buildMeshObject( geometry ) {
 
-		const name = 'Geometry_' + geometry.id;
+		const mesh = buildMesh( geometry );
+		return `
+def "Geometry"
+{
+	${mesh}
+}
+`;
+
+	}
+
+	function buildMesh( geometry ) {
+
+		const name = 'Geometry';
 		const attributes = geometry.attributes;
 		const count = attributes.position.count;
 
@@ -151,11 +193,11 @@
 
 		}
 
-		return `def Mesh "${name}"
+		return `
+	def Mesh "${name}"
     {
         int[] faceVertexCounts = [${buildMeshVertexCount( geometry )}]
         int[] faceVertexIndices = [${buildMeshVertexIndices( geometry )}]
-        rel material:binding = </Materials/Material_${material.id}>
         normal3f[] normals = [${buildVector3Array( attributes.normal, count )}] (
             interpolation = "vertex"
         )
@@ -320,6 +362,7 @@ ${array.join( '' )}
 
 		}
 
+		parameters.push( `${pad}float inputs:opacity = ${material.opacity}` );
 		return `
     def Material "Material_${material.id}"
     {
