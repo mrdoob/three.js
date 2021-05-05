@@ -8233,7 +8233,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( this.morphTargets === true ) data.morphTargets = true;
 		if ( this.morphNormals === true ) data.morphNormals = true;
-		if ( this.skinning === true ) data.skinning = true;
 
 		if ( this.flatShading === true ) data.flatShading = this.flatShading;
 
@@ -9013,7 +9012,6 @@ Color.prototype.b = 1;
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>
  * }
  */
@@ -9050,7 +9048,6 @@ class MeshBasicMaterial extends Material {
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
-		this.skinning = false;
 		this.morphTargets = false;
 
 		this.setValues( parameters );
@@ -9085,7 +9082,6 @@ class MeshBasicMaterial extends Material {
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
-		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 
 		return this;
@@ -11119,7 +11115,7 @@ function checkBufferGeometryIntersection( object, material, raycaster, ray, posi
 
 	}
 
-	if ( object.isSkinnedMesh && material.skinning ) {
+	if ( object.isSkinnedMesh ) {
 
 		object.boneTransform( a, _vA$1 );
 		object.boneTransform( b, _vB$1 );
@@ -11410,7 +11406,6 @@ var default_fragment = "void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0
  *
  *  lights: <bool>,
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
  * }
@@ -11439,7 +11434,6 @@ class ShaderMaterial extends Material {
 		this.lights = false; // set to use scene lights
 		this.clipping = false; // set to use user-defined clipping planes
 
-		this.skinning = false; // set to use skinning attribute streams
 		this.morphTargets = false; // set to use morph targets
 		this.morphNormals = false; // set to use morph normals
 
@@ -11493,8 +11487,6 @@ class ShaderMaterial extends Material {
 
 		this.lights = source.lights;
 		this.clipping = source.clipping;
-
-		this.skinning = source.skinning;
 
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
@@ -17563,7 +17555,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
 
-			skinning: material.skinning && maxBones > 0,
+			skinning: object.isSkinnedMesh === true && maxBones > 0,
 			maxBones: maxBones,
 			useVertexTexture: floatVertexTextures,
 
@@ -18675,7 +18667,6 @@ class MeshDepthMaterial extends Material {
 
 		this.depthPacking = BasicDepthPacking;
 
-		this.skinning = false;
 		this.morphTargets = false;
 
 		this.map = null;
@@ -18701,7 +18692,6 @@ class MeshDepthMaterial extends Material {
 
 		this.depthPacking = source.depthPacking;
 
-		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 
 		this.map = source.map;
@@ -18730,7 +18720,6 @@ MeshDepthMaterial.prototype.isMeshDepthMaterial = true;
  *  nearDistance: <float>,
  *  farDistance: <float>,
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>,
  *
  *  map: new THREE.Texture( <Image> ),
@@ -18756,7 +18745,6 @@ class MeshDistanceMaterial extends Material {
 		this.nearDistance = 1;
 		this.farDistance = 1000;
 
-		this.skinning = false;
 		this.morphTargets = false;
 
 		this.map = null;
@@ -18781,7 +18769,6 @@ class MeshDistanceMaterial extends Material {
 		this.nearDistance = source.nearDistance;
 		this.farDistance = source.farDistance;
 
-		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 
 		this.map = source.map;
@@ -19019,9 +19006,9 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 	}
 
-	function getDepthMaterialVariant( useMorphing, useSkinning, useInstancing ) {
+	function getDepthMaterialVariant( useMorphing ) {
 
-		const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
+		const index = useMorphing << 0;
 
 		let material = _depthMaterials[ index ];
 
@@ -19031,8 +19018,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 				depthPacking: RGBADepthPacking,
 
-				morphTargets: useMorphing,
-				skinning: useSkinning
+				morphTargets: useMorphing
 
 			} );
 
@@ -19044,9 +19030,9 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 	}
 
-	function getDistanceMaterialVariant( useMorphing, useSkinning, useInstancing ) {
+	function getDistanceMaterialVariant( useMorphing ) {
 
-		const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
+		const index = useMorphing << 0;
 
 		let material = _distanceMaterials[ index ];
 
@@ -19054,8 +19040,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			material = new MeshDistanceMaterial( {
 
-				morphTargets: useMorphing,
-				skinning: useSkinning
+				morphTargets: useMorphing
 
 			} );
 
@@ -19091,25 +19076,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			}
 
-			let useSkinning = false;
-
-			if ( object.isSkinnedMesh === true ) {
-
-				if ( material.skinning === true ) {
-
-					useSkinning = true;
-
-				} else {
-
-					console.warn( 'THREE.WebGLShadowMap: THREE.SkinnedMesh with material.skinning set to false:', object );
-
-				}
-
-			}
-
-			const useInstancing = object.isInstancedMesh === true;
-
-			result = getMaterialVariant( useMorphing, useSkinning, useInstancing );
+			result = getMaterialVariant( useMorphing );
 
 		} else {
 
@@ -24692,6 +24659,7 @@ function WebGLRenderer( parameters ) {
 
 		materialProperties.outputEncoding = parameters.outputEncoding;
 		materialProperties.instancing = parameters.instancing;
+		materialProperties.skinning = parameters.skinning;
 		materialProperties.numClippingPlanes = parameters.numClippingPlanes;
 		materialProperties.numIntersection = parameters.numClipIntersection;
 		materialProperties.vertexAlphas = parameters.vertexAlphas;
@@ -24749,6 +24717,14 @@ function WebGLRenderer( parameters ) {
 				needsProgramChange = true;
 
 			} else if ( ! object.isInstancedMesh && materialProperties.instancing === true ) {
+
+				needsProgramChange = true;
+
+			} else if ( object.isSkinnedMesh && materialProperties.skinning === false ) {
+
+				needsProgramChange = true;
+
+			} else if ( ! object.isSkinnedMesh && materialProperties.skinning === true ) {
 
 				needsProgramChange = true;
 
@@ -24874,7 +24850,7 @@ function WebGLRenderer( parameters ) {
 				material.isMeshStandardMaterial ||
 				material.isShaderMaterial ||
 				material.isShadowMaterial ||
-				material.skinning ) {
+				object.isSkinnedMesh ) {
 
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
@@ -24886,7 +24862,7 @@ function WebGLRenderer( parameters ) {
 		// auto-setting of texture unit for bone texture must go before other textures
 		// otherwise textures used for skinning can take over texture units reserved for other material textures
 
-		if ( material.skinning ) {
+		if ( object.isSkinnedMesh ) {
 
 			p_uniforms.setOptional( _gl, object, 'bindMatrix' );
 			p_uniforms.setOptional( _gl, object, 'bindMatrixInverse' );
@@ -31538,7 +31514,6 @@ RawShaderMaterial.prototype.isRawShaderMaterial = true;
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>,
  *
@@ -31599,7 +31574,6 @@ class MeshStandardMaterial extends Material {
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
-		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
 
@@ -31660,7 +31634,6 @@ class MeshStandardMaterial extends Material {
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
-		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
@@ -31824,7 +31797,6 @@ MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>,
  *
@@ -31881,7 +31853,6 @@ class MeshPhongMaterial extends Material {
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
-		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
 
@@ -31936,7 +31907,6 @@ class MeshPhongMaterial extends Material {
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
-		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
@@ -31983,7 +31953,6 @@ MeshPhongMaterial.prototype.isMeshPhongMaterial = true;
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
  * }
@@ -32032,7 +32001,6 @@ class MeshToonMaterial extends Material {
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
-		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
 
@@ -32077,7 +32045,6 @@ class MeshToonMaterial extends Material {
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
-		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
@@ -32107,7 +32074,6 @@ MeshToonMaterial.prototype.isMeshToonMaterial = true;
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>,
  *
@@ -32139,7 +32105,6 @@ class MeshNormalMaterial extends Material {
 
 		this.fog = false;
 
-		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
 
@@ -32167,7 +32132,6 @@ class MeshNormalMaterial extends Material {
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
 
-		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
@@ -32210,7 +32174,6 @@ MeshNormalMaterial.prototype.isMeshNormalMaterial = true;
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
  * }
@@ -32252,7 +32215,6 @@ class MeshLambertMaterial extends Material {
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
-		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
 
@@ -32292,7 +32254,6 @@ class MeshLambertMaterial extends Material {
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
-		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
@@ -32326,7 +32287,6 @@ MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
  *
  *  alphaMap: new THREE.Texture( <Image> ),
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
  *
@@ -32363,7 +32323,6 @@ class MeshMatcapMaterial extends Material {
 
 		this.alphaMap = null;
 
-		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
 
@@ -32399,7 +32358,6 @@ class MeshMatcapMaterial extends Material {
 
 		this.alphaMap = source.alphaMap;
 
-		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
@@ -38374,7 +38332,6 @@ class MaterialLoader extends Loader {
 		if ( json.polygonOffsetFactor !== undefined ) material.polygonOffsetFactor = json.polygonOffsetFactor;
 		if ( json.polygonOffsetUnits !== undefined ) material.polygonOffsetUnits = json.polygonOffsetUnits;
 
-		if ( json.skinning !== undefined ) material.skinning = json.skinning;
 		if ( json.morphTargets !== undefined ) material.morphTargets = json.morphTargets;
 		if ( json.morphNormals !== undefined ) material.morphNormals = json.morphNormals;
 		if ( json.dithering !== undefined ) material.dithering = json.dithering;
