@@ -1430,6 +1430,7 @@ function WebGLRenderer( parameters ) {
 
 		materialProperties.outputEncoding = parameters.outputEncoding;
 		materialProperties.instancing = parameters.instancing;
+		materialProperties.skinning = parameters.skinning;
 		materialProperties.numClippingPlanes = parameters.numClippingPlanes;
 		materialProperties.numIntersection = parameters.numClipIntersection;
 		materialProperties.vertexAlphas = parameters.vertexAlphas;
@@ -1487,6 +1488,14 @@ function WebGLRenderer( parameters ) {
 				needsProgramChange = true;
 
 			} else if ( ! object.isInstancedMesh && materialProperties.instancing === true ) {
+
+				needsProgramChange = true;
+
+			} else if ( object.isSkinnedMesh && materialProperties.skinning === false ) {
+
+				needsProgramChange = true;
+
+			} else if ( ! object.isSkinnedMesh && materialProperties.skinning === true ) {
 
 				needsProgramChange = true;
 
@@ -1612,7 +1621,7 @@ function WebGLRenderer( parameters ) {
 				material.isMeshStandardMaterial ||
 				material.isShaderMaterial ||
 				material.isShadowMaterial ||
-				material.skinning ) {
+				object.isSkinnedMesh ) {
 
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
@@ -1624,7 +1633,7 @@ function WebGLRenderer( parameters ) {
 		// auto-setting of texture unit for bone texture must go before other textures
 		// otherwise textures used for skinning can take over texture units reserved for other material textures
 
-		if ( material.skinning ) {
+		if ( object.isSkinnedMesh ) {
 
 			p_uniforms.setOptional( _gl, object, 'bindMatrix' );
 			p_uniforms.setOptional( _gl, object, 'bindMatrixInverse' );

@@ -1100,7 +1100,6 @@ class MaterialBuilder {
 
 			//
 
-			params.skinning = geometry.bones.length > 0 ? true : false;
 			params.morphTargets = geometry.morphTargets.length > 0 ? true : false;
 			params.fog = true;
 
