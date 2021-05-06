@@ -84,6 +84,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 	const floatVertexTextures = vertexTextures && floatFragmentTextures;
 
 	const maxSamples = isWebGL2 ? gl.getParameter( gl.MAX_SAMPLES ) : 0;
+	const multiRenderTarget = isWebGL2 || extensions.has( 'WEBGL_draw_buffers' );
 
 	return {
 
@@ -109,7 +110,8 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 		floatFragmentTextures: floatFragmentTextures,
 		floatVertexTextures: floatVertexTextures,
 
-		maxSamples: maxSamples
+		maxSamples: maxSamples,
+		multiRenderTarget: multiRenderTarget
 
 	};
 

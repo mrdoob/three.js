@@ -465,7 +465,11 @@ function WebGLState( gl, extensions, capabilities ) {
 
 			}
 
+			return true;
+
 		}
+
+		return false;
 
 	}
 
