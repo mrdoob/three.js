@@ -22,7 +22,6 @@ class OculusHandModel extends Object3D {
 
 			if ( xrInputSource.hand && ! this.motionController ) {
 
-				this.visible = true;
 				this.xrInputSource = xrInputSource;
 
 				this.motionController = new XRHandMeshModel( this, controller, this.path, xrInputSource.handedness );
