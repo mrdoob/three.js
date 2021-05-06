@@ -1,84 +1,122 @@
-import { Object3D, Sphere, Box3 } from "../../../build/three.module.js";
+import { Object3D, Sphere, Box3 } from '../../../build/three.module.js';
 import { fetchProfile } from '../libs/motion-controllers.module.js';
-import { XRHandMeshModel } from "./XRHandMeshModel.js";
+import { XRHandMeshModel } from './XRHandMeshModel.js';
 
 const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles';
 const DEFAULT_PROFILE = 'generic-hand';
 
-const POINTING_JOINT = "index-finger-tip";
+const POINTING_JOINT = 'index-finger-tip';
 
 class OculusHandModel extends Object3D {
-  constructor(controller) {
-    super();
 
-    this.controller = controller;
-    this.motionController = null;
-    this.envMap = null;
+	constructor( controller ) {
 
-    this.mesh = null;
+		super();
 
-    controller.addEventListener("connected", (event) => {
-      const xrInputSource = event.data;
-      if (xrInputSource.hand && !this.motionController) {
-        this.visible = true;
-        this.xrInputSource = xrInputSource;
-        fetchProfile(xrInputSource, DEFAULT_PROFILES_PATH, DEFAULT_PROFILE).then(({ profile, assetPath }) => {
-          this.motionController = new XRHandMeshModel(
-            this,
-            controller,
-            assetPath
-          );
-        }).catch((err) => {
-          console.warn(err);
-        });
-      }
-    });
+		this.controller = controller;
+		this.motionController = null;
+		this.envMap = null;
 
-    controller.addEventListener("disconnected", () => {
-      this.clear();
-      this.motionController = null;
-    })
-  }
+		this.mesh = null;
 
-  updateMatrixWorld(force) {
-    super.updateMatrixWorld(force);
+		controller.addEventListener( 'connected', ( event ) => {
 
-    if (this.motionController) {
-      this.motionController.updateMesh();
-    }
-  }
+			const xrInputSource = event.data;
+			if ( xrInputSource.hand && ! this.motionController ) {
 
-  getPointerPosition() {
-    let indexFingerTip = this.controller.joints[POINTING_JOINT];
-    if (indexFingerTip) {
-      return indexFingerTip.position;
-    } else {
-      return null;
-    }
-  }
+				this.visible = true;
+				this.xrInputSource = xrInputSource;
+				fetchProfile( xrInputSource, DEFAULT_PROFILES_PATH, DEFAULT_PROFILE ).then( ( { profile, assetPath } ) => {
 
-  intersectBoxObject(boxObject) {
-    let pointerPosition = this.getPointerPosition();
-    if (pointerPosition) {
-      let indexSphere = new Sphere(pointerPosition, TOUCH_RADIUS);
-      let box = new Box3().setFromObject(boxObject);
-      return indexSphere.intersectsBox(box);
-    } else {
-      return false;
-    }
-  }
+					this.motionController = new XRHandMeshModel(
+						this,
+						controller,
+						assetPath
+					);
 
-  checkButton(button) {
-    if (this.intersectBoxObject(button)) {
-      button.onPress();
-    } else {
-      button.onClear();
-    }
+				} ).catch( ( err ) => {
 
-    if (button.isPressed()) {
-      button.whilePressed();
-    }
-  }
+					console.warn( err );
+
+				} );
+
+			}
+
+		} );
+
+		controller.addEventListener( 'disconnected', () => {
+
+			this.clear();
+			this.motionController = null;
+
+		} );
+
+	}
+
+	updateMatrixWorld( force ) {
+
+		super.updateMatrixWorld( force );
+
+		if ( this.motionController ) {
+
+			this.motionController.updateMesh();
+
+		}
+
+	}
+
+	getPointerPosition() {
+
+		const indexFingerTip = this.controller.joints[ POINTING_JOINT ];
+		if ( indexFingerTip ) {
+
+			return indexFingerTip.position;
+
+		} else {
+
+			return null;
+
+		}
+
+	}
+
+	intersectBoxObject( boxObject ) {
+
+		const pointerPosition = this.getPointerPosition();
+		if ( pointerPosition ) {
+
+			const indexSphere = new Sphere( pointerPosition, TOUCH_RADIUS );
+			const box = new Box3().setFromObject( boxObject );
+			return indexSphere.intersectsBox( box );
+
+		} else {
+
+			return false;
+
+		}
+
+	}
+
+	checkButton( button ) {
+
+		if ( this.intersectBoxObject( button ) ) {
+
+			button.onPress();
+
+		} else {
+
+			button.onClear();
+
+		}
+
+		if ( button.isPressed() ) {
+
+			button.whilePressed();
+
+		}
+
+	}
+
 }
 
 export { OculusHandModel };

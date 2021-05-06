@@ -6,12 +6,12 @@ import {
 	XRHandPrimitiveModel
 } from './XRHandPrimitiveModel.js';
 
-import { 
-	XRHandMeshModel 
-} from "./XRHandMeshModel.js";
+import {
+	XRHandMeshModel
+} from './XRHandMeshModel.js';
 
-import { 
-	fetchProfile 
+import {
+	fetchProfile
 } from '../libs/motion-controllers.module.js';
 
 const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles';
@@ -84,15 +84,15 @@ class XRHandModelFactory {
 
 				} else if ( profile === 'oculus' ) {
 
-					fetchProfile(xrInputSource, DEFAULT_PROFILES_PATH, DEFAULT_PROFILE).then(({ profile, assetPath }) => {
-	
-						handModel.motionController = new XRHandMeshModel( handModel, controller, assetPath);
+					fetchProfile( xrInputSource, DEFAULT_PROFILES_PATH, DEFAULT_PROFILE ).then( ( { profile, assetPath } ) => {
 
-					}).catch((err) => {
+						handModel.motionController = new XRHandMeshModel( handModel, controller, assetPath );
 
-						console.warn(err);
+					} ).catch( ( err ) => {
 
-					});
+						console.warn( err );
+
+					} );
 
 				}
 
