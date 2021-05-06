@@ -9,12 +9,12 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">Uniforms are global [link:https://www.opengl.org/documentation/glsl/ GLSL] variables. They are passed to shader programs.
+		<p class="desc">유니폼은 전역 [link:https://www.opengl.org/documentation/glsl/ GLSL] 변수입니다. 셰이더 프로그램으로 전달됩니다.
 		</p>
 
-		<h2>Code Example</h2>
+		<h2>코드 예제</h2>
 		<p>
-		When declaring a uniform of a [page:ShaderMaterial], it is declared by value or by object.
+		[page:ShaderMaterial]의 유니폼이 선언될 때는, 값 혹은 객체로부터 선언됩니다.
 		</p>
 		<code>
 		uniforms: {
@@ -23,24 +23,20 @@
 		};
 		</code>
 
-		<h2>Uniform types</h2>
+		<h2>유니폼 타입</h2>
 
 		<p>
-		Each uniform must have a *value* property. The type of the value must correspond to the
-		type of the uniform variable in the GLSL code as specified for the primitive GLSL types
-		in the table below. Uniform structures and arrays are also supported. GLSL arrays of primitive
-		type must either be specified as an array of the corresponding THREE objects or as a flat
-		array containing the data of all the objects. In other words; GLSL primitives in arrays
-		must not be represented by arrays. This rule does not apply transitively.
-		An array of *vec2* arrays, each with a length of five vectors, must be an array of arrays,
-		of either five [page:Vector2] objects or ten *number*s.
+			각 유니폼에는 *value* 프로퍼티가 있어야 합니다. 값의 타입은 아래 표에 있는 기본 GLSL 유형에 대해 지정된 GLSL 코드의 유니폼 변수 타입과 일치해야 합니다. 
+			유니폼 구조 및 배열도 지원됩니다. 기본 유형의 GLSL 배열은 THREE 객체의 배열로 지정되거나 모든 객체의 데이터를 포함하는 플랫 배열로 지정되어야 합니다. 
+			즉, 배열 안의 GLSL 기본 요소는 배열로 표현해서는 안 됩니다. 이 규칙은 반대로는 적용되지 않습니다.
+			*vec2* 배열은 다섯 벡터의 길이를 각각 가지고 있기 때문에 배열 안에 배열을 가지고 있거나, 다섯개의 [page:Vector2] 객체, 10개의 *number*를 가지고 있어야 합니다.
 		</p>
 		<table>
-			<caption><a id="uniform-types">Uniform types</a></caption>
+			<caption><a id="uniform-types">유니폼 타입</a></caption>
 			<thead>
 				<tr>
-					<th>GLSL type</th>
-					<th>JavaScript type</th>
+					<th>GLSL 타입</th>
+					<th>JavaScript 타입</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -182,14 +178,13 @@
 		</table>
 
 		<p>
-		(*) Same for an (innermost) array (dimension) of the same GLSL type, containing the components of all vectors or matrices in the array.
+			(*)	동일한 GLSL 타입의 (가장 안쪽) 배열(차원)도 동일하며, 배열 내 모든 벡터 또는 배열의 재질을 포함합니다.
 		</p>
 
-		<h2>Structured Uniforms</h2>
+		<h2>구조화된 유니폼</h2>
 
 		<p>
-			Sometimes you want to organize uniforms as *structs* in your shader code. The following style must be used so *three.js* is able
-			to process structured uniform data.
+			때때로 셰이더 코드에서 유니폼을 *구조*로 구성하고자 할 수 있습니다. *three.js*가 구조화된 유니폼 데이터를 처리할 수 있도록 다음 스타일을 사용해야 합니다.
 		</p>
 		<code>
 		uniforms = {
@@ -201,7 +196,7 @@
 			}
 		};
 		</code>
-		This definition can be mapped on the following GLSL code:
+		이 정의는 다음 GLSL 코드로 매핑될 수 있습니다.
 		<code>
 		struct Data {
 			vec3 position;
@@ -211,10 +206,10 @@
 		uniform Data data;
 		</code>
 
-		<h2>Structured Uniforms with Arrays</h2>
+		<h2>배열이 있는 구조화된 유니폼</h2>
 
 		<p>
-			It's also possible to manage *structs* in arrays. The syntax for this use case looks like so:
+			배열 *구조*를 관리하는 것도 가능합니다. 이 기능의 사용 구문은 다음과 같습니다:
 		</p>
 		<code>
 		const entry1 = {
@@ -232,7 +227,7 @@
 			}
 		};
 		</code>
-		This definition can be mapped on the following GLSL code:
+		이 정의는 다음 GLSL 코드로 매핑될 수 있습니다.
 		<code>
 		struct Data {
 			vec3 position;
@@ -246,23 +241,23 @@
 
 		<h3>[name]( [param:Object value] )</h3>
 		<p>
-		value -- An object containing the value to set up the uniform. It's type must be one of the Uniform Types described above.
+		value -- 유니폼을 설정할 값을 가지고 있는 객체입니다. 위에 있는 유니폼 타입 중 하나여야 합니다.
 		</p>
 
 		<h2>프로퍼티</h2>
 
 		<h3>[property:Object value]</h3>
 		<p>
-		Current value of the uniform.
+		유니폼의 현재 값입니다.
 		</p>
 
 		<h2>메서드</h2>
 
 		<h3>[method:Uniform clone]()</h3>
 		<p>
-		Returns a clone of this uniform.<br />
-		If the uniform's value property is an [page:Object] with a clone() method, this is used, otherwise the value is copied by assignment.
-		Array values are shared between cloned [page:Uniform]s.
+		현재 유니폼의 사본을 리턴합니다.<br />
+		유니폼의 값 프로퍼티가 clone() 메서드를 가진 [page:Object]라면 이 메서드가 사용됩니다. 아니라면 값은 할당된 값으로 복사됩니다.
+		배열 값은 복제된 [page:Uniform]들이 공유합니다.
 		</p>
 
 		<h2>소스코드</h2>
