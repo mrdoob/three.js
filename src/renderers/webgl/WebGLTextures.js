@@ -1063,7 +1063,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		}
 
 		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
-		const isMultiRenderTarget = ( renderTarget.isWebGLMultipleRenderTargets === true );
+		const isMultipleRenderTargets = ( renderTarget.isWebGLMultipleRenderTargets === true );
 		const isMultisample = ( renderTarget.isWebGLMultisampleRenderTarget === true );
 		const isRenderTarget3D = texture.isDataTexture3D || texture.isDataTexture2DArray;
 		const supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
@@ -1094,13 +1094,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			renderTargetProperties.__webglFramebuffer = _gl.createFramebuffer();
 
-			if ( isMultiRenderTarget ) {
+			if ( isMultipleRenderTargets ) {
 
-				if ( capabilities.multiRenderTarget ) {
+				if ( capabilities.drawBuffers ) {
 
-					for ( let i = 0, il = renderTarget.texture.length; i < il; i ++ ) {
+					const textures = renderTarget.texture;
 
-						const attachmentProperties = properties.get( renderTarget.texture[ i ] );
+					for ( let i = 0, il = textures.length; i < il; i ++ ) {
+
+						const attachmentProperties = properties.get( textures[ i ] );
 
 						if ( attachmentProperties.__webglTexture === undefined ) {
 
@@ -1178,13 +1180,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
 
-		} else if ( isMultiRenderTarget ) {
+		} else if ( isMultipleRenderTargets ) {
 
-			const texture = renderTarget.texture;
+			const textures = renderTarget.texture;
 
-			for ( let i = 0, il = texture.length; i < il; i ++ ) {
+			for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
-				const attachment = texture[ i ];
+				const attachment = textures[ i ];
 				const attachmentProperties = properties.get( attachment );
 
 				state.bindTexture( _gl.TEXTURE_2D, attachmentProperties.__webglTexture );
