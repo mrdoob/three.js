@@ -284,8 +284,6 @@ class LineMaterial extends ShaderMaterial {
 
 		} );
 
-		this.dashed = false;
-
 		Object.defineProperties( this, {
 
 			color: {
@@ -319,6 +317,38 @@ class LineMaterial extends ShaderMaterial {
 				set: function ( value ) {
 
 					this.uniforms.linewidth.value = value;
+
+				}
+
+			},
+
+			dashed: {
+
+				enumerable: true,
+
+				get: function () {
+
+					return Boolean( 'USE_DASH' in this.defines );
+
+				},
+
+				set( value ) {
+
+					if ( Boolean( value ) !== Boolean( 'USE_DASH' in this.defines ) ) {
+
+						this.needsUpdate = true;
+
+					}
+
+					if ( value ) {
+
+						this.defines.USE_DASH = '';
+
+					} else {
+
+						delete this.defines.USE_DASH;
+
+					}
 
 				}
 

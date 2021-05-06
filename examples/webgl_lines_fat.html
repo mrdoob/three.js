@@ -242,13 +242,6 @@
 				gui.add( param, 'dashed' ).onChange( function ( val ) {
 
 					matLine.dashed = val;
-
-					// dashed is implemented as a defines -- not as a uniform. this could be changed.
-					// ... or THREE.LineDashedMaterial could be implemented as a separate material
-					// temporary hack - renderer should do this eventually
-					if ( val ) matLine.defines.USE_DASH = ""; else delete matLine.defines.USE_DASH;
-					matLine.needsUpdate = true;
-
 					line1.material = val ? matLineDashed : matLineBasic;
 
 				} );
