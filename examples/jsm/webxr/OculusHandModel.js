@@ -1,9 +1,5 @@
 import { Object3D, Sphere, Box3 } from '../../../build/three.module.js';
-import { fetchProfile } from '../libs/motion-controllers.module.js';
 import { XRHandMeshModel } from './XRHandMeshModel.js';
-
-const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles';
-const DEFAULT_PROFILE = 'generic-hand';
 
 const TOUCH_RADIUS = 0.01;
 const POINTING_JOINT = 'index-finger-tip';
@@ -23,23 +19,13 @@ class OculusHandModel extends Object3D {
 		controller.addEventListener( 'connected', ( event ) => {
 
 			const xrInputSource = event.data;
+
 			if ( xrInputSource.hand && ! this.motionController ) {
 
 				this.visible = true;
 				this.xrInputSource = xrInputSource;
-				fetchProfile( xrInputSource, DEFAULT_PROFILES_PATH, DEFAULT_PROFILE ).then( ( { profile, assetPath } ) => {
 
-					this.motionController = new XRHandMeshModel(
-						this,
-						controller,
-						assetPath
-					);
-
-				} ).catch( ( err ) => {
-
-					console.warn( err );
-
-				} );
+				this.motionController = new XRHandMeshModel( this, controller, this.path, xrInputSource.handedness );
 
 			}
 

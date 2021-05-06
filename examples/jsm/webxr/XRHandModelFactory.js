@@ -10,13 +10,6 @@ import {
 	XRHandMeshModel
 } from './XRHandMeshModel.js';
 
-import {
-	fetchProfile
-} from '../libs/motion-controllers.module.js';
-
-const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles';
-const DEFAULT_PROFILE = 'generic-hand';
-
 class XRHandModel extends Object3D {
 
 	constructor( controller ) {
@@ -49,18 +42,19 @@ class XRHandModelFactory {
 
 	constructor() {
 
-		this.path = '';
+		this.path = null;
 
 	}
 
 	setPath( path ) {
 
 		this.path = path;
+
 		return this;
 
 	}
 
-	createHandModel( controller, profile, options ) {
+	createHandModel( controller, profile ) {
 
 		const handModel = new XRHandModel( controller );
 
@@ -70,7 +64,6 @@ class XRHandModelFactory {
 
 			if ( xrInputSource.hand && ! handModel.motionController ) {
 
-				handModel.visible = true;
 				handModel.xrInputSource = xrInputSource;
 
 				// @todo Detect profile if not provided
@@ -82,17 +75,9 @@ class XRHandModelFactory {
 
 					handModel.motionController = new XRHandPrimitiveModel( handModel, controller, this.path, xrInputSource.handedness, { primitive: 'box' } );
 
-				} else if ( profile === 'oculus' ) {
+				} else if ( profile === 'mesh' ) {
 
-					fetchProfile( xrInputSource, DEFAULT_PROFILES_PATH, DEFAULT_PROFILE ).then( ( { profile, assetPath } ) => {
-
-						handModel.motionController = new XRHandMeshModel( handModel, controller, assetPath );
-
-					} ).catch( ( err ) => {
-
-						console.warn( err );
-
-					} );
+					handModel.motionController = new XRHandMeshModel( handModel, controller, this.path, xrInputSource.handedness );
 
 				}
 

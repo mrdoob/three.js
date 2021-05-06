@@ -1,17 +1,19 @@
 import { GLTFLoader } from '../loaders/GLTFLoader.js';
 
+const DEFAULT_HAND_PROFILE_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles/generic-hand/';
+
 class XRHandMeshModel {
 
-	constructor( handModel, controller, assetUrl ) {
+	constructor( handModel, controller, path, handedness ) {
 
 		this.controller = controller;
 		this.handModel = handModel;
 
 		this.bones = [];
-		const loader = new GLTFLoader();
 
-		loader.setPath( '' );
-		loader.load( assetUrl, gltf => {
+		const loader = new GLTFLoader();
+		loader.setPath( path || DEFAULT_HAND_PROFILE_PATH );
+		loader.load( `${handedness}.glb`, gltf => {
 
 			const object = gltf.scene.children[ 0 ];
 			this.handModel.add( object );
@@ -20,6 +22,8 @@ class XRHandMeshModel {
 			mesh.frustumCulled = false;
 			mesh.castShadow = true;
 			mesh.receiveShadow = true;
+
+			mesh.material.side = 0; // Workaround: force FrontSide
 
 			const joints = [
 				'wrist',
@@ -52,6 +56,7 @@ class XRHandMeshModel {
 			joints.forEach( jointName => {
 
 				const bone = object.getObjectByName( jointName );
+
 				if ( bone !== undefined ) {
 
 					bone.jointName = jointName;
@@ -74,15 +79,19 @@ class XRHandMeshModel {
 
 		// XR Joints
 		const XRJoints = this.controller.joints;
+
 		for ( let i = 0; i < this.bones.length; i ++ ) {
 
 			const bone = this.bones[ i ];
+
 			if ( bone ) {
 
 				const XRJoint = XRJoints[ bone.jointName ];
+
 				if ( XRJoint.visible ) {
 
 					const position = XRJoint.position;
+
 					if ( bone ) {
 
 						bone.position.copy( position );
