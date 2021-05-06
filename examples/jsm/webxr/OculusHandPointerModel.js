@@ -258,7 +258,7 @@ class OculusHandPointerModel extends THREE.Object3D {
   }
 
   updateMatrixWorld(force) {
-    THREE.Object3D.prototype.updateMatrixWorld.call(this, force);
+    super.updateMatrixWorld( force );
     if (this.pointerGeometry) {
       this._updatePointer();
       this._updateRaycaster();
