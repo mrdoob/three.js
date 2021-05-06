@@ -4,7 +4,7 @@ import Stats from '../libs/stats.module.js';
 // https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query_webgl2/
 export class GPUStatsPanel extends Stats.Panel {
 
-	constructor( context, name = 'GPU' ) {
+	constructor( context, name = 'GPU MS' ) {
 
 		super( name, '#f90', '#210' );
 
