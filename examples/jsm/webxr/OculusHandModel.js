@@ -5,6 +5,7 @@ import { XRHandMeshModel } from './XRHandMeshModel.js';
 const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles';
 const DEFAULT_PROFILE = 'generic-hand';
 
+const TOUCH_RADIUS = 0.01;
 const POINTING_JOINT = 'index-finger-tip';
 
 class OculusHandModel extends Object3D {
