@@ -69,6 +69,13 @@
 		若这个点，则距离将为负值。
 		</p>
 
+		<h3>[method:this expandByPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] that should be included in the sphere.<br /><br />
+
+		Expands the boundaries of this sphere to include [page:Vector3 point].
+		</p>
+
 		<h3>[method:Boolean isEmpty]()</h3>
 		<p>
 		检查球是否为空（the radius set to a negative number）.
@@ -132,6 +139,13 @@
 		<h3>[method:Sphere translate]( [param:Vector3 offset] )</h3>
 		<p>
 		使用所给定[page:Vector3] offset（偏移量）平移球心。
+		</p>
+
+		<h3>[method:this union]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere] - Bounding sphere that will be unioned with this sphere.<br /><br />
+
+		Expands this sphere to enclose both the original sphere and the given sphere.
 		</p>
 
 		<h2>源代码</h2>

@@ -1,5 +1,5 @@
 import { Vector3 } from './Vector3.js';
-import { MathUtils } from './MathUtils.js';
+import * as MathUtils from './MathUtils.js';
 
 const _startP = /*@__PURE__*/ new Vector3();
 const _startEnd = /*@__PURE__*/ new Vector3();

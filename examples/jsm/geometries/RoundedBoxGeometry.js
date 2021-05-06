@@ -3,7 +3,8 @@ import {
 	Vector3
 } from '../../../build/three.module.js';
 
-const tempNormal = new Vector3();
+const _tempNormal = new Vector3();
+
 function getUv( faceDirVector, normal, uvAxis, projectionAxis, radius, sideLength ) {
 
 	const totArcLength = 2 * Math.PI * radius / 4;
@@ -13,17 +14,17 @@ function getUv( faceDirVector, normal, uvAxis, projectionAxis, radius, sideLengt
 	const halfArc = Math.PI / 4;
 
 	// Get the vector projected onto the Y plane
-	tempNormal.copy( normal );
-	tempNormal[ projectionAxis ] = 0;
-	tempNormal.normalize();
+	_tempNormal.copy( normal );
+	_tempNormal[ projectionAxis ] = 0;
+	_tempNormal.normalize();
 
 	// total amount of UV space alloted to a single arc
 	const arcUvRatio = 0.5 * totArcLength / ( totArcLength + centerLength );
 
 	// the distance along one arc the point is at
-	const arcAngleRatio = 1.0 - ( tempNormal.angleTo( faceDirVector ) / halfArc );
+	const arcAngleRatio = 1.0 - ( _tempNormal.angleTo( faceDirVector ) / halfArc );
 
-	if ( Math.sign( tempNormal[ uvAxis ] ) === 1 ) {
+	if ( Math.sign( _tempNormal[ uvAxis ] ) === 1 ) {
 
 		return arcAngleRatio * arcUvRatio;
 

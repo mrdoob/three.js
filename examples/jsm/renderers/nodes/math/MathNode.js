@@ -3,7 +3,8 @@ import Node from '../core/Node.js';
 class MathNode extends Node {
 
 	static NORMALIZE = 'normalize';
-	static INVERSE_TRANSFORM_DIRETION = 'inverseTransformDirection';
+	static NEGATE = 'negate';
+	static LENGTH = 'length';
 
 	constructor( method, a, b = null ) {
 
@@ -16,31 +17,46 @@ class MathNode extends Node {
 
 	}
 
+	getInputType( builder ) {
+
+		const typeA = this.a.getType( builder );
+
+		if ( this.b !== null ) {
+
+			const typeB = this.b.getType( builder );
+
+			if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+
+				// anytype x anytype: use the greater length vector
+
+				return typeB;
+
+			}
+
+		}
+
+		return typeA;
+
+	}
+
 	getType( builder ) {
 
 		const method = this.method;
 
-		if ( method === MathNode.INVERSE_TRANSFORM_DIRETION ) {
+		if ( method === MathNode.LENGTH ) {
+
+			return 'float';
+
+		} else if (
+			method === MathNode.TRANSFORM_DIRETION ||
+			method === MathNode.INVERSE_TRANSFORM_DIRETION
+		) {
 
 			return 'vec3';
 
 		} else {
 
-			const typeA = this.a.getType( builder );
-
-			if ( this.b !== null ) {
-
-				if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
-
-					// anytype x anytype: use the greater length vector
-
-					return typeB;
-
-				}
-
-			}
-
-			return typeA;
+			return this.getInputType( builder );
 
 		}
 
@@ -49,27 +65,14 @@ class MathNode extends Node {
 	generate( builder, output ) {
 
 		const method = this.method;
-		const type = this.getType( builder );
+		const type = this.getInputType( builder );
 
-		let a = null, b = null;
+		const a = this.a.build( builder, type );
+		let b = null;
 
-		if ( method === MathNode.INVERSE_TRANSFORM_DIRETION ) {
+		if ( this.b !== null ) {
 
-			a = this.a.build( builder, 'vec3' );
-			b = this.b.build( builder, 'mat4' );
-
-			// add in FunctionNode later
-			return `normalize( ( vec4( ${a}, 0.0 ) * ${b} ).xyz )`;
-
-		} else {
-
-			a = this.a.build( builder, type );
-
-			if ( this.b !== null ) {
-
-				b = this.b.build( builder, type );
-
-			}
+			b = this.b.build( builder, type );
 
 		}
 
@@ -79,7 +82,15 @@ class MathNode extends Node {
 
 		} else {
 
-			return builder.format( `${method}( ${a} )`, type, output );
+			if ( method === MathNode.NEGATE ) {
+
+				return builder.format( `( -${a} )`, type, output );
+
+			} else {
+
+				return builder.format( `${method}( ${a} )`, type, output );
+
+			}
 
 		}
 

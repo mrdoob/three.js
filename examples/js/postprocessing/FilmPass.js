@@ -1,53 +1,50 @@
-THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
+( function () {
 
-	THREE.Pass.call( this );
+	class FilmPass extends THREE.Pass {
 
-	if ( THREE.FilmShader === undefined )
-		console.error( 'THREE.FilmPass relies on THREE.FilmShader' );
+		constructor( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
 
-	var shader = THREE.FilmShader;
+			super();
+			if ( THREE.FilmShader === undefined ) console.error( 'THREE.FilmPass relies on THREE.FilmShader' );
+			const shader = THREE.FilmShader;
+			this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+			this.material = new THREE.ShaderMaterial( {
+				uniforms: this.uniforms,
+				vertexShader: shader.vertexShader,
+				fragmentShader: shader.fragmentShader
+			} );
+			if ( grayscale !== undefined ) this.uniforms.grayscale.value = grayscale;
+			if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
+			if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
+			if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
+			this.fsQuad = new THREE.FullScreenQuad( this.material );
 
-	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+		}
 
-	this.material = new THREE.ShaderMaterial( {
+		render( renderer, writeBuffer, readBuffer, deltaTime
+			/*, maskActive */
+		) {
 
-		uniforms: this.uniforms,
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader
+			this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
+			this.uniforms[ 'time' ].value += deltaTime;
 
-	} );
+			if ( this.renderToScreen ) {
 
-	if ( grayscale !== undefined )	this.uniforms.grayscale.value = grayscale;
-	if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
-	if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
-	if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
+				renderer.setRenderTarget( null );
+				this.fsQuad.render( renderer );
 
-	this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
+			} else {
 
-};
+				renderer.setRenderTarget( writeBuffer );
+				if ( this.clear ) renderer.clear();
+				this.fsQuad.render( renderer );
 
-THREE.FilmPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
-
-	constructor: THREE.FilmPass,
-
-	render: function ( renderer, writeBuffer, readBuffer, deltaTime /*, maskActive */ ) {
-
-		this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
-		this.uniforms[ 'time' ].value += deltaTime;
-
-		if ( this.renderToScreen ) {
-
-			renderer.setRenderTarget( null );
-			this.fsQuad.render( renderer );
-
-		} else {
-
-			renderer.setRenderTarget( writeBuffer );
-			if ( this.clear ) renderer.clear();
-			this.fsQuad.render( renderer );
+			}
 
 		}
 
 	}
 
-} );
+	THREE.FilmPass = FilmPass;
+
+} )();

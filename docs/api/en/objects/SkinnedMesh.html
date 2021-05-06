@@ -13,7 +13,6 @@
 
 		<p class="desc">
 			A mesh that has a [page:Skeleton] with [page:Bone bones] that can then be used to animate the vertices of the geometry.
-			The material must support skinning and have skinning enabled - see [page:MeshStandardMaterial.skinning].
 		</p>
 
 		<iframe id="scene" src="scenes/bones-browser.html"></iframe>
@@ -151,6 +150,11 @@
 		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
 		<p>
 		Updates the [page:Matrix4 MatrixWorld].
+		</p>
+
+		<h3>[method:Vector3 boneTransform]( [index:Integer], [target:Vector3] )</h3>
+		<p>
+		Calculates the position of the vertex at the given index relative to the current bone transformations.
 		</p>
 
 		<h2>Source</h2>
