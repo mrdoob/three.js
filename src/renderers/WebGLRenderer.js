@@ -1852,32 +1852,42 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer ) && capabilities.multiRenderTarget ) {
+		const framebufferBound = state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+
+		if ( framebufferBound && capabilities.drawBuffers ) {
 
 			let needsUpdate = false;
 
-			if ( renderTarget && renderTarget.isWebGLMultipleRenderTargets ) {
+			if ( renderTarget ) {
 
-				if ( _currentDrawBuffers.length !== renderTarget.texture.length || _currentDrawBuffers[ 0 ] !== _gl.COLOR_ATTACHMENT0 ) {
+				if ( renderTarget.isWebGLMultipleRenderTargets ) {
 
-					for ( let i = 0, il = renderTarget.texture.length; i < il; i ++ ) {
+					const textures = renderTarget.texture;
 
-						_currentDrawBuffers[ i ] = _gl.COLOR_ATTACHMENT0 + i;
+					if ( _currentDrawBuffers.length !== textures.length || _currentDrawBuffers[ 0 ] !== _gl.COLOR_ATTACHMENT0 ) {
+
+						for ( let i = 0, il = textures.length; i < il; i ++ ) {
+
+							_currentDrawBuffers[ i ] = _gl.COLOR_ATTACHMENT0 + i;
+
+						}
+
+						_currentDrawBuffers.length = textures.length;
+
+						needsUpdate = true;
 
 					}
 
-					_currentDrawBuffers.length = renderTarget.texture.length;
-					needsUpdate = true;
+				} else {
 
-				}
+					if ( _currentDrawBuffers.length !== 1 || _currentDrawBuffers[ 0 ] !== _gl.COLOR_ATTACHMENT0 ) {
 
-			} else if ( renderTarget ) {
+						_currentDrawBuffers[ 0 ] = _gl.COLOR_ATTACHMENT0;
+						_currentDrawBuffers.length = 1;
 
-				if ( _currentDrawBuffers.length !== 1 || _currentDrawBuffers[ 0 ] !== _gl.COLOR_ATTACHMENT0 ) {
+						needsUpdate = true;
 
-					_currentDrawBuffers[ 0 ] = _gl.COLOR_ATTACHMENT0;
-					_currentDrawBuffers.length = 1;
-					needsUpdate = true;
+					}
 
 				}
 
@@ -1887,6 +1897,7 @@ function WebGLRenderer( parameters ) {
 
 					_currentDrawBuffers[ 0 ] = _gl.BACK;
 					_currentDrawBuffers.length = 1;
+
 					needsUpdate = true;
 
 				}

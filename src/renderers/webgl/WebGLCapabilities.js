@@ -67,6 +67,8 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	}
 
+	const drawBuffers = isWebGL2 || extensions.has( 'WEBGL_draw_buffers' );
+
 	const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
 
 	const maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
@@ -84,11 +86,12 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 	const floatVertexTextures = vertexTextures && floatFragmentTextures;
 
 	const maxSamples = isWebGL2 ? gl.getParameter( gl.MAX_SAMPLES ) : 0;
-	const multiRenderTarget = isWebGL2 || extensions.has( 'WEBGL_draw_buffers' );
 
 	return {
 
 		isWebGL2: isWebGL2,
+
+		drawBuffers: drawBuffers,
 
 		getMaxAnisotropy: getMaxAnisotropy,
 		getMaxPrecision: getMaxPrecision,
@@ -110,8 +113,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 		floatFragmentTextures: floatFragmentTextures,
 		floatVertexTextures: floatVertexTextures,
 
-		maxSamples: maxSamples,
-		multiRenderTarget: multiRenderTarget
+		maxSamples: maxSamples
 
 	};
 
