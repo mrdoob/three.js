@@ -127,13 +127,7 @@ class Rhino3dmLoader extends Loader {
 				} );
 
 			} )
-			.then( ( message ) => {
-
-				const geometry = this._createGeometry( message.data );
-				geometry.warnings = warnings;
-				return geometry;
-
-			} ).catch( e => {
+			.then( ( message ) => { this._createGeometry( message.data ); } ).catch( e => {
 
 				throw e;
 
@@ -722,6 +716,7 @@ class Rhino3dmLoader extends Loader {
 
 						case 'warning':
 							this.warnings.push( message )
+							console.warn( message )
 							break;
 
 						case 'decode':
@@ -802,7 +797,7 @@ function Rhino3dmWorker() {
 
 			case 'init':
 
-				console.log(message)
+				// console.log(message)
 				libraryConfig = message.libraryConfig;
 				const wasmBinary = libraryConfig.wasmBinary;
 				let RhinoModule;
