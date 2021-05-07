@@ -128,7 +128,7 @@ class Rhino3dmLoader extends Loader {
 
 			} )
 			.then( ( message ) => {
-				const geometry = this._createGeometry( message.data, taskID );
+				const geometry = this._createGeometry( message.data );
 				geometry.warnings = warnings;
 				return geometry;
 			}).catch( e => {
@@ -290,7 +290,7 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
-	_createGeometry( data, taskID ) {
+	_createGeometry( data ) {
 
 		// console.log(data);
 
@@ -337,12 +337,12 @@ class Rhino3dmLoader extends Loader {
 						const rMaterial = materials[ attributes.materialIndex ];
 						let material = this._createMaterial( rMaterial );
 						material = this._compareMaterials( material );
-						_object = this._createObject( obj, material, taskID );
+						_object = this._createObject( obj, material );
 
 					} else {
 
-						const material = this._createMaterial( );
-						_object = this._createObject( obj, material, taskID );
+						const material = this._createMaterial();
+						_object = this._createObject( obj, material );
 
 					}
 
@@ -431,7 +431,7 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
-	_createObject( obj, mat, taskID ) {
+	_createObject( obj, mat ) {
 
 		const loader = new BufferGeometryLoader();
 
@@ -789,7 +789,7 @@ function Rhino3dmWorker() {
 	let libraryPending;
 	let libraryConfig;
 	let rhino;
-	let taskId;
+	let taskID;
 
 	onmessage = function ( e ) {
 
@@ -820,7 +820,7 @@ function Rhino3dmWorker() {
 
 			case 'decode':
 
-				taskId = message.id;
+				taskID = message.id;
 				const buffer = message.buffer;
 				libraryPending.then( () => {
 
@@ -843,7 +843,7 @@ function Rhino3dmWorker() {
 
 	};
 
-	function decodeObjects( rhino, buffer, taskID ) {
+	function decodeObjects( rhino, buffer ) {
 
 		const arr = new Uint8Array( buffer );
 		const doc = rhino.File3dm.fromByteArray( arr );
@@ -864,7 +864,7 @@ function Rhino3dmWorker() {
 
 			const _object = objs.get( i );
 
-			const object = extractObjectData( _object, doc, taskID );
+			const object = extractObjectData( _object, doc );
 
 			_object.delete();
 
@@ -948,8 +948,10 @@ function Rhino3dmWorker() {
 						texture.image = 'data:image/png;base64,' + image;
 
 					} else {
+
 						self.postMessage( { type: 'warning', id: taskID, message:`THREE.3DMLoader: Image for ${textureType} texture not embedded in file.` } );
 						texture.image = null;
+
 					}
 
 					textures.push( texture );
@@ -1082,7 +1084,7 @@ function Rhino3dmWorker() {
 
 	}
 
-	function extractObjectData( object, doc, taskID ) {
+	function extractObjectData( object, doc ) {
 
 		const _geometry = object.geometry();
 		const _attributes = object.attributes();
@@ -1243,7 +1245,9 @@ function Rhino3dmWorker() {
 				*/
 
 			default:
+
 				self.postMessage( { type: 'warning', id: taskID, message:`THREE.3DMLoader: TODO: Implement ${objectType.constructor.name}` } );
+
 				break;
 
 		}
@@ -1279,7 +1283,9 @@ function Rhino3dmWorker() {
 			return { geometry, attributes, objectType };
 
 		} else {
+
 			self.postMessage( { type: 'warning', id: taskID, message:`THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.`  } );
+
 		}
 
 	}
