@@ -46,6 +46,7 @@ class Rhino3dmLoader extends Loader {
 		this.workerConfig = {};
 
 		this.materials = [];
+		this.warnings = [];
 
 	}
 
@@ -106,7 +107,6 @@ class Rhino3dmLoader extends Loader {
 
 		let worker;
 		let taskID;
-		let warnings =[];
 
 		const taskCost = buffer.byteLength;
 
@@ -118,20 +118,22 @@ class Rhino3dmLoader extends Loader {
 
 				return new Promise( ( resolve, reject ) => {
 
-					worker._callbacks[ taskID ] = { resolve, reject, warn: warning =>warnings.push(warning) };
+					worker._callbacks[ taskID ] = { resolve, reject };
 
 					worker.postMessage( { type: 'decode', id: taskID, buffer }, [ buffer ] );
 
-					// //this.debug();
+					// this.debug();
 
 				} );
 
 			} )
 			.then( ( message ) => {
+
 				const geometry = this._createGeometry( message.data );
 				geometry.warnings = warnings;
 				return geometry;
-			}).catch( e => {
+
+			} ).catch( e => {
 
 				throw e;
 
@@ -717,8 +719,9 @@ class Rhino3dmLoader extends Loader {
 					const message = e.data;
 
 					switch ( message.type ) {
+
 						case 'warning':
-							worker._callbacks[ message.id ].warn( message );
+							this.warnings.push( message )
 							break;
 
 						case 'decode':
