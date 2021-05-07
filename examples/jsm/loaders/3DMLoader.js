@@ -777,6 +777,7 @@ function Rhino3dmWorker() {
 	let libraryPending;
 	let libraryConfig;
 	let rhino;
+	let taskId;
 
 	onmessage = function ( e ) {
 
@@ -786,6 +787,7 @@ function Rhino3dmWorker() {
 
 			case 'init':
 
+				console.log(message)
 				libraryConfig = message.libraryConfig;
 				const wasmBinary = libraryConfig.wasmBinary;
 				let RhinoModule;
@@ -806,6 +808,7 @@ function Rhino3dmWorker() {
 
 			case 'decode':
 
+				taskId = message.id;
 				const buffer = message.buffer;
 				libraryPending.then( () => {
 
