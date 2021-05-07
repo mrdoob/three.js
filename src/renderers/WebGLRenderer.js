@@ -976,22 +976,6 @@ function WebGLRenderer( parameters ) {
 
 	this.render = function ( scene, camera ) {
 
-		let renderTarget, forceClear;
-
-		if ( arguments[ 2 ] !== undefined ) {
-
-			console.warn( 'THREE.WebGLRenderer.render(): the renderTarget argument has been removed. Use .setRenderTarget() instead.' );
-			renderTarget = arguments[ 2 ];
-
-		}
-
-		if ( arguments[ 3 ] !== undefined ) {
-
-			console.warn( 'THREE.WebGLRenderer.render(): the forceClear argument has been removed. Use .clear() instead.' );
-			forceClear = arguments[ 3 ];
-
-		}
-
 		if ( camera !== undefined && camera.isCamera !== true ) {
 
 			console.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
@@ -1016,7 +1000,7 @@ function WebGLRenderer( parameters ) {
 		}
 
 		//
-		if ( scene.isScene === true ) scene.onBeforeRender( _this, scene, camera, renderTarget || _currentRenderTarget );
+		if ( scene.isScene === true ) scene.onBeforeRender( _this, scene, camera, _currentRenderTarget );
 
 		currentRenderState = renderStates.get( scene, renderStateStack.length );
 		currentRenderState.init();
@@ -1061,15 +1045,9 @@ function WebGLRenderer( parameters ) {
 
 		if ( this.info.autoReset === true ) this.info.reset();
 
-		if ( renderTarget !== undefined ) {
-
-			this.setRenderTarget( renderTarget );
-
-		}
-
 		//
 
-		background.render( currentRenderList, scene, camera, forceClear );
+		background.render( currentRenderList, scene );
 
 		// render scene
 

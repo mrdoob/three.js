@@ -789,6 +789,7 @@ function Rhino3dmWorker() {
 	let libraryPending;
 	let libraryConfig;
 	let rhino;
+	let taskId;
 
 	onmessage = function ( e ) {
 
@@ -798,6 +799,7 @@ function Rhino3dmWorker() {
 
 			case 'init':
 
+				console.log(message)
 				libraryConfig = message.libraryConfig;
 				const wasmBinary = libraryConfig.wasmBinary;
 				let RhinoModule;
@@ -818,6 +820,7 @@ function Rhino3dmWorker() {
 
 			case 'decode':
 
+				taskId = message.id;
 				const buffer = message.buffer;
 				libraryPending.then( () => {
 
@@ -961,15 +964,13 @@ function Rhino3dmWorker() {
 
 			if ( _pbrMaterial.supported ) {
 
-				console.log( 'pbr true' );
-
 				for ( let j = 0; j < pbrTextureTypes.length; j ++ ) {
 
-					const _texture = _material.getTexture( textureTypes[ j ] );
+					const _texture = _material.getTexture( pbrTextureTypes[ j ] );
 					if ( _texture ) {
 
 						const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
-						let textureType = textureTypes[ j ].constructor.name;
+						let textureType = pbrTextureTypes[ j ].constructor.name;
 						textureType = textureType.substring( 12, textureType.length );
 						const texture = { type: textureType, image: 'data:image/png;base64,' + image };
 						textures.push( texture );
