@@ -709,16 +709,13 @@ class Rhino3dmLoader extends Loader {
 					libraryConfig: this.libraryConfig
 				} );
 
-				const pushWarning = warning =>{this.warnings.push(warning)}
-
-				worker.onmessage = function ( e ) {
-
+				worker.onmessage = e =>{
 					const message = e.data;
 
 					switch ( message.type ) {
 
 						case 'warning':
-							pushWarning( message )
+							this.warnings.push( message )
 							console.warn( message )
 							break;
 
@@ -734,8 +731,7 @@ class Rhino3dmLoader extends Loader {
 							console.error( 'THREE.Rhino3dmLoader: Unexpected message, "' + message.type + '"' );
 
 					}
-
-				};
+				}
 
 				this.workerPool.push( worker );
 
