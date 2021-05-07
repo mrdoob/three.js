@@ -127,7 +127,8 @@ class Rhino3dmLoader extends Loader {
 				} );
 
 			} )
-			.then( ( message ) => { this._createGeometry( message.data ); } ).catch( e => {
+			.then( ( message ) => this._createGeometry( message.data ) )
+			.catch( e => {
 
 				throw e;
 
