@@ -243,7 +243,6 @@
 
 				if ( material.name === 'invisible' ) return;
 				const outlineParameters = originalMaterial.userData.outlineParameters;
-				material.skinning = originalMaterial.skinning;
 				material.morphTargets = originalMaterial.morphTargets;
 				material.morphNormals = originalMaterial.morphNormals;
 				material.fog = originalMaterial.fog;

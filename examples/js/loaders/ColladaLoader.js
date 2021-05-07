@@ -3439,18 +3439,7 @@
 					} // regard skinning
 
 
-					const skinning = geometry.data.attributes.skinIndex !== undefined;
-
-					if ( skinning ) {
-
-						for ( let i = 0, l = materials.length; i < l; i ++ ) {
-
-							materials[ i ].skinning = true;
-
-						}
-
-					} // choose between a single or multi materials (material array)
-
+					const skinning = geometry.data.attributes.skinIndex !== undefined; // choose between a single or multi materials (material array)
 
 					const material = materials.length === 1 ? materials[ 0 ] : materials; // now create a specific 3D object
 
