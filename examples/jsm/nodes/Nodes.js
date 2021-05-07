@@ -71,6 +71,7 @@ export { BumpMapNode } from './misc/BumpMapNode.js';
 export { BypassNode } from './utils/BypassNode.js';
 export { JoinNode } from './utils/JoinNode.js';
 export { SwitchNode } from './utils/SwitchNode.js';
+export { RemapNode } from './utils/RemapNode.js';
 export { TimerNode } from './utils/TimerNode.js';
 export { VelocityNode } from './utils/VelocityNode.js';
 export { UVTransformNode } from './utils/UVTransformNode.js';
