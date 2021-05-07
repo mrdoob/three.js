@@ -340,7 +340,7 @@ class LineMaterial extends ShaderMaterial {
 
 					}
 
-					if ( value ) {
+					if ( value === true ) {
 
 						this.defines.USE_DASH = '';
 
@@ -480,7 +480,7 @@ class LineMaterial extends ShaderMaterial {
 
 					}
 
-					if ( value ) {
+					if ( value === true ) {
 
 						this.defines.ALPHA_TO_COVERAGE = '';
 						this.extensions.derivatives = true;
