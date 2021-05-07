@@ -621,7 +621,7 @@ class Rhino3dmLoader extends Loader {
 
 				} else if ( geometry.isLinearLight ) {
 
-					self.postMessage( { type: 'warning', id: taskID, message: 'THREE.3DMLoader:  No conversion exists for linear lights.' } );
+					// self.postMessage( { type: 'warning', id: taskID, message: 'THREE.3DMLoader:  No conversion exists for linear lights.' } );
 
 					return;
 
@@ -709,6 +709,8 @@ class Rhino3dmLoader extends Loader {
 					libraryConfig: this.libraryConfig
 				} );
 
+				const pushWarning = warning =>{this.warnings.push(warning)}
+
 				worker.onmessage = function ( e ) {
 
 					const message = e.data;
@@ -716,7 +718,7 @@ class Rhino3dmLoader extends Loader {
 					switch ( message.type ) {
 
 						case 'warning':
-							this.warnings.push( message )
+							pushWarning( message )
 							console.warn( message )
 							break;
 
