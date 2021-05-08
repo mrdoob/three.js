@@ -132,7 +132,7 @@ RemapNode.prototype.copy = function ( source ) {
 
 RemapNode.prototype.toJSON = function ( meta ) {
 
-	const data = this.getJSONNode( meta );
+	let data = this.getJSONNode( meta );
 
 	if ( ! data ) {
 
