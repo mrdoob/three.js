@@ -1,28 +1,20 @@
 import { MathUtils } from '../../../../build/three.module.js';
 
-function Node( type ) {
+class Node {
 
-	this.uuid = MathUtils.generateUUID();
+	constructor( type ) {
 
-	this.name = '';
+		this.uuid = MathUtils.generateUUID();
 
-	this.type = type;
+		this.name = '';
 
-	this.userData = {};
+		this.type = type;
 
-}
+		this.userData = {};
 
-Node.prototype = {
+	}
 
-	constructor: Node,
-
-	isNode: true,
-
-	hashProperties: undefined,
-
-	analyze: function ( builder, settings ) {
-
-		settings = settings || {};
+	analyze( builder, settings = {} ) {
 
 		builder.analyzing = true;
 
@@ -35,25 +27,21 @@ Node.prototype = {
 
 		builder.analyzing = false;
 
-	},
+	}
 
-	analyzeAndFlow: function ( builder, output, settings ) {
-
-		settings = settings || {};
+	analyzeAndFlow( builder, output, settings = {} ) {
 
 		this.analyze( builder, settings );
 
 		return this.flow( builder, output, settings );
 
-	},
+	}
 
-	flow: function ( builder, output, settings ) {
-
-		settings = settings || {};
+	flow( builder, output, settings = {} ) {
 
 		builder.addFlow( settings.slot, settings.cache, settings.context );
 
-		var flow = {};
+		const flow = {};
 		flow.result = this.build( builder, output );
 		flow.code = builder.clearNodeCode();
 		flow.extra = builder.context.extra;
@@ -62,13 +50,13 @@ Node.prototype = {
 
 		return flow;
 
-	},
+	}
 
-	build: function ( builder, output, uuid ) {
+	build( builder, output, uuid ) {
 
 		output = output || this.getType( builder, output );
 
-		var data = builder.getNodeData( uuid || this );
+		const data = builder.getNodeData( uuid || this );
 
 		if ( builder.analyzing ) {
 
@@ -90,18 +78,18 @@ Node.prototype = {
 
 		return this.generate( builder, output, uuid );
 
-	},
+	}
 
-	generate: function ( /* builder, output, uuid, type, ns */ ) {
+	generate( /* builder, output, uuid, type, ns */ ) {
 
 		// This method needs to be implemented in subclasses
 
-	},
+	}
 
-	getHash: function () {
+	getHash() {
 
-		var hash = '{';
-		var prop, obj;
+		let hash = '{';
+		let prop, obj;
 
 		for ( prop in this ) {
 
@@ -117,7 +105,7 @@ Node.prototype = {
 
 		if ( this.hashProperties ) {
 
-			for ( var i = 0; i < this.hashProperties.length; i ++ ) {
+			for ( let i = 0; i < this.hashProperties.length; i ++ ) {
 
 				prop = this.hashProperties[ i ];
 				obj = this[ prop ];
@@ -132,13 +120,13 @@ Node.prototype = {
 
 		return hash;
 
-	},
+	}
 
-	appendDepsNode: function ( builder, data, output ) {
+	appendDepsNode( builder, data, output ) {
 
 		data.deps = ( data.deps || 0 ) + 1;
 
-		var outputLen = builder.getTypeLength( output );
+		const outputLen = builder.getTypeLength( output );
 
 		if ( outputLen > ( data.outputMax || 0 ) || this.getType( builder, output ) ) {
 
@@ -147,31 +135,31 @@ Node.prototype = {
 
 		}
 
-	},
+	}
 
-	setName: function ( name ) {
+	setName( name ) {
 
 		this.name = name;
 
 		return this;
 
-	},
+	}
 
-	getName: function ( /* builder */ ) {
+	getName( /* builder */ ) {
 
 		return this.name;
 
-	},
+	}
 
-	getType: function ( builder, output ) {
+	getType( builder, output ) {
 
 		return output === 'sampler2D' || output === 'samplerCube' ? output : this.type;
 
-	},
+	}
 
-	getJSONNode: function ( meta ) {
+	getJSONNode( meta ) {
 
-		var isRootObject = ( meta === undefined || typeof meta === 'string' );
+		const isRootObject = ( meta === undefined || typeof meta === 'string' );
 
 		if ( ! isRootObject && meta.nodes[ this.uuid ] !== undefined ) {
 
@@ -179,9 +167,9 @@ Node.prototype = {
 
 		}
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		if ( source.name !== undefined ) this.name = source.name;
 
@@ -189,13 +177,13 @@ Node.prototype = {
 
 		return this;
 
-	},
+	}
 
-	createJSONNode: function ( meta ) {
+	createJSONNode( meta ) {
 
-		var isRootObject = ( meta === undefined || typeof meta === 'string' );
+		const isRootObject = ( meta === undefined || typeof meta === 'string' );
 
-		var data = {};
+		const data = {};
 
 		if ( typeof this.nodeType !== 'string' ) throw new Error( 'Node does not allow serialization.' );
 
@@ -214,14 +202,17 @@ Node.prototype = {
 
 		return data;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
 		return this.getJSONNode( meta ) || this.createJSONNode( meta );
 
 	}
 
-};
+}
+
+Node.prototype.isNode = true;
+Node.prototype.hashProperties = undefined;
 
 export { Node };

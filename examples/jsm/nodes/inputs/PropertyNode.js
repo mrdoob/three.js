@@ -1,53 +1,47 @@
 import { InputNode } from '../core/InputNode.js';
 
-function PropertyNode( object, property, type ) {
+class PropertyNode extends InputNode {
 
-	InputNode.call( this, type );
+	constructor( object, property, type ) {
 
-	this.object = object;
-	this.property = property;
+		super( type );
 
-}
+		this.object = object;
+		this.property = property;
 
-PropertyNode.prototype = Object.create( InputNode.prototype );
-PropertyNode.prototype.constructor = PropertyNode;
-PropertyNode.prototype.nodeType = 'Property';
+	}
 
-Object.defineProperties( PropertyNode.prototype, {
+	get value() {
 
-	value: {
+		return this.object[ this.property ];
 
-		get: function () {
+	}
 
-			return this.object[ this.property ];
+	set value( val ) {
 
-		},
+		this.object[ this.property ] = val;
 
-		set: function ( val ) {
+	}
 
-			this.object[ this.property ] = val;
+	toJSON( meta ) {
+
+		let data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			data = this.createJSONNode( meta );
+
+			data.value = this.value;
+			data.property = this.property;
 
 		}
 
-	}
-
-} );
-
-PropertyNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.value = this.value;
-		data.property = this.property;
+		return data;
 
 	}
 
-	return data;
+}
 
-};
+PropertyNode.prototype.nodeType = 'Property';
 
 export { PropertyNode };
