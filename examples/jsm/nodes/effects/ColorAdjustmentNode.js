@@ -2,20 +2,81 @@ import { TempNode } from '../core/TempNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { LuminanceNode } from './LuminanceNode.js';
 
-function ColorAdjustmentNode( rgb, adjustment, method ) {
+class ColorAdjustmentNode extends TempNode {
 
-	TempNode.call( this, 'v3' );
+	constructor( rgb, adjustment, method ) {
 
-	this.rgb = rgb;
-	this.adjustment = adjustment;
+		super( 'v3' );
 
-	this.method = method || ColorAdjustmentNode.SATURATION;
+		this.rgb = rgb;
+		this.adjustment = adjustment;
+
+		this.method = method || ColorAdjustmentNode.SATURATION;
+
+	}
+
+	generate( builder, output ) {
+
+		const rgb = this.rgb.build( builder, 'v3' ),
+			adjustment = this.adjustment.build( builder, 'f' );
+
+		switch ( this.method ) {
+
+			case ColorAdjustmentNode.BRIGHTNESS:
+
+				return builder.format( '( ' + rgb + ' + ' + adjustment + ' )', this.getType( builder ), output );
+
+				break;
+
+			case ColorAdjustmentNode.CONTRAST:
+
+				return builder.format( '( ' + rgb + ' * ' + adjustment + ' )', this.getType( builder ), output );
+
+				break;
+
+		}
+
+		const method = builder.include( ColorAdjustmentNode.Nodes[ this.method ] );
+
+		return builder.format( method + '( ' + rgb + ', ' + adjustment + ' )', this.getType( builder ), output );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.rgb = source.rgb;
+		this.adjustment = source.adjustment;
+		this.method = source.method;
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		let data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			data = this.createJSONNode( meta );
+
+			data.rgb = this.rgb.toJSON( meta ).uuid;
+			data.adjustment = this.adjustment.toJSON( meta ).uuid;
+			data.method = this.method;
+
+		}
+
+		return data;
+
+	}
 
 }
 
 ColorAdjustmentNode.Nodes = ( function () {
 
-	var hue = new FunctionNode( [
+	const hue = new FunctionNode( [
 		'vec3 hue(vec3 rgb, float adjustment) {',
 
 		'	const mat3 RGBtoYIQ = mat3(0.299, 0.587, 0.114, 0.595716, -0.274453, -0.321263, 0.211456, -0.522591, 0.311135);',
@@ -31,7 +92,7 @@ ColorAdjustmentNode.Nodes = ( function () {
 		'}'
 	].join( '\n' ) );
 
-	var saturation = new FunctionNode( [
+	const saturation = new FunctionNode( [
 		// Algorithm from Chapter 16 of OpenGL Shading Language
 		'vec3 saturation(vec3 rgb, float adjustment) {',
 
@@ -42,7 +103,7 @@ ColorAdjustmentNode.Nodes = ( function () {
 		'}'
 	].join( '\n' ), [ LuminanceNode.Nodes.luminance ] ); // include LuminanceNode function
 
-	var vibrance = new FunctionNode( [
+	const vibrance = new FunctionNode( [
 		// Shader by Evan Wallace adapted by @lo-th
 		'vec3 vibrance(vec3 rgb, float adjustment) {',
 
@@ -70,66 +131,7 @@ ColorAdjustmentNode.VIBRANCE = 'vibrance';
 ColorAdjustmentNode.BRIGHTNESS = 'brightness';
 ColorAdjustmentNode.CONTRAST = 'contrast';
 
-ColorAdjustmentNode.prototype = Object.create( TempNode.prototype );
-ColorAdjustmentNode.prototype.constructor = ColorAdjustmentNode;
 ColorAdjustmentNode.prototype.nodeType = 'ColorAdjustment';
 ColorAdjustmentNode.prototype.hashProperties = [ 'method' ];
-
-ColorAdjustmentNode.prototype.generate = function ( builder, output ) {
-
-	var rgb = this.rgb.build( builder, 'v3' ),
-		adjustment = this.adjustment.build( builder, 'f' );
-
-	switch ( this.method ) {
-
-		case ColorAdjustmentNode.BRIGHTNESS:
-
-			return builder.format( '( ' + rgb + ' + ' + adjustment + ' )', this.getType( builder ), output );
-
-			break;
-
-		case ColorAdjustmentNode.CONTRAST:
-
-			return builder.format( '( ' + rgb + ' * ' + adjustment + ' )', this.getType( builder ), output );
-
-			break;
-
-	}
-
-	var method = builder.include( ColorAdjustmentNode.Nodes[ this.method ] );
-
-	return builder.format( method + '( ' + rgb + ', ' + adjustment + ' )', this.getType( builder ), output );
-
-};
-
-ColorAdjustmentNode.prototype.copy = function ( source ) {
-
-	TempNode.prototype.copy.call( this, source );
-
-	this.rgb = source.rgb;
-	this.adjustment = source.adjustment;
-	this.method = source.method;
-
-	return this;
-
-};
-
-ColorAdjustmentNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.rgb = this.rgb.toJSON( meta ).uuid;
-		data.adjustment = this.adjustment.toJSON( meta ).uuid;
-		data.method = this.method;
-
-	}
-
-	return data;
-
-};
 
 export { ColorAdjustmentNode };

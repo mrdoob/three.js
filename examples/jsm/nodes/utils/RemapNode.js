@@ -70,23 +70,79 @@ vec4 remap( vec4 value, float inLow, float inHigh, float outLow, float outHigh )
 }
 `.trim();
 
-function RemapNode( value, inLow, inHigh, outLow, outHigh ) {
+class RemapNode extends TempNode {
 
-	TempNode.call( this, 'f' );
+	constructor( value, inLow, inHigh, outLow, outHigh ) {
 
-	this.value = value;
-	this.inLow = inLow;
-	this.inHigh = inHigh;
-	this.outLow = outLow;
-	this.outHigh = outHigh;
+		super( 'f' );
+
+		this.value = value;
+		this.inLow = inLow;
+		this.inHigh = inHigh;
+		this.outLow = outLow;
+		this.outHigh = outHigh;
+
+	}
+
+	generate( builder, output ) {
+
+		const remap = builder.include( RemapNode.Nodes.remap );
+
+		return builder.format( remap + '( ' + [
+
+			this.value.build( builder ),
+			this.inLow.build( builder ),
+			this.inHigh.build( builder ),
+			this.outLow.build( builder ),
+			this.outHigh.build( builder ),
+
+		].join( ', ' ) + ' )', this.getType( builder ), output );
+
+	}
+
+	getType( builder ) {
+
+		return this.value.getType( builder );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.value = source.value;
+		this.inLow = source.inLow;
+		this.inHigh = source.inHigh;
+		this.outLow = source.outLow;
+		this.outHigh = source.outHigh;
+
+	}
+
+	toJSON( meta ) {
+
+		let data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			data = this.createJSONNode( meta );
+
+			data.value = this.value.toJSON( meta ).uuid;
+			data.inLow = this.inLow.toJSON( meta ).uuid;
+			data.inHigh = this.inHigh.toJSON( meta ).uuid;
+			data.outLow = this.outLow.toJSON( meta ).uuid;
+			data.outHigh = this.outHigh.toJSON( meta ).uuid;
+
+		}
+
+		return data;
+
+	}
 
 }
 
-RemapNode.prototype = Object.create( TempNode.prototype );
-RemapNode.prototype.constructor = RemapNode;
 RemapNode.prototype.nodeType = 'Remap';
 
-RemapNode.Nodes = (function () {
+RemapNode.Nodes = ( function () {
 
 	return {
 
@@ -94,60 +150,6 @@ RemapNode.Nodes = (function () {
 
 	};
 
-})();
-
-RemapNode.prototype.generate = function (builder, output) {
-
-	const remap = builder.include( RemapNode.Nodes.remap );
-
-	return builder.format( remap + '( ' + [
-
-		this.value.build( builder ),
-		this.inLow.build( builder ),
-		this.inHigh.build( builder ),
-		this.outLow.build( builder ),
-		this.outHigh.build( builder ),
-
-	].join( ', ' ) + ' )', this.getType( builder ), output );
-
-};
-
-RemapNode.prototype.getType = function ( builder ) {
-
-	return this.value.getType( builder );
-
-};
-
-RemapNode.prototype.copy = function ( source ) {
-
-	TempNode.prototype.copy.call( this, source );
-
-	this.value = source.value;
-	this.inLow = source.inLow;
-	this.inHigh = source.inHigh;
-	this.outLow = source.outLow;
-	this.outHigh = source.outHigh;
-
-};
-
-RemapNode.prototype.toJSON = function ( meta ) {
-
-	let data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.value = this.value.toJSON( meta ).uuid;
-		data.inLow = this.inLow.toJSON( meta ).uuid;
-		data.inHigh = this.inHigh.toJSON( meta ).uuid;
-		data.outLow = this.outLow.toJSON( meta ).uuid;
-		data.outHigh = this.outHigh.toJSON( meta ).uuid;
-
-	}
-
-	return data;
-
-};
+} )();
 
 export { RemapNode };
