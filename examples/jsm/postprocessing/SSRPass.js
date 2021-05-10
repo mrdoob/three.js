@@ -50,7 +50,6 @@ class SSRPass extends Pass {
 		this.tempColor = new Color();
 
 		this.selects = [];
-		this.setSelects( selects );
 
 		this._bouncing = bouncing;
 		Object.defineProperty( this, 'bouncing', {
@@ -291,6 +290,8 @@ class SSRPass extends Pass {
 		this.fsQuad = new FullScreenQuad( null );
 
 		this.originalClearColor = new Color();
+
+		this.setSelects( selects );
 
 	}
 
@@ -560,9 +561,9 @@ class SSRPass extends Pass {
 
 				}
 
-				let materialBack = child.material;
+				const materialBack = child.material;
 				child.material = this.intensityMaterial;
-				renderer.render( child, this.camera, false ); // TODO: Will render all descendants?
+				renderer.render( child, this.camera, false );
 				child.material = materialBack;
 
 			}

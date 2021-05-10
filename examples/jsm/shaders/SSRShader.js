@@ -88,7 +88,12 @@ var SSRShader = {
 		}
 		float getViewZ( const in float depth ) {
 			#ifdef PERSPECTIVE_CAMERA
-				return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
+				// return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
+
+				// clipZ=cameraProjectionMatrix[2][2]*viewZ+cameraProjectionMatrix[3][2]
+				// clipZ=-2*depth*viewZ+viewZ
+				// viewZ=cameraProjectionMatrix[3][2]/(1.-2.*depth-cameraProjectionMatrix[2][2])
+				return cameraProjectionMatrix[3][2]/(1.-2.*depth-cameraProjectionMatrix[2][2]);
 			#else
 				return orthographicDepthToViewZ( depth, cameraNear, cameraFar );
 			#endif

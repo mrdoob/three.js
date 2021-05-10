@@ -35,7 +35,7 @@
 
 		const params = {
 			enableSSR: true,
-			autoRotate: false,
+			autoRotate: true,
 			otherMeshes: true,
 			groundReflector: true,
 		};
@@ -48,7 +48,6 @@
 		const otherMeshes = [];
 		let groundReflector;
 		const selects = [];
-		window.selects = selects;
 		let bunny, cube, sphere, cone;
 		let folder;
 
@@ -67,12 +66,10 @@
 			camera.position.set( 0.13271600513224902, 0.3489546826045913, 0.43921296427927076 );
 
 			scene = new THREE.Scene();
-			window.scene = scene;
-			// scene.fog = new THREE.Fog( 0x443333, 1, 4 );
 
 			// Ground
 			const groundPlane = new THREE.Mesh(
-				new THREE.PlaneGeometry( 8, 8 ),
+				new THREE.PlaneGeometry( 1, 1 ),
 				new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 			);
 			groundPlane.rotation.x = - Math.PI / 2;
@@ -81,7 +78,6 @@
 			scene.add( groundPlane );
 			if ( ! params.groundReflector ) selects.push( groundPlane );
 			groundPlane.name = 'groundPlane';
-			window.groundPlane = groundPlane;
 
 			// Lights
 			const hemiLight = new THREE.HemisphereLight( 0x443333, 0x111122 );
@@ -118,8 +114,7 @@
 			} );
 
 			let geometry, material, mesh;
-			let group = new THREE.Group();
-			window.group = group;
+			const group = new THREE.Group();
 			scene.add( group );
 			otherMeshes.push( group );
 			selects.push( group );
@@ -134,7 +129,6 @@
 			// selects.push( mesh );
 			cube = mesh;
 			mesh.name = 'cube';
-			window.cube = cube;
 
 			geometry = new THREE.IcosahedronBufferGeometry( .025, 4 );
 			material = new THREE.MeshPhysicalMaterial( { metalness: .5, roughness: .5, color: 'cyan' } );
@@ -145,7 +139,6 @@
 			// selects.push( mesh );
 			sphere = mesh;
 			mesh.name = 'sphere';
-			window.sphere = sphere;
 
 			geometry = new THREE.ConeBufferGeometry( .025, .05, 64 );
 			material = new THREE.MeshStandardMaterial( { metalness: .5, roughness: .5, color: 'yellow' } );
@@ -158,7 +151,6 @@
 			mesh.position.sub( cube.position );
 			cone = mesh;
 			mesh.name = 'cone';
-			window.cone = cone;
 
 			geometry = new THREE.PlaneBufferGeometry( 1, 1 );
 			groundReflector = new ReflectorForSSRPass( geometry, {
@@ -179,11 +171,6 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.outputEncoding = THREE.sRGBEncoding;
 			container.appendChild( renderer.domElement );
-			// scene.background = new THREE.Color( 0x443333 );
-			// new THREE.TextureLoader().load('textures/equirectangular/venice_sunset_1k.hdr', envMap=>{
-			// 	scene.background=envMap
-			// })
-
 
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 			pmremGenerator.compileEquirectangularShader();
@@ -192,7 +179,7 @@
 				.setPath( 'textures/equirectangular/' )
 				.load( 'venice_sunset_1k.hdr', function ( texture ) {
 
-					let envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+					const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 					pmremGenerator.dispose();
 
 					scene.background = envMap;
@@ -226,9 +213,8 @@
 				height: innerHeight,
 				encoding: THREE.sRGBEncoding,
 				groundReflector: params.groundReflector ? groundReflector : null,
-				selects: params.groundReflector ? selects : null
+				selects,
 			} );
-			window.ssrPass = ssrPass;
 
 			composer.addPass( ssrPass );
 
@@ -260,20 +246,6 @@
 				controls.enabled = ! params.autoRotate;
 
 			} );
-			// ssrPass.output=SSRPass.OUTPUT.Intensity
-			gui.add( ssrPass, 'output', {
-				'Default': SSRPass.OUTPUT.Default,
-				'SSR Only': SSRPass.OUTPUT.SSR,
-				'Beauty': SSRPass.OUTPUT.Beauty,
-				'Depth': SSRPass.OUTPUT.Depth,
-				'Normal': SSRPass.OUTPUT.Normal,
-				'Intensity': SSRPass.OUTPUT.Intensity,
-			} ).onChange( function ( value ) {
-
-				ssrPass.output = parseInt( value );
-
-			} );
-			gui.add( ssrPass, 'defaultIntensity' ).min( 0 ).max( 1 );
 
 			folder = gui.addFolder( 'more settings' );
 			folder.add( ssrPass, 'fresnel' ).onChange( ()=>{
@@ -307,6 +279,18 @@
 
 			} );
 			folder.add( ssrPass, 'bouncing' );
+			folder.add( ssrPass, 'output', {
+				'Default': SSRPass.OUTPUT.Default,
+				'SSR Only': SSRPass.OUTPUT.SSR,
+				'Beauty': SSRPass.OUTPUT.Beauty,
+				'Depth': SSRPass.OUTPUT.Depth,
+				'Normal': SSRPass.OUTPUT.Normal,
+				'Intensity': SSRPass.OUTPUT.Intensity,
+			} ).onChange( function ( value ) {
+
+				ssrPass.output = parseInt( value );
+
+			} );
 			ssrPass.opacity = 1;
 			groundReflector.opacity = ssrPass.opacity;
 			folder.add( ssrPass, 'opacity' ).min( 0 ).max( 1 ).onChange( ()=>{
@@ -317,6 +301,7 @@
 			folder.add( ssrPass, 'blur' );
 			ssrPass.infiniteThick = false;
 			folder.add( ssrPass, 'infiniteThick' );
+			folder.add( ssrPass, 'defaultIntensity' ).min( 0 ).max( 1 );
 
 			let folder2;
 			folder2 = folder.addFolder( 'bunny' );
