@@ -21,7 +21,7 @@ var SSRShader = {
 
 		'tDiffuse': { value: null },
 		'tNormal': { value: null },
-		'tMetalness': { value: null },
+		'tIntensity': { value: null },
 		'tDepth': { value: null },
 		'cameraNear': { value: null },
 		'cameraFar': { value: null },
@@ -55,7 +55,7 @@ var SSRShader = {
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
-		uniform sampler2D tMetalness;
+		uniform sampler2D tIntensity;
 		uniform sampler2D tDiffuse;
 		uniform float cameraRange;
 		uniform vec2 resolution;
@@ -112,8 +112,8 @@ var SSRShader = {
 			return xy;
 		}
 		void main(){
-			float metalness=texture2D(tMetalness,vUv).r;
-			if(metalness==0.) return;
+			float intensity=texture2D(tIntensity,vUv).r;
+			if(intensity==0.) return;
 
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
@@ -216,7 +216,7 @@ var SSRShader = {
 							float fresnelCoe=(dot(viewIncidentDir,viewReflectDir)+1.)/2.;
 							op*=fresnelCoe;
 						#endif
-						op*=metalness;
+						op*=intensity;
 						vec4 reflectColor=texture2D(tDiffuse,uv);
 						gl_FragColor.xyz=reflectColor.xyz;
 						gl_FragColor.a=op;

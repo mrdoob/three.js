@@ -37,7 +37,7 @@
 			enableSSR: true,
 			autoRotate: false,
 			otherMeshes: true,
-			groundReflector: false,
+			groundReflector: true,
 		};
 		let composer;
 		let ssrPass;
@@ -79,7 +79,7 @@
 			groundPlane.position.y = - 0.0001;
 			// groundPlane.receiveShadow = true;
 			scene.add( groundPlane );
-			selects.push( groundPlane );
+			if ( ! params.groundReflector ) selects.push( groundPlane );
 			groundPlane.name = 'groundPlane';
 			window.groundPlane = groundPlane;
 
@@ -198,12 +198,6 @@
 					scene.background = envMap;
 					scene.environment = envMap;
 
-					//
-
-					// buildGUI();
-					// initScene( scenes[ state.scene ] );
-					// animate();
-
 				} );
 
 			//
@@ -231,11 +225,9 @@
 				width: innerWidth,
 				height: innerHeight,
 				encoding: THREE.sRGBEncoding,
-				// groundReflector: params.groundReflector ? groundReflector : null,
-				// selects: params.groundReflector ? selects : null
-				selects,
+				groundReflector: params.groundReflector ? groundReflector : null,
+				selects: params.groundReflector ? selects : null
 			} );
-			ssrPass.selects = selects; // trigger defineProperty watch
 			window.ssrPass = ssrPass;
 
 			composer.addPass( ssrPass );
@@ -244,21 +236,23 @@
 
 			gui = new GUI( { width: 320 } );
 			gui.add( params, 'enableSSR' ).name( 'Enable SSR' );
-			// gui.add( params, 'groundReflector' ).onChange( () => {
+			gui.add( params, 'groundReflector' ).onChange( () => {
 
-			// 	if ( params.groundReflector ) {
+				if ( params.groundReflector ) {
 
-			// 		ssrPass.groundReflector = groundReflector,
-			// 		ssrPass.selects = selects;
+					ssrPass.groundReflector = groundReflector;
+					selects.splice( selects.indexOf( groundPlane ), 1 );
+					ssrPass.setSelects( selects );
 
-			// 	} else {
+				} else {
 
-			// 		ssrPass.groundReflector = null,
-			// 		ssrPass.selects = null;
+					ssrPass.groundReflector = null;
+					selects.push( groundPlane );
+					ssrPass.setSelects( selects );
 
-			// 	}
+				}
 
-			// } );
+			} );
 			ssrPass.thickness = 0.018;
 			gui.add( ssrPass, 'thickness' ).min( 0 ).max( .1 ).step( .0001 );
 			gui.add( params, 'autoRotate' ).onChange( () => {
@@ -266,44 +260,20 @@
 				controls.enabled = ! params.autoRotate;
 
 			} );
-			// ssrPass.output=SSRPass.OUTPUT.Metalness
+			// ssrPass.output=SSRPass.OUTPUT.Intensity
 			gui.add( ssrPass, 'output', {
 				'Default': SSRPass.OUTPUT.Default,
 				'SSR Only': SSRPass.OUTPUT.SSR,
 				'Beauty': SSRPass.OUTPUT.Beauty,
 				'Depth': SSRPass.OUTPUT.Depth,
 				'Normal': SSRPass.OUTPUT.Normal,
-				'Metalness': SSRPass.OUTPUT.Metalness,
+				'Intensity': SSRPass.OUTPUT.Intensity,
 			} ).onChange( function ( value ) {
 
 				ssrPass.output = parseInt( value );
 
 			} );
 			gui.add( ssrPass, 'defaultIntensity' ).min( 0 ).max( 1 );
-			folder = gui.addFolder( 'bunny' );
-			folder.open();
-			// folder.add(bunny.material,'reflectivity').name('ssr&reflectivity').min(0).max(1)
-			folder.add( bunny.material, 'envMapIntensity' ).name( 'ssr&envMapIntensity' ).min( 0 ).max( 1 );
-			folder.add( bunny.material, 'metalness' ).name( 'bunnyMetalness' ).min( 0 ).max( 1 );
-			folder.add( bunny.material, 'roughness' ).name( 'bunnyRoughness' ).min( 0 ).max( 1 );
-			folder = gui.addFolder( 'cube' );
-			folder.open();
-			// // folder.add(cube.material,'reflectivity').name('ssr&reflectivity').min(0).max(1)
-			folder.add( cube.material, 'envMapIntensity' ).name( 'ssr&envMapIntensity' ).min( 0 ).max( 1 );
-			folder.add( cube.material, 'metalness' ).name( 'cubeMetalness' ).min( 0 ).max( 1 );
-			folder.add( cube.material, 'roughness' ).name( 'cubeRoughness' ).min( 0 ).max( 1 );
-			folder = gui.addFolder( 'sphere' );
-			folder.open();
-			// // folder.add(sphere.material,'reflectivity').name('ssr&reflectivity').min(0).max(1)
-			folder.add( sphere.material, 'envMapIntensity' ).name( 'ssr&envMapIntensity' ).min( 0 ).max( 1 );
-			folder.add( sphere.material, 'metalness' ).name( 'sphereMetalness' ).min( 0 ).max( 1 );
-			folder.add( sphere.material, 'roughness' ).name( 'sphereRoughness' ).min( 0 ).max( 1 );
-			folder = gui.addFolder( 'cone' );
-			folder.open();
-			// // folder.add(cone.material,'reflectivity').name('ssr&reflectivity').min(0).max(1)
-			folder.add( cone.material, 'envMapIntensity' ).name( 'ssr&envMapIntensity' ).min( 0 ).max( 1 );
-			folder.add( cone.material, 'metalness' ).name( 'coneMetalness' ).min( 0 ).max( 1 );
-			folder.add( cone.material, 'roughness' ).name( 'coneRoughness' ).min( 0 ).max( 1 );
 
 			folder = gui.addFolder( 'more settings' );
 			folder.add( ssrPass, 'fresnel' ).onChange( ()=>{
@@ -347,6 +317,28 @@
 			folder.add( ssrPass, 'blur' );
 			ssrPass.infiniteThick = false;
 			folder.add( ssrPass, 'infiniteThick' );
+
+			let folder2;
+			folder2 = folder.addFolder( 'bunny' );
+			folder2.add( bunny.material, 'envMapIntensity' ).name( 'ssr&envMapIntensity' ).min( 0 ).max( 1 );
+			folder2.add( bunny.material, 'metalness' ).name( 'bunnyMetalness' ).min( 0 ).max( 1 );
+			folder2.add( bunny.material, 'roughness' ).name( 'bunnyRoughness' ).min( 0 ).max( 1 );
+
+			folder2 = folder.addFolder( 'cube' );
+			folder2.add( cube.material, 'envMapIntensity' ).name( 'ssr&envMapIntensity' ).min( 0 ).max( 1 );
+			folder2.add( cube.material, 'metalness' ).name( 'cubeMetalness' ).min( 0 ).max( 1 );
+			folder2.add( cube.material, 'roughness' ).name( 'cubeRoughness' ).min( 0 ).max( 1 );
+
+			folder2 = folder.addFolder( 'sphere' );
+			folder2.add( sphere.material, 'envMapIntensity' ).name( 'ssr&envMapIntensity' ).min( 0 ).max( 1 );
+			folder2.add( sphere.material, 'metalness' ).name( 'sphereMetalness' ).min( 0 ).max( 1 );
+			folder2.add( sphere.material, 'roughness' ).name( 'sphereRoughness' ).min( 0 ).max( 1 );
+
+			folder2 = folder.addFolder( 'cone' );
+			folder2.add( cone.material, 'envMapIntensity' ).name( 'ssr&envMapIntensity' ).min( 0 ).max( 1 );
+			folder2.add( cone.material, 'metalness' ).name( 'coneMetalness' ).min( 0 ).max( 1 );
+			folder2.add( cone.material, 'roughness' ).name( 'coneRoughness' ).min( 0 ).max( 1 );
+
 			// folder.open()
 			// gui.close()
 
