@@ -42,9 +42,6 @@ class Fractal3DNode extends TempNode {
 
 	generate( builder, output ) {
 
-		const noiseCommon = builder.include( Noise2DNode.Nodes.noiseCommon );
-		const noise3D = builder.include( Noise3DNode.Nodes.noise3d );
-
 		const fractal3d = new FunctionCallNode( Fractal3DNode.Nodes.fractal3d, [
 
 			this.position,
@@ -97,11 +94,11 @@ Fractal3DNode.prototype.nodeType = 'Fractal3D';
 
 Fractal3DNode.Nodes = (function () {
 
-	return {
+	const fractal3d = new FunctionNode( FRACTAL3D_SRC );
 
-		fractal3d: new FunctionNode( FRACTAL3D_SRC )
+	fractal3d.includes = [ Noise2DNode.Nodes.noiseCommon, Noise3DNode.Nodes.noise3d ];
 
-	};
+	return { fractal3d };
 
 })();
 

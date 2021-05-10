@@ -99,7 +99,6 @@ class Noise2DNode extends TempNode {
 
 	generate(builder, output) {
 
-		const noiseCommon = builder.include( Noise2DNode.Nodes.noiseCommon );
 		const noise2d = new FunctionCallNode( Noise2DNode.Nodes.noise2d, [ this.uv, this.amplitude, this.pivot ] );
 		return builder.format( noise2d.generate( builder, output ), this.getType( builder ), output );
 
@@ -139,12 +138,12 @@ Noise2DNode.prototype.nodeType = 'Noise2D';
 
 Noise2DNode.Nodes = (function () {
 
-	return {
+	const noiseCommon = new FunctionNode( NOISE_COMMON_SRC );
+	const noise2d = new FunctionNode( NOISE2D_SRC );
 
-		noiseCommon: new FunctionNode( NOISE_COMMON_SRC ),
-		noise2d: new FunctionNode( NOISE2D_SRC )
+	noise2d.includes = [ noiseCommon ];
 
-	};
+	return { noiseCommon, noise2d };
 
 })();
 

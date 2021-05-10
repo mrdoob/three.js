@@ -92,7 +92,6 @@ class Noise3DNode extends TempNode {
 
 	generate(builder, output) {
 
-		const noiseCommon = builder.include( Noise2DNode.Nodes.noiseCommon );
 		const noise3d = new FunctionCallNode( Noise3DNode.Nodes.noise3d, [ this.position, this.amplitude, this.pivot ] );
 		return builder.format( noise3d.generate( builder, output ), this.getType( builder ), output );
 
@@ -132,11 +131,11 @@ Noise3DNode.prototype.nodeType = 'Noise3D';
 
 Noise3DNode.Nodes = (function () {
 
-	return {
+	const noise3d = new FunctionNode( NOISE3D_SRC );
 
-		noise3d: new FunctionNode( NOISE3D_SRC )
+	noise3d.includes = [ Noise2DNode.Nodes.noiseCommon ];
 
-	};
+	return { noise3d };
 
 })();
 
