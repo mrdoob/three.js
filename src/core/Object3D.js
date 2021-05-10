@@ -9,18 +9,18 @@ import * as MathUtils from '../math/MathUtils.js';
 
 let _object3DId = 0;
 
-const _v1 = new /*@__PURE__*/ Vector3();
-const _q1 = new /*@__PURE__*/ Quaternion();
-const _m1 = new /*@__PURE__*/ Matrix4();
-const _target = new /*@__PURE__*/ Vector3();
+const _v1 = /*@__PURE__*/ new Vector3();
+const _q1 = /*@__PURE__*/ new Quaternion();
+const _m1 = /*@__PURE__*/ new Matrix4();
+const _target = /*@__PURE__*/ new Vector3();
 
-const _position = new /*@__PURE__*/ Vector3();
-const _scale = new /*@__PURE__*/ Vector3();
-const _quaternion = new /*@__PURE__*/ Quaternion();
+const _position = /*@__PURE__*/ new Vector3();
+const _scale = /*@__PURE__*/ new Vector3();
+const _quaternion = /*@__PURE__*/ new Quaternion();
 
-const _xAxis = new /*@__PURE__*/ Vector3( 1, 0, 0 );
-const _yAxis = new /*@__PURE__*/ Vector3( 0, 1, 0 );
-const _zAxis = new /*@__PURE__*/ Vector3( 0, 0, 1 );
+const _xAxis = /*@__PURE__*/ new Vector3( 1, 0, 0 );
+const _yAxis = /*@__PURE__*/ new Vector3( 0, 1, 0 );
+const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 
 const _addedEvent = { type: 'added' };
 const _removedEvent = { type: 'removed' };

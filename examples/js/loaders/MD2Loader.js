@@ -102,7 +102,6 @@
 
 			const translation = new THREE.Vector3();
 			const scale = new THREE.Vector3();
-			const string = [];
 			const frames = [];
 			offset = header.offset_frames;
 
@@ -111,6 +110,7 @@
 				scale.set( data.getFloat32( offset + 0, true ), data.getFloat32( offset + 4, true ), data.getFloat32( offset + 8, true ) );
 				translation.set( data.getFloat32( offset + 12, true ), data.getFloat32( offset + 16, true ), data.getFloat32( offset + 20, true ) );
 				offset += 24;
+				const string = [];
 
 				for ( let j = 0; j < 16; j ++ ) {
 

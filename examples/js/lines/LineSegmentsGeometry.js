@@ -121,7 +121,7 @@
 
 		}
 
-		romLineSegments( lineSegments ) {
+		fromLineSegments( lineSegments ) {
 
 			const geometry = lineSegments.geometry;
 

@@ -67,6 +67,8 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	}
 
+	const drawBuffers = isWebGL2 || extensions.has( 'WEBGL_draw_buffers' );
+
 	const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
 
 	const maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
@@ -88,6 +90,8 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 	return {
 
 		isWebGL2: isWebGL2,
+
+		drawBuffers: drawBuffers,
 
 		getMaxAnisotropy: getMaxAnisotropy,
 		getMaxPrecision: getMaxPrecision,

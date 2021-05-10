@@ -12,43 +12,41 @@ import {
 import { NodeMaterial } from '../materials/NodeMaterial.js';
 import { ScreenNode } from '../inputs/ScreenNode.js';
 
-function NodePostProcessing( renderer, renderTarget ) {
+class NodePostProcessing {
 
-	if ( renderTarget === undefined ) {
+	constructor( renderer, renderTarget ) {
 
-		var parameters = {
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			format: RGBAFormat
-		};
+		if ( renderTarget === undefined ) {
 
-		var size = renderer.getDrawingBufferSize( new Vector2() );
-		renderTarget = new WebGLRenderTarget( size.width, size.height, parameters );
+			const parameters = {
+				minFilter: LinearFilter,
+				magFilter: LinearFilter,
+				format: RGBAFormat
+			};
+
+			const size = renderer.getDrawingBufferSize( new Vector2() );
+			renderTarget = new WebGLRenderTarget( size.width, size.height, parameters );
+
+		}
+
+		this.renderer = renderer;
+		this.renderTarget = renderTarget;
+
+		this.output = new ScreenNode();
+		this.material = new NodeMaterial();
+
+		this.camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+		this.scene = new Scene();
+
+		this.quad = new Mesh( new PlaneGeometry( 2, 2 ), this.material );
+		this.quad.frustumCulled = false; // Avoid getting clipped
+		this.scene.add( this.quad );
+
+		this.needsUpdate = true;
 
 	}
 
-	this.renderer = renderer;
-	this.renderTarget = renderTarget;
-
-	this.output = new ScreenNode();
-	this.material = new NodeMaterial();
-
-	this.camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene = new Scene();
-
-	this.quad = new Mesh( new PlaneGeometry( 2, 2 ), this.material );
-	this.quad.frustumCulled = false; // Avoid getting clipped
-	this.scene.add( this.quad );
-
-	this.needsUpdate = true;
-
-}
-
-NodePostProcessing.prototype = {
-
-	constructor: NodePostProcessing,
-
-	render: function ( scene, camera, frame ) {
+	render( scene, camera, frame ) {
 
 		if ( this.needsUpdate ) {
 
@@ -78,39 +76,39 @@ NodePostProcessing.prototype = {
 		this.renderer.setRenderTarget( null );
 		this.renderer.render( this.scene, this.camera );
 
-	},
+	}
 
-	setPixelRatio: function ( value ) {
+	setPixelRatio( value ) {
 
 		this.renderer.setPixelRatio( value );
 
-		var size = this.renderer.getSize( new Vector2() );
+		const size = this.renderer.getSize( new Vector2() );
 
 		this.setSize( size.width, size.height );
 
-	},
+	}
 
-	setSize: function ( width, height ) {
+	setSize( width, height ) {
 
-		var pixelRatio = this.renderer.getPixelRatio();
+		const pixelRatio = this.renderer.getPixelRatio();
 
 		this.renderTarget.setSize( width * pixelRatio, height * pixelRatio );
 
 		this.renderer.setSize( width, height );
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		this.output = source.output;
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
-		var isRootObject = ( meta === undefined || typeof meta === 'string' );
+		const isRootObject = ( meta === undefined || typeof meta === 'string' );
 
 		if ( isRootObject ) {
 
@@ -124,7 +122,7 @@ NodePostProcessing.prototype = {
 
 		if ( ! meta.post[ this.uuid ] ) {
 
-			var data = {};
+			const data = {};
 
 			data.uuid = this.uuid;
 			data.type = 'NodePostProcessing';
@@ -145,6 +143,6 @@ NodePostProcessing.prototype = {
 
 	}
 
-};
+}
 
 export { NodePostProcessing };

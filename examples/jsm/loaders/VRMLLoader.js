@@ -34,7 +34,7 @@ import {
 	Vector2,
 	Vector3
 } from '../../../build/three.module.js';
-import { chevrotain } from '../libs/chevrotain.module.min.js';
+import chevrotain from '../libs/chevrotain.module.min.js';
 
 
 class VRMLLoader extends Loader {
@@ -3238,9 +3238,9 @@ class VRMLLexer {
 
 }
 
-const ChevrotainParser = chevrotain.Parser;// eslint-disable-line no-undef
+const CstParser = chevrotain.CstParser;// eslint-disable-line no-undef
 
-class VRMLParser extends ChevrotainParser {
+class VRMLParser extends CstParser {
 
 	constructor( tokenVocabulary ) {
 

@@ -2,17 +2,17 @@ import Node from './Node.js';
 
 class AttributeNode extends Node {
 
-	constructor( name, type ) {
+	constructor( attributeName, type ) {
 
 		super( type );
 
-		this.name = name;
+		this._attributeName = attributeName;
 
 	}
 
-	setAttributeName( name ) {
+	setAttributeName( attributeName ) {
 
-		this.name = name;
+		this._attributeName = attributeName;
 
 		return this;
 
@@ -20,7 +20,7 @@ class AttributeNode extends Node {
 
 	getAttributeName( /*builder*/ ) {
 
-		return this.name;
+		return this._attributeName;
 
 	}
 

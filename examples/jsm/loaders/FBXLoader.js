@@ -1261,12 +1261,6 @@ class FBXTreeParser {
 
 		if ( geometry.FBX_Deformer ) {
 
-			materials.forEach( function ( material ) {
-
-				material.skinning = true;
-
-			} );
-
 			model = new SkinnedMesh( geometry, material );
 			model.normalizeSkinWeights();
 
