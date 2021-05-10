@@ -96,7 +96,7 @@ Fractal3DNode.Nodes = (function () {
 
 	const fractal3d = new FunctionNode( FRACTAL3D_SRC );
 
-	fractal3d.includes = [ Noise2DNode.Nodes.noiseCommon, Noise3DNode.Nodes.noise3d ];
+	fractal3d.includes = [ Noise3DNode.Nodes.noise3d ];
 
 	return { fractal3d };
 
