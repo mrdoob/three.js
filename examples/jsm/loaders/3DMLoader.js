@@ -89,7 +89,9 @@ class Rhino3dmLoader extends Loader {
 			}
 
 			this.decodeObjects( buffer, url )
-				.then( result =>{onLoad(result); this.warnings.length>0 && onWarning(this.warnings)} )
+				.then( result => { 
+					onLoad( result ); 
+					this.warnings.length > 0 && onWarning ( this.warnings ) } )
 				.catch( e => onError( e ) );
 
 		}, onProgress, onError );
@@ -165,7 +167,7 @@ class Rhino3dmLoader extends Loader {
 	parse( data, onLoad, onError, onWarning ) {
 
 		this.decodeObjects( data, '' )
-			.then( result =>{onLoad(result); this.warnings.length>0 && onWarning(this.warnings)} )
+			.then( result => { onLoad( result ); this.warnings.length > 0 && onWarning( this.warnings ) } )
 			.catch( e => onError( e ) );
 
 	}
@@ -581,6 +583,58 @@ class Rhino3dmLoader extends Loader {
 
 				let light;
 
+				switch ( geometry.lightStyle.name ) {
+
+					case 'LightStyle_WorldPoint':
+
+						light = new PointLight();
+						light.castShadow = attributes.castsShadows;
+						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+						light.shadow.normalBias = 0.1;
+
+						break;
+
+					case 'LightStyle_WorldSpot':
+
+						light = new SpotLight();
+						light.castShadow = attributes.castsShadows;
+						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+						light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+						light.angle = geometry.spotAngleRadians;
+						light.shadow.normalBias = 0.1;
+
+						break;
+
+					case 'LightStyle_WorldRectangular':
+
+						light = new RectAreaLight();
+						const width = Math.abs( geometry.width[ 2 ] );
+						const height = Math.abs( geometry.length[ 0 ] );
+						light.position.set( geometry.location[ 0 ] - ( height / 2 ), geometry.location[ 1 ], geometry.location[ 2 ] - ( width / 2 ) );
+						light.height = height;
+						light.width = width;
+						light.lookAt( new Vector3( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] ) );
+	
+						break;
+
+					case 'LightStyle_WorldDirectional':
+
+						light = new DirectionalLight();
+						light.castShadow = attributes.castsShadows;
+						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+						light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+						light.shadow.normalBias = 0.1;
+
+						break;
+
+					case 'LightStyle_WorldLinear':
+						// not conversion exists, warning has already been printed to the console
+						break;
+
+					default:
+						break;
+				}
+/*
 				if ( geometry.isDirectionalLight ) {
 
 					light = new DirectionalLight();
@@ -626,6 +680,7 @@ class Rhino3dmLoader extends Loader {
 					return;
 
 				}
+				*/
 
 				if ( light ) {
 
@@ -709,14 +764,15 @@ class Rhino3dmLoader extends Loader {
 					libraryConfig: this.libraryConfig
 				} );
 
-				worker.onmessage = e =>{
+				worker.onmessage = e => {
+
 					const message = e.data;
 
 					switch ( message.type ) {
 
 						case 'warning':
-							this.warnings.push( message )
-							console.warn( message )
+							this.warnings.push( message.data )
+							console.warn( message.data )
 							break;
 
 						case 'decode':
@@ -731,6 +787,7 @@ class Rhino3dmLoader extends Loader {
 							console.error( 'THREE.Rhino3dmLoader: Unexpected message, "' + message.type + '"' );
 
 					}
+
 				}
 
 				this.workerPool.push( worker );
@@ -946,7 +1003,12 @@ function Rhino3dmWorker() {
 
 					} else {
 
-						self.postMessage( { type: 'warning', id: taskID, message:`THREE.3DMLoader: Image for ${textureType} texture not embedded in file.` } );
+						self.postMessage( { type: 'warning', id: taskID, data: { 
+							message: `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.`,
+							type: 'missing resource'
+							} 
+						} );
+
 						texture.image = null;
 
 					}
@@ -1211,6 +1273,18 @@ function Rhino3dmWorker() {
 
 				geometry = extractProperties( _geometry );
 
+				if ( geometry.lightStyle.name === 'LightStyle_WorldLinear' ) {
+
+					self.postMessage( { type: 'warning', id: taskID, data: {
+						message: `THREE.3DMLoader: No conversion exists for ${objectType.constructor.name} ${geometry.lightStyle.name}`,
+						type: 'no conversion',
+						guid: _attributes.id
+						}
+
+					} );
+
+				}
+
 				break;
 
 			case rhino.ObjectType.InstanceReference:
@@ -1243,7 +1317,13 @@ function Rhino3dmWorker() {
 
 			default:
 
-				self.postMessage( { type: 'warning', id: taskID, message:`THREE.3DMLoader: TODO: Implement ${objectType.constructor.name}` } );
+				self.postMessage( { type: 'warning', id: taskID, data: {
+					message: `THREE.3DMLoader: Conversion not implemented for ${objectType.constructor.name}`,
+					type: 'not implemented',
+					guid: _attributes.id
+					}
+
+				} );
 
 				break;
 
@@ -1281,7 +1361,13 @@ function Rhino3dmWorker() {
 
 		} else {
 
-			self.postMessage( { type: 'warning', id: taskID, message:`THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.`  } );
+			self.postMessage( { type: 'warning', id: taskID, data: {
+				message: `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.`,
+				type: 'missing mesh',
+				guid: _attributes.id
+				}
+
+			} );
 
 		}
 
