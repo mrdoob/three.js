@@ -53,8 +53,10 @@ class WebXRManager extends EventDispatcher {
 		this.isPresenting = false;
 
 		this.getControllers = function () {
-			return controllers
-		}
+
+			return controllers;
+
+		};
 
 		this.getController = function ( index ) {
 
