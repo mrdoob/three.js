@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name]은 구상 곡선 클래스에서 사용되는 스플라인 및 베지어 함수를 포함하고 있습니다.
+		</p>
+
+		<h2>메서드</h2>
+
+		<h3>[method:Float CatmullRom]( [param:Float t], [param:Float p0], [param:Float p1], [param:Float p2], [param:Float p3] )</h3>
+		<p>
+		t -- 보간 가중치.<br />
+		p0, p1, p2, p3 -- 스플라인 곡선을 정의하는 점입니다.<br /><br />
+
+		[page:SplineCurve SplineCurve]에서 내부적으로 사용됩니다.
+		</p>
+
+		<h3>[method:Float QuadraticBezier]( [param:Float t], [param:Float p0], [param:Float p1], [param:Float p2] )</h3>
+		<p>
+		t -- 보간 가중치.<br />
+		p0, p1, p2 -- 곡선을 정의하는 시작, 조절, 끝 점입니다.<br /><br />
+
+		[page:QuadraticBezierCurve3 QuadraticBezierCurve3], [page:QuadraticBezierCurve QuadraticBezierCurve] 및 [page:Font Font]에서 내부적으로 사용됩니다.
+		</p>
+
+		<h3>[method:Float CubicBezier]( [param:Float t], [param:Float p0], [param:Float p1], [param:Float p2], [param:Float p3] )</h3>
+		<p>
+		t -- 보간 가중치.<br />
+		p0, p1, p2, p3 -- 곡선을 정의하는 시작, 조절(두 번), 끝 점입니다.<br /><br />
+
+		[page:CubicBezierCurve3 CubicBezierCurve3], [page:CubicBezierCurve CubicBezierCurve] 및 [page:Font Font]에서 내부적으로 사용됩니다.
+		</p>
+
+		<h2>소스코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
