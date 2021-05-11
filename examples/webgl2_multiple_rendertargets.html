@@ -112,7 +112,6 @@
 			import { WEBGL } from './jsm/WebGL.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			let container;
 			let camera, scene, renderer, controls;
 			let renderTarget;
 			let postScene, postCamera;
@@ -128,20 +127,10 @@
 
 				}
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				const canvas = document.createElement( 'canvas' );
-				const context = canvas.getContext( 'webgl2' );
-
-				renderer = new THREE.WebGLRenderer( {
-					canvas: canvas,
-					context: context
-				} );
-
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				// Create a multi render target with Float buffers
 
