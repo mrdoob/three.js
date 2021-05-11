@@ -333,6 +333,8 @@
 			const geometry = new THREE.BoxGeometry( x, y, z );
 			const material = new THREE.MeshPhongMaterial( { color: color } );
 			const buttonMesh = new THREE.Mesh( geometry, material );
+			buttonMesh.castShadow = true;
+			buttonMesh.receiveShadow = true;
 			return buttonMesh;
 
 		}
@@ -406,12 +408,15 @@
 			const floorMaterial = new THREE.MeshPhongMaterial( { color: 0x222222 } );
 			const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 			floor.rotation.x = - Math.PI / 2;
+			floor.receiveShadow = true;
 			scene.add( floor );
 
 			const consoleGeometry = new THREE.BoxGeometry( 0.5, 0.12, 0.15 );
 			const consoleMaterial = new THREE.MeshPhongMaterial( { color: 0x595959 } );
 			const consoleMesh = new THREE.Mesh( consoleGeometry, consoleMaterial );
 			consoleMesh.position.set( 0, 1, - 0.3 );
+			consoleMesh.castShadow = true;
+			consoleMesh.receiveShadow = true;
 			scene.add( consoleMesh );
 
 			const orangeButton = makeButtonMesh( 0.08, 0.1, 0.08, 0xffd3b5 );
