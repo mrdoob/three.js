@@ -16,7 +16,7 @@ import {
 	Vector3
 } from '../../../build/three.module.js';
 
-var GeometryCompressionUtils = {
+class GeometryCompressionUtils {
 
 	/**
 		 * Make the input mesh.geometry's normal attribute encoded and compressed by 3 different methods.
@@ -26,7 +26,7 @@ var GeometryCompressionUtils = {
 		 * @param {String} encodeMethod		"DEFAULT" || "OCT1Byte" || "OCT2Byte" || "ANGLES"
 		 *
 		 */
-	compressNormals: function ( mesh, encodeMethod ) {
+	static compressNormals( mesh, encodeMethod ) {
 
 		if ( ! mesh.geometry ) {
 
@@ -61,7 +61,7 @@ var GeometryCompressionUtils = {
 
 			for ( let idx = 0; idx < array.length; idx += 3 ) {
 
-				const encoded = this.EncodingFuncs.defaultEncode( array[ idx ], array[ idx + 1 ], array[ idx + 2 ], 1 );
+				const encoded = EncodingFuncs.defaultEncode( array[ idx ], array[ idx + 1 ], array[ idx + 2 ], 1 );
 
 				result[ idx + 0 ] = encoded[ 0 ];
 				result[ idx + 1 ] = encoded[ 1 ];
@@ -84,7 +84,7 @@ var GeometryCompressionUtils = {
 
 			for ( let idx = 0; idx < array.length; idx += 3 ) {
 
-				const encoded = this.EncodingFuncs.octEncodeBest( array[ idx ], array[ idx + 1 ], array[ idx + 2 ], 1 );
+				const encoded = EncodingFuncs.octEncodeBest( array[ idx ], array[ idx + 1 ], array[ idx + 2 ], 1 );
 
 				result[ idx / 3 * 2 + 0 ] = encoded[ 0 ];
 				result[ idx / 3 * 2 + 1 ] = encoded[ 1 ];
@@ -100,7 +100,7 @@ var GeometryCompressionUtils = {
 
 			for ( let idx = 0; idx < array.length; idx += 3 ) {
 
-				const encoded = this.EncodingFuncs.octEncodeBest( array[ idx ], array[ idx + 1 ], array[ idx + 2 ], 2 );
+				const encoded = EncodingFuncs.octEncodeBest( array[ idx ], array[ idx + 1 ], array[ idx + 2 ], 2 );
 
 				result[ idx / 3 * 2 + 0 ] = encoded[ 0 ];
 				result[ idx / 3 * 2 + 1 ] = encoded[ 1 ];
@@ -116,7 +116,7 @@ var GeometryCompressionUtils = {
 
 			for ( let idx = 0; idx < array.length; idx += 3 ) {
 
-				const encoded = this.EncodingFuncs.anglesEncode( array[ idx ], array[ idx + 1 ], array[ idx + 2 ] );
+				const encoded = EncodingFuncs.anglesEncode( array[ idx ], array[ idx + 1 ], array[ idx + 2 ] );
 
 				result[ idx / 3 * 2 + 0 ] = encoded[ 0 ];
 				result[ idx / 3 * 2 + 1 ] = encoded[ 1 ];
@@ -167,7 +167,7 @@ var GeometryCompressionUtils = {
 
 		}
 
-	},
+	}
 
 
 	/**
@@ -177,7 +177,7 @@ var GeometryCompressionUtils = {
 		 * @param {THREE.Mesh} mesh
 		 *
 		 */
-	compressPositions: function ( mesh ) {
+	static compressPositions( mesh ) {
 
 		if ( ! mesh.geometry ) {
 
@@ -204,7 +204,7 @@ var GeometryCompressionUtils = {
 		const array = position.array;
 		const encodingBytes = 2;
 
-		const result = this.EncodingFuncs.quantizedEncode( array, encodingBytes );
+		const result = EncodingFuncs.quantizedEncode( array, encodingBytes );
 
 		const quantized = result.quantized;
 		const decodeMat = result.decodeMat;
@@ -230,7 +230,7 @@ var GeometryCompressionUtils = {
 		mesh.material.uniforms.quantizeMatPos.value = decodeMat;
 		mesh.material.uniforms.quantizeMatPos.needsUpdate = true;
 
-	},
+	}
 
 	/**
 		 * Make the input mesh.geometry's uv attribute encoded and compressed.
@@ -239,7 +239,7 @@ var GeometryCompressionUtils = {
 		 * @param {THREE.Mesh} mesh
 		 *
 		 */
-	compressUvs: function ( mesh ) {
+	static compressUvs( mesh ) {
 
 		if ( ! mesh.geometry ) {
 
@@ -277,7 +277,7 @@ var GeometryCompressionUtils = {
 
 			for ( let i = 0; i < array.length; i += 2 ) {
 
-				const encoded = this.EncodingFuncs.defaultEncode( array[ i ], array[ i + 1 ], 0, 2 );
+				const encoded = EncodingFuncs.defaultEncode( array[ i ], array[ i + 1 ], 0, 2 );
 
 				result[ i ] = encoded[ 0 ];
 				result[ i + 1 ] = encoded[ 1 ];
@@ -300,7 +300,7 @@ var GeometryCompressionUtils = {
 		} else {
 
 			// use quantized encoding method
-			result = this.EncodingFuncs.quantizedEncodeUV( array, 2 );
+			result = EncodingFuncs.quantizedEncodeUV( array, 2 );
 
 			mesh.geometry.setAttribute( 'uv', new BufferAttribute( result.quantized, 2 ) );
 			mesh.geometry.attributes.uv.isPacked = true;
@@ -320,348 +320,347 @@ var GeometryCompressionUtils = {
 
 		}
 
-	},
+	}
 
-	EncodingFuncs: {
+}
 
-		defaultEncode: function ( x, y, z, bytes ) {
+class EncodingFuncs {
 
-			if ( bytes == 1 ) {
+	static defaultEncode( x, y, z, bytes ) {
 
-				const tmpx = Math.round( ( x + 1 ) * 0.5 * 255 );
-				const tmpy = Math.round( ( y + 1 ) * 0.5 * 255 );
-				const tmpz = Math.round( ( z + 1 ) * 0.5 * 255 );
-				return new Uint8Array( [ tmpx, tmpy, tmpz ] );
+		if ( bytes == 1 ) {
 
-			} else if ( bytes == 2 ) {
+			const tmpx = Math.round( ( x + 1 ) * 0.5 * 255 );
+			const tmpy = Math.round( ( y + 1 ) * 0.5 * 255 );
+			const tmpz = Math.round( ( z + 1 ) * 0.5 * 255 );
+			return new Uint8Array( [ tmpx, tmpy, tmpz ] );
 
-				const tmpx = Math.round( ( x + 1 ) * 0.5 * 65535 );
-				const tmpy = Math.round( ( y + 1 ) * 0.5 * 65535 );
-				const tmpz = Math.round( ( z + 1 ) * 0.5 * 65535 );
-				return new Uint16Array( [ tmpx, tmpy, tmpz ] );
+		} else if ( bytes == 2 ) {
 
-			} else {
+			const tmpx = Math.round( ( x + 1 ) * 0.5 * 65535 );
+			const tmpy = Math.round( ( y + 1 ) * 0.5 * 65535 );
+			const tmpz = Math.round( ( z + 1 ) * 0.5 * 65535 );
+			return new Uint16Array( [ tmpx, tmpy, tmpz ] );
 
-				console.error( 'number of bytes must be 1 or 2' );
+		} else {
 
-			}
-
-		},
-
-		defaultDecode: function ( array, bytes ) {
-
-			if ( bytes == 1 ) {
-
-				return [
-					( ( array[ 0 ] / 255 ) * 2.0 ) - 1.0,
-					( ( array[ 1 ] / 255 ) * 2.0 ) - 1.0,
-					( ( array[ 2 ] / 255 ) * 2.0 ) - 1.0,
-				];
-
-			} else if ( bytes == 2 ) {
-
-				return [
-					( ( array[ 0 ] / 65535 ) * 2.0 ) - 1.0,
-					( ( array[ 1 ] / 65535 ) * 2.0 ) - 1.0,
-					( ( array[ 2 ] / 65535 ) * 2.0 ) - 1.0,
-				];
-
-			} else {
-
-				console.error( 'number of bytes must be 1 or 2' );
-
-			}
-
-		},
-
-		// for `Angles` encoding
-		anglesEncode: function ( x, y, z ) {
-
-			const normal0 = parseInt( 0.5 * ( 1.0 + Math.atan2( y, x ) / Math.PI ) * 65535 );
-			const normal1 = parseInt( 0.5 * ( 1.0 + z ) * 65535 );
-			return new Uint16Array( [ normal0, normal1 ] );
-
-		},
-
-		// for `Octahedron` encoding
-		octEncodeBest: function ( x, y, z, bytes ) {
-
-			var oct, dec, best, currentCos, bestCos;
-
-			// Test various combinations of ceil and floor
-			// to minimize rounding errors
-			best = oct = octEncodeVec3( x, y, z, 'floor', 'floor' );
-			dec = octDecodeVec2( oct );
-			bestCos = dot( x, y, z, dec );
-
-			oct = octEncodeVec3( x, y, z, 'ceil', 'floor' );
-			dec = octDecodeVec2( oct );
-			currentCos = dot( x, y, z, dec );
-
-			if ( currentCos > bestCos ) {
-
-				best = oct;
-				bestCos = currentCos;
-
-			}
-
-			oct = octEncodeVec3( x, y, z, 'floor', 'ceil' );
-			dec = octDecodeVec2( oct );
-			currentCos = dot( x, y, z, dec );
-
-			if ( currentCos > bestCos ) {
-
-				best = oct;
-				bestCos = currentCos;
-
-			}
-
-			oct = octEncodeVec3( x, y, z, 'ceil', 'ceil' );
-			dec = octDecodeVec2( oct );
-			currentCos = dot( x, y, z, dec );
-
-			if ( currentCos > bestCos ) {
-
-				best = oct;
-
-			}
-
-			return best;
-
-			function octEncodeVec3( x0, y0, z0, xfunc, yfunc ) {
-
-				var x = x0 / ( Math.abs( x0 ) + Math.abs( y0 ) + Math.abs( z0 ) );
-				var y = y0 / ( Math.abs( x0 ) + Math.abs( y0 ) + Math.abs( z0 ) );
-
-				if ( z < 0 ) {
-
-					var tempx = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
-					var tempy = ( 1 - Math.abs( x ) ) * ( y >= 0 ? 1 : - 1 );
-
-					x = tempx;
-					y = tempy;
-
-					var diff = 1 - Math.abs( x ) - Math.abs( y );
-					if ( diff > 0 ) {
-
-						diff += 0.001;
-						x += x > 0 ? diff / 2 : - diff / 2;
-						y += y > 0 ? diff / 2 : - diff / 2;
-
-					}
-
-				}
-
-				if ( bytes == 1 ) {
-
-					return new Int8Array( [
-						Math[ xfunc ]( x * 127.5 + ( x < 0 ? 1 : 0 ) ),
-						Math[ yfunc ]( y * 127.5 + ( y < 0 ? 1 : 0 ) )
-					] );
-
-				}
-
-				if ( bytes == 2 ) {
-
-					return new Int16Array( [
-						Math[ xfunc ]( x * 32767.5 + ( x < 0 ? 1 : 0 ) ),
-						Math[ yfunc ]( y * 32767.5 + ( y < 0 ? 1 : 0 ) )
-					] );
-
-				}
-
-
-			}
-
-			function octDecodeVec2( oct ) {
-
-				var x = oct[ 0 ];
-				var y = oct[ 1 ];
-
-				if ( bytes == 1 ) {
-
-					x /= x < 0 ? 127 : 128;
-					y /= y < 0 ? 127 : 128;
-
-				} else if ( bytes == 2 ) {
-
-					x /= x < 0 ? 32767 : 32768;
-					y /= y < 0 ? 32767 : 32768;
-
-				}
-
-
-				var z = 1 - Math.abs( x ) - Math.abs( y );
-
-				if ( z < 0 ) {
-
-					var tmpx = x;
-					x = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
-					y = ( 1 - Math.abs( tmpx ) ) * ( y >= 0 ? 1 : - 1 );
-
-				}
-
-				var length = Math.sqrt( x * x + y * y + z * z );
-
-				return [
-					x / length,
-					y / length,
-					z / length
-				];
-
-			}
-
-			function dot( x, y, z, vec3 ) {
-
-				return x * vec3[ 0 ] + y * vec3[ 1 ] + z * vec3[ 2 ];
-
-			}
-
-		},
-
-		quantizedEncode: function ( array, bytes ) {
-
-			let quantized, segments;
-
-			if ( bytes == 1 ) {
-
-				quantized = new Uint8Array( array.length );
-				segments = 255;
-
-			} else if ( bytes == 2 ) {
-
-				quantized = new Uint16Array( array.length );
-				segments = 65535;
-
-			} else {
-
-				console.error( 'number of bytes error! ' );
-
-			}
-
-			const decodeMat = new Matrix4();
-
-			const min = new Float32Array( 3 );
-			const max = new Float32Array( 3 );
-
-			min[ 0 ] = min[ 1 ] = min[ 2 ] = Number.MAX_VALUE;
-			max[ 0 ] = max[ 1 ] = max[ 2 ] = - Number.MAX_VALUE;
-
-			for ( let i = 0; i < array.length; i += 3 ) {
-
-				min[ 0 ] = Math.min( min[ 0 ], array[ i + 0 ] );
-				min[ 1 ] = Math.min( min[ 1 ], array[ i + 1 ] );
-				min[ 2 ] = Math.min( min[ 2 ], array[ i + 2 ] );
-				max[ 0 ] = Math.max( max[ 0 ], array[ i + 0 ] );
-				max[ 1 ] = Math.max( max[ 1 ], array[ i + 1 ] );
-				max[ 2 ] = Math.max( max[ 2 ], array[ i + 2 ] );
-
-			}
-
-			decodeMat.scale( new Vector3(
-				( max[ 0 ] - min[ 0 ] ) / segments,
-				( max[ 1 ] - min[ 1 ] ) / segments,
-				( max[ 2 ] - min[ 2 ] ) / segments
-			) );
-
-			decodeMat.elements[ 12 ] = min[ 0 ];
-			decodeMat.elements[ 13 ] = min[ 1 ];
-			decodeMat.elements[ 14 ] = min[ 2 ];
-
-			decodeMat.transpose();
-
-
-			const multiplier = new Float32Array( [
-				max[ 0 ] !== min[ 0 ] ? segments / ( max[ 0 ] - min[ 0 ] ) : 0,
-				max[ 1 ] !== min[ 1 ] ? segments / ( max[ 1 ] - min[ 1 ] ) : 0,
-				max[ 2 ] !== min[ 2 ] ? segments / ( max[ 2 ] - min[ 2 ] ) : 0
-			] );
-
-			for ( let i = 0; i < array.length; i += 3 ) {
-
-				quantized[ i + 0 ] = Math.floor( ( array[ i + 0 ] - min[ 0 ] ) * multiplier[ 0 ] );
-				quantized[ i + 1 ] = Math.floor( ( array[ i + 1 ] - min[ 1 ] ) * multiplier[ 1 ] );
-				quantized[ i + 2 ] = Math.floor( ( array[ i + 2 ] - min[ 2 ] ) * multiplier[ 2 ] );
-
-			}
-
-			return {
-				quantized: quantized,
-				decodeMat: decodeMat
-			};
-
-		},
-
-
-		quantizedEncodeUV: function ( array, bytes ) {
-
-			let quantized, segments;
-
-			if ( bytes == 1 ) {
-
-				quantized = new Uint8Array( array.length );
-				segments = 255;
-
-			} else if ( bytes == 2 ) {
-
-				quantized = new Uint16Array( array.length );
-				segments = 65535;
-
-			} else {
-
-				console.error( 'number of bytes error! ' );
-
-			}
-
-			const decodeMat = new Matrix3();
-
-			const min = new Float32Array( 2 );
-			const max = new Float32Array( 2 );
-
-			min[ 0 ] = min[ 1 ] = Number.MAX_VALUE;
-			max[ 0 ] = max[ 1 ] = - Number.MAX_VALUE;
-
-			for ( let i = 0; i < array.length; i += 2 ) {
-
-				min[ 0 ] = Math.min( min[ 0 ], array[ i + 0 ] );
-				min[ 1 ] = Math.min( min[ 1 ], array[ i + 1 ] );
-				max[ 0 ] = Math.max( max[ 0 ], array[ i + 0 ] );
-				max[ 1 ] = Math.max( max[ 1 ], array[ i + 1 ] );
-
-			}
-
-			decodeMat.scale(
-				( max[ 0 ] - min[ 0 ] ) / segments,
-				( max[ 1 ] - min[ 1 ] ) / segments
-			);
-
-			decodeMat.elements[ 6 ] = min[ 0 ];
-			decodeMat.elements[ 7 ] = min[ 1 ];
-
-			decodeMat.transpose();
-
-			const multiplier = new Float32Array( [
-				max[ 0 ] !== min[ 0 ] ? segments / ( max[ 0 ] - min[ 0 ] ) : 0,
-				max[ 1 ] !== min[ 1 ] ? segments / ( max[ 1 ] - min[ 1 ] ) : 0
-			] );
-
-			for ( let i = 0; i < array.length; i += 2 ) {
-
-				quantized[ i + 0 ] = Math.floor( ( array[ i + 0 ] - min[ 0 ] ) * multiplier[ 0 ] );
-				quantized[ i + 1 ] = Math.floor( ( array[ i + 1 ] - min[ 1 ] ) * multiplier[ 1 ] );
-
-			}
-
-			return {
-				quantized: quantized,
-				decodeMat: decodeMat
-			};
+			console.error( 'number of bytes must be 1 or 2' );
 
 		}
 
 	}
 
-};
+	static defaultDecode( array, bytes ) {
+
+		if ( bytes == 1 ) {
+
+			return [
+				( ( array[ 0 ] / 255 ) * 2.0 ) - 1.0,
+				( ( array[ 1 ] / 255 ) * 2.0 ) - 1.0,
+				( ( array[ 2 ] / 255 ) * 2.0 ) - 1.0,
+			];
+
+		} else if ( bytes == 2 ) {
+
+			return [
+				( ( array[ 0 ] / 65535 ) * 2.0 ) - 1.0,
+				( ( array[ 1 ] / 65535 ) * 2.0 ) - 1.0,
+				( ( array[ 2 ] / 65535 ) * 2.0 ) - 1.0,
+			];
+
+		} else {
+
+			console.error( 'number of bytes must be 1 or 2' );
+
+		}
+
+	}
+
+	// for `Angles` encoding
+	static anglesEncode( x, y, z ) {
+
+		const normal0 = parseInt( 0.5 * ( 1.0 + Math.atan2( y, x ) / Math.PI ) * 65535 );
+		const normal1 = parseInt( 0.5 * ( 1.0 + z ) * 65535 );
+		return new Uint16Array( [ normal0, normal1 ] );
+
+	}
+
+	// for `Octahedron` encoding
+	static octEncodeBest( x, y, z, bytes ) {
+
+		let oct, dec, best, currentCos, bestCos;
+
+		// Test various combinations of ceil and floor
+		// to minimize rounding errors
+		best = oct = octEncodeVec3( x, y, z, 'floor', 'floor' );
+		dec = octDecodeVec2( oct );
+		bestCos = dot( x, y, z, dec );
+
+		oct = octEncodeVec3( x, y, z, 'ceil', 'floor' );
+		dec = octDecodeVec2( oct );
+		currentCos = dot( x, y, z, dec );
+
+		if ( currentCos > bestCos ) {
+
+			best = oct;
+			bestCos = currentCos;
+
+		}
+
+		oct = octEncodeVec3( x, y, z, 'floor', 'ceil' );
+		dec = octDecodeVec2( oct );
+		currentCos = dot( x, y, z, dec );
+
+		if ( currentCos > bestCos ) {
+
+			best = oct;
+			bestCos = currentCos;
+
+		}
+
+		oct = octEncodeVec3( x, y, z, 'ceil', 'ceil' );
+		dec = octDecodeVec2( oct );
+		currentCos = dot( x, y, z, dec );
+
+		if ( currentCos > bestCos ) {
+
+			best = oct;
+
+		}
+
+		return best;
+
+		function octEncodeVec3( x0, y0, z0, xfunc, yfunc ) {
+
+			let x = x0 / ( Math.abs( x0 ) + Math.abs( y0 ) + Math.abs( z0 ) );
+			let y = y0 / ( Math.abs( x0 ) + Math.abs( y0 ) + Math.abs( z0 ) );
+
+			if ( z < 0 ) {
+
+				const tempx = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
+				const tempy = ( 1 - Math.abs( x ) ) * ( y >= 0 ? 1 : - 1 );
+
+				x = tempx;
+				y = tempy;
+
+				let diff = 1 - Math.abs( x ) - Math.abs( y );
+				if ( diff > 0 ) {
+
+					diff += 0.001;
+					x += x > 0 ? diff / 2 : - diff / 2;
+					y += y > 0 ? diff / 2 : - diff / 2;
+
+				}
+
+			}
+
+			if ( bytes == 1 ) {
+
+				return new Int8Array( [
+					Math[ xfunc ]( x * 127.5 + ( x < 0 ? 1 : 0 ) ),
+					Math[ yfunc ]( y * 127.5 + ( y < 0 ? 1 : 0 ) )
+				] );
+
+			}
+
+			if ( bytes == 2 ) {
+
+				return new Int16Array( [
+					Math[ xfunc ]( x * 32767.5 + ( x < 0 ? 1 : 0 ) ),
+					Math[ yfunc ]( y * 32767.5 + ( y < 0 ? 1 : 0 ) )
+				] );
+
+			}
+
+
+		}
+
+		function octDecodeVec2( oct ) {
+
+			let x = oct[ 0 ];
+			let y = oct[ 1 ];
+
+			if ( bytes == 1 ) {
+
+				x /= x < 0 ? 127 : 128;
+				y /= y < 0 ? 127 : 128;
+
+			} else if ( bytes == 2 ) {
+
+				x /= x < 0 ? 32767 : 32768;
+				y /= y < 0 ? 32767 : 32768;
+
+			}
+
+
+			const z = 1 - Math.abs( x ) - Math.abs( y );
+
+			if ( z < 0 ) {
+
+				const tmpx = x;
+				x = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
+				y = ( 1 - Math.abs( tmpx ) ) * ( y >= 0 ? 1 : - 1 );
+
+			}
+
+			const length = Math.sqrt( x * x + y * y + z * z );
+
+			return [
+				x / length,
+				y / length,
+				z / length
+			];
+
+		}
+
+		function dot( x, y, z, vec3 ) {
+
+			return x * vec3[ 0 ] + y * vec3[ 1 ] + z * vec3[ 2 ];
+
+		}
+
+	}
+
+	static quantizedEncode( array, bytes ) {
+
+		let quantized, segments;
+
+		if ( bytes == 1 ) {
+
+			quantized = new Uint8Array( array.length );
+			segments = 255;
+
+		} else if ( bytes == 2 ) {
+
+			quantized = new Uint16Array( array.length );
+			segments = 65535;
+
+		} else {
+
+			console.error( 'number of bytes error! ' );
+
+		}
+
+		const decodeMat = new Matrix4();
+
+		const min = new Float32Array( 3 );
+		const max = new Float32Array( 3 );
+
+		min[ 0 ] = min[ 1 ] = min[ 2 ] = Number.MAX_VALUE;
+		max[ 0 ] = max[ 1 ] = max[ 2 ] = - Number.MAX_VALUE;
+
+		for ( let i = 0; i < array.length; i += 3 ) {
+
+			min[ 0 ] = Math.min( min[ 0 ], array[ i + 0 ] );
+			min[ 1 ] = Math.min( min[ 1 ], array[ i + 1 ] );
+			min[ 2 ] = Math.min( min[ 2 ], array[ i + 2 ] );
+			max[ 0 ] = Math.max( max[ 0 ], array[ i + 0 ] );
+			max[ 1 ] = Math.max( max[ 1 ], array[ i + 1 ] );
+			max[ 2 ] = Math.max( max[ 2 ], array[ i + 2 ] );
+
+		}
+
+		decodeMat.scale( new Vector3(
+			( max[ 0 ] - min[ 0 ] ) / segments,
+			( max[ 1 ] - min[ 1 ] ) / segments,
+			( max[ 2 ] - min[ 2 ] ) / segments
+		) );
+
+		decodeMat.elements[ 12 ] = min[ 0 ];
+		decodeMat.elements[ 13 ] = min[ 1 ];
+		decodeMat.elements[ 14 ] = min[ 2 ];
+
+		decodeMat.transpose();
+
+
+		const multiplier = new Float32Array( [
+			max[ 0 ] !== min[ 0 ] ? segments / ( max[ 0 ] - min[ 0 ] ) : 0,
+			max[ 1 ] !== min[ 1 ] ? segments / ( max[ 1 ] - min[ 1 ] ) : 0,
+			max[ 2 ] !== min[ 2 ] ? segments / ( max[ 2 ] - min[ 2 ] ) : 0
+		] );
+
+		for ( let i = 0; i < array.length; i += 3 ) {
+
+			quantized[ i + 0 ] = Math.floor( ( array[ i + 0 ] - min[ 0 ] ) * multiplier[ 0 ] );
+			quantized[ i + 1 ] = Math.floor( ( array[ i + 1 ] - min[ 1 ] ) * multiplier[ 1 ] );
+			quantized[ i + 2 ] = Math.floor( ( array[ i + 2 ] - min[ 2 ] ) * multiplier[ 2 ] );
+
+		}
+
+		return {
+			quantized: quantized,
+			decodeMat: decodeMat
+		};
+
+	}
+
+	static quantizedEncodeUV( array, bytes ) {
+
+		let quantized, segments;
+
+		if ( bytes == 1 ) {
+
+			quantized = new Uint8Array( array.length );
+			segments = 255;
+
+		} else if ( bytes == 2 ) {
+
+			quantized = new Uint16Array( array.length );
+			segments = 65535;
+
+		} else {
+
+			console.error( 'number of bytes error! ' );
+
+		}
+
+		const decodeMat = new Matrix3();
+
+		const min = new Float32Array( 2 );
+		const max = new Float32Array( 2 );
+
+		min[ 0 ] = min[ 1 ] = Number.MAX_VALUE;
+		max[ 0 ] = max[ 1 ] = - Number.MAX_VALUE;
+
+		for ( let i = 0; i < array.length; i += 2 ) {
+
+			min[ 0 ] = Math.min( min[ 0 ], array[ i + 0 ] );
+			min[ 1 ] = Math.min( min[ 1 ], array[ i + 1 ] );
+			max[ 0 ] = Math.max( max[ 0 ], array[ i + 0 ] );
+			max[ 1 ] = Math.max( max[ 1 ], array[ i + 1 ] );
+
+		}
+
+		decodeMat.scale(
+			( max[ 0 ] - min[ 0 ] ) / segments,
+			( max[ 1 ] - min[ 1 ] ) / segments
+		);
+
+		decodeMat.elements[ 6 ] = min[ 0 ];
+		decodeMat.elements[ 7 ] = min[ 1 ];
+
+		decodeMat.transpose();
+
+		const multiplier = new Float32Array( [
+			max[ 0 ] !== min[ 0 ] ? segments / ( max[ 0 ] - min[ 0 ] ) : 0,
+			max[ 1 ] !== min[ 1 ] ? segments / ( max[ 1 ] - min[ 1 ] ) : 0
+		] );
+
+		for ( let i = 0; i < array.length; i += 2 ) {
+
+			quantized[ i + 0 ] = Math.floor( ( array[ i + 0 ] - min[ 0 ] ) * multiplier[ 0 ] );
+			quantized[ i + 1 ] = Math.floor( ( array[ i + 1 ] - min[ 1 ] ) * multiplier[ 1 ] );
+
+		}
+
+		return {
+			quantized: quantized,
+			decodeMat: decodeMat
+		};
+
+	}
+
+}
 
 
 

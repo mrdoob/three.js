@@ -23,23 +23,21 @@ import {
  * @constructor
  */
 
-var TDSLoader = function ( manager ) {
+class TDSLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.debug = false;
+		super( manager );
 
-	this.group = null;
-	this.position = 0;
+		this.debug = false;
 
-	this.materials = [];
-	this.meshes = [];
+		this.group = null;
+		this.position = 0;
 
-};
+		this.materials = [];
+		this.meshes = [];
 
-TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
-
-	constructor: TDSLoader,
+	}
 
 	/**
 	 * Load 3ds file from url.
@@ -50,13 +48,13 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {Function} onProgress onProgress callback.
 	 * @param {Function} onError onError callback.
 	 */
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		const scope = this;
 
-		var path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
+		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 
-		var loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
@@ -86,7 +84,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
 	/**
 	 * Parse arraybuffer data and load 3ds file.
@@ -96,7 +94,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {String} path Path for external resources.
 	 * @return {Group} Group loaded from 3ds file.
 	 */
-	parse: function ( arraybuffer, path ) {
+	parse( arraybuffer, path ) {
 
 		this.group = new Group();
 		this.position = 0;
@@ -105,7 +103,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		this.readFile( arraybuffer, path );
 
-		for ( var i = 0; i < this.meshes.length; i ++ ) {
+		for ( let i = 0; i < this.meshes.length; i ++ ) {
 
 			this.group.add( this.meshes[ i ] );
 
@@ -113,7 +111,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return this.group;
 
-	},
+	}
 
 	/**
 	 * Decode file content to read 3ds data.
@@ -122,20 +120,20 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
 	 * @param {String} path Path for external resources.
 	 */
-	readFile: function ( arraybuffer, path ) {
+	readFile( arraybuffer, path ) {
 
-		var data = new DataView( arraybuffer );
-		var chunk = this.readChunk( data );
+		const data = new DataView( arraybuffer );
+		const chunk = this.readChunk( data );
 
 		if ( chunk.id === MLIBMAGIC || chunk.id === CMAGIC || chunk.id === M3DMAGIC ) {
 
-			var next = this.nextChunk( data, chunk );
+			let next = this.nextChunk( data, chunk );
 
 			while ( next !== 0 ) {
 
 				if ( next === M3D_VERSION ) {
 
-					var version = this.readDWord( data );
+					const version = this.readDWord( data );
 					this.debugMessage( '3DS file version: ' + version );
 
 				} else if ( next === MDATA ) {
@@ -157,7 +155,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		this.debugMessage( 'Parsed ' + this.meshes.length + ' meshes' );
 
-	},
+	}
 
 	/**
 	 * Read mesh data chunk.
@@ -166,21 +164,21 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {Dataview} data Dataview in use.
 	 * @param {String} path Path for external resources.
 	 */
-	readMeshData: function ( data, path ) {
+	readMeshData( data, path ) {
 
-		var chunk = this.readChunk( data );
-		var next = this.nextChunk( data, chunk );
+		const chunk = this.readChunk( data );
+		let next = this.nextChunk( data, chunk );
 
 		while ( next !== 0 ) {
 
 			if ( next === MESH_VERSION ) {
 
-				var version = + this.readDWord( data );
+				const version = + this.readDWord( data );
 				this.debugMessage( 'Mesh Version: ' + version );
 
 			} else if ( next === MASTER_SCALE ) {
 
-				var scale = this.readFloat( data );
+				const scale = this.readFloat( data );
 				this.debugMessage( 'Master scale: ' + scale );
 				this.group.scale.set( scale, scale, scale );
 
@@ -206,7 +204,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-	},
+	}
 
 	/**
 	 * Read named object chunk.
@@ -214,19 +212,19 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @method readNamedObject
 	 * @param {Dataview} data Dataview in use.
 	 */
-	readNamedObject: function ( data ) {
+	readNamedObject( data ) {
 
-		var chunk = this.readChunk( data );
-		var name = this.readString( data, 64 );
+		const chunk = this.readChunk( data );
+		const name = this.readString( data, 64 );
 		chunk.cur = this.position;
 
-		var next = this.nextChunk( data, chunk );
+		let next = this.nextChunk( data, chunk );
 		while ( next !== 0 ) {
 
 			if ( next === N_TRI_OBJECT ) {
 
 				this.resetPosition( data );
-				var mesh = this.readMesh( data );
+				const mesh = this.readMesh( data );
 				mesh.name = name;
 				this.meshes.push( mesh );
 
@@ -242,7 +240,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		this.endChunk( chunk );
 
-	},
+	}
 
 	/**
 	 * Read material data chunk and add it to the material list.
@@ -251,11 +249,11 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {Dataview} data Dataview in use.
 	 * @param {String} path Path for external resources.
 	 */
-	readMaterialEntry: function ( data, path ) {
+	readMaterialEntry( data, path ) {
 
-		var chunk = this.readChunk( data );
-		var next = this.nextChunk( data, chunk );
-		var material = new MeshPhongMaterial();
+		const chunk = this.readChunk( data );
+		let next = this.nextChunk( data, chunk );
+		const material = new MeshPhongMaterial();
 
 		while ( next !== 0 ) {
 
@@ -271,7 +269,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			} else if ( next === MAT_WIRE_SIZE ) {
 
-				var value = this.readByte( data );
+				const value = this.readByte( data );
 				material.wireframeLinewidth = value;
 				this.debugMessage( '   Wireframe Thickness: ' + value );
 
@@ -302,13 +300,13 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			} else if ( next === MAT_SHININESS ) {
 
-				var shininess = this.readPercentage( data );
+				const shininess = this.readPercentage( data );
 				material.shininess = shininess * 100;
 				this.debugMessage( '   Shininess : ' + shininess );
 
 			} else if ( next === MAT_TRANSPARENCY ) {
 
-				var transparency = this.readPercentage( data );
+				const transparency = this.readPercentage( data );
 				material.opacity = 1 - transparency;
 				this.debugMessage( '  Transparency : ' + transparency );
 				material.transparent = material.opacity < 1 ? true : false;
@@ -351,7 +349,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		this.materials[ material.name ] = material;
 
-	},
+	}
 
 	/**
 	 * Read mesh data chunk.
@@ -360,31 +358,30 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {Dataview} data Dataview in use.
 	 * @return {Mesh} The parsed mesh.
 	 */
-	readMesh: function ( data ) {
+	readMesh( data ) {
 
-		var chunk = this.readChunk( data );
-		var next = this.nextChunk( data, chunk );
+		const chunk = this.readChunk( data );
+		let next = this.nextChunk( data, chunk );
 
-		var geometry = new BufferGeometry();
-		var uvs = [];
+		const geometry = new BufferGeometry();
 
-		var material = new MeshPhongMaterial();
-		var mesh = new Mesh( geometry, material );
+		const material = new MeshPhongMaterial();
+		const mesh = new Mesh( geometry, material );
 		mesh.name = 'mesh';
 
 		while ( next !== 0 ) {
 
 			if ( next === POINT_ARRAY ) {
 
-				var points = this.readWord( data );
+				const points = this.readWord( data );
 
 				this.debugMessage( '   Vertex: ' + points );
 
 				//BufferGeometry
 
-				var vertices = [];
+				const vertices = [];
 
-				for ( var i = 0; i < points; i ++ )		{
+				for ( let i = 0; i < points; i ++ )		{
 
 					vertices.push( this.readFloat( data ) );
 					vertices.push( this.readFloat( data ) );
@@ -401,15 +398,15 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			} else if ( next === TEX_VERTS ) {
 
-				var texels = this.readWord( data );
+				const texels = this.readWord( data );
 
 				this.debugMessage( '   UV: ' + texels );
 
 				//BufferGeometry
 
-				var uvs = [];
+				const uvs = [];
 
-				for ( var i = 0; i < texels; i ++ )		{
+				for ( let i = 0; i < texels; i ++ )		{
 
 					uvs.push( this.readFloat( data ) );
 					uvs.push( this.readFloat( data ) );
@@ -423,14 +420,14 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				this.debugMessage( '   Tranformation Matrix (TODO)' );
 
-				var values = [];
-				for ( var i = 0; i < 12; i ++ ) {
+				const values = [];
+				for ( let i = 0; i < 12; i ++ ) {
 
 					values[ i ] = this.readFloat( data );
 
 				}
 
-				var matrix = new Matrix4();
+				const matrix = new Matrix4();
 
 				//X Line
 				matrix.elements[ 0 ] = values[ 0 ];
@@ -458,7 +455,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				matrix.transpose();
 
-				var inverse = new Matrix4();
+				const inverse = new Matrix4();
 				inverse.copy( matrix ).invert();
 				geometry.applyMatrix4( inverse );
 
@@ -480,7 +477,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return mesh;
 
-	},
+	}
 
 	/**
 	 * Read face array data chunk.
@@ -489,16 +486,16 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {Dataview} data Dataview in use.
 	 * @param {Mesh} mesh Mesh to be filled with the data read.
 	 */
-	readFaceArray: function ( data, mesh ) {
+	readFaceArray( data, mesh ) {
 
-		var chunk = this.readChunk( data );
-		var faces = this.readWord( data );
+		const chunk = this.readChunk( data );
+		const faces = this.readWord( data );
 
 		this.debugMessage( '   Faces: ' + faces );
 
-		var index = [];
+		const index = [];
 
-		for ( var i = 0; i < faces; ++ i ) {
+		for ( let i = 0; i < faces; ++ i ) {
 
 			index.push( this.readWord( data ), this.readWord( data ), this.readWord( data ) );
 
@@ -510,12 +507,12 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		//The rest of the FACE_ARRAY chunk is subchunks
 
-		var materialIndex = 0;
-		var start = 0;
+		let materialIndex = 0;
+		let start = 0;
 
 		while ( this.position < chunk.end ) {
 
-			var subchunk = this.readChunk( data );
+			const subchunk = this.readChunk( data );
 
 			if ( subchunk.id === MSH_MAT_GROUP ) {
 
@@ -523,15 +520,15 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				this.resetPosition( data );
 
-				var group = this.readMaterialGroup( data );
-				var count = group.index.length * 3; // assuming successive indices
+				const group = this.readMaterialGroup( data );
+				const count = group.index.length * 3; // assuming successive indices
 
 				mesh.geometry.addGroup( start, count, materialIndex );
 
 				start += count;
 				materialIndex ++;
 
-				var material = this.materials[ group.name ];
+				const material = this.materials[ group.name ];
 
 				if ( Array.isArray( mesh.material ) === false ) mesh.material = [];
 
@@ -555,7 +552,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		this.endChunk( chunk );
 
-	},
+	}
 
 	/**
 	 * Read texture map data chunk.
@@ -565,20 +562,20 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {String} path Path for external resources.
 	 * @return {Texture} Texture read from this data chunk.
 	 */
-	readMap: function ( data, path ) {
+	readMap( data, path ) {
 
-		var chunk = this.readChunk( data );
-		var next = this.nextChunk( data, chunk );
-		var texture = {};
+		const chunk = this.readChunk( data );
+		let next = this.nextChunk( data, chunk );
+		let texture = {};
 
-		var loader = new TextureLoader( this.manager );
+		const loader = new TextureLoader( this.manager );
 		loader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		while ( next !== 0 ) {
 
 			if ( next === MAT_MAPNAME ) {
 
-				var name = this.readString( data, 128 );
+				const name = this.readString( data, 128 );
 				texture = loader.load( name );
 
 				this.debugMessage( '      File: ' + path + name );
@@ -617,7 +614,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return texture;
 
-	},
+	}
 
 	/**
 	 * Read material group data chunk.
@@ -626,17 +623,17 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {Dataview} data Dataview in use.
 	 * @return {Object} Object with name and index of the object.
 	 */
-	readMaterialGroup: function ( data ) {
+	readMaterialGroup( data ) {
 
 		this.readChunk( data );
-		var name = this.readString( data, 64 );
-		var numFaces = this.readWord( data );
+		const name = this.readString( data, 64 );
+		const numFaces = this.readWord( data );
 
 		this.debugMessage( '         Name: ' + name );
 		this.debugMessage( '         Faces: ' + numFaces );
 
-		var index = [];
-		for ( var i = 0; i < numFaces; ++ i ) {
+		const index = [];
+		for ( let i = 0; i < numFaces; ++ i ) {
 
 			index.push( this.readWord( data ) );
 
@@ -644,7 +641,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return { name: name, index: index };
 
-	},
+	}
 
 	/**
 	 * Read a color value.
@@ -653,16 +650,16 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {DataView} data Dataview.
 	 * @return {Color} Color value read..
 	 */
-	readColor: function ( data ) {
+	readColor( data ) {
 
-		var chunk = this.readChunk( data );
-		var color = new Color();
+		const chunk = this.readChunk( data );
+		const color = new Color();
 
 		if ( chunk.id === COLOR_24 || chunk.id === LIN_COLOR_24 ) {
 
-			var r = this.readByte( data );
-			var g = this.readByte( data );
-			var b = this.readByte( data );
+			const r = this.readByte( data );
+			const g = this.readByte( data );
+			const b = this.readByte( data );
 
 			color.setRGB( r / 255, g / 255, b / 255 );
 
@@ -670,9 +667,9 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}	else if ( chunk.id === COLOR_F || chunk.id === LIN_COLOR_F ) {
 
-			var r = this.readFloat( data );
-			var g = this.readFloat( data );
-			var b = this.readFloat( data );
+			const r = this.readFloat( data );
+			const g = this.readFloat( data );
+			const b = this.readFloat( data );
 
 			color.setRGB( r, g, b );
 
@@ -687,7 +684,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		this.endChunk( chunk );
 		return color;
 
-	},
+	}
 
 	/**
 	 * Read next chunk of data.
@@ -696,9 +693,9 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {DataView} data Dataview.
 	 * @return {Object} Chunk of data read.
 	 */
-	readChunk: function ( data ) {
+	readChunk( data ) {
 
-		var chunk = {};
+		const chunk = {};
 
 		chunk.cur = this.position;
 		chunk.id = this.readWord( data );
@@ -708,7 +705,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return chunk;
 
-	},
+	}
 
 	/**
 	 * Set position to the end of the current chunk of data.
@@ -716,11 +713,11 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @method endChunk
 	 * @param {Object} chunk Data chunk.
 	 */
-	endChunk: function ( chunk ) {
+	endChunk( chunk ) {
 
 		this.position = chunk.end;
 
-	},
+	}
 
 	/**
 	 * Move to the next data chunk.
@@ -729,7 +726,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {DataView} data Dataview.
 	 * @param {Object} chunk Data chunk.
 	 */
-	nextChunk: function ( data, chunk ) {
+	nextChunk( data, chunk ) {
 
 		if ( chunk.cur >= chunk.end ) {
 
@@ -741,7 +738,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		try {
 
-			var next = this.readChunk( data );
+			const next = this.readChunk( data );
 			chunk.cur += next.size;
 			return next.id;
 
@@ -752,18 +749,18 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-	},
+	}
 
 	/**
 	 * Reset dataview position.
 	 *
 	 * @method resetPosition
 	 */
-	resetPosition: function () {
+	resetPosition() {
 
 		this.position -= 6;
 
-	},
+	}
 
 	/**
 	 * Read byte value.
@@ -772,13 +769,13 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readByte: function ( data ) {
+	readByte( data ) {
 
-		var v = data.getUint8( this.position, true );
+		const v = data.getUint8( this.position, true );
 		this.position += 1;
 		return v;
 
-	},
+	}
 
 	/**
 	 * Read 32 bit float value.
@@ -787,11 +784,11 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readFloat: function ( data ) {
+	readFloat( data ) {
 
 		try {
 
-			var v = data.getFloat32( this.position, true );
+			const v = data.getFloat32( this.position, true );
 			this.position += 4;
 			return v;
 
@@ -801,7 +798,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-	},
+	}
 
 	/**
 	 * Read 32 bit signed integer value.
@@ -810,13 +807,13 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readInt: function ( data ) {
+	readInt( data ) {
 
-		var v = data.getInt32( this.position, true );
+		const v = data.getInt32( this.position, true );
 		this.position += 4;
 		return v;
 
-	},
+	}
 
 	/**
 	 * Read 16 bit signed integer value.
@@ -825,13 +822,13 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readShort: function ( data ) {
+	readShort( data ) {
 
-		var v = data.getInt16( this.position, true );
+		const v = data.getInt16( this.position, true );
 		this.position += 2;
 		return v;
 
-	},
+	}
 
 	/**
 	 * Read 64 bit unsigned integer value.
@@ -840,13 +837,13 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readDWord: function ( data ) {
+	readDWord( data ) {
 
-		var v = data.getUint32( this.position, true );
+		const v = data.getUint32( this.position, true );
 		this.position += 4;
 		return v;
 
-	},
+	}
 
 	/**
 	 * Read 32 bit unsigned integer value.
@@ -855,13 +852,13 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readWord: function ( data ) {
+	readWord( data ) {
 
-		var v = data.getUint16( this.position, true );
+		const v = data.getUint16( this.position, true );
 		this.position += 2;
 		return v;
 
-	},
+	}
 
 	/**
 	 * Read string value.
@@ -871,13 +868,13 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {Number} maxLength Max size of the string to be read.
 	 * @return {String} Data read from the dataview.
 	 */
-	readString: function ( data, maxLength ) {
+	readString( data, maxLength ) {
 
-		var s = '';
+		let s = '';
 
-		for ( var i = 0; i < maxLength; i ++ ) {
+		for ( let i = 0; i < maxLength; i ++ ) {
 
-			var c = this.readByte( data );
+			const c = this.readByte( data );
 			if ( ! c ) {
 
 				break;
@@ -890,7 +887,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return s;
 
-	},
+	}
 
 	/**
 	 * Read percentage value.
@@ -899,10 +896,10 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readPercentage: function ( data ) {
+	readPercentage( data ) {
 
-		var chunk = this.readChunk( data );
-		var value;
+		const chunk = this.readChunk( data );
+		let value;
 
 		switch ( chunk.id ) {
 
@@ -923,7 +920,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return value;
 
-	},
+	}
 
 	/**
 	 * Print debug message to the console.
@@ -933,7 +930,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * @method debugMessage
 	 * @param {Object} message Debug message to print to the console.
 	 */
-	debugMessage: function ( message ) {
+	debugMessage( message ) {
 
 		if ( this.debug ) {
 
@@ -943,224 +940,224 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
-// var NULL_CHUNK = 0x0000;
-var M3DMAGIC = 0x4D4D;
-// var SMAGIC = 0x2D2D;
-// var LMAGIC = 0x2D3D;
-var MLIBMAGIC = 0x3DAA;
-// var MATMAGIC = 0x3DFF;
-var CMAGIC = 0xC23D;
-var M3D_VERSION = 0x0002;
-// var M3D_KFVERSION = 0x0005;
-var COLOR_F = 0x0010;
-var COLOR_24 = 0x0011;
-var LIN_COLOR_24 = 0x0012;
-var LIN_COLOR_F = 0x0013;
-var INT_PERCENTAGE = 0x0030;
-var FLOAT_PERCENTAGE = 0x0031;
-var MDATA = 0x3D3D;
-var MESH_VERSION = 0x3D3E;
-var MASTER_SCALE = 0x0100;
-// var LO_SHADOW_BIAS = 0x1400;
-// var HI_SHADOW_BIAS = 0x1410;
-// var SHADOW_MAP_SIZE = 0x1420;
-// var SHADOW_SAMPLES = 0x1430;
-// var SHADOW_RANGE = 0x1440;
-// var SHADOW_FILTER = 0x1450;
-// var RAY_BIAS = 0x1460;
-// var O_CONSTS = 0x1500;
-// var AMBIENT_LIGHT = 0x2100;
-// var BIT_MAP = 0x1100;
-// var SOLID_BGND = 0x1200;
-// var V_GRADIENT = 0x1300;
-// var USE_BIT_MAP = 0x1101;
-// var USE_SOLID_BGND = 0x1201;
-// var USE_V_GRADIENT = 0x1301;
-// var FOG = 0x2200;
-// var FOG_BGND = 0x2210;
-// var LAYER_FOG = 0x2302;
-// var DISTANCE_CUE = 0x2300;
-// var DCUE_BGND = 0x2310;
-// var USE_FOG = 0x2201;
-// var USE_LAYER_FOG = 0x2303;
-// var USE_DISTANCE_CUE = 0x2301;
-var MAT_ENTRY = 0xAFFF;
-var MAT_NAME = 0xA000;
-var MAT_AMBIENT = 0xA010;
-var MAT_DIFFUSE = 0xA020;
-var MAT_SPECULAR = 0xA030;
-var MAT_SHININESS = 0xA040;
-// var MAT_SHIN2PCT = 0xA041;
-var MAT_TRANSPARENCY = 0xA050;
-// var MAT_XPFALL = 0xA052;
-// var MAT_USE_XPFALL = 0xA240;
-// var MAT_REFBLUR = 0xA053;
-// var MAT_SHADING = 0xA100;
-// var MAT_USE_REFBLUR = 0xA250;
-// var MAT_SELF_ILLUM = 0xA084;
-var MAT_TWO_SIDE = 0xA081;
-// var MAT_DECAL = 0xA082;
-var MAT_ADDITIVE = 0xA083;
-var MAT_WIRE = 0xA085;
-// var MAT_FACEMAP = 0xA088;
-// var MAT_TRANSFALLOFF_IN = 0xA08A;
-// var MAT_PHONGSOFT = 0xA08C;
-// var MAT_WIREABS = 0xA08E;
-var MAT_WIRE_SIZE = 0xA087;
-var MAT_TEXMAP = 0xA200;
-// var MAT_SXP_TEXT_DATA = 0xA320;
-// var MAT_TEXMASK = 0xA33E;
-// var MAT_SXP_TEXTMASK_DATA = 0xA32A;
-// var MAT_TEX2MAP = 0xA33A;
-// var MAT_SXP_TEXT2_DATA = 0xA321;
-// var MAT_TEX2MASK = 0xA340;
-// var MAT_SXP_TEXT2MASK_DATA = 0xA32C;
-var MAT_OPACMAP = 0xA210;
-// var MAT_SXP_OPAC_DATA = 0xA322;
-// var MAT_OPACMASK = 0xA342;
-// var MAT_SXP_OPACMASK_DATA = 0xA32E;
-var MAT_BUMPMAP = 0xA230;
-// var MAT_SXP_BUMP_DATA = 0xA324;
-// var MAT_BUMPMASK = 0xA344;
-// var MAT_SXP_BUMPMASK_DATA = 0xA330;
-var MAT_SPECMAP = 0xA204;
-// var MAT_SXP_SPEC_DATA = 0xA325;
-// var MAT_SPECMASK = 0xA348;
-// var MAT_SXP_SPECMASK_DATA = 0xA332;
-// var MAT_SHINMAP = 0xA33C;
-// var MAT_SXP_SHIN_DATA = 0xA326;
-// var MAT_SHINMASK = 0xA346;
-// var MAT_SXP_SHINMASK_DATA = 0xA334;
-// var MAT_SELFIMAP = 0xA33D;
-// var MAT_SXP_SELFI_DATA = 0xA328;
-// var MAT_SELFIMASK = 0xA34A;
-// var MAT_SXP_SELFIMASK_DATA = 0xA336;
-// var MAT_REFLMAP = 0xA220;
-// var MAT_REFLMASK = 0xA34C;
-// var MAT_SXP_REFLMASK_DATA = 0xA338;
-// var MAT_ACUBIC = 0xA310;
-var MAT_MAPNAME = 0xA300;
-// var MAT_MAP_TILING = 0xA351;
-// var MAT_MAP_TEXBLUR = 0xA353;
-var MAT_MAP_USCALE = 0xA354;
-var MAT_MAP_VSCALE = 0xA356;
-var MAT_MAP_UOFFSET = 0xA358;
-var MAT_MAP_VOFFSET = 0xA35A;
-// var MAT_MAP_ANG = 0xA35C;
-// var MAT_MAP_COL1 = 0xA360;
-// var MAT_MAP_COL2 = 0xA362;
-// var MAT_MAP_RCOL = 0xA364;
-// var MAT_MAP_GCOL = 0xA366;
-// var MAT_MAP_BCOL = 0xA368;
-var NAMED_OBJECT = 0x4000;
-// var N_DIRECT_LIGHT = 0x4600;
-// var DL_OFF = 0x4620;
-// var DL_OUTER_RANGE = 0x465A;
-// var DL_INNER_RANGE = 0x4659;
-// var DL_MULTIPLIER = 0x465B;
-// var DL_EXCLUDE = 0x4654;
-// var DL_ATTENUATE = 0x4625;
-// var DL_SPOTLIGHT = 0x4610;
-// var DL_SPOT_ROLL = 0x4656;
-// var DL_SHADOWED = 0x4630;
-// var DL_LOCAL_SHADOW2 = 0x4641;
-// var DL_SEE_CONE = 0x4650;
-// var DL_SPOT_RECTANGULAR = 0x4651;
-// var DL_SPOT_ASPECT = 0x4657;
-// var DL_SPOT_PROJECTOR = 0x4653;
-// var DL_SPOT_OVERSHOOT = 0x4652;
-// var DL_RAY_BIAS = 0x4658;
-// var DL_RAYSHAD = 0x4627;
-// var N_CAMERA = 0x4700;
-// var CAM_SEE_CONE = 0x4710;
-// var CAM_RANGES = 0x4720;
-// var OBJ_HIDDEN = 0x4010;
-// var OBJ_VIS_LOFTER = 0x4011;
-// var OBJ_DOESNT_CAST = 0x4012;
-// var OBJ_DONT_RECVSHADOW = 0x4017;
-// var OBJ_MATTE = 0x4013;
-// var OBJ_FAST = 0x4014;
-// var OBJ_PROCEDURAL = 0x4015;
-// var OBJ_FROZEN = 0x4016;
-var N_TRI_OBJECT = 0x4100;
-var POINT_ARRAY = 0x4110;
-// var POINT_FLAG_ARRAY = 0x4111;
-var FACE_ARRAY = 0x4120;
-var MSH_MAT_GROUP = 0x4130;
-// var SMOOTH_GROUP = 0x4150;
-// var MSH_BOXMAP = 0x4190;
-var TEX_VERTS = 0x4140;
-var MESH_MATRIX = 0x4160;
-// var MESH_COLOR = 0x4165;
-// var MESH_TEXTURE_INFO = 0x4170;
-// var KFDATA = 0xB000;
-// var KFHDR = 0xB00A;
-// var KFSEG = 0xB008;
-// var KFCURTIME = 0xB009;
-// var AMBIENT_NODE_TAG = 0xB001;
-// var OBJECT_NODE_TAG = 0xB002;
-// var CAMERA_NODE_TAG = 0xB003;
-// var TARGET_NODE_TAG = 0xB004;
-// var LIGHT_NODE_TAG = 0xB005;
-// var L_TARGET_NODE_TAG = 0xB006;
-// var SPOTLIGHT_NODE_TAG = 0xB007;
-// var NODE_ID = 0xB030;
-// var NODE_HDR = 0xB010;
-// var PIVOT = 0xB013;
-// var INSTANCE_NAME = 0xB011;
-// var MORPH_SMOOTH = 0xB015;
-// var BOUNDBOX = 0xB014;
-// var POS_TRACK_TAG = 0xB020;
-// var COL_TRACK_TAG = 0xB025;
-// var ROT_TRACK_TAG = 0xB021;
-// var SCL_TRACK_TAG = 0xB022;
-// var MORPH_TRACK_TAG = 0xB026;
-// var FOV_TRACK_TAG = 0xB023;
-// var ROLL_TRACK_TAG = 0xB024;
-// var HOT_TRACK_TAG = 0xB027;
-// var FALL_TRACK_TAG = 0xB028;
-// var HIDE_TRACK_TAG = 0xB029;
-// var POLY_2D = 0x5000;
-// var SHAPE_OK = 0x5010;
-// var SHAPE_NOT_OK = 0x5011;
-// var SHAPE_HOOK = 0x5020;
-// var PATH_3D = 0x6000;
-// var PATH_MATRIX = 0x6005;
-// var SHAPE_2D = 0x6010;
-// var M_SCALE = 0x6020;
-// var M_TWIST = 0x6030;
-// var M_TEETER = 0x6040;
-// var M_FIT = 0x6050;
-// var M_BEVEL = 0x6060;
-// var XZ_CURVE = 0x6070;
-// var YZ_CURVE = 0x6080;
-// var INTERPCT = 0x6090;
-// var DEFORM_LIMIT = 0x60A0;
-// var USE_CONTOUR = 0x6100;
-// var USE_TWEEN = 0x6110;
-// var USE_SCALE = 0x6120;
-// var USE_TWIST = 0x6130;
-// var USE_TEETER = 0x6140;
-// var USE_FIT = 0x6150;
-// var USE_BEVEL = 0x6160;
-// var DEFAULT_VIEW = 0x3000;
-// var VIEW_TOP = 0x3010;
-// var VIEW_BOTTOM = 0x3020;
-// var VIEW_LEFT = 0x3030;
-// var VIEW_RIGHT = 0x3040;
-// var VIEW_FRONT = 0x3050;
-// var VIEW_BACK = 0x3060;
-// var VIEW_USER = 0x3070;
-// var VIEW_CAMERA = 0x3080;
-// var VIEW_WINDOW = 0x3090;
-// var VIEWPORT_LAYOUT_OLD = 0x7000;
-// var VIEWPORT_DATA_OLD = 0x7010;
-// var VIEWPORT_LAYOUT = 0x7001;
-// var VIEWPORT_DATA = 0x7011;
-// var VIEWPORT_DATA_3 = 0x7012;
-// var VIEWPORT_SIZE = 0x7020;
-// var NETWORK_VIEW = 0x7030;
+// const NULL_CHUNK = 0x0000;
+const M3DMAGIC = 0x4D4D;
+// const SMAGIC = 0x2D2D;
+// const LMAGIC = 0x2D3D;
+const MLIBMAGIC = 0x3DAA;
+// const MATMAGIC = 0x3DFF;
+const CMAGIC = 0xC23D;
+const M3D_VERSION = 0x0002;
+// const M3D_KFVERSION = 0x0005;
+const COLOR_F = 0x0010;
+const COLOR_24 = 0x0011;
+const LIN_COLOR_24 = 0x0012;
+const LIN_COLOR_F = 0x0013;
+const INT_PERCENTAGE = 0x0030;
+const FLOAT_PERCENTAGE = 0x0031;
+const MDATA = 0x3D3D;
+const MESH_VERSION = 0x3D3E;
+const MASTER_SCALE = 0x0100;
+// const LO_SHADOW_BIAS = 0x1400;
+// const HI_SHADOW_BIAS = 0x1410;
+// const SHADOW_MAP_SIZE = 0x1420;
+// const SHADOW_SAMPLES = 0x1430;
+// const SHADOW_RANGE = 0x1440;
+// const SHADOW_FILTER = 0x1450;
+// const RAY_BIAS = 0x1460;
+// const O_CONSTS = 0x1500;
+// const AMBIENT_LIGHT = 0x2100;
+// const BIT_MAP = 0x1100;
+// const SOLID_BGND = 0x1200;
+// const V_GRADIENT = 0x1300;
+// const USE_BIT_MAP = 0x1101;
+// const USE_SOLID_BGND = 0x1201;
+// const USE_V_GRADIENT = 0x1301;
+// const FOG = 0x2200;
+// const FOG_BGND = 0x2210;
+// const LAYER_FOG = 0x2302;
+// const DISTANCE_CUE = 0x2300;
+// const DCUE_BGND = 0x2310;
+// const USE_FOG = 0x2201;
+// const USE_LAYER_FOG = 0x2303;
+// const USE_DISTANCE_CUE = 0x2301;
+const MAT_ENTRY = 0xAFFF;
+const MAT_NAME = 0xA000;
+const MAT_AMBIENT = 0xA010;
+const MAT_DIFFUSE = 0xA020;
+const MAT_SPECULAR = 0xA030;
+const MAT_SHININESS = 0xA040;
+// const MAT_SHIN2PCT = 0xA041;
+const MAT_TRANSPARENCY = 0xA050;
+// const MAT_XPFALL = 0xA052;
+// const MAT_USE_XPFALL = 0xA240;
+// const MAT_REFBLUR = 0xA053;
+// const MAT_SHADING = 0xA100;
+// const MAT_USE_REFBLUR = 0xA250;
+// const MAT_SELF_ILLUM = 0xA084;
+const MAT_TWO_SIDE = 0xA081;
+// const MAT_DECAL = 0xA082;
+const MAT_ADDITIVE = 0xA083;
+const MAT_WIRE = 0xA085;
+// const MAT_FACEMAP = 0xA088;
+// const MAT_TRANSFALLOFF_IN = 0xA08A;
+// const MAT_PHONGSOFT = 0xA08C;
+// const MAT_WIREABS = 0xA08E;
+const MAT_WIRE_SIZE = 0xA087;
+const MAT_TEXMAP = 0xA200;
+// const MAT_SXP_TEXT_DATA = 0xA320;
+// const MAT_TEXMASK = 0xA33E;
+// const MAT_SXP_TEXTMASK_DATA = 0xA32A;
+// const MAT_TEX2MAP = 0xA33A;
+// const MAT_SXP_TEXT2_DATA = 0xA321;
+// const MAT_TEX2MASK = 0xA340;
+// const MAT_SXP_TEXT2MASK_DATA = 0xA32C;
+const MAT_OPACMAP = 0xA210;
+// const MAT_SXP_OPAC_DATA = 0xA322;
+// const MAT_OPACMASK = 0xA342;
+// const MAT_SXP_OPACMASK_DATA = 0xA32E;
+const MAT_BUMPMAP = 0xA230;
+// const MAT_SXP_BUMP_DATA = 0xA324;
+// const MAT_BUMPMASK = 0xA344;
+// const MAT_SXP_BUMPMASK_DATA = 0xA330;
+const MAT_SPECMAP = 0xA204;
+// const MAT_SXP_SPEC_DATA = 0xA325;
+// const MAT_SPECMASK = 0xA348;
+// const MAT_SXP_SPECMASK_DATA = 0xA332;
+// const MAT_SHINMAP = 0xA33C;
+// const MAT_SXP_SHIN_DATA = 0xA326;
+// const MAT_SHINMASK = 0xA346;
+// const MAT_SXP_SHINMASK_DATA = 0xA334;
+// const MAT_SELFIMAP = 0xA33D;
+// const MAT_SXP_SELFI_DATA = 0xA328;
+// const MAT_SELFIMASK = 0xA34A;
+// const MAT_SXP_SELFIMASK_DATA = 0xA336;
+// const MAT_REFLMAP = 0xA220;
+// const MAT_REFLMASK = 0xA34C;
+// const MAT_SXP_REFLMASK_DATA = 0xA338;
+// const MAT_ACUBIC = 0xA310;
+const MAT_MAPNAME = 0xA300;
+// const MAT_MAP_TILING = 0xA351;
+// const MAT_MAP_TEXBLUR = 0xA353;
+const MAT_MAP_USCALE = 0xA354;
+const MAT_MAP_VSCALE = 0xA356;
+const MAT_MAP_UOFFSET = 0xA358;
+const MAT_MAP_VOFFSET = 0xA35A;
+// const MAT_MAP_ANG = 0xA35C;
+// const MAT_MAP_COL1 = 0xA360;
+// const MAT_MAP_COL2 = 0xA362;
+// const MAT_MAP_RCOL = 0xA364;
+// const MAT_MAP_GCOL = 0xA366;
+// const MAT_MAP_BCOL = 0xA368;
+const NAMED_OBJECT = 0x4000;
+// const N_DIRECT_LIGHT = 0x4600;
+// const DL_OFF = 0x4620;
+// const DL_OUTER_RANGE = 0x465A;
+// const DL_INNER_RANGE = 0x4659;
+// const DL_MULTIPLIER = 0x465B;
+// const DL_EXCLUDE = 0x4654;
+// const DL_ATTENUATE = 0x4625;
+// const DL_SPOTLIGHT = 0x4610;
+// const DL_SPOT_ROLL = 0x4656;
+// const DL_SHADOWED = 0x4630;
+// const DL_LOCAL_SHADOW2 = 0x4641;
+// const DL_SEE_CONE = 0x4650;
+// const DL_SPOT_RECTANGULAR = 0x4651;
+// const DL_SPOT_ASPECT = 0x4657;
+// const DL_SPOT_PROJECTOR = 0x4653;
+// const DL_SPOT_OVERSHOOT = 0x4652;
+// const DL_RAY_BIAS = 0x4658;
+// const DL_RAYSHAD = 0x4627;
+// const N_CAMERA = 0x4700;
+// const CAM_SEE_CONE = 0x4710;
+// const CAM_RANGES = 0x4720;
+// const OBJ_HIDDEN = 0x4010;
+// const OBJ_VIS_LOFTER = 0x4011;
+// const OBJ_DOESNT_CAST = 0x4012;
+// const OBJ_DONT_RECVSHADOW = 0x4017;
+// const OBJ_MATTE = 0x4013;
+// const OBJ_FAST = 0x4014;
+// const OBJ_PROCEDURAL = 0x4015;
+// const OBJ_FROZEN = 0x4016;
+const N_TRI_OBJECT = 0x4100;
+const POINT_ARRAY = 0x4110;
+// const POINT_FLAG_ARRAY = 0x4111;
+const FACE_ARRAY = 0x4120;
+const MSH_MAT_GROUP = 0x4130;
+// const SMOOTH_GROUP = 0x4150;
+// const MSH_BOXMAP = 0x4190;
+const TEX_VERTS = 0x4140;
+const MESH_MATRIX = 0x4160;
+// const MESH_COLOR = 0x4165;
+// const MESH_TEXTURE_INFO = 0x4170;
+// const KFDATA = 0xB000;
+// const KFHDR = 0xB00A;
+// const KFSEG = 0xB008;
+// const KFCURTIME = 0xB009;
+// const AMBIENT_NODE_TAG = 0xB001;
+// const OBJECT_NODE_TAG = 0xB002;
+// const CAMERA_NODE_TAG = 0xB003;
+// const TARGET_NODE_TAG = 0xB004;
+// const LIGHT_NODE_TAG = 0xB005;
+// const L_TARGET_NODE_TAG = 0xB006;
+// const SPOTLIGHT_NODE_TAG = 0xB007;
+// const NODE_ID = 0xB030;
+// const NODE_HDR = 0xB010;
+// const PIVOT = 0xB013;
+// const INSTANCE_NAME = 0xB011;
+// const MORPH_SMOOTH = 0xB015;
+// const BOUNDBOX = 0xB014;
+// const POS_TRACK_TAG = 0xB020;
+// const COL_TRACK_TAG = 0xB025;
+// const ROT_TRACK_TAG = 0xB021;
+// const SCL_TRACK_TAG = 0xB022;
+// const MORPH_TRACK_TAG = 0xB026;
+// const FOV_TRACK_TAG = 0xB023;
+// const ROLL_TRACK_TAG = 0xB024;
+// const HOT_TRACK_TAG = 0xB027;
+// const FALL_TRACK_TAG = 0xB028;
+// const HIDE_TRACK_TAG = 0xB029;
+// const POLY_2D = 0x5000;
+// const SHAPE_OK = 0x5010;
+// const SHAPE_NOT_OK = 0x5011;
+// const SHAPE_HOOK = 0x5020;
+// const PATH_3D = 0x6000;
+// const PATH_MATRIX = 0x6005;
+// const SHAPE_2D = 0x6010;
+// const M_SCALE = 0x6020;
+// const M_TWIST = 0x6030;
+// const M_TEETER = 0x6040;
+// const M_FIT = 0x6050;
+// const M_BEVEL = 0x6060;
+// const XZ_CURVE = 0x6070;
+// const YZ_CURVE = 0x6080;
+// const INTERPCT = 0x6090;
+// const DEFORM_LIMIT = 0x60A0;
+// const USE_CONTOUR = 0x6100;
+// const USE_TWEEN = 0x6110;
+// const USE_SCALE = 0x6120;
+// const USE_TWIST = 0x6130;
+// const USE_TEETER = 0x6140;
+// const USE_FIT = 0x6150;
+// const USE_BEVEL = 0x6160;
+// const DEFAULT_VIEW = 0x3000;
+// const VIEW_TOP = 0x3010;
+// const VIEW_BOTTOM = 0x3020;
+// const VIEW_LEFT = 0x3030;
+// const VIEW_RIGHT = 0x3040;
+// const VIEW_FRONT = 0x3050;
+// const VIEW_BACK = 0x3060;
+// const VIEW_USER = 0x3070;
+// const VIEW_CAMERA = 0x3080;
+// const VIEW_WINDOW = 0x3090;
+// const VIEWPORT_LAYOUT_OLD = 0x7000;
+// const VIEWPORT_DATA_OLD = 0x7010;
+// const VIEWPORT_LAYOUT = 0x7001;
+// const VIEWPORT_DATA = 0x7011;
+// const VIEWPORT_DATA_3 = 0x7012;
+// const VIEWPORT_SIZE = 0x7020;
+// const NETWORK_VIEW = 0x7030;
 
 export { TDSLoader };

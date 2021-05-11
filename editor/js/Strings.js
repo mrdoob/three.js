@@ -71,6 +71,9 @@ function Strings( config ) {
 			'menubar/examples/Pong': 'Pong',
 			'menubar/examples/Shaders': 'Shaders',
 
+			'menubar/view': 'View',
+			'menubar/view/fullscreen': 'Fullscreen',
+
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
 			'menubar/help/icons': 'Icon Pack',
@@ -233,8 +236,8 @@ function Strings( config ) {
 			'sidebar/material/name': 'Name',
 			'sidebar/material/program': 'Program',
 			'sidebar/material/info': 'Info',
-			'sidebar/material/vertex': 'Vertex',
-			'sidebar/material/fragment': 'fragment',
+			'sidebar/material/vertex': 'Vert',
+			'sidebar/material/fragment': 'Frag',
 			'sidebar/material/color': 'Color',
 			'sidebar/material/depthPacking': 'Depth Packing',
 			'sidebar/material/roughness': 'Roughness',
@@ -247,7 +250,6 @@ function Strings( config ) {
 			'sidebar/material/clearcoatroughness': 'Clearcoat Roughness',
 			'sidebar/material/vertexcolors': 'Vertex Colors',
 			'sidebar/material/vertextangents': 'Vertex Tangents',
-			'sidebar/material/skinning': 'Skinning',
 			'sidebar/material/matcap': 'Matcap',
 			'sidebar/material/map': 'Map',
 			'sidebar/material/alphamap': 'Alpha Map',
@@ -300,6 +302,11 @@ function Strings( config ) {
 			'sidebar/project/toneMapping': 'Tone mapping',
 			'sidebar/project/materials': 'Materials',
 			'sidebar/project/Assign': 'Assign',
+
+			'sidebar/project/video': 'Video',
+			'sidebar/project/resolution': 'Resolution',
+			'sidebar/project/duration': 'Duration',
+			'sidebar/project/render': 'Render',
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
@@ -397,6 +404,9 @@ function Strings( config ) {
 			'menubar/examples/Particles': 'Particles',
 			'menubar/examples/Pong': 'Pong',
 			'menubar/examples/Shaders': 'Shaders',
+
+			'menubar/view': 'View',
+			'menubar/view/fullscreen': 'Fullscreen',
 
 			'menubar/help': 'Aide',
 			'menubar/help/source_code': 'Code Source',
@@ -574,7 +584,6 @@ function Strings( config ) {
 			'sidebar/material/clearcoatroughness': 'Rugosité du vernis',
 			'sidebar/material/vertexcolors': 'Couleurs aux Sommets',
 			'sidebar/material/vertextangents': 'Tangentes aux sommets',
-			'sidebar/material/skinning': 'Skinning',
 			'sidebar/material/matcap': 'Matcap',
 			'sidebar/material/map': 'Texture',
 			'sidebar/material/alphamap': 'Texture de transparence',
@@ -627,6 +636,11 @@ function Strings( config ) {
 			'sidebar/project/toneMapping': 'Mappage des nuances',
 			'sidebar/project/materials': 'Matériaux',
 			'sidebar/project/Assign': 'Attribuer',
+
+			'sidebar/project/video': 'Video',
+			'sidebar/project/resolution': 'Resolution',
+			'sidebar/project/duration': 'Duration',
+			'sidebar/project/render': 'Render',
 
 			'sidebar/settings': 'Paramètres',
 			'sidebar/settings/language': 'Langue',
@@ -725,6 +739,9 @@ function Strings( config ) {
 			'menubar/examples/Pong': '乒乓球',
 			'menubar/examples/Shaders': '着色器',
 
+			'menubar/view': '视图',
+			'menubar/view/fullscreen': '全屏',
+
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
 			'menubar/help/icons': '图标组件包',
@@ -806,6 +823,16 @@ function Strings( config ) {
 			'sidebar/geometry/cylinder_geometry/heightsegments': '高度分段',
 			'sidebar/geometry/cylinder_geometry/openended': '开端',
 
+			'sidebar/geometry/extrude_geometry/curveSegments': '曲线段',
+			'sidebar/geometry/extrude_geometry/steps': '细分点数',
+			'sidebar/geometry/extrude_geometry/depth': '深度',
+			'sidebar/geometry/extrude_geometry/bevelEnabled': '启用斜角',
+			'sidebar/geometry/extrude_geometry/bevelThickness': '斜角厚度',
+			'sidebar/geometry/extrude_geometry/bevelSize': '斜角大小',
+			'sidebar/geometry/extrude_geometry/bevelOffset': '斜角偏移量',
+			'sidebar/geometry/extrude_geometry/bevelSegments': '斜角分段',
+			'sidebar/geometry/extrude_geometry/shape': '转换图形',
+
 			'sidebar/geometry/dodecahedron_geometry/radius': '半径',
 			'sidebar/geometry/dodecahedron_geometry/detail': '面片分段',
 
@@ -834,6 +861,9 @@ function Strings( config ) {
 			'sidebar/geometry/ring_geometry/phiSegments': '经度分段',
 			'sidebar/geometry/ring_geometry/thetastart': '弧度起点',
 			'sidebar/geometry/ring_geometry/thetalength': '弧度长度',
+
+			'sidebar/geometry/shape_geometry/curveSegments': '曲线段',
+			'sidebar/geometry/shape_geometry/extrude': '拉伸',
 
 			'sidebar/geometry/sphere_geometry/radius': '半径',
 			'sidebar/geometry/sphere_geometry/widthsegments': '宽度分段',
@@ -877,8 +907,10 @@ function Strings( config ) {
 			'sidebar/material/vertex': '顶点',
 			'sidebar/material/fragment': '片元',
 			'sidebar/material/color': '颜色',
+			'sidebar/material/depthPacking': 'Depth Packing',
 			'sidebar/material/roughness': '粗糙度',
 			'sidebar/material/metalness': '金属度',
+			'sidebar/material/sheen': '光泽',
 			'sidebar/material/emissive': '自发光',
 			'sidebar/material/specular': '高光',
 			'sidebar/material/shininess': '高光大小',
@@ -886,7 +918,6 @@ function Strings( config ) {
 			'sidebar/material/clearcoatroughness': '透明图层粗糙度',
 			'sidebar/material/vertexcolors': '顶点颜色',
 			'sidebar/material/vertextangents': '顶点切线',
-			'sidebar/material/skinning': '皮肤',
 			'sidebar/material/matcap': '材质捕获',
 			'sidebar/material/map': '贴图',
 			'sidebar/material/alphamap': '透明贴图',
@@ -901,6 +932,7 @@ function Strings( config ) {
 			'sidebar/material/lightmap': '光照贴图',
 			'sidebar/material/aomap': '环境光遮蔽贴图',
 			'sidebar/material/emissivemap': '自发光贴图',
+			'sidebar/material/gradientmap': '渐变贴图',
 			'sidebar/material/side': '面',
 			'sidebar/material/side/front': '正面',
 			'sidebar/material/side/back': '背面',
@@ -938,6 +970,11 @@ function Strings( config ) {
 			'sidebar/project/toneMapping': '色调映射',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
+
+			'sidebar/project/video': '视频',
+			'sidebar/project/resolution': '分辨率',
+			'sidebar/project/duration': '时长',
+			'sidebar/project/render': '渲染',
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',

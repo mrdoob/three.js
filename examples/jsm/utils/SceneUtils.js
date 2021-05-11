@@ -3,19 +3,19 @@ import {
 	Mesh
 } from '../../../build/three.module.js';
 
-var SceneUtils = {
+class SceneUtils {
 
-	createMeshesFromInstancedMesh: function ( instancedMesh ) {
+	static createMeshesFromInstancedMesh( instancedMesh ) {
 
-		var group = new Group();
+		const group = new Group();
 
-		var count = instancedMesh.count;
-		var geometry = instancedMesh.geometry;
-		var material = instancedMesh.material;
+		const count = instancedMesh.count;
+		const geometry = instancedMesh.geometry;
+		const material = instancedMesh.material;
 
-		for ( var i = 0; i < count; i ++ ) {
+		for ( let i = 0; i < count; i ++ ) {
 
-			var mesh = new Mesh( geometry, material );
+			const mesh = new Mesh( geometry, material );
 
 			instancedMesh.getMatrixAt( i, mesh.matrix );
 			mesh.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
@@ -29,13 +29,13 @@ var SceneUtils = {
 
 		return group;
 
-	},
+	}
 
-	createMultiMaterialObject: function ( geometry, materials ) {
+	static createMultiMaterialObject( geometry, materials ) {
 
-		var group = new Group();
+		const group = new Group();
 
-		for ( var i = 0, l = materials.length; i < l; i ++ ) {
+		for ( let i = 0, l = materials.length; i < l; i ++ ) {
 
 			group.add( new Mesh( geometry, materials[ i ] ) );
 
@@ -43,17 +43,17 @@ var SceneUtils = {
 
 		return group;
 
-	},
+	}
 
-	detach: function ( child, parent, scene ) {
+	static detach( child, parent, scene ) {
 
 		console.warn( 'THREE.SceneUtils: detach() has been deprecated. Use scene.attach( child ) instead.' );
 
 		scene.attach( child );
 
-	},
+	}
 
-	attach: function ( child, scene, parent ) {
+	static attach( child, scene, parent ) {
 
 		console.warn( 'THREE.SceneUtils: attach() has been deprecated. Use parent.attach( child ) instead.' );
 
@@ -61,6 +61,6 @@ var SceneUtils = {
 
 	}
 
-};
+}
 
 export { SceneUtils };

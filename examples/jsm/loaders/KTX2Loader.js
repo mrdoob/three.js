@@ -21,42 +21,17 @@ import {
 	LinearEncoding,
 	sRGBEncoding,
 } from '../../../build/three.module.js';
-
+import {
+	read as readKTX,
+	KTX2ChannelETC1S,
+	KTX2ChannelUASTC,
+	KTX2Flags,
+	KTX2Model,
+	KTX2SupercompressionScheme,
+	KTX2Transfer
+} from '../libs/ktx-parse.module.js';
 import { BasisTextureLoader } from './BasisTextureLoader.js';
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
-import { read as readKTX } from '../libs/ktx-parse.module.js';
-
-// KTX 2.0 constants.
-
-var DFDModel = {
-	ETC1S: 163,
-	UASTC: 166,
-};
-
-var DFDChannel = {
-	ETC1S: {
-		RGB: 0,
-		RRR: 3,
-		GGG: 4,
-		AAA: 15,
-	},
-	UASTC: {
-		RGB: 0,
-		RGBA: 3,
-		RRR: 4,
-		RRRG: 5
-	},
-};
-
-var SupercompressionScheme = {
-	ZSTD: 2
-};
-
-var Transfer = {
-	SRGB: 2
-};
-
-//
 
 class KTX2Loader extends CompressedTextureLoader {
 
@@ -176,7 +151,7 @@ class KTX2Loader extends CompressedTextureLoader {
 
 		KTX2Utils.createLevels( ktx, this.zstd ).then( function ( levels ) {
 
-			var basisFormat = dfd.colorModel === DFDModel.UASTC
+			var basisFormat = dfd.colorModel === KTX2Model.UASTC
 				? BasisTextureLoader.BasisFormat.UASTC_4x4
 				: BasisTextureLoader.BasisFormat.ETC1S;
 
@@ -200,7 +175,7 @@ class KTX2Loader extends CompressedTextureLoader {
 
 		} ).then( function ( texture ) {
 
-			texture.encoding = dfd.transferFunction === Transfer.SRGB
+			texture.encoding = dfd.transferFunction === KTX2Transfer.SRGB
 				? sRGBEncoding
 				: LinearEncoding;
 			texture.premultiplyAlpha = KTX2Utils.getPremultiplyAlpha( ktx );
@@ -219,7 +194,7 @@ var KTX2Utils = {
 
 	createLevels: async function ( ktx, zstd ) {
 
-		if ( ktx.supercompressionScheme === SupercompressionScheme.ZSTD ) {
+		if ( ktx.supercompressionScheme === KTX2SupercompressionScheme.ZSTD ) {
 
 			await zstd.init();
 
@@ -235,7 +210,7 @@ var KTX2Utils = {
 			var levelHeight = Math.max( 1, Math.floor( height / Math.pow( 2, levelIndex ) ) );
 			var levelData = ktx.levels[ levelIndex ].levelData;
 
-			if ( ktx.supercompressionScheme === SupercompressionScheme.ZSTD ) {
+			if ( ktx.supercompressionScheme === KTX2SupercompressionScheme.ZSTD ) {
 
 				levelData = zstd.decode( levelData, ktx.levels[ levelIndex ].uncompressedByteLength );
 
@@ -269,9 +244,9 @@ var KTX2Utils = {
 
 		// UASTC
 
-		if ( dfd.colorModel === DFDModel.UASTC ) {
+		if ( dfd.colorModel === KTX2Model.UASTC ) {
 
-			if ( ( dfd.samples[ 0 ].channelID & 0xF ) === DFDChannel.UASTC.RGBA ) {
+			if ( ( dfd.samples[ 0 ].channelID & 0xF ) === KTX2ChannelUASTC.RGBA ) {
 
 				return true;
 
@@ -284,7 +259,7 @@ var KTX2Utils = {
 		// ETC1S
 
 		if ( dfd.samples.length === 2
-			&& ( dfd.samples[ 1 ].channelID & 0xF ) === DFDChannel.ETC1S.AAA ) {
+			&& ( dfd.samples[ 1 ].channelID & 0xF ) === KTX2ChannelETC1S.AAA ) {
 
 			return true;
 
@@ -298,7 +273,7 @@ var KTX2Utils = {
 
 		var dfd = this.getBasicDFD( ktx );
 
-		return !! ( dfd.flags & 1 /* KHR_DF_FLAG_ALPHA_PREMULTIPLIED */ );
+		return !! ( dfd.flags & KTX2Flags.ALPHA_PREMULTIPLIED );
 
 	},
 

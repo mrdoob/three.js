@@ -1,6 +1,6 @@
 import * as THREE from '../../build/three.module.js';
 
-import { UIPanel, UIRow, UIInput, UIButton, UIColor, UICheckbox, UISelect, UIText, UINumber } from './libs/ui.js';
+import { UIButton, UICheckbox, UIColor, UIInput, UINumber, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
 import { UITexture } from './libs/ui.three.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
@@ -104,7 +104,7 @@ function SidebarMaterial( editor ) {
 	materialProgramRow.add( new UIText( strings.getKey( 'sidebar/material/program' ) ).setWidth( '90px' ) );
 
 	var materialProgramInfo = new UIButton( strings.getKey( 'sidebar/material/info' ) );
-	materialProgramInfo.setMarginLeft( '4px' );
+	materialProgramInfo.setMarginRight( '4px' );
 	materialProgramInfo.onClick( function () {
 
 		signals.editScript.dispatch( currentObject, 'programInfo' );
@@ -113,7 +113,7 @@ function SidebarMaterial( editor ) {
 	materialProgramRow.add( materialProgramInfo );
 
 	var materialProgramVertex = new UIButton( strings.getKey( 'sidebar/material/vertex' ) );
-	materialProgramVertex.setMarginLeft( '4px' );
+	materialProgramVertex.setMarginRight( '4px' );
 	materialProgramVertex.onClick( function () {
 
 		signals.editScript.dispatch( currentObject, 'vertexShader' );
@@ -122,7 +122,7 @@ function SidebarMaterial( editor ) {
 	materialProgramRow.add( materialProgramVertex );
 
 	var materialProgramFragment = new UIButton( strings.getKey( 'sidebar/material/fragment' ) );
-	materialProgramFragment.setMarginLeft( '4px' );
+	materialProgramFragment.setMarginRight( '4px' );
 	materialProgramFragment.onClick( function () {
 
 		signals.editScript.dispatch( currentObject, 'fragmentShader' );
@@ -261,16 +261,6 @@ function SidebarMaterial( editor ) {
 	materialDepthPackingRow.add( materialDepthPacking );
 
 	container.add( materialDepthPackingRow );
-
-	// skinning
-
-	var materialSkinningRow = new UIRow();
-	var materialSkinning = new UICheckbox( false ).onChange( update );
-
-	materialSkinningRow.add( new UIText( strings.getKey( 'sidebar/material/skinning' ) ).setWidth( '90px' ) );
-	materialSkinningRow.add( materialSkinning );
-
-	container.add( materialSkinningRow );
 
 	// map
 
@@ -748,12 +738,6 @@ function SidebarMaterial( editor ) {
 					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'depthPacking', depthPacking, currentMaterialSlot ) );
 
 				}
-
-			}
-
-			if ( material.skinning !== undefined && material.skinning !== materialSkinning.getValue() ) {
-
-				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'skinning', materialSkinning.getValue(), currentMaterialSlot ) );
 
 			}
 
@@ -1256,7 +1240,6 @@ function SidebarMaterial( editor ) {
 			'vertexColors': materialVertexColorsRow,
 			'vertexTangents': materialVertexTangentsRow,
 			'depthPacking': materialDepthPackingRow,
-			'skinning': materialSkinningRow,
 			'map': materialMapRow,
 			'matcap': materialMatcapMapRow,
 			'alphaMap': materialAlphaMapRow,
@@ -1273,8 +1256,8 @@ function SidebarMaterial( editor ) {
 			'emissiveMap': materialEmissiveMapRow,
 			'gradientMap': materialGradientMapRow,
 			'side': materialSideRow,
-			'size': materialSize,
-			'sizeAttenuation': materialSizeAttenuation,
+			'size': materialSizeRow,
+			'sizeAttenuation': materialSizeAttenuationRow,
 			'flatShading': materialShadingRow,
 			'blending': materialBlendingRow,
 			'opacity': materialOpacityRow,
@@ -1435,12 +1418,6 @@ function SidebarMaterial( editor ) {
 		if ( material.depthPacking !== undefined ) {
 
 			materialDepthPacking.setValue( material.depthPacking );
-
-		}
-
-		if ( material.skinning !== undefined ) {
-
-			materialSkinning.setValue( material.skinning );
 
 		}
 

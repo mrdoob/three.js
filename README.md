@@ -8,7 +8,7 @@ three.js
 
 #### JavaScript 3D library ####
 
-The aim of the project is to create an easy to use, lightweight, 3D library with a default WebGL renderer. The library also provides Canvas 2D, SVG and CSS3D renderers in the examples.
+The aim of the project is to create an easy to use, lightweight, cross-browser, general purpose 3D library. The current builds only include a WebGL renderer but WebGPU (experimental), SVG and CSS3D renderers are also available in the examples.
 
 [Examples](https://threejs.org/examples/) &mdash;
 [Documentation](https://threejs.org/docs/) &mdash;
@@ -61,7 +61,7 @@ function animation( time ) {
 }
 ```
 
-If everything went well, you should see [this](https://jsfiddle.net/zdjankqw/).
+If everything went well, you should see [this](https://jsfiddle.net/vy29n6aj/).
 
 ### Cloning this repository ###
 

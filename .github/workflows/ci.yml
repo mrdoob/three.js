@@ -28,7 +28,7 @@ jobs:
         run: npm ci
 
       - name: === Linting ===
-        run: npm run test-lint
+        run: npm run lint
 
   unit:
     name: "Unit testing"

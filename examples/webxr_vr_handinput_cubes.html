@@ -10,7 +10,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - handinput - cubes<br/>
-			(Oculus Browser with #webxr-hands flag enabled)
+			(Oculus Browser 15.1+)
 		</div>
 
 		<script type="module">
@@ -101,7 +101,7 @@
 				scene.add( controller2 );
 
 				const controllerModelFactory = new XRControllerModelFactory();
-				const handModelFactory = new XRHandModelFactory().setPath( "./models/fbx/" );
+				const handModelFactory = new XRHandModelFactory();
 
 				// Hand 1
 				controllerGrip1 = renderer.xr.getControllerGrip( 0 );

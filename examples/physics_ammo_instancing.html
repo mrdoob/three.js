@@ -72,6 +72,7 @@
 
 				const geometryBox = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
 				boxes = new THREE.InstancedMesh( geometryBox, material, 100 );
+				boxes.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
 				boxes.castShadow = true;
 				boxes.receiveShadow = true;
 				scene.add( boxes );
@@ -90,6 +91,7 @@
 
 				const geometrySphere = new THREE.IcosahedronGeometry( 0.075, 3 );
 				spheres = new THREE.InstancedMesh( geometrySphere, material, 100 );
+				spheres.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
 				spheres.castShadow = true;
 				spheres.receiveShadow = true;
 				scene.add( spheres );

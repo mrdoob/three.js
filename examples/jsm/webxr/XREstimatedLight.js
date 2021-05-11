@@ -3,7 +3,7 @@ import {
 	Group,
 	LightProbe,
 	WebGLCubeRenderTarget
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 class SessionLightProbe {
 
@@ -43,11 +43,11 @@ class SessionLightProbe {
 
 			this.xrWebGLBinding = new XRWebGLBinding( session, gl );
 
-			this.lightProbe.addEventListener('reflectionchange', () => {
+			this.lightProbe.addEventListener( 'reflectionchange', () => {
 
 				this.updateReflection();
 
-			});
+			} );
 
 		}
 

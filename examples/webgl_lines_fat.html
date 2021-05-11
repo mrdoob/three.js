@@ -97,7 +97,8 @@
 					linewidth: 5, // in pixels
 					vertexColors: true,
 					//resolution:  // to be set by renderer, eventually
-					dashed: false
+					dashed: false,
+					alphaToCoverage: true,
 
 				} );
 
@@ -198,6 +199,7 @@
 				const param = {
 					'line type': 0,
 					'width (px)': 5,
+					'alphaToCoverage': true,
 					'dashed': false,
 					'dash scale': 1,
 					'dash / gap': 1
@@ -231,16 +233,15 @@
 
 				} );
 
+				gui.add( param, 'alphaToCoverage' ).onChange( function ( val ) { 
+
+					matLine.alphaToCoverage = val;
+
+				} );
+
 				gui.add( param, 'dashed' ).onChange( function ( val ) {
 
 					matLine.dashed = val;
-
-					// dashed is implemented as a defines -- not as a uniform. this could be changed.
-					// ... or THREE.LineDashedMaterial could be implemented as a separate material
-					// temporary hack - renderer should do this eventually
-					if ( val ) matLine.defines.USE_DASH = ""; else delete matLine.defines.USE_DASH;
-					matLine.needsUpdate = true;
-
 					line1.material = val ? matLineDashed : matLineBasic;
 
 				} );

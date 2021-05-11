@@ -1,8 +1,8 @@
 import babel from '@rollup/plugin-babel';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
+import babelrc from './.babelrc.json';
 
-function glconstants() {
+export function glconstants() {
 
 	var constants = {
 		POINTS: 0, ZERO: 0, NONE: 0,
@@ -200,7 +200,7 @@ function addons() {
 
 }
 
-function glsl() {
+export function glsl() {
 
 	return {
 
@@ -272,51 +272,11 @@ ${ code }`;
 
 }
 
-function polyfills() {
-
-	return {
-
-		transform( code, filePath ) {
-
-			if ( filePath.endsWith( 'src/Three.js' ) || filePath.endsWith( 'src\\Three.js' ) ) {
-
-				code = 'import \'regenerator-runtime\';\n' + code;
-
-			}
-
-			return {
-				code: code,
-				map: null
-			};
-
-		}
-
-	};
-
-}
-
-const babelrc = {
-	presets: [
-		[
-			'@babel/preset-env',
-			{
-				modules: false,
-				targets: '>1%',
-				loose: true,
-				bugfixes: true,
-			}
-		]
-	]
-};
-
 export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			polyfills(),
-			nodeResolve(),
 			addons(),
-			glconstants(),
 			glsl(),
 			babel( {
 				babelHelpers: 'bundled',
@@ -339,8 +299,6 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			polyfills(),
-			nodeResolve(),
 			addons(),
 			glconstants(),
 			glsl(),

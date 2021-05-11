@@ -7,6 +7,7 @@ import { SidebarProjectVideo } from './Sidebar.Project.Video.js';
 function SidebarProject( editor ) {
 
 	var config = editor.config;
+	var signals = editor.signals;
 	var strings = editor.strings;
 
 	var container = new UISpan();
@@ -62,7 +63,21 @@ function SidebarProject( editor ) {
 
 	/* container.add( new SidebarProjectMaterials( editor ) ); */
 	container.add( new SidebarProjectRenderer( editor ) );
-	container.add( new SidebarProjectVideo( editor ) );
+
+	if ( 'SharedArrayBuffer' in window ) {
+
+		container.add( new SidebarProjectVideo( editor ) );
+
+	}
+
+	// Signals
+
+	signals.editorCleared.add( function () {
+
+		title.setValue( '' );
+		config.setKey( 'project/title', '' );
+
+	} );
 
 	return container;
 
