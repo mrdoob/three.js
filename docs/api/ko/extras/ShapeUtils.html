@@ -10,10 +10,9 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		A class containing utility functions for shapes.<br /><br />
+		shape에 대한 기능 함수를 포함하는 클래스입니다.<br /><br />
 
-		Note that these are all linear functions so it is neccessary to calculate separately for
-		x, y (and z, w if present) components of a vector.
+		이 함수들은 모두 일차함수이므로 벡터의 x, y(z, w 가 있는 경우 해당포함) 컴포넌트에 대해 별도로 계산할 필요가 있습니다.
 		</p>
 
 
@@ -21,28 +20,26 @@
 
 		<h3>[method:Number area]( contour )</h3>
 		<p>
-		contour -- 2D polygon. An array of THREE.Vector2()<br /><br />
+		contour -- 2D 폴리곤입니다. THREE.Vector2() 배열입니다.<br /><br />
 
-		Calculate area of a ( 2D ) contour polygon.
+		( 2D ) 윤곽 폴리곤의 면적을 계산합니다.
 		</p>
 
 		<h3>[method:Boolean isClockWise]( pts )</h3>
 		<p>
-		pts -- points defining a 2D polygon<br /><br />
+		pts -- 2D 폴리곤을 정의하는 점들입니다<br /><br />
 
-		Note that this is a linear function so it is neccessary to calculate separately for
-		x, y  components of a polygon.<br /><br />
+		일차함수이므로 벡터의 x, y 컴포넌트에 대해 별도로 계산해야 하는 점에 주의해주세요.<br /><br />
 
-		Used internally by [page:Path Path],
-		[page:ExtrudeGeometry ExtrudeGeometry] and [page:ShapeGeometry ShapeGeometry].
+		[page:Path Path], [page:ExtrudeGeometry ExtrudeGeometry] 및 [page:ShapeGeometry ShapeGeometry]에서 내부적으로 사용됩니다.
 		</p>
 
 		<h3>[method:Array triangulateShape]( contour, holes )</h3>
 		<p>
-		contour -- 2D polygon.<br />
-		holes -- array of holes<br /><br />
+		contour -- 2D 폴리곤.<br />
+		holes -- holes 배열<br /><br />
 
-		Used internally by [page:ExtrudeGeometry ExtrudeGeometry] and [page:ShapeGeometry ShapeGeometry] to calculate faces in shapes with holes.
+		[page:ExtrudeGeometry ExtrudeGeometry] 및 [page:ShapeGeometry ShapeGeometry]에서 내부적으로 holes와 함께 shape의 면을 계산하기 위해 사용됩니다.
 		</p>
 
 		<h2>소스코드</h2>

@@ -10,18 +10,18 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		An implementation of the earcut polygon triangulation algorithm. The code is a port of [link:https://github.com/mapbox/earcut mapbox/earcut].
+			이어컷 폴리곤 삼각측량 알고리즘 구현입니다. 이 코드는 [link:https://github.com/mapbox/earcut mapbox/earcut]의 일부입니다.
 		</p>
 
 		<h2>메서드</h2>
 
 		<h3>[method:Array triangulate]( data, holeIndices, dim )</h3>
 		<p>
-		data -- A flat array of vertex coordinates.<br />
-		holeIndices -- An array of hole indices if any.<br />
-		dim -- The number of coordinates per vertex in the input array.<br /><br />
+		data -- 꼭짓점 좌표를 가진 평면 배열입니다.<br />
+		holeIndices -- 확인 가능한 hole 인덱스의 배열입니다.<br />
+		dim -- 인풋 배열의 꼭짓점 당 좌표의 수입니다.<br /><br />
 
-		Triangulates the given shape definition by returning an array of triangles. A triangle is defined by three consecutive integers representing vertex indices. 
+		전달받은 모양의 정의를 바탕으로 삼각측량을 통해 삼각형 배열을 리턴합니다. 삼각형은 꼭짓점을 나타내는 연속된 세 개의 정수 인덱스들로 정의됩니다.
 		</p>
 
 		<h2>소스코드</h2>
