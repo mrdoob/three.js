@@ -269,7 +269,7 @@
 
 						// Create page links
 
-						const pageURL = pages[ pageName ];
+						const pageURL = pages[ pageName ]["url"];
 
 						// Localisation
 
@@ -350,7 +350,7 @@
 
 			//
 
-			const regExp = new RegExp( filterInput.value, 'gi' );
+			const regExp = new RegExp( filterInput.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi' );
 
 			for ( let pageName in pageProperties ) {
 
