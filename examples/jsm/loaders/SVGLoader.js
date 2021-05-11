@@ -2103,7 +2103,7 @@ class SVGLoader extends Loader {
 
 	}
 
-	static pointsToStroke( points, style, arcDivisions, minDistance ) {
+	static pointsToStroke( points, style, arcDivisions, minDistance, extrude = false, extrudeOptions = {} ) {
 
 		// Generates a stroke with some witdh around the given path.
 		// The path can be open or closed (last point equals to first point)
@@ -2125,18 +2125,18 @@ class SVGLoader extends Loader {
 
 		}
 
-		if ( ! extrude ) {
+		if ( extrude === true ) {
 
-			const geometry = new BufferGeometry();
-			geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-			if ( normals ) geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-			if ( uvs ) geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
-
-			return geometry;
+			// Extrude strokes
+			return SVGLoader.extrudeVertices( extrudeOptions, vertices, uvs );
 		}
 
-		// Extrude strokes
-		return SVGLoader.extrudeVertices( extrudeOptions, vertices, uvs );
+		const geometry = new BufferGeometry();
+		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		if ( normals ) geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		if ( uvs ) geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+
+		return geometry;
 
 	}
 
@@ -2892,135 +2892,133 @@ class SVGLoader extends Loader {
 
 	}
 
+	static extrudeVertices ( extrudeOptions, vertices, uvs ) {
+		// Extrudes planar vertices and returns a BufferGeometry.
 
-}
+		const options = {depth: 16, steps: 2};
+		if ( extrudeOptions ) Object.assign( options, extrudeOptions );
 
-SVGLoader.extrudeVertices = function ( extrudeOptions, vertices, uvs ) {
+		const indices = [];
+		const steps = options.steps;
+		const vlen = vertices.length;
+		const flen = vlen / 3;
+		let i;
+		let s;
+		const groups = [];
 
-	// Extrudes planar vertices and returns a BufferGeometry.
+		function addWall( j, k ) {
 
-	var options = { depth: 16, steps: 2 };
-	if ( extrudeOptions ) Object.assign( options, extrudeOptions );
+			if ( uvs ) {
 
-	var indices = [];
-	var steps = options.steps;
-	var vlen = vertices.length;
-	var flen = vlen / 3;
-	var i;
-	var s;
-	var groups = [];
+				const v1 = uvs[j * 2 + 1];
+				const v2 = uvs[k * 2 + 1];
+				if ( Math.abs( v1 - v2 ) > 0.01 || ( v1 > 0.01 && v1 < 0.99 ) ) {
 
-	// Bottom faces
-	for ( i = 0; i < flen; i += 3 ) {
+					return;
 
-		indices.push( i + 2, i + 1, i );
+				}
 
-	}
+			}
 
-	groups.push( [ 0, flen, 2 ] );
+			for ( s = 0; s <= steps; s ++ ) {
 
-	// Add stepped vertices...
-	for ( s = 1; s <= ( steps + 1 ); s ++ ) {
+				const s1 = flen * s;
+				const s2 = flen * (s + 1);
 
-		for ( i = 0; i < vlen; i += 3 ) {
+				const a = j + s1,
+					b = k + s1,
+					c = k + s2,
+					d = j + s2;
 
-			vertices.push( vertices[ i ], vertices[ i + 1 ], options.depth / steps * ( s - 1 ) );
-
-		}
-
-	}
-
-	// Side wall faces
-	for ( i = 0; i < flen; i += 3 ) {
-
-		addWall( i, i + 1 );
-		addWall( i + 1, i + 2 );
-		addWall( i + 2, i );
-
-	}
-
-	groups.push( [ flen, indices.length - flen, 1 ] );
-
-	// Front faces
-	for ( i = 0; i < vlen; i += 3 ) {
-
-		vertices.push( vertices[ i ], vertices[ i + 1 ], options.depth );
-
-	}
-
-	for ( i = 0; i < flen; i += 3 ) {
-
-		indices.push( i + flen * ( steps + 2 ), i + 1 + flen * ( steps + 2 ), i + 2 + flen * ( steps + 2 ) );
-
-	}
-
-	groups.push( [ indices.length - flen, flen, 0 ] );
-
-	var geometry = new BufferGeometry();
-	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	geometry.setIndex( indices );
-
-
-	if ( uvs ) {
-
-		var uvlen = uvs.length, v = 0;
-		for ( s = 0; s <= ( steps + 1 ); s ++ ) {
-
-			for ( i = 0; i < uvlen; i += 2 ) {
-
-				v = s === steps + 1 ? 1. - uvs[ i + 1 ] : Math.abs( uvs[ i + 1 ] - s / steps );
-				uvs.push( uvs[ i ], v );
+				indices.push( a, b, d );
+				indices.push( b, c, d );
 
 			}
 
 		}
 
-		geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+		// Bottom faces
+		for ( i = 0; i < flen; i += 3 ) {
 
-	}
+			indices.push( i + 2, i + 1, i );
 
-	for ( i = groups.length - 1; i >= 0; i -- ) {
+		}
 
-		geometry.addGroup( groups[ i ][ 0 ], groups[ i ][ 1 ], groups[ i ][ 2 ] );
+		groups.push( [ 0, flen, 2 ] );
 
-	}
+		// Add stepped vertices...
+		for ( s = 1; s <= ( steps + 1 ); s ++ ) {
 
-	geometry.computeVertexNormals();
+			for ( i = 0; i < vlen; i += 3 ) {
 
-	return geometry;
+				vertices.push( vertices[ i ], vertices[ i + 1 ], options.depth / steps * ( s - 1 ) );
 
+			}
 
-	function addWall( j, k ) {
+		}
+
+		// Side wall faces
+		for ( i = 0; i < flen; i += 3 ) {
+
+			addWall( i, i + 1 );
+			addWall( i + 1, i + 2 );
+			addWall( i + 2, i );
+
+		}
+
+		groups.push( [ flen, indices.length - flen, 1 ] );
+
+		// Front faces
+		for ( i = 0; i < vlen; i += 3 ) {
+
+			vertices.push( vertices[ i ], vertices[ i + 1 ], options.depth );
+
+		}
+
+		for ( i = 0; i < flen; i += 3 ) {
+
+			indices.push( i + flen * ( steps + 2 ), i + 1 + flen * ( steps + 2 ), i + 2 + flen * ( steps + 2 ) );
+
+		}
+
+		groups.push( [ indices.length - flen, flen, 0 ] );
+
+		const geometry = new BufferGeometry();
+		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		geometry.setIndex( indices );
+
 
 		if ( uvs ) {
 
-			var v1 = uvs[ j * 2 + 1 ];
-			var v2 = uvs[ k * 2 + 1 ];
-			if ( Math.abs( v1 - v2 ) > 0.01 || ( v1 > 0.01 && v1 < 0.99 ) ) {
+			const uvlen = uvs.length;
+			let v = 0;
+			for ( s = 0; s <= ( steps + 1 ); s ++ ) {
 
-				return;
+				for ( i = 0; i < uvlen; i += 2 ) {
+
+					v = s === steps + 1 ? 1. - uvs[ i + 1 ] : Math.abs( uvs[ i + 1 ] - s / steps );
+					uvs.push( uvs[ i ], v );
+
+				}
 
 			}
 
-		}
-
-		for ( s = 0; s <= steps; s ++ ) {
-
-			var s1 = flen * s;
-			var s2 = flen * ( s + 1 );
-
-			var a = j + s1,
-				b = k + s1,
-				c = k + s2,
-				d = j + s2;
-
-			indices.push( a, b, d );
-			indices.push( b, c, d );
+			geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 		}
+
+		for ( i = groups.length - 1; i >= 0; i -- ) {
+
+			geometry.addGroup( groups[ i ][ 0 ], groups[ i ][ 1 ], groups[ i ][ 2 ] );
+
+		}
+
+		geometry.computeVertexNormals();
+
+		return geometry;
 
 	}
 
-};
+}
 
 export { SVGLoader };

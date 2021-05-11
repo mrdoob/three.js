@@ -1923,7 +1923,7 @@
 
 		}
 
-		static pointsToStroke( points, style, arcDivisions, minDistance ) {
+		static pointsToStroke( points, style, arcDivisions, minDistance, extrude = false, extrudeOptions = {} ) {
 
 			// Generates a stroke with some witdh around the given path.
 			// The path can be open or closed (last point equals to first point)
@@ -1931,9 +1931,11 @@
 			// Param style: Object with SVG properties as returned by SVGLoader.getStrokeStyle(), or SVGLoader.parse() in the path.userData.style object
 			// Params arcDivisions: Arc divisions for round joins and endcaps. (Optional)
 			// Param minDistance: Points closer to this distance will be merged. (Optional)
+			// Param extrude: Extrude path (boolean). No UV or normals support in extruded geometry (Optional)
+			// Param extrudeOptions: Supported - depth, steps, same as ExtrudeGeometryOptions (Optional)
 			// Returns THREE.BufferGeometry with stroke triangles (In plane z = 0). UV coordinates are generated ('u' along path. 'v' across it, from left to right)
 			const vertices = [];
-			const normals = [];
+			const normals = extrude ? undefined : [];
 			const uvs = [];
 
 			if ( SVGLoader.pointsToStrokeWithBuffers( points, style, arcDivisions, minDistance, vertices, normals, uvs ) === 0 ) {
@@ -1942,10 +1944,17 @@
 
 			}
 
+			if ( extrude === true ) {
+
+				// Extrude strokes
+				return SVGLoader.extrudeVertices( extrudeOptions, vertices, uvs );
+
+			}
+
 			const geometry = new THREE.BufferGeometry();
 			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-			geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-			geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+			if ( normals ) geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+			if ( uvs ) geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 			return geometry;
 
 		}
@@ -2397,8 +2406,8 @@
 				addVertex( lastPointL, u0, 0 );
 				addVertex( currentPointL, u1, 0 );
 				addVertex( lastPointR, u0, 1 );
-				addVertex( currentPointL, u1, 1 );
-				addVertex( currentPointR, u1, 0 );
+				addVertex( currentPointL, u1, 0 );
+				addVertex( currentPointR, u1, 1 );
 
 			}
 
@@ -2419,7 +2428,7 @@
 
 						addVertex( currentPointL, u, 0 );
 						addVertex( nextPointL, u, 0 );
-						addVertex( innerPoint, u, 0.5 );
+						addVertex( innerPoint, u, 1 );
 
 					} else {
 
@@ -2432,8 +2441,8 @@
 						addVertex( currentPointR, u1, 1 ); // Bevel join triangle
 
 						addVertex( currentPointR, u, 1 );
-						addVertex( nextPointR, u, 0 );
-						addVertex( innerPoint, u, 0.5 );
+						addVertex( innerPoint, u, 0 );
+						addVertex( nextPointR, u, 1 );
 
 					}
 
@@ -2449,8 +2458,8 @@
 					} else {
 
 						addVertex( currentPointR, u, 1 );
-						addVertex( nextPointR, u, 0 );
 						addVertex( currentPoint, u, 0.5 );
+						addVertex( nextPointR, u, 1 );
 
 					}
 
@@ -2507,11 +2516,11 @@
 					case 'round':
 						if ( start ) {
 
-							makeCircularSector( center, p2, p1, u, 0.5 );
+							makeCircularSector( center, p2, p1, u, 0 );
 
 						} else {
 
-							makeCircularSector( center, p1, p2, u, 0.5 );
+							makeCircularSector( center, p1, p2, u, 1 );
 
 						}
 
@@ -2555,8 +2564,8 @@
 
 							} else {
 
-								tempV2_3.toArray( vertices, vl - 2 * 3 );
-								tempV2_4.toArray( vertices, vl - 1 * 3 );
+								tempV2_3.toArray( vertices, vl - 1 * 3 );
+								tempV2_4.toArray( vertices, vl - 2 * 3 );
 								tempV2_4.toArray( vertices, vl - 4 * 3 );
 
 							}
@@ -2609,6 +2618,130 @@
 				return newPoints;
 
 			}
+
+		}
+
+		static extrudeVertices( extrudeOptions, vertices, uvs ) {
+
+			// Extrudes planar vertices and returns a THREE.BufferGeometry.
+			const options = {
+				depth: 16,
+				steps: 2
+			};
+			if ( extrudeOptions ) Object.assign( options, extrudeOptions );
+			const indices = [];
+			const steps = options.steps;
+			const vlen = vertices.length;
+			const flen = vlen / 3;
+			let i;
+			let s;
+			const groups = [];
+
+			function addWall( j, k ) {
+
+				if ( uvs ) {
+
+					const v1 = uvs[ j * 2 + 1 ];
+					const v2 = uvs[ k * 2 + 1 ];
+
+					if ( Math.abs( v1 - v2 ) > 0.01 || v1 > 0.01 && v1 < 0.99 ) {
+
+						return;
+
+					}
+
+				}
+
+				for ( s = 0; s <= steps; s ++ ) {
+
+					const s1 = flen * s;
+					const s2 = flen * ( s + 1 );
+					const a = j + s1,
+						b = k + s1,
+						c = k + s2,
+						d = j + s2;
+					indices.push( a, b, d );
+					indices.push( b, c, d );
+
+				}
+
+			} // Bottom faces
+
+
+			for ( i = 0; i < flen; i += 3 ) {
+
+				indices.push( i + 2, i + 1, i );
+
+			}
+
+			groups.push( [ 0, flen, 2 ] ); // Add stepped vertices...
+
+			for ( s = 1; s <= steps + 1; s ++ ) {
+
+				for ( i = 0; i < vlen; i += 3 ) {
+
+					vertices.push( vertices[ i ], vertices[ i + 1 ], options.depth / steps * ( s - 1 ) );
+
+				}
+
+			} // Side wall faces
+
+
+			for ( i = 0; i < flen; i += 3 ) {
+
+				addWall( i, i + 1 );
+				addWall( i + 1, i + 2 );
+				addWall( i + 2, i );
+
+			}
+
+			groups.push( [ flen, indices.length - flen, 1 ] ); // Front faces
+
+			for ( i = 0; i < vlen; i += 3 ) {
+
+				vertices.push( vertices[ i ], vertices[ i + 1 ], options.depth );
+
+			}
+
+			for ( i = 0; i < flen; i += 3 ) {
+
+				indices.push( i + flen * ( steps + 2 ), i + 1 + flen * ( steps + 2 ), i + 2 + flen * ( steps + 2 ) );
+
+			}
+
+			groups.push( [ indices.length - flen, flen, 0 ] );
+			const geometry = new THREE.BufferGeometry();
+			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+			geometry.setIndex( indices );
+
+			if ( uvs ) {
+
+				const uvlen = uvs.length;
+				let v = 0;
+
+				for ( s = 0; s <= steps + 1; s ++ ) {
+
+					for ( i = 0; i < uvlen; i += 2 ) {
+
+						v = s === steps + 1 ? 1. - uvs[ i + 1 ] : Math.abs( uvs[ i + 1 ] - s / steps );
+						uvs.push( uvs[ i ], v );
+
+					}
+
+				}
+
+				geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+
+			}
+
+			for ( i = groups.length - 1; i >= 0; i -- ) {
+
+				geometry.addGroup( groups[ i ][ 0 ], groups[ i ][ 1 ], groups[ i ][ 2 ] );
+
+			}
+
+			geometry.computeVertexNormals();
+			return geometry;
 
 		}
 
