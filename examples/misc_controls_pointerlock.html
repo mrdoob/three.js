@@ -17,43 +17,29 @@
 				width: 100%;
 				height: 100%;
 
-				display: -webkit-box;
-				display: -moz-box;
-				display: box;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
 
-				-webkit-box-orient: horizontal;
-				-moz-box-orient: horizontal;
-				box-orient: horizontal;
-
-				-webkit-box-pack: center;
-				-moz-box-pack: center;
-				box-pack: center;
-
-				-webkit-box-align: center;
-				-moz-box-align: center;
-				box-align: center;
-
-				color: #ffffff;
 				text-align: center;
-				font-family: Arial;
 				font-size: 14px;
-				line-height: 24px;
-
 				cursor: pointer;
 			}
 		</style>
 	</head>
 	<body>
 		<div id="blocker">
-
 			<div id="instructions">
-				<span style="font-size:36px">Click to play</span>
-				<br /><br />
-				Move: WASD<br/>
-				Jump: SPACE<br/>
-				Look: MOUSE
+				<p style="font-size:36px">
+					Click to play
+				</p>
+				<p>
+					Move: WASD<br/>
+					Jump: SPACE<br/>
+					Look: MOUSE
+				</p>
 			</div>
-
 		</div>
 
 		<script type="module">
