@@ -66,7 +66,7 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
-	load( url, onLoad, onProgress, onError, onWarning ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const loader = new FileLoader( this.manager );
 
@@ -90,8 +90,9 @@ class Rhino3dmLoader extends Loader {
 
 			this.decodeObjects( buffer, url )
 				.then( result => { 
+					result.userData.warnings = this.warnings;
 					onLoad( result ); 
-					this.warnings.length > 0 && onWarning ( this.warnings ) } )
+				 } )
 				.catch( e => onError( e ) );
 
 		}, onProgress, onError );
@@ -164,10 +165,13 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
-	parse( data, onLoad, onError, onWarning ) {
+	parse( data, onLoad, onError ) {
 
 		this.decodeObjects( data, '' )
-			.then( result => { onLoad( result ); this.warnings.length > 0 && onWarning( this.warnings ) } )
+			.then( result => { 
+				result.userData.warnings = this.warnings;
+				onLoad( result ); 
+			} )
 			.catch( e => onError( e ) );
 
 	}
