@@ -1,6 +1,6 @@
-const LoaderUtils = {
+class LoaderUtils {
 
-	decodeText: function ( array ) {
+	static decodeText( array ) {
 
 		if ( typeof TextDecoder !== 'undefined' ) {
 
@@ -32,9 +32,9 @@ const LoaderUtils = {
 
 		}
 
-	},
+	}
 
-	extractUrlBase: function ( url ) {
+	static extractUrlBase( url ) {
 
 		const index = url.lastIndexOf( '/' );
 
@@ -44,6 +44,6 @@ const LoaderUtils = {
 
 	}
 
-};
+}
 
 export { LoaderUtils };

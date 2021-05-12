@@ -347,7 +347,7 @@ function Viewport( editor ) {
 
 	} );
 
-	signals.rendererChanged.add( function ( newRenderer ) {
+	signals.rendererCreated.add( function ( newRenderer ) {
 
 		if ( renderer !== null ) {
 
@@ -585,7 +585,7 @@ function Viewport( editor ) {
 
 					}; // TODO Remove hack
 
-					scene.background = renderTarget;
+					scene.background = renderTarget.texture;
 
 				}
 
@@ -616,7 +616,7 @@ function Viewport( editor ) {
 				scene.environment = pmremTexture;
 				break;
 			case 'ModelViewer':
-				scene.environment = pmremGenerator.fromScene( new RoomEnvironment() ).texture;
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 				break;
 
 		}

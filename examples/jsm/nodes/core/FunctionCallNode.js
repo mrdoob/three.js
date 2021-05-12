@@ -1,106 +1,108 @@
 import { TempNode } from './TempNode.js';
 
-function FunctionCallNode( func, inputs ) {
+class FunctionCallNode extends TempNode {
 
-	TempNode.call( this );
+	constructor( func, inputs ) {
 
-	this.setFunction( func, inputs );
+		super();
 
-}
-
-FunctionCallNode.prototype = Object.create( TempNode.prototype );
-FunctionCallNode.prototype.constructor = FunctionCallNode;
-FunctionCallNode.prototype.nodeType = 'FunctionCall';
-
-FunctionCallNode.prototype.setFunction = function ( func, inputs ) {
-
-	this.value = func;
-	this.inputs = inputs || [];
-
-};
-
-FunctionCallNode.prototype.getFunction = function () {
-
-	return this.value;
-
-};
-
-FunctionCallNode.prototype.getType = function ( builder ) {
-
-	return this.value.getType( builder );
-
-};
-
-FunctionCallNode.prototype.generate = function ( builder, output ) {
-
-	var type = this.getType( builder ),
-		func = this.value;
-
-	var code = func.build( builder, output ) + '( ',
-		params = [];
-
-	for ( var i = 0; i < func.inputs.length; i ++ ) {
-
-		var inpt = func.inputs[ i ],
-			param = this.inputs[ i ] || this.inputs[ inpt.name ];
-
-		params.push( param.build( builder, builder.getTypeByFormat( inpt.type ) ) );
+		this.setFunction( func, inputs );
 
 	}
 
-	code += params.join( ', ' ) + ' )';
+	setFunction( func, inputs = [] ) {
 
-	return builder.format( code, type, output );
-
-};
-
-FunctionCallNode.prototype.copy = function ( source ) {
-
-	TempNode.prototype.copy.call( this, source );
-
-	for ( var prop in source.inputs ) {
-
-		this.inputs[ prop ] = source.inputs[ prop ];
+		this.value = func;
+		this.inputs = inputs;
 
 	}
 
-	this.value = source.value;
+	getFunction() {
 
-	return this;
+		return this.value;
 
-};
+	}
 
-FunctionCallNode.prototype.toJSON = function ( meta ) {
+	getType( builder ) {
 
-	var data = this.getJSONNode( meta );
+		return this.value.getType( builder );
 
-	if ( ! data ) {
+	}
 
-		var func = this.value;
+	generate( builder, output ) {
 
-		data = this.createJSONNode( meta );
+		const type = this.getType( builder ),
+			func = this.value;
 
-		data.value = this.value.toJSON( meta ).uuid;
+		let code = func.build( builder, output ) + '( ';
+		const params = [];
 
-		if ( func.inputs.length ) {
+		for ( let i = 0; i < func.inputs.length; i ++ ) {
 
-			data.inputs = {};
+			const inpt = func.inputs[ i ],
+				param = this.inputs[ i ] || this.inputs[ inpt.name ];
 
-			for ( var i = 0; i < func.inputs.length; i ++ ) {
+			params.push( param.build( builder, builder.getTypeByFormat( inpt.type ) ) );
 
-				var inpt = func.inputs[ i ],
-					node = this.inputs[ i ] || this.inputs[ inpt.name ];
+		}
 
-				data.inputs[ inpt.name ] = node.toJSON( meta ).uuid;
+		code += params.join( ', ' ) + ' )';
+
+		return builder.format( code, type, output );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		for ( const prop in source.inputs ) {
+
+			this.inputs[ prop ] = source.inputs[ prop ];
+
+		}
+
+		this.value = source.value;
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		let data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			const func = this.value;
+
+			data = this.createJSONNode( meta );
+
+			data.value = this.value.toJSON( meta ).uuid;
+
+			if ( func.inputs.length ) {
+
+				data.inputs = {};
+
+				for ( let i = 0; i < func.inputs.length; i ++ ) {
+
+					const inpt = func.inputs[ i ],
+						node = this.inputs[ i ] || this.inputs[ inpt.name ];
+
+					data.inputs[ inpt.name ] = node.toJSON( meta ).uuid;
+
+				}
 
 			}
 
 		}
 
+		return data;
+
 	}
 
-	return data;
+}
 
-};
+FunctionCallNode.prototype.nodeType = 'FunctionCall';
 
 export { FunctionCallNode };

@@ -1,95 +1,79 @@
-THREE.HDRCubeTextureLoader = function ( manager ) {
+( function () {
 
-	THREE.Loader.call( this, manager );
+	class HDRCubeTextureLoader extends THREE.Loader {
 
-	this.hdrLoader = new THREE.RGBELoader();
-	this.type = THREE.UnsignedByteType;
+		constructor( manager ) {
 
-};
-
-THREE.HDRCubeTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-
-	constructor: THREE.HDRCubeTextureLoader,
-
-	load: function ( urls, onLoad, onProgress, onError ) {
-
-		if ( ! Array.isArray( urls ) ) {
-
-			console.warn( 'THREE.HDRCubeTextureLoader signature has changed. Use .setDataType() instead.' );
-
-			this.setDataType( urls );
-
-			urls = onLoad;
-			onLoad = onProgress;
-			onProgress = onError;
-			onError = arguments[ 4 ];
+			super( manager );
+			this.hdrLoader = new THREE.RGBELoader();
+			this.type = THREE.UnsignedByteType;
 
 		}
 
-		var texture = new THREE.CubeTexture();
+		load( urls, onLoad, onProgress, onError ) {
 
-		texture.type = this.type;
+			if ( ! Array.isArray( urls ) ) {
 
-		switch ( texture.type ) {
+				console.warn( 'THREE.HDRCubeTextureLoader signature has changed. Use .setDataType() instead.' );
+				this.setDataType( urls );
+				urls = onLoad;
+				onLoad = onProgress;
+				onProgress = onError;
+				onError = arguments[ 4 ];
 
-			case THREE.UnsignedByteType:
+			}
 
-				texture.encoding = THREE.RGBEEncoding;
-				texture.format = THREE.RGBAFormat;
-				texture.minFilter = THREE.NearestFilter;
-				texture.magFilter = THREE.NearestFilter;
-				texture.generateMipmaps = false;
-				break;
+			const texture = new THREE.CubeTexture();
+			texture.type = this.type;
 
-			case THREE.FloatType:
+			switch ( texture.type ) {
 
-				texture.encoding = THREE.LinearEncoding;
-				texture.format = THREE.RGBFormat;
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
-				texture.generateMipmaps = false;
-				break;
+				case THREE.UnsignedByteType:
+					texture.encoding = THREE.RGBEEncoding;
+					texture.format = THREE.RGBAFormat;
+					texture.minFilter = THREE.NearestFilter;
+					texture.magFilter = THREE.NearestFilter;
+					texture.generateMipmaps = false;
+					break;
 
-			case THREE.HalfFloatType:
+				case THREE.FloatType:
+					texture.encoding = THREE.LinearEncoding;
+					texture.format = THREE.RGBFormat;
+					texture.minFilter = THREE.LinearFilter;
+					texture.magFilter = THREE.LinearFilter;
+					texture.generateMipmaps = false;
+					break;
 
-				texture.encoding = THREE.LinearEncoding;
-				texture.format = THREE.RGBFormat;
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
-				texture.generateMipmaps = false;
-				break;
+				case THREE.HalfFloatType:
+					texture.encoding = THREE.LinearEncoding;
+					texture.format = THREE.RGBFormat;
+					texture.minFilter = THREE.LinearFilter;
+					texture.magFilter = THREE.LinearFilter;
+					texture.generateMipmaps = false;
+					break;
 
-		}
+			}
 
-		var scope = this;
+			const scope = this;
+			let loaded = 0;
 
-		var loaded = 0;
+			function loadHDRData( i, onLoad, onProgress, onError ) {
 
-		function loadHDRData( i, onLoad, onProgress, onError ) {
-
-			new THREE.FileLoader( scope.manager )
-				.setPath( scope.path )
-				.setResponseType( 'arraybuffer' )
-				.setWithCredentials( scope.withCredentials )
-				.load( urls[ i ], function ( buffer ) {
+				new THREE.FileLoader( scope.manager ).setPath( scope.path ).setResponseType( 'arraybuffer' ).setWithCredentials( scope.withCredentials ).load( urls[ i ], function ( buffer ) {
 
 					loaded ++;
-
-					var texData = scope.hdrLoader.parse( buffer );
-
+					const texData = scope.hdrLoader.parse( buffer );
 					if ( ! texData ) return;
 
 					if ( texData.data !== undefined ) {
 
-						var dataTexture = new THREE.DataTexture( texData.data, texData.width, texData.height );
-
+						const dataTexture = new THREE.DataTexture( texData.data, texData.width, texData.height );
 						dataTexture.type = texture.type;
 						dataTexture.encoding = texture.encoding;
 						dataTexture.format = texture.format;
 						dataTexture.minFilter = texture.minFilter;
 						dataTexture.magFilter = texture.magFilter;
 						dataTexture.generateMipmaps = texture.generateMipmaps;
-
 						texture.images[ i ] = dataTexture;
 
 					}
@@ -103,25 +87,28 @@ THREE.HDRCubeTextureLoader.prototype = Object.assign( Object.create( THREE.Loade
 
 				}, onProgress, onError );
 
+			}
+
+			for ( let i = 0; i < urls.length; i ++ ) {
+
+				loadHDRData( i, onLoad, onProgress, onError );
+
+			}
+
+			return texture;
+
 		}
 
-		for ( var i = 0; i < urls.length; i ++ ) {
+		setDataType( value ) {
 
-			loadHDRData( i, onLoad, onProgress, onError );
+			this.type = value;
+			this.hdrLoader.setDataType( value );
+			return this;
 
 		}
-
-		return texture;
-
-	},
-
-	setDataType: function ( value ) {
-
-		this.type = value;
-		this.hdrLoader.setDataType( value );
-
-		return this;
 
 	}
 
-} );
+	THREE.HDRCubeTextureLoader = HDRCubeTextureLoader;
+
+} )();

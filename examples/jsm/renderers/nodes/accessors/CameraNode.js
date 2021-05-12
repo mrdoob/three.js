@@ -1,37 +1,27 @@
-import Node from '../core/Node.js';
-import Vector3Node from '../inputs/Vector3Node.js';
+import Object3DNode from './Object3DNode.js';
 import Matrix4Node from '../inputs/Matrix4Node.js';
-import { NodeUpdateType } from '../core/constants.js';
 
-class CameraNode extends Node {
+class CameraNode extends Object3DNode {
 
-	static POSITION = 'position';
-	static PROJECTION = 'projection';
-	static VIEW = 'view';
+	static PROJECTION_MATRIX = 'projectionMatrix';
 
 	constructor( scope = CameraNode.POSITION ) {
 
-		super();
-
-		this.updateType = NodeUpdateType.Frame;
-
-		this.scope = scope;
-
-		this._inputNode = null;
+		super( scope );
 
 	}
 
-	getType() {
+	getType( builder ) {
 
 		const scope = this.scope;
 
-		if ( scope === CameraNode.PROJECTION || scope === CameraNode.VIEW ) {
+		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
 			return 'mat4';
 
 		}
 
-		return 'vec3';
+		return super.getType( builder );
 
 	}
 
@@ -41,17 +31,17 @@ class CameraNode extends Node {
 		const inputNode = this._inputNode;
 		const scope = this.scope;
 
-		if ( scope === CameraNode.PROJECTION ) {
+		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
 			inputNode.value = camera.projectionMatrix;
 
-		} else if ( scope === CameraNode.VIEW ) {
+		} else if ( scope === CameraNode.VIEW_MATRIX ) {
 
 			inputNode.value = camera.matrixWorldInverse;
 
-		} else if ( scope === CameraNode.POSITION ) {
+		} else {
 
-			camera.getWorldPosition( inputNode.value );
+			super.update( frame );
 
 		}
 
@@ -67,7 +57,7 @@ class CameraNode extends Node {
 
 			const scope = this.scope;
 
-			if ( scope === CameraNode.PROJECTION || scope === CameraNode.VIEW ) {
+			if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
 				if ( inputNode === null || inputNode.isMatrix4Node !== true ) {
 
@@ -75,13 +65,9 @@ class CameraNode extends Node {
 
 				}
 
-			} else if ( scope === CameraNode.POSITION ) {
+			} else {
 
-				if ( inputNode === null || inputNode.isVector3Node !== true ) {
-
-					inputNode = new Vector3Node();
-
-				}
+				return super.generate( builder, output );
 
 			}
 

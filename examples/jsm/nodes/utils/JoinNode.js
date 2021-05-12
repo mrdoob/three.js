@@ -1,112 +1,114 @@
 import { TempNode } from '../core/TempNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
-var inputs = NodeUtils.elements;
+const inputs = NodeUtils.elements;
 
-function JoinNode( x, y, z, w ) {
+class JoinNode extends TempNode {
 
-	TempNode.call( this, 'f' );
+	constructor( x, y, z, w ) {
 
-	this.x = x;
-	this.y = y;
-	this.z = z;
-	this.w = w;
+		super( 'f' );
 
-}
-
-JoinNode.prototype = Object.create( TempNode.prototype );
-JoinNode.prototype.constructor = JoinNode;
-JoinNode.prototype.nodeType = 'Join';
-
-JoinNode.prototype.getNumElements = function () {
-
-	var i = inputs.length;
-
-	while ( i -- ) {
-
-		if ( this[ inputs[ i ] ] !== undefined ) {
-
-			++ i;
-
-			break;
-
-		}
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.w = w;
 
 	}
 
-	return Math.max( i, 2 );
+	getNumElements() {
 
-};
+		let i = inputs.length;
 
-JoinNode.prototype.getType = function ( builder ) {
+		while ( i -- ) {
 
-	return builder.getTypeFromLength( this.getNumElements() );
+			if ( this[ inputs[ i ] ] !== undefined ) {
 
-};
+				++ i;
 
-JoinNode.prototype.generate = function ( builder, output ) {
-
-	var type = this.getType( builder ),
-		length = this.getNumElements(),
-		outputs = [];
-
-	for ( var i = 0; i < length; i ++ ) {
-
-		var elm = this[ inputs[ i ] ];
-
-		outputs.push( elm ? elm.build( builder, 'f' ) : '0.0' );
-
-	}
-
-	var code = ( length > 1 ? builder.getConstructorFromLength( length ) : '' ) + '( ' + outputs.join( ', ' ) + ' )';
-
-	return builder.format( code, type, output );
-
-};
-
-JoinNode.prototype.copy = function ( source ) {
-
-	TempNode.prototype.copy.call( this, source );
-
-	for ( var prop in source.inputs ) {
-
-		this[ prop ] = source.inputs[ prop ];
-
-	}
-
-	return this;
-
-};
-
-JoinNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.inputs = {};
-
-		var length = this.getNumElements();
-
-		for ( var i = 0; i < length; i ++ ) {
-
-			var elm = this[ inputs[ i ] ];
-
-			if ( elm ) {
-
-				data.inputs[ inputs[ i ] ] = elm.toJSON( meta ).uuid;
+				break;
 
 			}
 
 		}
 
+		return Math.max( i, 2 );
 
 	}
 
-	return data;
+	getType( builder ) {
 
-};
+		return builder.getTypeFromLength( this.getNumElements() );
+
+	}
+
+	generate( builder, output ) {
+
+		const type = this.getType( builder ),
+			length = this.getNumElements(),
+			outputs = [];
+
+		for ( let i = 0; i < length; i ++ ) {
+
+			const elm = this[ inputs[ i ] ];
+
+			outputs.push( elm ? elm.build( builder, 'f' ) : '0.0' );
+
+		}
+
+		const code = ( length > 1 ? builder.getConstructorFromLength( length ) : '' ) + '( ' + outputs.join( ', ' ) + ' )';
+
+		return builder.format( code, type, output );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		for ( const prop in source.inputs ) {
+
+			this[ prop ] = source.inputs[ prop ];
+
+		}
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		let data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			data = this.createJSONNode( meta );
+
+			data.inputs = {};
+
+			const length = this.getNumElements();
+
+			for ( let i = 0; i < length; i ++ ) {
+
+				const elm = this[ inputs[ i ] ];
+
+				if ( elm ) {
+
+					data.inputs[ inputs[ i ] ] = elm.toJSON( meta ).uuid;
+
+				}
+
+			}
+
+
+		}
+
+		return data;
+
+	}
+
+}
+
+JoinNode.prototype.nodeType = 'Join';
 
 export { JoinNode };

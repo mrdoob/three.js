@@ -21,7 +21,7 @@
 
 			let camera, scene, renderer;
 
-			let raycaster, mouse;
+			let raycaster, pointer;
 
 			let mesh, line;
 
@@ -175,7 +175,7 @@
 
 				raycaster = new THREE.Raycaster();
 
-				mouse = new THREE.Vector2();
+				pointer = new THREE.Vector2();
 
 				geometry = new THREE.BufferGeometry();
 				geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 4 * 3 ), 3 ) );
@@ -200,7 +200,7 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
-				document.addEventListener( 'mousemove', onDocumentMouseMove );
+				document.addEventListener( 'pointermove', onPointerMove );
 
 			}
 
@@ -213,12 +213,10 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
 
-				event.preventDefault();
-
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 			}
 
@@ -240,7 +238,7 @@
 				mesh.rotation.x = time * 0.15;
 				mesh.rotation.y = time * 0.25;
 
-				raycaster.setFromCamera( mouse, camera );
+				raycaster.setFromCamera( pointer, camera );
 
 				const intersects = raycaster.intersectObject( mesh );
 

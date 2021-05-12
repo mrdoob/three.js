@@ -12,7 +12,7 @@ class ModelViewProjectionNode extends Node {
 
 		this.position = position;
 
-		this._mvpMatrix = new OperatorNode( '*', new CameraNode( CameraNode.PROJECTION ), new ModelNode( ModelNode.VIEW ) );
+		this._mvpMatrix = new OperatorNode( '*', new CameraNode( CameraNode.PROJECTION_MATRIX ), new ModelNode( ModelNode.VIEW_MATRIX ) );
 
 	}
 

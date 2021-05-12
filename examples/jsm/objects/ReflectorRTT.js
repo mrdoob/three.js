@@ -1,13 +1,15 @@
 import { Reflector } from '../objects/Reflector.js';
 
-var ReflectorRTT = function ( geometry, options ) {
+class ReflectorRTT extends Reflector {
 
-	Reflector.call( this, geometry, options );
+	constructor( geometry, options ) {
 
-	this.geometry.setDrawRange( 0, 0 ); // avoid rendering geometry
+		super( geometry, options );
 
-};
+		this.geometry.setDrawRange( 0, 0 ); // avoid rendering geometry
 
-ReflectorRTT.prototype = Object.create( Reflector.prototype );
+	}
+
+}
 
 export { ReflectorRTT };

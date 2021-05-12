@@ -14,63 +14,59 @@ var ToneMapShader = {
 		'middleGrey': { value: 0.6 }
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
 
-		'varying vec2 vUv;',
+		varying vec2 vUv;
 
-		'void main() {',
+		void main() {
 
-		'	vUv = uv;',
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		'}'
+		}`,
 
-	].join( '\n' ),
+	fragmentShader: /* glsl */`
 
-	fragmentShader: [
+		#include <common>
 
-		'#include <common>',
+		uniform sampler2D tDiffuse;
 
-		'uniform sampler2D tDiffuse;',
+		varying vec2 vUv;
 
-		'varying vec2 vUv;',
+		uniform float middleGrey;
+		uniform float minLuminance;
+		uniform float maxLuminance;
+		#ifdef ADAPTED_LUMINANCE
+			uniform sampler2D luminanceMap;
+		#else
+			uniform float averageLuminance;
+		#endif
 
-		'uniform float middleGrey;',
-		'uniform float minLuminance;',
-		'uniform float maxLuminance;',
-		'#ifdef ADAPTED_LUMINANCE',
-		'	uniform sampler2D luminanceMap;',
-		'#else',
-		'	uniform float averageLuminance;',
-		'#endif',
+		vec3 ToneMap( vec3 vColor ) {
+			#ifdef ADAPTED_LUMINANCE
+				// Get the calculated average luminance
+				float fLumAvg = texture2D(luminanceMap, vec2(0.5, 0.5)).r;
+			#else
+				float fLumAvg = averageLuminance;
+			#endif
 
-		'vec3 ToneMap( vec3 vColor ) {',
-		'	#ifdef ADAPTED_LUMINANCE',
-		// Get the calculated average luminance
-		'		float fLumAvg = texture2D(luminanceMap, vec2(0.5, 0.5)).r;',
-		'	#else',
-		'		float fLumAvg = averageLuminance;',
-		'	#endif',
+			// Calculate the luminance of the current pixel
+			float fLumPixel = linearToRelativeLuminance( vColor );
 
-		// Calculate the luminance of the current pixel
-		'	float fLumPixel = linearToRelativeLuminance( vColor );',
+			// Apply the modified operator (Eq. 4)
+			float fLumScaled = (fLumPixel * middleGrey) / max( minLuminance, fLumAvg );
 
-		// Apply the modified operator (Eq. 4)
-		'	float fLumScaled = (fLumPixel * middleGrey) / max( minLuminance, fLumAvg );',
+			float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / (maxLuminance * maxLuminance)))) / (1.0 + fLumScaled);
+			return fLumCompressed * vColor;
+		}
 
-		'	float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / (maxLuminance * maxLuminance)))) / (1.0 + fLumScaled);',
-		'	return fLumCompressed * vColor;',
-		'}',
+		void main() {
 
-		'void main() {',
+			vec4 texel = texture2D( tDiffuse, vUv );
 
-		'	vec4 texel = texture2D( tDiffuse, vUv );',
+			gl_FragColor = vec4( ToneMap( texel.xyz ), texel.w );
 
-		'	gl_FragColor = vec4( ToneMap( texel.xyz ), texel.w );',
-
-		'}'
-
-	].join( '\n' )
+		}`
 
 };
 

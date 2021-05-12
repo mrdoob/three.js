@@ -1,6 +1,6 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 import { Triangle } from '../math/Triangle.js';
 import { Vector3 } from '../math/Vector3.js';
 

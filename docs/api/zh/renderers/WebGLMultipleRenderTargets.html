@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:WebGLRenderTarget] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A special render target that enables a fragment shader to write to several textures.
+			This approach is useful for advanced rendering techniques like post-processing or deferred rendering.
+
+			Heads up: [name] can only be used with a WebGL 2 rendering context.
+		</p>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl2_multiple_rendertargets webgl2 / multiple / rendertargets ]
+		</p>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([param:Number width], [param:Number height], [param:Number count])</h3>
+
+		<p>
+		[page:Number width] - The width of the render target. <br />
+		[page:Number height] - The height of the render target.<br />
+		[page:Number count] - The number of render targets.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array texture]</h3>
+		<p>
+		The texture property is overwritten in [name] and replaced with an array. This array holds the [page:WebGLRenderTarget.texture texture]
+		references of the respective render targets.
+		</p>
+
+		<p>[page:WebGLRenderTarget WebGLRenderTarget] properties are available on this class.</p>
+
+		<h2>Methods</h2>
+
+		<p>[page:WebGLRenderTarget WebGLRenderTarget] methods are available on this class.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

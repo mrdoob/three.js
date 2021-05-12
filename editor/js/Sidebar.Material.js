@@ -262,16 +262,6 @@ function SidebarMaterial( editor ) {
 
 	container.add( materialDepthPackingRow );
 
-	// skinning
-
-	var materialSkinningRow = new UIRow();
-	var materialSkinning = new UICheckbox( false ).onChange( update );
-
-	materialSkinningRow.add( new UIText( strings.getKey( 'sidebar/material/skinning' ) ).setWidth( '90px' ) );
-	materialSkinningRow.add( materialSkinning );
-
-	container.add( materialSkinningRow );
-
 	// map
 
 	var materialMapRow = new UIRow();
@@ -748,12 +738,6 @@ function SidebarMaterial( editor ) {
 					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'depthPacking', depthPacking, currentMaterialSlot ) );
 
 				}
-
-			}
-
-			if ( material.skinning !== undefined && material.skinning !== materialSkinning.getValue() ) {
-
-				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'skinning', materialSkinning.getValue(), currentMaterialSlot ) );
 
 			}
 
@@ -1313,7 +1297,6 @@ function SidebarMaterial( editor ) {
 			'vertexColors': materialVertexColorsRow,
 			'vertexTangents': materialVertexTangentsRow,
 			'depthPacking': materialDepthPackingRow,
-			'skinning': materialSkinningRow,
 			'map': materialMapRow,
 			'matcap': materialMatcapMapRow,
 			'alphaMap': materialAlphaMapRow,
@@ -1492,12 +1475,6 @@ function SidebarMaterial( editor ) {
 		if ( material.depthPacking !== undefined ) {
 
 			materialDepthPacking.setValue( material.depthPacking );
-
-		}
-
-		if ( material.skinning !== undefined ) {
-
-			materialSkinning.setValue( material.skinning );
 
 		}
 
