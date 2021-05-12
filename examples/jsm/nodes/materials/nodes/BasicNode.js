@@ -19,15 +19,15 @@ class BasicNode extends Node {
 
 			const position = this.position ? this.position.analyzeAndFlow( builder, 'v3', { cache: 'position' } ) : undefined;
 
-			builder.addParsCode( [
-				'varying vec3 vViewPosition;',
+			builder.addParsCode( /* glsl */`
+				varying vec3 vViewPosition;
 
-				'#ifndef FLAT_SHADED',
+				#ifndef FLAT_SHADED
 
-				' varying vec3 vNormal;',
+				 varying vec3 vNormal;
 
-				'#endif',
-			].join( '\n' ) );
+				#endif`
+			);
 
 			const output = [
 				'#include <beginnormal_vertex>',
@@ -82,15 +82,15 @@ class BasicNode extends Node {
 
 			builder.requires.transparent = alpha !== undefined;
 
-			builder.addParsCode( [
-				'varying vec3 vViewPosition;',
+			builder.addParsCode( /* glsl */`
+				varying vec3 vViewPosition;
 
-				'#ifndef FLAT_SHADED',
+				#ifndef FLAT_SHADED
 
-				' varying vec3 vNormal;',
+				 varying vec3 vNormal;
 
-				'#endif',
-			].join( '\n' ) );
+				#endif`
+			);
 
 			const output = [
 				// add before: prevent undeclared normal

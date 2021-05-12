@@ -52,14 +52,16 @@ LuminanceNode.Nodes = ( function () {
 
 	const LUMA = new ConstNode( 'vec3 LUMA vec3( 0.2125, 0.7154, 0.0721 )' );
 
-	const luminance = new FunctionNode( [
-		// Algorithm from Chapter 10 of Graphics Shaders
-		'float luminance( vec3 rgb ) {',
+	// Algorithm from Chapter 10 of Graphics Shaders
 
-		'	return dot( rgb, LUMA );',
+	const luminance = new FunctionNode( /* glsl */`
 
-		'}'
-	].join( '\n' ), [ LUMA ] );
+		float luminance( vec3 rgb ) {
+
+			return dot( rgb, LUMA );
+
+		}`
+	, [ LUMA ] );
 
 	return {
 		LUMA: LUMA,

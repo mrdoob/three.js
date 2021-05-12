@@ -76,18 +76,19 @@ class SpecularMIPLevelNode extends TempNode {
 
 SpecularMIPLevelNode.Nodes = ( function () {
 
-	const getSpecularMIPLevel = new FunctionNode( [
-		// taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
-		'float getSpecularMIPLevel( const in float roughness, const in float maxMIPLevelScalar ) {',
+	// taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
 
-		'	float sigma = PI * roughness * roughness / ( 1.0 + roughness );',
-		'	float desiredMIPLevel = maxMIPLevelScalar + log2( sigma );',
+	const getSpecularMIPLevel = new FunctionNode( /* glsl */`
 
-		// clamp to allowable LOD ranges.
-		'	return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );',
+		float getSpecularMIPLevel( const in float roughness, const in float maxMIPLevelScalar ) {
 
-		'}'
-	].join( '\n' ) );
+			float sigma = PI * roughness * roughness / ( 1.0 + roughness );
+			float desiredMIPLevel = maxMIPLevelScalar + log2( sigma );
+
+			return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );
+
+		}`
+	);
 
 	return {
 		getSpecularMIPLevel: getSpecularMIPLevel
