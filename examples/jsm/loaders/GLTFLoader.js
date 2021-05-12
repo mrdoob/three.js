@@ -1972,6 +1972,8 @@ class GLTFParser {
 		this.cameraCache = { refs: {}, uses: {} };
 		this.lightCache = { refs: {}, uses: {} };
 
+		this.textureCache = {};
+
 		// Track node names, to ensure no duplicates
 		this.nodeNamesUsed = {};
 
@@ -2536,6 +2538,15 @@ class GLTFParser {
 
 		const textureDef = json.textures[ textureIndex ];
 
+		const cacheKey = textureDef.source  + ':' + textureDef.sampler;
+
+		if ( this.textureCache[ cacheKey ] ) {
+
+			// See https://github.com/mrdoob/three.js/issues/21559.
+			return this.textureCache[ cacheKey ];
+
+		}
+
 		const URL = self.URL || self.webkitURL;
 
 		let sourceURI = source.uri;
@@ -2576,7 +2587,7 @@ class GLTFParser {
 
 		}
 
-		return Promise.resolve( sourceURI ).then( function ( sourceURI ) {
+		const promise = Promise.resolve( sourceURI ).then( function ( sourceURI ) {
 
 			return new Promise( function ( resolve, reject ) {
 
@@ -2629,6 +2640,10 @@ class GLTFParser {
 			return texture;
 
 		} );
+
+		this.textureCache[ cacheKey ] = promise;
+
+		return promise;
 
 	}
 
