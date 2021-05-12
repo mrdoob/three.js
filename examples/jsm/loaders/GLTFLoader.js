@@ -1115,6 +1115,19 @@ class GLTFTextureTransformExtension {
 
 	extendTexture( texture, transform ) {
 
+		if ( transform.texCoord !== undefined ) {
+
+			console.warn( 'THREE.GLTFLoader: Custom UV sets in "' + this.name + '" extension not yet supported.' );
+
+		}
+
+		if ( transform.offset === undefined && transform.rotation === undefined && transform.scale === undefined ) {
+
+			// See https://github.com/mrdoob/three.js/issues/21819.
+			return texture;
+
+		}
+
 		texture = texture.clone();
 
 		if ( transform.offset !== undefined ) {
@@ -1132,12 +1145,6 @@ class GLTFTextureTransformExtension {
 		if ( transform.scale !== undefined ) {
 
 			texture.repeat.fromArray( transform.scale );
-
-		}
-
-		if ( transform.texCoord !== undefined ) {
-
-			console.warn( 'THREE.GLTFLoader: Custom UV sets in "' + this.name + '" extension not yet supported.' );
 
 		}
 
@@ -1964,6 +1971,8 @@ class GLTFParser {
 		this.cameraCache = { refs: {}, uses: {} };
 		this.lightCache = { refs: {}, uses: {} };
 
+		this.textureCache = {};
+
 		// Track node names, to ensure no duplicates
 		this.nodeNamesUsed = {};
 
@@ -2528,6 +2537,15 @@ class GLTFParser {
 
 		const textureDef = json.textures[ textureIndex ];
 
+		const cacheKey = ( source.uri || source.bufferView ) + ':' + textureDef.sampler;
+
+		if ( this.textureCache[ cacheKey ] ) {
+
+			// See https://github.com/mrdoob/three.js/issues/21559.
+			return this.textureCache[ cacheKey ];
+
+		}
+
 		const URL = self.URL || self.webkitURL;
 
 		let sourceURI = source.uri;
@@ -2568,7 +2586,7 @@ class GLTFParser {
 
 		}
 
-		return Promise.resolve( sourceURI ).then( function ( sourceURI ) {
+		const promise = Promise.resolve( sourceURI ).then( function ( sourceURI ) {
 
 			return new Promise( function ( resolve, reject ) {
 
@@ -2621,6 +2639,10 @@ class GLTFParser {
 			return texture;
 
 		} );
+
+		this.textureCache[ cacheKey ] = promise;
+
+		return promise;
 
 	}
 
