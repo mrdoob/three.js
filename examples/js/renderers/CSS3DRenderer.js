@@ -45,6 +45,15 @@
 		constructor( element ) {
 
 			super( element );
+			this.spriteRotation = 0;
+
+		}
+
+		copy( source, recursive ) {
+
+			super.copy( source, recursive );
+			this.spriteRotation = source.spriteRotation;
+			return this;
 
 		}
 
@@ -53,6 +62,8 @@
 	CSS3DSprite.prototype.isCSS3DSprite = true; //
 
 	const _matrix = new THREE.Matrix4();
+
+	const _matrix2 = new THREE.Matrix4();
 
 	class CSS3DRenderer {
 
@@ -171,6 +182,8 @@
 						_matrix.copy( camera.matrixWorldInverse );
 
 						_matrix.transpose();
+
+						if ( object.spriteRotation !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.spriteRotation ) );
 
 						_matrix.copyPosition( object.matrixWorld );
 
