@@ -38,23 +38,23 @@ class PhongNode extends Node {
 
 			] ) );
 
-			builder.addParsCode( [
-				'varying vec3 vViewPosition;',
+			builder.addParsCode( /* glsl */`
+				varying vec3 vViewPosition;
 
-				'#ifndef FLAT_SHADED',
+				#ifndef FLAT_SHADED
 
-				'	varying vec3 vNormal;',
+					varying vec3 vNormal;
 
-				'#endif',
+				#endif
 
-				//"#include <encodings_pars_fragment>", // encoding functions
-				'#include <fog_pars_vertex>',
-				'#include <morphtarget_pars_vertex>',
-				'#include <skinning_pars_vertex>',
-				'#include <shadowmap_pars_vertex>',
-				'#include <logdepthbuf_pars_vertex>',
-				'#include <clipping_planes_pars_vertex>'
-			].join( '\n' ) );
+				//"#include <encodings_pars_fragment> // encoding functions
+				#include <fog_pars_vertex>
+				#include <morphtarget_pars_vertex>
+				#include <skinning_pars_vertex>
+				#include <shadowmap_pars_vertex>
+				#include <logdepthbuf_pars_vertex>
+				#include <clipping_planes_pars_vertex>`
+			);
 
 			const output = [
 				'#include <beginnormal_vertex>',
@@ -146,14 +146,14 @@ class PhongNode extends Node {
 
 			builder.requires.transparent = alpha !== undefined;
 
-			builder.addParsCode( [
-				'#include <fog_pars_fragment>',
-				'#include <bsdfs>',
-				'#include <lights_pars_begin>',
-				'#include <lights_phong_pars_fragment>',
-				'#include <shadowmap_pars_fragment>',
-				'#include <logdepthbuf_pars_fragment>'
-			].join( '\n' ) );
+			builder.addParsCode( /* glsl */`
+				#include <fog_pars_fragment>
+				#include <bsdfs>
+				#include <lights_pars_begin>
+				#include <lights_phong_pars_fragment>
+				#include <shadowmap_pars_fragment>
+				#include <logdepthbuf_pars_fragment>`
+			);
 
 			const output = [
 				// prevent undeclared normal

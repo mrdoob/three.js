@@ -76,46 +76,49 @@ class ColorAdjustmentNode extends TempNode {
 
 ColorAdjustmentNode.Nodes = ( function () {
 
-	const hue = new FunctionNode( [
-		'vec3 hue(vec3 rgb, float adjustment) {',
+	const hue = new FunctionNode( /* glsl */`
+		vec3 hue(vec3 rgb, float adjustment) {
 
-		'	const mat3 RGBtoYIQ = mat3(0.299, 0.587, 0.114, 0.595716, -0.274453, -0.321263, 0.211456, -0.522591, 0.311135);',
-		'	const mat3 YIQtoRGB = mat3(1.0, 0.9563, 0.6210, 1.0, -0.2721, -0.6474, 1.0, -1.107, 1.7046);',
+			const mat3 RGBtoYIQ = mat3(0.299, 0.587, 0.114, 0.595716, -0.274453, -0.321263, 0.211456, -0.522591, 0.311135);
+			const mat3 YIQtoRGB = mat3(1.0, 0.9563, 0.6210, 1.0, -0.2721, -0.6474, 1.0, -1.107, 1.7046);
 
-		'	vec3 yiq = RGBtoYIQ * rgb;',
+			vec3 yiq = RGBtoYIQ * rgb;
 
-		'	float hue = atan(yiq.z, yiq.y) + adjustment;',
-		'	float chroma = sqrt(yiq.z * yiq.z + yiq.y * yiq.y);',
+			float hue = atan(yiq.z, yiq.y) + adjustment;
+			float chroma = sqrt(yiq.z * yiq.z + yiq.y * yiq.y);
 
-		'	return YIQtoRGB * vec3(yiq.x, chroma * cos(hue), chroma * sin(hue));',
+			return YIQtoRGB * vec3(yiq.x, chroma * cos(hue), chroma * sin(hue));
 
-		'}'
-	].join( '\n' ) );
+		}`
+	);
 
-	const saturation = new FunctionNode( [
-		// Algorithm from Chapter 16 of OpenGL Shading Language
-		'vec3 saturation(vec3 rgb, float adjustment) {',
+	// Algorithm from Chapter 16 of OpenGL Shading Language
 
-		'	vec3 intensity = vec3( luminance( rgb ) );',
+	const saturation = new FunctionNode( /* glsl */`
+		vec3 saturation(vec3 rgb, float adjustment) {
 
-		'	return mix( intensity, rgb, adjustment );',
+			vec3 intensity = vec3( luminance( rgb ) );
 
-		'}'
-	].join( '\n' ), [ LuminanceNode.Nodes.luminance ] ); // include LuminanceNode function
+			return mix( intensity, rgb, adjustment );
 
-	const vibrance = new FunctionNode( [
-		// Shader by Evan Wallace adapted by @lo-th
-		'vec3 vibrance(vec3 rgb, float adjustment) {',
+		}`
+	, [ LuminanceNode.Nodes.luminance ] ); // include LuminanceNode function
 
-		'	float average = (rgb.r + rgb.g + rgb.b) / 3.0;',
+	// Shader by Evan Wallace adapted by @lo-th
 
-		'	float mx = max(rgb.r, max(rgb.g, rgb.b));',
-		'	float amt = (mx - average) * (-3.0 * adjustment);',
+	const vibrance = new FunctionNode( /* glsl */`
 
-		'	return mix(rgb.rgb, vec3(mx), amt);',
+		vec3 vibrance(vec3 rgb, float adjustment) {
 
-		'}'
-	].join( '\n' ) );
+			float average = (rgb.r + rgb.g + rgb.b) / 3.0;
+
+			float mx = max(rgb.r, max(rgb.g, rgb.b));
+			float amt = (mx - average) * (-3.0 * adjustment);
+
+			return mix(rgb.rgb, vec3(mx), amt);
+
+		}`
+	);
 
 	return {
 		hue: hue,
