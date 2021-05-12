@@ -19,28 +19,18 @@ class BasicNode extends Node {
 
 			const position = this.position ? this.position.analyzeAndFlow( builder, 'v3', { cache: 'position' } ) : undefined;
 
-			builder.addParsCode( /* glsl */`
-				varying vec3 vViewPosition;
-
-				#ifndef FLAT_SHADED
-
-				 varying vec3 vNormal;
-
-				#endif`
-			);
 
 			const output = [
 				'#include <beginnormal_vertex>',
-				'#include <defaultnormal_vertex>',
-
-				'#ifndef FLAT_SHADED', // Normal computed with derivatives when FLAT_SHADED
-
-				' vNormal = normalize( transformedNormal );',
-
-				'#endif',
-
-				'#include <begin_vertex>',
+				'#include <morphnormal_vertex>',
+				'#include <skinnormal_vertex>',
+				'#include <defaultnormal_vertex>'
 			];
+
+			output.push(
+				'#include <begin_vertex>'
+
+			);
 
 			if ( position ) {
 
@@ -55,14 +45,11 @@ class BasicNode extends Node {
 				'#include <morphtarget_vertex>',
 				'#include <skinning_vertex>',
 				'#include <project_vertex>',
-				'#include <fog_vertex>',
 				'#include <logdepthbuf_vertex>',
-				'#include <clipping_planes_vertex>',
-
-				'	vViewPosition = - mvPosition.xyz;',
 
 				'#include <worldpos_vertex>',
-				'#include <shadowmap_vertex>'
+				'#include <clipping_planes_vertex>',
+				'#include <fog_vertex>',
 			);
 
 			code = output.join( '\n' );
@@ -82,21 +69,8 @@ class BasicNode extends Node {
 
 			builder.requires.transparent = alpha !== undefined;
 
-			builder.addParsCode( /* glsl */`
-				varying vec3 vViewPosition;
-
-				#ifndef FLAT_SHADED
-
-				 varying vec3 vNormal;
-
-				#endif`
-			);
-
 			const output = [
-				// add before: prevent undeclared normal
-				'#include <normal_fragment_begin>',
-
-				color.code,
+				color.code
 			];
 
 			if ( mask ) {
