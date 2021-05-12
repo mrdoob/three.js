@@ -2538,7 +2538,7 @@ class GLTFParser {
 
 		const textureDef = json.textures[ textureIndex ];
 
-		const cacheKey = textureDef.source  + ':' + textureDef.sampler;
+		const cacheKey = ( source.uri || source.bufferView ) + ':' + textureDef.sampler;
 
 		if ( this.textureCache[ cacheKey ] ) {
 
