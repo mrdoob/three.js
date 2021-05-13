@@ -1,7 +1,6 @@
 import { TempNode } from '../core/TempNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { FunctionCallNode } from '../core/FunctionCallNode.js';
-import { IntNode } from '../inputs/IntNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
 import { Noise2DNode } from './Noise2DNode.js';
@@ -90,7 +89,7 @@ class Noise3DNode extends TempNode {
 
 	}
 
-	generate(builder, output) {
+	generate( builder, output ) {
 
 		const noise3d = new FunctionCallNode( Noise3DNode.Nodes.noise3d, [ this.position, this.amplitude, this.pivot ] );
 		return builder.format( noise3d.generate( builder, output ), this.getType( builder ), output );
@@ -109,7 +108,7 @@ class Noise3DNode extends TempNode {
 
 	toJSON( meta ) {
 
-		const data = this.getJSONNode( meta );
+		let data = this.getJSONNode( meta );
 
 		if ( ! data ) {
 
@@ -129,7 +128,7 @@ class Noise3DNode extends TempNode {
 
 Noise3DNode.prototype.nodeType = 'Noise3D';
 
-Noise3DNode.Nodes = (function () {
+Noise3DNode.Nodes = ( function () {
 
 	const noise3d = new FunctionNode( NOISE3D_SRC );
 
@@ -137,6 +136,6 @@ Noise3DNode.Nodes = (function () {
 
 	return { noise3d };
 
-})();
+} )();
 
 export { Noise3DNode };

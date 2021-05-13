@@ -4,7 +4,6 @@ import { FunctionCallNode } from '../core/FunctionCallNode.js';
 import { IntNode } from '../inputs/IntNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
-import { Noise2DNode } from './Noise2DNode.js';
 import { Noise3DNode } from './Noise3DNode.js';
 
 const FRACTAL3D_SRC = `
@@ -70,7 +69,7 @@ class Fractal3DNode extends TempNode {
 
 	toJSON( meta ) {
 
-		const data = this.getJSONNode( meta );
+		let data = this.getJSONNode( meta );
 
 		if ( ! data ) {
 
@@ -92,7 +91,7 @@ class Fractal3DNode extends TempNode {
 
 Fractal3DNode.prototype.nodeType = 'Fractal3D';
 
-Fractal3DNode.Nodes = (function () {
+Fractal3DNode.Nodes = ( function () {
 
 	const fractal3d = new FunctionNode( FRACTAL3D_SRC );
 
@@ -100,6 +99,6 @@ Fractal3DNode.Nodes = (function () {
 
 	return { fractal3d };
 
-})();
+} )();
 
 export { Fractal3DNode };
