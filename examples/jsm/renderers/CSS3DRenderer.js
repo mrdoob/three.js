@@ -53,7 +53,7 @@ class CSS3DSprite extends CSS3DObject {
 
 		super( element );
 
-		this.spriteRotation = 0;
+		this.rotation2D = 0;
 
 	}
 
@@ -61,7 +61,7 @@ class CSS3DSprite extends CSS3DObject {
 
 		super.copy( source, recursive );
 
-		this.spriteRotation = source.spriteRotation;
+		this.rotation2D = source.rotation2D;
 
 		return this;
 
@@ -240,7 +240,7 @@ class CSS3DRenderer {
 					_matrix.copy( camera.matrixWorldInverse );
 					_matrix.transpose();
 
-					if ( object.spriteRotation !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.spriteRotation ) );
+					if ( object.rotation2D !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.rotation2D ) );
 
 					_matrix.copyPosition( object.matrixWorld );
 					_matrix.scale( object.scale );
