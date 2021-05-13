@@ -216,10 +216,10 @@ class PerspectiveCamera extends Camera {
 	 * @param {boolean} estimateViewFrustum */
 	frameCorners( bottomLeftCorner, bottomRightCorner, topLeftCorner, estimateViewFrustum = false ) {
 
-		let pa = bottomLeftCorner, pb = bottomRightCorner, pc = topLeftCorner;
-		let pe = this.position; // eye position
-		let n = this.near; // distance of near clipping plane
-		let f = this.far; //distance of far clipping plane
+		const pa = bottomLeftCorner, pb = bottomRightCorner, pc = topLeftCorner;
+		const pe = this.position; // eye position
+		const n = this.near; // distance of near clipping plane
+		const f = this.far; //distance of far clipping plane
 
 		_vr.copy( pb ).sub( pa ).normalize();
 		_vu.copy( pc ).sub( pa ).normalize();
@@ -229,11 +229,11 @@ class PerspectiveCamera extends Camera {
 		_vb.copy( pb ).sub( pe ); // from pe to pb
 		_vc.copy( pc ).sub( pe ); // from pe to pc
 
-		let d = - _va.dot( _vn );		// distance from eye to screen
-		let l = _vr.dot( _va ) * n / d; // distance to left screen edge
-		let r = _vr.dot( _vb ) * n / d; // distance to right screen edge
-		let b = _vu.dot( _va ) * n / d; // distance to bottom screen edge
-		let t = _vu.dot( _vc ) * n / d; // distance to top screen edge
+		const d = - _va.dot( _vn );		// distance from eye to screen
+		const l = _vr.dot( _va ) * n / d; // distance to left screen edge
+		const r = _vr.dot( _vb ) * n / d; // distance to right screen edge
+		const b = _vu.dot( _va ) * n / d; // distance to bottom screen edge
+		const t = _vu.dot( _vc ) * n / d; // distance to top screen edge
 
 		// Set the camera rotation to match the focal plane to the corners' plane
 		_quat.setFromUnitVectors( _vec.set( 0, 1, 0 ), _vu );
