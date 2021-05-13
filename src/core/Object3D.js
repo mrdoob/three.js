@@ -367,6 +367,20 @@ class Object3D extends EventDispatcher {
 
 	}
 
+	removeFromParent() {
+
+		const parent = this.parent;
+
+		if ( parent !== null ) {
+
+			parent.remove( this );
+
+		}
+
+		return this;
+
+	}
+
 	clear() {
 
 		for ( let i = 0; i < this.children.length; i ++ ) {
