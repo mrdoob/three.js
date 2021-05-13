@@ -363,8 +363,8 @@ function WebGLState( gl, extensions, capabilities ) {
 	const scissorParam = gl.getParameter( gl.SCISSOR_BOX );
 	const viewportParam = gl.getParameter( gl.VIEWPORT );
 
-	const currentScissor = new Vector4( scissorParam[ 0 ], scissorParam[ 1 ], scissorParam[ 2 ], scissorParam[ 3 ] );
-	const currentViewport = new Vector4( viewportParam[ 0 ], viewportParam[ 1 ], viewportParam[ 2 ], viewportParam[ 3 ] );
+	const currentScissor = new Vector4().fromArray( scissorParam );
+	const currentViewport = new Vector4().fromArray( viewportParam );
 
 	function createTexture( type, target, count ) {
 
