@@ -673,13 +673,13 @@ class Matrix4 {
 
 	}
 
-	makeShear( x, y, z ) {
+	makeShear( xy, xz, yx, yz, zx, zy ) {
 
 		this.set(
 
-			1, y, z, 0,
-			x, 1, z, 0,
-			x, y, 1, 0,
+			1, yx, zx, 0,
+			xy, 1, zy, 0,
+			xz, yz, 1, 0,
 			0, 0, 0, 1
 
 		);
