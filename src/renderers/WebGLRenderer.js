@@ -6,8 +6,6 @@ import {
 	LinearEncoding,
 	NoToneMapping
 } from '../constants.js';
-import * as MathUtils from '../math/MathUtils.js';
-import { DataTexture } from '../textures/DataTexture.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Vector2 } from '../math/Vector2.js';
@@ -1648,34 +1646,9 @@ function WebGLRenderer( parameters ) {
 
 			if ( skeleton ) {
 
-				const bones = skeleton.bones;
-
 				if ( capabilities.floatVertexTextures ) {
 
-					if ( skeleton.boneTexture === null ) {
-
-						// layout (1 matrix = 4 pixels)
-						//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
-						//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
-						//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
-						//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
-						//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
-
-
-						let size = Math.sqrt( bones.length * 4 ); // 4 pixels needed for 1 matrix
-						size = MathUtils.ceilPowerOfTwo( size );
-						size = Math.max( size, 4 );
-
-						const boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
-						boneMatrices.set( skeleton.boneMatrices ); // copy current values
-
-						const boneTexture = new DataTexture( boneMatrices, size, size, RGBAFormat, FloatType );
-
-						skeleton.boneMatrices = boneMatrices;
-						skeleton.boneTexture = boneTexture;
-						skeleton.boneTextureSize = size;
-
-					}
+					if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
 
 					p_uniforms.setValue( _gl, 'boneTexture', skeleton.boneTexture, textures );
 					p_uniforms.setValue( _gl, 'boneTextureSize', skeleton.boneTextureSize );
