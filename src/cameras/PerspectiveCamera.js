@@ -229,7 +229,7 @@ class PerspectiveCamera extends Camera {
 		_vb.copy( pb ).sub( pe ); // from pe to pb
 		_vc.copy( pc ).sub( pe ); // from pe to pc
 
-		const d = - _va.dot( _vn );		// distance from eye to screen
+		const d = - _va.dot( _vn );	// distance from eye to screen
 		const l = _vr.dot( _va ) * n / d; // distance to left screen edge
 		const r = _vr.dot( _vb ) * n / d; // distance to right screen edge
 		const b = _vu.dot( _va ) * n / d; // distance to bottom screen edge
