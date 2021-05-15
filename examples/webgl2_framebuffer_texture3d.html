@@ -30,22 +30,62 @@
 			const _vector2 = new THREE.Vector2();
 			const _vector3 = new THREE.Vector3();
 
+			const SHADOW_PASS_CLEAR_COLOR = new THREE.Color(0xFFFFFF);
 			const INITIAL_CLOUD_SIZE = 128;
 
 			const fragmentShadowing = `
 				precision highp float;
+				precision highp sampler3D;
 
+				in vec2 vUv;
 				out vec4 color;
 
-				void main() {
-					color.r = 1.0;
+				uniform sampler3D volume;
+				uniform sampler3D shadowVolume;
+				uniform vec3 			lightDirectionVolume;
+				uniform float 		slice;
+
+				vec4 attenuation(vec3 localPosition)
+				{
+
+				}
+
+				void main()
+				{
+					vec3 localPosition = vec3(vUv, slice);
+
+
+
+					// if (lightDirectionVolume.y < - 0.5) {
+					// 	color = vec4(1.0, 0.0, 0.0, 1.0);
+					// } else {
+					// 	color = vec4(1.0);
+					// }
+
+					// if (slice > 0.0 && slice <= 1.0 / 128.0 + 0.000001)
+					// {
+					// 	color =	vec4(1.0, 0.0, 0.0, 0.0);
+					// } else if (slice > 0.0 && slice <= 2.0 / 128.0 + 0.000001)
+					// {
+					// 	color =	vec4(0.0, 1.0, 0.0, 0.0);
+					// }
+					// else if (slice > 0.0 && slice <= 3.0 / 128.0 + 0.000001)
+					// {
+					// 	color =	vec4(0.0, 0.0, 0.0, 1.0);
+					// }
+					// else
+					// {
+					// 	color = vec4(1.0);
+					// }
 				}
 
 			`;
 
 			let renderer, scene, camera;
 			let mesh;
-			let shadowScene, shadowTexture, shadowRenderTarget;
+			
+			let shadowScene, shadowTexture, shadowRenderTarget, shadowMaterial;
+
 			let prevTime = performance.now();
 
 			init();
@@ -82,6 +122,25 @@
 
 			}
 
+			function generateShadowTexture(volume) {
+				// Assumes the volume is a cube. For non-uniform volume, we need
+				// to compute the appropriate x, y, z basis.
+				// Diagonal of a cube: a * sqrt(3).
+				//
+				// This is a bit wasteful in terms of texture memory but it
+				// avoids to re-upload the texture and is easier to manage for an example.
+				const diagonal = volume.image.width * sqrt(3);
+
+				const texture = new THREE.DataTexture3D(null, diagonal, diagonal, diagonal);
+				texture.format = THREE.RGBAFormat;
+				texture.internalFormat = 'RGBA16F';
+				texture.type = THREE.HalfFloatType;
+				texture.unpackAlignment = 1;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				return texture;
+			}
+
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
@@ -96,11 +155,25 @@
 
 				new OrbitControls( camera, renderer.domElement );
 
+				// Volume texture
+
+				const texture = generateCloudTexture(INITIAL_CLOUD_SIZE);
+				texture.format = THREE.RedFormat;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				texture.unpackAlignment = 1;
+
 				// Shadow Pass
 
-				const shadowMaterial = new THREE.RawShaderMaterial( {
+				shadowTexture = generateShadowTexture(texture);
+
+				shadowMaterial = new THREE.RawShaderMaterial( {
 					glslVersion: THREE.GLSL3,
 					uniforms: {
+						volume: { value: texture },
+						shadowVolume: { value: shadowTexture },
+						lightDirectionVolume: { value: new THREE.Vector3() },
+						slice: { value: 0.0 }
 					},
 					vertexShader: `
 						in vec3 position;
@@ -108,7 +181,6 @@
 						out vec2 vUv;
 
 						uniform mat4 projectionMatrix;
-
 						void main() {
 							vUv = uv;
 							gl_Position = projectionMatrix * vec4( position, 1.0 );
@@ -123,19 +195,14 @@
 				shadowRenderTarget = new THREE.WebGLRenderTarget( INITIAL_CLOUD_SIZE, INITIAL_CLOUD_SIZE, {
 					minFilter: THREE.NearestFilter,
 					magFilter: THREE.NearestFilter,
-					format: THREE.RedFormat,
-					internalFormat: 'R16F',
+					// format: THREE.RedFormat,
+					// internalFormat: 'R16F',
+					format: THREE.RGBAFormat,
+      		internalFormat: 'RGBA16F',
 					type: THREE.HalfFloatType,
 					stencilBuffer: false,
 					depthBuffer: false
 				} );
-
-				shadowTexture = new THREE.DataTexture3D(null, INITIAL_CLOUD_SIZE, INITIAL_CLOUD_SIZE, INITIAL_CLOUD_SIZE);
-				shadowTexture.format = THREE.RedFormat;
-				shadowTexture.type = THREE.HalfFloatType;
-				shadowTexture.unpackAlignment = 1;
-				shadowTexture.minFilter = THREE.LinearFilter;
-				shadowTexture.magFilter = THREE.LinearFilter;
 
 				// Sky
 
@@ -156,14 +223,6 @@
 					new THREE.MeshBasicMaterial( { map: new THREE.CanvasTexture( canvas ), side: THREE.BackSide } )
 				);
 				scene.add( sky );
-
-				// Texture
-
-				const texture = generateCloudTexture(INITIAL_CLOUD_SIZE);
-				texture.format = THREE.RedFormat;
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
-				texture.unpackAlignment = 1;
 
 				// Material
 
@@ -194,6 +253,7 @@
 
 					uniform mat4 modelViewMatrix;
 					uniform mat4 projectionMatrix;
+					uniform mat4 volumeToShadowVolume;
 
 					in vec3 vOrigin;
 					in vec3 vDirection;
@@ -242,6 +302,11 @@
 
 					float sample1( vec3 p ) {
 						return texture( map, p ).r;
+					}
+
+					vec3 sampleShadow( vec3 p )
+					{
+						return texture( shadowTexture, p + 0.5 ).rgb;
 					}
 
 					vec3
@@ -310,11 +375,7 @@
 
 							d = smoothstep( threshold - range, threshold + range, d ) * opacity;
 
-							// float col = shading( p + 0.5 ) * 3.0 + ( ( p.x + p.y ) * 0.25 ) + 0.2;
-							// vec3 col = vec3(shading( p + 0.5 ) * 3.0 + ( ( p.x + p.y ) * 0.25 ) + 0.2);
-							// vec3 col = localShading( p + 0.5 );
-
-							vec3 col = vec3(1.0) * texture( shadowTexture, p ).r;
+							vec3 col = vec3(1.0) * sampleShadow( p );
 
 							ac.rgb += ( 1.0 - ac.a ) * d * col;
 
@@ -338,7 +399,8 @@
 				const material = new THREE.RawShaderMaterial( {
 					glslVersion: THREE.GLSL3,
 					uniforms: {
-						base: { value: new THREE.Color( 0x798aa0 ) },
+						// base: { value: new THREE.Color( 0x798aa0 ) },
+						base: { value: new THREE.Color( 0x111111 ) },
 						map: { value: texture },
 						shadowTexture: { value: shadowTexture },
 						cameraPos: { value: new THREE.Vector3() },
@@ -394,42 +456,43 @@
 
 			}
 
-			let curr = 0;
-			const countPerRow = 4;
-			const countPerSlice = countPerRow * countPerRow;
-			const sliceCount = 4;
-			const totalCount = sliceCount * countPerSlice;
-			const margins = 8;
-
-			const perElementPaddedSize = ( INITIAL_CLOUD_SIZE - margins ) / countPerRow;
-			const perElementSize = Math.floor( ( INITIAL_CLOUD_SIZE - 1 ) / countPerRow );
-
 			function animate() {
 
 				requestAnimationFrame( animate );
 
-				// Renders shadow volume first.
+				// mesh.rotation.y = - performance.now() / 7500;
+				mesh.updateMatrixWorld();
+
+				/** Step 1: Renders shadow volume first. */
+
+				// Update light.
+
+				const m = new THREE.Matrix4();
+				m.copy(mesh.matrixWorld).invert();
+				shadowMaterial.uniforms.lightDirectionVolume.value.set(0.0, -1.0, 0.0);
+				shadowMaterial.uniforms.lightDirectionVolume.value.applyMatrix4(m);
 
 				renderer.setRenderTarget( shadowRenderTarget );
-
-				for (let i = 0; i < INITIAL_CLOUD_SIZE; ++i) {
-
+				renderer.autoClear = false;
+				renderer.setClearColor(SHADOW_PASS_CLEAR_COLOR, 1.0);
+				renderer.clearColor();
+				for (let i = 1; i < INITIAL_CLOUD_SIZE; ++i) {
+					shadowMaterial.uniforms.slice.value = i / INITIAL_CLOUD_SIZE;
 					shadowScene.render(renderer);
 
 					// Copies slice from framebuffer into 3D texture.
 					const srcPos = _vector2.set(0, 0);
-					const dstPos = _vector2.set(0, 0, i);
+					const dstPos = _vector3.set(0, 0, i);
 					renderer.copyFramebufferToTexture3D(srcPos, dstPos, shadowTexture);
-
 				}
 
+				renderer.autoClear = true;
 				renderer.setRenderTarget( null );
 
 				// Renders volume and uses shadow texture.
 
+			
 				mesh.material.uniforms.cameraPos.value.copy( camera.position );
-				// mesh.rotation.y = - performance.now() / 7500;
-
 				mesh.material.uniforms.frame.value ++;
 
 				renderer.render( scene, camera );
