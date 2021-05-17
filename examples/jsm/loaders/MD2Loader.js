@@ -238,7 +238,7 @@ class MD2Loader extends Loader {
 			);
 
 			offset += 24;
-			
+
 			const string = [];
 
 			for ( let j = 0; j < 16; j ++ ) {
