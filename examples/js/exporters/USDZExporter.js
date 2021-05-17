@@ -11,7 +11,7 @@
 			let output = buildHeader();
 			const materials = {};
 			const textures = {};
-			scene.traverse( object => {
+			scene.traverseVisible( object => {
 
 				if ( object.isMesh ) {
 
