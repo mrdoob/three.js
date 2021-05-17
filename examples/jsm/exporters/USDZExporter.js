@@ -17,7 +17,7 @@ class USDZExporter {
 
 		scene.traverseVisible( ( object ) => {
 
-			if ( object.isMesh ) {
+			if ( object.isMesh && object.material.isMeshStandardMaterial ) {
 
 				const geometry = object.geometry;
 				const material = object.material;
