@@ -76,7 +76,7 @@
 					// hide spinner
 					document.getElementById( 'loader' ).style.display = 'none';
 
-				}, progress =>progress, error => ( console.log( error ) ) );
+				} );
 
 				controls = new OrbitControls( camera, renderer.domElement );
 
