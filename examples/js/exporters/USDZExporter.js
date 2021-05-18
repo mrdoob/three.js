@@ -11,9 +11,9 @@
 			let output = buildHeader();
 			const materials = {};
 			const textures = {};
-			scene.traverse( object => {
+			scene.traverseVisible( object => {
 
-				if ( object.isMesh ) {
+				if ( object.isMesh && object.material.isMeshStandardMaterial ) {
 
 					const geometry = object.geometry;
 					const material = object.material;
