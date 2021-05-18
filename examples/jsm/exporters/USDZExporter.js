@@ -1,4 +1,4 @@
-import * as fflate from 'three/examples/jsm/libs/fflate.module';
+import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
 
