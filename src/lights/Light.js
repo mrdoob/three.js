@@ -12,6 +12,8 @@ class Light extends Object3D {
 		this.color = new Color( color );
 		this.intensity = intensity;
 
+		Object.freeze( this.scale );
+		
 	}
 
 	dispose() {
