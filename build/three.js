@@ -1904,6 +1904,9 @@
 			this.depth = source.depth;
 			this.viewport.copy(source.viewport);
 			this.texture = source.texture.clone();
+			this.texture.image = { ...this.texture.image
+			}; // See #20328.
+
 			this.depthBuffer = source.depthBuffer;
 			this.stencilBuffer = source.stencilBuffer;
 			this.depthTexture = source.depthTexture;
@@ -1919,6 +1922,60 @@
 	}
 
 	WebGLRenderTarget.prototype.isWebGLRenderTarget = true;
+
+	class WebGLMultipleRenderTargets extends WebGLRenderTarget {
+		constructor(width, height, count) {
+			super(width, height);
+			const texture = this.texture;
+			this.texture = [];
+
+			for (let i = 0; i < count; i++) {
+				this.texture[i] = texture.clone();
+			}
+		}
+
+		setSize(width, height, depth = 1) {
+			if (this.width !== width || this.height !== height || this.depth !== depth) {
+				this.width = width;
+				this.height = height;
+				this.depth = depth;
+
+				for (let i = 0, il = this.texture.length; i < il; i++) {
+					this.texture[i].image.width = width;
+					this.texture[i].image.height = height;
+					this.texture[i].image.depth = depth;
+				}
+
+				this.dispose();
+			}
+
+			this.viewport.set(0, 0, width, height);
+			this.scissor.set(0, 0, width, height);
+			return this;
+		}
+
+		copy(source) {
+			this.dispose();
+			this.width = source.width;
+			this.height = source.height;
+			this.depth = source.depth;
+			this.viewport.set(0, 0, this.width, this.height);
+			this.scissor.set(0, 0, this.width, this.height);
+			this.depthBuffer = source.depthBuffer;
+			this.stencilBuffer = source.stencilBuffer;
+			this.depthTexture = source.depthTexture;
+			this.texture.length = 0;
+
+			for (let i = 0, il = source.texture.length; i < il; i++) {
+				this.texture[i] = source.texture[i].clone();
+			}
+
+			return this;
+		}
+
+	}
+
+	WebGLMultipleRenderTargets.prototype.isWebGLMultipleRenderTargets = true;
 
 	class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 		constructor(width, height, options) {
@@ -4475,8 +4532,8 @@
 			return this;
 		}
 
-		makeShear(x, y, z) {
-			this.set(1, y, z, 0, x, 1, z, 0, x, y, 1, 0, 0, 0, 0, 1);
+		makeShear(xy, xz, yx, yz, zx, zy) {
+			this.set(1, yx, zx, 0, xy, 1, zy, 0, xz, yz, 1, 0, 0, 0, 0, 1);
 			return this;
 		}
 
@@ -5217,6 +5274,16 @@
 				object.parent = null;
 				this.children.splice(index, 1);
 				object.dispatchEvent(_removedEvent);
+			}
+
+			return this;
+		}
+
+		removeFromParent() {
+			const parent = this.parent;
+
+			if (parent !== null) {
+				parent.remove(this);
 			}
 
 			return this;
@@ -6023,69 +6090,71 @@
 
 	let materialId = 0;
 
-	function Material() {
-		Object.defineProperty(this, 'id', {
-			value: materialId++
-		});
-		this.uuid = generateUUID();
-		this.name = '';
-		this.type = 'Material';
-		this.fog = true;
-		this.blending = NormalBlending;
-		this.side = FrontSide;
-		this.vertexColors = false;
-		this.opacity = 1;
-		this.transparent = false;
-		this.blendSrc = SrcAlphaFactor;
-		this.blendDst = OneMinusSrcAlphaFactor;
-		this.blendEquation = AddEquation;
-		this.blendSrcAlpha = null;
-		this.blendDstAlpha = null;
-		this.blendEquationAlpha = null;
-		this.depthFunc = LessEqualDepth;
-		this.depthTest = true;
-		this.depthWrite = true;
-		this.stencilWriteMask = 0xff;
-		this.stencilFunc = AlwaysStencilFunc;
-		this.stencilRef = 0;
-		this.stencilFuncMask = 0xff;
-		this.stencilFail = KeepStencilOp;
-		this.stencilZFail = KeepStencilOp;
-		this.stencilZPass = KeepStencilOp;
-		this.stencilWrite = false;
-		this.clippingPlanes = null;
-		this.clipIntersection = false;
-		this.clipShadows = false;
-		this.shadowSide = null;
-		this.colorWrite = true;
-		this.precision = null; // override the renderer's default precision for this material
+	class Material extends EventDispatcher {
+		constructor() {
+			super();
+			Object.defineProperty(this, 'id', {
+				value: materialId++
+			});
+			this.uuid = generateUUID();
+			this.name = '';
+			this.type = 'Material';
+			this.fog = true;
+			this.blending = NormalBlending;
+			this.side = FrontSide;
+			this.vertexColors = false;
+			this.opacity = 1;
+			this.transparent = false;
+			this.blendSrc = SrcAlphaFactor;
+			this.blendDst = OneMinusSrcAlphaFactor;
+			this.blendEquation = AddEquation;
+			this.blendSrcAlpha = null;
+			this.blendDstAlpha = null;
+			this.blendEquationAlpha = null;
+			this.depthFunc = LessEqualDepth;
+			this.depthTest = true;
+			this.depthWrite = true;
+			this.stencilWriteMask = 0xff;
+			this.stencilFunc = AlwaysStencilFunc;
+			this.stencilRef = 0;
+			this.stencilFuncMask = 0xff;
+			this.stencilFail = KeepStencilOp;
+			this.stencilZFail = KeepStencilOp;
+			this.stencilZPass = KeepStencilOp;
+			this.stencilWrite = false;
+			this.clippingPlanes = null;
+			this.clipIntersection = false;
+			this.clipShadows = false;
+			this.shadowSide = null;
+			this.colorWrite = true;
+			this.precision = null; // override the renderer's default precision for this material
 
-		this.polygonOffset = false;
-		this.polygonOffsetFactor = 0;
-		this.polygonOffsetUnits = 0;
-		this.dithering = false;
-		this.alphaTest = 0;
-		this.alphaToCoverage = false;
-		this.premultipliedAlpha = false;
-		this.visible = true;
-		this.toneMapped = true;
-		this.userData = {};
-		this.version = 0;
-	}
+			this.polygonOffset = false;
+			this.polygonOffsetFactor = 0;
+			this.polygonOffsetUnits = 0;
+			this.dithering = false;
+			this.alphaTest = 0;
+			this.alphaToCoverage = false;
+			this.premultipliedAlpha = false;
+			this.visible = true;
+			this.toneMapped = true;
+			this.userData = {};
+			this.version = 0;
+		}
 
-	Material.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
-		constructor: Material,
-		isMaterial: true,
-		onBuild: function ()
+		onBuild()
 		/* shaderobject, renderer */
-		{},
-		onBeforeCompile: function ()
+		{}
+
+		onBeforeCompile()
 		/* shaderobject, renderer */
-		{},
-		customProgramCacheKey: function () {
+		{}
+
+		customProgramCacheKey() {
 			return this.onBeforeCompile.toString();
-		},
-		setValues: function (values) {
+		}
+
+		setValues(values) {
 			if (values === undefined) return;
 
 			for (const key in values) {
@@ -6118,8 +6187,9 @@
 					this[key] = newValue;
 				}
 			}
-		},
-		toJSON: function (meta) {
+		}
+
+		toJSON(meta) {
 			const isRoot = meta === undefined || typeof meta === 'string';
 
 			if (isRoot) {
@@ -6252,7 +6322,6 @@
 			if (this.wireframeLinejoin !== 'round') data.wireframeLinejoin = this.wireframeLinejoin;
 			if (this.morphTargets === true) data.morphTargets = true;
 			if (this.morphNormals === true) data.morphNormals = true;
-			if (this.skinning === true) data.skinning = true;
 			if (this.flatShading === true) data.flatShading = this.flatShading;
 			if (this.visible === false) data.visible = false;
 			if (this.toneMapped === false) data.toneMapped = false;
@@ -6278,11 +6347,13 @@
 			}
 
 			return data;
-		},
-		clone: function () {
+		}
+
+		clone() {
 			return new this.constructor().copy(this);
-		},
-		copy: function (source) {
+		}
+
+		copy(source) {
 			this.name = source.name;
 			this.fog = source.fog;
 			this.blending = source.blending;
@@ -6336,18 +6407,21 @@
 			this.toneMapped = source.toneMapped;
 			this.userData = JSON.parse(JSON.stringify(source.userData));
 			return this;
-		},
-		dispose: function () {
+		}
+
+		dispose() {
 			this.dispatchEvent({
 				type: 'dispose'
 			});
 		}
-	});
-	Object.defineProperty(Material.prototype, 'needsUpdate', {
-		set: function (value) {
+
+		set needsUpdate(value) {
 			if (value === true) this.version++;
 		}
-	});
+
+	}
+
+	Material.prototype.isMaterial = true;
 
 	const _colorKeywords = {
 		'aliceblue': 0xF0F8FF,
@@ -6953,7 +7027,6 @@
 	 *	wireframe: <boolean>,
 	 *	wireframeLinewidth: <float>,
 	 *
-	 *	skinning: <bool>,
 	 *	morphTargets: <bool>
 	 * }
 	 */
@@ -6979,7 +7052,6 @@
 			this.wireframeLinewidth = 1;
 			this.wireframeLinecap = 'round';
 			this.wireframeLinejoin = 'round';
-			this.skinning = false;
 			this.morphTargets = false;
 			this.setValues(parameters);
 		}
@@ -7002,7 +7074,6 @@
 			this.wireframeLinewidth = source.wireframeLinewidth;
 			this.wireframeLinecap = source.wireframeLinecap;
 			this.wireframeLinejoin = source.wireframeLinejoin;
-			this.skinning = source.skinning;
 			this.morphTargets = source.morphTargets;
 			return this;
 		}
@@ -8486,7 +8557,7 @@
 			_vC$1.add(_morphC);
 		}
 
-		if (object.isSkinnedMesh && material.skinning) {
+		if (object.isSkinnedMesh) {
 			object.boneTransform(a, _vA$1);
 			object.boneTransform(b, _vB$1);
 			object.boneTransform(c, _vC$1);
@@ -8699,7 +8770,6 @@
 	 *
 	 *	lights: <bool>,
 	 *
-	 *	skinning: <bool>,
 	 *	morphTargets: <bool>,
 	 *	morphNormals: <bool>
 	 * }
@@ -8721,8 +8791,6 @@
 			this.lights = false; // set to use scene lights
 
 			this.clipping = false; // set to use user-defined clipping planes
-
-			this.skinning = false; // set to use skinning attribute streams
 
 			this.morphTargets = false; // set to use morph targets
 
@@ -8768,7 +8836,6 @@
 			this.wireframeLinewidth = source.wireframeLinewidth;
 			this.lights = source.lights;
 			this.clipping = source.clipping;
-			this.skinning = source.skinning;
 			this.morphTargets = source.morphTargets;
 			this.morphNormals = source.morphNormals;
 			this.extensions = Object.assign({}, source.extensions);
@@ -10031,7 +10098,7 @@
 	const UniformsLib = {
 		common: {
 			diffuse: {
-				value: new Color(0xeeeeee)
+				value: new Color(0xffffff)
 			},
 			opacity: {
 				value: 1.0
@@ -10257,7 +10324,7 @@
 		},
 		points: {
 			diffuse: {
-				value: new Color(0xeeeeee)
+				value: new Color(0xffffff)
 			},
 			opacity: {
 				value: 1.0
@@ -10280,7 +10347,7 @@
 		},
 		sprite: {
 			diffuse: {
-				value: new Color(0xeeeeee)
+				value: new Color(0xffffff)
 			},
 			opacity: {
 				value: 1.0
@@ -11132,6 +11199,7 @@
 			precision = maxPrecision;
 		}
 
+		const drawBuffers = isWebGL2 || extensions.has('WEBGL_draw_buffers');
 		const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
 		const maxTextures = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 		const maxVertexTextures = gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
@@ -11147,6 +11215,7 @@
 		const maxSamples = isWebGL2 ? gl.getParameter(gl.MAX_SAMPLES) : 0;
 		return {
 			isWebGL2: isWebGL2,
+			drawBuffers: drawBuffers,
 			getMaxAnisotropy: getMaxAnisotropy,
 			getMaxPrecision: getMaxPrecision,
 			precision: precision,
@@ -13184,7 +13253,7 @@
 				flatShading: !!material.flatShading,
 				sizeAttenuation: material.sizeAttenuation,
 				logarithmicDepthBuffer: logarithmicDepthBuffer,
-				skinning: material.skinning && maxBones > 0,
+				skinning: object.isSkinnedMesh === true && maxBones > 0,
 				maxBones: maxBones,
 				useVertexTexture: floatVertexTextures,
 				morphTargets: material.morphTargets,
@@ -13974,7 +14043,6 @@
 			super();
 			this.type = 'MeshDepthMaterial';
 			this.depthPacking = BasicDepthPacking;
-			this.skinning = false;
 			this.morphTargets = false;
 			this.map = null;
 			this.alphaMap = null;
@@ -13990,7 +14058,6 @@
 		copy(source) {
 			super.copy(source);
 			this.depthPacking = source.depthPacking;
-			this.skinning = source.skinning;
 			this.morphTargets = source.morphTargets;
 			this.map = source.map;
 			this.alphaMap = source.alphaMap;
@@ -14013,7 +14080,6 @@
 	 *	nearDistance: <float>,
 	 *	farDistance: <float>,
 	 *
-	 *	skinning: <bool>,
 	 *	morphTargets: <bool>,
 	 *
 	 *	map: new THREE.Texture( <Image> ),
@@ -14034,7 +14100,6 @@
 			this.referencePosition = new Vector3();
 			this.nearDistance = 1;
 			this.farDistance = 1000;
-			this.skinning = false;
 			this.morphTargets = false;
 			this.map = null;
 			this.alphaMap = null;
@@ -14050,7 +14115,6 @@
 			this.referencePosition.copy(source.referencePosition);
 			this.nearDistance = source.nearDistance;
 			this.farDistance = source.farDistance;
-			this.skinning = source.skinning;
 			this.morphTargets = source.morphTargets;
 			this.map = source.map;
 			this.alphaMap = source.alphaMap;
@@ -14249,15 +14313,14 @@
 			_renderer.renderBufferDirect(camera, null, geometry, shadowMaterialHorizontal, fullScreenMesh, null);
 		}
 
-		function getDepthMaterialVariant(useMorphing, useSkinning, useInstancing) {
-			const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
+		function getDepthMaterialVariant(useMorphing) {
+			const index = useMorphing << 0;
 			let material = _depthMaterials[index];
 
 			if (material === undefined) {
 				material = new MeshDepthMaterial({
 					depthPacking: RGBADepthPacking,
-					morphTargets: useMorphing,
-					skinning: useSkinning
+					morphTargets: useMorphing
 				});
 				_depthMaterials[index] = material;
 			}
@@ -14265,14 +14328,13 @@
 			return material;
 		}
 
-		function getDistanceMaterialVariant(useMorphing, useSkinning, useInstancing) {
-			const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
+		function getDistanceMaterialVariant(useMorphing) {
+			const index = useMorphing << 0;
 			let material = _distanceMaterials[index];
 
 			if (material === undefined) {
 				material = new MeshDistanceMaterial({
-					morphTargets: useMorphing,
-					skinning: useSkinning
+					morphTargets: useMorphing
 				});
 				_distanceMaterials[index] = material;
 			}
@@ -14297,18 +14359,7 @@
 					useMorphing = geometry.morphAttributes && geometry.morphAttributes.position && geometry.morphAttributes.position.length > 0;
 				}
 
-				let useSkinning = false;
-
-				if (object.isSkinnedMesh === true) {
-					if (material.skinning === true) {
-						useSkinning = true;
-					} else {
-						console.warn('THREE.WebGLShadowMap: THREE.SkinnedMesh with material.skinning set to false:', object);
-					}
-				}
-
-				const useInstancing = object.isInstancedMesh === true;
-				result = getMaterialVariant(useMorphing, useSkinning, useInstancing);
+				result = getMaterialVariant(useMorphing);
 			} else {
 				result = customMaterial;
 			}
@@ -14625,8 +14676,10 @@
 
 		let currentTextureSlot = null;
 		let currentBoundTextures = {};
-		const currentScissor = new Vector4(0, 0, gl.canvas.width, gl.canvas.height);
-		const currentViewport = new Vector4(0, 0, gl.canvas.width, gl.canvas.height);
+		const scissorParam = gl.getParameter(gl.SCISSOR_BOX);
+		const viewportParam = gl.getParameter(gl.VIEWPORT);
+		const currentScissor = new Vector4().fromArray(scissorParam);
+		const currentViewport = new Vector4().fromArray(viewportParam);
 
 		function createTexture(type, target, count) {
 			const data = new Uint8Array(4); // 4 is required to match default unpack alignment of 4.
@@ -14695,7 +14748,11 @@
 						currentBoundFramebuffers[gl.DRAW_FRAMEBUFFER] = framebuffer;
 					}
 				}
+
+				return true;
 			}
+
+			return false;
 		}
 
 		function useProgram(program) {
@@ -15246,7 +15303,6 @@
 			const renderTarget = event.target;
 			renderTarget.removeEventListener('dispose', onRenderTargetDispose);
 			deallocateRenderTarget(renderTarget);
-			info.memory.textures--;
 		} //
 
 
@@ -15267,6 +15323,8 @@
 
 			if (textureProperties.__webglTexture !== undefined) {
 				_gl.deleteTexture(textureProperties.__webglTexture);
+
+				info.memory.textures--;
 			}
 
 			if (renderTarget.depthTexture) {
@@ -15286,6 +15344,20 @@
 				if (renderTargetProperties.__webglMultisampledFramebuffer) _gl.deleteFramebuffer(renderTargetProperties.__webglMultisampledFramebuffer);
 				if (renderTargetProperties.__webglColorRenderbuffer) _gl.deleteRenderbuffer(renderTargetProperties.__webglColorRenderbuffer);
 				if (renderTargetProperties.__webglDepthRenderbuffer) _gl.deleteRenderbuffer(renderTargetProperties.__webglDepthRenderbuffer);
+			}
+
+			if (renderTarget.isWebGLMultipleRenderTargets) {
+				for (let i = 0, il = texture.length; i < il; i++) {
+					const attachmentProperties = properties.get(texture[i]);
+
+					if (attachmentProperties.__webglTexture) {
+						_gl.deleteTexture(attachmentProperties.__webglTexture);
+
+						info.memory.textures--;
+					}
+
+					properties.remove(texture[i]);
+				}
 			}
 
 			properties.remove(texture);
@@ -15669,8 +15741,7 @@
 		// Setup storage for target texture and bind it to correct framebuffer
 
 
-		function setupFrameBufferTexture(framebuffer, renderTarget, attachment, textureTarget) {
-			const texture = renderTarget.texture;
+		function setupFrameBufferTexture(framebuffer, renderTarget, texture, attachment, textureTarget) {
 			const glFormat = utils.convert(texture.format);
 			const glType = utils.convert(texture.type);
 			const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType);
@@ -15725,7 +15796,8 @@
 
 				_gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer);
 			} else {
-				const texture = renderTarget.texture;
+				// Use the first texture for MRT so far
+				const texture = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture[0] : renderTarget.texture;
 				const glFormat = utils.convert(texture.format);
 				const glType = utils.convert(texture.type);
 				const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType);
@@ -15805,10 +15877,15 @@
 			const renderTargetProperties = properties.get(renderTarget);
 			const textureProperties = properties.get(texture);
 			renderTarget.addEventListener('dispose', onRenderTargetDispose);
-			textureProperties.__webglTexture = _gl.createTexture();
-			textureProperties.__version = texture.version;
-			info.memory.textures++;
+
+			if (renderTarget.isWebGLMultipleRenderTargets !== true) {
+				textureProperties.__webglTexture = _gl.createTexture();
+				textureProperties.__version = texture.version;
+				info.memory.textures++;
+			}
+
 			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
+			const isMultipleRenderTargets = renderTarget.isWebGLMultipleRenderTargets === true;
 			const isMultisample = renderTarget.isWebGLMultisampleRenderTarget === true;
 			const isRenderTarget3D = texture.isDataTexture3D || texture.isDataTexture2DArray;
 			const supportsMips = isPowerOfTwo$1(renderTarget) || isWebGL2; // Handles WebGL2 RGBFormat fallback - #18858
@@ -15828,7 +15905,22 @@
 			} else {
 				renderTargetProperties.__webglFramebuffer = _gl.createFramebuffer();
 
-				if (isMultisample) {
+				if (isMultipleRenderTargets) {
+					if (capabilities.drawBuffers) {
+						const textures = renderTarget.texture;
+
+						for (let i = 0, il = textures.length; i < il; i++) {
+							const attachmentProperties = properties.get(textures[i]);
+
+							if (attachmentProperties.__webglTexture === undefined) {
+								attachmentProperties.__webglTexture = _gl.createTexture();
+								info.memory.textures++;
+							}
+						}
+					} else {
+						console.warn('THREE.WebGLRenderer: WebGLMultipleRenderTargets can only be used with WebGL2 or WEBGL_draw_buffers extension.');
+					}
+				} else if (isMultisample) {
 					if (isWebGL2) {
 						renderTargetProperties.__webglMultisampledFramebuffer = _gl.createFramebuffer();
 						renderTargetProperties.__webglColorRenderbuffer = _gl.createRenderbuffer();
@@ -15866,7 +15958,7 @@
 				setTextureParameters(_gl.TEXTURE_CUBE_MAP, texture, supportsMips);
 
 				for (let i = 0; i < 6; i++) {
-					setupFrameBufferTexture(renderTargetProperties.__webglFramebuffer[i], renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i);
+					setupFrameBufferTexture(renderTargetProperties.__webglFramebuffer[i], renderTarget, texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i);
 				}
 
 				if (textureNeedsGenerateMipmaps(texture, supportsMips)) {
@@ -15874,6 +15966,22 @@
 				}
 
 				state.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
+			} else if (isMultipleRenderTargets) {
+				const textures = renderTarget.texture;
+
+				for (let i = 0, il = textures.length; i < il; i++) {
+					const attachment = textures[i];
+					const attachmentProperties = properties.get(attachment);
+					state.bindTexture(_gl.TEXTURE_2D, attachmentProperties.__webglTexture);
+					setTextureParameters(_gl.TEXTURE_2D, attachment, supportsMips);
+					setupFrameBufferTexture(renderTargetProperties.__webglFramebuffer, renderTarget, attachment, _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D);
+
+					if (textureNeedsGenerateMipmaps(attachment, supportsMips)) {
+						generateMipmap(_gl.TEXTURE_2D, attachment, renderTarget.width, renderTarget.height);
+					}
+				}
+
+				state.bindTexture(_gl.TEXTURE_2D, null);
 			} else {
 				let glTextureType = _gl.TEXTURE_2D;
 
@@ -15889,7 +15997,7 @@
 
 				state.bindTexture(glTextureType, textureProperties.__webglTexture);
 				setTextureParameters(glTextureType, texture, supportsMips);
-				setupFrameBufferTexture(renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, glTextureType);
+				setupFrameBufferTexture(renderTargetProperties.__webglFramebuffer, renderTarget, texture, _gl.COLOR_ATTACHMENT0, glTextureType);
 
 				if (textureNeedsGenerateMipmaps(texture, supportsMips)) {
 					generateMipmap(_gl.TEXTURE_2D, texture, renderTarget.width, renderTarget.height);
@@ -15905,17 +16013,21 @@
 		}
 
 		function updateRenderTargetMipmap(renderTarget) {
-			const texture = renderTarget.texture;
 			const supportsMips = isPowerOfTwo$1(renderTarget) || isWebGL2;
+			const textures = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture : [renderTarget.texture];
 
-			if (textureNeedsGenerateMipmaps(texture, supportsMips)) {
-				const target = renderTarget.isWebGLCubeRenderTarget ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
+			for (let i = 0, il = textures.length; i < il; i++) {
+				const texture = textures[i];
 
-				const webglTexture = properties.get(texture).__webglTexture;
+				if (textureNeedsGenerateMipmaps(texture, supportsMips)) {
+					const target = renderTarget.isWebGLCubeRenderTarget ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
 
-				state.bindTexture(target, webglTexture);
-				generateMipmap(target, texture, renderTarget.width, renderTarget.height);
-				state.bindTexture(target, null);
+					const webglTexture = properties.get(texture).__webglTexture;
+
+					state.bindTexture(target, webglTexture);
+					generateMipmap(target, texture, renderTarget.width, renderTarget.height);
+					state.bindTexture(target, null);
+				}
 			}
 		}
 
@@ -17271,7 +17383,9 @@
 
 		const _scissor = new Vector4(0, 0, _width, _height);
 
-		let _scissorTest = false; // frustum
+		let _scissorTest = false; //
+
+		const _currentDrawBuffers = []; // frustum
 
 		const _frustum = new Frustum(); // clipping
 
@@ -17371,6 +17485,7 @@
 			extensions.init(capabilities);
 			utils = new WebGLUtils(_gl, extensions, capabilities);
 			state = new WebGLState(_gl, extensions, capabilities);
+			_currentDrawBuffers[0] = _gl.BACK;
 			info = new WebGLInfo(_gl);
 			properties = new WebGLProperties();
 			textures = new WebGLTextures(_gl, extensions, state, properties, capabilities, utils, info);
@@ -18139,6 +18254,7 @@
 			const materialProperties = properties.get(material);
 			materialProperties.outputEncoding = parameters.outputEncoding;
 			materialProperties.instancing = parameters.instancing;
+			materialProperties.skinning = parameters.skinning;
 			materialProperties.numClippingPlanes = parameters.numClippingPlanes;
 			materialProperties.numIntersection = parameters.numClipIntersection;
 			materialProperties.vertexAlphas = parameters.vertexAlphas;
@@ -18177,6 +18293,10 @@
 				} else if (object.isInstancedMesh && materialProperties.instancing === false) {
 					needsProgramChange = true;
 				} else if (!object.isInstancedMesh && materialProperties.instancing === true) {
+					needsProgramChange = true;
+				} else if (object.isSkinnedMesh && materialProperties.skinning === false) {
+					needsProgramChange = true;
+				} else if (!object.isSkinnedMesh && materialProperties.skinning === true) {
 					needsProgramChange = true;
 				} else if (materialProperties.envMap !== envMap) {
 					needsProgramChange = true;
@@ -18247,7 +18367,7 @@
 					p_uniforms.setValue(_gl, 'isOrthographic', camera.isOrthographicCamera === true);
 				}
 
-				if (material.isMeshPhongMaterial || material.isMeshToonMaterial || material.isMeshLambertMaterial || material.isMeshBasicMaterial || material.isMeshStandardMaterial || material.isShaderMaterial || material.isShadowMaterial || material.skinning) {
+				if (material.isMeshPhongMaterial || material.isMeshToonMaterial || material.isMeshLambertMaterial || material.isMeshBasicMaterial || material.isMeshStandardMaterial || material.isShaderMaterial || material.isShadowMaterial || object.isSkinnedMesh) {
 					p_uniforms.setValue(_gl, 'viewMatrix', camera.matrixWorldInverse);
 				}
 			} // skinning uniforms must be set even if material didn't change
@@ -18255,7 +18375,7 @@
 			// otherwise textures used for skinning can take over texture units reserved for other material textures
 
 
-			if (material.skinning) {
+			if (object.isSkinnedMesh) {
 				p_uniforms.setOptional(_gl, object, 'bindMatrix');
 				p_uniforms.setOptional(_gl, object, 'bindMatrixInverse');
 				const skeleton = object.skeleton;
@@ -18411,7 +18531,47 @@
 				_currentScissorTest = _scissorTest;
 			}
 
-			state.bindFramebuffer(_gl.FRAMEBUFFER, framebuffer);
+			const framebufferBound = state.bindFramebuffer(_gl.FRAMEBUFFER, framebuffer);
+
+			if (framebufferBound && capabilities.drawBuffers) {
+				let needsUpdate = false;
+
+				if (renderTarget) {
+					if (renderTarget.isWebGLMultipleRenderTargets) {
+						const textures = renderTarget.texture;
+
+						if (_currentDrawBuffers.length !== textures.length || _currentDrawBuffers[0] !== _gl.COLOR_ATTACHMENT0) {
+							for (let i = 0, il = textures.length; i < il; i++) {
+								_currentDrawBuffers[i] = _gl.COLOR_ATTACHMENT0 + i;
+							}
+
+							_currentDrawBuffers.length = textures.length;
+							needsUpdate = true;
+						}
+					} else {
+						if (_currentDrawBuffers.length !== 1 || _currentDrawBuffers[0] !== _gl.COLOR_ATTACHMENT0) {
+							_currentDrawBuffers[0] = _gl.COLOR_ATTACHMENT0;
+							_currentDrawBuffers.length = 1;
+							needsUpdate = true;
+						}
+					}
+				} else {
+					if (_currentDrawBuffers.length !== 1 || _currentDrawBuffers[0] !== _gl.BACK) {
+						_currentDrawBuffers[0] = _gl.BACK;
+						_currentDrawBuffers.length = 1;
+						needsUpdate = true;
+					}
+				}
+
+				if (needsUpdate) {
+					if (capabilities.isWebGL2) {
+						_gl.drawBuffers(_currentDrawBuffers);
+					} else {
+						extensions.get('WEBGL_draw_buffers').drawBuffersWEBGL(_currentDrawBuffers);
+					}
+				}
+			}
+
 			state.viewport(_currentViewport);
 			state.scissor(_currentScissor);
 			state.setScissorTest(_currentScissorTest);
@@ -22944,7 +23104,6 @@
 	 *	wireframe: <boolean>,
 	 *	wireframeLinewidth: <float>,
 	 *
-	 *	skinning: <bool>,
 	 *	morphTargets: <bool>,
 	 *	morphNormals: <bool>,
 	 *
@@ -22989,7 +23148,6 @@
 			this.wireframeLinewidth = 1;
 			this.wireframeLinecap = 'round';
 			this.wireframeLinejoin = 'round';
-			this.skinning = false;
 			this.morphTargets = false;
 			this.morphNormals = false;
 			this.flatShading = false;
@@ -23031,7 +23189,6 @@
 			this.wireframeLinewidth = source.wireframeLinewidth;
 			this.wireframeLinecap = source.wireframeLinecap;
 			this.wireframeLinejoin = source.wireframeLinejoin;
-			this.skinning = source.skinning;
 			this.morphTargets = source.morphTargets;
 			this.morphNormals = source.morphNormals;
 			this.flatShading = source.flatShading;
@@ -23164,7 +23321,6 @@
 	 *	wireframe: <boolean>,
 	 *	wireframeLinewidth: <float>,
 	 *
-	 *	skinning: <bool>,
 	 *	morphTargets: <bool>,
 	 *	morphNormals: <bool>,
 	 *
@@ -23206,7 +23362,6 @@
 			this.wireframeLinewidth = 1;
 			this.wireframeLinecap = 'round';
 			this.wireframeLinejoin = 'round';
-			this.skinning = false;
 			this.morphTargets = false;
 			this.morphNormals = false;
 			this.flatShading = false;
@@ -23244,7 +23399,6 @@
 			this.wireframeLinewidth = source.wireframeLinewidth;
 			this.wireframeLinecap = source.wireframeLinecap;
 			this.wireframeLinejoin = source.wireframeLinejoin;
-			this.skinning = source.skinning;
 			this.morphTargets = source.morphTargets;
 			this.morphNormals = source.morphNormals;
 			this.flatShading = source.flatShading;
@@ -23288,7 +23442,6 @@
 	 *	wireframe: <boolean>,
 	 *	wireframeLinewidth: <float>,
 	 *
-	 *	skinning: <bool>,
 	 *	morphTargets: <bool>,
 	 *	morphNormals: <bool>
 	 * }
@@ -23324,7 +23477,6 @@
 			this.wireframeLinewidth = 1;
 			this.wireframeLinecap = 'round';
 			this.wireframeLinejoin = 'round';
-			this.skinning = false;
 			this.morphTargets = false;
 			this.morphNormals = false;
 			this.setValues(parameters);
@@ -23355,7 +23507,6 @@
 			this.wireframeLinewidth = source.wireframeLinewidth;
 			this.wireframeLinecap = source.wireframeLinecap;
 			this.wireframeLinejoin = source.wireframeLinejoin;
-			this.skinning = source.skinning;
 			this.morphTargets = source.morphTargets;
 			this.morphNormals = source.morphNormals;
 			return this;
@@ -23383,7 +23534,6 @@
 	 *	wireframe: <boolean>,
 	 *	wireframeLinewidth: <float>
 	 *
-	 *	skinning: <bool>,
 	 *	morphTargets: <bool>,
 	 *	morphNormals: <bool>,
 	 *
@@ -23406,7 +23556,6 @@
 			this.wireframe = false;
 			this.wireframeLinewidth = 1;
 			this.fog = false;
-			this.skinning = false;
 			this.morphTargets = false;
 			this.morphNormals = false;
 			this.flatShading = false;
@@ -23425,7 +23574,6 @@
 			this.displacementBias = source.displacementBias;
 			this.wireframe = source.wireframe;
 			this.wireframeLinewidth = source.wireframeLinewidth;
-			this.skinning = source.skinning;
 			this.morphTargets = source.morphTargets;
 			this.morphNormals = source.morphNormals;
 			this.flatShading = source.flatShading;
@@ -23465,7 +23613,6 @@
 	 *	wireframe: <boolean>,
 	 *	wireframeLinewidth: <float>,
 	 *
-	 *	skinning: <bool>,
 	 *	morphTargets: <bool>,
 	 *	morphNormals: <bool>
 	 * }
@@ -23495,7 +23642,6 @@
 			this.wireframeLinewidth = 1;
 			this.wireframeLinecap = 'round';
 			this.wireframeLinejoin = 'round';
-			this.skinning = false;
 			this.morphTargets = false;
 			this.morphNormals = false;
 			this.setValues(parameters);
@@ -23522,7 +23668,6 @@
 			this.wireframeLinewidth = source.wireframeLinewidth;
 			this.wireframeLinecap = source.wireframeLinecap;
 			this.wireframeLinejoin = source.wireframeLinejoin;
-			this.skinning = source.skinning;
 			this.morphTargets = source.morphTargets;
 			this.morphNormals = source.morphNormals;
 			return this;
@@ -23554,7 +23699,6 @@
 	 *
 	 *	alphaMap: new THREE.Texture( <Image> ),
 	 *
-	 *	skinning: <bool>,
 	 *	morphTargets: <bool>,
 	 *	morphNormals: <bool>
 	 *
@@ -23582,7 +23726,6 @@
 			this.displacementScale = 1;
 			this.displacementBias = 0;
 			this.alphaMap = null;
-			this.skinning = false;
 			this.morphTargets = false;
 			this.morphNormals = false;
 			this.flatShading = false;
@@ -23606,7 +23749,6 @@
 			this.displacementScale = source.displacementScale;
 			this.displacementBias = source.displacementBias;
 			this.alphaMap = source.alphaMap;
-			this.skinning = source.skinning;
 			this.morphTargets = source.morphTargets;
 			this.morphNormals = source.morphNormals;
 			this.flatShading = source.flatShading;
@@ -27785,7 +27927,6 @@
 			if (json.polygonOffset !== undefined) material.polygonOffset = json.polygonOffset;
 			if (json.polygonOffsetFactor !== undefined) material.polygonOffsetFactor = json.polygonOffsetFactor;
 			if (json.polygonOffsetUnits !== undefined) material.polygonOffsetUnits = json.polygonOffsetUnits;
-			if (json.skinning !== undefined) material.skinning = json.skinning;
 			if (json.morphTargets !== undefined) material.morphTargets = json.morphTargets;
 			if (json.morphNormals !== undefined) material.morphNormals = json.morphNormals;
 			if (json.dithering !== undefined) material.dithering = json.dithering;
@@ -35960,6 +36101,7 @@
 	exports.VideoTexture = VideoTexture;
 	exports.WebGL1Renderer = WebGL1Renderer;
 	exports.WebGLCubeRenderTarget = WebGLCubeRenderTarget;
+	exports.WebGLMultipleRenderTargets = WebGLMultipleRenderTargets;
 	exports.WebGLMultisampleRenderTarget = WebGLMultisampleRenderTarget;
 	exports.WebGLRenderTarget = WebGLRenderTarget;
 	exports.WebGLRenderTargetCube = WebGLRenderTargetCube;

@@ -395,7 +395,7 @@
 					#include <project_vertex>
 
 					vPosition = mvPosition;
-					vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+					vec4 worldPosition = modelMatrix * vec4( transformed, 1.0 );
 					projTexCoord = textureMatrix * worldPosition;
 
 				}`,

@@ -621,9 +621,9 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "makeShear", ( assert ) => {
 
 			var a = new Matrix4();
-			var c = new Matrix4().set( 1, 3, 4, 0, 2, 1, 4, 0, 2, 3, 1, 0, 0, 0, 0, 1 );
+			var c = new Matrix4().set( 1, 3, 5, 0, 1, 1, 6, 0, 2, 4, 1, 0, 0, 0, 0, 1 );
 
-			a.makeShear( 2, 3, 4 );
+			a.makeShear( 1, 2, 3, 4, 5, 6 );
 			assert.ok( matrixEquals4( a, c ), "Passed!" );
 
 		} );

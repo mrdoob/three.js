@@ -90,6 +90,7 @@
 	"webgl_shadowmap_pcss": [ "soft" ],
 	"webgl_simple_gi": [ "global illumination" ],
 	"webgl_tiled_forward": [ "derivatives" ],
+	"webgl2_multiple_rendertargets": [ "mrt" ],
 	"webgl2_multisampled_renderbuffers": [ "msaa" ],
 	"physics_ammo_cloth": [ "integration" ],
 	"misc_controls_deviceorientation": [ "accelerometer", "sensors" ],

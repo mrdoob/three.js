@@ -360,8 +360,11 @@ function WebGLState( gl, extensions, capabilities ) {
 	let currentTextureSlot = null;
 	let currentBoundTextures = {};
 
-	const currentScissor = new Vector4( 0, 0, gl.canvas.width, gl.canvas.height );
-	const currentViewport = new Vector4( 0, 0, gl.canvas.width, gl.canvas.height );
+	const scissorParam = gl.getParameter( gl.SCISSOR_BOX );
+	const viewportParam = gl.getParameter( gl.VIEWPORT );
+
+	const currentScissor = new Vector4().fromArray( scissorParam );
+	const currentViewport = new Vector4().fromArray( viewportParam );
 
 	function createTexture( type, target, count ) {
 
@@ -465,7 +468,11 @@ function WebGLState( gl, extensions, capabilities ) {
 
 			}
 
+			return true;
+
 		}
+
+		return false;
 
 	}
 
