@@ -31,7 +31,7 @@ var SSRShader = {
 		'opacity': { value: .5 },
 		'maxDistance': { value: 180 },
 		'cameraRange': { value: 0 },
-		'thickness': { value: .018 },
+		'thickness': { value: .018 }
 
 	},
 

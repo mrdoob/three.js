@@ -454,6 +454,7 @@
 			const floorMaterial = new THREE.MeshPhongMaterial( { color: 0x222222 } );
 			const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 			floor.rotation.x = - Math.PI / 2;
+			floor.receiveShadow = true;
 			scene.add( floor );
 
 			const menuGeometry = new THREE.PlaneGeometry( 0.24, 0.5 );

@@ -4,24 +4,7 @@
 		<title>three.js webgl - Multiple Render Targets</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 
 		<!-- Write to G-Buffer -->
 		<script id="gbuffer-vert" type="x-shader/x-vertex">
@@ -129,7 +112,6 @@
 			import { WEBGL } from './jsm/WebGL.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			let container;
 			let camera, scene, renderer, controls;
 			let renderTarget;
 			let postScene, postCamera;
@@ -145,20 +127,10 @@
 
 				}
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				const canvas = document.createElement( 'canvas' );
-				const context = canvas.getContext( 'webgl2' );
-
-				renderer = new THREE.WebGLRenderer( {
-					canvas: canvas,
-					context: context
-				} );
-
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				// Create a multi render target with Float buffers
 

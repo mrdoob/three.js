@@ -52,17 +52,17 @@ CheckerNode.Nodes = ( function () {
 
 	// https://github.com/mattdesl/glsl-checker/blob/master/index.glsl
 
-	const checker = new FunctionNode( [
-		'float checker( vec2 uv ) {',
+	const checker = new FunctionNode( /* glsl */`
+		float checker( vec2 uv ) {
 
-		'	float cx = floor( uv.x );',
-		'	float cy = floor( uv.y ); ',
-		'	float result = mod( cx + cy, 2.0 );',
+			float cx = floor( uv.x );
+			float cy = floor( uv.y );
+			float result = mod( cx + cy, 2.0 );
 
-		'	return sign( result );',
+			return sign( result );
 
-		'}'
-	].join( '\n' ) );
+		}`
+	);
 
 	return {
 		checker: checker

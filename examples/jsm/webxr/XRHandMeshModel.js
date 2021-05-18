@@ -23,8 +23,6 @@ class XRHandMeshModel {
 			mesh.castShadow = true;
 			mesh.receiveShadow = true;
 
-			mesh.material.side = 0; // Workaround: force FrontSide
-
 			const joints = [
 				'wrist',
 				'thumb-metacarpal',

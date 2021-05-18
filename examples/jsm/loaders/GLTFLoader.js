@@ -418,10 +418,10 @@ const EXTENSIONS = {
 };
 
 /**
-	 * Punctual Lights Extension
-	 *
-	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_lights_punctual
-	 */
+ * Punctual Lights Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_lights_punctual
+ */
 class GLTFLightsExtension {
 
 	constructor( parser ) {
@@ -546,10 +546,10 @@ class GLTFLightsExtension {
 }
 
 /**
-	 * Unlit Materials Extension
-	 *
-	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_unlit
-	 */
+ * Unlit Materials Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_unlit
+ */
 class GLTFMaterialsUnlitExtension {
 
 	constructor() {
@@ -599,10 +599,10 @@ class GLTFMaterialsUnlitExtension {
 }
 
 /**
-	 * Clearcoat Materials Extension
-	 *
-	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
-	 */
+ * Clearcoat Materials Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
+ */
 class GLTFMaterialsClearcoatExtension {
 
 	constructor( parser ) {
@@ -684,11 +684,11 @@ class GLTFMaterialsClearcoatExtension {
 }
 
 /**
-	 * Transmission Materials Extension
-	 *
-	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_transmission
-	 * Draft: https://github.com/KhronosGroup/glTF/pull/1698
-	 */
+ * Transmission Materials Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_transmission
+ * Draft: https://github.com/KhronosGroup/glTF/pull/1698
+ */
 class GLTFMaterialsTransmissionExtension {
 
 	constructor( parser ) {
@@ -743,10 +743,10 @@ class GLTFMaterialsTransmissionExtension {
 }
 
 /**
-	 * BasisU Texture Extension
-	 *
-	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_texture_basisu
-	 */
+ * BasisU Texture Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_texture_basisu
+ */
 class GLTFTextureBasisUExtension {
 
 	constructor( parser ) {
@@ -795,10 +795,10 @@ class GLTFTextureBasisUExtension {
 }
 
 /**
-	 * WebP Texture Extension
-	 *
-	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_texture_webp
-	 */
+ * WebP Texture Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_texture_webp
+ */
 class GLTFTextureWebPExtension {
 
 	constructor( parser ) {
@@ -880,10 +880,10 @@ class GLTFTextureWebPExtension {
 }
 
 /**
-	* meshopt BufferView Compression Extension
-	*
-	* Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_meshopt_compression
-	*/
+ * meshopt BufferView Compression Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_meshopt_compression
+ */
 class GLTFMeshoptCompression {
 
 	constructor( parser ) {
@@ -1018,10 +1018,10 @@ class GLTFBinaryExtension {
 }
 
 /**
-	 * DRACO Mesh Compression Extension
-	 *
-	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_draco_mesh_compression
-	 */
+ * DRACO Mesh Compression Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_draco_mesh_compression
+ */
 class GLTFDracoMeshCompressionExtension {
 
 	constructor( json, dracoLoader ) {
@@ -1101,10 +1101,10 @@ class GLTFDracoMeshCompressionExtension {
 }
 
 /**
-	 * Texture Transform Extension
-	 *
-	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_texture_transform
-	 */
+ * Texture Transform Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_texture_transform
+ */
 class GLTFTextureTransformExtension {
 
 	constructor() {
@@ -1114,6 +1114,19 @@ class GLTFTextureTransformExtension {
 	}
 
 	extendTexture( texture, transform ) {
+
+		if ( transform.texCoord !== undefined ) {
+
+			console.warn( 'THREE.GLTFLoader: Custom UV sets in "' + this.name + '" extension not yet supported.' );
+
+		}
+
+		if ( transform.offset === undefined && transform.rotation === undefined && transform.scale === undefined ) {
+
+			// See https://github.com/mrdoob/three.js/issues/21819.
+			return texture;
+
+		}
 
 		texture = texture.clone();
 
@@ -1135,12 +1148,6 @@ class GLTFTextureTransformExtension {
 
 		}
 
-		if ( transform.texCoord !== undefined ) {
-
-			console.warn( 'THREE.GLTFLoader: Custom UV sets in "' + this.name + '" extension not yet supported.' );
-
-		}
-
 		texture.needsUpdate = true;
 
 		return texture;
@@ -1150,17 +1157,16 @@ class GLTFTextureTransformExtension {
 }
 
 /**
-	 * Specular-Glossiness Extension
-	 *
-	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_pbrSpecularGlossiness
-	 */
+ * Specular-Glossiness Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_pbrSpecularGlossiness
+ */
 
 /**
-	 * A sub class of StandardMaterial with some of the functionality
-	 * changed via the `onBeforeCompile` callback
-	 * @pailhead
-	 */
-
+ * A sub class of StandardMaterial with some of the functionality
+ * changed via the `onBeforeCompile` callback
+ * @pailhead
+ */
 class GLTFMeshStandardSGMaterial extends MeshStandardMaterial {
 
 	constructor( params ) {
@@ -1484,10 +1490,10 @@ class GLTFMaterialsPbrSpecularGlossinessExtension {
 }
 
 /**
-	 * Mesh Quantization Extension
-	 *
-	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_mesh_quantization
-	 */
+ * Mesh Quantization Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_mesh_quantization
+ */
 class GLTFMeshQuantizationExtension {
 
 	constructor() {
@@ -1700,8 +1706,8 @@ function resolveURL( url, path ) {
 }
 
 /**
-	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#default-material
-	 */
+ * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#default-material
+ */
 function createDefaultMaterial( cache ) {
 
 	if ( cache[ 'DefaultMaterial' ] === undefined ) {
@@ -1740,9 +1746,9 @@ function addUnknownExtensionsToUserData( knownExtensions, object, objectDef ) {
 }
 
 /**
-	 * @param {Object3D|Material|BufferGeometry} object
-	 * @param {GLTF.definition} gltfDef
-	 */
+ * @param {Object3D|Material|BufferGeometry} object
+ * @param {GLTF.definition} gltfDef
+ */
 function assignExtrasToUserData( object, gltfDef ) {
 
 	if ( gltfDef.extras !== undefined ) {
@@ -1762,13 +1768,13 @@ function assignExtrasToUserData( object, gltfDef ) {
 }
 
 /**
-	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#morph-targets
-	 *
-	 * @param {BufferGeometry} geometry
-	 * @param {Array<GLTF.Target>} targets
-	 * @param {GLTFParser} parser
-	 * @return {Promise<BufferGeometry>}
-	 */
+ * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#morph-targets
+ *
+ * @param {BufferGeometry} geometry
+ * @param {Array<GLTF.Target>} targets
+ * @param {GLTFParser} parser
+ * @return {Promise<BufferGeometry>}
+ */
 function addMorphTargets( geometry, targets, parser ) {
 
 	let hasMorphPosition = false;
@@ -1835,9 +1841,9 @@ function addMorphTargets( geometry, targets, parser ) {
 }
 
 /**
-	 * @param {Mesh} mesh
-	 * @param {GLTF.Mesh} meshDef
-	 */
+ * @param {Mesh} mesh
+ * @param {GLTF.Mesh} meshDef
+ */
 function updateMorphTargets( mesh, meshDef ) {
 
 	mesh.updateMorphTargets();
@@ -1964,6 +1970,8 @@ class GLTFParser {
 		this.meshCache = { refs: {}, uses: {} };
 		this.cameraCache = { refs: {}, uses: {} };
 		this.lightCache = { refs: {}, uses: {} };
+
+		this.textureCache = {};
 
 		// Track node names, to ensure no duplicates
 		this.nodeNamesUsed = {};
@@ -2529,6 +2537,15 @@ class GLTFParser {
 
 		const textureDef = json.textures[ textureIndex ];
 
+		const cacheKey = ( source.uri || source.bufferView ) + ':' + textureDef.sampler;
+
+		if ( this.textureCache[ cacheKey ] ) {
+
+			// See https://github.com/mrdoob/three.js/issues/21559.
+			return this.textureCache[ cacheKey ];
+
+		}
+
 		const URL = self.URL || self.webkitURL;
 
 		let sourceURI = source.uri;
@@ -2569,7 +2586,7 @@ class GLTFParser {
 
 		}
 
-		return Promise.resolve( sourceURI ).then( function ( sourceURI ) {
+		const promise = Promise.resolve( sourceURI ).then( function ( sourceURI ) {
 
 			return new Promise( function ( resolve, reject ) {
 
@@ -2622,6 +2639,10 @@ class GLTFParser {
 			return texture;
 
 		} );
+
+		this.textureCache[ cacheKey ] = promise;
+
+		return promise;
 
 	}
 

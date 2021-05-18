@@ -174,6 +174,16 @@ class BufferGeometry extends EventDispatcher {
 
 	}
 
+	applyQuaternion( q ) {
+
+		_m1.makeRotationFromQuaternion( q );
+
+		this.applyMatrix4( _m1 );
+
+		return this;
+
+	}
+
 	rotateX( angle ) {
 
 		// rotate geometry around world x-axis

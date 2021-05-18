@@ -56,8 +56,10 @@ export { CondNode } from './math/CondNode.js';
 
 // procedural
 
-export { NoiseNode } from './procedural/NoiseNode.js';
+export { Noise2DNode } from './procedural/Noise2DNode.js';
+export { Noise3DNode } from './procedural/Noise3DNode.js';
 export { CheckerNode } from './procedural/CheckerNode.js';
+export { Fractal3DNode } from './procedural/Fractal3DNode.js';
 
 // misc
 

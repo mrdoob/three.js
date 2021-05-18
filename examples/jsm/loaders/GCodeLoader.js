@@ -65,7 +65,7 @@ class GCodeLoader extends Loader {
 	parse( data ) {
 
 		let state = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false, relative: false };
-		let layers = [];
+		const layers = [];
 
 		let currentLayer = undefined;
 
@@ -117,21 +117,21 @@ class GCodeLoader extends Loader {
 
 		}
 
-		let lines = data.replace( /;.+/g, '' ).split( '\n' );
+		const lines = data.replace( /;.+/g, '' ).split( '\n' );
 
 		for ( let i = 0; i < lines.length; i ++ ) {
 
-			let tokens = lines[ i ].split( ' ' );
-			let cmd = tokens[ 0 ].toUpperCase();
+			const tokens = lines[ i ].split( ' ' );
+			const cmd = tokens[ 0 ].toUpperCase();
 
 			//Argumments
-			let args = {};
+			const args = {};
 			tokens.splice( 1 ).forEach( function ( token ) {
 
 				if ( token[ 0 ] !== undefined ) {
 
-					let key = token[ 0 ].toLowerCase();
-					let value = parseFloat( token.substring( 1 ) );
+					const key = token[ 0 ].toLowerCase();
+					const value = parseFloat( token.substring( 1 ) );
 					args[ key ] = value;
 
 				}
@@ -142,7 +142,7 @@ class GCodeLoader extends Loader {
 			//G0/G1 – Linear Movement
 			if ( cmd === 'G0' || cmd === 'G1' ) {
 
-				let line = {
+				const line = {
 					x: args.x !== undefined ? absolute( state.x, args.x ) : state.x,
 					y: args.y !== undefined ? absolute( state.y, args.y ) : state.y,
 					z: args.z !== undefined ? absolute( state.z, args.z ) : state.z,
@@ -184,7 +184,7 @@ class GCodeLoader extends Loader {
 			} else if ( cmd === 'G92' ) {
 
 				//G92: Set Position
-				let line = state;
+				const line = state;
 				line.x = args.x !== undefined ? args.x : line.x;
 				line.y = args.y !== undefined ? args.y : line.y;
 				line.z = args.z !== undefined ? args.z : line.z;
@@ -201,9 +201,9 @@ class GCodeLoader extends Loader {
 
 		function addObject( vertex, extruding, i ) {
 
-			let geometry = new BufferGeometry();
+			const geometry = new BufferGeometry();
 			geometry.setAttribute( 'position', new Float32BufferAttribute( vertex, 3 ) );
-			let segments = new LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
+			const segments = new LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
 			segments.name = 'layer' + i;
 			object.add( segments );
 
@@ -216,7 +216,7 @@ class GCodeLoader extends Loader {
 
 			for ( let i = 0; i < layers.length; i ++ ) {
 
-				let layer = layers[ i ];
+				const layer = layers[ i ];
 				addObject( layer.vertex, true, i );
 				addObject( layer.pathVertex, false, i );
 
@@ -229,9 +229,9 @@ class GCodeLoader extends Loader {
 
 			for ( let i = 0; i < layers.length; i ++ ) {
 
-				let layer = layers[ i ];
-				let layerVertex = layer.vertex;
-				let layerPathVertex = layer.pathVertex;
+				const layer = layers[ i ];
+				const layerVertex = layer.vertex;
+				const layerPathVertex = layer.pathVertex;
 
 				for ( let j = 0; j < layerVertex.length; j ++ ) {
 

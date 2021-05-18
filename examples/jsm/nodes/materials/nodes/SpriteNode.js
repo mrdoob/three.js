@@ -34,11 +34,11 @@ class SpriteNode extends Node {
 				UniformsLib.fog
 			] ) );
 
-			builder.addParsCode( [
-				'#include <fog_pars_vertex>',
-				'#include <logdepthbuf_pars_vertex>',
-				'#include <clipping_planes_pars_vertex>'
-			].join( '\n' ) );
+			builder.addParsCode( /* glsl */`
+				#include <fog_pars_vertex>
+				#include <logdepthbuf_pars_vertex>
+				#include <clipping_planes_pars_vertex>`
+			);
 
 			output = [
 				'#include <clipping_planes_fragment>',
@@ -109,16 +109,16 @@ class SpriteNode extends Node {
 
 		} else {
 
-			builder.addParsCode( [
-				'#include <fog_pars_fragment>',
-				'#include <logdepthbuf_pars_fragment>',
-				'#include <clipping_planes_pars_fragment>'
-			].join( '\n' ) );
+			builder.addParsCode( /* glsl */`
+				#include <fog_pars_fragment>
+				#include <logdepthbuf_pars_fragment>
+				#include <clipping_planes_pars_fragment>`
+			);
 
-			builder.addCode( [
-				'#include <clipping_planes_fragment>',
-				'#include <logdepthbuf_fragment>'
-			].join( '\n' ) );
+			builder.addCode( /* glsl */`
+				#include <clipping_planes_fragment>
+				#include <logdepthbuf_fragment>`
+			);
 
 			// analyze all nodes to reuse generate codes
 

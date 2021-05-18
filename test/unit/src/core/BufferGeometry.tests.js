@@ -8,6 +8,7 @@ import {
 } from '../../../../src/core/BufferAttribute';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
+import { Quaternion } from '../../../../src/math/Quaternion';
 import { Sphere } from '../../../../src/math/Sphere';
 import {
 	x,
@@ -210,6 +211,21 @@ export default QUnit.module( 'Core', () => {
 			assert.ok( position[ 3 ] === m[ 12 ] && position[ 4 ] === m[ 13 ] && position[ 5 ] === m[ 14 ], "position was extracted from matrix twice" );
 			assert.ok( geometry.attributes.position.version === 1, "version was increased during update" );
 
+		} );
+
+		QUnit.test( "applyQuaternion", ( assert ) => {
+
+			var geometry = new BufferGeometry();
+			geometry.setAttribute( "position", new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
+
+			var q = new Quaternion( 0.5, 0.5, 0.5, 0.5 );
+			geometry.applyQuaternion( q );
+
+			var pos = geometry.attributes.position.array;
+
+			// geometry was rotated around the (1, 1, 1) axis.
+			assert.ok( pos[ 0 ] === 3 && pos[ 1 ] === 1 && pos[ 2 ] === 2 &&
+				pos[ 3 ] === 6 && pos[ 4 ] === 4 && pos[ 5 ] === 5, "vertices were rotated properly" );
 		} );
 
 		QUnit.test( "rotateX/Y/Z", ( assert ) => {
