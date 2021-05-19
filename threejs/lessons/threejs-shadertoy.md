@@ -79,7 +79,7 @@ expected to provide a value for. We need to set this to some color.
 It also has an `in` (for input) parameter called `fragCoord`. This is the pixel
 coordinate that is about to be drawn. We can use that coordinate to decide on a
 color. If the canvas we're drawing to is 400x300 pixels then the function will
-be called 400x400 times or 120,000 times. Each time `fragCoord` will be a
+be called 400x300 times or 120,000 times. Each time `fragCoord` will be a
 different pixel coordinate.
 
 There are 2 more variables being used that are not defined in the code. One is
