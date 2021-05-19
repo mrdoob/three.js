@@ -1080,7 +1080,7 @@
 
 			if ( material.emissive ) {
 
-				// emissiveFactor
+				// note: `emissive` is not scaled by `material.emissiveIntensity` for now to accommodate glTF spec. see #21849.
 				const emissive = material.emissive.toArray();
 
 				if ( ! equalArray( emissive, [ 0, 0, 0 ] ) ) {
