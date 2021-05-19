@@ -3567,6 +3567,7 @@ class GLTFParser {
 
 				node.userData.name = nodeDef.name;
 				node.name = nodeName;
+				
 
 			}
 
@@ -4016,4 +4017,13 @@ function toTrianglesDrawMode( geometry, drawMode ) {
 
 }
 
-export { GLTFLoader };
+export function loadGlftObj(filePath) {
+const loader = new GLTFLoader();
+return new Promise((resolve, reject) => {
+loader.load(filePath, function ( gltf ) {
+resolve(gltf.scene)
+}, undefined, function ( e ) {
+console.error( e );
+} );
+});
+}
