@@ -36,7 +36,7 @@ class USDZExporter {
 					materials[ material.uuid ] = material;
 					if ( material.map !== null ) textures[ material.map.uuid ] = material.map;
 					if ( material.normalMap !== null ) textures[ material.normalMap.uuid ] = material.normalMap;
-					//if ( material.aoMap !== null ) textures[ material.aoMap.uuid ] = material.aoMap;
+					if ( material.aoMap !== null ) textures[ material.aoMap.uuid ] = material.aoMap;
 					if ( material.roughnessMap !== null ) textures[ material.roughnessMap.uuid ] = material.roughnessMap;
 					if ( material.metalnessMap !== null ) textures[ material.metalnessMap.uuid ] = material.metalnessMap;
 					if ( material.emissiveMap !== null ) textures[ material.emissiveMap.uuid ] = material.emissiveMap;
@@ -335,15 +335,9 @@ function buildMaterial( material ) {
 	const textures = [];
 	let texture;
 
-	function buildColorWithAlpha( color ) {
-
-		return `(${ color.r }, ${ color.g }, ${ color.b }, 1)`;
-	
-	}
-
-	function prepareTextureTransform(texture) {
+	function prepareTextureTransform(texture, mapType) {
 		return `
-		def Shader "Transform2D_${ texture.id }" (
+		def Shader "Transform2D_${ mapType }" (
 			sdrMetadata = {
 				string role = "math"
 			}
@@ -365,14 +359,14 @@ function buildMaterial( material ) {
 		parameters.push( `${ pad }color3f inputs:diffuseColor.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }.outputs:rgb>` );
 
 		texture = material.map;
-		texturesTransforms.push(prepareTextureTransform(texture));
+		texturesTransforms.push(prepareTextureTransform(texture, "diffuse"));
 		textures.push(`
 
 		def Shader "Texture_${ texture.id }"
 		{
 			uniform token info:id = "UsdUVTexture"
 			asset inputs:file = @textures/Texture_${ texture.id }.jpg@
-			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_${ texture.id }.outputs:result>
+			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_diffuse.outputs:result>
 			float4 inputs:scale = (1, 1, 1, 1)
 			float4 inputs:bias = (${material.color.r}, ${material.color.g}, ${material.color.b}, 0)
 			token inputs:wrapS = "repeat"
@@ -393,14 +387,14 @@ function buildMaterial( material ) {
 		parameters.push( `${ pad }color3f inputs:emissiveColor.connect = </Materials/Material_${ material.id }/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
 
 		texture = material.emissiveMap;
-		texturesTransforms.push(prepareTextureTransform(texture));
+		texturesTransforms.push(prepareTextureTransform(texture, "emissive"));
 		textures.push(`
 
 		def Shader "Texture_${ texture.id }"
 		{
 			uniform token info:id = "UsdUVTexture"
 			asset inputs:file = @textures/Texture_${ texture.id }.jpg@
-			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_${ texture.id }.outputs:result>
+			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_emissive.outputs:result>
 			token inputs:wrapS = "repeat"
 			token inputs:wrapT = "repeat"
 			float outputs:r
@@ -422,14 +416,14 @@ function buildMaterial( material ) {
 		parameters.push( `${ pad }normal3f inputs:normal.connect = </Materials/Material_${ material.id }/Texture_${ material.normalMap.id }.outputs:rgb>` );
 
 		texture = material.normalMap;
-		texturesTransforms.push(prepareTextureTransform(texture));
+		texturesTransforms.push(prepareTextureTransform(texture, "normal"));
 		textures.push(`
 
 		def Shader "Texture_${ texture.id }"
 		{
 			uniform token info:id = "UsdUVTexture"
 			asset inputs:file = @textures/Texture_${ texture.id }.jpg@
-			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_${ texture.id }.outputs:result>
+			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_normal.outputs:result>
 			token inputs:wrapS = "repeat"
 			token inputs:wrapT = "repeat"
 			float4 inputs:scale = (${material.normalScale.x}, ${material.normalScale.x}, ${material.normalScale.x}, 1.0)
@@ -445,8 +439,25 @@ function buildMaterial( material ) {
 
 	if ( material.aoMap !== null ) {
 
-		//parameters.push( `${ pad }float inputs:occlusion.connect = </Materials/Material_${ material.id }/Texture_${ material.aoMap.id }.outputs:r>` );
+		parameters.push( `${ pad }float inputs:occlusion.connect = </Materials/Material_${ material.id }/Texture_${ material.aoMap.id }.outputs:r>` );
 
+		texture = material.aoMap;
+		textures.push(`
+
+		def Shader "Texture_${ texture.id }"
+		{
+			uniform token info:id = "UsdUVTexture"
+			asset inputs:file = @textures/Texture_${ texture.id }.jpg@
+			float2 inputs:st = (0,0)
+			token inputs:wrapS = "repeat"
+			token inputs:wrapT = "repeat"
+			float outputs:r
+			float outputs:g
+			float outputs:b
+			float3 outputs:rgb
+		}
+		
+		`);
 	}
 
 	if ( material.roughnessMap !== null ) {
@@ -454,14 +465,14 @@ function buildMaterial( material ) {
 		parameters.push( `${ pad }float inputs:roughness.connect = </Materials/Material_${ material.id }/Texture_${ material.roughnessMap.id }_roughness.outputs:g>` );
 
 		texture = material.roughnessMap;
-		texturesTransforms.push(prepareTextureTransform(texture));
+		texturesTransforms.push(prepareTextureTransform(texture, "roughness"));
 		textures.push(`
 
 		def Shader "Texture_${ texture.id }_roughness"
 		{
 			uniform token info:id = "UsdUVTexture"
 			asset inputs:file = @textures/Texture_${ texture.id }.jpg@
-			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_${ texture.id }.outputs:result>
+			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_roughness.outputs:result>
 			token inputs:wrapS = "repeat"
 			token inputs:wrapT = "repeat"
 			float outputs:r
@@ -483,14 +494,14 @@ function buildMaterial( material ) {
 		parameters.push( `${ pad }float inputs:metallic.connect = </Materials/Material_${ material.id }/Texture_${ material.metalnessMap.id }_metalness.outputs:b>` );
 
 		texture = material.metalnessMap;
-		//texturesTransforms.push(prepareTextureTransform(texture));
+		texturesTransforms.push(prepareTextureTransform(texture, "metallic"));
 		textures.push(`
 
 		def Shader "Texture_${ texture.id }_metalness"
 		{
 			uniform token info:id = "UsdUVTexture"
 			asset inputs:file = @textures/Texture_${ texture.id }.jpg@
-			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_${ texture.id }.outputs:result>
+			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_metallic.outputs:result>
 			token inputs:wrapS = "repeat"
 			token inputs:wrapT = "repeat"
 			float outputs:r
