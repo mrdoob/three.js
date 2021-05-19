@@ -53,7 +53,6 @@ class USDZExporter {
 		} );
 
 		output += buildMaterials( materials );
-		//output += buildTextures( textures );
 
 		files[ modelFileName ] = fflate.strToU8( output );
 		output = null;
@@ -367,8 +366,6 @@ function buildMaterial( material ) {
 			uniform token info:id = "UsdUVTexture"
 			asset inputs:file = @textures/Texture_${ texture.id }.jpg@
 			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_diffuse.outputs:result>
-			float4 inputs:scale = (1, 1, 1, 1)
-			float4 inputs:bias = (${material.color.r}, ${material.color.g}, ${material.color.b}, 0)
 			token inputs:wrapS = "repeat"
 			token inputs:wrapT = "repeat"
 			float3 outputs:rgb
@@ -426,7 +423,6 @@ function buildMaterial( material ) {
 			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_normal.outputs:result>
 			token inputs:wrapS = "repeat"
 			token inputs:wrapT = "repeat"
-			float4 inputs:scale = (${material.normalScale.x}, ${material.normalScale.x}, ${material.normalScale.x}, 1.0)
 			float outputs:r
 			float outputs:g
 			float outputs:b
@@ -546,74 +542,6 @@ ${ parameters.join( '\n' ) }
 		
 		${ texturesTransforms.join( '\n' ) }
 		${ textures.join( '\n' ) }
-    }
-`;
-
-}
-
-function buildTextures( textures ) {
-
-	const array = [];
-
-	for ( const uuid in textures ) {
-
-		const texture = textures[ uuid ];
-
-		array.push( buildTexture( texture ) );
-
-	}
-
-	return `def "Textures"
-{
-
-	token inputs:frame:stPrimvarName = "st"
-	
-	def Shader "uvReader_st"
-	{
-		uniform token info:id = "UsdPrimvarReader_float2"
-		token inputs:varname.connect = </Textures.inputs:frame:stPrimvarName>
-		float2 inputs:fallback = (0.0, 0.0)
-		float2 outputs:result
-	}
-
-	${ array.join( '' ) }
-}
-
-`;
-
-}
-
-function buildTexture( texture ) {
-
-	return `
-	
-	
-	def Shader "Transform2D_${ texture.id }" (
-		sdrMetadata = {
-			string role = "math"
-		}
-	)
-	{
-		uniform token info:id = "UsdTransform2d"
-		float2 inputs:in.connect = </Textures/uvReader_st.outputs:result>
-		float2 inputs:scale = (${ texture.repeat.x },${ texture.repeat.y })
-		float2 inputs:translation = (${ texture.offset.x },${ texture.offset.y })
-		float2 outputs:result
-	}
-		
-		
-	def Shader "Texture_${ texture.id }"
-	{
-		uniform token info:id = "UsdUVTexture"
-		asset inputs:file = @textures/Texture_${ texture.id }.jpg@
-		float2 inputs:st.connect = </Textures/Transform2D_${ texture.id }.outputs:result>
-		token inputs:wrapS = "repeat"
-		token inputs:wrapT = "repeat"
-		float4 inputs:bias = (0.1,0.1,0.1,0)
-		float outputs:r
-        float outputs:g
-        float outputs:b
-        float3 outputs:rgb
     }
 `;
 
