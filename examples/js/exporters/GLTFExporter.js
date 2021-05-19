@@ -1081,7 +1081,7 @@
 			if ( material.emissive ) {
 
 				// emissiveFactor
-				const emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity ).toArray();
+				const emissive = material.emissive.toArray();
 
 				if ( ! equalArray( emissive, [ 0, 0, 0 ] ) ) {
 
