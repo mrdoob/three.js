@@ -27,8 +27,12 @@
 
 			}
 
+			const _minusZ = new THREE.Vector3(0.0, 0.0, -1.0);
+
 			const _vector2 = new THREE.Vector2();
 			const _vector3 = new THREE.Vector3();
+			const _pointA = new THREE.Vector3();
+			const _pointB = new THREE.Vector3();
 
 			const SHADOW_PASS_CLEAR_COLOR = new THREE.Color(0xFFFFFF);
 			const INITIAL_CLOUD_SIZE = 128;
@@ -47,14 +51,18 @@
 
 				vec4 attenuation(vec3 localPosition)
 				{
-
+					// @todo: use step size.
+					vec4 prev = texture(shadowVolume, vec3(localPosition.xy, localPosition.z - 1.0));
+					if (slice <= 0.00001) {
+						prev = vec4(1.0);
+					}
+					return prev * 0.9;
 				}
 
 				void main()
 				{
 					vec3 localPosition = vec3(vUv, slice);
-
-
+					color = attenuation(localPosition);
 
 					// if (lightDirectionVolume.y < - 0.5) {
 					// 	color = vec4(1.0, 0.0, 0.0, 1.0);
@@ -81,10 +89,60 @@
 
 			`;
 
-			let renderer, scene, camera;
+			class ShadowVolume extends THREE.Object3D {
+
+				constructor(volume) {
+
+					super();
+
+					this.texture = null;
+
+					if (volume) {
+
+						this._init(volume)
+
+					}
+
+				}
+
+				render(light) {
+
+					const direction = light.target.getWorldPosition(_pointA);
+					direction
+						.sub(light.target.getWorldPosition(_pointB))
+						.normalize();
+
+					this.quaternion.setFromUnitVectors(_minusZ, direction);
+					this.updateMatrix();
+
+				}
+
+				_init(volume) {
+
+					// Assumes the volume is a cube. For non-uniform volume, we need
+					// to compute the appropriate x, y, z basis.
+					// Diagonal of a cube: a * sqrt(3).
+					//
+					// This is a bit wasteful in terms of texture memory but it
+					// avoids to re-upload the texture and is easier to manage for an example.
+					const diagonal = volume.image.width * Math.sqrt(3);
+					const texture = new THREE.DataTexture3D(null, diagonal, diagonal, diagonal);
+					texture.format = THREE.RGBAFormat;
+					texture.internalFormat = 'RGBA16F';
+					texture.type = THREE.HalfFloatType;
+					texture.unpackAlignment = 1;
+					texture.minFilter = THREE.LinearFilter;
+					texture.magFilter = THREE.LinearFilter;
+					this.texture = texture;
+
+				}
+
+			}
+
+			let renderer, scene, camera, light;
 			let mesh;
 			
-			let shadowScene, shadowTexture, shadowRenderTarget, shadowMaterial;
+			let shadowScene, shadowRenderTarget, shadowMaterial, shadowVolume;
 
 			let prevTime = performance.now();
 
@@ -122,25 +180,6 @@
 
 			}
 
-			function generateShadowTexture(volume) {
-				// Assumes the volume is a cube. For non-uniform volume, we need
-				// to compute the appropriate x, y, z basis.
-				// Diagonal of a cube: a * sqrt(3).
-				//
-				// This is a bit wasteful in terms of texture memory but it
-				// avoids to re-upload the texture and is easier to manage for an example.
-				const diagonal = volume.image.width * sqrt(3);
-
-				const texture = new THREE.DataTexture3D(null, diagonal, diagonal, diagonal);
-				texture.format = THREE.RGBAFormat;
-				texture.internalFormat = 'RGBA16F';
-				texture.type = THREE.HalfFloatType;
-				texture.unpackAlignment = 1;
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
-				return texture;
-			}
-
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
@@ -165,13 +204,13 @@
 
 				// Shadow Pass
 
-				shadowTexture = generateShadowTexture(texture);
+				shadowVolume = new ShadowVolume(texture);
 
 				shadowMaterial = new THREE.RawShaderMaterial( {
 					glslVersion: THREE.GLSL3,
 					uniforms: {
 						volume: { value: texture },
-						shadowVolume: { value: shadowTexture },
+						shadowVolume: { value: shadowVolume.texture },
 						lightDirectionVolume: { value: new THREE.Vector3() },
 						slice: { value: 0.0 }
 					},
@@ -198,7 +237,7 @@
 					// format: THREE.RedFormat,
 					// internalFormat: 'R16F',
 					format: THREE.RGBAFormat,
-      		internalFormat: 'RGBA16F',
+					internalFormat: 'RGBA16F',
 					type: THREE.HalfFloatType,
 					stencilBuffer: false,
 					depthBuffer: false
@@ -223,6 +262,12 @@
 					new THREE.MeshBasicMaterial( { map: new THREE.CanvasTexture( canvas ), side: THREE.BackSide } )
 				);
 				scene.add( sky );
+
+				// Light
+
+				light = new THREE.DirectionalLight();
+				light.target.position.set(0.0, -1.0, 0.0);
+				light.target.updateMatrix();
 
 				// Material
 
@@ -402,7 +447,7 @@
 						// base: { value: new THREE.Color( 0x798aa0 ) },
 						base: { value: new THREE.Color( 0x111111 ) },
 						map: { value: texture },
-						shadowTexture: { value: shadowTexture },
+						shadowTexture: { value: shadowVolume.texture },
 						cameraPos: { value: new THREE.Vector3() },
 						threshold: { value: 0.25 },
 						opacity: { value: 0.25 },
@@ -447,6 +492,11 @@
 
 			}
 
+			function updateShadow() {
+				const light = new THREE.Vector3(0.0, -1.0, 0.0);
+
+			}
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -476,21 +526,20 @@
 				renderer.autoClear = false;
 				renderer.setClearColor(SHADOW_PASS_CLEAR_COLOR, 1.0);
 				renderer.clearColor();
-				for (let i = 1; i < INITIAL_CLOUD_SIZE; ++i) {
+				for (let i = 0; i < INITIAL_CLOUD_SIZE; ++i) {
 					shadowMaterial.uniforms.slice.value = i / INITIAL_CLOUD_SIZE;
 					shadowScene.render(renderer);
 
 					// Copies slice from framebuffer into 3D texture.
 					const srcPos = _vector2.set(0, 0);
 					const dstPos = _vector3.set(0, 0, i);
-					renderer.copyFramebufferToTexture3D(srcPos, dstPos, shadowTexture);
+					renderer.copyFramebufferToTexture3D(srcPos, dstPos, shadowVolume.texture);
 				}
 
 				renderer.autoClear = true;
 				renderer.setRenderTarget( null );
 
 				// Renders volume and uses shadow texture.
-
 			
 				mesh.material.uniforms.cameraPos.value.copy( camera.position );
 				mesh.material.uniforms.frame.value ++;
