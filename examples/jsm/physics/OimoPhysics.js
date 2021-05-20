@@ -144,8 +144,6 @@ async function OimoPhysics() {
 
 		if ( lastTime > 0 ) {
 
-			const delta = ( time - lastTime ) / 1000;
-
 			// console.time( 'world.step' );
 			world.step( 1 / frameRate );
 			// console.timeEnd( 'world.step' );
