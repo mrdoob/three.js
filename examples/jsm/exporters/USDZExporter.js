@@ -334,7 +334,8 @@ function buildMaterial( material ) {
 	const textures = [];
 	let texture;
 
-	function prepareTextureTransform(texture, mapType) {
+	function prepareTextureTransform( texture, mapType ) {
+
 		return `
 		def Shader "Transform2D_${ mapType }" (
 			sdrMetadata = {
@@ -349,17 +350,16 @@ function buildMaterial( material ) {
 			float2 outputs:result
 		}
 		`;
+
 	}
-
-
 
 	if ( material.map !== null ) {
 
 		parameters.push( `${ pad }color3f inputs:diffuseColor.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }.outputs:rgb>` );
 
 		texture = material.map;
-		texturesTransforms.push(prepareTextureTransform(texture, "diffuse"));
-		textures.push(`
+		texturesTransforms.push( prepareTextureTransform( texture, 'diffuse' ) );
+		textures.push( `
 
 		def Shader "Texture_${ texture.id }"
 		{
@@ -370,8 +370,8 @@ function buildMaterial( material ) {
 			token inputs:wrapT = "repeat"
 			float3 outputs:rgb
 		}
-		
-		`);
+
+		` );
 
 	} else {
 
@@ -384,8 +384,8 @@ function buildMaterial( material ) {
 		parameters.push( `${ pad }color3f inputs:emissiveColor.connect = </Materials/Material_${ material.id }/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
 
 		texture = material.emissiveMap;
-		texturesTransforms.push(prepareTextureTransform(texture, "emissive"));
-		textures.push(`
+		texturesTransforms.push( prepareTextureTransform( texture, 'emissive' ) );
+		textures.push( `
 
 		def Shader "Texture_${ texture.id }"
 		{
@@ -399,8 +399,8 @@ function buildMaterial( material ) {
 			float outputs:b
 			float3 outputs:rgb
 		}
-		
-		`);
+
+		` );
 
 	} else if ( material.emissive.getHex() > 0 ) {
 
@@ -413,8 +413,8 @@ function buildMaterial( material ) {
 		parameters.push( `${ pad }normal3f inputs:normal.connect = </Materials/Material_${ material.id }/Texture_${ material.normalMap.id }.outputs:rgb>` );
 
 		texture = material.normalMap;
-		texturesTransforms.push(prepareTextureTransform(texture, "normal"));
-		textures.push(`
+		texturesTransforms.push( prepareTextureTransform( texture, 'normal' ) );
+		textures.push( `
 
 		def Shader "Texture_${ texture.id }"
 		{
@@ -428,8 +428,8 @@ function buildMaterial( material ) {
 			float outputs:b
 			float3 outputs:rgb
 		}
-		
-		`);
+
+		` );
 
 	}
 
@@ -438,7 +438,7 @@ function buildMaterial( material ) {
 		parameters.push( `${ pad }float inputs:occlusion.connect = </Materials/Material_${ material.id }/Texture_${ material.aoMap.id }.outputs:r>` );
 
 		texture = material.aoMap;
-		textures.push(`
+		textures.push( `
 
 		def Shader "Texture_${ texture.id }"
 		{
@@ -452,8 +452,9 @@ function buildMaterial( material ) {
 			float outputs:b
 			float3 outputs:rgb
 		}
-		
-		`);
+
+		` );
+
 	}
 
 	if ( material.roughnessMap !== null ) {
@@ -461,8 +462,8 @@ function buildMaterial( material ) {
 		parameters.push( `${ pad }float inputs:roughness.connect = </Materials/Material_${ material.id }/Texture_${ material.roughnessMap.id }_roughness.outputs:g>` );
 
 		texture = material.roughnessMap;
-		texturesTransforms.push(prepareTextureTransform(texture, "roughness"));
-		textures.push(`
+		texturesTransforms.push( prepareTextureTransform( texture, 'roughness' ) );
+		textures.push( `
 
 		def Shader "Texture_${ texture.id }_roughness"
 		{
@@ -476,8 +477,8 @@ function buildMaterial( material ) {
 			float outputs:b
 			float3 outputs:rgb
 		}
-		
-		`);
+
+		` );
 
 	} else {
 
@@ -490,8 +491,8 @@ function buildMaterial( material ) {
 		parameters.push( `${ pad }float inputs:metallic.connect = </Materials/Material_${ material.id }/Texture_${ material.metalnessMap.id }_metalness.outputs:b>` );
 
 		texture = material.metalnessMap;
-		texturesTransforms.push(prepareTextureTransform(texture, "metallic"));
-		textures.push(`
+		texturesTransforms.push( prepareTextureTransform( texture, 'metallic' ) );
+		textures.push( `
 
 		def Shader "Texture_${ texture.id }_metalness"
 		{
@@ -505,8 +506,8 @@ function buildMaterial( material ) {
 			float outputs:b
 			float3 outputs:rgb
 		}
-		
-		`);
+
+		` );
 
 	} else {
 
@@ -519,7 +520,7 @@ function buildMaterial( material ) {
 	return `
     def Material "Material_${ material.id }"
     {
-		
+
 		def Shader "PreviewSurface"
         {
 			uniform token info:id = "UsdPreviewSurface"
@@ -531,7 +532,7 @@ ${ parameters.join( '\n' ) }
 		token outputs:surface.connect = </Materials/Material_${ material.id }/PreviewSurface.outputs:surface>
 
 		token inputs:frame:stPrimvarName = "st"
-	
+
 		def Shader "uvReader_st"
 		{
 			uniform token info:id = "UsdPrimvarReader_float2"
@@ -539,7 +540,7 @@ ${ parameters.join( '\n' ) }
 			float2 inputs:fallback = (0.0, 0.0)
 			float2 outputs:result
 		}
-		
+
 		${ texturesTransforms.join( '\n' ) }
 		${ textures.join( '\n' ) }
     }
