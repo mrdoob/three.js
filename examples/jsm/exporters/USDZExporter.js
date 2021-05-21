@@ -338,8 +338,8 @@ function buildMaterial( material ) {
         {
             uniform token info:id = "UsdTransform2d"
             float2 inputs:in.connect = </Materials/Material_${ material.id }/uvReader_st.outputs:result>
-            float2 inputs:scale = (${ texture.repeat.x },${ texture.repeat.y })
-            float2 inputs:translation = (${ texture.offset.x },${ texture.offset.y })
+            float2 inputs:scale = ${ buildVector2( texture.repeat ) }
+            float2 inputs:translation = ${ buildVector2( texture.offset ) }
             float2 outputs:result
         }
 
@@ -453,6 +453,12 @@ ${ textures.join( '\n' ) }
 function buildColor( color ) {
 
 	return `(${ color.r }, ${ color.g }, ${ color.b })`;
+
+}
+
+function buildVector2( vector ) {
+
+	return `(${ vector.x }, ${ vector.y })`;
 
 }
 
