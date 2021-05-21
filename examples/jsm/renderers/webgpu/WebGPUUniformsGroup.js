@@ -68,13 +68,19 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 			const chunkOffset = offset % chunkSize;
 			const remainingSizeInChunk = chunkSize - chunkOffset;
 
-			// check for chunk overflow
+			// conformance tests
 
 			if ( chunkOffset !== 0 && ( remainingSizeInChunk - uniform.boundary ) < 0 ) {
 
-				// add padding and adjust offset
+				// check for chunk overflow
 
 				offset += ( chunkSize - chunkOffset );
+
+			} else if ( chunkOffset % uniform.boundary !== 0 ) {
+
+				// check for correct alignment
+
+				offset += ( chunkOffset % uniform.boundary );
 
 			}
 
