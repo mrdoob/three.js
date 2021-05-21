@@ -30,6 +30,7 @@
 			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
 			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
 			import NormalNode from './jsm/renderers/nodes/accessors/NormalNode.js';
+			import FloatNode from './jsm/renderers/nodes/inputs/FloatNode.js';
 			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
 
 			import Stats from './jsm/libs/stats.module.js';
@@ -75,6 +76,10 @@
 				texture.wrapS = THREE.RepeatWrapping;
 				texture.wrapT = THREE.RepeatWrapping;
 
+				const opacityTexture = textureLoader.load( './textures/alphaMap.jpg' );
+				opacityTexture.wrapS = THREE.RepeatWrapping;
+				opacityTexture.wrapT = THREE.RepeatWrapping;
+
 				let material;
 
 				// PositionNode.LOCAL
@@ -106,6 +111,13 @@
 				material = new THREE.MeshBasicMaterial();
 				material.opacityNode = new TextureNode( texture );
 				material.transparent = true;
+				materials.push( material );
+
+				// AlphaTest
+				material = new THREE.MeshBasicMaterial();
+				material.colorNode = new TextureNode( texture );
+				material.opacityNode = new TextureNode( opacityTexture );
+				material.alphaTestNode = new FloatNode( 0.5 );
 				materials.push( material );
 
 				// Geometry

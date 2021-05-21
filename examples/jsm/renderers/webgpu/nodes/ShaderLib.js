@@ -49,6 +49,12 @@ const ShaderLib = {
 
 				#endif
 
+				#ifdef NODE_ALPHA_TEST
+
+					if ( MaterialDiffuseColor.a < NODE_ALPHA_TEST ) discard;
+
+				#endif
+
 				#ifdef NODE_LIGHT
 
 					NODE_CODE_LIGHT
@@ -106,6 +112,12 @@ const ShaderLib = {
 
 				NODE_CODE_OPACITY
 				MaterialDiffuseColor.a *= NODE_OPACITY;
+
+				#ifdef NODE_ALPHA_TEST
+
+					if ( MaterialDiffuseColor.a < NODE_ALPHA_TEST ) discard;
+
+				#endif
 
 				NODE_CODE_SPECULAR
 				MaterialSpecularColor = NODE_SPECULAR;

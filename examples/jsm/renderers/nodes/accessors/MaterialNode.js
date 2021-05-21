@@ -4,6 +4,7 @@ import MaterialReferenceNode from './MaterialReferenceNode.js';
 
 class MaterialNode extends Node {
 
+	static ALPHA_TEST = 'alphaTest';
 	static COLOR = 'color';
 	static OPACITY = 'opacity';
 	static SPECULAR = 'specular';
@@ -49,7 +50,11 @@ class MaterialNode extends Node {
 
 		let node = null;
 
-		if ( scope === MaterialNode.COLOR ) {
+		if ( scope === MaterialNode.ALPHA_TEST ) {
+
+			node = new MaterialReferenceNode( 'alphaTest', 'float' );
+
+		} else if ( scope === MaterialNode.COLOR ) {
 
 			const colorNode = new MaterialReferenceNode( 'color', 'color' );
 
