@@ -841,7 +841,7 @@ function Rhino3dmWorker() {
 
 					try {
 
-						const data = decodeObjects( rhino, buffer, message.id );
+						const data = decodeObjects( rhino, buffer );
 						self.postMessage( { type: 'decode', id: message.id, data } );
 
 					} catch ( error ) {

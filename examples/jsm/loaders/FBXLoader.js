@@ -431,6 +431,7 @@ class FBXTreeParser {
 
 			} else {
 
+				loader.setPath( this.textureLoader.path );
 				texture = loader.load( fileName );
 
 			}
