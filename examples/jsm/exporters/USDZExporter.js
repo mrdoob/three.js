@@ -53,7 +53,6 @@ class USDZExporter {
 		} );
 
 		output += buildMaterials( materials );
-		output += buildTextures( textures );
 
 		files[ modelFileName ] = fflate.strToU8( output );
 		output = null;
@@ -331,9 +330,48 @@ function buildMaterial( material ) {
 	const pad = '            ';
 	const parameters = [];
 
+	const texturesTransforms = [];
+	const textures = [];
+	let texture;
+
+	function prepareTextureTransform(texture, mapType) {
+		return `
+		def Shader "Transform2D_${ mapType }" (
+			sdrMetadata = {
+				string role = "math"
+			}
+		)
+		{
+			uniform token info:id = "UsdTransform2d"
+			float2 inputs:in.connect = </Materials/Material_${ material.id }/uvReader_st.outputs:result>
+			float2 inputs:scale = (${ texture.repeat.x },${ texture.repeat.y })
+			float2 inputs:translation = (${ texture.offset.x },${ texture.offset.y })
+			float2 outputs:result
+		}
+		`;
+	}
+
+
+
 	if ( material.map !== null ) {
 
-		parameters.push( `${ pad }color3f inputs:diffuseColor.connect = </Textures/Texture_${ material.map.id }.outputs:rgb>` );
+		parameters.push( `${ pad }color3f inputs:diffuseColor.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }.outputs:rgb>` );
+
+		texture = material.map;
+		texturesTransforms.push(prepareTextureTransform(texture, "diffuse"));
+		textures.push(`
+
+		def Shader "Texture_${ texture.id }"
+		{
+			uniform token info:id = "UsdUVTexture"
+			asset inputs:file = @textures/Texture_${ texture.id }.jpg@
+			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_diffuse.outputs:result>
+			token inputs:wrapS = "repeat"
+			token inputs:wrapT = "repeat"
+			float3 outputs:rgb
+		}
+		
+		`);
 
 	} else {
 
@@ -343,7 +381,26 @@ function buildMaterial( material ) {
 
 	if ( material.emissiveMap !== null ) {
 
-		parameters.push( `${ pad }color3f inputs:emissiveColor.connect = </Textures/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }color3f inputs:emissiveColor.connect = </Materials/Material_${ material.id }/Texture_${ material.emissiveMap.id }.outputs:rgb>` );
+
+		texture = material.emissiveMap;
+		texturesTransforms.push(prepareTextureTransform(texture, "emissive"));
+		textures.push(`
+
+		def Shader "Texture_${ texture.id }"
+		{
+			uniform token info:id = "UsdUVTexture"
+			asset inputs:file = @textures/Texture_${ texture.id }.jpg@
+			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_emissive.outputs:result>
+			token inputs:wrapS = "repeat"
+			token inputs:wrapT = "repeat"
+			float outputs:r
+			float outputs:g
+			float outputs:b
+			float3 outputs:rgb
+		}
+		
+		`);
 
 	} else if ( material.emissive.getHex() > 0 ) {
 
@@ -353,19 +410,74 @@ function buildMaterial( material ) {
 
 	if ( material.normalMap !== null ) {
 
-		parameters.push( `${ pad }normal3f inputs:normal.connect = </Textures/Texture_${ material.normalMap.id }.outputs:rgb>` );
+		parameters.push( `${ pad }normal3f inputs:normal.connect = </Materials/Material_${ material.id }/Texture_${ material.normalMap.id }.outputs:rgb>` );
+
+		texture = material.normalMap;
+		texturesTransforms.push(prepareTextureTransform(texture, "normal"));
+		textures.push(`
+
+		def Shader "Texture_${ texture.id }"
+		{
+			uniform token info:id = "UsdUVTexture"
+			asset inputs:file = @textures/Texture_${ texture.id }.jpg@
+			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_normal.outputs:result>
+			token inputs:wrapS = "repeat"
+			token inputs:wrapT = "repeat"
+			float outputs:r
+			float outputs:g
+			float outputs:b
+			float3 outputs:rgb
+		}
+		
+		`);
 
 	}
 
 	if ( material.aoMap !== null ) {
 
-		parameters.push( `${ pad }float inputs:occlusion.connect = </Textures/Texture_${ material.aoMap.id }.outputs:r>` );
+		parameters.push( `${ pad }float inputs:occlusion.connect = </Materials/Material_${ material.id }/Texture_${ material.aoMap.id }.outputs:r>` );
 
+		texture = material.aoMap;
+		textures.push(`
+
+		def Shader "Texture_${ texture.id }"
+		{
+			uniform token info:id = "UsdUVTexture"
+			asset inputs:file = @textures/Texture_${ texture.id }.jpg@
+			float2 inputs:st = (0,0)
+			token inputs:wrapS = "repeat"
+			token inputs:wrapT = "repeat"
+			float outputs:r
+			float outputs:g
+			float outputs:b
+			float3 outputs:rgb
+		}
+		
+		`);
 	}
 
 	if ( material.roughnessMap !== null ) {
 
-		parameters.push( `${ pad }float inputs:roughness.connect = </Textures/Texture_${ material.roughnessMap.id }.outputs:g>` );
+		parameters.push( `${ pad }float inputs:roughness.connect = </Materials/Material_${ material.id }/Texture_${ material.roughnessMap.id }_roughness.outputs:g>` );
+
+		texture = material.roughnessMap;
+		texturesTransforms.push(prepareTextureTransform(texture, "roughness"));
+		textures.push(`
+
+		def Shader "Texture_${ texture.id }_roughness"
+		{
+			uniform token info:id = "UsdUVTexture"
+			asset inputs:file = @textures/Texture_${ texture.id }.jpg@
+			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_roughness.outputs:result>
+			token inputs:wrapS = "repeat"
+			token inputs:wrapT = "repeat"
+			float outputs:r
+			float outputs:g
+			float outputs:b
+			float3 outputs:rgb
+		}
+		
+		`);
 
 	} else {
 
@@ -375,7 +487,26 @@ function buildMaterial( material ) {
 
 	if ( material.metalnessMap !== null ) {
 
-		parameters.push( `${ pad }float inputs:metallic.connect = </Textures/Texture_${ material.metalnessMap.id }.outputs:b>` );
+		parameters.push( `${ pad }float inputs:metallic.connect = </Materials/Material_${ material.id }/Texture_${ material.metalnessMap.id }_metalness.outputs:b>` );
+
+		texture = material.metalnessMap;
+		texturesTransforms.push(prepareTextureTransform(texture, "metallic"));
+		textures.push(`
+
+		def Shader "Texture_${ texture.id }_metalness"
+		{
+			uniform token info:id = "UsdUVTexture"
+			asset inputs:file = @textures/Texture_${ texture.id }.jpg@
+			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2D_metallic.outputs:result>
+			token inputs:wrapS = "repeat"
+			token inputs:wrapT = "repeat"
+			float outputs:r
+			float outputs:g
+			float outputs:b
+			float3 outputs:rgb
+		}
+		
+		`);
 
 	} else {
 
@@ -388,54 +519,29 @@ function buildMaterial( material ) {
 	return `
     def Material "Material_${ material.id }"
     {
-        token outputs:surface.connect = </Materials/Material_${ material.id }/PreviewSurface.outputs:surface>
-
-        def Shader "PreviewSurface"
+		
+		def Shader "PreviewSurface"
         {
-            uniform token info:id = "UsdPreviewSurface"
+			uniform token info:id = "UsdPreviewSurface"
 ${ parameters.join( '\n' ) }
             int inputs:useSpecularWorkflow = 0
             token outputs:surface
         }
-    }
-`;
 
-}
+		token outputs:surface.connect = </Materials/Material_${ material.id }/PreviewSurface.outputs:surface>
 
-function buildTextures( textures ) {
-
-	const array = [];
-
-	for ( const uuid in textures ) {
-
-		const texture = textures[ uuid ];
-
-		array.push( buildTexture( texture ) );
-
-	}
-
-	return `def "Textures"
-{
-${ array.join( '' ) }
-}
-
-`;
-
-}
-
-function buildTexture( texture ) {
-
-	return `
-    def Shader "Texture_${ texture.id }"
-    {
-        uniform token info:id = "UsdUVTexture"
-        asset inputs:file = @textures/Texture_${ texture.id }.jpg@
-        token inputs:wrapS = "repeat"
-        token inputs:wrapT = "repeat"
-        float outputs:r
-        float outputs:g
-        float outputs:b
-        float3 outputs:rgb
+		token inputs:frame:stPrimvarName = "st"
+	
+		def Shader "uvReader_st"
+		{
+			uniform token info:id = "UsdPrimvarReader_float2"
+			token inputs:varname.connect = </Materials/Material_${ material.id }.inputs:frame:stPrimvarName>
+			float2 inputs:fallback = (0.0, 0.0)
+			float2 outputs:result
+		}
+		
+		${ texturesTransforms.join( '\n' ) }
+		${ textures.join( '\n' ) }
     }
 `;
 
