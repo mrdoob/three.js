@@ -32,7 +32,7 @@ class WebGPURenderPipeline {
 
 		// determine shader attributes
 
-		const shaderAttributes = this._parseShaderAttributes( nodeBuilder.vertexShader );
+		const shaderAttributes = this._parseShaderAttributes( nodeBuilder.vertexShader, geometry );
 
 		// vertex buffers
 
@@ -119,24 +119,14 @@ class WebGPURenderPipeline {
 
 	}
 
-	_getArrayStride( type ) {
+	_getArrayStride( type, bytesPerElement ) {
 
 		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
 
-		if ( type === 'float' ) return 4;
-		if ( type === 'vec2' ) return 8;
-		if ( type === 'vec3' ) return 12;
-		if ( type === 'vec4' ) return 16;
-
-		if ( type === 'int' ) return 4;
-		if ( type === 'ivec2' ) return 8;
-		if ( type === 'ivec3' ) return 12;
-		if ( type === 'ivec4' ) return 16;
-
-		if ( type === 'uint' ) return 4;
-		if ( type === 'uvec2' ) return 8;
-		if ( type === 'uvec3' ) return 12;
-		if ( type === 'uvec4' ) return 16;
+		if ( type === 'float' || type === 'int' || type === 'uint' ) return bytesPerElement;
+		if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) return bytesPerElement * 2;
+		if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) return bytesPerElement * 3;
+		if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) return bytesPerElement * 4;
 
 		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
 
@@ -587,30 +577,131 @@ class WebGPURenderPipeline {
 
 	}
 
-	_getVertexFormat( type ) {
+	_getVertexFormat( type, bytesPerElement ) {
 
-		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
+		// float
 
 		if ( type === 'float' ) return GPUVertexFormat.Float32;
-		if ( type === 'vec2' ) return GPUVertexFormat.Float32x2;
+
+		if ( type === 'vec2' ) {
+
+			if ( bytesPerElement === 2 ) {
+
+				return GPUVertexFormat.Float16x2;
+
+			} else {
+
+				return GPUVertexFormat.Float32x2;
+
+			}
+
+		}
+
 		if ( type === 'vec3' ) return GPUVertexFormat.Float32x3;
-		if ( type === 'vec4' ) return GPUVertexFormat.Float32x4;
+
+		if ( type === 'vec4' ) {
+
+			if ( bytesPerElement === 2 ) {
+
+				return GPUVertexFormat.Float16x4;
+
+			} else {
+
+				return GPUVertexFormat.Float32x4;
+
+			}
+
+		}
+
+		// int
 
 		if ( type === 'int' ) return GPUVertexFormat.Sint32;
-		if ( type === 'ivec2' ) return GPUVertexFormat.Sint32x2;
+
+		if ( type === 'ivec2' ) {
+
+			if ( bytesPerElement === 1 ) {
+
+				return GPUVertexFormat.Sint8x2;
+
+			} else if ( bytesPerElement === 2 ) {
+
+				return GPUVertexFormat.Sint16x2;
+
+			} else {
+
+				return GPUVertexFormat.Sint32x2;
+
+			}
+
+		}
+
 		if ( type === 'ivec3' ) return GPUVertexFormat.Sint32x3;
-		if ( type === 'ivec4' ) return GPUVertexFormat.Sint32x4;
+
+		if ( type === 'ivec4' ) {
+
+			if ( bytesPerElement === 1 ) {
+
+				return GPUVertexFormat.Sint8x4;
+
+			} else if ( bytesPerElement === 2 ) {
+
+				return GPUVertexFormat.Sint16x4;
+
+			} else {
+
+				return GPUVertexFormat.Sint32x4;
+
+			}
+
+		}
+
+		// uint
 
 		if ( type === 'uint' ) return GPUVertexFormat.Uint32;
-		if ( type === 'uvec2' ) return GPUVertexFormat.Uint32x2;
+
+		if ( type === 'uvec2' ) {
+
+			if ( bytesPerElement === 1 ) {
+
+				return GPUVertexFormat.Uint8x2;
+
+			} else if ( bytesPerElement === 2 ) {
+
+				return GPUVertexFormat.Uint16x2;
+
+			} else {
+
+				return GPUVertexFormat.Uint32x2;
+
+			}
+
+		}
+
 		if ( type === 'uvec3' ) return GPUVertexFormat.Uint32x3;
-		if ( type === 'uvec4' ) return GPUVertexFormat.Uint32x4;
+
+		if ( type === 'uvec4' ) {
+
+			if ( bytesPerElement === 1 ) {
+
+				return GPUVertexFormat.Uint8x4;
+
+			} else if ( bytesPerElement === 2 ) {
+
+				return GPUVertexFormat.Uint16x4;
+
+			} else {
+
+				return GPUVertexFormat.Uint32x4;
+
+			}
+
+		}
 
 		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
 
 	}
 
-	_parseShaderAttributes( shader ) {
+	_parseShaderAttributes( shader, geometry ) {
 
 		// find "layout (location = num) in type name" in vertex shader
 
@@ -621,12 +712,17 @@ class WebGPURenderPipeline {
 
 		while ( shaderAttribute = regex.exec( shader ) ) {
 
+			const name = shaderAttribute.groups.name;
+
+			const geometryAttribute = geometry.getAttribute( name );
+			const bytesPerElement = ( geometryAttribute !== undefined ) ? geometryAttribute.array.BYTES_PER_ELEMENT : 4;
+
 			const shaderLocation = parseInt( shaderAttribute.groups.location );
-			const arrayStride = this._getArrayStride( shaderAttribute.groups.type );
-			const vertexFormat = this._getVertexFormat( shaderAttribute.groups.type );
+			const arrayStride = this._getArrayStride( shaderAttribute.groups.type, bytesPerElement );
+			const vertexFormat = this._getVertexFormat( shaderAttribute.groups.type, bytesPerElement );
 
 			attributes.push( {
-				name: shaderAttribute.groups.name,
+				name: name,
 				arrayStride: arrayStride,
 				slot: shaderLocation,
 				format: vertexFormat
