@@ -722,7 +722,7 @@ class WebGPURenderPipeline {
 			const vertexFormat = this._getVertexFormat( shaderAttribute.groups.type, bytesPerElement );
 
 			attributes.push( {
-				name: shaderAttribute.groups.name,
+				name: name,
 				arrayStride: arrayStride,
 				slot: shaderLocation,
 				format: vertexFormat
