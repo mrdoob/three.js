@@ -107,6 +107,23 @@ class CompressedTextureLoader extends Loader {
 					texture.image.height = texDatas.height;
 					texture.mipmaps = texDatas.mipmaps;
 
+					// put first mipmap data into image to simulate ImageData
+					if ( texDatas.mipmaps[ 0 ] && texDatas.mipmaps[ 0 ].data ) {
+
+						const firstBitmapData = texDatas.mipmaps[ 0 ].data;
+
+						if ( firstBitmapData instanceof Uint8ClampedArray ) {
+
+							texture.image.data = firstBitmapData;
+
+						} else if ( firstBitmapData instanceof Uint8Array ) {
+
+							texture.image.data = new Uint8ClampedArray( firstBitmapData );
+
+						}
+
+					}
+
 				}
 
 				if ( texDatas.mipmapCount === 1 ) {
