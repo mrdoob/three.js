@@ -42,7 +42,8 @@
       "potpack": true,
       "fflate": true,
       "ZSTDDecoder": true,
-      "bodymovin": true
+      "bodymovin": true,
+      "OIMO": true
     },
     "rules": {
       "quotes": [
