@@ -28,7 +28,12 @@ import {
 	TextureLoader,
 	Uint16BufferAttribute,
 	Vector3,
-	VectorKeyframeTrack
+	VectorKeyframeTrack,
+	RGB_S3TC_DXT1_Format,
+	RGB_PVRTC_4BPPV1_Format,
+	RGB_PVRTC_2BPPV1_Format,
+	RGB_ETC1_Format,
+	RGB_ETC2_Format
 } from '../../../build/three.module.js';
 import { TGALoader } from '../loaders/TGALoader.js';
 import { MMDParser } from '../libs/mmdparser.module.js';
@@ -363,6 +368,14 @@ const DEFAULT_TOON_TEXTURES = [
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII='
+];
+
+const NON_ALPHA_CHANNEL_FORMATS = [
+	RGB_S3TC_DXT1_Format,
+	RGB_PVRTC_4BPPV1_Format,
+	RGB_PVRTC_2BPPV1_Format,
+	RGB_ETC1_Format,
+	RGB_ETC2_Format
 ];
 
 // Builders. They build Three.js object from Object data parsed by MMDParser.
@@ -1515,6 +1528,23 @@ class MaterialBuilder {
 				const index = y * width + x;
 
 				return image.data[ index * 4 + 3 ];
+
+			}
+
+			if ( texture.isCompressedTexture === true ) {
+
+				if ( NON_ALPHA_CHANNEL_FORMATS.includes( texture.format ) ) {
+
+					map.transparent = false;
+
+				} else {
+
+					// any other way to check transparency of CompressedTexture?
+					map.transparent = true;
+
+				}
+
+				return;
 
 			}
 
