@@ -32,11 +32,18 @@
 
 		<h2>Methods</h2>
 
+		<h3>[method:ArrayCamera getCamera]( [param:PerspectiveCamera camera] )</h3>
+		<p>
+		Returns an instance of [page:ArrayCamera] which represents the XR camera of the active XR session.
+		For each view it holds a separate camera object in its [page:ArrayCamera.cameras cameras] property.
+		The method requires the non-XR camera of the scene as a parameter.
+		</p>
+
 		<h3>[method:Group getController]( [param:Integer index] )</h3>
 		<p>
 		[page:Integer index] — The index of the controller. <br /><br />
 
-		Returns a [page:Group] representing the so called *target ray* space of the controller.
+		Returns a [page:Group] representing the so called *target ray* space of the XR controller.
 		Use this space for visualizing 3D objects that support the user in pointing tasks like UI interaction.
 		</p>
 
@@ -44,7 +51,7 @@
 		<p>
 		[page:Integer index] — The index of the controller. <br /><br />
 
-		Returns a [page:Group] representing the so called *grip* space of the controller.
+		Returns a [page:Group] representing the so called *grip* space of the XR controller.
 		Use this space if the user is going to hold other 3D objects like a lightsaber.
 		</p>
 
@@ -52,6 +59,24 @@
 		Note: If you want to show something in the user's hand AND offer a pointing ray at the same time, you'll want to attached the handheld object to the
 		group returned by [page:.getControllerGrip]()  and the ray to the group returned by [page:.getController](). The idea is to have two different groups
 		in two different coordinate spaces for the same WebXR controller.
+		</p>
+
+		<h3>[method:Group getHand]( [param:Integer index] )</h3>
+		<p>
+		[page:Integer index] — The index of the controller. <br /><br />
+
+		Returns a [page:Group] representing the so called *hand* or *joint* space of the XR controller.
+		Use this space for visualizing the user's hands when no physical controllers are used.
+		</p>
+
+		<h3>[method:String getReferenceSpace]()</h3>
+		<p>
+		Returns the reference space.
+		</p>
+
+		<h3>[method:XRSession getSession]()</h3>
+		<p>
+		Returns the *XRSession* object which allows a more fine-grained management of active WebXR sessions on application level.
 		</p>
 
 		<h3>[method:void setFramebufferScaleFactor]( [param:Float framebufferScaleFactor] )</h3>
