@@ -1315,7 +1315,7 @@
 
 				}
 
-				if ( texture instanceof THREE.CompressedTexture ) {
+				if ( texture.isCompressedTexture === true ) {
 
 					if ( NON_ALPHA_CHANNEL_FORMATS.includes( texture.format ) ) {
 
@@ -1323,7 +1323,7 @@
 
 					} else {
 
-						// any other way to check transparency of THREE.CompressedTexture?
+						// any other way to check transparency of CompressedTexture?
 						map.transparent = true;
 
 					}

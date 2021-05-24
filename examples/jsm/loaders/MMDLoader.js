@@ -29,7 +29,6 @@ import {
 	Uint16BufferAttribute,
 	Vector3,
 	VectorKeyframeTrack,
-	CompressedTexture,
 	RGB_S3TC_DXT1_Format,
 	RGB_PVRTC_4BPPV1_Format,
 	RGB_PVRTC_2BPPV1_Format,
@@ -1533,7 +1532,7 @@ class MaterialBuilder {
 
 			}
 
-			if ( texture instanceof CompressedTexture ) {
+			if ( texture.isCompressedTexture === true ) {
 
 				if ( NON_ALPHA_CHANNEL_FORMATS.includes( texture.format ) ) {
 
