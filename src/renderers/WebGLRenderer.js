@@ -4,7 +4,10 @@ import {
 	FloatType,
 	UnsignedByteType,
 	LinearEncoding,
-	NoToneMapping
+	NoToneMapping,
+	LinearMipmapLinearFilter,
+	NearestFilter,
+	ClampToEdgeWrapping
 } from '../constants.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
@@ -30,6 +33,7 @@ import { WebGLPrograms } from './webgl/WebGLPrograms.js';
 import { WebGLProperties } from './webgl/WebGLProperties.js';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists.js';
 import { WebGLRenderStates } from './webgl/WebGLRenderStates.js';
+import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap.js';
 import { WebGLState } from './webgl/WebGLState.js';
 import { WebGLTextures } from './webgl/WebGLTextures.js';
@@ -159,6 +163,11 @@ function WebGLRenderer( parameters ) {
 
 	let _clippingEnabled = false;
 	let _localClippingEnabled = false;
+
+	// transmission
+
+	let _transmissionRenderTarget = null;
+	const _transmissionSamplerSize = new Vector2( 1024, 1024 ); // Should be configurable?
 
 	// camera matrices cache
 
@@ -1056,9 +1065,11 @@ function WebGLRenderer( parameters ) {
 		// render scene
 
 		const opaqueObjects = currentRenderList.opaque;
+		const transmissiveObjects = currentRenderList.transmissive;
 		const transparentObjects = currentRenderList.transparent;
 
 		if ( opaqueObjects.length > 0 ) renderObjects( opaqueObjects, scene, camera );
+		if ( transmissiveObjects.length > 0 ) renderTransmissiveObjects( opaqueObjects, transmissiveObjects, scene, camera );
 		if ( transparentObjects.length > 0 ) renderObjects( transparentObjects, scene, camera );
 
 		//
@@ -1239,6 +1250,75 @@ function WebGLRenderer( parameters ) {
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
 			projectObject( children[ i ], camera, groupOrder, sortObjects );
+
+		}
+
+	}
+
+	function renderTransmissiveObjects( opaqueObjects, transmissiveObjects, scene, camera ) {
+
+		if ( _transmissionRenderTarget === null ) {
+
+			_transmissionRenderTarget = new WebGLRenderTarget( _transmissionSamplerSize.x, _transmissionSamplerSize.y, {
+				generateMipmaps: true,
+				minFilter: LinearMipmapLinearFilter,
+				magFilter: NearestFilter,
+				wrapS: ClampToEdgeWrapping,
+				wrapT: ClampToEdgeWrapping
+			} );
+
+			// Hack to bring the size to refreshUniformsPhysical() in WebGLMaterials()
+			_transmissionRenderTarget.texture.size = _transmissionSamplerSize;
+
+		}
+
+		const currentRenderTarget = _this.getRenderTarget();
+		_this.setRenderTarget( _transmissionRenderTarget );
+		_this.clear();
+		renderObjects( opaqueObjects, scene, camera );
+		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
+
+		_this.setRenderTarget( currentRenderTarget );
+
+		for ( let i = 0, il = transmissiveObjects.length; i < il; i ++ ) {
+
+			const material = transmissiveObjects[ i ].material;
+
+			if ( Array.isArray( material ) ) {
+
+				for ( let j = 0, jl = material.length; j < jl; j ++ ) {
+
+					if ( material[ j ].transmission > 0.0 ) material[ j ]._transmissionSamplerMap = _transmissionRenderTarget.texture;
+
+				}
+
+			} else {
+
+				material._transmissionSamplerMap = _transmissionRenderTarget.texture;
+
+			}
+
+		}
+
+		renderObjects( transmissiveObjects, scene, camera );
+
+		for ( let i = 0, il = transmissiveObjects.length; i < il; i ++ ) {
+
+			const material = transmissiveObjects[ i ].material;
+
+			if ( Array.isArray( material ) ) {
+
+				for ( let j = 0, jl = material.length; j < jl; j ++ ) {
+
+					if ( material[ j ].transmission > 0.0 ) material[ j ]._transmissionSamplerMap = null;
+
+				}
+
+			} else {
+
+				material._transmissionSamplerMap = null;
+
+			}
 
 		}
 

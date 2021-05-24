@@ -561,6 +561,7 @@ function WebGLMaterials( properties ) {
 
 		uniforms.clearcoat.value = material.clearcoat;
 		uniforms.clearcoatRoughness.value = material.clearcoatRoughness;
+
 		if ( material.sheen ) uniforms.sheen.value.copy( material.sheen );
 
 		if ( material.clearcoatMap ) {
@@ -595,6 +596,24 @@ function WebGLMaterials( properties ) {
 			uniforms.transmissionMap.value = material.transmissionMap;
 
 		}
+
+		if ( material._transmissionSamplerMap ) {
+
+			uniforms.transmissionSamplerMap.value = material._transmissionSamplerMap;
+			uniforms.transmissionSamplerSize.value.copy( material._transmissionSamplerMap.size );
+
+		}
+
+		uniforms.thickness.value = material.thickness;
+
+		if ( material.thicknessMap ) {
+
+			uniforms.thicknessMap.value = material.thicknessMap;
+
+		}
+
+		uniforms.attenuationDistance.value = material.attenuationDistance;
+		uniforms.attenuationColor.value.copy( material.attenuationColor );
 
 	}
 
