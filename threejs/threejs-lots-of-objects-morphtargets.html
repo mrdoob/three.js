@@ -318,18 +318,16 @@ function main() {
 
     // show the selected data, hide the rest
     function showFileInfo(fileInfos, fileInfo) {
-      fileInfos.forEach((info) => {
+      const targets = {};
+      fileInfos.forEach((info, i) => {
         const visible = fileInfo === info;
         info.elem.className = visible ? 'selected' : '';
-        const targets = {};
-        fileInfos.forEach((info, i) => {
-          targets[i] = info === fileInfo ? 1 : 0;
-        });
-        const durationInMs = 1000;
-        tweenManager.createTween(mesh.morphTargetInfluences)
-          .to(targets, durationInMs)
-          .start();
+        targets[i] = visible ? 1 : 0;
       });
+      const durationInMs = 1000;
+      tweenManager.createTween(mesh.morphTargetInfluences)
+        .to(targets, durationInMs)
+        .start();
       requestRenderIfNotRequested();
     }
 

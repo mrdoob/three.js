@@ -384,19 +384,18 @@ And then create a `Tween` to animate the influences.
 ```js
 // show the selected data, hide the rest
 function showFileInfo(fileInfos, fileInfo) {
-  fileInfos.forEach((info) => {
++  const targets = {};
+-  fileInfos.forEach((info) => {
++  fileInfos.forEach((info, i) => {
     const visible = fileInfo === info;
 -    info.root.visible = visible;
     info.elem.className = visible ? 'selected' : '';
-+    const targets = {};
-+    fileInfos.forEach((info, i) => {
-+      targets[i] = info === fileInfo ? 1 : 0;
-+    });
-+    const durationInMs = 1000;
-+    new TWEEN.Tween(mesh.morphTargetInfluences)
-+      .to(targets, durationInMs)
-+      .start();
++    targets[i] = visible ? 1 : 0;
   });
++  const durationInMs = 1000;
++  new TWEEN.Tween(mesh.morphTargetInfluences)
++    .to(targets, durationInMs)
++    .start();
   requestRenderIfNotRequested();
 }
 ```
@@ -461,19 +460,17 @@ We'll use it to create our `Tween`s.
 ```js
 // show the selected data, hide the rest
 function showFileInfo(fileInfos, fileInfo) {
-  fileInfos.forEach((info) => {
+  const targets = {};
+  fileInfos.forEach((info, i) => {
     const visible = fileInfo === info;
     info.elem.className = visible ? 'selected' : '';
-    const targets = {};
-    fileInfos.forEach((info, i) => {
-      targets[i] = info === fileInfo ? 1 : 0;
-    });
-    const durationInMs = 1000;
--    new TWEEN.Tween(mesh.morphTargetInfluences)
-+    tweenManager.createTween(mesh.morphTargetInfluences)
-      .to(targets, durationInMs)
-      .start();
+    targets[i] = visible ? 1 : 0;
   });
+  const durationInMs = 1000;
+-  new TWEEN.Tween(mesh.morphTargetInfluences)
++  tweenManager.createTween(mesh.morphTargetInfluences)
+    .to(targets, durationInMs)
+    .start();
   requestRenderIfNotRequested();
 }
 ```
