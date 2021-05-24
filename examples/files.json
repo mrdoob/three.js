@@ -86,6 +86,7 @@
 		"webgl_loader_gltf",
 		"webgl_loader_gltf_compressed",
 		"webgl_loader_gltf_extensions",
+		"webgl_loader_gltf_transmission",
 		"webgl_loader_gltf_variants",
 		"webgl_loader_ifc",
 		"webgl_loader_imagebitmap",
