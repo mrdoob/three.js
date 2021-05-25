@@ -1,16 +1,13 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 
-const DOCS_FOLDERS = [ 'api', 'examples', 'manual' ];
 const DOCS_IGNORE = [ 'Template', 'Polyfills' ];
+const DOCS_FOLDERS = [ 'api', 'examples', 'manual' ];
 const DOCS_PATH = path.join( process.cwd(), 'docs' );
+const DOCS_PROPS_REGEX = /\[\s*(method|property):\w*\s(\w*\s*)\]/gi;
 
 /**
  * Builds a flattened tree of doc endpoints.
- *
- * @param {String} dir Target directory to build tree from.
- * @param {Object} [tree] Base tree to write to.
- * @param {String} [level] Accumulated parent directory.
  */
 const getEndpoints = ( dir, tree = {}, level ) => {
 
@@ -31,7 +28,7 @@ const getEndpoints = ( dir, tree = {}, level ) => {
 	}
 
 	// Crawl directory
-	fs.readdirSync( dir ).map( ( subDir ) => {
+	fs.readdirSync( dir ).forEach( ( subDir ) => {
 
 		// Scan target folders from base dir
 		if ( dir === DOCS_PATH && ! DOCS_FOLDERS.includes( subDir ) ) return;
@@ -45,9 +42,31 @@ const getEndpoints = ( dir, tree = {}, level ) => {
 };
 
 /**
+ * Creates a deeply-nested tree from an array of keys.
+ */
+const createTree = ( keys, value = {}, root = {} ) => {
+
+	let tree = root;
+
+	keys.forEach( ( key, index, arr ) => {
+
+		// Create new properties with value if specified
+		if ( ! tree.hasOwnProperty( key ) ) {
+
+			tree[ key ] = index === arr.length - 1 ? value : {};
+
+		}
+
+		tree = tree[ key ];
+
+	} );
+
+	return tree;
+
+};
+
+/**
  * Generates a list from a target docs directory.
- *
- * @param {String} dir Docs directory to scan.
  */
 const createList = ( dir ) => {
 
@@ -66,17 +85,16 @@ const createList = ( dir ) => {
 		);
 
 		// Parse methods & properties from doc file
-		const matches =
-			file.match( /\[\s*(method|property):\w*\s(\w*\s*)\]/gi ) || [];
+		const matches = file.match( DOCS_PROPS_REGEX ) || [];
 		const data = matches.reduce(
 			( output, match ) => {
 
 				if ( ! match ) return output;
 
-				const type = match.replace( /\[\s*(\w+):\w*\s(\w*\s*)\]/gi, '$1' );
+				const type = match.replace( DOCS_PROPS_REGEX, '$1' );
 				const target = type === 'method' ? 'methods' : 'properties';
 
-				const value = match.replace( /\[\s*(\w+):\w*\s(\w*\s*)\]/gi, '$2' );
+				const value = match.replace( DOCS_PROPS_REGEX, '$2' );
 				if ( value ) output[ target ].push( value );
 
 				return output;
@@ -89,15 +107,8 @@ const createList = ( dir ) => {
 			}
 		);
 
-		// Create JSON tree
-		let root = output;
-		[ ...slugs, value ].forEach( ( slug ) => {
-
-			if ( ! root.hasOwnProperty( slug ) ) root[ slug ] = slug === value ? data : {};
-
-			root = root[ slug ];
-
-		} );
+		// Create entry in JSON tree
+		createTree( [ ...slugs, value ], data, output );
 
 		return output;
 
