@@ -21,7 +21,7 @@
 
 		<h3>[property:Boolean cameraAutoUpdate]</h3>
 		<p>
-		Whether the manager's XR camera should be automatically update or not. Default is *true*.
+		Whether the manager's XR camera should be automatically updated or not. Default is *true*.
 		</p>
 
 		<h3>[property:Boolean enabled]</h3>
@@ -112,7 +112,8 @@
 		<h3>[method:void updateCamera]( [param:PerspectiveCamera camera] )</h3>
 		<p>
 		Updates the state of the XR camera. Use this method on app level if you set [page:.cameraAutoUpdate] to *false*.
-		The method requires the non-XR camera of the scene as a parameter.
+		The method requires the non-XR camera of the scene as a parameter. The passed in camera's transformation is automatically
+		adjusted to the position of the XR camera when calling this method.
 		</p>
 
 		<p>
