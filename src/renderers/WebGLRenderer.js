@@ -1274,9 +1274,6 @@ function WebGLRenderer( parameters ) {
 				wrapT: ClampToEdgeWrapping
 			} );
 
-			// Hack to bring the size to refreshUniformsPhysical() in WebGLMaterials()
-			_transmissionRenderTarget.texture.size = _transmissionSamplerSize;
-
 		}
 
 		const currentRenderTarget = _this.getRenderTarget();
@@ -1284,50 +1281,9 @@ function WebGLRenderer( parameters ) {
 		_this.clear();
 		renderObjects( opaqueObjects, scene, camera );
 		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
-
 		_this.setRenderTarget( currentRenderTarget );
 
-		for ( let i = 0, il = transmissiveObjects.length; i < il; i ++ ) {
-
-			const material = transmissiveObjects[ i ].material;
-
-			if ( Array.isArray( material ) ) {
-
-				for ( let j = 0, jl = material.length; j < jl; j ++ ) {
-
-					if ( material[ j ].transmission > 0.0 ) material[ j ]._transmissionSamplerMap = _transmissionRenderTarget.texture;
-
-				}
-
-			} else {
-
-				material._transmissionSamplerMap = _transmissionRenderTarget.texture;
-
-			}
-
-		}
-
 		renderObjects( transmissiveObjects, scene, camera );
-
-		for ( let i = 0, il = transmissiveObjects.length; i < il; i ++ ) {
-
-			const material = transmissiveObjects[ i ].material;
-
-			if ( Array.isArray( material ) ) {
-
-				for ( let j = 0, jl = material.length; j < jl; j ++ ) {
-
-					if ( material[ j ].transmission > 0.0 ) material[ j ]._transmissionSamplerMap = null;
-
-				}
-
-			} else {
-
-				material._transmissionSamplerMap = null;
-
-			}
-
-		}
 
 	}
 
@@ -1784,7 +1740,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height );
+			materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, _transmissionRenderTarget );
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
 

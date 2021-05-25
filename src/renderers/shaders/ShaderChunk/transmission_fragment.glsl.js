@@ -19,7 +19,7 @@ export default /* glsl */`
 	float ior = ( 1.0 + 0.4 * reflectivity ) / ( 1.0 - 0.4 * reflectivity );
 
 	// From https://google.github.io/filament/Filament.html#materialsystem/parameterization/remapping
-	vec3 f0 = vec3( pow( ior - 1.0, 2.0 ) / ( pow( ior + 1.0, 2.0 ) ) );
+	vec3 f0 = vec3( pow( ior - 1.0, 2.0 ) / pow( ior + 1.0, 2.0 ) );
 	vec3 f90 = vec3( 1.0 );
 
 	vec3 f_transmission = totalTransmission * getIBLVolumeRefraction(

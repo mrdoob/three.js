@@ -19,7 +19,7 @@ function WebGLMaterials( properties ) {
 
 	}
 
-	function refreshMaterialUniforms( uniforms, material, pixelRatio, height ) {
+	function refreshMaterialUniforms( uniforms, material, pixelRatio, height, transmissionRenderTarget ) {
 
 		if ( material.isMeshBasicMaterial ) {
 
@@ -46,7 +46,7 @@ function WebGLMaterials( properties ) {
 
 			if ( material.isMeshPhysicalMaterial ) {
 
-				refreshUniformsPhysical( uniforms, material );
+				refreshUniformsPhysical( uniforms, material, transmissionRenderTarget );
 
 			} else {
 
@@ -553,7 +553,7 @@ function WebGLMaterials( properties ) {
 
 	}
 
-	function refreshUniformsPhysical( uniforms, material ) {
+	function refreshUniformsPhysical( uniforms, material, transmissionRenderTarget ) {
 
 		refreshUniformsStandard( uniforms, material );
 
@@ -597,10 +597,10 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		if ( material._transmissionSamplerMap ) {
+		if ( material.transmission > 0.0 ) {
 
-			uniforms.transmissionSamplerMap.value = material._transmissionSamplerMap;
-			uniforms.transmissionSamplerSize.value.copy( material._transmissionSamplerMap.size );
+			uniforms.transmissionSamplerMap.value = transmissionRenderTarget.texture;
+			uniforms.transmissionSamplerSize.value.set( transmissionRenderTarget.width, transmissionRenderTarget.height );
 
 		}
 

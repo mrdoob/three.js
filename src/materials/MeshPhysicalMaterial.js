@@ -69,10 +69,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.transmission = 0.0;
 		this.transmissionMap = null;
 
-		// transmissionSamplerMap is automatically set up by WebGLRenderer.
-		// Users don't need to be aware of this property.
-		this._transmissionSamplerMap = null;
-
 		this.thickness = 0.01;
 		this.thicknessMap = null;
 		this.attenuationDistance = 0.0;
