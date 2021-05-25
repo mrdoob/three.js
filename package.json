@@ -75,7 +75,7 @@
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
     "make-screenshot": "node test/e2e/puppeteer.js --make",
-    "make-docs": "node utils/generateDocs.js --write",
+    "make-docs": "node utils/updateDocs.js --write",
     "prepublishOnly": "node utils/prepublish.js"
   },
   "keywords": [
