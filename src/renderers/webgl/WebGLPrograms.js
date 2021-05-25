@@ -45,7 +45,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 		'numDirLightShadows', 'numPointLightShadows', 'numSpotLightShadows',
 		'shadowMapEnabled', 'shadowMapType', 'toneMapping', 'physicallyCorrectLights',
 		'alphaTest', 'doubleSided', 'flipSided', 'numClippingPlanes', 'numClipIntersection', 'depthPacking', 'dithering',
-		'sheen', 'transmission', 'thicknessMap'
+		'sheen', 'transmission', 'transmissionMap', 'thicknessMap'
 	];
 
 	function getMaxBones( object ) {
