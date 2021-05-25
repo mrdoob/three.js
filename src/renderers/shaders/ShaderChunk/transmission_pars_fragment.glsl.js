@@ -46,9 +46,7 @@ export default /* glsl */`
 
 	vec3 getTransmissionSample(vec2 fragCoord, float roughness, float ior) {
 		float framebufferLod = log2(transmissionSamplerSize.x) * applyIorToRoughness(roughness, ior);
-		vec4 transmittedLight = textureLod(transmissionSamplerMap, fragCoord.xy, framebufferLod);
-		transmittedLight = sRGBToLinear(transmittedLight);
-		return transmittedLight.rgb;
+		return textureLod(transmissionSamplerMap, fragCoord.xy, framebufferLod).rgb;
 	}
 
 	vec3 applyVolumeAttenuation(vec3 radiance, float transmissionDistance, vec3 attenuationColor, float attenuationDistance) {
