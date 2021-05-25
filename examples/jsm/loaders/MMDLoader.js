@@ -1075,7 +1075,7 @@ class MaterialBuilder {
 	 * @param {BufferGeometry} geometry - some properties are dependend on geometry
 	 * @param {function} onProgress
 	 * @param {function} onError
-	 * @return {Array<MeshToonMaterial>}
+	 * @return {Array<MMDToonMaterial>}
 	 */
 	build( data, geometry /*, onProgress, onError */ ) {
 
@@ -1263,7 +1263,7 @@ class MaterialBuilder {
 
 			}
 
-			materials.push( new MeshToonMaterial( params ) );
+			materials.push( new MMDToonMaterial( params ) );
 
 		}
 
@@ -2061,6 +2061,24 @@ class CubicBezierInterpolation extends Interpolant {
 		return ( sst3 * y1 ) + ( stt3 * y2 ) + ttt;
 
 	}
+
+}
+
+class MMDToonMaterial extends MeshToonMaterial {
+
+	constructor( parameters ) {
+
+		super();
+
+    this.setValues( parameters );
+
+  }
+
+  copy( source ) {
+
+    super.copy( source );
+
+  }
 
 }
 
