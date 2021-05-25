@@ -1,128 +1,89 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 
-const DOCS_IGNORE = [ 'Template', 'Polyfills' ];
-const DOCS_FOLDERS = [ 'api', 'examples', 'manual' ];
 const DOCS_PATH = path.join( process.cwd(), 'docs' );
 const DOCS_PROPS_REGEX = /\[\s*(method|property):\w*\s(\w*\s*)\]/gi;
 
 /**
- * Builds a flattened tree of doc endpoints.
+ * Generates a list from a target docs directory.
  */
-const getEndpoints = ( dir, tree = {}, level ) => {
+const createList = ( write ) => {
 
-	// Get file stats
-	const isFile = fs.lstatSync( dir ).isFile();
-	const baseName = path.basename( dir ).replace( '.html', '' );
+	// Get list data
+	const list = JSON.parse( fs.readFileSync( path.join( DOCS_PATH, 'list.json' ), 'utf-8' ) );
 
-	// Ignore non-html and excluded docs
-	if ( isFile && ! dir.endsWith( '.html' ) ) return;
-	if ( DOCS_IGNORE.includes( baseName ) ) return;
+	for ( const locale in list ) {
 
-	if ( isFile ) {
+		const localList = list[ locale ];
 
-		return Object.assign( tree, {
-			[ level ]: baseName,
-		} );
+		for ( const section in list[ locale ] ) {
 
-	}
+			const categories = localList[ section ];
 
-	// Crawl directory
-	fs.readdirSync( dir ).forEach( ( subDir ) => {
+			for ( const category in categories ) {
 
-		// Scan target folders from base dir
-		if ( dir === DOCS_PATH && ! DOCS_FOLDERS.includes( subDir ) ) return;
+				const pages = categories[ category ];
 
-		getEndpoints( path.join( dir, subDir ), tree, dir );
+				for ( const pageName in pages ) {
 
-	} );
+					const pageURL = pages[ pageName ].url;
 
-	return tree;
+					// Read doc file
+					const file = fs.readFileSync(
+						path.join( DOCS_PATH, `${pageURL}.html` ),
+						'utf-8'
+					);
 
-};
+					// Parse methods & properties from doc file
+					const matches = file.match( DOCS_PROPS_REGEX ) || [];
+					const pageData = matches.reduce(
+						( output, match ) => {
 
-/**
- * Creates a deeply-nested tree from an array of keys.
- */
-const createTree = ( keys, value = {}, root = {} ) => {
+							if ( ! match ) return output;
 
-	let tree = root;
+							const type = match.replace( DOCS_PROPS_REGEX, '$1' );
+							const target = type === 'method' ? 'methods' : 'properties';
 
-	keys.forEach( ( key, index, arr ) => {
+							const value = match.replace( DOCS_PROPS_REGEX, '$2' );
+							if ( value ) output[ target ].push( value );
 
-		// Create new properties with value if specified
-		if ( ! tree.hasOwnProperty( key ) ) {
+							return output;
 
-			tree[ key ] = index === arr.length - 1 ? value : {};
+						},
+						{
+							url: pageURL,
+							methods: [],
+							properties: [],
+						}
+					);
+
+					list[ locale ][ section ][ category ][ pageName ] = pageData;
+
+				}
+
+			}
 
 		}
 
-		tree = tree[ key ];
+	}
 
-	} );
+	if ( write ) {
 
-	return tree;
-
-};
-
-/**
- * Generates a list from a target docs directory.
- */
-const createList = ( dir ) => {
-
-	// Generate list from endpoints
-	const endpoints = getEndpoints( dir );
-	const list = Object.entries( endpoints ).reduce( ( output, [ key, value ] ) => {
-
-		// Get slugs from path, build web endpoint
-		const slugs = key.replace( DOCS_PATH, '' ).split( /\/|\\/ ).filter( Boolean );
-		const endpoint = [ ...slugs, value ].join( '/' );
-
-		// Read doc file
-		const file = fs.readFileSync(
-			path.join( DOCS_PATH, `${endpoint}.html` ),
-			'utf-8'
+		fs.writeFileSync(
+			path.join( DOCS_PATH, 'list.json' ),
+			JSON.stringify( createList(), null, '\t' )
 		);
 
-		// Parse methods & properties from doc file
-		const matches = file.match( DOCS_PROPS_REGEX ) || [];
-		const data = matches.reduce(
-			( output, match ) => {
-
-				if ( ! match ) return output;
-
-				const type = match.replace( DOCS_PROPS_REGEX, '$1' );
-				const target = type === 'method' ? 'methods' : 'properties';
-
-				const value = match.replace( DOCS_PROPS_REGEX, '$2' );
-				if ( value ) output[ target ].push( value );
-
-				return output;
-
-			},
-			{
-				url: endpoint,
-				methods: [],
-				properties: [],
-			}
-		);
-
-		// Create entry in JSON tree
-		createTree( [ ...slugs, value ], data, output );
-
-		return output;
-
-	}, {} );
+	}
 
 	return list;
 
 };
 
-const list = createList( DOCS_PATH );
+// Write to list.json if specified via flag
+const args = process.argv.slice( 2 );
+const write = args.includes( '--write' );
 
-fs.writeFileSync(
-	path.join( DOCS_PATH, 'list.json' ),
-	JSON.stringify( list, null, '\t' )
-);
+createList( write );
 
 process.exit( 0 );
