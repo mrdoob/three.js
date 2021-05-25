@@ -48,6 +48,7 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
+		this.cameraAutoUpdate = true;
 		this.enabled = false;
 
 		this.isPresenting = false;
@@ -345,7 +346,7 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
-		this.getCamera = function ( camera ) {
+		this.updateCamera = function ( camera ) {
 
 			cameraVR.near = cameraR.near = cameraL.near = camera.near;
 			cameraVR.far = cameraR.far = cameraL.far = camera.far;
@@ -402,6 +403,10 @@ class WebXRManager extends EventDispatcher {
 				cameraVR.projectionMatrix.copy( cameraL.projectionMatrix );
 
 			}
+
+		};
+
+		this.getCamera = function () {
 
 			return cameraVR;
 
