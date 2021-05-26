@@ -504,7 +504,7 @@
 
 			const delta = clock.getDelta();
 			const elapsedTime = clock.elapsedTime;
-			if ( renderer.xr.isPresenting === true ) renderer.xr.updateCamera( camera );
+			renderer.xr.updateCamera( camera );
 			world.execute( delta, elapsedTime );
 			renderer.render( scene, camera );
 
