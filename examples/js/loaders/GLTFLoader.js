@@ -2295,6 +2295,7 @@
 			let isObjectURL = false;
 			let hasAlpha = true;
 			if ( source.mimeType === 'image/jpeg' ) hasAlpha = false;
+			if ( source.uri && source.uri.search( /\.jpe?g($|\?)/i ) > 0 ) hasAlpha = false;
 
 			if ( source.bufferView !== undefined ) {
 
