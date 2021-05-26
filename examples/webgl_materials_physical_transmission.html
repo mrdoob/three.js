@@ -23,7 +23,10 @@
 
 			const params = {
 				color: 0xffffff,
-				transmission: 0.90,
+				transmission: 1,
+				opacity: 1,
+				metalness: 0,
+				roughness: 0,
 				envMapIntensity: 1,
 				lightIntensity: 1,
 				exposure: 1
@@ -88,15 +91,14 @@
 
 				const material = new THREE.MeshPhysicalMaterial( {
 					color: params.color,
-					metalness: 0,
-					roughness: 0,
+					metalness: params.metalness,
+					roughness: params.roughness,
 					alphaMap: texture,
-					alphaTest: 0.5,
 					envMap: hdrCubeRenderTarget.texture,
 					envMapIntensity: params.envMapIntensity,
 					depthWrite: false,
 					transmission: params.transmission, // use material.transmission for glass materials
-					opacity: 1, // set material.opacity to 1 when material.transmission is non-zero
+					opacity: params.opacity,
 					transparent: true
 				} );
 
@@ -165,7 +167,7 @@
 
 					} );
 
-				gui.add( params, 'transmission', 0, 1 )
+				gui.add( params, 'transmission', 0, 1, 0.01 )
 					.onChange( function () {
 
 						material1.transmission = material2.transmission = params.transmission;
@@ -173,7 +175,31 @@
 
 					} );
 
-				gui.add( params, 'envMapIntensity', 0, 1 )
+				gui.add( params, 'opacity', 0, 1, 0.01 )
+					.onChange( function () {
+
+						material1.opacity = material2.opacity = params.opacity;
+						material1b.opacity = material2b.opacity = params.opacity;
+
+					} );
+
+				gui.add( params, 'metalness', 0, 1, 0.01 )
+					.onChange( function () {
+
+						material1.metalness = material2.metalness = params.metalness;
+						material1b.metalness = material2b.metalness = params.metalness;
+
+					} );
+
+				gui.add( params, 'roughness', 0, 1, 0.01 )
+					.onChange( function () {
+
+						material1.roughness = material2.roughness = params.roughness;
+						material1b.roughness = material2b.roughness = params.roughness;
+
+					} );
+
+				gui.add( params, 'envMapIntensity', 0, 1, 0.01 )
 					.name( 'envMap intensity' )
 					.onChange( function () {
 
@@ -182,7 +208,7 @@
 
 					} );
 
-				gui.add( params, 'lightIntensity', 0, 1 )
+				gui.add( params, 'lightIntensity', 0, 1, 0.01 )
 					.name( 'light intensity' )
 					.onChange( function () {
 
@@ -190,7 +216,7 @@
 
 					} );
 
-				gui.add( params, 'exposure', 0, 1 )
+				gui.add( params, 'exposure', 0, 1, 0.01 )
 					.onChange( function () {
 
 						renderer.toneMappingExposure = params.exposure;
