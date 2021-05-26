@@ -348,6 +348,8 @@ class WebXRManager extends EventDispatcher {
 
 		this.updateCamera = function ( camera ) {
 
+			if ( session === null ) return;
+
 			cameraVR.near = cameraR.near = cameraL.near = camera.near;
 			cameraVR.far = cameraR.far = cameraL.far = camera.far;
 
