@@ -117,13 +117,17 @@ function WebGLRenderList( properties ) {
 
 		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
 
-		if ( material.transmission !== undefined && material.transmission > 0.0 ) {
+		if ( material.transmission > 0.0 ) {
 
 			transmissive.push( renderItem );
 
+		} else if ( material.transparent === true ) {
+
+			transparent.push( renderItem );
+
 		} else {
 
-			( material.transparent === true ? transparent : opaque ).push( renderItem );
+			opaque.push( renderItem );
 
 		}
 
@@ -133,13 +137,17 @@ function WebGLRenderList( properties ) {
 
 		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
 
-		if ( material.transmission !== undefined && material.transmission > 0.0 ) {
+		if ( material.transmission > 0.0 ) {
 
 			transmissive.unshift( renderItem );
 
+		} else if ( material.transparent === true ) {
+
+			transparent.unshift( renderItem );
+
 		} else {
 
-			( material.transparent === true ? transparent : opaque ).unshift( renderItem );
+			opaque.unshift( renderItem );
 
 		}
 

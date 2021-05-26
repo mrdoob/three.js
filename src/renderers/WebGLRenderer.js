@@ -167,7 +167,6 @@ function WebGLRenderer( parameters ) {
 	// transmission
 
 	let _transmissionRenderTarget = null;
-	const _transmissionSamplerSize = new Vector2( 1024, 1024 ); // Should be configurable?
 
 	// camera matrices cache
 
@@ -1268,7 +1267,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( _transmissionRenderTarget === null ) {
 
-			_transmissionRenderTarget = new WebGLRenderTarget( _transmissionSamplerSize.x, _transmissionSamplerSize.y, {
+			_transmissionRenderTarget = new WebGLRenderTarget( 1024, 1024, {
 				generateMipmaps: true,
 				minFilter: LinearMipmapLinearFilter,
 				magFilter: NearestFilter,
@@ -1281,8 +1280,11 @@ function WebGLRenderer( parameters ) {
 		const currentRenderTarget = _this.getRenderTarget();
 		_this.setRenderTarget( _transmissionRenderTarget );
 		_this.clear();
+
 		renderObjects( opaqueObjects, scene, camera );
+
 		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
+
 		_this.setRenderTarget( currentRenderTarget );
 
 		renderObjects( transmissiveObjects, scene, camera );
