@@ -2038,7 +2038,17 @@ function WebGLRenderer( parameters ) {
 		const levelScale = Math.pow( 2, - level );
 		const width = Math.floor( texture.image.width * levelScale );
 		const height = Math.floor( texture.image.height * levelScale );
-		const glFormat = utils.convert( texture.format );
+
+		let glFormat = utils.convert( texture.format );
+
+		if ( capabilities.isWebGL2 ) {
+
+			// Workaround for https://bugs.chromium.org/p/chromium/issues/detail?id=1120100
+
+			if ( glFormat === _gl.RGB ) glFormat = _gl.RGB8;
+			if ( glFormat === _gl.RGBA ) glFormat = _gl.RGBA8;
+
+		}
 
 		textures.setTexture2D( texture, 0 );
 
