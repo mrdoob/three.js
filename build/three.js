@@ -13508,20 +13508,24 @@
 		function push(object, geometry, material, groupOrder, z, group) {
 			const renderItem = getNextRenderItem(object, geometry, material, groupOrder, z, group);
 
-			if (material.transmission !== undefined && material.transmission > 0.0) {
+			if (material.transmission > 0.0) {
 				transmissive.push(renderItem);
+			} else if (material.transparent === true) {
+				transparent.push(renderItem);
 			} else {
-				(material.transparent === true ? transparent : opaque).push(renderItem);
+				opaque.push(renderItem);
 			}
 		}
 
 		function unshift(object, geometry, material, groupOrder, z, group) {
 			const renderItem = getNextRenderItem(object, geometry, material, groupOrder, z, group);
 
-			if (material.transmission !== undefined && material.transmission > 0.0) {
+			if (material.transmission > 0.0) {
 				transmissive.unshift(renderItem);
+			} else if (material.transparent === true) {
+				transparent.unshift(renderItem);
 			} else {
-				(material.transparent === true ? transparent : opaque).unshift(renderItem);
+				opaque.unshift(renderItem);
 			}
 		}
 
@@ -17440,11 +17444,7 @@
 		let _clippingEnabled = false;
 		let _localClippingEnabled = false; // transmission
 
-		let _transmissionRenderTarget = null;
-
-		const _transmissionSamplerSize = new Vector2(1024, 1024); // Should be configurable?
-		// camera matrices cache
-
+		let _transmissionRenderTarget = null; // camera matrices cache
 
 		const _projScreenMatrix = new Matrix4();
 
@@ -18191,7 +18191,7 @@
 
 		function renderTransmissiveObjects(opaqueObjects, transmissiveObjects, scene, camera) {
 			if (_transmissionRenderTarget === null) {
-				_transmissionRenderTarget = new WebGLRenderTarget(_transmissionSamplerSize.x, _transmissionSamplerSize.y, {
+				_transmissionRenderTarget = new WebGLRenderTarget(1024, 1024, {
 					generateMipmaps: true,
 					minFilter: LinearMipmapLinearFilter,
 					magFilter: NearestFilter,

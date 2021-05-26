@@ -18000,13 +18000,17 @@ function WebGLRenderList( properties ) {
 
 		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
 
-		if ( material.transmission !== undefined && material.transmission > 0.0 ) {
+		if ( material.transmission > 0.0 ) {
 
 			transmissive.push( renderItem );
 
+		} else if ( material.transparent === true ) {
+
+			transparent.push( renderItem );
+
 		} else {
 
-			( material.transparent === true ? transparent : opaque ).push( renderItem );
+			opaque.push( renderItem );
 
 		}
 
@@ -18016,13 +18020,17 @@ function WebGLRenderList( properties ) {
 
 		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
 
-		if ( material.transmission !== undefined && material.transmission > 0.0 ) {
+		if ( material.transmission > 0.0 ) {
 
 			transmissive.unshift( renderItem );
 
+		} else if ( material.transparent === true ) {
+
+			transparent.unshift( renderItem );
+
 		} else {
 
-			( material.transparent === true ? transparent : opaque ).unshift( renderItem );
+			opaque.unshift( renderItem );
 
 		}
 
@@ -23626,7 +23634,6 @@ function WebGLRenderer( parameters ) {
 	// transmission
 
 	let _transmissionRenderTarget = null;
-	const _transmissionSamplerSize = new Vector2( 1024, 1024 ); // Should be configurable?
 
 	// camera matrices cache
 
@@ -24727,7 +24734,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( _transmissionRenderTarget === null ) {
 
-			_transmissionRenderTarget = new WebGLRenderTarget( _transmissionSamplerSize.x, _transmissionSamplerSize.y, {
+			_transmissionRenderTarget = new WebGLRenderTarget( 1024, 1024, {
 				generateMipmaps: true,
 				minFilter: LinearMipmapLinearFilter,
 				magFilter: NearestFilter,
@@ -24740,8 +24747,11 @@ function WebGLRenderer( parameters ) {
 		const currentRenderTarget = _this.getRenderTarget();
 		_this.setRenderTarget( _transmissionRenderTarget );
 		_this.clear();
+
 		renderObjects( opaqueObjects, scene, camera );
+
 		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
+
 		_this.setRenderTarget( currentRenderTarget );
 
 		renderObjects( transmissiveObjects, scene, camera );
