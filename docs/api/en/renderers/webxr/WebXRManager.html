@@ -19,6 +19,11 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:Boolean cameraAutoUpdate]</h3>
+		<p>
+		Whether the manager's XR camera should be automatically updated or not. Default is *true*.
+		</p>
+
 		<h3>[property:Boolean enabled]</h3>
 		<p>
 		This flag notifies the renderer to be ready for XR rendering. Default is *false*. Set it to *true* if you are going
@@ -32,11 +37,14 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:ArrayCamera getCamera]( [param:PerspectiveCamera camera] )</h3>
+		<h3>[method:ArrayCamera getCamera]()</h3>
 		<p>
 		Returns an instance of [page:ArrayCamera] which represents the XR camera of the active XR session.
 		For each view it holds a separate camera object in its [page:ArrayCamera.cameras cameras] property.
-		The method requires the non-XR camera of the scene as a parameter.
+		</p>
+		<p>
+		The camera's *fov* is currently not used and does not reflect the fov of the XR camera. If you need the fov on app level,
+		you have to compute in manually from the XR camera's projection matrices.
 		</p>
 
 		<h3>[method:Group getController]( [param:Integer index] )</h3>
@@ -99,6 +107,13 @@
 		Can be used to configure a spatial relationship with the user's physical environment. Depending on how the user moves in 3D space, setting an
 		appropriate reference space can improve tracking. Default is *local-floor*.
 		Please check out the [link:https://developer.mozilla.org/en-US/docs/Web/API/XRReferenceSpaceType MDN] for possible values and their use cases.
+		</p>
+
+		<h3>[method:void updateCamera]( [param:PerspectiveCamera camera] )</h3>
+		<p>
+		Updates the state of the XR camera. Use this method on app level if you set [page:.cameraAutoUpdate] to *false*.
+		The method requires the non-XR camera of the scene as a parameter. The passed in camera's transformation is automatically
+		adjusted to the position of the XR camera when calling this method.
 		</p>
 
 		<p>
