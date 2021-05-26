@@ -986,11 +986,20 @@ class GLTFWriter {
 
 				}
 
-				let data = image.data;
+				const data = new Uint8ClampedArray( image.height * image.width * 4 );
 
-				if ( format === RGBFormat ) {
+				if ( format === RGBAFormat ) {
 
-					data = new Uint8ClampedArray( image.height * image.width * 4 );
+					for ( let i = 0; i < data.length; i += 4 ) {
+
+						data[ i + 0 ] = image.data[ i + 0 ];
+						data[ i + 1 ] = image.data[ i + 1 ];
+						data[ i + 2 ] = image.data[ i + 2 ];
+						data[ i + 3 ] = image.data[ i + 3 ];
+
+					}
+
+				} else {
 
 					for ( let i = 0, j = 0; i < data.length; i += 4, j += 3 ) {
 
