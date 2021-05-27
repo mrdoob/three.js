@@ -418,6 +418,7 @@
 
 			"Utils": {
 				"BufferGeometryUtils": "examples/en/utils/BufferGeometryUtils",
+				"CameraUtils": "examples/en/utils/CameraUtils",
 				"SceneUtils": "examples/en/utils/SceneUtils",
 				"SkeletonUtils": "examples/en/utils/SkeletonUtils"
 			}

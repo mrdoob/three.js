@@ -49,7 +49,7 @@
 	"webgl_math_obb": [ "intersection", "bounding" ],
 	"webgl_math_orientation_transform": [ "rotation" ],
 	"webgl_mirror": [ "reflection" ],
-	"webgl_portal": [ "portal", "frameCorners", "renderTarget" ],
+	"webgl_portal": [ "frameCorners", "renderTarget" ],
 	"webgl_morphtargets_horse": [ "animation" ],
 	"webgl_multiple_elements": [ "differential equations", "physics" ],
 	"webgl_multiple_elements_text": [ "font" ],

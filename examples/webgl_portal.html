@@ -24,6 +24,7 @@
 
 			import * as THREE from '../build/three.module.js';
 
+			import { CameraUtils } from './jsm/utils/CameraUtils.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			let camera, scene, renderer;
@@ -33,7 +34,7 @@
 			let smallSphereOne, smallSphereTwo;
 
 			let portalCamera, leftPortal, rightPortal, leftPortalTexture, reflectedPosition,
-				rightPortalTexture, bottomLeftCorner, bottomRightCorner, topLeftCorner, frustumHelper;
+				rightPortalTexture, bottomLeftCorner, bottomRightCorner, topLeftCorner;
 
 			init();
 			animate();
@@ -191,7 +192,7 @@
 				otherPortalMesh.localToWorld( bottomRightCorner.set( - 50.05, - 50.05, 0.0 ) );
 				otherPortalMesh.localToWorld( topLeftCorner.set( 50.05, 50.05, 0.0 ) );
 				// set the projection matrix to encompass the portal's frame
-				portalCamera.frameCorners( bottomLeftCorner, bottomRightCorner, topLeftCorner, false );
+				CameraUtils.frameCorners( portalCamera, bottomLeftCorner, bottomRightCorner, topLeftCorner, false );
 
 				// render the portal
 				thisPortalTexture.texture.encoding = renderer.outputEncoding;
@@ -227,9 +228,9 @@
 				smallSphereTwo.rotation.z = timerTwo * 0.8;
 
 				// save the original camera properties
-				let currentRenderTarget = renderer.getRenderTarget();
-				let currentXrEnabled = renderer.xr.enabled;
-				let currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+				const currentRenderTarget = renderer.getRenderTarget();
+				const currentXrEnabled = renderer.xr.enabled;
+				const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 				renderer.xr.enabled = false; // Avoid camera modification
 				renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
