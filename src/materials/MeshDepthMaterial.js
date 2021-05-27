@@ -2,21 +2,20 @@ import { Material } from './Material.js';
 import { BasicDepthPacking } from '../constants.js';
 
 /**
- * parameters = {
- *
- *  opacity: <float>,
- *
- *  map: new THREE.Texture( <Image> ),
- *
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  displacementMap: new THREE.Texture( <Image> ),
- *  displacementScale: <float>,
- *  displacementBias: <float>,
- *
- *  wireframe: <boolean>,
- *  wireframeLinewidth: <float>
- * }
+ * @typedef { import('../textures/Texture.js').Texture } THREE.Texture
+ */
+/**
+ * @param {Parameters} parameters
+ * @template {{
+ *  opacity: number,
+ *  map: new THREE.Texture,
+ *  alphaMap: new THREE.Texture,
+ *  displacementMap: new THREE.Texture,
+ *  displacementScale: number,
+ *  displacementBias: number,
+ *  wireframe: number,
+ *  wireframeLinewidth: number
+ * }} Parameters
  */
 
 class MeshDepthMaterial extends Material {
