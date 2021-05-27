@@ -2548,11 +2548,13 @@ class GLTFParser {
 
 		const URL = self.URL || self.webkitURL;
 
-		let sourceURI = source.uri;
+		let sourceURI = source.uri || '';
 		let isObjectURL = false;
 		let hasAlpha = true;
 
-		if ( source.mimeType === 'image/jpeg' ) hasAlpha = false;
+		const isJPEG = sourceURI.search( /\.jpe?g($|\?)/i ) > 0 || sourceURI.search( /^data\:image\/jpeg/ ) === 0;
+
+		if ( source.mimeType === 'image/jpeg' || isJPEG ) hasAlpha = false;
 
 		if ( source.bufferView !== undefined ) {
 
