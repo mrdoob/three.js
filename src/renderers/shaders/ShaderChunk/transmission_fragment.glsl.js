@@ -16,7 +16,6 @@ export default /* glsl */`
 	vec3 pos = vWorldPosition.xyz / vWorldPosition.w;
 	vec3 v = normalize( cameraPosition - pos );
 	vec3 viewDir = ( isOrthographic ) ? vec3( 0, 0, 1 ) : normalize( vViewPosition );
-	vec3 n = normalize( vNormal );
 	float ior = ( 1.0 + 0.4 * reflectivity ) / ( 1.0 - 0.4 * reflectivity );
 
 	// From https://google.github.io/filament/Filament.html#materialsystem/parameterization/remapping
@@ -24,7 +23,7 @@ export default /* glsl */`
 	vec3 f90 = vec3( 1.0 );
 
 	vec3 f_transmission = totalTransmission * getIBLVolumeRefraction(
-		n, v, viewDir, roughnessFactor, diffuseColor.rgb, f0, f90,
+		normal, v, viewDir, roughnessFactor, diffuseColor.rgb, f0, f90,
 		pos, modelMatrix, viewMatrix, projectionMatrix, ior, thicknessFactor,
 		attenuationColor, attenuationDistance);
 
