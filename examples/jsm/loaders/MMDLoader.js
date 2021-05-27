@@ -2108,27 +2108,22 @@ class MMDToonMaterial extends ShaderMaterial {
 
 		this.alphaMap = null;
 
-		this.wireframe = false;
-		this.wireframeLinewidth = 1;
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
 		this.skinning = false;
-		this.morphTargets = false;
-		this.morphNormals = false;
 
-    this.uniforms = UniformsUtils.clone(MMDToonShader.uniforms);
-    this.vertexShader = MMDToonShader.vertexShader;
-    this.fragmentShader = MMDToonShader.fragmentShader;
+    parameters.uniforms = UniformsUtils.clone(MMDToonShader.uniforms);
+    parameters.uniforms.map.value = parameters.map;
+    parameters.uniforms.gradientMap.value = parameters.gradientMap;
+    parameters.uniforms.emissive.value = parameters.emissive;
 
-    this.uniforms.map.value = parameters.map;
-    this.uniforms.gradientMap.value = parameters.gradientMap;
-    this.uniforms.emissive.value = parameters.emissive;
+    parameters.vertexShader = MMDToonShader.vertexShader;
+    parameters.fragmentShader = MMDToonShader.fragmentShader;
 
-    this.lights = true;
+    parameters.lights = true;
 
     console.log('MMDToonMaterial.constructor() parameters:', parameters);
-    console.log('MMDToonMaterial.constructor() uniforms:', this.uniforms);
 
     this.setValues( parameters );
 
@@ -2166,16 +2161,10 @@ class MMDToonMaterial extends ShaderMaterial {
 
 		this.alphaMap = source.alphaMap;
 
-		this.wireframe = source.wireframe;
-		this.wireframeLinewidth = source.wireframeLinewidth;
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
 		this.skinning = source.skinning;
-		this.morphTargets = source.morphTargets;
-		this.morphNormals = source.morphNormals;
-
-    this.uniforms = UniformsUtils.clone( source.uniforms );
 
     return this;
 
