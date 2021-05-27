@@ -176,6 +176,16 @@ function SidebarMaterial( editor ) {
 	container.add( materialSheenRow );
 	*/
 
+	// transmission
+
+	var materialTransmissionRow = new UIRow();
+	var materialTransmission = new UINumber( 1 ).setWidth( '30px' ).setRange( 0, 1 ).onChange( update );
+
+	materialTransmissionRow.add( new UIText( strings.getKey( 'sidebar/material/transmission' ) ).setWidth( '90px' ) );
+	materialTransmissionRow.add( materialTransmission );
+
+	container.add( materialTransmissionRow );
+
 	// emissive
 
 	var materialEmissiveRow = new UIRow();
@@ -681,6 +691,12 @@ function SidebarMaterial( editor ) {
 
 			}
 			*/
+
+			if ( material.transmission !== undefined && Math.abs( material.transmission - materialTransmission.getValue() ) >= epsilon ) {
+
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'transmission', materialTransmission.getValue(), currentMaterialSlot ) );
+
+			}
 
 			if ( material.emissive !== undefined && material.emissive.getHex() !== materialEmissive.getHexValue() ) {
 
@@ -1232,6 +1248,7 @@ function SidebarMaterial( editor ) {
 			'metalness': materialMetalnessRow,
 			'emissive': materialEmissiveRow,
 			// 'sheen': materialSheenRow,
+			'transmission': materialTransmissionRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
 			'clearcoat': materialClearcoatRow,
@@ -1376,6 +1393,12 @@ function SidebarMaterial( editor ) {
 
 		}
 		*/
+
+		if ( material.transmission !== undefined ) {
+
+			materialTransmission.setValue( material.transmission );
+
+		}
 
 		if ( material.emissive !== undefined ) {
 
