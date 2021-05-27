@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 }(this, (function (exports) { 'use strict';
 
-	const REVISION = '129dev';
+	const REVISION = '129';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -22165,7 +22165,7 @@
 		}
 
 		toJSON() {
-			const data = BufferGeometry.prototype.toJSON.call(this);
+			const data = super.toJSON();
 			const shapes = this.parameters.shapes;
 			const options = this.parameters.options;
 			return toJSON$1(shapes, options, data);
@@ -22581,7 +22581,7 @@
 		}
 
 		toJSON() {
-			const data = BufferGeometry.prototype.toJSON.call(this);
+			const data = super.toJSON();
 			const shapes = this.parameters.shapes;
 			return toJSON(shapes, data);
 		}
@@ -22999,7 +22999,7 @@
 		}
 
 		toJSON() {
-			const data = BufferGeometry.prototype.toJSON.call(this);
+			const data = super.toJSON();
 			data.path = this.parameters.path.toJSON();
 			return data;
 		}
