@@ -16,6 +16,7 @@ import {
 	Interpolant,
 	Loader,
 	LoaderUtils,
+  UniformsUtils,
 	//MeshToonMaterial,
   ShaderMaterial,
 	MultiplyOperation,
@@ -38,7 +39,6 @@ import {
 	RGB_ETC1_Format,
 	RGB_ETC2_Format
 } from '../../../build/three.module.js';
-import { cloneUniforms } from '../../../src/renderers/shaders/UniformsUtils.js';
 import { MMDToonShader } from '../shaders/MMDToonShader.js';
 import { TGALoader } from '../loaders/TGALoader.js';
 import { MMDParser } from '../libs/mmdparser.module.js';
@@ -2117,11 +2117,15 @@ class MMDToonMaterial extends ShaderMaterial {
 		this.morphTargets = false;
 		this.morphNormals = false;
 
-    this.uniforms = cloneUniforms(MMDToonShader.uniforms);
+    this.uniforms = UniformsUtils.clone(MMDToonShader.uniforms);
     this.vertexShader = MMDToonShader.vertexShader;
     this.fragmentShader = MMDToonShader.fragmentShader;
 
     this.uniforms.map.value = parameters.map;
+    this.uniforms.gradientMap.value = parameters.gradientMap;
+    this.uniforms.emissive.value = parameters.emissive;
+
+    this.lights = true;
 
     console.log('MMDToonMaterial.constructor() parameters:', parameters);
     console.log('MMDToonMaterial.constructor() uniforms:', this.uniforms);
@@ -2171,7 +2175,7 @@ class MMDToonMaterial extends ShaderMaterial {
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
-    this.uniforms = cloneUniforms( source.uniforms );
+    this.uniforms = UniformsUtils.clone( source.uniforms );
 
     return this;
 
