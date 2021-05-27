@@ -237,12 +237,6 @@ function buildMesh( geometry ) {
 	const attributes = geometry.attributes;
 	const count = attributes.position.count;
 
-	if ( 'uv2' in attributes ) {
-
-		console.warn( 'THREE.USDZExporter: uv2 not supported yet.' );
-
-	}
-
 	return `
     def Mesh "${ name }"
     {
