@@ -396,6 +396,15 @@ ${array.join( '' )}
 		}
 
 		inputs.push( `${pad}float inputs:opacity = ${material.opacity}` );
+
+		if ( material.isMeshPhysicalMaterial ) {
+
+			inputs.push( `${pad}float inputs:clearcoat = ${material.clearcoat}` );
+			inputs.push( `${pad}float inputs:clearcoatRoughness = ${material.clearcoatRoughness}` );
+			inputs.push( `${pad}float inputs:ior = ${material.ior}` );
+
+		}
+
 		return `
     def Material "Material_${material.id}"
     {
