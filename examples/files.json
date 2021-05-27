@@ -173,6 +173,7 @@
 		"webgl_math_obb",
 		"webgl_math_orientation_transform",
 		"webgl_mirror",
+		"webgl_portal",
 		"webgl_modifier_curve",
 		"webgl_modifier_curve_instanced",
 		"webgl_modifier_edgesplit",
