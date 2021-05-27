@@ -14,8 +14,6 @@ class USDZExporter {
 
 		const materials = {};
 		const textures = {};
-		const materialsWithColor = new Set(); 
-		const coloredTextures = new Map(); // material -> diffuse map file name
 
 		scene.traverseVisible( ( object ) => {
 
@@ -36,20 +34,6 @@ class USDZExporter {
 				if ( ! ( material.uuid in materials ) ) {
 
 					materials[ material.uuid ] = material;
-					// note: material.colorWhite dows not work (always true for some reason)
-					const materialIsNotWhite = material.color.r != 1 || material.color.g != 1 || material.color.b != 1;
-					if ( material.map !== null ) {
-						if(materialIsNotWhite) {
-							materialsWithColor.add(material);
-						} else {
-							textures[ material.map.uuid ] = material.map;
-						}
-					}
-					if ( material.normalMap !== null ) textures[ material.normalMap.uuid ] = material.normalMap;
-					if ( material.aoMap !== null ) textures[ material.aoMap.uuid ] = material.aoMap;
-					if ( material.roughnessMap !== null ) textures[ material.roughnessMap.uuid ] = material.roughnessMap;
-					if ( material.metalnessMap !== null ) textures[ material.metalnessMap.uuid ] = material.metalnessMap;
-					if ( material.emissiveMap !== null ) textures[ material.emissiveMap.uuid ] = material.emissiveMap;
 
 				}
 
@@ -59,34 +43,19 @@ class USDZExporter {
 
 		} );
 
-		for (const material of materialsWithColor) {
-			const color256 = {
-				r: Math.floor(material.color.r * 256),
-				g: Math.floor(material.color.g * 256),
-				b: Math.floor(material.color.b * 256),
-			};
-			const textureSignature = `${material.map.id}_${color256.r}_${color256.g}_${color256.b}`;
-			const texturePath = `textures/Texture_${textureSignature}.jpg`;
-
-			if (!files[texturePath]) {
-				files[texturePath] = await imgToU8(material.map.image, color256);
-			}
-
-			coloredTextures.set(material, textureSignature);
-		}
-
-		output += buildMaterials( materials, coloredTextures );
+		output += buildMaterials( materials, textures );
 
 		files[ modelFileName ] = fflate.strToU8( output );
 		output = null;
 
-		for ( const uuid in textures ) {
+		for ( const id in textures ) {
 
-			const texture = textures[ uuid ];
-			files[ 'textures/Texture_' + texture.id + '.jpg' ] = await imgToU8( texture.image );
+			const texture = textures[ id ];
+			const color = id.split( '_' )[ 1 ];
+
+			files[ 'textures/Texture_' + id + '.jpg' ] = await imgToU8( texture.image, color );
 
 		}
-
 
 		// 64 byte alignment
 		// https://github.com/101arrowz/fflate/issues/39#issuecomment-777263109
@@ -115,12 +84,7 @@ class USDZExporter {
 
 		}
 
-		return await new Promise((resolve, reject) => {
-			fflate.zip(files, { level: 0 }, (err, zipped) => {
-				if (err) reject(err);
-				else resolve(zipped);
-			});
-		});
+		return fflate.zipSync( files, { level: 0 } );
 
 	}
 
@@ -142,10 +106,12 @@ async function imgToU8( image, color ) {
 		const context = canvas.getContext( '2d' );
 		context.drawImage( image, 0, 0, canvas.width, canvas.height );
 
-		if(!!color) {
-			context.globalCompositeOperation = "multiply";
-			context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
-			context.fillRect(0, 0, image.width, image.height);
+		if ( color !== undefined ) {
+
+			context.globalCompositeOperation = 'multiply';
+			context.fillStyle = `#${ color }`;
+			context.fillRect( 0, 0, canvas.width, canvas.height );
+
 		}
 
 		const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/jpeg', 1 ) );
@@ -330,7 +296,7 @@ function buildVector2Array( attribute, count ) {
 
 // Materials
 
-function buildMaterials( materials, coloredTextures ) {
+function buildMaterials( materials, textures ) {
 
 	const array = [];
 
@@ -338,7 +304,7 @@ function buildMaterials( materials, coloredTextures ) {
 
 		const material = materials[ uuid ];
 
-		array.push( buildMaterial( material, coloredTextures ) );
+		array.push( buildMaterial( material, textures ) );
 
 	}
 
@@ -351,17 +317,20 @@ ${ array.join( '' ) }
 
 }
 
-function buildMaterial( material, coloredTextures ) {
+function buildMaterial( material, textures ) {
 
 	// https://graphics.pixar.com/usd/docs/UsdPreviewSurface-Proposal.html
 
 	const pad = '            ';
-	const parameters = [];
-	const textures = [];
+	const inputs = [];
+	const samplers = [];
 
-	function buildTexture( texture, mapType, textureSignature ) {
+	function buildTexture( texture, mapType, color ) {
 
-		const textureId = textureSignature || texture.id;
+		const id = texture.id + ( color ? '_' + color.getHexString() : '' );
+
+		textures[ id ] = texture;
+
 		return `
         def Shader "Transform2d_${ mapType }" (
             sdrMetadata = {
@@ -379,7 +348,7 @@ function buildMaterial( material, coloredTextures ) {
         def Shader "Texture_${ texture.id }_${ mapType }"
         {
             uniform token info:id = "UsdUVTexture"
-            asset inputs:file = @textures/Texture_${ textureId }.jpg@
+            asset inputs:file = @textures/Texture_${ id }.jpg@
             float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
             token inputs:wrapS = "repeat"
             token inputs:wrapT = "repeat"
@@ -393,95 +362,95 @@ function buildMaterial( material, coloredTextures ) {
 
 	if ( material.map !== null ) {
 
-		parameters.push( `${ pad }color3f inputs:diffuseColor.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:rgb>` );
+		inputs.push( `${ pad }color3f inputs:diffuseColor.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:rgb>` );
 
-		textures.push( buildTexture( material.map, 'diffuse', coloredTextures.get(material) ) );
+		samplers.push( buildTexture( material.map, 'diffuse', material.color ) );
 
 	} else {
 
-		parameters.push( `${ pad }color3f inputs:diffuseColor = ${ buildColor( material.color ) }` );
+		inputs.push( `${ pad }color3f inputs:diffuseColor = ${ buildColor( material.color ) }` );
 
 	}
 
 	if ( material.emissiveMap !== null ) {
 
-		parameters.push( `${ pad }color3f inputs:emissiveColor.connect = </Materials/Material_${ material.id }/Texture_${ material.emissiveMap.id }_emissive.outputs:rgb>` );
+		inputs.push( `${ pad }color3f inputs:emissiveColor.connect = </Materials/Material_${ material.id }/Texture_${ material.emissiveMap.id }_emissive.outputs:rgb>` );
 
-		textures.push( buildTexture( material.emissiveMap, 'emissive' ) );
+		samplers.push( buildTexture( material.emissiveMap, 'emissive' ) );
 
 	} else if ( material.emissive.getHex() > 0 ) {
 
-		parameters.push( `${ pad }color3f inputs:emissiveColor = ${ buildColor( material.emissive ) }` );
+		inputs.push( `${ pad }color3f inputs:emissiveColor = ${ buildColor( material.emissive ) }` );
 
 	}
 
 	if ( material.normalMap !== null ) {
 
-		parameters.push( `${ pad }normal3f inputs:normal.connect = </Materials/Material_${ material.id }/Texture_${ material.normalMap.id }_normal.outputs:rgb>` );
+		inputs.push( `${ pad }normal3f inputs:normal.connect = </Materials/Material_${ material.id }/Texture_${ material.normalMap.id }_normal.outputs:rgb>` );
 
-		textures.push( buildTexture( material.normalMap, 'normal' ) );
+		samplers.push( buildTexture( material.normalMap, 'normal' ) );
 
 	}
 
 	if ( material.aoMap !== null ) {
 
-		parameters.push( `${ pad }float inputs:occlusion.connect = </Materials/Material_${ material.id }/Texture_${ material.aoMap.id }_occlusion.outputs:r>` );
+		inputs.push( `${ pad }float inputs:occlusion.connect = </Materials/Material_${ material.id }/Texture_${ material.aoMap.id }_occlusion.outputs:r>` );
 
-		textures.push( buildTexture( material.aoMap, 'occlusion' ) );
+		samplers.push( buildTexture( material.aoMap, 'occlusion' ) );
 
 	}
 
 	if ( material.roughnessMap !== null ) {
 
-		parameters.push( `${ pad }float inputs:roughness.connect = </Materials/Material_${ material.id }/Texture_${ material.roughnessMap.id }_roughness.outputs:g>` );
+		inputs.push( `${ pad }float inputs:roughness.connect = </Materials/Material_${ material.id }/Texture_${ material.roughnessMap.id }_roughness.outputs:g>` );
 
-		textures.push( buildTexture( material.roughnessMap, 'roughness' ) );
+		samplers.push( buildTexture( material.roughnessMap, 'roughness' ) );
 
 	} else {
 
-		parameters.push( `${ pad }float inputs:roughness = ${ material.roughness }` );
+		inputs.push( `${ pad }float inputs:roughness = ${ material.roughness }` );
 
 	}
 
 	if ( material.metalnessMap !== null ) {
 
-		parameters.push( `${ pad }float inputs:metallic.connect = </Materials/Material_${ material.id }/Texture_${ material.metalnessMap.id }_metallic.outputs:b>` );
+		inputs.push( `${ pad }float inputs:metallic.connect = </Materials/Material_${ material.id }/Texture_${ material.metalnessMap.id }_metallic.outputs:b>` );
 
-		textures.push( buildTexture( material.metalnessMap, 'metallic' ) );
+		samplers.push( buildTexture( material.metalnessMap, 'metallic' ) );
 
 	} else {
 
-		parameters.push( `${ pad }float inputs:metallic = ${ material.metalness }` );
+		inputs.push( `${ pad }float inputs:metallic = ${ material.metalness }` );
 
 	}
 
-	parameters.push( `${ pad }float inputs:opacity = ${ material.opacity }` );
+	inputs.push( `${ pad }float inputs:opacity = ${ material.opacity }` );
 
 	return `
-	def Material "Material_${ material.id }"
-	{
-			def Shader "PreviewSurface"
-			{
-					uniform token info:id = "UsdPreviewSurface"
-${ parameters.join( '\n' ) }
-					int inputs:useSpecularWorkflow = 0
-					token outputs:surface
-			}
+    def Material "Material_${ material.id }"
+    {
+        def Shader "PreviewSurface"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+${ inputs.join( '\n' ) }
+            int inputs:useSpecularWorkflow = 0
+            token outputs:surface
+        }
 
-			token outputs:surface.connect = </Materials/Material_${ material.id }/PreviewSurface.outputs:surface>
-			token inputs:frame:stPrimvarName = "st"
+        token outputs:surface.connect = </Materials/Material_${ material.id }/PreviewSurface.outputs:surface>
+        token inputs:frame:stPrimvarName = "st"
 
-			def Shader "uvReader_st"
-			{
-					uniform token info:id = "UsdPrimvarReader_float2"
-					token inputs:varname.connect = </Materials/Material_${ material.id }.inputs:frame:stPrimvarName>
-					float2 inputs:fallback = (0.0, 0.0)
-					float2 outputs:result
-			}
+        def Shader "uvReader_st"
+        {
+            uniform token info:id = "UsdPrimvarReader_float2"
+            token inputs:varname.connect = </Materials/Material_${ material.id }.inputs:frame:stPrimvarName>
+            float2 inputs:fallback = (0.0, 0.0)
+            float2 outputs:result
+        }
 
-${ textures.join( '\n' ) }
+${ samplers.join( '\n' ) }
 
-	}
+    }
 `;
 
 }
