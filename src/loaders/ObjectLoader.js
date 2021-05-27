@@ -34,6 +34,7 @@ import { SkinnedMesh } from '../objects/SkinnedMesh.js';
 import { Bone } from '../objects/Bone.js';
 import { Skeleton } from '../objects/Skeleton.js';
 import { Shape } from '../extras/core/Shape.js';
+import { Font } from '../extras/core/Font.js';
 import { Fog } from '../scenes/Fog.js';
 import { FogExp2 } from '../scenes/FogExp2.js';
 import { HemisphereLight } from '../lights/HemisphereLight.js';
@@ -117,7 +118,8 @@ class ObjectLoader extends Loader {
 
 		const animations = this.parseAnimations( json.animations );
 		const shapes = this.parseShapes( json.shapes );
-		const geometries = this.parseGeometries( json.geometries, shapes );
+		const fonts = this.parseFonts( json.fonts );
+		const geometries = this.parseGeometries( json.geometries, shapes, fonts );
 
 		const images = this.parseImages( json.images, function () {
 
@@ -178,6 +180,26 @@ class ObjectLoader extends Loader {
 
 	}
 
+	parseFonts( json ) {
+
+		const fonts = {};
+
+		if ( json !== undefined ) {
+
+			for ( let i = 0, l = json.length; i < l; i ++ ) {
+
+				const font = new Font().fromJSON( json[ i ] );
+
+				fonts[ font.uuid ] = font;
+
+			}
+
+		}
+
+		return fonts;
+
+	}
+
 	parseSkeletons( json, object ) {
 
 		const skeletons = {};
@@ -209,7 +231,7 @@ class ObjectLoader extends Loader {
 
 	}
 
-	parseGeometries( json, shapes ) {
+	parseGeometries( json, shapes, fonts ) {
 
 		const geometries = {};
 		let geometryShapes;
@@ -449,6 +471,18 @@ class ObjectLoader extends Loader {
 
 						geometry = new Geometries[ data.type ](
 							geometryShapes,
+							data.options
+						);
+
+						break;
+
+					case 'TextGeometry':
+					case 'TextBufferGeometry':
+
+						data.options.font = fonts[ data.options.font ];
+
+						geometry = new Geometries[ data.type ](
+							data.text,
 							data.options
 						);
 

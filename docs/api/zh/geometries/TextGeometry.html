@@ -50,6 +50,7 @@
 				bevelEnabled: true,
 				bevelThickness: 10,
 				bevelSize: 8,
+				bevelOffset: 0,
 				bevelSegments: 5
 			} );
 		} );
@@ -63,10 +64,10 @@
 
 		<h2>构造器</h2>
 
-		<h3>[name]([param:String text], [param:Object parameters])</h3>
+		<h3>[name]([param:String text], [param:Object options])</h3>
 		<p>
 		text — 将要显示的文本。<br />
-		parameters — 包含有下列参数的对象：
+		options — 包含有下列参数的对象：
 		<ul>
 			<li>font — THREE.Font的实例。</li>
 			<li>size — Float。字体大小，默认值为100。</li>

@@ -670,6 +670,7 @@ class Object3D extends EventDispatcher {
 				textures: {},
 				images: {},
 				shapes: {},
+				fonts: {},
 				skeletons: {},
 				animations: {}
 			};
@@ -733,23 +734,37 @@ class Object3D extends EventDispatcher {
 
 			const parameters = this.geometry.parameters;
 
-			if ( parameters !== undefined && parameters.shapes !== undefined ) {
+			if ( parameters !== undefined ) {
 
-				const shapes = parameters.shapes;
+				// shapes
 
-				if ( Array.isArray( shapes ) ) {
+				if ( parameters.shapes !== undefined ) {
 
-					for ( let i = 0, l = shapes.length; i < l; i ++ ) {
+					const shapes = parameters.shapes;
 
-						const shape = shapes[ i ];
+					if ( Array.isArray( shapes ) ) {
 
-						serialize( meta.shapes, shape );
+						for ( let i = 0, l = shapes.length; i < l; i ++ ) {
+
+							const shape = shapes[ i ];
+
+							serialize( meta.shapes, shape );
+
+						}
+
+					} else {
+
+						serialize( meta.shapes, shapes );
 
 					}
 
-				} else {
+				}
 
-					serialize( meta.shapes, shapes );
+				// fonts
+
+				if ( parameters.font !== undefined ) {
+
+					serialize( meta.fonts, parameters.font );
 
 				}
 
@@ -831,6 +846,7 @@ class Object3D extends EventDispatcher {
 			const textures = extractFromCache( meta.textures );
 			const images = extractFromCache( meta.images );
 			const shapes = extractFromCache( meta.shapes );
+			const fonts = extractFromCache( meta.fonts );
 			const skeletons = extractFromCache( meta.skeletons );
 			const animations = extractFromCache( meta.animations );
 
@@ -839,6 +855,7 @@ class Object3D extends EventDispatcher {
 			if ( textures.length > 0 ) output.textures = textures;
 			if ( images.length > 0 ) output.images = images;
 			if ( shapes.length > 0 ) output.shapes = shapes;
+			if ( fonts.length > 0 ) output.fonts = fonts;
 			if ( skeletons.length > 0 ) output.skeletons = skeletons;
 			if ( animations.length > 0 ) output.animations = animations;
 

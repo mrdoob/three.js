@@ -94,9 +94,11 @@
 		内部使用[page:.load]()进行加载, 但也可以直接用于解析先前加载的JSON结构。
 		</p>
 
-		<h3>[method:Object3D parseGeometries]( [param:Object json] )</h3>
+		<h3>[method:Object3D parseGeometries]( [param:Object json], [param:Object shapes], [param:Object fonts] )</h3>
 		<p>
-		[page:Object json] — 必选参数，需要被解析的JSON源。<br /><br />
+		[page:Object json] — 必选参数，需要被解析的JSON源。<br />
+		[page:Object shape] — required. A dictionary holding shapes.<br />
+		[page:Object fonts] — required. A dictionary holding fonts.<br /><br />
 
 			此函数以JSON结构，用[page:.parse]()去解析[page:BufferGeometry geometries]。
 		</p>

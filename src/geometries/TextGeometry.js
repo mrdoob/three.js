@@ -20,9 +20,9 @@ import { ExtrudeGeometry } from './ExtrudeGeometry.js';
 
 class TextGeometry extends ExtrudeGeometry {
 
-	constructor( text, parameters = {} ) {
+	constructor( text, options = {} ) {
 
-		const font = parameters.font;
+		const font = options.font;
 
 		if ( ! ( font && font.isFont ) ) {
 
@@ -31,21 +31,38 @@ class TextGeometry extends ExtrudeGeometry {
 
 		}
 
-		const shapes = font.generateShapes( text, parameters.size );
+		const shapes = font.generateShapes( text, options.size );
 
 		// translate parameters to ExtrudeGeometry API
 
-		parameters.depth = parameters.height !== undefined ? parameters.height : 50;
+		options.depth = options.height !== undefined ? options.height : 50;
 
 		// defaults
 
-		if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
-		if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
-		if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
+		if ( options.bevelThickness === undefined ) options.bevelThickness = 10;
+		if ( options.bevelSize === undefined ) options.bevelSize = 8;
+		if ( options.bevelEnabled === undefined ) options.bevelEnabled = false;
 
-		super( shapes, parameters );
+		super( shapes, options );
 
 		this.type = 'TextGeometry';
+
+		this.parameters = {
+			text: text,
+			font: font, // store font in parameters so it can be easier processed in Object3D.toJSON() (need to remove it in TextGeometry.toJSON() again)
+			options: options
+		};
+
+	}
+
+	toJSON() {
+
+		const data = super.toJSON();
+
+		delete data.font;
+		data.options.font = this.parameters.font.uuid;
+
+		return data;
 
 	}
 

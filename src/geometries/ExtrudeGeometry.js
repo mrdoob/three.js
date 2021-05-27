@@ -757,21 +757,25 @@ const WorldUVGenerator = {
 
 function toJSON( shapes, options, data ) {
 
-	data.shapes = [];
+	if ( shapes !== undefined ) {
 
-	if ( Array.isArray( shapes ) ) {
+		data.shapes = [];
 
-		for ( let i = 0, l = shapes.length; i < l; i ++ ) {
+		if ( Array.isArray( shapes ) ) {
 
-			const shape = shapes[ i ];
+			for ( let i = 0, l = shapes.length; i < l; i ++ ) {
 
-			data.shapes.push( shape.uuid );
+				const shape = shapes[ i ];
+
+				data.shapes.push( shape.uuid );
+
+			}
+
+		} else {
+
+			data.shapes.push( shapes.uuid );
 
 		}
-
-	} else {
-
-		data.shapes.push( shapes.uuid );
 
 	}
 

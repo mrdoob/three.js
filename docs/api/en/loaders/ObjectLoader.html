@@ -94,9 +94,11 @@
 		This is used internally by [page:.load]() but can also be used directly to parse a previously loaded JSON structure.
 		</p>
 
-		<h3>[method:Object3D parseGeometries]( [param:Object json] )</h3>
+		<h3>[method:Object3D parseGeometries]( [param:Object json], [param:Object shapes], [param:Object fonts] )</h3>
 		<p>
-		[page:Object json] — required. The JSON source to parse.<br /><br />
+		[page:Object json] — required. The JSON source to parse.<br />
+		[page:Object shape] — required. A dictionary holding shapes.<br />
+		[page:Object fonts] — required. A dictionary holding fonts.<br /><br />
 
 		This is used by [page:.parse]() to parse any [page:BufferGeometry geometries] in the JSON structure.
 		</p>

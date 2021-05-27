@@ -1,8 +1,11 @@
 import { ShapePath } from './ShapePath.js';
+import * as MathUtils from '../../math/MathUtils.js';
 
 class Font {
 
 	constructor( data ) {
+
+		this.uuid = MathUtils.generateUUID();
 
 		this.type = 'Font';
 
@@ -22,6 +25,24 @@ class Font {
 		}
 
 		return shapes;
+
+	}
+
+	fromJSON( json ) {
+
+		this.uuid = json.uuid;
+		this.data = json.data;
+
+		return this;
+
+	}
+
+	toJSON() {
+
+		return {
+			uuid: this.uuid,
+			data: this.data
+		};
 
 	}
 
