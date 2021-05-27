@@ -132,18 +132,6 @@
 
 				//
 
-				const spotLight1 = new THREE.SpotLight( 0xffffff, params.lightIntensity );
-				spotLight1.position.set( 100, 200, 100 );
-				spotLight1.angle = Math.PI / 6;
-				scene.add( spotLight1 );
-
-				const spotLight2 = new THREE.SpotLight( 0xffffff, params.lightIntensity );
-				spotLight2.position.set( - 100, - 200, - 100 );
-				spotLight2.angle = Math.PI / 6;
-				scene.add( spotLight2 );
-
-				//
-
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
@@ -205,14 +193,6 @@
 
 						material1.envMapIntensity = material2.envMapIntensity = params.envMapIntensity;
 						material1b.envMapIntensity = material2b.envMapIntensity = params.envMapIntensity;
-
-					} );
-
-				gui.add( params, 'lightIntensity', 0, 1, 0.01 )
-					.name( 'light intensity' )
-					.onChange( function () {
-
-						spotLight1.intensity = spotLight2.intensity = params.lightIntensity;
 
 					} );
 
