@@ -100,6 +100,9 @@ void main() {
 	#include <clearcoat_normal_fragment_begin>
 	#include <clearcoat_normal_fragment_maps>
 	#include <emissivemap_fragment>
+
+	vec3 rawDiffuseColor = diffuseColor.rgb;
+
 	#include <transmission_fragment>
 
 	// accumulation
