@@ -3,8 +3,10 @@ import {
 	AnimationClip,
 	Bone,
 	BufferGeometry,
+  Vector2,
 	Color,
 	CustomBlending,
+  TangentSpaceNormalMap,
 	DoubleSide,
 	DstAlphaFactor,
 	Euler,
@@ -14,7 +16,8 @@ import {
 	Interpolant,
 	Loader,
 	LoaderUtils,
-	MeshToonMaterial,
+	//MeshToonMaterial,
+  ShaderMaterial,
 	MultiplyOperation,
 	NearestFilter,
 	NumberKeyframeTrack,
@@ -35,6 +38,8 @@ import {
 	RGB_ETC1_Format,
 	RGB_ETC2_Format
 } from '../../../build/three.module.js';
+import { cloneUniforms } from '../../../src/renderers/shaders/UniformsUtils.js';
+import { MMDToonShader } from '../shaders/MMDToonShader.js';
 import { TGALoader } from '../loaders/TGALoader.js';
 import { MMDParser } from '../libs/mmdparser.module.js';
 
@@ -1198,6 +1203,7 @@ class MaterialBuilder {
 				if ( material.textureIndex !== - 1 ) {
 
 					params.map = this._loadTexture( data.textures[ material.textureIndex ], textures );
+					params.map.name = material.name;
 
 				}
 
@@ -1263,7 +1269,11 @@ class MaterialBuilder {
 
 			}
 
-			materials.push( new MMDToonMaterial( params ) );
+      const mmdToomMaterial = new MMDToonMaterial( params );
+
+      console.log('material:', mmdToomMaterial);
+
+			materials.push( mmdToomMaterial );
 
 		}
 
@@ -2064,11 +2074,57 @@ class CubicBezierInterpolation extends Interpolant {
 
 }
 
-class MMDToonMaterial extends MeshToonMaterial {
+class MMDToonMaterial extends ShaderMaterial {
 
 	constructor( parameters ) {
 
 		super();
+
+    this.color = new Color( 0xffffff );
+
+		this.map = null;
+		this.gradientMap = null;
+
+		this.lightMap = null;
+		this.lightMapIntensity = 1.0;
+
+		this.aoMap = null;
+		this.aoMapIntensity = 1.0;
+
+		this.emissive = new Color( 0x000000 );
+		this.emissiveIntensity = 1.0;
+		this.emissiveMap = null;
+
+		this.bumpMap = null;
+		this.bumpScale = 1;
+
+		this.normalMap = null;
+		this.normalMapType = TangentSpaceNormalMap;
+		this.normalScale = new Vector2( 1, 1 );
+
+		this.displacementMap = null;
+		this.displacementScale = 1;
+		this.displacementBias = 0;
+
+		this.alphaMap = null;
+
+		this.wireframe = false;
+		this.wireframeLinewidth = 1;
+		this.wireframeLinecap = 'round';
+		this.wireframeLinejoin = 'round';
+
+		this.skinning = false;
+		this.morphTargets = false;
+		this.morphNormals = false;
+
+    this.uniforms = cloneUniforms(MMDToonShader.uniforms);
+    this.vertexShader = MMDToonShader.vertexShader;
+    this.fragmentShader = MMDToonShader.fragmentShader;
+
+    this.uniforms.map.value = parameters.map;
+
+    console.log('MMDToonMaterial.constructor() parameters:', parameters);
+    console.log('MMDToonMaterial.constructor() uniforms:', this.uniforms);
 
     this.setValues( parameters );
 
@@ -2078,8 +2134,51 @@ class MMDToonMaterial extends MeshToonMaterial {
 
     super.copy( source );
 
+    this.color.copy( source.color );
+
+		this.map = source.map;
+		this.gradientMap = source.gradientMap;
+
+		this.lightMap = source.lightMap;
+		this.lightMapIntensity = source.lightMapIntensity;
+
+		this.aoMap = source.aoMap;
+		this.aoMapIntensity = source.aoMapIntensity;
+
+		this.emissive.copy( source.emissive );
+		this.emissiveMap = source.emissiveMap;
+		this.emissiveIntensity = source.emissiveIntensity;
+
+		this.bumpMap = source.bumpMap;
+		this.bumpScale = source.bumpScale;
+
+		this.normalMap = source.normalMap;
+		this.normalMapType = source.normalMapType;
+		this.normalScale.copy( source.normalScale );
+
+		this.displacementMap = source.displacementMap;
+		this.displacementScale = source.displacementScale;
+		this.displacementBias = source.displacementBias;
+
+		this.alphaMap = source.alphaMap;
+
+		this.wireframe = source.wireframe;
+		this.wireframeLinewidth = source.wireframeLinewidth;
+		this.wireframeLinecap = source.wireframeLinecap;
+		this.wireframeLinejoin = source.wireframeLinejoin;
+
+		this.skinning = source.skinning;
+		this.morphTargets = source.morphTargets;
+		this.morphNormals = source.morphNormals;
+
+    this.uniforms = cloneUniforms( source.uniforms );
+
+    return this;
+
   }
 
 }
+
+MMDToonMaterial.prototype.isMMDToonMaterial = true;
 
 export { MMDLoader };
