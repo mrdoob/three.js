@@ -176,6 +176,16 @@ function SidebarMaterial( editor ) {
 	container.add( materialSheenRow );
 	*/
 
+	// transmission
+
+	var materialTransmissionRow = new UIRow();
+	var materialTransmission = new UINumber( 1 ).setWidth( '30px' ).setRange( 0, 1 ).onChange( update );
+
+	materialTransmissionRow.add( new UIText( strings.getKey( 'sidebar/material/transmission' ) ).setWidth( '90px' ) );
+	materialTransmissionRow.add( materialTransmission );
+
+	container.add( materialTransmissionRow );
+
 	// emissive
 
 	var materialEmissiveRow = new UIRow();
@@ -261,16 +271,6 @@ function SidebarMaterial( editor ) {
 	materialDepthPackingRow.add( materialDepthPacking );
 
 	container.add( materialDepthPackingRow );
-
-	// skinning
-
-	var materialSkinningRow = new UIRow();
-	var materialSkinning = new UICheckbox( false ).onChange( update );
-
-	materialSkinningRow.add( new UIText( strings.getKey( 'sidebar/material/skinning' ) ).setWidth( '90px' ) );
-	materialSkinningRow.add( materialSkinning );
-
-	container.add( materialSkinningRow );
 
 	// map
 
@@ -692,6 +692,12 @@ function SidebarMaterial( editor ) {
 			}
 			*/
 
+			if ( material.transmission !== undefined && Math.abs( material.transmission - materialTransmission.getValue() ) >= epsilon ) {
+
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'transmission', materialTransmission.getValue(), currentMaterialSlot ) );
+
+			}
+
 			if ( material.emissive !== undefined && material.emissive.getHex() !== materialEmissive.getHexValue() ) {
 
 				editor.execute( new SetMaterialColorCommand( editor, currentObject, 'emissive', materialEmissive.getHexValue(), currentMaterialSlot ) );
@@ -748,12 +754,6 @@ function SidebarMaterial( editor ) {
 					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'depthPacking', depthPacking, currentMaterialSlot ) );
 
 				}
-
-			}
-
-			if ( material.skinning !== undefined && material.skinning !== materialSkinning.getValue() ) {
-
-				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'skinning', materialSkinning.getValue(), currentMaterialSlot ) );
 
 			}
 
@@ -1248,6 +1248,7 @@ function SidebarMaterial( editor ) {
 			'metalness': materialMetalnessRow,
 			'emissive': materialEmissiveRow,
 			// 'sheen': materialSheenRow,
+			'transmission': materialTransmissionRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
 			'clearcoat': materialClearcoatRow,
@@ -1256,7 +1257,6 @@ function SidebarMaterial( editor ) {
 			'vertexColors': materialVertexColorsRow,
 			'vertexTangents': materialVertexTangentsRow,
 			'depthPacking': materialDepthPackingRow,
-			'skinning': materialSkinningRow,
 			'map': materialMapRow,
 			'matcap': materialMatcapMapRow,
 			'alphaMap': materialAlphaMapRow,
@@ -1394,6 +1394,12 @@ function SidebarMaterial( editor ) {
 		}
 		*/
 
+		if ( material.transmission !== undefined ) {
+
+			materialTransmission.setValue( material.transmission );
+
+		}
+
 		if ( material.emissive !== undefined ) {
 
 			materialEmissive.setHexValue( material.emissive.getHexString() );
@@ -1435,12 +1441,6 @@ function SidebarMaterial( editor ) {
 		if ( material.depthPacking !== undefined ) {
 
 			materialDepthPacking.setValue( material.depthPacking );
-
-		}
-
-		if ( material.skinning !== undefined ) {
-
-			materialSkinning.setValue( material.skinning );
 
 		}
 

@@ -342,7 +342,6 @@
 
 			}
 
-
 			const renderList = new RenderList();
 
 			function projectObject( object ) {

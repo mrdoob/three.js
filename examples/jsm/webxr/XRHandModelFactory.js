@@ -7,8 +7,8 @@ import {
 } from './XRHandPrimitiveModel.js';
 
 import {
-	XRHandOculusMeshModel
-} from './XRHandOculusMeshModel.js';
+	XRHandMeshModel
+} from './XRHandMeshModel.js';
 
 class XRHandModel extends Object3D {
 
@@ -42,18 +42,19 @@ class XRHandModelFactory {
 
 	constructor() {
 
-		this.path = '';
+		this.path = null;
 
 	}
 
 	setPath( path ) {
 
 		this.path = path;
+
 		return this;
 
 	}
 
-	createHandModel( controller, profile, options ) {
+	createHandModel( controller, profile ) {
 
 		const handModel = new XRHandModel( controller );
 
@@ -63,7 +64,6 @@ class XRHandModelFactory {
 
 			if ( xrInputSource.hand && ! handModel.motionController ) {
 
-				handModel.visible = true;
 				handModel.xrInputSource = xrInputSource;
 
 				// @todo Detect profile if not provided
@@ -75,9 +75,9 @@ class XRHandModelFactory {
 
 					handModel.motionController = new XRHandPrimitiveModel( handModel, controller, this.path, xrInputSource.handedness, { primitive: 'box' } );
 
-				} else if ( profile === 'oculus' ) {
+				} else if ( profile === 'mesh' ) {
 
-					handModel.motionController = new XRHandOculusMeshModel( handModel, controller, this.path, xrInputSource.handedness, options );
+					handModel.motionController = new XRHandMeshModel( handModel, controller, this.path, xrInputSource.handedness );
 
 				}
 

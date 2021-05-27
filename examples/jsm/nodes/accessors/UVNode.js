@@ -1,54 +1,56 @@
 import { TempNode } from '../core/TempNode.js';
 import { NodeLib } from '../core/NodeLib.js';
 
-function UVNode( index ) {
+class UVNode extends TempNode {
 
-	TempNode.call( this, 'v2', { shared: false } );
+	constructor( index ) {
 
-	this.index = index || 0;
+		super( 'v2', { shared: false } );
 
-}
-
-UVNode.prototype = Object.create( TempNode.prototype );
-UVNode.prototype.constructor = UVNode;
-UVNode.prototype.nodeType = 'UV';
-
-UVNode.prototype.generate = function ( builder, output ) {
-
-	builder.requires.uv[ this.index ] = true;
-
-	var uvIndex = this.index > 0 ? this.index + 1 : '';
-	var result = builder.isShader( 'vertex' ) ? 'uv' + uvIndex : 'vUv' + uvIndex;
-
-	return builder.format( result, this.getType( builder ), output );
-
-};
-
-UVNode.prototype.copy = function ( source ) {
-
-	TempNode.prototype.copy.call( this, source );
-
-	this.index = source.index;
-
-	return this;
-
-};
-
-UVNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.index = this.index;
+		this.index = index || 0;
 
 	}
 
-	return data;
+	generate( builder, output ) {
 
-};
+		builder.requires.uv[ this.index ] = true;
+
+		const uvIndex = this.index > 0 ? this.index + 1 : '';
+		const result = builder.isShader( 'vertex' ) ? 'uv' + uvIndex : 'vUv' + uvIndex;
+
+		return builder.format( result, this.getType( builder ), output );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.index = source.index;
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		let data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			data = this.createJSONNode( meta );
+
+			data.index = this.index;
+
+		}
+
+		return data;
+
+	}
+
+}
+
+UVNode.prototype.nodeType = 'UV';
 
 NodeLib.addKeyword( 'uv', function () {
 

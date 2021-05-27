@@ -364,6 +364,7 @@
 
 				} else {
 
+					loader.setPath( this.textureLoader.path );
 					texture = loader.load( fileName );
 
 				}
@@ -1157,11 +1158,6 @@
 
 			if ( geometry.FBX_Deformer ) {
 
-				materials.forEach( function ( material ) {
-
-					material.skinning = true;
-
-				} );
 				model = new THREE.SkinnedMesh( geometry, material );
 				model.normalizeSkinWeights();
 
