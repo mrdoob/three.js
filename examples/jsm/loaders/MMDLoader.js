@@ -2108,6 +2108,11 @@ class MMDToonMaterial extends ShaderMaterial {
 
 		this.alphaMap = null;
 
+    this.envMap = null;
+    this.combine = MultiplyOperation;
+    this.reflectivity = 1;
+    this.refractionRatio = 0.98;
+
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
@@ -2115,8 +2120,11 @@ class MMDToonMaterial extends ShaderMaterial {
 
     parameters.uniforms = UniformsUtils.clone(MMDToonShader.uniforms);
     parameters.uniforms.map.value = parameters.map;
-    parameters.uniforms.gradientMap.value = parameters.gradientMap;
+    parameters.uniforms.envMap.value = parameters.envMap;
+    parameters.uniforms.reflectivity.value = parameters.reflectivity;
+    parameters.uniforms.refractionRatio.value = parameters.refractionRatio;
     parameters.uniforms.emissive.value = parameters.emissive;
+    parameters.uniforms.gradientMap.value = parameters.gradientMap;
 
     parameters.vertexShader = MMDToonShader.vertexShader;
     parameters.fragmentShader = MMDToonShader.fragmentShader;
@@ -2160,6 +2168,11 @@ class MMDToonMaterial extends ShaderMaterial {
 		this.displacementBias = source.displacementBias;
 
 		this.alphaMap = source.alphaMap;
+
+    this.envMap = source.envMap;
+    this.combine = source.combine;
+    this.reflectivity = source.reflectivity;
+    this.refractionRatio = source.refractionRatio;
 
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;

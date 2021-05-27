@@ -13,10 +13,11 @@ const MMDToonShader = {
     ShaderLib.matcap.uniforms,
   ] ),
 
+	// vertexShader: '#define TOON' + '\n' + ShaderLib.phong.vertexShader,
 	vertexShader: ShaderLib.toon.vertexShader,
 
 	fragmentShader: ShaderLib.toon.fragmentShader,
-
+ 
 };
 
 export { MMDToonShader };
