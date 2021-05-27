@@ -14,6 +14,8 @@ class USDZExporter {
 
 		const materials = {};
 		const textures = {};
+		const materialsWithColor = new Set(); 
+		const coloredTextures = new Map(); // material -> diffuse map file name
 
 		scene.traverseVisible( ( object ) => {
 
@@ -34,7 +36,15 @@ class USDZExporter {
 				if ( ! ( material.uuid in materials ) ) {
 
 					materials[ material.uuid ] = material;
-					if ( material.map !== null ) textures[ material.map.uuid ] = material.map;
+					// note: material.colorWhite dows not work (always true for some reason)
+					const materialIsNotWhite = material.color.r != 1 || material.color.g != 1 || material.color.b != 1;
+					if ( material.map !== null ) {
+						if(materialIsNotWhite) {
+							materialsWithColor.add(material);
+						} else {
+							textures[ material.map.uuid ] = material.map;
+						}
+					}
 					if ( material.normalMap !== null ) textures[ material.normalMap.uuid ] = material.normalMap;
 					if ( material.aoMap !== null ) textures[ material.aoMap.uuid ] = material.aoMap;
 					if ( material.roughnessMap !== null ) textures[ material.roughnessMap.uuid ] = material.roughnessMap;
@@ -49,7 +59,23 @@ class USDZExporter {
 
 		} );
 
-		output += buildMaterials( materials );
+		for (const material of materialsWithColor) {
+			const color256 = {
+				r: Math.floor(material.color.r * 256),
+				g: Math.floor(material.color.g * 256),
+				b: Math.floor(material.color.b * 256),
+			};
+			const textureSignature = `${material.map.id}_${color256.r}_${color256.g}_${color256.b}`;
+			const texturePath = `textures/Texture_${textureSignature}.jpg`;
+
+			if (!files[texturePath]) {
+				files[texturePath] = await imgToU8(material.map.image, color256);
+			}
+
+			coloredTextures.set(material, textureSignature);
+		}
+
+		output += buildMaterials( materials, coloredTextures );
 
 		files[ modelFileName ] = fflate.strToU8( output );
 		output = null;
@@ -60,6 +86,7 @@ class USDZExporter {
 			files[ 'textures/Texture_' + texture.id + '.jpg' ] = await imgToU8( texture.image );
 
 		}
+
 
 		// 64 byte alignment
 		// https://github.com/101arrowz/fflate/issues/39#issuecomment-777263109
@@ -88,13 +115,18 @@ class USDZExporter {
 
 		}
 
-		return fflate.zipSync( files, { level: 0 } );
+		return await new Promise((resolve, reject) => {
+			fflate.zip(files, { level: 0 }, (err, zipped) => {
+				if (err) reject(err);
+				else resolve(zipped);
+			});
+		});
 
 	}
 
 }
 
-async function imgToU8( image ) {
+async function imgToU8( image, color ) {
 
 	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
@@ -109,6 +141,12 @@ async function imgToU8( image ) {
 
 		const context = canvas.getContext( '2d' );
 		context.drawImage( image, 0, 0, canvas.width, canvas.height );
+
+		if(!!color) {
+			context.globalCompositeOperation = "multiply";
+			context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+			context.fillRect(0, 0, image.width, image.height);
+		}
 
 		const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/jpeg', 1 ) );
 		return new Uint8Array( await blob.arrayBuffer() );
@@ -298,7 +336,7 @@ function buildVector2Array( attribute, count ) {
 
 // Materials
 
-function buildMaterials( materials ) {
+function buildMaterials( materials, coloredTextures ) {
 
 	const array = [];
 
@@ -306,7 +344,7 @@ function buildMaterials( materials ) {
 
 		const material = materials[ uuid ];
 
-		array.push( buildMaterial( material ) );
+		array.push( buildMaterial( material, coloredTextures ) );
 
 	}
 
@@ -319,7 +357,7 @@ ${ array.join( '' ) }
 
 }
 
-function buildMaterial( material ) {
+function buildMaterial( material, coloredTextures ) {
 
 	// https://graphics.pixar.com/usd/docs/UsdPreviewSurface-Proposal.html
 
@@ -327,8 +365,9 @@ function buildMaterial( material ) {
 	const parameters = [];
 	const textures = [];
 
-	function buildTexture( texture, mapType ) {
+	function buildTexture( texture, mapType, textureSignature ) {
 
+		const textureId = textureSignature || texture.id;
 		return `
         def Shader "Transform2d_${ mapType }" (
             sdrMetadata = {
@@ -346,7 +385,7 @@ function buildMaterial( material ) {
         def Shader "Texture_${ texture.id }_${ mapType }"
         {
             uniform token info:id = "UsdUVTexture"
-            asset inputs:file = @textures/Texture_${ texture.id }.jpg@
+            asset inputs:file = @textures/Texture_${ textureId }.jpg@
             float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
             token inputs:wrapS = "repeat"
             token inputs:wrapT = "repeat"
@@ -362,7 +401,7 @@ function buildMaterial( material ) {
 
 		parameters.push( `${ pad }color3f inputs:diffuseColor.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:rgb>` );
 
-		textures.push( buildTexture( material.map, 'diffuse' ) );
+		textures.push( buildTexture( material.map, 'diffuse', coloredTextures.get(material) ) );
 
 	} else {
 
