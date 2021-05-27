@@ -1,6 +1,4 @@
 import { Camera } from './Camera.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Quaternion } from '../math/Quaternion.js';
 import * as MathUtils from '../math/MathUtils.js';
 
 class PerspectiveCamera extends Camera {
