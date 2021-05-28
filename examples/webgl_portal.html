@@ -195,7 +195,9 @@
 				renderer.setRenderTarget( thisPortalTexture );
 				renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
 				if ( renderer.autoClear === false ) renderer.clear();
+				thisPortalMesh.visible = false; // hide this portal from its own rendering
 				renderer.render( scene, portalCamera );
+				thisPortalMesh.visible = true; // re-enable this portal's visibility for general rendering
 
 			}
 
