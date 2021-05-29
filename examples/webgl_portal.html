@@ -67,14 +67,10 @@
 
 				const planeGeo = new THREE.PlaneGeometry( 100.1, 100.1 );
 
-				let geometry, material;
-				geometry = new THREE.CylinderGeometry( 0.1, 15 * Math.cos( Math.PI / 180 * 30 ), 0.1, 24, 1 );
-				material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x444444 } );
-
 				// bouncing icosphere
 				const portalPlane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0.0 );
-				geometry = new THREE.IcosahedronGeometry( 5, 0 );
-				material = new THREE.MeshPhongMaterial( {
+				const geometry = new THREE.IcosahedronGeometry( 5, 0 );
+				const material = new THREE.MeshPhongMaterial( {
 					color: 0xffffff, emissive: 0x333333, flatShading: true,
 					clippingPlanes: [ portalPlane ], clipShadows: true } );
 				smallSphereOne = new THREE.Mesh( geometry, material );
@@ -199,7 +195,9 @@
 				renderer.setRenderTarget( thisPortalTexture );
 				renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
 				if ( renderer.autoClear === false ) renderer.clear();
+				thisPortalMesh.visible = false; // hide this portal from its own rendering
 				renderer.render( scene, portalCamera );
+				thisPortalMesh.visible = true; // re-enable this portal's visibility for general rendering
 
 			}
 
