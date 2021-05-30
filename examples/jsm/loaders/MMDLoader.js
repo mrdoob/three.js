@@ -1083,6 +1083,7 @@ class MaterialBuilder {
 	 * @return {Array<MMDToonMaterial>}
 	 */
 	build( data, geometry /*, onProgress, onError */ ) {
+    console.log('build() data:', data);
 
 		const materials = [];
 
@@ -1103,16 +1104,21 @@ class MaterialBuilder {
 			/*
 				 * Color
 				 *
-				 * MMD         MeshToonMaterial
+				 * MMD         MMDToonMaterial
 				 * diffuse  -  color
 				 * ambient  -  emissive * a
 				 *               (a = 1.0 without map texture or 0.2 with map texture)
 				 *
-				 * MeshToonMaterial doesn't have ambient. Set it to emissive instead.
+				 * MMDToonMaterial doesn't have ambient. Set it to emissive instead.
 				 * It'll be too bright if material has map texture so using coef 0.2.
+         * 
+         * MMD's shininess (specular strength) seems like a 0-1 ratio, not sure
+         * what value should map by 1, choose 5 here.
 				 */
 			params.color = new Color().fromArray( material.diffuse );
 			params.opacity = material.diffuse[ 3 ];
+			params.specular = new Color().fromArray( material.specular );
+			params.shininess = material.shininess * 5;
 			params.emissive = new Color().fromArray( material.ambient );
 			params.transparent = params.opacity !== 1.0;
 
@@ -1200,10 +1206,13 @@ class MaterialBuilder {
 
 				// map
 
+        console.log('build() material:', material);
 				if ( material.textureIndex !== - 1 ) {
 
 					params.map = this._loadTexture( data.textures[ material.textureIndex ], textures );
 					params.map.name = material.name;
+          // add fileName for easier debugging
+					params.map.fileName = data.textures[ material.textureIndex ];
 
 				}
 
@@ -1215,6 +1224,8 @@ class MaterialBuilder {
 						data.textures[ material.envTextureIndex ],
 						textures
 					);
+          // add fileName for easier debugging
+					params.envMap.fileName = data.textures[ material.envTextureIndex ];
 
 					params.combine = material.envFlag === 1
 						? MultiplyOperation
@@ -2081,6 +2092,8 @@ class MMDToonMaterial extends ShaderMaterial {
 		super();
 
     this.color = new Color( 0xffffff );
+    this.specular = new Color( 0x111111 );
+		this.shininess = 30;
 
 		this.map = null;
 		this.gradientMap = null;
@@ -2106,6 +2119,8 @@ class MMDToonMaterial extends ShaderMaterial {
 		this.displacementScale = 1;
 		this.displacementBias = 0;
 
+    this.specularMap = null;
+
 		this.alphaMap = null;
 
     this.envMap = null;
@@ -2123,6 +2138,8 @@ class MMDToonMaterial extends ShaderMaterial {
     parameters.uniforms.envMap.value = parameters.envMap;
     parameters.uniforms.reflectivity.value = parameters.reflectivity;
     parameters.uniforms.refractionRatio.value = parameters.refractionRatio;
+    parameters.uniforms.specular.value = parameters.specular;
+    parameters.uniforms.shininess.value = parameters.shininess;
     parameters.uniforms.emissive.value = parameters.emissive;
     parameters.uniforms.gradientMap.value = parameters.gradientMap;
 
@@ -2142,6 +2159,8 @@ class MMDToonMaterial extends ShaderMaterial {
     super.copy( source );
 
     this.color.copy( source.color );
+    this.specular.copy( source.specular );
+		this.shininess = source.shininess;
 
 		this.map = source.map;
 		this.gradientMap = source.gradientMap;
@@ -2166,6 +2185,8 @@ class MMDToonMaterial extends ShaderMaterial {
 		this.displacementMap = source.displacementMap;
 		this.displacementScale = source.displacementScale;
 		this.displacementBias = source.displacementBias;
+
+		this.specularMap = source.specularMap;
 
 		this.alphaMap = source.alphaMap;
 
