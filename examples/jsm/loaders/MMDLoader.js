@@ -1083,7 +1083,6 @@ class MaterialBuilder {
 	 * @return {Array<MMDToonMaterial>}
 	 */
 	build( data, geometry /*, onProgress, onError */ ) {
-    console.log('build() data:', data);
 
 		const materials = [];
 
@@ -1206,7 +1205,6 @@ class MaterialBuilder {
 
 				// map
 
-        console.log('build() material:', material);
 				if ( material.textureIndex !== - 1 ) {
 
 					params.map = this._loadTexture( data.textures[ material.textureIndex ], textures );
@@ -1220,14 +1218,14 @@ class MaterialBuilder {
 
 				if ( material.envTextureIndex !== - 1 && ( material.envFlag === 1 || material.envFlag == 2 ) ) {
 
-					params.envMap = this._loadTexture(
+					params.matcap = this._loadTexture(
 						data.textures[ material.envTextureIndex ],
 						textures
 					);
           // add fileName for easier debugging
-					params.envMap.fileName = data.textures[ material.envTextureIndex ];
+					params.matcap.fileName = data.textures[ material.envTextureIndex ];
 
-					params.combine = material.envFlag === 1
+					params.matcapCombine = material.envFlag === 1
 						? MultiplyOperation
 						: AddOperation;
 
@@ -1280,11 +1278,7 @@ class MaterialBuilder {
 
 			}
 
-      const mmdToomMaterial = new MMDToonMaterial( params );
-
-      console.log('material:', mmdToomMaterial);
-
-			materials.push( mmdToomMaterial );
+			materials.push( new MMDToonMaterial( params ) );
 
 		}
 
@@ -2095,6 +2089,9 @@ class MMDToonMaterial extends ShaderMaterial {
     this.specular = new Color( 0x111111 );
 		this.shininess = 30;
 
+		this.matcap = null;
+		this.matcapCombine = null;
+
 		this.map = null;
 		this.gradientMap = null;
 
@@ -2131,9 +2128,23 @@ class MMDToonMaterial extends ShaderMaterial {
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
-		this.skinning = false;
+		this.flatShading = false;
+
+    parameters.defines = {};
+		switch ( parameters.matcapCombine ) {
+
+      case MultiplyOperation:
+				parameters.defines[ 'MATCAP_BLENDING_MULTIPLY' ] = '';
+				break;
+
+			case AddOperation:
+				parameters.defines[ 'MATCAP_BLENDING_ADD' ] = '';
+				break;
+
+		}
 
     parameters.uniforms = UniformsUtils.clone(MMDToonShader.uniforms);
+    parameters.uniforms.matcap.value = parameters.matcap;
     parameters.uniforms.map.value = parameters.map;
     parameters.uniforms.envMap.value = parameters.envMap;
     parameters.uniforms.reflectivity.value = parameters.reflectivity;
@@ -2148,8 +2159,6 @@ class MMDToonMaterial extends ShaderMaterial {
 
     parameters.lights = true;
 
-    console.log('MMDToonMaterial.constructor() parameters:', parameters);
-
     this.setValues( parameters );
 
   }
@@ -2161,6 +2170,9 @@ class MMDToonMaterial extends ShaderMaterial {
     this.color.copy( source.color );
     this.specular.copy( source.specular );
 		this.shininess = source.shininess;
+
+		this.matcap = source.matcap;
+		this.matcapCombine = source.matcapCombine;
 
 		this.map = source.map;
 		this.gradientMap = source.gradientMap;
@@ -2198,7 +2210,7 @@ class MMDToonMaterial extends ShaderMaterial {
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
-		this.skinning = source.skinning;
+		this.flatShading = source.flatShading;
 
     return this;
 

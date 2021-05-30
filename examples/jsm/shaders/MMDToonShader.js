@@ -1,6 +1,16 @@
 /**
  * MMD Toon Shader
  *
+ * This shader is extended from MashPhongMaterial, and merged algorithms with
+ * MashToonMaterial and MeshMetcapMaterial.
+ * Ideas came from https://github.com/mrdoob/three.js/issues/19609
+ *
+ * Combining steps:
+ *  * Declare matcap uniform.
+ *  * Add gradientmap_pars_fragment.
+ *  * Combine dotNL and gradient irradiences as total irradience.
+ *    (Replace lights_phong_pars_fragment with lights_mmd_toon_pars_fragment)
+ *  * Add mmd_toon_matcap_fragment.
  */
 
 import { UniformsUtils, ShaderLib } from '../../../build/three.module.js';
@@ -26,8 +36,8 @@ struct BlinnPhongMaterial {
 
 void RE_Direct_BlinnPhong( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
 
-	vec3 irradiance = 0.5 * getGradientIrradiance( geometry.normal, directLight.direction ) * directLight.color;
-	irradiance += 0.5 * saturate( dot( geometry.normal, directLight.direction ) ) * directLight.color;
+	vec3 irradiance = getGradientIrradiance( geometry.normal, directLight.direction ) * directLight.color;
+	irradiance += saturate( dot( geometry.normal, directLight.direction ) ) * directLight.color;
 
 	#ifndef PHYSICALLY_CORRECT_LIGHTS
 
@@ -53,6 +63,29 @@ void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in Geometric
 #define Material_LightProbeLOD( material )	(0)
 `;
 
+const mmd_toon_matcap_fragment = `
+#ifdef USE_MATCAP
+
+  vec3 viewDir = normalize( vViewPosition );
+  vec3 x = normalize( vec3( viewDir.z, 0.0, - viewDir.x ) );
+  vec3 y = cross( viewDir, x );
+  vec2 uv = vec2( dot( x, normal ), dot( y, normal ) ) * 0.495 + 0.5; // 0.495 to remove artifacts caused by undersized matcap disks
+  vec4 matcapColor = texture2D( matcap, uv );
+  matcapColor = matcapTexelToLinear( matcapColor );
+
+  #ifdef MATCAP_BLENDING_MULTIPLY
+
+    outgoingLight *= matcapColor.rgb;
+
+  #elif defined( MATCAP_BLENDING_ADD )
+
+    outgoingLight += matcapColor.rgb;
+
+  #endif
+
+#endif
+`;
+
 const MMDToonShader = {
 
 	uniforms: UniformsUtils.merge( [
@@ -61,15 +94,23 @@ const MMDToonShader = {
     ShaderLib.matcap.uniforms,
   ] ),
 
-	vertexShader: '#define TOON' + '\n' + ShaderLib.phong.vertexShader,
+	vertexShader: `
+    #define TOON
+    #define MATCAP
+  ` + ShaderLib.phong.vertexShader,
 
-  // Combined algorithm:
-  // * Extend from phong fragment shader
-  // * Add gradientmap_pars_fragment.
-  // * Combine dotNL and gradient irradiences as total irradience.
-  //   (Replace lights_phong_pars_fragment with lights_mmd_toon_pars_fragment)
 	fragmentShader:
     ShaderLib.phong.fragmentShader
+      .replace(
+        '#include <common>',
+        `
+          #ifdef USE_MATCAP
+            uniform sampler2D matcap;
+          #endif
+
+          #include <common>
+        `
+      )
       .replace(
         '#include <envmap_common_pars_fragment>',
         `
@@ -80,8 +121,14 @@ const MMDToonShader = {
       .replace(
         '#include <lights_phong_pars_fragment>',
         lights_mmd_toon_pars_fragment
+      )
+      .replace(
+        '#include <envmap_fragment>',
+        `
+          #include <envmap_fragment>
+          ${mmd_toon_matcap_fragment}
+        `
       ),
-      //) + 'c',
  
 };
 
