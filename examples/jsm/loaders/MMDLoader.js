@@ -3,10 +3,10 @@ import {
 	AnimationClip,
 	Bone,
 	BufferGeometry,
-  Vector2,
+	Vector2,
 	Color,
 	CustomBlending,
-  TangentSpaceNormalMap,
+	TangentSpaceNormalMap,
 	DoubleSide,
 	DstAlphaFactor,
 	Euler,
@@ -16,9 +16,8 @@ import {
 	Interpolant,
 	Loader,
 	LoaderUtils,
-  UniformsUtils,
-	//MeshToonMaterial,
-  ShaderMaterial,
+	UniformsUtils,
+	ShaderMaterial,
 	MultiplyOperation,
 	NearestFilter,
 	NumberKeyframeTrack,
@@ -1110,9 +1109,9 @@ class MaterialBuilder {
 				 *
 				 * MMDToonMaterial doesn't have ambient. Set it to emissive instead.
 				 * It'll be too bright if material has map texture so using coef 0.2.
-         * 
-         * MMD's shininess (specular strength) seems like a 0-1 ratio, not sure
-         * what value should map by 1, choose 5 here.
+				 *
+				 * MMD's shininess (specular strength) seems like a 0-1 ratio, not sure
+				 * what value should map by 1, choose 5 here.
 				 */
 			params.color = new Color().fromArray( material.diffuse );
 			params.opacity = material.diffuse[ 3 ];
@@ -1209,7 +1208,7 @@ class MaterialBuilder {
 
 					params.map = this._loadTexture( data.textures[ material.textureIndex ], textures );
 					params.map.name = material.name;
-          // add fileName for easier debugging
+					// add fileName for easier debugging
 					params.map.fileName = data.textures[ material.textureIndex ];
 
 				}
@@ -1222,7 +1221,7 @@ class MaterialBuilder {
 						data.textures[ material.envTextureIndex ],
 						textures
 					);
-          // add fileName for easier debugging
+					// add fileName for easier debugging
 					params.matcap.fileName = data.textures[ material.envTextureIndex ];
 
 					params.matcapCombine = material.envFlag === 1
@@ -2085,8 +2084,8 @@ class MMDToonMaterial extends ShaderMaterial {
 
 		super();
 
-    this.color = new Color( 0xffffff );
-    this.specular = new Color( 0x111111 );
+		this.color = new Color( 0xffffff );
+		this.specular = new Color( 0x111111 );
 		this.shininess = 30;
 
 		this.matcap = null;
@@ -2116,24 +2115,24 @@ class MMDToonMaterial extends ShaderMaterial {
 		this.displacementScale = 1;
 		this.displacementBias = 0;
 
-    this.specularMap = null;
+		this.specularMap = null;
 
 		this.alphaMap = null;
 
-    this.envMap = null;
-    this.combine = MultiplyOperation;
-    this.reflectivity = 1;
-    this.refractionRatio = 0.98;
+		this.envMap = null;
+		this.combine = MultiplyOperation;
+		this.reflectivity = 1;
+		this.refractionRatio = 0.98;
 
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
 		this.flatShading = false;
 
-    parameters.defines = {};
+		parameters.defines = {};
 		switch ( parameters.matcapCombine ) {
 
-      case MultiplyOperation:
+			case MultiplyOperation:
 				parameters.defines[ 'MATCAP_BLENDING_MULTIPLY' ] = '';
 				break;
 
@@ -2143,32 +2142,32 @@ class MMDToonMaterial extends ShaderMaterial {
 
 		}
 
-    parameters.uniforms = UniformsUtils.clone(MMDToonShader.uniforms);
-    parameters.uniforms.matcap.value = parameters.matcap;
-    parameters.uniforms.map.value = parameters.map;
-    parameters.uniforms.envMap.value = parameters.envMap;
-    parameters.uniforms.reflectivity.value = parameters.reflectivity;
-    parameters.uniforms.refractionRatio.value = parameters.refractionRatio;
-    parameters.uniforms.specular.value = parameters.specular;
-    parameters.uniforms.shininess.value = parameters.shininess;
-    parameters.uniforms.emissive.value = parameters.emissive;
-    parameters.uniforms.gradientMap.value = parameters.gradientMap;
+		parameters.uniforms = UniformsUtils.clone( MMDToonShader.uniforms );
+		parameters.uniforms.matcap.value = parameters.matcap;
+		parameters.uniforms.map.value = parameters.map;
+		parameters.uniforms.envMap.value = parameters.envMap;
+		parameters.uniforms.reflectivity.value = parameters.reflectivity;
+		parameters.uniforms.refractionRatio.value = parameters.refractionRatio;
+		parameters.uniforms.specular.value = parameters.specular;
+		parameters.uniforms.shininess.value = parameters.shininess;
+		parameters.uniforms.emissive.value = parameters.emissive;
+		parameters.uniforms.gradientMap.value = parameters.gradientMap;
 
-    parameters.vertexShader = MMDToonShader.vertexShader;
-    parameters.fragmentShader = MMDToonShader.fragmentShader;
+		parameters.vertexShader = MMDToonShader.vertexShader;
+		parameters.fragmentShader = MMDToonShader.fragmentShader;
 
-    parameters.lights = true;
+		parameters.lights = true;
 
-    this.setValues( parameters );
+		this.setValues( parameters );
 
-  }
+	}
 
-  copy( source ) {
+	copy( source ) {
 
-    super.copy( source );
+		super.copy( source );
 
-    this.color.copy( source.color );
-    this.specular.copy( source.specular );
+		this.color.copy( source.color );
+		this.specular.copy( source.specular );
 		this.shininess = source.shininess;
 
 		this.matcap = source.matcap;
@@ -2202,19 +2201,19 @@ class MMDToonMaterial extends ShaderMaterial {
 
 		this.alphaMap = source.alphaMap;
 
-    this.envMap = source.envMap;
-    this.combine = source.combine;
-    this.reflectivity = source.reflectivity;
-    this.refractionRatio = source.refractionRatio;
+		this.envMap = source.envMap;
+		this.combine = source.combine;
+		this.reflectivity = source.reflectivity;
+		this.refractionRatio = source.refractionRatio;
 
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
 		this.flatShading = source.flatShading;
 
-    return this;
+		return this;
 
-  }
+	}
 
 }
 
