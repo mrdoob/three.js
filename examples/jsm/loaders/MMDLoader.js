@@ -2143,6 +2143,7 @@ class MMDToonMaterial extends ShaderMaterial {
 		}
 
 		parameters.uniforms = UniformsUtils.clone( MMDToonShader.uniforms );
+		parameters.uniforms.diffuse.value = parameters.color;
 		parameters.uniforms.matcap.value = parameters.matcap;
 		parameters.uniforms.map.value = parameters.map;
 		parameters.uniforms.envMap.value = parameters.envMap;
