@@ -153,7 +153,6 @@ class Box3 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Box3: .getCenter() target is now required' );
 			target = new Vector3();
 
 		}
@@ -166,7 +165,6 @@ class Box3 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Box3: .getSize() target is now required' );
 			target = new Vector3();
 
 		}
@@ -261,7 +259,6 @@ class Box3 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Box3: .getParameter() target is now required' );
 			target = new Vector3();
 
 		}
@@ -397,7 +394,6 @@ class Box3 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Box3: .clampPoint() target is now required' );
 			target = new Vector3();
 
 		}
