@@ -478,11 +478,13 @@
 
 				iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
 				subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';
+				iframe.style.display = 'unset';
 
 			} else {
 
 				iframe.src = '';
 				subtitle = '';
+				iframe.style.display = 'none';
 
 			}
 
