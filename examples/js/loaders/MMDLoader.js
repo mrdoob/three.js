@@ -958,7 +958,7 @@
 				params.color = new THREE.Color().fromArray( material.diffuse );
 				params.opacity = material.diffuse[ 3 ];
 				params.specular = new THREE.Color().fromArray( material.specular );
-				params.shininess = material.shininess * 5;
+				params.shininess = material.shininess;
 				params.emissive = new THREE.Color().fromArray( material.ambient );
 				params.transparent = params.opacity !== 1.0; //
 

@@ -1116,7 +1116,7 @@ class MaterialBuilder {
 			params.color = new Color().fromArray( material.diffuse );
 			params.opacity = material.diffuse[ 3 ];
 			params.specular = new Color().fromArray( material.specular );
-			params.shininess = material.shininess * 5;
+			params.shininess = material.shininess;
 			params.emissive = new Color().fromArray( material.ambient );
 			params.transparent = params.opacity !== 1.0;
 
