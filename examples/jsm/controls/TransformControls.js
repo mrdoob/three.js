@@ -21,8 +21,6 @@ import {
 	Vector3
 } from '../../../build/three.module.js';
 
-const _raycaster = new Raycaster();
-
 const _tempVector = new Vector3();
 const _tempVector2 = new Vector3();
 const _tempQuaternion = new Quaternion();
@@ -146,6 +144,8 @@ class TransformControls extends Object3D {
 		defineProperty( 'rotationAngle', rotationAngle );
 		defineProperty( 'eye', eye );
 
+		this._raycaster = new Raycaster();
+
 		this._offset = new Vector3();
 		this._startNorm = new Vector3();
 		this._endNorm = new Vector3();
@@ -213,9 +213,9 @@ class TransformControls extends Object3D {
 
 		if ( this.object === undefined || this.dragging === true ) return;
 
-		_raycaster.setFromCamera( pointer, this.camera );
+		this._raycaster.setFromCamera( pointer, this.camera );
 
-		const intersect = intersectObjectWithRay( this._gizmo.picker[ this.mode ], _raycaster );
+		const intersect = intersectObjectWithRay( this._gizmo.picker[ this.mode ], this._raycaster );
 
 		if ( intersect ) {
 
@@ -235,9 +235,9 @@ class TransformControls extends Object3D {
 
 		if ( this.axis !== null ) {
 
-			_raycaster.setFromCamera( pointer, this.camera );
+			this._raycaster.setFromCamera( pointer, this.camera );
 
-			const planeIntersect = intersectObjectWithRay( this._plane, _raycaster, true );
+			const planeIntersect = intersectObjectWithRay( this._plane, this._raycaster, true );
 
 			if ( planeIntersect ) {
 
@@ -303,9 +303,9 @@ class TransformControls extends Object3D {
 
 		if ( object === undefined || axis === null || this.dragging === false || pointer.button !== - 1 ) return;
 
-		_raycaster.setFromCamera( pointer, this.camera );
+		this._raycaster.setFromCamera( pointer, this.camera );
 
-		const planeIntersect = intersectObjectWithRay( this._plane, _raycaster, true );
+		const planeIntersect = intersectObjectWithRay( this._plane, this._raycaster, true );
 
 		if ( ! planeIntersect ) return;
 

@@ -1,7 +1,5 @@
 ( function () {
 
-	const _raycaster = new THREE.Raycaster();
-
 	const _tempVector = new THREE.Vector3();
 
 	const _tempVector2 = new THREE.Vector3();
@@ -127,6 +125,7 @@
 			defineProperty( 'rotationAxis', rotationAxis );
 			defineProperty( 'rotationAngle', rotationAngle );
 			defineProperty( 'eye', eye );
+			this._raycaster = new THREE.Raycaster();
 			this._offset = new THREE.Vector3();
 			this._startNorm = new THREE.Vector3();
 			this._endNorm = new THREE.Vector3();
@@ -188,9 +187,9 @@
 
 			if ( this.object === undefined || this.dragging === true ) return;
 
-			_raycaster.setFromCamera( pointer, this.camera );
+			this._raycaster.setFromCamera( pointer, this.camera );
 
-			const intersect = intersectObjectWithRay( this._gizmo.picker[ this.mode ], _raycaster );
+			const intersect = intersectObjectWithRay( this._gizmo.picker[ this.mode ], this._raycaster );
 
 			if ( intersect ) {
 
@@ -210,9 +209,9 @@
 
 			if ( this.axis !== null ) {
 
-				_raycaster.setFromCamera( pointer, this.camera );
+				this._raycaster.setFromCamera( pointer, this.camera );
 
-				const planeIntersect = intersectObjectWithRay( this._plane, _raycaster, true );
+				const planeIntersect = intersectObjectWithRay( this._plane, this._raycaster, true );
 
 				if ( planeIntersect ) {
 
@@ -278,9 +277,9 @@
 
 			if ( object === undefined || axis === null || this.dragging === false || pointer.button !== - 1 ) return;
 
-			_raycaster.setFromCamera( pointer, this.camera );
+			this._raycaster.setFromCamera( pointer, this.camera );
 
-			const planeIntersect = intersectObjectWithRay( this._plane, _raycaster, true );
+			const planeIntersect = intersectObjectWithRay( this._plane, this._raycaster, true );
 			if ( ! planeIntersect ) return;
 			this.pointEnd.copy( planeIntersect.point ).sub( this.worldPositionStart );
 
