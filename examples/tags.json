@@ -27,6 +27,7 @@
 	"webgl_layers": [ "groups" ],
 	"webgl_lights_hemisphere": [ "directional" ],
 	"webgl_lights_pointlights": [ "multiple" ],
+	"webgl_lines_fat": [ "gpu", "stats", "panel" ],
 	"webgl_loader_ttf": [ "text", "font" ],
 	"webgl_loader_pdb": [ "molecules", "css2d" ],
 	"webgl_lod": [ "level", "details" ],
