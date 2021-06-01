@@ -37,8 +37,6 @@ struct BlinnPhongMaterial {
 void RE_Direct_BlinnPhong( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
 
 	vec3 irradiance = getGradientIrradiance( geometry.normal, directLight.direction ) * directLight.color;
-	irradiance += saturate( dot( geometry.normal, directLight.direction ) ) * directLight.color;
-  irradiance *= 0.5;
 
 	#ifndef PHYSICALLY_CORRECT_LIGHTS
 

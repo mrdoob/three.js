@@ -950,9 +950,6 @@
       	 *
       	 * MMDToonMaterial doesn't have ambient. Set it to emissive instead.
       	 * It'll be too bright if material has map texture so using coef 0.2.
-      	 *
-      	 * MMD's shininess (specular strength) seems like a 0-1 ratio, not sure
-      	 * what value should map by 1, choose 5 here.
       	 */
 
 				params.color = new THREE.Color().fromArray( material.diffuse );
