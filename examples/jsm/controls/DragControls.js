@@ -70,8 +70,6 @@ class DragControls extends EventDispatcher {
 
 		function onPointerMove( event ) {
 
-			event.preventDefault();
-
 			switch ( event.pointerType ) {
 
 				case 'mouse':
@@ -154,8 +152,6 @@ class DragControls extends EventDispatcher {
 
 		function onPointerDown( event ) {
 
-			event.preventDefault();
-
 			switch ( event.pointerType ) {
 
 				case 'mouse':
@@ -169,9 +165,7 @@ class DragControls extends EventDispatcher {
 
 		}
 
-		function onMouseDown( event ) {
-
-			event.preventDefault();
+		function onMouseDown() {
 
 			_intersections.length = 0;
 
@@ -200,8 +194,6 @@ class DragControls extends EventDispatcher {
 
 		function onPointerCancel( event ) {
 
-			event.preventDefault();
-
 			switch ( event.pointerType ) {
 
 				case 'mouse':
@@ -215,9 +207,7 @@ class DragControls extends EventDispatcher {
 
 		}
 
-		function onMouseCancel( event ) {
-
-			event.preventDefault();
+		function onMouseCancel() {
 
 			if ( _selected ) {
 

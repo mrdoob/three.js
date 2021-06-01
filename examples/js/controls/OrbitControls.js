@@ -741,11 +741,6 @@
 
 			function onMouseDown( event ) {
 
-				// Prevent the browser from scrolling.
-				event.preventDefault(); // Manually set the focus since calling preventDefault above
-				// prevents the browser from setting it automatically.
-
-				scope.domElement.focus ? scope.domElement.focus() : window.focus();
 				let mouseAction;
 
 				switch ( event.button ) {
@@ -827,7 +822,6 @@
 			function onMouseMove( event ) {
 
 				if ( scope.enabled === false ) return;
-				event.preventDefault();
 
 				switch ( state ) {
 

@@ -491,8 +491,6 @@ class TrackballControls extends EventDispatcher {
 
 		function onMouseDown( event ) {
 
-			event.preventDefault();
-
 			if ( _state === STATE.NONE ) {
 
 				switch ( event.button ) {
@@ -546,8 +544,6 @@ class TrackballControls extends EventDispatcher {
 
 			if ( scope.enabled === false ) return;
 
-			event.preventDefault();
-
 			const state = ( _keyState !== STATE.NONE ) ? _keyState : _state;
 
 			if ( state === STATE.ROTATE && ! scope.noRotate ) {
@@ -567,11 +563,9 @@ class TrackballControls extends EventDispatcher {
 
 		}
 
-		function onMouseUp( event ) {
+		function onMouseUp() {
 
 			if ( scope.enabled === false ) return;
-
-			event.preventDefault();
 
 			_state = STATE.NONE;
 

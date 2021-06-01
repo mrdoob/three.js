@@ -462,8 +462,6 @@
 
 			function onMouseDown( event ) {
 
-				event.preventDefault();
-
 				if ( _state === STATE.NONE ) {
 
 					switch ( event.button ) {
@@ -518,7 +516,6 @@
 			function onMouseMove( event ) {
 
 				if ( scope.enabled === false ) return;
-				event.preventDefault();
 				const state = _keyState !== STATE.NONE ? _keyState : _state;
 
 				if ( state === STATE.ROTATE && ! scope.noRotate ) {
@@ -539,10 +536,9 @@
 
 			}
 
-			function onMouseUp( event ) {
+			function onMouseUp() {
 
 				if ( scope.enabled === false ) return;
-				event.preventDefault();
 				_state = STATE.NONE;
 				scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
 				scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
