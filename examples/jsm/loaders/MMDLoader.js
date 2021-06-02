@@ -2126,7 +2126,7 @@ class MMDToonMaterial extends ShaderMaterial {
 
 		this.flatShading = false;
 
-		parameters.defines = {};
+		parameters.defines = Object.assign( {}, MMDToonShader.defines );
 		switch ( parameters.matcapCombine ) {
 
 			case MultiplyOperation:

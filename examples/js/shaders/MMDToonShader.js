@@ -3,8 +3,8 @@
 	/**
  * MMD Toon Shader
  *
- * This shader is extended from MashPhongMaterial, and merged algorithms with
- * MashToonMaterial and MeshMetcapMaterial.
+ * This shader is extended from MeshPhongMaterial, and merged algorithms with
+ * MeshToonMaterial and MeshMetcapMaterial.
  * Ideas came from https://github.com/mrdoob/three.js/issues/19609
  *
  * Combining steps:
@@ -63,44 +63,45 @@ void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in Geometric
 	const mmd_toon_matcap_fragment = `
 #ifdef USE_MATCAP
 
-  vec3 viewDir = normalize( vViewPosition );
-  vec3 x = normalize( vec3( viewDir.z, 0.0, - viewDir.x ) );
-  vec3 y = cross( viewDir, x );
-  vec2 uv = vec2( dot( x, normal ), dot( y, normal ) ) * 0.495 + 0.5; // 0.495 to remove artifacts caused by undersized matcap disks
-  vec4 matcapColor = texture2D( matcap, uv );
-  matcapColor = matcapTexelToLinear( matcapColor );
+	vec3 viewDir = normalize( vViewPosition );
+	vec3 x = normalize( vec3( viewDir.z, 0.0, - viewDir.x ) );
+	vec3 y = cross( viewDir, x );
+	vec2 uv = vec2( dot( x, normal ), dot( y, normal ) ) * 0.495 + 0.5; // 0.495 to remove artifacts caused by undersized matcap disks
+	vec4 matcapColor = texture2D( matcap, uv );
+	matcapColor = matcapTexelToLinear( matcapColor );
 
-  #ifdef MATCAP_BLENDING_MULTIPLY
+	#ifdef MATCAP_BLENDING_MULTIPLY
 
-    outgoingLight *= matcapColor.rgb;
+		outgoingLight *= matcapColor.rgb;
 
-  #elif defined( MATCAP_BLENDING_ADD )
+	#elif defined( MATCAP_BLENDING_ADD )
 
-    outgoingLight += matcapColor.rgb;
+		outgoingLight += matcapColor.rgb;
 
-  #endif
+	#endif
 
 #endif
 `;
 	const MMDToonShader = {
+		defines: {
+			TOON: true,
+			MATCAP: true
+		},
 		uniforms: THREE.UniformsUtils.merge( [ THREE.ShaderLib.toon.uniforms, THREE.ShaderLib.phong.uniforms, THREE.ShaderLib.matcap.uniforms ] ),
-		vertexShader: `
-    #define TOON
-    #define MATCAP
-  ` + THREE.ShaderLib.phong.vertexShader,
+		vertexShader: THREE.ShaderLib.phong.vertexShader,
 		fragmentShader: THREE.ShaderLib.phong.fragmentShader.replace( '#include <common>', `
-    		  #ifdef USE_MATCAP
-    		    uniform sampler2D matcap;
-    		  #endif
+					#ifdef USE_MATCAP
+						uniform sampler2D matcap;
+					#endif
 
-    		  #include <common>
-    		` ).replace( '#include <envmap_common_pars_fragment>', `
-    		  #include <gradientmap_pars_fragment>
-    		  #include <envmap_common_pars_fragment>
-    		` ).replace( '#include <lights_phong_pars_fragment>', lights_mmd_toon_pars_fragment ).replace( '#include <envmap_fragment>', `
-    		  #include <envmap_fragment>
-    		  ${mmd_toon_matcap_fragment}
-    		` )
+					#include <common>
+				` ).replace( '#include <envmap_common_pars_fragment>', `
+					#include <gradientmap_pars_fragment>
+					#include <envmap_common_pars_fragment>
+				` ).replace( '#include <lights_phong_pars_fragment>', lights_mmd_toon_pars_fragment ).replace( '#include <envmap_fragment>', `
+					#include <envmap_fragment>
+					${mmd_toon_matcap_fragment}
+				` )
 	};
 
 	THREE.MMDToonShader = MMDToonShader;

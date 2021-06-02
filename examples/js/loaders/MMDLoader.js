@@ -1854,7 +1854,7 @@
 			this.wireframeLinecap = 'round';
 			this.wireframeLinejoin = 'round';
 			this.flatShading = false;
-			parameters.defines = {};
+			parameters.defines = Object.assign( {}, THREE.MMDToonShader.defines );
 
 			switch ( parameters.matcapCombine ) {
 
