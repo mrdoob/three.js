@@ -385,6 +385,10 @@ iframe {
 	overflow: auto;
 }
 
+iframe#viewer {
+	display: none;
+}
+
 #viewer {
 	padding-left: var(--panel-width);
 }
