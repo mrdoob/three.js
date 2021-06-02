@@ -386,7 +386,7 @@ iframe {
 }
 
 iframe#viewer {
-	display: none;
+	display: none; /* Workaround: The iframe has white background in Chrome for some reason */
 }
 
 #viewer {
