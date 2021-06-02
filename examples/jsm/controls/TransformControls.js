@@ -144,7 +144,7 @@ class TransformControls extends Object3D {
 		defineProperty( 'rotationAngle', rotationAngle );
 		defineProperty( 'eye', eye );
 
-		this._raycaster = new Raycaster();
+		this.raycaster = new Raycaster();
 
 		this._offset = new Vector3();
 		this._startNorm = new Vector3();
@@ -213,9 +213,9 @@ class TransformControls extends Object3D {
 
 		if ( this.object === undefined || this.dragging === true ) return;
 
-		this._raycaster.setFromCamera( pointer, this.camera );
+		this.raycaster.setFromCamera( pointer, this.camera );
 
-		const intersect = intersectObjectWithRay( this._gizmo.picker[ this.mode ], this._raycaster );
+		const intersect = intersectObjectWithRay( this._gizmo.picker[ this.mode ], this.raycaster );
 
 		if ( intersect ) {
 
@@ -235,9 +235,9 @@ class TransformControls extends Object3D {
 
 		if ( this.axis !== null ) {
 
-			this._raycaster.setFromCamera( pointer, this.camera );
+			this.raycaster.setFromCamera( pointer, this.camera );
 
-			const planeIntersect = intersectObjectWithRay( this._plane, this._raycaster, true );
+			const planeIntersect = intersectObjectWithRay( this._plane, this.raycaster, true );
 
 			if ( planeIntersect ) {
 
@@ -303,9 +303,9 @@ class TransformControls extends Object3D {
 
 		if ( object === undefined || axis === null || this.dragging === false || pointer.button !== - 1 ) return;
 
-		this._raycaster.setFromCamera( pointer, this.camera );
+		this.raycaster.setFromCamera( pointer, this.camera );
 
-		const planeIntersect = intersectObjectWithRay( this._plane, this._raycaster, true );
+		const planeIntersect = intersectObjectWithRay( this._plane, this.raycaster, true );
 
 		if ( ! planeIntersect ) return;
 
