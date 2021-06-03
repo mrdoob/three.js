@@ -80,7 +80,7 @@
 				textureRenderer = new WebGPUTextureRenderer( renderer );
 				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 
-				window.addEventListener( 'mousemove', onWindowMouseMove, false );
+				window.addEventListener( 'mousemove', onWindowMouseMove );
 				window.addEventListener( 'resize', onWindowResize );
 
 				// FX
