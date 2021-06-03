@@ -39,6 +39,7 @@ const exceptionList = [
 	'index',
 	'css3d_youtube', // video tag not deterministic enough
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
+	'webgl_loader_imagebitmap', // takes too long to load?
 	'webgl_loader_texture_lottie', // not sure why this fails
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
 	'webgl_materials_envmaps_parallax', // empty for some reason
@@ -53,6 +54,7 @@ const exceptionList = [
 	// webgpu
 	'webgpu_compute',
 	'webgpu_instance_uniform',
+	'webgpu_lights_custom',
 	'webgpu_lights_selective',
 	'webgpu_materials',
 	'webgpu_rtt',
