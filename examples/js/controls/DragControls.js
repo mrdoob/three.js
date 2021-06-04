@@ -81,8 +81,6 @@
 
 			function onPointerMove( event ) {
 
-				event.preventDefault();
-
 				switch ( event.pointerType ) {
 
 					case 'mouse':
@@ -173,8 +171,6 @@
 
 			function onPointerDown( event ) {
 
-				event.preventDefault();
-
 				switch ( event.pointerType ) {
 
 					case 'mouse':
@@ -187,9 +183,8 @@
 
 			}
 
-			function onMouseDown( event ) {
+			function onMouseDown() {
 
-				event.preventDefault();
 				_intersections.length = 0;
 
 				_raycaster.setFromCamera( _mouse, _camera );
@@ -220,8 +215,6 @@
 
 			function onPointerCancel( event ) {
 
-				event.preventDefault();
-
 				switch ( event.pointerType ) {
 
 					case 'mouse':
@@ -234,9 +227,7 @@
 
 			}
 
-			function onMouseCancel( event ) {
-
-				event.preventDefault();
+			function onMouseCancel() {
 
 				if ( _selected ) {
 
