@@ -1020,8 +1020,7 @@
 					// map
 					if ( material.textureIndex !== - 1 ) {
 
-						params.map = this._loadTexture( data.textures[ material.textureIndex ], textures );
-						params.map.name = material.name; // Since PMX spec don't have standard to list map files except color map and env map,
+						params.map = this._loadTexture( data.textures[ material.textureIndex ], textures ); // Since PMX spec don't have standard to list map files except color map and env map,
 						// we need to save file name for further mapping, like matching normal map file names after model loaded.
 						// ref: https://gist.github.com/felixjones/f8a06bd48f9da9a4539f#texture
 
