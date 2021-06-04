@@ -24,11 +24,6 @@
 			}
 		</script>
 
-		<video id="video" loop crossOrigin="anonymous" webkit-playsinline style="display:none">
-			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
-			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-		</video>
-
 		<script type="module">
 
 			import * as THREE from 'three';
@@ -72,19 +67,14 @@
 				scene.add( ambient );
 
 				const textureLoader = new THREE.TextureLoader();
-				textureUrls = [ 'none', 'sintel (video)', 'uv_grid_opengl.jpg', 'sprite2.png', 'colors.png' ];
-				textures = { none: null };
+				textureUrls = [ 'none', 'uv_grid_opengl.jpg', 'sprite2.png', 'colors.png' ];
+				textures = { none: null }
 
-				const video = document.getElementById( 'video' );
-				textures[textureUrls[1]] = new THREE.VideoTexture( video );
-				textures[textureUrls[1]].minFilter = THREE.LinearFilter;
-				textures[textureUrls[1]].magFilter = THREE.LinearFilter;
+				for ( let i = 1; i < textureUrls.length; i ++ ) {
 
-				for ( let i = 2; i < textureUrls.length; ++i ) {
-
-					textures[textureUrls[i]] = textureLoader.load( 'textures/' + textureUrls[i] );
-					textures[textureUrls[i]].minFilter = THREE.LinearFilter;
-					textures[textureUrls[i]].magFilter = THREE.LinearFilter;
+					textures[ textureUrls[ i ] ] = textureLoader.load( 'textures/' + textureUrls[ i ] );
+					textures[ textureUrls[ i ] ].minFilter = THREE.LinearFilter;
+					textures[ textureUrls[ i ] ].magFilter = THREE.LinearFilter;
 
 				}
 
@@ -224,10 +214,8 @@
 
 				gui.add( params, 'map', textureUrls ).onChange( function ( val ) {
 
-					if (spotLight.map && spotLight.map.isVideoTexture) video.pause();
-					spotLight.map = textures[val];
-					if (spotLight.map && spotLight.map.isVideoTexture) video.play();
-					animate();
+					spotLight.map = textures[ val ];
+					render();
 
 				} );
 
@@ -239,14 +227,7 @@
 
 			buildGui();
 
-			animate();
-
-			function animate() {
-
-				if (spotLight.map && spotLight.map.isVideoTexture) requestAnimationFrame( animate );
-				render();
-
-			}
+			render();
 
 		</script>
 
