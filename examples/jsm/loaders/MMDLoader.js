@@ -1095,7 +1095,7 @@ class MaterialBuilder {
 
 			const material = data.materials[ i ];
 
-			const params = { userData: {} };
+			const params = { userData: { MMD: {} } };
 
 			if ( material.name !== undefined ) params.name = material.name;
 
@@ -1205,8 +1205,11 @@ class MaterialBuilder {
 
 					params.map = this._loadTexture( data.textures[ material.textureIndex ], textures );
 					params.map.name = material.name;
-					// add fileName for easier debugging
-					params.map.fileName = data.textures[ material.textureIndex ];
+
+					// Since PMX spec don't have standard to list map files except color map and env map,
+					// we need to save file name for further mapping, like matching normal map file names after model loaded.
+					// ref: https://gist.github.com/felixjones/f8a06bd48f9da9a4539f#texture
+					params.userData.MMD.mapFileName = data.textures[ material.textureIndex ];
 
 				}
 
@@ -1218,8 +1221,9 @@ class MaterialBuilder {
 						data.textures[ material.envTextureIndex ],
 						textures
 					);
-					// add fileName for easier debugging
-					params.matcap.fileName = data.textures[ material.envTextureIndex ];
+
+					// Same as color map above, keep file name in userData for further usage.
+					params.userData.MMD.matcapFileName = data.textures[ material.envTextureIndex ];
 
 					params.matcapCombine = material.envFlag === 1
 						? MultiplyOperation

@@ -937,7 +937,9 @@
 
 				const material = data.materials[ i ];
 				const params = {
-					userData: {}
+					userData: {
+						MMD: {}
+					}
 				};
 				if ( material.name !== undefined ) params.name = material.name;
 				/*
@@ -1019,18 +1021,20 @@
 					if ( material.textureIndex !== - 1 ) {
 
 						params.map = this._loadTexture( data.textures[ material.textureIndex ], textures );
-						params.map.name = material.name; // add fileName for easier debugging
+						params.map.name = material.name; // Since PMX spec don't have standard to list map files except color map and env map,
+						// we need to save file name for further mapping, like matching normal map file names after model loaded.
+						// ref: https://gist.github.com/felixjones/f8a06bd48f9da9a4539f#texture
 
-						params.map.fileName = data.textures[ material.textureIndex ];
+						params.userData.MMD.mapFileName = data.textures[ material.textureIndex ];
 
 					} // envMap TODO: support m.envFlag === 3
 
 
 					if ( material.envTextureIndex !== - 1 && ( material.envFlag === 1 || material.envFlag == 2 ) ) {
 
-						params.matcap = this._loadTexture( data.textures[ material.envTextureIndex ], textures ); // add fileName for easier debugging
+						params.matcap = this._loadTexture( data.textures[ material.envTextureIndex ], textures ); // Same as color map above, keep file name in userData for further usage.
 
-						params.matcap.fileName = data.textures[ material.envTextureIndex ];
+						params.userData.MMD.matcapFileName = data.textures[ material.envTextureIndex ];
 						params.matcapCombine = material.envFlag === 1 ? THREE.MultiplyOperation : THREE.AddOperation;
 
 					} // gradientMap
