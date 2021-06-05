@@ -9,14 +9,12 @@ const SSRrShader = {
 	defines: {
 		MAX_STEP: 0,
 		PERSPECTIVE_CAMERA: true,
-		SPECULAR: true,
-		INFINITE_THICK: false,
+		INFINITE_THICK: true,
 	},
 
 	uniforms: {
 
 		'tDiffuse': { value: null },
-		'tSpecular': { value: null },
 		'tRefractive': { value: null },
 		'tDepth': { value: null },
 		'cameraNear': { value: null },
@@ -52,7 +50,6 @@ const SSRrShader = {
 		uniform sampler2D tDepth;
 		uniform sampler2D tRefractive;
 		uniform sampler2D tDiffuse;
-		uniform sampler2D tSpecular;
 		uniform float cameraRange;
 		uniform vec2 resolution;
 		uniform float cameraNear;
@@ -170,13 +167,7 @@ const SSRrShader = {
 					gl_FragColor=vec4(1,0,0,1);
 					return;
 					// vec4 refractColor=texture2D(tDiffuse,uv);
-					// #ifdef SPECULAR
-					// 	vec4 specularColor=texture2D(tSpecular,vUv);
-					// 	gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);
-					// 	// gl_FragColor.xyz=refractColor.xyz*(1.+specularColor.r*3.);
-					// #else
-					// 	gl_FragColor.xyz=refractColor.xyz;
-					// #endif
+				  // gl_FragColor.xyz=refractColor.xyz;
 					// gl_FragColor.a=1.;
 					// return;
 				}else{

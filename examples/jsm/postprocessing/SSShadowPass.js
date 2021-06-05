@@ -48,23 +48,6 @@ class SSRrPass extends Pass {
 
 		this.tempColor = new Color();
 
-		this._specular = SSRrShader.defines.SPECULAR;
-		Object.defineProperty( this, 'specular', {
-			get() {
-
-				return this._specular;
-
-			},
-			set( val ) {
-
-				if ( this._specular === val ) return;
-				this._specular = val;
-				this.ssrrMaterial.defines.SPECULAR = val;
-				this.ssrrMaterial.needsUpdate = true;
-
-			}
-		} );
-
 		this._infiniteThick = SSRrShader.defines.INFINITE_THICK;
 		Object.defineProperty( this, 'infiniteThick', {
 			get() {
@@ -95,12 +78,6 @@ class SSRrPass extends Pass {
 			format: RGBAFormat,
 			depthTexture: depthTexture,
 			depthBuffer: true
-		} );
-
-		this.specularRenderTarget = new WebGLRenderTarget( this.width, this.height, { // TODO: Can merge with refractiveRenderTarget?
-			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			format: RGBAFormat,
 		} );
 
 		// refractive render target
@@ -138,7 +115,6 @@ class SSRrPass extends Pass {
 		} );
 
 		this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-		this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
 		this.ssrrMaterial.needsUpdate = true;
 		this.ssrrMaterial.uniforms[ 'tRefractive' ].value = this.refractiveRenderTarget.texture;
 		this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
@@ -163,13 +139,6 @@ class SSRrPass extends Pass {
 
 		this.refractiveOffMaterial = new MeshBasicMaterial( {
 			color: 'black'
-		} );
-
-		// specular material
-		this.specularMaterial = new MeshStandardMaterial( {
-			color: 'black',
-			metalness: 0,
-			roughness: .2,
 		} );
 
 		// material for rendering the depth
@@ -214,7 +183,6 @@ class SSRrPass extends Pass {
 		// dispose render targets
 
 		this.beautyRenderTarget.dispose();
-		this.specularRenderTarget.dispose();
 		this.refractiveRenderTarget.dispose();
 		this.ssrrRenderTarget.dispose();
 
@@ -241,16 +209,11 @@ class SSRrPass extends Pass {
 		renderer.clear();
 		renderer.render( this.scene, this.camera );
 
-		renderer.setRenderTarget( this.specularRenderTarget );
-		renderer.clear();
-		renderer.render( this.scene, this.camera );
-
 		// render SSRr
 
 		this.ssrrMaterial.uniforms[ 'lightPosition' ].value = this.lightPosition;
 		this.ssrrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
 		this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
-		this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
 		this.renderPass( renderer, this.ssrrMaterial, this.ssrrRenderTarget );
 
 		// output result to screen
@@ -295,14 +258,6 @@ class SSRrPass extends Pass {
 			case SSRrPass.OUTPUT.Refractive:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.refractiveRenderTarget.texture;
-				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
-
-				break;
-
-			case SSRrPass.OUTPUT.Specular:
-
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.specularRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -384,7 +339,6 @@ class SSRrPass extends Pass {
 		this.ssrrMaterial.defines.MAX_STEP = Math.sqrt( width * width + height * height );
 		this.ssrrMaterial.needsUpdate = true;
 		this.beautyRenderTarget.setSize( width, height );
-		this.specularRenderTarget.setSize( width, height );
 		this.ssrrRenderTarget.setSize( width, height );
 		this.refractiveRenderTarget.setSize( width, height );
 
@@ -402,7 +356,6 @@ SSRrPass.OUTPUT = {
 	'Beauty': 3,
 	'Depth': 4,
 	'Refractive': 7,
-	'Specular': 8,
 };
 
 export { SSRrPass };
