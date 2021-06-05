@@ -1268,7 +1268,9 @@ function WebGLRenderer( parameters ) {
 
 		if ( _transmissionRenderTarget === null ) {
 
-			const renderTargetType = _antialias && capabilities.isWebGL2 && false ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
+			const needsAntialias = _antialias === true && capabilities.isWebGL2 === true;
+			const renderTargetType = needsAntialias ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
+
 			_transmissionRenderTarget = new renderTargetType( 1024, 1024, {
 				generateMipmaps: true,
 				minFilter: LinearMipmapLinearFilter,
