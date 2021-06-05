@@ -80,6 +80,15 @@ class SSRrPass extends Pass {
 			depthBuffer: true
 		} );
 
+		// normal render target
+
+		this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+			minFilter: NearestFilter,
+			magFilter: NearestFilter,
+			format: RGBAFormat,
+			type: HalfFloatType,
+		} );
+
 		// refractive render target
 
 		this.refractiveRenderTarget = new WebGLRenderTarget( this.width, this.height, {
@@ -115,6 +124,7 @@ class SSRrPass extends Pass {
 		} );
 
 		this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+		this.ssrrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
 		this.ssrrMaterial.needsUpdate = true;
 		this.ssrrMaterial.uniforms[ 'tRefractive' ].value = this.refractiveRenderTarget.texture;
 		this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
@@ -183,6 +193,7 @@ class SSRrPass extends Pass {
 		// dispose render targets
 
 		this.beautyRenderTarget.dispose();
+		this.normalRenderTarget.dispose();
 		this.refractiveRenderTarget.dispose();
 		this.ssrrRenderTarget.dispose();
 
@@ -208,6 +219,10 @@ class SSRrPass extends Pass {
 		renderer.setRenderTarget( this.beautyRenderTarget );
 		renderer.clear();
 		renderer.render( this.scene, this.camera );
+
+		// render normals
+
+		this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0, 0 );
 
 		// render SSRr
 
@@ -252,6 +267,14 @@ class SSRrPass extends Pass {
 
 				this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
+
+				break;
+
+			case SSRPass.OUTPUT.Normal:
+
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
+				this.copyMaterial.blending = NoBlending;
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
@@ -339,6 +362,7 @@ class SSRrPass extends Pass {
 		this.ssrrMaterial.defines.MAX_STEP = Math.sqrt( width * width + height * height );
 		this.ssrrMaterial.needsUpdate = true;
 		this.beautyRenderTarget.setSize( width, height );
+		this.normalRenderTarget.setSize( width, height );
 		this.ssrrRenderTarget.setSize( width, height );
 		this.refractiveRenderTarget.setSize( width, height );
 
@@ -355,6 +379,7 @@ SSRrPass.OUTPUT = {
 	'SSRr': 1,
 	'Beauty': 3,
 	'Depth': 4,
+	'Normal': 5,
 	'Refractive': 7,
 };
 

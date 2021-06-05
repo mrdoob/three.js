@@ -15,6 +15,7 @@ const SSRrShader = {
 	uniforms: {
 
 		'tDiffuse': { value: null },
+		'tNormal': { value: null },
 		'tRefractive': { value: null },
 		'tDepth': { value: null },
 		'cameraNear': { value: null },
@@ -48,6 +49,7 @@ const SSRrShader = {
 		precision highp sampler2D;
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
+		uniform sampler2D tNormal;
 		uniform sampler2D tRefractive;
 		uniform sampler2D tDiffuse;
 		uniform float cameraRange;
@@ -91,6 +93,9 @@ const SSRrShader = {
 			clipPosition *= clipW; //clip
 			return ( cameraInverseProjectionMatrix * clipPosition ).xyz;//view
 		}
+		vec3 getViewNormal( const in vec2 uv ) {
+			return unpackRGBToNormal( texture2D( tNormal, uv ).xyz );
+		}
 		vec2 viewPositionToXY(vec3 viewPosition){
 			vec2 xy;
 			vec4 clip=cameraProjectionMatrix*vec4(viewPosition,1);
@@ -115,6 +120,8 @@ const SSRrShader = {
 			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
 
+			vec3 viewNormal=getViewNormal( vUv );
+
 			vec3 viewRefractDir=normalize(lightPosition-viewPosition);
 
 			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
@@ -133,7 +140,7 @@ const SSRrShader = {
 			float totalStep=max(abs(xLen),abs(yLen));
 			float xSpan=xLen/totalStep;
 			float ySpan=yLen/totalStep;
-			for(float i=10.;i<float(MAX_STEP);i++){
+			for(float i=0.;i<float(MAX_STEP);i++){
 				if(i>=totalStep) break;
 				vec2 xy=vec2(d0.x+i*xSpan,d0.y+i*ySpan);
 				if(xy.x<0.||xy.x>resolution.x||xy.y<0.||xy.y>resolution.y) break;
@@ -165,6 +172,8 @@ const SSRrShader = {
 				#endif
 				gl_FragColor=texture2D(tDiffuse,vUv);
 				if(hit){
+					vec3 vN=getViewNormal( uv );
+					if(dot(viewRefractDir,vN)>=0.) continue;
 					gl_FragColor.rgb*=.5;
 					return;
 				}
