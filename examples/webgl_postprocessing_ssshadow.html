@@ -179,9 +179,9 @@
 
 			gui = new GUI();
 			gui.add( params, 'enableSSRr' ).name( 'Enable SSRr' );
-			gui.add( ssrrPass.lightPosition, 'x' ).min( 0 ).max( 1.5 ).step( .0001 );
-			gui.add( ssrrPass.lightPosition, 'y' ).min( 0 ).max( 1.5 ).step( .0001 );
-			gui.add( ssrrPass.lightPosition, 'z' ).min( 0 ).max( 1.5 ).step( .0001 );
+			gui.add( ssrrPass.lightPosition, 'x' ).min( 0 ).max( 10 ).step( .0001 );
+			gui.add( ssrrPass.lightPosition, 'y' ).min( 0 ).max( 10 ).step( .0001 );
+			gui.add( ssrrPass.lightPosition, 'z' ).min( 0 ).max( 10 ).step( .0001 );
 			gui.add( params, 'autoRotate' ).onChange( () => {
 
 				controls.enabled = ! params.autoRotate;

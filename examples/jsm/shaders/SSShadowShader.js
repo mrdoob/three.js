@@ -9,7 +9,7 @@ const SSRrShader = {
 	defines: {
 		MAX_STEP: 0,
 		PERSPECTIVE_CAMERA: true,
-		INFINITE_THICK: true,
+		INFINITE_THICK: false,
 	},
 
 	uniforms: {
@@ -22,7 +22,7 @@ const SSRrShader = {
 		'resolution': { value: new Vector2() },
 		'cameraProjectionMatrix': { value: new Matrix4() },
 		'cameraInverseProjectionMatrix': { value: new Matrix4() },
-		'lightPosition': { value: new Vector3(0,3,0) },
+		'lightPosition': { value: new Vector3(1.7,1.7,0) },
 		'cameraRange': { value: 0 },
 		'maxDistance': { value: 180 },
 		'surfDist': { value: .007 },
@@ -133,7 +133,7 @@ const SSRrShader = {
 			float totalStep=max(abs(xLen),abs(yLen));
 			float xSpan=xLen/totalStep;
 			float ySpan=yLen/totalStep;
-			for(float i=0.;i<float(MAX_STEP);i++){
+			for(float i=10.;i<float(MAX_STEP);i++){
 				if(i>=totalStep) break;
 				vec2 xy=vec2(d0.x+i*xSpan,d0.y+i*ySpan);
 				if(xy.x<0.||xy.x>resolution.x||xy.y<0.||xy.y>resolution.y) break;
@@ -163,15 +163,10 @@ const SSRrShader = {
 					float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
 					hit=away<=sD;
 				#endif
+				gl_FragColor=texture2D(tDiffuse,vUv);
 				if(hit){
-					gl_FragColor=vec4(1,0,0,1);
+					gl_FragColor.rgb*=.5;
 					return;
-					// vec4 refractColor=texture2D(tDiffuse,uv);
-				  // gl_FragColor.xyz=refractColor.xyz;
-					// gl_FragColor.a=1.;
-					// return;
-				}else{
-					gl_FragColor=texture2D(tDiffuse,vUv);
 				}
 			}
 		}
