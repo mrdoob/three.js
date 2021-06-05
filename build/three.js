@@ -18192,7 +18192,9 @@
 
 		function renderTransmissiveObjects(opaqueObjects, transmissiveObjects, scene, camera) {
 			if (_transmissionRenderTarget === null) {
-				_transmissionRenderTarget = new WebGLRenderTarget(1024, 1024, {
+				const needsAntialias = _antialias === true && capabilities.isWebGL2 === true;
+				const renderTargetType = needsAntialias ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
+				_transmissionRenderTarget = new renderTargetType(1024, 1024, {
 					generateMipmaps: true,
 					minFilter: LinearMipmapLinearFilter,
 					magFilter: NearestFilter,
@@ -18208,6 +18210,7 @@
 			_this.clear();
 
 			renderObjects(opaqueObjects, scene, camera);
+			textures.updateMultisampleRenderTarget(_transmissionRenderTarget);
 			textures.updateRenderTargetMipmap(_transmissionRenderTarget);
 
 			_this.setRenderTarget(currentRenderTarget);
