@@ -40,7 +40,7 @@ class SSRrPass extends Pass {
 		this.output = 0;
 		// this.output = 1;
 
-		this.ior = SSRrShader.uniforms.ior.value;
+		this.lightPos = SSRrShader.uniforms.lightPos.value;
 		this.maxDistance = SSRrShader.uniforms.maxDistance.value;
 		this.surfDist = SSRrShader.uniforms.surfDist.value;
 
@@ -343,7 +343,7 @@ class SSRrPass extends Pass {
 
 		// render SSRr
 
-		this.ssrrMaterial.uniforms[ 'ior' ].value = this.ior;
+		this.ssrrMaterial.uniforms[ 'lightPos' ].value = this.lightPos;
 		this.ssrrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
 		this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
 		this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;

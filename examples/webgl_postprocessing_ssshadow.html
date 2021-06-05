@@ -187,8 +187,9 @@
 
 			gui = new GUI();
 			gui.add( params, 'enableSSRr' ).name( 'Enable SSRr' );
-			ssrrPass.ior = 1.1;
-			gui.add( ssrrPass, 'ior' ).name( 'IOR' ).min( 1 ).max( 1.5 ).step( .0001 );
+			gui.add( ssrrPass.lightPos, 'x' ).min( 0 ).max( 1.5 ).step( .0001 );
+			gui.add( ssrrPass.lightPos, 'y' ).min( 0 ).max( 1.5 ).step( .0001 );
+			gui.add( ssrrPass.lightPos, 'z' ).min( 0 ).max( 1.5 ).step( .0001 );
 			gui.add( ssrrPass, 'fillHole' );
 			gui.add( params, 'autoRotate' ).onChange( () => {
 

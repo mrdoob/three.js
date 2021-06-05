@@ -1,6 +1,7 @@
 import {
 	Matrix4,
-	Vector2
+	Vector2,
+	Vector3
 } from '../../../build/three.module.js';
 
 const SSRrShader = {
@@ -26,7 +27,7 @@ const SSRrShader = {
 		'resolution': { value: new Vector2() },
 		'cameraProjectionMatrix': { value: new Matrix4() },
 		'cameraInverseProjectionMatrix': { value: new Matrix4() },
-		'ior': { value: 1.03 },
+		'lightPos': { value: new Vector3(0,1,0) },
 		'cameraRange': { value: 0 },
 		'maxDistance': { value: 180 },
 		'surfDist': { value: .007 },
@@ -61,7 +62,7 @@ const SSRrShader = {
 		uniform vec2 resolution;
 		uniform float cameraNear;
 		uniform float cameraFar;
-		uniform float ior;
+		uniform vec3 lightPos;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
 		uniform float maxDistance;
@@ -127,7 +128,6 @@ const SSRrShader = {
 
 		}
 		void main(){
-			if(ior==1.) return; // Adding this line may have better performance, but more importantly, it can avoid display errors at the very edges of the model when IOR is equal to 1.
 
 			float refractive=texture2D(tRefractive,vUv).r;
 			if(refractive<=0.) return;
@@ -154,7 +154,7 @@ const SSRrShader = {
 				vec3 viewIncidentDir=vec3(0,0,-1);
 			#endif
 
-			vec3 viewRefractDir=refract(viewIncidentDir,viewNormalSelects,1./ior);
+			vec3 viewRefractDir=refract(viewIncidentDir,viewNormalSelects,1./1.2);
 			// https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/refract.xhtml
 
 			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
