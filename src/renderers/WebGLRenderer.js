@@ -28,6 +28,7 @@ import { WebGLGeometries } from './webgl/WebGLGeometries.js';
 import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer.js';
 import { WebGLInfo } from './webgl/WebGLInfo.js';
 import { WebGLMorphtargets } from './webgl/WebGLMorphtargets.js';
+import { WebGLMultisampleRenderTarget } from './WebGLMultisampleRenderTarget.js';
 import { WebGLObjects } from './webgl/WebGLObjects.js';
 import { WebGLPrograms } from './webgl/WebGLPrograms.js';
 import { WebGLProperties } from './webgl/WebGLProperties.js';
@@ -1267,7 +1268,8 @@ function WebGLRenderer( parameters ) {
 
 		if ( _transmissionRenderTarget === null ) {
 
-			_transmissionRenderTarget = new WebGLRenderTarget( 1024, 1024, {
+			const renderTargetType = _antialias && capabilities.isWebGL2 && false ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
+			_transmissionRenderTarget = new renderTargetType( 1024, 1024, {
 				generateMipmaps: true,
 				minFilter: LinearMipmapLinearFilter,
 				magFilter: NearestFilter,
@@ -1283,6 +1285,7 @@ function WebGLRenderer( parameters ) {
 
 		renderObjects( opaqueObjects, scene, camera );
 
+		textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
 		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
 
 		_this.setRenderTarget( currentRenderTarget );
