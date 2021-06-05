@@ -10,6 +10,7 @@ const SSRrShader = {
 		MAX_STEP: 0,
 		PERSPECTIVE_CAMERA: true,
 		INFINITE_THICK: false,
+		WORLD_LIGHT_POSITION: false,
 	},
 
 	uniforms: {
@@ -23,6 +24,7 @@ const SSRrShader = {
 		'resolution': { value: new Vector2() },
 		'cameraProjectionMatrix': { value: new Matrix4() },
 		'cameraInverseProjectionMatrix': { value: new Matrix4() },
+		'cameraMatrixWorldInverse': { value: new Matrix4() },
 		'lightPosition': { value: new Vector3(1.7,1.7,0) },
 		'cameraRange': { value: 0 },
 		'maxDistance': { value: 180 },
@@ -60,6 +62,7 @@ const SSRrShader = {
 		uniform vec3 lightPosition;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
+		uniform mat4 cameraMatrixWorldInverse;
 		uniform float maxDistance;
 		uniform float surfDist;
 		uniform float doubleSideCheckStartFrom;
@@ -124,7 +127,12 @@ const SSRrShader = {
 
 			vec3 viewNormal=getViewNormal( vUv );
 
-			vec3 viewRefractDir=normalize(lightPosition-viewPosition);
+			#ifdef WORLD_LIGHT_POSITION
+				vec3 viewLightPosition=(cameraMatrixWorldInverse*vec4(lightPosition,1.)).xyz;
+			#else
+				vec3 viewLightPosition=lightPosition;
+			#endif
+			vec3 viewRefractDir=normalize(viewLightPosition-viewPosition);
 
 			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
 			#ifdef PERSPECTIVE_CAMERA

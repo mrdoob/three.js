@@ -66,6 +66,23 @@ class SSRrPass extends Pass {
 			}
 		} );
 
+		this._worldLightPosition = SSRrShader.defines.WORLD_LIGHT_POSITION;
+		Object.defineProperty( this, 'worldLightPosition', {
+			get() {
+
+				return this._worldLightPosition;
+
+			},
+			set( val ) {
+
+				if ( this._worldLightPosition === val ) return;
+				this._worldLightPosition = val;
+				this.ssrrMaterial.defines.WORLD_LIGHT_POSITION = val;
+				this.ssrrMaterial.needsUpdate = true;
+
+			}
+		} );
+
 		// beauty render target with depth buffer
 
 		const depthTexture = new DepthTexture();
@@ -134,6 +151,7 @@ class SSRrPass extends Pass {
 		this.ssrrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
 		this.ssrrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 		this.ssrrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
+		this.ssrrMaterial.uniforms[ 'cameraMatrixWorldInverse' ].value.copy( this.camera.matrixWorldInverse );
 
 		// normal material
 
@@ -231,6 +249,7 @@ class SSRrPass extends Pass {
 		this.ssrrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
 		this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
 		this.ssrrMaterial.uniforms[ 'doubleSideCheckStartFrom' ].value = this.doubleSideCheckStartFrom;
+		this.ssrrMaterial.uniforms[ 'cameraMatrixWorldInverse' ].value.copy( this.camera.matrixWorldInverse );
 		this.renderPass( renderer, this.ssrrMaterial, this.ssrrRenderTarget );
 
 		// output result to screen
