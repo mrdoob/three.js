@@ -33,7 +33,7 @@
 
 		const params = {
 			enableSSRr: true,
-			autoRotate: true,
+			autoRotate: false,
 		};
 		let composer;
 		let ssrrPass;
@@ -179,9 +179,10 @@
 
 			gui = new GUI();
 			gui.add( params, 'enableSSRr' ).name( 'Enable SSRr' );
-			gui.add( ssrrPass.lightPosition, 'x' ).min( 0 ).max( 10 ).step( .0001 );
-			gui.add( ssrrPass.lightPosition, 'y' ).min( 0 ).max( 10 ).step( .0001 );
-			gui.add( ssrrPass.lightPosition, 'z' ).min( 0 ).max( 10 ).step( .0001 );
+			gui.add( ssrrPass.lightPosition, 'x' ).name('lightX').min( 0 ).max( 10 ).step( .0001 );
+			gui.add( ssrrPass.lightPosition, 'y' ).name('lightY').min( 0 ).max( 10 ).step( .0001 );
+			gui.add( ssrrPass.lightPosition, 'z' ).name('lightZ').min( 0 ).max( 10 ).step( .0001 );
+			gui.add( ssrrPass, 'doubleSideCheckStartFrom' ).min( 0 ).max( .1 ).step( .0001 );
 			gui.add( params, 'autoRotate' ).onChange( () => {
 
 				controls.enabled = ! params.autoRotate;

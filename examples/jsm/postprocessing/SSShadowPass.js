@@ -43,6 +43,7 @@ class SSRrPass extends Pass {
 		this.lightPosition = SSRrShader.uniforms.lightPosition.value;
 		this.maxDistance = SSRrShader.uniforms.maxDistance.value;
 		this.surfDist = SSRrShader.uniforms.surfDist.value;
+		this.doubleSideCheckStartFrom = SSRrShader.uniforms.doubleSideCheckStartFrom.value;
 
 		this.encoding = encoding;
 
@@ -229,6 +230,7 @@ class SSRrPass extends Pass {
 		this.ssrrMaterial.uniforms[ 'lightPosition' ].value = this.lightPosition;
 		this.ssrrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
 		this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
+		this.ssrrMaterial.uniforms[ 'doubleSideCheckStartFrom' ].value = this.doubleSideCheckStartFrom;
 		this.renderPass( renderer, this.ssrrMaterial, this.ssrrRenderTarget );
 
 		// output result to screen

@@ -27,6 +27,7 @@ const SSRrShader = {
 		'cameraRange': { value: 0 },
 		'maxDistance': { value: 180 },
 		'surfDist': { value: .007 },
+		'doubleSideCheckStartFrom': { value: .01 },
 
 	},
 
@@ -61,6 +62,7 @@ const SSRrShader = {
 		uniform mat4 cameraInverseProjectionMatrix;
 		uniform float maxDistance;
 		uniform float surfDist;
+		uniform float doubleSideCheckStartFrom;
 		#include <packing>
 		float pointToLineDistance(vec3 x0, vec3 x1, vec3 x2) {
 			//x0: point, x1: linePointA, x2: linePointB
@@ -173,7 +175,12 @@ const SSRrShader = {
 				gl_FragColor=texture2D(tDiffuse,vUv);
 				if(hit){
 					vec3 vN=getViewNormal( uv );
-					if(dot(viewRefractDir,vN)>=0.) continue;
+
+					// if(dot(viewRefractDir,vN)>=0.) continue;
+
+					if((length(viewPosition-vP)<doubleSideCheckStartFrom)&&(dot(viewRefractDir,vN)>=0.)) continue;
+					// May not need "doubleSideCheckStartFrom", use "surfDist" or change starting "i" of "for(float i=1.;i<float(MAX_STEP);i++){" instead.
+
 					gl_FragColor.rgb*=.5;
 					return;
 				}
