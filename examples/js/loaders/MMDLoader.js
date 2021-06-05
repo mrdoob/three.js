@@ -946,7 +946,6 @@
       	 * THREE.Color
       	 *
       	 * MMD         MMDToonMaterial
-      	 * diffuse  -  color
       	 * ambient  -  emissive * a
       	 *               (a = 1.0 without map texture or 0.2 with map texture)
       	 *
@@ -954,7 +953,7 @@
       	 * It'll be too bright if material has map texture so using coef 0.2.
       	 */
 
-				params.color = new THREE.Color().fromArray( material.diffuse );
+				params.diffuse = new THREE.Color().fromArray( material.diffuse );
 				params.opacity = material.diffuse[ 3 ];
 				params.specular = new THREE.Color().fromArray( material.specular );
 				params.shininess = material.shininess;
@@ -1826,65 +1825,67 @@
 		constructor( parameters ) {
 
 			super();
-			this.color = new THREE.Color( 0xffffff );
-			this.specular = new THREE.Color( 0x111111 );
-			this.shininess = 30;
-			this.matcap = null;
-			this.matcapCombine = null;
-			this.map = null;
-			this.gradientMap = null;
-			this.lightMap = null;
-			this.lightMapIntensity = 1.0;
-			this.aoMap = null;
-			this.aoMapIntensity = 1.0;
-			this.emissive = new THREE.Color( 0x000000 );
+			this._matcapCombine = THREE.AddOperation;
 			this.emissiveIntensity = 1.0;
-			this.emissiveMap = null;
-			this.bumpMap = null;
-			this.bumpScale = 1;
-			this.normalMap = null;
 			this.normalMapType = THREE.TangentSpaceNormalMap;
-			this.normalScale = new THREE.Vector2( 1, 1 );
-			this.displacementMap = null;
-			this.displacementScale = 1;
-			this.displacementBias = 0;
-			this.specularMap = null;
-			this.alphaMap = null;
-			this.envMap = null;
 			this.combine = THREE.MultiplyOperation;
-			this.reflectivity = 1;
-			this.refractionRatio = 0.98;
 			this.wireframeLinecap = 'round';
 			this.wireframeLinejoin = 'round';
 			this.flatShading = false;
-			parameters.defines = Object.assign( {}, THREE.MMDToonShader.defines );
+			this.lights = true;
+			this.vertexShader = THREE.MMDToonShader.vertexShader;
+			this.fragmentShader = THREE.MMDToonShader.fragmentShader;
+			this.defines = Object.assign( {}, THREE.MMDToonShader.defines );
+			Object.defineProperties( this, {
+				matcapCombine: {
+					get: function () {
 
-			switch ( parameters.matcapCombine ) {
+						return this._matcapCombine;
 
-				case THREE.MultiplyOperation:
-					parameters.defines[ 'MATCAP_BLENDING_MULTIPLY' ] = '';
-					break;
+					},
+					set: function ( value ) {
 
-				case THREE.AddOperation:
-					parameters.defines[ 'MATCAP_BLENDING_ADD' ] = '';
-					break;
+						this._matcapCombine = value;
+
+						switch ( value ) {
+
+							case THREE.MultiplyOperation:
+								this.defines.MATCAP_BLENDING_MULTIPLY = true;
+								delete this.defines.MATCAP_BLENDING_ADD;
+								break;
+
+							default:
+							case THREE.AddOperation:
+								this.defines.MATCAP_BLENDING_ADD = true;
+								delete this.defines.MATCAP_BLENDING_MULTIPLY;
+								break;
+
+						}
+
+					}
+				}
+			} );
+			this.uniforms = THREE.UniformsUtils.clone( THREE.MMDToonShader.uniforms );
+
+			for ( const uniformName in this.uniforms ) {
+
+				Object.defineProperties( this, {
+					[ uniformName ]: {
+						get: function () {
+
+							return this.uniforms[ uniformName ].value;
+
+						},
+						set: function ( value ) {
+
+							this.uniforms[ uniformName ].value = value;
+
+						}
+					}
+				} );
 
 			}
 
-			parameters.uniforms = THREE.UniformsUtils.clone( THREE.MMDToonShader.uniforms );
-			parameters.uniforms.diffuse.value = parameters.color;
-			parameters.uniforms.matcap.value = parameters.matcap;
-			parameters.uniforms.map.value = parameters.map;
-			parameters.uniforms.envMap.value = parameters.envMap;
-			parameters.uniforms.reflectivity.value = parameters.reflectivity;
-			parameters.uniforms.refractionRatio.value = parameters.refractionRatio;
-			parameters.uniforms.specular.value = parameters.specular;
-			parameters.uniforms.shininess.value = parameters.shininess;
-			parameters.uniforms.emissive.value = parameters.emissive;
-			parameters.uniforms.gradientMap.value = parameters.gradientMap;
-			parameters.vertexShader = THREE.MMDToonShader.vertexShader;
-			parameters.fragmentShader = THREE.MMDToonShader.fragmentShader;
-			parameters.lights = true;
 			this.setValues( parameters );
 
 		}
@@ -1892,34 +1893,10 @@
 		copy( source ) {
 
 			super.copy( source );
-			this.color.copy( source.color );
-			this.specular.copy( source.specular );
-			this.shininess = source.shininess;
-			this.matcap = source.matcap;
 			this.matcapCombine = source.matcapCombine;
-			this.map = source.map;
-			this.gradientMap = source.gradientMap;
-			this.lightMap = source.lightMap;
-			this.lightMapIntensity = source.lightMapIntensity;
-			this.aoMap = source.aoMap;
-			this.aoMapIntensity = source.aoMapIntensity;
-			this.emissive.copy( source.emissive );
-			this.emissiveMap = source.emissiveMap;
 			this.emissiveIntensity = source.emissiveIntensity;
-			this.bumpMap = source.bumpMap;
-			this.bumpScale = source.bumpScale;
-			this.normalMap = source.normalMap;
 			this.normalMapType = source.normalMapType;
-			this.normalScale.copy( source.normalScale );
-			this.displacementMap = source.displacementMap;
-			this.displacementScale = source.displacementScale;
-			this.displacementBias = source.displacementBias;
-			this.specularMap = source.specularMap;
-			this.alphaMap = source.alphaMap;
-			this.envMap = source.envMap;
 			this.combine = source.combine;
-			this.reflectivity = source.reflectivity;
-			this.refractionRatio = source.refractionRatio;
 			this.wireframeLinecap = source.wireframeLinecap;
 			this.wireframeLinejoin = source.wireframeLinejoin;
 			this.flatShading = source.flatShading;

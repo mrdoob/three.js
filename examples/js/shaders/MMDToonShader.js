@@ -10,7 +10,7 @@
  * Combining steps:
  *  * Declare matcap uniform.
  *  * Add gradientmap_pars_fragment.
- *  * Combine dotNL and gradient irradiances as total irradiance.
+ *  * Use gradient irradiances instead of dotNL irradiance from MeshPhongMaterial.
  *    (Replace lights_phong_pars_fragment with lights_mmd_toon_pars_fragment)
  *  * Add mmd_toon_matcap_fragment.
  */
@@ -85,7 +85,8 @@ void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in Geometric
 	const MMDToonShader = {
 		defines: {
 			TOON: true,
-			MATCAP: true
+			MATCAP: true,
+			MATCAP_BLENDING_ADD: true
 		},
 		uniforms: THREE.UniformsUtils.merge( [ THREE.ShaderLib.toon.uniforms, THREE.ShaderLib.phong.uniforms, THREE.ShaderLib.matcap.uniforms ] ),
 		vertexShader: THREE.ShaderLib.phong.vertexShader,
