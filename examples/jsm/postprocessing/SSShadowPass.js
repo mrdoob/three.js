@@ -40,7 +40,7 @@ class SSRrPass extends Pass {
 		this.output = 0;
 		// this.output = 1;
 
-		this.lightPos = SSRrShader.uniforms.lightPos.value;
+		this.lightPosition = SSRrShader.uniforms.lightPosition.value;
 		this.maxDistance = SSRrShader.uniforms.maxDistance.value;
 		this.surfDist = SSRrShader.uniforms.surfDist.value;
 
@@ -62,23 +62,6 @@ class SSRrPass extends Pass {
 				if ( this._specular === val ) return;
 				this._specular = val;
 				this.ssrrMaterial.defines.SPECULAR = val;
-				this.ssrrMaterial.needsUpdate = true;
-
-			}
-		} );
-
-		this._fillHole = SSRrShader.defines.FILL_HOLE;
-		Object.defineProperty( this, 'fillHole', {
-			get() {
-
-				return this._fillHole;
-
-			},
-			set( val ) {
-
-				if ( this._fillHole === val ) return;
-				this._fillHole = val;
-				this.ssrrMaterial.defines.FILL_HOLE = val;
 				this.ssrrMaterial.needsUpdate = true;
 
 			}
@@ -343,7 +326,7 @@ class SSRrPass extends Pass {
 
 		// render SSRr
 
-		this.ssrrMaterial.uniforms[ 'lightPos' ].value = this.lightPos;
+		this.ssrrMaterial.uniforms[ 'lightPosition' ].value = this.lightPosition;
 		this.ssrrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
 		this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
 		this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;

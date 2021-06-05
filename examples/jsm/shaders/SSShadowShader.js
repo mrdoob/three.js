@@ -10,7 +10,6 @@ const SSRrShader = {
 		MAX_STEP: 0,
 		PERSPECTIVE_CAMERA: true,
 		SPECULAR: true,
-		FILL_HOLE: true,
 		INFINITE_THICK: false,
 	},
 
@@ -27,7 +26,7 @@ const SSRrShader = {
 		'resolution': { value: new Vector2() },
 		'cameraProjectionMatrix': { value: new Matrix4() },
 		'cameraInverseProjectionMatrix': { value: new Matrix4() },
-		'lightPos': { value: new Vector3(0,1,0) },
+		'lightPosition': { value: new Vector3(0,1,0) },
 		'cameraRange': { value: 0 },
 		'maxDistance': { value: 180 },
 		'surfDist': { value: .007 },
@@ -53,8 +52,8 @@ const SSRrShader = {
 		precision highp sampler2D;
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
-		uniform sampler2D tDepthSelects;
-		uniform sampler2D tNormalSelects;
+		// uniform sampler2D tDepthSelects;
+		// uniform sampler2D tNormalSelects;
 		uniform sampler2D tRefractive;
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tSpecular;
@@ -62,7 +61,7 @@ const SSRrShader = {
 		uniform vec2 resolution;
 		uniform float cameraNear;
 		uniform float cameraFar;
-		uniform vec3 lightPos;
+		uniform vec3 lightPosition;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
 		uniform float maxDistance;
@@ -87,9 +86,9 @@ const SSRrShader = {
 		float getDepth( const in vec2 uv ) {
 			return texture2D( tDepth, uv ).x;
 		}
-		float getDepthSelects( const in vec2 uv ) {
-			return texture2D( tDepthSelects, uv ).x;
-		}
+		// float getDepthSelects( const in vec2 uv ) {
+		// 	return texture2D( tDepthSelects, uv ).x;
+		// }
 		float getViewZ( const in float depth ) {
 			#ifdef PERSPECTIVE_CAMERA
 				return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
@@ -102,9 +101,9 @@ const SSRrShader = {
 			clipPosition *= clipW; //clip
 			return ( cameraInverseProjectionMatrix * clipPosition ).xyz;//view
 		}
-		vec3 getViewNormalSelects( const in vec2 uv ) {
-			return unpackRGBToNormal( texture2D( tNormalSelects, uv ).xyz );
-		}
+		// vec3 getViewNormalSelects( const in vec2 uv ) {
+		// 	return unpackRGBToNormal( texture2D( tNormalSelects, uv ).xyz );
+		// }
 		vec2 viewPositionToXY(vec3 viewPosition){
 			vec2 xy;
 			vec4 clip=cameraProjectionMatrix*vec4(viewPosition,1);
@@ -129,16 +128,13 @@ const SSRrShader = {
 		}
 		void main(){
 
-			float refractive=texture2D(tRefractive,vUv).r;
-			if(refractive<=0.) return;
-
 			// gl_FragColor=vec4(0,0,.5,1);return;
-			vec3 viewNormalSelects=getViewNormalSelects( vUv );
+			// vec3 viewNormalSelects=getViewNormalSelects( vUv );
 			// gl_FragColor=vec4(viewNormalSelects,1);return;
 
 			// if(viewNormalSelects.x<=0.&&viewNormalSelects.y<=0.&&viewNormalSelects.z<=0.) return;
 
-			float depth = getDepthSelects( vUv );
+			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
 			// if(-viewZ>=cameraFar) return;
 
@@ -148,14 +144,7 @@ const SSRrShader = {
 			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
 
-			#ifdef PERSPECTIVE_CAMERA
-				vec3 viewIncidentDir=normalize(viewPosition);
-			#else
-				vec3 viewIncidentDir=vec3(0,0,-1);
-			#endif
-
-			vec3 viewRefractDir=refract(viewIncidentDir,viewNormalSelects,1./1.2);
-			// https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/refract.xhtml
+			vec3 viewRefractDir=normalize(lightPosition-viewPosition);
 
 			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
 			#ifdef PERSPECTIVE_CAMERA
@@ -173,10 +162,6 @@ const SSRrShader = {
 			float totalStep=max(abs(xLen),abs(yLen));
 			float xSpan=xLen/totalStep;
 			float ySpan=yLen/totalStep;
-			#ifdef FILL_HOLE
-				bool isRough=false;
-				vec2 uvRough;
-			#endif
 			for(float i=0.;i<float(MAX_STEP);i++){
 				if(i>=totalStep) break;
 				vec2 xy=vec2(d0.x+i*xSpan,d0.y+i*ySpan);
@@ -199,15 +184,6 @@ const SSRrShader = {
 					float sD=surfDist;
 				#endif
 
-				#ifdef FILL_HOLE // TODO: May can improve performance by check if INFINITE_THICK too.
-					if(viewRefractRayZ<=vZ){
-						if(!isRough){
-							uvRough=uv;
-							isRough=true;
-						}
-					}
-				#endif
-
 				bool hit;
 				#ifdef INFINITE_THICK
 					hit=viewRefractRayZ<=vZ;
@@ -221,17 +197,6 @@ const SSRrShader = {
 					return;
 				}
 			}
-
-			#ifdef FILL_HOLE
-				if(isRough){
-					setResultColor(uvRough);
-				}
-				// else{
-				// 	gl_FragColor=texture2D(tDiffuse,vUv);//For afterward add color mix feature.
-				// }
-			#else
-				// gl_FragColor=texture2D(tDiffuse,vUv);//For afterward add color mix feature.
-			#endif
 		}
 	`
 
