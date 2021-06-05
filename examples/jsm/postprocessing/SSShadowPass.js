@@ -24,7 +24,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
 
 class SSRrPass extends Pass {
 
-	constructor( { renderer, scene, camera, width, height, selects, encoding, morphTargets = false } ) {
+	constructor( { renderer, scene, camera, width, height, encoding, morphTargets = false } ) {
 
 		super();
 
@@ -47,8 +47,6 @@ class SSRrPass extends Pass {
 		this.encoding = encoding;
 
 		this.tempColor = new Color();
-
-		this.selects = selects;
 
 		this._specular = SSRrShader.defines.SPECULAR;
 		Object.defineProperty( this, 'specular', {
@@ -105,22 +103,6 @@ class SSRrPass extends Pass {
 			format: RGBAFormat,
 		} );
 
-		// normalSelects render target
-
-		const depthTextureSelects = new DepthTexture();
-		depthTextureSelects.type = UnsignedShortType;
-		depthTextureSelects.minFilter = NearestFilter;
-		depthTextureSelects.magFilter = NearestFilter;
-
-		this.normalSelectsRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			format: RGBAFormat,
-			type: HalfFloatType,
-			depthTexture: depthTextureSelects,
-			depthBuffer: true
-		} );
-
 		// refractive render target
 
 		this.refractiveRenderTarget = new WebGLRenderTarget( this.width, this.height, {
@@ -157,11 +139,9 @@ class SSRrPass extends Pass {
 
 		this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 		this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
-		this.ssrrMaterial.uniforms[ 'tNormalSelects' ].value = this.normalSelectsRenderTarget.texture;
 		this.ssrrMaterial.needsUpdate = true;
 		this.ssrrMaterial.uniforms[ 'tRefractive' ].value = this.refractiveRenderTarget.texture;
 		this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
-		this.ssrrMaterial.uniforms[ 'tDepthSelects' ].value = this.normalSelectsRenderTarget.depthTexture;
 		this.ssrrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 		this.ssrrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 		this.ssrrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
@@ -235,7 +215,6 @@ class SSRrPass extends Pass {
 
 		this.beautyRenderTarget.dispose();
 		this.specularRenderTarget.dispose();
-		this.normalSelectsRenderTarget.dispose();
 		this.refractiveRenderTarget.dispose();
 		this.ssrrRenderTarget.dispose();
 
@@ -260,69 +239,11 @@ class SSRrPass extends Pass {
 		if ( this.encoding ) this.beautyRenderTarget.texture.encoding = this.encoding;
 		renderer.setRenderTarget( this.beautyRenderTarget );
 		renderer.clear();
-		this.scene.children.forEach( child => {
-
-			if ( this.selects.includes( child ) ) {
-
-				child.visible = false;
-
-			} else {
-
-				child.visible = true;
-
-			}
-
-		} );
 		renderer.render( this.scene, this.camera );
 
 		renderer.setRenderTarget( this.specularRenderTarget );
 		renderer.clear();
-		this.scene.children.forEach( child => {
-
-			if ( this.selects.includes( child ) ) {
-
-				child.visible = true;
-				child._SSRrPassBackupMaterial = child.material;
-				child.material = this.specularMaterial;
-
-			} else if ( ! child.isLight ) {
-
-				child.visible = false;
-
-			}
-
-		} );
 		renderer.render( this.scene, this.camera );
-		this.scene.children.forEach( child => {
-
-			if ( this.selects.includes( child ) ) {
-
-				child.material = child._SSRrPassBackupMaterial;
-
-			}
-
-		} );
-
-
-		// render normalSelectss
-
-		this.scene.children.forEach( child => {
-
-			if ( this.selects.includes( child ) ) {
-
-				child.visible = true;
-
-			} else {
-
-				child.visible = false;
-
-			}
-
-		} );
-
-		this.renderOverride( renderer, this.normalMaterial, this.normalSelectsRenderTarget, 0, 0 );
-
-		this.renderRefractive( renderer, this.refractiveOnMaterial, this.refractiveRenderTarget, 0, 0 );
 
 		// render SSRr
 
@@ -368,21 +289,6 @@ class SSRrPass extends Pass {
 
 				this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
-
-				break;
-
-			case SSRrPass.OUTPUT.DepthSelects:
-
-				this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.normalSelectsRenderTarget.depthTexture;
-				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
-
-				break;
-
-			case SSRrPass.OUTPUT.NormalSelects:
-
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalSelectsRenderTarget.texture;
-				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
@@ -470,66 +376,6 @@ class SSRrPass extends Pass {
 
 	}
 
-	renderRefractive( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
-
-		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
-		const originalClearAlpha = renderer.getClearAlpha( this.tempColor );
-		const originalAutoClear = renderer.autoClear;
-
-		renderer.setRenderTarget( renderTarget );
-		renderer.autoClear = false;
-
-		clearColor = overrideMaterial.clearColor || clearColor;
-		clearAlpha = overrideMaterial.clearAlpha || clearAlpha;
-
-		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
-
-			renderer.setClearColor( clearColor );
-			renderer.setClearAlpha( clearAlpha || 0.0 );
-			renderer.clear();
-
-		}
-
-		this.scene.children.forEach( child => {
-
-			child.visible = true;
-
-		} );
-		this.scene.traverse( child => {
-
-			child._SSRrPassBackupMaterial = child.material;
-			if ( this.selects.includes( child ) ) {
-
-				child.material = this.refractiveOnMaterial;
-
-			} else {
-
-				child.material = this.refractiveOffMaterial;
-
-			}
-
-		} );
-		this.scene._SSRrPassBackupBackground = this.scene.background;
-		this.scene.background = null;
-		this.scene._SSRrPassBackupFog = this.scene.fog;
-		this.scene.fog = null;
-		renderer.render( this.scene, this.camera );
-		this.scene.fog = this.scene._SSRrPassBackupFog;
-		this.scene.background = this.scene._SSRrPassBackupBackground;
-		this.scene.traverse( child => {
-
-			child.material = child._SSRrPassBackupMaterial;
-
-		} );
-
-		// restore original state
-
-		renderer.autoClear = originalAutoClear;
-		renderer.setClearColor( this.originalClearColor );
-		renderer.setClearAlpha( originalClearAlpha );
-
-	}
-
 	setSize( width, height ) {
 
 		this.width = width;
@@ -540,7 +386,6 @@ class SSRrPass extends Pass {
 		this.beautyRenderTarget.setSize( width, height );
 		this.specularRenderTarget.setSize( width, height );
 		this.ssrrRenderTarget.setSize( width, height );
-		this.normalSelectsRenderTarget.setSize( width, height );
 		this.refractiveRenderTarget.setSize( width, height );
 
 		this.ssrrMaterial.uniforms[ 'resolution' ].value.set( width, height );
@@ -556,8 +401,6 @@ SSRrPass.OUTPUT = {
 	'SSRr': 1,
 	'Beauty': 3,
 	'Depth': 4,
-	'DepthSelects': 9,
-	'NormalSelects': 5,
 	'Refractive': 7,
 	'Specular': 8,
 };

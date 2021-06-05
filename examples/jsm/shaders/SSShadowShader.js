@@ -17,16 +17,14 @@ const SSRrShader = {
 
 		'tDiffuse': { value: null },
 		'tSpecular': { value: null },
-		'tNormalSelects': { value: null },
 		'tRefractive': { value: null },
 		'tDepth': { value: null },
-		'tDepthSelects': { value: null },
 		'cameraNear': { value: null },
 		'cameraFar': { value: null },
 		'resolution': { value: new Vector2() },
 		'cameraProjectionMatrix': { value: new Matrix4() },
 		'cameraInverseProjectionMatrix': { value: new Matrix4() },
-		'lightPosition': { value: new Vector3(0,1,0) },
+		'lightPosition': { value: new Vector3(0,3,0) },
 		'cameraRange': { value: 0 },
 		'maxDistance': { value: 180 },
 		'surfDist': { value: .007 },
@@ -52,8 +50,6 @@ const SSRrShader = {
 		precision highp sampler2D;
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
-		// uniform sampler2D tDepthSelects;
-		// uniform sampler2D tNormalSelects;
 		uniform sampler2D tRefractive;
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tSpecular;
@@ -86,9 +82,6 @@ const SSRrShader = {
 		float getDepth( const in vec2 uv ) {
 			return texture2D( tDepth, uv ).x;
 		}
-		// float getDepthSelects( const in vec2 uv ) {
-		// 	return texture2D( tDepthSelects, uv ).x;
-		// }
 		float getViewZ( const in float depth ) {
 			#ifdef PERSPECTIVE_CAMERA
 				return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
@@ -101,9 +94,6 @@ const SSRrShader = {
 			clipPosition *= clipW; //clip
 			return ( cameraInverseProjectionMatrix * clipPosition ).xyz;//view
 		}
-		// vec3 getViewNormalSelects( const in vec2 uv ) {
-		// 	return unpackRGBToNormal( texture2D( tNormalSelects, uv ).xyz );
-		// }
 		vec2 viewPositionToXY(vec3 viewPosition){
 			vec2 xy;
 			vec4 clip=cameraProjectionMatrix*vec4(viewPosition,1);
@@ -114,25 +104,9 @@ const SSRrShader = {
 			xy*=resolution;//screen
 			return xy;
 		}
-		void setResultColor(vec2 uv){
-			vec4 refractColor=texture2D(tDiffuse,uv);
-			#ifdef SPECULAR
-				vec4 specularColor=texture2D(tSpecular,vUv);
-				gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);
-				// gl_FragColor.xyz=refractColor.xyz*(1.+specularColor.r*3.);
-			#else
-				gl_FragColor.xyz=refractColor.xyz;
-			#endif
-			gl_FragColor.a=1.;
-
-		}
 		void main(){
 
 			// gl_FragColor=vec4(0,0,.5,1);return;
-			// vec3 viewNormalSelects=getViewNormalSelects( vUv );
-			// gl_FragColor=vec4(viewNormalSelects,1);return;
-
-			// if(viewNormalSelects.x<=0.&&viewNormalSelects.y<=0.&&viewNormalSelects.z<=0.) return;
 
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
@@ -193,8 +167,20 @@ const SSRrShader = {
 					hit=away<=sD;
 				#endif
 				if(hit){
-					setResultColor(uv);
+					gl_FragColor=vec4(1,0,0,1);
 					return;
+					// vec4 refractColor=texture2D(tDiffuse,uv);
+					// #ifdef SPECULAR
+					// 	vec4 specularColor=texture2D(tSpecular,vUv);
+					// 	gl_FragColor.xyz=mix(refractColor.xyz,vec3(1),specularColor.r);
+					// 	// gl_FragColor.xyz=refractColor.xyz*(1.+specularColor.r*3.);
+					// #else
+					// 	gl_FragColor.xyz=refractColor.xyz;
+					// #endif
+					// gl_FragColor.a=1.;
+					// return;
+				}else{
+					gl_FragColor=texture2D(tDiffuse,vUv);
 				}
 			}
 		}

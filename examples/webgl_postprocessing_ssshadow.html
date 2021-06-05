@@ -42,7 +42,6 @@
 		let controls;
 		let camera, scene, renderer;
 		const objects = [];
-		const selects = [];
 		const raycaster = new THREE.Raycaster();
 		const mouseDown = new THREE.Vector2();
 		const mouse = new THREE.Vector2();
@@ -108,7 +107,6 @@
 				mesh.name = 'bunny';
 				scene.add( mesh );
 				objects.push( mesh );
-				selects.push( mesh );
 
 				// Release decoder resources.
 				dracoLoader.dispose();
@@ -124,7 +122,6 @@
 			mesh.name = 'box';
 			scene.add( mesh );
 			objects.push( mesh );
-			selects.push( mesh );
 
 			geometry = new THREE.IcosahedronBufferGeometry( .025, 4 );
 			material = new THREE.MeshStandardMaterial( { color: 'cyan' } );
@@ -133,7 +130,6 @@
 			mesh.name = 'sphere';
 			scene.add( mesh );
 			objects.push( mesh );
-			// selects.push( mesh );
 
 			geometry = new THREE.ConeBufferGeometry( .025, .05, 64 );
 			material = new THREE.MeshStandardMaterial( { color: 'yellow' } );
@@ -142,7 +138,6 @@
 			mesh.name = 'cone';
 			scene.add( mesh );
 			objects.push( mesh );
-			// selects.push( mesh );
 
 			// renderer
 			renderer = new THREE.WebGLRenderer( { antialias: false } );
@@ -166,7 +161,6 @@
 
 			window.addEventListener( 'resize', onWindowResize );
 			window.addEventListener( 'pointerdown', onPointerDown );
-			window.addEventListener( 'pointerup', onPointerUp );
 
 			// composer
 
@@ -178,7 +172,6 @@
 				width: innerWidth,
 				height: innerHeight,
 				encoding: THREE.sRGBEncoding,
-				selects: selects
 			} );
 
 			composer.addPass( ssrrPass );
@@ -205,8 +198,6 @@
 				'SSRr Only': SSRrPass.OUTPUT.SSRr,
 				'Beauty': SSRrPass.OUTPUT.Beauty,
 				'Depth': SSRrPass.OUTPUT.Depth,
-				'DepthSelects': SSRrPass.OUTPUT.DepthSelects,
-				'NormalSelects': SSRrPass.OUTPUT.NormalSelects,
 				'Refractive': SSRrPass.OUTPUT.Refractive,
 				'Specular': SSRrPass.OUTPUT.Specular,
 			} ).onChange( function ( value ) {
@@ -219,7 +210,7 @@
 			ssrrPass.maxDistance = 50;
 			folder.add( ssrrPass, 'maxDistance' ).min( 0 ).max( 100 ).step( .001 );
 			folder.add( ssrrPass, 'infiniteThick' );
-			// folder.open()
+			folder.open()
 			// gui.close()
 
 		}
@@ -228,37 +219,6 @@
 
 			mouseDown.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 			mouseDown.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-		}
-
-		function onPointerUp( event ) {
-
-			// calculate mouse position in normalized device coordinates
-			// (-1 to +1) for both components
-
-			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-			if ( mouseDown.sub( mouse ).length() > 0 ) return;
-
-
-			raycaster.setFromCamera( mouse, camera );
-			const intersect = raycaster.intersectObjects( objects )[ 0 ];
-
-			if ( intersect ) {
-
-				const index = selects.indexOf( intersect.object );
-				if ( index >= 0 ) {
-
-					selects.splice( index, 1 );
-
-				} else {
-
-					selects.push( intersect.object );
-
-				}
-
-			}
 
 		}
 
