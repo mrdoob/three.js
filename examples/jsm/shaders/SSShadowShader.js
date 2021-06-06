@@ -182,7 +182,6 @@ const SSShadowShader = {
 					float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
 					hit=away<=sD;
 				#endif
-				gl_FragColor=texture2D(tDiffuse,vUv);
 				if(hit){
 					vec3 vN=getViewNormal( uv );
 
@@ -191,10 +190,15 @@ const SSShadowShader = {
 					if((length(viewPosition-vP)<doubleSideCheckStartFrom)&&(dot(viewRefractDir,vN)>=0.)) continue;
 					// May not need "doubleSideCheckStartFrom", use "surfDist" or change starting "i" of "for(float i=1.;i<float(MAX_STEP);i++){" instead.
 
+					gl_FragColor=texture2D(tDiffuse,vUv);
 					gl_FragColor.rgb*=.5;
 					return;
 				}
-			}
+			} // end of for loop
+			gl_FragColor=texture2D(tDiffuse,vUv);
+			float attenuation=max(0.,min(1.,length(viewPosition-lightPosition)/1.));
+			attenuation*=attenuation;
+			gl_FragColor.rgb*=attenuation;
 		}
 	`
 
