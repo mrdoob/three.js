@@ -2135,25 +2135,70 @@ class MMDToonMaterial extends ShaderMaterial {
 		} );
 
 		this.uniforms = UniformsUtils.clone( MMDToonShader.uniforms );
-		for ( const uniformName in this.uniforms ) {
 
-			Object.defineProperty( this, uniformName, {
+		// merged from MeshToon/Phong/MatcapMaterial
+		const exposePropertyNames = [
+			'specular',
+			'shininess',
+			'opacity',
+			'diffuse',
 
-        get: function () {
+			'map',
+			'matcap',
+			'gradientMap',
 
-          return this.uniforms[ uniformName ].value;
+			'lightMap',
+			'lightMapIntensity',
 
-        },
+			'aoMap',
+			'aoMapIntensity',
 
-        set: function ( value ) {
+			'emissive',
+			'emissiveMap',
 
-          this.uniforms[ uniformName ].value = value;
+			'bumpMap',
+			'bumpScale',
 
-        },
+			'normalMap',
+			'normalScale',
+
+			'displacemantBias',
+			'displacemantMap',
+			'displacemantScale',
+
+			'specularMap',
+
+			'alphaMap',
+
+			'envMap',
+			'reflectivity',
+			'refractionRatio',
+		];
+		for ( const propertyName of exposePropertyNames ) {
+
+			Object.defineProperty( this, propertyName, {
+
+				get: function () {
+
+					return this.uniforms[ propertyName ].value;
+
+				},
+
+				set: function ( value ) {
+
+					this.uniforms[ propertyName ].value = value;
+
+				},
 
 			} );
 
 		}
+
+		Object.defineProperty(
+			this,
+			'color',
+			Object.getOwnPropertyDescriptor( this, 'diffuse' )
+		);
 
 		this.setValues( parameters );
 

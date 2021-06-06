@@ -1865,27 +1865,28 @@
 					}
 				}
 			} );
-			this.uniforms = THREE.UniformsUtils.clone( THREE.MMDToonShader.uniforms );
+			this.uniforms = THREE.UniformsUtils.clone( THREE.MMDToonShader.uniforms ); // merged from MeshToon/Phong/MatcapMaterial
 
-			for ( const uniformName in this.uniforms ) {
+			const exposePropertyNames = [ 'specular', 'shininess', 'opacity', 'diffuse', 'map', 'matcap', 'gradientMap', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity', 'emissive', 'emissiveMap', 'bumpMap', 'bumpScale', 'normalMap', 'normalScale', 'displacemantBias', 'displacemantMap', 'displacemantScale', 'specularMap', 'alphaMap', 'envMap', 'reflectivity', 'refractionRatio' ];
 
-				Object.defineProperties( this, {
-					[ uniformName ]: {
-						get: function () {
+			for ( const propertyName of exposePropertyNames ) {
 
-							return this.uniforms[ uniformName ].value;
+				Object.defineProperty( this, propertyName, {
+					get: function () {
 
-						},
-						set: function ( value ) {
+						return this.uniforms[ propertyName ].value;
 
-							this.uniforms[ uniformName ].value = value;
+					},
+					set: function ( value ) {
 
-						}
+						this.uniforms[ propertyName ].value = value;
+
 					}
 				} );
 
 			}
 
+			Object.defineProperty( this, 'color', Object.getOwnPropertyDescriptor( this, 'diffuse' ) );
 			this.setValues( parameters );
 
 		}
