@@ -419,7 +419,7 @@
 
 					case 'mouse':
 					case 'pen':
-						onMouseUp( event );
+						onMouseUp();
 						break;
         // TODO touch
 

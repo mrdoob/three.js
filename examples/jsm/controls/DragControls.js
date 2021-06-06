@@ -156,7 +156,7 @@ class DragControls extends EventDispatcher {
 
 				case 'mouse':
 				case 'pen':
-					onMouseDown( event );
+					onMouseDown();
 					break;
 
 				// TODO touch
@@ -198,7 +198,7 @@ class DragControls extends EventDispatcher {
 
 				case 'mouse':
 				case 'pen':
-					onMouseCancel( event );
+					onMouseCancel();
 					break;
 
 				// TODO touch
