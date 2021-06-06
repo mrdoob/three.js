@@ -88,13 +88,18 @@
 			hemiLight.name = 'hemiLight';
 			scene.add( hemiLight );
 
-			const spotLight = new THREE.SpotLight();
-			spotLight.name = 'spotLight';
-			spotLight.angle = Math.PI / 16;
-			spotLight.penumbra = 0.5;
-			// spotLight.castShadow = true;
-			spotLight.position.set( - 1, 1, 1 );
-			scene.add( spotLight );
+			// const spotLight = new THREE.SpotLight();
+			// spotLight.name = 'spotLight';
+			// spotLight.angle = Math.PI / 16;
+			// spotLight.penumbra = 0.5;
+			// // spotLight.castShadow = true;
+			// spotLight.position.set( - 1, 1, 1 );
+			// scene.add( spotLight );
+
+			const light = new THREE.PointLight( 'white', 1, 100 );
+			light.position.set( - 1, 1, 1 );
+			// light.castShadow=true
+			scene.add( light );
 
 			dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
 
@@ -218,7 +223,7 @@
 			} );
 			ssshadowPass.surfDist = 0.0015;
 			folder.add( ssshadowPass, 'surfDist' ).min( 0 ).max( .005 ).step( .0001 );
-			folder.add( ssshadowPass, 'maxDistance' ).min( 0 ).max( 5 ).step( .001 );
+			folder.add( ssshadowPass, 'maxDistance' ).min( 0 ).max( 50 ).step( .001 );
 			folder.add( ssshadowPass, 'infiniteThick' );
 			folder.open()
 			// gui.close()

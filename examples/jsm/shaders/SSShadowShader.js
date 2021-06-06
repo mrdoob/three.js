@@ -27,9 +27,9 @@ const SSShadowShader = {
 		'cameraMatrixWorldInverse': { value: new Matrix4() },
 		// 'lightPosition': { value: new Vector3(1.7,1.7,0) },
 		// 'lightPosition': { value: new Vector3(0,.1,0) },
-		'lightPosition': { value: new Vector3(-.06,.17,-.03) },
+		'lightPosition': { value: new Vector3(- 1, 1, 1) },
 		'cameraRange': { value: 0 },
-		'maxDistance': { value: 1 },
+		'maxDistance': { value: 5 },
 		'surfDist': { value: .007 },
 		'doubleSideCheckStartFrom': { value: .01 },
 
@@ -155,6 +155,7 @@ const SSShadowShader = {
 
 			gl_FragColor=texture2D(tDiffuse,vUv);
 			float attenuation=max(0.,min(1.,1.-length(viewPosition-viewLightPosition)/maxDistance));
+			// float attenuation=max(0.,min(1.,1.-length(viewPosition-viewLightPosition)));
 			attenuation*=attenuation;
 			gl_FragColor.rgb*=attenuation;
 
