@@ -218,8 +218,7 @@
 			} );
 			ssshadowPass.surfDist = 0.0015;
 			folder.add( ssshadowPass, 'surfDist' ).min( 0 ).max( .005 ).step( .0001 );
-			ssshadowPass.maxDistance = 50;
-			folder.add( ssshadowPass, 'maxDistance' ).min( 0 ).max( 100 ).step( .001 );
+			folder.add( ssshadowPass, 'maxDistance' ).min( 0 ).max( 5 ).step( .001 );
 			folder.add( ssshadowPass, 'infiniteThick' );
 			folder.open()
 			// gui.close()

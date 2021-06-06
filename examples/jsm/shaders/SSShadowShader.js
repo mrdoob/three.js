@@ -29,7 +29,7 @@ const SSShadowShader = {
 		// 'lightPosition': { value: new Vector3(0,.1,0) },
 		'lightPosition': { value: new Vector3(-.06,.17,-.03) },
 		'cameraRange': { value: 0 },
-		'maxDistance': { value: 180 },
+		'maxDistance': { value: 1 },
 		'surfDist': { value: .007 },
 		'doubleSideCheckStartFrom': { value: .01 },
 
@@ -152,6 +152,12 @@ const SSShadowShader = {
 			float totalStep=max(abs(xLen),abs(yLen));
 			float xSpan=xLen/totalStep;
 			float ySpan=yLen/totalStep;
+
+			gl_FragColor=texture2D(tDiffuse,vUv);
+			float attenuation=max(0.,min(1.,1.-length(viewPosition-viewLightPosition)/maxDistance));
+			attenuation*=attenuation;
+			gl_FragColor.rgb*=attenuation;
+
 			for(float i=0.;i<float(MAX_STEP);i++){
 				if(i>=totalStep) break;
 				vec2 xy=vec2(d0.x+i*xSpan,d0.y+i*ySpan);
@@ -190,15 +196,11 @@ const SSShadowShader = {
 					if((length(viewPosition-vP)<doubleSideCheckStartFrom)&&(dot(viewRefractDir,vN)>=0.)) continue;
 					// May not need "doubleSideCheckStartFrom", use "surfDist" or change starting "i" of "for(float i=1.;i<float(MAX_STEP);i++){" instead.
 
-					gl_FragColor=texture2D(tDiffuse,vUv);
+					// gl_FragColor=texture2D(tDiffuse,vUv);
 					gl_FragColor.rgb*=.5;
 					return;
 				}
 			} // end of for loop
-			gl_FragColor=texture2D(tDiffuse,vUv);
-			float attenuation=max(0.,min(1.,length(viewPosition-lightPosition)/1.));
-			attenuation*=attenuation;
-			gl_FragColor.rgb*=attenuation;
 		}
 	`
 
