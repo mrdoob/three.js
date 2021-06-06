@@ -10,7 +10,7 @@ const SSShadowShader = {
 		MAX_STEP: 0,
 		PERSPECTIVE_CAMERA: true,
 		INFINITE_THICK: false,
-		WORLD_LIGHT_POSITION: false,
+		WORLD_LIGHT_POSITION: true,
 	},
 
 	uniforms: {
@@ -25,7 +25,9 @@ const SSShadowShader = {
 		'cameraProjectionMatrix': { value: new Matrix4() },
 		'cameraInverseProjectionMatrix': { value: new Matrix4() },
 		'cameraMatrixWorldInverse': { value: new Matrix4() },
-		'lightPosition': { value: new Vector3(1.7,1.7,0) },
+		// 'lightPosition': { value: new Vector3(1.7,1.7,0) },
+		// 'lightPosition': { value: new Vector3(0,.1,0) },
+		'lightPosition': { value: new Vector3(-.06,.17,-.03) },
 		'cameraRange': { value: 0 },
 		'maxDistance': { value: 180 },
 		'surfDist': { value: .007 },

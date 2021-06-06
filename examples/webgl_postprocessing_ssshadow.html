@@ -32,10 +32,11 @@
 
 		const params = {
 			enableSSShadow: true,
-			autoRotate: true,
+			autoRotate: false,
 		};
 		let composer;
 		let ssshadowPass;
+		let ssshadowLightHepler;
 		let gui;
 		let stats;
 		let controls;
@@ -174,13 +175,27 @@
 
 			composer.addPass( ssshadowPass );
 
+			// SSShadow light helper
+
+			// ssshadowLightHepler = new THREE.Mesh(new THREE.IcosahedronBufferGeometry(0,0),new THREE.MeshBasicMaterial({color:'white',}))
+			ssshadowLightHepler = new THREE.Mesh(new THREE.IcosahedronBufferGeometry(.001,3),new THREE.MeshBasicMaterial({color:'white',}))
+			// ssshadowLightHepler = new THREE.Sprite(new THREE.SpriteMaterial({color:'white',}))
+			ssshadowLightHepler.position.copy(ssshadowPass.lightPosition)
+			scene.add(ssshadowLightHepler)
+
 			// GUI
 
 			gui = new GUI();
 			gui.add( params, 'enableSSShadow' ).name( 'Enable SSShadow' );
-			gui.add( ssshadowPass.lightPosition, 'x' ).name('lightX').min( -10 ).max( 10 ).step( .0001 );
-			gui.add( ssshadowPass.lightPosition, 'y' ).name('lightY').min( -10 ).max( 10 ).step( .0001 );
-			gui.add( ssshadowPass.lightPosition, 'z' ).name('lightZ').min( -10 ).max( 10 ).step( .0001 );
+			gui.add( ssshadowPass.lightPosition, 'x' ).name('lightX').min( -10 ).max( 10 ).step( .001 ).onChange(()=>{
+				ssshadowLightHepler.position.copy(ssshadowPass.lightPosition)
+			});
+			gui.add( ssshadowPass.lightPosition, 'y' ).name('lightY').min( -10 ).max( 10 ).step( .001 ).onChange(()=>{
+				ssshadowLightHepler.position.copy(ssshadowPass.lightPosition)
+			});
+			gui.add( ssshadowPass.lightPosition, 'z' ).name('lightZ').min( -10 ).max( 10 ).step( .001 ).onChange(()=>{
+				ssshadowLightHepler.position.copy(ssshadowPass.lightPosition)
+			});
 			gui.add( ssshadowPass, 'worldLightPosition' );
 			gui.add( ssshadowPass, 'doubleSideCheckStartFrom' ).min( 0 ).max( .1 ).step( .0001 );
 			gui.add( params, 'autoRotate' ).onChange( () => {
@@ -195,7 +210,7 @@
 				'SSShadow Only': SSShadowPass.OUTPUT.SSShadow,
 				'Beauty': SSShadowPass.OUTPUT.Beauty,
 				'Depth': SSShadowPass.OUTPUT.Depth,
-				'Refractive': SSShadowPass.OUTPUT.Refractive,
+				'Normal': SSShadowPass.OUTPUT.Normal,
 			} ).onChange( function ( value ) {
 
 				ssshadowPass.output = parseInt( value );
