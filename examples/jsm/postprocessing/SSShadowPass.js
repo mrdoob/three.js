@@ -18,11 +18,11 @@ import {
 	MeshStandardMaterial
 } from '../../../build/three.module.js';
 import { Pass, FullScreenQuad } from './Pass.js';
-import { SSRrShader } from '../shaders/SSShadowShader.js';
-import { SSRrDepthShader } from '../shaders/SSShadowShader.js';
+import { SSShadowShader } from '../shaders/SSShadowShader.js';
+import { SSShadowDepthShader } from '../shaders/SSShadowShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
-class SSRrPass extends Pass {
+class SSShadowPass extends Pass {
 
 	constructor( { renderer, scene, camera, width, height, encoding, morphTargets = false } ) {
 
@@ -40,16 +40,16 @@ class SSRrPass extends Pass {
 		this.output = 0;
 		// this.output = 1;
 
-		this.lightPosition = SSRrShader.uniforms.lightPosition.value;
-		this.maxDistance = SSRrShader.uniforms.maxDistance.value;
-		this.surfDist = SSRrShader.uniforms.surfDist.value;
-		this.doubleSideCheckStartFrom = SSRrShader.uniforms.doubleSideCheckStartFrom.value;
+		this.lightPosition = SSShadowShader.uniforms.lightPosition.value;
+		this.maxDistance = SSShadowShader.uniforms.maxDistance.value;
+		this.surfDist = SSShadowShader.uniforms.surfDist.value;
+		this.doubleSideCheckStartFrom = SSShadowShader.uniforms.doubleSideCheckStartFrom.value;
 
 		this.encoding = encoding;
 
 		this.tempColor = new Color();
 
-		this._infiniteThick = SSRrShader.defines.INFINITE_THICK;
+		this._infiniteThick = SSShadowShader.defines.INFINITE_THICK;
 		Object.defineProperty( this, 'infiniteThick', {
 			get() {
 
@@ -60,13 +60,13 @@ class SSRrPass extends Pass {
 
 				if ( this._infiniteThick === val ) return;
 				this._infiniteThick = val;
-				this.ssrrMaterial.defines.INFINITE_THICK = val;
-				this.ssrrMaterial.needsUpdate = true;
+				this.ssshadowMaterial.defines.INFINITE_THICK = val;
+				this.ssshadowMaterial.needsUpdate = true;
 
 			}
 		} );
 
-		this._worldLightPosition = SSRrShader.defines.WORLD_LIGHT_POSITION;
+		this._worldLightPosition = SSShadowShader.defines.WORLD_LIGHT_POSITION;
 		Object.defineProperty( this, 'worldLightPosition', {
 			get() {
 
@@ -77,8 +77,8 @@ class SSRrPass extends Pass {
 
 				if ( this._worldLightPosition === val ) return;
 				this._worldLightPosition = val;
-				this.ssrrMaterial.defines.WORLD_LIGHT_POSITION = val;
-				this.ssrrMaterial.needsUpdate = true;
+				this.ssshadowMaterial.defines.WORLD_LIGHT_POSITION = val;
+				this.ssshadowMaterial.needsUpdate = true;
 
 			}
 		} );
@@ -115,43 +115,43 @@ class SSRrPass extends Pass {
 			format: RGBAFormat
 		} );
 
-		// ssrr render target
+		// ssshadow render target
 
-		this.ssrrRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+		this.ssshadowRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
 			format: RGBAFormat
 		} );
 
-		// ssrr material
+		// ssshadow material
 
-		if ( SSRrShader === undefined ) {
+		if ( SSShadowShader === undefined ) {
 
-			console.error( 'THREE.SSRrPass: The pass relies on SSRrShader.' );
+			console.error( 'THREE.SSShadowPass: The pass relies on SSShadowShader.' );
 
 		}
 
-		this.ssrrMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, SSRrShader.defines, {
+		this.ssshadowMaterial = new ShaderMaterial( {
+			defines: Object.assign( {}, SSShadowShader.defines, {
 				MAX_STEP: Math.sqrt( this.width * this.width + this.height * this.height )
 			} ),
-			uniforms: UniformsUtils.clone( SSRrShader.uniforms ),
-			vertexShader: SSRrShader.vertexShader,
-			fragmentShader: SSRrShader.fragmentShader,
+			uniforms: UniformsUtils.clone( SSShadowShader.uniforms ),
+			vertexShader: SSShadowShader.vertexShader,
+			fragmentShader: SSShadowShader.fragmentShader,
 			blending: NoBlending
 		} );
 
-		this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-		this.ssrrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
-		this.ssrrMaterial.needsUpdate = true;
-		this.ssrrMaterial.uniforms[ 'tRefractive' ].value = this.refractiveRenderTarget.texture;
-		this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
-		this.ssrrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
-		this.ssrrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-		this.ssrrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
-		this.ssrrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-		this.ssrrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
-		this.ssrrMaterial.uniforms[ 'cameraMatrixWorldInverse' ].value.copy( this.camera.matrixWorldInverse );
+		this.ssshadowMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+		this.ssshadowMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
+		this.ssshadowMaterial.needsUpdate = true;
+		this.ssshadowMaterial.uniforms[ 'tRefractive' ].value = this.refractiveRenderTarget.texture;
+		this.ssshadowMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+		this.ssshadowMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+		this.ssshadowMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
+		this.ssshadowMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
+		this.ssshadowMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
+		this.ssshadowMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
+		this.ssshadowMaterial.uniforms[ 'cameraMatrixWorldInverse' ].value.copy( this.camera.matrixWorldInverse );
 
 		// normal material
 
@@ -173,10 +173,10 @@ class SSRrPass extends Pass {
 		// material for rendering the depth
 
 		this.depthRenderMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, SSRrDepthShader.defines ),
-			uniforms: UniformsUtils.clone( SSRrDepthShader.uniforms ),
-			vertexShader: SSRrDepthShader.vertexShader,
-			fragmentShader: SSRrDepthShader.fragmentShader,
+			defines: Object.assign( {}, SSShadowDepthShader.defines ),
+			uniforms: UniformsUtils.clone( SSShadowDepthShader.uniforms ),
+			vertexShader: SSShadowDepthShader.vertexShader,
+			fragmentShader: SSShadowDepthShader.fragmentShader,
 			blending: NoBlending
 		} );
 		this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
@@ -214,7 +214,7 @@ class SSRrPass extends Pass {
 		this.beautyRenderTarget.dispose();
 		this.normalRenderTarget.dispose();
 		this.refractiveRenderTarget.dispose();
-		this.ssrrRenderTarget.dispose();
+		this.ssshadowRenderTarget.dispose();
 
 		// dispose materials
 
@@ -243,40 +243,40 @@ class SSRrPass extends Pass {
 
 		this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0, 0 );
 
-		// render SSRr
+		// render SSShadow
 
-		this.ssrrMaterial.uniforms[ 'lightPosition' ].value = this.lightPosition;
-		this.ssrrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
-		this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
-		this.ssrrMaterial.uniforms[ 'doubleSideCheckStartFrom' ].value = this.doubleSideCheckStartFrom;
-		this.ssrrMaterial.uniforms[ 'cameraMatrixWorldInverse' ].value.copy( this.camera.matrixWorldInverse );
-		this.renderPass( renderer, this.ssrrMaterial, this.ssrrRenderTarget );
+		this.ssshadowMaterial.uniforms[ 'lightPosition' ].value = this.lightPosition;
+		this.ssshadowMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
+		this.ssshadowMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
+		this.ssshadowMaterial.uniforms[ 'doubleSideCheckStartFrom' ].value = this.doubleSideCheckStartFrom;
+		this.ssshadowMaterial.uniforms[ 'cameraMatrixWorldInverse' ].value.copy( this.camera.matrixWorldInverse );
+		this.renderPass( renderer, this.ssshadowMaterial, this.ssshadowRenderTarget );
 
 		// output result to screen
 
 		switch ( this.output ) {
 
-			case SSRrPass.OUTPUT.Default:
+			case SSShadowPass.OUTPUT.Default:
 
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.texture;
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssshadowRenderTarget.texture;
 				this.copyMaterial.blending = NormalBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
-			case SSRrPass.OUTPUT.SSRr:
+			case SSShadowPass.OUTPUT.SSShadow:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.texture;
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssshadowRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
-			case SSRrPass.OUTPUT.Beauty:
+			case SSShadowPass.OUTPUT.Beauty:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
@@ -284,7 +284,7 @@ class SSRrPass extends Pass {
 
 				break;
 
-			case SSRrPass.OUTPUT.Depth:
+			case SSShadowPass.OUTPUT.Depth:
 
 				this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
@@ -299,7 +299,7 @@ class SSRrPass extends Pass {
 
 				break;
 
-			case SSRrPass.OUTPUT.Refractive:
+			case SSShadowPass.OUTPUT.Refractive:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.refractiveRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
@@ -308,7 +308,7 @@ class SSRrPass extends Pass {
 				break;
 
 			default:
-				console.warn( 'THREE.SSRrPass: Unknown output type.' );
+				console.warn( 'THREE.SSShadowPass: Unknown output type.' );
 
 		}
 
@@ -380,28 +380,28 @@ class SSRrPass extends Pass {
 		this.width = width;
 		this.height = height;
 
-		this.ssrrMaterial.defines.MAX_STEP = Math.sqrt( width * width + height * height );
-		this.ssrrMaterial.needsUpdate = true;
+		this.ssshadowMaterial.defines.MAX_STEP = Math.sqrt( width * width + height * height );
+		this.ssshadowMaterial.needsUpdate = true;
 		this.beautyRenderTarget.setSize( width, height );
 		this.normalRenderTarget.setSize( width, height );
-		this.ssrrRenderTarget.setSize( width, height );
+		this.ssshadowRenderTarget.setSize( width, height );
 		this.refractiveRenderTarget.setSize( width, height );
 
-		this.ssrrMaterial.uniforms[ 'resolution' ].value.set( width, height );
-		this.ssrrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-		this.ssrrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
+		this.ssshadowMaterial.uniforms[ 'resolution' ].value.set( width, height );
+		this.ssshadowMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
+		this.ssshadowMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 
 	}
 
 }
 
-SSRrPass.OUTPUT = {
+SSShadowPass.OUTPUT = {
 	'Default': 0,
-	'SSRr': 1,
+	'SSShadow': 1,
 	'Beauty': 3,
 	'Depth': 4,
 	'Normal': 5,
 	'Refractive': 7,
 };
 
-export { SSRrPass };
+export { SSShadowPass };

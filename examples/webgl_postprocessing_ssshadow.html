@@ -14,7 +14,7 @@
 	<div id="container"></div>
 	<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
-		SSRrPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
+		SSShadowPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
 		click object to toggle transparent<br/>
 	</div>
 
@@ -27,16 +27,16 @@
 
 		import { GUI } from './jsm/libs/dat.gui.module.js';
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-		import { SSRrPass } from './jsm/postprocessing/SSShadowPass.js';
+		import { SSShadowPass } from './jsm/postprocessing/SSShadowPass.js';
 
 		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
 		const params = {
-			enableSSRr: true,
+			enableSSShadow: true,
 			autoRotate: true,
 		};
 		let composer;
-		let ssrrPass;
+		let ssshadowPass;
 		let gui;
 		let stats;
 		let controls;
@@ -164,7 +164,7 @@
 			// composer
 
 			composer = new EffectComposer( renderer );
-			ssrrPass = new SSRrPass( {
+			ssshadowPass = new SSShadowPass( {
 				renderer,
 				scene,
 				camera,
@@ -173,17 +173,17 @@
 				encoding: THREE.sRGBEncoding,
 			} );
 
-			composer.addPass( ssrrPass );
+			composer.addPass( ssshadowPass );
 
 			// GUI
 
 			gui = new GUI();
-			gui.add( params, 'enableSSRr' ).name( 'Enable SSRr' );
-			gui.add( ssrrPass.lightPosition, 'x' ).name('lightX').min( -10 ).max( 10 ).step( .0001 );
-			gui.add( ssrrPass.lightPosition, 'y' ).name('lightY').min( -10 ).max( 10 ).step( .0001 );
-			gui.add( ssrrPass.lightPosition, 'z' ).name('lightZ').min( -10 ).max( 10 ).step( .0001 );
-			gui.add( ssrrPass, 'worldLightPosition' );
-			gui.add( ssrrPass, 'doubleSideCheckStartFrom' ).min( 0 ).max( .1 ).step( .0001 );
+			gui.add( params, 'enableSSShadow' ).name( 'Enable SSShadow' );
+			gui.add( ssshadowPass.lightPosition, 'x' ).name('lightX').min( -10 ).max( 10 ).step( .0001 );
+			gui.add( ssshadowPass.lightPosition, 'y' ).name('lightY').min( -10 ).max( 10 ).step( .0001 );
+			gui.add( ssshadowPass.lightPosition, 'z' ).name('lightZ').min( -10 ).max( 10 ).step( .0001 );
+			gui.add( ssshadowPass, 'worldLightPosition' );
+			gui.add( ssshadowPass, 'doubleSideCheckStartFrom' ).min( 0 ).max( .1 ).step( .0001 );
 			gui.add( params, 'autoRotate' ).onChange( () => {
 
 				controls.enabled = ! params.autoRotate;
@@ -191,22 +191,22 @@
 			} );
 
 			const folder = gui.addFolder( 'more settings' );
-			folder.add( ssrrPass, 'output', {
-				'Default': SSRrPass.OUTPUT.Default,
-				'SSRr Only': SSRrPass.OUTPUT.SSRr,
-				'Beauty': SSRrPass.OUTPUT.Beauty,
-				'Depth': SSRrPass.OUTPUT.Depth,
-				'Refractive': SSRrPass.OUTPUT.Refractive,
+			folder.add( ssshadowPass, 'output', {
+				'Default': SSShadowPass.OUTPUT.Default,
+				'SSShadow Only': SSShadowPass.OUTPUT.SSShadow,
+				'Beauty': SSShadowPass.OUTPUT.Beauty,
+				'Depth': SSShadowPass.OUTPUT.Depth,
+				'Refractive': SSShadowPass.OUTPUT.Refractive,
 			} ).onChange( function ( value ) {
 
-				ssrrPass.output = parseInt( value );
+				ssshadowPass.output = parseInt( value );
 
 			} );
-			ssrrPass.surfDist = 0.0015;
-			folder.add( ssrrPass, 'surfDist' ).min( 0 ).max( .005 ).step( .0001 );
-			ssrrPass.maxDistance = 50;
-			folder.add( ssrrPass, 'maxDistance' ).min( 0 ).max( 100 ).step( .001 );
-			folder.add( ssrrPass, 'infiniteThick' );
+			ssshadowPass.surfDist = 0.0015;
+			folder.add( ssshadowPass, 'surfDist' ).min( 0 ).max( .005 ).step( .0001 );
+			ssshadowPass.maxDistance = 50;
+			folder.add( ssshadowPass, 'maxDistance' ).min( 0 ).max( 100 ).step( .001 );
+			folder.add( ssshadowPass, 'infiniteThick' );
 			folder.open()
 			// gui.close()
 
@@ -256,7 +256,7 @@
 
 			}
 
-			if ( params.enableSSRr ) {
+			if ( params.enableSSShadow ) {
 
 				composer.render();
 
