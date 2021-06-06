@@ -29,7 +29,7 @@ const SSShadowShader = {
 		// 'lightPosition': { value: new Vector3(0,.1,0) },
 		'lightPosition': { value: new Vector3(- 1, 1, 1) },
 		'cameraRange': { value: 0 },
-		'maxDistance': { value: 5 },
+		'maxDistance': { value: 20 },
 		'surfDist': { value: .007 },
 		'doubleSideCheckStartFrom': { value: .01 },
 
