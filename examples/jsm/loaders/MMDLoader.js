@@ -2137,23 +2137,19 @@ class MMDToonMaterial extends ShaderMaterial {
 		this.uniforms = UniformsUtils.clone( MMDToonShader.uniforms );
 		for ( const uniformName in this.uniforms ) {
 
-			Object.defineProperties( this, {
+			Object.defineProperty( this, uniformName, {
 
-				[ uniformName ]: {
+        get: function () {
 
-					get: function () {
+          return this.uniforms[ uniformName ].value;
 
-						return this.uniforms[ uniformName ].value;
+        },
 
-					},
+        set: function ( value ) {
 
-					set: function ( value ) {
+          this.uniforms[ uniformName ].value = value;
 
-						this.uniforms[ uniformName ].value = value;
-
-					}
-
-				},
+        },
 
 			} );
 
