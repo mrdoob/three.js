@@ -175,7 +175,7 @@
 
 					case 'mouse':
 					case 'pen':
-						onMouseDown( event );
+						onMouseDown();
 						break;
         // TODO touch
 
@@ -219,7 +219,7 @@
 
 					case 'mouse':
 					case 'pen':
-						onMouseCancel( event );
+						onMouseCancel();
 						break;
         // TODO touch
 
