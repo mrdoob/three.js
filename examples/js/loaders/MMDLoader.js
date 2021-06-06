@@ -1836,33 +1836,31 @@
 			this.vertexShader = THREE.MMDToonShader.vertexShader;
 			this.fragmentShader = THREE.MMDToonShader.fragmentShader;
 			this.defines = Object.assign( {}, THREE.MMDToonShader.defines );
-			Object.defineProperties( this, {
-				matcapCombine: {
-					get: function () {
+			Object.defineProperty( this, 'matcapCombine', {
+				get: function () {
 
-						return this._matcapCombine;
+					return this._matcapCombine;
 
-					},
-					set: function ( value ) {
+				},
+				set: function ( value ) {
 
-						this._matcapCombine = value;
+					this._matcapCombine = value;
 
-						switch ( value ) {
+					switch ( value ) {
 
-							case THREE.MultiplyOperation:
-								this.defines.MATCAP_BLENDING_MULTIPLY = true;
-								delete this.defines.MATCAP_BLENDING_ADD;
-								break;
+						case THREE.MultiplyOperation:
+							this.defines.MATCAP_BLENDING_MULTIPLY = true;
+							delete this.defines.MATCAP_BLENDING_ADD;
+							break;
 
-							default:
-							case THREE.AddOperation:
-								this.defines.MATCAP_BLENDING_ADD = true;
-								delete this.defines.MATCAP_BLENDING_MULTIPLY;
-								break;
-
-						}
+						default:
+						case THREE.AddOperation:
+							this.defines.MATCAP_BLENDING_ADD = true;
+							delete this.defines.MATCAP_BLENDING_MULTIPLY;
+							break;
 
 					}
+
 				}
 			} );
 			this.uniforms = THREE.UniformsUtils.clone( THREE.MMDToonShader.uniforms ); // merged from MeshToon/Phong/MatcapMaterial

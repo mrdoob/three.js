@@ -2099,34 +2099,30 @@ class MMDToonMaterial extends ShaderMaterial {
 		this.fragmentShader = MMDToonShader.fragmentShader;
 
 		this.defines = Object.assign( {}, MMDToonShader.defines );
-		Object.defineProperties( this, {
+		Object.defineProperty( this, 'matcapCombine', {
 
-			matcapCombine: {
+			get: function () {
 
-				get: function () {
+				return this._matcapCombine;
 
-					return this._matcapCombine;
+			},
 
-				},
+			set: function ( value ) {
 
-				set: function ( value ) {
+				this._matcapCombine = value;
 
-					this._matcapCombine = value;
+				switch ( value ) {
 
-					switch ( value ) {
+					case MultiplyOperation:
+						this.defines.MATCAP_BLENDING_MULTIPLY = true;
+						delete this.defines.MATCAP_BLENDING_ADD;
+						break;
 
-						case MultiplyOperation:
-							this.defines.MATCAP_BLENDING_MULTIPLY = true;
-							delete this.defines.MATCAP_BLENDING_ADD;
-							break;
-
-						default:
-						case AddOperation:
-							this.defines.MATCAP_BLENDING_ADD = true;
-							delete this.defines.MATCAP_BLENDING_MULTIPLY;
-							break;
-
-					}
+					default:
+					case AddOperation:
+						this.defines.MATCAP_BLENDING_ADD = true;
+						delete this.defines.MATCAP_BLENDING_MULTIPLY;
+						break;
 
 				}
 
