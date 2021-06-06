@@ -72,7 +72,8 @@
 			map.repeat.set( 20, 20 );
 			const plane = new THREE.Mesh(
 				new THREE.PlaneGeometry( 8, 8 ),
-				new THREE.MeshPhongMaterial( {
+				// new THREE.MeshPhongMaterial( {
+				new THREE.MeshBasicMaterial( {
 					color: 0x999999,
 					map,
 				} )
@@ -105,7 +106,8 @@
 
 				geometry.computeVertexNormals();
 
-				const material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
+				// const material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
+				const material = new THREE.MeshBasicMaterial( { color: 0x606060 } );
 				const mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 0.0365;
 				mesh.name = 'bunny';
@@ -120,7 +122,8 @@
 			let geometry, material, mesh;
 
 			geometry = new THREE.BoxBufferGeometry( .05, .05, .05 );
-			material = new THREE.MeshStandardMaterial( { color: 'green' } );
+			// material = new THREE.MeshStandardMaterial( { color: 'green' } );
+			material = new THREE.MeshBasicMaterial( { color: 'green' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .12, .025, .015 );
 			mesh.name = 'box';
@@ -128,7 +131,8 @@
 			objects.push( mesh );
 
 			geometry = new THREE.IcosahedronBufferGeometry( .025, 4 );
-			material = new THREE.MeshStandardMaterial( { color: 'cyan' } );
+			// material = new THREE.MeshStandardMaterial( { color: 'cyan' } );
+			material = new THREE.MeshBasicMaterial( { color: 'cyan' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, .08 );
 			mesh.name = 'sphere';
@@ -136,7 +140,8 @@
 			objects.push( mesh );
 
 			geometry = new THREE.ConeBufferGeometry( .025, .05, 64 );
-			material = new THREE.MeshStandardMaterial( { color: 'yellow' } );
+			// material = new THREE.MeshStandardMaterial( { color: 'yellow' } );
+			material = new THREE.MeshBasicMaterial( { color: 'yellow' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, - .055 );
 			mesh.name = 'cone';
