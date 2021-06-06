@@ -202,6 +202,9 @@ const SSShadowShader = {
 					return;
 				}
 			} // end of for loop
+
+			gl_FragColor.rgb*=dot(viewNormal,viewRefractDir)*.5+.5;
+
 		}
 	`
 
