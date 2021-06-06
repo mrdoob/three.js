@@ -4,7 +4,7 @@ class InstancedBufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized, meshPerAttribute ) {
 
-		if ( typeof ( normalized ) === 'number' ) {
+		if ( typeof normalized === 'number' ) {
 
 			meshPerAttribute = normalized;
 
