@@ -65,11 +65,12 @@
 
 			function onPointerMove( event ) {
 
+				if ( scope.enabled === false ) return;
 				updatePointer( event );
 
 				_raycaster.setFromCamera( _pointer, _camera );
 
-				if ( _selected && scope.enabled ) {
+				if ( _selected ) {
 
 					if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
@@ -143,6 +144,7 @@
 
 			function onPointerDown() {
 
+				if ( scope.enabled === false ) return;
 				_domElement.style.touchAction = 'none';
 				updatePointer( event );
 				_intersections.length = 0;
@@ -177,6 +179,8 @@
 
 			function onPointerCancel() {
 
+				if ( scope.enabled === false ) return;
+
 				if ( _selected ) {
 
 					scope.dispatchEvent( {
@@ -194,12 +198,10 @@
 
 			function updatePointer( event ) {
 
-				const e = event.changedTouches ? event.changedTouches[ 0 ] : event;
-
 				const rect = _domElement.getBoundingClientRect();
 
-				_pointer.x = ( e.clientX - rect.left ) / rect.width * 2 - 1;
-				_pointer.y = - ( e.clientY - rect.top ) / rect.height * 2 + 1;
+				_pointer.x = ( event.clientX - rect.left ) / rect.width * 2 - 1;
+				_pointer.y = - ( event.clientY - rect.top ) / rect.height * 2 + 1;
 
 			}
 

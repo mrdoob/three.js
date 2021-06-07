@@ -188,12 +188,10 @@ class DragControls extends EventDispatcher {
 
 		function updatePointer( event ) {
 
-			const e = event.changedTouches ? event.changedTouches[ 0 ] : event;
-
 			const rect = _domElement.getBoundingClientRect();
 
-			_pointer.x = ( e.clientX - rect.left ) / rect.width * 2 - 1;
-			_pointer.y = - ( e.clientY - rect.top ) / rect.height * 2 + 1;
+			_pointer.x = ( event.clientX - rect.left ) / rect.width * 2 - 1;
+			_pointer.y = - ( event.clientY - rect.top ) / rect.height * 2 + 1;
 
 		}
 

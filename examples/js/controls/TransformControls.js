@@ -617,11 +617,10 @@
 
 		} else {
 
-			const pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 			const rect = this.domElement.getBoundingClientRect();
 			return {
-				x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
-				y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
+				x: ( event.clientX - rect.left ) / rect.width * 2 - 1,
+				y: - ( event.clientY - rect.top ) / rect.height * 2 + 1,
 				button: event.button
 			};
 
