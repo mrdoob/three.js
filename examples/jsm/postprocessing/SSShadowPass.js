@@ -66,23 +66,6 @@ class SSShadowPass extends Pass {
 			}
 		} );
 
-		this._worldLightPosition = SSShadowShader.defines.WORLD_LIGHT_POSITION;
-		Object.defineProperty( this, 'worldLightPosition', {
-			get() {
-
-				return this._worldLightPosition;
-
-			},
-			set( val ) {
-
-				if ( this._worldLightPosition === val ) return;
-				this._worldLightPosition = val;
-				this.ssshadowMaterial.defines.WORLD_LIGHT_POSITION = val;
-				this.ssshadowMaterial.needsUpdate = true;
-
-			}
-		} );
-
 		// beauty render target with depth buffer
 
 		const depthTexture = new DepthTexture();

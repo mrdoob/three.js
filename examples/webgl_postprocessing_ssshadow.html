@@ -23,6 +23,7 @@
 		import Stats from './jsm/libs/stats.module.js';
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { TransformControls } from './jsm/controls/TransformControls.js';
 
 		import { GUI } from './jsm/libs/dat.gui.module.js';
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
@@ -36,7 +37,7 @@
 		};
 		let composer;
 		let ssshadowPass;
-		let ssshadowLightHepler;
+		let ssshadowLightHelper;
 		let gui;
 		let stats;
 		let controls;
@@ -155,14 +156,6 @@
 			renderer.autoClear = false;
 			container.appendChild( renderer.domElement );
 
-			//
-
-			controls = new OrbitControls( camera, renderer.domElement );
-			controls.enableDamping = true;
-			controls.target.set( 0, 0.0635, 0 );
-			controls.update();
-			controls.enabled = ! params.autoRotate;
-
 			// STATS
 
 			stats = new Stats();
@@ -187,26 +180,40 @@
 
 			// SSShadow light helper
 
-			// ssshadowLightHepler = new THREE.Mesh(new THREE.IcosahedronBufferGeometry(0,0),new THREE.MeshBasicMaterial({color:'white',}))
-			ssshadowLightHepler = new THREE.Mesh(new THREE.IcosahedronBufferGeometry(.001,3),new THREE.MeshBasicMaterial({color:'white',}))
-			// ssshadowLightHepler = new THREE.Sprite(new THREE.SpriteMaterial({color:'white',}))
-			ssshadowLightHepler.position.copy(ssshadowPass.lightPosition)
-			// scene.add(ssshadowLightHepler)
+			// ssshadowLightHelper = new THREE.Mesh(new THREE.IcosahedronBufferGeometry(0,0),new THREE.MeshBasicMaterial({color:'white',}))
+			ssshadowLightHelper = new THREE.Mesh(new THREE.IcosahedronBufferGeometry(.001,3),new THREE.MeshBasicMaterial({color:'white',}))
+			// ssshadowLightHelper = new THREE.Sprite(new THREE.SpriteMaterial({color:'white',}))
+			ssshadowLightHelper.position.copy(ssshadowPass.lightPosition)
+			scene.add(ssshadowLightHelper)
+			ssshadowLightHelper.visible=false
+			ssshadowLightHelper.position.copy(ssshadowPass.lightPosition)
+
+			//
+
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			controls.target.set( 0, 0.0635, 0 );
+			controls.update();
+			controls.enabled = ! params.autoRotate;
+
+			let transformControls = new TransformControls( camera, renderer.domElement );
+			transformControls.attach( ssshadowLightHelper );
+			scene.add( transformControls );
+			transformControls.addEventListener( 'dragging-changed', function ( event ) {
+
+				controls.enabled = ! event.value;
+
+			} );
+			transformControls.addEventListener( 'objectChange', function ( event ) {
+
+				ssshadowPass.lightPosition.copy(ssshadowLightHelper.position)
+
+			} );
 
 			// GUI
 
 			gui = new GUI();
 			gui.add( params, 'enableSSShadow' ).name( 'Enable SSShadow' );
-			gui.add( ssshadowPass.lightPosition, 'x' ).name('lightX').min( -10 ).max( 10 ).step( .001 ).onChange(()=>{
-				ssshadowLightHepler.position.copy(ssshadowPass.lightPosition)
-			});
-			gui.add( ssshadowPass.lightPosition, 'y' ).name('lightY').min( -10 ).max( 10 ).step( .001 ).onChange(()=>{
-				ssshadowLightHepler.position.copy(ssshadowPass.lightPosition)
-			});
-			gui.add( ssshadowPass.lightPosition, 'z' ).name('lightZ').min( -10 ).max( 10 ).step( .001 ).onChange(()=>{
-				ssshadowLightHepler.position.copy(ssshadowPass.lightPosition)
-			});
-			gui.add( ssshadowPass, 'worldLightPosition' );
 			gui.add( ssshadowPass, 'doubleSideCheckStartFrom' ).min( 0 ).max( .1 ).step( .0001 );
 			gui.add( params, 'autoRotate' ).onChange( () => {
 

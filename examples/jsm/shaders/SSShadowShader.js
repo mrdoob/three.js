@@ -10,7 +10,6 @@ const SSShadowShader = {
 		MAX_STEP: 0,
 		PERSPECTIVE_CAMERA: true,
 		INFINITE_THICK: false,
-		WORLD_LIGHT_POSITION: true,
 	},
 
 	uniforms: {
@@ -27,7 +26,8 @@ const SSShadowShader = {
 		'cameraMatrixWorldInverse': { value: new Matrix4() },
 		// 'lightPosition': { value: new Vector3(1.7,1.7,0) },
 		// 'lightPosition': { value: new Vector3(0,.1,0) },
-		'lightPosition': { value: new Vector3(- 1, 1, 1) },
+		// 'lightPosition': { value: new Vector3(- .1, .1, .1) },
+		'lightPosition': { value: new Vector3(-0.0922132857715487,    0.2006275831841821,  0.07075003976997588) },
 		'cameraRange': { value: 0 },
 		'maxDistance': { value: 20 },
 		'surfDist': { value: .007 },
@@ -129,11 +129,7 @@ const SSShadowShader = {
 
 			vec3 viewNormal=getViewNormal( vUv );
 
-			#ifdef WORLD_LIGHT_POSITION
-				vec3 viewLightPosition=(cameraMatrixWorldInverse*vec4(lightPosition,1.)).xyz;
-			#else
-				vec3 viewLightPosition=lightPosition;
-			#endif
+			vec3 viewLightPosition=(cameraMatrixWorldInverse*vec4(lightPosition,1.)).xyz;
 			vec3 viewRefractDir=normalize(viewLightPosition-viewPosition);
 
 			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
