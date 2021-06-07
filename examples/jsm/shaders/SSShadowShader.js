@@ -27,7 +27,8 @@ const SSShadowShader = {
 		// 'lightPosition': { value: new Vector3(1.7,1.7,0) },
 		// 'lightPosition': { value: new Vector3(0,.1,0) },
 		// 'lightPosition': { value: new Vector3(- .1, .1, .1) },
-		'lightPosition': { value: new Vector3(-0.0922132857715487,    0.2006275831841821,  0.07075003976997588) },
+		// 'lightPosition': { value: new Vector3(-0.0922132857715487,    0.2006275831841821,  0.07075003976997588) },
+		'lightPosition': { value: new Vector3(-0.15913970847115963, 0.023419709474481437, 0.016692314923505848) },
 		'cameraRange': { value: 0 },
 		'maxDistance': { value: 20 },
 		'surfDist': { value: .007 },
@@ -132,7 +133,9 @@ const SSShadowShader = {
 			vec3 viewLightPosition=(cameraMatrixWorldInverse*vec4(lightPosition,1.)).xyz;
 			vec3 viewRefractDir=normalize(viewLightPosition-viewPosition);
 
-			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance;
+			float maxDistance2=length(viewPosition-viewLightPosition);
+			maxDistance2=min(maxDistance,maxDistance2);
+			vec3 d1viewPosition=viewPosition+viewRefractDir*maxDistance2;
 			#ifdef PERSPECTIVE_CAMERA
 				if(d1viewPosition.z>-cameraNear){
 					//https://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfLines.aspx

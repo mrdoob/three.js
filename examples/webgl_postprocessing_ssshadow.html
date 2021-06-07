@@ -60,7 +60,9 @@
 		function init() {
 
 			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 15 );
-			camera.position.set( 0.13271600513224902, 0.3489546826045913, 0.43921296427927076 );
+			// camera.position.set( 0.13271600513224902, 0.3489546826045913, 0.43921296427927076 );
+			camera.position.set(-0.3880278695483652, 0.19765997421081033, 0.3495264135888409);
+			window.camera=camera
 
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x443333 );
@@ -186,6 +188,7 @@
 			ssshadowLightHelper.position.copy(ssshadowPass.lightPosition)
 			scene.add(ssshadowLightHelper)
 			ssshadowLightHelper.visible=false
+			window.ssshadowLightHelper=ssshadowLightHelper
 			ssshadowLightHelper.position.copy(ssshadowPass.lightPosition)
 
 			//
