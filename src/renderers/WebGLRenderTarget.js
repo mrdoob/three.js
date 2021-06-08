@@ -10,7 +10,7 @@ import { Vector4 } from '../math/Vector4.js';
 */
 class WebGLRenderTarget extends EventDispatcher {
 
-	constructor( width, height, options ) {
+	constructor( width, height, options = {} ) {
 
 		super();
 
@@ -22,8 +22,6 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.scissorTest = false;
 
 		this.viewport = new Vector4( 0, 0, width, height );
-
-		options = options || {};
 
 		this.texture = new Texture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
