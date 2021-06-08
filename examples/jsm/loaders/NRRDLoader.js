@@ -358,38 +358,32 @@ class NRRDLoader extends Loader {
 		volume.windowLow = min;
 		volume.windowHigh = max;
 
-		// get the image dimensions
-		volume.dimensions = [ headerObject.sizes[ 0 ], headerObject.sizes[ 1 ], headerObject.sizes[ 2 ] ];
-		volume.xLength = volume.dimensions[ 0 ];
-		volume.yLength = volume.dimensions[ 1 ];
-		volume.zLength = volume.dimensions[ 2 ];
-		// spacing
-		const spacingX = ( new Vector3( headerObject.vectors[ 0 ][ 0 ], headerObject.vectors[ 0 ][ 1 ],
-			headerObject.vectors[ 0 ][ 2 ] ) ).length();
-		const spacingY = ( new Vector3( headerObject.vectors[ 1 ][ 0 ], headerObject.vectors[ 1 ][ 1 ],
-			headerObject.vectors[ 1 ][ 2 ] ) ).length();
-		const spacingZ = ( new Vector3( headerObject.vectors[ 2 ][ 0 ], headerObject.vectors[ 2 ][ 1 ],
-			headerObject.vectors[ 2 ][ 2 ] ) ).length();
-		volume.spacing = [ spacingX, spacingY, spacingZ ];
+		// Identify anchor points in the space-directions matrix.
+		const xIndex = headerObject.vectors.findIndex( vector => vector[ 0 ] !== 0 );
+		const yIndex = headerObject.vectors.findIndex( vector => vector[ 1 ] !== 0 );
+		const zIndex = headerObject.vectors.findIndex( vector => vector[ 2 ] !== 0 );
 
+		// get the image dimensions
+		volume.dimensions = [ headerObject.sizes[ xIndex ], headerObject.sizes[ yIndex ], headerObject.sizes[ zIndex ] ];
+		volume.xLength = volume.dimensions[ xIndex ];
+		volume.yLength = volume.dimensions[ yIndex ];
+		volume.zLength = volume.dimensions[ zIndex ];
+
+		// spacing
+		const spacingX = ( new Vector3( headerObject.vectors[ xIndex ][ 0 ], headerObject.vectors[ xIndex ][ 1 ],
+			headerObject.vectors[ xIndex ][ 2 ] ) ).length();
+		const spacingY = ( new Vector3( headerObject.vectors[ yIndex ][ 0 ], headerObject.vectors[ yIndex ][ 1 ],
+			headerObject.vectors[ yIndex ][ 2 ] ) ).length();
+		const spacingZ = ( new Vector3( headerObject.vectors[ zIndex ][ 0 ], headerObject.vectors[ zIndex ][ 1 ],
+			headerObject.vectors[ zIndex ][ 2 ] ) ).length();
+		volume.spacing = [ spacingX, spacingY, spacingZ ];
 
 		// Create IJKtoRAS matrix
 		volume.matrix = new Matrix4();
 
-		let _spaceX = 1;
-		let _spaceY = 1;
-		const _spaceZ = 1;
-
-		if ( headerObject.space == 'left-posterior-superior' ) {
-
-			_spaceX = - 1;
-			_spaceY = - 1;
-
-		} else if ( headerObject.space === 'left-anterior-superior' ) {
-
-			_spaceX = - 1;
-
-		}
+		const _spaceX = headerObject.vectors[ xIndex ][ 0 ] > 0 ? 1 : - 1;
+		const _spaceY = headerObject.vectors[ yIndex ][ 1 ] > 0 ? 1 : - 1;
+		const _spaceZ = headerObject.vectors[ zIndex ][ 2 ] > 0 ? 1 : - 1;
 
 
 		if ( ! headerObject.vectors ) {
