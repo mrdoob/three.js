@@ -385,6 +385,10 @@ iframe {
 	overflow: auto;
 }
 
+iframe#viewer {
+	display: none; /* Workaround: The iframe has white background in Chrome for some reason */
+}
+
 #viewer {
 	padding-left: var(--panel-width);
 }
