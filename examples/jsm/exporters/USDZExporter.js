@@ -394,9 +394,19 @@ function buildMaterial( material, textures ) {
 
 	if ( material.aoMap !== null ) {
 
-		inputs.push( `${ pad }float inputs:occlusion.connect = </Materials/Material_${ material.id }/Texture_${ material.aoMap.id }_occlusion.outputs:r>` );
+		// AO map will work correctly if:
+		// 1. There is no repeating of diffuse map
+		const noRepeating = material.map === null || material.map.repeat.x === 1 && material.map.repeat.y === 1;
+		// 2. AO map was on the primary UV set by design
+		const aoOnFirstUVbyDesign = true; // TODO: extend the workaround from PR #21832 so we can actually know this.
+		
+		if(noRepeating && aoOnFirstUVbyDesign) {
 
-		samplers.push( buildTexture( material.aoMap, 'occlusion' ) );
+			inputs.push( `${ pad }float inputs:occlusion.connect = </Materials/Material_${ material.id }/Texture_${ material.aoMap.id }_occlusion.outputs:r>` );
+	
+			samplers.push( buildTexture( material.aoMap, 'occlusion' ) );
+
+		}
 
 	}
 
