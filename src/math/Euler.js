@@ -228,7 +228,7 @@ class Euler {
 
 		this._order = order;
 
-		if ( update ) this._onChangeCallback();
+		if ( update === true ) this._onChangeCallback();
 
 		return this;
 
