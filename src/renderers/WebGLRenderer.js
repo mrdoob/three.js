@@ -1361,7 +1361,7 @@ function WebGLRenderer( parameters ) {
 
 		} else {
 
-			if ( material.side === DoubleSide ) {
+			if ( material.transparent === true && material.side === DoubleSide ) {
 
 				material.side = BackSide;
 				material.needsUpdate = true;
