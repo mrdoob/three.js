@@ -122,11 +122,11 @@ class SphereGeometry extends BufferGeometry {
 			const normal = this.attributes.normal;
 			const tangent = normal.clone();
 			const vector = new THREE.Vector3();
-      
-			for ( let i = 0; i < tangent.count; i++ ) {
+
+			for ( let i = 0; i < tangent.count; i ++ ) {
 
 				vector.fromBufferAttribute( normal, i );
-				vector.set( vector.z, 0, -vector.x ).normalize();
+				vector.set( vector.z, 0, - vector.x ).normalize();
 				tangent.setXYZ( i, vector.x, vector.y, vector.z );
 
 			}
