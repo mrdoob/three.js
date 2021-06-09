@@ -6,11 +6,6 @@ uniform float opacity;
 varying vec3 vLightFront;
 varying vec3 vIndirectFront;
 
-#ifdef DOUBLE_SIDED
-	varying vec3 vLightBack;
-	varying vec3 vIndirectBack;
-#endif
-
 
 #include <common>
 #include <packing>
@@ -53,29 +48,13 @@ void main() {
 
 	// accumulation
 
-	#ifdef DOUBLE_SIDED
-
-		reflectedLight.indirectDiffuse += ( gl_FrontFacing ) ? vIndirectFront : vIndirectBack;
-
-	#else
-
-		reflectedLight.indirectDiffuse += vIndirectFront;
-
-	#endif
+	reflectedLight.indirectDiffuse += vIndirectFront;
 
 	#include <lightmap_fragment>
 
 	reflectedLight.indirectDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb );
 
-	#ifdef DOUBLE_SIDED
-
-		reflectedLight.directDiffuse = ( gl_FrontFacing ) ? vLightFront : vLightBack;
-
-	#else
-
-		reflectedLight.directDiffuse = vLightFront;
-
-	#endif
+	reflectedLight.directDiffuse = vLightFront;
 
 	reflectedLight.directDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb ) * getShadowMask();
 

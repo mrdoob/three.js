@@ -4,11 +4,6 @@ export default /* glsl */`
 varying vec3 vLightFront;
 varying vec3 vIndirectFront;
 
-#ifdef DOUBLE_SIDED
-	varying vec3 vLightBack;
-	varying vec3 vIndirectBack;
-#endif
-
 #include <common>
 #include <uv_pars_vertex>
 #include <uv2_pars_vertex>

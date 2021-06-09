@@ -10,12 +10,6 @@ export default /* glsl */`
 
 	#endif
 
-	#ifdef DOUBLE_SIDED
-
-		normal = normal * faceDirection;
-
-	#endif
-
 	normal = normalize( normalMatrix * normal );
 
 #elif defined( TANGENTSPACE_NORMALMAP )
