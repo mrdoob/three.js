@@ -4783,11 +4783,11 @@
 			this._onChangeCallback();
 		}
 
-		set(x, y, z, order) {
+		set(x, y, z, order = this._order) {
 			this._x = x;
 			this._y = y;
 			this._z = z;
-			this._order = order || this._order;
+			this._order = order;
 
 			this._onChangeCallback();
 
@@ -4809,7 +4809,7 @@
 			return this;
 		}
 
-		setFromRotationMatrix(m, order, update) {
+		setFromRotationMatrix(m, order = this._order, update = true) {
 			// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 			const te = m.elements;
 			const m11 = te[0],
@@ -4821,7 +4821,6 @@
 			const m31 = te[2],
 						m32 = te[6],
 						m33 = te[10];
-			order = order || this._order;
 
 			switch (order) {
 				case 'XYZ':
@@ -4907,7 +4906,7 @@
 			}
 
 			this._order = order;
-			if (update !== false) this._onChangeCallback();
+			if (update === true) this._onChangeCallback();
 			return this;
 		}
 
@@ -4917,8 +4916,8 @@
 			return this.setFromRotationMatrix(_matrix$1, order, update);
 		}
 
-		setFromVector3(v, order) {
-			return this.set(v.x, v.y, v.z, order || this._order);
+		setFromVector3(v, order = this._order) {
+			return this.set(v.x, v.y, v.z, order);
 		}
 
 		reorder(newOrder) {
@@ -16781,12 +16780,15 @@
 
 				for (let i = 0; i < cameras.length; i++) {
 					updateCamera(cameras[i], parent);
-				} // update camera and its children
+				}
 
+				cameraVR.matrixWorld.decompose(cameraVR.position, cameraVR.quaternion, cameraVR.scale); // update user camera and its children
 
-				camera.matrixWorld.copy(cameraVR.matrixWorld);
+				camera.position.copy(cameraVR.position);
+				camera.quaternion.copy(cameraVR.quaternion);
+				camera.scale.copy(cameraVR.scale);
 				camera.matrix.copy(cameraVR.matrix);
-				camera.matrix.decompose(camera.position, camera.quaternion, camera.scale);
+				camera.matrixWorld.copy(cameraVR.matrixWorld);
 				const children = camera.children;
 
 				for (let i = 0, l = children.length; i < l; i++) {
@@ -19046,7 +19048,7 @@
 	const _vector$6 = /*@__PURE__*/new Vector3();
 
 	class InterleavedBufferAttribute {
-		constructor(interleavedBuffer, itemSize, offset, normalized) {
+		constructor(interleavedBuffer, itemSize, offset, normalized = false) {
 			this.name = '';
 			this.data = interleavedBuffer;
 			this.itemSize = itemSize;
@@ -32252,7 +32254,7 @@
 	class InstancedInterleavedBuffer extends InterleavedBuffer {
 		constructor(array, stride, meshPerAttribute = 1) {
 			super(array, stride);
-			this.meshPerAttribute = meshPerAttribute || 1;
+			this.meshPerAttribute = meshPerAttribute;
 		}
 
 		copy(source) {
