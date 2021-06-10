@@ -18775,11 +18775,9 @@
 				return;
 			}
 
-			const {
-				width,
-				height,
-				data
-			} = srcTexture.image;
+			const width = sourceBox.max.x - sourceBox.min.x + 1;
+			const height = sourceBox.max.y - sourceBox.min.y + 1;
+			const depth = sourceBox.max.z - sourceBox.min.z + 1;
 			const glFormat = utils.convert(dstTexture.format);
 			const glType = utils.convert(dstTexture.type);
 			let glTarget;
@@ -18811,9 +18809,11 @@
 
 			const unpackSkipImages = _gl.getParameter(_gl.UNPACK_SKIP_IMAGES);
 
-			_gl.pixelStorei(_gl.UNPACK_ROW_LENGTH, width);
+			const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[0] : srcTexture.image;
 
-			_gl.pixelStorei(_gl.UNPACK_IMAGE_HEIGHT, height);
+			_gl.pixelStorei(_gl.UNPACK_ROW_LENGTH, image.width);
+
+			_gl.pixelStorei(_gl.UNPACK_IMAGE_HEIGHT, image.height);
 
 			_gl.pixelStorei(_gl.UNPACK_SKIP_PIXELS, sourceBox.min.x);
 
@@ -18821,7 +18821,17 @@
 
 			_gl.pixelStorei(_gl.UNPACK_SKIP_IMAGES, sourceBox.min.z);
 
-			_gl.texSubImage3D(glTarget, level, position.x, position.y, position.z, sourceBox.max.x - sourceBox.min.x + 1, sourceBox.max.y - sourceBox.min.y + 1, sourceBox.max.z - sourceBox.min.z + 1, glFormat, glType, data);
+			if (srcTexture.isDataTexture || srcTexture.isDataTexture3D) {
+				_gl.texSubImage3D(glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, glType, image.data);
+			} else {
+				if (srcTexture.isCompressedTexture) {
+					console.warn('THREE.WebGLRenderer.copyTextureToTexture3D: untested support for compressed srcTexture.');
+
+					_gl.compressedTexSubImage3D(glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, image.data);
+				} else {
+					_gl.texSubImage3D(glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, glType, image);
+				}
+			}
 
 			_gl.pixelStorei(_gl.UNPACK_ROW_LENGTH, unpackRowLen);
 
