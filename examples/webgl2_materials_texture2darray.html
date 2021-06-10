@@ -110,13 +110,6 @@
 							glslVersion: THREE.GLSL3
 						} );
 
-						new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg', function(tex) {
-							const position = new THREE.Vector3(0,0,0);
-							const box = new THREE.Box3( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 255, 255, 0 ) );
-							// tex.image.data = tex.image; // workaround to mascarade a THREE.Texture as a THREE.DataTexture
-							renderer.copyTextureToTexture3D( box, position, tex, texture );
-						} );
-
 						const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 
 						mesh = new THREE.Mesh( geometry, material );
