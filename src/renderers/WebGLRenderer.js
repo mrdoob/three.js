@@ -2157,7 +2157,12 @@ function WebGLRenderer( parameters ) {
 
 			if ( srcTexture.isCompressedTexture ) {
 
-				console.warn( 'THREE.WebGLRenderer.copyTextureToTexture3D: untested support for compressed srcTexture.' );
+				if ( glFormat !== utils.convert( srcTexture.format ) ) {
+
+					console.warn( 'THREE.WebGLRenderer.copyTextureToTexture3D: non matching formats.' );
+
+				}
+
 				_gl.compressedTexSubImage3D( glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, image.data );
 
 			} else {

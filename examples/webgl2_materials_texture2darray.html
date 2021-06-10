@@ -59,6 +59,7 @@
 			import { unzipSync } from './jsm/libs/fflate.module.js';
 
 			import { WEBGL } from './jsm/WebGL.js';
+			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
 
 			if ( WEBGL.isWebGL2Available() === false ) {
 
@@ -71,7 +72,7 @@
 			const planeWidth = 50;
 			const planeHeight = 50;
 
-			let depthStep = 0.4;
+			let depthStep = 0.05;
 
 			init();
 			animate();
@@ -84,46 +85,6 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
 				camera.position.z = 70;
 
-				scene = new THREE.Scene();
-
-				// width 256, height 256, depth 109, 8-bit, zip archived raw data
-
-				new THREE.FileLoader()
-					.setResponseType( 'arraybuffer' )
-					.load( 'textures/3d/head256x256x109.zip', function ( data ) {
-
-						const zip = unzipSync( new Uint8Array( data ) );
-						const array = new Uint8Array( zip[ 'head256x256x109' ].buffer );
-
-						const texture = new THREE.DataTexture2DArray( array, 256, 256, 109 );
-						texture.format = THREE.RedFormat;
-						texture.type = THREE.UnsignedByteType;
-
-						const material = new THREE.ShaderMaterial( {
-							uniforms: {
-								diffuse: { value: texture },
-								depth: { value: 55 },
-								size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
-							},
-							vertexShader: document.getElementById( 'vs' ).textContent.trim(),
-							fragmentShader: document.getElementById( 'fs' ).textContent.trim(),
-							glslVersion: THREE.GLSL3
-						} );
-
-						new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg', function(tex) {
-							const position = new THREE.Vector3(0,0,0);
-							const box = new THREE.Box3( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 255, 255, 0 ) );
-							// tex.image.data = tex.image; // workaround to mascarade a THREE.Texture as a THREE.DataTexture
-							renderer.copyTextureToTexture3D( box, position, tex, texture );
-						} );
-
-						const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
-
-						mesh = new THREE.Mesh( geometry, material );
-
-						scene.add( mesh );
-
-					} );
 
 				// 2D Texture array is available on WebGL 2.0
 
@@ -132,6 +93,52 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
+
+												const loader = new DDSLoader();
+					scene = new THREE.Scene();
+				loader.load('textures/compressed/Mountains.dds', tex => {
+					const image =tex.image[0].mipmaps[0] || tex.mipmaps[0];
+					const texture = new THREE.DataTexture2DArray( image.data, image.width, image.height, 1);
+					texture.format = tex.format;
+					texture.type = tex.type;
+					texture.unpackAlignment = tex.unpackAlignment;
+					console.log("tex",tex);
+					console.log("array",texture);
+
+					const material = new THREE.ShaderMaterial( {
+						uniforms: {
+							diffuse: { value: texture },
+							depth: { value: 0 },
+							size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
+						},
+						vertexShader: document.getElementById( 'vs' ).textContent.trim(),
+						fragmentShader: document.getElementById( 'fs' ).textContent.trim(),
+						glslVersion: THREE.GLSL3
+					} );
+
+					const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
+
+					mesh = new THREE.Mesh( geometry, material );
+
+					scene.add( mesh );
+
+
+					function copyTextureToTexture3D(z, anisotropy, filter) {
+						return tex => {
+							if (filter) tex.minFilter = tex.magFilter = filter;
+							tex.anisotropy = anisotropy;
+							const box = new THREE.Box3( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 511, 511, 0 ) );
+							const position = new THREE.Vector3(0,0,z);
+							renderer.copyTextureToTexture3D( box, position, tex, texture );
+						};
+					}
+					//loader.load( 'textures/compressed/Mountains.dds', copyTextureToTexture3D(0, 4, THREE.LinearFilter));
+					//loader.load( 'textures/compressed/disturb_dxt1_mip.dds', copyTextureToTexture3D(0, 4));
+					//loader.load( 'textures/compressed/hepatica_dxt3_mip.dds', copyTextureToTexture3D(0, 4));
+					//loader.load( 'textures/compressed/explosion_dxt5_mip.dds', copyTextureToTexture3D(0, 4));
+					//loader.load( 'textures/compressed/disturb_argb_nomip.dds', copyTextureToTexture3D(0, 4, THREE.LinearFilter));
+					//loader.load( 'textures/compressed/disturb_argb_mip.dds', copyTextureToTexture3D(0, 4));
+				});
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
@@ -158,12 +165,9 @@
 
 					value += depthStep;
 
-					if ( value > 109.0 || value < 0.0 ) {
+					if ( value > 2.0 ) {
 
-						if ( value > 1.0 ) value = 109.0 * 2.0 - value;
-						if ( value < 0.0 ) value = - value;
-
-						depthStep = - depthStep;
+						value = value % 2;
 
 					}
 
