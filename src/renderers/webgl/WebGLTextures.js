@@ -672,7 +672,16 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else if ( texture.isDataTexture2DArray ) {
 
-			state.texImage3D( _gl.TEXTURE_2D_ARRAY, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
+			if ( utils.isCompressed( glInternalFormat ) ) {
+
+				state.compressedTexImage3D( _gl.TEXTURE_2D_ARRAY, 0, glInternalFormat, image.width, image.height, image.depth, 0, image.data );
+
+			} else {
+
+				state.texImage3D( _gl.TEXTURE_2D_ARRAY, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
+
+			}
+
 			textureProperties.__maxMipLevel = 0;
 
 		} else if ( texture.isDataTexture3D ) {
