@@ -2435,7 +2435,7 @@ Vector4.prototype.isVector4 = true;
 */
 class WebGLRenderTarget extends EventDispatcher {
 
-	constructor( width, height, options ) {
+	constructor( width, height, options = {} ) {
 
 		super();
 
@@ -2447,8 +2447,6 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.scissorTest = false;
 
 		this.viewport = new Vector4( 0, 0, width, height );
-
-		options = options || {};
 
 		this.texture = new Texture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
@@ -23516,9 +23514,7 @@ function createCanvasElement() {
 
 }
 
-function WebGLRenderer( parameters ) {
-
-	parameters = parameters || {};
+function WebGLRenderer( parameters = {} ) {
 
 	const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 		_context = parameters.context !== undefined ? parameters.context : null,
@@ -24823,7 +24819,23 @@ function WebGLRenderer( parameters ) {
 
 		} else {
 
-			_this.renderBufferDirect( camera, scene, geometry, material, object, group );
+			if ( material.transparent === true && material.side === DoubleSide ) {
+
+				material.side = BackSide;
+				material.needsUpdate = true;
+				_this.renderBufferDirect( camera, scene, geometry, material, object, group );
+
+				material.side = FrontSide;
+				material.needsUpdate = true;
+				_this.renderBufferDirect( camera, scene, geometry, material, object, group );
+
+				material.side = DoubleSide;
+
+			} else {
+
+				_this.renderBufferDirect( camera, scene, geometry, material, object, group );
+
+			}
 
 		}
 
@@ -26799,14 +26811,14 @@ Bone.prototype.isBone = true;
 
 class DataTexture extends Texture {
 
-	constructor( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+	constructor( data = null, width = 1, height = 1, format, type, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, encoding ) {
 
 		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
-		this.image = { data: data || null, width: width || 1, height: height || 1 };
+		this.image = { data: data, width: width, height: height };
 
-		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-		this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+		this.magFilter = magFilter;
+		this.minFilter = minFilter;
 
 		this.generateMipmaps = false;
 		this.flipY = false;
@@ -28800,9 +28812,7 @@ class EdgesGeometry extends BufferGeometry {
 
 const Earcut = {
 
-	triangulate: function ( data, holeIndices, dim ) {
-
-		dim = dim || 2;
+	triangulate: function ( data, holeIndices, dim = 2 ) {
 
 		const hasHoles = holeIndices && holeIndices.length;
 		const outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length;
@@ -39013,7 +39023,7 @@ InstancedBufferGeometry.prototype.isInstancedBufferGeometry = true;
 
 class InstancedBufferAttribute extends BufferAttribute {
 
-	constructor( array, itemSize, normalized, meshPerAttribute ) {
+	constructor( array, itemSize, normalized, meshPerAttribute = 1 ) {
 
 		if ( typeof normalized === 'number' ) {
 
@@ -39027,7 +39037,7 @@ class InstancedBufferAttribute extends BufferAttribute {
 
 		super( array, itemSize, normalized );
 
-		this.meshPerAttribute = meshPerAttribute || 1;
+		this.meshPerAttribute = meshPerAttribute;
 
 	}
 
@@ -39041,7 +39051,7 @@ class InstancedBufferAttribute extends BufferAttribute {
 
 	}
 
-	toJSON()	{
+	toJSON() {
 
 		const data = super.toJSON();
 
