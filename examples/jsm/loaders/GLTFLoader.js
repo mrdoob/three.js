@@ -2643,6 +2643,10 @@ class GLTFParser {
 
 			return texture;
 
+		} ).catch( function () {
+
+			return null;
+
 		} );
 
 		this.textureCache[ cacheKey ] = promise;
