@@ -255,6 +255,7 @@
 
 				scope.domElement.removeEventListener( 'contextmenu', onContextMenu );
 				scope.domElement.removeEventListener( 'pointerdown', onPointerDown );
+				scope.domElement.removeEventListener( 'pointercancel', onPointerCancel );
 				scope.domElement.removeEventListener( 'wheel', onMouseWheel );
 				scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
 				scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
@@ -763,6 +764,12 @@
 
 			}
 
+			function onPointerCancel( event ) {
+
+				removePointer( event );
+
+			}
+
 			function onMouseDown( event ) {
 
 				let mouseAction;
@@ -1054,6 +1061,7 @@
 
 			scope.domElement.addEventListener( 'contextmenu', onContextMenu );
 			scope.domElement.addEventListener( 'pointerdown', onPointerDown );
+			scope.domElement.addEventListener( 'pointercancel', onPointerCancel );
 			scope.domElement.addEventListener( 'wheel', onMouseWheel, {
 				passive: false
 			} ); // force an update at start
