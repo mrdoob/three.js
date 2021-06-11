@@ -1274,6 +1274,7 @@ function WebGLRenderer( parameters = {} ) {
 
 			_transmissionRenderTarget = new renderTargetType( 1024, 1024, {
 				generateMipmaps: true,
+				type: utils.convert( HalfFloatType ) !== null ? HalfFloatType : UnsignedByteType,
 				minFilter: LinearMipmapLinearFilter,
 				magFilter: NearestFilter,
 				wrapS: ClampToEdgeWrapping,
