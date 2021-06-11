@@ -1286,7 +1286,14 @@ function WebGLRenderer( parameters = {} ) {
 		_this.setRenderTarget( _transmissionRenderTarget );
 		_this.clear();
 
+		// Turn off the features which can affect the frag color for opaque objects pass.
+		// Otherwise they are applied twice in opaque objects pass and transmission objects pass.
+		const currentToneMapping = _this.toneMapping;
+		_this.toneMapping = NoToneMapping;
+
 		renderObjects( opaqueObjects, scene, camera );
+
+		_this.toneMapping = currentToneMapping;
 
 		textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
 		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
