@@ -22,6 +22,8 @@ class DragControls extends EventDispatcher {
 
 		super();
 
+		_domElement.style.touchAction = 'none'; // disable touch scroll
+
 		let _selected = null, _hovered = null;
 
 		const _intersections = [];
@@ -138,8 +140,6 @@ class DragControls extends EventDispatcher {
 
 			if ( scope.enabled === false ) return;
 
-			_domElement.style.touchAction = 'none';
-
 			updatePointer( event );
 
 			_intersections.length = 0;
@@ -182,7 +182,6 @@ class DragControls extends EventDispatcher {
 			}
 
 			_domElement.style.cursor = _hovered ? 'pointer' : 'auto';
-			_domElement.style.touchAction = '';
 
 		}
 
