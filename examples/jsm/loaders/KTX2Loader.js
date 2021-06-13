@@ -14,7 +14,7 @@
  * - DFD: https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor
  */
 
-import {
+ import {
 	CompressedTexture,
 	CompressedTextureLoader,
 	FileLoader,
@@ -31,7 +31,7 @@ import {
 	KTX2Transfer
 } from '../libs/ktx-parse.module.js';
 import { BasisTextureLoader } from './BasisTextureLoader.js';
-import { ZSTDDecoder } from '../libs/zstddec.module.js';
+import { ZSTDDecoderWorker } from '../libs/zstddec.worker.module.js';
 
 class KTX2Loader extends CompressedTextureLoader {
 
@@ -40,7 +40,7 @@ class KTX2Loader extends CompressedTextureLoader {
 		super( manager );
 
 		this.basisLoader = new BasisTextureLoader( manager );
-		this.zstd = new ZSTDDecoder();
+		this.zstd = new ZSTDDecoderWorker();
 
 		this.zstd.init();
 
@@ -65,9 +65,10 @@ class KTX2Loader extends CompressedTextureLoader {
 
 	}
 
-	setWorkerLimit( path ) {
+	setWorkerLimit( num ) {
 
-		this.basisLoader.setWorkerLimit( path );
+		this.basisLoader.setWorkerLimit( num );
+		this.zstd.setWorkerLimit( num );
 
 		return this;
 
@@ -84,6 +85,7 @@ class KTX2Loader extends CompressedTextureLoader {
 	dispose() {
 
 		this.basisLoader.dispose();
+		this.zstd.dispose();
 
 		return this;
 
