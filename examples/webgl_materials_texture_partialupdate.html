@@ -17,7 +17,7 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			let camera, scene, renderer, clock, dataTexture, diffuseMap;
+			let camera, scene, renderer, clock, dataTexture, diffuseMap, lavaMap;
 
 			let last = 0;
 			const position = new THREE.Vector2();
@@ -36,6 +36,7 @@
 
 				const loader = new THREE.TextureLoader();
 				diffuseMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg', animate );
+				lavaMap = loader.load( 'textures/lava/lavatile.jpg', animate );
 				diffuseMap.minFilter = THREE.LinearFilter;
 				diffuseMap.generateMipmaps = false;
 
@@ -85,16 +86,35 @@
 
 					last = elapsedTime;
 
-					position.x = ( 32 * THREE.MathUtils.randInt( 1, 16 ) ) - 32;
-					position.y = ( 32 * THREE.MathUtils.randInt( 1, 16 ) ) - 32;
+					position.x = ( 32 * THREE.MathUtils.randInt( 0, 15 ) );
+					position.y = ( 32 * THREE.MathUtils.randInt( 0, 15 ) );
 
-					// generate new color data
+					if (THREE.MathUtils.randInt(0,1)) {
 
-					updateDataTexture( dataTexture );
+						// generate new color data
+						updateDataTexture( dataTexture );
 
-					// perform copy from src to dest texture to a random position
+						// perform copy from src to dest texture to a random position
+						renderer.copyTextureToTexture( position, dataTexture, diffuseMap ); // old api
+						// renderer.copyTextureToTexture( dataTexture, diffuseMap, position ); // new api
 
-					renderer.copyTextureToTexture( position, dataTexture, diffuseMap );
+					} else {
+
+						const srcBox = new THREE.Box2();
+						srcBox.min.copy(position);
+						srcBox.max.x = srcBox.min.x + 31;
+						srcBox.max.y = srcBox.min.y + 31;
+
+						// if image is loaded, perform copy from src to dest texture to a random position
+						if (lavaMap.image) {
+
+							// impossible with old api (no srcBox parameter)
+							renderer.copyTextureToTexture( lavaMap, diffuseMap, position, srcBox ); // new api
+
+
+						}
+
+					}
 
 				}
 
