@@ -1,6 +1,6 @@
 /**
- * Development repository: https://github.com/kaisalmen/WWOBJLoader
- * Proposed by Don McCurdy / https://www.donmccurdy.com
+ * Development repository: https://github.com/kaisalmen/three-wtm
+ * Initial idea by Don McCurdy / https://www.donmccurdy.com
  */
 
 import { FileLoader } from "../../../../build/three.module.js";
@@ -86,9 +86,9 @@ class WorkerTaskManager {
      * Registers functions and dependencies for a new task type.
      *
      * @param {string} taskType The name to be used for registration.
-     * @param {function} initFunction The function to be called when the worker is initialised
-     * @param {function} executeFunction The function to be called when the worker is executed
-     * @param {function} comRoutingFunction The function that should handle communication, leave undefined for default behavior
+     * @param {Function} initFunction The function to be called when the worker is initialised
+     * @param {Function} executeFunction The function to be called when the worker is executed
+     * @param {Function} comRoutingFunction The function that should handle communication, leave undefined for default behavior
      * @param {boolean} fallback Set to true if execution should be performed in main
      * @param {Object[]} [dependencyDescriptions]
      * @return {boolean} Tells if registration is possible (new=true) or if task was already registered (existing=false)
@@ -147,17 +147,17 @@ class WorkerTaskManager {
                 if ( workerTypeDefinition.isWorkerModule() ) {
 
                     await workerTypeDefinition.createWorkerModules()
-                        .then( instances => workerTypeDefinition.initWorkers( config, transferables ) )
-                        .then( y => workerTypeDefinition.status.initComplete = true )
-                        .catch( x => console.error( x ) );
+                        .then( () => workerTypeDefinition.initWorkers( config, transferables ) )
+                        .then( () => workerTypeDefinition.status.initComplete = true )
+                        .catch( e => console.error( e ) );
 
                 } else {
 
                     await workerTypeDefinition.loadDependencies()
-                        .then( code => workerTypeDefinition.createWorkers() )
-                        .then( instances => workerTypeDefinition.initWorkers( config, transferables ) )
-                        .then( y => workerTypeDefinition.status.initComplete = true )
-                        .catch( x => console.error( x ) );
+                        .then( () => workerTypeDefinition.createWorkers() )
+                        .then( () => workerTypeDefinition.initWorkers( config, transferables ) )
+                        .then( () => workerTypeDefinition.status.initComplete = true )
+                        .catch( e => console.error( e ) );
 
                 }
 
@@ -222,26 +222,25 @@ class WorkerTaskManager {
                 this.actualExecutionCount ++;
                 let promiseWorker = new Promise( ( resolveWorker, rejectWorker ) => {
 
-                    taskWorker.onmessage = function ( e ) {
+                    taskWorker.onmessage = message => {
 
                         // allow intermediate asset provision before flagging execComplete
-                        if ( e.data.cmd === 'assetAvailable' ) {
+                        if ( message.data.cmd === 'assetAvailable' ) {
 
                             if ( storedExecution.assetAvailableFunction instanceof Function ) {
 
-                                storedExecution.assetAvailableFunction( e.data );
+                                storedExecution.assetAvailableFunction( message.data );
 
                             }
 
                         } else {
 
-                            resolveWorker( e );
+                            resolveWorker( message );
 
                         }
 
                     };
                     taskWorker.onerror = rejectWorker;
-
                     taskWorker.postMessage( {
                         cmd: "execute",
                         workerId: taskWorker.getId(),
@@ -249,10 +248,10 @@ class WorkerTaskManager {
                     }, storedExecution.transferables );
 
                 } );
-                promiseWorker.then( ( e ) => {
+                promiseWorker.then( ( message ) => {
 
                     workerTypeDefinition.returnAvailableTask( taskWorker );
-                    storedExecution.resolve( e.data );
+                    storedExecution.resolve( message.data );
                     this.actualExecutionCount --;
                     this._depleteExecutions();
 
@@ -309,11 +308,11 @@ class WorkerTypeDefinition {
         this.verbose = verbose === true;
         this.initialised = false;
         this.functions = {
-            /** @type {function} */
+            /** @type {Function} */
             init: null,
-            /** @type {function} */
+            /** @type {Function} */
             execute: null,
-            /** @type {function} */
+            /** @type {Function} */
             comRouting: null,
             dependencies: {
                 /** @type {Object[]} */
@@ -354,9 +353,9 @@ class WorkerTypeDefinition {
      * Set the three functions. A default comRouting function is used if it is not passed here.
      * Then it creates the code fr.
      *
-     * @param {function} initFunction The function to be called when the worker is initialised
-     * @param {function} executeFunction The function to be called when the worker is executed
-     * @param {function} [comRoutingFunction] The function that should handle communication, leave undefined for default behavior
+     * @param {Function} initFunction The function to be called when the worker is initialised
+     * @param {Function} executeFunction The function to be called when the worker is executed
+     * @param {Function} [comRoutingFunction] The function that should handle communication, leave undefined for default behavior
      */
     setFunctions ( initFunction, executeFunction, comRoutingFunction ) {
 
@@ -368,10 +367,29 @@ class WorkerTypeDefinition {
             this.functions.comRouting = WorkerTaskManagerDefaultRouting.comRouting;
 
         }
-        this.workers.code.push( 'const init = ' + this.functions.init.toString() + ';\n\n' );
-        this.workers.code.push( 'const execute = ' + this.functions.execute.toString() + ';\n\n' );
-        this.workers.code.push( 'const comRouting = ' + this.functions.comRouting.toString() + ';\n\n' );
+        this._addWorkerCode( 'init', this.functions.init.toString() );
+        this._addWorkerCode( 'execute', this.functions.execute.toString() );
+        this._addWorkerCode( 'comRouting', this.functions.comRouting.toString() );
         this.workers.code.push( 'self.addEventListener( "message", message => comRouting( self, message, null, init, execute ), false );' );
+
+    }
+
+    /**
+     *
+     * @param {string} functionName Name of the function
+     * @param {string} functionString A function as string
+     * @private
+     */
+    _addWorkerCode ( functionName, functionString ) {
+        if ( functionString.startsWith('function') ) {
+
+            this.workers.code.push( 'const ' + functionName + ' = ' + functionString + ';\n\n' );
+
+        } else {
+
+            this.workers.code.push( 'function ' + functionString + ';\n\n' );
+
+        }
 
     }
 
@@ -415,7 +433,7 @@ class WorkerTypeDefinition {
     /**
      * Loads all dependencies and stores each as {@link ArrayBuffer} into the array. Returns if all loading is completed.
      *
-     * @return {<String[]>}
+     * @return {String[]}
      */
     async loadDependencies () {
 
@@ -502,7 +520,12 @@ class WorkerTypeDefinition {
 
             let taskWorkerPromise = new Promise( ( resolveWorker, rejectWorker ) => {
 
-                taskWorker.onmessage = resolveWorker;
+                taskWorker.onmessage = message => {
+
+                    if ( this.verbose ) console.log( 'Init Complete: ' + message.data.id );
+                    resolveWorker( message );
+
+                }
                 taskWorker.onerror = rejectWorker;
 
                 // ensure all transferables are copies to all workers on init!
@@ -524,6 +547,7 @@ class WorkerTypeDefinition {
             promises.push( taskWorkerPromise );
 
         }
+
         if ( this.verbose ) console.log( 'Task: ' + this.getTaskType() + ': Waiting for completion of initialization of all workers.');
         await Promise.all( promises );
         this.workers.available = this.workers.instances;
@@ -652,8 +676,8 @@ class MockedTaskWorker {
      * Creates a new instance.
      *
      * @param {number} id
-     * @param {function} initFunction
-     * @param {function} executeFunction
+     * @param {Function} initFunction
+     * @param {Function} executeFunction
      */
     constructor( id, initFunction, executeFunction ) {
 

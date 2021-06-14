@@ -20,20 +20,20 @@
 			'use strict';
 
 			import * as THREE from '../build/three.module.js';
-
 			import { TrackballControls } from "./jsm/controls/TrackballControls.js";
+
 			import { WorkerTaskManager } from "./jsm/loaders/workerTaskManager/WorkerTaskManager.js";
 			import {
 				DataTransport,
 				GeometryTransport,
 				MeshTransport,
 				MaterialsTransport,
-				ObjectUtils
+				ObjectUtils,
+				DeUglify
 			} from "./jsm/loaders/workerTaskManager/utils/TransportUtils.js"
 			import { MaterialUtils } from "./jsm/loaders/workerTaskManager/utils/MaterialUtils.js"
 			import { MaterialStore } from "./jsm/loaders/workerTaskManager/utils/MaterialStore.js"
-			import { FileLoader } from "../src/loaders/FileLoader.js";
-			import { OBJLoaderWorker } from "./jsm/loaders/workerTaskManager/worker/tmOBJLoader.js";
+			import { OBJLoaderWorker } from "./jsm/loaders/workerTaskManager/worker/tmOBJLoader.js"
 
 			/**
 			 * The aim of this example is to show two possible ways how to use the {@link WorkerTaskManager}:
@@ -66,7 +66,7 @@
 
 					this.objectsUsed = new Map();
 
-					this.workerTaskManager = new WorkerTaskManager( 4 ).setVerbose( true );
+					this.workerTaskManager = new WorkerTaskManager( 8 ).setVerbose( true );
 					this.tasksToUse = [];
 					this.materialStore = new MaterialStore( true );
 
@@ -108,16 +108,16 @@
 				async initContent () {
 
 					/** Simplest way to define a worker for {@link WorkerTaskManager} */
-					const InlineWorker = {
+					class InlineWorker {
 
-						workerStandardInit: function ( context, id, config ) {
+						static init ( context, id, config ) {
 
 							context.storage = {	whoami: config.id };
 							context.postMessage( { cmd: "init",	id: id	} );
 
-						},
+						}
 
-						workerStandardExec: function ( context, id, config ) {
+						static execute ( context, id, config ) {
 
 							let bufferGeometry = new THREE.SphereBufferGeometry( 40, 64, 64 );
 							bufferGeometry.name = 'InlineWorker' + config.id;
@@ -128,19 +128,23 @@
 							.package( false )
 							.postMessage( context );
 
-						},
+						}
 
-						buildStandardWorkerDependencies( threeJsLocation ) {
-
+						static buildStandardWorkerDependencies( threeJsLocation ) {
 							return [
 								{ url: threeJsLocation },
-								{ code: 'const BufferGeometry = THREE.BufferGeometry;\n' },
-								{ code: 'const EventDispatcher = THREE.EventDispatcher;\n' },
+								{ code: '\n\n' },
+								{ code: DeUglify.buildThreeConst() },
+								{ code: '\n\n' },
+								{ code: DeUglify.buildUglifiedThreeMapping() },
+								{ code: '\n\n' },
 								{ code: ObjectUtils.serializeClass( DataTransport ) },
 								{ code: ObjectUtils.serializeClass( GeometryTransport ) },
 								{ code: ObjectUtils.serializeClass( MaterialUtils ) },
 								{ code: ObjectUtils.serializeClass( MaterialsTransport ) },
-								{ code: ObjectUtils.serializeClass( MeshTransport ) }
+								{ code: ObjectUtils.serializeClass( MeshTransport ) },
+								{ code: DeUglify.buildUglifiedThreeWtmMapping() },
+								{ code: '\n\n' }
 							];
 
 						}
@@ -150,9 +154,9 @@
 					let awaiting = [];
 					let taskDescr = {
 						name: 'InlineWorker',
-						funcInit: InlineWorker.workerStandardInit,
-						funcExec: InlineWorker.workerStandardExec,
-						dependencies: InlineWorker.buildStandardWorkerDependencies( "../build/three.min.js" )
+						funcInit: InlineWorker.init,
+						funcExec: InlineWorker.execute,
+						dependencies: InlineWorker.buildStandardWorkerDependencies( '../build/three.min.js' )
 					};
 					this.tasksToUse.push( taskDescr );
 					this.workerTaskManager.registerTaskType( taskDescr.name, taskDescr.funcInit, taskDescr.funcExec, null, false, taskDescr.dependencies );
@@ -168,7 +172,7 @@
 					this.tasksToUse.push( taskDescrObj );
 					this.workerTaskManager.registerTaskType( taskDescrObj.name, taskDescrObj.funcInit, taskDescrObj.funcExec, null, false, taskDescrObj.dependencies );
 					const loadObj = async function ( filenameObj ) {
-						let fileLoader = new FileLoader();
+						let fileLoader = new THREE.FileLoader();
 						fileLoader.setResponseType( 'arraybuffer' );
 						return await fileLoader.loadAsync( filenameObj );
 					}
@@ -181,7 +185,6 @@
 								.package( false );
 							awaiting.push( this.workerTaskManager.initTaskType( taskDescrObj.name, mt.getMain(), mt.getTransferables() ).catch( e => console.error( e ) ) );
 						} );
-
 					return await Promise.all( awaiting );
 
 				}
@@ -227,9 +230,6 @@
 				 */
 				_processMessage ( payload ) {
 					switch ( payload.cmd ) {
-						case 'init':
-							console.log( 'Init Completed: ' + payload.id );
-							break;
 
 						case 'assetAvailable':
 						case 'execComplete':

@@ -1,8 +1,6 @@
 /**
- * Development repository: https://github.com/kaisalmen/WWOBJLoader
+ * Development repository: https://github.com/kaisalmen/three-wtm
  */
-
-import { Material } from "../../../../../build/three.module.js";
 
 /**
  * Static functions useful in the context of handling materials.
@@ -62,7 +60,11 @@ class MaterialUtils {
 		for ( const materialName in materialsObject ) {
 
 			material = materialsObject[ materialName ];
-			if ( material instanceof Material ) materialsJSON[ materialName ] = material.toJSON();
+			if ( typeof material.toJSON === 'function' ) {
+
+				materialsJSON[ materialName ] = material.toJSON();
+
+			}
 
 		}
 		return materialsJSON;

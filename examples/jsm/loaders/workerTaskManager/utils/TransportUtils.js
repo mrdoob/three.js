@@ -1,5 +1,5 @@
 /**
- * Development repository: https://github.com/kaisalmen/WWOBJLoader
+ * Development repository: https://github.com/kaisalmen/three-wtm
  */
 
 import {
@@ -8,12 +8,72 @@ import {
 	Box3,
 	Sphere,
 	Texture,
-	Material,
 	MaterialLoader
 } from "../../../../../build/three.module.js";
-import {
-	MaterialUtils
-} from './MaterialUtils.js';
+import { MaterialUtils } from './MaterialUtils.js';
+
+class DeUglify {
+
+	static buildThreeConst () {
+		return 'const EventDispatcher = THREE.EventDispatcher;\n' +
+			'const BufferGeometry = THREE.BufferGeometry;\n' +
+			'const BufferAttribute = THREE.BufferAttribute;\n' +
+			'const Box3 = THREE.Box3;\n' +
+			'const Sphere = THREE.Sphere;\n' +
+			'const Texture = THREE.Texture;\n' +
+			'const MaterialLoader = THREE.MaterialLoader;\n';
+	}
+
+	static buildUglifiedThreeMapping () {
+		function _BufferGeometry() { return BufferGeometry; }
+		function _BufferAttribute () { return BufferAttribute; }
+		function _Box3 () { return Box3; }
+		function _Sphere () { return Sphere; }
+		function _Texture () { return Texture; }
+		function _MaterialLoader () { return MaterialLoader; }
+
+		return DeUglify.buildUglifiedNameAssignment( _BufferGeometry, 'BufferGeometry', /_BufferGeometry/, false ) +
+			DeUglify.buildUglifiedNameAssignment( _BufferAttribute, 'BufferAttribute', /_BufferAttribute/, false ) +
+			DeUglify.buildUglifiedNameAssignment( _Box3, 'Box3', /_Box3/, false ) +
+			DeUglify.buildUglifiedNameAssignment( _Sphere, 'Sphere', /_Sphere/, false ) +
+			DeUglify.buildUglifiedNameAssignment( _Texture, 'Texture', /_Texture/, false ) +
+			DeUglify.buildUglifiedNameAssignment( _MaterialLoader, 'MaterialLoader', /_MaterialLoader/, false );
+	}
+
+	static buildUglifiedThreeWtmMapping () {
+		function _DataTransport () { return DataTransport; }
+		function _GeometryTransport () { return GeometryTransport; }
+		function _MeshTransport () { return MeshTransport; }
+		function _MaterialsTransport () { return MaterialsTransport; }
+		function _MaterialUtils () { return MaterialUtils; }
+
+		return DeUglify.buildUglifiedNameAssignment( _DataTransport, 'DataTransport', /_DataTransport/, true ) +
+			DeUglify.buildUglifiedNameAssignment( _GeometryTransport, 'GeometryTransport', /_GeometryTransport/, true ) +
+			DeUglify.buildUglifiedNameAssignment( _MeshTransport, 'MeshTransport', /_MeshTransport/, true ) +
+			DeUglify.buildUglifiedNameAssignment( _MaterialsTransport, 'MaterialsTransport', /_MaterialsTransport/, true ) +
+			DeUglify.buildUglifiedNameAssignment( _MaterialUtils, 'MaterialUtils', /_MaterialUtils/, true );
+	}
+
+	static buildUglifiedNameAssignment(func, name, methodPattern, invert) {
+		let funcStr = func.toString();
+		// remove the method name and any line breaks (rollup lib creation, non-uglify case
+		funcStr = funcStr.replace(methodPattern, "").replace(/[\r\n]+/gm, "");
+		// remove return and any semi-colons
+		funcStr = funcStr.replace(/.*return/, "").replace(/\}/, "").replace(/;/gm, "");
+		const retrieveNamed = funcStr.trim()
+		// return non-empty string in uglified case (name!=retrieveNamed); e.g. "const BufferGeometry = e";
+		// return empty string in case of non-uglified lib/src
+		let output = "";
+		if (retrieveNamed !== name) {
+			const left = invert ? name : retrieveNamed;
+			const right = invert ? retrieveNamed : name;
+			output = "const " + left + " = " + right + ";\n";
+		}
+		return output;
+	}
+}
+
+
 
 /**
  * Define a base structure that is used to ship data in between main and workers.
@@ -181,7 +241,7 @@ class DataTransport {
 
 	/**
 	 * Return all transferable in one array.
-	 * @return {[]|ArrayBuffer[]}
+	 * @return {ArrayBuffer[]}
 	 */
 	getTransferables() {
 
@@ -314,7 +374,7 @@ class MaterialsTransport extends DataTransport {
 		let clonedMaterial;
 		for ( let material of Object.values( this.main.materials ) ) {
 
-			if ( material instanceof Material ) {
+			if ( typeof material.clone === 'function' ) {
 
 				clonedMaterial = material.clone();
 				clonedMaterials[ clonedMaterial.name ] = this._cleanMaterial( clonedMaterial );
@@ -424,10 +484,8 @@ class GeometryTransport extends DataTransport {
 
 		super( cmd, id );
 		this.main.type = 'GeometryTransport';
-		/**
-		 * @type {number}
-		 * 0: mesh, 1: line, 2: point
-		 */
+		// 0: mesh, 1: line, 2: point
+		/** @type {number} */
 		this.main.geometryType = 0;
 		/** @type {object} */
 		this.main.geometry = {};
@@ -808,5 +866,6 @@ export {
 	MeshTransport,
 	MaterialsTransport,
 	ObjectUtils,
-	ObjectManipulator
+	ObjectManipulator,
+	DeUglify
 }

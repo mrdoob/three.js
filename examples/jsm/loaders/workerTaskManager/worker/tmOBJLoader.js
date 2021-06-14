@@ -1,27 +1,24 @@
+import { OBJLoader } from '../../OBJLoader.js';
 import {
 	DataTransport,
 	MaterialsTransport,
 	GeometryTransport,
 	MeshTransport,
 	ObjectUtils,
-} from "../utils/TransportUtils.js";
-import {
-	MaterialUtils
-} from '../utils/MaterialUtils.js';
-import { OBJLoader } from "../../OBJLoader.js";
+	DeUglify
+} from '../utils/TransportUtils.js';
+import { MaterialUtils } from '../utils/MaterialUtils.js';;
 import { WorkerTaskManagerDefaultRouting } from "./defaultRouting.js";
 
-const OBJLoaderWorker = {
+class OBJLoaderWorker {
 
-	buildStandardWorkerDependencies: function ( threeJsLocation, objLoaderLocation ) {
+	static buildStandardWorkerDependencies ( threeJsLocation, objLoaderLocation ) {
 		return [
 			{ url: threeJsLocation },
 			{ code: '\n\n' },
-			{ code: 'const MaterialLoader = THREE.MaterialLoader;\n' },
-			{ code: 'const Material = THREE.Material;\n' },
-			{ code: 'const Texture = THREE.Texture;\n' },
-			{ code: 'const BufferGeometry = THREE.BufferGeometry;\n' },
-			{ code: 'const EventDispatcher = THREE.EventDispatcher;\n' },
+			{ code: DeUglify.buildThreeConst() },
+			{ code: '\n\n' },
+			{ code: DeUglify.buildUglifiedThreeMapping() },
 			{ code: '\n\n' },
 			{ url: objLoaderLocation },
 			{ code: '\n\nconst OBJLoader = THREE.OBJLoader;\n\n' },
@@ -30,11 +27,13 @@ const OBJLoaderWorker = {
 			{ code: ObjectUtils.serializeClass( MaterialsTransport ) },
 			{ code: ObjectUtils.serializeClass( MaterialUtils ) },
 			{ code: ObjectUtils.serializeClass( GeometryTransport ) },
-			{ code: ObjectUtils.serializeClass( MeshTransport ) }
+			{ code: ObjectUtils.serializeClass( MeshTransport ) },
+			{ code: DeUglify.buildUglifiedThreeWtmMapping() },
+			{ code: '\n\n' }
 		]
-	},
+	}
 
-	init: function ( context, id, config ) {
+	static init ( context, id, config ) {
 
 		const materialsTransport = new MaterialsTransport().loadData( config );
 		context.objLoader = {
@@ -50,9 +49,9 @@ const OBJLoaderWorker = {
 			cmd: "init",
 			id: id
 		} );
-	},
+	}
 
-	execute: function ( context, id, config ) {
+	static execute ( context, id, config ) {
 
 		context.objLoader.loader = new OBJLoader();
 		const dataTransport = new DataTransport().loadData( config );
@@ -85,7 +84,7 @@ const OBJLoaderWorker = {
 
 	}
 
-};
+}
 
 self.addEventListener( 'message', message => WorkerTaskManagerDefaultRouting.comRouting( self, message, OBJLoaderWorker, 'init', 'execute' ), false );
 

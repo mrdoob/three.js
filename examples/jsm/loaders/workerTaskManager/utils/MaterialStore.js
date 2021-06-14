@@ -1,9 +1,8 @@
 /**
- * Development repository: https://github.com/kaisalmen/WWOBJLoader
+ * Development repository: https://github.com/kaisalmen/three-wtm
  */
 
 import {
-	Material,
 	MeshStandardMaterial,
 	LineBasicMaterial,
 	PointsMaterial,
