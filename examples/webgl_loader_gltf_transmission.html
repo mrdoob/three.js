@@ -55,8 +55,8 @@
 
 						// model
 
-						const loader = new GLTFLoader().setPath( 'models/gltf/TransmissionTest/glTF/' );
-						loader.load( 'TransmissionTest.gltf', function ( gltf ) {
+						const loader = new GLTFLoader().setPath( 'models/gltf/' );
+						loader.load( 'TransmissionTest.glb', function ( gltf ) {
 
 							scene.add( gltf.scene );
 							render();

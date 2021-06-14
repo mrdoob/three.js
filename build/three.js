@@ -1849,7 +1849,7 @@
 	*/
 
 	class WebGLRenderTarget extends EventDispatcher {
-		constructor(width, height, options) {
+		constructor(width, height, options = {}) {
 			super();
 			this.width = width;
 			this.height = height;
@@ -1857,7 +1857,6 @@
 			this.scissor = new Vector4(0, 0, width, height);
 			this.scissorTest = false;
 			this.viewport = new Vector4(0, 0, width, height);
-			options = options || {};
 			this.texture = new Texture(undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding);
 			this.texture.image = {
 				width: width,
@@ -4783,11 +4782,11 @@
 			this._onChangeCallback();
 		}
 
-		set(x, y, z, order) {
+		set(x, y, z, order = this._order) {
 			this._x = x;
 			this._y = y;
 			this._z = z;
-			this._order = order || this._order;
+			this._order = order;
 
 			this._onChangeCallback();
 
@@ -4809,7 +4808,7 @@
 			return this;
 		}
 
-		setFromRotationMatrix(m, order, update) {
+		setFromRotationMatrix(m, order = this._order, update = true) {
 			// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 			const te = m.elements;
 			const m11 = te[0],
@@ -4821,7 +4820,6 @@
 			const m31 = te[2],
 						m32 = te[6],
 						m33 = te[10];
-			order = order || this._order;
 
 			switch (order) {
 				case 'XYZ':
@@ -4907,7 +4905,7 @@
 			}
 
 			this._order = order;
-			if (update !== false) this._onChangeCallback();
+			if (update === true) this._onChangeCallback();
 			return this;
 		}
 
@@ -4917,8 +4915,8 @@
 			return this.setFromRotationMatrix(_matrix$1, order, update);
 		}
 
-		setFromVector3(v, order) {
-			return this.set(v.x, v.y, v.z, order || this._order);
+		setFromVector3(v, order = this._order) {
+			return this.set(v.x, v.y, v.z, order);
 		}
 
 		reorder(newOrder) {
@@ -16781,12 +16779,15 @@
 
 				for (let i = 0; i < cameras.length; i++) {
 					updateCamera(cameras[i], parent);
-				} // update camera and its children
+				}
 
+				cameraVR.matrixWorld.decompose(cameraVR.position, cameraVR.quaternion, cameraVR.scale); // update user camera and its children
 
-				camera.matrixWorld.copy(cameraVR.matrixWorld);
+				camera.position.copy(cameraVR.position);
+				camera.quaternion.copy(cameraVR.quaternion);
+				camera.scale.copy(cameraVR.scale);
 				camera.matrix.copy(cameraVR.matrix);
-				camera.matrix.decompose(camera.position, camera.quaternion, camera.scale);
+				camera.matrixWorld.copy(cameraVR.matrixWorld);
 				const children = camera.children;
 
 				for (let i = 0, l = children.length; i < l; i++) {
@@ -17357,9 +17358,7 @@
 		return canvas;
 	}
 
-	function WebGLRenderer(parameters) {
-		parameters = parameters || {};
-
+	function WebGLRenderer(parameters = {}) {
 		const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 					_context = parameters.context !== undefined ? parameters.context : null,
 					_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
@@ -18257,7 +18256,21 @@
 				bindingStates.reset();
 				renderObjectImmediate(object, program);
 			} else {
-				_this.renderBufferDirect(camera, scene, geometry, material, object, group);
+				if (material.transparent === true && material.side === DoubleSide) {
+					material.side = BackSide;
+					material.needsUpdate = true;
+
+					_this.renderBufferDirect(camera, scene, geometry, material, object, group);
+
+					material.side = FrontSide;
+					material.needsUpdate = true;
+
+					_this.renderBufferDirect(camera, scene, geometry, material, object, group);
+
+					material.side = DoubleSide;
+				} else {
+					_this.renderBufferDirect(camera, scene, geometry, material, object, group);
+				}
 			}
 
 			object.onAfterRender(_this, scene, camera, geometry, material, group);
@@ -18762,11 +18775,9 @@
 				return;
 			}
 
-			const {
-				width,
-				height,
-				data
-			} = srcTexture.image;
+			const width = sourceBox.max.x - sourceBox.min.x + 1;
+			const height = sourceBox.max.y - sourceBox.min.y + 1;
+			const depth = sourceBox.max.z - sourceBox.min.z + 1;
 			const glFormat = utils.convert(dstTexture.format);
 			const glType = utils.convert(dstTexture.type);
 			let glTarget;
@@ -18798,9 +18809,11 @@
 
 			const unpackSkipImages = _gl.getParameter(_gl.UNPACK_SKIP_IMAGES);
 
-			_gl.pixelStorei(_gl.UNPACK_ROW_LENGTH, width);
+			const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[0] : srcTexture.image;
 
-			_gl.pixelStorei(_gl.UNPACK_IMAGE_HEIGHT, height);
+			_gl.pixelStorei(_gl.UNPACK_ROW_LENGTH, image.width);
+
+			_gl.pixelStorei(_gl.UNPACK_IMAGE_HEIGHT, image.height);
 
 			_gl.pixelStorei(_gl.UNPACK_SKIP_PIXELS, sourceBox.min.x);
 
@@ -18808,7 +18821,17 @@
 
 			_gl.pixelStorei(_gl.UNPACK_SKIP_IMAGES, sourceBox.min.z);
 
-			_gl.texSubImage3D(glTarget, level, position.x, position.y, position.z, sourceBox.max.x - sourceBox.min.x + 1, sourceBox.max.y - sourceBox.min.y + 1, sourceBox.max.z - sourceBox.min.z + 1, glFormat, glType, data);
+			if (srcTexture.isDataTexture || srcTexture.isDataTexture3D) {
+				_gl.texSubImage3D(glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, glType, image.data);
+			} else {
+				if (srcTexture.isCompressedTexture) {
+					console.warn('THREE.WebGLRenderer.copyTextureToTexture3D: untested support for compressed srcTexture.');
+
+					_gl.compressedTexSubImage3D(glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, image.data);
+				} else {
+					_gl.texSubImage3D(glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, glType, image);
+				}
+			}
 
 			_gl.pixelStorei(_gl.UNPACK_ROW_LENGTH, unpackRowLen);
 
@@ -19046,7 +19069,7 @@
 	const _vector$6 = /*@__PURE__*/new Vector3();
 
 	class InterleavedBufferAttribute {
-		constructor(interleavedBuffer, itemSize, offset, normalized) {
+		constructor(interleavedBuffer, itemSize, offset, normalized = false) {
 			this.name = '';
 			this.data = interleavedBuffer;
 			this.itemSize = itemSize;
@@ -19671,15 +19694,15 @@
 	Bone.prototype.isBone = true;
 
 	class DataTexture extends Texture {
-		constructor(data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding) {
+		constructor(data = null, width = 1, height = 1, format, type, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, encoding) {
 			super(null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding);
 			this.image = {
-				data: data || null,
-				width: width || 1,
-				height: height || 1
+				data: data,
+				width: width,
+				height: height
 			};
-			this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-			this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+			this.magFilter = magFilter;
+			this.minFilter = minFilter;
 			this.generateMipmaps = false;
 			this.flipY = false;
 			this.unpackAlignment = 1;
@@ -21072,8 +21095,7 @@
 	 * Port from https://github.com/mapbox/earcut (v2.2.2)
 	 */
 	const Earcut = {
-		triangulate: function (data, holeIndices, dim) {
-			dim = dim || 2;
+		triangulate: function (data, holeIndices, dim = 2) {
 			const hasHoles = holeIndices && holeIndices.length;
 			const outerLen = hasHoles ? holeIndices[0] * dim : data.length;
 			let outerNode = linkedList(data, 0, outerLen, dim, true);
@@ -28252,7 +28274,7 @@
 	InstancedBufferGeometry.prototype.isInstancedBufferGeometry = true;
 
 	class InstancedBufferAttribute extends BufferAttribute {
-		constructor(array, itemSize, normalized, meshPerAttribute) {
+		constructor(array, itemSize, normalized, meshPerAttribute = 1) {
 			if (typeof normalized === 'number') {
 				meshPerAttribute = normalized;
 				normalized = false;
@@ -28260,7 +28282,7 @@
 			}
 
 			super(array, itemSize, normalized);
-			this.meshPerAttribute = meshPerAttribute || 1;
+			this.meshPerAttribute = meshPerAttribute;
 		}
 
 		copy(source) {
@@ -32252,7 +32274,7 @@
 	class InstancedInterleavedBuffer extends InterleavedBuffer {
 		constructor(array, stride, meshPerAttribute = 1) {
 			super(array, stride);
-			this.meshPerAttribute = meshPerAttribute || 1;
+			this.meshPerAttribute = meshPerAttribute;
 		}
 
 		copy(source) {

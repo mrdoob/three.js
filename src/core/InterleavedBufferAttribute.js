@@ -13,7 +13,7 @@ class InterleavedBufferAttribute {
 		this.itemSize = itemSize;
 		this.offset = offset;
 
-		this.normalized = normalized;
+		this.normalized = normalized === true;
 
 	}
 
