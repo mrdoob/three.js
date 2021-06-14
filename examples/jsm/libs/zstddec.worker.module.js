@@ -105,7 +105,7 @@ export class ZSTDDecoderWorker {
 					this.workerPool.initWorkers( () => {
 
 						const worker = new Worker( this.workerSourceUrl );
-						const wasmBufferCopy = wasmBuffer.slice();
+						const wasmBufferCopy = wasmBuffer.slice( 0 );
 
 						worker.postMessage(
               { type: 'init', wasmBuffer: wasmBufferCopy }, 
