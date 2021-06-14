@@ -386,12 +386,9 @@
 			}
 
 			// spacing
-			const spacingX = ( new Vector3( headerObject.vectors[ 0 ][ 0 ], headerObject.vectors[ 0 ][ 1 ],
-				headerObject.vectors[ 0 ][ 2 ] ) ).length();
-			const spacingY = ( new Vector3( headerObject.vectors[ 1 ][ 0 ], headerObject.vectors[ 1 ][ 1 ],
-				headerObject.vectors[ 1 ][ 2 ] ) ).length();
-			const spacingZ = ( new Vector3( headerObject.vectors[ 2 ][ 0 ], headerObject.vectors[ 2 ][ 1 ],
-				headerObject.vectors[ 2 ][ 2 ] ) ).length();
+			const spacingX = new THREE.Vector3().fromArray( headerObject.vectors[ 0 ] ).length();
+			const spacingY = new THREE.Vector3().fromArray( headerObject.vectors[ 1 ] ).length();
+			const spacingZ = new THREE.Vector3().fromArray( headerObject.vectors[ 2 ] ).length();
 			volume.spacing = [ spacingX, spacingY, spacingZ ];
 
 			// Create IJKtoRAS matrix
