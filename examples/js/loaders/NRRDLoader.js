@@ -369,11 +369,8 @@
 			// Identify axis order in the space-directions matrix from the header if possible.
 			if (headerObject.vectors) {
 				const xIndex = headerObject.vectors.findIndex(vector => vector[0] !== 0);
-				const xAxisOrientation = headerObject.vectors[xIndex][0] >= 0 ? 1 : -1;
 				const yIndex = headerObject.vectors.findIndex(vector => vector[1] !== 0);
-				const yAxisOrientation = headerObject.vectors[yIndex][1] >= 0 ? 1 : -1;
 				const zIndex = headerObject.vectors.findIndex(vector => vector[2] !== 0);
-				const zAxisOrientation = headerObject.vectors[zIndex][2] >= 0 ? 1 : -1;
 
 				const axisOrder = [];
 				axisOrder[xIndex] = 'x';
