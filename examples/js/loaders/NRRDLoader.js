@@ -359,41 +359,87 @@
 			volume.windowLow = min;
 			volume.windowHigh = max; // get the image dimensions
 
-			// Identify anchor points in the space-directions matrix.
-			const xIndex = headerObject.vectors.findIndex( vector => vector[ 0 ] !== 0 );
-			const yIndex = headerObject.vectors.findIndex( vector => vector[ 1 ] !== 0 );
-			const zIndex = headerObject.vectors.findIndex( vector => vector[ 2 ] !== 0 );
 
 			// get the image dimensions
-			volume.dimensions = [ headerObject.sizes[ xIndex ], headerObject.sizes[ yIndex ], headerObject.sizes[ zIndex ] ];
-			volume.xLength = volume.dimensions[ xIndex ];
-			volume.yLength = volume.dimensions[ yIndex ];
-			volume.zLength = volume.dimensions[ zIndex ];
+			volume.dimensions = [ headerObject.sizes[ 0 ], headerObject.sizes[ 1 ], headerObject.sizes[ 2 ] ];
+			volume.xLength = volume.dimensions[ 0 ];
+			volume.yLength = volume.dimensions[ 1 ];
+			volume.zLength = volume.dimensions[ 2 ];
+
+			// Identify axis order in the space-directions matrix from the header if possible.
+			if (headerObject.vectors) {
+				const xIndex = headerObject.vectors.findIndex(vector => vector[0] !== 0);
+				const xAxisOrientation = headerObject.vectors[xIndex][0] >= 0 ? 1 : -1;
+				const yIndex = headerObject.vectors.findIndex(vector => vector[1] !== 0);
+				const yAxisOrientation = headerObject.vectors[yIndex][1] >= 0 ? 1 : -1;
+				const zIndex = headerObject.vectors.findIndex(vector => vector[2] !== 0);
+				const zAxisOrientation = headerObject.vectors[zIndex][2] >= 0 ? 1 : -1;
+
+				const axisOrder = [];
+				axisOrder[xIndex] = 'x';
+				axisOrder[yIndex] = 'y';
+				axisOrder[zIndex] = 'z';
+				volume.axisOrder = axisOrder;
+			}
+			else {
+				volume.axisOrder = ['x', 'y', 'z'];
+			}
 
 			// spacing
-			const spacingX = ( new THREE.Vector3( headerObject.vectors[ xIndex ][ 0 ], headerObject.vectors[ xIndex ][ 1 ],
-				headerObject.vectors[ xIndex ][ 2 ] ) ).length();
-			const spacingY = ( new THREE.Vector3( headerObject.vectors[ yIndex ][ 0 ], headerObject.vectors[ yIndex ][ 1 ],
-				headerObject.vectors[ yIndex ][ 2 ] ) ).length();
-			const spacingZ = ( new THREE.Vector3( headerObject.vectors[ zIndex ][ 0 ], headerObject.vectors[ zIndex ][ 1 ],
-				headerObject.vectors[ zIndex ][ 2 ] ) ).length();
+			const spacingX = ( new Vector3( headerObject.vectors[ 0 ][ 0 ], headerObject.vectors[ 0 ][ 1 ],
+				headerObject.vectors[ 0 ][ 2 ] ) ).length();
+			const spacingY = ( new Vector3( headerObject.vectors[ 1 ][ 0 ], headerObject.vectors[ 1 ][ 1 ],
+				headerObject.vectors[ 1 ][ 2 ] ) ).length();
+			const spacingZ = ( new Vector3( headerObject.vectors[ 2 ][ 0 ], headerObject.vectors[ 2 ][ 1 ],
+				headerObject.vectors[ 2 ][ 2 ] ) ).length();
 			volume.spacing = [ spacingX, spacingY, spacingZ ];
 
 			// Create IJKtoRAS matrix
 			volume.matrix = new THREE.Matrix4();
 
-			const _spaceX = headerObject.vectors[ xIndex ][ 0 ] > 0 ? 1 : - 1;
-			const _spaceY = headerObject.vectors[ yIndex ][ 1 ] > 0 ? 1 : - 1;
-			const _spaceZ = headerObject.vectors[ zIndex ][ 2 ] > 0 ? 1 : - 1;
+			const transitionMatrix = new THREE.Matrix4();
+
+			if ( headerObject.space === 'left-posterior-superior' ) {
+
+				transitionMatrix.set(
+					- 1, 0, 0, 0,
+					0, -1, 0, 0,
+					0, 0, 1, 0,
+					0, 0, 0, 1 );
+
+			} else if ( headerObject.space === 'left-anterior-superior' ) {
+
+				transitionMatrix.set(
+					1, 0, 0, 0,
+					0, 1, 0, 0,
+					0, 0, -1, 0,
+					0, 0, 0, 1 );
+
+			}
+
 
 			if ( ! headerObject.vectors ) {
 
-				volume.matrix.set( _spaceX, 0, 0, 0, 0, _spaceY, 0, 0, 0, 0, _spaceZ, 0, 0, 0, 0, 1 );
+				volume.matrix.set(
+					1, 0, 0, 0,
+					0, 1, 0, 0,
+					0, 0, 1, 0,
+					0, 0, 0, 1 );
 
 			} else {
 
 				const v = headerObject.vectors;
-				volume.matrix.set( _spaceX * v[ 0 ][ 0 ], _spaceX * v[ 1 ][ 0 ], _spaceX * v[ 2 ][ 0 ], 0, _spaceY * v[ 0 ][ 1 ], _spaceY * v[ 1 ][ 1 ], _spaceY * v[ 2 ][ 1 ], 0, _spaceZ * v[ 0 ][ 2 ], _spaceZ * v[ 1 ][ 2 ], _spaceZ * v[ 2 ][ 2 ], 0, 0, 0, 0, 1 );
+
+				const ijk_to_transition = ( new THREE.Matrix4() ).set(
+					v[ 0 ][ 0 ], v[ 1 ][ 0 ], v[ 2 ][ 0 ], 0,
+					v[ 0 ][ 1 ], v[ 1 ][ 1 ], v[ 2 ][ 1 ], 0,
+					v[ 0 ][ 2 ], v[ 1 ][ 2 ], v[ 2 ][ 2 ], 0,
+					0, 0, 0, 1
+				)
+
+				const transition_to_ras = (new THREE.Matrix4()).multiplyMatrices( ijk_to_transition, transitionMatrix );
+
+				volume.matrix = transition_to_ras;
 
 			}
 
