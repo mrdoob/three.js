@@ -61,8 +61,9 @@ export default /* glsl */`
 		}
 	}
 
-	vec3 getIBLVolumeRefraction(vec3 n, vec3 v, vec3 viewDir, float perceptualRoughness, vec3 baseColor, vec3 f0, vec3 f90,
-		vec3 position, mat4 modelMatrix, mat4 viewMatrix, mat4 projMatrix, float ior, float thickness, vec3 attenuationColor, float attenuationDistance) {
+	vec3 getIBLVolumeRefraction(vec3 n, vec3 v, float perceptualRoughness, vec3 baseColor, vec3 specularColor,
+		vec3 position, mat4 modelMatrix, mat4 viewMatrix, mat4 projMatrix, float ior, float thickness,
+		vec3 attenuationColor, float attenuationDistance) {
 		vec3 transmissionRay = getVolumeTransmissionRay(n, v, thickness, ior, modelMatrix);
 		vec3 refractedRayExit = position + transmissionRay;
 
@@ -76,10 +77,6 @@ export default /* glsl */`
 		vec3 transmittedLight = getTransmissionSample(refractionCoords, perceptualRoughness, ior);
 
 		vec3 attenuatedColor = applyVolumeAttenuation(transmittedLight, length(transmissionRay), attenuationColor, attenuationDistance);
-
-		float NdotV = saturate(dot(n, viewDir));
-		vec2 brdf = integrateSpecularBRDF(NdotV, perceptualRoughness);
-		vec3 specularColor = f0 * brdf.x + f90 * brdf.y;
 
 		return (1.0 - specularColor) * attenuatedColor * baseColor;
 	}
