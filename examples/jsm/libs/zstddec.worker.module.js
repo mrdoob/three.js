@@ -10,10 +10,10 @@ export class ZSTDDecoderWorker {
 	static Worker () {
 
 		let instance, heap;
-		let initPromiseResolve;
+		let initResolve;
 		let initPromise = new Promise( ( resolve ) => {
 
-			initPromiseResolve = ( e ) => {
+			initResolve = ( e ) => {
 
 				instance = e.instance;
 				importObject.env.emscripten_notify_memory_growth( 0 );
@@ -42,9 +42,7 @@ export class ZSTDDecoderWorker {
 
 				case 'init':
 
-					WebAssembly
-						.instantiate( e.data.wasmBuffer, importObject )
-						.then( initPromiseResolve );
+					WebAssembly.instantiate( e.data.wasmBuffer, importObject ).then( initResolve );
 
 					break;
 
