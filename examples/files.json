@@ -394,6 +394,7 @@
 		"css2d_label"
 	],
 	"css3d": [
+		"css3d_gallery",
 		"css3d_molecules",
 		"css3d_orthographic",
 		"css3d_periodictable",
