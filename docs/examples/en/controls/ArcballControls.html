@@ -16,7 +16,7 @@
 		Dragging cursor/fingers will cause camera to orbit around the center of the trackball in a conservative way (returning to the starting point
 		will make the camera to return to its starting orientation).<br><br>
 		
-		In addition to supporting pan, zoom and pinch gestures, Arcball controls provide <i>focus></i> functionality with a double click/tap for
+		In addition to supporting pan, zoom and pinch gestures, Arcball controls provide <i>focus</i> functionality with a double click/tap for
 		intuitively moving the object's point of interest in the center of the virtual trackball.   
 		Focus allows a much better inspection and navigation in complex environment. 
 		Moreover Arcball controls allow FOV manipulation (in a vertigo-style method) and z-rotation.
@@ -197,9 +197,19 @@
 			Make gizmos more or less visible.
 		</p>
 
+		<h3>[method:null copyState] ()</h3>
+		<p>
+			Copy the current state to clipboard (as a readable JSON text).
+		</p>
+
 		<h3>[method:null dispose] ()</h3>
 		<p>
 			Remove all the event listeners, cancel any pending animation and clean the scene from gizmos and grid.
+		</p>
+
+		<h3>[method:null pasteState] ()</h3>
+		<p>
+			Set the controls state from the clipboard, assumes that the clipboard stores a JSON text as saved from [page:.copyState].
 		</p>
 
 		<h3>[method:null reset] ()</h3>
