@@ -71,10 +71,13 @@
 					folderOptions.add( controls, 'minZoom', 0, 50, 0.5 ).name( 'Min zoom' );
 					folderOptions.add( controls, 'maxZoom', 0, 50, 0.5 ).name( 'Max zoom' );   
 					folderOptions.add( arcballGui, 'gizmoVisible' ).name( 'Show gizmos' ).onChange( function() {
-
+							
 						controls.setGizmosVisible( arcballGui.gizmoVisible );
 
 					} );
+					folderOptions.add( controls, 'CopyState' ).name( 'copy state' );
+					folderOptions.add( controls, 'PasteState' ).name( 'paste state' );
+
 					folderOptions.add( controls, 'saveState' ).name( 'Save state' );
 					folderOptions.add( controls, 'reset' ).name( 'Reset' );
 					folderAnimations.add( controls, 'enableAnimations' ).name( 'Enable anim' );
@@ -210,12 +213,12 @@
 						material.roughness = 1;
 						material.metalness = 1;
 
-						const diffuseMap = textureLoader.load( 'Cerberus_A.jpg' );
+						const diffuseMap = textureLoader.load( 'Cerberus_A.jpg', render );
 						diffuseMap.encoding = THREE.sRGBEncoding;
 						material.map = diffuseMap;
 
-						material.metalnessMap = material.roughnessMap = textureLoader.load( 'Cerberus_RM.jpg' );
-						material.normalMap = textureLoader.load( 'Cerberus_N.jpg' );
+						material.metalnessMap = material.roughnessMap = textureLoader.load( 'Cerberus_RM.jpg', render);
+						material.normalMap = textureLoader.load( 'Cerberus_N.jpg', render );
 
 						material.map.wrapS = THREE.RepeatWrapping;
 						material.roughnessMap.wrapS = THREE.RepeatWrapping;
@@ -234,7 +237,9 @@
 						} );
 
 						group.rotation.y = Math.PI / 2;
+						group.position.x += 0.25;
 						scene.add( group );
+						render();
 
 						const rgbeLoader = new RGBELoader()
 							.setDataType( THREE.UnsignedByteType )
@@ -249,8 +254,8 @@
 
 								//scene.background = hdrCubeRenderTarget.texture;
 								scene.environment = hdrCubeRenderTarget.texture;
-								render();
 
+								render();
 
 							} );
 
@@ -260,15 +265,15 @@
 						//
 
 						gui = new GUI();
-						gui.add( controlsType, 'type', types ).name('Choose Controller').onChange( function() {
-
-							setControls( controlsType.type );
+						gui.add( controlsType, 'type', types ).name( 'Choose Controller' ).onChange( function () {
+							
+							setControls( controls.type );
 
 						} );
 
-						gui.add( cameraType, 'type', cameras ).name('Choose Camera').onChange( function() {
-
-							setCamera( cameraType.type );
+						gui.add( cameraType, 'type', cameras ).name( 'Choose Camera' ).onChange( function () {
+							
+							setCamera( camera.type )
 
 						} );
 
@@ -276,11 +281,9 @@
 						folderAnimations = folderOptions.addFolder( 'Animations' );
 
 						arcballGui.setArcballControls();
-						controls.addEventListener( 'change', function() {
+						controls.addEventListener( 'change', render );
 
-							render();
-
-						} );
+					render();
 
 				} );
 
@@ -288,7 +291,6 @@
 
 			function animate( now ) {
 
-				console.log('frame')
 				animationId = requestAnimationFrame( animate );
 				controls.update()
 				render();
@@ -366,7 +368,7 @@
 				} else if ( type == 'Perspective' ) {
 
 					camera = makePerspectiveCamera();
-					camera.position.set( 0, 0, 2 );
+					camera.position.set( 0, 0, 2.5 );
 
 				}
 
