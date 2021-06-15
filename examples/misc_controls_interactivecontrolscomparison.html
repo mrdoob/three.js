@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - interactive controls comparison</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - interactive controls comparison<br/>
+			<a href="http://www.polycount.com/forum/showthread.php?t=130641" target="_blank" rel="noopener">Cerberus(FFVII Gun) model</a> by Andrew Maximov.
+		</div>
+
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
+			import { ArcballControls } from './jsm/controls/ArcballControls.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+
+			const types = [ 'Arcball', 'Orbit', 'Trackball' ];
+			const controlsType = { type: 'Arcball' };
+
+			const cameras = [ 'Orthographic', 'Perspective' ];
+			const cameraType = { type: 'Perspective' };
+
+			let camera, controls, scene, renderer, gui, animationId;
+			let folderControls, folderOptions, folderAnimations;
+
+			const arcballGui = {
+				
+				gizmoVisible: true,
+
+				setArcballControls: function() {
+					
+					controls = new ArcballControls( camera, renderer.domElement, scene );
+					controls.addEventListener( 'change', function() {
+
+						render();
+
+					} );
+
+					cancelAnimationFrame( animationId );
+					this.gizmoVisible = true;
+
+					this.populateGui();
+
+				},
+
+				populateGui: function() {
+
+					folderOptions.add( controls, 'enabled' ).name( 'Enable controls' );
+					folderOptions.add( controls, 'enableGrid' ).name( 'Enable Grid' );
+					folderOptions.add( controls, 'enableRotate' ).name( 'Enable rotate' );
+					folderOptions.add( controls, 'enablePan' ).name( 'Enable pan' );
+					folderOptions.add( controls, 'enableZoom' ).name( 'Enable zoom' );
+					folderOptions.add( controls, 'cursorZoom' ).name( 'Cursor zoom' );
+					folderOptions.add( controls, 'adjustNearFar' ).name( 'adjust near/far' );
+					folderOptions.add( controls, 'scaleFactor', 1.1, 10, 0.1 ).name( 'Scale factor' );
+					folderOptions.add( controls, 'minDistance', 0, 50, 0.5 ).name( 'Min distance' );
+					folderOptions.add( controls, 'maxDistance', 0, 50, 0.5 ).name( 'Max distance' );
+					folderOptions.add( controls, 'minZoom', 0, 50, 0.5 ).name( 'Min zoom' );
+					folderOptions.add( controls, 'maxZoom', 0, 50, 0.5 ).name( 'Max zoom' );   
+					folderOptions.add( arcballGui, 'gizmoVisible' ).name( 'Show gizmos' ).onChange( function() {
+
+						controls.setGizmosVisible( arcballGui.gizmoVisible );
+
+					} );
+					folderOptions.add( controls, 'saveState' ).name( 'Save state' );
+					folderOptions.add( controls, 'reset' ).name( 'Reset' );
+					folderAnimations.add( controls, 'enableAnimations' ).name( 'Enable anim' );
+					folderAnimations.add( controls, 'dampingFactor', 0, 100, 1 ).name( 'Damping' );
+					folderAnimations.add( controls, 'wMax', 0, 100, 1 ).name( 'Angular spd' );
+
+				}
+
+			};
+
+			const orbitGui = {
+
+				setOrbitControls: function() {
+					
+					controls = new OrbitControls( camera, renderer.domElement );				
+					controls.addEventListener( 'change', function() {
+
+						render();
+
+					} );
+
+					cancelAnimationFrame( animationId );
+
+					this.populateGui();
+
+				},
+
+				populateGui: function() {
+
+					folderOptions.add( controls, 'enabled' ).name( 'Enable controls' );
+					folderOptions.add( controls, 'enableRotate' ).name( 'Enable rotate' );
+					folderOptions.add( controls, 'enablePan' ).name( 'Enable pan' );
+					folderOptions.add( controls, 'enableZoom' ).name( 'Enable zoom' );
+					folderOptions.add( controls, 'minDistance', 0, 50, 0.5 ).name( 'Min distance' );
+					folderOptions.add( controls, 'maxDistance', 0, 50, 0.5 ).name( 'Max distance' );
+					folderOptions.add( controls, 'minZoom', 0, 50, 1 ).name( 'Min zoom' );
+					folderOptions.add( controls, 'maxZoom', 0, 50, 1 ).name( 'Max zoom' );
+					folderOptions.add( controls, 'rotateSpeed', 0, 10, 0.1 ).name( 'Rotate spd' );
+					folderOptions.add( controls, 'panSpeed', 0, 10, 0.1 ).name( 'Pan spd' );
+					folderOptions.add( controls, 'zoomSpeed', 1, 10, 0.1 ).name( 'Zoom spd' );
+					folderOptions.add( controls, 'saveState' ).name( 'Save state' );
+					folderOptions.add( controls, 'reset' ).name( 'Reset' );
+					folderAnimations.add( controls, 'enableDamping' ).name( 'Enable damping' ).onChange( function () {
+
+						if ( controls.enableDamping ) {
+
+							animate();
+
+						} else {
+
+							cancelAnimationFrame( animationId );
+
+						}
+
+					} );
+					
+					folderAnimations.add( controls, 'dampingFactor', 0.05, 1, 0.05 ).name( 'Damping' );
+
+				},
+
+				params: {
+
+					enableDamping: null
+
+				}
+
+			};
+
+			const trackballGui = {
+
+				setTrackballControls: function() {
+
+					animate();
+					controls = new TrackballControls( camera, renderer.domElement );
+					this.populateGui();
+
+				},
+
+				populateGui() {
+
+					folderOptions.add( controls, 'enabled' ).name( 'Enable controls' );
+					folderOptions.add( controls, 'noRotate' ).name( 'Disable rotate' );
+					folderOptions.add( controls, 'noPan' ).name( 'Disable pan' );
+					folderOptions.add( controls, 'noZoom' ).name( 'Disable zoom' );
+					folderOptions.add( controls, 'minDistance', 0, 50, 0.5 ).name( 'Min distance' );
+					folderOptions.add( controls, 'maxDistance', 0, 50, 0.5 ).name( 'Max distance' );
+					folderOptions.add( controls, 'rotateSpeed', 0, 10, 0.1 ).name( 'Rotate spd' );
+					folderOptions.add( controls, 'panSpeed', 0, 10, 0.1 ).name( 'Pan spd' );
+					folderOptions.add( controls, 'zoomSpeed', 1, 10, 0.1 ).name( 'Zoom spd' );
+					folderOptions.add( controls, 'reset' ).name( 'Reset' );
+					folderAnimations.add( controls, 'staticMoving' ).name( 'Static moving' );
+					folderAnimations.add( controls, 'dynamicDampingFactor', 0, 1, 0.1 ).name( 'Damping' );
+					
+				},
+
+			};
+
+
+			init();
+			//animate();
+
+			function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.toneMappingExposure = 3;
+				renderer.domElement.style.background = "linear-gradient( 180deg, rgba( 0,0,0,1 ) 0%, rgba( 128,128,255,1 ) 100% )";
+				container.appendChild( renderer.domElement );
+
+				//
+
+				scene = new THREE.Scene();
+				scene.add( new THREE.HemisphereLight( 0x443333, 0x222233, 4 ) );
+
+				camera = makePerspectiveCamera();
+				camera.position.set( 0, 0, 2 );
+
+				const material = new THREE.MeshStandardMaterial();
+
+				const loader = new OBJLoader()
+					.setPath( 'models/obj/cerberus/' )
+					.load( 'Cerberus.obj', function ( group ) {
+
+						const textureLoader = new THREE.TextureLoader().setPath( 'models/obj/cerberus/' );
+						
+						material.roughness = 1;
+						material.metalness = 1;
+
+						const diffuseMap = textureLoader.load( 'Cerberus_A.jpg' );
+						diffuseMap.encoding = THREE.sRGBEncoding;
+						material.map = diffuseMap;
+
+						material.metalnessMap = material.roughnessMap = textureLoader.load( 'Cerberus_RM.jpg' );
+						material.normalMap = textureLoader.load( 'Cerberus_N.jpg' );
+
+						material.map.wrapS = THREE.RepeatWrapping;
+						material.roughnessMap.wrapS = THREE.RepeatWrapping;
+						material.metalnessMap.wrapS = THREE.RepeatWrapping;
+						material.normalMap.wrapS = THREE.RepeatWrapping;
+
+
+						group.traverse( function ( child ) {
+
+							if ( child.isMesh ) {
+							
+								child.material = material;
+							
+							}
+
+						} );
+
+						group.rotation.y = Math.PI / 2;
+						scene.add( group );
+
+						const rgbeLoader = new RGBELoader()
+							.setDataType( THREE.UnsignedByteType )
+							.setPath( 'textures/equirectangular/' )
+							.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
+
+								const pmremGenerator = new THREE.PMREMGenerator( renderer );
+								pmremGenerator.compileEquirectangularShader();
+
+								const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
+								hdrEquirect.dispose();
+
+								//scene.background = hdrCubeRenderTarget.texture;
+								scene.environment = hdrCubeRenderTarget.texture;
+								render();
+
+
+							} );
+
+
+						window.addEventListener( 'resize', onWindowResize );
+
+						//
+
+						gui = new GUI();
+						gui.add( controlsType, 'type', types ).name('Choose Controller').onChange( function() {
+
+							setControls( controlsType.type );
+
+						} );
+
+						gui.add( cameraType, 'type', cameras ).name('Choose Camera').onChange( function() {
+
+							setCamera( cameraType.type );
+
+						} );
+
+						folderOptions = gui.addFolder( 'Arcball parameters' );
+						folderAnimations = folderOptions.addFolder( 'Animations' );
+
+						arcballGui.setArcballControls();
+						controls.addEventListener( 'change', function() {
+
+							render();
+
+						} );
+
+				} );
+
+			};
+
+			function animate( now ) {
+
+				console.log('frame')
+				animationId = requestAnimationFrame( animate );
+				controls.update()
+				render();
+
+			};
+
+			function makeOrthographicCamera( domElement ) {
+
+				const halfFovV = THREE.MathUtils.DEG2RAD * 45 * 0.5;
+				const halfFovH = Math.atan( ( window.innerWidth / window.innerHeight ) * Math.tan( halfFovV ) );
+
+				const halfW = 2 * Math.tan( halfFovH );
+				const halfH = 2 * Math.tan( halfFovV );
+				const near = 0.01;
+				const far = 2000;
+				const newCamera = new THREE.OrthographicCamera( -halfW, halfW, halfH, -halfH, near, far );
+				return newCamera
+
+			};
+
+			function makePerspectiveCamera() {
+
+				const fov = 45;
+				const aspect = window.innerWidth / window.innerHeight;
+				const near = 0.01;
+				const far = 2000;
+				const newCamera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+				return newCamera;
+
+			};
+
+		
+			function onWindowResize() {
+
+				if ( camera.type == 'OrthographicCamera') {
+
+					const halfFovV = THREE.MathUtils.DEG2RAD * 45 * 0.5;
+					const halfFovH = Math.atan( ( window.innerWidth / window.innerHeight ) * Math.tan( halfFovV ) );
+
+					const halfW = 2 * Math.tan( halfFovH );
+					const halfH = 2 * Math.tan( halfFovV );
+					camera.left = -halfW;
+					camera.right = halfW
+					camera.top = halfH;
+					camera.bottom = -halfH;
+
+				} else if ( camera.type == 'PerspectiveCamera' ) {
+
+					camera.aspect = window.innerWidth / window.innerHeight;
+
+				}
+
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			};
+			
+			function render() {
+
+				renderer.render( scene, camera );
+
+			};
+
+			function setCamera( type ) {
+
+				if ( type == 'Orthographic' ) {
+
+					camera = makeOrthographicCamera();
+					camera.position.set( 0, 0, 120 );
+
+
+				} else if ( type == 'Perspective' ) {
+
+					camera = makePerspectiveCamera();
+					camera.position.set( 0, 0, 2 );
+
+				}
+
+				if ( controlsType.type == 'Arcball' ) {
+
+					controls.setCamera( camera );
+
+				} else {
+
+					controls.object = camera;
+
+				}
+
+				render();
+
+			};
+
+			function setControls( type ) {
+				
+				if ( controls != null ) {
+
+					controls.dispose();
+
+				}
+
+				if ( camera.type == 'OrthographicCamera' ) {
+
+					camera = makeOrthographicCamera();
+
+				} else if ( camera.type == 'PerspectiveCamera' ) {
+
+					camera = makePerspectiveCamera();
+
+				}
+				
+				camera.position.set( 0, 0, 2 );   
+
+				gui.removeFolder( folderOptions );
+				folderOptions = gui.addFolder( type+' parameters' );
+				folderAnimations = folderOptions.addFolder( 'Animations' );
+
+				switch( type ) {
+
+					case 'Arcball': 
+						arcballGui.setArcballControls();
+						break;
+
+					case 'Orbit': 
+						orbitGui.setOrbitControls();
+						break;
+
+					case 'Trackball': 
+						trackballGui.setTrackballControls();
+						break;
+				}
+
+				render();
+
+			};
+
+		</script>
+	</body>
