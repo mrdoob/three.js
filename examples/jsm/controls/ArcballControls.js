@@ -519,36 +519,7 @@ class ArcballControls extends Object3D {
 
 			if ( event.ctrlKey || event.metaKey) {
 
-				let state;
-				if ( this.camera.type == 'OrthographicCamera' ) {
-
-					state = JSON.stringify( { arcballState: { 
-						
-						cameraFar: this.camera.far, 
-						cameraMatrix: this.camera.matrix, 
-						cameraNear: this.camera.near, 
-						cameraUp: this.camera.up, 
-						cameraZoom: this.camera.zoom, 
-						gizmoMatrix: this._gizmos.matrix 
-
-					} } );
-
-				} else if ( this.camera.type == 'PerspectiveCamera' ) {
-
-					state = JSON.stringify( { arcballState: { 
-						cameraFar: this.camera.far,
-						cameraFov: this.camera.fov,  
-						cameraMatrix: this.camera.matrix, 
-						cameraNear: this.camera.near, 
-						cameraUp: this.camera.up, 
-						cameraZoom: this.camera.zoom, 
-						gizmoMatrix: this._gizmos.matrix 
-						
-					} } );
-
-				}
-				
-				navigator.clipboard.writeText(state);
+				this.copyState();
 
 			}
 
@@ -556,18 +527,60 @@ class ArcballControls extends Object3D {
 
 			if ( event.ctrlKey || event.metaKey) {
 
-				const self = this;
-				navigator.clipboard.readText().then( function resolved( value ) {
-
-					self.setStateFromJSON( value );
-					
-				} );
+				this.pasteState();
 
 			}
 
 		}
 
 	};
+
+	copyState = () => {
+
+		let state;
+		if ( this.camera.type == 'OrthographicCamera' ) {
+
+			state = JSON.stringify( { arcballState: { 
+				
+				cameraFar: this.camera.far, 
+				cameraMatrix: this.camera.matrix, 
+				cameraNear: this.camera.near, 
+				cameraUp: this.camera.up, 
+				cameraZoom: this.camera.zoom, 
+				gizmoMatrix: this._gizmos.matrix 
+
+			} } );
+
+		} else if ( this.camera.type == 'PerspectiveCamera' ) {
+
+			state = JSON.stringify( { arcballState: { 
+				cameraFar: this.camera.far,
+				cameraFov: this.camera.fov,  
+				cameraMatrix: this.camera.matrix, 
+				cameraNear: this.camera.near, 
+				cameraUp: this.camera.up, 
+				cameraZoom: this.camera.zoom, 
+				gizmoMatrix: this._gizmos.matrix 
+				
+			} } );
+
+		}
+		
+		navigator.clipboard.writeText(state);
+
+	};
+
+
+	pasteState = () => {
+
+		const self = this;
+		navigator.clipboard.readText().then( function resolved( value ) {
+
+			self.setStateFromJSON( value );
+			
+		} );
+
+	}
 
 
 	onPress = () => {
@@ -2478,6 +2491,7 @@ class ArcballControls extends Object3D {
 			this.makeGizmos(this._gizmos.position, this._tbRadius);
 
 			this.camera.lookAt( this._gizmos.position );
+			this.updateTbState( STATE.IDLE, false );
 
 			this.dispatchEvent(_changeEvent);
 
