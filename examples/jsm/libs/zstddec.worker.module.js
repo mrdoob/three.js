@@ -43,8 +43,8 @@ export class ZSTDDecoderWorker {
 				case 'init':
 
 					WebAssembly
-            .instantiate( e.data.wasmBuffer, importObject )
-            .then( initPromiseResolve );
+						.instantiate( e.data.wasmBuffer, importObject )
+						.then( initPromiseResolve );
 
 					break;
 
@@ -84,7 +84,7 @@ export class ZSTDDecoderWorker {
 
 	constructor ( pool = 4 ) {
 
-    this.initPromise = null;
+		this.initPromise = null;
 		this.workerPool = new WorkerPool( pool );
 		this.wasmBufferPromise = fetch( 'data:application/wasm;base64,' + wasm ).then( res => res.arrayBuffer() );
 		this.workerSourceUrl = this.workerPool.createWorkerSourceUrl( ZSTDDecoderWorker.Worker );
@@ -95,7 +95,7 @@ export class ZSTDDecoderWorker {
 
 		if ( !this.initPromise ) {
 
-      this.initPromise = Promise.resolve( this.wasmBufferPromise ).then( ( wasmBuffer ) => {
+			this.initPromise = Promise.resolve( this.wasmBufferPromise ).then( ( wasmBuffer ) => {
 
 					this.workerPool.initWorkers( () => {
 
@@ -109,11 +109,11 @@ export class ZSTDDecoderWorker {
 					} );
 
 				}
-			
+
 			);
 
-    }
-			
+		}
+
 		return this.initPromise;
 
 	}

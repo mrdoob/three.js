@@ -4,102 +4,102 @@
 
 export class WorkerPool {
 
-  constructor (pool = 4 ) {
+	constructor (pool = 4 ) {
 
-    this.pool = pool;
-    this.quene = [];
-    this.workers = [];
-    this.workersResolve = [];
-    this.workerStatus = 0;
+		this.pool = pool;
+		this.quene = [];
+		this.workers = [];
+		this.workersResolve = [];
+		this.workerStatus = 0;
 
-  }
+	}
 
-  setWorkerLimit ( pool ) {
+	setWorkerLimit ( pool ) {
 
-    this.pool = pool;
+		this.pool = pool;
 
-  }
+	}
 
-  initWorkers ( creator ) {
+	initWorkers ( creator ) {
 
-    for ( let i = 0; i < this.pool; i++ ) {
+		for ( let i = 0; i < this.pool; i++ ) {
 
-      const worker = creator();
-      worker.addEventListener( 'message', this.onMessage.bind( this, i ) );
-      this.workers.push( worker );
+			const worker = creator();
+			worker.addEventListener( 'message', this.onMessage.bind( this, i ) );
+			this.workers.push( worker );
 
-    }
+		}
 
-  }
+	}
 
-  createWorkerSourceUrl ( fn ) {
+	createWorkerSourceUrl ( fn ) {
 
-    const fnStr = fn.toString();
-    const fnBody = fnStr.substring( fnStr.indexOf( '{' ) + 1, fnStr.lastIndexOf( '}' ) )
-    const blob = new Blob( [ fnBody] );
+		const fnStr = fn.toString();
+		const fnBody = fnStr.substring( fnStr.indexOf( '{' ) + 1, fnStr.lastIndexOf( '}' ) )
+		const blob = new Blob( [ fnBody] );
 
-    return URL.createObjectURL( blob );
+		return URL.createObjectURL( blob );
 
-  }
+	}
 
-  getIdleWorker () {
+	getIdleWorker () {
 
-    for ( let i = 0; i < this.pool; i++ ) 
-      if ( !( this.workerStatus & ( 1 << i ) ) ) return i;
+		for ( let i = 0; i < this.pool; i++ ) 
+			if ( !( this.workerStatus & ( 1 << i ) ) ) return i;
 
-    return -1;
+		return -1;
 
-  }
+	}
 
-  onMessage( workerId, msg ) {
+	onMessage( workerId, msg ) {
 
-    const resolve = this.workersResolve[ workerId ];
-    resolve && resolve( msg );
+		const resolve = this.workersResolve[ workerId ];
+		resolve && resolve( msg );
 
-    if ( this.quene.length ) {
+		if ( this.quene.length ) {
 
-      const { resolve, msg, transfer } = this.quene.shift();
-      this.workersResolve[ workerId ] = resolve;
-      this.workers[ workerId ].postMessage( msg, transfer );
+			const { resolve, msg, transfer } = this.quene.shift();
+			this.workersResolve[ workerId ] = resolve;
+			this.workers[ workerId ].postMessage( msg, transfer );
 
-    } else {
+		} else {
 
-      this.workerStatus ^= 1 << workerId;
+			this.workerStatus ^= 1 << workerId;
 
-    }
+		}
 
-  }
+	}
 
-  postMessage ( msg, transfer ) {
+	postMessage ( msg, transfer ) {
 
-    return new Promise( ( resolve ) => {
+		return new Promise( ( resolve ) => {
 
-      const workerId = this.getIdleWorker();
+			const workerId = this.getIdleWorker();
 
-      if ( workerId !== -1 ) {
+			if ( workerId !== -1 ) {
 
-        this.workerStatus |= 1 << workerId;
-        this.workersResolve[ workerId ] = resolve;
-        this.workers[ workerId ].postMessage( msg, transfer );
+				this.workerStatus |= 1 << workerId;
+				this.workersResolve[ workerId ] = resolve;
+				this.workers[ workerId ].postMessage( msg, transfer );
 
-      } else {
+			} else {
 
-        this.quene.push( { resolve, msg, transfer } );
+				this.quene.push( { resolve, msg, transfer } );
 
-      }
+			}
 
-    } );
+		} );
 
-  }
+	}
 
-  dispose () {
+	dispose () {
 
-    this.workers.forEach( ( worker ) => worker.terminate() );
-    this.workersResolve.length = 0;
-    this.workers.length = 0;
-    this.quene.length = 0;
-    this.workerStatus = 0;
+		this.workers.forEach( ( worker ) => worker.terminate() );
+		this.workersResolve.length = 0;
+		this.workers.length = 0;
+		this.quene.length = 0;
+		this.workerStatus = 0;
 
-  }
+	}
 
 }
