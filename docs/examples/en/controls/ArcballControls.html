@@ -10,15 +10,18 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		[name] allow the camera to be controlled by a virtual trackball.<br>
-		Cursor position is mapped over the virtual trackball surface represented by gizmos, dragging cursor will
-		cause camera to orbit around the center of the trackball in a conservative way (returning to the starting point
+		Arcball controls allow the camera to be controlled by a virtual trackball with full touch support and advanced navigation functionality. <br>
+		Cursor/finger positions and movements are mapped over a virtual trackball surface
+		represented by a gizmo and mapped in intuitive and consistent camera movements. 
+		Dragging cursor/fingers will cause camera to orbit around the center of the trackball in a conservative way (returning to the starting point
 		will make the camera to return to its starting orientation).<br><br>
 		
-		In addition to other common features like zoom and pan, Arcball controls provides focus functionality which
-		place the object's point of interest in the center of the virtual trackball for a better inspection, fov manipulation, z-rotation
-		function with a mobile touch device interaction and a copy/paste function which can be used with
-		ctrl+c and ctrl+v shortcuts which copy and paste the control's state using clipboard.<br><br>
+		In addition to supporting pan, zoom and pinch gestures, Arcball controls provide <i>focus></i> functionality with a double click/tap for
+		intuitively moving the object's point of interest in the center of the virtual trackball.   
+		Focus allows a much better inspection and navigation in complex environment. 
+		Moreover Arcball controls allow FOV manipulation (in a vertigo-style method) and z-rotation.
+		Saving and restoring of Camera State is supported also through clipboard 
+		(use ctrl+c and ctrl+v shortcuts for copy and paste the state).<br><br>
 		
 		Unlike [page:OrbitControls] and [page:TrackballControls], [name] doesn't require [page:.update] to be called externally in an animation loop when animations
 		are on.<br><br>
