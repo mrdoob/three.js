@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - interactive controls comparison</title>
+		<title>three.js webgl - arcball controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -19,7 +19,6 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
 			import { ArcballControls } from './jsm/controls/ArcballControls.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
@@ -33,8 +32,10 @@
 			const cameras = [ 'Orthographic', 'Perspective' ];
 			const cameraType = { type: 'Perspective' };
 
+			const perspectiveDistance = 2.5;
+			const orthographicDistance = 120;
 			let camera, controls, scene, renderer, gui, animationId;
-			let folderControls, folderOptions, folderAnimations;
+			let folderOptions, folderAnimations;
 
 			const arcballGui = {
 				
@@ -43,13 +44,15 @@
 				setArcballControls: function() {
 					
 					controls = new ArcballControls( camera, renderer.domElement, scene );
-					controls.addEventListener( 'change', function() {
+					controls.addEventListener( 'change', render );
 
-						render();
+					if (animationId != -1) {
 
-					} );
+						cancelAnimationFrame( animationId );
+						animationId = -1;
 
-					cancelAnimationFrame( animationId );
+					}
+
 					this.gizmoVisible = true;
 
 					this.populateGui();
@@ -91,13 +94,14 @@
 				setOrbitControls: function() {
 					
 					controls = new OrbitControls( camera, renderer.domElement );				
-					controls.addEventListener( 'change', function() {
+					controls.addEventListener( 'change', render );
 
-						render();
+					if (animationId != -1) {
 
-					} );
+						cancelAnimationFrame( animationId );
+						animationId = -1;
 
-					cancelAnimationFrame( animationId );
+					}
 
 					this.populateGui();
 
@@ -126,8 +130,12 @@
 
 						} else {
 
-							cancelAnimationFrame( animationId );
-
+							if (animationId != -1) {
+							
+								cancelAnimationFrame( animationId );
+								animationId = -1;
+							
+							}
 						}
 
 					} );
@@ -169,7 +177,7 @@
 					folderAnimations.add( controls, 'staticMoving' ).name( 'Static moving' );
 					folderAnimations.add( controls, 'dynamicDampingFactor', 0, 1, 0.1 ).name( 'Damping' );
 					
-				},
+				}
 
 			};
 
@@ -198,11 +206,11 @@
 				scene.add( new THREE.HemisphereLight( 0x443333, 0x222233, 4 ) );
 
 				camera = makePerspectiveCamera();
-				camera.position.set( 0, 0, 2.5 );
+				camera.position.set( 0, 0, perspectiveDistance );
 
 				const material = new THREE.MeshStandardMaterial();
 
-				const loader = new OBJLoader()
+				new OBJLoader()
 					.setPath( 'models/obj/cerberus/' )
 					.load( 'Cerberus.obj', function ( group ) {
 
@@ -239,7 +247,7 @@
 						scene.add( group );
 						render();
 
-						const rgbeLoader = new RGBELoader()
+						new RGBELoader()
 							.setDataType( THREE.UnsignedByteType )
 							.setPath( 'textures/equirectangular/' )
 							.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
@@ -279,9 +287,8 @@
 						folderAnimations = folderOptions.addFolder( 'Animations' );
 
 						arcballGui.setArcballControls();
-						controls.addEventListener( 'change', render );
 
-					render();
+						render();
 
 				} );
 
@@ -300,8 +307,8 @@
 				const halfFovV = THREE.MathUtils.DEG2RAD * 45 * 0.5;
 				const halfFovH = Math.atan( ( window.innerWidth / window.innerHeight ) * Math.tan( halfFovV ) );
 
-				const halfW = 2.5 * Math.tan( halfFovH );
-				const halfH = 2.5 * Math.tan( halfFovV );
+				const halfW = perspectiveDistance * Math.tan( halfFovH );
+				const halfH = perspectiveDistance * Math.tan( halfFovV );
 				const near = 0.01;
 				const far = 2000;
 				const newCamera = new THREE.OrthographicCamera( -halfW, halfW, halfH, -halfH, near, far );
@@ -328,8 +335,8 @@
 					const halfFovV = THREE.MathUtils.DEG2RAD * 45 * 0.5;
 					const halfFovH = Math.atan( ( window.innerWidth / window.innerHeight ) * Math.tan( halfFovV ) );
 
-					const halfW = 2 * Math.tan( halfFovH );
-					const halfH = 2 * Math.tan( halfFovV );
+					const halfW = perspectiveDistance * Math.tan( halfFovH );
+					const halfH = perspectiveDistance * Math.tan( halfFovV );
 					camera.left = -halfW;
 					camera.right = halfW
 					camera.top = halfH;
@@ -360,13 +367,13 @@
 				if ( type == 'Orthographic' ) {
 
 					camera = makeOrthographicCamera();
-					camera.position.set( 0, 0, 120 );
+					camera.position.set( 0, 0, orthographicDistance );
 
 
 				} else if ( type == 'Perspective' ) {
 
 					camera = makePerspectiveCamera();
-					camera.position.set( 0, 0, 2.5 );
+					camera.position.set( 0, 0, perspectiveDistance );
 
 				}
 
@@ -395,15 +402,15 @@
 				if ( camera.type == 'OrthographicCamera' ) {
 
 					camera = makeOrthographicCamera();
+					camera.position.set( 0, 0, orthographicDistance );
 
 				} else if ( camera.type == 'PerspectiveCamera' ) {
 
 					camera = makePerspectiveCamera();
+					camera.position.set( 0, 0, perspectiveDistance );   
 
 				}
 				
-				camera.position.set( 0, 0, 2 );   
-
 				gui.removeFolder( folderOptions );
 				folderOptions = gui.addFolder( type+' parameters' );
 				folderAnimations = folderOptions.addFolder( 'Animations' );

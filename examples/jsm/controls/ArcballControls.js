@@ -205,32 +205,6 @@ class ArcballControls extends Object3D {
 		this._manager.get( 'triplepan' ).requireFailure( 'rotate' );
 		this._manager.get( 'triplepan' ).requireFailure( 'doublepan' );
 
-
-		/*this._manager.get( 'doublepan' ).recognizeWith( 'singlepan' );
-		this._manager.get( 'doublepan' ).recognizeWith( 'pinch' );
-		this._manager.get( 'doublepan' ).recognizeWith( 'rotate' );
-		this._manager.get( 'rotate' ).recognizeWith( 'pinch' );
-		//this._manager.get( 'doublepan' ).recognizeWith( 'triplepan' );
-
-		this._manager.get( 'pinch' ).recognizeWith( 'singlepan' );
-		this._manager.get( 'pinch' ).recognizeWith( 'doublepan' );
-		this._manager.get( 'pinch' ).recognizeWith( 'rotate' );
-		//this._manager.get( 'pinch' ).recognizeWith( 'triplepan' );
-
-		this._manager.get( 'rotate' ).recognizeWith( 'singlepan' );
-		this._manager.get( 'rotate' ).recognizeWith( 'pinch' );
-		this._manager.get( 'rotate' ).recognizeWith( 'doublepan' );
-		//this._manager.get( 'rotate' ).recognizeWith( 'triplepan' );
-
-		this._manager.get( 'doubletap' ).recognizeWith( 'press' );
-
-		this._manager.get( 'singlepan' ).recognizeWith( 'triplepan' );
-		this._manager.get( 'doublepan' ).recognizeWith( 'triplepan' );
-		this._manager.get( 'triplepan' ).recognizeWith( 'rotate' );
-		this._manager.get( 'triplepan' ).recognizeWith( 'pinch' );*/
-
-
-		//this._manager.get('singlepan').requireFailure('press')
 		this._manager.get( 'rotate' ).recognizeWith( 'pinch' );
 
 		this.setCamera(camera);
@@ -267,7 +241,7 @@ class ArcballControls extends Object3D {
 		this.domElement.addEventListener( 'mousedown', this.onMouseDown );
 		this.domElement.addEventListener( 'wheel', this.onWheel );
 
-		window.addEventListener( 'keydown', this.onKeyDown );
+		document.addEventListener( 'keydown', this.onKeyDown );
 		window.addEventListener( 'resize', this.onWindowResize );
 
 	};
@@ -532,53 +506,6 @@ class ArcballControls extends Object3D {
 			}
 
 		}
-
-	};
-
-	copyState = () => {
-
-		let state;
-		if ( this.camera.type == 'OrthographicCamera' ) {
-
-			state = JSON.stringify( { arcballState: { 
-				
-				cameraFar: this.camera.far, 
-				cameraMatrix: this.camera.matrix, 
-				cameraNear: this.camera.near, 
-				cameraUp: this.camera.up, 
-				cameraZoom: this.camera.zoom, 
-				gizmoMatrix: this._gizmos.matrix 
-
-			} } );
-
-		} else if ( this.camera.type == 'PerspectiveCamera' ) {
-
-			state = JSON.stringify( { arcballState: { 
-				cameraFar: this.camera.far,
-				cameraFov: this.camera.fov,  
-				cameraMatrix: this.camera.matrix, 
-				cameraNear: this.camera.near, 
-				cameraUp: this.camera.up, 
-				cameraZoom: this.camera.zoom, 
-				gizmoMatrix: this._gizmos.matrix 
-				
-			} } );
-
-		}
-		
-		navigator.clipboard.writeText(state);
-
-	};
-
-
-	pasteState = () => {
-
-		const self = this;
-		navigator.clipboard.readText().then( function resolved( value ) {
-
-			self.setStateFromJSON( value );
-			
-		} );
 
 	};
 
@@ -1179,15 +1106,15 @@ class ArcballControls extends Object3D {
 
 		}
 
-		this.dispatchEvent( _changeEvent );
+		//this.dispatchEvent( _changeEvent );
 
 	};
 
 	onTriplePanEnd = ( event ) => {
 
-		this.updateTbState(STATE.IDLE, false);
+		this.updateTbState( STATE.IDLE, false );
 		this.dispatchEvent( _endEvent );
-		this.dispatchEvent( _changeEvent );
+		//this.dispatchEvent( _changeEvent );
 
 	};
 
@@ -1226,11 +1153,11 @@ class ArcballControls extends Object3D {
 
 			if ( this.adjustNearFar ) {
 
-				let cameraDistance = this.camera.position.distanceTo( this._gizmos.position );
+				const cameraDistance = this.camera.position.distanceTo( this._gizmos.position );
 				
-				let bb = new Box3();
+				const bb = new Box3();
 				bb.setFromObject( this._gizmos );
-				let sphere = new Sphere();
+				const sphere = new Sphere();
 				bb.getBoundingSphere( sphere );
 
 				const adjustedNearPosition = Math.max( this._nearPos0, sphere.radius + sphere.center.length() );
@@ -1243,16 +1170,34 @@ class ArcballControls extends Object3D {
 				const adjustedFarPosition = Math.min( this._farPos0, -sphere.radius + sphere.center.length() );
 				const regularFarPosition = cameraDistance - this._initialFar;
 
-				const minFarPos = Math.min(adjustedFarPosition, regularFarPosition );
+				const minFarPos = Math.min( adjustedFarPosition, regularFarPosition );
 				this.camera.far = cameraDistance - minFarPos;
 
 				this.camera.updateProjectionMatrix();
 
 			} else {
 
-				this.camera.near = this._initialNear;
-				this.camera.far = this._initialFar;
-				this.camera.updateProjectionMatrix()
+				let update = false;
+
+				if (this.camera.near != this._initialNear ) {
+
+					this.camera.near = this._initialNear;
+					update = true;
+
+				}
+
+				if ( this.camera.far != this._initialFar ) {
+
+					this.camera.far = this._initialFar;
+					update = true;
+
+				}
+
+				if ( update ) {
+
+					this.camera.updateProjectionMatrix();
+
+				}
 
 			}
 
@@ -1877,6 +1822,52 @@ class ArcballControls extends Object3D {
 		this.setTransformationMatrices( this._m4_1 );
 
 		return _transformation;
+
+	};
+
+	copyState = () => {
+
+		let state;
+		if ( this.camera.type == 'OrthographicCamera' ) {
+
+			state = JSON.stringify( { arcballState: { 
+				
+				cameraFar: this.camera.far, 
+				cameraMatrix: this.camera.matrix, 
+				cameraNear: this.camera.near, 
+				cameraUp: this.camera.up, 
+				cameraZoom: this.camera.zoom, 
+				gizmoMatrix: this._gizmos.matrix 
+
+			} } );
+
+		} else if ( this.camera.type == 'PerspectiveCamera' ) {
+
+			state = JSON.stringify( { arcballState: { 
+				cameraFar: this.camera.far,
+				cameraFov: this.camera.fov,  
+				cameraMatrix: this.camera.matrix, 
+				cameraNear: this.camera.near, 
+				cameraUp: this.camera.up, 
+				cameraZoom: this.camera.zoom, 
+				gizmoMatrix: this._gizmos.matrix 
+				
+			} } );
+
+		}
+		
+		navigator.clipboard.writeText( state );
+
+	};
+
+	pasteState = () => {
+
+		const self = this;
+		navigator.clipboard.readText().then( function resolved( value ) {
+
+			self.setStateFromJSON( value );
+			
+		} );
 
 	};
 
