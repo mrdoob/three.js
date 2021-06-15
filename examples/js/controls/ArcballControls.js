@@ -498,59 +498,60 @@
 		onKeyDown = ( event ) => {
 
 			if ( event.key == 'c' ) {
-
+	
 				if ( event.ctrlKey || event.metaKey) {
-
-					let state;
-					if ( this.camera.type == 'OrthographicCamera' ) {
-
-						state = JSON.stringify( { arcballState: { 
-
-							cameraFar: this.camera.far, 
-							cameraMatrix: this.camera.matrix, 
-							cameraNear: this.camera.near, 
-							cameraUp: this.camera.up, 
-							cameraZoom: this.camera.zoom, 
-							gizmoMatrix: this._gizmos.matrix 
-
-						} } );
-
-					} else if ( this.camera.type == 'PerspectiveCamera' ) {
-
-						state = JSON.stringify( { arcballState: { 
-							cameraFar: this.camera.far,
-							cameraFov: this.camera.fov,  
-							cameraMatrix: this.camera.matrix, 
-							cameraNear: this.camera.near, 
-							cameraUp: this.camera.up, 
-							cameraZoom: this.camera.zoom, 
-							gizmoMatrix: this._gizmos.matrix 
-
-						} } );
-
-					}
-
-					navigator.clipboard.writeText(state);
-
+	
+					this.copyState();
+	
 				}
-
+	
 			} else if ( event.key == 'v' ) {
-
+	
 				if ( event.ctrlKey || event.metaKey) {
-
-					const self = this;
-					navigator.clipboard.readText().then( function resolved( value ) {
-
-						self.setStateFromJSON( value );
-
-					} );
-
+	
+					this.pasteState();
+	
 				}
-
+	
 			}
-
+	
 		};
 
+
+		copyState = () => {
+
+			let state;
+			if ( this.camera.type == 'OrthographicCamera' ) {
+	
+				state = JSON.stringify( { arcballState: { 
+					
+					cameraFar: this.camera.far, 
+					cameraMatrix: this.camera.matrix, 
+					cameraNear: this.camera.near, 
+					cameraUp: this.camera.up, 
+					cameraZoom: this.camera.zoom, 
+					gizmoMatrix: this._gizmos.matrix 
+	
+				} } );
+	
+			} else if ( this.camera.type == 'PerspectiveCamera' ) {
+	
+				state = JSON.stringify( { arcballState: { 
+					cameraFar: this.camera.far,
+					cameraFov: this.camera.fov,  
+					cameraMatrix: this.camera.matrix, 
+					cameraNear: this.camera.near, 
+					cameraUp: this.camera.up, 
+					cameraZoom: this.camera.zoom, 
+					gizmoMatrix: this._gizmos.matrix 
+					
+				} } );
+	
+			}
+			
+			navigator.clipboard.writeText(state);
+	
+		};
 
 		onPress = () => {
 
