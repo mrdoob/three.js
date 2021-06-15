@@ -75,10 +75,8 @@
 						controls.setGizmosVisible( arcballGui.gizmoVisible );
 
 					} );
-					folderOptions.add( controls, 'copyState' ).name( 'Copy state' );
-					folderOptions.add( controls, 'pasteState' ).name( 'Paste state' );
-
-					folderOptions.add( controls, 'saveState' ).name( 'Save state' );
+					folderOptions.add( controls, 'copyState' ).name( 'Copy state(ctrl+c)' );
+					folderOptions.add( controls, 'pasteState' ).name( 'Paste state(ctrl+v)' );
 					folderOptions.add( controls, 'reset' ).name( 'Reset' );
 					folderAnimations.add( controls, 'enableAnimations' ).name( 'Enable anim' );
 					folderAnimations.add( controls, 'dampingFactor', 0, 100, 1 ).name( 'Damping' );
@@ -267,13 +265,13 @@
 						gui = new GUI();
 						gui.add( controlsType, 'type', types ).name( 'Choose Controller' ).onChange( function () {
 							
-							setControls( controls.type );
+							setControls( controlsType.type );
 
 						} );
 
 						gui.add( cameraType, 'type', cameras ).name( 'Choose Camera' ).onChange( function () {
 							
-							setCamera( camera.type )
+							setCamera( cameraType.type )
 
 						} );
 
