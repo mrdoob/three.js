@@ -14,7 +14,7 @@
  * - DFD: https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor
  */
 
- import {
+import {
 	CompressedTexture,
 	CompressedTextureLoader,
 	FileLoader,
