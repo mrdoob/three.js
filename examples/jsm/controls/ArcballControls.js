@@ -580,7 +580,7 @@ class ArcballControls extends Object3D {
 			
 		} );
 
-	}
+	};
 
 
 	onPress = () => {

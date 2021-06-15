@@ -198,7 +198,7 @@
 				scene.add( new THREE.HemisphereLight( 0x443333, 0x222233, 4 ) );
 
 				camera = makePerspectiveCamera();
-				camera.position.set( 0, 0, 2 );
+				camera.position.set( 0, 0, 2.5 );
 
 				const material = new THREE.MeshStandardMaterial();
 
@@ -300,8 +300,8 @@
 				const halfFovV = THREE.MathUtils.DEG2RAD * 45 * 0.5;
 				const halfFovH = Math.atan( ( window.innerWidth / window.innerHeight ) * Math.tan( halfFovV ) );
 
-				const halfW = 2 * Math.tan( halfFovH );
-				const halfH = 2 * Math.tan( halfFovV );
+				const halfW = 2.5 * Math.tan( halfFovH );
+				const halfH = 2.5 * Math.tan( halfFovV );
 				const near = 0.01;
 				const far = 2000;
 				const newCamera = new THREE.OrthographicCamera( -halfW, halfW, halfH, -halfH, near, far );
