@@ -86,13 +86,8 @@ export class ZSTDDecoderWorker {
 
     this.initPromise = null;
 		this.workerPool = new WorkerPool( pool );
-
-		this.wasmBufferPromise = 
-      fetch( 'data:application/wasm;base64,' + wasm )
-      .then( response => response.arrayBuffer() );
-
-		this.workerSourceUrl = 
-      this.workerPool.createWorkerSourceUrl( ZSTDDecoderWorker.Worker );
+		this.wasmBufferPromise = fetch( 'data:application/wasm;base64,' + wasm ).then( res => res.arrayBuffer() );
+		this.workerSourceUrl = this.workerPool.createWorkerSourceUrl( ZSTDDecoderWorker.Worker );
 
 	}
 
@@ -107,10 +102,7 @@ export class ZSTDDecoderWorker {
 						const worker = new Worker( this.workerSourceUrl );
 						const wasmBufferCopy = wasmBuffer.slice( 0 );
 
-						worker.postMessage(
-              { type: 'init', wasmBuffer: wasmBufferCopy }, 
-              [ wasmBufferCopy ]
-            );
+						worker.postMessage( { type: 'init', wasmBuffer: wasmBufferCopy }, [ wasmBufferCopy ] );
 
 						return worker;
 
