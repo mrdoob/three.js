@@ -12,11 +12,12 @@ class HTMLTexture extends CanvasTexture {
 
 		this.document = document.implementation.createHTMLDocument( 'xmlns' );
 
-		this.css = css;
+		this.onFinishRedraw = null;
+
+
+		this._css = css;
 
 		this._cache = {};
-
-		this.onRedraw = null;
 
 
 		this.redrawAsync( html, css, width, height );
@@ -27,30 +28,20 @@ class HTMLTexture extends CanvasTexture {
 
 		const scope = this;
 
+
+		if ( html ) {
+
+			scope.document = document.implementation.createHTMLDocument( 'xmlns' );
+
+			scope.document.write( html );
+
+		}
+
+
+		if ( ! css ) css = scope._css;
+
+
 		return new Promise( async resolve => {
-
-			if ( ! html ) html = scope.document.documentElement.innerHTML;
-
-			else {
-
-				scope.document = document.implementation.createHTMLDocument( 'xmlns' );
-
-				scope.document.write( html );
-
-			}
-
-
-			if ( ! css ) css = scope.css;
-
-
-
-			//enable css sizing
-
-			const body = scope.document.documentElement.querySelector( 'body' );
-
-			body.style.width = width + 'px';
-
-			body.style.height = height + 'px';
 
 
 
@@ -134,6 +125,16 @@ class HTMLTexture extends CanvasTexture {
 
 
 
+			//enable css sizing
+
+			const body = scope.document.documentElement.querySelector( 'body' );
+
+			body.style.width = width + 'px';
+
+			body.style.height = height + 'px';
+
+
+
 			const xml = new XMLSerializer().serializeToString( scope.document.documentElement.querySelector( 'body' ) );
 
 			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><style>${css}</style><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
@@ -153,6 +154,8 @@ class HTMLTexture extends CanvasTexture {
 				scope.needsUpdate = true;
 
 				resolve();
+
+				if ( scope.onFinishRedraw ) scope.onFinishRedraw();
 
 			};
 
