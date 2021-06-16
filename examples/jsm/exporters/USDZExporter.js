@@ -12,6 +12,26 @@ class USDZExporter {
 
 		let output = buildHeader();
 
+    output += `
+    def Xform "Root"
+    {
+      def Scope "Scenes" (
+          kind = "sceneLibrary"
+      )
+        {
+          def Xform "Scene" (
+            customData = {
+                bool preliminary_collidesWithEnvironment = 0
+                string sceneName = "Scene"
+            }
+            sceneName = "Scene"
+          )
+          {
+              token preliminary:anchoring:type = "plane"
+              token preliminary:planeAnchoring:alignment = "vertical"
+
+`
+
 		const materials = {};
 		const textures = {};
 
@@ -43,7 +63,16 @@ class USDZExporter {
 
 		} );
 
-		output += buildMaterials( materials, textures );
+
+    output += `
+          }
+        }
+    }
+    `
+
+    output += buildMaterials(materials, textures);
+    console.log('output', output)
+    
 
 		files[ modelFileName ] = fflate.strToU8( output );
 		output = null;
@@ -83,7 +112,7 @@ class USDZExporter {
 			offset = file.length;
 
 		}
-
+    console.log('files', files)
 		return fflate.zipSync( files, { level: 0 } );
 
 	}
