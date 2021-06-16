@@ -355,6 +355,7 @@ function Loader( editor ) {
 
 					var loader = new IFCLoader();
 					loader.setWasmPath( 'examples/jsm/loaders/ifc/' );
+
 					var scene = await loader.parse( event.target.result );
 
 					scene.name = filename;
