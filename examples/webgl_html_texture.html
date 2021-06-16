@@ -97,7 +97,7 @@
                 const html = document.getElementById( "texture-html" ).innerHTML;
                 const css = document.getElementById( "texture-css" ).innerHTML;
 
-                htmlTexture = new HTMLTexture( html , css , 256 , 256 );
+                htmlTexture = new THREE.HTMLTexture( html , css , 256 , 256 );
 
 				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
 				const material = new THREE.MeshBasicMaterial( { map: htmlTexture } );
