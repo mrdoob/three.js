@@ -6,16 +6,6 @@ import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 function MenubarFile( editor ) {
 
-	function parseNumber( key, value ) {
-
-		var precision = config.getKey( 'exportPrecision' );
-
-		return typeof value === 'number' ? parseFloat( value.toFixed( precision ) ) : value;
-
-	}
-
-	//
-
 	var config = editor.config;
 	var strings = editor.strings;
 
@@ -111,7 +101,7 @@ function MenubarFile( editor ) {
 
 		try {
 
-			output = JSON.stringify( output, parseNumber, '\t' );
+			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		} catch ( e ) {
@@ -145,7 +135,7 @@ function MenubarFile( editor ) {
 
 		try {
 
-			output = JSON.stringify( output, parseNumber, '\t' );
+			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		} catch ( e ) {
@@ -170,7 +160,7 @@ function MenubarFile( editor ) {
 
 		try {
 
-			output = JSON.stringify( output, parseNumber, '\t' );
+			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		} catch ( e ) {
@@ -424,7 +414,7 @@ function MenubarFile( editor ) {
 		output.metadata.type = 'App';
 		delete output.history;
 
-		output = JSON.stringify( output, parseNumber, '\t' );
+		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		toZip[ 'app.json' ] = strToU8( output );
