@@ -807,7 +807,15 @@ class BufferGeometry extends EventDispatcher {
 
 			for ( let i = 0, l = indices.length; i < l; i ++ ) {
 
-				index = indices[ i ] * itemSize;
+				if ( attribute.isInterleavedBufferAttribute ) {
+
+					index = indices[ i ] * attribute.data.stride + attribute.offset;
+
+				} else {
+
+					index = indices[ i ] * itemSize;
+
+				}
 
 				for ( let j = 0; j < itemSize; j ++ ) {
 
