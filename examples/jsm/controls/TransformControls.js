@@ -52,6 +52,12 @@ class TransformControls extends Object3D {
 
 		this.visible = false;
 		this.domElement = domElement;
+		this.previousObjectState = {
+			isActive: false,
+			position: new Vector3(),
+			quaternion: new Quaternion(),
+			scale: new Vector3()
+		};
 
 		const _gizmo = new TransformControlsGizmo();
 		this._gizmo = _gizmo;
@@ -232,6 +238,11 @@ class TransformControls extends Object3D {
 	pointerDown( pointer ) {
 
 		if ( this.object === undefined || this.dragging === true || pointer.button !== 0 ) return;
+
+		this.previousObjectState.position.copy( this.object.position );
+		this.previousObjectState.quaternion.copy( this.object.quaternion );
+		this.previousObjectState.scale.copy( this.object.scale );
+		this.previousObjectState.isActive = true;
 
 		if ( this.axis !== null ) {
 
@@ -546,6 +557,7 @@ class TransformControls extends Object3D {
 
 		this.dragging = false;
 		this.axis = null;
+		this.previousObjectState.isActive = false;
 
 	}
 
@@ -581,6 +593,7 @@ class TransformControls extends Object3D {
 		this.object = undefined;
 		this.visible = false;
 		this.axis = null;
+		this.previousObjectState.isActive = false;
 
 		return this;
 
@@ -633,6 +646,39 @@ class TransformControls extends Object3D {
 	update() {
 
 		console.warn( 'THREE.TransformControls: update function has no more functionality and therefore has been deprecated.' );
+
+	}
+
+	stop() {
+
+		if ( ! this.enabled ) return;
+
+		this.domElement.style.touchAction = '';
+		this.domElement.ownerDocument.removeEventListener( 'pointermove', this._onPointerMove );
+
+		this.pointerUp( {
+			x: 0,
+			y: 0,
+			button: 0
+		} );
+
+	}
+
+	cancel( continueTransform ) {
+
+		if ( this.previousObjectState.isActive ) {
+
+			this.object.position.copy( this.previousObjectState.position );
+			this.object.quaternion.copy( this.previousObjectState.quaternion );
+			this.object.scale.copy( this.previousObjectState.scale );
+
+		}
+
+		if ( ! continueTransform ) {
+
+			this.stop();
+
+		}
 
 	}
 
