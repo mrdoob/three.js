@@ -1,88 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - geometry - cube</title>
+		<title>three.js webgl - HTMLTexture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-        <div style="display:none">
+		<div style="display:none">
 
-            <style id="texture-css">
-                body {
-                    background-color: rgb(85,85,85);
-                    margin:0;
-                }
-                #html-box {
-                    position: absolute;
-                    left:0; top:0;
-                    margin:2rem;
-                    width:calc( 100% - 4rem );
-                    height:calc( 100% - 4rem );
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    background-color: rgb(120,120,120);
-                    color: white;
-                    box-shadow: 0 0 0.5rem 0.25rem black;
-                    border:1px solid rgb(225,225,225);
-                    font-size:1.36rem;
-                    font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-                    text-align: center;
-                    border-radius: 1rem;
-                }
-                #html-box > span {
-                    text-shadow: 0 0 1.67rem black;
-                }
-                #load-bar {
-                    position: relative;
-                    width:67%;
-                    height:1.67rem;
-                    margin-top:1rem;
-                    background-image: linear-gradient(0deg, rgb(116, 118, 144) 0%, rgb(83, 117, 179) 49%, rgb(100, 136, 200) 51%, rgb(45, 128, 253) 100%);
-                    border-radius:0.5rem;
-                    border:1px solid rgb(145,145,145);
-                    overflow: hidden;
-                    box-shadow: 0 0 1.67rem 0 rgba(255,255,255,0.25);
-                }
-                #load-line {
-                    position: absolute;
-                    left:0;
-                    top:0;
-                    height:100%;
-                    width:1px;
-                    background-color: white;
-                    mix-blend-mode: difference;
-                }
-                .back-image {
-                    position: absolute;
-                    left:0; top:0;
-                    width:100%; height:100%;
-                    opacity:0.25;
-                }
+			<style id="texture-css">
+				body {
+					background-color: rgb(85,85,85);
+					margin:0;
+				}
+				#html-box {
+					position: absolute;
+					left:0; top:0;
+					margin:2rem;
+					width:calc( 100% - 4rem );
+					height:calc( 100% - 4rem );
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+					background-color: rgb(120,120,120);
+					color: white;
+					box-shadow: 0 0 0.5rem 0.25rem black;
+					border:1px solid rgb(225,225,225);
+					font-size:1.36rem;
+					font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+					text-align: center;
+					border-radius: 1rem;
+				}
+				#html-box > span {
+					text-shadow: 0 0 1.67rem black;
+				}
+				#load-bar {
+					position: relative;
+					width:67%;
+					height:1.67rem;
+					margin-top:1rem;
+					background-image: linear-gradient(0deg, rgb(116, 118, 144) 0%, rgb(83, 117, 179) 49%, rgb(100, 136, 200) 51%, rgb(45, 128, 253) 100%);
+					border-radius:0.5rem;
+					border:1px solid rgb(145,145,145);
+					overflow: hidden;
+					box-shadow: 0 0 1.67rem 0 rgba(255,255,255,0.25);
+				}
+				#load-line {
+					position: absolute;
+					left:0;
+					top:0;
+					height:100%;
+					width:1px;
+					background-color: white;
+					mix-blend-mode: difference;
+				}
+				.back-image {
+					position: absolute;
+					left:0; top:0;
+					width:100%; height:100%;
+					opacity:0.25;
+				}
 
-            </style>
+			</style>
 
-            <div id="texture-html">
+			<div id="texture-html">
 
-                <div id="html-box">
-                    <span>HTML Texture</span>
-                    <div id="load-bar"><div id="load-line" style="width:0%;"></div></div>
-                </div>
+				<div id="html-box">
+					<span>HTML Texture</span>
+					<div id="load-bar"><div id="load-line" style="width:0%;"></div></div>
+				</div>
 
-            </div>
-        </div>
+			</div>
+		</div>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.plus.HTMLTexture.js';
+			import * as THREE from '../build/three.module.js';
 			
+			import { HTMLTexture } from './jsm/textures/HTMLTexture.js';
+
 			let camera, scene, renderer;
 			let mesh;
-            let htmlTexture;
+			let htmlTexture;
 
 			init();
 			animate();
@@ -94,10 +96,10 @@
 
 				scene = new THREE.Scene();
 
-                const html = document.getElementById( "texture-html" ).innerHTML;
-                const css = document.getElementById( "texture-css" ).innerHTML;
+				const html = document.getElementById( 'texture-html' ).innerHTML;
+				const css = document.getElementById( 'texture-css' ).innerHTML;
 
-                htmlTexture = new THREE.HTMLTexture( html , css , 256 , 256 );
+				htmlTexture = new HTMLTexture( html, css, 256, 256 );
 
 				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
 				const material = new THREE.MeshBasicMaterial( { map: htmlTexture } );
@@ -131,10 +133,10 @@
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
 
-                const loadLoop = 100 * ( Math.sin( 6.284 * (t % 5000) / 5000 ) + 1 ) / 2;
+				const loadLoop = 100 * ( Math.sin( 6.284 * ( t % 5000 ) / 5000 ) + 1 ) / 2;
 
-                htmlTexture.document.getElementById( "load-line" ).style.width = loadLoop + "%";
-                htmlTexture.redrawAsync();
+				htmlTexture.document.getElementById( 'load-line' ).style.width = loadLoop + '%';
+				htmlTexture.redrawAsync();
 
 				renderer.render( scene, camera );
 
