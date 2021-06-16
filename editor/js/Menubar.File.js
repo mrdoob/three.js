@@ -228,8 +228,18 @@ function MenubarFile( editor ) {
 
 		var exporter = new DRACOExporter();
 
+		const options = {
+			decodeSpeed: 5,
+			encodeSpeed: 5,
+			encoderMethod: DRACOExporter.MESH_EDGEBREAKER_ENCODING,
+			quantization: [ 16, 8, 8, 8, 8 ],
+			exportUvs: true,
+			exportNormals: true,
+			exportColor: object.geometry.hasAttribute( 'color' )
+		};
+
 		// TODO: Change to DRACOExporter's parse( geometry, onParse )?
-		var result = exporter.parse( object );
+		var result = exporter.parse( object, options );
 		saveArrayBuffer( result, 'model.drc' );
 
 	} );
