@@ -79,7 +79,8 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-
+			import HTMLTexture from '../src/textures/HTMLTexture.js';
+			
 			let camera, scene, renderer;
 			let mesh;
             let htmlTexture;
@@ -97,7 +98,7 @@
                 const html = document.getElementById( "texture-html" ).innerHTML;
                 const css = document.getElementById( "texture-css" ).innerHTML;
 
-                htmlTexture = new THREE.HTMLTexture( html , css , 256 , 256 );
+                htmlTexture = new HTMLTexture( html , css , 256 , 256 );
 
 				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
 				const material = new THREE.MeshBasicMaterial( { map: htmlTexture } );
