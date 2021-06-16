@@ -2,7 +2,7 @@ import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
 
-	async parse( scene ) {
+  async parse(scene, options = { ar: { anchoring: { type: "plane"}, planeAnchoring: {alignment: "vertical"} } ) {
 
 		const files = {};
 		const modelFileName = 'model.usda';
@@ -27,8 +27,8 @@ class USDZExporter {
             sceneName = "Scene"
           )
           {
-              token preliminary:anchoring:type = "plane"
-              token preliminary:planeAnchoring:alignment = "vertical"
+              token preliminary:anchoring:type = "${options.ar.anchoring.type}"
+              token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"
 
 `
 
