@@ -11087,7 +11087,7 @@
 		const isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext || typeof WebGL2ComputeRenderingContext !== 'undefined' && gl instanceof WebGL2ComputeRenderingContext;
 		/* eslint-enable no-undef */
 
-		let precision = parameters.precision !== undefined ? parameters.precision : 'highp';
+		let precision = parameters.precision !== undefined ? parameters.precision : 'mediump';
 		const maxPrecision = getMaxPrecision(precision);
 
 		if (maxPrecision !== precision) {
