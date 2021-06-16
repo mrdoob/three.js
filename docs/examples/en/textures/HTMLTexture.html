@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A texture for rendering and updating HTML / CSS documents.<br />
+
+			<ul>
+				<li>Static -- Scripts will not run, mouse and touch events will not trigger. For dynamic content, update [page:HTMLTexture.document document] style or content and call [page:HTMLTexture.redrawAsync redrawAsync].</li>
+				<li>Isolated (mostly) -- Stylesheets will not import, videos will not play, flash plugins will not load. &lt;img> tags will load normally.</li>
+			</ul>
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const html = getMyHTMLDocumentText();
+		const css = getMyCSSText();
+
+		const width = 256;
+		const height = 256;
+
+		const htmlTexture = new HTMLTexture( html , css , width , height );
+
+
+		function render() {
+
+			/* Update styles, text, etc. */
+
+			const someElement = htmlTexture.document.getElementById( 'my-element' );
+
+			someElement.classList.add( "highlighted" );
+
+			/* Redraw the texture. */
+
+			htmlTexture.redrawAsync();
+
+
+			renderer.render( scene, camera );
+
+		}
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_html_texture]<br />
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:String html], [param:String css], [param:Number width], [param:Number height], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Constant format], [param:Constant type], [param:Number anisotropy] )</h3>
+		<p>
+			[page:String html] -- (optional) The html to draw. Defaults to a blank document.<br />
+			[page:String css] -- (optional) Additional CSS to style the html.<br />
+			[page:Number width] -- (optional) Texture width. Will default to 300.<br />
+			[page:Number height] -- (optional) Texture height. Will default to 150.<br /><br />
+
+			See [page:CanvasTexture CanvasTexture] and [page:Texture Texture] for texture parameters.<br /><br />
+
+		</p>
+		<p>
+		Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:HTMLDocument document]</h3>
+		<p>
+			The texture's current html document.<br />
+			This will be replaced if a new html string is passed to [page:HTMLTexture.redrawAsync redrawAsync].
+		</p>
+
+		<h3>[property:Function onFinishRedraw]</h3>
+		<p>
+		A callback function, called when the texture has finished redrawing.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Promise redrawAsync]( [param:String html], [param:String css], [param:Number width], [param:Number height] )</h3>
+		<p>
+			Parameters are the same as [page:HTMLTexture.Constructor].<br /><br />
+
+			Redraw any changes made to the texture's HTML document.<br /><br />
+
+			If html is specified, the texture's document will be completely replaced by the new html.<br /><br />
+
+			If width and height are specified, the texture's dimensions will change and the HTML will reflow.<br /><br />
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/textures/HTMLTexture.js examples/jsm/textures/HTMLTexture.js]
+		</p>
+	
+	</body>
+</html>
