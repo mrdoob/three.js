@@ -47,24 +47,6 @@ function SidebarSettings( editor ) {
 
 	settings.add( languageRow );
 
-	// export precision
-
-	var exportPrecisionRow = new UIRow();
-	var exportPrecision = new UIInteger( config.getKey( 'exportPrecision' ) ).setRange( 2, Infinity );
-
-	exportPrecision.onChange( function () {
-
-		var value = this.getValue();
-
-		editor.config.setKey( 'exportPrecision', value );
-
-	} );
-
-	exportPrecisionRow.add( new UIText( strings.getKey( 'sidebar/settings/exportPrecision' ) ).setWidth( '90px' ) );
-	exportPrecisionRow.add( exportPrecision );
-
-	settings.add( exportPrecisionRow );
-
 	//
 
 	container.add( new SidebarSettingsViewport( editor ) );
