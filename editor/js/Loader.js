@@ -354,7 +354,7 @@ function Loader( editor ) {
 					var { IFCLoader } = await import( '../../examples/jsm/loaders/IFCLoader.js' );
 
 					var loader = new IFCLoader();
-					loader.setWasmPath( 'examples/jsm/loaders/ifc/' );
+					loader.setWasmPath( '../../examples/jsm/loaders/ifc/' );
 
 					var scene = await loader.parse( event.target.result );
 
