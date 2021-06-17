@@ -139,8 +139,6 @@ class HTMLTexture extends CanvasTexture {
 
 			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><style>${css}</style><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
 
-			const src = URL.createObjectURL( new Blob( [ svg ], { type: 'image/svg+xml;charset=utf-8' } ) );
-
 
 
 			const image = new Image();
@@ -148,8 +146,6 @@ class HTMLTexture extends CanvasTexture {
 			image.onload = () => {
 
 				canvas.getContext( '2d' ).drawImage( image, 0, 0 );
-
-				URL.revokeObjectURL( src );
 
 				scope.needsUpdate = true;
 
@@ -159,7 +155,7 @@ class HTMLTexture extends CanvasTexture {
 
 			};
 
-			image.src = src;
+			image.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent( svg );
 
 		} );
 
