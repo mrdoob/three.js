@@ -23,11 +23,11 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var pointLight;
+			let pointLight;
 
 			init();
 			animate();
@@ -41,50 +41,50 @@
 				camera.position.z = 2000;
 
 				//cubemap
-				var path = 'textures/cube/SwedishRoyalCastle/';
-				var format = '.jpg';
-				var urls = [
+				const path = 'textures/cube/SwedishRoyalCastle/';
+				const format = '.jpg';
+				const urls = [
 					path + 'px' + format, path + 'nx' + format,
 					path + 'py' + format, path + 'ny' + format,
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
-				var refractionCube = new THREE.CubeTextureLoader().load( urls );
+				const reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				const refractionCube = new THREE.CubeTextureLoader().load( urls );
 				refractionCube.mapping = THREE.CubeRefractionMapping;
 
 				scene = new THREE.Scene();
 				scene.background = reflectionCube;
 
 				//lights
-				var ambient = new THREE.AmbientLight( 0xffffff );
+				const ambient = new THREE.AmbientLight( 0xffffff );
 				scene.add( ambient );
 
 				pointLight = new THREE.PointLight( 0xffffff, 2 );
 				scene.add( pointLight );
 
 				//materials
-				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
-				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, envMap: refractionCube, refractionRatio: 0.95 } );
-				var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } );
+				const cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
+				const cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, envMap: refractionCube, refractionRatio: 0.95 } );
+				const cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } );
 
 				//models
-				var objLoader = new OBJLoader();
+				const objLoader = new OBJLoader();
 
 				objLoader.setPath( 'models/obj/walt/' );
 				objLoader.load( 'WaltHead.obj', function ( object ) {
 
-					var head = object.children[ 0 ];
+					const head = object.children[ 0 ];
 
 					head.scale.multiplyScalar( 15 );
 					head.position.y = - 500;
 					head.material = cubeMaterial1;
 
-					var head2 = head.clone();
+					const head2 = head.clone();
 					head2.position.x = - 900;
 					head2.material = cubeMaterial2;
 
-					var head3 = head.clone();
+					const head3 = head.clone();
 					head3.position.x = 900;
 					head3.material = cubeMaterial3;
 
@@ -99,7 +99,7 @@
 				container.appendChild( renderer.domElement );
 
 				//controls
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableZoom = false;
 				controls.enablePan = false;
 				controls.minPolarAngle = Math.PI / 4;
@@ -109,7 +109,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -1,23 +1,20 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { PhongNode } from './nodes/PhongNode.js';
 import { NodeMaterial } from './NodeMaterial.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
-function PhongNodeMaterial() {
+class PhongNodeMaterial extends NodeMaterial {
 
-	var node = new PhongNode();
+	constructor() {
 
-	NodeMaterial.call( this, node, node );
+		const node = new PhongNode();
 
-	this.type = "PhongNodeMaterial";
+		super( node, node );
+
+		this.type = 'PhongNodeMaterial';
+
+	}
 
 }
-
-PhongNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
-PhongNodeMaterial.prototype.constructor = PhongNodeMaterial;
 
 NodeUtils.addShortcuts( PhongNodeMaterial.prototype, 'fragment', [
 	'color',

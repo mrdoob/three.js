@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel } from './libs/ui.js';
 import { APP } from './libs/app.js';
 

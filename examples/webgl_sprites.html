@@ -16,22 +16,22 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer;
-			var cameraOrtho, sceneOrtho;
+			let camera, scene, renderer;
+			let cameraOrtho, sceneOrtho;
 
-			var spriteTL, spriteTR, spriteBL, spriteBR, spriteC;
+			let spriteTL, spriteTR, spriteBL, spriteBR, spriteC;
 
-			var mapC;
+			let mapC;
 
-			var group;
+			let group;
 
 			init();
 			animate();
 
 			function init() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera = new THREE.PerspectiveCamera( 60, width / height, 1, 2100 );
 				camera.position.z = 1500;
@@ -46,27 +46,27 @@
 
 				// create sprites
 
-				var amount = 200;
-				var radius = 500;
+				const amount = 200;
+				const radius = 500;
 
-				var textureLoader = new THREE.TextureLoader();
+				const textureLoader = new THREE.TextureLoader();
 
 				textureLoader.load( "textures/sprite0.png", createHUDSprites );
-				var mapB = textureLoader.load( "textures/sprite1.png" );
+				const mapB = textureLoader.load( "textures/sprite1.png" );
 				mapC = textureLoader.load( "textures/sprite2.png" );
 
 				group = new THREE.Group();
 
-				var materialC = new THREE.SpriteMaterial( { map: mapC, color: 0xffffff, fog: true } );
-				var materialB = new THREE.SpriteMaterial( { map: mapB, color: 0xffffff, fog: true } );
+				const materialC = new THREE.SpriteMaterial( { map: mapC, color: 0xffffff, fog: true } );
+				const materialB = new THREE.SpriteMaterial( { map: mapB, color: 0xffffff, fog: true } );
 
-				for ( var a = 0; a < amount; a ++ ) {
+				for ( let a = 0; a < amount; a ++ ) {
 
-					var x = Math.random() - 0.5;
-					var y = Math.random() - 0.5;
-					var z = Math.random() - 0.5;
+					const x = Math.random() - 0.5;
+					const y = Math.random() - 0.5;
+					const z = Math.random() - 0.5;
 
-					var material;
+					let material;
 
 					if ( z < 0 ) {
 
@@ -81,7 +81,7 @@
 
 					}
 
-					var sprite = new THREE.Sprite( material );
+					const sprite = new THREE.Sprite( material );
 
 					sprite.position.set( x, y, z );
 					sprite.position.normalize();
@@ -104,16 +104,16 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function createHUDSprites( texture ) {
 
-				var material = new THREE.SpriteMaterial( { map: texture } );
+				const material = new THREE.SpriteMaterial( { map: texture } );
 
-				var width = material.map.image.width;
-				var height = material.map.image.height;
+				const width = material.map.image.width;
+				const height = material.map.image.height;
 
 				spriteTL = new THREE.Sprite( material );
 				spriteTL.center.set( 0.0, 1.0 );
@@ -146,8 +146,8 @@
 
 			function updateHUDSprites() {
 
-				var width = window.innerWidth / 2;
-				var height = window.innerHeight / 2;
+				const width = window.innerWidth / 2;
+				const height = window.innerHeight / 2;
 
 				spriteTL.position.set( - width, height, 1 ); // top left
 				spriteTR.position.set( width, height, 1 ); // top right
@@ -159,8 +159,8 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -186,16 +186,16 @@
 
 			function render() {
 
-				var time = Date.now() / 1000;
+				const time = Date.now() / 1000;
 
-				for ( var i = 0, l = group.children.length; i < l; i ++ ) {
+				for ( let i = 0, l = group.children.length; i < l; i ++ ) {
 
-					var sprite = group.children[ i ];
-					var material = sprite.material;
-					var scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
+					const sprite = group.children[ i ];
+					const material = sprite.material;
+					const scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
 
-					var imageWidth = 1;
-					var imageHeight = 1;
+					let imageWidth = 1;
+					let imageHeight = 1;
 
 					if ( material.map && material.map.image && material.map.image.width ) {
 

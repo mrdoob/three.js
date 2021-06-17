@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function Config() {
 
 	var name = 'threejs-editor';

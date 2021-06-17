@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -27,11 +26,16 @@
 			using Draco with glTF, an instance of DRACOLoader will be used internally by [page:GLTFLoader].
 		</p>
 
+		<p>
+			It is recommended to create one DRACOLoader instance and reuse it to avoid loading and creating multiple
+			decoder instances.
+		</p>
+		
 		<h2>Code Example</h2>
 
 		<code>
 		// Instantiate a loader
-		var loader = new DRACOLoader();
+		const loader = new DRACOLoader();
 
 		// Specify path to a folder containing WASM/JS decoding libraries.
 		loader.setDecoderPath( '/examples/js/libs/draco/' );
@@ -46,8 +50,8 @@
 			// called when the resource is loaded
 			function ( geometry ) {
 
-				var material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
-				var mesh = new THREE.Mesh( geometry, material );
+				const material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 			},

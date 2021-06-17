@@ -34,14 +34,15 @@
 				UVNode
 			} from './jsm/nodes/Nodes.js';
 
-			var container = document.getElementById( 'container' );
+			const container = document.getElementById( 'container' );
 
-			var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
-			var frame = new NodeFrame();
-			var sprite1, sprite2, sprite3;
-			var walkingManTexture, walkingManTextureURL;
-			var library = {};
-			var controls;
+			let renderer, scene, camera;
+			const clock = new THREE.Clock(), fov = 50;
+			const frame = new NodeFrame();
+			let sprite1, sprite2, sprite3;
+			let walkingManTexture, walkingManTextureURL;
+			const library = {};
+			let controls;
 
 			window.addEventListener( 'load', init );
 
@@ -61,7 +62,6 @@
 
 				camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 100;
-				camera.target = new THREE.Vector3();
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
@@ -83,33 +83,33 @@
 
 				function createHorizontalSpriteSheetNode( hCount, speed ) {
 
-					var speed = new Vector2Node( speed, 0 ); // frame per second
-					var scale = new Vector2Node( 1 / hCount, 1 ); // 8 horizontal images in sprite-sheet
+					const speedNode = new Vector2Node( speed, 0 ); // frame per second
+					const scale = new Vector2Node( 1 / hCount, 1 ); // 8 horizontal images in sprite-sheet
 
-					var uvTimer = new OperatorNode(
+					const uvTimer = new OperatorNode(
 						new TimerNode(),
-						speed,
+						speedNode,
 						OperatorNode.MUL
 					);
 
-					var uvIntegerTimer = new MathNode(
+					const uvIntegerTimer = new MathNode(
 						uvTimer,
 						MathNode.FLOOR
 					);
 
-					var uvFrameOffset = new OperatorNode(
+					const uvFrameOffset = new OperatorNode(
 						uvIntegerTimer,
 						scale,
 						OperatorNode.MUL
 					);
 
-					var uvScale = new OperatorNode(
+					const uvScale = new OperatorNode(
 						new UVNode(),
 						scale,
 						OperatorNode.MUL
 					);
 
-					var uvFrame = new OperatorNode(
+					const uvFrame = new OperatorNode(
 						uvScale,
 						uvFrameOffset,
 						OperatorNode.ADD
@@ -121,8 +121,7 @@
 
 				// sprites
 
-				var spriteWidth = 20,
-					spriteHeight = 20;
+				const spriteWidth = 20, spriteHeight = 20;
 
 				scene.add( sprite1 = new THREE.Sprite( new SpriteNodeMaterial() ) );
 				sprite1.scale.x = spriteWidth;
@@ -149,7 +148,7 @@
 					OperatorNode.ADD
 				);
 
-				var sineWaveFunction = new FunctionNode( [
+				const sineWaveFunction = new FunctionNode( [
 					// https://stackoverflow.com/questions/36174431/how-to-make-a-wave-warp-effect-in-shader
 					"vec2 sineWave(vec2 uv, vec2 phase) {",
 					// wave distortion
@@ -182,7 +181,7 @@
 				// Events
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				onWindowResize();
 				animate();
@@ -193,7 +192,7 @@
 
 				// serialize
 
-				var json = sprite.material.toJSON();
+				const json = sprite.material.toJSON();
 
 				// replace uuid to url (facilitates the load of textures using url otherside uuid)
 
@@ -201,7 +200,7 @@
 
 				// deserialize
 
-				var material = new NodeMaterialLoader( null, library ).parse( json );
+				const material = new NodeMaterialLoader( null, library ).parse( json );
 
 				// replace material
 
@@ -213,7 +212,7 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth, height = window.innerHeight;
+				const width = window.innerWidth, height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -224,7 +223,7 @@
 
 			function animate() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				// update material animation and/or gpu calcs (pre-renderer)
 				frame.update( delta )

@@ -1,7 +1,3 @@
-/**
- * @author vHawk / https://github.com/vHawk/
- */
-
 import {
 	Vector2,
 	Vector3,
@@ -11,8 +7,8 @@ import {
 	Matrix4,
 	Box3
 } from '../../../build/three.module.js';
-import Frustum from './Frustum.js';
-import Shader from './Shader.js';
+import { Frustum } from './Frustum.js';
+import { CSMShader } from './CSMShader.js';
 
 const _cameraToLightMatrix = new Matrix4();
 const _lightSpaceFrustum = new Frustum();
@@ -243,8 +239,8 @@ export class CSM {
 
 	injectInclude() {
 
-		ShaderChunk.lights_fragment_begin = Shader.lights_fragment_begin;
-		ShaderChunk.lights_pars_begin = Shader.lights_pars_begin;
+		ShaderChunk.lights_fragment_begin = CSMShader.lights_fragment_begin;
+		ShaderChunk.lights_pars_begin = CSMShader.lights_pars_begin;
 
 	}
 
@@ -325,8 +321,8 @@ export class CSM {
 
 		for ( let i = 0; i < this.cascades; i ++ ) {
 
-			let amount = this.breaks[ i ];
-			let prev = this.breaks[ i - 1 ] || 0;
+			const amount = this.breaks[ i ];
+			const prev = this.breaks[ i - 1 ] || 0;
 			target[ i ].x = prev;
 			target[ i ].y = amount;
 

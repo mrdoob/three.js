@@ -1,23 +1,20 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { StandardNode } from './nodes/StandardNode.js';
 import { NodeMaterial } from './NodeMaterial.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
-function StandardNodeMaterial() {
+class StandardNodeMaterial extends NodeMaterial {
 
-	var node = new StandardNode();
+	constructor() {
 
-	NodeMaterial.call( this, node, node );
+		const node = new StandardNode();
 
-	this.type = "StandardNodeMaterial";
+		super( node, node );
+
+		this.type = 'StandardNodeMaterial';
+
+	}
 
 }
-
-StandardNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
-StandardNodeMaterial.prototype.constructor = StandardNodeMaterial;
 
 NodeUtils.addShortcuts( StandardNodeMaterial.prototype, 'fragment', [
 	'color',

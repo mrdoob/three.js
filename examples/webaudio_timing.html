@@ -22,23 +22,23 @@
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-		var scene, camera, renderer, clock;
+		let scene, camera, renderer, clock;
 
-		var objects = [];
+		const objects = [];
 
-		var speed = 2.5;
-		var height = 3;
-		var offset = 0.5;
+		const speed = 2.5;
+		const height = 3;
+		const offset = 0.5;
 
-		var startButton = document.getElementById( 'startButton' );
+		const startButton = document.getElementById( 'startButton' );
 		startButton.addEventListener( 'click', init );
 
 		function init() {
 
-			var overlay = document.getElementById( 'overlay' );
+			const overlay = document.getElementById( 'overlay' );
 			overlay.remove();
 
-			var container = document.getElementById( 'container' );
+			const container = document.getElementById( 'container' );
 
 			scene = new THREE.Scene();
 
@@ -51,14 +51,14 @@
 
 			// lights
 
-			var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+			const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 			scene.add( ambientLight );
 
-			var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.7 );
+			const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.7 );
 			directionalLight.position.set( 0, 5, 5 );
 			scene.add( directionalLight );
 
-			var d = 5;
+			const d = 5;
 			directionalLight.castShadow = true;
 			directionalLight.shadow.camera.left = - d;
 			directionalLight.shadow.camera.right = d;
@@ -73,46 +73,46 @@
 
 			// audio
 
-			var audioLoader = new THREE.AudioLoader();
+			const audioLoader = new THREE.AudioLoader();
 
-			var listener = new THREE.AudioListener();
+			const listener = new THREE.AudioListener();
 			camera.add( listener );
 
 			// floor
 
-			var floorGeometry = new THREE.PlaneBufferGeometry( 10, 10 );
-			var floorMaterial = new THREE.MeshLambertMaterial( { color: 0x4676b6 } );
+			const floorGeometry = new THREE.PlaneGeometry( 10, 10 );
+			const floorMaterial = new THREE.MeshLambertMaterial( { color: 0x4676b6 } );
 
-			var floor = new THREE.Mesh( floorGeometry, floorMaterial );
+			const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 			floor.rotation.x = Math.PI * - 0.5;
 			floor.receiveShadow = true;
 			scene.add( floor );
 
 			// objects
 
-			var count = 5;
-			var radius = 3;
+			const count = 5;
+			const radius = 3;
 
-			var ballGeometry = new THREE.SphereBufferGeometry( 0.3, 32, 16 );
+			const ballGeometry = new THREE.SphereGeometry( 0.3, 32, 16 );
 			ballGeometry.translate( 0, 0.3, 0 );
-			var ballMaterial = new THREE.MeshLambertMaterial( { color: 0xcccccc } );
+			const ballMaterial = new THREE.MeshLambertMaterial( { color: 0xcccccc } );
 
 			// create objects when audio buffer is loaded
 
 			audioLoader.load( 'sounds/ping_pong.mp3', function ( buffer ) {
 
-				for ( var i = 0; i < count; i ++ ) {
+				for ( let i = 0; i < count; i ++ ) {
 
-					var s = i / count * Math.PI * 2;
+					const s = i / count * Math.PI * 2;
 
-					var ball = new THREE.Mesh( ballGeometry, ballMaterial );
+					const ball = new THREE.Mesh( ballGeometry, ballMaterial );
 					ball.castShadow = true;
 					ball.userData.down = false;
 
 					ball.position.x = radius * Math.cos( s );
 					ball.position.z = radius * Math.sin( s );
 
-					var audio = new THREE.PositionalAudio( listener );
+					const audio = new THREE.PositionalAudio( listener );
 					audio.setBuffer( buffer );
 					ball.add( audio );
 
@@ -136,13 +136,13 @@
 
 			//
 
-			var controls = new OrbitControls( camera, renderer.domElement );
+			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.minDistance = 1;
 			controls.maxDistance = 25;
 
 			//
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 		}
 
@@ -165,13 +165,13 @@
 
 		function render() {
 
-			var time = clock.getElapsedTime();
+			const time = clock.getElapsedTime();
 
-			for ( var i = 0; i < objects.length; i ++ ) {
+			for ( let i = 0; i < objects.length; i ++ ) {
 
-				var ball = objects[ i ];
+				const ball = objects[ i ];
 
-				var previousHeight = ball.position.y;
+				const previousHeight = ball.position.y;
 				ball.position.y = Math.abs( Math.sin( i * offset + ( time * speed ) ) * height );
 
 				if ( ball.position.y < previousHeight ) {
@@ -184,7 +184,7 @@
 
 						// ball changed direction from down to up
 
-						var audio = ball.children[ 0 ];
+						const audio = ball.children[ 0 ];
 						audio.play(); // play audio with perfect timing when ball hits the surface
 						ball.userData.down = false;
 

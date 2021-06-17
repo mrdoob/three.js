@@ -26,11 +26,10 @@
 			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
 			import { PixelShader } from './jsm/shaders/PixelShader.js';
 
+			let camera, scene, renderer, gui, composer, controls;
+			let pixelPass, params;
 
-			var camera, scene, renderer, gui, composer, controls;
-			var pixelPass, params;
-
-			var group;
+			let group;
 
 			init();
 			animate();
@@ -41,19 +40,9 @@
 
 			}
 
-			function resize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				pixelPass.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
-
-			}
-
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -68,41 +57,44 @@
 
 				scene = new THREE.Scene();
 
-				var hemisphereLight = new THREE.HemisphereLight( 0xfceafc, 0x000000, .8 );
+				const hemisphereLight = new THREE.HemisphereLight( 0xfceafc, 0x000000, .8 );
 				scene.add( hemisphereLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
 				dirLight.position.set( 150, 75, 150 );
 				scene.add( dirLight );
 
-				var dirLight2 = new THREE.DirectionalLight( 0xffffff, .2 );
+				const dirLight2 = new THREE.DirectionalLight( 0xffffff, .2 );
 				dirLight2.position.set( - 150, 75, - 150 );
 				scene.add( dirLight2 );
 
-				var dirLight3 = new THREE.DirectionalLight( 0xffffff, .1 );
+				const dirLight3 = new THREE.DirectionalLight( 0xffffff, .1 );
 				dirLight3.position.set( 0, 125, 0 );
 				scene.add( dirLight3 );
 
-				var geometries = [
-					new THREE.SphereBufferGeometry( 1, 64, 64 ),
-					new THREE.BoxBufferGeometry( 1, 1, 1 ),
-					new THREE.ConeBufferGeometry( 1, 1, 32 ),
-					new THREE.TetrahedronBufferGeometry( 1 ),
-					new THREE.TorusKnotBufferGeometry( 1, .4 )
+				const geometries = [
+					new THREE.SphereGeometry( 1, 64, 64 ),
+					new THREE.BoxGeometry( 1, 1, 1 ),
+					new THREE.ConeGeometry( 1, 1, 32 ),
+					new THREE.TetrahedronGeometry( 1 ),
+					new THREE.TorusKnotGeometry( 1, .4 )
 				];
 
 				group = new THREE.Group();
 
-				for ( var i = 0; i < 25; i ++ ) {
+				for ( let i = 0; i < 25; i ++ ) {
 
-					var geom = geometries[ Math.floor( Math.random() * geometries.length ) ];
-					var color = new THREE.Color();
+					const geom = geometries[ Math.floor( Math.random() * geometries.length ) ];
+
+					const color = new THREE.Color();
 					color.setHSL( Math.random(), .7 + .2 * Math.random(), .5 + .1 * Math.random() );
-					var mat = new THREE.MeshPhongMaterial( { color: color, shininess: 200 } );
-					var mesh = new THREE.Mesh( geom, mat );
-					var s = 4 + Math.random() * 10;
-					mesh.scale.set( s, s, s );
 
+					const mat = new THREE.MeshPhongMaterial( { color: color, shininess: 200 } );
+
+					const mesh = new THREE.Mesh( geom, mat );
+
+					const s = 4 + Math.random() * 10;
+					mesh.scale.set( s, s, s );
 					mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
 					mesh.position.multiplyScalar( Math.random() * 200 );
 					mesh.rotation.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
@@ -120,7 +112,7 @@
 				pixelPass.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
 				composer.addPass( pixelPass );
 
-				window.addEventListener( 'resize', resize );
+				window.addEventListener( 'resize', onWindowResize );
 
 				params = {
 					pixelSize: 16,
@@ -129,6 +121,16 @@
 				gui = new GUI();
 				gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
 				gui.add( params, 'postprocessing' );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				pixelPass.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
 
 			}
 

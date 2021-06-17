@@ -1,14 +1,10 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-function SidebarGeometryDodecahedronGeometry( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -41,7 +37,7 @@ function SidebarGeometryDodecahedronGeometry( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.DodecahedronBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.DodecahedronGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );
@@ -52,4 +48,4 @@ function SidebarGeometryDodecahedronGeometry( editor, object ) {
 
 }
 
-export { SidebarGeometryDodecahedronGeometry };
+export { GeometryParametersPanel };

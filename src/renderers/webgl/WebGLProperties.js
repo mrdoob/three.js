@@ -1,7 +1,3 @@
-/**
- * @author fordacious / fordacious.github.io
- */
-
 function WebGLProperties() {
 
 	let properties = new WeakMap();

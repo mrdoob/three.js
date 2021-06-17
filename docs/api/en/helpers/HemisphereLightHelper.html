@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,8 +18,8 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
-		var helper = new THREE.HemisphereLightHelper( light, 5 );
+		const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+		const helper = new THREE.HemisphereLightHelper( light, 5 );
 		scene.add( helper );
 		</code>
 
@@ -43,10 +42,10 @@
 		<h3>[property:HemisphereLight light]</h3>
 		<p>Reference to the HemisphereLight being visualized.</p>
 
-		<h3>[property:object matrix]</h3>
+		<h3>[property:Object matrix]</h3>
 		<p>Reference to the hemisphereLight's [page:Object3D.matrixWorld matrixWorld].</p>
 
-		<h3>[property:object matrixAutoUpdate]</h3>
+		<h3>[property:Object matrixAutoUpdate]</h3>
 		<p>
 			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
 			hemisphereLight's [page:Object3D.matrixWorld matrixWorld].

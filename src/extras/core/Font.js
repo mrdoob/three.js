@@ -1,26 +1,16 @@
-/**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { ShapePath } from './ShapePath.js';
 
+class Font {
 
-function Font( data ) {
+	constructor( data ) {
 
-	this.type = 'Font';
+		this.type = 'Font';
 
-	this.data = data;
+		this.data = data;
 
-}
+	}
 
-Object.assign( Font.prototype, {
-
-	isFont: true,
-
-	generateShapes: function ( text, size ) {
-
-		if ( size === undefined ) size = 100;
+	generateShapes( text, size = 100 ) {
 
 		const shapes = [];
 		const paths = createPaths( text, size, this.data );
@@ -35,11 +25,11 @@ Object.assign( Font.prototype, {
 
 	}
 
-} );
+}
 
 function createPaths( text, size, data ) {
 
-	const chars = Array.from ? Array.from( text ) : String( text ).split( '' ); // workaround for IE11, see #13988
+	const chars = Array.from( text );
 	const scale = size / data.resolution;
 	const line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
 
@@ -147,5 +137,7 @@ function createPath( char, scale, offsetX, offsetY, data ) {
 	return { offsetX: glyph.ha * scale, path: path };
 
 }
+
+Font.prototype.isFont = true;
 
 export { Font };

@@ -38,7 +38,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
+			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
 			import {
 				NodeFrame,
@@ -52,17 +52,18 @@
 				PhongNodeMaterial
 			} from './jsm/nodes/Nodes.js';
 
-			var container = document.getElementById( 'container' );
+			const container = document.getElementById( 'container' );
 
-			var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
-			var frame = new NodeFrame();
-			var teapot;
-			var controls;
-			var meshes = [];
+			let renderer, scene, camera;
+			const clock = new THREE.Clock(), fov = 50;
+			const frame = new NodeFrame();
+			let teapot;
+			let controls;
+			const meshes = [];
 
 			document.getElementById( "preload" ).addEventListener( 'click', function () {
 
-				var hash = document.location.hash.substr( 1 );
+				const hash = document.location.hash.substr( 1 );
 
 				if ( hash.length === 0 ) {
 
@@ -76,7 +77,7 @@
 
 				location.reload( true );
 
-			}, false );
+			} );
 
 			window.addEventListener( 'load', init );
 
@@ -93,7 +94,6 @@
 				camera.position.x = 0;
 				camera.position.z = - 300;
 				camera.position.y = 200;
-				camera.target = new THREE.Vector3();
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
@@ -101,21 +101,21 @@
 
 				scene.add( new THREE.AmbientLight( 0x464646 ) );
 
-				var light = new THREE.DirectionalLight( 0xffddcc, 1 );
-				light.position.set( 1, 0.75, 0.5 );
-				scene.add( light );
+				const light1 = new THREE.DirectionalLight( 0xffddcc, 1 );
+				light1.position.set( 1, 0.75, 0.5 );
+				scene.add( light1 );
 
-				var light = new THREE.DirectionalLight( 0xccccff, 1 );
-				light.position.set( - 1, 0.75, - 0.5 );
-				scene.add( light );
+				const light2 = new THREE.DirectionalLight( 0xccccff, 1 );
+				light2.position.set( - 1, 0.75, - 0.5 );
+				scene.add( light2 );
 
-				teapot = new TeapotBufferGeometry( 15, 18 );
+				teapot = new TeapotGeometry( 15, 18 );
 
-				var itemsonrow = 10;
+				const itemsonrow = 10;
 
-				for ( var i = 0; i < itemsonrow * itemsonrow; i ++ ) {
+				for ( let i = 0; i < itemsonrow * itemsonrow; i ++ ) {
 
-					var mesh = new THREE.Mesh( teapot );
+					const mesh = new THREE.Mesh( teapot );
 
 					mesh.position.x = 50 * ( i % itemsonrow ) - 50 * itemsonrow / 2;
 					mesh.position.z = 50 * Math.floor( i / itemsonrow ) - 150;
@@ -125,9 +125,9 @@
 
 				}
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				var hash = document.location.hash.substr( 1 );
+				const hash = document.location.hash.substr( 1 );
 
 				if ( hash.length === 0 ) {
 
@@ -150,40 +150,40 @@
 
 				if ( mesh.material ) mesh.material.dispose();
 
-				var mtl = new PhongNodeMaterial();
+				const mtl = new PhongNodeMaterial();
 
-				var time = new TimerNode();
-				var speed = new FloatNode( Math.random() );
+				const time = new TimerNode();
+				const speed = new FloatNode( Math.random() );
 
-				var color = new ColorNode( Math.random() * 0xFFFFFF );
+				const color = new ColorNode( Math.random() * 0xFFFFFF );
 
-				var timeSpeed = new OperatorNode(
+				const timeSpeed = new OperatorNode(
 					time,
 					speed,
 					OperatorNode.MUL
 				);
 
-				var sinCycleInSecs = new OperatorNode(
+				const sinCycleInSecs = new OperatorNode(
 					timeSpeed,
 					new ConstNode( ConstNode.PI2 ),
 					OperatorNode.MUL
 				);
 
-				var cycle = new MathNode( sinCycleInSecs, MathNode.SIN );
+				const cycle = new MathNode( sinCycleInSecs, MathNode.SIN );
 
-				var cycleColor = new OperatorNode(
+				const cycleColor = new OperatorNode(
 					cycle,
 					color,
 					OperatorNode.MUL
 				);
 
-				var cos = new MathNode( cycleColor, MathNode.SIN );
+				const cos = new MathNode( cycleColor, MathNode.SIN );
 
 				mtl.color = new ColorNode( 0 );
 				mtl.emissive = cos;
 
 
-				var transformer = new ExpressionNode( "position + 0.0 * " + Math.random(), "vec3", [ ] );
+				const transformer = new ExpressionNode( "position + 0.0 * " + Math.random(), "vec3", [ ] );
 				mtl.transform = transformer;
 
 				// build shader ( ignore auto build )
@@ -196,7 +196,7 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth, height = window.innerHeight;
+				const width = window.innerWidth, height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -207,13 +207,13 @@
 
 			function animate() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				frame.update( delta );
 
-				for ( var i = 0; i < meshes.length; i ++ ) {
+				for ( let i = 0; i < meshes.length; i ++ ) {
 
-					var mesh = meshes[ i ];
+					const mesh = meshes[ i ];
 
 					frame.updateNode( mesh.material );
 

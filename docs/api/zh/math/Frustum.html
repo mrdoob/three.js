@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -63,15 +62,15 @@
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
 		<p>
 		[page:Box3 box] - [page:Box3] 用于检测是否要交的包围盒。<br /><br />
-		
+
 		返回 true 如果该 [page:Box3 box] 与视锥体相交。
 		</p>
 
 		<h3>[method:Boolean intersectsObject]( [param:Object3D object] )</h3>
 		<p>
-			检测 [page:Object3D object] 的包围球 [page:Geometry.boundingSphere bounding sphere] 是否与视锥体相交。<br /><br />
+			检测 [page:Object3D object] 的包围球 [page:BufferGeometry.boundingSphere bounding sphere] 是否与视锥体相交。<br /><br />
 
-			注意：该对象必须有一个 [page:Geometry] 或 [page:BufferGeometry] ，因为这样才能计算出包围球。
+			注意：该对象必须有一个 [page:BufferGeometry] ，因为这样才能计算出包围球。
 		</p>
 
 		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
@@ -88,7 +87,7 @@
 
 		<h3>[method:this set]( [param:Plane p0], [param:Plane p1], [param:Plane p2], [param:Plane p3], [param:Plane p4], [param:Plane p5] )</h3>
 		<p>
-		Sets the frustum from the passed planes. No plane order is implied.<br>
+		从传入的平面设置当前视锥体。没有隐式的顺序。<br>
 		Note that this method only copies the values from the given objects.
 		</p>
 

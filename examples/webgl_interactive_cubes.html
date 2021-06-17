@@ -27,11 +27,14 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var container, stats;
-			var camera, scene, raycaster, renderer;
+			let container, stats;
+			let camera, scene, raycaster, renderer;
 
-			var mouse = new THREE.Vector2(), INTERSECTED;
-			var radius = 100, theta = 0;
+			let INTERSECTED;
+			let theta = 0;
+
+			const pointer = new THREE.Vector2();
+			const radius = 100;
 
 			init();
 			animate();
@@ -46,15 +49,15 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				const light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				const geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
-				for ( var i = 0; i < 2000; i ++ ) {
+				for ( let i = 0; i < 2000; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 800 - 400;
 					object.position.y = Math.random() * 800 - 400;
@@ -82,11 +85,11 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onPointerMove );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -99,12 +102,10 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
 
-				event.preventDefault();
-
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 			}
 
@@ -132,9 +133,9 @@
 
 				// find intersections
 
-				raycaster.setFromCamera( mouse, camera );
+				raycaster.setFromCamera( pointer, camera );
 
-				var intersects = raycaster.intersectObjects( scene.children );
+				const intersects = raycaster.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 

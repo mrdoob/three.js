@@ -18,16 +18,16 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var camera, controls;
-			var renderer;
-			var scene;
+			let camera, controls;
+			let renderer;
+			let scene;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -45,42 +45,42 @@
 				controls.enableDamping = true;
 				controls.rotateSpeed = - 0.25;
 
-				var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
+				const textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
 
-				var materials = [];
+				const materials = [];
 
-				for ( var i = 0; i < 6; i ++ ) {
+				for ( let i = 0; i < 6; i ++ ) {
 
 					materials.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
 
 				}
 
-				var skyBox = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), materials );
+				const skyBox = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), materials );
 				skyBox.geometry.scale( 1, 1, - 1 );
 				scene.add( skyBox );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
 
-				var textures = [];
+				const textures = [];
 
-				for ( var i = 0; i < tilesNum; i ++ ) {
+				for ( let i = 0; i < tilesNum; i ++ ) {
 
 					textures[ i ] = new THREE.Texture();
 
 				}
 
-				var imageObj = new Image();
+				const imageObj = new Image();
 
 				imageObj.onload = function () {
 
-					var canvas, context;
-					var tileWidth = imageObj.height;
+					let canvas, context;
+					const tileWidth = imageObj.height;
 
-					for ( var i = 0; i < textures.length; i ++ ) {
+					for ( let i = 0; i < textures.length; i ++ ) {
 
 						canvas = document.createElement( 'canvas' );
 						context = canvas.getContext( '2d' );

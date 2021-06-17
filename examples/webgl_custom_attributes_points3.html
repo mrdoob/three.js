@@ -63,14 +63,16 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var renderer, scene, camera, stats;
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
-			var object;
+			let renderer, scene, camera, stats;
 
-			var vertices1;
+			let object;
 
-			var WIDTH = window.innerWidth;
-			var HEIGHT = window.innerHeight;
+			let vertices1;
+
+			const WIDTH = window.innerWidth;
+			const HEIGHT = window.innerHeight;
 
 			init();
 			animate();
@@ -82,35 +84,44 @@
 
 				scene = new THREE.Scene();
 
-				var radius = 100, inner = 0.6 * radius;
-				var vertices = [];
+				let radius = 100;
+				const inner = 0.6 * radius;
+				const vertex = new THREE.Vector3();
+				const vertices = [];
 
-				for ( var i = 0; i < 100000; i ++ ) {
+				for ( let i = 0; i < 100000; i ++ ) {
 
-					var vertex = new THREE.Vector3();
 					vertex.x = Math.random() * 2 - 1;
 					vertex.y = Math.random() * 2 - 1;
 					vertex.z = Math.random() * 2 - 1;
 					vertex.multiplyScalar( radius );
 
 					if ( ( vertex.x > inner || vertex.x < - inner ) ||
-					     ( vertex.y > inner || vertex.y < - inner ) ||
-					     ( vertex.z > inner || vertex.z < - inner ) )
+						( vertex.y > inner || vertex.y < - inner ) ||
+						( vertex.z > inner || vertex.z < - inner ) )
 
-						vertices.push( vertex );
+						vertices.push( vertex.x, vertex.y, vertex.z );
 
 				}
 
-				vertices1 = vertices.length;
+				vertices1 = vertices.length / 3;
 
 				radius = 200;
-				var geometry2 = new THREE.BoxGeometry( radius, 0.1 * radius, 0.1 * radius, 50, 5, 5 );
 
-				var matrix = new THREE.Matrix4();
-				var position = new THREE.Vector3();
-				var rotation = new THREE.Euler();
-				var quaternion = new THREE.Quaternion();
-				var scale = new THREE.Vector3( 1, 1, 1 );
+				let boxGeometry1 = new THREE.BoxGeometry( radius, 0.1 * radius, 0.1 * radius, 50, 5, 5 );
+
+				// if normal and uv attributes are not removed, mergeVertices() can't consolidate indentical vertices with different normal/uv data
+
+				boxGeometry1.deleteAttribute( 'normal' );
+				boxGeometry1.deleteAttribute( 'uv' );
+
+				boxGeometry1 = BufferGeometryUtils.mergeVertices( boxGeometry1 );
+
+				const matrix = new THREE.Matrix4();
+				const position = new THREE.Vector3();
+				const rotation = new THREE.Euler();
+				const quaternion = new THREE.Quaternion();
+				const scale = new THREE.Vector3( 1, 1, 1 );
 
 				function addGeo( geo, x, y, z, ry ) {
 
@@ -119,10 +130,13 @@
 
 					matrix.compose( position, quaternion.setFromEuler( rotation ), scale );
 
-					for ( var i = 0, l = geo.vertices.length; i < l; i ++ ) {
+					const positionAttribute = geo.getAttribute( 'position' );
 
-						var vertex = geo.vertices[ i ];
-						vertices.push( vertex.clone().applyMatrix4( matrix ) );
+					for ( var i = 0, l = positionAttribute.count; i < l; i ++ ) {
+
+						vertex.fromBufferAttribute( positionAttribute, i );
+						vertex.applyMatrix4( matrix );
+						vertices.push( vertex.x, vertex.y, vertex.z );
 
 					}
 
@@ -130,38 +144,40 @@
 
 				// side 1
 
-				addGeo( geometry2, 0, 110, 110, 0 );
-				addGeo( geometry2, 0, 110, - 110, 0 );
-				addGeo( geometry2, 0, - 110, 110, 0 );
-				addGeo( geometry2, 0, - 110, - 110, 0 );
+				addGeo( boxGeometry1, 0, 110, 110, 0 );
+				addGeo( boxGeometry1, 0, 110, - 110, 0 );
+				addGeo( boxGeometry1, 0, - 110, 110, 0 );
+				addGeo( boxGeometry1, 0, - 110, - 110, 0 );
 
 				// side 2
 
-				addGeo( geometry2, 110, 110, 0, Math.PI / 2 );
-				addGeo( geometry2, 110, - 110, 0, Math.PI / 2 );
-				addGeo( geometry2, - 110, 110, 0, Math.PI / 2 );
-				addGeo( geometry2, - 110, - 110, 0, Math.PI / 2 );
+				addGeo( boxGeometry1, 110, 110, 0, Math.PI / 2 );
+				addGeo( boxGeometry1, 110, - 110, 0, Math.PI / 2 );
+				addGeo( boxGeometry1, - 110, 110, 0, Math.PI / 2 );
+				addGeo( boxGeometry1, - 110, - 110, 0, Math.PI / 2 );
 
 				// corner edges
 
-				var geometry3 = new THREE.BoxGeometry( 0.1 * radius, radius * 1.2, 0.1 * radius, 5, 60, 5 );
+				let boxGeometry2 = new THREE.BoxGeometry( 0.1 * radius, radius * 1.2, 0.1 * radius, 5, 60, 5 );
 
-				addGeo( geometry3, 110, 0, 110, 0 );
-				addGeo( geometry3, 110, 0, - 110, 0 );
-				addGeo( geometry3, - 110, 0, 110, 0 );
-				addGeo( geometry3, - 110, 0, - 110, 0 );
+				boxGeometry2.deleteAttribute( 'normal' );
+				boxGeometry2.deleteAttribute( 'uv' );
 
-				var positions = new Float32Array( vertices.length * 3 );
-				var colors = new Float32Array( vertices.length * 3 );
-				var sizes = new Float32Array( vertices.length );
+				boxGeometry2 = BufferGeometryUtils.mergeVertices( boxGeometry2 );
 
-				var vertex;
-				var color = new THREE.Color();
+				addGeo( boxGeometry2, 110, 0, 110, 0 );
+				addGeo( boxGeometry2, 110, 0, - 110, 0 );
+				addGeo( boxGeometry2, - 110, 0, 110, 0 );
+				addGeo( boxGeometry2, - 110, 0, - 110, 0 );
 
-				for ( var i = 0; i < vertices.length; i ++ ) {
+				const positionAttribute = new THREE.Float32BufferAttribute( vertices, 3 );
 
-					vertex = vertices[ i ];
-					vertex.toArray( positions, i * 3 );
+				const colors = [];
+				const sizes = [];
+
+				const color = new THREE.Color();
+
+				for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
 					if ( i < vertices1 ) {
 
@@ -179,18 +195,18 @@
 
 				}
 
-				var geometry = new THREE.BufferGeometry();
-				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.setAttribute( 'ca', new THREE.BufferAttribute( colors, 3 ) );
-				geometry.setAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'ca', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ) );
 
 				//
 
-				var texture = new THREE.TextureLoader().load( "textures/sprites/ball.png" );
+				const texture = new THREE.TextureLoader().load( 'textures/sprites/ball.png' );
 				texture.wrapS = THREE.RepeatWrapping;
 				texture.wrapT = THREE.RepeatWrapping;
 
-				var material = new THREE.ShaderMaterial( {
+				const material = new THREE.ShaderMaterial( {
 
 					uniforms: {
 						amplitude: { value: 1.0 },
@@ -213,7 +229,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -221,7 +237,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -245,14 +261,14 @@
 
 			function render() {
 
-				var time = Date.now() * 0.01;
+				const time = Date.now() * 0.01;
 
 				object.rotation.y = object.rotation.z = 0.02 * time;
 
-				var geometry = object.geometry;
-				var attributes = geometry.attributes;
+				const geometry = object.geometry;
+				const attributes = geometry.attributes;
 
-				for ( var i = 0; i < attributes.size.array.length; i ++ ) {
+				for ( let i = 0; i < attributes.size.array.length; i ++ ) {
 
 					if ( i < vertices1 ) {
 

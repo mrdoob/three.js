@@ -1,6 +1,3 @@
-/**
- * @author Don McCurdy / https://www.donmccurdy.com
- */
 /* global QUnit */
 
 import { BufferGeometryUtils } from '../../../../examples/jsm/utils/BufferGeometryUtils';

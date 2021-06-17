@@ -29,13 +29,14 @@
 
 			import { DragControls } from './jsm/controls/DragControls.js';
 
-			var container;
-			var camera, scene, renderer;
-			var controls, group;
-			var objects = [];
-			var enableSelection = false;
+			let container;
+			let camera, scene, renderer;
+			let controls, group;
+			let enableSelection = false;
 
-			var mouse = new THREE.Vector2(), raycaster = new THREE.Raycaster();
+			const objects = [];
+
+			const mouse = new THREE.Vector2(), raycaster = new THREE.Raycaster();
 
 			init();
 
@@ -52,7 +53,7 @@
 
 				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
-				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				const light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
 				light.angle = Math.PI / 9;
 
@@ -67,11 +68,11 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				var geometry = new THREE.BoxBufferGeometry( 40, 40, 40 );
+				const geometry = new THREE.BoxGeometry( 40, 40, 40 );
 
-				for ( var i = 0; i < 200; i ++ ) {
+				for ( let i = 0; i < 200; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 1000 - 500;
 					object.position.y = Math.random() * 600 - 300;
@@ -108,11 +109,11 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				document.addEventListener( 'click', onClick, false );
-				window.addEventListener( 'keydown', onKeyDown, false );
-				window.addEventListener( 'keyup', onKeyUp, false );
+				document.addEventListener( 'click', onClick );
+				window.addEventListener( 'keydown', onKeyDown );
+				window.addEventListener( 'keyup', onKeyUp );
 
 				render();
 
@@ -147,7 +148,7 @@
 
 				if ( enableSelection === true ) {
 
-					var draggableObjects = controls.getObjects();
+					const draggableObjects = controls.getObjects();
 					draggableObjects.length = 0;
 
 					mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -155,11 +156,11 @@
 
 					raycaster.setFromCamera( mouse, camera );
 
-					var intersections = raycaster.intersectObjects( objects, true );
+					const intersections = raycaster.intersectObjects( objects, true );
 
 					if ( intersections.length > 0 ) {
 
-						var object = intersections[ 0 ].object;
+						const object = intersections[ 0 ].object;
 
 						if ( group.children.includes( object ) === true ) {
 

@@ -1,19 +1,16 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { AnimationMixer } from '../../../../src/animation/AnimationMixer';
 import { AnimationClip } from '../../../../src/animation/AnimationClip';
 import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack';
-import { Object3D } from '../../../../src/core/Object3D'
+import { Object3D } from '../../../../src/core/Object3D';
 import {
 	zero3,
 	one3,
 	two3
 } from '../math/Constants.tests';
 
-function getClips(pos1, pos2, scale1, scale2, dur) {
+function getClips( pos1, pos2, scale1, scale2, dur ) {
 
 	const clips = [];
 
@@ -72,8 +69,8 @@ export default QUnit.module( 'Animation', () => {
 			animMixer.stopAllAction();
 
 			assert.ok(
-				!actionA.isRunning() &&
-				!actionB.isRunning(),
+				! actionA.isRunning() &&
+				! actionB.isRunning(),
 				"All actions stopped" );
 			assert.ok(
 				obj.position.x == 0 &&

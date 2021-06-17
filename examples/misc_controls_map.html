@@ -30,7 +30,7 @@
 
 			import { MapControls } from './jsm/controls/OrbitControls.js';
 
-			var camera, controls, scene, renderer;
+			let camera, controls, scene, renderer;
 
 			init();
 			//render(); // remove when using next line for animation loop (requestAnimationFrame)
@@ -68,13 +68,13 @@
 
 				// world
 
-				var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 				geometry.translate( 0, 0.5, 0 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+				const material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
-				for ( var i = 0; i < 500; i ++ ) {
+				for ( let i = 0; i < 500; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 1600 - 800;
 					mesh.position.y = 0;
 					mesh.position.z = Math.random() * 1600 - 800;
@@ -89,23 +89,23 @@
 
 				// lights
 
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 1, 1, 1 );
-				scene.add( light );
+				const dirLight1 = new THREE.DirectionalLight( 0xffffff );
+				dirLight1.position.set( 1, 1, 1 );
+				scene.add( dirLight1 );
 
-				var light = new THREE.DirectionalLight( 0x002288 );
-				light.position.set( - 1, - 1, - 1 );
-				scene.add( light );
+				const dirLight2 = new THREE.DirectionalLight( 0x002288 );
+				dirLight2.position.set( - 1, - 1, - 1 );
+				scene.add( dirLight2 );
 
-				var light = new THREE.AmbientLight( 0x222222 );
-				scene.add( light );
+				const ambientLight = new THREE.AmbientLight( 0x222222 );
+				scene.add( ambientLight );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 
-				var gui = new GUI();
+				const gui = new GUI();
 				gui.add( controls, 'screenSpacePanning' );
 
 			}

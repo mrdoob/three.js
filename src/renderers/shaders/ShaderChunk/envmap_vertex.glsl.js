@@ -9,7 +9,7 @@ export default /* glsl */`
 
 		vec3 cameraToVertex;
 
-		if ( isOrthographic ) { 
+		if ( isOrthographic ) {
 
 			cameraToVertex = normalize( vec3( - viewMatrix[ 0 ][ 2 ], - viewMatrix[ 1 ][ 2 ], - viewMatrix[ 2 ][ 2 ] ) );
 

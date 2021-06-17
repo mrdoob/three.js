@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,7 +21,7 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+		const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
 		scene.add( light );
 		</code>
 
@@ -51,12 +50,6 @@
 		<p>
 			See the base [page:Light Light] class for common properties.
 		</p>
-
-		<h3>[property:Boolean castShadow]</h3>
-		<p>
-			This is set to *undefined* in the constructor as hemisphere lights cannot cast shadows.
-		</p>
-
 
 		<h3>[property:Float color]</h3>
 		<p>

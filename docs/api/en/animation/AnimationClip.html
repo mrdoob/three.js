@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -83,6 +82,11 @@
 			[page:KeyframeTrack].
 		</p>
 
+		<h3>[method:Object toJSON]()</h3>
+		<p>
+			Returns a JSON object representing the serialized animation clip.
+		</p>
+
 		<h3>[method:this trim]()</h3>
 		<p>
 			Trims all tracks to the clip's duration.
@@ -99,15 +103,14 @@
 
 		<h3>[method:Array CreateClipsFromMorphTargetSequences]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
 		<p>
-			Returns an array of new AnimationClips created from the [page:Geometry.morphTargets morph
-			target sequences] of a geometry, trying to sort morph target names into animation-group-based
+			Returns an array of new AnimationClips created from the morph
+			target sequences of a geometry, trying to sort morph target names into animation-group-based
 			patterns like "Walk_001, Walk_002, Run_001, Run_002 ...".
 		</p>
 
 		<h3>[method:AnimationClip CreateFromMorphTargetSequence]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
 		<p>
-			Returns a new AnimationClip from the passed [page:Geometry.morphTargets morph targets array]
-			of a geometry, taking a name and the number of frames per second.<br /><br />
+			Returns a new AnimationClip from the passed morph targets array of a geometry, taking a name and the number of frames per second.<br /><br />
 
 			Note: The fps parameter is required, but the animation speed can be overridden in an
 			*AnimationAction* via [page:AnimationAction.setDuration animationAction.setDuration].

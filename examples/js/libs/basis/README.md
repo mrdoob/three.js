@@ -7,20 +7,26 @@ a wide variety of GPU texture compression formats.
 
 [GitHub](https://github.com/BinomialLLC/basis_universal)
 
-## Contents
+## Transcoders
 
-This folder contains two files:
+Basis Universal texture data may be used in two different file formats:
+`.basis` and `.ktx2`, where `ktx2` is a standardized wrapper around basis texture data.
+
+For further documentation about the Basis compressor and transcoder, refer to
+the [Basis GitHub repository](https://github.com/BinomialLLC/basis_universal).
+
+The folder contains two files required for transcoding `.basis` or `.ktx2` textures:
 
 * `basis_transcoder.js` — JavaScript wrapper for the WebAssembly transcoder.
 * `basis_transcoder.wasm` — WebAssembly transcoder.
 
-Both are dependencies of `THREE.BasisTextureLoader`:
+Both are dependencies of `THREE.KTX2Loader` and `THREE.BasisTextureLoader`:
 
 ```js
-var basisLoader = new THREE.BasisTextureLoader();
-basisLoader.setTranscoderPath( 'examples/js/libs/basis/' );
-basisLoader.detectSupport( renderer );
-basisLoader.load( 'diffuse.basis', function ( texture ) {
+var ktx2Loader = new THREE.KTX2Loader();
+ktx2Loader.setTranscoderPath( 'examples/js/libs/basis/' );
+ktx2Loader.detectSupport( renderer );
+ktx2Loader.load( 'diffuse.ktx2', function ( texture ) {
 
 	var material = new THREE.MeshStandardMaterial( { map: texture } );
 
@@ -34,9 +40,6 @@ basisLoader.load( 'diffuse.basis', function ( texture ) {
 
 } );
 ```
-
-For further documentation about the Basis compressor and transcoder, refer to
-the [Basis GitHub repository](https://github.com/BinomialLLC/basis_universal).
 
 ## License
 

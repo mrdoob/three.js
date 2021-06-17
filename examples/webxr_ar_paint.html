@@ -18,11 +18,11 @@
 			import { TubePainter } from './jsm/misc/TubePainter.js';
 			import { ARButton } from './jsm/webxr/ARButton.js';
 
-			var container;
-			var camera, scene, renderer;
-			var controller, painter;
+			let container;
+			let camera, scene, renderer;
+			let controller, painter;
 
-			var cursor = new THREE.Vector3();
+			const cursor = new THREE.Vector3();
 
 			init();
 			animate();
@@ -50,7 +50,7 @@
 
 				// model
 
-				var light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 1 );
+				const light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 1 );
 				light.position.set( 0, 1, 0 );
 				scene.add( light );
 
@@ -84,7 +84,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -101,7 +101,7 @@
 
 			function handleController( controller ) {
 
-				var userData = controller.userData;
+				const userData = controller.userData;
 
 				cursor.set( 0, 0, - 0.2 ).applyMatrix4( controller.matrixWorld );
 
