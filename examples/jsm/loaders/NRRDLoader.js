@@ -365,19 +365,22 @@ class NRRDLoader extends Loader {
 		volume.zLength = volume.dimensions[ 2 ];
 
 		// Identify axis order in the space-directions matrix from the header if possible.
-		if (headerObject.vectors) {
-			const xIndex = headerObject.vectors.findIndex(vector => vector[0] !== 0);
-			const yIndex = headerObject.vectors.findIndex(vector => vector[1] !== 0);
-			const zIndex = headerObject.vectors.findIndex(vector => vector[2] !== 0);
+		if ( headerObject.vectors ) {
+
+			const xIndex = headerObject.vectors.findIndex( vector => vector[ 0 ] !== 0 );
+			const yIndex = headerObject.vectors.findIndex( vector => vector[ 1 ] !== 0 );
+			const zIndex = headerObject.vectors.findIndex( vector => vector[ 2 ] !== 0 );
 
 			const axisOrder = [];
-			axisOrder[xIndex] = 'x';
-			axisOrder[yIndex] = 'y';
-			axisOrder[zIndex] = 'z';
+			axisOrder[ xIndex ] = 'x';
+			axisOrder[ yIndex ] = 'y';
+			axisOrder[ zIndex ] = 'z';
 			volume.axisOrder = axisOrder;
-		}
-		else {
-			volume.axisOrder = ['x', 'y', 'z'];
+
+		} else {
+
+			volume.axisOrder = [ 'x', 'y', 'z' ];
+
 		}
 
 		// spacing
@@ -396,17 +399,19 @@ class NRRDLoader extends Loader {
 
 			transitionMatrix.set(
 				- 1, 0, 0, 0,
-				0, -1, 0, 0,
+				0, - 1, 0, 0,
 				0, 0, 1, 0,
-				0, 0, 0, 1 );
+				0, 0, 0, 1
+			);
 
 		} else if ( headerObject.space === 'left-anterior-superior' ) {
 
 			transitionMatrix.set(
 				1, 0, 0, 0,
 				0, 1, 0, 0,
-				0, 0, -1, 0,
-				0, 0, 0, 1 );
+				0, 0, - 1, 0,
+				0, 0, 0, 1
+			);
 
 		}
 
@@ -423,14 +428,14 @@ class NRRDLoader extends Loader {
 
 			const v = headerObject.vectors;
 
-			const ijk_to_transition = ( new Matrix4() ).set(
+			const ijk_to_transition = new Matrix4().set(
 				v[ 0 ][ 0 ], v[ 1 ][ 0 ], v[ 2 ][ 0 ], 0,
 				v[ 0 ][ 1 ], v[ 1 ][ 1 ], v[ 2 ][ 1 ], 0,
 				v[ 0 ][ 2 ], v[ 1 ][ 2 ], v[ 2 ][ 2 ], 0,
 				0, 0, 0, 1
-			)
+			);
 
-			const transition_to_ras = (new Matrix4()).multiplyMatrices( ijk_to_transition, transitionMatrix );
+			const transition_to_ras = new Matrix4().multiplyMatrices( ijk_to_transition, transitionMatrix );
 
 			volume.matrix = transition_to_ras;
 
@@ -438,7 +443,7 @@ class NRRDLoader extends Loader {
 
 		volume.inverseMatrix = new Matrix4();
 		volume.inverseMatrix.copy( volume.matrix ).invert();
-		volume.RASDimensions = ( new Vector3( volume.xLength, volume.yLength, volume.zLength ) ).applyMatrix4( volume.matrix ).round().toArray().map( Math.abs );
+		volume.RASDimensions = new Vector3( volume.xLength, volume.yLength, volume.zLength ).applyMatrix4( volume.matrix ).round().toArray().map( Math.abs );
 
 		// .. and set the default threshold
 		// only if the threshold was not already set

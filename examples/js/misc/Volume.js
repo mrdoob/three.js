@@ -13,7 +13,7 @@
  * @param   {ArrayBuffer}   arrayBuffer     The buffer with volume data
  */
 
-	var Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
+	function Volume( xLength, yLength, zLength, type, arrayBuffer ) {
 
 		if ( arguments.length > 0 ) {
 
@@ -31,13 +31,11 @@
      */
 
 			this.zLength = Number( zLength ) || 1;
-
 			/**
-			 * @member {Array<string>} The order of the Axis dictated by the NRRD header
-			 */
+     * @member {Array<string>} The order of the Axis dictated by the NRRD header
+     */
 
 			this.axisOrder = [ 'x', 'y', 'z' ];
-
 			/**
      * @member {TypedArray} data Data of the volume
      */
@@ -209,7 +207,7 @@
    * @member {Array} RASDimensions This array holds the dimensions of the volume in the RAS space
    */
 
-	};
+	}
 
 	Volume.prototype = {
 		constructor: Volume,
@@ -313,8 +311,8 @@
 					axisInIJK.set( 1, 0, 0 );
 					firstDirection.set( 0, 0, - 1 );
 					secondDirection.set( 0, - 1, 0 );
-					firstSpacing = this.spacing[ this.axisOrder.indexOf('z') ];
-					secondSpacing = this.spacing[ this.axisOrder.indexOf('y') ];
+					firstSpacing = this.spacing[ this.axisOrder.indexOf( 'z' ) ];
+					secondSpacing = this.spacing[ this.axisOrder.indexOf( 'y' ) ];
 					IJKIndex = new THREE.Vector3( RASIndex, 0, 0 );
 					planeMatrix.multiply( new THREE.Matrix4().makeRotationY( Math.PI / 2 ) );
 					positionOffset = ( volume.RASDimensions[ 0 ] - 1 ) / 2;
@@ -325,8 +323,8 @@
 					axisInIJK.set( 0, 1, 0 );
 					firstDirection.set( 1, 0, 0 );
 					secondDirection.set( 0, 0, 1 );
-					firstSpacing = this.spacing[ this.axisOrder.indexOf('x') ];
-					secondSpacing = this.spacing[ this.axisOrder.indexOf('z') ];
+					firstSpacing = this.spacing[ this.axisOrder.indexOf( 'x' ) ];
+					secondSpacing = this.spacing[ this.axisOrder.indexOf( 'z' ) ];
 					IJKIndex = new THREE.Vector3( 0, RASIndex, 0 );
 					planeMatrix.multiply( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 					positionOffset = ( volume.RASDimensions[ 1 ] - 1 ) / 2;
@@ -338,8 +336,8 @@
 					axisInIJK.set( 0, 0, 1 );
 					firstDirection.set( 1, 0, 0 );
 					secondDirection.set( 0, - 1, 0 );
-					firstSpacing = this.spacing[ this.axisOrder.indexOf('x') ];
-					secondSpacing = this.spacing[ this.axisOrder.indexOf('y') ];
+					firstSpacing = this.spacing[ this.axisOrder.indexOf( 'x' ) ];
+					secondSpacing = this.spacing[ this.axisOrder.indexOf( 'y' ) ];
 					IJKIndex = new THREE.Vector3( 0, 0, RASIndex );
 					positionOffset = ( volume.RASDimensions[ 2 ] - 1 ) / 2;
 					planeMatrix.setPosition( new THREE.Vector3( 0, 0, RASIndex - positionOffset ) );
