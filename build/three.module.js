@@ -28452,21 +28452,21 @@ class DodecahedronGeometry extends PolyhedronGeometry {
 
 		const vertices = [
 
-			// (Â±1, Â±1, Â±1)
+			// (±1, ±1, ±1)
 			- 1, - 1, - 1,	- 1, - 1, 1,
 			- 1, 1, - 1, - 1, 1, 1,
 			1, - 1, - 1, 1, - 1, 1,
 			1, 1, - 1, 1, 1, 1,
 
-			// (0, Â±1/Ï†, Â±Ï†)
+			// (0, ±1/φ, ±φ)
 			0, - r, - t, 0, - r, t,
 			0, r, - t, 0, r, t,
 
-			// (Â±1/Ï†, Â±Ï†, 0)
+			// (±1/φ, ±φ, 0)
 			- r, - t, 0, - r, t, 0,
 			r, - t, 0, r, t, 0,
 
-			// (Â±Ï†, 0, Â±1/Ï†)
+			// (±φ, 0, ±1/φ)
 			- t, 0, - r, t, 0, - r,
 			- t, 0, r, t, 0, r
 		];
@@ -36325,7 +36325,7 @@ CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
 
 /**
  * Bezier Curves formulas obtained from
- * http://en.wikipedia.org/wiki/BÃ©zier_curve
+ * http://en.wikipedia.org/wiki/Bézier_curve
  */
 
 function CatmullRom( t, p0, p1, p2, p3 ) {
@@ -38278,19 +38278,19 @@ class SphericalHarmonics3 {
 		const coeff = this.coefficients;
 
 		// band 0
-		target.copy( coeff[ 0 ] ).multiplyScalar( 0.886227 ); // Ï€ * 0.282095
+		target.copy( coeff[ 0 ] ).multiplyScalar( 0.886227 ); // π * 0.282095
 
 		// band 1
-		target.addScaledVector( coeff[ 1 ], 2.0 * 0.511664 * y ); // ( 2 * Ï€ / 3 ) * 0.488603
+		target.addScaledVector( coeff[ 1 ], 2.0 * 0.511664 * y ); // ( 2 * π / 3 ) * 0.488603
 		target.addScaledVector( coeff[ 2 ], 2.0 * 0.511664 * z );
 		target.addScaledVector( coeff[ 3 ], 2.0 * 0.511664 * x );
 
 		// band 2
-		target.addScaledVector( coeff[ 4 ], 2.0 * 0.429043 * x * y ); // ( Ï€ / 4 ) * 1.092548
+		target.addScaledVector( coeff[ 4 ], 2.0 * 0.429043 * x * y ); // ( π / 4 ) * 1.092548
 		target.addScaledVector( coeff[ 5 ], 2.0 * 0.429043 * y * z );
-		target.addScaledVector( coeff[ 6 ], 0.743125 * z * z - 0.247708 ); // ( Ï€ / 4 ) * 0.315392 * 3
+		target.addScaledVector( coeff[ 6 ], 0.743125 * z * z - 0.247708 ); // ( π / 4 ) * 0.315392 * 3
 		target.addScaledVector( coeff[ 7 ], 2.0 * 0.429043 * x * z );
-		target.addScaledVector( coeff[ 8 ], 0.429043 * ( x * x - y * y ) ); // ( Ï€ / 4 ) * 0.546274
+		target.addScaledVector( coeff[ 8 ], 0.429043 * ( x * x - y * y ) ); // ( π / 4 ) * 0.546274
 
 		return target;
 

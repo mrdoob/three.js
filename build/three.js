@@ -20827,10 +20827,10 @@
 		constructor(radius = 1, detail = 0) {
 			const t = (1 + Math.sqrt(5)) / 2;
 			const r = 1 / t;
-			const vertices = [// (Â±1, Â±1, Â±1)
-			-1, -1, -1, -1, -1, 1, -1, 1, -1, -1, 1, 1, 1, -1, -1, 1, -1, 1, 1, 1, -1, 1, 1, 1, // (0, Â±1/Ï†, Â±Ï†)
-			0, -r, -t, 0, -r, t, 0, r, -t, 0, r, t, // (Â±1/Ï†, Â±Ï†, 0)
-			-r, -t, 0, -r, t, 0, r, -t, 0, r, t, 0, // (Â±Ï†, 0, Â±1/Ï†)
+			const vertices = [// (±1, ±1, ±1)
+			-1, -1, -1, -1, -1, 1, -1, 1, -1, -1, 1, 1, 1, -1, -1, 1, -1, 1, 1, 1, -1, 1, 1, 1, // (0, ±1/φ, ±φ)
+			0, -r, -t, 0, -r, t, 0, r, -t, 0, r, t, // (±1/φ, ±φ, 0)
+			-r, -t, 0, -r, t, 0, r, -t, 0, r, t, 0, // (±φ, 0, ±1/φ)
 			-t, 0, -r, t, 0, -r, -t, 0, r, t, 0, r];
 			const indices = [3, 11, 7, 3, 7, 15, 3, 15, 13, 7, 19, 17, 7, 17, 6, 7, 6, 15, 17, 4, 8, 17, 8, 10, 17, 10, 6, 8, 0, 16, 8, 16, 2, 8, 2, 10, 0, 12, 1, 0, 1, 18, 0, 18, 16, 6, 10, 2, 6, 2, 13, 6, 13, 15, 2, 16, 18, 2, 18, 3, 2, 3, 13, 18, 1, 9, 18, 9, 11, 18, 11, 3, 4, 14, 12, 4, 12, 0, 4, 0, 8, 11, 9, 5, 11, 5, 19, 11, 19, 7, 19, 5, 14, 19, 14, 4, 19, 4, 17, 1, 12, 14, 1, 14, 5, 1, 5, 9];
 			super(vertices, indices, radius, detail);
@@ -26378,7 +26378,7 @@
 
 	/**
 	 * Bezier Curves formulas obtained from
-	 * http://en.wikipedia.org/wiki/BÃ©zier_curve
+	 * http://en.wikipedia.org/wiki/Bézier_curve
 	 */
 	function CatmullRom(t, p0, p1, p2, p3) {
 		const v0 = (p2 - p0) * 0.5;
@@ -27726,21 +27726,21 @@
 						z = normal.z;
 			const coeff = this.coefficients; // band 0
 
-			target.copy(coeff[0]).multiplyScalar(0.886227); // Ï€ * 0.282095
+			target.copy(coeff[0]).multiplyScalar(0.886227); // π * 0.282095
 			// band 1
 
-			target.addScaledVector(coeff[1], 2.0 * 0.511664 * y); // ( 2 * Ï€ / 3 ) * 0.488603
+			target.addScaledVector(coeff[1], 2.0 * 0.511664 * y); // ( 2 * π / 3 ) * 0.488603
 
 			target.addScaledVector(coeff[2], 2.0 * 0.511664 * z);
 			target.addScaledVector(coeff[3], 2.0 * 0.511664 * x); // band 2
 
-			target.addScaledVector(coeff[4], 2.0 * 0.429043 * x * y); // ( Ï€ / 4 ) * 1.092548
+			target.addScaledVector(coeff[4], 2.0 * 0.429043 * x * y); // ( π / 4 ) * 1.092548
 
 			target.addScaledVector(coeff[5], 2.0 * 0.429043 * y * z);
-			target.addScaledVector(coeff[6], 0.743125 * z * z - 0.247708); // ( Ï€ / 4 ) * 0.315392 * 3
+			target.addScaledVector(coeff[6], 0.743125 * z * z - 0.247708); // ( π / 4 ) * 0.315392 * 3
 
 			target.addScaledVector(coeff[7], 2.0 * 0.429043 * x * z);
-			target.addScaledVector(coeff[8], 0.429043 * (x * x - y * y)); // ( Ï€ / 4 ) * 0.546274
+			target.addScaledVector(coeff[8], 0.429043 * (x * x - y * y)); // ( π / 4 ) * 0.546274
 
 			return target;
 		}
