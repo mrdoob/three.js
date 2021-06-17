@@ -235,6 +235,18 @@ function WebGLRenderList( properties ) {
 		if ( transmissive.length > 1 ) transmissive.sort( customTransparentSort || reversePainterSortStable );
 		if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
 
+		// sort all individual render groups
+		for ( let i = 0; i < renderGroupItemIndex; i ++ ) {
+
+			const group = renderGroupItems[ i ];
+			const opaqueGroup = group.opaque;
+			const transparentGroup = group.transparent;
+
+			if ( opaqueGroup.length > 1 ) opaqueGroup.sort( customOpaqueSort || painterSortStable );
+			if ( transparentGroup.length > 1 ) transparentGroup.sort( customTransparentSort || reversePainterSortStable );
+
+		}
+
 	}
 
 	function finish() {
