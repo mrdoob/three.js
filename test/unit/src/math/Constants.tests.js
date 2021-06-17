@@ -1,7 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- */
-
 import { Vector2 } from '../../../../src/math/Vector2';
 import { Vector3 } from '../../../../src/math/Vector3';
 

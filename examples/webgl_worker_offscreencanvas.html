@@ -71,12 +71,12 @@
 
 			// onscreen
 
-			var canvas1 = document.getElementById( 'canvas1' );
-			var canvas2 = document.getElementById( 'canvas2' );
+			const canvas1 = document.getElementById( 'canvas1' );
+			const canvas2 = document.getElementById( 'canvas2' );
 
-			var width = canvas1.clientWidth;
-			var height = canvas1.clientHeight;
-			var pixelRatio = window.devicePixelRatio;
+			const width = canvas1.clientWidth;
+			const height = canvas1.clientHeight;
+			const pixelRatio = window.devicePixelRatio;
 
 			init( canvas1, width, height, pixelRatio, './' );
 			initJank();
@@ -85,8 +85,8 @@
 
 			if ( 'transferControlToOffscreen' in canvas2 ) {
 
-				var offscreen = canvas2.transferControlToOffscreen();
-				var worker = new Worker( 'jsm/offscreen/offscreen.js', { type: 'module' } );
+				const offscreen = canvas2.transferControlToOffscreen();
+				const worker = new Worker( 'jsm/offscreen/offscreen.js', { type: 'module' } );
 				worker.postMessage( {
 					drawingSurface: offscreen,
 					width: canvas2.clientWidth,

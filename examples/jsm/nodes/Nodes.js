@@ -56,8 +56,10 @@ export { CondNode } from './math/CondNode.js';
 
 // procedural
 
-export { NoiseNode } from './procedural/NoiseNode.js';
+export { Noise2DNode } from './procedural/Noise2DNode.js';
+export { Noise3DNode } from './procedural/Noise3DNode.js';
 export { CheckerNode } from './procedural/CheckerNode.js';
+export { Fractal3DNode } from './procedural/Fractal3DNode.js';
 
 // misc
 
@@ -71,6 +73,7 @@ export { BumpMapNode } from './misc/BumpMapNode.js';
 export { BypassNode } from './utils/BypassNode.js';
 export { JoinNode } from './utils/JoinNode.js';
 export { SwitchNode } from './utils/SwitchNode.js';
+export { RemapNode } from './utils/RemapNode.js';
 export { TimerNode } from './utils/TimerNode.js';
 export { VelocityNode } from './utils/VelocityNode.js';
 export { UVTransformNode } from './utils/UVTransformNode.js';
@@ -88,6 +91,7 @@ export { LuminanceNode } from './effects/LuminanceNode.js';
 // material nodes
 
 export { RawNode } from './materials/nodes/RawNode.js';
+export { BasicNode } from './materials/nodes/BasicNode.js';
 export { SpriteNode } from './materials/nodes/SpriteNode.js';
 export { PhongNode } from './materials/nodes/PhongNode.js';
 export { StandardNode } from './materials/nodes/StandardNode.js';
@@ -96,6 +100,7 @@ export { MeshStandardNode } from './materials/nodes/MeshStandardNode.js';
 // materials
 
 export { NodeMaterial } from './materials/NodeMaterial.js';
+export { BasicNodeMaterial } from './materials/BasicNodeMaterial.js';
 export { SpriteNodeMaterial } from './materials/SpriteNodeMaterial.js';
 export { PhongNodeMaterial } from './materials/PhongNodeMaterial.js';
 export { StandardNodeMaterial } from './materials/StandardNodeMaterial.js';

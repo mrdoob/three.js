@@ -21,15 +21,15 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { LightProbeGenerator } from './jsm/lights/LightProbeGenerator.js';
 
-			var mesh, renderer, scene, camera;
+			let mesh, renderer, scene, camera;
 
-			var gui;
+			let gui;
 
-			var lightProbe;
-			var directionalLight;
+			let lightProbe;
+			let directionalLight;
 
 			// linear color space
-			var API = {
+			const API = {
 				lightProbeIntensity: 1.0,
 				directionalLightIntensity: 0.2,
 				envMapIntensity: 1
@@ -58,7 +58,7 @@
 				camera.position.set( 0, 0, 30 );
 
 				// controls
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 10;
 				controls.maxDistance = 50;
@@ -74,7 +74,7 @@
 				scene.add( directionalLight );
 
 				// envmap
-				var genCubeUrls = function ( prefix, postfix ) {
+				const genCubeUrls = function ( prefix, postfix ) {
 
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
@@ -84,7 +84,7 @@
 
 				};
 
-				var urls = genCubeUrls( 'textures/cube/pisa/', '.png' );
+				const urls = genCubeUrls( 'textures/cube/pisa/', '.png' );
 
 				new THREE.CubeTextureLoader().load( urls, function ( cubeTexture ) {
 
@@ -94,10 +94,10 @@
 
 					lightProbe.copy( LightProbeGenerator.fromCubeTexture( cubeTexture ) );
 
-					var geometry = new THREE.SphereBufferGeometry( 5, 64, 32 );
-					//var geometry = new TorusKnotBufferGeometry( 4, 1.5, 256, 32, 2, 3 );
+					const geometry = new THREE.SphereGeometry( 5, 64, 32 );
+					//const geometry = new THREE.TorusKnotGeometry( 4, 1.5, 256, 32, 2, 3 );
 
-					var material = new THREE.MeshStandardMaterial( {
+					const material = new THREE.MeshStandardMaterial( {
 						color: 0xffffff,
 						metalness: 0,
 						roughness: 0,
@@ -121,7 +121,7 @@
 
 				gui.domElement.style.userSelect = 'none';
 
-				var fl = gui.addFolder( 'Intensity' );
+				const fl = gui.addFolder( 'Intensity' );
 
 				fl.add( API, 'lightProbeIntensity', 0, 1, 0.02 )
 					.name( 'light probe' )
@@ -150,7 +150,7 @@
 				fl.open();
 
 				// listener
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

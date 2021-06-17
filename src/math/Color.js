@@ -1,8 +1,4 @@
-import { MathUtils } from './MathUtils.js';
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import * as MathUtils from './MathUtils.js';
 
 const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 	'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
@@ -32,19 +28,6 @@ const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua'
 const _hslA = { h: 0, s: 0, l: 0 };
 const _hslB = { h: 0, s: 0, l: 0 };
 
-function Color( r, g, b ) {
-
-	if ( g === undefined && b === undefined ) {
-
-		// r is THREE.Color, hex or string
-		return this.set( r );
-
-	}
-
-	return this.setRGB( r, g, b );
-
-}
-
 function hue2rgb( p, q, t ) {
 
 	if ( t < 0 ) t += 1;
@@ -68,13 +51,22 @@ function LinearToSRGB( c ) {
 
 }
 
-Object.assign( Color.prototype, {
+class Color {
 
-	isColor: true,
+	constructor( r, g, b ) {
 
-	r: 1, g: 1, b: 1,
+		if ( g === undefined && b === undefined ) {
 
-	set: function ( value ) {
+			// r is THREE.Color, hex or string
+			return this.set( r );
+
+		}
+
+		return this.setRGB( r, g, b );
+
+	}
+
+	set( value ) {
 
 		if ( value && value.isColor ) {
 
@@ -92,9 +84,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setScalar: function ( scalar ) {
+	setScalar( scalar ) {
 
 		this.r = scalar;
 		this.g = scalar;
@@ -102,9 +94,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setHex: function ( hex ) {
+	setHex( hex ) {
 
 		hex = Math.floor( hex );
 
@@ -114,9 +106,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setRGB: function ( r, g, b ) {
+	setRGB( r, g, b ) {
 
 		this.r = r;
 		this.g = g;
@@ -124,9 +116,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setHSL: function ( h, s, l ) {
+	setHSL( h, s, l ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 		h = MathUtils.euclideanModulo( h, 1 );
@@ -150,9 +142,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setStyle: function ( style ) {
+	setStyle( style ) {
 
 		function handleAlpha( string ) {
 
@@ -169,7 +161,7 @@ Object.assign( Color.prototype, {
 
 		let m;
 
-		if ( m = /^((?:rgb|hsl)a?)\(\s*([^\)]*)\)/.exec( style ) ) {
+		if ( m = /^((?:rgb|hsl)a?)\(([^\)]*)\)/.exec( style ) ) {
 
 			// rgb / hsl
 
@@ -182,27 +174,27 @@ Object.assign( Color.prototype, {
 				case 'rgb':
 				case 'rgba':
 
-					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(,\s*([0-9]*\.?[0-9]+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// rgb(255,0,0) rgba(255,0,0,0.5)
 						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
 						this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
 						this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
 
-						handleAlpha( color[ 5 ] );
+						handleAlpha( color[ 4 ] );
 
 						return this;
 
 					}
 
-					if ( color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(,\s*([0-9]*\.?[0-9]+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
 						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
 						this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
 						this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
 
-						handleAlpha( color[ 5 ] );
+						handleAlpha( color[ 4 ] );
 
 						return this;
 
@@ -213,14 +205,14 @@ Object.assign( Color.prototype, {
 				case 'hsl':
 				case 'hsla':
 
-					if ( color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(,\s*([0-9]*\.?[0-9]+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
 						const h = parseFloat( color[ 1 ] ) / 360;
 						const s = parseInt( color[ 2 ], 10 ) / 100;
 						const l = parseInt( color[ 3 ], 10 ) / 100;
 
-						handleAlpha( color[ 5 ] );
+						handleAlpha( color[ 4 ] );
 
 						return this.setHSL( h, s, l );
 
@@ -230,7 +222,7 @@ Object.assign( Color.prototype, {
 
 			}
 
-		} else if ( m = /^\#([A-Fa-f0-9]+)$/.exec( style ) ) {
+		} else if ( m = /^\#([A-Fa-f\d]+)$/.exec( style ) ) {
 
 			// hex color
 
@@ -267,12 +259,12 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setColorName: function ( style ) {
+	setColorName( style ) {
 
 		// color keywords
-		const hex = _colorKeywords[ style ];
+		const hex = _colorKeywords[ style.toLowerCase() ];
 
 		if ( hex !== undefined ) {
 
@@ -288,15 +280,15 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor( this.r, this.g, this.b );
 
-	},
+	}
 
-	copy: function ( color ) {
+	copy( color ) {
 
 		this.r = color.r;
 		this.g = color.g;
@@ -304,11 +296,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyGammaToLinear: function ( color, gammaFactor ) {
-
-		if ( gammaFactor === undefined ) gammaFactor = 2.0;
+	copyGammaToLinear( color, gammaFactor = 2.0 ) {
 
 		this.r = Math.pow( color.r, gammaFactor );
 		this.g = Math.pow( color.g, gammaFactor );
@@ -316,11 +306,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyLinearToGamma: function ( color, gammaFactor ) {
-
-		if ( gammaFactor === undefined ) gammaFactor = 2.0;
+	copyLinearToGamma( color, gammaFactor = 2.0 ) {
 
 		const safeInverse = ( gammaFactor > 0 ) ? ( 1.0 / gammaFactor ) : 1.0;
 
@@ -330,25 +318,25 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	convertGammaToLinear: function ( gammaFactor ) {
+	convertGammaToLinear( gammaFactor ) {
 
 		this.copyGammaToLinear( this, gammaFactor );
 
 		return this;
 
-	},
+	}
 
-	convertLinearToGamma: function ( gammaFactor ) {
+	convertLinearToGamma( gammaFactor ) {
 
 		this.copyLinearToGamma( this, gammaFactor );
 
 		return this;
 
-	},
+	}
 
-	copySRGBToLinear: function ( color ) {
+	copySRGBToLinear( color ) {
 
 		this.r = SRGBToLinear( color.r );
 		this.g = SRGBToLinear( color.g );
@@ -356,9 +344,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyLinearToSRGB: function ( color ) {
+	copyLinearToSRGB( color ) {
 
 		this.r = LinearToSRGB( color.r );
 		this.g = LinearToSRGB( color.g );
@@ -366,37 +354,37 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	convertSRGBToLinear: function () {
+	convertSRGBToLinear() {
 
 		this.copySRGBToLinear( this );
 
 		return this;
 
-	},
+	}
 
-	convertLinearToSRGB: function () {
+	convertLinearToSRGB() {
 
 		this.copyLinearToSRGB( this );
 
 		return this;
 
-	},
+	}
 
-	getHex: function () {
+	getHex() {
 
 		return ( this.r * 255 ) << 16 ^ ( this.g * 255 ) << 8 ^ ( this.b * 255 ) << 0;
 
-	},
+	}
 
-	getHexString: function () {
+	getHexString() {
 
 		return ( '000000' + this.getHex().toString( 16 ) ).slice( - 6 );
 
-	},
+	}
 
-	getHSL: function ( target ) {
+	getHSL( target ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
@@ -444,15 +432,15 @@ Object.assign( Color.prototype, {
 
 		return target;
 
-	},
+	}
 
-	getStyle: function () {
+	getStyle() {
 
 		return 'rgb(' + ( ( this.r * 255 ) | 0 ) + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
 
-	},
+	}
 
-	offsetHSL: function ( h, s, l ) {
+	offsetHSL( h, s, l ) {
 
 		this.getHSL( _hslA );
 
@@ -462,9 +450,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	add: function ( color ) {
+	add( color ) {
 
 		this.r += color.r;
 		this.g += color.g;
@@ -472,9 +460,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	addColors: function ( color1, color2 ) {
+	addColors( color1, color2 ) {
 
 		this.r = color1.r + color2.r;
 		this.g = color1.g + color2.g;
@@ -482,9 +470,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	addScalar: function ( s ) {
+	addScalar( s ) {
 
 		this.r += s;
 		this.g += s;
@@ -492,9 +480,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	sub: function ( color ) {
+	sub( color ) {
 
 		this.r = Math.max( 0, this.r - color.r );
 		this.g = Math.max( 0, this.g - color.g );
@@ -502,9 +490,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiply: function ( color ) {
+	multiply( color ) {
 
 		this.r *= color.r;
 		this.g *= color.g;
@@ -512,9 +500,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiplyScalar: function ( s ) {
+	multiplyScalar( s ) {
 
 		this.r *= s;
 		this.g *= s;
@@ -522,9 +510,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	lerp: function ( color, alpha ) {
+	lerp( color, alpha ) {
 
 		this.r += ( color.r - this.r ) * alpha;
 		this.g += ( color.g - this.g ) * alpha;
@@ -532,9 +520,19 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	lerpHSL: function ( color, alpha ) {
+	lerpColors( color1, color2, alpha ) {
+
+		this.r = color1.r + ( color2.r - color1.r ) * alpha;
+		this.g = color1.g + ( color2.g - color1.g ) * alpha;
+		this.b = color1.b + ( color2.b - color1.b ) * alpha;
+
+		return this;
+
+	}
+
+	lerpHSL( color, alpha ) {
 
 		this.getHSL( _hslA );
 		color.getHSL( _hslB );
@@ -547,17 +545,15 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	equals: function ( c ) {
+	equals( c ) {
 
 		return ( c.r === this.r ) && ( c.g === this.g ) && ( c.b === this.b );
 
-	},
+	}
 
-	fromArray: function ( array, offset ) {
-
-		if ( offset === undefined ) offset = 0;
+	fromArray( array, offset = 0 ) {
 
 		this.r = array[ offset ];
 		this.g = array[ offset + 1 ];
@@ -565,12 +561,9 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toArray: function ( array, offset ) {
-
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+	toArray( array = [], offset = 0 ) {
 
 		array[ offset ] = this.r;
 		array[ offset + 1 ] = this.g;
@@ -578,9 +571,9 @@ Object.assign( Color.prototype, {
 
 		return array;
 
-	},
+	}
 
-	fromBufferAttribute: function ( attribute, index ) {
+	fromBufferAttribute( attribute, index ) {
 
 		this.r = attribute.getX( index );
 		this.g = attribute.getY( index );
@@ -598,16 +591,21 @@ Object.assign( Color.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		return this.getHex();
 
 	}
 
-} );
+}
 
 Color.NAMES = _colorKeywords;
+
+Color.prototype.isColor = true;
+Color.prototype.r = 1;
+Color.prototype.g = 1;
+Color.prototype.b = 1;
 
 export { Color };

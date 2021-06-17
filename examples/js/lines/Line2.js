@@ -1,24 +1,20 @@
-console.warn( "THREE.Line2: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
+( function () {
 
-THREE.Line2 = function ( geometry, material ) {
+	class Line2 extends THREE.LineSegments2 {
 
-	THREE.LineSegments2.call( this );
+		constructor( geometry = new THREE.LineGeometry(), material = new THREE.LineMaterial( {
+			color: Math.random() * 0xffffff
+		} ) ) {
 
-	this.type = 'Line2';
+			super( geometry, material );
+			this.type = 'Line2';
 
-	this.geometry = geometry !== undefined ? geometry : new THREE.LineGeometry();
-	this.material = material !== undefined ? material : new THREE.LineMaterial( { color: Math.random() * 0xffffff } );
+		}
 
-};
+	}
 
-THREE.Line2.prototype = Object.assign( Object.create( THREE.LineSegments2.prototype ), {
+	Line2.prototype.isLine2 = true;
 
-	constructor: THREE.Line2,
+	THREE.Line2 = Line2;
 
-	isLine2: true
-
-} );
+} )();

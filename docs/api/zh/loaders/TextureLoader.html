@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -20,17 +19,17 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var texture = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
+		const texture = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
 
 		// 立即使用纹理进行材质创建
-		var material = new THREE.MeshBasicMaterial( { map: texture } );
+		const material = new THREE.MeshBasicMaterial( { map: texture } );
 		</code>
 
 		<h2>Code Example with Callbacks</h2>
 
 		<code>
 		// 初始化一个加载器
-		var loader = new THREE.TextureLoader();
+		const loader = new THREE.TextureLoader();
 
 		// 加载一个资源
 		loader.load(
@@ -40,7 +39,7 @@
 			// onLoad回调
 			function ( texture ) {
 				// in this example we create the material when the texture is loaded
-				var material = new THREE.MeshBasicMaterial( {
+				const material = new THREE.MeshBasicMaterial( {
 					map: texture
 				 } );
 			},

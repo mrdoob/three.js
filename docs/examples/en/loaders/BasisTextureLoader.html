@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -32,12 +31,12 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var basisLoader = new BasisTextureLoader();
+		const basisLoader = new BasisTextureLoader();
 		basisLoader.setTranscoderPath( 'examples/js/libs/basis/' );
 		basisLoader.detectSupport( renderer );
 		basisLoader.load( 'diffuse.basis', function ( texture ) {
 
-			var material = new THREE.MeshStandardMaterial( { map: texture } );
+			const material = new THREE.MeshStandardMaterial( { map: texture } );
 
 		}, function () {
 

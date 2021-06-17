@@ -20,9 +20,9 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var camera, scene, renderer, clock, stats;
-			var dirLight, spotLight;
-			var torusKnot, dirGroup;
+			let camera, scene, renderer, clock, stats;
+			let dirLight, spotLight;
+			let torusKnot, dirGroup;
 
 			init();
 			animate();
@@ -31,11 +31,11 @@
 
 				initScene();
 				initMisc();
-				
-				// Init gui
-				var gui = new GUI();
 
-				var config = {
+				// Init gui
+				const gui = new GUI();
+
+				const config = {
 					'Spotlight Radius': 4,
 					'Directional light Radius': 4,
 				};
@@ -53,7 +53,7 @@
 				} );
 
 				document.body.appendChild( renderer.domElement );
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -79,7 +79,7 @@
 				spotLight.shadow.camera.far = 200;
 				spotLight.shadow.mapSize.width = 256;
 				spotLight.shadow.mapSize.height = 256;
-				spotLight.shadow.bias = -0.002;
+				spotLight.shadow.bias = - 0.002;
 				spotLight.shadow.radius = 4;
 				scene.add( spotLight );
 
@@ -97,7 +97,7 @@
 				dirLight.shadow.mapSize.width = 512;
 				dirLight.shadow.mapSize.height = 512;
 				dirLight.shadow.radius = 4;
-				dirLight.shadow.bias = -0.0005;
+				dirLight.shadow.bias = - 0.0005;
 				scene.add( dirLight );
 
 				dirGroup = new THREE.Group();
@@ -106,8 +106,8 @@
 
 				// Geometry
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 25, 8, 75, 20 );
-				var material = new THREE.MeshPhongMaterial( {
+				const geometry = new THREE.TorusKnotGeometry( 25, 8, 75, 20 );
+				const material = new THREE.MeshPhongMaterial( {
 					color: 0x999999,
 					shininess: 0,
 					specular: 0x222222
@@ -120,34 +120,34 @@
 				torusKnot.receiveShadow = true;
 				scene.add( torusKnot );
 
-				var geometry = new THREE.CylinderBufferGeometry( 0.75, 0.75, 7, 32 );
+				const cylinderGeometry = new THREE.CylinderGeometry( 0.75, 0.75, 7, 32 );
 
-				var pillar1 = new THREE.Mesh( geometry, material );
+				const pillar1 = new THREE.Mesh( cylinderGeometry, material );
 				pillar1.position.set( 10, 3.5, 10 );
 				pillar1.castShadow = true;
 				pillar1.receiveShadow = true;
 
-				var pillar2 = pillar1.clone();
-				pillar2.position.set( 10, 3.5, -10 );
-				var pillar3 = pillar1.clone();
-				pillar3.position.set( -10, 3.5, 10 );
-				var pillar4 = pillar1.clone();
-				pillar4.position.set( -10, 3.5, -10 );
+				const pillar2 = pillar1.clone();
+				pillar2.position.set( 10, 3.5, - 10 );
+				const pillar3 = pillar1.clone();
+				pillar3.position.set( - 10, 3.5, 10 );
+				const pillar4 = pillar1.clone();
+				pillar4.position.set( - 10, 3.5, - 10 );
 
 				scene.add( pillar1 );
 				scene.add( pillar2 );
 				scene.add( pillar3 );
 				scene.add( pillar4 );
 
-				var geometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				var material = new THREE.MeshPhongMaterial( {
+				const planeGeometry = new THREE.PlaneGeometry( 200, 200 );
+				const planeMaterial = new THREE.MeshPhongMaterial( {
 					color: 0x999999,
 					shininess: 0,
 					specular: 0x111111
 				} );
 
-				var ground = new THREE.Mesh( geometry, material );
-				ground.rotation.x = -Math.PI/2;
+				const ground = new THREE.Mesh( planeGeometry, planeMaterial );
+				ground.rotation.x = - Math.PI / 2;
 				ground.scale.multiplyScalar( 3 );
 				ground.castShadow = true;
 				ground.receiveShadow = true;
@@ -161,12 +161,12 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.VSMShadowMap;		
+				renderer.shadowMap.type = THREE.VSMShadowMap;
 
 				renderer.setClearColor( 0xCCCCCC, 1 );
 
 				// Mouse control
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 
@@ -203,8 +203,8 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
-				var time = clock.elapsedTime;
+				const delta = clock.getDelta();
+				const time = clock.elapsedTime;
 
 				renderScene();
 
@@ -213,7 +213,7 @@
 				torusKnot.rotation.z += 1 * delta;
 
 				dirGroup.rotation.y += 0.7 * delta;
-				dirLight.position.z = 17 + Math.sin(time*0.001)*5;
+				dirLight.position.z = 17 + Math.sin( time * 0.001 ) * 5;
 
 			}
 

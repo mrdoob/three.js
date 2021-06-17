@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,7 +16,7 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var material = new THREE.LineBasicMaterial( {
+		const material = new THREE.LineBasicMaterial( {
 			color: 0xffffff,
 			linewidth: 1,
 			linecap: 'round', //ignored by WebGLRenderer
@@ -28,7 +27,7 @@
 		<h2>Examples</h2>
 
 		<p>
-			[example:webgl_buffergeometry_drawcalls WebGL / buffergeometry / drawcalls]<br />
+			[example:webgl_buffergeometry_drawrange WebGL / buffergeometry / drawrange]<br />
 			[example:webgl_buffergeometry_lines WebGL / buffergeometry / lines]<br />
 			[example:webgl_buffergeometry_lines_indexed WebGL / buffergeometry / lines / indexed]<br />
 			[example:webgl_decals WebGL / decals]<br />

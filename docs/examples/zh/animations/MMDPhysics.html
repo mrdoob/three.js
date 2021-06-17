@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,7 +16,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var physics;
+		const physics;
 
 		// Load MMD resources and instantiate MMDPhysics
 		new MMDLoader().load(
@@ -32,7 +31,7 @@
 
 		function render() {
 
-			var delta = clock.getDelta();
+			const delta = clock.getDelta();
 			animate( delta );  // update bones
 			if ( physics !== undefined ) physics.update( delta );
 			renderer.render( scene, camera );

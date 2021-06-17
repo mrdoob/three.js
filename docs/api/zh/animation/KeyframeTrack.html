@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -81,7 +80,7 @@
 
 		<h3>[property:String name]</h3>
 		<p>
-			轨道的名称可以指动画对象中的变形目标([page:Geometry.morphTargets morph targets])、骨骼([page:SkinnedMesh bones])或可能的其他值
+			轨道的名称可以指动画对象中的变形目标(morph targets)、骨骼([page:SkinnedMesh bones])或可能的其他值
 			查看[page:PropertyBinding.parseTrackName]可获知哪些形式的字符串可以解析出绑定的属性:
 		</p>
 		<p>
@@ -214,11 +213,6 @@
 		</p>
 
 		<h2>静态方法</h2>
-
-		<h3>[method:KeyframeTrack parse]( [param:JSON json] )</h3>
-		<p>
-			解析JSON对象并返回一个正确类型的新关键帧轨道。
-		</p>
 
 		<h3>[method:JSON toJSON]( [param:KeyframeTrack track] )</h3>
 		<p>

@@ -1,8 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author tschw
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
@@ -528,7 +523,21 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "inverse/conjugate", ( assert ) => {
+		QUnit.test( "identity", ( assert ) => {
+
+			var a = new Quaternion();
+
+			a.set( x, y, z, w );
+			a.identity();
+
+			assert.ok( a.x == 0, "Passed!" );
+			assert.ok( a.y == 0, "Passed!" );
+			assert.ok( a.z === 0, "Passed!" );
+			assert.ok( a.w === 1, "Passed!" );
+
+		} );
+
+		QUnit.test( "invert/conjugate", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
 
@@ -645,6 +654,22 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( Math.abs( result.y - expected.y ) <= eps, "Check y" );
 			assert.ok( Math.abs( result.z - expected.z ) <= eps, "Check z" );
 			assert.ok( Math.abs( result.w - expected.w ) <= eps, "Check w" );
+
+		} );
+
+		QUnit.test( "slerpQuaternions", ( assert ) => {
+
+			var e = new Quaternion( 1, 0, 0, 0 );
+			var f = new Quaternion( 0, 0, 1, 0 );
+			var expected = new Quaternion( Math.SQRT1_2, 0, Math.SQRT1_2, 0 );
+
+			var a = new Quaternion();
+			a.slerpQuaternions( e, f, 0.5 );
+
+			assert.ok( Math.abs( a.x - expected.x ) <= eps, "Check x" );
+			assert.ok( Math.abs( a.y - expected.y ) <= eps, "Check y" );
+			assert.ok( Math.abs( a.z - expected.z ) <= eps, "Check z" );
+			assert.ok( Math.abs( a.w - expected.w ) <= eps, "Check w" );
 
 		} );
 

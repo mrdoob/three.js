@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -18,14 +17,13 @@
 			在这种投影模式下，无论物体距离相机距离远或者近，在最终渲染的图片中物体的大小都保持不变。
 			<br /><br />
 
-
 			这对于渲染2D场景或者UI元素是非常有用的。
 		</p>
 
 		<h2>代码示例</h2>
 
 		<code>
-		var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+		const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
 		scene.add( camera );
 		</code>
 
@@ -75,7 +73,7 @@
 		<h3>[property:Float far]</h3>
 		<p>
 			摄像机视锥体远端面，其默认值为*2000*。<br /><br />
-			Must be greater than the current value of [page:.near near] plane.
+			该值必须大于[page:.near near] plane（摄像机视锥体近端面）的值。
 
 		</p>
 
@@ -102,8 +100,7 @@
 		<p>这个值是由[page:OrthographicCamera.setViewOffset setViewOffset]来设置的，其默认值为*null*。</p>
 
 		<h3>[property:number zoom]</h3>
-		<p>
-			获取或者设置摄像机的缩放倍数，其默认值为*1*。</p>
+		<p>获取或者设置摄像机的缩放倍数，其默认值为*1*。</p>
 
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Camera]。</p>
@@ -124,16 +121,15 @@
 
 		<h3>[method:null clearViewOffset]()</h3>
 		<p>
-			清除任何由.setViewOffset设置的偏移量。
+		清除任何由.setViewOffset设置的偏移量。
 		</p>
 
 		<h3>[method:null updateProjectionMatrix]()</h3>
 		<p>
-			更新摄像机投影矩阵。在任何参数被改变以后必须被调用。
-
+		更新摄像机投影矩阵。在任何参数被改变以后必须被调用。
 		</p>
 
-		<h3>[method:Object toJSON]([param:object meta])</h3>
+		<h3>[method:Object toJSON]([param:Object meta])</h3>
 		<p>
 		meta -- 包含有元数据的对象，例如对象后代中的纹理或图像<br />
 		将摄像机转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。

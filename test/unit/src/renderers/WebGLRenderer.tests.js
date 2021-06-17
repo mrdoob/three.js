@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer';
@@ -459,11 +456,11 @@ var customWebGLContext = function () {
 
 export default QUnit.module( 'Renderers', () => {
 
-	QUnit.module( 'WebGLRenderer', () => {
+	QUnit.module( 'WebGLRenderer-webonly', () => {
 
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.test( "Instancing", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( new WebGLRenderer(), "Can instantiate a renderer." );
 
 		} );
 

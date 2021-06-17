@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -120,7 +119,8 @@
 
 		<h3>[method:Triangle set]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] ) [param:Triangle this]</h3>
 		<p>
-			将三角形的[page:.a a]、[page:.b b]和[page:.c c]属性设置为所传入的[page:vector3 vector3]。
+			将三角形的[page:.a a]、[page:.b b]和[page:.c c]属性设置为所传入的[page:Vector3 vector3]。<br>
+			Please note that this method only copies the values from the given objects.
 		</p>
 
 		<h3>[method:Triangle setFromPointsAndIndices]( [param:Array points], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>

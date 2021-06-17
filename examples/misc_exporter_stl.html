@@ -19,7 +19,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { STLExporter } from './jsm/exporters/STLExporter.js';
 
-			var scene, camera, renderer, exporter, mesh;
+			let scene, camera, renderer, exporter, mesh;
 
 			init();
 			animate();
@@ -37,11 +37,11 @@
 
 				//
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 200, 0 );
 				scene.add( hemiLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, 200, 100 );
 				directionalLight.castShadow = true;
 				directionalLight.shadow.camera.top = 180;
@@ -52,20 +52,20 @@
 
 				// ground
 
-				var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.receiveShadow = true;
 				scene.add( ground );
 
-				var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
+				const grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
 				scene.add( grid );
 
 				// export mesh
 
-				var geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+				const geometry = new THREE.BoxGeometry( 50, 50, 50 );
+				const material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
@@ -82,18 +82,18 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 25, 0 );
 				controls.update();
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				var buttonExportASCII = document.getElementById( 'exportASCII' );
+				const buttonExportASCII = document.getElementById( 'exportASCII' );
 				buttonExportASCII.addEventListener( 'click', exportASCII );
 
-				var buttonExportBinary = document.getElementById( 'exportBinary' );
+				const buttonExportBinary = document.getElementById( 'exportBinary' );
 				buttonExportBinary.addEventListener( 'click', exportBinary );
 
 			}
@@ -116,19 +116,19 @@
 
 			function exportASCII() {
 
-				var result = exporter.parse( mesh );
+				const result = exporter.parse( mesh );
 				saveString( result, 'box.stl' );
 
 			}
 
 			function exportBinary() {
 
-				var result = exporter.parse( mesh, { binary: true } );
+				const result = exporter.parse( mesh, { binary: true } );
 				saveArrayBuffer( result, 'box.stl' );
 
 			}
 
-			var link = document.createElement( 'a' );
+			const link = document.createElement( 'a' );
 			link.style.display = 'none';
 			document.body.appendChild( link );
 

@@ -28,7 +28,7 @@
 
 		}
 
-		var renderer,
+		let renderer,
 			scene,
 			camera,
 			controls,
@@ -49,8 +49,8 @@
 			document.body.appendChild( renderer.domElement );
 
 			// Create camera (The volume renderer does not work very well with perspective yet)
-			var h = 512; // frustum height
-			var aspect = window.innerWidth / window.innerHeight;
+			const h = 512; // frustum height
+			const aspect = window.innerWidth / window.innerHeight;
 			camera = new THREE.OrthographicCamera( - h * aspect / 2, h * aspect / 2, h / 2, - h / 2, 1, 1000 );
 			camera.position.set( 0, 0, 128 );
 			camera.up.set( 0, 0, 1 ); // In our data, z is up
@@ -66,11 +66,11 @@
 			// scene.add( new AxesHelper( 128 ) );
 
 			// Lighting is baked into the shader a.t.m.
-			// var dirLight = new DirectionalLight( 0xffffff );
+			// let dirLight = new DirectionalLight( 0xffffff );
 
 			// The gui for interaction
 			volconfig = { clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'viridis' };
-			var gui = new GUI();
+			const gui = new GUI();
 			gui.add( volconfig, 'clim1', 0, 1, 0.01 ).onChange( updateUniforms );
 			gui.add( volconfig, 'clim2', 0, 1, 0.01 ).onChange( updateUniforms );
 			gui.add( volconfig, 'colormap', { gray: 'gray', viridis: 'viridis' } ).onChange( updateUniforms );
@@ -84,7 +84,7 @@
 				// THREEJS will select R32F (33326) based on the THREE.RedFormat and THREE.FloatType.
 				// Also see https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_TYPES_FORMATS_FROM_DOM_ELEMENTS_TABLE
 				// TODO: look the dtype up in the volume metadata
-				var texture = new THREE.DataTexture3D( volume.data, volume.xLength, volume.yLength, volume.zLength );
+				const texture = new THREE.DataTexture3D( volume.data, volume.xLength, volume.yLength, volume.zLength );
 				texture.format = THREE.RedFormat;
 				texture.type = THREE.FloatType;
 				texture.minFilter = texture.magFilter = THREE.LinearFilter;
@@ -97,9 +97,9 @@
 				};
 
 				// Material
-				var shader = VolumeRenderShader1;
+				const shader = VolumeRenderShader1;
 
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+				const uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "u_data" ].value = texture;
 				uniforms[ "u_size" ].value.set( volume.xLength, volume.yLength, volume.zLength );
@@ -116,17 +116,17 @@
 				} );
 
 				// THREE.Mesh
-				var geometry = new THREE.BoxBufferGeometry( volume.xLength, volume.yLength, volume.zLength );
+				const geometry = new THREE.BoxGeometry( volume.xLength, volume.yLength, volume.zLength );
 				geometry.translate( volume.xLength / 2 - 0.5, volume.yLength / 2 - 0.5, volume.zLength / 2 - 0.5 );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				render();
 
 			} );
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 		}
 
@@ -145,9 +145,9 @@
 
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
-			var aspect = window.innerWidth / window.innerHeight;
+			const aspect = window.innerWidth / window.innerHeight;
 
-			var frustumHeight = camera.top - camera.bottom;
+			const frustumHeight = camera.top - camera.bottom;
 
 			camera.left = - frustumHeight * aspect / 2;
 			camera.right = frustumHeight * aspect / 2;

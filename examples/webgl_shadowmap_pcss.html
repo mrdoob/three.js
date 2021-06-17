@@ -122,17 +122,17 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var container, stats;
-			var camera, scene, renderer;
+			let stats;
+			let camera, scene, renderer;
 
-			var group;
+			let group;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				// scene
@@ -158,7 +158,7 @@
 
 				scene.add( new THREE.AmbientLight( 0x666666 ) );
 
-				var light = new THREE.DirectionalLight( 0xdfebff, 1.75 );
+				const light = new THREE.DirectionalLight( 0xdfebff, 1.75 );
 				light.position.set( 2, 8, 4 );
 
 				light.castShadow = true;
@@ -176,13 +176,13 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				var geometry = new THREE.SphereBufferGeometry( 0.3, 20, 20 );
+				const geometry = new THREE.SphereGeometry( 0.3, 20, 20 );
 
-				for ( var i = 0; i < 20; i ++ ) {
+				for ( let i = 0; i < 20; i ++ ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );
+					const material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );
 
-					var sphere = new THREE.Mesh( geometry, material );
+					const sphere = new THREE.Mesh( geometry, material );
 					sphere.position.x = Math.random() - 0.5;
 					sphere.position.z = Math.random() - 0.5;
 					sphere.position.normalize();
@@ -196,24 +196,24 @@
 
 				// ground
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0x404040, specular: 0x111111 } );
+				const groundMaterial = new THREE.MeshPhongMaterial( { color: 0x404040, specular: 0x111111 } );
 
-				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000, 8, 8 ), groundMaterial );
-				mesh.rotation.x = - Math.PI / 2;
-				mesh.receiveShadow = true;
-				scene.add( mesh );
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 20000, 20000, 8, 8 ), groundMaterial );
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
 
 				// column
 
-				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 4, 1 ), groundMaterial );
-				mesh.position.y = 2;
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
-				scene.add( mesh );
+				const column = new THREE.Mesh( new THREE.BoxGeometry( 1, 4, 1 ), groundMaterial );
+				column.position.y = 2;
+				column.castShadow = true;
+				column.receiveShadow = true;
+				scene.add( column );
 
 				// overwrite shadowmap code
 
-				var shader = THREE.ShaderChunk.shadowmap_pars_fragment;
+				let shader = THREE.ShaderChunk.shadowmap_pars_fragment;
 
 				shader = shader.replace(
 					'#ifdef USE_SHADOWMAP',
@@ -242,7 +242,7 @@
 				renderer.shadowMap.enabled = true;
 
 				// controls
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxPolarAngle = Math.PI * 0.5;
 				controls.minDistance = 10;
 				controls.maxDistance = 75;
@@ -256,7 +256,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -275,7 +275,7 @@
 
 			function animate() {
 
-				var time = performance.now() / 1000;
+				const time = performance.now() / 1000;
 
 				group.traverse( function ( child ) {
 

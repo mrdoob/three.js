@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,11 +21,11 @@
 
 		<code>
 		// Instantiate an exporter
-		var exporter = new ColladaExporter();
+		const exporter = new ColladaExporter();
 
 		// Parse the input and generate the ply output
-		var data = exporter.parse( scene, null, options );
-		downloadFile(data);
+		const data = exporter.parse( scene, null, options );
+		downloadFile( data );
 		</code>
 
 		<h2>Constructor</h2>
@@ -58,7 +57,7 @@
 			// Collada file content
 			data: "",
 
-			// List of referenced texures
+			// List of referenced textures
 			textures: [{
 
 				// File directory, name, and extension of the texture data

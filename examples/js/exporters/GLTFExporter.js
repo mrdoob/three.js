@@ -1,183 +1,271 @@
-console.warn( "THREE.GLTFExporter: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
-/**
- * @author fernandojsg / http://fernandojsg.com
- * @author Don McCurdy / https://www.donmccurdy.com
- * @author Takahiro / https://github.com/takahirox
- */
+( function () {
 
-//------------------------------------------------------------------------------
-// Constants
-//------------------------------------------------------------------------------
-var WEBGL_CONSTANTS = {
-	POINTS: 0x0000,
-	LINES: 0x0001,
-	LINE_LOOP: 0x0002,
-	LINE_STRIP: 0x0003,
-	TRIANGLES: 0x0004,
-	TRIANGLE_STRIP: 0x0005,
-	TRIANGLE_FAN: 0x0006,
+	class GLTFExporter {
 
-	UNSIGNED_BYTE: 0x1401,
-	UNSIGNED_SHORT: 0x1403,
-	FLOAT: 0x1406,
-	UNSIGNED_INT: 0x1405,
-	ARRAY_BUFFER: 0x8892,
-	ELEMENT_ARRAY_BUFFER: 0x8893,
+		constructor() {
 
-	NEAREST: 0x2600,
-	LINEAR: 0x2601,
-	NEAREST_MIPMAP_NEAREST: 0x2700,
-	LINEAR_MIPMAP_NEAREST: 0x2701,
-	NEAREST_MIPMAP_LINEAR: 0x2702,
-	LINEAR_MIPMAP_LINEAR: 0x2703,
+			this.pluginCallbacks = [];
+			this.register( function ( writer ) {
 
-	CLAMP_TO_EDGE: 33071,
-	MIRRORED_REPEAT: 33648,
-	REPEAT: 10497
-};
+				return new GLTFLightExtension( writer );
 
-var THREE_TO_WEBGL = {};
+			} );
+			this.register( function ( writer ) {
 
-THREE_TO_WEBGL[ THREE.NearestFilter ] = WEBGL_CONSTANTS.NEAREST;
-THREE_TO_WEBGL[ THREE.NearestMipmapNearestFilter ] = WEBGL_CONSTANTS.NEAREST_MIPMAP_NEAREST;
-THREE_TO_WEBGL[ THREE.NearestMipmapLinearFilter ] = WEBGL_CONSTANTS.NEAREST_MIPMAP_LINEAR;
-THREE_TO_WEBGL[ THREE.LinearFilter ] = WEBGL_CONSTANTS.LINEAR;
-THREE_TO_WEBGL[ THREE.LinearMipmapNearestFilter ] = WEBGL_CONSTANTS.LINEAR_MIPMAP_NEAREST;
-THREE_TO_WEBGL[ THREE.LinearMipmapLinearFilter ] = WEBGL_CONSTANTS.LINEAR_MIPMAP_LINEAR;
+				return new GLTFMaterialsUnlitExtension( writer );
 
-THREE_TO_WEBGL[ THREE.ClampToEdgeWrapping ] = WEBGL_CONSTANTS.CLAMP_TO_EDGE;
-THREE_TO_WEBGL[ THREE.RepeatWrapping ] = WEBGL_CONSTANTS.REPEAT;
-THREE_TO_WEBGL[ THREE.MirroredRepeatWrapping ] = WEBGL_CONSTANTS.MIRRORED_REPEAT;
+			} );
+			this.register( function ( writer ) {
 
-var PATH_PROPERTIES = {
-	scale: 'scale',
-	position: 'translation',
-	quaternion: 'rotation',
-	morphTargetInfluences: 'weights'
-};
-
-//------------------------------------------------------------------------------
-// GLTF Exporter
-//------------------------------------------------------------------------------
-THREE.GLTFExporter = function () {};
-
-THREE.GLTFExporter.prototype = {
-
-	constructor: THREE.GLTFExporter,
-
-	/**
-	 * Parse scenes and generate GLTF output
-	 * @param  {THREE.Scene or [THREE.Scenes]} input   THREE.Scene or Array of THREE.Scenes
-	 * @param  {Function} onDone  Callback on completed
-	 * @param  {Object} options options
-	 */
-	parse: function ( input, onDone, options ) {
-
-		var DEFAULT_OPTIONS = {
-			binary: false,
-			trs: false,
-			onlyVisible: true,
-			truncateDrawRange: true,
-			embedImages: true,
-			maxTextureSize: Infinity,
-			animations: [],
-			forcePowerOfTwoTextures: false,
-			includeCustomExtensions: false
-		};
-
-		options = Object.assign( {}, DEFAULT_OPTIONS, options );
-
-		if ( options.animations.length > 0 ) {
-
-			// Only TRS properties, and not matrices, may be targeted by animation.
-			options.trs = true;
-
-		}
-
-		var outputJSON = {
-
-			asset: {
-
-				version: "2.0",
-				generator: "THREE.GLTFExporter"
-
-			}
-
-		};
-
-		var byteOffset = 0;
-		var buffers = [];
-		var pending = [];
-		var nodeMap = new Map();
-		var skins = [];
-		var extensionsUsed = {};
-		var cachedData = {
-
-			meshes: new Map(),
-			attributes: new Map(),
-			attributesNormalized: new Map(),
-			materials: new Map(),
-			textures: new Map(),
-			images: new Map()
-
-		};
-
-		var cachedCanvas;
-
-		var uids = new Map();
-		var uid = 0;
-
-		/**
-		 * Assign and return a temporal unique id for an object
-		 * especially which doesn't have .uuid
-		 * @param  {Object} object
-		 * @return {Integer}
-		 */
-		function getUID( object ) {
-
-			if ( ! uids.has( object ) ) uids.set( object, uid ++ );
-
-			return uids.get( object );
-
-		}
-
-		/**
-		 * Compare two arrays
-		 * @param  {Array} array1 Array 1 to compare
-		 * @param  {Array} array2 Array 2 to compare
-		 * @return {Boolean}        Returns true if both arrays are equal
-		 */
-		function equalArray( array1, array2 ) {
-
-			return ( array1.length === array2.length ) && array1.every( function ( element, index ) {
-
-				return element === array2[ index ];
+				return new GLTFMaterialsPBRSpecularGlossiness( writer );
 
 			} );
 
 		}
 
-		/**
-		 * Converts a string to an ArrayBuffer.
-		 * @param  {string} text
-		 * @return {ArrayBuffer}
-		 */
-		function stringToArrayBuffer( text ) {
+		register( callback ) {
 
-			if ( window.TextEncoder !== undefined ) {
+			if ( this.pluginCallbacks.indexOf( callback ) === - 1 ) {
 
-				return new TextEncoder().encode( text ).buffer;
+				this.pluginCallbacks.push( callback );
 
 			}
 
-			var array = new Uint8Array( new ArrayBuffer( text.length ) );
+			return this;
 
-			for ( var i = 0, il = text.length; i < il; i ++ ) {
+		}
 
-				var value = text.charCodeAt( i );
+		unregister( callback ) {
 
-				// Replacing multi-byte character with space(0x20).
-				array[ i ] = value > 0xFF ? 0x20 : value;
+			if ( this.pluginCallbacks.indexOf( callback ) !== - 1 ) {
+
+				this.pluginCallbacks.splice( this.pluginCallbacks.indexOf( callback ), 1 );
+
+			}
+
+			return this;
+
+		}
+		/**
+   * Parse scenes and generate GLTF output
+   * @param  {Scene or [THREE.Scenes]} input   THREE.Scene or Array of THREE.Scenes
+   * @param  {Function} onDone  Callback on completed
+   * @param  {Object} options options
+   */
+
+
+		parse( input, onDone, options ) {
+
+			const writer = new GLTFWriter();
+			const plugins = [];
+
+			for ( let i = 0, il = this.pluginCallbacks.length; i < il; i ++ ) {
+
+				plugins.push( this.pluginCallbacks[ i ]( writer ) );
+
+			}
+
+			writer.setPlugins( plugins );
+			writer.write( input, onDone, options );
+
+		}
+
+	} //------------------------------------------------------------------------------
+	// Constants
+	//------------------------------------------------------------------------------
+
+
+	const WEBGL_CONSTANTS = {
+		POINTS: 0x0000,
+		LINES: 0x0001,
+		LINE_LOOP: 0x0002,
+		LINE_STRIP: 0x0003,
+		TRIANGLES: 0x0004,
+		TRIANGLE_STRIP: 0x0005,
+		TRIANGLE_FAN: 0x0006,
+		UNSIGNED_BYTE: 0x1401,
+		UNSIGNED_SHORT: 0x1403,
+		FLOAT: 0x1406,
+		UNSIGNED_INT: 0x1405,
+		ARRAY_BUFFER: 0x8892,
+		ELEMENT_ARRAY_BUFFER: 0x8893,
+		NEAREST: 0x2600,
+		LINEAR: 0x2601,
+		NEAREST_MIPMAP_NEAREST: 0x2700,
+		LINEAR_MIPMAP_NEAREST: 0x2701,
+		NEAREST_MIPMAP_LINEAR: 0x2702,
+		LINEAR_MIPMAP_LINEAR: 0x2703,
+		CLAMP_TO_EDGE: 33071,
+		MIRRORED_REPEAT: 33648,
+		REPEAT: 10497
+	};
+	const THREE_TO_WEBGL = {};
+	THREE_TO_WEBGL[ THREE.NearestFilter ] = WEBGL_CONSTANTS.NEAREST;
+	THREE_TO_WEBGL[ THREE.NearestMipmapNearestFilter ] = WEBGL_CONSTANTS.NEAREST_MIPMAP_NEAREST;
+	THREE_TO_WEBGL[ THREE.NearestMipmapLinearFilter ] = WEBGL_CONSTANTS.NEAREST_MIPMAP_LINEAR;
+	THREE_TO_WEBGL[ THREE.LinearFilter ] = WEBGL_CONSTANTS.LINEAR;
+	THREE_TO_WEBGL[ THREE.LinearMipmapNearestFilter ] = WEBGL_CONSTANTS.LINEAR_MIPMAP_NEAREST;
+	THREE_TO_WEBGL[ THREE.LinearMipmapLinearFilter ] = WEBGL_CONSTANTS.LINEAR_MIPMAP_LINEAR;
+	THREE_TO_WEBGL[ THREE.ClampToEdgeWrapping ] = WEBGL_CONSTANTS.CLAMP_TO_EDGE;
+	THREE_TO_WEBGL[ THREE.RepeatWrapping ] = WEBGL_CONSTANTS.REPEAT;
+	THREE_TO_WEBGL[ THREE.MirroredRepeatWrapping ] = WEBGL_CONSTANTS.MIRRORED_REPEAT;
+	const PATH_PROPERTIES = {
+		scale: 'scale',
+		position: 'translation',
+		quaternion: 'rotation',
+		morphTargetInfluences: 'weights'
+	}; // GLB constants
+	// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
+
+	const GLB_HEADER_BYTES = 12;
+	const GLB_HEADER_MAGIC = 0x46546C67;
+	const GLB_VERSION = 2;
+	const GLB_CHUNK_PREFIX_BYTES = 8;
+	const GLB_CHUNK_TYPE_JSON = 0x4E4F534A;
+	const GLB_CHUNK_TYPE_BIN = 0x004E4942; //------------------------------------------------------------------------------
+	// Utility functions
+	//------------------------------------------------------------------------------
+
+	/**
+ * Compare two arrays
+ * @param  {Array} array1 Array 1 to compare
+ * @param  {Array} array2 Array 2 to compare
+ * @return {Boolean}        Returns true if both arrays are equal
+ */
+
+	function equalArray( array1, array2 ) {
+
+		return array1.length === array2.length && array1.every( function ( element, index ) {
+
+			return element === array2[ index ];
+
+		} );
+
+	}
+	/**
+ * Converts a string to an ArrayBuffer.
+ * @param  {string} text
+ * @return {ArrayBuffer}
+ */
+
+
+	function stringToArrayBuffer( text ) {
+
+		if ( window.TextEncoder !== undefined ) {
+
+			return new TextEncoder().encode( text ).buffer;
+
+		}
+
+		const array = new Uint8Array( new ArrayBuffer( text.length ) );
+
+		for ( let i = 0, il = text.length; i < il; i ++ ) {
+
+			const value = text.charCodeAt( i ); // Replacing multi-byte character with space(0x20).
+
+			array[ i ] = value > 0xFF ? 0x20 : value;
+
+		}
+
+		return array.buffer;
+
+	}
+	/**
+ * Is identity matrix
+ *
+ * @param {Matrix4} matrix
+ * @returns {Boolean} Returns true, if parameter is identity matrix
+ */
+
+
+	function isIdentityMatrix( matrix ) {
+
+		return equalArray( matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] );
+
+	}
+	/**
+ * Get the min and max vectors from the given attribute
+ * @param  {BufferAttribute} attribute Attribute to find the min/max in range from start to start + count
+ * @param  {Integer} start
+ * @param  {Integer} count
+ * @return {Object} Object containing the `min` and `max` values (As an array of attribute.itemSize components)
+ */
+
+
+	function getMinMax( attribute, start, count ) {
+
+		const output = {
+			min: new Array( attribute.itemSize ).fill( Number.POSITIVE_INFINITY ),
+			max: new Array( attribute.itemSize ).fill( Number.NEGATIVE_INFINITY )
+		};
+
+		for ( let i = start; i < start + count; i ++ ) {
+
+			for ( let a = 0; a < attribute.itemSize; a ++ ) {
+
+				let value;
+
+				if ( attribute.itemSize > 4 ) {
+
+					// no support for interleaved data for itemSize > 4
+					value = attribute.array[ i * attribute.itemSize + a ];
+
+				} else {
+
+					if ( a === 0 ) value = attribute.getX( i ); else if ( a === 1 ) value = attribute.getY( i ); else if ( a === 2 ) value = attribute.getZ( i ); else if ( a === 3 ) value = attribute.getW( i );
+
+				}
+
+				output.min[ a ] = Math.min( output.min[ a ], value );
+				output.max[ a ] = Math.max( output.max[ a ], value );
+
+			}
+
+		}
+
+		return output;
+
+	}
+	/**
+ * Get the required size + padding for a buffer, rounded to the next 4-byte boundary.
+ * https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#data-alignment
+ *
+ * @param {Integer} bufferSize The size the original buffer.
+ * @returns {Integer} new buffer size with required padding.
+ *
+ */
+
+
+	function getPaddedBufferSize( bufferSize ) {
+
+		return Math.ceil( bufferSize / 4 ) * 4;
+
+	}
+	/**
+ * Returns a buffer aligned to 4-byte boundary.
+ *
+ * @param {ArrayBuffer} arrayBuffer Buffer to pad
+ * @param {Integer} paddingByte (Optional)
+ * @returns {ArrayBuffer} The same buffer if it's already aligned to 4-byte boundary or a new buffer
+ */
+
+
+	function getPaddedArrayBuffer( arrayBuffer, paddingByte = 0 ) {
+
+		const paddedLength = getPaddedBufferSize( arrayBuffer.byteLength );
+
+		if ( paddedLength !== arrayBuffer.byteLength ) {
+
+			const array = new Uint8Array( paddedLength );
+			array.set( new Uint8Array( arrayBuffer ) );
+
+			if ( paddingByte !== 0 ) {
+
+				for ( let i = arrayBuffer.byteLength; i < paddedLength; i ++ ) {
+
+					array[ i ] = paddingByte;
+
+				}
 
 			}
 
@@ -185,101 +273,263 @@ THREE.GLTFExporter.prototype = {
 
 		}
 
-		/**
-		 * Get the min and max vectors from the given attribute
-		 * @param  {THREE.BufferAttribute} attribute Attribute to find the min/max in range from start to start + count
-		 * @param  {Integer} start
-		 * @param  {Integer} count
-		 * @return {Object} Object containing the `min` and `max` values (As an array of attribute.itemSize components)
-		 */
-		function getMinMax( attribute, start, count ) {
+		return arrayBuffer;
 
-			var output = {
+	}
 
-				min: new Array( attribute.itemSize ).fill( Number.POSITIVE_INFINITY ),
-				max: new Array( attribute.itemSize ).fill( Number.NEGATIVE_INFINITY )
+	let cachedCanvas = null;
+	/**
+ * Writer
+ */
 
+	class GLTFWriter {
+
+		constructor() {
+
+			this.plugins = [];
+			this.options = {};
+			this.pending = [];
+			this.buffers = [];
+			this.byteOffset = 0;
+			this.buffers = [];
+			this.nodeMap = new Map();
+			this.skins = [];
+			this.extensionsUsed = {};
+			this.uids = new Map();
+			this.uid = 0;
+			this.json = {
+				asset: {
+					version: '2.0',
+					generator: 'THREE.GLTFExporter'
+				}
+			};
+			this.cache = {
+				meshes: new Map(),
+				attributes: new Map(),
+				attributesNormalized: new Map(),
+				materials: new Map(),
+				textures: new Map(),
+				images: new Map()
 			};
 
-			for ( var i = start; i < start + count; i ++ ) {
+		}
 
-				for ( var a = 0; a < attribute.itemSize; a ++ ) {
+		setPlugins( plugins ) {
 
-					var value = attribute.array[ i * attribute.itemSize + a ];
-					output.min[ a ] = Math.min( output.min[ a ], value );
-					output.max[ a ] = Math.max( output.max[ a ], value );
+			this.plugins = plugins;
+
+		}
+		/**
+   * Parse scenes and generate GLTF output
+   * @param  {Scene or [THREE.Scenes]} input   THREE.Scene or Array of THREE.Scenes
+   * @param  {Function} onDone  Callback on completed
+   * @param  {Object} options options
+   */
+
+
+		write( input, onDone, options ) {
+
+			this.options = Object.assign( {}, {
+				// default options
+				binary: false,
+				trs: false,
+				onlyVisible: true,
+				truncateDrawRange: true,
+				embedImages: true,
+				maxTextureSize: Infinity,
+				animations: [],
+				includeCustomExtensions: false
+			}, options );
+
+			if ( this.options.animations.length > 0 ) {
+
+				// Only TRS properties, and not matrices, may be targeted by animation.
+				this.options.trs = true;
+
+			}
+
+			this.processInput( input );
+			const writer = this;
+			Promise.all( this.pending ).then( function () {
+
+				const buffers = writer.buffers;
+				const json = writer.json;
+				const options = writer.options;
+				const extensionsUsed = writer.extensionsUsed; // Merge buffers.
+
+				const blob = new Blob( buffers, {
+					type: 'application/octet-stream'
+				} ); // Declare extensions.
+
+				const extensionsUsedList = Object.keys( extensionsUsed );
+				if ( extensionsUsedList.length > 0 ) json.extensionsUsed = extensionsUsedList; // Update bytelength of the single buffer.
+
+				if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
+
+				if ( options.binary === true ) {
+
+					// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
+					const reader = new window.FileReader();
+					reader.readAsArrayBuffer( blob );
+
+					reader.onloadend = function () {
+
+						// Binary chunk.
+						const binaryChunk = getPaddedArrayBuffer( reader.result );
+						const binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+						binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
+						binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true ); // JSON chunk.
+
+						const jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( json ) ), 0x20 );
+						const jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+						jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
+						jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true ); // GLB header.
+
+						const header = new ArrayBuffer( GLB_HEADER_BYTES );
+						const headerView = new DataView( header );
+						headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
+						headerView.setUint32( 4, GLB_VERSION, true );
+						const totalByteLength = GLB_HEADER_BYTES + jsonChunkPrefix.byteLength + jsonChunk.byteLength + binaryChunkPrefix.byteLength + binaryChunk.byteLength;
+						headerView.setUint32( 8, totalByteLength, true );
+						const glbBlob = new Blob( [ header, jsonChunkPrefix, jsonChunk, binaryChunkPrefix, binaryChunk ], {
+							type: 'application/octet-stream'
+						} );
+						const glbReader = new window.FileReader();
+						glbReader.readAsArrayBuffer( glbBlob );
+
+						glbReader.onloadend = function () {
+
+							onDone( glbReader.result );
+
+						};
+
+					};
+
+				} else {
+
+					if ( json.buffers && json.buffers.length > 0 ) {
+
+						const reader = new window.FileReader();
+						reader.readAsDataURL( blob );
+
+						reader.onloadend = function () {
+
+							const base64data = reader.result;
+							json.buffers[ 0 ].uri = base64data;
+							onDone( json );
+
+						};
+
+					} else {
+
+						onDone( json );
+
+					}
 
 				}
 
-			}
-
-			return output;
+			} );
 
 		}
-
 		/**
-		 * Checks if image size is POT.
-		 *
-		 * @param {Image} image The image to be checked.
-		 * @returns {Boolean} Returns true if image size is POT.
-		 *
-		 */
-		function isPowerOfTwo( image ) {
+   * Serializes a userData.
+   *
+   * @param {THREE.Object3D|THREE.Material} object
+   * @param {Object} objectDef
+   */
 
-			return THREE.MathUtils.isPowerOfTwo( image.width ) && THREE.MathUtils.isPowerOfTwo( image.height );
 
-		}
+		serializeUserData( object, objectDef ) {
 
-		/**
-		 * Checks if normal attribute values are normalized.
-		 *
-		 * @param {THREE.BufferAttribute} normal
-		 * @returns {Boolean}
-		 *
-		 */
-		function isNormalizedNormalAttribute( normal ) {
+			if ( Object.keys( object.userData ).length === 0 ) return;
+			const options = this.options;
+			const extensionsUsed = this.extensionsUsed;
 
-			if ( cachedData.attributesNormalized.has( normal ) ) {
+			try {
 
-				return false;
+				const json = JSON.parse( JSON.stringify( object.userData ) );
+
+				if ( options.includeCustomExtensions && json.gltfExtensions ) {
+
+					if ( objectDef.extensions === undefined ) objectDef.extensions = {};
+
+					for ( const extensionName in json.gltfExtensions ) {
+
+						objectDef.extensions[ extensionName ] = json.gltfExtensions[ extensionName ];
+						extensionsUsed[ extensionName ] = true;
+
+					}
+
+					delete json.gltfExtensions;
+
+				}
+
+				if ( Object.keys( json ).length > 0 ) objectDef.extras = json;
+
+			} catch ( error ) {
+
+				console.warn( 'THREE.GLTFExporter: userData of \'' + object.name + '\' ' + 'won\'t be serialized because of JSON.stringify error - ' + error.message );
 
 			}
 
-			var v = new THREE.Vector3();
+		}
+		/**
+   * Assign and return a temporal unique id for an object
+   * especially which doesn't have .uuid
+   * @param  {Object} object
+   * @return {Integer}
+   */
 
-			for ( var i = 0, il = normal.count; i < il; i ++ ) {
+
+		getUID( object ) {
+
+			if ( ! this.uids.has( object ) ) this.uids.set( object, this.uid ++ );
+			return this.uids.get( object );
+
+		}
+		/**
+   * Checks if normal attribute values are normalized.
+   *
+   * @param {BufferAttribute} normal
+   * @returns {Boolean}
+   */
+
+
+		isNormalizedNormalAttribute( normal ) {
+
+			const cache = this.cache;
+			if ( cache.attributesNormalized.has( normal ) ) return false;
+			const v = new THREE.Vector3();
+
+			for ( let i = 0, il = normal.count; i < il; i ++ ) {
 
 				// 0.0005 is from glTF-validator
-				if ( Math.abs( v.fromArray( normal.array, i * 3 ).length() - 1.0 ) > 0.0005 ) return false;
+				if ( Math.abs( v.fromBufferAttribute( normal, i ).length() - 1.0 ) > 0.0005 ) return false;
 
 			}
 
 			return true;
 
 		}
-
 		/**
-		 * Creates normalized normal buffer attribute.
-		 *
-		 * @param {THREE.BufferAttribute} normal
-		 * @returns {THREE.BufferAttribute}
-		 *
-		 */
-		function createNormalizedNormalAttribute( normal ) {
+   * Creates normalized normal buffer attribute.
+   *
+   * @param {BufferAttribute} normal
+   * @returns {BufferAttribute}
+   *
+   */
 
-			if ( cachedData.attributesNormalized.has( normal ) ) {
 
-				return cachedData.attributesNormalized.get( normal );
+		createNormalizedNormalAttribute( normal ) {
 
-			}
+			const cache = this.cache;
+			if ( cache.attributesNormalized.has( normal ) ) return cache.attributesNormalized.get( normal );
+			const attribute = normal.clone();
+			const v = new THREE.Vector3();
 
-			var attribute = normal.clone();
+			for ( let i = 0, il = attribute.count; i < il; i ++ ) {
 
-			var v = new THREE.Vector3();
-
-			for ( var i = 0, il = attribute.count; i < il; i ++ ) {
-
-				v.fromArray( attribute.array, i * 3 );
+				v.fromBufferAttribute( attribute, i );
 
 				if ( v.x === 0 && v.y === 0 && v.z === 0 ) {
 
@@ -292,126 +542,27 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				v.toArray( attribute.array, i * 3 );
+				attribute.setXYZ( i, v.x, v.y, v.z );
 
 			}
 
-			cachedData.attributesNormalized.set( normal, attribute );
-
+			cache.attributesNormalized.set( normal, attribute );
 			return attribute;
 
 		}
-
 		/**
-		 * Get the required size + padding for a buffer, rounded to the next 4-byte boundary.
-		 * https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#data-alignment
-		 *
-		 * @param {Integer} bufferSize The size the original buffer.
-		 * @returns {Integer} new buffer size with required padding.
-		 *
-		 */
-		function getPaddedBufferSize( bufferSize ) {
+   * Applies a texture transform, if present, to the map definition. Requires
+   * the KHR_texture_transform extension.
+   *
+   * @param {Object} mapDef
+   * @param {THREE.Texture} texture
+   */
 
-			return Math.ceil( bufferSize / 4 ) * 4;
 
-		}
+		applyTextureTransform( mapDef, texture ) {
 
-		/**
-		 * Returns a buffer aligned to 4-byte boundary.
-		 *
-		 * @param {ArrayBuffer} arrayBuffer Buffer to pad
-		 * @param {Integer} paddingByte (Optional)
-		 * @returns {ArrayBuffer} The same buffer if it's already aligned to 4-byte boundary or a new buffer
-		 */
-		function getPaddedArrayBuffer( arrayBuffer, paddingByte ) {
-
-			paddingByte = paddingByte || 0;
-
-			var paddedLength = getPaddedBufferSize( arrayBuffer.byteLength );
-
-			if ( paddedLength !== arrayBuffer.byteLength ) {
-
-				var array = new Uint8Array( paddedLength );
-				array.set( new Uint8Array( arrayBuffer ) );
-
-				if ( paddingByte !== 0 ) {
-
-					for ( var i = arrayBuffer.byteLength; i < paddedLength; i ++ ) {
-
-						array[ i ] = paddingByte;
-
-					}
-
-				}
-
-				return array.buffer;
-
-			}
-
-			return arrayBuffer;
-
-		}
-
-		/**
-		 * Serializes a userData.
-		 *
-		 * @param {THREE.Object3D|THREE.Material} object
-		 * @param {Object} gltfProperty
-		 */
-		function serializeUserData( object, gltfProperty ) {
-
-			if ( Object.keys( object.userData ).length === 0 ) {
-
-				return;
-
-			}
-
-			try {
-
-				var json = JSON.parse( JSON.stringify( object.userData ) );
-
-				if ( options.includeCustomExtensions && json.gltfExtensions ) {
-
-					if ( gltfProperty.extensions === undefined ) {
-
-						gltfProperty.extensions = {};
-
-					}
-
-					for ( var extensionName in json.gltfExtensions ) {
-
-						gltfProperty.extensions[ extensionName ] = json.gltfExtensions[ extensionName ];
-						extensionsUsed[ extensionName ] = true;
-
-					}
-
-					delete json.gltfExtensions;
-
-				}
-
-				if ( Object.keys( json ).length > 0 ) {
-
-					gltfProperty.extras = json;
-
-				}
-
-			} catch ( error ) {
-
-				console.warn( 'THREE.GLTFExporter: userData of \'' + object.name + '\' ' +
-					'won\'t be serialized because of JSON.stringify error - ' + error.message );
-
-			}
-
-		}
-
-		/**
-		 * Applies a texture transform, if present, to the map definition. Requires
-		 * the KHR_texture_transform extension.
-		 */
-		function applyTextureTransform( mapDef, texture ) {
-
-			var didTransform = false;
-			var transformDef = {};
+			let didTransform = false;
+			const transformDef = {};
 
 			if ( texture.offset.x !== 0 || texture.offset.y !== 0 ) {
 
@@ -438,52 +589,47 @@ THREE.GLTFExporter.prototype = {
 
 				mapDef.extensions = mapDef.extensions || {};
 				mapDef.extensions[ 'KHR_texture_transform' ] = transformDef;
-				extensionsUsed[ 'KHR_texture_transform' ] = true;
+				this.extensionsUsed[ 'KHR_texture_transform' ] = true;
 
 			}
 
 		}
-
 		/**
-		 * Process a buffer to append to the default one.
-		 * @param  {ArrayBuffer} buffer
-		 * @return {Integer}
-		 */
-		function processBuffer( buffer ) {
+   * Process a buffer to append to the default one.
+   * @param  {ArrayBuffer} buffer
+   * @return {Integer}
+   */
 
-			if ( ! outputJSON.buffers ) {
 
-				outputJSON.buffers = [ { byteLength: 0 } ];
+		processBuffer( buffer ) {
 
-			}
+			const json = this.json;
+			const buffers = this.buffers;
+			if ( ! json.buffers ) json.buffers = [ {
+				byteLength: 0
+			} ]; // All buffers are merged before export.
 
-			// All buffers are merged before export.
 			buffers.push( buffer );
-
 			return 0;
 
 		}
-
 		/**
-		 * Process and generate a BufferView
-		 * @param  {THREE.BufferAttribute} attribute
-		 * @param  {number} componentType
-		 * @param  {number} start
-		 * @param  {number} count
-		 * @param  {number} target (Optional) Target usage of the BufferView
-		 * @return {Object}
-		 */
-		function processBufferView( attribute, componentType, start, count, target ) {
+   * Process and generate a BufferView
+   * @param  {BufferAttribute} attribute
+   * @param  {number} componentType
+   * @param  {number} start
+   * @param  {number} count
+   * @param  {number} target (Optional) Target usage of the BufferView
+   * @return {Object}
+   */
 
-			if ( ! outputJSON.bufferViews ) {
 
-				outputJSON.bufferViews = [];
+		processBufferView( attribute, componentType, start, count, target ) {
 
-			}
+			const json = this.json;
+			if ( ! json.bufferViews ) json.bufferViews = []; // Create a new dataview and dump the attribute's array into it
 
-			// Create a new dataview and dump the attribute's array into it
-
-			var componentSize;
+			let componentSize;
 
 			if ( componentType === WEBGL_CONSTANTS.UNSIGNED_BYTE ) {
 
@@ -499,28 +645,24 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var byteLength = getPaddedBufferSize( count * attribute.itemSize * componentSize );
-			var dataView = new DataView( new ArrayBuffer( byteLength ) );
-			var offset = 0;
+			const byteLength = getPaddedBufferSize( count * attribute.itemSize * componentSize );
+			const dataView = new DataView( new ArrayBuffer( byteLength ) );
+			let offset = 0;
 
-			for ( var i = start; i < start + count; i ++ ) {
+			for ( let i = start; i < start + count; i ++ ) {
 
-				for ( var a = 0; a < attribute.itemSize; a ++ ) {
+				for ( let a = 0; a < attribute.itemSize; a ++ ) {
 
-					var value;
+					let value;
 
 					if ( attribute.itemSize > 4 ) {
 
-						 // no support for interleaved data for itemSize > 4
-
+						// no support for interleaved data for itemSize > 4
 						value = attribute.array[ i * attribute.itemSize + a ];
 
 					} else {
 
-						if ( a === 0 ) value = attribute.getX( i );
-						else if ( a === 1 ) value = attribute.getY( i );
-						else if ( a === 2 ) value = attribute.getZ( i );
-						else if ( a === 3 ) value = attribute.getW( i );
+						if ( a === 0 ) value = attribute.getX( i ); else if ( a === 1 ) value = attribute.getY( i ); else if ( a === 2 ) value = attribute.getZ( i ); else if ( a === 3 ) value = attribute.getW( i );
 
 					}
 
@@ -548,101 +690,86 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var gltfBufferView = {
-
-				buffer: processBuffer( dataView.buffer ),
-				byteOffset: byteOffset,
+			const bufferViewDef = {
+				buffer: this.processBuffer( dataView.buffer ),
+				byteOffset: this.byteOffset,
 				byteLength: byteLength
-
 			};
-
-			if ( target !== undefined ) gltfBufferView.target = target;
+			if ( target !== undefined ) bufferViewDef.target = target;
 
 			if ( target === WEBGL_CONSTANTS.ARRAY_BUFFER ) {
 
 				// Only define byteStride for vertex attributes.
-				gltfBufferView.byteStride = attribute.itemSize * componentSize;
+				bufferViewDef.byteStride = attribute.itemSize * componentSize;
 
 			}
 
-			byteOffset += byteLength;
+			this.byteOffset += byteLength;
+			json.bufferViews.push( bufferViewDef ); // @TODO Merge bufferViews where possible.
 
-			outputJSON.bufferViews.push( gltfBufferView );
-
-			// @TODO Merge bufferViews where possible.
-			var output = {
-
-				id: outputJSON.bufferViews.length - 1,
+			const output = {
+				id: json.bufferViews.length - 1,
 				byteLength: 0
-
 			};
-
 			return output;
 
 		}
-
 		/**
-		 * Process and generate a BufferView from an image Blob.
-		 * @param {Blob} blob
-		 * @return {Promise<Integer>}
-		 */
-		function processBufferViewImage( blob ) {
+   * Process and generate a BufferView from an image Blob.
+   * @param {Blob} blob
+   * @return {Promise<Integer>}
+   */
 
-			if ( ! outputJSON.bufferViews ) {
 
-				outputJSON.bufferViews = [];
+		processBufferViewImage( blob ) {
 
-			}
-
+			const writer = this;
+			const json = writer.json;
+			if ( ! json.bufferViews ) json.bufferViews = [];
 			return new Promise( function ( resolve ) {
 
-				var reader = new window.FileReader();
+				const reader = new window.FileReader();
 				reader.readAsArrayBuffer( blob );
+
 				reader.onloadend = function () {
 
-					var buffer = getPaddedArrayBuffer( reader.result );
-
-					var bufferView = {
-						buffer: processBuffer( buffer ),
-						byteOffset: byteOffset,
+					const buffer = getPaddedArrayBuffer( reader.result );
+					const bufferViewDef = {
+						buffer: writer.processBuffer( buffer ),
+						byteOffset: writer.byteOffset,
 						byteLength: buffer.byteLength
 					};
-
-					byteOffset += buffer.byteLength;
-
-					outputJSON.bufferViews.push( bufferView );
-
-					resolve( outputJSON.bufferViews.length - 1 );
+					writer.byteOffset += buffer.byteLength;
+					resolve( json.bufferViews.push( bufferViewDef ) - 1 );
 
 				};
 
 			} );
 
 		}
-
 		/**
-		 * Process attribute to generate an accessor
-		 * @param  {THREE.BufferAttribute} attribute Attribute to process
-		 * @param  {THREE.BufferGeometry} geometry (Optional) Geometry used for truncated draw range
-		 * @param  {Integer} start (Optional)
-		 * @param  {Integer} count (Optional)
-		 * @return {Integer}           Index of the processed accessor on the "accessors" array
-		 */
-		function processAccessor( attribute, geometry, start, count ) {
+   * Process attribute to generate an accessor
+   * @param  {BufferAttribute} attribute Attribute to process
+   * @param  {THREE.BufferGeometry} geometry (Optional) Geometry used for truncated draw range
+   * @param  {Integer} start (Optional)
+   * @param  {Integer} count (Optional)
+   * @return {Integer|null} Index of the processed accessor on the "accessors" array
+   */
 
-			var types = {
 
+		processAccessor( attribute, geometry, start, count ) {
+
+			const options = this.options;
+			const json = this.json;
+			const types = {
 				1: 'SCALAR',
 				2: 'VEC2',
 				3: 'VEC3',
 				4: 'VEC4',
 				16: 'MAT4'
-
 			};
+			let componentType; // Detect the component type of the attribute array (float, uint or ushort)
 
-			var componentType;
-
-			// Detect the component type of the attribute array (float, uint or ushort)
 			if ( attribute.array.constructor === Float32Array ) {
 
 				componentType = WEBGL_CONSTANTS.FLOAT;
@@ -666,46 +793,32 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			if ( start === undefined ) start = 0;
-			if ( count === undefined ) count = attribute.count;
+			if ( count === undefined ) count = attribute.count; // @TODO Indexed buffer geometry with drawRange not supported yet
 
-			// @TODO Indexed buffer geometry with drawRange not supported yet
 			if ( options.truncateDrawRange && geometry !== undefined && geometry.index === null ) {
 
-				var end = start + count;
-				var end2 = geometry.drawRange.count === Infinity
-					? attribute.count
-					: geometry.drawRange.start + geometry.drawRange.count;
-
+				const end = start + count;
+				const end2 = geometry.drawRange.count === Infinity ? attribute.count : geometry.drawRange.start + geometry.drawRange.count;
 				start = Math.max( start, geometry.drawRange.start );
 				count = Math.min( end, end2 ) - start;
-
 				if ( count < 0 ) count = 0;
 
-			}
+			} // Skip creating an accessor if the attribute doesn't have data to export
 
-			// Skip creating an accessor if the attribute doesn't have data to export
-			if ( count === 0 ) {
 
-				return null;
-
-			}
-
-			var minMax = getMinMax( attribute, start, count );
-
-			var bufferViewTarget;
-
-			// If geometry isn't provided, don't infer the target usage of the bufferView. For
+			if ( count === 0 ) return null;
+			const minMax = getMinMax( attribute, start, count );
+			let bufferViewTarget; // If geometry isn't provided, don't infer the target usage of the bufferView. For
 			// animation samplers, target must not be set.
+
 			if ( geometry !== undefined ) {
 
 				bufferViewTarget = attribute === geometry.index ? WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER : WEBGL_CONSTANTS.ARRAY_BUFFER;
 
 			}
 
-			var bufferView = processBufferView( attribute, componentType, start, count, bufferViewTarget );
-
-			var gltfAccessor = {
-
+			const bufferView = this.processBufferView( attribute, componentType, start, count, bufferViewTarget );
+			const accessorDef = {
 				bufferView: bufferView.id,
 				byteOffset: bufferView.byteOffset,
 				componentType: componentType,
@@ -713,77 +826,44 @@ THREE.GLTFExporter.prototype = {
 				max: minMax.max,
 				min: minMax.min,
 				type: types[ attribute.itemSize ]
-
 			};
-
-			if ( attribute.normalized === true ) {
-
-				gltfAccessor.normalized = true;
-
-			}
-
-			if ( ! outputJSON.accessors ) {
-
-				outputJSON.accessors = [];
-
-			}
-
-			outputJSON.accessors.push( gltfAccessor );
-
-			return outputJSON.accessors.length - 1;
+			if ( attribute.normalized === true ) accessorDef.normalized = true;
+			if ( ! json.accessors ) json.accessors = [];
+			return json.accessors.push( accessorDef ) - 1;
 
 		}
-
 		/**
-		 * Process image
-		 * @param  {Image} image to process
-		 * @param  {Integer} format of the image (e.g. THREE.RGBFormat, THREE.RGBAFormat etc)
-		 * @param  {Boolean} flipY before writing out the image
-		 * @return {Integer}     Index of the processed texture in the "images" array
-		 */
-		function processImage( image, format, flipY ) {
+   * Process image
+   * @param  {Image} image to process
+   * @param  {Integer} format of the image (e.g. THREE.RGBFormat, THREE.RGBAFormat etc)
+   * @param  {Boolean} flipY before writing out the image
+   * @return {Integer}     Index of the processed texture in the "images" array
+   */
 
-			if ( ! cachedData.images.has( image ) ) {
 
-				cachedData.images.set( image, {} );
+		processImage( image, format, flipY ) {
 
-			}
-
-			var cachedImages = cachedData.images.get( image );
-			var mimeType = format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
-			var key = mimeType + ":flipY/" + flipY.toString();
-
-			if ( cachedImages[ key ] !== undefined ) {
-
-				return cachedImages[ key ];
-
-			}
-
-			if ( ! outputJSON.images ) {
-
-				outputJSON.images = [];
-
-			}
-
-			var gltfImage = { mimeType: mimeType };
+			const writer = this;
+			const cache = writer.cache;
+			const json = writer.json;
+			const options = writer.options;
+			const pending = writer.pending;
+			if ( ! cache.images.has( image ) ) cache.images.set( image, {} );
+			const cachedImages = cache.images.get( image );
+			const mimeType = format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
+			const key = mimeType + ':flipY/' + flipY.toString();
+			if ( cachedImages[ key ] !== undefined ) return cachedImages[ key ];
+			if ( ! json.images ) json.images = [];
+			const imageDef = {
+				mimeType: mimeType
+			};
 
 			if ( options.embedImages ) {
 
-				var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
-
+				const canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
 				canvas.width = Math.min( image.width, options.maxTextureSize );
 				canvas.height = Math.min( image.height, options.maxTextureSize );
-
-				if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( canvas ) ) {
-
-					console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
-
-					canvas.width = THREE.MathUtils.floorPowerOfTwo( canvas.width );
-					canvas.height = THREE.MathUtils.floorPowerOfTwo( canvas.height );
-
-				}
-
-				var ctx = canvas.getContext( '2d' );
+				const ctx = canvas.getContext( '2d' );
 
 				if ( flipY === true ) {
 
@@ -792,7 +872,53 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
+				if ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement || typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement || typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas || typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) {
+
+					ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
+
+				} else {
+
+					if ( format !== THREE.RGBAFormat && format !== THREE.RGBFormat ) {
+
+						console.error( 'GLTFExporter: Only RGB and RGBA formats are supported.' );
+
+					}
+
+					if ( image.width > options.maxTextureSize || image.height > options.maxTextureSize ) {
+
+						console.warn( 'GLTFExporter: Image size is bigger than maxTextureSize', image );
+
+					}
+
+					const data = new Uint8ClampedArray( image.height * image.width * 4 );
+
+					if ( format === THREE.RGBAFormat ) {
+
+						for ( let i = 0; i < data.length; i += 4 ) {
+
+							data[ i + 0 ] = image.data[ i + 0 ];
+							data[ i + 1 ] = image.data[ i + 1 ];
+							data[ i + 2 ] = image.data[ i + 2 ];
+							data[ i + 3 ] = image.data[ i + 3 ];
+
+						}
+
+					} else {
+
+						for ( let i = 0, j = 0; i < data.length; i += 4, j += 3 ) {
+
+							data[ i + 0 ] = image.data[ j + 0 ];
+							data[ i + 1 ] = image.data[ j + 1 ];
+							data[ i + 2 ] = image.data[ j + 2 ];
+							data[ i + 3 ] = 255;
+
+						}
+
+					}
+
+					ctx.putImageData( new ImageData( data, image.width, image.height ), 0, 0 );
+
+				}
 
 				if ( options.binary === true ) {
 
@@ -800,10 +926,9 @@ THREE.GLTFExporter.prototype = {
 
 						canvas.toBlob( function ( blob ) {
 
-							processBufferViewImage( blob ).then( function ( bufferViewIndex ) {
+							writer.processBufferViewImage( blob ).then( function ( bufferViewIndex ) {
 
-								gltfImage.bufferView = bufferViewIndex;
-
+								imageDef.bufferView = bufferViewIndex;
 								resolve();
 
 							} );
@@ -814,106 +939,83 @@ THREE.GLTFExporter.prototype = {
 
 				} else {
 
-					gltfImage.uri = canvas.toDataURL( mimeType );
+					imageDef.uri = canvas.toDataURL( mimeType );
 
 				}
 
 			} else {
 
-				gltfImage.uri = image.src;
+				imageDef.uri = image.src;
 
 			}
 
-			outputJSON.images.push( gltfImage );
-
-			var index = outputJSON.images.length - 1;
+			const index = json.images.push( imageDef ) - 1;
 			cachedImages[ key ] = index;
-
 			return index;
 
 		}
-
 		/**
-		 * Process sampler
-		 * @param  {Texture} map Texture to process
-		 * @return {Integer}     Index of the processed texture in the "samplers" array
-		 */
-		function processSampler( map ) {
+   * Process sampler
+   * @param  {Texture} map Texture to process
+   * @return {Integer}     Index of the processed texture in the "samplers" array
+   */
 
-			if ( ! outputJSON.samplers ) {
 
-				outputJSON.samplers = [];
+		processSampler( map ) {
 
-			}
-
-			var gltfSampler = {
-
+			const json = this.json;
+			if ( ! json.samplers ) json.samplers = [];
+			const samplerDef = {
 				magFilter: THREE_TO_WEBGL[ map.magFilter ],
 				minFilter: THREE_TO_WEBGL[ map.minFilter ],
 				wrapS: THREE_TO_WEBGL[ map.wrapS ],
 				wrapT: THREE_TO_WEBGL[ map.wrapT ]
-
 			};
-
-			outputJSON.samplers.push( gltfSampler );
-
-			return outputJSON.samplers.length - 1;
+			return json.samplers.push( samplerDef ) - 1;
 
 		}
-
 		/**
-		 * Process texture
-		 * @param  {Texture} map Map to process
-		 * @return {Integer}     Index of the processed texture in the "textures" array
-		 */
-		function processTexture( map ) {
+   * Process texture
+   * @param  {Texture} map Map to process
+   * @return {Integer} Index of the processed texture in the "textures" array
+   */
 
-			if ( cachedData.textures.has( map ) ) {
 
-				return cachedData.textures.get( map );
+		processTexture( map ) {
 
-			}
-
-			if ( ! outputJSON.textures ) {
-
-				outputJSON.textures = [];
-
-			}
-
-			var gltfTexture = {
-
-				sampler: processSampler( map ),
-				source: processImage( map.image, map.format, map.flipY )
-
+			const cache = this.cache;
+			const json = this.json;
+			if ( cache.textures.has( map ) ) return cache.textures.get( map );
+			if ( ! json.textures ) json.textures = [];
+			const textureDef = {
+				sampler: this.processSampler( map ),
+				source: this.processImage( map.image, map.format, map.flipY )
 			};
+			if ( map.name ) textureDef.name = map.name;
 
-			if ( map.name ) {
+			this._invokeAll( function ( ext ) {
 
-				gltfTexture.name = map.name;
+				ext.writeTexture && ext.writeTexture( map, textureDef );
 
-			}
+			} );
 
-			outputJSON.textures.push( gltfTexture );
-
-			var index = outputJSON.textures.length - 1;
-			cachedData.textures.set( map, index );
-
+			const index = json.textures.push( textureDef ) - 1;
+			cache.textures.set( map, index );
 			return index;
 
 		}
-
 		/**
-		 * Process material
-		 * @param  {THREE.Material} material Material to process
-		 * @return {Integer}      Index of the processed material in the "materials" array
-		 */
-		function processMaterial( material ) {
+   * Process material
+   * @param  {THREE.Material} material Material to process
+   * @return {Integer|null} Index of the processed material in the "materials" array
+   */
 
-			if ( cachedData.materials.has( material ) ) {
 
-				return cachedData.materials.get( material );
+		processMaterial( material ) {
 
-			}
+			const cache = this.cache;
+			const json = this.json;
+			if ( cache.materials.has( material ) ) return cache.materials.get( material );
 
 			if ( material.isShaderMaterial ) {
 
@@ -922,88 +1024,49 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( ! outputJSON.materials ) {
+			if ( ! json.materials ) json.materials = []; // @QUESTION Should we avoid including any attribute that has the default value?
 
-				outputJSON.materials = [];
-
-			}
-
-			// @QUESTION Should we avoid including any attribute that has the default value?
-			var gltfMaterial = {
-
+			const materialDef = {
 				pbrMetallicRoughness: {}
-
 			};
 
-			if ( material.isMeshBasicMaterial ) {
-
-				gltfMaterial.extensions = { KHR_materials_unlit: {} };
-
-				extensionsUsed[ 'KHR_materials_unlit' ] = true;
-
-			} else if ( material.isGLTFSpecularGlossinessMaterial ) {
-
-				gltfMaterial.extensions = { KHR_materials_pbrSpecularGlossiness: {} };
-
-				extensionsUsed[ 'KHR_materials_pbrSpecularGlossiness' ] = true;
-
-			} else if ( ! material.isMeshStandardMaterial ) {
+			if ( material.isMeshStandardMaterial !== true && material.isMeshBasicMaterial !== true ) {
 
 				console.warn( 'GLTFExporter: Use MeshStandardMaterial or MeshBasicMaterial for best results.' );
 
-			}
+			} // pbrMetallicRoughness.baseColorFactor
 
-			// pbrMetallicRoughness.baseColorFactor
-			var color = material.color.toArray().concat( [ material.opacity ] );
+
+			const color = material.color.toArray().concat( [ material.opacity ] );
 
 			if ( ! equalArray( color, [ 1, 1, 1, 1 ] ) ) {
 
-				gltfMaterial.pbrMetallicRoughness.baseColorFactor = color;
+				materialDef.pbrMetallicRoughness.baseColorFactor = color;
 
 			}
 
 			if ( material.isMeshStandardMaterial ) {
 
-				gltfMaterial.pbrMetallicRoughness.metallicFactor = material.metalness;
-				gltfMaterial.pbrMetallicRoughness.roughnessFactor = material.roughness;
-
-			} else if ( material.isMeshBasicMaterial ) {
-
-				gltfMaterial.pbrMetallicRoughness.metallicFactor = 0.0;
-				gltfMaterial.pbrMetallicRoughness.roughnessFactor = 0.9;
+				materialDef.pbrMetallicRoughness.metallicFactor = material.metalness;
+				materialDef.pbrMetallicRoughness.roughnessFactor = material.roughness;
 
 			} else {
 
-				gltfMaterial.pbrMetallicRoughness.metallicFactor = 0.5;
-				gltfMaterial.pbrMetallicRoughness.roughnessFactor = 0.5;
+				materialDef.pbrMetallicRoughness.metallicFactor = 0.5;
+				materialDef.pbrMetallicRoughness.roughnessFactor = 0.5;
 
-			}
+			} // pbrMetallicRoughness.metallicRoughnessTexture
 
-			// pbrSpecularGlossiness diffuse, specular and glossiness factor
-			if ( material.isGLTFSpecularGlossinessMaterial ) {
 
-				if ( gltfMaterial.pbrMetallicRoughness.baseColorFactor ) {
-
-					gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor = gltfMaterial.pbrMetallicRoughness.baseColorFactor;
-
-				}
-
-				var specularFactor = [ 1, 1, 1 ];
-				material.specular.toArray( specularFactor, 0 );
-				gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.specularFactor = specularFactor;
-
-				gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.glossinessFactor = material.glossiness;
-
-			}
-
-			// pbrMetallicRoughness.metallicRoughnessTexture
 			if ( material.metalnessMap || material.roughnessMap ) {
 
 				if ( material.metalnessMap === material.roughnessMap ) {
 
-					var metalRoughMapDef = { index: processTexture( material.metalnessMap ) };
-					applyTextureTransform( metalRoughMapDef, material.metalnessMap );
-					gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
+					const metalRoughMapDef = {
+						index: this.processTexture( material.metalnessMap )
+					};
+					this.applyTextureTransform( metalRoughMapDef, material.metalnessMap );
+					materialDef.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
 
 				} else {
 
@@ -1011,59 +1074,49 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-			}
+			} // pbrMetallicRoughness.baseColorTexture or pbrSpecularGlossiness diffuseTexture
 
-			// pbrMetallicRoughness.baseColorTexture or pbrSpecularGlossiness diffuseTexture
+
 			if ( material.map ) {
 
-				var baseColorMapDef = { index: processTexture( material.map ) };
-				applyTextureTransform( baseColorMapDef, material.map );
-
-				if ( material.isGLTFSpecularGlossinessMaterial ) {
-
-					gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.diffuseTexture = baseColorMapDef;
-
-				}
-
-				gltfMaterial.pbrMetallicRoughness.baseColorTexture = baseColorMapDef;
-
-			}
-
-			// pbrSpecularGlossiness specular map
-			if ( material.isGLTFSpecularGlossinessMaterial && material.specularMap ) {
-
-				var specularMapDef = { index: processTexture( material.specularMap ) };
-				applyTextureTransform( specularMapDef, material.specularMap );
-				gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.specularGlossinessTexture = specularMapDef;
+				const baseColorMapDef = {
+					index: this.processTexture( material.map )
+				};
+				this.applyTextureTransform( baseColorMapDef, material.map );
+				materialDef.pbrMetallicRoughness.baseColorTexture = baseColorMapDef;
 
 			}
 
 			if ( material.emissive ) {
 
-				// emissiveFactor
-				var emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity ).toArray();
+				// note: `emissive` is not scaled by `material.emissiveIntensity` for now to accommodate glTF spec. see #21849.
+				const emissive = material.emissive.toArray();
 
 				if ( ! equalArray( emissive, [ 0, 0, 0 ] ) ) {
 
-					gltfMaterial.emissiveFactor = emissive;
+					materialDef.emissiveFactor = emissive;
 
-				}
+				} // emissiveTexture
 
-				// emissiveTexture
+
 				if ( material.emissiveMap ) {
 
-					var emissiveMapDef = { index: processTexture( material.emissiveMap ) };
-					applyTextureTransform( emissiveMapDef, material.emissiveMap );
-					gltfMaterial.emissiveTexture = emissiveMapDef;
+					const emissiveMapDef = {
+						index: this.processTexture( material.emissiveMap )
+					};
+					this.applyTextureTransform( emissiveMapDef, material.emissiveMap );
+					materialDef.emissiveTexture = emissiveMapDef;
 
 				}
 
-			}
+			} // normalTexture
 
-			// normalTexture
+
 			if ( material.normalMap ) {
 
-				var normalMapDef = { index: processTexture( material.normalMap ) };
+				const normalMapDef = {
+					index: this.processTexture( material.normalMap )
+				};
 
 				if ( material.normalScale && material.normalScale.x !== - 1 ) {
 
@@ -1077,17 +1130,16 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				applyTextureTransform( normalMapDef, material.normalMap );
+				this.applyTextureTransform( normalMapDef, material.normalMap );
+				materialDef.normalTexture = normalMapDef;
 
-				gltfMaterial.normalTexture = normalMapDef;
+			} // occlusionTexture
 
-			}
 
-			// occlusionTexture
 			if ( material.aoMap ) {
 
-				var occlusionMapDef = {
-					index: processTexture( material.aoMap ),
+				const occlusionMapDef = {
+					index: this.processTexture( material.aoMap ),
 					texCoord: 1
 				};
 
@@ -1097,65 +1149,61 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				applyTextureTransform( occlusionMapDef, material.aoMap );
+				this.applyTextureTransform( occlusionMapDef, material.aoMap );
+				materialDef.occlusionTexture = occlusionMapDef;
 
-				gltfMaterial.occlusionTexture = occlusionMapDef;
+			} // alphaMode
 
-			}
 
-			// alphaMode
 			if ( material.transparent ) {
 
-				gltfMaterial.alphaMode = 'BLEND';
+				materialDef.alphaMode = 'BLEND';
 
 			} else {
 
 				if ( material.alphaTest > 0.0 ) {
 
-					gltfMaterial.alphaMode = 'MASK';
-					gltfMaterial.alphaCutoff = material.alphaTest;
+					materialDef.alphaMode = 'MASK';
+					materialDef.alphaCutoff = material.alphaTest;
 
 				}
 
-			}
+			} // doubleSided
 
-			// doubleSided
-			if ( material.side === THREE.DoubleSide ) {
 
-				gltfMaterial.doubleSided = true;
+			if ( material.side === THREE.DoubleSide ) materialDef.doubleSided = true;
+			if ( material.name !== '' ) materialDef.name = material.name;
+			this.serializeUserData( material, materialDef );
 
-			}
+			this._invokeAll( function ( ext ) {
 
-			if ( material.name !== '' ) {
+				ext.writeMaterial && ext.writeMaterial( material, materialDef );
 
-				gltfMaterial.name = material.name;
+			} );
 
-			}
-
-			serializeUserData( material, gltfMaterial );
-
-			outputJSON.materials.push( gltfMaterial );
-
-			var index = outputJSON.materials.length - 1;
-			cachedData.materials.set( material, index );
-
+			const index = json.materials.push( materialDef ) - 1;
+			cache.materials.set( material, index );
 			return index;
 
 		}
-
 		/**
-		 * Process mesh
-		 * @param  {THREE.Mesh} mesh Mesh to process
-		 * @return {Integer}      Index of the processed mesh in the "meshes" array
-		 */
-		function processMesh( mesh ) {
+   * Process mesh
+   * @param  {THREE.Mesh} mesh Mesh to process
+   * @return {Integer|null} Index of the processed mesh in the "meshes" array
+   */
 
-			var meshCacheKeyParts = [ mesh.geometry.uuid ];
+
+		processMesh( mesh ) {
+
+			const cache = this.cache;
+			const json = this.json;
+			const meshCacheKeyParts = [ mesh.geometry.uuid ];
+
 			if ( Array.isArray( mesh.material ) ) {
 
-				for ( var i = 0, l = mesh.material.length; i < l; i ++ ) {
+				for ( let i = 0, l = mesh.material.length; i < l; i ++ ) {
 
-					meshCacheKeyParts.push( mesh.material[ i ].uuid	);
+					meshCacheKeyParts.push( mesh.material[ i ].uuid );
 
 				}
 
@@ -1165,18 +1213,11 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var meshCacheKey = meshCacheKeyParts.join( ':' );
-			if ( cachedData.meshes.has( meshCacheKey ) ) {
+			const meshCacheKey = meshCacheKeyParts.join( ':' );
+			if ( cache.meshes.has( meshCacheKey ) ) return cache.meshes.get( meshCacheKey );
+			const geometry = mesh.geometry;
+			let mode; // Use the correct mode
 
-				return cachedData.meshes.get( meshCacheKey );
-
-			}
-
-			var geometry = mesh.geometry;
-
-			var mode;
-
-			// Use the correct mode
 			if ( mesh.isLineSegments ) {
 
 				mode = WEBGL_CONSTANTS.LINES;
@@ -1199,109 +1240,90 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( ! geometry.isBufferGeometry ) {
+			if ( geometry.isBufferGeometry !== true ) {
 
-				console.warn( 'GLTFExporter: Exporting THREE.Geometry will increase file size. Use THREE.BufferGeometry instead.' );
-				geometry = new THREE.BufferGeometry().setFromObject( mesh );
+				throw new Error( 'THREE.GLTFExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 			}
 
-			var gltfMesh = {};
+			const meshDef = {};
+			const attributes = {};
+			const primitives = [];
+			const targets = []; // Conversion between attributes names in threejs and gltf spec
 
-			var attributes = {};
-			var primitives = [];
-			var targets = [];
-
-			// Conversion between attributes names in threejs and gltf spec
-			var nameConversion = {
-
+			const nameConversion = {
 				uv: 'TEXCOORD_0',
 				uv2: 'TEXCOORD_1',
 				color: 'COLOR_0',
 				skinWeight: 'WEIGHTS_0',
 				skinIndex: 'JOINTS_0'
-
 			};
+			const originalNormal = geometry.getAttribute( 'normal' );
 
-			var originalNormal = geometry.getAttribute( 'normal' );
-
-			if ( originalNormal !== undefined && ! isNormalizedNormalAttribute( originalNormal ) ) {
+			if ( originalNormal !== undefined && ! this.isNormalizedNormalAttribute( originalNormal ) ) {
 
 				console.warn( 'THREE.GLTFExporter: Creating normalized normal attribute from the non-normalized one.' );
+				geometry.setAttribute( 'normal', this.createNormalizedNormalAttribute( originalNormal ) );
 
-				geometry.setAttribute( 'normal', createNormalizedNormalAttribute( originalNormal ) );
-
-			}
-
-			// @QUESTION Detect if .vertexColors = true?
+			} // @QUESTION Detect if .vertexColors = true?
 			// For every attribute create an accessor
-			var modifiedAttribute = null;
-			for ( var attributeName in geometry.attributes ) {
+
+
+			let modifiedAttribute = null;
+
+			for ( let attributeName in geometry.attributes ) {
 
 				// Ignore morph target attributes, which are exported later.
 				if ( attributeName.substr( 0, 5 ) === 'morph' ) continue;
-
-				var attribute = geometry.attributes[ attributeName ];
-				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
-
-				// Prefix all geometry attributes except the ones specifically
+				const attribute = geometry.attributes[ attributeName ];
+				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase(); // Prefix all geometry attributes except the ones specifically
 				// listed in the spec; non-spec attributes are considered custom.
-				var validVertexAttributes =
-						/^(POSITION|NORMAL|TANGENT|TEXCOORD_\d+|COLOR_\d+|JOINTS_\d+|WEIGHTS_\d+)$/;
-				if ( ! validVertexAttributes.test( attributeName ) ) {
 
-					attributeName = '_' + attributeName;
+				const validVertexAttributes = /^(POSITION|NORMAL|TANGENT|TEXCOORD_\d+|COLOR_\d+|JOINTS_\d+|WEIGHTS_\d+)$/;
+				if ( ! validVertexAttributes.test( attributeName ) ) attributeName = '_' + attributeName;
 
-				}
+				if ( cache.attributes.has( this.getUID( attribute ) ) ) {
 
-				if ( cachedData.attributes.has( getUID( attribute ) ) ) {
-
-					attributes[ attributeName ] = cachedData.attributes.get( getUID( attribute ) );
+					attributes[ attributeName ] = cache.attributes.get( this.getUID( attribute ) );
 					continue;
 
-				}
+				} // JOINTS_0 must be UNSIGNED_BYTE or UNSIGNED_SHORT.
 
-				// JOINTS_0 must be UNSIGNED_BYTE or UNSIGNED_SHORT.
+
 				modifiedAttribute = null;
-				var array = attribute.array;
-				if ( attributeName === 'JOINTS_0' &&
-					! ( array instanceof Uint16Array ) &&
-					! ( array instanceof Uint8Array ) ) {
+				const array = attribute.array;
+
+				if ( attributeName === 'JOINTS_0' && ! ( array instanceof Uint16Array ) && ! ( array instanceof Uint8Array ) ) {
 
 					console.warn( 'GLTFExporter: Attribute "skinIndex" converted to type UNSIGNED_SHORT.' );
 					modifiedAttribute = new THREE.BufferAttribute( new Uint16Array( array ), attribute.itemSize, attribute.normalized );
 
 				}
 
-				var accessor = processAccessor( modifiedAttribute || attribute, geometry );
+				const accessor = this.processAccessor( modifiedAttribute || attribute, geometry );
+
 				if ( accessor !== null ) {
 
 					attributes[ attributeName ] = accessor;
-					cachedData.attributes.set( getUID( attribute ), accessor );
+					cache.attributes.set( this.getUID( attribute ), accessor );
 
 				}
 
 			}
 
-			if ( originalNormal !== undefined ) geometry.setAttribute( 'normal', originalNormal );
+			if ( originalNormal !== undefined ) geometry.setAttribute( 'normal', originalNormal ); // Skip if no exportable attributes found
 
-			// Skip if no exportable attributes found
-			if ( Object.keys( attributes ).length === 0 ) {
+			if ( Object.keys( attributes ).length === 0 ) return null; // Morph targets
 
-				return null;
-
-			}
-
-			// Morph targets
 			if ( mesh.morphTargetInfluences !== undefined && mesh.morphTargetInfluences.length > 0 ) {
 
-				var weights = [];
-				var targetNames = [];
-				var reverseDictionary = {};
+				const weights = [];
+				const targetNames = [];
+				const reverseDictionary = {};
 
 				if ( mesh.morphTargetDictionary !== undefined ) {
 
-					for ( var key in mesh.morphTargetDictionary ) {
+					for ( const key in mesh.morphTargetDictionary ) {
 
 						reverseDictionary[ mesh.morphTargetDictionary[ key ] ] = key;
 
@@ -1309,17 +1331,15 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				for ( var i = 0; i < mesh.morphTargetInfluences.length; ++ i ) {
+				for ( let i = 0; i < mesh.morphTargetInfluences.length; ++ i ) {
 
-					var target = {};
+					const target = {};
+					let warned = false;
 
-					var warned = false;
-
-					for ( var attributeName in geometry.morphAttributes ) {
+					for ( const attributeName in geometry.morphAttributes ) {
 
 						// glTF 2.0 morph supports only POSITION/NORMAL/TANGENT.
 						// Three.js doesn't support TANGENT yet.
-
 						if ( attributeName !== 'position' && attributeName !== 'normal' ) {
 
 							if ( ! warned ) {
@@ -1333,85 +1353,77 @@ THREE.GLTFExporter.prototype = {
 
 						}
 
-						var attribute = geometry.morphAttributes[ attributeName ][ i ];
-						var gltfAttributeName = attributeName.toUpperCase();
-
-						// Three.js morph attribute has absolute values while the one of glTF has relative values.
+						const attribute = geometry.morphAttributes[ attributeName ][ i ];
+						const gltfAttributeName = attributeName.toUpperCase(); // Three.js morph attribute has absolute values while the one of glTF has relative values.
 						//
 						// glTF 2.0 Specification:
 						// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#morph-targets
 
-						var baseAttribute = geometry.attributes[ attributeName ];
+						const baseAttribute = geometry.attributes[ attributeName ];
 
-						if ( cachedData.attributes.has( getUID( attribute ) ) ) {
+						if ( cache.attributes.has( this.getUID( attribute ) ) ) {
 
-							target[ gltfAttributeName ] = cachedData.attributes.get( getUID( attribute ) );
+							target[ gltfAttributeName ] = cache.attributes.get( this.getUID( attribute ) );
 							continue;
 
-						}
+						} // Clones attribute not to override
 
-						// Clones attribute not to override
-						var relativeAttribute = attribute.clone();
+
+						const relativeAttribute = attribute.clone();
 
 						if ( ! geometry.morphTargetsRelative ) {
 
-							for ( var j = 0, jl = attribute.count; j < jl; j ++ ) {
+							for ( let j = 0, jl = attribute.count; j < jl; j ++ ) {
 
-								relativeAttribute.setXYZ(
-									j,
-									attribute.getX( j ) - baseAttribute.getX( j ),
-									attribute.getY( j ) - baseAttribute.getY( j ),
-									attribute.getZ( j ) - baseAttribute.getZ( j )
-								);
+								relativeAttribute.setXYZ( j, attribute.getX( j ) - baseAttribute.getX( j ), attribute.getY( j ) - baseAttribute.getY( j ), attribute.getZ( j ) - baseAttribute.getZ( j ) );
 
 							}
 
 						}
 
-						target[ gltfAttributeName ] = processAccessor( relativeAttribute, geometry );
-						cachedData.attributes.set( getUID( baseAttribute ), target[ gltfAttributeName ] );
+						target[ gltfAttributeName ] = this.processAccessor( relativeAttribute, geometry );
+						cache.attributes.set( this.getUID( baseAttribute ), target[ gltfAttributeName ] );
 
 					}
 
 					targets.push( target );
-
 					weights.push( mesh.morphTargetInfluences[ i ] );
 					if ( mesh.morphTargetDictionary !== undefined ) targetNames.push( reverseDictionary[ i ] );
 
 				}
 
-				gltfMesh.weights = weights;
+				meshDef.weights = weights;
 
 				if ( targetNames.length > 0 ) {
 
-					gltfMesh.extras = {};
-					gltfMesh.extras.targetNames = targetNames;
+					meshDef.extras = {};
+					meshDef.extras.targetNames = targetNames;
 
 				}
 
 			}
 
-			var isMultiMaterial = Array.isArray( mesh.material );
-
+			const isMultiMaterial = Array.isArray( mesh.material );
 			if ( isMultiMaterial && geometry.groups.length === 0 ) return null;
+			const materials = isMultiMaterial ? mesh.material : [ mesh.material ];
+			const groups = isMultiMaterial ? geometry.groups : [ {
+				materialIndex: 0,
+				start: undefined,
+				count: undefined
+			} ];
 
-			var materials = isMultiMaterial ? mesh.material : [ mesh.material ];
-			var groups = isMultiMaterial ? geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
+			for ( let i = 0, il = groups.length; i < il; i ++ ) {
 
-			for ( var i = 0, il = groups.length; i < il; i ++ ) {
-
-				var primitive = {
+				const primitive = {
 					mode: mode,
-					attributes: attributes,
+					attributes: attributes
 				};
-
-				serializeUserData( geometry, primitive );
-
+				this.serializeUserData( geometry, primitive );
 				if ( targets.length > 0 ) primitive.targets = targets;
 
 				if ( geometry.index !== null ) {
 
-					var cacheKey = getUID( geometry.index );
+					let cacheKey = this.getUID( geometry.index );
 
 					if ( groups[ i ].start !== undefined || groups[ i ].count !== undefined ) {
 
@@ -1419,14 +1431,14 @@ THREE.GLTFExporter.prototype = {
 
 					}
 
-					if ( cachedData.attributes.has( cacheKey ) ) {
+					if ( cache.attributes.has( cacheKey ) ) {
 
-						primitive.indices = cachedData.attributes.get( cacheKey );
+						primitive.indices = cache.attributes.get( cacheKey );
 
 					} else {
 
-						primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
-						cachedData.attributes.set( cacheKey, primitive.indices );
+						primitive.indices = this.processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
+						cache.attributes.set( cacheKey, primitive.indices );
 
 					}
 
@@ -1434,122 +1446,95 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				var material = processMaterial( materials[ groups[ i ].materialIndex ] );
-
-				if ( material !== null ) {
-
-					primitive.material = material;
-
-				}
-
+				const material = this.processMaterial( materials[ groups[ i ].materialIndex ] );
+				if ( material !== null ) primitive.material = material;
 				primitives.push( primitive );
 
 			}
 
-			gltfMesh.primitives = primitives;
+			meshDef.primitives = primitives;
+			if ( ! json.meshes ) json.meshes = [];
 
-			if ( ! outputJSON.meshes ) {
+			this._invokeAll( function ( ext ) {
 
-				outputJSON.meshes = [];
+				ext.writeMesh && ext.writeMesh( mesh, meshDef );
 
-			}
+			} );
 
-			outputJSON.meshes.push( gltfMesh );
-
-			var index = outputJSON.meshes.length - 1;
-			cachedData.meshes.set( meshCacheKey, index );
-
+			const index = json.meshes.push( meshDef ) - 1;
+			cache.meshes.set( meshCacheKey, index );
 			return index;
 
 		}
-
 		/**
-		 * Process camera
-		 * @param  {THREE.Camera} camera Camera to process
-		 * @return {Integer}      Index of the processed mesh in the "camera" array
-		 */
-		function processCamera( camera ) {
+   * Process camera
+   * @param  {THREE.Camera} camera Camera to process
+   * @return {Integer}      Index of the processed mesh in the "camera" array
+   */
 
-			if ( ! outputJSON.cameras ) {
 
-				outputJSON.cameras = [];
+		processCamera( camera ) {
 
-			}
-
-			var isOrtho = camera.isOrthographicCamera;
-
-			var gltfCamera = {
-
+			const json = this.json;
+			if ( ! json.cameras ) json.cameras = [];
+			const isOrtho = camera.isOrthographicCamera;
+			const cameraDef = {
 				type: isOrtho ? 'orthographic' : 'perspective'
-
 			};
 
 			if ( isOrtho ) {
 
-				gltfCamera.orthographic = {
-
+				cameraDef.orthographic = {
 					xmag: camera.right * 2,
 					ymag: camera.top * 2,
 					zfar: camera.far <= 0 ? 0.001 : camera.far,
 					znear: camera.near < 0 ? 0 : camera.near
-
 				};
 
 			} else {
 
-				gltfCamera.perspective = {
-
+				cameraDef.perspective = {
 					aspectRatio: camera.aspect,
 					yfov: THREE.MathUtils.degToRad( camera.fov ),
 					zfar: camera.far <= 0 ? 0.001 : camera.far,
 					znear: camera.near < 0 ? 0 : camera.near
-
 				};
 
-			}
+			} // Question: Is saving "type" as name intentional?
 
-			if ( camera.name !== '' ) {
 
-				gltfCamera.name = camera.type;
-
-			}
-
-			outputJSON.cameras.push( gltfCamera );
-
-			return outputJSON.cameras.length - 1;
+			if ( camera.name !== '' ) cameraDef.name = camera.type;
+			return json.cameras.push( cameraDef ) - 1;
 
 		}
-
 		/**
-		 * Creates glTF animation entry from AnimationClip object.
-		 *
-		 * Status:
-		 * - Only properties listed in PATH_PROPERTIES may be animated.
-		 *
-		 * @param {THREE.AnimationClip} clip
-		 * @param {THREE.Object3D} root
-		 * @return {number}
-		 */
-		function processAnimation( clip, root ) {
+   * Creates glTF animation entry from AnimationClip object.
+   *
+   * Status:
+   * - Only properties listed in PATH_PROPERTIES may be animated.
+   *
+   * @param {THREE.AnimationClip} clip
+   * @param {THREE.Object3D} root
+   * @return {number|null}
+   */
 
-			if ( ! outputJSON.animations ) {
 
-				outputJSON.animations = [];
+		processAnimation( clip, root ) {
 
-			}
+			const json = this.json;
+			const nodeMap = this.nodeMap;
+			if ( ! json.animations ) json.animations = [];
+			clip = GLTFExporter.Utils.mergeMorphTargetTracks( clip.clone(), root );
+			const tracks = clip.tracks;
+			const channels = [];
+			const samplers = [];
 
-			clip = THREE.GLTFExporter.Utils.mergeMorphTargetTracks( clip.clone(), root );
+			for ( let i = 0; i < tracks.length; ++ i ) {
 
-			var tracks = clip.tracks;
-			var channels = [];
-			var samplers = [];
-
-			for ( var i = 0; i < tracks.length; ++ i ) {
-
-				var track = tracks[ i ];
-				var trackBinding = THREE.PropertyBinding.parseTrackName( track.name );
-				var trackNode = THREE.PropertyBinding.findNode( root, trackBinding.nodeName );
-				var trackProperty = PATH_PROPERTIES[ trackBinding.propertyName ];
+				const track = tracks[ i ];
+				const trackBinding = THREE.PropertyBinding.parseTrackName( track.name );
+				let trackNode = THREE.PropertyBinding.findNode( root, trackBinding.nodeName );
+				const trackProperty = PATH_PROPERTIES[ trackBinding.propertyName ];
 
 				if ( trackBinding.objectName === 'bones' ) {
 
@@ -1572,8 +1557,8 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				var inputItemSize = 1;
-				var outputItemSize = track.values.length / track.times.length;
+				const inputItemSize = 1;
+				let outputItemSize = track.values.length / track.times.length;
 
 				if ( trackProperty === PATH_PROPERTIES.morphTargetInfluences ) {
 
@@ -1581,20 +1566,17 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				var interpolation;
-
-				// @TODO export CubicInterpolant(InterpolateSmooth) as CUBICSPLINE
-
+				let interpolation; // @TODO export CubicInterpolant(InterpolateSmooth) as CUBICSPLINE
 				// Detecting glTF cubic spline interpolant by checking factory method's special property
 				// GLTFCubicSplineInterpolant is a custom interpolant and track doesn't return
 				// valid value from .getInterpolation().
+
 				if ( track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline === true ) {
 
-					interpolation = 'CUBICSPLINE';
-
-					// itemSize of CUBICSPLINE keyframe is 9
+					interpolation = 'CUBICSPLINE'; // itemSize of CUBICSPLINE keyframe is 9
 					// (VEC3 * 3: inTangent, splineVertex, and outTangent)
 					// but needs to be stored as VEC3 so dividing by 3 here.
+
 					outputItemSize /= 3;
 
 				} else if ( track.getInterpolation() === THREE.InterpolateDiscrete ) {
@@ -1608,88 +1590,329 @@ THREE.GLTFExporter.prototype = {
 				}
 
 				samplers.push( {
-
-					input: processAccessor( new THREE.BufferAttribute( track.times, inputItemSize ) ),
-					output: processAccessor( new THREE.BufferAttribute( track.values, outputItemSize ) ),
+					input: this.processAccessor( new THREE.BufferAttribute( track.times, inputItemSize ) ),
+					output: this.processAccessor( new THREE.BufferAttribute( track.values, outputItemSize ) ),
 					interpolation: interpolation
-
 				} );
-
 				channels.push( {
-
 					sampler: samplers.length - 1,
 					target: {
 						node: nodeMap.get( trackNode ),
 						path: trackProperty
 					}
-
 				} );
 
 			}
 
-			outputJSON.animations.push( {
-
-				name: clip.name || 'clip_' + outputJSON.animations.length,
+			json.animations.push( {
+				name: clip.name || 'clip_' + json.animations.length,
 				samplers: samplers,
 				channels: channels
-
 			} );
-
-			return outputJSON.animations.length - 1;
+			return json.animations.length - 1;
 
 		}
+		/**
+   * @param {THREE.Object3D} object
+   * @return {number|null}
+   */
 
-		function processSkin( object ) {
 
-			var node = outputJSON.nodes[ nodeMap.get( object ) ];
+		processSkin( object ) {
 
-			var skeleton = object.skeleton;
-
+			const json = this.json;
+			const nodeMap = this.nodeMap;
+			const node = json.nodes[ nodeMap.get( object ) ];
+			const skeleton = object.skeleton;
 			if ( skeleton === undefined ) return null;
-
-			var rootJoint = object.skeleton.bones[ 0 ];
-
+			const rootJoint = object.skeleton.bones[ 0 ];
 			if ( rootJoint === undefined ) return null;
+			const joints = [];
+			const inverseBindMatrices = new Float32Array( skeleton.bones.length * 16 );
+			const temporaryBoneInverse = new THREE.Matrix4();
 
-			var joints = [];
-			var inverseBindMatrices = new Float32Array( skeleton.bones.length * 16 );
-
-			for ( var i = 0; i < skeleton.bones.length; ++ i ) {
+			for ( let i = 0; i < skeleton.bones.length; ++ i ) {
 
 				joints.push( nodeMap.get( skeleton.bones[ i ] ) );
-
-				skeleton.boneInverses[ i ].toArray( inverseBindMatrices, i * 16 );
-
-			}
-
-			if ( outputJSON.skins === undefined ) {
-
-				outputJSON.skins = [];
+				temporaryBoneInverse.copy( skeleton.boneInverses[ i ] );
+				temporaryBoneInverse.multiply( object.bindMatrix ).toArray( inverseBindMatrices, i * 16 );
 
 			}
 
-			outputJSON.skins.push( {
-
-				inverseBindMatrices: processAccessor( new THREE.BufferAttribute( inverseBindMatrices, 16 ) ),
+			if ( json.skins === undefined ) json.skins = [];
+			json.skins.push( {
+				inverseBindMatrices: this.processAccessor( new THREE.BufferAttribute( inverseBindMatrices, 16 ) ),
 				joints: joints,
 				skeleton: nodeMap.get( rootJoint )
-
 			} );
-
-			var skinIndex = node.skin = outputJSON.skins.length - 1;
-
+			const skinIndex = node.skin = json.skins.length - 1;
 			return skinIndex;
 
 		}
+		/**
+   * Process Object3D node
+   * @param  {THREE.Object3D} node Object3D to processNode
+   * @return {Integer} Index of the node in the nodes list
+   */
 
-		function processLight( light ) {
 
-			var lightDef = {};
+		processNode( object ) {
 
+			const json = this.json;
+			const options = this.options;
+			const nodeMap = this.nodeMap;
+			if ( ! json.nodes ) json.nodes = [];
+			const nodeDef = {};
+
+			if ( options.trs ) {
+
+				const rotation = object.quaternion.toArray();
+				const position = object.position.toArray();
+				const scale = object.scale.toArray();
+
+				if ( ! equalArray( rotation, [ 0, 0, 0, 1 ] ) ) {
+
+					nodeDef.rotation = rotation;
+
+				}
+
+				if ( ! equalArray( position, [ 0, 0, 0 ] ) ) {
+
+					nodeDef.translation = position;
+
+				}
+
+				if ( ! equalArray( scale, [ 1, 1, 1 ] ) ) {
+
+					nodeDef.scale = scale;
+
+				}
+
+			} else {
+
+				if ( object.matrixAutoUpdate ) {
+
+					object.updateMatrix();
+
+				}
+
+				if ( isIdentityMatrix( object.matrix ) === false ) {
+
+					nodeDef.matrix = object.matrix.elements;
+
+				}
+
+			} // We don't export empty strings name because it represents no-name in Three.js.
+
+
+			if ( object.name !== '' ) nodeDef.name = String( object.name );
+			this.serializeUserData( object, nodeDef );
+
+			if ( object.isMesh || object.isLine || object.isPoints ) {
+
+				const meshIndex = this.processMesh( object );
+				if ( meshIndex !== null ) nodeDef.mesh = meshIndex;
+
+			} else if ( object.isCamera ) {
+
+				nodeDef.camera = this.processCamera( object );
+
+			}
+
+			if ( object.isSkinnedMesh ) this.skins.push( object );
+
+			if ( object.children.length > 0 ) {
+
+				const children = [];
+
+				for ( let i = 0, l = object.children.length; i < l; i ++ ) {
+
+					const child = object.children[ i ];
+
+					if ( child.visible || options.onlyVisible === false ) {
+
+						const nodeIndex = this.processNode( child );
+						if ( nodeIndex !== null ) children.push( nodeIndex );
+
+					}
+
+				}
+
+				if ( children.length > 0 ) nodeDef.children = children;
+
+			}
+
+			this._invokeAll( function ( ext ) {
+
+				ext.writeNode && ext.writeNode( object, nodeDef );
+
+			} );
+
+			const nodeIndex = json.nodes.push( nodeDef ) - 1;
+			nodeMap.set( object, nodeIndex );
+			return nodeIndex;
+
+		}
+		/**
+   * Process THREE.Scene
+   * @param  {Scene} node THREE.Scene to process
+   */
+
+
+		processScene( scene ) {
+
+			const json = this.json;
+			const options = this.options;
+
+			if ( ! json.scenes ) {
+
+				json.scenes = [];
+				json.scene = 0;
+
+			}
+
+			const sceneDef = {};
+			if ( scene.name !== '' ) sceneDef.name = scene.name;
+			json.scenes.push( sceneDef );
+			const nodes = [];
+
+			for ( let i = 0, l = scene.children.length; i < l; i ++ ) {
+
+				const child = scene.children[ i ];
+
+				if ( child.visible || options.onlyVisible === false ) {
+
+					const nodeIndex = this.processNode( child );
+					if ( nodeIndex !== null ) nodes.push( nodeIndex );
+
+				}
+
+			}
+
+			if ( nodes.length > 0 ) sceneDef.nodes = nodes;
+			this.serializeUserData( scene, sceneDef );
+
+		}
+		/**
+   * Creates a THREE.Scene to hold a list of objects and parse it
+   * @param  {Array} objects List of objects to process
+   */
+
+
+		processObjects( objects ) {
+
+			const scene = new THREE.Scene();
+			scene.name = 'AuxScene';
+
+			for ( let i = 0; i < objects.length; i ++ ) {
+
+				// We push directly to children instead of calling `add` to prevent
+				// modify the .parent and break its original scene and hierarchy
+				scene.children.push( objects[ i ] );
+
+			}
+
+			this.processScene( scene );
+
+		}
+		/**
+   * @param {THREE.Object3D|Array<THREE.Object3D>} input
+   */
+
+
+		processInput( input ) {
+
+			const options = this.options;
+			input = input instanceof Array ? input : [ input ];
+
+			this._invokeAll( function ( ext ) {
+
+				ext.beforeParse && ext.beforeParse( input );
+
+			} );
+
+			const objectsWithoutScene = [];
+
+			for ( let i = 0; i < input.length; i ++ ) {
+
+				if ( input[ i ] instanceof THREE.Scene ) {
+
+					this.processScene( input[ i ] );
+
+				} else {
+
+					objectsWithoutScene.push( input[ i ] );
+
+				}
+
+			}
+
+			if ( objectsWithoutScene.length > 0 ) this.processObjects( objectsWithoutScene );
+
+			for ( let i = 0; i < this.skins.length; ++ i ) {
+
+				this.processSkin( this.skins[ i ] );
+
+			}
+
+			for ( let i = 0; i < options.animations.length; ++ i ) {
+
+				this.processAnimation( options.animations[ i ], input[ 0 ] );
+
+			}
+
+			this._invokeAll( function ( ext ) {
+
+				ext.afterParse && ext.afterParse( input );
+
+			} );
+
+		}
+
+		_invokeAll( func ) {
+
+			for ( let i = 0, il = this.plugins.length; i < il; i ++ ) {
+
+				func( this.plugins[ i ] );
+
+			}
+
+		}
+
+	}
+	/**
+ * Punctual Lights Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_lights_punctual
+ */
+
+
+	class GLTFLightExtension {
+
+		constructor( writer ) {
+
+			this.writer = writer;
+			this.name = 'KHR_lights_punctual';
+
+		}
+
+		writeNode( light, nodeDef ) {
+
+			if ( ! light.isLight ) return;
+
+			if ( ! light.isDirectionalLight && ! light.isPointLight && ! light.isSpotLight ) {
+
+				console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.', light );
+				return;
+
+			}
+
+			const writer = this.writer;
+			const json = writer.json;
+			const extensionsUsed = writer.extensionsUsed;
+			const lightDef = {};
 			if ( light.name ) lightDef.name = light.name;
-
 			lightDef.color = light.color.toArray();
-
 			lightDef.intensity = light.intensity;
 
 			if ( light.isDirectionalLight ) {
@@ -1713,573 +1936,299 @@ THREE.GLTFExporter.prototype = {
 
 			if ( light.decay !== undefined && light.decay !== 2 ) {
 
-				console.warn( 'THREE.GLTFExporter: Light decay may be lost. glTF is physically-based, '
-					+ 'and expects light.decay=2.' );
+				console.warn( 'THREE.GLTFExporter: Light decay may be lost. glTF is physically-based, ' + 'and expects light.decay=2.' );
 
 			}
 
-			if ( light.target
-					&& ( light.target.parent !== light
-					 || light.target.position.x !== 0
-					 || light.target.position.y !== 0
-					 || light.target.position.z !== - 1 ) ) {
+			if ( light.target && ( light.target.parent !== light || light.target.position.x !== 0 || light.target.position.y !== 0 || light.target.position.z !== - 1 ) ) {
 
-				console.warn( 'THREE.GLTFExporter: Light direction may be lost. For best results, '
-					+ 'make light.target a child of the light with position 0,0,-1.' );
+				console.warn( 'THREE.GLTFExporter: Light direction may be lost. For best results, ' + 'make light.target a child of the light with position 0,0,-1.' );
 
 			}
 
-			var lights = outputJSON.extensions[ 'KHR_lights_punctual' ].lights;
-			lights.push( lightDef );
-			return lights.length - 1;
-
-		}
-
-		/**
-		 * Process Object3D node
-		 * @param  {THREE.Object3D} node Object3D to processNode
-		 * @return {Integer}      Index of the node in the nodes list
-		 */
-		function processNode( object ) {
-
-			if ( ! outputJSON.nodes ) {
-
-				outputJSON.nodes = [];
-
-			}
-
-			var gltfNode = {};
-
-			if ( options.trs ) {
-
-				var rotation = object.quaternion.toArray();
-				var position = object.position.toArray();
-				var scale = object.scale.toArray();
-
-				if ( ! equalArray( rotation, [ 0, 0, 0, 1 ] ) ) {
-
-					gltfNode.rotation = rotation;
-
-				}
-
-				if ( ! equalArray( position, [ 0, 0, 0 ] ) ) {
-
-					gltfNode.translation = position;
-
-				}
-
-				if ( ! equalArray( scale, [ 1, 1, 1 ] ) ) {
-
-					gltfNode.scale = scale;
-
-				}
-
-			} else {
-
-				if ( object.matrixAutoUpdate ) {
-
-					object.updateMatrix();
-
-				}
-
-				if ( ! equalArray( object.matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ) ) {
-
-					gltfNode.matrix = object.matrix.elements;
-
-				}
-
-			}
-
-			// We don't export empty strings name because it represents no-name in Three.js.
-			if ( object.name !== '' ) {
-
-				gltfNode.name = String( object.name );
-
-			}
-
-			serializeUserData( object, gltfNode );
-
-			if ( object.isMesh || object.isLine || object.isPoints ) {
-
-				var mesh = processMesh( object );
-
-				if ( mesh !== null ) {
-
-					gltfNode.mesh = mesh;
-
-				}
-
-			} else if ( object.isCamera ) {
-
-				gltfNode.camera = processCamera( object );
-
-			} else if ( object.isDirectionalLight || object.isPointLight || object.isSpotLight ) {
-
-				if ( ! extensionsUsed[ 'KHR_lights_punctual' ] ) {
-
-					outputJSON.extensions = outputJSON.extensions || {};
-					outputJSON.extensions[ 'KHR_lights_punctual' ] = { lights: [] };
-					extensionsUsed[ 'KHR_lights_punctual' ] = true;
-
-				}
-
-				gltfNode.extensions = gltfNode.extensions || {};
-				gltfNode.extensions[ 'KHR_lights_punctual' ] = { light: processLight( object ) };
-
-			} else if ( object.isLight ) {
-
-				console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.', object );
-				return null;
-
-			}
-
-			if ( object.isSkinnedMesh ) {
-
-				skins.push( object );
-
-			}
-
-			if ( object.children.length > 0 ) {
-
-				var children = [];
-
-				for ( var i = 0, l = object.children.length; i < l; i ++ ) {
-
-					var child = object.children[ i ];
-
-					if ( child.visible || options.onlyVisible === false ) {
-
-						var node = processNode( child );
-
-						if ( node !== null ) {
-
-							children.push( node );
-
-						}
-
-					}
-
-				}
-
-				if ( children.length > 0 ) {
-
-					gltfNode.children = children;
-
-				}
-
-
-			}
-
-			outputJSON.nodes.push( gltfNode );
-
-			var nodeIndex = outputJSON.nodes.length - 1;
-			nodeMap.set( object, nodeIndex );
-
-			return nodeIndex;
-
-		}
-
-		/**
-		 * Process Scene
-		 * @param  {THREE.Scene} node Scene to process
-		 */
-		function processScene( scene ) {
-
-			if ( ! outputJSON.scenes ) {
-
-				outputJSON.scenes = [];
-				outputJSON.scene = 0;
-
-			}
-
-			var gltfScene = {};
-
-			if ( scene.name !== '' ) {
-
-				gltfScene.name = scene.name;
-
-			}
-
-			outputJSON.scenes.push( gltfScene );
-
-			var nodes = [];
-
-			for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
-
-				var child = scene.children[ i ];
-
-				if ( child.visible || options.onlyVisible === false ) {
-
-					var node = processNode( child );
-
-					if ( node !== null ) {
-
-						nodes.push( node );
-
-					}
-
-				}
-
-			}
-
-			if ( nodes.length > 0 ) {
-
-				gltfScene.nodes = nodes;
-
-			}
-
-			serializeUserData( scene, gltfScene );
-
-		}
-
-		/**
-		 * Creates a THREE.Scene to hold a list of objects and parse it
-		 * @param  {Array} objects List of objects to process
-		 */
-		function processObjects( objects ) {
-
-			var scene = new THREE.Scene();
-			scene.name = 'AuxScene';
-
-			for ( var i = 0; i < objects.length; i ++ ) {
-
-				// We push directly to children instead of calling `add` to prevent
-				// modify the .parent and break its original scene and hierarchy
-				scene.children.push( objects[ i ] );
-
-			}
-
-			processScene( scene );
-
-		}
-
-		function processInput( input ) {
-
-			input = input instanceof Array ? input : [ input ];
-
-			var objectsWithoutScene = [];
-
-			for ( var i = 0; i < input.length; i ++ ) {
-
-				if ( input[ i ] instanceof THREE.Scene ) {
-
-					processScene( input[ i ] );
-
-				} else {
-
-					objectsWithoutScene.push( input[ i ] );
-
-				}
-
-			}
-
-			if ( objectsWithoutScene.length > 0 ) {
-
-				processObjects( objectsWithoutScene );
-
-			}
-
-			for ( var i = 0; i < skins.length; ++ i ) {
-
-				processSkin( skins[ i ] );
-
-			}
-
-			for ( var i = 0; i < options.animations.length; ++ i ) {
-
-				processAnimation( options.animations[ i ], input[ 0 ] );
-
-			}
-
-		}
-
-		processInput( input );
-
-		Promise.all( pending ).then( function () {
-
-			// Merge buffers.
-			var blob = new Blob( buffers, { type: 'application/octet-stream' } );
-
-			// Declare extensions.
-			var extensionsUsedList = Object.keys( extensionsUsed );
-			if ( extensionsUsedList.length > 0 ) outputJSON.extensionsUsed = extensionsUsedList;
-
-			// Update bytelength of the single buffer.
-			if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) outputJSON.buffers[ 0 ].byteLength = blob.size;
-
-			if ( options.binary === true ) {
-
-				// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
-
-				var GLB_HEADER_BYTES = 12;
-				var GLB_HEADER_MAGIC = 0x46546C67;
-				var GLB_VERSION = 2;
-
-				var GLB_CHUNK_PREFIX_BYTES = 8;
-				var GLB_CHUNK_TYPE_JSON = 0x4E4F534A;
-				var GLB_CHUNK_TYPE_BIN = 0x004E4942;
-
-				var reader = new window.FileReader();
-				reader.readAsArrayBuffer( blob );
-				reader.onloadend = function () {
-
-					// Binary chunk.
-					var binaryChunk = getPaddedArrayBuffer( reader.result );
-					var binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-					binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
-					binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
-
-					// JSON chunk.
-					var jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( outputJSON ) ), 0x20 );
-					var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-					jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
-					jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
-
-					// GLB header.
-					var header = new ArrayBuffer( GLB_HEADER_BYTES );
-					var headerView = new DataView( header );
-					headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
-					headerView.setUint32( 4, GLB_VERSION, true );
-					var totalByteLength = GLB_HEADER_BYTES
-						+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
-						+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
-					headerView.setUint32( 8, totalByteLength, true );
-
-					var glbBlob = new Blob( [
-						header,
-						jsonChunkPrefix,
-						jsonChunk,
-						binaryChunkPrefix,
-						binaryChunk
-					], { type: 'application/octet-stream' } );
-
-					var glbReader = new window.FileReader();
-					glbReader.readAsArrayBuffer( glbBlob );
-					glbReader.onloadend = function () {
-
-						onDone( glbReader.result );
-
-					};
-
+			if ( ! extensionsUsed[ this.name ] ) {
+
+				json.extensions = json.extensions || {};
+				json.extensions[ this.name ] = {
+					lights: []
 				};
+				extensionsUsed[ this.name ] = true;
+
+			}
+
+			const lights = json.extensions[ this.name ].lights;
+			lights.push( lightDef );
+			nodeDef.extensions = nodeDef.extensions || {};
+			nodeDef.extensions[ this.name ] = {
+				light: lights.length - 1
+			};
+
+		}
+
+	}
+	/**
+ * Unlit Materials Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_unlit
+ */
+
+
+	class GLTFMaterialsUnlitExtension {
+
+		constructor( writer ) {
+
+			this.writer = writer;
+			this.name = 'KHR_materials_unlit';
+
+		}
+
+		writeMaterial( material, materialDef ) {
+
+			if ( ! material.isMeshBasicMaterial ) return;
+			const writer = this.writer;
+			const extensionsUsed = writer.extensionsUsed;
+			materialDef.extensions = materialDef.extensions || {};
+			materialDef.extensions[ this.name ] = {};
+			extensionsUsed[ this.name ] = true;
+			materialDef.pbrMetallicRoughness.metallicFactor = 0.0;
+			materialDef.pbrMetallicRoughness.roughnessFactor = 0.9;
+
+		}
+
+	}
+	/**
+ * Specular-Glossiness Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_pbrSpecularGlossiness
+ */
+
+
+	class GLTFMaterialsPBRSpecularGlossiness {
+
+		constructor( writer ) {
+
+			this.writer = writer;
+			this.name = 'KHR_materials_pbrSpecularGlossiness';
+
+		}
+
+		writeMaterial( material, materialDef ) {
+
+			if ( ! material.isGLTFSpecularGlossinessMaterial ) return;
+			const writer = this.writer;
+			const extensionsUsed = writer.extensionsUsed;
+			const extensionDef = {};
+
+			if ( materialDef.pbrMetallicRoughness.baseColorFactor ) {
+
+				extensionDef.diffuseFactor = materialDef.pbrMetallicRoughness.baseColorFactor;
+
+			}
+
+			const specularFactor = [ 1, 1, 1 ];
+			material.specular.toArray( specularFactor, 0 );
+			extensionDef.specularFactor = specularFactor;
+			extensionDef.glossinessFactor = material.glossiness;
+
+			if ( materialDef.pbrMetallicRoughness.baseColorTexture ) {
+
+				extensionDef.diffuseTexture = materialDef.pbrMetallicRoughness.baseColorTexture;
+
+			}
+
+			if ( material.specularMap ) {
+
+				const specularMapDef = {
+					index: writer.processTexture( material.specularMap )
+				};
+				writer.applyTextureTransform( specularMapDef, material.specularMap );
+				extensionDef.specularGlossinessTexture = specularMapDef;
+
+			}
+
+			materialDef.extensions = materialDef.extensions || {};
+			materialDef.extensions[ this.name ] = extensionDef;
+			extensionsUsed[ this.name ] = true;
+
+		}
+
+	}
+	/**
+ * Static utility functions
+ */
+
+
+	GLTFExporter.Utils = {
+		insertKeyframe: function ( track, time ) {
+
+			const tolerance = 0.001; // 1ms
+
+			const valueSize = track.getValueSize();
+			const times = new track.TimeBufferType( track.times.length + 1 );
+			const values = new track.ValueBufferType( track.values.length + valueSize );
+			const interpolant = track.createInterpolant( new track.ValueBufferType( valueSize ) );
+			let index;
+
+			if ( track.times.length === 0 ) {
+
+				times[ 0 ] = time;
+
+				for ( let i = 0; i < valueSize; i ++ ) {
+
+					values[ i ] = 0;
+
+				}
+
+				index = 0;
+
+			} else if ( time < track.times[ 0 ] ) {
+
+				if ( Math.abs( track.times[ 0 ] - time ) < tolerance ) return 0;
+				times[ 0 ] = time;
+				times.set( track.times, 1 );
+				values.set( interpolant.evaluate( time ), 0 );
+				values.set( track.values, valueSize );
+				index = 0;
+
+			} else if ( time > track.times[ track.times.length - 1 ] ) {
+
+				if ( Math.abs( track.times[ track.times.length - 1 ] - time ) < tolerance ) {
+
+					return track.times.length - 1;
+
+				}
+
+				times[ times.length - 1 ] = time;
+				times.set( track.times, 0 );
+				values.set( track.values, 0 );
+				values.set( interpolant.evaluate( time ), track.values.length );
+				index = times.length - 1;
 
 			} else {
 
-				if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
+				for ( let i = 0; i < track.times.length; i ++ ) {
 
-					var reader = new window.FileReader();
-					reader.readAsDataURL( blob );
-					reader.onloadend = function () {
+					if ( Math.abs( track.times[ i ] - time ) < tolerance ) return i;
 
-						var base64data = reader.result;
-						outputJSON.buffers[ 0 ].uri = base64data;
-						onDone( outputJSON );
+					if ( track.times[ i ] < time && track.times[ i + 1 ] > time ) {
 
-					};
+						times.set( track.times.slice( 0, i + 1 ), 0 );
+						times[ i + 1 ] = time;
+						times.set( track.times.slice( i + 1 ), i + 2 );
+						values.set( track.values.slice( 0, ( i + 1 ) * valueSize ), 0 );
+						values.set( interpolant.evaluate( time ), ( i + 1 ) * valueSize );
+						values.set( track.values.slice( ( i + 1 ) * valueSize ), ( i + 2 ) * valueSize );
+						index = i + 1;
+						break;
 
-				} else {
+					}
 
-					onDone( outputJSON );
+				}
+
+			}
+
+			track.times = times;
+			track.values = values;
+			return index;
+
+		},
+		mergeMorphTargetTracks: function ( clip, root ) {
+
+			const tracks = [];
+			const mergedTracks = {};
+			const sourceTracks = clip.tracks;
+
+			for ( let i = 0; i < sourceTracks.length; ++ i ) {
+
+				let sourceTrack = sourceTracks[ i ];
+				const sourceTrackBinding = THREE.PropertyBinding.parseTrackName( sourceTrack.name );
+				const sourceTrackNode = THREE.PropertyBinding.findNode( root, sourceTrackBinding.nodeName );
+
+				if ( sourceTrackBinding.propertyName !== 'morphTargetInfluences' || sourceTrackBinding.propertyIndex === undefined ) {
+
+					// Tracks that don't affect morph targets, or that affect all morph targets together, can be left as-is.
+					tracks.push( sourceTrack );
+					continue;
+
+				}
+
+				if ( sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodDiscrete && sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodLinear ) {
+
+					if ( sourceTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
+
+						// This should never happen, because glTF morph target animations
+						// affect all targets already.
+						throw new Error( 'THREE.GLTFExporter: Cannot merge tracks with glTF CUBICSPLINE interpolation.' );
+
+					}
+
+					console.warn( 'THREE.GLTFExporter: Morph target interpolation mode not yet supported. Using LINEAR instead.' );
+					sourceTrack = sourceTrack.clone();
+					sourceTrack.setInterpolation( THREE.InterpolateLinear );
+
+				}
+
+				const targetCount = sourceTrackNode.morphTargetInfluences.length;
+				const targetIndex = sourceTrackNode.morphTargetDictionary[ sourceTrackBinding.propertyIndex ];
+
+				if ( targetIndex === undefined ) {
+
+					throw new Error( 'THREE.GLTFExporter: Morph target name not found: ' + sourceTrackBinding.propertyIndex );
+
+				}
+
+				let mergedTrack; // If this is the first time we've seen this object, create a new
+				// track to store merged keyframe data for each morph target.
+
+				if ( mergedTracks[ sourceTrackNode.uuid ] === undefined ) {
+
+					mergedTrack = sourceTrack.clone();
+					const values = new mergedTrack.ValueBufferType( targetCount * mergedTrack.times.length );
+
+					for ( let j = 0; j < mergedTrack.times.length; j ++ ) {
+
+						values[ j * targetCount + targetIndex ] = mergedTrack.values[ j ];
+
+					} // We need to take into consideration the intended target node
+					// of our original un-merged morphTarget animation.
+
+
+					mergedTrack.name = ( sourceTrackBinding.nodeName || '' ) + '.morphTargetInfluences';
+					mergedTrack.values = values;
+					mergedTracks[ sourceTrackNode.uuid ] = mergedTrack;
+					tracks.push( mergedTrack );
+					continue;
+
+				}
+
+				const sourceInterpolant = sourceTrack.createInterpolant( new sourceTrack.ValueBufferType( 1 ) );
+				mergedTrack = mergedTracks[ sourceTrackNode.uuid ]; // For every existing keyframe of the merged track, write a (possibly
+				// interpolated) value from the source track.
+
+				for ( let j = 0; j < mergedTrack.times.length; j ++ ) {
+
+					mergedTrack.values[ j * targetCount + targetIndex ] = sourceInterpolant.evaluate( mergedTrack.times[ j ] );
+
+				} // For every existing keyframe of the source track, write a (possibly
+				// new) keyframe to the merged track. Values from the previous loop may
+				// be written again, but keyframes are de-duplicated.
+
+
+				for ( let j = 0; j < sourceTrack.times.length; j ++ ) {
+
+					const keyframeIndex = this.insertKeyframe( mergedTrack, sourceTrack.times[ j ] );
+					mergedTrack.values[ keyframeIndex * targetCount + targetIndex ] = sourceTrack.values[ j ];
 
 				}
 
 			}
 
-		} );
-
-	}
-
-};
-
-THREE.GLTFExporter.Utils = {
-
-	insertKeyframe: function ( track, time ) {
-
-		var tolerance = 0.001; // 1ms
-		var valueSize = track.getValueSize();
-
-		var times = new track.TimeBufferType( track.times.length + 1 );
-		var values = new track.ValueBufferType( track.values.length + valueSize );
-		var interpolant = track.createInterpolant( new track.ValueBufferType( valueSize ) );
-
-		var index;
-
-		if ( track.times.length === 0 ) {
-
-			times[ 0 ] = time;
-
-			for ( var i = 0; i < valueSize; i ++ ) {
-
-				values[ i ] = 0;
-
-			}
-
-			index = 0;
-
-		} else if ( time < track.times[ 0 ] ) {
-
-			if ( Math.abs( track.times[ 0 ] - time ) < tolerance ) return 0;
-
-			times[ 0 ] = time;
-			times.set( track.times, 1 );
-
-			values.set( interpolant.evaluate( time ), 0 );
-			values.set( track.values, valueSize );
-
-			index = 0;
-
-		} else if ( time > track.times[ track.times.length - 1 ] ) {
-
-			if ( Math.abs( track.times[ track.times.length - 1 ] - time ) < tolerance ) {
-
-				return track.times.length - 1;
-
-			}
-
-			times[ times.length - 1 ] = time;
-			times.set( track.times, 0 );
-
-			values.set( track.values, 0 );
-			values.set( interpolant.evaluate( time ), track.values.length );
-
-			index = times.length - 1;
-
-		} else {
-
-			for ( var i = 0; i < track.times.length; i ++ ) {
-
-				if ( Math.abs( track.times[ i ] - time ) < tolerance ) return i;
-
-				if ( track.times[ i ] < time && track.times[ i + 1 ] > time ) {
-
-					times.set( track.times.slice( 0, i + 1 ), 0 );
-					times[ i + 1 ] = time;
-					times.set( track.times.slice( i + 1 ), i + 2 );
-
-					values.set( track.values.slice( 0, ( i + 1 ) * valueSize ), 0 );
-					values.set( interpolant.evaluate( time ), ( i + 1 ) * valueSize );
-					values.set( track.values.slice( ( i + 1 ) * valueSize ), ( i + 2 ) * valueSize );
-
-					index = i + 1;
-
-					break;
-
-				}
-
-			}
+			clip.tracks = tracks;
+			return clip;
 
 		}
+	};
 
-		track.times = times;
-		track.values = values;
+	THREE.GLTFExporter = GLTFExporter;
 
-		return index;
-
-	},
-
-	mergeMorphTargetTracks: function ( clip, root ) {
-
-		var tracks = [];
-		var mergedTracks = {};
-		var sourceTracks = clip.tracks;
-
-		for ( var i = 0; i < sourceTracks.length; ++ i ) {
-
-			var sourceTrack = sourceTracks[ i ];
-			var sourceTrackBinding = THREE.PropertyBinding.parseTrackName( sourceTrack.name );
-			var sourceTrackNode = THREE.PropertyBinding.findNode( root, sourceTrackBinding.nodeName );
-
-			if ( sourceTrackBinding.propertyName !== 'morphTargetInfluences' || sourceTrackBinding.propertyIndex === undefined ) {
-
-				// Tracks that don't affect morph targets, or that affect all morph targets together, can be left as-is.
-				tracks.push( sourceTrack );
-				continue;
-
-			}
-
-			if ( sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodDiscrete
-				&& sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodLinear ) {
-
-				if ( sourceTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
-
-					// This should never happen, because glTF morph target animations
-					// affect all targets already.
-					throw new Error( 'THREE.GLTFExporter: Cannot merge tracks with glTF CUBICSPLINE interpolation.' );
-
-				}
-
-				console.warn( 'THREE.GLTFExporter: Morph target interpolation mode not yet supported. Using LINEAR instead.' );
-
-				sourceTrack = sourceTrack.clone();
-				sourceTrack.setInterpolation( THREE.InterpolateLinear );
-
-			}
-
-			var targetCount = sourceTrackNode.morphTargetInfluences.length;
-			var targetIndex = sourceTrackNode.morphTargetDictionary[ sourceTrackBinding.propertyIndex ];
-
-			if ( targetIndex === undefined ) {
-
-				throw new Error( 'THREE.GLTFExporter: Morph target name not found: ' + sourceTrackBinding.propertyIndex );
-
-			}
-
-			var mergedTrack;
-
-			// If this is the first time we've seen this object, create a new
-			// track to store merged keyframe data for each morph target.
-			if ( mergedTracks[ sourceTrackNode.uuid ] === undefined ) {
-
-				mergedTrack = sourceTrack.clone();
-
-				var values = new mergedTrack.ValueBufferType( targetCount * mergedTrack.times.length );
-
-				for ( var j = 0; j < mergedTrack.times.length; j ++ ) {
-
-					values[ j * targetCount + targetIndex ] = mergedTrack.values[ j ];
-
-				}
-
-				// We need to take into consideration the intended target node
-				// of our original un-merged morphTarget animation.
-				mergedTrack.name = sourceTrackBinding.nodeName + '.morphTargetInfluences';
-				mergedTrack.values = values;
-
-				mergedTracks[ sourceTrackNode.uuid ] = mergedTrack;
-				tracks.push( mergedTrack );
-
-				continue;
-
-			}
-
-			var sourceInterpolant = sourceTrack.createInterpolant( new sourceTrack.ValueBufferType( 1 ) );
-
-			mergedTrack = mergedTracks[ sourceTrackNode.uuid ];
-
-			// For every existing keyframe of the merged track, write a (possibly
-			// interpolated) value from the source track.
-			for ( var j = 0; j < mergedTrack.times.length; j ++ ) {
-
-				mergedTrack.values[ j * targetCount + targetIndex ] = sourceInterpolant.evaluate( mergedTrack.times[ j ] );
-
-			}
-
-			// For every existing keyframe of the source track, write a (possibly
-			// new) keyframe to the merged track. Values from the previous loop may
-			// be written again, but keyframes are de-duplicated.
-			for ( var j = 0; j < sourceTrack.times.length; j ++ ) {
-
-				var keyframeIndex = this.insertKeyframe( mergedTrack, sourceTrack.times[ j ] );
-				mergedTrack.values[ keyframeIndex * targetCount + targetIndex ] = sourceTrack.values[ j ];
-
-			}
-
-		}
-
-		clip.tracks = tracks;
-
-		return clip;
-
-	}
-
-};
+} )();

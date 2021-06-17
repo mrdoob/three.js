@@ -22,13 +22,13 @@
 			import { VRMLLoader } from './jsm/loaders/VRMLLoader.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			var camera, scene, renderer, stats, controls, loader;
+			let camera, scene, renderer, stats, controls, loader;
 
-			var params = {
+			const params = {
 				asset: 'house'
 			};
 
-			var assets = [
+			const assets = [
 				'creaseAngle',
 				'crystal',
 				'house',
@@ -44,7 +44,7 @@
 				'points',
 			];
 
-			var vrmlScene;
+			let vrmlScene;
 
 			init();
 			animate();
@@ -59,10 +59,10 @@
 
 				// light
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
 				scene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				dirLight.position.set( 200, 200, 200 );
 				scene.add( dirLight );
 
@@ -90,11 +90,11 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
-				var gui = new GUI( { width: 300 } );
+				const gui = new GUI( { width: 300 } );
 				gui.add( params, 'asset', assets ).onChange( function ( value ) {
 
 					if ( vrmlScene ) {

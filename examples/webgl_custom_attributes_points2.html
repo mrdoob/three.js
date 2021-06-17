@@ -55,11 +55,13 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var renderer, scene, camera, stats;
-			var sphere, length1;
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
-			var WIDTH = window.innerWidth;
-			var HEIGHT = window.innerHeight;
+			let renderer, scene, camera, stats;
+			let sphere, length1;
+
+			const WIDTH = window.innerWidth;
+			const HEIGHT = window.innerHeight;
 
 			init();
 			animate();
@@ -71,26 +73,36 @@
 
 				scene = new THREE.Scene();
 
-				var radius = 100, segments = 68, rings = 38;
+				const radius = 100, segments = 68, rings = 38;
 
-				var vertices1 = new THREE.SphereGeometry( radius, segments, rings ).vertices;
-				var vertices2 = new THREE.BoxGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 ).vertices;
+				let sphereGeometry = new THREE.SphereGeometry( radius, segments, rings );
+				let boxGeometry = new THREE.BoxGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 );
 
-				length1 = vertices1.length;
+				// if normal and uv attributes are not removed, mergeVertices() can't consolidate indentical vertices with different normal/uv data
 
-				var vertices = vertices1.concat( vertices2 );
+				sphereGeometry.deleteAttribute( 'normal' );
+				sphereGeometry.deleteAttribute( 'uv' );
 
-				var positions = new Float32Array( vertices.length * 3 );
-				var colors = new Float32Array( vertices.length * 3 );
-				var sizes = new Float32Array( vertices.length );
+				boxGeometry.deleteAttribute( 'normal' );
+				boxGeometry.deleteAttribute( 'uv' );
 
-				var vertex;
-				var color = new THREE.Color();
+				sphereGeometry = BufferGeometryUtils.mergeVertices( sphereGeometry );
+				boxGeometry = BufferGeometryUtils.mergeVertices( boxGeometry );
 
-				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+				const combinedGeometry = BufferGeometryUtils.mergeBufferGeometries( [ sphereGeometry, boxGeometry ] );
+				const positionAttribute = combinedGeometry.getAttribute( 'position' );
 
-					vertex = vertices[ i ];
-					vertex.toArray( positions, i * 3 );
+				const colors = [];
+				const sizes = [];
+
+				const color = new THREE.Color();
+				const vertex = new THREE.Vector3();
+
+				length1 = sphereGeometry.getAttribute( 'position' ).count;
+
+				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
+
+					vertex.fromBufferAttribute( positionAttribute, i );
 
 					if ( i < length1 ) {
 
@@ -108,18 +120,18 @@
 
 				}
 
-				var geometry = new THREE.BufferGeometry();
-				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.setAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
-				geometry.setAttribute( 'ca', new THREE.BufferAttribute( colors, 3 ) );
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ) );
+				geometry.setAttribute( 'ca', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				//
 
-				var texture = new THREE.TextureLoader().load( "textures/sprites/disc.png" );
+				const texture = new THREE.TextureLoader().load( 'textures/sprites/disc.png' );
 				texture.wrapS = THREE.RepeatWrapping;
 				texture.wrapT = THREE.RepeatWrapping;
 
-				var material = new THREE.ShaderMaterial( {
+				const material = new THREE.ShaderMaterial( {
 
 					uniforms: {
 						color: { value: new THREE.Color( 0xffffff ) },
@@ -142,7 +154,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -150,7 +162,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -165,27 +177,27 @@
 
 			function sortPoints() {
 
-				var vector = new THREE.Vector3();
+				const vector = new THREE.Vector3();
 
 				// Model View Projection matrix
 
-				var matrix = new THREE.Matrix4();
+				const matrix = new THREE.Matrix4();
 				matrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 				matrix.multiply( sphere.matrixWorld );
 
 				//
 
-				var geometry = sphere.geometry;
+				const geometry = sphere.geometry;
 
-				var index = geometry.getIndex();
-				var positions = geometry.getAttribute( 'position' ).array;
-				var length = positions.length / 3;
+				let index = geometry.getIndex();
+				const positions = geometry.getAttribute( 'position' ).array;
+				const length = positions.length / 3;
 
 				if ( index === null ) {
 
-					var array = new Uint16Array( length );
+					const array = new Uint16Array( length );
 
-					for ( var i = 0; i < length; i ++ ) {
+					for ( let i = 0; i < length; i ++ ) {
 
 						array[ i ] = i;
 
@@ -197,9 +209,9 @@
 
 				}
 
-				var sortArray = [];
+				const sortArray = [];
 
-				for ( var i = 0; i < length; i ++ ) {
+				for ( let i = 0; i < length; i ++ ) {
 
 					vector.fromArray( positions, i * 3 );
 					vector.applyMatrix4( matrix );
@@ -216,9 +228,9 @@
 
 				sortArray.sort( numericalSort );
 
-				var indices = index.array;
+				const indices = index.array;
 
-				for ( var i = 0; i < length; i ++ ) {
+				for ( let i = 0; i < length; i ++ ) {
 
 					indices[ i ] = sortArray[ i ][ 1 ];
 
@@ -239,15 +251,15 @@
 
 			function render() {
 
-				var time = Date.now() * 0.005;
+				const time = Date.now() * 0.005;
 
 				sphere.rotation.y = 0.02 * time;
 				sphere.rotation.z = 0.02 * time;
 
-				var geometry = sphere.geometry;
-				var attributes = geometry.attributes;
+				const geometry = sphere.geometry;
+				const attributes = geometry.attributes;
 
-				for ( var i = 0; i < attributes.size.array.length; i ++ ) {
+				for ( let i = 0; i < attributes.size.array.length; i ++ ) {
 
 					if ( i < length1 ) {
 

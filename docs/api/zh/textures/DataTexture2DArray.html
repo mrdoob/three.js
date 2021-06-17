@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -39,20 +38,23 @@
 		<code>
 		// create a buffer with color data
 
-		var size = width * height;
-		var data = new Uint8Array( 3 * size * depth );
+		const width = 512;
+		const height = 512;
+		const depth = 100;
 
+		const size = width * height;
+		const data = new Uint8Array( 3 * size * depth );
 
-		for ( var i = 0; i < depth; i ++ ) {
+		for ( let i = 0; i < depth; i ++ ) {
 
-			var color = new THREE.Color( Math.random(), Math.random(), Math.random() );
-			var r = Math.floor( color.r * 255 );
-			var g = Math.floor( color.g * 255 );
-			var b = Math.floor( color.b * 255 );
+			const color = new THREE.Color( Math.random(), Math.random(), Math.random() );
+			const r = Math.floor( color.r * 255 );
+			const g = Math.floor( color.g * 255 );
+			const b = Math.floor( color.b * 255 );
 
-			for ( var j = 0; j < size; j ++ ) {
+			for ( let j = 0; j < size; j ++ ) {
 
-				var stride = ( i * size + j ) * 3;
+				const stride = ( i * size + j ) * 3;
 
 				data[ stride ] = r;
 				data[ stride + 1 ] = g;
@@ -63,7 +65,7 @@
 
 		// used the buffer to create a [name]
 
-		var texture = new THREE.DataTexture2DArray( data, width, height, depth );
+		const texture = new THREE.DataTexture2DArray( data, width, height, depth );
 		texture.format = THREE.RGBFormat;
 		texture.type = THREE.UnsignedByteType;
 		</code>

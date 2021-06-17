@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
 import { UIOutliner, UITexture } from './libs/ui.three.js';
 
@@ -170,7 +166,7 @@ function SidebarScene( editor ) {
 
 	var backgroundType = new UISelect().setOptions( {
 
-		'None': 'None',
+		'None': '',
 		'Color': 'Color',
 		'Texture': 'Texture',
 		'Equirectangular': 'Equirect'
@@ -187,7 +183,7 @@ function SidebarScene( editor ) {
 	backgroundRow.add( new UIText( strings.getKey( 'sidebar/scene/background' ) ).setWidth( '90px' ) );
 	backgroundRow.add( backgroundType );
 
-	var backgroundColor = new UIColor().setValue( '#000000' ).setMarginLeft( '8px' ).onChange( onBackgroundChanged );
+	var backgroundColor = new UIColor().setValue( '#000000' ).setMarginLeft( '8px' ).onInput( onBackgroundChanged );
 	backgroundRow.add( backgroundColor );
 
 	var backgroundTexture = new UITexture().setMarginLeft( '8px' ).onChange( onBackgroundChanged );
@@ -219,8 +215,9 @@ function SidebarScene( editor ) {
 
 	var environmentType = new UISelect().setOptions( {
 
-		'None': 'None',
-		'Background': 'Background'
+		'None': '',
+		'Background': 'Background',
+		'ModelViewer': 'ModelViewer'
 
 	} ).setWidth( '150px' );
 	environmentType.setValue( 'None' );
@@ -264,7 +261,7 @@ function SidebarScene( editor ) {
 	var fogTypeRow = new UIRow();
 	var fogType = new UISelect().setOptions( {
 
-		'None': 'None',
+		'None': '',
 		'Fog': 'Linear',
 		'FogExp2': 'Exponential'
 
@@ -289,7 +286,7 @@ function SidebarScene( editor ) {
 	container.add( fogPropertiesRow );
 
 	var fogColor = new UIColor().setValue( '#aaaaaa' );
-	fogColor.onChange( onFogSettingsChanged );
+	fogColor.onInput( onFogSettingsChanged );
 	fogPropertiesRow.add( fogColor );
 
 	// fog near
@@ -357,7 +354,7 @@ function SidebarScene( editor ) {
 
 			if ( scene.background.isColor ) {
 
-				backgroundType.setValue( "Color" );
+				backgroundType.setValue( 'Color' );
 				backgroundColor.setHexValue( scene.background.getHex() );
 				backgroundTexture.setValue( null );
 				backgroundEquirectangularTexture.setValue( null );
@@ -368,7 +365,7 @@ function SidebarScene( editor ) {
 
 		} else {
 
-			backgroundType.setValue( "None" );
+			backgroundType.setValue( 'None' );
 			backgroundTexture.setValue( null );
 			backgroundEquirectangularTexture.setValue( null );
 
@@ -380,7 +377,7 @@ function SidebarScene( editor ) {
 
 		} else {
 
-			environmentType.setValue( "None" );
+			environmentType.setValue( 'None' );
 
 		}
 
@@ -390,20 +387,20 @@ function SidebarScene( editor ) {
 
 			if ( scene.fog.isFog ) {
 
-				fogType.setValue( "Fog" );
+				fogType.setValue( 'Fog' );
 				fogNear.setValue( scene.fog.near );
 				fogFar.setValue( scene.fog.far );
 
 			} else if ( scene.fog.isFogExp2 ) {
 
-				fogType.setValue( "FogExp2" );
+				fogType.setValue( 'FogExp2' );
 				fogDensity.setValue( scene.fog.density );
 
 			}
 
 		} else {
 
-			fogType.setValue( "None" );
+			fogType.setValue( 'None' );
 
 		}
 
@@ -456,7 +453,7 @@ function SidebarScene( editor ) {
 
 		if ( ignoreObjectSelectedSignal === true ) return;
 
-		if ( object !== null ) {
+		if ( object !== null && object.parent !== null ) {
 
 			let needsRefresh = false;
 			let parent = object.parent;

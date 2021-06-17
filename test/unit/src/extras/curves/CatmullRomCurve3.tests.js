@@ -1,7 +1,3 @@
-/**
- * @author zz85 / http://joshuakoo.com
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { CatmullRomCurve3 } from '../../../../../src/extras/curves/CatmullRomCurve3';

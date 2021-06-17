@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { MeshDepthMaterial } from '../../../../src/materials/MeshDepthMaterial';

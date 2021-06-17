@@ -1,23 +1,16 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { ImageLoader } from './ImageLoader.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
 import { Loader } from './Loader.js';
 
+class CubeTextureLoader extends Loader {
 
-function CubeTextureLoader( manager ) {
+	constructor( manager ) {
 
-	Loader.call( this, manager );
+		super( manager );
 
-}
+	}
 
-CubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
-
-	constructor: CubeTextureLoader,
-
-	load: function ( urls, onLoad, onProgress, onError ) {
+	load( urls, onLoad, onProgress, onError ) {
 
 		const texture = new CubeTexture();
 
@@ -57,7 +50,7 @@ CubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 	}
 
-} );
+}
 
 
 export { CubeTextureLoader };

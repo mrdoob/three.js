@@ -64,6 +64,20 @@ body {
 	word-break: break-word;
 }
 
+body.rtl h1,
+body.rtl h2,
+body.rtl h3,
+body.rtl h4,
+body.rtl p,
+body.rtl ul,
+body.rtl ol,
+body.rtl table {
+	direction: rtl !important;
+}
+body.rtl code {
+	direction: ltr !important;
+}
+
 a {
 	color: var(--color-blue);
 	cursor: pointer;

@@ -19,15 +19,17 @@
 			import { VRButton } from './jsm/webxr/VRButton.js';
 			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 
-			var container;
-			var camera, scene, renderer;
-			var controller1, controller2;
-			var controllerGrip1, controllerGrip2;
+			let container;
+			let camera, scene, renderer;
+			let controller1, controller2;
+			let controllerGrip1, controllerGrip2;
 
-			var raycaster, intersected = [];
-			var tempMatrix = new THREE.Matrix4();
+			let raycaster;
 
-			var controls, group;
+			const intersected = [];
+			const tempMatrix = new THREE.Matrix4();
+
+			let controls, group;
 
 			init();
 			animate();
@@ -47,20 +49,20 @@
 				controls.target.set( 0, 1.6, 0 );
 				controls.update();
 
-				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
-				var material = new THREE.MeshStandardMaterial( {
+				const floorGeometry = new THREE.PlaneGeometry( 4, 4 );
+				const floorMaterial = new THREE.MeshStandardMaterial( {
 					color: 0xeeeeee,
 					roughness: 1.0,
 					metalness: 0.0
 				} );
-				var floor = new THREE.Mesh( geometry, material );
+				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
 				scene.add( floor );
 
 				scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				const light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
@@ -73,24 +75,24 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				var geometries = [
-					new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 ),
-					new THREE.ConeBufferGeometry( 0.2, 0.2, 64 ),
-					new THREE.CylinderBufferGeometry( 0.2, 0.2, 0.2, 64 ),
-					new THREE.IcosahedronBufferGeometry( 0.2, 3 ),
-					new THREE.TorusBufferGeometry( 0.2, 0.04, 64, 32 )
+				const geometries = [
+					new THREE.BoxGeometry( 0.2, 0.2, 0.2 ),
+					new THREE.ConeGeometry( 0.2, 0.2, 64 ),
+					new THREE.CylinderGeometry( 0.2, 0.2, 0.2, 64 ),
+					new THREE.IcosahedronGeometry( 0.2, 8 ),
+					new THREE.TorusGeometry( 0.2, 0.04, 64, 32 )
 				];
 
-				for ( var i = 0; i < 50; i ++ ) {
+				for ( let i = 0; i < 50; i ++ ) {
 
-					var geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
-					var material = new THREE.MeshStandardMaterial( {
+					const geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
+					const material = new THREE.MeshStandardMaterial( {
 						color: Math.random() * 0xffffff,
 						roughness: 0.7,
 						metalness: 0.0
 					} );
 
-					var object = new THREE.Mesh( geometry, material );
+					const object = new THREE.Mesh( geometry, material );
 
 					object.position.x = Math.random() * 4 - 2;
 					object.position.y = Math.random() * 2;
@@ -133,7 +135,7 @@
 				controller2.addEventListener( 'selectend', onSelectEnd );
 				scene.add( controller2 );
 
-				var controllerModelFactory = new XRControllerModelFactory();
+				const controllerModelFactory = new XRControllerModelFactory();
 
 				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
 				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
@@ -145,9 +147,9 @@
 
 				//
 
-				var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+				const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 
-				var line = new THREE.Line( geometry );
+				const line = new THREE.Line( geometry );
 				line.name = 'line';
 				line.scale.z = 5;
 
@@ -158,7 +160,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -173,15 +175,15 @@
 
 			function onSelectStart( event ) {
 
-				var controller = event.target;
+				const controller = event.target;
 
-				var intersections = getIntersections( controller );
+				const intersections = getIntersections( controller );
 
 				if ( intersections.length > 0 ) {
 
-					var intersection = intersections[ 0 ];
+					const intersection = intersections[ 0 ];
 
-					var object = intersection.object;
+					const object = intersection.object;
 					object.material.emissive.b = 1;
 					controller.attach( object );
 
@@ -193,11 +195,11 @@
 
 			function onSelectEnd( event ) {
 
-				var controller = event.target;
+				const controller = event.target;
 
 				if ( controller.userData.selected !== undefined ) {
 
-					var object = controller.userData.selected;
+					const object = controller.userData.selected;
 					object.material.emissive.b = 0;
 					group.attach( object );
 
@@ -225,14 +227,14 @@
 
 				if ( controller.userData.selected !== undefined ) return;
 
-				var line = controller.getObjectByName( 'line' );
-				var intersections = getIntersections( controller );
+				const line = controller.getObjectByName( 'line' );
+				const intersections = getIntersections( controller );
 
 				if ( intersections.length > 0 ) {
 
-					var intersection = intersections[ 0 ];
+					const intersection = intersections[ 0 ];
 
-					var object = intersection.object;
+					const object = intersection.object;
 					object.material.emissive.r = 1;
 					intersected.push( object );
 
@@ -250,7 +252,7 @@
 
 				while ( intersected.length ) {
 
-					var object = intersected.pop();
+					const object = intersected.pop();
 					object.material.emissive.r = 0;
 
 				}

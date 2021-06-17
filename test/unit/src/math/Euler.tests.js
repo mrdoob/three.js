@@ -1,8 +1,5 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
+
 import { Euler } from '../../../../src/math/Euler';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Quaternion } from '../../../../src/math/Quaternion';
@@ -440,27 +437,6 @@ export default QUnit.module( 'Maths', () => {
 
 			a._onChangeCallback();
 			assert.ok( b, "Passed!" );
-
-		} );
-
-		// OTHERS
-		QUnit.test( "gimbalLocalQuat", ( assert ) => {
-
-			// known problematic quaternions
-			var q1 = new Quaternion( 0.5207769385244341, - 0.4783214164122354, 0.520776938524434, 0.47832141641223547 );
-			var q2 = new Quaternion( 0.11284905712620674, 0.6980437630368944, - 0.11284905712620674, 0.6980437630368944 );
-
-			var eulerOrder = "ZYX";
-
-			// create Euler directly from a Quaternion
-			var eViaQ1 = new Euler().setFromQuaternion( q1, eulerOrder ); // there is likely a bug here
-
-			// create Euler from Quaternion via an intermediate Matrix4
-			var mViaQ1 = new Matrix4().makeRotationFromQuaternion( q1 );
-			var eViaMViaQ1 = new Euler().setFromRotationMatrix( mViaQ1, eulerOrder );
-
-			// the results here are different
-			assert.ok( eulerEquals( eViaQ1, eViaMViaQ1 ), "Passed!" ); // this result is correct
 
 		} );
 

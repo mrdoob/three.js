@@ -18,10 +18,10 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer;
-			var mapBg;
+			let camera, scene, renderer;
+			let mapBg;
 
-			var textureLoader = new THREE.TextureLoader();
+			const textureLoader = new THREE.TextureLoader();
 
 			init();
 			animate();
@@ -39,8 +39,8 @@
 
 				// BACKGROUND
 
-				var canvas = document.createElement( 'canvas' );
-				var ctx = canvas.getContext( '2d' );
+				const canvas = document.createElement( 'canvas' );
+				const ctx = canvas.getContext( '2d' );
 				canvas.width = canvas.height = 128;
 				ctx.fillStyle = '#ddd';
 				ctx.fillRect( 0, 0, 128, 128 );
@@ -58,20 +58,20 @@
 				mapBg.repeat.set( 128, 64 );
 
 				/*
-				var mapBg = textureLoader.load( 'textures/disturb.jpg' );
+				let mapBg = textureLoader.load( 'textures/disturb.jpg' );
 				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
 				mapBg.repeat.set( 8, 4 );
 				*/
 
-				var materialBg = new THREE.MeshBasicMaterial( { map: mapBg } );
+				const materialBg = new THREE.MeshBasicMaterial( { map: mapBg } );
 
-				var meshBg = new THREE.Mesh( new THREE.PlaneBufferGeometry( 4000, 2000 ), materialBg );
+				const meshBg = new THREE.Mesh( new THREE.PlaneGeometry( 4000, 2000 ), materialBg );
 				meshBg.position.set( 0, 0, - 1 );
 				scene.add( meshBg );
 
 				// OBJECTS
 
-				var blendings = [
+				const blendings = [
 					{ name: 'No', constant: THREE.NoBlending },
 					{ name: 'Normal', constant: THREE.NormalBlending },
 					{ name: 'Additive', constant: THREE.AdditiveBlending },
@@ -79,14 +79,14 @@
 					{ name: 'Multiply', constant: THREE.MultiplyBlending }
 				];
 
-				var map0 = textureLoader.load( 'textures/uv_grid_opengl.jpg' );
-				var map1 = textureLoader.load( 'textures/sprite0.jpg' );
-				var map2 = textureLoader.load( 'textures/sprite0.png' );
-				var map3 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
-				var map4 = textureLoader.load( 'textures/lensflare/lensflare0_alpha.png' );
+				const map0 = textureLoader.load( 'textures/uv_grid_opengl.jpg' );
+				const map1 = textureLoader.load( 'textures/sprite0.jpg' );
+				const map2 = textureLoader.load( 'textures/sprite0.png' );
+				const map3 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
+				const map4 = textureLoader.load( 'textures/lensflare/lensflare0_alpha.png' );
 
-				var geo1 = new THREE.PlaneBufferGeometry( 100, 100 );
-				var geo2 = new THREE.PlaneBufferGeometry( 100, 25 );
+				const geo1 = new THREE.PlaneGeometry( 100, 100 );
+				const geo2 = new THREE.PlaneGeometry( 100, 25 );
 
 				addImageRow( map0, 300 );
 				addImageRow( map1, 150 );
@@ -96,23 +96,23 @@
 
 				function addImageRow( map, y ) {
 
-					for ( var i = 0; i < blendings.length; i ++ ) {
+					for ( let i = 0; i < blendings.length; i ++ ) {
 
-						var blending = blendings[ i ];
+						const blending = blendings[ i ];
 
-						var material = new THREE.MeshBasicMaterial( { map: map } );
+						const material = new THREE.MeshBasicMaterial( { map: map } );
 						material.transparent = true;
 						material.blending = blending.constant;
 
-						var x = ( i - blendings.length / 2 ) * 110;
-						var z = 0;
+						const x = ( i - blendings.length / 2 ) * 110;
+						const z = 0;
 
-						var mesh = new THREE.Mesh( geo1, material );
+						let mesh = new THREE.Mesh( geo1, material );
 						mesh.position.set( x, y, z );
 						scene.add( mesh );
 
 
-						var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blending.name ) );
+						mesh = new THREE.Mesh( geo2, generateLabelMaterial( blending.name ) );
 						mesh.position.set( x, y - 75, z );
 						scene.add( mesh );
 
@@ -129,7 +129,7 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -137,8 +137,8 @@
 
 			function onWindowResize() {
 
-				var SCREEN_WIDTH = window.innerWidth;
-				var SCREEN_HEIGHT = window.innerHeight;
+				const SCREEN_WIDTH = window.innerWidth;
+				const SCREEN_HEIGHT = window.innerHeight;
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
@@ -150,8 +150,8 @@
 
 			function generateLabelMaterial( text ) {
 
-				var canvas = document.createElement( 'canvas' );
-				var ctx = canvas.getContext( '2d' );
+				const canvas = document.createElement( 'canvas' );
+				const ctx = canvas.getContext( '2d' );
 				canvas.width = 128;
 				canvas.height = 32;
 
@@ -162,9 +162,9 @@
 				ctx.font = '12pt arial bold';
 				ctx.fillText( text, 10, 22 );
 
-				var map = new THREE.CanvasTexture( canvas );
+				const map = new THREE.CanvasTexture( canvas );
 
-				var material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
+				const material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
 
 				return material;
 
@@ -174,9 +174,9 @@
 
 				requestAnimationFrame( animate );
 
-				var time = Date.now() * 0.00025;
-				var ox = ( time * - 0.01 * mapBg.repeat.x ) % 1;
-				var oy = ( time * - 0.01 * mapBg.repeat.y ) % 1;
+				const time = Date.now() * 0.00025;
+				const ox = ( time * - 0.01 * mapBg.repeat.x ) % 1;
+				const oy = ( time * - 0.01 * mapBg.repeat.y ) % 1;
 
 				mapBg.offset.set( ox, oy );
 

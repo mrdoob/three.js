@@ -28,11 +28,11 @@
 			import { LuminosityShader } from './jsm/shaders/LuminosityShader.js';
 			import { SobelOperatorShader } from './jsm/shaders/SobelOperatorShader.js';
 
-			var camera, scene, renderer, composer;
+			let camera, scene, renderer, composer;
 
-			var effectSobel;
+			let effectSobel;
 
-			var params = {
+			const params = {
 				enable: true
 			};
 
@@ -51,18 +51,18 @@
 
 				//
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 8, 3, 256, 32, 2, 3 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffff00 } );
+				const geometry = new THREE.TorusKnotGeometry( 8, 3, 256, 32, 2, 3 );
+				const material = new THREE.MeshPhongMaterial( { color: 0xffff00 } );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
@@ -76,12 +76,12 @@
 				// postprocessing
 
 				composer = new EffectComposer( renderer );
-				var renderPass = new RenderPass( scene, camera );
+				const renderPass = new RenderPass( scene, camera );
 				composer.addPass( renderPass );
 
 				// color to grayscale conversion
 
-				var effectGrayScale = new ShaderPass( LuminosityShader );
+				const effectGrayScale = new ShaderPass( LuminosityShader );
 				composer.addPass( effectGrayScale );
 
 				// you might want to use a gaussian blur filter before
@@ -94,20 +94,20 @@
 				effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
 				composer.addPass( effectSobel );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 10;
 				controls.maxDistance = 100;
 
 				//
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'enable' );
 				gui.open();
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

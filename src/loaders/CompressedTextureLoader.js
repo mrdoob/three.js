@@ -4,35 +4,32 @@ import { CompressedTexture } from '../textures/CompressedTexture.js';
 import { Loader } from './Loader.js';
 
 /**
- * @author mrdoob / http://mrdoob.com/
- *
  * Abstract Base class to block based textures loader (dds, pvr, ...)
  *
  * Sub classes have to implement the parse() method which will be used in load().
  */
 
-function CompressedTextureLoader( manager ) {
+class CompressedTextureLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: CompressedTextureLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
 
 		const images = [];
 
 		const texture = new CompressedTexture();
-		texture.image = images;
 
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 
 		let loaded = 0;
 
@@ -53,9 +50,9 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 
 				if ( loaded === 6 ) {
 
-					if ( texDatas.mipmapCount === 1 )
-						texture.minFilter = LinearFilter;
+					if ( texDatas.mipmapCount === 1 ) texture.minFilter = LinearFilter;
 
+					texture.image = images;
 					texture.format = texDatas.format;
 					texture.needsUpdate = true;
 
@@ -102,6 +99,8 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 
 					}
 
+					texture.image = images;
+
 				} else {
 
 					texture.image.width = texDatas.width;
@@ -129,7 +128,7 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 
 	}
 
-} );
+}
 
 
 export { CompressedTextureLoader };

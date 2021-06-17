@@ -1,10 +1,7 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { WebGLRenderLists, WebGLRenderList } from '../../../../../src/renderers/webgl/WebGLRenderLists';
-import { Camera } from '../../../../../src/cameras/Camera';
+import { WebGLProperties } from '../../../../../src/renderers/webgl/WebGLProperties';
 import { Scene } from '../../../../../src/scenes/Scene';
 
 export default QUnit.module( 'Renderers', () => {
@@ -16,37 +13,19 @@ export default QUnit.module( 'Renderers', () => {
 			// PUBLIC STUFF
 			QUnit.test( "get", ( assert ) => {
 
-				var renderLists = new WebGLRenderLists();
+				var properties = new WebGLProperties();
+
+				var renderLists = new WebGLRenderLists( properties );
 				var sceneA = new Scene();
 				var sceneB = new Scene();
-				var cameraA = new Camera();
-				var cameraB = new Camera();
 
-				var listAA = renderLists.get( sceneA, cameraA );
-				var listAB = renderLists.get( sceneA, cameraB );
-				var listBA = renderLists.get( sceneB, cameraA );
+				var listA = renderLists.get( sceneA );
+				var listB = renderLists.get( sceneB );
 
-				assert.propEqual( listAA, new WebGLRenderList(), "listAA is type of WebGLRenderList." );
-				assert.propEqual( listAB, new WebGLRenderList(), "listAB is type of WebGLRenderList." );
-				assert.ok( listAA !== listAB, "Render lists for camera A and B with same scene are different." );
-				assert.ok( listAA !== listBA, "Render lists for scene A and B with same camera are different." );
-				assert.ok( listAA === renderLists.get( sceneA, cameraA ), "The same list is returned when called with the same scene, camera." );
+				assert.propEqual( listA, new WebGLRenderList( properties ), "listA is type of WebGLRenderList." );
+				assert.propEqual( listB, new WebGLRenderList( properties ), "listB is type of WebGLRenderList." );
+				assert.ok( listA !== listB, "Render lists are different." );
 
-			} );
-
-			QUnit.test( "dispose", ( assert ) => {
-
-				var renderLists = new WebGLRenderLists();
-				var scene = new Scene();
-				var camera = new Camera();
-
-				var list1 = renderLists.get( scene, camera );
-
-				scene.dispose()
-
-				var list2 = renderLists.get( scene, camera );
-
-				assert.ok( list1 !== list2, "New list should be different after disposing of the scene." );
 
 			} );
 
@@ -57,7 +36,8 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'init', ( assert ) => {
 
-				var list = new WebGLRenderList();
+				var properties = new WebGLProperties();
+				var list = new WebGLRenderList( properties );
 
 				assert.ok( list.transparent.length === 0, 'Transparent list defaults to length 0.' );
 				assert.ok( list.opaque.length === 0, 'Opaque list defaults to length 0.' );
@@ -77,22 +57,37 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'push', ( assert ) => {
 
-				var list = new WebGLRenderList();
+				var properties = new WebGLProperties();
+
+				var list = new WebGLRenderList( properties );
 				var objA = { id: 'A', renderOrder: 0 };
-				var matA = { transparent: true, program: { id: 1 } };
+				var matA = { transparent: true };
+				var proA = { id: 1 };
 				var geoA = {};
 
 				var objB = { id: 'B', renderOrder: 0 };
-				var matB = { transparent: true, program: { id: 2 } };
+				var matB = { transparent: true };
+				var proB = { id: 2 };
 				var geoB = {};
 
 				var objC = { id: 'C', renderOrder: 0 };
-				var matC = { transparent: false, program: { id: 3 } };
+				var matC = { transparent: false };
+				var proC = { id: 3 };
 				var geoC = {};
 
 				var objD = { id: 'D', renderOrder: 0 };
-				var matD = { transparent: false, program: { id: 4 } };
+				var matD = { transparent: false };
+				var proD = { id: 4 };
 				var geoD = {};
+
+				var materialProperties = properties.get( matA );
+				materialProperties.program = proA;
+				materialProperties = properties.get( matB );
+				materialProperties.program = proB;
+				materialProperties = properties.get( matC );
+				materialProperties.program = proC;
+				materialProperties = properties.get( matD );
+				materialProperties.program = proD;
 
 				list.push( objA, geoA, matA, 0, 0.5, {} );
 				assert.ok( list.transparent.length === 1, 'Transparent list is length 1 after adding transparent item.' );
@@ -104,7 +99,7 @@ export default QUnit.module( 'Renderers', () => {
 						object: objA,
 						geometry: geoA,
 						material: matA,
-						program: matA.program,
+						program: proA,
 						groupOrder: 0,
 						renderOrder: 0,
 						z: 0.5,
@@ -123,7 +118,7 @@ export default QUnit.module( 'Renderers', () => {
 						object: objB,
 						geometry: geoB,
 						material: matB,
-						program: matB.program,
+						program: proB,
 						groupOrder: 1,
 						renderOrder: 0,
 						z: 1.5,
@@ -142,7 +137,7 @@ export default QUnit.module( 'Renderers', () => {
 						object: objC,
 						geometry: geoC,
 						material: matC,
-						program: matC.program,
+						program: proC,
 						groupOrder: 2,
 						renderOrder: 0,
 						z: 2.5,
@@ -161,7 +156,7 @@ export default QUnit.module( 'Renderers', () => {
 						object: objD,
 						geometry: geoD,
 						material: matD,
-						program: matD.program,
+						program: proD,
 						groupOrder: 3,
 						renderOrder: 0,
 						z: 3.5,
@@ -174,22 +169,36 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'unshift', ( assert ) => {
 
-				var list = new WebGLRenderList();
+				var properties = new WebGLProperties();
+				var list = new WebGLRenderList( properties );
 				var objA = { id: 'A', renderOrder: 0 };
-				var matA = { transparent: true, program: { id: 1 } };
+				var matA = { transparent: true };
+				var proA = { id: 1 };
 				var geoA = {};
 
 				var objB = { id: 'B', renderOrder: 0 };
-				var matB = { transparent: true, program: { id: 2 } };
+				var matB = { transparent: true };
+				var proB = { id: 2 };
 				var geoB = {};
 
 				var objC = { id: 'C', renderOrder: 0 };
-				var matC = { transparent: false, program: { id: 3 } };
+				var matC = { transparent: false };
+				var proC = { id: 3 };
 				var geoC = {};
 
 				var objD = { id: 'D', renderOrder: 0 };
-				var matD = { transparent: false, program: { id: 4 } };
+				var matD = { transparent: false };
+				var proD = { id: 4 };
 				var geoD = {};
+
+				var materialProperties = properties.get( matA );
+				materialProperties.program = proA;
+				materialProperties = properties.get( matB );
+				materialProperties.program = proB;
+				materialProperties = properties.get( matC );
+				materialProperties.program = proC;
+				materialProperties = properties.get( matD );
+				materialProperties.program = proD;
 
 				list.unshift( objA, geoA, matA, 0, 0.5, {} );
 				assert.ok( list.transparent.length === 1, 'Transparent list is length 1 after adding transparent item.' );
@@ -201,7 +210,7 @@ export default QUnit.module( 'Renderers', () => {
 						object: objA,
 						geometry: geoA,
 						material: matA,
-						program: matA.program,
+						program: proA,
 						groupOrder: 0,
 						renderOrder: 0,
 						z: 0.5,
@@ -220,7 +229,7 @@ export default QUnit.module( 'Renderers', () => {
 						object: objB,
 						geometry: geoB,
 						material: matB,
-						program: matB.program,
+						program: proB,
 						groupOrder: 1,
 						renderOrder: 0,
 						z: 1.5,
@@ -239,7 +248,7 @@ export default QUnit.module( 'Renderers', () => {
 						object: objC,
 						geometry: geoC,
 						material: matC,
-						program: matC.program,
+						program: proC,
 						groupOrder: 2,
 						renderOrder: 0,
 						z: 2.5,
@@ -258,7 +267,7 @@ export default QUnit.module( 'Renderers', () => {
 						object: objD,
 						geometry: geoD,
 						material: matD,
-						program: matD.program,
+						program: proD,
 						groupOrder: 3,
 						renderOrder: 0,
 						z: 3.5,
@@ -271,7 +280,8 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'sort', ( assert ) => {
 
-				var list = new WebGLRenderList();
+				var properties = new WebGLProperties();
+				var list = new WebGLRenderList( properties );
 				var items = [ { id: 4 }, { id: 5 }, { id: 2 }, { id: 3 } ];
 
 				items.forEach( item => {
@@ -299,7 +309,8 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'opaque renderGroups', ( assert ) => {
 
-				var list = new WebGLRenderList();
+				var properties = new WebGLProperties();
+				var list = new WebGLRenderList( properties );
 				var rg1 = { id: 1, renderOrder: 1 };
 				var rg2 = { id: 2, renderOrder: 2 };
 				var item1 = { id: 3, renderOrder: 3 };
@@ -342,7 +353,7 @@ export default QUnit.module( 'Renderers', () => {
 					'The render group was added to the root list.'
 				);
 
-				list.push( item2, {}, { transparent: false }, 0, 0, {} );
+				list.unshift( item2, {}, { transparent: false }, 0, 0, {} );
 
 				assert.equal(
 					list.opaque[ 1 ].opaque.length,
@@ -356,12 +367,15 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'transparent renderGroups', ( assert ) => {
 
-				var list = new WebGLRenderList();
+				var properties = new WebGLProperties();
+				var list = new WebGLRenderList( properties );
 				var rg = { id: 1, renderOrder: 1 };
 				var item = { id: 3, renderOrder: 3 };
+				var item = { id: 4, renderOrder: 4 };
 
 				list.pushRenderGroup( rg );
 				list.push( item, {}, { transparent: true }, 0, 0, {} );
+				list.unshift( item, {}, { transparent: true }, 0, 0, {} );
 
 				assert.equal(
 					list.opaque[ 0 ].opaque.length,
@@ -371,7 +385,7 @@ export default QUnit.module( 'Renderers', () => {
 
 				assert.equal(
 					list.opaque[ 0 ].transparent.length,
-					1,
+					2,
 					'The item was added to the transparent list of the render group item.'
 				);
 
@@ -379,13 +393,13 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( 'sort renderGroups', ( assert ) => {
+			QUnit.test( 'sort with renderGroups', ( assert ) => {
 
-				var list = new WebGLRenderList();
-				var rg = { id: 1 };
+				var properties = new WebGLProperties();
+				var list = new WebGLRenderList( properties );
 				var items = [ { id: 4 }, { id: 5 }, { id: 2 }, { id: 3 } ];
 
-				list.pushRenderGroup( rg );
+				list.pushRenderGroup( { id: 1 } );
 				items.forEach( item => {
 
 					list.push( item, {}, { transparent: true }, 0, 0, {} );
@@ -411,7 +425,8 @@ export default QUnit.module( 'Renderers', () => {
 
 			// QUnit.test( 'finish', ( assert ) => {
 
-			// 	var list = new WebGLRenderList();
+			// 	var properties = new WebGLProperties();
+			// 	var list = new WebGLRenderList( properties );
 			// 	var obj = { id: 'A', renderOrder: 0 };
 			// 	var mat = { transparent: false, program: { id: 0 } };
 			// 	var geom = {};

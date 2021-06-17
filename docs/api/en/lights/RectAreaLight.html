@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -27,17 +26,16 @@
 		<h2>Code Example</h2>
 
 		<code>
-var width = 10;
-var height = 10;
-var intensity = 1;
-var rectLight = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+const width = 10;
+const height = 10;
+const intensity = 1;
+const rectLight = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
 rectLight.position.set( 5, 5, 0 );
 rectLight.lookAt( 0, 0, 0 );
 scene.add( rectLight )
 
-rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
+const rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
 rectLight.add( rectLightHelper );
-
 		</code>
 
 		<h2>Examples</h2>

@@ -1,45 +1,41 @@
 import { Matrix4 } from '../math/Matrix4.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
-const _eyeRight = new Matrix4();
-const _eyeLeft = new Matrix4();
+const _eyeRight = /*@__PURE__*/ new Matrix4();
+const _eyeLeft = /*@__PURE__*/ new Matrix4();
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+class StereoCamera {
 
-function StereoCamera() {
+	constructor() {
 
-	this.type = 'StereoCamera';
+		this.type = 'StereoCamera';
 
-	this.aspect = 1;
+		this.aspect = 1;
 
-	this.eyeSep = 0.064;
+		this.eyeSep = 0.064;
 
-	this.cameraL = new PerspectiveCamera();
-	this.cameraL.layers.enable( 1 );
-	this.cameraL.matrixAutoUpdate = false;
+		this.cameraL = new PerspectiveCamera();
+		this.cameraL.layers.enable( 1 );
+		this.cameraL.matrixAutoUpdate = false;
 
-	this.cameraR = new PerspectiveCamera();
-	this.cameraR.layers.enable( 2 );
-	this.cameraR.matrixAutoUpdate = false;
+		this.cameraR = new PerspectiveCamera();
+		this.cameraR.layers.enable( 2 );
+		this.cameraR.matrixAutoUpdate = false;
 
-	this._cache = {
-		focus: null,
-		fov: null,
-		aspect: null,
-		near: null,
-		far: null,
-		zoom: null,
-		eyeSep: null
-	};
+		this._cache = {
+			focus: null,
+			fov: null,
+			aspect: null,
+			near: null,
+			far: null,
+			zoom: null,
+			eyeSep: null
+		};
 
-}
+	}
 
-Object.assign( StereoCamera.prototype, {
-
-	update: function ( camera ) {
+	update( camera ) {
 
 		const cache = this._cache;
 
@@ -98,7 +94,6 @@ Object.assign( StereoCamera.prototype, {
 
 	}
 
-} );
-
+}
 
 export { StereoCamera };

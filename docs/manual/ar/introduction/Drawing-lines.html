@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>رسم خطوط ([name])</h1>
+		<div>
+			<p>
+				لنفترض أنك تريد رسم خط أو دائرة ، وليس إطارًا سلكيًا [page:Mesh]. نحتاج أولاً إلى إعداد العارض [page:WebGLRenderer renderer] ، المسرح [page:Scene scene] والكاميرا (انظر صفحة إنشاء مشهد).
+			</p>
+
+			<p>هذا هو الكود الذي سنستخدمه:</p>
+			<code>
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
+const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
+camera.position.set( 0, 0, 100 );
+camera.lookAt( 0, 0, 0 );
+
+const scene = new THREE.Scene();
+			</code>
+			<p>الشيء التالي الذي سنفعله هو تحديد المادة. بالنسبة للخطوط ، يتعين علينا استخدام [page:LineBasicMaterial] أو [page:LineDashedMaterial].</p>
+			<code>
+//create a blue LineBasicMaterial
+const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+			</code>
+
+			<p>
+				بعد إختيار المادة سنحتاج إلى الهندسة الخاصة بها التي تحتوي بعض القمم(vertices):
+			</p>
+
+			<code>
+const points = [];
+points.push( new THREE.Vector3( - 10, 0, 0 ) );
+points.push( new THREE.Vector3( 0, 10, 0 ) );
+points.push( new THREE.Vector3( 10, 0, 0 ) );
+
+const geometry = new THREE.BufferGeometry().setFromPoints( points );
+			</code>
+
+			<p>لاحظ أنه تم رسم الخطوط بين كل زوج متتالي من الرؤوس ، ولكن ليس بين الأول والأخير (الخط غير مغلق).</p>
+
+			<p>الآن بعد أن أصبح لدينا نقاط لخطين ومادة ، يمكننا تجميعها معًا لتشكيل خط.</p>
+			<code>
+const line = new THREE.Line( geometry, material );
+			</code>
+			<p>كل ما تبقى هو إضافته إلى المشهد و إستعمال أمر العرض [page:WebGLRenderer.render render].</p>
+
+			<code>
+scene.add( line );
+renderer.render( scene, camera );
+			</code>
+
+			<p>يجب أن ترى الآن سهمًا يشير إلى الأعلى ، مكون من خطين أزرقين.</p>
+		</div>
+	</body>
+</html>

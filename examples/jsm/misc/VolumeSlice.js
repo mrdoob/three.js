@@ -1,22 +1,21 @@
-/**
- * This class has been made to hold a slice of a volume data
- * @class
- * @author Valentin Demeusy / https://github.com/stity
- * @param   {Volume} volume    The associated volume
- * @param   {number}       [index=0] The index of the slice
- * @param   {string}       [axis='z']      For now only 'x', 'y' or 'z' but later it will change to a normal vector
- * @see Volume
- */
-
 import {
 	ClampToEdgeWrapping,
 	DoubleSide,
 	LinearFilter,
 	Mesh,
 	MeshBasicMaterial,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	Texture
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
+
+/**
+ * This class has been made to hold a slice of a volume data
+ * @class
+ * @param   {Volume} volume    The associated volume
+ * @param   {number}       [index=0] The index of the slice
+ * @param   {string}       [axis='z']      For now only 'x', 'y' or 'z' but later it will change to a normal vector
+ * @see Volume
+ */
 var VolumeSlice = function ( volume, index, axis ) {
 
 	var slice = this;
@@ -210,7 +209,7 @@ VolumeSlice.prototype = {
 
 		if ( this.geometry ) this.geometry.dispose(); // dispose existing geometry
 
-		this.geometry = new PlaneBufferGeometry( extracted.planeWidth, extracted.planeHeight );
+		this.geometry = new PlaneGeometry( extracted.planeWidth, extracted.planeHeight );
 
 		if ( this.mesh ) {
 

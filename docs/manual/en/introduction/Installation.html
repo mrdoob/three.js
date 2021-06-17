@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -37,14 +36,12 @@
 		</p>
 
 		<code>
-		///////////////////////////////////////////////////////
 		// Option 1: Import the entire three.js core library.
 		import * as THREE from 'three';
 
 		const scene = new THREE.Scene();
 
 
-		///////////////////////////////////////////////////////
 		// Option 2: Import just the parts you need.
 		import { Scene } from 'three';
 
@@ -72,9 +69,9 @@
 		<code>
 		&lt;script type="module">
 
-		  // Find the latest version by visiting https://unpkg.com/three. The URL will
-		  // redirect to the newest stable release.
-		  import * as THREE from 'https://unpkg.com/three@&lt;VERSION>/build/three.module.js';
+		  // Find the latest version by visiting https://cdn.skypack.dev/three.
+
+		  import * as THREE from 'https://cdn.skypack.dev/three@&lt;version&gt;';
 
 		  const scene = new THREE.Scene();
 
@@ -82,7 +79,7 @@
 		</code>
 
 		<p>
-			Not all features are accessed through the <em>build/three.module.js</em> module. Other popular parts of the library — such as controls, loaders, and post-processing effects — must be imported from the [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] subfolder. To learn more, see <em>Examples</em> below.
+			Not all features are accessed through the <em>three</em> entrypoint. Other popular parts of the library — such as controls, loaders, and post-processing effects — must be imported from the [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] subfolder. To learn more, see <em>Examples</em> below.
 		</p>
 
 
@@ -110,9 +107,9 @@
 		<code>
 		&lt;script type="module">
 
-		  // Find the latest version by visiting https://unpkg.com/three. The URL will
-		  // redirect to the newest stable release.
-		  import { OrbitControls } from 'https://unpkg.com/three@&lt;VERSION>/examples/jsm/controls/OrbitControls.js';
+		  // Find the latest version by visiting https://cdn.skypack.dev/three.
+
+		  import { OrbitControls } from 'https://cdn.skypack.dev/three@&lt;version&gt;/examples/jsm/controls/OrbitControls.js';
 
 		  const controls = new OrbitControls();
 
@@ -129,6 +126,16 @@
 
 		<p>
 			While most modern JavaScript bundlers now support ES modules by default, some older build tools might not. In those cases you can likely configure the bundler to understand ES modules: [link:http://browserify.org/ Browserify] just needs the [link:https://github.com/babel/babelify babelify] plugin, for example.
+		</p>
+
+		<h3>Import maps</h3>
+
+		<p>
+			Imported paths differ when installing from npm, as compared to installing from static hosting or a CDN. We're aware that this is an ergonomic issue for both groups of users. Developers with build tools and bundlers prefer bare package specifiers (e.g. 'three') rather than relative paths, and files in the <em>examples/</em> folder use relative references to <em>three.module.js</em> that don't follow this expectation. Those who do not use build tools — for fast prototyping, learning, or personal preference — may similarly dislike those relative imports, which require certain folder structures and are less forgiving than a global <em>THREE.*</em> namespace.
+		</p>
+
+		<p>
+			We hope to remove these relative paths when [link:https://github.com/WICG/import-maps import maps] become broadly available, replacing them with bare package specifiers to the npm package name, 'three'. This matches build tool expectations for npm packages more closely, and allows both groups of users to write exactly the same code when importing a file. For users who prefer to avoid build tools, a simple JSON mapping can direct all imports to a CDN or static file folder. Experimentally, you can try using simpler imports today with an import map polyfill, as shown in our [link:https://glitch.com/edit/#!/three-import-map?path=index.html import map example].
 		</p>
 
 		<h3>Node.js</h3>

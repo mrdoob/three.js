@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<h2>概要</h2>
+
+		<p class="desc">
+			three.jsのアニメーションシステムの中では、モデルの様々なプロパティをアニメーション化できます。
+			例えば、装飾を行なったモデル([page:SkinnedMesh skinned and rigged model])の骨格や、[page:Geometry.morphTargets morphTargets]、異なるマテリアルの要素(色、不透明度、有無)、可視性、変形などを操作できます。
+			アニメーションの要素は、フェードインやフェードアウト、クロスフェード、重ね合わせが可能です。
+			同一のオブジェクトであっても異なるものであっても、異なるアニメーションの比重やタイムスケールは独立して変更出来ます。また、同じオブジェクトでも、異なるオブジェクトでもアニメーションは同期出来ます。<br /><br />
+
+			これらを一つのシステムで達成するために、three.jsのアニメーションシステムは2015に完全に変更されました([link:https://github.com/mrdoob/three.js/issues/6881 link])。古い情報に気をつけてください！three.jsのアニメーションシステムは現在はUnityやUnreal Engine 4と似た設計になっています。このページではメインの要素と、それがどうやって動くのかを簡単に説明します。
+
+		</p>
+
+		<h3>Animation Clips</h3>
+
+		<p class="desc">
+			アニメーション付きの3Dオブジェクトをインポートすることに成功した場合(そのオブジェクトが骨格なのか、モーフターゲットなのか、はたまた両方なのかには関係なく)、レスポンスフィールドのうちの一つは"animations"という配列で、そのモデルの[page:AnimationClip AnimationClips]を含んでいるはずです(下記の利用可能なローダーを参照)。
+			アニメーション付きの3Dオブジェクトをインポートすることに成功する状況というのは、例えばBlenderから[link:https://github.com/KhronosGroup/glTF-Blender-IO glTF Blender exporter]でオブジェクトをエクスポートして、そのオブジェクトを[page:GLTFLoader]を使って、three.jsに読みこむ、といったことが挙げられます。<br /><br />
+
+			
+			*AnimationClip*は普通、オブジェクトの特定の動作のデータを持っています。
+			例えば、メッシュの場合、1つめのAnimationClipはウォークサイクルのためのもの、2つ目のAnimationClipはジャンプ用の、3つ目はサイドステップ用という風に動作のデータをAnimationClipに持たせています。
+
+		</p>
+
+		<h3>Keyframe Tracks</h3>
+
+		<p class="desc">
+
+			こういった*AnimationClip*の中では、アニメーションの要素のデータは別の[page:KeyframeTrack]に保存されています。キャラクターオブジェクトが骨格を持っていると仮定すると、あるキートラックフレームは腕の下の方の骨の、位置の時間変化のデータを保存し、別のキートラックは同じ骨の回転成分の動きのデータを保存し、また別のキートラックは他の骨の位置や回転、スケールの変化といったデータを保存します。AnimationClipは、このようなたくさんのトラックで構成できることがわかります。
+
+			モデルが[page:Geometry.morphTargets morph targets]を持っていると仮定すると(例えば、友好的な顔から怒った顔にモーフィングするような場合)、それぞれのトラックは特定のモーフィングターゲットの[page:Mesh.morphTargetInfluences influence]がclipのパフォーマンス中にどうやって変化するかについての情報を持っています。
+
+		</p>
+
+		<h3>Animation Mixer</h3>
+
+		<p class="desc">
+
+			保存されたデータは、アニメーションのベースを形成するだけで、実際のアニメーションの再生は[page:AnimationMixer]によってコントロールされます。AnimationMixerはアニメーションのプレイヤーであるだけでなく、本物のミキサーコンソールのようなハードウェアのシミレーションでもあります。これによって、複数のアニメーションを同時にコントロールして、ブレンドしたり、マージしたり出来ます。
+
+		</p>
+
+		<h3>Animation Actions</h3>
+
+		<p class="desc">
+
+			[page:AnimationAction AnimationActions]によってコントールできるので、*AnimationMixer*自体の(一般的な)メソッドやプロパティは少ないです。*AnimationAction*を設定することで、あるミキサー上での*AnimationClip*の再生や、一時停止、停止のタイミングであったり、clipをリピートする頻度やリピートの有無、フェードや時間変化の有無、クロスフェードやシンクロなどの補助的なことを設定することが出来ます。
+
+		</p>
+
+		<h3>Animation Object Groups</h3>
+
+		<p class="desc">
+
+			オブジェクトのグループに、アニメーションの状態を受け取らせたい場合は、[page:AnimationObjectGroup]が使えます。
+
+		</p>
+
+		<h3>サポートされているフォーマットとloader</h3>
+
+		<p class="desc">
+			全てのモデル形式がアニメーションを含んでいるわけではないことに注意してください(OBJは特に含まれていません)。
+			またthree.jsのloaderのうちのいくつかしか[page:AnimationClip AnimationClip]シーケンスをサポートしていないことにも注意してください。このアニメーションのタイプをサポートしているものがいくつかあります。
+		</p>
+
+			<ul>
+				<li>[page:ObjectLoader THREE.ObjectLoader]</li>
+				<li>THREE.BVHLoader</li>
+				<li>THREE.ColladaLoader</li>
+				<li>THREE.FBXLoader</li>
+				<li>[page:GLTFLoader THREE.GLTFLoader]</li>
+				<li>THREE.MMDLoader</li>
+			</ul>
+
+		<p class="desc">
+			3ds maxとMayaは今のところ、複数のアニメーション(同じタイムラインにないもの)を一つのファイルに直接エクスポートすることは出来ません
+		</p>
+
+		<h2>Example</h2>
+
+		<code>
+		let mesh;
+
+		// Create an AnimationMixer, and get the list of AnimationClip instances
+		const mixer = new THREE.AnimationMixer( mesh );
+		const clips = mesh.animations;
+
+		// Update the mixer on each frame
+		function update () {
+			mixer.update( deltaSeconds );
+		}
+
+		// Play a specific animation
+		const clip = THREE.AnimationClip.findByName( clips, 'dance' );
+		const action = mixer.clipAction( clip );
+		action.play();
+
+		// Play all animations
+		clips.forEach( function ( clip ) {
+			mixer.clipAction( clip ).play();
+		} );
+		</code>
+
+	</body>
+</html>

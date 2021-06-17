@@ -26,26 +26,26 @@
 
 			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 
-			var camera, controls, scene, renderer, light;
+			let camera, controls, scene, renderer, light;
 
-			var material1, material2, material3;
+			let material1, material2, material3;
 
-			var analyser1, analyser2, analyser3;
+			let analyser1, analyser2, analyser3;
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
-			var startButton = document.getElementById( 'startButton' );
+			const startButton = document.getElementById( 'startButton' );
 			startButton.addEventListener( 'click', init );
 
 			function init() {
 
-				var overlay = document.getElementById( 'overlay' );
+				const overlay = document.getElementById( 'overlay' );
 				overlay.remove();
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 25, 0 );
 
-				var listener = new THREE.AudioListener();
+				const listener = new THREE.AudioListener();
 				camera.add( listener );
 
 				scene = new THREE.Scene();
@@ -55,7 +55,7 @@
 				light.position.set( 0, 0.5, 1 ).normalize();
 				scene.add( light );
 
-				var sphere = new THREE.SphereBufferGeometry( 20, 32, 16 );
+				const sphere = new THREE.SphereGeometry( 20, 32, 16 );
 
 				material1 = new THREE.MeshPhongMaterial( { color: 0xffaa00, flatShading: true, shininess: 0 } );
 				material2 = new THREE.MeshPhongMaterial( { color: 0xff2200, flatShading: true, shininess: 0 } );
@@ -63,13 +63,13 @@
 
 				// sound spheres
 
-				var audioLoader = new THREE.AudioLoader();
+				const audioLoader = new THREE.AudioLoader();
 
-				var mesh1 = new THREE.Mesh( sphere, material1 );
+				const mesh1 = new THREE.Mesh( sphere, material1 );
 				mesh1.position.set( - 250, 30, 0 );
 				scene.add( mesh1 );
 
-				var sound1 = new THREE.PositionalAudio( listener );
+				const sound1 = new THREE.PositionalAudio( listener );
 				audioLoader.load( 'sounds/358232_j_s_song.ogg', function ( buffer ) {
 
 					sound1.setBuffer( buffer );
@@ -81,11 +81,11 @@
 
 				//
 
-				var mesh2 = new THREE.Mesh( sphere, material2 );
+				const mesh2 = new THREE.Mesh( sphere, material2 );
 				mesh2.position.set( 250, 30, 0 );
 				scene.add( mesh2 );
 
-				var sound2 = new THREE.PositionalAudio( listener );
+				const sound2 = new THREE.PositionalAudio( listener );
 				audioLoader.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg', function ( buffer ) {
 
 					sound2.setBuffer( buffer );
@@ -97,12 +97,12 @@
 
 				//
 
-				var mesh3 = new THREE.Mesh( sphere, material3 );
+				const mesh3 = new THREE.Mesh( sphere, material3 );
 				mesh3.position.set( 0, 30, - 250 );
 				scene.add( mesh3 );
 
-				var sound3 = new THREE.PositionalAudio( listener );
-				var oscillator = listener.context.createOscillator();
+				const sound3 = new THREE.PositionalAudio( listener );
+				const oscillator = listener.context.createOscillator();
 				oscillator.type = 'sine';
 				oscillator.frequency.setValueAtTime( 144, sound3.context.currentTime );
 				oscillator.start( 0 );
@@ -119,7 +119,7 @@
 
 				// global ambient audio
 
-				var sound4 = new THREE.Audio( listener );
+				const sound4 = new THREE.Audio( listener );
 				audioLoader.load( 'sounds/Project_Utopia.ogg', function ( buffer ) {
 
 					sound4.setBuffer( buffer );
@@ -131,13 +131,13 @@
 
 				// ground
 
-				var helper = new THREE.GridHelper( 1000, 10, 0x444444, 0x444444 );
+				const helper = new THREE.GridHelper( 1000, 10, 0x444444, 0x444444 );
 				helper.position.y = 0.1;
 				scene.add( helper );
 
 				//
 
-				var SoundControls = function () {
+				const SoundControls = function () {
 
 					this.master = listener.getMasterVolume();
 					this.firstSphere = sound1.getVolume();
@@ -147,18 +147,18 @@
 
 				};
 
-				var GeneratorControls = function () {
+				const GeneratorControls = function () {
 
 					this.frequency = oscillator.frequency.value;
 					this.wavetype = oscillator.type;
 
 				};
 
-				var gui = new GUI();
-				var soundControls = new SoundControls();
-				var generatorControls = new GeneratorControls();
-				var volumeFolder = gui.addFolder( 'sound volume' );
-				var generatorFolder = gui.addFolder( 'sound generator' );
+				const gui = new GUI();
+				const soundControls = new SoundControls();
+				const generatorControls = new GeneratorControls();
+				const volumeFolder = gui.addFolder( 'sound volume' );
+				const generatorFolder = gui.addFolder( 'sound generator' );
 
 				volumeFolder.add( soundControls, 'master' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
 
@@ -218,7 +218,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				animate();
 
@@ -245,7 +245,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				controls.update( delta );
 

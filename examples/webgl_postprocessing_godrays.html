@@ -22,24 +22,24 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GodRaysFakeSunShader, GodRaysDepthMaskShader, GodRaysCombineShader, GodRaysGenerateShader } from './jsm/shaders/GodRaysShader.js';
 
-			var container, stats;
-			var camera, scene, renderer, materialDepth;
+			let container, stats;
+			let camera, scene, renderer, materialDepth;
 
-			var sphereMesh;
+			let sphereMesh;
 
-			var sunPosition = new THREE.Vector3( 0, 1000, - 1000 );
-			var clipPosition = new THREE.Vector4();
-			var screenSpacePosition = new THREE.Vector3();
+			const sunPosition = new THREE.Vector3( 0, 1000, - 1000 );
+			const clipPosition = new THREE.Vector4();
+			const screenSpacePosition = new THREE.Vector3();
 
-			var postprocessing = { enabled: true };
+			const postprocessing = { enabled: true };
 
-			var orbitRadius = 200;
+			const orbitRadius = 200;
 
-			var bgColor = 0x000511;
-			var sunColor = 0xffee00;
+			const bgColor = 0x000511;
+			const sunColor = 0xffee00;
 
 			// Use a smaller size for some of the god-ray render targets for better performance.
-			var godrayRenderTargetResolutionMultiplier = 1.0 / 4.0;
+			const godrayRenderTargetResolutionMultiplier = 1.0 / 4.0;
 
 			init();
 			animate();
@@ -60,11 +60,11 @@
 
 				materialDepth = new THREE.MeshDepthMaterial();
 
-				var materialScene = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+				const materialScene = new THREE.MeshBasicMaterial( { color: 0x000000 } );
 
 				// tree
 
-				var loader = new OBJLoader();
+				const loader = new OBJLoader();
 				loader.load( 'models/obj/tree.obj', function ( object ) {
 
 					object.material = materialScene;
@@ -76,7 +76,7 @@
 
 				// sphere
 
-				var geo = new THREE.SphereBufferGeometry( 1, 20, 10 );
+				const geo = new THREE.SphereGeometry( 1, 20, 10 );
 				sphereMesh = new THREE.Mesh( geo, materialScene );
 				sphereMesh.scale.multiplyScalar( 20 );
 				scene.add( sphereMesh );
@@ -91,7 +91,7 @@
 
 				renderer.autoClear = false;
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 500;
 
@@ -102,7 +102,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
@@ -114,8 +114,8 @@
 
 			function onWindowResize() {
 
-				var renderTargetWidth = window.innerWidth;
-				var renderTargetHeight = window.innerHeight;
+				const renderTargetWidth = window.innerWidth;
+				const renderTargetHeight = window.innerHeight;
 
 				camera.aspect = renderTargetWidth / renderTargetHeight;
 				camera.updateProjectionMatrix();
@@ -125,8 +125,8 @@
 				postprocessing.rtTextureDepth.setSize( renderTargetWidth, renderTargetHeight );
 				postprocessing.rtTextureDepthMask.setSize( renderTargetWidth, renderTargetHeight );
 
-				var adjustedWidth = renderTargetWidth * godrayRenderTargetResolutionMultiplier;
-				var adjustedHeight = renderTargetHeight * godrayRenderTargetResolutionMultiplier;
+				const adjustedWidth = renderTargetWidth * godrayRenderTargetResolutionMultiplier;
+				const adjustedHeight = renderTargetHeight * godrayRenderTargetResolutionMultiplier;
 				postprocessing.rtTextureGodRays1.setSize( adjustedWidth, adjustedHeight );
 				postprocessing.rtTextureGodRays2.setSize( adjustedWidth, adjustedHeight );
 
@@ -141,7 +141,7 @@
 
 				postprocessing.scene.add( postprocessing.camera );
 
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+				const pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 				postprocessing.rtTextureColors = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight, pars );
 
 				// Switching the depth formats to luminance from rgb doesn't seem to work. I didn't
@@ -156,14 +156,14 @@
 
 				// The ping-pong render targets can use an adjusted resolution to minimize cost
 
-				var adjustedWidth = renderTargetWidth * godrayRenderTargetResolutionMultiplier;
-				var adjustedHeight = renderTargetHeight * godrayRenderTargetResolutionMultiplier;
+				const adjustedWidth = renderTargetWidth * godrayRenderTargetResolutionMultiplier;
+				const adjustedHeight = renderTargetHeight * godrayRenderTargetResolutionMultiplier;
 				postprocessing.rtTextureGodRays1 = new THREE.WebGLRenderTarget( adjustedWidth, adjustedHeight, pars );
 				postprocessing.rtTextureGodRays2 = new THREE.WebGLRenderTarget( adjustedWidth, adjustedHeight, pars );
 
 				// god-ray shaders
 
-				var godraysMaskShader = GodRaysDepthMaskShader;
+				const godraysMaskShader = GodRaysDepthMaskShader;
 				postprocessing.godrayMaskUniforms = THREE.UniformsUtils.clone( godraysMaskShader.uniforms );
 				postprocessing.materialGodraysDepthMask = new THREE.ShaderMaterial( {
 
@@ -173,7 +173,7 @@
 
 				} );
 
-				var godraysGenShader = GodRaysGenerateShader;
+				const godraysGenShader = GodRaysGenerateShader;
 				postprocessing.godrayGenUniforms = THREE.UniformsUtils.clone( godraysGenShader.uniforms );
 				postprocessing.materialGodraysGenerate = new THREE.ShaderMaterial( {
 
@@ -183,7 +183,7 @@
 
 				} );
 
-				var godraysCombineShader = GodRaysCombineShader;
+				const godraysCombineShader = GodRaysCombineShader;
 				postprocessing.godrayCombineUniforms = THREE.UniformsUtils.clone( godraysCombineShader.uniforms );
 				postprocessing.materialGodraysCombine = new THREE.ShaderMaterial( {
 
@@ -193,7 +193,7 @@
 
 				} );
 
-				var godraysFakeSunShader = GodRaysFakeSunShader;
+				const godraysFakeSunShader = GodRaysFakeSunShader;
 				postprocessing.godraysFakeSunUniforms = THREE.UniformsUtils.clone( godraysFakeSunShader.uniforms );
 				postprocessing.materialGodraysFakeSun = new THREE.ShaderMaterial( {
 
@@ -209,7 +209,7 @@
 				postprocessing.godrayCombineUniforms.fGodRayIntensity.value = 0.75;
 
 				postprocessing.quad = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 1.0, 1.0 ),
+					new THREE.PlaneGeometry( 1.0, 1.0 ),
 					postprocessing.materialGodraysGenerate
 				);
 				postprocessing.quad.position.z = - 9900;
@@ -248,7 +248,7 @@
 
 			function render() {
 
-				var time = Date.now() / 4000;
+				const time = Date.now() / 4000;
 
 				sphereMesh.position.x = orbitRadius * Math.cos( time );
 				sphereMesh.position.z = orbitRadius * Math.sin( time ) - 100;
@@ -287,8 +287,8 @@
 					// space distance to the sun. Not very efficient, so i make a scissor
 					// rectangle around the suns position to avoid rendering surrounding pixels.
 
-					var sunsqH = 0.74 * window.innerHeight; // 0.74 depends on extent of sun from shader
-					var sunsqW = 0.74 * window.innerHeight; // both depend on height because sun is aspect-corrected
+					const sunsqH = 0.74 * window.innerHeight; // 0.74 depends on extent of sun from shader
+					const sunsqW = 0.74 * window.innerHeight; // both depend on height because sun is aspect-corrected
 
 					screenSpacePosition.x *= window.innerWidth;
 					screenSpacePosition.y *= window.innerHeight;
@@ -331,11 +331,11 @@
 
 					// Maximum length of god-rays (in texture space [0,1]X[0,1])
 
-					var filterLen = 1.0;
+					const filterLen = 1.0;
 
 					// Samples taken by filter
 
-					var TAPS_PER_PASS = 6.0;
+					const TAPS_PER_PASS = 6.0;
 
 					// Pass order could equivalently be 3,2,1 (instead of 1,2,3), which
 					// would start with a small filter support and grow to large. however

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -20,18 +19,18 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-		var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
 
-		var cubeA = new THREE.Mesh( geometry, material );
+		const cubeA = new THREE.Mesh( geometry, material );
 		cubeA.position.set( 100, 100, 0 );
 
-		var cubeB = new THREE.Mesh( geometry, material );
+		const cubeB = new THREE.Mesh( geometry, material );
 		cubeB.position.set( -100, -100, 0 );
 
 		//create a group and add the two cubes
 		//These cubes can now be rotated / scaled etc as a group
-		var group = new THREE.Group();
+		const group = new THREE.Group();
 		group.add( cubeA );
 		group.add( cubeB );
 

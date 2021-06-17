@@ -1,12 +1,10 @@
-export const REVISION = '119dev';
+export const REVISION = '130dev';
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 export const CullFaceNone = 0;
 export const CullFaceBack = 1;
 export const CullFaceFront = 2;
 export const CullFaceFrontBack = 3;
-export const FrontFaceDirectionCW = 0;
-export const FrontFaceDirectionCCW = 1;
 export const BasicShadowMap = 0;
 export const PCFShadowMap = 1;
 export const PCFSoftShadowMap = 2;
@@ -197,3 +195,6 @@ export const StreamReadUsage = 35041;
 export const StaticCopyUsage = 35046;
 export const DynamicCopyUsage = 35050;
 export const StreamCopyUsage = 35042;
+
+export const GLSL1 = '100';
+export const GLSL3 = '300 es';

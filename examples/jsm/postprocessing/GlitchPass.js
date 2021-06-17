@@ -1,7 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 import {
 	DataTexture,
 	FloatType,
@@ -9,46 +5,41 @@ import {
 	RGBFormat,
 	ShaderMaterial,
 	UniformsUtils
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
-import { DigitalGlitch } from "../shaders/DigitalGlitch.js";
+} from '../../../build/three.module.js';
+import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+import { DigitalGlitch } from '../shaders/DigitalGlitch.js';
 
-var GlitchPass = function ( dt_size ) {
+class GlitchPass extends Pass {
 
-	Pass.call( this );
+	constructor( dt_size = 64 ) {
 
-	if ( DigitalGlitch === undefined ) console.error( "GlitchPass relies on DigitalGlitch" );
+		super();
 
-	var shader = DigitalGlitch;
-	this.uniforms = UniformsUtils.clone( shader.uniforms );
+		if ( DigitalGlitch === undefined ) console.error( 'THREE.GlitchPass relies on DigitalGlitch' );
 
-	if ( dt_size == undefined ) dt_size = 64;
+		const shader = DigitalGlitch;
 
+		this.uniforms = UniformsUtils.clone( shader.uniforms );
 
-	this.uniforms[ "tDisp" ].value = this.generateHeightmap( dt_size );
+		this.uniforms[ 'tDisp' ].value = this.generateHeightmap( dt_size );
 
+		this.material = new ShaderMaterial( {
+			uniforms: this.uniforms,
+			vertexShader: shader.vertexShader,
+			fragmentShader: shader.fragmentShader
+		} );
 
-	this.material = new ShaderMaterial( {
-		uniforms: this.uniforms,
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader
-	} );
+		this.fsQuad = new FullScreenQuad( this.material );
 
-	this.fsQuad = new Pass.FullScreenQuad( this.material );
+		this.goWild = false;
+		this.curF = 0;
+		this.generateTrigger();
 
-	this.goWild = false;
-	this.curF = 0;
-	this.generateTrigger();
+	}
 
-};
+	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
-GlitchPass.prototype = Object.assign( Object.create( Pass.prototype ), {
-
-	constructor: GlitchPass,
-
-	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
-
-		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
+		this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
 		this.uniforms[ 'seed' ].value = Math.random();//default seeding
 		this.uniforms[ 'byp' ].value = 0;
 
@@ -93,22 +84,22 @@ GlitchPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		}
 
-	},
+	}
 
-	generateTrigger: function () {
+	generateTrigger() {
 
 		this.randX = MathUtils.randInt( 120, 240 );
 
-	},
+	}
 
-	generateHeightmap: function ( dt_size ) {
+	generateHeightmap( dt_size ) {
 
-		var data_arr = new Float32Array( dt_size * dt_size * 3 );
-		var length = dt_size * dt_size;
+		const data_arr = new Float32Array( dt_size * dt_size * 3 );
+		const length = dt_size * dt_size;
 
-		for ( var i = 0; i < length; i ++ ) {
+		for ( let i = 0; i < length; i ++ ) {
 
-			var val = MathUtils.randFloat( 0, 1 );
+			const val = MathUtils.randFloat( 0, 1 );
 			data_arr[ i * 3 + 0 ] = val;
 			data_arr[ i * 3 + 1 ] = val;
 			data_arr[ i * 3 + 2 ] = val;
@@ -119,6 +110,6 @@ GlitchPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	}
 
-} );
+}
 
 export { GlitchPass };
