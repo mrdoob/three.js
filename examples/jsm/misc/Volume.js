@@ -33,7 +33,10 @@ var Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
 		 * @member {number} zLength Depth of the volume in the IJK coordinate system
 		 */
 		this.zLength = Number( zLength ) || 1;
-
+		/**
+		 * @member {Array<string>} The order of the Axis dictated by the NRRD header
+		 */
+		this.axisOrder = [ 'x', 'y', 'z' ];
 		/**
 		 * @member {TypedArray} data Data of the volume
 		 */
@@ -301,8 +304,8 @@ Volume.prototype = {
 				axisInIJK.set( 1, 0, 0 );
 				firstDirection.set( 0, 0, - 1 );
 				secondDirection.set( 0, - 1, 0 );
-				firstSpacing = this.spacing[ 2 ];
-				secondSpacing = this.spacing[ 1 ];
+				firstSpacing = this.spacing[ this.axisOrder.indexOf('z') ];
+				secondSpacing = this.spacing[ this.axisOrder.indexOf('y') ];
 				IJKIndex = new Vector3( RASIndex, 0, 0 );
 
 				planeMatrix.multiply( ( new Matrix4() ).makeRotationY( Math.PI / 2 ) );
@@ -313,8 +316,8 @@ Volume.prototype = {
 				axisInIJK.set( 0, 1, 0 );
 				firstDirection.set( 1, 0, 0 );
 				secondDirection.set( 0, 0, 1 );
-				firstSpacing = this.spacing[ 0 ];
-				secondSpacing = this.spacing[ 2 ];
+				firstSpacing = this.spacing[ this.axisOrder.indexOf('x') ];
+				secondSpacing = this.spacing[ this.axisOrder.indexOf('z') ];
 				IJKIndex = new Vector3( 0, RASIndex, 0 );
 
 				planeMatrix.multiply( ( new Matrix4() ).makeRotationX( - Math.PI / 2 ) );
@@ -326,8 +329,8 @@ Volume.prototype = {
 				axisInIJK.set( 0, 0, 1 );
 				firstDirection.set( 1, 0, 0 );
 				secondDirection.set( 0, - 1, 0 );
-				firstSpacing = this.spacing[ 0 ];
-				secondSpacing = this.spacing[ 1 ];
+				firstSpacing = this.spacing[ this.axisOrder.indexOf('x') ];
+				secondSpacing = this.spacing[ this.axisOrder.indexOf('y') ];
 				IJKIndex = new Vector3( 0, 0, RASIndex );
 
 				positionOffset = ( volume.RASDimensions[ 2 ] - 1 ) / 2;
