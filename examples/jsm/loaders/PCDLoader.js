@@ -122,7 +122,7 @@ class PCDLoader extends Loader {
 
 			// remove comments
 
-			PCDheader.str = PCDheader.str.replace( /\#.*/gi, '' );
+			PCDheader.str = PCDheader.str.replace( /#.*/gi, '' );
 
 			// parse
 
@@ -290,30 +290,35 @@ class PCDLoader extends Loader {
 			const dataview = new DataView( decompressed.buffer );
 
 			const offset = PCDheader.offset;
+			
+			const fieldsSize = {};
+			PCDheader.fields.forEach( ( value, index ) => {
+				fieldsSize[ value ] = PCDheader.size[ index ];
+			} )
 
 			for ( let i = 0; i < PCDheader.points; i ++ ) {
 
 				if ( offset.x !== undefined ) {
 
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.x ) + PCDheader.size[ 0 ] * i, this.littleEndian ) );
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.y ) + PCDheader.size[ 1 ] * i, this.littleEndian ) );
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.z ) + PCDheader.size[ 2 ] * i, this.littleEndian ) );
+					position.push( dataview.getFloat32( ( PCDheader.points * offset.x ) + fieldsSize.x * i, this.littleEndian ) );
+					position.push( dataview.getFloat32( ( PCDheader.points * offset.y ) + fieldsSize.y * i, this.littleEndian ) );
+					position.push( dataview.getFloat32( ( PCDheader.points * offset.z ) + fieldsSize.z * i, this.littleEndian ) );
 
 				}
 
 				if ( offset.rgb !== undefined ) {
 
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 0 ) / 255.0 );
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 1 ) / 255.0 );
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 2 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + fieldsSize.rgb * i + 0 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + fieldsSize.rgb * i + 1 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + fieldsSize.rgb * i + 2 ) / 255.0 );
 
 				}
 
 				if ( offset.normal_x !== undefined ) {
 
-					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_x ) + PCDheader.size[ 4 ] * i, this.littleEndian ) );
-					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_y ) + PCDheader.size[ 5 ] * i, this.littleEndian ) );
-					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_z ) + PCDheader.size[ 6 ] * i, this.littleEndian ) );
+					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_x ) + fieldsSize.normal_x * i, this.littleEndian ) );
+					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_y ) + fieldsSize.normal_y * i, this.littleEndian ) );
+					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_z ) + fieldsSize.normal_z * i, this.littleEndian ) );
 
 				}
 
@@ -340,9 +345,9 @@ class PCDLoader extends Loader {
 
 				if ( offset.rgb !== undefined ) {
 
-					color.push( dataview.getUint8( row + offset.rgb + 2 ) / 255.0 );
-					color.push( dataview.getUint8( row + offset.rgb + 1 ) / 255.0 );
 					color.push( dataview.getUint8( row + offset.rgb + 0 ) / 255.0 );
+					color.push( dataview.getUint8( row + offset.rgb + 1 ) / 255.0 );
+					color.push( dataview.getUint8( row + offset.rgb + 2 ) / 255.0 );
 
 				}
 
@@ -386,7 +391,7 @@ class PCDLoader extends Loader {
 
 		const mesh = new Points( geometry, material );
 		let name = url.split( '' ).reverse().join( '' );
-		name = /([^\/]*)/.exec( name );
+		name = /([^/]*)/.exec( name );
 		name = name[ 1 ].split( '' ).reverse().join( '' );
 		mesh.name = name;
 
