@@ -10,7 +10,15 @@ class HTMLTexture extends CanvasTexture {
 		super( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 
-		this.document = document.implementation.createHTMLDocument( 'xmlns' );
+		let htmlTextureNode = customElements.get( 'htmltexture-node' );
+
+		if( ! htmlTextureNode ) htmlTextureNode = this._defineNode();
+
+
+		this._node = document.body.appendChild( new htmlTextureNode() );
+
+		this.document = this._node.shadowRoot;
+
 
 		this.onFinishRedraw = null;
 
@@ -24,38 +32,48 @@ class HTMLTexture extends CanvasTexture {
 
 	}
 
-	redrawAsync( html, css = '', width, height ) {
+	redrawAsync( html, css, width, height ) {
 
 		const scope = this;
+
+		const sroot = scope.document;
+
+		let rootStyle = null;
 
 
 		if ( html ) {
 
-			scope.document = document.implementation.createHTMLDocument( 'xmlns' );
+			while( sroot.firstChild ) sroot.removeChild( sroot.firstChild );
 
-			scope.document.write( html );
+			sroot.appendChild( new DOMParser().parseFromString( html , 'text/html' ).documentElement );
 
 		}
 
 
 		if ( ! css ) css = scope._css;
 
+		else {
+
+			scope._css = css;
+
+			sroot.appendChild( rootStyle = document.createElement( 'style' ) ).textContent = css;
+
+		}
+
 
 		return new Promise( async resolve => {
 
-
-
 			//enable in-line css
 
-			const styles = Array.from( scope.document.querySelectorAll( 'style' ) );
+			const styles = Array.from( sroot.querySelectorAll( 'style' ) );
 
-			css += '\n' + styles.map( style => style.innerText ).join( '\n' );
+			css += '\n' + styles.map( style => (style === rootStyle) ? '' : style.textContent ).join( '\n' );
 
 
 
 			//use fetch to enable linked css? seems out-of-scope. maybe add css loader
 
-			//const links = Array.from( scope.document.querySelectorAll( "link[rel=stylesheet]" ) );
+			//const links = Array.from( sroot.querySelectorAll( "link[rel=stylesheet]" ) );
 
 			//await Promise.all( links.map( link => css += '\n' + await ( await fetch( link.href ) ).text() ) );
 
@@ -66,7 +84,7 @@ class HTMLTexture extends CanvasTexture {
 
 				const _canvas = document.createElement( 'canvas' );
 
-				const images = Array.from( scope.document.querySelectorAll( 'img' ) );
+				const images = Array.from( sroot.querySelectorAll( 'img' ) );
 
 				await Promise.all( images.map(
 
@@ -85,6 +103,8 @@ class HTMLTexture extends CanvasTexture {
 						} else {
 
 							const urlImage = new Image();
+
+							urlImage.crossOrigin = "anonymous";
 
 							urlImage.onload = () => {
 
@@ -124,40 +144,77 @@ class HTMLTexture extends CanvasTexture {
 			else canvas.height = height;
 
 
+			scope._node.style.left = '-' + ( scope._node.style.width = width + 'px' );
 
-			//enable css sizing
-
-			const body = scope.document.documentElement.querySelector( 'body' );
-
-			body.style.width = width + 'px';
-
-			body.style.height = height + 'px';
+			scope._node.style.top = '-' + ( scope._node.style.height = width + 'px' );
 
 
 
-			const xml = new XMLSerializer().serializeToString( scope.document.documentElement.querySelector( 'body' ) );
+			const xml = new XMLSerializer().serializeToString( sroot );
 
 			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><style>${css}</style><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
 
 
-
+			
 			const image = new Image();
 
 			image.onload = () => {
 
-				canvas.getContext( '2d' ).drawImage( image, 0, 0 );
+				canvas.getContext( '2d' ).drawImage( image , 0 , 0 );
 
 				scope.needsUpdate = true;
 
 				resolve();
 
-				if ( scope.onFinishRedraw ) scope.onFinishRedraw();
-
-			};
+				if( scope.onFinishRedraw ) scope.onFinishRedraw();
+			}
 
 			image.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent( svg );
 
 		} );
+
+	}
+
+	elementFromPoint( x , y ) {
+		
+		const style = this._node.style;
+
+		style.left = 0;
+
+		style.top = 0;
+
+
+		const element = this.document.elementFromPoint( x , y );
+
+
+		style.left = '-' + style.width;
+
+		style.top = '-' + style.height;
+
+
+		return element;
+
+	}
+
+	_defineNode() {
+
+		class HTMLTextureNode extends HTMLElement {
+
+			constructor() {
+
+				super();
+
+				this.attachShadow( { mode: 'open' } );
+
+				this.style.cssText = 'contain:layout; display:block; position:absolute; left:0; top:0; opacity:0.1; overflow:hidden;';
+
+			}
+
+		}
+
+		customElements.define( 'htmltexture-node' , HTMLTextureNode , { is: "htmltexture-node" } );
+
+		return HTMLTextureNode;
 
 	}
 
