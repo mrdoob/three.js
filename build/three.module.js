@@ -25349,6 +25349,7 @@ function WebGLRenderer( parameters = {} ) {
 		if ( capabilities.isWebGL2 ) {
 
 			// Workaround for https://bugs.chromium.org/p/chromium/issues/detail?id=1120100
+			// Not needed in Chrome 93+
 
 			if ( glFormat === 6407 ) glFormat = 32849;
 			if ( glFormat === 6408 ) glFormat = 32856;

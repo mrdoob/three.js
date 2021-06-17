@@ -1185,8 +1185,9 @@ class GLTFWriter {
 
 		if ( material.emissive ) {
 
-			// note: `emissive` is not scaled by `material.emissiveIntensity` for now to accommodate glTF spec. see #21849.
-			const emissive = material.emissive.toArray();
+			// note: `emissiveIntensity` is clamped between 0 and 1 to accommodate glTF spec. see #21849 and #22000.
+			const emissiveIntensity = Math.min( Math.max( material.emissiveIntensity, 0 ), 1 );
+			const emissive = material.emissive.clone().multiplyScalar( emissiveIntensity ).toArray();
 
 			if ( ! equalArray( emissive, [ 0, 0, 0 ] ) ) {
 

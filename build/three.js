@@ -18599,6 +18599,7 @@
 
 			if (capabilities.isWebGL2) {
 				// Workaround for https://bugs.chromium.org/p/chromium/issues/detail?id=1120100
+				// Not needed in Chrome 93+
 				if (glFormat === _gl.RGB) glFormat = _gl.RGB8;
 				if (glFormat === _gl.RGBA) glFormat = _gl.RGBA8;
 			}
