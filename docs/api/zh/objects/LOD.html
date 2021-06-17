@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,14 +20,14 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var lod = new THREE.LOD();
+		const lod = new THREE.LOD();
 
 		//Create spheres with 3 levels of detail and create new LOD levels for them
-		for( var i = 0; i < 3; i++ ) {
+		for( let i = 0; i < 3; i++ ) {
 
-			var geometry = new THREE.IcosahedronBufferGeometry( 10, 3 - i )
+			const geometry = new THREE.IcosahedronGeometry( 10, 3 - i )
 
-			var mesh = new THREE.Mesh( geometry, material );
+			const mesh = new THREE.Mesh( geometry, material );
 
 			lod.addLevel( mesh, i * 75 );
 
@@ -53,16 +52,16 @@
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:Object3D]。</p>
 
-		<h3>[property:boolean autoUpdate]</h3>
+		<h3>[property:Boolean autoUpdate]</h3>
 		<p>
 		Whether the LOD object is updated automatically by the renderer per frame or not.
 		If set to false, you have to call [page:LOD.update]() in the render loop by yourself.
 		Default is true.
 		</p>
 
-		<h3>[property:array levels]</h3>
+		<h3>[property:Array levels]</h3>
 		<p>
-			一个包含有[page:object level] objects（各层次物体）的数组。<br /><br />
+			一个包含有[page:Object level] objects（各层次物体）的数组。<br /><br />
 
 			每一个层级都是一个对象，具有以下两个属性：
 			[page:Object3D object] —— 在这个层次中将要显示的[page:Object3D]。<br />
@@ -85,6 +84,10 @@
 			返回一个LOD对象及其所关联的在特定距离中的物体。
 		</p>
 
+		<h3>[method:Integer getCurrentLevel]()</h3>
+		<p>
+		Get the currently active LOD level. As index of the levels array.
+		</p>
 
 		<h3>[method:Object3D getObjectForDistance]( [param:Float distance] )</h3>
 		<p>

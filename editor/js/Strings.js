@@ -1,8 +1,4 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-var Strings = function ( config ) {
+function Strings( config ) {
 
 	var language = config.getKey( 'language' );
 
@@ -25,15 +21,16 @@ var Strings = function ( config ) {
 			'menubar/file/export/ply_binary': 'Export PLY (Binary)',
 			'menubar/file/export/stl': 'Export STL',
 			'menubar/file/export/stl_binary': 'Export STL (Binary)',
+			'menubar/file/export/usdz': 'Export USDZ',
 			'menubar/file/publish': 'Publish',
 
 			'menubar/edit': 'Edit',
 			'menubar/edit/undo': 'Undo (Ctrl+Z)',
 			'menubar/edit/redo': 'Redo (Ctrl+Shift+Z)',
 			'menubar/edit/clear_history': 'Clear History',
+			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Clone',
 			'menubar/edit/delete': 'Delete (Del)',
-			'menubar/edit/minify_shaders': 'Minify Shaders',
 			'menubar/edit/fixcolormaps': 'Fix Color Maps',
 
 			'menubar/add': 'Add',
@@ -74,13 +71,22 @@ var Strings = function ( config ) {
 			'menubar/examples/Pong': 'Pong',
 			'menubar/examples/Shaders': 'Shaders',
 
+			'menubar/view': 'View',
+			'menubar/view/fullscreen': 'Fullscreen',
+
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
 			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'About',
 
+			'sidebar/animations': 'Animations',
+			'sidebar/animations/play': 'Play',
+			'sidebar/animations/stop': 'Stop',
+			'sidebar/animations/timescale': 'Time Scale',
+
 			'sidebar/scene': 'Scene',
 			'sidebar/scene/background': 'Background',
+			'sidebar/scene/environment': 'Environment',
 			'sidebar/scene/fog': 'Fog',
 
 			'sidebar/properties/object': 'Object',
@@ -110,8 +116,9 @@ var Strings = function ( config ) {
 			'sidebar/object/penumbra': 'Penumbra',
 			'sidebar/object/decay': 'Decay',
 			'sidebar/object/shadow': 'Shadow',
-			'sidebar/object/shadowRadius': 'Shadow Radius',
 			'sidebar/object/shadowBias': 'Shadow Bias',
+			'sidebar/object/shadowNormalBias': 'Shadow Normal Bias',
+			'sidebar/object/shadowRadius': 'Shadow Radius',
 			'sidebar/object/cast': 'cast',
 			'sidebar/object/receive': 'receive',
 			'sidebar/object/visible': 'Visible',
@@ -157,9 +164,6 @@ var Strings = function ( config ) {
 			'sidebar/geometry/extrude_geometry/bevelOffset': 'Offset',
 			'sidebar/geometry/extrude_geometry/bevelSegments': 'Segments',
 			'sidebar/geometry/extrude_geometry/shape': 'Convert to Shape',
-
-			'sidebar/geometry/geometry/vertices': 'Vertices',
-			'sidebar/geometry/geometry/faces': 'Faces',
 
 			'sidebar/geometry/dodecahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/dodecahedron_geometry/detail': 'Detail',
@@ -226,18 +230,20 @@ var Strings = function ( config ) {
 			'sidebar/material/new': 'New',
 			'sidebar/material/copy': 'Copy',
 			'sidebar/material/paste': 'Paste',
+			'sidebar/material/slot': 'Slot',
 			'sidebar/material/type': 'Type',
 			'sidebar/material/uuid': 'UUID',
 			'sidebar/material/name': 'Name',
 			'sidebar/material/program': 'Program',
 			'sidebar/material/info': 'Info',
-			'sidebar/material/vertex': 'Vertex',
-			'sidebar/material/fragment': 'fragment',
+			'sidebar/material/vertex': 'Vert',
+			'sidebar/material/fragment': 'Frag',
 			'sidebar/material/color': 'Color',
 			'sidebar/material/depthPacking': 'Depth Packing',
 			'sidebar/material/roughness': 'Roughness',
 			'sidebar/material/metalness': 'Metalness',
 			'sidebar/material/sheen': 'Sheen',
+			'sidebar/material/transmission': 'Transmission',
 			'sidebar/material/emissive': 'Emissive',
 			'sidebar/material/specular': 'Specular',
 			'sidebar/material/shininess': 'Shininess',
@@ -245,7 +251,6 @@ var Strings = function ( config ) {
 			'sidebar/material/clearcoatroughness': 'Clearcoat Roughness',
 			'sidebar/material/vertexcolors': 'Vertex Colors',
 			'sidebar/material/vertextangents': 'Vertex Tangents',
-			'sidebar/material/skinning': 'Skinning',
 			'sidebar/material/matcap': 'Matcap',
 			'sidebar/material/map': 'Map',
 			'sidebar/material/alphamap': 'Alpha Map',
@@ -265,6 +270,8 @@ var Strings = function ( config ) {
 			'sidebar/material/side/front': 'Front',
 			'sidebar/material/side/back': 'Back',
 			'sidebar/material/side/double': 'Double',
+			'sidebar/material/size': 'Size',
+			'sidebar/material/sizeAttenuation': 'Size Attenuation',
 			'sidebar/material/flatshaded': 'Flat Shaded',
 			'sidebar/material/blending': 'Blending',
 			'sidebar/material/blending/no': 'No',
@@ -276,6 +283,8 @@ var Strings = function ( config ) {
 			'sidebar/material/opacity': 'Opacity',
 			'sidebar/material/transparent': 'Transparent',
 			'sidebar/material/alphatest': 'Alpha Test',
+			'sidebar/material/depthtest': 'Depth Test',
+			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Wireframe',
 
 			'sidebar/script': 'Script',
@@ -290,24 +299,29 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'Antialias',
 			'sidebar/project/shadows': 'Shadows',
-			'sidebar/project/shadowType': 'Shadow Type',
-			'sidebar/project/physicallyCorrectLights': 'Physically correct lights',
+			'sidebar/project/physicallyCorrectLights': 'Physical lights',
 			'sidebar/project/toneMapping': 'Tone mapping',
-			'sidebar/project/toneMappingExposure': 'Exposure',
 			'sidebar/project/materials': 'Materials',
 			'sidebar/project/Assign': 'Assign',
 
+			'sidebar/project/video': 'Video',
+			'sidebar/project/resolution': 'Resolution',
+			'sidebar/project/duration': 'Duration',
+			'sidebar/project/render': 'Render',
+
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
-			'sidebar/settings/exportPrecision': 'Export Precision',
 
+			'sidebar/settings/shortcuts': 'Shortcuts',
 			'sidebar/settings/shortcuts/translate': 'Translate',
 			'sidebar/settings/shortcuts/rotate': 'Rotate',
 			'sidebar/settings/shortcuts/scale': 'Scale',
 			'sidebar/settings/shortcuts/undo': 'Undo',
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
+			'sidebar/settings/viewport': 'Viewport',
 			'sidebar/settings/viewport/grid': 'Grid',
+			'sidebar/settings/viewport/helpers': 'Helpers',
 
 			'sidebar/history': 'History',
 			'sidebar/history/persistent': 'persistent',
@@ -323,7 +337,9 @@ var Strings = function ( config ) {
 			'viewport/info/frametime': 'Frametime'
 
 		},
+
 		fr: {
+
 			'menubar/file': 'Fichier',
 			'menubar/file/new': 'Nouveau',
 			'menubar/file/import': 'Importer',
@@ -339,15 +355,16 @@ var Strings = function ( config ) {
 			'menubar/file/export/ply_binary': 'Exporter PLY (Binaire)',
 			'menubar/file/export/stl': 'Exporter STL',
 			'menubar/file/export/stl_binary': 'Exporter STL (Binaire)',
+			'menubar/file/export/usdz': 'Exporter USDZ',
 			'menubar/file/publish': 'Publier',
 
 			'menubar/edit': 'Edition',
 			'menubar/edit/undo': 'Annuler (Ctrl+Z)',
 			'menubar/edit/redo': 'Refaire (Ctrl+Shift+Z)',
 			'menubar/edit/clear_history': 'Supprimer Historique',
+			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Cloner',
 			'menubar/edit/delete': 'Supprimer (Supp)',
-			'menubar/edit/minify_shaders': 'Minimiser les Shaders',
 			'menubar/edit/fixcolormaps': 'Correction des couleurs',
 
 			'menubar/add': 'Ajouter',
@@ -388,13 +405,22 @@ var Strings = function ( config ) {
 			'menubar/examples/Pong': 'Pong',
 			'menubar/examples/Shaders': 'Shaders',
 
+			'menubar/view': 'View',
+			'menubar/view/fullscreen': 'Fullscreen',
+
 			'menubar/help': 'Aide',
 			'menubar/help/source_code': 'Code Source',
 			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'A propos',
 
+			'sidebar/animations': 'Animations',
+			'sidebar/animations/play': 'Play',
+			'sidebar/animations/stop': 'Stop',
+			'sidebar/animations/timescale': 'Time Scale',
+
 			'sidebar/scene': 'Scène',
 			'sidebar/scene/background': 'Arrière Plan',
+			'sidebar/scene/environment': 'Environment',
 			'sidebar/scene/fog': 'Brouillard',
 
 			'sidebar/properties/object': 'Objet',
@@ -424,8 +450,9 @@ var Strings = function ( config ) {
 			'sidebar/object/penumbra': 'Pénombre',
 			'sidebar/object/decay': 'Affaiblissement',
 			'sidebar/object/shadow': 'Ombre',
-			'sidebar/object/shadowRadius': 'Rayon de l\'ombre',
 			'sidebar/object/shadowBias': 'Biais directionnel des ombres',
+			'sidebar/object/shadowNormalBias': 'Shadow Normal Bias',
+			'sidebar/object/shadowRadius': 'Rayon de l\'ombre',
 			'sidebar/object/cast': 'Projète',
 			'sidebar/object/receive': 'Reçoit',
 			'sidebar/object/visible': 'Visible',
@@ -471,9 +498,6 @@ var Strings = function ( config ) {
 			'sidebar/geometry/extrude_geometry/bevelOffset': 'Décalage',
 			'sidebar/geometry/extrude_geometry/bevelSegments': 'Segments',
 			'sidebar/geometry/extrude_geometry/shape': 'Convertir en forme',
-
-			'sidebar/geometry/geometry/vertices': 'Sommets',
-			'sidebar/geometry/geometry/faces': 'Faces',
 
 			'sidebar/geometry/dodecahedron_geometry/radius': 'Rayon',
 			'sidebar/geometry/dodecahedron_geometry/detail': 'Détail',
@@ -540,6 +564,7 @@ var Strings = function ( config ) {
 			'sidebar/material/new': 'Nouveau',
 			'sidebar/material/copy': 'Copier',
 			'sidebar/material/paste': 'Coller',
+			'sidebar/material/slot': 'Slot',
 			'sidebar/material/type': 'Type',
 			'sidebar/material/uuid': 'UUID',
 			'sidebar/material/name': 'Nom',
@@ -552,6 +577,7 @@ var Strings = function ( config ) {
 			'sidebar/material/roughness': 'Rugosité',
 			'sidebar/material/metalness': 'Métal',
 			'sidebar/material/sheen': 'Éclat',
+			'sidebar/material/transmission': 'Transmission',
 			'sidebar/material/emissive': 'Émissif',
 			'sidebar/material/specular': 'Spéculaire',
 			'sidebar/material/shininess': 'Brillance',
@@ -559,7 +585,6 @@ var Strings = function ( config ) {
 			'sidebar/material/clearcoatroughness': 'Rugosité du vernis',
 			'sidebar/material/vertexcolors': 'Couleurs aux Sommets',
 			'sidebar/material/vertextangents': 'Tangentes aux sommets',
-			'sidebar/material/skinning': 'Skinning',
 			'sidebar/material/matcap': 'Matcap',
 			'sidebar/material/map': 'Texture',
 			'sidebar/material/alphamap': 'Texture de transparence',
@@ -579,6 +604,8 @@ var Strings = function ( config ) {
 			'sidebar/material/side/front': 'Face avant',
 			'sidebar/material/side/back': 'Face Arrière',
 			'sidebar/material/side/double': 'Double face',
+			'sidebar/material/size': 'Size',
+			'sidebar/material/sizeAttenuation': 'Size Attenuation',
 			'sidebar/material/flatshaded': 'Rendu plat',
 			'sidebar/material/blending': 'Mélange',
 			'sidebar/material/blending/no': 'Non',
@@ -590,6 +617,8 @@ var Strings = function ( config ) {
 			'sidebar/material/opacity': 'Opacité',
 			'sidebar/material/transparent': 'Transparence',
 			'sidebar/material/alphatest': 'Test de transparence',
+			'sidebar/material/depthtest': 'Depth Test',
+			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Fil de fer',
 
 			'sidebar/script': 'Script',
@@ -604,24 +633,29 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': 'Rendus',
 			'sidebar/project/antialias': 'Anticrénelage',
 			'sidebar/project/shadows': 'Ombres',
-			'sidebar/project/shadowType': 'Type d\'ombre',
-			'sidebar/project/physicallyCorrectLights': 'Rendu physique lumineux',
+			'sidebar/project/physicallyCorrectLights': 'Physical lights',
 			'sidebar/project/toneMapping': 'Mappage des nuances',
-			'sidebar/project/toneMappingExposure': 'Réglage d\'exposition',
 			'sidebar/project/materials': 'Matériaux',
 			'sidebar/project/Assign': 'Attribuer',
 
+			'sidebar/project/video': 'Video',
+			'sidebar/project/resolution': 'Resolution',
+			'sidebar/project/duration': 'Duration',
+			'sidebar/project/render': 'Render',
+
 			'sidebar/settings': 'Paramètres',
 			'sidebar/settings/language': 'Langue',
-			'sidebar/settings/exportPrecision': 'Précision à l\'exportation',
 
+			'sidebar/settings/shortcuts': 'Shortcuts',
 			'sidebar/settings/shortcuts/translate': 'Position',
 			'sidebar/settings/shortcuts/rotate': 'Rotation',
 			'sidebar/settings/shortcuts/scale': 'Échelle',
 			'sidebar/settings/shortcuts/undo': 'Annuler',
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
+			'sidebar/settings/viewport': 'Viewport',
 			'sidebar/settings/viewport/grid': 'Grille',
+			'sidebar/settings/viewport/helpers': 'Helpers',
 
 			'sidebar/history': 'Historique',
 			'sidebar/history/persistent': 'permanent',
@@ -635,7 +669,9 @@ var Strings = function ( config ) {
 			'viewport/info/vertices': 'Sommets',
 			'viewport/info/triangles': 'Triangles',
 			'viewport/info/frametime': 'Temps de trame'
+
 		},
+
 		zh: {
 
 			'menubar/file': '文件',
@@ -653,15 +689,16 @@ var Strings = function ( config ) {
 			'menubar/file/export/ply_binary': '导出PLY(二进制)',
 			'menubar/file/export/stl': '导出STL',
 			'menubar/file/export/stl_binary': '导出STL(二进制)',
+			'menubar/file/export/usdz': '导出USDZ',
 			'menubar/file/publish': '发布',
 
 			'menubar/edit': '编辑',
 			'menubar/edit/undo': '撤销 (Ctrl+Z)',
 			'menubar/edit/redo': '重做 (Ctrl+Shift+Z)',
 			'menubar/edit/clear_history': '清空历史记录',
+			'menubar/edit/center': '居中',
 			'menubar/edit/clone': '拷贝',
 			'menubar/edit/delete': '删除 (Del)',
-			'menubar/edit/minify_shaders': '压缩着色器',
 			'menubar/edit/fixcolormaps': '修复颜色贴图',
 
 			'menubar/add': '添加',
@@ -702,13 +739,22 @@ var Strings = function ( config ) {
 			'menubar/examples/Pong': '乒乓球',
 			'menubar/examples/Shaders': '着色器',
 
+			'menubar/view': '视图',
+			'menubar/view/fullscreen': '全屏',
+
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
 			'menubar/help/icons': '图标组件包',
 			'menubar/help/about': '关于',
 
+			'sidebar/animations': '动画',
+			'sidebar/animations/play': '播放',
+			'sidebar/animations/stop': '暂停',
+			'sidebar/animations/timescale': '时间缩放',
+
 			'sidebar/scene': '场景',
 			'sidebar/scene/background': '背景',
+			'sidebar/scene/environment': '环境',
 			'sidebar/scene/fog': '雾',
 
 			'sidebar/properties/object': '属性',
@@ -738,8 +784,9 @@ var Strings = function ( config ) {
 			'sidebar/object/penumbra': '边缘',
 			'sidebar/object/decay': '衰减',
 			'sidebar/object/shadow': '阴影',
-			'sidebar/object/shadowRadius': '阴影半径',
 			'sidebar/object/shadowBias': '阴影偏移',
+			'sidebar/object/shadowNormalBias': '阴影法线偏移',
+			'sidebar/object/shadowRadius': '阴影半径',
 			'sidebar/object/cast': '产生',
 			'sidebar/object/receive': '接受',
 			'sidebar/object/visible': '可见性',
@@ -776,8 +823,15 @@ var Strings = function ( config ) {
 			'sidebar/geometry/cylinder_geometry/heightsegments': '高度分段',
 			'sidebar/geometry/cylinder_geometry/openended': '开端',
 
-			'sidebar/geometry/geometry/vertices': '顶点',
-			'sidebar/geometry/geometry/faces': '面',
+			'sidebar/geometry/extrude_geometry/curveSegments': '曲线段',
+			'sidebar/geometry/extrude_geometry/steps': '细分点数',
+			'sidebar/geometry/extrude_geometry/depth': '深度',
+			'sidebar/geometry/extrude_geometry/bevelEnabled': '启用斜角',
+			'sidebar/geometry/extrude_geometry/bevelThickness': '斜角厚度',
+			'sidebar/geometry/extrude_geometry/bevelSize': '斜角大小',
+			'sidebar/geometry/extrude_geometry/bevelOffset': '斜角偏移量',
+			'sidebar/geometry/extrude_geometry/bevelSegments': '斜角分段',
+			'sidebar/geometry/extrude_geometry/shape': '转换图形',
 
 			'sidebar/geometry/dodecahedron_geometry/radius': '半径',
 			'sidebar/geometry/dodecahedron_geometry/detail': '面片分段',
@@ -808,6 +862,9 @@ var Strings = function ( config ) {
 			'sidebar/geometry/ring_geometry/thetastart': '弧度起点',
 			'sidebar/geometry/ring_geometry/thetalength': '弧度长度',
 
+			'sidebar/geometry/shape_geometry/curveSegments': '曲线段',
+			'sidebar/geometry/shape_geometry/extrude': '拉伸',
+
 			'sidebar/geometry/sphere_geometry/radius': '半径',
 			'sidebar/geometry/sphere_geometry/widthsegments': '宽度分段',
 			'sidebar/geometry/sphere_geometry/heightsegments': '长度分段',
@@ -829,9 +886,19 @@ var Strings = function ( config ) {
 			'sidebar/geometry/torusKnot_geometry/p': '管长弧度',
 			'sidebar/geometry/torusKnot_geometry/q': '扭曲弧度',
 
+			'sidebar/geometry/tube_geometry/path': '路径',
+			'sidebar/geometry/tube_geometry/radius': '半径',
+			'sidebar/geometry/tube_geometry/tube': '管厚',
+			'sidebar/geometry/tube_geometry/tubularsegments': '管厚分段',
+			'sidebar/geometry/tube_geometry/radialsegments': '半径分段',
+			'sidebar/geometry/tube_geometry/closed': '闭合',
+			'sidebar/geometry/tube_geometry/curvetype': '曲线类型',
+			'sidebar/geometry/tube_geometry/tension': '张力',
+
 			'sidebar/material/new': '更新',
 			'sidebar/material/copy': '复制',
 			'sidebar/material/paste': '粘贴',
+			'sidebar/material/slot': '插槽',
 			'sidebar/material/type': '类型',
 			'sidebar/material/uuid': '识别码',
 			'sidebar/material/name': '名称',
@@ -840,21 +907,24 @@ var Strings = function ( config ) {
 			'sidebar/material/vertex': '顶点',
 			'sidebar/material/fragment': '片元',
 			'sidebar/material/color': '颜色',
+			'sidebar/material/depthPacking': '深度包装',
 			'sidebar/material/roughness': '粗糙度',
 			'sidebar/material/metalness': '金属度',
+			'sidebar/material/sheen': '光泽',
+			'sidebar/material/transmission': '透射',
 			'sidebar/material/emissive': '自发光',
 			'sidebar/material/specular': '高光',
 			'sidebar/material/shininess': '高光大小',
-			'sidebar/material/clearcoat': '透明图层',
-			'sidebar/material/clearcoatroughness': '透明图层粗糙度',
+			'sidebar/material/clearcoat': '清漆',
+			'sidebar/material/clearcoatroughness': '清漆粗糙度',
 			'sidebar/material/vertexcolors': '顶点颜色',
 			'sidebar/material/vertextangents': '顶点切线',
-			'sidebar/material/skinning': '皮肤',
+			'sidebar/material/matcap': '材质捕获',
 			'sidebar/material/map': '贴图',
 			'sidebar/material/alphamap': '透明贴图',
 			'sidebar/material/bumpmap': '凹凸贴图',
 			'sidebar/material/normalmap': '法线贴图',
-			'sidebar/material/clearcoatnormalmap': '透明图层法线贴图',
+			'sidebar/material/clearcoatnormalmap': '清漆法线贴图',
 			'sidebar/material/displacemap': '置换贴图',
 			'sidebar/material/roughmap': '粗糙贴图',
 			'sidebar/material/metalmap': '金属贴图',
@@ -863,10 +933,13 @@ var Strings = function ( config ) {
 			'sidebar/material/lightmap': '光照贴图',
 			'sidebar/material/aomap': '环境光遮蔽贴图',
 			'sidebar/material/emissivemap': '自发光贴图',
+			'sidebar/material/gradientmap': '渐变贴图',
 			'sidebar/material/side': '面',
 			'sidebar/material/side/front': '正面',
 			'sidebar/material/side/back': '背面',
 			'sidebar/material/side/double': '双面',
+			'sidebar/material/size': '大小',
+			'sidebar/material/sizeAttenuation': '大小衰减',
 			'sidebar/material/flatshaded': '平面着色',
 			'sidebar/material/blending': '混合',
 			'sidebar/material/blending/no': '无',
@@ -878,6 +951,8 @@ var Strings = function ( config ) {
 			'sidebar/material/opacity': '透明度',
 			'sidebar/material/transparent': '透明性',
 			'sidebar/material/alphatest': 'α测试',
+			'sidebar/material/depthtest': '深度测试',
+			'sidebar/material/depthwrite': '深度缓冲',
 			'sidebar/material/wireframe': '线框',
 
 			'sidebar/script': '脚本',
@@ -892,24 +967,29 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
-			'sidebar/project/shadowType': '阴影类型',
-			'sidebar/project/physicallyCorrectLights': '物理光照',
+			'sidebar/project/physicallyCorrectLights': '物理灯',
 			'sidebar/project/toneMapping': '色调映射',
-			'sidebar/project/toneMappingExposure': '曝光',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
 
+			'sidebar/project/video': '视频',
+			'sidebar/project/resolution': '分辨率',
+			'sidebar/project/duration': '时长',
+			'sidebar/project/render': '渲染',
+
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
-			'sidebar/settings/exportPrecision': '输出精度',
 
+			'sidebar/settings/shortcuts': '快捷键',
 			'sidebar/settings/shortcuts/translate': '移动',
 			'sidebar/settings/shortcuts/rotate': '旋转',
 			'sidebar/settings/shortcuts/scale': '缩放',
 			'sidebar/settings/shortcuts/undo': '撤销',
 			'sidebar/settings/shortcuts/focus': '聚焦',
 
+			'sidebar/settings/viewport': '视窗',
 			'sidebar/settings/viewport/grid': '网格',
+			'sidebar/settings/viewport/helpers': '辅助',
 
 			'sidebar/history': '历史记录',
 			'sidebar/history/persistent': '本地存储',
@@ -938,6 +1018,6 @@ var Strings = function ( config ) {
 
 	};
 
-};
+}
 
 export { Strings };

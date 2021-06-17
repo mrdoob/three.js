@@ -1,14 +1,10 @@
-/**
- * @author Temdog007 / http://github.com/Temdog007
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryOctahedronGeometry = function ( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -44,7 +40,7 @@ var SidebarGeometryOctahedronGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.OctahedronBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.OctahedronGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );
@@ -55,6 +51,6 @@ var SidebarGeometryOctahedronGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
-export { SidebarGeometryOctahedronGeometry };
+export { GeometryParametersPanel };

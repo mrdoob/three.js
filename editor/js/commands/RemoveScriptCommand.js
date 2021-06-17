@@ -1,8 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
-
 import { Command } from '../Command.js';
 
 /**
@@ -11,26 +6,26 @@ import { Command } from '../Command.js';
  * @param script javascript object
  * @constructor
  */
-var RemoveScriptCommand = function ( editor, object, script ) {
+class RemoveScriptCommand extends Command {
 
-	Command.call( this, editor );
+	constructor( editor, object, script ) {
 
-	this.type = 'RemoveScriptCommand';
-	this.name = 'Remove Script';
+		super( editor );
 
-	this.object = object;
-	this.script = script;
-	if ( this.object && this.script ) {
+		this.type = 'RemoveScriptCommand';
+		this.name = 'Remove Script';
 
-		this.index = this.editor.scripts[ this.object.uuid ].indexOf( this.script );
+		this.object = object;
+		this.script = script;
+		if ( this.object && this.script ) {
+
+			this.index = this.editor.scripts[ this.object.uuid ].indexOf( this.script );
+
+		}
 
 	}
 
-};
-
-RemoveScriptCommand.prototype = {
-
-	execute: function () {
+	execute() {
 
 		if ( this.editor.scripts[ this.object.uuid ] === undefined ) return;
 
@@ -42,9 +37,9 @@ RemoveScriptCommand.prototype = {
 
 		this.editor.signals.scriptRemoved.dispatch( this.script );
 
-	},
+	}
 
-	undo: function () {
+	undo() {
 
 		if ( this.editor.scripts[ this.object.uuid ] === undefined ) {
 
@@ -56,11 +51,11 @@ RemoveScriptCommand.prototype = {
 
 		this.editor.signals.scriptAdded.dispatch( this.script );
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var output = Command.prototype.toJSON.call( this );
+		const output = super.toJSON( this );
 
 		output.objectUuid = this.object.uuid;
 		output.script = this.script;
@@ -68,11 +63,11 @@ RemoveScriptCommand.prototype = {
 
 		return output;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Command.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.script = json.script;
 		this.index = json.index;
@@ -80,6 +75,6 @@ RemoveScriptCommand.prototype = {
 
 	}
 
-};
+}
 
 export { RemoveScriptCommand };

@@ -15,10 +15,8 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var container;
-
-			var camera, scene, renderer;
-			var group, cubes;
+			let camera, scene, renderer;
+			let group, cubes;
 
 			init();
 			animate();
@@ -29,8 +27,8 @@
 					.setOptions( { imageOrientation: 'none' } )
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( imageBitmap ) {
 
-						var texture = new THREE.CanvasTexture( imageBitmap );
-						var material = new THREE.MeshBasicMaterial( { map: texture } );
+						const texture = new THREE.CanvasTexture( imageBitmap );
+						const material = new THREE.MeshBasicMaterial( { map: texture } );
 
 						/* ImageBitmap should be disposed when done with it
 						   Can't be done until it's actually uploaded to WebGLTexture */
@@ -57,19 +55,19 @@
 					.setCrossOrigin( '*' )
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( image ) {
 
-						var texture = new THREE.CanvasTexture( image );
-						var material = new THREE.MeshBasicMaterial( { color: 0xff8888, map: texture } );
+						const texture = new THREE.CanvasTexture( image );
+						const material = new THREE.MeshBasicMaterial( { color: 0xff8888, map: texture } );
 						addCube( material );
 
 					} );
 
 			}
 
-			var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+			const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 
 			function addCube( material ) {
 
-				var cube = new THREE.Mesh( geometry, material );
+				const cube = new THREE.Mesh( geometry, material );
 				cube.position.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
 				cube.rotation.set( Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI );
 				cubes.add( cube );
@@ -78,7 +76,7 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				// CAMERA
@@ -96,7 +94,7 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				group.add( new THREE.GridHelper( 4, 12 ) );
+				group.add( new THREE.GridHelper( 4, 12, 0x888888, 0x444444 ) );
 
 				cubes = new THREE.Group();
 				group.add( cubes );
@@ -119,7 +117,7 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

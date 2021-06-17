@@ -19,15 +19,16 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
-			var statsEnabled = true;
+			const statsEnabled = true;
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer, controls;
+			let camera, scene, renderer, controls;
 
 			init();
 			animate();
@@ -61,19 +62,19 @@
 
 				//
 
-				var material = new THREE.MeshStandardMaterial();
+				const material = new THREE.MeshStandardMaterial();
 
 				new OBJLoader()
 					.setPath( 'models/obj/cerberus/' )
 					.load( 'Cerberus.obj', function ( group ) {
 
-						var loader = new THREE.TextureLoader()
+						const loader = new THREE.TextureLoader()
 							.setPath( 'models/obj/cerberus/' );
 
 						material.roughness = 1; // attenuates roughnessMap
 						material.metalness = 1; // attenuates metalnessMap
 
-						var diffuseMap = loader.load( 'Cerberus_A.jpg' );
+						const diffuseMap = loader.load( 'Cerberus_A.jpg' );
 						diffuseMap.encoding = THREE.sRGBEncoding;
 						material.map = diffuseMap;
 						// roughness is in G channel, metalness is in B channel
@@ -101,21 +102,56 @@
 
 					} );
 
-				new RGBELoader()
+				const environments = {
+
+					'Venice Sunset': { filename: 'venice_sunset_1k.hdr' },
+					'Overpass': { filename: 'pedestrian_overpass_1k.hdr' }
+
+				};
+
+				function loadEnvironment(name) {
+
+					if ( environments[ name ].texture !== undefined ) {
+
+						scene.background = environments[ name ].texture;
+						scene.environment = environments[ name ].texture;
+						return;
+
+					}
+
+					const filename = environments[ name ].filename;
+					new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
+					.load( filename, function ( hdrEquirect ) {
 
-						var hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
+						const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
 						hdrEquirect.dispose();
-						pmremGenerator.dispose();
 
 						scene.background = hdrCubeRenderTarget.texture;
 						scene.environment = hdrCubeRenderTarget.texture;
+						environments[ name ].texture = hdrCubeRenderTarget.texture;
 
 					} );
 
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				}
+
+				const params = {
+
+					environment: Object.keys( environments )[ 0 ]
+
+				};
+				loadEnvironment( params.environment );
+
+				const gui = new GUI();
+				gui.add( params, 'environment', Object.keys( environments ) ).onChange( function( value ) {
+
+					loadEnvironment(value);
+
+				} );
+				gui.open();
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
 				//
@@ -127,7 +163,7 @@
 
 				}
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

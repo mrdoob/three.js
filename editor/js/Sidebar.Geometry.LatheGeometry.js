@@ -1,7 +1,3 @@
-/**
- * @author rfm1201
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
@@ -9,7 +5,7 @@ import { UIPoints2 } from './libs/ui.three.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryLatheGeometry = function ( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -60,7 +56,7 @@ var SidebarGeometryLatheGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.LatheBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.LatheGeometry(
 			points.getValue(),
 			segments.getValue(),
 			phiStart.getValue() / 180 * Math.PI,
@@ -71,6 +67,6 @@ var SidebarGeometryLatheGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
-export { SidebarGeometryLatheGeometry };
+export { GeometryParametersPanel };

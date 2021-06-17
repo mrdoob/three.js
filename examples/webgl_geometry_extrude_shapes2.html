@@ -32,21 +32,23 @@
 
 			function d3threeD( exports ) {
 
-				var DEGS_TO_RADS = Math.PI / 180;
-				var DIGIT_0 = 48, DIGIT_9 = 57, COMMA = 44, SPACE = 32, PERIOD = 46, MINUS = 45;
+				const DEGS_TO_RADS = Math.PI / 180;
+				const DIGIT_0 = 48, DIGIT_9 = 57, COMMA = 44, SPACE = 32, PERIOD = 46, MINUS = 45;
 
 				exports.transformSVGPath = function transformSVGPath( pathStr ) {
 
-					var path = new THREE.ShapePath();
+					const path = new THREE.ShapePath();
 
-					var idx = 1, len = pathStr.length, activeCmd,
+					let idx = 1, activeCmd,
 						x = 0, y = 0, nx = 0, ny = 0, firstX = null, firstY = null,
 						x1 = 0, x2 = 0, y1 = 0, y2 = 0,
 						rx = 0, ry = 0, xar = 0, laf = 0, sf = 0, cx, cy;
 
+					const len = pathStr.length;
+
 					function eatNum() {
 
-						var sidx, c, isFloat = false, s;
+						let sidx, c, isFloat = false, s;
 
 						// eat delims
 
@@ -101,7 +103,7 @@
 
 					function nextIsNum() {
 
-						var c;
+						let c;
 
 						// do permanently eat any delims...
 
@@ -120,7 +122,7 @@
 
 					}
 
-					var canRepeat;
+					let canRepeat;
 					activeCmd = pathStr[ 0 ];
 
 					while ( idx <= len ) {
@@ -272,7 +274,7 @@
 
 								// step 2, using x2 as cx'
 
-								var norm = Math.sqrt( ( rx * rx * ry * ry - rx * rx * y1 * y1 - ry * ry * x1 * x1 ) /
+								let norm = Math.sqrt( ( rx * rx * ry * ry - rx * rx * y1 * y1 - ry * ry * x1 * x1 ) /
 									 ( rx * rx * y1 * y1 + ry * ry * x1 * x1 ) );
 
 								if ( laf === sf ) norm = - norm;
@@ -285,10 +287,10 @@
 								cx = Math.cos( xar ) * x2 - Math.sin( xar ) * y2 + ( x + nx ) / 2;
 								cy = Math.sin( xar ) * x2 + Math.cos( xar ) * y2 + ( y + ny ) / 2;
 
-								var u = new THREE.Vector2( 1, 0 );
-								var v = new THREE.Vector2( ( x1 - x2 ) / rx, ( y1 - y2 ) / ry );
+								const u = new THREE.Vector2( 1, 0 );
+								const v = new THREE.Vector2( ( x1 - x2 ) / rx, ( y1 - y2 ) / ry );
 
-								var startAng = Math.acos( u.dot( v ) / u.length() / v.length() );
+								let startAng = Math.acos( u.dot( v ) / u.length() / v.length() );
 
 								if ( ( ( u.x * v.y ) - ( u.y * v.x ) ) < 0 ) startAng = - startAng;
 
@@ -296,7 +298,7 @@
 								u.x = ( - x1 - x2 ) / rx;
 								u.y = ( - y1 - y2 ) / ry;
 
-								var deltaAng = Math.acos( v.dot( u ) / v.length() / u.length() );
+								let deltaAng = Math.acos( v.dot( u ) / v.length() / u.length() );
 
 								// This normalization ends up making our curves fail to triangulate...
 
@@ -328,39 +330,39 @@
 
 			}
 
-			var $d3g = {};
+			const $d3g = {};
 			d3threeD( $d3g );
 
 			/// Part from g0v/twgeojson
 			/// Graphic Engine and Geo Data Init Functions
 
-			var addGeoObject = function ( group, svgObject ) {
+			const addGeoObject = function ( group, svgObject ) {
 
-				var paths = svgObject.paths;
-				var depths = svgObject.depths;
-				var colors = svgObject.colors;
-				var center = svgObject.center;
+				const paths = svgObject.paths;
+				const depths = svgObject.depths;
+				const colors = svgObject.colors;
+				const center = svgObject.center;
 
-				for ( var i = 0; i < paths.length; i ++ ) {
+				for ( let i = 0; i < paths.length; i ++ ) {
 
-					var path = $d3g.transformSVGPath( paths[ i ] );
-					var color = new THREE.Color( colors[ i ] );
-					var material = new THREE.MeshLambertMaterial( {
+					const path = $d3g.transformSVGPath( paths[ i ] );
+					const color = new THREE.Color( colors[ i ] );
+					const material = new THREE.MeshLambertMaterial( {
 						color: color,
 						emissive: color
 					} );
-					var depth = depths[ i ];
-					var simpleShapes = path.toShapes( true );
+					const depth = depths[ i ];
+					const simpleShapes = path.toShapes( true );
 
-					for ( var j = 0; j < simpleShapes.length; j ++ ) {
+					for ( let j = 0; j < simpleShapes.length; j ++ ) {
 
-						var simpleShape = simpleShapes[ j ];
-						var shape3d = new THREE.ExtrudeBufferGeometry( simpleShape, {
+						const simpleShape = simpleShapes[ j ];
+						const shape3d = new THREE.ExtrudeGeometry( simpleShape, {
 							depth: depth,
 							bevelEnabled: false
 						} );
 
-						var mesh = new THREE.Mesh( shape3d, material );
+						const mesh = new THREE.Mesh( shape3d, material );
 						mesh.rotation.x = Math.PI;
 						mesh.translateZ( - depth - 1 );
 						mesh.translateX( - center.x );
@@ -374,7 +376,7 @@
 
 			};
 
-			var renderer, stats, scene, camera;
+			let renderer, stats, scene, camera;
 
 			init();
 			animate();
@@ -383,7 +385,7 @@
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				//
 
@@ -397,27 +399,27 @@
 
 				//
 
-				var group = new THREE.Group();
+				const group = new THREE.Group();
 				scene.add( group );
 
 				//
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
 				directionalLight.position.set( 0.75, 0.75, 1.0 ).normalize();
 				scene.add( directionalLight );
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.2 );
+				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.2 );
 				scene.add( ambientLight );
 
 				//
 
-				var helper = new THREE.GridHelper( 160, 10 );
+				const helper = new THREE.GridHelper( 160, 10 );
 				helper.rotation.x = Math.PI / 2;
 				group.add( helper );
 
 				//
 
-				var obj = initSVGObject();
+				const obj = initSVGObject();
 				addGeoObject( group, obj );
 
 				//
@@ -429,7 +431,7 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 100;
 				controls.maxDistance = 1000;
 
@@ -440,13 +442,13 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function initSVGObject() {
 
-				var obj = {};
+				const obj = {};
 
 				/// The geo data from Taipei City, Keelung City, Taipei County in SVG form
 				obj.paths = [

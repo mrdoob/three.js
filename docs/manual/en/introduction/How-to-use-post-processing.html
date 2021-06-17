@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -39,7 +38,7 @@
 		</p>
 
 		<code>
-		var composer = new EffectComposer( renderer );
+		const composer = new EffectComposer( renderer );
 		</code>
 
 		<p>
@@ -65,10 +64,10 @@
 		</p>
 
 		<code>
-		var renderPass = new RenderPass( scene, camera );
+		const renderPass = new RenderPass( scene, camera );
 		composer.addPass( renderPass );
 
-		var glitchPass = new GlitchPass();
+		const glitchPass = new GlitchPass();
 		composer.addPass( glitchPass );
 		</code>
 
@@ -98,7 +97,7 @@
 
 		// later in your init routine
 
-		var luminosityPass = new ShaderPass( LuminosityShader );
+		const luminosityPass = new ShaderPass( LuminosityShader );
 		composer.addPass( luminosityPass );
 		</code>
 

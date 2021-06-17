@@ -1,15 +1,12 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { Box3, Vector3 } from '../../build/three.module.js';
 
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
-import { MultiCmdsCommand } from './commands/MultiCmdsCommand.js';
-import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
+import { SetPositionCommand } from './commands/SetPositionCommand.js';
 
-var MenubarEdit = function ( editor ) {
+function MenubarEdit( editor ) {
 
 	var strings = editor.strings;
 
@@ -91,6 +88,30 @@ var MenubarEdit = function ( editor ) {
 
 	options.add( new UIHorizontalRule() );
 
+	// Center
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/edit/center' ) );
+	option.onClick( function () {
+
+		var object = editor.selected;
+
+		if ( object === null || object.parent === null ) return; // avoid centering the camera or scene
+
+		const aabb = new Box3().setFromObject( object );
+		const center = aabb.getCenter( new Vector3() );
+		const newPosition = new Vector3();
+
+		newPosition.x = object.position.x + ( object.position.x - center.x );
+		newPosition.y = object.position.y + ( object.position.y - center.y );
+		newPosition.z = object.position.z + ( object.position.z - center.z );
+
+		editor.execute( new SetPositionCommand( editor, object, newPosition ) );
+
+	} );
+	options.add( option );
+
 	// Clone
 
 	var option = new UIRow();
@@ -100,7 +121,7 @@ var MenubarEdit = function ( editor ) {
 
 		var object = editor.selected;
 
-		if ( object.parent === null ) return; // avoid cloning the camera or scene
+		if ( object === null || object.parent === null ) return; // avoid cloning the camera or scene
 
 		object = object.clone();
 
@@ -127,85 +148,7 @@ var MenubarEdit = function ( editor ) {
 	} );
 	options.add( option );
 
-	// Minify shaders
-
-	var option = new UIRow();
-	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/edit/minify_shaders' ) );
-	option.onClick( function () {
-
-		var root = editor.selected || editor.scene;
-
-		var errors = [];
-		var nMaterialsChanged = 0;
-
-		var path = [];
-
-		function getPath( object ) {
-
-			path.length = 0;
-
-			var parent = object.parent;
-			if ( parent !== undefined ) getPath( parent );
-
-			path.push( object.name || object.uuid );
-
-			return path;
-
-		}
-
-		var cmds = [];
-		root.traverse( function ( object ) {
-
-			var material = object.material;
-
-			if ( material !== undefined && material.isShaderMaterial ) {
-
-				try {
-
-					var shader = glslprep.minifyGlsl( [
-						material.vertexShader, material.fragmentShader ] );
-
-					cmds.push( new SetMaterialValueCommand( editor, object, 'vertexShader', shader[ 0 ] ) );
-					cmds.push( new SetMaterialValueCommand( editor, object, 'fragmentShader', shader[ 1 ] ) );
-
-					++ nMaterialsChanged;
-
-				} catch ( e ) {
-
-					var path = getPath( object ).join( "/" );
-
-					if ( e instanceof glslprep.SyntaxError )
-
-						errors.push( path + ":" +
-								e.line + ":" + e.column + ": " + e.message );
-
-					else {
-
-						errors.push( path +
-								": Unexpected error (see console for details)." );
-
-						console.error( e.stack || e );
-
-					}
-
-				}
-
-			}
-
-		} );
-
-		if ( nMaterialsChanged > 0 ) {
-
-			editor.execute( new MultiCmdsCommand( editor, cmds ), 'Minify Shaders' );
-
-		}
-
-		window.alert( nMaterialsChanged +
-				" material(s) were changed.\n" + errors.join( "\n" ) );
-
-	} );
-	options.add( option );
+	//
 
 	options.add( new UIHorizontalRule() );
 
@@ -272,6 +215,6 @@ var MenubarEdit = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { MenubarEdit };

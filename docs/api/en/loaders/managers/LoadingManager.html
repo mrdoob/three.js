@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -27,7 +26,7 @@
 		</p>
 
 		<code>
-		var manager = new THREE.LoadingManager();
+		const manager = new THREE.LoadingManager();
 		manager.onStart = function ( url, itemsLoaded, itemsTotal ) {
 
 			console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
@@ -53,7 +52,7 @@
 
 		};
 
-		var loader = new THREE.OBJLoader( manager );
+		const loader = new THREE.OBJLoader( manager );
 		loader.load( 'file.obj', function ( object ) {
 
 			//
@@ -70,12 +69,12 @@
 
 		<code>
 		// Blob or File objects created when dragging files into the webpage.
-		var blobs = {'fish.gltf': blob1, 'diffuse.png': blob2, 'normal.png': blob3};
+		const blobs = {'fish.gltf': blob1, 'diffuse.png': blob2, 'normal.png': blob3};
 
-		var manager = new THREE.LoadingManager();
+		const manager = new THREE.LoadingManager();
 
 		// Initialize loading manager with URL callback.
-		var objectURLs = [];
+		const objectURLs = [];
 		manager.setURLModifier( ( url ) => {
 
 			url = URL.createObjectURL( blobs[ url ] );
@@ -87,7 +86,7 @@
 		} );
 
 		// Load as usual, then revoke the blob URLs.
-		var loader = new THREE.GLTFLoader( manager );
+		const loader = new THREE.GLTFLoader( manager );
 		loader.load( 'fish.gltf', (gltf) => {
 
 			scene.add( gltf.scene );

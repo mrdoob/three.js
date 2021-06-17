@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -34,7 +33,7 @@
 		<h2>Constructor</h2>
 		<h3>[name]( [param:BufferGeometry geometry], [param:Material material], [param:Integer count] )</h3>
 		<p>
-		[page:Geometry geometry] - an instance of [page:BufferGeometry].<br />
+		[page:BufferGeometry geometry] - an instance of [page:BufferGeometry].<br />
 		[page:Material material] - an instance of [page:Material]. Default is a new [page:MeshBasicMaterial].<br />
 		[page:Integer count] - the number of instances.<br />
 		</p>
@@ -52,6 +51,12 @@
 			If you need more instances than the original count value, you have to create a new [name].
 		</p>
 
+		<h3>[property:BufferAttribute instanceColor]</h3>
+		<p>
+			Represents the colors of all instances. *null* by default.
+			You have to set its [page:BufferAttribute.needsUpdate needsUpdate] flag to true if you modify instanced data via [page:.setColorAt]().
+		</p>
+
 		<h3>[property:BufferAttribute instanceMatrix]</h3>
 		<p>
 			Represents the local transformation of all instances.
@@ -60,6 +65,22 @@
 
 		<h2>Methods</h2>
 		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>
+			Frees the internal resources of this instance.
+		</p>
+
+		<h3>[method:null getColorAt]( [param:Integer index], [param:Color color] )</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the range [0, count].
+		</p>
+		<p>
+			[page:Color color]: This color object will be set to the color of the defined instance.
+		</p>
+		<p>
+			Get the color of the defined instance.
+		</p>
 
 		<h3>[method:null getMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )</h3>
 		<p>
@@ -72,6 +93,18 @@
 			Get the local transformation matrix of the defined instance.
 		</p>
 
+		<h3>[method:null setColorAt]( [param:Integer index], [param:Color color] )</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the range [0, count].
+		</p>
+		<p>
+			[page:Color color]: The color of a single instance.
+		</p>
+		<p>
+			Sets the given color to the defined instance.
+			Make sure you set [page:.instanceColor][page:BufferAttribute.needsUpdate .needsUpdate] to true after updating all the colors.
+		</p>
+
 		<h3>[method:null setMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )</h3>
 		<p>
 			[page:Integer index]: The index of an instance. Values have to be in the range [0, count].
@@ -81,6 +114,7 @@
 		</p>
 		<p>
 			Sets the given local transformation matrix to the defined instance.
+			Make sure you set [page:.instanceMatrix][page:BufferAttribute.needsUpdate .needsUpdate] to true after updating all the matrices.
 		</p>
 
 		<h2>Source</h2>

@@ -1,27 +1,22 @@
-/**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * minimal class for proxing functions to Path. Replaces old "extractSubpaths()"
- **/
-
 import { Color } from '../../math/Color.js';
 import { Path } from './Path.js';
 import { Shape } from './Shape.js';
 import { ShapeUtils } from '../ShapeUtils.js';
 
-function ShapePath() {
+class ShapePath {
 
-	this.type = 'ShapePath';
+	constructor() {
 
-	this.color = new Color();
+		this.type = 'ShapePath';
 
-	this.subPaths = [];
-	this.currentPath = null;
+		this.color = new Color();
 
-}
+		this.subPaths = [];
+		this.currentPath = null;
 
-Object.assign( ShapePath.prototype, {
+	}
 
-	moveTo: function ( x, y ) {
+	moveTo( x, y ) {
 
 		this.currentPath = new Path();
 		this.subPaths.push( this.currentPath );
@@ -29,41 +24,41 @@ Object.assign( ShapePath.prototype, {
 
 		return this;
 
-	},
+	}
 
-	lineTo: function ( x, y ) {
+	lineTo( x, y ) {
 
 		this.currentPath.lineTo( x, y );
 
 		return this;
 
-	},
+	}
 
-	quadraticCurveTo: function ( aCPx, aCPy, aX, aY ) {
+	quadraticCurveTo( aCPx, aCPy, aX, aY ) {
 
 		this.currentPath.quadraticCurveTo( aCPx, aCPy, aX, aY );
 
 		return this;
 
-	},
+	}
 
-	bezierCurveTo: function ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
+	bezierCurveTo( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
 
 		this.currentPath.bezierCurveTo( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY );
 
 		return this;
 
-	},
+	}
 
-	splineThru: function ( pts ) {
+	splineThru( pts ) {
 
 		this.currentPath.splineThru( pts );
 
 		return this;
 
-	},
+	}
 
-	toShapes: function ( isCCW, noHoles ) {
+	toShapes( isCCW, noHoles ) {
 
 		function toShapesNoHoles( inSubpaths ) {
 
@@ -152,7 +147,8 @@ Object.assign( ShapePath.prototype, {
 		if ( noHoles === true )	return	toShapesNoHoles( subPaths );
 
 
-		let solid, tmpPath, tmpShape, shapes = [];
+		let solid, tmpPath, tmpShape;
+		const shapes = [];
 
 		if ( subPaths.length === 1 ) {
 
@@ -293,7 +289,7 @@ Object.assign( ShapePath.prototype, {
 
 	}
 
-} );
+}
 
 
 export { ShapePath };

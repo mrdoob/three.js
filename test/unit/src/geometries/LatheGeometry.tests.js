@@ -1,16 +1,11 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import {
-	LatheBufferGeometry
-} from '../../../../src/geometries/LatheGeometry';
+import { LatheGeometry, LatheBufferGeometry } from '../../../../src/geometries/LatheGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'LatheBufferGeometry', ( hooks ) => {
+	QUnit.module( 'LatheGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -23,8 +18,8 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				//				new LatheBufferGeometry(), // Todo: error for undefined point
-				new LatheBufferGeometry( parameters.points )
+				new LatheGeometry( parameters.points ),
+				new LatheBufferGeometry( parameters.points ),
 			];
 
 		} );

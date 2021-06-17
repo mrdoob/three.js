@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,13 +18,13 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
-		planeGeometry.rotateX( - Math.PI / 2 );
+		const geometry = new THREE.PlaneGeometry( 2000, 2000 );
+		geometry.rotateX( - Math.PI / 2 );
 
-		var planeMaterial = new THREE.ShadowMaterial();
-		planeMaterial.opacity = 0.2;
+		const material = new THREE.ShadowMaterial();
+		material.opacity = 0.2;
 
-		var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+		const plane = new THREE.Mesh( geometry, material );
 		plane.position.y = -200;
 		plane.receiveShadow = true;
 		scene.add( plane );

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <base href="../../../" />
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+    <h1>설치([name])</h1>
+
+    <p>
+        three.js는 [link:https://www.npmjs.com/ npm]을 포함한 빌드 툴에서 설치가 가능하고, CDN이나 static 호스팅으로 빠르게 사용이 가능합니다. 대부분의 경우 npm을
+        통한 설치가 가장 좋은 선택입니다.
+    </p>
+
+    <p>
+        어떤 방식을 선택하든, 같은 버전의 라이브러리에서 모든 파일을 동일하게 불러와야 합니다. 여러 소스에서 파일을 혼합해 가져오면 코드 중복이 일어나거나 비정상적으로 앱이 종료될 수 있습니다.
+    </p>
+
+    <p>
+        three.js의 모든 메서드들은 ES modules (see [link:https://eloquentjavascript.net/10_modules.html#h_hF2FmOVxw7 Eloquent
+        JavaScript: ECMAScript Modules])에 기반하고 있으며, 마지막 프로젝트에 필요한 부분만 불러오도록 할 것입니다.
+    </p>
+
+    <h2>npm으로 설치하기</h2>
+
+    <p>
+        [link:https://www.npmjs.com/package/three three] npm 모듈을 설치하려면, 프로젝트 폴더의 터미널을 열고 다음을 실행합니다.
+    </p>
+
+    <code>
+		npm install --save three
+		</code>
+
+    <p>
+        패키지가 다운로드 및 설치 될 것이며, 다음과 같이 코드에서 불러올 수 있을 것입니다.
+    </p>
+
+    <code>
+		///////////////////////////////////////////////////////
+		// Option 1: Import the entire three.js core library.
+		import * as THREE from 'three';
+
+		const scene = new THREE.Scene();
+
+
+		///////////////////////////////////////////////////////
+		// Option 2: Import just the parts you need.
+		import { Scene } from 'three';
+
+		const scene = new Scene();
+		</code>
+
+    <p>
+        npm을 통해 설치할 때, 아마 대부분의 경우 모든 패키지를 한 자바스크립트 파일에 결합시켜주는
+        [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC bundling tool]을 사용할텐데, three.js는 모든 자바스크립트
+        번들러에 호환되지만, 가장 널리 쓰이는 것은 [link:https://webpack.js.org/ webpack]일 것입니다.
+    </p>
+
+    <p>
+        모든 속성들이 <em>three</em> 모듈에서 바로 불러와지는 것은 아닙니다. ("bare import"라고도 불리는). 다른 자주 쓰이는 라이브러리들, controls, loaders, post-processing effects 같은 것들은
+[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] 의 하위폴더에서 불러와야 합니다. 더 자세한 내용을 알아보려면, 아래 <em>내용</em>을 참고하세요.
+    </p>
+
+    <p>
+    npm 모듈 [link:https://eloquentjavascript.net/20_node.html#h_J6hW/SmL/a Eloquent
+        JavaScript: Installing with npm]에 대해 더 알아보기.
+    </p>
+
+    <h2>static hosting 및 CDN을 통한 설치</h2>
+
+    <p>
+        three.js 라이브러리는 빌드 시스템 없이도, 본인의 웹서버나 기존의 CDN에 파일을 올리지 않고도 사용할 수 있습니다. three.js 라이브러리는 ES 모듈에 기반하고있기 때문에, 모든 스크립트는 참조할 때 아래처럼 <em>type="module"</em>을 사용해야합니다.
+    </p>
+
+    <code>
+		&lt;script type="module">
+
+		  // Find the latest version by visiting https://cdn.skypack.dev/three.
+
+		  import * as THREE from 'https://cdn.skypack.dev/three@&lt;version&gt;';
+
+		  const scene = new THREE.Scene();
+
+		&lt;/script>
+		</code>
+
+    <p>
+        모든 속성들이 <em>build/three.module.js</em> 모듈을 통해 접근하는 것은 아닙니다.  다른 자주 쓰이는 라이브러리들, controls, loaders, post-processing effects 같은 것들은
+        [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] 의 하위폴더에서 불러와야 합니다. 더 자세한 내용을 알아보려면, 아래 <em>예제</em>를 참고하세요.
+    </p>
+
+
+    <h2>예제</h2>
+
+    <p>
+        three.js는 3D 엔진의 주요 컴포넌트들에 초점을 두고 있습니다. 다른 여러 유용한 컴포넌트들 —
+        controls, loaders, post-processing effects — 은
+        [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] 폴더에 있습니다. 이들은 "예제"로 불리는데, 그대로 사용할 수도 있고,
+        재조합 및 커스터마이징이 가능하기 때문입니다. 이 컴포넌트들은 언제나 코어 라이브러리와 상응하게 이루어져있으며, 이는 다른 비슷한 서드파티 패키지들이 다양한 사람들에 의해 유지보수되고, 최신버전 반영이 안되는 점과는 대비되는 점입니다.
+    </p>
+
+    <p>
+        예제들은 각각 따로 <em>설치할</em> 필요는 없지만, 각각 <em>import</em>를 해 주어야 합니다.
+        three.js가 npm을 통해 설치되었다면, [page:OrbitControls] 컴포넌트를 다음과 같이 불러올 수 있습니다.
+    </p>
+
+
+    <code>
+		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+		const controls = new OrbitControls();
+		</code>
+
+    <p>
+        three.js를 CDN으로 설치했다면, 다른 컴포넌트들도 동일한 CDN에서 설치 가능합니다.
+    </p>
+
+    <code>
+		&lt;script type="module">
+
+		  // Find the latest version by visiting https://cdn.skypack.dev/three.
+
+		  import { OrbitControls } from 'https://cdn.skypack.dev/three@&lt;version&gt;/examples/jsm/controls/OrbitControls.js';
+
+		  const controls = new OrbitControls();
+
+		&lt;/script>
+		</code>
+
+    <p>
+        모든 파일들의 버전을 동일하게 맞추는것이 무엇보다 중요합니다. 서로 다른 버전에서 import를 하거나, three.js 라이브러리 자체가 아닌 다른 버전의 예제를 사용하지 마세요.
+    </p>
+
+    <h2>양립성</h2>
+
+    <h3>CommonJS 불러오기</h3>
+
+    <p>
+        대부분의 자바스크립트 번들러는 이제 ES 모듈을 기본적으로 지원하지만, 오래된 빌드 도구들은 그렇지 않을 수 있습니다.
+        이 경우에, 번들러에 ES 모듈을 인식할 수 있도록 설정해줄 수 있습니다. 예를들어 [link:http://browserify.org/
+        Browserify] 는 [link:https://github.com/babel/babelify babelify] 플러그인을 불러오기만 하면 됩니다.
+    </p>
+
+    <h3>maps 불러오기</h3>
+
+    <p>
+        npm을 통해 설치하는 경우, 호스팅 및 CDN으로 설치했을 때와 import 경로가 다릅니다. 이 점은 양쪽의 사용자 모두에게 불편한 문제가 될 것이라는 점을 알고 있습니다.
+        빌드 도구나 번들러를 사용하는 개발자들은 상대경로보다 단순한 패키지 구분자(ex: 'three')로 사용하기를 선호하지만 <em>examples/</em> 폴더의 파일들은
+        <em>three.module.js</em>에 상대 경로를 사용하기 때문에 예상을 빗나가게 됩니다. 빌드 도구를 사용하지 않는 사람들 — 빠른 프로토타입 제작, 학습용도, 개인적 취향 — 도 마찬가지로 이러한 상대 경로를 싫어할 텐데,
+        특정 폴더 구조가 필요하고, 전역 <em>THREE.*</em>를 사용하는 것보다 엄격하기 때문입니다.
+    </p>
+
+    <p>
+        [link:https://github.com/WICG/import-maps import maps] 이 후에 활발하게 지원된다면 이러한 상대 경로들을 npm 패키지 이름, 'three'처럼 단순한 패키지 식별자로 변경할 예정입니다.
+        이는 npm 패키지에서 주로 쓰이는 경로 작성법과 일치하고, 두 사용자군 모두에게 파일을 불러오는 데에 동일한 코드를 사용할 수 있게 해 줄 것입니다.
+        빌드 도구를 사용하지 않는 것을 선호하는 사용자들에게도, 간단한 JSON 맵핑을 통해 CDN이나 직접 파일 폴더에서 불러오는 것을 가능하게 해 줄 것입니다.
+        실험적 방법으로, [link:https://glitch.com/edit/#!/three-import-map?path=index.html import map
+        예제]처럼 map polyfill과 함께 import 해서 더 간단하게 사용해볼 수도 있습니다.
+    </p>
+
+    <h3>Node.js</h3>
+
+    <p>
+        three.js 를 [link:https://eloquentjavascript.net/20_node.html Node.js]에서 사용하는기에는 어려움이 있는데, 두 가지 이유가 있습니다.
+    </p>
+
+    <p>
+        첫 번째로, three.js는 웹을 목적으로 만들어졌기때문에, Node.js에서 항상 활용 가능하다고 보증할 수 없는 브라우저와 DOM API에 의존하고 있는 까닭입니다.
+        이러한 문제들은 shims를 통해 [link:https://github.com/stackgl/headless-gl
+        headless-gl]처럼 해결하거나, [page:TextureLoader] 같은 컴포넌트를 커스터마이징 해서 해결 가능합니다. 다른 DOM API는 관련된 코드가 더 복잡하게 연관되어 있어, 수정하기 더 까다롭습니다.
+        Node.js 지원을 향상시키기 위한 더 간단하고, 유지보수 가능한 pull 요청은 언제든지 환영이지만, 본인의 작업을 위한 issue 생성을 더 권장합니다.
+    </p>
+
+    <p>
+        둘째로, Node.js의 ES 모듈 지원은 ... 다소 복잡합니다. Node.js v12에서, 코어 라이브러리는 CommonJS 모듈로, <em>require('three')</em>와 같이 사용 가능합니다.
+        하지만, 대부분의 <em>examples/jsm</em> 안의 예제 컴포넌트들은 불가능합니다. Node.js 향후 버전에서는 이게 해결될 수도 있겠지만, 그 전까지는
+        [link:https://github.com/standard-things/esm esm]처럼 사용해 Node.js 앱이 ES 모듈을 인식할 수 있도록 해줘야 합니다.
+    </p>
+
+</body>
+
+</html>

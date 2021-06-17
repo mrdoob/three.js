@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,7 +16,7 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy )</h3>
+		<h3>[name]( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding )</h3>
 		<p>
 			The data argument must be an [link:https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView ArrayBufferView].
 			Further parameters correspond to the properties inherited from [page:Texture], where both magFilter and minFilter default to THREE.NearestFilter. The properties flipY and generateMipmaps are intially set to false.
@@ -37,16 +36,20 @@
 		<code>
 		// create a buffer with color data
 
-		var size = width * height;
-		var data = new Uint8Array( 3 * size );
+		const width = 512;
+		const height = 512;
 
-		var r = Math.floor( color.r * 255 );
-		var g = Math.floor( color.g * 255 );
-		var b = Math.floor( color.b * 255 );
+		const size = width * height;
+		const data = new Uint8Array( 3 * size );
+		const color = new THREE.Color( 0xffffff );
 
-		for ( var i = 0; i < size; i ++ ) {
+		const r = Math.floor( color.r * 255 );
+		const g = Math.floor( color.g * 255 );
+		const b = Math.floor( color.b * 255 );
 
-			var stride = i * 3;
+		for ( let i = 0; i < size; i ++ ) {
+
+			const stride = i * 3;
 
 			data[ stride ] = r;
 			data[ stride + 1 ] = g;
@@ -56,7 +59,7 @@
 
 		// used the buffer to create a [name]
 
-		var texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
+		const texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
 		</code>
 
 		<h2>Properties</h2>

@@ -1,12 +1,8 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIPanel, UIRow } from './libs/ui.js';
 
-var MenubarExamples = function ( editor ) {
+function MenubarExamples( editor ) {
 
 	var strings = editor.strings;
 
@@ -65,6 +61,6 @@ var MenubarExamples = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { MenubarExamples };

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -37,6 +36,12 @@
 		Default is *0*.
 		</p>
 
+		<h3>[property:Float alphaToCoverage]</h3>
+		<p>
+		Enables alpha to coverage. Can only be used with MSAA-enabled contexts (meaning when the renderer was created with *antialias* parameter set to *true*).
+		Default is *false*.
+		</p>
+
 		<h3>[property:Integer blendDst]</h3>
 		<p>
 		Blending destination. Default is [page:CustomBlendingEquation OneMinusSrcAlphaFactor].
@@ -45,7 +50,7 @@
 		</p>
 
 		<h3>[property:Integer blendDstAlpha]</h3>
-		<p>The transparency of the [page:.blendDst]. Default is *null*.</p>
+		<p>The transparency of the [page:.blendDst]. Uses [page:.blendDst] value if null. Default is *null*.</p>
 
 		<h3>[property:Integer blendEquation]</h3>
 		<p>
@@ -55,7 +60,7 @@
 		</p>
 
 		<h3>[property:Integer blendEquationAlpha]</h3>
-		<p>The tranparency of the [page:.blendEquation]. Default is *null*.</p>
+		<p>The transparency of the [page:.blendEquation]. Uses [page:.blendEquation] value if null. Default is *null*.</p>
 
 		<h3>[property:Blending blending]</h3>
 		<p>
@@ -72,7 +77,7 @@
 		</p>
 
 		<h3>[property:Integer blendSrcAlpha]</h3>
-		<p>The tranparency of the [page:.blendSrc]. Default is *null*.</p>
+		<p>The transparency of the [page:.blendSrc]. Uses [page:.blendSrc] value if null. Default is *null*.</p>
 
 		<h3>[property:Boolean clipIntersection]</h3>
 		<p>
@@ -125,7 +130,7 @@
 
 		<h3>[property:Boolean stencilWrite]</h3>
 		<p>
-		Whether rendering this material has any effect on the stencil buffer. Default is *false*.
+		Whether stencil operations are performed against the stencil buffer. In order to perform writes or comparisons against the stencil buffer this value must be *true*. Default is *false*.
 		</p>
 
 		<h3>[property:Integer stencilWriteMask]</h3>
@@ -161,11 +166,6 @@
 		<h3>[property:Integer stencilZPass]</h3>
 		<p>
 		Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
-		</p>
-
-		<h3>[property:Boolean flatShading]</h3>
-		<p>
-		Define whether the material is rendered with flat shading. Default is false.
 		</p>
 
 		<h3>[property:Boolean fog]</h3>
@@ -211,7 +211,7 @@
 		<h3>[property:Boolean premultipliedAlpha]</h3>
 		<p>
 		Whether to premultiply the alpha (transparency) value.
-		See [Example:webgl_materials_physical_transparency WebGL / Materials / Physical / Transparency] for an example of the difference.
+		See [Example:webgl_materials_physical_transmission WebGL / Materials / Physical / Transmission] for an example of the difference.
 		Default is *false*.
 		</p>
 
@@ -303,7 +303,7 @@
 		Defines whether this material is visible. Default is *true*.
 		</p>
 
-		<h3>[property:object userData]</h3>
+		<h3>[property:Object userData]</h3>
 		<p>
 		An object that can be used to store custom data about the Material. It should not hold
 		references to functions as these will not be cloned.
@@ -334,13 +334,43 @@
 		Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
 		</p>
 
-		<h3>[method:null setValues]( [param:object values] )</h3>
+		<h3>[method:String customProgramCacheKey]()</h3>
+		<p>
+		In case onBeforeCompile is used, this callback can be used to identify values of settings used in onBeforeCompile, so three.js can reuse a cached shader or recompile the shader for this material as needed.
+		</p>
+
+		<p>
+		For example, if onBeforeCompile contains a conditional statement like:<br />
+
+		<code>if ( black ) {
+
+			shader.fragmentShader = shader.fragmentShader.replace('gl_FragColor = vec4(1)', 'gl_FragColor = vec4(0)')
+
+		}
+		</code>
+
+		then customProgramCacheKey should be set like this:<br />
+
+		<code>material.customProgramCacheKey = function() {
+
+			return black ? '1' : '0';
+
+		}
+		</code>
+
+		</p>
+
+		<p>
+		Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
+		</p>
+
+		<h3>[method:null setValues]( [param:Object values] )</h3>
 		<p>
 		values -- a container with parameters.<br />
 		Sets the properties based on the *values*.
 		</p>
 
-		<h3>[method:Object toJSON]( [param:object meta] )</h3>
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
 		<p>
 		meta -- object containing metadata such as textures or images for the material.<br />
 		Convert the material to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].

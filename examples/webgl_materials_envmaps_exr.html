@@ -21,7 +21,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
 
-			var params = {
+			const params = {
 				envMap: 'EXR',
 				roughness: 0.0,
 				metalness: 0.0,
@@ -29,11 +29,11 @@
 				debug: false,
 			};
 
-			var container, stats;
-			var camera, scene, renderer, controls;
-			var torusMesh, planeMesh;
-			var pngCubeRenderTarget, exrCubeRenderTarget;
-			var pngBackground, exrBackground;
+			let container, stats;
+			let camera, scene, renderer, controls;
+			let torusMesh, planeMesh;
+			let pngCubeRenderTarget, exrCubeRenderTarget;
+			let pngBackground, exrBackground;
 
 			init();
 			animate();
@@ -52,8 +52,8 @@
 
 				//
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
-				var material = new THREE.MeshStandardMaterial( {
+				let geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
+				let material = new THREE.MeshStandardMaterial( {
 					metalness: params.roughness,
 					roughness: params.metalness,
 					envMapIntensity: 1.0
@@ -62,8 +62,8 @@
 				torusMesh = new THREE.Mesh( geometry, material );
 				scene.add( torusMesh );
 
-				var geometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				var material = new THREE.MeshBasicMaterial();
+				geometry = new THREE.PlaneGeometry( 200, 200 );
+				material = new THREE.MeshBasicMaterial();
 
 				planeMesh = new THREE.Mesh( geometry, material );
 				planeMesh.position.y = - 50;
@@ -99,7 +99,7 @@
 
 				} );
 
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -117,9 +117,9 @@
 				controls.minDistance = 50;
 				controls.maxDistance = 300;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'envMap', [ 'EXR', 'PNG' ] );
 				gui.add( params, 'roughness', 0, 1, 0.01 );
@@ -132,8 +132,8 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -157,8 +157,8 @@
 				torusMesh.material.roughness = params.roughness;
 				torusMesh.material.metalness = params.metalness;
 
-				var newEnvMap = torusMesh.material.envMap;
-				var background = scene.background;
+				let newEnvMap = torusMesh.material.envMap;
+				let background = scene.background;
 
 				switch ( params.envMap ) {
 

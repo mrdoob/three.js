@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,7 +15,7 @@
 
 		<code>
 		// load a texture, set wrap mode to repeat
-		var texture = new THREE.TextureLoader().load( "textures/water.jpg" );
+		const texture = new THREE.TextureLoader().load( "textures/water.jpg" );
 		texture.wrapS = THREE.RepeatWrapping;
 		texture.wrapT = THREE.RepeatWrapping;
 		texture.repeat.set( 4, 4 );
@@ -54,7 +53,7 @@
 		as long as video is playing - the [page:VideoTexture VideoTexture] class handles this automatically.
 		</p>
 
-		<h3>[property:array mipmaps]</h3>
+		<h3>[property:Array mipmaps]</h3>
 		<p>
 		Array of user-specified mipmaps (optional).
 		</p>
@@ -140,10 +139,33 @@
 		<h3>[property:Vector2 offset]</h3>
 		<p>
 		How much a single repetition of the texture is offset from the beginning, in each direction U and V.
-		Typical range is *0.0* to *1.0*.  _Note:_ The offset property is a convenience modifier and only affects
-		the Texture's application to the first set of UVs on a model.  If the Texture is used as a map requiring
-		additional UV sets (e.g. the aoMap or lightMap of most stock materials), those UVs must be manually
-		assigned to achieve the desired offset.
+		Typical range is *0.0* to *1.0*.
+		</p>
+		<p>
+			The below texture types share the *first* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			the following priorities and then shared by those textures:
+			<ol>
+				<li>color map</li>
+				<li>specular map</li>
+				<li>displacement map</li>
+				<li>normal map</li>
+				<li>bump map</li>
+				<li>roughness map</li>
+				<li>metalness map</li>
+				<li>alpha map</li>
+				<li>emissive map</li>
+				<li>clearcoat map</li>
+				<li>clearcoat normal map</li>
+				<li>clearcoat roughnessMap map</li>
+			</ol>
+		</p>
+		<p>
+			The below texture types share the *second* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			the following priorities and then shared by those textures:
+			<ol>
+				<li>ao map</li>
+				<li>light map</li>
+			</ol>
 		</p>
 
 		<h3>[property:Vector2 repeat]</h3>
@@ -151,10 +173,7 @@
 		How many times the texture is repeated across the surface, in each direction U and V.  If repeat is set
 		greater than 1 in either direction, the corresponding Wrap parameter should also be set to
 		[page:Textures THREE.RepeatWrapping] or [page:Textures THREE.MirroredRepeatWrapping] to achieve the desired
-		tiling effect.  _Note:_ The repeat property is a convenience modifier and only affects
-		the Texture's application to the first set of UVs on a model.  If the Texture is used as a map requiring
-		additional UV sets (e.g. the aoMap or lightMap of most stock materials), those UVs must be manually
-		assigned to achieve the desired repetiton.
+		tiling effect. Setting different repeat values for textures is restricted in the same way like [page:.offset].
 		</p>
 
 		<h3>[property:number rotation]</h3>
@@ -167,7 +186,7 @@
 		The point around which rotation occurs. A value of (0.5, 0.5) corresponds to the center of the texture. Default is (0, 0), the lower left.
 		</p>
 
-		<h3>[property:boolean matrixAutoUpdate]</h3>
+		<h3>[property:Boolean matrixAutoUpdate]</h3>
 		<p>
 		Whether to update the texture's uv-transform [page:Texture.matrix .matrix] from the texture properties [page:Texture.offset .offset], [page:Texture.repeat .repeat],
 		[page:Texture.rotation .rotation], and [page:Texture.center .center]. True by default.
@@ -182,25 +201,25 @@
 		Default is the identity matrix.
 		</p>
 
-		<h3>[property:boolean generateMipmaps]</h3>
+		<h3>[property:Boolean generateMipmaps]</h3>
 		<p>
 		Whether to generate mipmaps (if possible) for a texture. True by default. Set this to false if you are
 		creating mipmaps manually.
 		</p>
 
-		<h3>[property:boolean premultiplyAlpha]</h3>
+		<h3>[property:Boolean premultiplyAlpha]</h3>
 		<p>
 		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Default is *false*.<br /><br />
 
-		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
+		Note that this property has no effect for [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
 		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
-		<h3>[property:boolean flipY]</h3>
+		<h3>[property:Boolean flipY]</h3>
 		<p>
 		If set to *true*, the texture is flipped along the vertical axis when uploaded to the GPU. Default is *true*.<br /><br />
 
-		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
+		Note that this property has no effect for [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
 		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 

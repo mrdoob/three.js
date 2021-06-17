@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,7 +20,7 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+		const light = new THREE.AmbientLight( 0x404040 ); // soft white light
 		scene.add( light );
 		</code>
 
@@ -44,11 +43,6 @@
 		<h2>Properties</h2>
 		<p>
 				See the base [page:Light Light] class for common properties.
-		</p>
-
-		<h3>[property:Boolean castShadow]</h3>
-		<p>
-			This is set to *undefined* in the constructor as ambient lights cannot cast shadows.
 		</p>
 
 

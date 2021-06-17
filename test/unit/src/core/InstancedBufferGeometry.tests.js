@@ -1,6 +1,3 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- */
 /* global QUnit */
 
 import { InstancedBufferGeometry } from '../../../../src/core/InstancedBufferGeometry';

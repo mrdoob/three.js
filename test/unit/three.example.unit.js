@@ -1,7 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
-
 import './utils/qunit-utils.js';
 
 import './example/utils/BufferGeometryUtils.tests';

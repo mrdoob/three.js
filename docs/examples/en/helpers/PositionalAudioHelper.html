@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,10 +15,10 @@
 
 		<h2>Code Example</h2>
 		<code>
-		var positionalAudio = new THREE.PositionalAudio( listener );
+		const positionalAudio = new THREE.PositionalAudio( listener );
 		positionalAudio.setDirectionalCone( 180, 230, 0.1 );
 
-		var helper = new PositionalAudioHelper( positionalAudio );
+		const helper = new PositionalAudioHelper( positionalAudio );
 		positionalAudio.add( helper );
 		</code>
 

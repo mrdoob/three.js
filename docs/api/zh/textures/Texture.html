@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,7 +20,7 @@
 
 		<code>
 		// load a texture, set wrap mode to repeat
-		var texture = new THREE.TextureLoader().load( "textures/water.jpg" );
+		const texture = new THREE.TextureLoader().load( "textures/water.jpg" );
 		texture.wrapS = THREE.RepeatWrapping;
 		texture.wrapT = THREE.RepeatWrapping;
 		texture.repeat.set( 4, 4 );
@@ -54,7 +53,7 @@
 		并在视频播放时不断地更新这个纹理贴图。——[page:VideoTexture VideoTexture] 类会对此自动进行处理。
 		</p>
 
-		<h3>[property:array mipmaps]</h3>
+		<h3>[property:Array mipmaps]</h3>
 		<p>
 		用户所给定的mipmap数组（可选）。
 		</p>
@@ -117,6 +116,17 @@
 		请参阅[page:Textures texture constants]页面来了解其它格式。
 		</p>
 
+		<h3>[property:String internalFormat]</h3>
+		<p>
+		The default value is obtained using a combination of [page:Texture.format .format] and
+		[page:Texture.type .type].<br />
+
+		The GPU format allows the developer to specify how the data is going to be
+		stored on the GPU.<br /><br />
+
+		See the [page:Textures texture constants] page for details regarding all supported internal formats.
+		</p>
+
 		<h3>[property:number type]</h3>
 		<p>
 			这个值必须与[page:Texture.format .format]相对应。默认值为[page:Textures THREE.UnsignedByteType]，
@@ -127,21 +137,42 @@
 
 		<h3>[property:Vector2 offset]</h3>
 		<p>
-		纹理在单次重复时，从一开始将分别在U、V方向上偏移多少。
-		这个值的范围通常在*0.0*之间*1.0*。
-		请注意：这一属性是一个非常方便的修改器，仅仅影响纹理对模型上第一组UV的应用。
-		如果该纹理被用于需要额外的UV集的贴图（例如一些成品材质中的aoMap或lightMap），
-		这些UV必须被手动调整来实现所期望的偏移。
+		How much a single repetition of the texture is offset from the beginning, in each direction U and V.
+		Typical range is *0.0* to *1.0*.
+		</p>
+		<p>
+			The below texture types share the *first* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			the following priorities and then shared by those textures:
+			<ol>
+				<li>color map</li>
+				<li>specular map</li>
+				<li>displacement map</li>
+				<li>normal map</li>
+				<li>bump map</li>
+				<li>roughness map</li>
+				<li>metalness map</li>
+				<li>alpha map</li>
+				<li>emissive map</li>
+				<li>clearcoat map</li>
+				<li>clearcoat normal map</li>
+				<li>clearcoat roughnessMap map</li>
+			</ol>
+		</p>
+		<p>
+			The below texture types share the *second* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			the following priorities and then shared by those textures:
+			<ol>
+				<li>ao map</li>
+				<li>light map</li>
+			</ol>
 		</p>
 
 		<h3>[property:Vector2 repeat]</h3>
 		<p>
-		纹理将在表面上，分别在U、V方向重复多少次。如果这个值在任意方向上设置为大于1，
-		则对应的Wrap参数应当也被设为[page:Textures THREE.RepeatWrapping]或[page:Textures THREE.MirroredRepeatWrapping]，
-		以实现所期望的平铺效果。
-		请注意：这一属性是一个非常方便的修改器，仅仅影响纹理对模型上第一组UV的应用。
-		如果该纹理被用于需要额外的UV集的贴图（例如一些成品材质中的aoMap或lightMap），
-		这些UV必须被手动调整来实现所期望的重复。
+		How many times the texture is repeated across the surface, in each direction U and V.  If repeat is set
+		greater than 1 in either direction, the corresponding Wrap parameter should also be set to
+		[page:Textures THREE.RepeatWrapping] or [page:Textures THREE.MirroredRepeatWrapping] to achieve the desired
+		tiling effect. Setting different repeat values for textures is restricted in the same way like [page:.offset].
 		</p>
 
 		<h3>[property:number rotation]</h3>
@@ -154,7 +185,7 @@
 		旋转中心点。(0.5, 0.5)对应纹理的正中心。默认值为(0,0)，即左下角。
 		</p>
 
-		<h3>[property:boolean matrixAutoUpdate]</h3>
+		<h3>[property:Boolean matrixAutoUpdate]</h3>
 		<p>
 		是否从纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、[page:Texture.rotation .rotation]和[page:Texture.center .center]属性更新纹理的UV变换矩阵（uv-transform [page:Texture.matrix .matrix]）。
 		默认值为true。
@@ -170,25 +201,25 @@
 			默认值为单位矩阵。
 		</p>
 
-		<h3>[property:boolean generateMipmaps]</h3>
+		<h3>[property:Boolean generateMipmaps]</h3>
 		<p>
 			是否为纹理生成mipmap（如果可用）。默认为true。
 			如果你手动生成mipmap，请将其设为false。
 		</p>
 
-		<h3>[property:boolean premultiplyAlpha]</h3>
+		<h3>[property:Boolean premultiplyAlpha]</h3>
 		<p>
-		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Defaut is *false*.<br /><br />
+		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Default is *false*.<br /><br />
 
-		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
+		Note that this property has no effect for [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
 		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
-		<h3>[property:boolean flipY]</h3>
+		<h3>[property:Boolean flipY]</h3>
 		<p>
 		If set to *true*, the texture is flipped along the vertical axis when uploaded to the GPU. Default is *true*.<br /><br />
 
-		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
+		Note that this property has no effect for [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
 		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 

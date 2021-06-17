@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,15 +18,15 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
+		const light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
 
-		var textureLoader = new THREE.TextureLoader();
+		const textureLoader = new THREE.TextureLoader();
 
-		var textureFlare0 = textureLoader.load( "textures/lensflare/lensflare0.png" );
-		var textureFlare1 = textureLoader.load( "textures/lensflare/lensflare2.png" );
-		var textureFlare2 = textureLoader.load( "textures/lensflare/lensflare3.png" );
+		const textureFlare0 = textureLoader.load( "textures/lensflare/lensflare0.png" );
+		const textureFlare1 = textureLoader.load( "textures/lensflare/lensflare2.png" );
+		const textureFlare2 = textureLoader.load( "textures/lensflare/lensflare3.png" );
 
-		var lensflare = new Lensflare();
+		const lensflare = new Lensflare();
 
 		lensflare.addElement( new LensflareElement( textureFlare0, 512, 0 ) );
 		lensflare.addElement( new LensflareElement( textureFlare1, 512, 0 ) );

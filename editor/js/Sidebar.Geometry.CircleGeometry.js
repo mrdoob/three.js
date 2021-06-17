@@ -1,14 +1,10 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryCircleGeometry = function ( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -61,7 +57,7 @@ var SidebarGeometryCircleGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.CircleBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.CircleGeometry(
 			radius.getValue(),
 			segments.getValue(),
 			thetaStart.getValue() * THREE.MathUtils.DEG2RAD,
@@ -72,6 +68,6 @@ var SidebarGeometryCircleGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
-export { SidebarGeometryCircleGeometry };
+export { GeometryParametersPanel };

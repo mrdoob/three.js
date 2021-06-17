@@ -50,9 +50,9 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var ninjaMeshRaw, curvatureAttribute, bufferGeo;
+			let ninjaMeshRaw, curvatureAttribute, bufferGeo;
 
 			init();
 			animate();
@@ -60,8 +60,8 @@
 			//returns average of elements in a dictionary
 			function average( dict ) {
 
-				var sum = 0;
-				var length = 0;
+				let sum = 0;
+				let length = 0;
 
 				Object.keys( dict ).forEach( function ( key ) {
 
@@ -84,7 +84,7 @@
 			//filter the curvature array to only show concave values
 			function filterConcave( curvature ) {
 
-				for ( var i = 0; i < curvature.length; i ++ ) {
+				for ( let i = 0; i < curvature.length; i ++ ) {
 
 					curvature[ i ] = Math.abs( clamp( curvature[ i ], - 1, 0 ) );
 
@@ -95,7 +95,7 @@
 			//filter the curvature array to only show convex values
 			function filterConvex( curvature ) {
 
-				for ( var i = 0; i < curvature.length; i ++ ) {
+				for ( let i = 0; i < curvature.length; i ++ ) {
 
 					curvature[ i ] = clamp( curvature[ i ], 0, 1 );
 
@@ -106,7 +106,7 @@
 			//filter the curvature array to show both the concave and convex values
 			function filterBoth( curvature ) {
 
-				for ( var i = 0; i < curvature.length; i ++ ) {
+				for ( let i = 0; i < curvature.length; i ++ ) {
 
 					curvature[ i ] = Math.abs( curvature[ i ] );
 
@@ -130,11 +130,11 @@
 				renderer.autoClear = false;
 				document.body.appendChild( renderer.domElement );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 20;
 				controls.maxDistance = 100;
 
-				var loader = new OBJLoader();
+				const loader = new OBJLoader();
 				//load the obj
 				loader.load( 'models/obj/ninja/ninjaHead_Low.obj', function ( object ) {
 
@@ -144,48 +144,50 @@
 
 							bufferGeo = child.geometry;
 							bufferGeo.center();
-							var dict = {};
+							const dict = {};
 
-							for ( var i = 0; i < bufferGeo.attributes.position.count; i += 3 ) {
+							for ( let i = 0; i < bufferGeo.attributes.position.count; i += 3 ) {
 
 								//create a dictionary of every position, and its neighboring positions
-								var array = bufferGeo.attributes.position.array;
-								var normArray = bufferGeo.attributes.normal.array;
+								const array = bufferGeo.attributes.position.array;
+								const normArray = bufferGeo.attributes.normal.array;
 
-								var posA = new THREE.Vector3( array[ 3 * i ], array[ 3 * i + 1 ], array[ 3 * i + 2 ] );
-								var posB = new THREE.Vector3( array[ 3 * ( i + 1 ) ], array[ 3 * ( i + 1 ) + 1 ], array[ 3 * ( i + 1 ) + 2 ] );
-								var posC = new THREE.Vector3( array[ 3 * ( i + 2 ) ], array[ 3 * ( i + 2 ) + 1 ], array[ 3 * ( i + 2 ) + 2 ] );
+								const posA = new THREE.Vector3( array[ 3 * i ], array[ 3 * i + 1 ], array[ 3 * i + 2 ] );
+								const posB = new THREE.Vector3( array[ 3 * ( i + 1 ) ], array[ 3 * ( i + 1 ) + 1 ], array[ 3 * ( i + 1 ) + 2 ] );
+								const posC = new THREE.Vector3( array[ 3 * ( i + 2 ) ], array[ 3 * ( i + 2 ) + 1 ], array[ 3 * ( i + 2 ) + 2 ] );
 
-								var normA = new THREE.Vector3( normArray[ 3 * i ], normArray[ 3 * i + 1 ], normArray[ 3 * i + 2 ] ).normalize();
-								var normB = new THREE.Vector3( normArray[ 3 * ( i + 1 ) ], normArray[ 3 * ( i + 1 ) + 1 ], normArray[ 3 * ( i + 1 ) + 2 ] ).normalize();
-								var normC = new THREE.Vector3( normArray[ 3 * ( i + 2 ) ], normArray[ 3 * ( i + 2 ) + 1 ], normArray[ 3 * ( i + 2 ) + 2 ] ).normalize();
+								const normA = new THREE.Vector3( normArray[ 3 * i ], normArray[ 3 * i + 1 ], normArray[ 3 * i + 2 ] ).normalize();
+								const normB = new THREE.Vector3( normArray[ 3 * ( i + 1 ) ], normArray[ 3 * ( i + 1 ) + 1 ], normArray[ 3 * ( i + 1 ) + 2 ] ).normalize();
+								const normC = new THREE.Vector3( normArray[ 3 * ( i + 2 ) ], normArray[ 3 * ( i + 2 ) + 1 ], normArray[ 3 * ( i + 2 ) + 2 ] ).normalize();
 
-								var strA = posA.toArray().toString();
-								var strB = posB.toArray().toString();
-								var strC = posC.toArray().toString();
+								const strA = posA.toArray().toString();
+								const strB = posB.toArray().toString();
+								const strC = posC.toArray().toString();
 
-								var posB_A = new THREE.Vector3().subVectors( posB, posA );
-								var posB_C = new THREE.Vector3().subVectors( posB, posC );
-								var posC_A = new THREE.Vector3().subVectors( posC, posA );
+								const posB_A = new THREE.Vector3().subVectors( posB, posA );
+								const posB_C = new THREE.Vector3().subVectors( posB, posC );
+								const posC_A = new THREE.Vector3().subVectors( posC, posA );
 
-								var b2a = normB.dot( posB_A.normalize() );
-								var b2c = normB.dot( posB_C.normalize() );
-								var c2a = normC.dot( posC_A.normalize() );
+								const b2a = normB.dot( posB_A.normalize() );
+								const b2c = normB.dot( posB_C.normalize() );
+								const c2a = normC.dot( posC_A.normalize() );
 
-								var a2b = - normA.dot( posB_A.normalize() );
-								var c2b = - normC.dot( posB_C.normalize() );
-								var a2c = - normA.dot( posC_A.normalize() );
+								const a2b = - normA.dot( posB_A.normalize() );
+								const c2b = - normC.dot( posB_C.normalize() );
+								const a2c = - normA.dot( posC_A.normalize() );
 
 								if ( dict[ strA ] === undefined ) {
 
 									dict[ strA ] = {};
 
 								}
+
 								if ( dict[ strB ] === undefined ) {
 
 									dict[ strB ] = {};
 
 								}
+
 								if ( dict[ strC ] === undefined ) {
 
 									dict[ strC ] = {};
@@ -201,8 +203,8 @@
 
 							}
 
-							var curvatureDict = {};
-							var min = 10, max = 0;
+							let curvatureDict = {};
+							let min = 10, max = 0;
 
 							Object.keys( dict ).forEach( function ( key ) {
 
@@ -211,12 +213,12 @@
 							} );
 
 							//smoothing
-							var smoothCurvatureDict = Object.create( curvatureDict );
+							const smoothCurvatureDict = Object.create( curvatureDict );
 
 							Object.keys( dict ).forEach( function ( key ) {
 
-								var count = 0;
-								var sum = 0;
+								let count = 0;
+								let sum = 0;
 								Object.keys( dict[ key ] ).forEach( function ( key2 ) {
 
 									sum += smoothCurvatureDict[ key2 ];
@@ -232,17 +234,17 @@
 							// fit values to 0 and 1
 							Object.keys( curvatureDict ).forEach( function ( key ) {
 
-								var val = Math.abs( curvatureDict[ key ] );
+								const val = Math.abs( curvatureDict[ key ] );
 								if ( val < min ) min = val;
 								if ( val > max ) max = val;
 
 							} );
 
-							var range = ( max - min );
+							const range = ( max - min );
 
 							Object.keys( curvatureDict ).forEach( function ( key ) {
 
-								var val = Math.abs( curvatureDict[ key ] );
+								const val = Math.abs( curvatureDict[ key ] );
 								if ( curvatureDict[ key ] < 0 ) {
 
 									curvatureDict[ key ] = ( min - val ) / range;
@@ -257,11 +259,11 @@
 
 							curvatureAttribute = new Float32Array( bufferGeo.attributes.position.count );
 
-							for ( var i = 0; i < bufferGeo.attributes.position.count; i ++ ) {
+							for ( let i = 0; i < bufferGeo.attributes.position.count; i ++ ) {
 
-								array = bufferGeo.attributes.position.array;
-								var pos = new THREE.Vector3( array[ 3 * i ], array[ 3 * i + 1 ], array[ 3 * i + 2 ] );
-								var str = pos.toArray().toString();
+								const array = bufferGeo.attributes.position.array;
+								const pos = new THREE.Vector3( array[ 3 * i ], array[ 3 * i + 1 ], array[ 3 * i + 2 ] );
+								const str = pos.toArray().toString();
 								curvatureAttribute[ i ] = curvatureDict[ str ];
 
 							}
@@ -269,10 +271,10 @@
 							bufferGeo.setAttribute( 'curvature', new THREE.BufferAttribute( curvatureAttribute, 1 ) );
 
 							//starting filter is to show both concave and convex
-							var curvatureFiltered = new Float32Array( curvatureAttribute );
+							const curvatureFiltered = new Float32Array( curvatureAttribute );
 							filterBoth( curvatureFiltered );
 
-							var materialRaw = new THREE.ShaderMaterial( {
+							const materialRaw = new THREE.ShaderMaterial( {
 
 								vertexShader: document.getElementById( 'vertexShaderRaw' ).textContent,
 								fragmentShader: document.getElementById( 'fragmentShaderRaw' ).textContent
@@ -291,11 +293,11 @@
 
 
 				//init GUI
-				var params = {
+				const params = {
 
 					filterConvex: function () {
 
-						var curvatureFiltered = new Float32Array( curvatureAttribute );
+						const curvatureFiltered = new Float32Array( curvatureAttribute );
 						filterConvex( curvatureFiltered );
 						bufferGeo.attributes.curvature.array = curvatureFiltered;
 						bufferGeo.attributes.curvature.needsUpdate = true;
@@ -304,7 +306,7 @@
 					},
 					filterConcave: function () {
 
-						var curvatureFiltered = new Float32Array( curvatureAttribute );
+						const curvatureFiltered = new Float32Array( curvatureAttribute );
 						filterConcave( curvatureFiltered );
 						bufferGeo.attributes.curvature.array = curvatureFiltered;
 						bufferGeo.attributes.curvature.needsUpdate = true;
@@ -313,7 +315,7 @@
 					},
 					filterBoth: function () {
 
-						var curvatureFiltered = new Float32Array( curvatureAttribute );
+						const curvatureFiltered = new Float32Array( curvatureAttribute );
 						filterBoth( curvatureFiltered );
 						bufferGeo.attributes.curvature.array = curvatureFiltered;
 						bufferGeo.attributes.curvature.needsUpdate = true;
@@ -321,9 +323,9 @@
 					}
 				};
 
-				var gui = new GUI();
+				const gui = new GUI();
 
-				var topologyFolder = gui.addFolder( 'Topology' );
+				const topologyFolder = gui.addFolder( 'Topology' );
 				topologyFolder.add( params, 'filterConvex' );
 				topologyFolder.add( params, 'filterConcave' );
 				topologyFolder.add( params, 'filterBoth' );
@@ -331,7 +333,7 @@
 
 				onWindowResize();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

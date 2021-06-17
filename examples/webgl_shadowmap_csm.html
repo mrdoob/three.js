@@ -23,9 +23,9 @@
 			import { CSM } from './jsm/csm/CSM.js';
 			import { CSMHelper } from './jsm/csm/CSMHelper.js';
 
-			var renderer, scene, camera, orthoCamera, controls, csm, csmHelper;
+			let renderer, scene, camera, orthoCamera, controls, csm, csmHelper;
 
-			var params = {
+			const params = {
 				orthographic: false,
 				fade: false,
 				far: 1000,
@@ -49,8 +49,8 @@
 
 			function updateOrthoCamera() {
 
-				var size = controls.target.distanceTo( camera.position );
-				var aspect = camera.aspect;
+				const size = controls.target.distanceTo( camera.position );
+				const aspect = camera.aspect;
 
 				orthoCamera.left = size * aspect / - 2;
 				orthoCamera.right = size * aspect / 2;
@@ -64,6 +64,7 @@
 			}
 
 			function init() {
+
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( '#454e61' );
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 5000 );
@@ -78,13 +79,13 @@
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxPolarAngle = Math.PI / 2;
 				camera.position.set( 60, 60, 0 );
-				controls.target = new THREE.Vector3( -100, 10, 0 );
+				controls.target = new THREE.Vector3( - 100, 10, 0 );
 				controls.update();
 
-				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.5 );
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.5 );
 				scene.add( ambientLight );
 
-				csm = new CSM({
+				csm = new CSM( {
 					maxFar: params.far,
 					cascades: 4,
 					mode: params.mode,
@@ -98,33 +99,33 @@
 				csmHelper.visible = false;
 				scene.add( csmHelper );
 
-				var floorMaterial = new THREE.MeshPhongMaterial( { color: '#252a34' } );
+				const floorMaterial = new THREE.MeshPhongMaterial( { color: '#252a34' } );
 				csm.setupMaterial( floorMaterial );
 
-				var floor = new THREE.Mesh( new THREE.PlaneBufferGeometry( 10000, 10000, 8, 8 ), floorMaterial );
+				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000, 8, 8 ), floorMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				floor.castShadow = true;
 				floor.receiveShadow = true;
 				scene.add( floor );
 
-				var material1 = new THREE.MeshPhongMaterial( { color: '#08d9d6' } );
+				const material1 = new THREE.MeshPhongMaterial( { color: '#08d9d6' } );
 				csm.setupMaterial( material1 );
 
-				var material2 = new THREE.MeshPhongMaterial( { color: '#ff2e63' } );
+				const material2 = new THREE.MeshPhongMaterial( { color: '#ff2e63' } );
 				csm.setupMaterial( material2 );
 
-				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+				const geometry = new THREE.BoxGeometry( 10, 10, 10 );
 
-				for ( var i = 0; i < 40; i ++ ) {
+				for ( let i = 0; i < 40; i ++ ) {
 
-					var cube1 = new THREE.Mesh( geometry, i % 2 === 0 ? material1 : material2 );
+					const cube1 = new THREE.Mesh( geometry, i % 2 === 0 ? material1 : material2 );
 					cube1.castShadow = true;
 					cube1.receiveShadow = true;
 					scene.add( cube1 );
 					cube1.position.set( - i * 25, 20, 30 );
 					cube1.scale.y = Math.random() * 2 + 6;
 
-					var cube2 = new THREE.Mesh( geometry, i % 2 === 0 ? material2 : material1 );
+					const cube2 = new THREE.Mesh( geometry, i % 2 === 0 ? material2 : material1 );
 					cube2.castShadow = true;
 					cube2.receiveShadow = true;
 					scene.add( cube2 );
@@ -133,7 +134,7 @@
 
 				}
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'orthographic' ).onChange( function ( value ) {
 
@@ -142,7 +143,7 @@
 
 				} );
 
-				gui.add( params, 'fade' ).onChange( function ( value ) { 
+				gui.add( params, 'fade' ).onChange( function ( value ) {
 
 					csm.fade = value;
 					csm.updateFrustums();
@@ -189,7 +190,7 @@
 
 				gui.add( params, 'lightNear', 1, 10000 ).name( 'light near' ).onChange( function ( value ) {
 
-					for ( var i = 0; i < csm.lights.length; i ++ ) {
+					for ( let i = 0; i < csm.lights.length; i ++ ) {
 
 						csm.lights[ i ].shadow.camera.near = value;
 						csm.lights[ i ].shadow.camera.updateProjectionMatrix();
@@ -200,7 +201,7 @@
 
 				gui.add( params, 'lightFar', 1, 10000 ).name( 'light far' ).onChange( function ( value ) {
 
-					for ( var i = 0; i < csm.lights.length; i ++ ) {
+					for ( let i = 0; i < csm.lights.length; i ++ ) {
 
 						csm.lights[ i ].shadow.camera.far = value;
 						csm.lights[ i ].shadow.camera.updateProjectionMatrix();
@@ -210,22 +211,22 @@
 				} );
 
 				const helperFolder = gui.addFolder( 'helper' );
-				
+
 				helperFolder.add( csmHelper, 'visible' );
 
-				helperFolder.add( csmHelper, 'displayFrustum' ).onChange( function () { 
+				helperFolder.add( csmHelper, 'displayFrustum' ).onChange( function () {
 
 					csmHelper.updateVisibility();
 
 				} );
 
-				helperFolder.add( csmHelper, 'displayPlanes' ).onChange( function () { 
+				helperFolder.add( csmHelper, 'displayPlanes' ).onChange( function () {
 
 					csmHelper.updateVisibility();
 
 				} );
 
-				helperFolder.add( csmHelper, 'displayShadowBounds' ).onChange( function () { 
+				helperFolder.add( csmHelper, 'displayShadowBounds' ).onChange( function () {
 
 					csmHelper.updateVisibility();
 
@@ -234,7 +235,7 @@
 				helperFolder.add( params, 'autoUpdateHelper' ).name( 'auto update' );
 
 				helperFolder.add( params, 'updateHelper' ).name( 'update' );
-				
+
 				helperFolder.open();
 
 				window.addEventListener( 'resize', function () {
@@ -247,7 +248,8 @@
 
 					renderer.setSize( window.innerWidth, window.innerHeight );
 
-				}, false);
+				} );
+
 			}
 
 			function animate() {
@@ -262,20 +264,23 @@
 
 					updateOrthoCamera();
 					csm.updateFrustums();
+
 					if ( params.autoUpdateHelper ) {
-						
+
 						csmHelper.update();
-					
+
 					}
+
 					renderer.render( scene, orthoCamera );
 
 				} else {
-	
+
 					if ( params.autoUpdateHelper ) {
-						
+
 						csmHelper.update();
-					
+
 					}
+
 					renderer.render( scene, camera );
 
 				}

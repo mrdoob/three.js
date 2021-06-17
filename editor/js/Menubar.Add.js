@@ -1,14 +1,10 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 
-var MenubarAdd = function ( editor ) {
+function MenubarAdd( editor ) {
 
 	var strings = editor.strings;
 
@@ -50,7 +46,7 @@ var MenubarAdd = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/box' ) );
 	option.onClick( function () {
 
-		var geometry = new THREE.BoxBufferGeometry( 1, 1, 1, 1, 1, 1 );
+		var geometry = new THREE.BoxGeometry( 1, 1, 1, 1, 1, 1 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Box';
 
@@ -66,7 +62,7 @@ var MenubarAdd = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/circle' ) );
 	option.onClick( function () {
 
-		var geometry = new THREE.CircleBufferGeometry( 1, 8, 0, Math.PI * 2 );
+		var geometry = new THREE.CircleGeometry( 1, 8, 0, Math.PI * 2 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Circle';
 
@@ -82,7 +78,7 @@ var MenubarAdd = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/cylinder' ) );
 	option.onClick( function () {
 
-		var geometry = new THREE.CylinderBufferGeometry( 1, 1, 1, 8, 1, false, 0, Math.PI * 2 );
+		var geometry = new THREE.CylinderGeometry( 1, 1, 1, 8, 1, false, 0, Math.PI * 2 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Cylinder';
 
@@ -98,7 +94,7 @@ var MenubarAdd = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/dodecahedron' ) );
 	option.onClick( function () {
 
-		var geometry = new THREE.DodecahedronBufferGeometry( 1, 0 );
+		var geometry = new THREE.DodecahedronGeometry( 1, 0 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Dodecahedron';
 
@@ -114,7 +110,7 @@ var MenubarAdd = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/icosahedron' ) );
 	option.onClick( function () {
 
-		var geometry = new THREE.IcosahedronBufferGeometry( 1, 0 );
+		var geometry = new THREE.IcosahedronGeometry( 1, 0 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Icosahedron';
 
@@ -144,7 +140,7 @@ var MenubarAdd = function ( editor ) {
 			new THREE.Vector2( 0.3, 1.2 )
 		];
 
-		var geometry = new THREE.LatheBufferGeometry( points, 12, 0, Math.PI * 2 );
+		var geometry = new THREE.LatheGeometry( points, 12, 0, Math.PI * 2 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { side: THREE.DoubleSide } ) );
 		mesh.name = 'Lathe';
 
@@ -160,7 +156,7 @@ var MenubarAdd = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/octahedron' ) );
 	option.onClick( function () {
 
-		var geometry = new THREE.OctahedronBufferGeometry( 1, 0 );
+		var geometry = new THREE.OctahedronGeometry( 1, 0 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Octahedron';
 
@@ -176,7 +172,7 @@ var MenubarAdd = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/plane' ) );
 	option.onClick( function () {
 
-		var geometry = new THREE.PlaneBufferGeometry( 1, 1, 1, 1 );
+		var geometry = new THREE.PlaneGeometry( 1, 1, 1, 1 );
 		var material = new THREE.MeshStandardMaterial();
 		var mesh = new THREE.Mesh( geometry, material );
 		mesh.name = 'Plane';
@@ -193,7 +189,7 @@ var MenubarAdd = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/ring' ) );
 	option.onClick( function () {
 
-		var geometry = new THREE.RingBufferGeometry( 0.5, 1, 8, 1, 0, Math.PI * 2 );
+		var geometry = new THREE.RingGeometry( 0.5, 1, 8, 1, 0, Math.PI * 2 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Ring';
 
@@ -209,7 +205,7 @@ var MenubarAdd = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/sphere' ) );
 	option.onClick( function () {
 
-		var geometry = new THREE.SphereBufferGeometry( 1, 8, 6, 0, Math.PI * 2, 0, Math.PI );
+		var geometry = new THREE.SphereGeometry( 1, 8, 6, 0, Math.PI * 2, 0, Math.PI );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Sphere';
 
@@ -240,7 +236,7 @@ var MenubarAdd = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/tetrahedron' ) );
 	option.onClick( function () {
 
-		var geometry = new THREE.TetrahedronBufferGeometry( 1, 0 );
+		var geometry = new THREE.TetrahedronGeometry( 1, 0 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Tetrahedron';
 
@@ -256,7 +252,7 @@ var MenubarAdd = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/torus' ) );
 	option.onClick( function () {
 
-		var geometry = new THREE.TorusBufferGeometry( 1, 0.4, 8, 6, Math.PI * 2 );
+		var geometry = new THREE.TorusGeometry( 1, 0.4, 8, 6, Math.PI * 2 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Torus';
 
@@ -272,7 +268,7 @@ var MenubarAdd = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/torusknot' ) );
 	option.onClick( function () {
 
-		var geometry = new THREE.TorusKnotBufferGeometry( 1, 0.4, 64, 8, 2, 3 );
+		var geometry = new THREE.TorusKnotGeometry( 1, 0.4, 64, 8, 2, 3 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'TorusKnot';
 
@@ -295,7 +291,7 @@ var MenubarAdd = function ( editor ) {
 			new THREE.Vector3( - 2, 2, 2 )
 		] );
 
-		var geometry = new THREE.TubeBufferGeometry( path, 64, 1, 8, false );
+		var geometry = new THREE.TubeGeometry( path, 64, 1, 8, false );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Tube';
 
@@ -322,7 +318,7 @@ var MenubarAdd = function ( editor ) {
 
 		var material = new THREE.MeshStandardMaterial();
 
-		var geometry = new TeapotBufferGeometry( size, segments, bottom, lid, body, fitLid, blinnScale );
+		var geometry = new TeapotGeometry( size, segments, bottom, lid, body, fitLid, blinnScale );
 		var mesh = new THREE.Mesh( geometry, material );
 		mesh.name = 'Teapot';
 
@@ -450,7 +446,8 @@ var MenubarAdd = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/orthographiccamera' ) );
 	option.onClick( function () {
 
-		var camera = new THREE.OrthographicCamera();
+		var aspect = editor.camera.aspect;
+		var camera = new THREE.OrthographicCamera( - aspect, aspect );
 		camera.name = 'OrthographicCamera';
 
 		editor.execute( new AddObjectCommand( editor, camera ) );
@@ -475,6 +472,6 @@ var MenubarAdd = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { MenubarAdd };

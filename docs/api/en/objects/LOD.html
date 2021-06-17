@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -23,14 +22,14 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var lod = new THREE.LOD();
+		const lod = new THREE.LOD();
 
 		//Create spheres with 3 levels of detail and create new LOD levels for them
-		for( var i = 0; i < 3; i++ ) {
+		for( let i = 0; i < 3; i++ ) {
 
-			var geometry = new THREE.IcosahedronBufferGeometry( 10, 3 - i )
+			const geometry = new THREE.IcosahedronGeometry( 10, 3 - i )
 
-			var mesh = new THREE.Mesh( geometry, material );
+			const mesh = new THREE.Mesh( geometry, material );
 
 			lod.addLevel( mesh, i * 75 );
 
@@ -55,16 +54,16 @@
 		<h2>Properties</h2>
 		<p>See the base [page:Object3D] class for common properties.</p>
 
-		<h3>[property:boolean autoUpdate]</h3>
+		<h3>[property:Boolean autoUpdate]</h3>
 		<p>
 		Whether the LOD object is updated automatically by the renderer per frame or not.
 		If set to false, you have to call [page:LOD.update]() in the render loop by yourself.
 		Default is true.
 		</p>
 
-		<h3>[property:array levels]</h3>
+		<h3>[property:Array levels]</h3>
 		<p>
-		An array of [page:object level] objects<br /><br />
+		An array of [page:Object level] objects<br /><br />
 
 		Each level is an object with two properties:<br />
 		[page:Object3D object] - The [page:Object3D] to display at this level.<br />
@@ -89,7 +88,7 @@
 		</p>
 
 
-		<h3>[method:integer getCurrentLevel]()</h3>
+		<h3>[method:Integer getCurrentLevel]()</h3>
 		<p>
 		Get the currently active LOD level. As index of the levels array.
 		</p>

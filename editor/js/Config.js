@@ -1,14 +1,9 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-var Config = function () {
+function Config() {
 
 	var name = 'threejs-editor';
 
 	var storage = {
 		'language': 'en',
-		'exportPrecision': 6,
 
 		'autosave': true,
 
@@ -78,6 +73,6 @@ var Config = function () {
 
 	};
 
-};
+}
 
 export { Config };

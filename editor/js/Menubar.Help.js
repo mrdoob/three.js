@@ -1,10 +1,6 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIRow } from './libs/ui.js';
 
-var MenubarHelp = function ( editor ) {
+function MenubarHelp( editor ) {
 
 	var strings = editor.strings;
 
@@ -32,6 +28,7 @@ var MenubarHelp = function ( editor ) {
 	} );
 	options.add( option );
 
+	/*
 	// Icon
 
 	var option = new UIRow();
@@ -43,6 +40,7 @@ var MenubarHelp = function ( editor ) {
 
 	} );
 	options.add( option );
+	*/
 
 	// About
 
@@ -51,13 +49,13 @@ var MenubarHelp = function ( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/help/about' ) );
 	option.onClick( function () {
 
-		window.open( 'http://threejs.org', '_blank' );
+		window.open( 'https://threejs.org', '_blank' );
 
 	} );
 	options.add( option );
 
 	return container;
 
-};
+}
 
 export { MenubarHelp };

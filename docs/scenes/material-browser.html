@@ -26,101 +26,66 @@
 		<a id='newWindow' href='./material-browser.html' target='_blank'>Open in New Window</a>
 
 		<script type="module">
-			import {
-				AdditiveBlending, CustomBlending, MultiplyBlending, NormalBlending, NoBlending, SubtractiveBlending,
-				AddEquation, ReverseSubtractEquation, SubtractEquation,
-				AddOperation, MixOperation, MultiplyOperation,
-				AmbientLight,
-				Color,
-				CubeTextureLoader,
-				CubeRefractionMapping,
-				DoubleSide, FrontSide, BackSide,
-				DstAlphaFactor, DstColorFactor, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, ZeroFactor,
-				Float32BufferAttribute,
-				Fog,
-				LineBasicMaterial,
-				Mesh,
-				MeshBasicMaterial,
-				MeshDepthMaterial,
-				MeshLambertMaterial,
-				MeshMatcapMaterial,
-				MeshNormalMaterial,
-				MeshPhongMaterial,
-				MeshPhysicalMaterial,
-				MeshStandardMaterial,
-				MeshToonMaterial,
-				NearestFilter,
-				PerspectiveCamera,
-				PointLight,
-				RepeatWrapping,
-				RGBFormat,
-				Scene,
-				TextureLoader,
-				TorusKnotBufferGeometry,
-				WebGLRenderer
-			} from "../../build/three.module.js";
 
-			import { GUI } from '../../examples/jsm/libs/dat.gui.module.js';
+			import * as THREE from '../../build/three.module.js';
+			import * as DAT from '../../examples/jsm/libs/dat.gui.module.js';
+			import { RoomEnvironment } from '../../examples/jsm/environments/RoomEnvironment.js';
 
-			/**
-			 * @author TatumCreative (Greg Tatum) / http://gregtatum.com/
-			 */
-
-			var constants = {
+			const constants = {
 
 				combine: {
 
-					'THREE.MultiplyOperation': MultiplyOperation,
-					'THREE.MixOperation': MixOperation,
-					'THREE.AddOperation': AddOperation
+					'THREE.MultiplyOperation': THREE.MultiplyOperation,
+					'THREE.MixOperation': THREE.MixOperation,
+					'THREE.AddOperation': THREE.AddOperation
 
 				},
 
 				side: {
 
-					'THREE.FrontSide': FrontSide,
-					'THREE.BackSide': BackSide,
-					'THREE.DoubleSide': DoubleSide
+					'THREE.FrontSide': THREE.FrontSide,
+					'THREE.BackSide': THREE.BackSide,
+					'THREE.DoubleSide': THREE.DoubleSide
 
 				},
 
 				blendingMode: {
 
-					'THREE.NoBlending': NoBlending,
-					'THREE.NormalBlending': NormalBlending,
-					'THREE.AdditiveBlending': AdditiveBlending,
-					'THREE.SubtractiveBlending': SubtractiveBlending,
-					'THREE.MultiplyBlending': MultiplyBlending,
-					'THREE.CustomBlending': CustomBlending
+					'THREE.NoBlending': THREE.NoBlending,
+					'THREE.NormalBlending': THREE.NormalBlending,
+					'THREE.AdditiveBlending': THREE.AdditiveBlending,
+					'THREE.SubtractiveBlending': THREE.SubtractiveBlending,
+					'THREE.MultiplyBlending': THREE.MultiplyBlending,
+					'THREE.CustomBlending': THREE.CustomBlending
 
 				},
 
 				equations: {
 
-					'THREE.AddEquation': AddEquation,
-					'THREE.SubtractEquation': SubtractEquation,
-					'THREE.ReverseSubtractEquation': ReverseSubtractEquation
+					'THREE.AddEquation': THREE.AddEquation,
+					'THREE.SubtractEquation': THREE.SubtractEquation,
+					'THREE.ReverseSubtractEquation': THREE.ReverseSubtractEquation
 
 				},
 
 				destinationFactors: {
 
-					'THREE.ZeroFactor': ZeroFactor,
-					'THREE.OneFactor': OneFactor,
-					'THREE.SrcColorFactor': SrcColorFactor,
-					'THREE.OneMinusSrcColorFactor': OneMinusSrcColorFactor,
-					'THREE.SrcAlphaFactor': SrcAlphaFactor,
-					'THREE.OneMinusSrcAlphaFactor': OneMinusSrcAlphaFactor,
-					'THREE.DstAlphaFactor': DstAlphaFactor,
-					'THREE.OneMinusDstAlphaFactor': OneMinusDstAlphaFactor
+					'THREE.ZeroFactor': THREE.ZeroFactor,
+					'THREE.OneFactor': THREE.OneFactor,
+					'THREE.SrcColorFactor': THREE.SrcColorFactor,
+					'THREE.OneMinusSrcColorFactor': THREE.OneMinusSrcColorFactor,
+					'THREE.SrcAlphaFactor': THREE.SrcAlphaFactor,
+					'THREE.OneMinusSrcAlphaFactor': THREE.OneMinusSrcAlphaFactor,
+					'THREE.DstAlphaFactor': THREE.DstAlphaFactor,
+					'THREE.OneMinusDstAlphaFactor': THREE.OneMinusDstAlphaFactor
 
 				},
 
 				sourceFactors: {
 
-					'THREE.DstColorFactor': DstColorFactor,
-					'THREE.OneMinusDstColorFactor': OneMinusDstColorFactor,
-					'THREE.SrcAlphaSaturateFactor': SrcAlphaSaturateFactor
+					'THREE.DstColorFactor': THREE.DstColorFactor,
+					'THREE.OneMinusDstColorFactor': THREE.OneMinusDstColorFactor,
+					'THREE.SrcAlphaSaturateFactor': THREE.SrcAlphaSaturateFactor
 
 				}
 
@@ -128,9 +93,9 @@
 
 			function getObjectsKeys( obj ) {
 
-				var keys = [];
+				const keys = [];
 
-				for ( var key in obj ) {
+				for ( const key in obj ) {
 
 					if ( obj.hasOwnProperty( key ) ) {
 
@@ -144,25 +109,25 @@
 
 			}
 
-			var textureLoader = new TextureLoader();
-			var cubeTextureLoader = new CubeTextureLoader();
+			const textureLoader = new THREE.TextureLoader();
+			const cubeTextureLoader = new THREE.CubeTextureLoader();
 
-			var envMaps = ( function () {
+			const envMaps = ( function () {
 
-				var path = '../../examples/textures/cube/SwedishRoyalCastle/';
-				var format = '.jpg';
-				var urls = [
+				const path = '../../examples/textures/cube/SwedishRoyalCastle/';
+				const format = '.jpg';
+				const urls = [
 					path + 'px' + format, path + 'nx' + format,
 					path + 'py' + format, path + 'ny' + format,
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var reflectionCube = cubeTextureLoader.load( urls );
-				reflectionCube.format = RGBFormat;
+				const reflectionCube = cubeTextureLoader.load( urls );
+				reflectionCube.format = THREE.RGBFormat;
 
-				var refractionCube = cubeTextureLoader.load( urls );
-				refractionCube.mapping = CubeRefractionMapping;
-				refractionCube.format = RGBFormat;
+				const refractionCube = cubeTextureLoader.load( urls );
+				refractionCube.mapping = THREE.CubeRefractionMapping;
+				refractionCube.format = THREE.RGBFormat;
 
 				return {
 					none: null,
@@ -172,11 +137,11 @@
 
 			} )();
 
-			var diffuseMaps = ( function () {
+			const diffuseMaps = ( function () {
 
-				var bricks = textureLoader.load( '../../examples/textures/brick_diffuse.jpg' );
-				bricks.wrapS = RepeatWrapping;
-				bricks.wrapT = RepeatWrapping;
+				const bricks = textureLoader.load( '../../examples/textures/brick_diffuse.jpg' );
+				bricks.wrapS = THREE.RepeatWrapping;
+				bricks.wrapT = THREE.RepeatWrapping;
 				bricks.repeat.set( 9, 1 );
 
 				return {
@@ -186,11 +151,11 @@
 
 			} )();
 
-			var roughnessMaps = ( function () {
+			const roughnessMaps = ( function () {
 
-				var bricks = textureLoader.load( '../../examples/textures/brick_roughness.jpg' );
-				bricks.wrapT = RepeatWrapping;
-				bricks.wrapS = RepeatWrapping;
+				const bricks = textureLoader.load( '../../examples/textures/brick_roughness.jpg' );
+				bricks.wrapT = THREE.RepeatWrapping;
+				bricks.wrapS = THREE.RepeatWrapping;
 				bricks.repeat.set( 9, 1 );
 
 				return {
@@ -200,7 +165,7 @@
 
 			} )();
 
-			var matcaps = ( function () {
+			const matcaps = ( function () {
 
 				return {
 					none: null,
@@ -209,11 +174,11 @@
 
 			} )();
 
-			var alphaMaps = ( function () {
+			const alphaMaps = ( function () {
 
-				var fibers = textureLoader.load( '../../examples/textures/alphaMap.jpg' );
-				fibers.wrapT = RepeatWrapping;
-				fibers.wrapS = RepeatWrapping;
+				const fibers = textureLoader.load( '../../examples/textures/alphaMap.jpg' );
+				fibers.wrapT = THREE.RepeatWrapping;
+				fibers.wrapS = THREE.RepeatWrapping;
 				fibers.repeat.set( 9, 1 );
 
 				return {
@@ -223,15 +188,15 @@
 
 			} )();
 
-			var gradientMaps = ( function () {
+			const gradientMaps = ( function () {
 
-				var threeTone = textureLoader.load( '../../examples/textures/gradientMaps/threeTone.jpg' );
-				threeTone.minFilter = NearestFilter;
-				threeTone.magFilter = NearestFilter;
+				const threeTone = textureLoader.load( '../../examples/textures/gradientMaps/threeTone.jpg' );
+				threeTone.minFilter = THREE.NearestFilter;
+				threeTone.magFilter = THREE.NearestFilter;
 
-				var fiveTone = textureLoader.load( '../../examples/textures/gradientMaps/fiveTone.jpg' );
-				fiveTone.minFilter = NearestFilter;
-				fiveTone.magFilter = NearestFilter;
+				const fiveTone = textureLoader.load( '../../examples/textures/gradientMaps/fiveTone.jpg' );
+				fiveTone.minFilter = THREE.NearestFilter;
+				fiveTone.magFilter = THREE.NearestFilter;
 
 				return {
 					none: null,
@@ -241,28 +206,28 @@
 
 			} )();
 
-			var envMapKeys = getObjectsKeys( envMaps );
-			var diffuseMapKeys = getObjectsKeys( diffuseMaps );
-			var roughnessMapKeys = getObjectsKeys( roughnessMaps );
-			var matcapKeys = getObjectsKeys( matcaps );
-			var alphaMapKeys = getObjectsKeys( alphaMaps );
-			var gradientMapKeys = getObjectsKeys( gradientMaps );
+			const envMapKeys = getObjectsKeys( envMaps );
+			const diffuseMapKeys = getObjectsKeys( diffuseMaps );
+			const roughnessMapKeys = getObjectsKeys( roughnessMaps );
+			const matcapKeys = getObjectsKeys( matcaps );
+			const alphaMapKeys = getObjectsKeys( alphaMaps );
+			const gradientMapKeys = getObjectsKeys( gradientMaps );
 
 			function generateVertexColors( geometry ) {
 
-				var positionAttribute = geometry.attributes.position;
+				const positionAttribute = geometry.attributes.position;
 
-				var colors = [];
-				var color = new Color();
+				const colors = [];
+				const color = new THREE.Color();
 
-				for ( var i = 0, il = positionAttribute.count; i < il; i ++ ) {
+				for ( let i = 0, il = positionAttribute.count; i < il; i ++ ) {
 
 					color.setHSL( i / il * Math.random(), 0.5, 0.5 );
 					colors.push( color.r, color.g, color.b );
 
 				}
 
-				geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 			}
 
@@ -299,7 +264,7 @@
 
 			function updateCombine( material ) {
 
-				return function (combine) {
+				return function ( combine ) {
 
 					material.combine = parseInt( combine );
 					material.needsUpdate = true;
@@ -321,9 +286,9 @@
 
 			function guiScene( gui, scene ) {
 
-				var folder = gui.addFolder( 'Scene' );
+				const folder = gui.addFolder( 'Scene' );
 
-				var data = {
+				const data = {
 					background: '#000000',
 					'ambient light': ambientLight.color.getHex()
 				};
@@ -336,11 +301,11 @@
 
 			function guiSceneFog( folder, scene ) {
 
-				var fogFolder = folder.addFolder( 'scene.fog' );
+				const fogFolder = folder.addFolder( 'scene.fog' );
 
-				var fog = new Fog( 0x3f7b9d, 0, 60 );
+				const fog = new THREE.Fog( 0x3f7b9d, 0, 60 );
 
-				var data = {
+				const data = {
 					fog: {
 						'THREE.Fog()': false,
 						'scene.fog.color': fog.color.getHex()
@@ -367,7 +332,7 @@
 
 			function guiMaterial( gui, mesh, material, geometry ) {
 
-				var folder = gui.addFolder( 'THREE.Material' );
+				const folder = gui.addFolder( 'THREE.Material' );
 
 				folder.add( material, 'transparent' );
 				folder.add( material, 'opacity', 0, 1 ).step( 0.01 );
@@ -388,18 +353,17 @@
 
 			function guiMeshBasicMaterial( gui, mesh, material, geometry ) {
 
-				var data = {
+				const data = {
 					color: material.color.getHex(),
 					envMaps: envMapKeys[ 0 ],
 					map: diffuseMapKeys[ 0 ],
 					alphaMap: alphaMapKeys[ 0 ]
 				};
 
-				var folder = gui.addFolder( 'THREE.MeshBasicMaterial' );
+				const folder = gui.addFolder( 'THREE.MeshBasicMaterial' );
 
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 
@@ -414,14 +378,13 @@
 
 			function guiMeshDepthMaterial( gui, mesh, material ) {
 
-				var data = {
+				const data = {
 					alphaMap: alphaMapKeys[ 0 ]
 				};
 
-				var folder = gui.addFolder( 'THREE.MeshDepthMaterial' );
+				const folder = gui.addFolder( 'THREE.MeshDepthMaterial' );
 
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
 
@@ -429,21 +392,20 @@
 
 			function guiMeshNormalMaterial( gui, mesh, material, geometry ) {
 
-				var folder = gui.addFolder( 'THREE.MeshNormalMaterial' );
+				const folder = gui.addFolder( 'THREE.MeshNormalMaterial' );
 
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 
 			}
 
 			function guiLineBasicMaterial( gui, mesh, material, geometry ) {
 
-				var data = {
+				const data = {
 					color: material.color.getHex()
 				};
 
-				var folder = gui.addFolder( 'THREE.LineBasicMaterial' );
+				const folder = gui.addFolder( 'THREE.LineBasicMaterial' );
 
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 				folder.add( material, 'linewidth', 0, 10 );
@@ -456,7 +418,7 @@
 
 			function guiMeshLambertMaterial( gui, mesh, material, geometry ) {
 
-				var data = {
+				const data = {
 					color: material.color.getHex(),
 					emissive: material.emissive.getHex(),
 					envMaps: envMapKeys[ 0 ],
@@ -464,13 +426,12 @@
 					alphaMap: alphaMapKeys[ 0 ]
 				};
 
-				var folder = gui.addFolder( 'THREE.MeshLambertMaterial' );
+				const folder = gui.addFolder( 'THREE.MeshLambertMaterial' );
 
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 				folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
 
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 
@@ -485,15 +446,17 @@
 
 			function guiMeshMatcapMaterial( gui, mesh, material ) {
 
-				var data = {
+				const data = {
 					color: material.color.getHex(),
 					matcap: matcapKeys[ 1 ],
 					alphaMap: alphaMapKeys[ 0 ]
 				};
 
-				var folder = gui.addFolder( 'THREE.MeshMatcapMaterial' );
+				const folder = gui.addFolder( 'THREE.MeshMatcapMaterial' );
 
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
+
+				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( data, 'matcap', matcapKeys ).onChange( updateTexture( material, 'matcap', matcaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
 
@@ -501,7 +464,7 @@
 
 			function guiMeshPhongMaterial( gui, mesh, material, geometry ) {
 
-				var data = {
+				const data = {
 					color: material.color.getHex(),
 					emissive: material.emissive.getHex(),
 					specular: material.specular.getHex(),
@@ -510,7 +473,7 @@
 					alphaMap: alphaMapKeys[ 0 ]
 				};
 
-				var folder = gui.addFolder( 'THREE.MeshPhongMaterial' );
+				const folder = gui.addFolder( 'THREE.MeshPhongMaterial' );
 
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 				folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
@@ -519,7 +482,6 @@
 				folder.add( material, 'shininess', 0, 100 );
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
@@ -533,17 +495,16 @@
 
 			function guiMeshToonMaterial( gui, mesh, material ) {
 
-				var data = {
+				const data = {
 					color: material.color.getHex(),
 					map: diffuseMapKeys[ 0 ],
 					gradientMap: gradientMapKeys[ 1 ],
 					alphaMap: alphaMapKeys[ 0 ]
 				};
 
-				var folder = gui.addFolder( 'THREE.MeshToonMaterial' );
+				const folder = gui.addFolder( 'THREE.MeshToonMaterial' );
 
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
-
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
 				folder.add( data, 'gradientMap', gradientMapKeys ).onChange( updateTexture( material, 'gradientMap', gradientMaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
@@ -552,7 +513,7 @@
 
 			function guiMeshStandardMaterial( gui, mesh, material, geometry ) {
 
-				var data = {
+				const data = {
 					color: material.color.getHex(),
 					emissive: material.emissive.getHex(),
 					envMaps: envMapKeys[ 0 ],
@@ -561,7 +522,7 @@
 					alphaMap: alphaMapKeys[ 0 ]
 				};
 
-				var folder = gui.addFolder( 'THREE.MeshStandardMaterial' );
+				const folder = gui.addFolder( 'THREE.MeshStandardMaterial' );
 
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 				folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
@@ -570,7 +531,6 @@
 				folder.add( material, 'metalness', 0, 1 );
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
@@ -584,7 +544,7 @@
 
 			function guiMeshPhysicalMaterial( gui, mesh, material, geometry ) {
 
-				var data = {
+				const data = {
 					color: material.color.getHex(),
 					emissive: material.emissive.getHex(),
 					envMaps: envMapKeys[ 0 ],
@@ -593,7 +553,7 @@
 					alphaMap: alphaMapKeys[ 0 ]
 				};
 
-				var folder = gui.addFolder( 'THREE.MeshPhysicalMaterial' );
+				const folder = gui.addFolder( 'THREE.MeshPhysicalMaterial' );
 
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 				folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
@@ -605,7 +565,6 @@
 				folder.add( material, 'clearcoatRoughness', 0, 1 ).step( 0.01 );
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'wireframe' );
-				folder.add( material, 'wireframeLinewidth', 0, 10 );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
@@ -619,14 +578,15 @@
 
 			function chooseFromHash( gui, mesh, geometry ) {
 
-				var selectedMaterial = window.location.hash.substring( 1 ) || 'MeshBasicMaterial';
-				var material;
+				const selectedMaterial = window.location.hash.substring( 1 ) || 'MeshBasicMaterial';
+
+				let material;
 
 				switch ( selectedMaterial ) {
 
 					case 'MeshBasicMaterial' :
 
-						material = new MeshBasicMaterial( { color: 0x2194CE } );
+						material = new THREE.MeshBasicMaterial( { color: 0x049EF4 } );
 						guiMaterial( gui, mesh, material, geometry );
 						guiMeshBasicMaterial( gui, mesh, material, geometry );
 
@@ -636,7 +596,7 @@
 
 					case 'MeshLambertMaterial' :
 
-						material = new MeshLambertMaterial( { color: 0x2194CE } );
+						material = new THREE.MeshLambertMaterial( { color: 0x049EF4 } );
 						guiMaterial( gui, mesh, material, geometry );
 						guiMeshLambertMaterial( gui, mesh, material, geometry );
 
@@ -646,9 +606,15 @@
 
 					case 'MeshMatcapMaterial' :
 
-						material = new MeshMatcapMaterial( { matcap: matcaps.porcelainWhite } );
+						material = new THREE.MeshMatcapMaterial( { matcap: matcaps.porcelainWhite } );
 						guiMaterial( gui, mesh, material, geometry );
 						guiMeshMatcapMaterial( gui, mesh, material, geometry );
+
+						// no need for lights
+
+						light1.visible = false;
+						light2.visible = false;
+						light3.visible = false;
 
 						return material;
 
@@ -656,7 +622,7 @@
 
 					case 'MeshPhongMaterial' :
 
-						material = new MeshPhongMaterial( { color: 0x2194CE } );
+						material = new THREE.MeshPhongMaterial( { color: 0x049EF4 } );
 						guiMaterial( gui, mesh, material, geometry );
 						guiMeshPhongMaterial( gui, mesh, material, geometry );
 
@@ -666,14 +632,14 @@
 
 					case 'MeshToonMaterial' :
 
-						material = new MeshToonMaterial( { color: 0x2194CE, gradientMap: gradientMaps.threeTone } );
+						material = new THREE.MeshToonMaterial( { color: 0x049EF4, gradientMap: gradientMaps.threeTone } );
 						guiMaterial( gui, mesh, material, geometry );
 						guiMeshToonMaterial( gui, mesh, material, geometry );
 
 						// only use a single point light
 
-						lights[ 0 ].visible = false;
-						lights[ 2 ].visible = false;
+						light1.visible = false;
+						light3.visible = false;
 
 						return material;
 
@@ -681,9 +647,15 @@
 
 					case 'MeshStandardMaterial' :
 
-						material = new MeshStandardMaterial( { color: 0x2194CE } );
+						material = new THREE.MeshStandardMaterial( { color: 0x049EF4 } );
 						guiMaterial( gui, mesh, material, geometry );
 						guiMeshStandardMaterial( gui, mesh, material, geometry );
+
+						// only use scene environment
+
+						light1.visible = false;
+						light2.visible = false;
+						light3.visible = false;
 
 						return material;
 
@@ -691,9 +663,15 @@
 
 					case 'MeshPhysicalMaterial' :
 
-						material = new MeshPhysicalMaterial( { color: 0x2194CE } );
+						material = new THREE.MeshPhysicalMaterial( { color: 0x049EF4 } );
 						guiMaterial( gui, mesh, material, geometry );
 						guiMeshPhysicalMaterial( gui, mesh, material, geometry );
+
+						// only use scene environment
+
+						light1.visible = false;
+						light2.visible = false;
+						light3.visible = false;
 
 						return material;
 
@@ -701,7 +679,7 @@
 
 					case 'MeshDepthMaterial' :
 
-						material = new MeshDepthMaterial();
+						material = new THREE.MeshDepthMaterial();
 						guiMaterial( gui, mesh, material, geometry );
 						guiMeshDepthMaterial( gui, mesh, material, geometry );
 
@@ -711,7 +689,7 @@
 
 					case 'MeshNormalMaterial' :
 
-						material = new MeshNormalMaterial();
+						material = new THREE.MeshNormalMaterial();
 						guiMaterial( gui, mesh, material, geometry );
 						guiMeshNormalMaterial( gui, mesh, material, geometry );
 
@@ -721,7 +699,7 @@
 
 					case 'LineBasicMaterial' :
 
-						material = new LineBasicMaterial( { color: 0x2194CE } );
+						material = new THREE.LineBasicMaterial( { color: 0x2194CE } );
 						guiMaterial( gui, mesh, material, geometry );
 						guiLineBasicMaterial( gui, mesh, material, geometry );
 
@@ -737,50 +715,52 @@
 
 			document.getElementById( 'newWindow' ).href += window.location.hash;
 
-			var gui = new GUI();
+			const gui = new DAT.GUI();
 
-			var scene = new Scene();
-			scene.background = new Color( 0x444444 );
-
-			var camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 10, 50 );
-			camera.position.z = 30;
-
-			var renderer = new WebGLRenderer( { antialias: true } );
+			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.outputEncoding = THREE.sRGBEncoding;
 			document.body.appendChild( renderer.domElement );
 
-			var ambientLight = new AmbientLight( 0x000000 );
+			const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x444444 );
+			scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
+			const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 10, 100 );
+			camera.position.z = 35;
+
+			const ambientLight = new THREE.AmbientLight( 0x000000 );
 			scene.add( ambientLight );
 
-			var lights = [];
-			lights[ 0 ] = new PointLight( 0xffffff, 1, 0 );
-			lights[ 1 ] = new PointLight( 0xffffff, 1, 0 );
-			lights[ 2 ] = new PointLight( 0xffffff, 1, 0 );
+			const light1 = new THREE.PointLight( 0xffffff, 1, 0 );
+			light1.position.set( 0, 200, 0 );
+			scene.add( light1 );
 
-			lights[ 0 ].position.set( 0, 200, 0 );
-			lights[ 1 ].position.set( 100, 200, 100 );
-			lights[ 2 ].position.set( - 100, - 200, - 100 );
+			const light2 = new THREE.PointLight( 0xffffff, 1, 0 );
+			light2.position.set( 100, 200, 100 );
+			scene.add( light2 );
 
-			scene.add( lights[ 0 ] );
-			scene.add( lights[ 1 ] );
-			scene.add( lights[ 2 ] );
+			const light3 = new THREE.PointLight( 0xffffff, 1, 0 );
+			light3.position.set( - 100, - 200, - 100 );
+			scene.add( light3 );
 
 			guiScene( gui, scene, camera );
 
-			var geometry = new TorusKnotBufferGeometry( 10, 3, 100, 16 );
-			geometry = geometry.toNonIndexed();
+			const geometry = new THREE.TorusKnotGeometry( 10, 3, 200, 32 ).toNonIndexed();
 
 			generateVertexColors( geometry );
 
-			var mesh = new Mesh( geometry );
+			const mesh = new THREE.Mesh( geometry );
 			mesh.material = chooseFromHash( gui, mesh, geometry );
 
 			scene.add( mesh );
 
-			var prevFog = false;
+			let prevFog = false;
 
-			var render = function () {
+			function render() {
 
 				requestAnimationFrame( render );
 
@@ -796,7 +776,7 @@
 
 				renderer.render( scene, camera );
 
-			};
+			}
 
 			window.addEventListener( 'resize', function () {
 
