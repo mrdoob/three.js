@@ -150,18 +150,6 @@ function SidebarScene( editor ) {
 
 	// background
 
-	function onBackgroundChanged() {
-
-		signals.sceneBackgroundChanged.dispatch(
-			backgroundType.getValue(),
-			backgroundColor.getHexValue(),
-			backgroundTexture.getValue(),
-			backgroundEquirectangularTexture.getValue(),
-			environmentType.getValue()
-		);
-
-	}
-
 	var backgroundRow = new UIRow();
 
 	var backgroundType = new UISelect().setOptions( {
@@ -196,7 +184,16 @@ function SidebarScene( editor ) {
 
 	container.add( backgroundRow );
 
-	//
+	function onBackgroundChanged() {
+
+		signals.sceneBackgroundChanged.dispatch(
+			backgroundType.getValue(),
+			backgroundColor.getHexValue(),
+			backgroundTexture.getValue(),
+			backgroundEquirectangularTexture.getValue()
+		);
+
+	}
 
 	function refreshBackgroundUI() {
 
@@ -216,21 +213,44 @@ function SidebarScene( editor ) {
 	var environmentType = new UISelect().setOptions( {
 
 		'None': '',
-		'Background': 'Background',
+		'Equirectangular': 'Equirect',
 		'ModelViewer': 'ModelViewer'
 
 	} ).setWidth( '150px' );
 	environmentType.setValue( 'None' );
 	environmentType.onChange( function () {
 
-		signals.sceneEnvironmentChanged.dispatch( environmentType.getValue() );
+		onEnvironmentChanged();
+		refreshEnvironmentUI();
 
 	} );
 
 	environmentRow.add( new UIText( strings.getKey( 'sidebar/scene/environment' ) ).setWidth( '90px' ) );
 	environmentRow.add( environmentType );
 
+	var environmentEquirectangularTexture = new UITexture().setMarginLeft( '8px' ).onChange( onEnvironmentChanged );
+	environmentEquirectangularTexture.setDisplay( 'none' );
+	environmentRow.add( environmentEquirectangularTexture );
+
 	container.add( environmentRow );
+
+	function onEnvironmentChanged() {
+
+		signals.sceneEnvironmentChanged.dispatch(
+			environmentType.getValue(),
+			environmentEquirectangularTexture.getValue()
+		);
+
+	}
+
+	function refreshEnvironmentUI() {
+
+		var type = environmentType.getValue();
+
+		environmentType.setWidth( type !== 'Equirectangular' ? '150px' : '110px' );
+		environmentEquirectangularTexture.setDisplay( type === 'Equirectangular' ? '' : 'none' );
+
+	}
 
 	// fog
 
