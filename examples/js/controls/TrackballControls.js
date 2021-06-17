@@ -622,8 +622,8 @@
 					default:
 						// 2 or more
 						_state = STATE.TOUCH_ZOOM_PAN;
-						const dx = _pointers[ 0 ].pageX + _pointers[ 1 ].pageX;
-						const dy = _pointers[ 0 ].pageY + _pointers[ 1 ].pageY;
+						const dx = _pointers[ 0 ].pageX - _pointers[ 1 ].pageX;
+						const dy = _pointers[ 0 ].pageY - _pointers[ 1 ].pageY;
 						_touchZoomDistanceEnd = _touchZoomDistanceStart = Math.sqrt( dx * dx + dy * dy );
 						const x = ( _pointers[ 0 ].pageX + _pointers[ 1 ].pageX ) / 2;
 						const y = ( _pointers[ 0 ].pageY + _pointers[ 1 ].pageY ) / 2;
