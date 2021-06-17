@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,11 +15,11 @@
 
 		<h2>Code Example</h2>
 		<code>
-		var spotLight = new THREE.SpotLight( 0xffffff );
+		const spotLight = new THREE.SpotLight( 0xffffff );
 		spotLight.position.set( 10, 10, 10 );
 		scene.add( spotLight );
 
-		var spotLightHelper = new THREE.SpotLightHelper( spotLight );
+		const spotLightHelper = new THREE.SpotLightHelper( spotLight );
 		scene.add( spotLightHelper );
 		</code>
 
@@ -48,10 +47,10 @@
 		<h3>[property:SpotLight light]</h3>
 		<p>Reference to the [page:SpotLight] being visualized.</p>
 
-		<h3>[property:object matrix]</h3>
+		<h3>[property:Object matrix]</h3>
 		<p>Reference to the spotLight's [page:Object3D.matrixWorld matrixWorld].</p>
 
-		<h3>[property:object matrixAutoUpdate]</h3>
+		<h3>[property:Object matrixAutoUpdate]</h3>
 		<p>
 			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
 			spotLight's [page:Object3D.matrixWorld matrixWorld].

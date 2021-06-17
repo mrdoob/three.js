@@ -3,12 +3,11 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
 		<h1>[name]</h1>
 
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -36,16 +35,16 @@
 
 
 		<code>
-		var length = 12, width = 8;
+		const length = 12, width = 8;
 
-		var shape = new THREE.Shape();
+		const shape = new THREE.Shape();
 		shape.moveTo( 0,0 );
 		shape.lineTo( 0, width );
 		shape.lineTo( length, width );
 		shape.lineTo( length, 0 );
 		shape.lineTo( 0, 0 );
 
-		var extrudeSettings = {
+		const extrudeSettings = {
 			steps: 2,
 			depth: 16,
 			bevelEnabled: true,
@@ -55,9 +54,9 @@
 			bevelSegments: 1
 		};
 
-		var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
-		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-		var mesh = new THREE.Mesh( geometry, material ) ;
+		const geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const mesh = new THREE.Mesh( geometry, material ) ;
 		scene.add( mesh );
 		</code>
 
@@ -95,7 +94,7 @@
 		</p>
 
 		<h2>Properties</h2>
-		<p>See the base [page:Geometry] class for common properties.</p>
+		<p>See the base [page:BufferGeometry] class for common properties.</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
@@ -103,7 +102,7 @@
 		</p>
 
 		<h2>Methods</h2>
-		<p>See the base [page:Geometry] class for common methods.</p>
+		<p>See the base [page:BufferGeometry] class for common methods.</p>
 
 		<h2>Source</h2>
 

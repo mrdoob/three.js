@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,7 +21,7 @@
 
 		<code>
 		// instantiate a loader
-		var loader = new THREE.ImageLoader();
+		const loader = new THREE.ImageLoader();
 
 		// load a image resource
 		loader.load(
@@ -32,8 +31,8 @@
 			// onLoad callback
 			function ( image ) {
 				// use the image, e.g. draw part of it on a canvas
-				var canvas = document.createElement( 'canvas' );
-				var context = canvas.getContext( '2d' );
+				const canvas = document.createElement( 'canvas' );
+				const context = canvas.getContext( '2d' );
 				context.drawImage( image, 100, 100 );
 			},
 

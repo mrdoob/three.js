@@ -1,17 +1,3 @@
-/**
- * @author Emmett Lalish / elalish
- *
- * This class generates a Prefiltered, Mipmapped Radiance Environment Map
- * (PMREM) from a cubeMap environment texture. This allows different levels of
- * blur to be quickly accessed based on material roughness. It is packed into a
- * special CubeUV format that allows us to perform custom interpolation so that
- * we can support nonlinear formats such as RGBE. Unlike a traditional mipmap
- * chain, it only goes down to the LOD_MIN level (above), and then creates extra
- * even more filtered 'mips' at the same LOD_MIN resolution, associated with
- * higher roughness levels. In this way we maintain resolution to smoothly
- * interpolate diffuse lighting while limiting sampling computation.
- */
-
 import {
 	CubeUVReflectionMapping,
 	GammaEncoding,
@@ -26,17 +12,21 @@ import {
 	RGBM7Encoding,
 	UnsignedByteType,
 	sRGBEncoding
-} from "../constants.js";
+} from '../constants.js';
 
-import { BufferAttribute } from "../core/BufferAttribute.js";
-import { BufferGeometry } from "../core/BufferGeometry.js";
-import { Mesh } from "../objects/Mesh.js";
-import { OrthographicCamera } from "../cameras/OrthographicCamera.js";
-import { PerspectiveCamera } from "../cameras/PerspectiveCamera.js";
-import { RawShaderMaterial } from "../materials/RawShaderMaterial.js";
-import { Vector2 } from "../math/Vector2.js";
-import { Vector3 } from "../math/Vector3.js";
-import { WebGLRenderTarget } from "../renderers/WebGLRenderTarget.js";
+import { BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Mesh } from '../objects/Mesh.js';
+import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
+import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
+import { RawShaderMaterial } from '../materials/RawShaderMaterial.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Color } from '../math/Color.js';
+import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { BoxBufferGeometry } from '../geometries/BoxGeometry.js';
+import { BackSide } from '../constants.js';
 
 const LOD_MIN = 4;
 const LOD_MAX = 8;
@@ -64,8 +54,16 @@ const ENCODINGS = {
 	[ GammaEncoding ]: 6
 };
 
-const _flatCamera = new OrthographicCamera();
-const { _lodPlanes, _sizeLods, _sigmas } = _createPlanes();
+const backgroundMaterial = new MeshBasicMaterial( {
+	side: BackSide,
+	depthWrite: false,
+	depthTest: false,
+} );
+const backgroundBox = new Mesh( new BoxBufferGeometry(), backgroundMaterial );
+
+const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
+const { _lodPlanes, _sizeLods, _sigmas } = /*@__PURE__*/ _createPlanes();
+const _clearColor = /*@__PURE__*/ new Color();
 let _oldTarget = null;
 
 // Golden Ratio
@@ -75,33 +73,57 @@ const INV_PHI = 1 / PHI;
 // Vertices of a dodecahedron (except the opposites, which represent the
 // same axis), used as axis directions evenly spread on a sphere.
 const _axisDirections = [
-	new Vector3( 1, 1, 1 ),
-	new Vector3( - 1, 1, 1 ),
-	new Vector3( 1, 1, - 1 ),
-	new Vector3( - 1, 1, - 1 ),
-	new Vector3( 0, PHI, INV_PHI ),
-	new Vector3( 0, PHI, - INV_PHI ),
-	new Vector3( INV_PHI, 0, PHI ),
-	new Vector3( - INV_PHI, 0, PHI ),
-	new Vector3( PHI, INV_PHI, 0 ),
-	new Vector3( - PHI, INV_PHI, 0 ) ];
+	/*@__PURE__*/ new Vector3( 1, 1, 1 ),
+	/*@__PURE__*/ new Vector3( - 1, 1, 1 ),
+	/*@__PURE__*/ new Vector3( 1, 1, - 1 ),
+	/*@__PURE__*/ new Vector3( - 1, 1, - 1 ),
+	/*@__PURE__*/ new Vector3( 0, PHI, INV_PHI ),
+	/*@__PURE__*/ new Vector3( 0, PHI, - INV_PHI ),
+	/*@__PURE__*/ new Vector3( INV_PHI, 0, PHI ),
+	/*@__PURE__*/ new Vector3( - INV_PHI, 0, PHI ),
+	/*@__PURE__*/ new Vector3( PHI, INV_PHI, 0 ),
+	/*@__PURE__*/ new Vector3( - PHI, INV_PHI, 0 ) ];
 
-function PMREMGenerator( renderer ) {
+/**
+ * This class generates a Prefiltered, Mipmapped Radiance Environment Map
+ * (PMREM) from a cubeMap environment texture. This allows different levels of
+ * blur to be quickly accessed based on material roughness. It is packed into a
+ * special CubeUV format that allows us to perform custom interpolation so that
+ * we can support nonlinear formats such as RGBE. Unlike a traditional mipmap
+ * chain, it only goes down to the LOD_MIN level (above), and then creates extra
+ * even more filtered 'mips' at the same LOD_MIN resolution, associated with
+ * higher roughness levels. In this way we maintain resolution to smoothly
+ * interpolate diffuse lighting while limiting sampling computation.
+ *
+ * Paper: Fast, Accurate Image-Based Lighting
+ * https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view
+*/
 
-	this._renderer = renderer;
-	this._pingPongRenderTarget = null;
+function convertLinearToRGBE( color ) {
 
-	this._blurMaterial = _getBlurShader( MAX_SAMPLES );
-	this._equirectShader = null;
-	this._cubemapShader = null;
+	const maxComponent = Math.max( color.r, color.g, color.b );
+	const fExp = Math.min( Math.max( Math.ceil( Math.log2( maxComponent ) ), - 128.0 ), 127.0 );
+	color.multiplyScalar( Math.pow( 2.0, - fExp ) );
 
-	this._compileMaterial( this._blurMaterial );
+	const alpha = ( fExp + 128.0 ) / 255.0;
+	return alpha;
 
 }
 
-PMREMGenerator.prototype = {
+class PMREMGenerator {
 
-	constructor: PMREMGenerator,
+	constructor( renderer ) {
+
+		this._renderer = renderer;
+		this._pingPongRenderTarget = null;
+
+		this._blurMaterial = _getBlurShader( MAX_SAMPLES );
+		this._equirectShader = null;
+		this._cubemapShader = null;
+
+		this._compileMaterial( this._blurMaterial );
+
+	}
 
 	/**
 	 * Generates a PMREM from a supplied Scene, which can be faster than using an
@@ -110,7 +132,7 @@ PMREMGenerator.prototype = {
 	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
 	 * is placed at the origin).
 	 */
-	fromScene: function ( scene, sigma = 0, near = 0.1, far = 100 ) {
+	fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
 
 		_oldTarget = this._renderer.getRenderTarget();
 		const cubeUVRenderTarget = this._allocateTargets();
@@ -127,35 +149,35 @@ PMREMGenerator.prototype = {
 
 		return cubeUVRenderTarget;
 
-	},
+	}
 
 	/**
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
 	 * (RGBFormat) or HDR (RGBEFormat). The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
-	fromEquirectangular: function ( equirectangular ) {
+	fromEquirectangular( equirectangular ) {
 
 		return this._fromTexture( equirectangular );
 
-	},
+	}
 
 	/**
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
 	 * (RGBFormat) or HDR (RGBEFormat). The ideal input cube size is 256 x 256,
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
-	fromCubemap: function ( cubemap ) {
+	fromCubemap( cubemap ) {
 
 		return this._fromTexture( cubemap );
 
-	},
+	}
 
 	/**
 	 * Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
 	 * your texture's network fetch for increased concurrency.
 	 */
-	compileCubemapShader: function () {
+	compileCubemapShader() {
 
 		if ( this._cubemapShader === null ) {
 
@@ -164,13 +186,13 @@ PMREMGenerator.prototype = {
 
 		}
 
-	},
+	}
 
 	/**
 	 * Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
 	 * your texture's network fetch for increased concurrency.
 	 */
-	compileEquirectangularShader: function () {
+	compileEquirectangularShader() {
 
 		if ( this._equirectShader === null ) {
 
@@ -179,14 +201,14 @@ PMREMGenerator.prototype = {
 
 		}
 
-	},
+	}
 
 	/**
 	 * Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class,
 	 * so you should not need more than one PMREMGenerator object. If you do, calling dispose() on
 	 * one of them will cause any others to also become unusable.
 	 */
-	dispose: function () {
+	dispose() {
 
 		this._blurMaterial.dispose();
 
@@ -199,20 +221,20 @@ PMREMGenerator.prototype = {
 
 		}
 
-	},
+	}
 
 	// private interface
 
-	_cleanup: function ( outputTarget ) {
+	_cleanup( outputTarget ) {
 
 		this._pingPongRenderTarget.dispose();
 		this._renderer.setRenderTarget( _oldTarget );
 		outputTarget.scissorTest = false;
 		_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
 
-	},
+	}
 
-	_fromTexture: function ( texture ) {
+	_fromTexture( texture ) {
 
 		_oldTarget = this._renderer.getRenderTarget();
 		const cubeUVRenderTarget = this._allocateTargets( texture );
@@ -222,9 +244,9 @@ PMREMGenerator.prototype = {
 
 		return cubeUVRenderTarget;
 
-	},
+	}
 
-	_allocateTargets: function ( texture ) { // warning: null texture is valid
+	_allocateTargets( texture ) { // warning: null texture is valid
 
 		const params = {
 			magFilter: NearestFilter,
@@ -233,8 +255,7 @@ PMREMGenerator.prototype = {
 			type: UnsignedByteType,
 			format: RGBEFormat,
 			encoding: _isLDR( texture ) ? texture.encoding : RGBEEncoding,
-			depthBuffer: false,
-			stencilBuffer: false
+			depthBuffer: false
 		};
 
 		const cubeUVRenderTarget = _createRenderTarget( params );
@@ -242,16 +263,16 @@ PMREMGenerator.prototype = {
 		this._pingPongRenderTarget = _createRenderTarget( params );
 		return cubeUVRenderTarget;
 
-	},
+	}
 
-	_compileMaterial: function ( material ) {
+	_compileMaterial( material ) {
 
 		const tmpMesh = new Mesh( _lodPlanes[ 0 ], material );
 		this._renderer.compile( tmpMesh, _flatCamera );
 
-	},
+	}
 
-	_sceneToCubeUV: function ( scene, near, far, cubeUVRenderTarget ) {
+	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
 
 		const fov = 90;
 		const aspect = 1;
@@ -260,27 +281,40 @@ PMREMGenerator.prototype = {
 		const forwardSign = [ 1, 1, 1, - 1, - 1, - 1 ];
 		const renderer = this._renderer;
 
+		const originalAutoClear = renderer.autoClear;
 		const outputEncoding = renderer.outputEncoding;
 		const toneMapping = renderer.toneMapping;
-		const clearColor = renderer.getClearColor();
-		const clearAlpha = renderer.getClearAlpha();
+		renderer.getClearColor( _clearColor );
 
 		renderer.toneMapping = NoToneMapping;
 		renderer.outputEncoding = LinearEncoding;
+		renderer.autoClear = false;
 
-		let background = scene.background;
-		if ( background && background.isColor ) {
+		let useSolidColor = false;
+		const background = scene.background;
+		if ( background ) {
 
-			background.convertSRGBToLinear();
-			// Convert linear to RGBE
-			const maxComponent = Math.max( background.r, background.g, background.b );
-			const fExp = Math.min( Math.max( Math.ceil( Math.log2( maxComponent ) ), - 128.0 ), 127.0 );
-			background = background.multiplyScalar( Math.pow( 2.0, - fExp ) );
-			const alpha = ( fExp + 128.0 ) / 255.0;
-			renderer.setClearColor( background, alpha );
-			scene.background = null;
+			if ( background.isColor ) {
+
+				backgroundMaterial.color.copy( background ).convertSRGBToLinear();
+				scene.background = null;
+
+				const alpha = convertLinearToRGBE( backgroundMaterial.color );
+				backgroundMaterial.opacity = alpha;
+				useSolidColor = true;
+
+			}
+
+		} else {
+
+			backgroundMaterial.color.copy( _clearColor ).convertSRGBToLinear();
+
+			const alpha = convertLinearToRGBE( backgroundMaterial.color );
+			backgroundMaterial.opacity = alpha;
+			useSolidColor = true;
 
 		}
+
 
 		for ( let i = 0; i < 6; i ++ ) {
 
@@ -305,17 +339,24 @@ PMREMGenerator.prototype = {
 			_setViewport( cubeUVRenderTarget,
 				col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
 			renderer.setRenderTarget( cubeUVRenderTarget );
+
+			if ( useSolidColor ) {
+
+				renderer.render( backgroundBox, cubeCamera );
+
+			}
+
 			renderer.render( scene, cubeCamera );
 
 		}
 
 		renderer.toneMapping = toneMapping;
 		renderer.outputEncoding = outputEncoding;
-		renderer.setClearColor( clearColor, clearAlpha );
+		renderer.autoClear = originalAutoClear;
 
-	},
+	}
 
-	_textureToCubeUV: function ( texture, cubeUVRenderTarget ) {
+	_textureToCubeUV( texture, cubeUVRenderTarget ) {
 
 		const renderer = this._renderer;
 
@@ -358,9 +399,9 @@ PMREMGenerator.prototype = {
 		renderer.setRenderTarget( cubeUVRenderTarget );
 		renderer.render( mesh, _flatCamera );
 
-	},
+	}
 
-	_applyPMREM: function ( cubeUVRenderTarget ) {
+	_applyPMREM( cubeUVRenderTarget ) {
 
 		const renderer = this._renderer;
 		const autoClear = renderer.autoClear;
@@ -378,7 +419,7 @@ PMREMGenerator.prototype = {
 
 		renderer.autoClear = autoClear;
 
-	},
+	}
 
 	/**
 	 * This is a two-pass Gaussian blur for a cubemap. Normally this is done
@@ -387,7 +428,7 @@ PMREMGenerator.prototype = {
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
 	 */
-	_blur: function ( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
+	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
 
 		const pingPongRenderTarget = this._pingPongRenderTarget;
 
@@ -409,9 +450,9 @@ PMREMGenerator.prototype = {
 			'longitudinal',
 			poleAxis );
 
-	},
+	}
 
-	_halfBlur: function ( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
+	_halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
 
 		const renderer = this._renderer;
 		const blurMaterial = this._blurMaterial;
@@ -495,7 +536,7 @@ PMREMGenerator.prototype = {
 
 	}
 
-};
+}
 
 function _isLDR( texture ) {
 
@@ -639,7 +680,7 @@ function _getBlurShader( maxSamples ) {
 			uniform float mipInt;
 			uniform vec3 poleAxis;
 
-			${_getEncodings()}
+			${ _getEncodings() }
 
 			#define ENVMAP_TYPE_CUBE_UV
 			#include <cube_uv_reflection_fragment>
@@ -668,7 +709,7 @@ function _getBlurShader( maxSamples ) {
 
 				axis = normalize( axis );
 
-				gl_FragColor = vec4( 0.0 );
+				gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
 				gl_FragColor.rgb += weights[ 0 ] * getSample( 0.0, axis );
 
 				for ( int i = 1; i < n; i++ ) {
@@ -726,13 +767,13 @@ function _getEquirectShader() {
 			uniform sampler2D envMap;
 			uniform vec2 texelSize;
 
-			${_getEncodings()}
+			${ _getEncodings() }
 
 			#include <common>
 
 			void main() {
 
-				gl_FragColor = vec4( 0.0 );
+				gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
 
 				vec3 outputDirection = normalize( vOutputDirection );
 				vec2 uv = equirectUv( outputDirection );
@@ -789,11 +830,11 @@ function _getCubemapShader() {
 
 			uniform samplerCube envMap;
 
-			${_getEncodings()}
+			${ _getEncodings() }
 
 			void main() {
 
-				gl_FragColor = vec4( 0.0 );
+				gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
 				gl_FragColor.rgb = envMapTexelToLinear( textureCube( envMap, vec3( - vOutputDirection.x, vOutputDirection.yz ) ) ).rgb;
 				gl_FragColor = linearToOutputTexel( gl_FragColor );
 
@@ -884,7 +925,7 @@ function _getEncodings() {
 
 		vec4 inputTexelToLinear( vec4 value ) {
 
-			if( inputEncoding == 0 ) {
+			if ( inputEncoding == 0 ) {
 
 				return value;
 
@@ -916,9 +957,9 @@ function _getEncodings() {
 
 		}
 
-		vec4 linearToOutputTexel( vec4 value ){
+		vec4 linearToOutputTexel( vec4 value ) {
 
-			if( outputEncoding == 0 ) {
+			if ( outputEncoding == 0 ) {
 
 				return value;
 

@@ -3,58 +3,57 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>查找表（[name]）</h1>
 
 		<p class="desc">
-		Represents a lookup table for colormaps. It is used to determine the color values from a range of data values.
+		表示颜色表的查找表，用于从一个数据值的范围中确定颜色值。
 		</p>
 
 
 		<h2>代码示例</h2>
 		<code>
-		var lut = new Lut( 'rainbow', 512 );
-		var color = lut.getColor( 0.5 );
+		const lut = new Lut( 'rainbow', 512 );
+		const color = lut.getColor( 0.5 );
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]( colormap, numberOfColors )</h3>
 		<p>
-		colormap - optional argument that sets a colormap from predefined colormaps. Available colormaps are : "rainbow", "cooltowarm", "blackbody".
-		numberOfColors - optional argument that sets the number of colors used to represent the data array.
+		colormap - （可选）从预定义的颜色表中设置一个颜色表。可选值有："rainbow"、 "cooltowarm"、 "blackbody"。
+		numberOfColors - （可选）设置用于表示数据数组的颜色数量。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Float minV]</h3>
 		<p>
-		The minimum value to be represented with the lookup table. Default is 0.
+		查找表所表示的最小值，默认为0。
 		</p>
 
 		<h3>[property:Float maxV]</h3>
 		<p>
-		The maximum value to be represented with the lookup table. Default is 1.
+		查找表所表示的最小值，默认为1。
 		</p>
 
 		<h3>.[legend]</h3>
 		<p>
-		The legend of the lookup table.
+		查找表的图例。
 		</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:null copy]( [param:Lut lut] ) [param:Lut this]</h3>
 		<p>
-		color — Lut to copy.
+		color — 要拷贝的 Lut。
 		</p>
 		<p>
-		Copies given lut.
+		拷贝给定的 Lut。
 		</p>
 
 		<h3>.setLegendOn [parameters]</h3>
@@ -93,53 +92,53 @@
 
 		<h3>[method:Lut setMin]( [param:Float minV] )</h3>
 		<p>
-		minV — The minimum value to be represented with the lookup table.<br />
+		minV — 查找表所表示的最小值。<br />
 		</p>
 		<p>
-		Sets this Lut with the minimum value to be represented.
+		将查找表要表示的最小值设为该值。
 		</p>
 
 		<h3>[method:Lut setMax]( [param:Float maxV] )</h3>
 		<p>
-		maxV — The maximum value to be represented with the lookup table.<br />
+		maxV — 查找表所表示的最小值。<br />
 		</p>
 		<p>
-		Sets this Lut with the maximum value to be represented.
+		将查找表要表示的最大值设为该值。
 		</p>
 
 		<h3>[method:Lut changeNumberOfColors]( [param:Float numberOfColors] )</h3>
 		<p>
-		numberOfColors — The number of colors to be used to represent the data array.<br />
+		numberOfColors — 用于表示数据数组的颜色数量。<br />
 		</p>
 		<p>
-		Sets this Lut with the number of colors to be used.
+		设置查找表中要使用的颜色的数量。
 		</p>
 
 		<h3>[method:Lut changeColorMap]( [param:Float colorMap] )</h3>
 		<p>
-		colorMap — The name of the color map to be used to represent the data array.<br />
+		colorMap — 用于表示数据数组的颜色表名称。<br />
 		</p>
 		<p>
-		Sets this Lut with the colormap to be used.
+		设置查找表的颜色表为传入的颜色表。
 		</p>
 
 		<h3>[method:Lut addColorMap]( colorMapName, arrayOfColors )</h3>
 		<p>
-		Insert a new color map into the set of available color maps.
+		插入一个新的颜色表到可用颜色表中。
 		</p>
 
 		<h3>[method:Lut getColor]( value ) [param:Lut this]</h3>
 		<p>
-		value -- the data value to be displayed as a color.
+		value -- 作为颜色展示的数据值。
 		</p>
 		<p>
-		Returns a [page:Color].
+		返回一个[page:Color]。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/[path].js examples/jsm/math/[path].js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/Lut.js examples/jsm/math/Lut.js]
 		</p>
 	</body>
 </html>

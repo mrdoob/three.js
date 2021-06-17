@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,8 +16,8 @@
 
 		<h2>代码示例</h2>
 		<code>
-		var raycaster = new THREE.Raycaster();
-		var mouse = new THREE.Vector2();
+		const raycaster = new THREE.Raycaster();
+		const mouse = new THREE.Vector2();
 
 		function onMouseMove( event ) {
 
@@ -35,9 +34,9 @@
 			raycaster.setFromCamera( mouse, camera );
 
 			// 计算物体和射线的焦点
-			var intersects = raycaster.intersectObjects( scene.children );
+			const intersects = raycaster.intersectObjects( scene.children );
 
-			for ( var i = 0; i < intersects.length; i++ ) {
+			for ( let i = 0; i < intersects.length; i ++ ) {
 
 				intersects[ i ].object.material.color.set( 0xff0000 );
 
@@ -87,13 +86,13 @@
 
 		<h2>属性</h2>
 
-		<h3>[property:float far]</h3>
+		<h3>[property:Float far]</h3>
 		<p>
 			raycaster的远距离因数（投射远点）。这个值表明哪些对象可以基于该距离而被raycaster所丢弃。
 			这个值不应当为负，并且应当比near属性大。
 		</p>
 
-		<h3>[property:float near]</h3>
+		<h3>[property:Float near]</h3>
 		<p>
 			raycaster的近距离因数（投射近点）。这个值表明哪些对象可以基于该距离而被raycaster所丢弃。
 			这个值不应当为负，并且应当比far属性小。
@@ -121,7 +120,8 @@
 
 		<h3>[property:Object params]</h3>
 		<p>
-			具有以下属性的对象：<code>
+			具有以下属性的对象：
+			<code>
 {
 	Mesh: {},
 	Line: { threshold: 1 },
@@ -175,7 +175,7 @@
 		<p>
 			[page:Float distance] —— 射线投射原点和相交部分之间的距离。<br />
 			[page:Vector3 point] —— 相交部分的点（世界坐标）<br />
-			[page:Face3 face] —— 相交的面<br />
+			[page:Object face] —— 相交的面<br />
 			[page:Integer faceIndex] —— 相交的面的索引<br />
 			[page:Object3D object] —— 相交的物体<br />
 			[page:Vector2 uv] —— 相交部分的点的UV坐标。<br />

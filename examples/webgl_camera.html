@@ -22,16 +22,16 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
-			var aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+			let SCREEN_WIDTH = window.innerWidth;
+			let SCREEN_HEIGHT = window.innerHeight;
+			let aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 
-			var container, stats;
-			var camera, scene, renderer, mesh;
-			var cameraRig, activeCamera, activeHelper;
-			var cameraPerspective, cameraOrtho;
-			var cameraPerspectiveHelper, cameraOrthoHelper;
-			var frustumSize = 600;
+			let container, stats;
+			let camera, scene, renderer, mesh;
+			let cameraRig, activeCamera, activeHelper;
+			let cameraPerspective, cameraOrtho;
+			let cameraPerspectiveHelper, cameraOrthoHelper;
+			const frustumSize = 600;
 
 			init();
 			animate();
@@ -80,20 +80,20 @@
 				//
 
 				mesh = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 100, 16, 8 ),
+					new THREE.SphereGeometry( 100, 16, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } )
 				);
 				scene.add( mesh );
 
-				var mesh2 = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 50, 16, 8 ),
+				const mesh2 = new THREE.Mesh(
+					new THREE.SphereGeometry( 50, 16, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } )
 				);
 				mesh2.position.y = 150;
 				mesh.add( mesh2 );
 
-				var mesh3 = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 5, 16, 8 ),
+				const mesh3 = new THREE.Mesh(
+					new THREE.SphereGeometry( 5, 16, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } )
 				);
 				mesh3.position.z = 150;
@@ -101,10 +101,10 @@
 
 				//
 
-				var geometry = new THREE.BufferGeometry();
-				var vertices = [];
+				const geometry = new THREE.BufferGeometry();
+				const vertices = [];
 
-				for ( var i = 0; i < 10000; i ++ ) {
+				for ( let i = 0; i < 10000; i ++ ) {
 
 					vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // x
 					vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // y
@@ -114,7 +114,7 @@
 
 				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
-				var particles = new THREE.Points( geometry, new THREE.PointsMaterial( { color: 0x888888 } ) );
+				const particles = new THREE.Points( geometry, new THREE.PointsMaterial( { color: 0x888888 } ) );
 				scene.add( particles );
 
 				//
@@ -133,8 +133,8 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
-				document.addEventListener( 'keydown', onKeyDown, false );
+				window.addEventListener( 'resize', onWindowResize );
+				document.addEventListener( 'keydown', onKeyDown );
 
 			}
 
@@ -200,7 +200,7 @@
 
 			function render() {
 
-				var r = Date.now() * 0.0005;
+				const r = Date.now() * 0.0005;
 
 				mesh.position.x = 700 * Math.cos( r );
 				mesh.position.z = 700 * Math.sin( r );

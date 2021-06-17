@@ -18,14 +18,14 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var camera, scene, renderer, stats;
+			let camera, scene, renderer, stats;
 
-			var mesh;
+			let mesh;
 
-			var dummy = new THREE.Object3D();
+			const dummy = new THREE.Object3D();
 
-			var amount = 8;
-			var count = Math.pow( amount, 3 );
+			const amount = 8;
+			const count = Math.pow( amount, 3 );
 
 			init();
 			animate();
@@ -46,9 +46,9 @@
 
 				new THREE.BufferGeometryLoader().load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
 
-					var instanceColors = [];
+					const instanceColors = [];
 
-					for ( var i = 0; i < count; i ++ ) {
+					for ( let i = 0; i < count; i ++ ) {
 
 						instanceColors.push( Math.random() );
 						instanceColors.push( Math.random() );
@@ -70,25 +70,25 @@
 
 						texture.encoding = THREE.sRGBEncoding;
 
-						var material = new THREE.MeshMatcapMaterial( { color: 0xaaaaff, matcap: texture } );
+						const material = new THREE.MeshMatcapMaterial( { color: 0xaaaaff, matcap: texture } );
 
-						var colorParsChunk = [
+						const colorParsChunk = [
 							'attribute vec3 instanceColor;',
 							'varying vec3 vInstanceColor;',
 							'#include <common>'
 						].join( '\n' );
 
-						var instanceColorChunk = [
+						const instanceColorChunk = [
 							'#include <begin_vertex>',
 							'\tvInstanceColor = instanceColor;'
 						].join( '\n' );
 
-						var fragmentParsChunk = [
+						const fragmentParsChunk = [
 							'varying vec3 vInstanceColor;',
 							'#include <common>'
 						].join( '\n' );
 
-						var colorChunk = [
+						const colorChunk = [
 							'vec4 diffuseColor = vec4( diffuse * vInstanceColor, opacity );'
 						].join( '\n' );
 
@@ -125,7 +125,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -154,19 +154,19 @@
 
 				if ( mesh ) {
 
-					var time = Date.now() * 0.001;
+					const time = Date.now() * 0.001;
 
 					mesh.rotation.x = Math.sin( time / 4 );
 					mesh.rotation.y = Math.sin( time / 2 );
 
-					var i = 0;
-					var offset = ( amount - 1 ) / 2;
+					let i = 0;
+					const offset = ( amount - 1 ) / 2;
 
-					for ( var x = 0; x < amount; x ++ ) {
+					for ( let x = 0; x < amount; x ++ ) {
 
-						for ( var y = 0; y < amount; y ++ ) {
+						for ( let y = 0; y < amount; y ++ ) {
 
-							for ( var z = 0; z < amount; z ++ ) {
+							for ( let z = 0; z < amount; z ++ ) {
 
 								dummy.position.set( offset - x, offset - y, offset - z );
 								dummy.rotation.y = ( Math.sin( x / 4 + time ) + Math.sin( y / 4 + time ) + Math.sin( z / 4 + time ) );

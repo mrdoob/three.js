@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -215,11 +214,11 @@
 			It's also possible to manage *structs* in arrays. The syntax for this use case looks like so:
 		</p>
 		<code>
-		var entry1 = {
+		const entry1 = {
 			position: new Vector3(),
 			direction: new Vector3( 0, 0, 1 )
 		};
-		var entry2 = {
+		const entry2 = {
 			position: new Vector3( 1, 1, 1 ),
 			direction: new Vector3( 0, 1, 0 )
 		};

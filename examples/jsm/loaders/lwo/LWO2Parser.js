@@ -1,8 +1,3 @@
-/**
- * @author Lewy Blue / https://github.com/looeee
- * @author Guilherme Avila / https://github/sciecode
- */
-
 function LWO2Parser( IFFParser ) {
 
 	this.IFF = IFFParser;

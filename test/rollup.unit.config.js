@@ -36,24 +36,6 @@ function glsl() {
 }
 
 export default [
-	// editor unit conf
-	{
-		input: 'unit/three.editor.unit.js',
-		plugins: [
-			glsl()
-		],
-		// sourceMap: true,
-		output: [
-			{
-				format: 'umd',
-				name: 'THREE',
-				file: 'unit/build/three.editor.unit.js',
-				intro: 'QUnit.module( "Editor", () => {',
-				outro: '} );',
-				indent: '\t',
-			}
-		]
-	},
 	// example unit conf
 	{
 		input: 'unit/three.example.unit.js',

@@ -10,7 +10,7 @@ vec3 unpackRGBToNormal( const in vec3 rgb ) {
 const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
 const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
 
-const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
+const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256., 256. );
 const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );
 
 const float ShiftRight8 = 1. / 256.;
@@ -41,6 +41,8 @@ float viewZToOrthographicDepth( const in float viewZ, const in float near, const
 float orthographicDepthToViewZ( const in float linearClipZ, const in float near, const in float far ) {
 	return linearClipZ * ( near - far ) - near;
 }
+
+// NOTE: https://twitter.com/gonnavis/status/1377183786949959682
 
 float viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {
 	return (( near + viewZ ) * far ) / (( far - near ) * viewZ );

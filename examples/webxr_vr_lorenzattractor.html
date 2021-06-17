@@ -12,41 +12,41 @@
 			import * as THREE from '../build/three.module.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
 
-			var camera, scene, renderer;
-			var attractor, light;
+			let camera, scene, renderer;
+			let attractor, light;
 
-			var x = 15 * Math.random();
-			var y = 15 * Math.random();
-			var z = 15 * Math.random();
+			let x = 15 * Math.random();
+			let y = 15 * Math.random();
+			let z = 15 * Math.random();
 
-			var scale = .02; // for reducing overall displayed size
-			var speed = 5; // integer, increase for faster visualization
+			const scale = .02; // for reducing overall displayed size
+			const speed = 5; // integer, increase for faster visualization
 
-			var steps = 100000;
-			var current = 1;
-			var shown = 10000;
+			const steps = 100000;
+			let current = 1;
+			const shown = 10000;
 
-			var beta = 8 / 3;
-			var rho = 28;
-			var sigma = 10;
+			const beta = 8 / 3;
+			const rho = 28;
+			const sigma = 10;
 
-			var dt = .005;
+			const dt = .005;
 
 			init();
 			animate();
 
 			function draw() {
 
-				var geometry = attractor.geometry;
+				const geometry = attractor.geometry;
 
 				geometry.attributes.position.array.copyWithin( 3 );
 				geometry.attributes.color.array.copyWithin( 3 );
 
 				if ( current < steps ) {
 
-					var dx = sigma * ( y - x ) * dt;
-					var dy = ( x * ( rho - z ) - y ) * dt;
-					var dz = ( x * y - beta * z ) * dt;
+					const dx = sigma * ( y - x ) * dt;
+					const dy = ( x * ( rho - z ) - y ) * dt;
+					const dz = ( x * y - beta * z ) * dt;
 
 					x += dx;
 					y += dy;
@@ -81,11 +81,11 @@
 
 				//
 
-				var geometry = new THREE.BufferGeometry();
+				const geometry = new THREE.BufferGeometry();
 
-				var positions = new Float32Array( 3 * shown );
+				const positions = new Float32Array( 3 * shown );
 
-				for ( var i = 0; i < positions.length; i += 3 ) {
+				for ( let i = 0; i < positions.length; i += 3 ) {
 
 					positions.set( [ scale * x, scale * y, scale * z ], i );
 
@@ -93,9 +93,9 @@
 
 				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-				var colors = new Float32Array( 3 * shown );
+				const colors = new Float32Array( 3 * shown );
 
-				for ( var i = 0; i < positions.length; i += 3 ) {
+				for ( let i = 0; i < positions.length; i += 3 ) {
 
 					colors.set( [ 1, 0, 0 ], i );
 
@@ -103,7 +103,7 @@
 
 				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.LineBasicMaterial( { vertexColors: true } );
+				const material = new THREE.LineBasicMaterial( { vertexColors: true } );
 
 				attractor = new THREE.Line( geometry, material );
 				attractor.position.set( 0, 1.5, - 2 );
@@ -116,8 +116,8 @@
 				light.distance = 2;
 				attractor.add( light );
 
-				var ground = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 10, 10 ),
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( 10, 10 ),
 					new THREE.MeshPhongMaterial()
 				);
 				ground.geometry.rotateX( - 90 * Math.PI / 180 );
@@ -135,11 +135,11 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
-				if ( typeof TESTING !== 'undefined'  ) { for ( var i = 0; i < 200; i ++ ) { render(); } };
+				if ( typeof TESTING !== 'undefined'  ) { for ( let i = 0; i < 200; i ++ ) { render(); } };
 
 			}
 
@@ -160,7 +160,7 @@
 
 			function render() {
 
-				for ( var i = 0; i < speed; i ++ ) draw();
+				for ( let i = 0; i < speed; i ++ ) draw();
 
 				attractor.geometry.attributes.position.needsUpdate = true;
 				attractor.geometry.attributes.color.needsUpdate = true;

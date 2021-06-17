@@ -1,14 +1,10 @@
-/**
- * @author Temdog007 / http://github.com/Temdog007
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-function SidebarGeometryTetrahedronGeometry( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -44,7 +40,7 @@ function SidebarGeometryTetrahedronGeometry( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.TetrahedronBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.TetrahedronGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );
@@ -57,4 +53,4 @@ function SidebarGeometryTetrahedronGeometry( editor, object ) {
 
 }
 
-export { SidebarGeometryTetrahedronGeometry };
+export { GeometryParametersPanel };

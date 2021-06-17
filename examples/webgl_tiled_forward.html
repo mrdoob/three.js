@@ -26,7 +26,7 @@
 			// Simple form of tiled forward lighting
 			// using texels as bitmasks of 32 lights
 
-			var RADIUS = 75;
+			const RADIUS = 75;
 
 			THREE.ShaderChunk[ 'lights_pars_begin' ] += [
 				'',
@@ -66,9 +66,9 @@
 				'#endif'
 			].join( '\n' );
 
-			var lights = [];
+			const lights = [];
 
-			var State = {
+			const State = {
 				rows: 0,
 				cols: 0,
 				width: 0,
@@ -82,8 +82,8 @@
 
 			function resizeTiles() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				State.width = width;
 				State.height = height;
@@ -99,20 +99,20 @@
 
 				if ( ! camera.projectionMatrix ) return;
 
-				var d = State.tileTexture.value.image.data;
-				var ld = State.lightTexture.value.image.data;
+				const d = State.tileTexture.value.image.data;
+				const ld = State.lightTexture.value.image.data;
 
-				var viewMatrix = camera.matrixWorldInverse;
+				const viewMatrix = camera.matrixWorldInverse;
 
 				d.fill( 0 );
 
-				var vector = new THREE.Vector3();
+				const vector = new THREE.Vector3();
 
 				lights.forEach( function ( light, index ) {
 
 					vector.setFromMatrixPosition( light.matrixWorld );
 
-					var bs = lightBounds( camera, vector, light._light.radius );
+					const bs = lightBounds( camera, vector, light._light.radius );
 
 					vector.applyMatrix4( viewMatrix );
 					vector.toArray( ld, 4 * index );
@@ -126,11 +126,11 @@
 					if ( bs[ 2 ] < 0 ) bs[ 2 ] = 0;
 					if ( bs[ 3 ] > State.height ) bs[ 3 ] = State.height;
 
-					var i4 = Math.floor( index / 8 ), i8 = 7 - ( index % 8 );
+					const i4 = Math.floor( index / 8 ), i8 = 7 - ( index % 8 );
 
-					for ( var i = Math.floor( bs[ 2 ] / 32 ); i <= Math.ceil( bs[ 3 ] / 32 ); i ++ ) {
+					for ( let i = Math.floor( bs[ 2 ] / 32 ); i <= Math.ceil( bs[ 3 ] / 32 ); i ++ ) {
 
-						for ( var j = Math.floor( bs[ 0 ] / 32 ); j <= Math.ceil( bs[ 1 ] / 32 ); j ++ ) {
+						for ( let j = Math.floor( bs[ 0 ] / 32 ); j <= Math.ceil( bs[ 1 ] / 32 ); j ++ ) {
 
 							d[ ( State.cols * i + j ) * 4 + i4 ] |= 1 << i8;
 
@@ -146,22 +146,23 @@
 			}
 
 			// Screen rectangle bounds from light sphere's world AABB
-			var lightBounds = function () {
+			const lightBounds = function () {
 
-				var v = new THREE.Vector3();
+				const v = new THREE.Vector3();
 				return function ( camera, pos, r ) {
 
-					var minX = State.width, maxX = 0, minY = State.height, maxY = 0, hw = State.width / 2, hh = State.height / 2;
+					let minX = State.width, maxX = 0, minY = State.height, maxY = 0;
+					const hw = State.width / 2, hh = State.height / 2;
 
-					for ( var i = 0; i < 8; i ++ ) {
+					for ( let i = 0; i < 8; i ++ ) {
 
 						v.copy( pos );
 						v.x += i & 1 ? r : - r;
 						v.y += i & 2 ? r : - r;
 						v.z += i & 4 ? r : - r;
-						var vector = v.project( camera );
-						var x = ( vector.x * hw ) + hw;
-						var y = ( vector.y * hh ) + hh;
+						const vector = v.project( camera );
+						const x = ( vector.x * hw ) + hw;
+						const y = ( vector.y * hh ) + hh;
 						minX = Math.min( minX, x );
 						maxX = Math.max( maxX, x );
 						minY = Math.min( minY, y );
@@ -178,36 +179,36 @@
 
 			// Rendering
 
-			var container = document.createElement( 'div' );
+			const container = document.createElement( 'div' );
 			document.body.appendChild( container );
-			var camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 			camera.position.set( 0.0, 0.0, 240.0 );
-			var scene = new THREE.Scene();
+			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x111111 );
 
-			var renderer = new THREE.WebGLRenderer();
+			const renderer = new THREE.WebGLRenderer();
 			renderer.toneMapping = THREE.NoToneMapping;
 			container.appendChild( renderer.domElement );
 
-			var renderTarget = new THREE.WebGLRenderTarget();
+			const renderTarget = new THREE.WebGLRenderTarget();
 
 			scene.add( new THREE.AmbientLight( 0xffffff, 0.33 ) );
 			// At least one regular Pointlight is needed to activate light support
 			scene.add( new THREE.PointLight( 0xff0000, 0.1, 0.1 ) );
 
-			var bloom = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 0.8, 0.6, 0.8 );
+			const bloom = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 0.8, 0.6, 0.8 );
 			bloom.renderToScreen = true;
 
-			var stats = new Stats();
+			const stats = new Stats();
 			container.appendChild( stats.dom );
 
-			var controls = new OrbitControls( camera, renderer.domElement );
+			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.minDistance = 120;
 			controls.maxDistance = 320;
 
-			var materials = [];
+			const materials = [];
 
-			var Heads = [
+			const Heads = [
 				{ type: 'physical', uniforms: { "diffuse": 0x888888, "metalness": 1.0, "roughness": 0.66 }, defines: {} },
 				{ type: 'standard', uniforms: { "diffuse": 0x666666, "metalness": 0.1, "roughness": 0.33 }, defines: {} },
 				{ type: 'phong', uniforms: { "diffuse": 0x777777, "shininess": 20 }, defines: {} },
@@ -216,15 +217,15 @@
 
 			function init( geom ) {
 
-				var sphereGeom = new THREE.SphereBufferGeometry( 0.5, 32, 32 );
-				var tIndex = Math.round( Math.random() * 3 );
+				const sphereGeom = new THREE.SphereGeometry( 0.5, 32, 32 );
+				const tIndex = Math.round( Math.random() * 3 );
 
 				Object.keys( Heads ).forEach( function ( t, index ) {
 
-					var g = new THREE.Group();
-					var conf = Heads[ t ];
-					var ml = THREE.ShaderLib[ conf.type ];
-					var mtl = new THREE.ShaderMaterial( {
+					let g = new THREE.Group();
+					const conf = Heads[ t ];
+					const ml = THREE.ShaderLib[ conf.type ];
+					const mtl = new THREE.ShaderMaterial( {
 						lights: true,
 						fragmentShader: ml.fragmentShader,
 						vertexShader: ml.vertexShader,
@@ -240,9 +241,9 @@
 					mtl.uniforms[ "tileTexture" ] = State.tileTexture;
 					mtl.uniforms[ "lightTexture" ] = State.lightTexture;
 
-					for ( var u in conf.uniforms ) {
+					for ( const u in conf.uniforms ) {
 
-						var vu = conf.uniforms[ u ];
+						const vu = conf.uniforms[ u ];
 
 						if ( mtl.uniforms[ u ].value.set ) {
 
@@ -259,7 +260,7 @@
 					mtl.defines[ 'TILED_FORWARD' ] = 1;
 					materials.push( mtl );
 
-					var obj = new THREE.Mesh( geom, mtl );
+					const obj = new THREE.Mesh( geom, mtl );
 					obj.position.y = - 37;
 					mtl.side = tIndex === index ? THREE.FrontSide : THREE.DoubleSide;
 
@@ -268,10 +269,10 @@
 					g.position.z = Math.cos( index * Math.PI / 2 ) * RADIUS;
 					g.add( obj );
 
-					for ( var i = 0; i < 8; i ++ ) {
+					for ( let i = 0; i < 8; i ++ ) {
 
-						var color = new THREE.Color().setHSL( Math.random(), 1.0, 0.5 );
-						var l = new THREE.Group();
+						const color = new THREE.Color().setHSL( Math.random(), 1.0, 0.5 );
+						const l = new THREE.Group();
 
 						l.add( new THREE.Mesh(
 							sphereGeom,
@@ -319,8 +320,8 @@
 
 				lights.forEach( function ( l ) {
 
-					var ld = l._light;
-					var radius = 0.8 + 0.2 * Math.sin( ld.pr + ( 0.6 + 0.3 * ld.sr ) * now );
+					const ld = l._light;
+					const radius = 0.8 + 0.2 * Math.sin( ld.pr + ( 0.6 + 0.3 * ld.sr ) * now );
 					l.position.x = ( Math.sin( ld.pc + ( 0.8 + 0.2 * ld.sc ) * now * ld.dir ) ) * radius * RADIUS;
 					l.position.z = ( Math.cos( ld.pc + ( 0.8 + 0.2 * ld.sc ) * now * ld.dir ) ) * radius * RADIUS;
 					l.position.y = Math.sin( ld.py + ( 0.8 + 0.2 * ld.sy ) * now ) * radius * 32;
@@ -329,7 +330,7 @@
 
 			}
 
-			function resize() {
+			function onWindowResize() {
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -351,16 +352,16 @@
 
 			scene.onAfterRender = postEffect;
 
-			var loader = new OBJLoader();
+			const loader = new OBJLoader();
 
 			loader.load( 'models/obj/walt/WaltHead.obj', function ( object ) {
 
-				var geometry = object.children[ 0 ].geometry;
+				const geometry = object.children[ 0 ].geometry;
 
-				window.addEventListener( 'resize', resize );
+				window.addEventListener( 'resize', onWindowResize );
 
 				init( geometry );
-				resize();
+				onWindowResize();
 
 				renderer.setAnimationLoop( function ( time ) {
 

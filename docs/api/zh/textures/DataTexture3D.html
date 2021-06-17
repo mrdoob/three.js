@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -37,6 +36,14 @@
 
 		<p>
 		共有属性请参见其基类[page:Texture Texture]。
+		</p>
+
+		<h3>[property:number wrapR]</h3>
+		<p>
+		This defines how the texture is wrapped in the depth direction.<br />
+		The default is [page:Textures THREE.ClampToEdgeWrapping], where the edge is clamped to the outer edge texels.
+		The other two choices are [page:Textures THREE.RepeatWrapping] and [page:Textures THREE.MirroredRepeatWrapping].
+		See the [page:Textures texture constants] page for details.
 		</p>
 
 		<h2>方法</h2>

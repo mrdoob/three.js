@@ -10,7 +10,7 @@ varying vec3 vViewPosition;
 
 struct ToonMaterial {
 
-	vec3	diffuseColor;
+	vec3 diffuseColor;
 
 };
 

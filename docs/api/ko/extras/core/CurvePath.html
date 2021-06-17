@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Curve] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		[page:Curve]를 확장하는 추상 기본 클래스입니다. A CurvePath는 단순히 연결된 곡선의 배열이지만, curve의 api를 유지하고 있습니다.
+		</p>
+
+		<h2>생성자</h2>
+
+		<h3>[name]()</h3>
+		<p>
+		생성자에서는 파라미터를 받지 않습니다.
+		</p>
+
+		<h2>프로퍼티</h2>
+		<p>일빈 프로퍼티는 기본 [page:Curve] 클래스를 참고하세요.</p>
+
+		<h3>[property:Array curves]</h3>
+		<p>[page:Curve Curves]의 배열입니다.</p>
+
+		<h3>[property:Boolean autoClose]</h3>
+		<p>path를 자동으로 닫을지 말지를 결정합니다.</p>
+
+		<h2>메서드</h2>
+		<p>일빈 프로퍼티는 기본 [page:Curve] 클래스를 참고하세요.</p>
+
+		<h3>[method:null add]( [param:Curve curve] )</h3>
+		<p>[page:.curves] 배열에 곡선을 추가합니다.</p>
+
+		<h3>[method:null closePath]()</h3>
+		<p>path를 닫기위해 [page:LineCurve lineCurve]를 추가합니다.</p>
+
+		<h3>[method:Array getCurveLengths]()</h3>
+		<p>[page:.curves] 배열에 있는 곡선들의 누적 곡선 길이 목록을 가져옵니다.</p>
+
+		<h3>[method:Vector getPoint]( [param:Float t] )</h3>
+		<p>
+			[page:Float t] - 곡선의 위치입니다. [ 0, 1 ]범위 안에 있어야 합니다. <br><br />
+
+			곡선 path에 있는 위치 벡터를 리턴합니다.
+		</p>
+
+		<h3>[method:Array getPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions -- 곡선을 나눌 조각 수입니다. 기본값은 *12*입니다.<br /><br />
+
+			곡선 시퀀스를 나타내는 점 배열을 반환합니다. 
+			*divisions* 파라미터는 각 곡선이 분할되는 조각 수를 정의합니다. 
+			하지만 최적화 및 품질 목적을 위해 각 곡선의 실제 표본 해상도는 유형에 따라 달라집니다. 
+			예를 들어 [page:LineCurve]의 경우, 반환되는 점 수는 항상 2개입니다.
+		</p>
+
+		<h3>[method:Array getSpacedPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions -- 곡선을 나눌 조각 수입니다. 기본값은 *40*입니다.<br /><br />
+
+			getPointAt( u )를 사용하는 divisions + 1 의 균등하게 분할된 점을 리턴합니다.
+		</p>
+
+		<h2>소스코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,7 +1,12 @@
-// r118.3
+// r129
+
+const cacheName = 'threejs-editor';
 
 const assets = [
 	'./',
+
+	'./manifest.json',
+	'./images/icon.png',
 
 	'../files/favicon.ico',
 
@@ -10,8 +15,7 @@ const assets = [
 	'../examples/jsm/controls/TransformControls.js',
 
 	'../examples/jsm/libs/chevrotain.module.min.js',
-	'../examples/jsm/libs/inflate.module.min.js',
-	'../examples/jsm/libs/jszip.module.min.js',
+	'../examples/jsm/libs/fflate.module.js',
 
 	'../examples/js/libs/draco/draco_decoder.js',
 	'../examples/js/libs/draco/draco_decoder.wasm',
@@ -22,6 +26,12 @@ const assets = [
 	'../examples/js/libs/draco/gltf/draco_decoder.wasm',
 	'../examples/js/libs/draco/gltf/draco_wasm_wrapper.js',
 
+	'../examples/jsm/libs/motion-controllers.module.js',
+
+	'../examples/jsm/libs/rhino3dm/rhino3dm.wasm',
+	'../examples/jsm/libs/rhino3dm/rhino3dm.js',
+
+	'../examples/jsm/loaders/3DMLoader.js',
 	'../examples/jsm/loaders/3MFLoader.js',
 	'../examples/jsm/loaders/AMFLoader.js',
 	'../examples/jsm/loaders/ColladaLoader.js',
@@ -29,6 +39,9 @@ const assets = [
 	'../examples/jsm/loaders/FBXLoader.js',
 	'../examples/jsm/loaders/GLTFLoader.js',
 	'../examples/jsm/loaders/KMZLoader.js',
+	'../examples/jsm/loaders/IFCLoader.js',
+	'../examples/jsm/loaders/ifc/web-ifc-api.js',
+	'../examples/jsm/loaders/ifc/web-ifc.wasm',
 	'../examples/jsm/loaders/MD2Loader.js',
 	'../examples/jsm/loaders/OBJLoader.js',
 	'../examples/jsm/loaders/MTLLoader.js',
@@ -38,11 +51,18 @@ const assets = [
 	'../examples/jsm/loaders/SVGLoader.js',
 	'../examples/jsm/loaders/TGALoader.js',
 	'../examples/jsm/loaders/TDSLoader.js',
+	'../examples/jsm/loaders/VOXLoader.js',
 	'../examples/jsm/loaders/VRMLLoader.js',
 	'../examples/jsm/loaders/VTKLoader.js',
+	'../examples/jsm/loaders/XYZLoader.js',
 
 	'../examples/jsm/curves/NURBSCurve.js',
 	'../examples/jsm/curves/NURBSUtils.js',
+
+	'../examples/jsm/interactive/HTMLMesh.js',
+	'../examples/jsm/interactive/InteractiveGroup.js',
+
+	'../examples/jsm/environments/RoomEnvironment.js',
 
 	'../examples/jsm/exporters/ColladaExporter.js',
 	'../examples/jsm/exporters/DRACOExporter.js',
@@ -50,15 +70,15 @@ const assets = [
 	'../examples/jsm/exporters/OBJExporter.js',
 	'../examples/jsm/exporters/PLYExporter.js',
 	'../examples/jsm/exporters/STLExporter.js',
+	'../examples/jsm/exporters/USDZExporter.js',
 
 	'../examples/jsm/helpers/VertexNormalsHelper.js',
 
-	'../examples/jsm/geometries/TeapotBufferGeometry.js',
+	'../examples/jsm/geometries/TeapotGeometry.js',
 
 	'../examples/jsm/webxr/VRButton.js',
+	'../examples/jsm/webxr/XRControllerModelFactory.js',
 
-	'./manifest.json',
-	'./images/icon.png',
 	'./images/rotate.svg',
 	'./images/scale.svg',
 	'./images/translate.svg',
@@ -72,7 +92,6 @@ const assets = [
 
 	'./js/libs/esprima.js',
 	'./js/libs/jsonlint.js',
-	'./js/libs/glslprep.min.js',
 
 	'./js/libs/codemirror/addon/dialog.css',
 	'./js/libs/codemirror/addon/show-hint.css',
@@ -120,17 +139,22 @@ const assets = [
 	'./js/Menubar.Play.js',
 	'./js/Menubar.Examples.js',
 	'./js/Menubar.Help.js',
+	'./js/Menubar.View.js',
 	'./js/Menubar.Status.js',
+	'./js/Resizer.js',
 	'./js/Sidebar.js',
 	'./js/Sidebar.Scene.js',
 	'./js/Sidebar.Project.js',
+	'./js/Sidebar.Project.Materials.js',
+	'./js/Sidebar.Project.Renderer.js',
+	'./js/Sidebar.Project.Video.js',
 	'./js/Sidebar.Settings.js',
+	'./js/Sidebar.Settings.History.js',
 	'./js/Sidebar.Settings.Shortcuts.js',
 	'./js/Sidebar.Settings.Viewport.js',
 	'./js/Sidebar.Properties.js',
 	'./js/Sidebar.Object.js',
 	'./js/Sidebar.Geometry.js',
-	'./js/Sidebar.Geometry.Geometry.js',
 	'./js/Sidebar.Geometry.BufferGeometry.js',
 	'./js/Sidebar.Geometry.Modifiers.js',
 	'./js/Sidebar.Geometry.BoxGeometry.js',
@@ -139,6 +163,7 @@ const assets = [
 	'./js/Sidebar.Geometry.DodecahedronGeometry.js',
 	'./js/Sidebar.Geometry.ExtrudeGeometry.js',
 	'./js/Sidebar.Geometry.IcosahedronGeometry.js',
+	'./js/Sidebar.Geometry.LatheGeometry.js',
 	'./js/Sidebar.Geometry.OctahedronGeometry.js',
 	'./js/Sidebar.Geometry.PlaneGeometry.js',
 	'./js/Sidebar.Geometry.RingGeometry.js',
@@ -148,17 +173,17 @@ const assets = [
 	'./js/Sidebar.Geometry.TorusGeometry.js',
 	'./js/Sidebar.Geometry.TorusKnotGeometry.js',
 	'./js/Sidebar.Geometry.TubeGeometry.js',
-	'./js/Sidebar.Geometry.TeapotBufferGeometry.js',
-	'./js/Sidebar.Geometry.LatheGeometry.js',
+	'./js/Sidebar.Geometry.TeapotGeometry.js',
 	'./js/Sidebar.Material.js',
 	'./js/Sidebar.Animation.js',
 	'./js/Sidebar.Script.js',
-	'./js/Sidebar.History.js',
 	'./js/Strings.js',
 	'./js/Toolbar.js',
 	'./js/Viewport.js',
 	'./js/Viewport.Camera.js',
 	'./js/Viewport.Info.js',
+	'./js/Viewport.ViewHelper.js',
+	'./js/Viewport.VR.js',
 
 	'./js/Command.js',
 	'./js/commands/AddObjectCommand.js',
@@ -196,13 +221,13 @@ const assets = [
 
 self.addEventListener( 'install', async function () {
 
-	const cache = await caches.open( 'threejs-editor' );
+	const cache = await caches.open( cacheName );
 
 	assets.forEach( function ( asset ) {
 
 		cache.add( asset ).catch( function () {
 
-			console.error( '[SW] Cound\'t cache:', asset );
+			console.warn( '[SW] Cound\'t cache:', asset );
 
 		} );
 
@@ -213,17 +238,36 @@ self.addEventListener( 'install', async function () {
 self.addEventListener( 'fetch', async function ( event ) {
 
 	const request = event.request;
-	event.respondWith( cacheFirst( request ) );
+	event.respondWith( networkFirst( request ) );
 
 } );
 
+async function networkFirst( request ) {
+
+	return fetch( request ).catch( async function () {
+
+		const cachedResponse = await caches.match( request );
+
+		if ( cachedResponse === undefined ) {
+
+			console.warn( '[SW] Not cached:', request.url );
+
+		}
+
+		return cachedResponse;
+
+	} );
+
+}
+
+/*
 async function cacheFirst( request ) {
 
 	const cachedResponse = await caches.match( request );
 
 	if ( cachedResponse === undefined ) {
 
-		console.error( '[SW] Not cached:', request.url );
+		console.warn( '[SW] Not cached:', request.url );
 		return fetch( request );
 
 	}
@@ -231,3 +275,4 @@ async function cacheFirst( request ) {
 	return cachedResponse;
 
 }
+*/

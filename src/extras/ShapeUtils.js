@@ -1,14 +1,10 @@
-/**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- */
-
 import { Earcut } from './Earcut.js';
 
-const ShapeUtils = {
+class ShapeUtils {
 
 	// calculate area of the contour polygon
 
-	area: function ( contour ) {
+	static area( contour ) {
 
 		const n = contour.length;
 		let a = 0.0;
@@ -21,15 +17,15 @@ const ShapeUtils = {
 
 		return a * 0.5;
 
-	},
+	}
 
-	isClockWise: function ( pts ) {
+	static isClockWise( pts ) {
 
 		return ShapeUtils.area( pts ) < 0;
 
-	},
+	}
 
-	triangulateShape: function ( contour, holes ) {
+	static triangulateShape( contour, holes ) {
 
 		const vertices = []; // flat array of vertices like [ x0,y0, x1,y1, x2,y2, ... ]
 		const holeIndices = []; // array of hole indices
@@ -68,7 +64,7 @@ const ShapeUtils = {
 
 	}
 
-};
+}
 
 function removeDupEndPts( points ) {
 

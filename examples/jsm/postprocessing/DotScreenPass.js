@@ -1,49 +1,42 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 import {
 	ShaderMaterial,
 	UniformsUtils
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
-import { DotScreenShader } from "../shaders/DotScreenShader.js";
+} from '../../../build/three.module.js';
+import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+import { DotScreenShader } from '../shaders/DotScreenShader.js';
 
-var DotScreenPass = function ( center, angle, scale ) {
+class DotScreenPass extends Pass {
 
-	Pass.call( this );
+	constructor( center, angle, scale ) {
 
-	if ( DotScreenShader === undefined )
-		console.error( "DotScreenPass relies on DotScreenShader" );
+		super();
 
-	var shader = DotScreenShader;
+		if ( DotScreenShader === undefined ) console.error( 'THREE.DotScreenPass relies on DotScreenShader' );
 
-	this.uniforms = UniformsUtils.clone( shader.uniforms );
+		var shader = DotScreenShader;
 
-	if ( center !== undefined ) this.uniforms[ "center" ].value.copy( center );
-	if ( angle !== undefined ) this.uniforms[ "angle" ].value = angle;
-	if ( scale !== undefined ) this.uniforms[ "scale" ].value = scale;
+		this.uniforms = UniformsUtils.clone( shader.uniforms );
 
-	this.material = new ShaderMaterial( {
+		if ( center !== undefined ) this.uniforms[ 'center' ].value.copy( center );
+		if ( angle !== undefined ) this.uniforms[ 'angle' ].value = angle;
+		if ( scale !== undefined ) this.uniforms[ 'scale' ].value = scale;
 
-		uniforms: this.uniforms,
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader
+		this.material = new ShaderMaterial( {
 
-	} );
+			uniforms: this.uniforms,
+			vertexShader: shader.vertexShader,
+			fragmentShader: shader.fragmentShader
 
-	this.fsQuad = new Pass.FullScreenQuad( this.material );
+		} );
 
-};
+		this.fsQuad = new FullScreenQuad( this.material );
 
-DotScreenPass.prototype = Object.assign( Object.create( Pass.prototype ), {
+	}
 
-	constructor: DotScreenPass,
+	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
-	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
-
-		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
-		this.uniforms[ "tSize" ].value.set( readBuffer.width, readBuffer.height );
+		this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
+		this.uniforms[ 'tSize' ].value.set( readBuffer.width, readBuffer.height );
 
 		if ( this.renderToScreen ) {
 
@@ -60,6 +53,6 @@ DotScreenPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	}
 
-} );
+}
 
 export { DotScreenPass };

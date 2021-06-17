@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIBreak, UIText } from './libs/ui.js';
 
 function ViewportInfo( editor ) {
@@ -92,7 +88,7 @@ function ViewportInfo( editor ) {
 
 	function updateFrametime( frametime ) {
 
-		frametimeText.setValue( Number( frametime ).toFixed( 2 ) + " ms" );
+		frametimeText.setValue( Number( frametime ).toFixed( 2 ) + ' ms' );
 
 	}
 

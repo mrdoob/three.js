@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function WebGLAttributes( gl, capabilities ) {
 
 	const isWebGL2 = capabilities.isWebGL2;
@@ -32,7 +28,23 @@ function WebGLAttributes( gl, capabilities ) {
 
 		} else if ( array instanceof Uint16Array ) {
 
-			type = gl.UNSIGNED_SHORT;
+			if ( attribute.isFloat16BufferAttribute ) {
+
+				if ( isWebGL2 ) {
+
+					type = gl.HALF_FLOAT;
+
+				} else {
+
+					console.warn( 'THREE.WebGLAttributes: Usage of Float16BufferAttribute requires WebGL2.' );
+
+				}
+
+			} else {
+
+				type = gl.UNSIGNED_SHORT;
+
+			}
 
 		} else if ( array instanceof Int16Array ) {
 
@@ -51,6 +63,10 @@ function WebGLAttributes( gl, capabilities ) {
 			type = gl.BYTE;
 
 		} else if ( array instanceof Uint8Array ) {
+
+			type = gl.UNSIGNED_BYTE;
+
+		} else if ( array instanceof Uint8ClampedArray ) {
 
 			type = gl.UNSIGNED_BYTE;
 
@@ -125,6 +141,25 @@ function WebGLAttributes( gl, capabilities ) {
 	}
 
 	function update( attribute, bufferType ) {
+
+		if ( attribute.isGLBufferAttribute ) {
+
+			const cached = buffers.get( attribute );
+
+			if ( ! cached || cached.version < attribute.version ) {
+
+				buffers.set( attribute, {
+					buffer: attribute.buffer,
+					type: attribute.type,
+					bytesPerElement: attribute.elementSize,
+					version: attribute.version
+				} );
+
+			}
+
+			return;
+
+		}
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 

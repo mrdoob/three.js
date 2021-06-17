@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIRow, UIText, UISpan, UIBreak } from './libs/ui.js';
 
 function SidebarGeometryBufferGeometry( editor ) {

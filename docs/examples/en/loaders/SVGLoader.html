@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -20,7 +19,7 @@
 
 		<code>
 		// instantiate a loader
-		var loader = new SVGLoader();
+		const loader = new SVGLoader();
 
 		// load a SVG resource
 		loader.load(
@@ -29,26 +28,26 @@
 			// called when the resource is loaded
 			function ( data ) {
 
-				var paths = data.paths;
-				var group = new THREE.Group();
+				const paths = data.paths;
+				const group = new THREE.Group();
 
-				for ( var i = 0; i < paths.length; i ++ ) {
+				for ( let i = 0; i < paths.length; i ++ ) {
 
-					var path = paths[ i ];
+					const path = paths[ i ];
 
-					var material = new THREE.MeshBasicMaterial( {
+					const material = new THREE.MeshBasicMaterial( {
 						color: path.color,
 						side: THREE.DoubleSide,
 						depthWrite: false
 					} );
 
-					var shapes = path.toShapes( true );
+					const shapes = SVGLoader.createShapes( path );
 
-					for ( var j = 0; j < shapes.length; j ++ ) {
+					for ( let j = 0; j < shapes.length; j ++ ) {
 
-						var shape = shapes[ j ];
-						var geometry = new THREE.ShapeBufferGeometry( shape );
-						var mesh = new THREE.Mesh( geometry, material );
+						const shape = shapes[ j ];
+						const geometry = new THREE.ShapeGeometry( shape );
+						const mesh = new THREE.Mesh( geometry, material );
 						group.add( mesh );
 
 					}
@@ -103,6 +102,16 @@
 		</p>
 		<p>
 		Begin loading from url and call onLoad with the response content.
+		</p>
+
+		<h2>Static Methods</h2>
+
+		<h3>[method:Array createShapes]( [param:ShapePath shape] )</h3>
+		<p>
+		[page:ShapePath shape] — A ShapePath from the array of [page:ShapePath], given as argument in the onLoad function for the load function of [page:SVGLoader].<br />
+		</p>
+		<p>
+		Returns one or more [page:Shape] objects created from the [param:ShapePath shape] provided as an argument in this function.
 		</p>
 
 		<h2>Source</h2>

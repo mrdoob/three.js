@@ -9,12 +9,6 @@
 			a {
 				color: blue;
 			}
-			.ac {  /* prevent dat-gui from being selected */
-				-webkit-user-select: none;
-				-moz-user-select: none;
-				-ms-user-select: none;
-				user-select: none;
-			}
 			.control-inactive {
 				color: #888;
 			}
@@ -36,12 +30,12 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var scene, renderer, camera, stats;
-			var model, skeleton, mixer, clock;
+			let scene, renderer, camera, stats;
+			let model, skeleton, mixer, clock;
 
-			var crossFadeControls = [];
+			const crossFadeControls = [];
 
-			var currentBaseAction = 'idle';
+			let currentBaseAction = 'idle';
 			const allActions = [];
 			const baseActions = {
 				idle: { weight: 1 },
@@ -54,24 +48,24 @@
 				agree: { weight: 0 },
 				headShake: { weight: 0 }
 			};
-			var panelSettings, numAnimations;
+			let panelSettings, numAnimations;
 
 			init();
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 				clock = new THREE.Clock();
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
 				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 20, 0 );
 				scene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				const dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( 3, 10, 10 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.top = 2;
@@ -84,12 +78,12 @@
 
 				// ground
 
-				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var loader = new GLTFLoader();
+				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/Xbot.glb', function ( gltf ) {
 
 					model = gltf.scene;
@@ -105,7 +99,7 @@
 					skeleton.visible = false;
 					scene.add( skeleton );
 
-					var animations = gltf.animations;
+					const animations = gltf.animations;
 					mixer = new THREE.AnimationMixer( model );
 
 					numAnimations = animations.length;
@@ -160,7 +154,7 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100 );
 				camera.position.set( - 1, 2, 3 );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.enablePan = false;
 				controls.enableZoom = false;
 				controls.target.set( 0, 1, 0 );
@@ -169,17 +163,17 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function createPanel() {
 
-				var panel = new GUI( { width: 310 } );
+				const panel = new GUI( { width: 310 } );
 
-				var folder1 = panel.addFolder( 'Base Actions' );
-				var folder2 = panel.addFolder( 'Additive Action Weights' );
-				var folder3 = panel.addFolder( 'General Speed' );
+				const folder1 = panel.addFolder( 'Base Actions' );
+				const folder2 = panel.addFolder( 'Additive Action Weights' );
+				const folder3 = panel.addFolder( 'General Speed' );
 
 				panelSettings = {
 					'modify time scale': 1.0
@@ -404,7 +398,7 @@
 
 				// Get the time elapsed since the last frame, used for mixer update
 
-				var mixerUpdateDelta = clock.getDelta();
+				const mixerUpdateDelta = clock.getDelta();
 
 				// Update the animation mixer, the stats panel, and render this frame
 

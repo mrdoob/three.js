@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,19 +21,19 @@
 
 		<code>
 		// instantiate a listener
-		var audioListener = new THREE.AudioListener();
+		const audioListener = new THREE.AudioListener();
 
 		// add the listener to the camera
 		camera.add( audioListener );
 
 		// instantiate audio object
-		var oceanAmbientSound = new THREE.Audio( audioListener );
+		const oceanAmbientSound = new THREE.Audio( audioListener );
 
 		// add the audio object to the scene
 		scene.add( oceanAmbientSound );
 
 		// instantiate a loader
-		var loader = new THREE.AudioLoader();
+		const loader = new THREE.AudioLoader();
 
 		// load a resource
 		loader.load(

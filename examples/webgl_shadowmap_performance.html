@@ -10,7 +10,7 @@
 	<body>
 
 		<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shadowmap - models by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a><br />
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shadowmap - models by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="http://www.ro.me" target="_blank" rel="noopener">rome</a><br />
 		move camera with WASD / RF + mouse
 		</div>
 
@@ -23,24 +23,24 @@
 			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
+			const SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
-			var FLOOR = - 250;
+			let SCREEN_WIDTH = window.innerWidth;
+			let SCREEN_HEIGHT = window.innerHeight;
+			const FLOOR = - 250;
 
-			var ANIMATION_GROUPS = 25;
+			const ANIMATION_GROUPS = 25;
 
-			var camera, controls, scene, renderer;
-			var container, stats;
+			let camera, controls, scene, renderer;
+			let stats;
 
-			var NEAR = 5, FAR = 3000;
+			const NEAR = 5, FAR = 3000;
 
-			var morph, morphs = [], mixer, animGroups = [];
+			let morph, mixer;
 
-			var light;
+			const morphs = [], animGroups = [];
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -48,7 +48,7 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				// CAMERA
@@ -64,10 +64,10 @@
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x444444 );
+				const ambient = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambient );
 
-				light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 5, 0.3 );
+				const light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 5, 0.3 );
 				light.position.set( 0, 1500, 1000 );
 				light.target.position.set( 0, 0, 0 );
 
@@ -116,7 +116,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -138,10 +138,10 @@
 
 				// GROUND
 
-				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffb851 } );
+				const geometry = new THREE.PlaneGeometry( 100, 100 );
+				const planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffb851 } );
 
-				var ground = new THREE.Mesh( geometry, planeMaterial );
+				const ground = new THREE.Mesh( geometry, planeMaterial );
 
 				ground.position.set( 0, FLOOR, 0 );
 				ground.rotation.x = - Math.PI / 2;
@@ -154,10 +154,10 @@
 
 				// TEXT
 
-				var loader = new THREE.FontLoader();
+				const loader = new THREE.FontLoader();
 				loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
-					var textGeo = new THREE.TextBufferGeometry( "THREE.JS", {
+					const textGeo = new THREE.TextGeometry( "THREE.JS", {
 
 						font: font,
 
@@ -172,11 +172,11 @@
 					} );
 
 					textGeo.computeBoundingBox();
-					var centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+					const centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
-					var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
+					const textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
 
-					var mesh = new THREE.Mesh( textGeo, textMaterial );
+					const mesh = new THREE.Mesh( textGeo, textMaterial );
 					mesh.position.x = centerOffset;
 					mesh.position.y = FLOOR + 67;
 
@@ -189,31 +189,31 @@
 
 				// CUBES
 
-				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1500, 220, 150 ), planeMaterial );
+				const cubes1 = new THREE.Mesh( new THREE.BoxGeometry( 1500, 220, 150 ), planeMaterial );
 
-				mesh.position.y = FLOOR - 50;
-				mesh.position.z = 20;
+				cubes1.position.y = FLOOR - 50;
+				cubes1.position.z = 20;
 
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
+				cubes1.castShadow = true;
+				cubes1.receiveShadow = true;
 
-				scene.add( mesh );
+				scene.add( cubes1 );
 
-				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1600, 170, 250 ), planeMaterial );
+				const cubes2 = new THREE.Mesh( new THREE.BoxGeometry( 1600, 170, 250 ), planeMaterial );
 
-				mesh.position.y = FLOOR - 50;
-				mesh.position.z = 20;
+				cubes2.position.y = FLOOR - 50;
+				cubes2.position.z = 20;
 
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
+				cubes2.castShadow = true;
+				cubes2.receiveShadow = true;
 
-				scene.add( mesh );
+				scene.add( cubes2 );
 
 				mixer = new THREE.AnimationMixer( scene );
 
-				for ( var i = 0; i !== ANIMATION_GROUPS; ++ i ) {
+				for ( let i = 0; i !== ANIMATION_GROUPS; ++ i ) {
 
-					var group = new THREE.AnimationObjectGroup();
+					const group = new THREE.AnimationObjectGroup();
 					animGroups.push( group );
 
 				}
@@ -235,15 +235,15 @@
 
 					if ( massOptimization ) {
 
-						var index = Math.floor( Math.random() * ANIMATION_GROUPS ),
+						const index = Math.floor( Math.random() * ANIMATION_GROUPS ),
 							animGroup = animGroups[ index ];
 
 						animGroup.add( mesh );
 
 						if ( ! mixer.existingAction( clip, animGroup ) ) {
 
-							var randomness = 0.6 * Math.random() - 0.3;
-							var phase = ( index + randomness ) / ANIMATION_GROUPS;
+							const randomness = 0.6 * Math.random() - 0.3;
+							const phase = ( index + randomness ) / ANIMATION_GROUPS;
 
 							mixer.clipAction( clip, animGroup ).
 								setDuration( duration ).
@@ -273,14 +273,13 @@
 
 				}
 
-				var loader = new GLTFLoader();
+				const gltfLoader = new GLTFLoader();
+				gltfLoader.load( "models/gltf/Horse.glb", function ( gltf ) {
 
-				loader.load( "models/gltf/Horse.glb", function ( gltf ) {
+					const mesh = gltf.scene.children[ 0 ];
+					const clip = gltf.animations[ 0 ];
 
-					var mesh = gltf.scene.children[ 0 ];
-					var clip = gltf.animations[ 0 ];
-
-					for ( var i = - 600; i < 601; i += 2 ) {
+					for ( let i = - 600; i < 601; i += 2 ) {
 
 						addMorph( mesh, clip, 550, 1, 100 - Math.random() * 3000, FLOOR, i, true, true );
 
@@ -304,11 +303,11 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 
-				for ( var i = 0; i < morphs.length; i ++ ) {
+				for ( let i = 0; i < morphs.length; i ++ ) {
 
 					morph = morphs[ i ];
 

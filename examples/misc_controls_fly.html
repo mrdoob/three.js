@@ -38,28 +38,29 @@
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
 
-			var radius = 6371;
-			var tilt = 0.41;
-			var rotationSpeed = 0.02;
+			const radius = 6371;
+			const tilt = 0.41;
+			const rotationSpeed = 0.02;
 
-			var cloudsScale = 1.005;
-			var moonScale = 0.23;
+			const cloudsScale = 1.005;
+			const moonScale = 0.23;
 
-			var MARGIN = 0;
-			var SCREEN_HEIGHT = window.innerHeight - MARGIN * 2;
-			var SCREEN_WIDTH = window.innerWidth;
+			const MARGIN = 0;
+			let SCREEN_HEIGHT = window.innerHeight - MARGIN * 2;
+			let SCREEN_WIDTH = window.innerWidth;
 
-			var camera, controls, scene, renderer, stats;
-			var geometry, meshPlanet, meshClouds, meshMoon;
-			var dirLight;
+			let camera, controls, scene, renderer, stats;
+			let geometry, meshPlanet, meshClouds, meshMoon;
+			let dirLight;
 
-			var composer;
+			let composer;
 
-			var textureLoader = new THREE.TextureLoader();
+			const textureLoader = new THREE.TextureLoader();
 
-			var d, dPlanet, dMoon, dMoonVec = new THREE.Vector3();
+			let d, dPlanet, dMoon;
+			const dMoonVec = new THREE.Vector3();
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -76,7 +77,7 @@
 				dirLight.position.set( - 1, 0, 1 ).normalize();
 				scene.add( dirLight );
 
-				var materialNormalMap = new THREE.MeshPhongMaterial( {
+				const materialNormalMap = new THREE.MeshPhongMaterial( {
 
 					specular: 0x333333,
 					shininess: 15,
@@ -85,13 +86,13 @@
 					normalMap: textureLoader.load( "textures/planets/earth_normal_2048.jpg" ),
 
 					// y scale is negated to compensate for normal map handedness.
-					normalScale: new THREE.Vector2( 0.85, -0.85 )
+					normalScale: new THREE.Vector2( 0.85, - 0.85 )
 
 				} );
 
 				// planet
 
-				geometry = new THREE.SphereBufferGeometry( radius, 100, 50 );
+				geometry = new THREE.SphereGeometry( radius, 100, 50 );
 
 				meshPlanet = new THREE.Mesh( geometry, materialNormalMap );
 				meshPlanet.rotation.y = 0;
@@ -100,7 +101,7 @@
 
 				// clouds
 
-				var materialClouds = new THREE.MeshLambertMaterial( {
+				const materialClouds = new THREE.MeshLambertMaterial( {
 
 					map: textureLoader.load( "textures/planets/earth_clouds_1024.png" ),
 					transparent: true
@@ -114,7 +115,7 @@
 
 				// moon
 
-				var materialMoon = new THREE.MeshPhongMaterial( {
+				const materialMoon = new THREE.MeshPhongMaterial( {
 
 					map: textureLoader.load( "textures/planets/moon_1024.jpg" )
 
@@ -127,14 +128,14 @@
 
 				// stars
 
-				var i, r = radius, starsGeometry = [ new THREE.BufferGeometry(), new THREE.BufferGeometry() ];
+				const r = radius, starsGeometry = [ new THREE.BufferGeometry(), new THREE.BufferGeometry() ];
 
-				var vertices1 = [];
-				var vertices2 = [];
+				const vertices1 = [];
+				const vertices2 = [];
 
-				var vertex = new THREE.Vector3();
+				const vertex = new THREE.Vector3();
 
-				for ( i = 0; i < 250; i ++ ) {
+				for ( let i = 0; i < 250; i ++ ) {
 
 					vertex.x = Math.random() * 2 - 1;
 					vertex.y = Math.random() * 2 - 1;
@@ -145,7 +146,7 @@
 
 				}
 
-				for ( i = 0; i < 1500; i ++ ) {
+				for ( let i = 0; i < 1500; i ++ ) {
 
 					vertex.x = Math.random() * 2 - 1;
 					vertex.y = Math.random() * 2 - 1;
@@ -159,8 +160,7 @@
 				starsGeometry[ 0 ].setAttribute( 'position', new THREE.Float32BufferAttribute( vertices1, 3 ) );
 				starsGeometry[ 1 ].setAttribute( 'position', new THREE.Float32BufferAttribute( vertices2, 3 ) );
 
-				var stars;
-				var starsMaterials = [
+				const starsMaterials = [
 					new THREE.PointsMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
 					new THREE.PointsMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
 					new THREE.PointsMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
@@ -169,9 +169,9 @@
 					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
 				];
 
-				for ( i = 10; i < 30; i ++ ) {
+				for ( let i = 10; i < 30; i ++ ) {
 
-					stars = new THREE.Points( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
+					const stars = new THREE.Points( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
 
 					stars.rotation.x = Math.random() * 6;
 					stars.rotation.y = Math.random() * 6;
@@ -205,12 +205,12 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// postprocessing
 
-				var renderModel = new RenderPass( scene, camera );
-				var effectFilm = new FilmPass( 0.35, 0.75, 2048, false );
+				const renderModel = new RenderPass( scene, camera );
+				const effectFilm = new FilmPass( 0.35, 0.75, 2048, false );
 
 				composer = new EffectComposer( renderer );
 
@@ -245,7 +245,7 @@
 
 				// rotate the planet and clouds
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				meshPlanet.rotation.y += rotationSpeed * delta;
 				meshClouds.rotation.y += 1.25 * rotationSpeed * delta;

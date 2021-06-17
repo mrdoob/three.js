@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,28 +21,28 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var material = new THREE.LineBasicMaterial({
+		const material = new THREE.LineBasicMaterial({
 			color: 0x0000ff
 		});
 
-		var points = [];
+		const points = [];
 		points.push( new THREE.Vector3( - 10, 0, 0 ) );
 		points.push( new THREE.Vector3( 0, 10, 0 ) );
 		points.push( new THREE.Vector3( 10, 0, 0 ) );
 
-		var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-		var line = new THREE.Line( geometry, material );
+		const line = new THREE.Line( geometry, material );
 		scene.add( line );
 		</code>
 
 
 		<h2>构造器</h2>
 
-		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
 
 		<p>
-		[page:Geometry geometry] —— 表示线段的顶点，默认值是一个新的[page:BufferGeometry]。<br />
+		[page:BufferGeometry geometry] —— 表示线段的顶点，默认值是一个新的[page:BufferGeometry]。<br />
 		[page:Material material] —— 线的材质，默认值是一个新的具有随机颜色的[page:LineBasicMaterial]。<br />
 		</p>
 
@@ -51,7 +50,7 @@
 		<p>共有属性请参见其基类[page:Object3D]。</p>
 
 
-		<h3>[property:Geometry geometry]</h3>
+		<h3>[property:BufferGeometry geometry]</h3>
 		<p>表示线段的顶点。</p>
 
 		<h3>[property:Material material]</h3>

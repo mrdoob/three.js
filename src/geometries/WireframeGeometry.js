@@ -1,75 +1,30 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector3 } from '../math/Vector3.js';
 
-function WireframeGeometry( geometry ) {
+class WireframeGeometry extends BufferGeometry {
 
-	BufferGeometry.call( this );
+	constructor( geometry ) {
 
-	this.type = 'WireframeGeometry';
+		super();
+		this.type = 'WireframeGeometry';
 
-	// buffer
+		if ( geometry.isGeometry === true ) {
 
-	const vertices = [];
-
-	// helper variables
-
-	const edge = [ 0, 0 ], edges = {};
-	const keys = [ 'a', 'b', 'c' ];
-
-	// different logic for Geometry and BufferGeometry
-
-	if ( geometry && geometry.isGeometry ) {
-
-		// create a data structure that contains all edges without duplicates
-
-		const faces = geometry.faces;
-
-		for ( let i = 0, l = faces.length; i < l; i ++ ) {
-
-			const face = faces[ i ];
-
-			for ( let j = 0; j < 3; j ++ ) {
-
-				const edge1 = face[ keys[ j ] ];
-				const edge2 = face[ keys[ ( j + 1 ) % 3 ] ];
-				edge[ 0 ] = Math.min( edge1, edge2 ); // sorting prevents duplicates
-				edge[ 1 ] = Math.max( edge1, edge2 );
-
-				const key = edge[ 0 ] + ',' + edge[ 1 ];
-
-				if ( edges[ key ] === undefined ) {
-
-					edges[ key ] = { index1: edge[ 0 ], index2: edge[ 1 ] };
-
-				}
-
-			}
+			console.error( 'THREE.WireframeGeometry no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
+			return;
 
 		}
 
-		// generate vertices
+		// buffer
 
-		for ( const key in edges ) {
+		const vertices = [];
 
-			const e = edges[ key ];
+		// helper variables
 
-			let vertex = geometry.vertices[ e.index1 ];
-			vertices.push( vertex.x, vertex.y, vertex.z );
+		const edge = [ 0, 0 ], edges = {};
 
-			vertex = geometry.vertices[ e.index2 ];
-			vertices.push( vertex.x, vertex.y, vertex.z );
-
-		}
-
-	} else if ( geometry && geometry.isBufferGeometry ) {
-
-		let vertex = new Vector3();
+		const vertex = new Vector3();
 
 		if ( geometry.index !== null ) {
 
@@ -158,16 +113,13 @@ function WireframeGeometry( geometry ) {
 
 		}
 
+		// build geometry
+
+		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+
 	}
 
-	// build geometry
-
-	this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-
 }
-
-WireframeGeometry.prototype = Object.create( BufferGeometry.prototype );
-WireframeGeometry.prototype.constructor = WireframeGeometry;
 
 
 export { WireframeGeometry };

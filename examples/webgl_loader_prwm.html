@@ -35,15 +35,12 @@
 
 			import { PRWMLoader } from './jsm/loaders/PRWMLoader.js';
 
-			var container;
+			let camera, scene, renderer;
 
-			var camera, scene, renderer;
+			let mouseX = 0, mouseY = 0;
 
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -52,7 +49,7 @@
 			function init() {
 
 				document.getElementById( 'endianness' ).innerHTML = PRWMLoader.isBigEndianPlatform() ? 'big-endian' : 'little-endian';
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -62,25 +59,25 @@
 
 				scene = new THREE.Scene();
 
-				var ambient = new THREE.AmbientLight( 0x101030 );
+				const ambient = new THREE.AmbientLight( 0x101030 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+				const directionalLight = new THREE.DirectionalLight( 0xffeedd );
 				directionalLight.position.set( 0, 0, 1 );
 				scene.add( directionalLight );
 
 				// model
 
-				var loader = new PRWMLoader();
-				var material = new THREE.MeshPhongMaterial( {} );
-				var busy = false;
-				var mesh = null;
+				const loader = new PRWMLoader();
+				const material = new THREE.MeshPhongMaterial( {} );
+				let busy = false;
+				let mesh = null;
 
-				var onProgress = function ( xhr ) {
+				const onProgress = function ( xhr ) {
 
 					if ( xhr.lengthComputable ) {
 
-						var percentComplete = xhr.loaded / xhr.total * 100;
+						const percentComplete = xhr.loaded / xhr.total * 100;
 						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
 
 						if ( xhr.loaded === xhr.total ) {
@@ -94,7 +91,7 @@
 
 				};
 
-				var onError = function () {
+				const onError = function () {
 
 					busy = false;
 
@@ -138,7 +135,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 				//
 
@@ -159,7 +156,7 @@
 				// * is automatically replaced by 'le' or 'be' depending on the client platform's endianness
 				loadGeometry( './models/prwm/smooth-suzanne.*.prwm' );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -19,39 +19,39 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
+			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
-			var camera, scene, renderer;
-			var cameraControls;
-			var effectController;
-			var teapotSize = 400;
-			var ambientLight, light;
+			let camera, scene, renderer;
+			let cameraControls;
+			let effectController;
+			const teapotSize = 400;
+			let ambientLight, light;
 
-			var tess = - 1;	// force initialization
-			var bBottom;
-			var bLid;
-			var bBody;
-			var bFitLid;
-			var bNonBlinn;
-			var shading;
-			var wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, reflectiveMaterial;
+			let tess = - 1;	// force initialization
+			let bBottom;
+			let bLid;
+			let bBody;
+			let bFitLid;
+			let bNonBlinn;
+			let shading;
+			let wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, reflectiveMaterial;
 
-			var teapot, textureCube;
+			let teapot, textureCube;
 
 			// allocate these just once
-			var diffuseColor = new THREE.Color();
-			var specularColor = new THREE.Color();
+			const diffuseColor = new THREE.Color();
+			const specularColor = new THREE.Color();
 
 			init();
 			render();
 
 			function init() {
 
-				var container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var canvasWidth = window.innerWidth;
-				var canvasHeight = window.innerHeight;
+				const canvasWidth = window.innerWidth;
+				const canvasHeight = window.innerHeight;
 
 				// CAMERA
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 80000 );
@@ -71,21 +71,21 @@
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// CONTROLS
 				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
-				var textureMap = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
+				const textureMap = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
 				textureMap.encoding = THREE.sRGBEncoding;
 
 				// REFLECTION MAP
-				var path = "textures/cube/pisa/";
-				var urls = [
+				const path = "textures/cube/pisa/";
+				const urls = [
 					path + "px.png", path + "nx.png",
 					path + "py.png", path + "ny.png",
 					path + "pz.png", path + "nz.png"
@@ -95,7 +95,7 @@
 				textureCube.encoding = THREE.sRGBEncoding;
 
 				// MATERIALS
-				var materialColor = new THREE.Color();
+				const materialColor = new THREE.Color();
 				materialColor.setRGB( 1.0, 1.0, 1.0 );
 
 				wireMaterial = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe: true } );
@@ -126,8 +126,8 @@
 
 			function onWindowResize() {
 
-				var canvasWidth = window.innerWidth;
-				var canvasHeight = window.innerHeight;
+				const canvasWidth = window.innerWidth;
+				const canvasHeight = window.innerHeight;
 
 				renderer.setSize( canvasWidth, canvasHeight );
 
@@ -170,9 +170,9 @@
 					newShading: "glossy"
 				};
 
-				var h;
+				let h;
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				// material (attributes)
 
@@ -306,7 +306,7 @@
 
 				}
 
-				var teapotGeometry = new TeapotBufferGeometry( teapotSize,
+				const teapotGeometry = new TeapotGeometry( teapotSize,
 					tess,
 					effectController.bottom,
 					effectController.lid,

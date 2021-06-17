@@ -1,14 +1,8 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author szimek / https://github.com/szimek/
- */
-
 let _canvas;
 
-const ImageUtils = {
+class ImageUtils {
 
-	getDataURL: function ( image ) {
+	static getDataURL( image ) {
 
 		if ( /^data:/i.test( image.src ) ) {
 
@@ -53,6 +47,8 @@ const ImageUtils = {
 
 		if ( canvas.width > 2048 || canvas.height > 2048 ) {
 
+			console.warn( 'THREE.ImageUtils.getDataURL: Image converted to jpg for performance reasons', image );
+
 			return canvas.toDataURL( 'image/jpeg', 0.6 );
 
 		} else {
@@ -63,6 +59,6 @@ const ImageUtils = {
 
 	}
 
-};
+}
 
 export { ImageUtils };

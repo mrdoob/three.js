@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -20,10 +19,10 @@
 
 		<code>
 		// instantiate a loader
-		var loader = new TGALoader();
+		const loader = new TGALoader();
 
 		// load a resource
-		var texture = loader.load(
+		const texture = loader.load(
 			// resource URL
 			'textures/crate_grey8.tga'
 			// called when loading is completed
@@ -38,7 +37,7 @@
 				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
 			},
-			// called when the loading failes
+			// called when the loading fails
 			function ( error ) {
 
 				console.log( 'An error happened' );
@@ -46,7 +45,7 @@
 			}
 		);
 
-		var material = new THREE.MeshPhongMaterial( {
+		const material = new THREE.MeshPhongMaterial( {
 			color: 0xffffff,
 			map: texture
 		} );

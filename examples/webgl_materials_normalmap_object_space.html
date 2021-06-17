@@ -22,7 +22,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var renderer, scene, camera;
+			let renderer, scene, camera;
 
 			init();
 
@@ -44,7 +44,7 @@
 				scene.add( camera );
 
 				// controls
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 10;
 				controls.maxDistance = 50;
@@ -54,7 +54,7 @@
 				scene.add( new THREE.AmbientLight( 0xffffff, .2 ) );
 
 				// light
-				var light = new THREE.PointLight( 0xffffff, 1.5 );
+				const light = new THREE.PointLight( 0xffffff, 1.5 );
 				camera.add( light );
 
 				// model
@@ -94,7 +94,7 @@
 				} );
 
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

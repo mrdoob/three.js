@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -15,12 +14,12 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var gl = renderer.getContext();
+		const gl = renderer.getContext();
 
-		var glVertexShader = new THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexSourceCode );
-		var glFragmentShader = new THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentSourceCode );
+		const glVertexShader = new THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexSourceCode );
+		const glFragmentShader = new THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentSourceCode );
 
-		var program = gl.createProgram();
+		const program = gl.createProgram();
 
 		gl.attachShader( program, glVertexShader );
 		gl.attachShader( program, glFragmentShader );

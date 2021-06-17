@@ -55,23 +55,23 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var scene, camera, renderer, analyser, uniforms;
+			let scene, camera, renderer, analyser, uniforms;
 
-			var startButton = document.getElementById( 'startButton' );
+			const startButton = document.getElementById( 'startButton' );
 			startButton.addEventListener( 'click', init );
 
 			function init() {
 
-				var fftSize = 128;
+				const fftSize = 128;
 
 				//
 
-				var overlay = document.getElementById( 'overlay' );
+				const overlay = document.getElementById( 'overlay' );
 				overlay.remove();
 
 				//
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -85,14 +85,14 @@
 
 				//
 
-				var listener = new THREE.AudioListener();
+				const listener = new THREE.AudioListener();
 
-				var audio = new THREE.Audio( listener );
-				var file = './sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3';
+				const audio = new THREE.Audio( listener );
+				const file = './sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3';
 
 				if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-					var loader = new THREE.AudioLoader();
+					const loader = new THREE.AudioLoader();
 					loader.load( file, function ( buffer ) {
 
 						audio.setBuffer( buffer );
@@ -102,7 +102,7 @@
 
 				} else {
 
-					var mediaElement = new Audio( file );
+					const mediaElement = new Audio( file );
 					mediaElement.play();
 
 					audio.setMediaElementSource( mediaElement );
@@ -113,13 +113,15 @@
 
 				//
 
+				const format = ( renderer.capabilities.isWebGL2 ) ? THREE.RedFormat : THREE.LuminanceFormat;
+
 				uniforms = {
 
-					tAudioData: { value: new THREE.DataTexture( analyser.data, fftSize / 2, 1, THREE.LuminanceFormat ) }
+					tAudioData: { value: new THREE.DataTexture( analyser.data, fftSize / 2, 1, format ) }
 
 				};
 
-				var material = new THREE.ShaderMaterial( {
+				const material = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -127,20 +129,20 @@
 
 				} );
 
-				var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
+				const geometry = new THREE.PlaneGeometry( 1, 1 );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				//
 
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				animate();
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

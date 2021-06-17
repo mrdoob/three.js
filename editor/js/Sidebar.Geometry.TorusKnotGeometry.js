@@ -1,14 +1,10 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-function SidebarGeometryTorusKnotGeometry( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -82,7 +78,7 @@ function SidebarGeometryTorusKnotGeometry( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.TorusKnotBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.TorusKnotGeometry(
 			radius.getValue(),
 			tube.getValue(),
 			tubularSegments.getValue(),
@@ -97,4 +93,4 @@ function SidebarGeometryTorusKnotGeometry( editor, object ) {
 
 }
 
-export { SidebarGeometryTorusKnotGeometry };
+export { GeometryParametersPanel };

@@ -3,20 +3,19 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr; [page:ExtrudeGeometry] &rarr;
+		[page:BufferGeometry] &rarr; [page:ExtrudeGeometry] &rarr;
 
-		<h1>文本几何体（[name]）</h1>
+		<h1>文本缓冲几何体（[name]）</h1>
 
 		<p class="desc">
-			一个用于将文本生成为单一的几何体的类。
-			它是由一串给定的文本，以及由加载的[page:Font]（字体）和该几何体[page:ExtrudeGeometry]父类中的设置所组成的参数来构造的。
-			请参阅[page:Font]、[page:FontLoader]和[page:Creating_Text]页面来查看更多详细信息。
-		</p>
+				一个用于将文本生成为单一的几何体的类。
+				它是由一串给定的文本，以及由加载的[page:Font]（字体）和该几何体[page:ExtrudeGeometry]父类中的设置所组成的参数来构造的。
+				请参阅[page:Font]、[page:FontLoader]和[page:Creating_Text]页面来查看更多详细信息。
+			</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#TextGeometry"></iframe>
 
@@ -26,7 +25,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -39,11 +38,11 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var loader = new THREE.FontLoader();
+		const loader = new THREE.FontLoader();
 
 		loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
-			var geometry = new THREE.TextGeometry( 'Hello three.js!', {
+			const geometry = new THREE.TextGeometry( 'Hello three.js!', {
 				font: font,
 				size: 80,
 				height: 5,
@@ -83,16 +82,16 @@
 		<h2>可用的字体</h2>
 
 		<p>
-			文本几何体使用 <a href='http://gero3.github.io/facetype.js/' target="_top">typeface.json</a>所生成的字体。
-			一些已有的字体可以在<b>/examples/fonts</b>中找到，且必须在页面中引入。
-		</p>
+				文本几何体使用 <a href='http://gero3.github.io/facetype.js/' target="_top">typeface.json</a>所生成的字体。
+				一些已有的字体可以在<b>/examples/fonts</b>中找到，且必须在页面中引入。
+			</p>
 		<table>
-			<tr>
-				<th>字体</th>
-				<th>字重</th>
-				<th>风格</th>
-				<th>文件路径</th>
-			</tr>
+				<tr>
+						<th>字体</th>
+						<th>字重</th>
+						<th>风格</th>
+						<th>文件路径</th>
+					</tr>
 			<tr>
 				<td>helvetiker</td>
 				<td>normal</td>

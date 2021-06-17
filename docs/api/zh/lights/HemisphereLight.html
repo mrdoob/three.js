@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -13,7 +12,7 @@
 		<h1>半球光（[name]）</h1>
 
 		<p class="desc">
-			光源直接放置于场景之上，光照颜色从天空光线颜色颜色渐变到地面光线颜色。
+			光源直接放置于场景之上，光照颜色从天空光线颜色渐变到地面光线颜色。
 			<br /><br />
 
 			半球光不能投射阴影。
@@ -22,7 +21,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+		const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
 		scene.add( light );
 		</code>
 

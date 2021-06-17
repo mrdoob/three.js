@@ -37,7 +37,7 @@
 		"geometries": [
 			{
 				"uuid": "490CEBA3-6A25-4BE1-B517-C5FB11A5D18A",
-				"type": "PlaneBufferGeometry",
+				"type": "PlaneGeometry",
 				"width": 6,
 				"height": 4,
 				"widthSegments": 1,
@@ -45,7 +45,7 @@
 			},
 			{
 				"uuid": "D9A92F2D-2F08-4851-99C7-12D8D1CA13C7",
-				"type": "BoxBufferGeometry",
+				"type": "BoxGeometry",
 				"width": 0.1,
 				"height": 0.1,
 				"depth": 0.1,
@@ -55,7 +55,7 @@
 			},
 			{
 				"uuid": "5E63B8CF-E225-4ABC-994A-4D06BD4E21EB",
-				"type": "BoxBufferGeometry",
+				"type": "BoxGeometry",
 				"width": 0.2,
 				"height": 0.2,
 				"depth": 1,
@@ -65,7 +65,7 @@
 			},
 			{
 				"uuid": "D61532B4-24C3-4BC4-B56B-7245E8163E09",
-				"type": "BoxBufferGeometry",
+				"type": "BoxGeometry",
 				"width": 0.2,
 				"height": 0.2,
 				"depth": 1,
@@ -180,7 +180,7 @@
 		"31517222-A9A7-4EAF-B5F6-60751C0BABA3": [
 			{
 				"name": "Game logic",
-				"source": "var ball = this.getObjectByName( 'Ball' );\n\nvar position = ball.position;\n\nvar velocity = new THREE.Vector3();\n\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = Math.random() - 0.5;\ndirection.normalize().multiplyScalar( 0.1 );\n\nvar pad1 = this.getObjectByName( 'Pad 1' );\nvar pad2 = this.getObjectByName( 'Pad 2' );\n\nvar raycaster = new THREE.Raycaster();\nvar objects = [ pad1, pad2 ];\n\n//\n\nfunction mousemove( event ) {\n\n\tpad1.position.z = ( event.clientX / player.width ) * 3 - 1.5;\n\tpad2.position.z = - pad1.position.z;\n\n}\n\nfunction update( event ) {\n\t\n\tif ( position.x < -3 || position.x > 3 ) direction.x = - direction.x;\n\tif ( position.z < -2 || position.z > 2 ) direction.z = - direction.z;\n\t\n\tposition.x = Math.max( - 3, Math.min( 3, position.x ) );\n\tposition.z = Math.max( - 2, Math.min( 2, position.z ) );\n\t\n\traycaster.set( position, direction );\n\t\n\tvar intersections = raycaster.intersectObjects( objects );\n\t\n\tif ( intersections.length > 0 ) {\n\n\t\tvar intersection = intersections[ 0 ];\n\t\t\n\t\tif ( intersection.distance < 0.1 ) {\n\t\t\t\n\t\t\tdirection.reflect( intersection.face.normal );\n\t\t\t\n\t\t}\n\t\t\n\t}\n\n\tposition.add( velocity.copy( direction ).multiplyScalar( event.delta / 20 ) );\n\n}"
+				"source": "var ball = this.getObjectByName( 'Ball' );\n\nvar position = ball.position;\n\nvar velocity = new THREE.Vector3();\n\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = Math.random() - 0.5;\ndirection.normalize().multiplyScalar( 0.1 );\n\nvar pad1 = this.getObjectByName( 'Pad 1' );\nvar pad2 = this.getObjectByName( 'Pad 2' );\n\nvar raycaster = new THREE.Raycaster();\nvar objects = [ pad1, pad2 ];\n\n//\n\nfunction pointermove( event ) {\n\n\tpad1.position.z = ( event.clientX / player.width ) * 3 - 1.5;\n\tpad2.position.z = - pad1.position.z;\n\n}\n\nfunction update( event ) {\n\t\n\tif ( position.x < -3 || position.x > 3 ) direction.x = - direction.x;\n\tif ( position.z < -2 || position.z > 2 ) direction.z = - direction.z;\n\t\n\tposition.x = Math.max( - 3, Math.min( 3, position.x ) );\n\tposition.z = Math.max( - 2, Math.min( 2, position.z ) );\n\t\n\traycaster.set( position, direction );\n\t\n\tvar intersections = raycaster.intersectObjects( objects );\n\t\n\tif ( intersections.length > 0 ) {\n\n\t\tvar intersection = intersections[ 0 ];\n\t\t\n\t\tif ( intersection.distance < 0.1 ) {\n\t\t\t\n\t\t\tdirection.reflect( intersection.face.normal );\n\t\t\t\n\t\t}\n\t\t\n\t}\n\n\tposition.add( velocity.copy( direction ).multiplyScalar( event.delta / 20 ) );\n\n}"
 			}]
 	}
 }

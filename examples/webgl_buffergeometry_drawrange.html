@@ -23,22 +23,22 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var group;
-			var container, stats;
-			var particlesData = [];
-			var camera, scene, renderer;
-			var positions, colors;
-			var particles;
-			var pointCloud;
-			var particlePositions;
-			var linesMesh;
+			let group;
+			let container, stats;
+			const particlesData = [];
+			let camera, scene, renderer;
+			let positions, colors;
+			let particles;
+			let pointCloud;
+			let particlePositions;
+			let linesMesh;
 
-			var maxParticleCount = 1000;
-			var particleCount = 500;
-			var r = 800;
-			var rHalf = r / 2;
+			const maxParticleCount = 1000;
+			let particleCount = 500;
+			const r = 800;
+			const rHalf = r / 2;
 
-			var effectController = {
+			const effectController = {
 				showDots: true,
 				showLines: true,
 				minDistance: 150,
@@ -52,7 +52,7 @@
 
 			function initGUI() {
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( effectController, "showDots" ).onChange( function ( value ) {
 
@@ -85,7 +85,7 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
 				camera.position.z = 1750;
 
-				var controls = new OrbitControls( camera, container );
+				const controls = new OrbitControls( camera, container );
 				controls.minDistance = 1000;
 				controls.maxDistance = 3000;
 
@@ -95,18 +95,18 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				var helper = new THREE.BoxHelper( new THREE.Mesh( new THREE.BoxBufferGeometry( r, r, r ) ) );
+				const helper = new THREE.BoxHelper( new THREE.Mesh( new THREE.BoxGeometry( r, r, r ) ) );
 				helper.material.color.setHex( 0x101010 );
 				helper.material.blending = THREE.AdditiveBlending;
 				helper.material.transparent = true;
 				group.add( helper );
 
-				var segments = maxParticleCount * maxParticleCount;
+				const segments = maxParticleCount * maxParticleCount;
 
 				positions = new Float32Array( segments * 3 );
 				colors = new Float32Array( segments * 3 );
 
-				var pMaterial = new THREE.PointsMaterial( {
+				const pMaterial = new THREE.PointsMaterial( {
 					color: 0xFFFFFF,
 					size: 3,
 					blending: THREE.AdditiveBlending,
@@ -117,11 +117,11 @@
 				particles = new THREE.BufferGeometry();
 				particlePositions = new Float32Array( maxParticleCount * 3 );
 
-				for ( var i = 0; i < maxParticleCount; i ++ ) {
+				for ( let i = 0; i < maxParticleCount; i ++ ) {
 
-					var x = Math.random() * r - r / 2;
-					var y = Math.random() * r - r / 2;
-					var z = Math.random() * r - r / 2;
+					const x = Math.random() * r - r / 2;
+					const y = Math.random() * r - r / 2;
+					const z = Math.random() * r - r / 2;
 
 					particlePositions[ i * 3 ] = x;
 					particlePositions[ i * 3 + 1 ] = y;
@@ -142,7 +142,7 @@
 				pointCloud = new THREE.Points( particles, pMaterial );
 				group.add( pointCloud );
 
-				var geometry = new THREE.BufferGeometry();
+				const geometry = new THREE.BufferGeometry();
 
 				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).setUsage( THREE.DynamicDrawUsage ) );
 				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).setUsage( THREE.DynamicDrawUsage ) );
@@ -151,7 +151,7 @@
 
 				geometry.setDrawRange( 0, 0 );
 
-				var material = new THREE.LineBasicMaterial( {
+				const material = new THREE.LineBasicMaterial( {
 					vertexColors: true,
 					blending: THREE.AdditiveBlending,
 					transparent: true
@@ -174,7 +174,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -189,17 +189,17 @@
 
 			function animate() {
 
-				var vertexpos = 0;
-				var colorpos = 0;
-				var numConnected = 0;
+				let vertexpos = 0;
+				let colorpos = 0;
+				let numConnected = 0;
 
-				for ( var i = 0; i < particleCount; i ++ )
+				for ( let i = 0; i < particleCount; i ++ )
 					particlesData[ i ].numConnections = 0;
 
-				for ( var i = 0; i < particleCount; i ++ ) {
+				for ( let i = 0; i < particleCount; i ++ ) {
 
 					// get the particle
-					var particleData = particlesData[ i ];
+					const particleData = particlesData[ i ];
 
 					particlePositions[ i * 3 ] += particleData.velocity.x;
 					particlePositions[ i * 3 + 1 ] += particleData.velocity.y;
@@ -218,23 +218,23 @@
 						continue;
 
 					// Check collision
-					for ( var j = i + 1; j < particleCount; j ++ ) {
+					for ( let j = i + 1; j < particleCount; j ++ ) {
 
-						var particleDataB = particlesData[ j ];
+						const particleDataB = particlesData[ j ];
 						if ( effectController.limitConnections && particleDataB.numConnections >= effectController.maxConnections )
 							continue;
 
-						var dx = particlePositions[ i * 3 ] - particlePositions[ j * 3 ];
-						var dy = particlePositions[ i * 3 + 1 ] - particlePositions[ j * 3 + 1 ];
-						var dz = particlePositions[ i * 3 + 2 ] - particlePositions[ j * 3 + 2 ];
-						var dist = Math.sqrt( dx * dx + dy * dy + dz * dz );
+						const dx = particlePositions[ i * 3 ] - particlePositions[ j * 3 ];
+						const dy = particlePositions[ i * 3 + 1 ] - particlePositions[ j * 3 + 1 ];
+						const dz = particlePositions[ i * 3 + 2 ] - particlePositions[ j * 3 + 2 ];
+						const dist = Math.sqrt( dx * dx + dy * dy + dz * dz );
 
 						if ( dist < effectController.minDistance ) {
 
 							particleData.numConnections ++;
 							particleDataB.numConnections ++;
 
-							var alpha = 1.0 - dist / effectController.minDistance;
+							const alpha = 1.0 - dist / effectController.minDistance;
 
 							positions[ vertexpos ++ ] = particlePositions[ i * 3 ];
 							positions[ vertexpos ++ ] = particlePositions[ i * 3 + 1 ];
@@ -276,7 +276,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
 				group.rotation.y = time * 0.1;
 				renderer.render( scene, camera );
