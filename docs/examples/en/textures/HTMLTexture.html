@@ -86,6 +86,18 @@
 
 		<h2>Methods</h2>
 
+		<h3>[method:void addPointer]( [param:Vector2 pointer], [param:Bool down] )</h3>
+		<p>
+			Start tracking a new mouse pointer with 1 button (either down or not down).
+		</p>
+
+		<h3>[method:void updatePointer]( [param:Vector2 pointer], [param:Bool down] )</h3>
+		<p>
+			Update a mouse pointer's position and button state.<br /><br />
+
+			Pass the Vector2 pointer to addPointer() first, or this method will do nothing.
+		</p>
+
 		<h3>[method:HTMLElement elementFromPoint]( [param:Number x], [param:Number y] )</h3>
 		<p>
 			From the texture's HTML document, returns the element at (x,y).
