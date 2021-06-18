@@ -33,11 +33,11 @@ class HTMLTexture extends CanvasTexture {
 		this._pointerId = 0;
 
 
-		this.redrawAsync( html, css, width, height );
+		setTimeout( (scope=>(() => scope.redrawAsync( html, css, width, height )))(this) , 1 );
 
 	}
 
-	redrawAsync( html, css, width, height ) {
+	async redrawAsync( html, css, width, height ) {
 
 		const scope = this;
 
@@ -51,6 +51,13 @@ class HTMLTexture extends CanvasTexture {
 			while ( sroot.firstChild ) sroot.removeChild( sroot.firstChild );
 
 			sroot.appendChild( new DOMParser().parseFromString( html, 'text/html' ).documentElement );
+
+
+			//enable javascript
+
+			const scripts = Array.from( sroot.querySelectorAll( 'script' ) );
+
+			scripts.map( script => { script.parentNode.removeChild( script ); sroot.appendChild( document.createElement( 'script' ) ).textContent = script.textContent; } );
 
 		}
 
@@ -134,6 +141,7 @@ class HTMLTexture extends CanvasTexture {
 				) );
 
 			}
+
 
 
 			const canvas = scope.image;
