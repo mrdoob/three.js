@@ -19,6 +19,8 @@
 		constructor( _objects, _camera, _domElement ) {
 
 			super();
+			_domElement.style.touchAction = 'none'; // disable touch scroll
+
 			let _selected = null,
 				_hovered = null;
 			const _intersections = []; //
@@ -145,7 +147,6 @@
 			function onPointerDown() {
 
 				if ( scope.enabled === false ) return;
-				_domElement.style.touchAction = 'none';
 				updatePointer( event );
 				_intersections.length = 0;
 
@@ -192,7 +193,6 @@
 				}
 
 				_domElement.style.cursor = _hovered ? 'pointer' : 'auto';
-				_domElement.style.touchAction = '';
 
 			}
 

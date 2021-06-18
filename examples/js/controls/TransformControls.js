@@ -42,6 +42,7 @@
 
 			this.visible = false;
 			this.domElement = domElement;
+			this.domElement.style.touchAction = 'none'; // disable touch scroll
 
 			const _gizmo = new TransformControlsGizmo();
 
@@ -646,8 +647,6 @@
 	function onPointerDown( event ) {
 
 		if ( ! this.enabled ) return;
-		this.domElement.style.touchAction = 'none'; // disable touch scroll
-
 		this.domElement.ownerDocument.addEventListener( 'pointermove', this._onPointerMove );
 		this.pointerHover( this._getPointer( event ) );
 		this.pointerDown( this._getPointer( event ) );
@@ -664,7 +663,6 @@
 	function onPointerUp( event ) {
 
 		if ( ! this.enabled ) return;
-		this.domElement.style.touchAction = '';
 		this.domElement.ownerDocument.removeEventListener( 'pointermove', this._onPointerMove );
 		this.pointerUp( this._getPointer( event ) );
 
