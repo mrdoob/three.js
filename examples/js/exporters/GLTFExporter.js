@@ -1090,22 +1090,20 @@
 			if ( material.emissive ) {
 
 				// note: emissive components are limited to stay within the 0 - 1 range to accommodate glTF spec. see #21849 and #22000.
-				const emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity ).toArray();
-				const maxEmissiveComponent = Math.max( emissive[ 0 ], emissive[ 1 ], emissive[ 2 ] );
+				const emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity );
+				const maxEmissiveComponent = Math.max( emissive.r, emissive.g, emissive.b );
 
 				if ( maxEmissiveComponent > 1 ) {
 
-					emissive[ 0 ] = emissive[ 0 ] / maxEmissiveComponent;
-					emissive[ 1 ] = emissive[ 1 ] / maxEmissiveComponent;
-					emissive[ 2 ] = emissive[ 2 ] / maxEmissiveComponent;
+					emissive.multiplyScalar( 1 / maxEmissiveComponent );
 
-					console.warn( 'THREE.GLTFExporter: Some emissive components are bigger than 1, emissive has been limited' );
+					console.warn( 'THREE.GLTFExporter: Some emissive components exceed 1; emissive has been limited' );
 
 				}
 
-				if ( ! equalArray( emissive, [ 0, 0, 0 ] ) ) {
+				if ( maxEmissiveComponent > 0 ) {
 
-					materialDef.emissiveFactor = emissive;
+					materialDef.emissiveFactor = emissive.toArray();
 
 				} // emissiveTexture
 
