@@ -12,7 +12,7 @@ class HTMLTexture extends CanvasTexture {
 
 		let htmlTextureNode = customElements.get( 'htmltexture-node' );
 
-		if( ! htmlTextureNode ) htmlTextureNode = this._defineNode();
+		if ( ! htmlTextureNode ) htmlTextureNode = this._defineNode();
 
 
 		this._node = document.body.appendChild( new htmlTextureNode() );
@@ -26,6 +26,11 @@ class HTMLTexture extends CanvasTexture {
 		this._css = css;
 
 		this._cache = {};
+
+
+		this._pointers = new WeakMap();
+
+		this._pointerId = 0;
 
 
 		this.redrawAsync( html, css, width, height );
@@ -43,9 +48,9 @@ class HTMLTexture extends CanvasTexture {
 
 		if ( html ) {
 
-			while( sroot.firstChild ) sroot.removeChild( sroot.firstChild );
+			while ( sroot.firstChild ) sroot.removeChild( sroot.firstChild );
 
-			sroot.appendChild( new DOMParser().parseFromString( html , 'text/html' ).documentElement );
+			sroot.appendChild( new DOMParser().parseFromString( html, 'text/html' ).documentElement );
 
 		}
 
@@ -67,7 +72,7 @@ class HTMLTexture extends CanvasTexture {
 
 			const styles = Array.from( sroot.querySelectorAll( 'style' ) );
 
-			css += '\n' + styles.map( style => (style === rootStyle) ? '' : style.textContent ).join( '\n' );
+			css += '\n' + styles.map( style => ( style === rootStyle ) ? '' : style.textContent ).join( '\n' );
 
 
 
@@ -103,8 +108,6 @@ class HTMLTexture extends CanvasTexture {
 						} else {
 
 							const urlImage = new Image();
-
-							urlImage.crossOrigin = "anonymous";
 
 							urlImage.onload = () => {
 
@@ -144,10 +147,9 @@ class HTMLTexture extends CanvasTexture {
 			else canvas.height = height;
 
 
-			scope._node.style.left = '-' + ( scope._node.style.width = width + 'px' );
+			scope._node.style.width = width + 'px';
 
-			scope._node.style.top = '-' + ( scope._node.style.height = width + 'px' );
-
+			scope._node.style.height = width + 'px';
 
 
 			const xml = new XMLSerializer().serializeToString( sroot );
@@ -155,19 +157,20 @@ class HTMLTexture extends CanvasTexture {
 			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><style>${css}</style><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
 
 
-			
+
 			const image = new Image();
 
 			image.onload = () => {
 
-				canvas.getContext( '2d' ).drawImage( image , 0 , 0 );
+				canvas.getContext( '2d' ).drawImage( image, 0, 0 );
 
 				scope.needsUpdate = true;
 
 				resolve();
 
-				if( scope.onFinishRedraw ) scope.onFinishRedraw();
-			}
+				if ( scope.onFinishRedraw ) scope.onFinishRedraw();
+
+			};
 
 			image.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent( svg );
 
@@ -175,21 +178,112 @@ class HTMLTexture extends CanvasTexture {
 
 	}
 
-	elementFromPoint( x , y ) {
-		
+	//click event per https://www.w3.org/TR/uievents/#event-type-click
+	//pointers per https://w3c.github.io/pointerevents/#pointerevent-interface
+	//mouse events per https://w3c.github.io/uievents/#dom-mouseevent-mouseevent
+	//except no hover, no focus, no pointercapture, no pointercancel, no dblclick
+
+	addPointer( vec2, down ) {
+
+		const { x, y } = vec2;
+
+		down = !! down;
+
+
+		const target = this.elementFromPoint( x, y );
+
+		this._pointers.set( vec2, Object.freeze( { x, y, target, down, pointerId: this._pointerId ++ } ) );
+
+		this.updatePointer( vec2, down, true );
+
+	}
+
+	updatePointer( vec2, down, start = false ) {
+
+		const pointer = this._pointers.get( vec2 );
+
+		if ( ! pointer ) return;
+
+
+		const { x, y } = vec2;
+
+		down = !! down;
+
+
+		const event = { pointerId: pointer.pointerId, clientX: x, clientY: y, screenX: x, screenY: y, button: 1 * down };
+
+		const dispatch = ( key, target, relatedTarget = null, bubble = true ) => {
+
+			do {
+
+				if ( ! target.dispatchEvent( key === 'click' ? new Event( '' ) : new PointerEvent( 'pointer' + key, { relatedTarget, ...event } ) ) ) return false;
+
+				if ( ! target.dispatchEvent( new MouseEvent( ( key === 'click' ) ? key : ( 'mouse' + key ), { relatedTarget, ...event } ) ) ) return false;
+
+			} while ( bubble && ( target = target.parentNode ) );
+
+			return true;
+
+		};
+
+
+		const target = this.elementFromPoint( x, y );
+
+		if ( target !== pointer.target || start ) {
+
+			if ( pointer.target ) {
+
+				dispatch( 'out', pointer.target, target );
+
+				if ( ! pointer.target.contains( target ) ) dispatch( 'leave', pointer.target, target, false );
+
+			}
+
+			if ( target ) {
+
+				dispatch( 'over', target, pointer.target );
+
+				if ( ! target.contains( pointer.target ) ) dispatch( 'enter', target, pointer.target, false );
+
+				dispatch( 'move', target );
+
+			}
+
+		}
+
+		if ( target && ( ( down !== pointer.down ) || start ) ) {
+
+			if ( down ) dispatch( 'down', target );
+
+			if ( ! down ) {
+
+				dispatch( 'up', target );
+
+				if ( ! start ) dispatch( 'click', target );
+
+			}
+
+		}
+
+		this._pointers.set( vec2, Object.freeze( { x, y, target, down, pointerId: pointer.pointerId } ) );
+
+	}
+
+	elementFromPoint( x, y ) {
+
 		const style = this._node.style;
 
-		style.left = 0;
+		style.pointerEvents = 'auto';
 
-		style.top = 0;
-
-
-		const element = this.document.elementFromPoint( x , y );
+		style.zIndex = '1000000';
 
 
-		style.left = '-' + style.width;
+		const element = this.document.elementFromPoint( x, y );
 
-		style.top = '-' + style.height;
+
+		style.pointerEvents = 'none';
+
+		style.zIndex = '-1000000';
 
 
 		return element;
@@ -206,13 +300,13 @@ class HTMLTexture extends CanvasTexture {
 
 				this.attachShadow( { mode: 'open' } );
 
-				this.style.cssText = 'contain:layout; display:block; position:absolute; left:0; top:0; opacity:0.1; overflow:hidden;';
+				this.style.cssText = 'contain:layout; pointer-events:none; display:block; position:absolute; left:0; top:0; opacity:0.0; overflow:hidden; z-index:-1000000';
 
 			}
 
 		}
 
-		customElements.define( 'htmltexture-node' , HTMLTextureNode , { is: "htmltexture-node" } );
+		customElements.define( 'htmltexture-node', HTMLTextureNode, { is: 'htmltexture-node' } );
 
 		return HTMLTextureNode;
 
