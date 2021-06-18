@@ -11,12 +11,16 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			A texture for rendering and updating HTML / CSS documents.<br />
+			A texture that renders an HTML document.<br /><br />
 
+			Behaves like normal, except:
 			<ul>
-				<li>Static -- Scripts will not run, mouse and touch events will not trigger. For dynamic content, update [page:HTMLTexture.document document] style or content and call [page:HTMLTexture.redrawAsync redrawAsync].</li>
-				<li>Isolated (mostly) -- Stylesheets will not import, videos will not play, flash plugins will not load. &lt;img> tags will load normally.</li>
+				<li>CSS :hover will disappear during rendering. Use mouseover / mouseout instead.</li>
+				<li>GPU-heavy elements like video and webgl will disappear.</li>
+				<li>Iframes will disappear.</li>
 			</ul>
+
+			Be careful: Scripts in your texture are not isolated. They run in the same context as your page.
 		</p>
 
 		<h2>Code Example</h2>
