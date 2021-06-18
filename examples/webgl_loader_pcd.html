@@ -45,7 +45,7 @@
 				controls.minDistance = 0.5;
 				controls.maxDistance = 10;
 
-				scene.add( new THREE.AxesHelper( 1 ) );
+				//scene.add( new THREE.AxesHelper( 1 ) );
 
 				const loader = new PCDLoader();
 				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( points ) {
@@ -81,17 +81,14 @@
 
 					case '+':
 						points.material.size *= 1.2;
-						//points.material.needsUpdate = true;
 						break;
 
 					case '-':
 						points.material.size /= 1.2;
-						//points.material.needsUpdate = true;
 						break;
 
 					case 'c':
 						points.material.color.setHex( Math.random() * 0xffffff );
-						//points.material.needsUpdate = true;
 						break;
 
 				}
