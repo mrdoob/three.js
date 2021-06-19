@@ -164,6 +164,17 @@ class MeshPhongMaterial extends Material {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
+		if ( this.shininess !== 30 ) data.shininess = this.shininess;
+
+		return data;
+
+	}
+
 }
 
 MeshPhongMaterial.prototype.isMeshPhongMaterial = true;

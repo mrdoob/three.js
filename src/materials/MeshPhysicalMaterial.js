@@ -120,6 +120,46 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.clearcoat !== 0.0 ) data.clearcoat = this.clearcoat;
+		if ( this.clearcoatRoughness !== 0.0 ) data.clearcoatRoughness = this.clearcoatRoughness;
+
+		if ( this.clearcoatMap && this.clearcoatMap.isTexture ) {
+
+			data.clearcoatMap = this.clearcoatMap.toJSON( meta ).uuid;
+
+		}
+
+		if ( this.clearcoatRoughnessMap && this.clearcoatRoughnessMap.isTexture ) {
+
+			data.clearcoatRoughnessMap = this.clearcoatRoughnessMap.toJSON( meta ).uuid;
+
+		}
+
+		if ( this.clearcoatNormalMap && this.clearcoatNormalMap.isTexture ) {
+
+			data.clearcoatNormalMap = this.clearcoatNormalMap.toJSON( meta ).uuid;
+			data.clearcoatNormalScale = this.clearcoatNormalScale.toArray();
+
+		}
+
+		if ( this.sheen && this.sheen.isColor ) data.sheen = this.sheen.getHex();
+
+		if ( this.transmission !== 0.0 ) data.transmission = this.transmission;
+		if ( this.transmissionMap && this.transmissionMap.isTexture ) data.transmissionMap = this.transmissionMap.toJSON( meta ).uuid;
+
+		if ( this.thickness !== 0.01 ) data.thickness = this.thickness;
+		if ( this.thicknessMap && this.thicknessMap.isTexture ) data.thicknessMap = this.thicknessMap.toJSON( meta ).uuid;
+		if ( this.attenuationDistance !== 0.0 ) data.attenuationDistance = this.attenuationDistance;
+		if ( this.attenuationColor && this.attenuationColor.isColor ) data.attenuationColor = this.attenuationColor.getHex();
+
+		return data;
+
+	}
+
 }
 
 MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;

@@ -71,6 +71,18 @@ class MeshDistanceMaterial extends Material {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.referencePosition = this.referencePosition.toArray();
+		if ( this.nearDistance !== 1 ) data.nearDistance = this.nearDistance;
+		if ( this.farDistance !== 1000 ) data.farDistance = this.farDistance;
+
+		return data;
+
+	}
+
 }
 
 MeshDistanceMaterial.prototype.isMeshDistanceMaterial = true;

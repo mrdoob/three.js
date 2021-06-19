@@ -49,6 +49,17 @@ class LineBasicMaterial extends Material {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.linecap !== 'round' ) data.linecap = this.linecap;
+		if ( this.linejoin !== 'round' ) data.linejoin = this.linejoin;
+
+		return data;
+
+	}
+
 }
 
 LineBasicMaterial.prototype.isLineBasicMaterial = true;

@@ -177,6 +177,23 @@ class MeshStandardMaterial extends Material {
 		return this;
 
 	}
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.roughness !== 1.0 ) data.roughness = this.roughness;
+		if ( this.metalness !== 0.0 ) data.metalness = this.metalness;
+
+		if ( this.roughnessMap && this.roughnessMap.isTexture ) data.roughnessMap = this.roughnessMap.toJSON( meta ).uuid;
+		if ( this.metalnessMap && this.metalnessMap.isTexture ) data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
+
+		if ( this.envMapIntensity !== 1.0 ) data.envMapIntensity = this.envMapIntensity;
+
+		if ( this.vertexTangents === true ) this.vertexTangents = true;
+
+		return data;
+
+	}
 
 }
 
