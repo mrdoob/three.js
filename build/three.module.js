@@ -7174,7 +7174,29 @@ class Object3D extends EventDispatcher {
 
 		}
 
-		if ( this.isMesh || this.isLine || this.isPoints ) {
+		if ( this.isScene ) {
+
+			if ( this.background ) {
+
+				if ( this.background.isColor ) {
+
+					object.background = this.background.toJSON();
+
+				} else if ( this.background.isTexture ) {
+
+					object.background = this.background.toJSON( meta ).uuid;
+
+				}
+
+			}
+
+			if ( this.environment && this.environment.isTexture ) {
+
+				object.environment = this.environment.toJSON( meta ).uuid;
+
+			}
+
+		} else if ( this.isMesh || this.isLine || this.isPoints ) {
 
 			object.geometry = serialize( meta.geometries, this.geometry );
 
@@ -25349,6 +25371,7 @@ function WebGLRenderer( parameters = {} ) {
 		if ( capabilities.isWebGL2 ) {
 
 			// Workaround for https://bugs.chromium.org/p/chromium/issues/detail?id=1120100
+			// Not needed in Chrome 93+
 
 			if ( glFormat === 6407 ) glFormat = 32849;
 			if ( glFormat === 6408 ) glFormat = 32856;
@@ -25627,8 +25650,6 @@ class Scene extends Object3D {
 
 		const data = super.toJSON( meta );
 
-		if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
-		if ( this.environment !== null ) data.object.environment = this.environment.toJSON( meta );
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
 		return data;
@@ -39177,7 +39198,7 @@ class ObjectLoader extends Loader {
 		const textures = this.parseTextures( json.textures, images );
 		const materials = this.parseMaterials( json.materials, textures );
 
-		const object = this.parseObject( json.object, geometries, materials, animations );
+		const object = this.parseObject( json.object, geometries, materials, textures, animations );
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
 		this.bindSkeletons( object, skeletons );
@@ -39833,7 +39854,7 @@ class ObjectLoader extends Loader {
 
 	}
 
-	parseObject( data, geometries, materials, animations ) {
+	parseObject( data, geometries, materials, textures, animations ) {
 
 		let object;
 
@@ -39885,6 +39906,18 @@ class ObjectLoader extends Loader {
 
 		}
 
+		function getTexture( uuid ) {
+
+			if ( textures[ uuid ] === undefined ) {
+
+				console.warn( 'THREE.ObjectLoader: Undefined texture', uuid );
+
+			}
+
+			return textures[ uuid ];
+
+		}
+
 		let geometry, material;
 
 		switch ( data.type ) {
@@ -39899,9 +39932,15 @@ class ObjectLoader extends Loader {
 
 						object.background = new Color( data.background );
 
+					} else {
+
+						object.background = getTexture( data.background );
+
 					}
 
 				}
+
+				if ( data.environment !== undefined ) object.environment = getTexture( data.environment );
 
 				if ( data.fog !== undefined ) {
 
@@ -40118,7 +40157,7 @@ class ObjectLoader extends Loader {
 
 			for ( let i = 0; i < children.length; i ++ ) {
 
-				object.add( this.parseObject( children[ i ], geometries, materials, animations ) );
+				object.add( this.parseObject( children[ i ], geometries, materials, textures, animations ) );
 
 			}
 

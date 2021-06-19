@@ -5456,7 +5456,19 @@
 				return element.uuid;
 			}
 
-			if (this.isMesh || this.isLine || this.isPoints) {
+			if (this.isScene) {
+				if (this.background) {
+					if (this.background.isColor) {
+						object.background = this.background.toJSON();
+					} else if (this.background.isTexture) {
+						object.background = this.background.toJSON(meta).uuid;
+					}
+				}
+
+				if (this.environment && this.environment.isTexture) {
+					object.environment = this.environment.toJSON(meta).uuid;
+				}
+			} else if (this.isMesh || this.isLine || this.isPoints) {
 				object.geometry = serialize(meta.geometries, this.geometry);
 				const parameters = this.geometry.parameters;
 
@@ -18599,6 +18611,7 @@
 
 			if (capabilities.isWebGL2) {
 				// Workaround for https://bugs.chromium.org/p/chromium/issues/detail?id=1120100
+				// Not needed in Chrome 93+
 				if (glFormat === _gl.RGB) glFormat = _gl.RGB8;
 				if (glFormat === _gl.RGBA) glFormat = _gl.RGBA8;
 			}
@@ -18826,8 +18839,6 @@
 
 		toJSON(meta) {
 			const data = super.toJSON(meta);
-			if (this.background !== null) data.object.background = this.background.toJSON(meta);
-			if (this.environment !== null) data.object.environment = this.environment.toJSON(meta);
 			if (this.fog !== null) data.object.fog = this.fog.toJSON();
 			return data;
 		}
@@ -28362,7 +28373,7 @@
 			});
 			const textures = this.parseTextures(json.textures, images);
 			const materials = this.parseMaterials(json.materials, textures);
-			const object = this.parseObject(json.object, geometries, materials, animations);
+			const object = this.parseObject(json.object, geometries, materials, textures, animations);
 			const skeletons = this.parseSkeletons(json.skeletons, object);
 			this.bindSkeletons(object, skeletons); //
 
@@ -28745,7 +28756,7 @@
 			return textures;
 		}
 
-		parseObject(data, geometries, materials, animations) {
+		parseObject(data, geometries, materials, textures, animations) {
 			let object;
 
 			function getGeometry(name) {
@@ -28782,6 +28793,14 @@
 				return materials[name];
 			}
 
+			function getTexture(uuid) {
+				if (textures[uuid] === undefined) {
+					console.warn('THREE.ObjectLoader: Undefined texture', uuid);
+				}
+
+				return textures[uuid];
+			}
+
 			let geometry, material;
 
 			switch (data.type) {
@@ -28791,8 +28810,12 @@
 					if (data.background !== undefined) {
 						if (Number.isInteger(data.background)) {
 							object.background = new Color(data.background);
+						} else {
+							object.background = getTexture(data.background);
 						}
 					}
+
+					if (data.environment !== undefined) object.environment = getTexture(data.environment);
 
 					if (data.fog !== undefined) {
 						if (data.fog.type === 'Fog') {
@@ -28945,7 +28968,7 @@
 				const children = data.children;
 
 				for (let i = 0; i < children.length; i++) {
-					object.add(this.parseObject(children[i], geometries, materials, animations));
+					object.add(this.parseObject(children[i], geometries, materials, textures, animations));
 				}
 			}
 
