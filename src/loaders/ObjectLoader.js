@@ -50,7 +50,6 @@ import { CubeTexture } from '../textures/CubeTexture.js';
 import { Texture } from '../textures/Texture.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { ImageLoader } from './ImageLoader.js';
-import { LoadingManager } from './LoadingManager.js';
 import { AnimationClip } from '../animation/AnimationClip.js';
 import { MaterialLoader } from './MaterialLoader.js';
 import { LoaderUtils } from './LoaderUtils.js';
@@ -549,7 +548,7 @@ class ObjectLoader extends Loader {
 
 	}
 
-	async parseImages( json, onLoad ) {
+	async parseImages( json ) {
 
 		const scope = this;
 		const images = {};
@@ -588,9 +587,7 @@ class ObjectLoader extends Loader {
 
 		if ( json !== undefined && json.length > 0 ) {
 
-			const manager = new LoadingManager( onLoad );
-
-			loader = new ImageLoader( manager );
+			loader = new ImageLoader();
 			loader.setCrossOrigin( this.crossOrigin );
 
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
