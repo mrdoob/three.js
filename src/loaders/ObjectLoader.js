@@ -113,17 +113,19 @@ class ObjectLoader extends Loader {
 
 	}
 
-	parse( json, onLoad ) {
+	parse() {
+
+		console.warn( 'THREE.ObjectLoader: parse() has been deprecated. Use await loader.parseAsync() instead.' );
+
+	}
+
+	async parseAsync( json ) {
 
 		const animations = this.parseAnimations( json.animations );
 		const shapes = this.parseShapes( json.shapes );
 		const geometries = this.parseGeometries( json.geometries, shapes );
 
-		const images = this.parseImages( json.images, function () {
-
-			if ( onLoad !== undefined ) onLoad( object );
-
-		} );
+		const images = await this.parseImages( json.images );
 
 		const textures = this.parseTextures( json.textures, images );
 		const materials = this.parseMaterials( json.materials, textures );
@@ -132,27 +134,6 @@ class ObjectLoader extends Loader {
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
 		this.bindSkeletons( object, skeletons );
-
-		//
-
-		if ( onLoad !== undefined ) {
-
-			let hasImages = false;
-
-			for ( const uuid in images ) {
-
-				if ( images[ uuid ] instanceof HTMLImageElement ) {
-
-					hasImages = true;
-					break;
-
-				}
-
-			}
-
-			if ( hasImages === false ) onLoad( object );
-
-		}
 
 		return object;
 
@@ -568,31 +549,14 @@ class ObjectLoader extends Loader {
 
 	}
 
-	parseImages( json, onLoad ) {
+	async parseImages( json, onLoad ) {
 
 		const scope = this;
 		const images = {};
 
 		let loader;
 
-		function loadImage( url ) {
-
-			scope.manager.itemStart( url );
-
-			return loader.load( url, function () {
-
-				scope.manager.itemEnd( url );
-
-			}, undefined, function () {
-
-				scope.manager.itemError( url );
-				scope.manager.itemEnd( url );
-
-			} );
-
-		}
-
-		function deserializeImage( image ) {
+		async function deserializeImage( image ) {
 
 			if ( typeof image === 'string' ) {
 
@@ -600,7 +564,7 @@ class ObjectLoader extends Loader {
 
 				const path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( url ) ? url : scope.resourcePath + url;
 
-				return loadImage( path );
+				return await loader.loadAsync( path );
 
 			} else {
 
@@ -644,7 +608,7 @@ class ObjectLoader extends Loader {
 
 						const currentUrl = url[ j ];
 
-						const deserializedImage = deserializeImage( currentUrl );
+						const deserializedImage = await deserializeImage( currentUrl );
 
 						if ( deserializedImage !== null ) {
 
@@ -668,7 +632,7 @@ class ObjectLoader extends Loader {
 
 					// load single image
 
-					const deserializedImage = deserializeImage( image.url );
+					const deserializedImage = await deserializeImage( image.url );
 
 					if ( deserializedImage !== null ) {
 
