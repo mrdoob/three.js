@@ -91,6 +91,13 @@ class MaterialLoader extends Loader {
 
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
+		if ( json.blendSrc !== undefined ) material.blendSrc = json.blendSrc;
+		if ( json.blendDst !== undefined ) material.blendDst = json.blendDst;
+		if ( json.blendEquation !== undefined ) material.blendEquation = json.blendEquation;
+		if ( json.blendSrcAlpha !== undefined ) material.blendSrcAlpha = json.blendSrcAlpha;
+		if ( json.blendDstAlpha !== undefined ) material.blendDstAlpha = json.blendDstAlpha;
+		if ( json.blendEquationAlpha !== undefined ) material.blendEquationAlpha = json.blendEquationAlpha;
+		if ( json.depthFunc !== undefined ) material.depthFunc = json.depthFunc;
 		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
 		if ( json.stencilWriteMask !== undefined ) material.stencilWriteMask = json.stencilWriteMask;
@@ -101,8 +108,12 @@ class MaterialLoader extends Loader {
 		if ( json.stencilZFail !== undefined ) material.stencilZFail = json.stencilZFail;
 		if ( json.stencilZPass !== undefined ) material.stencilZPass = json.stencilZPass;
 		if ( json.stencilWrite !== undefined ) material.stencilWrite = json.stencilWrite;
+		if ( json.clippingPlanes !== undefined ) material.clippingPlanes = json.clippingPlanes;
+		if ( json.clipIntersection !== undefined ) material.clipIntersection = json.clipIntersection;
+		if ( json.clipShadows !== undefined ) material.clipShadows = json.clipShadows;
 		if ( json.shadowSide !== undefined ) material.shadowSide = json.shadowSide;
 		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
+		if ( json.precision !== undefined ) material.precision = json.precision;
 		if ( json.polygonOffset !== undefined ) material.polygonOffset = json.polygonOffset;
 		if ( json.polygonOffsetFactor !== undefined ) material.polygonOffsetFactor = json.polygonOffsetFactor;
 		if ( json.polygonOffsetUnits !== undefined ) material.polygonOffsetUnits = json.polygonOffsetUnits;
@@ -165,11 +176,31 @@ class MaterialLoader extends Loader {
 		if ( json.sizeAttenuation !== undefined ) material.sizeAttenuation = json.sizeAttenuation;
 		// End: Common properties of sub-material.
 
-		if ( material.isLineDashedMaterial ) {
+		if ( material.isLineBasicMaterial ) {
+
+			if ( json.linecap !== undefined ) material.linecap = json.linecap;
+			if ( json.linejoin !== undefined ) material.linejoin = json.linejoin;
+
+		} else if ( material.isLineDashedMaterial ) {
 
 			if ( json.scale !== undefined ) material.scale = json.scale;
 			if ( json.dashSize !== undefined ) material.dashSize = json.dashSize;
 			if ( json.gapSize !== undefined ) material.gapSize = json.gapSize;
+
+		} else if ( material.isMeshDepthMaterial ) {
+
+			if ( json.depthPacking !== undefined ) material.depthPacking = json.depthPacking;
+
+		} else if ( material.isMeshDistanceMaterial ) {
+
+			if ( json.referencePosition !== undefined ) {
+
+				material.referencePosition = new Vector3().fromArray( json.referencePosition );
+
+			}
+
+			if ( json.nearDistance !== undefined ) material.nearDistance = json.nearDistance;
+			if ( json.farDistance !== undefined ) material.farDistance = json.farDistance;
 
 		} else if ( material.isMeshMatcapMaterial ) {
 
@@ -215,6 +246,7 @@ class MaterialLoader extends Loader {
 
 		} else if ( material.isShaderMaterial ) {
 
+			if ( json.glslVersion !== undefined ) material.glslVersion = json.glslVersion;
 			if ( json.uniforms !== undefined ) {
 
 				for ( const name in json.uniforms ) {
@@ -264,6 +296,8 @@ class MaterialLoader extends Loader {
 
 			if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
 			if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
+			if ( json.lights !== undefined ) material.lights = json.lights;
+			if ( json.clipping !== undefined ) material.clipping = json.clipping;
 			if ( json.extensions !== undefined ) {
 
 				for ( const key in json.extensions ) {
@@ -273,6 +307,10 @@ class MaterialLoader extends Loader {
 				}
 
 			}
+
+			if ( json.defaultAttributeValues !== undefined ) material.defaultAttributeValues = json.defaultAttributeValues;
+			if ( json.index0AttributeName !== undefined ) material.index0AttributeName = json.index0AttributeName;
+			if ( json.uniformsNeedUpdate !== undefined ) material.uniformsNeedUpdate = json.uniformsNeedUpdate;
 
 		} else if ( material.isSpriteMaterial ) {
 

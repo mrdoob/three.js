@@ -164,12 +164,21 @@ class Material extends EventDispatcher {
 
 		if ( this.name !== '' ) data.name = this.name;
 
+		data.fog = this.fog;
+
 		if ( this.blending !== NormalBlending ) data.blending = this.blending;
 		if ( this.side !== FrontSide ) data.side = this.side;
 		if ( this.vertexColors ) data.vertexColors = true;
 
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
 		if ( this.transparent === true ) data.transparent = this.transparent;
+
+		if ( this.blendSrc !== SrcAlphaFactor ) data.blendSrc = this.blendSrc;
+		if ( this.blendDst !== OneMinusSrcAlphaFactor ) data.blendDst = this.blendDst;
+		if ( this.blendEquation !== AddEquation ) data.blendEquation = this.blendEquation;
+		if ( this.blendSrcAlpha !== null ) data.blendSrcAlpha = this.blendSrcAlpha;
+		if ( this.blendDstAlpha !== null ) data.blendDstAlpha = this.blendDstAlpha;
+		if ( this.blendEquationAlpha !== null ) data.blendEquationAlpha = this.blendEquationAlpha;
 
 		data.depthFunc = this.depthFunc;
 		data.depthTest = this.depthTest;
@@ -184,9 +193,15 @@ class Material extends EventDispatcher {
 		data.stencilZPass = this.stencilZPass;
 		data.stencilWrite = this.stencilWrite;
 
+		if ( this.clippingPlanes !== null ) data.clippingPlanes = this.clippingPlanes;
+		if ( this.clipIntersection === true ) data.clipIntersection = this.clipIntersection;
+		if ( this.clipShadows === true ) data.clipShadows = this.clipShadows;
+
 		if ( this.shadowSide !== null ) data.shadowSide = this.shadowSide;
 
 		data.colorWrite = this.colorWrite;
+
+		if ( this.precision !== null ) data.precision = this.precision;
 
 		if ( this.polygonOffset === true ) data.polygonOffset = true;
 		if ( this.polygonOffsetFactor !== 0 ) data.polygonOffsetFactor = this.polygonOffsetFactor;
@@ -260,6 +275,8 @@ class Material extends EventDispatcher {
 		if ( this.morphTargets === true ) data.morphTargets = true;
 		if ( this.morphNormals === true ) data.morphNormals = true;
 
+		if ( this.defines !== undefined ) data.defines = this.defines;
+
 		if ( this.bumpMap && this.bumpMap.isTexture ) {
 
 			data.bumpMap = this.bumpMap.toJSON( meta ).uuid;
@@ -281,10 +298,22 @@ class Material extends EventDispatcher {
 
 		// End: Common properties of sub-material.
 
+		// LineBasicMaterial
+		if ( this.linecap !== undefined ) data.linecap = this.linecap;
+		if ( this.linejoin !== undefined ) data.linejoin = this.linejoin;
+
 		// LineDashedMaterial
 		if ( this.scale !== undefined ) data.scale = this.scale;
 		if ( this.dashSize !== undefined ) data.dashSize = this.dashSize;
 		if ( this.gapSize !== undefined ) data.gapSize = this.gapSize;
+
+		// MeshDepthMaterial
+		if ( this.depthPacking !== undefined ) data.depthPacking = this.depthPacking;
+
+		// MeshDistanceMaterial
+		if ( this.referencePosition !== undefined ) data.referencePosition = this.referencePosition.toArray();
+		if ( this.nearDistance !== undefined ) data.nearDistance = this.nearDistance;
+		if ( this.farDistance !== undefined ) data.farDistance = this.farDistance;
 
 		// MeshMatcapMaterial
 		if ( this.matcap && this.matcap.isTexture ) data.matcap = this.matcap.toJSON( meta ).uuid;
@@ -334,6 +363,8 @@ class Material extends EventDispatcher {
 		if ( this.metalnessMap && this.metalnessMap.isTexture ) data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
 
 		if ( this.envMapIntensity !== undefined ) data.envMapIntensity = this.envMapIntensity;
+
+		if ( this.vertexTangents !== undefined ) this.vertexTangents = true;
 
 		// MeshToonMaterial
 		if ( this.gradientMap && this.gradientMap.isTexture ) {
