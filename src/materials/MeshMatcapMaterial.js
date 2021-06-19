@@ -105,6 +105,16 @@ class MeshMatcapMaterial extends Material {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.matcap && this.matcap.isTexture ) data.matcap = this.matcap.toJSON( meta ).uuid;
+
+		return data;
+
+	}
+
 }
 
 MeshMatcapMaterial.prototype.isMeshMatcapMaterial = true;

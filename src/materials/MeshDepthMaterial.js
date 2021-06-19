@@ -71,6 +71,16 @@ class MeshDepthMaterial extends Material {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.depthPacking !== BasicDepthPacking ) data.depthPacking = this.depthPacking;
+
+		return data;
+
+	}
+
 }
 
 MeshDepthMaterial.prototype.isMeshDepthMaterial = true;

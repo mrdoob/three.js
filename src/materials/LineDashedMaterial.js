@@ -41,6 +41,18 @@ class LineDashedMaterial extends LineBasicMaterial {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.scale !== undefined ) data.scale = this.scale;
+		if ( this.dashSize !== undefined ) data.dashSize = this.dashSize;
+		if ( this.gapSize !== undefined ) data.gapSize = this.gapSize;
+
+		return data;
+
+	}
+
 }
 
 LineDashedMaterial.prototype.isLineDashedMaterial = true;

@@ -53,6 +53,16 @@ class SpriteMaterial extends Material {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.rotation !== 0 ) data.rotation = this.rotation;
+
+		return data;
+
+	}
+
 }
 
 SpriteMaterial.prototype.isSpriteMaterial = true;

@@ -57,6 +57,16 @@ class PointsMaterial extends Material {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.size !== 1 ) data.size = this.size;
+
+		return data;
+
+	}
+
 }
 
 PointsMaterial.prototype.isPointsMaterial = true;

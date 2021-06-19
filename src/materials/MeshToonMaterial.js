@@ -135,6 +135,20 @@ class MeshToonMaterial extends Material {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.gradientMap && this.gradientMap.isTexture ) {
+
+			data.gradientMap = this.gradientMap.toJSON( meta ).uuid;
+
+		}
+
+		return data;
+
+	}
+
 }
 
 MeshToonMaterial.prototype.isMeshToonMaterial = true;
