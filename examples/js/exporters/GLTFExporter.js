@@ -1096,7 +1096,6 @@
 				if ( maxEmissiveComponent > 1 ) {
 
 					emissive.multiplyScalar( 1 / maxEmissiveComponent );
-
 					console.warn( 'THREE.GLTFExporter: Some emissive components exceed 1; emissive has been limited' );
 
 				}
