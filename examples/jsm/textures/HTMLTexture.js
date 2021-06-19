@@ -118,10 +118,12 @@ class HTMLTexture extends CanvasTexture {
 
 							urlImage.onload = () => {
 
-								_canvas.width = urlImage.width;
-								_canvas.height = urlImage.height;
+								const rect = image.getClientRects()[ 0 ];
 
-								_canvas.getContext( '2d' ).drawImage( urlImage, 0, 0 );
+								_canvas.width = Math.max( 1, Math.min( rect.width, image.width ) );
+								_canvas.height = Math.max( 1, Math.min( rect.height, image.height ) );
+
+								_canvas.getContext( '2d' ).drawImage( urlImage, 0, 0, _canvas.width, _canvas.height );
 
 								scope._cache[ image.src ] = _canvas.toDataURL();
 
