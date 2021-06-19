@@ -114,7 +114,7 @@ class ObjectLoader extends Loader {
 
 	parse() {
 
-		console.warn( 'THREE.ObjectLoader: parse() has been deprecated. Use await loader.parseAsync() instead.' );
+		console.error( 'THREE.ObjectLoader: parse() has been removed. Use await loader.parseAsync() instead.' );
 
 	}
 
