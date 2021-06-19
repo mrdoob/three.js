@@ -128,7 +128,7 @@ class ObjectLoader extends Loader {
 		const textures = this.parseTextures( json.textures, images );
 		const materials = this.parseMaterials( json.materials, textures );
 
-		const object = this.parseObject( json.object, geometries, materials, animations, textures );
+		const object = this.parseObject( json.object, geometries, materials, textures, animations );
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
 		this.bindSkeletons( object, skeletons );
@@ -784,7 +784,7 @@ class ObjectLoader extends Loader {
 
 	}
 
-	parseObject( data, geometries, materials, animations, textures ) {
+	parseObject( data, geometries, materials, textures, animations ) {
 
 		let object;
 
@@ -1087,7 +1087,7 @@ class ObjectLoader extends Loader {
 
 			for ( let i = 0; i < children.length; i ++ ) {
 
-				object.add( this.parseObject( children[ i ], geometries, materials, animations, textures ) );
+				object.add( this.parseObject( children[ i ], geometries, materials, textures, animations ) );
 
 			}
 
