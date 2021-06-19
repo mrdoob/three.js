@@ -33,7 +33,7 @@ class HTMLTexture extends CanvasTexture {
 		this._pointerId = 0;
 
 
-		setTimeout( (scope=>(() => scope.redrawAsync( html, css, width, height )))(this) , 1 );
+		this.redrawAsync( html, css, width, height );
 
 	}
 
