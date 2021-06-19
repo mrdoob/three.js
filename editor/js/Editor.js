@@ -131,7 +131,8 @@ Editor.prototype = {
 		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
 
-		if ( scene.background !== undefined ) this.scene.background = scene.background;
+		this.scene.background = scene.background;
+
 		if ( scene.fog !== null ) this.scene.fog = scene.fog.clone();
 
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
