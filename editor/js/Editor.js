@@ -131,7 +131,7 @@ Editor.prototype = {
 		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
 
-		this.scene.background = ( scene.background !== null ) ? scene.background.clone() : null;
+		this.scene.background = scene.background;
 
 		if ( scene.fog !== null ) this.scene.fog = scene.fog.clone();
 
