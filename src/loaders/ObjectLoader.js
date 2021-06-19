@@ -141,10 +141,25 @@ class ObjectLoader extends Loader {
 
 			for ( const uuid in images ) {
 
-				if ( images[ uuid ] instanceof HTMLImageElement ) {
+				const image = images[ uuid ];
+
+				if ( image instanceof HTMLImageElement ) {
 
 					hasImages = true;
 					break;
+
+				} else if ( Array.isArray( image ) ) {
+
+					for ( let i = 0; i < image.length; i ++ ) {
+
+						if ( image[ i ] instanceof HTMLImageElement ) {
+
+							hasImages = true;
+							break;
+
+						}
+
+					}
 
 				}
 
