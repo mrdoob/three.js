@@ -99,6 +99,10 @@ class ShaderMaterial extends Material {
 		this.lights = source.lights;
 		this.clipping = source.clipping;
 
+		this.defaultAttributeValues = JSON.parse( JSON.stringify( source.defaultAttributeValues ) );
+		this.index0AttributeName = source.index0AttributeName;
+		this.uniformsNeedUpdate = source.uniformsNeedUpdate;
+
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
@@ -114,7 +118,7 @@ class ShaderMaterial extends Material {
 
 		const data = super.toJSON( meta );
 
-		data.glslVersion = this.glslVersion;
+		if ( this.glslVersion !== null ) data.glslVersion = this.glslVersion;
 		data.uniforms = {};
 
 		for ( const name in this.uniforms ) {
@@ -187,6 +191,13 @@ class ShaderMaterial extends Material {
 
 		data.vertexShader = this.vertexShader;
 		data.fragmentShader = this.fragmentShader;
+
+		if ( this.lights === true ) data.lights = true;
+		if ( this.clipping === true ) data.clipping = true;
+
+		data.defaultAttributeValues = this.defaultAttributeValues;
+		if ( this.index0AttributeName !== undefined ) data.index0AttributeName = this.index0AttributeName;
+		if ( this.uniformsNeedUpdate === true ) data.uniformsNeedUpdate = true;
 
 		const extensions = {};
 

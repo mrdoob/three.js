@@ -164,6 +164,15 @@ class Material extends EventDispatcher {
 
 		if ( this.name !== '' ) data.name = this.name;
 
+		data.fog = this.fog;
+
+		if ( this.blendSrc !== SrcAlphaFactor ) data.blendSrc = this.blendSrc;
+		if ( this.blendDst !== OneMinusSrcAlphaFactor ) data.blendDst = this.blendDst;
+		if ( this.blendEquation !== AddEquation ) data.blendEquation = this.blendEquation;
+		if ( this.blendSrcAlpha !== null ) data.blendSrcAlpha = this.blendSrcAlpha;
+		if ( this.blendDstAlpha !== null ) data.blendDstAlpha = this.blendDstAlpha;
+		if ( this.blendEquationAlpha !== null ) data.blendEquationAlpha = this.blendEquationAlpha;
+
 		if ( this.color && this.color.isColor ) data.color = this.color.getHex();
 
 		if ( this.roughness !== undefined ) data.roughness = this.roughness;
@@ -293,6 +302,29 @@ class Material extends EventDispatcher {
 		data.stencilFail = this.stencilFail;
 		data.stencilZFail = this.stencilZFail;
 		data.stencilZPass = this.stencilZPass;
+
+		if ( this.clippingPlanes !== null ) data.clippingPlanes = this.clippingPlanes;
+		if ( this.clipIntersection === true ) data.clipIntersection = this.clipIntersection;
+		if ( this.clipShadows === true ) data.clipShadows = this.clipShadows;
+
+		if ( this.precision !== null ) data.precision = this.precision;
+
+		if ( this.defines !== undefined ) data.defines = this.defines;
+
+		// Line Basic Material
+		if ( this.linecap !== undefined ) data.linecap = this.linecap;
+		if ( this.linejoin !== undefined ) data.linejoin = this.linejoin;
+
+		// Mesh Depth Material
+		if ( this.depthPacking !== undefined ) data.depthPacking = this.depthPacking;
+
+		// Mesh Distance Material
+		if ( this.referencePosition !== undefined ) data.referencePosition = this.referencePosition.toArray();
+		if ( this.nearDistance !== undefined ) data.nearDistance = this.nearDistance;
+		if ( this.farDistance !== undefined ) data.farDistance = this.farDistance;
+
+		// Mesh Standard Material
+		if ( this.vertexTangents !== undefined ) this.vertexTangents = true;
 
 		// rotation (SpriteMaterial)
 		if ( this.rotation && this.rotation !== 0 ) data.rotation = this.rotation;
