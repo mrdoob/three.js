@@ -125,6 +125,8 @@ function WebGLRenderList( properties ) {
 
 		currOpaque.push( renderGroupItem );
 		currOpaque = renderGroupItem.opaque;
+
+		currTransparent.push( renderGroupItem );
 		currTransparent = renderGroupItem.transparent;
 
 		renderGroupStack.push( renderGroupItem );
