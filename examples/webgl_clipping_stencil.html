@@ -51,45 +51,6 @@
 			init();
 			animate();
 
-			function createPlaneStencilGroup( geometry, plane, renderOrder ) {
-
-				const group = new THREE.Group();
-				const baseMat = new THREE.MeshBasicMaterial();
-				baseMat.depthWrite = false;
-				baseMat.depthTest = false;
-				baseMat.colorWrite = false;
-				baseMat.stencilWrite = true;
-				baseMat.stencilFunc = THREE.AlwaysStencilFunc;
-
-				// back faces
-				const mat0 = baseMat.clone();
-				mat0.side = THREE.BackSide;
-				mat0.clippingPlanes = [ plane ];
-				mat0.stencilFail = THREE.IncrementWrapStencilOp;
-				mat0.stencilZFail = THREE.IncrementWrapStencilOp;
-				mat0.stencilZPass = THREE.IncrementWrapStencilOp;
-
-				const mesh0 = new THREE.Mesh( geometry, mat0 );
-				mesh0.renderOrder = renderOrder;
-				group.add( mesh0 );
-
-				// front faces
-				const mat1 = baseMat.clone();
-				mat1.side = THREE.FrontSide;
-				mat1.clippingPlanes = [ plane ];
-				mat1.stencilFail = THREE.DecrementWrapStencilOp;
-				mat1.stencilZFail = THREE.DecrementWrapStencilOp;
-				mat1.stencilZPass = THREE.DecrementWrapStencilOp;
-
-				const mesh1 = new THREE.Mesh( geometry, mat1 );
-				mesh1.renderOrder = renderOrder;
-
-				group.add( mesh1 );
-
-				return group;
-
-			}
-
 			function init() {
 
 				clock = new THREE.Clock();
@@ -131,46 +92,82 @@
 				object = new THREE.Group();
 				scene.add( object );
 
+				var backFaceStencilMat = new THREE.MeshBasicMaterial();
+				backFaceStencilMat.depthWrite = false;
+				backFaceStencilMat.depthTest = false;
+				backFaceStencilMat.colorWrite = false;
+				backFaceStencilMat.stencilWrite = true;
+				backFaceStencilMat.stencilFunc = THREE.AlwaysStencilFunc;
+				backFaceStencilMat.side = THREE.BackSide;
+				backFaceStencilMat.stencilFail = THREE.IncrementWrapStencilOp;
+				backFaceStencilMat.stencilZFail = THREE.IncrementWrapStencilOp;
+				backFaceStencilMat.stencilZPass = THREE.IncrementWrapStencilOp;
+
+				var frontFaceStencilMat = new THREE.MeshBasicMaterial();
+				frontFaceStencilMat.depthWrite = false;
+				frontFaceStencilMat.depthTest = false;
+				frontFaceStencilMat.colorWrite = false;
+				frontFaceStencilMat.stencilWrite = true;
+				frontFaceStencilMat.stencilFunc = THREE.AlwaysStencilFunc;
+				frontFaceStencilMat.side = THREE.FrontSide;
+				frontFaceStencilMat.stencilFail = THREE.DecrementWrapStencilOp;
+				frontFaceStencilMat.stencilZFail = THREE.DecrementWrapStencilOp;
+				frontFaceStencilMat.stencilZPass = THREE.DecrementWrapStencilOp;
+
+				var clearMat = new THREE.MeshBasicMaterial();
+				clearMat.depthWrite = false;
+				clearMat.depthTest = false;
+				clearMat.colorWrite = false;
+				clearMat.stencilWrite = true;
+				clearMat.stencilFunc = THREE.AlwaysStencilFunc;
+				clearMat.side = THREE.FrontSide;
+				clearMat.stencilFail = THREE.ReplaceStencilOp;
+				clearMat.stencilZFail = THREE.ReplaceStencilOp;
+				clearMat.stencilZPass = THREE.ReplaceStencilOp;
+
+				var planeStencilMat = new THREE.MeshStandardMaterial();
+				planeStencilMat.color.set( 0xE91E63 );
+				planeStencilMat.metalness = 0.1;
+				planeStencilMat.roughness = 0.75;
+				planeStencilMat.stencilWrite = true;
+				planeStencilMat.stencilRef = 0;
+				planeStencilMat.stencilFunc = THREE.NotEqualStencilFunc;
+				planeStencilMat.stencilFail = THREE.ReplaceStencilOp;
+				planeStencilMat.stencilZFail = THREE.ReplaceStencilOp;
+				planeStencilMat.stencilZPass = THREE.ReplaceStencilOp;
+
+
 				// Set up clip plane rendering
 				planeObjects = [];
-				const planeGeom = new THREE.PlaneGeometry( 4, 4 );
 
+				const planeGeom = new THREE.PlaneBufferGeometry( 4, 4 );
 				for ( let i = 0; i < 3; i ++ ) {
 
-					const poGroup = new THREE.Group();
 					const plane = planes[ i ];
-					const stencilGroup = createPlaneStencilGroup( geometry, plane, i + 1 );
+					const poGroup = new THREE.Group();
+					poGroup.renderChildrenTogether = true;
 
-					// plane is clipped by the other clipping planes
-					const planeMat =
-						new THREE.MeshStandardMaterial( {
+					const backFaceMesh = new THREE.Mesh( geometry, backFaceStencilMat.clone() );
+					backFaceMesh.material.clippingPlanes = [ plane ];
+					backFaceMesh.renderOrder = 0;
+					poGroup.add( backFaceMesh );
 
-							color: 0xE91E63,
-							metalness: 0.1,
-							roughness: 0.75,
-							clippingPlanes: planes.filter( p => p !== plane ),
+					const frontFaceMesh = new THREE.Mesh( geometry, frontFaceStencilMat.clone() );
+					frontFaceMesh.material.clippingPlanes = [ plane ];
+					frontFaceMesh.renderOrder = 1;
+					poGroup.add( frontFaceMesh );
 
-							stencilWrite: true,
-							stencilRef: 0,
-							stencilFunc: THREE.NotEqualStencilFunc,
-							stencilFail: THREE.ReplaceStencilOp,
-							stencilZFail: THREE.ReplaceStencilOp,
-							stencilZPass: THREE.ReplaceStencilOp,
+					const planeMesh = new THREE.Mesh( planeGeom, planeStencilMat.clone() );
+					planeMesh.material.clippingPlanes = planes.filter( p => p !== plane );
+					planeMesh.renderOrder = 3;
+					poGroup.add( planeMesh );
 
-						} );
-					const po = new THREE.Mesh( planeGeom, planeMat );
-					po.onAfterRender = function ( renderer ) {
+					const clearMesh = new THREE.Mesh( geometry, clearMat );
+					clearMesh.renderOrder = 4;
+					poGroup.add( clearMesh );
 
-						renderer.clearStencil();
-
-					};
-
-					po.renderOrder = i + 1.1;
-
-					object.add( stencilGroup );
-					poGroup.add( po );
-					planeObjects.push( po );
-					scene.add( poGroup );
+					planeObjects.push( planeMesh );
+					object.add( poGroup );
 
 				}
 
@@ -191,9 +188,8 @@
 				clippedColorFront.renderOrder = 6;
 				object.add( clippedColorFront );
 
-
 				const ground = new THREE.Mesh(
-					new THREE.PlaneGeometry( 9, 9, 1, 1 ),
+					new THREE.PlaneBufferGeometry( 9, 9, 1, 1 ),
 					new THREE.ShadowMaterial( { color: 0, opacity: 0.25, side: THREE.DoubleSide } )
 				);
 
