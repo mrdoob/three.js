@@ -325,8 +325,8 @@ export default QUnit.module( 'Renderers', () => {
 				);
 
 				assert.deepEqual(
-					list.transparent,
-					[],
+					list.transparent.length,
+					1,
 					'The transparent list is not modified.'
 				);
 
@@ -384,7 +384,7 @@ export default QUnit.module( 'Renderers', () => {
 				);
 
 				assert.equal(
-					list.opaque[ 0 ].transparent.length,
+					list.transparent[ 0 ].transparent.length,
 					2,
 					'The item was added to the transparent list of the render group item.'
 				);
@@ -416,7 +416,7 @@ export default QUnit.module( 'Renderers', () => {
 				);
 
 				assert.deepEqual(
-					list.opaque[ 0 ].transparent.map( item => item.id ),
+					list.transparent[ 0 ].transparent.map( item => item.id ),
 					[ 5, 4, 3, 2 ],
 					'The transparent sort is applied to the transparent items list.'
 				);
