@@ -1078,9 +1078,9 @@ function WebGLRenderer( parameters = {} ) {
 		const transmissiveObjects = currentRenderList.transmissive;
 		const transparentObjects = currentRenderList.transparent;
 
-		if ( opaqueObjects.length > 0 ) renderObjects( opaqueObjects, scene, camera );
+		if ( opaqueObjects.length > 0 ) renderObjects( opaqueObjects, scene, camera, 'opaque' );
 		if ( transmissiveObjects.length > 0 ) renderTransmissiveObjects( opaqueObjects, transmissiveObjects, scene, camera );
-		if ( transparentObjects.length > 0 ) renderObjects( transparentObjects, scene, camera );
+		if ( transparentObjects.length > 0 ) renderObjects( transparentObjects, scene, camera, 'transparent' );
 
 		//
 
@@ -1300,18 +1300,18 @@ function WebGLRenderer( parameters = {} ) {
 		_this.setRenderTarget( _transmissionRenderTarget );
 		_this.clear();
 
-		renderObjects( opaqueObjects, scene, camera );
+		renderObjects( opaqueObjects, scene, camera, 'opaque' );
 
 		textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
 		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
 
 		_this.setRenderTarget( currentRenderTarget );
 
-		renderObjects( transmissiveObjects, scene, camera );
+		renderObjects( transmissiveObjects, scene, camera, 'transmissive' );
 
 	}
 
-	function renderObjects( renderList, scene, camera ) {
+	function renderObjects( renderList, scene, camera, renderType ) {
 
 		const overrideMaterial = scene.isScene === true ? scene.overrideMaterial : null;
 
@@ -1326,11 +1326,22 @@ function WebGLRenderer( parameters = {} ) {
 
 			if ( renderItem.isRenderGroupItem ) {
 
-				var opaque = renderItem.opaque;
-				var transparent = renderItem.transparent;
+				let renderList = null;
+				if ( renderType === 'opaque' ) {
 
-				if ( opaque.length > 0 ) renderObjects( opaque, scene, camera, overrideMaterial );
-				if ( transparent.length > 0 ) renderObjects( transparent, scene, camera, overrideMaterial );
+					renderList = renderItem.opaque;
+
+				} else if ( renderType === 'transparent' ) {
+
+					renderList = renderItem.transparent;
+
+				}
+
+				if ( renderList !== null ) {
+
+					renderObjects( renderList, scene, camera, renderType );
+
+				}
 
 			} else if ( camera.isArrayCamera ) {
 
