@@ -1110,6 +1110,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		if ( object.visible === false ) return;
 
+		const children = object.children;
 		const visible = object.layers.test( camera.layers );
 
 		if ( visible ) {
@@ -1117,6 +1118,21 @@ function WebGLRenderer( parameters = {} ) {
 			if ( object.isGroup ) {
 
 				groupOrder = object.renderOrder;
+
+				if ( object.renderChildrenTogether ) {
+
+					currentRenderList.pushRenderGroup( object );
+
+					for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+						projectObject( children[ i ], camera, sortObjects );
+
+					}
+
+					currentRenderList.popRenderGroup();
+					return;
+
+				}
 
 			} else if ( object.isLOD ) {
 
@@ -1221,8 +1237,6 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		const children = object.children;
-
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
 			projectObject( children[ i ], camera, groupOrder, sortObjects );
@@ -1284,7 +1298,15 @@ function WebGLRenderer( parameters = {} ) {
 			const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
 			const group = renderItem.group;
 
-			if ( camera.isArrayCamera ) {
+			if ( renderItem.isRenderGroupItem ) {
+
+				var opaque = renderItem.opaque;
+				var transparent = renderItem.transparent;
+
+				if ( opaque.length > 0 ) renderObjects( opaque, scene, camera, overrideMaterial );
+				if ( transparent.length > 0 ) renderObjects( transparent, scene, camera, overrideMaterial );
+
+			} else if ( camera.isArrayCamera ) {
 
 				const cameras = camera.cameras;
 

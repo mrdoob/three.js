@@ -8,11 +8,11 @@ function painterSortStable( a, b ) {
 
 		return a.renderOrder - b.renderOrder;
 
-	} else if ( a.program !== b.program ) {
+	} else if ( a.program && b.program && a.program !== b.program ) {
 
 		return a.program.id - b.program.id;
 
-	} else if ( a.material.id !== b.material.id ) {
+	} else if ( a.material && b.material && a.material.id !== b.material.id ) {
 
 		return a.material.id - b.material.id;
 
@@ -53,6 +53,12 @@ function reversePainterSortStable( a, b ) {
 
 function WebGLRenderList( properties ) {
 
+	// lists containing groups of render items that are intended to be
+	// rendered together in a specific order.
+	const renderGroupStack = [];
+	const renderGroupItems = [];
+	let renderGroupItemIndex = 0;
+
 	const renderItems = [];
 	let renderItemsIndex = 0;
 
@@ -62,13 +68,83 @@ function WebGLRenderList( properties ) {
 
 	const defaultProgram = { id: - 1 };
 
+	let currOpaque = opaque;
+	let currTransparent = transparent;
+
 	function init() {
 
+		renderGroupItemIndex = 0;
 		renderItemsIndex = 0;
 
+		renderGroupStack.length = 0;
 		opaque.length = 0;
 		transmissive.length = 0;
 		transparent.length = 0;
+
+		currOpaque = opaque;
+		currTransparent = transparent;
+
+	}
+
+	function getNextRenderGroupItem( object ) {
+
+		let renderGroupItem = renderGroupItems[ renderGroupItemIndex ];
+
+		if ( renderGroupItem === undefined ) {
+
+			renderGroupItem = {
+
+				isRenderGroupItem: true,
+				id: object.id,
+				renderOrder: object.renderOrder,
+				opaque: [],
+				transparent: []
+
+			};
+
+			renderGroupItems[ renderGroupItemIndex ] = renderGroupItem;
+
+		} else {
+
+			renderGroupItem.id = object.id;
+			renderGroupItem.renderOrder = object.renderOrder;
+			renderGroupItem.opaque.length = 0;
+			renderGroupItem.transparent.length = 0;
+
+		}
+
+		renderGroupItemIndex ++;
+
+		return renderGroupItem;
+
+	}
+
+	function pushRenderGroup( object ) {
+
+		const renderGroupItem = getNextRenderGroupItem( object );
+
+		currOpaque.push( renderGroupItem );
+		currOpaque = renderGroupItem.opaque;
+		currTransparent = renderGroupItem.transparent;
+
+		renderGroupStack.push( renderGroupItem );
+
+	}
+
+	function popRenderGroup() {
+
+		renderGroupStack.pop();
+		if ( renderGroupStack.length !== 0 ) {
+
+			currOpaque = renderGroupStack[ renderGroupStack.length - 1 ].opaque;
+			currTransparent = renderGroupStack[ renderGroupStack.length - 1 ].transparent;
+
+		} else {
+
+			currOpaque = opaque;
+			currTransparent = transparent;
+
+		}
 
 	}
 
@@ -123,11 +199,11 @@ function WebGLRenderList( properties ) {
 
 		} else if ( material.transparent === true ) {
 
-			transparent.push( renderItem );
+			currTransparent.push( renderItem );
 
 		} else {
 
-			opaque.push( renderItem );
+			currOpaque.push( renderItem );
 
 		}
 
@@ -143,11 +219,11 @@ function WebGLRenderList( properties ) {
 
 		} else if ( material.transparent === true ) {
 
-			transparent.unshift( renderItem );
+			currTransparent.unshift( renderItem );
 
 		} else {
 
-			opaque.unshift( renderItem );
+			currOpaque.unshift( renderItem );
 
 		}
 
@@ -158,6 +234,18 @@ function WebGLRenderList( properties ) {
 		if ( opaque.length > 1 ) opaque.sort( customOpaqueSort || painterSortStable );
 		if ( transmissive.length > 1 ) transmissive.sort( customTransparentSort || reversePainterSortStable );
 		if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
+
+		// sort all individual render groups
+		for ( let i = 0; i < renderGroupItemIndex; i ++ ) {
+
+			const group = renderGroupItems[ i ];
+			const opaqueGroup = group.opaque;
+			const transparentGroup = group.transparent;
+
+			if ( opaqueGroup.length > 1 ) opaqueGroup.sort( customOpaqueSort || painterSortStable );
+			if ( transparentGroup.length > 1 ) transparentGroup.sort( customTransparentSort || reversePainterSortStable );
+
+		}
 
 	}
 
@@ -184,6 +272,9 @@ function WebGLRenderList( properties ) {
 
 	return {
 
+		// uncomment for "finish" tests
+		// renderItems: renderItems,
+
 		opaque: opaque,
 		transmissive: transmissive,
 		transparent: transparent,
@@ -192,6 +283,9 @@ function WebGLRenderList( properties ) {
 		push: push,
 		unshift: unshift,
 		finish: finish,
+
+		pushRenderGroup: pushRenderGroup,
+		popRenderGroup: popRenderGroup,
 
 		sort: sort
 	};

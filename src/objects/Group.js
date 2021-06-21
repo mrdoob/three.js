@@ -7,6 +7,7 @@ class Group extends Object3D {
 		super();
 
 		this.type = 'Group';
+		this.renderChildrenTogether = false;
 
 	}
 

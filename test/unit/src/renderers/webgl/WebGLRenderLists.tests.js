@@ -307,8 +307,125 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
+			QUnit.test( 'opaque renderGroups', ( assert ) => {
+
+				var properties = new WebGLProperties();
+				var list = new WebGLRenderList( properties );
+				var rg1 = { id: 1, renderOrder: 1 };
+				var rg2 = { id: 2, renderOrder: 2 };
+				var item1 = { id: 3, renderOrder: 3 };
+				var item2 = { id: 4, renderOrder: 4 };
+
+				list.pushRenderGroup( rg1 );
+
+				assert.deepEqual(
+					list.opaque,
+					[ { isRenderGroupItem: true, id: 1, renderOrder: 1, transparent: [], opaque: [] } ],
+					'The render group is added to the opaque list.'
+				);
+
+				assert.deepEqual(
+					list.transparent,
+					[],
+					'The transparent list is not modified.'
+				);
+
+				list.push( item1, {}, { transparent: false }, 0, 0, {} );
+
+				assert.equal(
+					list.opaque.length,
+					1,
+					'The item was not added to the root render list.'
+				);
+
+				assert.equal(
+					list.opaque[ 0 ].opaque.length,
+					1,
+					'The item was added to the render group item.'
+				);
+
+				list.popRenderGroup();
+				list.pushRenderGroup( rg2 );
+
+				assert.equal(
+					list.opaque.length,
+					2,
+					'The render group was added to the root list.'
+				);
+
+				list.unshift( item2, {}, { transparent: false }, 0, 0, {} );
+
+				assert.equal(
+					list.opaque[ 1 ].opaque.length,
+					1,
+					'The item was added to the render group item.'
+				);
+
+				list.popRenderGroup();
+
+			} );
+
+			QUnit.test( 'transparent renderGroups', ( assert ) => {
+
+				var properties = new WebGLProperties();
+				var list = new WebGLRenderList( properties );
+				var rg = { id: 1, renderOrder: 1 };
+				var item = { id: 3, renderOrder: 3 };
+				var item = { id: 4, renderOrder: 4 };
+
+				list.pushRenderGroup( rg );
+				list.push( item, {}, { transparent: true }, 0, 0, {} );
+				list.unshift( item, {}, { transparent: true }, 0, 0, {} );
+
+				assert.equal(
+					list.opaque[ 0 ].opaque.length,
+					0,
+					'The item was not added to the opaque list of the render group item.'
+				);
+
+				assert.equal(
+					list.opaque[ 0 ].transparent.length,
+					2,
+					'The item was added to the transparent list of the render group item.'
+				);
+
+				list.popRenderGroup();
+
+			} );
+
+			QUnit.test( 'sort with renderGroups', ( assert ) => {
+
+				var properties = new WebGLProperties();
+				var list = new WebGLRenderList( properties );
+				var items = [ { id: 4 }, { id: 5 }, { id: 2 }, { id: 3 } ];
+
+				list.pushRenderGroup( { id: 1 } );
+				items.forEach( item => {
+
+					list.push( item, {}, { transparent: true }, 0, 0, {} );
+					list.push( item, {}, { transparent: false }, 0, 0, {} );
+
+				} );
+
+				list.sort( ( a, b ) => a.id - b.id, ( a, b ) => b.id - a.id );
+
+				assert.deepEqual(
+					list.opaque[ 0 ].opaque.map( item => item.id ),
+					[ 2, 3, 4, 5 ],
+					'The opaque sort is applied to the opaque items list.'
+				);
+
+				assert.deepEqual(
+					list.opaque[ 0 ].transparent.map( item => item.id ),
+					[ 5, 4, 3, 2 ],
+					'The transparent sort is applied to the transparent items list.'
+				);
+
+			} );
+
 			// QUnit.test( 'finish', ( assert ) => {
 
+			// 	var properties = new WebGLProperties();
 			// 	var list = new WebGLRenderList( properties );
 			// 	var obj = { id: 'A', renderOrder: 0 };
 			// 	var mat = { transparent: false, program: { id: 0 } };
