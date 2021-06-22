@@ -319,8 +319,8 @@ class Material extends EventDispatcher {
 
 		}
 
-		if ( this.clipIntersection === true ) data.clipIntersection = this.clipIntersection;
-		if ( this.clipShadows === true ) data.clipShadows = this.clipShadows;
+		if ( this.clipIntersection === true ) data.clipIntersection = true;
+		if ( this.clipShadows === true ) data.clipShadows = true;
 
 		if ( this.precision !== null ) data.precision = this.precision;
 
@@ -339,7 +339,7 @@ class Material extends EventDispatcher {
 		if ( this.farDistance !== undefined ) data.farDistance = this.farDistance;
 
 		// Mesh Standard Material
-		if ( this.vertexTangents !== undefined ) this.vertexTangents = true;
+		if ( this.vertexTangents === true ) this.vertexTangents = true;
 
 		// rotation (SpriteMaterial)
 		if ( this.rotation && this.rotation !== 0 ) data.rotation = this.rotation;
