@@ -7,6 +7,7 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 import * as Materials from '../materials/Materials.js';
+import { Plane } from '../math/Plane';
 
 class MaterialLoader extends Loader {
 
@@ -159,7 +160,19 @@ class MaterialLoader extends Loader {
 		if ( json.blendEquationAlpha !== undefined ) material.blendEquationAlpha = json.blendEquationAlpha;
 		if ( json.depthFunc !== undefined ) material.depthFunc = json.depthFunc;
 
-		if ( json.clippingPlanes !== undefined ) material.clippingPlanes = json.clippingPlanes;
+		if ( json.clippingPlanes !== undefined ) {
+
+			const len = json.clippingPlanes.length;
+			material.clippingPlanes = new Array( len );
+
+			for ( let i = 0; i < len; i ++ ) {
+
+				material.clippingPlanes[ i ] = new Plane().setComponents( ...json.clippingPlanes[ i ] );
+
+			}
+
+		}
+
 		if ( json.clipIntersection !== undefined ) material.clipIntersection = json.clipIntersection;
 		if ( json.clipShadows !== undefined ) material.clipShadows = json.clipShadows;
 
@@ -174,7 +187,7 @@ class MaterialLoader extends Loader {
 
 		if ( json.depthPacking !== undefined ) material.depthPacking = json.depthPacking;
 
-		// MeshDistanceMaterial
+		// Mesh Distance Material
 
 		if ( json.referencePosition !== undefined ) {
 

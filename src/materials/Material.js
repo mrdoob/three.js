@@ -303,7 +303,22 @@ class Material extends EventDispatcher {
 		data.stencilZFail = this.stencilZFail;
 		data.stencilZPass = this.stencilZPass;
 
-		if ( this.clippingPlanes !== null ) data.clippingPlanes = this.clippingPlanes;
+		if ( this.clippingPlanes !== null && Array.isArray( this.clippingPlanes ) ) {
+
+			const len = this.clippingPlanes.length;
+			data.clippingPlanes = new Array( len );
+
+			for ( let i = 0; i < len; i ++ ) {
+
+				const plane = this.clippingPlanes[ i ];
+				const planeArr = plane.normal.toArray();
+				planeArr.push( plane.constant );
+				data.clippingPlanes[ i ] = planeArr;
+
+			}
+
+		}
+
 		if ( this.clipIntersection === true ) data.clipIntersection = this.clipIntersection;
 		if ( this.clipShadows === true ) data.clipShadows = this.clipShadows;
 
