@@ -2208,7 +2208,15 @@ class GLTFParser {
 	 */
 	getDependency( type, index ) {
 
-		const cacheKey = type + ':' + index;
+		let cacheKey = type + ':' + index;
+
+		if ( type == 'texture' ) {
+
+			const textureDef = this.json.textures[index];
+			cacheKey = type + ':' + textureDef.sampler + ':' + textureDef.source + ':' + JSON.stringify( textureDef.extensions );
+
+		}
+
 		let dependency = this.cache.get( cacheKey );
 
 		if ( ! dependency ) {
