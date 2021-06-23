@@ -2212,7 +2212,7 @@ class GLTFParser {
 
 		if ( type == 'texture' ) {
 
-			const textureDef = this.json.textures[index];
+			const textureDef = this.json.textures[ index ];
 			cacheKey = type + ':' + textureDef.sampler + ':' + textureDef.source + ':' + JSON.stringify( textureDef.extensions );
 
 		}
