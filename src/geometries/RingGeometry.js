@@ -106,6 +106,12 @@ class RingGeometry extends BufferGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		return new RingGeometry( data.innerRadius, data.outerRadius, data.thetaSegments, data.phiSegments, data.thetaStart, data.thetaLength );
+
+	}
+
 }
 
 
