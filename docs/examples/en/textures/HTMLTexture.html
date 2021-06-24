@@ -13,26 +13,25 @@
 		<p class="desc">
 			A texture that renders an HTML document.<br /><br />
 
-			Behaves like normal, except:
+			Note:
 			<ul>
-				<li>CSS :hover will disappear during rendering. Use mouseover / mouseout instead.</li>
 				<li>GPU-heavy elements like video and webgl will disappear.</li>
 				<li>Iframes will disappear.</li>
+				<li>Texture JavaScript is not isolated. It runs in the global context.</li>
+				<li>Depending on security settings, cross-origin content may not render.</li>
 			</ul>
 
-			Be careful: Scripts in your texture are not isolated. They run in the same context as your page.
 		</p>
 
 		<h2>Code Example</h2>
 
 		<code>
-		const html = getMyHTMLDocumentText();
-		const css = getMyCSSText();
+		const html = getMyHTML();
 
 		const width = 256;
 		const height = 256;
 
-		const htmlTexture = new HTMLTexture( html , css , width , height );
+		const htmlTexture = new HTMLTexture( html , width , height );
 
 
 		function render() {
@@ -61,10 +60,9 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:String html], [param:String css], [param:Number width], [param:Number height], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Constant format], [param:Constant type], [param:Number anisotropy] )</h3>
+		<h3>[name]( [param:String html], [param:Number width], [param:Number height], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Constant format], [param:Constant type], [param:Number anisotropy] )</h3>
 		<p>
 			[page:String html] -- (optional) The html to draw. Defaults to a blank document.<br />
-			[page:String css] -- (optional) Additional CSS to style the html.<br />
 			[page:Number width] -- (optional) Texture width. Will default to 300.<br />
 			[page:Number height] -- (optional) Texture height. Will default to 150.<br /><br />
 
@@ -107,11 +105,11 @@
 			From the texture's HTML document, returns the element at (x,y).
 		</p>
 
-		<h3>[method:Promise redrawAsync]( [param:String html], [param:String css], [param:Number width], [param:Number height] )</h3>
+		<h3>[method:Promise redrawAsync]( [param:String html], [param:Number width], [param:Number height] )</h3>
 		<p>
 			Parameters are the same as [page:HTMLTexture.Constructor].<br /><br />
 
-			Redraw any changes made to the texture's HTML document.<br /><br />
+			Redraw the texture's HTML document after changes.<br /><br />
 
 			If html is specified, the texture's document will be completely replaced by the new html.<br /><br />
 
