@@ -111,13 +111,11 @@ class SpriteNode extends Node {
 
 			builder.addParsCode( /* glsl */`
 				#include <fog_pars_fragment>
-				#include <logdepthbuf_pars_fragment>
 				#include <clipping_planes_pars_fragment>`
 			);
 
 			builder.addCode( /* glsl */`
-				#include <clipping_planes_fragment>
-				#include <logdepthbuf_fragment>`
+				#include <clipping_planes_fragment>`
 			);
 
 			// analyze all nodes to reuse generate codes

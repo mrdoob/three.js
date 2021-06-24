@@ -231,7 +231,6 @@
 
 		#include <common>
 		#include <fog_pars_fragment>
-		#include <logdepthbuf_pars_fragment>
 
 		uniform sampler2D tReflectionMap;
 		uniform sampler2D tRefractionMap;
@@ -253,8 +252,6 @@
 		varying vec3 vToEye;
 
 		void main() {
-
-			#include <logdepthbuf_fragment>
 
 			float flowMapOffset0 = config.x;
 			float flowMapOffset1 = config.y;

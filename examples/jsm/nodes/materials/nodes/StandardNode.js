@@ -248,8 +248,7 @@ class StandardNode extends Node {
 				#include <bsdfs>
 				#include <lights_pars_begin>
 				#include <lights_physical_pars_fragment>
-				#include <shadowmap_pars_fragment>
-				#include <logdepthbuf_pars_fragment>`
+				#include <shadowmap_pars_fragment>`
 			);
 
 			const output = [
@@ -277,8 +276,6 @@ class StandardNode extends Node {
 				color.code,
 				'	vec3 diffuseColor = ' + color.result + ';',
 				'	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );',
-
-				'#include <logdepthbuf_fragment>',
 
 				roughness.code,
 				'	float roughnessFactor = ' + roughness.result + ';',

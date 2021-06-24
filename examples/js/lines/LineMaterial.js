@@ -201,7 +201,6 @@
 		#include <common>
 		#include <color_pars_fragment>
 		#include <fog_pars_fragment>
-		#include <logdepthbuf_pars_fragment>
 		#include <clipping_planes_pars_fragment>
 
 		varying vec2 vUv;
@@ -250,7 +249,6 @@
 
 			vec4 diffuseColor = vec4( diffuse, alpha );
 
-			#include <logdepthbuf_fragment>
 			#include <color_fragment>
 
 			gl_FragColor = vec4( diffuseColor.rgb, alpha );

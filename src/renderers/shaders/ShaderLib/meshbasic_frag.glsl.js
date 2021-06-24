@@ -22,7 +22,6 @@ uniform float opacity;
 #include <cube_uv_reflection_fragment>
 #include <fog_pars_fragment>
 #include <specularmap_pars_fragment>
-#include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
 void main() {
@@ -31,7 +30,6 @@ void main() {
 
 	vec4 diffuseColor = vec4( diffuse, opacity );
 
-	#include <logdepthbuf_fragment>
 	#include <map_fragment>
 	#include <color_fragment>
 	#include <alphamap_fragment>
@@ -42,7 +40,7 @@ void main() {
 
 	// accumulation (baked indirect lighting only)
 	#ifdef USE_LIGHTMAP
-	
+
 		vec4 lightMapTexel= texture2D( lightMap, vUv2 );
 		reflectedLight.indirectDiffuse += lightMapTexelToLinear( lightMapTexel ).rgb * lightMapIntensity;
 
