@@ -58,7 +58,6 @@ import { BufferGeometryLoader } from './BufferGeometryLoader.js';
 import { Loader } from './Loader.js';
 import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
-import * as Curves from '../extras/curves/Curves.js';
 import { getTypedArray } from '../utils.js';
 
 class ObjectLoader extends Loader {
@@ -260,7 +259,6 @@ class ObjectLoader extends Loader {
 	parseGeometries( json, shapes ) {
 
 		const geometries = {};
-		let geometryShapes;
 
 		if ( json !== undefined ) {
 
@@ -272,55 +270,6 @@ class ObjectLoader extends Loader {
 				const data = json[ i ];
 
 				switch ( data.type ) {
-
-					case 'ShapeGeometry':
-					case 'ShapeBufferGeometry':
-
-						geometryShapes = [];
-
-						for ( let j = 0, jl = data.shapes.length; j < jl; j ++ ) {
-
-							const shape = shapes[ data.shapes[ j ] ];
-
-							geometryShapes.push( shape );
-
-						}
-
-						geometry = new Geometries[ data.type ](
-							geometryShapes,
-							data.curveSegments
-						);
-
-						break;
-
-
-					case 'ExtrudeGeometry':
-					case 'ExtrudeBufferGeometry':
-
-						geometryShapes = [];
-
-						for ( let j = 0, jl = data.shapes.length; j < jl; j ++ ) {
-
-							const shape = shapes[ data.shapes[ j ] ];
-
-							geometryShapes.push( shape );
-
-						}
-
-						const extrudePath = data.options.extrudePath;
-
-						if ( extrudePath !== undefined ) {
-
-							data.options.extrudePath = new Curves[ extrudePath.type ]().fromJSON( extrudePath );
-
-						}
-
-						geometry = new Geometries[ data.type ](
-							geometryShapes,
-							data.options
-						);
-
-						break;
 
 					case 'BufferGeometry':
 					case 'InstancedBufferGeometry':
@@ -339,7 +288,7 @@ class ObjectLoader extends Loader {
 
 						if ( data.type in Geometries ) {
 
-							geometry = Geometries[ data.type ].fromJSON( data );
+							geometry = Geometries[ data.type ].fromJSON( data, shapes );
 
 						} else {
 
