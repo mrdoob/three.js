@@ -2,7 +2,7 @@ import { CanvasTexture } from '../../../build/three.module.js';
 
 class HTMLTexture extends CanvasTexture {
 
-	constructor( html, css, width, height, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+	constructor( html, width, height, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
 		const canvas = document.createElement( 'canvas' );
 
@@ -23,8 +23,6 @@ class HTMLTexture extends CanvasTexture {
 		this.onFinishRedraw = null;
 
 
-		this._css = css;
-
 		this._cache = {};
 
 
@@ -33,17 +31,15 @@ class HTMLTexture extends CanvasTexture {
 		this._pointerId = 0;
 
 
-		this.redrawAsync( html, css, width, height );
+		this.redrawAsync( html, width, height );
 
 	}
 
-	async redrawAsync( html, css, width, height ) {
+	redrawAsync( html, width, height ) {
 
 		const scope = this;
 
 		const sroot = scope.document;
-
-		let rootStyle = null;
 
 
 		if ( html ) {
@@ -57,37 +53,49 @@ class HTMLTexture extends CanvasTexture {
 
 			const scripts = Array.from( sroot.querySelectorAll( 'script' ) );
 
-			scripts.map( script => { script.parentNode.removeChild( script ); sroot.appendChild( document.createElement( 'script' ) ).textContent = script.textContent; } );
+			scripts.map( script => {
 
-		}
+				const { parentNode } = script;
 
+				const newScript = document.createElement( 'script' );
+				newScript.textContent = script.textContent;
 
-		if ( ! css ) css = scope._css;
+				parentNode.insertBefore( newScript, script );
 
-		else {
+				parentNode.removeChild( script );
 
-			scope._css = css;
-
-			sroot.appendChild( rootStyle = document.createElement( 'style' ) ).textContent = css;
+			} );
 
 		}
 
 
 		return new Promise( async resolve => {
 
-			//enable in-line css
+			//enable css
 
-			const styles = Array.from( sroot.querySelectorAll( 'style' ) );
+			const importedSheets = new Set();
 
-			css += '\n' + styles.map( style => ( style === rootStyle ) ? '' : style.textContent ).join( '\n' );
+			const C = ( r, t ) => {
 
+				if ( typeof r === 'string' ) return ( /:hover/gmi ).test( r ) ? `${ r.replace( /:hover/gmi, '.vr-hover' ) } { ${ t } }` : '';
 
+				if ( r instanceof CSSImportRule ) return importedSheets.has( r.href ) ? '' : ( importedSheets.add( r.href ), C( r.styleSheet ) );
 
-			//use fetch to enable linked css? seems out-of-scope. maybe add css loader
+				if ( r instanceof CSSMediaRule ) return r.cssRules ? `@media ${r.media.mediaText} { ${ C( r.cssRules ) } }` : '';
 
-			//const links = Array.from( sroot.querySelectorAll( "link[rel=stylesheet]" ) );
+				if ( r instanceof CSSSupportsRule ) return r.cssRules ? `@supports ${r.conditionText} { ${ C( r.cssRules ) } }` : '';
 
-			//await Promise.all( links.map( link => css += '\n' + await ( await fetch( link.href ) ).text() ) );
+				if ( r instanceof CSSRule ) return r.cssText + '\n' + C( r.selectorText, r.style.cssText );
+
+				if ( r instanceof CSSRuleList ) return Array.from( r ).map( C ).join( '\n' );
+
+				if ( r instanceof CSSStyleSheet ) return C( r.cssRules );
+
+				if ( r instanceof Document ) return Array.from( r.styleSheets ).map( C ).join( '\n' );
+
+			};
+
+			const css = C( sroot );
 
 
 
@@ -145,6 +153,26 @@ class HTMLTexture extends CanvasTexture {
 			}
 
 
+			//simulate hover
+
+			const undoAddClasses = [];
+
+			Array.from( sroot.querySelectorAll( '*' ) ).forEach(
+
+				e => {
+
+					if ( ( ! e?.classList?.contains( 'vr-hover' ) ) && e?._isVRHovering ) {
+
+						e.classList.add( 'vr-hover' );
+
+						undoAddClasses.push( e );
+
+					}
+
+				}
+
+			);
+
 
 			const canvas = scope.image;
 
@@ -167,6 +195,8 @@ class HTMLTexture extends CanvasTexture {
 			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><style>${css}</style><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
 
 
+			for ( const e of undoAddClasses ) e.classList.remove( 'vr-hover' );
+
 
 			const image = new Image();
 
@@ -178,7 +208,7 @@ class HTMLTexture extends CanvasTexture {
 
 				resolve();
 
-				if ( scope.onFinishRedraw ) scope.onFinishRedraw();
+				if ( scope.onFinishRedraw ) setTimeout( scope.onFinishRedraw, 1 );
 
 			};
 
@@ -245,6 +275,8 @@ class HTMLTexture extends CanvasTexture {
 
 				dispatch( 'out', pointer.target, target );
 
+				pointer.target._isVRHovering = false;
+
 				if ( ! pointer.target.contains( target ) ) dispatch( 'leave', pointer.target, target, false );
 
 			}
@@ -252,6 +284,8 @@ class HTMLTexture extends CanvasTexture {
 			if ( target ) {
 
 				dispatch( 'over', target, pointer.target );
+
+				target._isVRHovering = true;
 
 				if ( ! target.contains( pointer.target ) ) dispatch( 'enter', target, pointer.target, false );
 
@@ -269,7 +303,16 @@ class HTMLTexture extends CanvasTexture {
 
 				dispatch( 'up', target );
 
-				if ( ! start ) dispatch( 'click', target );
+				if ( ! start ) {
+
+					//No support for :focus
+					//if ( typeof target.focus === 'function' ) target.focus();
+
+					if ( typeof target.click === 'function' ) target.click();
+
+					else dispatch( 'click', target );
+
+				}
 
 			}
 
