@@ -3,10 +3,17 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 	const isWebGL2 = capabilities.isWebGL2;
 
 	let mode;
+	let isFrameBuffer;
 
 	function setMode( value ) {
 
 		mode = value;
+
+	}
+
+	function setIsFrameBuffer( value ) {
+
+		isFrameBuffer = value;
 
 	}
 
@@ -23,7 +30,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 		gl.drawElements( mode, count, type, start * bytesPerElement );
 
-		info.update( count, mode, 1 );
+		info.update( count, mode, 1, isFrameBuffer );
 
 	}
 
@@ -53,14 +60,16 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 		}
 
 		extension[ methodName ]( mode, count, type, start * bytesPerElement, primcount );
+		console.log( 'renderinstance', start, count );
 
-		info.update( count, mode, primcount );
+		info.update( count, mode, primcount, isFrameBuffer );
 
 	}
 
 	//
 
 	this.setMode = setMode;
+	this.setIsFrameBuffer = setIsFrameBuffer;
 	this.setIndex = setIndex;
 	this.render = render;
 	this.renderInstances = renderInstances;

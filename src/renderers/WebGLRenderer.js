@@ -785,6 +785,8 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
+		renderer.setIsFrameBuffer( _currentRenderTarget !== null );
+
 		//
 
 		const dataCount = ( index !== null ) ? index.count : position.count;
@@ -1032,7 +1034,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		//
 
-		if ( this.info.autoReset === true ) this.info.reset();
+		if ( this.info.autoReset === true ) this.info.reset( _currentRenderTarget === null );
 
 		//
 

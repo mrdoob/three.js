@@ -3,6 +3,7 @@ function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 	const isWebGL2 = capabilities.isWebGL2;
 
 	let mode;
+	let isFrameBuffer;
 
 	function setMode( value ) {
 
@@ -10,11 +11,17 @@ function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
 	}
 
+	function setIsFrameBuffer( value ) {
+
+		isFrameBuffer = value;
+
+	}
+
 	function render( start, count ) {
 
 		gl.drawArrays( mode, start, count );
 
-		info.update( count, mode, 1 );
+		info.update( count, mode, 1, isFrameBuffer );
 
 	}
 
@@ -45,13 +52,14 @@ function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
 		extension[ methodName ]( mode, start, count, primcount );
 
-		info.update( count, mode, primcount );
+		info.update( count, mode, primcount, isFrameBuffer );
 
 	}
 
 	//
 
 	this.setMode = setMode;
+	this.setIsFrameBuffer = setIsFrameBuffer;
 	this.render = render;
 	this.renderInstances = renderInstances;
 
