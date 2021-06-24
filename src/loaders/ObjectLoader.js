@@ -354,15 +354,13 @@ class ObjectLoader extends Loader {
 
 						if ( data.type in Geometries ) {
 
-							geometry = new Geometries[ data.type ].fromJSON( data );
+							geometry = Geometries[ data.type ].fromJSON( data );
 
 						} else {
 
 							console.warn( `THREE.ObjectLoader: Unsupported geometry type "${ data.type }"` );
 
 						}
-
-						continue;
 
 				}
 
