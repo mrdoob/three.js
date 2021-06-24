@@ -121,6 +121,8 @@
 
 				const vertex = vertices[ i ].position;
 				position.push( vertex.x, vertex.y, vertex.z );
+				// cache final index to GREATLY speed up faces reconstruction
+				vertices[ i ].index = i;
 
 			} //
 
@@ -128,10 +130,7 @@
 			for ( let i = 0; i < faces.length; i ++ ) {
 
 				const face = faces[ i ];
-				const a = vertices.indexOf( face.v1 );
-				const b = vertices.indexOf( face.v2 );
-				const c = vertices.indexOf( face.v3 );
-				index.push( a, b, c );
+				index.push( face.v1.index, face.v2.index, face.v3.index );
 
 			} //
 
